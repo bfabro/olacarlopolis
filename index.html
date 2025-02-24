@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
  
-
+    <!-- > Css Menu lateral -->
     <style>
         /* Estilo do menu lateral aprimorado */
         #menu-lateral {
@@ -29,24 +29,8 @@
             transition: all 0.3s ease;
         }
 
-
-
-
-
-        /* Botão para abrir/fechar o menu */
-        #menu-toggle {
-            position: absolute;
-            top: 15px;
-            right: 10px;
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: white;
-            cursor: pointer;
-        }
-
-        /* Estilo dos itens do menu */
-        #menu-lateral a {
+         /* Estilo dos itens do menu */
+         #menu-lateral a {
             display: flex;
             align-items: center;
             padding: 10px;
@@ -66,8 +50,6 @@
             transition: transform 0.2s ease;
         }
 
-
-
         #menu-lateral a:hover {
             background-color: #022b83;
         }
@@ -76,6 +58,19 @@
         /* Animação dos ícones */
         #menu-lateral a:hover i {
             transform: scale(1.1);
+        }
+
+
+        /* Botão para abrir/fechar o menu */
+        #menu-toggle {
+            position: absolute;
+            top: 15px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
         }
 
         /* Submenus animados */
@@ -95,20 +90,15 @@
     </style>
 
 
-
-
-
-
-    <style>
-        html,
+    <style>        
         body {
-            overflow-x: hidden;
+           /* overflow-x: hidden;*/
             /* Impede rolagem horizontal */
         }
 
 
         .banner-container {
-            width: 100%;
+            width: 96%;
             white-space: nowrap;
             /* Mantém os anúncios em linha */
             overflow: hidden;
@@ -126,7 +116,7 @@
             background-color: white;
             color: #333;
             
-            width: 100%;
+            width: 150vh;
         }
 
         #mapa {
@@ -146,7 +136,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
+            width: 150vh
             z-index: 10;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
         }
@@ -246,9 +236,10 @@
             color: white;
             text-align: center;
             padding: 2px;
-            position: relative;
+            position: fixed;
             bottom: 0;
-            width: 100%;
+            
+            width: 99%;
         }
 
         #bem_vindo {
@@ -328,7 +319,7 @@
 <style>
     /* Estilos principais */
     .carousel-container {
-      width: 100%;
+      width: 148vh;
       background-color: #0036cc;
       color: white;
       padding: 16px;
@@ -342,7 +333,7 @@
     }
 
     .carousel-slide {
-      min-width: 100%;
+      min-width: 148vh;
       text-align: center;
       font-size: 1.5rem;
       font-weight: 600;
