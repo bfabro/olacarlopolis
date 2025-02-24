@@ -121,11 +121,11 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
+           /* display: flex; flex-direction: column;*/
             min-height: 100vh;
             background-color: white;
             color: #333;
-            flex-direction: column;
+            
             width: 100%;
         }
 
@@ -529,7 +529,7 @@
 
         <!-- Campo de pesquisa como o primeiro item -->
         <div class="search-container">
-            <input type="text" text-align: center; id="searchBox" onkeyup="search()" placeholder="Pesquise Aqui">
+            <input type="text" text-align: center; id="searchBox" onkeyup="search()" placeholder="Pesquise Aqui...">
         </div>
 
         <a href="javascript:void(0)" onclick="showContent('Comercios'); toggleSubmenu(event)"><i
