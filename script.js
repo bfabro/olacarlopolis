@@ -51,9 +51,12 @@ if (window.innerWidth < 768) {
 } else {
   sidebar.classList.remove("close");
 }
+
+
 document.addEventListener("DOMContentLoaded", function () {
   // Captura o link do Supermercado
   const supermercadoLink = document.querySelector(".nav_link.sublink:nth-child(4)"); 
+  const farmaciaLink = document.querySelector(".nav_link.sublink:nth-child(1)"); 
   const contentArea = document.querySelector(".content_area");
 
   // Adiciona evento de clique
@@ -68,6 +71,25 @@ document.addEventListener("DOMContentLoaded", function () {
         <li>🛒 Supermercado Rocha</li>
         <li>🛒 Supermercado Carreiro</li>
         <li>🛒 Mercado do Barateiro</li>
+      </ul>
+    `;
+  });
+
+
+
+
+   // Adiciona evento de clique
+   farmaciaLink.addEventListener("click", function (event) {
+    event.preventDefault(); // Evita que a página recarregue
+
+    // Define o conteúdo dinâmico
+    contentArea.innerHTML = `
+      <h2>Farmacias em Carlópolis</h2>
+      </br>
+      <ul>
+        <li>🛒 Aguera</li>
+        <li>🛒 Jorginho</li>
+        <li>🛒 Joao</li>
       </ul>
     `;
   });
