@@ -264,7 +264,7 @@ body.dark {
 .content_area {
   
   padding: 20px;
-  width: calc(100% - 450px);
+  width: calc(100% - 0px);
   min-height: 100vh;
   background: #f4f4f4;
   margin: 88px 0px 0px 270px;
