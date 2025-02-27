@@ -51,3 +51,24 @@ if (window.innerWidth < 768) {
 } else {
   sidebar.classList.remove("close");
 }
+document.addEventListener("DOMContentLoaded", function () {
+  // Captura o link do Supermercado
+  const supermercadoLink = document.querySelector(".nav_link.sublink:nth-child(4)"); 
+  const contentArea = document.querySelector(".content_area");
+
+  // Adiciona evento de clique
+  supermercadoLink.addEventListener("click", function (event) {
+    event.preventDefault(); // Evita que a página recarregue
+
+    // Define o conteúdo dinâmico
+    contentArea.innerHTML = `
+      <h2>Supermercados em Carlópolis</h2>
+      <p>Aqui estão alguns supermercados disponíveis na região:</p>
+      <ul>
+        <li>🛒 Supermercado Central</li>
+        <li>🛒 Supermercado Econômico</li>
+        <li>🛒 Mercado do Bairro</li>
+      </ul>
+    `;
+  });
+});

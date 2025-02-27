@@ -259,3 +259,13 @@ body.dark {
     left: -100%;
   }
 }
+
+
+.content_area {
+  margin-left: 250px; /* Espaço para não ficar sobre a sidebar */
+  padding: 20px;
+  width: calc(100% - 250px);
+  min-height: 100vh;
+  background: #f4f4f4;
+  margin: 88px 0px 0px 270px;
+}
