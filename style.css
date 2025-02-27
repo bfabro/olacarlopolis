@@ -89,7 +89,7 @@ body.dark {
   top: 0;
   left: 0;
   height: 100%;
-  padding: 80px 20px;
+  padding: 80px 5px;
   z-index: 100;
   overflow-y: scroll;
   box-shadow: 0 0 1px var(--grey-color-light);
@@ -121,7 +121,7 @@ body.dark {
   content: "Menu de Navegação";
 }
 .menu_editor::before {
-  content: "Editor";
+  content: "Informações Uteis";
 }
 .menu_setting::before {
   content: "Contato";
