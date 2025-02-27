@@ -81,6 +81,48 @@ body.dark {
   color: var(--grey-color);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* INICIO TESTE */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: #333;
+  color: white;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+
+
+
+
+/* INICIO TESTE */
+
+
+
+
+
+
+
+
+
+
+
 /* sidebar */
 .sidebar {
   background-color: var(--white-color);
@@ -264,8 +306,8 @@ body.dark {
 .content_area {
   
   padding: 20px;
-  width: calc(100% - 0px);
-  min-height: 100vh;
+  width: calc(82% - 0px);
+  min-height: 90vh;
   background: #f4f4f4;
   margin: 88px 0px 0px 270px;
 }
