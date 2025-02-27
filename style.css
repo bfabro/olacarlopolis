@@ -81,48 +81,6 @@ body.dark {
   color: var(--grey-color);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* INICIO TESTE */
-.sidebar {
-  width: 250px;
-  height: 100vh;
-  background: #333;
-  color: white;
-  overflow: hidden;
-  transition: width 0.3s ease;
-  position: fixed;
-  left: 0;
-  top: 0;
-}
-
-
-
-
-
-/* INICIO TESTE */
-
-
-
-
-
-
-
-
-
-
-
 /* sidebar */
 .sidebar {
   background-color: var(--white-color);
