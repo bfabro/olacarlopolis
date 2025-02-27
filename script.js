@@ -63,11 +63,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // Define o conteúdo dinâmico
     contentArea.innerHTML = `
       <h2>Supermercados em Carlópolis</h2>
-      <p>Aqui estão alguns supermercados disponíveis na região:</p>
+      </br>
       <ul>
-        <li>🛒 Supermercado Central</li>
-        <li>🛒 Supermercado Econômico</li>
-        <li>🛒 Mercado do Bairro</li>
+        <li>🛒 Supermercado Rocha</li>
+        <li>🛒 Supermercado Carreiro</li>
+        <li>🛒 Mercado do Barateiro</li>
       </ul>
     `;
   });
