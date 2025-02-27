@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<!-- Coding by CodingNepal || www.codingnepalweb.com -->
+
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Boxicons CSS -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-    <title>Side Navigation Bar in HTML CSS JavaScript</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>Bem vindo ao OLA CARLOPOLIS !!!</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -14,18 +17,18 @@
     <nav class="navbar">
       <div class="logo_item">
         <i class="bx bx-menu" id="sidebarOpen"></i>
-        <img src="images/logo.png" alt=""></i>CodingNepal
+        <img src="images/logo.png" alt=""></i>Ola Carlopolis
       </div>
 
       <div class="search_bar">
-        <input type="text" placeholder="Search" />
+        <input type="text" placeholder="Pesquisar..." />
       </div>
 
       <div class="navbar_content">
         <i class="bi bi-grid"></i>
         <i class='bx bx-sun' id="darkLight"></i>
-        <i class='bx bx-bell' ></i>
-        <img src="images/profile.jpg" alt="" class="profile" />
+       <!-- <i class='bx bx-bell' ></i>-->
+        
       </div>
     </nav>
 
@@ -41,15 +44,16 @@
               <span class="navlink_icon">
                 <i class="bx bx-home-alt"></i>
               </span>
-              <span class="navlink">Home</span>
+              <span class="navlink">Comercios</span>
               <i class="bx bx-chevron-right arrow-left"></i>
             </div>
 
             <ul class="menu_items submenu">
-              <a href="#" class="nav_link sublink">Nav Sub Link</a>
-              <a href="#" class="nav_link sublink">Nav Sub Link</a>
-              <a href="#" class="nav_link sublink">Nav Sub Link</a>
-              <a href="#" class="nav_link sublink">Nav Sub Link</a>
+              <a href="#" class="nav_link sublink">Farmacias</a>
+              <a href="#" class="nav_link sublink">Lanchonetes</a>              
+              <a href="#" class="nav_link sublink">Restaurantes</a>
+              <a href="#" class="nav_link sublink"><i class="fas fa-shopping-cart icon"></i>  Super Mercado</a>
+              
             </ul>
           </li>
           <!-- end -->
@@ -61,15 +65,15 @@
               <span class="navlink_icon">
                 <i class="bx bx-grid-alt"></i>
               </span>
-              <span class="navlink">Overview</span>
+              <span class="navlink">aqui 2</span>
               <i class="bx bx-chevron-right arrow-left"></i>
             </div>
 
             <ul class="menu_items submenu">
-              <a href="#" class="nav_link sublink">Nav Sub Link</a>
-              <a href="#" class="nav_link sublink">Nav Sub Link</a>
-              <a href="#" class="nav_link sublink">Nav Sub Link</a>
-              <a href="#" class="nav_link sublink">Nav Sub Link</a>
+              <a href="#" class="nav_link sublink">aaa</a>
+              <a href="#" class="nav_link sublink">bbb</a>
+              <a href="#" class="nav_link sublink">ccc</a>
+              <a href="#" class="nav_link sublink">ddd</a>
             </ul>
           </li>
           <!-- end -->
@@ -84,7 +88,7 @@
               <span class="navlink_icon">
                 <i class="bx bxs-magic-wand"></i>
               </span>
-              <span class="navlink">Magic build</span>
+              <span class="navlink">MAGICA</span>
             </a>
           </li>
           <!-- End -->
@@ -94,7 +98,7 @@
               <span class="navlink_icon">
                 <i class="bx bx-loader-circle"></i>
               </span>
-              <span class="navlink">Filters</span>
+              <span class="navlink">FILTROS</span>
             </a>
           </li>
           <li class="item">
@@ -102,7 +106,7 @@
               <span class="navlink_icon">
                 <i class="bx bx-filter"></i>
               </span>
-              <span class="navlink">Filter</span>
+              <span class="navlink">FILTROS 2</span>
             </a>
           </li>
           <li class="item">
@@ -110,7 +114,7 @@
               <span class="navlink_icon">
                 <i class="bx bx-cloud-upload"></i>
               </span>
-              <span class="navlink">Upload new</span>
+              <span class="navlink">NOVOOO</span>
             </a>
           </li>
         </ul>
@@ -121,7 +125,7 @@
               <span class="navlink_icon">
                 <i class="bx bx-flag"></i>
               </span>
-              <span class="navlink">Notice board</span>
+              <span class="navlink">NOTICIAS</span>
             </a>
           </li>
           <li class="item">
@@ -129,7 +133,7 @@
               <span class="navlink_icon">
                 <i class="bx bx-medal"></i>
               </span>
-              <span class="navlink">Award</span>
+              <span class="navlink">SEILAA</span>
             </a>
           </li>
           <li class="item">
@@ -137,7 +141,7 @@
               <span class="navlink_icon">
                 <i class="bx bx-cog"></i>
               </span>
-              <span class="navlink">Setting</span>
+              <span class="navlink">SETINGA</span>
             </a>
           </li>
           <li class="item">
@@ -145,7 +149,7 @@
               <span class="navlink_icon">
                 <i class="bx bx-layer"></i>
               </span>
-              <span class="navlink">Features</span>
+              <span class="navlink">IAAKK</span>
             </a>
           </li>
         </ul>
@@ -157,7 +161,7 @@
             <i class='bx bx-log-in' ></i>
           </div>
           <div class="bottom collapse_sidebar">
-            <span> Collapse</span>
+            <span>  </span>
             <i class='bx bx-log-out'></i>
           </div>
         </div>
