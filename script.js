@@ -32,6 +32,7 @@ expandFarmacia.addEventListener("click", () => {
 
 
 sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
+
 sidebarExpand.addEventListener("click", () => {
   sidebar.classList.remove("close", "hoverable");
 });
