@@ -275,9 +275,9 @@ body.dark {
  
   padding: 20px;
   width: calc(82% - 0px);  
-  min-height: 84vh;
+  min-height: 91vh;
   background: #f4f4f4;
-  margin: 88px 0px 0px 270px;
+  margin: 80px 0px 0px 270px;
   transition: margin-left 0.3s ease;
   margin-left: 85px; /* Padrão quando o menu está aberto */
 
