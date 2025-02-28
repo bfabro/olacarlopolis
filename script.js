@@ -5,6 +5,9 @@ const submenuItems = document.querySelectorAll(".submenu_item");
 const sidebarOpen = document.querySelector("#sidebarOpen");
 const sidebarClose = document.querySelector(".collapse_sidebar");
 const sidebarExpand = document.querySelector(".expand_sidebar");
+
+const expandMercado = document.querySelector("#mmm");
+
 sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
 
 sidebarClose.addEventListener("click", () => {
@@ -13,6 +16,12 @@ sidebarClose.addEventListener("click", () => {
 sidebarExpand.addEventListener("click", () => {
   sidebar.classList.remove("close", "hoverable");
 });
+
+expandMercado.addEventListener("click", () => sidebar.classList.toggle("close"));
+expandMercado.addEventListener("click", () => {
+  sidebar.classList.add("close", "hoverable");
+});
+
 
 sidebar.addEventListener("mouseenter", () => {
   if (sidebar.classList.contains("hoverable")) {
@@ -55,8 +64,9 @@ if (window.innerWidth < 768) {
 
 document.addEventListener("DOMContentLoaded", function () {
   // Captura o link do Supermercado
-  const supermercadoLink = document.querySelector(".nav_link.sublink:nth-child(4)"); 
   const farmaciaLink = document.querySelector(".nav_link.sublink:nth-child(1)"); 
+  const supermercadoLink = document.querySelector(".nav_link.sublink:nth-child(4)"); 
+  
   const contentArea = document.querySelector(".content_area");
 
   // Adiciona evento de clique
@@ -125,9 +135,15 @@ document.addEventListener("DOMContentLoaded", function () {
   
     // Evento para abrir/fechar o menu
     menuButton.addEventListener("click", function () {
-      sidebar.classList.toggle("collapsed");
+     sidebar.classList.toggle("collapsed");
+     
     });
   });
+
+
+  
+
+
   
  
 });

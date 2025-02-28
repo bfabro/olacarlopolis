@@ -95,9 +95,13 @@ body.dark {
   overflow: hidden;
   box-shadow: 0 0 1px var(--grey-color-light);
   transition: all 0.5s ease;
+
+  transition: transform 0.3s ease-in-out;
 }
+
+
 .sidebar.close {
-  padding: 60px 0;
+  padding: 80px 0;
   width: 80px;
 }
 .sidebar::-webkit-scrollbar {
@@ -119,7 +123,7 @@ body.dark {
   white-space: nowrap;
 }
 .menu_dahsboard::before {
-  content: "Menu de Navegação";
+  content: "Menu";
 }
 .menu_editor::before {
   content: "Informações Uteis";
@@ -261,19 +265,24 @@ body.dark {
   }
 }
 
-
 .content_area {
-  flex: 1;
+ 
   padding: 20px;
-  width: calc(82% - 0px);
-  width: calc(100% - 250px);
+  width: calc(82% - 0px);  
   min-height: 90vh;
   background: #f4f4f4;
   margin: 88px 0px 0px 270px;
   transition: margin-left 0.3s ease;
+  margin-left: 85px; /* Padrão quando o menu está aberto */
+
 }
 
 .sidebar.closed + .content {
   margin-left: 60px;
-  width: calc(100% - 60px);
+  width: calc(100% - 560px);
+}
+
+/* Quando um item do menu é selecionado */
+.content_active {
+  margin-left: 0; /* Move o conteúdo para a esquerda */
 }
