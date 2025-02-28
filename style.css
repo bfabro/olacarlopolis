@@ -255,13 +255,15 @@ body.dark {
     color: var(--grey-color);
   }
   .sidebar.close {
-    left: -100%;
+    /*left: -100%;*/
+    left: 0%;
   }
   .search_bar {
     display: none;
   }
   .sidebar.close .bottom_content {
-    left: -100%;
+    left: 0%;
+    /*left: -100%;*/
   }
 }
 
