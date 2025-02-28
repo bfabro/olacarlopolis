@@ -255,8 +255,10 @@ body.dark {
     color: var(--grey-color);
   }
   .sidebar.close {
-    /*left: -100%;*/
-    left: 0%;
+    /*left: -100%;
+    left: 0%;*/
+    width: 50px;
+    left: 15px;
   }
   .search_bar {
     display: none;
