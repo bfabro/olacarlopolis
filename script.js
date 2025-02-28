@@ -20,11 +20,11 @@ sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
 sidebarExpand.addEventListener("click", () => {
   sidebar.classList.remove("close", "hoverable");
 });
-sidebarClose.addEventListener("click", () => {
+
+
+////sidebarClose.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
-});
-
-
+//});
 
 
 
