@@ -256,13 +256,13 @@ body.dark {
   }
   .sidebar.close {
     /*left: -100%;*/
-    left: 0%;
+    left: 50%;
   }
   .search_bar {
-    display: none;
+    display: block;
   }
   .sidebar.close .bottom_content {
-    left: 0%;
+    left: 50%;
     /*left: -100%;*/
   }
 }
