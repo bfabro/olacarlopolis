@@ -259,10 +259,10 @@ body.dark {
     left: 0%;
   }
   .search_bar {
-    display: block;
+    display: none;
   }
   .sidebar.close .bottom_content {
-    left: 0%;
+    left: 50%;
     /*left: -100%;*/
   }
 }
