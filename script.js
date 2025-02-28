@@ -7,7 +7,9 @@ const sidebarOpen = document.querySelector("#sidebarOpen");
 const sidebarClose = document.querySelector(".collapse_sidebar");
 const sidebarExpand = document.querySelector(".expand_sidebar");
 const expandMercado = document.querySelector("#menuMercado");
-const expandFarmacia= document.querySelector("#menuFarmacia");
+const expandFarmacia = document.querySelector("#menuFarmacia");
+
+
 expandMercado.addEventListener("click", () => sidebar.classList.toggle("close"));
 expandMercado.addEventListener("click", () => {
   sidebar.classList.remove("close", "hoverable");
@@ -15,7 +17,6 @@ expandMercado.addEventListener("click", () => {
 expandMercado.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
 });
-
 
 
 expandFarmacia.addEventListener("click", () => sidebar.classList.toggle("close"));
@@ -31,25 +32,15 @@ expandFarmacia.addEventListener("click", () => {
 
 
 
-
-
-
-
-
-
-
-
-
-
 sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
 sidebarExpand.addEventListener("click", () => {
   sidebar.classList.remove("close", "hoverable");
 });
 
 
-////sidebarClose.addEventListener("click", () => {
+sidebarClose.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
-//});
+});
 
 
 

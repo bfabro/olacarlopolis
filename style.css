@@ -275,7 +275,7 @@ body.dark {
  
   padding: 20px;
   width: calc(82% - 0px);  
-  min-height: 91vh;
+  min-height: 90vh;
   background: #f4f4f4;
   margin: 80px 0px 0px 270px;
   transition: margin-left 0.3s ease;
