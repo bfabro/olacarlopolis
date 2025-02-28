@@ -255,20 +255,19 @@ body.dark {
     color: var(--grey-color);
   }
   .sidebar.close {
-    /*left: -100%;
-    left: 0%;*/
-    width: 50px;
-    left: 15px;
+    /*left: -100%;*/
+    left: 0%;
+  
   }
   .search_bar {
     display: none;
   }
   .sidebar.close .bottom_content {
    /* left: 50%;
-    left: -100%;*/
+    left: -100%;left: 15px;*/
 
     width: 50px;
-    left: 15px;
+    
   }
 }
 
