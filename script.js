@@ -94,5 +94,40 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
   });
 
+
+
+
+
+
+
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Seleciona os elementos
+    const sidebar = document.querySelector(".sidebar");
+    const menuButton = document.getElementById("sidebarOpen");
+    const submenuLinks = document.querySelectorAll(".submenu .sublink");
+    const contentArea = document.querySelector(".content_area");
+  
+    // Evento para cada link do submenu
+    submenuLinks.forEach(link => {
+      link.addEventListener("click", function (event) {
+        event.preventDefault(); // Evita recarregar a página
+  
+        // Oculta a sidebar
+        sidebar.classList.add("collapsed");
+  
+        // Define o conteúdo baseado no item clicado
+        let contentHTML = `<h2>${this.textContent}</h2><p>Conteúdo sobre ${this.textContent}...</p>`;
+        contentArea.innerHTML = contentHTML;
+      });
+    });
+  
+    // Evento para abrir/fechar o menu
+    menuButton.addEventListener("click", function () {
+      sidebar.classList.toggle("collapsed");
+    });
+  });
+  
  
 });
