@@ -18,7 +18,7 @@ expandMercado.addEventListener("click", () => {
 expandMercado.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
 });
-
+*/
 
 expandFarmacia.addEventListener("click", () => sidebar.classList.toggle("close"));
 expandFarmacia.addEventListener("click", () => {
@@ -28,7 +28,7 @@ expandFarmacia.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
 });
 
-*/
+
 
 sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
 
