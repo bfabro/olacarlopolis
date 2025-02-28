@@ -14,6 +14,7 @@ expandMercado.addEventListener("click", () => sidebar.classList.toggle("close"))
 expandMercado.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
 });
+
 expandMercado.addEventListener("click", () => {
   sidebar.classList.remove("close", "hoverable");
 });
@@ -22,10 +23,11 @@ expandMercado.addEventListener("click", () => {
 
 expandFarmacia.addEventListener("click", () => sidebar.classList.toggle("close"));
 expandFarmacia.addEventListener("click", () => {
-  sidebar.classList.remove("close", "hoverable");
-});
-expandFarmacia.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
+});
+
+expandFarmacia.addEventListener("click", () => {
+  sidebar.classList.remove("close", "hoverable");
 });
 
 
