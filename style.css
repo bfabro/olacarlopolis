@@ -262,8 +262,11 @@ body.dark {
     display: none;
   }
   .sidebar.close .bottom_content {
-    left: 50%;
-    /*left: -100%;*/
+   /* left: 50%;
+    left: -100%;*/
+
+    width: 50px;
+    left: 15px;
   }
 }
 
