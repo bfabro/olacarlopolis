@@ -2,11 +2,11 @@ const body = document.querySelector("body");
 const darkLight = document.querySelector("#darkLight");
 const sidebar = document.querySelector(".sidebar");
 const submenuItems = document.querySelectorAll(".submenu_item");
+
 const sidebarOpen = document.querySelector("#sidebarOpen");
 const sidebarClose = document.querySelector(".collapse_sidebar");
 const sidebarExpand = document.querySelector(".expand_sidebar");
 
-const expandMercado = document.querySelector("#mmm");
 
 sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
 
@@ -17,10 +17,7 @@ sidebarExpand.addEventListener("click", () => {
   sidebar.classList.remove("close", "hoverable");
 });
 
-expandMercado.addEventListener("click", () => sidebar.classList.toggle("close"));
-expandMercado.addEventListener("click", () => {
-  sidebar.classList.add("close", "hoverable");
-});
+
 
 
 
