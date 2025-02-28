@@ -21,9 +21,7 @@ expandMercado.addEventListener("click", () => sidebar.classList.toggle("close"))
 expandMercado.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
 });
-expandMercado.addEventListener("click", () => {
-  sidebar.classList.remove("close", "hoverable");
-});
+
 
 
 sidebar.addEventListener("mouseenter", () => {
