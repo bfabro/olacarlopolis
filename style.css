@@ -208,7 +208,7 @@ body.dark {
 }
 .bottom_content {
   position: fixed;
-  bottom: 60px;
+  bottom: 100px;
   left: 0;
   width: 260px;
   cursor: pointer;
