@@ -223,9 +223,9 @@ body.dark {
   padding: 18px 0;
   text-align: center;
   width: 100%;
-  color: var(--grey-color);
+  /*color: var(--grey-color);
   border-top: 1px solid var(--grey-color-light);
-  background-color: var(--white-color);
+  background-color: var(--white-color);*/
 }
 .bottom i {
   font-size: 20px;
