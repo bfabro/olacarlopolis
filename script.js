@@ -6,7 +6,11 @@ const submenuItems = document.querySelectorAll(".submenu_item");
 const sidebarOpen = document.querySelector("#sidebarOpen");
 const sidebarClose = document.querySelector(".collapse_sidebar");
 const sidebarExpand = document.querySelector(".expand_sidebar");
-
+const expandMercado = document.querySelector("#mmm");
+expandMercado.addEventListener("click", () => sidebar.classList.toggle("close"));
+expandMercado.addEventListener("click", () => {
+  sidebar.classList.add("close", "hoverable");
+});
 
 sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
 

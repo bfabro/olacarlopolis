@@ -276,13 +276,13 @@ body.dark {
   margin-left: 85px; /* Padrão quando o menu está aberto */
 
 }
-
+/*
 .sidebar.closed + .content {
   margin-left: 60px;
   width: calc(100% - 560px);
 }
 
-/* Quando um item do menu é selecionado */
+ Quando um item do menu é selecionado */
 .content_active {
   margin-left: 0; /* Move o conteúdo para a esquerda */
 }
