@@ -9,7 +9,7 @@ const sidebarExpand = document.querySelector(".expand_sidebar");
 const expandMercado = document.querySelector("#menuMercado");
 const expandFarmacia = document.querySelector("#menuFarmacia");
 
-
+/*
 expandMercado.addEventListener("click", () => sidebar.classList.toggle("close"));
 
 expandMercado.addEventListener("click", () => {
@@ -28,8 +28,7 @@ expandFarmacia.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
 });
 
-
-
+*/
 
 sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
 
@@ -83,7 +82,6 @@ if (window.innerWidth < 768) {
   sidebar.classList.remove("close");
 }
 
-
 document.addEventListener("DOMContentLoaded", function () {
   // Captura o link do Supermercado
   const farmaciaLink = document.querySelector(".nav_link.sublink:nth-child(1)");
@@ -107,9 +105,6 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
   });
 
-
-
-
   // Adiciona evento de clique
   farmaciaLink.addEventListener("click", function (event) {
     event.preventDefault(); // Evita que a página recarregue
@@ -125,14 +120,6 @@ document.addEventListener("DOMContentLoaded", function () {
       </ul>
     `;
   });
-
-
-
-
-
-
-
-
 
   document.addEventListener("DOMContentLoaded", function () {
     // Seleciona os elementos
@@ -161,11 +148,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
   });
-
-
-
-
-
-
 
 });
