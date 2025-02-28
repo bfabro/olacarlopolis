@@ -259,16 +259,18 @@ body.dark {
     left: 0%;
   
   }
+
+  .sidebar.close .bottom_content {
+    /* left: 50%;
+     left: -100%;*/left: 15px;
+ 
+     width: 50px;
+     
+   }
   .search_bar {
     display: none;
   }
-  .sidebar.close .bottom_content {
-   /* left: 50%;
-    left: -100%;left: 15px;*/
-
-    width: 50px;
-    
-  }
+  
 }
 
 .content_area {
