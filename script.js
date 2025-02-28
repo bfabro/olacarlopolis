@@ -9,17 +9,21 @@ const sidebarExpand = document.querySelector(".expand_sidebar");
 const expandMercado = document.querySelector("#mmm");
 expandMercado.addEventListener("click", () => sidebar.classList.toggle("close"));
 expandMercado.addEventListener("click", () => {
+  sidebar.classList.remove("close", "hoverable");
+});
+expandMercado.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
 });
+
 
 sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
-
-sidebarClose.addEventListener("click", () => {
-  sidebar.classList.add("close", "hoverable");
-});
 sidebarExpand.addEventListener("click", () => {
   sidebar.classList.remove("close", "hoverable");
 });
+sidebarClose.addEventListener("click", () => {
+  sidebar.classList.add("close", "hoverable");
+});
+
 
 
 
