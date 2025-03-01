@@ -13,9 +13,20 @@ document.addEventListener("DOMContentLoaded", function () {
   const supermercadoLink = document.querySelector("#menuMercado");
   const comercioLink = document.querySelector("#menuComercio");
   
-
+ //////////////////////////////////////////////////////////
   // Alternar sidebar
-  
+  sidebarOpen.addEventListener("click", () => {
+      sidebar.classList.toggle("close");
+  });
+
+  sidebarExpand.addEventListener("click", () => {
+      sidebar.classList.remove("close", "hoverable");
+  });
+
+  sidebarClose.addEventListener("click", () => {
+      sidebar.classList.add("close", "hoverable");
+  });
+
   //////////////////////////////////////////////////////////
 
 
