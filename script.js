@@ -37,6 +37,18 @@ supermercadoLink.addEventListener("click", () => {
 supermercadoLink.addEventListener("click", () => {
   sidebar.classList.add("close", "hoverable");
 });
+///
+farmaciaLink.addEventListener("click", () => {
+  sidebar.classList.toggle("close");
+});
+
+farmaciaLink.addEventListener("click", () => {
+sidebar.classList.remove("close", "hoverable");
+});
+
+farmaciaLink.addEventListener("click", () => {
+sidebar.classList.add("close", "hoverable");
+});
 
   /////////////////////////////////////////////////
 
@@ -90,11 +102,6 @@ supermercadoLink.addEventListener("click", () => {
   });
 
   
-
- 
-
-
-
   // Carregar informações de farmácias
   farmaciaLink.addEventListener("click", function (event) {
       event.preventDefault();
