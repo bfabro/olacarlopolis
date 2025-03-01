@@ -275,7 +275,7 @@ body.dark {
   }
 
   .sidebar {
-    left: -100%;
+    left: 15%;
   }
 
   .sidebar.open {
