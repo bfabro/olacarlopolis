@@ -286,6 +286,11 @@ body.dark {
     width: 100%;
     margin-left: 0;
   }
+  .sidebar.close {
+    /*left: -100%;*/
+    left: 15px; 
+  
+  }
 
   .search_bar{
     display: none;
