@@ -275,18 +275,16 @@ body.dark {
 
   padding: 20px;
   width: calc(82% - 0px);  
-  min-height: 84vh;
-  min-height: 91vh;
+  min-height: 84vh;  
   background: #f4f4f4;
-  margin: 88px 0px 0px 270px;
- 
+  margin: 88px 0px 0px 276px; 
   transition: margin-left 0.3s ease;
-  margin-left: 260px; /* Padrão quando o menu está aberto */
+  margin-left: 276px; /* Padrão quando o menu está aberto */
 
 }
 
 /* Quando o menu fechar */
 .sidebar.close ~ .content_area {
   width: calc(100% - 80px);
-  margin-left: 80px;
+  margin-left: 86px;
 }
