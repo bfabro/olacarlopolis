@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   sidebarExpand.addEventListener("click", () => {
-      sidebar.classList.remove("close", "hoverable");
+      sidebar.classList.remove("open", "hoverable");
   });
 
   sidebarClose.addEventListener("click", () => {
