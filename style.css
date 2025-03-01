@@ -279,11 +279,15 @@ body.dark {
   }
 
   .sidebar.open {
-    left: 0;
+    left: 50px;
   }
 
   .content_area {
     width: 100%;
     margin-left: 0;
+  }
+
+  .search_bar{
+    display: none;
   }
 }
