@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Fechar sidebar em telas pequenas ao carregar a página
   if (window.innerWidth < 768) {
-    sidebar.classList.add("close");
+    sidebar.classList.remove("close");
   }
 });
 
