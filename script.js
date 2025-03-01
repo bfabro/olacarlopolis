@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const sidebarExpand = document.querySelector(".expand_sidebar");
   const farmaciaLink = document.querySelector("#menuFarmacia");
   const supermercadoLink = document.querySelector("#menuMercado");
-
+  const comercioLink = document.querySelector("#menuComercio");
   
 
   // Alternar sidebar
@@ -18,12 +18,34 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   sidebarExpand.addEventListener("click", () => {
-      sidebar.classList.remove("open", "hoverable");
+      sidebar.classList.remove("close", "hoverable");
   });
 
   sidebarClose.addEventListener("click", () => {
       sidebar.classList.add("close", "hoverable");
   });
+
+  //////////////////////////////////////////////////////////
+
+
+  comercioLink.addEventListener("click", () => {
+    sidebar.classList.toggle("close");
+});
+
+comercioLink.addEventListener("click", () => {
+    sidebar.classList.remove("close", "hoverable");
+});
+
+comercioLink.addEventListener("click", () => {
+    sidebar.classList.add("close", "hoverable");
+});
+
+
+
+
+
+
+  //////////////////////////////////////////////////////////
 
 
   ////////////////////////////////////////////////
