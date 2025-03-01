@@ -235,7 +235,7 @@ body.dark {
   margin-left: 80px;
 }
 
-/* Ícones inferiores */
+/* Ícones inferiores 
 .bottom_content {
   position: fixed;
   bottom: 100px;
@@ -262,7 +262,40 @@ body.dark {
   width: 80px;
 }
 
+*/
 
+
+
+
+
+
+
+@media screen and (max-width: 768px) {
+  #sidebarOpen {
+    font-size: 25px;
+    display: block;
+    margin-right: 10px;
+    cursor: pointer;
+    color: var(--grey-color);
+  }
+  .sidebar.close {
+    /*left: -100%;*/
+    left: 15px; 
+  
+  }
+
+  .sidebar.close .bottom_content {
+    /* left: 50%;
+     left: -100%;*/
+     left: 15px; 
+     width: 50px;
+     
+   }
+  .search_bar {
+    display: none;
+  }
+  
+}
 
 /* Responsividade */
 @media screen and (max-width: 768px) {
