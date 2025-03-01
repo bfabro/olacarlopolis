@@ -10,9 +10,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const farmaciaLink = document.querySelector("#menuFarmacia");
   const supermercadoLink = document.querySelector("#menuMercado");
 
+  
+
   // Alternar sidebar
   sidebarOpen.addEventListener("click", () => {
-      sidebar.classList.toggle("close");
+      sidebar.classList.toggle("open");
   });
 
   sidebarExpand.addEventListener("click", () => {
