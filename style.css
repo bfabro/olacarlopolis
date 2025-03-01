@@ -279,7 +279,7 @@ body.dark {
   }
 
   .sidebar.open {
-    left: 50px;
+    left: 80px;
   }
 
   .content_area {
@@ -291,6 +291,13 @@ body.dark {
     left: 15px; 
   
   }
+  .sidebar.close .bottom_content {
+    /* left: 50%;
+     left: -100%;*/
+     left: 15px; 
+     width: 50px;
+     
+   }
 
   .search_bar{
     display: none;
