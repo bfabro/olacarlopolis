@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Alternar sidebar
   sidebarOpen.addEventListener("click", () => {
-      sidebar.classList.toggle("open");
+      sidebar.classList.toggle("close");
   });
 
   sidebarExpand.addEventListener("click", () => {
