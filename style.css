@@ -255,7 +255,7 @@ body.dark {
     color: var(--grey-color);
   }
   .sidebar.close {
-    /*left: -100%;*/
+    
     left: 0%;
 
   }
@@ -263,8 +263,6 @@ body.dark {
     display: none;
   }
   .sidebar.close .bottom_content {
-   /* left: 50%;
-    left: -100%;left: 15px;*/
 
     width: 50px;
 
@@ -278,8 +276,7 @@ body.dark {
   min-height: 84vh;  
   background: #f4f4f4;
   margin: 88px 0px 0px 276px; 
-  transition: margin-left 0.3s ease;
-  margin-left: 276px; /* Padrão quando o menu está aberto */
+  transition: margin-left 0.5s ease;  
 
 }
 
@@ -288,3 +285,16 @@ body.dark {
   width: calc(100% - 80px);
   margin-left: 86px;
 }
+
+
+/* Garantir que os ícones fiquem visíveis e centralizados */
+.sidebar.close .nav_link {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+/* Evitar que os submenus abram quando a sidebar está fechada */
+.sidebar.close .submenu {
+  display: none !important;
+}
+

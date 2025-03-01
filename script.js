@@ -23,6 +23,23 @@ document.addEventListener("DOMContentLoaded", function () {
       sidebar.classList.add("close", "hoverable");
   });
 
+
+  ////////////////////////////////////////////////
+  // Alternar sidebar
+  supermercadoLink.addEventListener("click", () => {
+    sidebar.classList.toggle("close");
+});
+
+supermercadoLink.addEventListener("click", () => {
+  sidebar.classList.remove("close", "hoverable");
+});
+
+supermercadoLink.addEventListener("click", () => {
+  sidebar.classList.add("close", "hoverable");
+});
+
+  /////////////////////////////////////////////////
+
   sidebar.addEventListener("mouseenter", () => {
       if (sidebar.classList.contains("hoverable")) {
           sidebar.classList.remove("close");
@@ -71,6 +88,12 @@ document.addEventListener("DOMContentLoaded", function () {
       event.preventDefault();
       loadContent("Supermercados em Carlópolis", ["Supermercado Rocha", "Supermercado Carreiro", "Mercado do Barateiro"]);
   });
+
+  
+
+ 
+
+
 
   // Carregar informações de farmácias
   farmaciaLink.addEventListener("click", function (event) {
