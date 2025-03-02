@@ -163,12 +163,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-
-
-
 // Função para carregar conteúdo dinâmico
 function loadContent(title, items) {
   contentArea.innerHTML = `<h2>${title}</h2><br><ul>${items.map(item => `<li>🛒 ${item}</li>`).join('')}</ul>`;
+  sidebar.classList.add("close"); // Sempre manter aberto após atualização
 }
 
 // Carregar informações de supermercados
