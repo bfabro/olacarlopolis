@@ -52,9 +52,9 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebar.classList.remove("close", "hoverable");
   });
 
-  supermercadoLink.addEventListener("click", () => {
-    sidebar.classList.add("close", "hoverable");
-  });
+  ///supermercadoLink.addEventListener("click", () => {
+   /// sidebar.classList.add("close", "hoverable");
+  ///});
   ///
   ///
   ///
@@ -106,8 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Fechar sidebar em telas pequenas
   if (window.innerWidth < 768) {
     sidebar.classList.remove("close");
-  } else {
-   
+  } else {   
     sidebar.classList.add("close");
   }
   // Função para expandir o menu quando um item pai for clicado
