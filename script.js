@@ -45,34 +45,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //////////////////////////////////////////////////////////
   // 🟢 Sidebar fecha em telas pequenas ao carregar a página
-  if (window.innerWidth < 768) {
-    sidebar.classList.add("close");
+  function adjustSidebarOnLoad() {
+    if (window.innerWidth < 768) {
+      sidebar.classList.add("close");
+    } else {
+      sidebar.classList.remove("close");
+    }
   }
+
+  adjustSidebarOnLoad();
+  window.addEventListener("resize", adjustSidebarOnLoad);
 
   //////////////////////////////////////////////////////////
   // 🟢 Função para carregar conteúdo dinâmico
   function loadContent(title, items) {
     contentArea.innerHTML = `<h2>${title}</h2><br><ul>${items
       .map((item) => `<li>🛒 ${item}</li>`)
-      .join("")}</ul>`;
-    expandSidebar(); // Expande sidebar após carregar o conteúdo
+      .join("")}</ul>`;     
+    
   }
 
   //////////////////////////////////////////////////////////
-  // 🟢 Eventos de clique para carregar conteúdos
-  supermercadoLink.addEventListener("click", function (event) {
-    event.preventDefault();
-    loadContent("Supermercados em Carlópolis", [
-      "Supermercado Rocha",
-      "Supermercado Carreiro",
-      "Mercado do Barateiro",
-    ]);
-  });
+  // 🟢 Função genérica para os menus
+  function setupMenuClick(link, title, items) {
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      loadContent(title, items);
+    });
+  }
 
-  farmaciaLink.addEventListener("click", function (event) {
-    event.preventDefault();
-    loadContent("Farmácias em Carlópolis", ["Aguera", "Jorginho", "João"]);
-  });
+  setupMenuClick(supermercadoLink, "Supermercados em Carlópolis", [
+    "Supermercado Rocha",
+    "Supermercado Carreiro",
+    "Mercado do Barateiro",
+  ]);
+
+  setupMenuClick(farmaciaLink, "Farmácias em Carlópolis", [
+    "Aguera",
+    "Jorginho",
+    "João",
+  ]);
 
   //////////////////////////////////////////////////////////
   // 🟢 Alternar tema escuro/claro

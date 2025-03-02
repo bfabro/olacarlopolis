@@ -88,7 +88,7 @@ body.dark {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
+  height: 88vh;
   padding: 80px 5px;
   z-index: 100;
   /*overflow-y: scroll;*/
@@ -234,8 +234,8 @@ body.dark {
   font-size: 18px;
 }
 .sidebar.close .bottom_content {
-  width: 50px;
-  left: 15px;
+  width: 80px;
+  left: 0px;
 }
 .sidebar.close .bottom span {
   display: none;
