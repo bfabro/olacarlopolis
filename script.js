@@ -172,6 +172,7 @@ function loadContent(title, items) {
 supermercadoLink.addEventListener("click", function (event) {
   event.preventDefault();
   loadContent("Supermercados em Carlópolis", ["Supermercado Rocha", "Supermercado Carreiro", "Mercado do Barateiro"]);
+  sidebar.classList.add("close"); // Sempre manter aberto após atualização
 });
 
 
