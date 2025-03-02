@@ -143,6 +143,14 @@ body.dark {
   padding: 0;
   list-style: none;
 }
+
+.navlink {
+  font-weight: normal; /* Padrão */
+}
+
+.navlink.bold {
+  font-weight: bold; /* Deixa o texto em negrito */
+}
 .navlink_icon {
   position: relative;
   font-size: 22px;
