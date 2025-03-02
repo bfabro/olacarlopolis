@@ -52,9 +52,9 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebar.classList.remove("close", "hoverable");
   });
 
-  ///supermercadoLink.addEventListener("click", () => {
-   /// sidebar.classList.add("close", "hoverable");
-  ///});
+  supermercadoLink.addEventListener("click", () => {
+    sidebar.classList.add("close", "hoverable");
+  });
   ///
   ///
   ///
