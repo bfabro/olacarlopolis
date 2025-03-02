@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Função para fechar o menu depois de selecionar um item
     function closeSidebar() {
       if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
-        sidebar.classList.add("close");
+        sidebar.classList.remove("close");
      }
     }
  
