@@ -137,7 +137,8 @@ document.addEventListener("DOMContentLoaded", function () {
     contentArea.innerHTML = `<h2>${title}</h2><br><ul>${items
       .map((item) => `<li>🛒 ${item}</li>`)
       .join("")}</ul>`;
-    closeSidebar(); // Fecha o menu após carregar o conteúdo
+   // closeSidebar(); // Fecha o menu após carregar o conteúdo
+    sidebar.classList.add("close"); // Sempre manter aberto após atualização
   }
 
   // Carregar informações de supermercados
