@@ -107,9 +107,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Fechar sidebar em telas pequenas
   if (window.innerWidth < 768) {
-    sidebar.classList.add("close");
-  } else {
     sidebar.classList.remove("close");
+   
+  } else {
+    sidebar.classList.add("close");
   }
   // Função para expandir o menu quando um item pai for clicado
   function expandSidebar() {
