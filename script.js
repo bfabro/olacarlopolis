@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Função para expandir o menu quando um item pai for clicado
   function expandSidebar() {
     if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
-      sidebar.classList.remove("close");
+      sidebar.classList.add("close");
     }
   }
 
