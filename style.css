@@ -176,7 +176,7 @@ body.dark {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 4px 15px;
+  padding: 4px 0px;
   border-radius: 8px;
   text-decoration: none;
   color: var(--grey-color);
@@ -214,7 +214,7 @@ body.dark {
   transform: rotate(90deg);
 }
 .submenu .sublink {
-  padding: 2px 15px 0px 50px;
+  padding: 1px 2px 0px 18px;
 }
 .bottom_content {
   position: fixed;
