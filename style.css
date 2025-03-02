@@ -89,7 +89,7 @@ body.dark {
   top: 0;
   left: 0;
   height: 100%;
-  padding: 80px 5px;
+  padding: 78px 5px;
   z-index: 100;
   /*overflow-y: scroll;*/
   overflow: hidden;
@@ -100,8 +100,10 @@ body.dark {
 }
 
 
+
+
 .sidebar.close {
-  padding: 60px 0;
+  padding: 78px 0;
   width: 80px;
 }
 .sidebar::-webkit-scrollbar {
@@ -212,7 +214,7 @@ body.dark {
   transform: rotate(90deg);
 }
 .submenu .sublink {
-  padding: 15px 15px 15px 52px;
+  padding: 2px 15px 0px 50px;
 }
 .bottom_content {
   position: fixed;
