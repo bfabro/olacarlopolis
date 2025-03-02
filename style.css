@@ -260,9 +260,7 @@ body.dark {
     transition: transform 0.3s ease;
   }
 
-  .sidebar.open {
-    transform: translateX(0);
-  }
+  
   .sidebar.close {
     
     left: 0%;
