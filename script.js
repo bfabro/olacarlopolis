@@ -96,17 +96,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-  document.querySelector(".search_bar input").addEventListener("input", function () {
-    let searchTerm = this.value.toLowerCase();
-    let items = document.querySelectorAll(".nav_link");
   
-    items.forEach(item => {
-      let text = item.textContent.toLowerCase();
-      if (text.includes(searchTerm)) {
-        item.style.display = "block";
-      } else {
-        item.style.display = "none";
-      }
-    });
-  });
 });
