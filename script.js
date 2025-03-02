@@ -104,12 +104,11 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
-
+ 
   // Fechar sidebar em telas pequenas
   if (window.innerWidth < 768) {
     sidebar.classList.remove("close");
-   
-  } else {
+  } else {   
     sidebar.classList.add("close");
   }
   // Função para expandir o menu quando um item pai for clicado
@@ -119,13 +118,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Função para fechar o menu depois de selecionar um item
+    // Função para fechar o menu depois de selecionar um item
   function closeSidebar() {
-    if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
+    if (window.innerWidth < 768) {
       sidebar.classList.add("close");
-    }
+   }
   }
-
+ 
 
   // Adicionar eventos para os menus pai
   [comercioLink, supermercadoLink, farmaciaLink].forEach((menu) => {
@@ -156,8 +155,8 @@ document.addEventListener("DOMContentLoaded", function () {
     loadContent("Farmácias em Carlópolis", ["Aguera", "Jorginho", "João"]);
   });
 
-  // Fechar sidebar em telas pequenas
-  if (window.innerWidth < 768) {
+   // Fechar sidebar em telas pequenas
+   if (window.innerWidth < 768) {
     sidebar.classList.remove("close"); // Garante que comece aberto no celular
   }
 
@@ -165,23 +164,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-  // Função para carregar conteúdo dinâmico
-  function loadContent(title, items) {
-    contentArea.innerHTML = `<h2>${title}</h2><br><ul>${items.map(item => `<li>🛒 ${item}</li>`).join('')}</ul>`;
-  }
+// Função para carregar conteúdo dinâmico
+function loadContent(title, items) {
+  contentArea.innerHTML = `<h2>${title}</h2><br><ul>${items.map(item => `<li>🛒 ${item}</li>`).join('')}</ul>`;
+}
 
-  // Carregar informações de supermercados
-  supermercadoLink.addEventListener("click", function (event) {
-    event.preventDefault();
-    loadContent("Supermercados em Carlópolis", ["Supermercado Rocha", "Supermercado Carreiro", "Mercado do Barateiro"]);
-  });
+// Carregar informações de supermercados
+supermercadoLink.addEventListener("click", function (event) {
+  event.preventDefault();
+  loadContent("Supermercados em Carlópolis", ["Supermercado Rocha", "Supermercado Carreiro", "Mercado do Barateiro"]);
+});
 
 
-  // Carregar informações de farmácias
-  farmaciaLink.addEventListener("click", function (event) {
-    event.preventDefault();
-    loadContent("Farmácias em Carlópolis", ["Aguera", "Jorginho", "João"]);
-  });
+// Carregar informações de farmácias
+farmaciaLink.addEventListener("click", function (event) {
+  event.preventDefault();
+  loadContent("Farmácias em Carlópolis", ["Aguera", "Jorginho", "João"]);
+});
 
 
 });
