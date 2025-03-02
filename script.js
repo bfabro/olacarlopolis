@@ -105,14 +105,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Fechar sidebar em telas pequenas
   if (window.innerWidth < 768) {
-    sidebar.classList.add("close");
-  } else {
     sidebar.classList.remove("close");
+  } else {
+   
+    sidebar.classList.add("close");
   }
-
-
-
-
   // Função para expandir o menu quando um item pai for clicado
   function expandSidebar() {
     if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
@@ -156,11 +153,14 @@ document.addEventListener("DOMContentLoaded", function () {
     loadContent("Farmácias em Carlópolis", ["Aguera", "Jorginho", "João"]);
   });
 
-  // Fechar sidebar em telas pequenas ao carregar a página
-  if (window.innerWidth < 768) {
-    sidebar.classList.remove("close");
+   // Fechar sidebar em telas pequenas
+   if (window.innerWidth < 768) {
+    sidebar.classList.remove("close"); // Garante que comece aberto no celular
   }
-});
+
+
+
+
 
 // Função para carregar conteúdo dinâmico
 function loadContent(title, items) {
@@ -178,5 +178,8 @@ supermercadoLink.addEventListener("click", function (event) {
 farmaciaLink.addEventListener("click", function (event) {
   event.preventDefault();
   loadContent("Farmácias em Carlópolis", ["Aguera", "Jorginho", "João"]);
+});
+
+
 });
 
