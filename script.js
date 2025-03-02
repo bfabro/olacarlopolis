@@ -104,12 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
-   // Função para fechar o menu depois de selecionar um item
-  function closeSidebar() {
-    if (window.innerWidth < 768) {
-      sidebar.classList.add("close");
-   }
-  }
+ 
   // Fechar sidebar em telas pequenas
   if (window.innerWidth < 768) {
     sidebar.classList.remove("close");
@@ -119,10 +114,16 @@ document.addEventListener("DOMContentLoaded", function () {
   // Função para expandir o menu quando um item pai for clicado
   function expandSidebar() {
     if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
-      sidebar.classList.add("close");
+      sidebar.classList.remove("close");
     }
   }
 
+    // Função para fechar o menu depois de selecionar um item
+    function closeSidebar() {
+      if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
+        sidebar.classList.add("close");
+     }
+    }
  
 
   // Adicionar eventos para os menus pai
