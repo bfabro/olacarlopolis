@@ -103,14 +103,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-
- 
   // Fechar sidebar em telas pequenas
   if (window.innerWidth < 768) {
-    sidebar.classList.remove("close");
-  } else {   
     sidebar.classList.add("close");
+  } else {
+    sidebar.classList.remove("close");
   }
+
+
+
+
   // Função para expandir o menu quando um item pai for clicado
   function expandSidebar() {
     if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
@@ -118,13 +120,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-    // Função para fechar o menu depois de selecionar um item
+  // Função para fechar o menu depois de selecionar um item
   function closeSidebar() {
     if (window.innerWidth < 768) {
       sidebar.classList.add("close");
-   }
+    }
   }
- 
 
   // Adicionar eventos para os menus pai
   [comercioLink, supermercadoLink, farmaciaLink].forEach((menu) => {
