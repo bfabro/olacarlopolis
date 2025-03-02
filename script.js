@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .map((item) => `<li>🛒 ${item}</li>`)
       .join("")}</ul>`;
    // closeSidebar(); // Fecha o menu após carregar o conteúdo
-    sidebar.classList.add("close"); // Sempre manter aberto após atualização
+    sidebar.classList.remove("close"); // Sempre manter aberto após atualização
   }
 
   // Carregar informações de supermercados
