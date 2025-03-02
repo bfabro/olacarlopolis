@@ -117,11 +117,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Função para fechar o menu depois de selecionar um item
-  function closeSidebar() {
-    if (window.innerWidth < 768) {
-      sidebar.classList.add("close");
-    }
-  }
+ // function closeSidebar() {
+ //   if (window.innerWidth < 768) {
+  //    sidebar.classList.add("close");
+ //  }
+ // }
 
   // Adicionar eventos para os menus pai
   [comercioLink, supermercadoLink, farmaciaLink].forEach((menu) => {
