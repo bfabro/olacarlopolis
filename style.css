@@ -350,5 +350,6 @@ body.dark {
     white-space: normal; /* Permite a quebra de linha no celular */
     text-overflow: unset; /* Remove o 'ellipsis' para o caso de quebra de linha */
     overflow: visible; /* Deixa o conteúdo visível e não corta */
+    width: 100%;
   }
 }
