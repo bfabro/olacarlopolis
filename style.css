@@ -280,6 +280,11 @@ body.dark {
 .content_area ul li b {
   display: inline-block; /* Garante que o texto em negrito fique ao lado do conteúdo */
   margin-right: 5px; /* Espaço entre o título e o valor */
+  font-weight: bold; /* Negrito */
+}
+
+.content_area ul li div {
+  display: block; /* Faz com que cada informação tenha seu próprio espaço */
 }
 .highlighted {
   font-size: 1.0em; /* Tamanho maior para o nome */
