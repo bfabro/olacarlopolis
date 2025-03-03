@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
       sidebar.classList.toggle("close");
     }
   }
-  
+
   // Aplicar a função a todos os menus principais
   [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink].forEach((menu) => {
     menu.addEventListener("click", toggleSidebar);
@@ -62,14 +62,14 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Alternar submenu
-submenuItems.forEach(item => {
-  item.addEventListener("click", () => {
-    submenuItems.forEach(i => i !== item && i.classList.remove("show_submenu"));
-    item.classList.toggle("show_submenu");
+  submenuItems.forEach(item => {
+    item.addEventListener("click", () => {
+      submenuItems.forEach(i => i !== item && i.classList.remove("show_submenu"));
+      item.classList.toggle("show_submenu");
+    });
   });
-});
 
- 
+
 
   // Função para expandir o menu quando um item pai for clicado
   function expandSidebar() {
@@ -87,7 +87,7 @@ submenuItems.forEach(item => {
 
   // Adicionar eventos para os menus pai
   // Ao clicar, apenas garantir que a sidebar não feche em telas grandes
-  [comercioLink, supermercadoLink, farmaciaLink,churrasqueiroLink].forEach((menu) => {
+  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink].forEach((menu) => {
     menu.addEventListener("click", () => {
       if (window.innerWidth >= 768) {
         sidebar.classList.remove("close");
@@ -111,11 +111,14 @@ submenuItems.forEach(item => {
   }
 
 
-  [comercioLink, supermercadoLink, farmaciaLink,churrasqueiroLink].forEach((menu) => {
+  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink].forEach((menu) => {
     menu.addEventListener("click", () => {
       if (window.innerWidth <= 768) {
+        sidebar.classList.remove("close");
+      } else {
         sidebar.classList.add("close");
       }
+
     });
   });
 
@@ -139,7 +142,7 @@ submenuItems.forEach(item => {
         </li>
       `).join('')}
     </ul>`;
-  
+
     // Adicionar eventos aos botões de detalhes
     document.querySelectorAll(".detalhes-btn").forEach(button => {
       button.addEventListener("click", function () {
@@ -147,7 +150,7 @@ submenuItems.forEach(item => {
         detalhesDiv.style.display = "block";
       });
     });
-  
+
     // Evento para fechar os detalhes
     document.querySelectorAll(".fechar-detalhes").forEach(button => {
       button.addEventListener("click", function () {
@@ -155,7 +158,7 @@ submenuItems.forEach(item => {
       });
     });
   }
-  
+
 
   // Carregar informações de categorias
   const categories = [
@@ -180,12 +183,12 @@ submenuItems.forEach(item => {
         { name: "Comércio C", address: "Rua I, 606", hours: "10h - 20h", contact: "(43) 9012-3456" },
       ]
     },
-// MENU SERVIÇOS
+    // MENU SERVIÇOS
     {
       link: churrasqueiroLink, title: "Churrasqueiros em Carlópolis", establishments: [
-        { name: "Pituka",  contact: "(43) 7890-1234" },
-        { name: "Gustavo",  contact: "(43) 8901-2345" },
-       
+        { name: "Pituka", contact: "(43) 7890-1234" },
+        { name: "Gustavo", contact: "(43) 8901-2345" },
+
       ]
     }
   ];
