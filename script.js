@@ -69,14 +69,7 @@ submenuItems.forEach(item => {
   });
 });
 
-  // Fechar sidebar em telas pequenas
-  if (window.innerWidth < 768) {
-    sidebar.classList.add("close");
-
-  } else {
-    sidebar.classList.remove("close");
-  }
-
+ 
 
   // Função para expandir o menu quando um item pai for clicado
   function expandSidebar() {
