@@ -343,7 +343,8 @@ body.dark {
   /* Ajuste de layout de forma mais compacta */
   .content_area {
     padding: 10px; /* Reduz o espaçamento interno */
-    font-size: 14px; /* Tamanho da fonte reduzido em telas menores */
+    font-size: 14px;
+    width: 200px; /* Tamanho da fonte reduzido em telas menores */
   }
   .content_area ul li span {
     white-space: normal; /* Permite a quebra de linha no celular */
