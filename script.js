@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const farmaciaLink = document.querySelector("#menuFarmacia");
   const supermercadoLink = document.querySelector("#menuMercado");
   const comercioLink = document.querySelector("#menuComercio");
+  const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
 
   //////////////////////////////////////////////////////////
   // Alternar sidebar
@@ -27,22 +28,16 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebar.classList.add("close", "hoverable");
   });
 
-  //////////////////////////////////////////////////////////
-  comercioLink.addEventListener("click", () => {
-    sidebar.classList.toggle("close");
-    sidebar.classList.toggle("hoverable");
+  function toggleSidebar() {
+    if (window.innerWidth < 768) {
+      sidebar.classList.toggle("close");
+    }
+  }
+  
+  // Aplicar a função a todos os menus principais
+  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink].forEach((menu) => {
+    menu.addEventListener("click", toggleSidebar);
   });
-  /////////////////////////////////////////////////
-  supermercadoLink.addEventListener("click", () => {
-    sidebar.classList.toggle("close");
-    sidebar.classList.toggle("hoverable");
-  });
-  /////////////////////////////////////////////////
-  farmaciaLink.addEventListener("click", () => {
-    sidebar.classList.toggle("close");
-    sidebar.classList.toggle("hoverable");
-  });
-
 
 
   /////////////////////////////////////////////////
@@ -99,7 +94,7 @@ submenuItems.forEach(item => {
 
   // Adicionar eventos para os menus pai
   // Ao clicar, apenas garantir que a sidebar não feche em telas grandes
-  [comercioLink, supermercadoLink, farmaciaLink].forEach((menu) => {
+  [comercioLink, supermercadoLink, farmaciaLink,churrasqueiroLink].forEach((menu) => {
     menu.addEventListener("click", () => {
       if (window.innerWidth >= 768) {
         sidebar.classList.remove("close");
@@ -159,6 +154,14 @@ submenuItems.forEach(item => {
         { name: "Comércio A", address: "Rua G, 404", hours: "8h - 18h", contact: "(43) 7890-1234" },
         { name: "Comércio B", address: "Rua H, 505", hours: "9h - 19h", contact: "(43) 8901-2345" },
         { name: "Comércio C", address: "Rua I, 606", hours: "10h - 20h", contact: "(43) 9012-3456" },
+      ]
+    },
+// MENU SERVIÇOS
+    {
+      link: churrasqueiroLink, title: "Churrasqueiros em Carlópolis", establishments: [
+        { name: "Pituka",  contact: "(43) 7890-1234" },
+        { name: "Gustavo",  contact: "(43) 8901-2345" },
+       
       ]
     }
   ];
