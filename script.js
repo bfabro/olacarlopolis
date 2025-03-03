@@ -111,6 +111,14 @@ submenuItems.forEach(item => {
   }
 
 
+  [comercioLink, supermercadoLink, farmaciaLink,churrasqueiroLink].forEach((menu) => {
+    menu.addEventListener("click", () => {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.add("close");
+      }
+    });
+  });
+
 
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
