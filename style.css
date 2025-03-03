@@ -256,53 +256,7 @@ body.dark {
 #sidebarOpen {
   display: none;
 }
-@media screen and (max-width: 768px) {
-  #sidebarOpen {
-    font-size: 25px;
-    display: block;
-    margin-right: 10px;
-    cursor: pointer;
-    color: var(--grey-color);
-  }
 
-  
-
-    
-  .sidebar.close {
-    
-    left: 0%;
-
-  }
-  .search_bar {
-    display: none;
-  }
-  .sidebar.close .bottom_content {
-
-    width: 80px;
-
-  }
-}
-
-@media (max-width: 768px) {
-  .content_area ul li {
-    flex-direction: column; /* Empilha os itens na vertical */
-  }
-
-  .content_area ul li b {
-    font-weight: bold; /* Deixa em negrito o nome de cada informação */
-    margin-right: 10px; /* Ajuste do espaço entre o título e o conteúdo */
-  }
-
-  /* Ajuste de layout de forma mais compacta */
-  .content_area {
-    padding: 10px; /* Reduz o espaçamento interno */
-    font-size: 14px; /* Tamanho da fonte reduzido em telas menores */
-  }
-  .content_area ul li span {
-    white-space: normal; /* Permite a quebra de linha no celular */
-    text-overflow: unset; /* Remove o 'ellipsis' para o caso de quebra de linha */
-  }
-}
 
 .content_area {
 
@@ -354,3 +308,46 @@ body.dark {
   display: none !important;
 }
 
+@media screen and (max-width: 768px) {
+  #sidebarOpen {
+    font-size: 25px;
+    display: block;
+    margin-right: 10px;
+    cursor: pointer;
+    color: var(--grey-color);
+  }
+    
+  .sidebar.close {    
+    left: 0%;
+
+  }
+  .search_bar {
+    display: none;
+  }
+  .sidebar.close .bottom_content {
+    width: 80px;
+
+  }
+}
+
+@media (max-width: 768px) {
+  .content_area ul li {
+    flex-direction: column; /* Empilha os itens na vertical */
+  }
+
+  .content_area ul li b {
+    font-weight: bold; /* Deixa em negrito o nome de cada informação */
+    margin-right: 10px; /* Ajuste do espaço entre o título e o conteúdo */
+  }
+
+  /* Ajuste de layout de forma mais compacta */
+  .content_area {
+    padding: 10px; /* Reduz o espaçamento interno */
+    font-size: 14px; /* Tamanho da fonte reduzido em telas menores */
+  }
+  .content_area ul li span {
+    white-space: normal; /* Permite a quebra de linha no celular */
+    text-overflow: unset; /* Remove o 'ellipsis' para o caso de quebra de linha */
+    overflow: visible; /* Deixa o conteúdo visível e não corta */
+  }
+}
