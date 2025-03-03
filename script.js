@@ -140,47 +140,56 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebar.classList.remove("close"); // Sempre manter aberto após atualização
   }
 
-  // Carregar informações de supermercados
-  supermercadoLink.addEventListener("click", function (event) {
-    event.preventDefault();
-    loadContent("Supermercados em Carlópolis", [
-      "Supermercado Rocha",
-      "Supermercado Carreiro",
-      "Mercado do Barateiro",
-    ]);
-  });
-
-  // Carregar informações de farmácias
-  farmaciaLink.addEventListener("click", function (event) {
-    event.preventDefault();
-    loadContent("Farmácias em Carlópolis", ["Aguera", "Jorginho", "João"]);
-  });
 
    // Fechar sidebar em telas pequenas
    if (window.innerWidth < 768) {
     sidebar.classList.remove("close"); // Garante que comece aberto no celular
   }
 
+  
 
-// Função para carregar conteúdo dinâmico
-function loadContent(title, items) {
-  contentArea.innerHTML = `<h2>${title}</h2><br><ul>${items.map(item => `<li>🛒 ${item}</li>`).join('')}</ul>`;
- // sidebar.classList.add("close"); // Sempre manter aberto após atualização
+// Função para carregar conteúdo
+function loadContent(title, establishments) {
+  contentArea.innerHTML = `<h2>${title}</h2><br><ul>${establishments.map(establishment => `
+    <li>
+      <strong>${establishment.name}</strong><br>
+      <b>Endereço:</b> ${establishment.address}<br>
+      <b>Horário de Funcionamento:</b> ${establishment.hours}<br>
+      <b>Contato:</b> ${establishment.contact}<br><br>
+    </li>`).join('')}</ul>`;
 }
 
-// Carregar informações de supermercados
-supermercadoLink.addEventListener("click", function (event) {
-  event.preventDefault();
-  loadContent("Supermercados em Carlópolis", ["Supermercado Rocha", "Supermercado Carreiro", "Mercado do Barateiro"]);
-  sidebar.classList.toggle("close"); // Sempre manter aberto após atualização
+// Carregar informações de categorias
+const categories = [
+  { link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
+    { name: "Supermercado Rocha", address: "Rua A, 123", hours: "8h - 18h", contact: "(43) 1234-5678" },
+    { name: "Supermercado Carreiro", address: "Rua B, 456", hours: "7h - 19h", contact: "(43) 2345-6789" },
+    { name: "Mercado do Barateiro", address: "Rua C, 789", hours: "9h - 21h", contact: "(43) 3456-7890" },
+  ] },
+  { link: farmaciaLink, title: "Farmácias em Carlópolis", establishments: [
+    { name: "Farmácia Aguera", address: "Rua D, 101", hours: "8h - 18h", contact: "(43) 4567-8901" },
+    { name: "Farmácia Jorginho", address: "Rua E, 202", hours: "8h - 20h", contact: "(43) 5678-9012" },
+    { name: "Farmácia João", address: "Rua F, 303", hours: "7h - 19h", contact: "(43) 6789-0123" },
+  ] },
+  { link: comercioLink, title: "Comércios em Carlópolis", establishments: [
+    { name: "Comércio A", address: "Rua G, 404", hours: "8h - 18h", contact: "(43) 7890-1234" },
+    { name: "Comércio B", address: "Rua H, 505", hours: "9h - 19h", contact: "(43) 8901-2345" },
+    { name: "Comércio C", address: "Rua I, 606", hours: "10h - 20h", contact: "(43) 9012-3456" },
+  ] }
+];
+
+categories.forEach(category => {
+  category.link.addEventListener("click", function (event) {
+    event.preventDefault();
+    loadContent(category.title, category.establishments);
+    sidebar.classList.remove("close"); // Garante que a sidebar fica aberta
+  });
 });
 
 
-// Carregar informações de farmácias
-farmaciaLink.addEventListener("click", function (event) {
-  event.preventDefault();
-  loadContent("Farmácias em Carlópolis", ["Aguera", "Jorginho", "João"]);
-});
+
+
+
 
 
 });
