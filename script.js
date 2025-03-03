@@ -126,41 +126,15 @@ submenuItems.forEach(item => {
 
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
-    contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
-      ${establishments.map(establishment => `
-        <li>
-          <strong class="highlighted">${establishment.name}</strong><br>
-          <b>Endereço:</b> ${establishment.address}<br>
-          <b>Horário de Funcionamento:</b> ${establishment.hours}<br>
-          <b>Contato:</b> ${establishment.contact}<br>
-          <button class="detalhes-btn" data-name="${establishment.name}" 
-            data-address="${establishment.address}" 
-            data-hours="${establishment.hours}" 
-            data-contact="${establishment.contact}">
-            Ver mais detalhes
-          </button>
-          <div class="detalhes-content" id="detalhes-${encodeURIComponent(establishment.name)}" style="display: none;">
-            <p>Aqui você pode adicionar fotos, promoções e mais informações sobre ${establishment.name}.</p>
-            <button class="fechar-detalhes">Fechar</button>
-          </div>
-        </li>
-      `).join('')}
-    </ul>`;
-  
-    // Adicionar evento aos botões "Ver mais detalhes"
-    document.querySelectorAll(".detalhes-btn").forEach(button => {
-      button.addEventListener("click", function () {
-        const detalhesDiv = document.getElementById(`detalhes-${encodeURIComponent(this.dataset.name)}`);
-        detalhesDiv.style.display = "block"; // Mostrar detalhes
-      });
-    });
-  
-    // Adicionar evento para fechar detalhes
-    document.querySelectorAll(".fechar-detalhes").forEach(button => {
-      button.addEventListener("click", function () {
-        this.parentElement.style.display = "none"; // Esconder detalhes
-      });
-    });
+    contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>${establishments.map(establishment => `
+    <li>
+      <strong class="highlighted">${establishment.name}</strong><br>
+      <b>Endereço:</b> ${establishment.address}<br>
+      <b>Horário de Funcionamento:</b> ${establishment.hours}<br>
+      <b>Contato:</b> ${establishment.contact}<br>
+   <a href="detalhes.html?nome=${encodeURIComponent(establishment.name)}" class="detalhes-link">Ver mais detalhes</a>
+    </li>`).join('')}</ul>`;
+
   }
 
 
