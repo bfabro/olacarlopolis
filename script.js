@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const supermercadoLink = document.querySelector("#menuMercado");
   const comercioLink = document.querySelector("#menuComercio");
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
+  const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
+  
 
   //////////////////////////////////////////////////////////
   // Alternar sidebar
@@ -35,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Aplicar a função a todos os menus principais
-  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink].forEach((menu) => {
+  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink,farmaciaPlantaoLink].forEach((menu) => {
     menu.addEventListener("click", toggleSidebar);
   });
 
@@ -87,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Adicionar eventos para os menus pai
   // Ao clicar, apenas garantir que a sidebar não feche em telas grandes
-  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink].forEach((menu) => {
+  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink,farmaciaPlantaoLink].forEach((menu) => {
     menu.addEventListener("click", () => {
       if (window.innerWidth >= 768) {
         sidebar.classList.remove("close");
@@ -111,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink].forEach((menu) => {
+  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink,farmaciaPlantaoLink].forEach((menu) => {
     menu.addEventListener("click", () => {
       if (window.innerWidth <= 768) {
         sidebar.classList.add("close");
@@ -190,6 +192,13 @@ document.addEventListener("DOMContentLoaded", function () {
         { name: "Pituka", contact: "(43) 7890-1234" },
         { name: "Gustavo", contact: "(43) 8901-2345" },
 
+      ]
+    },
+
+    {
+      link: farmaciaPlantaoLink, title: "Farmacia de Plantão", establishments: [
+       
+       { name: "Farma Mais", address: "Rua do calçadao, 123", hours: "7h - 21h e dom: 07 - 20h", contact: "(43) 3456-7890" },
       ]
     }
   ];
