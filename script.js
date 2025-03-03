@@ -152,18 +152,18 @@ document.addEventListener("DOMContentLoaded", function () {
 function loadContent(title, establishments) {
   contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>${establishments.map(establishment => `
     <li>
-     <strong class="highlighted">${est.name}</strong><br>
-        <div><b>Endereço:</b> ${est.address}</div>
-        <div><b>Horário de Funcionamento:</b> ${est.hours}</div>
-        <div><b>Contato:</b> ${est.contact}</div>
+      <strong class="highlighted">${establishment.name}</strong><br>
+      <b>Endereço:</b> ${establishment.address}<br>
+      <b>Horário de Funcionamento:</b> ${establishment.hours}<br>
+      <b>Contato:</b> ${establishment.contact}<br><br>
     </li>`).join('')}</ul>`;
-    if (window.innerWidth < 768) sidebar.classList.add("close");
+    
   }
 
 
 // Carregar informações de categorias
 const categories = [
-  { link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
+  { link: supermercadoLink, title: "Supermercadosx em Carlópolis", establishments: [
     { name: "Supermercado Rocha", address: "Rua A, 123", hours: "8h - 18h", contact: "(43) 1234-5678" },
     { name: "Supermercado Carreiro", address: "Rua B, 456", hours: "7h - 19h", contact: "(43) 2345-6789" },
     { name: "Mercado do Barateiro", address: "Rua C, 789", hours: "9h - 21h e dom: 06 - 12h", contact: "(43) 3456-7890" },
