@@ -166,7 +166,11 @@ submenuItems.forEach(item => {
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
       loadContent(category.title, category.establishments);
-      sidebar.classList.add("close"); // Garante que a sidebar fica aberta
+      if (window.innerWidth < 768) {
+        sidebar.classList.add("close"); // Fecha apenas em telas pequenas
+      } else {
+        sidebar.classList.remove("close"); // Garante que fica aberto no desktop
+      }
     });
   });
 
