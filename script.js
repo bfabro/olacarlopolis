@@ -132,7 +132,7 @@ submenuItems.forEach(item => {
       <b>Endereço:</b> ${establishment.address}<br>
       <b>Horário de Funcionamento:</b> ${establishment.hours}<br>
       <b>Contato:</b> ${establishment.contact}<br>
-   <a href="detalhes.html?nome=${encodeURIComponent(establishment.name)}" class="detalhes-link">Ver mais detalhes</a>
+  // <a href="detalhes.html?nome=${encodeURIComponent(establishment.name)}" class="detalhes-link">Ver mais detalhes</a>
     </li>`).join('')}</ul>`;
 
   }
