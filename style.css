@@ -369,6 +369,41 @@ body.dark {
   display: none !important;
 }
 
+.detalhes-content {
+  background: #f8f9fa;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.detalhes-btn {
+  background: #007BFF;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.detalhes-btn:hover {
+  background: #0056b3;
+}
+
+.fechar-detalhes {
+  background: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.fechar-detalhes:hover {
+  background: darkred;
+}
+
+
 @media screen and (max-width: 768px) {
   #sidebarOpen {
     font-size: 25px;
@@ -378,10 +413,15 @@ body.dark {
     color: var(--grey-color);
   }
 
-  .sidebar.close {
-    left: 0%;
-
+  .sidebar {
+    width: 260px !important;
+    position: fixed;
+    left: 0;
   }
+  .sidebar.close {
+    width: 260px !important;
+  }
+}
 
   .search_bar {
     display: none;
