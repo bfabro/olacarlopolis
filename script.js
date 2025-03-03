@@ -120,19 +120,42 @@ submenuItems.forEach(item => {
   });
 
 
-  // Função para carregar conteúdo
   function loadContent(title, establishments) {
-    contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>${establishments.map(establishment => `
-    <li>
-      <strong class="highlighted">${establishment.name}</strong><br>
-      <b>Endereço:</b> ${establishment.address}<br>
-      <b>Horário de Funcionamento:</b> ${establishment.hours}<br>
-      <b>Contato:</b> ${establishment.contact}<br>
+    contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
+      ${establishments.map(establishment => `
+        <li>
+          <strong class="highlighted">${establishment.name}</strong><br>
+          ${establishment.address ? `<b>Endereço:</b> ${establishment.address}<br>` : ""}
+          ${establishment.hours ? `<b>Horário de Funcionamento:</b> ${establishment.hours}<br>` : ""}
+          <b>Contato:</b> ${establishment.contact}<br>
+          <button class="detalhes-btn" data-name="${establishment.name}" 
+            data-contact="${establishment.contact}">
+            Ver mais detalhes
+          </button>
+          <div class="detalhes-content" id="detalhes-${encodeURIComponent(establishment.name)}" style="display: none;">
+            <p>Aqui você pode adicionar fotos e promoções para ${establishment.name}.</p>
+            <button class="fechar-detalhes">Fechar</button>
+          </div>
+        </li>
+      `).join('')}
+    </ul>`;
   
-    </li>`).join('')}</ul>`;
-
+    // Adicionar eventos aos botões de detalhes
+    document.querySelectorAll(".detalhes-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        const detalhesDiv = document.getElementById(`detalhes-${encodeURIComponent(this.dataset.name)}`);
+        detalhesDiv.style.display = "block";
+      });
+    });
+  
+    // Evento para fechar os detalhes
+    document.querySelectorAll(".fechar-detalhes").forEach(button => {
+      button.addEventListener("click", function () {
+        this.parentElement.style.display = "none";
+      });
+    });
   }
-
+  
 
   // Carregar informações de categorias
   const categories = [
