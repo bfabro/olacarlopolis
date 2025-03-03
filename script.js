@@ -114,9 +114,10 @@ document.addEventListener("DOMContentLoaded", function () {
   [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink].forEach((menu) => {
     menu.addEventListener("click", () => {
       if (window.innerWidth <= 768) {
-        sidebar.classList.remove("close");
-      } else {
         sidebar.classList.add("close");
+      } else {
+        
+        sidebar.classList.remove("close");
       }
 
     });
