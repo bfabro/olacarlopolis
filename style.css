@@ -1,24 +1,29 @@
 /* Import Google font - Poppins */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
+
 :root {
   --white-color: #fff;
   --blue-color: #4070f4;
   --grey-color: #707070;
   --grey-color-light: #aaa;
 }
+
 body {
   background-color: #e7f2fd;
   transition: all 0.5s ease;
 }
+
 body.dark {
   background-color: #333;
 }
+
 body.dark {
   --white-color: #333;
   --blue-color: #fff;
@@ -40,6 +45,7 @@ body.dark {
   z-index: 1000;
   box-shadow: 0 0 2px var(--grey-color-light);
 }
+
 .logo_item {
   display: flex;
   align-items: center;
@@ -48,17 +54,20 @@ body.dark {
   font-weight: 500;
   color: var(--blue-color);
 }
+
 .navbar img {
   width: 35px;
   height: 35px;
   object-fit: cover;
   border-radius: 50%;
 }
+
 .search_bar {
   height: 47px;
   max-width: 430px;
   width: 100%;
 }
+
 .search_bar input {
   height: 100%;
   width: 100%;
@@ -70,11 +79,13 @@ body.dark {
   border: 1px solid var(--grey-color-light);
   padding: 0 20px;
 }
+
 .navbar_content {
   display: flex;
   align-items: center;
   column-gap: 25px;
 }
+
 .navbar_content i {
   cursor: pointer;
   font-size: 20px;
@@ -106,33 +117,42 @@ body.dark {
   padding: 78px 0;
   width: 80px;
 }
+
 .sidebar::-webkit-scrollbar {
   display: none;
 }
+
 .menu_content {
   position: relative;
 }
+
 .menu_title {
   margin: 15px 0;
   padding: 0 20px;
   font-size: 18px;
 }
+
 .sidebar.close .menu_title {
   padding: 6px 30px;
 }
+
 .menu_title::before {
   color: var(--grey-color);
   white-space: nowrap;
 }
+
 .menu_dahsboard::before {
   content: "Menu";
 }
+
 .menu_editor::before {
   content: "Informações Uteis";
 }
+
 .menu_setting::before {
   content: "Contato";
 }
+
 .sidebar.close .menu_title::before {
   content: "";
   position: absolute;
@@ -141,18 +161,22 @@ body.dark {
   border-radius: 12px;
   background: var(--grey-color-light);
 }
+
 .menu_items {
   padding: 0;
   list-style: none;
 }
 
 .navlink {
-  font-weight: normal; /* Padrão */
+  font-weight: normal;
+  /* Padrão */
 }
 
 .navlink.bold {
-  font-weight: bold; /* Deixa o texto em negrito */
+  font-weight: bold;
+  /* Deixa o texto em negrito */
 }
+
 .navlink_icon {
   position: relative;
   font-size: 22px;
@@ -162,6 +186,7 @@ body.dark {
   text-align: center;
   border-radius: 6px;
 }
+
 .navlink_icon::before {
   content: "";
   position: absolute;
@@ -169,9 +194,11 @@ body.dark {
   width: calc(100% + 100px);
   left: -20px;
 }
+
 .navlink_icon:hover {
   background: var(--blue-color);
 }
+
 .sidebar .nav_link {
   display: flex;
   align-items: center;
@@ -182,40 +209,51 @@ body.dark {
   color: var(--grey-color);
   white-space: nowrap;
 }
+
 .sidebar.close .navlink {
   display: none;
 }
+
 .nav_link:hover {
   color: var(--white-color);
   background: var(--blue-color);
 }
+
 .sidebar.close .nav_link:hover {
   background: var(--white-color);
 }
+
 .submenu_item {
   cursor: pointer;
 }
+
 .submenu {
   display: none;
 }
+
 .submenu_item .arrow-left {
   position: absolute;
   right: 10px;
   display: inline-block;
   margin-right: auto;
 }
+
 .sidebar.close .submenu {
   display: none;
 }
-.show_submenu ~ .submenu {
+
+.show_submenu~.submenu {
   display: block;
 }
+
 .show_submenu .arrow-left {
   transform: rotate(90deg);
 }
+
 .submenu .sublink {
   padding: 1px 2px 0px 18px;
 }
+
 .bottom_content {
   position: fixed;
   bottom: 100px;
@@ -224,6 +262,7 @@ body.dark {
   cursor: pointer;
   transition: all 0.5s ease;
 }
+
 .bottom {
   position: absolute;
   display: flex;
@@ -237,22 +276,28 @@ body.dark {
   border-top: 1px solid var(--grey-color-light);
   background-color: var(--white-color);
 }
+
 .bottom i {
   font-size: 20px;
 }
+
 .bottom span {
   font-size: 18px;
 }
+
 .sidebar.close .bottom_content {
   width: 80px;
   left: 0px;
 }
+
 .sidebar.close .bottom span {
   display: none;
 }
+
 .sidebar.hoverable .collapse_sidebar {
   display: none;
 }
+
 #sidebarOpen {
   display: none;
 }
@@ -261,42 +306,53 @@ body.dark {
 .content_area {
 
   padding: 10px;
-  width: calc(82% - 0px);  
-  min-height: 84vh;  
+  width: calc(82% - 0px);
+  min-height: 84vh;
   background: #f4f4f4;
-  margin: 88px 0px 0px 276px; 
-  transition: margin-left 0.5s ease;  
-  font-size: 14px; /* Ajuste o tamanho da fonte conforme necessário */
+  margin: 88px 0px 0px 276px;
+  transition: margin-left 0.5s ease;
+  font-size: 14px;
+  /* Ajuste o tamanho da fonte conforme necessário */
 
 }
 
 .content_area ul li {
-  white-space: nowrap; /* Impede a quebra de linha */
-  overflow: hidden; /* Garante que o texto longo não transborde */
-  text-overflow: ellipsis; /* Adiciona '...' quando o texto for muito longo */
-  margin-bottom: 10px; /* Espaço entre os itens */
+  white-space: nowrap;
+  /* Impede a quebra de linha */
+  overflow: hidden;
+  /* Garante que o texto longo não transborde */
+  text-overflow: ellipsis;
+  /* Adiciona '...' quando o texto for muito longo */
+  margin-bottom: 10px;
+  /* Espaço entre os itens */
 }
 
 .content_area ul li b {
-  display: inline-block; /* Garante que o texto em negrito fique ao lado do conteúdo */
-  margin-right: 5px; /* Espaço entre o título e o valor */
-  font-weight: bold; /* Negrito */
+  display: inline-block;
+  /* Garante que o texto em negrito fique ao lado do conteúdo */
+  margin-right: 5px;
+  /* Espaço entre o título e o valor */
+  font-weight: bold;
+  /* Negrito */
 }
 
-.content_area ul li div {
-  display: block; /* Faz com que cada informação tenha seu próprio espaço */
-}
+
 .highlighted {
-  font-size: 1.0em; /* Tamanho maior para o nome */
-  font-weight: bold; /* Deixar o nome em negrito */
-  color: #007BFF; /* Cor de destaque, você pode mudar para a cor que preferir */
-  text-transform: uppercase; /* Deixar o nome em maiúsculas */
-  padding-bottom: 5px; /* Espaço abaixo do nome */
-  
+  font-size: 1.0em;
+  /* Tamanho maior para o nome */
+  font-weight: bold;
+  /* Deixar o nome em negrito */
+  color: #007BFF;
+  /* Cor de destaque, você pode mudar para a cor que preferir */
+  text-transform: uppercase;
+  /* Deixar o nome em maiúsculas */
+  padding-bottom: 5px;
+  /* Espaço abaixo do nome */
+
 }
 
 /* Quando o menu fechar */
-.sidebar.close ~ .content_area {
+.sidebar.close~.content_area {
   width: calc(100% - 80px);
   margin-left: 86px;
 }
@@ -321,40 +377,50 @@ body.dark {
     cursor: pointer;
     color: var(--grey-color);
   }
-    
-  .sidebar.close {    
+
+  .sidebar.close {
     left: 0%;
 
   }
+
   .search_bar {
     display: none;
   }
+
   .sidebar.close .bottom_content {
     width: 80px;
 
   }
-}
 
-@media (max-width: 768px) {
+
+
   .content_area ul li {
-    flex-direction: column; /* Empilha os itens na vertical */
+    flex-direction: column;
+    /* Empilha os itens na vertical */
   }
 
   .content_area ul li b {
-    font-weight: bold; /* Deixa em negrito o nome de cada informação */
-    margin-right: 10px; /* Ajuste do espaço entre o título e o conteúdo */
+    font-weight: bold;
+    /* Deixa em negrito o nome de cada informação */
+    margin-right: 10px;
+    /* Ajuste do espaço entre o título e o conteúdo */
   }
 
   /* Ajuste de layout de forma mais compacta */
   .content_area {
-    padding: 10px; /* Reduz o espaçamento interno */
+    padding: 10px;
+    /* Reduz o espaçamento interno */
     font-size: 14px;
-    width: 200px; /* Tamanho da fonte reduzido em telas menores */
+
   }
+
   .content_area ul li span {
-    white-space: normal; /* Permite a quebra de linha no celular */
-    text-overflow: unset; /* Remove o 'ellipsis' para o caso de quebra de linha */
-    overflow: visible; /* Deixa o conteúdo visível e não corta */
+    white-space: normal;
+    /* Permite a quebra de linha no celular */
+    text-overflow: unset;
+    /* Remove o 'ellipsis' para o caso de quebra de linha */
+    overflow: visible;
+    /* Deixa o conteúdo visível e não corta */
     width: 100%;
   }
 }
