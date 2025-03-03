@@ -380,14 +380,7 @@ body.dark {
     color: var(--grey-color);
   }
 
-  .sidebar {
-    width: 260px !important;
-    position: fixed;
-    left: 0;
-  }
-  .sidebar.close {
-    width: 260px !important;
-  }
+  
 
 
   .search_bar {
@@ -401,9 +394,9 @@ body.dark {
 
 
 
- 
 
 
 
-  
+
+
 }
