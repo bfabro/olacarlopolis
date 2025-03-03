@@ -401,33 +401,9 @@ body.dark {
 
 
 
-  .content_area ul li {
-    flex-direction: column;
-    /* Empilha os itens na vertical */
-  }
+ 
 
-  .content_area ul li b {
-    font-weight: bold;
-    /* Deixa em negrito o nome de cada informação */
-    margin-right: 10px;
-    /* Ajuste do espaço entre o título e o conteúdo */
-  }
 
-  /* Ajuste de layout de forma mais compacta */
-  .content_area {
-    padding: 10px;
-    /* Reduz o espaçamento interno */
-    font-size: 14px;
 
-  }
-
-  .content_area ul li span {
-    white-space: normal;
-    /* Permite a quebra de linha no celular */
-    text-overflow: unset;
-    /* Remove o 'ellipsis' para o caso de quebra de linha */
-    overflow: visible;
-    /* Deixa o conteúdo visível e não corta */
-    width: 100%;
-  }
+  
 }
