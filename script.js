@@ -182,7 +182,7 @@ categories.forEach(category => {
   category.link.addEventListener("click", function (event) {
     event.preventDefault();
     loadContent(category.title, category.establishments);
-    sidebar.classList.remove("close"); // Garante que a sidebar fica aberta
+    sidebar.classList.add("close"); // Garante que a sidebar fica aberta
   });
 });
 
