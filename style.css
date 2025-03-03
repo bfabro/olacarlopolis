@@ -292,6 +292,15 @@ body.dark {
 
 }
 
+.highlighted {
+  font-size: 1.0em; /* Tamanho maior para o nome */
+  font-weight: bold; /* Deixar o nome em negrito */
+  color: #007BFF; /* Cor de destaque, você pode mudar para a cor que preferir */
+  text-transform: uppercase; /* Deixar o nome em maiúsculas */
+  padding-bottom: 5px; /* Espaço abaixo do nome */
+  
+}
+
 /* Quando o menu fechar */
 .sidebar.close ~ .content_area {
   width: calc(100% - 80px);

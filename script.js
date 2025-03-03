@@ -150,9 +150,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Função para carregar conteúdo
 function loadContent(title, establishments) {
-  contentArea.innerHTML = `<h2>${title}</h2><br><ul>${establishments.map(establishment => `
+  contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>${establishments.map(establishment => `
     <li>
-      <strong>${establishment.name}</strong><br>
+      <strong class="highlighted">${establishment.name}</strong><br>
       <b>Endereço:</b> ${establishment.address}<br>
       <b>Horário de Funcionamento:</b> ${establishment.hours}<br>
       <b>Contato:</b> ${establishment.contact}<br><br>
