@@ -164,7 +164,7 @@ const categories = [
   { link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
     { name: "Supermercado Rocha", address: "Rua A, 123", hours: "8h - 18h", contact: "(43) 1234-5678" },
     { name: "Supermercado Carreiro", address: "Rua B, 456", hours: "7h - 19h", contact: "(43) 2345-6789" },
-    { name: "Mercado do Barateiro", address: "Rua C, 789", hours: "9h - 21h", contact: "(43) 3456-7890" },
+    { name: "Mercado do Barateiro", address: "Rua C, 789", hours: "9h - 21h e dom: 06 - 12h", contact: "(43) 3456-7890" },
   ] },
   { link: farmaciaLink, title: "Farmácias em Carlópolis", establishments: [
     { name: "Farmácia Aguera", address: "Rua D, 101", hours: "8h - 18h", contact: "(43) 4567-8901" },
