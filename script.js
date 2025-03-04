@@ -69,13 +69,32 @@ document.addEventListener("DOMContentLoaded", function () {
     darkLight.classList.toggle("bx-sun");
   });
 
-  // Alternar submenu
-  submenuItems.forEach(item => {
-    item.addEventListener("click", () => {
-      submenuItems.forEach(i => i !== item && i.classList.remove("show_submenu"));
-      item.classList.toggle("show_submenu");
+   // Expandir o menu principal quando clicado no celular
+   submenuItems.forEach(item => {
+    item.addEventListener("click", function () {
+      if (window.innerWidth < 768) {
+        // Se já estiver expandido, fecha; senão, expande
+        const submenu = this.nextElementSibling;
+        if (submenu.style.display === "block") {
+          submenu.style.display = "none";
+        } else {
+          document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
+          submenu.style.display = "block";
+        }
+      }
     });
   });
+
+  // Fechar a sidebar ao clicar em um subitem no celular
+  sublinks.forEach(link => {
+    link.addEventListener("click", function () {
+      if (window.innerWidth < 768) {
+        sidebar.classList.add("close");
+        document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
+      }
+    });
+  });
+});
 
 
 
