@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
   [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink, farmaciaPlantaoLink].forEach((menu) => {
     menu.addEventListener("click", function (event) {
       toggleSidebar(); // Expande a sidebar, se necessário
-      event.stopPropagation(); // Evita que outros eventos fechem a sidebar novamente
+    //  event.stopPropagation(); // Evita que outros eventos fechem a sidebar novamente
     });
   });
 
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
         detalhesDiv.style.display = "block";
       });
     });
-closeSidebar(); // Fecha a sidebar após carregar o conteúdo (somente no celular)
+
     // Evento para fechar os detalhes
     document.querySelectorAll(".fechar-detalhes").forEach(button => {
       button.addEventListener("click", function () {
