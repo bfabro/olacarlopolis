@@ -255,7 +255,7 @@ body.dark {
 }
 
 .bottom_content {
-  position: fixed;
+  position: RELATIVE;
   bottom: 100px;
   left: 0;
   width: 260px;
