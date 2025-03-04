@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+
   comercioLink.addEventListener("click", () => {
     if (sidebar.classList.contains("close")) {
       sidebar.classList.remove("close"); // Expande a barra lateral se estiver fechada
@@ -40,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebar.classList.add("close", "hoverable");
   });
 
-     sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
+  /////////////////////////////////////////////////
 
   sidebar.addEventListener("mouseenter", () => {
     if (sidebar.classList.contains("hoverable")) {
