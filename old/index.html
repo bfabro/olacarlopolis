@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Boxicons CSS -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://blade-ui-kit.com/build/assets/app-4a434763.css" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <title>Bem vindo ao OLA Carlópolis !!!</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+
+  <!-- navbar -->
+  <nav class="navbar">
+    <div class="logo_item">
+      <i class="bx bx-menu" id="sidebarOpen"></i>
+      <img src="images/logo.png" alt="">Ola Carlópolis
+    </div>
+
+    <div class="search_bar">
+      <input type="text" placeholder="Pesquisar..." />
+    </div>
+
+    <div class="navbar_content">
+      <i class="bi bi-grid"></i>
+      <i class='bx bx-sun' id="darkLight"></i>
+      <!-- <i class='bx bx-bell' ></i>-->
+
+    </div>
+  </nav>
+
+  <!-- sidebar -->
+  <nav class="sidebar">
+
+    <div class="menu_content">
+      <ul class="menu_items">
+        <!--<div class="menu_title menu_dahsboard"></div>
+      duplicate or remove this li tag if you want to add or remove navlink with submenu -->
+        <!-- start -->
+
+
+        <li class="item">
+          <a href="index.html" class="nav_link">
+            <span class="navlink_icon"><i class="fa-solid fa-house"></i></span>
+            <span class="navlink bold">Início</span>
+          </a>
+        </li>
+        <li class="item">
+          <div href="#" class="nav_link submenu_item">
+            <span class="navlink_icon">
+              <i id="menuComercio" class="bx bxs-store"></i>
+            </span>
+            <span class="navlink bold">Comercios</span>
+            <i class="bx bx-chevron-right arrow-left"></i>
+          </div>
+          <ul class="menu_items submenu">
+
+            <a id="menuAcougue" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-cow"></i></span>
+              <span class="navlink">Açougue</span>
+            </a>
+
+            <a id="menuAgropecuaria" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i style="color:rgb(43, 175, 26)" class="fa-solid fa-building-wheat"></i></span>
+              <span class="navlink">Agropecuaria</span>
+            </a>
+
+            <a id="menuDiskGas" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-kitchen-set"></i></span>
+              <span class="navlink">Disk Gas</span>
+            </a>
+
+            <a id="menuFarmacia" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-house-medical"></i></span>
+              <span class="navlink">Farmacia</span>
+            </a>
+
+            <a id="menuLanchonete" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"class="fas fa-hamburger"></i></span>
+              <span class="navlink">Lanchonete</span>
+            </a>
+
+            <a id="menuMaterialContrucao" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-person-digging"></i></span>
+              <span class="navlink">Material Construção</span>
+            </a>
+
+            <a id="menuPetShop" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-paw"></i></span>
+              <span class="navlink">PetShop</span>
+            </a>
+
+            <a id="menuQuitanda" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i style="color:rgb(255, 0, 0)" class="fa-solid fa-pepper-hot"></i></span>
+              <span class="navlink">Quitanda</span>
+            </a>
+
+            <a id="menuRestaurantes" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fas fa-utensils icon"></i></span>
+              <span class="navlink">Restaurante</span>
+            </a>
+
+            <a id="menuMercado" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fas fa-shopping-cart icon"></i></span>
+              <span class="navlink">SuperMercado</span>
+            </a>
+
+            
+
+
+          </ul>
+        </li>
+        <!-- end -->
+
+        <li class="item">
+          <div href="#" class="nav_link submenu_item">
+            <span class="navlink_icon">
+              <i class="fa-solid fa-user"></i>
+            </span>
+            <span class="navlink bold">Serviços</span>
+            <i class="bx bx-chevron-right arrow-left"></i>
+          </div>
+          <ul class="menu_items submenu">
+
+            <a id="menuBabas" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fas fa-baby"></i></span>
+              <span class="navlink">Babas</span>
+            </a>
+
+            <a id="menuDiarista" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fas fa-broom"></i></span>
+              <span class="navlink">Diarista</span>
+            </a>
+            <a id="menuChurrasqueiro" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-drumstick-bite"></i></span>
+              <span class="navlink">Churrasqueiro</span>
+            </a>
+
+
+            <a id="menuEletricista" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fas fa-lightbulb"></i></span>
+              <span class="navlink">Eletricista</span>
+            </a>
+
+            <a id="menuEncanador" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fas fa-wrench"></i></span>
+              <span class="navlink">Encanador</span>
+            </a>
+
+            <a id="menuGuiaPesca" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-fish-fins"></i></i></span>
+              <span class="navlink">Guia de Pesca</span>
+            </a>
+
+            <a id="menuJardineiro" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-tree"></i></span>
+              <span class="navlink">Jardineiro</span>
+            </a>
+
+            
+
+            <a id="menuMarceneiro" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fas fa-hammer"></i></span>
+              <span class="navlink">Marceneiro</span>
+            </a>
+
+            <a id="menuPedreiro" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fas fa-hard-hat"></i></span>
+              <span class="navlink">Pedreiro</span>
+            </a>
+
+            <a id="menuPintor" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-paintbrush"></i></span>
+              <span class="navlink">Pintor</span>
+            </a>
+
+            <a id="menuVeterinario" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i style="color:blue"class="fa-solid fa-shield-dog"></i></span>
+              <span class="navlink">Veterinario</span>
+            </a>
+
+          </ul>
+        </li>
+
+        <li class="item">
+          <div href="#" class="nav_link submenu_item">
+            <span class="navlink_icon">
+              <i class="fa-solid fa-circle-info"></i>
+            </span>
+            <span class="navlink bold">informações Uteis</span>
+            <i class="bx bx-chevron-right arrow-left"></i>
+          </div>
+          <ul class="menu_items submenu">
+
+            <a id="menuEventos" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-regular fa-calendar-days"></i></span>
+              <span class="navlink">Eventos</span>
+            </a>
+
+            <a id="menufarmaciaPlantao" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"class="bx bx-plus-medical"></i></span>
+              <span class="navlink">Farmacias de Plantão</span>
+            </a>
+
+            <a id="menuHorarioOnibus" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="bx bxs-bus"></i></span>
+              <span class="navlink">Horarios de Onibus</span>
+            </a>
+
+            <a id="menuLoterica" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-sack-dollar"></i></span>
+              <span class="navlink">Loterica</span>
+            </a>
+
+            <a id="menuVagasTrabalho" href="#" class="nav_link sublink">
+              <span class="navlink_icon"><i class="fa-solid fa-handshake"></i></i></span>
+              <span class="navlink">Vagas de Trabalho</span>
+            </a>
+          </ul>
+        </li>
+
+      </ul>
+      <!-- end -->
+
+      <ul class="menu_items">
+        <div class="menu_title menu_setting"></div>
+        <li class="item">
+          <a href="https://wa.me/+5511998985930?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20o%20site%20Ola%20Carlópolis."
+            target="_blank" class="nav_link">
+            <span class="navlink_icon">
+              <i class="fa-brands fa-whatsapp"></i>
+            </span>
+            <span class="navlink bold">Quero Participar!</span>
+          </a>
+        </li>
+
+      </ul>
+
+      <!-- Sidebar Open / Close -->
+      <div class="bottom_content">
+        <div class="bottom expand_sidebar">
+          <span> </span>
+          <i class='bx bx-log-in'></i>
+        </div>
+        <div class="bottom collapse_sidebar">
+          <span> </span>
+          <i class='bx bx-log-out'></i>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content_area">
+    <h2>Bem-vindo ao Ola Carlópolis Sssass</h2>
+    <p>Selecione um item ao lado para exibir informações.</p>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+</body>
+
+</html>
