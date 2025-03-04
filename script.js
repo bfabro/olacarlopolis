@@ -14,14 +14,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
 
-  // Inicializa o menu como retraído em telas pequenas
-  if (window.innerWidth < 768) {
-    sidebar.classList.add("close");
-  }
-
-  // Função para alternar a barra lateral
+  //////////////////////////////////////////////////////////
+  // Alternar sidebar
   sidebarOpen.addEventListener("click", () => {
-    sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
+    if (sidebar.classList.contains("close")) {
+      sidebar.classList.remove("close"); // Expande a barra lateral se estiver fechada
+    } else {
+      sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
+    }
   });
 
   sidebarExpand.addEventListener("click", () => {
@@ -136,10 +136,10 @@ document.addEventListener("DOMContentLoaded", function () {
   categories.forEach(category => {
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
+      loadContent(category.title, category.establishments);
       if (window.innerWidth < 768) {
-        sidebar.classList.remove("close"); // Expande o menu em telas pequenas
+        sidebar.classList.add("close"); // Fecha a barra lateral em telas pequenas
       }
-      loadContent(category.title, category.establishments); // Carrega o conteúdo
     });
   });
 });
