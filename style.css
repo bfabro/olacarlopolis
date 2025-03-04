@@ -259,7 +259,7 @@ body.dark {
 }
 
 .bottom {
-  position: absolute;
+  position: fixed;
   display: flex;
   align-items: center;
   left: 0;
