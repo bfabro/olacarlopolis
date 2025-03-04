@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const sidebar = document.querySelector(".sidebar");
   const contentArea = document.querySelector(".content_area");
   const submenuItems = document.querySelectorAll(".submenu_item");
-  // responsavel em mostrar o menu
   const sidebarOpen = document.querySelector("#sidebarOpen");
   const sidebarClose = document.querySelector(".collapse_sidebar");
   const sidebarExpand = document.querySelector(".expand_sidebar");
@@ -14,18 +13,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const comercioLink = document.querySelector("#menuComercio");
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
-  
 
   //////////////////////////////////////////////////////////
   // Alternar sidebar
- // Adicionar evento de clique no ícone do menu para expandir a barra lateral
-sidebarOpen.addEventListener("click", () => {
-  if (sidebar.classList.contains("close")) {
-    sidebar.classList.remove("close"); // Expande a barra lateral se estiver fechada
-  } else {
-    sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
-  }
-});
+  sidebarOpen.addEventListener("click", () => {
+    if (sidebar.classList.contains("close")) {
+      sidebar.classList.remove("close"); // Expande a barra lateral se estiver fechada
+    } else {
+      sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
+    }
+  });
 
   sidebarExpand.addEventListener("click", () => {
     sidebar.classList.remove("close", "hoverable");
@@ -34,17 +31,6 @@ sidebarOpen.addEventListener("click", () => {
   sidebarClose.addEventListener("click", () => {
     sidebar.classList.add("close", "hoverable");
   });
-
-
- 
-
-  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink, farmaciaPlantaoLink].forEach((menu) => {
-    menu.addEventListener("click", function (event) {
-      toggleSidebar(); // Expande a sidebar, se necessário
-    //  event.stopPropagation(); // Evita que outros eventos fechem a sidebar novamente
-    });
-  });
-
 
   /////////////////////////////////////////////////
 
@@ -75,99 +61,7 @@ sidebarOpen.addEventListener("click", () => {
     });
   });
 
-
- // Carregar conteúdo e fechar sidebar depois de selecionar um item
- function loadContent(title, items) {
-  contentArea.innerHTML = `<h2>${title}</h2><br><ul>${items
-    .map((item) => `<li>🛒 ${item}</li>`)
-    .join("")}</ul>`;
-  // closeSidebar(); // Fecha o menu após carregar o conteúdo
-  sidebar.classList.remove("close"); // Sempre manter aberto após atualização
-}
-
-
-
-
-
-
-
-
-  /////////////// INICIO < 768
-
-
-
-
-  function toggleSidebar() {
-    if (window.innerWidth < 768) {
-      if (sidebar.classList.contains("close")) {
-        sidebar.classList.remove("close"); // Expande a sidebar se estiver fechada
-      }
-    }
-  }
-
-
-  // Função para expandir o menu quando um item pai for clicado
-  function expandSidebar() {
-    if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
-      sidebar.classList.remove("close");
-    }
-  }
-
-  // Função para fechar o menu depois de selecionar um item
-  function closeSidebar() {
-    if (window.innerWidth < 768) {
-      sidebar.classList.add("close");
-    }
-  }
-
-  // Adicionar eventos para os menus pai
-  // Ao clicar, apenas garantir que a sidebar não feche em telas grandes
-  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink,farmaciaPlantaoLink].forEach((menu) => {
-    menu.addEventListener("click", () => {
-      if (window.innerWidth >= 768) {
-        sidebar.classList.remove("close");
-      }
-    });
-  });
-
-  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink, farmaciaPlantaoLink].forEach((menu) => {
-    menu.addEventListener("click", function (event) {
-      toggleSidebar(); // Expande a sidebar, se necessário
-     event.stopPropagation(); // Evita que outros eventos fechem a sidebar novamente
-    });
-  });
-
-  
-  // Fechar sidebar em telas pequenas
- // if (window.innerWidth < 768) {
- //   sidebar.classList.remove("close"); // Garante que comece aberto no celular
- // }
-
-  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink,farmaciaPlantaoLink].forEach((menu) => {
-    menu.addEventListener("click", () => {
-      if (window.innerWidth <= 768) {
-        sidebar.classList.add("close");
-      } else {
-        
-        sidebar.classList.remove("close");
-      }
-
-    });
-  });
-
-
-
-  /////// FIM < 768
-
-
-
-
- 
-
-
-
-
-
+  // Função para carregar conteúdo
   function loadContent(title, establishments) {
     contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
       ${establishments.map(establishment => `
@@ -204,7 +98,6 @@ sidebarOpen.addEventListener("click", () => {
     });
   }
 
-
   // Carregar informações de categorias
   const categories = [
     {
@@ -228,36 +121,27 @@ sidebarOpen.addEventListener("click", () => {
         { name: "Comércio C", address: "Rua I, 606", hours: "10h - 20h", contact: "(43) 9012-3456" },
       ]
     },
-    // MENU SERVIÇOS
     {
       link: churrasqueiroLink, title: "Churrasqueiros em Carlópolis", establishments: [
         { name: "Pituka", contact: "(43) 7890-1234" },
         { name: "Gustavo", contact: "(43) 8901-2345" },
-
       ]
     },
-
     {
       link: farmaciaPlantaoLink, title: "Farmacia de Plantão", establishments: [
-       
-       { name: "Farma Mais", address: "Rua do calçadao, 123", hours: "7h - 21h e dom: 07 - 20h", contact: "(43) 3456-7890" },
+        { name: "Farma Mais", address: "Rua do calçadao, 123", hours: "7h - 21h e dom: 07 - 20h", contact: "(43) 3456-7890" },
       ]
     }
   ];
 
+  // Adicionar eventos para os links do menu
   categories.forEach(category => {
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
       loadContent(category.title, category.establishments);
       if (window.innerWidth < 768) {
-        sidebar.classList.add("close"); // Fecha apenas em telas pequenas
-      } else {
-        sidebar.classList.remove("close"); // Garante que fica aberto no desktop
+        sidebar.classList.add("close"); // Fecha a barra lateral em telas pequenas
       }
     });
   });
-
-  
-
-
 });
