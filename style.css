@@ -312,7 +312,7 @@ body.dark {
 .content_area {
 
   padding: 10px;
-  width: calc(82% - 0px);
+  width: calc(130% - 30x);
   min-height: 84vh;
   background: #f4f4f4;
   margin: 88px 0px 0px 276px;
@@ -359,7 +359,7 @@ body.dark {
 
 /* Quando o menu fechar */
 .sidebar.close~.content_area {
-  width: calc(100% - 80px);
+  width: calc(140% - 80px);
   margin-left: 86px;
 }
 
@@ -370,10 +370,10 @@ body.dark {
   padding: 10px 0;
 }
 
-/* Evitar que os submenus abram quando a sidebar está fechada */
+/* Evitar que os submenus abram quando a sidebar está fechada 
 .sidebar.close .submenu {
   display: none !important;
-}
+}*/
 
 @media screen and (max-width: 768px) {
   #sidebarOpen {
