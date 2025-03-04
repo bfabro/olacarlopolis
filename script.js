@@ -134,9 +134,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   
   // Fechar sidebar em telas pequenas
-  if (window.innerWidth < 768) {
-    sidebar.classList.remove("close"); // Garante que comece aberto no celular
-  }
+ // if (window.innerWidth < 768) {
+ //   sidebar.classList.remove("close"); // Garante que comece aberto no celular
+ // }
 
   [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink,farmaciaPlantaoLink].forEach((menu) => {
     menu.addEventListener("click", () => {
