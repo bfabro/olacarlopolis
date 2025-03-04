@@ -34,18 +34,17 @@ document.addEventListener("DOMContentLoaded", function () {
   adjustSidebar();
   window.addEventListener("resize", adjustSidebar);
 
-  // Aplicar evento de clique para alternar a sidebar nos menus
-  Object.values(menuLinks).forEach((menu) => {
-    menu.addEventListener("click", toggleSidebar);
-  });
+  // Expandir item do menu quando a sidebar estiver retraída (celular)
+  function expandMenuOnClick(event) {
+    if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
+      sidebar.classList.remove("close"); // Expande a sidebar
+      event.stopPropagation(); // Evita que outros eventos interfiram
+    }
+  }
 
-  // Garantir que a sidebar fique aberta em telas grandes ao clicar no menu
+  // Aplicar evento de clique nos menus principais para expandir
   Object.values(menuLinks).forEach((menu) => {
-    menu.addEventListener("click", () => {
-      if (window.innerWidth >= 768) {
-        sidebar.classList.remove("close");
-      }
-    });
+    menu.addEventListener("click", expandMenuOnClick);
   });
 
   // Alternar submenu
@@ -97,6 +96,11 @@ document.addEventListener("DOMContentLoaded", function () {
         this.parentElement.style.display = "none";
       });
     });
+
+    // Após selecionar um item no submenu, a sidebar se retrai (se for no celular)
+    if (window.innerWidth < 768) {
+      sidebar.classList.add("close");
+    }
   }
 
   // Dados das categorias de estabelecimentos
@@ -140,7 +144,6 @@ document.addEventListener("DOMContentLoaded", function () {
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
       loadContent(category.title, category.establishments);
-      toggleSidebar();
     });
   });
 
