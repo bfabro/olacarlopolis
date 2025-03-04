@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
   
-
+ 
+  const sublinks = document.querySelectorAll(".sublink");
   //////////////////////////////////////////////////////////
   // Alternar sidebar
   sidebarOpen.addEventListener("click", () => {

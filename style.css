@@ -293,11 +293,11 @@ body.dark {
 .sidebar.close .bottom span {
   display: none;
 }
-/*
+
 .sidebar.hoverable .collapse_sidebar {
   display: none;
 }
-*/
+
 #sidebarOpen {
   display: none;
 }
