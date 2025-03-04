@@ -293,11 +293,11 @@ body.dark {
 .sidebar.close .bottom span {
   display: none;
 }
-
+/*
 .sidebar.hoverable .collapse_sidebar {
   display: none;
 }
-
+*/
 #sidebarOpen {
   display: none;
 }
@@ -369,8 +369,6 @@ body.dark {
   display: none !important;
 }
 
-
-
 @media screen and (max-width: 768px) {
   #sidebarOpen {
     font-size: 25px;
@@ -380,9 +378,6 @@ body.dark {
     color: var(--grey-color);
   }
 
-  
-
-
   .search_bar {
     display: none;
   }
@@ -391,7 +386,6 @@ body.dark {
     width: 80px;
 
   }
-
 
 
 }
