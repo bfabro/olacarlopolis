@@ -297,6 +297,17 @@ body.dark {
   display: none;
 }
 
+.map-icon {
+  margin-left: 8px;
+  color: #007bff; /* Cor do ícone */
+  text-decoration: none;
+  font-size: 1.2em;
+}
+
+.map-icon:hover {
+  color: #0056b3; /* Cor do ícone ao passar o mouse */
+}
+
 
 .content_area {
 

@@ -76,7 +76,12 @@ document.addEventListener("DOMContentLoaded", function () {
       ${establishments.map(establishment => `
         <li>
           <strong class="highlighted">${establishment.name}</strong><br>
-          ${establishment.address ? `<b>Endereço:</b> ${establishment.address}<br>` : ""}
+          ${establishment.address ? `
+            <b>Endereço:</b> ${establishment.address}
+            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="map-icon">
+              <i class='bx bx-map'></i> <!-- Ícone de mapa do Boxicons -->
+            </a><br>
+          ` : ""}
           ${establishment.hours ? `<b>Horário de Funcionamento:</b> ${establishment.hours}<br>` : ""}
           <b>Contato:</b> ${establishment.contact}<br>
           <button class="detalhes-btn" data-name="${establishment.name}" 
@@ -90,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </li>
       `).join('')}
     </ul>`;
-
+  
     // Adicionar eventos aos botões de detalhes
     document.querySelectorAll(".detalhes-btn").forEach(button => {
       button.addEventListener("click", function () {
@@ -98,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
         detalhesDiv.style.display = "block";
       });
     });
-
+  
     // Evento para fechar os detalhes
     document.querySelectorAll(".fechar-detalhes").forEach(button => {
       button.addEventListener("click", function () {
@@ -111,9 +116,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const categories = [
     {
       link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
-        { name: "Supermercado Rocha", address: "Rua A, 123", hours: "8h - 18h", contact: "(43) 1234-5678" },
-        { name: "Supermercado Carreiro", address: "Rua B, 456", hours: "7h - 19h", contact: "(43) 2345-6789" },
-        { name: "Mercado do Barateiro", address: "Rua C, 789", hours: "9h - 21h e dom: 06 - 12h", contact: "(43) 3456-7890" },
+        { name: "Supermercado Rocha", address: "Av. Elson Soares, 767 - Carlópolis, PR, 86420-000", hours: "8h - 18h", contact: "(43) 1234-5678" },
+        { name: "Supermercado Carreiro", address: "R. Benedito Salles, 341 - Carlópolis, PR, 86420-000", hours: "7h - 19h", contact: "(43) 2345-6789" },
+        { name: "Supermercado Barateiro", address: "PR-218, 1168 - Carlópolis, PR, 86420-000", hours: "9h - 21h e dom: 06 - 12h", contact: "(43) 3456-7890" },
       ]
     },
     {
