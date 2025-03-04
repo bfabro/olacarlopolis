@@ -18,9 +18,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //////////////////////////////////////////////////////////
   // Alternar sidebar
-  sidebarOpen.addEventListener("click", () => {
-    sidebar.classList.toggle("close");
-  });
+ // Adicionar evento de clique no ícone do menu para expandir a barra lateral
+sidebarOpen.addEventListener("click", () => {
+  if (sidebar.classList.contains("close")) {
+    sidebar.classList.remove("close"); // Expande a barra lateral se estiver fechada
+  } else {
+    sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
+  }
+});
 
   sidebarExpand.addEventListener("click", () => {
     sidebar.classList.remove("close", "hoverable");
@@ -251,6 +256,8 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  
 
 
 });
