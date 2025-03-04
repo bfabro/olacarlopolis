@@ -1,7 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const body = document.querySelector("body");
+  const darkLight = document.querySelector("#darkLight");
   const sidebar = document.querySelector(".sidebar");
   const contentArea = document.querySelector(".content_area");
+  const submenuItems = document.querySelectorAll(".submenu_item");
   const sidebarOpen = document.querySelector("#sidebarOpen");
+  const sidebarClose = document.querySelector(".collapse_sidebar");
+  const sidebarExpand = document.querySelector(".expand_sidebar");
 
   const farmaciaLink = document.querySelector("#menuFarmacia");
   const supermercadoLink = document.querySelector("#menuMercado");
@@ -9,17 +14,52 @@ document.addEventListener("DOMContentLoaded", function () {
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
 
-  // Inicializa o menu como retraído em telas pequenas
-  if (window.innerWidth < 768) {
-    sidebar.classList.add("close");
-  }
-
-  // Função para alternar a barra lateral
+  //////////////////////////////////////////////////////////
+  // Alternar sidebar
   sidebarOpen.addEventListener("click", () => {
-    sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
+    if (sidebar.classList.contains("close")) {
+      sidebar.classList.remove("close"); // Expande a barra lateral se estiver fechada
+    } else {
+      sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
+    }
   });
 
-  // Função para carregar conteúdo e esconder o menu em telas pequenas
+  sidebarExpand.addEventListener("click", () => {
+    sidebar.classList.remove("close", "hoverable");
+  });
+
+  sidebarClose.addEventListener("click", () => {
+    sidebar.classList.add("close", "hoverable");
+  });
+
+  sidebar.addEventListener("mouseenter", () => {
+    if (sidebar.classList.contains("hoverable")) {
+      sidebar.classList.remove("close");
+    }
+  });
+
+  sidebar.addEventListener("mouseleave", () => {
+    if (sidebar.classList.contains("hoverable")) {
+      sidebar.classList.add("close");
+    }
+  });
+
+  // Alternar tema escuro/claro
+  darkLight.addEventListener("click", () => {
+    body.classList.toggle("dark");
+    darkLight.classList.toggle("bx-moon");
+    darkLight.classList.toggle("bx-sun");
+  });
+
+  // Alternar submenu
+  submenuItems.forEach(item => {
+    item.addEventListener("click", () => {
+      submenuItems.forEach(i => i !== item && i.classList.remove("show_submenu"));
+      item.classList.toggle("show_submenu");
+    });
+  });
+
+  // Função para carregar conteúdo
   function loadContent(title, establishments) {
     contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
       ${establishments.map(establishment => `
@@ -54,14 +94,9 @@ document.addEventListener("DOMContentLoaded", function () {
         this.parentElement.style.display = "none";
       });
     });
-
-    // Esconder o menu em telas pequenas após carregar o conteúdo
-    if (window.innerWidth < 768) {
-      sidebar.classList.add("close");
-    }
   }
 
-  // Dados das categorias
+  // Carregar informações de categorias
   const categories = [
     {
       link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
@@ -101,10 +136,10 @@ document.addEventListener("DOMContentLoaded", function () {
   categories.forEach(category => {
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
+      loadContent(category.title, category.establishments);
       if (window.innerWidth < 768) {
-        sidebar.classList.remove("close"); // Expande o menu em telas pequenas
+        sidebar.classList.add("close"); // Fecha a barra lateral em telas pequenas
       }
-      loadContent(category.title, category.establishments); // Carrega o conteúdo
     });
   });
 });
