@@ -171,6 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
   function toggleSidebar() {
     if (window.innerWidth < 768) {
       if (sidebar.classList.contains("close")) {
@@ -181,20 +182,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   // Função para expandir o menu quando um item pai for clicado
-  function expandSidebar() {
+  function sidebarExpand() {
     if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
       sidebar.classList.remove("close");
     }
   }
 
   // Função para fechar o menu depois de selecionar um item
-  function closeSidebar() {
+  function sidebarClose() {
     if (window.innerWidth < 768) {
       sidebar.classList.add("close");
     }
   }
 
-  // Adicionar eventos para os menus pai
+  
   // Ao clicar, apenas garantir que a sidebar não feche em telas grandes
   [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink, farmaciaPlantaoLink].forEach((menu) => {
     menu.addEventListener("click", () => {
@@ -205,14 +206,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
-  // Fechar sidebar em telas pequenas
-  if (window.innerWidth < 768) {
-    sidebar.classList.remove("close"); // Garante que comece aberto no celular
-  }
-
+  
   [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink, farmaciaPlantaoLink].forEach((menu) => {
     menu.addEventListener("click", () => {
-      if (window.innerWidth <= 768) {
+      if (window.innerWidth < 768) {
         sidebar.classList.add("close");
       } else {
 
