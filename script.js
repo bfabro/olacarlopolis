@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
         detalhesDiv.style.display = "block";
       });
     });
-
+    closeSidebar(); // Fecha a sidebar após carregar o conteúdo (somente no celular)
     // Evento para fechar os detalhes
     document.querySelectorAll(".fechar-detalhes").forEach(button => {
       button.addEventListener("click", function () {
