@@ -77,13 +77,13 @@ document.addEventListener("DOMContentLoaded", function () {
         <li>
           <strong class="highlighted">${establishment.name}</strong><br>
           ${establishment.address ? `
-            <b>Endereço:</b> ${establishment.address}
-            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="map-icon">
-              <i class='bx bx-map'></i> <!-- Ícone de mapa do Boxicons -->
-            </a><br>
+            <b>Endereço: </b><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="map-icon">
+              <i class='bx bx-map'></i> 
+            </a> ${establishment.address}</br>
+            
           ` : ""}
           ${establishment.hours ? `<b>Horário de Funcionamento:</b> ${establishment.hours}<br>` : ""}
-          <b>Contato:</b> ${establishment.contact}<br>
+          <b>Contato:</b> ${establishment.contact}</br>
           <button class="detalhes-btn" data-name="${establishment.name}" 
             data-contact="${establishment.contact}">
             Ver mais detalhes
