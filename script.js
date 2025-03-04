@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const comercioLink = document.querySelector("#menuComercio");
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
-  
+
 
   //////////////////////////////////////////////////////////
   // Alternar sidebar
@@ -30,20 +30,13 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebar.classList.add("close", "hoverable");
   });
 
-  function toggleSidebar() {
-    if (window.innerWidth < 768) {
-      if (sidebar.classList.contains("close")) {
-        sidebar.classList.remove("close"); // Expande a sidebar se estiver fechada
-      }
-    }
-  }
 
- 
+
 
   [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink, farmaciaPlantaoLink].forEach((menu) => {
     menu.addEventListener("click", function (event) {
       toggleSidebar(); // Expande a sidebar, se necessário
-    //  event.stopPropagation(); // Evita que outros eventos fechem a sidebar novamente
+      //  event.stopPropagation(); // Evita que outros eventos fechem a sidebar novamente
     });
   });
 
@@ -78,31 +71,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
-
-  // Função para expandir o menu quando um item pai for clicado
-  function expandSidebar() {
-    if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
-      sidebar.classList.remove("close");
-    }
-  }
-
-  // Função para fechar o menu depois de selecionar um item
-  function closeSidebar() {
-    if (window.innerWidth < 768) {
-      sidebar.classList.add("close");
-    }
-  }
-
-  // Adicionar eventos para os menus pai
-  // Ao clicar, apenas garantir que a sidebar não feche em telas grandes
-  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink,farmaciaPlantaoLink].forEach((menu) => {
-    menu.addEventListener("click", () => {
-      if (window.innerWidth >= 768) {
-        sidebar.classList.remove("close");
-      }
-    });
-  });
-
   // Carregar conteúdo e fechar sidebar depois de selecionar um item
   function loadContent(title, items) {
     contentArea.innerHTML = `<h2>${title}</h2><br><ul>${items
@@ -113,44 +81,29 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  // Fechar sidebar em telas pequenas
-  if (window.innerWidth < 768) {
-    sidebar.classList.remove("close"); // Garante que comece aberto no celular
-  }
 
 
-  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink,farmaciaPlantaoLink].forEach((menu) => {
-    menu.addEventListener("click", () => {
-      if (window.innerWidth <= 768) {
-        sidebar.classList.add("close");
-      } else {
-        
-        sidebar.classList.remove("close");
-      }
-
-    });
-  });
 
 
   function loadContent(title, establishments) {
     contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
-      ${establishments.map(establishment => `
-        <li>
-          <strong class="highlighted">${establishment.name}</strong><br>
-          ${establishment.address ? `<b>Endereço:</b> ${establishment.address}<br>` : ""}
-          ${establishment.hours ? `<b>Horário de Funcionamento:</b> ${establishment.hours}<br>` : ""}
-          <b>Contato:</b> ${establishment.contact}<br>
-          <button class="detalhes-btn" data-name="${establishment.name}" 
-            data-contact="${establishment.contact}">
-            Ver mais detalhes
-          </button>
-          <div class="detalhes-content" id="detalhes-${encodeURIComponent(establishment.name)}" style="display: none;">
-            <p>Aqui você pode adicionar fotos e promoções para ${establishment.name}.</p>
-            <button class="fechar-detalhes">Fechar</button>
-          </div>
-        </li>
-      `).join('')}
-    </ul>`;
+    ${establishments.map(establishment => `
+      <li>
+        <strong class="highlighted">${establishment.name}</strong><br>
+        ${establishment.address ? `<b>Endereço:</b> ${establishment.address}<br>` : ""}
+        ${establishment.hours ? `<b>Horário de Funcionamento:</b> ${establishment.hours}<br>` : ""}
+        <b>Contato:</b> ${establishment.contact}<br>
+        <button class="detalhes-btn" data-name="${establishment.name}" 
+          data-contact="${establishment.contact}">
+          Ver mais detalhes
+        </button>
+        <div class="detalhes-content" id="detalhes-${encodeURIComponent(establishment.name)}" style="display: none;">
+          <p>Aqui você pode adicionar fotos e promoções para ${establishment.name}.</p>
+          <button class="fechar-detalhes">Fechar</button>
+        </div>
+      </li>
+    `).join('')}
+  </ul>`;
 
     // Adicionar eventos aos botões de detalhes
     document.querySelectorAll(".detalhes-btn").forEach(button => {
@@ -203,11 +156,82 @@ document.addEventListener("DOMContentLoaded", function () {
 
     {
       link: farmaciaPlantaoLink, title: "Farmacia de Plantão", establishments: [
-       
-       { name: "Farma Mais", address: "Rua do calçadao, 123", hours: "7h - 21h e dom: 07 - 20h", contact: "(43) 3456-7890" },
+
+        { name: "Farma Mais", address: "Rua do calçadao, 123", hours: "7h - 21h e dom: 07 - 20h", contact: "(43) 3456-7890" },
       ]
     }
   ];
+
+
+
+
+
+  /////////////// INICIO < 768
+
+
+
+
+  function toggleSidebar() {
+    if (window.innerWidth < 768) {
+      if (sidebar.classList.contains("close")) {
+        sidebar.classList.remove("close"); // Expande a sidebar se estiver fechada
+      }
+    }
+  }
+
+
+  // Função para expandir o menu quando um item pai for clicado
+  function expandSidebar() {
+    if (window.innerWidth < 768 && sidebar.classList.contains("close")) {
+      sidebar.classList.remove("close");
+    }
+  }
+
+  // Função para fechar o menu depois de selecionar um item
+  function closeSidebar() {
+    if (window.innerWidth < 768) {
+      sidebar.classList.add("close");
+    }
+  }
+
+  // Adicionar eventos para os menus pai
+  // Ao clicar, apenas garantir que a sidebar não feche em telas grandes
+  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink, farmaciaPlantaoLink].forEach((menu) => {
+    menu.addEventListener("click", () => {
+      if (window.innerWidth >= 768) {
+        sidebar.classList.remove("close");
+      }
+    });
+  });
+
+
+  // Fechar sidebar em telas pequenas
+  if (window.innerWidth < 768) {
+    sidebar.classList.remove("close"); // Garante que comece aberto no celular
+  }
+
+  [comercioLink, supermercadoLink, farmaciaLink, churrasqueiroLink, farmaciaPlantaoLink].forEach((menu) => {
+    menu.addEventListener("click", () => {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.add("close");
+      } else {
+
+        sidebar.classList.remove("close");
+      }
+
+    });
+  });
+
+
+
+  /////// FIM < 768
+
+
+
+
+
+
+
 
   categories.forEach(category => {
     category.link.addEventListener("click", function (event) {

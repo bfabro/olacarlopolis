@@ -105,13 +105,8 @@ body.dark {
   /*overflow-y: scroll;*/
   overflow: hidden;
   box-shadow: 0 0 1px var(--grey-color-light);
-  transition: all 0.5s ease;
-
   transition: transform 0.3s ease-in-out;
 }
-
-
-
 
 .sidebar.close {
   padding: 78px 0;
@@ -123,7 +118,7 @@ body.dark {
 }
 
 .menu_content {
-  position: absolute;
+  position: relative;
 }
 
 .menu_title {
