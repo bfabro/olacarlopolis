@@ -20,9 +20,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   //////////////////////////////////////////////////////////
-  // Alternar sidebar
+  // Alternar sidebar ao clicar no ícone do menu
   sidebarOpen.addEventListener("click", () => {
-    sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
+    sidebar.classList.remove("close"); // Expande a barra lateral
   });
 
   sidebarExpand.addEventListener("click", () => {
@@ -108,25 +108,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const categories = [
     {
       link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
-        { name: "Supermercado Rocha", address: "Av. Elson Soares, 767 - Carlópolis, PR, 86420-000", hours: "8h - 18h", contact: "(43) 1234-5678" },
-        { name: "Supermercado Carreiro", address: "R. Benedito Salles, 341 - Carlópolis, PR, 86420-000", hours: "7h - 19h", contact: "(43) 2345-6789" },
-        { name: "Supermercado Barateiro", address: "PR-218, 1168 - Carlópolis, PR, 86420-000", hours: "9h - 21h e dom: 06 - 12h", contact: "(43) 3456-7890" },
+        { name: "Supermercado Rocha", address: "Av. Elson Soares, 767 ", hours: "6h - 20h e dom: 06 - 12h", contact: "(43) 1234-5678" },
+        { name: "Supermercado Carreiro", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789" },
+        { name: "Supermercado Barateiro", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890" },
       ]
     },
     {
       link: farmaciaLink, title: "Farmácias em Carlópolis", establishments: [
-        { name: "Farmácia Aguera", address: "Rua D, 101", hours: "8h - 18h", contact: "(43) 4567-8901" },
-        { name: "Farmácia Jorginho", address: "Rua E, 202", hours: "8h - 20h", contact: "(43) 5678-9012" },
-        { name: "Farmácia João", address: "Rua F, 303", hours: "7h - 19h", contact: "(43) 6789-0123" },
+        { name: "Farmácia Aguera", address: "Rua D, 101", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 4567-8901" },
+        { name: "Farmácia Jorginho", address: "Rua E, 202", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 5678-9012" },
+        { name: "Farmácia João", address: "Rua F, 303", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 6789-0123" },
       ]
     },
-    {
-      link: comercioLink, title: "Comércios em Carlópolis", establishments: [
-        { name: "Comércio A", address: "Rua G, 404", hours: "8h - 18h", contact: "(43) 7890-1234" },
-        { name: "Comércio B", address: "Rua H, 505", hours: "9h - 19h", contact: "(43) 8901-2345" },
-        { name: "Comércio C", address: "Rua I, 606", hours: "10h - 20h", contact: "(43) 9012-3456" },
-      ]
-    },
+   
     {
       link: churrasqueiroLink, title: "Churrasqueiros em Carlópolis", establishments: [
         { name: "Pituka", contact: "(43) 7890-1234" },
@@ -145,9 +139,11 @@ document.addEventListener("DOMContentLoaded", function () {
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
       loadContent(category.title, category.establishments);
-      if (window.innerWidth < 768) {
-        sidebar.classList.remove("close"); // Expande a barra lateral ao clicar em um item
-      }
+
+      // Expande a sidebar ao clicar em um item
+      sidebar.classList.remove("close");
+
+      
     });
   });
 
