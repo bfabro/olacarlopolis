@@ -68,14 +68,18 @@ document.addEventListener("DOMContentLoaded", function () {
       ${establishments.map(establishment => `
         <li>
           <strong class="highlighted">${establishment.name}</strong><br>
+          ${establishment.hours ? `<b>Funcionamento:</b> ${establishment.hours}<br>` : ""}
           ${establishment.address ? `
             <b>Endereço: </b><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="map-icon">
               <i class='bx bx-map'></i> 
-            </a> ${establishment.address}</br>
-            
-          ` : ""}
-          ${establishment.hours ? `<b>Horário de Funcionamento:</b> ${establishment.hours}<br>` : ""}
-          <b>Contato:</b> ${establishment.contact}</br>
+            </a> ${establishment.address}</br>` : ""}
+  <b>Contato:</b> ${establishment.contact} 
+          <a href="https://wa.me/55${establishment.contact.replace(/[^0-9]/g, '')}?text=Vim%20por%20meio%20do%20site%20Ol%C3%A1%20Carl%C3%B3polis,%20poderia%20me%20ajudar?" target="_blank" class="whatsapp-icon">
+            <i style="color:rgb(16, 155, 35)"class='bx bxl-whatsapp'></i>
+          </a><br>
+          ${establishment.delivery ? `<b>Entrega:</b> ${establishment.delivery}<br>` : ""}
+         
+
           <button class="detalhes-btn" data-name="${establishment.name}" 
             data-contact="${establishment.contact}">
             Ver mais detalhes
@@ -108,14 +112,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const categories = [
     {
       link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
-        { name: "Supermercado Rocha", address: "Av. Elson Soares, 767 ", hours: "6h - 20h e dom: 06 - 12h", contact: "(43) 1234-5678" },
-        { name: "Supermercado Carreiro", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789" },
-        { name: "Supermercado Barateiro", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890" },
+        { name: "Supermercado Rocha", hours: "6h - 20h e dom: 06 - 12h",address: "Av. Elson Soares, 767 ",  contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" },
+        { name: "Supermercado Carreiro", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa" },
+        { name: "Supermercado Barateiro", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
       ]
     },
     {
       link: farmaciaLink, title: "Farmácias em Carlópolis", establishments: [
-        { name: "Farmácia Aguera", address: "Rua D, 101", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 4567-8901" },
+        { name: "Farmácia Aguera",hours: "seg a sex: 8h - 18h e sab: 08 - 12h", address: "Rua D, 101",  contact: "(43) 4567-8901" },
         { name: "Farmácia Jorginho", address: "Rua E, 202", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 5678-9012" },
         { name: "Farmácia João", address: "Rua F, 303", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 6789-0123" },
       ]
