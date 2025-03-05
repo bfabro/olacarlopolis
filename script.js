@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
               <i class='bx bx-map'></i> 
             </a> ${establishment.address}</br>` : ""}
   <b>Contato:</b> ${establishment.contact} 
-          <a href="https://wa.me/55${establishment.contact.replace(/[^0-9]/g, '')}?text=Vim%20por%20meio%20do%20site%20Ol%C3%A1%20Carl%C3%B3polis,%20poderia%20me%20ajudar?" target="_blank" class="whatsapp-icon">
+           <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação. Pode me atender?')}" target="_blank" class="whatsapp-icon">
             <i style="color:rgb(16, 155, 35)"class='bx bxl-whatsapp'></i>
           </a><br>
           ${establishment.delivery ? `<b>Entrega:</b> ${establishment.delivery}<br>` : ""}
