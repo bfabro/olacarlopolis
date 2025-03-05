@@ -14,6 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
 
+  // Verifica se é um dispositivo móvel e retrai a sidebar
+  if (window.innerWidth < 768) {
+    sidebar.classList.add("close", "hoverable");
+  }
+
   //////////////////////////////////////////////////////////
   // Alternar sidebar
   sidebarOpen.addEventListener("click", () => {
@@ -23,7 +28,6 @@ document.addEventListener("DOMContentLoaded", function () {
       sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
     }
   });
-
 
   comercioLink.addEventListener("click", () => {
     if (sidebar.classList.contains("close")) {
@@ -154,7 +158,10 @@ document.addEventListener("DOMContentLoaded", function () {
       event.preventDefault();
       loadContent(category.title, category.establishments);
       if (window.innerWidth < 768) {
-        sidebar.classList.add("close"); // Fecha a barra lateral em telas pequenas
+        sidebar.classList.remove("close"); // Expande a barra lateral ao clicar em um item
+        setTimeout(() => {
+          sidebar.classList.add("close"); // Fecha a barra lateral após 2 segundos
+        }, 2000); // Ajuste o tempo conforme necessário
       }
     });
   });
