@@ -22,19 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
   //////////////////////////////////////////////////////////
   // Alternar sidebar
   sidebarOpen.addEventListener("click", () => {
-    if (sidebar.classList.contains("close")) {
-      sidebar.classList.remove("close"); // Expande a barra lateral se estiver fechada
-    } else {
-      sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
-    }
-  });
-
-  comercioLink.addEventListener("click", () => {
-    if (sidebar.classList.contains("close")) {
-      sidebar.classList.remove("close"); // Expande a barra lateral se estiver fechada
-    } else {
-      sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
-    }
+    sidebar.classList.toggle("close"); // Alterna entre aberto e fechado
   });
 
   sidebarExpand.addEventListener("click", () => {
@@ -132,7 +120,13 @@ document.addEventListener("DOMContentLoaded", function () {
         { name: "Farmácia João", address: "Rua F, 303", hours: "7h - 19h", contact: "(43) 6789-0123" },
       ]
     },
-  
+    {
+      link: comercioLink, title: "Comércios em Carlópolis", establishments: [
+        { name: "Comércio A", address: "Rua G, 404", hours: "8h - 18h", contact: "(43) 7890-1234" },
+        { name: "Comércio B", address: "Rua H, 505", hours: "9h - 19h", contact: "(43) 8901-2345" },
+        { name: "Comércio C", address: "Rua I, 606", hours: "10h - 20h", contact: "(43) 9012-3456" },
+      ]
+    },
     {
       link: churrasqueiroLink, title: "Churrasqueiros em Carlópolis", establishments: [
         { name: "Pituka", contact: "(43) 7890-1234" },
@@ -153,10 +147,14 @@ document.addEventListener("DOMContentLoaded", function () {
       loadContent(category.title, category.establishments);
       if (window.innerWidth < 768) {
         sidebar.classList.remove("close"); // Expande a barra lateral ao clicar em um item
-        setTimeout(() => {
-          sidebar.classList.add("close"); // Fecha a barra lateral após 2 segundos
-        }, 2000); // Ajuste o tempo conforme necessário
       }
     });
+  });
+
+  // Fechar a sidebar ao clicar fora dela (em dispositivos móveis)
+  document.addEventListener("click", function (event) {
+    if (window.innerWidth < 768 && !sidebar.contains(event.target)) {
+      sidebar.classList.add("close");
+    }
   });
 });
