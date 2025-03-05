@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
               <i class='bx bx-map'></i> 
             </a> ${establishment.address}</br>` : ""}
   <b>Contato:</b> ${establishment.contact} 
-           <a href="https://api.whatsapp.com/send?phone=55${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação. Pode me atender?')}" target="_blank" class="whatsapp-icon">
+           <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação. Pode me atender?')}" target="_blank" class="whatsapp-icon">
             <i style="color:rgb(16, 155, 35)"class='bx bxl-whatsapp'></i>
           </a><br>
           ${establishment.delivery ? `<b>Entrega:</b> ${establishment.delivery}<br>` : ""}
@@ -142,10 +142,25 @@ document.addEventListener("DOMContentLoaded", function () {
   categories.forEach(category => {
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
-      loadContent(category.title, category.establishments);
+         // Remove a classe ativa de todos os itens
+    categories.forEach(cat => cat.link.classList.remove("active"));
 
-      // Expande a sidebar ao clicar em um item
+    // Adiciona a classe ativa ao item clicado
+    this.classList.add("active");
+
+    // Carrega o conteúdo correspondente
+    loadContent(category.title, category.establishments);
+
+    // Expande a sidebar, se estiver fechada
+    if (sidebar.classList.contains("close")) {
       sidebar.classList.remove("close");
+    }
+
+    // Define um timer para fechar a sidebar após 5 segundos
+    clearTimeout(window.sidebarTimer); // Limpa um possível timer anterior
+    window.sidebarTimer = setTimeout(() => {
+      sidebar.classList.add("close");
+    }, 100);
 
       
     });
