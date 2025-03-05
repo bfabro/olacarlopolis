@@ -132,13 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
         { name: "Farmácia João", address: "Rua F, 303", hours: "7h - 19h", contact: "(43) 6789-0123" },
       ]
     },
-    {
-      link: comercioLink, title: "Comércios em Carlópolis", establishments: [
-        { name: "Comércio A", address: "Rua G, 404", hours: "8h - 18h", contact: "(43) 7890-1234" },
-        { name: "Comércio B", address: "Rua H, 505", hours: "9h - 19h", contact: "(43) 8901-2345" },
-        { name: "Comércio C", address: "Rua I, 606", hours: "10h - 20h", contact: "(43) 9012-3456" },
-      ]
-    },
+  
     {
       link: churrasqueiroLink, title: "Churrasqueiros em Carlópolis", establishments: [
         { name: "Pituka", contact: "(43) 7890-1234" },
