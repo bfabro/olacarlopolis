@@ -9,12 +9,56 @@ document.addEventListener("DOMContentLoaded", function () {
   const sidebarExpand = document.querySelector(".expand_sidebar");
 
   const farmaciaLink = document.querySelector("#menuFarmacia");
-  const supermercadoLink = document.querySelector("#menuMercado");
-  const comercioLink = document.querySelector("#menuComercio");
+  const supermercadoLink = document.querySelector("#menuMercado");  
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
 
-  
+ //////////////////////////// inicio
+ const banner = document.getElementById("banner");
+
+ const subMenuLinks = document.querySelectorAll(".nav_link.sublink"); // Apenas subitens do menu
+ const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
+
+ // Função para esconder o banner e mostrar o conteúdo
+ function mostrarConteudo() {
+     if (banner) {
+         banner.classList.add("hidden"); // Esconde o banner
+     }
+     if (contentArea) {
+         contentArea.classList.remove("hidden"); // Mostra a área de conteúdo
+     }
+ }
+
+ // Adiciona evento SOMENTE aos subitens do menu
+ subMenuLinks.forEach(link => {
+     link.addEventListener("click", function (event) {
+         event.preventDefault(); // Evita recarregar a página
+         mostrarConteudo(); // Esconde o banner e mostra o conteúdo
+     });
+ });
+
+ // Garantir que ao clicar no "Início", a página recarregue corretamente
+ if (homeLink) {
+     homeLink.addEventListener("click", function (event) {
+         event.preventDefault();
+         window.location.href = "index.html"; // Recarrega a página
+     });
+ }
+
+ // Garantir que ao acessar a home, o banner esteja visível e o conteúdo escondido
+ if (window.location.pathname.includes("index.html")) {
+     banner.classList.remove("hidden");
+     contentArea.classList.add("hidden");
+ }
+
+///////////////////////////// fimmmmm 
+
+    // Garante que ao recarregar a página inicial, o banner apareça
+    if (window.location.pathname.includes("index.html")) {
+        banner.classList.remove("hidden");
+        contentArea.classList.add("hidden");
+    }
+
 
   // Verifica se é um dispositivo móvel e retrai a sidebar
   if (window.innerWidth < 768) {
@@ -63,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
       item.classList.toggle("show_submenu");
     });
   });
-  
+
 
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
@@ -88,13 +132,15 @@ document.addEventListener("DOMContentLoaded", function () {
             + Informações
           </button>
           <div class="detalhes-content" id="detalhes-${encodeURIComponent(establishment.name)}" style="display: none;">
-            <p>Aqui você pode adicionar fotos e promoções para ${establishment.name}.</p>
-            <button class="fechar-detalhes">Fechar</button>
+            <p>Promoçoes do <b>${establishment.name}.</b></p>
+
+            </br>
+            <button style="color:rgb(206, 24, 17)" class="fechar-detalhes">Fechar</button>
           </div>
         </li>
       `).join('')}
     </ul>`;
-  
+
     // Adicionar eventos aos botões de detalhes
     document.querySelectorAll(".detalhes-btn").forEach(button => {
       button.addEventListener("click", function () {
@@ -102,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function () {
         detalhesDiv.style.display = "block";
       });
     });
-  
+
     // Evento para fechar os detalhes
     document.querySelectorAll(".fechar-detalhes").forEach(button => {
       button.addEventListener("click", function () {
@@ -115,19 +161,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const categories = [
     {
       link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
-        { name: "Supermercado Rocha", hours: "6h - 20h e dom: 06 - 12h",address: "Av. Elson Soares, 767 ",  contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" },
+        { name: "Supermercado Rocha", hours: "6h - 20h e dom: 06 - 12h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" },
         { name: "Supermercado Carreiro", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa" },
         { name: "Supermercado Barateiro", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
       ]
     },
     {
       link: farmaciaLink, title: "Farmácias em Carlópolis", establishments: [
-        { name: "Farmácia Aguera",hours: "seg a sex: 8h - 18h e sab: 08 - 12h", address: "Rua D, 101",  contact: "(43) 4567-8901" },
+        { name: "Farmácia Aguera", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", address: "Rua D, 101", contact: "(43) 4567-8901" },
         { name: "Farmácia Jorginho", address: "Rua E, 202", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 5678-9012" },
         { name: "Farmácia João", address: "Rua F, 303", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 6789-0123" },
       ]
     },
-   
+
     {
       link: churrasqueiroLink, title: "Churrasqueiros em Carlópolis", establishments: [
         { name: "Pituka", contact: "(43) 7890-1234" },
@@ -145,27 +191,27 @@ document.addEventListener("DOMContentLoaded", function () {
   categories.forEach(category => {
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
-         // Remove a classe ativa de todos os itens
-    categories.forEach(cat => cat.link.classList.remove("active"));
+      // Remove a classe ativa de todos os itens
+      categories.forEach(cat => cat.link.classList.remove("active"));
 
-    // Adiciona a classe ativa ao item clicado
-    this.classList.add("active");
+      // Adiciona a classe ativa ao item clicado
+      this.classList.add("active");
 
-    // Carrega o conteúdo correspondente
-    loadContent(category.title, category.establishments);
+      // Carrega o conteúdo correspondente
+      loadContent(category.title, category.establishments);
 
-    // Expande a sidebar, se estiver fechada
-    if (sidebar.classList.contains("close")) {
-      sidebar.classList.remove("close");
-    }
+      // Expande a sidebar, se estiver fechada
+      if (sidebar.classList.contains("close")) {
+        sidebar.classList.remove("close");
+      }
 
-    // Define um timer para fechar a sidebar após 5 segundos
-    clearTimeout(window.sidebarTimer); // Limpa um possível timer anterior
-    window.sidebarTimer = setTimeout(() => {
-      sidebar.classList.add("close");
-    }, 100);
+      // Fecha a sidebar SOMENTE em telas pequenas após clicar no menu
+      if (window.innerWidth < 768) {
+        setTimeout(() => {
+          sidebar.classList.add("close");
+        }, 100); // Pequeno delay para evitar que o clique feche imediatamente
+      }
 
-      
     });
   });
 
@@ -175,4 +221,9 @@ document.addEventListener("DOMContentLoaded", function () {
       sidebar.classList.add("close");
     }
   });
+
+
+
+
+
 });
