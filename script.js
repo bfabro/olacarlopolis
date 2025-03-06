@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
 
+  
+
   // Verifica se é um dispositivo móvel e retrai a sidebar
   if (window.innerWidth < 768) {
     sidebar.classList.add("close", "hoverable");
@@ -61,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
       item.classList.toggle("show_submenu");
     });
   });
+  
 
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
@@ -82,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
           <button class="detalhes-btn" data-name="${establishment.name}" 
             data-contact="${establishment.contact}">
-            Ver mais detalhes
+            + Informações
           </button>
           <div class="detalhes-content" id="detalhes-${encodeURIComponent(establishment.name)}" style="display: none;">
             <p>Aqui você pode adicionar fotos e promoções para ${establishment.name}.</p>
