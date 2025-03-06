@@ -425,7 +425,7 @@ body.dark {
 }
 /* Banner Inicial */
 .banner {
-  width: 100%;
+  width: 100vh;
   height: 100vh;
   background: url('images/banner.jpg') no-repeat center center/cover;
   display: flex;
@@ -450,7 +450,7 @@ body.dark {
   position: relative;
   z-index: 1;
   padding: 20px;
-  margin: -500px -70px 0px 8px;
+  margin: -485px -70px 0px 8px;
 }
 
 .banner h1 {
