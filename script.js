@@ -151,11 +151,11 @@ ${establishment.menuImage ? `
   </div>` : ""}
 
   ${establishment.menuFlyer ? `
-  <button class="fleyer-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-    Ver Fleyer
+  <button class="flyer-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+    Ver Flyer
   </button>
   <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
-    <img src="${establishment.menuFlyer}" alt="Fleyer de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
+    <img src="${establishment.menuFlyer}" alt="Flyer de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
   </div>` : ""}
 
 
@@ -183,8 +183,8 @@ ${establishment.menuImage ? `
         }
       });
     });
-/// para o fleyer
-    document.querySelectorAll(".fleyer-btn").forEach(button => {
+/// para o flyer
+    document.querySelectorAll(".flyer-btn").forEach(button => {
       button.addEventListener("click", function () {
         const menuId2 = `menu-${encodeURIComponent(this.dataset.name)}`;
         const menuDiv2 = document.getElementById(menuId2);
@@ -193,12 +193,12 @@ ${establishment.menuImage ? `
         if (menuDiv2.classList.contains("hidden")) {
           // Abre o cardápio
           menuDiv2.classList.remove("hidden");
-          this.textContent = "Fechar Fleyer"; // Altera o texto do botão
+          this.textContent = "Fechar Flyer"; // Altera o texto do botão
           this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
         } else {
           // Fecha o cardápio
           menuDiv2.classList.add("hidden");
-          this.textContent = "Ver Fleyer"; // Texto volta ao original
+          this.textContent = "Ver Flyer"; // Texto volta ao original
           this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
         }
       });
@@ -207,7 +207,7 @@ ${establishment.menuImage ? `
 
     
 
-    document.querySelectorAll(".fleyer-btn").forEach(button => {
+    document.querySelectorAll(".flyer-btn").forEach(button => {
       button.addEventListener("click", function () {
         document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
       });
