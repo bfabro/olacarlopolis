@@ -140,19 +140,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
- ${establishment.menuImage ? `<button class="menu-btn" data-name="${establishment.name}" style="background-color: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Ver Cardápio</button>
+  ${establishment.menuImages && establishment.menuImages.length > 0 ? `<button class="menu-btn" data-name="${establishment.name}" style="background-color: red; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; display: block; margin-top: 10px;">Ver Cardápio</button>
           <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
-            <img src="${establishment.menuImage}" alt="Cardápio de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
+            <div class="carousel">
+              <button class="prev" onclick="prevSlide('${establishment.name}')">&#10094;</button>
+              <div class="carousel-images">
+                ${establishment.menuImages.map((img, index) => `
+                  <img src="${img}" class="carousel-img" data-index="${index}" style="display: ${index === 0 ? 'block' : 'none'}; width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
+                `).join('')}
+              </div>
+              <button class="next" onclick="nextSlide('${establishment.name}')">&#10095;</button>
+            </div>
             <button class="fechar-menu">Fechar Cardápio</button>
-          </div>` : ""}
-
-
+          </div>` : "<p style='color: red; font-weight: bold;'>Nenhum cardápio disponível</p>"}
 
 
 
         </li>
       `).join('')}
     </ul>`;
+
+
+    
     document.querySelectorAll(".menu-btn").forEach(button => {
       button.addEventListener("click", function () {
         document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
@@ -183,17 +192,35 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  window.nextSlide = function(name) {
+    const images = document.querySelectorAll(`#menu-${encodeURIComponent(name)} .carousel-img`);
+    let currentIndex = Array.from(images).findIndex(img => img.style.display === 'block');
+    images[currentIndex].style.display = 'none';
+    let nextIndex = (currentIndex + 1) % images.length;
+    images[nextIndex].style.display = 'block';
+  };
 
+  window.prevSlide = function(name) {
+    const images = document.querySelectorAll(`#menu-${encodeURIComponent(name)} .carousel-img`);
+    let currentIndex = Array.from(images).findIndex(img => img.style.display === 'block');
+    images[currentIndex].style.display = 'none';
+    let prevIndex = (currentIndex - 1 + images.length) % images.length;
+    images[prevIndex].style.display = 'block';
+  };
+
+  if (lanchoneteLink) {
+    lanchoneteLink.addEventListener("click", function (event) {
+      event.preventDefault();
+      loadContent("Lanchonetes em Carlópolis", [
+        { name: "Paiol", hours: "qua - dom 19 - 00h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa", menuImages: ["images/img_lanchonetes/cardapio_2.jpg", "images/img_lanchonetes/cardapio_1.jpg"] },
+        { name: "Casarao", hours: "seg - seg - 19h - 00h", address: "R. Benedito Salles, 341 ", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa", menuImages: ["images/img_lanchonetes/cardapio_1.jpg", "images/img_lanchonetes/cardapio_1.jpg"] }
+      ]);
+    });
+  }
   
   // Carregar informações de categorias
   const categories = [
-    {
-      link: lanchoneteLink, title: "Lanchonetes em Carlópolis", establishments: [
-        { name: "Lanchonete do Zé", hours: "6h - 20h e dom: 06 - 12h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" ,menuImage: "images/img_lanchonetes/cardapio_1.jpg"},
-        { name: "Fast Lanches", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa",menuImage: "images/img_lanchonetes/cardapio_2.jpg" },
-     ]
-    },
-
+    
 
 
     {
