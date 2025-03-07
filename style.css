@@ -413,37 +413,7 @@ body.dark {
 
   }
 
-  /* ------------------------------------------------------- */    
-  /* Ajuste para que a sidebar expanda sem empurrar o conteúdo */
-  .sidebar {
-    height: 100vh;
-    transition: width 0.3s ease-in-out;
-  }
-  .sidebar.close {
-    width: 80px; /* Sidebar fechada ocupa menos espaço */
-  }
-  .sidebar:not(.close) {
-    width: 260px; /* Sidebar expandida */
-  }
-
-  /* Mantém o conteúdo ajustado quando a sidebar expande */
-  .sidebar.close ~ .content_area {
-    margin-left: 86px;
-    width: calc(100% - 86px);
-  }
-
-  .sidebar:not(.close) ~ .content_area {
-    margin-left: 270px;
-    width: calc(100% - 270px);
-  }
-
-
-  .content_area {
-    min-height: 100vh; /* Garante que o conteúdo ocupe toda a tela */
-    padding-bottom: 50px; /* Evita espaços vazios no final */
-  }
-
-/* --------------------------------------------------------------------*/
+  
 
 }
 /* Banner Inicial */
