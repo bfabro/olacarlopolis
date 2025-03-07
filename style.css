@@ -395,6 +395,23 @@ body.dark {
   background-color: #0056b3;
 }
 
+
+.menu-btn {
+  background-color: #ff0000;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+.menu-btn:hover {
+  background-color: #700d0d;
+}
+
+
+
+
+
 @media screen and (max-width: 768px) {
   /*#sidebarOpen {
     font-size: 25px;
@@ -418,7 +435,7 @@ body.dark {
 }
 /* Banner Inicial */
 .banner {
-  width: calc(100% + 52%);
+  width: calc(104% + 52%);
   height: 100vh;
   background: url('images/banner.jpg') no-repeat center center/cover;
   display: flex;

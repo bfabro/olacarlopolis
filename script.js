@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const supermercadoLink = document.querySelector("#menuMercado");  
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
-
+  const lanchoneteLink = document.querySelector("#menuLanchonete");
  //////////////////////////// inicio
  const banner = document.getElementById("banner");
 
@@ -137,9 +137,54 @@ document.addEventListener("DOMContentLoaded", function () {
             </br>
             <button style="color:rgb(206, 24, 17)" class="fechar-detalhes">Fechar</button>
           </div>
+
+
+
+   ${establishment.menu ? `<button class="menu-btn" data-name="${establishment.name}">Ver Cardápio</button>
+          <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none;">
+            <p>${establishment.menu}</p>
+            <button class="fechar-menu">Fechar Cardápio</button>
+          </div>` : ""}
+
+
+
+
+
         </li>
       `).join('')}
     </ul>`;
+    document.querySelectorAll(".menu-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
+      });
+    });
+
+
+    document.querySelectorAll(".fechar-menu").forEach(button => {
+      button.addEventListener("click", function () {
+        this.parentElement.style.display = "none";
+      });
+    });
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Adicionar eventos aos botões de detalhes
     document.querySelectorAll(".detalhes-btn").forEach(button => {
@@ -157,8 +202,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+
+  
   // Carregar informações de categorias
   const categories = [
+    {
+      link: lanchoneteLink, title: "Lanchonetes em Carlópolis", establishments: [
+        { name: "Lanchonete do Zé", hours: "6h - 20h e dom: 06 - 12h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" ,menu: "X-Burguer - R$10\nX-Salada - R$12\nRefrigerante - R$5"},
+        { name: "Fast Lanches", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa",menu: "X-Burguer - R$10\nX-Salada - R$12\nRefrigerante - R$5" },
+     ]
+    },
+
+
+
     {
       link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
         { name: "Supermercado Rocha", hours: "6h - 20h e dom: 06 - 12h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" },
@@ -166,6 +222,18 @@ document.addEventListener("DOMContentLoaded", function () {
         { name: "Supermercado Barateiro", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
       ]
     },
+
+
+
+
+
+
+
+
+
+
+
+
     {
       link: farmaciaLink, title: "Farmácias em Carlópolis", establishments: [
         { name: "Farmácia Aguera", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", address: "Rua D, 101", contact: "(43) 4567-8901" },
@@ -214,6 +282,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
   });
+
+
+
+
+
 
   // Fechar a sidebar ao clicar fora dela (em dispositivos móveis)
   document.addEventListener("click", function (event) {
