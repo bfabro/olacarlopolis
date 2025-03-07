@@ -309,9 +309,7 @@ body.dark {
   color: #0056b3; /* Cor do ícone ao passar o mouse */
 }
 
-
 .content_area {
-
   padding: 10px;
   width: calc(100% - 30%);
   min-height: 84vh;
@@ -319,7 +317,6 @@ body.dark {
   margin: 84px 0px 0px 270px;
   transition: margin-left 0.5s ease;
   font-size: 14px;
-  /*Ajuste o tamanho da fonte conforme necessário */
 
 }
 
@@ -328,7 +325,6 @@ body.dark {
   border-bottom: 1px solid #ddd; /* Linha separadora */
   margin-bottom: 10px;
 }
-
 
 .content_area ul li {
   white-space: nowrap;
@@ -347,9 +343,8 @@ body.dark {
   margin-right: 5px;
   /* Espaço entre o título e o valor */
   font-weight: bold;
-  /* Negrito */
-}
 
+}
 
 .highlighted {
   font-size: 1.0em;
@@ -366,19 +361,16 @@ body.dark {
 }
 
 .highlighted {
-  font-size: 1.2em;
- 
+  font-size: 1.2em; 
   align-items: center;
   
 }
-
 
 /* Quando o menu fechar */
 .sidebar.close~.content_area {
   width: calc(150% - 80px);
   margin-left: 86px;
 }
-
 
 /* Garantir que os ícones fiquem visíveis e centralizados */
 .sidebar.close .nav_link {
@@ -404,13 +396,13 @@ body.dark {
 }
 
 @media screen and (max-width: 768px) {
-  #sidebarOpen {
+  /*#sidebarOpen {
     font-size: 25px;
     display: block;
     margin-right: 10px;
     cursor: pointer;
     color: var(--grey-color);
-  }
+  }*/
 
   .search_bar {
     display: none;
@@ -421,6 +413,37 @@ body.dark {
 
   }
 
+  /* ------------------------------------------------------- */    
+  /* Ajuste para que a sidebar expanda sem empurrar o conteúdo */
+  .sidebar {
+    height: 100vh;
+    transition: width 0.3s ease-in-out;
+  }
+  .sidebar.close {
+    width: 80px; /* Sidebar fechada ocupa menos espaço */
+  }
+  .sidebar:not(.close) {
+    width: 260px; /* Sidebar expandida */
+  }
+
+  /* Mantém o conteúdo ajustado quando a sidebar expande */
+  .sidebar.close ~ .content_area {
+    margin-left: 86px;
+    width: calc(100% - 86px);
+  }
+
+  .sidebar:not(.close) ~ .content_area {
+    margin-left: 270px;
+    width: calc(100% - 270px);
+  }
+
+
+  .content_area {
+    min-height: 100vh; /* Garante que o conteúdo ocupe toda a tela */
+    padding-bottom: 50px; /* Evita espaços vazios no final */
+  }
+
+/* --------------------------------------------------------------------*/
 
 }
 /* Banner Inicial */
