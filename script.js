@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
   const lanchoneteLink = document.querySelector("#menuLanchonete");
+  const eventosLink = document.querySelector("#menuEventos");
   //////////////////////////// inicio
   const banner = document.getElementById("banner");
 
@@ -149,8 +150,13 @@ ${establishment.menuImage ? `
     <img src="${establishment.menuImage}" alt="Cardápio de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
   </div>` : ""}
 
-
-
+  ${establishment.menuFlyer ? `
+  <button class="fleyer-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+    Ver Fleyer
+  </button>
+  <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
+    <img src="${establishment.menuFlyer}" alt="Fleyer de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
+  </div>` : ""}
 
 
         </li>
@@ -177,8 +183,38 @@ ${establishment.menuImage ? `
         }
       });
     });
+/// para o fleyer
+    document.querySelectorAll(".fleyer-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        const menuId2 = `menu-${encodeURIComponent(this.dataset.name)}`;
+        const menuDiv2 = document.getElementById(menuId2);
+
+        // Verifica se o cardápio está visível (não possui a classe "hidden")
+        if (menuDiv2.classList.contains("hidden")) {
+          // Abre o cardápio
+          menuDiv2.classList.remove("hidden");
+          this.textContent = "Fechar Fleyer"; // Altera o texto do botão
+          this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
+        } else {
+          // Fecha o cardápio
+          menuDiv2.classList.add("hidden");
+          this.textContent = "Ver Fleyer"; // Texto volta ao original
+          this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
+        }
+      });
+    });
 
 
+    
+
+    document.querySelectorAll(".fleyer-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
+      });
+    });
+
+
+    
 
 
     document.querySelectorAll(".menu-btn").forEach(button => {
@@ -222,6 +258,16 @@ ${establishment.menuImage ? `
       ]
     },
 
+    {
+      link: eventosLink , title: "Eventos em Carlópolis", establishments: [
+        { name: "Calendario Eventos", contact: "(43) 2345-6789", menuFlyer: "images/img_informacoes/eventos/calendario_evento.png" },     
+        { name: "Feira da Lua", hours: "sex 19 - 00h", address: "Praça Igreja Matriz ", contact: "(11) 99898-5930",menuFlyer: "images/img_informacoes/eventos/feira_lua_1.png" },
+        { name: "Passeata contra a barriga", hours: "dom: 07 - 12h", address: "Av Turistica, 800", contact: "(43) 2345-6789", menuFlyer: "images/img_informacoes/eventos/corrida_10.jpg" },
+        
+      
+      ]
+    },
+
 
 
     {
@@ -262,7 +308,7 @@ ${establishment.menuImage ? `
     },
     {
       link: farmaciaPlantaoLink, title: "Farmacia de Plantão", establishments: [
-        { name: "DrogaMais (Jorginho) ", address: "Rua Benedito Salles, 903",  contact: "(43) 98411-9145",plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025, "},
+        { name: "DrogaMais (Jorginho) ", address: "Rua Benedito Salles, 903",  contact: "(43) 98411-9145",plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025"},
       ]
     }
   ];

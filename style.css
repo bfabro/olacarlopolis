@@ -515,3 +515,8 @@ body.dark {
   font-weight: bold;
   text-transform: uppercase;
 }
+
+.plantao-vermelho {
+  color: red;
+  font-weight: bold;
+}
