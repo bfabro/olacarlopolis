@@ -41,7 +41,7 @@ body.dark {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 30px;
+  padding: 15px 23px;
   z-index: 1000;
   box-shadow: 0 0 2px var(--grey-color-light);
 }
@@ -405,11 +405,11 @@ body.dark {
 
 @media screen and (max-width: 768px) {
   #sidebarOpen {
-    font-size: 25px;
+    /*font-size: 25px;
     display: block;
     margin-right: 10px;
     cursor: pointer;
-    color: var(--grey-color);
+    color: var(--grey-color);*/
   }
 
   .search_bar {
@@ -451,6 +451,7 @@ body.dark {
   z-index: 1;
   padding: 20px;
   margin: -485px -70px 0px 8px;
+  font-size: 22px;
 }
 
 .banner h1 {
