@@ -404,13 +404,13 @@ body.dark {
 }
 
 @media screen and (max-width: 768px) {
-  /*#sidebarOpen {
+  #sidebarOpen {
     font-size: 25px;
     display: block;
     margin-right: 10px;
     cursor: pointer;
     color: var(--grey-color);
-  }*/
+  }
 
   .search_bar {
     display: none;
@@ -425,7 +425,7 @@ body.dark {
 }
 /* Banner Inicial */
 .banner {
-  width: calc(104% + 52%);
+  width: calc(100% + 52%);
   height: 100vh;
   background: url('images/banner.jpg') no-repeat center center/cover;
   display: flex;
