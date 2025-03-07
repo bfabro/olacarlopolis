@@ -9,55 +9,55 @@ document.addEventListener("DOMContentLoaded", function () {
   const sidebarExpand = document.querySelector(".expand_sidebar");
 
   const farmaciaLink = document.querySelector("#menuFarmacia");
-  const supermercadoLink = document.querySelector("#menuMercado");  
+  const supermercadoLink = document.querySelector("#menuMercado");
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
   const lanchoneteLink = document.querySelector("#menuLanchonete");
- //////////////////////////// inicio
- const banner = document.getElementById("banner");
+  //////////////////////////// inicio
+  const banner = document.getElementById("banner");
 
- const subMenuLinks = document.querySelectorAll(".nav_link.sublink"); // Apenas subitens do menu
- const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
+  const subMenuLinks = document.querySelectorAll(".nav_link.sublink"); // Apenas subitens do menu
+  const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
 
- // Função para esconder o banner e mostrar o conteúdo
- function mostrarConteudo() {
-     if (banner) {
-         banner.classList.add("hidden"); // Esconde o banner
-     }
-     if (contentArea) {
-         contentArea.classList.remove("hidden"); // Mostra a área de conteúdo
-     }
- }
-
- // Adiciona evento SOMENTE aos subitens do menu
- subMenuLinks.forEach(link => {
-     link.addEventListener("click", function (event) {
-         event.preventDefault(); // Evita recarregar a página
-         mostrarConteudo(); // Esconde o banner e mostra o conteúdo
-     });
- });
-
- // Garantir que ao clicar no "Início", a página recarregue corretamente
- if (homeLink) {
-     homeLink.addEventListener("click", function (event) {
-         event.preventDefault();
-         window.location.href = "index.html"; // Recarrega a página
-     });
- }
-
- // Garantir que ao acessar a home, o banner esteja visível e o conteúdo escondido
- if (window.location.pathname.includes("index.html")) {
-     banner.classList.remove("hidden");
-     contentArea.classList.add("hidden");
- }
-
-///////////////////////////// fimmmmm 
-
-    // Garante que ao recarregar a página inicial, o banner apareça
-    if (window.location.pathname.includes("index.html")) {
-        banner.classList.remove("hidden");
-        contentArea.classList.add("hidden");
+  // Função para esconder o banner e mostrar o conteúdo
+  function mostrarConteudo() {
+    if (banner) {
+      banner.classList.add("hidden"); // Esconde o banner
     }
+    if (contentArea) {
+      contentArea.classList.remove("hidden"); // Mostra a área de conteúdo
+    }
+  }
+
+  // Adiciona evento SOMENTE aos subitens do menu
+  subMenuLinks.forEach(link => {
+    link.addEventListener("click", function (event) {
+      event.preventDefault(); // Evita recarregar a página
+      mostrarConteudo(); // Esconde o banner e mostra o conteúdo
+    });
+  });
+
+  // Garantir que ao clicar no "Início", a página recarregue corretamente
+  if (homeLink) {
+    homeLink.addEventListener("click", function (event) {
+      event.preventDefault();
+      window.location.href = "index.html"; // Recarrega a página
+    });
+  }
+
+  // Garantir que ao acessar a home, o banner esteja visível e o conteúdo escondido
+  if (window.location.pathname.includes("index.html")) {
+    banner.classList.remove("hidden");
+    contentArea.classList.add("hidden");
+  }
+
+  ///////////////////////////// fimmmmm 
+
+  // Garante que ao recarregar a página inicial, o banner apareça
+  if (window.location.pathname.includes("index.html")) {
+    banner.classList.remove("hidden");
+    contentArea.classList.add("hidden");
+  }
 
 
   // Verifica se é um dispositivo móvel e retrai a sidebar
@@ -116,11 +116,12 @@ document.addEventListener("DOMContentLoaded", function () {
         <li>
           <strong class="locais_nomes">${establishment.name}</strong><br>
           ${establishment.hours ? `<b>Funcionamento:</b> ${establishment.hours}<br>` : ""}
+          ${establishment.plantaoHorario ? `<b class="highlight-plantao">Plantão:</b> <span class="plantao-text">${establishment.plantaoHorario}</span><br>` : ""}  <!-- Exibe o horário de plantão -->
           ${establishment.address ? `
             <b>Endereço: </b><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="map-icon">
               <i class='bx bx-map'></i> 
             </a> ${establishment.address}</br>` : ""}
-  <b>Contato:</b> ${establishment.contact} 
+              <b>Contato:</b> ${establishment.contact} 
            <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="whatsapp-icon">
             <i style="color:rgb(16, 155, 35)"class='bx bxl-whatsapp'></i>
           </a><br>
@@ -161,7 +162,7 @@ ${establishment.menuImage ? `
       button.addEventListener("click", function () {
         const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
         const menuDiv = document.getElementById(menuId);
-        
+
         // Verifica se o cardápio está visível (não possui a classe "hidden")
         if (menuDiv.classList.contains("hidden")) {
           // Abre o cardápio
@@ -176,7 +177,7 @@ ${establishment.menuImage ? `
         }
       });
     });
-    
+
 
 
 
@@ -211,14 +212,14 @@ ${establishment.menuImage ? `
   }
 
 
-  
+
   // Carregar informações de categorias
   const categories = [
     {
       link: lanchoneteLink, title: "Lanchonetes em Carlópolis", establishments: [
-        { name: "Paiol",        hours: "qua - dom 19 - 00h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" ,menuImage: "images/img_lanchonetes/cardapio_1.jpg"},
-        { name: "Casarao", hours: "seg - seg - 19h - 00h e dom: 07 - 12h", address: "R. Benedito Salles, 341 ", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa",menuImage: "images/img_lanchonetes/cardapio_2.jpg" },
-     ]
+        { name: "Paiol", hours: "qua - dom 19 - 00h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa", menuImage: "images/img_lanchonetes/cardapio_1.jpg" },
+        { name: "Casarao", hours: "seg - seg - 19h - 00h e dom: 07 - 12h", address: "R. Benedito Salles, 341 ", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa", menuImage: "images/img_lanchonetes/cardapio_2.jpg" },
+      ]
     },
 
 
@@ -232,29 +233,24 @@ ${establishment.menuImage ? `
         { name: "Zero Japan", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
         { name: "Carriel", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
         { name: "Compre Bem +", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
-      
-      
-      
-      
+
+
+
+
       ]
     },
-
-
-
-
-
-
-
-
-
 
 
 
     {
       link: farmaciaLink, title: "Farmácias em Carlópolis", establishments: [
         { name: "DrogaMais ( Jorginho )", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", address: "Rua Benedito Salles, 903", contact: "(43) 98411-9145" },
-        { name: "Desconto Facil 1", address: "R. Benedito Salles, 574", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1119" },
-        { name: "Santa Maria", address: "Praça Coronel Leite, nº 711", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1471" },
+        { name: "Desconto Facil 1 ( Joao )", address: "R. Benedito Salles, 574", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1119" },
+        { name: "Santa Maria ( Aguera )" , address: "Praça Coronel Leite, nº 711", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1471" },
+        { name: "Farmashop ( Zurdo )" , address: "Praça Coronel Leite, nº 699", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1471" },
+        { name: "PopularMais( Jeremias )" , address: "R. Laurindo Franco de Godói, 787", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 99647-6266" },
+      
+      
       ]
     },
 
@@ -266,7 +262,7 @@ ${establishment.menuImage ? `
     },
     {
       link: farmaciaPlantaoLink, title: "Farmacia de Plantão", establishments: [
-        { name: "DrogaMais", address: "Rua Benedito Salles, 903", hours: "7h - 21h e dom: 07 - 20h", contact: "(43) 98411-9145" },
+        { name: "DrogaMais (Jorginho) ", address: "Rua Benedito Salles, 903",  contact: "(43) 98411-9145",plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025, "},
       ]
     }
   ];

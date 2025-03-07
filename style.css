@@ -500,3 +500,18 @@ body.dark {
   padding-bottom: 3px;
   display: inline-block;
 }
+
+/* Aumenta o tamanho da fonte do horário de plantão */
+.plantao-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ff3333; /* Cor vermelha para dar destaque */
+}
+
+/* Destaca o título "Plantão" */
+.highlight-plantao {
+  font-size: 20px;
+  color: #ff3333; /* Cor vermelha para destacar o texto "Plantão" */
+  font-weight: bold;
+  text-transform: uppercase;
+}
