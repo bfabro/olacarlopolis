@@ -488,3 +488,15 @@ body.dark {
 .hidden {
   display: none !important;
 }
+
+.locais_nomes {
+  color: #2E8B57; /* Verde folha para um visual mais confiável */
+  font-size: 1.3rem; /* Um pouco maior para mais destaque */
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Adiciona um leve sombreamento */
+  border-bottom: 3px solid #FF8C00; /* Linha laranja embaixo para um detalhe extra */
+  padding-bottom: 3px;
+  display: inline-block;
+}

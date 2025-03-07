@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
     contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
       ${establishments.map(establishment => `
         <li>
-          <strong class="highlighted">${establishment.name}</strong><br>
+          <strong class="locais_nomes">${establishment.name}</strong><br>
           ${establishment.hours ? `<b>Funcionamento:</b> ${establishment.hours}<br>` : ""}
           ${establishment.address ? `
             <b>Endereço: </b><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="map-icon">
@@ -178,19 +178,6 @@ ${establishment.menuImage ? `
     });
     
 
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
 
 
     document.querySelectorAll(".menu-btn").forEach(button => {
@@ -238,9 +225,17 @@ ${establishment.menuImage ? `
 
     {
       link: supermercadoLink, title: "Supermercados em Carlópolis", establishments: [
-        { name: "Supermercado Rocha", hours: "6h - 20h e dom: 06 - 12h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" },
-        { name: "Supermercado Carreiro", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa" },
-        { name: "Supermercado Barateiro", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
+        { name: "Rocha", hours: "6h - 20h e dom: 06 - 12h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" },
+        { name: "Carreiro", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa" },
+        { name: "Barateiro", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
+        { name: "Kelve", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
+        { name: "Zero Japan", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
+        { name: "Carriel", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
+        { name: "Compre Bem +", address: "PR-218, 1168 ", hours: "8h - 21h e dom: 07 - 12h", contact: "(43) 3456-7890", delivery: "Sim / Sem Taxa" },
+      
+      
+      
+      
       ]
     },
 
@@ -257,9 +252,9 @@ ${establishment.menuImage ? `
 
     {
       link: farmaciaLink, title: "Farmácias em Carlópolis", establishments: [
-        { name: "Farmácia Aguera", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", address: "Rua D, 101", contact: "(43) 4567-8901" },
-        { name: "Farmácia Jorginho", address: "Rua E, 202", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 5678-9012" },
-        { name: "Farmácia João", address: "Rua F, 303", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 6789-0123" },
+        { name: "DrogaMais ( Jorginho )", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", address: "Rua Benedito Salles, 903", contact: "(43) 98411-9145" },
+        { name: "Desconto Facil 1", address: "R. Benedito Salles, 574", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1119" },
+        { name: "Santa Maria", address: "Praça Coronel Leite, nº 711", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1471" },
       ]
     },
 
@@ -271,7 +266,7 @@ ${establishment.menuImage ? `
     },
     {
       link: farmaciaPlantaoLink, title: "Farmacia de Plantão", establishments: [
-        { name: "Farma Mais", address: "Rua do calçadao, 123", hours: "7h - 21h e dom: 07 - 20h", contact: "(43) 3456-7890" },
+        { name: "DrogaMais", address: "Rua Benedito Salles, 903", hours: "7h - 21h e dom: 07 - 20h", contact: "(43) 98411-9145" },
       ]
     }
   ];
