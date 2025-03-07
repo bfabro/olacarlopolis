@@ -140,11 +140,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
- ${establishment.menuImage ? `<button class="menu-btn" data-name="${establishment.name}" style="background-color: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Ver Cardápio</button>
-          <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
-            <img src="${establishment.menuImage}" alt="Cardápio de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
-            <button class="fechar-menu">Fechar Cardápio</button>
-          </div>` : ""}
+${establishment.menuImage ? `
+  <button class="menu-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+    Ver Cardápio
+  </button>
+  <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
+    <img src="${establishment.menuImage}" alt="Cardápio de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
+  </div>` : ""}
 
 
 
@@ -153,6 +155,44 @@ document.addEventListener("DOMContentLoaded", function () {
         </li>
       `).join('')}
     </ul>`;
+
+
+    document.querySelectorAll(".menu-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
+        const menuDiv = document.getElementById(menuId);
+        
+        // Verifica se o cardápio está visível (não possui a classe "hidden")
+        if (menuDiv.classList.contains("hidden")) {
+          // Abre o cardápio
+          menuDiv.classList.remove("hidden");
+          this.textContent = "Fechar Cardápio"; // Altera o texto do botão
+          this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
+        } else {
+          // Fecha o cardápio
+          menuDiv.classList.add("hidden");
+          this.textContent = "Ver Cardápio"; // Texto volta ao original
+          this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
+        }
+      });
+    });
+    
+
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
     document.querySelectorAll(".menu-btn").forEach(button => {
       button.addEventListener("click", function () {
         document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";

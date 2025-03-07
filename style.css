@@ -397,7 +397,7 @@ body.dark {
 
 
 .menu-btn {
-  background-color: #c90202;
+  background-color: #dfa529;
   color: white;
   padding: 5px 10px;
   border-radius: 5px;
@@ -405,10 +405,20 @@ body.dark {
   cursor: pointer;
 }
 .menu-btn:hover {
-  background-color: #700d0d;
+  background-color: #000000;
 }
 
-
+.fechar-menu {
+  background-color: #c90202;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+.fechar-menu:hover {
+  background-color: #700d0d;
+}
 
 
 
