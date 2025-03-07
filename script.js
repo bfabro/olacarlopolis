@@ -140,9 +140,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-   ${establishment.menu ? `<button class="menu-btn" data-name="${establishment.name}">Ver Cardápio</button>
-          <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none;">
-            <p>${establishment.menu}</p>
+ ${establishment.menuImage ? `<button class="menu-btn" data-name="${establishment.name}" style="background-color: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Ver Cardápio</button>
+          <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
+            <img src="${establishment.menuImage}" alt="Cardápio de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
             <button class="fechar-menu">Fechar Cardápio</button>
           </div>` : ""}
 
@@ -167,25 +167,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Adicionar eventos aos botões de detalhes
     document.querySelectorAll(".detalhes-btn").forEach(button => {
       button.addEventListener("click", function () {
@@ -208,8 +189,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const categories = [
     {
       link: lanchoneteLink, title: "Lanchonetes em Carlópolis", establishments: [
-        { name: "Lanchonete do Zé", hours: "6h - 20h e dom: 06 - 12h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" ,menu: "X-Burguer - R$10\nX-Salada - R$12\nRefrigerante - R$5"},
-        { name: "Fast Lanches", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa",menu: "X-Burguer - R$10\nX-Salada - R$12\nRefrigerante - R$5" },
+        { name: "Lanchonete do Zé", hours: "6h - 20h e dom: 06 - 12h", address: "Av. Elson Soares, 767 ", contact: "(11) 99898-5930", delivery: "Sim / Sem Taxa" ,menuImage: "images/img_lanchonetes/cardapio_1.jpg"},
+        { name: "Fast Lanches", address: "R. Benedito Salles, 341 ", hours: "7h - 20h e dom: 07 - 12h", contact: "(43) 2345-6789", delivery: "Sim / Com Taxa",menuImage: "images/img_lanchonetes/cardapio_2.jpg" },
      ]
     },
 
