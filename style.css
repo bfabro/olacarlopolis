@@ -345,26 +345,20 @@ body.dark {
   font-weight: bold;
 
 }
-
 .highlighted {
-  font-size: 1.0em;
-  /* Tamanho maior para o nome */
+  font-size: 1.3em;
   font-weight: bold;
-  /* Deixar o nome em negrito */
-  color: #007BFF;
-  /* Cor de destaque, você pode mudar para a cor que preferir */
+  color: #fff;
   text-transform: uppercase;
-  /* Deixar o nome em maiúsculas */
-  padding-bottom: 5px;
-  /* Espaço abaixo do nome */
-
+  padding: 7px 20px;
+  border-radius: 12px;
+  background: radial-gradient(circle, rgba(255, 140, 0, 0.8), rgba(0, 123, 255, 0.8));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.highlighted {
-  font-size: 1.2em; 
-  align-items: center;
-  
-}
+
+
+
 
 /* Quando o menu fechar */
 .sidebar.close~.content_area {
@@ -516,7 +510,3 @@ body.dark {
   text-transform: uppercase;
 }
 
-.plantao-vermelho {
-  color: red;
-  font-weight: bold;
-}

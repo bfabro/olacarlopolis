@@ -290,11 +290,11 @@ ${establishment.menuImage ? `
 
     {
       link: farmaciaLink, title: "Farmácias em Carlópolis", establishments: [
-        { name: "DrogaMais ( Jorginho )", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", address: "Rua Benedito Salles, 903", contact: "(43) 98411-9145" },
-        { name: "Desconto Facil 1 ( Joao )", address: "R. Benedito Salles, 574", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1119" },
-        { name: "Santa Maria ( Aguera )" , address: "Praça Coronel Leite, nº 711", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1471" },
-        { name: "Farmashop ( Zurdo )" , address: "Praça Coronel Leite, nº 699", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1471" },
-        { name: "PopularMais( Jeremias )" , address: "R. Laurindo Franco de Godói, 787", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 99647-6266" },
+        { name: "DrogaMais ( Jorginho )", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", address: "Rua Benedito Salles, 903", contact: "(43) 98411-9145",delivery: "Sim / Sem Taxa" },
+        { name: "Desconto Facil 1 ( Joao )", address: "R. Benedito Salles, 574", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1119",delivery: "Sim / Sem Taxa" },
+        { name: "Santa Maria ( Aguera )" , address: "Praça Coronel Leite, nº 711", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 3566-1471",delivery: "Sim / Sem Taxa" },
+        { name: "MasterFarma ( Zurdo )" , address: "R. Laurindo Franco de Godoi, 90", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 99951-1540",delivery: "Sim / Sem Taxa" },
+        { name: "PopularMais( Jeremias )" , address: "R. Laurindo Franco de Godói, 787", hours: "seg a sex: 8h - 18h e sab: 08 - 12h", contact: "(43) 99647-6266",delivery: "Sim / Sem Taxa" },
       
       
       ]
@@ -308,7 +308,7 @@ ${establishment.menuImage ? `
     },
     {
       link: farmaciaPlantaoLink, title: "Farmacia de Plantão", establishments: [
-        { name: "DrogaMais (Jorginho) ", address: "Rua Benedito Salles, 903",  contact: "(43) 98411-9145",plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025"},
+        { name: "MasterFarma ( Zurdo ) ", address: "R. Laurindo Franco de Godoi, 90",  contact: "(43) 99951-1540",plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",delivery: "Sim / Sem Taxa"},
       ]
     }
   ];
