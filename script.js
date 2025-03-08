@@ -69,8 +69,10 @@ document.addEventListener("DOMContentLoaded", function () {
   //////////////////////////////////////////////////////////
   // Alternar sidebar ao clicar no ícone do menu
   sidebarOpen.addEventListener("click", () => {
-    sidebar.classList.remove("close"); // Expande a barra lateral
+    sidebar.classList.toggle("close"); // Expande a barra lateral
   });
+
+ 
 
   sidebarExpand.addEventListener("click", () => {
     sidebar.classList.remove("close", "hoverable");
@@ -350,25 +352,12 @@ ${establishment.menuImage ? `
 
 
 
-
-
-
-  // Fechar a sidebar ao clicar fora dela (em dispositivos móveis)
-//  document.addEventListener("click", function (event) {
- //   if (window.innerWidth < 768 && !sidebar.contains(event.target)) {
-  //    sidebar.classList.add("close");
-  //  }
- // });
-
   document.addEventListener("click", function (event) {
     if (window.innerWidth < 768 && !sidebar.contains(event.target) && event.target !== sidebarOpen) {
       sidebar.classList.add("close");
     }
   });
   
-
-
-
 
 
 });
