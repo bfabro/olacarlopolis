@@ -460,7 +460,7 @@ ${establishment.menuImage ? `
      });
   });
 
-  document.addEventListener("click", function (event) {
+  document.addEventListener("touchstart", function (event) {
     // Verifica se o clique foi fora da sidebar e do botão de abrir
     if (window.innerWidth < 768 && 
         !sidebar.contains(event.target) && 
