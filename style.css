@@ -581,6 +581,12 @@ body.dark {
     padding: 0 10px; /* Reduz o padding */
   }
 
+  .banner {
+    width: 180%; /* Ocupa toda a largura da tela em telas menores */
+    
+  }
+
+
   .navbar {
     max-width: 100%; /* Ocupa toda a largura da tela em telas menores */
   }
