@@ -444,23 +444,22 @@ ${establishment.menuImage ? `
         // Fecha a sidebar SOMENTE em telas pequenas após clicar no menu
         ///// OLTA AQUI
         if (window.innerWidth < 768) {
-           setTimeout(() => {
+          if (!sidebar.classList.contains("close")) { 
+            setTimeout(() => {
               sidebar.classList.add("close");
-           }, 300); // Pequeno delay para evitar que o clique feche imediatamente
+            }, 300);
+          }
         }
-        // Garante que a sidebar possa ser reaberta ao clicar no ícone
-        sidebarOpen.addEventListener("click", () => {
-           sidebar.classList.toggle("close"); // Alterna a abertura e fechamento da sidebar
-        });
-
+       
      });
   });
 
-
- 
-
   document.addEventListener("click", function (event) {
-    if (window.innerWidth < 768 &&  !sidebar.contains(event.target) && event.target !== sidebarOpen && !event.target.closest(".nav_link")) {
+    // Verifica se o clique foi fora da sidebar e do botão de abrir
+    if (window.innerWidth < 768 && 
+        !sidebar.contains(event.target) && 
+        event.target !== sidebarOpen && 
+        !event.target.closest(".menu_items")) {  
       sidebar.classList.add("close");
     }
   });
