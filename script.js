@@ -63,7 +63,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Verifica se é um dispositivo móvel e retrai a sidebar
   if (window.innerWidth < 768) {
-    sidebar.classList.add("close", "hoverable");
+   // sidebar.classList.add("close", "hoverable");
+   sidebar.classList.add("close");
+    sidebar.classList.remove("hoverable"); // Garante que ela não fique travada fechada
+
   }
 
   //////////////////////////////////////////////////////////
