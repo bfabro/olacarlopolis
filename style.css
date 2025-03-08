@@ -556,6 +556,7 @@ body.dark {
   position: relative;
 }
 
+
 .banner::before {
   content: "";
   position: absolute;
