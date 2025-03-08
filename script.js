@@ -69,8 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
   //////////////////////////////////////////////////////////
   // Alternar sidebar ao clicar no ícone do menu
   sidebarOpen.addEventListener("click", () => {
-    sidebar.classList.toggle("close"); // Alterna a abertura e fechamento da sidebar
-    sidebar.classList.toggle("hoverable"); // Permite que o hover funcione corretamente
+    sidebar.classList.remove("close"); // Expande a barra lateral
   });
 
   sidebarExpand.addEventListener("click", () => {
@@ -318,6 +317,8 @@ ${establishment.menuImage ? `
   categories.forEach(category => {
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
+      event.stopPropagation(); // Impede que o clique feche a sidebar antes do usuário interagir
+
       // Remove a classe ativa de todos os itens
       categories.forEach(cat => cat.link.classList.remove("active"));
 
@@ -333,14 +334,15 @@ ${establishment.menuImage ? `
       }
 
       // Fecha a sidebar SOMENTE em telas pequenas após clicar no menu
-      ///// volta aqui
+      ///// OLTA AQUI
       if (window.innerWidth < 768) {
-        sidebar.classList.add("close");
-        sidebar.classList.remove("hoverable"); // Garante que ela não fique travada fechada
+        setTimeout(() => {
+          sidebar.classList.add("close");
+        }, 300); // Pequeno delay para evitar que o clique feche imediatamente
       }
          // Garante que a sidebar possa ser reaberta ao clicar no ícone
     sidebarOpen.addEventListener("click", () => {
-      sidebar.classList.remove("close");
+      sidebar.classList.toggle("close"); // Alterna a abertura e fechamento da sidebar
     });
 
     });
