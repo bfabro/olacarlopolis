@@ -347,11 +347,18 @@ ${establishment.menuImage ? `
 
 
   // Fechar a sidebar ao clicar fora dela (em dispositivos móveis)
+//  document.addEventListener("click", function (event) {
+ //   if (window.innerWidth < 768 && !sidebar.contains(event.target)) {
+  //    sidebar.classList.add("close");
+  //  }
+ // });
+
   document.addEventListener("click", function (event) {
-    if (window.innerWidth < 768 && !sidebar.contains(event.target)) {
+    if (window.innerWidth < 768 && !sidebar.contains(event.target) && event.target !== sidebarOpen) {
       sidebar.classList.add("close");
     }
   });
+  
 
 
 
