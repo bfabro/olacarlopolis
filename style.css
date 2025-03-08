@@ -507,3 +507,89 @@ body.dark {
   text-transform: uppercase;
 }
 
+
+.container {
+  max-width: 1200px; /* Defina a largura máxima do conteúdo */
+  margin: 0 auto; /* Centraliza o container na tela */
+  padding: 0 00px; /* Adiciona um pouco de espaço nas laterais */
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  z-index: 100;
+  max-width: 260px; /* Largura da sidebar */
+  margin-left: calc((100% - 1200px) / 2); /* Centraliza a sidebar */
+}
+
+/* Ajustes para a navbar e sidebar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  max-width: 1200px; /* Mesma largura máxima do container */
+  margin: 0 auto; /* Centraliza a navbar */
+  padding: 15px 20px; /* Ajuste o padding conforme necessário */
+}
+
+.content_area {
+  margin-left: 262px; /* Ajuste para a largura da sidebar */
+  padding: 10px;
+  width: calc(100% - 262px); /* Ajuste para a largura da sidebar */
+  transition: margin-left 0.5s ease;
+}
+
+/* Ajustes para o banner */
+.banner {
+  width: 100%;
+  height: 100vh;
+  background: url('images/img_padrao_site/banner.jpg') no-repeat center center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+
+.banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Efeito de sobreposição */
+}
+
+.banner-content {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  margin: -485px -70px 0px 8px;
+  font-size: 22px;
+}
+
+@media screen and (max-width: 1200px) {
+  .container {
+    max-width: 100%; /* Ocupa toda a largura da tela em telas menores */
+    padding: 0 10px; /* Reduz o padding */
+  }
+
+  .navbar {
+    max-width: 100%; /* Ocupa toda a largura da tela em telas menores */
+  }
+
+  .sidebar {
+    margin-left: 0; /* Remove a margem para a sidebar em telas menores */
+  }
+
+  .content_area {
+    margin-left: 0; /* Remove a margem para a área de conteúdo em telas menores */
+    width: 100%; /* Ocupa toda a largura da tela */
+  }
+}
