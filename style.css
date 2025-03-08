@@ -359,7 +359,7 @@ body.dark {
 
 /* Quando o menu fechar */
 .sidebar.close~.content_area {
-  width: calc(100% - 80px);
+  width: calc(150% - 80px);
   margin-left: 86px;
 }
 
