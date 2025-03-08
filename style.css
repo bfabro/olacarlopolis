@@ -537,9 +537,9 @@ body.dark {
 }
 
 .content_area {
-  margin-left: 262px; /* Ajuste para a largura da sidebar */
+  margin-left: 260px; /* Ajuste para a largura da sidebar */
   padding: 10px;
-  width: calc(100% - 262px); /* Ajuste para a largura da sidebar */
+  width: calc(100% - 260px); /* Ajuste para a largura da sidebar */
   transition: margin-left 0.5s ease;
 }
 
