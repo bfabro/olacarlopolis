@@ -337,6 +337,10 @@ ${establishment.menuImage ? `
           sidebar.classList.add("close");
         }, 100); // Pequeno delay para evitar que o clique feche imediatamente
       }
+         // Garante que a sidebar possa ser reaberta ao clicar no ícone
+    sidebarOpen.addEventListener("click", () => {
+      sidebar.classList.remove("close");
+    });
 
     });
   });
