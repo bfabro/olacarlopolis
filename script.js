@@ -67,8 +67,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //////////////////////////////////////////////////////////
   // Alternar sidebar ao clicar no ícone do menu
-  sidebarOpen.addEventListener("click", () => {
-     sidebar.classList.toggle("close"); // Expande a barra lateral
+  document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.querySelector(".sidebar");
+    const sidebarOpen = document.querySelector("#sidebarOpen");
+  
+    // Garantir que o evento de clique só é adicionado uma vez
+    sidebarOpen.addEventListener("click", () => {
+      sidebar.classList.toggle("close");
+    });
   });
 
 
