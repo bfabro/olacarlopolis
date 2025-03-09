@@ -450,6 +450,14 @@ ${establishment.menuImage ? `
      });
   });
 
+  // Corrige o problema da barra lateral se retraindo ao clicar novamente em "Informações úteis"
+document.querySelectorAll(".submenu_item").forEach(item => {
+  item.addEventListener("click", function (event) {
+      event.stopPropagation(); // Impede que o clique feche a sidebar imediatamente
+      this.classList.toggle("show_submenu"); // Alterna o submenu corretamente
+  });
+});
+
   document.addEventListener("click", function (event) {
     // Verifica se o clique foi fora da sidebar e do botão de abrir
     if (window.innerWidth < 768 && 
