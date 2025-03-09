@@ -34,6 +34,11 @@ document.addEventListener("DOMContentLoaded", function () {
      link.addEventListener("click", function (event) {
         event.preventDefault(); // Evita recarregar a página
         mostrarConteudo(); // Esconde o banner e mostra o conteúdo
+
+         // Retrai a sidebar em dispositivos móveis
+      if (window.innerWidth < 768) {
+        sidebar.classList.add("close");
+      }
      });
   });
 
@@ -45,11 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
      });
   }
 
-  // Garantir que ao acessar a home, o banner esteja visível e o conteúdo escondido
-  if (window.location.pathname.includes("index.html")) {
-     banner.classList.remove("hidden");
-     contentArea.classList.add("hidden");
-  }
 
   ///////////////////////////// fimmmmm 
 
@@ -468,8 +468,7 @@ ${establishment.menuImage ? `
         !sidebar.contains(event.target) && 
         event.target !== sidebarOpen && 
         !event.target.closest(".submenu_item") && 
-        !event.target.closest(".menu_items")) {  
-        
+        !event.target.closest(".menu_items")) {          
         sidebar.classList.add("close");
     }
 });
