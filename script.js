@@ -453,7 +453,7 @@ ${establishment.menuImage ? `
           if (!sidebar.classList.contains("close")) { 
             setTimeout(() => {
               sidebar.classList.add("close");
-            }, 300);
+            }, 5000);
           }
         }
        
