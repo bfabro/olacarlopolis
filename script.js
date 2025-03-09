@@ -26,43 +26,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   // Inicio pesquisa nome no menu lateral
- 
+  // volta aqui
+
     const searchInput = document.getElementById("searchSidebar");
-    const menuItems = document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item");
+  
 
     searchInput.addEventListener("input", function () {
-      const filter = searchInput.value.toLowerCase();
+        const filter = searchInput.value.toLowerCase();
+        let foundInMenu = false;
+        let foundInEstablishments = false;
 
-      menuItems.forEach(item => {
-        const text = item.textContent.toLowerCase();
-        const parent = item.closest("ul.menu_items");
+        // Pesquisar dentro do menu lateral
+        document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item").forEach(item => {
+            const text = item.textContent.toLowerCase();
+            if (text.includes(filter)) {
+                item.style.display = "flex";
+                foundInMenu = true;
+            } else {
+                item.style.display = "none";
+            }
+        });
 
-        if (text.includes(filter)) {
-          item.style.display = "flex"; // Mostra o item
+        // Pesquisar dentro das categorias e carregar o conteúdo correspondente
+        categories.forEach(category => {
+            category.establishments.forEach(establishment => {
+                const dataString = Object.values(establishment).join(" ").toLowerCase();
+                
+                if (dataString.includes(filter)) {
+                    foundInEstablishments = true;
 
-          // Se for um submenu, mostra o título do grupo
-          if (parent && parent.classList.contains("submenu")) {
-            parent.style.display = "block";
-            parent.previousElementSibling.style.display = "flex";
-          }
-        } else {
-          item.style.display = "none"; // Oculta o item
+                    // Carrega automaticamente a categoria correspondente
+                    loadContent(category.title, category.establishments);
+
+                    // Simula um clique no menu correspondente
+                    if (category.link) {
+                        category.link.classList.add("active");
+                    }
+
+                    // Expande a sidebar se estiver fechada
+                    if (sidebar.classList.contains("close")) {
+                        sidebar.classList.remove("close");
+                    }
+                }
+            });
+        });
+
+        // Se nenhum resultado for encontrado, exibe uma mensagem
+        if (!foundInMenu && !foundInEstablishments) {
+            contentArea.innerHTML = "<h2>Nenhum resultado encontrado!</h2>";
         }
-      });
-
-      // Mostrar os submenus se houver um item visível dentro deles
-      document.querySelectorAll(".submenu").forEach(submenu => {
-        const visibleItems = submenu.querySelectorAll(".nav_link:not([style*='display: none'])");
-        if (visibleItems.length > 0) {
-          submenu.style.display = "block";
-          submenu.previousElementSibling.style.display = "flex";
-        } else {
-          submenu.style.display = "none";
-          submenu.previousElementSibling.style.display = "none";
-        }
-      });
     });
- 
+
+
+
+
+
+
+
+
 
 
 
