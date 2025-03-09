@@ -13,41 +13,95 @@ document.addEventListener("DOMContentLoaded", function () {
   const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
   const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
   const lanchoneteLink = document.querySelector("#menuLanchonete");
-  const eventosLink = document.querySelector("#menuEventos");  
+  const eventosLink = document.querySelector("#menuEventos");
   const banner = document.getElementById("banner");
 
   const subMenuLinks = document.querySelectorAll(".nav_link.sublink"); // Apenas subitens do menu
   const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
 
+
+
+
+
+
+
+  // Inicio pesquisa nome no menu lateral
+ 
+    const searchInput = document.getElementById("searchSidebar");
+    const menuItems = document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item");
+
+    searchInput.addEventListener("input", function () {
+      const filter = searchInput.value.toLowerCase();
+
+      menuItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        const parent = item.closest("ul.menu_items");
+
+        if (text.includes(filter)) {
+          item.style.display = "flex"; // Mostra o item
+
+          // Se for um submenu, mostra o título do grupo
+          if (parent && parent.classList.contains("submenu")) {
+            parent.style.display = "block";
+            parent.previousElementSibling.style.display = "flex";
+          }
+        } else {
+          item.style.display = "none"; // Oculta o item
+        }
+      });
+
+      // Mostrar os submenus se houver um item visível dentro deles
+      document.querySelectorAll(".submenu").forEach(submenu => {
+        const visibleItems = submenu.querySelectorAll(".nav_link:not([style*='display: none'])");
+        if (visibleItems.length > 0) {
+          submenu.style.display = "block";
+          submenu.previousElementSibling.style.display = "flex";
+        } else {
+          submenu.style.display = "none";
+          submenu.previousElementSibling.style.display = "none";
+        }
+      });
+    });
+ 
+
+
+
+
+
+
+
+  // Fim pesquisa nome no menu lateral
+
+
   // Função para esconder o banner e mostrar o conteúdo
   function mostrarConteudo() {
-     if (banner) {
-        banner.classList.add("hidden"); // Esconde o banner
-     }
-     if (contentArea) {
-        contentArea.classList.remove("hidden"); // Mostra a área de conteúdo
-     }
+    if (banner) {
+      banner.classList.add("hidden"); // Esconde o banner
+    }
+    if (contentArea) {
+      contentArea.classList.remove("hidden"); // Mostra a área de conteúdo
+    }
   }
 
   // Adiciona evento SOMENTE aos subitens do menu
   subMenuLinks.forEach(link => {
-     link.addEventListener("click", function (event) {
-        event.preventDefault(); // Evita recarregar a página
-        mostrarConteudo(); // Esconde o banner e mostra o conteúdo
+    link.addEventListener("click", function (event) {
+      event.preventDefault(); // Evita recarregar a página
+      mostrarConteudo(); // Esconde o banner e mostra o conteúdo
 
-         // Retrai a sidebar em dispositivos móveis
+      // Retrai a sidebar em dispositivos móveis
       if (window.innerWidth < 768) {
         sidebar.classList.add("close");
       }
-     });
+    });
   });
 
   // Garantir que ao clicar no "Início", a página recarregue corretamente
   if (homeLink) {
-     homeLink.addEventListener("click", function (event) {
-        event.preventDefault();
-        window.location.href = "index.html"; // Recarrega a página
-     });
+    homeLink.addEventListener("click", function (event) {
+      event.preventDefault();
+      window.location.href = "index.html"; // Recarrega a página
+    });
   }
 
 
@@ -55,14 +109,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Garante que ao recarregar a página inicial, o banner apareça
   if (window.location.pathname.includes("index.html")) {
-     banner.classList.remove("hidden");
-     contentArea.classList.add("hidden");
+    banner.classList.remove("hidden");
+    contentArea.classList.add("hidden");
   }
 
 
   // Verifica se é um dispositivo móvel e retrai a sidebar
   if (window.innerWidth < 768) {
-     sidebar.classList.add("close", "hoverable");
+    sidebar.classList.add("close", "hoverable");
   }
 
   //////////////////////////////////////////////////////////
@@ -73,56 +127,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   sidebarExpand.addEventListener("click", () => {
-     sidebar.classList.remove("close", "hoverable");
+    sidebar.classList.remove("close", "hoverable");
   });
 
   sidebarClose.addEventListener("click", () => {
-     sidebar.classList.add("close", "hoverable");
+    sidebar.classList.add("close", "hoverable");
   });
 
   /////////////////////////////////////////////////
 
   sidebar.addEventListener("mouseenter", () => {
-     if (sidebar.classList.contains("hoverable")) {
-        sidebar.classList.remove("close");
-     }
+    if (sidebar.classList.contains("hoverable")) {
+      sidebar.classList.remove("close");
+    }
   });
 
   sidebar.addEventListener("mouseleave", () => {
-     if (sidebar.classList.contains("hoverable")) {
-        sidebar.classList.add("close");
-     }
+    if (sidebar.classList.contains("hoverable")) {
+      sidebar.classList.add("close");
+    }
   });
 
   // Alternar tema escuro/claro
   darkLight.addEventListener("click", () => {
-     body.classList.toggle("dark");
-     darkLight.classList.toggle("bx-moon");
-     darkLight.classList.toggle("bx-sun");
+    body.classList.toggle("dark");
+    darkLight.classList.toggle("bx-moon");
+    darkLight.classList.toggle("bx-sun");
   });
 
   // Alternar submenu
   submenuItems.forEach(item => {
     item.addEventListener("click", (event) => {
       event.stopPropagation(); // Evita que o clique feche a sidebar
-  
+
       // Verifica se já está aberto
       const isOpen = item.classList.contains("show_submenu");
-  
+
       // Fecha todos os submenus antes de abrir o atual
       submenuItems.forEach(i => i.classList.remove("show_submenu"));
-  
+
       // Se não estava aberto, abre novamente
       if (!isOpen) {
         item.classList.add("show_submenu");
       }
     });
   });
-  
+
 
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
-     contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
+    contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
      ${establishments.map(establishment => `
        <li>
          <strong class="locais_nomes">${establishment.name}</strong><br>
@@ -174,306 +228,306 @@ ${establishment.menuImage ? `
    </ul>`;
 
 
-     document.querySelectorAll(".menu-btn").forEach(button => {
-        button.addEventListener("click", function () {
-           const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
-           const menuDiv = document.getElementById(menuId);
+    document.querySelectorAll(".menu-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
+        const menuDiv = document.getElementById(menuId);
 
-           // Verifica se o cardápio está visível (não possui a classe "hidden")
-           if (menuDiv.classList.contains("hidden")) {
-              // Abre o cardápio
-              menuDiv.classList.remove("hidden");
-              this.textContent = "Fechar Cardápio"; // Altera o texto do botão
-              this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
-           } else {
-              // Fecha o cardápio
-              menuDiv.classList.add("hidden");
-              this.textContent = "Ver Cardápio"; // Texto volta ao original
-              this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
-           }
-        });
-     });
-     /// para o flyer
-     document.querySelectorAll(".flyer-btn").forEach(button => {
-        button.addEventListener("click", function () {
-           const menuId2 = `menu-${encodeURIComponent(this.dataset.name)}`;
-           const menuDiv2 = document.getElementById(menuId2);
+        // Verifica se o cardápio está visível (não possui a classe "hidden")
+        if (menuDiv.classList.contains("hidden")) {
+          // Abre o cardápio
+          menuDiv.classList.remove("hidden");
+          this.textContent = "Fechar Cardápio"; // Altera o texto do botão
+          this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
+        } else {
+          // Fecha o cardápio
+          menuDiv.classList.add("hidden");
+          this.textContent = "Ver Cardápio"; // Texto volta ao original
+          this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
+        }
+      });
+    });
+    /// para o flyer
+    document.querySelectorAll(".flyer-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        const menuId2 = `menu-${encodeURIComponent(this.dataset.name)}`;
+        const menuDiv2 = document.getElementById(menuId2);
 
-           // Verifica se o cardápio está visível (não possui a classe "hidden")
-           if (menuDiv2.classList.contains("hidden")) {
-              // Abre o cardápio
-              menuDiv2.classList.remove("hidden");
-              this.textContent = "Fechar Flyer"; // Altera o texto do botão
-              this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
-           } else {
-              // Fecha o cardápio
-              menuDiv2.classList.add("hidden");
-              this.textContent = "Ver Flyer"; // Texto volta ao original
-              this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
-           }
-        });
-     });
-
-
-     document.querySelectorAll(".flyer-btn").forEach(button => {
-        button.addEventListener("click", function () {
-           document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
-        });
-     });
+        // Verifica se o cardápio está visível (não possui a classe "hidden")
+        if (menuDiv2.classList.contains("hidden")) {
+          // Abre o cardápio
+          menuDiv2.classList.remove("hidden");
+          this.textContent = "Fechar Flyer"; // Altera o texto do botão
+          this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
+        } else {
+          // Fecha o cardápio
+          menuDiv2.classList.add("hidden");
+          this.textContent = "Ver Flyer"; // Texto volta ao original
+          this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
+        }
+      });
+    });
 
 
-     document.querySelectorAll(".menu-btn").forEach(button => {
-        button.addEventListener("click", function () {
-           document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
-        });
-     });
+    document.querySelectorAll(".flyer-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
+      });
+    });
 
 
-     document.querySelectorAll(".fechar-menu").forEach(button => {
-        button.addEventListener("click", function () {
-           this.parentElement.style.display = "none";
-        });
-     });
+    document.querySelectorAll(".menu-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
+      });
+    });
 
 
-     // Adicionar eventos aos botões de detalhes
-     document.querySelectorAll(".detalhes-btn").forEach(button => {
-        button.addEventListener("click", function () {
-           const detalhesDiv = document.getElementById(`detalhes-${encodeURIComponent(this.dataset.name)}`);
-           detalhesDiv.style.display = "block";
-        });
-     });
+    document.querySelectorAll(".fechar-menu").forEach(button => {
+      button.addEventListener("click", function () {
+        this.parentElement.style.display = "none";
+      });
+    });
 
-     // Evento para fechar os detalhes
-     document.querySelectorAll(".fechar-detalhes").forEach(button => {
-        button.addEventListener("click", function () {
-           this.parentElement.style.display = "none";
-        });
-     });
+
+    // Adicionar eventos aos botões de detalhes
+    document.querySelectorAll(".detalhes-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        const detalhesDiv = document.getElementById(`detalhes-${encodeURIComponent(this.dataset.name)}`);
+        detalhesDiv.style.display = "block";
+      });
+    });
+
+    // Evento para fechar os detalhes
+    document.querySelectorAll(".fechar-detalhes").forEach(button => {
+      button.addEventListener("click", function () {
+        this.parentElement.style.display = "none";
+      });
+    });
   }
 
 
   // Carregar informações de categorias
   const categories = [{
-        link: lanchoneteLink,
-        title: "Lanchonetes em Carlópolis",
-        establishments: [{
-              name: "Paiol",
-              hours: "qua - dom 19 - 00h",
-              address: "Av. Elson Soares, 767 ",
-              contact: "(11) 99898-5930",
-              delivery: "Sim / Sem Taxa",
-              menuImage: "images/img_lanchonetes/cardapio_1.jpg"
-           },
-           {
-              name: "Casarao",
-              hours: "seg - seg - 19h - 00h e dom: 07 - 12h",
-              address: "R. Benedito Salles, 341 ",
-              contact: "(43) 2345-6789",
-              delivery: "Sim / Com Taxa",
-              menuImage: "images/img_lanchonetes/cardapio_2.jpg"
-           },
-        ]
-     },
+    link: lanchoneteLink,
+    title: "Lanchonetes em Carlópolis",
+    establishments: [{
+      name: "Paiol",
+      hours: "qua - dom 19 - 00h",
+      address: "Av. Elson Soares, 767 ",
+      contact: "(11) 99898-5930",
+      delivery: "Sim / Sem Taxa",
+      menuImage: "images/img_lanchonetes/cardapio_1.jpg"
+    },
+    {
+      name: "Casarao",
+      hours: "seg - seg - 19h - 00h e dom: 07 - 12h",
+      address: "R. Benedito Salles, 341 ",
+      contact: "(43) 2345-6789",
+      delivery: "Sim / Com Taxa",
+      menuImage: "images/img_lanchonetes/cardapio_2.jpg"
+    },
+    ]
+  },
 
-     {
-        link: eventosLink,
-        title: "Eventos em Carlópolis",
-        establishments: [{
-              name: "Calendario Eventos",
-              contact: "(43) 2345-6789",
-              menuFlyer: "images/img_informacoes/eventos/calendario_evento.png"
-           },
-           {
-              name: "Feira da Lua",
-              hours: "sex 19 - 00h",
-              address: "Praça Igreja Matriz ",
-              contact: "(11) 99898-5930",
-              menuFlyer: "images/img_informacoes/eventos/feira_lua_1.png"
-           },
-           {
-              name: "Passeata contra a barriga",
-              hours: "dom: 07 - 12h",
-              address: "Av Turistica, 800",
-              contact: "(43) 2345-6789",
-              menuFlyer: "images/img_informacoes/eventos/corrida_10.jpg"
-           },
-
-
-        ]
-     },
+  {
+    link: eventosLink,
+    title: "Eventos em Carlópolis",
+    establishments: [{
+      name: "Calendario Eventos",
+      contact: "(43) 2345-6789",
+      menuFlyer: "images/img_informacoes/eventos/calendario_evento.png"
+    },
+    {
+      name: "Feira da Lua",
+      hours: "sex 19 - 00h",
+      address: "Praça Igreja Matriz ",
+      contact: "(11) 99898-5930",
+      menuFlyer: "images/img_informacoes/eventos/feira_lua_1.png"
+    },
+    {
+      name: "Passeata contra a barriga",
+      hours: "dom: 07 - 12h",
+      address: "Av Turistica, 800",
+      contact: "(43) 2345-6789",
+      menuFlyer: "images/img_informacoes/eventos/corrida_10.jpg"
+    },
 
 
-     {
-        link: supermercadoLink,
-        title: "Supermercados em Carlópolis",
-        establishments: [{
-              name: "Rocha",
-              hours: "6h - 20h e dom: 06 - 12h",
-              address: "Av. Elson Soares, 767 ",
-              contact: "(11) 99898-5930",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Carreiro",
-              address: "R. Benedito Salles, 341 ",
-              hours: "7h - 20h e dom: 07 - 12h",
-              contact: "(43) 2345-6789",
-              delivery: "Sim / Com Taxa"
-           },
-           {
-              name: "Barateiro",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Kelve",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Zero Japan",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Carriel",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Compre Bem +",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
+    ]
+  },
 
 
-        ]
-     },
+  {
+    link: supermercadoLink,
+    title: "Supermercados em Carlópolis",
+    establishments: [{
+      name: "Rocha",
+      hours: "6h - 20h e dom: 06 - 12h",
+      address: "Av. Elson Soares, 767 ",
+      contact: "(11) 99898-5930",
+      delivery: "Sim / Sem Taxa"
+    },
+    {
+      name: "Carreiro",
+      address: "R. Benedito Salles, 341 ",
+      hours: "7h - 20h e dom: 07 - 12h",
+      contact: "(43) 2345-6789",
+      delivery: "Sim / Com Taxa"
+    },
+    {
+      name: "Barateiro",
+      address: "PR-218, 1168 ",
+      hours: "8h - 21h e dom: 07 - 12h",
+      contact: "(43) 3456-7890",
+      delivery: "Sim / Sem Taxa"
+    },
+    {
+      name: "Kelve",
+      address: "PR-218, 1168 ",
+      hours: "8h - 21h e dom: 07 - 12h",
+      contact: "(43) 3456-7890",
+      delivery: "Sim / Sem Taxa"
+    },
+    {
+      name: "Zero Japan",
+      address: "PR-218, 1168 ",
+      hours: "8h - 21h e dom: 07 - 12h",
+      contact: "(43) 3456-7890",
+      delivery: "Sim / Sem Taxa"
+    },
+    {
+      name: "Carriel",
+      address: "PR-218, 1168 ",
+      hours: "8h - 21h e dom: 07 - 12h",
+      contact: "(43) 3456-7890",
+      delivery: "Sim / Sem Taxa"
+    },
+    {
+      name: "Compre Bem +",
+      address: "PR-218, 1168 ",
+      hours: "8h - 21h e dom: 07 - 12h",
+      contact: "(43) 3456-7890",
+      delivery: "Sim / Sem Taxa"
+    },
 
 
-     {
-        link: farmaciaLink,
-        title: "Farmácias em Carlópolis",
-        establishments: [{
-              name: "DrogaMais ( Jorginho )",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              address: "Rua Benedito Salles, 903",
-              contact: "(43) 98411-9145",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Desconto Facil 1 ( Joao )",
-              address: "R. Benedito Salles, 574",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              contact: "(43) 3566-1119",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Santa Maria ( Aguera )",
-              address: "Praça Coronel Leite, nº 711",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              contact: "(43) 3566-1471",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "MasterFarma ( Zurdo )",
-              address: "R. Laurindo Franco de Godoi, 90",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              contact: "(43) 99951-1540",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "PopularMais( Jeremias )",
-              address: "R. Laurindo Franco de Godói, 787",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              contact: "(43) 99647-6266",
-              delivery: "Sim / Sem Taxa"
-           },
+    ]
+  },
 
 
-        ]
-     },
+  {
+    link: farmaciaLink,
+    title: "Farmácias em Carlópolis",
+    establishments: [{
+      name: "DrogaMais ( Jorginho )",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+      address: "Rua Benedito Salles, 903",
+      contact: "(43) 98411-9145",
+      delivery: "Sim / Sem Taxa"
+    },
+    {
+      name: "Desconto Facil 1 ( Joao )",
+      address: "R. Benedito Salles, 574",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+      contact: "(43) 3566-1119",
+      delivery: "Sim / Sem Taxa"
+    },
+    {
+      name: "Santa Maria ( Aguera )",
+      address: "Praça Coronel Leite, nº 711",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+      contact: "(43) 3566-1471",
+      delivery: "Sim / Sem Taxa"
+    },
+    {
+      name: "MasterFarma ( Zurdo )",
+      address: "R. Laurindo Franco de Godoi, 90",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+      contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
+    },
+    {
+      name: "PopularMais( Jeremias )",
+      address: "R. Laurindo Franco de Godói, 787",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+      contact: "(43) 99647-6266",
+      delivery: "Sim / Sem Taxa"
+    },
 
-     {
-        link: churrasqueiroLink,
-        title: "Churrasqueiros em Carlópolis",
-        establishments: [{
-              name: "Pituka",
-              contact: "(43) 7890-1234"
-           },
-           {
-              name: "Gustavo",
-              contact: "(43) 8901-2345"
-           },
-        ]
-     },
-     {
-        link: farmaciaPlantaoLink,
-        title: "Farmacia de Plantão",
-        establishments: [{
-           name: "MasterFarma ( Zurdo ) ",
-           address: "R. Laurindo Franco de Godoi, 90",
-           contact: "(43) 99951-1540",
-           plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
-           delivery: "Sim / Sem Taxa"
-        }, ]
-     }
+
+    ]
+  },
+
+  {
+    link: churrasqueiroLink,
+    title: "Churrasqueiros em Carlópolis",
+    establishments: [{
+      name: "Pituka",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Gustavo",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+  {
+    link: farmaciaPlantaoLink,
+    title: "Farmacia de Plantão",
+    establishments: [{
+      name: "MasterFarma ( Zurdo ) ",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+      plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
+      delivery: "Sim / Sem Taxa"
+    },]
+  }
   ];
 
   // Adicionar eventos para os links do menu
   categories.forEach(category => {
-     category.link.addEventListener("click", function (event) {
-        event.preventDefault();
-          // Remove a classe ativa de todos os itens
-        categories.forEach(cat => cat.link.classList.remove("active"));
-        // Adiciona a classe ativa ao item clicado
-        this.classList.add("active");
-        // Carrega o conteúdo correspondente
-        loadContent(category.title, category.establishments);
+    category.link.addEventListener("click", function (event) {
+      event.preventDefault();
+      // Remove a classe ativa de todos os itens
+      categories.forEach(cat => cat.link.classList.remove("active"));
+      // Adiciona a classe ativa ao item clicado
+      this.classList.add("active");
+      // Carrega o conteúdo correspondente
+      loadContent(category.title, category.establishments);
 
-        // Expande a sidebar, se estiver fechada
-        if (sidebar.classList.contains("close")) {
-           sidebar.classList.remove("close");
+      // Expande a sidebar, se estiver fechada
+      if (sidebar.classList.contains("close")) {
+        sidebar.classList.remove("close");
+      }
+
+      // Fecha a sidebar SOMENTE em telas pequenas após clicar no menu
+      ///// OLTA AQUI
+      if (window.innerWidth < 768) {
+
+        if (!sidebar.matches(":hover") && !document.activeElement.closest(".sidebar") &&
+          !document.activeElement.closest(".menu_items") &&
+          !document.activeElement.closest(".submenu_item")) {
+          sidebar.classList.add("close");
         }
 
-        // Fecha a sidebar SOMENTE em telas pequenas após clicar no menu
-        ///// OLTA AQUI
-        if (window.innerWidth < 768) {
-         
-            if (!sidebar.matches(":hover") && !document.activeElement.closest(".sidebar") && 
-            !document.activeElement.closest(".menu_items") &&
-                !document.activeElement.closest(".submenu_item")) {  
-              sidebar.classList.add("close");
-            }
-         
-        }
+      }
 
-      
-       
-     });
+
+
+    });
   });
 
-  
+
   document.addEventListener("click", function (event) {
-    if (window.innerWidth < 768 && 
-      !sidebar.contains(event.target) && 
-      event.target !== sidebarOpen && 
-      !event.target.closest(".submenu_item") && !event.target.closest(".menu_content") && 
-      !event.target.closest(".menu_items")) {          
+    if (window.innerWidth < 768 &&
+      !sidebar.contains(event.target) &&
+      event.target !== sidebarOpen &&
+      !event.target.closest(".submenu_item") && !event.target.closest(".menu_content") &&
+      !event.target.closest(".menu_items")) {
       sidebar.classList.add("close");
-  }
-});
+    }
+  });
 
 
 

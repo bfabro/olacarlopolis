@@ -300,13 +300,15 @@ body.dark {
 
 .map-icon {
   margin-left: 8px;
-  color: #007bff; /* Cor do ícone */
+  color: #007bff;
+  /* Cor do ícone */
   text-decoration: none;
   font-size: 1.2em;
 }
 
 .map-icon:hover {
-  color: #0056b3; /* Cor do ícone ao passar o mouse */
+  color: #0056b3;
+  /* Cor do ícone ao passar o mouse */
 }
 
 .content_area {
@@ -322,7 +324,8 @@ body.dark {
 
 .content_area li {
   padding: 10px;
-  border-bottom: 1px solid #ddd; /* Linha separadora */
+  border-bottom: 1px solid #ddd;
+  /* Linha separadora */
   margin-bottom: 10px;
 }
 
@@ -345,6 +348,7 @@ body.dark {
   font-weight: bold;
 
 }
+
 .highlighted {
   font-size: 1.3em;
   font-weight: bold;
@@ -382,6 +386,7 @@ body.dark {
   border: none;
   cursor: pointer;
 }
+
 .detalhes-btn:hover {
   background-color: #0056b3;
 }
@@ -395,6 +400,7 @@ body.dark {
   border: none;
   cursor: pointer;
 }
+
 .menu-btn:hover {
   background-color: #000000;
 }
@@ -407,6 +413,7 @@ body.dark {
   border: none;
   cursor: pointer;
 }
+
 .fechar-menu:hover {
   background-color: #700d0d;
 }
@@ -432,13 +439,14 @@ body.dark {
   }
 
   /* Quando o menu fechar */
-.sidebar.close~.content_area {
-  width: calc(150% - 80px);
-  margin-left: 86px;
-}
-  
+  .sidebar.close~.content_area {
+    width: calc(150% - 80px);
+    margin-left: 86px;
+  }
+
 
 }
+
 /* Banner Inicial */
 .banner {
   width: calc(104% + 52%);
@@ -459,7 +467,8 @@ body.dark {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Efeito de sobreposição */
+  background: rgba(0, 0, 0, 0.5);
+  /* Efeito de sobreposição */
 }
 
 .banner-content {
@@ -486,13 +495,17 @@ body.dark {
 }
 
 .locais_nomes {
-  color: #2E8B57; /* Verde folha para um visual mais confiável */
-  font-size: 1.3rem; /* Um pouco maior para mais destaque */
+  color: #2E8B57;
+  /* Verde folha para um visual mais confiável */
+  font-size: 1.3rem;
+  /* Um pouco maior para mais destaque */
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Adiciona um leve sombreamento */
-  border-bottom: 3px solid #FF8C00; /* Linha laranja embaixo para um detalhe extra */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  /* Adiciona um leve sombreamento */
+  border-bottom: 3px solid #FF8C00;
+  /* Linha laranja embaixo para um detalhe extra */
   padding-bottom: 3px;
   display: inline-block;
 }
@@ -501,22 +514,27 @@ body.dark {
 .plantao-text {
   font-size: 16px;
   font-weight: bold;
-  color: #ff3333; /* Cor vermelha para dar destaque */
+  color: #ff3333;
+  /* Cor vermelha para dar destaque */
 }
 
 /* Destaca o título "Plantão" */
 .highlight-plantao {
   font-size: 20px;
-  color: #ff3333; /* Cor vermelha para destacar o texto "Plantão" */
+  color: #ff3333;
+  /* Cor vermelha para destacar o texto "Plantão" */
   font-weight: bold;
   text-transform: uppercase;
 }
 
 
 .container {
-  max-width: 1200px; /* Defina a largura máxima do conteúdo */
-  margin: 0 auto; /* Centraliza o container na tela */
-  padding: 0 00px; /* Adiciona um pouco de espaço nas laterais */
+  max-width: 1200px;
+  /* Defina a largura máxima do conteúdo */
+  margin: 0 auto;
+  /* Centraliza o container na tela */
+  padding: 0 00px;
+  /* Adiciona um pouco de espaço nas laterais */
 }
 
 .sidebar {
@@ -525,8 +543,10 @@ body.dark {
   left: 0;
   height: 100%;
   z-index: 100;
-  max-width: 260px; /* Largura da sidebar */
-  margin-left: calc((100% - 1200px) / 2); /* Centraliza a sidebar */
+  max-width: 260px;
+  /* Largura da sidebar */
+  margin-left: calc((100% - 1200px) / 2);
+  /* Centraliza a sidebar */
 }
 
 /* Ajustes para a navbar e sidebar */
@@ -536,15 +556,20 @@ body.dark {
   left: 0;
   right: 0;
   z-index: 1000;
-  max-width: 1200px; /* Mesma largura máxima do container */
-  margin: 0 auto; /* Centraliza a navbar */
-  padding: 15px 20px; /* Ajuste o padding conforme necessário */
+  max-width: 1200px;
+  /* Mesma largura máxima do container */
+  margin: 0 auto;
+  /* Centraliza a navbar */
+  padding: 15px 20px;
+  /* Ajuste o padding conforme necessário */
 }
 
 .content_area {
-  margin-left: 260px; /* Ajuste para a largura da sidebar */
+  margin-left: 260px;
+  /* Ajuste para a largura da sidebar */
   padding: 10px;
-  width: calc(100% - 260px); /* Ajuste para a largura da sidebar */
+  width: calc(100% - 260px);
+  /* Ajuste para a largura da sidebar */
   transition: margin-left 0.5s ease;
 }
 
@@ -569,7 +594,8 @@ body.dark {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Efeito de sobreposição */
+  background: rgba(0, 0, 0, 0.5);
+  /* Efeito de sobreposição */
 }
 
 .banner-content {
@@ -582,27 +608,47 @@ body.dark {
 
 @media screen and (max-width: 1200px) {
   .container {
-    max-width: 100%; /* Ocupa toda a largura da tela em telas menores */
-    padding: 0 10px; /* Reduz o padding */
+    max-width: 100%;
+    /* Ocupa toda a largura da tela em telas menores */
+    padding: 0 10px;
+    /* Reduz o padding */
   }
 
   .banner {
-    width: 180%; /* Ocupa toda a largura da tela em telas menores */
-    
+    width: 180%;
+    /* Ocupa toda a largura da tela em telas menores */
+
   }
 
 
   .navbar {
-    max-width: 100%; /* Ocupa toda a largura da tela em telas menores */
+    max-width: 100%;
+    /* Ocupa toda a largura da tela em telas menores */
   }
 
   .sidebar {
-    margin-left: 0; /* Remove a margem para a sidebar em telas menores */
+    margin-left: 0;
+    /* Remove a margem para a sidebar em telas menores */
   }
 
   .content_area {
-    margin-left: 0; /* Remove a margem para a área de conteúdo em telas menores */
-    width: 100%; /* Ocupa toda a largura da tela */
+    margin-left: 0;
+    /* Remove a margem para a área de conteúdo em telas menores */
+    width: 100%;
+    /* Ocupa toda a largura da tela */
   }
+}
+
+.search_sidebar {
+  padding: 10px;
+}
+
+.search_sidebar input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
 }
 
