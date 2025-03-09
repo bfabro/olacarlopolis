@@ -450,26 +450,16 @@ ${establishment.menuImage ? `
         // Fecha a sidebar SOMENTE em telas pequenas após clicar no menu
         ///// OLTA AQUI
         if (window.innerWidth < 768) {
-          setTimeout(() => {
+         
             if (!sidebar.matches(":hover") && !document.activeElement.closest(".sidebar") && 
             !document.activeElement.closest(".menu_items") &&
                 !document.activeElement.closest(".submenu_item")) {  
               sidebar.classList.add("close");
             }
-          }, 0);
+         
         }
 
       
-
-
-
-
-
-
-
-
-
-        
        
      });
   });
@@ -477,12 +467,12 @@ ${establishment.menuImage ? `
   
   document.addEventListener("click", function (event) {
     if (window.innerWidth < 768 && 
-        !sidebar.contains(event.target) && 
-        event.target !== sidebarOpen && 
-        !event.target.closest(".submenu_item") && 
-        !event.target.closest(".menu_items")) {          
-        sidebar.classList.add("close");
-    }
+      !sidebar.contains(event.target) && 
+      event.target !== sidebarOpen && 
+      !event.target.closest(".submenu_item") && 
+      !event.target.closest(".menu_items")) {          
+      sidebar.classList.add("close");
+  }
 });
 
 
