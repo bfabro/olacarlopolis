@@ -450,7 +450,11 @@ ${establishment.menuImage ? `
         // Fecha a sidebar SOMENTE em telas pequenas após clicar no menu
         ///// OLTA AQUI
         if (window.innerWidth < 768) {
-          sidebar.classList.add("close");
+          setTimeout(() => {
+            if (!sidebar.matches(":hover") && !document.activeElement.closest(".sidebar")) {
+              sidebar.classList.add("close");
+            }
+          }, 300);
         }
         
        
