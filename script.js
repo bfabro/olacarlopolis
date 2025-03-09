@@ -451,7 +451,8 @@ ${establishment.menuImage ? `
         ///// OLTA AQUI
         if (window.innerWidth < 768) {
           setTimeout(() => {
-            if (!sidebar.matches(":hover") && !document.activeElement.closest(".sidebar")) {
+            if (!sidebar.matches(":hover") && !document.activeElement.closest(".sidebar") && 
+                !document.activeElement.closest(".submenu_item")) {  
               sidebar.classList.add("close");
             }
           }, 300);
