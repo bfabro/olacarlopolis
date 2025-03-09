@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const submenuItems = document.querySelectorAll(".submenu_item");
   const sidebarOpen = document.querySelector("#sidebarOpen");
   const sidebarClose = document.querySelector(".collapse_sidebar");
-  const sidebarExpand = document.querySelector(".expand_sidebar"); 
+  const sidebarExpand = document.querySelector(".expand_sidebar");
   const banner = document.getElementById("banner");
   const subMenuLinks = document.querySelectorAll(".nav_link.sublink"); // Apenas subitens do menu
   const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
@@ -183,6 +183,9 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     ]
   },
+
+
+
   {
 
     link: document.querySelector("#menufarmaciaPlantao"),
@@ -195,8 +198,190 @@ document.addEventListener("DOMContentLoaded", function () {
       plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
       delivery: "Sim / Sem Taxa"
     },]
+  },
+
+
+
+  {
+    link: document.querySelector("#menuMotoCenter"),
+
+    title: "Moto Center",
+    establishments: [{
+      name: "Binho Moto Center ",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+
+  {
+    link: document.querySelector("#menuAcougue"),
+
+    title: "Açougues",
+    establishments: [{
+      name: "Açougue do Carlinho ",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuAgropecuaria"),
+
+    title: "Agropecuarias",
+    establishments: [{
+      name: "Vida Nova",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuAutoCenter"),
+
+    title: "Auto Center",
+    establishments: [{
+      name: "Auto center bairro",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuBrinquedos"),
+
+    title: "Loja de Brinquedos",
+    establishments: [{
+      name: "Filho Otaviano",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuDiskGas"),
+
+    title: "Deposito de Gas",
+    establishments: [{
+      name: "Lia Gas",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuFuneraria"),
+
+    title: "Funerarias",
+    establishments: [{
+      name: "Bom Jesus",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuMaterialContrucao"),
+
+    title: "Material de Construção",
+    establishments: [{
+      name: "Carriel",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuPadaria"),
+
+    title: "Padarias",
+    establishments: [{
+      name: "Bom Jesus",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuPetShop"),
+
+    title: "Pet Shop",
+    establishments: [{
+      name: "Paraiso dos Animais",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuQuitanda"),
+
+    title: "Quitanda",
+    establishments: [{
+      name: "Pimenta Doce",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuRestaurantes"),
+
+    title: "Restaurante",
+    establishments: [{
+      name: "Delfino",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuPapelaria"),
+
+    title: "Papelaria",
+    establishments: [{
+      name: "Haruo",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
   }
-  ];
+
+
+
+
+
+
+
+
+
+
+  ]; // fim dos setores
 
 
   searchInput.addEventListener("input", function () {
@@ -204,7 +389,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let foundInMenu = false;
     let foundInEstablishments = false;
 
- 
+
     // Pesquisar dentro do menu lateral
     document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item").forEach(item => {
       const text = item.textContent.toLowerCase();
