@@ -103,12 +103,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Alternar submenu
   submenuItems.forEach(item => {
-     item.addEventListener("click", () => {
-        submenuItems.forEach(i => i !== item && i.classList.remove("show_submenu"));
-        item.classList.toggle("show_submenu");
-     });
+    item.addEventListener("click", (event) => {
+      event.stopPropagation(); // Evita que o clique feche a sidebar
+  
+      // Verifica se já está aberto
+      const isOpen = item.classList.contains("show_submenu");
+  
+      // Fecha todos os submenus antes de abrir o atual
+      submenuItems.forEach(i => i.classList.remove("show_submenu"));
+  
+      // Se não estava aberto, abre novamente
+      if (!isOpen) {
+        item.classList.add("show_submenu");
+      }
+    });
   });
-
+  
 
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
@@ -461,13 +471,6 @@ ${establishment.menuImage ? `
     }
   });
 
-  // Corrige o problema da barra lateral se retraindo ao clicar novamente em "Informações úteis"
-document.querySelectorAll(".submenu_item").forEach(item => {
-  item.addEventListener("click", function (event) {
-      event.stopPropagation(); // Impede que o clique feche a sidebar imediatamente
-      this.classList.toggle("show_submenu"); // Alterna o submenu corretamente
-  });
-});
 
 
 });
