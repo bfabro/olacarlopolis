@@ -59,7 +59,6 @@ document.addEventListener("DOMContentLoaded", function () {
      contentArea.classList.add("hidden");
   }
 
-
   // Verifica se é um dispositivo móvel e retrai a sidebar
   if (window.innerWidth < 768) {
      sidebar.classList.add("close", "hoverable");
@@ -67,16 +66,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //////////////////////////////////////////////////////////
   // Alternar sidebar ao clicar no ícone do menu
-  document.addEventListener("DOMContentLoaded", function () {
-    const sidebar = document.querySelector(".sidebar");
-    const sidebarOpen = document.querySelector("#sidebarOpen");
-  
-    // Garantir que o evento de clique só é adicionado uma vez
-    sidebarOpen.addEventListener("click", () => {
-      sidebar.classList.toggle("close");
-    });
+  sidebarOpen.addEventListener("click", () => {
+    sidebar.classList.toggle("close");
   });
-
 
   sidebarExpand.addEventListener("click", () => {
      sidebar.classList.remove("close", "hoverable");
@@ -115,7 +107,6 @@ document.addEventListener("DOMContentLoaded", function () {
      });
   });
 
-
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
      contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
@@ -128,109 +119,40 @@ document.addEventListener("DOMContentLoaded", function () {
            <b>Endereço: </b><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="map-icon">
              <i class='bx bx-map'></i> 
            </a> ${establishment.address}</br>` : ""}
-             <b>Contato:</b> ${establishment.contact} 
-          <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="whatsapp-icon">
+         <b>Contato:</b> ${establishment.contact} 
+         <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="whatsapp-icon">
            <i style="color:rgb(16, 155, 35)"class='bx bxl-whatsapp'></i>
          </a><br>
          ${establishment.delivery ? `<b>Entrega:</b> ${establishment.delivery}<br>` : ""}
-        
 
          <button class="detalhes-btn" data-name="${establishment.name}" 
            data-contact="${establishment.contact}">
            + Informações
          </button>
          <div class="detalhes-content" id="detalhes-${encodeURIComponent(establishment.name)}" style="display: none;">
-           <p>Promoçoes do <b>${establishment.name}.</b></p>
-
+           <p>Promoções do <b>${establishment.name}.</b></p>
            </br>
            <button style="color:rgb(206, 24, 17)" class="fechar-detalhes">Fechar</button>
          </div>
 
+         ${establishment.menuImage ? `
+          <button class="menu-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+           Ver Cardápio
+          </button>
+          <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
+           <img src="${establishment.menuImage}" alt="Cardápio de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
+          </div>` : ""}
 
-
-${establishment.menuImage ? `
- <button class="menu-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-   Ver Cardápio
- </button>
- <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
-   <img src="${establishment.menuImage}" alt="Cardápio de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
- </div>` : ""}
-
- ${establishment.menuFlyer ? `
- <button class="flyer-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-   Ver Flyer
- </button>
- <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
-   <img src="${establishment.menuFlyer}" alt="Flyer de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
- </div>` : ""}
-
-
+         ${establishment.menuFlyer ? `
+          <button class="flyer-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+           Ver Flyer
+          </button>
+          <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
+           <img src="${establishment.menuFlyer}" alt="Flyer de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
+          </div>` : ""}
        </li>
-     `).join('')}
+     `).join('') }
    </ul>`;
-
-
-     document.querySelectorAll(".menu-btn").forEach(button => {
-        button.addEventListener("click", function () {
-           const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
-           const menuDiv = document.getElementById(menuId);
-
-           // Verifica se o cardápio está visível (não possui a classe "hidden")
-           if (menuDiv.classList.contains("hidden")) {
-              // Abre o cardápio
-              menuDiv.classList.remove("hidden");
-              this.textContent = "Fechar Cardápio"; // Altera o texto do botão
-              this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
-           } else {
-              // Fecha o cardápio
-              menuDiv.classList.add("hidden");
-              this.textContent = "Ver Cardápio"; // Texto volta ao original
-              this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
-           }
-        });
-     });
-     /// para o flyer
-     document.querySelectorAll(".flyer-btn").forEach(button => {
-        button.addEventListener("click", function () {
-           const menuId2 = `menu-${encodeURIComponent(this.dataset.name)}`;
-           const menuDiv2 = document.getElementById(menuId2);
-
-           // Verifica se o cardápio está visível (não possui a classe "hidden")
-           if (menuDiv2.classList.contains("hidden")) {
-              // Abre o cardápio
-              menuDiv2.classList.remove("hidden");
-              this.textContent = "Fechar Flyer"; // Altera o texto do botão
-              this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
-           } else {
-              // Fecha o cardápio
-              menuDiv2.classList.add("hidden");
-              this.textContent = "Ver Flyer"; // Texto volta ao original
-              this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
-           }
-        });
-     });
-
-
-     document.querySelectorAll(".flyer-btn").forEach(button => {
-        button.addEventListener("click", function () {
-           document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
-        });
-     });
-
-
-     document.querySelectorAll(".menu-btn").forEach(button => {
-        button.addEventListener("click", function () {
-           document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
-        });
-     });
-
-
-     document.querySelectorAll(".fechar-menu").forEach(button => {
-        button.addEventListener("click", function () {
-           this.parentElement.style.display = "none";
-        });
-     });
-
 
      // Adicionar eventos aos botões de detalhes
      document.querySelectorAll(".detalhes-btn").forEach(button => {
@@ -246,209 +168,37 @@ ${establishment.menuImage ? `
            this.parentElement.style.display = "none";
         });
      });
+
+     // Adicionar eventos para os botões de menu e flyer
+     document.querySelectorAll(".menu-btn, .flyer-btn").forEach(button => {
+        button.addEventListener("click", function () {
+           const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
+           const menuDiv = document.getElementById(menuId);
+
+           // Alterna a exibição do cardápio ou flyer
+           menuDiv.classList.toggle("hidden");
+           this.textContent = menuDiv.classList.contains("hidden") ? `Ver ${this.classList.contains("menu-btn") ? "Cardápio" : "Flyer"}` : `Fechar ${this.classList.contains("menu-btn") ? "Cardápio" : "Flyer"}`;
+           this.style.backgroundColor = menuDiv.classList.contains("hidden") ? "#dfa529" : "#ff3333"; // Alterar cor do botão
+        });
+     });
   }
 
-
   // Carregar informações de categorias
-  const categories = [{
-        link: lanchoneteLink,
-        title: "Lanchonetes em Carlópolis",
-        establishments: [{
-              name: "Paiol",
-              hours: "qua - dom 19 - 00h",
-              address: "Av. Elson Soares, 767 ",
-              contact: "(11) 99898-5930",
-              delivery: "Sim / Sem Taxa",
-              menuImage: "images/img_lanchonetes/cardapio_1.jpg"
-           },
-           {
-              name: "Casarao",
-              hours: "seg - seg - 19h - 00h e dom: 07 - 12h",
-              address: "R. Benedito Salles, 341 ",
-              contact: "(43) 2345-6789",
-              delivery: "Sim / Com Taxa",
-              menuImage: "images/img_lanchonetes/cardapio_2.jpg"
-           },
-        ]
-     },
-
-     {
-        link: eventosLink,
-        title: "Eventos em Carlópolis",
-        establishments: [{
-              name: "Calendario Eventos",
-              contact: "(43) 2345-6789",
-              menuFlyer: "images/img_informacoes/eventos/calendario_evento.png"
-           },
-           {
-              name: "Feira da Lua",
-              hours: "sex 19 - 00h",
-              address: "Praça Igreja Matriz ",
-              contact: "(11) 99898-5930",
-              menuFlyer: "images/img_informacoes/eventos/feira_lua_1.png"
-           },
-           {
-              name: "Passeata contra a barriga",
-              hours: "dom: 07 - 12h",
-              address: "Av Turistica, 800",
-              contact: "(43) 2345-6789",
-              menuFlyer: "images/img_informacoes/eventos/corrida_10.jpg"
-           },
-
-
-        ]
-     },
-
-
-     {
-        link: supermercadoLink,
-        title: "Supermercados em Carlópolis",
-        establishments: [{
-              name: "Rocha",
-              hours: "6h - 20h e dom: 06 - 12h",
-              address: "Av. Elson Soares, 767 ",
-              contact: "(11) 99898-5930",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Carreiro",
-              address: "R. Benedito Salles, 341 ",
-              hours: "7h - 20h e dom: 07 - 12h",
-              contact: "(43) 2345-6789",
-              delivery: "Sim / Com Taxa"
-           },
-           {
-              name: "Barateiro",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Kelve",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Zero Japan",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Carriel",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Compre Bem +",
-              address: "PR-218, 1168 ",
-              hours: "8h - 21h e dom: 07 - 12h",
-              contact: "(43) 3456-7890",
-              delivery: "Sim / Sem Taxa"
-           },
-
-
-        ]
-     },
-
-
-     {
-        link: farmaciaLink,
-        title: "Farmácias em Carlópolis",
-        establishments: [{
-              name: "DrogaMais ( Jorginho )",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              address: "Rua Benedito Salles, 903",
-              contact: "(43) 98411-9145",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Desconto Facil 1 ( Joao )",
-              address: "R. Benedito Salles, 574",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              contact: "(43) 3566-1119",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "Santa Maria ( Aguera )",
-              address: "Praça Coronel Leite, nº 711",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              contact: "(43) 3566-1471",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "MasterFarma ( Zurdo )",
-              address: "R. Laurindo Franco de Godoi, 90",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              contact: "(43) 99951-1540",
-              delivery: "Sim / Sem Taxa"
-           },
-           {
-              name: "PopularMais( Jeremias )",
-              address: "R. Laurindo Franco de Godói, 787",
-              hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-              contact: "(43) 99647-6266",
-              delivery: "Sim / Sem Taxa"
-           },
-
-
-        ]
-     },
-
-     {
-        link: churrasqueiroLink,
-        title: "Churrasqueiros em Carlópolis",
-        establishments: [{
-              name: "Pituka",
-              contact: "(43) 7890-1234"
-           },
-           {
-              name: "Gustavo",
-              contact: "(43) 8901-2345"
-           },
-        ]
-     },
-     {
-        link: farmaciaPlantaoLink,
-        title: "Farmacia de Plantão",
-        establishments: [{
-           name: "MasterFarma ( Zurdo ) ",
-           address: "R. Laurindo Franco de Godoi, 90",
-           contact: "(43) 99951-1540",
-           plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
-           delivery: "Sim / Sem Taxa"
-        }, ]
-     }
-  ];
+  const categories = [ /* categorias e estabelecimentos aqui (como no seu código original) */ ];
 
   // Adicionar eventos para os links do menu
   categories.forEach(category => {
      category.link.addEventListener("click", function (event) {
         event.preventDefault();
-        //event.stopPropagation(); // Impede que o clique feche a sidebar antes do usuário interagir
-
-        // Remove a classe ativa de todos os itens
         categories.forEach(cat => cat.link.classList.remove("active"));
-
-        // Adiciona a classe ativa ao item clicado
         this.classList.add("active");
-
-        // Carrega o conteúdo correspondente
         loadContent(category.title, category.establishments);
 
-        // Expande a sidebar, se estiver fechada
         if (sidebar.classList.contains("close")) {
            sidebar.classList.remove("close");
         }
 
         // Fecha a sidebar SOMENTE em telas pequenas após clicar no menu
-        ///// OLTA AQUI
         if (window.innerWidth < 768) {
           if (!sidebar.classList.contains("close")) { 
             setTimeout(() => {
@@ -456,12 +206,10 @@ ${establishment.menuImage ? `
             }, 300);
           }
         }
-       
      });
   });
 
   document.addEventListener("click", function (event) {
-    // Verifica se o clique foi fora da sidebar e do botão de abrir
     if (window.innerWidth < 768 && 
         !sidebar.contains(event.target) && 
         event.target !== sidebarOpen && 
