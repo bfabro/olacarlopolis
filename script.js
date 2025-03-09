@@ -469,7 +469,7 @@ ${establishment.menuImage ? `
     if (window.innerWidth < 768 && 
       !sidebar.contains(event.target) && 
       event.target !== sidebarOpen && 
-      !event.target.closest(".submenu_item") && 
+      !event.target.closest(".submenu_item") && !event.target.closest(".menu_content") && 
       !event.target.closest(".menu_items")) {          
       sidebar.classList.add("close");
   }
