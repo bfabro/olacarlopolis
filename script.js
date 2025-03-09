@@ -60,10 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  // Verifica se é um dispositivo móvel e retrai a sidebar
-  if (window.innerWidth < 768) {
-     sidebar.classList.toggle("close", "hoverable");
-  }
+ 
 
   //////////////////////////////////////////////////////////
   // Alternar sidebar ao clicar no ícone do menu
