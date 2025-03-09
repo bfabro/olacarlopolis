@@ -450,12 +450,9 @@ ${establishment.menuImage ? `
         // Fecha a sidebar SOMENTE em telas pequenas após clicar no menu
         ///// OLTA AQUI
         if (window.innerWidth < 768) {
-          if (!sidebar.classList.contains("close")) { 
-            setTimeout(() => {
-              sidebar.classList.add("close");
-            }, 5000);
-          }
+          sidebar.classList.add("close");
         }
+        
        
      });
   });
