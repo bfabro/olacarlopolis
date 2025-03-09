@@ -464,15 +464,16 @@ ${establishment.menuImage ? `
 
   
   document.addEventListener("click", function (event) {
-    // Verifica se o clique foi fora da sidebar e do botão de abrir
     if (window.innerWidth < 768 && 
         !sidebar.contains(event.target) && 
         event.target !== sidebarOpen && 
-        !event.target.closest(".submenu_item")) {  
+        !event.target.closest(".submenu_item") && 
+        !event.target.closest(".menu_items")) {  
         
         sidebar.classList.add("close");
     }
 });
+
 
 
 
