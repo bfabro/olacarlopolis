@@ -455,7 +455,7 @@ ${establishment.menuImage ? `
                 !document.activeElement.closest(".submenu_item")) {  
               sidebar.classList.add("close");
             }
-          }, 300);
+          }, 0);
         }
         
        
