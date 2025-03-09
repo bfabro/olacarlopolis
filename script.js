@@ -6,25 +6,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const submenuItems = document.querySelectorAll(".submenu_item");
   const sidebarOpen = document.querySelector("#sidebarOpen");
   const sidebarClose = document.querySelector(".collapse_sidebar");
-  const sidebarExpand = document.querySelector(".expand_sidebar");
-
-  const farmaciaLink = document.querySelector("#menuFarmacia");
-  const supermercadoLink = document.querySelector("#menuMercado");
-  const churrasqueiroLink = document.querySelector("#menuChurrasqueiro");
-  const farmaciaPlantaoLink = document.querySelector("#menufarmaciaPlantao");
-  const lanchoneteLink = document.querySelector("#menuLanchonete");
-  const eventosLink = document.querySelector("#menuEventos");
+  const sidebarExpand = document.querySelector(".expand_sidebar"); 
   const banner = document.getElementById("banner");
-
   const subMenuLinks = document.querySelectorAll(".nav_link.sublink"); // Apenas subitens do menu
   const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
-
-
-
+  const searchInput = document.getElementById("searchSidebar");
   // Inicio pesquisa nome no menu lateral
   // volta aqui
 
-  const searchInput = document.getElementById("searchSidebar");
 
   if (!searchInput) return; // Evita erro se o campo de busca não existir
 
