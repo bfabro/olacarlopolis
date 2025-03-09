@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Verifica se é um dispositivo móvel e retrai a sidebar
   if (window.innerWidth < 768) {
-     sidebar.classList.add("close", "hoverable");
+     sidebar.classList.toggle("close", "hoverable");
   }
 
   //////////////////////////////////////////////////////////
@@ -462,15 +462,15 @@ ${establishment.menuImage ? `
 
   
   document.addEventListener("click", function (event) {
-    // Verifica se o clique foi fora da sidebar e do botão de abrir
     if (window.innerWidth < 768 && 
         !sidebar.contains(event.target) && 
         event.target !== sidebarOpen && 
-        !event.target.closest(".menu_items")) {  
+        !event.target.closest(".submenu_item") && // Permite clicar no submenu sem fechar a sidebar
+        !event.target.closest(".submenu")) {  
       sidebar.classList.add("close");
     }
   });
-
+  
 
 
 });
