@@ -452,11 +452,23 @@ ${establishment.menuImage ? `
         if (window.innerWidth < 768) {
           setTimeout(() => {
             if (!sidebar.matches(":hover") && !document.activeElement.closest(".sidebar") && 
+            !document.activeElement.closest(".menu_items") &&
                 !document.activeElement.closest(".submenu_item")) {  
               sidebar.classList.add("close");
             }
           }, 0);
         }
+
+      
+
+
+
+
+
+
+
+
+
         
        
      });
