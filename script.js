@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const subMenuLinks = document.querySelectorAll(".nav_link.sublink"); // Apenas subitens do menu
   const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
   const searchInput = document.getElementById("searchSidebar");
+
+const clearSearch = document.getElementById("clearSearch");
   // Inicio pesquisa nome no menu lateral
   // volta aqui
 
@@ -384,7 +386,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   ]; // fim dos setores
+// Mostrar ou esconder o ícone "x" com base no conteúdo do campo de pesquisa
+searchInput.addEventListener("input", function () {
+  if (searchInput.value.trim() !== "") {
+    clearSearch.style.display = "block"; // Mostra o ícone "x"
+  } else {
+    clearSearch.style.display = "none"; // Esconde o ícone "x"
+  }
+});
 
+// Limpar o campo de pesquisa quando o ícone "x" for clicado
+clearSearch.addEventListener("click", function () {
+  searchInput.value = ""; // Limpa o campo de pesquisa
+  clearSearch.style.display = "none"; // Esconde o ícone "x"
+  searchInput.dispatchEvent(new Event("input")); // Dispara o evento de input para atualizar a pesquisa
+});
 
   searchInput.addEventListener("input", function () {
     const filter = searchInput.value.toLowerCase();

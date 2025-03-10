@@ -106,6 +106,9 @@ body.dark {
   overflow: hidden;
   box-shadow: 0 0 1px var(--grey-color-light);
   transition: transform 0.3s ease-in-out;
+
+  overflow-y: auto; /* Permite rolagem caso tenha muitos itens */
+  max-height: 100vh; /* Impede que o menu seja cortado */
 }
 
 .sidebar.close {
@@ -630,7 +633,7 @@ body.dark {
 
 /* Garante que todos os itens fiquem visíveis após a pesquisa */
 .menu_items {
-  
+
   display: flex;
   flex-direction: column;
 }
@@ -718,6 +721,7 @@ body.dark {
 
 .search_sidebar {
   padding: 10px;
+  position: relative;
 }
 
 .search_sidebar input {
@@ -727,6 +731,20 @@ body.dark {
   border-radius: 5px;
   font-size: 16px;
   outline: none;
+}
+
+#clearSearch {
+  position: absolute;
+  right: 20px; /* Ajuste a posição conforme necessário */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--grey-color-light);
+  display: none; /* Inicialmente escondido */
+}
+
+#clearSearch:hover {
+  color: var(--blue-color); /* Muda a cor ao passar o mouse */
 }
 
 
