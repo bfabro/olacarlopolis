@@ -451,35 +451,6 @@ body.dark {
 
 
 
-@media screen and (max-width: 768px) {
-  /*#sidebarOpen {
-    font-size: 25px;
-    display: block;
-    margin-right: 10px;
-    cursor: pointer;
-    color: var(--grey-color);
-  }*/
-
-  .search_bar {
-    display: none;
-  }
-
-  .sidebar.close .bottom_content {
-    width: 80px;
-
-  }
-
-  /* Quando o menu fechar */
-  .sidebar.close~.content_area {
-    width: calc(150% - 80px);
-    margin-left: 86px;
-  }
-
-
-
-
-
-}
 
 /* Banner Inicial 
 .banner {
@@ -641,6 +612,51 @@ body.dark {
   margin: -485px -70px 0px 8px;
   font-size: 22px;
 }
+
+
+@media screen and (max-width: 768px) {
+  /*#sidebarOpen {
+    font-size: 25px;
+    display: block;
+    margin-right: 10px;
+    cursor: pointer;
+    color: var(--grey-color);
+  }*/
+
+  .sidebar {
+    overflow-y: auto; /* Permite rolagem caso tenha muitos itens */
+    max-height: 100vh; /* Impede que o menu seja cortado */
+}
+
+/* Garante que todos os itens fiquem visíveis após a pesquisa */
+.menu_items {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Garante que os submenus fiquem fechados ao iniciar */
+.submenu {
+  display: none;
+}
+
+  .search_bar {
+    display: none;
+  }
+
+  .sidebar.close .bottom_content {
+    width: 80px;
+
+  }
+
+  /* Quando o menu fechar */
+  .sidebar.close~.content_area {
+    width: calc(150% - 80px);
+    margin-left: 86px;
+  }
+
+
+}
+
 
 @media screen and (max-width: 1200px) {
   .container {

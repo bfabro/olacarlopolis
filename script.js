@@ -391,6 +391,18 @@ document.addEventListener("DOMContentLoaded", function () {
     let foundInMenu = false;
     let foundInEstablishments = false;
 
+// Se o campo de pesquisa estiver vazio, mostrar todos os itens do menu novamente
+if (filter === "") {
+  document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item").forEach(item => {
+      item.style.display = "flex";
+  });
+
+  // Garante que o menu lateral expanda completamente
+  sidebar.style.height = "auto";
+  return;
+}
+
+
 
     // Pesquisar dentro do menu lateral
     document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item").forEach(item => {
@@ -402,12 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
         item.style.display = "none";
       }
     });
-// Restaurar o menu lateral quando a busca estiver vazia
-if (filter === "") {
-  document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item").forEach(item => {
-    item.style.display = "flex"; // Mostra novamente todos os itens
-  });
-}
+
     // Pesquisar dentro das categorias e carregar o conteúdo correspondente
     categories.forEach(category => {
       category.establishments.forEach(establishment => {
