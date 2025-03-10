@@ -14,7 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // Inicio pesquisa nome no menu lateral
   // volta aqui
 
-
+  document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("content_area").classList.remove("hidden");
+});
   if (!searchInput) return; // Evita erro se o campo de busca não existir
 
   // Carregar informações de categorias
@@ -605,9 +607,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Garante que ao recarregar a página inicial, o banner apareça
   if (window.location.pathname.includes("index.html")) {
-    banner.classList.remove("hidden");
-    contentArea.classList.add("hidden");
-  }
+    contentArea.classList.remove("hidden"); // Garante que o conteúdo apareça
+}
 
 
   // Verifica se é um dispositivo móvel e retrai a sidebar
