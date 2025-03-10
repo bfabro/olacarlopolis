@@ -402,7 +402,12 @@ document.addEventListener("DOMContentLoaded", function () {
         item.style.display = "none";
       }
     });
-
+// Restaurar o menu lateral quando a busca estiver vazia
+if (filter === "") {
+  document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item").forEach(item => {
+    item.style.display = "flex"; // Mostra novamente todos os itens
+  });
+}
     // Pesquisar dentro das categorias e carregar o conteúdo correspondente
     categories.forEach(category => {
       category.establishments.forEach(establishment => {
@@ -436,6 +441,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
+    contentArea.classList.remove("hidden");
+
+
     contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
    ${establishments.map(establishment => `
      <li>
