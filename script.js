@@ -374,6 +374,19 @@ const clearSearch = document.getElementById("clearSearch");
 
 
     },]
+  },
+
+  {
+    link: document.querySelector("#menuImobiliaria"),
+
+    title: "Imobiliaria",
+    establishments: [{
+      name: "Rafael Bandeira",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
   }
 
 
@@ -518,7 +531,7 @@ if (filter === "") {
    `).join('')}
  </ul>`;
 
-
+///// inicio
     document.querySelectorAll(".menu-btn").forEach(button => {
       button.addEventListener("click", function () {
         const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
@@ -538,6 +551,11 @@ if (filter === "") {
         }
       });
     });
+
+
+//// fimmm
+
+
     /// para o flyer
     document.querySelectorAll(".flyer-btn").forEach(button => {
       button.addEventListener("click", function () {
@@ -565,7 +583,7 @@ if (filter === "") {
         document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
       });
     });
-
+// volta aqui
 
     document.querySelectorAll(".menu-btn").forEach(button => {
       button.addEventListener("click", function () {
