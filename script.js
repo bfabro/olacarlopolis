@@ -532,25 +532,32 @@ if (filter === "") {
  </ul>`;
 
 ///// inicio
-    document.querySelectorAll(".menu-btn").forEach(button => {
-      button.addEventListener("click", function () {
-        const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
-        const menuDiv = document.getElementById(menuId);
 
-        // Verifica se o cardápio está visível (não possui a classe "hidden")
-        if (menuDiv.classList.contains("hidden")) {
-          // Abre o cardápio
-          menuDiv.classList.remove("hidden");
-          this.textContent = "Fechar Cardápio"; // Altera o texto do botão
-          this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
-        } else {
-          // Fecha o cardápio
-          menuDiv.classList.add("hidden");
-          this.textContent = "Ver Cardápio"; // Texto volta ao original
-          this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
-        }
-      });
+
+  document.querySelectorAll(".menu-btn").forEach(button => {
+    button.addEventListener("click", function () {
+      const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
+      const menuDiv = document.getElementById(menuId);
+
+      if (!menuDiv) {
+        console.error(`Elemento #${menuId} não encontrado.`);
+        return;
+      }
+
+      // Alterna a exibição do cardápio
+      if (menuDiv.style.display === "none" || menuDiv.style.display === "") {
+        menuDiv.style.display = "block"; // Mostra o cardápio
+        this.textContent = "Fechar Cardápio"; // Atualiza o texto do botão
+        this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
+      } else {
+        menuDiv.style.display = "none"; // Esconde o cardápio
+        this.textContent = "Ver Cardápio"; // Retorna o texto original
+        this.style.backgroundColor = "#dfa529"; // Retorna a cor original
+      }
     });
+  });
+
+
 
 
 //// fimmm
@@ -583,13 +590,13 @@ if (filter === "") {
         document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
       });
     });
+
+
+
+    
 // volta aqui
 
-    document.querySelectorAll(".menu-btn").forEach(button => {
-      button.addEventListener("click", function () {
-        document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
-      });
-    });
+    
 
 
     document.querySelectorAll(".fechar-menu").forEach(button => {
