@@ -188,6 +188,148 @@ const clearSearch = document.getElementById("clearSearch");
     ]
   },
 
+  {
+    link: document.querySelector("#menuBabas"),
+    title: "Babas em Carlópolis",
+    establishments: [{
+      name: "Maria",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Antonia",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+  {
+    link: document.querySelector("#menuDiarista"),
+    title: "Diarias em Carlópolis",
+    establishments: [{
+      name: "Rose",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Maria",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+  {
+    link: document.querySelector("#menuEletricista"),
+    title: "Eletrecistas em Carlópolis",
+    establishments: [{
+      name: "Juca",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Jurandir",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+  {
+    link: document.querySelector("#menuEncanador"),
+    title: "Encanador em Carlópolis",
+    establishments: [{
+      name: "Rubens",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Jose",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+  {
+    link: document.querySelector("#menuGuiaPesca"),
+    title: "Guia de Pesca em Carlópolis",
+    establishments: [{
+      name: "Fabio Sushimoto",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Thiago Aguera",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+  {
+    link: document.querySelector("#menuJardineiro"),
+    title: "Jardineiros em Carlópolis",
+    establishments: [{
+      name: "Antonio Gil",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Ruan",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+  {
+    link: document.querySelector("#menuMarceneiro"),
+    title: "Marceneiros em Carlópolis",
+    establishments: [{
+      name: "Pedro alvez",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Rodrigo",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+  {
+    link: document.querySelector("#menuPedreiro"),
+    title: "Pedreiros em Carlópolis",
+    establishments: [{
+      name: "Denis centurion",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Kauan",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+  {
+    link: document.querySelector("#menuPintor"),
+    title: "Pintor em Carlópolis",
+    establishments: [{
+      name: "Rafael portes",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Yuri",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+  {
+    link: document.querySelector("#menuVeterinario"),
+    title: "Veterinario em Carlópolis",
+    establishments: [{
+      name: "Celso Golçalves",
+      contact: "(43) 7890-1234"
+    },
+    {
+      name: "Jurandir Machado",
+      contact: "(43) 8901-2345"
+    },
+    ]
+  },
+
+
+
 
 
   {
@@ -382,6 +524,19 @@ const clearSearch = document.getElementById("clearSearch");
     title: "Imobiliaria",
     establishments: [{
       name: "Rafael Bandeira",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuAdega"),
+
+    title: "Adegas",
+    establishments: [{
+      name: "Adega Cuenca",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
 
