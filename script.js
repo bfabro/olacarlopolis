@@ -39,7 +39,7 @@ const clearSearch = document.getElementById("clearSearch");
       address: "R. Benedito Salles, 341 ",
       contact: "(43) 2345-6789",
       delivery: "Sim / Com Taxa",
-      menuImage: "images/img_lanchonetes/cardapio_2.jpg"
+      menuImage: "images/img_lanchonetes/casarao.png"
     },
     ]
   },
