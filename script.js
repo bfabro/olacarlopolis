@@ -342,9 +342,39 @@ const clearSearch = document.getElementById("clearSearch");
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
       plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
-      delivery: "Sim / Sem Taxa"
+      delivery: "Sim / Sem Taxa",
+       image: "images/img_farmacia_plantao/masterFarma.png"
     },]
   },
+
+   {
+
+    link: document.querySelector("#menuHorarioOnibus"),
+    title: "Hoario de Onibus em Carlópolis",
+    establishments: [{
+      name: "Princesa",
+      contact: "(43) 2345-6789",
+      menuFlyer: "images/img_informacoes/eventos/calendario_evento.png"
+    },
+    {
+      name: "Feira da Lua",
+      hours: "sex 19 - 00h",
+      address: "Praça Igreja Matriz ",
+      contact: "(11) 99898-5930",
+      menuFlyer: "images/img_informacoes/eventos/feira_lua_1.png"
+    },
+    {
+      name: "Passeata contra a barriga",
+      hours: "dom: 07 - 12h",
+      address: "Av Turistica, 800",
+      contact: "(43) 2345-6789",
+      menuFlyer: "images/img_informacoes/eventos/corrida_10.jpg"
+    },
+
+
+    ]
+  },
+
 
 
 
@@ -637,8 +667,13 @@ if (filter === "") {
 
     contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
    ${establishments.map(establishment => `
-     <li>
-       <strong class="locais_nomes">${establishment.name}</strong><br>
+     <li>  
+     
+     ${title === "Farmacia de Plantão" && establishment.image ? `
+            <img src="${establishment.image}" alt="Imagem de ${establishment.name}" style="width: 100%; max-width: 425px; border-radius: 10px; margin-bottom: 10px;">
+          ` : ""}
+     
+     <strong class="locais_nomes">${establishment.name}</strong><br>
        ${establishment.hours ? `<b>Funcionamento:</b> ${establishment.hours}<br>` : ""}
        ${establishment.plantaoHorario ? `<b class="highlight-plantao">Plantão:</b> <span class="plantao-text">${establishment.plantaoHorario}</span><br>` : ""}  <!-- Exibe o horário de plantão -->
        ${establishment.address ? `
