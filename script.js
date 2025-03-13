@@ -750,21 +750,6 @@ if (filter === "") {
        ${establishment.address ? `
          <b>Endereço: </b>${establishment.address}</br>` : ""}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
            <b>Contato:</b> ${establishment.contact} 
        <br>
        ${establishment.delivery ? `<b>Entrega:</b> ${establishment.delivery}<br>` : ""}
@@ -776,13 +761,13 @@ if (filter === "") {
                 <i class='bx bx-map'></i> Localização
               </a>
             ` : ""}
-            
+           
             ${establishment.contact ? `
               <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="icon-link">
                 <i class='bx bxl-whatsapp' style="color: #25D366;"></i> WhatsApp
               </a>
-            ` : ""}
-            
+            ` : ""} 
+             </div>  <div class="social-icons">
             ${establishment.facebook ? `
               <a href="${establishment.facebook}" target="_blank" class="icon-link">
                 <i class='bx bxl-facebook' style="color: #1877F2;"></i> Facebook

@@ -763,7 +763,7 @@ body.dark {
   text-decoration: none;
   color: #333;
   font-size: 16x;
-  white-space: nowrap; /* Impede que o texto quebre em várias linhas */
+ /* white-space: nowrap;  Impede que o texto quebre em várias linhas */
 }
 
 .icon-link i {
