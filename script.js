@@ -372,7 +372,12 @@ document.addEventListener("DOMContentLoaded", function () {
       contact: "(43) 99951-1540",
       plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
       delivery: "Sim / Sem Taxa",
-      image: "images/info_uteis/farmacia_plantao/masterFarma.png"
+      image: "images/info_uteis/farmacia_plantao/masterFarma.png",
+      facebook: "www.facebook.com/uahh",
+      instagram: "www.instagram.com/uahh",
+      site: "www.google.com",
+      info: " <strong>Descontao:</strong><ul>Procure o Zurdo e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+ 
 
     },]
   },
@@ -795,7 +800,7 @@ ${establishment.image ? `
             ` : ""}
            
             ${establishment.contact ? `
-              <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="icon-link">
+              <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace('+', '').replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="icon-link">
                 <i class='bx bxl-whatsapp' style="color: #25D366;"></i> WhatsApp
               </a>
             ` : ""} 
