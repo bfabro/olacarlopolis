@@ -150,28 +150,39 @@ const clearSearch = document.getElementById("clearSearch");
       address: "R. Benedito Salles, 574",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       contact: "(43) 3566-1119",
-      delivery: "Sim / Sem Taxa"
+      delivery: "Sim / Sem Taxa",
+      facebook: "www.facebook.com/uahh",
+      instagram : "www.instagram.com/uahh",
+      site: "www.google.com"
     },
     {
       name: "Santa Maria ( Aguera )",
       address: "Praça Coronel Leite, nº 711",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       contact: "(43) 3566-1471",
-      delivery: "Sim / Sem Taxa"
+      delivery: "Sim / Sem Taxa",
+      facebook: "www.facebook.com/uahh",
+      instagram : "www.instagram.com/uahh",
+      site: "www.google.com"
     },
     {
       name: "MasterFarma ( Zurdo )",
       address: "R. Laurindo Franco de Godoi, 90",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       contact: "(43) 99951-1540",
-      delivery: "Sim / Sem Taxa"
+      delivery: "Sim / Sem Taxa",
+      facebook: "www.facebook.com/uahh",
+      instagram : "www.instagram.com/uahh",
+      site: "www.google.com"
     },
     {
       name: "PopularMais( Jeremias )",
       address: "R. Laurindo Franco de Godói, 787",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-      contact: "(43) 99647-6266",
-      delivery: "Sim / Sem Taxa"
+      delivery: "Sim / Sem Taxa",
+      facebook: "www.facebook.com/uahh",
+      instagram : "www.instagram.com/uahh",
+      site: "www.google.com"
     },
 
 
