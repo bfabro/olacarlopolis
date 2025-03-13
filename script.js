@@ -328,7 +328,7 @@ document.addEventListener("DOMContentLoaded", function () {
     establishments: [{
       image: "images/servicos/pedreiro/denis2.png",
       name: "Denis centurion",
-      contact: "(11) 95982-2485"
+      contact: "(11) 9.5982-2485"
     },
     {
       name: "Kauan",
