@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
       name: "Casarao",
       hours: "seg - seg - 19h - 00h e dom: 07 - 12h",
       address: "R. Benedito Salles, 341 ",
-      contact: "(43) 9693-0565",
+      contact: "(43) 99693-0565",
       delivery: "Sim / Com Taxa",
       facebook: "www.facebook.com/uahh",
       instagram: "www.instagram.com/uahh",
