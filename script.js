@@ -758,7 +758,7 @@ if (filter === "") {
           <div class="social-icons">
             ${establishment.address ? `
               <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="icon-link">
-                <i class='bx bx-map'></i> Localização
+                <i style="color:rgb(250, 9, 9);" class='bx bx-map'></i> Localização
               </a>
             ` : ""}
            

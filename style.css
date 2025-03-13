@@ -777,9 +777,9 @@ body.dark {
 
 @media (max-width: 600px) {
   .icon-link {
-    font-size: 12px; /* Reduz o tamanho do texto */
+    font-size: 16px; /* Reduz o tamanho do texto */
   }
   .icon-link i {
-    font-size: 16px; /* Reduz o tamanho dos ícones */
+    font-size: 24px; /* Reduz o tamanho dos ícones */
   }
 }
