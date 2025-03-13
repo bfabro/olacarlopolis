@@ -58,21 +58,22 @@ const clearSearch = document.getElementById("clearSearch");
     establishments: [{
       name: "Calendario Eventos",
       contact: "(43) 2345-6789",
-      menuFlyer: "images/img_informacoes/eventos/calendario_evento.png"
+      menuFlyer: "images/info_uteis/eventos/evento_1/calendario_evento.png"
+     
     },
     {
       name: "Feira da Lua",
       hours: "sex 19 - 00h",
       address: "Praça Igreja Matriz ",
       contact: "(11) 99898-5930",
-      menuFlyer: "images/img_informacoes/eventos/feira_lua_1.png"
+      menuFlyer: "images/info_uteis/eventos/evento_2/feira_lua_1.png"
     },
     {
       name: "Passeata contra a barriga",
       hours: "dom: 07 - 12h",
       address: "Av Turistica, 800",
       contact: "(43) 2345-6789",
-      menuFlyer: "images/img_informacoes/eventos/corrida_10.jpg"
+      menuFlyer: "images/info_uteis/eventos/evento_3/corrida_10.jpg"
     },
 
 
@@ -367,7 +368,8 @@ const clearSearch = document.getElementById("clearSearch");
       contact: "(43) 99951-1540",
       plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
       delivery: "Sim / Sem Taxa",
-       image: "images/img_farmacia_plantao/masterFarma.png"
+       image: "images/info_uteis/farmacia_plantao/masterFarma.png"
+      
     },]
   },
 
