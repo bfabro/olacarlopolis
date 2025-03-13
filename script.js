@@ -31,8 +31,8 @@ document.addEventListener("DOMContentLoaded", function () {
       name: "Paiol",
       hours: "qua - dom 19 - 00h",
       address: "Av. Elson Soares, 767 ",
-     // contact: "(11) 99898-5930",   
-      contact: "(43) 99159-0070",   
+      // contact: "(11) 99898-5930",   
+      contact: "(43) 99159-0070",
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
       instagram: "www.instagram.com/uahh",
@@ -147,65 +147,67 @@ document.addEventListener("DOMContentLoaded", function () {
   {
     link: document.querySelector("#menuFarmacia"),
     title: "Farmácias em Carlópolis",
-    establishments: [{
+    establishments: [
 
-      image: "images/comercios/farmacia/drogamais.png",
-      name: "DrogaMais ( Jorginho )",
-      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-      address: "Rua Benedito Salles, 903",
-      contact: "(43) 98411-9145",
-      delivery: "Sim / Sem Taxa",
-      facebook: "www.facebook.com/uahh",
-      instagram: "www.instagram.com/uahh",
-      site: "www.google.com",
-      info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
-   
-    },
-    {
-      image: "images/comercios/farmacia/farmafacil.png",
-      name: "Desconto Facil 1 ( Joao )",
-      address: "R. Benedito Salles, 574",
-      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-      contact: "(43) 3566-1119",
-      delivery: "Sim / Sem Taxa",
-      facebook: "www.facebook.com/uahh",
-      instagram: "www.instagram.com/uahh",
-      site: "www.google.com"
-    },
-    {
-      image: "images/comercios/farmacia/santamaria.png",
-      name: "Santa Maria ( Aguera )",
-      address: "Praça Coronel Leite, nº 711",
-      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-      contact: "(43) 3566-1471",
-      delivery: "Sim / Sem Taxa",
-      facebook: "www.facebook.com/uahh",
-      instagram: "www.instagram.com/uahh",
-      site: "www.google.com"
-    },
-    {
-      image: "images/comercios/farmacia/masterfarma.png",
-      name: "MasterFarma ( Zurdo )",
-      address: "R. Laurindo Franco de Godoi, 90",
-      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-      contact: "(43) 3566-1471",
-      delivery: "Sim / Sem Taxa",
-      facebook: "www.facebook.com/uahh",
-      instagram: "www.instagram.com/uahh",
-      site: "www.google.com"
-    },
-    {
-      image: "images/comercios/farmacia/drogamais.png",
-      name: "PopularMais( Jeremias )",
-      address: "R. Laurindo Franco de Godói, 787",
-      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-      contact: "(43) 3566-1471",
-      delivery: "Sim / Sem Taxa",
-      facebook: "www.facebook.com/uahh",
-      instagram: "www.instagram.com/uahh",
-      site: "www.google.com"
-    },
+      {
+        image: "images/comercios/farmacia/farmafacil.png",
+        name: "Desconto Facil 1 ( Joao )",
+        address: "R. Benedito Salles, 574",
+        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        contact: "(43) 3566-1119",
+        delivery: "Sim / Sem Taxa",
+        facebook: "www.facebook.com/uahh",
+        instagram: "www.instagram.com/uahh",
+        site: "www.google.com"
+      },
+      {
+        image: "images/comercios/farmacia/drogamais.png",
+        name: "DrogaMais ( Jorginho )",
+        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        address: "Rua Benedito Salles, 903",
+        contact: "(43) 98411-9145",
+        delivery: "Sim / Sem Taxa",
+        facebook: "www.facebook.com/uahh",
+        instagram: "www.instagram.com/uahh",
+        site: "www.google.com",
+        info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
 
+      },
+
+
+      {
+        image: "images/comercios/farmacia/masterfarma.png",
+        name: "MasterFarma ( Zurdo )",
+        address: "R. Laurindo Franco de Godoi, 90",
+        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        contact: "(43) 3566-1471",
+        delivery: "Sim / Sem Taxa",
+        facebook: "www.facebook.com/uahh",
+        instagram: "www.instagram.com/uahh",
+        site: "www.google.com"
+      },
+      {
+        image: "images/comercios/farmacia/popularMais.png",
+        name: "PopularMais ( Jeremias )",
+        address: "R. Laurindo Franco de Godói, 787",
+        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        contact: "(43) 3566-1471",
+        delivery: "Sim / Sem Taxa",
+        facebook: "www.facebook.com/uahh",
+        instagram: "www.instagram.com/uahh",
+        site: "www.google.com"
+      },
+      {
+        image: "images/comercios/farmacia/santamaria.png",
+        name: "Santa Maria ( Aguera )",
+        address: "Praça Coronel Leite, nº 711",
+        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        contact: "(43) 3566-1471",
+        delivery: "Sim / Sem Taxa",
+        facebook: "www.facebook.com/uahh",
+        instagram: "www.instagram.com/uahh",
+        site: "www.google.com"
+      }
 
     ]
   },
@@ -381,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
       instagram: "www.instagram.com/uahh",
       site: "www.google.com",
       info: " <strong>Descontao:</strong><ul>Procure o Zurdo e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
- 
+
 
     },]
   },
@@ -806,7 +808,7 @@ ${establishment.image ? `
             ${establishment.contact ? `
               <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace('+', '').replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="icon-link">
                 <i class='bx bxl-whatsapp' style="color: #25D366;"></i> WhatsApp
-              </a>
+              </a>  
             ` : ""} 
              </div>  <div class="social-icons">
             ${establishment.facebook ? `
@@ -865,82 +867,82 @@ ${establishment.image ? `
 
 
     // Função para fechar todos os conteúdos abertos
-function closeAllContents() {
-  document.querySelectorAll(".detalhes-content, .menu-content").forEach(content => {
-    content.style.display = "none";
-  });
+    function closeAllContents() {
+      document.querySelectorAll(".detalhes-content, .menu-content").forEach(content => {
+        content.style.display = "none";
+      });
 
-  // Restaura o texto e a cor dos botões
-  document.querySelectorAll(".detalhes-btn, .menu-btn, .flyer-btn").forEach(button => {
-    if (button.classList.contains("detalhes-btn")) {
-      button.textContent = "+ Informações";
-      button.style.backgroundColor = "#007bff"; // Cor original do botão de informações
-    } else if (button.classList.contains("menu-btn")) {
-      button.textContent = "Ver Cardápio";
-      button.style.backgroundColor = "#dfa529"; // Cor original do botão de cardápio
-    } else if (button.classList.contains("flyer-btn")) {
-      button.textContent = "Ver Flyer";
-      button.style.backgroundColor = "#dfa529"; // Cor original do botão de flyer
+      // Restaura o texto e a cor dos botões
+      document.querySelectorAll(".detalhes-btn, .menu-btn, .flyer-btn").forEach(button => {
+        if (button.classList.contains("detalhes-btn")) {
+          button.textContent = "+ Informações";
+          button.style.backgroundColor = "#007bff"; // Cor original do botão de informações
+        } else if (button.classList.contains("menu-btn")) {
+          button.textContent = "Ver Cardápio";
+          button.style.backgroundColor = "#dfa529"; // Cor original do botão de cardápio
+        } else if (button.classList.contains("flyer-btn")) {
+          button.textContent = "Ver Flyer";
+          button.style.backgroundColor = "#dfa529"; // Cor original do botão de flyer
+        }
+      });
     }
-  });
-}
 
-// Função para alternar a exibição de um elemento
-function toggleElement(button, elementId, openText, closeText, openColor, closeColor) {
-  const element = document.getElementById(elementId);
+    // Função para alternar a exibição de um elemento
+    function toggleElement(button, elementId, openText, closeText, openColor, closeColor) {
+      const element = document.getElementById(elementId);
 
-  if (!element) {
-    console.error(`Elemento #${elementId} não encontrado.`);
-    return;
-  }
+      if (!element) {
+        console.error(`Elemento #${elementId} não encontrado.`);
+        return;
+      }
 
-  // Verifica se o conteúdo já está aberto
-  if (element.style.display === "block") {
-    // Fecha o conteúdo
-    element.style.display = "none";
-    button.textContent = openText; // Retorna o texto original
-    button.style.backgroundColor = closeColor; // Retorna a cor original
-  } else {
-    // Fecha todos os conteúdos antes de abrir o atual
-    closeAllContents();
+      // Verifica se o conteúdo já está aberto
+      if (element.style.display === "block") {
+        // Fecha o conteúdo
+        element.style.display = "none";
+        button.textContent = openText; // Retorna o texto original
+        button.style.backgroundColor = closeColor; // Retorna a cor original
+      } else {
+        // Fecha todos os conteúdos antes de abrir o atual
+        closeAllContents();
 
-    // Abre o conteúdo
-    element.style.display = "block";
-    button.textContent = closeText; // Atualiza o texto do botão
-    button.style.backgroundColor = openColor; // Muda a cor do botão
-  }
-}
+        // Abre o conteúdo
+        element.style.display = "block";
+        button.textContent = closeText; // Atualiza o texto do botão
+        button.style.backgroundColor = openColor; // Muda a cor do botão
+      }
+    }
 
-// Eventos para o Cardápio
-document.querySelectorAll(".menu-btn").forEach(button => {
-  button.addEventListener("click", function () {
-    const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
-    toggleElement(this, menuId, "Ver Cardápio", "Fechar Cardápio", "#ff3333", "#dfa529");
-  });
-});
+    // Eventos para o Cardápio
+    document.querySelectorAll(".menu-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
+        toggleElement(this, menuId, "Ver Cardápio", "Fechar Cardápio", "#ff3333", "#dfa529");
+      });
+    });
 
-// Eventos para o Flyer
-document.querySelectorAll(".flyer-btn").forEach(button => {
-  button.addEventListener("click", function () {
-    const flyerId = `menu-${encodeURIComponent(this.dataset.name)}`;
-    toggleElement(this, flyerId, "Ver Flyer", "Fechar Flyer", "#ff3333", "#dfa529");
-  });
-});
+    // Eventos para o Flyer
+    document.querySelectorAll(".flyer-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        const flyerId = `menu-${encodeURIComponent(this.dataset.name)}`;
+        toggleElement(this, flyerId, "Ver Flyer", "Fechar Flyer", "#ff3333", "#dfa529");
+      });
+    });
 
-// Eventos para as Informações
-document.querySelectorAll(".detalhes-btn").forEach(button => {
-  button.addEventListener("click", function () {
-    const infoId = `detalhes-${encodeURIComponent(this.dataset.name)}`;
-    toggleElement(this, infoId, "+ Informações", "Fechar Informações", "#ff3333", "#007bff");
-  });
-});
+    // Eventos para as Informações
+    document.querySelectorAll(".detalhes-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        const infoId = `detalhes-${encodeURIComponent(this.dataset.name)}`;
+        toggleElement(this, infoId, "+ Informações", "Fechar Informações", "#ff3333", "#007bff");
+      });
+    });
 
-// Eventos para fechar o Cardápio, Flyer e Informações
-document.querySelectorAll(".fechar-menu, .fechar-flyer, .fechar-detalhes").forEach(button => {
-  button.addEventListener("click", function () {
-    closeAllContents(); // Fecha todos os conteúdos
-  });
-});
+    // Eventos para fechar o Cardápio, Flyer e Informações
+    document.querySelectorAll(".fechar-menu, .fechar-flyer, .fechar-detalhes").forEach(button => {
+      button.addEventListener("click", function () {
+        closeAllContents(); // Fecha todos os conteúdos
+      });
+    });
 
 
 
