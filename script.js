@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     link: document.querySelector("#menuLanchonete"),
     title: "Lanchonetes em Carlópolis",
     establishments: [{
+      image: "images/comercios/lanchonete/paiol/paiol.png",
       name: "Paiol",
       hours: "qua - dom 19 - 00h",
       address: "Av. Elson Soares, 767 ",
@@ -40,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
       info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
     },
     {
+      image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
       name: "Casarao",
       hours: "seg - seg - 19h - 00h e dom: 07 - 12h",
       address: "R. Benedito Salles, 341 ",
@@ -324,8 +326,9 @@ document.addEventListener("DOMContentLoaded", function () {
     link: document.querySelector("#menuPedreiro"),
     title: "Pedreiros em Carlópolis",
     establishments: [{
+      image: "images/servicos/pedreiro/denis2.png",
       name: "Denis centurion",
-      contact: "(43) 7890-1234"
+      contact: "(11) 95982-2485"
     },
     {
       name: "Kauan",
