@@ -32,7 +32,10 @@ const clearSearch = document.getElementById("clearSearch");
       address: "Av. Elson Soares, 767 ",
       contact: "(11) 99898-5930",
       delivery: "Sim / Sem Taxa",
-      menuImage: "images/img_lanchonetes/cardapio_1.jpg"
+      facebook: "www.facebook.com/uahh",
+      instagram : "www.instagram.com/uahh",
+      site: "www.google.com",
+      menuImage: "images/comercios/lanchonete/paiol/cardapio_1.jpg"      
     },
     {
       name: "Casarao",
@@ -40,7 +43,10 @@ const clearSearch = document.getElementById("clearSearch");
       address: "R. Benedito Salles, 341 ",
       contact: "(43) 2345-6789",
       delivery: "Sim / Com Taxa",
-      menuImage: "images/img_lanchonetes/casarao.png"
+      facebook: "www.facebook.com/uahh",
+      instagram : "www.instagram.com/uahh",
+      site: "www.google.com",
+      menuImage: "images/comercios/lanchonete/casarao/casarao.png"
     },
     ]
   },
@@ -136,6 +142,8 @@ const clearSearch = document.getElementById("clearSearch");
     link: document.querySelector("#menuFarmacia"),
     title: "Farmácias em Carlópolis",
     establishments: [{
+
+      image: "images/comercios/farmacia/drogamais.png",      
       name: "DrogaMais ( Jorginho )",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "Rua Benedito Salles, 903",
@@ -146,6 +154,7 @@ const clearSearch = document.getElementById("clearSearch");
       site: "www.google.com"
     },
     {
+      image: "images/comercios/farmacia/farmafacil.png", 
       name: "Desconto Facil 1 ( Joao )",
       address: "R. Benedito Salles, 574",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -156,6 +165,7 @@ const clearSearch = document.getElementById("clearSearch");
       site: "www.google.com"
     },
     {
+      image: "images/comercios/farmacia/santamaria.png", 
       name: "Santa Maria ( Aguera )",
       address: "Praça Coronel Leite, nº 711",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -166,19 +176,22 @@ const clearSearch = document.getElementById("clearSearch");
       site: "www.google.com"
     },
     {
+      image: "images/comercios/farmacia/masterfarma.png", 
       name: "MasterFarma ( Zurdo )",
       address: "R. Laurindo Franco de Godoi, 90",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-      contact: "(43) 99951-1540",
+       contact: "(43) 3566-1471",
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
       instagram : "www.instagram.com/uahh",
       site: "www.google.com"
     },
     {
+      image: "images/comercios/farmacia/drogamais.png", 
       name: "PopularMais( Jeremias )",
       address: "R. Laurindo Franco de Godói, 787",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+      contact: "(43) 3566-1471",
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
       instagram : "www.instagram.com/uahh",
@@ -751,9 +764,11 @@ if (filter === "") {
    ${establishments.map(establishment => `
      <li>  
      
-     ${title === "Farmacia de Plantão" && establishment.image ? `
-            <img src="${establishment.image}" alt="Imagem de ${establishment.name}" style="width: 100%; max-width: 425px; border-radius: 10px; margin-bottom: 10px;">
+       <!-- Exibe a imagem do estabelecimento, se existir -->
+${establishment.image ? `
+            <img src="${establishment.image}" alt="Imagem de ${establishment.name}">
           ` : ""}
+
      
      <strong class="locais_nomes">${establishment.name}</strong><br>
        ${establishment.hours ? `<b>Funcionamento:</b> ${establishment.hours}<br>` : ""}
