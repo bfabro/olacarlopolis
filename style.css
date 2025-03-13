@@ -538,7 +538,7 @@ body.dark {
   /* Mesma largura máxima do container */
   margin: 0 auto;
   /* Centraliza a navbar */
-  padding: 15px 20px;
+  padding: 15px 5px;
   /* Ajuste o padding conforme necessário */
 }
 
