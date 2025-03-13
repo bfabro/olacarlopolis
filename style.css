@@ -782,4 +782,8 @@ body.dark {
   .icon-link i {
     font-size: 24px; /* Reduz o tamanho dos ícones */
   }
+
+  .social-icons {
+    gap: 10px; /* Reduz o espaçamento entre os ícones */
+  }
 }
