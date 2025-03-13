@@ -12,14 +12,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
   const searchInput = document.getElementById("searchSidebar");
 
-const clearSearch = document.getElementById("clearSearch");
+  const clearSearch = document.getElementById("clearSearch");
   // Inicio pesquisa nome no menu lateral
   // volta aqui
-  
+
 
   document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("content_area").classList.remove("hidden");
-});
+  });
   if (!searchInput) return; // Evita erro se o campo de busca não existir
 
   // Carregar informações de categorias
@@ -33,9 +33,10 @@ const clearSearch = document.getElementById("clearSearch");
       contact: "(11) 99898-5930",
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
-      instagram : "www.instagram.com/uahh",
+      instagram: "www.instagram.com/uahh",
       site: "www.google.com",
-      menuImage: "images/comercios/lanchonete/paiol/cardapio_1.jpg"      
+      menuImage: "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+      info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
     },
     {
       name: "Casarao",
@@ -44,9 +45,10 @@ const clearSearch = document.getElementById("clearSearch");
       contact: "(43) 2345-6789",
       delivery: "Sim / Com Taxa",
       facebook: "www.facebook.com/uahh",
-      instagram : "www.instagram.com/uahh",
+      instagram: "www.instagram.com/uahh",
       site: "www.google.com",
-      menuImage: "images/comercios/lanchonete/casarao/casarao.png"
+      menuImage: "images/comercios/lanchonete/casarao/casarao.png",
+      info: "Palavra Chave: <strong>Supimpa</strong>. Use no pedido e ganhe 1% de desconto!" // Informação personalizada
     },
     ]
   },
@@ -59,7 +61,7 @@ const clearSearch = document.getElementById("clearSearch");
       name: "Calendario Eventos",
       contact: "(43) 2345-6789",
       menuFlyer: "images/info_uteis/eventos/evento_1/calendario_evento.png"
-     
+
     },
     {
       name: "Feira da Lua",
@@ -144,58 +146,58 @@ const clearSearch = document.getElementById("clearSearch");
     title: "Farmácias em Carlópolis",
     establishments: [{
 
-      image: "images/comercios/farmacia/drogamais.png",      
+      image: "images/comercios/farmacia/drogamais.png",
       name: "DrogaMais ( Jorginho )",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "Rua Benedito Salles, 903",
       contact: "(43) 98411-9145",
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
-      instagram : "www.instagram.com/uahh",
+      instagram: "www.instagram.com/uahh",
       site: "www.google.com"
     },
     {
-      image: "images/comercios/farmacia/farmafacil.png", 
+      image: "images/comercios/farmacia/farmafacil.png",
       name: "Desconto Facil 1 ( Joao )",
       address: "R. Benedito Salles, 574",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       contact: "(43) 3566-1119",
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
-      instagram : "www.instagram.com/uahh",
+      instagram: "www.instagram.com/uahh",
       site: "www.google.com"
     },
     {
-      image: "images/comercios/farmacia/santamaria.png", 
+      image: "images/comercios/farmacia/santamaria.png",
       name: "Santa Maria ( Aguera )",
       address: "Praça Coronel Leite, nº 711",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       contact: "(43) 3566-1471",
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
-      instagram : "www.instagram.com/uahh",
+      instagram: "www.instagram.com/uahh",
       site: "www.google.com"
     },
     {
-      image: "images/comercios/farmacia/masterfarma.png", 
+      image: "images/comercios/farmacia/masterfarma.png",
       name: "MasterFarma ( Zurdo )",
       address: "R. Laurindo Franco de Godoi, 90",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-       contact: "(43) 3566-1471",
+      contact: "(43) 3566-1471",
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
-      instagram : "www.instagram.com/uahh",
+      instagram: "www.instagram.com/uahh",
       site: "www.google.com"
     },
     {
-      image: "images/comercios/farmacia/drogamais.png", 
+      image: "images/comercios/farmacia/drogamais.png",
       name: "PopularMais( Jeremias )",
       address: "R. Laurindo Franco de Godói, 787",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       contact: "(43) 3566-1471",
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
-      instagram : "www.instagram.com/uahh",
+      instagram: "www.instagram.com/uahh",
       site: "www.google.com"
     },
 
@@ -368,12 +370,12 @@ const clearSearch = document.getElementById("clearSearch");
       contact: "(43) 99951-1540",
       plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
       delivery: "Sim / Sem Taxa",
-       image: "images/info_uteis/farmacia_plantao/masterFarma.png"
-      
+      image: "images/info_uteis/farmacia_plantao/masterFarma.png"
+
     },]
   },
 
-   {
+  {
 
     link: document.querySelector("#menuHorarioOnibus"),
     title: "Hoario de Onibus em Carlópolis",
@@ -409,7 +411,7 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Moto Center",
     establishments: [{
-      
+
 
       name: "Binho Moto Center ",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -427,7 +429,7 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Açougues",
     establishments: [{
-     
+
 
       name: "Açougue do Carlinho ",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -444,8 +446,8 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Agropecuarias",
     establishments: [{
-     
-      
+
+
 
       name: "Vida Nova",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -462,8 +464,8 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Auto Center",
     establishments: [{
-      
-      
+
+
 
       name: "Auto center bairro",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -480,15 +482,15 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Loja de Brinquedos",
     establishments: [{
-     
-     
+
+
       name: "Filho Otaviano",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
       delivery: "Sim / Sem Taxa"
 
-      
+
 
 
     },]
@@ -499,8 +501,8 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Deposito de Gas",
     establishments: [{
-      
-    
+
+
 
       name: "Lia Gas",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -516,7 +518,7 @@ const clearSearch = document.getElementById("clearSearch");
     link: document.querySelector("#menuFuneraria"),
 
     title: "Funerarias",
-    establishments: [{  
+    establishments: [{
 
       name: "Bom Jesus",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -532,8 +534,8 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Material de Construção",
     establishments: [{
-     
-     
+
+
 
 
       name: "Carriel",
@@ -550,7 +552,7 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Padarias",
     establishments: [{
-    
+
 
       name: "Bom Jesus",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -558,7 +560,7 @@ const clearSearch = document.getElementById("clearSearch");
       contact: "(43) 99951-1540",
       delivery: "Sim / Sem Taxa"
 
-      
+
 
 
     },]
@@ -569,7 +571,7 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Pet Shop",
     establishments: [{
-     
+
 
       name: "Paraiso dos Animais",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -587,8 +589,8 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Quitanda",
     establishments: [{
-      
-     
+
+
       name: "Pimenta Doce",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
@@ -604,8 +606,8 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Restaurante",
     establishments: [{
-    
-      
+
+
 
       name: "Delfino",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -622,16 +624,16 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Papelaria",
     establishments: [{
-      
-      
+
+
 
       name: "Haruo",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
-      
 
-      
+
+
 
 
     },]
@@ -642,13 +644,13 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Imobiliaria",
     establishments: [{
-      
+
 
       name: "Rafael Bandeira",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
-     
+
 
 
     },]
@@ -659,7 +661,7 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Adegas",
     establishments: [{
-      
+
 
       name: "Adega Cuenca",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
@@ -681,37 +683,37 @@ const clearSearch = document.getElementById("clearSearch");
 
 
   ]; // fim dos setores
-// Mostrar ou esconder o ícone "x" com base no conteúdo do campo de pesquisa
-searchInput.addEventListener("input", function () {
-  if (searchInput.value.trim() !== "") {
-    clearSearch.style.display = "block"; // Mostra o ícone "x"
-  } else {
-    clearSearch.style.display = "none"; // Esconde o ícone "x"
-  }
-});
+  // Mostrar ou esconder o ícone "x" com base no conteúdo do campo de pesquisa
+  searchInput.addEventListener("input", function () {
+    if (searchInput.value.trim() !== "") {
+      clearSearch.style.display = "block"; // Mostra o ícone "x"
+    } else {
+      clearSearch.style.display = "none"; // Esconde o ícone "x"
+    }
+  });
 
-// Limpar o campo de pesquisa quando o ícone "x" for clicado
-clearSearch.addEventListener("click", function () {
-  searchInput.value = ""; // Limpa o campo de pesquisa
-  clearSearch.style.display = "none"; // Esconde o ícone "x"
-  searchInput.dispatchEvent(new Event("input")); // Dispara o evento de input para atualizar a pesquisa
-});
+  // Limpar o campo de pesquisa quando o ícone "x" for clicado
+  clearSearch.addEventListener("click", function () {
+    searchInput.value = ""; // Limpa o campo de pesquisa
+    clearSearch.style.display = "none"; // Esconde o ícone "x"
+    searchInput.dispatchEvent(new Event("input")); // Dispara o evento de input para atualizar a pesquisa
+  });
 
   searchInput.addEventListener("input", function () {
     const filter = searchInput.value.toLowerCase();
     let foundInMenu = false;
     let foundInEstablishments = false;
 
-// Se o campo de pesquisa estiver vazio, mostrar todos os itens do menu novamente
-if (filter === "") {
-  document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item").forEach(item => {
-      item.style.display = "flex";
-  });
+    // Se o campo de pesquisa estiver vazio, mostrar todos os itens do menu novamente
+    if (filter === "") {
+      document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item").forEach(item => {
+        item.style.display = "flex";
+      });
 
-  // Garante que o menu lateral expanda completamente
-  sidebar.style.height = "auto";
-  return;
-}
+      // Garante que o menu lateral expanda completamente
+      sidebar.style.height = "auto";
+      return;
+    }
 
 
 
@@ -817,22 +819,18 @@ ${establishment.image ? `
 </br>
 
 
-
-       <button class="detalhes-btn" data-name="${establishment.name}" 
-         data-contact="${establishment.contact}">
-         + Informações
-       </button>
-       <div class="detalhes-content" id="detalhes-${encodeURIComponent(establishment.name)}" style="display: none;">
-         <p>Promoçoes do <b>${establishment.name}.</b></p>
-
-         </br>
-         <button style="color:rgb(206, 24, 17)" class="fechar-detalhes">Fechar</button>
-       </div>
-
-
+<!-- Botão de + Informações -->
+          <button class="detalhes-btn" data-name="${establishment.name}">
+            + Informações
+          </button>
+          <div class="detalhes-content" id="detalhes-${encodeURIComponent(establishment.name)}" style="display: none;">
+            <p>${establishment.info}</p> <!-- Exibe a informação personalizada -->
+            <br>
+            
+          </div>
 
         ${establishment.menuImage ? `
-         <button class="menu-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+         <button class="menu-btn" data-name="${establishment.name}" style=" #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
           Ver Cardápio
           </button>
           <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
@@ -840,7 +838,7 @@ ${establishment.image ? `
              </div>` : ""}
 
                 ${establishment.menuFlyer ? `
-                <button class="flyer-btn" data-name="${establishment.name}" style="background-color: #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                <button class="flyer-btn" data-name="${establishment.name}" style=" #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
                   Ver Flyer
                 </button>
                 <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
@@ -852,95 +850,61 @@ ${establishment.image ? `
    `).join('')}
  </ul>`;
 
-///// inicio
+    ///// inicio
+// Função para alternar a exibição de um elemento
+function toggleElement(button, elementId, openText, closeText, openColor, closeColor) {
+  const element = document.getElementById(elementId);
 
+  if (!element) {
+    console.error(`Elemento #${elementId} não encontrado.`);
+    return;
+  }
 
-  document.querySelectorAll(".menu-btn").forEach(button => {
-    button.addEventListener("click", function () {
-      const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
-      const menuDiv = document.getElementById(menuId);
+  // Alterna a exibição do elemento
+  if (element.style.display === "none" || element.style.display === "") {
+    element.style.display = "block"; // Mostra o elemento
+    button.textContent = closeText; // Atualiza o texto do botão
+    button.style.backgroundColor = openColor; // Muda a cor do botão
+  } else {
+    element.style.display = "none"; // Esconde o elemento
+    button.textContent = openText; // Retorna o texto original
+    button.style.backgroundColor = closeColor; // Retorna a cor original
+  }
+}
 
-      if (!menuDiv) {
-        console.error(`Elemento #${menuId} não encontrado.`);
-        return;
-      }
-
-      // Alterna a exibição do cardápio
-      if (menuDiv.style.display === "none" || menuDiv.style.display === "") {
-        menuDiv.style.display = "block"; // Mostra o cardápio
-        this.textContent = "Fechar Cardápio"; // Atualiza o texto do botão
-        this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
-      } else {
-        menuDiv.style.display = "none"; // Esconde o cardápio
-        this.textContent = "Ver Cardápio"; // Retorna o texto original
-        this.style.backgroundColor = "#dfa529"; // Retorna a cor original
-      }
-    });
+// Eventos para o Cardápio
+document.querySelectorAll(".menu-btn").forEach(button => {
+  button.addEventListener("click", function () {
+    const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
+    toggleElement(this, menuId, "Ver Cardápio", "Fechar Cardápio", "#ff3333", "#dfa529");
   });
+});
+
+// Eventos para o Flyer
+document.querySelectorAll(".flyer-btn").forEach(button => {
+  button.addEventListener("click", function () {
+    const flyerId = `menu-${encodeURIComponent(this.dataset.name)}`;
+    toggleElement(this, flyerId, "Ver Flyer", "Fechar Flyer", "#ff3333", "#dfa529");
+  });
+});
+
+// Eventos para as Informações
+document.querySelectorAll(".detalhes-btn").forEach(button => {
+  button.addEventListener("click", function () {
+    const infoId = `detalhes-${encodeURIComponent(this.dataset.name)}`;
+    toggleElement(this, infoId, "+ Informações", "Fechar Informações", "#ff3333", "#007bff");
+  });
+});
+
+// Eventos para fechar o Cardápio, Flyer e Informações
+document.querySelectorAll(".fechar-menu, .fechar-flyer, .fechar-detalhes").forEach(button => {
+  button.addEventListener("click", function () {
+    this.parentElement.style.display = "none"; // Fecha o elemento pai
+  });
+});
 
 
 
-
-//// fimmm
-
-
-    /// para o flyer
-    document.querySelectorAll(".flyer-btn").forEach(button => {
-      button.addEventListener("click", function () {
-        const menuId2 = `menu-${encodeURIComponent(this.dataset.name)}`;
-        const menuDiv2 = document.getElementById(menuId2);
-
-        // Verifica se o cardápio está visível (não possui a classe "hidden")
-        if (menuDiv2.classList.contains("hidden")) {
-          // Abre o cardápio
-          menuDiv2.classList.remove("hidden");
-          this.textContent = "Fechar Flyer"; // Altera o texto do botão
-          this.style.backgroundColor = "#ff3333"; // Muda a cor para vermelho
-        } else {
-          // Fecha o cardápio
-          menuDiv2.classList.add("hidden");
-          this.textContent = "Ver Flyer"; // Texto volta ao original
-          this.style.backgroundColor = "#dfa529"; // Cor original (amarelo)
-        }
-      });
-    });
-
-
-    document.querySelectorAll(".flyer-btn").forEach(button => {
-      button.addEventListener("click", function () {
-        document.getElementById(`menu-${encodeURIComponent(this.dataset.name)}`).style.display = "block";
-      });
-    });
-
-
-
-    
-// volta aqui
-
-    
-
-
-    document.querySelectorAll(".fechar-menu").forEach(button => {
-      button.addEventListener("click", function () {
-        this.parentElement.style.display = "none";
-      });
-    });
-
-
-    // Adicionar eventos aos botões de detalhes
-    document.querySelectorAll(".detalhes-btn").forEach(button => {
-      button.addEventListener("click", function () {
-        const detalhesDiv = document.getElementById(`detalhes-${encodeURIComponent(this.dataset.name)}`);
-        detalhesDiv.style.display = "block";
-      });
-    });
-
-    // Evento para fechar os detalhes
-    document.querySelectorAll(".fechar-detalhes").forEach(button => {
-      button.addEventListener("click", function () {
-        this.parentElement.style.display = "none";
-      });
-    });
   }
 
 
@@ -985,7 +949,7 @@ ${establishment.image ? `
   // Garante que ao recarregar a página inicial, o banner apareça
   if (window.location.pathname.includes("index.html")) {
     contentArea.classList.remove("hidden"); // Garante que o conteúdo apareça
-}
+  }
 
 
   // Verifica se é um dispositivo móvel e retrai a sidebar

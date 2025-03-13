@@ -452,6 +452,19 @@ body.dark {
   background-color: #700d0d;
 }
 
+.flyer-btn {
+  background-color: #dfa529; /* Cor original do botão */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.flyer-btn:active, .flyer-btn:focus {
+  background-color: #ff3333; /* Cor ao clicar */
+  opacity: 0.8; /* Transparência ao clicar */
+}
 
 
 
@@ -794,3 +807,4 @@ img {
   border-radius: 10px; /* Bordas arredondadas */
   margin-bottom: 10px; /* Espaçamento inferior */
 }
+
