@@ -154,7 +154,9 @@ document.addEventListener("DOMContentLoaded", function () {
       delivery: "Sim / Sem Taxa",
       facebook: "www.facebook.com/uahh",
       instagram: "www.instagram.com/uahh",
-      site: "www.google.com"
+      site: "www.google.com",
+      info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
+   
     },
     {
       image: "images/comercios/farmacia/farmafacil.png",
@@ -851,6 +853,29 @@ ${establishment.image ? `
  </ul>`;
 
     ///// inicio
+
+
+    // Função para fechar todos os conteúdos abertos
+function closeAllContents() {
+  document.querySelectorAll(".detalhes-content, .menu-content").forEach(content => {
+    content.style.display = "none";
+  });
+
+  // Restaura o texto e a cor dos botões
+  document.querySelectorAll(".detalhes-btn, .menu-btn, .flyer-btn").forEach(button => {
+    if (button.classList.contains("detalhes-btn")) {
+      button.textContent = "+ Informações";
+      button.style.backgroundColor = "#007bff"; // Cor original do botão de informações
+    } else if (button.classList.contains("menu-btn")) {
+      button.textContent = "Ver Cardápio";
+      button.style.backgroundColor = "#dfa529"; // Cor original do botão de cardápio
+    } else if (button.classList.contains("flyer-btn")) {
+      button.textContent = "Ver Flyer";
+      button.style.backgroundColor = "#dfa529"; // Cor original do botão de flyer
+    }
+  });
+}
+
 // Função para alternar a exibição de um elemento
 function toggleElement(button, elementId, openText, closeText, openColor, closeColor) {
   const element = document.getElementById(elementId);
@@ -860,15 +885,20 @@ function toggleElement(button, elementId, openText, closeText, openColor, closeC
     return;
   }
 
-  // Alterna a exibição do elemento
-  if (element.style.display === "none" || element.style.display === "") {
-    element.style.display = "block"; // Mostra o elemento
-    button.textContent = closeText; // Atualiza o texto do botão
-    button.style.backgroundColor = openColor; // Muda a cor do botão
-  } else {
-    element.style.display = "none"; // Esconde o elemento
+  // Verifica se o conteúdo já está aberto
+  if (element.style.display === "block") {
+    // Fecha o conteúdo
+    element.style.display = "none";
     button.textContent = openText; // Retorna o texto original
     button.style.backgroundColor = closeColor; // Retorna a cor original
+  } else {
+    // Fecha todos os conteúdos antes de abrir o atual
+    closeAllContents();
+
+    // Abre o conteúdo
+    element.style.display = "block";
+    button.textContent = closeText; // Atualiza o texto do botão
+    button.style.backgroundColor = openColor; // Muda a cor do botão
   }
 }
 
@@ -899,18 +929,14 @@ document.querySelectorAll(".detalhes-btn").forEach(button => {
 // Eventos para fechar o Cardápio, Flyer e Informações
 document.querySelectorAll(".fechar-menu, .fechar-flyer, .fechar-detalhes").forEach(button => {
   button.addEventListener("click", function () {
-    this.parentElement.style.display = "none"; // Fecha o elemento pai
+    closeAllContents(); // Fecha todos os conteúdos
   });
 });
 
 
 
+    // Fim pesquisa nome no menu lateral
   }
-
-
-
-  // Fim pesquisa nome no menu lateral
-
 
   // Função para esconder o banner e mostrar o conteúdo
   function mostrarConteudo() {
