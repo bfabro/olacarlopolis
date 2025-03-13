@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
 const clearSearch = document.getElementById("clearSearch");
   // Inicio pesquisa nome no menu lateral
   // volta aqui
+  
 
   document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("content_area").classList.remove("hidden");
@@ -139,7 +140,10 @@ const clearSearch = document.getElementById("clearSearch");
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "Rua Benedito Salles, 903",
       contact: "(43) 98411-9145",
-      delivery: "Sim / Sem Taxa"
+      delivery: "Sim / Sem Taxa",
+      facebook: "www.facebook.com/uahh",
+      instagram : "www.instagram.com/uahh",
+      site: "www.google.com"
     },
     {
       name: "Desconto Facil 1 ( Joao )",
@@ -328,10 +332,6 @@ const clearSearch = document.getElementById("clearSearch");
     ]
   },
 
-
-
-
-
   {
 
     link: document.querySelector("#menufarmaciaPlantao"),
@@ -383,9 +383,13 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Moto Center",
     establishments: [{
+      
+
       name: "Binho Moto Center ",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
 
 
     },]
@@ -397,9 +401,13 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Açougues",
     establishments: [{
+     
+
       name: "Açougue do Carlinho ",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
 
 
     },]
@@ -410,9 +418,14 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Agropecuarias",
     establishments: [{
+     
+      
+
       name: "Vida Nova",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
 
 
     },]
@@ -423,9 +436,14 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Auto Center",
     establishments: [{
+      
+      
+
       name: "Auto center bairro",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
 
 
     },]
@@ -436,9 +454,15 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Loja de Brinquedos",
     establishments: [{
+     
+     
       name: "Filho Otaviano",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
+
+      
 
 
     },]
@@ -449,9 +473,14 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Deposito de Gas",
     establishments: [{
+      
+    
+
       name: "Lia Gas",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
 
 
     },]
@@ -461,11 +490,13 @@ const clearSearch = document.getElementById("clearSearch");
     link: document.querySelector("#menuFuneraria"),
 
     title: "Funerarias",
-    establishments: [{
+    establishments: [{  
+
       name: "Bom Jesus",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
-
+      delivery: "Sim / Sem Taxa"
 
     },]
   },
@@ -475,10 +506,15 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Material de Construção",
     establishments: [{
+     
+     
+
+
       name: "Carriel",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
-
+      delivery: "Sim / Sem Taxa"
 
     },]
   },
@@ -488,9 +524,15 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Padarias",
     establishments: [{
+    
+
       name: "Bom Jesus",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
+
+      
 
 
     },]
@@ -501,9 +543,14 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Pet Shop",
     establishments: [{
+     
+
       name: "Paraiso dos Animais",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
+
 
 
     },]
@@ -514,9 +561,13 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Quitanda",
     establishments: [{
+      
+     
       name: "Pimenta Doce",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
 
 
     },]
@@ -527,9 +578,14 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Restaurante",
     establishments: [{
+    
+      
+
       name: "Delfino",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
 
 
     },]
@@ -540,9 +596,16 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Papelaria",
     establishments: [{
+      
+      
+
       name: "Haruo",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      
+
+      
 
 
     },]
@@ -553,9 +616,13 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Imobiliaria",
     establishments: [{
+      
+
       name: "Rafael Bandeira",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+     
 
 
     },]
@@ -566,9 +633,13 @@ const clearSearch = document.getElementById("clearSearch");
 
     title: "Adegas",
     establishments: [{
+      
+
       name: "Adega Cuenca",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
 
 
     },]
@@ -677,15 +748,62 @@ if (filter === "") {
        ${establishment.hours ? `<b>Funcionamento:</b> ${establishment.hours}<br>` : ""}
        ${establishment.plantaoHorario ? `<b class="highlight-plantao">Plantão:</b> <span class="plantao-text">${establishment.plantaoHorario}</span><br>` : ""}  <!-- Exibe o horário de plantão -->
        ${establishment.address ? `
-         <b>Endereço: </b><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="map-icon">
-           <i class='bx bx-map'></i> 
-         </a> ${establishment.address}</br>` : ""}
+         <b>Endereço: </b>${establishment.address}</br>` : ""}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
            <b>Contato:</b> ${establishment.contact} 
-        <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="whatsapp-icon">
-         <i style="color:rgb(16, 155, 35)"class='bx bxl-whatsapp'></i>
-       </a><br>
+       <br>
        ${establishment.delivery ? `<b>Entrega:</b> ${establishment.delivery}<br>` : ""}
       
+   <!-- Ícones de redes sociais e contato -->
+          <div class="social-icons">
+            ${establishment.address ? `
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address)}" target="_blank" class="icon-link">
+                <i class='bx bx-map'></i> Localização
+              </a>
+            ` : ""}
+            
+            ${establishment.contact ? `
+              <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="icon-link">
+                <i class='bx bxl-whatsapp' style="color: #25D366;"></i> WhatsApp
+              </a>
+            ` : ""}
+            
+            ${establishment.facebook ? `
+              <a href="${establishment.facebook}" target="_blank" class="icon-link">
+                <i class='bx bxl-facebook' style="color: #1877F2;"></i> Facebook
+              </a>
+            ` : ""}
+            
+            ${establishment.instagram ? `
+              <a href="${establishment.instagram}" target="_blank" class="icon-link">
+                <i class='bx bxl-instagram' style="color: #E4405F;"></i> Instagram
+              </a>
+            ` : ""}
+            
+            ${establishment.site ? `
+              <a href="${establishment.site}" target="_blank" class="icon-link">
+                <i class='bx bx-globe'></i> Site
+              </a>
+            ` : ""}
+          </div>
+</br>
+
+
 
        <button class="detalhes-btn" data-name="${establishment.name}" 
          data-contact="${establishment.contact}">
