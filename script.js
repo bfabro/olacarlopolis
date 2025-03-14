@@ -1072,7 +1072,7 @@ ${establishment.image ? `
     }
   });
 
-
+/*
   document.addEventListener("click", function (event) {
     if (window.innerWidth < 768 &&
       !sidebar.contains(event.target) &&
@@ -1083,7 +1083,7 @@ ${establishment.image ? `
     }
   });
 
-
+*/
 
 
 });
