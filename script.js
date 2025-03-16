@@ -61,12 +61,14 @@ document.addEventListener("DOMContentLoaded", function () {
     link: document.querySelector("#menuEventos"),
     title: "Eventos em Carlópolis",
     establishments: [{
+      image: "images/info_uteis/eventos/evento_1/calendario_evento.png",
       name: "Calendario Eventos",
       contact: "(43) 2345-6789",
       menuFlyer: "images/info_uteis/eventos/evento_1/calendario_evento.png"
 
     },
     {
+      image:"images/info_uteis/eventos/evento_2/feira_lua_1.png",
       name: "Feira da Lua",
       hours: "sex 19 - 00h",
       address: "Praça Igreja Matriz ",
@@ -74,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
       menuFlyer: "images/info_uteis/eventos/evento_2/feira_lua_1.png"
     },
     {
+      image: "images/info_uteis/eventos/evento_3/corrida_10.jpg",
       name: "Passeata contra a barriga",
       hours: "dom: 07 - 12h",
       address: "Av Turistica, 800",
@@ -388,6 +391,41 @@ document.addEventListener("DOMContentLoaded", function () {
     },]
   },
 
+
+
+
+
+
+
+
+  {
+
+    link: document.querySelector("#menuHospital"),
+
+    title: "Hospital em Carlopolis",
+    establishments: [{
+      name: "Hospital São Jose",
+      address: "R. Cap. Estácio, 460",
+      contact: "(43) 99174-2539",
+      hours: "24 horas",      
+      image: "images/info_uteis/hospital/hospital.png",
+      facebook: "www.facebook.com/uahh",
+      instagram: "www.instagram.com/uahh",
+      site: "www.google.com"
+     
+
+    },]
+  },
+
+
+
+
+
+
+
+
+
+
   {
 
     link: document.querySelector("#menuHorarioOnibus"),
@@ -675,16 +713,45 @@ document.addEventListener("DOMContentLoaded", function () {
     title: "Adegas",
     establishments: [{
 
-
       name: "Adega Cuenca",
       hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
       address: "R. Laurindo Franco de Godoi, 90",
       contact: "(43) 99951-1540",
       delivery: "Sim / Sem Taxa"
 
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuAdvocacia"),
+
+    title: "Escriorio de Advocacia",
+    establishments: [{
+
+      name: "Ruan ABILIO",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
+
+    },]
+  },
+
+  {
+    link: document.querySelector("#menuAssistenciaCelular"),
+
+    title: "Assistencia Celular",
+    establishments: [{
+
+      name: "Soraya",
+      hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+      address: "R. Laurindo Franco de Godoi, 90",
+      contact: "(43) 99951-1540",
+      delivery: "Sim / Sem Taxa"
 
     },]
   }
+
 
 
 
@@ -1072,7 +1139,7 @@ ${establishment.image ? `
     }
   });
 
-/*
+
   document.addEventListener("click", function (event) {
     if (window.innerWidth < 768 &&
       !sidebar.contains(event.target) &&
@@ -1083,7 +1150,6 @@ ${establishment.image ? `
     }
   });
 
-*/
 
 
 });
