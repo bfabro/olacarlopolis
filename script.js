@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     },
     {
-      image:"images/info_uteis/eventos/evento_2/feira_lua_1.png",
+      image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
       name: "Feira da Lua",
       hours: "sex 19 - 00h",
       address: "Praça Igreja Matriz ",
@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function () {
         image: "images/comercios/farmacia/farmafacil.png",
         name: "Desconto Facil 1 ( Joao )",
         address: "R. Benedito Salles, 574",
-        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        hours: "Seg a Sex: 8h - 18h e Sab: 08 - 12h",
         contact: "(43) 3566-1119",
         delivery: "Sim / Sem Taxa",
         facebook: "www.facebook.com/uahh",
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
       {
         image: "images/comercios/farmacia/drogamais.png",
         name: "DrogaMais ( Jorginho )",
-        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        hours: "Seg a Sex: 8h - 18h e Sab: 08 - 12h",
         address: "Rua Benedito Salles, 903",
         contact: "(43) 98411-9145",
         delivery: "Sim / Sem Taxa",
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
         image: "images/comercios/farmacia/elshaday.png",
         name: "El Shaday ( Daniel )",
         address: "R. Benedito Sales, 353",
-        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        hours: "Seg a Sex: 8h - 18h e Sab: 08 - 12h",
         contact: "(43) 98488-9420",
         delivery: "Sim / Sem Taxa",
         facebook: "www.facebook.com/uahh",
@@ -189,12 +189,25 @@ document.addEventListener("DOMContentLoaded", function () {
         site: "www.google.com"
       },
 
+      {
+        image: "images/comercios/farmacia/farmais.png",
+        name: "FarMais",
+        address: "R. Benedito Salles, 1188",
+        hours: "Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+        contact: "(43) 3566-1211",
+        delivery: "Sim / Sem Taxa",
+        facebook: "www.facebook.com/uahh",
+        instagram: "www.instagram.com/uahh",
+        site: "www.google.com"
+      },
+
+
 
       {
         image: "images/comercios/farmacia/masterfarma.png",
         name: "MasterFarma ( Zurdo )",
         address: "R. Laurindo Franco de Godoi, 90",
-        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        hours: "Seg a Sex: 8h - 18h e Sab: 08 - 12h",
         contact: "(43) 3566-1471",
         delivery: "Sim / Sem Taxa",
         facebook: "www.facebook.com/uahh",
@@ -205,7 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
         image: "images/comercios/farmacia/popularMais.png",
         name: "PopularMais ( Jeremias )",
         address: "R. Laurindo Franco de Godói, 787",
-        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        hours: "Seg a Sex: 8h - 18h e Sab: 08 - 12h",
         contact: "(43) 3566-1471",
         delivery: "Sim / Sem Taxa",
         facebook: "www.facebook.com/uahh",
@@ -216,8 +229,20 @@ document.addEventListener("DOMContentLoaded", function () {
         image: "images/comercios/farmacia/santamaria.png",
         name: "Santa Maria ( Aguera )",
         address: "Praça Coronel Leite, nº 711",
-        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        hours: "Seg a Sex: 8h - 18h e Sab: 08 - 12h",
         contact: "(43) 3566-1471",
+        delivery: "Sim / Sem Taxa",
+        facebook: "www.facebook.com/uahh",
+        instagram: "www.instagram.com/uahh",
+        site: "www.google.com"
+      },
+
+      {
+        image: "images/comercios/farmacia/saudeFarma.png",
+        name: "Saude Farma",
+        address: "Praça Coronel Leite, nº 711",
+        hours: "Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+        contact: "(43) 99956-8938",
         delivery: "Sim / Sem Taxa",
         facebook: "www.facebook.com/uahh",
         instagram: "www.instagram.com/uahh",
@@ -386,34 +411,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
     link: document.querySelector("#menufarmaciaPlantao"),
 
-  /*
-    title: "Farmacia de Plantão",
-    establishments: [{
-      name: "MasterFarma ( Zurdo ) ",
-      address: "R. Laurindo Franco de Godoi, 90",
-      contact: "(43) 99951-1540",
-      plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
-      delivery: "Sim / Sem Taxa",
-      image: "images/info_uteis/farmacia_plantao/masterFarma.png",
-      facebook: "www.facebook.com/uahh",
-      instagram: "www.instagram.com/uahh",
-      site: "www.google.com",
-      info: " <strong>Descontao:</strong><ul>Procure o Zurdo e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
-*/
-
+    /*
       title: "Farmacia de Plantão",
       establishments: [{
-        name: "El Shaday ( Daniel ) ",
-        address: "R. Benedito Sales, 353",
-        contact: "(43) 98488-9420",
-        plantaoHorario: "Das 8h às 21h , De 15/03 a 21/03",
+        name: "MasterFarma ( Zurdo ) ",
+        address: "R. Laurindo Franco de Godoi, 90",
+        contact: "(43) 99951-1540",
+        plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
         delivery: "Sim / Sem Taxa",
-        image: "images/info_uteis/farmacia_plantao/elshaday.png",
+        image: "images/info_uteis/farmacia_plantao/masterFarma.png",
         facebook: "www.facebook.com/uahh",
         instagram: "www.instagram.com/uahh",
         site: "www.google.com",
-        info: " <strong>Descontao:</strong><ul>Procure o Daniel e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
-  
+        info: " <strong>Descontao:</strong><ul>Procure o Zurdo e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+  */
+
+    title: "Farmacia de Plantão",
+    establishments: [{
+      name: "El Shaday ( Daniel ) ",
+      address: "R. Benedito Sales, 353",
+      contact: "(43) 98488-9420",
+      plantaoHorario: "Das 8h às 21h , De 15/03 a 21/03",
+      delivery: "Sim / Sem Taxa",
+      image: "images/info_uteis/farmacia_plantao/elshaday.png",
+      facebook: "www.facebook.com/uahh",
+      instagram: "www.instagram.com/uahh",
+      site: "www.google.com",
+      info: " <strong>Descontao:</strong><ul>Procure o Daniel e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+
 
     },]
   },
@@ -434,12 +459,12 @@ document.addEventListener("DOMContentLoaded", function () {
       name: "Hospital São Jose",
       address: "R. Cap. Estácio, 460",
       contact: "(43) 99174-2539",
-      hours: "24 horas",      
+      hours: "24 horas",
       image: "images/info_uteis/hospital/hospital.png",
       facebook: "www.facebook.com/uahh",
       instagram: "www.instagram.com/uahh",
       site: "www.google.com"
-     
+
 
     },]
   },
