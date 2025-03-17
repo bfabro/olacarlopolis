@@ -177,6 +177,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
       },
 
+      {
+        image: "images/comercios/farmacia/elshaday.png",
+        name: "El Shaday ( Daniel )",
+        address: "R. Benedito Sales, 353",
+        hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+        contact: "(43) 98488-9420",
+        delivery: "Sim / Sem Taxa",
+        facebook: "www.facebook.com/uahh",
+        instagram: "www.instagram.com/uahh",
+        site: "www.google.com"
+      },
+
 
       {
         image: "images/comercios/farmacia/masterfarma.png",
@@ -374,6 +386,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     link: document.querySelector("#menufarmaciaPlantao"),
 
+  /*
     title: "Farmacia de Plantão",
     establishments: [{
       name: "MasterFarma ( Zurdo ) ",
@@ -386,7 +399,21 @@ document.addEventListener("DOMContentLoaded", function () {
       instagram: "www.instagram.com/uahh",
       site: "www.google.com",
       info: " <strong>Descontao:</strong><ul>Procure o Zurdo e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+*/
 
+      title: "Farmacia de Plantão",
+      establishments: [{
+        name: "El Shaday ( Daniel ) ",
+        address: "R. Benedito Sales, 353",
+        contact: "(43) 98488-9420",
+        plantaoHorario: "Das 8h às 21h , De 15/03 a 21/03",
+        delivery: "Sim / Sem Taxa",
+        image: "images/info_uteis/farmacia_plantao/elshaday.png",
+        facebook: "www.facebook.com/uahh",
+        instagram: "www.instagram.com/uahh",
+        site: "www.google.com",
+        info: " <strong>Descontao:</strong><ul>Procure o Daniel e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+  
 
     },]
   },
@@ -725,7 +752,7 @@ document.addEventListener("DOMContentLoaded", function () {
   {
     link: document.querySelector("#menuAdvocacia"),
 
-    title: "Escriorio de Advocacia",
+    title: "Escritorio de Advocacia",
     establishments: [{
 
       name: "Ruan ABILIO",
