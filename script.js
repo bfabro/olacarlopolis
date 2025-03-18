@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
       name: "Rocha",
       hours: "6h - 20h e dom: 06 - 12h",
       address: "Av. Elson Soares, 767 ",
-      contact: "(11) 99898-5930",
+      contact: "(43) 3566-2436",
       delivery: "Sim / Sem Taxa"
     },
     {
