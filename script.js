@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
     link: document.querySelector("#menuMercado"),
     title: "Supermercados em Carlópolis",
     establishments: [{
-      name: "Rocha",
+      name: "Rochaa", 
       hours: "6h - 20h e dom: 06 - 12h",
       address: "Av. Elson Soares, 767 ",
       contact: "(43) 3566-2436",
