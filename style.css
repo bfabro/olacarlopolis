@@ -623,7 +623,7 @@ body.dark {
   .sidebar.close~.content_area {
    /* width: calc(108% - 80px);*/
     width: calc(100% - 00px);
-    margin-left: 0px;
+    margin-left: -5px;
   }
 
 
