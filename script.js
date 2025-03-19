@@ -172,52 +172,52 @@ document.addEventListener("DOMContentLoaded", function () {
     title: "Supermercados ",
     establishments: [{
       name: "Rocha",
-      hours: "6h - 20h e dom: 06 - 12h",
-      address: "Av. Elson Soares, 767 ",
-      contact: "(43) 3566-2436",
-      delivery: "Sim / Sem Taxa"
+      hours: "</br>6h - 20h e dom: 06 - 12h",
+      address: "</br>Av. Elson Soares, 767 ",
+      contact: "</br>(43) 3566-2436",
+      delivery: "</br>Sim / Sem Taxa"
     },
     {
       name: "Carreiro",
-      address: "R. Benedito Salles, 341 ",
-      hours: "7h - 20h e dom: 07 - 12h",
-      contact: "(43) 2345-6789",
-      delivery: "Sim / Com Taxa"
+      address: "</br>R. Benedito Salles, 341 ",
+      hours: "</br>7h - 20h e dom: 07 - 12h",
+      contact: "</br>(43) 2345-6789",
+      delivery: "</br>Sim / Com Taxa"
     },
     {
       name: "Barateiro",
-      address: "PR-218, 1168 ",
-      hours: "8h - 21h e dom: 07 - 12h",
-      contact: "(43) 3456-7890",
-      delivery: "Sim / Sem Taxa"
+      address: "</br>PR-218, 1168 ",
+      hours: "</br>8h - 21h e dom: 07 - 12h",
+      contact: "</br>(43) 3456-7890",
+      delivery: "</br>Sim / Sem Taxa"
     },
     {
       name: "Kelve",
-      address: "PR-218, 1168 ",
-      hours: "8h - 21h e dom: 07 - 12h",
-      contact: "(43) 3456-7890",
-      delivery: "Sim / Sem Taxa"
+      address: "</br>PR-218, 1168 ",
+      hours: "</br>8h - 21h e dom: 07 - 12h",
+      contact: "</br>(43) 3456-7890",
+      delivery: "</br>Sim / Sem Taxa"
     },
     {
       name: "Zero Japan",
-      address: "PR-218, 1168 ",
-      hours: "8h - 21h e dom: 07 - 12h",
-      contact: "(43) 3456-7890",
-      delivery: "Sim / Sem Taxa"
+      address: "</br>PR-218, 1168 ",
+      hours: "</br>8h - 21h e dom: 07 - 12h",
+      contact: "</br>(43) 3456-7890",
+      delivery: "</br>Sim / Sem Taxa"
     },
     {
       name: "Carriel",
-      address: "PR-218, 1168 ",
-      hours: "8h - 21h e dom: 07 - 12h",
-      contact: "(43) 3456-7890",
-      delivery: "Sim / Sem Taxa"
+      address: "</br>PR-218, 1168 ",
+      hours: "</br>8h - 21h e dom: 07 - 12h",
+      contact: "</br>(43) 3456-7890",
+      delivery: "</br>Sim / Sem Taxa"
     },
     {
       name: "Compre Bem +",
-      address: "PR-218, 1168 ",
-      hours: "8h - 21h e dom: 07 - 12h",
-      contact: "(43) 3456-7890",
-      delivery: "Sim / Sem Taxa"
+      address: "</br>PR-218, 1168 ",
+      hours: "</br>8h - 21h e dom: 07 - 12h",
+      contact: "</br>(43) 3456-7890",
+      delivery: "</br>Sim / Sem Taxa"
     },
 
 
@@ -509,7 +509,7 @@ document.addEventListener("DOMContentLoaded", function () {
       name: "El Shaday ( Daniel ) ",
       address: "R. Benedito Sales, 353",
       contact: "(43) 98488-9420",
-      plantaoHorario: "Das 8h às 21h , De 15/03 a 21/03",
+      plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
       delivery: "Sim / Sem Taxa",
       image: "images/info_uteis/farmacia_plantao/elshaday.png",
       facebook: "www.facebook.com/uahh",
