@@ -178,6 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
       delivery: "</br>Sim / Sem Taxa"
     },
     {
+      image: "images/comercios/supermercado/carreiro.png",
       name: "Carreiro",
       address: "</br>R. Benedito Salles, 341 ",
       hours: "</br>7h - 20h e dom: 07 - 12h",
@@ -185,7 +186,8 @@ document.addEventListener("DOMContentLoaded", function () {
       delivery: "</br>Sim / Com Taxa"
     },
     {
-      name: "Barateiro",
+      image: "images/comercios/supermercado/obarateiro.png",
+      name: "O Barateiro",
       address: "</br>PR-218, 1168 ",
       hours: "</br>8h - 21h e dom: 07 - 12h",
       contact: "</br>(43) 3456-7890",
