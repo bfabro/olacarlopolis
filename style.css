@@ -541,7 +541,7 @@ body.dark {
 
 
 .content_area {
-  margin-left: 260px;
+  margin-left: 268px;
   /* Ajuste para a largura da sidebar */
   padding: 10px;
   width: calc(100% - 260px);
