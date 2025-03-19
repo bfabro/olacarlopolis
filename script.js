@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   const overlay = document.querySelector("#overlay");
+  const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
 
 
   // Quando clicar no menu, abre a sidebar e ativa o fundo escuro
@@ -43,6 +44,21 @@ overlay.addEventListener("click", function () {
 
 
   sidebar.appendChild(closeButton);
+
+
+
+
+   // Quando um item do menu for clicado, fecha o menu automaticamente
+   menuLinks.forEach(link => {
+    link.addEventListener("click", function () {
+       // Verifica se o item do menu tem a classe "submenu_item"
+    if (!this.classList.contains("submenu_item")) {
+      // Se for um link válido (não um menu pai), fecha o menu
+      sidebar.classList.remove("open");
+      overlay.classList.remove("active");
+    }
+    });
+  });
 
 
 

@@ -631,6 +631,20 @@ body.dark {
 
 }
 
+/* Quando um item do menu for clicado, fecha o menu automaticamente */
+@media screen and (max-width: 768px) {
+  .sidebar .nav_link {
+    cursor: pointer;
+  }
+}
+
+
+
+
+
+
+
+
 
 @media screen and (max-width: 1200px) {
   .container {
