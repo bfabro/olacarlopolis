@@ -11,10 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const subMenuLinks = document.querySelectorAll(".nav_link.sublink"); // Apenas subitens do menu
   const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
   const searchInput = document.getElementById("searchSidebar");
+  const overlay = document.querySelector("#overlay");
+  const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
 
   const clearSearch = document.getElementById("clearSearch");
   // Inicio pesquisa nome no menu lateral
- 
+
   // Inicializa o carrossel de Turismo
   const swiperTurismo = new Swiper('.swiper-turismo', {
     loop: true, // Permite rolagem infinita
@@ -26,9 +28,9 @@ document.addEventListener("DOMContentLoaded", function () {
       delay: 3000, // Troca de slide a cada 3 segundos
     },
     effect: 'fade', // Efeito de fade entre os slides
-  fadeEffect: {
-    crossFade: true, // Faz o fade suave entre os slides
-  },
+    fadeEffect: {
+      crossFade: true, // Faz o fade suave entre os slides
+    },
   });
 
   // Inicializa o carrossel de Eventos
@@ -46,8 +48,10 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
-  const overlay = document.querySelector("#overlay");
-  const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
+
+  
+
+ 
 
 
   // Quando clicar no menu, abre a sidebar e ativa o fundo escuro
@@ -56,11 +60,11 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.classList.toggle("active");
   });
 
-// Quando clicar fora do menu, fecha a sidebar
-overlay.addEventListener("click", function () {
-  sidebar.classList.remove("open");
-  overlay.classList.remove("active");
-});
+  // Quando clicar fora do menu, fecha a sidebar
+  overlay.addEventListener("click", function () {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("active");
+  });
 
   // Criar um botão "X" para fechar o menu
   const closeButton = document.createElement("button");
@@ -77,15 +81,15 @@ overlay.addEventListener("click", function () {
 
 
 
-   // Quando um item do menu for clicado, fecha o menu automaticamente
-   menuLinks.forEach(link => {
+  // Quando um item do menu for clicado, fecha o menu automaticamente
+  menuLinks.forEach(link => {
     link.addEventListener("click", function () {
-       // Verifica se o item do menu tem a classe "submenu_item"
-    if (!this.classList.contains("submenu_item")) {
-      // Se for um link válido (não um menu pai), fecha o menu
-      sidebar.classList.remove("open");
-      overlay.classList.remove("active");
-    }
+      // Verifica se o item do menu tem a classe "submenu_item"
+      if (!this.classList.contains("submenu_item")) {
+        // Se for um link válido (não um menu pai), fecha o menu
+        sidebar.classList.remove("open");
+        overlay.classList.remove("active");
+      }
     });
   });
 

@@ -525,11 +525,7 @@ body.dark {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-
-
-
-  
+  width: 100%;  
   position: fixed;
   top: 0;
   left: 0;
@@ -537,6 +533,8 @@ body.dark {
   padding: 15px 23px;
   z-index: 1000;
   box-shadow: 0 0 2px var(--grey-color-light);
+
+  
 }
 
 
@@ -949,4 +947,24 @@ img {
     margin-left: auto; /* Centraliza a imagem horizontalmente */
     margin-right: auto; /* Centraliza a imagem horizontalmente */
   }
+}
+
+/* Estilo para o ícone de link */
+.info-link {
+  display: inline-flex; /* Alinha o ícone e o texto */
+  align-items: center; /* Centraliza verticalmente */
+  gap: 5px; /* Espaço entre o ícone e o texto */
+  color: #007bff; /* Cor do link */
+  text-decoration: none; /* Remove o sublinhado */
+  font-size: 14px; /* Tamanho da fonte */
+  margin-top: 10px; /* Espaçamento acima do link */
+}
+
+.info-link:hover {
+  color: #0056b3; /* Cor do link ao passar o mouse */
+  text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
+}
+
+.info-link i {
+  font-size: 16px; /* Tamanho do ícone */
 }
