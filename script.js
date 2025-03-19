@@ -169,13 +169,9 @@ document.addEventListener("DOMContentLoaded", function() {
       {
           link: document.querySelector("#menuMercado"),
           title: "Supermercados ",
-          establishments: [{
-                  name: "Rocha",
-                  hours: "</br>6h - 20h e dom: 06 - 12h",
-                  address: "</br>Av. Elson Soares, 767 ",
-                  contact: "</br>(43) 3566-2436",
-                  delivery: "</br>Sim / Sem Taxa"
-              },
+          establishments: [
+            
+         
               {
                   image: "images/comercios/supermercado/carreiro.png",
                   name: "Carreiro",
@@ -199,13 +195,15 @@ document.addEventListener("DOMContentLoaded", function() {
                   contact: "</br>(43) 3456-7890",
                   delivery: "</br>Sim / Sem Taxa"
               },
+
               {
-                  name: "Zero Japan",
-                  address: "</br>PR-218, 1168 ",
-                  hours: "</br>8h - 21h e dom: 07 - 12h",
-                  contact: "</br>(43) 3456-7890",
-                  delivery: "</br>Sim / Sem Taxa"
-              },
+                name: "Rocha",
+                hours: "</br>6h - 20h e dom: 06 - 12h",
+                address: "</br>Av. Elson Soares, 767 ",
+                contact: "</br>(43) 3566-2436",
+                delivery: "</br>Sim / Sem Taxa"
+            },
+             
               {
                   name: "Carriel",
                   address: "</br>PR-218, 1168 ",
@@ -220,6 +218,14 @@ document.addEventListener("DOMContentLoaded", function() {
                   contact: "</br>(43) 3456-7890",
                   delivery: "</br>Sim / Sem Taxa"
               },
+
+              {
+                name: "Zero Japan",
+                address: "</br>PR-218, 1168 ",
+                hours: "</br>8h - 21h e dom: 07 - 12h",
+                contact: "</br>(43) 3456-7890",
+                delivery: "</br>Sim / Sem Taxa"
+            },
 
 
           ]
