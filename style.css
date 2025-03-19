@@ -935,8 +935,8 @@ img {
   img {
     max-width: 600px; /* Aumenta o tamanho máximo das imagens */
     display: block; /* Garante que a imagem seja tratada como um bloco */
-    margin-left: auto; /* Centraliza a imagem horizontalmente */
-    margin-right: auto; /* Centraliza a imagem horizontalmente */
+    /*margin-left: auto;  Centraliza a imagem horizontalmente 
+    margin-right: auto;  Centraliza a imagem horizontalmente */
   }
 }
 
