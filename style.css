@@ -49,10 +49,12 @@ body.dark {
 .logo_item {
   display: flex;
   align-items: center;
-  column-gap: 10px;
+  justify-content: center; /* Centraliza horizontalmente */
+  flex-grow: 1; /* Faz ocupar todo o espaço disponível */
   font-size: 22px;
   font-weight: 500;
   color: var(--blue-color);
+  text-align: center;
 }
 
 .navbar img {
@@ -529,18 +531,19 @@ body.dark {
 
 /* Ajustes para a navbar e sidebar */
 .navbar {
+  display: flex;
+  justify-content: center; /* Centraliza os itens na navbar */
+  align-items: center;
+  width: 100%;
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  background-color: var(--white-color);
+  padding: 15px 23px;
   z-index: 1000;
-  max-width: 1200px;
-  /* Mesma largura máxima do container */
-  margin: 0 auto;
-  /* Centraliza a navbar */
-  padding: 15px 5px;
-  /* Ajuste o padding conforme necessário */
+  box-shadow: 0 0 2px var(--grey-color-light);
 }
+
 
 .content_area {
   margin-left: 260px;
@@ -801,12 +804,13 @@ img {
 
   /* Ícone do menu hambúrguer */
   #sidebarOpen {
-    display: block;
-    cursor: pointer;
-    font-size: 25px;
-    color: var(--grey-color);
-  }
-
+    position: absolute;
+  left: 15px; /* Mantém o menu no canto esquerdo */
+  font-size: 25px;
+  cursor: pointer;
+  color: var(--grey-color);
+  display: block;
+}
   /* Sobreposição escura ao abrir o menu */
   .overlay {
     display: none;
