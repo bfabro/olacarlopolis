@@ -14,8 +14,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const clearSearch = document.getElementById("clearSearch");
   // Inicio pesquisa nome no menu lateral
-  // volta aqui
+ 
+  // Inicializa o carrossel de Turismo
+  const swiperTurismo = new Swiper('.swiper-turismo', {
+    loop: true, // Permite rolagem infinita
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    autoplay: {
+      delay: 3000, // Troca de slide a cada 3 segundos
+    },
+    effect: 'fade', // Efeito de fade entre os slides
+  fadeEffect: {
+    crossFade: true, // Faz o fade suave entre os slides
+  },
+  });
 
+  // Inicializa o carrossel de Eventos
+  const swiperEventos = new Swiper('.swiper-eventos', {
+    loop: true, // Permite rolagem infinita
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    autoplay: {
+      delay: 5000, // Troca de slide a cada 3 segundos
+    }, effect: 'fade', // Efeito de fade entre os slides
+    fadeEffect: {
+      crossFade: true, // Faz o fade suave entre os slides
+    },
+  });
 
   const overlay = document.querySelector("#overlay");
   const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu

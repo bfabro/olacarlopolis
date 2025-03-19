@@ -701,9 +701,6 @@ body.dark {
     font-size: 20px;
   }
 
-
-
-
 }
 
 .search_sidebar {
@@ -844,4 +841,49 @@ img {
 
 
 
+/* CARROEU */
+
+
+/* Espaçamento entre os slides do carrossel */
+.swiper-slide {
+  opacity: 0; /* Esconde todos os slides por padrão */
+  transition: opacity 0.5s ease; /* Transição suave */
+}
+
+
+
+.swiper-slide-active {
+  opacity: 1; /* Torna o slide ativo visível */
+}
+
+.swiper-container {
+  overflow: hidden; /* Impede que o carrossel cause overflow */
+  width: 100%;
+}
+
+/* Ajustar o tamanho das imagens */
+.swiper-slide img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 10px;
+
+  display: block;
+  transition: none; /* Remove qualquer transição que possa causar o problema */
+}
+
+/* Ajustar o tamanho do carrossel */
+.carrossel-container {
+  max-width: 95%; /* Ajuste conforme necessário */
+  margin: 0 auto; /* Centralizar o carrossel */
+}
+
+/* Estilo para o separador entre os carrosséis */
+.separador {
+  width: 100%;
+  height: 2px; /* Altura do separador */
+  background-color: #ccc; /* Cor do separador */
+  margin: 30px 0; /* Espaçamento acima e abaixo do separador */
+  position: relative;
+}
 
