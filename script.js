@@ -70,7 +70,7 @@ overlay.addEventListener("click", function () {
   // Carregar informações de categorias
   const categories = [{
     link: document.querySelector("#menuLanchonete"),
-    title: "Lanchonetes em Carlópolis",
+    title: "Lanchonetes",
     establishments: [{
       image: "images/comercios/lanchonete/paiol/paiol.png",
       name: "Paiol",
@@ -136,7 +136,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuMercado"),
-    title: "Supermercados em Carlópolis",
+    title: "Supermercados ",
     establishments: [{
       name: "Rocha",
       hours: "6h - 20h e dom: 06 - 12h",
@@ -194,7 +194,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuFarmacia"),
-    title: "Farmácias em Carlópolis",
+    title: "Farmácias ",
     establishments: [
 
       {
@@ -299,7 +299,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuChurrasqueiro"),
-    title: "Churrasqueiros em Carlópolis",
+    title: "Churrasqueiros ",
     establishments: [{
       name: "Pituka",
       contact: "(43) 7890-1234"
@@ -313,7 +313,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuBabas"),
-    title: "Babas em Carlópolis",
+    title: "Babas ",
     establishments: [{
       name: "Maria",
       contact: "(43) 7890-1234"
@@ -327,7 +327,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuDiarista"),
-    title: "Diarias em Carlópolis",
+    title: "Diaristas",
     establishments: [{
       name: "Rose",
       contact: "(43) 7890-1234"
@@ -341,7 +341,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuEletricista"),
-    title: "Eletrecistas em Carlópolis",
+    title: "Eletrecistas",
     establishments: [{
       name: "Juca",
       contact: "(43) 7890-1234"
@@ -355,7 +355,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuEncanador"),
-    title: "Encanador em Carlópolis",
+    title: "Encanador",
     establishments: [{
       name: "Rubens",
       contact: "(43) 7890-1234"
@@ -369,7 +369,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuGuiaPesca"),
-    title: "Guia de Pesca em Carlópolis",
+    title: "Guia de Pesca",
     establishments: [{
       name: "Fabio Sushimoto",
       contact: "(43) 7890-1234"
@@ -383,7 +383,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuJardineiro"),
-    title: "Jardineiros em Carlópolis",
+    title: "Jardineiros ",
     establishments: [{
       name: "Antonio Gil",
       contact: "(43) 7890-1234"
@@ -397,7 +397,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuMarceneiro"),
-    title: "Marceneiros em Carlópolis",
+    title: "Marceneiros ",
     establishments: [{
       name: "Pedro alvez",
       contact: "(43) 7890-1234"
@@ -411,7 +411,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuPedreiro"),
-    title: "Pedreiros em Carlópolis",
+    title: "Pedreiros ",
     establishments: [{
       image: "images/servicos/pedreiro/denis2.png",
       name: "Denis centurion",
@@ -426,7 +426,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuPintor"),
-    title: "Pintor em Carlópolis",
+    title: "Pintor ",
     establishments: [{
       name: "Rafael portes",
       contact: "(43) 7890-1234"
@@ -440,7 +440,7 @@ overlay.addEventListener("click", function () {
 
   {
     link: document.querySelector("#menuVeterinario"),
-    title: "Veterinario em Carlópolis",
+    title: "Veterinario ",
     establishments: [{
       name: "Celso Golçalves",
       contact: "(43) 7890-1234"
@@ -499,7 +499,7 @@ overlay.addEventListener("click", function () {
 
     link: document.querySelector("#menuHospital"),
 
-    title: "Hospital em Carlopolis",
+    title: "Hospital ",
     establishments: [{
       name: "Hospital São Jose",
       address: "R. Cap. Estácio, 460",
@@ -514,19 +514,10 @@ overlay.addEventListener("click", function () {
     },]
   },
 
-
-
-
-
-
-
-
-
-
   {
 
     link: document.querySelector("#menuHorarioOnibus"),
-    title: "Hoario de Onibus em Carlópolis",
+    title: "Horario de Onibus em Carlópolis",
     establishments: [{
       name: "Princesa",
       contact: "(43) 2345-6789",
