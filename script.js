@@ -17,6 +17,35 @@ document.addEventListener("DOMContentLoaded", function () {
   // volta aqui
 
 
+  const overlay = document.querySelector("#overlay");
+
+
+  // Quando clicar no menu, abre a sidebar e ativa o fundo escuro
+  sidebarOpen.addEventListener("click", function () {
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("active");
+  });
+
+// Quando clicar fora do menu, fecha a sidebar
+overlay.addEventListener("click", function () {
+  sidebar.classList.remove("open");
+  overlay.classList.remove("active");
+});
+
+  // Criar um botão "X" para fechar o menu
+  const closeButton = document.createElement("button");
+  closeButton.innerHTML = "&times;";
+  closeButton.classList.add("close-btn");
+  closeButton.addEventListener("click", function () {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("active");
+  });
+
+
+  sidebar.appendChild(closeButton);
+
+
+
   document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("content_area").classList.remove("hidden");
   });
@@ -93,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function () {
     link: document.querySelector("#menuMercado"),
     title: "Supermercados em Carlópolis",
     establishments: [{
-      name: "Rochaa", 
+      name: "Rocha",
       hours: "6h - 20h e dom: 06 - 12h",
       address: "Av. Elson Soares, 767 ",
       contact: "(43) 3566-2436",
