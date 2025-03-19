@@ -648,7 +648,7 @@ body.dark {
   .container {
     max-width: 100%;
     /* Ocupa toda a largura da tela em telas menores */
-    padding: 0 10px;
+    padding: 0 3px;
     /* Reduz o padding */
   }
 
