@@ -73,7 +73,8 @@
                <li class="item">
                   <a href="index.html" class="nav_link">
                      <span class="navlink_icon"><i style="color:rgb(1, 5, 1)" class="fa-solid fa-house"></i></span>
-                     <span class="navlink bold">Início</span> <span id="contador"style="margin:0px 0px 0px 7px"> 0</span>
+                     <span class="navlink bold">Início</span> <span id="contador" style="margin:0px 0px 0px 7px">
+                        0</span>
 
                   </a>
                </li>
@@ -387,7 +388,7 @@
                      <span class="navlink_icon">
                         <i style="color:rgb(16, 155, 35)" class="fa-brands fa-whatsapp"></i>
                      </span>
-                     <span class="navlink bold">Quero Participar!</span> 
+                     <span class="navlink bold">Quero Participar!</span>
                   </a>
                </li>
             </ul>
@@ -572,17 +573,7 @@
    <script>
 
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
-
-
-
-
-
-
-
-
-
+import { getDatabase, ref, push, onDisconnect, onValue } from "firebase/database";
 
 
       // Configuração do Firebase
@@ -594,35 +585,29 @@ import { getAnalytics } from "firebase/analytics";
          storageBucket: "contadoracessos.firebasestorage.app",
          messagingSenderId: "521517291315",
          appId: "1:521517291315:web:74f8d878d2d8769460d046",
-  measurementId: "G-BXPWYWK61F"
+         measurementId: "G-BXPWYWK61F"
       };
-
-      // Initialize Firebase
+      // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const database = getDatabase(app);
 
-      // Inicializa Firebase
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.database().ref("onlineUsers");
+// Referência para o nó de usuários online
+const onlineUsersRef = ref(database, "onlineUsers");
 
-      // Atualiza contador de usuários online
-      const userRef = db.push();
-      userRef.set(true);
-      userRef.onDisconnect().remove(); // Remove usuário ao sair
+// Adiciona um novo usuário online
+const userRef = push(onlineUsersRef);
+userRef.set(true);
 
-      // Exibe contador na tela
-      db.on("value", (snapshot) => {
-         document.getElementById("contador").innerText = snapshot.numChildren();
-      });
+// Remove o usuário ao sair
+onDisconnect(userRef).remove();
 
+// Atualiza o contador de usuários online
+onValue(onlineUsersRef, (snapshot) => {
+  const userCount = snapshot.size; // Número de usuários online
+  document.getElementById("contador").innerText = userCount;
+});
 
-
-   </script>
-
-
-
-
-
+      </script>
 
 
 
