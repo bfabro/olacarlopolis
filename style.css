@@ -949,12 +949,17 @@ img {
 */
 
 .carrossel-container h2 {
-  font-size: 2rem;
+  color: #2E8B57; /* Verde folha para um visual confiável */
+  font-size: 1.5rem; /* Ajuste o tamanho conforme necessário */
   font-weight: bold;
-  color: white;
-  text-shadow: 0 0 5px #ff8c00, 0 0 10px #ff4500, 0 0 20px #ff0000;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra leve */
+  border-bottom: 4px solid #FF8C00; /* Linha laranja embaixo */
+  padding-bottom: 5px;
+  display: inline-block;
   text-align: center;
-  padding: 8px;
+  margin-bottom: 15px; /* Espaçamento para separar dos elementos abaixo */
 }
 
 
