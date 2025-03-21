@@ -638,7 +638,22 @@ body.dark {
 
 
 
+@media screen and (min-width: 1024px) { /* Apenas para computadores */
+  .swiper-turismo .swiper-slide img,
+  .swiper-eventos .swiper-slide img {
+    max-width: 450px; /* Ajuste o tamanho conforme necessário */
+    height: 400px; /* Mantém uma altura proporcional */
+    object-fit: cover; /* Garante que a imagem preencha o espaço sem distorção */
+    border-radius: 10px; /* Bordas arredondadas para um visual mais agradável */
+  }
 
+  .swiper-turismo .swiper-slide,
+  .swiper-eventos .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
 
 
 
@@ -879,25 +894,76 @@ img {
 .carrossel-container {
   max-width: 95%; /* Ajuste conforme necessário */
   margin: 0 auto; /* Centralizar o carrossel */
-
-  margin: 0 auto; /* Centraliza o carrossel */
   padding: 20px; /* Espaçamento interno */
   background-color: #f9f9f9; /* Fundo claro para o contêiner */
   border-radius: 15px; /* Bordas arredondadas */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra sutil */
 }
+/*
+.carrossel-container h2 {
+/*  font-size: 1.5rem; /* Tamanho maior para o título */
+/*  text-align: center; /* Centraliza o título */
+ /* margin-bottom: 30px; /* Espaçamento abaixo do título */
+ /* font-weight: bold; /* Texto em negrito */
+ /* letter-spacing: 2px; /* Espaçamento entre as letras */
+ /* background: linear-gradient(90deg, #2E8B57, #FF8C00); /* Gradiente verde e laranja */
+ /* -webkit-background-clip: text; /* Aplica o gradiente ao texto */
+ /* color: transparent; /* Torna o texto transparente para mostrar o gradiente */
+ /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra sutil para dar destaque */
+/*} */
+
+
+
+
+
+
+   /* .carrossel-container h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: rgb(4, 7, 7);
+      text-shadow: 0 0 5px rgb(219, 123, 13), 0 0 10px rgb(202, 41, 20), 0 0 20px rgb(161, 89, 30);
+      text-align: center;
+      padding: 20px;
+    }
+*/
+/*
+    .carrossel-container h2 {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: -2px 0px 5px #ff8c00, 2px 0px 5px #ff0080;/*
+      text-shadow: 0 0 5px rgb(100, 74, 248), 0 0 10px rgb(74, 58, 216), 0 0 20px rgb(12, 26, 145);
+      animation: glitch 0.3s infinite alternate;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    @keyframes glitch {
+      from {
+        transform: translateX(-2px);
+      }
+      to {
+        transform: translateX(2px);
+      }
+    }
+*/
 
 .carrossel-container h2 {
-  font-size: 1.5rem; /* Tamanho maior para o título */
-  text-align: center; /* Centraliza o título */
-  margin-bottom: 30px; /* Espaçamento abaixo do título */
-  font-weight: bold; /* Texto em negrito */
-  letter-spacing: 2px; /* Espaçamento entre as letras */
-  background: linear-gradient(90deg, #2E8B57, #FF8C00); /* Gradiente verde e laranja */
-  -webkit-background-clip: text; /* Aplica o gradiente ao texto */
-  color: transparent; /* Torna o texto transparente para mostrar o gradiente */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra sutil para dar destaque */
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 0 5px #ff8c00, 0 0 10px #ff4500, 0 0 20px #ff0000;
+  text-align: center;
+  padding: 8px;
 }
+
+
+
+
+
+
+
+
 
 /* Estilo para o separador entre os carrosséis */
 .separador {
