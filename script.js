@@ -16,22 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const clearSearch = document.getElementById("clearSearch");
 
 
-
-
-/// INICIO contador de acessos
-
-
-
-
-
-
-
-
-/// FIM CONTADOR DE ACESSOS
-
-
-
-  
+ 
   // Inicio pesquisa nome no menu lateral
 
   // Inicializa o carrossel de Turismo

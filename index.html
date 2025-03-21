@@ -33,6 +33,8 @@
    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+
 </head>
 
 <body>
@@ -577,7 +579,7 @@
       const firebaseConfig = {
          apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
          authDomain: "contadoracessos.firebaseapp.com",
-         
+         databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com", // Certifique-se de que esta URL está correta
          projectId: "contadoracessos",
          storageBucket: "contadoracessos.firebasestorage.app",
          messagingSenderId: "521517291315",
@@ -585,26 +587,26 @@
          measurementId: "G-BXPWYWK61F"
       };
       // Inicializa o Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
 
-// Referência para o nó de usuários online
-const onlineUsersRef = ref(database, "onlineUsers");
+      // Referência para o nó de usuários online
+      const onlineUsersRef = ref(database, "onlineUsers");
 
-// Adiciona um novo usuário online
-const userRef = push(onlineUsersRef);
-userRef.set(true);
+      // Adiciona um novo usuário online
+      const userRef = push(onlineUsersRef);
+      userRef.set(true);
 
-// Remove o usuário ao sair
-onDisconnect(userRef).remove();
+ // Remove o usuário ao sair
+ firebase.onDisconnect(userRef).remove();
 
-// Atualiza o contador de usuários online
-onValue(onlineUsersRef, (snapshot) => {
-  const userCount = snapshot.size; // Número de usuários online
-  document.getElementById("contador").innerText = userCount;
-});
+     // Atualiza o contador de usuários online
+  firebase.onValue(onlineUsersRef, (snapshot) => {
+    const userCount = snapshot.size; // Número de usuários online
+    document.getElementById("contador").innerText = userCount;
+  });
 
-      </script>
+   </script>
 
 
 
