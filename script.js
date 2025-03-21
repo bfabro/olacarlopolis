@@ -13,8 +13,9 @@ document.addEventListener("DOMContentLoaded", function() {
   const searchInput = document.getElementById("searchSidebar");
   const overlay = document.querySelector("#overlay");
   const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
-
   const clearSearch = document.getElementById("clearSearch");
+
+  
   // Inicio pesquisa nome no menu lateral
 
   // Inicializa o carrossel de Turismo
@@ -48,6 +49,37 @@ document.addEventListener("DOMContentLoaded", function() {
           crossFade: true, // Faz o fade suave entre os slides
       },
   });
+
+
+
+/// inicio cardapio
+
+
+
+
+
+
+
+
+
+
+/// f
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
