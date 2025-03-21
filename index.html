@@ -61,8 +61,9 @@
             </a>
          </div>
          <div class="navbar_content">
-            <i class="bi bi-grid"></i>
-            <i class='bx bx-sun' id="darkLight"></i>
+            <i class="bi bi-grid">
+            <i class='bx bx-sun' id="darkLight"><span id="contador" style="margin:0px 0px 0px 15px">
+               0</span></i></i>
             <!-- <i class='bx bx-bell' ></i>-->
          </div>
       </nav>
@@ -80,8 +81,7 @@
                <li class="item">
                   <a href="index.html" class="nav_link">
                      <span class="navlink_icon"><i style="color:rgb(1, 5, 1)" class="fa-solid fa-house"></i></span>
-                     <span class="navlink bold">Início</span> <span id="contador" style="margin:0px 0px 0px 7px">
-                        0</span>
+                     <span class="navlink bold">Início</span> 
 
                   </a>
                </li>
@@ -582,8 +582,7 @@
  const firebaseConfig = {
     apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
     authDomain: "contadoracessos.firebaseapp.com",
-    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",                 
-
+    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
     projectId: "contadoracessos",
     storageBucket: "contadoracessos.firebasestorage.app",
     messagingSenderId: "521517291315",
