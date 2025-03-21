@@ -1,449 +1,453 @@
 <!DOCTYPE html>
 <html lang="br">
-   <head>
-      <!-- Google tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-5YS63QMFHW"></script>
-      <script>
-         window.dataLayer = window.dataLayer || [];
-         function gtag() { dataLayer.push(arguments); }
-         gtag('js', new Date());
-         gtag('config', 'G-5YS63QMFHW');
-      </script>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta name="description"
-         content="Bem-vindo ao Ola Carlópolis! Encontre comércios, Serviços e Informações úteis na Cidade de Carlópolis.">
-      <meta name="keywords"
-         content="Carlópolis, Comércios, Serviços, informações, Eventos, Farmácias, Lotérica, Turismo, Vagas de trabalho,Lanchonetes, RotaPr218,angradoce">
-      <meta name="author" content="Bruno Fabro">
-      <meta name="robots" content="index, follow">
-      <!-- Boxicons CSS -->
-      <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-      <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-      <link rel="stylesheet" href="https://blade-ui-kit.com/build/assets/app-4a434763.css" />
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-      <title>Bem vindo ao OLA Carlópolis !!!</title>
-      <link rel="stylesheet" href="style.css" />
-      <!-- No <head> -->
-      <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-      <!-- No final do <body>, antes de fechar </body> -->
-      <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-   </head>
-   <body>
-      <div class="container">
-         <!-- navbar -->
-         <nav class="navbar">
-            <div class="logo_item">
-               <i class="bx bx-menu" id="sidebarOpen"></i> <!-- Ícone do menu -->
-               <div class="overlay" id="overlay"></div>
-               <!-- Sobreposição de fundo -->
-               <a href="index.html">
-                  <!--   <img src="images/img_padrao_site/logo.png" alt="Logo do Ola Carlópolis">-->
-               </a>
-               <a href="index.html" style="  font-size: 1.5rem;
+
+<head>
+   <!-- Google tag (gtag.js) -->
+   <script async src="https://www.googletagmanager.com/gtag/js?id=G-5YS63QMFHW"></script>
+   <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-5YS63QMFHW');
+   </script>
+
+
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description"
+      content="Bem-vindo ao Ola Carlópolis! Encontre comércios, Serviços e Informações úteis na Cidade de Carlópolis.">
+   <meta name="keywords"
+      content="Carlópolis, Comércios, Serviços, informações, Eventos, Farmácias, Lotérica, Turismo, Vagas de trabalho,Lanchonetes, RotaPr218,angradoce">
+   <meta name="author" content="Bruno Fabro">
+   <meta name="robots" content="index, follow">
+   <!-- Boxicons CSS -->
+   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+   <link rel="stylesheet" href="https://blade-ui-kit.com/build/assets/app-4a434763.css" />
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+   <title>Bem vindo ao OLA Carlópolis !!!</title>
+   <link rel="stylesheet" href="style.css" />
+   <!-- No <head> -->
+   <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+   <!-- No final do <body>, antes de fechar </body> -->
+   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+</head>
+
+<body>
+   <div class="container">
+      <!-- navbar -->
+      <nav class="navbar">
+         <div class="logo_item">
+            <i class="bx bx-menu" id="sidebarOpen"></i> <!-- Ícone do menu -->
+            <div class="overlay" id="overlay"></div>
+            <!-- Sobreposição de fundo -->
+            <a href="index.html">
+               <!--   <img src="images/img_padrao_site/logo.png" alt="Logo do Ola Carlópolis">-->
+            </a>
+            <a href="index.html" style="  font-size: 1.5rem;
                font-weight: bold;
                color: white;
                text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 20px var(--blue-color);
-               margin :0px 0px 0px 40px">Ola Carlópolis
-               !!!</a>
-            </div>
-            <div class="navbar_content">
-               <i class="bi bi-grid"></i>
-               <i class='bx bx-sun' id="darkLight"></i>
-               <!-- <i class='bx bx-bell' ></i>-->
-            </div>
-         </nav>
-         <!-- sidebar -->
-         <nav class="sidebar">
-            <div class="search_sidebar">
-               <input type="text" id="searchSidebar" placeholder="Pesquise a Categoria">
-               <i class='bx bx-x' id="clearSearch"></i> <!-- Ícone "x" para limpar a pesquisa -->
-            </div>
-            <div class="menu_content">
-               <ul class="menu_items">
-                  <!--<div class="menu_title menu_dahsboard"></div>
+               margin :0px 0px 0px 40px">Ola Carlópolis !!!
+            </a>
+         </div>
+         <div class="navbar_content">
+            <i class="bi bi-grid"></i>
+            <i class='bx bx-sun' id="darkLight"></i>
+            <!-- <i class='bx bx-bell' ></i>-->
+         </div>
+      </nav>
+      <!-- sidebar -->
+      <nav class="sidebar">
+         <div class="search_sidebar">
+            <input type="text" id="searchSidebar" placeholder="Pesquise a Categoria">
+            <i class='bx bx-x' id="clearSearch"></i> <!-- Ícone "x" para limpar a pesquisa -->
+         </div>
+         <div class="menu_content">
+            <ul class="menu_items">
+               <!--<div class="menu_title menu_dahsboard"></div>
                      duplicate or remove this li tag if you want to add or remove navlink with submenu -->
-                  <!-- start -->
-                  <li class="item">
-                     <a href="index.html" class="nav_link">
+               <!-- start -->
+               <li class="item">
+                  <a href="index.html" class="nav_link">
                      <span class="navlink_icon"><i style="color:rgb(1, 5, 1)" class="fa-solid fa-house"></i></span>
-                     <span class="navlink bold">Início</span>
-                     </a>
-                  </li>
-                  <li class="item">
-                     <div href="#" class="nav_link submenu_item">
-                        <span class="navlink_icon">
+                     <span class="navlink bold">Início</span> <span id="contador"style="margin:0px 0px 0px 7px"> 0</span>
+
+                  </a>
+               </li>
+               <li class="item">
+                  <div href="#" class="nav_link submenu_item">
+                     <span class="navlink_icon">
                         <i style="color:rgb(43, 175, 26)" class="bx bxs-store"></i>
-                        </span>
-                        <span id="menuComercio" class="navlink bold">Comercios</span>
-                        <i class="bx bx-chevron-right arrow-left"></i>
-                     </div>
-                     <ul class="menu_items submenu">
-                        <a id="menuAdega" href="#" class="nav_link sublink">
+                     </span>
+                     <span id="menuComercio" class="navlink bold">Comercios</span>
+                     <i class="bx bx-chevron-right arrow-left"></i>
+                  </div>
+                  <ul class="menu_items submenu">
+                     <a id="menuAdega" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgba(255, 25, 140, 0.856)"
-                           class="fa-solid fa-wine-bottle"></i></span>
+                              class="fa-solid fa-wine-bottle"></i></span>
                         <span class="navlink">Adega</span>
-                        </a>
-                        <a id="menuAdvocacia" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuAdvocacia" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgba(0, 0, 0, 0.856)"
-                           class="fa-solid fa-scale-balanced"></i></span>
+                              class="fa-solid fa-scale-balanced"></i></span>
                         <span class="navlink">Advocacia</span>
-                        </a>
-                        <a id="menuAcougue" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgba(175, 115, 26, 0.76)" class="fa-solid fa-cow"></i></span>
+                     </a>
+                     <a id="menuAcougue" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgba(175, 115, 26, 0.76)"
+                              class="fa-solid fa-cow"></i></span>
                         <span class="navlink">Açougue</span>
-                        </a>
-                        <a id="menuAgropecuaria" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuAgropecuaria" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(43, 175, 26)"
-                           class="fa-solid fa-building-wheat"></i></span>
+                              class="fa-solid fa-building-wheat"></i></span>
                         <span class="navlink">Agropecuaria</span>
-                        </a>
-                        <a id="menuAssistenciaCelular" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuAssistenciaCelular" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(211, 0, 158)"
-                           class="fa-solid fa-mobile-retro"></i></span>
+                              class="fa-solid fa-mobile-retro"></i></span>
                         <span class="navlink">Assistencia Celular</span>
-                        </a>
-                        <a id="menuAutoCenter" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-car-side"></i></span>
+                     </a>
+                     <a id="menuAutoCenter" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
+                              class="fa-solid fa-car-side"></i></span>
                         <span class="navlink">Auto Center</span>
-                        </a>
-                        <a id="menuEletrico" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-car-side"></i></span>
+                     </a>
+                     <a id="menuEletrico" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
+                              class="fa-solid fa-car-side"></i></span>
                         <span class="navlink">Auto Eletrico</span>
-                        </a>
-                        <a id="menuAutoMecanica" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-car-side"></i></span>
+                     </a>
+                     <a id="menuAutoMecanica" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
+                              class="fa-solid fa-car-side"></i></span>
                         <span class="navlink">Auto Mecanica</span>
-                        </a>
-                        <a id="menuAutoPecas" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-car-side"></i></span>
+                     </a>
+                     <a id="menuAutoPecas" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
+                              class="fa-solid fa-car-side"></i></span>
                         <span class="navlink">Auto Pecas</span>
-                        </a>
-                        <a id="menuBancos" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuBancos" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(255, 208, 0)"
-                           class="fa-solid fa-money-check-dollar"></i></span>
+                              class="fa-solid fa-money-check-dollar"></i></span>
                         <span class="navlink">Bancos</span>
-                        </a>
-                        <a id="menuBicicletaria" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuBicicletaria" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-bicycle"></i></span>
                         <span class="navlink">Bicicletaria</span>
-                        </a>
-                        <a id="menuBiorracharia" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuBiorracharia" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-truck-monster"></i></span>
                         <span class="navlink">Borracharia</span>
-                        </a>
-                        <a id="menuBrinquedos" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuBrinquedos" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(50, 207, 199)"
-                           class="fa-solid fa-child-reaching"></i></span>
+                              class="fa-solid fa-child-reaching"></i></span>
                         <span class="navlink">Brinquedos</span>
-                        </a>
-                        <a id="menuCalhas" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuCalhas" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-cloud-showers-water"></i></span>
                         <span class="navlink">Calhas</span>
-                        </a>
-                        <a id="menuCeramica" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(201, 0, 0)" class="fa-solid fa-trowel-bricks"></i></span>
+                     </a>
+                     <a id="menuCeramica" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(201, 0, 0)"
+                              class="fa-solid fa-trowel-bricks"></i></span>
                         <span class="navlink">Ceramica</span>
-                        </a>
-                        <a id="menuConstrutora" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuConstrutora" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-hammer"></i></span>
                         <span class="navlink">Construtora</span>
-                        </a>
-                        <a id="menuDiskGas" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(35, 46, 207)" class="fa-solid fa-kitchen-set"></i></span>
+                     </a>
+                     <a id="menuDiskGas" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(35, 46, 207)"
+                              class="fa-solid fa-kitchen-set"></i></span>
                         <span class="navlink">Disk Gas</span>
-                        </a>
-                        <a id="menuFarmacia" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)" class="fa-solid fa-house-medical"></i></span>
+                     </a>
+                     <a id="menuFarmacia" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
+                              class="fa-solid fa-house-medical"></i></span>
                         <span class="navlink">Farmacia</span>
-                        </a>
-                        <a id="menuFuneraria" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuFuneraria" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-skull"></i></span>
                         <span class="navlink">Funeraria</span>
-                        </a>
-                        <a id="menuGesso" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuGesso" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-people-roof"></i></span>
                         <span class="navlink">Gesso</span>
-                        </a>
-                        <a id="menuGrafica" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuGrafica" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-compass-drafting"></i></span>
                         <span class="navlink">Grafica</span>
-                        </a>
-                        <a id="menuImobiliaria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(85, 29, 240)" class="fa-solid fa-landmark"></i></span>
+                     </a>
+                     <a id="menuImobiliaria" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(85, 29, 240)"
+                              class="fa-solid fa-landmark"></i></span>
                         <span class="navlink">Imobiliaria</span>
-                        </a>
-                        <a id="menuLanchonete" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(238, 199, 26)" class="fas fa-hamburger"></i></span>
+                     </a>
+                     <a id="menuLanchonete" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(238, 199, 26)"
+                              class="fas fa-hamburger"></i></span>
                         <span class="navlink">Lanchonete</span>
-                        </a>
-                        <a id="menuLavaRapido" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuLavaRapido" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-car-on"></i></span>
                         <span class="navlink">Lava Rapido</span>
-                        </a>
-                        <a id="menuLoterica" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuLoterica" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgba(231, 198, 9, 0.836)"
-                           class="fa-solid fa-sack-dollar"></i></span>
+                              class="fa-solid fa-sack-dollar"></i></span>
                         <span class="navlink">Loterica</span>
-                        </a>
-                        <a id="menuMaterialContrucao" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuMaterialContrucao" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(100, 98, 98)"
-                           class="fa-solid fa-person-digging"></i></span>
+                              class="fa-solid fa-person-digging"></i></span>
                         <span class="navlink">Material Construção</span>
-                        </a>
-                        <a id="menuMarmoraria" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuMarmoraria" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(100, 98, 98)"
-                           class="fa-solid fa-person-digging"></i></span>
+                              class="fa-solid fa-person-digging"></i></span>
                         <span class="navlink">Marmoraria</span>
-                        </a>
-                        <a id="menuPadaria" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuPadaria" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-bread-slice"></i></span>
                         <span class="navlink">Padaria</span>
-                        </a>
-                        <a id="menuPapelaria" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuPapelaria" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-paperclip"></i></span>
                         <span class="navlink">Papelaria</span>
-                        </a>
-                        <a id="menuPetShop" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuPetShop" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(43, 175, 26)" class="fa-solid fa-paw"></i></span>
                         <span class="navlink">PetShop</span>
-                        </a>
-                        <a id="menuProdutosNaturais" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(30, 128, 17)" class="fa-solid fa-leaf"></i></span>
+                     </a>
+                     <a id="menuProdutosNaturais" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(30, 128, 17)"
+                              class="fa-solid fa-leaf"></i></span>
                         <span class="navlink">Produtos Naturais</span>
-                        </a>
-                        <a id="menuMotoCenter" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-motorcycle"></i></span>
+                     </a>
+                     <a id="menuMotoCenter" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
+                              class="fa-solid fa-motorcycle"></i></span>
                         <span class="navlink">Moto Center</span>
-                        </a>
-                        <a id="menuQuitanda" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 105, 5)" class="fa-solid fa-carrot"></i></span>
+                     </a>
+                     <a id="menuQuitanda" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(255, 105, 5)"
+                              class="fa-solid fa-carrot"></i></span>
                         <span class="navlink">Quitanda</span>
-                        </a>
-                        <a id="menuRadio" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuRadio" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-radio"></i></span>
                         <span class="navlink">Radio</span>
-                        </a>
-                        <a id="menuRestaurantes" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)" class="fas fa-utensils icon"></i></span>
+                     </a>
+                     <a id="menuRestaurantes" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
+                              class="fas fa-utensils icon"></i></span>
                         <span class="navlink">Restaurante</span>
-                        </a>
-                        <a id="menuRoupas" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(209, 13, 167)" class="fa-solid fa-shirt"></i></span>
+                     </a>
+                     <a id="menuRoupas" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(209, 13, 167)"
+                              class="fa-solid fa-shirt"></i></span>
                         <span class="navlink">Roupas</span>
-                        </a>
-                        <a id="menuMercado" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuMercado" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(100, 98, 98)"
-                           class="fas fa-shopping-cart icon"></i></span>
+                              class="fas fa-shopping-cart icon"></i></span>
                         <span class="navlink">SuperMercado</span>
-                        </a>
-                        <a id="menuTerraPlanagem" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuTerraPlanagem" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-person-digging"></i></span>
                         <span class="navlink">Terraplanagem</span>
-                        </a>
-                        <a id="menuSorveteria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 204, 255)" class="fa-solid fa-ice-cream"></i></span>
+                     </a>
+                     <a id="menuSorveteria" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(0, 204, 255)"
+                              class="fa-solid fa-ice-cream"></i></span>
                         <span class="navlink">Sorveteria</span>
-                        </a>
-                     </ul>
-                  </li>
-                  <!-- end -->
-                  <li class="item">
-                     <div href="#" class="nav_link submenu_item">
-                        <span class="navlink_icon">
+                     </a>
+                  </ul>
+               </li>
+               <!-- end -->
+               <li class="item">
+                  <div href="#" class="nav_link submenu_item">
+                     <span class="navlink_icon">
                         <i style="color:rgb(219, 173, 20)" class="fa-solid fa-user"></i>
-                        </span>
-                        <span class="navlink bold">Serviços</span>
-                        <i class="bx bx-chevron-right arrow-left"></i>
-                     </div>
-                     <ul class="menu_items submenu">
-                        <a id="menuBabas" href="#" class="nav_link sublink">
+                     </span>
+                     <span class="navlink bold">Serviços</span>
+                     <i class="bx bx-chevron-right arrow-left"></i>
+                  </div>
+                  <ul class="menu_items submenu">
+                     <a id="menuBabas" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(228, 30, 185)" class="fas fa-baby"></i></span>
                         <span class="navlink">Babas</span>
-                        </a>
-                        <a id="menuDiarista" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuDiarista" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(179, 124, 23)" class="fas fa-broom"></i></span>
                         <span class="navlink">Diarista</span>
-                        </a>
-                        <a id="menuChurrasqueiro" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuChurrasqueiro" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
-                           class="fa-solid fa-drumstick-bite"></i></span>
+                              class="fa-solid fa-drumstick-bite"></i></span>
                         <span class="navlink">Churrasqueiro</span>
-                        </a>
-                        <a id="menuEletricista" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(224, 211, 24)" class="fas fa-lightbulb"></i></span>
+                     </a>
+                     <a id="menuEletricista" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(224, 211, 24)"
+                              class="fas fa-lightbulb"></i></span>
                         <span class="navlink">Eletricista</span>
-                        </a>
-                        <a id="menuEncanador" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuEncanador" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(100, 98, 98)" class="fas fa-wrench"></i></span>
                         <span class="navlink">Encanador</span>
-                        </a>
-                        <a id="menuGuiaPesca" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuGuiaPesca" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(38, 23, 172)"
-                           class="fa-solid fa-fish-fins"></i></i></span>
+                              class="fa-solid fa-fish-fins"></i></i></span>
                         <span class="navlink">Guia de Pesca</span>
-                        </a>
-                        <a id="menuJardineiro" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuJardineiro" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(75, 146, 9)" class="fa-solid fa-tree"></i></span>
                         <span class="navlink">Jardineiro</span>
-                        </a>
-                        <a id="menuMarceneiro" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuMarceneiro" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(121, 78, 22)" class="fas fa-hammer"></i></span>
                         <span class="navlink">Marceneiro</span>
-                        </a>
-                        <a id="menuPedreiro" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuPedreiro" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(121, 78, 22)" class="fas fa-hard-hat"></i></span>
                         <span class="navlink">Pedreiro</span>
-                        </a>
-                        <a id="menuPintor" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(121, 78, 22)" class="fa-solid fa-paintbrush"></i></span>
+                     </a>
+                     <a id="menuPintor" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(121, 78, 22)"
+                              class="fa-solid fa-paintbrush"></i></span>
                         <span class="navlink">Pintor</span>
-                        </a>
-                        <a id="menuVeterinario" href="#" class="nav_link sublink">
+                     </a>
+                     <a id="menuVeterinario" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:blue" class="fa-solid fa-shield-dog"></i></span>
                         <span class="navlink">Veterinario</span>
-                        </a>
-                     </ul>
-                  </li>
-                  <li class="item">
-                     <div href="#" class="nav_link submenu_item">
-                        <span class="navlink_icon">
-                        <i style="color:rgb(218, 30, 30)" class="fa-solid fa-circle-info"></i>
-                        </span>
-                        <span class="navlink bold">informações Uteis</span>
-                        <i class="bx bx-chevron-right arrow-left"></i>
-                     </div>
-                     <ul class="menu_items submenu">
-                        <a id="menuDelegacia" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 24, 240)"
-                           class="fa-solid fa-person-military-pointing"></i></span>
-                        <span class="navlink">Delegacia</span>
-                        </a>
-                        <a id="menuEventos" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(44, 192, 180)"
-                           class="fa-regular fa-calendar-days"></i></span>
-                        <span class="navlink">Eventos</span>
-                        </a>
-                        <a id="menufarmaciaPlantao" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)" class="bx bx-plus-medical"></i></span>
-                        <span class="navlink">Farmacias de Plantão</span>
-                        </a>
-                        <a id="menuHospital" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
-                           class="fa-solid fa-house-medical"></i></i></span>
-                        <span class="navlink">Hospital</span>
-                        </a>
-                        <a id="menuPrefeitura" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgba(160, 120, 12, 0.829)"
-                           class="fa-solid fa-building-columns"></i></span>
-                        <span class="navlink">Prefeitura</span>
-                        </a>
-                        <a id="menuVagasTrabalho" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(121, 78, 22)" class="fa-solid fa-handshake"></i></span>
-                        <span class="navlink">Vagas de Trabalho</span>
-                        </a>
-                     </ul>
-                  </li>
-               </ul>
-               <!-- end -->
-               <ul class="menu_items">
-                  <div class="menu_title menu_setting"></div>
-                  <li class="item">
-                     <a href="https://wa.me/+5511998985930?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20o%20site%20Ola%20Carlópolis."
-                        target="_blank" class="nav_link">
-                     <span class="navlink_icon">
-                     <i style="color:rgb(16, 155, 35)" class="fa-brands fa-whatsapp"></i>
-                     </span>
-                     <span class="navlink bold">Quero Participar!</span>
                      </a>
-                  </li>
-               </ul>
-               <!-- Sidebar Open / Close -->
-               <div class="bottom_content">
-                  <div class="bottom expand_sidebar">
-                     <span> </span>
-                     <i class='bx bx-log-in'></i>
+                  </ul>
+               </li>
+               <li class="item">
+                  <div href="#" class="nav_link submenu_item">
+                     <span class="navlink_icon">
+                        <i style="color:rgb(218, 30, 30)" class="fa-solid fa-circle-info"></i>
+                     </span>
+                     <span class="navlink bold">informações Uteis</span>
+                     <i class="bx bx-chevron-right arrow-left"></i>
                   </div>
-                  <div class="bottom collapse_sidebar">
-                     <span> </span>
-                     <i class='bx bx-log-out'></i>
-                  </div>
+                  <ul class="menu_items submenu">
+                     <a id="menuDelegacia" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(0, 24, 240)"
+                              class="fa-solid fa-person-military-pointing"></i></span>
+                        <span class="navlink">Delegacia</span>
+                     </a>
+                     <a id="menuEventos" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(44, 192, 180)"
+                              class="fa-regular fa-calendar-days"></i></span>
+                        <span class="navlink">Eventos</span>
+                     </a>
+                     <a id="menufarmaciaPlantao" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
+                              class="bx bx-plus-medical"></i></span>
+                        <span class="navlink">Farmacias de Plantão</span>
+                     </a>
+                     <a id="menuHospital" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
+                              class="fa-solid fa-house-medical"></i></i></span>
+                        <span class="navlink">Hospital</span>
+                     </a>
+                     <a id="menuPrefeitura" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgba(160, 120, 12, 0.829)"
+                              class="fa-solid fa-building-columns"></i></span>
+                        <span class="navlink">Prefeitura</span>
+                     </a>
+
+                     <a id="menuTurismo" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(121, 78, 22)"
+                              class="fa-solid fa-handshake"></i></span>
+                        <span class="navlink">Turismo</span>
+                     </a>
+                     <a id="menuVagasTrabalho" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(121, 78, 22)"
+                              class="fa-solid fa-handshake"></i></span>
+                        <span class="navlink">Vagas de Trabalho</span>
+                     </a>
+                  </ul>
+               </li>
+            </ul>
+            <!-- end -->
+            <ul class="menu_items">
+               <div class="menu_title menu_setting"></div>
+               <li class="item">
+                  <a href="https://wa.me/+5511998985930?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20o%20site%20Ola%20Carlópolis."
+                     target="_blank" class="nav_link">
+                     <span class="navlink_icon">
+                        <i style="color:rgb(16, 155, 35)" class="fa-brands fa-whatsapp"></i>
+                     </span>
+                     <span class="navlink bold">Quero Participar!</span> 
+                  </a>
+               </li>
+            </ul>
+            <!-- Sidebar Open / Close -->
+            <div class="bottom_content">
+               <div class="bottom expand_sidebar">
+                  <span> </span>
+                  <i class='bx bx-log-in'></i>
+               </div>
+               <div class="bottom collapse_sidebar">
+                  <span> </span>
+                  <i class='bx bx-log-out'></i>
                </div>
             </div>
-         </nav>
-         <div class="content_area" id="content_area">
-            <!-- Carrossel de Turismo -->
-            <div class="carrossel-container">
+         </div>
+      </nav>
+      <div class="content_area" id="content_area">
+         <!-- Carrossel de Turismo -->
+         <div class="carrossel-container">
 
-              <h2>Eventos </h2>
-              <div class="swiper-container swiper-eventos">
-                 <div class="swiper-wrapper">
-                    <!-- Slides de Eventos -->
-                    <div class="swiper-slide">
-                       <img src="images/info_uteis/eventos/evento_2/feira_lua_1.png" alt="Evento 1">
-                       <p>
-                          Feira da Lua toda Sexta-feira</br>
-                          <!-- Ícone de link para mais informações -->
-                          <a href="https://www.youtube.com/watch?v=_GYY3jOJgTY" target="_blank" class="info-link">
-                          <i class='bx bx-link-external'></i> Mais informações
-                          </a>
-                       </p>
-                    </div>
-                    <div class="swiper-slide">
-                       <img src="images/info_uteis/eventos/evento_3/corrida_10.jpg" alt="Evento 2">
-                       <p>Corrida Para Perder Barriga</br><a href="https://www.tuasaude.com/3-exercicios-simples-para-fazer-em-casa-e-perder-barriga/" target="_blank" class="info-link">
-                          <i class='bx bx-link-external'></i> Mais informações
-                          </a>
-                       </p>
-                    </div>
+            <h2>Eventos </h2>
+            <div class="swiper-container swiper-eventos">
+               <div class="swiper-wrapper">
+                  <!-- Slides de Eventos -->
+                  <div class="swiper-slide">
+                     <img src="images/info_uteis/eventos/evento_2/feira_lua_1.png" alt="Evento 1">
+                     <p>
+                        Feira da Lua toda Sexta-feira</br>
+                        <!-- Ícone de link para mais informações -->
+                        <a href="https://www.youtube.com/watch?v=_GYY3jOJgTY" target="_blank" class="info-link">
+                           <i class='bx bx-link-external'></i> Mais informações
+                        </a>
+                     </p>
+                  </div>
+                  <div class="swiper-slide">
+                     <img src="images/info_uteis/eventos/evento_3/corrida_10.jpg" alt="Evento 2">
+                     <p>Corrida Para Perder Barriga</br><a
+                           href="https://www.tuasaude.com/3-exercicios-simples-para-fazer-em-casa-e-perder-barriga/"
+                           target="_blank" class="info-link">
+                           <i class='bx bx-link-external'></i> Mais informações
+                        </a>
+                     </p>
+                  </div>
 
-                    <div class="swiper-slide">
+                  <div class="swiper-slide">
                      <img src="images/turismo/toro.jpg" alt="Ponto Turístico 2">
                      <p>
                         Toro Nagashi - Tradição</br>
                         <!-- Ícone de link para mais informações -->
-                        <a href="https://pt.wikipedia.org/wiki/T%C5%8Dr%C5%8D_nagashi" target="_blank" class="info-link">
-                        <i class='bx bx-link-external'></i> Mais informações
+                        <a href="https://pt.wikipedia.org/wiki/T%C5%8Dr%C5%8D_nagashi" target="_blank"
+                           class="info-link">
+                           <i class='bx bx-link-external'></i> Mais informações
                         </a>
                      </p>
                   </div>
-                    <!-- Adicione mais slides conforme necessário -->
-                 </div>
-                 <!-- Botões de navegação 
+                  <!-- Adicione mais slides conforme necessário -->
+               </div>
+               <!-- Botões de navegação 
                     <div class="swiper-button-next"></div>
                     <div class="swiper-button-prev"></div>-->
-              </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-              
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             </div>
 
 
@@ -461,73 +465,169 @@
 
 
 
-            <!-- Separador entre os carrosséis -->
-            <div class="separador"></div>
-            <!-- Carrossel de Eventos -->
-            <div class="carrossel-container">
 
 
 
 
-              <h2>Pontos Turísticos</h2>
-              <div class="swiper-container swiper-turismo">
 
 
 
-                 <div class="swiper-wrapper">
-                    <!-- Slides de Turismo -->
-                    
-                    <div class="swiper-slide">
-                       <img src="images/turismo/ponte.jpg" alt="Ponto Turístico 2">
-                       <p>
-                         Ponte Benedito Garcia Ribeiro - 1,5km</br>
-                          <!-- Ícone de link para mais informações -->
-                          <a href="https://folhaextra.com/noticia/30256/governo-do-parana-vai-reformar-ponte-que-liga-carlopolis-a-fartura" target="_blank" class="info-link">
-                          <i class='bx bx-link-external'></i> Mais informações
-                          </a>
-                       </p>
-                    </div>
-                    <div class="swiper-slide">
+
+
+
+
+
+
+
+
+         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+         <!-- Separador entre os carrosséis -->
+         <div class="separador"></div>
+         <!-- Carrossel de Eventos -->
+         <div class="carrossel-container">
+
+
+
+
+            <h2>Pontos Turísticos</h2>
+            <div class="swiper-container swiper-turismo">
+
+
+
+               <div class="swiper-wrapper">
+                  <!-- Slides de Turismo -->
+
+                  <div class="swiper-slide">
+                     <img src="images/turismo/ponte.jpg" alt="Ponto Turístico 2">
+                     <p>
+                        Ponte Benedito Garcia Ribeiro - 1,5km</br>
+                        <!-- Ícone de link para mais informações -->
+                        <a href="https://folhaextra.com/noticia/30256/governo-do-parana-vai-reformar-ponte-que-liga-carlopolis-a-fartura"
+                           target="_blank" class="info-link">
+                           <i class='bx bx-link-external'></i> Mais informações
+                        </a>
+                     </p>
+                  </div>
+                  <div class="swiper-slide">
                      <img src="images/turismo/ilhabela.jpg" alt="Ponto Turístico 1">
                      <p>
                         Condominio Ilha Bella </br>
                         <!-- Ícone de link para mais informações -->
                         <a href="https://mapaosc.ipea.gov.br/detalhar/673843" target="_blank" class="info-link">
-                        <i class='bx bx-link-external'></i> Mais informações
+                           <i class='bx bx-link-external'></i> Mais informações
                         </a>
                      </p>
                   </div>
-                    <!-- Adicione mais slides conforme necessário -->
-                 </div>
-                 <!-- Botões de navegação 
+                  <!-- Adicione mais slides conforme necessário -->
+               </div>
+               <!-- Botões de navegação 
                     <div class="swiper-button-next"></div>
                     <div class="swiper-button-prev"></div>-->
-              </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
          </div>
-         <!-- fim do conteiner--> 
       </div>
-      <!--  JavaScript -->
-      <script src="script.js"></script>
-   </body>
+      <!-- fim do conteiner-->
+   </div>
+   <!--  JavaScript -->
+   <script src="script.js"></script>
+
+
+
+   <script>
+
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+
+
+
+
+
+
+
+
+
+
+
+      // Configuração do Firebase
+      const firebaseConfig = {
+         apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+         authDomain: "contadoracessos.firebaseapp.com",
+         databaseURL: "https://SEU_PROJETO.firebaseio.com",
+         projectId: "contadoracessos",
+         storageBucket: "contadoracessos.firebasestorage.app",
+         messagingSenderId: "521517291315",
+         appId: "1:521517291315:web:74f8d878d2d8769460d046",
+  measurementId: "G-BXPWYWK61F"
+      };
+
+      // Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+      // Inicializa Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database().ref("onlineUsers");
+
+      // Atualiza contador de usuários online
+      const userRef = db.push();
+      userRef.set(true);
+      userRef.onDisconnect().remove(); // Remove usuário ao sair
+
+      // Exibe contador na tela
+      db.on("value", (snapshot) => {
+         document.getElementById("contador").innerText = snapshot.numChildren();
+      });
+
+
+
+   </script>
+
+
+
+
+
+
+
+
+
+
+</body>
+
 </html>

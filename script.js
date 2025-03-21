@@ -15,6 +15,22 @@ document.addEventListener("DOMContentLoaded", function() {
   const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
   const clearSearch = document.getElementById("clearSearch");
 
+
+
+
+/// INICIO contador de acessos
+
+
+
+
+
+
+
+
+/// FIM CONTADOR DE ACESSOS
+
+
+
   
   // Inicio pesquisa nome no menu lateral
 
@@ -50,39 +66,11 @@ document.addEventListener("DOMContentLoaded", function() {
       },
   });
 
-
-
-/// inicio cardapio
-
+///////////
 
 
 
-
-
-
-
-
-
-/// f
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/////////
 
   // Quando clicar no menu, abre a sidebar e ativa o fundo escuro
   sidebarOpen.addEventListener("click", function() {
