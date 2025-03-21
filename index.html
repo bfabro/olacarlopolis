@@ -30,9 +30,14 @@
    <!-- No <head> -->
    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
    <!-- No final do <body>, antes de fechar </body> -->
-   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script><!--
+
    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>-->
+
+   <!-- Use a versão compatível do Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 
 </head>
@@ -573,36 +578,35 @@
 
 
    <script>
+ // Configuração do Firebase
+ const firebaseConfig = {
+    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+    authDomain: "contadoracessos.firebaseapp.com",
+    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+    projectId: "contadoracessos",
+    storageBucket: "contadoracessos.firebasestorage.app",
+    messagingSenderId: "521517291315",
+    appId: "1:521517291315:web:74f8d878d2d8769460d046",
+    measurementId: "G-BXPWYWK61F"
+  };
 
+  // Inicializa o Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const database = firebase.database(app);
 
-      // Configuração do Firebase
-      const firebaseConfig = {
-         apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
-         authDomain: "contadoracessos.firebaseapp.com",
-         databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com", // Certifique-se de que esta URL está correta
-         projectId: "contadoracessos",
-         storageBucket: "contadoracessos.firebasestorage.app",
-         messagingSenderId: "521517291315",
-         appId: "1:521517291315:web:74f8d878d2d8769460d046",
-         measurementId: "G-BXPWYWK61F"
-      };
-      // Inicializa o Firebase
-      const app = initializeApp(firebaseConfig);
-      const database = getDatabase(app);
+  // Referência para o nó de usuários online
+  const onlineUsersRef = database.ref("onlineUsers");
 
-      // Referência para o nó de usuários online
-      const onlineUsersRef = ref(database, "onlineUsers");
+  // Adiciona um novo usuário online
+  const userRef = onlineUsersRef.push();
+  userRef.set(true);
 
-      // Adiciona um novo usuário online
-      const userRef = push(onlineUsersRef);
-      userRef.set(true);
+  // Remove o usuário ao sair
+  userRef.onDisconnect().remove();
 
- // Remove o usuário ao sair
- firebase.onDisconnect(userRef).remove();
-
-     // Atualiza o contador de usuários online
-  firebase.onValue(onlineUsersRef, (snapshot) => {
-    const userCount = snapshot.size; // Número de usuários online
+  // Atualiza o contador de usuários online
+  onlineUsersRef.on("value", (snapshot) => {
+    const userCount = snapshot.numChildren(); // Número de usuários online
     document.getElementById("contador").innerText = userCount;
   });
 
