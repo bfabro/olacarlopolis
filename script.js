@@ -167,6 +167,9 @@ document.addEventListener("DOMContentLoaded", function () {
         passeatacontraabarriga: "s",
 
         // Adicione outros estabelecimentos aqui
+
+        // pedreiro
+        deniscenturion:"s",
     };
 
 
