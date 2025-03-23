@@ -842,12 +842,7 @@ img {
     color: var(--grey-color);
   }
 }
-
-
-
-
-/* CARROEU */
-
+/* CARROsEU */
 
 /* Espaçamento entre os slides do carrossel */
 .swiper-slide {
@@ -876,8 +871,8 @@ img {
 
 /* Ajustar o tamanho das imagens */
 .swiper-slide img {
-  width: auto;
-  height: auto;
+  width: 450;
+  height: 400;
   border-radius: 10px;
   margin-bottom: 10px;
   display: block;
