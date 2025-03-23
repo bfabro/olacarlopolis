@@ -142,6 +142,11 @@ document.addEventListener("DOMContentLoaded", function () {
         elshaday: "s",
         farmais: "s", // Farmais não pagou
         descontofacil1: "s", // Desconto Facil 1 (Joao) não pagou
+        drogamais:"s",
+        masterfarma:"s",
+        popularmais:"s",
+        santamaria:"s",
+        saudefarma:"s",
 
 
         //lanchonete
@@ -393,7 +398,7 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             {
                 image: "images/comercios/farmacia/santamaria.png",
-                name: "</br>Santa Maria ( Aguera )",
+                name: "Santa Maria ( Aguera )",
                 address: "</br>Praça Coronel Leite, nº 711",
                 hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
                 contact: "</br>(43) 3566-1471",
@@ -591,7 +596,7 @@ document.addEventListener("DOMContentLoaded", function () {
     site: "www.google.com",
     info: " <strong>Descontao:</strong><ul>Procure o Zurdo e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
 */
-
+/*
         title: "Farmacia de Plantão",
         establishments: [{
             name: "El Shaday ( Daniel )",
@@ -604,7 +609,21 @@ document.addEventListener("DOMContentLoaded", function () {
             instagram: "www.instagram.com/uahh",
             site: "www.google.com",
             info: " <strong>Descontao:</strong><ul>Procure o Daniel e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+*/
 
+            title: "Farmacia de Plantão",
+            establishments: [{
+                name: "DrogaMais ( Jorginho )",
+                address: "Rua Benedito Salles, 903",
+                contact: "(43) 98411-9145",
+                plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
+                delivery: "Sim / Sem Taxa",
+                image: "images/comercios/farmacia/drogamais.png",
+                facebook: "www.facebook.com/uahh",
+                instagram: "www.instagram.com/uahh",
+                site: "www.google.com",
+                info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+    
 
         },]
     },
@@ -1063,7 +1082,7 @@ document.addEventListener("DOMContentLoaded", function () {
    
      <!-- Exibe a imagem do estabelecimento, se existir -->
 ${establishment.image ? `
-          <img src="${establishment.image}" alt="Imagem de ${establishment.name}">
+          <img src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}">
         ` : ""}
 
    
