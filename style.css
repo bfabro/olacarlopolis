@@ -640,23 +640,22 @@ body.dark {
 
 @media screen and (min-width: 1024px) { /* Apenas para computadores */
   .swiper-turismo .swiper-slide img,
-  .swiper-eventos .swiper-slide img {
-    max-width: 450px; /* Ajuste o tamanho conforme necessário */
-    height: 400px; /* Mantém uma altura proporcional */
+  .swiper-eventos .swiper-slide img
+  .swiper-novidades .swiper-slide img  {
+    max-width: 400px; /* Ajuste o tamanho conforme necessário */
+    height: 450px; /* Mantém uma altura proporcional */
     object-fit: cover; /* Garante que a imagem preencha o espaço sem distorção */
     border-radius: 10px; /* Bordas arredondadas para um visual mais agradável */
   }
 
   .swiper-turismo .swiper-slide,
-  .swiper-eventos .swiper-slide {
+  .swiper-eventos .swiper-slide,
+  .swiper-novidades .swiper-slide {    
     display: flex;
     justify-content: center;
     align-items: center;
   }
 }
-
-
-
 
 
 @media screen and (max-width: 1200px) {
@@ -852,8 +851,14 @@ img {
 
 /* Espaçamento entre os slides do carrossel */
 .swiper-slide {
-  opacity: 0; /* Esconde todos os slides por padrão */
-  transition: opacity 0.5s ease; /* Transição suave */
+  width: 100%; /* Ou defina a largura fixa, como 300px */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0; /* Impede que os slides encolham */
+  box-sizing: border-box; /* Garante que o padding não afete a largura */
 }
 
 
@@ -867,9 +872,11 @@ img {
   width: 100%;
 }
 
+
+
 /* Ajustar o tamanho das imagens */
 .swiper-slide img {
-  width: 100%;
+  width: auto;
   height: auto;
   border-radius: 10px;
   margin-bottom: 10px;
@@ -1014,7 +1021,7 @@ img {
 /* Estilos para o carrossel em telas grandes */
 @media screen and (min-width: 768px) {
   .swiper-slide img {
-    max-width: 800px; /* Aumenta o tamanho máximo das imagens no carrossel */
+    max-width: 400px; /* Aumenta o tamanho máximo das imagens no carrossel */
     margin-left: auto; /* Centraliza a imagem horizontalmente */
     margin-right: auto; /* Centraliza a imagem horizontalmente */
   }
