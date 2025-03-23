@@ -616,7 +616,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 name: "DrogaMais ( Jorginho )",
                 address: "Rua Benedito Salles, 903",
                 contact: "(43) 98411-9145",
-                plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
+                plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
                 delivery: "Sim / Sem Taxa",
                 image: "images/comercios/farmacia/drogamais.png",
                 facebook: "www.facebook.com/uahh",
