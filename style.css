@@ -710,13 +710,22 @@ body.dark {
     margin: -50px 0px 0px 0px;
   }
 
+  
+
 }
 
+.search_sidebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  width: 100%;
+}
 
 
 .search_sidebar input {
   width: 100%;
-  padding: 8px;
+  padding: 10px 40px 10px 10px; /* Espaço para o botão X */
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
@@ -725,17 +734,45 @@ body.dark {
 
 #clearSearch {
   position: absolute;
-  right: 20px; /* Ajuste a posição conforme necessário */
+  right: 15px; /* Ajuste para telas maiores */
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  color: var(--grey-color-light);
-  display: none; /* Inicialmente escondido */
+  color: #888;
+  font-size: 20px;
+  display: none; /* Escondido inicialmente */
+  background: transparent;
+  border: none;
 }
 
 #clearSearch:hover {
   color: var(--blue-color); /* Muda a cor ao passar o mouse */
 }
+
+/* Ajuste específico para telas maiores (computador) */
+@media screen and (min-width: 768px) {
+  .search_sidebar {
+    max-width: 400px; /* Limita a largura em telas grandes */
+  }
+
+  #clearSearch {
+    right: 10px; /* Reposiciona melhor o "X" no desktop */
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*/////////////////////////////////////*/
 .social-icons {
@@ -1022,6 +1059,8 @@ img {
   }
 }
 
+
+
 /* Estilo para o ícone de link */
 .info-link {
   display: inline-flex; /* Alinha o ícone e o texto */
@@ -1041,3 +1080,4 @@ img {
 .info-link i {
   font-size: 16px; /* Tamanho do ícone */
 }
+/* aaa*/

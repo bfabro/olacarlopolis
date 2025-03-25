@@ -74,7 +74,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     ///////////
-
+    if (searchInput && clearSearch) {
+        // Mostrar ou esconder o botão X ao digitar
+        searchInput.addEventListener("input", function () {
+          if (searchInput.value.length > 0) {
+            clearSearch.style.display = "block";
+          } else {
+            clearSearch.style.display = "none";
+          }
+        });
+    
+        // Limpar o campo ao clicar no "X"
+        clearSearch.addEventListener("click", function () {
+          searchInput.value = "";
+          clearSearch.style.display = "none";
+    
+          // Dispara um evento de input para garantir que a pesquisa seja resetada
+          searchInput.dispatchEvent(new Event("input"));
+        });
+      }
 
     // Quando clicar no menu, abre a sidebar e ativa o fundo escuro
     sidebarOpen.addEventListener("click", function () {
