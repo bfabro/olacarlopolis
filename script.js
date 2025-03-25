@@ -56,22 +56,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     ///////////
-   // Inicializa o carrossel de Novidades
-   const swiperNovidades = new Swiper('.swiper-novidades', {
-    loop: true, // Permite rolagem infinita
-    navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-    },
-    autoplay: {
-        delay: 6000, // Troca de slide a cada 3 segundos
-    },
-    effect: 'fade', // Efeito de fade entre os slides
-    fadeEffect: {
-        crossFade: true, // Faz o fade suave entre os slides
-    },
-});
- 
+    // Inicializa o carrossel de Novidades
+    const swiperNovidades = new Swiper('.swiper-novidades', {
+        loop: true, // Permite rolagem infinita
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        autoplay: {
+            delay: 6000, // Troca de slide a cada 3 segundos
+        },
+        effect: 'fade', // Efeito de fade entre os slides
+        fadeEffect: {
+            crossFade: true, // Faz o fade suave entre os slides
+        },
+    });
+
 
     ///////////
 
@@ -142,11 +142,11 @@ document.addEventListener("DOMContentLoaded", function () {
         elshaday: "s",
         farmais: "s", // Farmais não pagou
         descontofacil1: "s", // Desconto Facil 1 (Joao) não pagou
-        drogamais:"s",
-        masterfarma:"s",
-        popularmais:"s",
-        santamaria:"s",
-        saudefarma:"s",
+        drogamais: "s",
+        masterfarma: "s",
+        popularmais: "s",
+        santamaria: "s",
+        saudefarma: "s",
 
 
         //lanchonete
@@ -166,11 +166,12 @@ document.addEventListener("DOMContentLoaded", function () {
         feiradalua: "s",
         passeatacontraabarriga: "s",
         prefeitura: "s",
+        duvidasereclamações: "s",
 
         // Adicione outros estabelecimentos aqui
 
         // pedreiro
-        deniscenturion:"s",
+        deniscenturion: "s",
     };
 
 
@@ -180,6 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .toLowerCase()
             .replace(/\s*\(.*?\)\s*/g, '')
             .replace(/\s+/g, '');
+            
     }
 
     function sendPaymentReminder(establishment) {
@@ -600,34 +602,34 @@ document.addEventListener("DOMContentLoaded", function () {
     site: "www.google.com",
     info: " <strong>Descontao:</strong><ul>Procure o Zurdo e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
 */
-/*
+        /*
+                title: "Farmacia de Plantão",
+                establishments: [{
+                    name: "El Shaday ( Daniel )",
+                    address: "R. Benedito Sales, 353",
+                    contact: "(43) 98488-9420",
+                    plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
+                    delivery: "Sim / Sem Taxa",
+                    image: "images/info_uteis/farmacia_plantao/elshaday.png",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+                    info: " <strong>Descontao:</strong><ul>Procure o Daniel e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+        */
+
         title: "Farmacia de Plantão",
         establishments: [{
-            name: "El Shaday ( Daniel )",
-            address: "R. Benedito Sales, 353",
-            contact: "(43) 98488-9420",
-            plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
+            name: "DrogaMais ( Jorginho )",
+            address: "Rua Benedito Salles, 903",
+            contact: "(43) 98411-9145",
+            plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
             delivery: "Sim / Sem Taxa",
-            image: "images/info_uteis/farmacia_plantao/elshaday.png",
+            image: "images/comercios/farmacia/drogamais.png",
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
             site: "www.google.com",
-            info: " <strong>Descontao:</strong><ul>Procure o Daniel e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
-*/
+            info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
 
-            title: "Farmacia de Plantão",
-            establishments: [{
-                name: "DrogaMais ( Jorginho )",
-                address: "Rua Benedito Salles, 903",
-                contact: "(43) 98411-9145",
-                plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
-                delivery: "Sim / Sem Taxa",
-                image: "images/comercios/farmacia/drogamais.png",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                site: "www.google.com",
-                info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
-    
 
         },]
     },
@@ -670,7 +672,23 @@ document.addEventListener("DOMContentLoaded", function () {
             site: "www.google.com"
 
 
-        },]
+        },
+
+        {
+            name: "Duvidas e  Reclamações",            
+            contact: "(43) 99825-0360",
+            hours: "8h as 17h",
+            image: "images/info_uteis/prefeitura/prefeitura.png",
+            
+
+           
+
+
+        }
+
+
+
+        ]
     },
 
     {
