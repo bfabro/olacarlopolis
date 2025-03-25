@@ -167,6 +167,8 @@ document.addEventListener("DOMContentLoaded", function () {
         passeatacontraabarriga: "s",
         prefeitura: "s",
         duvidasereclamações: "s",
+        copel:"s",
+        sanepar:"s",
 
         // Adicione outros estabelecimentos aqui
 
@@ -635,12 +637,9 @@ document.addEventListener("DOMContentLoaded", function () {
     },
 
 
-
-
     {
 
         link: document.querySelector("#menuHospital"),
-
         title: "Hospital",
         establishments: [{
             name: "Hospital São Jose",
@@ -671,18 +670,13 @@ document.addEventListener("DOMContentLoaded", function () {
             instagram: "www.instagram.com/uahh",
             site: "www.google.com"
 
-
         },
 
         {
             name: "Duvidas e  Reclamações",            
             contact: "(43) 99825-0360",
             hours: "8h as 17h",
-            image: "images/info_uteis/prefeitura/prefeitura.png",
-            
-
-           
-
+            image: "images/info_uteis/prefeitura/prefeitura.png", 
 
         }
 
@@ -717,6 +711,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         ]
+    },
+
+    {
+        link: document.querySelector("#menuCopel"),
+
+        title: "Copel",
+        establishments: [{
+
+
+            name: "Copel",
+            hours: "seg a sex: 8h - 12h",
+            address: "R. Benedito Salles, 1094",
+            contact: "(41) 3013-8973",
+            image: "images/info_uteis/copel/copel.png", 
+
+
+        },]
+    },
+
+    {
+        link: document.querySelector("#menuSanepar"),
+
+        title: "Sanepar",
+        establishments: [{
+
+
+            name: "Sanepar",
+            hours: "seg a sex: 8:30h - 12h, 13:30 as 17h",
+            address: "R. André Jorge Cleli, 148 ",
+            contact: "0800 200 0115",
+            image: "images/info_uteis/sanepar/sanepar.png", 
+
+
+        },]
     },
 
 
