@@ -662,7 +662,7 @@ document.addEventListener("DOMContentLoaded", function () {
         establishments: [{
             name: "Prefeitura",
             address: "R. Benedito Salles, 1060 - Centro",
-            contact: "(043)3566-1291",
+            contact: "(43) 3566-1291",
             hours: "8h as 17h",
             image: "images/info_uteis/prefeitura/prefeitura.png",
             facebook: "www.facebook.com/uahh",
