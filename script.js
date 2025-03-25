@@ -165,6 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
         calendarioeventos: "s",
         feiradalua: "s",
         passeatacontraabarriga: "s",
+        prefeitura: "s",
 
         // Adicione outros estabelecimentos aqui
 
@@ -644,6 +645,25 @@ document.addEventListener("DOMContentLoaded", function () {
             address: "R. Cap. Estácio, 460",
             contact: "(43) 99174-2539",
             hours: "24 horas",
+            image: "images/info_uteis/hospital/hospital.png",
+            facebook: "www.facebook.com/uahh",
+            instagram: "www.instagram.com/uahh",
+            site: "www.google.com"
+
+
+        },]
+    },
+
+    {
+
+        link: document.querySelector("#menuPrefeitura"),
+
+        title: "Prefeitura",
+        establishments: [{
+            name: "Prefeitura",
+            address: "R. Cap. Estácio, 460",
+            contact: "(43) 99174-2539",
+            hours: "8 as 15",
             image: "images/info_uteis/hospital/hospital.png",
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
