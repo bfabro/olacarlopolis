@@ -661,10 +661,10 @@ document.addEventListener("DOMContentLoaded", function () {
         title: "Prefeitura",
         establishments: [{
             name: "Prefeitura",
-            address: "R. Cap. Estácio, 460",
-            contact: "(43) 99174-2539",
-            hours: "8 as 15",
-            image: "images/info_uteis/hospital/hospital.png",
+            address: "R. Benedito Salles, 1060 - Centro",
+            contact: "(043)3566-1291",
+            hours: "8h as 17h",
+            image: "images/info_uteis/prefeitura/prefeitura.png",
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
             site: "www.google.com"
