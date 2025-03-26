@@ -166,6 +166,9 @@ document.addEventListener("DOMContentLoaded", function () {
         santamaria: "s",
         saudefarma: "s",
 
+        // quitanda
+        pimentadoce:"s",
+
 
         //lanchonete
         casarao: "s", // Casarao pagou
@@ -955,9 +958,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             name: "Pimenta Doce",
             hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
+            address: "R. Kalil Keder ",
+            contact: "(43) 3566-1554",
+            delivery: "Sim / Sem Taxa",
+            image: "images/comercios/quitanda/pimentadoce.png", 
 
 
         },]
