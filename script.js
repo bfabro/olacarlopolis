@@ -158,8 +158,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         //farmacia
         elshaday: "s",
-        farmais: "s", // Farmais não pagou
-        descontofacil1: "s", // Desconto Facil 1 (Joao) não pagou
+        farmais: "s", 
+        descontofacil1: "s", 
         drogamais: "s",
         masterfarma: "s",
         popularmais: "s",
@@ -191,10 +191,19 @@ document.addEventListener("DOMContentLoaded", function () {
         copel:"s",
         sanepar:"s",
 
-        // Adicione outros estabelecimentos aqui
+        // Servicos
+
+        // churrasqueiro
+        pituka:"s",
+
+        //diarista
+        rose:"s",
 
         // pedreiro
         deniscenturion: "s",
+
+        // guia de pesca
+        thiagoaguera: "s",
     };
 
 
