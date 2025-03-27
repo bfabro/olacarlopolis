@@ -106,6 +106,8 @@ document.addEventListener("DOMContentLoaded", function () {
         overlay.classList.remove("active");
     });
 
+    
+
     // Criar um botão "X" para fechar o menu
     const closeButton = document.createElement("button");
     closeButton.innerHTML = "&times;";
@@ -236,7 +238,11 @@ document.addEventListener("DOMContentLoaded", function () {
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
             site: "www.google.com",
-            menuImage: "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+            
+            menuImages: [  // Agora é um array de imagens
+                "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+                "images/comercios/lanchonete/paiol/cardapio_2.jpg",
+                "images/comercios/lanchonete/paiol/cardapio_3.jpg"],
             info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
         },
         {
@@ -249,7 +255,11 @@ document.addEventListener("DOMContentLoaded", function () {
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
             site: "www.google.com",
-            menuImage: "images/comercios/lanchonete/casarao/casarao.png",
+           
+            menuImages: [  // Agora é um array de imagens
+                "images/comercios/lanchonete/casarao/casarao.png",
+                "images/comercios/lanchonete/paiol/cardapio_2.jpg"
+               ],
             info: "Palavra Chave: <strong>Supimpa</strong>. Use no pedido e ganhe 1% de desconto!" // Informação personalizada
         },
         ]
@@ -633,7 +643,7 @@ document.addEventListener("DOMContentLoaded", function () {
     instagram: "www.instagram.com/uahh",
     site: "www.google.com",
     info: " <strong>Descontao:</strong><ul>Procure o Zurdo e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
-*/
+        */
         /*
                 title: "Farmacia de Plantão",
                 establishments: [{
@@ -1181,7 +1191,7 @@ document.addEventListener("DOMContentLoaded", function () {
    <li>  
    
      <!-- Exibe a imagem do estabelecimento, se existir -->
-${establishment.image ? `
+    ${establishment.image ? `
           <img src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}">
         ` : ""}
 
@@ -1228,10 +1238,10 @@ ${establishment.image ? `
             </a>
           ` : ""}
         </div>
-</br>
+    </br>
 
 
-<!-- Botão de + Informações -->
+    <!-- Botão de + Informações -->
         <button class="detalhes-btn" data-name="${establishment.name}">
           + Informações
         </button>
@@ -1241,13 +1251,23 @@ ${establishment.image ? `
           
         </div>
 
-      ${establishment.menuImage ? `
-       <button class="menu-btn" data-name="${establishment.name}" style=" #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-        Ver Cardápio
-        </button>
-        <div class="menu-content" id="menu-${encodeURIComponent(establishment.name)}" style="display: none; text-align: center;">
-          <img src="${establishment.menuImage}" alt="Cardápio de ${establishment.name}" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 10px;">
-           </div>` : ""}
+     ${establishment.menuImages && establishment.menuImages.length > 0 ? `
+<button class="menu-btn" data-name="${establishment.name}">
+    Ver Cardápio (${establishment.menuImages.length})
+</button>
+<div class="menu-cardapio swiper" id="menu-${encodeURIComponent(establishment.name)}" style="display: none;">
+    <div class="swiper-wrapper">
+        ${establishment.menuImages.map((img, index) => `
+            <div class="swiper-slide">
+                <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}">
+            </div>
+        `).join('')}
+    </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-pagination"></div>
+</div>
+` : ""}
 
               ${establishment.menuFlyer ? `
              <!-- <button class="flyer-btn" data-name="${establishment.name}" style=" #dfa529; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
@@ -1260,10 +1280,56 @@ ${establishment.image ? `
 
    </li>
  `).join('')}
-</ul>`;
+    </ul>`;
 
         ///// inicio
-
+        function toggleElement(button, elementId, openText, closeText, openColor, closeColor) {
+            const element = document.getElementById(elementId);
+        
+            if (!element) {
+                console.error(`Elemento #${elementId} não encontrado.`);
+                return;
+            }
+        
+            if (element.style.display === "block") {
+                // Fecha o conteúdo
+                element.style.display = "none";
+                button.textContent = openText;
+                button.style.backgroundColor = closeColor;
+                
+                // Destrói a instância do Swiper se existir
+                if (element.swiperInstance) {
+                    element.swiperInstance.destroy(true, true);
+                    element.swiperInstance = null;
+                }
+            } else {
+                // Fecha todos os conteúdos antes de abrir o atual
+                closeAllContents();
+                
+                // Abre o conteúdo
+                element.style.display = "block";
+                button.textContent = closeText;
+                button.style.backgroundColor = openColor;
+                
+                // Inicializa o Swiper se for um carrossel
+                if (element.classList.contains('swiper') && !element.swiperInstance) {
+                    element.swiperInstance = new Swiper(element, {
+                        loop: true,
+                        navigation: {
+                            nextEl: element.querySelector('.swiper-button-next'),
+                            prevEl: element.querySelector('.swiper-button-prev'),
+                        },
+                        pagination: {
+                            el: element.querySelector('.swiper-pagination'),
+                            clickable: true,
+                        },
+                    });
+                }
+                
+                // Rola suavemente para o elemento
+                element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
 
         // Função para fechar todos os conteúdos abertos
         function closeAllContents() {
@@ -1286,31 +1352,7 @@ ${establishment.image ? `
             });
         }
 
-        // Função para alternar a exibição de um elemento
-        function toggleElement(button, elementId, openText, closeText, openColor, closeColor) {
-            const element = document.getElementById(elementId);
-
-            if (!element) {
-                console.error(`Elemento #${elementId} não encontrado.`);
-                return;
-            }
-
-            // Verifica se o conteúdo já está aberto
-            if (element.style.display === "block") {
-                // Fecha o conteúdo
-                element.style.display = "none";
-                button.textContent = openText; // Retorna o texto original
-                button.style.backgroundColor = closeColor; // Retorna a cor original
-            } else {
-                // Fecha todos os conteúdos antes de abrir o atual
-                closeAllContents();
-
-                // Abre o conteúdo
-                element.style.display = "block";
-                button.textContent = closeText; // Atualiza o texto do botão
-                button.style.backgroundColor = openColor; // Muda a cor do botão
-            }
-        }
+       
 
         // Eventos para o Cardápio
         document.querySelectorAll(".menu-btn").forEach(button => {
@@ -1508,6 +1550,8 @@ ${establishment.image ? `
             sidebar.classList.add("close");
         }
     });
+
+    
 
 
 

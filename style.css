@@ -762,7 +762,17 @@ body.dark {
 
 
 
+.menu-image-container {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
 
+.image-counter {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 5px;
+}
 
 
 
@@ -888,7 +898,7 @@ img {
   justify-content: center;
   align-items: center;
   margin: 0;
-  padding: 0;
+  padding: 10px;
   flex-shrink: 0; /* Impede que os slides encolham */
   box-sizing: border-box; /* Garante que o padding não afete a largura */
 }
@@ -1081,3 +1091,32 @@ img {
   font-size: 16px; /* Tamanho do ícone */
 }
 /* aaa*/
+
+
+
+
+
+
+
+/* Estilos específicos para o carrossel de cardápios */
+.menu-cardapio .swiper-button-next,
+.menu-cardapio .swiper-button-prev {
+    color: #dfa529;
+    background: rgba(0,0,0,0.2);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-cardapio .swiper-button-next::after,
+.menu-cardapio .swiper-button-prev::after {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.menu-cardapio .swiper-pagination-bullet-active {
+    background: #dfa529;
+}
