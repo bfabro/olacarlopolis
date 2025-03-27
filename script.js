@@ -185,13 +185,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // MENU INFORMACOES UTEIS
         hospitalsãojose: "s",
-        calendarioeventos: "s",
-        feiradalua: "s",
-        passeatacontraabarriga: "s",
+       
+        lixoeletronico: "s",
         prefeitura: "s",
         duvidasereclamações: "s",
         copel:"s",
         sanepar:"s",
+        //Eventos
+        calendarioeventos: "s",
+        feiradalua: "s",
+        pescar:"s",
+        triathlon:"s",
+        coletalixoeletronico:"s",
+        
+        
 
         // Servicos
 
@@ -231,8 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
             image: "images/comercios/lanchonete/paiol/paiol.png",
             name: "Paiol",
             hours: "qua - dom 19 - 00h",
-            address: "Av. Elson Soares, 767 ",
-            // contact: "(11) 99898-5930",   
+            address: "Av. Elson Soares, 767 ",            
             contact: "(43) 99159-0070",
             delivery: "Sim / Sem Taxa",
             facebook: "www.facebook.com/uahh",
@@ -264,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         ]
     },
-
+// Eventos
     {
 
         link: document.querySelector("#menuEventos"),
@@ -272,26 +278,47 @@ document.addEventListener("DOMContentLoaded", function () {
         establishments: [{
 
             name: "Calendario Eventos",
-            image: "images/info_uteis/eventos/evento_1/calendario_evento.png",
-            contact: "(43) 2345-6789",
-            menuFlyer: "images/info_uteis/eventos/evento_1/calendario_evento.png"
+            image: "images/info_uteis/eventos/evento_1/calendario_evento.png"
+                     
 
         },
+      
+        {
+            image: "images/info_uteis/eventos/evento_3/lixoEletronico.png",
+            name: "Coleta Lixo Eletronico",
+            date: "05/03/25 a 20/04/2025",
+            address: "Paroquia Senhor Bom Jesus",
+            contact: "",
+            menuFlyer: "#"
+        },
+
+        {
+            image: "images/info_uteis/eventos/evento_5/triathlon.png",
+            name: "Triathlon",
+            date: "06/04/25",
+            address: "Ilha do Ponciano",
+            contact: "(43) 99964-6136",
+            menuFlyer: "#"
+        },
+
+        {
+            image: "images/info_uteis/eventos/evento_4/pescar.png",
+            name: "Pescar",
+            date: "03/05/25 a 04/05/2025",
+            address: "Ilha do Ponciano",
+            contact: "(41) 99950-9291",
+            menuFlyer: "#"
+        },
+
+      
+
         {
             image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
             name: "Feira da Lua",
-            hours: "sex 19 - 00h",
+            date: "Sex das 19 - 00h",
             address: "Praça Igreja Matriz ",
             contact: "(11) 99898-5930",
             menuFlyer: "images/info_uteis/eventos/evento_2/feira_lua_1.png"
-        },
-        {
-            image: "images/info_uteis/eventos/evento_3/corrida_10.jpg",
-            name: "Passeata contra a barriga",
-            hours: "dom: 07 - 12h",
-            address: "Av Turistica, 800",
-            contact: "(43) 2345-6789",
-            menuFlyer: "images/info_uteis/eventos/evento_3/corrida_10.jpg"
         },
 
 
@@ -662,15 +689,15 @@ document.addEventListener("DOMContentLoaded", function () {
         title: "Farmacia de Plantão",
         establishments: [{
             name: "DrogaMais ( Jorginho )",
-            address: "Rua Benedito Salles, 903",
-            contact: "(43) 98411-9145",
+            address: "</br>Rua Benedito Salles, 903",
+            contact: "</br>(43) 98411-9145",
             plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
-            delivery: "Sim / Sem Taxa",
+            delivery: "</br>Sim / Sem Taxa",
             image: "images/comercios/farmacia/drogamais.png",
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
             site: "www.google.com",
-            info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+            info: " <strong>Descontão:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
 
 
         },]
@@ -725,33 +752,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ]
     },
 
-    {
-
-        link: document.querySelector("#menuHorarioOnibus"),
-        title: "Horario de Onibus em Carlópolis",
-        establishments: [{
-            name: "Princesa",
-            contact: "(43) 2345-6789",
-            menuFlyer: "images/img_informacoes/eventos/calendario_evento.png"
-        },
-        {
-            name: "Feira da Lua",
-            hours: "sex 19 - 00h",
-            address: "Praça Igreja Matriz ",
-            contact: "(11) 99898-5930",
-            menuFlyer: "images/img_informacoes/eventos/feira_lua_1.png"
-        },
-        {
-            name: "Passeata contra a barriga",
-            hours: "dom: 07 - 12h",
-            address: "Av Turistica, 800",
-            contact: "(43) 2345-6789",
-            menuFlyer: "images/img_informacoes/eventos/corrida_10.jpg"
-        },
-
-
-        ]
-    },
+    
 
     {
         link: document.querySelector("#menuCopel"),
@@ -1197,6 +1198,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
    
    <strong class="locais_nomes">${establishment.name}</strong><br>
+
+${establishment.date ? `<b>Data do Evento:</b> ${establishment.date}<br>` : ""} <!-- Exibe a data do evento se existir -->
+
+
      ${establishment.hours ? `<b>Funcionamento:</b> ${establishment.hours}<br>` : ""}
      ${establishment.plantaoHorario ? `<b class="highlight-plantao">Plantão:</b> <span class="plantao-text">${establishment.plantaoHorario}</span><br>` : ""}  <!-- Exibe o horário de plantão -->
      ${establishment.address ? `
@@ -1213,12 +1218,16 @@ document.addEventListener("DOMContentLoaded", function () {
               <i style="color:rgb(250, 9, 9);" class='bx bx-map'></i> Localização
             </a>
           ` : ""}
+        
          
           ${establishment.contact ? `
             <a href="https://api.whatsapp.com/send?phone=${establishment.contact.replace('+', '').replace(/\D/g, '')}&text=${encodeURIComponent('Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="icon-link">
               <i class='bx bxl-whatsapp' style="color: #25D366;"></i> WhatsApp
             </a>  
           ` : ""} 
+
+          
+
            </div>  <div class="social-icons">
           ${establishment.facebook ? `
             <a href="${establishment.facebook}" target="_blank" class="icon-link">
