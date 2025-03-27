@@ -934,10 +934,11 @@ img {
   font-weight: 500; /* Texto um pouco mais forte */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra para melhorar a legibilidade */
 }
-
+/*
 .swiper-slide img:hover {
-  transform: scale(1.05); /* Aumenta ligeiramente o tamanho da imagem */
+  transform: scale(1.05); /* Aumenta ligeiramente o tamanho da imagem 
 }
+*/
 
 /* Ajustar o tamanho do carrossel */
 .carrossel-container {
@@ -948,54 +949,7 @@ img {
   border-radius: 15px; /* Bordas arredondadas */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra sutil */
 }
-/*
-.carrossel-container h2 {
-/*  font-size: 1.5rem; /* Tamanho maior para o título */
-/*  text-align: center; /* Centraliza o título */
- /* margin-bottom: 30px; /* Espaçamento abaixo do título */
- /* font-weight: bold; /* Texto em negrito */
- /* letter-spacing: 2px; /* Espaçamento entre as letras */
- /* background: linear-gradient(90deg, #2E8B57, #FF8C00); /* Gradiente verde e laranja */
- /* -webkit-background-clip: text; /* Aplica o gradiente ao texto */
- /* color: transparent; /* Torna o texto transparente para mostrar o gradiente */
- /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra sutil para dar destaque */
-/*} */
 
-
-
-
-
-
-   /* .carrossel-container h2 {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: rgb(4, 7, 7);
-      text-shadow: 0 0 5px rgb(219, 123, 13), 0 0 10px rgb(202, 41, 20), 0 0 20px rgb(161, 89, 30);
-      text-align: center;
-      padding: 20px;
-    }
-*/
-/*
-    .carrossel-container h2 {
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: white;
-      text-shadow: -2px 0px 5px #ff8c00, 2px 0px 5px #ff0080;/*
-      text-shadow: 0 0 5px rgb(100, 74, 248), 0 0 10px rgb(74, 58, 216), 0 0 20px rgb(12, 26, 145);
-      animation: glitch 0.3s infinite alternate;
-      text-align: center;
-      padding: 20px;
-    }
-    
-    @keyframes glitch {
-      from {
-        transform: translateX(-2px);
-      }
-      to {
-        transform: translateX(2px);
-      }
-    }
-*/
 
 .carrossel-container h2 {
   color: #2E8B57; /* Verde folha para um visual confiável */
@@ -1010,13 +964,6 @@ img {
   text-align: center;
   margin-bottom: 15px; /* Espaçamento para separar dos elementos abaixo */
 }
-
-
-
-
-
-
-
 
 
 /* Estilo para o separador entre os carrosséis */
@@ -1119,4 +1066,44 @@ img {
 
 .menu-cardapio .swiper-pagination-bullet-active {
     background: #dfa529;
+    
+}
+
+.swiper-pagination{
+  margin:-15px;
+}
+
+
+
+
+
+
+
+
+
+
+
+.menu-cardapio {
+  display: none;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.menu-cardapio.swiper {
+  overflow: hidden;
+}
+
+.menu-cardapio.swiper-visible {
+  display: block;
+}
+
+.detalhes-content, .menu-cardapio, .menu-content {
+  display: none !important; /* Garante que estejam ocultos inicialmente */
+}
+
+/* Quando visíveis */
+.detalhes-content[style*="display: block"],
+.menu-cardapio[style*="display: block"],
+.menu-content[style*="display: block"] {
+  display: block !important;
 }

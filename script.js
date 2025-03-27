@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function () {
            
             menuImages: [  // Agora é um array de imagens
                 "images/comercios/lanchonete/casarao/casarao.png",
-                "images/comercios/lanchonete/paiol/cardapio_2.jpg"
+                "images/comercios/lanchonete/paiol/cardapio_2.jpg",
                ],
             info: "Palavra Chave: <strong>Supimpa</strong>. Use no pedido e ganhe 1% de desconto!" // Informação personalizada
         },
@@ -1285,13 +1285,17 @@ document.addEventListener("DOMContentLoaded", function () {
         ///// inicio
         function toggleElement(button, elementId, openText, closeText, openColor, closeColor) {
             const element = document.getElementById(elementId);
-        
+            
             if (!element) {
                 console.error(`Elemento #${elementId} não encontrado.`);
                 return;
             }
         
-            if (element.style.display === "block") {
+            // Verifica se o elemento está visível
+            const isVisible = element.style.display !== "none" && 
+                             window.getComputedStyle(element).display !== "none";
+        
+            if (isVisible) {
                 // Fecha o conteúdo
                 element.style.display = "none";
                 button.textContent = openText;
@@ -1325,42 +1329,81 @@ document.addEventListener("DOMContentLoaded", function () {
                         },
                     });
                 }
-                
-                // Rola suavemente para o elemento
-                element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
 
         // Função para fechar todos os conteúdos abertos
         function closeAllContents() {
-            document.querySelectorAll(".detalhes-content, .menu-content").forEach(content => {
+            document.querySelectorAll(".detalhes-content, .menu-cardapio, .menu-content").forEach(content => {
                 content.style.display = "none";
+                
+                // Destrói as instâncias do Swiper
+                if (content.swiperInstance) {
+                    content.swiperInstance.destroy(true, true);
+                    content.swiperInstance = null;
+                }
             });
-
+        
             // Restaura o texto e a cor dos botões
             document.querySelectorAll(".detalhes-btn, .menu-btn, .flyer-btn").forEach(button => {
                 if (button.classList.contains("detalhes-btn")) {
                     button.textContent = "+ Informações";
-                    button.style.backgroundColor = "#007bff"; // Cor original do botão de informações
+                    button.style.backgroundColor = "#007bff";
                 } else if (button.classList.contains("menu-btn")) {
-                    button.textContent = "Ver Cardápio";
-                    button.style.backgroundColor = "#dfa529"; // Cor original do botão de cardápio
+                    const count = button.dataset.count ? ` (${button.dataset.count})` : '';
+                    button.textContent = `Ver Cardápio${count}`;
+                    button.style.backgroundColor = "#dfa529";
                 } else if (button.classList.contains("flyer-btn")) {
                     button.textContent = "Ver Flyer";
-                    button.style.backgroundColor = "#dfa529"; // Cor original do botão de flyer
+                    button.style.backgroundColor = "#dfa529";
                 }
             });
         }
 
-       
-
-        // Eventos para o Cardápio
-        document.querySelectorAll(".menu-btn").forEach(button => {
-            button.addEventListener("click", function () {
-                const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
-                toggleElement(this, menuId, "Ver Cardápio", "Fechar Cardápio", "#ff3333", "#dfa529");
-            });
+       // Inicializa todos os carrosséis visíveis quando a página carrega
+document.querySelectorAll('.menu-cardapio').forEach(menu => {
+    if (window.getComputedStyle(menu).display !== "none") {
+        menu.swiperInstance = new Swiper(menu, {
+            loop: true,
+            navigation: {
+                nextEl: menu.querySelector('.swiper-button-next'),
+                prevEl: menu.querySelector('.swiper-button-prev'),
+            },
+            pagination: {
+                el: menu.querySelector('.swiper-pagination'),
+                clickable: true,
+            },
         });
+    }
+});
+
+///////
+/////
+//////////
+//////////
+
+   // Eventos para o Cardápio
+document.querySelectorAll(".menu-btn").forEach(button => {
+    // Armazena o número de itens no cardápio como data attribute
+    const match = button.textContent.match(/\((\d+)\)/);
+    if (match) {
+        button.dataset.count = match[1];
+    }
+
+    button.addEventListener("click", function() {
+        const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
+        const count = this.dataset.count ? ` (${this.dataset.count})` : '';
+        
+        toggleElement(
+            this, 
+            menuId, 
+            `Ver Cardápio${count}`, 
+            "Fechar Cardápio", 
+            "#ff3333", 
+            "#dfa529"
+        );
+    });
+});
 
         // Eventos para o Flyer
         document.querySelectorAll(".flyer-btn").forEach(button => {
