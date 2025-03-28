@@ -2,6 +2,80 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+     // pagou? defina por s pago n nao pago // PAGx
+     const statusEstabelecimentos = {
+        // ADEGAS
+        adegacuenca: "s",
+
+        //ADVOCACIA
+        ruanabilio: "s",
+
+        //Açougue
+        açouguedocarlinho: "s",
+
+        // Agropecuaria
+        agrovida: "s",
+
+        //farmacia
+        elshaday: "s",
+        farmais: "s", 
+        descontofacil1: "s", 
+        drogamais: "s",
+        masterfarma: "s",
+        popularmais: "s",
+        santamaria: "s",
+        saudefarma: "s",
+
+        //pizzaria
+        fornalhapizzaria:"s",
+
+        // quitanda
+        pimentadoce:"s",
+
+
+        //lanchonete
+        casarao: "s", // Casarao pagou
+        paiol: "s", // Paiol pagou
+
+        //supermercado
+        mercadorocha: "s", // Mercado Rocha pagou
+        carreiro: "s", // Carreiro pagou
+        obarateiro: "s", // O Barateiro pagou
+        kelve: "s", // Kelve não pagou
+        rocha: "s", // Rocha pagou
+
+        // MENU INFORMACOES UTEIS
+        hospitalsãojose: "s",
+       
+        lixoeletronico: "s",
+        prefeitura: "s",
+        duvidasereclamações: "s",
+        copel:"s",
+        sanepar:"s",
+        //Eventos
+        calendarioeventos: "s",
+        feiradalua: "s",
+        pescar:"s",
+        triathlon:"s",
+        coletalixoeletronico:"s",
+        
+        
+
+        // Servicos
+
+        // churrasqueiro
+        pituka:"s",
+
+        //diarista
+        rose:"s",
+
+        // pedreiro
+        deniscenturion: "s",
+
+        // guia de pesca
+        thiagoaguera: "s",
+    };
+
 
     const body = document.querySelector("body");
     const darkLight = document.querySelector("#darkLight");
@@ -144,76 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-    // pagou? defina por s pago n nao pago // PAGx
-    const statusEstabelecimentos = {
-        // ADEGAS
-        adegacuenca: "s",
-
-        //ADVOCACIA
-        ruanabilio: "s",
-
-        //Açougue
-        açouguedocarlinho: "s",
-
-        // Agropecuaria
-        agrovida: "s",
-
-        //farmacia
-        elshaday: "s",
-        farmais: "s", 
-        descontofacil1: "s", 
-        drogamais: "s",
-        masterfarma: "s",
-        popularmais: "s",
-        santamaria: "s",
-        saudefarma: "s",
-
-        // quitanda
-        pimentadoce:"s",
-
-
-        //lanchonete
-        casarao: "s", // Casarao pagou
-        paiol: "s", // Paiol pagou
-
-        //supermercado
-        mercadorocha: "s", // Mercado Rocha pagou
-        carreiro: "s", // Carreiro pagou
-        obarateiro: "s", // O Barateiro pagou
-        kelve: "s", // Kelve não pagou
-        rocha: "s", // Rocha pagou
-
-        // MENU INFORMACOES UTEIS
-        hospitalsãojose: "s",
-       
-        lixoeletronico: "s",
-        prefeitura: "s",
-        duvidasereclamações: "s",
-        copel:"s",
-        sanepar:"s",
-        //Eventos
-        calendarioeventos: "s",
-        feiradalua: "s",
-        pescar:"s",
-        triathlon:"s",
-        coletalixoeletronico:"s",
-        
-        
-
-        // Servicos
-
-        // churrasqueiro
-        pituka:"s",
-
-        //diarista
-        rose:"s",
-
-        // pedreiro
-        deniscenturion: "s",
-
-        // guia de pesca
-        thiagoaguera: "s",
-    };
+   
 
 
 
@@ -231,7 +236,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // Carregar informações de categorias
-    const categories = [{
+    const categories = [
+        
+        
+        
+        
+        
+        {
         link: document.querySelector("#menuLanchonete"),
         title: "Lanchonetes",
         establishments: [{
@@ -268,6 +279,32 @@ document.addEventListener("DOMContentLoaded", function () {
                ],
             info: "Palavra Chave: <strong>Supimpa</strong>. Use no pedido e ganhe 1% de desconto!" // Informação personalizada
         },
+        ]
+    },
+
+
+// pizzaria
+    {
+        link: document.querySelector("#menuPizzaria"),
+        title: "Pizzarias",
+        establishments: [{
+            image: "images/comercios/pizzaria/fornalha.png",
+            name: "Fornalha Pizzaria",
+            hours: "</br>Quarta -  Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
+            address: "</br>R. Benedito Salles, 837",            
+            contact: "</br>(43) 3566-1450",
+            delivery: "</br>Sim / Com Taxa",
+            facebook: "www.facebook.com/uahh",
+            instagram: "www.instagram.com/uahh",
+            site: "www.google.com",
+            
+            menuImages: [  // Agora é um array de imagens
+                "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+                "images/comercios/lanchonete/paiol/cardapio_2.jpg",
+                "images/comercios/lanchonete/paiol/cardapio_3.jpg"],
+            info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
+        },
+      
         ]
     },
 // Eventos
