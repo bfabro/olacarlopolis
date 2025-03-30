@@ -331,8 +331,8 @@ document.addEventListener("DOMContentLoaded", function() {
             establishments: [{
 
                     name: "Calendario Eventos",
-                    image: "images/info_uteis/eventos/evento_1/calendario_evento.png"
-
+                    image: "images/info_uteis/eventos/evento_1/calendario_evento.png",
+                    contact: "",
 
                 },
 
