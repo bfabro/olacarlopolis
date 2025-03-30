@@ -1,9 +1,7 @@
+document.addEventListener("DOMContentLoaded", function() {
 
-
-document.addEventListener("DOMContentLoaded", function () {
-
-     // pagou? defina por s pago n nao pago // PAGx
-     const statusEstabelecimentos = {
+    // pagou? defina por s pago n nao pago // PAGx
+    const statusEstabelecimentos = {
         // ADEGAS
         adegacuenca: "s",
 
@@ -18,8 +16,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         //farmacia
         elshaday: "s",
-        farmais: "s", 
-        descontofacil1: "s", 
+        farmais: "s",
+        descontofacil1: "s",
         drogamais: "s",
         masterfarma: "s",
         popularmais: "s",
@@ -27,10 +25,10 @@ document.addEventListener("DOMContentLoaded", function () {
         saudefarma: "s",
 
         //pizzaria
-        fornalhapizzaria:"s",
+        fornalhapizzaria: "s",
 
         // quitanda
-        pimentadoce:"s",
+        pimentadoce: "s",
 
 
         //lanchonete
@@ -46,28 +44,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // MENU INFORMACOES UTEIS
         hospitalsãojose: "s",
-       
+
         lixoeletronico: "s",
         prefeitura: "s",
         duvidasereclamações: "s",
-        copel:"s",
-        sanepar:"s",
+        copel: "s",
+        sanepar: "s",
         //Eventos
         calendarioeventos: "s",
         feiradalua: "s",
-        pescar:"s",
-        triathlon:"s",
-        coletalixoeletronico:"s",
-        
-        
+        pescar: "s",
+        triathlon: "s",
+        coletalixoeletronico: "s",
+
+
 
         // Servicos
 
         // churrasqueiro
-        pituka:"s",
+        pituka: "s",
 
         //diarista
-        rose:"s",
+        rose: "s",
 
         // pedreiro
         deniscenturion: "s",
@@ -93,27 +91,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
     const clearSearch = document.getElementById("clearSearch");
 
- // Função para adicionar contadores de slides
- function addSlideCounters(swiperInstance, containerSelector) {
-    const container = document.querySelector(containerSelector);
-    if (!container) return;
+    // Função para adicionar contadores de slides
+    function addSlideCounters(swiperInstance, containerSelector) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
 
-    // Cria o elemento do contador
-    const counter = document.createElement('div');
-    counter.className = 'swiper-counter';
-    
-    // Atualiza o contador
-    function updateCounter() {
-        counter.textContent = `${swiperInstance.realIndex + 1}/${swiperInstance.slides.length}`;
+        // Cria o elemento do contador
+        const counter = document.createElement('div');
+        counter.className = 'swiper-counter';
+
+        // Atualiza o contador
+        function updateCounter() {
+            counter.textContent = `${swiperInstance.realIndex + 1}/${swiperInstance.slides.length}`;
+        }
+
+        // Adiciona o contador ao container
+        container.appendChild(counter);
+
+        // Atualiza inicialmente e adiciona listeners
+        updateCounter();
+        swiperInstance.on('slideChange', updateCounter);
     }
-    
-    // Adiciona o contador ao container
-    container.appendChild(counter);
-    
-    // Atualiza inicialmente e adiciona listeners
-    updateCounter();
-    swiperInstance.on('slideChange', updateCounter);
-}
 
     // Inicializa o carrossel de Turismo
     const swiperTurismo = new Swiper('.swiper-turismo', {
@@ -170,43 +168,43 @@ document.addEventListener("DOMContentLoaded", function () {
     ///////////
     if (searchInput && clearSearch) {
         // Mostrar ou esconder o botão X ao digitar
-        searchInput.addEventListener("input", function () {
-          if (searchInput.value.length > 0) {
-            clearSearch.style.display = "block";
-          } else {
-            clearSearch.style.display = "none";
-          }
+        searchInput.addEventListener("input", function() {
+            if (searchInput.value.length > 0) {
+                clearSearch.style.display = "block";
+            } else {
+                clearSearch.style.display = "none";
+            }
         });
-    
+
         // Limpar o campo ao clicar no "X"
-        clearSearch.addEventListener("click", function () {
-          searchInput.value = "";
-          clearSearch.style.display = "none";
-    
-          // Dispara um evento de input para garantir que a pesquisa seja resetada
-          searchInput.dispatchEvent(new Event("input"));
+        clearSearch.addEventListener("click", function() {
+            searchInput.value = "";
+            clearSearch.style.display = "none";
+
+            // Dispara um evento de input para garantir que a pesquisa seja resetada
+            searchInput.dispatchEvent(new Event("input"));
         });
-      }
+    }
 
     // Quando clicar no menu, abre a sidebar e ativa o fundo escuro
-    sidebarOpen.addEventListener("click", function () {
+    sidebarOpen.addEventListener("click", function() {
         sidebar.classList.toggle("open");
         overlay.classList.toggle("active");
     });
 
     // Quando clicar fora do menu, fecha a sidebar
-    overlay.addEventListener("click", function () {
+    overlay.addEventListener("click", function() {
         sidebar.classList.remove("open");
         overlay.classList.remove("active");
     });
 
-    
+
 
     // Criar um botão "X" para fechar o menu
     const closeButton = document.createElement("button");
     closeButton.innerHTML = "&times;";
     closeButton.classList.add("close-btn");
-    closeButton.addEventListener("click", function () {
+    closeButton.addEventListener("click", function() {
         sidebar.classList.remove("open");
         overlay.classList.remove("active");
     });
@@ -219,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Quando um item do menu for clicado, fecha o menu automaticamente
     menuLinks.forEach(link => {
-        link.addEventListener("click", function () {
+        link.addEventListener("click", function() {
             // Verifica se o item do menu tem a classe "submenu_item"
             if (!this.classList.contains("submenu_item")) {
                 // Se for um link válido (não um menu pai), fecha o menu
@@ -231,14 +229,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("content_area").classList.remove("hidden");
     });
     if (!searchInput) return; // Evita erro se o campo de busca não existir
 
-
-
-   
 
 
 
@@ -247,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .toLowerCase()
             .replace(/\s*\(.*?\)\s*/g, '')
             .replace(/\s+/g, '');
-            
+
     }
 
     function sendPaymentReminder(establishment) {
@@ -257,464 +252,465 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Carregar informações de categorias
     const categories = [
-        
-        
-        
-        
-        
+
+
+
+
+        {
+            link: document.querySelector("#menuLanchonete"),
+            title: "Lanchonetes",
+            establishments: [{
+                    image: "images/comercios/lanchonete/paiol/paiol.png",
+                    name: "Paiol",
+                    hours: "qua - dom 19 - 00h",
+                    address: "Av. Elson Soares, 767 ",
+                    contact: "(43) 99159-0070",
+                    delivery: "Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+
+                    menuImages: [ // Agora é um array de imagens
+                        "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+                        "images/comercios/lanchonete/paiol/cardapio_2.jpg",
+                        "images/comercios/lanchonete/paiol/cardapio_3.jpg"
+                    ],
+                    info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
+                },
+                {
+                    image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
+                    name: "Casarao",
+                    hours: "seg - seg - 19h - 00h e dom: 07 - 12h",
+                    address: "R. Benedito Salles, 341 ",
+                    contact: "(43) 99693-0565",
+                    delivery: "Sim / Com Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+
+                    menuImages: [ // Agora é um array de imagens
+                        "images/comercios/lanchonete/casarao/casarao.png",
+                        "images/comercios/lanchonete/paiol/cardapio_2.jpg",
+                    ],
+                    info: "Palavra Chave: <strong>Supimpa</strong>. Use no pedido e ganhe 1% de desconto!" // Informação personalizada
+                },
+            ]
+        },
+
+
+        // pizzaria
         {
-        link: document.querySelector("#menuLanchonete"),
-        title: "Lanchonetes",
-        establishments: [{
-            image: "images/comercios/lanchonete/paiol/paiol.png",
-            name: "Paiol",
-            hours: "qua - dom 19 - 00h",
-            address: "Av. Elson Soares, 767 ",            
-            contact: "(43) 99159-0070",
-            delivery: "Sim / Sem Taxa",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
-            
-            menuImages: [  // Agora é um array de imagens
-                "images/comercios/lanchonete/paiol/cardapio_1.jpg",
-                "images/comercios/lanchonete/paiol/cardapio_2.jpg",
-                "images/comercios/lanchonete/paiol/cardapio_3.jpg"],
-            info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
+            link: document.querySelector("#menuPizzaria"),
+            title: "Pizzarias",
+            establishments: [{
+                    image: "images/comercios/pizzaria/fornalha.png",
+                    name: "Fornalha Pizzaria",
+                    hours: "</br>Quarta -  Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
+                    address: "</br>R. Benedito Salles, 837",
+                    contact: "</br>(43) 3566-1450",
+                    delivery: "</br>Sim / Com Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+
+                    menuImages: [ // Agora é um array de imagens
+                        "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+                        "images/comercios/lanchonete/paiol/cardapio_2.jpg",
+                        "images/comercios/lanchonete/paiol/cardapio_3.jpg"
+                    ],
+                    info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
+                },
+
+            ]
         },
+        // Eventos
         {
-            image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
-            name: "Casarao",
-            hours: "seg - seg - 19h - 00h e dom: 07 - 12h",
-            address: "R. Benedito Salles, 341 ",
-            contact: "(43) 99693-0565",
-            delivery: "Sim / Com Taxa",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
-           
-            menuImages: [  // Agora é um array de imagens
-                "images/comercios/lanchonete/casarao/casarao.png",
-                "images/comercios/lanchonete/paiol/cardapio_2.jpg",
-               ],
-            info: "Palavra Chave: <strong>Supimpa</strong>. Use no pedido e ganhe 1% de desconto!" // Informação personalizada
+
+            link: document.querySelector("#menuEventos"),
+            title: "Eventos em Carlópolis",
+            establishments: [{
+
+                    name: "Calendario Eventos",
+                    image: "images/info_uteis/eventos/evento_1/calendario_evento.png"
+
+
+                },
+
+                {
+                    image: "images/info_uteis/eventos/evento_3/lixoEletronico.png",
+                    name: "Coleta Lixo Eletronico",
+                    date: "05/03/25 a 20/04/2025",
+                    address: "Paroquia Senhor Bom Jesus",
+                    contact: "",
+                    menuFlyer: "#"
+                },
+
+                {
+                    image: "images/info_uteis/eventos/evento_5/triathlon.png",
+                    name: "Triathlon",
+                    date: "06/04/25",
+                    address: "Ilha do Ponciano",
+                    contact: "(43) 99964-6136",
+                    menuFlyer: "#"
+                },
+
+                {
+                    image: "images/info_uteis/eventos/evento_4/pescar.png",
+                    name: "Pescar",
+                    date: "03/05/25 a 04/05/2025",
+                    address: "Ilha do Ponciano",
+                    contact: "(41) 99950-9291",
+                    menuFlyer: "#"
+                },
+
+
+
+                {
+                    image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
+                    name: "Feira da Lua",
+                    date: "Sex das 19 - 00h",
+                    address: "Praça Igreja Matriz ",
+                    contact: "(11) 99898-5930",
+                    menuFlyer: "images/info_uteis/eventos/evento_2/feira_lua_1.png"
+                },
+
+
+            ]
         },
-        ]
-    },
 
-
-// pizzaria
-    {
-        link: document.querySelector("#menuPizzaria"),
-        title: "Pizzarias",
-        establishments: [{
-            image: "images/comercios/pizzaria/fornalha.png",
-            name: "Fornalha Pizzaria",
-            hours: "</br>Quarta -  Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
-            address: "</br>R. Benedito Salles, 837",            
-            contact: "</br>(43) 3566-1450",
-            delivery: "</br>Sim / Com Taxa",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
-            
-            menuImages: [  // Agora é um array de imagens
-                "images/comercios/lanchonete/paiol/cardapio_1.jpg",
-                "images/comercios/lanchonete/paiol/cardapio_2.jpg",
-                "images/comercios/lanchonete/paiol/cardapio_3.jpg"],
-            info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
-        },
-      
-        ]
-    },
-// Eventos
-    {
-
-        link: document.querySelector("#menuEventos"),
-        title: "Eventos em Carlópolis",
-        establishments: [{
-
-            name: "Calendario Eventos",
-            image: "images/info_uteis/eventos/evento_1/calendario_evento.png"
-                     
-
-        },
-      
-        {
-            image: "images/info_uteis/eventos/evento_3/lixoEletronico.png",
-            name: "Coleta Lixo Eletronico",
-            date: "05/03/25 a 20/04/2025",
-            address: "Paroquia Senhor Bom Jesus",
-            contact: "",
-            menuFlyer: "#"
-        },
 
         {
-            image: "images/info_uteis/eventos/evento_5/triathlon.png",
-            name: "Triathlon",
-            date: "06/04/25",
-            address: "Ilha do Ponciano",
-            contact: "(43) 99964-6136",
-            menuFlyer: "#"
+            link: document.querySelector("#menuMercado"),
+            title: "Supermercados ",
+            establishments: [
+
+
+                {
+                    image: "images/comercios/supermercado/carreiro.png",
+                    name: "Carreiro",
+                    address: "</br>R. Benedito Salles, 341 ",
+                    hours: "</br>7h - 20h e dom: 07 - 12h",
+                    contact: "</br>(43) 2345-6789",
+                    delivery: "</br>Sim / Com Taxa"
+                },
+                {
+                    image: "images/comercios/supermercado/obarateiro.png",
+                    name: "O Barateiro",
+                    address: "</br>PR-218, 1168 ",
+                    hours: "</br>8h - 21h e dom: 07 - 12h",
+                    contact: "</br>(43) 3456-7890",
+                    delivery: "</br>Sim / Sem Taxa"
+                },
+                {
+                    name: "Kelve",
+                    address: "</br>PR-218, 1168 ",
+                    hours: "</br>8h - 21h e dom: 07 - 12h",
+                    contact: "</br>(43) 3456-7890",
+                    delivery: "</br>Sim / Sem Taxa"
+                },
+
+                {
+                    name: "Rocha",
+                    hours: "</br>6h - 20h e dom: 06 - 12h",
+                    address: "</br>Av. Elson Soares, 767 ",
+                    contact: "</br>(43) 3566-2436",
+                    delivery: "</br>Sim / Sem Taxa"
+                },
+
+                {
+                    name: "Carriel",
+                    address: "</br>PR-218, 1168 ",
+                    hours: "</br>8h - 21h e dom: 07 - 12h",
+                    contact: "</br>(43) 3456-7890",
+                    delivery: "</br>Sim / Sem Taxa"
+                },
+                {
+                    name: "Compre Bem +",
+                    address: "</br>PR-218, 1168 ",
+                    hours: "</br>8h - 21h e dom: 07 - 12h",
+                    contact: "</br>(43) 3456-7890",
+                    delivery: "</br>Sim / Sem Taxa"
+                },
+
+                {
+                    name: "Zero Japan",
+                    address: "</br>PR-218, 1168 ",
+                    hours: "</br>8h - 21h e dom: 07 - 12h",
+                    contact: "</br>(43) 3456-7890",
+                    delivery: "</br>Sim / Sem Taxa"
+                },
+
+
+            ]
+        },
+
+
+        {
+            link: document.querySelector("#menuFarmacia"),
+            title: "Farmácias ",
+            establishments: [
+
+                {
+                    image: "images/comercios/farmacia/farmafacil.png",
+                    name: "Desconto Facil 1 ( Joao )",
+                    address: "</br>R. Benedito Salles, 574",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    contact: "</br>(43) 3566-1119",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com"
+
+                },
+                {
+                    image: "images/comercios/farmacia/drogamais.png",
+                    name: "DrogaMais ( Jorginho )",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    address: "</br>Rua Benedito Salles, 903",
+                    contact: "</br>(43) 98411-9145",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+                    info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
+
+                },
+
+                {
+                    image: "images/comercios/farmacia/elshaday.png",
+                    name: "El Shaday ( Daniel )",
+                    address: "</br>R. Benedito Sales, 353",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    contact: "</br>(43) 98488-9420",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com"
+                },
+
+                {
+                    image: "images/comercios/farmacia/farmais.png",
+                    name: "FarMais",
+                    address: "</br>R. Benedito Salles, 1188",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    contact: "</br>(43) 3566-1211",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com"
+                },
+
+
+
+                {
+                    image: "images/comercios/farmacia/masterfarma.png",
+                    name: "MasterFarma ( Zurdo )",
+                    address: "</br>R. Laurindo Franco de Godoi, 90",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    contact: "</br>(43) 3566-1471",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com"
+                },
+                {
+                    image: "images/comercios/farmacia/popularMais.png",
+                    name: "PopularMais ( Jeremias )",
+                    address: "</br>R. Laurindo Franco de Godói, 787",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    contact: "</br>(43) 3566-1471",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com"
+                },
+                {
+                    image: "images/comercios/farmacia/santamaria.png",
+                    name: "Santa Maria ( Aguera )",
+                    address: "</br>Praça Coronel Leite, nº 711",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    contact: "</br>(43) 3566-1471",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com"
+                },
+
+                {
+                    image: "images/comercios/farmacia/saudeFarma.png",
+                    name: "Saude Farma",
+                    address: "</br>Praça Coronel Leite, nº 711",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    contact: "</br>(43) 99956-8938",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com"
+                }
+
+            ]
         },
 
         {
-            image: "images/info_uteis/eventos/evento_4/pescar.png",
-            name: "Pescar",
-            date: "03/05/25 a 04/05/2025",
-            address: "Ilha do Ponciano",
-            contact: "(41) 99950-9291",
-            menuFlyer: "#"
+            link: document.querySelector("#menuChurrasqueiro"),
+            title: "Churrasqueiros ",
+            establishments: [{
+                    name: "Pituka",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Gustavo",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-
-      
 
         {
-            image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
-            name: "Feira da Lua",
-            date: "Sex das 19 - 00h",
-            address: "Praça Igreja Matriz ",
-            contact: "(11) 99898-5930",
-            menuFlyer: "images/info_uteis/eventos/evento_2/feira_lua_1.png"
+            link: document.querySelector("#menuBabas"),
+            title: "Babas ",
+            establishments: [{
+                    name: "Maria",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Antonia",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
 
-
-        ]
-    },
-
-
-    {
-        link: document.querySelector("#menuMercado"),
-        title: "Supermercados ",
-        establishments: [
-
-
-            {
-                image: "images/comercios/supermercado/carreiro.png",
-                name: "Carreiro",
-                address: "</br>R. Benedito Salles, 341 ",
-                hours: "</br>7h - 20h e dom: 07 - 12h",
-                contact: "</br>(43) 2345-6789",
-                delivery: "</br>Sim / Com Taxa"
-            },
-            {
-                image: "images/comercios/supermercado/obarateiro.png",
-                name: "O Barateiro",
-                address: "</br>PR-218, 1168 ",
-                hours: "</br>8h - 21h e dom: 07 - 12h",
-                contact: "</br>(43) 3456-7890",
-                delivery: "</br>Sim / Sem Taxa"
-            },
-            {
-                name: "Kelve",
-                address: "</br>PR-218, 1168 ",
-                hours: "</br>8h - 21h e dom: 07 - 12h",
-                contact: "</br>(43) 3456-7890",
-                delivery: "</br>Sim / Sem Taxa"
-            },
-
-            {
-                name: "Rocha",
-                hours: "</br>6h - 20h e dom: 06 - 12h",
-                address: "</br>Av. Elson Soares, 767 ",
-                contact: "</br>(43) 3566-2436",
-                delivery: "</br>Sim / Sem Taxa"
-            },
-
-            {
-                name: "Carriel",
-                address: "</br>PR-218, 1168 ",
-                hours: "</br>8h - 21h e dom: 07 - 12h",
-                contact: "</br>(43) 3456-7890",
-                delivery: "</br>Sim / Sem Taxa"
-            },
-            {
-                name: "Compre Bem +",
-                address: "</br>PR-218, 1168 ",
-                hours: "</br>8h - 21h e dom: 07 - 12h",
-                contact: "</br>(43) 3456-7890",
-                delivery: "</br>Sim / Sem Taxa"
-            },
-
-            {
-                name: "Zero Japan",
-                address: "</br>PR-218, 1168 ",
-                hours: "</br>8h - 21h e dom: 07 - 12h",
-                contact: "</br>(43) 3456-7890",
-                delivery: "</br>Sim / Sem Taxa"
-            },
-
-
-        ]
-    },
-
-
-    {
-        link: document.querySelector("#menuFarmacia"),
-        title: "Farmácias ",
-        establishments: [
-
-            {
-                image: "images/comercios/farmacia/farmafacil.png",
-                name: "Desconto Facil 1 ( Joao )",
-                address: "</br>R. Benedito Salles, 574",
-                hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                contact: "</br>(43) 3566-1119",
-                delivery: "</br>Sim / Sem Taxa",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                site: "www.google.com"
-
-            },
-            {
-                image: "images/comercios/farmacia/drogamais.png",
-                name: "DrogaMais ( Jorginho )",
-                hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                address: "</br>Rua Benedito Salles, 903",
-                contact: "</br>(43) 98411-9145",
-                delivery: "</br>Sim / Sem Taxa",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                site: "www.google.com",
-                info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
-
-            },
-
-            {
-                image: "images/comercios/farmacia/elshaday.png",
-                name: "El Shaday ( Daniel )",
-                address: "</br>R. Benedito Sales, 353",
-                hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                contact: "</br>(43) 98488-9420",
-                delivery: "</br>Sim / Sem Taxa",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                site: "www.google.com"
-            },
-
-            {
-                image: "images/comercios/farmacia/farmais.png",
-                name: "FarMais",
-                address: "</br>R. Benedito Salles, 1188",
-                hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                contact: "</br>(43) 3566-1211",
-                delivery: "</br>Sim / Sem Taxa",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                site: "www.google.com"
-            },
-
-
-
-            {
-                image: "images/comercios/farmacia/masterfarma.png",
-                name: "MasterFarma ( Zurdo )",
-                address: "</br>R. Laurindo Franco de Godoi, 90",
-                hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                contact: "</br>(43) 3566-1471",
-                delivery: "</br>Sim / Sem Taxa",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                site: "www.google.com"
-            },
-            {
-                image: "images/comercios/farmacia/popularMais.png",
-                name: "PopularMais ( Jeremias )",
-                address: "</br>R. Laurindo Franco de Godói, 787",
-                hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                contact: "</br>(43) 3566-1471",
-                delivery: "</br>Sim / Sem Taxa",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                site: "www.google.com"
-            },
-            {
-                image: "images/comercios/farmacia/santamaria.png",
-                name: "Santa Maria ( Aguera )",
-                address: "</br>Praça Coronel Leite, nº 711",
-                hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                contact: "</br>(43) 3566-1471",
-                delivery: "</br>Sim / Sem Taxa",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                site: "www.google.com"
-            },
-
-            {
-                image: "images/comercios/farmacia/saudeFarma.png",
-                name: "Saude Farma",
-                address: "</br>Praça Coronel Leite, nº 711",
-                hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                contact: "</br>(43) 99956-8938",
-                delivery: "</br>Sim / Sem Taxa",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                site: "www.google.com"
-            }
-
-        ]
-    },
-
-    {
-        link: document.querySelector("#menuChurrasqueiro"),
-        title: "Churrasqueiros ",
-        establishments: [{
-            name: "Pituka",
-            contact: "(43) 7890-1234"
-        },
         {
-            name: "Gustavo",
-            contact: "(43) 8901-2345"
+            link: document.querySelector("#menuDiarista"),
+            title: "Diaristas",
+            establishments: [{
+                    name: "Rose",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Maria",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuBabas"),
-        title: "Babas ",
-        establishments: [{
-            name: "Maria",
-            contact: "(43) 7890-1234"
-        },
         {
-            name: "Antonia",
-            contact: "(43) 8901-2345"
+            link: document.querySelector("#menuEletricista"),
+            title: "Eletrecistas",
+            establishments: [{
+                    name: "Juca",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Jurandir",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuDiarista"),
-        title: "Diaristas",
-        establishments: [{
-            name: "Rose",
-            contact: "(43) 7890-1234"
-        },
         {
-            name: "Maria",
-            contact: "(43) 8901-2345"
+            link: document.querySelector("#menuEncanador"),
+            title: "Encanador",
+            establishments: [{
+                    name: "Rubens",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Jose",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuEletricista"),
-        title: "Eletrecistas",
-        establishments: [{
-            name: "Juca",
-            contact: "(43) 7890-1234"
-        },
         {
-            name: "Jurandir",
-            contact: "(43) 8901-2345"
+            link: document.querySelector("#menuGuiaPesca"),
+            title: "Guia de Pesca",
+            establishments: [{
+                    name: "Fabio Sushimoto",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Thiago Aguera",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuEncanador"),
-        title: "Encanador",
-        establishments: [{
-            name: "Rubens",
-            contact: "(43) 7890-1234"
-        },
         {
-            name: "Jose",
-            contact: "(43) 8901-2345"
+            link: document.querySelector("#menuJardineiro"),
+            title: "Jardineiros ",
+            establishments: [{
+                    name: "Antonio Gil",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Ruan",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuGuiaPesca"),
-        title: "Guia de Pesca",
-        establishments: [{
-            name: "Fabio Sushimoto",
-            contact: "(43) 7890-1234"
-        },
         {
-            name: "Thiago Aguera",
-            contact: "(43) 8901-2345"
+            link: document.querySelector("#menuMarceneiro"),
+            title: "Marceneiros ",
+            establishments: [{
+                    name: "Pedro alvez",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Rodrigo",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuJardineiro"),
-        title: "Jardineiros ",
-        establishments: [{
-            name: "Antonio Gil",
-            contact: "(43) 7890-1234"
-        },
         {
-            name: "Ruan",
-            contact: "(43) 8901-2345"
+            link: document.querySelector("#menuPedreiro"),
+            title: "Pedreiros ",
+            establishments: [{
+                    image: "images/servicos/pedreiro/denis2.png",
+                    name: "Denis centurion",
+                    contact: "(11) 9.5982-2485"
+                },
+                {
+                    name: "Kauan",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuMarceneiro"),
-        title: "Marceneiros ",
-        establishments: [{
-            name: "Pedro alvez",
-            contact: "(43) 7890-1234"
-        },
         {
-            name: "Rodrigo",
-            contact: "(43) 8901-2345"
+            link: document.querySelector("#menuPintor"),
+            title: "Pintor ",
+            establishments: [{
+                    name: "Rafael portes",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Yuri",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuPedreiro"),
-        title: "Pedreiros ",
-        establishments: [{
-            image: "images/servicos/pedreiro/denis2.png",
-            name: "Denis centurion",
-            contact: "(11) 9.5982-2485"
-        },
         {
-            name: "Kauan",
-            contact: "(43) 8901-2345"
+            link: document.querySelector("#menuVeterinario"),
+            title: "Veterinario ",
+            establishments: [{
+                    name: "Celso Golçalves",
+                    contact: "(43) 7890-1234"
+                },
+                {
+                    name: "Jurandir Machado",
+                    contact: "(43) 8901-2345"
+                },
+            ]
         },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuPintor"),
-        title: "Pintor ",
-        establishments: [{
-            name: "Rafael portes",
-            contact: "(43) 7890-1234"
-        },
         {
-            name: "Yuri",
-            contact: "(43) 8901-2345"
-        },
-        ]
-    },
 
-    {
-        link: document.querySelector("#menuVeterinario"),
-        title: "Veterinario ",
-        establishments: [{
-            name: "Celso Golçalves",
-            contact: "(43) 7890-1234"
-        },
-        {
-            name: "Jurandir Machado",
-            contact: "(43) 8901-2345"
-        },
-        ]
-    },
+            link: document.querySelector("#menufarmaciaPlantao"),
 
-    {
-
-        link: document.querySelector("#menufarmaciaPlantao"),
-
-        /*
+            /*
   title: "Farmacia de Plantão",
   establishments: [{
     name: "MasterFarma ( Zurdo ) ",
@@ -728,427 +724,427 @@ document.addEventListener("DOMContentLoaded", function () {
     site: "www.google.com",
     info: " <strong>Descontao:</strong><ul>Procure o Zurdo e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
         */
-        /*
-                title: "Farmacia de Plantão",
-                establishments: [{
-                    name: "El Shaday ( Daniel )",
-                    address: "R. Benedito Sales, 353",
-                    contact: "(43) 98488-9420",
-                    plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
-                    delivery: "Sim / Sem Taxa",
-                    image: "images/info_uteis/farmacia_plantao/elshaday.png",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com",
-                    info: " <strong>Descontao:</strong><ul>Procure o Daniel e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
-        */
+            /*
+                    title: "Farmacia de Plantão",
+                    establishments: [{
+                        name: "El Shaday ( Daniel )",
+                        address: "R. Benedito Sales, 353",
+                        contact: "(43) 98488-9420",
+                        plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
+                        delivery: "Sim / Sem Taxa",
+                        image: "images/info_uteis/farmacia_plantao/elshaday.png",
+                        facebook: "www.facebook.com/uahh",
+                        instagram: "www.instagram.com/uahh",
+                        site: "www.google.com",
+                        info: " <strong>Descontao:</strong><ul>Procure o Daniel e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
+            */
 
-        title: "Farmacia de Plantão",
-        establishments: [{
-            name: "DrogaMais ( Jorginho )",
-            address: "</br>Rua Benedito Salles, 903",
-            contact: "</br>(43) 98411-9145",
-            plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
-            delivery: "</br>Sim / Sem Taxa",
-            image: "images/comercios/farmacia/drogamais.png",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
-            info: " <strong>Descontão:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
-
-
-        },]
-    },
+            title: "Farmacia de Plantão",
+            establishments: [{
+                name: "DrogaMais ( Jorginho )",
+                address: "</br>Rua Benedito Salles, 903",
+                contact: "</br>(43) 98411-9145",
+                plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
+                delivery: "</br>Sim / Sem Taxa",
+                image: "images/comercios/farmacia/drogamais.png",
+                facebook: "www.facebook.com/uahh",
+                instagram: "www.instagram.com/uahh",
+                site: "www.google.com",
+                info: " <strong>Descontão:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
 
 
-    {
-
-        link: document.querySelector("#menuHospital"),
-        title: "Hospital",
-        establishments: [{
-            name: "Hospital São Jose",
-            address: "R. Cap. Estácio, 460",
-            contact: "(43) 99174-2539",
-            hours: "24 horas",
-            image: "images/info_uteis/hospital/hospital.png",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com"
+            }, ]
+        },
 
 
-        },]
-    },
+        {
 
-    {
+            link: document.querySelector("#menuHospital"),
+            title: "Hospital",
+            establishments: [{
+                name: "Hospital São Jose",
+                address: "R. Cap. Estácio, 460",
+                contact: "(43) 99174-2539",
+                hours: "24 horas",
+                image: "images/info_uteis/hospital/hospital.png",
+                facebook: "www.facebook.com/uahh",
+                instagram: "www.instagram.com/uahh",
+                site: "www.google.com"
 
-        link: document.querySelector("#menuPrefeitura"),
 
-        title: "Prefeitura",
-        establishments: [{
-            name: "Prefeitura",
-            address: "R. Benedito Salles, 1060 - Centro",
-            contact: "(43) 3566-1291",
-            hours: "8h as 17h",
-            image: "images/info_uteis/prefeitura/prefeitura.png",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com"
-
+            }, ]
         },
 
         {
-            name: "Duvidas e  Reclamações",            
-            contact: "(43) 99825-0360",
-            hours: "8h as 17h",
-            image: "images/info_uteis/prefeitura/prefeitura.png", 
 
+            link: document.querySelector("#menuPrefeitura"),
+
+            title: "Prefeitura",
+            establishments: [{
+                    name: "Prefeitura",
+                    address: "R. Benedito Salles, 1060 - Centro",
+                    contact: "(43) 3566-1291",
+                    hours: "8h as 17h",
+                    image: "images/info_uteis/prefeitura/prefeitura.png",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com"
+
+                },
+
+                {
+                    name: "Duvidas e  Reclamações",
+                    contact: "(43) 99825-0360",
+                    hours: "8h as 17h",
+                    image: "images/info_uteis/prefeitura/prefeitura.png",
+
+                }
+
+
+
+            ]
+        },
+
+
+
+        {
+            link: document.querySelector("#menuCopel"),
+
+            title: "Copel",
+            establishments: [{
+
+
+                name: "Copel",
+                hours: "seg a sex: 8h - 12h",
+                address: "R. Benedito Salles, 1094",
+                contact: "(41) 3013-8973",
+                image: "images/info_uteis/copel/copel.png",
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuSanepar"),
+
+            title: "Sanepar",
+            establishments: [{
+
+
+                name: "Sanepar",
+                hours: "seg a sex: 8:30h - 12h, 13:30 as 17h",
+                address: "R. André Jorge Cleli, 148 ",
+                contact: "0800 200 0115",
+                image: "images/info_uteis/sanepar/sanepar.png",
+
+
+            }, ]
+        },
+
+
+
+
+        {
+            link: document.querySelector("#menuMotoCenter"),
+
+            title: "Moto Center",
+            establishments: [{
+
+
+                name: "Binho Moto Center ",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+
+            }, ]
+        },
+
+
+        {
+            link: document.querySelector("#menuAcougue"),
+
+            title: "Açougues",
+            establishments: [{
+
+
+                name: "Açougue do Carlinho",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuAgropecuaria"),
+
+            title: "Agropecuarias",
+            establishments: [{
+
+
+
+                name: "Agro Vida",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuAutoCenter"),
+
+            title: "Auto Center",
+            establishments: [{
+
+
+
+                name: "Auto center bairro",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuBrinquedos"),
+
+            title: "Loja de Brinquedos",
+            establishments: [{
+
+
+                name: "Filho Otaviano",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuDiskGas"),
+
+            title: "Deposito de Gas",
+            establishments: [{
+
+
+
+                name: "Lia Gas",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuFuneraria"),
+
+            title: "Funerarias",
+            establishments: [{
+
+                name: "Bom Jesus",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuMaterialContrucao"),
+
+            title: "Material de Construção",
+            establishments: [{
+
+
+
+
+                name: "Carriel",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuPadaria"),
+
+            title: "Padarias",
+            establishments: [{
+
+
+                name: "Bom Jesus",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuPetShop"),
+
+            title: "Pet Shop",
+            establishments: [{
+
+
+                name: "Paraiso dos Animais",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuQuitanda"),
+
+            title: "Quitanda",
+            establishments: [{
+
+
+                name: "Pimenta Doce",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Kalil Keder ",
+                contact: "(43) 3566-1554",
+                delivery: "Sim / Sem Taxa",
+                image: "images/comercios/quitanda/pimentadoce.png",
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuRestaurantes"),
+
+            title: "Restaurante",
+            establishments: [{
+
+
+
+                name: "Delfino",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuPapelaria"),
+
+            title: "Papelaria",
+            establishments: [{
+
+
+
+                name: "Haruo",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+
+
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuImobiliaria"),
+
+            title: "Imobiliaria",
+            establishments: [{
+
+
+                name: "Rafael Bandeira",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuAdega"),
+
+            title: "Adegas",
+            establishments: [{
+
+                name: "Adega Cuenca",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuAdvocacia"),
+
+            title: "Escritorio de Advocacia",
+            establishments: [{
+
+                name: "Ruan ABILIO",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuAssistenciaCelular"),
+
+            title: "Assistencia Celular",
+            establishments: [{
+
+                name: "Soraya",
+                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "R. Laurindo Franco de Godoi, 90",
+                contact: "(43) 99951-1540",
+                delivery: "Sim / Sem Taxa"
+
+            }, ]
         }
-
-
-
-        ]
-    },
-
-    
-
-    {
-        link: document.querySelector("#menuCopel"),
-
-        title: "Copel",
-        establishments: [{
-
-
-            name: "Copel",
-            hours: "seg a sex: 8h - 12h",
-            address: "R. Benedito Salles, 1094",
-            contact: "(41) 3013-8973",
-            image: "images/info_uteis/copel/copel.png", 
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuSanepar"),
-
-        title: "Sanepar",
-        establishments: [{
-
-
-            name: "Sanepar",
-            hours: "seg a sex: 8:30h - 12h, 13:30 as 17h",
-            address: "R. André Jorge Cleli, 148 ",
-            contact: "0800 200 0115",
-            image: "images/info_uteis/sanepar/sanepar.png", 
-
-
-        },]
-    },
-
-
-
-
-    {
-        link: document.querySelector("#menuMotoCenter"),
-
-        title: "Moto Center",
-        establishments: [{
-
-
-            name: "Binho Moto Center ",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-
-        },]
-    },
-
-
-    {
-        link: document.querySelector("#menuAcougue"),
-
-        title: "Açougues",
-        establishments: [{
-
-
-            name: "Açougue do Carlinho",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuAgropecuaria"),
-
-        title: "Agropecuarias",
-        establishments: [{
-
-
-
-            name: "Agro Vida",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuAutoCenter"),
-
-        title: "Auto Center",
-        establishments: [{
-
-
-
-            name: "Auto center bairro",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuBrinquedos"),
-
-        title: "Loja de Brinquedos",
-        establishments: [{
-
-
-            name: "Filho Otaviano",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuDiskGas"),
-
-        title: "Deposito de Gas",
-        establishments: [{
-
-
-
-            name: "Lia Gas",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuFuneraria"),
-
-        title: "Funerarias",
-        establishments: [{
-
-            name: "Bom Jesus",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuMaterialContrucao"),
-
-        title: "Material de Construção",
-        establishments: [{
-
-
-
-
-            name: "Carriel",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuPadaria"),
-
-        title: "Padarias",
-        establishments: [{
-
-
-            name: "Bom Jesus",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuPetShop"),
-
-        title: "Pet Shop",
-        establishments: [{
-
-
-            name: "Paraiso dos Animais",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuQuitanda"),
-
-        title: "Quitanda",
-        establishments: [{
-
-
-            name: "Pimenta Doce",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Kalil Keder ",
-            contact: "(43) 3566-1554",
-            delivery: "Sim / Sem Taxa",
-            image: "images/comercios/quitanda/pimentadoce.png", 
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuRestaurantes"),
-
-        title: "Restaurante",
-        establishments: [{
-
-
-
-            name: "Delfino",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuPapelaria"),
-
-        title: "Papelaria",
-        establishments: [{
-
-
-
-            name: "Haruo",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-
-
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuImobiliaria"),
-
-        title: "Imobiliaria",
-        establishments: [{
-
-
-            name: "Rafael Bandeira",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-
-
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuAdega"),
-
-        title: "Adegas",
-        establishments: [{
-
-            name: "Adega Cuenca",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuAdvocacia"),
-
-        title: "Escritorio de Advocacia",
-        establishments: [{
-
-            name: "Ruan ABILIO",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-        },]
-    },
-
-    {
-        link: document.querySelector("#menuAssistenciaCelular"),
-
-        title: "Assistencia Celular",
-        establishments: [{
-
-            name: "Soraya",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa"
-
-        },]
-    }
 
 
 
 
     ]; // fim dos setores
     // Mostrar ou esconder o ícone "x" com base no conteúdo do campo de pesquisa
-    searchInput.addEventListener("input", function () {
+    searchInput.addEventListener("input", function() {
         if (searchInput.value.trim() !== "") {
             clearSearch.style.display = "block"; // Mostra o ícone "x"
         } else {
@@ -1157,13 +1153,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Limpar o campo de pesquisa quando o ícone "x" for clicado
-    clearSearch.addEventListener("click", function () {
+    clearSearch.addEventListener("click", function() {
         searchInput.value = ""; // Limpa o campo de pesquisa
         clearSearch.style.display = "none"; // Esconde o ícone "x"
         searchInput.dispatchEvent(new Event("input")); // Dispara o evento de input para atualizar a pesquisa
     });
 
-    searchInput.addEventListener("input", function () {
+    searchInput.addEventListener("input", function() {
         const filter = searchInput.value.toLowerCase();
         let foundInMenu = false;
         let foundInEstablishments = false;
@@ -1351,22 +1347,22 @@ ${establishment.date ? `<b>Data do Evento:</b> ${establishment.date}<br>` : ""} 
         ///// inicio
         function toggleElement(button, elementId, openText, closeText, openColor, closeColor) {
             const element = document.getElementById(elementId);
-            
+
             if (!element) {
                 console.error(`Elemento #${elementId} não encontrado.`);
                 return;
             }
-        
+
             // Verifica se o elemento está visível
-            const isVisible = element.style.display !== "none" && 
-                             window.getComputedStyle(element).display !== "none";
-        
+            const isVisible = element.style.display !== "none" &&
+                window.getComputedStyle(element).display !== "none";
+
             if (isVisible) {
                 // Fecha o conteúdo
                 element.style.display = "none";
                 button.textContent = openText;
                 button.style.backgroundColor = closeColor;
-                
+
                 // Destrói a instância do Swiper se existir
                 if (element.swiperInstance) {
                     element.swiperInstance.destroy(true, true);
@@ -1375,12 +1371,12 @@ ${establishment.date ? `<b>Data do Evento:</b> ${establishment.date}<br>` : ""} 
             } else {
                 // Fecha todos os conteúdos antes de abrir o atual
                 closeAllContents();
-                
+
                 // Abre o conteúdo
                 element.style.display = "block";
                 button.textContent = closeText;
                 button.style.backgroundColor = openColor;
-                
+
                 // Inicializa o Swiper se for um carrossel
                 if (element.classList.contains('swiper') && !element.swiperInstance) {
                     element.swiperInstance = new Swiper(element, {
@@ -1402,14 +1398,14 @@ ${establishment.date ? `<b>Data do Evento:</b> ${establishment.date}<br>` : ""} 
         function closeAllContents() {
             document.querySelectorAll(".detalhes-content, .menu-cardapio, .menu-content").forEach(content => {
                 content.style.display = "none";
-                
+
                 // Destrói as instâncias do Swiper
                 if (content.swiperInstance) {
                     content.swiperInstance.destroy(true, true);
                     content.swiperInstance = null;
                 }
             });
-        
+
             // Restaura o texto e a cor dos botões
             document.querySelectorAll(".detalhes-btn, .menu-btn, .flyer-btn").forEach(button => {
                 if (button.classList.contains("detalhes-btn")) {
@@ -1426,58 +1422,58 @@ ${establishment.date ? `<b>Data do Evento:</b> ${establishment.date}<br>` : ""} 
             });
         }
 
-       // Inicializa todos os carrosséis visíveis quando a página carrega
-document.querySelectorAll('.menu-cardapio').forEach(menu => {
-    if (window.getComputedStyle(menu).display !== "none") {
-        menu.swiperInstance = new Swiper(menu, {
-            loop: true,
-            navigation: {
-                nextEl: menu.querySelector('.swiper-button-next'),
-                prevEl: menu.querySelector('.swiper-button-prev'),
-            },
-            pagination: {
-                el: menu.querySelector('.swiper-pagination'),
-                clickable: true,
-            },
+        // Inicializa todos os carrosséis visíveis quando a página carrega
+        document.querySelectorAll('.menu-cardapio').forEach(menu => {
+            if (window.getComputedStyle(menu).display !== "none") {
+                menu.swiperInstance = new Swiper(menu, {
+                    loop: true,
+                    navigation: {
+                        nextEl: menu.querySelector('.swiper-button-next'),
+                        prevEl: menu.querySelector('.swiper-button-prev'),
+                    },
+                    pagination: {
+                        el: menu.querySelector('.swiper-pagination'),
+                        clickable: true,
+                    },
+                });
+            }
         });
-    }
-});
 
-////////////////////////////
+        ////////////////////////////
 
 
 
-///////
-/////
-//////////
-//////////
+        ///////
+        /////
+        //////////
+        //////////
 
-   // Eventos para o Cardápio
-document.querySelectorAll(".menu-btn").forEach(button => {
-    // Armazena o número de itens no cardápio como data attribute
-    const match = button.textContent.match(/\((\d+)\)/);
-    if (match) {
-        button.dataset.count = match[1];
-    }
+        // Eventos para o Cardápio
+        document.querySelectorAll(".menu-btn").forEach(button => {
+            // Armazena o número de itens no cardápio como data attribute
+            const match = button.textContent.match(/\((\d+)\)/);
+            if (match) {
+                button.dataset.count = match[1];
+            }
 
-    button.addEventListener("click", function() {
-        const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
-        const count = this.dataset.count ? ` (${this.dataset.count})` : '';
-        
-        toggleElement(
-            this, 
-            menuId, 
-            `Ver Cardápio${count}`, 
-            "Fechar Cardápio", 
-            "#ff3333", 
-            "#dfa529"
-        );
-    });
-});
+            button.addEventListener("click", function() {
+                const menuId = `menu-${encodeURIComponent(this.dataset.name)}`;
+                const count = this.dataset.count ? ` (${this.dataset.count})` : '';
+
+                toggleElement(
+                    this,
+                    menuId,
+                    `Ver Cardápio${count}`,
+                    "Fechar Cardápio",
+                    "#ff3333",
+                    "#dfa529"
+                );
+            });
+        });
 
         // Eventos para o Flyer
         document.querySelectorAll(".flyer-btn").forEach(button => {
-            button.addEventListener("click", function () {
+            button.addEventListener("click", function() {
                 const flyerId = `menu-${encodeURIComponent(this.dataset.name)}`;
                 toggleElement(this, flyerId, "Ver Flyer", "Fechar Flyer", "#ff3333", "#dfa529");
             });
@@ -1485,7 +1481,7 @@ document.querySelectorAll(".menu-btn").forEach(button => {
 
         // Eventos para as Informações
         document.querySelectorAll(".detalhes-btn").forEach(button => {
-            button.addEventListener("click", function () {
+            button.addEventListener("click", function() {
                 const infoId = `detalhes-${encodeURIComponent(this.dataset.name)}`;
                 toggleElement(this, infoId, "+ Informações", "Fechar Informações", "#ff3333", "#007bff");
             });
@@ -1493,7 +1489,7 @@ document.querySelectorAll(".menu-btn").forEach(button => {
 
         // Eventos para fechar o Cardápio, Flyer e Informações
         document.querySelectorAll(".fechar-menu, .fechar-flyer, .fechar-detalhes").forEach(button => {
-            button.addEventListener("click", function () {
+            button.addEventListener("click", function() {
                 closeAllContents(); // Fecha todos os conteúdos
             });
         });
@@ -1513,13 +1509,10 @@ document.querySelectorAll(".menu-btn").forEach(button => {
 
 
 
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         loadPaidEstablishments();
 
     });
-
-
-
 
 
 
@@ -1536,7 +1529,7 @@ document.querySelectorAll(".menu-btn").forEach(button => {
 
     // Adiciona evento SOMENTE aos subitens do menu
     subMenuLinks.forEach(link => {
-        link.addEventListener("click", function (event) {
+        link.addEventListener("click", function(event) {
             event.preventDefault(); // Evita recarregar a página
             mostrarConteudo(); // Esconde o banner e mostra o conteúdo
 
@@ -1549,7 +1542,7 @@ document.querySelectorAll(".menu-btn").forEach(button => {
 
     // Garantir que ao clicar no "Início", a página recarregue corretamente
     if (homeLink) {
-        homeLink.addEventListener("click", function (event) {
+        homeLink.addEventListener("click", function(event) {
             event.preventDefault();
             window.location.href = "index.html"; // Recarrega a página
         });
@@ -1627,7 +1620,7 @@ document.querySelectorAll(".menu-btn").forEach(button => {
     // Adicionar eventos para os links do menu
     categories.forEach(category => {
         if (category.link) { // 🔹 Só adicionamos o evento se o link existir
-            category.link.addEventListener("click", function (event) {
+            category.link.addEventListener("click", function(event) {
                 event.preventDefault();
                 // Remove a classe ativa de todos os itens
                 categories.forEach(cat => cat.link?.classList.remove("active"));
@@ -1651,10 +1644,9 @@ document.querySelectorAll(".menu-btn").forEach(button => {
 
 
 
-
     ///// FIM AREA DE PAGAMENTO
 
-    document.addEventListener("click", function (event) {
+    document.addEventListener("click", function(event) {
         if (window.innerWidth < 768 &&
             !sidebar.contains(event.target) &&
             event.target !== sidebarOpen &&
@@ -1664,7 +1656,6 @@ document.querySelectorAll(".menu-btn").forEach(button => {
         }
     });
 
-    
 
 
 

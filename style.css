@@ -856,7 +856,7 @@ img {
   #sidebarOpen {
     position: absolute;
   left: 15px; /* Mantém o menu no canto esquerdo */
-  font-size: 25px;
+  font-size: 30px;
   cursor: pointer;
   color: var(--grey-color);
   display: block;
@@ -1131,4 +1131,18 @@ img {
 /* Ajuste para garantir que o contador fique acima das imagens */
 .swiper-slide {
     position: relative;
+}
+
+/* Estilo para a paginação abaixo do título */
+.carrossel-pagination {
+  text-align: center;
+  margin: 5px 0 15px 0;
+  font-size: 14px;
+  color: var(--grey-color);
+  font-weight: 500;
+}
+
+/* Remova o position:relative do .carrossel-container se existir */
+.carrossel-container {
+  /* remova position: relative se estiver definido */
 }
