@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Atualiza o contador
         function updateCounter() {
-            counter.textContent = `${swiperInstance.realIndex + 1}/${swiperInstance.slides.length}`;
+            counter.textContent = `${swiperInstance.realIndex + 1} / ${swiperInstance.slides.length}`;
         }
 
         // Adiciona o contador ao container
@@ -738,7 +738,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         site: "www.google.com",
                         info: " <strong>Descontao:</strong><ul>Procure o Daniel e fala que veio atravez do site</br>Receba teu descontao de 1%</ul> " // Informação personalizada      
             */
-
+  /*
             title: "Farmacia de Plantão",
             establishments: [{
                 name: "DrogaMais ( Jorginho )",
@@ -751,7 +751,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 instagram: "www.instagram.com/uahh",
                 site: "www.google.com",
                 info: " <strong>Descontão:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
+                */
 
+
+                title: "Farmacia de Plantão",
+                establishments: [{
+                    name: "Desconto Facil 1 ( Joao )",
+                    address: "</br>R. Benedito Salles, 574",
+                    contact: "</br>(43) 3566-1119",
+                    plantaoHorario: "</br>Das 8h às 21h , De 29/03 a 04/04",
+                    delivery: "</br>Sim / Sem Taxa",
+                    image: "images/comercios/farmacia/farmafacil.png",
+                    facebook: "https://www.facebook.com/p/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis-100054221361992/",
+                    instagram: "https://www.instagram.com/descontofacil.clps/",
+                    site: "https://www.grupoasfar.com.br/",
+                    info: " <strong>Descontão:</strong><ul>Procure o Joao e fala que veio atravez do site</br></ul> " // Informação personalizada      
+    
+    
 
             }, ]
         },
