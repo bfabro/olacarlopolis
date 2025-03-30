@@ -93,9 +93,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
     const clearSearch = document.getElementById("clearSearch");
 
+ // Função para adicionar contadores de slides
+ function addSlideCounters(swiperInstance, containerSelector) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
 
-
-    // Inicio pesquisa nome no menu lateral
+    // Cria o elemento do contador
+    const counter = document.createElement('div');
+    counter.className = 'swiper-counter';
+    
+    // Atualiza o contador
+    function updateCounter() {
+        counter.textContent = `${swiperInstance.realIndex + 1}/${swiperInstance.slides.length}`;
+    }
+    
+    // Adiciona o contador ao container
+    container.appendChild(counter);
+    
+    // Atualiza inicialmente e adiciona listeners
+    updateCounter();
+    swiperInstance.on('slideChange', updateCounter);
+}
 
     // Inicializa o carrossel de Turismo
     const swiperTurismo = new Swiper('.swiper-turismo', {
@@ -112,6 +130,8 @@ document.addEventListener("DOMContentLoaded", function () {
             crossFade: true, // Faz o fade suave entre os slides
         },
     });
+    addSlideCounters(swiperTurismo, '.swiper-turismo');
+
 
     // Inicializa o carrossel de Eventos
     const swiperEventos = new Swiper('.swiper-eventos', {
@@ -128,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function () {
             crossFade: true, // Faz o fade suave entre os slides
         },
     });
-
+    addSlideCounters(swiperEventos, '.swiper-eventos');
     ///////////
     // Inicializa o carrossel de Novidades
     const swiperNovidades = new Swiper('.swiper-novidades', {
@@ -145,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
             crossFade: true, // Faz o fade suave entre os slides
         },
     });
-
+    addSlideCounters(swiperNovidades, '.swiper-novidades');
 
     ///////////
     if (searchInput && clearSearch) {
@@ -1422,6 +1442,10 @@ document.querySelectorAll('.menu-cardapio').forEach(menu => {
         });
     }
 });
+
+////////////////////////////
+
+
 
 ///////
 /////

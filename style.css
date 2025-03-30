@@ -1107,3 +1107,28 @@ img {
 .menu-content[style*="display: block"] {
   display: block !important;
 }
+
+
+
+/* Estilo para o contador de slides */
+.swiper-counter {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    z-index: 10;
+    font-weight: bold;
+}
+
+.carrossel-container {
+    position: relative; /* Para posicionar o contador corretamente */
+}
+
+/* Ajuste para garantir que o contador fique acima das imagens */
+.swiper-slide {
+    position: relative;
+}
