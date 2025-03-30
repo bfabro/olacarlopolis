@@ -758,7 +758,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 establishments: [{
                     name: "Desconto Facil 1 ( Joao )",
                     address: "</br>R. Benedito Salles, 574",
-                    contact: "</br>(43) 3566-1119",
+                    contact: "</br>(43) 99628-7851",
                     plantaoHorario: "</br>Das 8h às 21h , De 29/03 a 04/04",
                     delivery: "</br>Sim / Sem Taxa",
                     image: "images/comercios/farmacia/farmafacil.png",
