@@ -2,11 +2,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // pagou? defina por s pago n nao pago // PAGx
     const statusEstabelecimentos = {
+
+        // COMERCIOS:
         // ADEGAS
         adegacuenca: "s",
 
         //ADVOCACIA
-        ruanabilio: "s",
+        
+        advocaciaabilio: "s",
 
         //Açougue
         açouguedocarlinho: "s",
@@ -23,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
         popularmais: "s",
         santamaria: "s",
         saudefarma: "s",
+        popular:"s",
 
         //pizzaria
         fornalhapizzaria: "s",
@@ -46,24 +50,11 @@ document.addEventListener("DOMContentLoaded", function() {
         // pesqueiro
         peskepagueaguamarine:"s",
 
-        // MENU INFORMACOES UTEIS
-        hospitalsãojose: "s",
 
-        lixoeletronico: "s",
-        prefeitura: "s",
-        duvidasereclamações: "s",
-        copel: "s",
-        sanepar: "s",
-        //Eventos
-        calendarioeventos: "s",
-        feiradalua: "s",
-        pescar: "s",
-        triathlon: "s",
-        coletalixoeletronico: "s",
-        delegacia:"s",
+//// FIM COMERCIO
 
-
-
+//// INICIO SERCIÇOS
+        
         // Servicos
 
         // churrasqueiro
@@ -80,6 +71,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // taxista
         joaotaxista:"s",
+        
+       
+      //// FIM SERVIÇOS  
+
+       //// INICIO INFORMAÇOES UTEIS
+        copel: "s",
+        delegacia:"s",
+        hospitalsãojose: "s",
+        prefeitura: "s",
+            duvidasereclamações: "s",
+        sanepar: "s",
+
+
+
+        //Eventos
+        calendarioeventos: "s",
+        lixoeletronico: "s",
+        triathlon: "s",
+        pescar: "s",
+        coletalixoeletronico: "s",
+        feiradalua: "s",
+        
+       
+//// INICIO INFORMAÇOES UTEIS
     };
 
 
@@ -507,7 +522,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     facebook: "www.facebook.com/uahh",
                     instagram: "www.instagram.com/uahh",
                     site: "www.google.com",
-                    info: " <strong>Descontao:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>Receba teu desconto de 1%</ul> " // Informação personalizada      
+                    info: " <strong>Teste:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>.</ul> " // Informação personalizada      
 
                 },
 
@@ -548,6 +563,24 @@ document.addEventListener("DOMContentLoaded", function() {
                     instagram: "www.instagram.com/uahh",
                     site: "www.google.com"
                 },
+
+                {
+                    image: "images/comercios/farmacia/drogamais.png",
+                    name: "Popular ( Estela )",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    address: "</br>Rua Laurindo Franco Godoy, 464",
+                    contact: "</br>(43) 3566-1473",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+                    info: " <strong>Teste:</strong><ul>Procure a Estela e fala que veio atravez do site</br>.</ul> " // Informação personalizada      
+
+                },
+
+
+
+
                 {
                     image: "images/comercios/farmacia/popularMais.png",
                     name: "PopularMais ( Jeremias )",
@@ -1167,12 +1200,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
             title: "Adegas",
             establishments: [{
-
+                image: "images/comercios/adega/adega_cuenca.jpg",
                 name: "Adega Cuenca",
-                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-                address: "R. Laurindo Franco de Godoi, 90",
-                contact: "(43) 99951-1540",
-                delivery: "Sim / Sem Taxa"
+                hours: "</br>seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
+                address: "</br>R. Kalil Keder, 752",
+                contact: "</br>(43) 99800-1680",
+                delivery: "</br>Sim / Sem Taxa"
 
             }, ]
         },
@@ -1183,11 +1216,11 @@ document.addEventListener("DOMContentLoaded", function() {
             title: "Escritorio de Advocacia",
             establishments: [{
 
-                name: "Ruan ABILIO",
-                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-                address: "R. Laurindo Franco de Godoi, 90",
-                contact: "(43) 99951-1540",
-                delivery: "Sim / Sem Taxa"
+                name: "ADVOCACIA ABILIO",
+                hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
+                address: "</br>R. Salvira Marquês, 315",
+                contact: "</br>(43) 3566-1368"
+                
 
             }, ]
         },
