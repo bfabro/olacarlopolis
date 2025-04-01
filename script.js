@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // Agropecuaria
         agrovida: "s",
 
+        // borracharia
+        vidanova:"s",
+
         //farmacia
         elshaday: "s",
         farmais: "s",
@@ -993,6 +996,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 address: "R. Laurindo Franco de Godoi, 90",
                 contact: "(43) 99951-1540",
                 delivery: "Sim / Sem Taxa"
+
+
+            }, ]
+        },
+        {
+            link: document.querySelector("#menuBorracharia"),
+
+            title: "Borracharia",
+            establishments: [{
+
+
+
+                name: "Vida Nova",
+                hours: "</br>seg a sex: 7h - 18h </br>sab: 07 - 16h",
+                address: "</br>Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
+                contact: "(43) 99900-2991"
+                
 
 
             }, ]
