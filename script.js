@@ -42,6 +42,10 @@ document.addEventListener("DOMContentLoaded", function() {
         kelve: "s", // Kelve não pagou
         rocha: "s", // Rocha pagou
 
+
+        // pesqueiro
+        peskepagueaguamarine:"s",
+
         // MENU INFORMACOES UTEIS
         hospitalsãojose: "s",
 
@@ -56,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
         pescar: "s",
         triathlon: "s",
         coletalixoeletronico: "s",
+        delegacia:"s",
 
 
 
@@ -72,6 +77,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // guia de pesca
         thiagoaguera: "s",
+
+        // taxista
+        joaotaxista:"s",
     };
 
 
@@ -314,9 +322,36 @@ document.addEventListener("DOMContentLoaded", function() {
                     site: "www.google.com",
 
                     menuImages: [ // Agora é um array de imagens
-                        "images/comercios/lanchonete/paiol/cardapio_1.jpg",
-                        "images/comercios/lanchonete/paiol/cardapio_2.jpg",
-                        "images/comercios/lanchonete/paiol/cardapio_3.jpg"
+                        "images/comercios/pizzaria/cardapio_fornalha.jpg",
+                        "images/comercios/pizzaria/cardapio_fornalha_2.jpg"
+                   
+                    ],
+                    info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
+                },
+
+            ]
+        },
+
+
+// pesqueiro
+        {
+            link: document.querySelector("#menuPesqueiro"),
+            title: "Pesqueiro",
+            establishments: [{
+                    image: "images/comercios/pesqueiro/aguamarine.jpg",
+                    name: "Pesk e Pague Agua Marine",
+                    hours: "</br>Sexta - Domingo: 09:30 - 18",
+                    address: "</br>Rod. Jose Alves Pereira",
+                    contact: "</br>(43) 98808-1911",
+                    delivery: "</br>Sim / Com Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+
+                    menuImages: [ // Agora é um array de imagens
+                        "images/comercios/pesqueiro/cardapio_aguamarine.jpg"
+                        
+                   
                     ],
                     info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> " // Informação personalizada      
                 },
@@ -667,7 +702,7 @@ document.addEventListener("DOMContentLoaded", function() {
             link: document.querySelector("#menuPedreiro"),
             title: "Pedreiros ",
             establishments: [{
-                    image: "images/servicos/pedreiro/denis2.png",
+                    image: "images/servicos/pedreiro/pedreiro.jpg",
                     name: "Denis centurion",
                     contact: "(11) 9.5982-2485"
                 },
@@ -829,12 +864,29 @@ document.addEventListener("DOMContentLoaded", function() {
             title: "Copel",
             establishments: [{
 
-
+                image: "images/info_uteis/copel/copel.png",
                 name: "Copel",
                 hours: "seg a sex: 8h - 12h",
                 address: "R. Benedito Salles, 1094",
                 contact: "(41) 3013-8973",
-                image: "images/info_uteis/copel/copel.png",
+                
+
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuDelegacia"),
+
+            title: "Delegacia",
+            establishments: [{
+
+                image: "images/info_uteis/delegacia/delegacia.jpg",
+                name: "Delegacia",
+                hours: "seg a sex: 9h - 18h",
+                address: "R. Alfeneiro, 215 ",
+                contact: "(43) 3566-1202",
+                
 
 
             }, ]
@@ -1046,10 +1098,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
                 name: "Pimenta Doce",
-                hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-                address: "R. Kalil Keder ",
-                contact: "(43) 3566-1554",
-                delivery: "Sim / Sem Taxa",
+                hours: "</br>seg a sex: 8h - 18h e sab: 08 - 12h",
+                address: "</br>R. Kalil Keder ",
+                contact: "</br>(43) 3566-1554",
+                delivery: "</br>Sim / Sem Taxa",
                 image: "images/comercios/quitanda/pimentadoce.png",
 
 
@@ -1136,6 +1188,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 address: "R. Laurindo Franco de Godoi, 90",
                 contact: "(43) 99951-1540",
                 delivery: "Sim / Sem Taxa"
+
+            }, ]
+        },
+
+        {
+            link: document.querySelector("#menuTaxista"),
+
+            title: "Taxista",
+            establishments: [{
+
+                name: "Joao Taxista",
+                hours: "</br>seg a sab: 7h - 20h e sab: 07 - 00h",
+                address: "</br>R. Laurindo Franco de Godoi, 90",
+                contact: "</br>(43) 99951-1540"
+     
 
             }, ]
         },
