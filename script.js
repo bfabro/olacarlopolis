@@ -566,7 +566,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     delivery: "</br>Sim / Sem Taxa",
                     facebook: "#",
                     instagram: "https://www.instagram.com/farmaciadavilaclps/",
-                    site: "www.google.com"
+                    site: "#"
 
                 },
 
@@ -578,8 +578,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     contact: "</br>(43) 3566-1211",
                     delivery: "</br>Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com"
+                    instagram: "https://www.instagram.com/farmaiscarlopolis/",
+                    site: "#"
                 },
 
 
@@ -648,6 +648,22 @@ document.addEventListener("DOMContentLoaded", function() {
                     site: "www.google.com"
                 }
 
+            ]
+        },
+
+
+
+
+        ///////////////////
+
+        {
+            link: document.querySelector("#menuAnuncio"),
+            title: "Anuncio",
+            establishments: [{
+                    name: "Joao do Palio",
+                    contact: "(43) 7890-1234"
+                }
+                
             ]
         },
 
