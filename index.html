@@ -25,19 +25,30 @@
    
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="theme-color" content="#ffffff">
-   <!-- Boxicons CSS -->
-   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-
-   
-   <script src=" https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
+   <!-- Inicio CSS -->
+   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.cs" rel="stylesheet" />
    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
    <link rel="stylesheet" href="https://blade-ui-kit.com/build/assets/app-4a434763.css" />
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  
-   <link rel="stylesheet" href="style.css" />   
+
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+   <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+
+
+      <!-- FIM  CSS -->
+
+
+   <script src=" https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+   
+  <!-- FIM  JAVA -->
+
+   
+  
+   <link rel="stylesheet" href="style.css" />   
+   
 
    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
@@ -45,7 +56,7 @@
    <!-- Use a versão compatível do Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+
 
    <!-- Adicione antes do seu script.js -->
    <!-- <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>-->   
@@ -100,165 +111,138 @@
                <li class="item">
                   <div href="#" class="nav_link submenu_item">
                      <span class="navlink_icon">
-                        <i style="color:rgb(43, 175, 26)" class="bx bxs-store"></i>
+                        
+                        <i style="color:rgb(43, 175, 26)" class="fa-solid fa-shop"></i>
                      </span>
                      <span id="menuComercio" class="navlink bold">Comercios</span>
                      <i class="bx bx-chevron-right arrow-left"></i>
                   </div>
                   <ul class="menu_items submenu">
+
+
+                     <a id="menuAcougue" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:#FFA500" class="fa-solid fa-cow"></i></span>
+                        <span class="navlink">Açougue</span>
+                     </a>
                      <a id="menuAdega" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgba(255, 25, 140, 0.856)"
-                              class="fa-solid fa-wine-bottle"></i></span>
+                        <span class="navlink_icon"><i style="color:#FFA500" class="fa-solid fa-wine-bottle"></i></span>
                         <span class="navlink">Adega</span>
                      </a>
                      <a id="menuAdvocacia" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgba(0, 0, 0, 0.856)"
-                              class="fa-solid fa-scale-balanced"></i></span>
+                        <span class="navlink_icon"><i style="color:rgba(0, 0, 0, 0.856)" class="fa-solid fa-scale-balanced"></i></span>
                         <span class="navlink">Advocacia</span>
                      </a>
-                     <a id="menuAcougue" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgba(175, 115, 26, 0.76)"
-                              class="fa-solid fa-cow"></i></span>
-                        <span class="navlink">Açougue</span>
-                     </a>
                      <a id="menuAgropecuaria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(43, 175, 26)"
-                              class="fa-solid fa-building-wheat"></i></span>
+                        <span class="navlink_icon"><i style="color:#228B22" class="fa-solid fa-building-wheat"></i></span>
                         <span class="navlink">Agropecuaria</span>
                      </a>
                      <a id="menuAssistenciaCelular" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(211, 0, 158)"
-                              class="fa-solid fa-mobile-retro"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(211, 0, 158)" class="fa-solid fa-mobile-retro"></i></span>
                         <span class="navlink">Assistencia Celular</span>
                      </a>
                      <a id="menuAutoCenter" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
-                              class="fa-solid fa-car-side"></i></span>
+                        <span class="navlink_icon"><i style="color:#00008B" class="fa-solid fa-car-side"></i></span>
                         <span class="navlink">Auto Center</span>
                      </a>
-                     <a id="menuEletrico" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
-                              class="fa-solid fa-car-side"></i></span>
+                     <a id="menuAutoEletrico" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:#00008B" class="fa-solid fa-car-side"></i></span>
                         <span class="navlink">Auto Eletrico</span>
                      </a>
                      <a id="menuAutoMecanica" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
-                              class="fa-solid fa-car-side"></i></span>
+                        <span class="navlink_icon"><i style="color:#00008B" class="fa-solid fa-car-side"></i></span>
                         <span class="navlink">Auto Mecanica</span>
                      </a>
                      <a id="menuAutoPecas" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
-                              class="fa-solid fa-car-side"></i></span>
+                        <span class="navlink_icon"><i style="color:#00008B" class="fa-solid fa-car-side"></i></span>
                         <span class="navlink">Auto Pecas</span>
                      </a>
                      <a id="menuBancos" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 208, 0)"
-                              class="fa-solid fa-money-check-dollar"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(255, 208, 0)" class="fa-solid fa-money-check-dollar"></i></span>
                         <span class="navlink">Bancos</span>
                      </a>
                      <a id="menuBicicletaria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 225, 233)"  class="fa-solid fa-bicycle"></i></span>
+                        <span class="navlink_icon"><i style="color:#00008B" class="fa-solid fa-bicycle"></i></span>
                         <span class="navlink">Bicicletaria</span>
                      </a>
                      <a id="menuBorracharia" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-truck-monster"></i></span>
+                        <span class="navlink_icon"><i style="color:#00008B" class="fa-solid fa-truck-monster"></i></span>
                         <span class="navlink">Borracharia</span>
                      </a>
                      <a id="menuBrinquedos" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(50, 207, 199)"
-                              class="fa-solid fa-child-reaching"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(50, 207, 199)" class="fa-solid fa-child-reaching"></i></span>
                         <span class="navlink">Brinquedos</span>
                      </a>
                      <a id="menuCalhas" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i class="fa-solid fa-cloud-showers-water"></i></span>
+                        <span class="navlink_icon"><i style="color:#808080" class="fa-solid fa-cloud-showers-water"></i></span>
                         <span class="navlink">Calhas</span>
+                        
                      </a>
                      <a id="menuCeramica" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(201, 0, 0)"
-                              class="fa-solid fa-trowel-bricks"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(201, 0, 0)" class="fa-solid fa-trowel-bricks"></i></span>
                         <span class="navlink">Ceramica</span>
                      </a>
-
                      <a id="menuChaveiro" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(252, 143, 0)"class="fa-solid fa-key"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(252, 143, 0)" class="fa-solid fa-key"></i></span>
                         <span class="navlink">Chaveiro</span>
                      </a>
-
-
                      <a id="menuClinicaFisioterapia" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"class="fa-solid fa-person-walking-with-cane"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-person-walking-with-cane"></i></span>
                         <span class="navlink">Clinica Fisioterapia</span>
                      </a>
-
                      <a id="menuClinicaOdontologica" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-tooth"></i></span>
                         <span class="navlink">Clinica Odontologica</span>
                      </a>
-
                      <a id="menuClinicaOrtopedia" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"  class="fa-solid fa-crutch"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-crutch"></i></span>
                         <span class="navlink">Clinica Ortopedia</span>
                      </a>
-
                      <a id="menuClinicaPsicologica" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(196, 9, 140)"class="fa-solid fa-head-side-cough"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(196, 9, 140)" class="fa-solid fa-head-side-cough"></i></span>
                         <span class="navlink">Clinica Psicologica</span>
                      </a>
-
                      <a id="menuClinicaVeterinaria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(41, 54, 235)" class="fa-solid fa-shield-dog"></i></span>
+                        <span class="navlink_icon"><i style="color:#D2691E" class="fa-solid fa-shield-dog"></i></span>
                         <span class="navlink">Clinica Veterinaria</span>
                      </a>
-
-
-
                      <a id="menuConstrutora" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i class="fa-solid fa-hammer"></i></span>
+                        <span class="navlink_icon"><i style="color:#808080"  class="fa-solid fa-hammer"></i></span>
                         <span class="navlink">Construtora</span>
                      </a>
-
                      <a id="menuDespachante" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(250, 126, 10)"  class="fa-solid fa-square-parking"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(250, 126, 10)" class="fa-solid fa-square-parking"></i></span>
                         <span class="navlink">Despachante</span>
                      </a>
-
                      <a id="menuDetetizadora" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(199, 115, 18)"  class="fa-solid fa-bug-slash"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(199, 115, 18)" class="fa-solid fa-bug-slash"></i></span>
                         <span class="navlink">Detetizadora</span>
                      </a>
-                     <a id="menuDiskGas" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(35, 46, 207)"
-                              class="fa-solid fa-kitchen-set"></i></span>
-                        <span class="navlink">Disk Gas</span>
-                     </a>
-
                      <a id="menuDiskCacamba" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i class="fa-solid fa-truck-moving"></i></span>
+                        <span class="navlink_icon"><i style="color:#808080" class="fa-solid fa-truck-moving"></i></span>
                         <span class="navlink">Disk Caçamba</span>
                      </a>
-
-                     <a id="menuEscritorioContabilidade" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"  class="fa-solid fa-calculator"></i></span>
-                        <span class="navlink">Escritorio Contabil</span>
+                     <a id="menuDiskGas" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(35, 46, 207)" class="fa-solid fa-kitchen-set"></i></span>
+                        <span class="navlink">Disk Gas</span>
                      </a>
-
                      <a id="menuEnergiaSolar" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(255, 230, 0)" class="fa-solid fa-solar-panel"></i></span>
                         <span class="navlink">Energia Solar</span>
                      </a>
+                     <a id="menuEscritorioContabilidade" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-calculator"></i></span>
+                        <span class="navlink">Escritorio Contabil</span>
+                     </a>
                      <a id="menuFarmacia" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
-                              class="fa-solid fa-house-medical"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)" class="fa-solid fa-house-medical"></i></span>
                         <span class="navlink">Farmacia</span>
                      </a>
-
                      <a id="menuFerroVelho" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fa-solid fa-trash-can"></i></span>
                         <span class="navlink">Ferro Velho</span>
                      </a>
-
                      <a id="menuFloricultura" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 10, 132)"class="fa-solid fa-spa"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(255, 10, 132)" class="fa-solid fa-spa"></i></span>
                         <span class="navlink">Floricultura</span>
                      </a>
                      <a id="menuFuneraria" href="#" class="nav_link sublink">
@@ -266,55 +250,52 @@
                         <span class="navlink">Funeraria</span>
                      </a>
                      <a id="menuGesso" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i class="fa-solid fa-people-roof"></i></span>
+                        <span class="navlink_icon"><i style="color:#808080" class="fa-solid fa-people-roof"></i></span>
                         <span class="navlink">Gesso</span>
                      </a>
                      <a id="menuGrafica" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-compass-drafting"></i></span>
                         <span class="navlink">Grafica</span>
                      </a>
-
                      <a id="menuHotel" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(26, 58, 238)" class="fa-solid fa-hotel"></i></span>
                         <span class="navlink">Hotel</span>
                      </a>
                      <a id="menuImobiliaria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(85, 29, 240)"
-                              class="fa-solid fa-landmark"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(85, 29, 240)" class="fa-solid fa-landmark"></i></span>
                         <span class="navlink">Imobiliaria</span>
                      </a>
-                     <a id="menuLanchonete" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(238, 199, 26)"
-                              class="fas fa-hamburger"></i></span>
-                        <span class="navlink">Lanchonete</span>
-                     </a>
-
                      <a id="menuLaboratorio" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i class="fa-solid fa-vial"></i></span>
                         <span class="navlink">Laboratorio</span>
+                     </a>
+                     <a id="menuLanchonete" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:#FFA500" class="fas fa-hamburger"></i></span>
+                        <span class="navlink">Lanchonete</span>
                      </a>
                      <a id="menuLavaRapido" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(26, 75, 238)" class="fa-solid fa-car-on"></i></span>
                         <span class="navlink">Lava Rapido</span>
                      </a>
                      <a id="menuLoterica" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgba(231, 198, 9, 0.836)"
-                              class="fa-solid fa-sack-dollar"></i></span>
+                        <span class="navlink_icon"><i style="color:rgba(231, 198, 9, 0.836)" class="fa-solid fa-sack-dollar"></i></span>
                         <span class="navlink">Loterica</span>
                      </a>
-                     <a id="menuMaterialContrucao" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(100, 98, 98)"
-                              class="fa-solid fa-person-digging"></i></span>
-                        <span class="navlink">Material Construção</span>
-                     </a>
                      <a id="menuMarmoraria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(100, 98, 98)"
-                              class="fa-solid fa-person-digging"></i></span>
+                        <span class="navlink_icon"><i style="color:#808080"  class="fa-solid fa-person-digging"></i></span>
                         <span class="navlink">Marmoraria</span>
                      </a>
-
+                     <a id="menuMaterialContrucao" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:#808080"  class="fa-solid fa-person-digging"></i></span>
+                        <span class="navlink">Material Construção</span>
+                     </a>
+                    
+                     <a id="menuMotoCenter" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:#00008B" class="fa-solid fa-motorcycle"></i></span>
+                        <span class="navlink">Moto Center</span>
+                     </a>
                      <a id="menuMoveis" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i  style="color:rgba(255, 160, 19, 0.842)"  class="fa-solid fa-couch"></i></span>
+                        <span class="navlink_icon"><i style="color:rgba(255, 160, 19, 0.842)" class="fa-solid fa-couch"></i></span>
                         <span class="navlink">Moveis</span>
                      </a>
                      <a id="menuOtica" href="#" class="nav_link sublink">
@@ -322,7 +303,7 @@
                         <span class="navlink">Otica</span>
                      </a>
                      <a id="menuPadaria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"  class="fa-solid fa-bread-slice"></i></span>
+                        <span class="navlink_icon"><i style="color:#FFA500" class="fa-solid fa-bread-slice"></i></span>
                         <span class="navlink">Padaria</span>
                      </a>
                      <a id="menuPapelaria" href="#" class="nav_link sublink">
@@ -333,67 +314,53 @@
                         <span class="navlink_icon"><i style="color:rgb(43, 175, 26)" class="fa-solid fa-paw"></i></span>
                         <span class="navlink">PetShop</span>
                      </a>
-
                      <a id="menuPesqueiro" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(15, 90, 230)" class="fa-solid fa-fish-fins"></i></span>
                         <span class="navlink">Pesqueiro</span>
                      </a>
-
                      <a id="menuPizzaria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(218, 19, 19)" class="fa-solid fa-pizza-slice"></i></span>
+                        <span class="navlink_icon"><i style="color:#FFA500" class="fa-solid fa-pizza-slice"></i></span>
                         <span class="navlink">Pizzaria</span>
                      </a>
                      <a id="menuPostoGasolina" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 44, 190)"  class="fa-solid fa-gas-pump"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(0, 44, 190)" class="fa-solid fa-gas-pump"></i></span>
                         <span class="navlink">Posto de Gasolina</span>
                      </a>
                      <a id="menuProdutosNaturais" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(30, 128, 17)"
-                              class="fa-solid fa-leaf"></i></span>
+                        <span class="navlink_icon"><i style="color:#228B22" class="fa-solid fa-leaf"></i></span>
                         <span class="navlink">Produtos Naturais</span>
                      </a>
-                     <a id="menuMotoCenter" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"
-                              class="fa-solid fa-motorcycle"></i></span>
-                        <span class="navlink">Moto Center</span>
-                     </a>
                      <a id="menuQuitanda" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 105, 5)"
-                              class="fa-solid fa-carrot"></i></span>
+                        <span class="navlink_icon"><i style="color:#FFA500" class="fa-solid fa-carrot"></i></span>
                         <span class="navlink">Quitanda</span>
                      </a>
                      <a id="menuRadio" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i class="fa-solid fa-radio"></i></span>
+                        <span class="navlink_icon"><i style="color:rgba(61, 88, 240, 0.842)" class="fa-solid fa-radio"></i></span>
                         <span class="navlink">Radio</span>
                      </a>
                      <a id="menuRestaurantes" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
-                              class="fas fa-utensils icon"></i></span>
+                        <span class="navlink_icon"><i style="color:#FFA500" class="fas fa-utensils icon"></i></span>
                         <span class="navlink">Restaurante</span>
                      </a>
-
                      <a id="menuRevendaVeiculo" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"class="fa-solid fa-car"></i></span>
+                        <span class="navlink_icon"><i style="color:#00008B" class="fa-solid fa-car"></i></span>
                         <span class="navlink">Revenda de Veiculos</span>
                      </a>
                      <a id="menuRoupas" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(209, 13, 167)"
-                              class="fa-solid fa-shirt"></i></span>
+                        <span class="navlink_icon"><i style="color:#800080" class="fa-solid fa-shirt"></i></span>
                         <span class="navlink">Roupas</span>
                      </a>
+                     <a id="menuSorveteria" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:#FFA500" class="fa-solid fa-ice-cream"></i></span>
+                        <span class="navlink">Sorveteria</span>
+                     </a>
                      <a id="menuMercado" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(100, 98, 98)"
-                              class="fas fa-shopping-cart icon"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)" class="fas fa-shopping-cart icon"></i></span>
                         <span class="navlink">SuperMercado</span>
                      </a>
                      <a id="menuTerraPlanagem" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i class="fa-solid fa-snowplow"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(0, 0, 0)"class="fa-solid fa-snowplow"></i></span>
                         <span class="navlink">Terraplanagem</span>
-                     </a>
-                     <a id="menuSorveteria" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(0, 204, 255)"
-                              class="fa-solid fa-ice-cream"></i></span>
-                        <span class="navlink">Sorveteria</span>
                      </a>
                   </ul>
                </li>
@@ -408,25 +375,23 @@
                   </div>
                   <ul class="menu_items submenu">
                      <a id="menuAuncio" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(228, 30, 185)" class="fas fa-baby"></i></span>
+                        <span class="navlink_icon"><i class="fa-solid fa-tower-cell"></i></span>
                         <span class="navlink">Anuncios</span>
                      </a>
                      <a id="menuBabas" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(228, 30, 185)" class="fas fa-baby"></i></span>
                         <span class="navlink">Babas</span>
                      </a>
+                     <a id="menuChurrasqueiro" href="#" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)" class="fa-solid fa-drumstick-bite"></i></span>
+                        <span class="navlink">Churrasqueiro</span>
+                     </a>
                      <a id="menuDiarista" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(179, 124, 23)" class="fas fa-broom"></i></span>
                         <span class="navlink">Diarista</span>
                      </a>
-                     <a id="menuChurrasqueiro" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
-                              class="fa-solid fa-drumstick-bite"></i></span>
-                        <span class="navlink">Churrasqueiro</span>
-                     </a>
                      <a id="menuEletricista" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(224, 211, 24)"
-                              class="fas fa-lightbulb"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(224, 211, 24)" class="fas fa-lightbulb"></i></span>
                         <span class="navlink">Eletricista</span>
                      </a>
                      <a id="menuEncanador" href="#" class="nav_link sublink">
@@ -434,8 +399,7 @@
                         <span class="navlink">Encanador</span>
                      </a>
                      <a id="menuGuiaPesca" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(38, 23, 172)"
-                              class="fa-solid fa-fish-fins"></i></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(38, 23, 172)" class="fa-solid fa-fish-fins"></i></span>
                         <span class="navlink">Guia de Pesca</span>
                      </a>
                      <a id="menuJardineiro" href="#" class="nav_link sublink">
@@ -451,17 +415,15 @@
                         <span class="navlink">Pedreiro</span>
                      </a>
                      <a id="menuPintor" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(121, 78, 22)"
-                              class="fa-solid fa-paintbrush"></i></span>
+                        <span class="navlink_icon"><i style="color:rgb(231, 32, 205)" class="fa-solid fa-paintbrush"></i></span>
                         <span class="navlink">Pintor</span>
                      </a>
-
                      <a id="menuTaxista" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(235, 200, 46)" class="fa-solid fa-taxi"></i></span>
                         <span class="navlink">Taxista</span>
                      </a>
                      <a id="menuVeterinario" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:blue" class="fa-solid fa-shield-dog"></i></span>
+                        <span class="navlink_icon"><i style="color:#D2691E" class="fa-solid fa-shield-dog"></i></span>
                         <span class="navlink">Veterinario</span>
                      </a>
                   </ul>
@@ -491,13 +453,18 @@
                         <span class="navlink">Eventos</span>
                      </a>
                      <a id="menufarmaciaPlantao" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
-                              class="bx bx-plus-medical"></i></span>
-                        <span class="navlink">Farmacias de Plantão</span>
+                        <span class="navlink_icon">
+                           
+                           <i style="color:rgb(255, 0, 0)"class="fa-solid fa-house-medical"></i>
+                        </span>
+                        <span class="navlink">Farmacia de Plantão</span>
                      </a>
                      <a id="menuHospital" href="#" class="nav_link sublink">
-                        <span class="navlink_icon"><i style="color:rgb(255, 0, 0)"
-                              class="fa-solid fa-house-medical"></i></i></span>
+                        <span class="navlink_icon">
+                           <i style="color:rgb(255, 0, 0)"class="fa-solid fa-circle-h"></i>
+                           
+                        </span>
+                              
                         <span class="navlink">Hospital</span>
                      </a>
                      <a id="menuPrefeitura" href="#" class="nav_link sublink">

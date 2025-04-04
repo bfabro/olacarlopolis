@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", function() {
         santamaria: "s",
         saudefarma: "s",
         popular:"s",
+        biofarma:"s",
+        farmaciadavila:"s",
 
         //pizzaria
         fornalhapizzaria: "s",
@@ -504,14 +506,28 @@ document.addEventListener("DOMContentLoaded", function() {
             establishments: [
 
                 {
+                    image: "images/comercios/farmacia/biofarma.png",
+                    name: "Bio Farma ( Estela )",
+                    address: "</br>Rua Laurindo Franco Godoy, 464",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    contact: "</br>(43) 3566-1473",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com"
+
+                },
+
+
+                {
                     image: "images/comercios/farmacia/farmafacil.png",
                     name: "Desconto Facil 1 ( Joao )",
                     address: "</br>R. Benedito Salles, 574",
                     hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                    contact: "</br>(43) 3566-1119",
+                    contact: "</br>(43) 99966-9812",
                     delivery: "</br>Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
+                    facebook: "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
+                    instagram: "https://www.instagram.com/descontofacil.clps/",
                     site: "www.google.com"
 
                 },
@@ -522,8 +538,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     address: "</br>Rua Benedito Salles, 903",
                     contact: "</br>(43) 98411-9145",
                     delivery: "</br>Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
+                    facebook: "https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/drogamaisjorginho/",
                     site: "www.google.com",
                     info: " <strong>Teste:</strong><ul>Procure o Jorginho e fala que veio atravez do site</br>.</ul> " // Informação personalizada      
 
@@ -536,9 +552,22 @@ document.addEventListener("DOMContentLoaded", function() {
                     hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
                     contact: "</br>(43) 98488-9420",
                     delivery: "</br>Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
+                    facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
                     instagram: "www.instagram.com/uahh",
                     site: "www.google.com"
+                },
+
+                {
+                    image: "images/comercios/farmacia/farmaciaDaVila.png",
+                    name: "Farmacia da Vila ( Marcela )",
+                    address: "</br>Rua Manguba, 320",
+                    hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
+                    contact: "</br>(43) 99148-8478",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "#",
+                    instagram: "https://www.instagram.com/farmaciadavilaclps/",
+                    site: "www.google.com"
+
                 },
 
                 {
@@ -548,7 +577,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
                     contact: "</br>(43) 3566-1211",
                     delivery: "</br>Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
+                    facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
                     instagram: "www.instagram.com/uahh",
                     site: "www.google.com"
                 },
