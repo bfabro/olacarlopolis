@@ -62,6 +62,9 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Servicos
 
+        //anuncio
+        piodoanuncio:"s",
+
         // churrasqueiro
         pituka: "s",
 
@@ -528,7 +531,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     delivery: "</br>Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
                     instagram: "https://www.instagram.com/descontofacil.clps/",
-                    site: "www.google.com"
+                    site: "https://www.grupoasfar.com.br/",
 
                 },
                 {
@@ -589,11 +592,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     name: "MasterFarma ( Zurdo )",
                     address: "</br>R. Laurindo Franco de Godoi, 90",
                     hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                    contact: "</br>(43) 3566-1471",
+                    contact: "</br>(43) 99951-1540",
                     delivery: "</br>Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com"
+                    facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/masterfarma_carlopolis/",
+                    site: "#"
                 },
 
                 {
@@ -618,11 +621,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     name: "PopularMais ( Jeremias )",
                     address: "</br>R. Laurindo Franco de Godói, 787",
                     hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
-                    contact: "</br>(43) 3566-1471",
+                    contact: "</br>(43) 99647-6266",
                     delivery: "</br>Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com"
+                    facebook: "https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
+                    instagram: "https://www.instagram.com/popularmais_farmaciadojeremias/",
+                    site: "#"
                 },
                 {
                     image: "images/comercios/farmacia/santamaria.png",
@@ -631,20 +634,20 @@ document.addEventListener("DOMContentLoaded", function() {
                     hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
                     contact: "</br>(43) 3566-1471",
                     delivery: "</br>Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com"
+                    facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
+                    instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
+                    site: "#"
                 },
 
                 {
                     image: "images/comercios/farmacia/saudeFarma.png",
                     name: "Saude Farma",
-                    address: "</br>Praça Coronel Leite, nº 711",
+                    address: "</br>Rua Benedito Salles, 951",
                     hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
                     contact: "</br>(43) 99956-8938",
                     delivery: "</br>Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
+                    facebook: "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
+                    instagram: "#",
                     site: "www.google.com"
                 }
 
@@ -660,7 +663,7 @@ document.addEventListener("DOMContentLoaded", function() {
             link: document.querySelector("#menuAnuncio"),
             title: "Anuncio",
             establishments: [{
-                    name: "Joao do Palio",
+                    name: "Pio do Anuncio",
                     contact: "(43) 7890-1234"
                 }
                 
