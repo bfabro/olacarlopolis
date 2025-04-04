@@ -1170,7 +1170,7 @@ img {
     display: inline-block;
     margin-top: 5px;
   }
-}
+
 
 /* Ajustes gerais para os carrosséis */
 .carrossel-container {
@@ -1200,7 +1200,7 @@ img {
   margin-top: 10px;
   width: 80%;
 }
-
+}
 .banners-btn {
   background-color: #4CAF50;
   color: white;

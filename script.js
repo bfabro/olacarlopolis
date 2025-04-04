@@ -284,6 +284,12 @@ document.addEventListener("DOMContentLoaded", function () {
               "images/comercios/lanchonete/paiol/cardapio_2.jpg",
               "images/comercios/lanchonete/paiol/cardapio_3.jpg",
             ],
+            bannerImages: [
+                // Novo array de imagens de banner
+                "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+                "images/comercios/acougue/banner/banner_1.jpg",
+                "images/comercios/acougue/banner/banner_2.jpg",
+              ],
             info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> ", // Informação personalizada
           },
           {
@@ -1457,7 +1463,7 @@ document.addEventListener("DOMContentLoaded", function () {
     establishment.bannerImages && establishment.bannerImages.length > 0
       ? `
   <button class="banners-btn" data-name="${establishment.name}">
-      Ver Banners (${establishment.bannerImages.length})
+      Banners (${establishment.bannerImages.length})
   </button>
   <div class="banners-container swiper" id="banners-${encodeURIComponent(
           establishment.name
@@ -1488,7 +1494,7 @@ document.addEventListener("DOMContentLoaded", function () {
          establishment.menuImages && establishment.menuImages.length > 0
            ? `
   <button class="menu-btn" data-name="${establishment.name}">
-      Ver Cardápio (${establishment.menuImages.length})
+      Cardápio (${establishment.menuImages.length})
   </button>
   <div class="menu-cardapio swiper" id="menu-${encodeURIComponent(
                establishment.name
@@ -1626,7 +1632,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 : "";
               button.textContent = `Ver Cardápio${count}`;
               button.style.backgroundColor = "#dfa529";
-              
+
             } else if (button.classList.contains("flyer-btn")) {
               button.textContent = "Ver Flyer";
               button.style.backgroundColor = "#dfa529";
@@ -1635,31 +1641,13 @@ document.addEventListener("DOMContentLoaded", function () {
               const count = button.dataset.count
                 ? ` (${button.dataset.count})`
                 : "";
-              button.textContent = `Ver Banners${count}`;
+              button.textContent = `Banners${count}`;
               button.style.backgroundColor = "#4CAF50";
             }
           });
       }
-  
-      // Inicializa todos os carrosséis visíveis quando a página carrega
-      document
-        .querySelectorAll(".menu-cardapio, .banners-container")
-        .forEach((container) => {
-          if (window.getComputedStyle(container).display !== "none") {
-            container.swiperInstance = new Swiper(container, {
-              loop: true,
-              navigation: {
-                nextEl: container.querySelector(".swiper-button-next"),
-                prevEl: container.querySelector(".swiper-button-prev"),
-              },
-              pagination: {
-                el: container.querySelector(".swiper-pagination"),
-                clickable: true,
-              },
-            });
-          }
-        });
-  
+
+      
       // Eventos para os Banners
       document.querySelectorAll(".banners-btn").forEach((button) => {
         // Armazena o número de banners como data attribute
@@ -1675,7 +1663,7 @@ document.addEventListener("DOMContentLoaded", function () {
           toggleElement(
             this,
             bannersId,
-            `Ver Banners${count}`,
+            `Banners${count}`,
             "Fechar Banner",
             "#ff3333",
             "#4CAF50" // Cor verde para diferenciar dos outros botões
@@ -1698,13 +1686,33 @@ document.addEventListener("DOMContentLoaded", function () {
           toggleElement(
             this,
             menuId,
-            `Ver Cardápio${count}`,
+            `Cardápio${count}`,
             "Fechar Cardápio",
             "#ff3333",
             "#dfa529"
           );
         });
       });
+  
+      // Inicializa todos os carrosséis visíveis quando a página carrega
+      document
+        .querySelectorAll(".menu-cardapio, .banners-container")
+        .forEach((container) => {
+          if (window.getComputedStyle(container).display !== "none") {
+            container.swiperInstance = new Swiper(container, {
+              loop: true,
+              navigation: {
+                nextEl: container.querySelector(".swiper-button-next"),
+                prevEl: container.querySelector(".swiper-button-prev"),
+              },
+              pagination: {
+                el: container.querySelector(".swiper-pagination"),
+                clickable: true,
+              },
+            });
+          }
+        });
+  
   
       // Eventos para o Flyer
       document.querySelectorAll(".flyer-btn").forEach((button) => {
