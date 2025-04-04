@@ -874,11 +874,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 establishments: [{
                     name: "Desconto Facil 1 ( Joao )",
                     address: "</br>R. Benedito Salles, 574",
-                    contact: "</br>(43) 99628-7851",
+                    contact: "</br>(43) 99966-9812",
                     plantaoHorario: "</br>Das 8h às 21h , De 29/03 a 04/04",
                     delivery: "</br>Sim / Sem Taxa",
                     image: "images/comercios/farmacia/farmafacil.png",
-                    facebook: "https://www.facebook.com/p/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis-100054221361992/",
+                    facebook: "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
                     instagram: "https://www.instagram.com/descontofacil.clps/",
                     site: "https://www.grupoasfar.com.br/",
                     info: " <strong>Descontão:</strong><ul>Procure o Joao e fala que veio atravez do site</br></ul> " // Informação personalizada      
