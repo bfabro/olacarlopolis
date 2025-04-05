@@ -1216,3 +1216,10 @@ img {
 .banners-btn:hover {
   background-color: #45a049;
 }
+
+/* Estilos para o contêiner de banners */
+.banners-container.swiper {
+  overflow: hidden;
+}.banners-container.swiper-visible {
+  display: block;
+}

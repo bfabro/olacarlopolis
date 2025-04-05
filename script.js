@@ -1146,7 +1146,7 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             image: "images/comercios/mercearia/seiza/seiza.png",
             name: "Seiza",
-            hours: "</br>Seg a Qui: 9h - 18:30h </br>Sex 9h - 16:30 </br> sab: 09 - 12h",
+            hours: "</br>Seg a Qui 9h - 18:30h </br>Sex 9h - 16:30 </br> sab: 09 - 12h",
             address: "</br>R. Fidêncio de Melo, 212 - Sala B",
             contact: "</br>(43) 99103-4187",
             delivery: "</br>Sim / Sem Taxa",            
@@ -1688,50 +1688,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
   
-      // Função para fechar todos os conteúdos abertos
-      function closeAllContents() {
-        document
-          .querySelectorAll(
-            ".detalhes-content, .menu-cardapio, .menu-content, .banners-container"
-          )
-          .forEach((content) => {
-            content.style.display = "none";
-  
-            // Destrói as instâncias do Swiper
-            if (content.swiperInstance) {
-              content.swiperInstance.destroy(true, true);
-              content.swiperInstance = null;
-            }
-          });
-  
-        // Restaura o texto e a cor dos botões
-        document
-          .querySelectorAll(".detalhes-btn, .menu-btn, .flyer-btn, .banners-btn")
-          .forEach((button) => {
-            if (button.classList.contains("detalhes-btn")) {
-              button.textContent = "+ Informações";
-              button.style.backgroundColor = "#007bff";
-            } else if (button.classList.contains("menu-btn")) {
-              const count = button.dataset.count
-                ? ` (${button.dataset.count})`
-                : "";
-              button.textContent = `Ver Cardápio${count}`;
-              button.style.backgroundColor = "#dfa529";
-
-            } else if (button.classList.contains("flyer-btn")) {
-              button.textContent = "Ver Flyer";
-              button.style.backgroundColor = "#dfa529";
-
-            } else if (button.classList.contains("banners-btn")) {
-              const count = button.dataset.count
-                ? ` (${button.dataset.count})`
-                : "";
-              button.textContent = `Banners${count}`;
-              button.style.backgroundColor = "#4CAF50";
-            }
-          });
-      }
-
+      
       
       // Eventos para os Banners
      document.querySelectorAll(".banners-btn").forEach((button) => {
@@ -1744,6 +1701,17 @@ document.addEventListener("DOMContentLoaded", function () {
   button.addEventListener("click", function () {
     const bannersId = `banners-${encodeURIComponent(this.dataset.name)}`;
     const count = this.dataset.count ? ` (${this.dataset.count})` : "";
+
+
+    toggleElement(
+        this,
+        bannersId,
+        `Banners${count}`,
+        "Fechar Banners",
+        "#ff3333",
+        "#4CAF50"
+      );
+
 
     // Verifica se o banner já está aberto
     const bannersElement = document.getElementById(bannersId);
@@ -1785,6 +1753,53 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+// Função para fechar todos os conteúdos abertos
+function closeAllContents() {
+    document
+      .querySelectorAll(
+        ".detalhes-content, .menu-cardapio, .menu-content, .banners-container"
+      )
+      .forEach((content) => {
+        content.style.display = "none";
+
+        // Destrói as instâncias do Swiper
+        if (content.swiperInstance) {
+          content.swiperInstance.destroy(true, true);
+          content.swiperInstance = null;
+        }
+      });
+
+    // Restaura o texto e a cor dos botões
+    document
+      .querySelectorAll(".detalhes-btn, .menu-btn, .flyer-btn, .banners-btn")
+      .forEach((button) => {
+        if (button.classList.contains("detalhes-btn")) {
+          button.textContent = "+ Informações";
+          button.style.backgroundColor = "#007bff";
+
+        } else if (button.classList.contains("menu-btn")) {
+          const count = button.dataset.count
+            ? ` (${button.dataset.count})`
+            : "";
+            
+          button.textContent = `Cardápio${count}`;
+          button.style.backgroundColor = "#dfa529";
+
+        } else if (button.classList.contains("flyer-btn")) {
+          button.textContent = "Ver Flyer";
+          button.style.backgroundColor = "#dfa529";
+
+        } else if (button.classList.contains("banners-btn")) {
+          const count = button.dataset.count
+            ? ` (${button.dataset.count})`
+            : "";
+          button.textContent = `Banners${count}`;
+          button.style.backgroundColor = "#4CAF50";
+        }
+      });
+  }
+
   
       // Eventos para o Cardápio
       document.querySelectorAll(".menu-btn").forEach((button) => {
@@ -1999,6 +2014,8 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   
+
+    
     ///// INICIO area de pagamento:
   
     ///// FIM AREA DE PAGAMENTO
