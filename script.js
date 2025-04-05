@@ -2,6 +2,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // pagou? defina por s pago n nao pago // PAGx
     const statusEstabelecimentos = {
       // COMERCIOS:
+
+      //AÇAI
+      turminhadoaçai:"s",
+
       // ADEGAS
       adegacuenca: "s",
   
@@ -38,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
       pimentadoce: "s",
   
       //lanchonete
-      casarao: "s", // Casarao pagou
+      ocasarao: "s", // Casarao pagou
       paiol: "s", // Paiol pagou
   
       //supermercado
@@ -267,6 +271,33 @@ document.addEventListener("DOMContentLoaded", function () {
         link: document.querySelector("#menuLanchonete"),
         title: "Lanchonetes",
         establishments: [
+
+            {
+                image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
+                name: "O Casarao",
+                hours: "</br>Ter - Dom - 18h - 00:30h",
+                address: "</br>R. Benedito Salles, 1340",
+                contact: "</br>(43) 99693-0565",
+                delivery: "</br>Sim / Com Taxa",
+                facebook: "https://www.facebook.com/ocasaraoph/?locale=pt_BR",
+                instagram: "https://www.instagram.com/ocasaraoph/",       
+                menuImages: [
+                  // Agora é um array de imagens
+                  "images/comercios/lanchonete/casarao/1.png",
+                  "images/comercios/lanchonete/casarao/2.png",
+                  "images/comercios/lanchonete/casarao/3.png",
+                  "images/comercios/lanchonete/casarao/4.png",
+                  "images/comercios/lanchonete/casarao/5.png",
+                  "images/comercios/lanchonete/casarao/6.png",
+                  "images/comercios/lanchonete/casarao/7.png",
+                  "images/comercios/lanchonete/casarao/8.png",
+                  "images/comercios/lanchonete/casarao/9.png",
+                  "images/comercios/lanchonete/casarao/10.png",
+                ],
+                info: "Palavra Chave: <strong>Supimpa</strong>. Use no pedido e ganhe 1% de desconto!", // Informação personalizada
+              },
+
+
           {
             image: "images/comercios/lanchonete/paiol/paiol.png",
             name: "Paiol",
@@ -276,8 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
             delivery: "Sim / Sem Taxa",
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
-  
+            site: "www.google.com",  
             menuImages: [
               // Agora é um array de imagens
               "images/comercios/lanchonete/paiol/cardapio_1.jpg",
@@ -292,24 +322,7 @@ document.addEventListener("DOMContentLoaded", function () {
               ],
             info: " <strong>Promoção especial:</strong><ul>Compre 1 pizza e ganhe uma sobremesa grátis!</br>Desconto de 15% para pedidos acima de R$ 50,00. </ul> ", // Informação personalizada
           },
-          {
-            image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
-            name: "Casarao",
-            hours: "seg - seg - 19h - 00h e dom: 07 - 12h",
-            address: "R. Benedito Salles, 341 ",
-            contact: "(43) 99693-0565",
-            delivery: "Sim / Com Taxa",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
-  
-            menuImages: [
-              // Agora é um array de imagens
-              "images/comercios/lanchonete/casarao/casarao.png",
-              "images/comercios/lanchonete/paiol/cardapio_2.jpg",
-            ],
-            info: "Palavra Chave: <strong>Supimpa</strong>. Use no pedido e ganhe 1% de desconto!", // Informação personalizada
-          },
+          
         ],
       },
   
@@ -324,11 +337,10 @@ document.addEventListener("DOMContentLoaded", function () {
             hours:
               "</br>Quarta -  Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
             address: "</br>R. Benedito Salles, 837",
-            contact: "</br>(43) 3566-1450",
+            contact: "</br>(43) 99632-1310",
             delivery: "</br>Sim / Com Taxa",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
+            facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
+            instagram: "https://www.instagram.com/_fornalhapizzaria_/",       
   
             menuImages: [
               // Agora é um array de imagens
@@ -354,7 +366,7 @@ document.addEventListener("DOMContentLoaded", function () {
             delivery: "</br>Sim / Com Taxa",
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
+            
   
             menuImages: [
               // Agora é um array de imagens
@@ -421,32 +433,42 @@ document.addEventListener("DOMContentLoaded", function () {
             image: "images/comercios/supermercado/carreiro.png",
             name: "Carreiro",
             address: "</br>R. Benedito Salles, 341 ",
-            hours: "</br>7h - 20h e dom: 07 - 12h",
-            contact: "</br>(43) 2345-6789",
+            hours: "</br>8h - 19h e dom: 08 - 12h",
+            contact: "</br>(43) 3566-1520",
             delivery: "</br>Sim / Com Taxa",
+            facebook: "https://www.facebook.com/p/Supermercado-Carreiro-100066342918723/?locale=pt_BR",
+            instagram: "https://www.instagram.com/mercadocarreiroclps/",
           },
           {
             image: "images/comercios/supermercado/obarateiro.png",
             name: "O Barateiro",
-            address: "</br>PR-218, 1168 ",
-            hours: "</br>8h - 21h e dom: 07 - 12h",
-            contact: "</br>(43) 3456-7890",
+            address: "</br>Bendito Salles, 1168 ",
+            hours: "</br>8h - 21h e dom: 08 - 12h",
+            contact: "</br>(43) 99196-7816",
             delivery: "</br>Sim / Sem Taxa",
+            facebook: "https://www.facebook.com/MercadoObarateiro",
+            instagram: "https://www.instagram.com/supermercado_obarateiro/p/DFgIRupxbr-/",
           },
           {
+            image: "images/comercios/supermercado/kelve.png",
             name: "Kelve",
-            address: "</br>PR-218, 1168 ",
-            hours: "</br>8h - 21h e dom: 07 - 12h",
-            contact: "</br>(43) 3456-7890",
+            address: "</br>R. Paul Harris,104",
+            hours: "</br>8h - 19:30h e dom: 08:30 - 12:30h",
+            contact: "</br>(43) 99844-6105",
             delivery: "</br>Sim / Sem Taxa",
+            facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
+            instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
           },
   
           {
+            image: "images/comercios/supermercado/rocha.jpg",
             name: "Rocha",
             hours: "</br>6h - 20h e dom: 06 - 12h",
             address: "</br>Av. Elson Soares, 767 ",
             contact: "</br>(43) 3566-2436",
             delivery: "</br>Sim / Sem Taxa",
+            facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
+            instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
           },
   
           {
@@ -961,6 +983,30 @@ document.addEventListener("DOMContentLoaded", function () {
           },
         ],
       },
+
+      {
+        link: document.querySelector("#menuAcai"),
+  
+        title: "Açai",
+        establishments: [
+          {
+            image: "images/comercios/acai/faxada.png",
+            name: "Turminha do Açai",
+            hours: "</br>Qua a Seg: 14h - 23h e Ter: Fechado",
+            address: "</br>Rua Benedito Salles, 409",
+            contact: "</br>(43) 99176-7871",
+            delivery: "Sim / Com Taxa",
+            instagram: "https://www.instagram.com/turminha_do_acai/",
+            menuImages: [
+                // Agora é um array de imagens
+                "images/comercios/acai/cardapio/1.png",
+                "images/comercios/acai/cardapio/2.png",
+                "images/comercios/acai/cardapio/3.png",
+              ],
+            info: " <strong>Carne do Dia:</strong><ul> Fraldinha</br></ul> ",
+          },
+        ],
+      },
   
       {
         link: document.querySelector("#menuAcougue"),
@@ -975,8 +1021,8 @@ document.addEventListener("DOMContentLoaded", function () {
             contact: "(43) 99635-1001",
             delivery: "Sim / Sem Taxa",
             bannerImages: [
-              // Novo array de imagens de banner
-              "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+           
+             
               "images/comercios/acougue/banner/banner_1.jpg",
               "images/comercios/acougue/banner/banner_2.jpg",
             ],
@@ -993,10 +1039,12 @@ document.addEventListener("DOMContentLoaded", function () {
         establishments: [
           {
             name: "Agro Vida",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
+            hours: "</br>seg a sex: 8h - 18h e sab: 08 - 16h",
+            address: "</br>rua benedito salles 309",
+            contact: "</br>(43) 99158-9047",
+            delivery: "</br>Sim / Sem Taxa",
+            facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
+            instagram: "https://www.instagram.com/agrovida_carlopolis/"
           },
         ],
       },
@@ -1128,7 +1176,7 @@ document.addEventListener("DOMContentLoaded", function () {
             name: "Pimenta Doce",
             hours: "</br>seg a sex: 8h - 18h e sab: 08 - 12h",
             address: "</br>R. Kalil Keder ",
-            contact: "</br>(43) 3566-1554",
+            contact: "</br>(43) 98806-5747",
             delivery: "</br>Sim / Sem Taxa",
             image: "images/comercios/quitanda/pimentadoce.png",
           },
@@ -1649,27 +1697,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
       
       // Eventos para os Banners
-      document.querySelectorAll(".banners-btn").forEach((button) => {
-        // Armazena o número de banners como data attribute
-        const match = button.textContent.match(/\((\d+)\)/);
-        if (match) {
-          button.dataset.count = match[1];
-        }
-  
-        button.addEventListener("click", function () {
-          const bannersId = `banners-${encodeURIComponent(this.dataset.name)}`;
-          const count = this.dataset.count ? ` (${this.dataset.count})` : "";
-  
-          toggleElement(
-            this,
-            bannersId,
-            `Banners${count}`,
-            "Fechar Banner",
-            "#ff3333",
-            "#4CAF50" // Cor verde para diferenciar dos outros botões
-          );
+     document.querySelectorAll(".banners-btn").forEach((button) => {
+  // Armazena o número de banners como data attribute
+  const match = button.textContent.match(/\((\d+)\)/);
+  if (match) {
+    button.dataset.count = match[1];
+  }
+
+  button.addEventListener("click", function () {
+    const bannersId = `banners-${encodeURIComponent(this.dataset.name)}`;
+    const count = this.dataset.count ? ` (${this.dataset.count})` : "";
+
+    // Verifica se o banner já está aberto
+    const bannersElement = document.getElementById(bannersId);
+    const isOpen = bannersElement && window.getComputedStyle(bannersElement).display !== "none";
+
+    if (isOpen) {
+      // Se já estiver aberto, fecha
+      bannersElement.style.display = "none";
+      this.textContent = `Banners${count}`;
+      this.style.backgroundColor = "#4CAF50";
+      
+      // Destrói a instância do Swiper se existir
+      if (bannersElement.swiperInstance) {
+        bannersElement.swiperInstance.destroy(true, true);
+        bannersElement.swiperInstance = null;
+      }
+    } else {
+      // Se estiver fechado, fecha todos os outros e abre este
+      closeAllContents();
+      
+      bannersElement.style.display = "block";
+      this.textContent = "Fechar Banner";
+      this.style.backgroundColor = "#ff3333";
+
+      // Inicializa o Swiper
+      if (bannersElement.classList.contains("swiper") && !bannersElement.swiperInstance) {
+        bannersElement.swiperInstance = new Swiper(bannersElement, {
+          loop: true,
+          navigation: {
+            nextEl: bannersElement.querySelector(".swiper-button-next"),
+            prevEl: bannersElement.querySelector(".swiper-button-prev"),
+          },
+          pagination: {
+            el: bannersElement.querySelector(".swiper-pagination"),
+            clickable: true,
+          },
         });
-      });
+      }
+    }
+  });
+});
   
       // Eventos para o Cardápio
       document.querySelectorAll(".menu-btn").forEach((button) => {
