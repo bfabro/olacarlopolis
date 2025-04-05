@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", function () {
       popular: "s",
       biofarma: "s",
       farmaciadavila: "s",
+
+      // mercearia
+      seiza:"s",
   
       //pizzaria
       fornalhapizzaria: "s",
@@ -55,11 +58,11 @@ document.addEventListener("DOMContentLoaded", function () {
       // pesqueiro
       peskepagueaguamarine: "s",
   
-      //// FIM COMERCIO
+      //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
   
-      //// INICIO SERCIÇOS
+      //// INICIO SERCIÇOS ////////////////////////////////////////////////////////////////////////////////////////////////
   
-      // Servicos
+     
   
       //anuncio
       piodoanuncio: "s",
@@ -74,10 +77,15 @@ document.addEventListener("DOMContentLoaded", function () {
       deniscenturion: "s",
   
       // guia de pesca
-      thiagoaguera: "s",
+      fabiosushimoto: "s",
   
       // taxista
-      joaotaxista: "s",
+      douglasdotaxi: "s",
+
+      // VETERINARIO
+
+      celsogolçalves:"s",
+      jurandirmachado:"s",
   
       //// FIM SERVIÇOS
   
@@ -658,7 +666,7 @@ document.addEventListener("DOMContentLoaded", function () {
         establishments: [
           {
             name: "Pituka",
-            contact: "(43) 7890-1234",
+            contact: "(43) 99984-5074",
           },
           {
             name: "Gustavo",
@@ -732,8 +740,14 @@ document.addEventListener("DOMContentLoaded", function () {
         title: "Guia de Pesca",
         establishments: [
           {
+            image:"images/servicos/guiapesca/fabio.png",
             name: "Fabio Sushimoto",
-            contact: "(43) 7890-1234",
+            contact: "(43) 99904-3894",
+            instagram: "https://www.instagram.com/suguimotofishing/",
+            facebook:"https://www.facebook.com/fabio.katsumisuguimoto/",
+            info:"Venha passar um dia cheio de emoçoes!",
+
+            
           },
           {
             name: "Thiago Aguera",
@@ -779,7 +793,7 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             image: "images/servicos/pedreiro/pedreiro.jpg",
             name: "Denis centurion",
-            contact: "(11) 9.5982-2485",
+            contact: "(43) 94587-2485",
           },
           {
             name: "Kauan",
@@ -809,11 +823,11 @@ document.addEventListener("DOMContentLoaded", function () {
         establishments: [
           {
             name: "Celso Golçalves",
-            contact: "(43) 7890-1234",
+            contact: "(43) 98851-3310",
           },
           {
             name: "Jurandir Machado",
-            contact: "(43) 8901-2345",
+            contact: "(43) 99642-1494",
           },
         ],
       },
@@ -892,9 +906,8 @@ document.addEventListener("DOMContentLoaded", function () {
             contact: "(43) 99174-2539",
             hours: "24 horas",
             image: "images/info_uteis/hospital/hospital.png",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
+        
+           
           },
         ],
       },
@@ -910,9 +923,9 @@ document.addEventListener("DOMContentLoaded", function () {
             contact: "(43) 3566-1291",
             hours: "8h as 17h",
             image: "images/info_uteis/prefeitura/prefeitura.png",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
+            facebook: "https://www.facebook.com/profile.php?id=200531799983410&_rdr",
+            instagram: "www.instagram.com/uahhhttps://www.instagram.com/prefeitura.carlopolis/?locale=zh_CN&hl=af",
+            site: "http://www.carlopolis.pr.gov.br/",
           },
   
           {
@@ -975,7 +988,7 @@ document.addEventListener("DOMContentLoaded", function () {
         title: "Moto Center",
         establishments: [
           {
-            name: "Binho Moto Center ",
+            name: "Binho Moto Center",
             hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
             address: "R. Laurindo Franco de Godoi, 90",
             contact: "(43) 99951-1540",
@@ -1038,6 +1051,7 @@ document.addEventListener("DOMContentLoaded", function () {
         title: "Agropecuarias",
         establishments: [
           {
+            image: "images/comercios/agropecuaria/vida nova/vidanova.png",
             name: "Agro Vida",
             hours: "</br>seg a sex: 8h - 18h e sab: 08 - 16h",
             address: "</br>rua benedito salles 309",
@@ -1121,6 +1135,29 @@ document.addEventListener("DOMContentLoaded", function () {
           },
         ],
       },
+
+
+
+      {
+        link: document.querySelector("#menuMercearia"),
+  
+        title: "Mercearia",
+        establishments: [
+          {
+            image: "images/comercios/mercearia/seiza/seiza.png",
+            name: "Seiza",
+            hours: "</br>Seg a Qui: 9h - 18:30h </br>Sex 9h - 16:30 </br> sab: 09 - 12h",
+            address: "</br>R. Fidêncio de Melo, 212 - Sala B",
+            contact: "</br>(43) 99103-4187",
+            delivery: "</br>Sim / Sem Taxa",            
+            instagram: "https://www.instagram.com/seizapr/",
+            info:"Muitas Variedades de produtos Japoneses"
+          },
+        ],
+      },
+
+
+
   
       {
         link: document.querySelector("#menuMaterialContrucao"),
@@ -1263,10 +1300,10 @@ document.addEventListener("DOMContentLoaded", function () {
         title: "Taxista",
         establishments: [
           {
-            name: "Joao Taxista",
-            hours: "</br>seg a sab: 7h - 20h e sab: 07 - 00h",
-            address: "</br>R. Laurindo Franco de Godoi, 90",
-            contact: "</br>(43) 99951-1540",
+            name: "Douglas do Taxi",
+            hours: "</br>Seg a Sab: 7h - 20h e Dom: 07 - 00h",
+            address: "</br>Em Frente ao banco Itau",
+            contact: "</br>(43) 88807-8515",
           },
         ],
       },
