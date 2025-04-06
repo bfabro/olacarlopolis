@@ -1688,119 +1688,123 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
   
-      
-      
-      // Eventos para os Banners
-     document.querySelectorAll(".banners-btn").forEach((button) => {
-  // Armazena o número de banners como data attribute
-  const match = button.textContent.match(/\((\d+)\)/);
-  if (match) {
-    button.dataset.count = match[1];
-  }
+      // Função para fechar todos os conteúdos abertos
+      function closeAllContents() {
+        document
+          .querySelectorAll(
+            ".detalhes-content, .menu-cardapio, .menu-content, .banners-container"
+          )
+          .forEach((content) => {
+            content.style.display = "none";
+  
+            // Destrói as instâncias do Swiper
+            if (content.swiperInstance) {
+              content.swiperInstance.destroy(true, true);
+              content.swiperInstance = null;
+            }
+          });
+  
+        // Restaura o texto e a cor dos botões
+        document
+          .querySelectorAll(".detalhes-btn, .menu-btn, .flyer-btn, .banners-btn")
+          .forEach((button) => {
+            if (button.classList.contains("detalhes-btn")) {
+              button.textContent = "+ Informações";
+              button.style.backgroundColor = "#007bff";
+            } else if (button.classList.contains("menu-btn")) {
+              const count = button.dataset.count
+                ? ` (${button.dataset.count})`
+                : "";
+              button.textContent = `Ver Cardápio${count}`;
+              button.style.backgroundColor = "#dfa529";
 
-  button.addEventListener("click", function () {
-    const bannersId = `banners-${encodeURIComponent(this.dataset.name)}`;
-    const count = this.dataset.count ? ` (${this.dataset.count})` : "";
+            } else if (button.classList.contains("flyer-btn")) {
+              button.textContent = "Ver Flyer";
+              button.style.backgroundColor = "#dfa529";
 
-
-    toggleElement(
-        this,
-        bannersId,
-        `Banners${count}`,
-        "Fechar Banners",
-        "#ff3333",
-        "#4CAF50"
-      );
-
-
-    // Verifica se o banner já está aberto
-    const bannersElement = document.getElementById(bannersId);
-    const isOpen = bannersElement && window.getComputedStyle(bannersElement).display !== "none";
-
-    if (isOpen) {
-      // Se já estiver aberto, fecha
-      bannersElement.style.display = "none";
-      this.textContent = `Banners${count}`;
-      this.style.backgroundColor = "#4CAF50";
-      
-      // Destrói a instância do Swiper se existir
-      if (bannersElement.swiperInstance) {
-        bannersElement.swiperInstance.destroy(true, true);
-        bannersElement.swiperInstance = null;
+            } else if (button.classList.contains("banners-btn")) {
+              const count = button.dataset.count
+                ? ` (${button.dataset.count})`
+                : "";
+              button.textContent = `Banners${count}`;
+              button.style.backgroundColor = "#4CAF50";
+            }
+          });
       }
-    } else {
-      // Se estiver fechado, fecha todos os outros e abre este
-      closeAllContents();
-      
-      bannersElement.style.display = "block";
-      this.textContent = "Fechar Banner";
-      this.style.backgroundColor = "#ff3333";
 
-      // Inicializa o Swiper
-      if (bannersElement.classList.contains("swiper") && !bannersElement.swiperInstance) {
-        bannersElement.swiperInstance = new Swiper(bannersElement, {
+      
+
+
+
+
+
+
+// Eventos para os Banners - VERSÃO DEFINITIVA
+document.querySelectorAll(".banners-btn").forEach((button) => {
+    // Extrai o número de banners do texto do botão
+    const countMatch = button.textContent.match(/\((\d+)\)/);
+    const bannerCount = countMatch ? countMatch[1] : '0';
+    
+    button.addEventListener("click", function() {
+      const bannersId = `banners-${encodeURIComponent(this.dataset.name)}`;
+      const bannersContainer = document.getElementById(bannersId);
+      
+      // Verifica se já está visível
+      const isVisible = bannersContainer.style.display === 'block' || 
+                       window.getComputedStyle(bannersContainer).display === 'block';
+      
+      // Fecha todos os outros conteúdos primeiro
+      if (!isVisible) {
+        closeAllContents();
+      }
+      
+      // Alterna o estado
+      if (isVisible) {
+        // Fecha o banner
+        bannersContainer.style.display = 'none';
+        button.textContent = `Banners (${bannerCount})`;
+        button.style.backgroundColor = '#4CAF50';
+        
+        // Destrói o Swiper
+        if (bannersContainer.swiperInstance) {
+          bannersContainer.swiperInstance.destroy(true, true);
+          bannersContainer.swiperInstance = null;
+        }
+      } else {
+        // Abre o banner
+        bannersContainer.style.display = 'block';
+        button.textContent = 'Fechar Banner';
+        button.style.backgroundColor = '#ff3333';
+        
+        // Inicializa o Swiper
+        bannersContainer.swiperInstance = new Swiper(bannersContainer, {
           loop: true,
           navigation: {
-            nextEl: bannersElement.querySelector(".swiper-button-next"),
-            prevEl: bannersElement.querySelector(".swiper-button-prev"),
+            nextEl: bannersContainer.querySelector('.swiper-button-next'),
+            prevEl: bannersContainer.querySelector('.swiper-button-prev'),
           },
           pagination: {
-            el: bannersElement.querySelector(".swiper-pagination"),
+            el: bannersContainer.querySelector('.swiper-pagination'),
             clickable: true,
           },
         });
       }
-    }
+    });
   });
-});
 
-// Função para fechar todos os conteúdos abertos
-function closeAllContents() {
-    document
-      .querySelectorAll(
-        ".detalhes-content, .menu-cardapio, .menu-content, .banners-container"
-      )
-      .forEach((content) => {
-        content.style.display = "none";
 
-        // Destrói as instâncias do Swiper
-        if (content.swiperInstance) {
-          content.swiperInstance.destroy(true, true);
-          content.swiperInstance = null;
-        }
-      });
 
-    // Restaura o texto e a cor dos botões
-    document
-      .querySelectorAll(".detalhes-btn, .menu-btn, .flyer-btn, .banners-btn")
-      .forEach((button) => {
-        if (button.classList.contains("detalhes-btn")) {
-          button.textContent = "+ Informações";
-          button.style.backgroundColor = "#007bff";
 
-        } else if (button.classList.contains("menu-btn")) {
-          const count = button.dataset.count
-            ? ` (${button.dataset.count})`
-            : "";
-            
-          button.textContent = `Cardápio${count}`;
-          button.style.backgroundColor = "#dfa529";
 
-        } else if (button.classList.contains("flyer-btn")) {
-          button.textContent = "Ver Flyer";
-          button.style.backgroundColor = "#dfa529";
 
-        } else if (button.classList.contains("banners-btn")) {
-          const count = button.dataset.count
-            ? ` (${button.dataset.count})`
-            : "";
-          button.textContent = `Banners${count}`;
-          button.style.backgroundColor = "#4CAF50";
-        }
-      });
-  }
 
-  
+
+
+
+
+
+
+
       // Eventos para o Cardápio
       document.querySelectorAll(".menu-btn").forEach((button) => {
         // Armazena o número de itens no cardápio como data attribute
@@ -2014,8 +2018,6 @@ function closeAllContents() {
       }
     });
   
-
-    
     ///// INICIO area de pagamento:
   
     ///// FIM AREA DE PAGAMENTO
