@@ -611,17 +611,24 @@ document.addEventListener("DOMContentLoaded", function () {
          },
   
           {
-            image: "images/comercios/farmacia/popularMais.png",
+            
             name: "PopularMais ( Jeremias )",
-            address: "</br>R. Laurindo Franco de Godói, 787",
+            address: "</br>Elson Soares, 787 = Sala 2",
             hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
             contact: "</br>(43) 99647-6266",
             delivery: "</br>Sim / Sem Taxa",
+            image: "images/comercios/farmacia/popularMais.png",
             facebook:
               "https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
             instagram:
               "https://www.instagram.com/popularmais_farmaciadojeremias/",
             site: "#",
+            novidadesImages: [
+                // Agora é um array de imagens
+               "images/comercios/farmacia/novidades_popularmais/1.png",
+               "images/comercios/farmacia/novidades_popularmais/2.png",
+                              
+              ],
           },
           {
             image: "images/comercios/farmacia/santamaria.png",
@@ -880,7 +887,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   site: "www.google.com",
                    
                   */
-  
+  /*
         title: "Farmacia de Plantão",
         establishments: [
           {
@@ -894,8 +901,38 @@ document.addEventListener("DOMContentLoaded", function () {
               "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
             instagram: "https://www.instagram.com/descontofacil.clps/",
             site: "https://www.grupoasfar.com.br/",
+
+           
          },
         ],
+*/
+
+
+title: "Farmacia de Plantão",
+establishments: [
+  {
+    name: "Popularmais ( Jeremias )",
+    address: "</br>Av. Elson Soares, 787 Sala 2",
+    contact: "</br>(43) 99647-6266",
+    plantaoHorario: "</br>Das 8h às 21h , De 05/04 a 11/04",
+    delivery: "</br>Sim / Sem Taxa",
+    image: "images/comercios/farmacia/popularMais.png",
+            facebook:
+              "https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
+            instagram:
+              "https://www.instagram.com/popularmais_farmaciadojeremias/",
+            site: "#",
+            novidadesImages: [
+                // Agora é um array de imagens
+               
+               "images/comercios/farmacia/novidades_popularmais/1.png",
+               "images/comercios/farmacia/novidades_popularmais/2.png",
+              ],
+
+   
+ },
+],
+        
       },
   
       {
@@ -1014,8 +1051,8 @@ document.addEventListener("DOMContentLoaded", function () {
             instagram: "https://www.instagram.com/turminha_do_acai/",
             novidadesImages: [
                 // Agora é um array de imagens
-               "images/comercios/acai/cardapio/3.png",
-                "images/comercios/acai/cardapio/2.png",               
+               "images/comercios/acai/novidades/1.png",
+                             
               ],
             menuImages: [
                 // Agora é um array de imagens
