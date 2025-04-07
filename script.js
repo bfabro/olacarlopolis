@@ -613,7 +613,7 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             
             name: "PopularMais ( Jeremias )",
-            address: "</br>Elson Soares, 787 = Sala 2",
+            address: "</br>Elson Soares, 787, Sala 2",
             hours: "</br>Seg a Sex: 8h - 18h e Sab: 08 - 12h",
             contact: "</br>(43) 99647-6266",
             delivery: "</br>Sim / Sem Taxa",
@@ -912,7 +912,7 @@ title: "Farmacia de Plantão",
 establishments: [
   {
     name: "Popularmais ( Jeremias )",
-    address: "</br>Av. Elson Soares, 787 Sala 2",
+    address: "</br>Av. Elson Soares, 787. sala 2",
     contact: "</br>(43) 99647-6266",
     plantaoHorario: "</br>Das 8h às 21h , De 05/04 a 11/04",
     delivery: "</br>Sim / Sem Taxa",
