@@ -914,7 +914,7 @@ establishments: [
     name: "Popularmais ( Jeremias )",
     address: "</br>Av. Elson Soares, 787. sala 2",
     contact: "</br>(43) 99647-6266",
-    plantaoHorario: "</br>Das 8h às 21h , De 05/04 a 11/04",
+    plantaoHorario: "</br>Das 8h às 21h </br> De 05/04 a 11/04",
     delivery: "</br>Sim / Sem Taxa",
     image: "images/comercios/farmacia/popularMais.png",
             facebook:
