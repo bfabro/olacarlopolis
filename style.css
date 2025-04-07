@@ -1214,6 +1214,7 @@ img {
   font-size: 16px;
   font-weight: bold;
   letter-spacing: 1px;
+  width: 100%;
 }
 .novidades-btn:hover {
   background-color: #000000;
@@ -1228,7 +1229,7 @@ img {
   cursor: pointer;
   transition: background-color 0.4s;
   font-size: 16px;
-  margin: 0px 0px 0px 10px;
+  width: 100%;
   font-weight: bold;
   letter-spacing: 1px;
 }
