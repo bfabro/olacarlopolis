@@ -518,11 +518,6 @@ document.addEventListener("DOMContentLoaded", function () {
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
             site: "www.google.com",
-            novidadesImages: [
-                // Agora é um array de imagens
-               "images/comercios/acai/cardapio/3.png",
-                "images/comercios/acai/cardapio/2.png",               
-              ],
           },
   
           {
@@ -1014,8 +1009,9 @@ document.addEventListener("DOMContentLoaded", function () {
             instagram: "https://www.instagram.com/turminha_do_acai/",
             novidadesImages: [
                 // Agora é um array de imagens
-               "images/comercios/acai/cardapio/3.png",
-                "images/comercios/acai/cardapio/2.png",               
+                "images/comercios/acai/cardapio/1.png",
+                "images/comercios/acai/cardapio/2.png",
+               
               ],
             menuImages: [
                 // Agora é um array de imagens

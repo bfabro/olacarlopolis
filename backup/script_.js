@@ -518,11 +518,6 @@ document.addEventListener("DOMContentLoaded", function () {
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
             site: "www.google.com",
-            novidadesImages: [
-                // Agora é um array de imagens
-               "images/comercios/acai/cardapio/3.png",
-                "images/comercios/acai/cardapio/2.png",               
-              ],
           },
   
           {
@@ -1014,8 +1009,9 @@ document.addEventListener("DOMContentLoaded", function () {
             instagram: "https://www.instagram.com/turminha_do_acai/",
             novidadesImages: [
                 // Agora é um array de imagens
-               "images/comercios/acai/cardapio/3.png",
-                "images/comercios/acai/cardapio/2.png",               
+                "images/comercios/acai/cardapio/1.png",
+                "images/comercios/acai/cardapio/2.png",
+               
               ],
             menuImages: [
                 // Agora é um array de imagens
@@ -1379,61 +1375,6 @@ document.addEventListener("DOMContentLoaded", function () {
       // Pesquisar dentro das categorias e carregar o conteúdo correspondente
       categories.forEach((category) => {
         category.establishments.forEach((establishment) => {
-
-  const nome = document.createElement("h3");
-  nome.textContent = establishment.name;
-  contentArea.appendChild(nome);
-
-  // outras informações do estabelecimento (endereço, horário, etc.)
-
-  const areaNovidades = document.createElement("div");
-  const areaCardapio = document.createElement("div");
-  areaNovidades.classList.add("hidden");
-  areaCardapio.classList.add("hidden");
-
-  contentArea.appendChild(areaNovidades);
-  contentArea.appendChild(areaCardapio);
-
-  if (establishment.novidadesImages && establishment.novidadesImages.length > 0) {
-    const btnNovidades = document.createElement("button");
-    btnNovidades.textContent = "Novidades";
-    btnNovidades.className = "menu-btn";
-    contentArea.appendChild(btnNovidades);
-
-    btnNovidades.addEventListener("click", () => {
-      areaCardapio.classList.add("hidden");
-      areaNovidades.classList.remove("hidden");
-      areaNovidades.innerHTML = "";
-
-      establishment.novidadesImages.forEach(imgSrc => {
-        const img = document.createElement("img");
-        img.src = imgSrc;
-        img.className = "content_image";
-        areaNovidades.appendChild(img);
-      });
-    });
-  }
-
-  if (establishment.menuImages && establishment.menuImages.length > 0) {
-    const btnCardapio = document.createElement("button");
-    btnCardapio.textContent = "Cardápio";
-    btnCardapio.className = "menu-btn";
-    contentArea.appendChild(btnCardapio);
-
-    btnCardapio.addEventListener("click", () => {
-      areaNovidades.classList.add("hidden");
-      areaCardapio.classList.remove("hidden");
-      areaCardapio.innerHTML = "";
-
-      establishment.menuImages.forEach(imgSrc => {
-        const img = document.createElement("img");
-        img.src = imgSrc;
-        img.className = "content_image";
-        areaCardapio.appendChild(img);
-      });
-    });
-  }
-
           const dataString = Object.values(establishment).join(" ").toLowerCase();
   
           if (dataString.includes(filter)) {
@@ -1613,38 +1554,37 @@ document.addEventListener("DOMContentLoaded", function () {
           ` : ''}
         </div>
         
-      
-            ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
-                <div class="novidades-container swiper" id="novidades-${encodeURIComponent(establishment.name)}">
-                    <div class="swiper-wrapper">
-                        ${establishment.novidadesImages.map((img, index) => `
-                        <div class="swiper-slide">
-                            <img src="${img}" alt="Novidades ${index + 1} de ${establishment.name}">
-                        </div>
-                        `).join('')}
-                    </div>
-
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
-                </div>
-                 ` : ''}
+        <div class="carrossel-container">
+          ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
+            <div class="novidades-container swiper" id="novidades-${encodeURIComponent(establishment.name)}">
+              <div class="swiper-wrapper">
+                ${establishment.novidadesImages.map((img, index) => `
+                  <div class="swiper-slide">
+                    <img src="${img}" alt="Novidades ${index + 1} de ${establishment.name}">
+                  </div>
+                `).join('')}
+              </div>
+              <div class="swiper-button-next"></div>
+              <div class="swiper-button-prev"></div>
+              <div class="swiper-pagination"></div>
+            </div>
+          ` : ''}
           
-           ${establishment.menuImages && establishment.menuImages.length > 0 ? `
-                <div class="menu-cardapio swiper" id="menu-${encodeURIComponent(establishment.name)}">
-                    <div class="swiper-wrapper">
-                        ${establishment.menuImages.map((img, index) => `
-                        <div class="swiper-slide">
-                            <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}">
-                        </div>
-                        `).join('')}
-                    </div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
-                </div>
-                 ` : ''}
-       
+          ${establishment.menuImages && establishment.menuImages.length > 0 ? `
+            <div class="menu-cardapio swiper" id="menu-${encodeURIComponent(establishment.name)}">
+              <div class="swiper-wrapper">
+                ${establishment.menuImages.map((img, index) => `
+                  <div class="swiper-slide">
+                    <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}">
+                  </div>
+                `).join('')}
+              </div>
+              <div class="swiper-button-next"></div>
+              <div class="swiper-button-prev"></div>
+              <div class="swiper-pagination"></div>
+            </div>
+          ` : ''}
+        </div>
         
         <!-- Restante do conteúdo... -->
       </li>
@@ -1717,7 +1657,7 @@ function toggleContent(button, contentId, otherButtons) {
       if (btn.classList.contains('menu-btn')) {
         btn.style.backgroundColor = '#dfa529';
       } else if (btn.classList.contains('novidades-btn')) {
-        btn.style.backgroundColor = '#3726d1';
+        btn.style.backgroundColor = '#4CAF50';
       }
     });
   }

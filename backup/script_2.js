@@ -518,11 +518,6 @@ document.addEventListener("DOMContentLoaded", function () {
             facebook: "www.facebook.com/uahh",
             instagram: "www.instagram.com/uahh",
             site: "www.google.com",
-            novidadesImages: [
-                // Agora é um array de imagens
-               "images/comercios/acai/cardapio/3.png",
-                "images/comercios/acai/cardapio/2.png",               
-              ],
           },
   
           {
@@ -1014,8 +1009,9 @@ document.addEventListener("DOMContentLoaded", function () {
             instagram: "https://www.instagram.com/turminha_do_acai/",
             novidadesImages: [
                 // Agora é um array de imagens
-               "images/comercios/acai/cardapio/3.png",
-                "images/comercios/acai/cardapio/2.png",               
+                "images/comercios/acai/cardapio/1.png",
+                "images/comercios/acai/cardapio/2.png",
+               
               ],
             menuImages: [
                 // Agora é um array de imagens
@@ -1386,13 +1382,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // outras informações do estabelecimento (endereço, horário, etc.)
 
+  const containerConteudo = document.createElement("div");
+  containerConteudo.style.marginTop = "20px";
+
   const areaNovidades = document.createElement("div");
   const areaCardapio = document.createElement("div");
   areaNovidades.classList.add("hidden");
   areaCardapio.classList.add("hidden");
 
-  contentArea.appendChild(areaNovidades);
-  contentArea.appendChild(areaCardapio);
+  containerConteudo.appendChild(areaNovidades);
+  containerConteudo.appendChild(areaCardapio);
+  contentArea.appendChild(containerConteudo);
 
   if (establishment.novidadesImages && establishment.novidadesImages.length > 0) {
     const btnNovidades = document.createElement("button");
@@ -1613,38 +1613,37 @@ document.addEventListener("DOMContentLoaded", function () {
           ` : ''}
         </div>
         
-      
-            ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
-                <div class="novidades-container swiper" id="novidades-${encodeURIComponent(establishment.name)}">
-                    <div class="swiper-wrapper">
-                        ${establishment.novidadesImages.map((img, index) => `
-                        <div class="swiper-slide">
-                            <img src="${img}" alt="Novidades ${index + 1} de ${establishment.name}">
-                        </div>
-                        `).join('')}
-                    </div>
-
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
-                </div>
-                 ` : ''}
+        <div class="carrossel-container">
+          ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
+            <div class="novidades-container swiper" id="novidades-${encodeURIComponent(establishment.name)}">
+              <div class="swiper-wrapper">
+                ${establishment.novidadesImages.map((img, index) => `
+                  <div class="swiper-slide">
+                    <img src="${img}" alt="Novidades ${index + 1} de ${establishment.name}">
+                  </div>
+                `).join('')}
+              </div>
+              <div class="swiper-button-next"></div>
+              <div class="swiper-button-prev"></div>
+              <div class="swiper-pagination"></div>
+            </div>
+          ` : ''}
           
-           ${establishment.menuImages && establishment.menuImages.length > 0 ? `
-                <div class="menu-cardapio swiper" id="menu-${encodeURIComponent(establishment.name)}">
-                    <div class="swiper-wrapper">
-                        ${establishment.menuImages.map((img, index) => `
-                        <div class="swiper-slide">
-                            <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}">
-                        </div>
-                        `).join('')}
-                    </div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
-                </div>
-                 ` : ''}
-       
+          ${establishment.menuImages && establishment.menuImages.length > 0 ? `
+            <div class="menu-cardapio swiper" id="menu-${encodeURIComponent(establishment.name)}">
+              <div class="swiper-wrapper">
+                ${establishment.menuImages.map((img, index) => `
+                  <div class="swiper-slide">
+                    <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}">
+                  </div>
+                `).join('')}
+              </div>
+              <div class="swiper-button-next"></div>
+              <div class="swiper-button-prev"></div>
+              <div class="swiper-pagination"></div>
+            </div>
+          ` : ''}
+        </div>
         
         <!-- Restante do conteúdo... -->
       </li>
@@ -1717,7 +1716,7 @@ function toggleContent(button, contentId, otherButtons) {
       if (btn.classList.contains('menu-btn')) {
         btn.style.backgroundColor = '#dfa529';
       } else if (btn.classList.contains('novidades-btn')) {
-        btn.style.backgroundColor = '#3726d1';
+        btn.style.backgroundColor = '#4CAF50';
       }
     });
   }
