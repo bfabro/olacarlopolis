@@ -332,7 +332,8 @@ document.addEventListener("DOMContentLoaded", function () {
           },
           
         ],
-      },
+    },
+
   
       // pizzaria
       {
@@ -359,6 +360,10 @@ document.addEventListener("DOMContentLoaded", function () {
           },
         ],
       },
+
+
+
+      
   
       // pesqueiro
       {
