@@ -520,8 +520,11 @@ document.addEventListener("DOMContentLoaded", function () {
             site: "www.google.com",
             novidadesImages: [
                 // Agora é um array de imagens
-               "images/comercios/acai/cardapio/3.png",
-                "images/comercios/acai/cardapio/2.png",               
+               "images/comercios/farmacia/novidade_biofarma/1.png",
+                "images/comercios/farmacia/novidade_biofarma/2.png",     
+                "images/comercios/farmacia/novidade_biofarma/3.png",
+                "images/comercios/farmacia/novidade_biofarma/4.png",
+                
               ],
           },
   
