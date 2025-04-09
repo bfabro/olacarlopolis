@@ -123,6 +123,29 @@ document.addEventListener("DOMContentLoaded", function () {
     const overlay = document.querySelector("#overlay");
     const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
     const clearSearch = document.getElementById("clearSearch");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
   
     // Função para adicionar contadores de slides
     function addSlideCounters(swiperInstance, containerSelector) {
@@ -606,17 +629,7 @@ document.addEventListener("DOMContentLoaded", function () {
             site: "#",
           },
   
-          {
-            image: "images/comercios/farmacia/drogamais.png",
-            name: "Popular ( Estela )",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            address: "</br>Rua Laurindo Franco Godoy, 464",
-            contact: "</br>(43) 3566-1473",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
-         },
+          
   
           {
             
@@ -1267,6 +1280,16 @@ establishments: [
             contact: "</br>(43) 98806-5747",
             delivery: "</br>Sim / Sem Taxa",
             image: "images/comercios/quitanda/pimentadoce.png",
+            novidadesImages: [           
+             
+                "images/comercios/quitanda/novidades/1.png",
+               "images/comercios/quitanda/novidades/2.png",
+               "images/comercios/quitanda/novidades/3.png",
+               "images/comercios/quitanda/novidades/4.png",
+               "images/comercios/quitanda/novidades/5.png",
+              ],
+
+
           },
         ],
       },
@@ -1450,6 +1473,8 @@ establishments: [
       areaNovidades.classList.remove("hidden");
       areaNovidades.innerHTML = "";
 
+
+      ///////////////////////////////////
       establishment.novidadesImages.forEach(imgSrc => {
         const img = document.createElement("img");
         img.src = imgSrc;
@@ -1646,13 +1671,13 @@ establishments: [
 
   <div class="button-container">
           ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
-            <button class="novidades-btn" data-name="${establishment.name}">
+            <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}">
               Novidades (${establishment.novidadesImages.length})
             </button>
           ` : ''}
           
           ${establishment.menuImages && establishment.menuImages.length > 0 ? `
-            <button class="menu-btn" data-name="${establishment.name}">
+            <button  id="cardapioButton" class="menu-btn" data-name="${establishment.name}">
               Cardápio (${establishment.menuImages.length})
             </button>
           ` : ''}
@@ -1711,6 +1736,8 @@ establishments: [
       
       ///// inicio
 // Substitua a função toggleElement e eventos relacionados por:
+
+
 
 // Função para alternar entre cardápio e novidades
 function toggleContent(button, contentId, otherButtons) {
