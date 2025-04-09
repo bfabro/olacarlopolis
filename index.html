@@ -545,9 +545,12 @@
                      </p>
                   </div>
 
+                 
+
                   <div class="swiper-slide">
-                     <video autoplay controls class="novidade-video">
+                     <video class="novidade-video" controls>
                      <source src="images/novidades/v_1.mp4" type="video/mp4">
+                     Seu navegador não suporta o vídeo.
                   </video><p>
                         Frango Assado / Costela Assada<br>
                         <!-- Ícone de link para mais informações -->
@@ -712,7 +715,25 @@
    </div>
    <!--  JavaScript -->
    <script src="script.js"></script>
-
+   <script>// Função para iniciar o vídeo quando ele aparecer na tela
+      const video = document.querySelector('video');
+      
+      const playVideoWhenVisible = () => {
+        // Checa se o vídeo está visível
+        const videoRect = video.getBoundingClientRect();
+        if (videoRect.top >= 0 && videoRect.bottom <= window.innerHeight) {
+          if (video.paused) {
+            video.play(); // Reproduz o vídeo
+          }
+        }
+      };
+      
+      // Aciona a função de visibilidade quando o carrossel ou seção de novidades for exibida
+      window.addEventListener('scroll', playVideoWhenVisible);
+      
+      // Se já estiver na parte visível da tela quando carregado
+      document.addEventListener('DOMContentLoaded', playVideoWhenVisible);
+      </script>
 
 
    <script>
