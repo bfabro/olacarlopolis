@@ -57,6 +57,8 @@ document.addEventListener("DOMContentLoaded", function () {
   
       // pesqueiro
       peskepagueaguamarine: "s",
+
+      delfino:"s",
   
       //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
   
@@ -297,1106 +299,1066 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   
     // Carregar informações de categorias
-    const categories = [
-      {
-        link: document.querySelector("#menuLanchonete"),
-        title: "Lanchonetes",
-        establishments: [
+    const categories = 
+    [
+        {
+            link: document.querySelector("#menuLanchonete"),
+            title: "Lanchonetes",
+            establishments: [
 
-            {
-                image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
-                name: "O Casarao",
-                hours: "</br>Ter - Dom - 18h - 00:30h",
-                address: "</br>R. Benedito Salles, 1340",
-                contact: "</br>(43) 99693-0565",
-                delivery: "</br>Sim / Com Taxa",
-                facebook: "https://www.facebook.com/ocasaraoph/?locale=pt_BR",
-                instagram: "https://www.instagram.com/ocasaraoph/",       
-                menuImages: [
-                  // Agora é um array de imagens
-                  "images/comercios/lanchonete/casarao/1.png",
-                  "images/comercios/lanchonete/casarao/2.png",
-                  "images/comercios/lanchonete/casarao/3.png",
-                  "images/comercios/lanchonete/casarao/4.png",
-                  "images/comercios/lanchonete/casarao/5.png",
-                  "images/comercios/lanchonete/casarao/6.png",
-                  "images/comercios/lanchonete/casarao/7.png",
-                  "images/comercios/lanchonete/casarao/8.png",
-                  "images/comercios/lanchonete/casarao/9.png",
-                  "images/comercios/lanchonete/casarao/10.png",
-                ],
-                
-              },
+                {
+                    link: document.querySelector("#menuAcai"),    
+                    title: "Açai",
+                    establishments: [
+                        {
+                            image: "images/comercios/acai/faxada.png",
+                            name: "Turminha do Açai",
+                            hours: "</br>Qua a Seg: 14h - 23h </br> Ter: Fechado",
+                            address: "</br>Rua Benedito Salles, 409",
+                            contact: "</br>(43) 99176-7871",
+                            delivery: "Sim / Com Taxa",
+                            instagram: "https://www.instagram.com/turminha_do_acai/",
+                            novidadesImages: [            
+                            "images/comercios/acai/novidades/1.png",
+                                            
+                            ],
+                            menuImages: [                    
+                                "images/comercios/acai/cardapio/1.png",
+                                "images/comercios/acai/cardapio/2.png",
+                                "images/comercios/acai/cardapio/3.png",
+                            ],
+                        
+                        },
+                    ],
+                },
+
+                {
+                    link: document.querySelector("#menuAcougue"),  
+                    title: "Açougues",
+                    establishments: [
+                        {
+                            image: "images/comercios/acougue/acougue.png",
+                            name: "Açougue do Carlinho",
+                            hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                            address: "Rua Benedito Salles, 409",
+                            contact: "(43) 99635-1001",
+                            delivery: "Sim / Sem Taxa",
+                            novidadesImages: [ 
+                            "images/comercios/acougue/banner/banner_1.jpg",
+                            "images/comercios/acougue/banner/banner_2.jpg",
+                            ],
+                        },
+                    ],
+                },
+
+                {
+                    link: document.querySelector("#menuAdega"),    
+                    title: "Adegas",
+                    establishments: [
+                        {
+                            image: "images/comercios/adega/adega_cuenca.jpg",
+                            name: "Adega Cuenca",
+                            hours:
+                            "</br>seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
+                            address: "</br>R. Kalil Keder, 752",
+                            contact: "</br>(43) 99800-1680",
+                            delivery: "</br>Sim / Sem Taxa",
+                        },
+                    ],
+                },
+
+                {
+                    link: document.querySelector("#menuAgropecuaria"),  
+                    title: "Agropecuarias",
+                    establishments: [
+                        {
+                            image: "images/comercios/agropecuaria/vida nova/vidanova.png",
+                            name: "Agro Vida",
+                            hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 16h",
+                            address: "</br>rua benedito salles 309",
+                            contact: "</br>(43) 99158-9047",
+                            delivery: "</br>Sim / Sem Taxa",
+                            facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
+                            instagram: "https://www.instagram.com/agrovida_carlopolis/"
+                        },
+                    ],
+                },
+
+                {
+                    link: document.querySelector("#menuAdvocacia"),    
+                    title: "Escritorio de Advocacia",
+                    establishments: [
+                        {
+                            name: "ADVOCACIA ABILIO",
+                            hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
+                            address: "</br>R. Salvira Marquês, 315",
+                            contact: "</br>(43) 3566-1368",
+                        },
+                    ],
+                },
+
+                {
+                    image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
+                    name: "O Casarao",
+                    hours: "</br>Ter - Dom - 18h - 00:30h",
+                    address: "</br>R. Benedito Salles, 1340",
+                    contact: "</br>(43) 99693-0565",
+                    delivery: "</br>Sim / Com Taxa",
+                    facebook: "https://www.facebook.com/ocasaraoph/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/ocasaraoph/",       
+                    menuImages: [                   
+                    "images/comercios/lanchonete/casarao/1.png",
+                    "images/comercios/lanchonete/casarao/2.png",
+                    "images/comercios/lanchonete/casarao/3.png",
+                    "images/comercios/lanchonete/casarao/4.png",
+                    "images/comercios/lanchonete/casarao/5.png",
+                    "images/comercios/lanchonete/casarao/6.png",
+                    "images/comercios/lanchonete/casarao/7.png",
+                    "images/comercios/lanchonete/casarao/8.png",
+                    "images/comercios/lanchonete/casarao/9.png",
+                    "images/comercios/lanchonete/casarao/10.png",
+                    ],
+                    
+                },
 
 
-          {
-            image: "images/comercios/lanchonete/paiol/paiol.png",
-            name: "Paiol",
-            hours: "qua - dom 19 - 00h",
-            address: "Av. Elson Soares, 767 ",
-            contact: "(43) 99159-0070",
-            delivery: "Sim / Sem Taxa",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",  
-            menuImages: [
-              // Agora é um array de imagens
-              "images/comercios/lanchonete/paiol/cardapio_1.jpg",
-              "images/comercios/lanchonete/paiol/cardapio_2.jpg",
-              "images/comercios/lanchonete/paiol/cardapio_3.jpg",
-            ],
-            novidadesImages: [
-                // Novo array de imagens de novidades
-                "images/comercios/lanchonete/paiol/cardapio_1.jpg",
-                "images/comercios/acougue/banner/banner_1.jpg",
-                "images/comercios/acougue/banner/banner_2.jpg",
-              ],
-           
-          },
+                {
+                    image: "images/comercios/lanchonete/paiol/paiol.png",
+                    name: "Paiol",
+                    hours: "qua - dom 19 - 00h",
+                    address: "Av. Elson Soares, 767 ",
+                    contact: "(43) 99159-0070",
+                    delivery: "Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",  
+                    menuImages: [
+                        // Agora é um array de imagens
+                        "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+                        "images/comercios/lanchonete/paiol/cardapio_2.jpg",
+                        "images/comercios/lanchonete/paiol/cardapio_3.jpg",
+                    ],
+                    novidadesImages: [
+                        // Novo array de imagens de novidades
+                        "images/comercios/lanchonete/paiol/cardapio_1.jpg",
+                        "images/comercios/acougue/banner/banner_1.jpg",
+                        "images/comercios/acougue/banner/banner_2.jpg",
+                    ],
+            
+                },
           
-        ],
-    },
-
+            ],
+        },
   
       // pizzaria
-      {
-        link: document.querySelector("#menuPizzaria"),
-        title: "Pizzarias",
-        establishments: [
-          {
-            image: "images/comercios/pizzaria/fornalha.png",
-            name: "Fornalha Pizzaria",
-            hours:
-              "</br>Quarta -  Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
-            address: "</br>R. Benedito Salles, 837",
-            contact: "</br>(43) 99632-1310",
-            delivery: "</br>Sim / Com Taxa",
-            facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
-            instagram: "https://www.instagram.com/_fornalhapizzaria_/",       
-  
-            menuImages: [
-              // Agora é um array de imagens
-              "images/comercios/pizzaria/cardapio_fornalha.jpg",
-              "images/comercios/pizzaria/cardapio_fornalha_2.jpg",
+        {
+            link: document.querySelector("#menuPizzaria"),
+            title: "Pizzarias",
+            establishments: [
+                {
+                    image: "images/comercios/pizzaria/fornalha.png",
+                    name: "Fornalha Pizzaria",
+                    hours:"</br>Quarta - Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
+                    address: "</br>R. Benedito Salles, 837",
+                    contact: "</br>(43) 99632-1310",
+                    delivery: "</br>Sim / Com Taxa",
+                    facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/_fornalhapizzaria_/",    
+                    menuImages: [                
+                        "images/comercios/pizzaria/cardapio_fornalha.jpg",
+                        "images/comercios/pizzaria/cardapio_fornalha_2.jpg",
+                    ],            
+                },
             ],
-       
-          },
-        ],
-      },
+        },
 
-
-
-      
-  
-      // pesqueiro
-      {
-        link: document.querySelector("#menuPesqueiro"),
-        title: "Pesqueiro",
-        establishments: [
-          {
-            image: "images/comercios/pesqueiro/aguamarine.jpg",
-            name: "Pesk e Pague Agua Marine",
-            hours: "</br>Sexta - Domingo: 09:30 - 18",
-            address: "</br>Rod. Jose Alves Pereira",
-            contact: "</br>(43) 98808-1911",
-            delivery: "</br>Sim / Com Taxa",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            
-  
-            menuImages: [
-              // Agora é um array de imagens
-              "images/comercios/pesqueiro/cardapio_aguamarine.jpg",
+         // pesqueiro
+        {
+            link: document.querySelector("#menuPesqueiro"),
+            title: "Pesqueiro",
+            establishments: [
+                {
+                    image: "images/comercios/pesqueiro/aguamarine.jpg",
+                    name: "Pesk e Pague Agua Marine",
+                    hours: "</br>Sex a  - Dom: 09:30 - 18",
+                    address: "</br>Rod. Jose Alves Pereira",
+                    contact: "</br>(43) 98808-1911",
+                    delivery: "</br>Sim / Com Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    menuImages: [
+                    // Agora é um array de imagens
+                     "images/comercios/pesqueiro/cardapio_aguamarine.jpg",
+                    ],                    
+                },
             ],
-            
-          },
-        ],
-      },
+        },
       // Eventos
-      {
-        link: document.querySelector("#menuEventos"),
-        title: "Eventos em Carlópolis",
-        establishments: [
-          {
-            name: "Calendario Eventos",
-            image: "images/info_uteis/eventos/evento_1/calendario_evento.png",
-            contact: "",
-          },
+        {
+            link: document.querySelector("#menuEventos"),
+            title: "Eventos em Carlópolis",
+            establishments: [
+                {
+                    name: "Calendario Eventos",
+                    image: "images/info_uteis/eventos/evento_1/calendario_evento.png",
+                    contact: "",
+                },
+    
+                {
+                    image: "images/info_uteis/eventos/evento_3/lixoEletronico.png",
+                    name: "Coleta Lixo Eletronico",
+                    date: "05/03/25 a 20/04/2025",
+                    address: "Paroquia Senhor Bom Jesus",
+                    contact: "",
+                    menuFlyer: "#",
+                },
   
-          {
-            image: "images/info_uteis/eventos/evento_3/lixoEletronico.png",
-            name: "Coleta Lixo Eletronico",
-            date: "05/03/25 a 20/04/2025",
-            address: "Paroquia Senhor Bom Jesus",
-            contact: "",
-            menuFlyer: "#",
-          },
+                {
+                    image: "images/info_uteis/eventos/evento_5/triathlon.png",
+                    name: "Triathlon",
+                    date: "06/04/25",
+                    address: "Ilha do Ponciano",
+                    contact: "(43) 99964-6136",
+                    menuFlyer: "#",
+                },
   
-          {
-            image: "images/info_uteis/eventos/evento_5/triathlon.png",
-            name: "Triathlon",
-            date: "06/04/25",
-            address: "Ilha do Ponciano",
-            contact: "(43) 99964-6136",
-            menuFlyer: "#",
-          },
+                {
+                    image: "images/info_uteis/eventos/evento_4/pescar.png",
+                    name: "Pescar",
+                    date: "03/05/25 a 04/05/2025",
+                    address: "Ilha do Ponciano",
+                    contact: "(41) 99950-9291",
+                    menuFlyer: "#",
+                },
   
-          {
-            image: "images/info_uteis/eventos/evento_4/pescar.png",
-            name: "Pescar",
-            date: "03/05/25 a 04/05/2025",
-            address: "Ilha do Ponciano",
-            contact: "(41) 99950-9291",
-            menuFlyer: "#",
-          },
+                {
+                    image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
+                    name: "Feira da Lua",
+                    date: "Sex das 19 - 00h",
+                    address: "Praça Igreja Matriz ",
+                    contact: "(11) 99898-5930",
+                    menuFlyer: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
+                },
+            ],
+        },
   
-          {
-            image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
-            name: "Feira da Lua",
-            date: "Sex das 19 - 00h",
-            address: "Praça Igreja Matriz ",
-            contact: "(11) 99898-5930",
-            menuFlyer: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuMercado"),
-        title: "Supermercados ",
-        establishments: [
-          {
-            image: "images/comercios/supermercado/carreiro.png",
-            name: "Carreiro",
-            address: "</br>R. Benedito Salles, 341 ",
-            hours: "</br>8h - 19h e dom: 08 - 12h",
-            contact: "</br>(43) 3566-1520",
-            delivery: "</br>Sim / Com Taxa",
-            facebook: "https://www.facebook.com/p/Supermercado-Carreiro-100066342918723/?locale=pt_BR",
-            instagram: "https://www.instagram.com/mercadocarreiroclps/",
-          },
-          {
-            image: "images/comercios/supermercado/obarateiro.png",
-            name: "O Barateiro",
-            address: "</br>Bendito Salles, 1168 ",
-            hours: "</br>8h - 21h e dom: 08 - 12h",
-            contact: "</br>(43) 99196-7816",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/MercadoObarateiro",
-            instagram: "https://www.instagram.com/supermercado_obarateiro/p/DFgIRupxbr-/",
-          },
-          {
-            image: "images/comercios/supermercado/kelve.png",
-            name: "Kelve",
-            address: "</br>R. Paul Harris,104",
-            hours: "</br>8h - 19:30h e dom: 08:30 - 12:30h",
-            contact: "</br>(43) 99844-6105",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
-            instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
-          },
-  
-          {
-            image: "images/comercios/supermercado/rocha.jpg",
-            name: "Rocha",
-            hours: "</br>6h - 20h e dom: 06 - 12h",
-            address: "</br>Av. Elson Soares, 767 ",
-            contact: "</br>(43) 3566-2436",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
-            instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
-          },
-  
-          {
-            name: "Carriel",
-            address: "</br>PR-218, 1168 ",
-            hours: "</br>8h - 21h e dom: 07 - 12h",
-            contact: "</br>(43) 3456-7890",
-            delivery: "</br>Sim / Sem Taxa",
-          },
-          {
-            name: "Compre Bem +",
-            address: "</br>PR-218, 1168 ",
-            hours: "</br>8h - 21h e dom: 07 - 12h",
-            contact: "</br>(43) 3456-7890",
-            delivery: "</br>Sim / Sem Taxa",
-          },
-  
-          {
-            name: "Zero Japan",
-            address: "</br>PR-218, 1168 ",
-            hours: "</br>8h - 21h e dom: 07 - 12h",
-            contact: "</br>(43) 3456-7890",
-            delivery: "</br>Sim / Sem Taxa",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuFarmacia"),
-        title: "Farmácias ",
-        establishments: [
-          {
-            image: "images/comercios/farmacia/biofarma.png",
-            name: "Bio Farma ( Estela )",
-            address: "</br>Rua Laurindo Franco Godoy, 464",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            contact: "</br>(43) 3566-1473",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "www.facebook.com/uahh",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
-            novidadesImages: [
-                // Agora é um array de imagens
-               "images/comercios/farmacia/novidade_biofarma/1.png",
-                "images/comercios/farmacia/novidade_biofarma/2.png",     
-                "images/comercios/farmacia/novidade_biofarma/3.png",
-                "images/comercios/farmacia/novidade_biofarma/4.png",
-                
-              ],
-          },
-  
-          {
-            image: "images/comercios/farmacia/farmafacil.png",
-            name: "Desconto Facil 1 ( Joao )",
-            address: "</br>R. Benedito Salles, 574",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            contact: "</br>(43) 99966-9812",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook:
-              "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
-            instagram: "https://www.instagram.com/descontofacil.clps/",
-            site: "https://www.grupoasfar.com.br/",
-          },
-          {
-            image: "images/comercios/farmacia/drogamais.png",
-            name: "DrogaMais ( Jorginho )",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            address: "</br>Rua Benedito Salles, 903",
-            contact: "</br>(43) 98411-9145",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook:
-              "https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
-            instagram: "https://www.instagram.com/drogamaisjorginho/",
-            site: "www.google.com",
-          },
-  
-          {
-            image: "images/comercios/farmacia/elshaday.png",
-            name: "El Shaday ( Daniel )",
-            address: "</br>R. Benedito Sales, 353",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            contact: "</br>(43) 98488-9420",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
-            instagram: "www.instagram.com/uahh",
-            site: "www.google.com",
-          },
-  
-          {
-            image: "images/comercios/farmacia/farmaciaDaVila.png",
-            name: "Farmacia da Vila ( Marcela )",
-            address: "</br>Rua Manguba, 320",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            contact: "</br>(43) 99148-8478",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "#",
-            instagram: "https://www.instagram.com/farmaciadavilaclps/",
-            site: "#",
-          },
-  
-          {
-            image: "images/comercios/farmacia/farmais.png",
-            name: "FarMais",
-            address: "</br>R. Benedito Salles, 1188",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            contact: "</br>(43) 3566-1211",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
-            instagram: "https://www.instagram.com/farmaiscarlopolis/",
-            site: "#",
-          },
-  
-          {
-            image: "images/comercios/farmacia/masterfarma.png",
-            name: "MasterFarma ( Zurdo )",
-            address: "</br>R. Laurindo Franco de Godoi, 90",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            contact: "</br>(43) 99951-1540",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
-            instagram: "https://www.instagram.com/masterfarma_carlopolis/",
-            site: "#",
-          },
-  
+        {
+            link: document.querySelector("#menuMercado"),
+            title: "Supermercados ",
+            establishments: [
+                {
+                    image: "images/comercios/supermercado/carreiro.png",
+                    name: "Carreiro",
+                    address: "</br>R. Benedito Salles, 341 ",
+                    hours: "</br>Seg a Sex 8h - 19h </br> dom: 08 - 12h",
+                    contact: "</br>(43) 3566-1520",
+                    delivery: "</br>Sim / Com Taxa",
+                    facebook: "https://www.facebook.com/p/Supermercado-Carreiro-100066342918723/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/mercadocarreiroclps/",
+                },
+                {
+                    image: "images/comercios/supermercado/obarateiro.png",
+                    name: "O Barateiro",
+                    address: "</br>Bendito Salles, 1168 ",
+                    hours: "</br>Seg a Sex 8h - 21h </br> dom: 08 - 12h",
+                    contact: "</br>(43) 99196-7816",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "https://www.facebook.com/MercadoObarateiro",
+                    instagram: "https://www.instagram.com/supermercado_obarateiro/p/DFgIRupxbr-/",
+                },
+                {
+                    image: "images/comercios/supermercado/kelve.png",
+                    name: "Kelve",
+                    address: "</br>R. Paul Harris,104",
+                    hours: "</br>Seg a Sex 8h - 19:30h </br> dom: 08:30 - 12:30h",
+                    contact: "</br>(43) 99844-6105",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
+                },
+    
+                {
+                    image: "images/comercios/supermercado/rocha.jpg",
+                    name: "Rocha",
+                    hours: "</br>Seg a Sex 6h - 20h </br> dom: 06 - 12h",
+                    address: "</br>Av. Elson Soares, 767 ",
+                    contact: "</br>(43) 3566-2436",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
+                },
+    
+                {
+                    name: "Carriel",
+                    address: "</br>PR-218, 1168 ",
+                    hours: "</br>Seg a Sex 8h - 21h </br> dom: 07 - 12h",
+                    contact: "</br>(43) 3456-7890",
+                    delivery: "</br>Sim / Sem Taxa",
+                },
+                {
+                    name: "Compre Bem +",
+                    address: "</br>PR-218, 1168 ",
+                    hours: "</br>Seg a Sex 8h - 21h </br> Dom: 07 - 12h",
+                    contact: "</br>(43) 3456-7890",
+                    delivery: "</br>Sim / Sem Taxa",
+                },
+    
+                {
+                    name: "Zero Japan",
+                    address: "</br>PR-218, 1168 ",
+                    hours: "</br>Seg a Sex 8h - 21h </br> dom: 07 - 12h",
+                    contact: "</br>(43) 3456-7890",
+                    delivery: "</br>Sim / Sem Taxa",
+                },
+            ],
+        },
+  //// farmacias
+        {
+            link: document.querySelector("#menuFarmacia"),
+            title: "Farmácias ",
+            establishments: [
+
+                {
+                    image: "images/comercios/farmacia/biofarma.png",
+                    name: "Bio Farma ( Estela )",
+                    address: "</br>Rua Laurindo Franco Godoy, 464",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    contact: "</br>(43) 3566-1473",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/novidade_biofarma/2.png",     
+                        "images/comercios/farmacia/novidade_biofarma/3.png",
+                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                    ],  
+                },
           
   
-          {
-            
-            name: "PopularMais ( Jeremias )",
-            address: "</br>Elson Soares, 787, Sala 2",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            contact: "</br>(43) 99647-6266",
-            delivery: "</br>Sim / Sem Taxa",
-            image: "images/comercios/farmacia/popularMais.png",
-            facebook:
-              "https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
-            instagram:
-              "https://www.instagram.com/popularmais_farmaciadojeremias/",
-            site: "#",
-            novidadesImages: [
-                // Agora é um array de imagens
-               "images/comercios/farmacia/novidades_popularmais/1.png",
-               "images/comercios/farmacia/novidades_popularmais/2.png",
-                              
-              ],
-          },
-          {
-            image: "images/comercios/farmacia/santamaria.png",
-            name: "Santa Maria ( Aguera )",
-            address: "</br>Praça Coronel Leite, nº 711",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            contact: "</br>(43) 3566-1471",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
-            instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
-            site: "#",
-          },
-  
-          {
-            image: "images/comercios/farmacia/saudeFarma.png",
-            name: "Saude Farma",
-            address: "</br>Rua Benedito Salles, 951",
-            hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-            contact: "</br>(43) 99956-8938",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook:
-              "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
-            instagram: "#",
-            site: "www.google.com",
-          },
-        ],
-      },
+                {
+                    image: "images/comercios/farmacia/farmafacil.png",
+                    name: "Desconto Facil 1 ( Joao )",
+                    address: "</br>R. Benedito Salles, 574",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    contact: "</br>(43) 99966-9812",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook:"https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
+                    instagram: "https://www.instagram.com/descontofacil.clps/",
+                    site: "https://www.grupoasfar.com.br/",
+                },
+
+                {
+                    image: "images/comercios/farmacia/drogamais.png",
+                    name: "DrogaMais ( Jorginho )",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    address: "</br>Rua Benedito Salles, 903",
+                    contact: "</br>(43) 98411-9145",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook:"https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/drogamaisjorginho/",
+                    site: "www.google.com",
+                },
+        
+                {
+                    image: "images/comercios/farmacia/elshaday.png",
+                    name: "El Shaday ( Daniel )",
+                    address: "</br>R. Benedito Sales, 353",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    contact: "</br>(43) 98488-9420",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+                },
+        
+                {
+                    image: "images/comercios/farmacia/farmaciaDaVila.png",
+                    name: "Farmacia da Vila ( Marcela )",
+                    address: "</br>Rua Manguba, 320",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    contact: "</br>(43) 99148-8478",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "#",
+                    instagram: "https://www.instagram.com/farmaciadavilaclps/",
+                    site: "#",
+                },
+        
+                {
+                    image: "images/comercios/farmacia/farmais.png",
+                    name: "FarMais",
+                    address: "</br>R. Benedito Salles, 1188",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    contact: "</br>(43) 3566-1211",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/farmaiscarlopolis/",
+                    site: "#",
+                },
+        
+                {
+                    image: "images/comercios/farmacia/masterfarma.png",
+                    name: "MasterFarma ( Zurdo )",
+                    address: "</br>R. Laurindo Franco de Godoi, 90",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    contact: "</br>(43) 99951-1540",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/masterfarma_carlopolis/",
+                    site: "#",
+                },
+                
+                {
+                    
+                    name: "PopularMais ( Jeremias )",
+                    address: "</br>Elson Soares, 787, Sala 2",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    contact: "</br>(43) 99647-6266",
+                    delivery: "</br>Sim / Sem Taxa",
+                    image: "images/comercios/farmacia/popularMais.png",
+                    facebook:
+                    "https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
+                    instagram:
+                    "https://www.instagram.com/popularmais_farmaciadojeremias/",
+                    site: "#",
+                    novidadesImages: [                  
+                        "images/comercios/farmacia/novidades_popularmais/1.png",
+                        "images/comercios/farmacia/novidades_popularmais/2.png",
+                                    
+                    ],
+                },
+
+                {
+                    image: "images/comercios/farmacia/santamaria.png",
+                    name: "Santa Maria ( Aguera )",
+                    address: "</br>Praça Coronel Leite, nº 711",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    contact: "</br>(43) 3566-1471",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
+                    instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
+                    site: "#",
+                },
+        
+                {
+                    image: "images/comercios/farmacia/saudeFarma.png",
+                    name: "Saude Farma",
+                    address: "</br>Rua Benedito Salles, 951",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    contact: "</br>(43) 99956-8938",
+                    delivery: "</br>Sim / Sem Taxa",
+                    facebook:
+                    "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
+                    instagram: "#",
+                    site: "www.google.com",
+                },
+            ],
+        },
   
       ///////////////////
   
-      {
-        link: document.querySelector("#menuAnuncio"),
-        title: "Anuncio",
-        establishments: [
-          {
-            name: "Pio do Anuncio",
-            contact: "(43) 7890-1234",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuChurrasqueiro"),
-        title: "Churrasqueiros ",
-        establishments: [
-          {
-            name: "Pituka",
-            contact: "(43) 99984-5074",
-          },
-          {
-            name: "Gustavo",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuBabas"),
-        title: "Babas ",
-        establishments: [
-          {
-            name: "Maria",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Antonia",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuDiarista"),
-        title: "Diaristas",
-        establishments: [
-          {
-            name: "Rose",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Maria",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuEletricista"),
-        title: "Eletrecistas",
-        establishments: [
-          {
-            name: "Juca",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Jurandir",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuEncanador"),
-        title: "Encanador",
-        establishments: [
-          {
-            name: "Rubens",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Jose",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuGuiaPesca"),
-        title: "Guia de Pesca",
-        establishments: [
-          {
-            image:"images/servicos/guiapesca/fabio.png",
-            name: "Fabio Sushimoto",
-            contact: "(43) 99904-3894",
-            instagram: "https://www.instagram.com/suguimotofishing/",
-            facebook:"https://www.facebook.com/fabio.katsumisuguimoto/",
-          
-
-            
-          },
-          {
-            name: "Thiago Aguera",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuJardineiro"),
-        title: "Jardineiros ",
-        establishments: [
-          {
-            name: "Antonio Gil",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Ruan",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuMarceneiro"),
-        title: "Marceneiros ",
-        establishments: [
-          {
-            name: "Pedro alvez",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Rodrigo",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuPedreiro"),
-        title: "Pedreiros ",
-        establishments: [
-          {
-            image: "images/servicos/pedreiro/pedreiro.jpg",
-            name: "Denis centurion",
-            contact: "(43) 94587-2485",
-          },
-          {
-            name: "Kauan",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuPintor"),
-        title: "Pintor ",
-        establishments: [
-          {
-            name: "Rafael portes",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Yuri",
-            contact: "(43) 8901-2345",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuVeterinario"),
-        title: "Veterinario ",
-        establishments: [
-          {
-            name: "Celso Golçalves",
-            contact: "(43) 98851-3310",
-          },
-          {
-            name: "Jurandir Machado",
-            contact: "(43) 99642-1494",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menufarmaciaPlantao"),
-  
-        /*
-    title: "Farmacia de Plantão",
-    establishments: [{
-      name: "MasterFarma ( Zurdo ) ",
-      address: "R. Laurindo Franco de Godoi, 90",
-      contact: "(43) 99951-1540",
-      plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
-      delivery: "Sim / Sem Taxa",
-      image: "images/info_uteis/farmacia_plantao/masterFarma.png",
-      facebook: "www.facebook.com/uahh",
-      instagram: "www.instagram.com/uahh",
-      site: "www.google.com",
-        
-          */
-        /*
-                      title: "Farmacia de Plantão",
-                      establishments: [{
-                          name: "El Shaday ( Daniel )",
-                          address: "R. Benedito Sales, 353",
-                          contact: "(43) 98488-9420",
-                          plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
-                          delivery: "Sim / Sem Taxa",
-                          image: "images/info_uteis/farmacia_plantao/elshaday.png",
-                          facebook: "www.facebook.com/uahh",
-                          instagram: "www.instagram.com/uahh",
-                          site: "www.google.com",
-                            
-              */
-        /*
-              title: "Farmacia de Plantão",
-              establishments: [{
-                  name: "DrogaMais ( Jorginho )",
-                  address: "</br>Rua Benedito Salles, 903",
-                  contact: "</br>(43) 98411-9145",
-                  plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
-                  delivery: "</br>Sim / Sem Taxa",
-                  image: "images/comercios/farmacia/drogamais.png",
-                  facebook: "www.facebook.com/uahh",
-                  instagram: "www.instagram.com/uahh",
-                  site: "www.google.com",
-                   
-                  */
-  /*
-        title: "Farmacia de Plantão",
-        establishments: [
-          {
-            name: "Desconto Facil 1 ( Joao )",
-            address: "</br>R. Benedito Salles, 574",
-            contact: "</br>(43) 99966-9812",
-            plantaoHorario: "</br>Das 8h às 21h , De 29/03 a 04/04",
-            delivery: "</br>Sim / Sem Taxa",
-            image: "images/comercios/farmacia/farmafacil.png",
-            facebook:
-              "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
-            instagram: "https://www.instagram.com/descontofacil.clps/",
-            site: "https://www.grupoasfar.com.br/",
-
-           
-         },
-        ],
-*/
-
-
-title: "Farmacia de Plantão",
-establishments: [
-  {
-    name: "Popularmais ( Jeremias )",
-    address: "</br>Av. Elson Soares, 787. sala 2",
-    contact: "</br>(43) 99647-6266",
-    plantaoHorario: "</br>Das 8h às 21h </br> De 05/04 a 11/04",
-    delivery: "</br>Sim / Sem Taxa",
-    image: "images/comercios/farmacia/popularMais.png",
-            facebook:
-              "https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
-            instagram:
-              "https://www.instagram.com/popularmais_farmaciadojeremias/",
-            site: "#",
-            novidadesImages: [
-                // Agora é um array de imagens
-               
-               "images/comercios/farmacia/novidades_popularmais/1.png",
-               "images/comercios/farmacia/novidades_popularmais/2.png",
-              ],
-
-   
- },
-],
-        
-      },
-  
-      {
-        link: document.querySelector("#menuHospital"),
-        title: "Hospital",
-        establishments: [
-          {
-            name: "Hospital São Jose",
-            address: "R. Cap. Estácio, 460",
-            contact: "(43) 99174-2539",
-            hours: "24 horas",
-            image: "images/info_uteis/hospital/hospital.png",
-        
-           
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuPrefeitura"),
-  
-        title: "Prefeitura",
-        establishments: [
-          {
-            name: "Prefeitura",
-            address: "R. Benedito Salles, 1060 - Centro",
-            contact: "(43) 3566-1291",
-            hours: "8h as 17h",
-            image: "images/info_uteis/prefeitura/prefeitura.png",
-            facebook: "https://www.facebook.com/profile.php?id=200531799983410&_rdr",
-            instagram: "www.instagram.com/uahhhttps://www.instagram.com/prefeitura.carlopolis/?locale=zh_CN&hl=af",
-            site: "http://www.carlopolis.pr.gov.br/",
-          },
-  
-          {
-            name: "Duvidas e  Reclamações",
-            contact: "(43) 99825-0360",
-            hours: "8h as 17h",
-            image: "images/info_uteis/prefeitura/prefeitura.png",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuCopel"),
-  
-        title: "Copel",
-        establishments: [
-          {
-            image: "images/info_uteis/copel/copel.png",
-            name: "Copel",
-            hours: "seg a sex: 8h - 12h",
-            address: "R. Benedito Salles, 1094",
-            contact: "(41) 3013-8973",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuDelegacia"),
-  
-        title: "Delegacia",
-        establishments: [
-          {
-            image: "images/info_uteis/delegacia/delegacia.jpg",
-            name: "Delegacia",
-            hours: "seg a sex: 9h - 18h",
-            address: "R. Alfeneiro, 215 ",
-            contact: "(43) 3566-1202",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuSanepar"),
-  
-        title: "Sanepar",
-        establishments: [
-          {
-            name: "Sanepar",
-            hours: "seg a sex: 8:30h - 12h, 13:30 as 17h",
-            address: "R. André Jorge Cleli, 148 ",
-            contact: "0800 200 0115",
-            image: "images/info_uteis/sanepar/sanepar.png",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuMotoCenter"),
-  
-        title: "Moto Center",
-        establishments: [
-          {
-            name: "Binho Moto Center",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
-
-      {
-        link: document.querySelector("#menuAcai"),
-  
-        title: "Açai",
-        establishments: [
-          {
-            image: "images/comercios/acai/faxada.png",
-            name: "Turminha do Açai",
-            hours: "</br>Qua a Seg: 14h - 23h e Ter: Fechado",
-            address: "</br>Rua Benedito Salles, 409",
-            contact: "</br>(43) 99176-7871",
-            delivery: "Sim / Com Taxa",
-            instagram: "https://www.instagram.com/turminha_do_acai/",
-            novidadesImages: [
-                // Agora é um array de imagens
-               "images/comercios/acai/novidades/1.png",
-                             
-              ],
-            menuImages: [
-                // Agora é um array de imagens
-                "images/comercios/acai/cardapio/1.png",
-                "images/comercios/acai/cardapio/2.png",
-                "images/comercios/acai/cardapio/3.png",
-              ],
-          
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuAcougue"),
-  
-        title: "Açougues",
-        establishments: [
-          {
-            image: "images/comercios/acougue/acougue.png",
-            name: "Açougue do Carlinho",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "Rua Benedito Salles, 409",
-            contact: "(43) 99635-1001",
-            delivery: "Sim / Sem Taxa",
-            novidadesImages: [           
-             
-              "images/comercios/acougue/banner/banner_1.jpg",
-              "images/comercios/acougue/banner/banner_2.jpg",
+        {
+            link: document.querySelector("#menuAnuncio"),
+            title: "Anuncio",
+            establishments: [
+                {
+                    name: "Pio do Anuncio",
+                    contact: "(43) 7890-1234",
+                },
             ],
+        },
   
-          
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuChurrasqueiro"),
+            title: "Churrasqueiros ",
+            establishments: [
+                {
+                name: "Pituka",
+                contact: "(43) 99984-5074",
+                },
+
+                {
+                    name: "Gustavo",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuAgropecuaria"),
+        {
+            link: document.querySelector("#menuBabas"),
+            title: "Babas ",
+            establishments: [
+                {
+                    name: "Maria",
+                    contact: "(43) 7890-1234",
+                },
+                {
+                    name: "Antonia",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
   
-        title: "Agropecuarias",
-        establishments: [
-          {
-            image: "images/comercios/agropecuaria/vida nova/vidanova.png",
-            name: "Agro Vida",
-            hours: "</br>seg a sex: 8h - 18h e sab: 08 - 16h",
-            address: "</br>rua benedito salles 309",
-            contact: "</br>(43) 99158-9047",
-            delivery: "</br>Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
-            instagram: "https://www.instagram.com/agrovida_carlopolis/"
-          },
-        ],
-      },
-      {
-        link: document.querySelector("#menuBorracharia"),
+        {
+            link: document.querySelector("#menuDiarista"),
+            title: "Diaristas",
+            establishments: [
+                {
+                    name: "Rose",
+                    contact: "(43) 7890-1234",
+                },
+                {
+                    name: "Maria",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
   
-        title: "Borracharia",
-        establishments: [
-          {
-            name: "Vida Nova",
-            hours: "</br>seg a sex: 7h - 18h </br>sab: 07 - 16h",
-            address: "</br>Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
-            contact: "(43) 99900-2991",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuEletricista"),
+            title: "Eletrecistas",
+            establishments: [
+                {
+                    name: "Juca",
+                    contact: "(43) 7890-1234",
+                },
+
+                {
+                    name: "Jurandir",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuAutoCenter"),
+        {
+            link: document.querySelector("#menuEncanador"),
+            title: "Encanador",
+            establishments: [
+                {
+                    name: "Rubens",
+                    contact: "(43) 7890-1234",
+                },
+                {
+                    name: "Jose",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
   
-        title: "Auto Center",
-        establishments: [
-          {
-            name: "Auto center bairro",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuGuiaPesca"),
+            title: "Guia de Pesca",
+            establishments: [
+                {
+                    image:"images/servicos/guiapesca/fabio.png",
+                    name: "Fabio Sushimoto",
+                    contact: "(43) 99904-3894",
+                    instagram: "https://www.instagram.com/suguimotofishing/",
+                    facebook:"https://www.facebook.com/fabio.katsumisuguimoto/",
+                },
+                {
+                    name: "Thiago Aguera",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
+    
+        {
+            link: document.querySelector("#menuJardineiro"),
+            title: "Jardineiros ",
+            establishments: [
+                {
+                    name: "Antonio Gil",
+                    contact: "(43) 7890-1234",
+                },
+                {
+                    name: "Ruan",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuBrinquedos"),
+        {
+            link: document.querySelector("#menuMarceneiro"),
+            title: "Marceneiros ",
+            establishments: [
+                {
+                    name: "Pedro alvez",
+                    contact: "(43) 7890-1234",
+                },
+                {
+                    name: "Rodrigo",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
+    
+        {
+            link: document.querySelector("#menuPedreiro"),
+            title: "Pedreiros ",
+            establishments: [
+                {
+                    image: "images/servicos/pedreiro/pedreiro.jpg",
+                    name: "Denis centurion",
+                    contact: "(43) 94587-2485",
+                },
+                {
+                    name: "Kauan",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
   
-        title: "Loja de Brinquedos",
-        establishments: [
-          {
-            name: "Filho Otaviano",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuPintor"),
+            title: "Pintor ",
+            establishments: [
+                {
+                    name: "Rafael portes",
+                    contact: "(43) 7890-1234",
+                },
+                {
+                    name: "Yuri",
+                    contact: "(43) 8901-2345",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuDiskGas"),
+        {
+            link: document.querySelector("#menuVeterinario"),
+            title: "Veterinario ",
+            establishments: [
+                {
+                    name: "Celso Golçalves",
+                    contact: "(43) 98851-3310",
+                },
+                {
+                    name: "Jurandir Machado",
+                    contact: "(43) 99642-1494",
+                },
+            ],
+        },
   
-        title: "Deposito de Gas",
-        establishments: [
-          {
-            name: "Lia Gas",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuFuneraria"),
-  
-        title: "Funerarias",
-        establishments: [
-          {
-            name: "Bom Jesus",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menufarmaciaPlantao"),
+            title: "Farmacia de Plantão",
+            establishments: [
+
+                {
+                    /*
+                    title: "Farmacia de Plantão",
+                    establishments: [{
+                    name: "MasterFarma ( Zurdo ) ",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
+                    delivery: "Sim / Sem Taxa",
+                    image: "images/info_uteis/farmacia_plantao/masterFarma.png",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+                        
+                    */
+
+                    /*
+                    title: "Farmacia de Plantão",
+                    establishments: [{
+                    name: "El Shaday ( Daniel )",
+                    address: "R. Benedito Sales, 353",
+                    contact: "(43) 98488-9420",
+                    plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
+                    delivery: "Sim / Sem Taxa",
+                    image: "images/info_uteis/farmacia_plantao/elshaday.png",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+
+                    */
 
 
+                    /*
+                    title: "Farmacia de Plantão",
+                    establishments: [{
+                    name: "DrogaMais ( Jorginho )",
+                    address: "</br>Rua Benedito Salles, 903",
+                    contact: "</br>(43) 98411-9145",
+                    plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
+                    delivery: "</br>Sim / Sem Taxa",
+                    image: "images/comercios/farmacia/drogamais.png",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    site: "www.google.com",
+                    
+                    */
 
-      {
-        link: document.querySelector("#menuMercearia"),
-  
-        title: "Mercearia",
-        establishments: [
-          {
-            image: "images/comercios/mercearia/seiza/seiza.png",
-            name: "Seiza",
-            hours: "</br>Seg a Qui 9h - 18:30h </br>Sex 9h - 16:30 </br> sab: 09 - 12h",
-            address: "</br>R. Fidêncio de Melo, 212 - Sala B",
-            contact: "</br>(43) 99103-4187",
-            delivery: "</br>Sim / Sem Taxa",            
-            instagram: "https://www.instagram.com/seizapr/",
-         
-          },
-        ],
-      },
+                    /*
+                    
+                    name: "Desconto Facil 1 ( Joao )",
+                    address: "</br>R. Benedito Salles, 574",
+                    contact: "</br>(43) 99966-9812",
+                    plantaoHorario: "</br>Das 8h às 21h , De 29/03 a 04/04",
+                    delivery: "</br>Sim / Sem Taxa",
+                    image: "images/comercios/farmacia/farmafacil.png",
+                    facebook:
+                    "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
+                    instagram: "https://www.instagram.com/descontofacil.clps/",
+                    site: "https://www.grupoasfar.com.br/",
 
-
-
-  
-      {
-        link: document.querySelector("#menuMaterialContrucao"),
-  
-        title: "Material de Construção",
-        establishments: [
-          {
-            name: "Carriel",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuPadaria"),
-  
-        title: "Padarias",
-        establishments: [
-          {
-            name: "Bom Jesus",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuPetShop"),
-  
-        title: "Pet Shop",
-        establishments: [
-          {
-            name: "Paraiso dos Animais",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
-  
-      {
-        link: document.querySelector("#menuQuitanda"),
-  
-        title: "Quitanda",
-        establishments: [
-          {
-            name: "Pimenta Doce",
-            hours: "</br>seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "</br>R. Kalil Keder ",
-            contact: "</br>(43) 98806-5747",
-            delivery: "</br>Sim / Sem Taxa",
-            image: "images/comercios/quitanda/pimentadoce.png",
-            novidadesImages: [           
-             
-                "images/comercios/quitanda/novidades/1.png",
-                "images/comercios/quitanda/novidades/2.png",
-                "images/comercios/quitanda/novidades/3.png",
-                "images/comercios/quitanda/novidades/4.png",
-                "images/comercios/quitanda/novidades/5.png",
-              ],
+                    */
 
 
-          },
-        ],
-      },
+                
+                    name: "Popularmais ( Jeremias )",
+                    address: "</br>Av. Elson Soares, 787. sala 2",
+                    contact: "</br>(43) 99647-6266",
+                    plantaoHorario: "</br>Das 8h às 21h </br> De 05/04 a 11/04",
+                    delivery: "</br>Sim / Sem Taxa",
+                    image: "images/comercios/farmacia/popularMais.png",
+                    facebook:"https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
+                    instagram:"https://www.instagram.com/popularmais_farmaciadojeremias/",
+                    site: "#",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidades_popularmais/1.png",
+                        "images/comercios/farmacia/novidades_popularmais/2.png",
+                    ],
+                },
+            ],
+        
+        },
   
-      {
-        link: document.querySelector("#menuRestaurantes"),
+        {
+            link: document.querySelector("#menuHospital"),
+            title: "Hospital",
+            establishments: [
+                {
+                    name: "Hospital São Jose",
+                    address: "R. Cap. Estácio, 460",
+                    contact: "(43) 99174-2539",
+                    hours: "24 horas",
+                    image: "images/info_uteis/hospital/hospital.png",
+                },
+            ],
+        },
   
-        title: "Restaurante",
-        establishments: [
-          {
-            name: "Delfino",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuPrefeitura"),
+    
+            title: "Prefeitura",
+            establishments: [
+                {
+                    name: "Prefeitura",
+                    address: "R. Benedito Salles, 1060 - Centro",
+                    contact: "(43) 3566-1291",
+                    hours: "8h as 17h",
+                    image: "images/info_uteis/prefeitura/prefeitura.png",
+                    facebook: "https://www.facebook.com/profile.php?id=200531799983410&_rdr",
+                    instagram: "www.instagram.com/uahhhttps://www.instagram.com/prefeitura.carlopolis/?locale=zh_CN&hl=af",
+                    site: "http://www.carlopolis.pr.gov.br/",
+                },
+        
+                {
+                    name: "Duvidas e  Reclamações",
+                    contact: "(43) 99825-0360",
+                    hours: "8h as 17h",
+                    image: "images/info_uteis/prefeitura/prefeitura.png",
+                },
+            ],
+        },
+    
+        {
+            link: document.querySelector("#menuCopel"),    
+            title: "Copel",
+            establishments: [
+                {
+                    image: "images/info_uteis/copel/copel.png",
+                    name: "Copel",
+                    hours: "seg a sex: 8h - 12h",
+                    address: "R. Benedito Salles, 1094",
+                    contact: "(41) 3013-8973",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuPapelaria"),
+        {
+            link: document.querySelector("#menuDelegacia"),
+    
+            title: "Delegacia",
+            establishments: [
+                {
+                    image: "images/info_uteis/delegacia/delegacia.jpg",
+                    name: "Delegacia",
+                    hours: "seg a sex: 9h - 18h",
+                    address: "R. Alfeneiro, 215 ",
+                    contact: "(43) 3566-1202",
+                },
+            ],
+        },
   
-        title: "Papelaria",
-        establishments: [
-          {
-            name: "Haruo",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuSanepar"),
+    
+            title: "Sanepar",
+            establishments: [
+                {
+                    name: "Sanepar",
+                    hours: "seg a sex: 8:30h - 12h, 13:30 as 17h",
+                    address: "R. André Jorge Cleli, 148 ",
+                    contact: "0800 200 0115",
+                    image: "images/info_uteis/sanepar/sanepar.png",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuImobiliaria"),
+        {
+            link: document.querySelector("#menuMotoCenter"),  
+            title: "Moto Center",
+            establishments: [
+                {
+                    name: "Binho Moto Center",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
+
+        
   
-        title: "Imobiliaria",
-        establishments: [
-          {
-            name: "Rafael Bandeira",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-          },
-        ],
-      },
+       
+    
+        
+
+        {
+            link: document.querySelector("#menuBorracharia"),  
+            title: "Borracharia",
+            establishments: [
+                {
+                    name: "Vida Nova",
+                    hours: "</br>seg a sex: 7h - 18h </br>sab: 07 - 16h",
+                    address: "</br>Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
+                    contact: "(43) 99900-2991",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuAdega"),
+        {
+            link: document.querySelector("#menuAutoCenter"),    
+            title: "Auto Center",
+            establishments: [
+                {
+                    name: "Auto center bairro",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
   
-        title: "Adegas",
-        establishments: [
-          {
-            image: "images/comercios/adega/adega_cuenca.jpg",
-            name: "Adega Cuenca",
-            hours:
-              "</br>seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
-            address: "</br>R. Kalil Keder, 752",
-            contact: "</br>(43) 99800-1680",
-            delivery: "</br>Sim / Sem Taxa",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuBrinquedos"),    
+            title: "Loja de Brinquedos",
+            establishments: [
+                {
+                    name: "Filho Otaviano",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuAdvocacia"),
+        {
+            link: document.querySelector("#menuDiskGas"),    
+            title: "Deposito de Gas",
+            establishments: [
+                {
+                    name: "Lia Gas",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
   
-        title: "Escritorio de Advocacia",
-        establishments: [
-          {
-            name: "ADVOCACIA ABILIO",
-            hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
-            address: "</br>R. Salvira Marquês, 315",
-            contact: "</br>(43) 3566-1368",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuFuneraria"),    
+            title: "Funerarias",
+            establishments: [
+                {
+                    name: "Bom Jesus",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
+
+
+        {
+            link: document.querySelector("#menuMercearia"),  
+            title: "Mercearia",
+            establishments: [
+                {
+                    image: "images/comercios/mercearia/seiza/seiza.png",
+                    name: "Seiza",
+                    hours: "</br>Seg a Qui 9h - 18:30h </br>Sex 9h - 16:30 </br> sab: 09 - 12h",
+                    address: "</br>R. Fidêncio de Melo, 212 - Sala B",
+                    contact: "</br>(43) 99103-4187",
+                    delivery: "</br>Sim / Sem Taxa",            
+                    instagram: "https://www.instagram.com/seizapr/",
+                
+                },
+            ],
+        },
+
+        {
+            link: document.querySelector("#menuMaterialContrucao"),    
+            title: "Material de Construção",
+            establishments: [
+                {
+                    name: "Carriel",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuTaxista"),
+        {
+            link: document.querySelector("#menuPadaria"),    
+            title: "Padarias",
+            establishments: [
+                {
+                    name: "Bom Jesus",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
   
-        title: "Taxista",
-        establishments: [
-          {
-            name: "Douglas do Taxi",
-            hours: "</br>Seg a Sab: 7h - 20h e Dom: 07 - 00h",
-            address: "</br>Em Frente ao banco Itau",
-            contact: "</br>(43) 88807-8515",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuPetShop"),    
+            title: "Pet Shop",
+            establishments: [
+                {
+                    name: "Paraiso dos Animais",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
   
-      {
-        link: document.querySelector("#menuAssistenciaCelular"),
+        {
+            link: document.querySelector("#menuQuitanda"),  
+            title: "Quitanda",
+            establishments: [
+                {
+                    name: "Pimenta Doce",
+                    hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "</br>R. Kalil Keder ",
+                    contact: "</br>(43) 98806-5747",
+                    delivery: "</br>Sim / Sem Taxa",
+                    image: "images/comercios/quitanda/pimentadoce.png",
+                    novidadesImages: [
+                        "images/comercios/quitanda/novidades/1.png",
+                        "images/comercios/quitanda/novidades/2.png",
+                        "images/comercios/quitanda/novidades/3.png",
+                        "images/comercios/quitanda/novidades/4.png",
+                        "images/comercios/quitanda/novidades/5.png",
+                    ],
+                },
+            ],
+        },
   
-        title: "Assistencia Celular",
-        establishments: [
-          {
-            name: "Soraya",
-            hours: "seg a sex: 8h - 18h e sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
+        {
+            link: document.querySelector("#menuRestaurantes"),    
+            title: "Restaurante",
+            establishments: [
+                {
+                    name: "Delfino",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
+  
+        {
+            link: document.querySelector("#menuPapelaria"),    
+            title: "Papelaria",
+            establishments: [
+                {
+                    name: "Haruo",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                },
+            ],
+        },
+  
+        {
+            link: document.querySelector("#menuImobiliaria"),  
+            title: "Imobiliaria",
+            establishments: [
+                {
+                    name: "Rafael Bandeira",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                },
+            ],
+        },
+  
+       
+  
+        
+  
+        {
+            link: document.querySelector("#menuTaxista"),  
+            title: "Taxista",
+            establishments: [
+                {
+                    name: "Douglas do Taxi",
+                    hours: "</br>Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
+                    address: "</br>Em Frente ao banco Itau",
+                    contact: "</br>(43) 88807-8515",
+                },
+            ],
+        },
+    
+        {
+            link: document.querySelector("#menuAssistenciaCelular"),    
+            title: "Assistencia Celular",
+            establishments: [
+                {
+                    name: "Soraya",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Laurindo Franco de Godoi, 90",
+                    contact: "(43) 99951-1540",
+                    delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
+        /////////
+
     ]; // fim dos setores
+
+
+
+
+    ////////////////
     // Mostrar ou esconder o ícone "x" com base no conteúdo do campo de pesquisa
     searchInput.addEventListener("input", function () {
       if (searchInput.value.trim() !== "") {

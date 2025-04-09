@@ -1249,3 +1249,33 @@ img {
   text-align: center;
   margin-top: 8px;
 }
+
+#novidades {
+  margin: 20px 0;
+}
+
+.novidade-item {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.novidade-image, .novidade-video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.novidade-description {
+  font-size: 14px;
+  color: #555;
+  margin-top: 8px;
+}
+
+.novidade-video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto; /* Centraliza o vídeo */
+}
+
