@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
   
       // Agropecuaria
       agrovida: "s",
+
+      armazémrei:"s",
   
       // borracharia
       vidanova: "s",
@@ -37,6 +39,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // mercearia
       seiza:"s",
+
+      // padaria
+      bomjesus:"s",
   
       //pizzaria
       fornalhapizzaria: "s",
@@ -58,7 +63,10 @@ document.addEventListener("DOMContentLoaded", function () {
       // pesqueiro
       peskepagueaguamarine: "s",
 
+      // restaurantes
+      cabanas:"s",
       delfino:"s",
+      portal:"s",
   
       //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
   
@@ -98,6 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
       prefeitura: "s",
       duvidasereclamações: "s",
       sanepar: "s",
+      mototaximodesto: "s",
   
       //Eventos
       calendarioeventos: "s",
@@ -343,6 +352,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     link: document.querySelector("#menuAgropecuaria"),  
                     title: "Agropecuarias",
                     establishments: [
+
+                        {
+                            image: "images/comercios/agropecuaria/armazem Rei/armazemRei.png",
+                            name: "ARMAZÉM REI",
+                            hours: "</br>seg a Sab: 8h - 19h </br> Dom: 08h - 12h",
+                            address: "</br>R. Kalil Keder, 718",
+                            contact: "</br> (43) 99185-6532",
+                            delivery: "</br>Sim / Sem Taxa",
+                            facebook: "#",
+                            instagram: "#",
+                            novidadesImages: [
+                                // Novo array de imagens de novidades
+                                "images/comercios/agropecuaria/armazem rei/novidades/1.png",
+                              "images/comercios/agropecuaria/armazem rei/novidades/2.png",
+                            ],
+                        },
                         {
                             image: "images/comercios/agropecuaria/vida nova/vidanova.png",
                             name: "Agro Vida",
@@ -351,8 +376,11 @@ document.addEventListener("DOMContentLoaded", function () {
                             contact: "</br>(43) 99158-9047",
                             delivery: "</br>Sim / Sem Taxa",
                             facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
-                            instagram: "https://www.instagram.com/agrovida_carlopolis/"
+                            instagram: "https://www.instagram.com/agrovida_carlopolis/",
+                            
                         },
+
+                        
                     ],
                 },
 
@@ -468,6 +496,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
             ],
         },
+
+
+
+
+        {
+            link: document.querySelector("#menuPadaria"),    
+            title: "Padarias",
+            establishments: [
+                {
+                    image: "images/comercios/padaria/bom jesus/bomjesus.png",
+                    name: "Bom Jesus",
+                    hours: "</br>seg a Sab: 6h - 19h </br> Dom: 06 - 14h",
+                    address: "R. Benedito Salles, 615",
+                    contact: " (43) 99653-9285",
+                    delivery: "Sim / Com Taxa",
+                    facebook: "www.facebook.com/uahh",
+                    instagram: "www.instagram.com/uahh",
+                    novidadesImages: [
+                        // Novo array de imagens de novidades
+                        "images/comercios/padaria/bom jesus/novidades/1.png",
+                       
+                    ],
+                },
+            ],
+        },
+
+
+
+
+
+
       // Eventos
         {
             link: document.querySelector("#menuEventos"),
@@ -1071,8 +1130,7 @@ document.addEventListener("DOMContentLoaded", function () {
         },
   
         {
-            link: document.querySelector("#menuSanepar"),
-    
+            link: document.querySelector("#menuSanepar"),    
             title: "Sanepar",
             establishments: [
                 {
@@ -1081,6 +1139,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     address: "R. André Jorge Cleli, 148 ",
                     contact: "0800 200 0115",
                     image: "images/info_uteis/sanepar/sanepar.png",
+                },
+            ],
+        },
+
+
+        {
+            link: document.querySelector("#menuVagasTrabalho"),    
+            title: "Vagas de Trabalho",
+            establishments: [
+                {
+                    name: "Moto Taxi Modesto",
+                    hours: "Seg a Dom: 7h - 20h",
+                    address: "R. Kelil Keder, 603, 148 ",
+                    contact: "(43) 99137-5516",
+                    image: "images/info_uteis/VagasTrabalho/modesto/modesto.png",
+                    infoVagaTrabalho:"Precisa-se de motoboy",
                 },
             ],
         },
@@ -1206,19 +1280,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ],
         },
   
-        {
-            link: document.querySelector("#menuPadaria"),    
-            title: "Padarias",
-            establishments: [
-                {
-                    name: "Bom Jesus",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    contact: "(43) 99951-1540",
-                    delivery: "Sim / Sem Taxa",
-                },
-            ],
-        },
+        
   
         {
             link: document.querySelector("#menuPetShop"),    
@@ -1260,12 +1322,34 @@ document.addEventListener("DOMContentLoaded", function () {
             link: document.querySelector("#menuRestaurantes"),    
             title: "Restaurante",
             establishments: [
+
                 {
+                    name: "Cabanas",
+                    hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "</br>R. Laurindo Franco de Godoi, 90",
+                    contact: "</br>(43) 99951-1540",
+                    delivery: "</br>Sim / Com Taxa",
+                    infoAdicional:"</br>Somente Marmita"
+                },
+                {
+                    image: "images/comercios/restaurante/delfino/delfino.png",
                     name: "Delfino",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    contact: "(43) 99951-1540",
-                    delivery: "Sim / Sem Taxa",
+                    hours: "</br>seg a sex: 11h - 15h / 18h - 22:30</br> sab: 11 - 16h",
+                    address: "</br>R. Kalil Keder, 90",
+                    contact: "</br>(43) 9111-9484",
+                    delivery: "</br>Sim / Com Taxa",
+                    menuImages: [                        
+                         "images/comercios/restaurante/delfino/cardapio/cardapio_1.png",
+                                 
+                        ],    
+                },
+                {
+                    name: "Portal",
+                    hours: "</br>Seg a Qui: 19h - 21h",
+                    address: "</br>R. Benedito Salles, 2023",
+                    contact: "</br>(43) 3566-2174",
+                    delivery: "</br>Sim / Com Taxa",
+                    infoAdicional:"</br>Fica dentro do Hotel Portal"
                 },
             ],
         },
@@ -1529,6 +1613,18 @@ document.addEventListener("DOMContentLoaded", function () {
            ? `<b>Entrega:</b> ${establishment.delivery}<br>`
            : ""
        }
+
+       ${
+         establishment.infoAdicional
+           ? `<b>Informação Adicional:</b> ${establishment.infoAdicional}<br>`
+           : ""
+       }
+
+       ${
+         establishment.infoVagaTrabalho
+           ? `<b>Info Vaga de Trabalho:</b> <span class="plantao-text">${establishment.infoVagaTrabalho}</span><br>`
+           : ""
+       }
       
    <!-- Ícones de redes sociais e contato -->
           <div class="social-icons">
@@ -1591,6 +1687,10 @@ document.addEventListener("DOMContentLoaded", function () {
             `
                 : ""
             }
+
+
+
+            
           </div>
       </br>
   
