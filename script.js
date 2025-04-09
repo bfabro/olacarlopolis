@@ -1695,7 +1695,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       
       ///// inicio
-// Substitua a função toggleElement e eventos relacionados por:
+
 
 
 
