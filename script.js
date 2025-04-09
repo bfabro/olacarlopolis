@@ -1283,10 +1283,10 @@ establishments: [
             novidadesImages: [           
              
                 "images/comercios/quitanda/novidades/1.png",
-               "images/comercios/quitanda/novidades/2.png",
-               "images/comercios/quitanda/novidades/3.png",
-               "images/comercios/quitanda/novidades/4.png",
-               "images/comercios/quitanda/novidades/5.png",
+                "images/comercios/quitanda/novidades/2.png",
+                "images/comercios/quitanda/novidades/3.png",
+                "images/comercios/quitanda/novidades/4.png",
+                "images/comercios/quitanda/novidades/5.png",
               ],
 
 
@@ -1473,8 +1473,6 @@ establishments: [
       areaNovidades.classList.remove("hidden");
       areaNovidades.innerHTML = "";
 
-
-      ///////////////////////////////////
       establishment.novidadesImages.forEach(imgSrc => {
         const img = document.createElement("img");
         img.src = imgSrc;
