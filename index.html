@@ -545,20 +545,18 @@
                      </p>
                   </div>
 
-                 
-
                   <div class="swiper-slide">
-                     <video class="novidade-video" controls>
-                     <source src="images/novidades/v_1.mp4" type="video/mp4">
-                     Seu navegador não suporta o vídeo.
-                  </video><p>
-                        Frango Assado / Costela Assada<br>
+                     <img src="images/novidades/quitanda.png" alt="Quitanda Pimenta Doce">
+                     <p>
+                        Assados Na Quitanda Pimenta Doce<br>
                         <!-- Ícone de link para mais informações -->
                         <a href="#" target="_blank" class="info-link">
                            <i class='bx bx-link-external'></i> Mais informações
                         </a>
-                     </p>  
+                     </p>
                   </div>
+
+                  
                   <div class="swiper-slide">
                      <img src="images/novidades/seiza.png" alt="Evento 2">
                      <p>
@@ -716,32 +714,6 @@
    <!--  JavaScript -->
    <script src="script.js"></script>
 
-
-
-   <script>// Função para iniciar o vídeo quando ele aparecer na tela
-         const swiperNovidades = new Swiper('.swiper-novidades', {
-            loop: true,  // Habilita o loop do carrossel
-            autoplay: {
-                delay: 6500, // Intervalo de tempo entre as trocas de slide
-            },
-            on: {
-                slideChange: function () {
-                    // Pausa todos os vídeos quando o slide mudar
-                    const allVideos = document.querySelectorAll('.novidade-video');
-                    allVideos.forEach(video => video.pause());
-
-                    // Verifica o slide atual
-                    const currentSlide = this.slides[this.activeIndex];
-                    const videoInCurrentSlide = currentSlide.querySelector('video');
-
-                    // Se houver um vídeo no slide atual, reproduz-o
-                    if (videoInCurrentSlide) {
-                        videoInCurrentSlide.play();
-                    }
-                },
-            },
-        });
-      </script>
 
 
    <script>
