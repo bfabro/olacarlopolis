@@ -715,24 +715,32 @@
    </div>
    <!--  JavaScript -->
    <script src="script.js"></script>
+
+
+
    <script>// Função para iniciar o vídeo quando ele aparecer na tela
-      const video = document.querySelector('video');
-      
-      const playVideoWhenVisible = () => {
-        // Checa se o vídeo está visível
-        const videoRect = video.getBoundingClientRect();
-        if (videoRect.top >= 0 && videoRect.bottom <= window.innerHeight) {
-          if (video.paused) {
-            video.play(); // Reproduz o vídeo
-          }
-        }
-      };
-      
-      // Aciona a função de visibilidade quando o carrossel ou seção de novidades for exibida
-      window.addEventListener('scroll', playVideoWhenVisible);
-      
-      // Se já estiver na parte visível da tela quando carregado
-      document.addEventListener('DOMContentLoaded', playVideoWhenVisible);
+         const swiperNovidades = new Swiper('.swiper-novidades', {
+            loop: true,  // Habilita o loop do carrossel
+            autoplay: {
+                delay: 6500, // Intervalo de tempo entre as trocas de slide
+            },
+            on: {
+                slideChange: function () {
+                    // Pausa todos os vídeos quando o slide mudar
+                    const allVideos = document.querySelectorAll('.novidade-video');
+                    allVideos.forEach(video => video.pause());
+
+                    // Verifica o slide atual
+                    const currentSlide = this.slides[this.activeIndex];
+                    const videoInCurrentSlide = currentSlide.querySelector('video');
+
+                    // Se houver um vídeo no slide atual, reproduz-o
+                    if (videoInCurrentSlide) {
+                        videoInCurrentSlide.play();
+                    }
+                },
+            },
+        });
       </script>
 
 
