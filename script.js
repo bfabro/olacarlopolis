@@ -125,29 +125,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const overlay = document.querySelector("#overlay");
     const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
     const clearSearch = document.getElementById("clearSearch");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
   
     // Função para adicionar contadores de slides
     function addSlideCounters(swiperInstance, containerSelector) {
@@ -301,11 +278,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Carregar informações de categorias
     const categories = 
     [
-        {
-            link: document.querySelector("#menuLanchonete"),
-            title: "Lanchonetes",
-            establishments: [
-
                 {
                     link: document.querySelector("#menuAcai"),    
                     title: "Açai",
@@ -398,29 +370,33 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
 
                 {
-                    image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
-                    name: "O Casarao",
-                    hours: "</br>Ter - Dom - 18h - 00:30h",
-                    address: "</br>R. Benedito Salles, 1340",
-                    contact: "</br>(43) 99693-0565",
-                    delivery: "</br>Sim / Com Taxa",
-                    facebook: "https://www.facebook.com/ocasaraoph/?locale=pt_BR",
-                    instagram: "https://www.instagram.com/ocasaraoph/",       
-                    menuImages: [                   
-                    "images/comercios/lanchonete/casarao/1.png",
-                    "images/comercios/lanchonete/casarao/2.png",
-                    "images/comercios/lanchonete/casarao/3.png",
-                    "images/comercios/lanchonete/casarao/4.png",
-                    "images/comercios/lanchonete/casarao/5.png",
-                    "images/comercios/lanchonete/casarao/6.png",
-                    "images/comercios/lanchonete/casarao/7.png",
-                    "images/comercios/lanchonete/casarao/8.png",
-                    "images/comercios/lanchonete/casarao/9.png",
-                    "images/comercios/lanchonete/casarao/10.png",
+                    link: document.querySelector("#menuLanchonete"),
+                    title: "Lanchonetes",
+                    establishments: [
+                        {
+                            image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
+                            name: "O Casarao",
+                            hours: "</br>Ter - Dom - 18h - 00:30h",
+                            address: "</br>R. Benedito Salles, 1340",
+                            contact: "</br>(43) 99693-0565",
+                            delivery: "</br>Sim / Com Taxa",
+                            facebook: "https://www.facebook.com/ocasaraoph/?locale=pt_BR",
+                            instagram: "https://www.instagram.com/ocasaraoph/",       
+                            menuImages: [                   
+                                "images/comercios/lanchonete/casarao/1.png",
+                                "images/comercios/lanchonete/casarao/2.png",
+                                "images/comercios/lanchonete/casarao/3.png",
+                                "images/comercios/lanchonete/casarao/4.png",
+                                "images/comercios/lanchonete/casarao/5.png",
+                                "images/comercios/lanchonete/casarao/6.png",
+                                "images/comercios/lanchonete/casarao/7.png",
+                                "images/comercios/lanchonete/casarao/8.png",
+                                "images/comercios/lanchonete/casarao/9.png",
+                                "images/comercios/lanchonete/casarao/10.png",
+                            ],                    
+                        },
                     ],
-                    
                 },
-
 
                 {
                     image: "images/comercios/lanchonete/paiol/paiol.png",
@@ -447,8 +423,7 @@ document.addEventListener("DOMContentLoaded", function () {
             
                 },
           
-            ],
-        },
+        
   
       // pizzaria
         {
@@ -612,7 +587,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
             ],
         },
-  //// farmacias
+         //// farmacias
         {
             link: document.querySelector("#menuFarmacia"),
             title: "Farmácias ",
@@ -1680,7 +1655,7 @@ document.addEventListener("DOMContentLoaded", function () {
       </li>
     `).join('')}
   </ul>
-`;
+    `;
   
 
 
@@ -1699,8 +1674,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-// Função para alternar entre cardápio e novidades
-function toggleContent(button, contentId, otherButtons) {
+    // Função para alternar entre cardápio e novidades
+    function toggleContent(button, contentId, otherButtons) {
     const content = document.getElementById(contentId);
     const isActive = button.classList.contains('active');
   
