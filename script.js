@@ -215,7 +215,7 @@ document.addEventListener("DOMContentLoaded", function () {
         prevEl: ".swiper-button-prev",
       },
       autoplay: {
-        delay: 6000, // Troca de slide a cada 3 segundos
+        delay: 6500, // Troca de slide a cada 3 segundos
       },
       effect: "fade", // Efeito de fade entre os slides
       fadeEffect: {
