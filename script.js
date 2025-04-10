@@ -117,8 +117,8 @@ document.addEventListener("DOMContentLoaded", function () {
       pescar: "s",
       coletalixoeletronico: "s",
       feiradalua: "s",
-  f
-      //// INICIO INFORMAÇOES UTEIs
+  
+      //// INICIO INFORMAÇOES UTEIS
     };
   
     const body = document.querySelector("body");
@@ -439,7 +439,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             ],                    
                         },
                     ],
-                
+                },
 
                 {
                     image: "images/comercios/lanchonete/paiol/paiol.png",
@@ -466,7 +466,7 @@ document.addEventListener("DOMContentLoaded", function () {
             
                 },
           
-            },
+        
   
       // pizzaria
         {
