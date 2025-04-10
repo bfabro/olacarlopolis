@@ -654,7 +654,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 {
                     image: "images/comercios/farmacia/biofarma.png",
-                    name: "Bio Farma ( Estela )",
+                    name: "Bio Farma",
                     address: "</br>Rua Laurindo Franco Godoy, 464",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 3566-1473",
@@ -673,7 +673,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
                 {
                     image: "images/comercios/farmacia/farmafacil.png",
-                    name: "Desconto Facil 1 ( Joao )",
+                    name: "Desconto Facil 1",
                     address: "<br>R. Benedito Salles, 574",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99966-9812",
@@ -685,7 +685,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 {
                     image: "images/comercios/farmacia/drogamais.png",
-                    name: "DrogaMais ( Jorginho )",
+                    name: "DrogaMais",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     address: "<br>Rua Benedito Salles, 903",
                     contact: "</br>(43) 98411-9145",
@@ -697,7 +697,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
                 {
                     image: "images/comercios/farmacia/elshaday.png",
-                    name: "El Shaday ( Daniel )",
+                    name: "El Shaday",
                     address: "<br>R. Benedito Sales, 353",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 98488-9420",
@@ -709,7 +709,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
                 {
                     image: "images/comercios/farmacia/farmaciaDaVila.png",
-                    name: "Farmacia da Vila ( Marcela )",
+                    name: "Farmacia da Vila",
                     address: "<br>Rua Manguba, 320",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99148-8478",
@@ -733,7 +733,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
                 {
                     image: "images/comercios/farmacia/masterfarma.png",
-                    name: "MasterFarma ( Zurdo )",
+                    name: "MasterFarma",
                     address: "<br>R. Laurindo Franco de Godoi, 90",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99951-1540",
@@ -745,7 +745,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 {
                     
-                    name: "PopularMais ( Jeremias )",
+                    name: "PopularMais",
                     address: "<br>Elson Soares, 787, Sala 2",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99647-6266",
@@ -765,7 +765,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 {
                     image: "images/comercios/farmacia/santamaria.png",
-                    name: "Santa Maria ( Aguera )",
+                    name: "Santa Maria",
                     address: "<br>Praça Coronel Leite, nº 711",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 3566-1471",
