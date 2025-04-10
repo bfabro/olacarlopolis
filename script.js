@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             name: "Adega Cuenca",
                             hours:
                             "</br>seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
-                            address: "</br>R. Kalil Keder, 752",
+                            address: "<br>R. Kalil Keder, 752",
                             contact: "</br>(43) 99800-1680",
                             delivery: "</br>Sim / Sem Taxa",
                         },
@@ -357,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             image: "images/comercios/agropecuaria/armazem Rei/armazemRei.png",
                             name: "ARMAZÉM REI",
                             hours: "</br>seg a Sab: 8h - 19h </br> Dom: 08h - 12h",
-                            address: "</br>R. Kalil Keder, 718",
+                            address: "<br>R. Kalil Keder, 718",
                             contact: "</br> (43) 99185-6532",
                             delivery: "</br>Sim / Sem Taxa",
                             facebook: "#",
@@ -372,7 +372,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             image: "images/comercios/agropecuaria/vida nova/vidanova.png",
                             name: "Agro Vida",
                             hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 16h",
-                            address: "</br>rua benedito salles 309",
+                            address: "<br>rua benedito salles 309",
                             contact: "</br>(43) 99158-9047",
                             delivery: "</br>Sim / Sem Taxa",
                             facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
@@ -391,7 +391,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         {
                             name: "ADVOCACIA ABILIO",
                             hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
-                            address: "</br>R. Salvira Marquês, 315",
+                            address: "<br>R. Salvira Marquês, 315",
                             contact: "</br>(43) 3566-1368",
                         },
                     ],
@@ -405,7 +405,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
                             name: "O Casarao",
                             hours: "</br>Ter - Dom - 18h - 00:30h",
-                            address: "</br>R. Benedito Salles, 1340",
+                            address: "<br>R. Benedito Salles, 1340",
                             contact: "</br>(43) 99693-0565",
                             delivery: "</br>Sim / Com Taxa",
                             facebook: "https://www.facebook.com/ocasaraoph/?locale=pt_BR",
@@ -462,7 +462,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     image: "images/comercios/pizzaria/fornalha.png",
                     name: "Fornalha Pizzaria",
                     hours:"</br>Quarta - Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
-                    address: "</br>R. Benedito Salles, 837",
+                    address: "<br>R. Benedito Salles, 837",
                     contact: "</br>(43) 99632-1310",
                     delivery: "</br>Sim / Com Taxa",
                     facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
@@ -484,7 +484,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     image: "images/comercios/pesqueiro/aguamarine.jpg",
                     name: "Pesk e Pague Agua Marine",
                     hours: "</br>Sex a  - Dom: 09:30 - 18",
-                    address: "</br>Rod. Jose Alves Pereira",
+                    address: "<br>Rod. Jose Alves Pereira",
                     contact: "</br>(43) 98808-1911",
                     delivery: "</br>Sim / Com Taxa",
                     facebook: "www.facebook.com/uahh",
@@ -583,7 +583,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/supermercado/carreiro.png",
                     name: "Carreiro",
-                    address: "</br>R. Benedito Salles, 341 ",
+                    address: "<br>R. Benedito Salles, 341 ",
                     hours: "</br>Seg a Sex 8h - 19h </br> dom: 08 - 12h",
                     contact: "</br>(43) 3566-1520",
                     delivery: "</br>Sim / Com Taxa",
@@ -593,7 +593,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/supermercado/obarateiro.png",
                     name: "O Barateiro",
-                    address: "</br>Bendito Salles, 1168 ",
+                    address: "<br>Bendito Salles, 1168 ",
                     hours: "</br>Seg a Sex 8h - 21h </br> dom: 08 - 12h",
                     contact: "</br>(43) 99196-7816",
                     delivery: "</br>Sim / Sem Taxa",
@@ -603,7 +603,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/supermercado/kelve.png",
                     name: "Kelve",
-                    address: "</br>R. Paul Harris,104",
+                    address: "<br>R. Paul Harris,104",
                     hours: "</br>Seg a Sex 8h - 19:30h </br> dom: 08:30 - 12:30h",
                     contact: "</br>(43) 99844-6105",
                     delivery: "</br>Sim / Sem Taxa",
@@ -614,8 +614,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/supermercado/rocha.jpg",
                     name: "Rocha",
-                    hours: "</br>Seg a Sex 6h - 20h </br> dom: 06 - 12h",
-                    address: "</br>Av. Elson Soares, 767 ",
+                    hours: "<br>Seg a Sex 6h - 20h </br> dom: 06 - 12h",
+                    address: "<br>Av. Elson Soares, 767 ",
                     contact: "</br>(43) 3566-2436",
                     delivery: "</br>Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
@@ -624,14 +624,14 @@ document.addEventListener("DOMContentLoaded", function () {
     
                 {
                     name: "Carriel",
-                    address: "</br>PR-218, 1168 ",
+                    address: "<br>PR-218, 1168 ",
                     hours: "</br>Seg a Sex 8h - 21h </br> dom: 07 - 12h",
                     contact: "</br>(43) 3456-7890",
                     delivery: "</br>Sim / Sem Taxa",
                 },
                 {
                     name: "Compre Bem +",
-                    address: "</br>PR-218, 1168 ",
+                    address: "<br>PR-218, 1168 ",
                     hours: "</br>Seg a Sex 8h - 21h </br> Dom: 07 - 12h",
                     contact: "</br>(43) 3456-7890",
                     delivery: "</br>Sim / Sem Taxa",
@@ -639,7 +639,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
                 {
                     name: "Zero Japan",
-                    address: "</br>PR-218, 1168 ",
+                    address: "<br>PR-218, 1168 ",
                     hours: "</br>Seg a Sex 8h - 21h </br> dom: 07 - 12h",
                     contact: "</br>(43) 3456-7890",
                     delivery: "</br>Sim / Sem Taxa",
@@ -655,7 +655,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/biofarma.png",
                     name: "Bio Farma",
-                    address: "</br>Rua Laurindo Franco Godoy, 464",
+                    address: "<br>Rua Laurindo Franco Godoy, 464",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 3566-1473",
                     delivery: "</br>Sim / Sem Taxa",
@@ -1199,7 +1199,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     name: "Moto Taxi Modesto",
                     hours: "</br>Seg a Dom: 7h - 20h",
-                    address: "</br>R. Kelil Keder, 603, 148 ",
+                    address: "<br>R. Kelil Keder, 603, 148 ",
                     contact: "</br>(43) 99137-5516",
                     image: "images/info_uteis/VagasTrabalho/modesto/modesto.png",
                     infoVagaTrabalho:"</br>Precisa-se de motoboy",
@@ -1234,7 +1234,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     name: "Vida Nova",
                     hours: "</br>seg a sex: 7h - 18h </br>sab: 07 - 16h",
-                    address: "</br>Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
+                    address: "<br>Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
                     contact: "(43) 99900-2991",
                 },
             ],
@@ -1305,7 +1305,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     image: "images/comercios/mercearia/seiza/seiza.png",
                     name: "Seiza",
                     hours: "</br>Seg a Qui 9h - 18:30h </br>Sex 9h - 16:30 </br> sab: 09 - 12h",
-                    address: "</br>R. Fidêncio de Melo, 212 - Sala B",
+                    address: "<br>R. Fidêncio de Melo, 212 - Sala B",
                     contact: "</br>(43) 99103-4187",
                     delivery: "</br>Sim / Sem Taxa",            
                     instagram: "https://www.instagram.com/seizapr/",
@@ -1351,7 +1351,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     name: "Pimenta Doce",
                     hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "</br>R. Kalil Keder ",
+                    address: "<br>R. Kalil Keder ",
                     contact: "</br>(43) 98806-5747",
                     delivery: "</br>Sim / Sem Taxa",
                     image: "images/comercios/quitanda/pimentadoce.png",
@@ -1374,7 +1374,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     name: "Cabanas",
                     hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "</br>R. Laurindo Franco de Godoi, 90",
+                    address: "<br>R. Laurindo Franco de Godoi, 90",
                     contact: "</br>(43) 99951-1540",
                     delivery: "</br>Sim / Com Taxa",
                     infoAdicional:"</br>Somente Marmita"
@@ -1383,7 +1383,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     image: "images/comercios/restaurante/delfino/delfino.png",
                     name: "Delfino",
                     hours: "</br>seg a sex: 11h - 15h / 18h - 22:30</br> sab: 11 - 16h",
-                    address: "</br>R. Kalil Keder, 90",
+                    address: "<br>R. Kalil Keder, 90",
                     contact: "</br>(43) 9111-9484",
                     delivery: "</br>Sim / Com Taxa",
                     menuImages: [                        
@@ -1394,7 +1394,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     name: "Portal",
                     hours: "</br>Seg a Qui: 19h - 21h",
-                    address: "</br>R. Benedito Salles, 2023",
+                    address: "<br>R. Benedito Salles, 2023",
                     contact: "</br>(43) 3566-2174",
                     delivery: "</br>Sim / Com Taxa",
                     infoAdicional:"</br>Fica dentro do Hotel Portal"
@@ -1439,7 +1439,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     name: "Douglas do Taxi",
                     hours: "</br>Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
-                    address: "</br>Em Frente ao banco Itau",
+                    address: "<br>Em Frente ao banco Itau",
                     contact: "</br>(43) 88807-8515",
                 },
             ],
