@@ -294,12 +294,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         {
                             image: "images/comercios/acai/faxada.png",
                             name: "Turminha do Açai",
-                            hours: "</br>Qua a Seg: 14h - 23h </br> Ter: Fechado",
-                            address: "</br>Rua Benedito Salles, 409",
-                            contact: "</br>(43) 99176-7871",
+                            hours: "<br>Qua a Seg: 14h - 23h </br> Ter: Fechado",
+                            address: "<br>Rua Benedito Salles, 409",
+                            contact: "<br>(43) 99176-7871",
                             delivery: "Sim / Com Taxa",
                             instagram: "https://www.instagram.com/turminha_do_acai/",
-                            infoAdicional:"</br>Espetinhos a partir de Quinta até Domingo",
+                            infoAdicional:"<br>Espetinhos a partir de Quinta até<br> Domingo",
                             novidadesImages: [            
                             "images/comercios/acai/novidades/1.png",                                            
                             ],
