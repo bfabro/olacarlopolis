@@ -1280,6 +1280,13 @@ img {
 }
 
 
-
+.item-separator {
+  border-radius: 10px;
+  background: linear-gradient(to right, #f06, #48f); /* Gradiente de cor */
+  height: 2px; /* Espessura da linha */
+  margin: 20px 0; /* Espaçamento superior e inferior */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  width: 100%;
+}
 
 

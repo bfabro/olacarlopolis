@@ -655,7 +655,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/biofarma.png",
                     name: "Bio Farma ( Estela )",
-                    address: "</br>Rua Laurindo Franco Godoy, 464",
+                    address: "Rua Laurindo Franco Godoy, 464",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 3566-1473",
                     delivery: "</br>Sim / Sem Taxa",
@@ -710,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/farmaciaDaVila.png",
                     name: "Farmacia da Vila ( Marcela )",
-                    address: "</br>Rua Manguba, 320",
+                    address: "Rua Manguba, 320",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99148-8478",
                     delivery: "</br>Sim / Sem Taxa",
@@ -1631,9 +1631,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ${
               establishment.address
                 ? `
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                establishment.address
-              )}" target="_blank" class="icon-link">
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address.replace(/<br>/g, " "))}" target="_blank" class="icon-link">
                 <i style="color:rgb(250, 9, 9);" class='bx bx-map'></i> Localização
               </a>
             `
