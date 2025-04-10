@@ -18,8 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
   
       // Agropecuaria
       agrovida: "s",
-
       armazémrei:"s",
+
+      //confecção
+      yellowjeans:"s",
   
       // borracharia
       vidanova: "s",
@@ -393,6 +395,19 @@ document.addEventListener("DOMContentLoaded", function () {
                             hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
                             address: "<br>R. Salvira Marquês, 315",
                             contact: "</br>(43) 3566-1368",
+                        },
+                    ],
+                },
+
+                {
+                    link: document.querySelector("#menuConfecção"),    
+                    title: "Confecção",
+                    establishments: [
+                        {
+                            name: "Yellow Jeans",
+                            hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
+                            address: "<br>Rua Maria Pereira da Rocha Aleixo, 435",
+                            contact: "</br>(43) 998070671",
                         },
                     ],
                 },
