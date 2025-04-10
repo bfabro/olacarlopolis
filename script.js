@@ -655,7 +655,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/biofarma.png",
                     name: "Bio Farma ( Estela )",
-                    address: "Rua Laurindo Franco Godoy, 464",
+                    address: "</br>Rua Laurindo Franco Godoy, 464",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 3566-1473",
                     delivery: "</br>Sim / Sem Taxa",
@@ -674,7 +674,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/farmafacil.png",
                     name: "Desconto Facil 1 ( Joao )",
-                    address: "</br>R. Benedito Salles, 574",
+                    address: "<br>R. Benedito Salles, 574",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99966-9812",
                     delivery: "</br>Sim / Sem Taxa",
@@ -687,7 +687,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     image: "images/comercios/farmacia/drogamais.png",
                     name: "DrogaMais ( Jorginho )",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-                    address: "</br>Rua Benedito Salles, 903",
+                    address: "<br>Rua Benedito Salles, 903",
                     contact: "</br>(43) 98411-9145",
                     delivery: "</br>Sim / Sem Taxa",
                     facebook:"https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
@@ -698,7 +698,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/elshaday.png",
                     name: "El Shaday ( Daniel )",
-                    address: "</br>R. Benedito Sales, 353",
+                    address: "<br>R. Benedito Sales, 353",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 98488-9420",
                     delivery: "</br>Sim / Sem Taxa",
@@ -710,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/farmaciaDaVila.png",
                     name: "Farmacia da Vila ( Marcela )",
-                    address: "Rua Manguba, 320",
+                    address: "<br>Rua Manguba, 320",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99148-8478",
                     delivery: "</br>Sim / Sem Taxa",
@@ -722,7 +722,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/farmais.png",
                     name: "FarMais",
-                    address: "</br>R. Benedito Salles, 1188",
+                    address: "<br>R. Benedito Salles, 1188",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 3566-1211",
                     delivery: "</br>Sim / Sem Taxa",
@@ -734,7 +734,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/masterfarma.png",
                     name: "MasterFarma ( Zurdo )",
-                    address: "</br>R. Laurindo Franco de Godoi, 90",
+                    address: "<br>R. Laurindo Franco de Godoi, 90",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99951-1540",
                     delivery: "</br>Sim / Sem Taxa",
@@ -746,7 +746,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     
                     name: "PopularMais ( Jeremias )",
-                    address: "</br>Elson Soares, 787, Sala 2",
+                    address: "<br>Elson Soares, 787, Sala 2",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99647-6266",
                     delivery: "</br>Sim / Sem Taxa",
@@ -766,7 +766,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/santamaria.png",
                     name: "Santa Maria ( Aguera )",
-                    address: "</br>Praça Coronel Leite, nº 711",
+                    address: "<br>Praça Coronel Leite, nº 711",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 3566-1471",
                     delivery: "</br>Sim / Sem Taxa",
@@ -778,7 +778,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/comercios/farmacia/saudeFarma.png",
                     name: "Saude Farma",
-                    address: "</br>Rua Benedito Salles, 951",
+                    address: "<br>Rua Benedito Salles, 951",
                     hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "</br>(43) 99956-8938",
                     delivery: "</br>Sim / Sem Taxa",
@@ -1015,7 +1015,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     title: "Farmacia de Plantão",
                     establishments: [{
                     name: "DrogaMais ( Jorginho )",
-                    address: "</br>Rua Benedito Salles, 903",
+                    address: "<br>Rua Benedito Salles, 903",
                     contact: "</br>(43) 98411-9145",
                     plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
                     delivery: "</br>Sim / Sem Taxa",
@@ -1029,7 +1029,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     /*
                     
                     name: "Desconto Facil 1 ( Joao )",
-                    address: "</br>R. Benedito Salles, 574",
+                    address: "<br>R. Benedito Salles, 574",
                     contact: "</br>(43) 99966-9812",
                     plantaoHorario: "</br>Das 8h às 21h , De 29/03 a 04/04",
                     delivery: "</br>Sim / Sem Taxa",
@@ -1044,7 +1044,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 
                     name: "Popularmais ( Jeremias )",
-                    address: "</br>Av. Elson Soares, 787. sala 2",
+                    address: "<br>Av. Elson Soares, 787",
                     contact: "</br>(43) 99647-6266",
                     plantaoHorario: "</br>Das 8h às 21h </br> De 05/04 a 11/04",
                     delivery: "</br>Sim / Sem Taxa",
@@ -1067,9 +1067,9 @@ document.addEventListener("DOMContentLoaded", function () {
             establishments: [
                 {
                     name: "Hospital São Jose",
-                    address: "R. Cap. Estácio, 460",
-                    contact: "(43) 99174-2539",
-                    hours: "24 horas",
+                    address: "<br>R. Cap. Estácio, 460",
+                    contact: "<br>(43) 99174-2539",
+                    hours: "<br>24 horas",
                     image: "images/info_uteis/hospital/hospital.png",
                 },
             ],
@@ -1082,9 +1082,9 @@ document.addEventListener("DOMContentLoaded", function () {
             establishments: [
                 {
                     name: "Prefeitura",
-                    address: "R. Benedito Salles, 1060 - Centro",
-                    contact: "(43) 3566-1291",
-                    hours: "8h as 17h",
+                    address: "<br>R. Benedito Salles, 1060 - Centro",
+                    contact: "<br>(43) 3566-1291",
+                    hours: "<br>8h as 17h",
                     image: "images/info_uteis/prefeitura/prefeitura.png",
                     facebook: "https://www.facebook.com/profile.php?id=200531799983410&_rdr",
                     instagram: "www.instagram.com/uahhhttps://www.instagram.com/prefeitura.carlopolis/?locale=zh_CN&hl=af",
