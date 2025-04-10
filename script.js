@@ -299,9 +299,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             contact: "</br>(43) 99176-7871",
                             delivery: "Sim / Com Taxa",
                             instagram: "https://www.instagram.com/turminha_do_acai/",
+                            infoAdicional:"</br>Espetinhos a partir de Quinta até Domingo",
                             novidadesImages: [            
-                            "images/comercios/acai/novidades/1.png",
-                                            
+                            "images/comercios/acai/novidades/1.png",                                            
                             ],
                             menuImages: [                    
                                 "images/comercios/acai/cardapio/1.png",
@@ -1150,11 +1150,11 @@ document.addEventListener("DOMContentLoaded", function () {
             establishments: [
                 {
                     name: "Moto Taxi Modesto",
-                    hours: "Seg a Dom: 7h - 20h",
-                    address: "R. Kelil Keder, 603, 148 ",
-                    contact: "(43) 99137-5516",
+                    hours: "</br>Seg a Dom: 7h - 20h",
+                    address: "</br>R. Kelil Keder, 603, 148 ",
+                    contact: "</br>(43) 99137-5516",
                     image: "images/info_uteis/VagasTrabalho/modesto/modesto.png",
-                    infoVagaTrabalho:"Precisa-se de motoboy",
+                    infoVagaTrabalho:"</br>Precisa-se de motoboy",
                 },
             ],
         },
@@ -1645,7 +1645,7 @@ document.addEventListener("DOMContentLoaded", function () {
               <a href="https://api.whatsapp.com/send?phone=${establishment.contact
                 .replace("+", "")
                 .replace(/\D/g, "")}&text=${encodeURIComponent(
-                    "Olá! Encontrei seu número no Olá Carlópolis e gostaria de uma informação!"
+                    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
                   )}" target="_blank" class="icon-link">
                 <i class='bx bxl-whatsapp' style="color: #25D366;"></i> WhatsApp
               </a>  
@@ -1749,7 +1749,7 @@ document.addEventListener("DOMContentLoaded", function () {
                  ` : ''}
        
         
-        <!-- Restante do conteúdo... -->
+     
       </li>
     `).join('')}
   </ul>
