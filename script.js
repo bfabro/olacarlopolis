@@ -681,6 +681,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     facebook:"https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
                     instagram: "https://www.instagram.com/descontofacil.clps/",
                     site: "https://www.grupoasfar.com.br/",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/novidade_biofarma/2.png",     
+                        "images/comercios/farmacia/novidade_biofarma/3.png",
+                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                    ], 
                 },
 
                 {
@@ -693,6 +699,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     facebook:"https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
                     instagram: "https://www.instagram.com/drogamaisjorginho/",
                     site: "www.google.com",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/novidade_biofarma/2.png",     
+                        "images/comercios/farmacia/novidade_biofarma/3.png",
+                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                    ], 
                 },
         
                 {
@@ -705,6 +717,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
                     instagram: "www.instagram.com/uahh",
                     site: "www.google.com",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/novidade_biofarma/2.png",     
+                        "images/comercios/farmacia/novidade_biofarma/3.png",
+                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                    ], 
                 },
         
                 {
@@ -717,6 +735,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     facebook: "#",
                     instagram: "https://www.instagram.com/farmaciadavilaclps/",
                     site: "#",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/novidade_biofarma/2.png",     
+                        "images/comercios/farmacia/novidade_biofarma/3.png",
+                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                    ], 
                 },
         
                 {
@@ -729,6 +753,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
                     instagram: "https://www.instagram.com/farmaiscarlopolis/",
                     site: "#",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/novidade_biofarma/2.png",     
+                        "images/comercios/farmacia/novidade_biofarma/3.png",
+                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                    ], 
                 },
         
                 {
@@ -741,6 +771,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
                     instagram: "https://www.instagram.com/masterfarma_carlopolis/",
                     site: "#",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/novidade_biofarma/2.png",     
+                        "images/comercios/farmacia/novidade_biofarma/3.png",
+                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                    ], 
                 },
                 
                 {
@@ -773,6 +809,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
                     instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
                     site: "#",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/novidade_biofarma/2.png",     
+                        "images/comercios/farmacia/novidade_biofarma/3.png",
+                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                    ], 
                 },
         
                 {
@@ -786,6 +828,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
                     instagram: "#",
                     site: "www.google.com",
+                    novidadesImages: [               
+                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/novidade_biofarma/2.png",     
+                        "images/comercios/farmacia/novidade_biofarma/3.png",
+                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                    ], 
                 },
             ],
         },
@@ -1748,7 +1796,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
                  ` : ''}
        
-        
+         <div class="separador_categorias"></div> <!-- Separador visual entre os itens -->
      
       </li>
     `).join('')}
