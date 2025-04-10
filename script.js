@@ -1107,9 +1107,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     image: "images/info_uteis/copel/copel.png",
                     name: "Copel",
-                    hours: "seg a sex: 8h - 12h",
-                    address: "R. Benedito Salles, 1094",
-                    contact: "(41) 3013-8973",
+                    hours: "<br>seg a sex: 8h - 12h",
+                    address: "<br>R. Benedito Salles, 1094",
+                    contact: "<br>(41) 3013-8973",
                 },
             ],
         },
