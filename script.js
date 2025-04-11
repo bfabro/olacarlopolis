@@ -44,6 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // padaria
       bomjesus:"s",
+      sãofrancisco:"s",
+      
   
       //pizzaria
       fornalhapizzaria: "s",
@@ -69,6 +71,8 @@ document.addEventListener("DOMContentLoaded", function () {
       cabanas:"s",
       delfino:"s",
       portal:"s",
+      neia:"s",
+      sabordaroça:"s",
   
       //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
   
@@ -526,14 +530,45 @@ document.addEventListener("DOMContentLoaded", function () {
                     address: "R. Benedito Salles, 615",
                     contact: " (43) 99653-9285",
                     delivery: "Sim / Com Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
+                    facebook: "https://www.facebook.com/PanificadoraRestauranteBomJesus/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/bom_jesus_panificadora/",
                     novidadesImages: [
                         // Novo array de imagens de novidades
                         "images/comercios/padaria/bom jesus/novidades/1.png",
+                        "images/comercios/padaria/bom jesus/novidades/2.png",
+                        "images/comercios/padaria/bom jesus/novidades/3.png",
+                        "images/comercios/padaria/bom jesus/novidades/4.png",
+                        "images/comercios/padaria/bom jesus/novidades/5.png",
                        
                     ],
                 },
+
+                {
+                  image: "images/comercios/padaria/saoFrancisco/saoFrancisco.png",
+                  name: "São Francisco",
+                  hours: "</br>seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
+                  address: "R. Benedito Salles, 881",
+                  contact: " (43) 98873-1488",
+                  delivery: "Sim / Com Taxa",
+                  facebook: "www.facebook.com/uahh",
+                  instagram: "www.instagram.com/uahh",
+                  novidadesImages: [
+                      // Novo array de imagens de novidades
+                      "images/comercios/padaria/saoFrancisco/novidades/4.png",
+                      "images/comercios/padaria/saoFrancisco/novidades/3.png",
+                      "images/comercios/padaria/saoFrancisco/novidades/5.png",
+                      "images/comercios/padaria/saoFrancisco/novidades/2.png",
+                      "images/comercios/padaria/saoFrancisco/novidades/1.png",
+                     
+                  ],
+              },
+
+
+
+
+
+
+
             ],
         },
 
@@ -1407,6 +1442,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         ],    
                 },
                 {
+                  image: "images/comercios/restaurante/neia/neia.png",
+                  name: "Neia",
+                  hours: "</br>seg a sex: 11h - 14h <br>sab: 11 - 16h",
+                  address: "<br>R. Kalil Keder, 262 ",
+                  contact: "</br>(43) 99847-1137",
+                  delivery: "</br>Sim / Com Taxa",
+                  menuImages: [                        
+                       "images/comercios/restaurante/neia/cardapio/cardapio_1.png",                               
+                      ],    
+              },
+                {
                     name: "Portal",
                     hours: "</br>Seg a Qui: 19h - 21h",
                     address: "<br>R. Benedito Salles, 2023",
@@ -1414,6 +1460,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     delivery: "</br>Sim / Com Taxa",
                     infoAdicional:"</br>Fica dentro do Hotel Portal"
                 },
+
+                {
+                  image: "images/comercios/restaurante/saborRoca/saborRoca.png",
+                  name: "Sabor da Roça",
+                  hours: "</br>Seg a Sab: 10:30h - 14h",
+                  address: "<br>R. Benedito Salles, 365",
+                  contact: "</br>(43) 99832-3050",
+                  delivery: "</br>Sim / Com Taxa",
+                
+              },
             ],
         },
   
