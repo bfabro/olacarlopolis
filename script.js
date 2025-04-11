@@ -438,8 +438,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 "images/comercios/lanchonete/casarao/10.png",
                             ],                    
                         },
-                    ],
-                },
+                  
 
                 {
                     image: "images/comercios/lanchonete/paiol/paiol.png",
@@ -465,7 +464,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     ],
             
                 },
-          
+              ],
+            },
         
   
       // pizzaria

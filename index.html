@@ -754,6 +754,29 @@
     document.getElementById("contador").innerText = userCount;
   });
 
+////////////////////////////////////////
+
+  // Função para atualizar o contador
+function updateCounter(category) {
+    const ref = database.ref('clickCounters/' + category);
+    ref.transaction(function(currentCount) {
+        return (currentCount || 0) + 1;
+    });
+}
+
+// Recuperar o contador ao carregar
+firebase.database().ref('clickCounters').once('value', (snapshot) => {
+    const counters = snapshot.val();
+    if (counters) {
+        for (const category in counters) {
+            const counterElement = document.getElementById(category + "Counter");
+            if (counterElement) {
+                counterElement.textContent = counters[category];
+            }
+        }
+    }
+});
+
    </script>
 
 
