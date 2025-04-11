@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
       descontofacil1: "s",
       drogamais: "s",
       masterfarma: "s",
-      popularmais: "s",
+      popularmais: "s",  
       santamaria: "s",
       saudefarma: "s",
       popular: "s",
