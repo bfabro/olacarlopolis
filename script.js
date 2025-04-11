@@ -550,8 +550,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   address: "R. Benedito Salles, 881",
                   contact: " (43) 98873-1488",
                   delivery: "Sim / Com Taxa",
-                  facebook: "www.facebook.com/uahh",
-                  instagram: "www.instagram.com/uahh",
+                  facebook: "#",
+                  instagram: "#",
                   novidadesImages: [
                       // Novo array de imagens de novidades
                       "images/comercios/padaria/saoFrancisco/novidades/4.png",
@@ -621,7 +621,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     date: "Sex das 19 - 00h",
                     address: "Praça Igreja Matriz ",
                     contact: "(11) 99898-5930",
-                    menuFlyer: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
+                    facebook: "https://www.facebook.com/people/Feira-Da-Lua-Carl%C3%B3polis/100089210937457/?_rdr",
+                  instagram: "https://www.instagram.com/feiradaluacarlopolis/",
+                    novidadesImages: [
+                      // Novo array de imagens de novidades                      
+                      "images/info_uteis/eventos/feiraLua/novidades/2.png",
+                      "images/info_uteis/eventos/feiraLua/novidades/1.png",
+                     
+                  ],
                 },
             ],
         },
