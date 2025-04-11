@@ -777,6 +777,20 @@ firebase.database().ref('clickCounters').once('value', (snapshot) => {
     }
 });
 
+
+
+// Ouvir as mudanças no nó 'clickCounters'
+database.ref('clickCounters').on('value', snapshot => {
+  const counters = snapshot.val(); // Obtém os dados mais recentes
+  console.log(counters); // Exibe os contadores atualizados
+
+  // Iterar sobre as categorias e mostrar os contadores
+  for (const category in counters) {
+    console.log(`${category}: ${counters[category]}`);
+  }
+});
+
+
    </script>
 
 
