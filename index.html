@@ -738,8 +738,10 @@
   const app = firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
 
-  // Referência para o nó de usuários online
-  const onlineUsersRef = database.ref("onlineUsers");
+   // Firebase Realtime Database para "onlineUsers"
+const onlineUsersRef = firebase.database().ref("onlineUsers");
+
+
 
   // Adiciona um novo usuário online
   const userRef = onlineUsersRef.push();
