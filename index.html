@@ -126,7 +126,7 @@
                         <span class="navlink_icon"><i  style="color:#c20d9b" class="fa-solid fa-store"></i></span>
                         <span class="navlink">Açai</span>
                      </a>
-
+                     
                      <a id="menuAcougue" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:#FFA500" class="fa-solid fa-cow"></i></span>
                         <span class="navlink">Açougue</span>
@@ -736,7 +736,7 @@
 
   // Inicializa o Firebase
   const app = firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
+  const database = firebase.database(app);
 
    // Firebase Realtime Database para "onlineUsers"
 const onlineUsersRef = firebase.database().ref("onlineUsers");
@@ -758,39 +758,8 @@ const onlineUsersRef = firebase.database().ref("onlineUsers");
 
 ////////////////////////////////////////
 
-  // Função para atualizar o contador
-function updateCounter(category) {
-    const ref = database.ref('clickCounters/' + category);
-    ref.transaction(function(currentCount) {
-        return (currentCount || 0) + 1;
-    });
-}
+ 
 
-// Recuperar o contador ao carregar
-firebase.database().ref('clickCounters').once('value', (snapshot) => {
-    const counters = snapshot.val();
-    if (counters) {
-        for (const category in counters) {
-            const counterElement = document.getElementById(category + "Counter");
-            if (counterElement) {
-                counterElement.textContent = counters[category];
-            }
-        }
-    }
-});
-
-
-
-// Ouvir as mudanças no nó 'clickCounters'
-database.ref('clickCounters').on('value', snapshot => {
-  const counters = snapshot.val(); // Obtém os dados mais recentes
-  console.log(counters); // Exibe os contadores atualizados
-
-  // Iterar sobre as categorias e mostrar os contadores
-  for (const category in counters) {
-    console.log(`${category}: ${counters[category]}`);
-  }
-});
 
 
    </script>
