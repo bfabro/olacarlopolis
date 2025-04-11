@@ -736,7 +736,7 @@
 
   // Inicializa o Firebase
   const app = firebase.initializeApp(firebaseConfig);
-  const database = firebase.database(app);
+  const database = firebase.database();
 
   // Referência para o nó de usuários online
   const onlineUsersRef = database.ref("onlineUsers");
