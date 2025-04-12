@@ -123,6 +123,12 @@ document.addEventListener("DOMContentLoaded", function () {
       feiradalua: "s",
   
       //// INICIO INFORMAÇOES UTEIS
+
+
+
+      ///
+
+      rodoviaria:"s",
     };
   
     const body = document.querySelector("body");
@@ -462,9 +468,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     ],
                     novidadesImages: [
                         // Novo array de imagens de novidades
-                        "images/comercios/lanchonete/paiol/cardapio_1.jpg",
-                        "images/comercios/acougue/banner/banner_1.jpg",
-                        "images/comercios/acougue/banner/banner_2.jpg",
+                        "images/comercios/lanchonete/paiol/novidades/1.png",
+                       "images/comercios/lanchonete/paiol/novidades/2.png",
+                       "images/comercios/lanchonete/paiol/novidades/3.png",
+                       "images/comercios/lanchonete/paiol/novidades/4.png",
                     ],
             
                 },
@@ -888,7 +895,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     instagram: "#",
                     site: "www.google.com",
                     novidadesImages: [               
-                        "images/comercios/farmacia/novidade_biofarma/1.png",
+                        "images/comercios/farmacia/saudeFarma/novidade/1.png",
                         "images/comercios/farmacia/novidade_biofarma/2.png",     
                         "images/comercios/farmacia/novidade_biofarma/3.png",
                         "images/comercios/farmacia/novidade_biofarma/4.png",
@@ -1203,6 +1210,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
             ],
         },
+
+        {
+          link: document.querySelector("#menuRodoviaria"),
+          title: "Rodoviaria",
+          establishments: [
+              {
+                  name: "Rodoviaria",
+                  address: "<br>R. Kaliu keder, 0",
+                  contact: "<br>(43) 3566-1393",
+                  hours: "<br>24 horas",
+                  image: "images/info_uteis/rodoviaria/rodoviaria.png",
+              },
+          ],
+      },
   
         {
             link: document.querySelector("#menuPrefeitura"),
