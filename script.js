@@ -436,17 +436,25 @@ document.addEventListener("DOMContentLoaded", function () {
                             facebook: "https://www.facebook.com/ocasaraoph/?locale=pt_BR",
                             instagram: "https://www.instagram.com/ocasaraoph/",       
                             menuImages: [                   
-                                "images/comercios/lanchonete/casarao/1.png",
-                                "images/comercios/lanchonete/casarao/2.png",
-                                "images/comercios/lanchonete/casarao/3.png",
-                                "images/comercios/lanchonete/casarao/4.png",
-                                "images/comercios/lanchonete/casarao/5.png",
-                                "images/comercios/lanchonete/casarao/6.png",
-                                "images/comercios/lanchonete/casarao/7.png",
-                                "images/comercios/lanchonete/casarao/8.png",
-                                "images/comercios/lanchonete/casarao/9.png",
-                                "images/comercios/lanchonete/casarao/10.png",
-                            ],                    
+                                "images/comercios/lanchonete/casarao/cardapio/1.png",
+                                "images/comercios/lanchonete/casarao/cardapio/2.png",
+                                "images/comercios/lanchonete/casarao/cardapio/3.png",
+                                "images/comercios/lanchonete/casarao/cardapio/4.png",
+                                "images/comercios/lanchonete/casarao/cardapio/5.png",
+                                "images/comercios/lanchonete/casarao/cardapio/6.png",
+                                "images/comercios/lanchonete/casarao/cardapio/7.png",
+                                "images/comercios/lanchonete/casarao/cardapio/8.png",
+                                "images/comercios/lanchonete/casarao/cardapio/9.png",
+                                "images/comercios/lanchonete/casarao/cardapio/10.png",
+                            ],     
+                            novidadesImages: [
+                              // Novo array de imagens de novidades
+                              "images/comercios/lanchonete/casarao/novidades/1.png",
+                             "images/comercios/lanchonete/casarao/novidades/2.png",
+                             "images/comercios/lanchonete/casarao/novidades/3.png",
+                             "images/comercios/lanchonete/casarao/novidades/4.png",
+                             "images/comercios/lanchonete/casarao/novidades/5.png",
+                          ],               
                         },
                   
 
@@ -462,9 +470,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     site: "www.google.com",  
                     menuImages: [
                         // Agora é um array de imagens
-                        "images/comercios/lanchonete/paiol/cardapio_1.jpg",
-                        "images/comercios/lanchonete/paiol/cardapio_2.jpg",
-                        "images/comercios/lanchonete/paiol/cardapio_3.jpg",
+                        "images/comercios/lanchonete/paiol/cardapio/1.png",
+                        "images/comercios/lanchonete/paiol/cardapio/2.png",
+                        "images/comercios/lanchonete/paiol/cardapio/3.png",
+                               
                     ],
                     novidadesImages: [
                         // Novo array de imagens de novidades
@@ -1223,7 +1232,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   image: "images/info_uteis/rodoviaria/rodoviaria.png",
               },
           ],
-      },
+        },
   
         {
             link: document.querySelector("#menuPrefeitura"),
