@@ -94,6 +94,10 @@ document.addEventListener("DOMContentLoaded", function () {
   
       // guia de pesca
       fabiosushimoto: "s",
+
+      // montador de moveis
+      hirancastro:"s",
+      
   
       // taxista
       douglasdotaxi: "s",
@@ -1050,10 +1054,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
             ],
         },
-    
+
+
+        {
+          link: document.querySelector("#menuMontadorMoveis"),
+          title: "Montador de Moveis",
+          establishments: [
+              {                  
+                  name: "Hiran Castro",
+                  contact: "(43) 99174-4396",
+                  novidadesImages: [               
+                    "images/servicos/montadorMoveis/novidades/1.png",
+                    "images/servicos/montadorMoveis/novidades/2.png",
+                ], 
+              },
+            
+          ],
+        },
+
+
         {
             link: document.querySelector("#menuPedreiro"),
-            title: "Pedreiros ",
+            title: "Pedreiros",
             establishments: [
                 {
                     image: "images/servicos/pedreiro/pedreiro.jpg",
