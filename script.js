@@ -703,6 +703,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
             ],
         },
+
+
          //// farmacias
         {
             link: document.querySelector("#menuFarmacia"),
@@ -1146,7 +1148,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     */
 
-
+                    /*
                 
                     name: "Popularmais ( Jeremias )",
                     address: "<br>Av. Elson Soares, 787",
@@ -1161,6 +1163,28 @@ document.addEventListener("DOMContentLoaded", function () {
                         "images/comercios/farmacia/novidades_popularmais/1.png",
                         "images/comercios/farmacia/novidades_popularmais/2.png",
                     ],
+                   
+                    */
+
+                    image: "images/comercios/farmacia/saudeFarma.png",
+                    name: "Saude Farma",
+                    address: "<br>Rua Benedito Salles, 951",
+                    contact: "</br>(43) 99956-8938",
+                    plantaoHorario: "</br>Das 8h às 21h </br> De 12/04 a 18/04",                   
+                    delivery: "</br>Sim / Sem Taxa", 
+                    
+                      facebook:
+                      "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
+                      instagram: "https://www.instagram.com/saudefarmacarlopolis/",                     
+                      novidadesImages: [               
+                          "images/comercios/farmacia/saudeFarma/novidade/1.png",
+                          "images/comercios/farmacia/novidade_biofarma/2.png",     
+                          "images/comercios/farmacia/novidade_biofarma/3.png",
+                          "images/comercios/farmacia/novidade_biofarma/4.png",
+                      ], 
+                  
+
+
                 },
             ],
         
@@ -1279,11 +1303,6 @@ document.addEventListener("DOMContentLoaded", function () {
         },
 
         
-  
-       
-    
-        
-
         {
             link: document.querySelector("#menuBorracharia"),  
             title: "Borracharia",
