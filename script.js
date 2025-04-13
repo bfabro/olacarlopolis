@@ -1060,12 +1060,13 @@ document.addEventListener("DOMContentLoaded", function () {
           link: document.querySelector("#menuMontadorMoveis"),
           title: "Montador de Moveis",
           establishments: [
-              {                  
+              {      
+                image:"images/servicos/montadorMoveis/hiran/hiran.png",                                          
                   name: "Hiran Castro",
                   contact: "(43) 99174-4396",
                   novidadesImages: [               
-                    "images/servicos/montadorMoveis/novidades/1.png",
-                    "images/servicos/montadorMoveis/novidades/2.png",
+                    "images/servicos/montadorMoveis/hiran/novidades/1.png",
+                    "images/servicos/montadorMoveis/hiran/novidades/2.png",
                 ], 
               },
             
