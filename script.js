@@ -73,6 +73,9 @@ document.addEventListener("DOMContentLoaded", function () {
       portal:"s",
       neia:"s",
       sabordaroça:"s",
+
+      // sorveteria
+      limone:"s",
   
       //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
   
@@ -84,7 +87,9 @@ document.addEventListener("DOMContentLoaded", function () {
       piodoanuncio: "s",
   
       // churrasqueiro
+      flaviochurrasqueiro:"s",
       pituka: "s",
+
   
       //diarista
       rose: "s",
@@ -598,12 +603,34 @@ document.addEventListener("DOMContentLoaded", function () {
                     facebook: "www.facebook.com/uahh",
                     instagram: "www.instagram.com/uahh",
                     menuImages: [
-                    // Agora é um array de imagens
+                 
                      "images/comercios/pesqueiro/cardapio_aguamarine.jpg",
                     ],                    
                 },
             ],
         },
+
+
+        {
+          link: document.querySelector("#menuSorveteria"),
+          title: "Sorveteria",
+          establishments: [
+              {
+                  image: "images/comercios/sorveteria/limone/limone.png",
+                  name: "Limone",
+                  hours: "</br>Seg - Dom: 13:00 - 22h",
+                  address: "<br>Rua Benedito Salles n° 619",
+                  contact: "</br>(43) 99922-8336",
+                  delivery: "</br>Sim / Com Taxa",
+                  facebook: "#",
+                  instagram: "https://www.instagram.com/limone.sorvetes/?hl=pt",
+                  novidadesImages: [              
+                   "images/comercios/sorveteria/limone/divulgacao/1.png",
+                   "images/comercios/sorveteria/limone/divulgacao/2.png",
+                  ],                    
+              },
+          ],
+      },
 
 
 
@@ -652,17 +679,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   ],
               },
 
-
-
-
-
-
-
             ],
         },
-
-
-
 
 
 
@@ -1009,8 +1027,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
 
                 {
-                    name: "Gustavo",
-                    contact: "(43) 8901-2345",
+                  image: "images/servicos/churrasqueiro/flavio/flavio.png",
+                    name: "Flavio Churrasqueiro",
+                    contact: "(43) 99906-1349",
+                    instagram:"https://www.instagram.com/donascimentoflaviogiovani/",
+                    novidadesImages: [               
+                      "images/servicos/churrasqueiro/flavio/divulgacao/1.png",
+                      "images/servicos/churrasqueiro/flavio/divulgacao/2.png",
+                     
+                  ], 
+                    
                 },
             ],
         },
@@ -1949,20 +1975,10 @@ function restaurarMenuOriginal() {
             }
 
 
-
             
           </div>
       </br>
   
-
-
-
-
-
-
-
-
-
 
   <div class="button-container">
           ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
