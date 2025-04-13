@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const statusEstabelecimentos = {
       // COMERCIOS:
 
+      //academia
+      lobofitness:"s",
+
       //AÇAI
       turminhadoaçai:"s",
 
@@ -257,55 +260,45 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebar.appendChild(closeButton);
   
     // Quando um item do menu for clicado, fecha o menu automaticamente
-    menuLinks.forEach((link) => {
-      link.addEventListener("click", function () {
-        // Se for um item de submenu (ex: serviços), só abre/fecha
-        if (this.classList.contains("submenu_item")) {
-          const submenu = this.nextElementSibling;
-          const isOpen = this.classList.contains("show_submenu");
-    
-          // Fecha todos
-          document.querySelectorAll(".submenu_item").forEach(i => i.classList.remove("show_submenu"));
-          document.querySelectorAll(".submenu").forEach(s => s.style.display = "none");
-    
-          if (!isOpen && submenu) {
-            this.classList.add("show_submenu");
-            submenu.style.display = "block";
-          }
-    
-          return; // não segue o restante
-        }
-    
-        // Clique em item normal (carrega conteúdo)
-        sidebar.classList.remove("open");
-        overlay.classList.remove("active");
-    
-        // Limpa submenu visualmente
-        document.querySelectorAll(".submenu_item").forEach(item => {
-          item.classList.remove("show_submenu");
-        });
-    
-        // Limpa pesquisa e restaura visual do menu
-        if (searchInput && clearSearch) {
-          searchInput.value = "";
-          clearSearch.style.display = "none";
-        }
-    
-        // Mostra todos os itens e títulos
-        document.querySelectorAll(".menu_items > li").forEach(item => {
-          item.style.display = "block";
-          item.querySelectorAll(".nav_link").forEach(link => link.style.display = "flex");
-    
-          const submenu = item.querySelector(".submenu");
-          if (submenu) submenu.style.display = "none";
-        });
-    
-        document.querySelectorAll(".menu_title").forEach(title => {
-          title.style.display = "block";
-        });
+    document.addEventListener("DOMContentLoaded", function () {
+      // Seleciona todos os itens com submenu
+      const submenuItems = document.querySelectorAll('.submenu_item');
+  
+      submenuItems.forEach(item => {
+          item.addEventListener('click', function (e) {
+              e.preventDefault(); // Impede a navegação padrão
+  
+              // Verifica o submenu relacionado ao item clicado
+              const submenu = this.nextElementSibling;
+  
+              // Alterna entre expandir e retrair o submenu
+              if (submenu.style.display === 'block') {
+                  // Se o submenu estiver aberto, fecha-o
+                  submenu.style.display = 'none';
+                  this.classList.remove('show_submenu');
+              } else {
+                  // Se o submenu estiver fechado, abre-o
+                  submenu.style.display = 'block';
+                  this.classList.add('show_submenu');
+              }
+          });
       });
-    });
+  });
+  
     
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
     
     
     
@@ -402,6 +395,35 @@ document.addEventListener("DOMContentLoaded", function () {
                         },
                     ],
                 },
+
+                {
+                  link: document.querySelector("#menuAcademia"),  
+                  title: "Academia",
+                  establishments: [
+                      {
+                          image: "images/comercios/academia/lobofitness/lobofitness.png",
+                                  
+                          name: "Lobo Fitness",
+                          hours: "seg a Qui:06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
+                          address: "R. Delfino Mendes, 264 - Centro",
+                          contact: "(43) 99112-1009",                          
+                          facebook: "#",
+                          instagram: "https://www.instagram.com/academialobocarlopolis/",
+                          novidadesImages: [ 
+                          "images/comercios/academia/lobofitness/divulgacao/1.png",
+                          "images/comercios/academia/lobofitness/divulgacao/2.png",
+                          ],
+                      },
+                  ],
+              },
+
+
+
+
+
+
+
+
 
                 {
                     link: document.querySelector("#menuAcougue"),  
@@ -1808,7 +1830,62 @@ document.addEventListener("DOMContentLoaded", function () {
     title.style.display = "block";
   });
   resetarMenuLateral();
+  
 });
+
+
+
+
+
+
+function resetarMenuLateral() {
+  // Restaura os submenus para o estado fechado
+  document.querySelectorAll(".submenu_item").forEach(item => {
+      item.classList.remove("show_submenu");
+      const submenu = item.nextElementSibling;
+      if (submenu) submenu.style.display = "none"; // Garante que o submenu esteja fechado
+  });
+
+  // Restaura todos os itens do menu ao estado visível
+  document.querySelectorAll(".menu_items > li").forEach(item => {
+      item.style.display = "block"; // Garante que todos os itens do menu sejam visíveis
+  });
+
+  // Restaura os eventos de clique para os itens pai
+  document.querySelectorAll('.submenu_item').forEach(item => {
+      // Remover event listeners antigos, se houver
+      item.removeEventListener('click', handleSubmenuClick);
+
+      // Adiciona um novo event listener
+      item.addEventListener('click', handleSubmenuClick);
+  });
+}
+
+// Função que alterna o estado de visibilidade do submenu
+function handleSubmenuClick(e) {
+  e.preventDefault(); // Impede a navegação padrão
+
+  // Verifica o submenu relacionado ao item clicado
+  const submenu = this.nextElementSibling;
+
+  // Alterna entre expandir e retrair o submenu
+  if (submenu.style.display === 'block') {
+      // Se o submenu estiver aberto, fecha-o
+      submenu.style.display = 'none';
+      this.classList.remove('show_submenu');
+  } else {
+      // Se o submenu estiver fechado, abre-o
+      submenu.style.display = 'block';
+      this.classList.add('show_submenu');
+  }
+}
+
+
+
+
+
+
+
 
 
     // Função para restaurar o menu ao estado original
