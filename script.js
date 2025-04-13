@@ -1967,7 +1967,7 @@ function restaurarMenuOriginal() {
   <div class="button-container">
           ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
             <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}">
-              Novidades (${establishment.novidadesImages.length})
+              Divulgação (${establishment.novidadesImages.length})
             </button>
           ` : ''}
           

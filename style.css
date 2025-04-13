@@ -1334,3 +1334,26 @@ img {
   max-width: 80%;
   word-wrap: break-word; /* Garante que o texto quebre corretamente, se for muito longo */
 }
+
+
+.botao-real {
+  background-color: #2e7d32; /* verde escuro */
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.3s ease;
+}
+
+.botao-real:hover {
+  background-color: #27632a; /* tom mais escuro ao passar o mouse */
+  transform: scale(1.03); /* leve aumento */
+}
+
+.botao-real:active {
+  transform: scale(0.98); /* efeito de clique */
+}
