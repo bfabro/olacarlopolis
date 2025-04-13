@@ -451,8 +451,8 @@ document.addEventListener("DOMContentLoaded", function () {
                           image: "images/comercios/academia/lobofitness/lobofitness.png",
                                   
                           name: "Lobo Fitness",
-                          hours: "seg a Qui:06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
-                          address: "R. Delfino Mendes, 264 - Centro",
+                          hours: "<br>seg a Qui:06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
+                          address: "<br>R. Delfino Mendes, 264 - Centro",
                           contact: "(43) 99112-1009",                          
                           facebook: "#",
                           instagram: "https://www.instagram.com/academialobocarlopolis/",
