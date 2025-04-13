@@ -254,14 +254,21 @@ document.addEventListener("DOMContentLoaded", function () {
     // Quando um item do menu for clicado, fecha o menu automaticamente
     menuLinks.forEach((link) => {
       link.addEventListener("click", function () {
-        // Verifica se o item do menu tem a classe "submenu_item"
         if (!this.classList.contains("submenu_item")) {
-          // Se for um link válido (não um menu pai), fecha o menu
+          // Fecha o menu lateral
           sidebar.classList.remove("open");
           overlay.classList.remove("active");
+    
+          // Limpa campo de busca
+          searchInput.value = "";
+          clearSearch.style.display = "none";
+    
+          // Força o menu a voltar completo na próxima vez
+          searchInput.dispatchEvent(new Event("input"));
         }
       });
     });
+    
   
     document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("content_area").classList.remove("hidden");
@@ -1603,152 +1610,65 @@ document.addEventListener("DOMContentLoaded", function () {
   
   
     searchInput.addEventListener("input", function () {
-      const filter = searchInput.value.toLowerCase();
-      let foundInMenu = false;
-      let foundInEstablishments = false;
-  
-      // Se o campo de pesquisa estiver vazio, mostrar todos os itens do menu novamente
-      if (filter === "") {
-        document
-          .querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item")
-          .forEach((item) => {
-            item.style.display = "flex";
-          });
-  
-        // Garante que o menu lateral expanda completamente
-        sidebar.style.height = "auto";
-        return;
-      }
-  
-      // Pesquisar dentro do menu lateral
-      document.querySelectorAll(".menu_items .nav_link, .menu_items .submenu_item").forEach((item) => {
-          const text = item.textContent.toLowerCase();
-          if (text.includes(filter)) {
-            item.style.display = "flex";
-            foundInMenu = true;
+      const filter = searchInput.value.toLowerCase().trim();
+      const allItems = document.querySelectorAll(".menu_items .item");
+    
+      allItems.forEach((item) => {
+        const navLinks = item.querySelectorAll(".nav_link");
+        let showItem = false;
+    
+        navLinks.forEach((link) => {
+          const text = link.textContent.toLowerCase();
+          if (filter === "" || text.includes(filter)) {
+            link.style.display = "flex";
+            showItem = true;
           } else {
-            item.style.display = "none";
+            link.style.display = "none";
           }
-      });
-  
-      // Pesquisar dentro das categorias e carregar o conteúdo correspondente
-      categories.forEach((category) => {
-        category.establishments.forEach((establishment) => {
-
-          const nome = document.createElement("h3");
-          nome.textContent = establishment.name;
-          contentArea.appendChild(nome);
-
-          // outras informações do estabelecimento (endereço, horário, etc.)
-
-          const areaNovidades = document.createElement("div");
-          const areaCardapio = document.createElement("div");
-          areaNovidades.classList.add("hidden");
-          areaCardapio.classList.add("hidden");
-          contentArea.appendChild(areaNovidades);
-          contentArea.appendChild(areaCardapio);
-
-          if (establishment.novidadesImages && establishment.novidadesImages.length > 0) {
-            const btnNovidades = document.createElement("button");
-            btnNovidades.textContent = "Novidades";
-            btnNovidades.className = "menu-btn";
-            contentArea.appendChild(btnNovidades);
-
-            btnNovidades.addEventListener("click", () => {
-              areaCardapio.classList.add("hidden");
-              areaNovidades.classList.remove("hidden");
-              areaNovidades.innerHTML = ""; // Limpar conteúdo anterior
-              
-              establishment.novidadesImages.forEach((imgSrc, index) => {
-                const imgContainer = document.createElement("div"); // Container para a imagem e descrição
-                imgContainer.classList.add("img-container");
-                const img = document.createElement("img");
-                img.src = imgSrc;
-                img.className = "content_image";
-                // Adicionar a descrição da imagem
-                const description = document.createElement("p");
-                description.classList.add("image-description");
-                // Verificar se existe uma descrição para esta imagem e, se não, usar "Sem descrição"
-                description.textContent = establishment.novidadesDescriptions[index] || "Sem descrição";
-                // Adicionar a imagem e a descrição ao container
-                imgContainer.appendChild(img);
-                imgContainer.appendChild(description);
-                // Adicionar o container ao elemento de novidades
-                areaNovidades.appendChild(imgContainer);
-              });
-            });
-          }
-
-          if (establishment.menuImages && establishment.menuImages.length > 0) {
-            const btnCardapio = document.createElement("button");
-            btnCardapio.textContent = "Cardápio";
-            btnCardapio.className = "menu-btn";
-            contentArea.appendChild(btnCardapio);
-
-            btnCardapio.addEventListener("click", () => {
-              areaNovidades.classList.add("hidden");
-              areaCardapio.classList.remove("hidden");
-              areaCardapio.innerHTML = "";
-              establishment.menuImages.forEach(imgSrc => {
-                const img = document.createElement("img");
-                img.src = imgSrc;
-                img.className = "content_image";
-                areaCardapio.appendChild(img);
-              });
-            });
-         }
-
-
-          const dataString = Object.values(establishment).join(" ").toLowerCase();
-
-          if (dataString.includes(filter)) {
-            foundInEstablishments = true;
-
-            // Carrega automaticamente a categoria correspondente
-            loadContent(category.title, category.establishments);
-
-            // Simula um clique no menu correspondente
-            if (category.link) {
-              category.link.classList.add("active");
-            }
-
-            // Expande a sidebar se estiver fechada
-            if (sidebar.classList.contains("close")) {
-              sidebar.classList.remove("close");
-            }
-          }
-          
         });
-
-        if (!foundInMenu && !foundInEstablishments) {
-          contentArea.innerHTML = "<h2>Nenhum resultado encontrado!</h2>";
+    
+        const submenu = item.querySelector(".submenu");
+        const submenuItem = item.querySelector(".submenu_item");
+    
+        // Exibe ou oculta item pai com base nos filhos visíveis
+        if (submenu) {
+          const visibleSublinks = item.querySelectorAll(".sublink");
+          const hasVisible = Array.from(visibleSublinks).some(
+            (sublink) => sublink.style.display !== "none"
+          );
+    
+          submenu.style.display = hasVisible ? "block" : "none";
+          if (submenuItem) {
+            submenuItem.classList.toggle("show_submenu", hasVisible);
+          }
+    
+          item.style.display = hasVisible ? "block" : "none";
+        } else {
+          item.style.display = showItem ? "block" : "none";
         }
-
       });
-
-      // Se nenhum resultado for encontrado, exibe uma mensagem
-     
     });
+    
+    
+    
+    
+    
 
     
-      // Limpar o campo ao clicar no "X"
+     
+
+    if (searchInput && clearSearch) {
+      searchInput.addEventListener("input", function () {
+        clearSearch.style.display = searchInput.value.length > 0 ? "block" : "none";
+      });
+    
       clearSearch.addEventListener("click", function () {
         searchInput.value = "";
-        clearSearch.style.display = "none";         
-        searchInput.dispatchEvent(new Event("input"));// Dispara um evento de input para garantir que a pesquisa seja resetada
-      });
-
-       ///////////
-     if (searchInput && clearSearch) {
-      // Mostrar ou esconder o botão X ao digitar
-      searchInput.addEventListener("input", function () {
-        if (searchInput.value.trim() !== "") {
-          clearSearch.style.display = "block";
-        } else {
-          clearSearch.style.display = "none";
-        }
+        clearSearch.style.display = "none";
+        searchInput.dispatchEvent(new Event("input")); // força reprocessamento
       });
     }
+    
   
     // Função para carregar conteúdo
     function loadContent(title, establishments) {
