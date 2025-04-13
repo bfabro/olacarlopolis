@@ -254,20 +254,98 @@ document.addEventListener("DOMContentLoaded", function () {
     // Quando um item do menu for clicado, fecha o menu automaticamente
     menuLinks.forEach((link) => {
       link.addEventListener("click", function () {
-        if (!this.classList.contains("submenu_item")) {
-          // Fecha o menu lateral
-          sidebar.classList.remove("open");
-          overlay.classList.remove("active");
+        // Se for um item de submenu (ex: serviços), só abre/fecha
+        if (this.classList.contains("submenu_item")) {
+          const submenu = this.nextElementSibling;
+          const isOpen = this.classList.contains("show_submenu");
     
-          // Limpa campo de busca
+          // Fecha todos
+          document.querySelectorAll(".submenu_item").forEach(i => i.classList.remove("show_submenu"));
+          document.querySelectorAll(".submenu").forEach(s => s.style.display = "none");
+    
+          if (!isOpen && submenu) {
+            this.classList.add("show_submenu");
+            submenu.style.display = "block";
+          }
+    
+          return; // não segue o restante
+        }
+    
+        // Clique em item normal (carrega conteúdo)
+        sidebar.classList.remove("open");
+        overlay.classList.remove("active");
+    
+        // Limpa submenu visualmente
+        document.querySelectorAll(".submenu_item").forEach(item => {
+          item.classList.remove("show_submenu");
+        });
+    
+        // Limpa pesquisa e restaura visual do menu
+        if (searchInput && clearSearch) {
           searchInput.value = "";
           clearSearch.style.display = "none";
-    
-          // Força o menu a voltar completo na próxima vez
-          searchInput.dispatchEvent(new Event("input"));
         }
+    
+        // Mostra todos os itens e títulos
+        document.querySelectorAll(".menu_items > li").forEach(item => {
+          item.style.display = "block";
+          item.querySelectorAll(".nav_link").forEach(link => link.style.display = "flex");
+    
+          const submenu = item.querySelector(".submenu");
+          if (submenu) submenu.style.display = "none";
+        });
+    
+        document.querySelectorAll(".menu_title").forEach(title => {
+          title.style.display = "block";
+        });
       });
     });
+    
+    
+    
+    
+    
+
+    function resetarMenuLateral() {
+      // Restaura visual
+      document.querySelectorAll(".menu_items > li").forEach(item => {
+        item.style.display = "block";
+    
+        const links = item.querySelectorAll(".nav_link");
+        links.forEach(link => {
+          link.style.display = "flex";
+        });
+    
+        const submenu = item.querySelector(".submenu");
+        if (submenu) submenu.style.display = "none";
+    
+        const submenuItem = item.querySelector(".submenu_item");
+        if (submenuItem) submenuItem.classList.remove("show_submenu");
+      });
+    
+      // Mostra todos os títulos
+      document.querySelectorAll(".menu_title").forEach(title => {
+        title.style.display = "block";
+      });
+    
+      // Reanexa eventos dos submenus
+      document.querySelectorAll(".submenu_item").forEach(item => {
+        item.onclick = function () {
+          const submenu = this.nextElementSibling;
+          const isOpen = this.classList.contains("show_submenu");
+    
+          document.querySelectorAll(".submenu_item").forEach(i => i.classList.remove("show_submenu"));
+          document.querySelectorAll(".submenu").forEach(s => s.style.display = "none");
+    
+          if (!isOpen && submenu) {
+            this.classList.add("show_submenu");
+            submenu.style.display = "block";
+          }
+        };
+      });
+    }
+    
+
     
   
     document.addEventListener("DOMContentLoaded", function () {
@@ -1662,11 +1740,74 @@ document.addEventListener("DOMContentLoaded", function () {
         clearSearch.style.display = searchInput.value.length > 0 ? "block" : "none";
       });
     
-      clearSearch.addEventListener("click", function () {
-        searchInput.value = "";
-        clearSearch.style.display = "none";
-        searchInput.dispatchEvent(new Event("input")); // força reprocessamento
-      });
+
+
+
+
+
+
+
+
+
+
+      clearSearch.addEventListener("click", function() {
+  searchInput.value = "";
+  clearSearch.style.display = "none";
+    restaurarMenuOriginal(); // <- volta ao estado padrão
+  
+  // Mostrar todos os itens e resetar o estado
+  const allItems = document.querySelectorAll(".menu_items > li");
+  allItems.forEach(item => {
+    item.style.display = "block";
+    
+    const links = item.querySelectorAll(".nav_link");
+    links.forEach(link => {
+      link.style.display = "flex";
+    });
+    
+    // Resetar submenus
+    const submenu = item.querySelector(".submenu");
+    if (submenu) {
+      submenu.style.display = "none";
+    }
+    
+    const submenuItem = item.querySelector(".submenu_item");
+    if (submenuItem) {
+      submenuItem.classList.remove("show_submenu");
+    }
+  });
+  
+  // Mostrar todos os títulos
+  document.querySelectorAll(".menu_title").forEach(title => {
+    title.style.display = "block";
+  });
+  resetarMenuLateral();
+});
+
+
+    // Função para restaurar o menu ao estado original
+function restaurarMenuOriginal() {
+  document.querySelectorAll(".item").forEach((item) => {
+    item.style.display = "block";
+  });
+  document.querySelectorAll(".submenu_item").forEach(item => {
+    item.classList.remove("show_submenu");
+  });
+  document.querySelectorAll(".submenu").forEach(sub => {
+    sub.style.display = "none";
+  });
+}
+
+      
+
+      
+   
+
+
+
+
+
+      
     }
     
   
