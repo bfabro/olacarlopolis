@@ -260,31 +260,37 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebar.appendChild(closeButton);
   
     // Quando um item do menu for clicado, fecha o menu automaticamente
+    // Quando um item do menu for clicado, fecha o menu automaticamente
     menuLinks.forEach((link) => {
       link.addEventListener("click", function (e) {
         // CATEGORIA PAI - com submenu
         if (this.classList.contains("submenu_item")) {
-          e.preventDefault(); // Impede qualquer navegação padrão, se houver
-    
+          e.preventDefault();
+        
           const submenu = this.nextElementSibling;
           const isOpen = this.classList.contains("show_submenu");
-    
+        
           if (isOpen) {
-            // Fecha submenu
+            // Estava aberto → fecha só este submenu
             this.classList.remove("show_submenu");
             if (submenu) submenu.style.display = "none";
           } else {
-            // Fecha todos os outros submenus
+            // Fecha todos os outros
             document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
             document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
-    
-            // Abre submenu clicado
+        
+            // Abre este submenu
             this.classList.add("show_submenu");
             if (submenu) submenu.style.display = "block";
           }
-    
-          return; // Não continua para evitar fechar o menu lateral
+        
+          return;
         }
+        
+        
+        
+        
+        
     
         // CATEGORIA COMUM - sem submenu (carrega conteúdo)
         sidebar.classList.remove("open");
@@ -311,6 +317,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
     });
+    
+
     
     
     
@@ -352,21 +360,34 @@ document.addEventListener("DOMContentLoaded", function () {
         title.style.display = "block";
       });
     
+
+
+
       // Reanexa eventos dos submenus
-      document.querySelectorAll(".submenu_item").forEach(item => {
-        item.onclick = function () {
-          const submenu = this.nextElementSibling;
-          const isOpen = this.classList.contains("show_submenu");
-    
-          document.querySelectorAll(".submenu_item").forEach(i => i.classList.remove("show_submenu"));
-          document.querySelectorAll(".submenu").forEach(s => s.style.display = "none");
-    
-          if (!isOpen && submenu) {
-            this.classList.add("show_submenu");
-            submenu.style.display = "block";
-          }
-        };
-      });
+    document.querySelectorAll(".submenu_item").forEach(item => {
+  item.onclick = function () {
+    const submenu = this.nextElementSibling;
+    const isOpen = this.classList.contains("show_submenu");
+
+    // Fecha todos os outros
+    document.querySelectorAll(".submenu_item").forEach(i => i.classList.remove("show_submenu"));
+    document.querySelectorAll(".submenu").forEach(s => s.style.display = "none");
+
+    // Se já estiver aberto, recolhe. Se não estiver, expande
+    if (!isOpen && submenu) {
+      this.classList.add("show_submenu");
+      submenu.style.display = "block";
+    } else if (isOpen && submenu) {
+      this.classList.remove("show_submenu");
+      submenu.style.display = "none";
+    }
+  };
+});
+
+
+
+
+
     }
     
 
