@@ -1316,3 +1316,21 @@ img {
   background-color: #FF8C00; /* Cor laranja */
   border-radius: 2px;
 }
+
+
+
+/* Container da imagem */
+.img-container {
+  display: inline-block;
+  text-align: center; /* Alinha a imagem e o texto ao centro */
+  margin: 10px;
+}
+
+/* Descrição da imagem */
+.image-description {
+  font-size: 14px;
+  color: #333;
+  margin-top: 5px; /* Adiciona um espaço entre a imagem e a descrição */
+  max-width: 80%;
+  word-wrap: break-word; /* Garante que o texto quebre corretamente, se for muito longo */
+}
