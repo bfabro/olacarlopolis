@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
       obarateiro: "s", // O Barateiro pagou
       kelve: "s", // Kelve não pagou
       rocha: "s", // Rocha pagou
+      zerojapan:"s",
   
       // pesqueiro
       peskepagueaguamarine: "s",
@@ -263,65 +264,67 @@ document.addEventListener("DOMContentLoaded", function () {
     // Quando um item do menu for clicado, fecha o menu automaticamente
     menuLinks.forEach((link) => {
       link.addEventListener("click", function (e) {
-        // CATEGORIA PAI - com submenu
-        if (this.classList.contains("submenu_item")) {
+        const isPai = this.classList.contains("submenu_item");
+        const submenu = this.nextElementSibling;
+    
+        if (isPai) {
           e.preventDefault();
-        
-          const submenu = this.nextElementSibling;
+    
           const isOpen = this.classList.contains("show_submenu");
-        
-          if (isOpen) {
-            // Estava aberto → fecha só este submenu
-            this.classList.remove("show_submenu");
-            if (submenu) submenu.style.display = "none";
-          } else {
-            // Fecha todos os outros
-            document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
-            document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
-        
-            // Abre este submenu
+    
+          // Fecha todos os submenus
+          document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
+          document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
+    
+          if (!isOpen) {
             this.classList.add("show_submenu");
             if (submenu) submenu.style.display = "block";
+          } else {
+            // Se clicou num pai já aberto → fechar tudo e restaurar
+            restaurarMenuOriginal();
           }
-        
+    
           return;
         }
-        
-        
-        
-        
-        
     
-        // CATEGORIA COMUM - sem submenu (carrega conteúdo)
+        // Se for subitem normal
         sidebar.classList.remove("open");
         overlay.classList.remove("active");
     
-        document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
-        document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
+        // Restaura visual completo
+        restaurarMenuOriginal();
     
         if (searchInput && clearSearch) {
           searchInput.value = "";
           clearSearch.style.display = "none";
         }
-    
-        document.querySelectorAll(".menu_items > li").forEach(item => {
-          item.style.display = "block";
-          item.querySelectorAll(".nav_link").forEach(link => link.style.display = "flex");
-    
-          const submenu = item.querySelector(".submenu");
-          if (submenu) submenu.style.display = "none";
-        });
-    
-        document.querySelectorAll(".menu_title").forEach(title => {
-          title.style.display = "block";
-        });
       });
     });
+    
+    
     
 
     
     
     
+    function restaurarMenuOriginal() {
+      document.querySelectorAll(".menu_items > li").forEach(item => {
+        item.style.display = "block";
+    
+        const links = item.querySelectorAll(".nav_link");
+        links.forEach(link => link.style.display = "flex");
+    
+        const submenu = item.querySelector(".submenu");
+        if (submenu) submenu.style.display = "none";
+    
+        const submenuItem = item.querySelector(".submenu_item");
+        if (submenuItem) submenuItem.classList.remove("show_submenu");
+      });
+    
+      document.querySelectorAll(".menu_title").forEach(title => {
+        title.style.display = "block";
+      });
+    }
     
 
 
@@ -377,7 +380,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!isOpen && submenu) {
       this.classList.add("show_submenu");
       submenu.style.display = "block";
-    } else if (isOpen && submenu) {
+    } else if (isOpen && submenu) { 
       this.classList.remove("show_submenu");
       submenu.style.display = "none";
     }
@@ -871,10 +874,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
     
                 {
+                  image: "images/comercios/supermercado/zerojapan.png",
                     name: "Zero Japan",
-                    address: "<br>PR-218, 1168 ",
-                    hours: "</br>Seg a Sex 8h - 21h </br> dom: 07 - 12h",
-                    contact: "</br>(43) 3456-7890",
+                    address: "<br>Rua Doutora Paula e Silva, 445 ",
+                    hours: "</br>Seg a Seg 8h - 20h ",
+                    contact: "</br>(43) 3142-2005",
                     delivery: "</br>Sim / Sem Taxa",
                 },
             ],
