@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
       // churrasqueiro
       flaviochurrasqueiro:"s",
-      pituka: "s",
+      pituca: "s",
 
   
       //diarista
@@ -1153,6 +1153,13 @@ menuLinks.forEach((link) => {
                   ], 
                     
                 },
+
+                {
+                  image: "images/servicos/churrasqueiro/pituka/pituka.png",
+                name: "Pituca",
+                contact: "(43) 99984-5074",
+                instagram:"https://www.instagram.com/pituca.abilio/",
+                },
             ],
         },
   
@@ -1229,12 +1236,7 @@ menuLinks.forEach((link) => {
                     facebook:"https://www.facebook.com/fabio.katsumisuguimoto/",
                 },
 
-                {
-                  image: "images/servicos/guiapesca/pituka/pituka.png",
-                name: "Pituka",
-                contact: "(43) 99984-5074",
-                instagram:"https://www.instagram.com/pituca.abilio/",
-                },
+                
                 {
                     name: "Thiago Aguera",
                     contact: "(43) 8901-2345",
