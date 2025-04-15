@@ -827,6 +827,20 @@ menuLinks.forEach((link) => {
                     delivery: "</br>Sim / Com Taxa",
                     facebook: "https://www.facebook.com/p/Supermercado-Carreiro-100066342918723/?locale=pt_BR",
                     instagram: "https://www.instagram.com/mercadocarreiroclps/",
+                    novidadesImages: [               
+                      "images/comercios/supermercado/carreiro/divulgacao/1.png",
+                     "images/comercios/supermercado/carreiro/divulgacao/2.png",    
+                      "images/comercios/supermercado/carreiro/divulgacao/3.png",
+                      "images/comercios/supermercado/carreiro/divulgacao/4.png",
+                      "images/comercios/supermercado/carreiro/divulgacao/5.png",
+                  ], 
+                  novidadesDescriptions: [                            
+                    "Nosso Horti Fruti",
+                    "Carnes Frescas toda quinta!",
+                    "Paozinho Frances a partir das 8hrs",
+                    "Chocolates Importados" ,
+                    "Area de Promoçoes de <br> Leite Condensado!",
+                  ],
                 },
                 {
                     image: "images/comercios/supermercado/obarateiro.png",
@@ -1836,7 +1850,32 @@ menuLinks.forEach((link) => {
     
     
     
+    ////////////////////////////////////////////////
+    ///////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
     
+
+
+
+
+
+
+
+
+
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
     
 
     
@@ -2168,6 +2207,8 @@ function restaurarMenuOriginal() {
       }
     }
   }
+  
+
   
   // Função para fechar todos os conteúdos
   function closeAllContents() {
