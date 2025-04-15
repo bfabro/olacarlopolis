@@ -262,59 +262,67 @@ document.addEventListener("DOMContentLoaded", function () {
   
     // Quando um item do menu for clicado, fecha o menu automaticamente
     // Quando um item do menu for clicado, fecha o menu automaticamente
-    menuLinks.forEach((link) => {
-      link.addEventListener("click", function (e) {
-        // CATEGORIA PAI - com submenu
-        if (this.classList.contains("submenu_item")) {
-          e.preventDefault();
-        
-          // Se já estiver aberto, ao clicar de novo, reseta tudo
-          if (this.classList.contains("show_submenu")) {
-            resetarMenuLateral(); // <- volta ao estado original do menu
-            return;
-          }
-        
-          // Fecha todos os submenus
-          document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
-          document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
-        
-          // Abre o submenu clicado
-          const submenu = this.nextElementSibling;
-          this.classList.add("show_submenu");
-          if (submenu) submenu.style.display = "block";
-        
-          return;
-        }
-        
-        
-        
-    
-        // CATEGORIA COMUM - sem submenu (carrega conteúdo)
-        sidebar.classList.remove("open");
-        overlay.classList.remove("active");
-    
+menuLinks.forEach((link) => {
+  link.addEventListener("click", function (e) {
+    const isParent = this.classList.contains("submenu_item");
+    const submenu = this.nextElementSibling;
+
+    if (isParent) {
+      e.preventDefault();
+
+      const isOpen = this.classList.contains("show_submenu");
+
+      // Se já estiver aberto, fecha tudo e mostra os grupos principais
+      if (isOpen) {
         document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
         document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
-    
-        if (searchInput && clearSearch) {
-          searchInput.value = "";
-          clearSearch.style.display = "none";
-        }
-    
+
+        // Restaurar todos os grupos principais
         document.querySelectorAll(".menu_items > li").forEach(item => {
           item.style.display = "block";
-          item.querySelectorAll(".nav_link").forEach(link => link.style.display = "flex");
-    
-          const submenu = item.querySelector(".submenu");
-          if (submenu) submenu.style.display = "none";
         });
-    
+
         document.querySelectorAll(".menu_title").forEach(title => {
           title.style.display = "block";
         });
-      });
+
+        return;
+      }
+
+      // Se não estiver aberto, fecha os outros e abre o atual
+      document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
+      document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
+
+      this.classList.add("show_submenu");
+      if (submenu) submenu.style.display = "block";
+
+      return;
+    }
+
+    // CATEGORIA COMUM - sem submenu (carrega conteúdo)
+    sidebar.classList.remove("open");
+    overlay.classList.remove("active");
+
+    document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
+    document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
+
+    if (searchInput && clearSearch) {
+      searchInput.value = "";
+      clearSearch.style.display = "none";
+    }
+
+    // Restaurar visual completo
+    document.querySelectorAll(".menu_items > li").forEach(item => {
+      item.style.display = "block";
+      item.querySelectorAll(".nav_link").forEach(link => link.style.display = "flex");
     });
-    
+
+    document.querySelectorAll(".menu_title").forEach(title => {
+      title.style.display = "block";
+    });
+  });
+});
+
 
     
     
@@ -2312,23 +2320,7 @@ function restaurarMenuOriginal() {
       darkLight.classList.toggle("bx-sun");
     });
   
-    // Alternar submenu
-    submenuItems.forEach((item) => {
-      item.addEventListener("click", (event) => {
-        event.stopPropagation(); // Evita que o clique feche a sidebar
-  
-        // Verifica se já está aberto
-        const isOpen = item.classList.contains("show_submenu");
-  
-        // Fecha todos os submenus antes de abrir o atual
-        submenuItems.forEach((i) => i.classList.remove("show_submenu"));
-  
-        // Se não estava aberto, abre novamente
-        if (!isOpen) {
-          item.classList.add("show_submenu");
-        }
-      });
-    });
+    
   
     // Adicionar eventos para os links do menu
     categories.forEach((category) => {
