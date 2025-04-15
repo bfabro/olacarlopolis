@@ -264,67 +264,61 @@ document.addEventListener("DOMContentLoaded", function () {
     // Quando um item do menu for clicado, fecha o menu automaticamente
     menuLinks.forEach((link) => {
       link.addEventListener("click", function (e) {
-        const isPai = this.classList.contains("submenu_item");
-        const submenu = this.nextElementSibling;
-    
-        if (isPai) {
+        // CATEGORIA PAI - com submenu
+        if (this.classList.contains("submenu_item")) {
           e.preventDefault();
-    
-          const isOpen = this.classList.contains("show_submenu");
-    
+        
+          // Se já estiver aberto, ao clicar de novo, reseta tudo
+          if (this.classList.contains("show_submenu")) {
+            resetarMenuLateral(); // <- volta ao estado original do menu
+            return;
+          }
+        
           // Fecha todos os submenus
           document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
           document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
-    
-          if (!isOpen) {
-            this.classList.add("show_submenu");
-            if (submenu) submenu.style.display = "block";
-          } else {
-            // Se clicou num pai já aberto → fechar tudo e restaurar
-            restaurarMenuOriginal();
-          }
-    
+        
+          // Abre o submenu clicado
+          const submenu = this.nextElementSibling;
+          this.classList.add("show_submenu");
+          if (submenu) submenu.style.display = "block";
+        
           return;
         }
+        
+        
+        
     
-        // Se for subitem normal
+        // CATEGORIA COMUM - sem submenu (carrega conteúdo)
         sidebar.classList.remove("open");
         overlay.classList.remove("active");
     
-        // Restaura visual completo
-        restaurarMenuOriginal();
+        document.querySelectorAll(".submenu_item").forEach(item => item.classList.remove("show_submenu"));
+        document.querySelectorAll(".submenu").forEach(sub => sub.style.display = "none");
     
         if (searchInput && clearSearch) {
           searchInput.value = "";
           clearSearch.style.display = "none";
         }
+    
+        document.querySelectorAll(".menu_items > li").forEach(item => {
+          item.style.display = "block";
+          item.querySelectorAll(".nav_link").forEach(link => link.style.display = "flex");
+    
+          const submenu = item.querySelector(".submenu");
+          if (submenu) submenu.style.display = "none";
+        });
+    
+        document.querySelectorAll(".menu_title").forEach(title => {
+          title.style.display = "block";
+        });
       });
     });
-    
-    
     
 
     
     
     
-    function restaurarMenuOriginal() {
-      document.querySelectorAll(".menu_items > li").forEach(item => {
-        item.style.display = "block";
-    
-        const links = item.querySelectorAll(".nav_link");
-        links.forEach(link => link.style.display = "flex");
-    
-        const submenu = item.querySelector(".submenu");
-        if (submenu) submenu.style.display = "none";
-    
-        const submenuItem = item.querySelector(".submenu_item");
-        if (submenuItem) submenuItem.classList.remove("show_submenu");
-      });
-    
-      document.querySelectorAll(".menu_title").forEach(title => {
-        title.style.display = "block";
-      });
-    }
     
 
 
@@ -380,7 +374,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!isOpen && submenu) {
       this.classList.add("show_submenu");
       submenu.style.display = "block";
-    } else if (isOpen && submenu) { 
+    } else if (isOpen && submenu) {
       this.classList.remove("show_submenu");
       submenu.style.display = "none";
     }
