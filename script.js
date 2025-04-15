@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
       //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
   
-      //// INICIO SERCIÇOS ////////////////////////////////////////////////////////////////////////////////////////////////
+      //// INICIO SERVIÇOS ////////////////////////////////////////////////////////////////////////////////////////////////
   
      
   
@@ -120,6 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
       //// FIM SERVIÇOS
   
       //// INICIO INFORMAÇOES UTEIS
+      asilo:"s",
       copel: "s",
       delegacia: "s",
       hospitalsãojose: "s",
@@ -1155,7 +1156,7 @@ menuLinks.forEach((link) => {
                 },
 
                 {
-                  image: "images/servicos/churrasqueiro/pituka/pituka.png",
+                image: "images/servicos/churrasqueiro/pituka/pituka.png",
                 name: "Pituca",
                 contact: "(43) 99984-5074",
                 instagram:"https://www.instagram.com/pituca.abilio/",
@@ -1506,6 +1507,21 @@ menuLinks.forEach((link) => {
                 },
             ],
         },
+
+
+        {
+          link: document.querySelector("#menuAsilo"),    
+          title: "Asilo",
+          establishments: [
+              {
+                  image: "images/info_uteis/asilo/asilo.png",
+                  name: "Asilo",
+                  hours: "<br>seg a sex: 9h - 12h",
+                  address: "<br>Rua Andrino Soares, 26",
+                  contact: "<br> 43 3566-1196",
+              },
+          ],
+      },
     
         {
             link: document.querySelector("#menuCopel"),    
