@@ -881,7 +881,7 @@ menuLinks.forEach((link) => {
                     address: "<br>Rua Doutora Paula e Silva, 445 ",
                     hours: "</br>Seg a Seg 8h - 20h ",
                     contact: "</br>(43) 3142-2005", // telefone fixo
-                    whatsapp: "43 99111-2222", // novo campo para o WhatsApp real
+                    whatsapp: "43 3142-2005", // novo campo para o WhatsApp real
                     delivery: "</br>Sim / Sem Taxa",
                 },
             ],
