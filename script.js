@@ -1139,10 +1139,7 @@ menuLinks.forEach((link) => {
             link: document.querySelector("#menuChurrasqueiro"),
             title: "Churrasqueiros ",
             establishments: [
-                {
-                name: "Pituka",
-                contact: "(43) 99984-5074",
-                },
+                
 
                 {
                   image: "images/servicos/churrasqueiro/flavio/flavio.png",
@@ -1230,6 +1227,13 @@ menuLinks.forEach((link) => {
                     contact: "(43) 99904-3894",
                     instagram: "https://www.instagram.com/suguimotofishing/",
                     facebook:"https://www.facebook.com/fabio.katsumisuguimoto/",
+                },
+
+                {
+                  image: "images/servicos/guiapesca/pituka/pituka.png",
+                name: "Pituka",
+                contact: "(43) 99984-5074",
+                instagram:"https://www.instagram.com/pituca.abilio/",
                 },
                 {
                     name: "Thiago Aguera",
