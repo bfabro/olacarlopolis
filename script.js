@@ -2004,19 +2004,21 @@ function restaurarMenuOriginal() {
           
            
             ${
-              establishment.contact
-                ? `
-            <a href="https://api.whatsapp.com/send?phone=${(establishment.whatsapp || establishment.contact)
-  .replace(/\D/g, "")
-  .padStart(13, "55")}&text=${encodeURIComponent(
-    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-)}" target="_blank" class="icon-link">
-  <i class='bx bxl-whatsapp' style="color: #25D366;"></i> WhatsApp
-</a>
-  
-            `
-                : ""
-            } 
+  establishment.contact
+    ? (() => {
+        const rawNumber = (establishment.whatsapp || establishment.contact || "").replace(/\D/g, "");
+        const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
+        return `
+          <a href="https://api.whatsapp.com/send?phone=${fullNumber}&text=${encodeURIComponent(
+            "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
+          )}" target="_blank" class="icon-link">
+            <i class='bx bxl-whatsapp' style="color: #25D366;"></i> WhatsApp
+          </a>
+        `;
+      })()
+    : ""
+}
+
   
             
   
