@@ -121,6 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
       //// INICIO INFORMAÇOES UTEIS
       asilo:"s",
+      agenciatrabalhador:"s",
       copel: "s",
       delegacia: "s",
       hospitalsãojose: "s",
@@ -1509,6 +1510,22 @@ menuLinks.forEach((link) => {
         },
 
 
+
+        {
+          link: document.querySelector("#menuAgenciaTrabalhador"),    
+          title: "Agencia Trabalhador",
+          establishments: [
+              {
+                  image: "images/info_uteis/agenciaTrabalhador/AgenciaTrabalhador.png",
+                  name: "Agencia Trabalhador",
+                  hours: "<br>seg a sex: 9h - 15h",
+                  address: "<br>Rua Padre Hugo 1025",
+                  contact: "<br> (43) 3566-1291",
+              },
+          ],
+        },
+
+
         {
           link: document.querySelector("#menuAsilo"),    
           title: "Asilo",
@@ -1521,7 +1538,7 @@ menuLinks.forEach((link) => {
                   contact: "<br> 43 3566-1196",
               },
           ],
-      },
+        },
     
         {
             link: document.querySelector("#menuCopel"),    
