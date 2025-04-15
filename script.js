@@ -436,7 +436,7 @@ menuLinks.forEach((link) => {
                             "images/comercios/acai/novidades/1.png",                                            
                             ],
                             novidadesDescriptions: [                            
-                              "Promoção especial de pães e bolos nesta semana!",
+                            "Marmita de Açai <br>Voce só encontra aqui!",
                           ],
                             menuImages: [                    
                                 "images/comercios/acai/cardapio/1.png",
@@ -2077,11 +2077,15 @@ function restaurarMenuOriginal() {
             ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
                 <div class="novidades-container swiper" id="novidades-${encodeURIComponent(establishment.name)}">
                     <div class="swiper-wrapper">
-                        ${establishment.novidadesImages.map((img, index) => `
-                        <div class="swiper-slide">
-                            <img src="${img}" alt="Novidades ${index + 1} de ${establishment.name}">
-                        </div>
-                        `).join('')}
+                       ${establishment.novidadesImages.map((img, index) => `
+  <div class="swiper-slide">
+    <img src="${img}" alt="Novidades ${index + 1} de ${establishment.name}">
+    ${establishment.novidadesDescriptions && establishment.novidadesDescriptions[index] ? `
+      <p class="novidade-descricao">${establishment.novidadesDescriptions[index]}</p>
+    ` : ""}
+  </div>
+`).join('')}
+
                     </div>
 
                     <div class="swiper-button-next"></div>

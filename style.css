@@ -1200,7 +1200,7 @@ img {
 
 .swiper-slide p {
   margin-top: 10px;
-  width: 80%;
+  width: 100%;
 }
 }
 
@@ -1356,4 +1356,13 @@ img {
 
 .botao-real:active {
   transform: scale(0.98); /* efeito de clique */
+}
+
+
+.novidade-descricao {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #333;
+  font-style: italic;
 }
