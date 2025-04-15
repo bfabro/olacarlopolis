@@ -843,7 +843,7 @@ menuLinks.forEach((link) => {
                     name: "Kelve",
                     address: "<br>R. Paul Harris,104",
                     hours: "</br>Seg a Sex 8h - 19:30h </br> dom: 08:30 - 12:30h",
-                    contact: "</br>(43) 99844-6105",
+                    contact: "<br>(43) 99844-6105",
                     delivery: "</br>Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
                     instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
@@ -880,7 +880,7 @@ menuLinks.forEach((link) => {
                     name: "Zero Japan",
                     address: "<br>Rua Doutora Paula e Silva, 445 ",
                     hours: "</br>Seg a Seg 8h - 20h ",
-                    contact: "4331422005", // telefone fixo
+                    contact: "<br>(43)31422005", // telefone fixo
                     whatsapp: "4331422005", // novo campo para o WhatsApp real
                     delivery: "</br>Sim / Sem Taxa",
                 },
