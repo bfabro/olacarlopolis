@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // sorveteria
       limone:"s",
+      santtinogelateria:"s",
   
       //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
   
@@ -703,6 +704,33 @@ menuLinks.forEach((link) => {
                    "images/comercios/sorveteria/limone/divulgacao/2.png",
                   ],                    
               },
+
+
+              {
+                image: "images/comercios/sorveteria/santino/santino.png",
+                name: "Santtino Gelateria",
+                hours: "</br>Dom - Sex: 13:00 - 22h<br>Sab 13h - 23h",
+                address: "<br>R. Kalil Keder, 583 - Centro",
+                contact: "</br>(43) 99971-3535",
+                delivery: "</br>Sim / Sem Taxa",
+                facebook: "https://www.facebook.com/santtinogelateria/?locale=pt_BR",
+                instagram: "https://www.instagram.com/santtinogelateria/",
+                novidadesImages: [              
+                 "images/comercios/sorveteria/santino/divulgacao/1.png",
+                 "images/comercios/sorveteria/santino/divulgacao/2.png",
+                ],     
+                novidadesDescriptions: [                            
+                  "Nossa Barca",
+                  "Açai e Fruta!",
+              
+                ],               
+            },
+
+
+
+
+
+
           ],
       },
 
