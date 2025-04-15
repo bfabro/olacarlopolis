@@ -2005,7 +2005,7 @@ function restaurarMenuOriginal() {
             ${
               establishment.contact
                 ? `
-            <a href="https://api.whatsapp.com/send?phone=${establishment.contact
+            <a href="https://api.whatsapp.com/send?phone=${(establishment.whatsapp || establishment.contact)
   .replace(/\D/g, "")
   .padStart(13, "55")}&text=${encodeURIComponent(
     "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
