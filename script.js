@@ -1382,8 +1382,7 @@ menuLinks.forEach((link) => {
                     address: "<br>Rua Benedito Salles, 951",
                     contact: "</br>(43) 99956-8938",
                     plantaoHorario: "</br>Das 8h às 21h </br> De 12/04 a 18/04",                   
-                    delivery: "</br>Sim / Sem Taxa", 
-                    
+                    delivery: "</br>Sim / Sem Taxa",                     
                       facebook:
                       "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
                       instagram: "https://www.instagram.com/saudefarmacarlopolis/",                     
@@ -1393,6 +1392,12 @@ menuLinks.forEach((link) => {
                           "images/comercios/farmacia/novidade_biofarma/3.png",
                           "images/comercios/farmacia/novidade_biofarma/4.png",
                       ], 
+                      novidadesDescriptions: [                            
+                        "Venham nos visitar!",
+                        "Flanax 660mg R$ 900,00",
+                        "Xadago 50mg em promoçao!",
+                        "Dipirona, resolve em 10 minutos",
+                      ],
                   
 
 
