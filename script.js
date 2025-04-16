@@ -2361,6 +2361,11 @@ function restaurarMenuOriginal() {
       button.classList.add('active');
       content.classList.add('visible');
       content.style.display = 'block';
+
+// Faz scroll suave para a área do conteúdo
+setTimeout(() => {
+  content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}, 100); // delay curto para garantir que o conteúdo esteja visível
       
       // Inicializa o Swiper se necessário
       if (content.classList.contains('swiper') && !content.swiperInstance) {
