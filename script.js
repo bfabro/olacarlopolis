@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
     // pagou? defina por s pago n nao pago // PAGx
     const statusEstabelecimentos = {
+
+
+
+
       // COMERCIOS:
 
       //academia
@@ -9,6 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
       //AÇAI
       turminhadoaçai:"s",
 
+      //Açougue
+      açouguecuritiba: "s",
+
       // ADEGAS
       adegacuenca: "s",
   
@@ -16,12 +23,22 @@ document.addEventListener("DOMContentLoaded", function () {
   
       advocaciaabilio: "s",
   
-      //Açougue
-      açouguedocarlinho: "s",
+      
+      
   
       // Agropecuaria
       agrovida: "s",
-      armazémrei:"s",
+      armazemrei:"s",
+
+      //agencia turismo
+      cvccarlopolis:"s",
+
+        // assistencia celular
+        oficinadocelular:"s",
+      
+
+
+
 
       //confecção
       yellowjeans:"s",
@@ -90,6 +107,8 @@ document.addEventListener("DOMContentLoaded", function () {
   
       //anuncio
       piodoanuncio: "s",
+
+      luisbarbeiro:"s",
   
       // churrasqueiro
       flaviochurrasqueiro:"s",
@@ -422,12 +441,40 @@ menuLinks.forEach((link) => {
     // Carregar informações de categorias
     const categories = 
     [
+
+
+
+      {
+        link: document.querySelector("#menuAcademia"),  
+        title: "Academia",
+        establishments: [
+            {
+                image: "images/comercios/academia/lobofitness/lobofitness.png",
+                        
+                name: "Lobo Fitness",
+                hours: "<br>seg a Qui:06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
+                address: "<br>R. Delfino Mendes, 264 - Centro",
+                contact: "(43) 99112-1009",                          
+                facebook: "#",
+                instagram: "https://www.instagram.com/academialobocarlopolis/",
+                novidadesImages: [ 
+                "images/comercios/academia/lobofitness/divulgacao/1.png",
+                "images/comercios/academia/lobofitness/divulgacao/2.png",
+                ],
+                novidadesDescriptions: [                            
+                  "Venham Conferir nosso espaço",
+                ],
+            },
+        ],
+      },
+
+
                 {
                     link: document.querySelector("#menuAcai"),    
                     title: "Açai",
                     establishments: [
                         {
-                            image: "images/comercios/acai/faxada.png",
+                            image: "images/comercios/acai/turminhaAcai/turminhaAcai.png",
                             name: "Turminha do Açai",
                             hours: "<br>Qua a Seg: 14h - 23h </br> Ter: Fechado",
                             address: "<br>Rua Benedito Salles, 409",
@@ -436,64 +483,40 @@ menuLinks.forEach((link) => {
                             instagram: "https://www.instagram.com/turminha_do_acai/",
                             infoAdicional:"<br>Espetinhos a partir de Quinta até<br> Domingo",
                             novidadesImages: [            
-                            "images/comercios/acai/novidades/1.png",                                            
+                            "images/comercios/acai/turminhaAcai/novidades/1.png",                                            
                             ],
                             novidadesDescriptions: [                            
                             "Marmita de Açai <br>Voce só encontra aqui!",
                           ],
                             menuImages: [                    
-                                "images/comercios/acai/cardapio/1.png",
-                                "images/comercios/acai/cardapio/2.png",
-                                "images/comercios/acai/cardapio/3.png",
+                                "images/comercios/acai/turminhaAcai/cardapio/1.png",
+                                "images/comercios/acai/turminhaAcai/cardapio/2.png",
+                                "images/comercios/acai/turminhaAcai/cardapio/3.png",
                             ],
                         
                         },
                     ],
                 },
 
-                {
-                  link: document.querySelector("#menuAcademia"),  
-                  title: "Academia",
-                  establishments: [
-                      {
-                          image: "images/comercios/academia/lobofitness/lobofitness.png",
-                                  
-                          name: "Lobo Fitness",
-                          hours: "<br>seg a Qui:06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
-                          address: "<br>R. Delfino Mendes, 264 - Centro",
-                          contact: "(43) 99112-1009",                          
-                          facebook: "#",
-                          instagram: "https://www.instagram.com/academialobocarlopolis/",
-                          novidadesImages: [ 
-                          "images/comercios/academia/lobofitness/divulgacao/1.png",
-                          "images/comercios/academia/lobofitness/divulgacao/2.png",
-                          ],
-                      },
-                  ],
-              },
-
-
-
-
-
-
-
-
+               
 
                 {
                     link: document.querySelector("#menuAcougue"),  
                     title: "Açougues",
                     establishments: [
                         {
-                            image: "images/comercios/acougue/acougue.png",
-                            name: "Açougue do Carlinho",
-                            hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                            address: "Rua Benedito Salles, 409",
+                            image: "images/comercios/acougue/curitiba/curitiba.png",
+                            name: "Açougue Curitiba",
+                            hours: "<br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                            address: "<br>Rua Benedito Salles, 409",
                             contact: "(43) 99635-1001",
                             delivery: "Sim / Sem Taxa",
                             novidadesImages: [ 
-                            "images/comercios/acougue/banner/banner_1.jpg",
-                            "images/comercios/acougue/banner/banner_2.jpg",
+                            "images/comercios/acougue/curitiba/banner/banner_1.jpg",
+                            "images/comercios/acougue/curitiba/banner/banner_2.jpg",
+                            ],
+                            novidadesDescriptions: [                            
+                              "Carnes de primeiras!",
                             ],
                         },
                     ],
@@ -504,16 +527,62 @@ menuLinks.forEach((link) => {
                     title: "Adegas",
                     establishments: [
                         {
-                            image: "images/comercios/adega/adega_cuenca.jpg",
+                            image: "images/comercios/adega/cuenca/adega_cuenca.jpg",
                             name: "Adega Cuenca",
                             hours:
                             "</br>seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
                             address: "<br>R. Kalil Keder, 752",
                             contact: "</br>(43) 99800-1680",
                             delivery: "</br>Sim / Sem Taxa",
+                            instagram: "https://www.instagram.com/turminha_do_acai/",
+                            facebook:"https://www.facebook.com/adega.carlopolis.37/",
+
+                            novidadesImages: [ 
+                              "images/comercios/adega/cuenca/divulgacao/1.png",
+                              "images/comercios/adega/cuenca/divulgacao/2.png",
+                              "images/comercios/adega/cuenca/divulgacao/3.png",
+                              "images/comercios/adega/cuenca/divulgacao/4.png",
+                              "images/comercios/adega/cuenca/divulgacao/5.png",
+                              ],
+                              novidadesDescriptions: [                            
+                                "Chop Brahma encontra aqui!",
+                                "Chop HASS encontra aqui!",
+                              ],
+                              
                         },
                     ],
                 },
+
+                {
+                  link: document.querySelector("#menuAdvocacia"),    
+                  title: "Escritorio de Advocacia",
+                  establishments: [
+                      {
+                          name: "ADVOCACIA ABILIO",
+                          hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
+                          address: "<br>R. Salvira Marquês, 315",
+                          contact: "</br>(43) 3566-1368",
+                      },
+                  ],
+              },
+
+              {
+                link: document.querySelector("#menuAgenciaViagem"),    
+                title: "Agencia de Viagem",
+                establishments: [
+                    {
+                      image: "images/comercios/agenciaViagem/cvc/cvc.png",
+                        name: "CVC Carlopolis",
+                        hours: "</br>Seg a Sab: 11h - 22h",
+                        address: "<br>Rua Padre Hugo, 450, Sala 10",
+                        contact: "</br>(43) 99177-2244",
+                        instagram:"https://www.instagram.com/cvc.pr.carlopolis/",
+                        facebook:"https://www.facebook.com/CVC.PR.Carlopolis?mibextid=LQQJ4d",
+                    },
+                ],
+            },
+
+
 
                 {
                     link: document.querySelector("#menuAgropecuaria"),  
@@ -522,7 +591,7 @@ menuLinks.forEach((link) => {
 
                         {
                             image: "images/comercios/agropecuaria/armazem Rei/armazemRei.png",
-                            name: "ARMAZÉM REI",
+                            name: "Armazem Rei",
                             hours: "</br>seg a Sab: 8h - 19h </br> Dom: 08h - 12h",
                             address: "<br>R. Kalil Keder, 718",
                             contact: "</br> (43) 99185-6532",
@@ -531,12 +600,16 @@ menuLinks.forEach((link) => {
                             instagram: "#",
                             novidadesImages: [
                                 // Novo array de imagens de novidades
-                                "images/comercios/agropecuaria/armazem rei/novidades/1.png",
-                              "images/comercios/agropecuaria/armazem rei/novidades/2.png",
+                                "images/comercios/agropecuaria/armazem rei/divulgacao/1.png",
+                              "images/comercios/agropecuaria/armazem rei/divulgacao/2.png",
+                            ],
+                            novidadesDescriptions: [                            
+                              "Special Dog no Precinho",
+                              "Temos sacos de milho 40kg",
                             ],
                         },
                         {
-                            image: "images/comercios/agropecuaria/vida nova/vidanova.png",
+                            image: "images/comercios/agropecuaria/agroVida/agrovida.png",
                             name: "Agro Vida",
                             hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 16h",
                             address: "<br>rua benedito salles 309",
@@ -544,25 +617,49 @@ menuLinks.forEach((link) => {
                             delivery: "</br>Sim / Sem Taxa",
                             facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
                             instagram: "https://www.instagram.com/agrovida_carlopolis/",
-                            
+                            novidadesImages: [
+                    
+                              "images/comercios/agropecuaria/agroVida/divulgacao/2.png",
+                              "images/comercios/agropecuaria/agroVida/divulgacao/1.png",
+                          ],
+                          novidadesDescriptions: [  
+                            "Temos sacos de milho 40kg",                          
+                            "Special Dog no Precinho",
+                           
+                          ],
                         },
 
                         
                     ],
                 },
 
+
                 {
-                    link: document.querySelector("#menuAdvocacia"),    
-                    title: "Escritorio de Advocacia",
-                    establishments: [
-                        {
-                            name: "ADVOCACIA ABILIO",
-                            hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
-                            address: "<br>R. Salvira Marquês, 315",
-                            contact: "</br>(43) 3566-1368",
-                        },
-                    ],
+                  link: document.querySelector("#menuAssistenciaCelular"),    
+                  title: "Assistencia Celular",
+                  establishments: [
+                      {
+                          image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
+                          name: "Oficina do Celular",
+                          hours: "</br>seg a sex: 8h - 18:00h<br> Sab: 08:00-17:00",
+                          address: "<br>Rua Dr Paula e Silva 676",
+                          contact: "</br>(43) 3566-1600",
+                          facebook: "https://www.facebook.com/oficinadocelularclps/",
+                          instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
+                          novidadesImages: [                  
+                            "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/2.png",
+                            "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/1.png"
+                        ],
+                        novidadesDescriptions: [  
+                          "Fazemos sua capinha!",                          
+                          "Temos Assistencia Tecnica!"
+                         
+                        ],
+                      },
+                  ],
                 },
+
+                
 
                 {
                     link: document.querySelector("#menuConfecção"),    
@@ -1136,6 +1233,25 @@ menuLinks.forEach((link) => {
                 },
             ],
         },
+
+
+        {
+          link: document.querySelector("#menuBarbeiro"),
+          title: "Barbeiros ",
+          establishments: [
+              {
+                image: "images/servicos/barbeiro/luis/luis.png",
+                  name: "Luis Barbeiro",
+                  contact: "(43) 99663-3256",
+              },
+              {
+                  name: "Antonia",
+                  contact: "(43) 8901-2345",
+              },
+          ],
+      },
+
+
   
         {
             link: document.querySelector("#menuChurrasqueiro"),
@@ -1519,7 +1635,7 @@ menuLinks.forEach((link) => {
                   image: "images/info_uteis/agenciaTrabalhador/AgenciaTrabalhador.png",
                   name: "Agencia Trabalhador",
                   hours: "<br>seg a sex: 9h - 15h",
-                  address: "<br>Rua Padre Hugo 1025",
+                  address: "<br>Rua Padre Hugo, 1025",
                   contact: "<br> (43) 3566-1291",
               },
           ],
@@ -1853,19 +1969,7 @@ menuLinks.forEach((link) => {
             ],
         },
     
-        {
-            link: document.querySelector("#menuAssistenciaCelular"),    
-            title: "Assistencia Celular",
-            establishments: [
-                {
-                    name: "Soraya",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    contact: "(43) 99951-1540",
-                    delivery: "Sim / Sem Taxa",
-                },
-            ],
-        },
+      
         /////////
 
     ]; // fim dos setores
