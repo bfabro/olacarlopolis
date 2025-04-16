@@ -2364,7 +2364,9 @@ function restaurarMenuOriginal() {
 
 // Faz scroll suave para a área do conteúdo
 setTimeout(() => {
-  content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Rolagem até o botão
+  const y = button.getBoundingClientRect().top + window.pageYOffset - 80;
+  window.scrollTo({ top: y, behavior: 'smooth' });
 }, 100); // delay curto para garantir que o conteúdo esteja visível
       
       // Inicializa o Swiper se necessário
