@@ -844,8 +844,8 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/padaria/bom jesus/bomjesus.png",
                     name: "Bom Jesus",
                     hours: "</br>seg a Sab: 6h - 19h </br> Dom: 06 - 14h",
-                    address: "R. Benedito Salles, 615",
-                    contact: " (43) 99653-9285",
+                    address: "<br>R. Benedito Salles, 615",
+                    contact: "<br>(43) 99653-9285",
                     delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/PanificadoraRestauranteBomJesus/?locale=pt_BR",
                     instagram: "https://www.instagram.com/bom_jesus_panificadora/",
@@ -864,13 +864,12 @@ menuLinks.forEach((link) => {
                   image: "images/comercios/padaria/saoFrancisco/saoFrancisco.png",
                   name: "São Francisco",
                   hours: "</br>seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
-                  address: "R. Benedito Salles, 881",
-                  contact: " (43) 98873-1488",
+                  address: "<br>R. Benedito Salles, 881",
+                  contact: "<br>(43) 98873-1488",
                   delivery: "Sim / Com Taxa",
                   facebook: "#",
                   instagram: "#",
-                  novidadesImages: [
-                      // Novo array de imagens de novidades
+                  novidadesImages: [                   
                       "images/comercios/padaria/saoFrancisco/novidades/4.png",
                       "images/comercios/padaria/saoFrancisco/novidades/3.png",
                       "images/comercios/padaria/saoFrancisco/novidades/5.png",
@@ -2149,13 +2148,15 @@ function restaurarMenuOriginal() {
             ${paidEstablishments
               .map(
                 (establishment) => `
-     <li>  
+     <li  id="${normalizeName(establishment.name)}">  
      
        <!-- Exibe a imagem do estabelecimento, se existir -->
       ${
         establishment.image
           ? `
-            <img src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}">
+           <img id="imagem-${normalizeName(establishment.name)}" src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}">
+
+
           `
           : ""
       }
@@ -2276,13 +2277,13 @@ function restaurarMenuOriginal() {
 
   <div class="button-container">
           ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
-            <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}">
+            <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
               Divulgação (${establishment.novidadesImages.length})
             </button>
           ` : ''}
           
           ${establishment.menuImages && establishment.menuImages.length > 0 ? `
-            <button  id="cardapioButton" class="menu-btn" data-name="${establishment.name}">
+            <button  id="cardapioButton" class="menu-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
               Cardápio (${establishment.menuImages.length})
             </button>
           ` : ''}
@@ -2306,6 +2307,7 @@ function restaurarMenuOriginal() {
                     <div class="swiper-button-next"></div>
                     <div class="swiper-button-prev"></div>
                     <div class="swiper-pagination"></div>
+                 
                 </div>
                  ` : ''}
           
@@ -2321,6 +2323,7 @@ function restaurarMenuOriginal() {
                     <div class="swiper-button-next"></div>
                     <div class="swiper-button-prev"></div>
                     <div class="swiper-pagination"></div>
+                      
                 </div>
                  ` : ''}
        
@@ -2347,12 +2350,12 @@ function restaurarMenuOriginal() {
 
 
 
-
+      let lastClickedButton = null;
     // Função para alternar entre cardápio e novidades
     function toggleContent(button, contentId, otherButtons) {
     const content = document.getElementById(contentId);
     const isActive = button.classList.contains('active');
-  
+   
     // Fecha todos os conteúdos primeiro
     closeAllContents();
   
@@ -2416,6 +2419,7 @@ setTimeout(() => {
   document.querySelectorAll('.novidades-btn').forEach(button => {
     button.addEventListener('click', function() {
       const contentId = `novidades-${encodeURIComponent(this.dataset.name)}`;
+      lastClickedButton = this; // <-- Salva o botão clicado
       toggleContent(this, contentId);
     });
   });
@@ -2424,6 +2428,7 @@ setTimeout(() => {
   document.querySelectorAll('.menu-btn').forEach(button => {
     button.addEventListener('click', function() {
       const contentId = `menu-${encodeURIComponent(this.dataset.name)}`;
+      lastClickedButton = this; // <-- Salva o botão clicado
       toggleContent(this, contentId);
     });
   });
@@ -2459,6 +2464,24 @@ setTimeout(() => {
         .forEach((button) => {
           button.addEventListener("click", function () {
             closeAllContents(); // Fecha todos os conteúdos
+
+        // Rola de volta para o estabelecimento
+        if (lastClickedButton) {
+          const targetId = lastClickedButton.getAttribute("data-id");
+          const liEstabelecimento = document.getElementById(targetId);
+if (liEstabelecimento) {
+  const separador = liEstabelecimento.querySelector(".separador_categorias");
+  if (separador) {
+    const separadorTop = separador.getBoundingClientRect().top + window.pageYOffset;
+    const scrollToY = separadorTop - (window.innerHeight - separador.offsetHeight);
+    window.scrollTo({ top: scrollToY, behavior: "smooth" });
+  }
+}
+
+
+        }
+
+
           });
         });
 
