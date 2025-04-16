@@ -2365,12 +2365,19 @@ function restaurarMenuOriginal() {
       content.classList.add('visible');
       content.style.display = 'block';
 
-// Faz scroll suave para a área do conteúdo
+// NOVO scroll até o separador dentro do item clicado
 setTimeout(() => {
-  // Rolagem até o botão
-  const y = button.getBoundingClientRect().top + window.pageYOffset - 80;
-  window.scrollTo({ top: y, behavior: 'smooth' });
-}, 100); // delay curto para garantir que o conteúdo esteja visível
+  const targetId = button.dataset.id;
+  const liEstabelecimento = document.getElementById(targetId);
+  if (liEstabelecimento) {
+    const separador = liEstabelecimento.querySelector(".separador_categorias");
+    if (separador) {
+      const separadorTop = separador.getBoundingClientRect().top + window.pageYOffset;
+      const scrollToY = separadorTop - (window.innerHeight - separador.offsetHeight);
+      window.scrollTo({ top: scrollToY, behavior: "smooth" });
+    }
+  }
+}, 100);
       
       // Inicializa o Swiper se necessário
       if (content.classList.contains('swiper') && !content.swiperInstance) {
@@ -2473,7 +2480,7 @@ if (liEstabelecimento) {
   const separador = liEstabelecimento.querySelector(".separador_categorias");
   if (separador) {
     const separadorTop = separador.getBoundingClientRect().top + window.pageYOffset;
-    const scrollToY = separadorTop - (window.innerHeight - separador.offsetHeight);
+    const scrollToY = separadorTop - (window.innerHeight - separador.offsetHeight - 20);
     window.scrollTo({ top: scrollToY, behavior: "smooth" });
   }
 }
