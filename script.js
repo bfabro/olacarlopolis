@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
       paiol: "s", // Paiol pagou
       restaurantedadi:"s",
       sabordaroça:"s",
-      selahtgrillpizzariaeesfiharia:"s",
+      selahtgrill:"s",
     
       
       // sorveteria
@@ -2238,6 +2238,8 @@ menuLinks.forEach((link) => {
               ],
               
             },
+
+            /*
                 {
                     name: "Cabanas",
                     hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
@@ -2246,6 +2248,8 @@ menuLinks.forEach((link) => {
                     delivery: "</br>Sim / Com Taxa",
                     infoAdicional:"</br>Somente Marmita"
                 },
+
+                */
                 {
                     image: "images/comercios/restaurante/delfino/delfino.png",
                     name: "Delfino",
@@ -2326,7 +2330,7 @@ menuLinks.forEach((link) => {
 
               {
                 image: "images/comercios/restaurante/selaht/selaht.png",
-                name: "Selaht Grill Pizzaria e Esfiharia",
+                name: "Selaht Grill",
                 hours: "</br>Ter a Dom: 11h - 23h",
                 address: "<br>R. Padre Hugo, 460",
                 contact: "<br>(43) 9 9160-5120",
