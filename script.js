@@ -776,7 +776,8 @@ menuLinks.forEach((link) => {
                           "images/comercios/feiraLua/divulgacao/2.png",
                           "images/comercios/feiraLua/divulgacao/3.png",
                           "images/comercios/feiraLua/divulgacao/4.png",
-                          "images/comercios/feiraLua/divulgacao/5.png"
+                          "images/comercios/feiraLua/divulgacao/5.png",
+                             "images/comercios/feiraLua/divulgacao/6.png"
                       ],                
                     },
                 ],
