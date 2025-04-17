@@ -2312,7 +2312,15 @@ menuLinks.forEach((link) => {
                     address: "<br>R. Benedito Salles, 2023",
                     contact: "</br>(43) 3566-2174",
                     delivery: "</br>Sim / Com Taxa",
-                    infoAdicional:"</br>Fica dentro do Hotel Portal"
+                    infoAdicional:"</br>Fica dentro do Hotel Portal",
+                    novidadesImages: [                    
+                      "images/comercios/restaurante/portal/divulgacao/1.png",
+                     "images/comercios/restaurante/portal/divulgacao/2.png",
+                     "images/comercios/restaurante/portal/divulgacao/3.png",
+                     "images/comercios/restaurante/portal/divulgacao/4.png",
+                     "images/comercios/restaurante/portal/divulgacao/5.png",
+                  ],
+                    
                 },
 
 
