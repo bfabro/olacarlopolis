@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // ADEGAS
       adegacuenca: "s",
+      assao:"s",
   
       //ADVOCACIA
   
@@ -68,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // padaria
       bomjesus:"s",
       sãofrancisco:"s",
+      prelie:"s",
       
   
       //pizzaria
@@ -78,11 +80,13 @@ document.addEventListener("DOMContentLoaded", function () {
   
       //lanchonete
       ocasarao: "s", // Casarao pagou
-      paiol: "s", // Paiol pagou
+      
+      ione:"s",
   
       //supermercado
       mercadorocha: "s", // Mercado Rocha pagou
       carreiro: "s", // Carreiro pagou
+      comprebemmais:"s",
       obarateiro: "s", // O Barateiro pagou
       kelve: "s", // Kelve não pagou
       rocha: "s", // Rocha pagou
@@ -97,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
       delfino:"s",
       portal:"s",
       neia:"s",
+      paiol: "s", // Paiol pagou
       sabordaroça:"s",
       selahtgrillpizzariaeesfiharia:"s",
     
@@ -589,6 +594,18 @@ menuLinks.forEach((link) => {
                               ],
                               
                         },
+
+                        {
+                          image: "images/comercios/adega/assao/assao.png",
+                          name: "Assao",
+                          hours:"</br>seg 09:00h - 22h ",
+                          address: "<br>R. Benedito Sales, 1551",
+                          contact: "</br>-",                          
+                          instagram: "https://www.instagram.com/casadecarneassao/",                     
+
+                         
+                            
+                      },
                     ],
                 },
 
@@ -747,6 +764,23 @@ menuLinks.forEach((link) => {
                              "images/comercios/lanchonete/casarao/novidades/5.png",
                           ],               
                         },
+
+                        {
+                          image: "images/comercios/lanchonete/ione/ione.png",
+                          name: "Ione",
+                          hours: "</br>Seg - Sab - 9:30h - 19:30h",
+                          address: "<br>R. Benedito Salles, 1233",
+                          contact: "</br>(43) 99180-4287",
+                          delivery: "</br>Sim / Com Taxa",
+                          facebook: "https://www.facebook.com/IoneSalgados1687Fabiana/?locale=pt_BR",
+                          instagram: "https://www.instagram.com/salgadosione29/",       
+                              
+                          novidadesImages: [
+                          
+                            "images/comercios/lanchonete/ione/divulgacao/1.png",
+                           "images/comercios/lanchonete/ione/divulgacao/2.png",
+                          ]
+                      },
                   
 
                 
@@ -875,6 +909,22 @@ menuLinks.forEach((link) => {
                 },
 
                 {
+                  image: "images/comercios/padaria/prelie/prelie.png",
+                  name: "Prelie",
+                  hours: "</br>seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
+                  address: "<br>R. Benedito Salles, 1098",
+                  contact: "<br>(43) 99954-0863",
+                  delivery: "Sim / Com Taxa",
+                  
+                  instagram: "https://www.instagram.com/prelie.confeitaria/",
+                  novidadesImages: [                   
+                      "images/comercios/padaria/prelie/divulgacao/1.png",
+                     
+                     
+                  ],
+              },
+
+                {
                   image: "images/comercios/padaria/saoFrancisco/saoFrancisco.png",
                   name: "São Francisco",
                   hours: "</br>seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
@@ -892,6 +942,8 @@ menuLinks.forEach((link) => {
                      
                   ],
               },
+
+
 
             ],
         },
@@ -927,6 +979,35 @@ menuLinks.forEach((link) => {
                     "Area de Promoçoes de <br> Leite Condensado!",
                   ],
                 },
+
+
+                {
+                  image: "images/comercios/supermercado/compreBemMais/compreBemMais.png",
+                  name: "Compre Bem Mais",
+                  address: "<br>R. Andrino Soares, 355",
+                  hours: "</br>Seg a Sex 7h - 20h </br> dom: 08 - 12h",
+                  contact: "</br>(43) 99977-6613",
+                  delivery: "</br>Sim / Sem Taxa",
+                  facebook: "https://www.facebook.com/people/Compre-bem-Mais/61559328414681/?_rdr",
+                  instagram: "#",
+                  novidadesImages: [               
+                    "images/comercios/supermercado/compreBemMais/divulgacao/1.png",
+                     
+                    
+                ], 
+                novidadesDescriptions: [                            
+                  "Nosso Horti Fruti",
+                
+                  
+                ],
+              },
+
+
+
+
+
+
+
                 {
                     image: "images/comercios/supermercado/obarateiro.png",
                     name: "O Barateiro",
@@ -1310,7 +1391,7 @@ menuLinks.forEach((link) => {
                   contact: "(43) 99695-7449",
               },
               {
-                image: "images/servicos/frete/erickson/erickson.png",
+                image: "images/servicos/fretes/erickson/erickson.png",
                   name: "Erickson",
                   contact: "(43) 99611-5261",
               },
