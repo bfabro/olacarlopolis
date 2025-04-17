@@ -2283,7 +2283,7 @@ menuLinks.forEach((link) => {
                 delivery: "<br>Sim / Com Taxa",
                 facebook: "www.facebook.com/uahh",
                 instagram: "www.instagram.com/uahh",
-                infoAdicional:"<a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
+                infoAdicional:"<br><a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
                
                 menuImages: [                   
                     "images/comercios/restaurante/paiol/cardapio/1.png",
@@ -2337,7 +2337,7 @@ menuLinks.forEach((link) => {
                 delivery: "</br>Sim / Com Taxa",
                 facebook:"https://www.facebook.com/selaht.gastronomia",
                 instagram:"https://www.instagram.com/selaht.gastronomia/",
-                infoAdicional:"<a style='color:#2da6ff;' href='https://eatfood.app/cardapio/58qt9yj5dqgt2timpqd7'>Cardapio On Line</a>",
+                infoAdicional:"<br><a style='color:#2da6ff;' href='https://eatfood.app/cardapio/58qt9yj5dqgt2timpqd7'>Cardapio On Line</a>",
                 menuImages: [                   
                   "images/comercios/restaurante/selaht/cardapio/1.png",          
                          
