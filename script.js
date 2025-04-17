@@ -62,6 +62,9 @@ document.addEventListener("DOMContentLoaded", function () {
       // mercearia
       seiza:"s",
 
+      //mototaxi
+      mototaximodesto: "s",
+
       // padaria
       bomjesus:"s",
       sãofrancisco:"s",
@@ -89,12 +92,15 @@ document.addEventListener("DOMContentLoaded", function () {
       peskepagueaguamarine: "s",
 
       // restaurantes
+      assadãodorussão:"s",
       cabanas:"s",
       delfino:"s",
       portal:"s",
       neia:"s",
       sabordaroça:"s",
-
+      selahtgrillpizzariaeesfiharia:"s",
+    
+      
       // sorveteria
       limone:"s",
       santtinogelateria:"s",
@@ -108,6 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
       //anuncio
       piodoanuncio: "s",
 
+      //barbeiro
       luisbarbeiro:"s",
   
       // churrasqueiro
@@ -117,6 +124,10 @@ document.addEventListener("DOMContentLoaded", function () {
   
       //diarista
       rose: "s",
+
+      //frete
+      anselmofrete:"s",
+      erickson:"s",
   
       // pedreiro
       deniscenturion: "s",
@@ -139,31 +150,64 @@ document.addEventListener("DOMContentLoaded", function () {
       //// FIM SERVIÇOS
   
       //// INICIO INFORMAÇOES UTEIS
+      
+  
+    
+  
+
+
+      // FIMMMM SERVIÇOSSSSSS
+
+/// INICIO SETOR PUBLICO
+
+
+
+/// FIM SETOR PUBLICO
       asilo:"s",
       agenciatrabalhador:"s",
       copel: "s",
+      correio:"s",    
+      // cheches:
+      ainzararossisallescmei:"s",
+      isabeldallabdasilvacmeiprofa:"s",
+      marinhafogacadeoliveiracmei:"s",
+      
       delegacia: "s",
+      // escolas
+
+      beneditorodriguesdecamargo:"s",
+      cmeiraymundasantanasalles:"s",
+      carolinalupion:"s",
+      escolamunicipaljosésalles:"s",     
+      hercíliadepaulaesilva:"s",
+      //posto de saude
+      ubseugênionevessoares:"s",
+      centrodesaudedrjosé:"s",
+     
+      
+    
+      
       hospitalsãojose: "s",
       prefeitura: "s",
       duvidasereclamações: "s",
       sanepar: "s",
-      mototaximodesto: "s",
-  
-      //Eventos
-      calendarioeventos: "s",
-      lixoeletronico: "s",
-      triathlon: "s",
-      pescar: "s",
-      coletalixoeletronico: "s",
-      feiradalua: "s",
-  
-      //// INICIO INFORMAÇOES UTEIS
+      
+      rodoviaria:"s",
 
+
+      //// INICIO INFORMAÇOES UTEIS
+  //Eventos
+  calendarioeventos: "s",
+  lixoeletronico: "s",
+  triathlon: "s",
+  pescar: "s",
+  coletalixoeletronico: "s",
+  feiradalua: "s",
 
 
       ///
 
-      rodoviaria:"s",
+      
     };
   
     const body = document.querySelector("body");
@@ -412,9 +456,6 @@ menuLinks.forEach((link) => {
 });
 
 
-
-
-
     }
     
 
@@ -441,9 +482,7 @@ menuLinks.forEach((link) => {
     // Carregar informações de categorias
     const categories = 
     [
-
-
-
+// DADOS COMERCIOS
       {
         link: document.querySelector("#menuAcademia"),  
         title: "Academia",
@@ -710,32 +749,7 @@ menuLinks.forEach((link) => {
                         },
                   
 
-                {
-                    image: "images/comercios/lanchonete/paiol/paiol.png",
-                    name: "Paiol",
-                    hours: "qua - dom 19 - 00h",
-                    address: "Av. Elson Soares, 767 ",
-                    contact: "(43) 99159-0070",
-                    delivery: "Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com",  
-                    menuImages: [
-                        // Agora é um array de imagens
-                        "images/comercios/lanchonete/paiol/cardapio/1.png",
-                        "images/comercios/lanchonete/paiol/cardapio/2.png",
-                        "images/comercios/lanchonete/paiol/cardapio/3.png",
-                               
-                    ],
-                    novidadesImages: [
-                        // Novo array de imagens de novidades
-                        "images/comercios/lanchonete/paiol/novidades/1.png",
-                       "images/comercios/lanchonete/paiol/novidades/2.png",
-                       "images/comercios/lanchonete/paiol/novidades/3.png",
-                       "images/comercios/lanchonete/paiol/novidades/4.png",
-                    ],
-            
-                },
+                
               ],
             },
         
@@ -884,62 +898,7 @@ menuLinks.forEach((link) => {
 
 
 
-      // Eventos
-        {
-            link: document.querySelector("#menuEventos"),
-            title: "Eventos em Carlópolis",
-            establishments: [
-                {
-                    name: "Calendario Eventos",
-                    image: "images/info_uteis/eventos/evento_1/calendario_evento.png",
-                    contact: "",
-                },
-    
-                {
-                    image: "images/info_uteis/eventos/evento_3/lixoEletronico.png",
-                    name: "Coleta Lixo Eletronico",
-                    date: "05/03/25 a 20/04/2025",
-                    address: "Paroquia Senhor Bom Jesus",
-                    contact: "",
-                    menuFlyer: "#",
-                },
-  
-                {
-                    image: "images/info_uteis/eventos/evento_5/triathlon.png",
-                    name: "Triathlon",
-                    date: "06/04/25",
-                    address: "Ilha do Ponciano",
-                    contact: "(43) 99964-6136",
-                    menuFlyer: "#",
-                },
-  
-                {
-                    image: "images/info_uteis/eventos/evento_4/pescar.png",
-                    name: "Pescar",
-                    date: "03/05/25 a 04/05/2025",
-                    address: "Ilha do Ponciano",
-                    contact: "(41) 99950-9291",
-                    menuFlyer: "#",
-                },
-  
-                {
-                    image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
-                    name: "Feira da Lua",
-                    date: "Sex das 19 - 00h",
-                    address: "Praça Igreja Matriz ",
-                    contact: "(11) 99898-5930",
-                    facebook: "https://www.facebook.com/people/Feira-Da-Lua-Carl%C3%B3polis/100089210937457/?_rdr",
-                  instagram: "https://www.instagram.com/feiradaluacarlopolis/",
-                    novidadesImages: [
-                      // Novo array de imagens de novidades                      
-                      "images/info_uteis/eventos/feiraLua/novidades/2.png",
-                      "images/info_uteis/eventos/feiraLua/novidades/1.png",
-                     
-                  ],
-                },
-            ],
-        },
-  
+      
         {
             link: document.querySelector("#menuMercado"),
             title: "Supermercados ",
@@ -1340,6 +1299,23 @@ menuLinks.forEach((link) => {
                 },
             ],
         },
+
+        {
+          link: document.querySelector("#menuFretes"),
+          title: "Fretes ",
+          establishments: [
+              {
+                image: "images/servicos/frete/anselmo/anselmo.png",
+                  name: "Anselmo Frete",
+                  contact: "(43) 99695-7449",
+              },
+              {
+                image: "images/servicos/frete/erickson/erickson.png",
+                  name: "Erickson",
+                  contact: "(43) 99611-5261",
+              },
+          ],
+      },
   
         {
             link: document.querySelector("#menuGuiaPesca"),
@@ -1456,6 +1432,69 @@ menuLinks.forEach((link) => {
                 },
             ],
         },
+
+
+
+
+
+        // inicio Eventos
+        {
+          link: document.querySelector("#menuEventos"),
+          title: "Eventos em Carlópolis",
+          establishments: [
+              {
+                  name: "Calendario Eventos",
+                  image: "images/info_uteis/eventos/evento_1/calendario_evento.png",
+                  contact: "",
+              },
+  
+              {
+                  image: "images/info_uteis/eventos/evento_3/lixoEletronico.png",
+                  name: "Coleta Lixo Eletronico",
+                  date: "05/03/25 a 20/04/2025",
+                  address: "Paroquia Senhor Bom Jesus",
+                  contact: "",
+                  menuFlyer: "#",
+              },
+
+              {
+                  image: "images/info_uteis/eventos/evento_5/triathlon.png",
+                  name: "Triathlon",
+                  date: "06/04/25",
+                  address: "Ilha do Ponciano",
+                  contact: "(43) 99964-6136",
+                  menuFlyer: "#",
+              },
+
+              {
+                  image: "images/info_uteis/eventos/evento_4/pescar.png",
+                  name: "Pescar",
+                  date: "03/05/25 a 04/05/2025",
+                  address: "Ilha do Ponciano",
+                  contact: "(41) 99950-9291",
+                  menuFlyer: "#",
+              },
+
+              {
+                  image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
+                  name: "Feira da Lua",
+                  date: "Sex das 19 - 00h",
+                  address: "Praça Igreja Matriz ",
+                  contact: "(11) 99898-5930",
+                  facebook: "https://www.facebook.com/people/Feira-Da-Lua-Carl%C3%B3polis/100089210937457/?_rdr",
+                instagram: "https://www.instagram.com/feiradaluacarlopolis/",
+                  novidadesImages: [
+                    // Novo array de imagens de novidades                      
+                    "images/info_uteis/eventos/feiraLua/novidades/2.png",
+                    "images/info_uteis/eventos/feiraLua/novidades/1.png",
+                   
+                ],
+              },
+          ],
+      },
+
+
+      // fim eventos
   
         {
             link: document.querySelector("#menufarmaciaPlantao"),
@@ -1570,7 +1609,104 @@ menuLinks.forEach((link) => {
             ],
         
         },
-  
+
+
+  // INICIO SETOR PUBLICO
+  {
+    link: document.querySelector("#menuAsilo"),    
+    title: "Asilo",
+    establishments: [
+        {
+            image: "images/info_uteis/asilo/asilo.png",
+            name: "Asilo",
+            hours: "<br>seg a sex: 9h - 12h",
+            address: "<br>Rua Andrino Soares, 26",
+            contact: "<br> 43 3566-1196",
+        },
+    ],
+  },
+
+  {
+    link: document.querySelector("#menuAgenciaTrabalhador"),    
+    title: "Agencia Trabalhador",
+    establishments: [
+        {
+            image: "images/info_uteis/agenciaTrabalhador/AgenciaTrabalhador.png",
+            name: "Agencia Trabalhador",
+            hours: "<br>seg a sex: 9h - 15h",
+            address: "<br>Rua Padre Hugo, 1025",
+            contact: "<br> (43) 3566-1291",
+        },
+    ],
+  },
+
+  {
+    link: document.querySelector("#menuCras"),    
+    title: "Cras",
+    establishments: [
+        {
+            image: "images/info_uteis/cras/cras.png",
+            name: "Cras",
+            hours: "<br>seg a sex: 9h - 15h",
+            address: "<br>R. Salvira Marquês, 366",
+            contact: "<br>(43) 98485-1626",
+            facebook:"https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
+        },
+    ],
+  },
+
+  {
+    link: document.querySelector("#menuCorreio"),    
+    title: "Correio",
+    establishments: [
+        {
+            image: "images/info_uteis/correio/correio.png",
+            name: "Correio",
+            hours: "<br>seg a sex: 9h - 13h",
+            address: "<br>R. Padre Hugo, 843 ",
+            contact: "<br>(43) 3566-1113",
+            facebook:"https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
+        },
+    ],
+  },
+
+
+
+
+  {
+    link: document.querySelector("#menuCreche"),    
+    title: "Creches",
+    establishments: [
+        {
+        
+            name: "Ainzara Rossi Salles C M e I",
+            hours: "<br>-",
+            address: "<br>Rua Jose Salles, 313",
+            contact: "<br>(43) 3566-1349 ",
+            facebook:"#",
+        },
+     
+
+        {
+          
+          name: "Isabel Dalla B da Silva C M e I Profa",
+          hours: "<br>-",
+          address: "<br>Av dos Diogossn",
+          contact: "<br>(43) 3566-2330",
+          facebook:"#",
+      },
+
+      {
+           
+        name: "Marinha Fogaca de Oliveira C M e I",
+        hours: "<br>-",
+        address: "<br>Est Mun Espirito Santo, 95",
+        contact: "(43) 3566-2705",
+        facebook:"#",
+      },
+    ],
+  },
+
         {
             link: document.querySelector("#menuHospital"),
             title: "Hospital",
@@ -1608,7 +1744,7 @@ menuLinks.forEach((link) => {
                     name: "Prefeitura",
                     address: "<br>R. Benedito Salles, 1060 - Centro",
                     contact: "<br>(43) 3566-1291",
-                    hours: "<br>8h as 17h",
+                    hours: "<br>8h as 11:30 - 13h as 17h",
                     image: "images/info_uteis/prefeitura/prefeitura.png",
                     facebook: "https://www.facebook.com/profile.php?id=200531799983410&_rdr",
                     instagram: "www.instagram.com/uahhhttps://www.instagram.com/prefeitura.carlopolis/?locale=zh_CN&hl=af",
@@ -1617,8 +1753,8 @@ menuLinks.forEach((link) => {
         
                 {
                     name: "Duvidas e  Reclamações",
-                    contact: "(43) 99825-0360",
-                    hours: "8h as 17h",
+                    contact: "<br>(43) 99825-0360",
+                    hours: "<br>8h as 17h",
                     image: "images/info_uteis/prefeitura/prefeitura.png",
                 },
             ],
@@ -1626,34 +1762,10 @@ menuLinks.forEach((link) => {
 
 
 
-        {
-          link: document.querySelector("#menuAgenciaTrabalhador"),    
-          title: "Agencia Trabalhador",
-          establishments: [
-              {
-                  image: "images/info_uteis/agenciaTrabalhador/AgenciaTrabalhador.png",
-                  name: "Agencia Trabalhador",
-                  hours: "<br>seg a sex: 9h - 15h",
-                  address: "<br>Rua Padre Hugo, 1025",
-                  contact: "<br> (43) 3566-1291",
-              },
-          ],
-        },
+     
 
 
-        {
-          link: document.querySelector("#menuAsilo"),    
-          title: "Asilo",
-          establishments: [
-              {
-                  image: "images/info_uteis/asilo/asilo.png",
-                  name: "Asilo",
-                  hours: "<br>seg a sex: 9h - 12h",
-                  address: "<br>Rua Andrino Soares, 26",
-                  contact: "<br> 43 3566-1196",
-              },
-          ],
-        },
+       
     
         {
             link: document.querySelector("#menuCopel"),    
@@ -1677,12 +1789,100 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/info_uteis/delegacia/delegacia.jpg",
                     name: "Delegacia",
-                    hours: "seg a sex: 9h - 18h",
-                    address: "R. Alfeneiro, 215 ",
+                    hours: "<br>seg a sex: 9h - 18h",
+                    address: "<br>R. Alfeneiro, 215 ",
                     contact: "(43) 3566-1202",
                 },
             ],
         },
+
+
+
+        {
+          link: document.querySelector("#menuEscolaPublica"),
+  
+          title: "Escola Publica",
+          establishments: [
+
+
+            {
+              image: "images/info_uteis/escolaPublica/benedito.png",
+              name: "Benedito Rodrigues de Camargo",
+              hours: "<br>seg a sex: 9h - 18h",
+              address: "<br>Avenida Elson Soares, 295",
+              contact: "<br>(43) 3566-1496",
+              infoAdicional:"Turno: Manha e Tarde",
+          },
+
+            {
+              image: "images/info_uteis/escolaPublica/carolinaLupion.png",
+              name: "Carolina Lupion",
+              hours: "<br>seg a sex: 9h - 18h",
+              address: "<br>R. Jorge Barros, 1095",
+              contact: "<br>(43) 3566-1295",
+              infoAdicional:"Turno: Manha e Tarde",
+          },
+
+
+
+              {
+                  image: "images/info_uteis/escolaPublica/raymunda.png",
+                  name: "CMEI Raymunda Santana Salles",
+                  hours: "<br>seg a sex: 9h - 18h",
+                  address: "<br>Rua Nicolau Miguel, 233",
+                  contact: "<br>(43) 3566-2273",
+                  infoAdicional:"Turno: Manha",
+              },
+
+             
+
+            {
+              image: "images/info_uteis/escolaPublica/joseSalles.png",
+              name: "Escola Municipal José Salles",
+              hours: "<br>seg a sex: 07:45h - 17h",
+              address: "<br>R. Quaresmeira Roxa, 418-458",
+              contact: "<br>(43) 3566-1275",
+              infoAdicional:"Turno: Manha e Tarde",
+          },
+
+          {
+            image: "images/info_uteis/escolaPublica/hercilia.png",
+            name: "Hercília de Paula e Silva",
+            hours: "<br>seg a sex: 06:30h - 18:30h",
+            address: "<br> Av. Elson Soares, 34",
+            contact: "<br>(43) 3566-1282",
+            infoAdicional:"Turno: Manha e Tarde",
+        },
+          ],
+      },
+
+
+      {
+        link: document.querySelector("#menuPostoSaude"),    
+        title: "Posto de Saude",
+        establishments: [
+            {
+                image: "images/info_uteis/postoSaude/joseAparecido.png",
+                name: "Centro de Saude Dr José",                
+                hours: "<br>seg a sex: 8:00h as 17h",
+                address: "<br>Avenida Elson Soares,769",
+                contact: "<br>(43) 3566-1328",
+               
+            },
+           
+            {
+              image: "images/info_uteis/postoSaude/eugenioNeves.png",
+                name: "UBS Eugênio Neves Soares",
+                hours: "<br>seg a sex: 8:00h as 17h",
+                address: "<br>Rua Bauínea,79",
+                contact: "<br>(43) 3566-1932",
+               
+            },
+        ],
+      },
+
+
+
   
         {
             link: document.querySelector("#menuSanepar"),    
@@ -1698,6 +1898,19 @@ menuLinks.forEach((link) => {
             ],
         },
 
+
+
+
+
+
+
+
+
+
+
+
+
+// FIM SETOR PUBLICO
 
         {
             link: document.querySelector("#menuVagasTrabalho"),    
@@ -1872,7 +2085,26 @@ menuLinks.forEach((link) => {
             link: document.querySelector("#menuRestaurantes"),    
             title: "Restaurante",
             establishments: [
-
+              {
+                image: "images/comercios/restaurante/assadaoRussao/assadaoRussao.png",
+                name: "Assadão do Russão",
+                hours: "</br>Seg a Sab: 10:30h - 14h",
+                address: "<br>Rua Benedito Salles 1241",
+                contact: "</br>(43) 9838-7570",
+                delivery: "</br>Sim / Com Taxa",
+                menuImages: [                   
+                  "images/comercios/restaurante/assadaoRussao/cardapio/1.png",
+                 
+                         
+              ],
+              novidadesImages: [                    
+                  "images/comercios/restaurante/assadaoRussao/divulgacao/1.png",                        
+                 "images/comercios/restaurante/assadaoRussao/divulgacao/2.png",
+                 "images/comercios/restaurante/assadaoRussao/divulgacao/3.png",
+                 
+              ],
+              
+            },
                 {
                     name: "Cabanas",
                     hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
@@ -1904,7 +2136,40 @@ menuLinks.forEach((link) => {
                        "images/comercios/restaurante/neia/cardapio/cardapio_1.png",                               
                       ],    
               },
+
+              {
+                image: "images/comercios/lanchonete/paiol/paiol.png",
+                name: "Paiol",
+                hours: "qua - dom 19 - 00h",
+                address: "Av. Elson Soares, 767 ",
+                contact: "(43) 99159-0070",
+                delivery: "Sim / Sem Taxa",
+                facebook: "www.facebook.com/uahh",
+                instagram: "www.instagram.com/uahh",
+                infoAdicional:"<a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
+               
+                menuImages: [                   
+                    "images/comercios/restaurante/paiol/cardapio/1.png",
+                    "images/comercios/restaurante/paiol/cardapio/2.png",
+                    "images/comercios/restaurante/paiol/cardapio/3.png",
+                           
+                ],
+                novidadesImages: [                    
+                    "images/comercios/restaurante/paiol/divulgacao/1.png",
+                   "images/comercios/restaurante/paiol/divulgacao/2.png",
+                   "images/comercios/restaurante/paiol/divulgacao/3.png",
+                   "images/comercios/restaurante/paiol/divulgacao/4.png",
+                ],
+        
+            },
+
+
+
+
+
+
                 {
+                  image: "images/comercios/restaurante/portal/portal.png",
                     name: "Portal",
                     hours: "</br>Seg a Qui: 19h - 21h",
                     address: "<br>R. Benedito Salles, 2023",
@@ -1912,6 +2177,9 @@ menuLinks.forEach((link) => {
                     delivery: "</br>Sim / Com Taxa",
                     infoAdicional:"</br>Fica dentro do Hotel Portal"
                 },
+
+
+              
 
                 {
                   image: "images/comercios/restaurante/saborRoca/saborRoca.png",
@@ -1922,6 +2190,33 @@ menuLinks.forEach((link) => {
                   delivery: "</br>Sim / Com Taxa",
                 
               },
+
+              {
+                image: "images/comercios/restaurante/selaht/selaht.png",
+                name: "Selaht Grill Pizzaria e Esfiharia",
+                hours: "</br>Ter a Dom: 11h - 23h",
+                address: "<br>R. Padre Hugo, 460",
+                contact: "<br>(43) 9 9160-5120",
+                delivery: "</br>Sim / Com Taxa",
+                facebook:"https://www.facebook.com/selaht.gastronomia",
+                instagram:"https://www.instagram.com/selaht.gastronomia/",
+                infoAdicional:"<a style='color:#2da6ff;' href='https://eatfood.app/cardapio/58qt9yj5dqgt2timpqd7'>Cardapio On Line</a>",
+                menuImages: [                   
+                  "images/comercios/restaurante/selaht/cardapio/1.png",          
+                         
+              ],
+              novidadesImages: [                    
+                  "images/comercios/restaurante/selaht/divulgacao/1.png",
+                 "images/comercios/restaurante/selaht/divulgacao/2.png",
+                 "images/comercios/restaurante/selaht/divulgacao/3.png",
+                 "images/comercios/restaurante/selaht/divulgacao/4.png",
+              ],
+            },
+
+
+
+
+
             ],
         },
   
@@ -1969,9 +2264,12 @@ menuLinks.forEach((link) => {
         },
     
       
-        /////////
+        
 
-    ]; // fim dos setores
+    ]; 
+    
+
+    
 
 
 
