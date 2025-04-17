@@ -60,6 +60,12 @@ document.addEventListener("DOMContentLoaded", function () {
       biofarma: "s",
       farmaciadavila: "s",
 
+      //ferro velho
+      reidoferro:"s",
+
+      //feira da lua
+      feiradalua:"s",
+
       // mercearia
       seiza:"s",
 
@@ -102,6 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
       portal:"s",
       neia:"s",
       paiol: "s", // Paiol pagou
+      restaurantedadi:"s",
       sabordaroça:"s",
       selahtgrillpizzariaeesfiharia:"s",
     
@@ -730,6 +737,54 @@ menuLinks.forEach((link) => {
                     ],
                 },
 
+
+                {
+                  link: document.querySelector("#menuFerroVelho"),
+                  title: "Ferro Velho",
+                  establishments: [
+                      {
+                          image: "images/comercios/ferroVelho/reiDoFerro/reiDoFerro.png",
+                          name: "Rei do Ferro",
+                          hours: "</br>Seg a Sex - 08:00 - 18:00",
+                          address: "<br>Rodovia PR 218",
+                          contact: "</br>(43) 3566-2505",                         
+                          instagram: "https://www.instagram.com/rei_do.ferro/",
+                          novidadesImages: [                  
+                            "images/comercios/ferroVelho/reiDoFerro/divulgacao/2.png",
+                            "images/comercios/ferroVelho/reiDoFerro/divulgacao/1.png"
+                        ],                
+                      },
+                  ],
+              },
+
+
+              {
+                link: document.querySelector("#menuFeiraLua"),
+                title: "Feira da Lua",
+                establishments: [
+                    {
+                        image: "images/comercios/feiraLua/feiraLua.png",
+                               
+                        name: "Feira da Lua",
+                        hours: "</br>Sex - 19:00 - 123:30",
+                        address: "<br>Praça Igreja Matriz",
+                        contact: "</br>(43) 99965-2084",                         
+                        instagram: "https://www.instagram.com/feiradaluacarlopolis/",
+                        novidadesImages: [                 
+                          
+                          "images/comercios/feiraLua/divulgacao/1.png",
+                          "images/comercios/feiraLua/divulgacao/2.png",
+                          "images/comercios/feiraLua/divulgacao/3.png",
+                          "images/comercios/feiraLua/divulgacao/4.png",
+                          "images/comercios/feiraLua/divulgacao/5.png"
+                      ],                
+                    },
+                ],
+            },
+
+
+
+
                 {
                     link: document.querySelector("#menuLanchonete"),
                     title: "Lanchonetes",
@@ -1001,10 +1056,6 @@ menuLinks.forEach((link) => {
                   
                 ],
               },
-
-
-
-
 
 
 
@@ -1386,7 +1437,7 @@ menuLinks.forEach((link) => {
           title: "Fretes ",
           establishments: [
               {
-                image: "images/servicos/frete/anselmo/anselmo.png",
+                image: "images/servicos/fretes/anselmo/anselmo.png",
                   name: "Anselmo Frete",
                   contact: "(43) 99695-7449",
               },
@@ -2293,6 +2344,25 @@ menuLinks.forEach((link) => {
                  "images/comercios/restaurante/selaht/divulgacao/4.png",
               ],
             },
+
+
+            {
+              image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.png",
+              name: "Restaurante da Di",
+              hours: "</br>Seg a Sab: 10:30h - 14h",
+              address: "<br>Benedito Salles n°910",
+              contact: "</br>(43) 99632-3418",
+              delivery: "</br>Sim / Com Taxa",
+              instagram:"https://www.instagram.com/marmitasdadiih/",
+              novidadesImages: [                    
+                "images/comercios/restaurante/restauranteDaDi/divulgacao/1.png",
+               "images/comercios/restaurante/restauranteDaDi/divulgacao/2.png",
+               "images/comercios/restaurante/restauranteDaDi/divulgacao/3.png",
+               "images/comercios/restaurante/restauranteDaDi/divulgacao/4.png",
+            ],
+            
+          },
+
 
 
 
