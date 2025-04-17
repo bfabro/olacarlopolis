@@ -2275,12 +2275,12 @@ menuLinks.forEach((link) => {
               },
 
               {
-                image: "images/comercios/lanchonete/paiol/paiol.png",
+                image: "images/comercios/restaurante/paiol/paiol.png",
                 name: "Paiol",
-                hours: "qua - dom 19 - 00h",
-                address: "Av. Elson Soares, 767 ",
-                contact: "(43) 99159-0070",
-                delivery: "Sim / Sem Taxa",
+                hours: "<br>qua - dom 19 - 00h",
+                address: "<br>Av. Elson Soares, 767 ",
+                contact: "<br>(43) 99159-0070",
+                delivery: "<br>Sim / Com Taxa",
                 facebook: "www.facebook.com/uahh",
                 instagram: "www.instagram.com/uahh",
                 infoAdicional:"<a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
