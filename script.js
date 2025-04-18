@@ -1,4 +1,49 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+
+
+  let contadorAnterior = null; // <- começa como null
+
+const contadorEl = document.getElementById("contador");
+const iconeEl = document.getElementById("iconeUsuarios");
+
+if (iconeEl) {
+  iconeEl.style.color = "#00008B"; // azul escuro padrão
+}
+
+const db = firebase.database();
+const ref = db.ref("usuariosOnline");
+
+ref.on("value", function(snapshot) {
+  const novoValor = snapshot.val();
+
+  if (contadorEl) {
+    contadorEl.textContent = novoValor;
+  }
+
+  if (contadorAnterior !== null && novoValor > contadorAnterior) {
+    // animação só após carregamento inicial
+    if (iconeEl) {
+      iconeEl.style.color = "red";
+      iconeEl.classList.add("pulsando");
+
+      setTimeout(() => {
+        iconeEl.style.color = "#00008B";
+        iconeEl.classList.remove("pulsando");
+      }, 5000);
+    }
+  }
+
+  contadorAnterior = novoValor;
+});
+
+
+
+
+
+
+
+
     // pagou? defina por s pago n nao pago // PAGx
     const statusEstabelecimentos = {
 
@@ -402,70 +447,52 @@ menuLinks.forEach((link) => {
 });
 
 
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
 
     function resetarMenuLateral() {
       // Restaura visual
-      document.querySelectorAll(".menu_items > li").forEach(item => {
-        item.style.display = "block";
+        document.querySelectorAll(".menu_items > li").forEach(item => {
+          item.style.display = "block";
+      
+          const links = item.querySelectorAll(".nav_link");
+          links.forEach(link => {
+            link.style.display = "flex";
+          });
     
-        const links = item.querySelectorAll(".nav_link");
-        links.forEach(link => {
-          link.style.display = "flex";
+          const submenu = item.querySelector(".submenu");
+          if (submenu) submenu.style.display = "none";
+        
+            const submenuItem = item.querySelector(".submenu_item");
+            if (submenuItem) submenuItem.classList.remove("show_submenu");
+          });
+        
+        // Mostra todos os títulos
+        document.querySelectorAll(".menu_title").forEach(title => {
+          title.style.display = "block";
         });
-    
-        const submenu = item.querySelector(".submenu");
-        if (submenu) submenu.style.display = "none";
-    
-        const submenuItem = item.querySelector(".submenu_item");
-        if (submenuItem) submenuItem.classList.remove("show_submenu");
+          
+
+
+
+            // Reanexa eventos dos submenus
+          document.querySelectorAll(".submenu_item").forEach(item => {
+        item.onclick = function () {
+          const submenu = this.nextElementSibling;
+          const isOpen = this.classList.contains("show_submenu");
+
+          // Fecha todos os outros
+        document.querySelectorAll(".submenu_item").forEach(i => i.classList.remove("show_submenu"));
+        document.querySelectorAll(".submenu").forEach(s => s.style.display = "none");
+
+          // Se já estiver aberto, recolhe. Se não estiver, expande
+          if (!isOpen && submenu) {
+            this.classList.add("show_submenu");
+            submenu.style.display = "block";
+          } else if (isOpen && submenu) {
+            this.classList.remove("show_submenu");
+            submenu.style.display = "none";
+          }
+        };
       });
-    
-      // Mostra todos os títulos
-      document.querySelectorAll(".menu_title").forEach(title => {
-        title.style.display = "block";
-      });
-    
-
-
-
-      // Reanexa eventos dos submenus
-    document.querySelectorAll(".submenu_item").forEach(item => {
-  item.onclick = function () {
-    const submenu = this.nextElementSibling;
-    const isOpen = this.classList.contains("show_submenu");
-
-    // Fecha todos os outros
-    document.querySelectorAll(".submenu_item").forEach(i => i.classList.remove("show_submenu"));
-    document.querySelectorAll(".submenu").forEach(s => s.style.display = "none");
-
-    // Se já estiver aberto, recolhe. Se não estiver, expande
-    if (!isOpen && submenu) {
-      this.classList.add("show_submenu");
-      submenu.style.display = "block";
-    } else if (isOpen && submenu) {
-      this.classList.remove("show_submenu");
-      submenu.style.display = "none";
-    }
-  };
-});
 
 
     }
@@ -473,6 +500,8 @@ menuLinks.forEach((link) => {
 
     
   
+
+
     document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("content_area").classList.remove("hidden");
     });
