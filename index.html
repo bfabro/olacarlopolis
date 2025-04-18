@@ -1042,6 +1042,41 @@ onlineUsersRef.on("value", (snapshot) => {
    </script>
 
 
+<script>
+   fetch("https://ipapi.co/json/")
+     .then(response => response.json())
+     .then(data => {
+       const info = {
+         ip: data.ip,
+         cidade: data.city,
+         estado: data.region,
+         pais: data.country_name,
+         navegador: navigator.userAgent,
+         horario: new Date().toLocaleString("pt-BR"),
+         pagina: window.location.href
+       };
+   
+       const firebaseConfig = {
+    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+    authDomain: "contadoracessos.firebaseapp.com",
+    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+    projectId: "contadoracessos",
+    storageBucket: "contadoracessos.firebasestorage.app",
+    messagingSenderId: "521517291315",
+    appId: "1:521517291315:web:74f8d878d2d8769460d046",
+    measurementId: "G-BXPWYWK61F"
+   };
+       if (!firebase.apps.length) {
+         firebase.initializeApp(firebaseConfig);
+       }
+   
+       const database = firebase.database();
+       const visitasRef = database.ref("acessosDetalhados");
+       visitasRef.push(info);
+     });
+   </script>
+
+
 
 
 
