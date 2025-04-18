@@ -184,8 +184,6 @@ button:hover {
     });
 
     document.getElementById("btnBuscar").addEventListener("click", async () => {
-	
-	
 		const snapAcessos = await db.ref("acessosDetalhados").once("value");
 		const dadosAcessos = snapAcessos.val();
 		let totalAcessos = 0;
@@ -233,34 +231,12 @@ button:hover {
       });
 	  
 	  if (dadosAcessos) {
-  const dataFiltro = (() => {
-    if (tipo === "diario") {
-      return document.getElementById("filtroData").value;
-    } else if (tipo === "mensal" || tipo === "semanal") {
-      return document.getElementById("filtroMes").value;
-    }
-    return "";
-  })();
-
-  const semana = parseInt(document.getElementById("filtroSemana").value);
-
-  Object.values(dadosAcessos).forEach(acesso => {
-    const dataAcesso = acesso.horario?.split(" ")[0];
-    if (!dataAcesso) return;
-
-    if (tipo === "diario" && dataAcesso === dataFiltro) {
+  Object.entries(dadosAcessos).forEach(([key, acesso]) => {
+    if (diasFiltrados.includes(acesso.horario?.split(" ")[0])) {
       totalAcessos++;
-    } else if (tipo === "mensal" && dataAcesso.startsWith(dataFiltro)) {
-      totalAcessos++;
-    } else if (tipo === "semanal" && dataAcesso.startsWith(dataFiltro)) {
-      const dia = parseInt(dataAcesso.split("-")[2]);
-      if (dia >= (semana - 1) * 7 + 1 && dia <= semana * 7) {
-        totalAcessos++;
-      }
     }
   });
 }
-
 	  
 	  document.getElementById("totalAcessos").textContent = totalAcessos;
 

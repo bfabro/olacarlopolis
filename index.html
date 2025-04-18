@@ -1033,7 +1033,27 @@ onlineUsersRef.on("value", (snapshot) => {
   }
   });
 
-////////////////////////////////////////
+  /////////////////////////////
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+  
+
+/////////////////////////////////////////*
+/*
 fetch("https://ipapi.co/json/")
      .then(response => response.json())
      .then(data => {
@@ -1056,13 +1076,9 @@ fetch("https://ipapi.co/json/")
        const visitasRef = database.ref("acessosDetalhados");
        visitasRef.push(info);
 
-       // ✅ Novo trecho para armazenar IP único por data
-    const ip = data.ip;
-    const hoje = new Date().toISOString().split("T")[0];
-    const usuariosRef = database.ref(`usuariosUnicos/${hoje}/${ip}`);
-    usuariosRef.set(true);
+       
      });
- 
+ */
 ////////////////////////////////////////
 
   // Seleciona todos os itens de menu que começam com "menu"
@@ -1107,7 +1123,21 @@ fetch("https://ipapi.co/json/")
 
    </script>
 
-
+<script>
+   fetch("https://ipinfo.io/json?token=8bd1345795d2ac").then(res => res.json()).then(dados => {
+     const navegador = navigator.userAgent;
+     const registro = {
+       ip: dados.ip,
+       cidade: dados.city,
+       estado: dados.region,
+       navegador: navegador,
+       horario: new Date().toLocaleString("pt-BR"),
+       pagina: "index.html"
+     };
+     firebase.database().ref("acessosDetalhados").push(registro);
+   });
+ </script>
+ 
 
 
 
