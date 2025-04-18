@@ -1025,9 +1025,22 @@ const onlineUsersRef = firebase.database().ref("onlineUsers");
   userRef.onDisconnect().remove();
 
   // Atualiza o contador de usuários online
-  onlineUsersRef.on("value", (snapshot) => {
-    const userCount = snapshot.numChildren(); // Número de usuários online
-    document.getElementById("contador").innerText = userCount;
+  // Atualiza o contador de usuários online
+onlineUsersRef.on("value", (snapshot) => {
+  const userCount = snapshot.numChildren(); // Número de usuários online
+  const contador = document.getElementById("contador");
+  const icone = document.getElementById("iconeUsuarios");
+
+  contador.innerText = userCount;
+
+  // Lógica para mudar a cor
+  if (userCount > 1) {
+    
+    icone.style.color = "red";
+  } else {
+    contador.style.color = "";
+    icone.style.color = "";
+  }
   });
 
 ////////////////////////////////////////

@@ -2,39 +2,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-  let contadorAnterior = null; // <- começa como null
-
-const contadorEl = document.getElementById("contador");
-const iconeEl = document.getElementById("iconeUsuarios");
-
-if (iconeEl) {
-  iconeEl.style.color = "#00008B"; // azul escuro padrão
-}
-
-const db = firebase.database();
-const ref = db.ref("usuariosOnline");
-
-ref.on("value", function(snapshot) {
-  const novoValor = snapshot.val();
-
-  if (contadorEl) {
-    contadorEl.textContent = novoValor;
+  let contadorAnterior = 0;
+  const contadorEl = document.getElementById("contador");
+  const iconeEl = document.getElementById("iconeUsuarios");
+  
+  // Cor padrão do ícone ao iniciar
+  if (iconeEl) {
+    iconeEl.style.color = "#00008B";
   }
-
-  if (contadorAnterior !== null && novoValor > contadorAnterior) {
-    // animação só após carregamento inicial
-    if (iconeEl) {
+  
+  onlineUsersRef.on("value", (snapshot) => {
+    const userCount = snapshot.numChildren();
+  
+    // Atualiza somente o número visível
+    if (contadorEl) {
+      contadorEl.textContent = userCount;
+    }
+  
+    // Se aumentou, aplica efeito no ícone
+    if (iconeEl && userCount > contadorAnterior) {
       iconeEl.style.color = "red";
       iconeEl.classList.add("pulsando");
-
+  
       setTimeout(() => {
         iconeEl.style.color = "#00008B";
         iconeEl.classList.remove("pulsando");
       }, 5000);
     }
-  }
+  
+    contadorAnterior = userCount;
 
-  contadorAnterior = novoValor;
+
 });
 
 
