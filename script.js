@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
   // Cor padrão do ícone ao iniciar
   if (iconeEl) {
-    iconeEl.style.color = "#000000";
+    iconeEl.style.color = "#808080";
   }
   
   onlineUsersRef.on("value", (snapshot) => {
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
       iconeEl.classList.add("pulsando");
   
       setTimeout(() => {
-        iconeEl.style.color = "#000000";
+        iconeEl.style.color = "#808080";
         iconeEl.classList.remove("pulsando");
       }, 5000);
     }
