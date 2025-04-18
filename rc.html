@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatório de Acessos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+    h1 {
+      text-align: center;
+    }
+    .filtros {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    select, input {
+      padding: 8px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+  <h1>Relatório de Acessos por Categoria</h1>
+  <div class="filtros">
+    <select id="tipoRelatorio">
+      <option value="">Selecione o tipo</option>
+      <option value="diario">Diário</option>
+      <option value="semanal">Semanal</option>
+      <option value="mensal">Mensal</option>
+    </select>
+
+    <input type="date" id="dataDiaria" style="display:none" />
+    <input type="week" id="semanaInput" style="display:none" />
+    <input type="month" id="mesInput" style="display:none" />
+
+    <button onclick="gerarRelatorio()">Gerar Relatório</button>
+  </div>
+
+  <table id="tabelaResultados">
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Total de Cliques</th>
+        <th>Horários (se aplicável)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+      authDomain: "contadoracessos.firebaseapp.com",
+      databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+      projectId: "contadoracessos",
+      storageBucket: "contadoracessos.firebasestorage.app",
+      messagingSenderId: "521517291315",
+      appId: "1:521517291315:web:74f8d878d2d8769460d046"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const tipoRelatorio = document.getElementById("tipoRelatorio");
+    const dataDiaria = document.getElementById("dataDiaria");
+    const semanaInput = document.getElementById("semanaInput");
+    const mesInput = document.getElementById("mesInput");
+
+    tipoRelatorio.addEventListener("change", () => {
+      dataDiaria.style.display = "none";
+      semanaInput.style.display = "none";
+      mesInput.style.display = "none";
+      if (tipoRelatorio.value === "diario") dataDiaria.style.display = "inline";
+      if (tipoRelatorio.value === "semanal") semanaInput.style.display = "inline";
+      if (tipoRelatorio.value === "mensal") mesInput.style.display = "inline";
+    });
+
+    function gerarRelatorio() {
+      const tipo = tipoRelatorio.value;
+      let datas = [];
+
+      if (tipo === "diario") {
+        const dia = dataDiaria.value;
+        if (!dia) return alert("Escolha a data");
+        datas.push(dia);
+      } else if (tipo === "semanal") {
+        const semana = semanaInput.value;
+        if (!semana) return alert("Escolha a semana");
+        const [ano, semanaNum] = semana.split("-W");
+        const primeira = new Date(ano, 0, 1 + (semanaNum - 1) * 7);
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(primeira);
+          d.setDate(d.getDate() + i);
+          datas.push(d.toISOString().split("T")[0]);
+        }
+      } else if (tipo === "mensal") {
+        const mes = mesInput.value;
+        if (!mes) return alert("Escolha o mês");
+        const [ano, mesNum] = mes.split("-");
+        const diasNoMes = new Date(ano, mesNum, 0).getDate();
+        for (let i = 1; i <= diasNoMes; i++) {
+          const dia = `${ano}-${mesNum.padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+          datas.push(dia);
+        }
+      }
+
+      const resultados = {};
+      const promises = datas.map(data =>
+        db.ref(`cliquesPorMenu/${data}`).once("value").then(snapshot => {
+          snapshot.forEach(child => {
+            const categoria = child.key;
+            const total = child.val().total || 0;
+            const horarios = child.val().detalhes || {};
+            if (!resultados[categoria]) {
+              resultados[categoria] = { total: 0, horarios: [] };
+            }
+            resultados[categoria].total += total;
+            Object.values(horarios).forEach(h => resultados[categoria].horarios.push(h.horario));
+          });
+        })
+      );
+
+      Promise.all(promises).then(() => {
+        const tbody = document.querySelector("#tabelaResultados tbody");
+        tbody.innerHTML = "";
+
+        const ranking = Object.entries(resultados).sort((a, b) => b[1].total - a[1].total);
+        ranking.forEach(([categoria, dados]) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${categoria}</td>
+            <td>${dados.total}</td>
+            <td>${tipo === 'diario' ? dados.horarios.join(", ") : "-"}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

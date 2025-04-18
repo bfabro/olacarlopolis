@@ -1714,7 +1714,7 @@ menuLinks.forEach((link) => {
       // fim eventos
   
         {
-            link: document.querySelector("#menufarmaciaPlantao"),
+            link: document.querySelector("#menuFarmaciaPlantao"),
             title: "Farmacia de Plantão",
             establishments: [
 
