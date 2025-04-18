@@ -815,7 +815,7 @@ img {
   #sidebarOpen {
     position: absolute;
   left: 15px; /* Mantém o menu no canto esquerdo */
-  font-size: 30px;
+  font-size: 44px;
   cursor: pointer;
   color: var(--grey-color);
   display: block;
