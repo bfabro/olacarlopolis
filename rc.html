@@ -1,164 +1,278 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Relatório de Acessos</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Cliques por Menu</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #f5f5f5;
+      margin: 0;
       padding: 20px;
-      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
     }
+
+    .container {
+      width: 300px;
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
     h1 {
       text-align: center;
-    }
-    .filtros {
+      color: #00bcd4;
       margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .filtros {
       display: flex;
+      flex-direction: column;
       gap: 10px;
-      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
-    select, input {
-      padding: 8px;
-      font-size: 16px;
+
+    label {
+      font-weight: bold;
     }
+
+    select, input[type="date"], input[type="month"], button {
+      padding: 10px;
+      background-color: #2a2a2a;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #00bcd4;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0097a7;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
+      background-color: #1e1e1e;
+      font-size: 14px;
     }
+
     th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
+      padding: 8px;
       text-align: left;
+      border-bottom: 1px solid #333;
     }
+
     th {
-      background: #007bff;
-      color: white;
+      background-color: #222;
+      color: #00bcd4;
     }
+
+    tr:hover {
+      background-color: #2a2a2a;
+    }
+
+    .hidden {
+      display: none;
+    }
+	
+	th:nth-child(2), td:nth-child(2) {
+  text-align: center;
+}
+
+
+button {
+  background: linear-gradient(135deg, #00bcd4, #007b8a);
+  color: #ffffff;
+  font-weight: bold;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.4);
+}
+
+button:hover {
+  background: linear-gradient(135deg, #00a3ba, #006273);
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.6);
+}
+
   </style>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
-  <h1>Relatório de Acessos por Categoria</h1>
-  <div class="filtros">
-    <select id="tipoRelatorio">
-      <option value="">Selecione o tipo</option>
-      <option value="diario">Diário</option>
-      <option value="semanal">Semanal</option>
-      <option value="mensal">Mensal</option>
-    </select>
-
-    <input type="date" id="dataDiaria" style="display:none" />
-    <input type="week" id="semanaInput" style="display:none" />
-    <input type="month" id="mesInput" style="display:none" />
-
-    <button onclick="gerarRelatorio()">Gerar Relatório</button>
+  <div class="container">
+    <h1>Relatório de Cliques</h1>
+	<div id="cabecalhoPdf" style="display:none; text-align:center; margin-bottom: 20px;">
+  <h2>Ola Carlópolis</h2>
+  <p id="tipoSelecionadoTexto"></p>
+</div>
+    <div class="filtros">
+      <label for="tipoRelatorio">Tipo de Relatório:</label>
+      <select id="tipoRelatorio">
+        <option value="diario">Diário</option>
+        <option value="semanal">Semanal</option>
+        <option value="mensal">Mensal</option>
+      </select>
+      <input type="date" id="filtroData" class="filtro">
+      <input type="month" id="filtroMes" class="filtro hidden">
+      <select id="filtroSemana" class="filtro hidden">
+        <option value="1">Semana 1 (1-7)</option>
+        <option value="2">Semana 2 (8-14)</option>
+        <option value="3">Semana 3 (15-21)</option>
+        <option value="4">Semana 4 (22-28)</option>
+        <option value="5">Semana 5 (29-31)</option>
+      </select>
+      <button id="btnBuscar">Buscar</button>
+	  <button id="btnExportar">Exportar PDF</button>
+    </div>
+    <div class="info-box">
+      <p><strong>Qnt Usuarios Diferentes:</strong> <span id="usuariosUnicos">-</span></p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Categoria</th>
+          <th>Cliques</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaResultados"></tbody>
+    </table>
   </div>
 
-  <table id="tabelaResultados">
-    <thead>
-      <tr>
-        <th>Categoria</th>
-        <th>Total de Cliques</th>
-        <th>Horários (se aplicável)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
       authDomain: "contadoracessos.firebaseapp.com",
       databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
       projectId: "contadoracessos",
-      storageBucket: "contadoracessos.firebasestorage.app",
+      storageBucket: "contadoracessos.appspot.com",
       messagingSenderId: "521517291315",
       appId: "1:521517291315:web:74f8d878d2d8769460d046"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const tipoRelatorio = document.getElementById("tipoRelatorio");
-    const dataDiaria = document.getElementById("dataDiaria");
-    const semanaInput = document.getElementById("semanaInput");
-    const mesInput = document.getElementById("mesInput");
-
-    tipoRelatorio.addEventListener("change", () => {
-      dataDiaria.style.display = "none";
-      semanaInput.style.display = "none";
-      mesInput.style.display = "none";
-      if (tipoRelatorio.value === "diario") dataDiaria.style.display = "inline";
-      if (tipoRelatorio.value === "semanal") semanaInput.style.display = "inline";
-      if (tipoRelatorio.value === "mensal") mesInput.style.display = "inline";
+    const tipoRelatorioEl = document.getElementById("tipoRelatorio");
+    tipoRelatorioEl.addEventListener("change", e => {
+      document.querySelectorAll(".filtro").forEach(f => f.classList.add("hidden"));
+      if (e.target.value === "diario") {
+        document.getElementById("filtroData").classList.remove("hidden");
+      } else if (e.target.value === "mensal") {
+        document.getElementById("filtroMes").classList.remove("hidden");
+      } else {
+        document.getElementById("filtroMes").classList.remove("hidden");
+        document.getElementById("filtroSemana").classList.remove("hidden");
+      }
     });
 
-    function gerarRelatorio() {
-      const tipo = tipoRelatorio.value;
-      let datas = [];
-
-      if (tipo === "diario") {
-        const dia = dataDiaria.value;
-        if (!dia) return alert("Escolha a data");
-        datas.push(dia);
-      } else if (tipo === "semanal") {
-        const semana = semanaInput.value;
-        if (!semana) return alert("Escolha a semana");
-        const [ano, semanaNum] = semana.split("-W");
-        const primeira = new Date(ano, 0, 1 + (semanaNum - 1) * 7);
-        for (let i = 0; i < 7; i++) {
-          const d = new Date(primeira);
-          d.setDate(d.getDate() + i);
-          datas.push(d.toISOString().split("T")[0]);
-        }
-      } else if (tipo === "mensal") {
-        const mes = mesInput.value;
-        if (!mes) return alert("Escolha o mês");
-        const [ano, mesNum] = mes.split("-");
-        const diasNoMes = new Date(ano, mesNum, 0).getDate();
-        for (let i = 1; i <= diasNoMes; i++) {
-          const dia = `${ano}-${mesNum.padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-          datas.push(dia);
-        }
-      }
-
+    document.getElementById("btnBuscar").addEventListener("click", async () => {
+      const tipo = tipoRelatorioEl.value;
       const resultados = {};
-      const promises = datas.map(data =>
-        db.ref(`cliquesPorMenu/${data}`).once("value").then(snapshot => {
-          snapshot.forEach(child => {
-            const categoria = child.key;
-            const total = child.val().total || 0;
-            const horarios = child.val().detalhes || {};
-            if (!resultados[categoria]) {
-              resultados[categoria] = { total: 0, horarios: [] };
-            }
-            resultados[categoria].total += total;
-            Object.values(horarios).forEach(h => resultados[categoria].horarios.push(h.horario));
-          });
-        })
-      );
+      const unicos = new Set();
 
-      Promise.all(promises).then(() => {
-        const tbody = document.querySelector("#tabelaResultados tbody");
-        tbody.innerHTML = "";
+      const snapCliques = await db.ref("cliquesPorMenu").once("value");
+      const snapUsuarios = await db.ref("usuariosUnicos").once("value");
+      const dados = snapCliques.val();
+      const dadosUsuarios = snapUsuarios.val();
 
-        const ranking = Object.entries(resultados).sort((a, b) => b[1].total - a[1].total);
-        ranking.forEach(([categoria, dados]) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${categoria}</td>
-            <td>${dados.total}</td>
-            <td>${tipo === 'diario' ? dados.horarios.join(", ") : "-"}</td>
-          `;
-          tbody.appendChild(row);
-        });
+      const diasFiltrados = Object.keys(dados || {}).filter(dia => {
+        const diaNum = d => parseInt(d.split("-")[2]);
+        if (tipo === "diario") {
+          const filtro = document.getElementById("filtroData").value;
+          return filtro && dia === filtro;
+        } else if (tipo === "mensal") {
+          const mes = document.getElementById("filtroMes").value;
+          return dia.startsWith(mes);
+        } else {
+          const mes = document.getElementById("filtroMes").value;
+          const semana = parseInt(document.getElementById("filtroSemana").value);
+          return dia.startsWith(mes) && diaNum(dia) >= (semana - 1) * 7 + 1 && diaNum(dia) <= semana * 7;
+        }
       });
-    }
+
+      diasFiltrados.forEach(dia => {
+        const categorias = dados[dia];
+        Object.entries(categorias).forEach(([nome, info]) => {
+          if (!resultados[nome]) resultados[nome] = 0;
+          resultados[nome] += info.total || 0;
+        });
+
+        // Contar usuarios unicos
+        if (dadosUsuarios && dadosUsuarios[dia]) {
+          Object.keys(dadosUsuarios[dia]).forEach(ip => unicos.add(ip));
+        }
+      });
+
+      document.getElementById("usuariosUnicos").textContent = unicos.size;
+
+      const tabela = document.getElementById("tabelaResultados");
+      tabela.innerHTML = "";
+      Object.entries(resultados)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([nome, total]) => {
+          const nomeFormatado = nome.startsWith("menu") ? nome.replace("menu", "") : nome;
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${nomeFormatado}</td><td style="text-align:center">${total}</td>`;
+          tabela.appendChild(row);
+        });
+    });
   </script>
+  
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+<script>
+  document.getElementById("btnExportar").addEventListener("click", () => {
+    // Mostra cabeçalho PDF e define o tipo de relatório no texto
+    const tipo = document.getElementById("tipoRelatorio").value;
+    const tipoTexto = {
+      diario: "Relatório Diário",
+      semanal: "Relatório Semanal",
+      mensal: "Relatório Mensal"
+    };
+
+    document.getElementById("tipoSelecionadoTexto").textContent = tipoTexto[tipo] || "";
+    document.getElementById("cabecalhoPdf").style.display = "block";
+
+    // Oculta filtros e botões
+    document.querySelector(".filtros").style.display = "none";
+    document.getElementById("btnExportar").style.display = "none";
+
+    // Gera PDF
+    const elemento = document.querySelector(".container");
+    const opt = {
+      margin:       0.3,
+      filename:     `relatorio-${new Date().toISOString().split("T")[0]}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(elemento).save().then(() => {
+      // Reexibe os elementos após exportar
+      document.getElementById("cabecalhoPdf").style.display = "none";
+      document.querySelector(".filtros").style.display = "flex";
+      document.getElementById("btnExportar").style.display = "inline-block";
+    });
+  });
+</script>
+
 </body>
 </html>

@@ -1055,6 +1055,12 @@ fetch("https://ipapi.co/json/")
        const database = firebase.database();
        const visitasRef = database.ref("acessosDetalhados");
        visitasRef.push(info);
+
+       // ✅ Novo trecho para armazenar IP único por data
+    const ip = data.ip;
+    const hoje = new Date().toISOString().split("T")[0];
+    const usuariosRef = database.ref(`usuariosUnicos/${hoje}/${ip}`);
+    usuariosRef.set(true);
      });
  
 ////////////////////////////////////////
