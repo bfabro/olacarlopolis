@@ -1057,18 +1057,67 @@ fetch("https://ipapi.co/json/")
        visitasRef.push(info);
      });
  
+////////////////////////////////////////
+
+  // Seleciona todos os itens de menu que começam com "menu"
+  document.querySelectorAll("[id^='menu']").forEach(item => {
+    item.addEventListener("click", () => {
+      const menuId = item.id;
+      const hoje = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
+      const ref = db.ref(`cliquesPorMenu/${hoje}/${menuId}`);
+
+      // Atualiza o contador de cliques
+      ref.transaction(current => (current || 0) + 1);
+    });
+  });
+
+
+ // Função para registrar clique
+ function registrarClique(nomeMenu) {
+    const hoje = new Date().toLocaleDateString("pt-BR"); // Ex: 17/04/2025
+    const caminho = `cliquesMenus/${hoje}/${nomeMenu}`;
+
+    db.ref(caminho).transaction(valorAtual => {
+      return (valorAtual || 0) + 1;
+    });
+  }
+
+  // Aplica o evento a todos os submenus (clique em categorias)
+  document.querySelectorAll(".nav_link.sublink").forEach(link => {
+    link.addEventListener("click", () => {
+      const nomeMenu = link.innerText.trim();
+      registrarClique(nomeMenu);
+    });
+  });
+
+
+  
+
+
 
 
 
    </script>
 
+<script>
+   const db = firebase.database();
+ 
+   function registrarClique(nomeMenu) {
+     const hoje = new Date().toLocaleDateString("pt-BR"); // formato dd/mm/aaaa
+     const caminho = `cliquesMenus/${hoje}/${nomeMenu}`;
+ 
+     db.ref(caminho).transaction(valorAtual => {
+       return (valorAtual || 0) + 1;
+     });
+   }
+ </script>
 
 
 
 
 
 
-
+ 
 </body>
 
 </html>
