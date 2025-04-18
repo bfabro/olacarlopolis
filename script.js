@@ -2,6 +2,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   let contadorAnterior = 0;
   const contadorEl = document.getElementById("contador");
   const iconeEl = document.getElementById("iconeUsuarios");

@@ -1001,7 +1001,7 @@
   // Inicializa o Firebase
   const app = firebase.initializeApp(firebaseConfig);
   const database = firebase.database(app);
-
+  const db = firebase.database();
    // Firebase Realtime Database para "onlineUsers"
 const onlineUsersRef = firebase.database().ref("onlineUsers");
 
@@ -1061,26 +1061,26 @@ fetch("https://ipapi.co/json/")
 
   // Seleciona todos os itens de menu que começam com "menu"
   document.querySelectorAll("[id^='menu']").forEach(item => {
-    item.addEventListener("click", () => {
-      const menuId = item.id;
-      const hoje = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
-      const ref = db.ref(`cliquesPorMenu/${hoje}/${menuId}`);
-
-      // Atualiza o contador de cliques
-      ref.transaction(current => (current || 0) + 1);
+   item.addEventListener("click", () => {
+    const menuId = item.id;
+    const agora = new Date();
+    const dataHoje = agora.toISOString().split("T")[0]; // yyyy-mm-dd
+    const horaAgora = agora.toLocaleTimeString("pt-BR"); // hh:mm:ss
+  
+    // Caminho de contagem total por data e menu
+    const contadorRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/total`);
+    contadorRef.transaction(current => (current || 0) + 1);
+  
+    // Caminho de log detalhado com horário
+    const detalhesRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/detalhes`);
+    detalhesRef.push({
+      horario: horaAgora
     });
+  });
   });
 
 
- // Função para registrar clique
- function registrarClique(nomeMenu) {
-    const hoje = new Date().toLocaleDateString("pt-BR"); // Ex: 17/04/2025
-    const caminho = `cliquesMenus/${hoje}/${nomeMenu}`;
-
-    db.ref(caminho).transaction(valorAtual => {
-      return (valorAtual || 0) + 1;
-    });
-  }
+ 
 
   // Aplica o evento a todos os submenus (clique em categorias)
   document.querySelectorAll(".nav_link.sublink").forEach(link => {
@@ -1089,6 +1089,8 @@ fetch("https://ipapi.co/json/")
       registrarClique(nomeMenu);
     });
   });
+ 
+ 
 
 
   
@@ -1099,18 +1101,7 @@ fetch("https://ipapi.co/json/")
 
    </script>
 
-<script>
-   const db = firebase.database();
- 
-   function registrarClique(nomeMenu) {
-     const hoje = new Date().toLocaleDateString("pt-BR"); // formato dd/mm/aaaa
-     const caminho = `cliquesMenus/${hoje}/${nomeMenu}`;
- 
-     db.ref(caminho).transaction(valorAtual => {
-       return (valorAtual || 0) + 1;
-     });
-   }
- </script>
+
 
 
 
