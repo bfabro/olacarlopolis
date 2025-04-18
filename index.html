@@ -1034,16 +1034,7 @@ onlineUsersRef.on("value", (snapshot) => {
   });
 
 ////////////////////////////////////////
-
- 
-
-
-
-   </script>
-
-
-<script>
-   fetch("https://ipapi.co/json/")
+fetch("https://ipapi.co/json/")
      .then(response => response.json())
      .then(data => {
        const info = {
@@ -1056,16 +1047,7 @@ onlineUsersRef.on("value", (snapshot) => {
          pagina: window.location.href
        };
    
-       const firebaseConfig = {
-    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
-    authDomain: "contadoracessos.firebaseapp.com",
-    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
-    projectId: "contadoracessos",
-    storageBucket: "contadoracessos.firebasestorage.app",
-    messagingSenderId: "521517291315",
-    appId: "1:521517291315:web:74f8d878d2d8769460d046",
-    measurementId: "G-BXPWYWK61F"
-   };
+       
        if (!firebase.apps.length) {
          firebase.initializeApp(firebaseConfig);
        }
@@ -1074,7 +1056,14 @@ onlineUsersRef.on("value", (snapshot) => {
        const visitasRef = database.ref("acessosDetalhados");
        visitasRef.push(info);
      });
+ 
+
+
+
    </script>
+
+
+
 
 
 
