@@ -142,6 +142,7 @@ button:hover {
     </div>
     <div class="info-box">
       <p><strong>Qnt Usuarios Diferentes:</strong> <span id="usuariosUnicos">-</span></p>
+	  <p><strong>Total de Acessos:</strong> <span id="totalAcessos">-</span></p>
     </div>
     <table>
       <thead>
@@ -183,6 +184,9 @@ button:hover {
     });
 
     document.getElementById("btnBuscar").addEventListener("click", async () => {
+		const snapAcessos = await db.ref("acessosDetalhados").once("value");
+		const dadosAcessos = snapAcessos.val();
+		let totalAcessos = 0;
       const tipo = tipoRelatorioEl.value;
       const resultados = {};
       const unicos = new Set();
@@ -191,34 +195,77 @@ button:hover {
       const snapUsuarios = await db.ref("usuariosUnicos").once("value");
       const dados = snapCliques.val();
       const dadosUsuarios = snapUsuarios.val();
+	  
+	  // Juntando todas as datas possíveis dos 3 registros
+const diasPossiveis = new Set();
 
-      const diasFiltrados = Object.keys(dados || {}).filter(dia => {
-        const diaNum = d => parseInt(d.split("-")[2]);
-        if (tipo === "diario") {
-          const filtro = document.getElementById("filtroData").value;
-          return filtro && dia === filtro;
-        } else if (tipo === "mensal") {
-          const mes = document.getElementById("filtroMes").value;
-          return dia.startsWith(mes);
-        } else {
-          const mes = document.getElementById("filtroMes").value;
-          const semana = parseInt(document.getElementById("filtroSemana").value);
-          return dia.startsWith(mes) && diaNum(dia) >= (semana - 1) * 7 + 1 && diaNum(dia) <= semana * 7;
-        }
-      });
+if (dados) Object.keys(dados).forEach(d => diasPossiveis.add(d));
+if (dadosUsuarios) Object.keys(dadosUsuarios).forEach(d => diasPossiveis.add(d));
+if (dadosAcessos) {
+  Object.values(dadosAcessos).forEach(a => {
+    const horario = a.horario?.split(" ")[0];
+    if (horario) {
+      const partes = horario.split("/");
+      if (partes.length === 3) {
+        const dataISO = `${partes[2]}-${partes[1]}-${partes[0]}`;
+        diasPossiveis.add(dataISO);
+      }
+    }
+  });
+}
+
+
+   const diasFiltrados = Array.from(diasPossiveis).filter(dia => {
+  const diaNum = d => parseInt(d.split("-")[2]);
+  if (tipo === "diario") {
+    const filtro = document.getElementById("filtroData").value;
+    return filtro && dia === filtro;
+  } else if (tipo === "mensal") {
+    const mes = document.getElementById("filtroMes").value;
+    return dia.startsWith(mes);
+  } else {
+    const mes = document.getElementById("filtroMes").value;
+    const semana = parseInt(document.getElementById("filtroSemana").value);
+    return dia.startsWith(mes) && diaNum(dia) >= (semana - 1) * 7 + 1 && diaNum(dia) <= semana * 7;
+  }
+});
+
 
       diasFiltrados.forEach(dia => {
-        const categorias = dados[dia];
-        Object.entries(categorias).forEach(([nome, info]) => {
-          if (!resultados[nome]) resultados[nome] = 0;
-          resultados[nome] += info.total || 0;
-        });
+  // Contabiliza cliques por categoria com segurança
+  if (dados && dados[dia]) {
+    const categorias = dados[dia];
+    Object.entries(categorias).forEach(([nome, info]) => {
+      if (!resultados[nome]) resultados[nome] = 0;
+      resultados[nome] += info.total || 0;
+    });
+  }
 
-        // Contar usuarios unicos
-        if (dadosUsuarios && dadosUsuarios[dia]) {
-          Object.keys(dadosUsuarios[dia]).forEach(ip => unicos.add(ip));
+  // Contabiliza usuários únicos
+  if (dadosUsuarios && dadosUsuarios[dia]) {
+    Object.keys(dadosUsuarios[dia]).forEach(ip => unicos.add(ip));
+  }
+});
+
+	  
+	if (dadosAcessos) {
+  Object.entries(dadosAcessos).forEach(([key, acesso]) => {
+    const horario = acesso.horario?.split(" ")[0]; // Ex: "18/04/2025"
+    if (horario) {
+      const partes = horario.split("/"); // [dia, mes, ano]
+      if (partes.length === 3) {
+        const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`; // yyyy-mm-dd
+        if (diasFiltrados.includes(dataFormatada)) {
+          totalAcessos++;
         }
-      });
+      }
+    }
+  });
+}
+
+	  
+	  document.getElementById("totalAcessos").textContent = totalAcessos;
+
 
       document.getElementById("usuariosUnicos").textContent = unicos.size;
 

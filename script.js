@@ -1214,7 +1214,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/biofarma.png",
                     name: "Bio Farma",
                     address: "<br>Rua Laurindo Franco Godoy, 464",
-                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h</br> Dom e feriado: Fechado",
                     contact: "</br>(43) 3566-1473",
                     delivery: "</br>Sim / Sem Taxa",
                     facebook: "www.facebook.com/uahh",
