@@ -68,34 +68,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /////////
 
+  // Função para registrar o acesso diário
+  function registrarAcesso() {
+    const hoje = new Date().toISOString().slice(0, 10); // "AAAA-MM-DD"
+    const ref = firebase.database().ref(`acessosPorDia/${hoje}/total`);
 
+    ref.transaction(function (acessos) {
+      return (acessos || 0) + 1;
+    });
+  }
+
+  registrarAcesso(); // Chamada da função
 
 
 
 
 ///////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
