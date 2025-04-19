@@ -542,75 +542,6 @@ body.dark {
 }
 
 
-
-
-/* PARA TABLETS */
-
-
-
-@media screen and (max-width: 821px) {
-  /*#sidebarOpen {
-    font-size: 25px;
-    display: block;
-    margin-right: 10px;
-    cursor: pointer;
-    color: var(--grey-color);
-  }*/
-
-  .sidebar {
-    overflow-y: auto; /* Permite rolagem caso tenha muitos itens */
-    max-height: 100vh; /* Impede que o menu seja cortado */
-    
-}
-
-/* Garante que todos os itens fiquem visíveis após a pesquisa */
-.menu_items {
-
-  display: flex;
-  flex-direction: column;
-}
-
-/* Garante que os submenus fiquem fechados ao iniciar */
-.submenu {
-  display: none;
-}
-
-  .search_bar {
-    display: none;
-  }
-
-  .sidebar.close .bottom_content {
-    width: 80px;
-
-  }
-
-  /* Quando o menu fechar */
-  .sidebar.close~.content_area {
-   /* width: calc(108% - 80px);*/
-    width: calc(100% - 00px);
-    margin-left: -5px;
-  }
-
-
-}
-
-/* Quando um item do menu for clicado, fecha o menu automaticamente */
-@media screen and (max-width:821px) {
-  .sidebar .nav_link {
-    cursor: pointer;
-  }
-}
-
-
-
-
-
-
-
-
-/* FIM PARA TABLETS */
-
-
 @media screen and (max-width: 768px) {
   /*#sidebarOpen {
     font-size: 25px;
@@ -919,6 +850,38 @@ img {
 }
 /* CARROsEU */
 
+
+
+/* PARA TABLETS */
+
+@media only screen 
+  and (min-device-width: 768px) 
+  and (max-device-width: 1024px)
+  and (orientation: portrait),
+only screen 
+  and (min-device-width: 834px) 
+  and (max-device-width: 1112px) 
+  and (orientation: landscape) {
+  
+  .sidebar {
+    width: 240px;
+  }
+
+  .content_area {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .banner-content {
+    font-size: 18px;
+    margin: 10px;
+  }
+}
+
+
+
+/* FINAL PARA TABLETS */
+
 /* Espaçamento entre os slides do carrossel */
 .swiper-slide {
   width: 100%; /* Ou defina a largura fixa, como 300px */
@@ -1023,29 +986,6 @@ img {
   max-width: 425px; /* Limita a largura máxima para não ficar muito grande */
   border-radius: 10px; /* Bordas arredondadas */
   margin-bottom: 10px; /* Espaçamento inferior */
-}
-
-
-
-/*  para tablets */
-
-/* Ajustes para telas grandes (computadores) */
-@media screen and (min-width: 821px) {
-  img {
-    max-width: 600px; /* Aumenta o tamanho máximo das imagens */
-    display: block; /* Garante que a imagem seja tratada como um bloco */
-    /*margin-left: auto;  Centraliza a imagem horizontalmente 
-    margin-right: auto;  Centraliza a imagem horizontalmente */
-  }
-}
-
-/* Estilos para o carrossel em telas grandes */
-@media screen and (min-width: 821px) {
-  .swiper-slide img {
-    max-width: 400px; /* Aumenta o tamanho máximo das imagens no carrossel */
-    margin-left: auto; /* Centraliza a imagem horizontalmente */
-    margin-right: auto; /* Centraliza a imagem horizontalmente */
-  }
 }
 
 /* Ajustes para telas grandes (computadores) */
