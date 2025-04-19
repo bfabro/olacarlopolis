@@ -217,7 +217,14 @@
 </table>
 
 
-
+<table style="margin-top: 20px;">
+  <thead>
+    <tr>
+      <th colspan="2" style="text-align: center;">Acessos por Faixa de Horário</th>
+    </tr>
+  </thead>
+  <tbody id="tabelaHorarios"></tbody>
+</table>
 
 
     <table>
@@ -270,6 +277,7 @@
       const snapCliques = await db.ref("cliquesPorMenu").once("value");
       const snapUsuarios = await db.ref("usuariosUnicos").once("value");
       const snapAcessos = await db.ref("acessosPorDia").once("value");
+	  
 
       const dadosCliques = snapCliques.val() || {};
       const dadosUsuarios = snapUsuarios.val() || {};
@@ -350,6 +358,33 @@ Object.entries(cidadesContagem)
     row.innerHTML = `<td>${cidade}</td><td style="text-align:center">${total}</td>`;
     tabelaCidades.appendChild(row);
   });
+  
+  
+  // Resumo por faixa de horário
+const horarios = {};
+
+diasFiltrados.forEach(dia => {
+  const acessos = dadosAcessos[dia]?.detalhados || {};
+  Object.values(acessos).forEach(acesso => {
+    const horaCompleta = acesso.horario || "00:00:00";
+    const hora = parseInt(horaCompleta.split(":")[0]);
+    const faixa = `${hora}:00 – ${hora + 1}:00`;
+
+    if (!horarios[faixa]) horarios[faixa] = 0;
+    horarios[faixa]++;
+  });
+});
+
+const tabelaHorarios = document.getElementById("tabelaHorarios");
+tabelaHorarios.innerHTML = "";
+Object.entries(horarios)
+  .sort((a, b) => a[0].localeCompare(b[0]))
+  .forEach(([faixa, total]) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${faixa}</td><td style="text-align:center">${total}</td>`;
+    tabelaHorarios.appendChild(row);
+  });
+
 
     });
   </script>
@@ -440,6 +475,13 @@ Object.entries(cidadesContagem)
     const nomeArquivo = `relatorio-${dataHoje}.xlsx`;
     XLSX.writeFile(wb, nomeArquivo);
   });
+  
+  document.addEventListener("DOMContentLoaded", () => {
+  const hoje = new Date().toISOString().split("T")[0];
+  const inputData = document.getElementById("filtroData");
+  if (inputData) inputData.value = hoje;
+});
+
 </script>
 
 
