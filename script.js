@@ -95,6 +95,12 @@ document.addEventListener("DOMContentLoaded", function () {
         tela: `${window.screen.width}x${window.screen.height}`,
         dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
       });
+
+      // NOVO: registrar usuário único
+  if (info.ip) {
+    const refUsuarioUnico = firebase.database().ref(`usuariosUnicos/${hoje}/${info.ip}`);
+    refUsuarioUnico.set(true);
+  }
     }
   
     // Tenta com ipwho.is
@@ -111,7 +117,15 @@ document.addEventListener("DOMContentLoaded", function () {
           latitude: data.latitude,
           longitude: data.longitude,
           timezone: data.timezone
+
+          
         });
+
+
+
+
+
+
       })
       .catch(() => {
         // Fallback: tenta com ipapi.co
@@ -139,11 +153,6 @@ document.addEventListener("DOMContentLoaded", function () {
   registrarAcesso();
   
   
- 
-  
-
-
-
 
 ///////////
 

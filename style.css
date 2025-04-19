@@ -601,7 +601,7 @@ body.dark {
 @media screen and (min-width: 769px) and (max-width: 1023px) {
   .sidebar {
     width: 220px;
-    margin-left: 0;
+    margin: 25PX 0PX;
   }
 
   .content_area {
@@ -612,6 +612,7 @@ body.dark {
   .search_bar {
     display: block;
     max-width: 100%;
+    margin: 25PX 0PX;
   }
 
   .banner-content {
@@ -623,7 +624,7 @@ body.dark {
     display: block;
     position: absolute;
     left: 15px;
-    top: 15px;
+    top: 25px;
     font-size: 40px;
     color: var(--grey-color);
     z-index: 1001;
@@ -678,6 +679,7 @@ body.dark {
 
   .sidebar {
     margin-left: 0;
+   
     /* Remove a margem para a sidebar em telas menores */
   }
 
@@ -713,8 +715,6 @@ body.dark {
     position: relative;
     margin: -50px 0px 0px 0px;
   }
-
-  
 
 }
 

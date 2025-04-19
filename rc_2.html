@@ -1,0 +1,259 @@
+<!-- Salve como relatorio.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Acessos e Cliques</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 300px;
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      text-align: center;
+      color: #00bcd4;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .filtros {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    select, input[type="date"], input[type="month"], button {
+      padding: 10px;
+      background-color: #2a2a2a;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #00bcd4, #007b8a);
+      color: #ffffff;
+      font-weight: bold;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 188, 212, 0.4);
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #00a3ba, #006273);
+      transform: scale(1.03);
+      box-shadow: 0 4px 12px rgba(0, 188, 212, 0.6);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1e1e1e;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #333;
+    }
+
+    th {
+      background-color: #222;
+      color: #00bcd4;
+    }
+
+    tr:hover {
+      background-color: #2a2a2a;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+      text-align: center;
+    }
+
+    .info-box p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Relatório de Cliques</h1>
+    <div class="filtros">
+      <label for="tipoRelatorio">Tipo de Relatório:</label>
+      <select id="tipoRelatorio">
+        <option value="diario">Diário</option>
+        <option value="semanal">Semanal</option>
+        <option value="mensal">Mensal</option>
+      </select>
+      <input type="date" id="filtroData" class="filtro">
+      <input type="month" id="filtroMes" class="filtro hidden">
+      <select id="filtroSemana" class="filtro hidden">
+        <option value="1">Semana 1 (1–7)</option>
+        <option value="2">Semana 2 (8–14)</option>
+        <option value="3">Semana 3 (15–21)</option>
+        <option value="4">Semana 4 (22–28)</option>
+        <option value="5">Semana 5 (29–31)</option>
+      </select>
+      <button id="btnBuscar">Buscar</button>
+      <button id="btnExportar">Exportar PDF</button>
+    </div>
+    <div class="info-box">
+      <p><strong>Total de Acessos:</strong> <span id="totalAcessos">-</span></p>
+      <p><strong>Usuários Únicos:</strong> <span id="usuariosUnicos">-</span></p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Categoria</th>
+          <th>Cliques</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaResultados"></tbody>
+    </table>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+      authDomain: "contadoracessos.firebaseapp.com",
+      databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+      projectId: "contadoracessos",
+      storageBucket: "contadoracessos.appspot.com",
+      messagingSenderId: "521517291315",
+      appId: "1:521517291315:web:74f8d878d2d8769460d046"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
+  <script>
+    const tipoRelatorioEl = document.getElementById("tipoRelatorio");
+    tipoRelatorioEl.addEventListener("change", e => {
+      document.querySelectorAll(".filtro").forEach(f => f.classList.add("hidden"));
+      if (e.target.value === "diario") {
+        document.getElementById("filtroData").classList.remove("hidden");
+      } else if (e.target.value === "mensal") {
+        document.getElementById("filtroMes").classList.remove("hidden");
+      } else {
+        document.getElementById("filtroMes").classList.remove("hidden");
+        document.getElementById("filtroSemana").classList.remove("hidden");
+      }
+    });
+
+    document.getElementById("btnBuscar").addEventListener("click", async () => {
+      const tipo = tipoRelatorioEl.value;
+      const resultados = {};
+      const unicos = new Set();
+
+      const snapCliques = await db.ref("cliquesPorMenu").once("value");
+      const snapUsuarios = await db.ref("usuariosUnicos").once("value");
+      const snapAcessos = await db.ref("acessosPorDia").once("value");
+
+      const dadosCliques = snapCliques.val() || {};
+      const dadosUsuarios = snapUsuarios.val() || {};
+      const dadosAcessos = snapAcessos.val() || {};
+
+      let diasFiltrados = [];
+      const getDiaNum = d => parseInt(d.split("-")[2]);
+
+      if (tipo === "diario") {
+        const dia = document.getElementById("filtroData").value;
+        diasFiltrados = [dia];
+      } else if (tipo === "mensal") {
+        const mes = document.getElementById("filtroMes").value;
+        diasFiltrados = Object.keys(dadosCliques).filter(dia => dia.startsWith(mes));
+      } else if (tipo === "semanal") {
+        const mes = document.getElementById("filtroMes").value;
+        const semana = parseInt(document.getElementById("filtroSemana").value);
+        const inicio = (semana - 1) * 7 + 1;
+        const fim = semana * 7;
+        diasFiltrados = Object.keys(dadosCliques).filter(dia =>
+          dia.startsWith(mes) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+        );
+      }
+
+      let totalAcessos = 0;
+
+      diasFiltrados.forEach(dia => {
+        const categorias = dadosCliques[dia] || {};
+        Object.entries(categorias).forEach(([nome, info]) => {
+          if (!resultados[nome]) resultados[nome] = 0;
+          resultados[nome] += info.total || 0;
+        });
+
+        if (dadosUsuarios[dia]) {
+          Object.keys(dadosUsuarios[dia]).forEach(ip => unicos.add(ip));
+        }
+
+        const acessosDetalhados = dadosAcessos[dia]?.detalhados;
+        if (acessosDetalhados) {
+          totalAcessos += Object.keys(acessosDetalhados).length;
+        }
+      });
+
+      document.getElementById("totalAcessos").textContent = totalAcessos;
+      document.getElementById("usuariosUnicos").textContent = unicos.size;
+
+      const tabela = document.getElementById("tabelaResultados");
+      tabela.innerHTML = "";
+      Object.entries(resultados)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([nome, total]) => {
+          const nomeFormatado = nome.startsWith("menu") ? nome.replace("menu", "") : nome;
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
+          tabela.appendChild(row);
+        });
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    document.getElementById("btnExportar").addEventListener("click", () => {
+      const elemento = document.querySelector(".container");
+      const opt = {
+        margin: 0.3,
+        filename: `relatorio-${new Date().toISOString().split("T")[0]}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(elemento).save();
+    });
+  </script>
+</body>
+</html>
