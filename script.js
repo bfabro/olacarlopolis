@@ -70,38 +70,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Função para registrar o acesso diário
   function registrarAcesso() {
-    fetch("https://ipapi.co/json/")
+    fetch("https://ipwho.is/")
       .then((response) => response.json())
       .then((data) => {
-        const hoje = new Date().toISOString().slice(0, 10); // "AAAA-MM-DD"
+        const hoje = new Date().toISOString().slice(0, 10);
         const cidade = data.city || "Desconhecida";
         const estado = data.region || "UF";
         const ip = data.ip || "sem_ip";
+        const pais = data.country || "BR";
+        const provedor = data.connection?.isp || "Desconhecido";
+        const timezone = data.timezone || "Desconhecido";
+        const latitude = data.latitude || null;
+        const longitude = data.longitude || null;
   
         const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
         const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
   
-        // Incrementa o total de acessos
-        refTotal.transaction((acessos) => {
-          return (acessos || 0) + 1;
-        });
+        refTotal.transaction((acessos) => (acessos || 0) + 1);
   
-        // Salva os dados detalhados
         refDetalhado.set({
           ip: ip,
           cidade: cidade,
           estado: estado,
+          pais: pais,
+          provedor: provedor,
+          latitude: latitude,
+          longitude: longitude,
+          timezone: timezone,
           horario: new Date().toLocaleTimeString(),
-          navegador: navigator.userAgent
+          navegador: navigator.userAgent,
+          idioma: navigator.language,
+          plataforma: navigator.platform
         });
       })
       .catch((error) => {
-        console.error("Erro ao obter localização:", error);
+        console.error("Erro ao obter localização com ipwho.is:", error);
       });
   }
   
+  registrarAcesso();
   
-  registrarAcesso(); // Chamada da função
 
 
 
