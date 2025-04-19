@@ -595,6 +595,51 @@ body.dark {
   }
 }
 
+/* TESTE TABLETS */
+
+/* Estilos específicos para tablets (ex: iPads em pé e deitados) */
+@media screen and (min-width: 769px) and (max-width: 1023px) {
+  .sidebar {
+    width: 220px;
+    margin-left: 0;
+  }
+
+  .content_area {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+  }
+
+  .search_bar {
+    display: block;
+    max-width: 100%;
+  }
+
+  .banner-content {
+    font-size: 20px;
+    margin: -350px 0 0 0;
+  }
+
+  #sidebarOpen {
+    display: block;
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    font-size: 40px;
+    color: var(--grey-color);
+    z-index: 1001;
+    cursor: pointer;
+  }
+
+  .swiper-slide img {
+    max-width: 350px;
+    height: auto;
+  }
+}
+
+
+
+/* TESTE TABLETS */
+
 
 
 @media screen and (min-width: 1024px) { /* Apenas para computadores */
