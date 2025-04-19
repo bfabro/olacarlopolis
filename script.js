@@ -70,45 +70,73 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Função para registrar o acesso diário
   function registrarAcesso() {
+    const hoje = new Date().toISOString().slice(0, 10);
+    const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
+    const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
+  
+    // Sempre conta o acesso (mesmo sem detalhes)
+    refTotal.transaction((acessos) => (acessos || 0) + 1);
+  
+    // Função auxiliar para salvar dados no Firebase
+    function salvarDados(info) {
+      refDetalhado.set({
+        ip: info.ip || "sem_ip",
+        cidade: info.city || "Desconhecida",
+        estado: info.region || "UF",
+        pais: info.country || "BR",
+        provedor: info.provider || "Desconhecido",
+        latitude: info.latitude || null,
+        longitude: info.longitude || null,
+        timezone: info.timezone || "Indefinido",
+        horario: new Date().toLocaleTimeString(),
+        navegador: navigator.userAgent,
+        idioma: navigator.language,
+        plataforma: navigator.platform
+      });
+    }
+  
+    // Tenta com ipwho.is
     fetch("https://ipwho.is/")
-      .then((response) => response.json())
+      .then((res) => res.json())
       .then((data) => {
-        const hoje = new Date().toISOString().slice(0, 10);
-        const cidade = data.city || "Desconhecida";
-        const estado = data.region || "UF";
-        const ip = data.ip || "sem_ip";
-        const pais = data.country || "BR";
-        const provedor = data.connection?.isp || "Desconhecido";
-        const timezone = data.timezone || "Desconhecido";
-        const latitude = data.latitude || null;
-        const longitude = data.longitude || null;
-  
-        const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
-        const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
-  
-        refTotal.transaction((acessos) => (acessos || 0) + 1);
-  
-        refDetalhado.set({
-          ip: ip,
-          cidade: cidade,
-          estado: estado,
-          pais: pais,
-          provedor: provedor,
-          latitude: latitude,
-          longitude: longitude,
-          timezone: timezone,
-          horario: new Date().toLocaleTimeString(),
-          navegador: navigator.userAgent,
-          idioma: navigator.language,
-          plataforma: navigator.platform
+        if (!data.success) throw new Error("Falhou no ipwho.is");
+        salvarDados({
+          ip: data.ip,
+          city: data.city,
+          region: data.region,
+          country: data.country,
+          provider: data.connection?.isp,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          timezone: data.timezone
         });
       })
-      .catch((error) => {
-        console.error("Erro ao obter localização com ipwho.is:", error);
+      .catch(() => {
+        // Se falhar, tenta ipapi.co
+        fetch("https://ipapi.co/json/")
+          .then((res) => res.json())
+          .then((data) => {
+            salvarDados({
+              ip: data.ip,
+              city: data.city,
+              region: data.region,
+              country: data.country,
+              provider: data.org,
+              latitude: data.latitude,
+              longitude: data.longitude,
+              timezone: data.timezone
+            });
+          })
+          .catch((error) => {
+            console.warn("Não foi possível obter localização:", error);
+            // Salva apenas o horário e navegador
+            salvarDados({});
+          });
       });
   }
   
-  registrarAcesso();
+  registrarAcesso();  
+ 
   
 
 
