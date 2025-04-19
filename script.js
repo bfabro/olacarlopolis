@@ -70,14 +70,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Função para registrar o acesso diário
   function registrarAcesso() {
-    const hoje = new Date().toISOString().slice(0, 10); // "AAAA-MM-DD"
-    const ref = firebase.database().ref(`acessosPorDia/${hoje}/total`);
-
-    ref.transaction(function (acessos) {
-      return (acessos || 0) + 1;
-    });
+    fetch("https://ipapi.co/json/")
+      .then((response) => response.json())
+      .then((data) => {
+        const hoje = new Date().toISOString().slice(0, 10); // "AAAA-MM-DD"
+        const cidade = data.city || "Desconhecida";
+        const estado = data.region || "UF";
+        const ip = data.ip || "sem_ip";
+  
+        const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
+        const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
+  
+        // Incrementa o total de acessos
+        refTotal.transaction((acessos) => {
+          return (acessos || 0) + 1;
+        });
+  
+        // Salva os dados detalhados
+        refDetalhado.set({
+          ip: ip,
+          cidade: cidade,
+          estado: estado,
+          horario: new Date().toLocaleTimeString(),
+          navegador: navigator.userAgent
+        });
+      })
+      .catch((error) => {
+        console.error("Erro ao obter localização:", error);
+      });
   }
-
+  
+  
   registrarAcesso(); // Chamada da função
 
 
