@@ -74,10 +74,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
     const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
   
-    // Sempre conta o acesso (mesmo sem detalhes)
     refTotal.transaction((acessos) => (acessos || 0) + 1);
   
-    // Função auxiliar para salvar dados no Firebase
     function salvarDados(info) {
       refDetalhado.set({
         ip: info.ip || "sem_ip",
@@ -91,7 +89,11 @@ document.addEventListener("DOMContentLoaded", function () {
         horario: new Date().toLocaleTimeString(),
         navegador: navigator.userAgent,
         idioma: navigator.language,
-        plataforma: navigator.platform
+        plataforma: navigator.platform,
+        pagina: window.location.href,
+        referrer: document.referrer || "acesso direto",
+        tela: `${window.screen.width}x${window.screen.height}`,
+        dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
       });
     }
   
@@ -112,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       })
       .catch(() => {
-        // Se falhar, tenta ipapi.co
+        // Fallback: tenta com ipapi.co
         fetch("https://ipapi.co/json/")
           .then((res) => res.json())
           .then((data) => {
@@ -129,13 +131,14 @@ document.addEventListener("DOMContentLoaded", function () {
           })
           .catch((error) => {
             console.warn("Não foi possível obter localização:", error);
-            // Salva apenas o horário e navegador
             salvarDados({});
           });
       });
   }
   
-  registrarAcesso();  
+  registrarAcesso();
+  
+  
  
   
 
