@@ -541,7 +541,7 @@ body.dark {
   font-size: 22px;
 }
 
-/* VOLTAR AQUI */ 
+
 @media screen and (max-width: 768px) {
   /*#sidebarOpen {
     font-size: 25px;
@@ -1381,26 +1381,47 @@ img {
   animation: pulsar 1s infinite;
 }
 
-/* INICIO PARA TABLETS */
 
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  #sidebarOpen {
-    display: block;
-    position: absolute;
-    left: 15px;
-    top: 15px;
-    font-size: 40px;
-    color: var(--grey-color);
-    z-index: 1001;
-    cursor: pointer;
+/* Ajustes específicos para iPads e tablets Apple */
+@media only screen 
+  and (min-device-width: 768px) 
+  and (max-device-width: 1024px)
+  and (orientation: portrait),
+only screen 
+  and (min-device-width: 834px) 
+  and (max-device-width: 1112px) 
+  and (orientation: landscape),
+only screen 
+  and (min-width: 768px) 
+  and (max-width: 1024px) {
+
+  .sidebar {
+    width: 220px;
+    overflow-y: auto;
   }
 
-  .container {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 0 10px;
+  .content_area {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 10px;
   }
-  
+
+  .banner-content {
+    font-size: 18px !important;
+    margin: 10px !important;
+  }
+
+  .search_sidebar {
+    padding: 10px;
+    margin: 10px 0;
+  }
+
+  .menu_items {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .submenu {
+    display: none;
+  }
 }
-
-/* FIM PARA TABLETS */
