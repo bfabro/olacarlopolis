@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Ola Carlópolis</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #007acc;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    h2 {
+      text-align: center;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin - Ola Carlópolis</h2>
+
+    <div id="loginForm">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="senha" placeholder="Senha">
+      <button onclick="login()">Entrar</button>
+    </div>
+
+    <div id="adminForm" class="hidden">
+      <p>Bem-vindo, <span id="usuarioEmail"></span> | <button onclick="logout()">Sair</button></p>
+      <input type="text" id="nomeComercio" placeholder="Nome do Comércio">
+      <input type="text" id="horario" placeholder="Horário de Funcionamento">
+
+      <label>Foto de Perfil:</label>
+      <input type="file" id="imagemPerfil">
+
+      <label>Imagens de Divulgação:</label>
+      <input type="file" id="imagensDivulgacao" multiple>
+
+      <label>Imagens de Cardápio:</label>
+      <input type="file" id="imagensCardapio" multiple>
+
+      <button onclick="salvarDados()">Salvar Dados</button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+      authDomain: "contadoracessos.firebaseapp.com",
+      databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+      projectId: "contadoracessos",
+      storageBucket: "contadoracessos.appspot.com",
+      messagingSenderId: "521517291315",
+      appId: "1:521517291315:web:74f8d878d2d8769460d046"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const storage = firebase.storage();
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('adminForm').classList.remove('hidden');
+        document.getElementById('usuarioEmail').textContent = user.email;
+      } else {
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('adminForm').classList.add('hidden');
+      }
+    });
+
+    function login() {
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+      auth.signInWithEmailAndPassword(email, senha)
+        .catch(err => alert("Erro ao logar: " + err.message));
+    }
+
+    function logout() {
+      auth.signOut();
+    }
+
+    function salvarDados() {
+      const userId = auth.currentUser.uid;
+      const nome = document.getElementById('nomeComercio').value;
+      const horario = document.getElementById('horario').value;
+
+      const ref = db.ref('estabelecimentos/' + userId);
+      ref.set({ nome, horario });
+
+      const perfil = document.getElementById('imagemPerfil').files[0];
+      if (perfil) {
+        const refPerfil = storage.ref(`perfil/${userId}`);
+        refPerfil.put(perfil).then(snapshot => snapshot.ref.getDownloadURL()).then(url => {
+          ref.update({ imagemPerfil: url });
+        });
+      }
+
+      const divulgacao = document.getElementById('imagensDivulgacao').files;
+      for (let i = 0; i < divulgacao.length; i++) {
+        const refDiv = storage.ref(`divulgacao/${userId}/${divulgacao[i].name}`);
+        refDiv.put(divulgacao[i]).then(snap => snap.ref.getDownloadURL()).then(url => {
+          db.ref(`estabelecimentos/${userId}/imagensDivulgacao`).push(url);
+        });
+      }
+
+      const cardapio = document.getElementById('imagensCardapio').files;
+      for (let i = 0; i < cardapio.length; i++) {
+        const refCard = storage.ref(`cardapio/${userId}/${cardapio[i].name}`);
+        refCard.put(cardapio[i]).then(snap => snap.ref.getDownloadURL()).then(url => {
+          db.ref(`estabelecimentos/${userId}/imagensCardapio`).push(url);
+        });
+      }
+
+      alert("Dados salvos com sucesso!");
+    }
+  </script>
+</body>
+</html>

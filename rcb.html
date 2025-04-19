@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Relatório - Acessos</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -153,12 +155,17 @@
       display: none;
     }
 	
+	canvas {
+  max-width: 100%;
+  overflow-x: auto;
+}
 
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Relatório Ola Carlopolis</h1>
+	
 	<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
   <h2 style="margin:0; font-size: 18px; color:#00bcd4;">📊 Relatório de Cliques</h2>
   <div>
@@ -396,6 +403,11 @@
 			  });
 
 
+criarGraficoResumo(totalAcessos, unicos.size);
+criarGraficoCidades(cidadesContagem);
+criarGraficoHorarios(horarios);
+criarGraficoCategorias(resultados);
+
 				});
 			  </script>
 
@@ -493,8 +505,159 @@
 			});
 
 		</script>
+		
+	
+
+<!-- Adicionando botões para exibir/ocultar gráficos -->
+<script>
+  function toggleGrafico(id, btn) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = el.style.display === "none" ? "block" : "none";
+    btn.textContent = el.style.display === "none" ? "📈 Mostrar Gráfico" : "➖ Ocultar Gráfico";
+  }
+
+  function criarBotaoToggle(id, container) {
+    const btn = document.createElement("button");
+    btn.textContent = "📈 Mostrar Gráfico";
+    btn.style.marginTop = "10px";
+    btn.style.marginBottom = "10px";
+    btn.style.background = "#ccc";
+    btn.style.color = "#333";
+    btn.style.border = "1px solid #aaa";
+    btn.style.padding = "6px 10px";
+    btn.style.borderRadius = "6px";
+    btn.style.cursor = "pointer";
+    btn.onclick = () => toggleGrafico(id, btn);
+    container.appendChild(btn);
+  }
+
+  function criarGraficoResumo(acessos, unicos) {
+    const container = document.querySelector(".card:nth-of-type(1)");
+    const ctxResumo = document.createElement("canvas");
+    ctxResumo.id = "graficoResumo";
+    ctxResumo.style.display = "none";
+    container.appendChild(ctxResumo);
+    criarBotaoToggle("graficoResumo", container);
+
+    new Chart(ctxResumo, {
+      type: 'doughnut',
+      data: {
+        labels: ['Total de Acessos', 'Usuários Únicos'],
+        datasets: [{
+          data: [acessos, unicos],
+          backgroundColor: ['#007acc', '#4caf50']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+  }
+
+  function criarGraficoCidades(cidadesContagem) {
+    const container = document.querySelector(".card:nth-of-type(2)");
+    const ctxCidade = document.createElement("canvas");
+    ctxCidade.id = "graficoCidade";
+    ctxCidade.style.display = "none";
+    container.appendChild(ctxCidade);
+    criarBotaoToggle("graficoCidade", container);
+
+    const labels = Object.keys(cidadesContagem);
+    const data = Object.values(cidadesContagem);
+
+    new Chart(ctxCidade, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Acessos por Cidade',
+          data: data,
+          backgroundColor: '#007acc'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  function criarGraficoHorarios(horarios) {
+    const container = document.querySelector(".card:nth-of-type(3)");
+    const ctxHorario = document.createElement("canvas");
+    ctxHorario.id = "graficoHorarios";
+    ctxHorario.style.display = "none";
+    container.appendChild(ctxHorario);
+    criarBotaoToggle("graficoHorarios", container);
+
+    const labels = Object.keys(horarios);
+    const data = Object.values(horarios);
+
+    new Chart(ctxHorario, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Acessos por Horário',
+          data: data,
+          borderColor: '#ff5722',
+          backgroundColor: '#ffe0b2',
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  function criarGraficoCategorias(categorias) {
+    const container = document.querySelector(".card:nth-of-type(4)");
+    const ctxCat = document.createElement("canvas");
+    ctxCat.id = "graficoCategorias";
+    ctxCat.style.display = "none";
+    container.appendChild(ctxCat);
+    criarBotaoToggle("graficoCategorias", container);
+
+    const labels = Object.keys(categorias);
+    const data = Object.values(categorias);
+
+    new Chart(ctxCat, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Cliques por Categoria',
+          data: data,
+          backgroundColor: '#673ab7'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  document.getElementById("btnBuscar").addEventListener("click", () => {
+    ["graficoResumo", "graficoCidade", "graficoHorarios", "graficoCategorias"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    });
+    document.querySelectorAll(".card button").forEach(btn => {
+      if (btn.textContent.includes("Gráfico")) btn.remove();
+    });
+  });
+</script>
 
 
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	</body>
 </html>
