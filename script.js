@@ -1299,7 +1299,7 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
                     name: "Farmacia da Vila",
-                    address: "Rua Manguba, 320",
+                    address: "Rua Manguba, 320, Carlopolis",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "(43) 99148-8478",
                     delivery: "Sim / Sem Taxa",
