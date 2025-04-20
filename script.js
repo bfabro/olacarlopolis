@@ -177,7 +177,10 @@ document.addEventListener("DOMContentLoaded", function () {
   
       // borracharia
       vidanova: "s",
-  
+  // deposito de gas
+  liagas:"s",
+
+
       //farmacia
       elshaday: "s",
       farmais: "s",
@@ -1369,7 +1372,7 @@ menuLinks.forEach((link) => {
                     "https://www.instagram.com/popularmais_farmaciadojeremias/",
                     site: "#",
                     novidadesImages: [                  
-                        "images/comercios/farmacia/novidades_popularmais/1.png",
+                        
                         "images/comercios/farmacia/novidades_popularmais/2.png",
                                     
                     ],
@@ -1713,9 +1716,9 @@ menuLinks.forEach((link) => {
               {
                   image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
                   name: "Feira da Lua",
-                  date: "Sex das 19 - 00h",
+                  date: "Sex das 19h as 23:30h",
                   address: "Praça Igreja Matriz ",
-                  contact: "(11) 99898-5930",
+                  contact: "(43) 99965-2084",
                   facebook: "https://www.facebook.com/people/Feira-Da-Lua-Carl%C3%B3polis/100089210937457/?_rdr",
                 instagram: "https://www.instagram.com/feiradaluacarlopolis/",
                   novidadesImages: [
@@ -2160,25 +2163,15 @@ delivery: "Sim / Sem Taxa",
             title: "Sanepar",
             establishments: [
                 {
+                  image: "images/info_uteis/sanepar/sanepar.png",
                     name: "Sanepar",
                     hours: "seg a sex: 8:30h - 12h, 13:30 as 17h",
                     address: "R. André Jorge Cleli, 148 ",
                     contact: "0800 200 0115",
-                    image: "images/info_uteis/sanepar/sanepar.png",
+                    
                 },
             ],
         },
-
-
-
-
-
-
-
-
-
-
-
 
 
 // FIM SETOR PUBLICO
@@ -2190,7 +2183,7 @@ delivery: "Sim / Sem Taxa",
                 {
                     name: "Moto Taxi Modesto",
                     hours: "Seg a Dom: 7h - 20h",
-                    address: "R. Kelil Keder, 603, 148 ",
+                    address: "R. Kelil Keder, 603",
                     contact: "(43) 99137-5516",
                     image: "images/info_uteis/VagasTrabalho/modesto/modesto.png",
                     infoVagaTrabalho:"Precisa-se de motoboy",
@@ -2204,7 +2197,7 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Binho Moto Center",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h",
                     address: "R. Laurindo Franco de Godoi, 90",
                     contact: "(43) 99951-1540",
                     delivery: "Sim / Sem Taxa",
@@ -2246,7 +2239,7 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Filho Otaviano",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h",
                     address: "R. Laurindo Franco de Godoi, 90",
                     contact: "(43) 99951-1540",
                     delivery: "Sim / Sem Taxa",
@@ -2259,10 +2252,11 @@ delivery: "Sim / Sem Taxa",
             title: "Deposito de Gas",
             establishments: [
                 {
+                  image: "images/comercios/depositoGas/liaGas/liaGas.png",
                     name: "Lia Gas",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    contact: "(43) 99951-1540",
+                    hours: "Seg a Sab: 8h - 20h </br> Dom: 08h - 12h",
+                    address: "R. Kalil Keder, 910",
+                    contact: "(43) 99821-7243",
                     delivery: "Sim / Sem Taxa",
                 },
             ],
@@ -2716,10 +2710,7 @@ function restaurarMenuOriginal() {
      
      <strong class="locais_nomes">${establishment.name}</strong><br>
   
-  ${
-    establishment.date ? `<b>Data do Evento:</b> ${establishment.date}<br>` : ""
-  } <!-- Exibe a data do evento se existir -->
-  
+ 
   
       
 ${
@@ -2742,6 +2733,23 @@ ${
 
 
 <div class="info-boxes-container">
+
+
+ ${establishment.date ? `
+    <div class="info-box">
+      <i class="fas fa-calendar-alt info-icon"></i>
+      <div>
+        <div class="info-label">Data do Evento</div>
+        <div class="info-value">${establishment.date}</div>
+      </div>
+    </div>` : ""
+  }
+
+
+
+
+
+
   ${establishment.hours ? `
     <div class="info-box">
       <i class="fas fa-clock info-icon"></i>
@@ -2805,12 +2813,12 @@ ${establishment.contact ? (() => {
     </div>` : ""
   }
 
-  ${establishment.vagaTrabalho ? `
-    <div class="info-box">
+  ${establishment.infoVagaTrabalho ? `
+    <div class="info-box vaga">
       <i class="fas fa-briefcase info-icon"></i>
       <div>
         <div class="info-label">Vaga de Trabalho</div>
-        <div class="info-value">${establishment.vagaTrabalho}</div>
+        <div class="info-value">${establishment.infoVagaTrabalho}</div>
       </div>
     </div>` : ""
   }
@@ -2825,15 +2833,7 @@ ${establishment.contact ? (() => {
     </div>` : ""
   }
 
-  ${establishment.dataEvento ? `
-    <div class="info-box">
-      <i class="fas fa-calendar-alt info-icon"></i>
-      <div>
-        <div class="info-label">Data do Evento</div>
-        <div class="info-value">${establishment.dataEvento}</div>
-      </div>
-    </div>` : ""
-  }
+ 
 
   ${(establishment.instagram || establishment.facebook || establishment.site) ? `
     <div class="info-box">

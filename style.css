@@ -1608,7 +1608,10 @@ img {
   margin-bottom: 4px;
 }
 
-
+.info-box.vaga .info-value {
+  color: #d32f2f; /* vermelho forte */
+  font-weight: 600;
+}
 
 
 /* fim card info categorias */
