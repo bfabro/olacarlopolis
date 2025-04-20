@@ -2765,9 +2765,6 @@ function restaurarMenuOriginal() {
       }
   
       contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
-      contentDiv.appendChild(criarCardsInformacoes(estabelecimento));
-
-      
           
             ${paidEstablishments
               .map(
@@ -2989,49 +2986,7 @@ ${
 
       
       ///// inicio
-      function criarCardsInformacoes(estabelecimento) {
-        const container = document.createElement("div");
-        container.className = "info-cards-container";
-      
-        const informacoes = [
-          {
-            label: "Horário de Funcionamento",
-            valor: estabelecimento.hours || "Não informado",
-            icone: "fa-regular fa-clock"
-          },
-          {
-            label: "Endereço",
-            valor: estabelecimento.address || "Não informado",
-            icone: "fa-solid fa-location-dot"
-          },
-          {
-            label: "Contato",
-            valor: estabelecimento.contact || estabelecimento.whatsapp || "Não informado",
-            icone: "fa-solid fa-phone"
-          },
-          {
-            label: "Entrega",
-            valor: estabelecimento.delivery || "Não informado",
-            icone: "fa-solid fa-truck"
-          }
-        ];
-      
-        informacoes.forEach(info => {
-          const card = document.createElement("div");
-          card.className = "info-card";
-          card.innerHTML = `
-            <i class="${info.icone}"></i>
-            <div class="info-card-text">
-              <div class="info-card-label">${info.label}</div>
-              <div class="info-card-value">${info.valor}</div>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-      
-        return container;
-      }
-      
+
 
 
       let lastClickedButton = null;
@@ -3283,7 +3238,25 @@ setTimeout(() => {
       }
     });
   
-   
+    ///// INICIO area de pagamento:
+    function compartilharPlantao(nomeFarmacia) {
+      const url = `${window.location.origin}/index.html#menuFarmaciaPlantao`;
+      const texto = `Farmácia de Plantão: ${nomeFarmacia}\nVeja mais em: ${url}`;
+    
+      if (navigator.share) {
+        navigator.share({
+          title: "Farmácia de Plantão",
+          text: texto,
+          url: url
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(texto).then(() => {
+          alert("Link copiado para compartilhar!");
+        }).catch(() => {
+          alert("Não foi possível copiar o link.");
+        });
+      }
+    }
     
     
     
@@ -3304,4 +3277,51 @@ setTimeout(() => {
       }
     });
   });
-  
+
+function criarCardsInformacoes(estabelecimento) {
+  const infoContainer = document.createElement("div");
+  infoContainer.classList.add("info-boxes-container");
+
+  const infoList = [
+    {
+      icon: "fa-solid fa-clock",
+      label: "Horário",
+      valor: establishment.hours || "Não informado"
+    },
+    {
+      icon: "fa-solid fa-map-marker-alt",
+      label: "Endereço",
+      valor: establishment.endereco || "Não informado"
+    },
+    {
+      icon: "fa-solid fa-phone",
+      label: "Contato",
+      valor: establishment.contato || estabelecimento.whatsapp || "Não informado"
+    },
+    {
+      icon: "fa-solid fa-truck",
+      label: "Entrega",
+      valor: estabelecimento.entrega === "sim" ? "Faz entrega" : "Não faz entrega"
+    },
+    {
+      icon: "fa-solid fa-money-bill-wave",
+      label: "Taxa de Entrega",
+      valor: estabelecimento.taxaEntrega === "sim" ? "Possui taxa" : "Sem taxa"
+    }
+  ];
+
+  infoList.forEach(info => {
+    const box = document.createElement("div");
+    box.className = "info-box";
+    box.innerHTML = `
+      <i class="${info.icon} info-icon"></i>
+      <div>
+        <span class="info-label">${info.label}</span><br>
+        <span class="info-value">${info.valor}</span>
+      </div>
+    `;
+    infoContainer.appendChild(box);
+  });
+
+  return infoContainer;
+}
