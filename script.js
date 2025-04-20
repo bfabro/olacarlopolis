@@ -649,7 +649,7 @@ menuLinks.forEach((link) => {
                             instagram: "https://www.instagram.com/turminha_do_acai/",
                             facebook:"#",
                             site:"#",
-                            infoAdicional:"Espetinhos a partir de Quinta até Domingo, venha conferir",
+                            infoAdicional:"Espetinhos a partir de Quinta até Domingo",
                             novidadesImages: [            
                             "images/comercios/acai/turminhaAcai/novidades/1.png",                                            
                             ],
