@@ -40,90 +40,121 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /////////
 
-  // Função para registrar o acesso diário
-  function registrarAcesso() {
-    const hoje = new Date().toISOString().slice(0, 10);
-    const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
-    const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
-  
-    refTotal.transaction((acessos) => (acessos || 0) + 1);
-  
-    function salvarDados(info) {
-      refDetalhado.set({
-        ip: info.ip || "sem_ip",
-        cidade: info.city || "Desconhecida",
-        estado: info.region || "UF",
-        pais: info.country || "BR",
-        provedor: info.provider || "Desconhecido",
-        latitude: info.latitude || null,
-        longitude: info.longitude || null,
-        timezone: info.timezone || "Indefinido",
-        horario: new Date().toLocaleTimeString(),
-        navegador: navigator.userAgent,
-        idioma: navigator.language,
-        plataforma: navigator.platform,
-        pagina: window.location.href,
-        referrer: document.referrer || "acesso direto",
-        tela: `${window.screen.width}x${window.screen.height}`,
-        dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
-      });
 
-      // NOVO: registrar usuário único
-  if (info.ip) {
-    const refUsuarioUnico = firebase.database().ref(`usuariosUnicos/${hoje}/${info.ip}`);
-    refUsuarioUnico.set(true);
-  }
+
+
+
+
+
+// Função para registrar o acesso diário
+function registrarAcesso() {
+  const hoje = new Date().toISOString().slice(0, 10);
+  const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
+  const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
+
+  refTotal.transaction((acessos) => (acessos || 0) + 1);
+
+  function salvarDados(info) {
+    refDetalhado.set({
+      ip: info.ip || "sem_ip",
+      cidade: info.city || "Desconhecida",
+      estado: info.region || "UF",
+      pais: info.country || "BR",
+      provedor: info.provider || "Desconhecido",
+      latitude: info.latitude || null,
+      longitude: info.longitude || null,
+      timezone: info.timezone || "Indefinido",
+      horario: new Date().toLocaleTimeString(),
+      navegador: navigator.userAgent,
+      idioma: navigator.language,
+      plataforma: navigator.platform,
+      pagina: window.location.href,
+      referrer: document.referrer || "acesso direto",
+      tela: `${window.screen.width}x${window.screen.height}`,
+      dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
+    });
+
+    // NOVO: registrar usuário único
+    if (info.ip) {
+      const refUsuarioUnico = firebase.database().ref(`usuariosUnicos/${hoje}/${info.ip}`);
+      refUsuarioUnico.set(true);
     }
-  
-    // Tenta com ipwho.is
-    fetch("https://ipwho.is/")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.success) throw new Error("Falhou no ipwho.is");
-        salvarDados({
-          ip: data.ip,
-          city: data.city,
-          region: data.region,
-          country: data.country,
-          provider: data.connection?.isp,
-          latitude: data.latitude,
-          longitude: data.longitude,
-          timezone: data.timezone
-
-          
-        });
-
-
-
-
-
-
-      })
-      .catch(() => {
-        // Fallback: tenta com ipapi.co
-        fetch("https://ipapi.co/json/")
-          .then((res) => res.json())
-          .then((data) => {
-            salvarDados({
-              ip: data.ip,
-              city: data.city,
-              region: data.region,
-              country: data.country,
-              provider: data.org,
-              latitude: data.latitude,
-              longitude: data.longitude,
-              timezone: data.timezone
-            });
-          })
-          .catch((error) => {
-            console.warn("Não foi possível obter localização:", error);
-            salvarDados({});
-          });
-      });
   }
+
+  // Tenta com ipwho.is
+  fetch("https://ipwho.is/")
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data.success) throw new Error("Falhou no ipwho.is");
+      salvarDados({
+        ip: data.ip,
+        city: data.city,
+        region: data.region,
+        country: data.country,
+        provider: data.connection?.isp,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        timezone: data.timezone
+      });
+    })
+    .catch(() => {
+      // Fallback: tenta com ipapi.co
+      fetch("https://ipapi.co/json/")
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.city) throw new Error("Falhou no ipapi.co");
+          salvarDados({
+            ip: data.ip,
+            city: data.city,
+            region: data.region,
+            country: data.country,
+            provider: data.org,
+            latitude: data.latitude,
+            longitude: data.longitude,
+            timezone: data.timezone
+          });
+        })
+        .catch(() => {
+          // Segundo fallback: ipinfo.io
+          fetch("https://ipinfo.io/json?token=50e0b3cf789df2")
+            .then((res) => res.json())
+            .then((data) => {
+              salvarDados({
+                ip: data.ip,
+                city: data.city,
+                region: data.region,
+                country: data.country,
+                provider: data.org,
+                latitude: data.loc?.split(',')[0],
+                longitude: data.loc?.split(',')[1],
+                timezone: data.timezone
+              });
+            })
+            .catch((error) => {
+              console.warn("Não foi possível obter localização:", error);
+              salvarDados({});
+            });
+        });
+    });
+}
+
+registrarAcesso();
+
   
-  registrarAcesso();
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
 
 ///////////
@@ -1845,7 +1876,7 @@ menuLinks.forEach((link) => {
 
 image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
 name: "Farmacia da Vila",
-address: "Rua Manguba, 320",
+address: "Rua Manguba, 320, Carlopolis",
 contact: "(43) 99148-8478",
 plantaoHorario: "8:00h às 21:00h", 
 plantaoData:"19/04 a 25/04",                  
