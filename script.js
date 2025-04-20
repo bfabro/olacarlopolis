@@ -1333,10 +1333,10 @@ menuLinks.forEach((link) => {
                   ], 
                   novidadesDescriptions: [                            
                     "Venham nos visitar!",
-                    "Indicado cólicas do trato gastrintestinal",
-                    "indicado como analgésico <br>(para dor) e antitérmico (para febre)",
-                    "Indicado no alívio da dor associada a <br> contraturas musculares, incluindo dor de<br> cabeça tensional.",
-                    "Indicado para redução da febre e para <br> o alívio de dores",
+                    "Cólicas do trato gastrintestinal",
+                    "Analgésico (para dor) <br> antitérmico (para febre)",
+                    "Alívio da dor associada a <br> contraturas musculares, incluindo dor de<br> cabeça tensional.",
+                    "Redução da febre e para <br> o alívio de dores",
                   ],
                 },
         
