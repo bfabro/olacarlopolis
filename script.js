@@ -618,8 +618,8 @@ menuLinks.forEach((link) => {
                 image: "images/comercios/academia/lobofitness/lobofitness.png",
                         
                 name: "Lobo Fitness",
-                hours: "<br>seg a Qui:06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
-                address: "<br>R. Delfino Mendes, 264 - Centro",
+                hours: "seg a Qui:06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
+                address: "R. Delfino Mendes, 264 - Centro",
                 contact: "(43) 99112-1009",                          
                 facebook: "#",
                 instagram: "https://www.instagram.com/academialobocarlopolis/",
@@ -675,8 +675,8 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/acougue/curitiba/curitiba.png",
                             name: "Açougue Curitiba",
-                            hours: "<br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                            address: "<br>Rua Benedito Salles, 409",
+                            hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                            address: "Rua Benedito Salles, 409",
                             contact: "(43) 99635-1001",
                             delivery: "Sim / Sem Taxa",
                             novidadesImages: [ 
@@ -698,10 +698,10 @@ menuLinks.forEach((link) => {
                             image: "images/comercios/adega/cuenca/adega_cuenca.jpg",
                             name: "Adega Cuenca",
                             hours:
-                            "</br>seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
-                            address: "<br>R. Kalil Keder, 752",
-                            contact: "</br>(43) 99800-1680",
-                            delivery: "</br>Sim / Sem Taxa",
+                            "seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
+                            address: "R. Kalil Keder, 752",
+                            contact: "(43) 99800-1680",
+                            delivery: "Sim / Sem Taxa",
                             instagram: "https://www.instagram.com/turminha_do_acai/",
                             facebook:"https://www.facebook.com/adega.carlopolis.37/",
 
@@ -722,9 +722,9 @@ menuLinks.forEach((link) => {
                         {
                           image: "images/comercios/adega/assao/assao.png",
                           name: "Assao",
-                          hours:"</br>seg 09:00h - 22h ",
-                          address: "<br>R. Benedito Sales, 1551",
-                          contact: "</br>-",                          
+                          hours:"seg 09:00h - 22h ",
+                          address: "R. Benedito Sales, 1551",
+                          contact: "-",                          
                           instagram: "https://www.instagram.com/casadecarneassao/",                     
 
                          
@@ -739,9 +739,9 @@ menuLinks.forEach((link) => {
                   establishments: [
                       {
                           name: "ADVOCACIA ABILIO",
-                          hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
-                          address: "<br>R. Salvira Marquês, 315",
-                          contact: "</br>(43) 3566-1368",
+                          hours: "seg a sex: 9h - 11:30h, 13:00-17:00",
+                          address: "R. Salvira Marquês, 315",
+                          contact: "(43) 3566-1368",
                       },
                   ],
               },
@@ -753,9 +753,9 @@ menuLinks.forEach((link) => {
                     {
                       image: "images/comercios/agenciaViagem/cvc/cvc.png",
                         name: "CVC Carlopolis",
-                        hours: "</br>Seg a Sab: 11h - 22h",
-                        address: "<br>Rua Padre Hugo, 450, Sala 10",
-                        contact: "</br>(43) 99177-2244",
+                        hours: "Seg a Sab: 11h - 22h",
+                        address: "Rua Padre Hugo, 450, Sala 10",
+                        contact: "(43) 99177-2244",
                         instagram:"https://www.instagram.com/cvc.pr.carlopolis/",
                         facebook:"https://www.facebook.com/CVC.PR.Carlopolis?mibextid=LQQJ4d",
                     },
@@ -769,32 +769,14 @@ menuLinks.forEach((link) => {
                     title: "Agropecuarias",
                     establishments: [
 
-                        {
-                            image: "images/comercios/agropecuaria/armazem Rei/armazemRei.png",
-                            name: "Armazem Rei",
-                            hours: "</br>seg a Sab: 8h - 19h </br> Dom: 08h - 12h",
-                            address: "<br>R. Kalil Keder, 718",
-                            contact: "</br> (43) 99185-6532",
-                            delivery: "</br>Sim / Sem Taxa",
-                            facebook: "#",
-                            instagram: "#",
-                            novidadesImages: [
-                                // Novo array de imagens de novidades
-                                "images/comercios/agropecuaria/armazem rei/divulgacao/1.png",
-                              "images/comercios/agropecuaria/armazem rei/divulgacao/2.png",
-                            ],
-                            novidadesDescriptions: [                            
-                              "Special Dog no Precinho",
-                              "Temos sacos de milho 40kg",
-                            ],
-                        },
+                       
                         {
                             image: "images/comercios/agropecuaria/agroVida/agrovida.png",
                             name: "Agro Vida",
-                            hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 16h",
-                            address: "<br>rua benedito salles 309",
-                            contact: "</br>(43) 99158-9047",
-                            delivery: "</br>Sim / Sem Taxa",
+                            hours: "seg a sex: 8h - 18h </br> sab: 08 - 16h",
+                            address: "rua benedito salles 309",
+                            contact: "(43) 99158-9047",
+                            delivery: "Sim / Sem Taxa",
                             facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
                             instagram: "https://www.instagram.com/agrovida_carlopolis/",
                             novidadesImages: [
@@ -821,9 +803,9 @@ menuLinks.forEach((link) => {
                       {
                           image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
                           name: "Oficina do Celular",
-                          hours: "</br>seg a sex: 8h - 18:00h<br> Sab: 08:00-17:00",
-                          address: "<br>Rua Dr Paula e Silva 676",
-                          contact: "</br>(43) 3566-1600",
+                          hours: "Seg a Sex: 8h - 18:00h<br> Sab: 08:00-17:00",
+                          address: "Rua Dr Paula e Silva 676",
+                          contact: "(43) 3566-1600",
                           facebook: "https://www.facebook.com/oficinadocelularclps/",
                           instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
                           novidadesImages: [                  
@@ -847,7 +829,7 @@ menuLinks.forEach((link) => {
                     establishments: [
                         {
                             name: "Yellow Jeans",
-                            hours: "</br>seg a sex: 9h - 11:30h, 13:00-17:00",
+                            hours: "seg a sex: 9h - 11:30h, 13:00-17:00",
                             address: "<br>Rua Maria Pereira da Rocha Aleixo, 435",
                             contact: "</br>(43) 998070671",
                         },
@@ -862,9 +844,9 @@ menuLinks.forEach((link) => {
                       {
                           image: "images/comercios/ferroVelho/reiDoFerro/reiDoFerro.png",
                           name: "Rei do Ferro",
-                          hours: "</br>Seg a Sex - 08:00 - 18:00",
-                          address: "<br>Rodovia PR 218",
-                          contact: "</br>(43) 3566-2505",                         
+                          hours: "Seg a Sex - 08:00 - 18:00",
+                          address: "Rodovia PR 218",
+                          contact: "(43) 3566-2505",                         
                           instagram: "https://www.instagram.com/rei_do.ferro/",
                           novidadesImages: [                  
                             "images/comercios/ferroVelho/reiDoFerro/divulgacao/2.png",
@@ -883,9 +865,9 @@ menuLinks.forEach((link) => {
                         image: "images/comercios/feiraLua/feiraLua.png",
                                
                         name: "Feira da Lua",
-                        hours: "</br>Sex - 19:00 - 123:30",
-                        address: "<br>Praça Igreja Matriz",
-                        contact: "</br>(43) 99965-2084",                         
+                        hours: "Sex - 19:00 - 23:30",
+                        address: "Praça Igreja Matriz",
+                        contact: "(43) 99965-2084",                         
                         instagram: "https://www.instagram.com/feiradaluacarlopolis/",
                         novidadesImages: [                 
                           
@@ -894,7 +876,7 @@ menuLinks.forEach((link) => {
                           "images/comercios/feiraLua/divulgacao/3.png",
                           "images/comercios/feiraLua/divulgacao/4.png",
                           "images/comercios/feiraLua/divulgacao/5.png",
-                             "images/comercios/feiraLua/divulgacao/6.png"
+                          "images/comercios/feiraLua/divulgacao/6.png"
                       ],                
                     },
                 ],
@@ -910,10 +892,10 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
                             name: "O Casarao",
-                            hours: "</br>Ter - Dom - 18h - 00:30h",
-                            address: "<br>R. Benedito Salles, 1340",
-                            contact: "</br>(43) 99693-0565",
-                            delivery: "</br>Sim / Com Taxa",
+                            hours: "Ter - Dom - 18h - 00:30h",
+                            address: "R. Benedito Salles, 1340",
+                            contact: "(43) 99693-0565",
+                            delivery: "Sim / Com Taxa",
                             facebook: "https://www.facebook.com/ocasaraoph/?locale=pt_BR",
                             instagram: "https://www.instagram.com/ocasaraoph/",       
                             menuImages: [                   
@@ -929,7 +911,7 @@ menuLinks.forEach((link) => {
                                 "images/comercios/lanchonete/casarao/cardapio/10.png",
                             ],     
                             novidadesImages: [
-                              // Novo array de imagens de novidades
+                            
                               "images/comercios/lanchonete/casarao/novidades/1.png",
                              "images/comercios/lanchonete/casarao/novidades/2.png",
                              "images/comercios/lanchonete/casarao/novidades/3.png",
@@ -941,10 +923,10 @@ menuLinks.forEach((link) => {
                         {
                           image: "images/comercios/lanchonete/ione/ione.png",
                           name: "Ione",
-                          hours: "</br>Seg - Sab - 9:30h - 19:30h",
-                          address: "<br>R. Benedito Salles, 1233",
-                          contact: "</br>(43) 99180-4287",
-                          delivery: "</br>Sim / Com Taxa",
+                          hours: "Seg - Sab - 9:30h - 19:30h",
+                          address: "R. Benedito Salles, 1233",
+                          contact: "(43) 99180-4287",
+                          delivery: "Sim / Com Taxa",
                           facebook: "https://www.facebook.com/IoneSalgados1687Fabiana/?locale=pt_BR",
                           instagram: "https://www.instagram.com/salgadosione29/",       
                               
@@ -969,10 +951,10 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/pizzaria/fornalha.png",
                     name: "Fornalha Pizzaria",
-                    hours:"</br>Quarta - Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
-                    address: "<br>R. Benedito Salles, 837",
-                    contact: "</br>(43) 99632-1310",
-                    delivery: "</br>Sim / Com Taxa",
+                    hours:"Quarta - Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
+                    address: "R. Benedito Salles, 837",
+                    contact: "(43) 99632-1310",
+                    delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
                     instagram: "https://www.instagram.com/_fornalhapizzaria_/",    
                     menuImages: [                
@@ -991,10 +973,10 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/pesqueiro/aguamarine.jpg",
                     name: "Pesk e Pague Agua Marine",
-                    hours: "</br>Sex a  - Dom: 09:30 - 18",
-                    address: "<br>Rod. Jose Alves Pereira",
-                    contact: "</br>(43) 98808-1911",
-                    delivery: "</br>Sim / Com Taxa",
+                    hours: "Sex a  - Dom: 09:30 - 18",
+                    address: "Rod. Jose Alves Pereira",
+                    contact: "(43) 98808-1911",
+                    delivery: "Sim / Com Taxa",
                     facebook: "www.facebook.com/uahh",
                     instagram: "www.instagram.com/uahh",
                     menuImages: [
@@ -1013,10 +995,10 @@ menuLinks.forEach((link) => {
               {
                   image: "images/comercios/sorveteria/limone/limone.png",
                   name: "Limone",
-                  hours: "</br>Seg - Dom: 13:00 - 22h",
-                  address: "<br>Rua Benedito Salles n° 619",
-                  contact: "</br>(43) 99922-8336",
-                  delivery: "</br>Sim / Com Taxa",
+                  hours: "Seg - Dom: 13:00 - 22h",
+                  address: "Rua Benedito Salles n° 619",
+                  contact: "(43) 99922-8336",
+                  delivery: "Sim / Com Taxa",
                   facebook: "#",
                   instagram: "https://www.instagram.com/limone.sorvetes/?hl=pt",
                   novidadesImages: [              
@@ -1029,10 +1011,10 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/sorveteria/santino/santino.png",
                 name: "Santtino Gelateria",
-                hours: "</br>Dom - Sex: 13:00 - 22h<br>Sab 13h - 23h",
-                address: "<br>R. Kalil Keder, 583 - Centro",
-                contact: "</br>(43) 99971-3535",
-                delivery: "</br>Sim / Sem Taxa",
+                hours: "Dom - Sex: 13:00 - 22h<br>Sab 13h - 23h",
+                address: "R. Kalil Keder, 583 - Centro",
+                contact: "(43) 99971-3535",
+                delivery: "Sim / Sem Taxa",
                 facebook: "https://www.facebook.com/santtinogelateria/?locale=pt_BR",
                 instagram: "https://www.instagram.com/santtinogelateria/",
                 novidadesImages: [              
@@ -1045,11 +1027,6 @@ menuLinks.forEach((link) => {
               
                 ],               
             },
-
-
-
-
-
 
           ],
       },
@@ -1064,9 +1041,9 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/padaria/bom jesus/bomjesus.png",
                     name: "Bom Jesus",
-                    hours: "</br>seg a Sab: 6h - 19h </br> Dom: 06 - 14h",
-                    address: "<br>R. Benedito Salles, 615",
-                    contact: "<br>(43) 99653-9285",
+                    hours: "Seg a Sab: 6h - 19h </br> Dom: 06 - 14h",
+                    address: "R. Benedito Salles, 615",
+                    contact: "43) 99653-9285",
                     delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/PanificadoraRestauranteBomJesus/?locale=pt_BR",
                     instagram: "https://www.instagram.com/bom_jesus_panificadora/",
@@ -1084,9 +1061,9 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/padaria/prelie/prelie.png",
                   name: "Prelie",
-                  hours: "</br>seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
-                  address: "<br>R. Benedito Salles, 1098",
-                  contact: "<br>(43) 99954-0863",
+                  hours: "seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
+                  address: "R. Benedito Salles, 1098",
+                  contact: "(43) 99954-0863",
                   delivery: "Sim / Com Taxa",
                   
                   instagram: "https://www.instagram.com/prelie.confeitaria/",
@@ -1100,9 +1077,9 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/padaria/saoFrancisco/saoFrancisco.png",
                   name: "São Francisco",
-                  hours: "</br>seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
-                  address: "<br>R. Benedito Salles, 881",
-                  contact: "<br>(43) 98873-1488",
+                  hours: "seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
+                  address: "R. Benedito Salles, 881",
+                  contact: "(43) 98873-1488",
                   delivery: "Sim / Com Taxa",
                   facebook: "#",
                   instagram: "#",
@@ -1131,10 +1108,10 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/supermercado/carreiro.png",
                     name: "Carreiro",
-                    address: "<br>R. Benedito Salles, 341 ",
-                    hours: "</br>Seg a Sex 8h - 19h </br> dom: 08 - 12h",
-                    contact: "</br>(43) 3566-1520",
-                    delivery: "</br>Sim / Com Taxa",
+                    address: "R. Benedito Salles, 341 ",
+                    hours: "Seg a Sex 8h - 19h </br> dom: 08 - 12h",
+                    contact: "(43) 3566-1520",
+                    delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/p/Supermercado-Carreiro-100066342918723/?locale=pt_BR",
                     instagram: "https://www.instagram.com/mercadocarreiroclps/",
                     novidadesImages: [               
@@ -1157,10 +1134,10 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/supermercado/compreBemMais/compreBemMais.png",
                   name: "Compre Bem Mais",
-                  address: "<br>R. Andrino Soares, 355",
-                  hours: "</br>Seg a Sex 7h - 20h </br> dom: 08 - 12h",
-                  contact: "</br>(43) 99977-6613",
-                  delivery: "</br>Sim / Sem Taxa",
+                  address: "R. Andrino Soares, 355",
+                  hours: "Seg a Sex 7h - 20h </br> Dom: 08 - 12h",
+                  contact: "(43) 99977-6613",
+                  delivery: "Sim / Sem Taxa",
                   facebook: "https://www.facebook.com/people/Compre-bem-Mais/61559328414681/?_rdr",
                   instagram: "#",
                   novidadesImages: [               
@@ -1180,10 +1157,10 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/supermercado/obarateiro.png",
                     name: "O Barateiro",
-                    address: "<br>Bendito Salles, 1168 ",
-                    hours: "</br>Seg a Sex 8h - 21h </br> dom: 08 - 12h",
-                    contact: "</br>(43) 99196-7816",
-                    delivery: "</br>Sim / Sem Taxa",
+                    address: "Bendito Salles, 1168 ",
+                    hours: "Seg a Sex 8h - 21h </br> dom: 08 - 12h",
+                    contact: "(43) 99196-7816",
+                    delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/MercadoObarateiro",
                     instagram: "https://www.instagram.com/supermercado_obarateiro/p/DFgIRupxbr-/",
                 },
@@ -1191,9 +1168,9 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/supermercado/kelve.png",
                     name: "Kelve",
                     address: "<br>R. Paul Harris,104",
-                    hours: "</br>Seg a Sex 8h - 19:30h </br> dom: 08:30 - 12:30h",
-                    contact: "<br>(43) 99844-6105",
-                    delivery: "</br>Sim / Sem Taxa",
+                    hours: "Seg a Sex 8h - 19:30h </br> dom: 08:30 - 12:30h",
+                    contact: "(43) 99844-6105",
+                    delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
                     instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
                 },
@@ -1201,10 +1178,10 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/supermercado/rocha.jpg",
                     name: "Rocha",
-                    hours: "<br>Seg a Sex 6h - 20h </br> dom: 06 - 12h",
-                    address: "<br>Av. Elson Soares, 767 ",
-                    contact: "</br>(43) 3566-2436",
-                    delivery: "</br>Sim / Sem Taxa",
+                    hours: "Seg a Sex 6h - 20h </br> Dom: 06 - 12h",
+                    address: "Av. Elson Soares, 767 ",
+                    contact: "(43) 3566-2436",
+                    delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
                     instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
                 },
@@ -1212,26 +1189,26 @@ menuLinks.forEach((link) => {
                 {
                     name: "Carriel",
                     address: "<br>PR-218, 1168 ",
-                    hours: "</br>Seg a Sex 8h - 21h </br> dom: 07 - 12h",
-                    contact: "</br>(43) 3456-7890",
-                    delivery: "</br>Sim / Sem Taxa",
+                    hours: "Seg a Sex 8h - 21h </br> Dom: 07 - 12h",
+                    contact: "(43) 3456-7890",
+                    delivery: "Sim / Sem Taxa",
                 },
                 {
                     name: "Compre Bem +",
-                    address: "<br>PR-218, 1168 ",
-                    hours: "</br>Seg a Sex 8h - 21h </br> Dom: 07 - 12h",
-                    contact: "</br>(43) 3456-7890",
-                    delivery: "</br>Sim / Sem Taxa",
+                    address: "PR-218, 1168 ",
+                    hours: "Seg a Sex 8h - 21h </br> Dom: 07 - 12h",
+                    contact: "(43) 3456-7890",
+                    delivery: "Sim / Sem Taxa",
                 },
     
                 {
                   image: "images/comercios/supermercado/zerojapan.png",
                     name: "Zero Japan",
-                    address: "<br>Rua Doutora Paula e Silva, 445 ",
-                    hours: "</br>Seg a Seg 8h - 20h ",
-                    contact: "<br>(43) 3142-2005", // telefone fixo
-                    whatsapp: "4331422005", // novo campo para o WhatsApp real
-                    delivery: "</br>Sim / Sem Taxa",
+                    address: "Rua Doutora Paula e Silva, 445 ",
+                    hours: "Seg a Seg 8h - 20h ",
+                    contact: "(43) 3142-2005", 
+                    whatsapp: "4331422005", 
+                    delivery: "Sim / Sem Taxa",
                 },
             ],
         },
@@ -2212,11 +2189,11 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Moto Taxi Modesto",
-                    hours: "</br>Seg a Dom: 7h - 20h",
-                    address: "<br>R. Kelil Keder, 603, 148 ",
-                    contact: "</br>(43) 99137-5516",
+                    hours: "Seg a Dom: 7h - 20h",
+                    address: "R. Kelil Keder, 603, 148 ",
+                    contact: "(43) 99137-5516",
                     image: "images/info_uteis/VagasTrabalho/modesto/modesto.png",
-                    infoVagaTrabalho:"</br>Precisa-se de motoboy",
+                    infoVagaTrabalho:"Precisa-se de motoboy",
                 },
             ],
         },
@@ -2242,8 +2219,8 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Vida Nova",
-                    hours: "</br>seg a sex: 7h - 18h </br>sab: 07 - 16h",
-                    address: "<br>Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
+                    hours: "Seg a Sex: 7h - 18h </br>Sab: 07 - 16h",
+                    address: "Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
                     contact: "(43) 99900-2991",
                 },
             ],
@@ -2313,10 +2290,10 @@ delivery: "Sim / Sem Taxa",
                 {
                     image: "images/comercios/mercearia/seiza/seiza.png",
                     name: "Seiza",
-                    hours: "</br>Seg a Qui 9h - 18:30h </br>Sex 9h - 16:30 </br> sab: 09 - 12h",
-                    address: "<br>R. Fidêncio de Melo, 212 - Sala B",
-                    contact: "</br>(43) 99103-4187",
-                    delivery: "</br>Sim / Sem Taxa",            
+                    hours: "Seg a Qui 9h - 18:30h </br>Sex 9h - 16:30 </br> sab: 09 - 12h",
+                    address: "R. Fidêncio de Melo, 212 - Sala B",
+                    contact: "(43) 99103-4187",
+                    delivery: "Sim / Sem Taxa",            
                     instagram: "https://www.instagram.com/seizapr/",
                 
                 },
@@ -2359,10 +2336,10 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Pimenta Doce",
-                    hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "<br>R. Kalil Keder ",
-                    contact: "</br>(43) 98806-5747",
-                    delivery: "</br>Sim / Sem Taxa",
+                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    address: "R. Kalil Keder ",
+                    contact: "(43) 98806-5747",
+                    delivery: "Sim / Sem Taxa",
                     image: "images/comercios/quitanda/pimentadoce.png",
                     novidadesImages: [
                         "images/comercios/quitanda/novidades/1.png",
@@ -2382,10 +2359,10 @@ delivery: "Sim / Sem Taxa",
               {
                 image: "images/comercios/restaurante/assadaoRussao/assadaoRussao.png",
                 name: "Assadão do Russão",
-                hours: "</br>Seg a Sab: 10:30h - 14h",
-                address: "<br>Rua Benedito Salles 1241",
-                contact: "</br>(43) 9838-7570",
-                delivery: "</br>Sim / Com Taxa",
+                hours: "Seg a Sab: 10:30h - 14h",
+                address: "Rua Benedito Salles 1241",
+                contact: "(43) 9838-7570",
+                delivery: "Sim / Com Taxa",
                 menuImages: [                   
                   "images/comercios/restaurante/assadaoRussao/cardapio/1.png",
                  
@@ -2414,10 +2391,10 @@ delivery: "Sim / Sem Taxa",
                 {
                     image: "images/comercios/restaurante/delfino/delfino.png",
                     name: "Delfino",
-                    hours: "</br>seg a sex: 11h - 15h / 18h - 22:30</br> sab: 11 - 16h",
-                    address: "<br>R. Kalil Keder, 90",
-                    contact: "</br>(43) 9111-9484",
-                    delivery: "</br>Sim / Com Taxa",
+                    hours: "Seg a Sex: 11h - 15h / 18h - 22:30h</br> Sab: 11h - 16h",
+                    address: "R. Kalil Keder, 90",
+                    contact: "(43) 9111-9484",
+                    delivery: "Sim / Com Taxa",
                     menuImages: [                        
                          "images/comercios/restaurante/delfino/cardapio/cardapio_1.png",
                                  
@@ -2426,10 +2403,10 @@ delivery: "Sim / Sem Taxa",
                 {
                   image: "images/comercios/restaurante/neia/neia.png",
                   name: "Neia",
-                  hours: "</br>seg a sex: 11h - 14h <br>sab: 11 - 16h",
-                  address: "<br>R. Kalil Keder, 262 ",
-                  contact: "</br>(43) 99847-1137",
-                  delivery: "</br>Sim / Com Taxa",
+                  hours: "Seg a Sex: 11h - 14h <br>Sab: 11h - 16h",
+                  address: "R. Kalil Keder, 262 ",
+                  contact: "(43) 99847-1137",
+                  delivery: "Sim / Com Taxa",
                   menuImages: [                        
                        "images/comercios/restaurante/neia/cardapio/cardapio_1.png",                               
                       ],    
@@ -2438,13 +2415,13 @@ delivery: "Sim / Sem Taxa",
               {
                 image: "images/comercios/restaurante/paiol/paiol.png",
                 name: "Paiol",
-                hours: "<br>qua - dom 19 - 00h",
-                address: "<br>Av. Elson Soares, 767 ",
-                contact: "<br>(43) 99159-0070",
-                delivery: "<br>Sim / Com Taxa",
+                hours: "Qua - Dom 19 - 00h",
+                address: "Av. Elson Soares, 767 ",
+                contact: "(43) 99159-0070",
+                delivery: "Sim / Com Taxa",
                 facebook: "www.facebook.com/uahh",
                 instagram: "www.instagram.com/uahh",
-                infoAdicional:"<br><a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
+                infoAdicional:"<a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
                
                 menuImages: [                   
                     "images/comercios/restaurante/paiol/cardapio/1.png",
@@ -2469,11 +2446,11 @@ delivery: "Sim / Sem Taxa",
                 {
                   image: "images/comercios/restaurante/portal/portal.png",
                     name: "Portal",
-                    hours: "</br>Seg a Qui: 19h - 21h",
+                    hours: "Seg a Qui: 19h - 21h",
                     address: "<br>R. Benedito Salles, 2023",
-                    contact: "</br>(43) 3566-2174",
-                    delivery: "</br>Sim / Com Taxa",
-                    infoAdicional:"</br>Fica dentro do Hotel Portal",
+                    contact: "(43) 3566-2174",
+                    delivery: "Sim / Com Taxa",
+                    infoAdicional:"Fica dentro do Hotel Portal",
                     novidadesImages: [                    
                       "images/comercios/restaurante/portal/divulgacao/1.png",
                      "images/comercios/restaurante/portal/divulgacao/2.png",
@@ -2490,23 +2467,23 @@ delivery: "Sim / Sem Taxa",
                 {
                   image: "images/comercios/restaurante/saborRoca/saborRoca.png",
                   name: "Sabor da Roça",
-                  hours: "</br>Seg a Sab: 10:30h - 14h",
+                  hours: "Seg a Sab: 10:30h - 14h",
                   address: "<br>R. Benedito Salles, 365",
-                  contact: "</br>(43) 99832-3050",
-                  delivery: "</br>Sim / Com Taxa",
+                  contact: "(43) 99832-3050",
+                  delivery: "Sim / Com Taxa",
                 
               },
 
               {
                 image: "images/comercios/restaurante/selaht/selaht.png",
                 name: "Selaht Grill",
-                hours: "</br>Ter a Dom: 11h - 23h",
-                address: "<br>R. Padre Hugo, 460",
-                contact: "<br>(43) 9 9160-5120",
-                delivery: "</br>Sim / Com Taxa",
+                hours: "Ter a Dom: 11h - 23h",
+                address: "R. Padre Hugo, 460",
+                contact: "(43) 9 9160-5120",
+                delivery: "Sim / Com Taxa",
                 facebook:"https://www.facebook.com/selaht.gastronomia",
                 instagram:"https://www.instagram.com/selaht.gastronomia/",
-                infoAdicional:"<br><a style='color:#2da6ff;' href='https://eatfood.app/cardapio/58qt9yj5dqgt2timpqd7'>Cardapio On Line</a>",
+                infoAdicional:"<a style='color:#2da6ff;' href='https://eatfood.app/cardapio/58qt9yj5dqgt2timpqd7'>Cardapio On Line</a>",
                 menuImages: [                   
                   "images/comercios/restaurante/selaht/cardapio/1.png",          
                          
@@ -2523,10 +2500,10 @@ delivery: "Sim / Sem Taxa",
             {
               image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.png",
               name: "Restaurante da Di",
-              hours: "</br>Seg a Sab: 10:30h - 14h",
+              hours: "Seg a Sab: 10:30h - 14h",
               address: "<br>Benedito Salles n°910",
-              contact: "</br>(43) 99632-3418",
-              delivery: "</br>Sim / Com Taxa",
+              contact: "(43) 99632-3418",
+              delivery: "Sim / Com Taxa",
               instagram:"https://www.instagram.com/marmitasdadiih/",
               novidadesImages: [                    
                 "images/comercios/restaurante/restauranteDaDi/divulgacao/1.png",
@@ -2537,11 +2514,6 @@ delivery: "Sim / Sem Taxa",
             
           },
 
-
-
-
-
-
             ],
         },
   
@@ -2551,7 +2523,7 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Haruo",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h",
                     address: "R. Laurindo Franco de Godoi, 90",
                     contact: "(43) 99951-1540",
                 },
@@ -2564,7 +2536,7 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Rafael Bandeira",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h",
                     address: "R. Laurindo Franco de Godoi, 90",
                     contact: "(43) 99951-1540",
                 },
@@ -2581,9 +2553,9 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Douglas do Taxi",
-                    hours: "</br>Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
+                    hours: "Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
                     address: "<br>Em Frente ao banco Itau",
-                    contact: "</br>(43) 88807-8515",
+                    contact: "(43) 88807-8515",
                 },
             ],
         },
