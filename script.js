@@ -642,9 +642,9 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/acai/turminhaAcai/turminhaAcai.png",
                             name: "Turminha do Açai",
-                            hours: "<br>Qua a Seg: 14h - 23h </br> Ter: Fechado",
-                            address: "<br>Rua Benedito Salles, 409",
-                            contact: "<br>(43) 99176-7871",
+                            hours: "Qua a Seg: 14h - 23h <br> Ter: Fechado",
+                            address: "Rua Benedito Salles, 409",
+                            contact: "(43) 99176-7871",
                             delivery: "Sim / Com Taxa",
                             instagram: "https://www.instagram.com/turminha_do_acai/",
                             infoAdicional:"<br>Espetinhos a partir de Quinta até<br> Domingo",
@@ -1244,10 +1244,10 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/farmacia/biofarma.png",
                     name: "Bio Farma",
-                    address: "<br>Rua Laurindo Franco Godoy, 464",
-                    hours: "</br>Seg a Sex: 8h - 18h </br> Sab: 08 - 12h</br> Dom e feriado: Fechado",
-                    contact: "</br>(43) 3566-1473",
-                    delivery: "</br>Sim / Sem Taxa",
+                    address: "Rua Laurindo Franco Godoy, 464",
+                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h</br> Dom e feriado: Fechado",
+                    contact: "(43) 3566-1473",
+                    delivery: "Sim / Sem Taxa",
                     facebook: "www.facebook.com/uahh",
                     instagram: "www.instagram.com/uahh",
                     site: "www.google.com",
@@ -2793,13 +2793,6 @@ function restaurarMenuOriginal() {
   } <!-- Exibe a data do evento se existir -->
   
   
-       ${
-         establishment.hours
-           ? `<b>Funcionamento:</b> ${establishment.hours}<br>`
-           : ""
-       }
-
-       
       
 ${
   establishment.plantaoHorario
@@ -2821,20 +2814,8 @@ ${
 
 
 
-       ${
-         establishment.address
-           ? `
-         <b>Endereço: </b>${establishment.address}</br>`
-           : ""
-       }
-  
-           <b>Contato:</b> ${establishment.contact} 
-       <br>
-       ${
-         establishment.delivery
-           ? `<b>Entrega:</b> ${establishment.delivery}<br>`
-           : ""
-       }
+       
+      
 
        ${
          establishment.infoAdicional
@@ -2847,6 +2828,65 @@ ${
            ? `<b>Info Vaga de Trabalho:</b> <span class="plantao-text">${establishment.infoVagaTrabalho}</span><br>`
            : ""
        }
+
+
+
+
+
+
+
+
+
+<div class="info-boxes-container">
+  ${establishment.hours ? `
+    <div class="info-box">
+      <i class="fas fa-clock info-icon"></i>
+      <div>
+        <div class="info-label">Funcionamento</div>
+        <div class="info-value">${establishment.hours}</div>
+      </div>
+    </div>` : ""
+  }
+  ${establishment.address ? `
+    <div class="info-box">
+      <i class="fas fa-map-marker-alt info-icon"></i>
+      <div>
+        <div class="info-label">Endereço</div>
+        <div class="info-value">${establishment.address}</div>
+      </div>
+    </div>` : ""
+  }
+  ${establishment.contact ? `
+    <div class="info-box">
+      <i class="fas fa-phone info-icon"></i>
+      <div>
+        <div class="info-label">Contato</div>
+        <div class="info-value">${establishment.contact}</div>
+      </div>
+    </div>` : ""
+  }
+  ${establishment.delivery ? `
+    <div class="info-box">
+      <i class="fas fa-truck info-icon"></i>
+      <div>
+        <div class="info-label">Entrega</div>
+        <div class="info-value">${establishment.delivery}</div>
+      </div>
+    </div>` : ""
+  }
+  ${establishment.taxaEntrega ? `
+    <div class="info-box">
+      <i class="fas fa-money-bill-wave info-icon"></i>
+      <div>
+        <div class="info-label">Taxa de Entrega</div>
+        <div class="info-value">${establishment.taxaEntrega === 'sim' ? 'Possui taxa' : 'Sem taxa'}</div>
+      </div>
+    </div>` : ""
+  }
+</div>
+
+
+       
       
    <!-- Ícones de redes sociais e contato -->
           <div class="social-icons">
@@ -2978,59 +3018,48 @@ ${
   
 
 
-
-
-
-
-
-
-
-
-
-      
-      ///// inicio
-      function criarCardsInformacoes(estabelecimento) {
-        const container = document.createElement("div");
-        container.className = "info-cards-container";
-      
-        const informacoes = [
-          {
-            label: "Horário de Funcionamento",
-            valor: estabelecimento.hours || "Não informado",
-            icone: "fa-regular fa-clock"
-          },
-          {
-            label: "Endereço",
-            valor: estabelecimento.address || "Não informado",
-            icone: "fa-solid fa-location-dot"
-          },
-          {
-            label: "Contato",
-            valor: estabelecimento.contact || estabelecimento.whatsapp || "Não informado",
-            icone: "fa-solid fa-phone"
-          },
-          {
-            label: "Entrega",
-            valor: estabelecimento.delivery || "Não informado",
-            icone: "fa-solid fa-truck"
-          }
-        ];
-      
-        informacoes.forEach(info => {
-          const card = document.createElement("div");
-          card.className = "info-card";
-          card.innerHTML = `
-            <i class="${info.icone}"></i>
-            <div class="info-card-text">
-              <div class="info-card-label">${info.label}</div>
-              <div class="info-card-value">${info.valor}</div>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-      
-        return container;
-      }
+    function criarInfoCards(establishment) {
+      const wrapper = document.createElement("div");
+    
+      const infos = [
+        {
+          icon: "fa-clock",
+          label: "Horário",
+          valor: establishment.hours?.replace(/<br>/g, " | ") || "Não informado",
+        },
+        {
+          icon: "fa-map-marker-alt",
+          label: "Endereço",
+          valor: establishment.address?.replace(/<br>/g, "") || "Não informado",
+        },
+        {
+          icon: "fa-phone",
+          label: "Contato",
+          valor: establishment.contact || establishment.whatsapp || "Não informado",
+        },
+        {
+          icon: "fa-truck",
+          label: "Entrega",
+          valor: establishment.delivery || "Não informado",
+        },
+      ];
+    
+      infos.forEach(({ icon, label, valor }) => {
+        const card = document.createElement("div");
+        card.className = "info-card";
+        card.innerHTML = `
+          <i class="fas ${icon}"></i>
+          <div class="info-card-text">
+            <span class="info-card-label">${label}</span>
+            <span class="info-card-value">${valor}</span>
+          </div>
+        `;
+        wrapper.appendChild(card);
+      });
+    
+      return wrapper;
+    }
+    
       
 
 

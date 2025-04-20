@@ -1530,10 +1530,48 @@ img {
 
 
 
+/* inicio card aqui o card para informaçoes basicas da categoria */
+
+.info-boxes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.info-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-left: 5px solid #007acc;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.info-icon {
+  font-size: 20px;
+  color: #007acc;
+  min-width: 24px;
+}
+
+.info-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.info-value {
+  font-size: 15px;
+  color: #555;
+}
 
 
 
 
+
+/* fim card info categorias */
 
 
 
