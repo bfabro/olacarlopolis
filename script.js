@@ -1,34 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
 
 
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   let contadorAnterior = 0;
   const contadorEl = document.getElementById("contador");
   const iconeEl = document.getElementById("iconeUsuarios");
@@ -1856,7 +1828,7 @@ menuLinks.forEach((link) => {
                     ],
                    
                     */
-
+                      /*
                     image: "images/comercios/farmacia/saudeFarma.png",
                     name: "Saude Farma",
                     address: "<br>Rua Benedito Salles, 951",
@@ -1878,6 +1850,41 @@ menuLinks.forEach((link) => {
                         "Xadago 50mg em promoçao!",
                         "Dipirona, resolve em 10 minutos",
                       ],
+*/
+
+
+image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
+name: "Farmacia da Vila",
+address: "<br>Rua Manguba, 320",
+contact: "</br>(43) 99148-8478",
+plantaoHorario: "</br>Das 8h às 21h </br> De 19/04 a 25/04",                   
+delivery: "</br>Sim / Sem Taxa",                     
+  facebook: "#",
+  instagram: "https://www.instagram.com/farmaciadavilaclps/",                     
+  novidadesImages: [               
+      "images/comercios/farmacia/farmaciaDaVila/divulgacao/1.png",
+      "images/comercios/farmacia/farmaciaDaVila/divulgacao/2.png",     
+      "images/comercios/farmacia/farmaciaDaVila/divulgacao/3.png",
+      "images/comercios/farmacia/farmaciaDaVila/divulgacao/4.png",
+      "images/comercios/farmacia/farmaciaDaVila/divulgacao/5.png",
+  ], 
+  novidadesDescriptions: [                            
+    "Venham nos visitar!",
+    "Indicado cólicas do trato gastrintestinal",
+    "indicado como analgésico <br>(para dor) e antitérmico (para febre)",
+    "Indicado no alívio da dor associada a <br> contraturas musculares, incluindo dor de<br> cabeça tensional.",
+    "Indicado para redução da febre e para <br> o alívio de dores",
+  ],
+
+
+
+
+
+
+
+
+
+                      
                   
 
 

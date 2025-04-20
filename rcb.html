@@ -457,7 +457,7 @@ criarGraficoCategorias(resultados);
 				Object.entries(dadosAcessos).forEach(([dia, info]) => {
 				  const detalhados = info.detalhados || {};
 				  Object.values(detalhados).forEach((acesso) => {
-					const cidade = acesso.cidade || "Desconhecida";
+					const cidade = acesso.cidade ;
 					if (!cidades[cidade]) cidades[cidade] = 0;
 					cidades[cidade]++;
 				  });
