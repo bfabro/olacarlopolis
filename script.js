@@ -1865,11 +1865,11 @@ menuLinks.forEach((link) => {
 
 image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
 name: "Farmacia da Vila",
-address: "<br>Rua Manguba, 320",
-contact: "</br>(43) 99148-8478",
+address: "Rua Manguba, 320",
+contact: "(43) 99148-8478",
 plantaoHorario: "8:00h às 21:00h", 
 plantaoData:"19/04 a 25/04",                  
-delivery: "</br>Sim / Sem Taxa",                     
+delivery: "Sim / Sem Taxa",                     
   facebook: "#",
   instagram: "https://www.instagram.com/farmaciadavilaclps/",                     
   novidadesImages: [               
@@ -1882,9 +1882,9 @@ delivery: "</br>Sim / Sem Taxa",
   novidadesDescriptions: [                            
     "Venham nos visitar!",
     "Indicado cólicas do trato gastrintestinal",
-    "indicado como analgésico <br>(para dor) e antitérmico (para febre)",
-    "Indicado no alívio da dor associada a <br> contraturas musculares, incluindo dor de<br> cabeça tensional.",
-    "Indicado para redução da febre e para <br> o alívio de dores",
+    "indicado como analgésico (para dor) e antitérmico (para febre)",
+    "Indicado no alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional",
+    "Indicado para redução da febre e para o alívio de dores",
   ],
 
 
