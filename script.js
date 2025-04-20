@@ -2765,7 +2765,7 @@ function restaurarMenuOriginal() {
       }
   
       contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
-      contentDiv.appendChild(criarCardsInformacoes(estabelecimento));
+      
 
       
           
