@@ -1405,13 +1405,32 @@ img {
 
 
 .novidade-descricao {
-  font-size: clamp(12px, 2.5vw, 16px);
-  color: #444;
-  margin-top: 8px;
   text-align: center;
-  padding: 0 10px;
-  word-wrap: break-word;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #333;
+  font-style: italic;
+  width:100%
 }
+
+.novidade-descricao {
+  font-size: 1rem;
+  padding: 8px;
+  text-align: left;
+  word-break: break-word;
+  white-space: normal;
+  width: 100%;
+  box-sizing: border-box;
+  color: #444;
+  line-height: 1.4;
+}
+
+.swiper-slide p.novidade-descricao {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  display: block;
+}
+
 
 #iconeUsuarios {
   transition: color 0.3s ease;

@@ -1334,9 +1334,9 @@ menuLinks.forEach((link) => {
                   novidadesDescriptions: [                            
                     "Venham nos visitar!",
                     "Cólicas do trato gastrintestinal",
-                    "Analgésico (para dor) <br> antitérmico (para febre)",
-                    "Alívio da dor associada a <br> contraturas musculares, incluindo dor de<br> cabeça tensional.",
-                    "Redução da febre e para <br> o alívio de dores",
+                    "Analgésico (para dor) antitérmico (para febre)",
+                    "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                    "Redução da febre e para o alívio de dores",
                   ],
                 },
         
