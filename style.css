@@ -1603,7 +1603,7 @@ img {
 
 .social-icons {
   display: flex;
-  gap: 18px;
+  gap: 14px;
   align-items: center;
   margin-bottom: 4px;
 }

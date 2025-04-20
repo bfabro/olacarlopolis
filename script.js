@@ -2614,36 +2614,6 @@ delivery: "Sim / Sem Taxa",
     });
     
     
-    
-    ////////////////////////////////////////////////
-    ///////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-    //////////////////////////////////////////////
-    //////////////////////////////////////////////
-    
-
-    
      
 
     if (searchInput && clearSearch) {
@@ -2651,14 +2621,6 @@ delivery: "Sim / Sem Taxa",
         clearSearch.style.display = searchInput.value.length > 0 ? "block" : "none";
       });
     
-
-
-
-
-
-
-
-
 
 
       clearSearch.addEventListener("click", function() {
@@ -2710,14 +2672,6 @@ function restaurarMenuOriginal() {
 }
 
       
-
-      
-   
-
-
-
-
-
       
     }
     
@@ -2888,9 +2842,9 @@ ${establishment.contact ? (() => {
       <div>
         <div class="info-label">Redes Sociais</div>
         <div class="social-icons">
-        ${establishment.facebook ? `<a href="${establishment.facebook}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 20px;"></i> Facebook</a>` : ""}
-          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 20px;"></i> Instagram</a>` : ""}          
-          ${establishment.site ? `<a href="${establishment.site}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 20px;"></i> Site</a>` : ""}
+        ${establishment.facebook ? `<a href="${establishment.facebook}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
+          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram</a>` : ""}          
+          ${establishment.site ? `<a href="${establishment.site}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
         </div>
       </div>
     </div>` : ""
