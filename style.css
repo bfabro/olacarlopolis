@@ -1591,14 +1591,20 @@ img {
   gap: 8px;
 }
 
-
+.info-box a.icon-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
 
 .social-icons {
   display: flex;
-  gap: 12px;
+  gap: 18px;
   align-items: center;
   margin-bottom: 4px;
 }
+
+
 
 
 /* fim card info categorias */

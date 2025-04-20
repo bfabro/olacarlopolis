@@ -2911,13 +2911,14 @@ ${establishment.contact ? (() => {
 
   ${(establishment.instagram || establishment.facebook || establishment.site) ? `
     <div class="info-box">
+    
       <i class="fas fa-share-alt info-icon"></i>
       <div>
         <div class="info-label">Redes Sociais</div>
-        <div class="info-value">
-        ${establishment.facebook ? `<a href="${establishment.facebook}" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>` : ""}
-          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>` : ""}          
-          ${establishment.site ? `<a href="${establishment.site}" target="_blank"><i class="fas fa-globe"></i> Site</a>` : ""}
+        <div class="social-icons">
+        ${establishment.facebook ? `<a href="${establishment.facebook}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 20px;"></i> Facebook</a>` : ""}
+          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 20px;"></i> Instagram</a>` : ""}          
+          ${establishment.site ? `<a href="${establishment.site}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 20px;"></i> Site</a>` : ""}
         </div>
       </div>
     </div>` : ""
