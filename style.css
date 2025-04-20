@@ -1565,6 +1565,10 @@ img {
 .info-value {
   font-size: 15px;
   color: #555;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.4;
 }
 
 .info-value a {
