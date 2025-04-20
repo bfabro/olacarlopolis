@@ -647,7 +647,9 @@ menuLinks.forEach((link) => {
                             contact: "(43) 99176-7871",
                             delivery: "Sim / Com Taxa",
                             instagram: "https://www.instagram.com/turminha_do_acai/",
-                            infoAdicional:"<br>Espetinhos a partir de Quinta até<br> Domingo",
+                            facebook:"#",
+                            site:"#",
+                            infoAdicional:"Espetinhos a partir de Quinta até Domingo, venha conferir",
                             novidadesImages: [            
                             "images/comercios/acai/turminhaAcai/novidades/1.png",                                            
                             ],
@@ -2813,30 +2815,6 @@ ${
 
 
 
-
-       
-      
-
-       ${
-         establishment.infoAdicional
-           ? `<b>Informação Adicional:</b> ${establishment.infoAdicional}<br>`
-           : ""
-       }
-
-       ${
-         establishment.infoVagaTrabalho
-           ? `<b>Info Vaga de Trabalho:</b> <span class="plantao-text">${establishment.infoVagaTrabalho}</span><br>`
-           : ""
-       }
-
-
-
-
-
-
-
-
-
 <div class="info-boxes-container">
   ${establishment.hours ? `
     <div class="info-box">
@@ -2847,24 +2825,40 @@ ${
       </div>
     </div>` : ""
   }
-  ${establishment.address ? `
+
+ ${establishment.address ? `
+  <div class="info-box">
+    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address.replace(/<br>/g, " "))}" 
+       target="_blank">
+      <i class='bx bx-map info-icon' style="color: #f44336;font-size:26px;"></i>
+    </a>
+    <div>
+      <div class="info-label">Endereço</div>
+      <div class="info-value">${establishment.address}</div>
+    </div>
+  </div>
+` : ""}
+
+
+${establishment.contact ? (() => {
+  const rawNumber = (establishment.whatsapp || establishment.contact || "").replace(/\D/g, "");
+  const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
+  return `
     <div class="info-box">
-      <i class="fas fa-map-marker-alt info-icon"></i>
-      <div>
-        <div class="info-label">Endereço</div>
-        <div class="info-value">${establishment.address}</div>
-      </div>
-    </div>` : ""
-  }
-  ${establishment.contact ? `
-    <div class="info-box">
-      <i class="fas fa-phone info-icon"></i>
+      <a href="https://api.whatsapp.com/send?phone=${fullNumber}&text=${encodeURIComponent(
+        "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
+      )}" target="_blank">
+        <i class='bx bxl-whatsapp info-icon' style="color: #25D366;font-size:26px;"></i>
+      </a>
       <div>
         <div class="info-label">Contato</div>
         <div class="info-value">${establishment.contact}</div>
       </div>
-    </div>` : ""
-  }
+    </div>
+  `;
+})() : ""}
+
+
   ${establishment.delivery ? `
     <div class="info-box">
       <i class="fas fa-truck info-icon"></i>
@@ -2874,6 +2868,7 @@ ${
       </div>
     </div>` : ""
   }
+
   ${establishment.taxaEntrega ? `
     <div class="info-box">
       <i class="fas fa-money-bill-wave info-icon"></i>
@@ -2883,78 +2878,54 @@ ${
       </div>
     </div>` : ""
   }
+
+  ${establishment.vagaTrabalho ? `
+    <div class="info-box">
+      <i class="fas fa-briefcase info-icon"></i>
+      <div>
+        <div class="info-label">Vaga de Trabalho</div>
+        <div class="info-value">${establishment.vagaTrabalho}</div>
+      </div>
+    </div>` : ""
+  }
+
+  ${establishment.infoAdicional ? `
+    <div class="info-box">
+      <i class="fas fa-circle-info info-icon"></i>
+      <div>
+        <div class="info-label">Informações Adicionais</div>
+        <div class="info-value">${establishment.infoAdicional}</div>
+      </div>
+    </div>` : ""
+  }
+
+  ${establishment.dataEvento ? `
+    <div class="info-box">
+      <i class="fas fa-calendar-alt info-icon"></i>
+      <div>
+        <div class="info-label">Data do Evento</div>
+        <div class="info-value">${establishment.dataEvento}</div>
+      </div>
+    </div>` : ""
+  }
+
+  ${(establishment.instagram || establishment.facebook || establishment.site) ? `
+    <div class="info-box">
+      <i class="fas fa-share-alt info-icon"></i>
+      <div>
+        <div class="info-label">Redes Sociais</div>
+        <div class="info-value">
+        ${establishment.facebook ? `<a href="${establishment.facebook}" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>` : ""}
+          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>` : ""}          
+          ${establishment.site ? `<a href="${establishment.site}" target="_blank"><i class="fas fa-globe"></i> Site</a>` : ""}
+        </div>
+      </div>
+    </div>` : ""
+  }
 </div>
 
-
-       
-      
-   <!-- Ícones de redes sociais e contato -->
-          <div class="social-icons">
-            ${
-              establishment.address
-                ? `
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address.replace(/<br>/g, " "))}" target="_blank" class="icon-link">
-                <i style="color:rgb(250, 9, 9); font-size: 30px;" class='bx bx-map'></i> Localização
-              </a>
-            `
-                : ""
-            }
-          
-           
-            ${
-  establishment.contact
-    ? (() => {
-        const rawNumber = (establishment.whatsapp || establishment.contact || "").replace(/\D/g, "");
-        const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
-        return `
-          <a href="https://api.whatsapp.com/send?phone=${fullNumber}&text=${encodeURIComponent(
-            "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-          )}" target="_blank" class="icon-link">
-            <i class='bx bxl-whatsapp' style="color: #25D366;  font-size: 30px;"></i> WhatsApp
-          </a>
-        `;
-      })()
-    : ""
-}
-
-  
-            
-  
-             </div>  <div class="social-icons">
-            ${
-              establishment.facebook
-                ? `
-              <a href="${establishment.facebook}" target="_blank" class="icon-link">
-                <i class='bx bxl-facebook' style="color: #1877F2;font-size: 30px;"></i> Facebook
-              </a>
-            `
-                : ""
-            }
-            
-            ${
-              establishment.instagram
-                ? `
-              <a href="${establishment.instagram}" target="_blank" class="icon-link">
-                <i class='bx bxl-instagram' style="color: #E4405F;font-size: 30px;"></i> Instagram
-              </a>
-            `
-                : ""
-            }
-            
-            ${
-              establishment.site
-                ? `
-              <a href="${establishment.site}" target="_blank" class="icon-link">
-                <i class='bx bx-globe' style="font-size: 30px";></i> Site
-              </a>
-            `
-                : ""
-            }
-
-
-            
-          </div>
-      </br>
+   
+      <br>
   
 
   <div class="button-container">

@@ -1535,7 +1535,7 @@ img {
 .info-boxes-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin-top: 15px;
 }
 
@@ -1566,6 +1566,31 @@ img {
   font-size: 15px;
   color: #555;
 }
+
+.info-value a {
+  color: #007acc;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.info-value a:hover {
+  text-decoration: underline;
+}
+
+.info-value i {
+  margin-right: 6px;
+}
+
+.icon-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #25D366;
+  gap: 8px;
+}
+
 
 
 
