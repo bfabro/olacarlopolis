@@ -3231,8 +3231,8 @@ setTimeout(() => {
           // Adiciona a classe ativa ao item clicado
           this.classList.add("active");
           // Carrega o conteúdo correspondente
-          loadContent(category.title, category.establishments);
-  
+          //loadContent(category.title, category.establishments);
+          carregarComerciosPorCategoria(normalizeName(category.title));
           // Expande a sidebar, se estiver fechada
           if (sidebar.classList.contains("close")) {
             sidebar.classList.remove("close");
@@ -3281,14 +3281,30 @@ setTimeout(() => {
         for (let chave in dados) {
           const item = dados[chave];
           html += `
-            <div class="comercio">
+            <div class="comercio" style="margin-bottom: 30px;">
               <h2>${item.nome || "Nome não informado"}</h2>
               ${item.endereco ? `<p><strong>Endereço:</strong> ${item.endereco}</p>` : ""}
-              ${item.horario ? `<p><strong>Horário:</strong> ${item.horario}</p>` : ""}
               ${item.telefone ? `<p><strong>Telefone:</strong> ${item.telefone}</p>` : ""}
+              ${item.horario ? `<p><strong>Horário:</strong> ${item.horario}</p>` : ""}
+              ${item.entrega ? `<p><strong>Entrega:</strong> ${item.entrega}</p>` : ""}
+              ${item.infoAdicional ? `<p><strong>Informações adicionais:</strong> ${item.infoAdicional}</p>` : ""}
+              ${item.dataEvento ? `<p><strong>Data do Evento:</strong> ${item.dataEvento}</p>` : ""}
               ${item.instagram ? `<p><a href="${item.instagram}" target="_blank">Instagram</a></p>` : ""}
-              ${item.novidades ? item.novidades.map(src => `<img src="${src}" style="max-width:100%; margin:5px;">`).join("") : ""}
-              ${item.cardapio ? `<h4>Cardápio:</h4>` + item.cardapio.map(src => `<img src="${src}" style="max-width:100%; margin:5px;">`).join("") : ""}
+              ${item.facebook ? `<p><a href="${item.facebook}" target="_blank">Facebook</a></p>` : ""}
+    
+              ${item.novidades ? `
+                <h4>Novidades:</h4>
+                ${item.novidades.map((src, i) => `
+                  <div style="margin-bottom:10px;">
+                    <img src="${src}" style="max-width:100%; margin-bottom:5px;">
+                    ${item.descricaoNovidades && item.descricaoNovidades[i] ? `<p>${item.descricaoNovidades[i]}</p>` : ""}
+                  </div>
+                `).join("")}` : ""}
+    
+              ${item.cardapio ? `
+                <h4>Cardápio:</h4>
+                ${item.cardapio.map(src => `
+                  <img src="${src}" style="max-width:100%; margin-bottom:5px;">`).join("")}` : ""}
             </div>
             <hr>`;
         }
@@ -3296,6 +3312,20 @@ setTimeout(() => {
         document.getElementById("conteudo").innerHTML = html;
       });
     }
+    
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const links = document.querySelectorAll(".nav_link[data-categoria]");
+    links.forEach(link => {
+      link.addEventListener("click", function () {
+        const categoria = this.getAttribute("data-categoria");
+        carregarComerciosPorCategoria(categoria);
+      });
+    });
+  });
+
+
     
   });
   
