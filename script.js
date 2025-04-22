@@ -3133,7 +3133,8 @@ setTimeout(() => {
     function loadPaidEstablishments() {
       const categories = window.categories || [];
       categories.forEach((category) => {
-        loadContent(category.title, category.establishments);
+        //loadContent(category.title, category.establishments);
+        carregarComerciosPorCategoria(normalizeName(category.title));
       });
     }
   
