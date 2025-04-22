@@ -3254,7 +3254,6 @@ setTimeout(() => {
 
     function carregarComerciosPorCategoria(categoria) {
       const ref = firebase.database().ref(`comercios/${categoria}`);
-    
       ref.once("value").then(snapshot => {
         const dados = snapshot.val();
         if (!dados) {
@@ -3266,58 +3265,67 @@ setTimeout(() => {
         for (let chave in dados) {
           const item = dados[chave];
           html += `
-          <div class="boxEstabelecimento">
-           
-              <h2>${item.nome || "Nome não informado"}</h2>
-
-              ${item.endereco ? `<p><strong>Endereço:</strong> ${item.endereco}</p>` : ""}
-              ${item.telefone ? `<p><strong>Telefone:</strong> ${item.telefone}</p>` : ""}
-              ${item.horario ? `<p><strong>Horário:</strong> ${item.horario}</p>` : ""}              
-              ${item.entrega ? `<p><strong>Entrega:</strong> ${item.entrega}</p>` : ""}
-              ${item.infoAdicional ? `<p><strong>Informações adicionais:</strong> ${item.infoAdicional}</p>` : ""}
-              ${item.dataEvento ? `<p><strong>Data do Evento:</strong> ${item.dataEvento}</p>` : ""}
-              ${item.instagram ? `<p><a href="${item.instagram}" target="_blank">Instagram</a></p>` : ""}
-              ${item.facebook ? `<p><a href="${item.facebook}" target="_blank">Facebook</a></p>` : ""}
+            <div class="novidade-item">
+              <h2 class="locais_nomes">${item.nome || "Nome não informado"}</h2>
+              
+              ${item.endereco ? `<p><b>Endereço:</b> ${item.endereco}</p>` : ""}
+              ${item.telefone ? `<p><b>Telefone:</b> ${item.telefone}</p>` : ""}
+              ${item.horario ? `<p><b>Horário:</b> ${item.horario}</p>` : ""}
+              ${item.entrega ? `<p><b>Entrega:</b> ${item.entrega}</p>` : ""}
+              ${item.infoAdicional ? `<p><b>Info:</b> ${item.infoAdicional}</p>` : ""}
+              
+              <div class="botoesToggle">
+                ${item.novidades ? `<button class="btnNovidades">Novidades</button>` : ""}
+                ${item.cardapio ? `<button class="btnCardapio">Cardápio</button>` : ""}
+              </div>
     
-  <div class="botoesToggle">
-      ${item.novidades ? `<button class="btnNovidades">Novidades</button>` : ""}
-      ${item.cardapio ? `<button class="btnCardapio">Cardápio</button>` : ""}
-    </div>
-
-    ${item.novidades ? `
-      <div class="novidadesContent" style="display:none;">
-        ${item.novidades.map(src => `<img src="${src}" style="max-width:100%; margin-bottom:5px;">`).join("")}
-      </div>
-    ` : ""}
-
-    ${item.cardapio ? `
-      <div class="cardapioContent" style="display:none;">
-        ${item.cardapio.map(src => `<img src="${src}" style="max-width:100%; margin-bottom:5px;">`).join("")}
-      </div>
-    ` : ""}
-  </div>
-  <hr>`;
+              ${item.novidades ? `
+                <div class="novidadesContent" style="display:none;">
+                  ${item.novidades.map((src, i) => `
+                    <div class="img-container">
+                      <img src="${src}" class="novidade-image">
+                      ${item.descricaoNovidades && item.descricaoNovidades[i] ? `<p class="image-description">${item.descricaoNovidades[i]}</p>` : ""}
+                    </div>
+                  `).join("")}
+                </div>
+              ` : ""}
+    
+              ${item.cardapio ? `
+                <div class="cardapioContent" style="display:none;">
+                  ${item.cardapio.map(src => `
+                    <div class="img-container">
+                      <img src="${src}" class="novidade-image">
+                    </div>
+                  `).join("")}
+                </div>
+              ` : ""}
+    
+              <hr>
+            </div>
+          `;
         }
     
-        document.getElementById("conteudo").innerHTML = html;
+        document.getElementById("conteudo").innerHTML = `<div class="container">${html}</div>`;
+    
+        // Reativar botões dinamicamente
         setTimeout(() => {
           document.querySelectorAll(".btnNovidades").forEach(btn => {
             btn.addEventListener("click", function () {
-              const content = this.closest(".boxEstabelecimento").querySelector(".novidadesContent");
+              const content = this.closest(".novidade-item").querySelector(".novidadesContent");
               content.style.display = content.style.display === "none" ? "block" : "none";
             });
           });
-        
+    
           document.querySelectorAll(".btnCardapio").forEach(btn => {
             btn.addEventListener("click", function () {
-              const content = this.closest(".boxEstabelecimento").querySelector(".cardapioContent");
+              const content = this.closest(".novidade-item").querySelector(".cardapioContent");
               content.style.display = content.style.display === "none" ? "block" : "none";
             });
           });
         }, 100);
-        
       });
     }
+    
     
 
 
