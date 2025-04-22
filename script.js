@@ -3257,6 +3257,7 @@ setTimeout(() => {
       ref.once("value").then(snapshot => {
         const dados = snapshot.val();
         console.log("DADOS CARREGADOS:", dados);
+    
         if (!dados) {
           document.getElementById("conteudo").innerHTML = "<p>Nenhum comércio encontrado.</p>";
           return;
@@ -3267,17 +3268,17 @@ setTimeout(() => {
           const item = dados[chave];
           html += `
             <div class="novidade-item">
-             ${item.image ? `<img src="${item.image}" class="content_image">` : ""}
-              <h2 class="locais_nomes">${item.name || "Nome não informado"}</h2>
-              
-              ${item.address ? `<p><b>Endereço:</b> ${item.address}</p>` : ""}
-              ${item.contact ? `<p><b>Telefone:</b> ${item.contact}</p>` : ""}
-              ${item.hours ? `<p><b>Horário:</b> ${item.hours}</p>` : ""}
-              ${item.delivery ? `<p><b>Entrega:</b> ${item.delivery}</p>` : ""}
+              ${item.imagem ? `<img src="${item.imagem}" class="content_image">` : ""}
+              <h2 class="locais_nomes">${item.nome || "Nome não informado"}</h2>
+    
+              ${item.endereco ? `<p><b>Endereço:</b> ${item.endereco}</p>` : ""}
+              ${item.telefone ? `<p><b>Telefone:</b> ${item.telefone}</p>` : ""}
+              ${item.horario ? `<p><b>Horário:</b> ${item.horario}</p>` : ""}
+              ${item.entrega ? `<p><b>Entrega:</b> ${item.entrega}</p>` : ""}
               ${item.infoAdicional ? `<p><b>Info:</b> ${item.infoAdicional}</p>` : ""}
               ${item.instagram ? `<p><a href="${item.instagram}" target="_blank">Instagram</a></p>` : ""}
               ${item.facebook ? `<p><a href="${item.facebook}" target="_blank">Facebook</a></p>` : ""}
-
+    
               <div class="botoesToggle">
                 ${item.novidades ? `<button class="btnNovidades">Novidades</button>` : ""}
                 ${item.cardapio ? `<button class="btnCardapio">Cardápio</button>` : ""}
@@ -3311,7 +3312,6 @@ setTimeout(() => {
     
         document.getElementById("conteudo").innerHTML = `<div class="container">${html}</div>`;
     
-        // Reativar botões dinamicamente
         setTimeout(() => {
           document.querySelectorAll(".btnNovidades").forEach(btn => {
             btn.addEventListener("click", function () {
@@ -3329,6 +3329,7 @@ setTimeout(() => {
         }, 100);
       });
     }
+    
     
     
 
