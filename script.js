@@ -3268,16 +3268,21 @@ setTimeout(() => {
           const item = dados[chave];
           html += `
             <div class="novidade-item">
-              ${item.imagem ? `<img src="${item.imagem}" class="content_image">` : ""}
+              <div class="img-container">
+                ${item.imagem ? `<img src="${item.imagem}" class="content_image">` : ""}
+              </div>
+    
               <h2 class="locais_nomes">${item.nome || "Nome não informado"}</h2>
     
-              ${item.endereco ? `<p><b>Endereço:</b> ${item.endereco}</p>` : ""}
-              ${item.telefone ? `<p><b>Telefone:</b> ${item.telefone}</p>` : ""}
-              ${item.horario ? `<p><b>Horário:</b> ${item.horario}</p>` : ""}
-              ${item.entrega ? `<p><b>Entrega:</b> ${item.entrega}</p>` : ""}
-              ${item.infoAdicional ? `<p><b>Info:</b> ${item.infoAdicional}</p>` : ""}
-              ${item.instagram ? `<p><a href="${item.instagram}" target="_blank">Instagram</a></p>` : ""}
-              ${item.facebook ? `<p><a href="${item.facebook}" target="_blank">Facebook</a></p>` : ""}
+              <div class="novidade-description">
+                ${item.endereco ? `<p><b>Endereço:</b> ${item.endereco}</p>` : ""}
+                ${item.telefone ? `<p><b>Telefone:</b> ${item.telefone}</p>` : ""}
+                ${item.horario ? `<p><b>Horário:</b> ${item.horario}</p>` : ""}
+                ${item.entrega ? `<p><b>Entrega:</b> ${item.entrega}</p>` : ""}
+                ${item.infoAdicional ? `<p><b>Info:</b> ${item.infoAdicional}</p>` : ""}
+                ${item.instagram ? `<p><a href="${item.instagram}" target="_blank">Instagram</a></p>` : ""}
+                ${item.facebook ? `<p><a href="${item.facebook}" target="_blank">Facebook</a></p>` : ""}
+              </div>
     
               <div class="botoesToggle">
                 ${item.novidades ? `<button class="btnNovidades">Novidades</button>` : ""}
@@ -3304,14 +3309,13 @@ setTimeout(() => {
                   `).join("")}
                 </div>
               ` : ""}
-    
-              <hr>
             </div>
           `;
         }
     
         document.getElementById("conteudo").innerHTML = `<div class="container">${html}</div>`;
     
+        // Reativar botões dinamicamente
         setTimeout(() => {
           document.querySelectorAll(".btnNovidades").forEach(btn => {
             btn.addEventListener("click", function () {
