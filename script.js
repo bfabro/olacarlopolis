@@ -706,7 +706,7 @@ menuLinks.forEach((link) => {
 
                 {
                     link: document.querySelector("#menuAdega"),    
-                    title: "Adegas",
+                    title: "Adega",
                     establishments: [
                         {
                             image: "images/comercios/adega/cuenca/adega_cuenca.jpg",
