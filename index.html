@@ -70,55 +70,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<script>
-
-
-  var firebaseConfig = {
    
-   
-    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
-    authDomain: "contadoracessos.firebaseapp.com",
-    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
-    projectId: "contadoracessos",
-    storageBucket: "contadoracessos.firebasestorage.app",
-    messagingSenderId: "521517291315",
-    appId: "1:521517291315:web:74f8d878d2d8769460d046",
-    measurementId: "G-BXPWYWK61F"
-
-  };
-  if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
    
    <title>Bem vindo ao OLA Carlópolis !!!</title>
 </head>
@@ -841,7 +793,6 @@
             </div>
          </div>
       </nav>
-      
       <div class="content_area" id="content_area">
           <!-- Carrossel de Turismo -->
          <div class="carrossel-container">
@@ -1034,8 +985,6 @@
 
 
          </div>
-
-         <div id="conteudo" style="padding: 20px;"></div>
       </div>
       <!-- fim do conteiner-->
    </div>
@@ -1045,12 +994,22 @@
 
 
    <script>
-
+ // Configuração do Firebase
+ const firebaseConfig = {
+    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+    authDomain: "contadoracessos.firebaseapp.com",
+    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+    projectId: "contadoracessos",
+    storageBucket: "contadoracessos.firebasestorage.app",
+    messagingSenderId: "521517291315",
+    appId: "1:521517291315:web:74f8d878d2d8769460d046",
+    measurementId: "G-BXPWYWK61F"
+  };
 
 
 
   // Inicializa o Firebase
- // const app = firebase.initializeApp(firebaseConfig);
+  const app = firebase.initializeApp(firebaseConfig);
   const database = firebase.database(app);
   const db = firebase.database();
    // Firebase Realtime Database para "onlineUsers"
@@ -1117,6 +1076,11 @@ onlineUsersRef.on("value", (snapshot) => {
   }); 
 
    </script>
+
+
+ 
+
+
 
 
 
