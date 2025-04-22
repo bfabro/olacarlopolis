@@ -141,26 +141,6 @@ function registrarAcesso() {
 registrarAcesso();
 
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-///////////
-
-
-
     // pagou? defina por s pago n nao pago // PAGx
     const statusEstabelecimentos = {
 
@@ -3233,7 +3213,11 @@ setTimeout(() => {
           this.classList.add("active");
           // Carrega o conteúdo correspondente
           //loadContent(category.title, category.establishments);
+
+
           carregarComerciosPorCategoria(normalizeName(category.title));
+
+          
           // Expande a sidebar, se estiver fechada
           if (sidebar.classList.contains("close")) {
             sidebar.classList.remove("close");

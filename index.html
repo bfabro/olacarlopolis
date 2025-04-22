@@ -100,7 +100,9 @@
     measurementId: "G-BXPWYWK61F"
 
   };
+  if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
+}
 </script>
 
 
