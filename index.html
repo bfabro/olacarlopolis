@@ -63,6 +63,77 @@
    <!-- Adicione antes do seu script.js -->
    <!-- <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>-->   
    <!-- <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  var firebaseConfig = {
+   
+   
+    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+    authDomain: "contadoracessos.firebaseapp.com",
+    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+    projectId: "contadoracessos",
+    storageBucket: "contadoracessos.firebasestorage.app",
+    messagingSenderId: "521517291315",
+    appId: "1:521517291315:web:74f8d878d2d8769460d046",
+    measurementId: "G-BXPWYWK61F"
+
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    
    <title>Bem vindo ao OLA Carlópolis !!!</title>
 </head>
@@ -986,17 +1057,7 @@
 
 
    <script>
- // Configuração do Firebase
- const firebaseConfig = {
-    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
-    authDomain: "contadoracessos.firebaseapp.com",
-    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
-    projectId: "contadoracessos",
-    storageBucket: "contadoracessos.firebasestorage.app",
-    messagingSenderId: "521517291315",
-    appId: "1:521517291315:web:74f8d878d2d8769460d046",
-    measurementId: "G-BXPWYWK61F"
-  };
+
 
 
 
@@ -1068,11 +1129,6 @@ onlineUsersRef.on("value", (snapshot) => {
   }); 
 
    </script>
-
-
- 
-
-
 
 
 

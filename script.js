@@ -736,7 +736,7 @@ menuLinks.forEach((link) => {
                             address: "R. Kalil Keder, 752",
                             contact: "(43) 99800-1680",
                             delivery: "Sim / Sem Taxa",
-                            instagram: "https://www.instagram.com/turminha_do_acai/",
+                            instagram: "#",
                             facebook:"https://www.facebook.com/adega.carlopolis.37/",
 
                             novidadesImages: [ 
@@ -3261,5 +3261,41 @@ setTimeout(() => {
         sidebar.classList.add("close");
       }
     });
+
+
+
+
+
+
+    function carregarComerciosPorCategoria(categoria) {
+      const ref = firebase.database().ref(`comercios/${categoria}`);
+    
+      ref.once("value").then(snapshot => {
+        const dados = snapshot.val();
+        if (!dados) {
+          document.getElementById("conteudo").innerHTML = "<p>Nenhum comércio encontrado.</p>";
+          return;
+        }
+    
+        let html = "";
+        for (let chave in dados) {
+          const item = dados[chave];
+          html += `
+            <div class="comercio">
+              <h2>${item.nome || "Nome não informado"}</h2>
+              ${item.endereco ? `<p><strong>Endereço:</strong> ${item.endereco}</p>` : ""}
+              ${item.horario ? `<p><strong>Horário:</strong> ${item.horario}</p>` : ""}
+              ${item.telefone ? `<p><strong>Telefone:</strong> ${item.telefone}</p>` : ""}
+              ${item.instagram ? `<p><a href="${item.instagram}" target="_blank">Instagram</a></p>` : ""}
+              ${item.novidades ? item.novidades.map(src => `<img src="${src}" style="max-width:100%; margin:5px;">`).join("") : ""}
+              ${item.cardapio ? `<h4>Cardápio:</h4>` + item.cardapio.map(src => `<img src="${src}" style="max-width:100%; margin:5px;">`).join("") : ""}
+            </div>
+            <hr>`;
+        }
+    
+        document.getElementById("conteudo").innerHTML = html;
+      });
+    }
+    
   });
   

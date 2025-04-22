@@ -1,0 +1,129 @@
+{
+  "comercios": {
+    "academia": {
+      "lobofitness": {
+        "nome": "Lobo Fitness",
+        "horario": "seg a Qui:06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
+        "endereco": "R. Delfino Mendes, 264 - Centro",
+        "telefone": "(43) 99112-1009",
+        "instagram": "https://www.instagram.com/academialobocarlopolis/",
+        "novidades": [
+          "images/comercios/academia/lobofitness/divulgacao/1.png",
+          "images/comercios/academia/lobofitness/divulgacao/2.png"
+        ],
+        "descricaoNovidades": [
+          "Venham Conferir nosso espaço"
+        ]
+      }
+    },
+    "acai": {
+      "turminhadoacai": {
+        "nome": "Turminha do Açai",
+        "horario": "Qua a Seg: 14h - 23h <br> Ter: Fechado",
+        "endereco": "Rua Benedito Salles, 409",
+        "telefone": "(43) 99176-7871",
+        "entrega": "Sim / Com Taxa",
+        "instagram": "https://www.instagram.com/turminha_do_acai/",
+        "infoAdicional": "Espetinhos a partir de Quinta até Domingo",
+        "novidades": [
+          "images/comercios/acai/turminhaAcai/novidades/1.png"
+        ],
+        "descricaoNovidades": [
+          "Marmita de Açai <br>Voce só encontra aqui!"
+        ],
+        "cardapio": [
+          "images/comercios/acai/turminhaAcai/cardapio/1.png",
+          "images/comercios/acai/turminhaAcai/cardapio/2.png",
+          "images/comercios/acai/turminhaAcai/cardapio/3.png"
+        ]
+      }
+    },
+    "acougue": {
+      "curitiba": {
+        "nome": "Açougue Curitiba",
+        "horario": "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+        "endereco": "Rua Benedito Salles, 409",
+        "telefone": "(43) 99635-1001",
+        "novidades": [
+          "images/comercios/acougue/curitiba/banner/banner_1.jpg",
+          "images/comercios/acougue/curitiba/banner/banner_2.jpg"
+        ],
+        "descricaoNovidades": [
+          "Carnes de primeiras!"
+        ]
+      }
+    },
+    "adega": {
+      "cuenca": {
+        "nome": "Adega Cuenca",
+        "horario": "seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
+        "endereco": "R. Kalil Keder, 752",
+        "telefone": "(43) 99800-1680",
+        "instagram": "https://www.instagram.com/turminha_do_acai/",
+        "facebook": "https://www.facebook.com/adega.carlopolis.37/",
+        "novidades": [
+          "images/comercios/adega/cuenca/divulgacao/1.png",
+          "images/comercios/adega/cuenca/divulgacao/2.png",
+          "images/comercios/adega/cuenca/divulgacao/3.png",
+          "images/comercios/adega/cuenca/divulgacao/4.png",
+          "images/comercios/adega/cuenca/divulgacao/5.png"
+        ],
+        "descricaoNovidades": [
+          "Chop Brahma encontra aqui!",
+          "Chop HASS encontra aqui!"
+        ]
+      },
+      "assao": {
+        "nome": "Assao",
+        "horario": "seg 09:00h - 22h",
+        "endereco": "R. Benedito Sales, 1551",
+        "instagram": "https://www.instagram.com/casadecarneassao/"
+      }
+    },
+    "agenciaViagem": {
+      "cvccarlopolis": {
+        "nome": "CVC Carlopolis",
+        "horario": "Seg a Sab: 11h - 22h",
+        "endereco": "Rua Padre Hugo, 450, Sala 10",
+        "telefone": "(43) 99177-2244",
+        "instagram": "https://www.instagram.com/cvc.pr.carlopolis/",
+        "facebook": "https://www.facebook.com/CVC.PR.Carlopolis?mibextid=LQQJ4d"
+      }
+    },
+    "assistenciaCelular": {
+      "oficinadocelular": {
+        "nome": "Oficina do Celular",
+        "horario": "Seg a Sex: 8h - 18:00h<br> Sab: 08:00-17:00",
+        "endereco": "Rua Dr Paula e Silva 676",
+        "telefone": "(43) 3566-1600",
+        "facebook": "https://www.facebook.com/oficinadocelularclps/",
+        "instagram": "https://www.instagram.com/oficinadocelular_carlopolis/",
+        "novidades": [
+          "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/2.png",
+          "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/1.png"
+        ],
+        "descricaoNovidades": [
+          "Fazemos sua capinha!",
+          "Temos Assistência Técnica!"
+        ]
+      }
+    },
+    "feiraLua": {
+      "feiradalua": {
+        "nome": "Feira da Lua",
+        "horario": "Sex - 19:00 - 23:30",
+        "endereco": "Praça Igreja Matriz",
+        "telefone": "(43) 99965-2084",
+        "instagram": "https://www.instagram.com/feiradaluacarlopolis/",
+        "novidades": [
+          "images/comercios/feiraLua/divulgacao/1.png",
+          "images/comercios/feiraLua/divulgacao/2.png",
+          "images/comercios/feiraLua/divulgacao/3.png",
+          "images/comercios/feiraLua/divulgacao/4.png",
+          "images/comercios/feiraLua/divulgacao/5.png",
+          "images/comercios/feiraLua/divulgacao/6.png"
+        ]
+      }
+    }
+  }
+}
