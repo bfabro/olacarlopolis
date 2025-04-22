@@ -3256,6 +3256,7 @@ setTimeout(() => {
       const ref = firebase.database().ref(`comercios/${categoria}`);
       ref.once("value").then(snapshot => {
         const dados = snapshot.val();
+        console.log("DADOS CARREGADOS:", dados);
         if (!dados) {
           document.getElementById("conteudo").innerHTML = "<p>Nenhum comércio encontrado.</p>";
           return;
