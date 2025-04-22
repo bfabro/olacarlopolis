@@ -3266,35 +3266,56 @@ setTimeout(() => {
         for (let chave in dados) {
           const item = dados[chave];
           html += `
-            <div class="comercio" style="margin-bottom: 30px;">
+          <div class="boxEstabelecimento">
+           
               <h2>${item.nome || "Nome não informado"}</h2>
+
               ${item.endereco ? `<p><strong>Endereço:</strong> ${item.endereco}</p>` : ""}
               ${item.telefone ? `<p><strong>Telefone:</strong> ${item.telefone}</p>` : ""}
-              ${item.horario ? `<p><strong>Horário:</strong> ${item.horario}</p>` : ""}
+              ${item.horario ? `<p><strong>Horário:</strong> ${item.horario}</p>` : ""}              
               ${item.entrega ? `<p><strong>Entrega:</strong> ${item.entrega}</p>` : ""}
               ${item.infoAdicional ? `<p><strong>Informações adicionais:</strong> ${item.infoAdicional}</p>` : ""}
               ${item.dataEvento ? `<p><strong>Data do Evento:</strong> ${item.dataEvento}</p>` : ""}
               ${item.instagram ? `<p><a href="${item.instagram}" target="_blank">Instagram</a></p>` : ""}
               ${item.facebook ? `<p><a href="${item.facebook}" target="_blank">Facebook</a></p>` : ""}
     
-              ${item.novidades ? `
-                <h4>Novidades:</h4>
-                ${item.novidades.map((src, i) => `
-                  <div style="margin-bottom:10px;">
-                    <img src="${src}" style="max-width:100%; margin-bottom:5px;">
-                    ${item.descricaoNovidades && item.descricaoNovidades[i] ? `<p>${item.descricaoNovidades[i]}</p>` : ""}
-                  </div>
-                `).join("")}` : ""}
-    
-              ${item.cardapio ? `
-                <h4>Cardápio:</h4>
-                ${item.cardapio.map(src => `
-                  <img src="${src}" style="max-width:100%; margin-bottom:5px;">`).join("")}` : ""}
-            </div>
-            <hr>`;
+  <div class="botoesToggle">
+      ${item.novidades ? `<button class="btnNovidades">Novidades</button>` : ""}
+      ${item.cardapio ? `<button class="btnCardapio">Cardápio</button>` : ""}
+    </div>
+
+    ${item.novidades ? `
+      <div class="novidadesContent" style="display:none;">
+        ${item.novidades.map(src => `<img src="${src}" style="max-width:100%; margin-bottom:5px;">`).join("")}
+      </div>
+    ` : ""}
+
+    ${item.cardapio ? `
+      <div class="cardapioContent" style="display:none;">
+        ${item.cardapio.map(src => `<img src="${src}" style="max-width:100%; margin-bottom:5px;">`).join("")}
+      </div>
+    ` : ""}
+  </div>
+  <hr>`;
         }
     
         document.getElementById("conteudo").innerHTML = html;
+        setTimeout(() => {
+          document.querySelectorAll(".btnNovidades").forEach(btn => {
+            btn.addEventListener("click", function () {
+              const content = this.closest(".boxEstabelecimento").querySelector(".novidadesContent");
+              content.style.display = content.style.display === "none" ? "block" : "none";
+            });
+          });
+        
+          document.querySelectorAll(".btnCardapio").forEach(btn => {
+            btn.addEventListener("click", function () {
+              const content = this.closest(".boxEstabelecimento").querySelector(".cardapioContent");
+              content.style.display = content.style.display === "none" ? "block" : "none";
+            });
+          });
+        }, 100);
+        
       });
     }
     
