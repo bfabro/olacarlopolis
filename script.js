@@ -3266,6 +3266,7 @@ setTimeout(() => {
           const item = dados[chave];
           html += `
             <div class="novidade-item">
+             ${item.image ? `<img src="${item.image}" class="content_image">` : ""}
               <h2 class="locais_nomes">${item.name || "Nome não informado"}</h2>
               
               ${item.address ? `<p><b>Endereço:</b> ${item.address}</p>` : ""}
