@@ -714,7 +714,7 @@ menuLinks.forEach((link) => {
                             hours:
                             "seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
                             address: "R. Kalil Keder, 752",
-                            contact: "(43) 99800-1680",
+                            contact: "(43) 99800-16800",
                             delivery: "Sim / Sem Taxa",
                             instagram: "#",
                             facebook:"https://www.facebook.com/adega.carlopolis.37/",
