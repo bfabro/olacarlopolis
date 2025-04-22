@@ -3217,7 +3217,7 @@ setTimeout(() => {
 
           carregarComerciosPorCategoria(normalizeName(category.title));
 
-          
+
           // Expande a sidebar, se estiver fechada
           if (sidebar.classList.contains("close")) {
             sidebar.classList.remove("close");
@@ -3305,12 +3305,30 @@ setTimeout(() => {
     links.forEach(link => {
       link.addEventListener("click", function () {
         const categoria = this.getAttribute("data-categoria");
+        registrarClique(categoria); // 👈 adicione aqui
         carregarComerciosPorCategoria(categoria);
       });
     });
   });
 
+  
+  
+
 
     
   });
   
+  function registrarClique(categoria) {
+    const dataAtual = new Date();
+    const anoMesDia = dataAtual.toISOString().slice(0, 10); // ex: 2025-04-22
+    const horario = dataAtual.toLocaleTimeString("pt-BR");
+  
+    const refTotal = firebase.database().ref(`cliquesPorMenu/${anoMesDia}/${categoria}/total`);
+    const refDetalhado = firebase.database().ref(`cliquesPorMenu/${anoMesDia}/${categoria}/horarios`).push();
+  
+    // Incrementa o total
+    refTotal.transaction((atual) => (atual || 0) + 1);
+  
+    // Registra horário individual
+    refDetalhado.set(horario);
+  }
