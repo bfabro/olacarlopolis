@@ -141,6 +141,26 @@ function registrarAcesso() {
 registrarAcesso();
 
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+///////////
+
+
+
     // pagou? defina por s pago n nao pago // PAGx
     const statusEstabelecimentos = {
 
@@ -706,7 +726,7 @@ menuLinks.forEach((link) => {
 
                 {
                     link: document.querySelector("#menuAdega"),    
-                    title: "Adega",
+                    title: "Adegas",
                     establishments: [
                         {
                             image: "images/comercios/adega/cuenca/adega_cuenca.jpg",
@@ -714,7 +734,7 @@ menuLinks.forEach((link) => {
                             hours:
                             "seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
                             address: "R. Kalil Keder, 752",
-                            contact: "(43) 99800-16800",
+                            contact: "(43) 99800-1680",
                             delivery: "Sim / Sem Taxa",
                             instagram: "#",
                             facebook:"https://www.facebook.com/adega.carlopolis.37/",
@@ -3113,8 +3133,7 @@ setTimeout(() => {
     function loadPaidEstablishments() {
       const categories = window.categories || [];
       categories.forEach((category) => {
-        //loadContent(category.title, category.establishments);
-        carregarComerciosPorCategoria(normalizeName(category.title));
+        loadContent(category.title, category.establishments);
       });
     }
   
@@ -3212,12 +3231,8 @@ setTimeout(() => {
           // Adiciona a classe ativa ao item clicado
           this.classList.add("active");
           // Carrega o conteúdo correspondente
-          //loadContent(category.title, category.establishments);
-
-
-          carregarComerciosPorCategoria(normalizeName(category.title));
-
-
+          loadContent(category.title, category.establishments);
+  
           // Expande a sidebar, se estiver fechada
           if (sidebar.classList.contains("close")) {
             sidebar.classList.remove("close");
@@ -3250,123 +3265,6 @@ setTimeout(() => {
 
 
 
-
-
-    function carregarComerciosPorCategoria(categoria) {
-      const ref = firebase.database().ref(`comercios/${categoria}`);
-      ref.once("value").then(snapshot => {
-        const dados = snapshot.val();
-        console.log("DADOS CARREGADOS:", dados);
-    
-        if (!dados) {
-          document.getElementById("conteudo").innerHTML = "<p>Nenhum comércio encontrado.</p>";
-          return;
-        }
-    
-        let html = "";
-        for (let chave in dados) {
-          const item = dados[chave];
-          html += `
-            <div class="novidade-item">
-              <div class="img-container">
-                ${item.imagem ? `<img src="${item.imagem}" class="content_image">` : ""}
-              </div>
-    
-              <h2 class="locais_nomes">${item.nome || "Nome não informado"}</h2>
-    
-              <div class="novidade-description">
-                ${item.endereco ? `<p><b>Endereço:</b> ${item.endereco}</p>` : ""}
-                ${item.telefone ? `<p><b>Telefone:</b> ${item.telefone}</p>` : ""}
-                ${item.horario ? `<p><b>Horário:</b> ${item.horario}</p>` : ""}
-                ${item.entrega ? `<p><b>Entrega:</b> ${item.entrega}</p>` : ""}
-                ${item.infoAdicional ? `<p><b>Info:</b> ${item.infoAdicional}</p>` : ""}
-                ${item.instagram ? `<p><a href="${item.instagram}" target="_blank">Instagram</a></p>` : ""}
-                ${item.facebook ? `<p><a href="${item.facebook}" target="_blank">Facebook</a></p>` : ""}
-              </div>
-    
-              <div class="botoesToggle">
-                ${item.novidades ? `<button class="btnNovidades">Novidades</button>` : ""}
-                ${item.cardapio ? `<button class="btnCardapio">Cardápio</button>` : ""}
-              </div>
-    
-              ${item.novidades ? `
-                <div class="novidadesContent" style="display:none;">
-                  ${item.novidades.map((src, i) => `
-                    <div class="img-container">
-                      <img src="${src}" class="novidade-image">
-                      ${item.descricaoNovidades && item.descricaoNovidades[i] ? `<p class="image-description">${item.descricaoNovidades[i]}</p>` : ""}
-                    </div>
-                  `).join("")}
-                </div>
-              ` : ""}
-    
-              ${item.cardapio ? `
-                <div class="cardapioContent" style="display:none;">
-                  ${item.cardapio.map(src => `
-                    <div class="img-container">
-                      <img src="${src}" class="novidade-image">
-                    </div>
-                  `).join("")}
-                </div>
-              ` : ""}
-            </div>
-          `;
-        }
-    
-        document.getElementById("conteudo").innerHTML = `<div class="container">${html}</div>`;
-    
-        // Reativar botões dinamicamente
-        setTimeout(() => {
-          document.querySelectorAll(".btnNovidades").forEach(btn => {
-            btn.addEventListener("click", function () {
-              const content = this.closest(".novidade-item").querySelector(".novidadesContent");
-              content.style.display = content.style.display === "none" ? "block" : "none";
-            });
-          });
-    
-          document.querySelectorAll(".btnCardapio").forEach(btn => {
-            btn.addEventListener("click", function () {
-              const content = this.closest(".novidade-item").querySelector(".cardapioContent");
-              content.style.display = content.style.display === "none" ? "block" : "none";
-            });
-          });
-        }, 100);
-      });
-    }
-    
-    
-    
-
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const links = document.querySelectorAll(".nav_link[data-categoria]");
-    links.forEach(link => {
-      link.addEventListener("click", function () {
-        const categoria = this.getAttribute("data-categoria");
-        registrarClique(categoria); // 👈 adicione aqui
-        carregarComerciosPorCategoria(categoria);
-      });
-    });
-  });
-
-  
-  
-
-
     
   });
   
-  function registrarClique(categoria) {
-    const dataAtual = new Date();
-    const anoMesDia = dataAtual.toISOString().slice(0, 10); // ex: 2025-04-22
-    const horario = dataAtual.toLocaleTimeString("pt-BR");
-  
-    const refTotal = firebase.database().ref(`cliquesPorMenu/${anoMesDia}/${categoria}/total`);
-    const refDetalhado = firebase.database().ref(`cliquesPorMenu/${anoMesDia}/${categoria}/horarios`).push();
-  
-    // Incrementa o total
-    refTotal.transaction((atual) => (atual || 0) + 1);
-  
-    // Registra horário individual
-    refDetalhado.set(horario);
-  }
