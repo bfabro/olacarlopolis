@@ -1255,7 +1255,7 @@ menuLinks.forEach((link) => {
             establishments: [
 
                 {
-                    image: "images/comercios/farmacia/biofarma.png",
+                    image: "images/comercios/farmacia/biofarma.jpg",
                     name: "Bio Farma",
                     address: "Rua Laurindo Franco Godoy, 464",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h</br> Dom e feriado: Fechado",
