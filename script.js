@@ -276,6 +276,7 @@ registrarAcesso();
       restaurantedadi:"s",
       sabordaroça:"s",
       selahtgrill:"s",
+      yingyang:"s",
     
       
       // sorveteria
@@ -688,7 +689,7 @@ menuLinks.forEach((link) => {
                             "images/comercios/acai/turminhaAcai/novidades/1.png",                                            
                             ],
                             novidadesDescriptions: [                            
-                            "Marmita de Açai <br>Voce só encontra aqui!",
+                            "Marmita de Açai! Voce só encontra aqui!",
                           ],
                             menuImages: [                    
                                 "images/comercios/acai/turminhaAcai/cardapio/1.png",
@@ -864,7 +865,7 @@ menuLinks.forEach((link) => {
                         {
                             name: "Yellow Jeans",
                             hours: "seg a sex: 9h - 11:30h, 13:00-17:00",
-                            address: "<br>Rua Maria Pereira da Rocha Aleixo, 435",
+                            address: "Rua Maria Pereira da Rocha Aleixo, 435",
                             contact: "</br>(43) 998070671",
                         },
                     ],
@@ -1160,7 +1161,7 @@ menuLinks.forEach((link) => {
                     "Carnes Frescas toda quinta!",
                     "Paozinho Frances a partir das 8hrs",
                     "Chocolates Importados" ,
-                    "Area de Promoçoes de <br> Leite Condensado!",
+                    "Area de Promoçoes de Leite Condensado!",
                   ],
                 },
 
@@ -1201,7 +1202,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/supermercado/kelve.png",
                     name: "Kelve",
-                    address: "<br>R. Paul Harris,104",
+                    address: "R. Paul Harris,104",
                     hours: "Seg a Sex 8h - 19:30h </br> dom: 08:30 - 12:30h",
                     contact: "(43) 99844-6105",
                     delivery: "Sim / Sem Taxa",
@@ -1222,7 +1223,7 @@ menuLinks.forEach((link) => {
     
                 {
                     name: "Carriel",
-                    address: "<br>PR-218, 1168 ",
+                    address: "PR-218, 1168 ",
                     hours: "Seg a Sex 8h - 21h </br> Dom: 07 - 12h",
                     contact: "(43) 3456-7890",
                     delivery: "Sim / Sem Taxa",
@@ -1924,9 +1925,9 @@ delivery: "Sim / Sem Taxa",
         {
             image: "images/info_uteis/asilo/asilo.png",
             name: "Asilo",
-            hours: "<br>seg a sex: 9h - 12h",
-            address: "<br>Rua Andrino Soares, 26",
-            contact: "<br> 43 3566-1196",
+            hours: "Seg a Sex: 9h - 12h",
+            address: "Rua Andrino Soares, 26",
+            contact: "(43) 3566-1196",
         },
     ],
   },
@@ -1938,9 +1939,9 @@ delivery: "Sim / Sem Taxa",
         {
             image: "images/info_uteis/agenciaTrabalhador/AgenciaTrabalhador.png",
             name: "Agencia Trabalhador",
-            hours: "<br>seg a sex: 9h - 15h",
-            address: "<br>Rua Padre Hugo, 1025",
-            contact: "<br> (43) 3566-1291",
+            hours: "Seg a Sex: 9h - 15h",
+            address: "Rua Padre Hugo, 1025",
+            contact: "(43) 3566-1291",
         },
     ],
   },
@@ -1952,9 +1953,9 @@ delivery: "Sim / Sem Taxa",
         {
             image: "images/info_uteis/cras/cras.png",
             name: "Cras",
-            hours: "<br>seg a sex: 9h - 15h",
-            address: "<br>R. Salvira Marquês, 366",
-            contact: "<br>(43) 98485-1626",
+            hours: "Seg a Sex: 9h - 15h",
+            address: "R. Salvira Marquês, 366",
+            contact: "(43) 98485-1626",
             facebook:"https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
         },
     ],
@@ -1967,9 +1968,9 @@ delivery: "Sim / Sem Taxa",
         {
             image: "images/info_uteis/correio/correio.png",
             name: "Correio",
-            hours: "<br>seg a sex: 9h - 13h",
-            address: "<br>R. Padre Hugo, 843 ",
-            contact: "<br>(43) 3566-1113",
+            hours: "Seg a Sex: 9h - 13h",
+            address: "R. Padre Hugo, 843 ",
+            contact: "(43) 3566-1113",
             facebook:"https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
         },
     ],
@@ -1985,9 +1986,9 @@ delivery: "Sim / Sem Taxa",
         {
         
             name: "Ainzara Rossi Salles C M e I",
-            hours: "<br>-",
-            address: "<br>Rua Jose Salles, 313",
-            contact: "<br>(43) 3566-1349 ",
+            hours: "-",
+            address: "Rua Jose Salles, 313",
+            contact: "(43) 3566-1349 ",
             facebook:"#",
         },
      
@@ -1995,17 +1996,17 @@ delivery: "Sim / Sem Taxa",
         {
           
           name: "Isabel Dalla B da Silva C M e I Profa",
-          hours: "<br>-",
-          address: "<br>Av dos Diogossn",
-          contact: "<br>(43) 3566-2330",
+          hours: "-",
+          address: "Av dos Diogossn",
+          contact: "(43) 3566-2330",
           facebook:"#",
       },
 
       {
            
         name: "Marinha Fogaca de Oliveira C M e I",
-        hours: "<br>-",
-        address: "<br>Est Mun Espirito Santo, 95",
+        hours: "-",
+        address: "Est Mun Espirito Santo, 95",
         contact: "(43) 3566-2705",
         facebook:"#",
       },
@@ -2018,9 +2019,9 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Hospital São Jose",
-                    address: "<br>R. Cap. Estácio, 460",
-                    contact: "<br>(43) 99174-2539",
-                    hours: "<br>24 horas",
+                    address: "R. Cap. Estácio, 460",
+                    contact: "(43) 99174-2539",
+                    hours: "24 horas",
                     image: "images/info_uteis/hospital/hospital.png",
                 },
             ],
@@ -2032,9 +2033,9 @@ delivery: "Sim / Sem Taxa",
           establishments: [
               {
                   name: "Rodoviaria",
-                  address: "<br>R. Kaliu keder, 0",
-                  contact: "<br>(43) 3566-1393",
-                  hours: "<br>24 horas",
+                  address: "R. Kaliu keder, 0",
+                  contact: "(43) 3566-1393",
+                  hours: "24 horas",
                   image: "images/info_uteis/rodoviaria/rodoviaria.png",
               },
           ],
@@ -2047,9 +2048,9 @@ delivery: "Sim / Sem Taxa",
             establishments: [
                 {
                     name: "Prefeitura",
-                    address: "<br>R. Benedito Salles, 1060 - Centro",
-                    contact: "<br>(43) 3566-1291",
-                    hours: "<br>8h as 11:30 - 13h as 17h",
+                    address: "R. Benedito Salles, 1060 - Centro",
+                    contact: "(43) 3566-1291",
+                    hours: "8h as 11:30 - 13h as 17h",
                     image: "images/info_uteis/prefeitura/prefeitura.png",
                     facebook: "https://www.facebook.com/profile.php?id=200531799983410&_rdr",
                     instagram: "www.instagram.com/uahhhttps://www.instagram.com/prefeitura.carlopolis/?locale=zh_CN&hl=af",
@@ -2058,19 +2059,14 @@ delivery: "Sim / Sem Taxa",
         
                 {
                     name: "Duvidas e  Reclamações",
-                    contact: "<br>(43) 99825-0360",
-                    hours: "<br>8h as 17h",
+                    contact: "(43) 99825-0360",
+                    hours: "8h as 17h",
                     image: "images/info_uteis/prefeitura/prefeitura.png",
                 },
             ],
         },
 
 
-
-     
-
-
-       
     
         {
             link: document.querySelector("#menuCopel"),    
@@ -2079,9 +2075,9 @@ delivery: "Sim / Sem Taxa",
                 {
                     image: "images/info_uteis/copel/copel.png",
                     name: "Copel",
-                    hours: "<br>seg a sex: 8h - 12h",
-                    address: "<br>R. Benedito Salles, 1094",
-                    contact: "<br>(41) 3013-8973",
+                    hours: "Seg a Sex: 8h - 12h",
+                    address: "R. Benedito Salles, 1094",
+                    contact: "(41) 3013-8973",
                 },
             ],
         },
@@ -2094,8 +2090,8 @@ delivery: "Sim / Sem Taxa",
                 {
                     image: "images/info_uteis/delegacia/delegacia.jpg",
                     name: "Delegacia",
-                    hours: "<br>seg a sex: 9h - 18h",
-                    address: "<br>R. Alfeneiro, 215 ",
+                    hours: "Seg a Sex: 9h - 18h",
+                    address: "R. Alfeneiro, 215 ",
                     contact: "(43) 3566-1202",
                 },
             ],
@@ -2113,18 +2109,18 @@ delivery: "Sim / Sem Taxa",
             {
               image: "images/info_uteis/escolaPublica/benedito.png",
               name: "Benedito Rodrigues de Camargo",
-              hours: "<br>seg a sex: 9h - 18h",
-              address: "<br>Avenida Elson Soares, 295",
-              contact: "<br>(43) 3566-1496",
+              hours: "Seg a Ssex: 9h - 18h",
+              address: "Avenida Elson Soares, 295",
+              contact: "(43) 3566-1496",
               infoAdicional:"Turno: Manha e Tarde",
           },
 
             {
               image: "images/info_uteis/escolaPublica/carolinaLupion.png",
               name: "Carolina Lupion",
-              hours: "<br>seg a sex: 9h - 18h",
-              address: "<br>R. Jorge Barros, 1095",
-              contact: "<br>(43) 3566-1295",
+              hours: "Seg a Sex: 9h - 18h",
+              address: "R. Jorge Barros, 1095",
+              contact: "(43) 3566-1295",
               infoAdicional:"Turno: Manha e Tarde",
           },
 
@@ -2133,9 +2129,9 @@ delivery: "Sim / Sem Taxa",
               {
                   image: "images/info_uteis/escolaPublica/raymunda.png",
                   name: "CMEI Raymunda Santana Salles",
-                  hours: "<br>seg a sex: 9h - 18h",
-                  address: "<br>Rua Nicolau Miguel, 233",
-                  contact: "<br>(43) 3566-2273",
+                  hours: "Seg a sex: 9h - 18h",
+                  address: "Rua Nicolau Miguel, 233",
+                  contact: "(43) 3566-2273",
                   infoAdicional:"Turno: Manha",
               },
 
@@ -2144,18 +2140,18 @@ delivery: "Sim / Sem Taxa",
             {
               image: "images/info_uteis/escolaPublica/joseSalles.png",
               name: "Escola Municipal José Salles",
-              hours: "<br>seg a sex: 07:45h - 17h",
-              address: "<br>R. Quaresmeira Roxa, 418-458",
-              contact: "<br>(43) 3566-1275",
+              hours: "Seg a Sex: 07:45h - 17h",
+              address: "R. Quaresmeira Roxa, 418-458",
+              contact: "(43) 3566-1275",
               infoAdicional:"Turno: Manha e Tarde",
           },
 
           {
             image: "images/info_uteis/escolaPublica/hercilia.png",
             name: "Hercília de Paula e Silva",
-            hours: "<br>seg a sex: 06:30h - 18:30h",
-            address: "<br> Av. Elson Soares, 34",
-            contact: "<br>(43) 3566-1282",
+            hours: "Seg a Sex: 06:30h - 18:30h",
+            address: "Av. Elson Soares, 34",
+            contact: "(43) 3566-1282",
             infoAdicional:"Turno: Manha e Tarde",
         },
           ],
@@ -2169,18 +2165,18 @@ delivery: "Sim / Sem Taxa",
             {
                 image: "images/info_uteis/postoSaude/joseAparecido.png",
                 name: "Centro de Saude Dr José",                
-                hours: "<br>seg a sex: 8:00h as 17h",
-                address: "<br>Avenida Elson Soares,769",
-                contact: "<br>(43) 3566-1328",
+                hours: "Seg a Sex: 8:00h as 17h",
+                address: "Avenida Elson Soares,769",
+                contact: "(43) 3566-1328",
                
             },
            
             {
               image: "images/info_uteis/postoSaude/eugenioNeves.png",
                 name: "UBS Eugênio Neves Soares",
-                hours: "<br>seg a sex: 8:00h as 17h",
-                address: "<br>Rua Bauínea,79",
-                contact: "<br>(43) 3566-1932",
+                hours: "Seg a Sex: 8:00h as 17h",
+                address: "Rua Bauínea,79",
+                contact: "(43) 3566-1932",
                
             },
         ],
@@ -2196,7 +2192,7 @@ delivery: "Sim / Sem Taxa",
                 {
                   image: "images/info_uteis/sanepar/sanepar.png",
                     name: "Sanepar",
-                    hours: "seg a sex: 8:30h - 12h, 13:30 as 17h",
+                    hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
                     address: "R. André Jorge Cleli, 148 ",
                     contact: "0800 200 0115",
                     
@@ -2472,7 +2468,7 @@ delivery: "Sim / Sem Taxa",
                   image: "images/comercios/restaurante/portal/portal.png",
                     name: "Portal",
                     hours: "Seg a Qui: 19h - 21h",
-                    address: "<br>R. Benedito Salles, 2023",
+                    address: "R. Benedito Salles, 2023",
                     contact: "(43) 3566-2174",
                     delivery: "Sim / Com Taxa",
                     infoAdicional:"Fica dentro do Hotel Portal",
@@ -2493,7 +2489,7 @@ delivery: "Sim / Sem Taxa",
                   image: "images/comercios/restaurante/saborRoca/saborRoca.png",
                   name: "Sabor da Roça",
                   hours: "Seg a Sab: 10:30h - 14h",
-                  address: "<br>R. Benedito Salles, 365",
+                  address: "R. Benedito Salles, 365",
                   contact: "(43) 99832-3050",
                   delivery: "Sim / Com Taxa",
                 
@@ -2526,7 +2522,7 @@ delivery: "Sim / Sem Taxa",
               image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.png",
               name: "Restaurante da Di",
               hours: "Seg a Sab: 10:30h - 14h",
-              address: "<br>Benedito Salles n°910",
+              address: "Benedito Salles n°910",
               contact: "(43) 99632-3418",
               delivery: "Sim / Com Taxa",
               instagram:"https://www.instagram.com/marmitasdadiih/",
@@ -2538,6 +2534,52 @@ delivery: "Sim / Sem Taxa",
             ],
             
           },
+
+
+          {
+            image: "images/comercios/restaurante/yingyang/yingyang.png",
+            name: "Ying Yang",
+            hours: "Seg a Sab: 18h - 23h <br> Sab e Dom: 10h30 - 14h",
+            address: "Benedito Salles n°910",
+            contact: "(43) 99954-0831",
+            delivery: "Sim / Com Taxa",
+            instagram:"https://www.instagram.com/yingyang_comidachinesa/",
+            facebook:"https://www.facebook.com/p/Ying-yang-100063519044209/",
+            menuImages: [                   
+              "images/comercios/restaurante/yingyang/cardapio/1.jpeg",  
+              "images/comercios/restaurante/yingyang/cardapio/2.jpeg", 
+              "images/comercios/restaurante/yingyang/cardapio/3.jpeg", 
+              "images/comercios/restaurante/yingyang/cardapio/4.jpeg", 
+              "images/comercios/restaurante/yingyang/cardapio/5.jpeg", 
+              "images/comercios/restaurante/yingyang/cardapio/6.jpeg", 
+              "images/comercios/restaurante/yingyang/cardapio/7.jpeg",  
+              "images/comercios/restaurante/yingyang/cardapio/8.jpeg",        
+                     
+          ],
+            novidadesImages: [                    
+            "images/comercios/restaurante/yingyang/divulgacao/1.png",
+             "images/comercios/restaurante/yingyang/divulgacao/2.png",
+             "images/comercios/restaurante/yingyang/divulgacao/3.png",
+             "images/comercios/restaurante/yingyang/divulgacao/4.png",
+             "images/comercios/restaurante/yingyang/divulgacao/5.png",
+          ],
+          novidadesDescriptions: [  
+
+         "1",
+         "2",
+         "3",
+         "4",
+         "5",
+          ],
+        },
+
+
+
+
+
+
+
+
 
             ],
         },
@@ -2579,7 +2621,7 @@ delivery: "Sim / Sem Taxa",
                 {
                     name: "Douglas do Taxi",
                     hours: "Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
-                    address: "<br>Em Frente ao banco Itau",
+                    address: "Em Frente ao banco Itau",
                     contact: "(43) 88807-8515",
                 },
             ],
