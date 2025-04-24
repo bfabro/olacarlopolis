@@ -77,8 +77,15 @@ function registrarAcesso() {
     // NOVO: registrar usuário único
     if (info.ip) {
       const refUsuarioUnico = firebase.database().ref(`usuariosUnicos/${hoje}/${info.ip}`);
-      refUsuarioUnico.set(true);
+      refUsuarioUnico.set(true)
+        .then(() => {
+          console.log("Usuário único registrado:", info.ip);
+        })
+        .catch((error) => {
+          console.error("Erro ao registrar usuário único:", error);
+        });
     }
+    
   }
 
   // Tenta com ipwho.is
