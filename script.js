@@ -240,7 +240,7 @@ registrarAcesso();
       delfino:"s",
       portal:"s",
       neia:"s",
-      paiol: "s", // Paiol pagou
+      churrascoegastronomiapaiol: "s", // Paiol pagou
       restaurantedadi:"s",
       sabordaroça:"s",
       selahtgrill:"s",
@@ -622,7 +622,7 @@ menuLinks.forEach((link) => {
                 image: "images/comercios/academia/lobofitness/lobofitness.png",
                         
                 name: "Lobo Fitness",
-                hours: "seg a Qui:06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
+                hours: "Seg a Qui: 06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
                 address: "R. Delfino Mendes, 264 - Centro",
                 contact: "(43) 99112-1009",                          
                 facebook: "#",
@@ -2435,17 +2435,31 @@ delivery: "Sim / Sem Taxa",
               
             },
 
-            /*
-                {
-                    name: "Cabanas",
-                    hours: "</br>seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "<br>R. Laurindo Franco de Godoi, 90",
-                    contact: "</br>(43) 99951-1540",
-                    delivery: "</br>Sim / Com Taxa",
-                    infoAdicional:"</br>Somente Marmita"
-                },
-
-                */
+            {
+              image: "images/comercios/restaurante/paiol/paiol.png",
+              name: "Churrasco e Gastronomia Paiol",
+              hours: "Ter: 10h a 15h<br>Qua - Sab: 10h a 15h - 18h30 a 23h <br> Dom: 11h a 15h<br>Seg: Fechado",
+              address: "Rua Benedito Salles 10, Carlópolis,",
+              contact: "(43) 99159-0070",
+              delivery: "Sim / Com Taxa",
+              facebook: "https://www.facebook.com/SaleBrasaCarlopolis/?locale=pt_BR",
+              instagram: "https://www.instagram.com/paiolpizzaburguer/",
+              infoAdicional:"<a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
+             
+              menuImages: [                   
+                  "images/comercios/restaurante/paiol/cardapio/1.png",
+                  "images/comercios/restaurante/paiol/cardapio/2.png",
+                  "images/comercios/restaurante/paiol/cardapio/3.png",
+                         
+              ],
+              novidadesImages: [                    
+                  "images/comercios/restaurante/paiol/divulgacao/1.png",
+                 "images/comercios/restaurante/paiol/divulgacao/2.png",
+                 "images/comercios/restaurante/paiol/divulgacao/3.png",
+                 "images/comercios/restaurante/paiol/divulgacao/4.png",
+              ],
+      
+          },
                 {
                     image: "images/comercios/restaurante/delfino/delfino.png",
                     name: "Delfino",
@@ -2470,31 +2484,7 @@ delivery: "Sim / Sem Taxa",
                       ],    
               },
 
-              {
-                image: "images/comercios/restaurante/paiol/paiol.png",
-                name: "Paiol",
-                hours: "Qua - Dom 19 - 00h",
-                address: "Av. Elson Soares, 767 ",
-                contact: "(43) 99159-0070",
-                delivery: "Sim / Com Taxa",
-                facebook: "www.facebook.com/uahh",
-                instagram: "www.instagram.com/uahh",
-                infoAdicional:"<a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
-               
-                menuImages: [                   
-                    "images/comercios/restaurante/paiol/cardapio/1.png",
-                    "images/comercios/restaurante/paiol/cardapio/2.png",
-                    "images/comercios/restaurante/paiol/cardapio/3.png",
-                           
-                ],
-                novidadesImages: [                    
-                    "images/comercios/restaurante/paiol/divulgacao/1.png",
-                   "images/comercios/restaurante/paiol/divulgacao/2.png",
-                   "images/comercios/restaurante/paiol/divulgacao/3.png",
-                   "images/comercios/restaurante/paiol/divulgacao/4.png",
-                ],
-        
-            },
+              
 
 
 
