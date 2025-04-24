@@ -35,17 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-
-
-
-/////////
-
-
-
-
-
-
-
 // Função para registrar o acesso diário
 function registrarAcesso() {
   const hoje = new Date().toISOString().slice(0, 10);
@@ -149,32 +138,9 @@ function registrarAcesso() {
 
 registrarAcesso();
 
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-///////////
-
-
 
     // pagou? defina por s pago n nao pago // PAGx
     const statusEstabelecimentos = {
-
-
-
 
       // COMERCIOS:
 
@@ -191,11 +157,8 @@ registrarAcesso();
       adegacuenca: "s",
       assao:"s",
   
-      //ADVOCACIA
-  
-      advocaciaabilio: "s",
-  
-      
+      //ADVOCACIA  
+      advocaciaabilio: "s",      
       
   
       // Agropecuaria
@@ -208,8 +171,6 @@ registrarAcesso();
         // assistencia celular
         oficinadocelular:"s",
       
-
-
 
 
       //confecção
@@ -249,8 +210,7 @@ registrarAcesso();
       // padaria
       bomjesus:"s",
       sãofrancisco:"s",
-      prelie:"s",
-      
+      prelie:"s",      
   
       //pizzaria
       fornalhapizzaria: "s",
@@ -259,8 +219,7 @@ registrarAcesso();
       pimentadoce: "s",
   
       //lanchonete
-      ocasarao: "s", // Casarao pagou
-      
+      ocasarao: "s", // Casarao pagou      
       ione:"s",
   
       //supermercado
@@ -295,8 +254,6 @@ registrarAcesso();
       //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
   
       //// INICIO SERVIÇOS ////////////////////////////////////////////////////////////////////////////////////////////////
-  
-     
   
       //anuncio
       piodoanuncio: "s",
@@ -349,7 +306,7 @@ registrarAcesso();
 
 
 
-/// FIM SETOR PUBLICO
+      agendamento:"s",
       asilo:"s",
       agenciatrabalhador:"s",
       copel: "s",
@@ -378,9 +335,12 @@ registrarAcesso();
       prefeitura: "s",
       duvidasereclamações: "s",
       sanepar: "s",
+      samuzinho:"s",
       
       rodoviaria:"s",
-
+      secretariadasaude:"s",
+      vigilanciasanitaria:"s",
+/// FIM SETOR PUBLICO
 
       //// INICIO INFORMAÇOES UTEIS
   //Eventos
@@ -1927,6 +1887,27 @@ delivery: "Sim / Sem Taxa",
 
 
   // INICIO SETOR PUBLICO
+
+
+
+  {
+    link: document.querySelector("#menuAgendamento"),    
+    title: "Agendamento",
+    establishments: [
+        {
+         
+            name: "Agendamento",
+            hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
+            address: "-",
+            contact: "(43) 99825-0996",
+            contact2: "(43) 98872-8504",
+            
+        },
+    ],
+ },
+
+
+
   {
     link: document.querySelector("#menuAsilo"),    
     title: "Asilo",
@@ -2208,6 +2189,53 @@ delivery: "Sim / Sem Taxa",
                 },
             ],
         },
+
+        {
+          link: document.querySelector("#menuSamuzinho"),    
+          title: "Samuzinho",
+          establishments: [
+              {
+                
+                  name: "Samuzinho",
+                  hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
+                  address: "-",
+                  contact: "(43) 99825-0248",
+                  
+              },
+          ],
+      },
+
+
+      {
+        link: document.querySelector("#menuSecrariaSaude"),    
+        title: "Secretaria da Saude",
+        establishments: [
+            {
+             
+                name: "Secretaria da Saude",
+                hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
+                address: "-",
+                contact: "(43) 3566-1328",
+                
+            },
+        ],
+     },
+
+
+     {
+      link: document.querySelector("#menuVigilanciaSanitaria"),    
+      title: "Vigilancia Sanitaria",
+      establishments: [
+          {
+           
+              name: "Vigilancia Sanitaria",
+              hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
+              address: "-",
+              contact: "(43) 99825-1079",
+              
+          },
+      ],
+   },
 
 
 // FIM SETOR PUBLICO
@@ -2856,12 +2884,23 @@ ${
 ` : ""}
 
 
-${establishment.contact ? (() => {
-  const rawNumber = (establishment.whatsapp || establishment.contact || "").replace(/\D/g, "");
-  const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
+${establishment.contact || establishment.contact2 ? (() => {
+  // Função para formatar o número de telefone
+  const formatPhone = (number) => {
+    const rawNumber = (number || "").replace(/\D/g, "");
+    const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
+    return fullNumber;
+  }
+
+  // Definindo o primeiro número e segundo número
+  const firstNumber = formatPhone(establishment.whatsapp || establishment.contact || "");
+  const secondNumber = establishment.contact2 ? formatPhone(establishment.contact2) : null;
+
+  // Gerando o HTML
   return `
     <div class="info-box">
-      <a href="https://api.whatsapp.com/send?phone=${fullNumber}&text=${encodeURIComponent(
+      <!-- WhatsApp Link for the first number -->
+      <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent(
         "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
       )}" target="_blank">
         <i class='bx bxl-whatsapp info-icon' style="color: #25D366;font-size:26px;"></i>
@@ -2870,9 +2909,22 @@ ${establishment.contact ? (() => {
         <div class="info-label">Contato</div>
         <div class="info-value">${establishment.contact}</div>
       </div>
+      ${secondNumber ? `
+        <!-- WhatsApp Link for the second number -->
+        <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent(
+          "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
+        )}" target="_blank">
+          <i class='bx bxl-whatsapp info-icon' style="color: #25D366;font-size:26px;"></i>
+        </a>
+        <div>
+          <div class="info-label">Contato Secundário</div>
+          <div class="info-value">${establishment.contact2}</div>
+        </div>
+      ` : ""}
     </div>
   `;
 })() : ""}
+
 
 
   ${establishment.delivery ? `
