@@ -76,14 +76,16 @@ function registrarAcesso() {
 
     // NOVO: registrar usuário único
     if (info.ip) {
-      const refUsuarioUnico = firebase.database().ref(`usuariosUnicos/${hoje}/${info.ip}`);
+      const ipTratado = info.ip.replace(/\./g, "-");  // Substitui os pontos por hífens
+      const refUsuarioUnico = firebase.database().ref(`usuariosUnicos/${hoje}/${ipTratado}`);
       refUsuarioUnico.set(true)
         .then(() => {
-          console.log("Usuário único registrado:", info.ip);
+          console.log("Usuário único registrado:", ipTratado); // Log para confirmar
         })
-        .catch((error) => {
-          console.error("Erro ao registrar usuário único:", error);
+        .catch(error => {
+          console.error("Erro ao registrar IP no Firebase:", error);
         });
+      
     }
     
   }
