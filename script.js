@@ -3223,13 +3223,13 @@ ${establishment.contact || establishment.contact2 ? (() => {
   <div class="button-container">
           ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
             <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
-              <i class="fas fa-camera"></i> Divulgação (${establishment.novidadesImages.length})
+              <i class="fas fa-camera"></i>  Divulgação (${establishment.novidadesImages.length})
             </button>
           ` : ''}
           
           ${establishment.menuImages && establishment.menuImages.length > 0 ? `
             <button  id="cardapioButton" class="menu-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
-              Cardápio (${establishment.menuImages.length})
+              <i class="fas fa-utensils"></i>  Cardápio (${establishment.menuImages.length})
             </button>
           ` : ''}
         </div>

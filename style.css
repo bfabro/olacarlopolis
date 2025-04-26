@@ -1251,28 +1251,25 @@ img {
 
 
 .novidades-btn {
-  padding: 10px 20px;
-  background-color: #4CAF50; /* Cor do botão */
-  color: white; /* Cor do texto */
-  font-size: 16px;
+  box-shadow: 0px 9px 16px rgba(0, 0, 0, 0.75);
+  background-color: #3726d1;
+  color: white;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center; /* Alinha o ícone e o texto na mesma linha */
-  gap: 8px; /* Espaçamento entre o ícone e o texto */
-  transition: background-color 0.3s ease; /* Transição suave para o hover */
-}
-
-.novidades-btn i {
-  font-size: 20px; /* Tamanho do ícone */
+  padding: 5px 10px;
+  border-radius: 12px;
+  cursor: pointer;  
+  transition: background-color 0.4s; 
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  width: 100%;
 }
 .novidades-btn:hover {
   background-color: #000000;
 }
 .menu-btn {
   box-shadow: 0px 9px 16px rgba(0, 0, 0, 0.75);
-  background-color: #dfa529;
+  background-color: #c99423;
   color: rgb(255, 255, 255);
   border: none;
   padding: 5px 10px;
