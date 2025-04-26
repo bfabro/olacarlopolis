@@ -2471,10 +2471,7 @@ menuLinks.forEach((link) => {
                     address: "R. Kalil Keder, 90",
                     contact: "(43) 9111-9484",
                     delivery: "Sim / Com Taxa",
-                    menuImages: [                        
-                         "images/comercios/restaurante/delfino/cardapio/cardapio_1.png",
-                                 
-                        ],    
+                  
                 },
                 {
                   image: "images/comercios/restaurante/neia/neia.png",
@@ -2483,9 +2480,7 @@ menuLinks.forEach((link) => {
                   address: "R. Kalil Keder, 262 ",
                   contact: "(43) 99847-1137",
                   delivery: "Sim / Com Taxa",
-                  menuImages: [                        
-                       "images/comercios/restaurante/neia/cardapio/cardapio_1.png",                               
-                      ],    
+                  
               },
 
               
