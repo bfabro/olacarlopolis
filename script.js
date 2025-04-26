@@ -1642,7 +1642,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/farmacia/santaMaria/santamaria.png",
                     name: "Santa Maria",
-                    address: "Praça Coronel Leite, nº 711",
+                    address: "R. Benedito Salles, nº 711, Carlopols",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "(43) 99840-9658",
                     delivery: "Sim / Sem Taxa",
@@ -2041,7 +2041,7 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/farmacia/santaMaria/santamaria.png",
                   name: "Santa Maria",
-                  address: "Praça Coronel Leite, nº 711",
+                  address: "R. Benedito Salles, nº 711, Carlopols",
                   contact: "(43) 99840-9658",
                   plantaoHorario: "8:00h às 21:00h", 
                   plantaoData:"26/04 a 02/05",
