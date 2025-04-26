@@ -205,6 +205,9 @@ registrarAcesso();
       // mercearia
       seiza:"s",
 
+      //moveis
+      movepar:"s",
+
       //mototaxi
       mototaximodesto: "s",
 
@@ -2886,6 +2889,35 @@ menuLinks.forEach((link) => {
 
             ],
         },
+
+
+        {
+          link: document.querySelector("#menuMoveis"),    
+          title: "Moveis",
+          establishments: [
+              {
+                image: "images/comercios/moveis/movepar/perfil.png",
+                  name: "Movepar",
+                  hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h<br> Dom: Fechado",
+                  address: "R. Benedito Salles, 627 - Carlópolis",
+                  contact: "(43) 3566-2749",
+                  instagram:"https://www.instagram.com/movepar_carlopolis/",
+                  novidadesImages: [                    
+                    "images/comercios/moveis/movepar/divulgacao/1.png",
+                     "images/comercios/moveis/movepar/divulgacao/2.png",
+                   
+                  ],
+                  novidadesDescriptions: [  
+        
+                 "1",
+                 "2",
+                
+                  ],
+              },
+          ],
+      },
+
+
   
         {
             link: document.querySelector("#menuPapelaria"),    
