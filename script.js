@@ -226,6 +226,9 @@ registrarAcesso();
       ocasarao: "s", // Casarao pagou      
       ione:"s",
       cantinhodapraça:"s",
+      kidog:"s",
+      didog:"s",
+      xisbauinea:"s",
   
       //supermercado
       mercadorocha: "s", // Mercado Rocha pagou
@@ -242,6 +245,7 @@ registrarAcesso();
       // restaurantes
       assadãodorussão:"s",
       cabanas:"s",
+      cantinaitaliana:"s",
       delfino:"s",
       portal:"s",
       neia:"s",
@@ -927,6 +931,44 @@ menuLinks.forEach((link) => {
 
 
 
+                    {
+                      image: "images/comercios/lanchonete/didog/perfil.png",
+                      name: "Di Dog",
+                      hours: "Ter - Dom - 18h - 23:30h",
+                      address: "R. Benedito Salles, 350, Carlopolis",
+                      contact: "(43) 99161-8381",
+                      delivery: "Sim / Com Taxa",   
+                           
+                  },
+
+
+
+
+                    {
+                      image: "images/comercios/lanchonete/kidog/perfil.png",
+                      name: "Ki Dog",
+                      hours: "Ter - Dom - 18h - 23:30h",
+                      address: "R. Padre Hugo, 478 , Carlópolis",
+                      contact: "(43) 99604-9187",
+                      delivery: "Sim / Com Taxa",   
+                      facebook:"https://www.facebook.com/p/Ki-dog-lanches-100063348873193/",
+                                        
+                      menuImages: [                   
+                          "images/comercios/lanchonete/kidog/cardapio/1.png",
+                          "images/comercios/lanchonete/kidog/cardapio/2.png",
+                          
+                         
+                      ],     
+                      novidadesImages: [
+                      
+                        "images/comercios/lanchonete/kidog/divulgacao/1.png",
+                        "images/comercios/lanchonete/kidog/divulgacao/2.png",
+                      
+                    ],               
+                  },
+
+
+
                         {
                             image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
                             name: "O Casarao",
@@ -974,6 +1016,34 @@ menuLinks.forEach((link) => {
                            "images/comercios/lanchonete/ione/divulgacao/2.png",
                           ]
                       },
+
+
+
+
+                      {
+                        image: "images/comercios/lanchonete/xisBauinea/perfil.png",
+                        name: "Xis Bauinea",
+                        hours: "Qui a Ter - 18h - 23h<br>Qua: Fechado",
+                        address: "R. Benedito Salles, 1188, Carlópolis",
+                        contact: "(43) 99957-6197",
+                        delivery: "Sim / Com Taxa",   
+                        instagram:"https://www.instagram.com/_xisbauinea/",
+                                          
+                        menuImages: [                   
+                            "images/comercios/lanchonete/xisBauinea/cardapio/1.png",
+                            "images/comercios/lanchonete/xisBauinea/cardapio/2.png",                            
+                           
+                        ],     
+                        novidadesImages: [
+                        
+                          "images/comercios/lanchonete/xisBauinea/divulgacao/1.png",
+                          "images/comercios/lanchonete/xisBauinea/divulgacao/2.png",
+                          "images/comercios/lanchonete/xisBauinea/divulgacao/3.png",
+                          "images/comercios/lanchonete/xisBauinea/divulgacao/4.png",
+                          "images/comercios/lanchonete/xisBauinea/divulgacao/5.png",
+                        
+                      ],               
+                    },
                   
 
                 
@@ -2501,6 +2571,29 @@ menuLinks.forEach((link) => {
             },
 
             {
+              image: "images/comercios/restaurante/cantinaItaliana/perfil.png",
+              name: "Cantina Italiana",
+              hours: "Seg: 17:30h a 23h <br> Ter: Fechado<br>Qua a Dom: 17:30h a 23h",
+              address: "R. Padre Hugo - Carlópolis",
+              contact: "(43) 99640-4484",
+              delivery: "Sim / Com Taxa", 
+              novidadesImages: [                    
+                "images/comercios/restaurante/cantinaItaliana/divulgacao/1.png",
+                 "images/comercios/restaurante/cantinaItaliana/divulgacao/2.png",
+                 "images/comercios/restaurante/cantinaItaliana/divulgacao/3.png",
+                 "images/comercios/restaurante/cantinaItaliana/divulgacao/4.png",
+                 "images/comercios/restaurante/cantinaItaliana/divulgacao/5.png",
+              ],
+              menuImages: [                   
+                "images/comercios/restaurante/cantinaItaliana/cardapio/1.png",
+                "images/comercios/restaurante/cantinaItaliana/cardapio/2.png", 
+                "images/comercios/restaurante/cantinaItaliana/cardapio/3.png",           
+                       
+            ],
+      
+          },
+
+            {
               image: "images/comercios/restaurante/paiol/paiol.png",
               name: "Paiol",
               hours: "Ter: 10h a 15h<br>Qua - Sab: 10h a 15h - 18h30 a 23h <br> Dom: 11h a 15h<br>Seg: Fechado",
@@ -2520,6 +2613,16 @@ menuLinks.forEach((link) => {
               ],
       
           },
+
+
+
+
+          
+
+
+
+
+
                 {
                     image: "images/comercios/restaurante/delfino/delfino.png",
                     name: "Delfino",
