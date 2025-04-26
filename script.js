@@ -1644,7 +1644,7 @@ menuLinks.forEach((link) => {
                     name: "Santa Maria",
                     address: "Praça Coronel Leite, nº 711",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
-                    contact: "(43) 3566-1471",
+                    contact: "(43) 99840-9658",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
                     instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
@@ -1657,7 +1657,7 @@ menuLinks.forEach((link) => {
                         "images/comercios/farmacia/santaMaria/divulgacao/5.png",
                     ], 
                     novidadesDescriptions: [                            
-                      "Analgésico de alívio eficaz para dores intensas",
+                      "Venham nos Visitar",
                       "Cólicas do trato gastrintestinal",
                       "Analgésico (para dor) antitérmico (para febre)",
                       "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
@@ -2007,7 +2007,7 @@ menuLinks.forEach((link) => {
             link: document.querySelector("#menuFarmaciaPlantao"),
             title: "Farmacia de Plantão",
             establishments: [
-
+/*
                 { 
                   image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
                   name: "Farmacia da Vila",
@@ -2033,19 +2033,54 @@ menuLinks.forEach((link) => {
                     "Indicado para redução da febre e para o alívio de dores",
                   ],
 
-
-
-
-
-
-
-
-
-                      
-                  
-
-
                 },
+
+
+*/
+
+                {
+                  image: "images/comercios/farmacia/santaMaria/santamaria.png",
+                  name: "Santa Maria",
+                  address: "Praça Coronel Leite, nº 711",
+                  contact: "(43) 99840-9658",
+                  plantaoHorario: "8:00h às 21:00h", 
+                  plantaoData:"26/04 a 02/05",
+                  
+                  delivery: "Sim / Sem Taxa",
+                  facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
+                  instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
+                  
+                  novidadesImages: [               
+                      "images/comercios/farmacia/santaMaria/divulgacao/1.png",
+                      "images/comercios/farmacia/santaMaria/divulgacao/2.png",     
+                      "images/comercios/farmacia/santaMaria/divulgacao/3.png",
+                      "images/comercios/farmacia/santaMaria/divulgacao/4.png",
+                      "images/comercios/farmacia/santaMaria/divulgacao/5.png",
+                  ], 
+                  novidadesDescriptions: [                            
+                    "Venham nos Visitar",
+                    "Cólicas do trato gastrintestinal",
+                    "Analgésico (para dor) antitérmico (para febre)",
+                    "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                    "Redução da febre e para o alívio de dores",
+                  ],
+              },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             ],
         
         },
