@@ -1252,7 +1252,7 @@ menuLinks.forEach((link) => {
             establishments: [
 
                 {
-                    image: "images/comercios/farmacia/biofarma.jpg",
+                    image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
                     name: "Bio Farma",
                     address: "Rua Laurindo Franco Godoy, 464",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h</br> Dom e feriado: Fechado",
@@ -1262,16 +1262,24 @@ menuLinks.forEach((link) => {
                     instagram: "www.instagram.com/uahh",
                     site: "www.google.com",
                     novidadesImages: [               
-                        "images/comercios/farmacia/novidade_biofarma/1.png",
-                        "images/comercios/farmacia/novidade_biofarma/2.png",     
-                        "images/comercios/farmacia/novidade_biofarma/3.png",
-                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                      "images/comercios/farmacia/bioFarma/divulgacao/1.png",
+                      "images/comercios/farmacia/bioFarma/divulgacao/2.png",
+                      "images/comercios/farmacia/bioFarma/divulgacao/3.png",
+                      "images/comercios/farmacia/bioFarma/divulgacao/4.png",
+                      "images/comercios/farmacia/bioFarma/divulgacao/5.png",
                     ],  
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
                 },
           
   
                 {
-                    image: "images/comercios/farmacia/farmafacil.png",
+                    image: "images/comercios/farmacia/descontoFacil/descontoFacil.png",
                     name: "Desconto Facil 1",
                     address: "R. Benedito Salles, 574",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
@@ -1281,15 +1289,23 @@ menuLinks.forEach((link) => {
                     instagram: "https://www.instagram.com/descontofacil.clps/",
                     site: "https://www.grupoasfar.com.br/",
                     novidadesImages: [               
-                        "images/comercios/farmacia/novidade_biofarma/1.png",
-                        "images/comercios/farmacia/novidade_biofarma/2.png",     
-                        "images/comercios/farmacia/novidade_biofarma/3.png",
-                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/1.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/2.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/3.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/4.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/5.png",
                     ], 
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
                 },
 
                 {
-                    image: "images/comercios/farmacia/drogamais.png",
+                    image: "images/comercios/farmacia/drogaMais/drogamais.png",
                     name: "DrogaMais",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     address: "Rua Benedito Salles, 903",
@@ -1299,15 +1315,23 @@ menuLinks.forEach((link) => {
                     instagram: "https://www.instagram.com/drogamaisjorginho/",
                     site: "www.google.com",
                     novidadesImages: [               
-                        "images/comercios/farmacia/novidade_biofarma/1.png",
-                        "images/comercios/farmacia/novidade_biofarma/2.png",     
-                        "images/comercios/farmacia/novidade_biofarma/3.png",
-                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/1.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/2.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/3.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/4.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/5.png",
                     ], 
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
                 },
         
                 {
-                    image: "images/comercios/farmacia/elshaday.png",
+                    image: "images/comercios/farmacia/elShaday/elshaday.png",
                     name: "El Shaday",
                     address: "R. Benedito Sales, 353",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
@@ -1317,11 +1341,19 @@ menuLinks.forEach((link) => {
                     instagram: "www.instagram.com/uahh",
                     site: "www.google.com",
                     novidadesImages: [               
-                        "images/comercios/farmacia/novidade_biofarma/1.png",
-                        "images/comercios/farmacia/novidade_biofarma/2.png",     
-                        "images/comercios/farmacia/novidade_biofarma/3.png",
-                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                      "images/comercios/farmacia/elShaday/divulgacao/1.png",
+                      "images/comercios/farmacia/elShaday/divulgacao/2.png",
+                      "images/comercios/farmacia/elShaday/divulgacao/3.png",
+                      "images/comercios/farmacia/elShaday/divulgacao/4.png",
+                      "images/comercios/farmacia/elShaday/divulgacao/5.png",
                     ], 
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
                 },
         
                 {
@@ -1342,7 +1374,7 @@ menuLinks.forEach((link) => {
                       "images/comercios/farmacia/farmaciaDaVila/divulgacao/5.png",
                   ], 
                   novidadesDescriptions: [                            
-                    "Venham nos visitar!",
+                    "Analgésico de alívio eficaz para dores intensas",
                     "Cólicas do trato gastrintestinal",
                     "Analgésico (para dor) antitérmico (para febre)",
                     "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
@@ -1351,7 +1383,7 @@ menuLinks.forEach((link) => {
                 },
         
                 {
-                    image: "images/comercios/farmacia/farmais.png",
+                    image: "images/comercios/farmacia/farmais/farmais.png",
                     name: "FarMais",
                     address: "R. Benedito Salles, 1188",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
@@ -1361,15 +1393,23 @@ menuLinks.forEach((link) => {
                     instagram: "https://www.instagram.com/farmaiscarlopolis/",
                     site: "#",
                     novidadesImages: [               
-                        "images/comercios/farmacia/novidade_biofarma/1.png",
-                        "images/comercios/farmacia/novidade_biofarma/2.png",     
-                        "images/comercios/farmacia/novidade_biofarma/3.png",
-                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                      "images/comercios/farmacia/farmais/divulgacao/1.png",
+                      "images/comercios/farmacia/farmais/divulgacao/2.png",
+                      "images/comercios/farmacia/farmais/divulgacao/3.png",
+                      "images/comercios/farmacia/farmais/divulgacao/4.png",
+                      "images/comercios/farmacia/farmais/divulgacao/5.png",
                     ], 
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
                 },
         
                 {
-                    image: "images/comercios/farmacia/masterfarma.png",
+                    image: "images/comercios/farmacia/masterFarma/masterfarma.png",
                     name: "MasterFarma",
                     address: "R. Laurindo Franco de Godoi, 90",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
@@ -1379,11 +1419,19 @@ menuLinks.forEach((link) => {
                     instagram: "https://www.instagram.com/masterfarma_carlopolis/",
                     site: "#",
                     novidadesImages: [               
-                        "images/comercios/farmacia/novidade_biofarma/1.png",
-                        "images/comercios/farmacia/novidade_biofarma/2.png",     
-                        "images/comercios/farmacia/novidade_biofarma/3.png",
-                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                      "images/comercios/farmacia/masterFarma/divulgacao/1.png",
+                      "images/comercios/farmacia/masterFarma/divulgacao/2.png",
+                      "images/comercios/farmacia/masterFarma/divulgacao/3.png",
+                      "images/comercios/farmacia/masterFarma/divulgacao/4.png",
+                      "images/comercios/farmacia/masterFarma/divulgacao/5.png",
                     ], 
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
                 },
                 
                 {
@@ -1393,7 +1441,7 @@ menuLinks.forEach((link) => {
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
                     contact: "(43) 99647-6266",
                     delivery: "Sim / Sem Taxa",
-                    image: "images/comercios/farmacia/popularMais.png",
+                    image: "images/comercios/farmacia/popularMais/popularMais.png",
                     facebook:
                     "https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
                     instagram:
@@ -1401,13 +1449,24 @@ menuLinks.forEach((link) => {
                     site: "#",
                     novidadesImages: [                  
                         
-                        "images/comercios/farmacia/novidades_popularmais/2.png",
+                        "images/comercios/farmacia/popularMais/divulgacao/1.png",
+                        "images/comercios/farmacia/popularMais/divulgacao/2.png",
+                        "images/comercios/farmacia/popularMais/divulgacao/3.png",
+                        "images/comercios/farmacia/popularMais/divulgacao/4.png",
+                        "images/comercios/farmacia/popularMais/divulgacao/5.png",
                                     
+                    ],
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
                     ],
                 },
 
                 {
-                    image: "images/comercios/farmacia/santamaria.png",
+                    image: "images/comercios/farmacia/santaMaria/santamaria.png",
                     name: "Santa Maria",
                     address: "Praça Coronel Leite, nº 711",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
@@ -1417,15 +1476,23 @@ menuLinks.forEach((link) => {
                     instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
                     site: "#",
                     novidadesImages: [               
-                        "images/comercios/farmacia/novidade_biofarma/1.png",
-                        "images/comercios/farmacia/novidade_biofarma/2.png",     
-                        "images/comercios/farmacia/novidade_biofarma/3.png",
-                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                        "images/comercios/farmacia/santaMaria/divulgacao/1.png",
+                        "images/comercios/farmacia/santaMaria/divulgacao/2.png",     
+                        "images/comercios/farmacia/santaMaria/divulgacao/3.png",
+                        "images/comercios/farmacia/santaMaria/divulgacao/4.png",
+                        "images/comercios/farmacia/santaMaria/divulgacao/5.png",
                     ], 
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
                 },
         
                 {
-                    image: "images/comercios/farmacia/saudeFarma.png",
+                    image: "images/comercios/farmacia/saudeFarma/saudeFarma.png",
                     name: "Saude Farma",
                     address: "Rua Benedito Salles, 951",
                     hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
@@ -1436,11 +1503,19 @@ menuLinks.forEach((link) => {
                     instagram: "#",
                     site: "www.google.com",
                     novidadesImages: [               
-                        "images/comercios/farmacia/saudeFarma/novidade/1.png",
-                        "images/comercios/farmacia/novidade_biofarma/2.png",     
-                        "images/comercios/farmacia/novidade_biofarma/3.png",
-                        "images/comercios/farmacia/novidade_biofarma/4.png",
+                        "images/comercios/farmacia/saudeFarma/divulgacao/1.png",
+                        "images/comercios/farmacia/saudeFarma/divulgacao/2.png",     
+                        "images/comercios/farmacia/saudeFarma/divulgacao/3.png",
+                        "images/comercios/farmacia/saudeFarma/divulgacao/4.png",
+                        "images/comercios/farmacia/saudeFarma/divulgacao/5.png",
                     ], 
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
                 },
             ],
         },
