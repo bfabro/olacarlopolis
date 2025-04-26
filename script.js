@@ -218,6 +218,7 @@ registrarAcesso();
   
       //pizzaria
       fornalhapizzaria: "s",
+      tonnypizzaria:"s",
   
       // quitanda
       pimentadoce: "s",
@@ -231,6 +232,7 @@ registrarAcesso();
       xisbauinea:"s",
   
       //supermercado
+      bompreço:"s",
       mercadorocha: "s", // Mercado Rocha pagou
       carreiro: "s", // Carreiro pagou
       comprebemmais:"s",
@@ -1057,7 +1059,7 @@ menuLinks.forEach((link) => {
             title: "Pizzarias",
             establishments: [
                 {
-                    image: "images/comercios/pizzaria/fornalha.png",
+                    image: "images/comercios/pizzaria/fornalha/fornalha.png",
                     name: "Fornalha Pizzaria",
                     hours:"Quarta - Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
                     address: "R. Benedito Salles, 837",
@@ -1065,10 +1067,7 @@ menuLinks.forEach((link) => {
                     delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
                     instagram: "https://www.instagram.com/_fornalhapizzaria_/",    
-                    menuImages: [                
-                        "images/comercios/pizzaria/fornalha/cardapio/1.jpg",
-                        
-                    ],    
+                     
                     novidadesImages: [
                           
                       "images/comercios/pizzaria/fornalha/divulgacao/1.png",
@@ -1078,6 +1077,39 @@ menuLinks.forEach((link) => {
                       "images/comercios/pizzaria/fornalha/divulgacao/5.png",
                     ]        
                 },
+
+
+                {
+                  image: "images/comercios/pizzaria/tonnyPizzaria/perfil.png",
+                  name: "Tonny Pizzaria",
+                  hours:"Seg a Ter: 18h - 23:30h <br> Qua: Fechado<br>Qui a Dom: 18h - 23:30h",
+                  address: "R. Paul Harris, 52 - Carlópolis",
+                  contact: "(43) 99191-7686",
+                  delivery: "Sim / Com Taxa",
+                  facebook: "https://www.facebook.com/p/Tonny-Pizzaria-100084516954612/",
+                    
+                  menuImages: [                
+                      "images/comercios/pizzaria/tonnyPizzaria/cardapio/1.png",
+                      "images/comercios/pizzaria/tonnyPizzaria/cardapio/2.png",
+                      "images/comercios/pizzaria/tonnyPizzaria/cardapio/3.png",
+                      "images/comercios/pizzaria/tonnyPizzaria/cardapio/4.png",
+                      "images/comercios/pizzaria/tonnyPizzaria/cardapio/5.png",
+                      "images/comercios/pizzaria/tonnyPizzaria/cardapio/6.png",
+                      "images/comercios/pizzaria/tonnyPizzaria/cardapio/7.png",
+                      "images/comercios/pizzaria/tonnyPizzaria/cardapio/8.png",
+                      "images/comercios/pizzaria/tonnyPizzaria/cardapio/9.png",
+                      
+                  ],    
+                  novidadesImages: [
+                        
+                    "images/comercios/pizzaria/tonnyPizzaria/divulgacao/1.png",
+                    "images/comercios/pizzaria/tonnyPizzaria/divulgacao/2.png",
+                    "images/comercios/pizzaria/tonnyPizzaria/divulgacao/3.png",
+                 
+                  ]        
+              },
+
+
             ],
         },
 
@@ -1221,6 +1253,26 @@ menuLinks.forEach((link) => {
             link: document.querySelector("#menuMercado"),
             title: "Supermercados ",
             establishments: [
+
+              {
+                image: "images/comercios/supermercado/bomPreco/perfil.png",
+                name: "Bom Preço",
+                address: "R. Chuva de Ouro, 397 - Vista Alegre, Carlópolis",
+                hours: "Dom a Dom 8h - 19:30h",
+                contact: "(43) 98821-4701",
+                delivery: "Sim / Sem Taxa",                
+                instagram: "https://www.instagram.com/bomprecocarlopolis/?locale=ne_NP&hl=ar",
+                novidadesImages: [               
+                  "images/comercios/supermercado/bomPreco/divulgacao/1.png",
+                
+              ], 
+              novidadesDescriptions: [                            
+                "Nosso Horti Fruti",
+             
+              ],
+            },
+
+
                 {
                     image: "images/comercios/supermercado/carreiro.png",
                     name: "Carreiro",
