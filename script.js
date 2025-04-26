@@ -230,6 +230,7 @@ registrarAcesso();
       kidog:"s",
       didog:"s",
       xisbauinea:"s",
+      mycoffe:"s",
   
       //supermercado
       bompreço:"s",
@@ -968,6 +969,42 @@ menuLinks.forEach((link) => {
                       
                     ],               
                   },
+
+
+
+                  {
+                    image: "images/comercios/lanchonete/mycoffe/perfil.png",
+                    name: "My Coffe",
+                    hours: "Seg: Fechado<br>Ter a Qui - 13h - 20:00h <br>Sex: 13h a 18h<br>Sab: 13h a 20h<br>Dom: 13h a 19h",
+                    address: "R. Benedito Salles, 1205 - Centro",
+                    contact: "(43) 99126-5705",
+                    delivery: "Não",   
+                    instagram:"https://www.instagram.com/mycoffeecarlopolis/",
+                                      
+                      
+                    novidadesImages: [
+                    
+                      "images/comercios/lanchonete/mycoffe/divulgacao/1.png",
+                      "images/comercios/lanchonete/mycoffe/divulgacao/2.png",
+                      "images/comercios/lanchonete/mycoffe/divulgacao/3.png",
+                      "images/comercios/lanchonete/mycoffe/divulgacao/4.png",
+                      "images/comercios/lanchonete/mycoffe/divulgacao/5.png",
+                
+                    
+                  ],               
+                },
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
