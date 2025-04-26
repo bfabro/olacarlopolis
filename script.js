@@ -989,9 +989,17 @@ menuLinks.forEach((link) => {
                     facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
                     instagram: "https://www.instagram.com/_fornalhapizzaria_/",    
                     menuImages: [                
-                        "images/comercios/pizzaria/cardapio_fornalha.jpg",
-                        "images/comercios/pizzaria/cardapio_fornalha_2.jpg",
-                    ],            
+                        "images/comercios/pizzaria/fornalha/cardapio/1.jpg",
+                        
+                    ],    
+                    novidadesImages: [
+                          
+                      "images/comercios/pizzaria/fornalha/divulgacao/1.png",
+                      "images/comercios/pizzaria/fornalha/divulgacao/2.png",
+                      "images/comercios/pizzaria/fornalha/divulgacao/3.png",
+                      "images/comercios/pizzaria/fornalha/divulgacao/4.png",
+                      "images/comercios/pizzaria/fornalha/divulgacao/5.png",
+                    ]        
                 },
             ],
         },
