@@ -180,6 +180,7 @@ registrarAcesso();
       vidanova: "s",
   // deposito de gas
   liagas:"s",
+  cncasadogas:"s",
 
 
       //farmacia
@@ -206,6 +207,9 @@ registrarAcesso();
 
       //mototaxi
       mototaximodesto: "s",
+
+      //motocenter
+      binhomotocenter:"s",
 
       // padaria
       bomjesus:"s",
@@ -312,6 +316,7 @@ registrarAcesso();
       agenciatrabalhador:"s",
       copel: "s",
       correio:"s",    
+      cras:"s",
       // cheches:
       ainzararossisallescmei:"s",
       isabeldallabdasilvacmeiprofa:"s",
@@ -340,6 +345,7 @@ registrarAcesso();
       
       rodoviaria:"s",
       secretariadasaude:"s",
+      
       vigilanciasanitaria:"s",
 /// FIM SETOR PUBLICO
 
@@ -351,6 +357,7 @@ registrarAcesso();
   pescar: "s",
   coletalixoeletronico: "s",
   feiradalua: "s",
+  frutfest:"s",
 
 
       ///
@@ -867,7 +874,7 @@ menuLinks.forEach((link) => {
                 title: "Feira da Lua",
                 establishments: [
                     {
-                        image: "images/comercios/feiraLua/feiraLua.png",
+                        image: "images/comercios/feiraLua/perfil.png",
                                
                         name: "Feira da Lua",
                         hours: "Sex - 19:00 - 23:30",
@@ -1797,21 +1804,7 @@ menuLinks.forEach((link) => {
                   contact: "",
               },
 
-              {
-                image: "images/informacoes/eventos/evento_2/feira_lua_1.png",
-                name: "Feira da Lua",
-                date: "Sex das 19h as 23:30h",
-                address: "Praça Igreja Matriz ",
-                contact: "(43) 99965-2084",
-                facebook: "https://www.facebook.com/people/Feira-Da-Lua-Carl%C3%B3polis/100089210937457/?_rdr",
-              instagram: "https://www.instagram.com/feiradaluacarlopolis/",
-                novidadesImages: [
-                  // Novo array de imagens de novidades                      
-                  "images/info_uteis/eventos/feiraLua/novidades/2.png",
-                  "images/info_uteis/eventos/feiraLua/novidades/1.png",
-                 
-              ],
-            },
+            
 
             {
               image: "images/informacoes/eventos/evento_3/lixoEletronico.png",
@@ -1926,7 +1919,7 @@ menuLinks.forEach((link) => {
     title: "Asilo",
     establishments: [
         {
-            image: "images/info_uteis/asilo/asilo.png",
+            image: "images/setorPublico/asilo/asilo.png",
             name: "Asilo",
             hours: "Seg a Sex: 9h - 12h",
             address: "Rua Andrino Soares, 26",
@@ -1940,7 +1933,7 @@ menuLinks.forEach((link) => {
     title: "Agencia Trabalhador",
     establishments: [
         {
-            image: "images/info_uteis/agenciaTrabalhador/AgenciaTrabalhador.png",
+            image: "images/setorPublico/agenciaTrabalhador/AgenciaTrabalhador.png",
             name: "Agencia Trabalhador",
             hours: "Seg a Sex: 9h - 15h",
             address: "Rua Padre Hugo, 1025",
@@ -1954,7 +1947,7 @@ menuLinks.forEach((link) => {
     title: "Cras",
     establishments: [
         {
-            image: "images/info_uteis/cras/cras.png",
+            image: "images/setorPublico/cras/cras.png",
             name: "Cras",
             hours: "Seg a Sex: 9h - 15h",
             address: "R. Salvira Marquês, 366",
@@ -1969,7 +1962,7 @@ menuLinks.forEach((link) => {
     title: "Correio",
     establishments: [
         {
-            image: "images/info_uteis/correio/correio.png",
+            image: "images/setorPublico/correio/correio.png",
             name: "Correio",
             hours: "Seg a Sex: 9h - 13h",
             address: "R. Padre Hugo, 843 ",
@@ -2021,11 +2014,12 @@ menuLinks.forEach((link) => {
             title: "Hospital",
             establishments: [
                 {
+                  image: "images/setorPublico/hospital/hospital.png",
                     name: "Hospital São Jose",
                     address: "R. Cap. Estácio, 460",
                     contact: "(43) 99174-2539",
                     hours: "24 horas",
-                    image: "images/info_uteis/hospital/hospital.png",
+                    
                 },
             ],
         },
@@ -2035,11 +2029,12 @@ menuLinks.forEach((link) => {
           title: "Rodoviaria",
           establishments: [
               {
+                image: "images/setorPublico/rodoviaria/rodoviaria.png",
                   name: "Rodoviaria",
                   address: "R. Kaliu keder, 0",
                   contact: "(43) 3566-1393",
                   hours: "24 horas",
-                  image: "images/info_uteis/rodoviaria/rodoviaria.png",
+                  
               },
           ],
         },
@@ -2050,21 +2045,23 @@ menuLinks.forEach((link) => {
             title: "Prefeitura",
             establishments: [
                 {
+                  image: "images/setorPublico/prefeitura/prefeitura.png",
                     name: "Prefeitura",
                     address: "R. Benedito Salles, 1060 - Centro",
                     contact: "(43) 3566-1291",
                     hours: "8h as 11:30 - 13h as 17h",
-                    image: "images/info_uteis/prefeitura/prefeitura.png",
+                   
                     facebook: "https://www.facebook.com/profile.php?id=200531799983410&_rdr",
                     instagram: "www.instagram.com/uahhhttps://www.instagram.com/prefeitura.carlopolis/?locale=zh_CN&hl=af",
                     site: "http://www.carlopolis.pr.gov.br/",
                 },
         
                 {
+                  image: "images/setorPublico/prefeitura/prefeitura.png",
                     name: "Duvidas e  Reclamações",
                     contact: "(43) 99825-0360",
                     hours: "8h as 17h",
-                    image: "images/info_uteis/prefeitura/prefeitura.png",
+                
                 },
             ],
         },
@@ -2076,7 +2073,7 @@ menuLinks.forEach((link) => {
             title: "Copel",
             establishments: [
                 {
-                    image: "images/info_uteis/copel/copel.png",
+                    image: "images/setorPublico/copel/copel.png",
                     name: "Copel",
                     hours: "Seg a Sex: 8h - 12h",
                     address: "R. Benedito Salles, 1094",
@@ -2091,7 +2088,7 @@ menuLinks.forEach((link) => {
             title: "Delegacia",
             establishments: [
                 {
-                    image: "images/info_uteis/delegacia/delegacia.jpg",
+                    image: "images/setorPublico/delegacia/delegacia.jpg",
                     name: "Delegacia",
                     hours: "Seg a Sex: 9h - 18h",
                     address: "R. Alfeneiro, 215 ",
@@ -2110,7 +2107,7 @@ menuLinks.forEach((link) => {
 
 
             {
-              image: "images/info_uteis/escolaPublica/benedito.png",
+              image: "images/setorPublico/escolaPublica/benedito.png",
               name: "Benedito Rodrigues de Camargo",
               hours: "Seg a Ssex: 9h - 18h",
               address: "Avenida Elson Soares, 295",
@@ -2119,7 +2116,7 @@ menuLinks.forEach((link) => {
           },
 
             {
-              image: "images/info_uteis/escolaPublica/carolinaLupion.png",
+              image: "images/setorPublico/escolaPublica/carolinaLupion.png",
               name: "Carolina Lupion",
               hours: "Seg a Sex: 9h - 18h",
               address: "R. Jorge Barros, 1095",
@@ -2130,7 +2127,7 @@ menuLinks.forEach((link) => {
 
 
               {
-                  image: "images/info_uteis/escolaPublica/raymunda.png",
+                  image: "images/setorPublico/escolaPublica/raymunda.png",
                   name: "CMEI Raymunda Santana Salles",
                   hours: "Seg a sex: 9h - 18h",
                   address: "Rua Nicolau Miguel, 233",
@@ -2141,7 +2138,7 @@ menuLinks.forEach((link) => {
              
 
             {
-              image: "images/info_uteis/escolaPublica/joseSalles.png",
+              image: "images/setorPublico/escolaPublica/joseSalles.png",
               name: "Escola Municipal José Salles",
               hours: "Seg a Sex: 07:45h - 17h",
               address: "R. Quaresmeira Roxa, 418-458",
@@ -2150,7 +2147,7 @@ menuLinks.forEach((link) => {
           },
 
           {
-            image: "images/info_uteis/escolaPublica/hercilia.png",
+            image: "images/setorPublico/escolaPublica/hercilia.png",
             name: "Hercília de Paula e Silva",
             hours: "Seg a Sex: 06:30h - 18:30h",
             address: "Av. Elson Soares, 34",
@@ -2166,7 +2163,7 @@ menuLinks.forEach((link) => {
         title: "Posto de Saude",
         establishments: [
             {
-                image: "images/info_uteis/postoSaude/joseAparecido.png",
+                image: "images/setorPublico/postoSaude/joseAparecido.png",
                 name: "Centro de Saude Dr José",                
                 hours: "Seg a Sex: 8:00h as 17h",
                 address: "Avenida Elson Soares,769",
@@ -2175,7 +2172,7 @@ menuLinks.forEach((link) => {
             },
            
             {
-              image: "images/info_uteis/postoSaude/eugenioNeves.png",
+              image: "images/setorPublico/postoSaude/eugenioNeves.png",
                 name: "UBS Eugênio Neves Soares",
                 hours: "Seg a Sex: 8:00h as 17h",
                 address: "Rua Bauínea,79",
@@ -2193,7 +2190,7 @@ menuLinks.forEach((link) => {
             title: "Sanepar",
             establishments: [
                 {
-                  image: "images/info_uteis/sanepar/sanepar.png",
+                  image: "images/setorPublico/sanepar/sanepar.png",
                     name: "Sanepar",
                     hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
                     address: "R. André Jorge Cleli, 148 ",
@@ -2220,7 +2217,7 @@ menuLinks.forEach((link) => {
 
 
       {
-        link: document.querySelector("#menuSecrariaSaude"),    
+        link: document.querySelector("#menuSecretariaSaude"),    
         title: "Secretaria da Saude",
         establishments: [
             {
@@ -2273,11 +2270,26 @@ menuLinks.forEach((link) => {
             title: "Moto Center",
             establishments: [
                 {
+                  image: "images/comercios/motoCenter/binho/perfil.png",
                     name: "Binho Moto Center",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    contact: "(43) 99951-1540",
+                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 14h",
+                    address: "R. Luis Consulmagno de Proenca, 451 - Carlópolis",
+                    contact: " (43) 99903-3447",
                     delivery: "Sim / Sem Taxa",
+                    instagram:"https://www.instagram.com/binhomotocenter/",
+                    facebook:"https://www.facebook.com/Motocenterbinho/?locale=pt_BR",
+                    novidadesImages: [               
+                      "images/comercios/motoCenter/binho/divulgacao/1.png",
+                      "images/comercios/motoCenter/binho/divulgacao/2.png",     
+                      "images/comercios/motoCenter/binho/divulgacao/3.png",
+                     
+                  ], 
+                  novidadesDescriptions: [                            
+                    "1",
+                    "2",
+                    "3",
+                  
+                  ],
                 },
             ],
         },
@@ -2288,10 +2300,23 @@ menuLinks.forEach((link) => {
             title: "Borracharia",
             establishments: [
                 {
+                    image: "images/comercios/borracharia/vidaNova/vidanova.png",
                     name: "Vida Nova",
                     hours: "Seg a Sex: 7h - 18h </br>Sab: 07 - 16h",
                     address: "Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
                     contact: "(43) 99900-2991",
+                    novidadesImages: [               
+                      "images/comercios/borracharia/vidaNova/divulgacao/1.png",
+                      "images/comercios/borracharia/vidaNova/divulgacao/2.png",     
+                      "images/comercios/borracharia/vidaNova/divulgacao/3.png",
+                     
+                  ], 
+                  novidadesDescriptions: [                            
+                    "Pneus para Tratores",
+                    "Manutenção no local",
+                    "Manutenção no local",
+                  
+                  ],
                 },
             ],
         },
@@ -2335,6 +2360,36 @@ menuLinks.forEach((link) => {
                     address: "R. Kalil Keder, 910",
                     contact: "(43) 99821-7243",
                     delivery: "Sim / Sem Taxa",
+                    facebook:"https://www.facebook.com/liagasclps/",
+                    novidadesImages: [               
+                      "images/comercios/depositoGas/liaGas/divulgacao/1.png",
+                      "images/comercios/depositoGas/liaGas/divulgacao/2.png",                    
+                     
+                  ], 
+                  novidadesDescriptions: [                            
+                    "Botijao em estoque",
+                    "Temos agua Cristal",                   
+                  ],
+                },
+
+                {
+                  image: "images/comercios/depositoGas/cnCasaDoGas/perfil.png",
+                    name: "CN Casa do Gas",
+                    hours: "Seg a Sab: 8h - 19h </br> Dom: 08h - 12h",
+                    address: "Avenida Elson Soares, 1048, Carlopolis",
+                    contact: "(43) 99829-5216",
+                    delivery: "Sim / Sem Taxa",
+                    facebook:"https://www.facebook.com/people/CN-Casa-do-G%C3%A1s/100068139145901/",
+                    instagram:"https://www.instagram.com/ultracarlopolis/",
+                    novidadesImages: [               
+                      "images/comercios/depositoGas/cnCasaDoGas/divulgacao/1.png",
+                                          
+                     
+                  ], 
+                  novidadesDescriptions: [                            
+                    "Botijao em estoque",
+                                    
+                  ],
                 },
             ],
         },
@@ -2406,12 +2461,13 @@ menuLinks.forEach((link) => {
             title: "Quitanda",
             establishments: [
                 {
+                  image: "images/comercios/quitanda/pimentadoce.png",
                     name: "Pimenta Doce",
                     hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
                     address: "R. Kalil Keder ",
                     contact: "(43) 98806-5747",
                     delivery: "Sim / Sem Taxa",
-                    image: "images/comercios/quitanda/pimentadoce.png",
+                    
                     novidadesImages: [
                         "images/comercios/quitanda/novidades/1.png",
                         "images/comercios/quitanda/novidades/2.png",
@@ -2598,12 +2654,6 @@ menuLinks.forEach((link) => {
          "5",
           ],
         },
-
-
-
-
-
-
 
 
 
