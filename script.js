@@ -898,7 +898,7 @@ menuLinks.forEach((link) => {
                       {
                         image: "images/comercios/lanchonete/cantinhoPraca/perfil.png",
                         name: "Cantinho da Praça",
-                        hours: "Ter - Dom - 18h - 00:30h",
+                        hours: "Ter - Dom - 18h - 023:30h",
                         address: "R. Padre Hugo, 478 , Carlópolis",
                         contact: "(43) 99604-9187",
                         delivery: "Sim / Com Taxa",                        
@@ -2448,11 +2448,7 @@ delivery: "Sim / Sem Taxa",
                 address: "Rua Benedito Salles 1241",
                 contact: "(43) 9838-7570",
                 delivery: "Sim / Com Taxa",
-                menuImages: [                   
-                  "images/comercios/restaurante/assadaoRussao/cardapio/1.png",
-                 
-                         
-              ],
+                
               novidadesImages: [                    
                   "images/comercios/restaurante/assadaoRussao/divulgacao/1.png",                        
                  "images/comercios/restaurante/assadaoRussao/divulgacao/2.png",
