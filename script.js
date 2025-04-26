@@ -221,6 +221,7 @@ registrarAcesso();
       //lanchonete
       ocasarao: "s", // Casarao pagou      
       ione:"s",
+      cantinhodapraça:"s",
   
       //supermercado
       mercadorocha: "s", // Mercado Rocha pagou
@@ -893,6 +894,32 @@ menuLinks.forEach((link) => {
                     link: document.querySelector("#menuLanchonete"),
                     title: "Lanchonetes",
                     establishments: [
+
+                      {
+                        image: "images/comercios/lanchonete/cantinhoPraca/perfil.png",
+                        name: "Cantinho da Praça",
+                        hours: "Ter - Dom - 18h - 00:30h",
+                        address: "R. Padre Hugo, 478 , Carlópolis",
+                        contact: "(43) 99604-9187",
+                        delivery: "Sim / Com Taxa",                        
+                        menuImages: [                   
+                            "images/comercios/lanchonete/cantinhoPraca/cardapio/1.png",
+                            "images/comercios/lanchonete/cantinhoPraca/cardapio/2.png",
+                            "images/comercios/lanchonete/cantinhoPraca/cardapio/3.png",
+                            "images/comercios/lanchonete/cantinhoPraca/cardapio/4.png",
+                            "images/comercios/lanchonete/cantinhoPraca/cardapio/5.png",
+                           
+                        ],     
+                        novidadesImages: [
+                        
+                          "images/comercios/lanchonete/cantinhoPraca/divulgacao/1.png",
+                          "images/comercios/lanchonete/cantinhoPraca/divulgacao/2.png",
+                        
+                      ],               
+                    },
+
+
+
                         {
                             image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
                             name: "O Casarao",
