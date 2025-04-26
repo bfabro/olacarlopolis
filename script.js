@@ -654,7 +654,7 @@ menuLinks.forEach((link) => {
                             instagram: "https://www.instagram.com/turminha_do_acai/",
                             facebook:"#",
                             site:"#",
-                            infoAdicional:"Espetinhos a partir de Quinta até Domingo",
+                            infoAdicional:"Espetinhos de Quinta a Sabado",
                             novidadesImages: [            
                             "images/comercios/acai/turminhaAcai/novidades/1.png",                                            
                             ],
@@ -778,7 +778,7 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/agropecuaria/agroVida/agrovida.png",
                             name: "Agro Vida",
-                            hours: "seg a sex: 8h - 18h </br> sab: 08 - 16h",
+                            hours: "Seg a Sex: 8h - 18h </br> Sab: 08H - 16h",
                             address: "rua benedito salles 309",
                             contact: "(43) 99158-9047",
                             delivery: "Sim / Sem Taxa",
@@ -898,7 +898,7 @@ menuLinks.forEach((link) => {
                       {
                         image: "images/comercios/lanchonete/cantinhoPraca/perfil.png",
                         name: "Cantinho da Praça",
-                        hours: "Ter - Dom - 18h - 023:30h",
+                        hours: "Ter - Dom - 18h - 23:30h",
                         address: "R. Padre Hugo, 478 , Carlópolis",
                         contact: "(43) 99604-9187",
                         delivery: "Sim / Com Taxa",                        
@@ -1710,52 +1710,58 @@ menuLinks.forEach((link) => {
           establishments: [
               {
                   name: "Calendario Eventos",
-                  image: "images/info_uteis/eventos/evento_1/calendario_evento.png",
+                  image: "images/informacoes/eventos/evento_1/calendario_evento.png",
                   contact: "",
               },
-  
-              {
-                  image: "images/info_uteis/eventos/evento_3/lixoEletronico.png",
-                  name: "Coleta Lixo Eletronico",
-                  date: "05/03/25 a 20/04/2025",
-                  address: "Paroquia Senhor Bom Jesus",
-                  contact: "",
-                  menuFlyer: "#",
-              },
 
               {
-                  image: "images/info_uteis/eventos/evento_5/triathlon.png",
-                  name: "Triathlon",
-                  date: "06/04/25",
+                image: "images/informacoes/eventos/evento_2/feira_lua_1.png",
+                name: "Feira da Lua",
+                date: "Sex das 19h as 23:30h",
+                address: "Praça Igreja Matriz ",
+                contact: "(43) 99965-2084",
+                facebook: "https://www.facebook.com/people/Feira-Da-Lua-Carl%C3%B3polis/100089210937457/?_rdr",
+              instagram: "https://www.instagram.com/feiradaluacarlopolis/",
+                novidadesImages: [
+                  // Novo array de imagens de novidades                      
+                  "images/info_uteis/eventos/feiraLua/novidades/2.png",
+                  "images/info_uteis/eventos/feiraLua/novidades/1.png",
+                 
+              ],
+            },
+
+            {
+              image: "images/informacoes/eventos/evento_3/lixoEletronico.png",
+              name: "Coleta Lixo Eletronico",
+              date: "05/03/25 a 20/04/2025",
+              address: "Paroquia Senhor Bom Jesus",
+              contact: "",
+             
+          },
+              {
+                image: "images/informacoes/eventos/evento_4/pescar.png",
+                name: "Pescar",
+                date: "03/05/25 a 04/05/2025",
+                address: "Ilha do Ponciano",
+                contact: "(41) 99950-9291",
+               
+            },
+                  
+
+              {
+                  image: "images/informacoes/eventos/evento_5/frutFest.png",
+                  name: "FrutFest",
+                  date: "04/07/25",
                   address: "Ilha do Ponciano",
-                  contact: "(43) 99964-6136",
-                  menuFlyer: "#",
+                  contact: "(43) 99825-0570",
+                
               },
 
-              {
-                  image: "images/info_uteis/eventos/evento_4/pescar.png",
-                  name: "Pescar",
-                  date: "03/05/25 a 04/05/2025",
-                  address: "Ilha do Ponciano",
-                  contact: "(41) 99950-9291",
-                  menuFlyer: "#",
-              },
 
-              {
-                  image: "images/info_uteis/eventos/evento_2/feira_lua_1.png",
-                  name: "Feira da Lua",
-                  date: "Sex das 19h as 23:30h",
-                  address: "Praça Igreja Matriz ",
-                  contact: "(43) 99965-2084",
-                  facebook: "https://www.facebook.com/people/Feira-Da-Lua-Carl%C3%B3polis/100089210937457/?_rdr",
-                instagram: "https://www.instagram.com/feiradaluacarlopolis/",
-                  novidadesImages: [
-                    // Novo array de imagens de novidades                      
-                    "images/info_uteis/eventos/feiraLua/novidades/2.png",
-                    "images/info_uteis/eventos/feiraLua/novidades/1.png",
-                   
-                ],
-              },
+
+            
+
+             
           ],
       },
 
@@ -1767,133 +1773,30 @@ menuLinks.forEach((link) => {
             title: "Farmacia de Plantão",
             establishments: [
 
-                {
-                    /*
-                    title: "Farmacia de Plantão",
-                    establishments: [{
-                    name: "MasterFarma ( Zurdo ) ",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    contact: "(43) 99951-1540",
-                    plantaoHorario: "Das 7h às 21h , Do dia 7 a 14  Março 2025",
-                    delivery: "Sim / Sem Taxa",
-                    image: "images/info_uteis/farmacia_plantao/masterFarma.png",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com",
-                        
-                    */
-
-                    /*
-                    title: "Farmacia de Plantão",
-                    establishments: [{
-                    name: "El Shaday ( Daniel )",
-                    address: "R. Benedito Sales, 353",
-                    contact: "(43) 98488-9420",
-                    plantaoHorario: "</br>Das 8h às 21h , De 15/03 a 21/03",
-                    delivery: "Sim / Sem Taxa",
-                    image: "images/info_uteis/farmacia_plantao/elshaday.png",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com",
-
-                    */
-
-
-                    /*
-                    title: "Farmacia de Plantão",
-                    establishments: [{
-                    name: "DrogaMais ( Jorginho )",
-                    address: "<br>Rua Benedito Salles, 903",
-                    contact: "</br>(43) 98411-9145",
-                    plantaoHorario: "</br>Das 8h às 21h , De 22/03 a 28/03",
-                    delivery: "</br>Sim / Sem Taxa",
-                    image: "images/comercios/farmacia/drogamais.png",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com",
-                    
-                    */
-
-                    /*
-                    
-                    name: "Desconto Facil 1 ( Joao )",
-                    address: "<br>R. Benedito Salles, 574",
-                    contact: "</br>(43) 99966-9812",
-                    plantaoHorario: "</br>Das 8h às 21h , De 29/03 a 04/04",
-                    delivery: "</br>Sim / Sem Taxa",
-                    image: "images/comercios/farmacia/farmafacil.png",
-                    facebook:
-                    "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
-                    instagram: "https://www.instagram.com/descontofacil.clps/",
-                    site: "https://www.grupoasfar.com.br/",
-
-                    */
-
-                    /*
-                
-                    name: "Popularmais ( Jeremias )",
-                    address: "<br>Av. Elson Soares, 787",
-                    contact: "</br>(43) 99647-6266",
-                    plantaoHorario: "</br>Das 8h às 21h </br> De 05/04 a 11/04",
-                    delivery: "</br>Sim / Sem Taxa",
-                    image: "images/comercios/farmacia/popularMais.png",
-                    facebook:"https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
-                    instagram:"https://www.instagram.com/popularmais_farmaciadojeremias/",
-                    site: "#",
-                    novidadesImages: [               
-                        "images/comercios/farmacia/novidades_popularmais/1.png",
-                        "images/comercios/farmacia/novidades_popularmais/2.png",
-                    ],
-                   
-                    */
-                      /*
-                    image: "images/comercios/farmacia/saudeFarma.png",
-                    name: "Saude Farma",
-                    address: "<br>Rua Benedito Salles, 951",
-                    contact: "</br>(43) 99956-8938",
-                    plantaoHorario: "</br>Das 8h às 21h </br> De 12/04 a 18/04",                   
-                    delivery: "</br>Sim / Sem Taxa",                     
-                      facebook:
-                      "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
-                      instagram: "https://www.instagram.com/saudefarmacarlopolis/",                     
-                      novidadesImages: [               
-                          "images/comercios/farmacia/saudeFarma/novidade/1.png",
-                          "images/comercios/farmacia/novidade_biofarma/2.png",     
-                          "images/comercios/farmacia/novidade_biofarma/3.png",
-                          "images/comercios/farmacia/novidade_biofarma/4.png",
-                      ], 
-                      novidadesDescriptions: [                            
-                        "Venham nos visitar!",
-                        "Flanax 660mg R$ 900,00",
-                        "Xadago 50mg em promoçao!",
-                        "Dipirona, resolve em 10 minutos",
-                      ],
-*/
-
-
-image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
-name: "Farmacia da Vila",
-address: "Rua Manguba, 320, Carlopolis",
-contact: "(43) 99148-8478",
-plantaoHorario: "8:00h às 21:00h", 
-plantaoData:"19/04 a 25/04",                  
-delivery: "Sim / Sem Taxa",                     
-  facebook: "#",
-  instagram: "https://www.instagram.com/farmaciadavilaclps/",                     
-  novidadesImages: [               
-      "images/comercios/farmacia/farmaciaDaVila/divulgacao/1.png",
-      "images/comercios/farmacia/farmaciaDaVila/divulgacao/2.png",     
-      "images/comercios/farmacia/farmaciaDaVila/divulgacao/3.png",
-      "images/comercios/farmacia/farmaciaDaVila/divulgacao/4.png",
-      "images/comercios/farmacia/farmaciaDaVila/divulgacao/5.png",
-  ], 
-  novidadesDescriptions: [                            
-    "Venham nos visitar!",
-    "Indicado cólicas do trato gastrintestinal",
-    "indicado como analgésico (para dor) e antitérmico (para febre)",
-    "Indicado no alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional",
-    "Indicado para redução da febre e para o alívio de dores",
-  ],
+                { 
+                  image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
+                  name: "Farmacia da Vila",
+                  address: "Rua Manguba, 320, Carlopolis",
+                  contact: "(43) 99148-8478",
+                  plantaoHorario: "8:00h às 21:00h", 
+                  plantaoData:"19/04 a 25/04",                  
+                  delivery: "Sim / Sem Taxa",                     
+                  facebook: "#",
+                  instagram: "https://www.instagram.com/farmaciadavilaclps/",                     
+                  novidadesImages: [               
+                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/1.png",
+                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/2.png",     
+                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/3.png",
+                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/4.png",
+                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/5.png",
+                  ], 
+                  novidadesDescriptions: [                            
+                    "Venham nos visitar!",
+                    "Indicado cólicas do trato gastrintestinal",
+                    "indicado como analgésico (para dor) e antitérmico (para febre)",
+                    "Indicado no alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional",
+                    "Indicado para redução da febre e para o alívio de dores",
+                  ],
 
 
 
@@ -2276,7 +2179,7 @@ delivery: "Sim / Sem Taxa",
                     hours: "Seg a Dom: 7h - 20h",
                     address: "R. Kelil Keder, 603",
                     contact: "(43) 99137-5516",
-                    image: "images/info_uteis/VagasTrabalho/modesto/modesto.png",
+                    image: "images/informacoes/VagasTrabalho/modesto/modesto.png",
                     infoVagaTrabalho:"Precisa-se de motoboy",
                 },
             ],
@@ -2460,7 +2363,7 @@ delivery: "Sim / Sem Taxa",
 
             {
               image: "images/comercios/restaurante/paiol/paiol.png",
-              name: "Churrasco e Gastronomia Paiol",
+              name: "Paiol",
               hours: "Ter: 10h a 15h<br>Qua - Sab: 10h a 15h - 18h30 a 23h <br> Dom: 11h a 15h<br>Seg: Fechado",
               address: "Rua Benedito Salles 10, Carlópolis,",
               contact: "(43) 99159-0070",
@@ -2469,12 +2372,7 @@ delivery: "Sim / Sem Taxa",
               instagram: "https://www.instagram.com/paiolpizzaburguer/",
               infoAdicional:"<a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
              
-              menuImages: [                   
-                  "images/comercios/restaurante/paiol/cardapio/1.png",
-                  "images/comercios/restaurante/paiol/cardapio/2.png",
-                  "images/comercios/restaurante/paiol/cardapio/3.png",
-                         
-              ],
+             
               novidadesImages: [                    
                   "images/comercios/restaurante/paiol/divulgacao/1.png",
                  "images/comercios/restaurante/paiol/divulgacao/2.png",
