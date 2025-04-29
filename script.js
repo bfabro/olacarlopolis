@@ -171,7 +171,8 @@ registrarAcesso();
         // assistencia celular
         oficinadocelular:"s",
       
-
+// auto peças
+paulinhoautopeças:"s",
 
       //confecção
       yellowjeans:"s",
@@ -842,6 +843,39 @@ menuLinks.forEach((link) => {
                       },
                   ],
                 },
+
+
+
+
+                {
+                  link: document.querySelector("#menuAutoPecas"),
+                  title: "Auto Peças",
+                  establishments: [
+                      {
+                          image: "images/comercios/autopecas/paulinho/perfil.png",
+                                 
+                          name: "Paulinho auto peças",
+                          hours: "Seg a Sex - 07:00 - 18:00<br> Sab: 07:00 a 12:00",
+                          address: "R. Paul Harris, 98 - Centro, Carlópolis",
+                          contact: "(43) 3566-1306",                         
+                          instagram: "https://www.instagram.com/autopecas_paulinho/",
+                          novidadesImages: [                 
+                            
+                            "images/comercios/autopecas/paulinho/divulgacao/1.png",
+                            "images/comercios/autopecas/paulinho/divulgacao/2.png",
+                        ],                
+                      },
+                  ],
+              },
+
+
+
+
+
+
+
+
+
 
                 
 
