@@ -2164,6 +2164,7 @@ menuLinks.forEach((link) => {
             hours: "Seg a Sex: 9h - 13h",
             address: "R. Padre Hugo, 843 ",
             contact: "(43) 3566-1113",
+            contact2:"(43) 3377-5023",
             facebook:"https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
         },
     ],
