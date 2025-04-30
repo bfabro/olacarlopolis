@@ -183,6 +183,9 @@ paulinhoautopeças:"s",
   liagas:"s",
   cncasadogas:"s",
 
+// clinica veterinaria
+
+clínicaveterináriacarlópolis:"s",
 
       //farmacia
       elshaday: "s",
@@ -872,7 +875,31 @@ menuLinks.forEach((link) => {
 
 
 
-
+              {
+                link: document.querySelector("#menuClinicaVeterinaria"),
+                title: "Clinica Veterinaria",
+                establishments: [
+                    {
+                        image: "images/comercios/clinicaVeterinaria/jurandir/perfil.png",
+                        name: "Clínica Veterinária Carlópolis",
+                        hours: "Seg a Sex: 09:00 - 18h <br>Sab: 09:00 a 17:00<br>Dom: Fechado",
+                        address: "Rua Ataliba Leonel, 410, Carlópolis, PR,",
+                        contact: "(43) 3566-1664",
+                        contact2:"(43) 99642-1494",
+                      
+                        facebook: "https://www.facebook.com/veterinariacarlopolis/?locale=pt_BR",
+                        instagram: "https://www.instagram.com/clinicavetcarlopolis/",
+                        novidadesImages: [
+                     
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/1.png",
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/2.png",
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/3.png",
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/4.png",
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/5.png",
+                        ],                    
+                    },
+                ],
+            },
 
 
 
@@ -1217,7 +1244,7 @@ menuLinks.forEach((link) => {
               {
                   image: "images/comercios/sorveteria/limone/limone.png",
                   name: "Limone",
-                  hours: "Seg - Dom: 13:00 - 22h",
+                  hours: "Seg - Sab: 13:00 - 23h<br>Dom: 14:00 a 00:00",
                   address: "Rua Benedito Salles n° 619",
                   contact: "(43) 99922-8336",
                   contact2:"(43) 98863-3040",
