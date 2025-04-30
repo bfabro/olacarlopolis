@@ -885,8 +885,7 @@ menuLinks.forEach((link) => {
                         hours: "Seg a Sex: 09:00 - 18h <br>Sab: 09:00 a 17:00<br>Dom: Fechado",
                         address: "Rua Ataliba Leonel, 410, Carlópolis, PR,",
                         contact: "(43) 3566-1664",
-                        contact2:"(43) 99642-1494",
-                      
+                        contact2:"(43) 99642-1494",                      
                         facebook: "https://www.facebook.com/veterinariacarlopolis/?locale=pt_BR",
                         instagram: "https://www.instagram.com/clinicavetcarlopolis/",
                         novidadesImages: [
@@ -2238,7 +2237,7 @@ menuLinks.forEach((link) => {
         {
             image: "images/setorPublico/correio/correio.png",
             name: "Correio",
-            hours: "Seg a Sex: 9h - 13h",
+            hours: "Seg a Sex: 10h as 12h e 13h30 as 15:30",
             address: "R. Padre Hugo, 843 ",
             contact: "(43) 3566-1113",
             contact2:"(43) 3377-5023",
