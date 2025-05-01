@@ -978,7 +978,7 @@ menuLinks.forEach((link) => {
                       {
                         image: "images/comercios/lanchonete/caldodecanaamaral/perfil.png",
                         name: "Caldo de Cana Amaral",
-                        hours: "Dom a Dom - 13h as 19:30h",
+                        hours: "Dom a Dom - 13h as 18:30h",
                         address: "Rua Benedito Salles, 2639, Carlópolis",
                         contact: "(43) 99977-8839",
                         delivery: "Sim / Com Taxa",
