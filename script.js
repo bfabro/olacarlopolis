@@ -1915,7 +1915,7 @@ menuLinks.forEach((link) => {
             establishments: [
                 {
                     image:"images/servicos/guiapesca/fabio.png",
-                    name: "Fabio Sushimoto",
+                    name: "Fabio Katsumi",
                     contact: "(43) 99904-3894",
                     instagram: "https://www.instagram.com/suguimotofishing/",
                     facebook:"https://www.facebook.com/fabio.katsumisuguimoto/",
