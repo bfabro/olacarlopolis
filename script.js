@@ -3306,46 +3306,51 @@ ${
 ` : ""}
 
 
+
+
 ${establishment.contact || establishment.contact2 ? (() => {
-  // Função para formatar o número de telefone
   const formatPhone = (number) => {
     const rawNumber = (number || "").replace(/\D/g, "");
     const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
     return fullNumber;
   }
 
-  // Definindo o primeiro número e segundo número
   const firstNumber = formatPhone(establishment.whatsapp || establishment.contact || "");
   const secondNumber = establishment.contact2 ? formatPhone(establishment.contact2) : null;
 
-  // Gerando o HTML
   return `
     <div class="info-box">
-      <!-- WhatsApp Link for the first number -->
-      <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent(
-        "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-      )}" target="_blank">
-        <i class='bx bxl-whatsapp info-icon' style="color: #25D366;font-size:26px;"></i>
-      </a>
       <div>
         <div class="info-label">Contato</div>
-        <div class="info-value">${establishment.contact}</div>
-      </div>
-      ${secondNumber ? `
-        <!-- WhatsApp Link for the second number -->
-        <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent(
-          "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-        )}" target="_blank">
-          <i class='bx bxl-whatsapp info-icon' style="color: #25D366;font-size:26px;"></i>
-        </a>
-        <div>
-          <div class="info-label">Contato Secundário</div>
-          <div class="info-value">${establishment.contact2}</div>
+        <div class="info-value">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent(
+              "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
+            )}" target="_blank">
+              <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+            </a>
+            <span>${establishment.contact}</span>
+          </div>
+          ${
+            secondNumber
+              ? `<div style="display: flex; align-items: center; gap: 8px;">
+                  <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent(
+                    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
+                  )}" target="_blank">
+                    <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+                  </a>
+                  <span>${establishment.contact2}</span>
+                </div>`
+              : ""
+          }
         </div>
-      ` : ""}
+      </div>
     </div>
   `;
 })() : ""}
+
+
+
 
 
 
