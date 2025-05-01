@@ -234,6 +234,7 @@ clínicaveterináriacarlópolis:"s",
       ocasarao: "s", // Casarao pagou      
       ione:"s",
       cantinhodapraça:"s",
+      caldodecanaamaral:"s",
       kidog:"s",
       didog:"s",
       xisbauinea:"s",
@@ -366,13 +367,14 @@ clínicaveterináriacarlópolis:"s",
       //// INICIO INFORMAÇOES UTEIS
   //Eventos
   calendarioeventos: "s",
-  lixoeletronico: "s",
+
   triathlon: "s",
   pescar: "s",
   coletalixoeletronico: "s",
   feiradalua: "s",
   frutfest:"s",
 
+  etapalestevelocross:"s",
 
       ///
 
@@ -972,10 +974,49 @@ menuLinks.forEach((link) => {
                     title: "Lanchonetes",
                     establishments: [
 
+
+                      {
+                        image: "images/comercios/lanchonete/caldodecanaamaral/perfil.png",
+                        name: "Caldo de Cana Amaral",
+                        hours: "Dom a Dom - 13h as 19:30h",
+                        address: "Rua Benedito Salles, 2639, Carlópolis",
+                        contact: "(43) 99977-8839",
+                        delivery: "Sim / Com Taxa",
+                        infoAdicional:"<a style='color:#2da6ff;' href='https://www.youtube.com/watch?v=LkTSbakmFrE'>Conheça nossas especiarias!</a>",
+                
+                      
+                        instagram:"https://www.instagram.com/caldodecanaamaral/" ,
+                        facebook:"https://www.facebook.com/CaldodecanaAmaral",                       
+                        menuImages: [                   
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/1.jpg",
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/2.jpg",
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/3.jpg",
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/4.jpg",
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/5.jpg",
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/6.jpg",
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/7.jpg",
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/8.jpg",
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/9.jpg",
+                            "images/comercios/lanchonete/caldodecanaamaral/cardapio/10.jpg",
+                           
+                        ],     
+                        novidadesImages: [
+                        
+                          "images/comercios/lanchonete/caldodecanaamaral/divulgacao/1.png",
+                          "images/comercios/lanchonete/caldodecanaamaral/divulgacao/2.png",
+                          "images/comercios/lanchonete/caldodecanaamaral/divulgacao/3.png",
+                          "images/comercios/lanchonete/caldodecanaamaral/divulgacao/4.png",
+                          "images/comercios/lanchonete/caldodecanaamaral/divulgacao/5.png",
+                        
+                      ],               
+                    },
+
+
+
                       {
                         image: "images/comercios/lanchonete/cantinhoPraca/perfil.png",
                         name: "Cantinho da Praça",
-                        hours: "Ter - Dom - 18h - 23:30h",
+                        hours: "Ter a Dom - 18h - 23:30h",
                         address: "R. Padre Hugo, 478 , Carlópolis",
                         contact: "(43) 99604-9187",
                         delivery: "Sim / Com Taxa",                        
@@ -2042,14 +2083,7 @@ menuLinks.forEach((link) => {
 
             
 
-            {
-              image: "images/informacoes/eventos/evento_3/lixoEletronico.png",
-              name: "Coleta Lixo Eletronico",
-              date: "05/03/25 a 20/04/2025",
-              address: "Paroquia Senhor Bom Jesus",
-              contact: "",
-             
-          },
+         
               {
                 image: "images/informacoes/eventos/evento_4/pescar.png",
                 name: "Pescar",
@@ -2060,6 +2094,19 @@ menuLinks.forEach((link) => {
                 instagram:"https://www.instagram.com/p/DJAoxh4gRPS/",
                
             },
+
+
+            {
+              image: "images/informacoes/eventos/evento_6/velocross.png",
+              name: "Etapa Leste VeloCross",
+              date: "24/05/25 a 25/05/2025",
+              address: "Centro de Eventos Ilha do Ponciano",
+              contact: "(43) 99636-2971",
+              
+            
+             
+          },
+            
                   
 
               {
