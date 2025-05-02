@@ -679,10 +679,14 @@ menuLinks.forEach((link) => {
                             site:"#",
                             infoAdicional:"Espetinhos de Quinta a Sabado",
                             novidadesImages: [            
-                            "images/comercios/acai/turminhaAcai/novidades/1.png",                                            
+                            "images/comercios/acai/turminhaAcai/novidades/1.png", 
+                            "images/comercios/acai/turminhaAcai/novidades/2.png",
+                            "images/comercios/acai/turminhaAcai/novidades/3.png",                                           
                             ],
                             novidadesDescriptions: [                            
                             "Marmita de Açai! Voce só encontra aqui!",
+                            "2",
+                            "3",
                           ],
                             menuImages: [                    
                                 "images/comercios/acai/turminhaAcai/cardapio/1.png",
@@ -2112,9 +2116,10 @@ menuLinks.forEach((link) => {
               {
                   image: "images/informacoes/eventos/evento_5/frutFest.png",
                   name: "FrutFest",
-                  date: "04/07/25",
+                  date: "04/09/25",
                   address: "Ilha do Ponciano",
                   contact: "(43) 99825-0570",
+                  infoAdicional:"https://www.instagram.com/frutfestoficial/",
                 
               },
 
