@@ -307,6 +307,9 @@
 					document.getElementById("filtroSemana").classList.remove("hidden");
 				  }
 				});
+				
+				let valoresAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresCliques") || "{}");
+
 
 				document.getElementById("btnBuscar").addEventListener("click", async () => {
 				  const tipo = tipoRelatorioEl.value;
@@ -365,15 +368,36 @@
 
 				  const tabela = document.getElementById("tabelaResultados");
 				  tabela.innerHTML = "";
-				  Object.entries(resultados)
-					.sort((a, b) => b[1] - a[1])
-					.forEach(([nome, total]) => {
-					  const nomeFormatado = nome.startsWith("menu") ? nome.replace("menu", "") : nome;
-					  const row = document.createElement("tr");
-					  row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
-					  tabela.appendChild(row);
-					});
-					
+				  
+				  
+				// Criar uma cópia dos valores anteriores para comparar
+const anteriores = { ...valoresAnteriores };
+
+// Limpar o objeto atual antes de atualizar
+valoresAnteriores = {};
+
+Object.entries(resultados)
+  .sort((a, b) => b[1] - a[1])
+  .forEach(([nome, total]) => {
+    const nomeFormatado = nome.startsWith("menu") ? nome.replace("menu", "") : nome;
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
+
+    // Comparar com os dados antigos, e destacar se houve mudança
+    if (anteriores[nomeFormatado] !== undefined && anteriores[nomeFormatado] !== total) {
+      row.style.color  = "yellow";
+    }
+
+    // Preencher o novo objeto que será salvo
+    valoresAnteriores[nomeFormatado] = total;
+    tabela.appendChild(row);
+  });
+
+// Agora sim salva os novos dados após toda verificação
+localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriores));
+
+
+
 					// Mostrar data do relatório
 			document.getElementById("dataRelatorio").textContent = `Data do Relatório: ${diasFiltrados.join(", ")}`;
 
