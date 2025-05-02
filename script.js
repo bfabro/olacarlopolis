@@ -2359,8 +2359,9 @@ menuLinks.forEach((link) => {
                 image: "images/setorPublico/rodoviaria/rodoviaria.png",
                   name: "Rodoviaria",
                   address: "R. Kaliu keder, 0",
-                  contact: "Princesa: (43) 99926-6484",
-                  contact2:"Rodoviaria: (43) 3566-1393",
+                  contact: "Rodoviaria: (43) 3566-1393",
+                  contact2:"Guiche Princesa: (43) 99926-6484",
+                  contact3:"Pedro (43) 99641-0412",
                   hours: "Seg a Sex - 08:30 as 11:00, 13:30 as 16:00, 23:00 as 23:40<br>Sab: 08:30 as 11:00<br>Dom: 23:30 as 23:40",
                   infoAdicional:"<a target='_blank'  style='color:#2da6ff;' href='https://queropassagem.com.br/rodoviaria-de-carlopolis-pr?wpsrc=Google%20AdWords&wpcid=15361090317&wpsnetn=x&wpkwn=&wpkmatch=&wpcrid=&wpscid=&wpkwid=&gad_source=1&gad_campaignid=15361092411&gbraid=0AAAAADpKqgF9tpsAwMZNVxXOyQz1HO5FS&gclid=Cj0KCQjwt8zABhDKARIsAHXuD7bNWFyJzC0hKW5n8saZVgNqiBJbBtlcDLdxbyVAsun4w8d07isBGGIaAnL7EALw_wcB'>Compre sua Passagem</a>",
                 
@@ -3336,7 +3337,7 @@ ${
 
 
 
-${establishment.contact || establishment.contact2 ? (() => {
+${establishment.contact || establishment.contact2 || establishment.contact3 ? (() => {
   const formatPhone = (number) => {
     const rawNumber = (number || "").replace(/\D/g, "");
     const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
@@ -3345,8 +3346,9 @@ ${establishment.contact || establishment.contact2 ? (() => {
 
   const firstNumber = formatPhone(establishment.whatsapp || establishment.contact || "");
   const secondNumber = establishment.contact2 ? formatPhone(establishment.contact2) : null;
+const thirdNumber = establishment.contact3 ? formatPhone(establishment.contact3) : null;
 
-  return `
+ return `
     <div class="info-box">
       <div>
         <div class="info-label">Contato</div>
@@ -3359,15 +3361,29 @@ ${establishment.contact || establishment.contact2 ? (() => {
             </a>
             <span>${establishment.contact}</span>
           </div>
+
           ${
             secondNumber
-              ? `<div style="display: flex; align-items: center; gap: 8px;">
+              ? `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                   <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent(
                     "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
                   )}" target="_blank">
                     <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
                   </a>
                   <span>${establishment.contact2}</span>
+                </div>`
+              : ""
+          }
+
+          ${
+            thirdNumber
+              ? `<div style="display: flex; align-items: center; gap: 8px;">
+                  <a href="https://api.whatsapp.com/send?phone=${thirdNumber}&text=${encodeURIComponent(
+                    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
+                  )}" target="_blank">
+                    <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+                  </a>
+                  <span>${establishment.contact3}</span>
                 </div>`
               : ""
           }
