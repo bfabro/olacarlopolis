@@ -260,7 +260,7 @@ clínicaveterináriacarlópolis:"s",
       delfino:"s",
       portal:"s",
       neia:"s",
-      churrascoegastronomiapaiol: "s", // Paiol pagou
+      paiol: "s", // Paiol pagou
       restaurantedadi:"s",
       sabordaroça:"s",
       selahtgrill:"s",
@@ -367,7 +367,7 @@ clínicaveterináriacarlópolis:"s",
       //// INICIO INFORMAÇOES UTEIS
   //Eventos
   calendarioeventos: "s",
-
+      coletadelixo:"n",
   triathlon: "s",
   pescar: "s",
   coletalixoeletronico: "s",
@@ -986,7 +986,7 @@ menuLinks.forEach((link) => {
                         address: "Rua Benedito Salles, 2639, Carlópolis",
                         contact: "(43) 99977-8839",
                         delivery: "Sim / Com Taxa",
-                        infoAdicional:"<a style='color:#2da6ff;' href='https://www.youtube.com/watch?v=LkTSbakmFrE'>Conheça nossas especiarias!</a>",
+                        infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://www.youtube.com/watch?v=LkTSbakmFrE'>Conheça nossas especiarias!</a>",
                 
                       
                         instagram:"https://www.instagram.com/caldodecanaamaral/" ,
@@ -2116,11 +2116,12 @@ menuLinks.forEach((link) => {
               {
                   image: "images/informacoes/eventos/evento_5/frutFest.png",
                   name: "FrutFest",
-                  date: "04/09/25",
-                  address: "Ilha do Ponciano",
+                  date: "04/09/25 a 07/09/25",
+                  address: "Centro de Eventos Ilha do Ponciano",
                   contact: "(43) 99825-0570",
-                  infoAdicional:"https://www.instagram.com/frutfestoficial/",
-                
+                  instagram:"https://www.instagram.com/frutfestoficial/",
+                 
+                 
               },
 
 
@@ -2360,7 +2361,7 @@ menuLinks.forEach((link) => {
                   address: "R. Kaliu keder, 0",
                   contact: "(43) 99926-6484",
                   hours: "Seg a Sex - 08:30 as 11:00, 13:30 as 16:00, 23:00 as 23:40<br>Sab: 08:30 as 11:00<br>Dom: 23:30 as 23:40",
-                  infoAdicional:"<a style='color:#2da6ff;' href='https://queropassagem.com.br/rodoviaria-de-carlopolis-pr?wpsrc=Google%20AdWords&wpcid=15361090317&wpsnetn=x&wpkwn=&wpkmatch=&wpcrid=&wpscid=&wpkwid=&gad_source=1&gad_campaignid=15361092411&gbraid=0AAAAADpKqgF9tpsAwMZNVxXOyQz1HO5FS&gclid=Cj0KCQjwt8zABhDKARIsAHXuD7bNWFyJzC0hKW5n8saZVgNqiBJbBtlcDLdxbyVAsun4w8d07isBGGIaAnL7EALw_wcB'>Compre sua Passagem</a>",
+                  infoAdicional:"<a target='_blank'  style='color:#2da6ff;' href='https://queropassagem.com.br/rodoviaria-de-carlopolis-pr?wpsrc=Google%20AdWords&wpcid=15361090317&wpsnetn=x&wpkwn=&wpkmatch=&wpcrid=&wpscid=&wpkwid=&gad_source=1&gad_campaignid=15361092411&gbraid=0AAAAADpKqgF9tpsAwMZNVxXOyQz1HO5FS&gclid=Cj0KCQjwt8zABhDKARIsAHXuD7bNWFyJzC0hKW5n8saZVgNqiBJbBtlcDLdxbyVAsun4w8d07isBGGIaAnL7EALw_wcB'>Compre sua Passagem</a>",
                 
                   
               },
@@ -2578,20 +2579,7 @@ menuLinks.forEach((link) => {
 
 // FIM SETOR PUBLICO
 
-        {
-            link: document.querySelector("#menuVagasTrabalho"),    
-            title: "Vagas de Trabalho",
-            establishments: [
-                {
-                    name: "Moto Taxi Modesto",
-                    hours: "Seg a Dom: 7h - 20h",
-                    address: "R. Kelil Keder, 603",
-                    contact: "(43) 99137-5516",
-                    image: "images/informacoes/VagasTrabalho/modesto/modesto.png",
-                    infoVagaTrabalho:"Precisa-se de motoboy",
-                },
-            ],
-        },
+       
   
         {
             link: document.querySelector("#menuMotoCenter"),  
@@ -2860,7 +2848,7 @@ menuLinks.forEach((link) => {
               delivery: "Sim / Com Taxa",
               facebook: "https://www.facebook.com/SaleBrasaCarlopolis/?locale=pt_BR",
               instagram: "https://www.instagram.com/paiolpizzaburguer/",
-              infoAdicional:"<a style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'>Cardapio On Line</a>",
+              infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'  >Cardapio On Line</a>",
              
              
               novidadesImages: [                    
@@ -2947,7 +2935,7 @@ menuLinks.forEach((link) => {
                 delivery: "Sim / Com Taxa",
                 facebook:"https://www.facebook.com/selaht.gastronomia",
                 instagram:"https://www.instagram.com/selaht.gastronomia/",
-                infoAdicional:"<a style='color:#2da6ff;' href='https://eatfood.app/cardapio/58qt9yj5dqgt2timpqd7'>Cardapio On Line</a>",
+                infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://eatfood.app/cardapio/58qt9yj5dqgt2timpqd7'>Cardapio On Line</a>",
                 menuImages: [                   
                   "images/comercios/restaurante/selaht/cardapio/1.png",          
                          
@@ -3092,6 +3080,38 @@ menuLinks.forEach((link) => {
                 },
             ],
         },
+
+
+
+        {
+          link: document.querySelector("#menuColetaLixo"),    
+          title: "Coleta de Lixo",
+          establishments: [
+              {
+                  name: "Coleta de Lix",
+                  hours: "Seg a Dom: 7h - 20h",
+                  address: "R. Kelil Keder, 603",
+                  contact: "(43) 99137-5516",
+                  image: "images/informacoes/VagasTrabalho/modesto/modesto.png",
+                  infoVagaTrabalho:"Precisa-se de motoboy",
+              },
+          ],
+      },
+
+        {
+          link: document.querySelector("#menuVagasTrabalho"),    
+          title: "Vagas de Trabalho",
+          establishments: [
+              {
+                  name: "Moto Taxi Modesto",
+                  hours: "Seg a Dom: 7h - 20h",
+                  address: "R. Kelil Keder, 603",
+                  contact: "(43) 99137-5516",
+                  image: "images/informacoes/VagasTrabalho/modesto/modesto.png",
+                  infoVagaTrabalho:"Precisa-se de motoboy",
+              },
+          ],
+      },
     
       
         
