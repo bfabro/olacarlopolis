@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Relatório - Acessos</title>
+	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>																									  
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -383,10 +385,15 @@ Object.entries(resultados)
     const row = document.createElement("tr");
     row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
 
-    // Comparar com os dados antigos, e destacar se houve mudança
-    if (anteriores[nomeFormatado] !== undefined && anteriores[nomeFormatado] !== total) {
-      row.style.color  = "yellow";
-    }
+   if (anteriores[nomeFormatado] === undefined) {
+  // Item novo
+  row.style.color = "yellow"; // 
+} else if (anteriores[nomeFormatado] !== total) {
+  // Item existente com valor alterado
+  row.style.color = "yellow"; // 
+ 
+}
+
 
     // Preencher o novo objeto que será salvo
     valoresAnteriores[nomeFormatado] = total;
