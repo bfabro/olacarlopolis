@@ -286,6 +286,7 @@
 				  }
 				});
 	let valoresAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresCliques") || "{}");
+	let cidadesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresCidades") || "{}");
 
 				document.getElementById("btnBuscar").addEventListener("click", async () => {
 				  const tipo = tipoRelatorioEl.value;
@@ -347,6 +348,7 @@
 				// Criar uma cópia dos valores anteriores para comparar
 const anteriores = { ...valoresAnteriores };
 
+
 // Limpar o objeto atual antes de atualizar
 valoresAnteriores = {};
 
@@ -394,13 +396,33 @@ localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriore
 
 			const tabelaCidades = document.getElementById("tabelaCidades");
 			tabelaCidades.innerHTML = "";
-			Object.entries(cidadesContagem)
-			  .sort((a, b) => b[1] - a[1])
-			  .forEach(([cidade, total]) => {
-				const row = document.createElement("tr");
-				row.innerHTML = `<td>${cidade}</td><td style="text-align:center">${total}</td>`;
-				tabelaCidades.appendChild(row);
-			  });
+			
+			
+			const cidadesAnterioresTemp = { ...cidadesAnteriores };
+cidadesAnteriores = {}; // Resetar antes de salvar os novos dados
+
+Object.entries(cidadesContagem)
+  .sort((a, b) => b[1] - a[1])
+  .forEach(([cidade, total]) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${cidade}</td><td style="text-align:center">${total}</td>`;
+
+    if (cidadesAnterioresTemp[cidade] === undefined) {
+      // Nova cidade
+       row.style.color = "black";
+      row.style.backgroundColor = "yellow";
+    } else if (cidadesAnterioresTemp[cidade] !== total) {
+      // Cidade existente com valor alterado
+      row.style.color = "black";
+      row.style.backgroundColor = "yellow";
+    }
+
+    cidadesAnteriores[cidade] = total;
+    tabelaCidades.appendChild(row);
+  });
+
+localStorage.setItem("valoresAnterioresCidades", JSON.stringify(cidadesAnteriores));
+
 			  
 			  
 			  // Resumo por faixa de horário
