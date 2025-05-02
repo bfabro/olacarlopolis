@@ -258,6 +258,7 @@ clínicaveterináriacarlópolis:"s",
       cabanas:"s",
       cantinaitaliana:"s",
       delfino:"s",
+      pesqueirodogalego:"s",
       portal:"s",
       neia:"s",
       paiol: "s", // Paiol pagou
@@ -2840,6 +2841,41 @@ menuLinks.forEach((link) => {
             ],
       
           },
+
+
+
+          {
+            image: "images/comercios/restaurante/galego/perfil.png",
+            name: "Pesqueiro do Galego",
+            hours: "Qua a Sab: 11:00h - 22:00h<br>Dom: 11:00h - 16:00h ",
+            address: "Estr. Fazendinha, 158 - Carlópolis",
+            contact: "(43) 99619-1971",
+            delivery: "Sim / Com Taxa",
+            instagram:"https://www.instagram.com/pesqueirodogalego/?locale=ko-KR&hl=ar",
+            facebook:"https://www.facebook.com/pesqueirodogalegoclps/",
+            menuImages: [                   
+              "images/comercios/restaurante/galego/cardapio/1.png",
+               
+                     
+          ],
+            
+          novidadesImages: [                    
+              "images/comercios/restaurante/galego/divulgacao/1.png",                        
+             "images/comercios/restaurante/galego/divulgacao/2.png",
+             "images/comercios/restaurante/galego/divulgacao/3.png",
+             "images/comercios/restaurante/galego/divulgacao/4.png",
+             "images/comercios/restaurante/galego/divulgacao/5.png",
+             
+          ],
+          
+        },
+
+
+
+
+
+
+
 
             {
               image: "images/comercios/restaurante/paiol/paiol.png",
