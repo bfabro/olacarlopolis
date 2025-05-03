@@ -438,6 +438,7 @@ body.dark {
   /* Linha laranja embaixo para um detalhe extra */
   padding-bottom: 3px;
   display: inline-block;
+  margin:3px;
 }
 
 /* Aumenta o tamanho da fonte do horário de plantão */

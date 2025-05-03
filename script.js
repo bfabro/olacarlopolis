@@ -1167,7 +1167,7 @@ menuLinks.forEach((link) => {
                       {
                         image: "images/comercios/lanchonete/caldodecanaamaral/perfil.png",
                         name: "Caldo de Cana Amaral",
-                        hours: "Dom a Dom - 13h as 18:30h",
+                        hours: "Dom a Dom - 13:00h as 18:30h",
                         statusAberto:".",
                         horarios: {                          
                           seg: [{ inicio: "13:00", fim: "18:30" }],
@@ -1215,7 +1215,7 @@ menuLinks.forEach((link) => {
                       {
                         image: "images/comercios/lanchonete/cantinhoPraca/perfil.png",
                         name: "Cantinho da Praça",
-                        hours: "Ter a Dom - 18h - 23:30h",
+                        hours: "Ter a Dom - 18:00h as 23:30h",
                         statusAberto:".",
                         horarios: {
                           
@@ -1251,7 +1251,7 @@ menuLinks.forEach((link) => {
                     {
                       image: "images/comercios/lanchonete/didog/perfil.png",
                       name: "Di Dog",
-                      hours: "Ter - Dom - 18h - 23:30h",
+                      hours: "Ter a Dom - 18:00h as 23:30h",
                       statusAberto:".",
                       horarios: {
                         
@@ -1275,7 +1275,7 @@ menuLinks.forEach((link) => {
                     {
                       image: "images/comercios/lanchonete/kidog/perfil.png",
                       name: "Ki Dog",
-                      hours: "Ter - Dom - 18h - 23:30h",
+                      hours: "Ter a Dom - 18:00h as 23:30h",
                       statusAberto:".",
                       horarios: {
                         
@@ -1311,7 +1311,7 @@ menuLinks.forEach((link) => {
                   {
                     image: "images/comercios/lanchonete/mycoffe/perfil.png",
                     name: "My Coffe",
-                    hours: "Seg: Fechado<br>Ter a Qui - 13h - 20:00h <br>Sex: 13h a 18h<br>Sab: 13h a 20h<br>Dom: 13h a 19h",
+                    hours: "Seg: Fechado<br>Ter a Qui - 13:00h - 20:00h <br>Sex: 13:00h a 18:00h<br>Sab: 13:00h a 20:00h<br>Dom: 13:00h a 19:00h",
                     statusAberto:".",
                     horarios: {
                       
@@ -1346,7 +1346,7 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
                             name: "O Casarao",
-                            hours: "Ter - Dom - 18h - 00:30h",
+                            hours: "Ter a Dom - 18:00h as 00:30h",
                             statusAberto:".",
                             horarios: {
                               
@@ -1388,7 +1388,7 @@ menuLinks.forEach((link) => {
                         {
                           image: "images/comercios/lanchonete/ione/ione.png",
                           name: "Ione",
-                          hours: "Seg - Sab - 9:30h - 19:30h",
+                          hours: "Seg a Sab - 9:30h as 19:30h",
                           statusAberto:".",
                           horarios: {                            
                             seg: [{ inicio: "09:30", fim: "19:30" }],
@@ -1418,7 +1418,7 @@ menuLinks.forEach((link) => {
                       {
                         image: "images/comercios/lanchonete/xisBauinea/perfil.png",
                         name: "Xis Bauinea",
-                        hours: "Qui a Ter - 18h - 23h<br>Qua: Fechado",
+                        hours: "Qui a Ter - 18:00h as 23:00h<br>Qua: Fechado",
                         statusAberto:".",
                         horarios: {                            
                           seg: [{ inicio: "18:00", fim: "23:00" }],
@@ -1464,7 +1464,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/pizzaria/fornalha/fornalha.png",
                     name: "Fornalha Pizzaria",
-                    hours:"Quarta - Quinta: 18 - 23h </br> Sexta - Sabado: 18 - 00h </br> Domingo: 18 - 23h",
+                    hours:"Quarta a Quinta: 18:00 as 23:00h </br> Sexta - Sabado: 18:00 as 00:00h </br> Domingo: 18:00 as 23:00h",
                     address: "R. Benedito Salles, 837",
                     contact: "(43) 99632-1310",
                     delivery: "Sim / Com Taxa",
@@ -1485,7 +1485,7 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/pizzaria/tonnyPizzaria/perfil.png",
                   name: "Tonny Pizzaria",
-                  hours:"Seg a Ter: 18h - 23:30h <br> Qua: Fechado<br>Qui a Dom: 18h - 23:30h",
+                  hours:"Seg a Ter: 18:00h as 23:30h <br> Qua: Fechado<br>Qui a Dom: 18:00h as 23:30h",
                   address: "R. Paul Harris, 52 - Carlópolis",
                   contact: "(43) 99191-7686",
                   delivery: "Sim / Com Taxa",
@@ -1524,7 +1524,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/pesqueiro/aguamarine.jpg",
                     name: "Pesk e Pague Agua Marine",
-                    hours: "Sex a  - Dom: 09:30 - 18",
+                    hours: "Sex a Dom: 09:30h as 18:00h",
                     address: "Rod. Jose Alves Pereira",
                     contact: "(43) 98808-1911",
                     delivery: "Sim / Com Taxa",
@@ -1546,7 +1546,7 @@ menuLinks.forEach((link) => {
               {
                   image: "images/comercios/sorveteria/limone/limone.png",
                   name: "Limone",
-                  hours: "Seg - Sab: 13:00 - 23h<br>Dom: 14:00 a 00:00",
+                  hours: "Seg a Sab: 13:00 as 23:00h<br>Dom: 14:00 as 00:00",
                   address: "Rua Benedito Salles n° 619",
                   contact: "(43) 99922-8336",
                   contact2:"(43) 98863-3040",
@@ -1576,7 +1576,7 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/sorveteria/santino/santino.png",
                 name: "Santtino Gelateria",
-                hours: "Dom - Sex: 13:00 - 22h<br>Sab 13h - 23h",
+                hours: "Dom a Sex: 13:00 as 22h<br>Sab 13:00h - 23:00h",
                 address: "R. Kalil Keder, 583 - Centro",
                 contact: "(43) 99971-3535",
                 delivery: "Sim / Sem Taxa",
@@ -1606,7 +1606,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/padaria/bom jesus/bomjesus.png",
                     name: "Bom Jesus",
-                    hours: "Seg a Sab: 6h - 19h </br> Dom: 06 - 14h",
+                    hours: "Seg a Sab: 6:00h as 19:00h </br> Dom: 06:00 as 14:00h",
                     address: "R. Benedito Salles, 615",
                     contact: "43) 99653-9285",
                     delivery: "Sim / Com Taxa",
@@ -1626,7 +1626,7 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/padaria/prelie/prelie.png",
                   name: "Prelie",
-                  hours: "seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
+                  hours: "Seg a Sab: 5:30h as 19:00h </br> Dom: 5:30h as 12:00h",
                   address: "R. Benedito Salles, 1098",
                   contact: "(43) 99954-0863",
                   delivery: "Sim / Com Taxa",
@@ -1642,7 +1642,7 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/padaria/saoFrancisco/saoFrancisco.png",
                   name: "São Francisco",
-                  hours: "seg a Sab: 5:30h - 19h </br> Dom: 5:30h - 12h",
+                  hours: "Seg a Sab: 5:30h as 19:00h </br> Dom: 5:30h - 12:00h",
                   address: "R. Benedito Salles, 881",
                   contact: "(43) 98873-1488",
                   delivery: "Sim / Com Taxa",
@@ -1675,7 +1675,7 @@ menuLinks.forEach((link) => {
                 image: "images/comercios/supermercado/bomPreco/perfil.png",
                 name: "Bom Preço",
                 address: "R. Chuva de Ouro, 397 - Vista Alegre, Carlópolis",
-                hours: "Dom a Dom 8h - 19:30h",
+                hours: "Dom a Dom: 8:00h as 19:30h",
                 contact: "(43) 98821-4701",
                 delivery: "Sim / Sem Taxa",                
                 instagram: "https://www.instagram.com/bomprecocarlopolis/?locale=ne_NP&hl=ar",
@@ -1694,7 +1694,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/supermercado/carreiro.png",
                     name: "Carreiro",
                     address: "R. Benedito Salles, 341 ",
-                    hours: "Seg a Sex 8h - 19h </br> dom: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 19:00h </br> Dom: 0:00 as 12:00h",
                     contact: "(43) 3566-1520",
                     delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/p/Supermercado-Carreiro-100066342918723/?locale=pt_BR",
