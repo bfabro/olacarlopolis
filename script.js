@@ -3678,46 +3678,37 @@ function restaurarMenuOriginal() {
 
                 return `
                     <div class="info-box">
-                      <div>
-                        <div class="info-label">Contato</div>
-                        <div class="info-value">
-                          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                            <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent(
-                              "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-                            )}" target="_blank">
-                              <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-                            </a>
-                            <span>${establishment.contact}</span>
-                          </div>
+  <i class="fas fa-phone info-icon"></i>
+  <div>
+    <div class="info-label">Contato</div>
+    <div class="info-value">
+      ${establishment.contact ? `
+        <div style="display: flex; align-items: center;  margin-bottom: 4px;">
+          <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
+            <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+          </a>
+          <span>${establishment.contact}</span>
+        </div>` : ""}
 
-                          ${
-                            secondNumber
-                              ? `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                  <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent(
-                                    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-                                  )}" target="_blank">
-                                    <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-                                  </a>
-                                  <span>${establishment.contact2}</span>
-                                </div>`
-                              : ""
-                          }
+      ${secondNumber ? `
+        <div style="display: flex; align-items: center;  margin-bottom: 4px;">
+          <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
+            <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+          </a>
+          <span>${establishment.contact2}</span>
+        </div>` : ""}
 
-                          ${
-                            thirdNumber
-                              ? `<div style="display: flex; align-items: center; gap: 8px;">
-                                  <a href="https://api.whatsapp.com/send?phone=${thirdNumber}&text=${encodeURIComponent(
-                                    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-                                  )}" target="_blank">
-                                    <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-                                  </a>
-                                  <span>${establishment.contact3}</span>
-                                </div>`
-                              : ""
-                          }
-                        </div>
-                      </div>
-                    </div>
+      ${thirdNumber ? `
+        <div style="display: flex; align-items: center; ">
+          <a href="https://api.whatsapp.com/send?phone=${thirdNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
+            <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+          </a>
+          <span>${establishment.contact3}</span>
+        </div>` : ""}
+    </div>
+  </div>
+</div>
+
                   `;
                 })() : ""}
 
