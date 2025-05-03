@@ -1644,22 +1644,21 @@ img {
 
 
 
-
 .status-tag {
   padding: 2px 8px;
   border-radius: 12px;
   font-weight: bold;
   font-size: 13px;
   color: white;
-  letter-spacing: 0.8px; /* 👈 espaçamento entre letras */
+  letter-spacing: 0.8px;
 }
 
 .status-tag.aberto {
-  background-color: #2e7d32; /* verde */
+  background-color: #2e7d32;
 }
 
 .status-tag.fechado {
-  background-color: #c62828; /* vermelho */
+  background-color: #c62828;
 }
 
 .proximo-horario {
@@ -1667,4 +1666,26 @@ img {
   color: #555;
   font-style: italic;
 }
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+  color: white;
+}
 
+.status-tag.aberto {
+  background-color: #2e7d32;
+}
+
+.status-tag.fechado {
+  background-color: #c62828;
+}
+
+.status-tag .fa-circle {
+  font-size: 10px;
+}

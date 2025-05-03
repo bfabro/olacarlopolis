@@ -65,7 +65,28 @@ document.addEventListener("DOMContentLoaded", function () {
   
   
 
-
+  function horarioFechamentoAtual(horarios) {
+    const agora = new Date();
+    const horaAtual = agora.getHours() + agora.getMinutes() / 60;
+  
+    const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
+    const hoje = dias[agora.getDay()];
+    const faixas = horarios[hoje] || [];
+  
+    for (const faixa of faixas) {
+      const [hInicio, mInicio] = faixa.inicio.split(":").map(Number);
+      const [hFim, mFim] = faixa.fim.split(":").map(Number);
+      const inicio = hInicio + (mInicio || 0) / 60;
+      const fim = hFim + (mFim || 0) / 60;
+  
+      if (horaAtual >= inicio && horaAtual < fim) {
+        return `${String(hFim).padStart(2, '0')}:${String(mFim || 0).padStart(2, '0')}`;
+      }
+    }
+  
+    return null;
+  }
+  
 
 
 
@@ -720,6 +741,16 @@ menuLinks.forEach((link) => {
                         
                 name: "Lobo Fitness",
                 hours: "Seg a Qui: 06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
+                statusAberto:".",
+                horarios: {
+                  dom: [], // fechado
+                  seg: [{ inicio: "06:00", fim: "13:00" },{ inicio: "15:00", fim: "21:00" }],
+                  ter: [{ inicio: "06:00", fim: "13:00" },{ inicio: "15:00", fim: "21:00" }],
+                  qua: [{ inicio: "06:00", fim: "13:00" },{ inicio: "15:00", fim: "21:00" }],
+                  qui: [{ inicio: "06:00", fim: "13:00" },{ inicio: "15:00", fim: "21:00" }],
+                  sex: [{ inicio: "06:00", fim: "13:00" },{ inicio: "15:00", fim: "20:30" }],
+                  sab: [{ inicio: "15:00", fim: "18:00" }]
+                },
                 address: "R. Delfino Mendes, 264 - Centro",
                 contact: "(43) 99112-1009",                          
                 facebook: "#",
@@ -742,9 +773,9 @@ menuLinks.forEach((link) => {
                     establishments: [
                         {
                             image: "images/comercios/acai/turminhaAcai/turminhaAcai.png",
-                            name: "Turminha do Açai",
-                            
+                            name: "Turminha do Açai",                            
                             hours: "Qua a Seg: 14h - 23h <br> Ter: Fechado",
+                            statusAberto:".",
                             horarios: {
                               dom: [{ inicio: "14:00", fim: "23:00" }],
                               seg: [{ inicio: "14:00", fim: "23:00" }],
@@ -791,6 +822,7 @@ menuLinks.forEach((link) => {
                             image: "images/comercios/acougue/curitiba/curitiba.png",
                             name: "Açougue Curitiba",
                             hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                            statusAberto:"a",
                             horarios: {
                               dom: [{ inicio: "08:00", fim: "18:00" }],
                               seg: [{ inicio: "08:00", fim: "18:00" }],
@@ -823,6 +855,17 @@ menuLinks.forEach((link) => {
                             name: "Adega Cuenca",
                             hours:
                             "seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
+                            statusAberto:".",
+                            horarios: {
+                              
+                              seg: [{ inicio: "09:00", fim: "19:30" }],
+                              ter: [{ inicio: "09:00", fim: "22:00" }],
+                              qua: [{ inicio: "09:00", fim: "22:00" }],
+                              qui: [{ inicio: "09:00", fim: "23:50" }],
+                              sex: [{ inicio: "09:00", fim: "23:50" }],
+                              sab: [{ inicio: "09:00", fim: "23:50" }],
+                              dom: [{ inicio: "09:00", fim: "22:00" }],
+                            },
                             address: "R. Kalil Keder, 752",
                             contact: "(43) 99800-1680",
                             delivery: "Sim / Sem Taxa",
@@ -846,7 +889,18 @@ menuLinks.forEach((link) => {
                         {
                           image: "images/comercios/adega/assao/assao.png",
                           name: "Assao",
-                          hours:"seg 09:00h - 22h ",
+                          hours:"Dom a Dom - 09:00h as 22h ",
+                          statusAberto:"a",
+                            horarios: {
+                              
+                              seg: [{ inicio: "09:00", fim: "22:00" }],
+                              ter: [{ inicio: "09:00", fim: "22:00" }],
+                              qua: [{ inicio: "09:00", fim: "22:00" }],
+                              qui: [{ inicio: "09:00", fim: "22:00" }],
+                              sex: [{ inicio: "09:00", fim: "22:00" }],
+                              sab: [{ inicio: "09:00", fim: "22:00" }],
+                              dom: [{ inicio: "09:00", fim: "22:00" }]
+                            },
                           address: "R. Benedito Sales, 1551",
                           contact: "-",                          
                           instagram: "https://www.instagram.com/casadecarneassao/",                     
@@ -878,6 +932,17 @@ menuLinks.forEach((link) => {
                       image: "images/comercios/agenciaViagem/cvc/cvc.png",
                         name: "CVC Carlopolis",
                         hours: "Seg a Sab: 11h - 22h",
+                        statusAberto:"a",
+                            horarios: {
+                              
+                              seg: [{ inicio: "11:00", fim: "22:00" }],
+                              ter: [{ inicio: "11:00", fim: "22:00" }],
+                              qua: [{ inicio: "11:00", fim: "22:00" }],
+                              qui: [{ inicio: "11:00", fim: "22:00" }],
+                              sex: [{ inicio: "11:00", fim: "22:00" }],
+                              sab: [{ inicio: "11:00", fim: "22:00" }],
+                              dom: []
+                            },
                         address: "Rua Padre Hugo, 450, Sala 10",
                         contact: "(43) 99177-2244",
                         instagram:"https://www.instagram.com/cvc.pr.carlopolis/",
@@ -1075,6 +1140,17 @@ menuLinks.forEach((link) => {
                         image: "images/comercios/lanchonete/caldodecanaamaral/perfil.png",
                         name: "Caldo de Cana Amaral",
                         hours: "Dom a Dom - 13h as 18:30h",
+                        statusAberto:".",
+                        horarios: {
+                          
+                          seg: [{ inicio: "13:00", fim: "18:30" }],
+                          ter: [{ inicio: "13:00", fim: "18:30" }],
+                          qua: [{ inicio: "13:00", fim: "18:30" }],
+                          qui: [{ inicio: "13:00", fim: "18:30" }],
+                          sex: [{ inicio: "13:00", fim: "18:30" }],
+                          sab: [{ inicio: "13:00", fim: "18:30" }],
+                          dom: [{ inicio: "13:00", fim: "18:30" }]
+                        },
                         address: "Rua Benedito Salles, 2639, Carlópolis",
                         contact: "(43) 99977-8839",
                         delivery: "Sim / Com Taxa",
@@ -1113,6 +1189,17 @@ menuLinks.forEach((link) => {
                         image: "images/comercios/lanchonete/cantinhoPraca/perfil.png",
                         name: "Cantinho da Praça",
                         hours: "Ter a Dom - 18h - 23:30h",
+                        statusAberto:".",
+                        horarios: {
+                          
+                          seg: [],
+                          ter: [{ inicio: "18:00", fim: "23:30" }],
+                          qua: [{ inicio: "18:00", fim: "23:30" }],
+                          qui: [{ inicio: "18:00", fim: "23:30" }],
+                          sex: [{ inicio: "18:00", fim: "23:30" }],
+                          sab: [{ inicio: "18:00", fim: "23:30" }],
+                          dom: [{ inicio: "18:00", fim: "23:30" }]
+                        },
                         address: "R. Padre Hugo, 478 , Carlópolis",
                         contact: "(43) 99604-9187",
                         delivery: "Sim / Com Taxa",                        
@@ -1138,6 +1225,17 @@ menuLinks.forEach((link) => {
                       image: "images/comercios/lanchonete/didog/perfil.png",
                       name: "Di Dog",
                       hours: "Ter - Dom - 18h - 23:30h",
+                      statusAberto:".",
+                      horarios: {
+                        
+                        seg: [],
+                        ter: [{ inicio: "18:00", fim: "23:30" }],
+                        qua: [{ inicio: "18:00", fim: "23:30" }],
+                        qui: [{ inicio: "18:00", fim: "23:30" }],
+                        sex: [{ inicio: "18:00", fim: "23:30" }],
+                        sab: [{ inicio: "18:00", fim: "23:30" }],
+                        dom: [{ inicio: "18:00", fim: "23:30" }]
+                      },
                       address: "R. Benedito Salles, 350, Carlopolis",
                       contact: "(43) 99161-8381",
                       delivery: "Sim / Com Taxa",   
@@ -1151,6 +1249,17 @@ menuLinks.forEach((link) => {
                       image: "images/comercios/lanchonete/kidog/perfil.png",
                       name: "Ki Dog",
                       hours: "Ter - Dom - 18h - 23:30h",
+                      statusAberto:".",
+                      horarios: {
+                        
+                        seg: [],
+                        ter: [{ inicio: "18:00", fim: "23:30" }],
+                        qua: [{ inicio: "18:00", fim: "23:30" }],
+                        qui: [{ inicio: "18:00", fim: "23:30" }],
+                        sex: [{ inicio: "18:00", fim: "23:30" }],
+                        sab: [{ inicio: "18:00", fim: "23:30" }],
+                        dom: [{ inicio: "18:00", fim: "23:30" }]
+                      },
                       address: "R. Padre Hugo, 478 , Carlópolis",
                       contact: "(43) 99604-9187",
                       delivery: "Sim / Com Taxa",   
@@ -1176,6 +1285,17 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/lanchonete/mycoffe/perfil.png",
                     name: "My Coffe",
                     hours: "Seg: Fechado<br>Ter a Qui - 13h - 20:00h <br>Sex: 13h a 18h<br>Sab: 13h a 20h<br>Dom: 13h a 19h",
+                    statusAberto:".",
+                    horarios: {
+                      
+                      seg: [],
+                      ter: [{ inicio: "13:00", fim: "20:00" }],
+                      qua: [{ inicio: "13:00", fim: "20:00" }],
+                      qui: [{ inicio: "13:00", fim: "20:00" }],
+                      sex: [{ inicio: "13:00", fim: "18:00" }],
+                      sab: [{ inicio: "13:00", fim: "20:00" }],
+                      dom: [{ inicio: "13:00", fim: "19:00" }]
+                    },
                     address: "R. Benedito Salles, 1205 - Centro",
                     contact: "(43) 99126-5705",
                     delivery: "Não",   
@@ -1196,22 +1316,21 @@ menuLinks.forEach((link) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
                         {
                             image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
                             name: "O Casarao",
                             hours: "Ter - Dom - 18h - 00:30h",
+                            statusAberto:".",
+                            horarios: {
+                              
+                              seg: [],
+                              ter: [{ inicio: "18:00", fim: "00:30" }],
+                              qua: [{ inicio: "18:00", fim: "00:30" }],
+                              qui: [{ inicio: "18:00", fim: "00:30" }],
+                              sex: [{ inicio: "18:00", fim: "00:30" }],
+                              sab: [{ inicio: "18:00", fim: "00:30" }],
+                              dom: [{ inicio: "18:00", fim: "00:30" }]
+                            },
                             address: "R. Benedito Salles, 1340",
                             contact: "(43) 99693-0565",
                             delivery: "Sim / Com Taxa",
@@ -1243,6 +1362,16 @@ menuLinks.forEach((link) => {
                           image: "images/comercios/lanchonete/ione/ione.png",
                           name: "Ione",
                           hours: "Seg - Sab - 9:30h - 19:30h",
+                          statusAberto:".",
+                          horarios: {                            
+                            seg: [{ inicio: "09:30", fim: "19:30" }],
+                            ter: [{ inicio: "09:30", fim: "19:30" }],
+                            qua: [{ inicio: "18:00", fim: "00:30" }],
+                            qui: [{ inicio: "18:00", fim: "00:30" }],
+                            sex: [{ inicio: "18:00", fim: "00:30" }],
+                            sab: [{ inicio: "18:00", fim: "00:30" }],
+                            dom: []
+                          },
                           address: "R. Benedito Salles, 1233",
                           contact: "(43) 99180-4287",
                           delivery: "Sim / Com Taxa",
@@ -1263,6 +1392,16 @@ menuLinks.forEach((link) => {
                         image: "images/comercios/lanchonete/xisBauinea/perfil.png",
                         name: "Xis Bauinea",
                         hours: "Qui a Ter - 18h - 23h<br>Qua: Fechado",
+                        statusAberto:".",
+                        horarios: {                            
+                          seg: [{ inicio: "18:00", fim: "23:00" }],
+                          ter: [{ inicio: "18:00", fim: "23:00" }],
+                          qua: [],
+                          qui: [{ inicio: "18:00", fim: "23:00" }],
+                          sex: [{ inicio: "18:00", fim: "23:00" }],
+                          sab: [{ inicio: "18:00", fim: "23:00" }],
+                          dom: [{ inicio: "18:00", fim: "23:00" }]
+                        },
                         address: "R. Benedito Salles, 1188, Carlópolis",
                         contact: "(43) 99957-6197",
                         delivery: "Sim / Com Taxa",   
@@ -3422,10 +3561,11 @@ function restaurarMenuOriginal() {
         if (establishment.horarios) {
           const aberto = estaAbertoAgora(establishment.horarios);
           if (aberto) {
-            statusAberto = "<span class='status-tag aberto'>Aberto Agora</span>";
+            const fechamento = horarioFechamentoAtual(establishment.horarios);
+            statusAberto = `<span class='status-tag aberto'>Aberto até ${fechamento}</span>`;
           } else {
             const proximo = proximoHorarioDeAbertura(establishment.horarios);
-            statusAberto = `<span class='status-tag fechado'>Fechado </span> <span class='proximo-horario'>• Abre ${proximo}</span>`;
+            statusAberto = `<span class='status-tag fechado'>Fechado</span><span class='proximo-horario'>Abre ${proximo}</span>`;
           }
         }
 
@@ -3486,7 +3626,15 @@ function restaurarMenuOriginal() {
                     </div>` : ""
                   }
 
-
+                  ${establishment.statusAberto ? `
+                    <div class="info-box">
+                      
+                      <div>
+                        <div class="info-label"> ${statusAberto}</div>
+                        
+                      </div>
+                    </div>` : ""
+                  }
 
 
 
@@ -3495,7 +3643,7 @@ function restaurarMenuOriginal() {
                     <div class="info-box">
                       <i class="fas fa-clock info-icon"></i>
                       <div>
-                        <div class="info-label">Funcionamento: ${statusAberto}</div>
+                        <div class="info-label">Funcionamento: </div>
                         <div class="info-value">${establishment.hours}</div>
                       </div>
                     </div>` : ""
@@ -3706,6 +3854,13 @@ function restaurarMenuOriginal() {
                       const wrapper = document.createElement("div");
                     
                       const infos = [
+
+                        {
+                          icon: "fa-clock",
+                          label: "Status",
+                          valor: statusAberto,
+                        },
+
                         {
                           icon: "fa-clock",
                           label: "Horário",
