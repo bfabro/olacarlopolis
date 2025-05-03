@@ -3,31 +3,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
-
-
   function estaAbertoAgora(horarios) {
     const agora = new Date();
     const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
     const hoje = dias[agora.getDay()];
-    const horaAtual = agora.getHours();
-    const minutoAtual = agora.getMinutes();
+    const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
   
-    const faixas = horarios[hoje] || [];
-    for (const faixa of faixas) {
-      const [hIni, mIni] = faixa.inicio.split(":").map(Number);
-      const [hFim, mFim] = faixa.fim.split(":").map(Number);
+    const turnosHoje = horarios[hoje] || [];
   
-      const minutosAtual = horaAtual * 60 + minutoAtual;
-      const minutosIni = hIni * 60 + mIni;
-      const minutosFim = hFim * 60 + mFim;
+    for (const turno of turnosHoje) {
+      if (!turno || !turno.inicio || !turno.fim) continue;
   
-      if (minutosAtual >= minutosIni && minutosAtual <= minutosFim) {
+      const [hInicio, mInicio] = turno.inicio.split(":").map(Number);
+      const [hFim, mFim] = turno.fim.split(":").map(Number);
+  
+      if (isNaN(hInicio) || isNaN(mInicio) || isNaN(hFim) || isNaN(mFim)) continue;
+  
+      const inicioMinutos = hInicio * 60 + mInicio;
+      let fimMinutos = hFim * 60 + mFim;
+  
+      // Caso o horário cruze a meia-noite
+      if (fimMinutos <= inicioMinutos) fimMinutos += 1440;
+  
+      let horaComparada = horaAtualMinutos;
+      if (horaAtualMinutos < inicioMinutos) horaComparada += 1440;
+  
+      if (horaComparada >= inicioMinutos && horaComparada <= fimMinutos) {
         return true;
       }
     }
+  
     return false;
   }
+  
+  
+  
+
+
+
+
+  
   
 
   function proximoHorarioDeAbertura(horarios) {
@@ -63,29 +78,42 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   
   
-  
-
   function horarioFechamentoAtual(horarios) {
-    const agora = new Date();
-    const horaAtual = agora.getHours() + agora.getMinutes() / 60;
+    if (!horarios || typeof horarios !== "object") return null;
   
+    const agora = new Date();
     const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
     const hoje = dias[agora.getDay()];
-    const faixas = horarios[hoje] || [];
+    const turnosHoje = horarios[hoje] || [];
   
-    for (const faixa of faixas) {
-      const [hInicio, mInicio] = faixa.inicio.split(":").map(Number);
-      const [hFim, mFim] = faixa.fim.split(":").map(Number);
-      const inicio = hInicio + (mInicio || 0) / 60;
-      const fim = hFim + (mFim || 0) / 60;
+    const horaAgoraMinutos = agora.getHours() * 60 + agora.getMinutes();
   
-      if (horaAtual >= inicio && horaAtual < fim) {
-        return `${String(hFim).padStart(2, '0')}:${String(mFim || 0).padStart(2, '0')}`;
+    for (const turno of turnosHoje) {
+      if (!turno || !turno.inicio || !turno.fim) continue;
+  
+      const [hInicio, mInicio] = turno.inicio.split(":").map(Number);
+      const [hFim, mFim] = turno.fim.split(":").map(Number);
+  
+      if (isNaN(hInicio) || isNaN(mInicio) || isNaN(hFim) || isNaN(mFim)) continue;
+  
+      const inicioMinutos = hInicio * 60 + mInicio;
+      let fimMinutos = hFim * 60 + mFim;
+      let horaComparada = horaAgoraMinutos;
+  
+      // Caso o horário vá além da meia-noite
+      if (fimMinutos <= inicioMinutos) {
+        fimMinutos += 1440;
+        if (horaComparada < inicioMinutos) horaComparada += 1440;
+      }
+  
+      if (horaComparada >= inicioMinutos && horaComparada <= fimMinutos) {
+        return turno.fim;
       }
     }
   
     return null;
   }
+  
   
 
 
