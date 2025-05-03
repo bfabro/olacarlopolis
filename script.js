@@ -1464,7 +1464,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/pizzaria/fornalha/fornalha.png",
                     name: "Fornalha Pizzaria",
-                    hours:"Qua a Qui: 18:00h as 23:00h </br>Sexta a Sabado: 18:00h as 00:00h </br> Domingo: 18:00 as 23:00h",
+                    hours:"Qua a Qui: 18:00h as 23:00h </br>Sex a Sab: 18:00h as 00:00h </br> Dom: 18:00 as 23:00h",
                     address: "R. Benedito Salles, 837",
                     contact: "(43) 99632-1310",
                     delivery: "Sim / Com Taxa",
