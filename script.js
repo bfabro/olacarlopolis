@@ -768,7 +768,7 @@ menuLinks.forEach((link) => {
                 image: "images/comercios/academia/lobofitness/lobofitness.png",
                         
                 name: "Lobo Fitness",
-                hours: "Seg a Qui: 06h a 13h - 15h a 21h <br> Sex: 06h a 13h - 15h a 20:30h<br> Sab: 15h - 18h <br>Dom: Fechado ",
+                hours: "Seg a Qui: 06:00h as 13:00h - 15:00h as 21:00h <br> Sex: 06:00h as 13:00h - 15:00h as 20:30h<br> Sab: 15:00h as 18:00h <br>Dom: Fechado ",
                 statusAberto:".",
                 horarios: {
                   dom: [], // fechado
@@ -802,7 +802,7 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/acai/turminhaAcai/turminhaAcai.png",
                             name: "Turminha do Açai",                            
-                            hours: "Qua a Seg: 14h - 23h <br> Ter: Fechado",
+                            hours: "Qua a Seg: 14:00h as 23:00h <br> Ter: Fechado",
                             statusAberto:".",
                             horarios: {
                               dom: [{ inicio: "14:00", fim: "23:00" }],
@@ -849,7 +849,7 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/acougue/curitiba/curitiba.png",
                             name: "Açougue Curitiba",
-                            hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                            hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00 as 12:00h",
                             statusAberto:"a",
                             horarios: {
                               dom: [{ inicio: "08:00", fim: "18:00" }],
@@ -882,7 +882,7 @@ menuLinks.forEach((link) => {
                             image: "images/comercios/adega/cuenca/adega_cuenca.jpg",
                             name: "Adega Cuenca",
                             hours:
-                            "seg 09:00h - 19:30h </br> ter e qua 09:00 - 22:00h </br> qui a sab 09:00 - 23:50 </br> dom 09:00 - 22:00h",
+                            "Seg 09:00h as 19:30h </br> Ter e Qua 09:00h as 22:00h </br> Qui a Sab 09:00h as 23:50h </br> Dom 09:00h as 22:00h",
                             statusAberto:".",
                             horarios: {
                               
@@ -917,7 +917,7 @@ menuLinks.forEach((link) => {
                         {
                           image: "images/comercios/adega/assao/assao.png",
                           name: "Assao",
-                          hours:"Dom a Dom - 09:00h as 22h ",
+                          hours:"Dom a Dom - 09:00h as 22:00h ",
                           statusAberto:"a",
                             horarios: {
                               
@@ -959,7 +959,7 @@ menuLinks.forEach((link) => {
                     {
                       image: "images/comercios/agenciaViagem/cvc/cvc.png",
                         name: "CVC Carlopolis",
-                        hours: "Seg a Sab: 11h - 22h",
+                        hours: "Seg a Sab: 11:00h as 22:00h",
                         statusAberto:"a",
                             horarios: {
                               
@@ -990,7 +990,7 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/agropecuaria/agroVida/agrovida.png",
                             name: "Agro Vida",
-                            hours: "Seg a Sex: 8h - 18h </br> Sab: 08H - 16h",
+                            hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 16:00h",
                             address: "rua benedito salles 309",
                             contact: "(43) 99158-9047",
                             delivery: "Sim / Sem Taxa",
@@ -1020,7 +1020,7 @@ menuLinks.forEach((link) => {
                       {
                           image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
                           name: "Oficina do Celular",
-                          hours: "Seg a Sex: 8h - 18:00h<br> Sab: 08:00-17:00",
+                          hours: "Seg a Sex: 8:00h as 18:00h<br> Sab: 08:00h as 17:00h",
                           address: "Rua Dr Paula e Silva 676",
                           contact: "(43) 3566-1600",
                           facebook: "https://www.facebook.com/oficinadocelularclps/",
@@ -1049,7 +1049,7 @@ menuLinks.forEach((link) => {
                           image: "images/comercios/autopecas/paulinho/perfil.png",
                                  
                           name: "Paulinho auto peças",
-                          hours: "Seg a Sex - 07:00 - 18:00<br> Sab: 07:00 a 12:00",
+                          hours: "Seg a Sex: 07:00h as 18:00h<br> Sab: 07:00h as 12:00h",
                           address: "R. Paul Harris, 98 - Centro, Carlópolis",
                           contact: "(43) 3566-1306",                         
                           instagram: "https://www.instagram.com/autopecas_paulinho/",
@@ -1073,7 +1073,7 @@ menuLinks.forEach((link) => {
                     {
                         image: "images/comercios/clinicaVeterinaria/jurandir/perfil.png",
                         name: "Clínica Veterinária Carlópolis",
-                        hours: "Seg a Sex: 09:00 - 18h <br>Sab: 09:00 a 17:00<br>Dom: Fechado",
+                        hours: "Seg a Sex: 09:00h as 18:00h <br>Sab: 09:00h a 17:00h<br>Dom: Fechado",
                         address: "Rua Ataliba Leonel, 410, Carlópolis, PR,",
                         contact: "(43) 3566-1664",
                         contact2:"(43) 99642-1494",                      
@@ -1102,7 +1102,7 @@ menuLinks.forEach((link) => {
                     establishments: [
                         {
                             name: "Yellow Jeans",
-                            hours: "seg a sex: 9h - 11:30h, 13:00-17:00",
+                            hours: "Seg a Sex: 9:00h as 11:30h -  13:00h as 17:00h",
                             address: "Rua Maria Pereira da Rocha Aleixo, 435",
                             contact: "</br>(43) 998070671",
                         },
@@ -1117,7 +1117,7 @@ menuLinks.forEach((link) => {
                       {
                           image: "images/comercios/ferroVelho/reiDoFerro/reiDoFerro.png",
                           name: "Rei do Ferro",
-                          hours: "Seg a Sex - 08:00 - 18:00",
+                          hours: "Seg a Sex: 08:00h as 18:00h",
                           address: "Rodovia PR 218",
                           contact: "(43) 3566-2505",                         
                           instagram: "https://www.instagram.com/rei_do.ferro/",
@@ -1138,7 +1138,7 @@ menuLinks.forEach((link) => {
                         image: "images/comercios/feiraLua/perfil.png",
                                
                         name: "Feira da Lua",
-                        hours: "Sex - 19:00 - 23:30",
+                        hours: "Sex: 19:00h as 23:30h",
                         address: "Praça Igreja Matriz",
                         contact: "(43) 99965-2084",                         
                         instagram: "https://www.instagram.com/feiradaluacarlopolis/",
@@ -1167,7 +1167,7 @@ menuLinks.forEach((link) => {
                       {
                         image: "images/comercios/lanchonete/caldodecanaamaral/perfil.png",
                         name: "Caldo de Cana Amaral",
-                        hours: "Dom a Dom - 13:00h as 18:30h",
+                        hours: "Dom a Dom: 13:00h as 18:30h",
                         statusAberto:".",
                         horarios: {                          
                           seg: [{ inicio: "13:00", fim: "18:30" }],
@@ -1215,7 +1215,7 @@ menuLinks.forEach((link) => {
                       {
                         image: "images/comercios/lanchonete/cantinhoPraca/perfil.png",
                         name: "Cantinho da Praça",
-                        hours: "Ter a Dom - 18:00h as 23:30h",
+                        hours: "Ter a Dom: 18:00h as 23:30h",
                         statusAberto:".",
                         horarios: {
                           
@@ -1251,7 +1251,7 @@ menuLinks.forEach((link) => {
                     {
                       image: "images/comercios/lanchonete/didog/perfil.png",
                       name: "Di Dog",
-                      hours: "Ter a Dom - 18:00h as 23:30h",
+                      hours: "Ter a Dom: 18:00h as 23:30h",
                       statusAberto:".",
                       horarios: {
                         
@@ -1275,7 +1275,7 @@ menuLinks.forEach((link) => {
                     {
                       image: "images/comercios/lanchonete/kidog/perfil.png",
                       name: "Ki Dog",
-                      hours: "Ter a Dom - 18:00h as 23:30h",
+                      hours: "Ter a Dom: 18:00h as 23:30h",
                       statusAberto:".",
                       horarios: {
                         
@@ -1311,7 +1311,7 @@ menuLinks.forEach((link) => {
                   {
                     image: "images/comercios/lanchonete/mycoffe/perfil.png",
                     name: "My Coffe",
-                    hours: "Seg: Fechado<br>Ter a Qui - 13:00h - 20:00h <br>Sex: 13:00h a 18:00h<br>Sab: 13:00h a 20:00h<br>Dom: 13:00h a 19:00h",
+                    hours: "Seg: Fechado<br>Ter a Qui: 13:00h as 20:00h <br>Sex: 13:00h as 18:00h<br>Sab: 13:00h as 20:00h<br>Dom: 13:00h as 19:00h",
                     statusAberto:".",
                     horarios: {
                       
@@ -1346,7 +1346,7 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/lanchonete/casarao/faxada_casarao.png",
                             name: "O Casarao",
-                            hours: "Ter a Dom - 18:00h as 00:30h",
+                            hours: "Ter a Dom: 18:00h as 00:30h",
                             statusAberto:".",
                             horarios: {
                               
@@ -1388,7 +1388,7 @@ menuLinks.forEach((link) => {
                         {
                           image: "images/comercios/lanchonete/ione/ione.png",
                           name: "Ione",
-                          hours: "Seg a Sab - 9:30h as 19:30h",
+                          hours: "Seg a Sab: 9:30h as 19:30h",
                           statusAberto:".",
                           horarios: {                            
                             seg: [{ inicio: "09:30", fim: "19:30" }],
@@ -1418,7 +1418,7 @@ menuLinks.forEach((link) => {
                       {
                         image: "images/comercios/lanchonete/xisBauinea/perfil.png",
                         name: "Xis Bauinea",
-                        hours: "Qui a Ter - 18:00h as 23:00h<br>Qua: Fechado",
+                        hours: "Qui a Ter: 18:00h as 23:00h<br>Qua: Fechado",
                         statusAberto:".",
                         horarios: {                            
                           seg: [{ inicio: "18:00", fim: "23:00" }],
@@ -1464,7 +1464,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/pizzaria/fornalha/fornalha.png",
                     name: "Fornalha Pizzaria",
-                    hours:"Quarta a Quinta: 18:00 as 23:00h </br> Sexta - Sabado: 18:00 as 00:00h </br> Domingo: 18:00 as 23:00h",
+                    hours:"Qua a Qui: 18:00h as 23:00h </br>Sexta a Sabado: 18:00h as 00:00h </br> Domingo: 18:00 as 23:00h",
                     address: "R. Benedito Salles, 837",
                     contact: "(43) 99632-1310",
                     delivery: "Sim / Com Taxa",
@@ -1546,7 +1546,7 @@ menuLinks.forEach((link) => {
               {
                   image: "images/comercios/sorveteria/limone/limone.png",
                   name: "Limone",
-                  hours: "Seg a Sab: 13:00 as 23:00h<br>Dom: 14:00 as 00:00",
+                  hours: "Seg a Sab: 13:00h as 23:00h<br>Dom: 14:00h as 00:00h",
                   address: "Rua Benedito Salles n° 619",
                   contact: "(43) 99922-8336",
                   contact2:"(43) 98863-3040",
@@ -1576,7 +1576,7 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/sorveteria/santino/santino.png",
                 name: "Santtino Gelateria",
-                hours: "Dom a Sex: 13:00 as 22h<br>Sab 13:00h - 23:00h",
+                hours: "Dom a Sex: 13:00h as 22:00h<br>Sab: 13:00h as 23:00h",
                 address: "R. Kalil Keder, 583 - Centro",
                 contact: "(43) 99971-3535",
                 delivery: "Sim / Sem Taxa",
@@ -1606,14 +1606,14 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/padaria/bom jesus/bomjesus.png",
                     name: "Bom Jesus",
-                    hours: "Seg a Sab: 6:00h as 19:00h </br> Dom: 06:00 as 14:00h",
+                    hours: "Seg a Sab: 6:00h as 19:00h </br> Dom: 06:00h as 14:00h",
                     address: "R. Benedito Salles, 615",
                     contact: "43) 99653-9285",
                     delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/PanificadoraRestauranteBomJesus/?locale=pt_BR",
                     instagram: "https://www.instagram.com/bom_jesus_panificadora/",
                     novidadesImages: [
-                        // Novo array de imagens de novidades
+                      
                         "images/comercios/padaria/bom jesus/novidades/1.png",
                         "images/comercios/padaria/bom jesus/novidades/2.png",
                         "images/comercios/padaria/bom jesus/novidades/3.png",
@@ -1720,7 +1720,7 @@ menuLinks.forEach((link) => {
                   image: "images/comercios/supermercado/compreBemMais/compreBemMais.png",
                   name: "Compre Bem Mais",
                   address: "R. Andrino Soares, 355",
-                  hours: "Seg a Sex 7h - 20h </br> Dom: 08 - 12h",
+                  hours: "Seg a Sex: 7:00h as 20:00h </br> Dom: 08:00 as 12:00h",
                   contact: "(43) 99977-6613",
                   delivery: "Sim / Sem Taxa",
                   facebook: "https://www.facebook.com/people/Compre-bem-Mais/61559328414681/?_rdr",
@@ -1743,7 +1743,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/supermercado/obarateiro.png",
                     name: "O Barateiro",
                     address: "Bendito Salles, 1168 ",
-                    hours: "Seg a Sex 8h - 21h </br> dom: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 21:00h </br> Dom: 08:00h as 12:00h",
                     contact: "(43) 99196-7816",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/MercadoObarateiro",
@@ -1753,7 +1753,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/supermercado/kelve.png",
                     name: "Kelve",
                     address: "R. Paul Harris,104",
-                    hours: "Seg a Sex 8h - 19:30h </br> dom: 08:30 - 12:30h",
+                    hours: "Seg a Sex: 8:00h as 19:30h </br> Dom: 08:30h as 12:30h",
                     contact: "(43) 99844-6105",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
@@ -1763,7 +1763,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/supermercado/rocha.jpg",
                     name: "Rocha",
-                    hours: "Seg a Sex 6h - 20h </br> Dom: 06 - 12h",
+                    hours: "Seg a Sex: 6:00h as 20:00h </br> Dom: 06:00h as 12:00h",
                     address: "Av. Elson Soares, 767 ",
                     contact: "(43) 99105-9324",
                     delivery: "Sim / Sem Taxa",
@@ -1774,7 +1774,7 @@ menuLinks.forEach((link) => {
                 {
                     name: "Carriel",
                     address: "PR-218, 1168 ",
-                    hours: "Seg a Sex 8h - 21h </br> Dom: 07 - 12h",
+                    hours: "Seg a Sex: 8:00h as 21:00h </br> Dom: 07:00h as 12:00h",
                     contact: "(43) 3456-7890",
                     delivery: "Sim / Sem Taxa",
                 },
@@ -1790,7 +1790,7 @@ menuLinks.forEach((link) => {
                   image: "images/comercios/supermercado/zerojapan.png",
                     name: "Zero Japan",
                     address: "Rua Doutora Paula e Silva, 445 ",
-                    hours: "Seg a Seg 8h - 20h ",
+                    hours: "Seg a Seg: 8:00h as 20:00h",
                     contact: "(43) 3142-2005", 
                     whatsapp: "4331422005", 
                     delivery: "Sim / Sem Taxa",
@@ -1809,7 +1809,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
                     name: "Bio Farma",
                     address: "Rua Laurindo Franco Godoy, 464",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h</br> Dom e feriado: Fechado",
+                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h</br> Dom e feriado: Fechado",
                     contact: "(43) 3566-1473",
                     delivery: "Sim / Sem Taxa",
                     facebook: "www.facebook.com/uahh",
@@ -1836,7 +1836,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/descontoFacil/descontoFacil.png",
                     name: "Desconto Facil 1",
                     address: "R. Benedito Salles, 574",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     contact: "(43) 99966-9812",
                     delivery: "Sim / Sem Taxa",
                     facebook:"https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
@@ -1861,7 +1861,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/farmacia/drogaMais/drogamais.png",
                     name: "DrogaMais",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     address: "Rua Benedito Salles, 903",
                     contact: "(43) 98411-9145",
                     delivery: "Sim / Sem Taxa",
@@ -1888,7 +1888,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/elShaday/elshaday.png",
                     name: "El Shaday",
                     address: "R. Benedito Sales, 353",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     contact: "(43) 98488-9420",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
@@ -1914,7 +1914,7 @@ menuLinks.forEach((link) => {
                   image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
                     name: "Farmacia da Vila",
                     address: "Rua Manguba, 320, Carlopolis",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     contact: "(43) 99148-8478",
                     delivery: "Sim / Sem Taxa",
                     facebook: "#",
@@ -1940,7 +1940,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/farmais/farmais.png",
                     name: "FarMais",
                     address: "R. Benedito Salles, 1188",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     contact: "(43) 3566-1211",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
@@ -1966,7 +1966,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/masterFarma/masterfarma.png",
                     name: "MasterFarma",
                     address: "R. Laurindo Franco de Godoi, 90",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     contact: "(43) 99951-1540",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
@@ -1992,7 +1992,7 @@ menuLinks.forEach((link) => {
                     
                     name: "PopularMais",
                     address: "Elson Soares, 787, Sala 2",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     contact: "(43) 99647-6266",
                     delivery: "Sim / Sem Taxa",
                     image: "images/comercios/farmacia/popularMais/popularMais.png",
@@ -2023,7 +2023,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/santaMaria/santamaria.png",
                     name: "Santa Maria",
                     address: "R. Benedito Salles, nº 711, Carlopols",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 18h </br> Sab: 08:00h as 12:00h",
                     contact: "(43) 99840-9658",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
@@ -2049,7 +2049,7 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/saudeFarma/saudeFarma.png",
                     name: "Saude Farma",
                     address: "Rua Benedito Salles, 951",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08 - 12h",
+                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     contact: "(43) 99956-8938",
                     delivery: "Sim / Sem Taxa",
                     facebook:
