@@ -2170,7 +2170,7 @@ menuLinks.forEach((link) => {
 
 
 */
-
+/*
                 {
                   image: "images/comercios/farmacia/santaMaria/santamaria.png",
                   name: "Santa Maria",
@@ -2198,6 +2198,37 @@ menuLinks.forEach((link) => {
                     "Redução da febre e para o alívio de dores",
                   ],
               },
+*/
+
+
+              {
+                image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
+                name: "Bio Farma",
+                    address: "Rua Laurindo Franco Godoy, 464",
+                    contact:"(43) 99988-9376",
+                    contact2: "(43) 3566-1473",
+                    delivery: "Sim / Sem Taxa",
+                plantaoHorario: "8:00h às 21:00h", 
+                plantaoData:"03/05 a 09/05",             
+                
+                facebook: "https://www.facebook.com/p/Farm%C3%A1cia-Bio-Farma-100063579070016/?_rdr",
+                instagram: "https://www.instagram.com/farmaciabiofarmaa/",
+                
+                novidadesImages: [               
+                    "images/comercios/farmacia/bioFarma/divulgacao/1.png",
+                    "images/comercios/farmacia/bioFarma/divulgacao/2.png",     
+                    "images/comercios/farmacia/bioFarma/divulgacao/3.png",
+                    "images/comercios/farmacia/bioFarma/divulgacao/4.png",
+                    "images/comercios/farmacia/bioFarma/divulgacao/5.png",
+                ], 
+                novidadesDescriptions: [                            
+                  "Venham nos Visitar",
+                  "Cólicas do trato gastrintestinal",
+                  "Analgésico (para dor) antitérmico (para febre)",
+                  "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                  "Redução da febre e para o alívio de dores",
+                ],
+            },
 
 
 
@@ -2843,11 +2874,18 @@ menuLinks.forEach((link) => {
           },
 
 
+         
+          
+         
+
+
+
+
 
           {
             image: "images/comercios/restaurante/galego/perfil.png",
             name: "Pesqueiro do Galego",
-            hours: "Qua a Sab: 11:00h - 22:00h<br>Dom: 11:00h - 16:00h ",
+            hours: "Qua a Sab: 11:00h - 21:30h<br>Dom: 11:00h - 16:00h ",
             address: "Estr. Fazendinha, 158 - Carlópolis",
             contact: "(43) 99619-1971",
             delivery: "Sim / Com Taxa",

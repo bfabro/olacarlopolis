@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Comerciante</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    input[type="file"] {
+      margin-top: 10px;
+    }
+    img.preview {
+      width: 100px;
+      height: auto;
+      margin: 10px 5px 0 0;
+      border-radius: 8px;
+    }
+    .login {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    button {
+      padding: 10px;
+      background-color: #4070f4;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="loginCard">
+    <h2>Login</h2>
+    <div class="login">
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="senha" placeholder="Senha" />
+      <button onclick="fazerLogin()">Entrar</button>
+    </div>
+  </div>
+
+  <div class="card" id="painelCard" style="display: none;">
+    <h2>Suas Imagens</h2>
+    <div id="imagensContainer"></div>
+    <input type="file" id="uploadInput" multiple accept="image/*" />
+    <button onclick="uploadImagens()">Enviar Imagens</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_AUTH_DOMAIN",
+      databaseURL: "SEU_DATABASE_URL",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_STORAGE_BUCKET",
+      messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+      appId: "SEU_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const storage = firebase.storage();
+    const db = firebase.database();
+
+    let uidGlobal = null;
+
+    function fazerLogin() {
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+      auth.signInWithEmailAndPassword(email, senha)
+        .then((userCredential) => {
+          uidGlobal = userCredential.user.uid;
+          document.getElementById("loginCard").style.display = "none";
+          document.getElementById("painelCard").style.display = "block";
+          carregarImagens();
+        })
+        .catch((error) => {
+          alert("Erro no login: " + error.message);
+        });
+    }
+
+    function carregarImagens() {
+      db.ref("estabelecimentos/" + uidGlobal + "/imagens/divulgacao").once("value").then(snapshot => {
+        const container = document.getElementById("imagensContainer");
+        container.innerHTML = "";
+        snapshot.forEach(child => {
+          const nome = child.val();
+          storage.ref("imagens/" + uidGlobal + "/" + nome).getDownloadURL().then(url => {
+            const img = document.createElement("img");
+            img.src = url;
+            img.className = "preview";
+            container.appendChild(img);
+          });
+        });
+      });
+    }
+
+    function uploadImagens() {
+      const files = document.getElementById("uploadInput").files;
+      if (!files.length) return;
+      const listaRef = db.ref("estabelecimentos/" + uidGlobal + "/imagens/divulgacao");
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ref = storage.ref("imagens/" + uidGlobal + "/" + file.name);
+        ref.put(file).then(() => {
+          listaRef.push(file.name);
+          carregarImagens();
+        });
+      }
+    }
+  </script>
+</body>
+</html>
