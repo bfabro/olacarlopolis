@@ -1737,7 +1737,7 @@ menuLinks.forEach((link) => {
                     name: "Rocha",
                     hours: "Seg a Sex 6h - 20h </br> Dom: 06 - 12h",
                     address: "Av. Elson Soares, 767 ",
-                    contact: "(43) 3566-2436",
+                    contact: "(43) 99105-9324",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
                     instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
