@@ -783,7 +783,7 @@ menuLinks.forEach((link) => {
                               qua: [{ inicio: "14:00", fim: "23:00" }],
                               qui: [{ inicio: "14:00", fim: "23:00" }],
                               sex: [{ inicio: "14:00", fim: "23:00" }],
-                              sab: [{ inicio: "01:00", fim: "23:00" }]
+                              sab: [{ inicio: "14:00", fim: "23:00" }]
                             },
                             address: "Rua Benedito Salles, 409",
                             contact: "(43) 99176-7871",
@@ -1141,8 +1141,7 @@ menuLinks.forEach((link) => {
                         name: "Caldo de Cana Amaral",
                         hours: "Dom a Dom - 13h as 18:30h",
                         statusAberto:".",
-                        horarios: {
-                          
+                        horarios: {                          
                           seg: [{ inicio: "13:00", fim: "18:30" }],
                           ter: [{ inicio: "13:00", fim: "18:30" }],
                           qua: [{ inicio: "13:00", fim: "18:30" }],
@@ -2439,7 +2438,17 @@ menuLinks.forEach((link) => {
                     contact2: "(43) 3566-1473",
                     delivery: "Sim / Sem Taxa",
                 plantaoHorario: "8:00h às 21:00h", 
-                plantaoData:"03/05 a 09/05",             
+                plantaoData:"03/05 a 09/05",     
+                statusAberto:".",
+                horarios: {                          
+                  seg: [{ inicio: "08:00", fim: "21:00" }],
+                  ter: [{ inicio: "08:00", fim: "21:00" }],
+                  qua: [{ inicio: "08:00", fim: "21:00" }],
+                  qui: [{ inicio: "08:00", fim: "21:00" }],
+                  sex: [{ inicio: "08:00", fim: "21:00" }],
+                  sab: [{ inicio: "08:00", fim: "21:00" }],
+                  dom: [{ inicio: "08:00", fim: "21:00" }]
+                },        
                 
                 facebook: "https://www.facebook.com/p/Farm%C3%A1cia-Bio-Farma-100063579070016/?_rdr",
                 instagram: "https://www.instagram.com/farmaciabiofarmaa/",
@@ -3591,7 +3600,16 @@ function restaurarMenuOriginal() {
       
       
   
- 
+ ${establishment.statusAberto ? `
+                    <div class="info-box">
+                      
+                      <div>
+                        <div class="info-label"> ${statusAberto}</div>
+                        
+                      </div>
+                    </div>` : ""
+                  }
+
   
       
                 ${
@@ -3626,16 +3644,7 @@ function restaurarMenuOriginal() {
                     </div>` : ""
                   }
 
-                  ${establishment.statusAberto ? `
-                    <div class="info-box">
-                      
-                      <div>
-                        <div class="info-label"> ${statusAberto}</div>
-                        
-                      </div>
-                    </div>` : ""
-                  }
-
+                  
 
 
 
