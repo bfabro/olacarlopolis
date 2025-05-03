@@ -1365,10 +1365,10 @@ menuLinks.forEach((link) => {
                           horarios: {                            
                             seg: [{ inicio: "09:30", fim: "19:30" }],
                             ter: [{ inicio: "09:30", fim: "19:30" }],
-                            qua: [{ inicio: "18:00", fim: "00:30" }],
-                            qui: [{ inicio: "18:00", fim: "00:30" }],
-                            sex: [{ inicio: "18:00", fim: "00:30" }],
-                            sab: [{ inicio: "18:00", fim: "00:30" }],
+                            qua: [{ inicio: "09:30", fim: "19:30" }],
+                            qui: [{ inicio: "09:30", fim: "19:30" }],
+                            sex: [{ inicio: "09:30", fim: "19:30" }],
+                            sab: [{ inicio: "09:30", fim: "19:30" }],
                             dom: []
                           },
                           address: "R. Benedito Salles, 1233",
