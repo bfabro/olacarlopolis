@@ -1,6 +1,78 @@
 document.addEventListener("DOMContentLoaded", function () {
 
 
+
+
+
+
+
+  function estaAbertoAgora(horarios) {
+    const agora = new Date();
+    const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
+    const hoje = dias[agora.getDay()];
+    const horaAtual = agora.getHours();
+    const minutoAtual = agora.getMinutes();
+  
+    const faixas = horarios[hoje] || [];
+    for (const faixa of faixas) {
+      const [hIni, mIni] = faixa.inicio.split(":").map(Number);
+      const [hFim, mFim] = faixa.fim.split(":").map(Number);
+  
+      const minutosAtual = horaAtual * 60 + minutoAtual;
+      const minutosIni = hIni * 60 + mIni;
+      const minutosFim = hFim * 60 + mFim;
+  
+      if (minutosAtual >= minutosIni && minutosAtual <= minutosFim) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+
+  function proximoHorarioDeAbertura(horarios) {
+    const agora = new Date();
+    const horaAtual = agora.getHours() + agora.getMinutes() / 60;
+  
+    const dias = [
+      { chave: "dom", nome: "Domingo" },
+      { chave: "seg", nome: "Segunda" },
+      { chave: "ter", nome: "Terça" },
+      { chave: "qua", nome: "Quarta" },
+      { chave: "qui", nome: "Quinta" },
+      { chave: "sex", nome: "Sexta" },
+      { chave: "sab", nome: "Sábado" },
+    ];
+  
+    for (let i = 0; i < 7; i++) {
+      const diaIndex = (agora.getDay() + i) % 7;
+      const { chave, nome } = dias[diaIndex];
+      const faixas = horarios[chave] || [];
+  
+      for (const faixa of faixas) {
+        const [h, m] = faixa.inicio.split(":").map(Number);
+        const horaInicio = h + m / 60;
+        if (i > 0 || horaInicio > horaAtual) {
+          const horaFormatada = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+          return `${nome} às ${horaFormatada}`;
+        }
+      }
+    }
+  
+    return "em breve"; // se não houver horários futuros
+  }
+  
+  
+  
+
+
+
+
+
+
+
+
+
   let contadorAnterior = 0;
   const contadorEl = document.getElementById("contador");
   const iconeEl = document.getElementById("iconeUsuarios");
@@ -671,7 +743,17 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/acai/turminhaAcai/turminhaAcai.png",
                             name: "Turminha do Açai",
+                            
                             hours: "Qua a Seg: 14h - 23h <br> Ter: Fechado",
+                            horarios: {
+                              dom: [{ inicio: "14:00", fim: "23:00" }],
+                              seg: [{ inicio: "14:00", fim: "23:00" }],
+                              ter: [], // fechado
+                              qua: [{ inicio: "14:00", fim: "23:00" }],
+                              qui: [{ inicio: "14:00", fim: "23:00" }],
+                              sex: [{ inicio: "14:00", fim: "23:00" }],
+                              sab: [{ inicio: "01:00", fim: "23:00" }]
+                            },
                             address: "Rua Benedito Salles, 409",
                             contact: "(43) 99176-7871",
                             delivery: "Sim / Com Taxa",
@@ -709,6 +791,15 @@ menuLinks.forEach((link) => {
                             image: "images/comercios/acougue/curitiba/curitiba.png",
                             name: "Açougue Curitiba",
                             hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+                            horarios: {
+                              dom: [{ inicio: "08:00", fim: "18:00" }],
+                              seg: [{ inicio: "08:00", fim: "18:00" }],
+                              ter: [ {inicio: "08:00", fim: "18:00" }],
+                              qua: [{ inicio: "08:00", fim: "18:00" }],
+                              qui: [{ inicio: "08:00", fim: "18:00" }],
+                              sex: [{ inicio: "08:00", fim: "18:00" }],
+                              sab: [{ inicio: "08:00", fim: "12:00" }]
+                            },
                             address: "Rua Benedito Salles, 409",
                             contact: "(43) 99635-1001",
                             delivery: "Sim / Sem Taxa",
@@ -2995,17 +3086,17 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/restaurante/saborRoca/saborRoca.png",
                   name: "Sabor da Roça",
-                  hours: "Seg a Sab: 10:30h - 14h",
+                  hours: "Seg a Sab: 10:30h as 14:00h",
                   address: "R. Benedito Salles, 365",
                   contact: "(43) 99832-3050",
-                  delivery: "Sim / Com Taxa",
+                  delivery: "Sim / Sem Taxa",
                 
               },
 
               {
                 image: "images/comercios/restaurante/selaht/selaht.png",
                 name: "Selaht Grill",
-                hours: "Ter a Dom: 11h - 23h",
+                hours: "Ter a Dom: 11h as 23h",
                 address: "R. Padre Hugo, 460",
                 contact: "(43) 9 9160-5120",
                 delivery: "Sim / Com Taxa",
@@ -3326,12 +3417,25 @@ function restaurarMenuOriginal() {
 
       
           
-            ${paidEstablishments
-              .map(
-                (establishment) => `
+      ${paidEstablishments.map((establishment) => {
+        let statusAberto = "";
+        if (establishment.horarios) {
+          const aberto = estaAbertoAgora(establishment.horarios);
+          if (aberto) {
+            statusAberto = "<span class='status-tag aberto'>Aberto Agora</span>";
+          } else {
+            const proximo = proximoHorarioDeAbertura(establishment.horarios);
+            statusAberto = `<span class='status-tag fechado'>Fechado </span> <span class='proximo-horario'>• Abre ${proximo}</span>`;
+          }
+        }
+
+        return `
+
+
+              
      <li  id="${normalizeName(establishment.name)}">  
      
-       <!-- Exibe a imagem do estabelecimento, se existir -->
+    
       ${
         establishment.image
           ? `
@@ -3343,576 +3447,578 @@ function restaurarMenuOriginal() {
       }
   
      
-     <strong class="locais_nomes">${establishment.name}</strong><br>
+      <strong class="locais_nomes">${establishment.name} </strong><br>
+      
+      
   
  
   
       
-${
-  establishment.plantaoHorario
-    ? `
-    <div class="card-plantao detalhe-esquerda">
-      <div class="conteudo-plantao">
-        <div class="titulo-plantao">
-          <i class="fas fa-clinic-medical"></i> Plantão
-        </div>
-        <p><strong><i class="fas fa-clock"></i> Horário:</strong> ${establishment.plantaoHorario}</p>
-        ${establishment.plantaoData ? `<p><strong><i class="fas fa-calendar-alt"></i> Data:</strong> ${establishment.plantaoData}</p>` : ""}
-      </div>
-    </div>
-    `
-    : ""
-}
-
-
-
-
-<div class="info-boxes-container">
-
-
- ${establishment.date ? `
-    <div class="info-box">
-      <i class="fas fa-calendar-alt info-icon"></i>
-      <div>
-        <div class="info-label">Data do Evento</div>
-        <div class="info-value">${establishment.date}</div>
-      </div>
-    </div>` : ""
-  }
-
-
-
-
-
-
-  ${establishment.hours ? `
-    <div class="info-box">
-      <i class="fas fa-clock info-icon"></i>
-      <div>
-        <div class="info-label">Funcionamento</div>
-        <div class="info-value">${establishment.hours}</div>
-      </div>
-    </div>` : ""
-  }
-
- ${establishment.address ? `
-  <div class="info-box">
-    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address.replace(/<br>/g, " "))}" 
-       target="_blank">
-      <i class='bx bx-map info-icon' style="color: #f44336;font-size:26px;"></i>
-    </a>
-    <div>
-      <div class="info-label">Endereço</div>
-      <div class="info-value">${establishment.address}</div>
-    </div>
-  </div>
-` : ""}
-
-
-
-
-${establishment.contact || establishment.contact2 || establishment.contact3 ? (() => {
-  const formatPhone = (number) => {
-    const rawNumber = (number || "").replace(/\D/g, "");
-    const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
-    return fullNumber;
-  }
-
-  const firstNumber = formatPhone(establishment.whatsapp || establishment.contact || "");
-  const secondNumber = establishment.contact2 ? formatPhone(establishment.contact2) : null;
-const thirdNumber = establishment.contact3 ? formatPhone(establishment.contact3) : null;
-
- return `
-    <div class="info-box">
-      <div>
-        <div class="info-label">Contato</div>
-        <div class="info-value">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent(
-              "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-            )}" target="_blank">
-              <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-            </a>
-            <span>${establishment.contact}</span>
-          </div>
-
-          ${
-            secondNumber
-              ? `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                  <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent(
-                    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-                  )}" target="_blank">
-                    <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-                  </a>
-                  <span>${establishment.contact2}</span>
-                </div>`
-              : ""
-          }
-
-          ${
-            thirdNumber
-              ? `<div style="display: flex; align-items: center; gap: 8px;">
-                  <a href="https://api.whatsapp.com/send?phone=${thirdNumber}&text=${encodeURIComponent(
-                    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
-                  )}" target="_blank">
-                    <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-                  </a>
-                  <span>${establishment.contact3}</span>
-                </div>`
-              : ""
-          }
-        </div>
-      </div>
-    </div>
-  `;
-})() : ""}
-
-
-
-
-
-
-  ${establishment.delivery ? `
-    <div class="info-box">
-      <i class="fas fa-truck info-icon"></i>
-      <div>
-        <div class="info-label">Entrega</div>
-        <div class="info-value">${establishment.delivery}</div>
-      </div>
-    </div>` : ""
-  }
-
-  ${establishment.taxaEntrega ? `
-    <div class="info-box">
-      <i class="fas fa-money-bill-wave info-icon"></i>
-      <div>
-        <div class="info-label">Taxa de Entrega</div>
-        <div class="info-value">${establishment.taxaEntrega === 'sim' ? 'Possui taxa' : 'Sem taxa'}</div>
-      </div>
-    </div>` : ""
-  }
-
-  ${establishment.infoVagaTrabalho ? `
-    <div class="info-box vaga">
-      <i class="fas fa-briefcase info-icon"></i>
-      <div>
-        <div class="info-label">Vaga de Trabalho</div>
-        <div class="info-value">${establishment.infoVagaTrabalho}</div>
-      </div>
-    </div>` : ""
-  }
-
-  ${establishment.infoAdicional ? `
-    <div class="info-box">
-      <i class="fas fa-circle-info info-icon"></i>
-      <div>
-        <div class="info-label">Informações Adicionais</div>
-        <div class="info-value">${establishment.infoAdicional}</div>
-      </div>
-    </div>` : ""
-  }
-
- 
-
-  ${(establishment.instagram || establishment.facebook || establishment.site) ? `
-    <div class="info-box">
-    
-      <i class="fas fa-share-alt info-icon"></i>
-      <div>
-        <div class="info-label">Redes Sociais</div>
-        <div class="social-icons">
-        ${establishment.facebook ? `<a href="${establishment.facebook}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
-          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram</a>` : ""}          
-          ${establishment.site ? `<a href="${establishment.site}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
-        </div>
-      </div>
-    </div>` : ""
-  }
-</div>
-
-   
-      <br>
-  
-
-  <div class="button-container">
-          ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
-            <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
-              <i class="fas fa-camera"></i>  Divulgação (${establishment.novidadesImages.length})
-            </button>
-          ` : ''}
-          
-          ${establishment.menuImages && establishment.menuImages.length > 0 ? `
-            <button  id="cardapioButton" class="menu-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
-              <i class="fas fa-utensils"></i>  Cardápio (${establishment.menuImages.length})
-            </button>
-          ` : ''}
-        </div>
-        
-      
-            ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
-                <div class="novidades-container swiper" id="novidades-${encodeURIComponent(establishment.name)}">
-                    <div class="swiper-wrapper">
-                       ${establishment.novidadesImages.map((img, index) => `
-  <div class="swiper-slide">
-    <img src="${img}" alt="Novidades ${index + 1} de ${establishment.name}">
-    ${establishment.novidadesDescriptions && establishment.novidadesDescriptions[index] ? `
-      <p class="novidade-descricao">${establishment.novidadesDescriptions[index]}</p>
-    ` : ""}
-  </div>
-`).join('')}
-
-                    </div>
-
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
-                 
-                </div>
-                 ` : ''}
-          
-           ${establishment.menuImages && establishment.menuImages.length > 0 ? `
-                <div class="menu-cardapio swiper" id="menu-${encodeURIComponent(establishment.name)}">
-                    <div class="swiper-wrapper">
-                        ${establishment.menuImages.map((img, index) => `
-                        <div class="swiper-slide">
-                            <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}">
+                ${
+                  establishment.plantaoHorario
+                    ? `
+                    <div class="card-plantao detalhe-esquerda">
+                      <div class="conteudo-plantao">
+                        <div class="titulo-plantao">
+                          <i class="fas fa-clinic-medical"></i> Plantão
                         </div>
-                        `).join('')}
+                        <p><strong><i class="fas fa-clock"></i> Horário:</strong> ${establishment.plantaoHorario}</p>
+                        ${establishment.plantaoData ? `<p><strong><i class="fas fa-calendar-alt"></i> Data:</strong> ${establishment.plantaoData}</p>` : ""}
+                      </div>
                     </div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
-                      
+                    `
+                    : ""
+                }
+
+
+
+
+                <div class="info-boxes-container">
+
+
+                ${establishment.date ? `
+                    <div class="info-box">
+                      <i class="fas fa-calendar-alt info-icon"></i>
+                      <div>
+                        <div class="info-label">Data do Evento</div>
+                        <div class="info-value">${establishment.date}</div>
+                      </div>
+                    </div>` : ""
+                  }
+
+
+
+
+
+
+                  ${establishment.hours ? `
+                    <div class="info-box">
+                      <i class="fas fa-clock info-icon"></i>
+                      <div>
+                        <div class="info-label">Funcionamento: ${statusAberto}</div>
+                        <div class="info-value">${establishment.hours}</div>
+                      </div>
+                    </div>` : ""
+                  }
+
+                ${establishment.address ? `
+                  <div class="info-box">
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address.replace(/<br>/g, " "))}" 
+                      target="_blank">
+                      <i class='bx bx-map info-icon' style="color: #f44336;font-size:26px;"></i>
+                    </a>
+                    <div>
+                      <div class="info-label">Endereço</div>
+                      <div class="info-value">${establishment.address}</div>
+                    </div>
+                  </div>
+                ` : ""}
+
+
+
+
+                ${establishment.contact || establishment.contact2 || establishment.contact3 ? (() => {
+                  const formatPhone = (number) => {
+                    const rawNumber = (number || "").replace(/\D/g, "");
+                    const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
+                    return fullNumber;
+                  }
+
+                  const firstNumber = formatPhone(establishment.whatsapp || establishment.contact || "");
+                  const secondNumber = establishment.contact2 ? formatPhone(establishment.contact2) : null;
+                const thirdNumber = establishment.contact3 ? formatPhone(establishment.contact3) : null;
+
+                return `
+                    <div class="info-box">
+                      <div>
+                        <div class="info-label">Contato</div>
+                        <div class="info-value">
+                          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent(
+                              "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
+                            )}" target="_blank">
+                              <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+                            </a>
+                            <span>${establishment.contact}</span>
+                          </div>
+
+                          ${
+                            secondNumber
+                              ? `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                  <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent(
+                                    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
+                                  )}" target="_blank">
+                                    <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+                                  </a>
+                                  <span>${establishment.contact2}</span>
+                                </div>`
+                              : ""
+                          }
+
+                          ${
+                            thirdNumber
+                              ? `<div style="display: flex; align-items: center; gap: 8px;">
+                                  <a href="https://api.whatsapp.com/send?phone=${thirdNumber}&text=${encodeURIComponent(
+                                    "Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!"
+                                  )}" target="_blank">
+                                    <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+                                  </a>
+                                  <span>${establishment.contact3}</span>
+                                </div>`
+                              : ""
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                })() : ""}
+
+
+
+
+
+
+                  ${establishment.delivery ? `
+                    <div class="info-box">
+                      <i class="fas fa-truck info-icon"></i>
+                      <div>
+                        <div class="info-label">Entrega</div>
+                        <div class="info-value">${establishment.delivery}</div>
+                      </div>
+                    </div>` : ""
+                  }
+
+                  ${establishment.taxaEntrega ? `
+                    <div class="info-box">
+                      <i class="fas fa-money-bill-wave info-icon"></i>
+                      <div>
+                        <div class="info-label">Taxa de Entrega</div>
+                        <div class="info-value">${establishment.taxaEntrega === 'sim' ? 'Possui taxa' : 'Sem taxa'}</div>
+                      </div>
+                    </div>` : ""
+                  }
+
+                  ${establishment.infoVagaTrabalho ? `
+                    <div class="info-box vaga">
+                      <i class="fas fa-briefcase info-icon"></i>
+                      <div>
+                        <div class="info-label">Vaga de Trabalho</div>
+                        <div class="info-value">${establishment.infoVagaTrabalho}</div>
+                      </div>
+                    </div>` : ""
+                  }
+
+                  ${establishment.infoAdicional ? `
+                    <div class="info-box">
+                      <i class="fas fa-circle-info info-icon"></i>
+                      <div>
+                        <div class="info-label">Informações Adicionais</div>
+                        <div class="info-value">${establishment.infoAdicional}</div>
+                      </div>
+                    </div>` : ""
+                  }
+
+                
+
+                  ${(establishment.instagram || establishment.facebook || establishment.site) ? `
+                    <div class="info-box">
+                    
+                      <i class="fas fa-share-alt info-icon"></i>
+                      <div>
+                        <div class="info-label">Redes Sociais</div>
+                        <div class="social-icons">
+                        ${establishment.facebook ? `<a href="${establishment.facebook}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
+                          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram</a>` : ""}          
+                          ${establishment.site ? `<a href="${establishment.site}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
+                        </div>
+                      </div>
+                    </div>` : ""
+                  }
                 </div>
-                 ` : ''}
-       
-         <div class="separador_categorias"></div> <!-- Separador visual entre os itens -->
-     
-      </li>
-    `).join('')}
-  </ul>
-    `;
-  
+
+                  
+                      <br>
+                  
+
+                  <div class="button-container">
+                          ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
+                            <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
+                              <i class="fas fa-camera"></i>  Divulgação (${establishment.novidadesImages.length})
+                            </button>
+                          ` : ''}
+                          
+                          ${establishment.menuImages && establishment.menuImages.length > 0 ? `
+                            <button  id="cardapioButton" class="menu-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
+                              <i class="fas fa-utensils"></i>  Cardápio (${establishment.menuImages.length})
+                            </button>
+                          ` : ''}
+                        </div>
+                        
+                      
+                            ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
+                                <div class="novidades-container swiper" id="novidades-${encodeURIComponent(establishment.name)}">
+                                    <div class="swiper-wrapper">
+                                      ${establishment.novidadesImages.map((img, index) => `
+                  <div class="swiper-slide">
+                    <img src="${img}" alt="Novidades ${index + 1} de ${establishment.name}">
+                    ${establishment.novidadesDescriptions && establishment.novidadesDescriptions[index] ? `
+                      <p class="novidade-descricao">${establishment.novidadesDescriptions[index]}</p>
+                    ` : ""}
+                  </div>
+                `).join('')}
+
+                                    </div>
+
+                                    <div class="swiper-button-next"></div>
+                                    <div class="swiper-button-prev"></div>
+                                    <div class="swiper-pagination"></div>
+                                
+                                </div>
+                                ` : ''}
+                          
+                          ${establishment.menuImages && establishment.menuImages.length > 0 ? `
+                                <div class="menu-cardapio swiper" id="menu-${encodeURIComponent(establishment.name)}">
+                                    <div class="swiper-wrapper">
+                                        ${establishment.menuImages.map((img, index) => `
+                                        <div class="swiper-slide">
+                                            <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}">
+                                        </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="swiper-button-next"></div>
+                                    <div class="swiper-button-prev"></div>
+                                    <div class="swiper-pagination"></div>
+                                      
+                                </div>
+                                ` : ''}
+                      
+                        <div class="separador_categorias"></div> <!-- Separador visual entre os itens -->
+                    
+                      </li>
+  `;
+}).join('')}
+                  </ul>
+                    `;
+                  
 
 
-    function criarInfoCards(establishment) {
-      const wrapper = document.createElement("div");
-    
-      const infos = [
-        {
-          icon: "fa-clock",
-          label: "Horário",
-          valor: establishment.hours?.replace(/<br>/g, " | ") || "Não informado",
-        },
-        {
-          icon: "fa-map-marker-alt",
-          label: "Endereço",
-          valor: establishment.address?.replace(/<br>/g, "") || "Não informado",
-        },
-        {
-          icon: "fa-phone",
-          label: "Contato",
-          valor: establishment.contact || establishment.whatsapp || "Não informado",
-        },
-        {
-          icon: "fa-truck",
-          label: "Entrega",
-          valor: establishment.delivery || "Não informado",
-        },
-      ];
-    
-      infos.forEach(({ icon, label, valor }) => {
-        const card = document.createElement("div");
-        card.className = "info-card";
-        card.innerHTML = `
-          <i class="fas ${icon}"></i>
-          <div class="info-card-text">
-            <span class="info-card-label">${label}</span>
-            <span class="info-card-value">${valor}</span>
-          </div>
-        `;
-        wrapper.appendChild(card);
-      });
-    
-      return wrapper;
-    }
-    
-      
+                    function criarInfoCards(establishment) {
+                      const wrapper = document.createElement("div");
+                    
+                      const infos = [
+                        {
+                          icon: "fa-clock",
+                          label: "Horário",
+                          valor: establishment.hours?.replace(/<br>/g, " | ") || "Não informado",
+                        },
+                        {
+                          icon: "fa-map-marker-alt",
+                          label: "Endereço",
+                          valor: establishment.address?.replace(/<br>/g, "") || "Não informado",
+                        },
+                        {
+                          icon: "fa-phone",
+                          label: "Contato",
+                          valor: establishment.contact || establishment.whatsapp || "Não informado",
+                        },
+                        {
+                          icon: "fa-truck",
+                          label: "Entrega",
+                          valor: establishment.delivery || "Não informado",
+                        },
+                      ];
+                    
+                      infos.forEach(({ icon, label, valor }) => {
+                        const card = document.createElement("div");
+                        card.className = "info-card";
+                        card.innerHTML = `
+                          <i class="fas ${icon}"></i>
+                          <div class="info-card-text">
+                            <span class="info-card-label">${label}</span>
+                            <span class="info-card-value">${valor}</span>
+                          </div>
+                        `;
+                        wrapper.appendChild(card);
+                      });
+                    
+                      return wrapper;
+                    }
+                    
+                      
 
 
-      let lastClickedButton = null;
-    // Função para alternar entre cardápio e novidades
-    function toggleContent(button, contentId, otherButtons) {
-    const content = document.getElementById(contentId);
-    const isActive = button.classList.contains('active');
-   
-    // Fecha todos os conteúdos primeiro
-    closeAllContents();
-  
-    if (!isActive) {
-      // Abre o conteúdo clicado
-      button.classList.add('active');
-      content.classList.add('visible');
-      content.style.display = 'block';
+                      let lastClickedButton = null;
+                    // Função para alternar entre cardápio e novidades
+                    function toggleContent(button, contentId, otherButtons) {
+                    const content = document.getElementById(contentId);
+                    const isActive = button.classList.contains('active');
+                  
+                    // Fecha todos os conteúdos primeiro
+                    closeAllContents();
+                  
+                    if (!isActive) {
+                      // Abre o conteúdo clicado
+                      button.classList.add('active');
+                      content.classList.add('visible');
+                      content.style.display = 'block';
 
-// NOVO scroll até o separador dentro do item clicado
-setTimeout(() => {
-  const targetId = button.dataset.id;
-  const liEstabelecimento = document.getElementById(targetId);
-  if (liEstabelecimento) {
-    const separador = liEstabelecimento.querySelector(".separador_categorias");
-    if (separador) {
-      const separadorTop = separador.getBoundingClientRect().top + window.pageYOffset;
-      const scrollToY = separadorTop - (window.innerHeight - separador.offsetHeight);
-      window.scrollTo({ top: scrollToY, behavior: "smooth" });
-    }
-  }
-}, 100);
-      
-      // Inicializa o Swiper se necessário
-      if (content.classList.contains('swiper') && !content.swiperInstance) {
-        content.swiperInstance = new Swiper(content, {
-          loop: true,
-          navigation: {
-            nextEl: content.querySelector('.swiper-button-next'),
-            prevEl: content.querySelector('.swiper-button-prev'),
-          },
-          pagination: {
-            el: content.querySelector('.swiper-pagination'),
-            clickable: true,
-          },
-        });
-      }
-    }
-  }
-  
+                // NOVO scroll até o separador dentro do item clicado
+                setTimeout(() => {
+                  const targetId = button.dataset.id;
+                  const liEstabelecimento = document.getElementById(targetId);
+                  if (liEstabelecimento) {
+                    const separador = liEstabelecimento.querySelector(".separador_categorias");
+                    if (separador) {
+                      const separadorTop = separador.getBoundingClientRect().top + window.pageYOffset;
+                      const scrollToY = separadorTop - (window.innerHeight - separador.offsetHeight);
+                      window.scrollTo({ top: scrollToY, behavior: "smooth" });
+                    }
+                  }
+                }, 100);
+                      
+                      // Inicializa o Swiper se necessário
+                      if (content.classList.contains('swiper') && !content.swiperInstance) {
+                        content.swiperInstance = new Swiper(content, {
+                          loop: true,
+                          navigation: {
+                            nextEl: content.querySelector('.swiper-button-next'),
+                            prevEl: content.querySelector('.swiper-button-prev'),
+                          },
+                          pagination: {
+                            el: content.querySelector('.swiper-pagination'),
+                            clickable: true,
+                          },
+                        });
+                      }
+                    }
+                  }
+                  
 
-  
-  // Função para fechar todos os conteúdos
-  function closeAllContents() {
-    document.querySelectorAll('.menu-cardapio, .novidades-container').forEach(content => {
-      content.style.display = 'none';
-      content.classList.remove('visible');
-      
-      // Destrói a instância do Swiper para liberar memória
-      if (content.swiperInstance) {
-        content.swiperInstance.destroy(true, true);
-        content.swiperInstance = null;
-      }
-    });
-  
-    // Remove a classe active de todos os botões
-    document.querySelectorAll('.menu-btn, .novidades-btn').forEach(btn => {
-      btn.classList.remove('active');
-      if (btn.classList.contains('menu-btn')) {
-        btn.style.backgroundColor = '#dfa529';
-      } else if (btn.classList.contains('novidades-btn')) {
-        btn.style.backgroundColor = '#3726d1';
-      }
-    });
-  }
-  
-  // Eventos para os botões de Novidades
-  document.querySelectorAll('.novidades-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const contentId = `novidades-${encodeURIComponent(this.dataset.name)}`;
-      lastClickedButton = this; // <-- Salva o botão clicado
-      toggleContent(this, contentId);
-    });
-  });
-  
-  // Eventos para os botões de Cardápio
-  document.querySelectorAll('.menu-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const contentId = `menu-${encodeURIComponent(this.dataset.name)}`;
-      lastClickedButton = this; // <-- Salva o botão clicado
-      toggleContent(this, contentId);
-    });
-  });
-  
-      // Inicializa todos os carrosséis visíveis quando a página carrega
-      document
-        .querySelectorAll(".menu-cardapio, .novidades-container")
-        .forEach((container) => {
-          if (window.getComputedStyle(container).display !== "none") {
-            container.swiperInstance = new Swiper(container, {
-              loop: true,
-              navigation: {
-                nextEl: container.querySelector(".swiper-button-next"),
-                prevEl: container.querySelector(".swiper-button-prev"),
-              },
-              pagination: {
-                el: container.querySelector(".swiper-pagination"),
-                clickable: true,
-              },
-            });
-          }
-        });
-  
-  
+                  
+                  // Função para fechar todos os conteúdos
+                  function closeAllContents() {
+                    document.querySelectorAll('.menu-cardapio, .novidades-container').forEach(content => {
+                      content.style.display = 'none';
+                      content.classList.remove('visible');
+                      
+                      // Destrói a instância do Swiper para liberar memória
+                      if (content.swiperInstance) {
+                        content.swiperInstance.destroy(true, true);
+                        content.swiperInstance = null;
+                      }
+                    });
+                  
+                    // Remove a classe active de todos os botões
+                    document.querySelectorAll('.menu-btn, .novidades-btn').forEach(btn => {
+                      btn.classList.remove('active');
+                      if (btn.classList.contains('menu-btn')) {
+                        btn.style.backgroundColor = '#dfa529';
+                      } else if (btn.classList.contains('novidades-btn')) {
+                        btn.style.backgroundColor = '#3726d1';
+                      }
+                    });
+                  }
+                  
+                  // Eventos para os botões de Novidades
+                  document.querySelectorAll('.novidades-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                      const contentId = `novidades-${encodeURIComponent(this.dataset.name)}`;
+                      lastClickedButton = this; // <-- Salva o botão clicado
+                      toggleContent(this, contentId);
+                    });
+                  });
+                  
+                  // Eventos para os botões de Cardápio
+                  document.querySelectorAll('.menu-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                      const contentId = `menu-${encodeURIComponent(this.dataset.name)}`;
+                      lastClickedButton = this; // <-- Salva o botão clicado
+                      toggleContent(this, contentId);
+                    });
+                  });
+                  
+                      // Inicializa todos os carrosséis visíveis quando a página carrega
+                      document
+                        .querySelectorAll(".menu-cardapio, .novidades-container")
+                        .forEach((container) => {
+                          if (window.getComputedStyle(container).display !== "none") {
+                            container.swiperInstance = new Swiper(container, {
+                              loop: true,
+                              navigation: {
+                                nextEl: container.querySelector(".swiper-button-next"),
+                                prevEl: container.querySelector(".swiper-button-prev"),
+                              },
+                              pagination: {
+                                el: container.querySelector(".swiper-pagination"),
+                                clickable: true,
+                              },
+                            });
+                          }
+                        });
+                  
+                  
 
-      
-  
-      // Eventos para fechar o Cardápio, 
-      document
-        .querySelectorAll(
-          ".fechar-menu, .fechar-novidades"
-        )
-        .forEach((button) => {
-          button.addEventListener("click", function () {
-            closeAllContents(); // Fecha todos os conteúdos
+                      
+                  
+                      // Eventos para fechar o Cardápio, 
+                      document
+                        .querySelectorAll(
+                          ".fechar-menu, .fechar-novidades"
+                        )
+                        .forEach((button) => {
+                          button.addEventListener("click", function () {
+                            closeAllContents(); // Fecha todos os conteúdos
 
-        // Rola de volta para o estabelecimento
-        if (lastClickedButton) {
-          const targetId = lastClickedButton.getAttribute("data-id");
-          const liEstabelecimento = document.getElementById(targetId);
-          if (liEstabelecimento) {
-            const y = liEstabelecimento.getBoundingClientRect().top + window.pageYOffset - 20;
-            window.scrollTo({ top: y, behavior: "smooth" });
-          }
-        }
-
-
-          });
-        });
-
-    }
-  
-    function loadPaidEstablishments() {
-      const categories = window.categories || [];
-      categories.forEach((category) => {
-        loadContent(category.title, category.establishments);
-      });
-    }
-  
-    document.addEventListener("DOMContentLoaded", function () {
-      loadPaidEstablishments();
-    });
-  
-    // Função para esconder o novidades e mostrar o conteúdo
-    function mostrarConteudo() {
-      if (novidades) {
-        novidades.classList.add("hidden"); // Esconde o novidades
-      }
-      if (contentArea) {
-        contentArea.classList.remove("hidden"); // Mostra a área de conteúdo
-      }
-    }
-  
-    // Adiciona evento SOMENTE aos subitens do menu
-    subMenuLinks.forEach((link) => {
-      link.addEventListener("click", function (event) {
-        event.preventDefault(); // Evita recarregar a página
-        mostrarConteudo(); // Esconde o novidades e mostra o conteúdo
-  
-        // Retrai a sidebar em dispositivos móveis
-        if (window.innerWidth < 768) {
-          sidebar.classList.add("close");
-        }
-      });
-    });
-  
-    // Garantir que ao clicar no "Início", a página recarregue corretamente
-    if (homeLink) {
-      homeLink.addEventListener("click", function (event) {
-        event.preventDefault();
-        window.location.href = "index.html"; // Recarrega a página
-      });
-    }
-  
-    ///////////////////////////// fimmmmm
-  
-    // Garante que ao recarregar a página inicial, o novidades apareça
-    if (window.location.pathname.includes("index.html")) {
-      contentArea.classList.remove("hidden"); // Garante que o conteúdo apareça
-    }
-  
-    // Verifica se é um dispositivo móvel e retrai a sidebar
-    if (window.innerWidth < 768) {
-      sidebar.classList.add("close", "hoverable");
-    }
-  
-    // Alternar sidebar ao clicar no ícone do menu
-    sidebarOpen.addEventListener("click", () => {
-      sidebar.classList.toggle("close");
-    });
-  
-    sidebarExpand.addEventListener("click", () => {
-      sidebar.classList.remove("close", "hoverable");
-    });
-  
-    sidebarClose.addEventListener("click", () => {
-      sidebar.classList.add("close", "hoverable");
-    });
-  
-    /////////////////////////////////////////////////
-  
-    sidebar.addEventListener("mouseenter", () => {
-      if (sidebar.classList.contains("hoverable")) {
-        sidebar.classList.remove("close");
-      }
-    });
-  
-    sidebar.addEventListener("mouseleave", () => {
-      if (sidebar.classList.contains("hoverable")) {
-        sidebar.classList.add("close");
-      }
-    });
-  
-    // Alternar tema escuro/claro
-    darkLight.addEventListener("click", () => {
-      body.classList.toggle("dark");
-      darkLight.classList.toggle("bx-moon");
-      darkLight.classList.toggle("bx-sun");
-    });
-  
-    
-  
-    // Adicionar eventos para os links do menu
-    categories.forEach((category) => {
-      if (category.link) {
-        // 🔹 Só adicionamos o evento se o link existir
-        category.link.addEventListener("click", function (event) {
-          event.preventDefault();
-          // Remove a classe ativa de todos os itens
-          categories.forEach((cat) => cat.link?.classList.remove("active"));
-          // Adiciona a classe ativa ao item clicado
-          this.classList.add("active");
-          // Carrega o conteúdo correspondente
-          loadContent(category.title, category.establishments);
-  
-          // Expande a sidebar, se estiver fechada
-          if (sidebar.classList.contains("close")) {
-            sidebar.classList.remove("close");
-          }
-        });
-      }
-    });
-  
-   
-    
-    
-    
-    
-    
-    ///// FIM AREA DE PAGAMENTO
-  
-    document.addEventListener("click", function (event) {
-      if (
-        window.innerWidth < 768 &&
-        !sidebar.contains(event.target) &&
-        event.target !== sidebarOpen &&
-        !event.target.closest(".submenu_item") &&
-        !event.target.closest(".menu_content") &&
-        !event.target.closest(".menu_items")
-      ) {
-        sidebar.classList.add("close");
-      }
-    });
+                        // Rola de volta para o estabelecimento
+                        if (lastClickedButton) {
+                          const targetId = lastClickedButton.getAttribute("data-id");
+                          const liEstabelecimento = document.getElementById(targetId);
+                          if (liEstabelecimento) {
+                            const y = liEstabelecimento.getBoundingClientRect().top + window.pageYOffset - 20;
+                            window.scrollTo({ top: y, behavior: "smooth" });
+                          }
+                        }
 
 
+                          });
+                        });
+
+                    }
+                  
+                    function loadPaidEstablishments() {
+                      const categories = window.categories || [];
+                      categories.forEach((category) => {
+                        loadContent(category.title, category.establishments);
+                      });
+                    }
+                  
+                    document.addEventListener("DOMContentLoaded", function () {
+                      loadPaidEstablishments();
+                    });
+                  
+                    // Função para esconder o novidades e mostrar o conteúdo
+                    function mostrarConteudo() {
+                      if (novidades) {
+                        novidades.classList.add("hidden"); // Esconde o novidades
+                      }
+                      if (contentArea) {
+                        contentArea.classList.remove("hidden"); // Mostra a área de conteúdo
+                      }
+                    }
+                  
+                    // Adiciona evento SOMENTE aos subitens do menu
+                    subMenuLinks.forEach((link) => {
+                      link.addEventListener("click", function (event) {
+                        event.preventDefault(); // Evita recarregar a página
+                        mostrarConteudo(); // Esconde o novidades e mostra o conteúdo
+                  
+                        // Retrai a sidebar em dispositivos móveis
+                        if (window.innerWidth < 768) {
+                          sidebar.classList.add("close");
+                        }
+                      });
+                    });
+                  
+                    // Garantir que ao clicar no "Início", a página recarregue corretamente
+                    if (homeLink) {
+                      homeLink.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        window.location.href = "index.html"; // Recarrega a página
+                      });
+                    }
+                  
+                    ///////////////////////////// fimmmmm
+                  
+                    // Garante que ao recarregar a página inicial, o novidades apareça
+                    if (window.location.pathname.includes("index.html")) {
+                      contentArea.classList.remove("hidden"); // Garante que o conteúdo apareça
+                    }
+                  
+                    // Verifica se é um dispositivo móvel e retrai a sidebar
+                    if (window.innerWidth < 768) {
+                      sidebar.classList.add("close", "hoverable");
+                    }
+                  
+                    // Alternar sidebar ao clicar no ícone do menu
+                    sidebarOpen.addEventListener("click", () => {
+                      sidebar.classList.toggle("close");
+                    });
+                  
+                    sidebarExpand.addEventListener("click", () => {
+                      sidebar.classList.remove("close", "hoverable");
+                    });
+                  
+                    sidebarClose.addEventListener("click", () => {
+                      sidebar.classList.add("close", "hoverable");
+                    });
+                  
+                    /////////////////////////////////////////////////
+                  
+                    sidebar.addEventListener("mouseenter", () => {
+                      if (sidebar.classList.contains("hoverable")) {
+                        sidebar.classList.remove("close");
+                      }
+                    });
+                  
+                    sidebar.addEventListener("mouseleave", () => {
+                      if (sidebar.classList.contains("hoverable")) {
+                        sidebar.classList.add("close");
+                      }
+                    });
+                  
+                    // Alternar tema escuro/claro
+                    darkLight.addEventListener("click", () => {
+                      body.classList.toggle("dark");
+                      darkLight.classList.toggle("bx-moon");
+                      darkLight.classList.toggle("bx-sun");
+                    });
+                  
+                    
+                  
+                    // Adicionar eventos para os links do menu
+                    categories.forEach((category) => {
+                      if (category.link) {
+                        // 🔹 Só adicionamos o evento se o link existir
+                        category.link.addEventListener("click", function (event) {
+                          event.preventDefault();
+                          // Remove a classe ativa de todos os itens
+                          categories.forEach((cat) => cat.link?.classList.remove("active"));
+                          // Adiciona a classe ativa ao item clicado
+                          this.classList.add("active");
+                          // Carrega o conteúdo correspondente
+                          loadContent(category.title, category.establishments);
+                  
+                          // Expande a sidebar, se estiver fechada
+                          if (sidebar.classList.contains("close")) {
+                            sidebar.classList.remove("close");
+                          }
+                        });
+                      }
+                    });
+                  
+                  
+                    
+                    
+                    
+                    
+                    
+                    ///// FIM AREA DE PAGAMENTO
+                  
+                    document.addEventListener("click", function (event) {
+                      if (
+                        window.innerWidth < 768 &&
+                        !sidebar.contains(event.target) &&
+                        event.target !== sidebarOpen &&
+                        !event.target.closest(".submenu_item") &&
+                        !event.target.closest(".menu_content") &&
+                        !event.target.closest(".menu_items")
+                      ) {
+                        sidebar.classList.add("close");
+                      }
+                    });
 
 
-    
-  });
-  
+
+
+                    
+                  });

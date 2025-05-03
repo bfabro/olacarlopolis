@@ -45,6 +45,24 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    .alerta-extra {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      border-radius: 6px;
+    }
+    .pagamento-btn {
+      margin-top: 10px;
+      background-color: #25d366;
+      border: none;
+      padding: 10px 15px;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -63,6 +81,13 @@
     <input type="file" id="uploadInput" multiple accept="image/*" />
     <button onclick="uploadImagens()">Enviar Imagens</button>
     <p id="limiteMsg" style="color: red;"></p>
+    <div class="alerta-extra" id="extraAviso" style="display:none">
+      Você atingiu o limite de trocas mensais gratuitas. Trocas adicionais têm um custo de <strong>R$ 5,00 cada</strong>.<br>
+      Clique no botão abaixo para solicitar a liberação via WhatsApp:
+      <a href="https://api.whatsapp.com/send?phone=5543999999999&text=Olá! Gostaria de solicitar uma troca extra no site Olá Carlópolis." target="_blank">
+        <button class="pagamento-btn">Solicitar via WhatsApp</button>
+      </a>
+    </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
@@ -71,8 +96,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
   <script>
-    const firebaseConfig = {
-         apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+ apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
     authDomain: "contadoracessos.firebaseapp.com",
     databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
     projectId: "contadoracessos",
@@ -134,10 +158,33 @@
 
       db.ref("estabelecimentos/" + uidGlobal + "/trocasRealizadas").once("value").then(snap => {
         const trocas = snap.val() || 0;
-        if (trocas >= trocasMaximas) {
-          document.getElementById("limiteMsg").textContent = "Limite de trocas mensais atingido. (1 por mês)";
-          return;
-        }
+
+      db.ref("estabelecimentos/" + uidGlobal + "/trocaExtraLiberada").once("value").then(extraSnap => {
+  const extraLiberada = extraSnap.val();
+
+  if (trocas >= trocasMaximas && !extraLiberada) {
+    document.getElementById("limiteMsg").textContent = "Você já utilizou sua troca gratuita.";
+    document.getElementById("extraAviso").style.display = "block";
+    return;
+  }
+
+  const listaRef = db.ref("estabelecimentos/" + uidGlobal + "/imagens/divulgacao");
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const ref = storage.ref("imagens/" + uidGlobal + "/" + file.name);
+    ref.put(file).then(() => {
+      listaRef.push(file.name);
+      db.ref("estabelecimentos/" + uidGlobal + "/trocasRealizadas").set(trocas + 1);
+      if (extraLiberada) {
+        db.ref("estabelecimentos/" + uidGlobal + "/trocaExtraLiberada").remove(); // remove após uso
+      }
+      carregarImagens();
+    });
+  }
+  document.getElementById("limiteMsg").textContent = "";
+  document.getElementById("extraAviso").style.display = "none";
+});
+
 
         const listaRef = db.ref("estabelecimentos/" + uidGlobal + "/imagens/divulgacao");
         for (let i = 0; i < files.length; i++) {
@@ -150,6 +197,7 @@
           });
         }
         document.getElementById("limiteMsg").textContent = "";
+        document.getElementById("extraAviso").style.display = "none";
       });
     }
   </script>

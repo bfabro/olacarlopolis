@@ -1641,3 +1641,30 @@ img {
 .btn-divulgacao:hover {
   background-color: #45a049; /* Cor do botão ao passar o mouse */
 }
+
+
+
+
+.status-tag {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 13px;
+  color: white;
+  letter-spacing: 0.8px; /* 👈 espaçamento entre letras */
+}
+
+.status-tag.aberto {
+  background-color: #2e7d32; /* verde */
+}
+
+.status-tag.fechado {
+  background-color: #c62828; /* vermelho */
+}
+
+.proximo-horario {
+  margin-left: 6px;
+  color: #555;
+  font-style: italic;
+}
+
