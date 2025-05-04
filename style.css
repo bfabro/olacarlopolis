@@ -424,7 +424,7 @@ body.dark {
   display: none !important;
 }
 
-.locais_nomes {
+.locais_nomes { 
   color: #2E8B57;
   /* Verde folha para um visual mais confiável */
   font-size: 1.2rem;

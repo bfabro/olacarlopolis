@@ -295,8 +295,13 @@ registrarAcesso();
 // auto peças
 paulinhoautopeças:"s",
 
+//chaveiro
+chaveirocentral:"s",
+
+
       //confecção
       yellowjeans:"s",
+      panaceira:"s",
   
       // borracharia
       vidanova: "s",
@@ -326,6 +331,10 @@ clínicaveterináriacarlópolis:"s",
 
       //feira da lua
       feiradalua:"s",
+
+      //imobiliaria
+      
+      imobiliariacarlopolis:"s",
 
       // mercearia
       seiza:"s",
@@ -391,6 +400,7 @@ clínicaveterináriacarlópolis:"s",
       
       // sorveteria
       limone:"s",
+      sorvetessallesferreira:"s",
       santtinogelateria:"s",
   
       //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
@@ -849,12 +859,12 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/acougue/curitiba/curitiba.png",
                             name: "Açougue Curitiba",
-                            hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00 as 12:00h",
+                            hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                             statusAberto:"a",
                             horarios: {
                               dom: [{ inicio: "08:00", fim: "18:00" }],
                               seg: [{ inicio: "08:00", fim: "18:00" }],
-                              ter: [ {inicio: "08:00", fim: "18:00" }],
+                              ter: [{ inicio: "08:00", fim: "18:00" }],
                               qua: [{ inicio: "08:00", fim: "18:00" }],
                               qui: [{ inicio: "08:00", fim: "18:00" }],
                               sex: [{ inicio: "08:00", fim: "18:00" }],
@@ -1064,6 +1074,49 @@ menuLinks.forEach((link) => {
 
 
 
+              {
+                link: document.querySelector("#menuChaveiro"),  
+                title: "Chaveiro",
+                establishments: [
+                    {
+                        image: "images/comercios/chaveiro/central/perfil.png",
+                        name: "Chaveiro Central",
+                        hours: "Dom a Dom: 8:00h as 20:00h",
+                        statusAberto:"a",
+                        horarios: {
+                          dom: [{ inicio: "08:00", fim: "20:00" }],
+                          seg: [{ inicio: "08:00", fim: "20:00" }],
+                          ter: [ {inicio: "08:00", fim: "20:00" }],
+                          qua: [{ inicio: "08:00", fim: "20:00" }],
+                          qui: [{ inicio: "08:00", fim: "20:00" }],
+                          sex: [{ inicio: "08:00", fim: "20:00" }],
+                          sab: [{ inicio: "08:00", fim: "20:00" }]
+                        },
+                        address: "R. Ataliba Leonel, 287 - Carlopolis",
+                        contact: "(43) 99632-3898",
+                        infoAdicional:"Atendemos Emergêncas<br>Confecções de chaves automotivas<br>Confecções de chaves residenciasis<br>Abertua de veiculos<br>Abertura de residencias<br>Codificação de chaves automotivas<br>Codificação de controles residenciais",
+                        instagram:"https://www.instagram.com/chaveiro.central.77/",
+                        novidadesImages: [ 
+                        "images/comercios/chaveiro/central/divulgacao/1.png",
+                        "images/comercios/chaveiro/central/divulgacao/2.png",
+                        "images/comercios/chaveiro/central/divulgacao/3.png",
+                        "images/comercios/chaveiro/central/divulgacao/4.png",
+                        "images/comercios/chaveiro/central/divulgacao/5.png",
+                        ],
+                        novidadesDescriptions: [                            
+                          "Transponder",
+                          "Evite falhas na multimídia e preserve a originalidade do seu veículo! Com a remoção do chip, sua central continua funcionando perfeitamente, sem erros ou travamentos.",
+                        "Com design compacto e funcional, nossos canivetes oferecem facilidade no uso e segurança, combinando tecnologia e estilo",
+                        "Garanta a segurança que você merece com nossas chaves Yale simples por apenas R$8,00! Qualidade e durabilidade por um preço que cabe no seu bolso",
+                        "Temos uma grande variedade de cilindros de ignição para diferentes modelos de veículos, garantindo que você encontre a peça perfeita para o seu carro",
+                        
+                        ],
+                    },
+                ],
+            },
+
+
+
 
 
               {
@@ -1153,6 +1206,51 @@ menuLinks.forEach((link) => {
                       ],                
                     },
                 ],
+            },
+
+
+
+
+
+            {
+              link: document.querySelector("#menuImobiliaria"),  
+              title: "Imobiliaria",
+              establishments: [
+                  {
+                      image: "images/comercios/imobiliaria/imobiliariaCarlopolis/perfil.png",
+                      name: "Imobiliaria Carlopolis",
+                      hours: "Seg a Sex: 8:00h as 18:00h<br>Sab: 08:00h as 12:00h",
+                      statusAberto:".",
+                      horarios: {
+                        
+                        seg: [{ inicio: "08:00", fim: "20:00" }],
+                        ter: [ {inicio: "08:00", fim: "20:00" }],
+                        qua: [{ inicio: "08:00", fim: "20:00" }],
+                        qui: [{ inicio: "08:00", fim: "20:00" }],
+                        sex: [{ inicio: "08:00", fim: "20:00" }],
+                        sab: [{ inicio: "08:00", fim: "12:00" }],
+                        dom: []
+                      },
+                      address: "Rua Benedito Salles n°1.033 - Centro, Carlópolis",
+                      contact: "(43) 99686-4716",
+                      infoAdicional:"Somos Correspondente Caixa",
+                      instagram:"https://www.instagram.com/imobiliariacarlopolis/",
+                      facebook:"https://www.facebook.com/imobiliariacarlopolis/?locale=pt_BR",
+                      site:"https://www.imobiliariacarlopolis.com.br/",
+                      novidadesImages: [ 
+                      "images/comercios/imobiliaria/imobiliariaCarlopolis/divulgacao/1.png",
+                      "images/comercios/imobiliaria/imobiliariaCarlopolis/divulgacao/2.png",
+                      "images/comercios/imobiliaria/imobiliariaCarlopolis/divulgacao/3.png",
+                      
+                      ],
+                      novidadesDescriptions: [                            
+                        "Terrenos exclusivos em Barão de Antonina!",
+                        "Loteamento Bela Vista",
+                         "Correspondente Caixa",
+                        
+                      ],
+                  },
+              ],
             },
 
 
@@ -1571,6 +1669,56 @@ menuLinks.forEach((link) => {
                    "images/comercios/sorveteria/limone/divulgacao/5.jpeg",                  
                   ],                    
               },
+
+
+
+
+
+
+              {
+                image: "images/comercios/sorveteria/salles/perfil.png",
+                name: "Sorvetes Salles Ferreira",
+                hours: "Seg: 13:30h as 21:00h<br>Ter a Dom: 13:30h as 22:00h",
+                statusAberto:".",
+                horarios: {                            
+                  seg: [{ inicio: "13:30", fim: "21:00" }],
+                  ter: [{ inicio: "13:30", fim: "22:00" }],
+                  qua: [{ inicio: "13:30", fim: "22:00" }],
+                  qui: [{ inicio: "13:30", fim: "22:00" }],
+                  sex: [{ inicio: "13:30", fim: "22:00" }],
+                  sab: [{ inicio: "13:30", fim: "22:00" }],
+                  dom: [{ inicio: "13:30", fim: "22:00" }]
+                },
+                address: "R. Kalil Keder, n° 525 - Carlópolis",
+                contact: "(43) 99600-1919",
+                delivery: "Sim / Sem Taxa",
+                facebook: "https://www.facebook.com/sorvetessalles/?locale=pt_BR",
+                instagram: "https://www.instagram.com/sorvetessalles/",
+                novidadesImages: [              
+                 "images/comercios/sorveteria/salles/divulgacao/1.png",
+                 "images/comercios/sorveteria/salles/divulgacao/2.png",
+                 "images/comercios/sorveteria/salles/divulgacao/3.png",
+                 "images/comercios/sorveteria/salles/divulgacao/4.png",
+                 "images/comercios/sorveteria/salles/divulgacao/5.png",
+                ],     
+                novidadesDescriptions: [                            
+                  "Açaí irresistível do jeito que você ama, cheio de complementos deliciosos! Venha experimentar na Sorveteria Salles Ferreira",
+                  "Está planejando uma confraternização inesquecível? Ou está planejando algo especial? Nossa caixa de sorvetes é a escolha perfeita para refrescar os momentos de confraternização",
+                  "Qual seria o sabor que você escolheria para acompanhar?",
+                  "Quer se refrescar com muito sabor? Experimente nossos milkshakes deliciosos e cremosos! Escolha seu sabor favorito e venha se deliciar! ",
+                  "Nosso petit gâteau com sorvete é a combinação perfeita entre o quente e o frio. Venha provar e se encantar!",
+              
+                ],               
+            },
+
+
+
+
+
+
+
+
+
 
 
               {
@@ -3394,18 +3542,7 @@ menuLinks.forEach((link) => {
             ],
         },
   
-        {
-            link: document.querySelector("#menuImobiliaria"),  
-            title: "Imobiliaria",
-            establishments: [
-                {
-                    name: "Rafael Bandeira",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    contact: "(43) 99951-1540",
-                },
-            ],
-        },
+      
   
        
   
