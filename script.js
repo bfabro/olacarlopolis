@@ -3984,10 +3984,10 @@ function restaurarMenuOriginal() {
           const aberto = estaAbertoAgora(establishment.horarios);
           if (aberto) {
             const fechamento = horarioFechamentoAtual(establishment.horarios);
-            statusAberto = `<span class='status-tag aberto'>Aberto até ${fechamento}</span>`;
+            statusAberto = `<span class='status-tag aberto'>ABERTO ATÉ ${fechamento}</span>`;
           } else {
             const proximo = proximoHorarioDeAbertura(establishment.horarios);
-            statusAberto = `<span class='status-tag fechado'>Fechado</span><span class='proximo-horario'>Abre ${proximo}</span>`;
+            statusAberto = `<span class='status-tag fechado'>FECHADO</span><span class='proximo-horario'>Abre ${proximo}</span>`;
           }
         }
 
