@@ -402,6 +402,9 @@ clínicaveterináriacarlópolis:"s",
       limone:"s",
       sorvetessallesferreira:"s",
       santtinogelateria:"s",
+
+      // topografia
+      da2engenharia:"s",
   
       //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
   
@@ -2220,6 +2223,54 @@ menuLinks.forEach((link) => {
                     ],
                 },
             ],
+        },
+
+
+
+
+
+        {
+          link: document.querySelector("#menuTopografia"),  
+          title: "Topografia",
+          establishments: [
+              {
+                  image: "images/comercios/topografia/da2/perfil.png",
+                  name: "DA2 Engenharia",
+                  hours: "Seg a Sex: 8:00h as 12:00h - 13:30h as 17:30h<br>Sab e Dom: Fechado",
+                  statusAberto:".",
+                  horarios: {
+                    
+                    seg: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:30", fim: "17:30" }],
+                    ter: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:30", fim: "17:30" }],
+                    qua: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:30", fim: "17:30" }],
+                    qui: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:30", fim: "17:30" }],
+                    sex: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:30", fim: "17:30" }],
+                    sab: [],
+                    dom: []
+                  },
+                  address: "Rua Antônio Jonas Ferreira Pinto, 395, Carlópolis ",
+                  contact: "Anderson: (43) 99128-6761",
+                  contact2:"Mingo: (43) 99146-4264",
+                  infoAdicional:"Somos Especialista em Georreferenciamento<br>Eng. Florestal<br>Eng. de Segurança do Trabalho<br>CAR",
+                  instagram:"https://www.instagram.com/da2engenharia/",                 
+                  
+                  novidadesImages: [ 
+                  "images/comercios/topografia/da2/divulgacao/1.png",
+                  "images/comercios/topografia/da2/divulgacao/2.png",
+                  "images/comercios/topografia/da2/divulgacao/3.png",
+                  "images/comercios/topografia/da2/divulgacao/4.png",
+                  "images/comercios/topografia/da2/divulgacao/5.png",
+                  
+                  ],
+                  novidadesDescriptions: [                            
+                    "Venha nos Visitar!",
+                    "Nos serviços prestados pela DA2 Engenharia, além de contarmos com equipamentos de última geração, também dispomos de profissionais com a expertise que exige as normas atinentes aos trabalhos",
+                     "Regularização Imobiliária é o processo que legaliza imóveis com pendências, garantindo o direito de propriedade e a regularidade das construções",
+                    "A documentação como os elencados acima, dentro do Georreferenciamento, consideramos como sendo a Fase de Planejamento( inicial de todo o processo), é nesta etapa inclusive que elaboramos o orçamento, bem como determinamos a melhor alternativa para a regularização do imóvel rural, Matricula, CCIR e CAR",
+                    "Prazo para fazer o GEO do teu imovel vai até 25/11/2025",
+                  ],
+              },
+          ],
         },
   
       ///////////////////
