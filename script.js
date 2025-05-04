@@ -3342,7 +3342,18 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/restaurante/assadaoRussao/assadaoRussao.png",
                 name: "Assadão do Russão",
-                hours: "Seg a Sab: 10:30h - 14h",
+                hours: "Seg a Sab: 10:30h as 14:00h",
+                statusAberto:".",
+                  horarios: {
+                    
+                    seg: [{ inicio: "10:30", fim: "14:00" }],
+                    ter: [{ inicio: "10:30", fim: "14:00" }],
+                    qua: [{ inicio: "10:30", fim: "14:00" }],
+                    qui: [{ inicio: "10:30", fim: "14:00" }],
+                    sex: [{ inicio: "10:30", fim: "14:00" }],
+                    sab: [{ inicio: "10:30", fim: "14:00" }],
+                    dom: []
+                  },
                 address: "Rua Benedito Salles 1241",
                 contact: "(43) 9838-7570",
                 delivery: "Sim / Com Taxa",
@@ -3360,6 +3371,16 @@ menuLinks.forEach((link) => {
               image: "images/comercios/restaurante/cantinaItaliana/perfil.png",
               name: "Cantina Italiana",
               hours: "Seg: 17:30h a 23h <br> Ter: Fechado<br>Qua a Dom: 17:30h a 23h",
+              statusAberto:".",
+                  horarios: {                    
+                    seg: [{ inicio: "17:30", fim: "23:00" }],
+                    ter: [],
+                    qua: [{ inicio: "17:30", fim: "23:00" }],
+                    qui: [{ inicio: "17:30", fim: "23:00" }],
+                    sex: [{ inicio: "17:30", fim: "23:00" }],
+                    sab: [{ inicio: "17:30", fim: "23:00" }],
+                    dom: [{ inicio: "17:30", fim: "23:00" }]
+                  },
               address: "R. Padre Hugo - Carlópolis",
               contact: "(43) 99640-4484",
               delivery: "Sim / Com Taxa", 
@@ -3383,7 +3404,17 @@ menuLinks.forEach((link) => {
           {
             image: "images/comercios/restaurante/oficinaSabor/perfil.png",
             name: "Oficina do Sabor",
-            hours: "Dom a Dom: 07:00h as 14:00h",
+            hours: "Dom a Dom: 10:30h as 14:00h",
+            statusAberto:".",
+                  horarios: {                    
+                    seg: [{ inicio: "10:30", fim: "14:00" }],
+                    ter: [{ inicio: "10:30", fim: "14:00" }],
+                    qua: [{ inicio: "10:30", fim: "14:00" }],
+                    qui: [{ inicio: "10:30", fim: "14:00" }],
+                    sex: [{ inicio: "10:30", fim: "14:00" }],
+                    sab: [{ inicio: "10:30", fim: "14:00" }],
+                    dom: [{ inicio: "10:30", fim: "14:00" }]
+                  },
             statusAberto:".",
             horarios: {              
               seg: [{ inicio: "07:00", fim: "14:00" }],
@@ -3423,19 +3454,20 @@ menuLinks.forEach((link) => {
 
 
 
-
-
-          
-         
-
-
-
-
-
           {
             image: "images/comercios/restaurante/galego/perfil.png",
             name: "Pesqueiro do Galego",
             hours: "Qua a Sab: 11:00h - 21:30h<br>Dom: 11:00h - 16:00h ",
+            statusAberto:".",
+            horarios: {                    
+              seg: [],
+              ter: [],
+              qua: [{ inicio: "11:00", fim: "21:30" }],
+              qui: [{ inicio: "11:00", fim: "21:30" }],
+              sex: [{ inicio: "11:00", fim: "21:30" }],
+              sab: [{ inicio: "11:00", fim: "21:30" }],
+              dom: [{ inicio: "11:00", fim: "16:00" }]
+            },
             address: "Estr. Fazendinha, 158 - Carlópolis",
             contact: "(43) 99619-1971",
             delivery: "Sim / Com Taxa",
@@ -3460,15 +3492,20 @@ menuLinks.forEach((link) => {
 
 
 
-
-
-
-
-
             {
               image: "images/comercios/restaurante/paiol/paiol.png",
               name: "Paiol",
-              hours: "Ter: 10h a 15h<br>Qua - Sab: 10h a 15h - 18h30 a 23h <br> Dom: 11h a 15h<br>Seg: Fechado",
+              hours: "Ter: 10:00h as 15:00h<br>Qua - Sab: 10:00h as 15:00h - 18h30 as 23:00h <br> Dom: 11:00h as 15:00h - 18h30 as 23:00h<br>Seg: Fechado",
+              statusAberto:".",
+            horarios: {                    
+              seg: [],
+              ter: [{ inicio: "10:00", fim: "15:00" }],
+              qua: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
+              qui: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
+              sex: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
+              sab: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
+              dom: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }]
+            },
               address: "Rua Benedito Salles 10, Carlópolis,",
               contact: "(43) 99159-0070",
               delivery: "Sim / Com Taxa",
@@ -3487,18 +3524,20 @@ menuLinks.forEach((link) => {
           },
 
 
-
-
-          
-
-
-
-
-
                 {
                     image: "images/comercios/restaurante/delfino/delfino.png",
                     name: "Delfino",
-                    hours: "Seg a Sex: 11h - 15h / 18h - 22:30h</br> Sab: 11h - 16h",
+                    hours: "Seg a Sex: 11:00h as 15:00h - 18:00h as 22:30h</br> Sab: 11:00h as 16:00h",
+                    statusAberto:".",
+                    horarios: {                    
+                      seg: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      ter: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      qua: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      qui: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      sex: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      sab: [{ inicio: "11:00", fim: "16:00" }],
+                      dom: []
+                    },
                     address: "R. Kalil Keder, 90",
                     contact: "(43) 9111-9484",
                     delivery: "Sim / Com Taxa",
@@ -3507,7 +3546,17 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/restaurante/neia/neia.png",
                   name: "Neia",
-                  hours: "Seg a Sex: 11h - 14h <br>Sab: 11h - 16h",
+                  hours: "Seg a Sex: 11:00h as 14:00h <br>Sab: 11:00h as 16:00h",
+                  statusAberto:".",
+                  horarios: {                    
+                    seg: [{ inicio: "11:00", fim: "14:00" }],
+                    ter: [{ inicio: "11:00", fim: "14:00" }],
+                    qua: [{ inicio: "11:00", fim: "14:00" }],
+                    qui: [{ inicio: "11:00", fim: "14:00" }],
+                    sex: [{ inicio: "11:00", fim: "14:00" }],
+                    sab: [{ inicio: "11:00", fim: "16:00" }],
+                    dom: []
+                  },
                   address: "R. Kalil Keder, 262 ",
                   contact: "(43) 99847-1137",
                   delivery: "Sim / Com Taxa",
@@ -3515,16 +3564,20 @@ menuLinks.forEach((link) => {
               },
 
               
-
-
-
-
-
-
                 {
                   image: "images/comercios/restaurante/portal/portal.png",
                     name: "Portal",
-                    hours: "Seg a Qui: 19h - 21h",
+                    hours: "Seg a Qui: 19:00h as 21:00h",
+                    statusAberto:".",
+                    horarios: {                    
+                      seg: [{ inicio: "19:00", fim: "21:00" }],
+                      ter: [{ inicio: "19:00", fim: "21:00" }],
+                      qua: [{ inicio: "19:00", fim: "21:00" }],
+                      qui: [{ inicio: "19:00", fim: "21:00" }],
+                      sex: [],
+                      sab: [],
+                      dom: []
+                    },
                     address: "R. Benedito Salles, 2023",
                     contact: "(43) 3566-2174",
                     delivery: "Sim / Com Taxa",
@@ -3546,6 +3599,16 @@ menuLinks.forEach((link) => {
                   image: "images/comercios/restaurante/saborRoca/saborRoca.png",
                   name: "Sabor da Roça",
                   hours: "Seg a Sab: 10:30h as 14:00h",
+                  statusAberto:".",
+                    horarios: {                    
+                      seg: [{ inicio: "10:30", fim: "14:00" }],
+                      ter: [{ inicio: "10:30", fim: "14:00" }],
+                      qua: [{ inicio: "10:30", fim: "14:00" }],
+                      qui: [{ inicio: "10:30", fim: "14:00" }],
+                      sex: [{ inicio: "10:30", fim: "14:00" }],
+                      sab: [{ inicio: "10:30", fim: "14:00" }],
+                      dom: []
+                    },
                   address: "R. Benedito Salles, 365",
                   contact: "(43) 99832-3050",
                   delivery: "Sim / Sem Taxa",
@@ -3555,7 +3618,17 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/restaurante/selaht/selaht.png",
                 name: "Selaht Grill",
-                hours: "Ter a Dom: 11h as 23h",
+                hours: "Ter a Dom: 11:00h as 23:00h",
+                statusAberto:".",
+                    horarios: {                    
+                      seg: [],
+                      ter: [{ inicio: "11:00", fim: "23:00" }],
+                      qua: [{ inicio: "11:00", fim: "23:00" }],
+                      qui: [{ inicio: "11:00", fim: "23:00" }],
+                      sex: [{ inicio: "11:00", fim: "23:00" }],
+                      sab: [{ inicio: "11:00", fim: "23:00" }],
+                      dom: [{ inicio: "11:00", fim: "23:00" }]
+                    },
                 address: "R. Padre Hugo, 460",
                 contact: "(43) 9 9160-5120",
                 delivery: "Sim / Com Taxa",
@@ -3578,7 +3651,17 @@ menuLinks.forEach((link) => {
             {
               image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.png",
               name: "Restaurante da Di",
-              hours: "Seg a Sab: 10:30h - 14h",
+              hours: "Seg a Sab: 10:30h as 14:00h",
+              statusAberto:".",
+              horarios: {                    
+                seg: [{ inicio: "10:30", fim: "14:00" }],
+                ter: [{ inicio: "10:30", fim: "14:00" }],
+                qua: [{ inicio: "10:30", fim: "14:00" }],
+                qui: [{ inicio: "10:30", fim: "14:00" }],
+                sex: [{ inicio: "10:30", fim: "14:00" }],
+                sab: [{ inicio: "10:30", fim: "14:00" }],
+                dom: []
+              },
               address: "Benedito Salles n°910",
               contact: "(43) 99632-3418",
               delivery: "Sim / Com Taxa",
@@ -3596,7 +3679,17 @@ menuLinks.forEach((link) => {
           {
             image: "images/comercios/restaurante/yingyang/yingyang.png",
             name: "Ying Yang",
-            hours: "Seg a Sab: 18h - 23h <br> Sab e Dom: 10h30 - 14h",
+            hours: "Seg a Sab: 18:00h as 23:00h <br> Sab e Dom: 10h30 as 14:00h",
+            statusAberto:".",
+            horarios: {                    
+              seg: [{ inicio: "18:00", fim: "23:00" }],
+              ter: [{ inicio: "18:00", fim: "23:00" }],
+              qua: [{ inicio: "18:00", fim: "23:00" }],
+              qui: [{ inicio: "18:00", fim: "23:00" }],
+              sex: [{ inicio: "18:00", fim: "23:00" }],
+              sab: [{ inicio: "10:30", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }],
+              dom: [{ inicio: "10:30", fim: "14:00" }]
+            },
             address: "Benedito Salles n°910",
             contact: "(43) 99954-0831",
             delivery: "Sim / Com Taxa",
@@ -3643,7 +3736,17 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/moveis/movepar/perfil.png",
                   name: "Movepar",
-                  hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h<br> Dom: Fechado",
+                  hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 12:00h",
+                  statusAberto:".",
+                  horarios: {                    
+                    seg: [{ inicio: "08:00", fim: "18:00" }],
+                    ter: [{ inicio: "08:00", fim: "18:00" }],
+                    qua: [{ inicio: "08:00", fim: "18:00" }],
+                    qui: [{ inicio: "08:00", fim: "18:00" }],
+                    sex: [{ inicio: "08:00", fim: "18:00" }],
+                    sab: [{ inicio: "08:00", fim: "12:00" }],
+                    dom: []
+                  },
                   address: "R. Benedito Salles, 627 - Carlópolis",
                   contact: "(43) 3566-2749",
                   instagram:"https://www.instagram.com/movepar_carlopolis/",
@@ -3670,7 +3773,17 @@ menuLinks.forEach((link) => {
             establishments: [
                 {
                     name: "Haruo",
-                    hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h",
+                    hours: "Seg a Sex: 8:00h as 18:00h <br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                    
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },
                     address: "R. Laurindo Franco de Godoi, 90",
                     contact: "(43) 99951-1540",
                 },
