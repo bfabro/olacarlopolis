@@ -1200,7 +1200,7 @@ menuLinks.forEach((link) => {
                             name: "Yellow Jeans",
                             hours: "Seg a Sex: 9:00h as 11:30h -  13:00h as 17:00h",
                             address: "Rua Maria Pereira da Rocha Aleixo, 435",
-                            contact: "</br>(43) 998070671",
+                            contact: "(43) 998070671",
                         },
                     ],
                 },
