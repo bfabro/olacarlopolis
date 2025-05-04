@@ -391,6 +391,7 @@ clínicaveterináriacarlópolis:"s",
       pesqueirodogalego:"s",
       portal:"s",
       neia:"s",
+      oficinadosabor:"s",
       paiol: "s", // Paiol pagou
       restaurantedadi:"s",
       sabordaroça:"s",
@@ -3340,7 +3341,51 @@ menuLinks.forEach((link) => {
           },
 
 
-         
+          {
+            image: "images/comercios/restaurante/oficinaSabor/perfil.png",
+            name: "Oficina do Sabor",
+            hours: "Dom a Dom: 07:00h as 14:00h",
+            statusAberto:".",
+            horarios: {              
+              seg: [{ inicio: "07:00", fim: "14:00" }],
+              ter: [{ inicio: "07:00", fim: "14:00" }],
+              qua: [{ inicio: "07:00", fim: "14:00" }],
+              qui: [{ inicio: "07:00", fim: "14:00" }],
+              sex: [{ inicio: "07:00", fim: "14:00" }],
+              sab: [{ inicio: "07:00", fim: "14:00" }],
+              dom: [{ inicio: "07:00", fim: "14:00" }],
+            },
+            address: "Rua Capitão Estácio 604, Carlópolis",
+            contact: "(43) 99601-5543",
+            delivery: "Sim / Com Taxa",
+            instagram:"https://www.instagram.com/oficinadosabor_clps/",
+            facebook:"https://www.facebook.com/people/Oficina-do-Sabor/100051036652126/",
+           
+            
+          novidadesImages: [                    
+              "images/comercios/restaurante/oficinaSabor/divulgacao/1.png",                        
+             "images/comercios/restaurante/oficinaSabor/divulgacao/2.png",
+             "images/comercios/restaurante/oficinaSabor/divulgacao/3.png",
+             "images/comercios/restaurante/oficinaSabor/divulgacao/4.png",
+             "images/comercios/restaurante/oficinaSabor/divulgacao/5.png",
+             
+                    ],
+                    novidadesDescriptions:[
+          "A COMIDA CASEIRA PASSANDO DE GERAÇÃO PARA GERAÇÃO!!",
+          "Espetinho de Quarta a Sexta",
+          "Você que procura aquele assado, aquela costela de qualidade para o seu almoço de domingo, encontrou o lugar certo!!!",
+          "Temos Marmitas! Confira os preços",
+          "Nossa famosa Maionese!",
+
+          ],
+          
+        },
+
+
+
+
+
+
           
          
 
