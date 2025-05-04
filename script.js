@@ -301,7 +301,7 @@ chaveirocentral:"s",
 
       //confecção
       yellowjeans:"s",
-      panaceira:"s",
+      panaceia:"s",
   
       // borracharia
       vidanova: "s",
@@ -1157,6 +1157,45 @@ menuLinks.forEach((link) => {
                     link: document.querySelector("#menuConfecção"),    
                     title: "Confecção",
                     establishments: [
+
+
+                      {
+                        image: "images/comercios/confeccao/panaceia/perfil.png",
+                        name: "Panaceia",
+                        hours: "Seg a Sex: 8:00h as 18:00h<br>Sab: 08:00h as 12:00h",
+                        statusAberto:"a",
+                        horarios: {
+                          
+                          seg: [{ inicio: "08:00", fim: "18:00" }],
+                          ter: [ {inicio: "08:00", fim: "18:00" }],
+                          qua: [{ inicio: "08:00", fim: "18:00" }],
+                          qui: [{ inicio: "08:00", fim: "18:00" }],
+                          sex: [{ inicio: "08:00", fim: "18:00" }],
+                          sab: [{ inicio: "08:00", fim: "12:00" }],
+                          dom: [],
+                        },
+                        address: "Padre Hugo, 475 - Centro Carlópolis",
+                        contact: "(43) 99606-1356",
+                        contact2: "(43) 3566-1383",
+                        instagram:"https://www.instagram.com/panaceaconfeccoes/",
+                        facebook:"https://www.facebook.com/panacea.conf/?locale=pt_BR",
+                        novidadesImages: [ 
+                          "images/comercios/confeccao/panaceia/divulgacao/1.png",
+                          "images/comercios/confeccao/panaceia/divulgacao/2.png",
+                          "images/comercios/confeccao/panaceia/divulgacao/3.png",
+                          "images/comercios/confeccao/panaceia/divulgacao/4.png",
+                          "images/comercios/confeccao/panaceia/divulgacao/5.png",
+                          ],
+                          novidadesDescriptions: [                            
+                            "Camisa para ciclista.",
+                            "Body de bebê e camisetas personalizadas ",
+                            "Camisa de pesca em sublimação total.",
+                            "Uniformes esportivos",
+                            "",
+                          ],
+                    },
+
+
                         {
                             name: "Yellow Jeans",
                             hours: "Seg a Sex: 9:00h as 11:30h -  13:00h as 17:00h",
