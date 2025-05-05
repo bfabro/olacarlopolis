@@ -1262,7 +1262,7 @@ menuLinks.forEach((link) => {
                   {
                       image: "images/comercios/imobiliaria/imobiliariaCarlopolis/perfil.png",
                       name: "Imobiliaria Carlopolis",
-                      hours: "Seg a Sex: 8:00h as 18:00h<br>Sab: 08:00h as 12:00h",
+                      hours: "Seg a Sex: 08:00h as 18:00h<br>Sab: 08:00h as 12:00h",
                       statusAberto:".",
                       horarios: {
                         
@@ -3127,18 +3127,17 @@ menuLinks.forEach((link) => {
                     name: "Prefeitura",
                     address: "R. Benedito Salles, 1060 - Centro",
                     contact: "(43) 3566-1291",
-                    hours: "8h as 11:30 - 13h as 17h",
+                    hours: "Seg a Sex: 08:00h as 11:30 - 13:00h as 17:00h",                   
                    
-                    facebook: "https://www.facebook.com/profile.php?id=200531799983410&_rdr",
-                    instagram: "www.instagram.com/uahhhttps://www.instagram.com/prefeitura.carlopolis/?locale=zh_CN&hl=af",
+                    instagram: "https://www.instagram.com/prefeitura.carlopolis/?locale=zh_CN&hl=da",
                     site: "http://www.carlopolis.pr.gov.br/",
                 },
         
                 {
                   image: "images/setorPublico/prefeitura/prefeitura.png",
-                    name: "Duvidas e  Reclamações",
+                    name: "Duvidas e Reclamações",
                     contact: "(43) 99825-0360",
-                    hours: "8h as 17h",
+                    hours: "08:00h as 17:00h",
                 
                 },
             ],
@@ -3887,7 +3886,7 @@ menuLinks.forEach((link) => {
           {
             image: "images/comercios/restaurante/yingyang/yingyang.png",
             name: "Ying Yang",
-            hours: "Seg a Sab: 18:00h as 23:00h <br> Sab e Dom: 10h30 as 14:00h",
+            hours: "Seg a Sab: 18:00h as 23:00h <br> Sab e Dom: 10:30h as 14:00h - 18:00h as 23:00h",
             statusAberto:".",
             horarios: {                    
               seg: [{ inicio: "18:00", fim: "23:00" }],
@@ -3896,7 +3895,7 @@ menuLinks.forEach((link) => {
               qui: [{ inicio: "18:00", fim: "23:00" }],
               sex: [{ inicio: "18:00", fim: "23:00" }],
               sab: [{ inicio: "10:30", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }],
-              dom: [{ inicio: "10:30", fim: "14:00" }]
+              dom: [{ inicio: "10:30", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }]
             },
             address: "Benedito Salles n°910",
             contact: "(43) 99954-0831",
