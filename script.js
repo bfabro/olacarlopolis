@@ -2576,7 +2576,7 @@ menuLinks.forEach((link) => {
 
                 {
                   image: "images/servicos/churrasqueiro/flavio/flavio.png",
-                    name: "Flavio Churrasqueiro",
+                    name: "Flavio Giovani",
                     contact: "(43) 99906-1349",
                     instagram:"https://www.instagram.com/donascimentoflaviogiovani/",
                     novidadesImages: [               
