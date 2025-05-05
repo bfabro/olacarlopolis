@@ -2000,7 +2000,19 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
                     name: "Bio Farma",
                     address: "Rua Laurindo Franco Godoy, 464",
-                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h</br> Dom e feriado: Fechado",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    },  
+                    plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"03/05 a 09/05", 
                     contact: "(43) 3566-1473",
                     delivery: "Sim / Sem Taxa",
                     facebook: "www.facebook.com/uahh",
@@ -2027,7 +2039,17 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/descontoFacil/descontoFacil.png",
                     name: "Desconto Facil 1",
                     address: "R. Benedito Salles, 574",
-                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     contact: "(43) 99966-9812",
                     delivery: "Sim / Sem Taxa",
                     facebook:"https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
@@ -2052,7 +2074,17 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/farmacia/drogaMais/drogamais.png",
                     name: "DrogaMais",
-                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     address: "Rua Benedito Salles, 903",
                     contact: "(43) 98411-9145",
                     delivery: "Sim / Sem Taxa",
@@ -2079,7 +2111,17 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/elShaday/elshaday.png",
                     name: "El Shaday",
                     address: "R. Benedito Sales, 353",
-                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     contact: "(43) 98488-9420",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
@@ -2105,7 +2147,17 @@ menuLinks.forEach((link) => {
                   image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
                     name: "Farmacia da Vila",
                     address: "Rua Manguba, 320, Carlopolis",
-                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     contact: "(43) 99148-8478",
                     delivery: "Sim / Sem Taxa",
                     facebook: "#",
@@ -2131,7 +2183,17 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/farmais/farmais.png",
                     name: "FarMais",
                     address: "R. Benedito Salles, 1188",
-                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     contact: "(43) 3566-1211",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
@@ -2157,7 +2219,17 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/masterFarma/masterfarma.png",
                     name: "MasterFarma",
                     address: "R. Laurindo Franco de Godoi, 90",
-                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     contact: "(43) 99951-1540",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
@@ -2183,7 +2255,17 @@ menuLinks.forEach((link) => {
                     
                     name: "PopularMais",
                     address: "Elson Soares, 787, Sala 2",
-                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    hours: "Seg a Sex: 08:00h as 18:00h <br>Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     contact: "(43) 99647-6266",
                     delivery: "Sim / Sem Taxa",
                     image: "images/comercios/farmacia/popularMais/popularMais.png",
@@ -2214,7 +2296,17 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/santaMaria/santamaria.png",
                     name: "Santa Maria",
                     address: "R. Benedito Salles, nº 711, Carlopols",
-                    hours: "Seg a Sex: 8:00h as 18h </br> Sab: 08:00h as 12:00h",
+                    hours: "Seg a Sex: 08:00h as 18h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     contact: "(43) 99840-9658",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
@@ -2240,7 +2332,17 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/saudeFarma/saudeFarma.png",
                     name: "Saude Farma",
                     address: "Rua Benedito Salles, 951",
-                    hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     contact: "(43) 99956-8938",
                     delivery: "Sim / Sem Taxa",
                     facebook:
@@ -2278,8 +2380,7 @@ menuLinks.forEach((link) => {
                   name: "DA2 Engenharia",
                   hours: "Seg a Sex: 8:00h as 12:00h - 13:30h as 17:30h<br>Sab e Dom: Fechado",
                   statusAberto:".",
-                  horarios: {
-                    
+                  horarios: {                    
                     seg: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:30", fim: "17:30" }],
                     ter: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:30", fim: "17:30" }],
                     qua: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:30", fim: "17:30" }],
@@ -2704,7 +2805,7 @@ menuLinks.forEach((link) => {
                     contact:"(43) 99988-9376",
                     contact2: "(43) 3566-1473",
                     delivery: "Sim / Sem Taxa",
-                plantaoHorario: "8:00h às 21:00h", 
+                plantaoHorario: "08:00h às 21:00h", 
                 plantaoData:"03/05 a 09/05",     
                 statusAberto:".",
                 horarios: {                          
@@ -2735,20 +2836,6 @@ menuLinks.forEach((link) => {
                   "Redução da febre e para o alívio de dores",
                 ],
             },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             ],
@@ -3344,8 +3431,7 @@ menuLinks.forEach((link) => {
                 name: "Assadão do Russão",
                 hours: "Seg a Sab: 10:30h as 14:00h",
                 statusAberto:".",
-                  horarios: {
-                    
+                  horarios: {                    
                     seg: [{ inicio: "10:30", fim: "14:00" }],
                     ter: [{ inicio: "10:30", fim: "14:00" }],
                     qua: [{ inicio: "10:30", fim: "14:00" }],
