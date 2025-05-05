@@ -418,7 +418,7 @@ clínicaveterináriacarlópolis:"s",
       luisbarbeiro:"s",
   
       // churrasqueiro
-      flaviochurrasqueiro:"s",
+      flaviogiovani:"s",      
       pituca: "s",
 
   
