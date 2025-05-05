@@ -3480,11 +3480,37 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/mercearia/seiza/seiza.png",
                     name: "Seiza",
-                    hours: "Seg a Qui 9h - 18:30h </br>Sex 9h - 16:30 </br> sab: 09 - 12h",
+                    hours: "Seg a Qui: 09:00h as 18:30h <br>Sex: 09:00h as 16:30h </br> Sab: 09:00 - 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "09:00", fim: "18:30" }],
+                      ter: [{ inicio: "09:00", fim: "18:30" }],
+                      qua: [{ inicio: "09:00", fim: "18:30" }],
+                      qui: [{ inicio: "09:00", fim: "18:30" }],
+                      sex: [{ inicio: "08:00", fim: "16:30" }],
+                      sab: [{ inicio: "09:00", fim: "12:00" }],
+                      dom: []
+                    },  
                     address: "R. Fidêncio de Melo, 212 - Sala B",
                     contact: "(43) 99103-4187",
                     delivery: "Sim / Sem Taxa",            
                     instagram: "https://www.instagram.com/seizapr/",
+                    novidadesImages: [                  
+                        
+                      "images/comercios/mercearia/seiza/divulgacao/1.png",
+                      "images/comercios/mercearia/seiza/divulgacao/2.png",
+                      "images/comercios/mercearia/seiza/divulgacao/3.png",
+                      "images/comercios/mercearia/seiza/divulgacao/4.png",
+                      "images/comercios/mercearia/seiza/divulgacao/5.png",
+                                  
+                  ],
+                  novidadesDescriptions: [                            
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
                 
                 },
             ],
