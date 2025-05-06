@@ -259,6 +259,18 @@ function registrarAcesso() {
 
 registrarAcesso();
 
+// Função para registrar clique no Firebase
+function registrarCliqueBotao(tipo, idEstabelecimento) {
+  const hoje = new Date().toISOString().slice(0, 10);
+  const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
+  ref.transaction((atual) => (atual || 0) + 1);
+}
+
+
+
+
+
+
 
     // pagou? defina por s pago n nao pago // PAGx
     const statusEstabelecimentos = {
@@ -4434,19 +4446,21 @@ function restaurarMenuOriginal() {
                       <br>
                   
 
-                  <div class="button-container">
-                          ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
-                            <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
-                              <i class="fas fa-camera"></i>  Divulgação (${establishment.novidadesImages.length})
-                            </button>
-                          ` : ''}
-                          
-                          ${establishment.menuImages && establishment.menuImages.length > 0 ? `
-                            <button  id="cardapioButton" class="menu-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}">
-                              <i class="fas fa-utensils"></i>  Cardápio (${establishment.menuImages.length})
-                            </button>
-                          ` : ''}
-                        </div>
+                 <div class="button-container">
+  ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
+    <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}"
+      onclick="registrarClique('${normalizeName(establishment.name)}', 'divulgacao')">
+      <i class="fas fa-camera"></i> Divulgação (${establishment.novidadesImages.length})
+    </button>
+  ` : ''}
+
+  ${establishment.menuImages && establishment.menuImages.length > 0 ? `
+    <button id="cardapioButton" class="menu-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}"
+      onclick="registrarClique('${normalizeName(establishment.name)}', 'cardapio')">
+      <i class="fas fa-utensils"></i> Cardápio (${establishment.menuImages.length})
+    </button>
+  ` : ''}
+</div>
                         
                       
                             ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
@@ -4562,6 +4576,11 @@ function restaurarMenuOriginal() {
                       button.classList.add('active');
                       content.classList.add('visible');
                       content.style.display = 'block';
+
+
+                      const tipo = button.classList.contains('novidades-btn') ? "divulgacao" : "cardapio";
+    const id = button.getAttribute("data-id");
+    registrarCliqueBotao(tipo, id);
 
                 // NOVO scroll até o separador dentro do item clicado
                 setTimeout(() => {
@@ -4817,6 +4836,24 @@ function restaurarMenuOriginal() {
                         sidebar.classList.add("close");
                       }
                     });
+
+
+////
+
+// Função para registrar clique no Firebase
+function registrarCliqueBotao(tipo, idEstabelecimento) {
+  const hoje = new Date().toISOString().slice(0, 10);
+  const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
+  
+  ref.transaction((atual) => (atual || 0) + 1);
+}
+
+
+
+
+
+
+
 
 
 
