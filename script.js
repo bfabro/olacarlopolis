@@ -3523,7 +3523,7 @@ menuLinks.forEach((link) => {
                       "images/comercios/mercearia/seiza/divulgacao/2.png",
                       "images/comercios/mercearia/seiza/divulgacao/3.png",
                       "images/comercios/mercearia/seiza/divulgacao/4.png",
-                      "images/comercios/mercearia/seiza/divulgacao/5.png",
+                      
                                   
                   ],
                   novidadesDescriptions: [                            
