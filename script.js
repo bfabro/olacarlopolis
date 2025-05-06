@@ -2830,16 +2830,7 @@ menuLinks.forEach((link) => {
             
 
          
-              {
-                image: "images/informacoes/eventos/evento_4/pescar.png",
-                name: "Pescar",
-                date: "03/05/25 a 04/05/2025",
-                address: "Ilha do Ponciano",
-                contact: "(41) 99950-9291",
-                contact2:"(43) 99604-1013",
-                instagram:"https://www.instagram.com/p/DJAoxh4gRPS/",
-               
-            },
+              
 
 
             {
