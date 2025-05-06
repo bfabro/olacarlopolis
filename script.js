@@ -1876,6 +1876,16 @@ menuLinks.forEach((link) => {
                         "images/comercios/padaria/bom jesus/novidades/5.png",
                        
                     ],
+                    novidadesDescriptions:[
+                      "Pão Frances","Tortinhas","Mini Churros","Mistos Quente","Sucos de Frutas",
+
+                    ],
+                    menuImages: [
+                 
+                      "images/comercios/padaria/bom jesus/cardapio/1.png",
+                      "images/comercios/padaria/bom jesus/cardapio/2.png",
+                     
+                     ],  
                 },
 
                 {
