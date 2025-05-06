@@ -3480,7 +3480,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/mercearia/seiza/seiza.png",
                     name: "Seiza",
-                    hours: "Seg a Qui: 09:00h as 18:30h <br>Sex: 09:00h as 16:30h </br> Sab: 09:00 - 12:00h",
+                    hours: "Seg a Qui: 09:00h as 18:30h <br>Sex: 09:00h as 16:30h </br> Sab: 09:00 as 12:00h",
                     statusAberto:".",
                     horarios: {                          
                       seg: [{ inicio: "09:00", fim: "18:30" }],
@@ -4234,7 +4234,7 @@ function restaurarMenuOriginal() {
       ${
         establishment.image
           ? `
-           <img id="imagem-${normalizeName(establishment.name)}" src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}">
+           <img  id="imagem-${normalizeName(establishment.name)}" src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}">
 
 
           `
