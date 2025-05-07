@@ -1264,6 +1264,9 @@ img {
   font-weight: bold;
   letter-spacing: 1px;
   width: 100%;
+
+  animation: pulseGlow 2s ease-in-out infinite;
+  animation-delay: 4s;
 }
 .novidades-btn:hover {
   background-color: #000000;
@@ -1282,6 +1285,9 @@ img {
   font-weight: bold;
   letter-spacing: 1px;
   margin:0px 0px 0px 10px;
+
+  animation: pulseCardapio 2s ease-in-out infinite;
+  animation-delay: 2s;
 }
 
 .menu-btn:hover {
@@ -1698,4 +1704,38 @@ img {
   object-fit: cover;
   border-radius: 8px;
   background-color: #eee;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 20px rgba(255, 152, 0, 0.0);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 55, 5, 0.959);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(255, 152, 0, 0.0);
+  }
+}
+
+@keyframes pulseCardapio {
+  0% {
+    box-shadow: 0 0 20px rgba(255, 152, 0, 0.0);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(00, 55, 5, 0.959);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(255, 152, 0, 0.0);
+  }
+}
+
+.botao-divulgacao-animado {
+  animation: pulseGlow 2s ease-in-out infinite;
+  animation-delay: 5s;
+}
+
+.botao-divulgacao-animado {
+  animation: pulseGlow 2s ease-in-out infinite;
+  animation-delay: 5s;
 }
