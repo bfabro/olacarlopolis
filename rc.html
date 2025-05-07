@@ -363,21 +363,29 @@
 ]);
 diasFiltrados = Array.from(diasDoMes);
 				  } else if (tipo === "semanal") {
-					const mes = document.getElementById("filtroMes").value;
-					const semana = parseInt(document.getElementById("filtroSemana").value);
-					const inicio = (semana - 1) * 7 + 1;
-					const fim = semana * 7;
-					const diasDaSemana = new Set([
-  ...Object.keys(dadosCliques).filter(dia =>
-    dia.startsWith(mes) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-  ),
-  ...Object.keys(dadosBotoes).filter(dia =>
-    dia.startsWith(mes) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-  )
-]);
-diasFiltrados = Array.from(diasDaSemana);
+  const mesSelecionado = document.getElementById("filtroMes").value;
+  const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
 
-				  }
+  if (!mesSelecionado || isNaN(semanaSelecionada)) {
+    alert("Selecione um mês e uma semana para o relatório semanal.");
+    return;
+  }
+
+  const inicio = (semanaSelecionada - 1) * 7 + 1;
+  const fim = semanaSelecionada * 7;
+
+  const diasDaSemana = new Set([
+    ...Object.keys(dadosCliques).filter(dia =>
+      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+    ),
+    ...Object.keys(dadosBotoes).filter(dia =>
+      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+    )
+  ]);
+
+  diasFiltrados = Array.from(diasDaSemana);
+}
+
 				  
 				  if (diasFiltrados.length === 0 || !diasFiltrados[0]) {
   alert("Nenhuma data selecionada ou nenhum dado encontrado.");
@@ -521,6 +529,10 @@ tabelaBotoes.innerHTML = "";
 const totaisEstab = {};
 let encontrouDadosBotao = false;
 
+let botoesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresBotoes") || "{}");
+const botoesAnterioresTemp = { ...botoesAnteriores }; // Cópia para comparação
+botoesAnteriores = {}; // Reiniciar antes de preencher
+
 diasFiltrados.forEach(dia => {
   const cliquesDoDia = dadosBotoes[dia] || {};
   Object.entries(cliquesDoDia).forEach(([estabId, botoes]) => {
@@ -543,12 +555,26 @@ if (encontrouDadosBotao) {
         <td style="text-align:center">${dados.divulgacao}</td>
         <td style="text-align:center">${dados.cardapio}</td>
       `;
+
+      // Verifica mudanças em relação aos valores anteriores
+      const anterior = botoesAnterioresTemp[estabId];
+      if (
+        !anterior ||
+        anterior.divulgacao !== dados.divulgacao ||
+        anterior.cardapio !== dados.cardapio
+      ) {
+        row.style.color = "yellow";
+        row.style.fontWeight = "bold";
+      }
+
+      botoesAnteriores[estabId] = { ...dados };
       tabelaBotoes.appendChild(row);
     });
 } else {
   tabelaBotoes.innerHTML = `<tr><td colspan="3" style="text-align:center; color: #999;">Nenhum clique encontrado</td></tr>`;
 }
-console.log("DADOS BOTÕES:", dadosBotoes);
+
+localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores));
 
 
 	});
