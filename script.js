@@ -431,6 +431,9 @@ clínicaveterináriacarlópolis:"s",
 
       //barbeiro
       luisbarbeiro:"s",
+
+      //cantor
+      foguinho:"s",
   
       // churrasqueiro
       flaviogiovani:"s",      
@@ -2651,6 +2654,41 @@ menuLinks.forEach((link) => {
               },
           ],
       },
+
+      {
+        link: document.querySelector("#menuCantor"),
+        title: "Cantor ",
+        establishments: [
+            {
+              image: "images/servicos/cantor/foguinho/perfil.png",
+                name: "Foguinho",
+                contact: "(43) 99106-8957",
+
+                instagram:"https://www.instagram.com/edisonfoguinho/",   
+                infoAdicional:"Baterista e Cantor Popular",              
+                  
+                novidadesImages: [ 
+                "images/servicos/cantor/foguinho/divulgacao/1.png",
+               "images/servicos/cantor/foguinho/divulgacao/2.png",
+               "images/servicos/cantor/foguinho/divulgacao/3.png",
+               "images/servicos/cantor/foguinho/divulgacao/4.png",
+               
+                
+                ],
+                novidadesDescriptions: [                            
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                
+                
+                ],
+
+
+            },
+            
+        ],
+    },
 
 
   
