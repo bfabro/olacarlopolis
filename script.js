@@ -395,6 +395,9 @@ clínicaveterináriacarlópolis:"s",
       // pesqueiro
       peskepagueaguamarine: "s",
 
+      // radio
+      carlopolitana:"s",
+
       // restaurantes
       assadãodorussão:"s",
       cabanas:"s",
@@ -1720,6 +1723,67 @@ menuLinks.forEach((link) => {
                 },
             ],
         },
+
+
+
+
+
+
+        {
+          link: document.querySelector("#menuRadio"),
+          title: "Radio",
+          establishments: [
+              {
+                  image: "images/comercios/radio/carlopolitana/perfil.png",
+                  name: "Carlopolitana",
+                  hours: "Seg a Sex: 06:00h as 19:00h<br>Sab: 08:00h as 17:00h<br>08:00h as 12:00h",
+                  statusAberto:".",
+                  horarios: {                          
+                    seg: [{ inicio: "06:00", fim: "19:00" }],
+                    ter: [{ inicio: "06:00", fim: "19:00" }],
+                    qua: [{ inicio: "06:00", fim: "19:00" }],
+                    qui: [{ inicio: "06:00", fim: "19:00" }],
+                    sex: [{ inicio: "06:00", fim: "19:00" }],
+                    sab: [{ inicio: "08:00", fim: "17:00" }],
+                    dom: [{ inicio: "08:00", fim: "12:00" }],
+                  }, 
+                  address: "Rua Januario Francisco Falarz, 128, Carlópolis",
+                  contact: "(43) 3566-2328",                 
+                  facebook: "https://www.facebook.com/carlopolitanafm/?locale=pt_BR",
+                  instagram: "https://www.instagram.com/carlopolitanafm/",
+                  site:"https://www.carlopolitanafm.com.br/?fbclid=PAZXh0bgNhZW0CMTEAAad8PhwvElNeRofoPTlpyFT1nz4Uh9etElI-3EtwgvmWVFQyKt0FxbPmWizd0Q_aem_27nMAxQanrHJ1awpU0BLTA",
+                  
+                  
+                  infoAdicional: "Baixe o App da Rádio: <a target='_blank' style='color:#2e7d32;' href='https://play.google.com/store/apps/details?id=carlopolitana.virtues.ag.appradio.pro&hl=pt_BR&pli=1'><i class='fab fa-android'></i> Android</a>  ou  <a target='_blank' style='color:#db0d0d;' href='https://apps.apple.com/br/app/radiosnet/id1089290449'><i class='fab fa-apple'></i> Apple</a><br> ou escute <a target='_blank' style='color:#007bff' href='https://apps.apple.com/br/app/radiosnet/id1089290449'> On-line:</a> ",
+
+                  
+                  novidadesImages: [               
+                   "images/comercios/radio/carlopolitana/divulgacao/1.png",
+                   "images/comercios/radio/carlopolitana/divulgacao/2.png",
+                   "images/comercios/radio/carlopolitana/divulgacao/3.png",
+                   "images/comercios/radio/carlopolitana/divulgacao/4.png",
+                   "images/comercios/radio/carlopolitana/divulgacao/5.png",
+                  ],
+                  novidadesDescriptions: [               
+                    "Programa 1",
+                    "Programa 2",
+                    "Programa 3",
+                    "Programa 4",
+                    "Programa 5",
+                   
+                   ],           
+
+              },
+          ],
+      },
+
+
+
+
+
+
+
+
 
 
         {
