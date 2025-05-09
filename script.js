@@ -1280,7 +1280,7 @@ menuLinks.forEach((link) => {
         {
             image: "images/comercios/grafica/serigraf/perfil.png",
             name: "Serigraf Gráfica e Serigrafia",
-            hours: "Seg a Sex: 09:30h as 18:00h",
+            hours: "Seg a Sex: 08:00h as 18:00h",
             statusAberto:".",
             horarios: {                          
               seg: [{ inicio: "08:00", fim: "18:00" }],
