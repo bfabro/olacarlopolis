@@ -3639,10 +3639,23 @@ menuLinks.forEach((link) => {
             link: document.querySelector("#menuDiskGas"),    
             title: "Deposito de Gas",
             establishments: [
+
+             
+
                 {
                   image: "images/comercios/depositoGas/liaGas/liaGas.png",
                     name: "Lia Gas",
-                    hours: "Seg a Sab: 8h - 20h </br> Dom: 08h - 12h",
+                    hours: "Seg a Sab: 08:00h as 19:00h </br>Dom: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "19:00" }],
+                      ter: [{ inicio: "08:00", fim: "19:00" }],
+                      qua: [{ inicio: "08:00", fim: "19:00" }],
+                      qui: [{ inicio: "08:00", fim: "19:00" }],
+                      sex: [{ inicio: "08:00", fim: "19:00" }],
+                      sab: [{ inicio: "08:00", fim: "19:00" }],
+                      dom: [{ inicio: "08:00", fim: "12:00" }]
+                    }, 
                     address: "R. Kalil Keder, 910",
                     contact: "(43) 99821-7243",
                     delivery: "Sim / Sem Taxa",
@@ -3661,7 +3674,17 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/depositoGas/cnCasaDoGas/perfil.png",
                     name: "CN Casa do Gas",
-                    hours: "Seg a Sab: 8h - 19h </br> Dom: 08h - 12h",
+                    hours: "Seg a Sab: 08:00h as 19:00h </br>Dom: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "19:00" }],
+                      ter: [{ inicio: "08:00", fim: "19:00" }],
+                      qua: [{ inicio: "08:00", fim: "19:00" }],
+                      qui: [{ inicio: "08:00", fim: "19:00" }],
+                      sex: [{ inicio: "08:00", fim: "19:00" }],
+                      sab: [{ inicio: "08:00", fim: "19:00" }],
+                      dom: [{ inicio: "08:00", fim: "12:00" }]
+                    }, 
                     address: "Avenida Elson Soares, 1048, Carlopolis",
                     contact: "(43) 99829-5216",
                     delivery: "Sim / Sem Taxa",
