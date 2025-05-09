@@ -344,9 +344,12 @@ clínicaveterináriacarlópolis:"s",
       //feira da lua
       feiradalua:"s",
 
-      //imobiliaria
-      
+      //imobiliaria      
       imobiliariacarlopolis:"s",
+
+      // grafica
+     
+      serigrafgráficaeserigrafia:"s",
 
       // mercearia
       seiza:"s",
@@ -1269,7 +1272,42 @@ menuLinks.forEach((link) => {
                 ],
             },
 
-
+  // pesqueiro
+  {
+    link: document.querySelector("#menuGrafica"),
+    title: "Grafica",
+    establishments: [
+        {
+            image: "images/comercios/grafica/serigraf/perfil.png",
+            name: "Serigraf Gráfica e Serigrafia",
+            hours: "Seg a Sex: 09:30h as 18:00h",
+            statusAberto:".",
+            horarios: {                          
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [],
+              dom: [],
+            }, 
+            address: "R. Padre Hugo, 486 - Carlópolis,",
+            contact: "(43) 99906-4434",
+            contact2: "(43) 3566-2376",
+            delivery: "Sim / Com Taxa",
+            facebook: "https://www.facebook.com/serigraf.carlopolis/?locale=pt_BR",
+            instagram: "https://www.instagram.com/serigraf.carlopolis/",
+            novidadesImages: [
+         
+             "images/comercios/grafica/serigraf/divulgacao/1.png",
+             "images/comercios/grafica/serigraf/divulgacao/2.png",
+             "images/comercios/grafica/serigraf/divulgacao/3.png",
+             "images/comercios/grafica/serigraf/divulgacao/4.png",
+             "images/comercios/grafica/serigraf/divulgacao/5.png",
+            ],                    
+        },
+    ],
+},
 
 
 
