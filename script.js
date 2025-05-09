@@ -1410,21 +1410,33 @@ menuLinks.forEach((link) => {
                     {
                       image: "images/comercios/lanchonete/didog/perfil.png",
                       name: "Di Dog",
-                      hours: "Ter a Dom: 18:00h as 23:30h",
+                      hours: "Seg a Dom: 19:00h as 23:30h",
                       statusAberto:".",
                       horarios: {
                         
-                        seg: [],
-                        ter: [{ inicio: "18:00", fim: "23:30" }],
-                        qua: [{ inicio: "18:00", fim: "23:30" }],
-                        qui: [{ inicio: "18:00", fim: "23:30" }],
-                        sex: [{ inicio: "18:00", fim: "23:30" }],
-                        sab: [{ inicio: "18:00", fim: "23:30" }],
-                        dom: [{ inicio: "18:00", fim: "23:30" }]
+                        seg: [{ inicio: "19:00", fim: "23:30" }],
+                        ter: [{ inicio: "19:00", fim: "23:30" }],
+                        qua: [{ inicio: "19:00", fim: "23:30" }],
+                        qui: [{ inicio: "19:00", fim: "23:30" }],
+                        sex: [{ inicio: "19:00", fim: "23:30" }],
+                        sab: [{ inicio: "19:00", fim: "23:30" }],
+                        dom: [{ inicio: "19:00", fim: "23:30" }]
                       },
                       address: "R. Benedito Salles, 350, Carlopolis",
                       contact: "(43) 99161-8381",
                       delivery: "Sim / Com Taxa",   
+                      menuImages: [                   
+                        "images/comercios/lanchonete/didog/cardapio/1.png",
+                        "images/comercios/lanchonete/didog/cardapio/2.png",
+                        "images/comercios/lanchonete/didog/cardapio/3.png",
+                        
+                       
+                    ],  novidadesImages: [
+                        
+                      "images/comercios/lanchonete/didog/divulgacao/1.png",
+                      "images/comercios/lanchonete/didog/divulgacao/2.png",
+                    
+                  ],   
                            
                   },
 
@@ -3145,7 +3157,7 @@ menuLinks.forEach((link) => {
         {
             image: "images/setorPublico/cras/cras.png",
             name: "Cras",
-            hours: "Seg a Sex: 9h - 15h",
+            hours: "Seg a Sex: 09:00h as 15:00h",
             address: "R. Salvira Marquês, 366",
             contact: "(43) 98485-1626",
             facebook:"https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
@@ -3160,7 +3172,7 @@ menuLinks.forEach((link) => {
         {
             image: "images/setorPublico/correio/correio.png",
             name: "Correio",
-            hours: "Seg a Sex: 10h as 12h e 13h30 as 15:30",
+            hours: "Seg a Sex: 10:00h as 12;00h e 13:30h as 15:30h",
             address: "R. Padre Hugo, 843 ",           
             contact:"(43) 3377-5023",
             facebook:"https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
