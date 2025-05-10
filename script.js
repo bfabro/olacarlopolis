@@ -3212,6 +3212,7 @@ menuLinks.forEach((link) => {
                 dom: [{ inicio: "08:00", fim: "21:00" }]
               },  
               contact: "(43) 99951-1540",
+              contact2:"(43) 3566-1141",
               delivery: "Sim / Sem Taxa",
               facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
               instagram: "https://www.instagram.com/masterfarma_carlopolis/",
