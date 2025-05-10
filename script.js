@@ -2342,8 +2342,8 @@ menuLinks.forEach((link) => {
                     
                     contact: "(43) 3566-1473",
                     delivery: "Sim / Sem Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
+              
+                    instagram: "https://www.instagram.com/farmaciabiofarmaa/",
                     
                     novidadesImages: [               
                       "images/comercios/farmacia/bioFarma/divulgacao/1.png",
