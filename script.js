@@ -3956,6 +3956,7 @@ menuLinks.forEach((link) => {
               address: "R. Padre Hugo - Carlópolis",
               contact: "(43) 99640-4484",
               delivery: "Sim / Com Taxa", 
+              instagram:"https://www.instagram.com/cantina_italiana_joao/",
               novidadesImages: [                    
                 "images/comercios/restaurante/cantinaItaliana/divulgacao/1.png",
                  "images/comercios/restaurante/cantinaItaliana/divulgacao/2.png",
