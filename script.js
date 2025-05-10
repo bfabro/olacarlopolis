@@ -989,7 +989,7 @@ menuLinks.forEach((link) => {
                             address: "R. Kalil Keder, 752",
                             contact: "(43) 99800-1680",
                             delivery: "Sim / Sem Taxa",
-                            instagram: "#",
+                            instagram: "https://www.instagram.com/adegaclps/",
                             facebook:"https://www.facebook.com/adega.carlopolis.37/",
 
                             novidadesImages: [ 
