@@ -253,8 +253,8 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "carlopolitana", "turminhadoaçai", "seiza",
-  "adegacuenca", "fornalhapizzaria","paiol"
+  "carlopolitana", "fornalhapizzaria", "limone","adegacuenca", "seiza"
+  
 ]; // nomes normalizados
 
 function montarCarrosselDivulgacao() {
@@ -271,50 +271,51 @@ function montarCarrosselDivulgacao() {
     });
   });
 
-  const fixos = listaTodos.filter(e => destaquesFixos.includes(e.nomeNormalizado));
-  let totalExibir = [...fixos];
+  const fixos = destaquesFixos
+  .map(nome => listaTodos.find(e => e.nomeNormalizado === nome))
+  .filter(Boolean);
 
-  if (totalExibir.length < 20) {
-    const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
-    const sorteados = restantes.sort(() => Math.random() - 0.5);
-    
-    // Tenta pegar o tanto que falta, mas garante no máximo o que tem disponível
-    while (totalExibir.length < 20 && sorteados.length > 0) {
-      const proximo = sorteados.shift();
-      totalExibir.push(proximo);
-    }
-  }
+  const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
+  //const sorteados = restantes.sort(() => Math.random() - 0.5).slice(0, Math.max(0, 20 - fixos.length)); RAMDOMICO
+  //const sorteados = restantes.slice(0, Math.max(0, 20 - fixos.length)); fixo sempre os primeiro do
+  const sorteados = restantes.sort(() => Math.random() - 0.5).slice(0, Math.max(0, 20 - fixos.length));
+
+
+  const totalExibir = [...fixos, ...sorteados].slice(0, 22);
 
   const swiperWrapper = document.querySelector(".swiper-novidades .swiper-wrapper");
   if (!swiperWrapper) return;
 
-  swiperWrapper.innerHTML = "";
+  swiperWrapper.innerHTML = ""; // Limpa conteúdo atual
 
   totalExibir.forEach(est => {
     const imagem = est.novidadesImages[0];
     const texto = est.novidadesDescriptions?.[0] || "Confira nossas novidades!";
+  
+    // Busca a categoria correspondente ao estabelecimento
     const categoria = categories.find(cat =>
       cat.establishments?.some(e => e.name === est.name)
     )?.title || "";
-
+  
     const slide = document.createElement("div");
     slide.classList.add("swiper-slide");
-
+  
+    // Monta o conteúdo do slide com nome da categoria + nome do comércio
     slide.innerHTML = `
       <img class="content_image" src="${imagem}" alt="${est.name}">
       <div class="info_divulgacao">
-        <h3>${categoria} - ${est.name}</h3>
+        <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
         <p>${texto}</p>
         ${est.instagram ? `<a href="${est.instagram}" target="_blank" class="mais-info">+ informações</a>` : ""}
       </div>
     `;
-
+  
     swiperWrapper.appendChild(slide);
   });
-  addSlideCounters(swiperNovidades, ".swiper-novidades", totalExibir.length);
+  
+
+  
 }
-
-
 
 //document.addEventListener("DOMContentLoaded", montarCarrosselDivulgacao);
 
@@ -605,31 +606,28 @@ clínicaveterináriacarlópolis:"s",
     const clearSearch = document.getElementById("clearSearch");
   
     // Função para adicionar contadores de slides
-    function addSlideCounters(swiperInstance, containerSelector, totalReal) {
+    function addSlideCounters(swiperInstance, containerSelector) {
       const container = document.querySelector(containerSelector);
       if (!container) return;
-    
-      // Remove contador anterior se já existir
-      const existingCounter = container.querySelector(".swiper-counter");
-      if (existingCounter) existingCounter.remove();
-    
+  
+      // Cria o elemento do contador
       const counter = document.createElement("div");
       counter.className = "swiper-counter";
-    
+  
+      // Atualiza o contador
       function updateCounter() {
-        const atual = swiperInstance.realIndex + 1;
-        counter.textContent = `${atual} / ${totalReal}`;
+        counter.textContent = `${swiperInstance.realIndex + 1} / ${
+          swiperInstance.slides.length
+        }`;
       }
-    
+  
+      // Adiciona o contador ao container
       container.appendChild(counter);
-      swiperInstance.on("slideChangeTransitionEnd", updateCounter); // ✅ correto para loop + fade
+  
+      // Atualiza inicialmente e adiciona listeners
       updateCounter();
+      swiperInstance.on("slideChange", updateCounter);
     }
-    
-    
-    
-    
-    
   
     // Inicializa o carrossel de Turismo
     const swiperTurismo = new Swiper(".swiper-turismo", {
@@ -680,7 +678,7 @@ clínicaveterináriacarlópolis:"s",
         crossFade: true, // Faz o fade suave entre os slides
       },
     });
-    
+    addSlideCounters(swiperNovidades, ".swiper-novidades");
   
    
   
@@ -1866,7 +1864,7 @@ menuLinks.forEach((link) => {
 
                   
                   novidadesImages: [               
-                   "images/comercios/radio/carlopolitana/divulgacao/1.jpeg",
+                   "images/comercios/radio/carlopolitana/divulgacao/1.jpg",
                    "images/comercios/radio/carlopolitana/divulgacao/2.jpeg",
                    "images/comercios/radio/carlopolitana/divulgacao/3.jpeg",
                    "images/comercios/radio/carlopolitana/divulgacao/4.jpeg",
@@ -1877,7 +1875,7 @@ menuLinks.forEach((link) => {
                    "images/comercios/radio/carlopolitana/divulgacao/9.jpeg",
                   ],
                   novidadesDescriptions: [               
-                    "24hrs transmitindo",
+                    "Promoção",
                     "Entre em contato pelo WhatsApp",
                     "Temos aplicativos para voce ouvir e receber notificações em qualquer lugar!",
                     "",
@@ -1886,6 +1884,7 @@ menuLinks.forEach((link) => {
                     "",
                     "Nos siga nas redes sociais!",
                     "E não pode faltar nosso programa de modão!",
+                    "24hrs transmitindo",
                    ],           
 
               },
