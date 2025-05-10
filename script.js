@@ -2560,6 +2560,7 @@ menuLinks.forEach((link) => {
                       dom: []
                     },  
                     contact: "(43) 99951-1540",
+                    contact2:"(43) 3566-1141",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
                     instagram: "https://www.instagram.com/masterfarma_carlopolis/",
@@ -3223,7 +3224,7 @@ menuLinks.forEach((link) => {
                 "images/comercios/farmacia/masterFarma/divulgacao/5.png",
               ], 
               novidadesDescriptions: [                            
-                "Analgésico de alívio eficaz para dores intensas",
+                "Estamos de Plantão!",
                 "Cólicas do trato gastrintestinal",
                 "Analgésico (para dor) antitérmico (para febre)",
                 "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
