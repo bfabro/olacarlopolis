@@ -37,13 +37,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   
   
-  
-
-
-
-
-  
-  
 
   function proximoHorarioDeAbertura(horarios) {
     const agora = new Date();
@@ -115,13 +108,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   
   
-
-
-
-
-
-
-
   let contadorAnterior = 0;
   const contadorEl = document.getElementById("contador");
   const iconeEl = document.getElementById("iconeUsuarios");
@@ -266,7 +252,55 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
   ref.transaction((atual) => (atual || 0) + 1);
 }
 
+const destaquesFixos = [
+  "lobofitness", "turminhadoaçai", "açouguecuritiba",
+  "adegacuenca", "fornalhapizzaria"
+]; // nomes normalizados
 
+function montarCarrosselDivulgacao() {
+  const listaTodos = [];
+
+  categories.forEach(cat => {
+    cat.establishments?.forEach(est => {
+      const nomeNormalizado = normalizeName(est.name);
+      const imagens = est.novidadesImages || [];
+
+      if (statusEstabelecimentos[nomeNormalizado] === "s" && imagens.length > 0) {
+        listaTodos.push({ ...est, nomeNormalizado });
+      }
+    });
+  });
+
+  const fixos = listaTodos.filter(e => destaquesFixos.includes(e.nomeNormalizado));
+  const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
+  const sorteados = restantes.sort(() => Math.random() - 0.5).slice(0, Math.max(0, 20 - fixos.length));
+
+  const totalExibir = [...fixos, ...sorteados].slice(0, 22);
+
+  const swiperWrapper = document.querySelector(".swiper-novidades .swiper-wrapper");
+  if (!swiperWrapper) return;
+
+  swiperWrapper.innerHTML = ""; // Limpa conteúdo atual
+
+  totalExibir.forEach(est => {
+    const imagem = est.novidadesImages[0];
+    const texto = est.novidadesDescriptions?.[0] || "Confira nossas novidades!";
+    const slide = document.createElement("div");
+    slide.classList.add("swiper-slide");
+
+    slide.innerHTML = `
+  <img class="content_image" src="${imagem}" alt="${est.name}">
+  <div class="info_divulgacao">
+    <h3>${est.name}</h3>
+    <p>${texto}</p>
+  </div>
+`;
+
+    swiperWrapper.appendChild(slide);
+  });
+}
+
+//document.addEventListener("DOMContentLoaded", montarCarrosselDivulgacao);
 
 
 
@@ -524,14 +558,14 @@ clínicaveterináriacarlópolis:"s",
       //// INICIO INFORMAÇOES UTEIS
   //Eventos
   calendarioeventos: "s",
-      coletadelixo:"n",
-  triathlon: "s",
-  pescar: "s",
-  coletalixoeletronico: "s",
-  feiradalua: "s",
-  frutfest:"s",
-
   etapalestevelocross:"s",
+ frutfest:"s",
+  
+  lowcyty:"s",
+  feiradalua: "s",
+ 
+
+ 
 
       ///
 
@@ -2984,31 +3018,24 @@ menuLinks.forEach((link) => {
           establishments: [
               {
                   name: "Calendario Eventos",
-                  image: "images/informacoes/eventos/evento_1/calendario_evento.png",
+                  image: "images/informacoes/eventos/calendario_evento.png",
                   contact: "",
               },
 
-            
-
-         
-              
-
-
             {
-              image: "images/informacoes/eventos/evento_6/velocross.png",
+              image: "images/informacoes/eventos/velocross.png",
               name: "Etapa Leste VeloCross",
               date: "24/05/25 a 25/05/2025",
               address: "Centro de Eventos Ilha do Ponciano",
               contact: "(43) 99636-2971",
               
-            
              
           },
-            
+         
                   
 
               {
-                  image: "images/informacoes/eventos/evento_5/frutFest.png",
+                  image: "images/informacoes/eventos/frutFest.png",
                   name: "FrutFest",
                   date: "04/09/25 a 07/09/25",
                   address: "Centro de Eventos Ilha do Ponciano",
@@ -3018,9 +3045,16 @@ menuLinks.forEach((link) => {
                  
               },
 
-
-
-            
+              {
+                image: "images/informacoes/eventos/lowCity.png",
+                name: "LowCyty",
+                date: "05/10/2025",
+                address: "Centro de Eventos Ilha do Ponciano",
+                contact: "-",
+                instagram:"https://www.instagram.com/lowcity_043club/",
+               
+               
+            },
 
              
           ],
@@ -4386,7 +4420,7 @@ menuLinks.forEach((link) => {
     
 
 
-
+    montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
     
   
   
