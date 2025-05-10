@@ -919,7 +919,7 @@ menuLinks.forEach((link) => {
                             ],
                             novidadesDescriptions: [                            
                             "Marmita de Açai! Voce só encontra aqui!",
-                            "2",
+                            "Nossos espetos montados na hora",
                             "3",
                           ],
                             menuImages: [                    
@@ -2794,7 +2794,7 @@ menuLinks.forEach((link) => {
                 
                 ],
                 novidadesDescriptions: [                            
-                  "1",
+                  "Aquela boa carteira de musico",
                   "2",
                   "3",
                   "4",
@@ -3669,7 +3669,7 @@ menuLinks.forEach((link) => {
                      
                   ], 
                   novidadesDescriptions: [                            
-                    "1",
+                    "Venha conhecer nosso espaço",
                     "2",
                     "3",
                   
