@@ -1739,6 +1739,10 @@ img {
   animation: pulseGlow 2s ease-in-out infinite;
   animation-delay: 5s;
 }
+
+
+
+
 .info_divulgacao {
   text-align: center;
   padding: 10px 15px;
@@ -1759,3 +1763,17 @@ img {
   color: #666;
   margin: 0;
 }
+
+.mais-info {
+  display: inline-block;
+  margin-top: 8px;
+  
+  color: #6b4cf5;
+  padding: 5px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+

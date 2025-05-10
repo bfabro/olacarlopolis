@@ -289,12 +289,14 @@ function montarCarrosselDivulgacao() {
     slide.classList.add("swiper-slide");
 
     slide.innerHTML = `
-  <img class="content_image" src="${imagem}" alt="${est.name}">
-  <div class="info_divulgacao">
-    <h3>${est.name}</h3>
-    <p>${texto}</p>
-  </div>
-`;
+    <img class="content_image" src="${imagem}" alt="${est.name}">
+    <div class="info_divulgacao">
+      <h3>${est.name}</h3>
+      <p>${texto}</p>
+      ${est.instagram ? `<a href="${est.instagram}" target="_blank" class="mais-info">+ informações</a>` : ""}
+    </div>
+  `;
+  
 
     swiperWrapper.appendChild(slide);
   });
