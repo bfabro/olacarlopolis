@@ -2344,7 +2344,7 @@ menuLinks.forEach((link) => {
                     delivery: "Sim / Sem Taxa",
                     facebook: "www.facebook.com/uahh",
                     instagram: "www.instagram.com/uahh",
-                    site: "www.google.com",
+                    
                     novidadesImages: [               
                       "images/comercios/farmacia/bioFarma/divulgacao/1.png",
                       "images/comercios/farmacia/bioFarma/divulgacao/2.png",
@@ -2417,7 +2417,7 @@ menuLinks.forEach((link) => {
                     delivery: "Sim / Sem Taxa",
                     facebook:"https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
                     instagram: "https://www.instagram.com/drogamaisjorginho/",
-                    site: "www.google.com",
+                    
                     novidadesImages: [               
                       "images/comercios/farmacia/drogaMais/divulgacao/1.png",
                       "images/comercios/farmacia/drogaMais/divulgacao/2.png",
@@ -2452,8 +2452,8 @@ menuLinks.forEach((link) => {
                     contact: "(43) 98488-9420",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
-                    instagram: "www.instagram.com/uahh",
-                    site: "www.google.com",
+                    instagram: "https://www.instagram.com/farmaciaels/",
+                   
                     novidadesImages: [               
                       "images/comercios/farmacia/elShaday/divulgacao/1.png",
                       "images/comercios/farmacia/elShaday/divulgacao/2.png",
@@ -2489,7 +2489,7 @@ menuLinks.forEach((link) => {
                     delivery: "Sim / Sem Taxa",
                     facebook: "#",
                     instagram: "https://www.instagram.com/farmaciadavilaclps/",
-                    site: "#",
+                  
                     novidadesImages: [               
                       "images/comercios/farmacia/farmaciaDaVila/divulgacao/1.png",
                       "images/comercios/farmacia/farmaciaDaVila/divulgacao/2.png",     
@@ -2525,7 +2525,7 @@ menuLinks.forEach((link) => {
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
                     instagram: "https://www.instagram.com/farmaiscarlopolis/",
-                    site: "#",
+                    
                     novidadesImages: [               
                       "images/comercios/farmacia/farmais/divulgacao/1.png",
                       "images/comercios/farmacia/farmais/divulgacao/2.png",
@@ -2563,7 +2563,7 @@ menuLinks.forEach((link) => {
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
                     instagram: "https://www.instagram.com/masterfarma_carlopolis/",
-                    site: "#",
+                   
                     novidadesImages: [               
                       "images/comercios/farmacia/masterFarma/divulgacao/1.png",
                       "images/comercios/farmacia/masterFarma/divulgacao/2.png",
@@ -2602,7 +2602,7 @@ menuLinks.forEach((link) => {
                     "https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
                     instagram:
                     "https://www.instagram.com/popularmais_farmaciadojeremias/",
-                    site: "#",
+                   
                     novidadesImages: [                  
                         
                         "images/comercios/farmacia/popularMais/divulgacao/1.png",
@@ -2640,7 +2640,7 @@ menuLinks.forEach((link) => {
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
                     instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
-                    site: "#",
+                    
                     novidadesImages: [               
                         "images/comercios/farmacia/santaMaria/divulgacao/1.png",
                         "images/comercios/farmacia/santaMaria/divulgacao/2.png",     
@@ -2676,8 +2676,8 @@ menuLinks.forEach((link) => {
                     delivery: "Sim / Sem Taxa",
                     facebook:
                     "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
-                    instagram: "#",
-                    site: "www.google.com",
+                    instagram: "https://www.instagram.com/saudefarmacarlopolis/",
+                  
                     novidadesImages: [               
                         "images/comercios/farmacia/saudeFarma/divulgacao/1.png",
                         "images/comercios/farmacia/saudeFarma/divulgacao/2.png",     
@@ -3214,7 +3214,7 @@ menuLinks.forEach((link) => {
               delivery: "Sim / Sem Taxa",
               facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
               instagram: "https://www.instagram.com/masterfarma_carlopolis/",
-              site: "#",
+
               novidadesImages: [               
                 "images/comercios/farmacia/masterFarma/divulgacao/1.png",
                 "images/comercios/farmacia/masterFarma/divulgacao/2.png",
