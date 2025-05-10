@@ -1898,10 +1898,10 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/sorveteria/salles/perfil.png",
                 name: "Sorvetes Salles Ferreira",
-                hours: "Seg: 13:30h as 21:00h<br>Ter a Dom: 13:30h as 22:00h",
+                hours: "Dom a Dom: 13:30h as 22:00h",
                 statusAberto:".",
                 horarios: {                            
-                  seg: [{ inicio: "13:30", fim: "21:00" }],
+                  seg: [{ inicio: "13:30", fim: "22:00" }],
                   ter: [{ inicio: "13:30", fim: "22:00" }],
                   qua: [{ inicio: "13:30", fim: "22:00" }],
                   qui: [{ inicio: "13:30", fim: "22:00" }],
@@ -1911,7 +1911,7 @@ menuLinks.forEach((link) => {
                 },
                 address: "R. Kalil Keder, n° 525 - Carlópolis",
                 contact: "(43) 99600-1919",
-                delivery: "Sim / Sem Taxa",
+                delivery: "Não",
                 facebook: "https://www.facebook.com/sorvetessalles/?locale=pt_BR",
                 instagram: "https://www.instagram.com/sorvetessalles/",
                 novidadesImages: [              
@@ -3746,15 +3746,24 @@ menuLinks.forEach((link) => {
                       "images/comercios/mercearia/seiza/divulgacao/2.png",
                       "images/comercios/mercearia/seiza/divulgacao/3.png",
                       "images/comercios/mercearia/seiza/divulgacao/4.png",
+                      "images/comercios/mercearia/seiza/divulgacao/5.png",
+                      "images/comercios/mercearia/seiza/divulgacao/6.png",
+                      "images/comercios/mercearia/seiza/divulgacao/7.png",
+                      "images/comercios/mercearia/seiza/divulgacao/8.png",
+                      "images/comercios/mercearia/seiza/divulgacao/9.png",
                       
                                   
                   ],
                   novidadesDescriptions: [                            
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5",
+                    "Na Seiza você encontra uma seleção incrível de lámens e massas orientais — coreanos, japoneses e muito mais. Vem experimentar!",
+                    "O segredo da culinária oriental começa aqui! Shoyu, óleo de gergelim, saquê mirin, molho tarê, hondashi, aji-no-moto e muito mais para deixar suas receitas com o sabor autêntico do Japão, China e Coreia!",
+                    "Farinha Panko, mistura para tempurá, kinako (soja em pó), papel de arroz e os ingredientes perfeitos pra dar aquele toque autêntico nas suas receitas japonesas!",
+                    "Bebidas orientais alcóolicas mais procuradas: Soju (vários sabores), Makgeolli (vinho de arroz) e o tradicional saquê japonês.",
+                    "Direto da Coreia! Experimente os sorvetes orientais mais amados: Samanco, Melona e Power Cap! Sabores únicos e refrescantes que conquistam todos os paladares!",
+                    "Aqui na Seiza você encontra uma seleção especial de balas japonesas e coreanas!",
+                    "Clássicos orientais que encantam todas as idades! Famosos biscoitos Pocky, Pepero, Koalas, Toppo e muitos mais!",
+                    "Tradição e sabor em cada mordida! Temos os doces tradicionais da culinária japonesa com recheio de feijão azuki (anko) sempre fresquinhos para vocês!",
+                  "Snacks orientais para todos os gostos! Sembeis doces e salgados, salgadinhos crocantes, lula desidratada — experimente sabores autênticos do Japão, Coreia e China!",
                   ],
                 
                 },
