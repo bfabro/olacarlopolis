@@ -289,18 +289,20 @@ function montarCarrosselDivulgacao() {
   swiperWrapper.innerHTML = ""; // Limpa conteúdo atual
 
   totalExibir.forEach(est => {
-    const imagem = est.novidadesImages[0];
-    const texto = est.novidadesDescriptions?.[0] || "Confira nossas novidades!";
-  
-    // Busca a categoria correspondente ao estabelecimento
     const categoria = categories.find(cat =>
       cat.establishments?.some(e => e.name === est.name)
     )?.title || "";
   
+    const imagem = destaquesFixos.includes(est.nomeNormalizado)
+      ? est.novidadesImages[0] // sempre a primeira imagem para fixos
+      : est.novidadesImages[Math.floor(Math.random() * est.novidadesImages.length)];
+  
+    const indexImagem = est.novidadesImages.indexOf(imagem);
+    const texto = est.novidadesDescriptions?.[indexImagem] || "Confira nossas novidades!";
+  
     const slide = document.createElement("div");
     slide.classList.add("swiper-slide");
   
-    // Monta o conteúdo do slide com nome da categoria + nome do comércio
     slide.innerHTML = `
       <img class="content_image" src="${imagem}" alt="${est.name}">
       <div class="info_divulgacao">
@@ -312,6 +314,10 @@ function montarCarrosselDivulgacao() {
   
     swiperWrapper.appendChild(slide);
   });
+  
+  
+  
+  
   
 
   
@@ -3913,7 +3919,7 @@ menuLinks.forEach((link) => {
                     address: "Rua kalil keder 491 centro",
                     contact: "(43) 98806-5747",
                     delivery: "Não",
-                    instagram:"https://www.instagram.com/quintanda.pimenta.doce/";
+                    instagram:"https://www.instagram.com/quintanda.pimenta.doce/",
                     
                     novidadesImages: [
                         "images/comercios/quitanda/divulgacao/1.png",
@@ -4357,8 +4363,8 @@ menuLinks.forEach((link) => {
                   ],
                   novidadesDescriptions: [  
         
-                 "1",
-                 "2",
+                 "Venha conferir nossos moveis",
+                 "Venha conferir nossos eletronicos",
                 
                   ],
               },
