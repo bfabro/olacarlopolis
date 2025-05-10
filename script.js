@@ -253,8 +253,8 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "carlopolitana", "turminhadoaçai", "açouguecuritiba",
-  "adegacuenca", "fornalhapizzaria"
+  "carlopolitana", "turminhadoaçai", "seiza",
+  "adegacuenca", "fornalhapizzaria","paiol"
 ]; // nomes normalizados
 
 function montarCarrosselDivulgacao() {
@@ -272,44 +272,49 @@ function montarCarrosselDivulgacao() {
   });
 
   const fixos = listaTodos.filter(e => destaquesFixos.includes(e.nomeNormalizado));
-  const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
-  const sorteados = restantes.sort(() => Math.random() - 0.5).slice(0, Math.max(0, 20 - fixos.length));
+  let totalExibir = [...fixos];
 
-  const totalExibir = [...fixos, ...sorteados].slice(0, 22);
+  if (totalExibir.length < 20) {
+    const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
+    const sorteados = restantes.sort(() => Math.random() - 0.5);
+    
+    // Tenta pegar o tanto que falta, mas garante no máximo o que tem disponível
+    while (totalExibir.length < 20 && sorteados.length > 0) {
+      const proximo = sorteados.shift();
+      totalExibir.push(proximo);
+    }
+  }
 
   const swiperWrapper = document.querySelector(".swiper-novidades .swiper-wrapper");
   if (!swiperWrapper) return;
 
-  swiperWrapper.innerHTML = ""; // Limpa conteúdo atual
+  swiperWrapper.innerHTML = "";
 
   totalExibir.forEach(est => {
     const imagem = est.novidadesImages[0];
     const texto = est.novidadesDescriptions?.[0] || "Confira nossas novidades!";
-  
-    // Busca a categoria correspondente ao estabelecimento
     const categoria = categories.find(cat =>
       cat.establishments?.some(e => e.name === est.name)
     )?.title || "";
-  
+
     const slide = document.createElement("div");
     slide.classList.add("swiper-slide");
-  
-    // Monta o conteúdo do slide com nome da categoria + nome do comércio
+
     slide.innerHTML = `
       <img class="content_image" src="${imagem}" alt="${est.name}">
       <div class="info_divulgacao">
-        <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
+        <h3>${categoria} - ${est.name}</h3>
         <p>${texto}</p>
         ${est.instagram ? `<a href="${est.instagram}" target="_blank" class="mais-info">+ informações</a>` : ""}
       </div>
     `;
-  
+
     swiperWrapper.appendChild(slide);
   });
-  
-
-  
+  addSlideCounters(swiperNovidades, ".swiper-novidades", totalExibir.length);
 }
+
+
 
 //document.addEventListener("DOMContentLoaded", montarCarrosselDivulgacao);
 
@@ -600,28 +605,31 @@ clínicaveterináriacarlópolis:"s",
     const clearSearch = document.getElementById("clearSearch");
   
     // Função para adicionar contadores de slides
-    function addSlideCounters(swiperInstance, containerSelector) {
+    function addSlideCounters(swiperInstance, containerSelector, totalReal) {
       const container = document.querySelector(containerSelector);
       if (!container) return;
-  
-      // Cria o elemento do contador
+    
+      // Remove contador anterior se já existir
+      const existingCounter = container.querySelector(".swiper-counter");
+      if (existingCounter) existingCounter.remove();
+    
       const counter = document.createElement("div");
       counter.className = "swiper-counter";
-  
-      // Atualiza o contador
+    
       function updateCounter() {
-        counter.textContent = `${swiperInstance.realIndex + 1} / ${
-          swiperInstance.slides.length
-        }`;
+        const atual = swiperInstance.realIndex + 1;
+        counter.textContent = `${atual} / ${totalReal}`;
       }
-  
-      // Adiciona o contador ao container
+    
       container.appendChild(counter);
-  
-      // Atualiza inicialmente e adiciona listeners
+      swiperInstance.on("slideChangeTransitionEnd", updateCounter); // ✅ correto para loop + fade
       updateCounter();
-      swiperInstance.on("slideChange", updateCounter);
     }
+    
+    
+    
+    
+    
   
     // Inicializa o carrossel de Turismo
     const swiperTurismo = new Swiper(".swiper-turismo", {
@@ -672,7 +680,7 @@ clínicaveterináriacarlópolis:"s",
         crossFade: true, // Faz o fade suave entre os slides
       },
     });
-    addSlideCounters(swiperNovidades, ".swiper-novidades");
+    
   
    
   
@@ -924,7 +932,7 @@ menuLinks.forEach((link) => {
 
                 {
                     link: document.querySelector("#menuAcougue"),  
-                    title: "Açougues",
+                    title: "Açougue",
                     establishments: [
                         {
                             image: "images/comercios/acougue/curitiba/curitiba.png",
@@ -956,7 +964,7 @@ menuLinks.forEach((link) => {
 
                 {
                     link: document.querySelector("#menuAdega"),    
-                    title: "Adegas",
+                    title: "Adega",
                     establishments: [
                         {
                             image: "images/comercios/adega/cuenca/adega_cuenca.jpg",
@@ -1063,7 +1071,7 @@ menuLinks.forEach((link) => {
 
                 {
                     link: document.querySelector("#menuAgropecuaria"),  
-                    title: "Agropecuarias",
+                    title: "Agropecuaria",
                     establishments: [
 
                        
@@ -1123,7 +1131,7 @@ menuLinks.forEach((link) => {
 
                 {
                   link: document.querySelector("#menuAutoPecas"),
-                  title: "Auto Peças",
+                  title: "Auto Peça",
                   establishments: [
                       {
                           image: "images/comercios/autopecas/paulinho/perfil.png",
@@ -1402,7 +1410,7 @@ menuLinks.forEach((link) => {
 
                 {
                     link: document.querySelector("#menuLanchonete"),
-                    title: "Lanchonetes",
+                    title: "Lanchonete",
                     establishments: [
 
 
@@ -1714,7 +1722,7 @@ menuLinks.forEach((link) => {
       // pizzaria
         {
             link: document.querySelector("#menuPizzaria"),
-            title: "Pizzarias",
+            title: "Pizzaria",
             establishments: [
                 {
                     image: "images/comercios/pizzaria/fornalha/fornalha.png",
@@ -2017,7 +2025,7 @@ menuLinks.forEach((link) => {
 
         {
             link: document.querySelector("#menuPadaria"),    
-            title: "Padarias",
+            title: "Padaria",
             establishments: [
                 {
                     image: "images/comercios/padaria/bom jesus/bomjesus.png",
@@ -2124,7 +2132,7 @@ menuLinks.forEach((link) => {
       
         {
             link: document.querySelector("#menuMercado"),
-            title: "Supermercados ",
+            title: "Supermercado",
             establishments: [
 
               {
@@ -2308,7 +2316,7 @@ menuLinks.forEach((link) => {
          //// farmacias
         {
             link: document.querySelector("#menuFarmacia"),
-            title: "Farmácias ",
+            title: "Farmácia",
             establishments: [
 
                 {
@@ -2746,7 +2754,7 @@ menuLinks.forEach((link) => {
 
         {
           link: document.querySelector("#menuBarbeiro"),
-          title: "Barbeiros ",
+          title: "Barbeiro",
           establishments: [
               {
                 image: "images/servicos/barbeiro/luis/luis.png",
@@ -2762,7 +2770,7 @@ menuLinks.forEach((link) => {
 
       {
         link: document.querySelector("#menuCantor"),
-        title: "Cantor ",
+        title: "Cantor",
         establishments: [
             {
               image: "images/servicos/cantor/foguinho/perfil.png",
@@ -2799,7 +2807,7 @@ menuLinks.forEach((link) => {
   
         {
             link: document.querySelector("#menuChurrasqueiro"),
-            title: "Churrasqueiros ",
+            title: "Churrasqueiro",
             establishments: [
                 
 
@@ -2827,7 +2835,7 @@ menuLinks.forEach((link) => {
   
         {
             link: document.querySelector("#menuBabas"),
-            title: "Babas ",
+            title: "Baba",
             establishments: [
                 {
                     name: "Maria",
@@ -2842,7 +2850,7 @@ menuLinks.forEach((link) => {
   
         {
             link: document.querySelector("#menuDiarista"),
-            title: "Diaristas",
+            title: "Diarista",
             establishments: [
                 {
                     name: "Rose",
@@ -2857,7 +2865,7 @@ menuLinks.forEach((link) => {
   
         {
             link: document.querySelector("#menuEletricista"),
-            title: "Eletrecistas",
+            title: "Eletrecista",
             establishments: [
                 {
                     name: "Juca",
@@ -2888,7 +2896,7 @@ menuLinks.forEach((link) => {
 
         {
           link: document.querySelector("#menuFretes"),
-          title: "Fretes ",
+          title: "Frete",
           establishments: [
               {
                 image: "images/servicos/fretes/anselmo/anselmo.png",
@@ -2925,7 +2933,7 @@ menuLinks.forEach((link) => {
     
         {
             link: document.querySelector("#menuJardineiro"),
-            title: "Jardineiros ",
+            title: "Jardineiro",
             establishments: [
                 {
                     name: "Antonio Gil",
@@ -2940,7 +2948,7 @@ menuLinks.forEach((link) => {
   
         {
             link: document.querySelector("#menuMarceneiro"),
-            title: "Marceneiros ",
+            title: "Marceneiro",
             establishments: [
                 {
                     name: "Pedro alvez",
@@ -2975,7 +2983,7 @@ menuLinks.forEach((link) => {
 
         {
             link: document.querySelector("#menuPedreiro"),
-            title: "Pedreiros",
+            title: "Pedreiro",
             establishments: [
                 {
                     image: "images/servicos/pedreiro/pedreiro.jpg",
@@ -2991,7 +2999,7 @@ menuLinks.forEach((link) => {
   
         {
             link: document.querySelector("#menuPintor"),
-            title: "Pintor ",
+            title: "Pintor",
             establishments: [
                 {
                     name: "Rafael portes",
@@ -3006,7 +3014,7 @@ menuLinks.forEach((link) => {
   
         {
             link: document.querySelector("#menuVeterinario"),
-            title: "Veterinario ",
+            title: "Veterinario",
             establishments: [
                 {
                     name: "Celso Golçalves",
@@ -3718,7 +3726,7 @@ menuLinks.forEach((link) => {
   
         {
             link: document.querySelector("#menuBrinquedos"),    
-            title: "Loja de Brinquedos",
+            title: "Loja de Brinquedo",
             establishments: [
                 {
                     name: "Filho Otaviano",
@@ -3800,7 +3808,7 @@ menuLinks.forEach((link) => {
   
         {
             link: document.querySelector("#menuFuneraria"),    
-            title: "Funerarias",
+            title: "Funeraria",
             establishments: [
                 {
                     name: "Bom Jesus",
