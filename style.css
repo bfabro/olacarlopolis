@@ -1776,4 +1776,6 @@ img {
   transition: background-color 0.3s;
 }
 
-
+.swiper-novidades .swiper-counter {
+  display: none !important;
+}

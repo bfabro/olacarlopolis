@@ -253,7 +253,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "carlopolitana", "fornalhapizzaria", "limone","adegacuenca", "seiza"
+  "carlopolitana", "pimentadoce", "limone","adegacuenca", "seiza"
   
 ]; // nomes normalizados
 
@@ -1875,7 +1875,7 @@ menuLinks.forEach((link) => {
                    "images/comercios/radio/carlopolitana/divulgacao/9.jpeg",
                   ],
                   novidadesDescriptions: [               
-                    "Promoção",
+                    "Promoção dia das Mães",
                     "Entre em contato pelo WhatsApp",
                     "Temos aplicativos para voce ouvir e receber notificações em qualquer lugar!",
                     "",
@@ -3913,6 +3913,7 @@ menuLinks.forEach((link) => {
                     address: "Rua kalil keder 491 centro",
                     contact: "(43) 98806-5747",
                     delivery: "Não",
+                    instagram:"https://www.instagram.com/quintanda.pimenta.doce/";
                     
                     novidadesImages: [
                         "images/comercios/quitanda/divulgacao/1.png",
@@ -3920,6 +3921,16 @@ menuLinks.forEach((link) => {
                         "images/comercios/quitanda/divulgacao/3.png",
                         "images/comercios/quitanda/divulgacao/4.png",
                         "images/comercios/quitanda/divulgacao/5.png",
+                    ],
+                    novidadesDescriptions: [ 
+                      
+                      "Temos Assados agora todo domingo",
+                      "Temos Massas todas as quartas",
+                      "Frutas exoticas",
+                      "Frutas Frescas",
+                      "Verduras frescas",
+
+                    
                     ],
                 },
             ],
@@ -3945,8 +3956,7 @@ menuLinks.forEach((link) => {
                   },
                 address: "Rua Benedito Salles 1241",
                 contact: "(43) 9838-7570",
-                delivery: "Sim / Com Taxa",
-                
+                delivery: "Sim / Com Taxa",                
               novidadesImages: [                    
                   "images/comercios/restaurante/assadaoRussao/divulgacao/1.png",                        
                  "images/comercios/restaurante/assadaoRussao/divulgacao/2.png",
