@@ -2572,7 +2572,7 @@ menuLinks.forEach((link) => {
                       "images/comercios/farmacia/masterFarma/divulgacao/5.png",
                     ], 
                     novidadesDescriptions: [                            
-                      "Analgésico de alívio eficaz para dores intensas",
+                      "Estamos de Plantão!",
                       "Cólicas do trato gastrintestinal",
                       "Analgésico (para dor) antitérmico (para febre)",
                       "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
