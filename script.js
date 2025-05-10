@@ -2272,16 +2272,15 @@ menuLinks.forEach((link) => {
                     hours: "<strong>Seg a Sex:</strong> 08:00h as 18:00h </br><strong>Sab: </strong>08:00h as 12:00h",
                     statusAberto:".",
                     horarios: {                          
-                      seg: [{ inicio: "08:00", fim: "21:00" }],
-                      ter: [{ inicio: "08:00", fim: "21:00" }],
-                      qua: [{ inicio: "08:00", fim: "21:00" }],
-                      qui: [{ inicio: "08:00", fim: "21:00" }],
-                      sex: [{ inicio: "08:00", fim: "21:00" }],
-                      sab: [{ inicio: "08:00", fim: "21:00" }],
-                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "18:00" }],
+                      dom: [{ inicio: "08:00", fim: "18:00" }]
                     },  
-                    plantaoHorario: "08:00h às 21:00h", 
-                    plantaoData:"03/05 a 09/05", 
+                    
                     contact: "(43) 3566-1473",
                     delivery: "Sim / Sem Taxa",
                     facebook: "www.facebook.com/uahh",
@@ -2486,9 +2485,11 @@ menuLinks.forEach((link) => {
         
                 {
                     image: "images/comercios/farmacia/masterFarma/masterfarma.png",
-                    name: "MasterFarma",
+                    name: "Master Farma",
                     address: "R. Laurindo Franco de Godoi, 90",
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"10/05 a 16/05", 
                     statusAberto:".",
                     horarios: {                          
                       seg: [{ inicio: "08:00", fim: "18:00" }],
@@ -3091,7 +3092,7 @@ menuLinks.forEach((link) => {
                   ],
               },
 */
-
+/*
 
               {
                 image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
@@ -3131,6 +3132,54 @@ menuLinks.forEach((link) => {
                   "Redução da febre e para o alívio de dores",
                 ],
             },
+            */
+
+            {
+              image: "images/comercios/farmacia/masterFarma/masterfarma.png",
+              name: "Master Farma",
+              address: "R. Laurindo Franco de Godoi, 90",
+              
+              plantaoHorario: "08:00h às 21:00h", 
+              plantaoData:"Sab 10/05 a Sex 16/05", 
+              statusAberto:".",
+              horarios: {                          
+                seg: [{ inicio: "08:00", fim: "21:00" }],
+                ter: [{ inicio: "08:00", fim: "21:00" }],
+                qua: [{ inicio: "08:00", fim: "21:00" }],
+                qui: [{ inicio: "08:00", fim: "21:00" }],
+                sex: [{ inicio: "08:00", fim: "21:00" }],
+                sab: [{ inicio: "08:00", fim: "21:00" }],
+                dom: [{ inicio: "08:00", fim: "21:00" }]
+              },  
+              contact: "(43) 99951-1540",
+              delivery: "Sim / Sem Taxa",
+              facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
+              instagram: "https://www.instagram.com/masterfarma_carlopolis/",
+              site: "#",
+              novidadesImages: [               
+                "images/comercios/farmacia/masterFarma/divulgacao/1.png",
+                "images/comercios/farmacia/masterFarma/divulgacao/2.png",
+                "images/comercios/farmacia/masterFarma/divulgacao/3.png",
+                "images/comercios/farmacia/masterFarma/divulgacao/4.png",
+                "images/comercios/farmacia/masterFarma/divulgacao/5.png",
+              ], 
+              novidadesDescriptions: [                            
+                "Analgésico de alívio eficaz para dores intensas",
+                "Cólicas do trato gastrintestinal",
+                "Analgésico (para dor) antitérmico (para febre)",
+                "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                "Redução da febre e para o alívio de dores",
+              ],
+          },
+
+
+
+
+
+
+
+
+
 
 
             ],
