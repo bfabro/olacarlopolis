@@ -253,7 +253,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "lobofitness", "turminhadoaçai", "açouguecuritiba",
+  "carlopolitana", "turminhadoaçai", "açouguecuritiba",
   "adegacuenca", "fornalhapizzaria"
 ]; // nomes normalizados
 
@@ -285,21 +285,30 @@ function montarCarrosselDivulgacao() {
   totalExibir.forEach(est => {
     const imagem = est.novidadesImages[0];
     const texto = est.novidadesDescriptions?.[0] || "Confira nossas novidades!";
+  
+    // Busca a categoria correspondente ao estabelecimento
+    const categoria = categories.find(cat =>
+      cat.establishments?.some(e => e.name === est.name)
+    )?.title || "";
+  
     const slide = document.createElement("div");
     slide.classList.add("swiper-slide");
-
-    slide.innerHTML = `
-    <img class="content_image" src="${imagem}" alt="${est.name}">
-    <div class="info_divulgacao">
-      <h3>${est.name}</h3>
-      <p>${texto}</p>
-      ${est.instagram ? `<a href="${est.instagram}" target="_blank" class="mais-info">+ informações</a>` : ""}
-    </div>
-  `;
   
-
+    // Monta o conteúdo do slide com nome da categoria + nome do comércio
+    slide.innerHTML = `
+      <img class="content_image" src="${imagem}" alt="${est.name}">
+      <div class="info_divulgacao">
+        <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
+        <p>${texto}</p>
+        ${est.instagram ? `<a href="${est.instagram}" target="_blank" class="mais-info">+ informações</a>` : ""}
+      </div>
+    `;
+  
     swiperWrapper.appendChild(slide);
   });
+  
+
+  
 }
 
 //document.addEventListener("DOMContentLoaded", montarCarrosselDivulgacao);
@@ -1499,6 +1508,7 @@ menuLinks.forEach((link) => {
                       address: "R. Benedito Salles, 350, Carlopolis",
                       contact: "(43) 99161-8381",
                       delivery: "Sim / Com Taxa",   
+                      instagram:"https://www.instagram.com/didog_prensados/",
                       menuImages: [                   
                         "images/comercios/lanchonete/didog/cardapio/1.png",
                         "images/comercios/lanchonete/didog/cardapio/2.png",
