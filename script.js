@@ -763,15 +763,14 @@ clínicaveterináriacarlópolis:"s",
   
     // Quando clicar no menu, abre a sidebar e ativa o fundo escuro
     sidebarOpen.addEventListener("click", function () {
-      
-      sidebar.classList.toggle("open");
-      overlay.classList.toggle("active");
-    
+      sidebar.classList.add("open");
+      sidebar.classList.remove("close"); // <-- ESSA LINHA É ESSENCIAL
+      overlay.classList.add("active");
     });
   
     // Quando clicar fora do menu, fecha a sidebar
     overlay.addEventListener("click", function () {
-      sidebar.classList.remove("close");
+      
       sidebar.classList.remove("open");
       overlay.classList.remove("active");
     });
