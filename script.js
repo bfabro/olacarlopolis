@@ -7,7 +7,8 @@ function compartilharEstabelecimento(id) {
     return;
   }
 
-  const url = `${window.location.origin}#${id}`;
+  const nomeNormalizado = normalizeName(id);
+  const url = `${window.location.origin}#${nomeNormalizado}`;
 
   if (navigator.share) {
     navigator.share({
@@ -24,6 +25,7 @@ function compartilharEstabelecimento(id) {
       .catch(() => alert("Não foi possível copiar o link."));
   }
 }
+
 
 
 function mostrarToast(mensagem) {
@@ -913,9 +915,11 @@ menuLinks.forEach((link) => {
   
     function normalizeName(name) {
       return name
-        .toLowerCase()
-        .replace(/\s*\(.*?\)\s*/g, "")
-        .replace(/\s+/g, "");
+      .toLowerCase()
+    .normalize("NFD")                // separa letras de acentos
+    .replace(/[\u0300-\u036f]/g, "") // remove acentos
+    .replace(/[ç]/g, "c")            // substitui cedilha
+    .replace(/\s+/g, "");            // remove espaços
     }
   
     function sendPaymentReminder(establishment) {
