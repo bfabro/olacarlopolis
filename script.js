@@ -763,9 +763,10 @@ clínicaveterináriacarlópolis:"s",
   
     // Quando clicar no menu, abre a sidebar e ativa o fundo escuro
     sidebarOpen.addEventListener("click", function () {
-      sidebar.classList.add("open");
-      sidebar.classList.remove("close"); // <-- ESSA LINHA É ESSENCIAL
-      overlay.classList.add("active");
+      
+      sidebar.classList.toggle("open");
+      overlay.classList.toggle("active");
+    
     });
   
     // Quando clicar fora do menu, fecha a sidebar
@@ -786,7 +787,7 @@ clínicaveterináriacarlópolis:"s",
   
     sidebar.appendChild(closeButton);
   
-    // Quando um item do menu for clicado, fecha o menu automaticamente
+
     // Quando um item do menu for clicado, fecha o menu automaticamente
 menuLinks.forEach((link) => {
   link.addEventListener("click", function (e) {
