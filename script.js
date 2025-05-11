@@ -7,8 +7,7 @@ function compartilharEstabelecimento(id) {
     return;
   }
 
-  const url = `${window.location.protocol}//${window.location.host}${window.location.pathname}#${id}`;
-
+  const url = `${window.location.origin}#${id}`;
 
   if (navigator.share) {
     navigator.share({
@@ -4699,9 +4698,9 @@ function restaurarMenuOriginal() {
   
      
      <strong class="locais_nomes">${establishment.name}</strong>
-<button class="share-btn" data-share-id="${normalizeName(est.name)}">
-  <i class="fas fa-share-alt"></i>
-</button>
+ <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
+    <i class="fas fa-share-alt"></i>
+  </button>
 
 
 <br>
