@@ -5310,18 +5310,18 @@ setTimeout(() => {
                     }
 
                     // Mostra o loader só se veio de link compartilhado
-                    if (window.location.hash) {
-                      const loader = document.getElementById("loader");
-                      if (loader) {
-                        setTimeout(() => {
-                          loader.style.display = "none";
-                        }, 1200); // Tempo suficiente para o efeito visual
-                      }
-                    } else {
-                      const loader = document.getElementById("loader");
-                      if (loader) loader.style.display = "none";
-                    }
-                    
+if (window.location.hash) {
+  const loader = document.getElementById("loader");
+  if (loader) {
+    setTimeout(() => {
+      loader.style.display = "none"; // esconde após tudo carregar
+    }, 1000); // tempo mínimo para efeito visual
+  }
+} else {
+  // Se não veio de link, remove o loader imediatamente
+  const loader = document.getElementById("loader");
+  if (loader) loader.style.display = "none";
+}
 
                     
                     
