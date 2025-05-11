@@ -5282,10 +5282,6 @@ setTimeout(() => {
                   
                   
                     
-                    
-                    
-                    
-                    
                     ///// FIM AREA DE PAGAMENTO
                   
                     document.addEventListener("click", function (event) {
@@ -5301,7 +5297,15 @@ setTimeout(() => {
                       }
                     });
 
-
+                    if (window.location.hash) {
+                      setTimeout(() => {
+                        const sidebar = document.querySelector(".sidebar");
+                        if (sidebar && sidebar.classList.contains("close")) {
+                          sidebar.classList.remove("close");
+                        }
+                      }, 300);
+                    }
+                    
 ////
 
 // Função para registrar clique no Firebase
