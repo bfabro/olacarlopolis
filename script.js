@@ -4702,7 +4702,7 @@ function restaurarMenuOriginal() {
      
      <strong class="locais_nomes">${establishment.name}</strong>
  <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
-    <i class="fas fa-share-alt"></i>
+    <i class="fas fa-share-alt"> </i>
   </button>
 
 
@@ -5308,6 +5308,21 @@ setTimeout(() => {
                         sidebar.classList.remove("close");
                       }, { once: true }); // executa só na primeira vez
                     }
+
+                    // Mostra o loader só se veio de link compartilhado
+if (window.location.hash) {
+  const loader = document.getElementById("loader");
+  if (loader) {
+    setTimeout(() => {
+      loader.style.display = "none"; // esconde após tudo carregar
+    }, 1000); // tempo mínimo para efeito visual
+  }
+} else {
+  // Se não veio de link, remove o loader imediatamente
+  const loader = document.getElementById("loader");
+  if (loader) loader.style.display = "none";
+}
+
                     
                     
 ////
