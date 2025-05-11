@@ -1829,7 +1829,7 @@ img {
   left: 0;
   width: 100%;
   height: 100%;
-  background: black; /* ou preto, se o fundo do GIF for escuro */
+  background: black; /* fundo escuro combina com seu gif */
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -1837,6 +1837,7 @@ img {
 }
 
 .loader-gif {
-  width: 120px; /* ajuste o tamanho como preferir */
+  max-width: 200px;
   height: auto;
 }
+
