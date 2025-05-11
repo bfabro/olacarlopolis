@@ -5345,13 +5345,25 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 
 
 window.addEventListener("load", () => {
-  const hash = window.location.hash.replace("#", "");
+  const urlParams = new URLSearchParams(window.location.hash.replace("#", "").replace("?", "&"));
+const hash = urlParams.get("")?.split("&")[0]; // nome do estabelecimento
+const categoriaForcada = urlParams.get("categoria"); // se tiver, força a categoria
+
   if (!hash) return;
 
   // Procura em quais categorias está o estabelecimento
-  const categoriaAlvo = categories.find(cat =>
+  let categoriaAlvo;
+
+if (categoriaForcada) {
+  categoriaAlvo = categories.find(cat =>
+    cat.title.toLowerCase().includes(categoriaForcada.toLowerCase())
+  );
+} else {
+  categoriaAlvo = categories.find(cat =>
     cat.establishments?.some(est => normalizeName(est.name) === hash)
   );
+}
+
 
   if (categoriaAlvo && categoriaAlvo.link) {
     categoriaAlvo.link.click(); // simula o clique para carregar a categoria
