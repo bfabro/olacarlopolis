@@ -392,7 +392,7 @@ function montarCarrosselDivulgacao() {
       lobofitness:"s",
 
       //AÇAI
-      turminhadoaçai:"s",
+      turminhadoacai:"s",
 
       //Açougue
       acouguecuritiba: "s",
@@ -416,7 +416,7 @@ function montarCarrosselDivulgacao() {
         oficinadocelular:"s",
       
 // auto peças
-paulinhoautopeças:"s",
+paulinhoautopecas:"s",
 
 //chaveiro
 chaveirocentral:"s",
@@ -434,7 +434,7 @@ chaveirocentral:"s",
 
 // clinica veterinaria
 
-clínicaveterináriacarlópolis:"s",
+clinicaveterinariacarlopolis:"s",
 
       //farmacia
       elshaday: "s",
