@@ -5352,18 +5352,9 @@ const categoriaForcada = urlParams.get("categoria"); // se tiver, força a categ
   if (!hash) return;
 
   // Procura em quais categorias está o estabelecimento
-  let categoriaAlvo;
-
-if (categoriaForcada) {
-  categoriaAlvo = categories.find(cat =>
-    cat.title.toLowerCase().includes(categoriaForcada.toLowerCase())
-  );
-} else {
-  categoriaAlvo = categories.find(cat =>
+  const categoriaAlvo = categories.find(cat =>
     cat.establishments?.some(est => normalizeName(est.name) === hash)
   );
-}
-
 
   if (categoriaAlvo && categoriaAlvo.link) {
     categoriaAlvo.link.click(); // simula o clique para carregar a categoria
