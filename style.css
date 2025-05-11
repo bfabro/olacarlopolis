@@ -1779,3 +1779,43 @@ img {
 .swiper-novidades .swiper-counter {
   display: none !important;
 }
+
+
+
+
+
+.share-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  font-size: 18px;
+  color: #4070f4;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.share-btn:hover {
+  color: #0056b3;
+}
+
+.toast-compartilhar {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+}
+
+.toast-compartilhar.ativo {
+  opacity: 1;
+}
+

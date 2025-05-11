@@ -1,4 +1,69 @@
+
+
+function compartilharEstabelecimento(id) {
+  if (!id || typeof id !== "string") {
+    console.warn("ID inválido para compartilhamento:", id);
+    mostrarToast("❌ Erro ao compartilhar: ID inválido");
+    return;
+  }
+
+  const url = `${window.location.origin}#${id}`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: "Olá Carlópolis",
+      text: "Veja este comércio que encontrei no site!",
+      url: url
+    }).catch((err) => {
+      console.warn("Compartilhamento cancelado ou falhou:", err);
+      mostrarToast("❌ Não foi possível compartilhar.");
+    });
+  } else {
+    navigator.clipboard.writeText(url)
+      .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
+      .catch(() => alert("Não foi possível copiar o link."));
+  }
+}
+
+
+function mostrarToast(mensagem) {
+  const toast = document.createElement("div");
+  toast.textContent = mensagem;
+  toast.className = "toast-compartilhar";
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add("ativo"), 100);
+  setTimeout(() => {
+    toast.classList.remove("ativo");
+    setTimeout(() => document.body.removeChild(toast), 300);
+  }, 2000);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
+
+
+
+
+  
+
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////// fim botao para compartilha estabelecimento
+
 
 
 
@@ -316,6 +381,14 @@ function montarCarrosselDivulgacao() {
   });
   
   
+  setTimeout(() => {
+    document.querySelectorAll(".share-btn").forEach((botao) => {
+      botao.addEventListener("click", () => {
+        const id = botao.getAttribute("data-share-id");
+        if (id) compartilharEstabelecimento(id);
+      });
+    });
+  }, 300);
   
   
   
@@ -4061,7 +4134,11 @@ menuLinks.forEach((link) => {
           
         },
 
+/////////////////////
+//////////////////////
+///////////////////////
 
+//////////////////////
 
 
           {
@@ -4620,7 +4697,13 @@ function restaurarMenuOriginal() {
       }
   
      
-      <strong class="locais_nomes">${establishment.name} </strong><br>
+     <strong class="locais_nomes">${establishment.name}</strong>
+<button class="share-btn" data-share-id="nome-normalizado-do-estabelecimento">
+  <i class="fas fa-share-alt"></i>
+</button>
+
+
+<br>
       
       
   
@@ -4826,6 +4909,8 @@ function restaurarMenuOriginal() {
       <i class="fas fa-utensils"></i> Cardápio (${establishment.menuImages.length})
     </button>
   ` : ''}
+
+  
 </div>
                         
                       
@@ -4874,6 +4959,16 @@ function restaurarMenuOriginal() {
                   </ul>
                     `;
                   
+// Ativa os botões de compartilhar
+setTimeout(() => {
+  document.querySelectorAll(".share-btn").forEach((botao) => {
+    botao.addEventListener("click", () => {
+      const id = botao.getAttribute("data-share-id");
+      if (id) compartilharEstabelecimento(id);
+    });
+  });
+}, 300);
+
 
 
                     function criarInfoCards(establishment) {
@@ -5216,6 +5311,35 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 
 
 
+ ///////////// inicio botao compartilhamento
+
+ document.addEventListener("DOMContentLoaded", () => {
+  const hash = window.location.hash.replace("#", "").toLowerCase();
+  if (!hash) return;
+
+  // Procura o estabelecimento com nome normalizado igual ao hash
+  categories.forEach((categoria) => {
+    categoria.establishments?.forEach((est) => {
+      const nomeNormalizado = normalizeName(est.name);
+      if (nomeNormalizado === hash) {
+        // Abre o menu correspondente
+        if (categoria.link) categoria.link.click();
+
+        // Espera carregar o conteúdo e então rola até o elemento
+        setTimeout(() => {
+          const elementoEst = document.querySelector(`[data-id="${nomeNormalizado}"]`);
+          if (elementoEst) {
+            elementoEst.scrollIntoView({ behavior: "smooth", block: "center" });
+            elementoEst.classList.add("highlighted"); // opcional, destaque visual
+          }
+        }, 500);
+      }
+    });
+  });
+});
+
+
+
 
 
 
@@ -5226,3 +5350,6 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 
                     
                   });
+
+                
+                  
