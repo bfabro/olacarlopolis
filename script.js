@@ -5310,6 +5310,7 @@ setTimeout(() => {
                     }
 
                     // Mostra o loader só se veio de link compartilhado
+// Mostra o loader só se veio de link compartilhado
 if (window.location.hash) {
   const loader = document.getElementById("loader");
   if (loader) {
@@ -5322,6 +5323,7 @@ if (window.location.hash) {
   const loader = document.getElementById("loader");
   if (loader) loader.style.display = "none";
 }
+
 
                     
                     
