@@ -5297,14 +5297,18 @@ setTimeout(() => {
                       }
                     });
 
+                
+
                     if (window.location.hash) {
-                      setTimeout(() => {
-                        const sidebar = document.querySelector(".sidebar");
-                        if (sidebar && sidebar.classList.contains("close")) {
-                          sidebar.classList.remove("close");
-                        }
-                      }, 300);
+                      // Garante que o menu comece fechado mas com textos prontos para exibir
+                      sidebar.classList.add("close");
+                    
+                      // Ao clicar no menu, garante que os textos sejam mostrados
+                      sidebarOpen.addEventListener("click", function () {
+                        sidebar.classList.remove("close");
+                      }, { once: true }); // executa só na primeira vez
                     }
+                    
                     
 ////
 
