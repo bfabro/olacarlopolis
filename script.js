@@ -1483,7 +1483,8 @@ menuLinks.forEach((link) => {
                         },
                         address: "R. Padre Hugo, 478 , Carlópolis",
                         contact: "(43) 99604-9187",
-                        delivery: "Sim / Com Taxa",                        
+                        delivery: "Sim / Com Taxa",  
+                        instagram:"https://www.instagram.com/cantinhodapraca043/",                      
                         menuImages: [                   
                             "images/comercios/lanchonete/cantinhoPraca/cardapio/1.png",
                             "images/comercios/lanchonete/cantinhoPraca/cardapio/2.png",
@@ -3701,6 +3702,7 @@ menuLinks.forEach((link) => {
                     },
                     address: "Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
                     contact: "(43) 99900-2991",
+                    instagram:"https://www.instagram.com/borracharia.vidanova/",
                     novidadesImages: [               
                       "images/comercios/borracharia/vidaNova/divulgacao/1.png",
                       "images/comercios/borracharia/vidaNova/divulgacao/2.png",     
@@ -3762,11 +3764,11 @@ menuLinks.forEach((link) => {
                     qui: [{ inicio: "08:00", fim: "19:00" }],
                     sex: [{ inicio: "08:00", fim: "19:00" }],
                     sab: [{ inicio: "08:00", fim: "19:00" }],
-                    dom: [{ inicio: "08:00", fim: "12:00" }]
+                    dom: [{ inicio: "09:00", fim: "12:00" }]
                   }, 
                   address: "Avenida Elson Soares, 1048, Carlopolis",
                   contact: "(43) 99829-5216",
-                  delivery: "Sim / Sem Taxa",
+                  delivery: "Sim / Com Taxa",
                   facebook:"https://www.facebook.com/people/CN-Casa-do-G%C3%A1s/100068139145901/",
                   instagram:"https://www.instagram.com/ultracarlopolis/",
                   novidadesImages: [               
@@ -4175,14 +4177,14 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/restaurante/portal/portal.png",
                     name: "Portal",
-                    hours: "Seg a Qui: 19:00h as 21:00h",
+                    hours: "Seg a Sex: 11:30h as 14:00h - 19:00h as 21:00h",
                     statusAberto:".",
                     horarios: {                    
-                      seg: [{ inicio: "19:00", fim: "21:00" }],
-                      ter: [{ inicio: "19:00", fim: "21:00" }],
-                      qua: [{ inicio: "19:00", fim: "21:00" }],
-                      qui: [{ inicio: "19:00", fim: "21:00" }],
-                      sex: [],
+                      seg: [{ inicio: "11:30", fim: "14:00" },{ inicio: "19:00", fim: "21:00" }],
+                      ter: [{ inicio: "11:30", fim: "14:00" },{ inicio: "19:00", fim: "21:00" }],
+                      qua: [{ inicio: "11:30", fim: "14:00" },{ inicio: "19:00", fim: "21:00" }],
+                      qui: [{ inicio: "11:30", fim: "14:00" },{ inicio: "19:00", fim: "21:00" }],
+                      sex: [{ inicio: "11:30", fim: "14:00" },{ inicio: "19:00", fim: "21:00" }],
                       sab: [],
                       dom: []
                     },
@@ -4190,6 +4192,7 @@ menuLinks.forEach((link) => {
                     contact: "(43) 3566-2174",
                     delivery: "Sim / Com Taxa",
                     infoAdicional:"Fica dentro do Hotel Portal",
+                    site:"http://www.hotelportalpr.com.br/restaurante",
                     novidadesImages: [                    
                       "images/comercios/restaurante/portal/divulgacao/1.png",
                      "images/comercios/restaurante/portal/divulgacao/2.png",
