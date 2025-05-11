@@ -5345,20 +5345,30 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 
 
 window.addEventListener("load", () => {
-  const hash = window.location.hash;
-  if (hash) {
+  const hash = window.location.hash.replace("#", "");
+  if (!hash) return;
+
+  // Procura em quais categorias está o estabelecimento
+  const categoriaAlvo = categories.find(cat =>
+    cat.establishments?.some(est => normalizeName(est.name) === hash)
+  );
+
+  if (categoriaAlvo && categoriaAlvo.link) {
+    categoriaAlvo.link.click(); // simula o clique para carregar a categoria
+
     const tentarRolar = () => {
-      const alvo = document.querySelector(hash);
+      const alvo = document.getElementById(hash);
       if (alvo) {
         alvo.scrollIntoView({ behavior: "smooth", block: "center" });
       } else {
-        // Se ainda não existe, tenta de novo em 300ms
-        setTimeout(tentarRolar, 300);
+        setTimeout(tentarRolar, 300); // tenta de novo até existir
       }
     };
-    tentarRolar();
+
+    setTimeout(tentarRolar, 500); // dá um tempo para renderizar primeiro
   }
 });
+
 
 
 
