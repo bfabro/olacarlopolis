@@ -5344,21 +5344,6 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 
 
 
-window.addEventListener("load", () => {
-  const hash = window.location.hash;
-  if (hash) {
-    const tentarRolar = () => {
-      const alvo = document.querySelector(hash);
-      if (alvo) {
-        alvo.scrollIntoView({ behavior: "smooth", block: "center" });
-      } else {
-        // Se ainda não existe, tenta de novo em 300ms
-        setTimeout(tentarRolar, 300);
-      }
-    };
-    tentarRolar();
-  }
-});
 
 
 
