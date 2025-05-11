@@ -5348,26 +5348,28 @@ window.addEventListener("load", () => {
   const hash = window.location.hash.replace("#", "");
   if (!hash) return;
 
-  // Procura em quais categorias está o estabelecimento
   const categoriaAlvo = categories.find(cat =>
     cat.establishments?.some(est => normalizeName(est.name) === hash)
   );
 
   if (categoriaAlvo && categoriaAlvo.link) {
-    categoriaAlvo.link.click(); // simula o clique para carregar a categoria
+    categoriaAlvo.link.click(); // simula o clique
 
     const tentarRolar = () => {
       const alvo = document.getElementById(hash);
-      if (alvo) {
+      const imagem = alvo?.querySelector("img");
+
+      if (alvo && imagem) {
         alvo.scrollIntoView({ behavior: "smooth", block: "center" });
       } else {
-        setTimeout(tentarRolar, 300); // tenta de novo até existir
+        setTimeout(tentarRolar, 300);
       }
     };
 
-    setTimeout(tentarRolar, 500); // dá um tempo para renderizar primeiro
+    setTimeout(tentarRolar, 500);
   }
 });
+
 
 
 
