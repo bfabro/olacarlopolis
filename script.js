@@ -7,8 +7,7 @@ function compartilharEstabelecimento(id) {
     return;
   }
 
-  const nomeNormalizado = normalizeName(id);
-  const url = `${window.location.origin}#${nomeNormalizado}`;
+  const url = `${window.location.origin}#${id}`;
 
   if (navigator.share) {
     navigator.share({
@@ -27,7 +26,6 @@ function compartilharEstabelecimento(id) {
 }
 
 
-
 function mostrarToast(mensagem) {
   const toast = document.createElement("div");
   toast.textContent = mensagem;
@@ -41,25 +39,6 @@ function mostrarToast(mensagem) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-
-
-
-
-  
-
- 
-  
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -416,7 +395,7 @@ function montarCarrosselDivulgacao() {
       turminhadoaçai:"s",
 
       //Açougue
-      açouguecuritiba: "s",
+      acouguecuritiba: "s",
 
       // ADEGAS
       adegacuenca: "s",
