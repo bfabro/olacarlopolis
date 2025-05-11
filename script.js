@@ -460,7 +460,7 @@ clinicaveterinariacarlopolis:"s",
 
       // grafica
      
-      serigrafgráficaeserigrafia:"s",
+      serigrafgraficaeserigrafia:"s",
 
       // mercearia
       seiza:"s",
@@ -489,7 +489,7 @@ clinicaveterinariacarlopolis:"s",
       //lanchonete
       ocasarao: "s", // Casarao pagou      
       ione:"s",
-      cantinhodapraça:"s",
+      cantinhodapraca:"s",
       caldodecanaamaral:"s",
       kidog:"s",
       didog:"s",
@@ -497,7 +497,7 @@ clinicaveterinariacarlopolis:"s",
       mycoffe:"s",
   
       //supermercado
-      bompreço:"s",
+      bompreco:"s",
       mercadorocha: "s", // Mercado Rocha pagou
       carreiro: "s", // Carreiro pagou
       comprebemmais:"s",
@@ -513,7 +513,7 @@ clinicaveterinariacarlopolis:"s",
       carlopolitana:"s",
 
       // restaurantes
-      assadãodorussão:"s",
+      assadaodorussao:"s",
       cabanas:"s",
       cantinaitaliana:"s",
       delfino:"s",
@@ -523,7 +523,7 @@ clinicaveterinariacarlopolis:"s",
       oficinadosabor:"s",
       paiol: "s", // Paiol pagou
       restaurantedadi:"s",
-      sabordaroça:"s",
+      sabordaroca:"s",
       selahtgrill:"s",
       yingyang:"s",
     
@@ -576,7 +576,7 @@ clinicaveterinariacarlopolis:"s",
 
       // VETERINARIO
 
-      celsogolçalves:"s",
+      celsogolcalves:"s",
       jurandirmachado:"s",
   
       //// FIM SERVIÇOS
@@ -611,16 +611,16 @@ clinicaveterinariacarlopolis:"s",
       beneditorodriguesdecamargo:"s",
       cmeiraymundasantanasalles:"s",
       carolinalupion:"s",
-      escolamunicipaljosésalles:"s",     
-      hercíliadepaulaesilva:"s",
+      escolamunicipaljosesalles:"s",     
+      herciliadepaulaesilva:"s",
       //posto de saude
-      ubseugênionevessoares:"s",
-      centrodesaudedrjosé:"s",
+      ubseugenionevessoares:"s",
+      centrodesaudedrjose:"s",
      
       
     
       
-      hospitalsãojose: "s",
+      hospitalsaojose: "s",
       prefeitura: "s",
       duvidasereclamações: "s",
       sanepar: "s",
