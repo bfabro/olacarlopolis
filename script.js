@@ -4081,7 +4081,7 @@ menuLinks.forEach((link) => {
             address: "Estr. Fazendinha, 158 - Carlópolis",
             contact: "(43) 99619-1971",
             delivery: "Sim / Com Taxa",
-            instagram:"https://www.instagram.com/pesqueirodogalego/?locale=ko-KR&hl=ar",
+            instagram:"https://www.instagram.com/pesqueirodogalego",
             facebook:"https://www.facebook.com/pesqueirodogalegoclps/",
             menuImages: [                   
               "images/comercios/restaurante/galego/cardapio/1.png",
