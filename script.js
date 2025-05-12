@@ -476,7 +476,7 @@ clinicaveterinariacarlopolis:"s",
 
       // padaria
       bomjesus:"s",
-      sãofrancisco:"s",
+      saofrancisco:"s",
       prelie:"s",      
   
       //pizzaria
