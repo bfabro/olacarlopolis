@@ -4021,12 +4021,12 @@ menuLinks.forEach((link) => {
                 hours: "Seg a Sab: 10:30h as 14:00h - 18:30h as 21:00",
                 statusAberto:".",
                   horarios: {                    
-                    seg: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
-                    ter: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
-                    qua: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
-                    qui: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
-                    sex: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
-                    sab: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
+                    seg: [{ inicio: "10:00", fim: "13:00" },{ inicio: "18:30", fim: "21:00" }],
+                    ter: [{ inicio: "10:00", fim: "13:00" },{ inicio: "18:30", fim: "21:00" }],
+                    qua: [{ inicio: "10:00", fim: "13:00" },{ inicio: "18:30", fim: "21:00" }],
+                    qui: [{ inicio: "10:00", fim: "13:00" },{ inicio: "18:30", fim: "21:00" }],
+                    sex: [{ inicio: "10:00", fim: "13:00" },{ inicio: "18:30", fim: "21:00" }],
+                    sab: [{ inicio: "10:00", fim: "13:00" },],
                     dom: []
                   },
                 address: "Rua Benedito Salles 1241",
