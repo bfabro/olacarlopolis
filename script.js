@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "carlopolitana", "pimentadoce", "limone","adegacuenca", "seiza"
+  "carlopolitana","assadaodorussao", "pimentadoce", "limone","adegacuenca", "seiza"
   
 ]; // nomes normalizados
 
@@ -4018,7 +4018,7 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/restaurante/assadaoRussao/assadaoRussao.png",
                 name: "Assadão do Russão",
-                hours: "Seg a Sab: 10:30h as 14:00h - 19:00h as 21:00",
+                hours: "Seg a Sab: 10:30h as 14:00h - 18:30h as 21:00",
                 statusAberto:".",
                   horarios: {                    
                     seg: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
@@ -4037,8 +4037,16 @@ menuLinks.forEach((link) => {
                   "images/comercios/restaurante/assadaoRussao/divulgacao/1.png",                        
                  "images/comercios/restaurante/assadaoRussao/divulgacao/2.png",
                  "images/comercios/restaurante/assadaoRussao/divulgacao/3.png",
+                 "images/comercios/restaurante/assadaoRussao/divulgacao/4.png", 
                  
               ],
+              novidadesDescriptions:[
+                "Sua noite merece um sabor especial! Venha saborear nossos pratos feitos e marmitex quentinhos, de segunda a sexta, das 18h30 às 21h!",
+                "m1",
+                "m2",
+                "m3",
+      
+                ],
               
             },
 
