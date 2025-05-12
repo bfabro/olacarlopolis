@@ -2033,6 +2033,12 @@ menuLinks.forEach((link) => {
                 delivery: "Não",
                 facebook: "https://www.facebook.com/sorvetessalles/?locale=pt_BR",
                 instagram: "https://www.instagram.com/sorvetessalles/",
+                menuImages: [
+                 
+                  "images/comercios/sorveteria/salles/cardapio/1.jpeg",
+                  "images/comercios/sorveteria/salles/cardapio/2.jpeg",
+                
+                 ], 
                 novidadesImages: [              
                  "images/comercios/sorveteria/salles/divulgacao/1.png",
                  "images/comercios/sorveteria/salles/divulgacao/2.png",
