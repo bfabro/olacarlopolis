@@ -4018,19 +4018,20 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/restaurante/assadaoRussao/assadaoRussao.png",
                 name: "Assadão do Russão",
-                hours: "Seg a Sab: 10:30h as 14:00h",
+                hours: "Seg a Sab: 10:30h as 14:00h - 19:00h as 21:00",
                 statusAberto:".",
                   horarios: {                    
-                    seg: [{ inicio: "10:30", fim: "14:00" }],
-                    ter: [{ inicio: "10:30", fim: "14:00" }],
-                    qua: [{ inicio: "10:30", fim: "14:00" }],
-                    qui: [{ inicio: "10:30", fim: "14:00" }],
-                    sex: [{ inicio: "10:30", fim: "14:00" }],
-                    sab: [{ inicio: "10:30", fim: "14:00" }],
+                    seg: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
+                    ter: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
+                    qua: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
+                    qui: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
+                    sex: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
+                    sab: [{ inicio: "10:00", fim: "13:00" },{ inicio: "19:00", fim: "21:00" }],
                     dom: []
                   },
                 address: "Rua Benedito Salles 1241",
-                contact: "(43) 9838-7570",
+                contact: "(43) 98844-8407",
+                contact2: "(43) 99838-7570",
                 delivery: "Sim / Com Taxa",                
               novidadesImages: [                    
                   "images/comercios/restaurante/assadaoRussao/divulgacao/1.png",                        
