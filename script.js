@@ -622,7 +622,7 @@ clinicaveterinariacarlopolis:"s",
       
       hospitalsaojose: "s",
       prefeitura: "s",
-      duvidasereclamações: "s",
+      duvidasereclamacoes: "s",
       sanepar: "s",
       samuzinho:"s",
       
