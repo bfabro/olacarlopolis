@@ -1057,10 +1057,15 @@ menuLinks.forEach((link) => {
                               "images/comercios/adega/cuenca/divulgacao/3.png",
                               "images/comercios/adega/cuenca/divulgacao/4.png",
                               "images/comercios/adega/cuenca/divulgacao/5.png",
+                              "images/comercios/adega/cuenca/divulgacao/6.png",
                               ],
                               novidadesDescriptions: [                            
                                 "Chop Brahma encontra aqui!",
                                 "Chop HASS encontra aqui!",
+                                " ",
+                                " ",
+                                " ",
+                                "Pediu chegou! Delivery de bebidas!",
                               ],
                               
                         },
