@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "carlopolitana","assadaodorussao", "pimentadoce", "limone","adegacuenca", "seiza"
+  "seiza","assadaodorussao", "pimentadoce", "limone","adegacuenca"
   
 ]; // nomes normalizados
 
@@ -1941,7 +1941,7 @@ menuLinks.forEach((link) => {
                    "images/comercios/radio/carlopolitana/divulgacao/9.jpeg",
                   ],
                   novidadesDescriptions: [               
-                    "Promoção dia das Mães",
+                    "Nos escute em qualquer plataforma!",
                     "Entre em contato pelo WhatsApp",
                     "Temos aplicativos para voce ouvir e receber notificações em qualquer lugar!",
                     "",
