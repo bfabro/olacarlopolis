@@ -4018,7 +4018,7 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/restaurante/assadaoRussao/assadaoRussao.png",
                 name: "Assadão do Russão",
-                hours: "Seg a Sab: 10:30h as 14:00h - 18:30h as 21:00",
+                hours: "Seg a Sab: 10:30h as 13:00h<br>Seg a Sex: 18:30h as 21:00h",
                 statusAberto:".",
                   horarios: {                    
                     seg: [{ inicio: "10:00", fim: "13:00" },{ inicio: "18:30", fim: "21:00" }],
