@@ -3590,7 +3590,17 @@ menuLinks.forEach((link) => {
             {
                 image: "images/setorPublico/postoSaude/joseAparecido.png",
                 name: "Centro de Saude Dr José",                
-                hours: "Seg a Sex: 8:00h as 17h",
+                hours: "Seg a Sex: 07:00h as 11:00h - 13:00 as 17:00h",
+                statusAberto:".",
+                horarios: {                    
+                  seg: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  ter: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  qua: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  qui: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  sex: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  sab: [],
+                  dom: []
+                },
                 address: "Avenida Elson Soares,769",
                 contact: "(43) 3566-1328",
                
@@ -3632,18 +3642,17 @@ menuLinks.forEach((link) => {
               {
                 
                   name: "Samuzinho",
-                  hours: "Seg a Sex: 08:30h as 12:00h - 13:30 as 17:00h",
-                  address: "-",
+                  hours: "24 horas",                  
                   contact: "(43) 99825-0248",
                   statusAberto:".",
                   horarios: {                    
-                    seg: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                    ter: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                    qua: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                    qui: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                    sex: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                    sab: [],
-                    dom: []
+                    seg: [{ inicio: "00:00", fim: "23:59" }],
+                    ter: [{ inicio: "00:00", fim: "23:59" }],
+                    qua: [{ inicio: "00:00", fim: "23:59" }],
+                    qui: [{ inicio: "00:00", fim: "23:59" }],
+                    sex: [{ inicio: "00:00", fim: "23:59" }],
+                    sab: [{ inicio: "00:00", fim: "23:59" }],
+                    dom: [{ inicio: "00:00", fim: "23:59" }]
                   },
                   
               },
@@ -3658,16 +3667,16 @@ menuLinks.forEach((link) => {
             {
              
                 name: "Secretaria da Saude",
-                hours: "Seg a Sex: 8:30h as 12h - 13:30 as 17h",
+                hours: "Seg a Sex: 07:00h as 11:00h - 13:00 as 17:00h",
                 address: "-",
                 contact: "(43) 3566-1328",
                 statusAberto:".",
                 horarios: {                    
-                  seg: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                  ter: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                  qua: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                  qui: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                  sex: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
+                  seg: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  ter: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  qua: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  qui: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  sex: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
                   sab: [],
                   dom: []
                 },
@@ -3684,16 +3693,16 @@ menuLinks.forEach((link) => {
           {
            
               name: "Vigilancia Sanitaria",
-              hours: "Seg a Sex: 08:30h as 12:00h - 13:30 as 17:00h",
+              hours: "Seg a Sex: 08:00h as 11:00h - 13:00 as 17:00h",
               address: "-",
               contact: "(43) 99825-1079",
               statusAberto:".",
               horarios: {                    
-                seg: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                ter: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                qua: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                qui: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
-                sex: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
+                seg: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                ter: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                qua: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                qui: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                sex: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
                 sab: [],
                 dom: []
               },
