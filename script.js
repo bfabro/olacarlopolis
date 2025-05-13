@@ -1942,7 +1942,7 @@ menuLinks.forEach((link) => {
                   ],
                   novidadesDescriptions: [               
                     "Nos escute em qualquer plataforma!",
-                    "Entre em contato pelo WhatsApp",
+                    "Entre em contato pelo WhatsApp!",
                     "Temos aplicativos para voce ouvir e receber notificações em qualquer lugar!",
                     "",
                     "Fique informado com noticias da cidade e região!",
