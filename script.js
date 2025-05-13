@@ -3909,57 +3909,60 @@ menuLinks.forEach((link) => {
         },
 
 
+        
+
+
         {
-            link: document.querySelector("#menuMercearia"),  
-            title: "Mercearia",
-            establishments: [
-                {
-                    image: "images/comercios/mercearia/seiza/seiza.png",
-                    name: "Seiza",
-                    hours: "Seg a Qui: 09:00h as 18:30h <br>Sex: 09:00h as 16:30h </br> Sab: 09:00 as 12:00h",
-                    statusAberto:".",
-                    horarios: {                          
-                      seg: [{ inicio: "09:00", fim: "18:30" }],
-                      ter: [{ inicio: "09:00", fim: "18:30" }],
-                      qua: [{ inicio: "09:00", fim: "18:30" }],
-                      qui: [{ inicio: "09:00", fim: "18:30" }],
-                      sex: [{ inicio: "08:00", fim: "16:30" }],
-                      sab: [{ inicio: "09:00", fim: "12:00" }],
-                      dom: []
-                    },  
-                    address: "R. Fidêncio de Melo, 212 - Sala B",
-                    contact: "(43) 99103-4187",
-                    delivery: "Sim / Sem Taxa",            
-                    instagram: "https://www.instagram.com/seizapr/",
-                    novidadesImages: [                  
-                        
-                      "images/comercios/mercearia/seiza/divulgacao/1.png",
-                      "images/comercios/mercearia/seiza/divulgacao/2.png",
-                      "images/comercios/mercearia/seiza/divulgacao/3.png",
-                      "images/comercios/mercearia/seiza/divulgacao/4.png",
-                      "images/comercios/mercearia/seiza/divulgacao/5.png",
-                      "images/comercios/mercearia/seiza/divulgacao/6.png",
-                      "images/comercios/mercearia/seiza/divulgacao/7.png",
-                      "images/comercios/mercearia/seiza/divulgacao/8.png",
-                      "images/comercios/mercearia/seiza/divulgacao/9.png",
+          link: document.querySelector("#menuProdutosOrientais"),  
+          title: "Produtos Orientais",
+          establishments: [
+              {
+                  image: "images/comercios/produtosOrientais/seiza/seiza.png",
+                  name: "Seiza",
+                  hours: "Seg a Qui: 09:00h as 18:30h <br>Sex: 09:00h as 16:30h </br> Sab: 09:00 as 12:00h",
+                  statusAberto:".",
+                  horarios: {                          
+                    seg: [{ inicio: "09:00", fim: "18:30" }],
+                    ter: [{ inicio: "09:00", fim: "18:30" }],
+                    qua: [{ inicio: "09:00", fim: "18:30" }],
+                    qui: [{ inicio: "09:00", fim: "18:30" }],
+                    sex: [{ inicio: "08:00", fim: "16:30" }],
+                    sab: [{ inicio: "09:00", fim: "12:00" }],
+                    dom: []
+                  },  
+                  address: "R. Fidêncio de Melo, 212 - Sala B",
+                  contact: "(43) 99103-4187",
+                  delivery: "Sim / Sem Taxa",            
+                  instagram: "https://www.instagram.com/seizapr/",
+                  novidadesImages: [                  
                       
-                                  
-                  ],
-                  novidadesDescriptions: [                            
-                    "Na Seiza você encontra uma seleção incrível de lámens e massas orientais — coreanos, japoneses e muito mais. Vem experimentar!",
-                    "O segredo da culinária oriental começa aqui! Shoyu, óleo de gergelim, saquê mirin, molho tarê, hondashi, aji-no-moto e muito mais para deixar suas receitas com o sabor autêntico do Japão, China e Coreia!",
-                    "Farinha Panko, mistura para tempurá, kinako (soja em pó), papel de arroz e os ingredientes perfeitos pra dar aquele toque autêntico nas suas receitas japonesas!",
-                    "Bebidas orientais alcóolicas mais procuradas: Soju (vários sabores), Makgeolli (vinho de arroz) e o tradicional saquê japonês.",
-                    "Direto da Coreia! Experimente os sorvetes orientais mais amados: Samanco, Melona e Power Cap! Sabores únicos e refrescantes que conquistam todos os paladares!",
-                    "Aqui na Seiza você encontra uma seleção especial de balas japonesas e coreanas!",
-                    "Clássicos orientais que encantam todas as idades! Famosos biscoitos Pocky, Pepero, Koalas, Toppo e muitos mais!",
-                    "Tradição e sabor em cada mordida! Temos os doces tradicionais da culinária japonesa com recheio de feijão azuki (anko) sempre fresquinhos para vocês!",
-                  "Snacks orientais para todos os gostos! Sembeis doces e salgados, salgadinhos crocantes, lula desidratada — experimente sabores autênticos do Japão, Coreia e China!",
-                  ],
-                
-                },
-            ],
-        },
+                    "images/comercios/produtosOrientais/seiza/divulgacao/1.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/2.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/3.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/4.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/5.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/6.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/7.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/8.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/9.png",
+                    
+                                
+                ],
+                novidadesDescriptions: [                            
+                  "Na Seiza você encontra uma seleção incrível de lámens e massas orientais — coreanos, japoneses e muito mais. Vem experimentar!",
+                  "O segredo da culinária oriental começa aqui! Shoyu, óleo de gergelim, saquê mirin, molho tarê, hondashi, aji-no-moto e muito mais para deixar suas receitas com o sabor autêntico do Japão, China e Coreia!",
+                  "Farinha Panko, mistura para tempurá, kinako (soja em pó), papel de arroz e os ingredientes perfeitos pra dar aquele toque autêntico nas suas receitas japonesas!",
+                  "Bebidas orientais alcóolicas mais procuradas: Soju (vários sabores), Makgeolli (vinho de arroz) e o tradicional saquê japonês.",
+                  "Direto da Coreia! Experimente os sorvetes orientais mais amados: Samanco, Melona e Power Cap! Sabores únicos e refrescantes que conquistam todos os paladares!",
+                  "Aqui na Seiza você encontra uma seleção especial de balas japonesas e coreanas!",
+                  "Clássicos orientais que encantam todas as idades! Famosos biscoitos Pocky, Pepero, Koalas, Toppo e muitos mais!",
+                  "Tradição e sabor em cada mordida! Temos os doces tradicionais da culinária japonesa com recheio de feijão azuki (anko) sempre fresquinhos para vocês!",
+                "Snacks orientais para todos os gostos! Sembeis doces e salgados, salgadinhos crocantes, lula desidratada — experimente sabores autênticos do Japão, Coreia e China!",
+                ],
+              
+              },
+          ],
+      },
 
         {
             link: document.querySelector("#menuMaterialContrucao"),    
