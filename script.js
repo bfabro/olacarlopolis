@@ -3834,7 +3834,7 @@ menuLinks.forEach((link) => {
               {
                 image: "images/comercios/depositoGas/cnCasaDoGas/perfil.png",
                   name: "CN Casa do Gas",
-                  hours: "Seg a Sab: 08:00h as 19:00h </br>Dom: 08:00h as 12:00h",
+                  hours: "Seg a Sab: 08:00h as 19:00h </br>Dom: 09:00h as 12:00h",
                   statusAberto:".",
                   horarios: {                          
                     seg: [{ inicio: "08:00", fim: "19:00" }],
