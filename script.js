@@ -1643,15 +1643,15 @@ menuLinks.forEach((link) => {
                   {
                     image: "images/comercios/lanchonete/mycoffe/perfil.png",
                     name: "My Coffe",
-                    hours: "Seg: Fechado<br>Ter a Qui: 13:00h as 20:00h <br>Sex: 13:00h as 18:00h<br>Sab: 13:00h as 20:00h<br>Dom: 13:00h as 19:00h",
+                    hours: "Seg: Fechado<br>Ter a Qui: 13:00h as 19:00h <br>Sex: 13:00h as 18:00h<br>Sab: 13:00h as 20:00h<br>Dom: 13:00h as 19:00h",
                     statusAberto:".",
                     horarios: {
                       
                       seg: [],
-                      ter: [{ inicio: "13:00", fim: "20:00" }],
-                      qua: [{ inicio: "13:00", fim: "20:00" }],
-                      qui: [{ inicio: "13:00", fim: "20:00" }],
-                      sex: [{ inicio: "13:00", fim: "18:00" }],
+                      ter: [{ inicio: "13:00", fim: "19:00" }],
+                      qua: [{ inicio: "13:00", fim: "19:00" }],
+                      qui: [{ inicio: "13:00", fim: "19:00" }],
+                      sex: [{ inicio: "13:00", fim: "19:00" }],
                       sab: [{ inicio: "13:00", fim: "20:00" }],
                       dom: [{ inicio: "13:00", fim: "19:00" }]
                     },
@@ -4357,7 +4357,7 @@ menuLinks.forEach((link) => {
             {
               image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.png",
               name: "Restaurante da Di",
-              hours: "Seg a Sab: 10:30h as 14:00h",
+              hours: "Dom a Dom: 10:30h as 14:00h",
               statusAberto:".",
               horarios: {                    
                 seg: [{ inicio: "10:30", fim: "14:00" }],
@@ -4366,7 +4366,7 @@ menuLinks.forEach((link) => {
                 qui: [{ inicio: "10:30", fim: "14:00" }],
                 sex: [{ inicio: "10:30", fim: "14:00" }],
                 sab: [{ inicio: "10:30", fim: "14:00" }],
-                dom: []
+                dom: [{ inicio: "10:30", fim: "14:00" }]
               },
               address: "Benedito Salles n°910",
               contact: "(43) 99632-3418",
