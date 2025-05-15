@@ -1658,7 +1658,32 @@ menuLinks.forEach((link) => {
                 },
 
 
-
+{
+                          image: "images/comercios/lanchonete/ione/ione.png",
+                          name: "Ione",
+                          hours: "Seg a Sab: 9:30h as 19:30h",
+                          statusAberto:".",
+                          horarios: {                            
+                            seg: [{ inicio: "09:30", fim: "19:30" }],
+                            ter: [{ inicio: "09:30", fim: "19:30" }],
+                            qua: [{ inicio: "09:30", fim: "19:30" }],
+                            qui: [{ inicio: "09:30", fim: "19:30" }],
+                            sex: [{ inicio: "09:30", fim: "19:30" }],
+                            sab: [{ inicio: "09:30", fim: "19:30" }],
+                            dom: []
+                          },
+                          address: "R. Benedito Salles, 1233",
+                          contact: "(43) 99180-4287",
+                          delivery: "Sim / Com Taxa",
+                          facebook: "https://www.facebook.com/IoneSalgados1687Fabiana/?locale=pt_BR",
+                          instagram: "https://www.instagram.com/salgadosione29/",       
+                              
+                          novidadesImages: [
+                          
+                            "images/comercios/lanchonete/ione/divulgacao/1.png",
+                           "images/comercios/lanchonete/ione/divulgacao/2.png",
+                          ]
+                      },
 
 
 
@@ -1780,32 +1805,7 @@ menuLinks.forEach((link) => {
                           ],               
                         },
 
-                        {
-                          image: "images/comercios/lanchonete/ione/ione.png",
-                          name: "Ione",
-                          hours: "Seg a Sab: 9:30h as 19:30h",
-                          statusAberto:".",
-                          horarios: {                            
-                            seg: [{ inicio: "09:30", fim: "19:30" }],
-                            ter: [{ inicio: "09:30", fim: "19:30" }],
-                            qua: [{ inicio: "09:30", fim: "19:30" }],
-                            qui: [{ inicio: "09:30", fim: "19:30" }],
-                            sex: [{ inicio: "09:30", fim: "19:30" }],
-                            sab: [{ inicio: "09:30", fim: "19:30" }],
-                            dom: []
-                          },
-                          address: "R. Benedito Salles, 1233",
-                          contact: "(43) 99180-4287",
-                          delivery: "Sim / Com Taxa",
-                          facebook: "https://www.facebook.com/IoneSalgados1687Fabiana/?locale=pt_BR",
-                          instagram: "https://www.instagram.com/salgadosione29/",       
-                              
-                          novidadesImages: [
-                          
-                            "images/comercios/lanchonete/ione/divulgacao/1.png",
-                           "images/comercios/lanchonete/ione/divulgacao/2.png",
-                          ]
-                      },
+                        
 
 
 
@@ -4167,6 +4167,27 @@ menuLinks.forEach((link) => {
 
 
           {
+                    image: "images/comercios/restaurante/delfino/delfino.png",
+                    name: "Delfino",
+                    hours: "Seg a Sex: 11:00h as 15:00h - 18:00h as 22:30h</br> Sab: 11:00h as 16:00h",
+                    statusAberto:".",
+                    horarios: {                    
+                      seg: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      ter: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      qua: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      qui: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      sex: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
+                      sab: [{ inicio: "11:00", fim: "16:00" }],
+                      dom: []
+                    },
+                    address: "R. Kalil Keder, 90",
+                    contact: "(43) 9111-9484",
+                    delivery: "Sim / Com Taxa",
+                  
+                },
+
+
+          {
             image: "images/comercios/restaurante/oficinaSabor/perfil.png",
             name: "Oficina do Sabor",
             hours: "Dom a Dom: 10:30h as 14:00h",
@@ -4216,11 +4237,36 @@ menuLinks.forEach((link) => {
           
         },
 
-/////////////////////
-//////////////////////
-///////////////////////
-
-//////////////////////
+{
+              image: "images/comercios/restaurante/paiol/paiol.png",
+              name: "Paiol",
+              hours: "Ter: 10:00h as 15:00h<br>Qua - Sab: 10:00h as 15:00h - 18h30 as 23:00h <br> Dom: 11:00h as 15:00h - 18h30 as 23:00h<br>Seg: Fechado",
+              statusAberto:".",
+            horarios: {                    
+              seg: [],
+              ter: [{ inicio: "10:00", fim: "15:00" }],
+              qua: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
+              qui: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
+              sex: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
+              sab: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
+              dom: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }]
+            },
+              address: "Rua Benedito Salles 10, Carlópolis,",
+              contact: "(43) 99159-0070",
+              delivery: "Sim / Com Taxa",
+              facebook: "https://www.facebook.com/SaleBrasaCarlopolis/?locale=pt_BR",
+              instagram: "https://www.instagram.com/paiolpizzaburguer/",
+              infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'  >Cardapio On Line</a>",
+             
+             
+              novidadesImages: [                    
+                  "images/comercios/restaurante/paiol/divulgacao/1.png",
+                 "images/comercios/restaurante/paiol/divulgacao/2.png",
+                 "images/comercios/restaurante/paiol/divulgacao/3.png",
+                 "images/comercios/restaurante/paiol/divulgacao/4.png",
+              ],
+      
+          },
 
 
           {
@@ -4261,57 +4307,10 @@ menuLinks.forEach((link) => {
 
 
 
-            {
-              image: "images/comercios/restaurante/paiol/paiol.png",
-              name: "Paiol",
-              hours: "Ter: 10:00h as 15:00h<br>Qua - Sab: 10:00h as 15:00h - 18h30 as 23:00h <br> Dom: 11:00h as 15:00h - 18h30 as 23:00h<br>Seg: Fechado",
-              statusAberto:".",
-            horarios: {                    
-              seg: [],
-              ter: [{ inicio: "10:00", fim: "15:00" }],
-              qua: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
-              qui: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
-              sex: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
-              sab: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
-              dom: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }]
-            },
-              address: "Rua Benedito Salles 10, Carlópolis,",
-              contact: "(43) 99159-0070",
-              delivery: "Sim / Com Taxa",
-              facebook: "https://www.facebook.com/SaleBrasaCarlopolis/?locale=pt_BR",
-              instagram: "https://www.instagram.com/paiolpizzaburguer/",
-              infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'  >Cardapio On Line</a>",
-             
-             
-              novidadesImages: [                    
-                  "images/comercios/restaurante/paiol/divulgacao/1.png",
-                 "images/comercios/restaurante/paiol/divulgacao/2.png",
-                 "images/comercios/restaurante/paiol/divulgacao/3.png",
-                 "images/comercios/restaurante/paiol/divulgacao/4.png",
-              ],
-      
-          },
+            
 
 
-                {
-                    image: "images/comercios/restaurante/delfino/delfino.png",
-                    name: "Delfino",
-                    hours: "Seg a Sex: 11:00h as 15:00h - 18:00h as 22:30h</br> Sab: 11:00h as 16:00h",
-                    statusAberto:".",
-                    horarios: {                    
-                      seg: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
-                      ter: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
-                      qua: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
-                      qui: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
-                      sex: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "22:30" }],
-                      sab: [{ inicio: "11:00", fim: "16:00" }],
-                      dom: []
-                    },
-                    address: "R. Kalil Keder, 90",
-                    contact: "(43) 9111-9484",
-                    delivery: "Sim / Com Taxa",
-                  
-                },
+                
                 {
                   image: "images/comercios/restaurante/neia/neia.png",
                   name: "Neia",
@@ -4361,7 +4360,32 @@ menuLinks.forEach((link) => {
                   ],
                     
                 },
-
+ {
+              image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.png",
+              name: "Restaurante da Di",
+              hours: "Dom a Dom: 10:30h as 14:00h",
+              statusAberto:".",
+              horarios: {                    
+                seg: [{ inicio: "10:30", fim: "14:00" }],
+                ter: [{ inicio: "10:30", fim: "14:00" }],
+                qua: [{ inicio: "10:30", fim: "14:00" }],
+                qui: [{ inicio: "10:30", fim: "14:00" }],
+                sex: [{ inicio: "10:30", fim: "14:00" }],
+                sab: [{ inicio: "10:30", fim: "14:00" }],
+                dom: [{ inicio: "10:30", fim: "14:00" }]
+              },
+              address: "Benedito Salles n°910",
+              contact: "(43) 99632-3418",
+              delivery: "Sim / Com Taxa",
+              instagram:"https://www.instagram.com/marmitasdadiih/",
+              novidadesImages: [                    
+                "images/comercios/restaurante/restauranteDaDi/divulgacao/1.png",
+               "images/comercios/restaurante/restauranteDaDi/divulgacao/2.png",
+               "images/comercios/restaurante/restauranteDaDi/divulgacao/3.png",
+               "images/comercios/restaurante/restauranteDaDi/divulgacao/4.png",
+            ],
+            
+          },
 
               
 
@@ -4418,32 +4442,7 @@ menuLinks.forEach((link) => {
             },
 
 
-            {
-              image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.png",
-              name: "Restaurante da Di",
-              hours: "Dom a Dom: 10:30h as 14:00h",
-              statusAberto:".",
-              horarios: {                    
-                seg: [{ inicio: "10:30", fim: "14:00" }],
-                ter: [{ inicio: "10:30", fim: "14:00" }],
-                qua: [{ inicio: "10:30", fim: "14:00" }],
-                qui: [{ inicio: "10:30", fim: "14:00" }],
-                sex: [{ inicio: "10:30", fim: "14:00" }],
-                sab: [{ inicio: "10:30", fim: "14:00" }],
-                dom: [{ inicio: "10:30", fim: "14:00" }]
-              },
-              address: "Benedito Salles n°910",
-              contact: "(43) 99632-3418",
-              delivery: "Sim / Com Taxa",
-              instagram:"https://www.instagram.com/marmitasdadiih/",
-              novidadesImages: [                    
-                "images/comercios/restaurante/restauranteDaDi/divulgacao/1.png",
-               "images/comercios/restaurante/restauranteDaDi/divulgacao/2.png",
-               "images/comercios/restaurante/restauranteDaDi/divulgacao/3.png",
-               "images/comercios/restaurante/restauranteDaDi/divulgacao/4.png",
-            ],
-            
-          },
+           
 
 
           {
