@@ -1597,9 +1597,20 @@ menuLinks.forEach((link) => {
                         
                       "images/comercios/lanchonete/didog/divulgacao/1.png",
                       "images/comercios/lanchonete/didog/divulgacao/2.png",
+                      "images/comercios/lanchonete/didog/divulgacao/3.png",
+                      "images/comercios/lanchonete/didog/divulgacao/4.png",
+                      "images/comercios/lanchonete/didog/divulgacao/5.png",
+                     
                     
                   ],   
-                           
+                  novidadesDescriptions: [
+                           "Dogão Caprichado",
+                           "Suco do Bill 100% natural",
+                           "Dog Paulista,venha experimentar",
+                           "Dog Paulista com Doritos",
+                           "Dog em recheado!",
+
+                  ], 
                   },
 
 
@@ -1630,10 +1641,13 @@ menuLinks.forEach((link) => {
                     menuImages: [                   
                         "images/comercios/lanchonete/espacoGourmet/cardapio/1.png",
                         "images/comercios/lanchonete/espacoGourmet/cardapio/2.png",   
-                        "images/comercios/lanchonete/espacoGourmet/cardapio/1.png",
-                        "images/comercios/lanchonete/espacoGourmet/cardapio/2.png", 
-                        "images/comercios/lanchonete/espacoGourmet/cardapio/1.png",
-                        "images/comercios/lanchonete/espacoGourmet/cardapio/2.png",                        
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/3.png",
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/4.png", 
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/5.png",
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/6.png",
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/7.png", 
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/8.png",
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/9.png"                        
                     ],     
                     novidadesImages: [                      
                       "images/comercios/lanchonete/espacoGourmet/divulgacao/1.png",
@@ -2188,6 +2202,7 @@ menuLinks.forEach((link) => {
                  
                       "images/comercios/padaria/bom jesus/cardapio/1.png",
                       "images/comercios/padaria/bom jesus/cardapio/2.png",
+                      "images/comercios/padaria/bom jesus/cardapio/3.png",
                      
                      ],  
                 },
