@@ -418,6 +418,9 @@ function montarCarrosselDivulgacao() {
 // auto peças
 paulinhoautopecas:"s",
 
+// cartorip
+cartoriomariazelia:"s",
+
 //chaveiro
 chaveirocentral:"s",
 
@@ -1261,6 +1264,42 @@ menuLinks.forEach((link) => {
                     },
                 ],
             },
+
+
+
+
+
+            {
+                    link: document.querySelector("#menuCartorios"),  
+                    title: "Cartorio",
+                    establishments: [
+
+                       
+                        {
+                            image: "images/comercios/cartorio/fabiano/perfil.png",
+                            name: "Cartorio Maria Zelia",
+                            hours: "Seg a Sex: 8:30h as 11:00h - 13:00h as 17:00h",
+                            statusAberto:"a",
+                            horarios: {
+                          
+                            seg: [{ inicio: "08:30", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                            ter: [{ inicio: "08:30", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                            qua: [{ inicio: "08:30", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                            qui: [{ inicio: "08:30", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                            sex: [{ inicio: "08:30", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                            sab: [],
+                            dom: [],
+                        },
+                            address: "R. Salvira Marquês, 453 - Carlópolis",
+                            contact: "(43) 99621-5094",  
+                            infoAdicional:"Registro: de nascimento, de casamento, de obito, averbações, certidões.",           
+                            
+                           
+                        },
+
+                        
+                    ],
+                },
 
 
 
