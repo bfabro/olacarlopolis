@@ -491,7 +491,7 @@ clinicaveterinariacarlopolis:"s",
       ione:"s",
       cantinhodapraca:"s",
       caldodecanaamaral:"s",
-      kidog:"s",
+      kidoglanches:"s",
       didog:"s",
       xisbauinea:"s",
       mycoffe:"s",
@@ -1604,9 +1604,61 @@ menuLinks.forEach((link) => {
 
 
 
+
+                  {
+                    image: "images/comercios/lanchonete/espacoGourmet/perfil.png",
+                    name: "Espaço Gourmet",
+                    hours: "Ter a Sex: 17:00h as 22:50h<br>Sab:17:00h a 23:30h<br>Dom: 15:00h a 23:10h",
+                    statusAberto:".",
+                    horarios: {
+                      
+                      seg: [],
+                      ter: [{ inicio: "17:00", fim: "22:50" }],
+                      qua: [{ inicio: "17:00", fim: "22:50" }],
+                      qui: [{ inicio: "17:00", fim: "22:50" }],
+                      sex: [{ inicio: "17:00", fim: "22:50" }],
+                      sab: [{ inicio: "17:30", fim: "23:30" }],
+                      dom: [{ inicio: "15:00", fim: "23:10" }]
+                    },
+                    address: "Avenida Turística Elias Mehi Mansur 738",
+                    contact: "(43) 99105-6257",
+                    delivery: "Sim / Com Taxa",   
+                    facebook:"https://www.facebook.com/p/Espa%C3%A7o-Gourmet-100063553480172/",
+                    instagram:"https://www.instagram.com/pamellaoizumidasilva/",
+                                      
+                    menuImages: [                   
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/1.png",
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/2.png",   
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/1.png",
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/2.png", 
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/1.png",
+                        "images/comercios/lanchonete/espacoGourmet/cardapio/2.png",                        
+                    ],     
+                    novidadesImages: [                      
+                      "images/comercios/lanchonete/espacoGourmet/divulgacao/1.png",
+                      "images/comercios/lanchonete/espacoGourmet/divulgacao/2.png",
+                      "images/comercios/lanchonete/espacoGourmet/divulgacao/3.png",
+                      "images/comercios/lanchonete/espacoGourmet/divulgacao/4.png",                      
+                  ],               
+                },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     {
                       image: "images/comercios/lanchonete/kidog/perfil.png",
-                      name: "Ki Dog",
+                      name: "Ki Dog lanches",
                       hours: "Ter a Dom: 18:00h as 23:30h",
                       statusAberto:".",
                       horarios: {
@@ -1620,21 +1672,17 @@ menuLinks.forEach((link) => {
                         dom: [{ inicio: "18:00", fim: "23:30" }]
                       },
                       address: "R. Padre Hugo, 478 , Carlópolis",
-                      contact: "(43) 99604-9187",
+                      contact: "(43) 99952-7826",
                       delivery: "Sim / Com Taxa",   
                       facebook:"https://www.facebook.com/p/Ki-dog-lanches-100063348873193/",
                                         
                       menuImages: [                   
                           "images/comercios/lanchonete/kidog/cardapio/1.png",
-                          "images/comercios/lanchonete/kidog/cardapio/2.png",
-                          
-                         
+                          "images/comercios/lanchonete/kidog/cardapio/2.png",                          
                       ],     
-                      novidadesImages: [
-                      
+                      novidadesImages: [                      
                         "images/comercios/lanchonete/kidog/divulgacao/1.png",
-                        "images/comercios/lanchonete/kidog/divulgacao/2.png",
-                      
+                        "images/comercios/lanchonete/kidog/divulgacao/2.png",                      
                     ],               
                   },
 
