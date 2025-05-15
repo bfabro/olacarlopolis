@@ -632,6 +632,7 @@ clinicaveterinariacarlopolis:"s",
       
       rodoviaria:"s",
       secretariadasaude:"s",
+      sindicatorural:"s",
       
       vigilanciasanitaria:"s",
 /// FIM SETOR PUBLICO
@@ -970,6 +971,7 @@ menuLinks.forEach((link) => {
                             },
                             address: "Rua Benedito Salles, 409",
                             contact: "(43) 99176-7871",
+                            contact2:" 43 98868-7038",
                             delivery: "Sim / Com Taxa",
                             instagram: "https://www.instagram.com/turminha_do_acai/",
                             
@@ -3792,6 +3794,33 @@ menuLinks.forEach((link) => {
             },
         ],
      },
+
+
+
+     {
+      link: document.querySelector("#menuSindicatoRural"),    
+      title: "Sindicato Rural",
+      establishments: [
+          {
+           
+              name: "Sindicato Rural",
+              hours: "Seg a Sex: 08:00h as 11:30h - 13:00 as 17:00h",
+              address: "Av. Elson Soares, 1147 - Carlopolis",
+              contact: "(43) 3566-1292",
+              statusAberto:".",
+              horarios: {                    
+                seg: [{ inicio: "08:00", fim: "11:30" },{ inicio: "13:00", fim: "17:00" }],
+                ter: [{ inicio: "08:00", fim: "11:30" },{ inicio: "13:00", fim: "17:00" }],
+                qua: [{ inicio: "08:00", fim: "11:30" },{ inicio: "13:00", fim: "17:00" }],
+                qui: [{ inicio: "08:00", fim: "11:30" },{ inicio: "13:00", fim: "17:00" }],
+                sex: [{ inicio: "08:00", fim: "11:30" },{ inicio: "13:00", fim: "17:00" }],
+                sab: [],
+                dom: []
+              },
+              
+          },
+      ],
+   },
 
 
      {
