@@ -3684,6 +3684,7 @@ menuLinks.forEach((link) => {
             hours: "Seg a Sex: 06:30h - 18:30h",
             address: "Av. Elson Soares, 34",
             contact: "(43) 3566-1282",
+            contact2:"(43) 98840-0984",
             infoAdicional:"Turno: Manha e Tarde",
         },
           ],
