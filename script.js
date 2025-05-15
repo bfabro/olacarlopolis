@@ -1292,7 +1292,7 @@ menuLinks.forEach((link) => {
                         },
                             address: "R. Salvira Marquês, 453 - Carlópolis",
                             contact: "(43) 99621-5094",  
-                            infoAdicional:"Registro: de nascimento, de casamento, de obito, averbações, certidões.",           
+                            infoAdicional:"Registro: de nascimento, de casamento, de obito, averbações e certidões.",           
                             
                            
                         },
