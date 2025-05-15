@@ -1675,6 +1675,10 @@ menuLinks.forEach((link) => {
                     address: "Avenida Turística Elias Mehi Mansur 738",
                     contact: "(43) 99105-6257",
                     delivery: "Sim / Com Taxa",   
+                    
+                      infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://pediucomeu.com.br/espacogourmet' >Cardapio On Line</a>",
+             
+             
                     facebook:"https://www.facebook.com/p/Espa%C3%A7o-Gourmet-100063553480172/",
                     instagram:"https://www.instagram.com/pamellaoizumidasilva/",
                                       
