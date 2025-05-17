@@ -1899,10 +1899,10 @@ img {
     overflow-x: auto;
     justify-content: flex-start;
     padding: 0px;
-    margin-left: 10px;
+    margin-left: 0px;
     margin-right: 10px;
     border-radius: 8px;
-    gap: 8px;
+    gap: 12px;
   }
 
   .botao-menu-topo {
