@@ -658,7 +658,7 @@ clinicaveterinariacarlopolis:"s",
     };
   
     const body = document.querySelector("body");
-    const darkLight = document.querySelector("#darkLight");
+    //const darkLight = document.querySelector("#darkLight");
     const sidebar = document.querySelector(".sidebar");
     const contentArea = document.querySelector(".content_area");
     const submenuItems = document.querySelectorAll(".submenu_item");
@@ -5440,11 +5440,11 @@ setTimeout(() => {
                     });
                   
                     // Alternar tema escuro/claro
-                    darkLight.addEventListener("click", () => {
-                      body.classList.toggle("dark");
-                      darkLight.classList.toggle("bx-moon");
-                      darkLight.classList.toggle("bx-sun");
-                    });
+                  //  darkLight.addEventListener("click", () => {
+                 //     body.classList.toggle("dark");
+                 //     darkLight.classList.toggle("bx-moon");
+                 //     darkLight.classList.toggle("bx-sun");
+                 //   });
                   
                     
                   
