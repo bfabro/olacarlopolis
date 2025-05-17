@@ -947,7 +947,7 @@ img {
 
 /* Ajustar o tamanho do carrossel */
 .carrossel-container {
-  max-width: 95%; /* Ajuste conforme necessário */
+  max-width: 100%; /* Ajuste conforme necessário */
   margin: 0 auto; /* Centralizar o carrossel */
   padding: 20px; /* Espaçamento interno */
   background-color: #f9f9f9; /* Fundo claro para o contêiner */
