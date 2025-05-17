@@ -1850,7 +1850,6 @@ img {
 }
 
 
-
 .menu-horizontal-custom {
   display: flex;
   justify-content: center;
@@ -1860,21 +1859,24 @@ img {
   border-radius: 10px;
   margin: 0px auto;
   width: fit-content;
+  flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
 }
 
 .botao-menu-topo {
-  background-color: transparent;
-  border: none;
+  background-color: white;
+  border: 1px solid #ccc;
   font-weight: 500;
-  padding: 10px 20px;
+  padding: 10px 14px;
   border-radius: 8px;
-  font-size: 16px;
-  color: #555;
+  font-size: 15px;
+  color: #333;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+
 }
 
 .botao-menu-topo:hover {
@@ -1882,10 +1884,33 @@ img {
 }
 
 .botao-menu-topo.ativo {
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  background-color: #ffffff;
+  color: var(--blue-color);
   font-weight: bold;
-  color: #000;
+  border: 2px solid var(--blue-color);
+  box-shadow: 0 0 8px var(--blue-color), 0 0 15px var(--blue-color), 0 0 20px var(--blue-color);
 }
+
+
+/* 👇 RESPONSIVO: transforma em scroll horizontal se espaço for pouco */
+@media (max-width: 768px) {
+  .menu-horizontal-custom {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 8px;
+    gap: 8px;
+  }
+
+  .botao-menu-topo {
+    flex-shrink: 0;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
+
 
 
