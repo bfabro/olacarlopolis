@@ -409,6 +409,9 @@ function montarCarrosselDivulgacao() {
       agrovida: "s",
       armazemrei:"s",
 
+
+      // assessocia balistica
+      betogunsassessoriaarmaria:"s",
       //agencia turismo
       cvccarlopolis:"s",
 
@@ -1175,6 +1178,51 @@ menuLinks.forEach((link) => {
                 },
 
 
+
+                {
+    link: document.querySelector("#menuAssessoriaBalistica"),
+    title: "Assessoria Balistica",
+    establishments: [
+        {
+            image: "images/comercios/assessoriaBalistica/betogun/perfil.png",
+            name: "Beto Guns Assessoria Armaria",
+            hours: "Seg a Sex: 09:00h as 16:30h",
+            statusAberto:".",
+            horarios: {                          
+              seg: [{ inicio: "09:00", fim: "16:30" }],
+              ter: [{ inicio: "09:00", fim: "16:30" }],
+              qua: [{ inicio: "09:00", fim: "16:30" }],
+              qui: [{ inicio: "09:00", fim: "16:30" }],
+              sex: [{ inicio: "09:00", fim: "16:30" }],
+              sab: [],
+              dom: [],
+            }, 
+            address: "R. Nicolau Miguel, 452 - sala 1 - centro, Carlópolis",
+            contact: "(43) 99135-4012", 
+            infoAdicional:"IAT e Armeiro Credenciado • Port. SR/PF/PR N° 1821 de 08/23<br> Perito cred TJPR<br>Despachante<br>Assessoria<br>Cursos",          
+          
+            facebook: "https://www.facebook.com/betopedreira.instrutor.armeiro/",
+            instagram: "https://www.instagram.com/betopedreira.instrutor.armeiro/",
+            novidadesImages: [
+         
+             "images/comercios/assessoriaBalistica/betogun/divulgacao/1.png",
+             "images/comercios/assessoriaBalistica/betogun/divulgacao/2.png",
+             "images/comercios/assessoriaBalistica/betogun/divulgacao/3.png",
+           
+            ],   
+            novidadesDescriptions : [  
+"Confiança em primeiro Lugar",
+"Entre em contato para tirar qualquer tipo de duvida sobre armamentos",
+"Treinamento teorico e pratico!",
+
+
+
+             ],              
+        },
+    ],
+},
+
+
                 {
                   link: document.querySelector("#menuAssistenciaCelular"),    
                   title: "Assistencia Celular",
@@ -1660,17 +1708,17 @@ menuLinks.forEach((link) => {
                   {
                     image: "images/comercios/lanchonete/espacoGourmet/perfil.png",
                     name: "Espaço Gourmet",
-                    hours: "Ter a Sex: 17:00h as 22:50h<br>Sab:17:00h a 23:30h<br>Dom: 15:00h a 23:10h",
+                    hours: "Ter a Sab: 17:00h as 23:30h<br>Dom: 15:00h a 23:30h",
                     statusAberto:".",
                     horarios: {
                       
                       seg: [],
-                      ter: [{ inicio: "17:00", fim: "22:50" }],
-                      qua: [{ inicio: "17:00", fim: "22:50" }],
-                      qui: [{ inicio: "17:00", fim: "22:50" }],
-                      sex: [{ inicio: "17:00", fim: "22:50" }],
+                      ter: [{ inicio: "17:00", fim: "23:30" }],
+                      qua: [{ inicio: "17:00", fim: "23:30" }],
+                      qui: [{ inicio: "17:00", fim: "23:30" }],
+                      sex: [{ inicio: "17:00", fim: "23:30" }],
                       sab: [{ inicio: "17:30", fim: "23:30" }],
-                      dom: [{ inicio: "15:00", fim: "23:10" }]
+                      dom: [{ inicio: "15:00", fim: "23:30" }]
                     },
                     address: "Avenida Turística Elias Mehi Mansur 738",
                     contact: "(43) 99105-6257",
