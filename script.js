@@ -674,7 +674,9 @@ clinicaveterinariacarlopolis:"s",
     const clearSearch = document.getElementById("clearSearch");
   
     // Função para adicionar contadores de slides
-    function addSlideCounters(swiperInstance, containerSelector) {
+
+
+     function addSlideCounters(swiperInstance, containerSelector) {
       const container = document.querySelector(containerSelector);
       if (!container) return;
   
@@ -696,6 +698,8 @@ clinicaveterinariacarlopolis:"s",
       updateCounter();
       swiperInstance.on("slideChange", updateCounter);
     }
+
+    
   
     // Inicializa o carrossel de Turismo
    window.swiperTurismo = new Swiper(".swiper-turismo", {
