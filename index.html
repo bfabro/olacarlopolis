@@ -95,7 +95,13 @@
                text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 12px var(--blue-color);
                margin :0px 0px 0px 40px">Olá Carlópolis
             </a>
+
+          
          </div>
+
+
+
+
          <div class="navbar_content">
             <i class="bi bi-gri">
                <i class='bx bx-sunn' id="darkLight">
@@ -106,6 +112,8 @@
          
             <!-- <i class='bx bx-bell' ></i>-->
          </div>
+
+        
       </nav>
       <!-- sidebar -->
       <nav class="sidebar">
@@ -856,8 +864,23 @@
        
       <div class="content_area" id="conteudo">
 
+
+
+ <div id="menuHorizontal" class="menu-horizontal-custom">
+  <button class="botao-menu-topo ativo" data-target="divulgacao">
+    <i class="fa-regular fa-image"></i> Divulgação
+  </button>
+  <button class="botao-menu-topo" data-target="eventos">
+    <i class="fa-regular fa-calendar-days"></i> Eventos
+  </button>
+  <button class="botao-menu-topo" data-target="turismo">
+    <i class="fa-solid fa-map-location-dot"></i> Turismo
+  </button>
+</div>
+
+
           <!-- Carrossel de Turismo -->
-         <div class="carrossel-container">
+         <div id="secao-divulgacao" class="carrossel-container">
             <h2>Divulgação </h2>
 
             <div class="swiper-container swiper-novidades">
@@ -875,10 +898,10 @@
 
 
 
-         <!-- Separador entre os carrosséis -->
-         <div class="separador"></div>
+         <!-- Separador entre os carrosséis
+         <div class="separador"></div> -->
          <!-- Carrossel de Turismo -->
-         <div class="carrossel-container">
+         <div id="secao-eventos" class="carrossel-container">
 
             <h2>Eventos </h2>
 
@@ -1009,10 +1032,10 @@
 
 
 
-         <!-- Separador entre os carrosséis -->
-         <div class="separador"></div>
+         <!-- Separador entre os carrosséis 
+         <div class="separador"></div>-->
          <!-- Carrossel de Eventos -->
-         <div class="carrossel-container">
+         <div id="secao-turismo" class="carrossel-container">
             <h2>Turismo</h2>
             <div class="swiper-container swiper-turismo">
 
@@ -1144,6 +1167,52 @@ onlineUsersRef.on("value", (snapshot) => {
 
 
  
+<script>
+  document.querySelectorAll('.botao-menu-topo').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.target;
+
+      // Remove destaque dos outros
+      document.querySelectorAll('.botao-menu-topo').forEach(b => b.classList.remove('ativo'));
+      btn.classList.add('ativo');
+
+      // Esconde todas as seções
+      document.querySelectorAll('.carrossel-container').forEach(secao => {
+        secao.style.display = 'none';
+      });
+
+      // Mostra a seção correta
+      const secaoAlvo = document.getElementById('secao-' + target);
+      if (secaoAlvo) {
+        secaoAlvo.style.display = 'block';
+      }
+
+      // ✅ Força atualização do swiper específico
+      if (target === "eventos" && window.swiperEventos) {
+        swiperEventos.update();
+        swiperEventos.slideTo(0);
+      }
+      if (target === "turismo" && window.swiperTurismo) {
+        swiperTurismo.update();
+        swiperTurismo.slideTo(0);
+      }
+      if (target === "divulgacao" && window.swiperNovidades) {
+        swiperNovidades.update();
+        swiperNovidades.slideTo(0);
+      }
+    });
+  });
+
+  // Inicial exibe apenas Divulgação
+  window.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.carrossel-container').forEach(secao => {
+      secao.style.display = 'none';
+    });
+    const primeira = document.getElementById('secao-divulgacao');
+    if (primeira) primeira.style.display = 'block';
+  });
+</script>
+
 
 
 

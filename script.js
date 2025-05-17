@@ -698,55 +698,42 @@ clinicaveterinariacarlopolis:"s",
     }
   
     // Inicializa o carrossel de Turismo
-    const swiperTurismo = new Swiper(".swiper-turismo", {
-      loop: true, // Permite rolagem infinita
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-      },
-      autoplay: {
-        delay: 4000, // Troca de slide a cada 3 segundos
-      },
-      effect: "fade", // Efeito de fade entre os slides
-      fadeEffect: {
-        crossFade: true, // Faz o fade suave entre os slides
-      },
-    });
-    addSlideCounters(swiperTurismo, ".swiper-turismo");
-  
-    // Inicializa o carrossel de Eventos
-    const swiperEventos = new Swiper(".swiper-eventos", {
-      loop: true, // Permite rolagem infinita
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-      },
-      autoplay: {
-        delay: 5000, // Troca de slide a cada 3 segundos
-      },
-      effect: "fade", // Efeito de fade entre os slides
-      fadeEffect: {
-        crossFade: true, // Faz o fade suave entre os slides
-      },
-    });
-    addSlideCounters(swiperEventos, ".swiper-eventos");
-    ///////////
-    // Inicializa o carrossel de Novidades
-    const swiperNovidades = new Swiper(".swiper-novidades", {
-      loop: true, // Permite rolagem infinita
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-      },
-      autoplay: {
-        delay: 6500, // Troca de slide a cada 3 segundos
-      },
-      effect: "fade", // Efeito de fade entre os slides
-      fadeEffect: {
-        crossFade: true, // Faz o fade suave entre os slides
-      },
-    });
-    addSlideCounters(swiperNovidades, ".swiper-novidades");
+   window.swiperTurismo = new Swiper(".swiper-turismo", {
+  loop: true,
+  navigation: {
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev",
+  },
+  autoplay: { delay: 4000 },
+  effect: "fade",
+  fadeEffect: { crossFade: true }
+});
+addSlideCounters(window.swiperTurismo, ".swiper-turismo");
+
+window.swiperEventos = new Swiper(".swiper-eventos", {
+  loop: true,
+  navigation: {
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev",
+  },
+  autoplay: { delay: 5000 },
+  effect: "fade",
+  fadeEffect: { crossFade: true }
+});
+addSlideCounters(window.swiperEventos, ".swiper-eventos");
+
+window.swiperNovidades = new Swiper(".swiper-novidades", {
+  loop: true,
+  navigation: {
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev",
+  },
+  autoplay: { delay: 6500 },
+  effect: "fade",
+  fadeEffect: { crossFade: true }
+});
+addSlideCounters(window.swiperNovidades, ".swiper-novidades");
+
   
    
   
@@ -5599,6 +5586,50 @@ window.addEventListener("load", () => {
 
 
 
+document.querySelectorAll('.botao-menu-topo').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.target;
+
+    // Remove classe ativo
+    document.querySelectorAll('.botao-menu-topo').forEach(b => b.classList.remove('ativo'));
+    btn.classList.add('ativo');
+
+    // Esconde todas
+    document.querySelectorAll('.carrossel-container').forEach(secao => {
+      secao.style.display = 'none';
+    });
+
+    // Mostra a correta
+    const secaoAlvo = document.getElementById('secao-' + target);
+    if (secaoAlvo) {
+      secaoAlvo.style.display = 'block';
+    }
+
+    // Atualiza swiper correto
+    setTimeout(() => {
+      if (target === "turismo" && window.swiperTurismo) {
+        window.swiperTurismo.update();
+        window.swiperTurismo.slideTo(0);
+      }
+      if (target === "eventos" && window.swiperEventos) {
+        window.swiperEventos.update();
+        window.swiperEventos.slideTo(0);
+      }
+      if (target === "divulgacao" && window.swiperNovidades) {
+        window.swiperNovidades.update();
+        window.swiperNovidades.slideTo(0);
+      }
+    }, 150);
+  });
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.carrossel-container').forEach(secao => {
+    secao.style.display = 'none';
+  });
+  const primeira = document.getElementById('secao-divulgacao');
+  if (primeira) primeira.style.display = 'block';
+});
 
 
                     

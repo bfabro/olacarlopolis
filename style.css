@@ -1849,3 +1849,43 @@ img {
   to { transform: rotate(360deg); }
 }
 
+
+
+.menu-horizontal-custom {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  background: #f2f6fc;
+  padding: 0px;
+  border-radius: 10px;
+  margin: 0px auto;
+  width: fit-content;
+}
+
+.botao-menu-topo {
+  background-color: transparent;
+  border: none;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.botao-menu-topo:hover {
+  background-color: #e2e8f0;
+}
+
+.botao-menu-topo.ativo {
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  font-weight: bold;
+  color: #000;
+}
+
+
