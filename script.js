@@ -1403,14 +1403,14 @@ menuLinks.forEach((link) => {
                           "images/comercios/confeccao/panaceia/divulgacao/2.png",
                           "images/comercios/confeccao/panaceia/divulgacao/3.png",
                           "images/comercios/confeccao/panaceia/divulgacao/4.png",
-                          "images/comercios/confeccao/panaceia/divulgacao/5.png",
+                        
                           ],
                           novidadesDescriptions: [                            
                             "Camisa para ciclista.",
                             "Body de bebê e camisetas personalizadas ",
                             "Camisa de pesca em sublimação total.",
                             "Uniformes esportivos",
-                            "",
+                          
                           ],
                     },
 
