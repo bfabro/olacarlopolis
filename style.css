@@ -583,7 +583,7 @@ body.dark {
   .sidebar.close~.content_area {
    /* width: calc(108% - 80px);*/
     width: calc(100% - 00px);
-    margin-left: -5px;
+    margin-left: 0px;
   }
 
 
@@ -1898,7 +1898,7 @@ img {
     flex-wrap: nowrap;
     overflow-x: auto;
     justify-content: flex-start;
-    padding: 10px;
+    padding: 0px;
     margin-left: 10px;
     margin-right: 10px;
     border-radius: 8px;
