@@ -299,9 +299,9 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "seiza","assadaodorussao", "pimentadoce", "limone","adegacuenca"
+  "seiza","assadaodorussao", "pimentadoce", "limone","pesqueirodogalego"
   
-]; // nomes normalizados
+]; 
 
 function montarCarrosselDivulgacao() {
   const listaTodos = [];
@@ -4412,6 +4412,13 @@ menuLinks.forEach((link) => {
              "images/comercios/restaurante/galego/divulgacao/4.png",
              "images/comercios/restaurante/galego/divulgacao/5.png",
              
+          ],novidadesDescriptions:[
+            "Venha Conferir nossas porções!", 
+            "Cerveja sempre gelada!",
+            "Estacionamento amplo!",
+            "Espaço para seu filho se divertir",
+            "As quintas temos tilapia aberta assada! tradição da casa!"
+          
           ],
           
         },
