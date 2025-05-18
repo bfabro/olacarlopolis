@@ -1,7 +1,7 @@
 {
   "name": "Olá Carlópolis",
-  "short_name": "Carlópolis",
-  "description": "Encontre comércios e serviços em Carlópolis.",
+  "short_name": "Olá Carlópolis",
+  "description": "Encontre Locais e Serviços em Carlópolis.",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
