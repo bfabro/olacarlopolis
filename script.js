@@ -2727,7 +2727,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/farmacia/farmais/farmais.png",
                     name: "FarMais",
-                    address: "R. Benedito Salles, 1188",
+                    address: "R. Benedito Salles, 979 - Carlopolis",
                     plantaoHorario: "08:00h às 21:00h", 
               plantaoData:"Sab 17/05 a Sex 23/05", 
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
@@ -3458,7 +3458,7 @@ menuLinks.forEach((link) => {
           {
                     image: "images/comercios/farmacia/farmais/farmais.png",
                     name: "FarMais",
-                    address: "R. Benedito Salles, 1188",
+                    address: "R. Benedito Salles, 979 - Carlopolis",
                     plantaoHorario: "08:00h às 21:00h", 
               plantaoData:"Sab 17/05 a Sex 23/05", 
               statusAberto:".",
