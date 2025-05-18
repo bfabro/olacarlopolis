@@ -4153,8 +4153,8 @@ menuLinks.forEach((link) => {
                   instagram: "https://www.instagram.com/seizapr/",
                   novidadesImages: [                  
                       
-                    "images/comercios/produtosOrientais/seiza/divulgacao/1.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/2.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/1.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/3.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/4.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/5.png",
@@ -4165,9 +4165,10 @@ menuLinks.forEach((link) => {
                     
                                 
                 ],
-                novidadesDescriptions: [                            
-                  "Na Seiza você encontra uma seleção incrível de lámens e massas orientais — coreanos, japoneses e muito mais. Vem experimentar!",
+                novidadesDescriptions: [ 
                   "O segredo da culinária oriental começa aqui! Shoyu, óleo de gergelim, saquê mirin, molho tarê, hondashi, aji-no-moto e muito mais para deixar suas receitas com o sabor autêntico do Japão, China e Coreia!",
+                                             
+                  "Na Seiza você encontra uma seleção incrível de lámens e massas orientais — coreanos, japoneses e muito mais. Vem experimentar!",
                   "Farinha Panko, mistura para tempurá, kinako (soja em pó), papel de arroz e os ingredientes perfeitos pra dar aquele toque autêntico nas suas receitas japonesas!",
                   "Bebidas orientais alcóolicas mais procuradas: Soju (vários sabores), Makgeolli (vinho de arroz) e o tradicional saquê japonês.",
                   "Direto da Coreia! Experimente os sorvetes orientais mais amados: Samanco, Melona e Power Cap! Sabores únicos e refrescantes que conquistam todos os paladares!",
