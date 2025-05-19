@@ -558,7 +558,7 @@ clinicaveterinariacarlopolis:"s",
   
       // churrasqueiro
       flaviogiovani:"s",      
-      pituca: "s",
+      
 
   
       //diarista
