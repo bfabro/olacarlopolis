@@ -313,9 +313,10 @@
   <h2 class="section-title">📱 Uso Diário do App Instalado (PWA)</h2>
   <table>
     <thead>
-      <tr><th>Data</th><th>Usos</th></tr>
-    </thead>
-    <tbody id="tabelaUsoPWA">
+  <tr><th>Data</th><th>Usos</th><th>Conexões</th></tr>
+</thead>
+<tbody id="tabelaUsoPWA">
+
       <tr><td colspan="2" style="text-align:center;">Nenhum dado ainda</td></tr>
     </tbody>
   </table>
@@ -361,31 +362,6 @@
 
 				document.getElementById("btnBuscar").addEventListener("click", async () => {
 				
-				
-				
-				
-				
-				const snapUsoPWA = await db.ref("usoPWA").once("value");
-						const dadosUsoPWA = snapUsoPWA.val() || {};
-
-						const tabelaUsoPWA = document.getElementById("tabelaUsoPWA");
-						tabelaUsoPWA.innerHTML = "";
-
-						let totalUsoPWA = 0;
-
-						diasFiltrados.forEach(dia => {
-						  const registros = dadosUsoPWA[dia];
-						  const quantidade = registros ? Object.keys(registros).length : 0;
-						  totalUsoPWA += quantidade;
-
-						  const row = document.createElement("tr");
-						  row.innerHTML = `<td>${dia}</td><td style="text-align:center;">${quantidade}</td>`;
-						  tabelaUsoPWA.appendChild(row);
-						});
-
-						if (totalUsoPWA === 0) {
-						  tabelaUsoPWA.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum uso registrado</td></tr>`;
-						}
 				
 				
 				
@@ -478,6 +454,60 @@
 					  totalAcessos += Object.keys(acessosDetalhados).length;
 					}
 				  });
+				  
+				  
+				  
+				
+				
+				
+				const snapUsoPWA = await db.ref("usoPWA").once("value");
+						const dadosUsoPWA = snapUsoPWA.val() || {};
+
+						const tabelaUsoPWA = document.getElementById("tabelaUsoPWA");
+						tabelaUsoPWA.innerHTML = "";
+
+						let totalUsoPWA = 0;
+
+
+
+
+
+						diasFiltrados.forEach(dia => {
+  const registros = dadosUsoPWA[dia];
+  const quantidade = registros ? Object.keys(registros).length : 0;
+  totalUsoPWA += quantidade;
+
+  // Contar tipos de conexão
+  const contagemConexoes = {};
+  if (registros) {
+    Object.values(registros).forEach(reg => {
+      const tipo = reg.conexao || "desconhecido";
+      contagemConexoes[tipo] = (contagemConexoes[tipo] || 0) + 1;
+    });
+  }
+
+  const listaConexoes = Object.entries(contagemConexoes)
+    .map(([tipo, qtd]) => `${tipo}: ${qtd}`)
+    .join("<br>");
+
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${dia}</td>
+    <td style="text-align:center;">${quantidade}</td>
+    <td style="text-align:center;">${listaConexoes}</td>
+  `;
+  tabelaUsoPWA.appendChild(row);
+});
+
+						
+						
+						
+						
+
+						if (totalUsoPWA === 0) {
+						  tabelaUsoPWA.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum uso registrado</td></tr>`;
+						}
+				
 
 				  document.getElementById("totalAcessos").textContent = totalAcessos;
 				  document.getElementById("usuariosUnicos").textContent = unicos.size;
