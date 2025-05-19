@@ -4819,7 +4819,7 @@ menuLinks.forEach((link) => {
                     contact: "43) 99653-9285",                    
                     facebook: "https://www.facebook.com/PanificadoraRestauranteBomJesus/?locale=pt_BR",
                     instagram: "https://www.instagram.com/bom_jesus_panificadora/",
-                         infoVagaTrabalho:"1 Vaga Para Balconista<br> 1 Vaga Para Serviços Gerais<br>2 Vagas Para Auxiliar de Cozinha<br>1 Vaga Para Padeiro / Confeiteiro<br> ",
+                         infoVagaTrabalho:"1 Vaga Para Balconista<br> 1 Vaga Para Serviços Gerais<br>1 Vaga Para Auxiliar de Cozinha<br>1 Vaga Para Padeiro / Confeiteiro<br> ",
                
                      
                 },
