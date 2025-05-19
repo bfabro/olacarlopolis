@@ -295,6 +295,22 @@
 </div>
 
 
+
+
+<div class="card">
+  <h2 class="section-title">📲 Instalações do App (PWA)</h2>
+  <table>
+    <thead>
+      <tr><th>Data</th><th>Instalações</th></tr>
+    </thead>
+    <tbody id="tabelaInstalacoesPWA">
+      <tr><td colspan="2" style="text-align:center;">Nenhum dado ainda</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+
 		  <!-- Firebase -->
 			  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 			  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -340,6 +356,12 @@
 				  const snapAcessos = await db.ref("acessosPorDia").once("value");
 				  
 				  const snapBotoes = await db.ref("cliquesPorBotao").once("value");
+				  
+				  const snapPWA = await db.ref("instalacoesPWA").once("value");
+				  const dadosPWA = snapPWA.val() || {};
+				  
+				  
+				  
 				  const dadosBotoes = snapBotoes.val() || {};
 				  
 
@@ -468,6 +490,28 @@ diasFiltrados = Array.from(diasDoMes);
 
 								const tabelaCidades = document.getElementById("tabelaCidades");
 								tabelaCidades.innerHTML = "";
+								
+								
+								
+								const tabelaInstalacoes = document.getElementById("tabelaInstalacoesPWA");
+tabelaInstalacoes.innerHTML = "";
+
+let totalInstalacoes = 0;
+
+diasFiltrados.forEach(dia => {
+  const registros = dadosPWA[dia];
+  const quantidade = registros ? Object.keys(registros).length : 0;
+  totalInstalacoes += quantidade;
+
+  const row = document.createElement("tr");
+  row.innerHTML = `<td>${dia}</td><td style="text-align:center;">${quantidade}</td>`;
+  tabelaInstalacoes.appendChild(row);
+});
+
+if (totalInstalacoes === 0) {
+  tabelaInstalacoes.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhuma instalação registrada</td></tr>`;
+}
+
 								
 								
 								const cidadesAnterioresTemp = { ...cidadesAnteriores };
