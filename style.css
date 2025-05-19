@@ -1947,3 +1947,24 @@ img {
   font-weight: bold;
   cursor: pointer;
 }
+
+
+.ios-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.ios-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  color: #333;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}

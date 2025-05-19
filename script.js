@@ -5820,6 +5820,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+function isIosSafari() {
+  const userAgent = window.navigator.userAgent;
+  return /iPhone|iPad|iPod/i.test(userAgent) && /Safari/i.test(userAgent) && !/CriOS|FxiOS/i.test(userAgent);
+}
+
+function isInStandaloneMode() {
+  return window.navigator.standalone === true;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (isIosSafari() && !isInStandaloneMode()) {
+    setTimeout(() => {
+      document.getElementById('iosInstallModal')?.classList.remove('hidden');
+    }, 3000); // Aguarda 3 segundos após carregar
+  }
+});
+
+
+
+
+
+
+
+
 
 
                     
