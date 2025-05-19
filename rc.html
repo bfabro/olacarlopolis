@@ -309,6 +309,19 @@
   </table>
 </div>
 
+<div class="card">
+  <h2 class="section-title">📱 Uso Diário do App Instalado (PWA)</h2>
+  <table>
+    <thead>
+      <tr><th>Data</th><th>Usos</th></tr>
+    </thead>
+    <tbody id="tabelaUsoPWA">
+      <tr><td colspan="2" style="text-align:center;">Nenhum dado ainda</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
 
 
 		  <!-- Firebase -->
@@ -347,6 +360,38 @@
 
 
 				document.getElementById("btnBuscar").addEventListener("click", async () => {
+				
+				
+				
+				
+				
+				const snapUsoPWA = await db.ref("usoPWA").once("value");
+						const dadosUsoPWA = snapUsoPWA.val() || {};
+
+						const tabelaUsoPWA = document.getElementById("tabelaUsoPWA");
+						tabelaUsoPWA.innerHTML = "";
+
+						let totalUsoPWA = 0;
+
+						diasFiltrados.forEach(dia => {
+						  const registros = dadosUsoPWA[dia];
+						  const quantidade = registros ? Object.keys(registros).length : 0;
+						  totalUsoPWA += quantidade;
+
+						  const row = document.createElement("tr");
+						  row.innerHTML = `<td>${dia}</td><td style="text-align:center;">${quantidade}</td>`;
+						  tabelaUsoPWA.appendChild(row);
+						});
+
+						if (totalUsoPWA === 0) {
+						  tabelaUsoPWA.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum uso registrado</td></tr>`;
+						}
+				
+				
+				
+				
+				
+				
 				  const tipo = tipoRelatorioEl.value;
 				  const resultados = {};
 				  const unicos = new Set();
@@ -378,50 +423,50 @@
 					diasFiltrados = [dia];
 					
 				  } else if (tipo === "mensal") {
-					const mes = document.getElementById("filtroMes").value;
-					const diasDoMes = new Set([
-  ...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
-  ...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
-]);
-diasFiltrados = Array.from(diasDoMes);
-				  } else if (tipo === "semanal") {
-  const mesSelecionado = document.getElementById("filtroMes").value;
-  const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
+								const mes = document.getElementById("filtroMes").value;
+								const diasDoMes = new Set([
+			  ...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
+			  ...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
+			]);
+			diasFiltrados = Array.from(diasDoMes);
+							  } else if (tipo === "semanal") {
+			  const mesSelecionado = document.getElementById("filtroMes").value;
+			  const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
 
-  if (!mesSelecionado || isNaN(semanaSelecionada)) {
-    alert("Selecione um mês e uma semana para o relatório semanal.");
-    return;
-  }
+			  if (!mesSelecionado || isNaN(semanaSelecionada)) {
+				alert("Selecione um mês e uma semana para o relatório semanal.");
+				return;
+			  }
 
-  const inicio = (semanaSelecionada - 1) * 7 + 1;
-  const fim = semanaSelecionada * 7;
+			  const inicio = (semanaSelecionada - 1) * 7 + 1;
+			  const fim = semanaSelecionada * 7;
 
-  const diasDaSemana = new Set([
-    ...Object.keys(dadosCliques).filter(dia =>
-      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-    ),
-    ...Object.keys(dadosBotoes).filter(dia =>
-      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-    )
-  ]);
+			  const diasDaSemana = new Set([
+				...Object.keys(dadosCliques).filter(dia =>
+				  dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+				),
+				...Object.keys(dadosBotoes).filter(dia =>
+				  dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+				)
+			  ]);
 
-  diasFiltrados = Array.from(diasDaSemana);
-}
+			  diasFiltrados = Array.from(diasDaSemana);
+			}
 
-				  
-				  if (diasFiltrados.length === 0 || !diasFiltrados[0]) {
-  alert("Nenhuma data selecionada ou nenhum dado encontrado.");
-  return;
-}
+						  
+						  if (diasFiltrados.length === 0 || !diasFiltrados[0]) {
+		  alert("Nenhuma data selecionada ou nenhum dado encontrado.");
+		  return;
+		}
 
 
-				  let totalAcessos = 0;
+						  let totalAcessos = 0;
 
-				  diasFiltrados.forEach(dia => {
-					const categorias = dadosCliques[dia] || {};
-					Object.entries(categorias).forEach(([nome, info]) => {
-					  if (!resultados[nome]) resultados[nome] = 0;
-					  resultados[nome] += info.total || 0;
+						  diasFiltrados.forEach(dia => {
+							const categorias = dadosCliques[dia] || {};
+							Object.entries(categorias).forEach(([nome, info]) => {
+							  if (!resultados[nome]) resultados[nome] = 0;
+							  resultados[nome] += info.total || 0;
 					});
 
 					if (dadosUsuarios[dia]) {
@@ -493,24 +538,31 @@ diasFiltrados = Array.from(diasDoMes);
 								
 								
 								
-								const tabelaInstalacoes = document.getElementById("tabelaInstalacoesPWA");
-tabelaInstalacoes.innerHTML = "";
+								
+														
+						
 
-let totalInstalacoes = 0;
+														
+														
+														
+						const tabelaInstalacoes = document.getElementById("tabelaInstalacoesPWA");
+						tabelaInstalacoes.innerHTML = "";
 
-diasFiltrados.forEach(dia => {
-  const registros = dadosPWA[dia];
-  const quantidade = registros ? Object.keys(registros).length : 0;
-  totalInstalacoes += quantidade;
+						let totalInstalacoes = 0;
 
-  const row = document.createElement("tr");
-  row.innerHTML = `<td>${dia}</td><td style="text-align:center;">${quantidade}</td>`;
-  tabelaInstalacoes.appendChild(row);
-});
+						diasFiltrados.forEach(dia => {
+						  const registros = dadosPWA[dia];
+						  const quantidade = registros ? Object.keys(registros).length : 0;
+						  totalInstalacoes += quantidade;
 
-if (totalInstalacoes === 0) {
-  tabelaInstalacoes.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhuma instalação registrada</td></tr>`;
-}
+						  const row = document.createElement("tr");
+						  row.innerHTML = `<td>${dia}</td><td style="text-align:center;">${quantidade}</td>`;
+						  tabelaInstalacoes.appendChild(row);
+						});
+
+						if (totalInstalacoes === 0) {
+						  tabelaInstalacoes.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhuma instalação registrada</td></tr>`;
+						}
 
 								
 								
@@ -566,63 +618,63 @@ if (totalInstalacoes === 0) {
 				tabelaHorarios.appendChild(row);
 			  });
 			  
-			  
-			 const tabelaBotoes = document.getElementById("tabelaBotoes");
-tabelaBotoes.innerHTML = "";
+						  
+						 const tabelaBotoes = document.getElementById("tabelaBotoes");
+			tabelaBotoes.innerHTML = "";
 
-const totaisEstab = {};
-let encontrouDadosBotao = false;
+			const totaisEstab = {};
+			let encontrouDadosBotao = false;
 
-let botoesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresBotoes") || "{}");
-const botoesAnterioresTemp = { ...botoesAnteriores }; // Cópia para comparação
-botoesAnteriores = {}; // Reiniciar antes de preencher
+			let botoesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresBotoes") || "{}");
+			const botoesAnterioresTemp = { ...botoesAnteriores }; // Cópia para comparação
+			botoesAnteriores = {}; // Reiniciar antes de preencher
 
-diasFiltrados.forEach(dia => {
-  const cliquesDoDia = dadosBotoes[dia] || {};
-  Object.entries(cliquesDoDia).forEach(([estabId, botoes]) => {
-    encontrouDadosBotao = true;
-    if (!totaisEstab[estabId]) {
-      totaisEstab[estabId] = { divulgacao: 0, cardapio: 0 };
-    }
-    totaisEstab[estabId].divulgacao += botoes.divulgacao || 0;
-    totaisEstab[estabId].cardapio += botoes.cardapio || 0;
-  });
-});
+			diasFiltrados.forEach(dia => {
+			  const cliquesDoDia = dadosBotoes[dia] || {};
+			  Object.entries(cliquesDoDia).forEach(([estabId, botoes]) => {
+				encontrouDadosBotao = true;
+				if (!totaisEstab[estabId]) {
+				  totaisEstab[estabId] = { divulgacao: 0, cardapio: 0 };
+				}
+				totaisEstab[estabId].divulgacao += botoes.divulgacao || 0;
+				totaisEstab[estabId].cardapio += botoes.cardapio || 0;
+			  });
+			});
 
-if (encontrouDadosBotao) {
-  Object.entries(totaisEstab)
-    .sort((a, b) => (b[1].divulgacao + b[1].cardapio) - (a[1].divulgacao + a[1].cardapio))
-    .forEach(([estabId, dados]) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${estabId}</td>
-        <td style="text-align:center">${dados.divulgacao}</td>
-        <td style="text-align:center">${dados.cardapio}</td>
-      `;
+			if (encontrouDadosBotao) {
+			  Object.entries(totaisEstab)
+				.sort((a, b) => (b[1].divulgacao + b[1].cardapio) - (a[1].divulgacao + a[1].cardapio))
+				.forEach(([estabId, dados]) => {
+				  const row = document.createElement("tr");
+				  row.innerHTML = `
+					<td>${estabId}</td>
+					<td style="text-align:center">${dados.divulgacao}</td>
+					<td style="text-align:center">${dados.cardapio}</td>
+				  `;
 
-      // Verifica mudanças em relação aos valores anteriores
-      const anterior = botoesAnterioresTemp[estabId];
-      if (
-        !anterior ||
-        anterior.divulgacao !== dados.divulgacao ||
-        anterior.cardapio !== dados.cardapio
-      ) {
-        row.style.color = "yellow";
-        row.style.fontWeight = "bold";
-      }
+							  // Verifica mudanças em relação aos valores anteriores
+							  const anterior = botoesAnterioresTemp[estabId];
+				  if (
+					!anterior ||
+					anterior.divulgacao !== dados.divulgacao ||
+					anterior.cardapio !== dados.cardapio
+				  ) {
+					row.style.color = "yellow";
+					row.style.fontWeight = "bold";
+				  }
 
-      botoesAnteriores[estabId] = { ...dados };
-      tabelaBotoes.appendChild(row);
-    });
-} else {
-  tabelaBotoes.innerHTML = `<tr><td colspan="3" style="text-align:center; color: #999;">Nenhum clique encontrado</td></tr>`;
-}
+				  botoesAnteriores[estabId] = { ...dados };
+				  tabelaBotoes.appendChild(row);
+				});
+			} else {
+			  tabelaBotoes.innerHTML = `<tr><td colspan="3" style="text-align:center; color: #999;">Nenhum clique encontrado</td></tr>`;
+			}
 
-localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores));
+			localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores));
 
 
-	});
-			  </script>
+				});
+						  </script>
 
 			  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 			  <script>

@@ -5772,4 +5772,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  const hoje = new Date().toISOString().split('T')[0];
+
+  fetch(`https://contadoracessos-default-rtdb.firebaseio.com/usoPWA/${hoje}.json`, {
+    method: "POST",
+    body: JSON.stringify({
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
+
+
                   
