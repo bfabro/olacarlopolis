@@ -645,8 +645,9 @@ clinicaveterinariacarlopolis:"s",
   calendarioeventos: "s",
   etapalestevelocross:"s",
  frutfest:"s",
+ cresolrun:"s",
   
-  lowcyty:"s",
+  lowcity:"s",
   feiradalua: "s",
  
 
@@ -3276,7 +3277,23 @@ menuLinks.forEach((link) => {
               
              
           },
-         
+         {
+                  image: "images/informacoes/eventos/cresolRun.png",
+                  name: "Cresol Run",
+                  date: "22/06/25",
+                  address: "Av Turistica",
+                  contact: "(43) 99950-9291",
+                  instagram:"https://www.instagram.com/carlopolisrunning/p/DJw_BS6SObU/?img_index=2",
+                  infoAdicional:"",
+                  infoAdicional:"<a target='_blank'  style='color:#2da6ff;' href='www.cronocorridas.com.br'>Faça sua inscrição</a>",
+                
+                    novidadesImages: [               
+                    "images/informacoes/eventos/cresolRun2.png",
+                
+                ], novidadesDescriptions:[ 
+                 "INSCRIÇÕES ABERTAS GARANTA JÁ SUA VAGA!",
+                 ],
+              },
                   
 
               {
@@ -3292,7 +3309,7 @@ menuLinks.forEach((link) => {
 
               {
                 image: "images/informacoes/eventos/lowCity.png",
-                name: "LowCyty",
+                name: "LowCity",
                 date: "05/10/2025",
                 address: "Centro de Eventos Ilha do Ponciano",
                 contact: "-",
@@ -4761,13 +4778,26 @@ menuLinks.forEach((link) => {
           title: "Vagas de Trabalho",
           establishments: [
               {
-                  name: "Moto Taxi Modesto",
-                  hours: "Seg a Dom: 7h - 20h",
-                  address: "R. Kelil Keder, 603",
-                  contact: "(43) 99137-5516",
-                  image: "images/informacoes/VagasTrabalho/modesto/modesto.png",
-                  infoVagaTrabalho:"Precisa-se de motoboy",
-              },
+                    image: "images/comercios/supermercado/rocha.jpg",
+                    name: "Rocha",
+                    hours: "Seg a Sex: 06:00h as 20:00h <br> Dom: 06:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "06:00", fim: "20:00" }],
+                      ter: [{ inicio: "06:00", fim: "20:00" }],
+                      qua: [{ inicio: "06:00", fim: "20:00" }],
+                      qui: [{ inicio: "06:00", fim: "20:00" }],
+                      sex: [{ inicio: "06:00", fim: "20:00" }],
+                      sab: [{ inicio: "06:00", fim: "20:00" }],
+                      dom: [{ inicio: "06:00", fim: "20:00" }],
+                    },  
+                    address: "Av. Elson Soares, 767 ",
+                    contact: "(43) 99105-9324",
+                   
+                    facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
+                    infoVagaTrabalho:"1 Vaga Para Açougueiro<br> 1 Vaga Para Feira<br>2 Vagas Para Padaria<br>1 Vaga Para Repositor<br> ",
+                },
           ],
       },
     
