@@ -21,10 +21,24 @@
    <meta name="author" content="Bruno Fabro">
    <meta name="robots" content="index, follow">  
 
-   <!-- Inicio CSS -->
+   <!-- Inicio APP -->
    <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4070f4"> 
 <link rel="icon" type="image/png" sizes="192x192" href="images/img_padrao_site/icon-192.png">
+
+
+<!-- Ícone para iOS -->
+<link rel="apple-touch-icon" href="images/img_padrao_site/icon-512.png">
+
+<!-- Nome do app (usado como nome do ícone) -->
+<meta name="apple-mobile-web-app-title" content="Olá Carlópolis">
+
+<!-- Força o modo app (sem barra de endereço) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<!-- Cor da barra de status -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
 
 <!-- FIM APP  -->
    <link rel="icon" type="image/png" sizes="16x16"  href="images/img_padrao_site/favicon.ico">
@@ -825,6 +839,12 @@
             <!-- end -->
             <ul class="menu_items">
                <div class="menu_title menu_setting"></div>
+                    <li class="item">
+  <a href="#" id="menuApp" class="nav_link">
+    <span class="navlink_icon"><i style="color:#4070f4" class="fa-solid fa-mobile-screen"></i></span>
+    <span class="navlink bold">APP</span>
+  </a>
+</li>
                <li class="item">
                   <a href="https://www.instagram.com/olacarlopolis/"
                      target="_blank" class="nav_link">
@@ -843,6 +863,9 @@
                      <span class="navlink bold">Quero Participar!</span>
                   </a>
                </li>
+
+          
+
 
               
             </ul>
@@ -1075,9 +1098,24 @@
 
 
          </div>
+
+
+         
       </div>
       <!-- fim do conteiner-->
-   </div>
+
+     
+
+
+   </div> <!--  FECHAMENTO CONTAINER -->
+
+
+   <div id="instalarAppBox" class="hidden instalar-app">
+  <p>📲 Instale o Olá Carlópolis em seu celular!</p>
+  <button id="btnInstalarPWA">Adicionar à Tela Inicial</button>
+  <button onclick="fecharInstalador()">Fechar</button>
+</div>
+
    <!--  JavaScript -->
    <script src="script.js"></script>
 

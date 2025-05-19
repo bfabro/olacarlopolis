@@ -5685,6 +5685,35 @@ window.addEventListener("DOMContentLoaded", () => {
   if (primeira) primeira.style.display = 'block';
 });
 
+let deferredPrompt = null;
+
+// Captura o evento nativo do Android
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+// Quando clicar no botão do menu APP
+document.getElementById("menuApp").addEventListener("click", () => {
+  document.getElementById("instalarAppBox").classList.remove("hidden");
+});
+
+document.getElementById("btnInstalarPWA").addEventListener("click", () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log("Usuário aceitou instalar o app");
+      }
+      deferredPrompt = null;
+    });
+  } else {
+    alert("📱 No iPhone, toque em 'Compartilhar' (ícone com seta) e depois em 'Adicionar à Tela de Início'.");
+  }
+  fecharInstalador();
+});
+
+
 
 
 
@@ -5692,5 +5721,9 @@ window.addEventListener("DOMContentLoaded", () => {
                     
                   });
 
-                
+                function fecharInstalador() {
+  const aviso = document.getElementById("instalarAppBox");
+  if (aviso) aviso.classList.add("hidden");
+}
+
                   

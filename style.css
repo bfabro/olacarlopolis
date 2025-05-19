@@ -1904,4 +1904,32 @@ img {
 }
 
 
+.instalar-app {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4070f4;
+  color: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  z-index: 9999;
+  text-align: center;
+}
+
+.instalar-app button {
+  background: white;
+  color: #4070f4;
+  padding: 6px 12px;
+  margin: 5px;
+  border-radius: 8px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
 
