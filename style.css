@@ -146,6 +146,11 @@ body.dark {
 
 .menu_setting::before {
   content: "Contato";
+
+}
+
+.menu_atalho::before {
+  content: "Atalho";
 }
 
 .sidebar.close .menu_title::before {
