@@ -5721,9 +5721,21 @@ document.getElementById("btnInstalarPWA").addEventListener("click", () => {
                     
                   });
 
-                function fecharInstalador() {
-  const aviso = document.getElementById("instalarAppBox");
-  if (aviso) aviso.classList.add("hidden");
+       function fecharInstalador() {
+  const modal = document.getElementById("instalarAppBox");
+  if (modal) modal.classList.add("hidden");
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const botaoApp = document.getElementById("menuApp");
+  if (botaoApp) {
+    botaoApp.addEventListener("click", (e) => {
+      e.preventDefault();
+      const modal = document.getElementById("instalarAppBox");
+      if (modal) modal.classList.remove("hidden");
+    });
+  }
+});
+
 
                   
