@@ -5834,36 +5834,34 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
   });
 }
 
-
-
 let promptInstalacao = null;
 
+// Detecta o momento em que o navegador permite instalar o PWA
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault(); // Impede o prompt automático
   promptInstalacao = e;
 
-  const box = document.getElementById("instalarPWABox");
+  // Exibe a modal personalizada
+  const box = document.getElementById("instalarAppBox");
   if (box) box.classList.remove("hidden");
 });
 
+// Quando o usuário clicar no botão "Adicionar"
 document.getElementById("btnInstalarPWA")?.addEventListener("click", () => {
   if (promptInstalacao) {
     promptInstalacao.prompt();
     promptInstalacao.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === "accepted") {
-        console.log("✅ Usuário aceitou instalar o PWA");
-      } else {
-        console.log("❌ Usuário recusou a instalação");
-      }
       promptInstalacao = null;
-      document.getElementById("instalarPWABox").classList.add("hidden");
+      document.getElementById("instalarAppBox")?.classList.add("hidden");
     });
   }
 });
 
+// Quando o usuário clicar no botão "Fechar"
 document.getElementById("fecharPWABox")?.addEventListener("click", () => {
-  document.getElementById("instalarPWABox").classList.add("hidden");
+  document.getElementById("instalarAppBox")?.classList.add("hidden");
 });
+
 
 
 
