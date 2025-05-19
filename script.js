@@ -4816,7 +4816,7 @@ menuLinks.forEach((link) => {
                       dom: [{ inicio: "06:00", fim: "14:00" }],
                     }, 
                     address: "R. Benedito Salles, 615",
-                    contact: "43) 99653-9285",                    
+                    contact: "(43) 99653-9285",                    
                     facebook: "https://www.facebook.com/PanificadoraRestauranteBomJesus/?locale=pt_BR",
                     instagram: "https://www.instagram.com/bom_jesus_panificadora/",
                          infoVagaTrabalho:"1 Vaga Para Balconista<br> 1 Vaga Para Serviços Gerais<br>1 Vaga Para Auxiliar de Cozinha<br>1 Vaga Para Padeiro / Confeiteiro<br> ",
