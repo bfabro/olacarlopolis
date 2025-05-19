@@ -501,7 +501,7 @@ clinicaveterinariacarlopolis:"s",
       kidoglanches:"s",
       didog:"s",
       xisbauinea:"s",
-      mycoffe:"s",
+      mycoffee:"s",
   
       //supermercado
       bompreco:"s",
@@ -1813,7 +1813,7 @@ menuLinks.forEach((link) => {
 
                   {
                     image: "images/comercios/lanchonete/mycoffe/perfil.png",
-                    name: "My Coffe",
+                    name: "My Coffee",
                     hours: "Seg: Fechado<br>Ter a Qui: 13:00h as 19:00h <br>Sex: 13:00h as 18:00h<br>Sab: 13:00h as 20:00h<br>Dom: 13:00h as 19:00h",
                     statusAberto:".",
                     horarios: {
@@ -5708,10 +5708,39 @@ document.getElementById("btnInstalarPWA").addEventListener("click", () => {
       deferredPrompt = null;
     });
   } else {
-    alert("📱 No iPhone, toque em 'Compartilhar' (ícone com seta) e depois em 'Adicionar à Tela de Início'.");
+    alert("📱 Para IPhone, no navegador, toque em 'Compartilhar' (ícone com a seta para cima) e depois em 'Adicionar à Tela de Início' ");
   }
   fecharInstalador();
 });
+
+
+
+
+// Detecta quando o app for instalado como PWA
+window.addEventListener('appinstalled', () => {
+  console.log('✅ PWA instalado detectado');
+
+  const hoje = new Date().toISOString().split('T')[0];
+
+  fetch(`https://contadoracessos-default-rtdb.firebaseio.com/instalacoesPWA/${hoje}.json`, {
+    method: "POST",
+    body: JSON.stringify({
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }).then(() => {
+    console.log('📦 Instalação registrada no Firebase');
+  }).catch((err) => {
+    console.error('❌ Falha ao registrar instalação:', err);
+  });
+});
+
+
+
+
 
 
 
@@ -5720,6 +5749,11 @@ document.getElementById("btnInstalarPWA").addEventListener("click", () => {
 
                     
                   });
+
+
+
+
+
 
        function fecharInstalador() {
   const modal = document.getElementById("instalarAppBox");
