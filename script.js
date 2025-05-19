@@ -5772,6 +5772,20 @@ window.addEventListener('appinstalled', () => {
 
 
 
+function isIos() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function isInStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (isIos() && !isInStandaloneMode()) {
+    const box = document.getElementById("iosInstallBox");
+    if (box) box.classList.remove("hidden");
+  }
+});
 
 
 
@@ -5819,6 +5833,37 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
     }
   });
 }
+
+
+
+let promptInstalacao = null;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault(); // Impede o prompt automático
+  promptInstalacao = e;
+
+  const box = document.getElementById("instalarPWABox");
+  if (box) box.classList.remove("hidden");
+});
+
+document.getElementById("btnInstalarPWA")?.addEventListener("click", () => {
+  if (promptInstalacao) {
+    promptInstalacao.prompt();
+    promptInstalacao.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("✅ Usuário aceitou instalar o PWA");
+      } else {
+        console.log("❌ Usuário recusou a instalação");
+      }
+      promptInstalacao = null;
+      document.getElementById("instalarPWABox").classList.add("hidden");
+    });
+  }
+});
+
+document.getElementById("fecharPWABox")?.addEventListener("click", () => {
+  document.getElementById("instalarPWABox").classList.add("hidden");
+});
 
 
 

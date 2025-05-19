@@ -1124,6 +1124,9 @@
    </div> <!--  FECHAMENTO CONTAINER -->
 
 
+
+
+   <!--  INICIO MODAL BOTAO LATERAL -->
    <div id="instalarAppBox" class="hidden instalar-app">
   <div class="app-box-conteudo">
     <p>📲 Instale o <strong>Olá Carlópolis</strong> em seu celular!</p>
@@ -1131,6 +1134,34 @@
     <button onclick="fecharInstalador()">Fechar</button>
   </div>
 </div>
+
+<!--  FIM MODAL BOTAO LATERAL -->
+
+
+
+
+<!--  INICIO MODAL QUANDO ABRI O SITE -->
+<div id="iosInstallBox" class="hidden" style="
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  color: black;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.4);
+  z-index: 9999;
+  max-width: 320px;
+  text-align: center;
+">
+  <strong>📱 Quer usar como app?</strong><br>
+  No iPhone, toque em <strong>Compartilhar</strong> (ícone ⬆️) e depois em<br><strong>“Adicionar à Tela de Início”</strong>.
+  <br><br>
+  <button onclick="document.getElementById('iosInstallBox').classList.add('hidden')" style="padding:6px 12px;border:none;background:#ccc;color:#333;border-radius:6px;">Fechar</button>
+</div>
+
+<!--  FIM MODAL QUANDO ABRI O SITE -->
 
 
 
