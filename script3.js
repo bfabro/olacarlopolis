@@ -51,11 +51,74 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function estaAbertoAgora(horarios) {
     const agora = new Date();
-    const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
-    const hoje = dias[agora.getDay()];
+    const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab",
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
+    const hoje = dias[agora.getDay(),
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
     const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
   
-    const turnosHoje = horarios[hoje] || [];
+    const turnosHoje = horarios[hoje] || [,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
   
     for (const turno of turnosHoje) {
       if (!turno || !turno.inicio || !turno.fim) continue;
@@ -96,12 +159,75 @@ document.addEventListener("DOMContentLoaded", function () {
       { chave: "qui", nome: "Quinta" },
       { chave: "sex", nome: "Sexta" },
       { chave: "sab", nome: "Sábado" },
-    ];
+    ,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
   
     for (let i = 0; i < 7; i++) {
       const diaIndex = (agora.getDay() + i) % 7;
-      const { chave, nome } = dias[diaIndex];
-      const faixas = horarios[chave] || [];
+      const { chave, nome } = dias[diaIndex,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
+      const faixas = horarios[chave] || [,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
   
       for (const faixa of faixas) {
         const [h, m] = faixa.inicio.split(":").map(Number);
@@ -121,9 +247,72 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!horarios || typeof horarios !== "object") return null;
   
     const agora = new Date();
-    const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
-    const hoje = dias[agora.getDay()];
-    const turnosHoje = horarios[hoje] || [];
+    const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab",
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
+    const hoje = dias[agora.getDay(),
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
+    const turnosHoje = horarios[hoje] || [,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
   
     const horaAgoraMinutos = agora.getHours() * 60 + agora.getMinutes();
   
@@ -301,15 +490,78 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 const destaquesFixos = [
   "seiza","assadaodorussao", "pimentadoce", "limone","pesqueirodogalego"
   
+,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
 ]; 
 
 function montarCarrosselDivulgacao() {
-  const listaTodos = [];
+  const listaTodos = [,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
 
   categories.forEach(cat => {
     cat.establishments?.forEach(est => {
       const nomeNormalizado = normalizeName(est.name);
-      const imagens = est.novidadesImages || [];
+      const imagens = est.novidadesImages || [,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
 
       if (statusEstabelecimentos[nomeNormalizado] === "s" && imagens.length > 0) {
         listaTodos.push({ ...est, nomeNormalizado });
@@ -341,7 +593,28 @@ function montarCarrosselDivulgacao() {
   
     const imagem = destaquesFixos.includes(est.nomeNormalizado)
       ? est.novidadesImages[0] // sempre a primeira imagem para fixos
-      : est.novidadesImages[Math.floor(Math.random() * est.novidadesImages.length)];
+      : est.novidadesImages[Math.floor(Math.random() * est.novidadesImages.length),
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
   
     const indexImagem = est.novidadesImages.indexOf(imagem);
     const texto = est.novidadesDescriptions?.[indexImagem] || "Confira nossas novidades!";
@@ -592,8 +865,8 @@ clinicaveterinariacarlopolis:"s",
       
   
     
-  funerariacristorei:"s",
-  
+  mmm:"s",
+   nnn:"s",
 
 
       // FIMMMM SERVIÇOSSSSSS
@@ -776,7 +1049,11 @@ menuLinks.forEach((link) => {
     const isParent = this.classList.contains("submenu_item");
     const submenu = this.nextElementSibling;
 
-   
+       if (this.id === "menuNotaFalecimento") {
+  const categoria = categories.find(c => c.title === "Nota de Falecimento");
+  if (categoria) mostrarFalecimentos(categoria.establishments);
+  return;
+}
 
     if (isParent) {
       e.preventDefault();
@@ -4788,14 +5065,16 @@ menuLinks.forEach((link) => {
   title: "Nota de Falecimento",
   establishments: [
     {
-      name: "Funeraria Cristo Rei",    
+      name: "mmm",
+      funeraria: "Cristo Rei",
       image: "images/informacoes/notaFalecimento/cristoRei/1.png",
-     descricaoFalecido: "Faleceu em Campo Largo aos 79 anos de idade, Sr 'NELSON DE OLIVEIRA', mais conhecido como: Nelson Marinho.<br> A cerimônia do velório iniciou às 11:30 horas no Velório Municipal.<br>Seu sepultamento será hoje às 17:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
     },
-     {
-      name: "Funeraria Cristo Rei",      
-      image: "images/informacoes/notaFalecimento/cristoRei/2.png",
-      descricaoFalecido: "Faleceu em Carlópolis aos 88 anos de idade, Sr 'JOÃO ANTÔNIO DE OLIVEIRA NETO' mais conhecido como: João Amâncio <br>A cerimônia do velório iniciará hoje às 17:00 horas no Cemitério Municipal de Carlópolis.<br>Sua despedida será amanhã às 12:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
+    {
+      name: "nnn",
+      funeraria: "Cristo Rei",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
     }
   ]
 },
@@ -4866,10 +5145,58 @@ menuLinks.forEach((link) => {
       
         
 
-    ]; 
+    ,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+]; 
     
 
-    
+    // FALECIMENTO
+    function mostrarFalecimentos(establishments) {
+  const container = document.querySelector(".content_area");
+  container.innerHTML = "";
+
+  establishments.forEach(est => {
+    const box = document.createElement("div");
+    box.className = "content_box";
+
+    box.innerHTML = `
+      <div class="info-box">
+        <div class="info-label"><i class="fa-solid fa-cross" style="margin-right: 5px; color: #8b0000;"></i> ${est.funeraria}</div>
+      </div>
+      <div class="content_image_container">
+        <img class="content_image" src="${est.image}" alt="${est.name}">
+      </div>
+      <div class="info-box">
+        <div class="info-value">${est.description}</div>
+      </div>
+    `;
+
+    container.appendChild(box);
+  });
+}
+
+
+
+    // FALECIMENTO
 
 
     montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
@@ -5207,26 +5534,6 @@ function restaurarMenuOriginal() {
                     </div>` : ""
                   }
 
-                      ${establishment.funeraria ? `
-                    <div class="info-box">
-                      <i class="fas fa-circle-info info-icon"></i>
-                      <div>
-                        <div class="info-label">Funeraria:</div>
-                        <div class="info-value">${establishment.funeraria}</div>
-                      </div>
-                    </div>` : ""
-                  }
-
-                      ${establishment.descricaoFalecido ? `
-                    <div class="info-box">
-                      <i class="fas fa-circle-info info-icon"></i>
-                      <div>
-                        <div class="info-label">Nota de Falecimento:</div>
-                        <div class="info-value">${establishment.descricaoFalecido}</div>
-                      </div>
-                    </div>` : ""
-                  }
-
                    
                 
 
@@ -5359,7 +5666,28 @@ setTimeout(() => {
                           label: "Entrega",
                           valor: establishment.delivery || "Não informado",
                         },
-                      ];
+                      ,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
                     
                       infos.forEach(({ icon, label, valor }) => {
                         const card = document.createElement("div");
@@ -5524,7 +5852,28 @@ setTimeout(() => {
                     }
                   
                     function loadPaidEstablishments() {
-                      const categories = window.categories || [];
+                      const categories = window.categories || [,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
                       categories.forEach((category) => {
                         loadContent(category.title, category.establishments);
                       });
@@ -5835,7 +6184,28 @@ document.getElementById("btnInstalarPWA").addEventListener("click", () => {
 window.addEventListener('appinstalled', () => {
   console.log('✅ PWA instalado detectado');
 
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = new Date().toISOString().split('T')[0,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
 
   fetch(`https://contadoracessos-default-rtdb.firebaseio.com/instalacoesPWA/${hoje}.json`, {
     method: "POST",
@@ -5928,7 +6298,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 if (window.matchMedia('(display-mode: standalone)').matches) {
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = new Date().toISOString().split('T')[0,
+
+{
+  link: document.querySelector("#menuNotaFalecimento"),
+  title: "Nota de Falecimento",
+  establishments: [
+    {
+      name: "Maria da Silva",
+      funeraria: "Funerária Cristo Rei",
+      image: "images/informacoes/notaFalecimento/cristoRei/1.png",
+      description: "É com pesar que comunicamos o falecimento de Maria da Silva, aos 78 anos. Velório na Capela Municipal e sepultamento em 21/05/2025 às 10h."
+    },
+    {
+      name: "João Pereira",
+      funeraria: "Funerária Bom Jesus",
+      image: "images/informacoes/notaFalecimento/bomJesus/1.png",
+      description: "Faleceu João Pereira, aos 83 anos. Velório às 14h no Velório Central."
+    }
+  ]
+}
+
+];
 
   const tipoConexao = navigator.connection?.effectiveType || "desconhecido";
 

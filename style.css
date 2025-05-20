@@ -1970,3 +1970,28 @@ img {
   box-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
 
+
+
+
+
+.info-box {
+  background-color: #f9f9f9;
+  padding: 10px;
+  margin-top: 10px;
+  border-left: 4px solid #8b0000;
+  border-radius: 6px;
+}
+
+.info-label {
+  font-weight: bold;
+  color: #8b0000;
+  font-size: 16px;
+}
+
+.info-value {
+  margin-top: 5px;
+  font-size: 15px;
+  color: #333;
+}
+
+
