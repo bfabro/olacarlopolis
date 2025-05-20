@@ -464,6 +464,9 @@ clinicaveterinariacarlopolis:"s",
       //imobiliaria      
       imobiliariacarlopolis:"s",
 
+      //funeraria
+      cristorei:"s",
+
       // grafica
      
       serigrafgraficaeserigrafia:"s",
@@ -1480,41 +1483,86 @@ menuLinks.forEach((link) => {
                 ],
             },
 
-  // pesqueiro
+
+
+
   {
-    link: document.querySelector("#menuGrafica"),
-    title: "Grafica",
+    link: document.querySelector("#menuFuneraria"),
+    title: "Funeraria",
     establishments: [
         {
-            image: "images/comercios/grafica/serigraf/perfil.png",
-            name: "Serigraf Gráfica e Serigrafia",
-            hours: "Seg a Sex: 08:00h as 12:00h - 13:00h as 17:00h",
+            image: "images/comercios/funeraria/cristorei/perfil.png",
+            name: "Cristo Rei",
+            hours: "Seg a Sab: 08:00h as 18:00h",
             statusAberto:".",
             horarios: {                          
-              seg: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
-              ter: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
-              qua: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
-              qui: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
-              sex: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
-              sab: [],
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "18:00" }],
               dom: [],
             }, 
-            address: "R. Padre Hugo, 486 - Carlópolis,",
-            contact: "(43) 99906-4434",            
-            delivery: "Sim / Com Taxa",
-            facebook: "https://www.facebook.com/serigraf.carlopolis/?locale=pt_BR",
-            instagram: "https://www.instagram.com/serigraf.carlopolis/",
+            address: "Av Benedito Salles N°1277, Carlópolis,",
+            contact: "(43) 99637-2328",           
+            facebook: "https://www.facebook.com/funerariacristoreicarlopolispr/?locale=pt_BR",
+            instagram: "#",
             novidadesImages: [
          
-             "images/comercios/grafica/serigraf/divulgacao/1.png",
-             "images/comercios/grafica/serigraf/divulgacao/2.png",
-             "images/comercios/grafica/serigraf/divulgacao/3.png",
-             "images/comercios/grafica/serigraf/divulgacao/4.png",
-             "images/comercios/grafica/serigraf/divulgacao/5.png",
-            ],                    
+             "images/comercios/funeraria/cristorei/divulgacao/1.png",
+             "images/comercios/funeraria/cristorei/divulgacao/2.png",
+             
+            ],     
+            novidadesDescriptions: [ 
+
+              "Caixao com detalhes em cromo",
+              "Caixao com detalhes em ouro"
+
+             ],              
         },
     ],
 },
+
+
+
+
+
+
+                {
+                  link: document.querySelector("#menuGrafica"),
+                  title: "Grafica",
+                  establishments: [
+                      {
+                          image: "images/comercios/grafica/serigraf/perfil.png",
+                          name: "Serigraf Gráfica e Serigrafia",
+                          hours: "Seg a Sex: 08:00h as 12:00h - 13:00h as 17:00h",
+                          statusAberto:".",
+                          horarios: {                          
+                            seg: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
+                            ter: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
+                            qua: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
+                            qui: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
+                            sex: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" },],
+                            sab: [],
+                            dom: [],
+                          }, 
+                          address: "R. Padre Hugo, 486 - Carlópolis,",
+                          contact: "(43) 99906-4434",            
+                          delivery: "Sim / Com Taxa",
+                          facebook: "https://www.facebook.com/serigraf.carlopolis/?locale=pt_BR",
+                          instagram: "https://www.instagram.com/serigraf.carlopolis/",
+                          novidadesImages: [
+                      
+                          "images/comercios/grafica/serigraf/divulgacao/1.png",
+                          "images/comercios/grafica/serigraf/divulgacao/2.png",
+                          "images/comercios/grafica/serigraf/divulgacao/3.png",
+                          "images/comercios/grafica/serigraf/divulgacao/4.png",
+                          "images/comercios/grafica/serigraf/divulgacao/5.png",
+                          ],                    
+                      },
+                  ],
+              },
 
 
 
@@ -4133,19 +4181,7 @@ menuLinks.forEach((link) => {
             ],
         },
   
-        {
-            link: document.querySelector("#menuFuneraria"),    
-            title: "Funeraria",
-            establishments: [
-                {
-                    name: "Bom Jesus",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    contact: "(43) 99951-1540",
-                    delivery: "Sim / Sem Taxa",
-                },
-            ],
-        },
+    
 
 
         
