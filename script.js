@@ -1507,7 +1507,7 @@ menuLinks.forEach((link) => {
             address: "Av Benedito Salles N°1277, Carlópolis,",
             contact: "(43) 99637-2328",           
             facebook: "https://www.facebook.com/funerariacristoreicarlopolispr/?locale=pt_BR",
-            instagram: "#",
+            instagram: "https://www.instagram.com/funeraria_cristoreiclps/",
             novidadesImages: [
          
              "images/comercios/funeraria/cristorei/divulgacao/1.png",
