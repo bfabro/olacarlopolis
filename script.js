@@ -3711,7 +3711,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/setorPublico/copel/copel.png",
                     name: "Copel",
-                    hours: "Seg a Sex: 8h - 12h",
+                    hours: "Seg a Sex: 08:00h - 12:00h",
                     address: "R. Benedito Salles, 1094",
                     contact: "(41) 3013-8973",
                 },
@@ -3726,7 +3726,7 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/setorPublico/delegacia/delegacia.jpg",
                     name: "Delegacia",
-                    hours: "Seg a Sex: 9h - 18h",
+                    hours: "Seg a Sex: 09:00h - 18:00h",
                     address: "R. Alfeneiro, 215 ",
                     contact: "(43) 3566-1202",
                 },
@@ -3745,7 +3745,7 @@ menuLinks.forEach((link) => {
             {
               image: "images/setorPublico/escolaPublica/benedito.png",
               name: "Benedito Rodrigues de Camargo",
-              hours: "Seg a Ssex: 9h - 18h",
+              hours: "Seg a Sex: 09:00h - 18:00h",
               address: "Avenida Elson Soares, 295",
               contact: "(43) 3566-1496",
               infoAdicional:"Turno: Manha e Tarde",
@@ -3754,7 +3754,7 @@ menuLinks.forEach((link) => {
             {
               image: "images/setorPublico/escolaPublica/carolinaLupion.png",
               name: "Carolina Lupion",
-              hours: "Seg a Sex: 9h - 18h",
+              hours: "Seg a Sex: 09:00h - 18:00h",
               address: "R. Jorge Barros, 1095",
               contact: "(43) 3566-1295",
               infoAdicional:"Turno: Manha e Tarde",
@@ -3765,7 +3765,7 @@ menuLinks.forEach((link) => {
               {
                   image: "images/setorPublico/escolaPublica/raymunda.png",
                   name: "CMEI Raymunda Santana Salles",
-                  hours: "Seg a sex: 9h - 18h",
+                  hours: "Seg a sex: 09:00h - 18:00h",
                   address: "Rua Nicolau Miguel, 233",
                   contact: "(43) 3566-2273",
                   infoAdicional:"Turno: Manha",
