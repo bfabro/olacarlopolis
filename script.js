@@ -5821,21 +5821,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 function isIosSafari() {
-  const userAgent = window.navigator.userAgent;
-  return /iPhone|iPad|iPod/i.test(userAgent) && /Safari/i.test(userAgent) && !/CriOS|FxiOS/i.test(userAgent);
+  const ua = window.navigator.userAgent;
+  return /iPhone|iPad|iPod/i.test(ua) && /Safari/i.test(ua) && !/CriOS|FxiOS/i.test(ua);
 }
 
 function isInStandaloneMode() {
-  return window.navigator.standalone === true;
+  return 'standalone' in window.navigator && window.navigator.standalone;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   if (isIosSafari() && !isInStandaloneMode()) {
     setTimeout(() => {
-      document.getElementById('iosInstallModal')?.classList.remove('hidden');
-    }, 3000); // Aguarda 3 segundos após carregar
+      const modal = document.getElementById("iosInstallPrompt");
+      if (modal) modal.classList.remove("hidden");
+    }, 2500);
   }
 });
+
 
 
 

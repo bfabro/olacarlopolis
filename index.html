@@ -868,7 +868,7 @@
                <li class="item">
       
   <a href="#" id="menuApp" class="nav_link">
-    <span class="navlink_icon"><i style="color:#4070f4" class="fa-solid fa-mobile-screen"></i></span>
+    <span class="navlink_icon"><i style="color:rgb(10, 23, 207)" class="fa-solid fa-mobile-screen"></i></span>
     <span class="navlink bold">APP</span>
   </a>
 </li>
@@ -1176,6 +1176,16 @@
     <p><strong>Toque no botão "Compartilhar" do Safari</strong> <i class="fas fa-share-square"></i></p>
     <p>Depois selecione <strong>“Adicionar à Tela de Início”</strong>.</p>
     <button onclick="document.getElementById('iosInstallModal').classList.add('hidden')">Fechar</button>
+  </div>
+</div>
+
+<!-- Modal para instalação no iPhone -->
+<div id="iosInstallPrompt" class="ios-modal hidden">
+  <div class="ios-modal-content">
+    <p>📱 Para adicionar este site à tela inicial:</p>
+    <p><strong>Toque no botão de compartilhar do Safari</strong> <i class="fas fa-share-square"></i></p>
+    <p>e selecione <strong>“Adicionar à Tela de Início”</strong>.</p>
+    <button onclick="document.getElementById('iosInstallPrompt').classList.add('hidden')">Fechar</button>
   </div>
 </div>
 
