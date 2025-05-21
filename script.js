@@ -635,11 +635,14 @@ funerariacristorei:"s",
   feiradalua: "s",
   calendarioeventos: "s",
   etapalestevelocross:"s",
+  festajuninaapae:"s",
   frutfest:"s",
   cresolrun:"s",
   festadosenhorbomjesus:"s", 
+  campeonatopescaesportiva:"s",
   lowcity:"s",  
   toroonagashi:"s",
+  passeiociclisticorotary:"s",
 
  
 
@@ -969,12 +972,14 @@ menuLinks.forEach((link) => {
                             novidadesImages: [            
                             "images/comercios/acai/turminhaAcai/novidades/1.png", 
                             "images/comercios/acai/turminhaAcai/novidades/2.png",
-                            "images/comercios/acai/turminhaAcai/novidades/3.png",                                           
+                            "images/comercios/acai/turminhaAcai/novidades/3.png",  
+                            "images/comercios/acai/turminhaAcai/novidades/4.png",                                            
                             ],
                             novidadesDescriptions: [                            
                             "Marmita de Açai! Voce só encontra aqui!",
                             "Nossos espetos montados na hora",
                             "3",
+                            "Espetinhos Diferenciados",
                           ],
                             menuImages: [                    
                                 "images/comercios/acai/turminhaAcai/cardapio/1.png",
@@ -3339,6 +3344,17 @@ menuLinks.forEach((link) => {
                     
               },
 
+              {
+                  image: "images/informacoes/eventos/paranaFishing1.png",
+                  name: "Campeonato Pesca Esportiva",
+                  date: "Inscrições até 05/06/2025<br> Campeonato: 07/06/25 ",
+                  address: "Represa de Chavantes",
+                  contact: "(43) 99980-0495",
+                  instagram:"https://www.instagram.com/parana_fishing/",
+                  facebook:"https://www.facebook.com/thiagoagueraparanafishingteam/?locale=pt_BR",
+                
+                    
+              },
 
 
 
@@ -3400,6 +3416,17 @@ menuLinks.forEach((link) => {
                
                
             },
+
+             {
+                  image: "images/informacoes/eventos/rotary.png",
+                  name: "Passeio Ciclistico Rotary",
+                  date: "19/10/2025",
+                  address: "Rodovia PR218",
+                  contact: "-",
+               
+                
+                    
+              },
 
 
                 {
