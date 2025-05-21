@@ -4903,6 +4903,13 @@ menuLinks.forEach((link) => {
   title: "Nota de Falecimento",
   establishments: [
 
+    {
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/4.png",
+     descricaoFalecido: "Faleceu em Jacarezinho aos 80 anos de idade, Sra 'IRACEMA DA SILVA DE OLIVEIRA'.<br>A cerimônia do velório iniciará hoje às 19:00 horas na Igreja Paróquia  Senhor Bom Jesus (Matriz).<br>Seu sepultamento será amanhã às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
+    },
+
+
  {
       name: "Funeraria Cristo Rei",    
       image: "images/informacoes/notaFalecimento/cristoRei/3.png",
