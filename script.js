@@ -4673,7 +4673,15 @@ menuLinks.forEach((link) => {
                "images/comercios/restaurante/restauranteDaDi/divulgacao/2.png",
                "images/comercios/restaurante/restauranteDaDi/divulgacao/3.png",
                "images/comercios/restaurante/restauranteDaDi/divulgacao/4.png",
+               "images/comercios/restaurante/restauranteDaDi/divulgacao/5.png",
             ],
+            novidadesDescriptions: [    
+              "Toda Quinta-feira temos Panqueca",
+              "Toda Sexta-feira temos Parmegiana",              
+              "Todo Sabado temos Feijoada",              
+              "Todo Sábado temos A Porção de Feijoada ( 3 pessoas)",
+              "Todo Domingo temos os Assados",
+             ],
             
           },
 
