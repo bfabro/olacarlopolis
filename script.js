@@ -4902,6 +4902,13 @@ menuLinks.forEach((link) => {
   link: document.querySelector("#menuNotaFalecimento"),
   title: "Nota de Falecimento",
   establishments: [
+
+ {
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/3.png",
+     descricaoFalecido: " Faleceu em Jacarezinho aos 75 anos de idade, Sr 'GERALDO MAJOR DA SILVA', mais conhecido como: De Reto.<br> A cerimônia do velório iniciará às 14:30 horas em sua residência na vila rural do lado do sapé.<br>Seu sepultamento será amanhã às 09:00 horas no Cemitério Municipal de Quatiguá.<br>Nossos profundos sentimentos a toda família e amigos!"
+    },
+
     {
       name: "Funeraria Cristo Rei",    
       image: "images/informacoes/notaFalecimento/cristoRei/1.png",
