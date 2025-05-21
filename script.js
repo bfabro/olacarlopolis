@@ -1509,13 +1509,14 @@ menuLinks.forEach((link) => {
             novidadesImages: [
          
              "images/comercios/funeraria/cristorei/divulgacao/1.png",
-             "images/comercios/funeraria/cristorei/divulgacao/2.png",
+             
              
             ],     
             novidadesDescriptions: [ 
+"Mais do que uma despedida, nós oferecemos uma homenagem",
+"Resolvemos tudo para que você não precise pensar em burocracia em um momento de tanta dor",
 
-              "Caixao com detalhes em cromo",
-              "Caixao com detalhes em ouro"
+             
 
              ],              
         },
