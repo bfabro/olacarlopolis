@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "seiza","assadaodorussao", "pimentadoce", "limone","pesqueirodogalego"
+  "feiradalua", "seiza","assadaodorussao", "pimentadoce", "limone","pesqueirodogalego"
   
 ]; 
 
@@ -373,14 +373,7 @@ function montarCarrosselDivulgacao() {
   
   
   
-
-  
 }
-
-//document.addEventListener("DOMContentLoaded", montarCarrosselDivulgacao);
-
-
-
 
 
     // pagou? defina por s pago n nao pago // PAGx
@@ -402,13 +395,10 @@ function montarCarrosselDivulgacao() {
       assao:"s",
   
       //ADVOCACIA  
-      advocaciaabilio: "s",      
-      
+      advocaciaabilio: "s",
   
       // Agropecuaria
-      agrovida: "s",
-      armazemrei:"s",
-
+      agrovida: "s",     
 
       // assessocia balistica
       betogunsassessoriaarmaria:"s",
@@ -466,6 +456,7 @@ clinicaveterinariacarlopolis:"s",
 
       //funeraria
       cristorei:"s",
+      
 
       // grafica
      
@@ -496,7 +487,7 @@ clinicaveterinariacarlopolis:"s",
       pimentadoce: "s",
   
       //lanchonete
-      ocasarao: "s", // Casarao pagou      
+      ocasarao: "s",       
       ione:"s",
       cantinhodapraca:"s",
       caldodecanaamaral:"s",
@@ -507,13 +498,12 @@ clinicaveterinariacarlopolis:"s",
       mycoffee:"s",
   
       //supermercado
-      bompreco:"s",
-      mercadorocha: "s", // Mercado Rocha pagou
-      carreiro: "s", // Carreiro pagou
+      bompreco:"s",      
+      carreiro: "s", 
       comprebemmais:"s",
-      obarateiro: "s", // O Barateiro pagou
-      kelve: "s", // Kelve não pagou
-      rocha: "s", // Rocha pagou
+      obarateiro: "s", 
+      kelve: "s", 
+      rocha: "s", 
       zerojapan:"s",
   
       // pesqueiro
@@ -531,7 +521,7 @@ clinicaveterinariacarlopolis:"s",
       portal:"s",
       neia:"s",
       oficinadosabor:"s",
-      paiol: "s", // Paiol pagou
+      paiol: "s", 
       restaurantedadi:"s",
       sabordaroca:"s",
       selahtgrill:"s",
@@ -560,9 +550,7 @@ clinicaveterinariacarlopolis:"s",
       foguinho:"s",
   
       // churrasqueiro
-      flaviogiovani:"s",      
-      
-
+      flaviogiovani:"s", 
   
       //diarista
       rose: "s",
@@ -571,15 +559,11 @@ clinicaveterinariacarlopolis:"s",
       anselmofrete:"s",
       erickson:"s",
   
-      // pedreiro
-      deniscenturion: "s",
-  
       // guia de pesca
       fabiosushimoto: "s",
 
       // montador de moveis
-      hirancastro:"s",
-      
+      hirancastro:"s",      
   
       // taxista
       douglasdotaxi: "s",
@@ -589,22 +573,19 @@ clinicaveterinariacarlopolis:"s",
       celsogolcalves:"s",
       jurandirmachado:"s",
   
-      //// FIM SERVIÇOS
-  
-      //// INICIO INFORMAÇOES UTEIS
       
   
     
-  funerariacristorei:"s",
+      
+  
+    
+    
   
 
 
       // FIMMMM SERVIÇOSSSSSS
 
 /// INICIO SETOR PUBLICO
-
-
-
       agendamento:"s",
       asilo:"s",
       agenciatrabalhador:"s",
@@ -617,47 +598,52 @@ clinicaveterinariacarlopolis:"s",
       marinhafogacadeoliveiracmei:"s",
       
       delegacia: "s",
-      // escolas
 
+      // escolas
       beneditorodriguesdecamargo:"s",
       cmeiraymundasantanasalles:"s",
       carolinalupion:"s",
       escolamunicipaljosesalles:"s",     
       herciliadepaulaesilva:"s",
+
       //posto de saude
       ubseugenionevessoares:"s",
       centrodesaudedrjose:"s",
-     
-      
-    
       
       hospitalsaojose: "s",
       prefeitura: "s",
       duvidasereclamacoes: "s",
       sanepar: "s",
-      samuzinho:"s",
-      
+      samuzinho:"s",      
       rodoviaria:"s",
       secretariadasaude:"s",
-      sindicatorural:"s",
-      
+      sindicatorural:"s",      
       vigilanciasanitaria:"s",
+
+
 /// FIM SETOR PUBLICO
 
-      //// INICIO INFORMAÇOES UTEIS
-  //Eventos
+// INFORMAÇOES
+
+// INICIO NOTA DE FALECIMENTO
+funerariacristorei:"s",
+
+// FIM NOTA DE FALECIMENTO
+
+     
+  // INICIO EVENTOS 
+  feiradalua: "s",
   calendarioeventos: "s",
   etapalestevelocross:"s",
- frutfest:"s",
- cresolrun:"s",
-  
-  lowcity:"s",
-  feiradalua: "s",
- 
+  frutfest:"s",
+  cresolrun:"s",
+  festadosenhorbomjesus:"s", 
+  lowcity:"s",  
+  toroonagashi:"s",
 
  
 
-      ///
+      /// FIM EVENTOS 
 
       
     };
@@ -1477,8 +1463,15 @@ menuLinks.forEach((link) => {
                           "images/comercios/feiraLua/divulgacao/3.png",
                           "images/comercios/feiraLua/divulgacao/4.png",
                           "images/comercios/feiraLua/divulgacao/5.png",
-                          "images/comercios/feiraLua/divulgacao/6.png"
-                      ],                
+                          "images/comercios/feiraLua/divulgacao/6.png",
+                          "images/comercios/feiraLua/divulgacao/7.png",
+                      ],     
+                      
+                      novidadesDescriptions: [ 
+"Dionival Rosa - Jeitão AgroBoy 23/05",
+
+
+                      ],
                     },
                 ],
             },
@@ -3330,6 +3323,32 @@ menuLinks.forEach((link) => {
               
              
           },
+
+
+
+
+             {
+                  image: "images/informacoes/eventos/festaJuninaApae.png",
+                  name: "Festa Junina APAE",
+                  date: "07/06/25 Abertura da Festa<br> 08/07/2025 Leilão as 14hrs",
+                  address: "R. Jorge Barros, 1777 - Carlópolis",
+                  contact: "(43) 99833-9638",
+                  instagram:"https://www.instagram.com/apaeclps/",
+                  facebook:"https://www.facebook.com/p/APAE-Carl%C3%B3polis-100067016812454/?locale=pt_BR&_rdr",
+                
+                    
+              },
+
+
+
+
+
+
+
+
+
+
+
          {
                   image: "images/informacoes/eventos/cresolRun.png",
                   name: "Cresol Run",
@@ -3346,6 +3365,17 @@ menuLinks.forEach((link) => {
                 ], novidadesDescriptions:[ 
                  "INSCRIÇÕES ABERTAS GARANTA JÁ SUA VAGA!",
                  ],
+              },
+
+                {
+                  image: "images/informacoes/eventos/senhorbomjesus.png",
+                  name: "Festa Do Senhor Bom Jesus",
+                  date: "28/07/25 Programação Religiosa<br> 01/08/2025 Programação Social",
+                  address: "Em Frente a Igreja Matriz",
+                  contact: "(43) 99833-9638",
+                  instagram:"https://www.instagram.com/paroquiacarlopolis/",
+                
+                    
               },
                   
 
@@ -3370,6 +3400,19 @@ menuLinks.forEach((link) => {
                
                
             },
+
+
+                {
+                  image: "images/informacoes/eventos/toroonagashi.png",
+                  name: "Toroonagashi",
+                  date: "25/10/2025",
+                  address: "Ponte interstadual Benedito Garcia Ribeiro (Carlopolis x Fartura)",
+                  contact: "-",
+               
+                
+                    
+              },
+
 
              
           ],
