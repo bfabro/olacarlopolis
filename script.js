@@ -586,7 +586,8 @@ clinicaveterinariacarlopolis:"s",
       // FIMMMM SERVIÇOSSSSSS
 
 /// INICIO SETOR PUBLICO
-      agendamento:"s",
+      agendamentosaude:"s",
+      agendamentodeviagens:"s",
       asilo:"s",
       agenciatrabalhador:"s",
       copel: "s",
@@ -3659,7 +3660,7 @@ menuLinks.forEach((link) => {
     establishments: [
         {
          
-            name: "Agendamento",
+            name: "Agendamento Saude",
             hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
             address: "-",
             contact: "(43) 99825-0996",
