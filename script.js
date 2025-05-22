@@ -3666,6 +3666,16 @@ menuLinks.forEach((link) => {
             contact2: "(43) 98872-8504",
             
         },
+
+         {
+         
+            name: "Agendamento De Viagens",
+            hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
+            address: "-",
+            contact: "(43) 99825-1005",
+            
+            
+        },
     ],
  },
 
@@ -3965,7 +3975,8 @@ menuLinks.forEach((link) => {
                     name: "Sanepar",
                     hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
                     address: "R. André Jorge Cleli, 148 ",
-                    contact: "0800 200 0115",
+                    contact: "(41) 9544-0115",
+                    contact2: "0800 200 0115",
                     
                 },
             ],
@@ -4902,7 +4913,7 @@ menuLinks.forEach((link) => {
   link: document.querySelector("#menuNotaFalecimento"),
   title: "Nota de Falecimento",
   establishments: [
-
+// 20/05
     {
       name: "Funeraria Cristo Rei",    
       image: "images/informacoes/notaFalecimento/cristoRei/4.png",
