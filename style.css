@@ -1791,10 +1791,13 @@ img {
 
 
 
-.share-btn:hover {
-  color: #0056b3;
+.share-btn i {
+  color: #444;
 }
 
+.share-btn:hover i {
+  color: #007bff;
+}
 .toast-compartilhar {
   position: fixed;
   bottom: 40px;
