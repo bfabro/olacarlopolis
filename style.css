@@ -1785,15 +1785,13 @@ img {
   padding: 4px;
     font-size: 16px;
   color: #4070f4;
-   margin-left: 6px;
+   margin-left: 5px;
   vertical-align: middle;
 }
 
 
 
-.share-btn i {
-  color: #444;
-}
+
 
 .share-btn:hover i {
   color: #007bff;
