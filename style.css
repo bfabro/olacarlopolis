@@ -365,14 +365,10 @@ body.dark {
 }
 
 .content_area ul li {
-  white-space: nowrap;
-  /* Impede a quebra de linha */
-  overflow: hidden;
-  /* Garante que o texto longo não transborde */
-  text-overflow: ellipsis;
-  /* Adiciona '...' quando o texto for muito longo */
+ white-space: normal; /* permite quebras de linha */
+  overflow: visible;   /* mostra o conteúdo completo */
+  text-overflow: unset; /* desativa reticências */
   margin-bottom: 10px;
-  /* Espaço entre os itens */
 }
 
 .content_area ul li b {
@@ -444,6 +440,16 @@ body.dark {
   padding-bottom: 3px;
   display: inline-block;
   margin:3px;
+}
+
+@media screen and (max-width: 768px) {
+  .locais_nomes {
+    font-size: 1rem;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    display: block;
+  }
 }
 
 /* Aumenta o tamanho da fonte do horário de plantão */
