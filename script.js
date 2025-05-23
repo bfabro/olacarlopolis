@@ -574,13 +574,6 @@ clinicaveterinariacarlopolis:"s",
       jurandirmachado:"s",
   
       
-  
-    
-      
-  
-    
-    
-  
 
 
       // FIMMMM SERVIÇOSSSSSS
@@ -3661,7 +3654,7 @@ menuLinks.forEach((link) => {
         {
          
             name: "Agendamento Saude",
-            hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
+            hours: "Seg a Sex: 8:30h as 12h - 13:30 as 17:00h",
             address: "-",
             contact: "(43) 99825-0996",
             contact2: "(43) 98872-8504",
@@ -5165,7 +5158,6 @@ function restaurarMenuOriginal() {
         establishment.image
           ? `
            <img  id="imagem-${normalizeName(establishment.name)}" src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}">
-
 
           `
           : ""
