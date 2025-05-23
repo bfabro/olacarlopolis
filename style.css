@@ -1782,11 +1782,17 @@ img {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 6px;
-  font-size: 18px;
+  padding: 4px;
+    font-size: 16px;
   color: #4070f4;
-  margin-left: 5px;
+   margin-left: 6px;
   vertical-align: middle;
+}
+
+@media screen and (max-width: 768px) {
+  .share-btn {
+    display: none;
+  }
 }
 
 .share-btn:hover {
