@@ -574,6 +574,13 @@ clinicaveterinariacarlopolis:"s",
       jurandirmachado:"s",
   
       
+  
+    
+      
+  
+    
+    
+  
 
 
       // FIMMMM SERVIÇOSSSSSS
@@ -3654,7 +3661,7 @@ menuLinks.forEach((link) => {
         {
          
             name: "Agendamento Saude",
-            hours: "Seg a Sex: 08:30h as 12:00h - 13:30h as 17:00h",
+            hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
             address: "-",
             contact: "(43) 99825-0996",
             contact2: "(43) 98872-8504",
@@ -3664,7 +3671,7 @@ menuLinks.forEach((link) => {
          {
          
             name: "Agendamento De Viagens",
-            hours: "Seg a Sex: 08:30h as 12:00h - 13:30h as 17:00h",
+            hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
             address: "-",
             contact: "(43) 99825-1005",
             
@@ -3682,7 +3689,7 @@ menuLinks.forEach((link) => {
         {
             image: "images/setorPublico/asilo/asilo.png",
             name: "Asilo",
-            hours: "Seg a Sex: 09:00h as 12:00h",
+            hours: "Seg a Sex: 9h - 12h",
             address: "Rua Andrino Soares, 26",
             contact: "(43) 3566-1196",
         },
@@ -3696,7 +3703,7 @@ menuLinks.forEach((link) => {
         {
             image: "images/setorPublico/agenciaTrabalhador/AgenciaTrabalhador.png",
             name: "Agencia Trabalhador",
-            hours: "Seg a Sex: 09:00h as 15:00h",
+            hours: "Seg a Sex: 9h - 15h",
             address: "Rua Padre Hugo, 1025",
             contact: "(43) 3566-1291",
         },
