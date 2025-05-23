@@ -1789,11 +1789,7 @@ img {
   vertical-align: middle;
 }
 
-@media screen and (max-width: 768px) {
-  .share-btn {
-    display: none;
-  }
-}
+
 
 .share-btn:hover {
   color: #0056b3;
