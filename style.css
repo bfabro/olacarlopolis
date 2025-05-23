@@ -438,19 +438,12 @@ body.dark {
   text-transform: uppercase;
   letter-spacing: 1px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-
+  /* Adiciona um leve sombreamento */
+  border-bottom: 3px solid #FF8C00;
   /* Linha laranja embaixo para um detalhe extra */
   padding-bottom: 3px;
   display: inline-block;
   margin:3px;
-}
-
-.site-logo {
-  text-decoration: none;
-}
-
-.content_area .locais_nomes {
-  border-bottom: 3px solid #FF8C00;
 }
 
 /* Aumenta o tamanho da fonte do horário de plantão */
