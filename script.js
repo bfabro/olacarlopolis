@@ -574,13 +574,19 @@ clinicaveterinariacarlopolis:"s",
       jurandirmachado:"s",
   
       
+  
+    
+      
+  
+    
+    
+  
 
 
       // FIMMMM SERVIÇOSSSSSS
 
 /// INICIO SETOR PUBLICO
-      agendamentosaude:"s",
-      agendamentodeviagens:"s",
+      agendamento:"s",
       asilo:"s",
       agenciatrabalhador:"s",
       copel: "s",
@@ -3653,8 +3659,8 @@ menuLinks.forEach((link) => {
     establishments: [
         {
          
-            name: "Agendamento Saude",
-            hours: "Seg a Sex: 8:30h as 12h - 13:30 as 17:00h",
+            name: "Agendamento",
+            hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
             address: "-",
             contact: "(43) 99825-0996",
             contact2: "(43) 98872-8504",
@@ -5159,10 +5165,11 @@ function restaurarMenuOriginal() {
           ? `
            <img  id="imagem-${normalizeName(establishment.name)}" src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}">
 
+
           `
           : ""
       }
- 
+  
      
      <strong class="locais_nomes">${establishment.name}</strong>
  <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
@@ -5458,7 +5465,7 @@ setTimeout(() => {
 }, 300);
 
 
- console.log(establishment)
+
 
 
                     function criarInfoCards(establishment) {
