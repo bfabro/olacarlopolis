@@ -5162,7 +5162,7 @@ function restaurarMenuOriginal() {
           `
           : ""
       }
-  
+ 
      
      <strong class="locais_nomes">${establishment.name}</strong>
  <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
@@ -5458,7 +5458,7 @@ setTimeout(() => {
 }, 300);
 
 
-
+ console.log(establishment)
 
 
                     function criarInfoCards(establishment) {
