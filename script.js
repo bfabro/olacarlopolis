@@ -12,7 +12,7 @@ function compartilharEstabelecimento(id) {
   if (navigator.share) {
     navigator.share({
       title: "Olá Carlópolis",
-      text: "Veja este comércio que encontrei no site!",
+      text: "Segue o Link!",
       url: url
     }).catch((err) => {
       console.warn("Compartilhamento cancelado ou falhou:", err);
