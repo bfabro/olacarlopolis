@@ -1778,24 +1778,15 @@ img {
 
 
 
-.share-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-    font-size: 16px;
-  color: #4070f4;
-   margin-left: 10px;
-  vertical-align: middle;
-}
 
 
 
 
 
-.share-btn:hover i {
-  color: #007bff;
-}
+
+
+
+
 .toast-compartilhar {
   position: fixed;
   bottom: 40px;
@@ -1948,6 +1939,7 @@ img {
   font-weight: bold;
   cursor: pointer;
 }
+
 
 
 .ios-modal {

@@ -362,14 +362,6 @@ function montarCarrosselDivulgacao() {
   });
   
   
-  setTimeout(() => {
-    document.querySelectorAll(".share-btn").forEach((botao) => {
-      botao.addEventListener("click", () => {
-        const id = botao.getAttribute("data-share-id");
-        if (id) compartilharEstabelecimento(id);
-      });
-    });
-  }, 300);
   
   
   
@@ -633,7 +625,7 @@ funerariacristorei:"s",
   frutfest:"s",
   cresolrun:"s",
   festadosenhorbomjesus:"s", 
-  campeonatopescaesportiva:"s",
+  campeonatoparanafishing:"s",
   lowcity:"s",  
   toroonagashi:"s",
   passeiociclisticorotary:"s",
@@ -3341,7 +3333,7 @@ menuLinks.forEach((link) => {
 
               {
                   image: "images/informacoes/eventos/paranaFishing1.png",
-                  name: "Campeonato Pesca Esportiva",
+                  name: "Campeonato Parana Fishing",
                   date: "Inscrições até 05/06/2025<br> Campeonato: 07/06/25 ",
                   address: "Represa de Chavantes",
                   contact: "(43) 99980-0495",
@@ -5166,9 +5158,7 @@ function restaurarMenuOriginal() {
   
      
      <strong class="locais_nomes">${establishment.name}</strong>
- <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
-    <i class="fas fa-share-alt"> </i>
-  </button>
+
 
 
 <br>
@@ -5366,8 +5356,8 @@ function restaurarMenuOriginal() {
 
                   ${(establishment.instagram || establishment.facebook || establishment.site) ? `
                     <div class="info-box">
-                    
-                      <i class="fas fa-share-alt info-icon"></i>
+                
+                    <a href="${normalizeName(establishment.name)}" target="_blank"><i class="fas fa-share-alt info-icon" style="color:rgb(238, 38, 171); font-size: 24px;"></i> </a>
                       <div>
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
