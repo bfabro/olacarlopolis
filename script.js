@@ -5356,8 +5356,10 @@ function restaurarMenuOriginal() {
 
                   ${(establishment.instagram || establishment.facebook || establishment.site) ? `
                     <div class="info-box">
-                
-                    <a href="${normalizeName(establishment.name)}" target="_blank"><i class="fas fa-share-alt info-icon" style="color:rgb(238, 38, 171); font-size: 24px;"></i> </a>
+                     <button data-share-id="${normalizeName(establishment.name)}">
+    <i style="color:rgb(250, 45, 205); font-size: 24px;" class="fas fa-share-alt info-icon"> </i>
+  </button>
+                    
                       <div>
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
