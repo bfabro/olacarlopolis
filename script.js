@@ -911,7 +911,7 @@ menuLinks.forEach((link) => {
                         
                 name: "Lobo Fitness",
                 hours: "Seg a Qui: 06:00h as 13:00h - 15:00h as 21:00h <br> Sex: 06:00h as 13:00h - 15:00h as 20:30h<br> Sab: 15:00h as 18:00h <br>Dom: Fechado ",
-                statusAberto:".",
+                statusAberto:" ",
                 horarios: {
                   dom: [], // fechado
                   seg: [{ inicio: "06:00", fim: "13:00" },{ inicio: "15:00", fim: "21:00" }],
@@ -5165,10 +5165,10 @@ function restaurarMenuOriginal() {
       }
   
      
-     <strong class="locais_nomes">${establishment.name}</strong>
- <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
-    <i class="fas fa-share-alt"> </i>
-  </button>
+      <strong class="locais_nomes">${establishment.name}</strong>
+        <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
+          <i class="fas fa-share-alt info-icon"></i>
+        </button>
 
 
 <br>

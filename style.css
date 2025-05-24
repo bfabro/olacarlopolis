@@ -380,6 +380,11 @@ body.dark {
 
 }
 
+.content_area ul {
+  list-style: none;
+  padding-left: 0;
+}
+
 .highlighted {
   font-size: 1.3em;
   font-weight: bold;
@@ -755,6 +760,14 @@ body.dark {
 
 #clearSearch:hover {
   color: var(--blue-color); /* Muda a cor ao passar o mouse */
+}
+
+
+
+@media screen and (max-width: 768px) {
+  #clearSearch {
+    display: none !important;
+  }
 }
 
 /* Ajuste específico para telas maiores (computador) */
