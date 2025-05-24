@@ -362,6 +362,14 @@ function montarCarrosselDivulgacao() {
   });
   
   
+  setTimeout(() => {
+    document.querySelectorAll(".share-btn").forEach((botao) => {
+      botao.addEventListener("click", () => {
+        const id = botao.getAttribute("data-share-id");
+        if (id) compartilharEstabelecimento(id);
+      });
+    });
+  }, 300);
   
   
   
@@ -5158,7 +5166,9 @@ function restaurarMenuOriginal() {
   
      
      <strong class="locais_nomes">${establishment.name}</strong>
-
+ <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
+    <i class="fas fa-share-alt"> </i>
+  </button>
 
 
 <br>
@@ -5356,10 +5366,8 @@ function restaurarMenuOriginal() {
 
                   ${(establishment.instagram || establishment.facebook || establishment.site) ? `
                     <div class="info-box">
-                     <button data-share-id="${normalizeName(establishment.name)}">
-    <i style="color:rgb(250, 45, 205); font-size: 24px;" class="fas fa-share-alt info-icon"> </i>
-  </button>
                     
+                      <i class="fas fa-share-alt info-icon"></i>
                       <div>
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
