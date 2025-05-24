@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "feiradalua", "seiza","foguinho", "pimentadoce", "limone","pesqueirodogalego"
+  "feiradalua", "seiza","foguinho", "esquinadopao", "limone","pesqueirodogalego"
   
 ]; 
 
@@ -476,6 +476,7 @@ clinicaveterinariacarlopolis:"s",
 
       // padaria
       bomjesus:"s",
+      esquinadopao:"s",
       saofrancisco:"s",
       prelie:"s",      
   
@@ -2339,6 +2340,47 @@ menuLinks.forEach((link) => {
                      
                      ],  
                 },
+
+
+{
+                  image: "images/comercios/padaria/esquinadopao/perfil.png",
+                  name: "Esquina do Pão",
+                  hours: "Seg a Sab: 06:00h as 19:00h </br> Dom: 06:00h as 12:00h",
+                  statusAberto:".",
+                  horarios: {                          
+                    seg: [{ inicio: "06:00", fim: "19:00" }],
+                    ter: [{ inicio: "06:00", fim: "19:00" }],
+                    qua: [{ inicio: "06:00", fim: "19:00" }],
+                    qui: [{ inicio: "06:00", fim: "19:00" }],
+                    sex: [{ inicio: "06:00", fim: "19:00" }],
+                    sab: [{ inicio: "06:00", fim: "19:00" }],
+                    dom: [{ inicio: "06:00", fim: "12:00" }],
+                  }, 
+                  address: "R. Ipê Roxo, 209 - Carlópolis",
+                  contact: "(43) 99808-0362",
+                  delivery: "Não",                  
+                  instagram: "https://www.instagram.com/esquinadopaoclps/",
+                  novidadesImages: [                   
+                      "images/comercios/padaria/esquinadopao/divulgacao/1.png",
+                      "images/comercios/padaria/esquinadopao/divulgacao/2.png",
+                      "images/comercios/padaria/esquinadopao/divulgacao/3.png",
+                      "images/comercios/padaria/esquinadopao/divulgacao/4.png",
+                      "images/comercios/padaria/esquinadopao/divulgacao/5.png",
+                     
+                     
+                  ],
+                  novidadesDescriptions: [
+
+"Precisando de um bolo de última hora? Não se preocupe! Temos opções prontinhas para você: Leite Ninho, Brigadeiro e Dois Amores",
+"Nosso rocambole fresquinho, com recheio de leite ninho ou doce de leite, é a escolha perfeita para adoçar o dia com muito sabor e carinho!",
+"emos pizza pré-assada 🍕🍕",
+"Surpreenda sua família com o nosso pudim de leite condensado no almoço de domingo. É sucesso garantido! 🧡",
+"Experimente esse delicioso lanche de forno, perfeito para qualquer momento do dia.",
+
+                  ],
+              },
+
+
 
                 {
                   image: "images/comercios/padaria/prelie/prelie.png",
