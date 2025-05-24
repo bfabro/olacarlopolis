@@ -462,6 +462,9 @@ clinicaveterinariacarlopolis:"s",
      
       serigrafgraficaeserigrafia:"s",
 
+      //loja de pesca
+      pescaepresente:"s",
+
       // mercearia
       seiza:"s",
 
@@ -4235,6 +4238,71 @@ menuLinks.forEach((link) => {
                 },
             ],
         },
+
+
+
+
+{
+            link: document.querySelector("#menuLojaPesca"),  
+            title: "Loja de Pesca",
+            establishments: [
+                {
+                  image: "images/comercios/lojadepesca/pescaepresente/perfil.png",
+                    name: "Pesca e Presente",
+                    hours: "Seg a Sexta: 08:00h as 18:00h<Br>Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: [],
+                    },
+                    address: "Rua Benedito Salles, 854 - Carlópolis",
+                    contact: "(43) 99921-9959",                    
+                    instagram:"https://www.instagram.com/pescaepresentes/",
+                    
+                    novidadesImages: [
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/1.png",
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/2.png",
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/3.png",
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/4.png",
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/5.png",
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/6.png",
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/7.png",
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/8.png",
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/9.png",
+                        "images/comercios/lojadepesca/pescaepresente/divulgacao/10.png",
+                    ],
+                    novidadesDescriptions: [ 
+                      
+                      "Variedade em Iscas",
+                      "Variedade em Linhas",
+                      "Variedade em Chumbos",
+                      "Variedade em Molinetes e Carretilhas",
+                      "Variedade em Facas",
+                      "Variedade em Varas",
+                      "Variedade em Coletes",
+                      "Loja Ampla com Presentes",
+                      "Variedades em Camisas para Pescas",
+                      "Variedade em Oculos UV",
+
+                    
+                    ],
+                },
+            ],
+        },
+
+
+
+
+
+
+
+
+
   
         {
             link: document.querySelector("#menuDiskGas"),    
