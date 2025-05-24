@@ -568,6 +568,8 @@ clinicaveterinariacarlopolis:"s",
   
       // taxista
       douglasdotaxi: "s",
+        lucianodotaxi: "s",
+          rogerdotaxi: "s",
 
       // VETERINARIO
 
@@ -4922,6 +4924,20 @@ menuLinks.forEach((link) => {
                     hours: "Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
                     address: "Em Frente ao banco Itau",
                     contact: "(43) 88807-8515",
+                },
+
+                  {
+                    name: "Luciano do Taxi",
+                    hours: "Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
+                    address: "Em Frente ao banco Itau",
+                    contact: "(43) 99631-5034",
+                },
+
+                {
+                    name: "Roger do Taxi",
+                    hours: "Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
+                    address: "Em Frente ao banco Itau",
+                    contact: "(43) 99175-8283",
                 },
             ],
         },
