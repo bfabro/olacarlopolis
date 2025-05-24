@@ -2705,8 +2705,8 @@ menuLinks.forEach((link) => {
                       "images/comercios/farmacia/descontoFacil/divulgacao/5.png",
                     ], 
                     novidadesDescriptions: [                            
-                      "Analgésico de alívio eficaz para dores intensas",
-                      "Cólicas do trato gastrintestinal",
+                      "Carmed",
+                      "Proteja e cuide da sua pele!",
                       "Analgésico (para dor) antitérmico (para febre)",
                       "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
                       "Redução da febre e para o alívio de dores",
@@ -2752,8 +2752,10 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/farmacia/elShaday/elshaday.png",
                     name: "El Shaday",
-                    address: "R. Benedito Sales, 353",
+                    address: "R. Benedito Sales, 353 - Carlopolis",
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                         plantaoHorario: "08:00h às 21:00h", 
+              plantaoData:"Sab 24/05 a Sex 30/05", 
                     statusAberto:".",
                     horarios: {                          
                       seg: [{ inicio: "08:00", fim: "18:00" }],
@@ -2825,18 +2827,17 @@ menuLinks.forEach((link) => {
                     image: "images/comercios/farmacia/farmais/farmais.png",
                     name: "FarMais",
                     address: "R. Benedito Salles, 979 - Carlopolis",
-                    plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"Sab 17/05 a Sex 23/05", 
+                     
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     statusAberto:".",
                   horarios: {                          
-                seg: [{ inicio: "08:00", fim: "21:00" }],
-                ter: [{ inicio: "08:00", fim: "21:00" }],
-                qua: [{ inicio: "08:00", fim: "21:00" }],
-                qui: [{ inicio: "08:00", fim: "21:00" }],
-                sex: [{ inicio: "08:00", fim: "21:00" }],
-                sab: [{ inicio: "08:00", fim: "21:00" }],
-                dom: [{ inicio: "08:00", fim: "21:00" }]
+                seg: [{ inicio: "08:00", fim: "18:00" }],
+                ter: [{ inicio: "08:00", fim: "18:00" }],
+                qua: [{ inicio: "08:00", fim: "18:00" }],
+                qui: [{ inicio: "08:00", fim: "18:00" }],
+                sex: [{ inicio: "08:00", fim: "18:00" }],
+                sab: [{ inicio: "08:00", fim: "18:00" }],
+                dom: []
               },  
                     contact: "(43) 3566-1211",
                     delivery: "Sim / Sem Taxa",
@@ -2851,8 +2852,8 @@ menuLinks.forEach((link) => {
                       "images/comercios/farmacia/farmais/divulgacao/5.png",
                     ], 
                     novidadesDescriptions: [                            
-                      "Analgésico de alívio eficaz para dores intensas",
-                      "Cólicas do trato gastrintestinal",
+                      "ome no horário certo – Respeite os intervalos indicados.",
+                      "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
                       "Analgésico (para dor) antitérmico (para febre)",
                       "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
                       "Redução da febre e para o alívio de dores",
@@ -2862,9 +2863,8 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/farmacia/masterFarma/masterfarma.png",
                     name: "Master Farma",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
-                   
+                    address: "R. Laurindo Franco de Godoi, 90 - Carlopolis",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",                   
                     statusAberto:".",
                     horarios: {                          
                       seg: [{ inicio: "08:00", fim: "18:00" }],
@@ -2889,11 +2889,11 @@ menuLinks.forEach((link) => {
                       "images/comercios/farmacia/masterFarma/divulgacao/5.png",
                     ], 
                     novidadesDescriptions: [                            
-                      "Estamos de Plantão!",
-                      "Cólicas do trato gastrintestinal",
-                      "Analgésico (para dor) antitérmico (para febre)",
-                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                      "Redução da febre e para o alívio de dores",
+                      "Pensado para atender às necessidades do organismo feminino, MASTERFORCE Pró Mulher auxilia na sua saúde e bem-estar diário! ",
+                      "Coração saudável e mente afiada! 🧠Conheça os benefícios do Ômega 3 para o seu bem-estar diário.",
+                      "Para os pequenos explorarem o mundo com mais disposição! 🌟 Cuidar da imunidade é um ato de amor.",
+                       "MELATONINA LÍQUIDA Dormir bem faz toda a diferença para a sua saúde! 😴 A melatonina ajuda a regular o sono de forma natural, promovendo noites mais tranquilas",
+                        "Com o Cartão Crediário da Master Farma, você parcela suas compras e cuida da sua saúde sem pesar no bolso!",
                     ],
                 },
                 
@@ -2930,8 +2930,8 @@ menuLinks.forEach((link) => {
                                     
                     ],
                     novidadesDescriptions: [                            
-                      "Analgésico de alívio eficaz para dores intensas",
-                      "Cólicas do trato gastrintestinal",
+                      "A diversão agora também está na hora de escovar os dentes<br>O Gel Dental CARMED Fini chegou para deixar a escovação da meninada muito mais gostosa e divertida!",
+                      "Diga adeus aos insetos com proteção de verdade",
                       "Analgésico (para dor) antitérmico (para febre)",
                       "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
                       "Redução da febre e para o alívio de dores",
@@ -3639,7 +3639,7 @@ menuLinks.forEach((link) => {
 
 */
 
-
+/*
           {
                     image: "images/comercios/farmacia/farmais/farmais.png",
                     name: "FarMais",
@@ -3677,16 +3677,47 @@ menuLinks.forEach((link) => {
                       "Redução da febre e para o alívio de dores",
                     ],
                 },
+*/
 
 
-
-
-
-
-
-
-
-
+{
+                    image: "images/comercios/farmacia/elShaday/elshaday.png",
+                    name: "El Shaday",
+                    address: "Rua Benedito Sales, 353 - Carlopolis",
+                    plantaoHorario: "08:00h às 21:00h", 
+              plantaoData:"Sab 24/05 a Sex 30/05", 
+              statusAberto:".",
+              horarios: {                          
+                seg: [{ inicio: "08:00", fim: "21:00" }],
+                ter: [{ inicio: "08:00", fim: "21:00" }],
+                qua: [{ inicio: "08:00", fim: "21:00" }],
+                qui: [{ inicio: "08:00", fim: "21:00" }],
+                sex: [{ inicio: "08:00", fim: "21:00" }],
+                sab: [{ inicio: "08:00", fim: "21:00" }],
+                dom: [{ inicio: "08:00", fim: "21:00" }]
+              },  
+                     
+                    contact: "(43) 98488-9420",
+                    contact2: "(43) 3566-2789",
+                    delivery: "Sim / Sem Taxa",
+                    facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/farmaciaels/",
+                    
+                   novidadesImages: [               
+                      "images/comercios/farmacia/elShaday/divulgacao/1.png",
+                      "images/comercios/farmacia/elShaday/divulgacao/2.png",
+                      "images/comercios/farmacia/elShaday/divulgacao/3.png",
+                      "images/comercios/farmacia/elShaday/divulgacao/4.png",
+                      "images/comercios/farmacia/elShaday/divulgacao/5.png",
+                    ], 
+                    novidadesDescriptions: [                            
+                      "Analgésico de alívio eficaz para dores intensas",
+                      "Cólicas do trato gastrintestinal",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
+                },
 
             ],
         
