@@ -795,8 +795,8 @@ body.dark {
 /*/////////////////////////////////////*/
 .social-icons {
   display: flex;
-  gap: 15px; /* Espaçamento entre os ícones */
-  margin-top: 10px;
+  gap: 14px; /* Espaçamento entre os ícones */
+  
   flex-wrap: nowrap; /* Impede que os ícones quebrem para a próxima linha */
   overflow-x: auto; /* Adiciona scroll horizontal se necessário */
 }
@@ -1975,9 +1975,11 @@ img {
 
 
 
-
-
-
-
-
-
+a,
+a:visited,
+a:hover,
+a:active,
+a:focus {
+  
+  text-decoration: none !important;
+}
