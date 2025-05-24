@@ -966,7 +966,7 @@ menuLinks.forEach((link) => {
                             },
                             address: "Rua Benedito Salles, 409",
                             contact: "(43) 99176-7871",
-                            contact2:" 43 98868-7038",
+                            contact2:" (43) 98868-7038",
                             delivery: "Sim / Com Taxa",
                             instagram: "https://www.instagram.com/turminha_do_acai/",
                             
