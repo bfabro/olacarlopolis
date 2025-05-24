@@ -2778,12 +2778,12 @@ menuLinks.forEach((link) => {
                       "images/comercios/farmacia/elShaday/divulgacao/4.png",
                       "images/comercios/farmacia/elShaday/divulgacao/5.png",
                     ], 
-                    novidadesDescriptions: [                            
-                      "Analgésico de alívio eficaz para dores intensas",
-                      "Cólicas do trato gastrintestinal",
-                      "Analgésico (para dor) antitérmico (para febre)",
-                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                      "Redução da febre e para o alívio de dores",
+                       novidadesDescriptions: [                            
+                      "Agora ficou ainda mais fácil cuidar da sua saúde! Na Farmácia El Shaday, você encontra os medicamentos do Programa Farmácia Popular, com preços acessíveis e descontos especiais para quem precisa!",
+                      "Tosse, febre, cansaço ou dor no corpo? Pode ser COVID-19! Não fique na dúvida!<br>Na Farmácia El Shaday, você faz o teste rápido de COVID-19 e tem o resultado em poucos minutos! Rápido, seguro e confiável!",
+                      "Dengue não é brincadeira! Se você está com febre alta, dor no corpo, manchas na pele e fraqueza, faça já o teste rápido de dengue!<br>Na Farmácia El Shaday, você tem um resultado confiável em poucos minutos, sem precisar esperar para saber o diagnóstico!",
+                      "Manter os níveis de glicose sob controle é essencial para quem vive com diabetes ou busca prevenir problemas de saúde. O teste rápido de glicemia é um exame simples e eficaz, que permite acompanhar os níveis de açúcar no sangue e identificar eventuais alterações.<br>Em nossa farmácia, você pode realizar o teste de glicemia com rapidez e segurança, sempre com o acompanhamento de profissionais qualificados.",
+                      "A hipertensão, conhecida como “pressão alta”, é uma condição que pode levar a sérios problemas de saúde se não for monitorada e tratada adequadamente. Felizmente, pequenas mudanças na rotina ajudam a controlar a pressão e a proteger o coração.",
                     ],
                 },
         
@@ -3711,11 +3711,11 @@ menuLinks.forEach((link) => {
                       "images/comercios/farmacia/elShaday/divulgacao/5.png",
                     ], 
                     novidadesDescriptions: [                            
-                      "Analgésico de alívio eficaz para dores intensas",
-                      "Cólicas do trato gastrintestinal",
-                      "Analgésico (para dor) antitérmico (para febre)",
-                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                      "Redução da febre e para o alívio de dores",
+                      "Agora ficou ainda mais fácil cuidar da sua saúde! Na Farmácia El Shaday, você encontra os medicamentos do Programa Farmácia Popular, com preços acessíveis e descontos especiais para quem precisa!",
+                      "Tosse, febre, cansaço ou dor no corpo? Pode ser COVID-19! Não fique na dúvida!<br>Na Farmácia El Shaday, você faz o teste rápido de COVID-19 e tem o resultado em poucos minutos! Rápido, seguro e confiável!",
+                      "Dengue não é brincadeira! Se você está com febre alta, dor no corpo, manchas na pele e fraqueza, faça já o teste rápido de dengue!<br>Na Farmácia El Shaday, você tem um resultado confiável em poucos minutos, sem precisar esperar para saber o diagnóstico!",
+                      "Manter os níveis de glicose sob controle é essencial para quem vive com diabetes ou busca prevenir problemas de saúde. O teste rápido de glicemia é um exame simples e eficaz, que permite acompanhar os níveis de açúcar no sangue e identificar eventuais alterações.<br>Em nossa farmácia, você pode realizar o teste de glicemia com rapidez e segurança, sempre com o acompanhamento de profissionais qualificados.",
+                      "A hipertensão, conhecida como “pressão alta”, é uma condição que pode levar a sérios problemas de saúde se não for monitorada e tratada adequadamente. Felizmente, pequenas mudanças na rotina ajudam a controlar a pressão e a proteger o coração.",
                     ],
                 },
 
