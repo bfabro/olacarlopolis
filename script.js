@@ -660,6 +660,9 @@ funerariacristorei:"s",
     const overlay = document.querySelector("#overlay");
     const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
     const clearSearch = document.getElementById("clearSearch");
+
+
+    
   
     // Função para adicionar contadores de slides
 
