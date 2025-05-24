@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "feiradalua", "seiza","assadaodorussao", "pimentadoce", "limone","pesqueirodogalego"
+  "feiradalua", "seiza","foguinho", "pimentadoce", "limone","pesqueirodogalego"
   
 ]; 
 
