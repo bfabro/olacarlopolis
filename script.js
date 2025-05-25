@@ -5068,6 +5068,13 @@ menuLinks.forEach((link) => {
   title: "Nota de Falecimento",
   establishments: [
 
+
+/// 25/05
+    {
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/6.png",
+     descricaoFalecido: "Faleceu em Carlópolis aos 79 anos de idade, Sr 'JOSÉ PEREIRA VIEIRA', mais conhecido como: Zé do Margarida Lima.<br>A cerimônia iniciará nesta madrugada de Domingo às 02:00 horas no velório Municipal de Carlópolis.<br>Seu sepultamento será hoje às 17:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigo"},
+
 //24/05
 
  {
