@@ -2378,7 +2378,7 @@ menuLinks.forEach((link) => {
 
 "Precisando de um bolo de última hora? Não se preocupe! Temos opções prontinhas para você: Leite Ninho, Brigadeiro e Dois Amores",
 "Nosso rocambole fresquinho, com recheio de leite ninho ou doce de leite, é a escolha perfeita para adoçar o dia com muito sabor e carinho!",
-"emos pizza pré-assada 🍕🍕",
+"Temos pizza pré-assada 🍕🍕",
 "Surpreenda sua família com o nosso pudim de leite condensado no almoço de domingo. É sucesso garantido! 🧡",
 "Experimente esse delicioso lanche de forno, perfeito para qualquer momento do dia.",
 
@@ -3111,7 +3111,7 @@ menuLinks.forEach((link) => {
                 
                 ],
                 novidadesDescriptions: [                            
-                  "Aquela boa carteira de musico",
+                  "Aquele bom som ao vivo sempre",
                   "2",
                   "3",
                   "4",
@@ -5067,6 +5067,16 @@ menuLinks.forEach((link) => {
   link: document.querySelector("#menuNotaFalecimento"),
   title: "Nota de Falecimento",
   establishments: [
+
+//24/05
+
+ {
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/5.png",
+     descricaoFalecido: "Faleceu em Carlópolis aos 85 anos de idade, Sr 'WENCESLAU GONÇALVES DE ALMEIDA'. Mais conhecido como: Wenceslau Gino.<br>A cerimônia iniciará nesta madrugada de sábado às 02:00 horas no velório Municipal de Carlópolis.<br>Seu sepultamento será hoje às 16:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos"
+    },
+
+
 // 20/05
     {
       name: "Funeraria Cristo Rei",    
