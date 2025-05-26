@@ -454,6 +454,9 @@ clinicaveterinariacarlopolis:"s",
       //imobiliaria      
       imobiliariacarlopolis:"s",
 
+      // foodtruck
+      celeiro:"s",
+
       //funeraria
       cristorei:"s",
       
@@ -4404,7 +4407,39 @@ menuLinks.forEach((link) => {
         },
   
     
+ {
+            link: document.querySelector("#menuFoodTruck"),    
+            title: "Food Truck",
+            establishments: [
+                {
+                  image: "images/comercios/foodtruck/celeiro/perfil.png",
+                    name: "Celeiro",
+                    hours: "Sex: 19:00h as 23:00",
+                    statusAberto:".",
+                    horarios: {                    
+                      seg: [],
+                      ter: [],
+                      qua: [],
+                      qui: [],
+                      sex: [{ inicio: "019:00", fim: "23:00" }],
+                      sab: [],
+                      dom: []
+                    },
+                    address: "Feira da Lua",
+                    contact: "(43) 99965-2084",
 
+                     novidadesImages: [               
+                      "images/comercios/foodtruck/celeiro/divulgacao/1.png",
+                      "images/comercios/foodtruck/celeiro/divulgacao/2.png",                    
+                     
+                  ], 
+                  novidadesDescriptions: [                            
+                    "Eventos Publicos",
+                    "Eventos Publicos",                   
+                  ],
+                },
+            ],
+        },
 
         
 
