@@ -634,7 +634,7 @@ funerariacristorei:"s",
   // INICIO EVENTOS 
   feiradalua: "s",
   calendarioeventos: "s",
-  etapalestevelocross:"s",
+  
   festajuninaapae:"s",
   frutfest:"s",
   cresolrun:"s",
@@ -1476,7 +1476,7 @@ menuLinks.forEach((link) => {
                       ],     
                       
                       novidadesDescriptions: [ 
-"Dionival Rosa - Jeitão AgroBoy 23/05",
+"Jaqueline del Nobile- Diretamente de Fartura 30/05 a partir das 19:00hrs",
 
 
                       ],
@@ -5103,6 +5103,8 @@ menuLinks.forEach((link) => {
       image: "images/informacoes/notaFalecimento/cristoRei/1.png",
      descricaoFalecido: "Faleceu em Campo Largo aos 79 anos de idade, Sr 'NELSON DE OLIVEIRA', mais conhecido como: Nelson Marinho.<br> A cerimônia do velório iniciou às 11:30 horas no Velório Municipal.<br>Seu sepultamento será hoje às 17:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
     },
+
+    // 20/05/2025
      {
       name: "Funeraria Cristo Rei",      
       image: "images/informacoes/notaFalecimento/cristoRei/2.png",
