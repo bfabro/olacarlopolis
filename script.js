@@ -4425,17 +4425,18 @@ menuLinks.forEach((link) => {
                       sab: [],
                       dom: []
                     },
+                    infoAdicional:"Realizamos Eventos Particulares, Festas, servindo muitas variedades de espetinhos e temos tambem Chop!",
                     address: "Feira da Lua",
                     contact: "(43) 99965-2084",
 
                      novidadesImages: [               
                       "images/comercios/foodtruck/celeiro/divulgacao/1.png",
-                      "images/comercios/foodtruck/celeiro/divulgacao/2.png",                    
+                                         
                      
                   ], 
                   novidadesDescriptions: [                            
                     "Eventos Publicos",
-                    "Eventos Publicos",                   
+                    
                   ],
                 },
             ],
