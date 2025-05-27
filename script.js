@@ -459,6 +459,7 @@ clinicaveterinariacarlopolis:"s",
 
       //funeraria
       cristorei:"s",
+      grupocastilho:"s",
       
 
       // grafica
@@ -630,6 +631,7 @@ clinicaveterinariacarlopolis:"s",
 
 // INICIO NOTA DE FALECIMENTO
 funerariacristorei:"s",
+funerariagrupocastilho:"s",
 
 // FIM NOTA DE FALECIMENTO
 
@@ -1508,7 +1510,7 @@ menuLinks.forEach((link) => {
               sab: [{ inicio: "08:00", fim: "18:00" }],
               dom: [],
             }, 
-            address: "Av Benedito Salles N°1277, Carlópolis,",
+            address: "Av Benedito Salles N°1277, Carlópolis",
             contact: "(43) 99637-2328",           
             facebook: "https://www.facebook.com/funerariacristoreicarlopolispr/?locale=pt_BR",
             instagram: "https://www.instagram.com/funeraria_cristoreiclps/",
@@ -1526,6 +1528,44 @@ menuLinks.forEach((link) => {
 
              ],              
         },
+
+
+
+{
+            image: "images/comercios/funeraria/castilho/perfil.png",
+            name: "Grupo Castilho",
+            hours: "Seg a Sab: 08:00h as 18:00h<br> Plantão 24hrs",
+            statusAberto:".",
+            horarios: {                          
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "18:00" }],
+              dom: [],
+            }, 
+            address: "Rua Capitão Estácio, 329 - Centro, Carlópolis",
+            contact: "(43) 99668-9078", 
+            contact2: "(43) 99972-2809", 
+             contact3: "(43) 99932-1983",         
+            facebook: "https://www.facebook.com/funerariagrupocastilho/?locale=pt_BR",
+            instagram: "https://www.instagram.com/funerariagrupocastilho/",
+            novidadesImages: [
+         
+             "images/comercios/funeraria/castilho/divulgacao/1.png",
+             
+             
+            ],     
+            novidadesDescriptions: [ 
+"A coroa de flores representa mais do que um arranjo, é um gesto de amor, respeito e despedida, uma forma delicada de expressar sentimentos eternos e honrar memórias que jamais serão esquecidas.",
+
+
+             
+
+             ],              
+        },
+
     ],
 },
 
@@ -5105,11 +5145,19 @@ menuLinks.forEach((link) => {
   establishments: [
 
 
+     {
+      name: "Funeraria Grupo Castilho",    
+      image: "images/informacoes/notaFalecimento/castilho/1.png",
+     descricaoFalecido: "Comunicamos o falecimento da Sr. ANA MARIA TELES ALVES aos 83 anos de idade.<br>‌O velório será na CAPELA MUNICIPAL DE CARLÓPOLIS - PR.<br>O sepultamento será realizado 23/05/2025 as 09:00 no CEMITÉRIO MUNICIPAL DE CARLÓPOLIS - PR."
+    },
+
+
 /// 25/05
     {
       name: "Funeraria Cristo Rei",    
       image: "images/informacoes/notaFalecimento/cristoRei/6.png",
-     descricaoFalecido: "Faleceu em Carlópolis aos 79 anos de idade, Sr 'JOSÉ PEREIRA VIEIRA', mais conhecido como: Zé do Margarida Lima.<br>A cerimônia iniciará nesta madrugada de Domingo às 02:00 horas no velório Municipal de Carlópolis.<br>Seu sepultamento será hoje às 17:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigo"},
+     descricaoFalecido: "Faleceu em Carlópolis aos 79 anos de idade, Sr 'JOSÉ PEREIRA VIEIRA', mais conhecido como: Zé do Margarida Lima.<br>A cerimônia iniciará nesta madrugada de Domingo às 02:00 horas no velório Municipal de Carlópolis.<br>Seu sepultamento será hoje às 17:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigo"
+    },
 
 //24/05
 
