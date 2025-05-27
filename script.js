@@ -4508,7 +4508,7 @@ menuLinks.forEach((link) => {
                   delivery: "Sim / Sem Taxa",            
                   instagram: "https://www.instagram.com/seizapr/",
                   novidadesImages: [                  
-                      
+                       "images/comercios/produtosOrientais/seiza/divulgacao/9.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/2.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/1.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/3.png",
@@ -4517,21 +4517,24 @@ menuLinks.forEach((link) => {
                     "images/comercios/produtosOrientais/seiza/divulgacao/6.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/7.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/8.png",
-                    "images/comercios/produtosOrientais/seiza/divulgacao/9.png",
+                   
                     
                                 
                 ],
                 novidadesDescriptions: [ 
+                   "Snacks orientais para todos os gostos! Sembeis doces e salgados, salgadinhos crocantes, lula desidratada — experimente sabores autênticos do Japão, Coreia e China!",
+                
                   "O segredo da culinária oriental começa aqui! Shoyu, óleo de gergelim, saquê mirin, molho tarê, hondashi, aji-no-moto e muito mais para deixar suas receitas com o sabor autêntico do Japão, China e Coreia!",
-                                             
                   "Na Seiza você encontra uma seleção incrível de lámens e massas orientais — coreanos, japoneses e muito mais. Vem experimentar!",
+                                                
+                
                   "Farinha Panko, mistura para tempurá, kinako (soja em pó), papel de arroz e os ingredientes perfeitos pra dar aquele toque autêntico nas suas receitas japonesas!",
                   "Bebidas orientais alcóolicas mais procuradas: Soju (vários sabores), Makgeolli (vinho de arroz) e o tradicional saquê japonês.",
                   "Direto da Coreia! Experimente os sorvetes orientais mais amados: Samanco, Melona e Power Cap! Sabores únicos e refrescantes que conquistam todos os paladares!",
                   "Aqui na Seiza você encontra uma seleção especial de balas japonesas e coreanas!",
                   "Clássicos orientais que encantam todas as idades! Famosos biscoitos Pocky, Pepero, Koalas, Toppo e muitos mais!",
                   "Tradição e sabor em cada mordida! Temos os doces tradicionais da culinária japonesa com recheio de feijão azuki (anko) sempre fresquinhos para vocês!",
-                "Snacks orientais para todos os gostos! Sembeis doces e salgados, salgadinhos crocantes, lula desidratada — experimente sabores autênticos do Japão, Coreia e China!",
+               
                 ],
               
               },
