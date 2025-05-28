@@ -5443,19 +5443,18 @@ function restaurarMenuOriginal() {
       
       
   
- ${establishment.statusAberto ? `
-                    <div class="info-box">
-                      
-                      <div>
-                        <div class="info-label"> ${statusAberto}</div>
-                        
-                      </div>
-                    </div>` : ""
-                  }
+
 
   
       
-                ${
+               
+
+
+
+
+                <div class="info-boxes-container">
+
+                 ${
                   establishment.plantaoHorario
                     ? `
                     <div class="card-plantao detalhe-esquerda">
@@ -5471,10 +5470,15 @@ function restaurarMenuOriginal() {
                     : ""
                 }
 
-
-
-
-                <div class="info-boxes-container">
+                 ${establishment.statusAberto ? `
+                    <div class="info-box">
+                      
+                      <div>
+                        <div class="info-label"> ${statusAberto}</div>
+                        
+                      </div>
+                    </div>` : ""
+                  }
 
 
                 ${establishment.date ? `

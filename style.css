@@ -1542,14 +1542,14 @@ img {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 0px;
 }
 
 .info-box {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px;
+  gap: 10px;
+  padding: 3px;
   border-left: 5px solid #007acc;
   /*background-color: #f9f9f9;*/
   background-color: #ffffff;
@@ -2001,7 +2001,7 @@ a:focus {
   display: flex;
   align-items: center;    /* Alinha verticalmente no centro */
   gap: 12px;              /* Espaço entre nome e botão */
-  margin-bottom: 5px;
+  margin-bottom: 0px;
 }
 
 .falecimento-header .locais_nomes {
