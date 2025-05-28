@@ -2024,8 +2024,4 @@ a:focus {
   border-radius: 50%;
 }
 
-@media (max-width: 600px) {
-  .falecimento-header {
-    flex-wrap: nowrap;
-  }
-}
+
