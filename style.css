@@ -1007,7 +1007,7 @@ img {
   width: 100%; /* A imagem ocupa 100% da largura do contêiner */
   max-width: 425px; /* Limita a largura máxima para não ficar muito grande */
   border-radius: 10px; /* Bordas arredondadas */
-  margin-bottom: 10px; /* Espaçamento inferior */
+  margin-bottom: 2px; /* Espaçamento inferior */
 }
 
 /* Ajustes para telas grandes (computadores) */
@@ -1351,7 +1351,7 @@ img {
   width: 100%;
   height: 3px;
   background: linear-gradient(90deg, #2E8B57, #FF8C00); /* Gradiente verde e laranja */
-  margin: 30px 0px 1px 0px; /* Centraliza o separador */
+  margin: 5px 0px 1px 0px; /* Centraliza o separador */
   position: relative;
 }
 
@@ -1542,7 +1542,7 @@ img {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 0px;
 }
 
 .info-box {
@@ -1988,4 +1988,44 @@ a:focus {
   
   text-decoration: none ;
   color:#555;
+}
+
+
+
+
+
+
+
+
+.falecimento-header {
+  display: flex;
+  align-items: center;    /* Alinha verticalmente no centro */
+  gap: 2px;              /* Espaço entre nome e botão */
+  margin-bottom: 0px;
+}
+
+.falecimento-header .locais_nomes {
+  margin: 0; /* Tira margens desnecessárias do nome */
+}
+
+.falecimento-header .share-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2em;
+  margin-left: 0px;
+  color: #4070f4; /* Azul para destaque, ajuste se quiser */
+  padding: 4px 6px;
+  transition: background 0.2s;
+}
+
+.falecimento-header .share-btn:hover {
+  background: #e7f2fd;
+  border-radius: 50%;
+}
+
+@media (max-width: 600px) {
+  .falecimento-header {
+    flex-wrap: nowrap;
+  }
 }

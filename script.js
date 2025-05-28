@@ -5431,10 +5431,12 @@ function restaurarMenuOriginal() {
       }
   
      
-      <strong class="locais_nomes">${establishment.name}</strong>
-        <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
-          <i class="fas fa-share-alt info-icon"></i>
-        </button>
+     <div class="falecimento-header">
+    <span class="locais_nomes">${establishment.name}</span>
+    <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
+      <i class="fas fa-share-alt"></i>
+    </button>
+  </div>
 
 
 <br>
