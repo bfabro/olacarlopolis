@@ -464,7 +464,7 @@ clinicaveterinariacarlopolis:"s",
 
       // grafica
      
-      serigrafgraficaeserigrafia:"s",
+      serigraf:"s",
 
       //loja de pesca
       pescaepresente:"s",
@@ -1583,7 +1583,7 @@ menuLinks.forEach((link) => {
                   establishments: [
                       {
                           image: "images/comercios/grafica/serigraf/perfil.png",
-                          name: "Serigraf Gráfica e Serigrafia",
+                          name: "Serigraf",
                           hours: "Seg a Sex: 08:00h as 12:00h - 13:00h as 17:00h",
                           statusAberto:".",
                           horarios: {                          
