@@ -1901,7 +1901,7 @@ img {
     flex-wrap: nowrap;
     overflow-x: auto;
     justify-content: flex-start;
-    padding: 0px;
+    padding: 1px;
     margin-left: 10px;
     margin-right: 0px;
     border-radius: 8px;
