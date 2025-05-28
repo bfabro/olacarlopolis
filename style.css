@@ -316,18 +316,19 @@ body.dark {
 }
 
 .content_area {
-  padding: 10px;
+  padding: 1px;
   width: calc(100% - 30%);
   min-height: 84vh;
   background: #f4f4f4;
   margin: 72px 0px 0px 270px;
   transition: margin-left 0.5s ease;
-  font-size: 16px;
+  font-size: 14px;
   align-items: center;
   justify-content: center;
+ margin-left: 268px;
+
 
 }
-
 
 
 .content_overlay {
@@ -511,7 +512,7 @@ body.dark {
 .content_area {
   margin-left: 268px;
   /* Ajuste para a largura da sidebar */
-  padding: 10px;
+  padding: 1px;
   width: calc(100% - 260px);
   /* Ajuste para a largura da sidebar */
   transition: margin-left 0.5s ease;
