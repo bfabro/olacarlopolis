@@ -534,6 +534,9 @@ clinicaveterinariacarlopolis:"s",
       sabordaroca:"s",
       selahtgrill:"s",
       yingyang:"s",
+
+      // produtos de limpeza
+      jmprodutosdelimpeza:"s",
     
       
       // sorveteria
@@ -2674,6 +2677,64 @@ menuLinks.forEach((link) => {
                 },
             ],
         },
+
+
+
+
+
+
+{
+                    link: document.querySelector("#menuProdutosLimpeza"),  
+                    title: "Produtos de Limpeza",
+                    establishments: [
+                       
+                        {
+                            image: "images/comercios/produtosLimpeza/jm/perfil.png",
+                            name: "J M Produtos de Limpeza",
+                            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                            statusAberto:".",
+                            horarios: {                          
+                            seg: [{ inicio: "08:00", fim: "18:00" }],
+                            ter: [{ inicio: "08:00", fim: "18:00" }],
+                            qua: [{ inicio: "08:00", fim: "18:00" }],
+                            qui: [{ inicio: "08:00", fim: "18:00" }],
+                            sex: [{ inicio: "08:00", fim: "18:00" }],
+                            sab: [{ inicio: "08:00", fim: "12:00" }],
+                            dom: [],
+                            }, 
+                            address: " R. Kalil Keder, 503 - Centro, Carlópolis",
+                            contact: "(43) 99692-9674",
+                            delivery: "Sim / Sem Taxa",
+                            facebook: "https://www.facebook.com/p/JM-Produtos-de-Limpeza-100076385972701/",
+                            instagram: "https://www.instagram.com/jmprodutosdelimpezacarlopolis/",
+                            novidadesImages: [
+                              "images/comercios/produtosLimpeza/jm/divulgacao/1.png",
+                              "images/comercios/produtosLimpeza/jm/divulgacao/2.png",
+                              "images/comercios/produtosLimpeza/jm/divulgacao/3.png",
+                              "images/comercios/produtosLimpeza/jm/divulgacao/4.png",
+                              "images/comercios/produtosLimpeza/jm/divulgacao/5.png",
+                              "images/comercios/produtosLimpeza/jm/divulgacao/6.png",
+                              
+                              
+                          ],
+                          novidadesDescriptions: [ 
+                            "Temos produtos para limpeza de todos os setores!", 
+                            "Muitas Variedades em protudos de limpeza, venha conferir!",                          
+                            "Temos Lixos de todos os tipos e tamanhos!",   
+                            "Linha completa para limpeza de piscinas",                          
+                            "Linha completa para limpeza de piscinas", 
+                            "Linha completa para limpeza automotiva",                         
+                            
+                          ],
+                        },
+
+                        
+                    ],
+                },
+
+
+
+
 
 
          //// farmacias
