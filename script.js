@@ -420,7 +420,7 @@ chaveirocentral:"s",
 
       //confecção
       yellowjeans:"s",
-      panaceia:"s",
+      panacea:"s",
   
       // borracharia
       vidanova: "s",
@@ -1395,7 +1395,7 @@ menuLinks.forEach((link) => {
 
                       {
                         image: "images/comercios/confeccao/panaceia/perfil.png",
-                        name: "Panaceia",
+                        name: "Panacea",
                         hours: "Seg a Sex: 8:00h as 18:00h<br>Sab: 08:00h as 12:00h",
                         statusAberto:"a",
                         horarios: {
@@ -1408,7 +1408,7 @@ menuLinks.forEach((link) => {
                           sab: [{ inicio: "08:00", fim: "12:00" }],
                           dom: [],
                         },
-                        address: "Padre Hugo, 475 - Centro Carlópolis",
+                        address: "Padre Hugo, 475, Centro - Carlópolis",
                         contact: "(43) 99606-1356",
                         contact2: "(43) 3566-1383",
                         instagram:"https://www.instagram.com/panaceaconfeccoes/",
