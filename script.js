@@ -1484,7 +1484,7 @@ menuLinks.forEach((link) => {
                       ],     
                       
                       novidadesDescriptions: [ 
-"Jaqueline del Nobile- Diretamente de Fartura 30/05 a partir das 19:00hrs",
+"Poliana Rojas - 30/05 a partir das 19:00hrs",
 
 
                       ],
