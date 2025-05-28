@@ -5431,30 +5431,17 @@ function restaurarMenuOriginal() {
       }
   
      
-     <div class="falecimento-header">
+     
     <span class="locais_nomes">${establishment.name}</span>
     <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
       <i class="fas fa-share-alt"></i>
     </button>
-  </div>
+  
 
 
 <br>
       
-      
-  
-
-
-  
-      
-               
-
-
-
-
-                <div class="info-boxes-container">
-
-                 ${
+        ${
                   establishment.plantaoHorario
                     ? `
                     <div class="card-plantao detalhe-esquerda">
@@ -5469,6 +5456,19 @@ function restaurarMenuOriginal() {
                     `
                     : ""
                 }
+  
+
+
+  
+      
+               
+
+
+
+
+                <div class="info-boxes-container">
+
+               
 
                  ${establishment.statusAberto ? `
                     <div class="info-box">
