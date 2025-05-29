@@ -599,6 +599,8 @@ clinicaveterinariacarlopolis:"s",
       copel: "s",
       correio:"s",    
       cras:"s",
+      clubedexadrez:"s",
+      
       // cheches:
       ainzararossisallescmei:"s",
       isabeldallabdasilvacmeiprofa:"s",
@@ -3920,6 +3922,22 @@ menuLinks.forEach((link) => {
             address: "R. Salvira Marquês, 366",
             contact: "(43) 98485-1626",
             facebook:"https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
+        },
+    ],
+  },
+
+
+    {
+    link: document.querySelector("#menuXadrez"),    
+    title: "Clube de Xadrez",
+    establishments: [
+        {
+            image: "images/setorPublico/xadrez/perfil.png",
+            name: "Clube de Xadrez",
+            hours: "Ter: 18:00 as 20:00h ( Adulto )<br> Sab: 09:00 as 11:00h ( 6 a 17 anos )",
+            address: "Elson Soares, 787, Sala 8",
+            contact: "(43) 99639-6503",
+           
         },
     ],
   },
