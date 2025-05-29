@@ -1545,7 +1545,7 @@ menuLinks.forEach((link) => {
             }, 
             address: "Av Benedito Salles N°1277, Carlópolis",
             contact: "(43) 99637-2328",           
-            facebook: "https://www.facebook.com/funerariacristoreicarlopolispr/?locale=pt_BR",
+            facebook: "https://www.facebook.com/funerariacristoreicarlopolispr",
             instagram: "https://www.instagram.com/funeraria_cristoreiclps/",
             novidadesImages: [
          
@@ -1582,7 +1582,7 @@ menuLinks.forEach((link) => {
             contact: "(43) 99668-9078", 
             contact2: "(43) 99972-2809", 
              contact3: "(43) 99932-1983",         
-            facebook: "https://www.facebook.com/funerariagrupocastilho/?locale=pt_BR",
+            facebook: "https://www.facebook.com/funerariagrupocastilho",
             instagram: "https://www.instagram.com/funerariagrupocastilho/",
             novidadesImages: [
          
