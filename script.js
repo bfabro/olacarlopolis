@@ -647,7 +647,8 @@ funerariagrupocastilho:"s",
   frutfest:"s",
   cresolrun:"s",
   encontrocarroantigo:"s",
-  festadosenhorbomjesus:"s", 
+  festadosenhorbomjesus:"s",
+  standup:"s", 
   campeonatoparanafishing:"s",
   lowcity:"s",  
   toroonagashi:"s",
@@ -3500,7 +3501,18 @@ menuLinks.forEach((link) => {
 
 
 
-
+{
+              image: "images/informacoes/eventos/standUp.png",
+              name: "Stand Up",
+              date: "16/06/2025",
+              address: "Rua Padre Hugo, 460, Carlopolis ( Thac Thal )",
+              contact: "(43) 99160-5120",
+              instagram:"https://www.instagram.com/p/DKAe7CkxUzQ/?img_index=1",
+              infoAdicional:"Os ingressos já estão à venda! Garanta o seu agora mesmo — ou junte a galera e reserve uma mesa exclusiva só pra vocês! 🍻👯‍♀️📲 Para mais informações e reservas: (43) 99160-5120",
+              
+              
+             
+          },
 
 
 
