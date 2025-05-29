@@ -948,11 +948,12 @@ menuLinks.forEach((link) => {
                 },
                 address: "R. Delfino Mendes, 264 - Centro",
                 contact: "(43) 99112-1009",                          
-                facebook: "#",
+                facebook: "https://www.facebook.com/teamlobofitnesscarlopolis",
                 instagram: "https://www.instagram.com/academialobocarlopolis/",
                 novidadesImages: [ 
                 "images/comercios/academia/lobofitness/divulgacao/1.png",
                 "images/comercios/academia/lobofitness/divulgacao/2.png",
+                "images/comercios/academia/lobofitness/divulgacao/3.png",
                 ],
                 novidadesDescriptions: [                            
                   "Venham Conferir nosso espaço",
