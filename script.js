@@ -5586,6 +5586,14 @@ function restaurarMenuOriginal() {
 
               
      <li  id="${normalizeName(establishment.name)}">  
+
+
+
+
+
+
+
+     
      
     
       ${
@@ -5609,7 +5617,7 @@ ${!establishment.descricaoFalecido ? `
   
 
 
-<br>
+
       
         ${
                   establishment.plantaoHorario
