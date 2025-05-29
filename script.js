@@ -410,6 +410,7 @@ function montarCarrosselDivulgacao() {
       
 // auto peças
 paulinhoautopecas:"s",
+norbaautopecas:"s",
 
 // cartorip
 cartoriomariazelia:"s",
@@ -1264,6 +1265,28 @@ menuLinks.forEach((link) => {
                   link: document.querySelector("#menuAutoPecas"),
                   title: "Auto Peça",
                   establishments: [
+
+{
+                          image: "images/comercios/autopecas/norba/perfil.png",
+                                 
+                          name: "Norba Auto Peças",
+                          hours: "Seg a Sex: 07:00h as 18:00h<br> Sab: 07:00h as 12:00h",
+                          address: "Av Anesio Fernandes Machado, 341 - Carlopolis",
+                          contact: "(43) 99620-3108",         
+                          contact2:"(43) 99610-1135",               
+                          instagram: "https://www.instagram.com/norba_comerciodepecas/",
+                          novidadesImages: [                 
+                            
+                            "images/comercios/autopecas/norba/divulgacao/1.png",
+                            "images/comercios/autopecas/norba/divulgacao/2.png",
+                            "images/comercios/autopecas/norba/divulgacao/3.png",
+                            "images/comercios/autopecas/norba/divulgacao/4.png",
+                            "images/comercios/autopecas/norba/divulgacao/5.png",
+                        ],                
+                      },
+
+
+
                       {
                           image: "images/comercios/autopecas/paulinho/perfil.png",
                                  
