@@ -3937,6 +3937,17 @@ menuLinks.forEach((link) => {
             hours: "Ter: 18:00 as 20:00h ( Adulto )<br> Sab: 09:00 as 11:00h ( 6 a 17 anos )",
             address: "Elson Soares, 787, Sala 22",
             contact: "(43) 99639-6503",
+             novidadesImages: [               
+                      "images/setorPublico/xadrez/divulgacao/1.png",
+                      "images/setorPublico/xadrez/divulgacao/2.png",
+                      "images/setorPublico/xadrez/divulgacao/3.png",
+                    ], 
+                    novidadesDescriptions: [                            
+                     "Venha jogar com nós!",
+                     "Aquela resenha boa",
+                      "Duelo de Gigantes",
+                    ],
+            
            
         },
     ],
