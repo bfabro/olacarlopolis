@@ -646,6 +646,7 @@ funerariagrupocastilho:"s",
   festajuninaapae:"s",
   frutfest:"s",
   cresolrun:"s",
+  encontrocarroantigo:"s",
   festadosenhorbomjesus:"s", 
   campeonatoparanafishing:"s",
   lowcity:"s",  
@@ -3468,15 +3469,7 @@ menuLinks.forEach((link) => {
                   contact: "",
               },
 
-            {
-              image: "images/informacoes/eventos/velocross.png",
-              name: "Etapa Leste VeloCross",
-              date: "24/05/25 a 25/05/2025",
-              address: "Centro de Eventos Ilha do Ponciano",
-              contact: "(43) 99636-2971",
-              
-             
-          },
+           
 
 
 
@@ -3531,6 +3524,22 @@ menuLinks.forEach((link) => {
                  "INSCRIÇÕES ABERTAS GARANTA JÁ SUA VAGA!",
                  ],
               },
+
+
+
+
+
+               {
+              image: "images/informacoes/eventos/carroAntigo.png",
+              name: "Encontro Carro Antigo",
+              date: "20/07/2025",
+              address: "Centro de Eventos Ilha do Ponciano",
+              contact: "(43) 99825-0570",
+              instagram:"https://www.instagram.com/turismocarlopolis/",
+              
+              
+             
+          },
 
                 {
                   image: "images/informacoes/eventos/senhorbomjesus.png",
