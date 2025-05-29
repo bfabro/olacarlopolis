@@ -505,6 +505,9 @@ clinicaveterinariacarlopolis:"s",
       xisbauinea:"s",
       mycoffee:"s",
   
+      // material de construcao
+      lojaferreira:"s",
+
       //supermercado
       bompreco:"s",      
       carreiro: "s", 
@@ -4657,11 +4660,42 @@ menuLinks.forEach((link) => {
             title: "Material de Construção",
             establishments: [
                 {
-                    name: "Carriel",
-                    hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
-                    address: "R. Laurindo Franco de Godoi, 90",
-                    contact: "(43) 99951-1540",
+                  image: "images/comercios/materialConstrucao/ferreira/perfil.png",
+                    name: "Loja Ferreira",
+                    hours: "Seg a Sex: 07:00h as 18:00h </br> Sab: 08:00h as 17:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                    seg: [{ inicio: "07:00", fim: "18:00" }],
+                    ter: [{ inicio: "07:00", fim: "18:00" }],
+                    qua: [{ inicio: "07:00", fim: "18:00" }],
+                    qui: [{ inicio: "07:00", fim: "18:00" }],
+                    sex: [{ inicio: "07:00", fim: "18:00" }],
+                    sab: [{ inicio: "07:00", fim: "17:00" }],
+                    dom: []
+                  },
+                    address: "R. Ataliba Leonel, 442 - Carlopolis",
+                    contact: "(43) 99653-8400",
                     delivery: "Sim / Sem Taxa",
+                    instagram:"https://www.instagram.com/lojaferreira1/",
+                      novidadesImages: [
+                        "images/comercios/materialConstrucao/ferreira/divulgacao/1.png",
+                        "images/comercios/materialConstrucao/ferreira/divulgacao/2.png",
+                        "images/comercios/materialConstrucao/ferreira/divulgacao/3.png",
+                        "images/comercios/materialConstrucao/ferreira/divulgacao/4.png",
+                        "images/comercios/materialConstrucao/ferreira/divulgacao/5.png",
+                    ],
+                    novidadesDescriptions: [ 
+                      
+                      "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
+                      "tela Morlan na Loja Ferreira!Se você está procurando qualidade e resistência para cercas e proteções, aqui TEM!",
+                      "A Loja Ferreira tem tudo que você precisa! Luvas, lonas, rastelos e muito mais para a colheita do café. ",
+                      "Precisando de um container para sua obra?Na Loja Ferreira, você aluga por apenas R$200,00 por mês!Ideal para guardar ferramentas, materiais e manter tudo organizado e seguro.",
+                      "Quer reformar com rapidez e praticidade? O drywall é a solução perfeita! Transforme seus ambientes com agilidade e qualidade!",
+                      
+
+                    
+                    ],
+
                 },
             ],
         },
