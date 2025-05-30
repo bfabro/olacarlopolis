@@ -4554,19 +4554,20 @@ menuLinks.forEach((link) => {
                 {
                   image: "images/comercios/depositoGas/liaGas/liaGas.png",
                     name: "Lia Gas",
-                    hours: "Seg a Sab: 08:00h as 19:00h </br>Dom: 08:00h as 12:00h",
+                    hours: "Seg a Sab: 08:00h as 20:00h </br>Dom: 08:00h as 20:00h",
                     statusAberto:".",
                     horarios: {                          
-                      seg: [{ inicio: "08:00", fim: "19:00" }],
-                      ter: [{ inicio: "08:00", fim: "19:00" }],
-                      qua: [{ inicio: "08:00", fim: "19:00" }],
-                      qui: [{ inicio: "08:00", fim: "19:00" }],
-                      sex: [{ inicio: "08:00", fim: "19:00" }],
-                      sab: [{ inicio: "08:00", fim: "19:00" }],
-                      dom: [{ inicio: "08:00", fim: "12:00" }]
+                      seg: [{ inicio: "08:00", fim: "20:00" }],
+                      ter: [{ inicio: "08:00", fim: "20:00" }],
+                      qua: [{ inicio: "08:00", fim: "20:00" }],
+                      qui: [{ inicio: "08:00", fim: "20:00" }],
+                      sex: [{ inicio: "08:00", fim: "20:00" }],
+                      sab: [{ inicio: "08:00", fim: "20:00" }],
+                      dom: []
                     }, 
                     address: "R. Kalil Keder, 910",
                     contact: "(43) 99821-7243",
+                    contact2: "(43) 99844-5345",
                     delivery: "Sim / Sem Taxa",
                     facebook:"https://www.facebook.com/liagasclps/",
                     novidadesImages: [               
