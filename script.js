@@ -2815,17 +2815,20 @@ menuLinks.forEach((link) => {
                 {
                     image: "images/comercios/farmacia/descontoFacil/descontoFacil.png",
                     name: "Desconto Facil 1",
-                    address: "R. Benedito Salles, 574",
+                    address: "R. Benedito Salles, 574 - Carlopolis",
+                    plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"Sab 31/05 a Sex 06/06",
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    
                     statusAberto:".",
                     horarios: {                          
-                      seg: [{ inicio: "08:00", fim: "18:00" }],
-                      ter: [{ inicio: "08:00", fim: "18:00" }],
-                      qua: [{ inicio: "08:00", fim: "18:00" }],
-                      qui: [{ inicio: "08:00", fim: "18:00" }],
-                      sex: [{ inicio: "08:00", fim: "18:00" }],
-                      sab: [{ inicio: "08:00", fim: "12:00" }],
-                      dom: []
+                      seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
                     },  
                     contact: "(43) 99966-9812",
                     delivery: "Sim / Sem Taxa",
@@ -2889,8 +2892,7 @@ menuLinks.forEach((link) => {
                     name: "El Shaday",
                     address: "R. Benedito Sales, 353 - Carlopolis",
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
-                         plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"Sab 24/05 a Sex 30/05", 
+                    
                     statusAberto:".",
                     horarios: {                          
                       seg: [{ inicio: "08:00", fim: "18:00" }],
@@ -3833,8 +3835,8 @@ menuLinks.forEach((link) => {
                 },
 */
 
-
-{
+/*
+          {
                     image: "images/comercios/farmacia/elShaday/elshaday.png",
                     name: "El Shaday",
                     address: "Rua Benedito Sales, 353 - Carlopolis",
@@ -3870,6 +3872,51 @@ menuLinks.forEach((link) => {
                       "Dengue não é brincadeira! Se você está com febre alta, dor no corpo, manchas na pele e fraqueza, faça já o teste rápido de dengue!<br>Na Farmácia El Shaday, você tem um resultado confiável em poucos minutos, sem precisar esperar para saber o diagnóstico!",
                       "Manter os níveis de glicose sob controle é essencial para quem vive com diabetes ou busca prevenir problemas de saúde. O teste rápido de glicemia é um exame simples e eficaz, que permite acompanhar os níveis de açúcar no sangue e identificar eventuais alterações.<br>Em nossa farmácia, você pode realizar o teste de glicemia com rapidez e segurança, sempre com o acompanhamento de profissionais qualificados.",
                       "A hipertensão, conhecida como “pressão alta”, é uma condição que pode levar a sérios problemas de saúde se não for monitorada e tratada adequadamente. Felizmente, pequenas mudanças na rotina ajudam a controlar a pressão e a proteger o coração.",
+                    ],
+                },
+
+
+                */
+
+
+
+
+
+                {
+                    image: "images/comercios/farmacia/descontoFacil/descontoFacil.png",
+                    name: "Desconto Facil 1",
+                    address: "R. Benedito Salles, 574 - Carlopolis",
+                    plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"Sab 31/05 a Sex 06/06",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                     seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    },  
+                    contact: "(43) 99966-9812",
+                    delivery: "Sim / Sem Taxa",
+                    facebook:"https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
+                    instagram: "https://www.instagram.com/descontofacil.clps/",
+                    site: "https://www.grupoasfar.com.br/",
+                    novidadesImages: [               
+                      "images/comercios/farmacia/descontoFacil/divulgacao/1.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/2.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/3.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/4.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/5.png",
+                    ], 
+                    novidadesDescriptions: [                            
+                      "Carmed",
+                      "Proteja e cuide da sua pele!",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
                     ],
                 },
 
