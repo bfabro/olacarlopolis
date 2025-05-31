@@ -5354,7 +5354,11 @@ menuLinks.forEach((link) => {
   link: document.querySelector("#menuNotaFalecimento"),
   title: "Nota de Falecimento",
   establishments: [
-
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/8.png",
+     descricaoFalecido: "Faleceu em Carlópolis aos 78 anos de idade, Sr 'ANTÔNIO BARBOSA DA SILVA'.<Br> A cerimônia iniciará a pedido da família às 08:00 desta Sexta-Feira 30.05.25 no velório Municipal de Carlópolis.<Br>Seu sepultamento será hoje às 16:45 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a toda família e amigos"
+    },
 
      {
       name: "Funeraria Grupo Castilho",    
