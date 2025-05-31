@@ -4931,16 +4931,7 @@ menuLinks.forEach((link) => {
                     sab: [{ inicio: "10:30", fim: "14:00" }],
                     dom: [{ inicio: "10:30", fim: "14:00" }]
                   },
-            statusAberto:".",
-            horarios: {              
-              seg: [{ inicio: "07:00", fim: "14:00" }],
-              ter: [{ inicio: "07:00", fim: "14:00" }],
-              qua: [{ inicio: "07:00", fim: "14:00" }],
-              qui: [{ inicio: "07:00", fim: "14:00" }],
-              sex: [{ inicio: "07:00", fim: "14:00" }],
-              sab: [{ inicio: "07:00", fim: "14:00" }],
-              dom: [{ inicio: "07:00", fim: "14:00" }],
-            },
+            
             address: "Rua Capitão Estácio 604, Carlópolis",
             contact: "(43) 99601-5543",
             delivery: "Sim / Com Taxa",
