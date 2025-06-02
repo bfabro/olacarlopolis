@@ -4207,7 +4207,7 @@ menuLinks.forEach((link) => {
             title: "Delegacia",
             establishments: [
                 {
-                    image: "images/setorPublico/delegacia/delegacia.jpg",
+                    image: "images/setorPublico/delegacia/1.png",
                     name: "Delegacia",
                     hours: "Seg a Sex: 09:00h - 18:00h",
                     address: "R. Alfeneiro, 215 ",
