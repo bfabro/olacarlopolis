@@ -398,7 +398,9 @@ function montarCarrosselDivulgacao() {
       advocaciaabilio: "s",
   
       // Agropecuaria
-      agrovida: "s",     
+      agrovida: "s", 
+      saojose:"s", 
+  
 
       // assessocia balistica
       betogunsassessoriaarmaria:"s",
@@ -1166,8 +1168,19 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/agropecuaria/agroVida/agrovida.png",
                             name: "Agro Vida",
-                            hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 16:00h",
-                            address: "rua benedito salles 309",
+                            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 16:00h",
+                            statusAberto:"a",
+                            horarios: {
+                              
+                              seg: [{ inicio: "08:00", fim: "18:00" }],
+                              ter: [{ inicio: "08:00", fim: "18:00" }],
+                              qua: [{ inicio: "08:00", fim: "18:00" }],
+                              qui: [{ inicio: "08:00", fim: "18:00" }],
+                              sex: [{ inicio: "08:00", fim: "18:00" }],
+                              sab: [{ inicio: "08:00", fim: "16:00" }],
+                              dom: []
+                            },
+                            address: "Rua Benedito salles,309 - Carlopolis",
                             contact: "(43) 99158-9047",
                             delivery: "Sim / Sem Taxa",
                             facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
@@ -1180,6 +1193,39 @@ menuLinks.forEach((link) => {
                           novidadesDescriptions: [  
                             "Temos sacos de milho 40kg",                          
                             "Special Dog no Precinho",
+                           
+                          ],
+                        },
+
+
+                        {
+                            image: "images/comercios/agropecuaria/saoJose/perfil.png",
+                            name: "São Jose",
+                            hours: "Seg a Sex: 8:00h as 19:00h </br> Sab: 08:00h as 19:00h",
+                            statusAberto:"a",
+                            horarios: {
+                              
+                              seg: [{ inicio: "08:00", fim: "19:00" }],
+                              ter: [{ inicio: "08:00", fim: "19:00" }],
+                              qua: [{ inicio: "08:00", fim: "19:00" }],
+                              qui: [{ inicio: "08:00", fim: "19:00" }],
+                              sex: [{ inicio: "08:00", fim: "19:00" }],
+                              sab: [{ inicio: "08:00", fim: "19:00" }],
+                              dom: []
+                            },
+                            address: "Rua Benedito Salles 35, Carlópolis",
+                            contact: "(43) 99682-9898",
+                            delivery: "Sim / Sem Taxa",
+                            facebook: "https://www.facebook.com/p/Ra%C3%A7%C3%B5es-S%C3%A3o-Jos%C3%A9-100088108752876/",
+                            
+                            novidadesImages: [
+                              "images/comercios/agropecuaria/saoJose/divulgacao/1.png",
+                            
+                              
+                          ],
+                          novidadesDescriptions: [  
+                            "Ração QUIDOG no precinho",                          
+                            
                            
                           ],
                         },
