@@ -5354,6 +5354,27 @@ menuLinks.forEach((link) => {
   link: document.querySelector("#menuNotaFalecimento"),
   title: "Nota de Falecimento",
   establishments: [
+///
+///
+///
+
+
+
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/10.png",
+     descricaoFalecido: "Faleceu em Carlópolis aos 66 anos de idade, Sr 'JOSÉ RODRIGUES CAMARGO', mais conhecido como: Zé Gordo<br> O horário da cerimônia será definido juntamente com os familiares no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às  09:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos"
+
+    },
+
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/9.png",
+     descricaoFalecido: "Faleceu em Carlópolis aos 81 anos de idade, Sra 'ANGÉLICA BERGAMO GABRIEL'.<br>A cerimônia do velório iniciará hoje às 12:00 horas no Velório Municipal de Carlópolis.<br>Seu sepultamento será hoje às 16:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
+
+    },
+
+
 {
       name: "Funeraria Cristo Rei",    
       image: "images/informacoes/notaFalecimento/cristoRei/8.png",
