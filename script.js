@@ -3592,6 +3592,20 @@ menuLinks.forEach((link) => {
           },
 
 
+          {
+              image: "images/informacoes/eventos/truco.png",
+              name: "Truco",
+              date: "21/06/2025",
+              address: "Pedro Salles - Casa do Elton",
+              contact: "(43) 99243-2345",
+              instagram:"#",
+              infoAdicional:"A partir das 11hrs começa o barulho! venha participar",
+              
+              
+             
+          },
+
+
 
 
 
