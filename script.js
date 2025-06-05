@@ -2582,8 +2582,20 @@ menuLinks.forEach((link) => {
             title: "Despachante",
             establishments: [
                 {
+
+
                     name: "Rodriguinho",
                     hours: "Seg a Sex: 08:30h as 11:30h - 13:00h as 17:00h",
+                      statusAberto:".",
+                horarios: {                          
+                  seg: [{ inicio: "05:30", fim: "19:00" },{inicio: "13:00", fim: "17:00" }],
+                  ter: [{ inicio: "05:30", fim: "19:00" },{inicio: "13:00", fim: "17:00" }],
+                  qua: [{ inicio: "05:30", fim: "19:00" },{inicio: "13:00", fim: "17:00" }],
+                  qui: [{ inicio: "05:30", fim: "19:00" },{inicio: "13:00", fim: "17:00" }],
+                  sex: [{ inicio: "05:30", fim: "19:00" },{inicio: "13:00", fim: "17:00" }],
+                  sab: [],
+                  dom: [],
+                }, 
                     address: "Rodovia PR 218, 91 - Carlopolis",
                     contact: "(43) 99812-5120",
                     infoAdicional:"⚠️ Transferências,<br> ⚠️ Licenciamento, <br>⚠️ Emplacamentos,<br>⚠️ Guia de Multas, IPVA,<br> ⚠️ 2° Via CRV,<br> ⚠️ Atpv-e,<br> ⚠️ Comunicação de Venda, "
