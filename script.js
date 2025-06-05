@@ -5404,6 +5404,14 @@ menuLinks.forEach((link) => {
 ///
 ///
 
+//05/06
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/11.png",
+     descricaoFalecido: "Faleceu em Carlópolis aos 95 anos de idade, Sr 'OLIVINO CÂNDIDO DE SOUZA', mais conhecido como: Livino Souza<br>O horário da cerimônia será às 12:00 horas desta Quinta - feira no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às 09:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigo"
+
+    },
+
 
 
 {
