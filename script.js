@@ -1561,7 +1561,7 @@ menuLinks.forEach((link) => {
                       ],     
                       
                       novidadesDescriptions: [ 
-"Poliana Rojas - 30/05 a partir das 19:00hrs",
+"Fernando e Mary - 06/06 a partir das 19:00hrs",
 
 
                       ],
