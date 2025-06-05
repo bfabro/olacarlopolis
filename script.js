@@ -3620,7 +3620,7 @@ menuLinks.forEach((link) => {
               date: "21/06/2025",
               address: "Pedro Salles - Casa do Elton",
               contact: "(43) 99243-2345",
-              instagram:"#",
+              instagram:"https://www.instagram.com/veterano_pedro_salles?igsh=NmhobzJscnI0NWxo",
               infoAdicional:"A partir das 11hrs começa o barulho! venha participar",
               
               
