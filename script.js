@@ -3575,7 +3575,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 
                 ],
                 novidadesDescriptions: [                            
-                  "Especialista em Tratamentos em Diabéticos",
+                  "Especialista no Tratamento em Diabético",
                 
                 
                 
