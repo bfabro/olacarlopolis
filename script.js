@@ -583,7 +583,10 @@ rodriguinho:"s",
       fabiosushimoto: "s",
 
       // montador de moveis
-      hirancastro:"s",      
+      hirancastro:"s",     
+      
+      //podologa
+      vania:"s",
   
       // taxista
       douglasdotaxi: "s",
@@ -3550,6 +3553,47 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 },
             ],
         },
+
+
+
+{
+        link: document.querySelector("#menuPodologa"),
+        title: "Podologa",
+        establishments: [
+            {
+              image: "images/servicos/podologa/vania/perfil.png",
+                name: "Vania",
+                contact: "(43) 99834-3496",
+
+                instagram:"https://www.instagram.com/me_vania/",   
+                infoAdicional:"👣 Tratamentos em Diabeticos , <br>👣 Calos , <br>👣 Unhas encravadas , <br>👣 Reflexologia podal entre outros tratamento nos pés<br>",              
+                  
+                novidadesImages: [ 
+                "images/servicos/podologa/vania/divulgacao/1.png",
+              
+               
+                
+                ],
+                novidadesDescriptions: [                            
+                  "Expecialista em Tratamentos em Diabéticos",
+                
+                
+                
+                ],
+
+
+            },
+            
+        ],
+    },
+
+
+
+
+
+
+
+
   
         {
             link: document.querySelector("#menuVeterinario"),
