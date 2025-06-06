@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "feiradalua", "seiza","foguinho", "esquinadopao", "limone","pesqueirodogalego"
+  "feiradalua", "seiza","vania", "esquinadopao", "limone","pesqueirodogalego"
   
 ]; 
 
@@ -3575,7 +3575,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 
                 ],
                 novidadesDescriptions: [                            
-                  "Expecialista em Tratamentos em Diabéticos",
+                  "Especialista em Tratamentos em Diabéticos",
                 
                 
                 
