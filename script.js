@@ -5452,6 +5452,16 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 ///
 ///
 
+//06/06
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/12.png",
+     descricaoFalecido: "Faleceu em Carlópolis o Anjinho 'LUIS MIGUEL' com pouco meses de vida.<br> A cerimônia do velório iniciará hoje às 11:10 horas no Cemitério Municipal de Carlópolis.<br>Sua despedida será hoje às 13:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
+
+    },
+
+
+
 //05/06
 {
       name: "Funeraria Cristo Rei",    
