@@ -661,6 +661,7 @@ funerariagrupocastilho:"s",
   frutfest:"s",
   cresolrun:"s",
   truco:"s",
+  beachvolleyball:"s",
   encontrocarroantigo:"s",
   festadosenhorbomjesus:"s",
   standup:"s", 
@@ -3682,6 +3683,25 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               
              
           },
+
+
+
+
+{
+                  image: "images/informacoes/eventos/volley.png",
+                  name: "Beach Volleyball",
+                  date: "22/06/25",
+                  address: "Arena Seu Luiz",
+                  contact: "(43) 99627-2094",
+                  contact2: "(43) 99860-4291",
+                  contact3: "(43) 99659-5510",
+                  instagram:"https://www.instagram.com/volleyball_beach_carlopolis/",
+                  infoAdicional:"",
+                  infoAdicional:"Inscrições até 19 de Junho",
+                
+                   
+              },
+
 
 
 
