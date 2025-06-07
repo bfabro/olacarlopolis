@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "feiradalua", "seiza","vania", "esquinadopao", "limone","pesqueirodogalego"
+  "festajuninaapae", "seiza","vania", "esquinadopao", "limone","pesqueirodogalego"
   
 ]; 
 
@@ -2950,7 +2950,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "08:00", fim: "21:00" }],
                       dom: [{ inicio: "08:00", fim: "21:00" }]
                     },
-                    address: "Rua Benedito Salles, 903",
+                    address: "Rua Benedito Salles, 903 - Carlopolis",
                     contact: "(43) 98411-9145",
                     delivery: "Sim / Sem Taxa",
                     facebook:"https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
@@ -3560,7 +3560,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 {
         link: document.querySelector("#menuPodologa"),
-        title: "Podologa",
+        title: "Podóloga",
         establishments: [
             {
               image: "images/servicos/podologa/vania/perfil.png",
@@ -4098,7 +4098,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "08:00", fim: "21:00" }],
                       dom: [{ inicio: "08:00", fim: "21:00" }]
                     },  
-                    address: "Rua Benedito Salles, 903",
+                    address: "Rua Benedito Salles, 903 - Carlopolis",
 
                      plantaoHorario: "08:00h às 21:00h", 
                     plantaoData:"Sab 07/06 a Sex 13/06",
