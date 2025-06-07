@@ -478,6 +478,8 @@ rodriguinho:"s",
       // mercearia
       seiza:"s",
 
+      radarmeteorologico:"s",
+
       //moveis
       movepar:"s",
 
@@ -3837,7 +3839,14 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
       },
 
 
+      
+
+
       // fim eventos
+
+
+
+
   
         {
             link: document.querySelector("#menuFarmaciaPlantao"),
@@ -5748,11 +5757,21 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
           ],
       },
     
-      
+     
         
 
     ]; 
     
+   const menuPrevisaoTempo = document.getElementById("menuPrevisaoTempo");
+
+if (menuPrevisaoTempo) {
+  menuPrevisaoTempo.addEventListener("click", function (e) {
+    e.preventDefault();
+    window.open("https://www.ipmetradar.com.br/2animRadar.php", "_blank");
+  });
+}
+
+
 
     
 
@@ -5879,9 +5898,9 @@ function restaurarMenuOriginal() {
         contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><p>Nenhum estabelecimento se cadastrou ainda.</p>`;
         return;
       }
-  
-      contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
+ 
       
+      contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
 
       
           
