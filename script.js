@@ -2782,13 +2782,44 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 },
     
                 {
-                  image: "images/comercios/supermercado/zerojapan.png",
+                  image: "images/comercios/supermercado/zerojapan/zerojapan.png",
                     name: "Zero Japan",
-                    address: "Rua Doutora Paula e Silva, 445 ",
-                    hours: "Seg a Seg: 8:00h as 20:00h",
+                    address: "Rua Doutora Paula e Silva, 445 - Carlopolis ",
+                    hours: "Dom a Dom: 8:00h as 20:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "20:00" }],
+                      ter: [{ inicio: "08:00", fim: "20:00" }],
+                      qua: [{ inicio: "08:00", fim: "20:00" }],
+                      qui: [{ inicio: "08:00", fim: "20:00" }],
+                      sex: [{ inicio: "08:00", fim: "20:00" }],
+                      sab: [{ inicio: "08:00", fim: "20:00" }],
+                      dom: [{ inicio: "08:00", fim: "20:00" }],
+                    },  
                     contact: "(43) 3142-2005", 
                     whatsapp: "4331422005", 
+                    facebook: "https://www.facebook.com/zerojapangroup/",
+                    instagram: "https://www.instagram.com/mercadozerojapan/",
                     delivery: "Sim / Sem Taxa",
+                    novidadesImages: [               
+                    "images/comercios/supermercado/zerojapan/divulgacao/1.png",
+                    "images/comercios/supermercado/zerojapan/divulgacao/2.png",
+                     "images/comercios/supermercado/zerojapan/divulgacao/3.png",
+                      "images/comercios/supermercado/zerojapan/divulgacao/4.png",
+                       "images/comercios/supermercado/zerojapan/divulgacao/5.png",
+                     
+                    
+                ], 
+                novidadesDescriptions: [                            
+                  "Temos a Famosa La fufu",
+                 "Tilapia disponível aqui no Zero Japan",
+
+                "Hidratante beijavel mais famoso, chegou no Zero Japan",
+
+                 "Venha fazer seu cartão na ZeroJapan",
+                  "Cerveja Geladinha, aqui no Zero Japan",
+                  
+                ],
                 },
             ],
         },
