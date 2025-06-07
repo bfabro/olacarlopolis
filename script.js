@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-  "festajuninaapae", "seiza","vania", "esquinadopao", "limone","pesqueirodogalego"
+   "seiza","vania","zerojapan", "esquinadopao", "limone","pesqueirodogalego"
   
 ]; 
 
