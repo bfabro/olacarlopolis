@@ -3058,7 +3058,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 qua: [{ inicio: "08:00", fim: "18:00" }],
                 qui: [{ inicio: "08:00", fim: "18:00" }],
                 sex: [{ inicio: "08:00", fim: "18:00" }],
-                sab: [{ inicio: "08:00", fim: "18:00" }],
+                sab: [{ inicio: "08:00", fim: "12:00" }],
                 dom: []
               },  
                     contact: "(43) 3566-1211",
