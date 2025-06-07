@@ -2870,8 +2870,8 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       qua: [{ inicio: "08:00", fim: "18:00" }],
                       qui: [{ inicio: "08:00", fim: "18:00" }],
                       sex: [{ inicio: "08:00", fim: "18:00" }],
-                      sab: [{ inicio: "08:00", fim: "18:00" }],
-                      dom: [{ inicio: "08:00", fim: "18:00" }]
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: ]
                     },  
                     
                     contact: "(43) 3566-1473",
@@ -2900,20 +2900,19 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     image: "images/comercios/farmacia/descontoFacil/descontoFacil.png",
                     name: "Desconto Facil 1",
                     address: "R. Benedito Salles, 574 - Carlopolis",
-                    plantaoHorario: "08:00h às 21:00h", 
-                    plantaoData:"Sab 31/05 a Sex 06/06",
+                   
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     
                     statusAberto:".",
-                    horarios: {                          
-                      seg: [{ inicio: "08:00", fim: "21:00" }],
-                      ter: [{ inicio: "08:00", fim: "21:00" }],
-                      qua: [{ inicio: "08:00", fim: "21:00" }],
-                      qui: [{ inicio: "08:00", fim: "21:00" }],
-                      sex: [{ inicio: "08:00", fim: "21:00" }],
-                      sab: [{ inicio: "08:00", fim: "21:00" }],
-                      dom: [{ inicio: "08:00", fim: "21:00" }]
-                    },  
+                      horarios: {                          
+                      seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
+                    }, 
                     contact: "(43) 99966-9812",
                     delivery: "Sim / Sem Taxa",
                     facebook:"https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
@@ -2939,16 +2938,18 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     image: "images/comercios/farmacia/drogaMais/drogamais.png",
                     name: "DrogaMais",
                     hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
+                     plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"Sab 07/06 a Sex 13/06",
                     statusAberto:".",
                     horarios: {                          
-                      seg: [{ inicio: "08:00", fim: "18:00" }],
-                      ter: [{ inicio: "08:00", fim: "18:00" }],
-                      qua: [{ inicio: "08:00", fim: "18:00" }],
-                      qui: [{ inicio: "08:00", fim: "18:00" }],
-                      sex: [{ inicio: "08:00", fim: "18:00" }],
-                      sab: [{ inicio: "08:00", fim: "12:00" }],
-                      dom: []
-                    },  
+                     seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    },
                     address: "Rua Benedito Salles, 903",
                     contact: "(43) 98411-9145",
                     delivery: "Sim / Sem Taxa",
@@ -2963,7 +2964,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       "images/comercios/farmacia/drogaMais/divulgacao/5.png",
                     ], 
                     novidadesDescriptions: [                            
-                      "Analgésico de alívio eficaz para dores intensas",
+                      "Você conhece a Linha LIFE, a própria marca da Drogamais? ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
                       "Cólicas do trato gastrintestinal",
                       "Analgésico (para dor) antitérmico (para febre)",
                       "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
@@ -4037,7 +4038,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 */
 
 
-
+/*
 
 
                 {
@@ -4072,6 +4073,50 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     novidadesDescriptions: [                            
                       "Carmed",
                       "Proteja e cuide da sua pele!",
+                      "Analgésico (para dor) antitérmico (para febre)",
+                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+                      "Redução da febre e para o alívio de dores",
+                    ],
+                },
+
+*/
+
+
+
+
+                {
+                    image: "images/comercios/farmacia/drogaMais/drogamais.png",
+                    name: "DrogaMais",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                     seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    },  
+                    address: "Rua Benedito Salles, 903",
+
+                     plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"Sab 07/06 a Sex 13/06",
+                    contact: "(43) 98411-9145",
+                    delivery: "Sim / Sem Taxa",
+                    facebook:"https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
+                    instagram: "https://www.instagram.com/drogamaisjorginho/",
+                    
+                    novidadesImages: [               
+                      "images/comercios/farmacia/drogaMais/divulgacao/1.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/2.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/3.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/4.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/5.png",
+                    ], 
+                    novidadesDescriptions: [                            
+                      "Você conhece a Linha LIFE, a própria marca da Drogamais? ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
+                      "Cólicas do trato gastrintestinal",
                       "Analgésico (para dor) antitérmico (para febre)",
                       "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
                       "Redução da febre e para o alívio de dores",
