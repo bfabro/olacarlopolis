@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-   "seiza","vania","zerojapan", "esquinadopao", "limone","pesqueirodogalego"
+   "seiza","vania","zerojapan", "prelie", "sorvetessallesferreira","drogamais"
   
 ]; 
 
@@ -2474,8 +2474,9 @@ menuLinks.forEach((link) => {
                  "images/comercios/sorveteria/salles/divulgacao/9.png",
                  "images/comercios/sorveteria/salles/divulgacao/10.png",
                 ],     
-                novidadesDescriptions: [                            
-                  "Açaí irresistível do jeito que você ama, cheio de complementos deliciosos! Venha experimentar na Sorveteria Salles Ferreira",
+                novidadesDescriptions: [  
+                   "🍌 Banana Split<br> Perfeita para adoçar o seu dia!<br> 😋 Venha experimentar essa delícia!",                          
+                 
                   "Está planejando uma confraternização inesquecível? Ou está planejando algo especial? Nossa caixa de sorvetes é a escolha perfeita para refrescar os momentos de confraternização",
                   "Qual seria o sabor que você escolheria para acompanhar?",
                   "Quer se refrescar com muito sabor? Experimente nossos milkshakes deliciosos e cremosos! Escolha seu sabor favorito e venha se deliciar! ",
@@ -2484,7 +2485,7 @@ menuLinks.forEach((link) => {
                "Temos mais de 25 sabores de Picolés!",
                "Quem aí também não resiste a um açaí caprichado? 😍🍓🍌 Vem para a Sorvetes Ferreira e garanta a sua dose de energia e sabor hoje mesmo!",
                "Uma explosão de cores e sabores! 🌈🍦✨ Delicie-se com o nosso sorvete especial de unicórnio, recheado com guloseimas irresistíveis.",
-               "🍌 Banana Split perfeita para adoçar o seu dia! 😋 Venha experimentar essa delícia aqui na Sorvetes Salles Ferreira.",
+               "Açaí irresistível do jeito que você ama, cheio de complementos deliciosos! Venha experimentar na Sorveteria Salles Ferreira",
                "Já experimentou o sabor autêntico do nosso sorvete de café?Um sabor que combina tradição e refrescância! ☕🍦 Experimente o nosso sorvete de café e sinta o sabor da roça em cada colherada",
                
                
@@ -2630,13 +2631,27 @@ menuLinks.forEach((link) => {
                     sab: [{ inicio: "05:45", fim: "19:00" }],
                     dom: [{ inicio: "05:45", fim: "12:00" }],
                   }, 
-                  address: "R. Benedito Salles, 1098 - Carlopolis",
+                  address: "R. Benedito Salles, 1094 - Carlopolis",
                   contact: "(43) 99954-0863",
                   delivery: "Sim / Com Taxa",
                   
                   instagram: "https://www.instagram.com/prelie.confeitaria/",
                   novidadesImages: [                   
                       "images/comercios/padaria/prelie/divulgacao/1.png",
+                      "images/comercios/padaria/prelie/divulgacao/2.png",
+                      "images/comercios/padaria/prelie/divulgacao/3.png",
+                      "images/comercios/padaria/prelie/divulgacao/4.png",
+                      "images/comercios/padaria/prelie/divulgacao/5.png",
+                     
+                     
+                  ],
+                  novidadesDescriptions:[ 
+                    "Folhado de nutella com morango 🍓",                  
+                      "Bolo decorado de leite ninho!",
+                      
+                      "Rosquinha de coco",
+                      "Faça seu orçamento conosco! 🎂🎉",
+                      "Novidades aqui na Prelie, venham experimentar. Cappuccino",
                      
                      
                   ],
@@ -3776,17 +3791,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     
               },
 
-              {
-                  image: "images/informacoes/eventos/paranaFishing1.png",
-                  name: "Campeonato Parana Fishing",
-                  date: "Inscrições até 05/06/2025<br> Campeonato: 07/06/25 ",
-                  address: "Represa de Chavantes",
-                  contact: "(43) 99980-0495",
-                  instagram:"https://www.instagram.com/parana_fishing/",
-                  facebook:"https://www.facebook.com/thiagoagueraparanafishingteam/?locale=pt_BR",
-                
-                    
-              },
+              
 
 
 
