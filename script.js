@@ -1967,7 +1967,7 @@ menuLinks.forEach((link) => {
                       statusAberto:".",
                       horarios: {
                         
-                        seg: [],
+                        seg: [{ inicio: "08:00", fim: "19:00" }],
                         ter: [{ inicio: "08:00", fim: "19:00" }],
                         qua: [{ inicio: "08:00", fim: "19:00" }],
                         qui: [{ inicio: "08:00", fim: "19:00" }],
