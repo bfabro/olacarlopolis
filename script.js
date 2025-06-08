@@ -1961,7 +1961,7 @@ menuLinks.forEach((link) => {
 
 
                     {
-                      image: "images/comercios/lanchonete/levisalgados/perfil.png",
+                      image: "images/comercios/lanchonete/levisalgados/perfil.jpg",
                       name: "Levi Salgados",
                       hours: "Seg a Sab: 08:00h as 19:00h",
                       statusAberto:".",
