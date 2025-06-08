@@ -350,7 +350,7 @@ function montarCarrosselDivulgacao() {
     slide.classList.add("swiper-slide");
   
     slide.innerHTML = `
-      <img class="content_image" src="${imagem}" alt="${est.name}">
+      <img class="content_image" src="${imagem}" alt="${est.name} loading="lazy"">
       <div class="info_divulgacao">
         <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
         <p>${texto}</p>
@@ -966,7 +966,7 @@ menuLinks.forEach((link) => {
                 novidadesImages: [ 
                 "images/comercios/academia/lobofitness/divulgacao/1.png",
                 "images/comercios/academia/lobofitness/divulgacao/2.png",
-                "images/comercios/academia/lobofitness/divulgacao/3.png",
+                "images/comercios/academia/lobofitness/divulgacao/3.webp",
                 ],
                 novidadesDescriptions: [                            
                   "Venham Conferir nosso espaço",
