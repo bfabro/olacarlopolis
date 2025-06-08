@@ -1965,8 +1965,7 @@ menuLinks.forEach((link) => {
                       name: "Levi Salgados",
                       hours: "Seg a Sab: 08:00h as 19:00h",
                       statusAberto:".",
-                      horarios: {
-                        
+                      horarios: {                        
                         seg: [{ inicio: "08:00", fim: "19:00" }],
                         ter: [{ inicio: "08:00", fim: "19:00" }],
                         qua: [{ inicio: "08:00", fim: "19:00" }],
@@ -1978,33 +1977,22 @@ menuLinks.forEach((link) => {
                       address: "R. Padre Hugo, 488 , Carlópolis",
                       contact: "(43) 98850-7966",
                       delivery: "Sim / Com Taxa",   
-                      instagram:"https://www.instagram.com/levisalgados.clps/",
-                                        
-                       
+                      instagram:"https://www.instagram.com/levisalgados.clps/",                        
                       novidadesImages: [                      
-                        "images/comercios/lanchonete/levisalgados/divulgacao/1.png",
+                       "images/comercios/lanchonete/levisalgados/divulgacao/1.png",
                         "images/comercios/lanchonete/levisalgados/divulgacao/2.png",
-                           "images/comercios/lanchonete/levisalgados/divulgacao/3.png", 
-                        
-
-
-                    ],        
-                    novidadesDescriptions:[   
+                         
+                     ],        
+                    novidadesDescriptions:[  
                       
-                      "Agora temos pasteis deliciosos e fritos na hora, venham saborear",
-                           "Mais uma novidade na loja, nosso delicioso kibe com queijo! Uma nova sensação a cada mordida 🥰Venha experimentar 🤤",
+                      "A melhor coxinha da cidade!",
+                      "Mais uma novidade na loja, nosso delicioso kibe com queijo! Uma nova sensação a cada mordida 🥰Venha experimentar 🤤",
+                     
  
-                        "A melhor coxinha da cidade!",
  
- 
-                          ],     
+                    ],  
+
                   },
-
-
-
-
-
-
 
 
                     {
