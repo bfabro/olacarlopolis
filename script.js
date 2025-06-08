@@ -1976,7 +1976,7 @@ menuLinks.forEach((link) => {
                         dom: []
                       },
                       address: "R. Padre Hugo, 488 , Carlópolis",
-                      contact: "(43) 99952-7826",
+                      contact: "(43) 98850-7966",
                       delivery: "Sim / Com Taxa",   
                       instagram:"https://www.instagram.com/levisalgados.clps/",
                                         
