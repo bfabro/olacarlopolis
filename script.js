@@ -507,6 +507,7 @@ rodriguinho:"s",
       ione:"s",
       cantinhodapraca:"s",
       caldodecanaamaral:"s",
+      levisalgados:"s",
       espacogourmet:"s",
       kidoglanches:"s",
       didog:"s",
@@ -1930,7 +1931,7 @@ menuLinks.forEach((link) => {
                 },
 
 
-{
+                    {
                           image: "images/comercios/lanchonete/ione/ione.png",
                           name: "Ione",
                           hours: "Seg a Sab: 9:30h as 19:30h",
@@ -1959,7 +1960,45 @@ menuLinks.forEach((link) => {
 
 
 
+                    {
+                      image: "images/comercios/lanchonete/levisalgados/perfil.png",
+                      name: "Levi Salgados",
+                      hours: "Seg a Sab: 08:00h as 19:00h",
+                      statusAberto:".",
+                      horarios: {
+                        
+                        seg: [],
+                        ter: [{ inicio: "08:00", fim: "19:00" }],
+                        qua: [{ inicio: "08:00", fim: "19:00" }],
+                        qui: [{ inicio: "08:00", fim: "19:00" }],
+                        sex: [{ inicio: "08:00", fim: "19:00" }],
+                        sab: [{ inicio: "08:00", fim: "19:00" }],
+                        dom: []
+                      },
+                      address: "R. Padre Hugo, 488 , Carlópolis",
+                      contact: "(43) 99952-7826",
+                      delivery: "Sim / Com Taxa",   
+                      instagram:"https://www.instagram.com/levisalgados.clps/",
+                                        
+                       
+                      novidadesImages: [                      
+                        "images/comercios/lanchonete/levisalgados/divulgacao/1.png",
+                        "images/comercios/lanchonete/levisalgados/divulgacao/2.png",
+                           "images/comercios/lanchonete/levisalgados/divulgacao/3.png", 
+                        
 
+
+                    ],        
+                    novidadesDescriptions:[   
+                      
+                      "Agora temos pasteis deliciosos e fritos na hora, venham saborear",
+                           "Mais uma novidade na loja, nosso delicioso kibe com queijo! Uma nova sensação a cada mordida 🥰Venha experimentar 🤤",
+ 
+                        "A melhor coxinha da cidade!",
+ 
+ 
+                          ],     
+                  },
 
 
 
@@ -1983,7 +2022,7 @@ menuLinks.forEach((link) => {
                         sab: [{ inicio: "18:00", fim: "23:30" }],
                         dom: [{ inicio: "18:00", fim: "23:30" }]
                       },
-                      address: "R. Padre Hugo, 478 , Carlópolis",
+                      address: "R. Padre Hugo, 463 - Carlópolis",
                       contact: "(43) 99952-7826",
                       delivery: "Sim / Com Taxa",   
                       facebook:"https://www.facebook.com/p/Ki-dog-lanches-100063348873193/",
@@ -5118,7 +5157,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     sab: [{ inicio: "17:30", fim: "23:00" }],
                     dom: [{ inicio: "17:30", fim: "23:00" }]
                   },
-              address: "R. Padre Hugo - Carlópolis",
+              address: "R. Padre Hugo , 463 - Carlópolis",
               contact: "(43) 99640-4484",
               delivery: "Sim / Com Taxa", 
               instagram:"https://www.instagram.com/cantina_italiana_joao/",
