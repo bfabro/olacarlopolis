@@ -510,6 +510,7 @@ rodriguinho:"s",
       levisalgados:"s",
       espacogourmet:"s",
       kidoglanches:"s",
+      pracalanches:"s",
       didog:"s",
       xisbauinea:"s",
       mycoffee:"s",
@@ -2088,6 +2089,31 @@ menuLinks.forEach((link) => {
                     
                   ],               
                 },
+
+
+
+                {
+                      image: "images/comercios/lanchonete/pracaLanches/perfil.png",
+                      name: "Praça Lanches",
+                      hours: "Qua a Seg: 18:30h as 22:30h",
+                      statusAberto:".",
+                      horarios: {
+                        
+                        seg: [{ inicio: "18:30", fim: "22:30" }],
+                        ter: [],
+                        qua: [{ inicio: "18:30", fim: "22:30" }],
+                        qui: [{ inicio: "18:30", fim: "22:30" }],
+                        sex: [{ inicio: "18:30", fim: "22:30" }],
+                        sab: [{ inicio: "18:30", fim: "22:30" }],
+                        dom: [{ inicio: "18:30", fim: "22:30" }]
+                      },
+                      address: "R. Padre Hugo, 463 - Carlópolis",
+                      contact: "(43) 98830-2776",
+                      delivery: "Sim / Com Taxa",   
+                     
+                                        
+                                
+                  },
 
 
 
