@@ -492,7 +492,7 @@ rodriguinho:"s",
       // padaria
       bomjesus:"s",
       esquinadopao:"s",
-      saofrancisco:"s",
+      //saofrancisco:"s",
       prelie:"s",      
   
       //pizzaria
