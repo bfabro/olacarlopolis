@@ -3034,13 +3034,16 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       "images/comercios/farmacia/drogaMais/divulgacao/3.png",
                       "images/comercios/farmacia/drogaMais/divulgacao/4.png",
                       "images/comercios/farmacia/drogaMais/divulgacao/5.png",
+                        "images/comercios/farmacia/drogaMais/divulgacao/6.png",
                     ], 
-                       novidadesDescriptions: [                            
-                      "Você conhece a Linha LIFE, a própria marca da Drogamais?<br> ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
-                      "Quer garantir o melhor para o seu bebê?<br> Passe na Drogamais ou peça pelos nossos canais de atendimento!",
+                       novidadesDescriptions: [ 
+                        "Arraia de Ofertas na semana do plantão! Venha conferir!"  ,                         
+                     "Quer garantir o melhor para o seu bebê?<br> Passe na Drogamais ou peça pelos nossos canais de atendimento!",
                       "Tudo o que você precisa tem na DROGAMAIS! ❤️ <br>• Medicamentos • Perfumaria • Itens de beleza • Produtos de higiene! Vem pra Drogamais e encontre tudo em um só lugar! ",
                       "Em dúvidas sobre sua receita?<br> Passe na Drogamais que a gente te ajuda!",
                       "Aqui na Drogamais do Jorginho você encontra! <br>✨Uma linha completa de brinquedos e acessórios infantis Pimpolho! 👶 • Produtos de qualidade para deixar a infância ainda mais divertida e segura.• Tudo o que seu filho precisa para brincar com alegria!",
+                    "Você conhece a Linha LIFE, a própria marca da Drogamais?<br> ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
+                      
                     ],
                 },
         
@@ -4192,13 +4195,16 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       "images/comercios/farmacia/drogaMais/divulgacao/3.png",
                       "images/comercios/farmacia/drogaMais/divulgacao/4.png",
                       "images/comercios/farmacia/drogaMais/divulgacao/5.png",
+                      "images/comercios/farmacia/drogaMais/divulgacao/6.png",
                     ], 
-                    novidadesDescriptions: [                            
-                      "Você conhece a Linha LIFE, a própria marca da Drogamais?<br> ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
-                      "Quer garantir o melhor para o seu bebê?<br> Passe na Drogamais ou peça pelos nossos canais de atendimento!",
+                    novidadesDescriptions: [   
+                      "Arraia de Ofertas na semana do plantão! Venha conferir!"  ,                           
+                     "Quer garantir o melhor para o seu bebê?<br> Passe na Drogamais ou peça pelos nossos canais de atendimento!",
                       "Tudo o que você precisa tem na DROGAMAIS! ❤️ <br>• Medicamentos • Perfumaria • Itens de beleza • Produtos de higiene! Vem pra Drogamais e encontre tudo em um só lugar! ",
                       "Em dúvidas sobre sua receita?<br> Passe na Drogamais que a gente te ajuda!",
                       "Aqui na Drogamais do Jorginho você encontra! <br>✨Uma linha completa de brinquedos e acessórios infantis Pimpolho! 👶 • Produtos de qualidade para deixar a infância ainda mais divertida e segura.• Tudo o que seu filho precisa para brincar com alegria!",
+                     "Você conhece a Linha LIFE, a própria marca da Drogamais?<br> ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
+                      
                     ],
                 },
 
