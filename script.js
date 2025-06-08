@@ -556,6 +556,7 @@ rodriguinho:"s",
       limone:"s",
       sorvetessallesferreira:"s",
       santtinogelateria:"s",
+      fortyshake:"s",
 
       // topografia
       da2engenharia:"s",
@@ -2392,6 +2393,49 @@ menuLinks.forEach((link) => {
           link: document.querySelector("#menuSorveteria"),
           title: "Sorveteria",
           establishments: [
+
+
+{
+                image: "images/comercios/sorveteria/fortyshake/perfil.png",
+                name: "Forty Shake",
+                hours: "Dom a Dom: 13:00h as 23:00h",
+                statusAberto:".",
+                horarios: {                          
+                  seg: [{ inicio: "13:00", fim: "23:00" }],
+                  ter: [{ inicio: "13:00", fim: "23:00" }],
+                  qua: [{ inicio: "13:00", fim: "23:00" }],
+                  qui: [{ inicio: "13:00", fim: "23:00" }],
+                  sex: [{ inicio: "13:00", fim: "23:00" }],
+                  sab: [{ inicio: "13:00", fim: "23:00" }],
+                  dom: [{ inicio: "13:00", fim: "23:00" }],
+                }, 
+                address: "R. Benedito Salles, 832 - Centro  - Carlopolis",
+                contact: "(43) 99630-9935",
+                delivery: "Sim / Sem Taxa",
+                facebook: "https://www.facebook.com/FortyShakeSorvetes/",
+                instagram: "https://www.instagram.com/forty_shake_carlopolis_oficial/",
+                novidadesImages: [              
+                 "images/comercios/sorveteria/fortyshake/divulgacao/1.png",
+                 "images/comercios/sorveteria/fortyshake/divulgacao/2.png",
+                 "images/comercios/sorveteria/fortyshake/divulgacao/3.png",
+                 "images/comercios/sorveteria/fortyshake/divulgacao/4.png",
+                           "images/comercios/sorveteria/fortyshake/divulgacao/5.png",
+                ],     
+                novidadesDescriptions: [   
+                  "Salada de fruta com açai!",                         
+                  
+                  "Milk Kinder ❤💕🥤",
+                     "Milk Sundae fini💕🎀",
+                        "",
+                           "Milk Shake de Ovomaltine!",
+              
+                ],               
+            },
+
+
+
+
+
               {
                   image: "images/comercios/sorveteria/limone/limone.png",
                   name: "Limone",
