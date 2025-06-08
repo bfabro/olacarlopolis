@@ -350,7 +350,7 @@ function montarCarrosselDivulgacao() {
     slide.classList.add("swiper-slide");
   
     slide.innerHTML = `
-      <img class="content_image" src="${imagem}" alt="${est.name} loading="lazy"">
+      <img class="content_image" src="${imagem}" alt="${est.name}" loading="lazy">
       <div class="info_divulgacao">
         <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
         <p>${texto}</p>
