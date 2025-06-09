@@ -541,7 +541,7 @@ rodriguinho:"s",
       pesqueirodogalego:"s",
       portal:"s",
       neia:"s",
-      oficinadosabor:"s",
+      //oficinadosabor:"s",
       paiol: "s", 
       restaurantedadi:"s",
       sabordaroca:"s",
@@ -6042,13 +6042,6 @@ function restaurarMenuOriginal() {
      <li  id="${normalizeName(establishment.name)}">  
 
 
-
-
-
-
-
-     
-     
     
       ${
         establishment.image
