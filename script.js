@@ -3823,17 +3823,8 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 
 
-             {
-                  image: "images/informacoes/eventos/festaJuninaApae.png",
-                  name: "Festa Junina APAE",
-                  date: "07/06/25 Abertura da Festa<br> 08/07/2025 Leilão as 14hrs",
-                  address: "R. Jorge Barros, 1777 - Carlópolis",
-                  contact: "(43) 99833-9638",
-                  instagram:"https://www.instagram.com/apaeclps/",
-                  facebook:"https://www.facebook.com/p/APAE-Carl%C3%B3polis-100067016812454/?locale=pt_BR&_rdr",
-                
-                    
-              },
+             
+          
 
               
 
@@ -5225,7 +5216,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
             {
               image: "images/comercios/restaurante/cantinaItaliana/perfil.png",
               name: "Cantina Italiana",
-              hours: "Seg: 17:30h a 23h <br> Ter: Fechado<br>Qua a Dom: 17:30h a 23h",
+              hours: "Seg: 17:30h a 23:00h <br> Ter: Fechado<br>Qua a Dom: 17:30h a 23:00h",
               statusAberto:".",
                   horarios: {                    
                     seg: [{ inicio: "17:30", fim: "23:00" }],
