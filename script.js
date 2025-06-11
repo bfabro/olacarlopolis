@@ -4964,7 +4964,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 {
                   image: "images/comercios/lojadepesca/pescaepresente/perfil.png",
                     name: "Pesca e Presente",
-                    hours: "Seg a Sexta: 08:30h as 18:00h<Br>Sab: 08:00h as 18:00h",
+                    hours: "Seg a Sab: 08:30h as 18:00h",
                     statusAberto:".",
                     horarios: {                          
                       seg: [{ inicio: "08:30", fim: "18:00" }],
