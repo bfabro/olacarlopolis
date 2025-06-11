@@ -3316,18 +3316,16 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     instagram: "https://www.instagram.com/farmaiscarlopolis/",
                     
                     novidadesImages: [               
-                      "images/comercios/farmacia/farmais/divulgacao/1.png",
-                      "images/comercios/farmacia/farmais/divulgacao/2.png",
-                      "images/comercios/farmacia/farmais/divulgacao/3.png",
-                      "images/comercios/farmacia/farmais/divulgacao/4.png",
-                      "images/comercios/farmacia/farmais/divulgacao/5.png",
+                      "images/comercios/farmacia/farmais/divulgacao/1.jpg",
+                      "images/comercios/farmacia/farmais/divulgacao/2.jpg",
+                      "images/comercios/farmacia/farmais/divulgacao/3.jpg",
+               
                     ], 
                     novidadesDescriptions: [                            
-                      "ome no horário certo – Respeite os intervalos indicados.",
+                      "Tome no horário certo – Respeite os intervalos indicados.",
                       "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
-                      "Analgésico (para dor) antitérmico (para febre)",
-                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                      "Redução da febre e para o alívio de dores",
+                      "Tome no horário certo – Respeite os intervalos indicados.",
+                      
                     ],
                 },
         
@@ -3396,19 +3394,19 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                    
                     novidadesImages: [                  
                         
-                        "images/comercios/farmacia/popularMais/divulgacao/1.png",
-                        "images/comercios/farmacia/popularMais/divulgacao/2.png",
-                        "images/comercios/farmacia/popularMais/divulgacao/3.png",
-                        "images/comercios/farmacia/popularMais/divulgacao/4.png",
-                        "images/comercios/farmacia/popularMais/divulgacao/5.png",
+                        "images/comercios/farmacia/popularMais/divulgacao/1.jpg",
+                        "images/comercios/farmacia/popularMais/divulgacao/2.jpg",
+                        "images/comercios/farmacia/popularMais/divulgacao/3.jpg",
+                        "images/comercios/farmacia/popularMais/divulgacao/4.jpg",
+                       
                                     
                     ],
-                    novidadesDescriptions: [                            
-                      "A diversão agora também está na hora de escovar os dentes<br>O Gel Dental CARMED Fini chegou para deixar a escovação da meninada muito mais gostosa e divertida!",
+                    novidadesDescriptions: [  
+                        "🦠🤧 Dengue ou H1N1? Tire a dúvida agora! ✅Na Farmácia do Jeremias, você faz o teste rápido para Dengue e H1N1 com resultado confiável e sem complicação! ⏳🔬",
                       "Diga adeus aos insetos com proteção de verdade",
-                      "Analgésico (para dor) antitérmico (para febre)",
-                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                      "Redução da febre e para o alívio de dores",
+                    "A diversão agora também está na hora de escovar os dentes<br>O Gel Dental CARMED Fini chegou para deixar a escovação da meninada muito mais gostosa e divertida!",
+                      "💳🔥 Cartão Fidelidade Popular Mais: COMPROU, GANHOU! 🔥💳Quer mais vantagens nas suas compras? Agora, na Farmácia do Jeremias, você acumula pontos a cada compra e pode trocar por descontos imperdíveis ou produtos exclusivos! 🎁💰",
+                     
                     ],
                 },
 
@@ -3433,18 +3431,18 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
                     
                     novidadesImages: [               
-                        "images/comercios/farmacia/santaMaria/divulgacao/1.png",
-                        "images/comercios/farmacia/santaMaria/divulgacao/2.png",     
-                        "images/comercios/farmacia/santaMaria/divulgacao/3.png",
-                        "images/comercios/farmacia/santaMaria/divulgacao/4.png",
-                        "images/comercios/farmacia/santaMaria/divulgacao/5.png",
+                        "images/comercios/farmacia/santaMaria/divulgacao/1.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/2.jpg",     
+                        "images/comercios/farmacia/santaMaria/divulgacao/3.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/4.jpg",
+                      
                     ], 
                     novidadesDescriptions: [                            
-                      "Venham nos Visitar",
-                      "Cólicas do trato gastrintestinal",
-                      "Analgésico (para dor) antitérmico (para febre)",
-                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                      "Redução da febre e para o alívio de dores",
+                      "Nutricolin - Silício orgânico!Estimula as proteínas da beleza na pele, cabelos e unhas.Peça já o seu manipulado ❤️",
+                       "Emagreça com saúde! Fórmula manipulada completa.",
+                        "Colágeno Verisol em sachê.",
+                         "Equilibre seu corpo e mente!",
+                     
                     ],
                 },
         
@@ -3470,18 +3468,17 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     instagram: "https://www.instagram.com/saudefarmacarlopolis/",
                   
                     novidadesImages: [               
-                        "images/comercios/farmacia/saudeFarma/divulgacao/1.png",
-                        "images/comercios/farmacia/saudeFarma/divulgacao/2.png",     
-                        "images/comercios/farmacia/saudeFarma/divulgacao/3.png",
-                        "images/comercios/farmacia/saudeFarma/divulgacao/4.png",
-                        "images/comercios/farmacia/saudeFarma/divulgacao/5.png",
+                        "images/comercios/farmacia/saudeFarma/divulgacao/1.jpg",
+                        "images/comercios/farmacia/saudeFarma/divulgacao/2.jpg",     
+                        "images/comercios/farmacia/saudeFarma/divulgacao/3.jpg",
+                       
                     ], 
                     novidadesDescriptions: [                            
-                      "Analgésico de alívio eficaz para dores intensas",
-                      "Cólicas do trato gastrintestinal",
-                      "Analgésico (para dor) antitérmico (para febre)",
-                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                      "Redução da febre e para o alívio de dores",
+                      "Faça o aferimento de glicemia e pressão aqui conosco!",
+                         "Esses são alguns dos sinais que sua pressão pode estar alta, é importante ficar atento nesse checklisk!",
+                            "Fraudas e lenço do Scooby doo você encontra na Saúde Farma, venha conferir!",
+                              
+                      
                     ],
                 },
             ],
