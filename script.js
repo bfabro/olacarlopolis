@@ -409,6 +409,7 @@ function montarCarrosselDivulgacao() {
 
         // assistencia celular
         oficinadocelular:"s",
+        cevassistenciacelular:"s",
       
 // auto peças
 paulinhoautopecas:"s",
@@ -662,15 +663,16 @@ funerariagrupocastilho:"s",
   feiradalua: "s",
   calendarioeventos: "s",
   
-  festajuninaapae:"s",
+  
   frutfest:"s",
   cresolrun:"s",
   truco:"s",
   beachvolleyball:"s",
+  cafebingo:"s",
   encontrocarroantigo:"s",
   festadosenhorbomjesus:"s",
   standup:"s", 
-  campeonatoparanafishing:"s",
+ 
   lowcity:"s",  
   toroonagashi:"s",
   passeiociclisticorotary:"s",
@@ -1297,11 +1299,45 @@ menuLinks.forEach((link) => {
                   link: document.querySelector("#menuAssistenciaCelular"),    
                   title: "Assistencia Celular",
                   establishments: [
+
+
+
+ {
+                          image: "images/comercios/assistenciaCelular/cev/perfil.jpg",
+                          name: "C e V Assistencia Celular",
+                          hours: "Seg a Sex: 08:00h as 18:30h<br> Sab: 08:00h as 13:00h",
+                           statusAberto:".",
+            horarios: {                          
+              seg: [{ inicio: "08:00", fim: "18:30" }],
+              ter: [{ inicio: "08:00", fim: "18:30" }],
+              qua: [{ inicio: "08:00", fim: "18:30" }],
+              qui: [{ inicio: "08:00", fim: "18:30" }],
+              sex: [{ inicio: "08:00", fim: "18:30" }],
+              sab: [{ inicio: "08:00", fim: "13:00" }],
+              dom: [],
+            }, 
+                          address: "R. Dra. Paula e Silva, 445 - Carlópolis",
+                          contact: "14 99607-5513",                   
+                          instagram: "https://www.instagram.com/claudiamira225/",
+                          novidadesImages: [
+                            "images/comercios/assistenciaCelular/cev/divulgacao/1.jpg",                  
+                            "images/comercios/assistenciaCelular/cev/divulgacao/2.jpg",
+                            
+                        ],
+                        novidadesDescriptions: [  
+                          "",                          
+                       
+                         
+                        ],
+                      },
+
+
+
                       {
                           image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
                           name: "Oficina do Celular",
                           hours: "Seg a Sex: 8:00h as 18:00h<br> Sab: 08:00h as 17:00h",
-                          address: "Rua Dr Paula e Silva 676",
+                          address: "R. Dra. Paula e Silva, 676 - Carlopolis",
                           contact: "(43) 3566-1600",
                           facebook: "https://www.facebook.com/oficinadocelularclps/",
                           instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
@@ -1315,6 +1351,21 @@ menuLinks.forEach((link) => {
                          
                         ],
                       },
+
+                     
+
+
+
+
+
+
+
+
+
+
+
+
+
                   ],
                 },
 
@@ -3085,7 +3136,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
           
   
                 {
-                    image: "images/comercios/farmacia/descontoFacil/descontoFacil.png",
+                    image: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg",
                     name: "Desconto Facil 1",
                     address: "R. Benedito Salles, 574 - Carlopolis",
                    
@@ -3107,18 +3158,26 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     instagram: "https://www.instagram.com/descontofacil.clps/",
                     site: "https://www.grupoasfar.com.br/",
                     novidadesImages: [               
-                      "images/comercios/farmacia/descontoFacil/divulgacao/1.png",
-                      "images/comercios/farmacia/descontoFacil/divulgacao/2.png",
-                      "images/comercios/farmacia/descontoFacil/divulgacao/3.png",
-                      "images/comercios/farmacia/descontoFacil/divulgacao/4.png",
-                      "images/comercios/farmacia/descontoFacil/divulgacao/5.png",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/1.jpg",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/2.jpg",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/3.jpg",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/4.jpg",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/5.jpg",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/6.jpg",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/7.jpg",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/8.jpg",
+                      "images/comercios/farmacia/descontoFacil/divulgacao/9.jpg",
                     ], 
                     novidadesDescriptions: [                            
                       "Carmed",
                       "Proteja e cuide da sua pele!",
-                      "Analgésico (para dor) antitérmico (para febre)",
-                      "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                      "Redução da febre e para o alívio de dores",
+                      "",
+                       "",
+                        "",
+                         "",
+                          "",
+                           "",
+                            "",
                     ],
                 },
 
@@ -3221,18 +3280,17 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     instagram: "https://www.instagram.com/farmaciadavilaclps/",
                   
                     novidadesImages: [               
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/1.png",
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/2.png",     
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/3.png",
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/4.png",
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/5.png",
+                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/1.jpg",
+                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/2.jpg", 
+                       "images/comercios/farmacia/farmaciaDaVila/divulgacao/3.jpg",     
+                   
                   ], 
                   novidadesDescriptions: [                            
-                    "Analgésico de alívio eficaz para dores intensas",
-                    "Cólicas do trato gastrintestinal",
-                    "Analgésico (para dor) antitérmico (para febre)",
-                    "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                    "Redução da febre e para o alívio de dores",
+                    "💊✨ Na Farmácia da Vila, cuidamos de você de todas as formas! ✨💊",
+                     "A gripe é uma doença respiratória altamente transmissível causada pelos vírus Influenza A e B, sendo mais comum durante os meses frios. Com a chegada do inverno, realizar um teste de influenza é essencial para um diagnóstico rápido e preciso.",
+                      "🦟 FIQUE ATENTO AOS SINTOMAS DA DENGUE! 🚨A dengue pode começar com sintomas parecidos com os da gripe, mas merece atenção! Se sentir:",
+                       
+                    
                   ],
                 },
         
@@ -3300,6 +3358,8 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       "images/comercios/farmacia/masterFarma/divulgacao/3.png",
                       "images/comercios/farmacia/masterFarma/divulgacao/4.png",
                       "images/comercios/farmacia/masterFarma/divulgacao/5.png",
+                      "images/comercios/farmacia/masterFarma/divulgacao/6.png",
+               
                     ], 
                     novidadesDescriptions: [                            
                       "Pensado para atender às necessidades do organismo feminino, MASTERFORCE Pró Mulher auxilia na sua saúde e bem-estar diário! ",
@@ -3307,7 +3367,8 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       "Para os pequenos explorarem o mundo com mais disposição! 🌟 Cuidar da imunidade é um ato de amor.",
                        "MELATONINA LÍQUIDA Dormir bem faz toda a diferença para a sua saúde! 😴 A melatonina ajuda a regular o sono de forma natural, promovendo noites mais tranquilas",
                         "Com o Cartão Crediário da Master Farma, você parcela suas compras e cuida da sua saúde sem pesar no bolso!",
-                    ],
+                    "Venha nos conhecer!"
+                      ],
                 },
                 
                 {
@@ -3830,7 +3891,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 
 
-{
+            {
               image: "images/informacoes/eventos/standUp.png",
               name: "Stand Up",
               date: "16/06/2025",
@@ -3900,6 +3961,18 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               },
 
 
+
+              {
+              image: "images/informacoes/eventos/cafeBingo.jpg",
+              name: "Cafe Bingo",
+              date: "13/07/2025",
+              address: "Rotary Clube",
+              contact: "-",
+              instagram:"https://www.instagram.com/anjos_depatasclps/",
+              
+              
+             
+          },
 
 
 
@@ -4221,7 +4294,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 
                 {
-                    image: "images/comercios/farmacia/descontoFacil/descontoFacil.png",
+                    image: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg",
                     name: "Desconto Facil 1",
                     address: "R. Benedito Salles, 574 - Carlopolis",
                     plantaoHorario: "08:00h às 21:00h", 
@@ -4445,12 +4518,12 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
      
 
         {
-          
+          image: "images/setorPublico/creche/perfil.png",
           name: "Isabel Dalla B da Silva C M e I Profa",
           hours: "-",
           address: "Av dos Diogossn",
           contact: "(43) 3566-2330",
-          facebook:"#",
+          instagram:"https://www.instagram.com/cmeiisabel/",
       },
 
       {
@@ -4599,8 +4672,9 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               image: "images/setorPublico/escolaPublica/joseSalles.png",
               name: "Escola Municipal José Salles",
               hours: "Seg a Sex: 07:45h - 17h",
-              address: "R. Quaresmeira Roxa, 418-458",
+              address: "R. Quaresmeira Roxa, Jardim Vista Alegre - 400 - Carlopolis",
               contact: "(43) 3566-1275",
+              contact2:"(43) 98868-1323",
               infoAdicional:"Turno: Manha e Tarde",
           },
 
@@ -5046,9 +5120,9 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                   delivery: "Sim / Sem Taxa",            
                   instagram: "https://www.instagram.com/seizapr/",
                   novidadesImages: [                  
-                       "images/comercios/produtosOrientais/seiza/divulgacao/9.png",
+                       "images/comercios/produtosOrientais/seiza/divulgacao/9.jpg",
                     "images/comercios/produtosOrientais/seiza/divulgacao/2.png",
-                    "images/comercios/produtosOrientais/seiza/divulgacao/1.png",
+                    "images/comercios/produtosOrientais/seiza/divulgacao/1.jpg",
                     "images/comercios/produtosOrientais/seiza/divulgacao/3.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/4.png",
                     "images/comercios/produtosOrientais/seiza/divulgacao/5.png",
