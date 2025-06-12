@@ -960,20 +960,24 @@ menuLinks.forEach((link) => {
   } else {
     promocoesAtivas.forEach((promo, idx) => {
       html += `
-      <div class="promocao-card">
-        <img src="${promo.imagem}" alt="Promoção ${promo.nome}" class="content_image promo-img" style="max-width:120px; cursor:pointer;" data-img="${promo.imagem}">
-        <div class="promo-infos">
-          <h3>${promo.nome}</h3>
-          <p>${promo.descricao}</p>
-          ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
-            `Olá, vi a oferta: "${promo.descricao}" no Site Olá Carlópolis, voces estão tendo ainda?!`
-          )}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
-          <div class="promo-countdown-container">
-            <div id="countdown${idx}" class="promo-countdown" data-expira="${promo.validade}"></div>
-          </div>
-        </div>
+  <div class="promocao-card">
+    <div class="img-desconto-container">
+      <img src="${promo.imagem}" alt="Promoção ${promo.nome}" class="content_image promo-img" style="max-width:120px; cursor:pointer;" data-img="${promo.imagem}">
+      ${promo.desconto ? `<div class="tag-desconto-img">${promo.desconto}% OFF</div>` : ""}
+    </div>
+    <div class="promo-infos">
+      <h3>${promo.nome}</h3>
+      <p>${promo.descricao}</p>
+      ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
+        `Olá, vi a oferta: "${promo.descricao}" no Olá Carlópolis e quero saber mais!`
+      )}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
+      <div class="promo-countdown-container">
+        <div id="countdown${idx}" class="promo-countdown" data-expira="${promo.validade}"></div>
       </div>
-      `;
+    </div>
+  </div>
+`;
+
     });
   }
 
@@ -1042,22 +1046,24 @@ const promocoes = [
     nome: "Seiza",
     descricao: "Conserva de Acelga 300g TAKAKI",    
     validade: "2025-06-15T21:00:00",       
-    whatsapp: "43991034187" // só números, DDD+NÚMERO
+    whatsapp: "43991034187", // só números, DDD+NÚMERO
+    desconto: "15" // em percentual, só o número
   },
   {
     imagem: "images/comercios/farmacia/drogaMais/divulgacao/1.png",
     nome: "Drogamais",
     descricao: "Ofertas da semana, venham conferir",    
     validade: "2025-06-13T21:00:00",       
-    whatsapp: "43984119145" // só números, DDD+NÚMERO
+    whatsapp: "43984119145", // só números, DDD+NÚMERO
+    desconto: "15" // em percentual, só o número
   },
   {
     imagem: "images/promocoes/2.jpg",
     nome: " Supermercado Zero Japan",
-    descricao: "Boneco La Fufu.",
-    
+    descricao: "Boneco La Fufu.",    
     validade: "2025-06-12T18:00:00",    
-       whatsapp: "4331422005"
+       whatsapp: "4331422005",
+       desconto: "15" // em percentual, só o número
   }
   // ...adicione mais promoções!
 ];
