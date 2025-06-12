@@ -973,10 +973,6 @@ menuLinks.forEach((link) => {
       )}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
 
 
-${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
-  `Olá! Vi esta oferta no Site Olá Carlópolis:\n${promo.nome}\n${promo.descricao}\nVeja a foto: ${window.location.origin}/${promo.imagem}`
-)}" target="_blank" class="mais-info">Chamar no Whats</a>` : ""}
-
 
 
       <div class="promo-countdown-container">
@@ -1070,8 +1066,8 @@ const promocoes = [
     nome: " Supermercado Zero Japan",
     descricao: "Boneco La Fufu.",    
     validade: "2025-06-13T01:28:00",    
-      // whatsapp: "4331422005",
-        whatsapp: "11998985930",
+       whatsapp: "4331422005",
+       
        desconto: "5" // em percentual, só o número
   }
   // ...adicione mais promoções!
