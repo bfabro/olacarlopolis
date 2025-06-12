@@ -969,7 +969,7 @@ menuLinks.forEach((link) => {
       <h3>${promo.nome}</h3>
       <p>${promo.descricao}</p>
       ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
-        `Olá, vi a oferta: "${promo.descricao}" no Olá Carlópolis e quero saber mais!`
+        `Olá, vi a oferta: "${promo.descricao}" no site Olá Carlópolis, estão tendo ainda?!`
       )}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
       <div class="promo-countdown-container">
         <div id="countdown${idx}" class="promo-countdown" data-expira="${promo.validade}"></div>
