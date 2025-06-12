@@ -7191,6 +7191,10 @@ document.getElementById("fecharPWABox")?.addEventListener("click", () => {
 });
 
 function expandirImagem(url) {
+  // Remove overlay antigo, se existir
+  const old = document.querySelector('.img-expand-overlay');
+  if (old) old.remove();
+
   // Cria overlay de fundo
   const overlay = document.createElement('div');
   overlay.className = 'img-expand-overlay';
@@ -7199,7 +7203,7 @@ function expandirImagem(url) {
   overlay.style.left = 0;
   overlay.style.width = '100vw';
   overlay.style.height = '100vh';
-  overlay.style.background = 'rgba(0,0,0,0.82)';
+  overlay.style.background = 'rgba(0,0,0,0.85)';
   overlay.style.display = 'flex';
   overlay.style.alignItems = 'center';
   overlay.style.justifyContent = 'center';
@@ -7210,30 +7214,9 @@ function expandirImagem(url) {
   img.src = url;
   img.style.maxWidth = '92vw';
   img.style.maxHeight = '85vh';
-  img.style.borderRadius = '14px';
+  img.style.borderRadius = '16px';
   img.style.boxShadow = '0 4px 32px rgba(0,0,0,0.9)';
   img.style.background = '#fff';
-
-  // Botão de fechar
-  const closeBtn = document.createElement('button');
-  closeBtn.innerHTML = '&times;';
-  closeBtn.className = 'img-expand-close';
-  closeBtn.style.position = 'absolute';
-  closeBtn.style.top = '32px';
-  closeBtn.style.right = '42px';
-  closeBtn.style.fontSize = '2.2em';
-  closeBtn.style.background = 'rgba(0,0,0,0.7)';
-  closeBtn.style.color = '#fff';
-  closeBtn.style.border = 'none';
-  closeBtn.style.borderRadius = '50%';
-  closeBtn.style.width = '48px';
-  closeBtn.style.height = '48px';
-  closeBtn.style.cursor = 'pointer';
-  closeBtn.style.zIndex = 10001;
-
-  closeBtn.onclick = function() {
-    document.body.removeChild(overlay);
-  };
 
   // Fechar ao clicar fora da imagem
   overlay.onclick = function(e) {
@@ -7241,11 +7224,8 @@ function expandirImagem(url) {
   };
 
   overlay.appendChild(img);
-  overlay.appendChild(closeBtn);
   document.body.appendChild(overlay);
 }
-
-
 
 
                   
