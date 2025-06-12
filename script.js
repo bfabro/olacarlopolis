@@ -939,6 +939,121 @@ menuLinks.forEach((link) => {
         `Atenção! O pagamento do site para ${establishment.name} vence hoje.`
       );
     }
+
+function mostrarPromocoes() {
+  let html = `<h2 class="highlighted">Promoções</h2>
+    <div class="promocoes-lista">`;
+
+  if (promocoes.length === 0) {
+    html += `<p>Nenhuma promoção ativa no momento.</p>`;
+  } else {
+    promocoes.forEach((promo, idx) => {
+      const expirou = new Date() > new Date(promo.validade + "T23:59:59");
+   html += `
+  <div class="promocao-card${expirou ? " promo-expirada" : ""}">
+
+    <img src="${promo.imagem}" alt="Promoção ${promo.nome}" class="content_image promo-img" style="max-width:120px; cursor:pointer;" data-img="${promo.imagem}">
+
+    
+    <div class="promo-infos">
+      <h3>${promo.nome}</h3>
+      <p>${promo.descricao}</p>
+      
+      ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
+        `Olá, vi a oferta: "${promo.descricao}" no Olá Carlópolis e quero saber mais!`
+      )}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
+      <div class="promo-countdown-container">
+      <div id="countdown${idx}" class="promo-countdown" data-expira="${promo.validade}"></div>
+    </div>
+      ${expirou ? "<span style='color:#B22222'>Expirado</span>" : ""}
+    </div>
+  </div>
+`;
+    });
+  }
+
+  html += `</div>`;
+  document.querySelector(".content_area").innerHTML = html;
+
+  // INICIALIZA O RELÓGIO DE CADA PROMOÇÃO
+  document.querySelectorAll('.promo-countdown').forEach(function(el) {
+    iniciarCountdown(el);
+  });
+
+
+  // Expansão de imagem ao clicar
+document.querySelectorAll('.promo-img').forEach(function(img){
+  img.addEventListener('click', function(){
+    expandirImagem(this.getAttribute('data-img'));
+  });
+});
+
+}
+
+
+
+
+
+// inicio relogio contador
+
+function iniciarCountdown(element) {
+  const dataExpira = element.getAttribute('data-expira');
+  if (!dataExpira) return;
+
+  function atualizar() {
+    const agora = new Date();
+    const fim = new Date(dataExpira);
+    const diff = fim - agora;
+    if (diff <= 0) {
+      element.innerHTML = "<span style='color:#B22222;font-weight:bold;'>Promoção expirada</span>";
+      return;
+    }
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const mins = Math.floor((diff / (1000 * 60)) % 60);
+    const segs = Math.floor((diff / 1000) % 60);
+
+    element.innerHTML = `
+      <span class="relogio-countdown">
+        ⏰ Termina: ${dias} D ${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}
+      </span>
+    `;
+    setTimeout(atualizar, 1000);
+  }
+
+  atualizar();
+}
+
+
+
+/// fim relogio contador
+
+
+
+const promocoes = [
+  {
+    imagem: "images/comercios/farmacia/drogaMais/divulgacao/1.png",
+    nome: "Drogamais",
+    descricao: "Ofertas da semana, venham conferir",    
+    validade: "2025-06-13T21:00:00",       
+    whatsapp: "11998985930" // só números, DDD+NÚMERO
+  },
+  {
+    imagem: "images/comercios/supermercado/zerojapan/zerojapan.png",
+    nome: " Supermercado Zero Japan",
+    descricao: "Leve 3, pague 2 no setor de bebidas! Só hoje.",
+    
+    validade: "2025-06-12T18:00:00",    
+       whatsapp: "43988347000"
+  }
+  // ...adicione mais promoções!
+];
+
+
+
+
+
+
   
     // Carregar informações de categorias
     const categories = 
@@ -5091,7 +5206,11 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
   
     
 
+////////////
 
+//////////
+
+//////////////
         
 
 
@@ -5942,7 +6061,11 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
         
 
     ]; 
-    
+    document.getElementById("menuPromocoes").addEventListener("click", function(e){
+  e.preventDefault();
+  mostrarPromocoes();
+});
+
    const menuPrevisaoTempo = document.getElementById("menuPrevisaoTempo");
 
 if (menuPrevisaoTempo) {
@@ -7067,6 +7190,60 @@ document.getElementById("fecharPWABox")?.addEventListener("click", () => {
   document.getElementById("instalarAppBox")?.classList.add("hidden");
 });
 
+function expandirImagem(url) {
+  // Cria overlay de fundo
+  const overlay = document.createElement('div');
+  overlay.className = 'img-expand-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = 0;
+  overlay.style.left = 0;
+  overlay.style.width = '100vw';
+  overlay.style.height = '100vh';
+  overlay.style.background = 'rgba(0,0,0,0.82)';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.zIndex = 9999;
+
+  // Cria a imagem expandida
+  const img = document.createElement('img');
+  img.src = url;
+  img.style.maxWidth = '92vw';
+  img.style.maxHeight = '85vh';
+  img.style.borderRadius = '14px';
+  img.style.boxShadow = '0 4px 32px rgba(0,0,0,0.9)';
+  img.style.background = '#fff';
+
+  // Botão de fechar
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.className = 'img-expand-close';
+  closeBtn.style.position = 'absolute';
+  closeBtn.style.top = '32px';
+  closeBtn.style.right = '42px';
+  closeBtn.style.fontSize = '2.2em';
+  closeBtn.style.background = 'rgba(0,0,0,0.7)';
+  closeBtn.style.color = '#fff';
+  closeBtn.style.border = 'none';
+  closeBtn.style.borderRadius = '50%';
+  closeBtn.style.width = '48px';
+  closeBtn.style.height = '48px';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.zIndex = 10001;
+
+  closeBtn.onclick = function() {
+    document.body.removeChild(overlay);
+  };
+
+  // Fechar ao clicar fora da imagem
+  overlay.onclick = function(e) {
+    if (e.target === overlay) document.body.removeChild(overlay);
+  };
+
+  overlay.appendChild(img);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+}
 
 
 

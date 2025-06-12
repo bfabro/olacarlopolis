@@ -2071,3 +2071,79 @@ a:focus {
 }
 
 
+.promocoes-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+.promocao-card {
+  background: #fffbe8;
+  border: 2px solid #ffd700;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(255, 136, 0, 0.05);
+  padding: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 240px;
+  max-width: 390px;
+}
+.promo-expirada {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+.promocao-card h3 {
+  margin: 0;
+  font-size: 1.1em;
+}
+.promocao-card .mais-info {
+  display: inline-block;
+  margin-top: 4px;
+  color: #FF4500;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+
+
+
+.relogio-countdown {
+  display: inline-block;
+  background: #fff3cd;
+  color: #ff4500;
+  border: 1px solid #ffd700;
+  border-radius: 8px;
+  padding: 3px 10px;
+  font-size: 1em;
+  font-weight: bold;
+  margin: 5px 0 8px 0;
+}
+.promo-expirada .relogio-countdown {
+  background: #f8d7da;
+  color: #B22222;
+  border-color: #f5c2c7;
+}
+.promo-infos {
+  width: 100%;
+  text-align: center;
+  margin-top: 8px;
+}
+
+
+
+
+
+
+.img-expand-overlay {
+  animation: fadein .2s;
+}
+
+@keyframes fadein {
+  from { opacity: 0;}
+  to { opacity: 1;}
+}
+.img-expand-close:hover {
+  background: #ff3333;
+  color: #fff;
+}
