@@ -1031,6 +1031,15 @@ function iniciarCountdown(element) {
 
 
 const promocoes = [
+
+
+  {
+    imagem: "images/promocoes/1.jpg",
+    nome: "Seiza",
+    descricao: "Conserva de Acelga 300g TAKAKI",    
+    validade: "2025-06-15T21:00:00",       
+    whatsapp: "43991034187" // só números, DDD+NÚMERO
+  },
   {
     imagem: "images/comercios/farmacia/drogaMais/divulgacao/1.png",
     nome: "Drogamais",
