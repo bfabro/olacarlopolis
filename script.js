@@ -7217,6 +7217,9 @@ function expandirImagem(url) {
   img.style.borderRadius = '16px';
   img.style.boxShadow = '0 4px 32px rgba(0,0,0,0.9)';
   img.style.background = '#fff';
+  // ESSENCIAL:
+img.style.objectFit = 'contain';
+img.style.display = 'block';
 
   // Fechar ao clicar fora da imagem
   overlay.onclick = function(e) {

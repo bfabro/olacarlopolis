@@ -2100,7 +2100,7 @@ a:focus {
 .promocao-card .mais-info {
   display: inline-block;
   margin-top: 4px;
-  color: #FF4500;
+  color: #0e7513;
   font-weight: bold;
   text-decoration: underline;
 }
@@ -2145,4 +2145,18 @@ a:focus {
 .img-expand-close:hover {
   background: #ff3333;
   color: #fff;
+}
+
+
+
+.img-expand-overlay img {
+  object-fit: contain;
+  width: auto;
+  height: auto;
+  max-width: 92vw;
+  max-height: 85vh;
+  display: block;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
 }
