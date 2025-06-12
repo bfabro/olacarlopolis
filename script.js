@@ -1203,6 +1203,32 @@ nome: "Supermercado Zero Japan",
 },
 
 
+
+{
+
+nome: "MovePar",
+    imagem: "images/comercios/moveis/movepar/perfil.png",
+    promocoes: [
+      {
+        imagem: "images/promocoes/m1.jpg",
+        descricao: "CJ BOX MOLAS ENSACADAS CASAL 1.38, APENAS 999,00 A VISTA",
+        validade: "2025-06-14T18:00:00",
+       // desconto: "5",
+        whatsapp: "4391201782"
+      },
+
+      {
+        imagem: "images/promocoes/m2.jpg",
+        descricao: "ESTOFADO 3X2 LUGARES, APENAS 999,00 A VISTA",
+        validade: "2025-06-14T18:00:00",
+       // desconto: "5",
+        whatsapp: "4391201782"
+      },
+      // ...até 10 promoções
+    ]
+},
+
+
   // ...outros comércios
 ];
 
