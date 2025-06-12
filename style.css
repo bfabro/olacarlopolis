@@ -2223,7 +2223,7 @@ a:focus {
 }
 .promo-carousel-modal {
   background: #fff;
-  padding: 20px 0px 14px 0px;
+  padding: 30px 0px 14px 0px;
   border-radius: 18px;
   box-shadow: 0 8px 48px #0005;
   position: relative;
@@ -2233,7 +2233,7 @@ a:focus {
   text-align: center;
 }
 .promo-carousel-img {
-  max-width: 340px; max-height: 280px; margin: 0 auto 15px; border-radius: 14px; display: block;
+  max-width: 340px; max-height: 360px; margin: 0 auto 15px; border-radius: 14px; display: block;
 }
 .promo-carousel-info { text-align:center; }
 .tag-desconto-carousel {
@@ -2243,7 +2243,7 @@ a:focus {
   box-shadow: 0 2px 8px #ff450033; letter-spacing: 1px; text-shadow: 0 1px 4px #f2000050;
 }
 .close-promo-carousel {
-  position: absolute; top:14px; right:18px; font-size:2em;
+  position: absolute; top:0px; right:10px; font-size:2em;
   background:none; border:none; color:#ff4500; cursor:pointer; z-index:10;
 }
 
@@ -2383,7 +2383,7 @@ a:focus {
   border: none;
   outline: none;
   cursor: pointer;
-  gap: 12px;
+  gap: 0px;
 }
 
 .btn-whatsapp-promo:hover, 
@@ -2401,3 +2401,4 @@ a:focus {
   color: #fff;
   filter: drop-shadow(0 0 4px #128C7E88);
 }
+

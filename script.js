@@ -1036,6 +1036,7 @@ function abrirCarrosselPromocoes(idxComercio) {
 overlay.className = 'promo-carousel-overlay';
 overlay.innerHTML = `
   <div class="promo-carousel-modal">
+    <button class="close-promo-carousel" title="Fechar">&times;</button>
     <h2>${comercio.nome}</h2>
     <div class="swiper promoSwiperUnica">
       <div class="swiper-wrapper">
@@ -1047,6 +1048,9 @@ overlay.innerHTML = `
     </div>
   </div>
 `;
+overlay.querySelector('.close-promo-carousel').onclick = () => {
+  overlay.remove();
+};
 overlay.querySelectorAll('.promo-countdown').forEach(el => {
   iniciarCountdown(el);
 });
