@@ -1049,7 +1049,7 @@ const promocoes = [
     nome: "Drogamais",
     descricao: "Ofertas da semana, venham conferir",    
     validade: "2025-06-13T21:00:00",       
-    whatsapp: "4398411-9145" // só números, DDD+NÚMERO
+    whatsapp: "43984119145" // só números, DDD+NÚMERO
   },
   {
     imagem: "images/promocoes/2.jpg",
