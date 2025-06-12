@@ -6034,6 +6034,14 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 ///
 ///
 
+//11/06
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/13.jpg",
+     descricaoFalecido: "Faleceu em Carlópolis aos 86 anos de idade, Sra 'KIMICO IKEDA'<Br>mais conhecida como: Dona Tereza Viúva do Sr Zé Ikeda .<Br>O horário da cerimônia será às 11:00 horas desta Quarta - feira no velório municipal de Carlópolis.<Br>Seu sepultamento será hoje às  17:00 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a toda família e amigos"
+
+    },
+
 //06/06
 {
       name: "Funeraria Cristo Rei",    
