@@ -943,64 +943,138 @@ menuLinks.forEach((link) => {
     
 
 
-    function mostrarPromocoes() {
+     function mostrarPromocoes() {
   let html = `<h2 class="highlighted">Promoções</h2>
-    <div class="promocoes-lista">`;
+    <div class="estab-promos-lista">`;
 
-  // FILTRAR SÓ AS QUE NÃO EXPIREDARAM
-  const agora = new Date();
-  const promocoesAtivas = promocoes.filter(promo => {
-    // Suporte para validade com ou sem hora definida
-    const expira = promo.validade.includes("T") ? new Date(promo.validade) : new Date(promo.validade + "T23:59:59");
-    return expira > agora;
-  });
+  promocoesPorComercio.forEach((comercio, idx) => {
+    // Pega a primeira promoção válida e NÃO expirada (ou a mais próxima do vencimento)
+    const agora = new Date();
+    let primeiraPromoValida = null;
+    for (const p of comercio.promocoes) {
+      if (new Date(p.validade) > agora) {
+        primeiraPromoValida = p;
+        break;
+      }
+    }
 
-  if (promocoesAtivas.length === 0) {
-    html += `<p>Nenhuma promoção ativa no momento.</p>`;
-  } else {
-    promocoesAtivas.forEach((promo, idx) => {
-      html += `
-  <div class="promocao-card">
-    <div class="img-desconto-container">
-      <img src="${promo.imagem}" alt="Promoção ${promo.nome}" class="content_image promo-img" style="max-width:120px; cursor:pointer;" data-img="${promo.imagem}">
-      ${promo.desconto ? `<div class="tag-desconto-img">-${promo.desconto}%  </div>` : ""}
-    </div>
-    <div class="promo-infos">
-      <h3>${promo.nome}</h3>
-      <p>${promo.descricao}</p>
-      ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
-        `Olá, vi a oferta: "${promo.descricao}" no site Olá Carlópolis, estão tendo ainda?!`
-      )}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
-
-
-
-
-      <div class="promo-countdown-container">
-        <div id="countdown${idx}" class="promo-countdown" data-expira="${promo.validade}"></div>
+    html += `
+      <div class="card-estab-promo" data-idx="${idx}">
+        <img src="${comercio.imagem}" alt="Promoções ${comercio.nome}" class="logo-estab-promo" />
+        <div class="info-estab-promo">
+          <h3>${comercio.nome}</h3>
+          <div class="badge-promocoes">${comercio.promocoes.length} promoção(ões)</div>
+          ${
+            primeiraPromoValida
+              ? `<div class="promo-countdown-lista" data-expira="${primeiraPromoValida.validade}" id="countdown-lista-${idx}"></div>`
+              : `<span style="color:#B22222;font-weight:bold;">Sem promoções ativas</span>`
+          }
+        </div>
       </div>
-    </div>
-  </div>
-`;
-
-    });
-  }
+    `;
+  });
 
   html += `</div>`;
   document.querySelector(".content_area").innerHTML = html;
 
-  // INICIALIZA O RELÓGIO DE CADA PROMOÇÃO
-  document.querySelectorAll('.promo-countdown').forEach(function(el) {
-    iniciarCountdown(el);
+  // Torna cada card clicável para abrir o carrossel
+  document.querySelectorAll('.card-estab-promo').forEach(card => {
+    card.addEventListener('click', function() {
+      const idx = this.getAttribute('data-idx');
+      abrirCarrosselPromocoes(idx);
+    });
   });
 
-  // Expansão de imagem ao clicar
-  document.querySelectorAll('.promo-img').forEach(function(img){
-    img.addEventListener('click', function(){
-      expandirImagem(this.getAttribute('data-img'));
-    });
+  // Ativa os countdowns
+  document.querySelectorAll('.promo-countdown-lista').forEach(el => {
+    iniciarCountdown(el);
   });
 }
 
+
+
+
+function abrirCarrosselPromocoes(idxComercio) {
+  // Remove overlay antigo se existir
+  document.querySelectorAll('.promo-carousel-overlay').forEach(el => el.remove());
+  
+  const comercio = promocoesPorComercio[idxComercio];
+  const promoSlides = comercio.promocoes.slice(0,10).map((promo, i) => `
+  <div class="swiper-slide">
+    <div class="promo-carousel-slide">
+      <img src="${promo.imagem}" class="promo-carousel-img">
+      <div class="promo-carousel-info">
+        <h4>${promo.descricao}</h4>
+        ${promo.desconto ? `<div class="tag-desconto-carousel">- ${promo.desconto}% </div>` : ""}
+        <div class="promo-countdown-container">
+          <div id="countdown-modal-${i}" class="promo-countdown" data-expira="${promo.validade}"></div>
+        </div>
+        ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
+`Olá! Vi esta oferta em ${comercio.nome}: ${promo.descricao}` +
+(promo.desconto ? ` com ${promo.desconto}% de desconto` : "") +
+` no site Olá Carlópolis, estão tendo ainda?!`
+)}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
+      </div>
+    </div>
+  </div>
+`).join('');
+
+
+
+
+
+  const overlay = document.createElement('div');
+  
+overlay.className = 'promo-carousel-overlay';
+overlay.innerHTML = `
+  <div class="promo-carousel-modal">
+    <h2>${comercio.nome}</h2>
+    <div class="swiper promoSwiperUnica">
+      <div class="swiper-wrapper">
+        ${promoSlides}
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </div>
+`;
+overlay.querySelectorAll('.promo-countdown').forEach(el => {
+  iniciarCountdown(el);
+});
+
+document.body.appendChild(overlay);
+
+// Fecha o modal ao clicar fora
+overlay.addEventListener('click', function (e) {
+  // Se clicou direto no fundo (overlay), remove!
+  if (e.target === overlay) {
+    overlay.remove();
+  }
+});
+
+
+  // Inicia Swiper
+  new Swiper('.promoSwiperUnica', {
+    slidesPerView: 1,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev'
+    },
+    pagination: {
+      el: '.swiper-pagination'
+    }
+  });
+
+  overlay.querySelector('.close-promo-carousel').onclick = () => {
+    overlay.remove();
+  };
+
+  // Inicia os countdowns de cada slide
+  overlay.querySelectorAll('.promo-countdown').forEach(el => {
+    iniciarCountdown(el);
+  });
+}
 
 
 
@@ -1042,38 +1116,65 @@ function iniciarCountdown(element) {
 
 
 
-const promocoes = [
 
 
+
+
+
+
+
+const promocoesPorComercio = [
   {
-    imagem: "images/promocoes/1.jpg",
     nome: "Seiza",
-    descricao: "Conserva de Acelga 300g TAKAKI",    
-    validade: "2025-06-15T21:00:00",       
-    whatsapp: "43991034187", // só números, DDD+NÚMERO
-    desconto: "14,6" // em percentual, só o número
+    imagem: "images/comercios/mercearia/seiza/seiza.png",
+    promocoes: [
+      {
+        imagem: "images/promocoes/1.jpg",
+        descricao: "Conserva de Acelga 300g TAKAKI",
+        validade: "2025-06-15T21:00:00",
+        desconto: "14,6",
+        whatsapp: "43991034187"
+      },
+
+      {
+        imagem: "images/promocoes/2.jpg",
+        descricao: "Conserva de Acelga 400g TAKAKI",
+        validade: "2025-06-15T21:00:00",
+        desconto: "15",
+        whatsapp: "43991034187"
+      },
+      // ...até 10 promoções
+    ]
   },
-  {
-    imagem: "images/comercios/farmacia/drogaMais/divulgacao/1.png",
-    nome: "Drogamais",
-    descricao: "Ofertas da semana, venham conferir",    
-    validade: "2025-06-13T21:00:00",       
-    whatsapp: "43984119145", // só números, DDD+NÚMERO
-    desconto: "5" // em percentual, só o número
-  },
-  {
-    imagem: "images/promocoes/2.jpg",
-    nome: " Supermercado Zero Japan",
-    descricao: "Boneco La Fufu.",    
-    validade: "2025-06-13T01:28:00",    
-       whatsapp: "4331422005",
-       
-       desconto: "5" // em percentual, só o número
-  }
-  // ...adicione mais promoções!
+
+
+   {
+
+nome: "Supermercado Zero Japan",
+    imagem: "images/comercios/supermercado/zerojapan/zerojapan.png",
+    promocoes: [
+      {
+        imagem: "images/promocoes/1.jpg",
+        descricao: "xxxxxx  o melhor da cidade voce encontra aqui 300g TAKAKI",
+        validade: "2025-06-15T21:00:00",
+        desconto: "5",
+        whatsapp: "4331422005"
+      },
+
+      {
+        imagem: "images/promocoes/2.jpg",
+        descricao: "La fufu",
+        validade: "2025-06-15T21:00:00",
+        desconto: "5",
+        whatsapp: "4331422005"
+      },
+      // ...até 10 promoções
+    ]
+},
+
+
+  // ...outros comércios
 ];
-
-
 
 
 
