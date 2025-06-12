@@ -940,35 +940,40 @@ menuLinks.forEach((link) => {
       );
     }
 
-function mostrarPromocoes() {
+    
+
+
+    function mostrarPromocoes() {
   let html = `<h2 class="highlighted">Promoções</h2>
     <div class="promocoes-lista">`;
 
-  if (promocoes.length === 0) {
+  // FILTRAR SÓ AS QUE NÃO EXPIREDARAM
+  const agora = new Date();
+  const promocoesAtivas = promocoes.filter(promo => {
+    // Suporte para validade com ou sem hora definida
+    const expira = promo.validade.includes("T") ? new Date(promo.validade) : new Date(promo.validade + "T23:59:59");
+    return expira > agora;
+  });
+
+  if (promocoesAtivas.length === 0) {
     html += `<p>Nenhuma promoção ativa no momento.</p>`;
   } else {
-    promocoes.forEach((promo, idx) => {
-      const expirou = new Date() > new Date(promo.validade + "T23:59:59");
-   html += `
-  <div class="promocao-card${expirou ? " promo-expirada" : ""}">
-
-    <img src="${promo.imagem}" alt="Promoção ${promo.nome}" class="content_image promo-img" style="max-width:120px; cursor:pointer;" data-img="${promo.imagem}">
-
-    
-    <div class="promo-infos">
-      <h3>${promo.nome}</h3>
-      <p>${promo.descricao}</p>
-      
-      ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
-        `Olá, vi a oferta: "${promo.descricao}" no Olá Carlópolis e quero saber mais!`
-      )}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
-      <div class="promo-countdown-container">
-      <div id="countdown${idx}" class="promo-countdown" data-expira="${promo.validade}"></div>
-    </div>
-      ${expirou ? "<span style='color:#B22222'>Expirado</span>" : ""}
-    </div>
-  </div>
-`;
+    promocoesAtivas.forEach((promo, idx) => {
+      html += `
+      <div class="promocao-card">
+        <img src="${promo.imagem}" alt="Promoção ${promo.nome}" class="content_image promo-img" style="max-width:120px; cursor:pointer;" data-img="${promo.imagem}">
+        <div class="promo-infos">
+          <h3>${promo.nome}</h3>
+          <p>${promo.descricao}</p>
+          ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
+            `Olá, vi a oferta: "${promo.descricao}" no Olá Carlópolis e quero saber mais!`
+          )}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
+          <div class="promo-countdown-container">
+            <div id="countdown${idx}" class="promo-countdown" data-expira="${promo.validade}"></div>
+          </div>
+        </div>
+      </div>
+      `;
     });
   }
 
@@ -980,15 +985,14 @@ function mostrarPromocoes() {
     iniciarCountdown(el);
   });
 
-
   // Expansão de imagem ao clicar
-document.querySelectorAll('.promo-img').forEach(function(img){
-  img.addEventListener('click', function(){
-    expandirImagem(this.getAttribute('data-img'));
+  document.querySelectorAll('.promo-img').forEach(function(img){
+    img.addEventListener('click', function(){
+      expandirImagem(this.getAttribute('data-img'));
+    });
   });
-});
-
 }
+
 
 
 
