@@ -2202,12 +2202,14 @@ a:focus {
   font-size: 1em;
   border-radius: 0 8px 8px 0;
   padding: 0px 0px 0px 0px;
-  margin: 0px 0px -5px 10px;
+  margin: 0px 0px -7px 0px;
   box-shadow: 0 2px 8px #ff450044;
   letter-spacing: 1px;
   text-shadow: 0 1px 4px #f2000050;
+  text-align: center;
   border-left: 4px solid #fff3;
   z-index: 2;
   /* opcional: */
   opacity: 0.95;
+  width: 100%;
 }

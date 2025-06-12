@@ -963,7 +963,7 @@ menuLinks.forEach((link) => {
   <div class="promocao-card">
     <div class="img-desconto-container">
       <img src="${promo.imagem}" alt="Promoção ${promo.nome}" class="content_image promo-img" style="max-width:120px; cursor:pointer;" data-img="${promo.imagem}">
-      ${promo.desconto ? `<div class="tag-desconto-img">${promo.desconto}% OFF</div>` : ""}
+      ${promo.desconto ? `<div class="tag-desconto-img">-${promo.desconto}%  </div>` : ""}
     </div>
     <div class="promo-infos">
       <h3>${promo.nome}</h3>
@@ -1047,7 +1047,7 @@ const promocoes = [
     descricao: "Conserva de Acelga 300g TAKAKI",    
     validade: "2025-06-15T21:00:00",       
     whatsapp: "43991034187", // só números, DDD+NÚMERO
-    desconto: "15" // em percentual, só o número
+    desconto: "14,6" // em percentual, só o número
   },
   {
     imagem: "images/comercios/farmacia/drogaMais/divulgacao/1.png",
@@ -1055,15 +1055,15 @@ const promocoes = [
     descricao: "Ofertas da semana, venham conferir",    
     validade: "2025-06-13T21:00:00",       
     whatsapp: "43984119145", // só números, DDD+NÚMERO
-    desconto: "15" // em percentual, só o número
+    desconto: "5" // em percentual, só o número
   },
   {
     imagem: "images/promocoes/2.jpg",
     nome: " Supermercado Zero Japan",
     descricao: "Boneco La Fufu.",    
-    validade: "2025-06-12T18:00:00",    
+    validade: "2025-06-13T01:28:00",    
        whatsapp: "4331422005",
-       desconto: "15" // em percentual, só o número
+       desconto: "5" // em percentual, só o número
   }
   // ...adicione mais promoções!
 ];
