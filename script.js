@@ -1138,20 +1138,42 @@ const promocoesPorComercio = [
     promocoes: [
       {
         imagem: "images/promocoes/1.jpg",
-        descricao: "Conserva de Acelga 300g TAKAKI",
-        validade: "2025-06-15T21:00:00",
-        desconto: "14,6",
+        descricao: "Bolinho Custard Orion 138G",
+        validade: "2025-06-30T23:00:00",
+        //desconto: "14,6",
         whatsapp: "43991034187"
       },
 
       {
         imagem: "images/promocoes/11.jpg",
         descricao: "Biscoito Wafer 57,6G",
-        validade: "2025-06-15T21:00:00",
-        desconto: "14,8",
+        validade: "2025-06-30T21:00:00",
+        desconto: "20,59",
         whatsapp: "43991034187"
       },
-      // ...até 10 promoções
+       {
+        imagem: "images/promocoes/3.jpg",
+        descricao: "Cookie Blanchule Bourbon 78g",
+        validade: "2025-06-30T23:00:00",
+        //desconto: "20,59",
+        whatsapp: "43991034187"
+      },
+
+        {
+        imagem: "images/promocoes/4.jpg",
+        descricao: "Alfort Mini Chocolate Morango 5g",
+        validade: "2025-06-30T23:00:00",
+        //desconto: "20,59",
+        whatsapp: "43991034187"
+      },
+
+       {
+        imagem: "images/promocoes/5.jpg",
+        descricao: "Chocolate Branco Morinaga Dars",
+        validade: "2025-06-30T23:00:00",
+        //desconto: "20,59",
+        whatsapp: "43991034187"
+      },
     ]
   },
 
