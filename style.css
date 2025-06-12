@@ -2272,7 +2272,7 @@ a:focus {
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 2px 20px #0001;
-  padding: 1px 10px;
+  padding: 10px 10px 0px 10px;
   min-height: 150px;
   cursor: pointer;
   transition: box-shadow 0.15s, transform 0.10s;
@@ -2305,6 +2305,7 @@ a:focus {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  width: 250px;
 }
 
 .info-estab-promo h3 {
@@ -2313,6 +2314,7 @@ a:focus {
   color: #2e8b57;
   font-weight: bold;
   letter-spacing: 1px;
+  text-align: center;
 }
 
 .badge-promocoes {

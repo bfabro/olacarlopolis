@@ -963,7 +963,7 @@ menuLinks.forEach((link) => {
         <img src="${comercio.imagem}" alt="Promoções ${comercio.nome}" class="logo-estab-promo" />
         <div class="info-estab-promo">
           <h3>${comercio.nome}</h3>
-          <div class="badge-promocoes">${comercio.promocoes.length} promoção(ões)</div>
+          <div class="badge-promocoes">${comercio.promocoes.length} - Promoção(ões)</div>
           ${
             primeiraPromoValida
               ? `<div class="promo-countdown-lista" data-expira="${primeiraPromoValida.validade}" id="countdown-lista-${idx}"></div>`
@@ -1164,7 +1164,7 @@ nome: "Supermercado Zero Japan",
       {
         imagem: "images/promocoes/2.jpg",
         descricao: "Boneco La Fufu",
-        validade: "2025-06-15T21:00:00",
+        validade: "2025-06-13T21:00:00",
         desconto: "5",
         whatsapp: "4331422005"
       },
@@ -1172,7 +1172,7 @@ nome: "Supermercado Zero Japan",
       {
         imagem: "images/promocoes/22.jpg",
         descricao: "Perfume Body Splash",
-        validade: "2025-06-15T21:00:00",
+        validade: "2025-06-14T21:00:00",
         desconto: "5",
         whatsapp: "4331422005"
       },
