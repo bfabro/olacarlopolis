@@ -1048,9 +1048,9 @@ const promocoes = [
     whatsapp: "11998985930" // só números, DDD+NÚMERO
   },
   {
-    imagem: "images/comercios/supermercado/zerojapan/zerojapan.png",
+    imagem: "images/promocoes/2.jpg",
     nome: " Supermercado Zero Japan",
-    descricao: "Leve 3, pague 2 no setor de bebidas! Só hoje.",
+    descricao: "Boneco La Fufu.",
     
     validade: "2025-06-12T18:00:00",    
        whatsapp: "43988347000"
