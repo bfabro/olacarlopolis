@@ -971,6 +971,14 @@ menuLinks.forEach((link) => {
       ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
         `Olá, vi a oferta: "${promo.descricao}" no site Olá Carlópolis, estão tendo ainda?!`
       )}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
+
+
+${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
+  `Olá! Vi esta oferta no Olá Carlópolis:\n${promo.nome}\n${promo.descricao}\nVeja a foto: ${window.location.origin}/${promo.imagem}`
+)}" target="_blank" class="mais-info">Chamar no Whats</a>` : ""}
+
+
+
       <div class="promo-countdown-container">
         <div id="countdown${idx}" class="promo-countdown" data-expira="${promo.validade}"></div>
       </div>
