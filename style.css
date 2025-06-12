@@ -2223,13 +2223,14 @@ a:focus {
 }
 .promo-carousel-modal {
   background: #fff;
-  padding: 20px 0px 14px 20px;
+  padding: 20px 0px 14px 0px;
   border-radius: 18px;
   box-shadow: 0 8px 48px #0005;
   position: relative;
   min-width: 330px; max-width: 94vw;
   min-height: 340px; max-height: 92vh;
   overflow-y: auto;
+  text-align: center;
 }
 .promo-carousel-img {
   max-width: 340px; max-height: 280px; margin: 0 auto 15px; border-radius: 14px; display: block;
