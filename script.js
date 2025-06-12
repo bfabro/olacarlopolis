@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-   "seiza","vania","zerojapan", "prelie", "sorvetessallesferreira","drogamais"
+   "feiradalua","seiza","vania","zerojapan", "prelie", "sorvetessallesferreira","drogamais"
   
 ]; 
 
@@ -1037,16 +1037,17 @@ menuLinks.forEach((link) => {
                         {
                             image: "images/comercios/acougue/curitiba/curitiba.png",
                             name: "Açougue Curitiba",
-                            hours: "Seg a Sex: 8:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                            hours: "Seg a Sab: 08:00h as 20:00h </br> Dom: 08:00h as 12:00h",
                             statusAberto:"a",
                             horarios: {
-                              dom: [{ inicio: "08:00", fim: "18:00" }],
-                              seg: [{ inicio: "08:00", fim: "18:00" }],
-                              ter: [{ inicio: "08:00", fim: "18:00" }],
-                              qua: [{ inicio: "08:00", fim: "18:00" }],
-                              qui: [{ inicio: "08:00", fim: "18:00" }],
-                              sex: [{ inicio: "08:00", fim: "18:00" }],
-                              sab: [{ inicio: "08:00", fim: "12:00" }]
+                              
+                              seg: [{ inicio: "08:00", fim: "20:00" }],
+                              ter: [{ inicio: "08:00", fim: "20:00" }],
+                              qua: [{ inicio: "08:00", fim: "20:00" }],
+                              qui: [{ inicio: "08:00", fim: "20:00" }],
+                              sex: [{ inicio: "08:00", fim: "20:00" }],
+                              sab: [{ inicio: "08:00", fim: "20:00" }],
+                              dom: [{ inicio: "08:00", fim: "12:00" }]
                             },
                             address: "Rua Benedito Salles, 409",
                             contact: "(43) 99635-1001",
@@ -1615,7 +1616,7 @@ menuLinks.forEach((link) => {
                         instagram: "https://www.instagram.com/feiradaluacarlopolis/",
                         novidadesImages: [                 
                           
-                          "images/comercios/feiraLua/divulgacao/1.png",
+                          "images/comercios/feiraLua/divulgacao/1.jpg",
                           "images/comercios/feiraLua/divulgacao/2.png",
                           "images/comercios/feiraLua/divulgacao/3.png",
                           "images/comercios/feiraLua/divulgacao/4.png",
@@ -1625,7 +1626,7 @@ menuLinks.forEach((link) => {
                       ],     
                       
                       novidadesDescriptions: [ 
-"Fernando e Mary - 06/06 a partir das 19:00hrs",
+"Juninho Ribeiro - 13/06 a partir das 19:00hrs",
 
 
                       ],
