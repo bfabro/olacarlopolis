@@ -1009,11 +1009,19 @@ function abrirCarrosselPromocoes(idxComercio) {
         <div class="promo-countdown-container">
           <div id="countdown-modal-${i}" class="promo-countdown" data-expira="${promo.validade}"></div>
         </div>
-        ${promo.whatsapp ? `<a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
-`Olá! Vi esta oferta em ${comercio.nome}: ${promo.descricao}` +
-(promo.desconto ? ` com ${promo.desconto}% de desconto` : "") +
-` no site Olá Carlópolis, estão tendo ainda?!`
-)}" target="_blank" class="mais-info">Chamar no WhatsApp</a>` : ""}
+        ${promo.whatsapp ? `
+  <a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
+    `Olá! vi esta oferta: ${promo.descricao}` +
+    (promo.desconto ? ` com ${promo.desconto}% de desconto` : "") +
+    ` no site Olá Carlópolis, estão tendo ainda?!`
+  )}" 
+  target="_blank" 
+  class="btn-whatsapp-promo"
+  rel="noopener">
+    <i class="fab fa-whatsapp"></i> Negociar pelo WhatsApp
+  </a>
+` : ""}
+
       </div>
     </div>
   </div>
@@ -1137,10 +1145,10 @@ const promocoesPorComercio = [
       },
 
       {
-        imagem: "images/promocoes/2.jpg",
-        descricao: "Conserva de Acelga 400g TAKAKI",
+        imagem: "images/promocoes/11.jpg",
+        descricao: "Biscoito Wafer 57,6G",
         validade: "2025-06-15T21:00:00",
-        desconto: "15",
+        desconto: "14,8",
         whatsapp: "43991034187"
       },
       // ...até 10 promoções
@@ -1154,16 +1162,16 @@ nome: "Supermercado Zero Japan",
     imagem: "images/comercios/supermercado/zerojapan/zerojapan.png",
     promocoes: [
       {
-        imagem: "images/promocoes/1.jpg",
-        descricao: "xxxxxx  o melhor da cidade voce encontra aqui 300g TAKAKI",
+        imagem: "images/promocoes/2.jpg",
+        descricao: "Boneco La Fufu",
         validade: "2025-06-15T21:00:00",
         desconto: "5",
         whatsapp: "4331422005"
       },
 
       {
-        imagem: "images/promocoes/2.jpg",
-        descricao: "La fufu",
+        imagem: "images/promocoes/22.jpg",
+        descricao: "Perfume Body Splash",
         validade: "2025-06-15T21:00:00",
         desconto: "5",
         whatsapp: "4331422005"

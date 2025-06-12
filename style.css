@@ -2252,7 +2252,7 @@ a:focus {
   grid-template-columns: 1fr;
   gap: 32px;
   max-width: 900px;
-  margin: 40px auto 0 auto;
+  margin: 20px auto 0 auto;
   padding: 0 10px;
 }
 
@@ -2346,7 +2346,7 @@ a:focus {
 @media (max-width: 700px) {
   .estab-promos-lista {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 13px;
     max-width: 99vw;
     padding: 0 2px;
   }
@@ -2361,3 +2361,40 @@ a:focus {
   }
 }
 
+.btn-whatsapp-promo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #25D366 60%, #128C7E 100%);
+  color: #fff;
+  font-size: 1.1em;
+  font-weight: bold;
+      padding: 5px 5px 5px 5px;
+  border-radius: 12px;
+  margin-top: 10px;
+  margin-bottom: 8px;
+  text-decoration: none !important;
+  box-shadow: 0 4px 18px #25d36630;
+  transition: background 0.15s, transform 0.13s, box-shadow 0.14s;
+  letter-spacing: 1px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  gap: 12px;
+}
+
+.btn-whatsapp-promo:hover, 
+.btn-whatsapp-promo:focus {
+  background: linear-gradient(90deg, #128C7E 0%, #25D366 100%);
+  color: #fff;
+  transform: scale(1.04);
+  box-shadow: 0 8px 30px #25d36666;
+  text-decoration: none;
+}
+
+.btn-whatsapp-promo i {
+  font-size: 1.55em;
+  margin-right: 10px;
+  color: #fff;
+  filter: drop-shadow(0 0 4px #128C7E88);
+}
