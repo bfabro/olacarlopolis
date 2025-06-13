@@ -2330,17 +2330,22 @@ a:focus {
 }
 
 .promo-countdown-lista {
-  margin-top: 0;
-  font-size: 1em;
   font-weight: bold;
-  color: #ff9800;
-  background: #fff7e1;
-  border-radius: 7px;
-  padding: 5px 10px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 2px 0px;
+  border-radius: 8px;
+  color: #8a6d3b;
   display: inline-block;
-  box-shadow: 0 1px 4px #ffb90022;
-  letter-spacing: 1px;
+  white-space: nowrap; /* 🟢 Mantém tudo em linha */
+  font-size: 15px;
 }
+
+.promo-countdown-lista span {
+  display: inline;
+  white-space: nowrap;
+}
+
 
 .relogio-countdown {
   font-size: 1em;
@@ -2514,4 +2519,22 @@ a:focus {
 .card-conteudo {
   padding: 10px 15px;
   flex: 1;
+}
+.contador-horizontal {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.contador-horizontal span {
+  background-color: #222;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  min-width: 60px;
+  text-align: center;
 }

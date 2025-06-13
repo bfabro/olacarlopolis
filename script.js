@@ -966,7 +966,7 @@ menuLinks.forEach((link) => {
         <img src="${comercio.imagem}" alt="Promoções ${comercio.nome}" class="logo-estab-promo" />
         <div class="info-estab-promo">
           <h3>${comercio.nome}</h3>
-          <div class="badge-promocoes">${comercio.promocoes.length} - Promoção(ões)</div>
+          <div class="badge-promocoes"> ${comercio.promocoes.length} - Promoções</div>
           ${
             primeiraPromoValida
               ? `<div class="promo-countdown-lista" data-expira="${primeiraPromoValida.validade}" id="countdown-lista-${idx}"></div>`
@@ -1134,7 +1134,7 @@ function iniciarCountdown(element) {
 
     element.innerHTML = `
       <span class="relogio-countdown">
-        ⏰ Termina: <br>${dias} D ${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}
+        ⏰ Termina:${dias} D ${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}
       </span>
     `;
     setTimeout(atualizar, 1000);
