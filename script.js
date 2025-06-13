@@ -2446,26 +2446,40 @@ nome: "MovePar",
 
 
                 {
-                      image: "images/comercios/lanchonete/pracaLanches/perfil.png",
+                      image: "images/comercios/lanchonete/pracaLanches/perfil.jpg",
                       name: "Praça Lanches",
-                      hours: "Qua a Seg: 18:30h as 22:30h",
+                      hours: "Qua a Seg: 18:30h as 22:45h",
                       statusAberto:".",
                       horarios: {
                         
-                        seg: [{ inicio: "18:30", fim: "22:30" }],
+                        seg: [{ inicio: "18:30", fim: "22:45" }],
                         ter: [],
-                        qua: [{ inicio: "18:30", fim: "22:30" }],
-                        qui: [{ inicio: "18:30", fim: "22:30" }],
-                        sex: [{ inicio: "18:30", fim: "22:30" }],
-                        sab: [{ inicio: "18:30", fim: "22:30" }],
-                        dom: [{ inicio: "18:30", fim: "22:30" }]
+                        qua: [{ inicio: "18:30", fim: "22:45" }],
+                        qui: [{ inicio: "18:30", fim: "22:45" }],
+                        sex: [{ inicio: "18:30", fim: "22:45" }],
+                        sab: [{ inicio: "18:30", fim: "22:45" }],
+                        dom: [{ inicio: "18:30", fim: "22:45" }]
                       },
                       address: "R. Padre Hugo, 463 - Carlópolis",
                       contact: "(43) 98830-2776",
                       delivery: "Sim / Com Taxa",   
                      
-                                        
-                                
+                                   novidadesImages: [
+                            
+                              "images/comercios/lanchonete/pracaLanches/divulgacao/1.jpg",
+                             "images/comercios/lanchonete/pracaLanches/divulgacao/2.jpg",
+                             "images/comercios/lanchonete/pracaLanches/divulgacao/3.jpg",
+                             "images/comercios/lanchonete/pracaLanches/divulgacao/4.jpg",
+                             "images/comercios/lanchonete/pracaLanches/divulgacao/5.jpg",
+                          ],        
+                          
+                            novidadesDescriptions: [ 
+                              "Aquele Dogão no capricho!", 
+                               "Dogão muito bem recheado!",   
+                                "Cortamos ao meio, praticidade na hora da fome",   
+                                 "X-Gaucho!",       
+                                  "X-Gaucho!",   
+                                    ],  
                   },
 
 
