@@ -399,7 +399,7 @@ function montarCarrosselDivulgacao() {
   
       // Agropecuaria
       agrovida: "s", 
-      saojose:"s", 
+      racoessaojose:"s", 
   
 
       // assessocia balistica
@@ -1667,8 +1667,8 @@ nome: "Agro São José",
 
                         {
                             image: "images/comercios/agropecuaria/saoJose/perfil.png",
-                            name: "São Jose",
-                            hours: "Seg a Sex: 8:00h as 19:00h </br> Sab: 08:00h as 19:00h",
+                            name: "Rações São Jose",
+                            hours: "Seg a Sex: 08:00h as 19:00h </br> Sab: 08:00h as 19:00h",
                             statusAberto:"a",
                             horarios: {
                               
@@ -1684,6 +1684,7 @@ nome: "Agro São José",
                             contact: "(43) 99682-9898",
                             delivery: "Sim / Sem Taxa",
                             facebook: "https://www.facebook.com/p/Ra%C3%A7%C3%B5es-S%C3%A3o-Jos%C3%A9-100088108752876/",
+                            instagram:"https://www.instagram.com/racoessaojosecarlopolis/",
                             
                             novidadesImages: [
                               "images/comercios/agropecuaria/saoJose/divulgacao/1.png",
