@@ -1281,7 +1281,7 @@ nome: "MovePar",
         validade: "2025-06-14T18:00:00",
         preco:"999,00",
        // desconto: "5",
-        whatsapp: "4391201782"
+        whatsapp: "43991186909"
       },
 
       {
@@ -1290,7 +1290,7 @@ nome: "MovePar",
         validade: "2025-06-14T18:00:00",
         preco:"999,00",
        // desconto: "5",
-        whatsapp: "4391201782"
+        whatsapp: "43991186909"
       },
       // ...até 10 promoções
     ]
