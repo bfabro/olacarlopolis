@@ -1032,7 +1032,7 @@ function abrirCarrosselPromocoes(idxComercio) {
   <div class="promo-card whatsapp">
     <a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
       `Olá! vi esta oferta: ${promo.descricao || ''}` +
-      `${promo.preco ? ` por R$ ${promo.preco}` : ''}` +
+      `${promo.preco ? ` de R$ ${promo.preco}` : ''}` +
       ` no site Olá Carlópolis, estão tendo ainda?!`
     )}"target="_blank"
                class="btn-whatsapp-promo"
@@ -1279,6 +1279,53 @@ nome: "MovePar",
         preco:"999,00",
        // desconto: "5",
         whatsapp: "4391201782"
+      },
+      // ...até 10 promoções
+    ]
+},
+
+
+{
+
+nome: "Agro São José",
+    imagem: "images/comercios/agropecuaria/saojose/perfil.png",
+    promocoes: [
+      
+
+      {
+        imagem: "images/promocoes/agro/saojose/1.jpg",
+        descricao: "Casinhas a vista 10% desconto",
+        validade: "2025-06-15T18:00:00",
+       // preco:"999,00",
+       // desconto: "5",
+        whatsapp: "43996829898"
+      },
+
+      {
+        imagem: "images/promocoes/agro/saojose/2.jpg",
+        descricao: "Botina",
+        validade: "2025-06-15T18:00:00",
+        preco:"124,90 por 85,00",
+       // desconto: "5",
+        whatsapp: "43996829898"
+      },
+
+      {
+        imagem: "images/promocoes/agro/saojose/3.jpg",
+        descricao: "Caminhas e tocas para pet  10% desconto a vista",
+        validade: "2025-06-15T18:00:00",
+       // preco:"124,90 por 85,00",
+       // desconto: "5",
+        whatsapp: "43996829898"
+      },
+
+      {
+        imagem: "images/promocoes/agro/saojose/4.jpg",
+        descricao: "Ração Aisha 15kg ",
+        validade: "2025-06-15T18:00:00",
+        preco:"55,00",
+       // desconto: "5",
+        whatsapp: "43996829898"
       },
       // ...até 10 promoções
     ]
