@@ -1034,7 +1034,7 @@ function abrirCarrosselPromocoes(idxComercio) {
                target="_blank"
                class="btn-whatsapp-promo"
                rel="noopener">
-              <i class="fab fa-whatsapp"></i> <b>Chamar no WhatsApp</b>
+               <b>Chamar no WhatsApp</b>
             </a>
           </div>
         ` : ""}
