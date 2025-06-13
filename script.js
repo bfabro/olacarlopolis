@@ -2448,17 +2448,17 @@ nome: "MovePar",
                 {
                       image: "images/comercios/lanchonete/pracaLanches/perfil.jpg",
                       name: "Praça Lanches",
-                      hours: "Qua a Seg: 18:30h as 22:45h",
+                      hours: "Qua a Seg: 18:30h as 23:00h",
                       statusAberto:".",
                       horarios: {
                         
-                        seg: [{ inicio: "18:30", fim: "22:45" }],
+                        seg: [{ inicio: "18:30", fim: "23:00" }],
                         ter: [],
-                        qua: [{ inicio: "18:30", fim: "22:45" }],
-                        qui: [{ inicio: "18:30", fim: "22:45" }],
-                        sex: [{ inicio: "18:30", fim: "22:45" }],
-                        sab: [{ inicio: "18:30", fim: "22:45" }],
-                        dom: [{ inicio: "18:30", fim: "22:45" }]
+                        qua: [{ inicio: "18:30", fim: "23:00" }],
+                        qui: [{ inicio: "18:30", fim: "23:00" }],
+                        sex: [{ inicio: "18:30", fim: "23:00" }],
+                        sab: [{ inicio: "18:30", fim: "23:00" }],
+                        dom: [{ inicio: "18:30", fim: "23:00" }]
                       },
                       address: "R. Padre Hugo, 463 - Carlópolis",
                       contact: "(43) 98830-2776",
