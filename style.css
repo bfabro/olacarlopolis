@@ -2397,7 +2397,7 @@ a:focus {
   display: flex;
   justify-content: center; /* Centraliza horizontalmente */
   align-items: center;
-  margin-top: 10px;
+  margin-top: 0px;
 }
 
 
