@@ -1028,10 +1028,13 @@ function abrirCarrosselPromocoes(idxComercio) {
           <span><b>Validade:</b> ${new Date(promo.validade).toLocaleDateString()}</span>
           
         </div>
-        ${promo.whatsapp ? `
-          <div class="promo-card whatsapp">
-            <a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(`Olá! vi esta oferta: ${promo.descricao} por ${promo.preco ? ` ` : ""} no site Olá Carlópolis, estão tendo ainda?!`)}"
-               target="_blank"
+       ${promo.whatsapp ? `
+  <div class="promo-card whatsapp">
+    <a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
+      `Olá! vi esta oferta: ${promo.descricao || ''}` +
+      `${promo.preco ? ` por R$ ${promo.preco}` : ''}` +
+      ` no site Olá Carlópolis, estão tendo ainda?!`
+    )}"target="_blank"
                class="btn-whatsapp-promo"
                rel="noopener">
                <b>Chamar no WhatsApp</b>
