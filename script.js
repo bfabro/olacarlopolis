@@ -1037,7 +1037,7 @@ function abrirCarrosselPromocoes(idxComercio) {
         ` : ""}
         <div class="promo-card validade">
           <i class="fa-solid fa-clock"></i>
-          <span><b>Validade:</b> ${new Date(promo.validade).toLocaleDateString()}</span>
+          <span><b>Valido até:</b> ${new Date(promo.validade).toLocaleDateString()}</span>
           
         </div>
        ${promo.whatsapp ? `
