@@ -2391,6 +2391,16 @@ a:focus {
   gap: 0px;
 }
 
+
+
+.promo-card.whatsapp {
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center;
+  margin-top: 10px;
+}
+
+
 .btn-whatsapp-promo:hover, 
 .btn-whatsapp-promo:focus {
   background: linear-gradient(90deg, #128C7E 0%, #25D366 100%);
