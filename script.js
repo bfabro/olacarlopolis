@@ -1433,6 +1433,44 @@ nome: "MovePar",
                     ],
                 },
 
+
+
+{
+                    link: document.querySelector("#menuArtesanato"),  
+                    title: "Artesanato",
+                    establishments: [
+                        {
+                            image: "images/comercios/artesanato/judite/perfil.jpg",
+                            name: "Judite",
+                            hours: "Seg a Sab: 08:00h as 20:00h </br> Dom: 08:00h as 12:00h",
+                            statusAberto:"a",
+                            horarios: {
+                              
+                              seg: [{ inicio: "08:00", fim: "20:00" }],
+                              ter: [{ inicio: "08:00", fim: "20:00" }],
+                              qua: [{ inicio: "08:00", fim: "20:00" }],
+                              qui: [{ inicio: "08:00", fim: "20:00" }],
+                              sex: [{ inicio: "08:00", fim: "20:00" }],
+                              sab: [{ inicio: "08:00", fim: "20:00" }],
+                              dom: [{ inicio: "08:00", fim: "12:00" }]
+                            },
+                            address: "Rua Benedito Salles, 409",
+                            contact: "(43) 99635-1001",
+                            delivery: "Sim / Sem Taxa",
+                            novidadesImages: [ 
+                            "images/comercios/acougue/curitiba/banner/banner_1.jpg",
+                            "images/comercios/acougue/curitiba/banner/banner_2.jpg",
+                            ],
+                            novidadesDescriptions: [                            
+                              "Carnes de primeiras!",
+                            ],
+                        },
+                    ],
+                },
+
+
+
+
                 {
                   link: document.querySelector("#menuAdvocacia"),    
                   title: "Escritorio de Advocacia",
@@ -2478,12 +2516,12 @@ nome: "MovePar",
                           ],        
                           
                             novidadesDescriptions: [ 
-                              "Aquele Dogão no capricho!", 
+                              "Nossa Variedade para sua escolha!",                              
                                "Dogão muito bem recheado!",   
                                 "Cortamos ao meio, praticidade na hora da fome",   
                                  "X-Gaucho!",       
                                   "X-Gaucho!",  
-
+                                    "Aquele Dogão no capricho!", 
                                   "Temos Pizzas tambem!",
                                   "Pizzas de 8 pedaços",
                                   "Pizza Recheadissima!",
