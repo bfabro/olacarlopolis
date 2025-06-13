@@ -415,7 +415,10 @@ function montarCarrosselDivulgacao() {
 paulinhoautopecas:"s",
 norbaautopecas:"s",
 
-// cartorip
+// artesanato
+judite:"s",
+
+// cartorio
 cartoriomariazelia:"s",
 
 //chaveiro
@@ -1442,27 +1445,29 @@ nome: "MovePar",
                         {
                             image: "images/comercios/artesanato/judite/perfil.jpg",
                             name: "Judite",
-                            hours: "Seg a Sab: 08:00h as 20:00h </br> Dom: 08:00h as 12:00h",
+                            hours: "Seg a Sab: 08:00h as 18:00h",
                             statusAberto:"a",
                             horarios: {
                               
-                              seg: [{ inicio: "08:00", fim: "20:00" }],
-                              ter: [{ inicio: "08:00", fim: "20:00" }],
-                              qua: [{ inicio: "08:00", fim: "20:00" }],
-                              qui: [{ inicio: "08:00", fim: "20:00" }],
-                              sex: [{ inicio: "08:00", fim: "20:00" }],
-                              sab: [{ inicio: "08:00", fim: "20:00" }],
-                              dom: [{ inicio: "08:00", fim: "12:00" }]
+                              seg: [{ inicio: "08:00", fim: "18:00" }],
+                              ter: [{ inicio: "08:00", fim: "18:00" }],
+                              qua: [{ inicio: "08:00", fim: "18:00" }],
+                              qui: [{ inicio: "08:00", fim: "18:00" }],
+                              sex: [{ inicio: "08:00", fim: "18:00" }],
+                              sab: [{ inicio: "08:00", fim: "18:00" }],
+                              dom: []
                             },
-                            address: "Rua Benedito Salles, 409",
-                            contact: "(43) 99635-1001",
-                            delivery: "Sim / Sem Taxa",
+                            address: "Rua Elidia Maria de Jesus, 36 - Carlopolis",
+                            contact: "(43) 99871-3498",
+                            
                             novidadesImages: [ 
-                            "images/comercios/acougue/curitiba/banner/banner_1.jpg",
-                            "images/comercios/acougue/curitiba/banner/banner_2.jpg",
+                            "images/comercios/artesanato/judite/divulgacao/1.jpg",
+                            "images/comercios/artesanato/judite/divulgacao/2.jpg",
                             ],
                             novidadesDescriptions: [                            
-                              "Carnes de primeiras!",
+                              "Bonecas de Pano",
+                              "Bolsas de croche!",
+                            
                             ],
                         },
                     ],
