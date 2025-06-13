@@ -2505,7 +2505,8 @@ nome: "MovePar",
                       },
                       address: "R. Padre Hugo, 463 - Carlópolis",
                       contact: "(43) 98830-2776",
-                      delivery: "Sim / Com Taxa",   
+                      delivery: "Sim / Com Taxa",  
+                      facebook:"https://www.facebook.com/people/Pra%C3%A7a-lanches/100063527200560/?rdid=AGSo5y3TPRtYDFnG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F16aKgCqDDv%2F", 
                      
                                    novidadesImages: [
                             
