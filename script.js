@@ -1030,7 +1030,7 @@ function abrirCarrosselPromocoes(idxComercio) {
         </div>
         ${promo.whatsapp ? `
           <div class="promo-card whatsapp">
-            <a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(`Olá! vi esta oferta: ${promo.descricao}${promo.desconto ? ` com ${promo.desconto}% de desconto` : ""} no site Olá Carlópolis, estão tendo ainda?!`)}"
+            <a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(`Olá! vi esta oferta: ${promo.descricao} por ${promo.preco ? ` ` : ""} no site Olá Carlópolis, estão tendo ainda?!`)}"
                target="_blank"
                class="btn-whatsapp-promo"
                rel="noopener">
