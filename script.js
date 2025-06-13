@@ -945,13 +945,28 @@ menuLinks.forEach((link) => {
 
     
 
-
-     function mostrarPromocoes() {
+function mostrarPromocoes() {
   let html = `<h2 class="highlighted">Promoções</h2>
     <div class="estab-promos-lista">`;
 
-  promocoesPorComercio.forEach((comercio, idx) => {
-    // Pega a primeira promoção válida e NÃO expirada (ou a mais próxima do vencimento)
+  const agora = new Date();
+
+  // Ordena os estabelecimentos pela promoção com validade mais próxima
+  const ordenados = [...promocoesPorComercio].sort((a, b) => {
+    const validadeA = a.promocoes
+      .map(p => new Date(p.validade))
+      .filter(d => d > agora)
+      .sort((x, y) => x - y)[0] || new Date("9999-12-31");
+
+    const validadeB = b.promocoes
+      .map(p => new Date(p.validade))
+      .filter(d => d > agora)
+      .sort((x, y) => x - y)[0] || new Date("9999-12-31");
+
+    return validadeA - validadeB;
+  });
+
+  ordenados.forEach((comercio, idx) => {
     const agora = new Date();
     let primeiraPromoValida = null;
     for (const p of comercio.promocoes) {
@@ -980,15 +995,12 @@ menuLinks.forEach((link) => {
   html += `</div>`;
   document.querySelector(".content_area").innerHTML = html;
 
-  // Torna cada card clicável para abrir o carrossel
-  document.querySelectorAll('.card-estab-promo').forEach(card => {
+  document.querySelectorAll('.card-estab-promo').forEach((card, i) => {
     card.addEventListener('click', function() {
-      const idx = this.getAttribute('data-idx');
-      abrirCarrosselPromocoes(idx);
+      abrirCarrosselPromocoes(promocoesPorComercio.indexOf(ordenados[i]));
     });
   });
 
-  // Ativa os countdowns
   document.querySelectorAll('.promo-countdown-lista').forEach(el => {
     iniciarCountdown(el);
   });
@@ -1134,7 +1146,7 @@ function iniciarCountdown(element) {
 
     element.innerHTML = `
       <span class="relogio-countdown">
-        ⏰ Termina:${dias} D ${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}
+        ⏰ Termina: ${dias} D ${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}
       </span>
     `;
     setTimeout(atualizar, 1000);
@@ -7585,6 +7597,3 @@ img.style.display = 'block';
   overlay.appendChild(img);
   document.body.appendChild(overlay);
 }
-
-
-                  
