@@ -1005,30 +1005,45 @@ function abrirCarrosselPromocoes(idxComercio) {
   const promoSlides = comercio.promocoes.slice(0,10).map((promo, i) => `
   <div class="swiper-slide">
     <div class="promo-carousel-slide">
-      <img src="${promo.imagem}" class="promo-carousel-img">
-      <div class="promo-carousel-info">
-        <h4>${promo.descricao}</h4>
-        ${promo.desconto ? `<div class="tag-desconto-carousel">- ${promo.desconto}% </div>` : ""}
-        <div class="promo-countdown-container">
-          <div id="countdown-modal-${i}" class="promo-countdown" data-expira="${promo.validade}"></div>
+      <img src="${promo.imagem}" class="promo-carousel-img" />
+      <div class="promo-info-cards">
+        <div class="promo-card descricao">
+          <i class="fa-solid fa-tag"></i>
+          <span>${promo.descricao}</span>
+        </div>
+        ${promo.desconto ? `
+          <div class="promo-card desconto">
+            <i class="fa-solid fa-percent"></i>
+            <span><b>Desconto:</b> -${promo.desconto}%</span>
+          </div>
+        ` : ""}
+        ${promo.preco ? `
+          <div class="promo-card preco">
+            <i class="fa-solid fa-dollar-sign"></i>
+            <span><b>Preço:</b> R$ ${promo.preco}</span>
+          </div>
+        ` : ""}
+        <div class="promo-card validade">
+          <i class="fa-solid fa-clock"></i>
+          <span><b>Validade:</b> ${new Date(promo.validade).toLocaleDateString()}</span>
+          
         </div>
         ${promo.whatsapp ? `
-  <a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(
-    `Olá! vi esta oferta: ${promo.descricao}` +
-    (promo.desconto ? ` com ${promo.desconto}% de desconto` : "") +
-    ` no site Olá Carlópolis, estão tendo ainda?!`
-  )}" 
-  target="_blank" 
-  class="btn-whatsapp-promo"
-  rel="noopener">
-    <i class="fab fa-whatsapp"></i> Chamar no WhatsApp
-  </a>
-` : ""}
-
+          <div class="promo-card whatsapp">
+            <a href="https://wa.me/55${promo.whatsapp}?text=${encodeURIComponent(`Olá! vi esta oferta: ${promo.descricao}${promo.desconto ? ` com ${promo.desconto}% de desconto` : ""} no site Olá Carlópolis, estão tendo ainda?!`)}"
+               target="_blank"
+               class="btn-whatsapp-promo"
+               rel="noopener">
+              <i class="fab fa-whatsapp"></i> <b>Chamar no WhatsApp</b>
+            </a>
+          </div>
+        ` : ""}
       </div>
     </div>
   </div>
 `).join('');
+
+
 
 
 
@@ -1116,7 +1131,7 @@ function iniciarCountdown(element) {
 
     element.innerHTML = `
       <span class="relogio-countdown">
-        ⏰ Termina: ${dias} D ${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}
+        ⏰ Termina: <br>${dias} D ${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}
       </span>
     `;
     setTimeout(atualizar, 1000);
@@ -1131,13 +1146,6 @@ function iniciarCountdown(element) {
 
 
 
-
-
-
-
-
-
-
 const promocoesPorComercio = [
   {
     nome: "Seiza",
@@ -1147,6 +1155,7 @@ const promocoesPorComercio = [
         imagem: "images/promocoes/1.jpg",
         descricao: "Bolinho Custard Orion 138G",
         validade: "2025-06-30T23:00:00",
+        preco:"17,90",
         //desconto: "14,6",
         whatsapp: "43991034187"
       },
@@ -1154,14 +1163,15 @@ const promocoesPorComercio = [
       {
         imagem: "images/promocoes/11.jpg",
         descricao: "Biscoito Wafer 57,6G",
-        validade: "2025-06-30T21:00:00",
-        desconto: "20,59",
+        validade: "2025-06-30T21:00:00",       
+        preco:"13,50",
         whatsapp: "43991034187"
       },
        {
         imagem: "images/promocoes/3.jpg",
         descricao: "Cookie Blanchule Bourbon 78g",
         validade: "2025-06-30T23:00:00",
+        preco:"16,79",
         //desconto: "20,59",
         whatsapp: "43991034187"
       },
@@ -1170,6 +1180,7 @@ const promocoesPorComercio = [
         imagem: "images/promocoes/4.jpg",
         descricao: "Alfort Mini Chocolate Morango 5g",
         validade: "2025-06-30T23:00:00",
+        preco:"13,99",
         //desconto: "20,59",
         whatsapp: "43991034187"
       },
@@ -1178,6 +1189,7 @@ const promocoesPorComercio = [
         imagem: "images/promocoes/5.jpg",
         descricao: "Chocolate Branco Morinaga Dars",
         validade: "2025-06-30T23:00:00",
+        preco:"13,99",
         //desconto: "20,59",
         whatsapp: "43991034187"
       },
@@ -1190,26 +1202,58 @@ const promocoesPorComercio = [
 nome: "Supermercado Zero Japan",
     imagem: "images/comercios/supermercado/zerojapan/zerojapan.png",
     promocoes: [
-      {
-        imagem: "images/promocoes/2.jpg",
-        descricao: "Boneco La Fufu",
-        validade: "2025-06-13T21:00:00",
-        desconto: "5",
+        {
+        imagem: "images/promocoes/zerojapan/1.jpg",
+        descricao: "Perfume YARA ARABIC",
+        validade: "2025-06-14T21:00:00",
+        preco:"199,99",
+        //desconto: "5",
         whatsapp: "4331422005"
       },
 
       {
-        imagem: "images/promocoes/22.jpg",
+        imagem: "images/promocoes/zerojapan/2.jpg",
         descricao: "Perfume Body Splash",
         validade: "2025-06-14T21:00:00",
-        desconto: "5",
+         preco:"250,00",
+        //desconto: "5",
         whatsapp: "4331422005"
       },
+
+      {
+        imagem: "images/promocoes/zerojapan/3.jpg",
+        descricao: "Perfume sHAGHAF Silver",
+        validade: "2025-06-14T21:00:00",
+          preco:"299,00",
+        whatsapp: "4331422005"
+      },
+
+      {
+        imagem: "images/promocoes/zerojapan/4.jpg",
+        descricao: "Perfume Hareem Al Sultan",
+        validade: "2025-06-14T21:00:00",
+         preco:"499,00",
+        whatsapp: "4331422005"
+      },
+
+       {
+        imagem: "images/promocoes/zerojapan/5.jpg",
+        descricao: "Perfume Atheeri",
+        validade: "2025-06-14T21:00:00",
+          preco:"750,00",
+        //desconto: "5",
+        whatsapp: "4331422005"
+      },
+
+     
+
+    
       // ...até 10 promoções
     ]
 },
 
-
+////
+////aquiiii
 
 {
 
@@ -1218,16 +1262,18 @@ nome: "MovePar",
     promocoes: [
       {
         imagem: "images/promocoes/m1.jpg",
-        descricao: "CJ BOX MOLAS ENSACADAS CASAL 1.38, APENAS 999,00 A VISTA",
+        descricao: "CJ BOX MOLAS ENSACADAS CASAL 1.38",
         validade: "2025-06-14T18:00:00",
+        preco:"999,00",
        // desconto: "5",
         whatsapp: "4391201782"
       },
 
       {
         imagem: "images/promocoes/m2.jpg",
-        descricao: "ESTOFADO 3X2 LUGARES, APENAS 999,00 A VISTA",
+        descricao: "ESTOFADO 3X2 LUGARES",
         validade: "2025-06-14T18:00:00",
+        preco:"999,00",
        // desconto: "5",
         whatsapp: "4391201782"
       },
