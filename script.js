@@ -2474,6 +2474,7 @@ nome: "MovePar",
                              "images/comercios/lanchonete/pracaLanches/divulgacao/6.jpg",
                              "images/comercios/lanchonete/pracaLanches/divulgacao/7.jpg",
                              "images/comercios/lanchonete/pracaLanches/divulgacao/8.jpg",
+                              "images/comercios/lanchonete/pracaLanches/divulgacao/9.jpg",
                           ],        
                           
                             novidadesDescriptions: [ 
@@ -2481,10 +2482,12 @@ nome: "MovePar",
                                "Dogão muito bem recheado!",   
                                 "Cortamos ao meio, praticidade na hora da fome",   
                                  "X-Gaucho!",       
-                                  "X-Gaucho!",   
+                                  "X-Gaucho!",  
+
                                   "Temos Pizzas tambem!",
-                                  "Pizza Recheadissima!",
                                   "Pizzas de 8 pedaços",
+                                  "Pizza Recheadissima!",
+                                  
                                     ],  
                   },
 
