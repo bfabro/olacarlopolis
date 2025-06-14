@@ -1183,14 +1183,7 @@ const promocoesPorComercio = [
         whatsapp: "43991034187"
       },
 
-      {
-        imagem: "images/promocoes/11.jpg",
-        descricao: "Biscoito Wafer 57,6G",
-        validade: "2025-06-30T21:00:00",       
-        preco:"17,00",
-        preco_com_desconto: "13,50",  
-        whatsapp: "43991034187"
-      },
+     
        {
         imagem: "images/promocoes/3.jpg",
         descricao: "Cookie Blanchule Bourbon 78g",
@@ -1287,7 +1280,7 @@ nome: "MovePar",
       {
         imagem: "images/promocoes/m1.jpg",
         descricao: "CJ BOX MOLAS ENSACADAS CASAL 1.38",
-        validade: "2025-06-14T18:00:00",
+        validade: "2025-06-30T18:00:00",
         preco:"1.200,00",
         preco_com_desconto: "999,00 a vista",
        // desconto: "5",
@@ -1297,7 +1290,7 @@ nome: "MovePar",
       {
         imagem: "images/promocoes/m2.jpg",
         descricao: "ESTOFADO 3X2 LUGARES",
-        validade: "2025-06-14T18:00:00",
+        validade: "2025-06-30T18:00:00",
         preco:"1.200,00",
        preco_com_desconto: "999,00 a vista",
         whatsapp: "43991186909"
