@@ -1345,7 +1345,7 @@ nome: "Agro São José",
 
       {
         imagem: "images/promocoes/agro/saojose/4.jpg",
-        descricao: "Ração Aisha 15kg ",
+        descricao: "Ração Aysha 15kg ",
         validade: "2025-06-30T18:00:00",
         preco:"60,00",
         preco_com_desconto: "55,00 a vista",
