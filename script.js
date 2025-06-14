@@ -1228,8 +1228,8 @@ nome: "Supermercado Zero Japan",
         imagem: "images/promocoes/zerojapan/1.jpg",
         descricao: "Perfume YARA ARABIC",
         validade: "2025-06-14T21:00:00",
-        preco:"199,99",
-        //desconto: "5",
+        preco:"220,00",
+       preco_com_desconto: "199,99 a vista",
         whatsapp: "4331422005"
       },
 
@@ -1237,16 +1237,17 @@ nome: "Supermercado Zero Japan",
         imagem: "images/promocoes/zerojapan/2.jpg",
         descricao: "Perfume Body Splash",
         validade: "2025-06-14T21:00:00",
-         preco:"250,00",
-        //desconto: "5",
+         preco:"280,00",
+      preco_com_desconto: "250,00 a vista",
         whatsapp: "4331422005"
       },
 
       {
         imagem: "images/promocoes/zerojapan/3.jpg",
-        descricao: "Perfume sHAGHAF Silver",
+        descricao: "Perfume Shaghaf Silver",
         validade: "2025-06-14T21:00:00",
-          preco:"299,00",
+          preco:"330,00",
+          preco_com_desconto: "750,00 a vista",
         whatsapp: "4331422005"
       },
 
@@ -1254,7 +1255,8 @@ nome: "Supermercado Zero Japan",
         imagem: "images/promocoes/zerojapan/4.jpg",
         descricao: "Perfume Hareem Al Sultan",
         validade: "2025-06-14T21:00:00",
-         preco:"499,00",
+         preco:"550,00",
+         preco_com_desconto: "750,00 a vista",
         whatsapp: "4331422005"
       },
 
@@ -1262,8 +1264,9 @@ nome: "Supermercado Zero Japan",
         imagem: "images/promocoes/zerojapan/5.jpg",
         descricao: "Perfume Atheeri",
         validade: "2025-06-14T21:00:00",
-          preco:"750,00",
-        //desconto: "5",
+          preco:"830,00",
+          preco_com_desconto: "750,00 a vista",
+       
         whatsapp: "4331422005"
       },
 
@@ -1286,7 +1289,8 @@ nome: "MovePar",
         imagem: "images/promocoes/m1.jpg",
         descricao: "CJ BOX MOLAS ENSACADAS CASAL 1.38",
         validade: "2025-06-14T18:00:00",
-        preco:"999,00",
+        preco:"1200,00",
+        preco_com_desconto: "999,00 a vista",
        // desconto: "5",
         whatsapp: "43991186909"
       },
@@ -1295,8 +1299,8 @@ nome: "MovePar",
         imagem: "images/promocoes/m2.jpg",
         descricao: "ESTOFADO 3X2 LUGARES",
         validade: "2025-06-14T18:00:00",
-        preco:"999,00",
-       // desconto: "5",
+        preco:"1200,00",
+       preco_com_desconto: "999,00 a vista",
         whatsapp: "43991186909"
       },
       // ...até 10 promoções
@@ -1314,7 +1318,7 @@ nome: "Agro São José",
       {
         imagem: "images/promocoes/agro/saojose/1.jpg",
         descricao: "Casinha de plastico N4",
-        validade: "2025-06-15T18:00:00",
+        validade: "2025-06-30T18:00:00",
         preco:"180,00",
         preco_com_desconto: "162,00 a vista",
         whatsapp: "43996829898"
@@ -1323,7 +1327,7 @@ nome: "Agro São José",
       {
         imagem: "images/promocoes/agro/saojose/2.jpg",
         descricao: "Botina ",
-        validade: "2025-06-15T18:00:00",
+        validade: "2025-06-30T18:00:00",
         preco:"124,90",
         preco_com_desconto: "85,00 a vista",
         whatsapp: "43996829898"
@@ -1332,7 +1336,7 @@ nome: "Agro São José",
       {
         imagem: "images/promocoes/agro/saojose/3.jpg",
         descricao: "Toquinha G 10% A vista",
-        validade: "2025-06-15T18:00:00",
+        validade: "2025-06-30T18:00:00",
         preco:"75,00",
         preco_com_desconto: "85,00 a vista",
         whatsapp: "43996829898"
@@ -1341,7 +1345,7 @@ nome: "Agro São José",
       {
         imagem: "images/promocoes/agro/saojose/4.jpg",
         descricao: "Ração Aisha 15kg ",
-        validade: "2025-06-15T18:00:00",
+        validade: "2025-06-30T18:00:00",
         preco:"60,00",
         preco_com_desconto: "55,00 a vista",
         whatsapp: "43996829898"
