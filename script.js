@@ -1228,7 +1228,7 @@ nome: "Supermercado Zero Japan",
         {
         imagem: "images/promocoes/zerojapan/1.jpg",
         descricao: "Perfume YARA ARABIC",
-        validade: "2025-06-14T21:00:00",
+        validade: "2025-06-15T21:00:00",
         preco:"220,00",
         preco_com_desconto: "199,99 a vista",
         whatsapp: "4331422005"
@@ -1237,7 +1237,7 @@ nome: "Supermercado Zero Japan",
       {
         imagem: "images/promocoes/zerojapan/2.jpg",
         descricao: "Perfume Body Splash",
-        validade: "2025-06-14T21:00:00",
+        validade: "2025-06-15T21:00:00",
         preco:"280,00",
         preco_com_desconto: "250,00 a vista",
         whatsapp: "4331422005"
@@ -1246,7 +1246,7 @@ nome: "Supermercado Zero Japan",
       {
         imagem: "images/promocoes/zerojapan/3.jpg",
         descricao: "Perfume Shaghaf Silver",
-        validade: "2025-06-14T21:00:00",
+        validade: "2025-06-15T21:00:00",
           preco:"330,00",
           preco_com_desconto: "299,00 a vista",
         whatsapp: "4331422005"
@@ -1255,7 +1255,7 @@ nome: "Supermercado Zero Japan",
       {
         imagem: "images/promocoes/zerojapan/4.jpg",
         descricao: "Perfume Hareem Al Sultan",
-        validade: "2025-06-14T21:00:00",
+        validade: "2025-06-15T21:00:00",
          preco:"550,00",
          preco_com_desconto: "499,00 a vista",
         whatsapp: "4331422005"
@@ -1264,7 +1264,7 @@ nome: "Supermercado Zero Japan",
        {
         imagem: "images/promocoes/zerojapan/5.jpg",
         descricao: "Perfume Atheeri",
-        validade: "2025-06-14T21:00:00",
+        validade: "2025-06-15T21:00:00",
           preco:"830,00",
           preco_com_desconto: "750,00 a vista",
        
@@ -1272,9 +1272,6 @@ nome: "Supermercado Zero Japan",
       },
 
      
-
-    
-      // ...até 10 promoções
     ]
 },
 
