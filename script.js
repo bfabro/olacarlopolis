@@ -1968,7 +1968,7 @@ nome: "Agro São José",
                 establishments: [
                     {
                         image: "images/comercios/clinicaVeterinaria/jurandir/perfil.png",
-                        name: "Clínica Veterinária Carlópolis",
+                        name: "Veterinária Carlópolis",
                         hours: "Seg a Sex: 09:00h as 18:00h <br>Sab: 09:00h a 17:00h",
                           statusAberto:"a",
                             horarios: {
@@ -2000,7 +2000,7 @@ nome: "Agro São José",
 
 {
                         image: "images/comercios/clinicaVeterinaria/sued/perfil.jpg",
-                        name: "Sued Clínica Veterinária e Petshop",
+                        name: "Sued Veterinária e Petshop",
                         hours: "Seg a Sex: 08:30h as 18:00h <br>Sab: 08:30h a 12:00h",
                         statusAberto:"a",
                             horarios: {
