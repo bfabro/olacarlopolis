@@ -2030,7 +2030,13 @@ nome: "Agro São José",
                         
                         novidadesDescriptions: [
                           "Os gatos são animais independentes, mas isso não significa que não precisam de cuidados especiais! Se liga nessas 3 dicas para garantir o bem-estar do seu bichano:",
- ], 
+"Você sabia que manter a vacinação em dia é a forma mais eficaz de proteger seu pet contra doenças graves como raiva, leptospirose, cinomose e parvovirose?",
+"🛁 Seu pet merece um banho cheio de carinho! 🐶💛 Nada como um banho relaxante pra deixar seu amigo de quatro patas limpinho, cheiroso e feliz! Além de remover sujeiras e odores, o banho também ajuda a manter a pele e os pelos saudáveis.",
+"🐾 Castração é um ato de cuidado, amor e responsabilidade! Ao optar pela castração, você está garantindo mais saúde e bem-estar para o seu pet. Confira os principais benefícios",
+"💚 Amor pelos pets e dedicação para cuidar de quem você mais ama! Aqui, cada consulta, banho ou procedimento é feito com o máximo de carinho e profissionalismo. Nosso compromisso é garantir o bem-estar e a saúde do seu melhor amigo.",
+ 
+ 
+                        ], 
 
 
                     },
