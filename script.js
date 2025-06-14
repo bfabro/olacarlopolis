@@ -671,6 +671,7 @@ funerariagrupocastilho:"s",
   cresolrun:"s",
   truco:"s",
   beachvolleyball:"s",
+  torneiodecaiaques:"s",
   cafebingo:"s",
   encontrocarroantigo:"s",
   festadosenhorbomjesus:"s",
@@ -1229,7 +1230,7 @@ nome: "Supermercado Zero Japan",
         descricao: "Perfume YARA ARABIC",
         validade: "2025-06-14T21:00:00",
         preco:"220,00",
-       preco_com_desconto: "199,99 a vista",
+        preco_com_desconto: "199,99 a vista",
         whatsapp: "4331422005"
       },
 
@@ -1237,8 +1238,8 @@ nome: "Supermercado Zero Japan",
         imagem: "images/promocoes/zerojapan/2.jpg",
         descricao: "Perfume Body Splash",
         validade: "2025-06-14T21:00:00",
-         preco:"280,00",
-      preco_com_desconto: "250,00 a vista",
+        preco:"280,00",
+        preco_com_desconto: "250,00 a vista",
         whatsapp: "4331422005"
       },
 
@@ -1247,7 +1248,7 @@ nome: "Supermercado Zero Japan",
         descricao: "Perfume Shaghaf Silver",
         validade: "2025-06-14T21:00:00",
           preco:"330,00",
-          preco_com_desconto: "750,00 a vista",
+          preco_com_desconto: "299,00 a vista",
         whatsapp: "4331422005"
       },
 
@@ -1256,7 +1257,7 @@ nome: "Supermercado Zero Japan",
         descricao: "Perfume Hareem Al Sultan",
         validade: "2025-06-14T21:00:00",
          preco:"550,00",
-         preco_com_desconto: "750,00 a vista",
+         preco_com_desconto: "499,00 a vista",
         whatsapp: "4331422005"
       },
 
@@ -1289,7 +1290,7 @@ nome: "MovePar",
         imagem: "images/promocoes/m1.jpg",
         descricao: "CJ BOX MOLAS ENSACADAS CASAL 1.38",
         validade: "2025-06-14T18:00:00",
-        preco:"1200,00",
+        preco:"1.200,00",
         preco_com_desconto: "999,00 a vista",
        // desconto: "5",
         whatsapp: "43991186909"
@@ -1299,7 +1300,7 @@ nome: "MovePar",
         imagem: "images/promocoes/m2.jpg",
         descricao: "ESTOFADO 3X2 LUGARES",
         validade: "2025-06-14T18:00:00",
-        preco:"1200,00",
+        preco:"1.200,00",
        preco_com_desconto: "999,00 a vista",
         whatsapp: "43991186909"
       },
@@ -4369,17 +4370,6 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                   contact: "",
               },
 
-           
-
-
-
-
-             
-          
-
-              
-
-
 
             {
               image: "images/informacoes/eventos/standUp.png",
@@ -4390,8 +4380,6 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               instagram:"https://www.instagram.com/p/DKAe7CkxUzQ/?img_index=1",
               infoAdicional:"Os ingressos já estão à venda! Garanta o seu agora mesmo — ou junte a galera e reserve uma mesa exclusiva só pra vocês! 🍻👯‍♀️📲 Para mais informações e reservas: (43) 99160-5120",
               
-              
-             
           },
 
 
@@ -4411,7 +4399,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 
 
-{
+            {
                   image: "images/informacoes/eventos/volley.png",
                   name: "Beach Volleyball",
                   date: "22/06/25",
@@ -4426,6 +4414,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                    
               },
 
+              
 
 
 
@@ -4450,6 +4439,19 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                  ],
               },
 
+               {
+                  image: "images/informacoes/eventos/paranaFishing.jpg",
+                  name: "Torneio de Caiaques",
+                  date: "26/06/25",
+                  address: "Represa Chavantes",
+                  contact: "(43) 99980-0495",
+                  
+                  instagram:"https://www.instagram.com/parana_fishing/",
+                  infoAdicional:"",
+                  infoAdicional:"Inscrições até 26 de Junho",
+                
+                   
+              },
 
 
               {
