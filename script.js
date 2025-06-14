@@ -1025,19 +1025,25 @@ function abrirCarrosselPromocoes(idxComercio) {
         </div>
         ${promo.desconto ? `
           <div class="promo-card desconto">
-            <i class="fa-solid fa-percent"></i>
+               <i class="fa-solid fa-percent" ></i>
             <span><b>Desconto:</b> -${promo.desconto}%</span>
           </div>
         ` : ""}
         ${promo.preco ? `
           <div class="promo-card preco">
-            <i class="fa-solid fa-dollar-sign"></i>
-            <span><b>Preço:</b> R$ ${promo.preco}</span>
+            <i class="fa-solid fa-dollar-sign" style="color: red;"></i>
+            <span><b>De:</b> <span class="preco-original">R$ ${promo.preco}</span></span>
           </div>
         ` : ""}
+        ${promo.preco_com_desconto ? `
+  <div class="promo-card preco">
+    <i class="fa-solid fa-dollar-sign"></i>
+    <span><b>Por:</b> R$ ${promo.preco_com_desconto}</span>
+  </div>
+` : ""}
         <div class="promo-card validade">
           <i class="fa-solid fa-clock"></i>
-          <span><b>Valido até:</b> ${new Date(promo.validade).toLocaleDateString()}</span>
+          <span class="preco-desconto"><b>Valido até:</b> ${new Date(promo.validade).toLocaleDateString()}</span>
           
         </div>
        ${promo.whatsapp ? `
@@ -1170,8 +1176,8 @@ const promocoesPorComercio = [
         imagem: "images/promocoes/1.jpg",
         descricao: "Bolinho Custard Orion 138G",
         validade: "2025-06-30T23:00:00",
-        preco:"17,90",
-        //desconto: "14,6",
+        preco:"26,90",
+        preco_com_desconto: "17,90",        
         whatsapp: "43991034187"
       },
 
@@ -1179,15 +1185,16 @@ const promocoesPorComercio = [
         imagem: "images/promocoes/11.jpg",
         descricao: "Biscoito Wafer 57,6G",
         validade: "2025-06-30T21:00:00",       
-        preco:"13,50",
+        preco:"17,00",
+        preco_com_desconto: "13,50",  
         whatsapp: "43991034187"
       },
        {
         imagem: "images/promocoes/3.jpg",
         descricao: "Cookie Blanchule Bourbon 78g",
         validade: "2025-06-30T23:00:00",
-        preco:"16,79",
-        //desconto: "20,59",
+        preco:"20,99",
+        preco_com_desconto: "16,79",
         whatsapp: "43991034187"
       },
 
@@ -1195,8 +1202,8 @@ const promocoesPorComercio = [
         imagem: "images/promocoes/4.jpg",
         descricao: "Alfort Mini Chocolate Morango 5g",
         validade: "2025-06-30T23:00:00",
-        preco:"13,99",
-        //desconto: "20,59",
+        preco:"17,00",
+        preco_com_desconto: "13,99",
         whatsapp: "43991034187"
       },
 
@@ -1204,8 +1211,8 @@ const promocoesPorComercio = [
         imagem: "images/promocoes/5.jpg",
         descricao: "Chocolate Branco Morinaga Dars",
         validade: "2025-06-30T23:00:00",
-        preco:"13,99",
-        //desconto: "20,59",
+        preco:"17,00",
+        preco_com_desconto: "13,99",
         whatsapp: "43991034187"
       },
     ]
@@ -1306,19 +1313,19 @@ nome: "Agro São José",
 
       {
         imagem: "images/promocoes/agro/saojose/1.jpg",
-        descricao: "Casinhas N4 vista 10% desconto",
+        descricao: "Casinha de plastico N4",
         validade: "2025-06-15T18:00:00",
         preco:"180,00",
-       // desconto: "5",
+        preco_com_desconto: "162,00 a vista",
         whatsapp: "43996829898"
       },
 
       {
         imagem: "images/promocoes/agro/saojose/2.jpg",
-        descricao: "Botina",
+        descricao: "Botina ",
         validade: "2025-06-15T18:00:00",
-        preco:"124,90 por 85,00",
-       // desconto: "5",
+        preco:"124,90",
+        preco_com_desconto: "85,00 a vista",
         whatsapp: "43996829898"
       },
 
@@ -1327,7 +1334,7 @@ nome: "Agro São José",
         descricao: "Toquinha G 10% A vista",
         validade: "2025-06-15T18:00:00",
         preco:"75,00",
-       // desconto: "5",
+        preco_com_desconto: "85,00 a vista",
         whatsapp: "43996829898"
       },
 
@@ -1335,8 +1342,8 @@ nome: "Agro São José",
         imagem: "images/promocoes/agro/saojose/4.jpg",
         descricao: "Ração Aisha 15kg ",
         validade: "2025-06-15T18:00:00",
-        preco:"55,00",
-       // desconto: "5",
+        preco:"60,00",
+        preco_com_desconto: "55,00 a vista",
         whatsapp: "43996829898"
       },
       // ...até 10 promoções

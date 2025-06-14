@@ -2548,3 +2548,21 @@ a:focus {
   min-width: 60px;
   text-align: center;
 }
+.promo-card.preco span {
+  font-weight: bold;
+  color: #333;
+}
+
+.promo-card.preco:last-child span {
+  color: green;
+}
+.preco-original {
+  color: #888;
+  text-decoration: line-through;
+  font-weight: bold;
+}
+
+.preco-desconto {
+  color: #28a745; /* ou #c0392b */
+  font-weight: bold;
+}
