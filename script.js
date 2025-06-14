@@ -438,6 +438,7 @@ chaveirocentral:"s",
 // clinica veterinaria
 
 clinicaveterinariacarlopolis:"s",
+suedclinicaveterinariaepetshop:"s",
 
 //DESPACHANTE
 rodriguinho:"s",
@@ -1968,12 +1969,24 @@ nome: "Agro São José",
                     {
                         image: "images/comercios/clinicaVeterinaria/jurandir/perfil.png",
                         name: "Clínica Veterinária Carlópolis",
-                        hours: "Seg a Sex: 09:00h as 18:00h <br>Sab: 09:00h a 17:00h<br>Dom: Fechado",
+                        hours: "Seg a Sex: 09:00h as 18:00h <br>Sab: 09:00h a 17:00h",
+                          statusAberto:"a",
+                            horarios: {
+                          
+                            seg: [{ inicio: "09:00", fim: "18:00" }],
+                            ter: [{ inicio: "09:00", fim: "18:00" }],
+                            qua: [{ inicio: "09:00", fim: "18:00" }],
+                            qui: [{ inicio: "09:00", fim: "18:00" }],
+                            sex: [{ inicio: "09:00", fim: "18:00" }],
+                            sab: [{ inicio: "09:00", fim: "17:00" }],
+                            dom: [],
+                        },
                         address: "Rua Ataliba Leonel, 410, Carlópolis, PR,",
                         contact: "(43) 3566-1664",
                         contact2:"(43) 99642-1494",                      
                         facebook: "https://www.facebook.com/veterinariacarlopolis/?locale=pt_BR",
                         instagram: "https://www.instagram.com/clinicavetcarlopolis/",
+                        infoAdicional:"Agende o horario para banho e tosa!",
                         novidadesImages: [
                      
                          "images/comercios/clinicaVeterinaria/jurandir/divulgacao/1.png",
@@ -1983,6 +1996,49 @@ nome: "Agro São José",
                          "images/comercios/clinicaVeterinaria/jurandir/divulgacao/5.png",
                         ],                    
                     },
+
+
+{
+                        image: "images/comercios/clinicaVeterinaria/sued/perfil.jpg",
+                        name: "Sued Clínica Veterinária e Petshop",
+                        hours: "Seg a Sex: 08:30h as 18:00h <br>Sab: 08:30h a 12:00h",
+                        statusAberto:"a",
+                            horarios: {
+                          
+                            seg: [{ inicio: "08:30", fim: "18:00" }],
+                            ter: [{ inicio: "08:30", fim: "18:00" }],
+                            qua: [{ inicio: "08:30", fim: "18:00" }],
+                            qui: [{ inicio: "08:30", fim: "18:00" }],
+                            sex: [{ inicio: "08:30", fim: "18:00" }],
+                            sab: [{ inicio: "08:30", fim: "12:00" }],
+                            dom: [],
+                        },
+                        address: "Av. Elson Soares,649 - Carlópolis",
+                        contact: "(43) 98851-3310 ",
+                        contact2:"(43) 3566-2623",                      
+                        facebook: "https://www.facebook.com/clinicavetsued",
+                        instagram: "https://www.instagram.com/clinicasued.vet/",
+                        infoAdicional:"Agende o horario para banho e tosa!",
+                        novidadesImages: [
+                     
+                         "images/comercios/clinicaVeterinaria/sued/divulgacao/1.jpg",
+                         "images/comercios/clinicaVeterinaria/sued/divulgacao/2.jpg",
+                         "images/comercios/clinicaVeterinaria/sued/divulgacao/3.jpg",
+                         "images/comercios/clinicaVeterinaria/sued/divulgacao/4.jpg",
+                         "images/comercios/clinicaVeterinaria/sued/divulgacao/5.jpg",
+                        ],      
+                        
+                        novidadesDescriptions: [
+                          "Os gatos são animais independentes, mas isso não significa que não precisam de cuidados especiais! Se liga nessas 3 dicas para garantir o bem-estar do seu bichano:",
+ ], 
+
+
+                    },
+
+
+
+
+
                 ],
             },
 
