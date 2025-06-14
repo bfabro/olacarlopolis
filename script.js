@@ -299,7 +299,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-   "feiradalua","seiza","vania","zerojapan", "prelie", "sorvetessallesferreira","drogamais"
+   "feiradalua","popularmais","flaviogiovani","seiza", "prelie", "vania","racoessaojose"
   
 ]; 
 
@@ -1691,7 +1691,7 @@ nome: "Agro São José",
                               sab: [{ inicio: "08:00", fim: "19:00" }],
                               dom: []
                             },
-                            address: "Rua Benedito Salles 35, Carlópolis",
+                            address: "Rua Benedito Salles, 35 - Carlópolis",
                             contact: "(43) 99682-9898",
                             delivery: "Sim / Sem Taxa",
                             facebook: "https://www.facebook.com/p/Ra%C3%A7%C3%B5es-S%C3%A3o-Jos%C3%A9-100088108752876/",
@@ -1703,6 +1703,7 @@ nome: "Agro São José",
                               
                           ],
                           novidadesDescriptions: [  
+                            "Venham nos conhecer, temos variedades em produtos para toda sua criação!<br> Trabalhamos até as 19hrs",
                             "Ração QUIDOG no precinho",                          
                             
                            
@@ -2089,7 +2090,7 @@ nome: "Agro São José",
                       ],     
                       
                       novidadesDescriptions: [ 
-"Juninho Ribeiro - 13/06 a partir das 19:00hrs",
+                      "20/06 a partir das 19:00hrs",
 
 
                       ],
@@ -3891,11 +3892,11 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                                     
                     ],
                     novidadesDescriptions: [  
-                        "🦠🤧 Dengue ou H1N1? Tire a dúvida agora! ✅Na Farmácia do Jeremias, você faz o teste rápido para Dengue e H1N1 com resultado confiável e sem complicação! ⏳🔬",
-                      "Diga adeus aos insetos com proteção de verdade",
+                          "💳🔥 Cartão Fidelidade Popular Mais: COMPROU, GANHOU! 🔥💳Quer mais vantagens nas suas compras? Agora, na Farmácia do Jeremias, você acumula pontos a cada compra e pode trocar por descontos imperdíveis ou produtos exclusivos! 🎁💰",
+                   "Diga adeus aos insetos com proteção de verdade",
                     "A diversão agora também está na hora de escovar os dentes<br>O Gel Dental CARMED Fini chegou para deixar a escovação da meninada muito mais gostosa e divertida!",
-                      "💳🔥 Cartão Fidelidade Popular Mais: COMPROU, GANHOU! 🔥💳Quer mais vantagens nas suas compras? Agora, na Farmácia do Jeremias, você acumula pontos a cada compra e pode trocar por descontos imperdíveis ou produtos exclusivos! 🎁💰",
-                     
+                       "🦠🤧 Dengue ou H1N1? Tire a dúvida agora! ✅Na Farmácia do Jeremias, você faz o teste rápido para Dengue e H1N1 com resultado confiável e sem complicação! ⏳🔬",
+                      
                     ],
                 },
 
@@ -4099,10 +4100,13 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     contact: "(43) 99906-1349",
                     instagram:"https://www.instagram.com/donascimentoflaviogiovani/",
                     novidadesImages: [               
-                      "images/servicos/churrasqueiro/flavio/divulgacao/1.png",
+                      "images/servicos/churrasqueiro/flavio/divulgacao/1.jpg",
                       "images/servicos/churrasqueiro/flavio/divulgacao/2.png",
+                      "images/servicos/churrasqueiro/flavio/divulgacao/3.png",
                      
-                  ], 
+                  ], novidadesDescriptions: [  
+                    "🔥 Churrasco de verdade tem carne no ponto, fogo controlado e zero preocupação pra você. Deixa comigo e curta sua festa!",
+                    ], 
                     
                 },
 
@@ -4903,12 +4907,12 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                        
                                     
                     ],
-                    novidadesDescriptions: [  
-                        "🦠🤧 Dengue ou H1N1? Tire a dúvida agora! ✅Na Farmácia do Jeremias, você faz o teste rápido para Dengue e H1N1 com resultado confiável e sem complicação! ⏳🔬",
-                      "Diga adeus aos insetos com proteção de verdade",
+                    novidadesDescriptions: [ 
+                         "💳🔥 Cartão Fidelidade Popular Mais: COMPROU, GANHOU! 🔥💳Quer mais vantagens nas suas compras? Agora, na Farmácia do Jeremias, você acumula pontos a cada compra e pode trocar por descontos imperdíveis ou produtos exclusivos! 🎁💰",
+                   "Diga adeus aos insetos com proteção de verdade",
                     "A diversão agora também está na hora de escovar os dentes<br>O Gel Dental CARMED Fini chegou para deixar a escovação da meninada muito mais gostosa e divertida!",
-                      "💳🔥 Cartão Fidelidade Popular Mais: COMPROU, GANHOU! 🔥💳Quer mais vantagens nas suas compras? Agora, na Farmácia do Jeremias, você acumula pontos a cada compra e pode trocar por descontos imperdíveis ou produtos exclusivos! 🎁💰",
-                     
+                       "🦠🤧 Dengue ou H1N1? Tire a dúvida agora! ✅Na Farmácia do Jeremias, você faz o teste rápido para Dengue e H1N1 com resultado confiável e sem complicação! ⏳🔬",
+                      
                     ],
                 },
 
