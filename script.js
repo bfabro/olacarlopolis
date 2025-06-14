@@ -1306,9 +1306,9 @@ nome: "Agro São José",
 
       {
         imagem: "images/promocoes/agro/saojose/1.jpg",
-        descricao: "Casinhas a vista 10% desconto",
+        descricao: "Casinhas N4 vista 10% desconto",
         validade: "2025-06-15T18:00:00",
-       // preco:"999,00",
+        preco:"180,00",
        // desconto: "5",
         whatsapp: "43996829898"
       },
@@ -1324,9 +1324,9 @@ nome: "Agro São José",
 
       {
         imagem: "images/promocoes/agro/saojose/3.jpg",
-        descricao: "Caminhas e tocas para pet  10% desconto a vista",
+        descricao: "Toquinha G 10% A vista",
         validade: "2025-06-15T18:00:00",
-       // preco:"124,90 por 85,00",
+        preco:"75,00",
        // desconto: "5",
         whatsapp: "43996829898"
       },
