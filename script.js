@@ -1336,7 +1336,7 @@ nome: "Agro São José",
         descricao: "Toquinha G",
         validade: "2025-06-30T18:00:00",
         preco:"75,00",
-        preco_com_desconto: "85,00 a vista",
+        preco_com_desconto: "67,50 a vista",
         whatsapp: "43996829898"
       },
 
