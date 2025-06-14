@@ -1966,36 +1966,6 @@ nome: "Agro São José",
                 link: document.querySelector("#menuClinicaVeterinaria"),
                 title: "Clinica Veterinaria",
                 establishments: [
-                    {
-                        image: "images/comercios/clinicaVeterinaria/jurandir/perfil.png",
-                        name: "Veterinária Carlópolis",
-                        hours: "Seg a Sex: 09:00h as 18:00h <br>Sab: 09:00h a 17:00h",
-                          statusAberto:"a",
-                            horarios: {
-                          
-                            seg: [{ inicio: "09:00", fim: "18:00" }],
-                            ter: [{ inicio: "09:00", fim: "18:00" }],
-                            qua: [{ inicio: "09:00", fim: "18:00" }],
-                            qui: [{ inicio: "09:00", fim: "18:00" }],
-                            sex: [{ inicio: "09:00", fim: "18:00" }],
-                            sab: [{ inicio: "09:00", fim: "17:00" }],
-                            dom: [],
-                        },
-                        address: "Rua Ataliba Leonel, 410, Carlópolis, PR,",
-                        contact: "(43) 3566-1664",
-                        contact2:"(43) 99642-1494",                      
-                        facebook: "https://www.facebook.com/veterinariacarlopolis/?locale=pt_BR",
-                        instagram: "https://www.instagram.com/clinicavetcarlopolis/",
-                        infoAdicional:"Agende o horario para banho e tosa!",
-                        novidadesImages: [
-                     
-                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/1.png",
-                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/2.png",
-                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/3.png",
-                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/4.png",
-                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/5.png",
-                        ],                    
-                    },
 
 
 {
@@ -2040,6 +2010,41 @@ nome: "Agro São José",
 
 
                     },
+
+
+                    {
+                        image: "images/comercios/clinicaVeterinaria/jurandir/perfil.png",
+                        name: "Veterinária Carlópolis",
+                        hours: "Seg a Sex: 09:00h as 18:00h <br>Sab: 09:00h a 17:00h",
+                          statusAberto:"a",
+                            horarios: {
+                          
+                            seg: [{ inicio: "09:00", fim: "18:00" }],
+                            ter: [{ inicio: "09:00", fim: "18:00" }],
+                            qua: [{ inicio: "09:00", fim: "18:00" }],
+                            qui: [{ inicio: "09:00", fim: "18:00" }],
+                            sex: [{ inicio: "09:00", fim: "18:00" }],
+                            sab: [{ inicio: "09:00", fim: "17:00" }],
+                            dom: [],
+                        },
+                        address: "Rua Ataliba Leonel, 410, Carlópolis, PR,",
+                        contact: "(43) 3566-1664",
+                        contact2:"(43) 99642-1494",                      
+                        facebook: "https://www.facebook.com/veterinariacarlopolis/?locale=pt_BR",
+                        instagram: "https://www.instagram.com/clinicavetcarlopolis/",
+                        infoAdicional:"Agende o horario para banho e tosa!",
+                        novidadesImages: [
+                     
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/1.png",
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/2.png",
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/3.png",
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/4.png",
+                         "images/comercios/clinicaVeterinaria/jurandir/divulgacao/5.png",
+                        ],                    
+                    },
+
+
+                      
 
 
 
