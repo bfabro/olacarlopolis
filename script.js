@@ -437,8 +437,8 @@ chaveirocentral:"s",
 
 // clinica veterinaria
 
-clinicaveterinariacarlopolis:"s",
-suedclinicaveterinariaepetshop:"s",
+veterinariacarlopolis:"s",
+suedveterinariaepetshop:"s",
 
 //DESPACHANTE
 rodriguinho:"s",
