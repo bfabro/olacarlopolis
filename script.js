@@ -1335,7 +1335,7 @@ nome: "Agro São José",
 
       {
         imagem: "images/promocoes/agro/saojose/3.jpg",
-        descricao: "Toquinha G 10% A vista",
+        descricao: "Toquinha G",
         validade: "2025-06-30T18:00:00",
         preco:"75,00",
         preco_com_desconto: "85,00 a vista",
