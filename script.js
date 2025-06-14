@@ -3673,8 +3673,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     image: "images/comercios/farmacia/drogaMais/drogamais.png",
                     name: "DrogaMais",
                     hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-                     plantaoHorario: "08:00h às 21:00h", 
-                    plantaoData:"Sab 07/06 a Sex 13/06",
+                    
                     statusAberto:".",
                     horarios: {                          
                      seg: [{ inicio: "08:00", fim: "21:00" }],
@@ -3862,15 +3861,17 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     name: "PopularMais",
                     address: "Elson Soares, 787, Sala 2",
                     hours: "Seg a Sex: 08:00h as 18:00h <br>Sab: 08:00h as 12:00h",
+                     plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"Sab 14/06 a Sex 20/06",
                     statusAberto:".",
                     horarios: {                          
-                      seg: [{ inicio: "08:00", fim: "18:00" }],
-                      ter: [{ inicio: "08:00", fim: "18:00" }],
-                      qua: [{ inicio: "08:00", fim: "18:00" }],
-                      qui: [{ inicio: "08:00", fim: "18:00" }],
-                      sex: [{ inicio: "08:00", fim: "18:00" }],
-                      sab: [{ inicio: "08:00", fim: "12:00" }],
-                      dom: []
+                    seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
                     },  
                     contact: "(43) 99647-6266",
                     delivery: "Sim / Sem Taxa",
@@ -4775,7 +4776,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 */
 
 
-/*
+            /*
 
 
                 {
@@ -4816,11 +4817,11 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     ],
                 },
 
-*/
+                  */
 
 
 
-
+                /*
                 {
                     image: "images/comercios/farmacia/drogaMais/drogamais.png",
                     name: "DrogaMais",
@@ -4860,6 +4861,54 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       "Aqui na Drogamais do Jorginho você encontra! <br>✨Uma linha completa de brinquedos e acessórios infantis Pimpolho! 👶 • Produtos de qualidade para deixar a infância ainda mais divertida e segura.• Tudo o que seu filho precisa para brincar com alegria!",
                      "Você conhece a Linha LIFE, a própria marca da Drogamais?<br> ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
                       
+                    ],
+                },
+
+
+              */
+
+
+
+                {
+                    
+                    name: "PopularMais",
+                    address: "Elson Soares, 787, Sala 2",
+                    hours: "Seg a Sex: 08:00h as 18:00h <br>Sab: 08:00h as 12:00h",
+                     plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"Sab 14/06 a Sex 20/06",
+                    statusAberto:".",
+                    horarios: {                          
+                    seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    },  
+                    contact: "(43) 99647-6266",
+                    delivery: "Sim / Sem Taxa",
+                    image: "images/comercios/farmacia/popularMais/popularMais.png",
+                    facebook:
+                    "https://www.facebook.com/people/Popular-Mais-a-Farm%C3%A1cia-do-Jeremias/100075024257599/#",
+                    instagram:
+                    "https://www.instagram.com/popularmais_farmaciadojeremias/",
+                   
+                    novidadesImages: [                  
+                        
+                        "images/comercios/farmacia/popularMais/divulgacao/1.jpg",
+                        "images/comercios/farmacia/popularMais/divulgacao/2.jpg",
+                        "images/comercios/farmacia/popularMais/divulgacao/3.jpg",
+                        "images/comercios/farmacia/popularMais/divulgacao/4.jpg",
+                       
+                                    
+                    ],
+                    novidadesDescriptions: [  
+                        "🦠🤧 Dengue ou H1N1? Tire a dúvida agora! ✅Na Farmácia do Jeremias, você faz o teste rápido para Dengue e H1N1 com resultado confiável e sem complicação! ⏳🔬",
+                      "Diga adeus aos insetos com proteção de verdade",
+                    "A diversão agora também está na hora de escovar os dentes<br>O Gel Dental CARMED Fini chegou para deixar a escovação da meninada muito mais gostosa e divertida!",
+                      "💳🔥 Cartão Fidelidade Popular Mais: COMPROU, GANHOU! 🔥💳Quer mais vantagens nas suas compras? Agora, na Farmácia do Jeremias, você acumula pontos a cada compra e pode trocar por descontos imperdíveis ou produtos exclusivos! 🎁💰",
+                     
                     ],
                 },
 
