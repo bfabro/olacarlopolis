@@ -1440,7 +1440,31 @@ onlineUsersRef.on("value", (snapshot) => {
 
 
 
- 
+ <script>
+// Bloqueia Ctrl+U (ver código-fonte)
+document.onkeydown = function(e) {
+  // Ctrl+U
+  if (e.ctrlKey && e.key.toLowerCase() == 'u') {
+    e.preventDefault();
+    return false;
+  }
+  // Ctrl+Shift+I (DevTools)
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() == 'i') {
+    e.preventDefault();
+    return false;
+  }
+  // F12 (DevTools)
+  if (e.keyCode == 123) {
+    e.preventDefault();
+    return false;
+  }
+};
+// Bloqueia botão direito do mouse
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+});
+</script>
+
 </body>
 
 </html>
