@@ -410,6 +410,7 @@ function montarCarrosselDivulgacao() {
         // assistencia celular
         oficinadocelular:"s",
         cevassistenciacelular:"s",
+        efcell:"s",
       
 // auto peças
 paulinhoautopecas:"s",
@@ -1467,11 +1468,15 @@ nome: "Agro São José",
                             contact: "(43) 99635-1001",
                             delivery: "Sim / Sem Taxa",
                             novidadesImages: [ 
-                            "images/comercios/acougue/curitiba/banner/banner_1.jpg",
-                            "images/comercios/acougue/curitiba/banner/banner_2.jpg",
+                            "images/comercios/acougue/curitiba/divulgacao/1.jpg",
+                            "images/comercios/acougue/curitiba/divulgacao/2.jpg",
+                            "images/comercios/acougue/curitiba/divulgacao/3.jpg",
                             ],
                             novidadesDescriptions: [                            
-                              "Carnes de primeiras!",
+                              "Aquele Chouriço feito no capricho!",
+                              "Espetinhos preparados por nos, faça seu pedido",
+                              "Temos queijos de Minas",
+                              
                             ],
                         },
                     ],
@@ -1763,16 +1768,16 @@ nome: "Agro São José",
                           image: "images/comercios/assistenciaCelular/cev/perfil.jpg",
                           name: "C e V Assistencia Celular",
                           hours: "Seg a Sex: 08:00h as 18:30h<br> Sab: 08:00h as 13:00h",
-                           statusAberto:".",
-            horarios: {                          
-              seg: [{ inicio: "08:00", fim: "18:30" }],
-              ter: [{ inicio: "08:00", fim: "18:30" }],
-              qua: [{ inicio: "08:00", fim: "18:30" }],
-              qui: [{ inicio: "08:00", fim: "18:30" }],
-              sex: [{ inicio: "08:00", fim: "18:30" }],
-              sab: [{ inicio: "08:00", fim: "13:00" }],
-              dom: [],
-            }, 
+                          statusAberto:".",
+                          horarios: {                          
+                            seg: [{ inicio: "08:00", fim: "18:30" }],
+                            ter: [{ inicio: "08:00", fim: "18:30" }],
+                            qua: [{ inicio: "08:00", fim: "18:30" }],
+                            qui: [{ inicio: "08:00", fim: "18:30" }],
+                            sex: [{ inicio: "08:00", fim: "18:30" }],
+                            sab: [{ inicio: "08:00", fim: "13:00" }],
+                            dom: [],
+                          }, 
                           address: "R. Dra. Paula e Silva, 445 - Carlópolis",
                           contact: "14 99607-5513",                   
                           instagram: "https://www.instagram.com/claudiamira225/",
@@ -1790,10 +1795,54 @@ nome: "Agro São José",
 
 
 
+
+{
+                          image: "images/comercios/assistenciaCelular/efcell/perfil.jpg",
+                          name: "EF Cell",
+                          hours: "Seg a Sex: 8:00h as 18:30h<br> Sab: 08:00h as 13:00h",
+                              statusAberto:".",
+                          horarios: {                          
+                            seg: [{ inicio: "08:00", fim: "18:30" }],
+                            ter: [{ inicio: "08:00", fim: "18:30" }],
+                            qua: [{ inicio: "08:00", fim: "18:30" }],
+                            qui: [{ inicio: "08:00", fim: "18:30" }],
+                            sex: [{ inicio: "08:00", fim: "18:30" }],
+                            sab: [{ inicio: "08:00", fim: "13:00" }],
+                            dom: [],
+                          }, 
+                          address: "R. Benedito Salles, 1188 - Carlopolis",
+                          contact: "(43) 99131-4642",
+                          facebook: "https://www.facebook.com/p/EF-CELL-Clinica-do-Celular-100026836159338/",
+                          instagram: "https://www.instagram.com/ef_clinica/",
+                       
+                          novidadesImages: [ 
+                            "images/comercios/assistenciaCelular/efcell/divulgacao/1.jpg",                 
+                            "images/comercios/assistenciaCelular/efcell/divulgacao/2.jpg",
+                            
+                        ],
+                        novidadesDescriptions: [  
+                          "Aqui na EF CELL CLÍNICA DO CELULAR <br>resolvemos todos os teus problemas 📲",                          
+                          "Temos o melhor APLICATIVO de ENTRETENIMENTO do BRASIL<br>Lembrando só que precisa de internet e mais nada,conteúdos para toda a família 😉 <br>Não fiquem de fora eeeeee chama aiii que explicamos tudo para vocês",
+                         
+                        ],
+                      },
+
+
+
                       {
                           image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
                           name: "Oficina do Celular",
                           hours: "Seg a Sex: 8:00h as 18:00h<br> Sab: 08:00h as 17:00h",
+                              statusAberto:".",
+                          horarios: {                          
+                            seg: [{ inicio: "08:00", fim: "18:00" }],
+                            ter: [{ inicio: "08:00", fim: "18:00" }],
+                            qua: [{ inicio: "08:00", fim: "18:00" }],
+                            qui: [{ inicio: "08:00", fim: "18:00" }],
+                            sex: [{ inicio: "08:00", fim: "18:00" }],
+                            sab: [{ inicio: "08:00", fim: "17:00" }],
+                            dom: [],
+                          }, 
                           address: "R. Dra. Paula e Silva, 676 - Carlopolis",
                           contact: "(43) 3566-1600",
                           facebook: "https://www.facebook.com/oficinadocelularclps/",
@@ -4544,6 +4593,12 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                   address: "Em Frente a Igreja Matriz",
                   contact: "(43) 99833-9638",
                   instagram:"https://www.instagram.com/paroquiacarlopolis/",
+                    novidadesImages: [               
+                    "images/informacoes/eventos/senhorbomjesus_premios.jpg",
+                
+                ], novidadesDescriptions:[ 
+                 "Show de Premios",
+                 ],
                 
                     
               },
