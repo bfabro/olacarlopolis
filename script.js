@@ -6440,6 +6440,14 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 ///
 ///
 
+//16/06
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/14.jpg",
+     descricaoFalecido: "Faleceu em Londrina aos 69 anos de idade, Sra 'MARIA APARECIDA PEREIRA DE LIMA'<br>A cerimônia terá início nessa madrugada de terça - feira em horário a ser definido no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã no período da tarde, no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos"
+
+    },
+
 //11/06
 {
       name: "Funeraria Cristo Rei",    
