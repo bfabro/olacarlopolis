@@ -463,6 +463,9 @@ rodriguinho:"s",
       //feira da lua
       feiradalua:"s",
 
+      //floricultura
+      rosadesarom:"s",
+
       //imobiliaria      
       imobiliariacarlopolis:"s",
 
@@ -5605,6 +5608,51 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     address: "R. Laurindo Franco de Godoi, 90",
                     contact: "(43) 99951-1540",
                     delivery: "Sim / Sem Taxa",
+                },
+            ],
+        },
+
+
+
+
+
+
+
+        {
+            link: document.querySelector("#menuFloricultura"),  
+            title: "Floricultura",
+            establishments: [
+                {
+                    image: "images/comercios/floricultura/rosadesaron/perfil.jpg",
+                    name: "Rosa de Sarom",
+                    hours: "Seg a Sab: 08:30h as 18:00h<br>2 ultimos Sab: 08:30h as 12:00h<br>",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "08:30", fim: "18:00" }],
+                      ter: [{ inicio: "08:30", fim: "18:00" }],
+                      qua: [{ inicio: "08:30", fim: "18:00" }],
+                      qui: [{ inicio: "08:30", fim: "18:00" }],
+                      sex: [{ inicio: "08:30", fim: "18:00" }],
+                      sab: [{ inicio: "08:30", fim: "18:00" }],
+                      dom: [],
+                    },
+                    address: "Rua Padre Hugo, 818 - Carlopolis",
+                    contact: "(43) 99632-0028",
+                     contact2: "(43) 99805-9591",
+                    instagram:"https://www.instagram.com/saromflores/",
+                    facebook:"https://www.facebook.com/www.rosadesarom/",
+                    novidadesImages: [               
+                      "images/comercios/floricultura/rosadesaron/divulgacao/1.jpg",
+                      "images/comercios/floricultura/rosadesaron/divulgacao/2.jpg",     
+                      "images/comercios/floricultura/rosadesaron/divulgacao/3.jpg",   
+                     
+                  ], 
+                  novidadesDescriptions: [                            
+                    "Lindos Buques de Rosas",
+                  "Lindos Buques de Rosas",
+                  "Orquideas",
+                  
+                  ],
                 },
             ],
         },
