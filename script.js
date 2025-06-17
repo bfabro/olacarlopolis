@@ -6440,6 +6440,17 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 ///
 ///
 
+
+//16/06
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/15.jpg",
+     descricaoFalecido: "Faleceu em Carlópolis aos 78 anos de idade, Sr 'ANIBAL MENDES DA SILVA' mais conhecido como: Aníbal do Quinzote<br> O horário da cerimônia dará início hoje às 10:30 horas no velório municipal de Carlópolis.<br>Seu sepultamento será hoje às  17:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos"
+
+    },
+
+
+
 //16/06
 {
       name: "Funeraria Cristo Rei",    
