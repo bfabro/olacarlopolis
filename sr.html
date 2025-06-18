@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorteio de Números</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --verde: #00e676;
+      --vermelho: #ff1744;
+      --cinza-fundo: #171a21;
+      --cinza-card: #232633;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--cinza-fundo);
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      box-sizing: border-box;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .sorteio-container {
+      background: var(--cinza-card);
+      border-radius: 2.5vw;
+      box-shadow: 0 4px 32px #0009;
+      padding: 6vw 4vw 4vw 4vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 96vw;
+      max-width: 500px;
+      min-height: 60vh;
+      margin: 2vw auto;
+      gap: 2vw;
+    }
+    .titulo {
+      font-size: clamp(2.5rem, 7vw, 3.5rem);
+      font-weight: bold;
+      letter-spacing: 1.2px;
+      margin-bottom: 1.5vw;
+      text-align: center;
+    }
+    .input-group {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1vw;
+      align-items: center;
+      margin-bottom: 1vw;
+    }
+    .input-group label {
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
+    }
+    input[type="number"] {
+      width: 90px;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      padding: 8px 10px;
+      border: none;
+      border-radius: 10px;
+      background: #232a3a;
+      color: #fff;
+      font-weight: bold;
+      text-align: center;
+      outline: none;
+      margin-top: 8px;
+    }
+    button {
+      background: var(--verde);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 1.1em 2.4em;
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 2px 8px #0003;
+      transition: background 0.15s, transform 0.12s;
+    }
+    button:active { transform: scale(0.98); }
+    button:disabled {
+      background: #44485c;
+      cursor: not-allowed;
+    }
+    .display-numero {
+      margin: 3vw 0 1.3vw 0;
+      font-size: clamp(4rem, 14vw, 7.5rem);
+      font-weight: bold;
+      background: #181c24;
+      border-radius: 1.4em;
+      min-width: 2em;
+      min-height: 1.2em;
+      text-align: center;
+      letter-spacing: 0.25em;
+      border: 3px solid var(--verde);
+      box-shadow: 0 4px 18px #0006;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* MENSAGEM MODAL */
+    .mensagem {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000d;
+      color: #fff;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .mensagem .fechar {
+      position: absolute;
+      top: 24px;
+      right: 38px;
+      font-size: 3.2rem;
+      background: transparent;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      z-index: 99;
+      opacity: 0.6;
+      transition: opacity 0.2s, color 0.2s;
+      pointer-events: all;
+    }
+    .mensagem .fechar:hover {
+      opacity: 1;
+      color: var(--vermelho);
+    }
+    .mensagem .numero-escolhido {
+      font-size: clamp(1.7rem, 5vw, 2.7rem);
+      margin-bottom: 0.3em;
+      font-weight: 500;
+      color: #e5e5e5;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 4px #0008;
+    }
+    .mensagem .resultado {
+      margin-bottom: 0.2em;
+      margin-top: 0.2em;
+    }
+    .mensagem .numero-sorteado {
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      margin-top: 0.9em;
+      font-weight: 400;
+      color: #cacaca;
+      letter-spacing: 1px;
+    }
+    .mensagem.ganhou .resultado {
+      color: var(--verde);
+      text-shadow: 0 0 22px var(--verde), 0 0 12px #fff5;
+    }
+    .mensagem.errou .resultado {
+      color: var(--vermelho);
+      text-shadow: 0 0 22px var(--vermelho), 0 0 12px #fff3;
+    }
+    .mensagem.mostrar {
+      display: flex;
+      opacity: 1;
+      pointer-events: all;
+      animation: popup 0.3s cubic-bezier(.4,2,.6,1) 1;
+    }
+    @keyframes popup {
+      from { transform: scale(0.92); opacity: 0.4; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @media (max-width: 600px) {
+      .sorteio-container {
+        max-width: 99vw;
+        padding: 5vw 1vw 7vw 1vw;
+        border-radius: 4vw;
+        min-height: 65vh;
+      }
+      .display-numero { font-size: 12vw; }
+      .mensagem .fechar {
+        top: 10px;
+        right: 10px;
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sorteio-container">
+    <div class="titulo">Sorteio de Números</div>
+    <div class="input-group">
+      <label for="numeroInput">Escolha um número de 1 a 10:</label>
+      <input type="number" id="numeroInput" min="1" max="10" value="1">
+    </div>
+    <button id="btnSortear">Sortear</button>
+    <div class="display-numero" id="displayNumero">--</div>
+    <audio id="somGiro">
+      <source src="data:audio/wav;base64,UklGRhIAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YYwAAACAgICAf4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gH+Af4CAgH+Af4B/gICAf4B/gA==" type="audio/wav">
+    </audio>
+  </div>
+  <div class="mensagem" id="mensagem">
+    <button class="fechar" id="btnFechar">&times;</button>
+    <div class="numero-escolhido"></div>
+    <div class="resultado"></div>
+    <div class="numero-sorteado"></div>
+  </div>
+  <script>
+    const numeroInput = document.getElementById('numeroInput');
+    const btnSortear = document.getElementById('btnSortear');
+    const displayNumero = document.getElementById('displayNumero');
+    const mensagem = document.getElementById('mensagem');
+    const btnFechar = document.getElementById('btnFechar');
+    const resultadoEl = mensagem.querySelector('.resultado');
+    const numeroEscolhidoEl = mensagem.querySelector('.numero-escolhido');
+    const numeroSorteadoEl = mensagem.querySelector('.numero-sorteado');
+    const somGiro = document.getElementById('somGiro');
+    let rodando = false;
+
+    btnSortear.addEventListener('click', () => {
+      const numeroEscolhido = parseInt(numeroInput.value, 10);
+
+      if (isNaN(numeroEscolhido) || numeroEscolhido < 1 || numeroEscolhido > 10) {
+        mostrarMensagem(null, "Escolha um número de 1 a 10!", "errou", null);
+        return;
+      }
+
+      btnSortear.disabled = true;
+      numeroInput.disabled = true;
+      rodando = true;
+      displayNumero.textContent = '--';
+
+      let tempo = 0;
+      let intervalo = 65;
+      let sorteado = null;
+
+      const animacao = setInterval(() => {
+        sorteado = Math.floor(Math.random() * 10) + 1;
+        displayNumero.textContent = sorteado;
+        // Toca som a cada giro
+        try {
+          somGiro.currentTime = 0;
+          somGiro.play();
+        } catch (e) {}
+        tempo += intervalo;
+        if (tempo > 7000) intervalo = 150;
+        else if (tempo > 4000) intervalo = 90;
+      }, intervalo);
+
+      setTimeout(() => {
+        clearInterval(animacao);
+        rodando = false;
+        displayNumero.textContent = sorteado;
+        if (sorteado === numeroEscolhido) {
+          mostrarMensagem(numeroEscolhido, "🎉 Você Ganhou! 🎉", "ganhou", sorteado);
+        } else {
+          mostrarMensagem(numeroEscolhido, "😕 Tente mais uma vez!", "errou", sorteado);
+        }
+        btnSortear.disabled = false;
+        numeroInput.disabled = false;
+      }, 2000);
+    });
+
+    function mostrarMensagem(escolhido, texto, tipo, sorteado) {
+      // Seu número (acima)
+      if (typeof escolhido === "number") {
+        numeroEscolhidoEl.innerHTML = `<span>Seu número: <b>${escolhido}</b></span>`;
+      } else {
+        numeroEscolhidoEl.innerHTML = "";
+      }
+      // Mensagem principal (meio)
+      resultadoEl.textContent = texto;
+      // Número sorteado (abaixo)
+      if (typeof sorteado === "number") {
+        numeroSorteadoEl.innerHTML = `<span>Número sorteado: <b>${sorteado}</b></span>`;
+      } else {
+        numeroSorteadoEl.innerHTML = "";
+      }
+      mensagem.className = "mensagem " + tipo + " mostrar";
+    }
+
+    btnFechar.addEventListener('click', () => {
+      mensagem.classList.remove("mostrar");
+    });
+
+    // Impede alterar enquanto roda
+    numeroInput.addEventListener('keydown', (e) => { if (rodando) e.preventDefault(); });
+    numeroInput.addEventListener('input', () => {
+      if (!rodando) displayNumero.textContent = "--";
+    });
+
+    // Fechar mensagem com ESC
+    document.addEventListener('keydown', (e) => {
+      if (mensagem.classList.contains("mostrar") && (e.key === "Escape" || e.key === "Esc")) {
+        mensagem.classList.remove("mostrar");
+      }
+    });
+
+    // Fechar ao clicar fora da mensagem
+    mensagem.addEventListener('click', (e) => {
+      if (e.target === mensagem) {
+        mensagem.classList.remove("mostrar");
+      }
+    });
+  </script>
+</body>
+</html>
