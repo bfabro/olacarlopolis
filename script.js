@@ -1,3 +1,8 @@
+function getHojeBR() {
+  const agora = new Date();
+  agora.setHours(agora.getHours() - 3); // UTC-3 (Brasília)
+  return agora.toISOString().slice(0, 10);
+}
 
 
 function compartilharEstabelecimento(id) {
@@ -190,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Função para registrar o acesso diário
 function registrarAcesso() {
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = getHojeBR();
   const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
   const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
 
@@ -293,7 +298,7 @@ registrarAcesso();
 
 // Função para registrar clique no Firebase
 function registrarCliqueBotao(tipo, idEstabelecimento) {
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = getHojeBR();
   const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
   ref.transaction((atual) => (atual || 0) + 1);
 }
