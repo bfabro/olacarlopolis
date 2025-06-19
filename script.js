@@ -542,6 +542,9 @@ rodriguinho:"s",
       // radio
       carlopolitana:"s",
 
+      // relojoaria
+      relojoariamartini:"s",
+
       // restaurantes
       assadaodorussao:"s",
       cabanas:"s",
@@ -3684,6 +3687,53 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                         
                     ],
                 },
+
+
+
+
+                {
+        link: document.querySelector("#menuRelojoaria"),  
+        title: "Relojoaria",
+        establishments: [
+            {
+                image: "images/comercios/relojoaria/martini/perfil.jpg",                        
+                name: "Relojoaria Martini",
+                hours: "Seg a Sex: 09:00h as 18:00h<br> Sab: 09:00h as 14:00h ",
+                statusAberto:" ",
+                horarios: {
+                  
+                  seg: [{ inicio: "09:00", fim: "18:00" }],
+                  ter: [{ inicio: "09:00", fim: "18:00" }],
+                  qua: [{ inicio: "09:00", fim: "18:00" }],
+                  qui: [{ inicio: "09:00", fim: "18:00" }],
+                  sex: [{ inicio: "09:00", fim: "18:00" }],
+                  sab: [{ inicio: "09:00", fim: "14:00" }],
+                  dom: [], // fechado
+                },
+                address: "Rua Benedito Salles, 1031 - Carlópolis",
+                contact: "(43) 99917-8632",                          
+                facebook: "https://www.facebook.com/vidracariamartini/",
+                instagram: "https://www.instagram.com/vidracariamartini/",
+                novidadesImages: [ 
+                "images/comercios/relojoaria/martini/divulgacao/1.jpg",
+                "images/comercios/relojoaria/martini/divulgacao/2.jpg",
+                "images/comercios/relojoaria/martini/divulgacao/3.jpg",
+                "images/comercios/relojoaria/martini/divulgacao/4.jpg",
+                "images/comercios/relojoaria/martini/divulgacao/5.jpg",
+                "images/comercios/relojoaria/martini/divulgacao/6.jpg",
+                ],
+                novidadesDescriptions: [                            
+                  "A Relojoaria Martini oferece serviços completos para o seu relógio, como troca de baterias, ajuste de pulseiras, substituição de vidros, além de alianças de moeda, acessórios em prata 925 e venda de relógios. Com entrega rápida, qualidade garantida e atendimento em Carlópolis, solicite seu orçamento sem compromisso pelo WhatsApp!",
+                     "Alianças a partir de R$ 139,00 o par, venha escolher o modelo e fazer aquela pessoa feliz",
+                        "Trabalhamos com os Relogios Champion!",
+                         "Consertamos o teu relogio, fazemos limpeza e entregamos como se fosse novo! faça um orçamento sem compromisso! ",
+                        "Muitas peças em prata",
+                         "Montamos o teu box do tamanho e jeito que quiser! nos chame para um orçamento!",
+                      
+                ],
+            },
+        ],
+      },
 
 
 
