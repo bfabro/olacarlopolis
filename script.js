@@ -721,46 +721,8 @@ funerariagrupocastilho:"s",
 
 
     
-// Função para esconder/mostrar separadores de letra
-function toggleSeparadoresLetras(ocultar) {
-  document.querySelectorAll('.separador-letra').forEach(function (el) {
-    if (ocultar) {
-      el.style.visibility = 'hidden';
-      el.style.height = '0px';
-      el.style.padding = '0px';
-      el.style.margin = '0px';
-    } else {
-      el.style.visibility = '';
-      el.style.height = '';
-      el.style.padding = '';
-      el.style.margin = '';
-    }
-  });
-}
 
-
-// Evento de input para esconder/mostrar separadores
-
-if (searchInput) {
-  searchInput.addEventListener("input", function () {
-    toggleSeparadoresLetras(this.value.trim().length > 0);
-  });
-}
-
-// Se tiver botão de limpar pesquisa
-
-if (clearSearch && searchInput) {
-  clearSearch.addEventListener("click", function () {
-    toggleSeparadoresLetras(false);
-  });
-}
-
-
-
-
-
-
-
+    
   
     // Função para adicionar contadores de slides
 
