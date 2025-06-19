@@ -631,9 +631,11 @@ rodriguinho:"s",
       asilo:"s",
       agenciatrabalhador:"s",
       copel: "s",
+      farmaciamunicipal:"s",
       correio:"s",    
       cras:"s",
       clubedexadrez:"s",
+      ubsceleiderobles:"s",
       
       // cheches:
       ainzararossisallescmei:"s",
@@ -5095,7 +5097,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
         {
          
             name: "Agendamento Saude",
-            hours: "Seg a Sex: 8:30h as 12h - 13:30 as 17h",
+            hours: "Seg a Sex: 8:30h as 12:00h - 13:30 as 17:00h",
             address: "-",
             contact: "(43) 99825-0996",
             contact2: "(43) 98872-8504",
@@ -5105,7 +5107,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
          {
          
             name: "Agendamento De Viagens",
-            hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
+            hours: "Seg a Sex: 8:30h as 12:00h, 13:30 as 17:00h",
             address: "-",
             contact: "(43) 99825-1005",
             
@@ -5123,7 +5125,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
         {
             image: "images/setorPublico/asilo/asilo.png",
             name: "Asilo",
-            hours: "Seg a Sex: 9h - 12h",
+            hours: "Seg a Sex: 09:00h as 12:00h",
             address: "Rua Andrino Soares, 26",
             contact: "(43) 3566-1196",
         },
@@ -5393,11 +5395,28 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 
       {
+            link: document.querySelector("#menuFarmaciaMunicipal"),    
+            title: "Farmacia Municipal",
+            establishments: [
+                {
+                  image: "images/setorPublico/farmaciaMunicipal/perfil.jpg",
+                    name: "Farmacia Municipal",
+                    hours: "Seg a Sex: 08:00h as 11:00h -  13:00 as 17:00h",
+                    address: "R. Laurindo Franco de Godói, 787 - Carlópolis",
+                    contact: "#",
+                  
+                    
+                },
+            ],
+        },
+
+
+      {
         link: document.querySelector("#menuPostoSaude"),    
         title: "Posto de Saude",
         establishments: [
             {
-                image: "images/setorPublico/postoSaude/joseAparecido.png",
+                image: "images/setorPublico/postoSaude/drjose.jpg",
                 name: "Centro de Saude Dr José",                
                 hours: "Seg a Sex: 07:00h as 11:00h - 13:00 as 17:00h",
                 statusAberto:".",
@@ -5410,8 +5429,27 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                   sab: [],
                   dom: []
                 },
-                address: "Avenida Elson Soares,769",
+                address: "Avenida Elson Soares,769 - Carlópolis",
                 contact: "(43) 3566-1328",
+               
+            },
+
+             {
+              image: "images/setorPublico/postoSaude/celeide.jpg",
+                name: "UBS Celeide Robles",
+                hours: "Seg a Sex: 07:00h as 11h - 13:00h as 17:00h",
+                statusAberto:".",
+                horarios: {                    
+                  seg: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  ter: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  qua: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  qui: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  sex: [{ inicio: "07:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  sab: [],
+                  dom: []
+                },
+                address: "R. Laurindo Franco de Godói, 71 - Carlópolis",
+                contact: "#",
                
             },
            
@@ -5419,7 +5457,17 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               image: "images/setorPublico/postoSaude/eugenioNeves.png",
                 name: "UBS Eugênio Neves Soares",
                 hours: "Seg a Sex: 8:00h as 17h",
-                address: "Rua Bauínea,79",
+                statusAberto:".",
+                horarios: {                    
+                  seg: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  ter: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  qua: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  qui: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  sex: [{ inicio: "08:00", fim: "11:00" },{ inicio: "13:00", fim: "17:00" }],
+                  sab: [],
+                  dom: []
+                },
+                address: "Rua Bauínea,79 - Carlópolis",
                 contact: "(43) 3566-1932",
                
             },
@@ -5436,7 +5484,17 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 {
                   image: "images/setorPublico/sanepar/sanepar.png",
                     name: "Sanepar",
-                    hours: "Seg a Sex: 8:30h - 12h, 13:30 as 17h",
+                    hours: "Seg a Sex: 08:30h - 12:00h -  13:30 as 17:00h",
+                      statusAberto:".",
+                   horarios: {                    
+                  seg: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
+                  ter: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
+                  qua: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
+                  qui: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
+                  sex: [{ inicio: "08:30", fim: "12:00" },{ inicio: "13:30", fim: "17:00" }],
+                  sab: [],
+                  dom: []
+                },
                     address: "R. André Jorge Cleli, 148 ",
                     contact: "(41) 9544-0115",
                     contact2: "0800 200 0115",
