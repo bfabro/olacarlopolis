@@ -4530,16 +4530,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               },
 
 
-            {
-              image: "images/informacoes/eventos/standUp.png",
-              name: "Stand Up",
-              date: "16/06/2025",
-              address: "Rua Padre Hugo, 460, Carlopolis ( Thac Thal )",
-              contact: "(43) 99160-5120",
-              instagram:"https://www.instagram.com/p/DKAe7CkxUzQ/?img_index=1",
-              infoAdicional:"Os ingressos já estão à venda! Garanta o seu agora mesmo — ou junte a galera e reserve uma mesa exclusiva só pra vocês! 🍻👯‍♀️📲 Para mais informações e reservas: (43) 99160-5120",
-              
-          },
+          
 
 
           {
@@ -5694,13 +5685,27 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     novidadesImages: [               
                       "images/comercios/floricultura/rosadesaron/divulgacao/1.jpg",
                       "images/comercios/floricultura/rosadesaron/divulgacao/2.jpg",     
-                      "images/comercios/floricultura/rosadesaron/divulgacao/3.jpg",   
-                     
+                      "images/comercios/floricultura/rosadesaron/divulgacao/3.jpg",  
+                      "images/comercios/floricultura/rosadesaron/divulgacao/4.jpg",
+                      "images/comercios/floricultura/rosadesaron/divulgacao/5.jpg",     
+                      "images/comercios/floricultura/rosadesaron/divulgacao/6.jpg",   
+                      "images/comercios/floricultura/rosadesaron/divulgacao/7.jpg",
+                      "images/comercios/floricultura/rosadesaron/divulgacao/8.jpg",     
+                      "images/comercios/floricultura/rosadesaron/divulgacao/9.jpg",    
+                      "images/comercios/floricultura/rosadesaron/divulgacao/10.jpg",
                   ], 
                   novidadesDescriptions: [                            
-                    "Lindos Buques de Rosas",
                   "Lindos Buques de Rosas",
-                  "Orquideas",
+                  "Lindos Buques de Rosas Amarelas",
+                  "Temos Orquideas",
+                  "Lindos Buques de flores mistas",
+                  "Presenteie quem voce gosta com nossas cestas de chocolate ",
+                  "Presenteie quem voce gosta com nossas cestas de café da manha",
+                  "Lindos crisântemos",
+                  "Buques de rosas com decoração",
+                  "Temos varios itens para que voce possa presentear",
+                  "Montamos o presente do jeito que pedir",
+                
                   
                   ],
                 },
