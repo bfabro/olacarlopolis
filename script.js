@@ -6817,44 +6817,53 @@ if (menuPrevisaoTempo) {
   
   
     searchInput.addEventListener("input", function () {
-      const filter = searchInput.value.toLowerCase().trim();
-      const allItems = document.querySelectorAll(".menu_items .item");
-    
-      allItems.forEach((item) => {
-        const navLinks = item.querySelectorAll(".nav_link");
-        let showItem = false;
-    
-        navLinks.forEach((link) => {
-          const text = link.textContent.toLowerCase();
-          if (filter === "" || text.includes(filter)) {
-            link.style.display = "flex";
-            showItem = true;
-          } else {
-            link.style.display = "none";
-          }
-        });
-    
-        const submenu = item.querySelector(".submenu");
-        const submenuItem = item.querySelector(".submenu_item");
-    
-        // Exibe ou oculta item pai com base nos filhos visíveis
-        if (submenu) {
-          const visibleSublinks = item.querySelectorAll(".sublink");
-          const hasVisible = Array.from(visibleSublinks).some(
-            (sublink) => sublink.style.display !== "none"
-          );
-    
-          submenu.style.display = hasVisible ? "block" : "none";
-          if (submenuItem) {
-            submenuItem.classList.toggle("show_submenu", hasVisible);
-          }
-    
-          item.style.display = hasVisible ? "block" : "none";
-        } else {
-          item.style.display = showItem ? "block" : "none";
-        }
-      });
+  const termo = searchInput.value.toLowerCase().trim();
+  clearSearch.style.display = termo ? "inline-block" : "none";
+
+  // Esconde todos os separadores enquanto pesquisa
+  document.querySelectorAll(".separador-letra, .separadorr").forEach(sep => {
+    sep.style.display = termo ? "none" : "block";
+  });
+
+  // Para cada grupo/item do menu (inclui submenus e categorias principais)
+  document.querySelectorAll(".menu_items .item").forEach(item => {
+    let showItem = false;
+
+    // Procura todos os links dentro deste item
+    item.querySelectorAll(".nav_link").forEach(link => {
+      const texto = link.textContent.toLowerCase();
+      if (!termo || texto.includes(termo)) {
+        link.style.display = "flex";
+        showItem = true;
+      } else {
+        link.style.display = "none";
+      }
     });
+
+    // Trata submenus
+    const submenu = item.querySelector(".submenu");
+    const submenuItem = item.querySelector(".submenu_item");
+
+    if (submenu) {
+      // Mostra submenu apenas se algum filho for visível
+      const visibleSublinks = item.querySelectorAll(".sublink");
+      const hasVisible = Array.from(visibleSublinks).some(
+        (sublink) => sublink.style.display !== "none"
+      );
+
+      submenu.style.display = hasVisible ? "block" : "none";
+      if (submenuItem) {
+        submenuItem.classList.toggle("show_submenu", hasVisible);
+      }
+      item.style.display = hasVisible ? "block" : "none";
+    } else {
+      // Se não é grupo, mostra apenas se o próprio item bate
+      item.style.display = showItem ? "block" : "none";
+    }
+  });
+});
+
+
     
     
      
