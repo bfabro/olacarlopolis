@@ -6274,7 +6274,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     
                 },
  {
-              image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.png",
+              image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.jpg",
               name: "Restaurante da Di",
               hours: "Dom a Dom: 10:30h as 14:00h",
               statusAberto:".",
