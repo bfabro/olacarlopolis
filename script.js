@@ -1207,14 +1207,7 @@ const promocoesPorComercio = [
         whatsapp: "43991034187"
       },
 
-        {
-        imagem: "images/promocoes/4.jpg",
-        descricao: "Alfort Mini Chocolate Morango 5g",
-        validade: "2025-06-30T23:00:00",
-        preco:"17,00",
-        preco_com_desconto: "13,99",
-        whatsapp: "43991034187"
-      },
+        
 
        {
         imagem: "images/promocoes/5.jpg",
