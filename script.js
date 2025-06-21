@@ -405,6 +405,7 @@ function montarCarrosselDivulgacao() {
       // Agropecuaria
       agrovida: "s", 
       racoessaojose:"s", 
+      agrocasavaraschin:"s",
   
 
       // assessocia balistica
@@ -1645,6 +1646,42 @@ nome: "Agro São José",
                     title: "Agropecuaria",
                     establishments: [
 
+{
+                            image: "images/comercios/agropecuaria/varaschin/perfil.jpg",
+                            name: "AgroCasa Varaschin",
+                            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 16:00h",
+                            statusAberto:"a",
+                            horarios: {
+                              
+                              seg: [{ inicio: "08:00", fim: "18:00" }],
+                              ter: [{ inicio: "08:00", fim: "18:00" }],
+                              qua: [{ inicio: "08:00", fim: "18:00" }],
+                              qui: [{ inicio: "08:00", fim: "18:00" }],
+                              sex: [{ inicio: "08:00", fim: "18:00" }],
+                              sab: [{ inicio: "08:00", fim: "16:00" }],
+                              dom: []
+                            },
+                            address: "Rua Jorge Barros, 861 - Carlopolis",
+                            contact: "(43) 99657-7021",
+                            delivery: "Sim / Sem Taxa",
+                            facebook: "https://www.facebook.com/agro.varaschin/",
+                            instagram: "https://www.instagram.com/agro.varaschin/",
+                            novidadesImages: [
+                    
+                              "images/comercios/agropecuaria/varaschin/divulgacao/1.jpg",
+                        
+                          ],
+                          novidadesDescriptions: [  
+                            "Amplo espaço e muita variedade de rações",                          
+                           
+                           
+                          ],
+                        },
+
+
+
+
+
                        
                         {
                             image: "images/comercios/agropecuaria/agroVida/agrovida.png",
@@ -1661,7 +1698,7 @@ nome: "Agro São José",
                               sab: [{ inicio: "08:00", fim: "16:00" }],
                               dom: []
                             },
-                            address: "Rua Benedito salles,309 - Carlopolis",
+                            address: "Rua Benedito salles, 309 - Carlopolis",
                             contact: "(43) 99158-9047",
                             delivery: "Sim / Sem Taxa",
                             facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
@@ -2865,7 +2902,7 @@ nome: "Agro São José",
             title: "Pizzaria",
             establishments: [
                 {
-                    image: "images/comercios/pizzaria/fornalha/fornalha.png",
+                    image: "images/comercios/pizzaria/fornalha/perfil.jpg",
                     name: "Fornalha Pizzaria",
                     hours:"Qua a Qui: 18:00h as 23:00h </br>Sex a Sab: 18:00h as 00:00h </br> Dom: 18:00 as 23:00h",
                     statusAberto:".",
@@ -2882,7 +2919,9 @@ nome: "Agro São José",
                     contact: "(43) 99632-1310",
                     delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
-                    instagram: "https://www.instagram.com/_fornalhapizzaria_/",    
+                    instagram: "https://www.instagram.com/_fornalhapizzaria_/",   
+                     infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://fornalha.menudino.com/'  >Cardapio On Line</a>",
+             
                      
                     novidadesImages: [
                           
@@ -2891,7 +2930,18 @@ nome: "Agro São José",
                       "images/comercios/pizzaria/fornalha/divulgacao/3.png",
                       "images/comercios/pizzaria/fornalha/divulgacao/4.png",
                       "images/comercios/pizzaria/fornalha/divulgacao/5.png",
-                    ]        
+                      "images/comercios/pizzaria/fornalha/divulgacao/6.jpg",
+                    ]     ,
+                    novidadesDescriptions: [
+
+"",
+"",
+"",
+"",
+"",
+"Temos um Amplo espaço para realizar seu evento!",
+
+                      ]
                 },
 
 
@@ -3049,7 +3099,7 @@ nome: "Agro São José",
 
 
 {
-                image: "images/comercios/sorveteria/fortyshake/perfil.png",
+                image: "images/comercios/sorveteria/fortyshake/perfil.jpg",
                 name: "Forty Shake",
                 hours: "Dom a Dom: 13:00h as 23:00h",
                 statusAberto:".",
@@ -3062,7 +3112,7 @@ nome: "Agro São José",
                   sab: [{ inicio: "13:00", fim: "23:00" }],
                   dom: [{ inicio: "13:00", fim: "23:00" }],
                 }, 
-                address: "R. Benedito Salles, 832 - Centro  - Carlopolis",
+                address: "R. Benedito Salles, 832 - Carlopolis",
                 contact: "(43) 99630-9935",
                 delivery: "Sim / Sem Taxa",
                 facebook: "https://www.facebook.com/FortyShakeSorvetes/",
@@ -4022,17 +4072,16 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     name: "PopularMais",
                     address: "Elson Soares, 787, Sala 2",
                     hours: "Seg a Sex: 08:00h as 18:00h <br>Sab: 08:00h as 12:00h",
-                     plantaoHorario: "08:00h às 21:00h", 
-                    plantaoData:"Sab 14/06 a Sex 20/06",
+                     
                     statusAberto:".",
                     horarios: {                          
-                    seg: [{ inicio: "08:00", fim: "21:00" }],
-                      ter: [{ inicio: "08:00", fim: "21:00" }],
-                      qua: [{ inicio: "08:00", fim: "21:00" }],
-                      qui: [{ inicio: "08:00", fim: "21:00" }],
-                      sex: [{ inicio: "08:00", fim: "21:00" }],
-                      sab: [{ inicio: "08:00", fim: "21:00" }],
-                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "18:00" }],
+                      dom: [{ inicio: "08:00", fim: "18:00" }]
                     },  
                     contact: "(43) 99647-6266",
                     delivery: "Sim / Sem Taxa",
@@ -4099,18 +4148,20 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 {
                     image: "images/comercios/farmacia/saudeFarma/saudeFarma.png",
                     name: "Saude Farma",
-                    address: "Rua Benedito Salles, 951",
+                    address: "Rua Benedito Salles, 951 - Carlopolis",
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"Sab 21/06 a Sex 27/06",
                     statusAberto:".",
                     horarios: {                          
-                      seg: [{ inicio: "08:00", fim: "18:00" }],
-                      ter: [{ inicio: "08:00", fim: "18:00" }],
-                      qua: [{ inicio: "08:00", fim: "18:00" }],
-                      qui: [{ inicio: "08:00", fim: "18:00" }],
-                      sex: [{ inicio: "08:00", fim: "18:00" }],
-                      sab: [{ inicio: "08:00", fim: "12:00" }],
-                      dom: []
-                    },  
+                    seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    },
                     contact: "(43) 99956-8938",
                     delivery: "Sim / Sem Taxa",
                     facebook:
@@ -4712,7 +4763,9 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
             link: document.querySelector("#menuFarmaciaPlantao"),
             title: "Farmacia de Plantão",
             establishments: [
-/*
+
+
+            /* [ 1 ]
                 { 
                   image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
                   name: "Farmacia da Vila",
@@ -4739,10 +4792,10 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                   ],
 
                 },
+              */
 
 
-*/
-/*
+              /* [ 2 ]
                 {
                   image: "images/comercios/farmacia/santaMaria/santamaria.png",
                   name: "Santa Maria",
@@ -4770,8 +4823,9 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     "Redução da febre e para o alívio de dores",
                   ],
               },
-*/
-/*
+            */
+
+            /* [ 3 ]
 
               {
                 image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
@@ -4812,7 +4866,8 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 ],
             },
             */
-/*
+
+            /* [ 4 ]
             {
               image: "images/comercios/farmacia/masterFarma/masterfarma.png",
               name: "Master Farma",
@@ -4852,14 +4907,14 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               ],
           },
 
-*/
+          */
 
-/*
+            /* [ 5 ]
           {
-                    image: "images/comercios/farmacia/farmais/farmais.png",
-                    name: "FarMais",
-                    address: "R. Benedito Salles, 979 - Carlopolis",
-                    plantaoHorario: "08:00h às 21:00h", 
+              image: "images/comercios/farmacia/farmais/farmais.png",
+              name: "FarMais",
+              address: "R. Benedito Salles, 979 - Carlopolis",
+              plantaoHorario: "08:00h às 21:00h", 
               plantaoData:"Sab 17/05 a Sex 23/05", 
               statusAberto:".",
               horarios: {                          
@@ -4892,9 +4947,9 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       "Redução da febre e para o alívio de dores",
                     ],
                 },
-*/
+            */
 
-/*
+          /* [ 6 ]
           {
                     image: "images/comercios/farmacia/elShaday/elshaday.png",
                     name: "El Shaday",
@@ -4934,11 +4989,10 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     ],
                 },
 
-
                 */
 
 
-            /*
+            /* [ 7 ]
 
 
                 {
@@ -4983,7 +5037,8 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 
 
-                /*
+                /* [ 8 ]
+
                 {
                     image: "images/comercios/farmacia/drogaMais/drogamais.png",
                     name: "DrogaMais",
@@ -5030,7 +5085,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               */
 
 
-
+/* [ 9 ]
                 {
                     
                     name: "PopularMais",
@@ -5073,6 +5128,57 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       
                     ],
                 },
+*/
+
+
+// aqui
+{
+                    image: "images/comercios/farmacia/saudeFarma/saudeFarma.png",
+                    name: "Saude Farma",
+                    address: "Rua Benedito Salles, 951 - Carlopolis",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                      plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"Sab 21/06 a Sex 27/06",
+                    statusAberto:".",
+                    horarios: {                          
+                    seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    },
+                    contact: "(43) 99956-8938",
+                    delivery: "Sim / Sem Taxa",
+                    facebook:
+                    "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
+                    instagram: "https://www.instagram.com/saudefarmacarlopolis/",
+                  
+                    novidadesImages: [               
+                        "images/comercios/farmacia/saudeFarma/divulgacao/1.jpg",
+                        "images/comercios/farmacia/saudeFarma/divulgacao/2.jpg",     
+                        "images/comercios/farmacia/saudeFarma/divulgacao/3.jpg",
+                       
+                    ], 
+                    novidadesDescriptions: [                            
+                      "Faça o aferimento de glicemia e pressão aqui conosco!",
+                         "Esses são alguns dos sinais que sua pressão pode estar alta, é importante ficar atento nesse checklisk!",
+                            "Fraudas e lenço do Scooby doo você encontra na Saúde Farma, venha conferir!",
+                              
+                      
+                    ],
+                },
+
+// aqui
+
+
+
+
+
+
+
+
 
             ],
         
@@ -5839,7 +5945,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
             establishments: [
 
               {
-                image: "images/comercios/depositoGas/cnCasaDoGas/perfil.png",
+                image: "images/comercios/depositoGas/cnCasaDoGas/perfil.jpg",
                   name: "CN Casa do Gas",
                   hours: "Seg a Sab: 08:00h as 19:00h </br>Dom: 09:00h as 12:00h",
                   statusAberto:".",
@@ -5852,26 +5958,29 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     sab: [{ inicio: "08:00", fim: "19:00" }],
                     dom: [{ inicio: "09:00", fim: "12:00" }]
                   }, 
-                  address: "Avenida Elson Soares, 1048, Carlopolis",
+                  address: "Avenida Elson Soares, 1048 - Carlopolis",
                   contact: "(43) 99829-5216",
                   delivery: "Sim / Com Taxa",
                   facebook:"https://www.facebook.com/people/CN-Casa-do-G%C3%A1s/100068139145901/",
                   instagram:"https://www.instagram.com/ultracarlopolis/",
                   novidadesImages: [               
                     "images/comercios/depositoGas/cnCasaDoGas/divulgacao/1.png",
+                    "images/comercios/depositoGas/cnCasaDoGas/divulgacao/2.jpg",
+                     "images/comercios/depositoGas/cnCasaDoGas/divulgacao/3.jpg",
                                         
                    
                 ], 
                 novidadesDescriptions: [                            
-                  "Botijao em estoque",
-                                  
+                  "Nossos Modelos de botijões",
+                  "",
+                  "Temos Galões de 20lts de agua e carvão",                
                 ],
               },
 
                 {
                   image: "images/comercios/depositoGas/liaGas/liaGas.png",
                     name: "Lia Gas",
-                    hours: "Seg a Sab: 08:00h as 20:00h </br>Dom: 08:00h as 20:00h",
+                    hours: "Seg a Sab: 08:00h as 20:00h",
                     statusAberto:".",
                     horarios: {                          
                       seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -5882,7 +5991,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "08:00", fim: "20:00" }],
                       dom: []
                     }, 
-                    address: "R. Kalil Keder, 910",
+                    address: "R. Kalil Keder, 910 - Carlopolis",
                     contact: "(43) 99821-7243",
                     contact2: "(43) 99844-5345",
                     delivery: "Sim / Sem Taxa",
@@ -6152,10 +6261,84 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       dom: []
                     },
                     address: "R. Kalil Keder, 90",
-                    contact: "(43) 9111-9484",
+                    contact: "(43) 99111-9484",
                     delivery: "Sim / Com Taxa",
+                    instagram:"https://www.instagram.com/delfinos.mendes1/",
+                    menuImages: [                   
+                "images/comercios/restaurante/delfino/cardapio/1.jpg",
+                "images/comercios/restaurante/delfino/cardapio/2.jpg", 
+                "images/comercios/restaurante/delfino/cardapio/3.jpg",   
+                "images/comercios/restaurante/delfino/cardapio/4.jpg",         
+                       
+            ],
+
+            novidadesImages: [                    
+                "images/comercios/restaurante/delfino/divulgacao/1.jpg",
+                 "images/comercios/restaurante/delfino/divulgacao/2.jpg",
+                 "images/comercios/restaurante/delfino/divulgacao/3.jpg",
+                 "images/comercios/restaurante/delfino/divulgacao/4.jpg",
+               
+              ],novidadesDescriptions: [ 
+
+"Nossa famosa Parmegiana",
+"Venha conhecer nosso ambiente!",
+"Temos porções de tilapia com maionese verde da casa!",
+"Fazemos um Salmãozinho com alcaparras! Divino!",
+
+
+               ],
                   
                 },
+
+
+
+
+
+
+{
+                    image: "images/comercios/restaurante/hime/perfil.jpg",
+                    name: "Hime",
+                    hours: "Qui a Sab: 19:00h as 22:00h",
+                    statusAberto:".",
+                    horarios: {                    
+                      seg: [],
+                      ter: [],
+                      qua: [],
+                      qui: [{ inicio: "19:00", fim: "22:00" }],
+                      sex: [{ inicio: "19:00", fim: "22:00" }],
+                      sab: [{ inicio: "19:00", fim: "22:00" }],
+                      dom: []
+                    },
+                    address: "Rua Kalil Keder - 1204 - saída para Ribeirão Claro",
+                    contact: "(43) 99686-5040",
+                    delivery: "Sim / Com Taxa",
+
+
+                    novidadesImages: [                    
+              "images/comercios/restaurante/hime/divulgacao/1.jpg",  
+              "images/comercios/restaurante/hime/divulgacao/2.jpg", 
+              "images/comercios/restaurante/hime/divulgacao/3.jpg", 
+                                  
+          
+             
+                    ],
+                    novidadesDescriptions:[
+                "Sabiam quem temos Rodizio todas as Sextas-ferias?  ",
+                  "Nosso famoso Yaki Soba!",
+                    "Amplo espaço para atendermos toda sua familia! ",
+                    
+       
+
+          ],
+                  
+                },
+
+
+
+
+
+
+
 
 
           {
