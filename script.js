@@ -1305,7 +1305,17 @@ nome: "MovePar",
        preco_com_desconto: "999,00 a vista",
         whatsapp: "43991186909"
       },
-      // ...até 10 promoções
+      
+       {
+        imagem: "images/promocoes/m3.jpg",
+        descricao: "Roupeiro 6 portas e 2 gavetas",
+        validade: "2025-06-30T18:00:00",
+        preco:"1.090,00",
+       preco_com_desconto: "699,00 a vista",
+        whatsapp: "43991186909"
+      },
+
+
     ]
 },
 
