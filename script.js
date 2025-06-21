@@ -1335,7 +1335,7 @@ nome: "Judite",
 
          {
         imagem: "images/promocoes/bolsa1.jpg",
-        descricao: "Bolsa de pano 24x26cm",
+        descricao: "Bolsa de croche 24x26cm",
         validade: "2025-06-30T18:00:00",
         preco:"100,00",
        preco_com_desconto: "90,00 a vista",
