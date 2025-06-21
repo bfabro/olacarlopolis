@@ -1311,6 +1311,43 @@ nome: "MovePar",
 
 {
 
+nome: "Judite",
+    imagem: "images/comercios/artesanato/judite/perfil.jpg",
+    promocoes: [
+      {
+        imagem: "images/promocoes/boneca1.jpg",
+        descricao: "Boneca de Pano Moranguinho",
+        validade: "2025-06-30T18:00:00",
+        preco:"180,00",
+        preco_com_desconto: "150,00 a vista",
+       // desconto: "5",
+        whatsapp: "43998713498"
+      },
+
+      {
+        imagem: "images/promocoes/boneca2.jpg",
+        descricao: "Boneca de Pano Emilia",
+        validade: "2025-06-30T18:00:00",
+        preco:"180,00",
+       preco_com_desconto: "150,00 a vista",
+        whatsapp: "43998713498"
+      },
+
+         {
+        imagem: "images/promocoes/bolsa1.jpg",
+        descricao: "Bolsa de pano 24x26cm",
+        validade: "2025-06-30T18:00:00",
+        preco:"100,00",
+       preco_com_desconto: "90,00 a vista",
+        whatsapp: "43998713498"
+      },
+      
+    ]
+},
+
+
+{
+
 nome: "Agro São José",
     imagem: "images/comercios/agropecuaria/saojose/perfil.png",
     promocoes: [
