@@ -391,6 +391,7 @@ function montarCarrosselDivulgacao() {
 
       //AÇAI
       turminhadoacai:"s",
+      thebestacai:"s",
 
       //Açougue
       acouguecuritiba: "s",
@@ -1444,6 +1445,48 @@ nome: "Agro São José",
                     link: document.querySelector("#menuAcai"),    
                     title: "Açai",
                     establishments: [
+
+{
+                            image: "images/comercios/acai/thebestacai/perfil.jpg",
+                            name: "The Best Açai",                            
+                            hours: "Dom a Dom: 13:00h as 22:00h",
+                            statusAberto:".",
+                            horarios: {                              
+                              seg: [{ inicio: "13:00", fim: "22:00" }],
+                              ter: [{ inicio: "13:00", fim: "22:00" }], 
+                              qua: [{ inicio: "13:00", fim: "22:00" }],
+                              qui: [{ inicio: "13:00", fim: "22:00" }],
+                              sex: [{ inicio: "13:00", fim: "22:00" }],
+                              sab: [{ inicio: "13:00", fim: "22:00" }],
+                              dom: [{ inicio: "13:00", fim: "22:00" }],
+                            },
+                            address: "Rua Benedito Salles, 519 - Carlopolis",
+                            contact: "(43) 98814-0469",                        
+                            delivery: "Não",
+                            instagram: "https://www.instagram.com/carlopolis.thebestacai/",
+                            novidadesImages: [            
+                            "images/comercios/acai/thebestacai/divulgacao/1.jpg", 
+                           "images/comercios/acai/thebestacai/divulgacao/2.jpg",
+                           "images/comercios/acai/thebestacai/divulgacao/3.jpg", 
+                           "images/comercios/acai/thebestacai/divulgacao/4.jpg", 
+                           "images/comercios/acai/thebestacai/divulgacao/5.jpg",                                              
+                            ],
+                            novidadesDescriptions: [                            
+                            "E aí já provou nossa piscininha de inverno? Não 😳. Então vem se deliciar 😋",
+                             "Quem ama açaí, ama The Best. São 12 sabores de açaí, sendo tradicional, do Pará e zero açúcar e mais 9 com sabor e trufado, Aqui no the best Carlopolis você faz do seu jeito!!!!!",
+                            "Explosão de sabores com morango apenas no the best açaí!",
+                             "Variedades é no the best açai Carlopolis!!!!",
+                              "Quando cores vibrantes se unem a sabores deliciosos, a experiência gastronômica se torna uma obra de arte.",
+                          ],
+                            menuImages: [                    
+                                "images/comercios/acai/thebestacai/cardapio/1.jpg",
+                                "images/comercios/acai/thebestacai/cardapio/2.jpg",
+                                "images/comercios/acai/thebestacai/cardapio/3.jpg",
+                            ],
+                        
+                        },
+
+
                         {
                             image: "images/comercios/acai/turminhaAcai/turminhaAcai.png",
                             name: "Turminha do Açai",                            
