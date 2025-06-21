@@ -1448,7 +1448,7 @@ nome: "Agro São José",
 
 {
                             image: "images/comercios/acai/thebestacai/perfil.jpg",
-                            name: "The Best Açai",                            
+                            name: "The Best Açaí",                            
                             hours: "Dom a Dom: 13:00h as 22:00h",
                             statusAberto:".",
                             horarios: {                              
