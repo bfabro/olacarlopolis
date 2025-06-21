@@ -304,7 +304,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-   "feiradalua","popularmais","flaviogiovani","seiza", "prelie", "vania","racoessaojose"
+   "saudefarma","relojoariamartini","racoessaojose","flaviogiovani", "esquinadopao", "vania",
   
 ]; 
 
@@ -4206,15 +4206,17 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
                     instagram: "https://www.instagram.com/saudefarmacarlopolis/",
                   
-                    novidadesImages: [               
+                    novidadesImages: [
+                      "images/comercios/farmacia/saudeFarma/divulgacao/2.jpg",               
                         "images/comercios/farmacia/saudeFarma/divulgacao/1.jpg",
-                        "images/comercios/farmacia/saudeFarma/divulgacao/2.jpg",     
+                             
                         "images/comercios/farmacia/saudeFarma/divulgacao/3.jpg",
                        
                     ], 
-                    novidadesDescriptions: [                            
+                    novidadesDescriptions: [ 
+                       "Esses são alguns dos sinais que sua pressão pode estar alta, é importante ficar atento nesse checklisk!",                           
                       "Faça o aferimento de glicemia e pressão aqui conosco!",
-                         "Esses são alguns dos sinais que sua pressão pode estar alta, é importante ficar atento nesse checklisk!",
+                        
                             "Fraudas e lenço do Scooby doo você encontra na Saúde Farma, venha conferir!",
                               
                       
@@ -5193,15 +5195,17 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
                     instagram: "https://www.instagram.com/saudefarmacarlopolis/",
                   
-                    novidadesImages: [               
+                    novidadesImages: [  
+                       "images/comercios/farmacia/saudeFarma/divulgacao/2.jpg",              
                         "images/comercios/farmacia/saudeFarma/divulgacao/1.jpg",
-                        "images/comercios/farmacia/saudeFarma/divulgacao/2.jpg",     
+                           
                         "images/comercios/farmacia/saudeFarma/divulgacao/3.jpg",
                        
                     ], 
-                    novidadesDescriptions: [                            
+                    novidadesDescriptions: [  
+                       "Esses são alguns dos sinais que sua pressão pode estar alta, é importante ficar atento nesse checklisk!",                          
                       "Faça o aferimento de glicemia e pressão aqui conosco!",
-                         "Esses são alguns dos sinais que sua pressão pode estar alta, é importante ficar atento nesse checklisk!",
+                        
                             "Fraudas e lenço do Scooby doo você encontra na Saúde Farma, venha conferir!",
                               
                       
