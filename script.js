@@ -427,7 +427,7 @@ norbaautopecas:"s",
 judite:"s",
 
 // cartorio
-cartoriomariazelia:"s",
+cartorioregistrocivileimoveis :"s",
 
 //chaveiro
 chaveirocentral:"s",
@@ -2112,7 +2112,7 @@ nome: "Agro São José",
                        
                         {
                             image: "images/comercios/cartorio/fabiano/perfil.png",
-                            name: "Cartorio Maria Zelia",
+                            name: "Cartorio Registro Civil e Imóveis",
                             hours: "Seg a Sex: 8:30h as 11:00h - 13:00h as 17:00h",
                             statusAberto:"a",
                             horarios: {
@@ -2127,7 +2127,7 @@ nome: "Agro São José",
                         },
                             address: "R. Salvira Marquês, 453 - Carlópolis",
                             contact: "(43) 99621-5094",  
-                            infoAdicional:"Registro: de nascimento, de casamento, de obito, averbações e certidões.",           
+                            infoAdicional:"Cartório de registro de imóveis, cumulado com cartório de registro civil e títulos, documentos de pessoas jurídicas.",           
                             
                            
                         },
