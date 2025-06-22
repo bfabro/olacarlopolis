@@ -427,7 +427,7 @@ norbaautopecas:"s",
 judite:"s",
 
 // cartorio
-cartorioregistrocivileimoveis :"s",
+registrocivileimoveis :"s",
 
 //chaveiro
 chaveirocentral:"s",
@@ -2112,7 +2112,7 @@ nome: "Agro São José",
                        
                         {
                             image: "images/comercios/cartorio/fabiano/perfil.png",
-                            name: "Cartorio Registro Civil e Imóveis",
+                            name: "Registro Civil e Imóveis",
                             hours: "Seg a Sex: 8:30h as 11:00h - 13:00h as 17:00h",
                             statusAberto:"a",
                             horarios: {
