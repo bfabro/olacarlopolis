@@ -4257,8 +4257,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     },
                     contact: "(43) 99956-8938",
                     delivery: "Sim / Sem Taxa",
-                    facebook:
-                    "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
+                    facebook: "https://www.facebook.com/share/1BrGP14Pbc/",
                     instagram: "https://www.instagram.com/saudefarmacarlopolis/",
                   
                     novidadesImages: [
@@ -5246,8 +5245,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     },
                     contact: "(43) 99956-8938",
                     delivery: "Sim / Sem Taxa",
-                    facebook:
-                    "https://www.facebook.com/people/Sa%C3%BAde-Farma-Carl%C3%B3polis/100077692803333/",
+                    facebook: "https://www.facebook.com/share/1BrGP14Pbc/",
                     instagram: "https://www.instagram.com/saudefarmacarlopolis/",
                   
                     novidadesImages: [  
