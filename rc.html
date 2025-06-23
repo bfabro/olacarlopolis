@@ -561,11 +561,9 @@
 
 				// Criar uma cópia dos valores anteriores para comparar
 				const anteriores = { ...valoresAnteriores };
+valoresAnteriores = {}; // Reset para regravar os novos ao final
 
-				// Limpar o objeto atual antes de atualizar
-				valoresAnteriores = {};
-
-				Object.entries(resultados)
+Object.entries(resultados)
   .sort((a, b) => b[1] - a[1])
   .forEach(([nome, total]) => {
     const nomeFormatado = nome.startsWith("menu") ? nome.replace("menu", "") : nome;
@@ -575,22 +573,20 @@
     if (nomesOcultos.includes(nomeFormatado.toLowerCase())) return;
 
     const row = document.createElement("tr");
-row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
+    row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
 
-// Verificar se é novo ou se o valor mudou
-if (anteriores[nome] === undefined || anteriores[nome] !== total) {
-  row.style.color = "yellow";
-  row.style.fontWeight = "bold";
-}
+    // Destaque amarelo para novos ou alterados
+    if (anteriores[nome] === undefined || anteriores[nome] !== total) {
+      row.style.color = "yellow";
+      row.style.fontWeight = "bold";
+    }
 
-valoresAnteriores[nome] = total;
-tabela.appendChild(row);
-
+    valoresAnteriores[nome] = total;
+    tabela.appendChild(row);
   });
 
+localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriores));
 
-				// Agora sim salva os novos dados após toda verificação
-				localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriores));
 
 
 
