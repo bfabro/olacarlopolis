@@ -686,18 +686,11 @@ funerariagrupocastilho:"s",
   // INICIO EVENTOS 
   feiradalua: "s",
   calendarioeventos: "s",
-  
-  
   frutfest:"s",
-  cresolrun:"s",
-  truco:"s",
-  beachvolleyball:"s",
-  torneiodecaiaques:"s",
+   torneiodecaiaques:"s",
   cafebingo:"s",
   encontrocarroantigo:"s",
   festadosenhorbomjesus:"s",
-  standup:"s", 
- 
   lowcity:"s",  
   toroonagashi:"s",
   passeiociclisticorotary:"s",
@@ -1570,16 +1563,26 @@ nome: "Agro São José",
                             address: "Rua Benedito Salles, 409",
                             contact: "(43) 99635-1001",
                             delivery: "Sim / Sem Taxa",
+                            infoAdicional:"Fazemos espetinhos assados de quarta e sabado até as 20:00hrs",
                             novidadesImages: [ 
                             "images/comercios/acougue/curitiba/divulgacao/1.jpg",
                             "images/comercios/acougue/curitiba/divulgacao/2.jpg",
                             "images/comercios/acougue/curitiba/divulgacao/3.jpg",
+                            "images/comercios/acougue/curitiba/divulgacao/4.jpg",
+                            "images/comercios/acougue/curitiba/divulgacao/5.jpg",
+                            "images/comercios/acougue/curitiba/divulgacao/6.jpg",
+                            "images/comercios/acougue/curitiba/divulgacao/7.jpg",
+                             "images/comercios/acougue/curitiba/divulgacao/8.jpg",
                             ],
                             novidadesDescriptions: [                            
                               "Aquele Chouriço feito no capricho!",
                               "Espetinhos preparados por nos, faça seu pedido",
                               "Temos queijos de Minas",
-                              
+                              "Temos tambem: Espetinho de boi, kafta, linguicinha suína, linguiça apimentada, 'Luis gordo', coração e muitos mais!",
+                              "Linguiça defumada artesanal suína, lombo e pernil",
+                              "Sabiam que temos, torresmo pré frito? Facilitando sua vida na hora de preparar essa delicia!",
+                                "Temos Banha suína 1 kg porco caipira, Gordura boa!",
+                              "Linguiça defumada artesanal mista, boi e porco",
                             ],
                         },
                     ],
@@ -4717,36 +4720,12 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
           
 
 
-          {
-              image: "images/informacoes/eventos/truco.png",
-              name: "Truco",
-              date: "21/06/2025",
-              address: "Pedro Salles - Casa do Elton",
-              contact: "(43) 99243-2345",
-              instagram:"https://www.instagram.com/veterano_pedro_salles?igsh=NmhobzJscnI0NWxo",
-              infoAdicional:"A partir das 11hrs começa o barulho! venha participar",
-              
-              
-             
-          },
+        
 
 
 
 
-            {
-                  image: "images/informacoes/eventos/volley.png",
-                  name: "Beach Volleyball",
-                  date: "22/06/25",
-                  address: "Arena Seu Luiz",
-                  contact: "(43) 99627-2094",
-                  contact2: "(43) 99860-4291",
-                  contact3: "(43) 99659-5510",
-                  instagram:"https://www.instagram.com/volleyball_beach_carlopolis/",
-                  infoAdicional:"",
-                  infoAdicional:"Inscrições até 19 de Junho",
-                
-                   
-              },
+           
 
               
 
@@ -4755,23 +4734,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 
 
-         {
-                  image: "images/informacoes/eventos/cresolRun.png",
-                  name: "Cresol Run",
-                  date: "22/06/25",
-                  address: "Av Turistica",
-                  contact: "(43) 99950-9291",
-                  instagram:"https://www.instagram.com/carlopolisrunning/p/DJw_BS6SObU/?img_index=2",
-                  infoAdicional:"",
-                  infoAdicional:"<a target='_blank'  style='color:#2da6ff;' href='www.cronocorridas.com.br'>Faça sua inscrição</a>",
-                
-                    novidadesImages: [               
-                    "images/informacoes/eventos/cresolRun2.png",
-                
-                ], novidadesDescriptions:[ 
-                 "INSCRIÇÕES ABERTAS GARANTA JÁ SUA VAGA!",
-                 ],
-              },
+         
 
                {
                   image: "images/informacoes/eventos/paranaFishing.jpg",
@@ -6711,7 +6674,8 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               {
                 image: "images/comercios/restaurante/selaht/selaht.png",
                 name: "Selaht Grill",
-                hours: "Ter a Dom: 11:00h as 23:00h",
+                hours: "<span style='color:#FF0000;font-weight:bold;'>VOLTAMOS DIA 10/07/2025</span>",
+                /*
                 statusAberto:".",
                     horarios: {                    
                       seg: [],
@@ -6721,7 +6685,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sex: [{ inicio: "11:00", fim: "23:00" }],
                       sab: [{ inicio: "11:00", fim: "23:00" }],
                       dom: [{ inicio: "11:00", fim: "23:00" }]
-                    },
+                    },*/
                 address: "R. Padre Hugo, 460",
                 contact: "(43) 9 9160-5120",
                 delivery: "Sim / Com Taxa",
