@@ -509,7 +509,10 @@ rodriguinho:"s",
       bomjesus:"s",
       esquinadopao:"s",
       //saofrancisco:"s",
-      prelie:"s",      
+      prelie:"s",     
+      
+      //produtosNaturais
+      cantinhosaudavel:"s",
   
       //pizzaria
       fornalhapizzaria: "s",
@@ -1850,47 +1853,47 @@ nome: "Agro São José",
 
 
                 {
-    link: document.querySelector("#menuAssessoriaBalistica"),
-    title: "Assessoria Balistica",
-    establishments: [
-        {
-            image: "images/comercios/assessoriaBalistica/betogun/perfil.png",
-            name: "Beto Guns Assessoria Armaria",
-            hours: "Seg a Sex: 09:00h as 16:30h",
-            statusAberto:".",
-            horarios: {                          
-              seg: [{ inicio: "09:00", fim: "16:30" }],
-              ter: [{ inicio: "09:00", fim: "16:30" }],
-              qua: [{ inicio: "09:00", fim: "16:30" }],
-              qui: [{ inicio: "09:00", fim: "16:30" }],
-              sex: [{ inicio: "09:00", fim: "16:30" }],
-              sab: [],
-              dom: [],
-            }, 
-            address: "R. Nicolau Miguel, 452 - sala 1 - centro, Carlópolis",
-            contact: "(43) 99135-4012", 
-            infoAdicional:"IAT e Armeiro Credenciado • Port. SR/PF/PR N° 1821 de 08/23<br> Perito cred TJPR<br>Despachante<br>Assessoria<br>Cursos",          
-          
-            facebook: "https://www.facebook.com/betopedreira.instrutor.armeiro/",
-            instagram: "https://www.instagram.com/betopedreira.instrutor.armeiro/",
-            novidadesImages: [
-         
-             "images/comercios/assessoriaBalistica/betogun/divulgacao/1.png",
-             "images/comercios/assessoriaBalistica/betogun/divulgacao/2.png",
-             "images/comercios/assessoriaBalistica/betogun/divulgacao/3.png",
-           
-            ],   
-            novidadesDescriptions : [  
-"Confiança em primeiro Lugar",
-"Entre em contato para tirar qualquer tipo de duvida sobre armamentos",
-"Treinamento teorico e pratico!",
+                link: document.querySelector("#menuAssessoriaBalistica"),
+                title: "Assessoria Balistica",
+                establishments: [
+                    {
+                        image: "images/comercios/assessoriaBalistica/betogun/perfil.png",
+                        name: "Beto Guns Assessoria Armaria",
+                        hours: "Seg a Sex: 09:00h as 16:30h",
+                        statusAberto:".",
+                        horarios: {                          
+                          seg: [{ inicio: "09:00", fim: "16:30" }],
+                          ter: [{ inicio: "09:00", fim: "16:30" }],
+                          qua: [{ inicio: "09:00", fim: "16:30" }],
+                          qui: [{ inicio: "09:00", fim: "16:30" }],
+                          sex: [{ inicio: "09:00", fim: "16:30" }],
+                          sab: [],
+                          dom: [],
+                        }, 
+                        address: "R. Nicolau Miguel, 452 - sala 1 - centro, Carlópolis",
+                        contact: "(43) 99135-4012", 
+                        infoAdicional:"IAT e Armeiro Credenciado • Port. SR/PF/PR N° 1821 de 08/23<br> Perito cred TJPR<br>Despachante<br>Assessoria<br>Cursos",          
+                      
+                        facebook: "https://www.facebook.com/betopedreira.instrutor.armeiro/",
+                        instagram: "https://www.instagram.com/betopedreira.instrutor.armeiro/",
+                        novidadesImages: [
+                    
+                        "images/comercios/assessoriaBalistica/betogun/divulgacao/1.png",
+                        "images/comercios/assessoriaBalistica/betogun/divulgacao/2.png",
+                        "images/comercios/assessoriaBalistica/betogun/divulgacao/3.png",
+                      
+                        ],   
+                        novidadesDescriptions : [  
+            "Confiança em primeiro Lugar",
+            "Entre em contato para tirar qualquer tipo de duvida sobre armamentos",
+            "Treinamento teorico e pratico!",
 
 
 
-             ],              
-        },
-    ],
-},
+                        ],              
+                    },
+                ],
+            },
 
 
                 {
@@ -1900,7 +1903,7 @@ nome: "Agro São José",
 
 
 
- {
+                    {
                           image: "images/comercios/assistenciaCelular/cev/perfil.jpg",
                           name: "C e V Assistencia Celular",
                           hours: "Seg a Sex: 08:00h as 18:30h<br> Sab: 08:00h as 13:00h",
@@ -1932,11 +1935,11 @@ nome: "Agro São José",
 
 
 
-{
+                  {
                           image: "images/comercios/assistenciaCelular/efcell/perfil.jpg",
                           name: "EF Cell",
                           hours: "Seg a Sex: 8:00h as 18:30h<br> Sab: 08:00h as 13:00h",
-                              statusAberto:".",
+                          statusAberto:".",
                           horarios: {                          
                             seg: [{ inicio: "08:00", fim: "18:30" }],
                             ter: [{ inicio: "08:00", fim: "18:30" }],
@@ -1997,17 +2000,6 @@ nome: "Agro São José",
                      
 
 
-
-
-
-
-
-
-
-
-
-
-
                   ],
                 },
 
@@ -2019,9 +2011,8 @@ nome: "Agro São José",
                   title: "Auto Peça",
                   establishments: [
 
-{
-                          image: "images/comercios/autopecas/norba/perfil.png",
-                                 
+                  {
+                          image: "images/comercios/autopecas/norba/perfil.png",                                 
                           name: "Norba Auto Peças",
                           hours: "Seg a Sex: 07:00h as 18:00h<br> Sab: 07:00h as 12:00h",
                           address: "Av Anesio Fernandes Machado, 341 - Carlopolis",
@@ -2178,10 +2169,10 @@ nome: "Agro São José",
                         
                         novidadesDescriptions: [
                           "Os gatos são animais independentes, mas isso não significa que não precisam de cuidados especiais! Se liga nessas 3 dicas para garantir o bem-estar do seu bichano:",
-"Você sabia que manter a vacinação em dia é a forma mais eficaz de proteger seu pet contra doenças graves como raiva, leptospirose, cinomose e parvovirose?",
-"🛁 Seu pet merece um banho cheio de carinho! 🐶💛 Nada como um banho relaxante pra deixar seu amigo de quatro patas limpinho, cheiroso e feliz! Além de remover sujeiras e odores, o banho também ajuda a manter a pele e os pelos saudáveis.",
-"🐾 Castração é um ato de cuidado, amor e responsabilidade! Ao optar pela castração, você está garantindo mais saúde e bem-estar para o seu pet. Confira os principais benefícios",
-"💚 Amor pelos pets e dedicação para cuidar de quem você mais ama! Aqui, cada consulta, banho ou procedimento é feito com o máximo de carinho e profissionalismo. Nosso compromisso é garantir o bem-estar e a saúde do seu melhor amigo.",
+                          "Você sabia que manter a vacinação em dia é a forma mais eficaz de proteger seu pet contra doenças graves como raiva, leptospirose, cinomose e parvovirose?",
+                          "🛁 Seu pet merece um banho cheio de carinho! 🐶💛 Nada como um banho relaxante pra deixar seu amigo de quatro patas limpinho, cheiroso e feliz! Além de remover sujeiras e odores, o banho também ajuda a manter a pele e os pelos saudáveis.",
+                          "🐾 Castração é um ato de cuidado, amor e responsabilidade! Ao optar pela castração, você está garantindo mais saúde e bem-estar para o seu pet. Confira os principais benefícios",
+                          "💚 Amor pelos pets e dedicação para cuidar de quem você mais ama! Aqui, cada consulta, banho ou procedimento é feito com o máximo de carinho e profissionalismo. Nosso compromisso é garantir o bem-estar e a saúde do seu melhor amigo.",
  
  
                         ], 
@@ -2410,7 +2401,7 @@ nome: "Agro São José",
              
             ],     
             novidadesDescriptions: [ 
-"A coroa de flores representa mais do que um arranjo, é um gesto de amor, respeito e despedida, uma forma delicada de expressar sentimentos eternos e honrar memórias que jamais serão esquecidas.",
+            "A coroa de flores representa mais do que um arranjo, é um gesto de amor, respeito e despedida, uma forma delicada de expressar sentimentos eternos e honrar memórias que jamais serão esquecidas.",
 
 
              
@@ -3778,7 +3769,55 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
         },
 
 
+{
+                link: document.querySelector("#menuProdutosNaturais"),    
+                title: "Produtos Naturais",
+                establishments: [
+                    {
+                      image: "images/comercios/produtosNaturais/cantinhoSaudavel/perfil.jpg",
+                        name: "Cantinho Saudável",
+                        hours: "Seg a Sex: 09:00h as 18:00h<br>Sab: 09:00 as 12:40h",
+                        statusAberto:"a",
+                            horarios: {
+                              
+                              seg: [{ inicio: "09:00", fim: "18:00" }],
+                              ter: [{ inicio: "09:00", fim: "18:00" }],
+                              qua: [{ inicio: "09:00", fim: "18:00" }],
+                              qui: [{ inicio: "09:00", fim: "18:00" }],
+                              sex: [{ inicio: "09:00", fim: "18:00" }],
+                              sab: [{ inicio: "09:00", fim: "12:40" }],
+                              dom: []
+                            },
+                        address: " R. Laurindo Franco de Godói, 403 - Carlópolis ",
+                        contact: "(43) 99630-2465",
+                        instagram:"https://www.instagram.com/_cantinho.saudavel_/",
+                        facebook:"https://www.facebook.com/people/Cantinho-Sauda%CC%81vel/100083758940743/#",
+                        novidadesImages: [               
+                    "images/comercios/produtosNaturais/cantinhoSaudavel/divulgacao/1.jpg",
+                    "images/comercios/produtosNaturais/cantinhoSaudavel/divulgacao/2.jpg",
+                    "images/comercios/produtosNaturais/cantinhoSaudavel/divulgacao/3.jpg",
+                    "images/comercios/produtosNaturais/cantinhoSaudavel/divulgacao/4.jpg",
+                    "images/comercios/produtosNaturais/cantinhoSaudavel/divulgacao/5.jpg",
+                    "images/comercios/produtosNaturais/cantinhoSaudavel/divulgacao/6.jpg",
+                 
+                     
+                    
+                ], 
+                novidadesDescriptions: [                            
+                  "A compra de temperos a granel proporciona um consumo consciente, podendo comprar em quantidades necessárias, e o melhor de tudo…com muito mais economia!<br> Além da qualidade que importa muito!  Os temperos fazem toda diferença nas receitas caseiras e o Cantinho possui uma variedade imeeeensa, não só em temperos como ervas, especiarias, farinhas e muito mais!<br>Vem conferir com a gente, você merece o Cantinho na sua casa 💚",
+                   "Uma xícara para resolver seu problema ☕️ <br><br>Chás como o dente de leão, cavalinha e salsinha são aliados poderosos para o seu trato urinário. <br><br>Confie no poder das ervas!⚠️ Não dispensa acompanhamento médico!",                
+                    "POTENCIALIZE SEUS TREINOS COM A CREATINA DUX! 🔥<br> Está preparado para elevar seus treinos a um novo nível? <br>Preço imperdível aqui no Cantinho, corre conferir e garantir a sua!! 💪🏻",
+                   "Está com algum desses sintomas? Nós te ajudamos 💚",
+                   "Também chamada como “MARAVILHA”, é uma flor vibrante conhecida por suas propriedades medicinais.<br> É ótima para ser usada em tratamentos de pele podendo ser incorporada em óleos, extratos, pomadas, máscaras, chás, infusões e mais uma infinidade de maneiras. <br>Descubra a magia da calêndula em nossa loja! 💚",
+               "PARA UM INTESTINO FELIZ 💚🌿<br> O Psyllium é uma fibra solúvel derivada das sementes da planta Plantago Ovata possuindo inúmeros benefícios para nossa saúde intestinal, tendo a capacidade de absorver água e formar um gel viscoso, proporcionando diversos efeitos positivos em nosso sistema digestivo, regulando o trânsito intestinal.<br>É muito importante que seu uso seja aliado com um bom consumo de água, devendo sempre ser consumido com moderação. 💦",
+               
+               
+                  ],
 
+
+                    },
+                ],
+            },
 
 
 
