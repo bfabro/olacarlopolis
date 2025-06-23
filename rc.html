@@ -575,9 +575,17 @@
     if (nomesOcultos.includes(nomeFormatado.toLowerCase())) return;
 
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
-    // ... resto igual
-    tabela.appendChild(row);
+row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
+
+// Verificar se é novo ou se o valor mudou
+if (anteriores[nome] === undefined || anteriores[nome] !== total) {
+  row.style.color = "yellow";
+  row.style.fontWeight = "bold";
+}
+
+valoresAnteriores[nome] = total;
+tabela.appendChild(row);
+
   });
 
 
