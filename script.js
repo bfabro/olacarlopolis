@@ -4756,8 +4756,10 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               name: "Cafe Bingo",
               date: "13/07/2025",
               address: "Rotary Clube",
-              contact: "-",
+              infoAdicional:"Café Beneficiente ao Amigos de Patas",
+              contact: "(43) 99145-3387",
               instagram:"https://www.instagram.com/anjos_depatasclps/",
+              facebook:"https://www.facebook.com/Anjos-de-Patas-Carl%C3%B3polis-PR-100083209006791/?_rdr",
               
               
              
