@@ -687,7 +687,8 @@ funerariagrupocastilho:"s",
   feiradalua: "s",
   calendarioeventos: "s",
   frutfest:"s",
-   torneiodecaiaques:"s",
+   campeonatopescaesportivatucunare:"s",
+   
   cafebingo:"s",
   encontrocarroantigo:"s",
   festadosenhorbomjesus:"s",
@@ -3906,6 +3907,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 "images/comercios/relojoaria/martini/divulgacao/4.jpg",
                 "images/comercios/relojoaria/martini/divulgacao/5.jpg",
                 "images/comercios/relojoaria/martini/divulgacao/6.jpg",
+                "images/comercios/relojoaria/martini/divulgacao/7.jpg",
                 ],
                 novidadesDescriptions: [                            
                   "A Relojoaria Martini oferece serviços completos para o seu relógio, como troca de baterias, ajuste de pulseiras, substituição de vidros, além de alianças de moeda, acessórios em prata 925 e venda de relógios. Com entrega rápida, qualidade garantida e atendimento em Carlópolis, solicite seu orçamento sem compromisso pelo WhatsApp!",
@@ -3914,6 +3916,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                          "Consertamos o teu relogio, fazemos limpeza e entregamos como se fosse novo! faça um orçamento sem compromisso! ",
                         "Muitas peças em prata",
                          "Montamos o teu box do tamanho e jeito que quiser! nos chame para um orçamento!",
+                         "Fazemos manutençao e conserto de seu relogio, de qualquer marca!",
                       
                 ],
             },
@@ -4015,6 +4018,17 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     ],
                 },
 
+
+                //
+                //
+                //
+
+
+                //
+                //
+                //
+
+                
                 {
                     image: "images/comercios/farmacia/drogaMais/drogamais.png",
                     name: "DrogaMais",
@@ -4736,19 +4750,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
          
 
-               {
-                  image: "images/informacoes/eventos/paranaFishing.jpg",
-                  name: "Torneio de Caiaques",
-                  date: "26/06/25",
-                  address: "Represa Chavantes",
-                  contact: "(43) 99980-0495",
-                  
-                  instagram:"https://www.instagram.com/parana_fishing/",
-                  infoAdicional:"",
-                  infoAdicional:"Inscrições até 26 de Junho",
-                
-                   
-              },
+            
 
 
               {
@@ -4765,6 +4767,20 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
              
           },
 
+
+             {
+                  image: "images/informacoes/eventos/paranaFishing.jpg",
+                  name: "Campeonato Pesca Esportiva Tucunaré",
+                  date: "19/07/25",
+                  address: "Represa Chavantes",
+                  contact: "(43) 99980-0495",
+                  
+                  instagram:"https://www.instagram.com/parana_fishing/",
+                  infoAdicional:"",
+                  infoAdicional:"Inscrições até 17 de Julho",
+                
+                   
+              },
 
 
                {
