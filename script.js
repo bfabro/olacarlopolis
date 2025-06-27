@@ -688,7 +688,7 @@ funerariagrupocastilho:"s",
   calendarioeventos: "s",
   frutfest:"s",
    campeonatopescaesportivatucunare:"s",
-   
+   coloniadeferias:"s",
   cafebingo:"s",
   encontrocarroantigo:"s",
   festadosenhorbomjesus:"s",
@@ -4731,21 +4731,20 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               },
 
 
-          
-
-
-        
-
-
-
-
-           
+{
+              image: "images/informacoes/eventos/espacoBrincar.jpg",
+              name: "Colonia de Ferias",
+              date: "10/07/2025 a 25/07/2025",
+              address: "Rua Capitão Estácio,356 - Carlopolis",
+              infoAdicional:"De 10 a 25 de julho, o Espaço do Brincar está preparando dias incríveis de muita diversão, aprendizado e carinho para as crianças!<br>Nossa Colônia de Férias foi pensada com todo amor para oferecer:<br> ✨ Atividades lúdicas e Oficinas criativas <br>✨Brincadeiras dirigidas <br>✨Lanchinhos gostosos<br>✨Um ambiente acolhedor e seguro!<br>Temos pacotes especiais para atender à sua rotina:<br>- Meio período ou integral<br>- Diárias avulsas<br>- Planos semanais e quinzenais <br>👉🏻Garanta a vaga do seu pequeno e proporcione momentos inesquecíveis nessas férias!",
+              contact: "(43) 99983-8897 ",
+              contact2: "(43) 98814-2008 ",
+              instagram:"https://www.instagram.com/espacodobrincareserfeliz/",
 
               
-
-
-
-
+              
+             
+          },
 
 
          
