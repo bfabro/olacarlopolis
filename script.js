@@ -4109,17 +4109,19 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 {
                   image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
                     name: "Farmacia da Vila",
-                    address: "Rua Manguba, 320, Carlopolis",
+                    address: "Rua Manguba, 320 - Carlopolis",
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"28/06 a 04/07",
                     statusAberto:".",
                     horarios: {                          
-                      seg: [{ inicio: "08:00", fim: "18:00" }],
-                      ter: [{ inicio: "08:00", fim: "18:00" }],
-                      qua: [{ inicio: "08:00", fim: "18:00" }],
-                      qui: [{ inicio: "08:00", fim: "18:00" }],
-                      sex: [{ inicio: "08:00", fim: "18:00" }],
-                      sab: [{ inicio: "08:00", fim: "12:00" }],
-                      dom: []
+                     seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
                     },  
                     contact: "(43) 99148-8478",
                     delivery: "Sim / Sem Taxa",
@@ -4298,18 +4300,16 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     image: "images/comercios/farmacia/saudeFarma/saudeFarma.png",
                     name: "Saude Farma",
                     address: "Rua Benedito Salles, 951 - Carlopolis",
-                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
-                    plantaoHorario: "08:00h às 21:00h", 
-                    plantaoData:"Sab 21/06 a Sex 27/06",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",                    
                     statusAberto:".",
                     horarios: {                          
-                    seg: [{ inicio: "08:00", fim: "21:00" }],
-                      ter: [{ inicio: "08:00", fim: "21:00" }],
-                      qua: [{ inicio: "08:00", fim: "21:00" }],
-                      qui: [{ inicio: "08:00", fim: "21:00" }],
-                      sex: [{ inicio: "08:00", fim: "21:00" }],
-                      sab: [{ inicio: "08:00", fim: "21:00" }],
-                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                   seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
                     },
                     contact: "(43) 99956-8938",
                     delivery: "Sim / Sem Taxa",
@@ -4878,34 +4878,46 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
             establishments: [
 
 
-            /* [ 1 ]
-                { 
+            /* [ 1 ] */
+                {
                   image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
-                  name: "Farmacia da Vila",
-                  address: "Rua Manguba, 320, Carlopolis",
-                  contact: "(43) 99148-8478",
-                  plantaoHorario: "8:00h às 21:00h", 
-                  plantaoData:"19/04 a 25/04",                  
-                  delivery: "Sim / Sem Taxa",                     
-                  facebook: "#",
-                  instagram: "https://www.instagram.com/farmaciadavilaclps/",                     
-                  novidadesImages: [               
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/1.png",
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/2.png",     
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/3.png",
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/4.png",
-                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/5.png",
+                    name: "Farmacia da Vila",
+                    address: "Rua Manguba, 320 - Carlopolis",
+                    plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"28/06 a 04/07",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                       seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    },
+                    contact: "(43) 99148-8478",
+                    delivery: "Sim / Sem Taxa",
+                    facebook: "#",
+                    instagram: "https://www.instagram.com/farmaciadavilaclps/",
+                  
+                    novidadesImages: [               
+                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/1.jpg",
+                      "images/comercios/farmacia/farmaciaDaVila/divulgacao/2.jpg", 
+                       "images/comercios/farmacia/farmaciaDaVila/divulgacao/3.jpg", 
+                         "images/comercios/farmacia/farmaciaDaVila/divulgacao/4.jpg", 
+                       "images/comercios/farmacia/farmaciaDaVila/divulgacao/5.jpg",      
+                   
                   ], 
                   novidadesDescriptions: [                            
-                    "Venham nos visitar!",
-                    "Indicado cólicas do trato gastrintestinal",
-                    "indicado como analgésico (para dor) e antitérmico (para febre)",
-                    "Indicado no alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional",
-                    "Indicado para redução da febre e para o alívio de dores",
+                    "💊✨ Na Farmácia da Vila, cuidamos de você de todas as formas! ✨💊",
+                     "A gripe é uma doença respiratória altamente transmissível causada pelos vírus Influenza A e B, sendo mais comum durante os meses frios. Com a chegada do inverno, realizar um teste de influenza é essencial para um diagnóstico rápido e preciso.",
+                      "🦟 FIQUE ATENTO AOS SINTOMAS DA DENGUE! 🚨A dengue pode começar com sintomas parecidos com os da gripe, mas merece atenção! Se sentir:",
+                       "Faça seu pedido e jaja entregaremos!",
+                    "Sabia que aqui na Farmacia da vila, voce pode estar pagando suas contas?",
                   ],
-
                 },
-              */
+             /* */
 
 
               /* [ 2 ]
@@ -5244,7 +5256,8 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 */
 
 
-// aqui
+// aqui 
+/* [10 ]
 {
                     image: "images/comercios/farmacia/saudeFarma/saudeFarma.png",
                     name: "Saude Farma",
@@ -5283,7 +5296,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       
                     ],
                 },
-
+*/
 // aqui
 
 
