@@ -304,7 +304,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-   "saudefarma","relojoariamartini","racoessaojose","flaviogiovani", "esquinadopao", "vania",
+   "farmaciadavila","relojoariamartini","racoessaojose","flaviogiovani", "esquinadopao", "vania",
   
 ]; 
 
