@@ -6312,7 +6312,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               {
                 image: "images/comercios/restaurante/assadaoRussao/assadaoRussao.png",
                 name: "Assadão do Russão",
-                hours: "Seg a Sab: 10:30h as 14:00h",
+                hours: "Dom a Dom: 10:30h as 14:00h",
                 statusAberto:".",
                   horarios: {                    
                     seg: [{ inicio: "10:30", fim: "14:00" }],
@@ -6321,7 +6321,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     qui: [{ inicio: "10:30", fim: "14:00" }],
                     sex: [{ inicio: "10:30", fim: "14:00" }],
                     sab: [{ inicio: "10:30", fim: "14:00" }],
-                    dom: []
+                    dom: [{ inicio: "10:30", fim: "14:00" }]
                   },
                 address: "Rua Benedito Salles 1241",
                 contact: "(43) 98844-8407",
