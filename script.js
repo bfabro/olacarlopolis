@@ -46,15 +46,13 @@ function mostrarToast(mensagem) {
 document.addEventListener("DOMContentLoaded", function () {
 
 
-  document.addEventListener("DOMContentLoaded", () => {
-  const isInStandaloneMode = () =>
-    window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-  if (isInStandaloneMode()) {
-    const installBanner = document.getElementById("installBanner");
-    if (installBanner) installBanner.style.display = "none";
+document.addEventListener("DOMContentLoaded", () => {
+  const barra = document.getElementById('barraInstalacao');
+  if (isAppInstalado() && barra) {
+    barra.style.display = 'none'; // garante que a barra não apareça se já estiver instalado
   }
 });
+
 
 
 
@@ -8067,10 +8065,6 @@ function isAppInstalado() {
   return isStandaloneAndroid || isStandaloneIos;
 }
 
-
-
-
-
   window.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.carrossel-container').forEach(secao => {
       secao.style.display = 'none';
@@ -8081,15 +8075,22 @@ function isAppInstalado() {
 
   let deferredPrompt = null;
 
+
+
+
   // Captura o evento nativo do Android
 window.addEventListener('beforeinstallprompt', (e) => {
   if (isAppInstalado()) return; // já instalado? então não mostra
 
   e.preventDefault();
   deferredPrompt = e;
+
   const barra = document.getElementById('barraInstalacao');
   if (barra) barra.style.display = 'flex';
 });
+
+
+
 
 const btnInstalar = document.getElementById('btnInstalar');
 if (btnInstalar) {
@@ -8243,17 +8244,7 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
   });
 }
 
-let promptInstalacao = null;
 
-// Detecta o momento em que o navegador permite instalar o PWA
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault(); // Impede o prompt automático
-  promptInstalacao = e;
-
-  // Exibe a modal personalizada
-  const box = document.getElementById("instalarAppBox");
-  if (box) box.classList.remove("hidden");
-});
 
 // Quando o usuário clicar no botão "Adicionar"
 document.getElementById("btnInstalarPWA")?.addEventListener("click", () => {
