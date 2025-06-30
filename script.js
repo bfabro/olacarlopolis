@@ -8081,13 +8081,10 @@ ${!establishment.descricaoFalecido ? `
 
 
 
-
-
-
-  function isAppInstalado() {
-  const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
-  const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
-  return isStandaloneAndroid || isStandaloneIos;
+function isAppInstaladoAgora() {
+  // Detecta se está rodando como app (standalone)
+  return window.matchMedia('(display-mode: standalone)').matches ||
+         window.navigator.standalone === true;
 }
 
 let deferredPrompt = null;
@@ -8096,27 +8093,28 @@ window.addEventListener('DOMContentLoaded', () => {
   const barra = document.getElementById('barraInstalacao');
   const iosPrompt = document.getElementById('iosInstallPrompt');
 
-  // Verifica se o usuário já instalou o app anteriormente
-  const jaInstalado = localStorage.getItem('appJaInstalado') === 'true';
+  // Verifica se o app já foi instalado alguma vez
+  const jaInstalouAntes = localStorage.getItem('appJaInstalado') === 'true';
 
-  if (jaInstalado) {
+  // Se já instalou antes, nunca mais mostra a barra
+  if (jaInstalouAntes) {
     if (barra) barra.style.display = 'none';
     if (iosPrompt) iosPrompt.style.display = 'none';
     return;
   }
 
-  // Se for iOS e ainda não estiver instalado, mostra orientação
+  // Detecta se é iOS e ainda não está em standalone
   const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+  const isInStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
 
-  if (isIos && !isInStandaloneMode && iosPrompt) {
+  if (isIos && !isInStandalone && iosPrompt) {
     iosPrompt.style.display = 'flex';
   }
 });
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  // Se já instalou, não mostra a barra novamente
-  if (localStorage.getItem('appJaInstalado') === 'true') return;
+  const jaInstalouAntes = localStorage.getItem('appJaInstalado') === 'true';
+  if (jaInstalouAntes) return;
 
   e.preventDefault();
   deferredPrompt = e;
@@ -8133,10 +8131,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
-          // Marca como instalado no localStorage
+          // Salvamos que o app foi instalado
           localStorage.setItem('appJaInstalado', 'true');
         }
-
+        const barra = document.getElementById('barraInstalacao');
         if (barra) barra.style.display = 'none';
         deferredPrompt = null;
       });
