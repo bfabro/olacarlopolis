@@ -8096,24 +8096,27 @@ window.addEventListener('DOMContentLoaded', () => {
   const barra = document.getElementById('barraInstalacao');
   const iosPrompt = document.getElementById('iosInstallPrompt');
 
-  const jaInstalado = isAppInstalado() || localStorage.getItem('appJaInstalado') === 'true';
+  // Verifica se o usuário já instalou o app anteriormente
+  const jaInstalado = localStorage.getItem('appJaInstalado') === 'true';
 
-  // Oculta barras se já instalado
   if (jaInstalado) {
     if (barra) barra.style.display = 'none';
     if (iosPrompt) iosPrompt.style.display = 'none';
-  } else {
-    // Detecta iOS e exibe instrução personalizada
-    const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-    const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
-    if (isIos && !isInStandaloneMode && iosPrompt) {
-      iosPrompt.style.display = 'flex';
-    }
+    return;
+  }
+
+  // Se for iOS e ainda não estiver instalado, mostra orientação
+  const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+
+  if (isIos && !isInStandaloneMode && iosPrompt) {
+    iosPrompt.style.display = 'flex';
   }
 });
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  if (isAppInstalado() || localStorage.getItem('appJaInstalado') === 'true') return;
+  // Se já instalou, não mostra a barra novamente
+  if (localStorage.getItem('appJaInstalado') === 'true') return;
 
   e.preventDefault();
   deferredPrompt = e;
@@ -8130,14 +8133,17 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
+          // Marca como instalado no localStorage
           localStorage.setItem('appJaInstalado', 'true');
         }
+
         if (barra) barra.style.display = 'none';
         deferredPrompt = null;
       });
     });
   }
 });
+
 
 
 
