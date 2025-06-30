@@ -8075,53 +8075,50 @@ ${!establishment.descricaoFalecido ? `
 
 
   function isAppInstalado() {
-    const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
-    const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
-    return isStandaloneAndroid || isStandaloneIos;
+  const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
+  const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
+  return isStandaloneAndroid || isStandaloneIos;
+}
+
+let deferredPrompt = null;
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Esconde a barra se já instalado ou se já foi escondida anteriormente
+  const barra = document.getElementById('barraInstalacao');
+  if (isAppInstalado() || localStorage.getItem('appJaInstalado') === 'true') {
+    if (barra) barra.style.display = 'none';
+  }
+});
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  if (isAppInstalado() || localStorage.getItem('appJaInstalado') === 'true') {
+    return; // já instalado ou usuário dispensou anteriormente
   }
 
-  window.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('.carrossel-container').forEach(secao => {
-      secao.style.display = 'none';
-    });
-    const primeira = document.getElementById('secao-divulgacao');
-    if (primeira) primeira.style.display = 'block';
-  });
+  e.preventDefault();
+  deferredPrompt = e;
 
-  let deferredPrompt = null;
-
-
-
-
-  // Captura o evento nativo do Android
-  window.addEventListener('beforeinstallprompt', (e) => {
-    if (isAppInstalado()) return; // já instalado? então não mostra
-
-    e.preventDefault();
-    deferredPrompt = e;
-
-    const barra = document.getElementById('barraInstalacao');
-    if (barra) barra.style.display = 'flex';
-  });
-
-
-
+  const barra = document.getElementById('barraInstalacao');
+  if (barra) barra.style.display = 'flex';
 
   const btnInstalar = document.getElementById('btnInstalar');
   if (btnInstalar) {
     btnInstalar.addEventListener('click', () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            const barra = document.getElementById('barraInstalacao');
-            if (barra) barra.style.display = 'none';
-          }
-          deferredPrompt = null;
-        });
-      }
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          localStorage.setItem('appJaInstalado', 'true');
+        }
+        const barra = document.getElementById('barraInstalacao');
+        if (barra) barra.style.display = 'none';
+        deferredPrompt = null;
+      });
     });
   }
+});
+
 
 
 
