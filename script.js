@@ -43,24 +43,10 @@ function mostrarToast(mensagem) {
   }, 2000);
 }
 
-let deferredPrompt = null;
-function isAppInstalado() {
-  const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
-  const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
-  return isStandaloneAndroid || isStandaloneIos;
-}
-
 document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (isAppInstalado()) {
-    const barra = document.getElementById('barraInstalacao');
-    if (barra) barra.style.display = 'none';
-  }
-});
 
 
 
@@ -8078,97 +8064,20 @@ window.addEventListener("DOMContentLoaded", () => {
   if (primeira) primeira.style.display = 'block';
 });
 
-const btnInstalar = document.getElementById('btnInstalar');
-//const barra = document.getElementById('barraInstalacao');
+let deferredPrompt = null;
 
-const btnModal = document.getElementById('btnInstalarModal'); // Supondo que esse seja o botão da modal
-
-function instalarApp() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('Usuário aceitou a instalação');
-        document.getElementById('barraInstalacao').style.display = 'none';
-        const modal = document.getElementById('modalInstalacao');
-        if (modal) modal.style.display = 'none';
-      } else {
-        console.log('Usuário recusou a instalação');
-      }
-      deferredPrompt = null;
-    });
-  }
+function isAppInstalado() {
+  const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
+  const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
+  return isStandaloneAndroid || isStandaloneIos;
 }
-
-if (btnInstalar) btnInstalar.addEventListener('click', instalarApp);
-if (btnModal) btnModal.addEventListener('click', instalarApp);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Captura o evento nativo do Android
 window.addEventListener('beforeinstallprompt', (e) => {
   if (isAppInstalado()) return; // já instalado? então não mostra
-
   e.preventDefault();
   deferredPrompt = e;
-
-    const barra = document.getElementById('barraInstalacao');
-  if (barra) barra.style.display = 'flex';
-
-   // Exibe a modal de instalação para iOS (ex: iPhone)
-  const isIOS = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-  if (isIOS) {
-    const iosPrompt = document.getElementById('iosInstallPrompt');
-    if (iosPrompt) iosPrompt.style.display = 'flex';
-  }
 });
-
-//
-//
-//
-
-
-
-if (btnInstalar) {
-  btnInstalar.addEventListener("click", async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-
-      const escolha = await deferredPrompt.userChoice;
-      if (escolha.outcome === "accepted") {
-        console.log("Usuário aceitou instalar o app");
-        document.getElementById('barraInstalacao').style.display = 'none';
-        deferredPrompt = null;
-      } else {
-        console.log("Usuário recusou instalar o app");
-      }
-       deferredPrompt = null;
-    }
-  });
-}
-
-
-//
-//
-//
-
 
 // Quando clicar no botão do menu APP
 document.getElementById("menuApp").addEventListener("click", () => {
