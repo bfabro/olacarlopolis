@@ -8078,6 +8078,8 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 let deferredPrompt = null;
+const barra = document.getElementById('barraInstalacao');
+const btnInstalar = document.getElementById('btnInstalar');
 
 // Captura o evento nativo do Android
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -8094,7 +8096,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 //
 //
 
-const btnInstalar = document.getElementById("btnInstalar");
+
 
 if (btnInstalar) {
   btnInstalar.addEventListener("click", async () => {
@@ -8109,6 +8111,7 @@ if (btnInstalar) {
       } else {
         console.log("Usuário recusou instalar o app");
       }
+       deferredPrompt = null;
     }
   });
 }
