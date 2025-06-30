@@ -8102,6 +8102,37 @@ document.getElementById("btnInstalarPWA").addEventListener("click", () => {
 
 
 
+// Quando clicar no botão DO RODAPE
+document.getElementById("barraInstalacao").addEventListener("click", () => {
+  document.getElementById("instalarAppBox").classList.remove("hidden");
+});
+
+document.getElementById("btnInstalarPWA").addEventListener("click", () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log("Usuário aceitou instalar o app");
+      }
+      deferredPrompt = null;
+    });
+  } else {
+    alert("📱 Para IPhone, no navegador SAFARI, toque em 'Compartilhar' (ícone com a seta para cima), arraste pra cima, e va até 'Adicionar à Tela de Início' ");
+  }
+  fecharInstalador();
+});
+
+
+
+
+
+
+
+
+
+
+
+
 // Detecta quando o app for instalado como PWA
 window.addEventListener('appinstalled', () => {
   console.log('✅ PWA instalado detectado');
