@@ -43,10 +43,23 @@ function mostrarToast(mensagem) {
   }, 2000);
 }
 
+function isAppInstalado() {
+  const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
+  const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
+  return isStandaloneAndroid || isStandaloneIos;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (isAppInstalado()) {
+    const barra = document.getElementById('barraInstalacao');
+    if (barra) barra.style.display = 'none';
+  }
+});
 
 
 
@@ -8068,9 +8081,43 @@ let deferredPrompt = null;
 
 // Captura o evento nativo do Android
 window.addEventListener('beforeinstallprompt', (e) => {
+  if (isAppInstalado()) return; // já instalado? então não mostra
+
   e.preventDefault();
   deferredPrompt = e;
+
+    const barra = document.getElementById('barraInstalacao');
+  if (barra) barra.style.display = 'flex';
 });
+
+//
+//
+//
+
+const btnInstalar = document.getElementById("btnInstalar");
+
+if (btnInstalar) {
+  btnInstalar.addEventListener("click", async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+
+      const escolha = await deferredPrompt.userChoice;
+      if (escolha.outcome === "accepted") {
+        console.log("Usuário aceitou instalar o app");
+        document.getElementById('barraInstalacao').style.display = 'none';
+        deferredPrompt = null;
+      } else {
+        console.log("Usuário recusou instalar o app");
+      }
+    }
+  });
+}
+
+
+//
+//
+//
+
 
 // Quando clicar no botão do menu APP
 document.getElementById("menuApp").addEventListener("click", () => {
