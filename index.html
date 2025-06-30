@@ -1446,7 +1446,10 @@ onlineUsersRef.on("value", (snapshot) => {
   <span>📱 Instalar em sua tela inicial</span>
   <button id="btnInstalar">Instalar</button>
 </div>
-
+<div id="iosInstallPrompt" class="barra-instalacao" style="display: none;">
+  📱 Para instalar, toque em <b>Compartilhar</b> e depois <b>“Adicionar à Tela de Início”</b>
+  <button onclick="document.getElementById('iosInstallPrompt').style.display='none'">Fechar</button>
+</div>
 
 
 <!-- 
