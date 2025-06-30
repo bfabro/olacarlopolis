@@ -1,3 +1,12 @@
+
+function isAppInstalado() {
+  const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
+  const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
+  return isStandaloneAndroid || isStandaloneIos;
+}
+
+
+
 function getHojeBR() {
   const agora = new Date();
   agora.setHours(agora.getHours() - 3); // UTC-3 (Brasília)
@@ -8066,18 +8075,54 @@ window.addEventListener("DOMContentLoaded", () => {
 
 let deferredPrompt = null;
 
-function isAppInstalado() {
-  const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
-  const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
-  return isStandaloneAndroid || isStandaloneIos;
-}
+
 
 // Captura o evento nativo do Android
 window.addEventListener('beforeinstallprompt', (e) => {
   if (isAppInstalado()) return; // já instalado? então não mostra
+
   e.preventDefault();
   deferredPrompt = e;
+
+   const barra = document.getElementById("barraInstalacao");
+  if (barra) barra.style.display = "flex";
 });
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Se já está instalado, esconde a barra
+  if (isAppInstalado()) {
+    const barra = document.getElementById("barraInstalacao");
+    if (barra) barra.style.display = "none";
+
+    const iosPrompt = document.getElementById("iosInstallPrompt");
+    if (iosPrompt) iosPrompt.style.display = "none";
+  }
+});
+
+
+
+
+const btnInstalar = document.getElementById("btnInstalar");
+btnInstalar?.addEventListener("click", () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === "accepted") {
+        const barra = document.getElementById("barraInstalacao");
+        if (barra) barra.style.display = "none";
+      }
+      deferredPrompt = null;
+    });
+  }
+});
+
+
+
+
+
+
 
 // Quando clicar no botão do menu APP
 document.getElementById("menuApp").addEventListener("click", () => {
