@@ -46,12 +46,27 @@ function mostrarToast(mensagem) {
 document.addEventListener("DOMContentLoaded", function () {
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  const barra = document.getElementById('barraInstalacao');
-  if (isAppInstalado() && barra) {
-    barra.style.display = 'none'; // garante que a barra não apareça se já estiver instalado
-  }
-});
+  document.addEventListener("DOMContentLoaded", () => {
+    const barra = document.getElementById('barraInstalacao');
+    if (isAppInstalado() && barra) {
+      barra.style.display = 'none'; // garante que a barra não apareça se já estiver instalado
+    }
+
+    let deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      if (isAppInstalado()) return; // já está instalado? não mostra a barra
+
+      e.preventDefault(); // impede o navegador de mostrar o prompt automático
+      deferredPrompt = e;
+
+      const barra = document.getElementById('barraInstalacao');
+      if (barra) barra.style.display = 'flex';
+    });
+
+  });
+
+
 
 
 
@@ -8059,11 +8074,11 @@ ${!establishment.descricaoFalecido ? `
 
 
 
-function isAppInstalado() {
-  const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
-  const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
-  return isStandaloneAndroid || isStandaloneIos;
-}
+  function isAppInstalado() {
+    const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
+    const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
+    return isStandaloneAndroid || isStandaloneIos;
+  }
 
   window.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.carrossel-container').forEach(secao => {
@@ -8079,34 +8094,34 @@ function isAppInstalado() {
 
 
   // Captura o evento nativo do Android
-window.addEventListener('beforeinstallprompt', (e) => {
-  if (isAppInstalado()) return; // já instalado? então não mostra
+  window.addEventListener('beforeinstallprompt', (e) => {
+    if (isAppInstalado()) return; // já instalado? então não mostra
 
-  e.preventDefault();
-  deferredPrompt = e;
+    e.preventDefault();
+    deferredPrompt = e;
 
-  const barra = document.getElementById('barraInstalacao');
-  if (barra) barra.style.display = 'flex';
-});
-
-
-
-
-const btnInstalar = document.getElementById('btnInstalar');
-if (btnInstalar) {
-  btnInstalar.addEventListener('click', () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          const barra = document.getElementById('barraInstalacao');
-          if (barra) barra.style.display = 'none';
-        }
-        deferredPrompt = null;
-      });
-    }
+    const barra = document.getElementById('barraInstalacao');
+    if (barra) barra.style.display = 'flex';
   });
-}
+
+
+
+
+  const btnInstalar = document.getElementById('btnInstalar');
+  if (btnInstalar) {
+    btnInstalar.addEventListener('click', () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            const barra = document.getElementById('barraInstalacao');
+            if (barra) barra.style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      }
+    });
+  }
 
 
 
@@ -8173,16 +8188,16 @@ if (btnInstalar) {
       if (box) box.classList.remove("hidden");
     }
   });
-/////
-////
+  /////
+  ////
 
-if (isIos && !isAppInstalado()) {
-  const iosPrompt = document.getElementById('iosInstallPrompt');
-  if (iosPrompt) iosPrompt.style.display = 'flex';
-}
+  if (isIos && !isAppInstalado()) {
+    const iosPrompt = document.getElementById('iosInstallPrompt');
+    if (iosPrompt) iosPrompt.style.display = 'flex';
+  }
 
-///
-///
+  ///
+  ///
   function isIosSafari() {
     const ua = window.navigator.userAgent;
     return /iPhone|iPad|iPod/i.test(ua) && /Safari/i.test(ua) && !/CriOS|FxiOS/i.test(ua);
