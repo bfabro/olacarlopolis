@@ -46,6 +46,18 @@ function mostrarToast(mensagem) {
 document.addEventListener("DOMContentLoaded", function () {
 
 
+  document.addEventListener("DOMContentLoaded", () => {
+  const isInStandaloneMode = () =>
+    window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+  if (isInStandaloneMode()) {
+    const installBanner = document.getElementById("installBanner");
+    if (installBanner) installBanner.style.display = "none";
+  }
+});
+
+
+
   function estaAbertoAgora(horarios) {
     const agora = new Date();
     const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
@@ -8047,6 +8059,18 @@ ${!establishment.descricaoFalecido ? `
     });
   });
 
+
+
+function isAppInstalado() {
+  const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
+  const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
+  return isStandaloneAndroid || isStandaloneIos;
+}
+
+
+
+
+
   window.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.carrossel-container').forEach(secao => {
       secao.style.display = 'none';
@@ -8058,7 +8082,9 @@ ${!establishment.descricaoFalecido ? `
   let deferredPrompt = null;
 
   // Captura o evento nativo do Android
- window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener('beforeinstallprompt', (e) => {
+  if (isAppInstalado()) return; // já instalado? então não mostra
+
   e.preventDefault();
   deferredPrompt = e;
   const barra = document.getElementById('barraInstalacao');
@@ -8146,9 +8172,16 @@ if (btnInstalar) {
       if (box) box.classList.remove("hidden");
     }
   });
+/////
+////
 
+if (isIos && !isAppInstalado()) {
+  const iosPrompt = document.getElementById('iosInstallPrompt');
+  if (iosPrompt) iosPrompt.style.display = 'flex';
+}
 
-
+///
+///
   function isIosSafari() {
     const ua = window.navigator.userAgent;
     return /iPhone|iPad|iPod/i.test(ua) && /Safari/i.test(ua) && !/CriOS|FxiOS/i.test(ua);
