@@ -43,6 +43,7 @@ function mostrarToast(mensagem) {
   }, 2000);
 }
 
+let deferredPrompt = null;
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -8077,9 +8078,49 @@ window.addEventListener("DOMContentLoaded", () => {
   if (primeira) primeira.style.display = 'block';
 });
 
-let deferredPrompt = null;
-const barra = document.getElementById('barraInstalacao');
 const btnInstalar = document.getElementById('btnInstalar');
+//const barra = document.getElementById('barraInstalacao');
+
+const btnModal = document.getElementById('btnInstalarModal'); // Supondo que esse seja o botão da modal
+
+function instalarApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('Usuário aceitou a instalação');
+        document.getElementById('barraInstalacao').style.display = 'none';
+        const modal = document.getElementById('modalInstalacao');
+        if (modal) modal.style.display = 'none';
+      } else {
+        console.log('Usuário recusou a instalação');
+      }
+      deferredPrompt = null;
+    });
+  }
+}
+
+if (btnInstalar) btnInstalar.addEventListener('click', instalarApp);
+if (btnModal) btnModal.addEventListener('click', instalarApp);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Captura o evento nativo do Android
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -8090,6 +8131,13 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
     const barra = document.getElementById('barraInstalacao');
   if (barra) barra.style.display = 'flex';
+
+   // Exibe a modal de instalação para iOS (ex: iPhone)
+  const isIOS = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+  if (isIOS) {
+    const iosPrompt = document.getElementById('iosInstallPrompt');
+    if (iosPrompt) iosPrompt.style.display = 'flex';
+  }
 });
 
 //
