@@ -695,6 +695,7 @@ funerariagrupocastilho:"s",
   frutfest:"s",
    campeonatopescaesportivatucunare:"s",
    coloniadeferias:"s",
+  beachvolleyball:"s",
   cafebingo:"s",
   encontrocarroantigo:"s",
   festadosenhorbomjesus:"s",
@@ -4735,6 +4736,22 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                   image: "images/informacoes/eventos/calendario_evento.png",
                   contact: "",
               },
+
+
+
+
+
+ {
+              image: "images/informacoes/eventos/voley.jpg",
+              name: "Beach VolleyBall",
+              date: "06/07/2025",
+              address: "Arena Seu Luiz",
+             contact: "-",         
+              instagram:"https://www.instagram.com/volleyball_beach_carlopolis/",             
+              
+             
+          },
+
 
 
           {
