@@ -7577,7 +7577,7 @@ ${!establishment.descricaoFalecido ? `
                                     <div class="swiper-wrapper">
                                         ${establishment.menuImages.map((img, index) => `
                                         <div class="swiper-slide">
-                                            <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}">
+                                            <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}" loading="lazy" decoding="async">
                                         </div>
                                         `).join('')}
                                     </div>
