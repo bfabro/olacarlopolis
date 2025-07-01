@@ -6922,6 +6922,15 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 ///
 
 
+//30/06
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/16.jpg",
+     descricaoFalecido: "Faleceu em Timbó - Santa Catarina aos 47 anos de idade, Sr 'Alexandre Ernst Braun'.<Br> O horário da cerimônia dará início hoje às 13:30 horas no velório municipal de Carlópolis.<Br>Seu sepultamento será hoje às  16:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a esposa: Adriane, Mãe Irmã, Irmãos Ivana, Haroldo, Erlin e a todos familiares"
+
+    },
+
+
 //16/06
 {
       name: "Funeraria Cristo Rei",    
