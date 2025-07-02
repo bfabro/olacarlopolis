@@ -952,8 +952,9 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
       ` : ''}
     </div>
     <div class="onde-comer-info">
-      <h3>${est.name}</h3>
+      
       <span class="onde-comer-categoria">${est.categoria}</span>
+      <h3>${est.name}</h3>
       <span class="onde-comer-endereco">
   ${est.address
     ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}"
