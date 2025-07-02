@@ -2233,7 +2233,13 @@ a:focus {
   text-align: center;
 }
 .promo-carousel-img {
-  max-width: 340px; max-height: 360px; margin: 0 auto 15px; border-radius: 14px; display: block;
+ width: 100%;
+  max-width: 400px;
+  height: auto;
+  object-fit: contain; /* ou 'cover' dependendo do efeito desejado */
+  display: block;
+  margin: 0 auto;
+  border-radius: 10px;
 }
 .promo-carousel-info { text-align:center; }
 .tag-desconto-carousel {
@@ -2622,4 +2628,11 @@ a:focus {
   padding: 10px;
   margin-bottom: 20px;
   border-radius: 6px;
+}
+
+.card-estab-promo.inativo {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(100%);
+  cursor: default;
 }

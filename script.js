@@ -1000,8 +1000,10 @@ function mostrarPromocoes() {
     }
 
     html += `
-      <div class="card-estab-promo" data-idx="${idx}">
+      
+      <div class="card-estab-promo ${primeiraPromoValida ? '' : 'inativo'}" data-idx="${idx}">
         <img src="${comercio.imagem}" alt="Promoções ${comercio.nome}" class="logo-estab-promo" />
+        
         <div class="info-estab-promo">
           <h3>${comercio.nome}</h3>
           <div class="badge-promocoes"> ${comercio.promocoes.length} - Promoções</div>
@@ -1038,6 +1040,8 @@ function abrirCarrosselPromocoes(idxComercio) {
   
   const comercio = promocoesPorComercio[idxComercio];
   const promoSlides = comercio.promocoes.slice(0,10).map((promo, i) => `
+
+
   <div class="swiper-slide">
     <div class="promo-carousel-slide">
       <img src="${promo.imagem}" class="promo-carousel-img" />
