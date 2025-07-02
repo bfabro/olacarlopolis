@@ -312,7 +312,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-   "farmaciadavila","relojoariamartini","racoessaojose","flaviogiovani", "esquinadopao", "vania",
+   "feiradalua","farmaciadavila","relojoariamartini","racoessaojose","flaviogiovani", "esquinadopao", "vania",
   
 ]; 
 
@@ -2529,7 +2529,7 @@ nome: "Agro São José",
                       ],     
                       
                       novidadesDescriptions: [ 
-                      "20/06 a partir das 19:00hrs",
+                      "Cantando para vocês Rafaela Domingos <br>04/07 a partir das 19:00hrs",
 
 
                       ],
