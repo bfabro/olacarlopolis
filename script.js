@@ -8474,7 +8474,10 @@ function preCarregarImagensCardapio(imagens) {
 
 
 document.body.addEventListener('click', function(e) {
-  if (e.target.classList.contains('imagem-cardapio') || e.target.classList.contains('promo-carousel-img')) {
+  if (
+    e.target.classList.contains('promo-carousel-img') ||
+    e.target.classList.contains('imagem-cardapio')
+  ) {
     const src = e.target.src;
     const bg = document.createElement('div');
     bg.className = 'fullscreen-img-bg';
