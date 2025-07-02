@@ -2643,8 +2643,8 @@ a:focus {
 .onde-comer-lista {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
-  margin-top: 25px;
+  gap: 14px;
+  margin-top: 18px;
 }
 .onde-comer-card {
   display: flex;
@@ -2652,7 +2652,7 @@ a:focus {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.10);
   padding: 6px;
-  width: 360px;
+  width: 99%;
   min-height: 95px;
   align-items: center;
   transition: box-shadow 0.2s;
