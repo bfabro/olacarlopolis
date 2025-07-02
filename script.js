@@ -894,17 +894,32 @@ menuLinks.forEach((link) => {
 
 
 // mostrar onde comer
-function mostrarOndeComer() {
+function mostrarOndeComer(filtroCategoria = "Todos") {
   const categoriasComida = [
     "Lanchonete", "Restaurante", "Pizzaria", "Padaria", "Sorveteria", "Açai"
   ];
 
+  // 1. Monta o filtro
+  let html = `
+  <h2 class="highlighted">🍽️ Onde Comer</h2>
+  <div class="filtro-comidas-card">
+    <label for="filtroComidas">Filtrar por tipo:</label>
+    <select id="filtroComidas">
+      <option value="Todos">Todos</option>
+      ${categoriasComida.map(cat => `<option value="${cat}" ${filtroCategoria===cat?'selected':''}>${cat}</option>`).join("")}
+    </select>
+  </div>
+  <div class="onde-comer-lista">
+`;
+
+  // 2. Lista filtrada
   let lista = [];
   categories.forEach(cat => {
     if (categoriasComida.includes(cat.title)) {
       cat.establishments.forEach(est => {
         const nomeNorm = normalizeName(est.name);
-        if (statusEstabelecimentos[nomeNorm] === "s") {
+        if (statusEstabelecimentos[nomeNorm] === "s" && 
+            (filtroCategoria === "Todos" || cat.title === filtroCategoria)) {
           lista.push({
             ...est,
             categoria: cat.title
@@ -915,9 +930,8 @@ function mostrarOndeComer() {
   });
 
   lista.sort((a, b) => a.name.localeCompare(b.name));
-  let html = `<h2 class="highlighted">🍽️ Onde Comer</h2>
-  <div class="onde-comer-lista">`;
 
+  // 3. Renderiza cards
   lista.forEach(est => {
     html += `
       <div class="onde-comer-card">
@@ -925,7 +939,7 @@ function mostrarOndeComer() {
         <div class="onde-comer-info">
           <h3>${est.name}</h3>
           <span class="onde-comer-categoria">${est.categoria}</span>
-          <span class="onde-comer-endereco">${est.address || ""}<Br></span>
+          <span class="onde-comer-endereco">${est.address || ""}<br></span>
           <span class="onde-comer-telefone">${est.contact || ""}</span>
           ${est.menuImages && est.menuImages.length ? `<button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Ver Cardápio</button>` : ''}
         </div>
@@ -934,7 +948,13 @@ function mostrarOndeComer() {
   });
   html += `</div>`;
   document.querySelector(".content_area").innerHTML = html;
+
+  // 4. Evento do filtro
+  document.getElementById("filtroComidas").addEventListener("change", function() {
+    mostrarOndeComer(this.value);
+  });
 }
+
 
 
 document.getElementById("menuComidas").addEventListener("click", function(e) {
