@@ -6936,6 +6936,14 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 ///
 ///
 
+//01/07
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/17.jpg",
+     descricaoFalecido: "Faleceu em Jacarezinho aos 71 anos de idade, Sra 'MARIA CRISTINA RODRIGUES YAMACITA'.<Br> A cerimônia iníciara hoje às 21:00 horas desta Segunda - Feira  no velório municipal de Carlópolis.<Br>Seu sepultamento será amanhã às 09:00 horas Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a toda família e amigos"
+
+    },
+
 
 //30/06
 {
