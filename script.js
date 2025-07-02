@@ -896,7 +896,7 @@ menuLinks.forEach((link) => {
 // mostrar onde comer
 function mostrarOndeComer() {
   const categoriasComida = [
-    "Lanchonete", "Restaurante", "Pizzaria", "Padaria", "Sorveteria", "Açaí"
+    "Lanchonete", "Restaurante", "Pizzaria", "Padaria", "Sorveteria", "Açai"
   ];
 
   let lista = [];
@@ -925,7 +925,7 @@ function mostrarOndeComer() {
         <div class="onde-comer-info">
           <h3>${est.name}</h3>
           <span class="onde-comer-categoria">${est.categoria}</span>
-          <span class="onde-comer-endereco">${est.address || ""}</span>
+          <span class="onde-comer-endereco">${est.address || ""}<Br></span>
           <span class="onde-comer-telefone">${est.contact || ""}</span>
           ${est.menuImages && est.menuImages.length ? `<button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Ver Cardápio</button>` : ''}
         </div>
@@ -945,14 +945,16 @@ document.getElementById("menuComidas").addEventListener("click", function(e) {
 
 
 function mostrarCardapio(nomeNormalizado) {
-  // Encontre o estabelecimento pelo nome normalizado
+  // Procura sempre o PRIMEIRO que tem menuImages
   let est = null;
   categories.forEach(cat => {
     cat.establishments.forEach(e => {
-      if (normalizeName(e.name) === nomeNormalizado) est = e;
+      if (normalizeName(e.name) === nomeNormalizado && e.menuImages && e.menuImages.length) {
+        est = e;
+      }
     });
   });
-  if (!est || !est.menuImages || !est.menuImages.length) return;
+  if (!est) return;
 
   // Remove modal antiga se existir
   document.querySelectorAll('.modal-cardapio-overlay').forEach(el => el.remove());
@@ -991,8 +993,6 @@ function mostrarCardapio(nomeNormalizado) {
 }
 window.mostrarCardapio = mostrarCardapio;
 
-
-window.mostrarCardapio = mostrarCardapio;
 ///////// fim onde comer
 
 
@@ -1667,7 +1667,7 @@ nome: "Agro São José",
                               sex: [{ inicio: "14:00", fim: "23:00" }],
                               sab: [{ inicio: "14:00", fim: "23:00" }]
                             },
-                            address: "Rua Benedito Salles, 409",
+                            address: "Rua Benedito Salles, 409 - Carlopolis",
                             contact: "(43) 99176-7871",
                             contact2:" (43) 98868-7038",
                             delivery: "Sim / Com Taxa",
@@ -3528,7 +3528,7 @@ nome: "Agro São José",
             title: "Padaria",
             establishments: [
                 {
-                    image: "images/comercios/padaria/bom jesus/bomjesus.png",
+                    image: "images/comercios/padaria/bomjesus/bomjesus.png",
                     name: "Bom Jesus",
                     hours: "Seg a Sab: 6:00h as 19:00h </br> Dom: 06:00h as 14:00h",
                     statusAberto:".",
@@ -3542,30 +3542,28 @@ nome: "Agro São José",
                       dom: [{ inicio: "06:00", fim: "14:00" }],
                     }, 
                     address: "R. Benedito Salles, 615 - Carlopolis",
-                    contact: "43) 99653-9285",
+                    contact: "(43) 99653-9285",
                     delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/PanificadoraRestauranteBomJesus/?locale=pt_BR",
                     instagram: "https://www.instagram.com/bom_jesus_panificadora/",
+                     menuImages: [                   
+                      "images/comercios/padaria/bomjesus/cardapio/1.png",
+                      "images/comercios/padaria/bomjesus/cardapio/2.png",
+                      "images/comercios/padaria/bomjesus/cardapio/3.png",                     
+                     ],  
                     novidadesImages: [
-                      
-                        "images/comercios/padaria/bom jesus/novidades/1.png",
-                        "images/comercios/padaria/bom jesus/novidades/2.png",
-                        "images/comercios/padaria/bom jesus/novidades/3.png",
-                        "images/comercios/padaria/bom jesus/novidades/4.png",
-                        "images/comercios/padaria/bom jesus/novidades/5.png",
+                        "images/comercios/padaria/bomjesus/novidades/1.png",
+                        "images/comercios/padaria/bomjesus/novidades/2.png",
+                        "images/comercios/padaria/bomjesus/novidades/3.png",
+                        "images/comercios/padaria/bomjesus/novidades/4.png",
+                        "images/comercios/padaria/bomjesus/novidades/5.png",
                        
                     ],
                     novidadesDescriptions:[
                       "Pão Frances","Tortinhas","Mini Churros","Mistos Quente","Sucos de Frutas",
 
                     ],
-                    menuImages: [
-                 
-                      "images/comercios/padaria/bom jesus/cardapio/1.png",
-                      "images/comercios/padaria/bom jesus/cardapio/2.png",
-                      "images/comercios/padaria/bom jesus/cardapio/3.png",
-                     
-                     ],  
+                   
                 },
 
 
@@ -6801,7 +6799,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [],
                       dom: []
                     },
-                    address: "R. Benedito Salles, 2023",
+                    address: "R. Benedito Salles, 2023 - Carlopolis",
                     contact: "(43) 3566-2174",
                     delivery: "Sim / Com Taxa",
                     infoAdicional:"Fica dentro do Hotel Portal",
@@ -6829,7 +6827,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 sab: [{ inicio: "10:30", fim: "14:00" }],
                 dom: [{ inicio: "10:30", fim: "14:00" }]
               },
-              address: "Benedito Salles n°910",
+              address: "Benedito Salles, 910 - Carlopolis",
               contact: "(43) 99632-3418",
               delivery: "Sim / Com Taxa",
               instagram:"https://www.instagram.com/marmitasdadiih/",
@@ -6866,7 +6864,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "10:30", fim: "14:00" }],
                       dom: []
                     },
-                  address: "R. Benedito Salles, 365",
+                  address: "R. Benedito Salles, 365 - Carlopolis",
                   contact: "(43) 99832-3050",
                   delivery: "Sim / Sem Taxa",
                 
@@ -6887,7 +6885,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "11:00", fim: "23:00" }],
                       dom: [{ inicio: "11:00", fim: "23:00" }]
                     },*/
-                address: "R. Padre Hugo, 460",
+                address: "R. Padre Hugo, 460 - Carlopolis",
                 contact: "(43) 9 9160-5120",
                 delivery: "Sim / Com Taxa",
                 facebook:"https://www.facebook.com/selaht.gastronomia",
