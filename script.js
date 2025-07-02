@@ -942,7 +942,19 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
   lista.sort((a, b) => a.name.localeCompare(b.name));
 
   // 3. Renderiza cards
-  lista.forEach(est => {
+ lista.forEach(est => {
+  // ...código anterior...
+  let statusAberto = '';
+  if (est.horarios) {
+    const aberto = estaAbertoAgora(est.horarios);
+    if (aberto) {
+      const fechamento = horarioFechamentoAtual(est.horarios);
+      statusAberto = `<span class='status-tag aberto'>ABERTO${fechamento ? ' ATÉ ' + fechamento : ''}</span>`;
+    } else {
+      const proximo = proximoHorarioDeAbertura(est.horarios);
+      statusAberto = `<span class='status-tag fechado'>FECHADO</span> <span class='status-tag proximo'>Abre: ${proximo}</span>`;
+    }
+  }
    html += `
   <div class="onde-comer-card">
     <div class="onde-comer-card-esq">
@@ -955,6 +967,7 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
       
       <span class="onde-comer-categoria">${est.categoria}</span>
       <h3>${est.name}</h3>
+      
       <span class="onde-comer-endereco">
   ${est.address
     ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}"
