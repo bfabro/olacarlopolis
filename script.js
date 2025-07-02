@@ -713,7 +713,7 @@ funerariagrupocastilho:"s",
     };
   
     const body = document.querySelector("body");
-    //const darkLight = document.querySelector("#darkLight");
+
     const sidebar = document.querySelector(".sidebar");
     const contentArea = document.querySelector(".content_area");
     const submenuItems = document.querySelectorAll(".submenu_item");
@@ -6978,6 +6978,15 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 ///
 
 //01/07
+
+{
+      name: "Funeraria Cristo Rei",    
+      image: "images/informacoes/notaFalecimento/cristoRei/18.jpg",
+     descricaoFalecido: "Faleceu em Carlópolis aos 94 anos de idade, Sr 'JOÃO ROSSI'<br> O horário da cerimônia dará início amanhã às 07:00 horas no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às  16:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos"
+
+    },
+
+
 {
       name: "Funeraria Cristo Rei",    
       image: "images/informacoes/notaFalecimento/cristoRei/17.jpg",
