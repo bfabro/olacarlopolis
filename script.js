@@ -893,6 +893,115 @@ menuLinks.forEach((link) => {
 });
 
 
+// mostrar onde comer
+function mostrarOndeComer() {
+  const categoriasComida = [
+    "Lanchonete", "Restaurante", "Pizzaria", "Padaria", "Sorveteria", "Açaí"
+  ];
+
+  let lista = [];
+  categories.forEach(cat => {
+    if (categoriasComida.includes(cat.title)) {
+      cat.establishments.forEach(est => {
+        const nomeNorm = normalizeName(est.name);
+        if (statusEstabelecimentos[nomeNorm] === "s") {
+          lista.push({
+            ...est,
+            categoria: cat.title
+          });
+        }
+      });
+    }
+  });
+
+  lista.sort((a, b) => a.name.localeCompare(b.name));
+  let html = `<h2 class="highlighted">🍽️ Onde Comer</h2>
+  <div class="onde-comer-lista">`;
+
+  lista.forEach(est => {
+    html += `
+      <div class="onde-comer-card">
+        <img src="${est.image}" alt="${est.name}" class="onde-comer-img">
+        <div class="onde-comer-info">
+          <h3>${est.name}</h3>
+          <span class="onde-comer-categoria">${est.categoria}</span>
+          <span class="onde-comer-endereco">${est.address || ""}</span>
+          <span class="onde-comer-telefone">${est.contact || ""}</span>
+          ${est.menuImages && est.menuImages.length ? `<button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Ver Cardápio</button>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+  document.querySelector(".content_area").innerHTML = html;
+}
+
+
+document.getElementById("menuComidas").addEventListener("click", function(e) {
+  e.preventDefault();
+  mostrarOndeComer();
+});
+
+
+
+function mostrarCardapio(nomeNormalizado) {
+  // Encontre o estabelecimento pelo nome normalizado
+  let est = null;
+  categories.forEach(cat => {
+    cat.establishments.forEach(e => {
+      if (normalizeName(e.name) === nomeNormalizado) est = e;
+    });
+  });
+  if (!est || !est.menuImages || !est.menuImages.length) return;
+
+  // Remove modal antiga se existir
+  document.querySelectorAll('.modal-cardapio-overlay').forEach(el => el.remove());
+
+  // Monta HTML do modal
+  let html = `
+    <div class="modal-cardapio-overlay">
+      <div class="modal-cardapio">
+        <button class="close-modal-cardapio" title="Fechar">&times;</button>
+        <h2>Cardápio - ${est.name}</h2>
+        <div class="modal-cardapio-imgs">
+  `;
+
+  est.menuImages.forEach(img => {
+    html += `<img src="${img}" class="cardapio-img" loading="lazy">`;
+  });
+
+  html += `
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Adiciona modal ao body
+  document.body.insertAdjacentHTML('beforeend', html);
+
+  // Evento para fechar ao clicar no botão
+  document.querySelector('.close-modal-cardapio').onclick = function() {
+    document.querySelector('.modal-cardapio-overlay').remove();
+  };
+
+  // Fecha ao clicar fora do modal
+  document.querySelector('.modal-cardapio-overlay').onclick = function(e) {
+    if (e.target === this) this.remove();
+  };
+}
+window.mostrarCardapio = mostrarCardapio;
+
+
+window.mostrarCardapio = mostrarCardapio;
+///////// fim onde comer
+
+
+
+
+
+
+
+
 
     function resetarMenuLateral() {
       // Restaura visual
