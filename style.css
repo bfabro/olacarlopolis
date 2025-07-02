@@ -2614,3 +2614,12 @@ a:focus {
 .barra-instalacao button:hover {
   background-color: #e6e6e6;
 }
+
+
+.promocao-area {
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+}

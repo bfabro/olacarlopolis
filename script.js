@@ -1230,13 +1230,13 @@ const promocoesPorComercio = [
 
    {
 
-nome: "Supermercado Zero Japan",
+    nome: "Supermercado Zero Japan",
     imagem: "images/comercios/supermercado/zerojapan/zerojapan.png",
     promocoes: [
         {
         imagem: "images/promocoes/zerojapan/1.jpg",
         descricao: "Perfume YARA ARABIC",
-        validade: "2025-06-30T21:00:00",
+        validade: "2025-07-05T21:00:00",
         preco:"220,00",
         preco_com_desconto: "199,99 a vista",
         whatsapp: "4331422005"
@@ -1245,7 +1245,7 @@ nome: "Supermercado Zero Japan",
       {
         imagem: "images/promocoes/zerojapan/2.jpg",
         descricao: "Perfume Body Splash",
-        validade: "2025-06-30T21:00:00",
+        validade: "2025-07-05T21:00:00",
         preco:"280,00",
         preco_com_desconto: "250,00 a vista",
         whatsapp: "4331422005"
@@ -1254,7 +1254,7 @@ nome: "Supermercado Zero Japan",
       {
         imagem: "images/promocoes/zerojapan/3.jpg",
         descricao: "Perfume Shaghaf Silver",
-        validade: "2025-06-30T21:00:00",
+        validade: "2025-07-05T21:00:00",
           preco:"330,00",
           preco_com_desconto: "299,00 a vista",
         whatsapp: "4331422005"
@@ -1263,7 +1263,7 @@ nome: "Supermercado Zero Japan",
       {
         imagem: "images/promocoes/zerojapan/4.jpg",
         descricao: "Perfume Hareem Al Sultan",
-        validade: "2025-06-30T21:00:00",
+        validade: "2025-07-05T21:00:00",
          preco:"550,00",
          preco_com_desconto: "499,00 a vista",
         whatsapp: "4331422005"
@@ -1272,7 +1272,7 @@ nome: "Supermercado Zero Japan",
        {
         imagem: "images/promocoes/zerojapan/5.jpg",
         descricao: "Perfume Atheeri",
-        validade: "2025-06-30T21:00:00",
+        validade: "2025-07-05T21:00:00",
           preco:"830,00",
           preco_com_desconto: "750,00 a vista",
        
@@ -1288,7 +1288,7 @@ nome: "Supermercado Zero Japan",
 
 {
 
-nome: "MovePar",
+    nome: "MovePar",
     imagem: "images/comercios/moveis/movepar/perfil.png",
     promocoes: [
       {
@@ -1322,6 +1322,36 @@ nome: "MovePar",
 
     ]
 },
+
+
+
+{
+
+    nome: "Relojoaria Martini ",
+    imagem: "images/comercios/relojoaria/martini/perfil.jpg",
+    promocoes: [
+      {
+        imagem: "images/promocoes/martini/1.jpg",
+        descricao: "Comprando um relógio Champion masculino vc ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",
+       // preco:"1.200,00",
+       // preco_com_desconto: "999,00 a vista",
+        
+       // desconto: "5",
+        whatsapp: " 43999178632"
+      },
+
+
+
+    ]
+},
+
+
+
+
+
+
+
 
 
 {
@@ -7356,13 +7386,6 @@ ${!establishment.descricaoFalecido ? `
                     : ""
                 }
   
-
-
-  
-      
-               
-
-
 
 
                 <div class="info-boxes-container">
