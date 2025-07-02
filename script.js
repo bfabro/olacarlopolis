@@ -896,7 +896,7 @@ menuLinks.forEach((link) => {
 // mostrar onde comer
 function mostrarOndeComer(filtroCategoria = "Todos") {
   const categoriasComida = [
-    "Lanchonete", "Restaurante", "Pizzaria", "Padaria", "Sorveteria", "Açai"
+    "Açai","Lanchonete", "Padaria", "Pizzaria", "Restaurante","Sorveteria", 
   ];
 
   // 1. Monta o filtro
