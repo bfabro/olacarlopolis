@@ -2214,6 +2214,12 @@ a:focus {
   width: 100%;
 }
 
+.promo-carousel-img,
+.imagem-cardapio {
+  touch-action: pinch-zoom;     /* Ajuda em alguns navegadores */
+  -ms-touch-action: pinch-zoom;
+  /* Não bloqueia o zoom */
+}
 
 
 .promo-carousel-overlay {
@@ -2635,4 +2641,21 @@ a:focus {
   pointer-events: none;
   filter: grayscale(100%);
   cursor: default;
+}
+
+
+.fullscreen-img-bg {
+  position: fixed; z-index: 9999;
+  top:0; left:0; width:100vw; height:100vh;
+  background: rgba(0,0,0,0.8);
+  display: flex; align-items: center; justify-content: center;
+}
+.fullscreen-img-bg img {
+  max-width: 98vw;
+  max-height: 98vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 0 20px #000;
+  cursor: zoom-out;
+  touch-action: pinch-zoom;
 }

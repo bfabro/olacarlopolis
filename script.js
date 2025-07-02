@@ -8470,3 +8470,16 @@ function preCarregarImagensCardapio(imagens) {
     img.src = src;
   });
 }
+
+
+
+document.body.addEventListener('click', function(e) {
+  if (e.target.classList.contains('imagem-cardapio') || e.target.classList.contains('promo-carousel-img')) {
+    const src = e.target.src;
+    const bg = document.createElement('div');
+    bg.className = 'fullscreen-img-bg';
+    bg.innerHTML = `<img src="${src}" alt="Ampliada" />`;
+    bg.onclick = () => bg.remove();
+    document.body.appendChild(bg);
+  }
+});
