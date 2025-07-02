@@ -1338,7 +1338,7 @@ const promocoesPorComercio = [
        // preco_com_desconto: "999,00 a vista",
         
        // desconto: "5",
-        whatsapp: " 43999178632"
+        whatsapp: "43999178632"
       },
 
 
