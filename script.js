@@ -14,6 +14,8 @@ function getHojeBR() {
 }
 
 
+
+
 function compartilharEstabelecimento(id) {
   if (!id || typeof id !== "string") {
     console.warn("ID inválido para compartilhamento:", id);
@@ -1019,6 +1021,11 @@ function mostrarPromocoes() {
 
   html += `</div>`;
   document.querySelector(".content_area").innerHTML = html;
+
+ // PRÉ-CARREGA IMAGENS DO CARDÁPIO!
+if (establishment.menuImages && establishment.menuImages.length > 0) {
+  preCarregarImagensCardapio(establishment.menuImages);
+}
 
   document.querySelectorAll('.card-estab-promo').forEach((card, i) => {
     card.addEventListener('click', function() {
@@ -7245,7 +7252,7 @@ if (menuPrevisaoTempo) {
 });
 
 
-    
+
     
      
 
@@ -8452,5 +8459,14 @@ if (document.getElementById("clearSearch")) {
         el.style.margin = "";
       });
     }, 100);
+  });
+}
+
+    // pre carregar as imagens 
+function preCarregarImagensCardapio(imagens) {
+  if (!Array.isArray(imagens)) return;
+  imagens.forEach(src => {
+    const img = new Image();
+    img.src = src;
   });
 }
