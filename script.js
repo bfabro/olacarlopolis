@@ -1178,10 +1178,7 @@ function mostrarPromocoes() {
   html += `</div>`;
   document.querySelector(".content_area").innerHTML = html;
 
- // PRÉ-CARREGA IMAGENS DO CARDÁPIO!
-if (establishment.menuImages && establishment.menuImages.length > 0) {
-  preCarregarImagensCardapio(establishment.menuImages);
-}
+
 
   document.querySelectorAll('.card-estab-promo').forEach((card, i) => {
     card.addEventListener('click', function() {

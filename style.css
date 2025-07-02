@@ -2097,30 +2097,16 @@ a:focus {
 
 
 
-
-.relogio-countdown {
-  display: inline-block;
-  background: #fff3cd;
-  color: #ff4500;
-  border: 1px solid #ffd700;
-  border-radius: 8px;
-  padding: 3px 10px;
-  font-size: 1em;
-  font-weight: bold;
-  margin: 5px 0 8px 0;
-}
 .promo-expirada .relogio-countdown {
   background: #f8d7da;
   color: #B22222;
-  border-color: #f5c2c7;
+  border-color: #f5c2c77c;
 }
 .promo-infos {
   width: 100%;
   text-align: center;
   margin-top: 8px;
 }
-
-
 
 
 
