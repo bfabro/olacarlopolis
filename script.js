@@ -892,7 +892,15 @@ menuLinks.forEach((link) => {
   });
 });
 
-
+const iconesCategorias = {
+  "Lanchonete": "🥪",
+  "Restaurante": "🍽️",
+  "Pizzaria": "🍕",
+  "Padaria": "🍞",
+  "Sorveteria": "🍦",
+  "Açai": "🥤",
+ 
+};
 // mostrar onde comer
 function mostrarOndeComer(filtroCategoria = "Todos") {
   const categoriasComida = [
@@ -904,10 +912,12 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
   <h2 class="highlighted">🍽️ Onde Comer</h2>
   <div class="filtro-comidas-card">
     <label for="filtroComidas">Filtrar por tipo:</label>
-    <select id="filtroComidas">
-      <option value="Todos">Todos</option>
-      ${categoriasComida.map(cat => `<option value="${cat}" ${filtroCategoria===cat?'selected':''}>${cat}</option>`).join("")}
-    </select>
+  <select id="filtroComidas">
+  <option value="Todos">🍽️ Todos</option>
+  ${categoriasComida.map(cat =>
+    `<option value="${cat}" ${filtroCategoria===cat?'selected':''}>${iconesCategorias[cat] || '🍽️'} ${cat}</option>`
+  ).join("")}
+</select>
   </div>
   <div class="onde-comer-lista">
 `;
@@ -938,10 +948,13 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
         <img src="${est.image}" alt="${est.name}" class="onde-comer-img">
         <div class="onde-comer-info">
           <h3>${est.name}</h3>
-          <span class="onde-comer-categoria">${est.categoria}</span>
+          <span class="onde-comer-categoria">${est.categoria}    ${est.menuImages && est.menuImages.length ? `<button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>` : ''}
+       </span>
           <span class="onde-comer-endereco">${est.address || ""}<br></span>
-          <span class="onde-comer-telefone">${est.contact || ""}</span>
-          ${est.menuImages && est.menuImages.length ? `<button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Ver Cardápio</button>` : ''}
+         <span class="onde-comer-telefone">
+  ${est.contact ? `<a href="https://wa.me/55${est.contact.replace(/\D/g,'')}" target="_blank" class="zap-link"><i class="fab fa-whatsapp"></i> ${est.contact}</a>` : ""}
+</span>
+
         </div>
       </div>
     `;
@@ -2699,7 +2712,7 @@ nome: "Agro São José",
                           sab: [{ inicio: "13:00", fim: "18:30" }],
                           dom: [{ inicio: "13:00", fim: "18:30" }]
                         },
-                        address: "Rua Benedito Salles, 2639, Carlópolis",
+                        address: "Rua Benedito Salles, 2639 - Carlópolis",
                         contact: "(43) 99977-8839",
                         delivery: "Sim / Com Taxa",
                         infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://www.youtube.com/watch?v=LkTSbakmFrE'>Conheça nossas especiarias!</a>",
@@ -2814,7 +2827,7 @@ nome: "Agro São José",
                         sab: [{ inicio: "19:00", fim: "23:30" }],
                         dom: [{ inicio: "19:00", fim: "23:30" }]
                       },
-                      address: "R. Benedito Salles, 380, Carlopolis",
+                      address: "R. Benedito Salles, 380 - Carlopolis",
                       contact: "(43) 99161-8381",
                       delivery: "Sim / Com Taxa",   
                       instagram:"https://www.instagram.com/didog_prensados/",
@@ -2863,7 +2876,7 @@ nome: "Agro São José",
                       sab: [{ inicio: "17:30", fim: "23:30" }],
                       dom: [{ inicio: "15:00", fim: "23:30" }]
                     },
-                    address: "Avenida Turística Elias Mehi Mansur 738",
+                    address: "Avenida Turística Elias Mehi Mansur, 738 - Carlopolis",
                     contact: "(43) 99105-6257",
                     delivery: "Sim / Com Taxa",   
                     
@@ -2907,7 +2920,7 @@ nome: "Agro São José",
                             sab: [{ inicio: "09:30", fim: "19:30" }],
                             dom: []
                           },
-                          address: "R. Benedito Salles, 1233",
+                          address: "R. Benedito Salles, 1233 - Carlopolis",
                           contact: "(43) 99180-4287",
                           delivery: "Sim / Com Taxa",
                           facebook: "https://www.facebook.com/IoneSalgados1687Fabiana/?locale=pt_BR",
@@ -3088,7 +3101,7 @@ nome: "Agro São José",
                               sab: [{ inicio: "18:00", fim: "00:30" }],
                               dom: [{ inicio: "18:00", fim: "00:30" }]
                             },
-                            address: "R. Benedito Salles, 1340",
+                            address: "R. Benedito Salles, 1340 - Carlopolis",
                             contact: "(43) 99693-0565",
                             delivery: "Sim / Com Taxa",
                             facebook: "https://www.facebook.com/ocasaraoph/?locale=pt_BR",
@@ -3180,7 +3193,7 @@ nome: "Agro São José",
                       sab: [{ inicio: "18:00", fim: "00:00" }],
                       dom: [{ inicio: "18:00", fim: "23:00" }],
                     }, 
-                    address: "R. Benedito Salles, 837",
+                    address: "R. Benedito Salles, 837 - Carlopolis",
                     contact: "(43) 99632-1310",
                     delivery: "Sim / Com Taxa",
                     facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
@@ -3418,7 +3431,7 @@ nome: "Agro São José",
                     sab: [{ inicio: "13:00", fim: "23:00" }],
                     dom: [{ inicio: "14:00", fim: "00:00" }],
                   }, 
-                  address: "Rua Benedito Salles n° 619 - Carlopolis",
+                  address: "Rua Benedito Salles, 619 - Carlopolis",
                   contact: "(43) 99922-8336",
                   contact2:"(43) 98863-3040",
                   delivery: "Sim / Com Taxa",
@@ -6576,7 +6589,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "11:00", fim: "16:00" }],
                       dom: []
                     },
-                    address: "R. Kalil Keder, 90",
+                    address: "R. Kalil Keder, 90 - Carlopolis",
                     contact: "(43) 99111-9484",
                     delivery: "Sim / Com Taxa",
                     instagram:"https://www.instagram.com/delfinos.mendes1/",
@@ -6664,7 +6677,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     sab: [{ inicio: "11:00", fim: "16:00" }],
                     dom: []
                   },
-                  address: "R. Kalil Keder, 262 ",
+                  address: "R. Kalil Keder, 262 - Carlopolis",
                   contact: "(43) 99847-1137",
                   delivery: "Sim / Com Taxa",
                   
@@ -6941,7 +6954,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               sab: [{ inicio: "10:30", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }],
               dom: [{ inicio: "10:30", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }]
             },
-            address: "Benedito Salles n°910",
+            address: "Benedito Salles, 910 - Carlopolis",
             contact: "(43) 99954-0831",
             delivery: "Sim / Com Taxa",
             instagram:"https://www.instagram.com/yingyang_comidachinesa/",
