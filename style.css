@@ -2872,3 +2872,8 @@ a:focus {
   color: #373737;
   margin-left: 6px;
 }
+
+.whatsapp-icon {
+  color: #25D366; /* Verde do WhatsApp */
+  font-size: 18px; /* 2px maior que o padrão (16px) */
+}

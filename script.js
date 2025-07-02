@@ -980,7 +980,10 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
 </span>
 
       <span class="onde-comer-telefone">
-        ${est.contact ? `<a href="https://wa.me/55${est.contact.replace(/\D/g,'')}" target="_blank" class="zap-link"><i class="fab fa-whatsapp"></i> ${est.contact}</a>` : ""}
+        ${est.contact ? `<a href="https://wa.me/55${est.contact.replace(/\D/g,'')}?text=${encodeURIComponent('Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="zap-link">
+  <i class="fab fa-whatsapp whatsapp-icon"></i> ${est.contact}
+</a>
+` : ""}
       </span>
     </div>
   </div>
