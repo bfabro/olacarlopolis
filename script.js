@@ -954,7 +954,17 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
     <div class="onde-comer-info">
       <h3>${est.name}</h3>
       <span class="onde-comer-categoria">${est.categoria}</span>
-      <span class="onde-comer-endereco">${est.address || ""}<br></span>
+      <span class="onde-comer-endereco">
+  ${est.address
+    ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}"
+         target="_blank"
+         class="map-link">
+          ${est.address}
+       </a>`
+    : ""}
+  <br>
+</span>
+
       <span class="onde-comer-telefone">
         ${est.contact ? `<a href="https://wa.me/55${est.contact.replace(/\D/g,'')}" target="_blank" class="zap-link"><i class="fab fa-whatsapp"></i> ${est.contact}</a>` : ""}
       </span>
