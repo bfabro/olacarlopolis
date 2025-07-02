@@ -911,7 +911,7 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
   let html = `
   <h2 class="highlighted">🍽️ Onde Comer</h2>
   <div class="filtro-comidas-card">
-    <label for="filtroComidas">Filtrar por tipo:</label>
+    <label for="filtroComidas">Filtrar por:</label>
   <select id="filtroComidas">
   <option value="Todos">🍽️ Todos</option>
   ${categoriasComida.map(cat =>
@@ -943,21 +943,25 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
 
   // 3. Renderiza cards
   lista.forEach(est => {
-    html += `
-      <div class="onde-comer-card">
-        <img src="${est.image}" alt="${est.name}" class="onde-comer-img">
-        <div class="onde-comer-info">
-          <h3>${est.name}</h3>
-          <span class="onde-comer-categoria">${est.categoria}    ${est.menuImages && est.menuImages.length ? `<button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>` : ''}
-       </span>
-          <span class="onde-comer-endereco">${est.address || ""}<br></span>
-         <span class="onde-comer-telefone">
-  ${est.contact ? `<a href="https://wa.me/55${est.contact.replace(/\D/g,'')}" target="_blank" class="zap-link"><i class="fab fa-whatsapp"></i> ${est.contact}</a>` : ""}
-</span>
+   html += `
+  <div class="onde-comer-card">
+    <div class="onde-comer-card-esq">
+      <img src="${est.image}" alt="${est.name}" class="onde-comer-img">
+      ${est.menuImages && est.menuImages.length ? `
+        <button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
+      ` : ''}
+    </div>
+    <div class="onde-comer-info">
+      <h3>${est.name}</h3>
+      <span class="onde-comer-categoria">${est.categoria}</span>
+      <span class="onde-comer-endereco">${est.address || ""}<br></span>
+      <span class="onde-comer-telefone">
+        ${est.contact ? `<a href="https://wa.me/55${est.contact.replace(/\D/g,'')}" target="_blank" class="zap-link"><i class="fab fa-whatsapp"></i> ${est.contact}</a>` : ""}
+      </span>
+    </div>
+  </div>
+`;
 
-        </div>
-      </div>
-    `;
   });
   html += `</div>`;
   document.querySelector(".content_area").innerHTML = html;
@@ -1700,7 +1704,7 @@ nome: "Agro São José",
                               sex: [{ inicio: "14:00", fim: "23:00" }],
                               sab: [{ inicio: "14:00", fim: "23:00" }]
                             },
-                            address: "Rua Benedito Salles, 409 - Carlopolis",
+                            address: "R. Benedito Salles, 409 - Carlopolis",
                             contact: "(43) 99176-7871",
                             contact2:" (43) 98868-7038",
                             delivery: "Sim / Com Taxa",
@@ -2712,7 +2716,7 @@ nome: "Agro São José",
                           sab: [{ inicio: "13:00", fim: "18:30" }],
                           dom: [{ inicio: "13:00", fim: "18:30" }]
                         },
-                        address: "Rua Benedito Salles, 2639 - Carlópolis",
+                        address: "R. Benedito Salles, 2639 - Carlópolis",
                         contact: "(43) 99977-8839",
                         delivery: "Sim / Com Taxa",
                         infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://www.youtube.com/watch?v=LkTSbakmFrE'>Conheça nossas especiarias!</a>",
@@ -3431,7 +3435,7 @@ nome: "Agro São José",
                     sab: [{ inicio: "13:00", fim: "23:00" }],
                     dom: [{ inicio: "14:00", fim: "00:00" }],
                   }, 
-                  address: "Rua Benedito Salles, 619 - Carlopolis",
+                  address: "R. Benedito Salles, 619 - Carlopolis",
                   contact: "(43) 99922-8336",
                   contact2:"(43) 98863-3040",
                   delivery: "Sim / Com Taxa",
@@ -3920,7 +3924,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 {
                   image: "images/comercios/supermercado/zerojapan/zerojapan.png",
                     name: "Zero Japan",
-                    address: "Rua Doutora Paula e Silva, 445 - Carlopolis ",
+                    address: "R. Doutora Paula e Silva, 445 - Carlopolis ",
                     hours: "Dom a Dom: 8:00h as 20:00h",
                     statusAberto:".",
                     horarios: {                          
@@ -4084,7 +4088,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                   sab: [{ inicio: "09:00", fim: "14:00" }],
                   dom: [], // fechado
                 },
-                address: "Rua Benedito Salles, 1031 - Carlópolis",
+                address: "R. Benedito Salles, 1031 - Carlópolis",
                 contact: "(43) 99917-8632",                          
                 facebook: "https://www.facebook.com/vidracariamartini/",
                 instagram: "https://www.instagram.com/vidracariamartini/",
@@ -4125,7 +4129,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 {
                     image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
                     name: "Bio Farma",
-                    address: "Rua Laurindo Franco Godoy, 464",
+                    address: "R. Laurindo Franco Godoy, 464",
                     hours: "<strong>Seg a Sex:</strong> 08:00h as 18:00h </br><strong>Sab: </strong>08:00h as 12:00h",
                     statusAberto:".",
                     horarios: {                          
@@ -4232,7 +4236,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "08:00", fim: "21:00" }],
                       dom: [{ inicio: "08:00", fim: "21:00" }]
                     },
-                    address: "Rua Benedito Salles, 903 - Carlopolis",
+                    address: "R. Benedito Salles, 903 - Carlopolis",
                     contact: "(43) 98411-9145",
                     delivery: "Sim / Sem Taxa",
                     facebook:"https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
@@ -4297,7 +4301,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 {
                   image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
                     name: "Farmacia da Vila",
-                    address: "Rua Manguba, 320 - Carlopolis",
+                    address: "R. Manguba, 320 - Carlopolis",
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     plantaoHorario: "08:00h às 21:00h", 
                     plantaoData:"28/06 a 04/07",
@@ -6519,7 +6523,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     sab: [{ inicio: "10:30", fim: "14:00" }],
                     dom: [{ inicio: "10:30", fim: "14:00" }]
                   },
-                address: "Rua Benedito Salles 1241",
+                address: "R. Benedito Salles, 1241 - Carlopolis",
                 contact: "(43) 98844-8407",
                 contact2: "(43) 99838-7570",
                 delivery: "Sim / Com Taxa",                
@@ -6638,7 +6642,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "19:00", fim: "22:00" }],
                       dom: []
                     },
-                    address: "Rua Kalil Keder - 1204 - saída para Ribeirão Claro",
+                    address: "R. Kalil Keder - 1204 - saída para Ribeirão Claro",
                     contact: "(43) 99686-5040",
                     delivery: "Sim / Com Taxa",
 
@@ -6748,7 +6752,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               sab: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }],
               dom: [{ inicio: "10:00", fim: "15:00" },{ inicio: "18:30", fim: "23:00" }]
             },
-              address: "Rua Benedito Salles 10, Carlópolis,",
+              address: "R. Benedito Salles 10, Carlópolis,",
               contact: "(43) 99159-0070",
               delivery: "Sim / Com Taxa",
               facebook: "https://www.facebook.com/SaleBrasaCarlopolis/?locale=pt_BR",
@@ -6954,7 +6958,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               sab: [{ inicio: "10:30", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }],
               dom: [{ inicio: "10:30", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }]
             },
-            address: "Benedito Salles, 910 - Carlopolis",
+            address: "R.Benedito Salles, 910 - Carlopolis",
             contact: "(43) 99954-0831",
             delivery: "Sim / Com Taxa",
             instagram:"https://www.instagram.com/yingyang_comidachinesa/",
