@@ -961,9 +961,17 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
   
     <div class="onde-comer-card-esq">
       <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel">
-      ${est.menuImages && est.menuImages.length ? `
-        <button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
-      ` : ''}
+     ${est.menuImages && est.menuImages.length ? `
+  <button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
+` : (est.cardapioLink ? `
+  <button class="btn-cardapio" onclick="window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
+` : '')}
+
+
+
+
+
+
       
     </div>
     <div class="onde-comer-info">
@@ -3235,7 +3243,7 @@ nome: "Agro São José",
                     facebook: "https://www.facebook.com/p/Fornalha-Fornalha-100054510698755/?locale=pt_BR",
                     instagram: "https://www.instagram.com/_fornalhapizzaria_/",   
                      infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://fornalha.menudino.com/'  >Cardapio On Line</a>",
-             
+             cardapioLink: "https://fornalha.menudino.com/",
                      
                     novidadesImages: [
                           
@@ -6790,7 +6798,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
               facebook: "https://www.facebook.com/SaleBrasaCarlopolis/?locale=pt_BR",
               instagram: "https://www.instagram.com/paiolpizzaburguer/",
               infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://shop.beetech.com.br/churrascoegastronomia'  >Cardapio On Line</a>",
-             
+             cardapioLink: "https://shop.beetech.com.br/churrascoegastronomia",
              
               novidadesImages: [                    
                   "images/comercios/restaurante/paiol/divulgacao/1.png",
@@ -6960,6 +6968,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 facebook:"https://www.facebook.com/selaht.gastronomia",
                 instagram:"https://www.instagram.com/selaht.gastronomia/",
                 infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://eatfood.app/cardapio/58qt9yj5dqgt2timpqd7'>Cardapio On Line</a>",
+                cardapioLink: "https://eatfood.app/cardapio/58qt9yj5dqgt2timpqd7",
                 menuImages: [                   
                   "images/comercios/restaurante/selaht/cardapio/1.png",          
                          
@@ -8671,6 +8680,21 @@ document.body.addEventListener('click', function(e) {
     document.body.appendChild(bg);
   }
 });
+
+document.body.addEventListener('click', function(e) {
+  if (e.target.classList.contains('btn-cardapio')) {
+    const link = e.target.getAttribute("data-link");
+
+    if (link) {
+      window.open(link, '_blank');
+    } else {
+      const nome = e.target.getAttribute("data-name");
+      const id = e.target.getAttribute("data-id");
+      abrirCardapio(nome, id);
+    }
+  }
+});
+
 
 
 
