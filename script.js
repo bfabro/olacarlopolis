@@ -498,6 +498,7 @@ rodriguinho:"s",
 
       //loja de pesca
       pescaepresente:"s",
+      lojathiagoaguera:"s",
 
       // mercearia
       seiza:"s",
@@ -6254,6 +6255,68 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
             link: document.querySelector("#menuLojaPesca"),  
             title: "Loja de Pesca",
             establishments: [
+
+
+
+
+{
+                  image: "images/comercios/lojadepesca/thiago/perfil.jpg",
+                    name: "Loja Thiago Aguera",
+                    hours: "Seg a Sex: 07:30h as 19:30h<br>Sab: 07:00h as 17:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "07:30", fim: "19:30" }],
+                      ter: [{ inicio: "07:30", fim: "19:00" }],
+                      qua: [{ inicio: "07:30", fim: "19:00" }],
+                      qui: [{ inicio: "07:30", fim: "19:00" }],
+                      sex: [{ inicio: "07:30", fim: "19:00" }],
+                      sab: [{ inicio: "07:00", fim: "17:00" }],
+                      dom: [],
+                    },
+                    address: "R. Benedito Salles, 637 - Carlopolis",
+                    contact: "(43) 99177-5226",                    
+                    instagram:"https://www.instagram.com/lojathiagoaguera/",
+                    facebook:"https://www.facebook.com/thiagoagueraparanafishingteam",
+                    site:"https://thiagoaguera.com.br/",
+                    infoAdicional: "Participe dos nossos grupos, acesse: <a target='_blank' style='color:#2da6ff;' href='https://linktr.ee/thiagoaguera?fbclid=PAZXh0bgNhZW0CMTEAAac0ZKqOBGEodhRS0HLfsGrN_c8ezIX72_c4icn9ZXQvUkI8_YfxE02fT-AJeQ_aem_GjbNm-TtqQr33uPA79l21Q'  >LinkTree</a>",
+                    
+                    novidadesImages: [
+                        "images/comercios/lojadepesca/thiago/divulgacao/1.jpg",
+                        "images/comercios/lojadepesca/thiago/divulgacao/2.jpg",
+                        "images/comercios/lojadepesca/thiago/divulgacao/3.jpg",
+                        "images/comercios/lojadepesca/thiago/divulgacao/4.jpg",
+                        "images/comercios/lojadepesca/thiago/divulgacao/5.jpg",
+                        "images/comercios/lojadepesca/thiago/divulgacao/6.jpg",
+                        "images/comercios/lojadepesca/thiago/divulgacao/7.jpg",
+                    ],
+                    novidadesDescriptions: [ 
+                      
+                    "A Jackall Squad Shad 65SP é uma isca japonesa de alta performance, projetada para pescadores que exigem precisão e eficiência. Com 6,5 cm de comprimento e 5,8 g, ela possui ação suspending, mantendo-se na mesma profundidade mesmo durante as pausas, ideal para dias em que os predadores estão mais cautelosos. Seu sistema interno de balanceamento proporciona um nado errático que simula um peixe ferido, aumentando a atratividade para espécies como tucunaré, robalo e black bass. Equipada com garatéias afiadas e acabamento detalhado, é uma escolha confiável para diversas condições de pesca",
+                      "A máquina +1 veio pra complementar ainda mais sua caixa de iscas! Com sua nova barbela maior, a máquina agora chega a profundidade de 2,20, atingindo águas mais profundas para sua captura perfeita!",
+                     "O molinete Daisen Inverse 10 é uma opção robusta e versátil para pescadores que buscam desempenho e confiabilidade. Com 11 rolamentos em aço inoxidável (10 de esferas e 1 de roletes), oferece recolhimento suave e eficiente. Seu sistema de carretel flutuante com eixo curto reduz o atrito, proporcionando arremessos mais longos e precisos. O chassi em grafite de alta densidade garante leveza e resistência, enquanto o freio magnético e o drag de 8 kg asseguram controle durante as capturas. A manivela em alumínio com knob em EVA de alta densidade oferece conforto mesmo em longas jornadas de pesca.",
+                     "A Shimano SLX DC XT 70/71 XG é uma carretilha de perfil baixo que combina tecnologias avançadas para oferecer desempenho superior na pesca esportiva. Equipada com o sistema de freio digital I-DC5, ela ajusta automaticamente a força de frenagem, proporcionando arremessos longos e precisos, mesmo em condições adversas. O carretel MGL Spool III de baixa inércia facilita o uso de iscas leves, enquanto a engrenagem MicroModule e o sistema X-Ship garantem uma recuperação suave e potente. Com uma relação de recolhimento de 8.1:1, peso de 195 g e drag máximo de 5,5 kg, esta carretilha é ideal para pescarias que exigem velocidade e precisão",
+                      "A ￼ Vara Redai Silverback By Jansen é o mais recente lançamento da @redai. Inspirada na força e liderança do gorila Silverback, esta vara foi projetada para oferecer potência, tecnologia e alto desempenho nas pescarias mais desafiadoras. <BR>A Silverback possui ação rápida, ideal para fisgadas precisas e controle durante o trabalho com iscas. Seu blank de carbono de alto módulo proporciona leveza e sensibilidade, enquanto os passadores Fuji Concept O garantem arremessos suaves e durabilidade. O cabo e o reel seat ergonômico oferecem conforto e firmeza durante o uso.",
+                      "A linha 4x da @kastkingbrazilofficial Hammer Braid é uma escolha de alto desempenho para pescadores que buscam resistência, sensibilidade e durabilidade. Utilizando fibras microfilamentadas de UHMWPE em um padrão exclusivo de trançado Diamond Braid, esta linha oferece até 10% mais resistência do que trançados convencionais de 4 fios na mesma libragem. Seu processo de pré-tratamento com revestimento proprietário (EPC) garante cor duradoura, praticamente sem desbotamento, e maior resistência ao nó. Com uma superfície mais lisa e diâmetro reduzido, proporciona arremessos mais longos e silenciosos, além de excelente resistência à abrasão. Disponível em diversas libragens e cores, é ideal para diversas condições de pesca.",
+                    "Pescaria top de inverno ! Pouco tempo de pesca e bastante tucunaré amarelo na linha.<br>Todos peixes foram capturado na isca cometa da @itaipujigs",
+                    ],
+                },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 {
                   image: "images/comercios/lojadepesca/pescaepresente/perfil.png",
                     name: "Pesca e Presente",
