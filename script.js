@@ -2003,32 +2003,7 @@ nome: "Agro São José",
                   ],
               },
 
-              {
-                link: document.querySelector("#menuAgenciaViagem"),    
-                title: "Agencia de Viagem",
-                establishments: [
-                    {
-                      image: "images/comercios/agenciaViagem/cvc/cvc.png",
-                        name: "CVC Carlopolis",
-                        hours: "Seg a Sab: 11:00h as 22:00h",
-                        statusAberto:"a",
-                            horarios: {
-                              
-                              seg: [{ inicio: "11:00", fim: "22:00" }],
-                              ter: [{ inicio: "11:00", fim: "22:00" }],
-                              qua: [{ inicio: "11:00", fim: "22:00" }],
-                              qui: [{ inicio: "11:00", fim: "22:00" }],
-                              sex: [{ inicio: "11:00", fim: "22:00" }],
-                              sab: [{ inicio: "11:00", fim: "22:00" }],
-                              dom: []
-                            },
-                        address: "Rua Padre Hugo, 450, Sala 10",
-                        contact: "(43) 99177-2244",
-                        instagram:"https://www.instagram.com/cvc.pr.carlopolis/",
-                        facebook:"https://www.facebook.com/CVC.PR.Carlopolis?mibextid=LQQJ4d",
-                    },
-                ],
-            },
+              
 
 
 
