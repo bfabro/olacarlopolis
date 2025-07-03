@@ -2957,3 +2957,33 @@ a:focus {
   color: red;
   background: none !important;
 }
+
+
+.fullscreen-img-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.fullscreen-img-bg img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+  box-shadow: 0 0 15px #000;
+  transition: transform 0.3s ease-in-out;
+}
+
+.fullscreen-img-bg:hover img {
+  transform: scale(1.02);
+}
+
+.fullscreen-img-bg:active {
+  cursor: zoom-out;
+}

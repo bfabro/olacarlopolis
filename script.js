@@ -960,7 +960,7 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
    
   
     <div class="onde-comer-card-esq">
-      <img src="${est.image}" alt="${est.name}" class="onde-comer-img">
+      <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel">
       ${est.menuImages && est.menuImages.length ? `
         <button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
       ` : ''}
@@ -8663,6 +8663,19 @@ document.body.addEventListener('click', function(e) {
     e.target.classList.contains('promo-carousel-img') ||
     e.target.classList.contains('imagem-cardapio')
   ) {
+    const src = e.target.src;
+    const bg = document.createElement('div');
+    bg.className = 'fullscreen-img-bg';
+    bg.innerHTML = `<img src="${src}" alt="Ampliada" />`;
+    bg.onclick = () => bg.remove();
+    document.body.appendChild(bg);
+  }
+});
+
+
+
+document.body.addEventListener('click', function(e) {
+  if (e.target.classList.contains('imagem-expandivel')) {
     const src = e.target.src;
     const bg = document.createElement('div');
     bg.className = 'fullscreen-img-bg';
