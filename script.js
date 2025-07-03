@@ -608,6 +608,7 @@ rodriguinho:"s",
   
       // churrasqueiro
       flaviogiovani:"s", 
+      gustavinho:"s",
   
       //diarista
       rose: "s",
@@ -4705,10 +4706,24 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                 },
 
                 {
-                image: "images/servicos/churrasqueiro/pituka/pituka.png",
-                name: "Pituca",
-                contact: "(43) 99984-5074",
-                instagram:"https://www.instagram.com/pituca.abilio/",
+                image: "images/servicos/churrasqueiro/gustavo/perfil.jpg",
+                name: "Gustavinho",
+                contact: "(43) 99654-5053",
+                instagram:"https://www.instagram.com/gustavo.cunha_/",
+
+                novidadesImages: [               
+                    "images/servicos/churrasqueiro/gustavo/divulgacao/1.jpg",
+                    "images/servicos/churrasqueiro/gustavo/divulgacao/2.jpg",
+                    "images/servicos/churrasqueiro/gustavo/divulgacao/3.jpg",
+                    "images/servicos/churrasqueiro/gustavo/divulgacao/4.jpg",
+                    "images/servicos/churrasqueiro/gustavo/divulgacao/5.jpg",
+                    "images/servicos/churrasqueiro/gustavo/divulgacao/6.jpg",
+                    "images/servicos/churrasqueiro/gustavo/divulgacao/7.jpg",
+                    
+                     
+                  ], novidadesDescriptions: [  
+                    "Fogo, brasa e paixão: aqui o churrasco é tratado como arte!",
+                    ], 
                 },
             ],
         },
@@ -6748,6 +6763,18 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     address: "R. Kalil Keder, 1204 - saída para Ribeirão Claro",
                     contact: "(43) 99686-5040",
                     delivery: "Sim / Com Taxa",
+                     menuImages: [                   
+              "images/comercios/restaurante/hime/cardapio/1.jpg",
+              "images/comercios/restaurante/hime/cardapio/2.jpg",
+              "images/comercios/restaurante/hime/cardapio/3.jpg",
+              "images/comercios/restaurante/hime/cardapio/4.jpg",
+              "images/comercios/restaurante/hime/cardapio/5.jpg",
+              "images/comercios/restaurante/hime/cardapio/6.jpg",
+              "images/comercios/restaurante/hime/cardapio/7.jpg",
+              "images/comercios/restaurante/hime/cardapio/8.jpg",
+               
+                     
+          ],
 
 
                     novidadesImages: [                    
