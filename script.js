@@ -1395,32 +1395,21 @@ const promocoesPorComercio = [
     imagem: "images/comercios/mercearia/seiza/seiza.png",
     promocoes: [
       {
-        imagem: "images/promocoes/1.jpg",
-        descricao: "Bolinho Custard Orion 138G",
-        validade: "2025-06-30T23:00:00",
-        preco:"26,90",
-        preco_com_desconto: "17,90",        
+        imagem: "images/promocoes/seiza/1.jpg",
+        descricao: "Molho Tare Maruiti 500ml",
+        validade: "2025-07-31T18:00:00",
+        preco:"26,99",
+        preco_com_desconto: "23,99",        
         whatsapp: "43991034187"
       },
 
-     
-       {
-        imagem: "images/promocoes/3.jpg",
-        descricao: "Cookie Blanchule Bourbon 78g",
-        validade: "2025-06-30T23:00:00",
-        preco:"20,99",
-        preco_com_desconto: "16,79",
-        whatsapp: "43991034187"
-      },
-
-        
 
        {
-        imagem: "images/promocoes/5.jpg",
-        descricao: "Chocolate Branco Morinaga Dars",
-        validade: "2025-06-30T23:00:00",
-        preco:"17,00",
-        preco_com_desconto: "13,99",
+        imagem: "images/promocoes/seiza/2.jpg",
+        descricao: "Natto Nippo Kyoka Agronippo 100g",
+        validade: "2025-07-31T18:00:00",
+        preco:"15,20",
+        preco_com_desconto: "13,49",
         whatsapp: "43991034187"
       },
     ]
@@ -1529,16 +1518,78 @@ const promocoesPorComercio = [
     nome: "Relojoaria Martini ",
     imagem: "images/comercios/relojoaria/martini/perfil.jpg",
     promocoes: [
+
       {
         imagem: "images/promocoes/martini/1.jpg",
-        descricao: "Comprando um relógio Champion masculino vc ganha um desodorante Eudora!",
-        validade: "2025-08-12T18:00:00",
-       // preco:"1.200,00",
-       // preco_com_desconto: "999,00 a vista",
-        
-       // desconto: "5",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
         whatsapp: "43999178632"
       },
+
+      {
+        imagem: "images/promocoes/martini/2.jpg",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
+        whatsapp: "43999178632"
+      },
+
+      {
+        imagem: "images/promocoes/martini/3.jpg",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
+        whatsapp: "43999178632"
+      },
+
+      {
+        imagem: "images/promocoes/martini/4.jpg",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
+        whatsapp: "43999178632"
+      },
+
+      {
+        imagem: "images/promocoes/martini/5.jpg",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
+        whatsapp: "43999178632"
+      },
+
+      {
+        imagem: "images/promocoes/martini/6.jpg",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
+        whatsapp: "43999178632"
+      },
+
+      {
+        imagem: "images/promocoes/martini/7.jpg",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
+        whatsapp: "43999178632"
+      },
+
+      {
+        imagem: "images/promocoes/martini/8.jpg",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
+        whatsapp: "43999178632"
+      },
+
+      {
+        imagem: "images/promocoes/martini/9.jpg",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
+        whatsapp: "43999178632"
+      },
+
+      {
+        imagem: "images/promocoes/martini/10.jpg",
+        descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
+        validade: "2025-08-12T18:00:00",       
+        whatsapp: "43999178632"
+      },
+
+
 
 
 
@@ -7407,7 +7458,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
           title: "Vagas de Trabalho",
           establishments: [
               {
-                    image: "images/comercios/supermercado/rocha.jpg",
+                    image: "images/comercios/supermercado/rocha/perfil.jpg",
                     name: "Rocha",
                     hours: "Seg a Sex: 06:30h as 20:00h <br> Dom: 06:00h as 12:00h",
                     statusAberto:".",
@@ -7420,7 +7471,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "06:30", fim: "20:00" }],
                       dom: [{ inicio: "06:30", fim: "20:00" }],
                     },  
-                    address: "Av. Elson Soares, 767 ",
+                    address: "Av. Elson Soares, 767 - Carlopolis",
                     contact: "(43) 99105-9324",
                    
                     facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
