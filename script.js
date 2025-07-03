@@ -6682,7 +6682,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       sab: [{ inicio: "19:00", fim: "22:00" }],
                       dom: []
                     },
-                    address: "R. Kalil Keder - 1204 - saída para Ribeirão Claro",
+                    address: "R. Kalil Keder, 1204 - saída para Ribeirão Claro",
                     contact: "(43) 99686-5040",
                     delivery: "Sim / Com Taxa",
 
