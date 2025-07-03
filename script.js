@@ -554,6 +554,9 @@ rodriguinho:"s",
       kelve: "s", 
       rocha: "s", 
       zerojapan:"s",
+
+      // peixaria
+      coopanorpi:"s",
   
       // pesqueiro
       peskepagueaguamarine: "s",
@@ -644,6 +647,7 @@ rodriguinho:"s",
 /// INICIO SETOR PUBLICO
       agendamentosaude:"s",
       agendamentodeviagens:"s",
+      ambulatoriodohospital:"s",
       asilo:"s",
       agenciatrabalhador:"s",
       copel: "s",
@@ -3364,6 +3368,65 @@ nome: "Agro São José",
             ],
         },
 
+
+
+{
+            link: document.querySelector("#menuPeixaria"),
+            title: "Peixaria",
+            establishments: [
+                {
+                    image: "images/comercios/peixaria/coopanorpi/perfil.jpg",
+                    name: "Coopanorpi",
+                    hours: "Dom a Dom: 07:00h as 18:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                      seg: [{ inicio: "07:00", fim: "18:30" }],
+                      ter: [{ inicio: "07:00", fim: "18:30" }],
+                      qua: [{ inicio: "07:00", fim: "18:30" }],
+                      qui: [{ inicio: "07:00", fim: "18:30" }],
+                      sex: [{ inicio: "07:00", fim: "18:30" }],
+                      sab: [{ inicio: "07:00", fim: "18:30" }],
+                      dom: [{ inicio: "07:00", fim: "18:30" }],
+                    }, 
+                    address: "PR-218, km 1 - Passos do Leite, Carlópolis",
+                    contact: " (14) 98130-9957",
+                    delivery: "Não",
+                    facebook: "https://www.facebook.com/p/Coopanorpi-Cooperativa-de-Pescadores-e-Aquicultores-do-Norte-Pioneiro-100063664195364/",
+                    instagram: "https://www.instagram.com/coopanorpi/",
+                               
+                  novidadesImages: [
+                        
+                      "images/comercios/peixaria/coopanorpi/divulgacao/1.jpg",
+                      "images/comercios/peixaria/coopanorpi/divulgacao/2.jpg",
+                      "images/comercios/peixaria/coopanorpi/divulgacao/3.jpg",
+                      "images/comercios/peixaria/coopanorpi/divulgacao/4.jpg",
+                      "images/comercios/peixaria/coopanorpi/divulgacao/5.jpg",
+                    
+                    
+                 
+                  ],
+                  novidadesDescriptions: [ 
+                    "Variedades em peixes frescos",              
+                    "Camarao  Barbas",
+                    "Filé de Tilapia",
+                    "Postas de Tilapia",
+                    "Pintado",
+                   
+                   ],     
+                },
+            ],
+        },
+
+
+
+
+
+
+
+
+
+
+
          // pesqueiro
         {
             link: document.querySelector("#menuPesqueiro"),
@@ -5652,6 +5715,24 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
             
             
         },
+    ],
+ },
+
+ {
+    link: document.querySelector("#menuAmbulatorio"),    
+    title: "Ambulatorio Do Hospital",
+    establishments: [
+        {
+         image: "images/setorPublico/ambulatorio/perfil.jpg",
+            name: "Ambulatorio Do Hospital",
+            hours: "Seg a Sex: 8:00h as 17:00h",
+            address: "R. Marcos Rodrigues do Amaral, S/N - Carlopolis",
+            contact: "(43) 99113-3084",
+            
+            
+        },
+
+       
     ],
  },
 
