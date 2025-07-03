@@ -1023,7 +1023,7 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
 
 
 
-document.getElementById("menuComidas").addEventListener("click", function(e) {
+document.getElementById("menuOndeComer").addEventListener("click", function(e) {
   e.preventDefault();
   mostrarOndeComer();
 });
