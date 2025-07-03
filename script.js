@@ -957,15 +957,21 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
   }
    html += `
   <div class="onde-comer-card">
+   
+  
     <div class="onde-comer-card-esq">
       <img src="${est.image}" alt="${est.name}" class="onde-comer-img">
       ${est.menuImages && est.menuImages.length ? `
         <button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
       ` : ''}
+      
     </div>
     <div class="onde-comer-info">
-      
-      <span class="onde-comer-categoria">${est.categoria}</span>
+    
+      <span class="onde-comer-categoria">${est.categoria}</span> ${est.horarios ? `
+    <span class="status-tag ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
+      ${estaAbertoAgora(est.horarios) ? 'ABERTO' : 'FECHADO'}
+    </span>` : ""}
       <h3>${est.name}</h3>
       
       <span class="onde-comer-endereco">
@@ -985,7 +991,9 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
 </a>
 ` : ""}
       </span>
+      
     </div>
+    
   </div>
 `;
 

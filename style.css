@@ -2656,6 +2656,12 @@ a:focus {
   min-height: 95px;
   align-items: center;
   transition: box-shadow 0.2s;
+   position: relative;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 .onde-comer-card:hover {
   box-shadow: 0 8px 24px rgba(0,0,0,0.18);
@@ -2850,30 +2856,104 @@ a:focus {
   width: 100px;
 }
 
+.status-aberto-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
 .status-tag {
-  display: inline-block;
-  font-size: 0.95em;
-  font-weight: bold;
-  margin: 4px 5px 2px 0;
-  padding: 2px 10px;
+  padding: 4px 8px;
   border-radius: 8px;
-  color: #fff;
-  background: #bdbdbd;
-  letter-spacing: 1px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: inline-block;
 }
+
 .status-tag.aberto {
-  background: linear-gradient(90deg, #30c85a 60%, #3eb86a 100%);
+  background-color: #28a745;
+  color: white;
 }
+
 .status-tag.fechado {
-  background: linear-gradient(90deg, #da362d 60%, #c90d1d 100%);
+  background-color: #dc3545;
+  color: white;
 }
+
 .status-tag.proximo {
-  background: #FFD600;
-  color: #373737;
-  margin-left: 6px;
+  background-color: #ffc107;
+  color: black;
+  margin-left: 5px;
 }
+
+
+
+
+
+.status-aberto-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.status-tag {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.status-tag.aberto {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-tag.fechado {
+  background-color: #dc3545;
+  color: white;
+}
+
+.status-tag.proximo {
+  background-color: #ffc107;
+  color: black;
+  margin-left: 5px;
+}
+
+
+
+
 
 .whatsapp-icon {
   color: #25D366; /* Verde do WhatsApp */
   font-size: 18px; /* 2px maior que o padrão (16px) */
+}
+
+
+
+.onde-comer-card {
+  position: relative;
+}
+
+.status-tag {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 2;
+}
+
+.status-tag.aberto {
+  color: green;
+  background: none !important;
+}
+
+.status-tag.fechado {
+  color: red;
+  background: none !important;
 }
