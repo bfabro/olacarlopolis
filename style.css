@@ -2939,7 +2939,7 @@ a:focus {
   position: relative;
 }
 
-.status-tag {
+.status-tag_comer {
   position: absolute;
   top: 5px;
   right: 10px;
@@ -2948,12 +2948,12 @@ a:focus {
   z-index: 2;
 }
 
-.status-tag.aberto {
+.status-tag_comer.aberto {
   color: green;
   background: none !important;
 }
 
-.status-tag.fechado {
+.status-tag_comer.fechado {
   color: red;
   background: none !important;
 }

@@ -969,7 +969,7 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
     <div class="onde-comer-info">
     
       <span class="onde-comer-categoria">${est.categoria}</span> ${est.horarios ? `
-    <span class="status-tag ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
+    <span class="status-tag_comer ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
       ${estaAbertoAgora(est.horarios) ? 'ABERTO' : 'FECHADO'}
     </span>` : ""}
       <h3>${est.name}</h3>
