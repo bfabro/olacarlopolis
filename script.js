@@ -968,11 +968,12 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
   
     <div class="onde-comer-card-esq">
       <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel">
-     ${est.menuImages && est.menuImages.length ? `
-  <button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
-` : (est.cardapioLink ? `
+     ${est.cardapioLink ? `
   <button class="btn-cardapio" onclick="window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
+` : (est.menuImages && est.menuImages.length ? `
+  <button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
 ` : '')}
+
 
 
 
