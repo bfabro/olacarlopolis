@@ -7214,7 +7214,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                       dom: [{ inicio: "11:00", fim: "23:00" }]
                     },*/
                 address: "R. Padre Hugo, 460 - Carlopolis",
-                contact: "(43) 9 9160-5120",
+                contact: "(43) 99160-5120",
                 delivery: "Sim / Com Taxa",
                 facebook:"https://www.facebook.com/selaht.gastronomia",
                 instagram:"https://www.instagram.com/selaht.gastronomia/",
