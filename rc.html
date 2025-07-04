@@ -321,7 +321,21 @@
 
 
 		
+ <!-- NOVO CARD - Origem dos Acessos -->
+  <div class="card">
+    <h2 class="section-title">🔗 Origem dos Acessos</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Origem</th>
+          <th>Acessos</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaOrigem"></tbody>
+    </table>
+  </div>
 
+  <!-- Adicione aqui os outros cards de relatório existentes -->
 
 		
 		
@@ -751,6 +765,36 @@ localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriore
 
 			});
 		</script>
+
+
+
+<script>
+    // Suponha que os dados já foram buscados e agrupados em dadosAcessos
+    // E que diasFiltrados contenha as datas válidas selecionadas
+
+    const dadosAcessos = {}; // substitua pela estrutura real
+    const diasFiltrados = []; // substitua pela lista real de dias
+
+    const origens = {};
+    diasFiltrados.forEach(dia => {
+      const acessosDia = dadosAcessos[dia]?.detalhados || {};
+      Object.values(acessosDia).forEach(acesso => {
+        const origem = acesso.origem || "acesso direto";
+        if (!origens[origem]) origens[origem] = 0;
+        origens[origem]++;
+      });
+    });
+
+    const tabelaOrigem = document.getElementById("tabelaOrigem");
+    tabelaOrigem.innerHTML = "";
+    Object.entries(origens)
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([origem, total]) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${origem}</td><td style="text-align:center">${total}</td>`;
+        tabelaOrigem.appendChild(row);
+      });
+  </script>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 		<script>
