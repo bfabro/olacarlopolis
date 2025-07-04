@@ -225,7 +225,7 @@ function registrarAcesso() {
       plataforma: navigator.platform,
       pagina: window.location.href,
       referrer: document.referrer || "acesso direto",
-      origem: new URLSearchParams(window.location.search).get("origem") || "acesso direto",
+      origem: new URLSearchParams(window.location.search).get("o") || "acesso direto",
       tela: `${window.screen.width}x${window.screen.height}`,
       dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
     });
