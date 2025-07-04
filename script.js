@@ -970,10 +970,11 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
     <div class="onde-comer-card-esq">
       <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel">
     ${est.cardapioLink ? `
-  <button class="btn-cardapio" onclick="window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
+  <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
 ` : (est.menuImages && est.menuImages.length ? `
-  <button class="btn-cardapio" onclick="mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
+  <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
 ` : '')}
+
 
 
 
@@ -1219,11 +1220,15 @@ function mostrarPromocoes() {
 
 
 
-  document.querySelectorAll('.card-estab-promo').forEach((card, i) => {
-    card.addEventListener('click', function() {
-      abrirCarrosselPromocoes(promocoesPorComercio.indexOf(ordenados[i]));
-    });
+document.querySelectorAll('.card-estab-promo').forEach((card, i) => {
+  card.addEventListener('click', function() {
+    const comercio = ordenados[i];
+    registrarCliqueNaPromocao(comercio.nome);
+    abrirCarrosselPromocoes(promocoesPorComercio.indexOf(comercio));
   });
+});
+
+
 
   document.querySelectorAll('.promo-countdown-lista').forEach(el => {
     iniciarCountdown(el);
@@ -8960,3 +8965,20 @@ document.body.addEventListener('click', function(e) {
     document.body.appendChild(bg);
   }
 });
+
+
+
+function registrarCliqueCardapioOndeComer(nomeEstabelecimento) {
+  const hoje = new Date().toISOString().split("T")[0];
+  const ref = firebase.database().ref(`cliquesCardapiosOndeComer/${hoje}/${nomeEstabelecimento}`);
+  ref.transaction(valorAtual => (valorAtual || 0) + 1);
+}
+
+function registrarCliqueNaPromocao(nomeComercio) {
+  const hoje = new Date().toISOString().split('T')[0];
+  const ref = firebase.database().ref(`cliquesPromocoesPorComercio/${hoje}/${nomeComercio}`);
+  ref.transaction(valorAtual => (valorAtual || 0) + 1);
+}
+
+
+

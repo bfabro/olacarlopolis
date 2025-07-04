@@ -379,6 +379,37 @@
 			</table>
 		</div>
 
+	
+<div class="card">
+  <h2 class="section-title">📋 Cardápios (Onde Comer)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Estabelecimento</th>
+        <th>Cliques</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaOndeComerCardapio">
+      <tr>
+        <td colspan="2" style="text-align:center; color: #999;">Carregando...</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+		<div class="card" id="cardPromocoesClicadas" style="display: none;">
+			<h2 class="section-title">🔥 Promoções Acessadas</h2>
+			<table>
+				<thead>
+				<tr>
+					<th>Estabelecimento</th>
+					<th style="text-align: center;">Total de Cliques</th>
+				</tr>
+				</thead>
+				<tbody id="tabelaPromocoes"></tbody>
+			</table>
+		</div>
 
 
 
@@ -536,7 +567,39 @@ Object.entries(origens)
   });
 
 
+/// inicio contabilizar promoçoes
 
+const snapPromos = await db.ref("cliquesPromocoesPorComercio").once("value");
+const dadosPromos = snapPromos.val() || {};
+
+const tabelaPromocoes = document.getElementById("tabelaPromocoes");
+const cardPromocoes = document.getElementById("cardPromocoesClicadas");
+
+tabelaPromocoes.innerHTML = "";
+let totalPorComercio = {};
+
+diasFiltrados.forEach(dia => {
+  const dadosDia = dadosPromos[dia] || {};
+  Object.entries(dadosDia).forEach(([comercio, total]) => {
+    totalPorComercio[comercio] = (totalPorComercio[comercio] || 0) + total;
+  });
+});
+
+Object.entries(totalPorComercio)
+  .sort((a, b) => b[1] - a[1])
+  .forEach(([comercio, total]) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${comercio}</td>
+      <td style="text-align:center;">${total}</td>
+    `;
+    tabelaPromocoes.appendChild(row);
+  });
+
+cardPromocoes.style.display = Object.keys(totalPorComercio).length ? "block" : "none";
+
+
+/// fim contabilizar promoçoes 
 
 				const snapUsoPWA = await db.ref("usoPWA").once("value");
 				const dadosUsoPWA = snapUsoPWA.val() || {};
@@ -698,7 +761,39 @@ localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriore
 				localStorage.setItem("valoresAnterioresCidades", JSON.stringify(cidadesAnteriores));
 
 
+/// inicio contabilizar cardarpio
+async function carregarCliquesCardapioOndeComer() {
+  const snap = await db.ref("cliquesCardapiosOndeComer").once("value");
+  const dados = snap.val() || {};
+  const totais = {};
 
+  Object.values(dados).forEach(porDia => {
+    Object.entries(porDia).forEach(([estab, cliques]) => {
+      totais[estab] = (totais[estab] || 0) + cliques;
+    });
+  });
+
+  const tbody = document.getElementById("tabelaOndeComerCardapio");
+  tbody.innerHTML = "";
+
+  Object.entries(totais)
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([estab, total]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${estab}</td><td>${total}</td>`;
+      tbody.appendChild(tr);
+    });
+
+  if (Object.keys(totais).length === 0) {
+    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color: #999;">Nenhum clique registrado ainda</td></tr>`;
+  }
+}
+
+// Chamar ao carregar a página
+carregarCliquesCardapioOndeComer();
+
+
+/// fim contablizar cardapio
 				// Resumo por faixa de horário
 				const horarios = {};
 
@@ -786,10 +881,6 @@ localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriore
 
 			});
 		</script>
-
-
-
-<
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 		<script>
@@ -885,6 +976,8 @@ localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriore
 			});
 			console.log(mes, semana, diasDaSemana); 
 		</script>
+
+		
 
 
 
