@@ -3115,7 +3115,7 @@ nome: "Agro São José",
                 {
                     image: "images/comercios/lanchonete/mrpotato/perfil.jpg",
                     name: "Mr Potato",
-                    hours: "Qui a Ter: 18:30 as 23:00 <br> Qua: Fechado",
+                    hours: "Qui a Ter: 18:30h as 23:00h <br> Qua: Fechado",
                     statusAberto:".",
                     horarios: {
                       
