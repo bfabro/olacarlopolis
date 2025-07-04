@@ -542,6 +542,7 @@ rodriguinho:"s",
       didog:"s",
       xisbauinea:"s",
       mycoffee:"s",
+      mrpotato:"s",
   
       // material de construcao
       lojaferreira:"s",
@@ -989,13 +990,10 @@ function mostrarOndeComer(filtroCategoria = "Todos") {
       <h3>${est.name}</h3>
       
       <span class="onde-comer-endereco">
-  ${est.address
-    ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}"
-         target="_blank"
-         class="map-link">
-          ${est.address}
-       </a>`
-    : ""}
+  ${est.address && est.address.trim().toLowerCase() !== "somente delivery"
+    ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank" > ${est.address}</a>`
+    : `<span style="color:#ff0000; font-weight:bold"> ${est.address}</span>`
+  }
   <br>
 </span>
 
@@ -3109,6 +3107,61 @@ nome: "Agro São José",
                 
                     
                   ],               
+                },
+
+
+
+
+                {
+                    image: "images/comercios/lanchonete/mrpotato/perfil.jpg",
+                    name: "Mr Potato",
+                    hours: "Qui a Ter: 18:30 as 23:00 <br> Qua: Fechado",
+                    statusAberto:".",
+                    horarios: {
+                      
+                      seg: [{ inicio: "18:30", fim: "23:00" }],
+                      ter: [{ inicio: "18:30", fim: "23:00" }],
+                      qua: [],
+                      qui: [{ inicio: "18:30", fim: "23:00" }],
+                      sex: [{ inicio: "18:30", fim: "23:00" }],
+                      sab: [{ inicio: "18:30", fim: "23:00" }],
+                      dom: [{ inicio: "18:30", fim: "23:00" }]
+                    },
+                    address: "Somente Delivery",
+                    contact: "(43) 99128-0341",
+                    delivery: "Sim / Com Taxa",  
+                    instagram:"https://www.instagram.com/mr.potato_carlopolis/", 
+                    
+                    infoAdicional:"<a target='_blank' style='color:#2da6ff;' href='https://mrpotato-2.ola.click/products?utm_source=Chatbot&utm_campaign=greetings.open%F0%9F%8D%9F%F0%9F%94%A5'  >Cardapio On Line</a><br>Abrangência da entrega: CENTRO, VISTA ALEGRE, VISTA BELLA, TOMODATI, NOVO HORIZONTE 1, NOVO HORIZONTE 2, NOVO HORIZONTE 3, ITALIA, MURADOR, BELA VISTA, EL DORADO, AMARAL, ILHA BELLA, CTG, outro, ATRÁS DO CAMPO",
+                    cardapioLink: "https://mrpotato-2.ola.click/products?utm_source=Chatbot&utm_campaign=greetings.open%F0%9F%8D%9F%F0%9F%94%A5",                     
+                    menuImages: [                   
+                                "images/comercios/lanchonete/mrpotato/cardapio/1.jpg",
+                                "images/comercios/lanchonete/mrpotato/cardapio/2.jpg",
+                                "images/comercios/lanchonete/mrpotato/cardapio/3.jpg",
+                                "images/comercios/lanchonete/mrpotato/cardapio/4.jpg",
+                                "images/comercios/lanchonete/mrpotato/cardapio/5.jpg",
+                                "images/comercios/lanchonete/mrpotato/cardapio/6.jpg",
+                               
+                            ],   
+                    
+                    
+                    novidadesImages: [                    
+                      "images/comercios/lanchonete/mrpotato/divulgacao/1.jpg",
+                      "images/comercios/lanchonete/mrpotato/divulgacao/2.jpg",
+                      "images/comercios/lanchonete/mrpotato/divulgacao/3.jpg",
+                      "images/comercios/lanchonete/mrpotato/divulgacao/4.jpg",
+                                   
+                    
+                    ],         
+                  
+                        novidadesDescriptions:[
+                          "Umas das mais aclamadas…<br> MR. Potato Chef: Batata recheada com costela de boi desfiada e cream cheese, trazendo um sabor defumado irresistível. Ideal para quem busca um sabor intenso e marcante.<Br><Br> E também a outra opção de Frango com cheddar e bacon: Batata recheada com frango desfiado, cheddar cremoso e pedacinhos crocantes de bacon. Acompanha cebolinha para um toque especial.",
+                          "",
+                          "",
+                          "Fazemos com muito carinho e dedicação para ser incrível no visual e espetacular no sabor!",
+                        
+
+                        ] ,  
                 },
 
 
