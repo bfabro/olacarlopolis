@@ -313,7 +313,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 }
 
 const destaquesFixos = [
-   "feiradalua","farmaciadavila","relojoariamartini","racoessaojose","flaviogiovani", "esquinadopao", "vania",
+   "santamaria","relojoariamartini","racoessaojose","flaviogiovani", "esquinadopao", "vania",
   
 ]; 
 
@@ -4494,17 +4494,16 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     name: "Farmacia da Vila",
                     address: "R. Manguba, 320 - Carlopolis",
                     hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
-                    plantaoHorario: "08:00h às 21:00h", 
-                    plantaoData:"28/06 a 04/07",
+                    
                     statusAberto:".",
                     horarios: {                          
-                     seg: [{ inicio: "08:00", fim: "21:00" }],
-                      ter: [{ inicio: "08:00", fim: "21:00" }],
-                      qua: [{ inicio: "08:00", fim: "21:00" }],
-                      qui: [{ inicio: "08:00", fim: "21:00" }],
-                      sex: [{ inicio: "08:00", fim: "21:00" }],
-                      sab: [{ inicio: "08:00", fim: "21:00" }],
-                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                     seg: [{ inicio: "08:00", fim: "18:00" }],
+                      ter: [{ inicio: "08:00", fim: "18:00" }],
+                      qua: [{ inicio: "08:00", fim: "18:00" }],
+                      qui: [{ inicio: "08:00", fim: "18:00" }],
+                      sex: [{ inicio: "08:00", fim: "18:00" }],
+                      sab: [{ inicio: "08:00", fim: "12:00" }],
+                      dom: []
                     },  
                     contact: "(43) 99148-8478",
                     delivery: "Sim / Sem Taxa",
@@ -4648,16 +4647,19 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     name: "Santa Maria",
                     address: "R. Benedito Salles, nº 711, Carlopols",
                     hours: "Seg a Sex: 08:00h as 18h </br> Sab: 08:00h as 12:00h",
+                     plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"05/07 a 11/07",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
                     statusAberto:".",
                     horarios: {                          
-                      seg: [{ inicio: "08:00", fim: "18:00" }],
-                      ter: [{ inicio: "08:00", fim: "18:00" }],
-                      qua: [{ inicio: "08:00", fim: "18:00" }],
-                      qui: [{ inicio: "08:00", fim: "18:00" }],
-                      sex: [{ inicio: "08:00", fim: "18:00" }],
-                      sab: [{ inicio: "08:00", fim: "12:00" }],
-                      dom: []
-                    },  
+                       seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    }, 
                     contact: "(43) 99840-9658",
                     delivery: "Sim / Sem Taxa",
                     facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
@@ -4668,9 +4670,13 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                         "images/comercios/farmacia/santaMaria/divulgacao/2.jpg",     
                         "images/comercios/farmacia/santaMaria/divulgacao/3.jpg",
                         "images/comercios/farmacia/santaMaria/divulgacao/4.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/5.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/6.jpg",
                       
                     ], 
-                    novidadesDescriptions: [                            
+                    novidadesDescriptions: [
+                      "Aniversário de 30 anos da Farmácia Santa Maria, e quem ganha o presente é você! ❤️🎁❤️ Venha comemorar com a gente",
+                      "Estamos de Plantao! Conte com nós!",                            
                       "Nutricolin - Silício orgânico!Estimula as proteínas da beleza na pele, cabelos e unhas.Peça já o seu manipulado ❤️",
                        "Emagreça com saúde! Fórmula manipulada completa.",
                         "Colágeno Verisol em sachê.",
@@ -5290,6 +5296,7 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 
             /* [ 1 ] */
+            /*
                 {
                   image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
                     name: "Farmacia da Vila",
@@ -5328,38 +5335,54 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
                     "Sabia que aqui na Farmacia da vila, voce pode estar pagando suas contas?",
                   ],
                 },
-             /* */
+              */
 
 
-              /* [ 2 ]
+              /* [ 2 ]  */
+
                 {
-                  image: "images/comercios/farmacia/santaMaria/santamaria.png",
-                  name: "Santa Maria",
-                  address: "R. Benedito Salles, nº 711, Carlopols",
-                  contact: "(43) 99840-9658",
-                  plantaoHorario: "8:00h às 21:00h", 
-                  plantaoData:"26/04 a 02/05",
-                  
-                  delivery: "Sim / Sem Taxa",
-                  facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
-                  instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
-                  
-                  novidadesImages: [               
-                      "images/comercios/farmacia/santaMaria/divulgacao/1.png",
-                      "images/comercios/farmacia/santaMaria/divulgacao/2.png",     
-                      "images/comercios/farmacia/santaMaria/divulgacao/3.png",
-                      "images/comercios/farmacia/santaMaria/divulgacao/4.png",
-                      "images/comercios/farmacia/santaMaria/divulgacao/5.png",
-                  ], 
-                  novidadesDescriptions: [                            
-                    "Venham nos Visitar",
-                    "Cólicas do trato gastrintestinal",
-                    "Analgésico (para dor) antitérmico (para febre)",
-                    "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                    "Redução da febre e para o alívio de dores",
-                  ],
-              },
-            */
+                    image: "images/comercios/farmacia/santaMaria/santamaria.png",
+                    name: "Santa Maria",
+                    address: "R. Benedito Salles, nº 711 - Carlopols",
+                    hours: "Seg a Sex: 08:00h as 18h </br> Sab: 08:00h as 12:00h",
+                    plantaoHorario: "08:00h às 21:00h", 
+                    plantaoData:"05/07 a 11/07",
+                    hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                    statusAberto:".",
+                    horarios: {                          
+                       seg: [{ inicio: "08:00", fim: "21:00" }],
+                      ter: [{ inicio: "08:00", fim: "21:00" }],
+                      qua: [{ inicio: "08:00", fim: "21:00" }],
+                      qui: [{ inicio: "08:00", fim: "21:00" }],
+                      sex: [{ inicio: "08:00", fim: "21:00" }],
+                      sab: [{ inicio: "08:00", fim: "21:00" }],
+                      dom: [{ inicio: "08:00", fim: "21:00" }]
+                    }, 
+                    contact: "(43) 99840-9658",
+                    delivery: "Sim / Sem Taxa",
+                    facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
+                    instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
+                    
+                    novidadesImages: [               
+                        "images/comercios/farmacia/santaMaria/divulgacao/1.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/2.jpg",     
+                        "images/comercios/farmacia/santaMaria/divulgacao/3.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/4.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/5.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/6.jpg",
+                      
+                    ], 
+                    novidadesDescriptions: [
+                      "Aniversário de 30 anos da Farmácia Santa Maria, e quem ganha o presente é você! ❤️🎁❤️ Venha comemorar com a gente",
+                      "Estamos de Plantao! Conte com nós!",                            
+                      "Nutricolin - Silício orgânico!Estimula as proteínas da beleza na pele, cabelos e unhas.Peça já o seu manipulado ❤️",
+                       "Emagreça com saúde! Fórmula manipulada completa.",
+                        "Colágeno Verisol em sachê.",
+                         "Equilibre seu corpo e mente!",
+                     
+                    ],
+                },
+            
 
             /* [ 3 ]
 
