@@ -3484,12 +3484,8 @@ nome: "Agro São José",
                     address: "Rod. Jose Alves Pereira - Carlopolis",
                     contact: "(43) 98808-1911",
                     delivery: "Sim / Com Taxa",
-                    facebook: "www.facebook.com/uahh",
-                    instagram: "www.instagram.com/uahh",
-                    menuImages: [
-                 
-                     "images/comercios/pesqueiro/cardapio_aguamarine.jpg",
-                    ],                    
+                   
+                                    
                 },
             ],
         },
@@ -3767,7 +3763,7 @@ nome: "Agro São José",
                       qui: [{ inicio: "06:00", fim: "19:00" }],
                       sex: [{ inicio: "06:00", fim: "19:00" }],
                       sab: [{ inicio: "06:00", fim: "19:00" }],
-                      dom: [{ inicio: "06:00", fim: "14:00" }],
+                      dom: [],
                     }, 
                     address: "R. Benedito Salles, 615 - Carlopolis",
                     contact: "(43) 99653-9285",
