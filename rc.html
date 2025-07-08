@@ -761,20 +761,24 @@ localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriore
 				localStorage.setItem("valoresAnterioresCidades", JSON.stringify(cidadesAnteriores));
 
 
-/// inicio contabilizar cardarpio
-async function carregarCliquesCardapioOndeComer() {
-  const snap = await db.ref("cliquesCardapiosOndeComer").once("value");
-  const dados = snap.val() || {};
+/// Substitua a função atual por esta nova versão:
+function carregarCliquesCardapioOndeComerFiltrado(dados, diasFiltrados) {
   const totais = {};
 
-  Object.values(dados).forEach(porDia => {
-    Object.entries(porDia).forEach(([estab, cliques]) => {
+  diasFiltrados.forEach(dia => {
+    const dadosDoDia = dados[dia] || {};
+    Object.entries(dadosDoDia).forEach(([estab, cliques]) => {
       totais[estab] = (totais[estab] || 0) + cliques;
     });
   });
 
   const tbody = document.getElementById("tabelaOndeComerCardapio");
   tbody.innerHTML = "";
+
+  if (Object.keys(totais).length === 0) {
+    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color: #999;">Nenhum clique registrado ainda</td></tr>`;
+    return;
+  }
 
   Object.entries(totais)
     .sort((a, b) => b[1] - a[1])
@@ -783,14 +787,13 @@ async function carregarCliquesCardapioOndeComer() {
       tr.innerHTML = `<td>${estab}</td><td>${total}</td>`;
       tbody.appendChild(tr);
     });
-
-  if (Object.keys(totais).length === 0) {
-    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color: #999;">Nenhum clique registrado ainda</td></tr>`;
-  }
 }
 
+
 // Chamar ao carregar a página
-carregarCliquesCardapioOndeComer();
+const snapCardapios = await db.ref("cliquesCardapiosOndeComer").once("value");
+const dadosCardapios = snapCardapios.val() || {};
+carregarCliquesCardapioOndeComerFiltrado(dadosCardapios, diasFiltrados);
 
 
 /// fim contablizar cardapio

@@ -1425,6 +1425,69 @@ const promocoesPorComercio = [
   },
 
 
+
+{
+    nome: "Quitanda Pimenta Doce",
+    imagem: "images/comercios/quitanda/pimentaDoce/pimentadoce.png",
+    promocoes: [
+      {
+        imagem: "images/comercios/quitanda/pimentaDoce/promocao/1.jpg",
+        descricao: "Maracuja Azedo",
+        validade: "2025-07-15T20:00:00",
+        preco:"6,99",
+        preco_com_desconto: "4,99",        
+        whatsapp: "43988065747"
+      },
+
+
+       {
+        imagem: "images/comercios/quitanda/pimentaDoce/promocao/2.jpg",
+        descricao: "Caixa Cerveja Cristal",
+        validade: "2025-07-15T20:00:00",
+        preco:"34,99",
+        preco_com_desconto: "29,95",        
+        whatsapp: "43988065747"
+      },
+
+      {
+        imagem: "images/comercios/quitanda/pimentaDoce/promocao/3.jpg",
+        descricao: "Cerveja Heineken Und",
+        validade: "2025-07-15T20:00:00",
+        preco:"7,95",
+        preco_com_desconto: "5,95",        
+        whatsapp: "43988065747"
+      },
+
+          {
+        imagem: "images/comercios/quitanda/pimentaDoce/promocao/4.jpg",
+        descricao: "Vassoura Caipira",
+        validade: "2025-07-15T20:00:00",
+        preco:"24,00",
+        preco_com_desconto: "19,50",        
+        whatsapp: "43988065747"
+      },
+
+
+
+    ]
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    {
 
     nome: "Supermercado Zero Japan",
@@ -5132,20 +5195,6 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
 
 
 
-
- {
-              image: "images/informacoes/eventos/voley.jpg",
-              name: "Beach VolleyBall",
-              date: "06/07/2025",
-              address: "Arena Seu Luiz",
-             contact: "-",         
-              instagram:"https://www.instagram.com/volleyball_beach_carlopolis/",             
-              
-             
-          },
-
-
-
           {
               image: "images/informacoes/eventos/espacoBrincar.jpg",
               name: "Colonia de Ferias",
@@ -6780,20 +6829,20 @@ image: "images/comercios/despachante/rodriguinho/perfil.png",
             title: "Quitanda",
             establishments: [
                 {
-                  image: "images/comercios/quitanda/pimentadoce.png",
+                  image: "images/comercios/quitanda/pimentaDoce/pimentadoce.png",
                     name: "Pimenta Doce",
-                    hours: "Dom a Dom: 8h - 20h",
-                    address: "Rua kalil keder 491 centro",
+                    hours: "Dom a Dom: 08:00h as 20:00h",
+                    address: "Rua kalil keder, 491 - Carlopolis",
                     contact: "(43) 98806-5747",
                     delivery: "Não",
                     instagram:"https://www.instagram.com/quintanda.pimenta.doce/",
                     
                     novidadesImages: [
-                        "images/comercios/quitanda/divulgacao/1.png",
-                        "images/comercios/quitanda/divulgacao/2.png",
-                        "images/comercios/quitanda/divulgacao/3.png",
-                        "images/comercios/quitanda/divulgacao/4.png",
-                        "images/comercios/quitanda/divulgacao/5.png",
+                        "images/comercios/quitanda/pimentaDoce/divulgacao/1.png",
+                        "images/comercios/quitanda/pimentaDoce/divulgacao/2.png",
+                        "images/comercios/quitanda/pimentaDoce/divulgacao/3.png",
+                        "images/comercios/quitanda/pimentaDoce/divulgacao/4.png",
+                        "images/comercios/quitanda/pimentaDoce/divulgacao/5.png",
                     ],
                     novidadesDescriptions: [ 
                       
@@ -8988,13 +9037,13 @@ document.body.addEventListener('click', function(e) {
 
 
 function registrarCliqueCardapioOndeComer(nomeEstabelecimento) {
-  const hoje = new Date().toISOString().split("T")[0];
+  const hoje = getHojeBR();
   const ref = firebase.database().ref(`cliquesCardapiosOndeComer/${hoje}/${nomeEstabelecimento}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
 }
 
 function registrarCliqueNaPromocao(nomeComercio) {
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = getHojeBR();
   const ref = firebase.database().ref(`cliquesPromocoesPorComercio/${hoje}/${nomeComercio}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
 }
