@@ -1196,7 +1196,12 @@ if (
 
       return validadeA - validadeB;
     });
+/////
+////
+////
+////
 
+///
     ordenados.forEach((comercio, idx) => {
       const agora = new Date();
       let primeiraPromoValida = null;
@@ -1214,7 +1219,7 @@ if (
         
         <div class="info-estab-promo">
           <h3>${comercio.nome}</h3>
-          <div class="badge-promocoes"> ${comercio.promocoes.length} - Promoções</div>
+          <div class="badge-promocoes">Confira as ${comercio.promocoes.length} promoções</div>
           ${primeiraPromoValida
           ? `<div class="promo-countdown-lista" data-expira="${primeiraPromoValida.validade}" id="countdown-lista-${idx}"></div>`
           : `<span style="color:#B22222;font-weight:bold;">Sem promoções ativas</span>`

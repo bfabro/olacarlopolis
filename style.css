@@ -2306,12 +2306,12 @@ a:focus {
 }
 
 .badge-promocoes {
-  background: #ff1744;
+  background: #4d51ff;
   color: #fff;
   padding: 5px 14px;
-  border-radius: 8px;
+  border-radius: 20px;
   font-size: 1.01em;
-  font-weight: bold;
+  
   display: inline-block;
   margin-bottom: 8px;
   box-shadow: 0 1px 6px #ffbe3033;
@@ -2987,3 +2987,9 @@ a:focus {
 .fullscreen-img-bg:active {
   cursor: zoom-out;
 }
+
+
+
+
+
+
