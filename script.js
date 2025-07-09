@@ -6939,12 +6939,11 @@ if (
               "images/comercios/restaurante/assadaoRussao/divulgacao/1.png",
               "images/comercios/restaurante/assadaoRussao/divulgacao/2.png",
               "images/comercios/restaurante/assadaoRussao/divulgacao/3.png",
-              "images/comercios/restaurante/assadaoRussao/divulgacao/4.png",
+              
 
             ],
             novidadesDescriptions: [
-              "Sua noite merece um sabor especial! Venha saborear nossos pratos feitos e marmitex quentinhos, de segunda a sexta, das 18h30 às 21h!",
-              "m1",
+             "m1",
               "m2",
               "m3",
 
