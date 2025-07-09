@@ -1874,7 +1874,7 @@ if (
               "images/comercios/acai/thebestacai/divulgacao/7.jpg",
             ],
             novidadesDescriptions: [
-              'Agora na The Best Açai, você pode levar para casa, ou entao pedir pelo WhatsApp <a href="https://wa.me/5543988140469?text=Olá!%20Vi%20sua%20divulgação%20no%20site%20Olá%20Carlópolis." target="_blank" style="color:#25D366;">43 98814-0469</a>."',
+              'Agora na The Best Açai, você pode levar para casa, ou entao pedir pelo WhatsApp<Br><a href="https://wa.me/5543988140469?text=Olá!%20Vi%20sua%20divulgação%20no%20site%20Olá%20Carlópolis." target="_blank" style="color:#25D366;">43 98814-0469</a>.',
               "E aí já provou nossa piscininha de inverno? Não 😳. <br>Então vem se deliciar 😋",
               "Quem ama açaí, ama The Best.<br> São 12 sabores de açaí, sendo tradicional, do Pará e zero açúcar e mais 9 com sabor e trufado.<br> Aqui no the best Carlopolis você faz do seu jeito!!!!!",
               "Explosão de sabores com morango apenas no the best açaí!",
