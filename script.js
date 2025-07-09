@@ -4535,10 +4535,10 @@ if (
               "images/comercios/farmacia/drogaMais/divulgacao/3.png",
               "images/comercios/farmacia/drogaMais/divulgacao/4.png",
               "images/comercios/farmacia/drogaMais/divulgacao/5.png",
-              "images/comercios/farmacia/drogaMais/divulgacao/6.png",
+              
             ],
             novidadesDescriptions: [
-              "Arraia de Ofertas na semana do plantão! Venha conferir!",
+            
               "Quer garantir o melhor para o seu bebê?<br> Passe na Drogamais ou peça pelos nossos canais de atendimento!",
               "Tudo o que você precisa tem na DROGAMAIS! ❤️ <br>• Medicamentos • Perfumaria • Itens de beleza • Produtos de higiene! Vem pra Drogamais e encontre tudo em um só lugar! ",
               "Em dúvidas sobre sua receita?<br> Passe na Drogamais que a gente te ajuda!",
