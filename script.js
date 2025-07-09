@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "santamaria", "relojoariamartini", "racoessaojose", "flaviogiovani", "esquinadopao", "vania",
+    "santamaria", "thebestacai","relojoariamartini", "racoessaojose", "flaviogiovani", "esquinadopao", "vania",
 
   ];
 
@@ -727,6 +727,7 @@ document.addEventListener("DOMContentLoaded", function () {
     beachvolleyball: "s",
     cafebingo: "s",
     encontrocarroantigo: "s",
+    circuitomonisakdevoleidepraia: "s",
     festadosenhorbomjesus: "s",
     lowcity: "s",
     toroonagashi: "s",
@@ -1870,8 +1871,10 @@ if (
               "images/comercios/acai/thebestacai/divulgacao/4.jpg",
               "images/comercios/acai/thebestacai/divulgacao/5.jpg",
               "images/comercios/acai/thebestacai/divulgacao/6.jpg",
+              "images/comercios/acai/thebestacai/divulgacao/7.jpg",
             ],
             novidadesDescriptions: [
+              'Agora na The Best Açai, você pode levar para casa, ou entao pedir pelo WhatsApp <a href="https://wa.me/5543988140469?text=Olá!%20Vi%20sua%20divulgação%20no%20site%20Olá%20Carlópolis." target="_blank" style="color:#25D366;">43 98814-0469</a>."',
               "E aí já provou nossa piscininha de inverno? Não 😳. <br>Então vem se deliciar 😋",
               "Quem ama açaí, ama The Best.<br> São 12 sabores de açaí, sendo tradicional, do Pará e zero açúcar e mais 9 com sabor e trufado.<br> Aqui no the best Carlopolis você faz do seu jeito!!!!!",
               "Explosão de sabores com morango apenas no the best açaí!",
@@ -1883,6 +1886,7 @@ if (
               "images/comercios/acai/thebestacai/cardapio/1.jpg",
               "images/comercios/acai/thebestacai/cardapio/2.jpg",
               "images/comercios/acai/thebestacai/cardapio/3.jpg",
+              "images/comercios/acai/thebestacai/cardapio/4.jpg",
             ],
 
           },
@@ -5288,6 +5292,24 @@ if (
 
 
           },
+
+
+
+ {
+            image: "images/informacoes/eventos/volei_monizak.jpg",
+            name: "Circuito Monisak de Vôlei de Praia",
+            date: "27/07/2025",
+            address: "Clube Caravela",
+            infoAdicional: "Em homenagem ao inesquecível Monisak, grande incentivador do esporte e inspiração para todos nós, realizaremos este evento especial reunindo atletas, amigos e a comunidade em uma grande celebração ao vôlei de praia.<Br>🎫 Inscrição: R$ 60,00 por dupla<br>💰 Premiação:<br>🥇 1º lugar – R$ 300,00 + troféu<Br>🥈 2º lugar – R$ 200,00+ troféu<Br>🥉 3º lugar – R$ 100,00+ troféu<Br>🎖️Medalha a todos os participantes",
+            contact: "(43) 99627-2094 ",
+            contact2: "(43) 99659-5510 ",
+            contact3: "(43) 99123-6711 ",
+            instagram: "https://www.instagram.com/volleyball_beach_carlopolis/",
+
+
+          },
+
+
 
           {
             image: "images/informacoes/eventos/senhorbomjesus.png",
