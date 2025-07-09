@@ -5,6 +5,25 @@ function isAppInstalado() {
   return isStandaloneAndroid || isStandaloneIos;
 }
 
+function gerarMensagemWhatsApp() {
+  const agora = new Date();
+  const hora = agora.getHours();
+  let saudacao;
+
+  if (hora >= 5 && hora < 12) {
+    saudacao = "Bom dia!";
+  } else if (hora >= 12 && hora < 18) {
+    saudacao = "Boa tarde!";
+  } else if (hora >= 18 && hora <= 23) {
+    saudacao = "Boa noite!";
+  } else {
+    saudacao = "Desculpe pelo horário,";
+  }
+
+  return `${saudacao} Encontrei seu numero no Ola Carlopolis.`;
+}
+
+
 
 
 function getHojeBR() {
@@ -1011,7 +1030,7 @@ if (
 </span>
 
       <span class="onde-comer-telefone">
-        ${est.contact ? `<a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent('Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!')}" target="_blank" class="zap-link">
+        ${est.contact ? `<a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent(gerarMensagemWhatsApp())}" target="_blank" class="zap-link">
   <i class="fab fa-whatsapp whatsapp-icon"></i> ${est.contact}
 </a>
 ` : ""}
