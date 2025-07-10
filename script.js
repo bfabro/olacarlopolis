@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "santamaria", "thebestacai","relojoariamartini", "racoessaojose", "flaviogiovani", "esquinadopao", "vania",
+    "feiradalua", "santamaria", "thebestacai","relojoariamartini", "racoessaojose", "flaviogiovani", "esquinadopao", "vania",
 
   ];
 
@@ -2705,7 +2705,7 @@ if (
             ],
 
             novidadesDescriptions: [
-              "Cantando para vocês Rafaela Domingos <br>04/07 a partir das 19:00hrs",
+              "Cantando para vocês Fernando e Mary <br>11/07 a partir das 19:00hrs",
 
 
             ],
@@ -7021,7 +7021,6 @@ if (
               "images/comercios/restaurante/assadaoRussao/divulgacao/1.png",
               "images/comercios/restaurante/assadaoRussao/divulgacao/2.png",
               "images/comercios/restaurante/assadaoRussao/divulgacao/3.png",
-
               "images/comercios/restaurante/assadaoRussao/divulgacao/4.jpg",
                "images/comercios/restaurante/assadaoRussao/divulgacao/5.jpg",
                 
