@@ -7021,13 +7021,21 @@ if (
               "images/comercios/restaurante/assadaoRussao/divulgacao/1.png",
               "images/comercios/restaurante/assadaoRussao/divulgacao/2.png",
               "images/comercios/restaurante/assadaoRussao/divulgacao/3.png",
+
+              "images/comercios/restaurante/assadaoRussao/divulgacao/4.jpg",
+               "images/comercios/restaurante/assadaoRussao/divulgacao/5.jpg",
+                "images/comercios/restaurante/assadaoRussao/divulgacao/6.jpg",
+
               
 
             ],
             novidadesDescriptions: [
-             "m1",
-              "m2",
-              "m3",
+             "Marmita Churrasco!",
+              "Marmita de Salada",
+              "Marmita com Feijoada",
+              "Frango Assado pupuricado",
+              "Todos os Domingos, temos Frangos Assados!, encomende o teu!",
+              "",
 
             ],
 
