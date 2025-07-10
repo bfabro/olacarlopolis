@@ -644,6 +644,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // guia de pesca
     fabiosushimoto: "s",
 
+    //eletrecista
+    cyberneticosinstalacoes:"s",
+
     // montador de moveis
     hirancastro: "s",
 
@@ -5014,14 +5017,35 @@ if (
         title: "Eletrecista",
         establishments: [
           {
-            name: "Juca",
-            contact: "(43) 7890-1234",
+            image: "images/servicos/eletrecista/cybernetico/perfil.jpg",
+            name: "Cyberneticos instalações",
+            address:"R. Laurindo Franco Godoi, 1028 - Carlopolis",
+            hours: "Seg a Sab: 08:00h as 18:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "18:00" }],
+              dom: []
+            },
+            contact: "(43) 98854-4318",
+            instagram:"https://www.instagram.com/cyberneticos.pr/",
+            infoAdicional:"⚠️ - Atendemos Emergencias <br> 🔧 - Fazemos instalações:<br> 🏭 - Elerica Industriais<br>🌾 - Eletrica em sitios. ",
+            novidadesImages: [
+              "images/servicos/eletrecista/cybernetico/divulgacao/1.jpg",
+              "images/servicos/eletrecista/cybernetico/divulgacao/2.jpg",
+              
+            ],
+            novidadesDescriptions: [
+              "Instalação completa de consultorio.",
+              "Instalação de TV de de 72pol.",
+            ],
           },
 
-          {
-            name: "Jurandir",
-            contact: "(43) 8901-2345",
-          },
+         
         ],
       },
 
