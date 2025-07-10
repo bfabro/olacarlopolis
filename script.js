@@ -7024,7 +7024,7 @@ if (
 
               "images/comercios/restaurante/assadaoRussao/divulgacao/4.jpg",
                "images/comercios/restaurante/assadaoRussao/divulgacao/5.jpg",
-                "images/comercios/restaurante/assadaoRussao/divulgacao/6.jpg",
+                
 
               
 
@@ -7035,7 +7035,7 @@ if (
               "Marmita com Feijoada",
               "Frango Assado pupuricado",
               "Todos os Domingos, temos Frangos Assados!, encomende o teu!",
-              "",
+              
 
             ],
 
