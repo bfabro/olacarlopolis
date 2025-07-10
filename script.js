@@ -617,6 +617,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // topografia
     da2engenharia: "s",
 
+    //vidraçadia
+    sallesvidros:"s",
+
     //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
 
     //// INICIO SERVIÇOS ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4870,6 +4873,61 @@ if (
         ],
       },
 
+
+
+
+
+
+      //// vidraçaria
+{
+        link: document.querySelector("#menuVidracaria"),
+        title: "Vidraçãria",
+        establishments: [
+          {
+            image: "images/comercios/vidracaria/sallesVidros/perfil.jpg",
+            name: "Salles Vidros",
+            hours: "Seg a Sex: 08:00h as 17:30h<br>Sab: 08:00h as 12:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "17:30" },],
+              ter: [{ inicio: "08:00", fim: "17:30" },],
+              qua: [{ inicio: "08:00", fim: "17:30" },],
+              qui: [{ inicio: "08:00", fim: "17:30" },],
+              sex: [{ inicio: "08:00", fim: "17:30" },],
+              sab: [{ inicio: "08:00", fim: "12:00" },],
+              dom: []
+            },
+            address: "R. Benedito Salles, 1225 - Carlópolis",
+            contact: "(43) 99901-0269",
+            contact2: "(43) 99618-4867",
+            infoAdicional: "<strong>Somos Especialistas em:</strong><br>🧊 - Vidros Temperados<br>🚪 - Portas e Janelas<br>🚿 - Box<br>🏠 - Coberturas<br>🏢 - Sacadas e Fachadas<br>🔲 - Espelhos<br>🔒 - Fechaduras para Portas de Vidro",
+            instagram: "https://www.instagram.com/salles_vidross/",
+
+            novidadesImages: [
+              "images/comercios/vidracaria/sallesVidros/divulgacao/1.jpg",
+              "images/comercios/vidracaria/sallesVidros/divulgacao/2.jpg",
+              "images/comercios/vidracaria/sallesVidros/divulgacao/3.jpg",
+              "images/comercios/vidracaria/sallesVidros/divulgacao/4.jpg",
+              "images/comercios/vidracaria/sallesVidros/divulgacao/5.jpg",
+              "images/comercios/vidracaria/sallesVidros/divulgacao/6.jpg",
+
+            ],
+            novidadesDescriptions: [
+              "Painel de Espelho 04mm lapidado e polido com a qualidade Belga.",
+              "Portinhas de pia no vidro temperado fumê!!",
+              "Portas 4 folhas 10mm incolor!!!",
+              "Box em vidro temperado fume com acabamento na cor preto.",
+              "Muro em vidro temperado fume com acabamento na cor preto.",
+              "Obra com portas 4 folhas, janelas 2 e folhas, fixo, basculante e box em vidro temperado incolor com acabamento preto.",
+            ],
+          },
+        ],
+      },
+
+      /// vidraçaria
+
+
+
       ///////////////////
 
       {
@@ -5014,7 +5072,7 @@ if (
 
       {
         link: document.querySelector("#menuEletricista"),
-        title: "Eletrecista",
+        title: "Eletricista",
         establishments: [
           {
             image: "images/servicos/eletrecista/cybernetico/perfil.jpg",
@@ -5033,7 +5091,7 @@ if (
             },
             contact: "(43) 98854-4318",
             instagram:"https://www.instagram.com/cyberneticos.pr/",
-            infoAdicional:"⚠️ - Atendemos Emergencias <br> 🔧 - Fazemos instalações:<br> 🏭 - Elerica Industriais<br>🌾 - Eletrica em sitios. ",
+            infoAdicional:"⚠️ - Atendemos Emergencias <br> 🔧 - Fazemos instalações:<br> 🏭 - Eletrica Industriais<br>🌾 - Eletrica em sitios. ",
             novidadesImages: [
               "images/servicos/eletrecista/cybernetico/divulgacao/1.jpg",
               "images/servicos/eletrecista/cybernetico/divulgacao/2.jpg",
