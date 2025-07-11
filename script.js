@@ -569,10 +569,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //supermercado
     bompreco: "s",
-    carreiro: "s",
+    carreiro: "n",
     comprebemmais: "s",
     obarateiro: "s",
-    kelve: "s",
+    kelve: "n",
     rocha: "s",
     zerojapan: "s",
 
@@ -596,7 +596,7 @@ document.addEventListener("DOMContentLoaded", function () {
     hime: "s",
     pesqueirodogalego: "s",
     portal: "s",
-    neia: "s",
+    neia: "n",
     //oficinadosabor:"s",
     paiol: "s",
     restaurantedadi: "s",
@@ -4081,7 +4081,7 @@ if (
           {
             image: "images/comercios/supermercado/carreiro.png",
             name: "Carreiro",
-            address: "R. Benedito Salles, 341 ",
+            address: "R. Benedito Salles, 341 - Carlopolis",
             hours: "Seg a Sex: 08:00h as 19:00h <br> Dom: 08:00 as 12:00h",
             statusAberto: ".",
             horarios: {
@@ -4117,7 +4117,7 @@ if (
           {
             image: "images/comercios/supermercado/compreBemMais/compreBemMais.png",
             name: "Compre Bem Mais",
-            address: "R. Andrino Soares, 355",
+            address: "R. Andrino Soares, 355 - Carlopolis",
             hours: "Seg a Sex: 07:00h as 20:00h </br> Dom: 08:00 as 12:00h",
             statusAberto: ".",
             horarios: {
@@ -4150,7 +4150,7 @@ if (
           {
             image: "images/comercios/supermercado/obarateiro.png",
             name: "O Barateiro",
-            address: "Bendito Salles, 1168 ",
+            address: "Bendito Salles, 1168 - Carlopolis",
             hours: "Seg a Sex: 8:00h as 21:00h </br> Dom: 08:00h as 12:00h",
             contact: "(43) 99196-7816",
             delivery: "Sim / Sem Taxa",
@@ -4179,7 +4179,7 @@ if (
           },
 
           {
-            image: "images/comercios/supermercado/rocha.jpg",
+            image: "images/comercios/supermercado/rocha/perfil.jpg",
             name: "Rocha",
             hours: "Seg a Sex: 06:00h as 20:00h <br> Dom: 06:00h as 12:00h",
             statusAberto: ".",
@@ -4192,33 +4192,20 @@ if (
               sab: [{ inicio: "06:00", fim: "20:00" }],
               dom: [{ inicio: "06:00", fim: "20:00" }],
             },
-            address: "Av. Elson Soares, 767 ",
+            address: "Av. Elson Soares, 767 - Carlopolis",
             contact: "(43) 99105-9324",
             delivery: "Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
-            instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
+            facebook: "https://www.facebook.com/supermercadorochaclps",
+            instagram: "https://www.instagram.com/_supermercado.rocha/",
           },
 
-          {
-            name: "Carriel",
-            address: "PR-218, 1168 ",
-            hours: "Seg a Sex: 8:00h as 21:00h </br> Dom: 07:00h as 12:00h",
-            contact: "(43) 3456-7890",
-            delivery: "Sim / Sem Taxa",
-          },
-          {
-            name: "Compre Bem +",
-            address: "PR-218, 1168 ",
-            hours: "Seg a Sex 8h - 21h </br> Dom: 07 - 12h",
-            contact: "(43) 3456-7890",
-            delivery: "Sim / Sem Taxa",
-          },
+         
 
           {
             image: "images/comercios/supermercado/zerojapan/zerojapan.png",
             name: "Zero Japan",
-            address: "R. Doutora Paula e Silva, 445 - Carlopolis ",
-            hours: "Dom a Dom: 8:00h as 20:00h",
+            address: "R. Doutora Paula e Silva, 445 - Carlopolis",
+            hours: "Dom a Dom: 08:00h as 20:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -4246,12 +4233,9 @@ if (
             novidadesDescriptions: [
               "Temos a Famosa La fufu",
               "Tilapia disponível aqui no Zero Japan",
-
               "Hidratante beijavel mais famoso, chegou no Zero Japan",
-
               "Venha fazer seu cartão na ZeroJapan",
               "Cerveja Geladinha, aqui no Zero Japan",
-
             ],
           },
         ],
@@ -4265,7 +4249,7 @@ if (
           {
             image: "images/comercios/produtosNaturais/cantinhoSaudavel/perfil.jpg",
             name: "Cantinho Saudável",
-            hours: "Seg a Sex: 09:00h as 18:00h<br>Sab: 09:00 as 12:40h",
+            hours: "Seg a Sex: 09:00h as 18:00h<br>Sab: 09:00h as 12:40h",
             statusAberto: "a",
             horarios: {
 
@@ -4329,7 +4313,7 @@ if (
               sab: [{ inicio: "08:00", fim: "12:00" }],
               dom: [],
             },
-            address: " R. Kalil Keder, 503 - Centro, Carlópolis",
+            address: " R. Kalil Keder, 503 - Carlópolis",
             contact: "(43) 99692-9674",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/p/JM-Produtos-de-Limpeza-100076385972701/",
@@ -4422,7 +4406,7 @@ if (
           {
             image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
             name: "Bio Farma",
-            address: "R. Laurindo Franco Godoy, 464",
+            address: "R. Laurindo Franco Godoy, 464 - Carlopolis",
             hours: "<strong>Seg a Sex:</strong> 08:00h as 18:00h </br><strong>Sab: </strong>08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
@@ -4504,21 +4488,11 @@ if (
           },
 
 
-          //
-          //
-          //
-
-
-          //
-          //
-          //
-
 
           {
             image: "images/comercios/farmacia/drogaMais/drogamais.png",
             name: "DrogaMais",
             hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "21:00" }],
@@ -4705,7 +4679,7 @@ if (
           {
 
             name: "PopularMais",
-            address: "Elson Soares, 787, Sala 2",
+            address: "Elson Soares, 787, Sala 2 - Carlopolis",
             hours: "Seg a Sex: 08:00h as 18:00h <br>Sab: 08:00h as 12:00h",
 
             statusAberto: ".",
@@ -4747,7 +4721,7 @@ if (
           {
             image: "images/comercios/farmacia/santaMaria/santamaria.png",
             name: "Santa Maria",
-            address: "R. Benedito Salles, nº 711, Carlopols",
+            address: "R. Benedito Salles, nº 711 - Carlopols",
             hours: "Seg a Sex: 08:00h as 18h </br> Sab: 08:00h as 12:00h",
             plantaoHorario: "08:00h às 21:00h",
             plantaoData: "05/07 a 11/07",
@@ -4837,7 +4811,7 @@ if (
           {
             image: "images/comercios/topografia/da2/perfil.png",
             name: "DA2 Engenharia",
-            hours: "Seg a Sex: 8:00h as 12:00h - 13:30h as 17:30h<br>Sab e Dom: Fechado",
+            hours: "Seg a Sex: 08:00h as 12:00h - 13:30h as 17:30h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:30", fim: "17:30" }],
@@ -4848,7 +4822,7 @@ if (
               sab: [],
               dom: []
             },
-            address: "Rua Antônio Jonas Ferreira Pinto, 395, Carlópolis ",
+            address: "Rua Antônio Jonas Ferreira Pinto, 395 - Carlópolis ",
             contact: "Anderson: (43) 99128-6761",
             contact2: "Mingo: (43) 99146-4264",
             infoAdicional: "Somos Especialista em Georreferenciamento<br>Eng. Florestal<br>Eng. de Segurança do Trabalho<br>CAR",
