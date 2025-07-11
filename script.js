@@ -1914,7 +1914,7 @@ if (
             },
             address: "R. Benedito Salles, 409 - Carlopolis",
             contact: "(43) 99176-7871",
-            contact2: " (43) 98868-7038",
+          
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/turminha_do_acai/",
 
