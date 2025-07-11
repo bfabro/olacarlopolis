@@ -4419,7 +4419,9 @@ if (
               dom: []
             },
 
-            contact: "(43) 3566-1473",
+            
+            contact:"(43) 99988-9376",
+            contact2: "(43) 3566-1473",
             delivery: "Sim / Sem Taxa",
 
             instagram: "https://www.instagram.com/farmaciabiofarmaa/",
@@ -5545,12 +5547,12 @@ if (
             {
               image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
               name: "Bio Farma",
-                  address: "Rua Laurindo Franco Godoy, 464",
+                  address: "Rua Laurindo Franco Godoy, 464 - Carlopolis",
                   contact:"(43) 99988-9376",
                   contact2: "(43) 3566-1473",
                   delivery: "Sim / Sem Taxa",
               plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"03/05 a 09/05",     
+              plantaoData:"12/07 a 18/07",     
               statusAberto:".",
               horarios: {                          
                 seg: [{ inicio: "08:00", fim: "21:00" }],
