@@ -4412,38 +4412,37 @@ if (
             image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
             name: "Bio Farma",
             address: "R. Laurindo Franco Godoy, 464 - Carlopolis",
-            hours: "<strong>Seg a Sex:</strong> 08:00h as 18:00h </br><strong>Sab: </strong>08:00h as 12:00h",
+            hours: "Seg a Sex:</strong> 08:00h as 18:00h </br>Sab: </strong>08:00h as 12:00h",
+             plantaoHorario: "08:00h às 21:00h", 
+              plantaoData:"12/07 a 18/07",  
             statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
-              dom: []
-            },
-
+           horarios: {                          
+                seg: [{ inicio: "08:00", fim: "21:00" }],
+                ter: [{ inicio: "08:00", fim: "21:00" }],
+                qua: [{ inicio: "08:00", fim: "21:00" }],
+                qui: [{ inicio: "08:00", fim: "21:00" }],
+                sex: [{ inicio: "08:00", fim: "21:00" }],
+                sab: [{ inicio: "08:00", fim: "21:00" }],
+                dom: [{ inicio: "08:00", fim: "21:00" }]
+              },    
             
             contact:"(43) 99988-9376",
             contact2: "(43) 3566-1473",
             delivery: "Sim / Sem Taxa",
-
+            facebook: "https://www.facebook.com/p/Farm%C3%A1cia-Bio-Farma-100063579070016/?_rdr",
             instagram: "https://www.instagram.com/farmaciabiofarmaa/",
 
             novidadesImages: [
               "images/comercios/farmacia/bioFarma/divulgacao/1.png",
               "images/comercios/farmacia/bioFarma/divulgacao/2.png",
               "images/comercios/farmacia/bioFarma/divulgacao/3.png",
-              "images/comercios/farmacia/bioFarma/divulgacao/4.png",
-              "images/comercios/farmacia/bioFarma/divulgacao/5.png",
+              
             ],
             novidadesDescriptions: [
-              "Analgésico de alívio eficaz para dores intensas",
-              "Cólicas do trato gastrintestinal",
-              "Analgésico (para dor) antitérmico (para febre)",
-              "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-              "Redução da febre e para o alívio de dores",
+              "Venham Nos Visitar, na BioFarma encontre o que precisa!",
+              "Cabelo seco igual a um turista perdido no deserto da Austrália?Sorte a sua que a linha tem tudo o que Você precisa para deixar os cabelos macios e intensamente hidratados!!",
+              "Linha completa da Gota Dourada para o seu cabelo ficar Maravilhoso e causar inveja a todoos❤️",
+             
             ],
           },
 
@@ -4730,18 +4729,17 @@ if (
             name: "Santa Maria",
             address: "R. Benedito Salles, nº 711 - Carlopols",
             hours: "Seg a Sex: 08:00h as 18h </br> Sab: 08:00h as 12:00h",
-            plantaoHorario: "08:00h às 21:00h",
-            plantaoData: "05/07 a 11/07",
+     
             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "21:00" }],
-              ter: [{ inicio: "08:00", fim: "21:00" }],
-              qua: [{ inicio: "08:00", fim: "21:00" }],
-              qui: [{ inicio: "08:00", fim: "21:00" }],
-              sex: [{ inicio: "08:00", fim: "21:00" }],
-              sab: [{ inicio: "08:00", fim: "21:00" }],
-              dom: [{ inicio: "08:00", fim: "21:00" }]
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
+              dom: []
             },
             contact: "(43) 99840-9658",
             delivery: "Sim / Sem Taxa",
@@ -5502,7 +5500,7 @@ if (
 
 
           /* [ 2 ]  */
-
+/* 
           {
             image: "images/comercios/farmacia/santaMaria/santamaria.png",
             name: "Santa Maria",
@@ -5546,8 +5544,8 @@ if (
             ],
           },
 
-
-          /* [ 3 ]
+*/
+          /* [ 3 ]*/
 
             {
               image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
@@ -5576,18 +5574,15 @@ if (
                   "images/comercios/farmacia/bioFarma/divulgacao/1.png",
                   "images/comercios/farmacia/bioFarma/divulgacao/2.png",     
                   "images/comercios/farmacia/bioFarma/divulgacao/3.png",
-                  "images/comercios/farmacia/bioFarma/divulgacao/4.png",
-                  "images/comercios/farmacia/bioFarma/divulgacao/5.png",
+              
               ], 
               novidadesDescriptions: [                            
-                "Venham nos Visitar",
-                "Cólicas do trato gastrintestinal",
-                "Analgésico (para dor) antitérmico (para febre)",
-                "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                "Redução da febre e para o alívio de dores",
+              "Venham Nos Visitar, na BioFarma encontre o que precisa!",
+              "Cabelo seco igual a um turista perdido no deserto da Austrália?Sorte a sua que a linha tem tudo o que Você precisa para deixar os cabelos macios e intensamente hidratados!!",
+              "Linha completa da Gota Dourada para o seu cabelo ficar Maravilhoso e causar inveja a todoos❤️",
               ],
           },
-          */
+          
 
           /* [ 4 ]
           {
