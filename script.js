@@ -598,7 +598,7 @@ document.addEventListener("DOMContentLoaded", function () {
     portal: "s",
     neia: "n",
     //oficinadosabor:"s",
-    paiol: "s",
+    paiol: "n",
     restaurantedadi: "s",
     sabordaroca: "s",
     selahtgrill: "s",
@@ -1463,6 +1463,11 @@ if (
         },
       ]
     },
+
+
+
+
+    
 
 
 
