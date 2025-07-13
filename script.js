@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "feiradalua", "santamaria", "thebestacai","relojoariamartini", "racoessaojose", "flaviogiovani", "esquinadopao", "vania",
+     "biofarma", "thebestacai","relojoariamartini", "racoessaojose", "flaviogiovani", "esquinadopao", "vania",
 
   ];
 
@@ -634,6 +634,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pesqueirodogalego: "s",
     portal: "s",
     neia: "n",
+    namigojapaneserestaurant:"s",
     //oficinadosabor:"s",
     paiol: "n",
     restaurantedadi: "s",
@@ -4470,12 +4471,14 @@ if (
             instagram: "https://www.instagram.com/farmaciabiofarmaa/",
 
             novidadesImages: [
-              "images/comercios/farmacia/bioFarma/divulgacao/1.png",
+"images/comercios/farmacia/bioFarma/divulgacao/1.jpg", 
               "images/comercios/farmacia/bioFarma/divulgacao/2.png",
               "images/comercios/farmacia/bioFarma/divulgacao/3.png",
+              "images/comercios/farmacia/bioFarma/divulgacao/4.png",
               
             ],
             novidadesDescriptions: [
+                "Estamos de Plantão!",  
               "Venham Nos Visitar, na BioFarma encontre o que precisa!",
               "Cabelo seco igual a um turista perdido no deserto da Austrália?Sorte a sua que a linha tem tudo o que Você precisa para deixar os cabelos macios e intensamente hidratados!!",
               "Linha completa da Gota Dourada para o seu cabelo ficar Maravilhoso e causar inveja a todoos❤️",
@@ -5607,13 +5610,15 @@ if (
               facebook: "https://www.facebook.com/p/Farm%C3%A1cia-Bio-Farma-100063579070016/?_rdr",
               instagram: "https://www.instagram.com/farmaciabiofarmaa/",
               
-              novidadesImages: [               
-                  "images/comercios/farmacia/bioFarma/divulgacao/1.png",
-                  "images/comercios/farmacia/bioFarma/divulgacao/2.png",     
-                  "images/comercios/farmacia/bioFarma/divulgacao/3.png",
+              novidadesImages: [ 
+                "images/comercios/farmacia/bioFarma/divulgacao/1.jpg",              
+                  "images/comercios/farmacia/bioFarma/divulgacao/2.png",
+                  "images/comercios/farmacia/bioFarma/divulgacao/3.png",     
+                  "images/comercios/farmacia/bioFarma/divulgacao/4.png",
               
               ], 
-              novidadesDescriptions: [                            
+              novidadesDescriptions: [   
+                "Estamos de Plantão!",                         
               "Venham Nos Visitar, na BioFarma encontre o que precisa!",
               "Cabelo seco igual a um turista perdido no deserto da Austrália?Sorte a sua que a linha tem tudo o que Você precisa para deixar os cabelos macios e intensamente hidratados!!",
               "Linha completa da Gota Dourada para o seu cabelo ficar Maravilhoso e causar inveja a todoos❤️",
@@ -7189,6 +7194,55 @@ if (
 
 
           {
+            image: "images/comercios/restaurante/namigo/perfil.jpg",
+            name: "NamiGO Japanese Restaurant",
+            hours: "Seg a Sab: 11:00h - 00:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "11:00", fim: "00:00" }],
+              ter: [{ inicio: "11:00", fim: "00:00" }],
+              qua: [{ inicio: "11:00", fim: "00:00" }],
+              qui: [{ inicio: "11:00", fim: "21:30" }],
+              sex: [{ inicio: "11:00", fim: "21:30" }],
+              sab: [{ inicio: "11:00", fim: "21:30" }],
+              dom: []
+            },
+            address: "R. Padre Hugo, 460 - Carlopolis",
+            contact: "(43) 99166-5381",
+            delivery: "Sim / Com Taxa",
+            instagram: "https://www.instagram.com/nami_g0/",
+           
+            menuImages: [
+              "images/comercios/restaurante/namigo/cardapio/1.jpg",
+"images/comercios/restaurante/namigo/cardapio/2.jpg",
+"images/comercios/restaurante/namigo/cardapio/3.jpg",
+"images/comercios/restaurante/namigo/cardapio/4.jpg",
+"images/comercios/restaurante/namigo/cardapio/5.jpg",
+"images/comercios/restaurante/namigo/cardapio/6.jpg",
+"images/comercios/restaurante/namigo/cardapio/7.jpg",
+"images/comercios/restaurante/namigo/cardapio/8.jpg",
+"images/comercios/restaurante/namigo/cardapio/9.jpg",
+
+            ],
+
+            novidadesImages: [
+              "images/comercios/restaurante/namigo/divulgacao/1.jpg",
+              "images/comercios/restaurante/namigo/divulgacao/2.jpg",
+           
+              
+
+            ], novidadesDescriptions: [
+               "Uramaki Philadelphia especial",
+              "Do jeitinho que o Cliente pediu!",
+             
+             
+
+            ],
+
+          },
+
+
+          {
             image: "images/comercios/restaurante/neia/neia.png",
             name: "Neia",
             hours: "Seg a Sex: 11:00h as 14:00h <br>Sab: 11:00h as 16:00h",
@@ -7336,13 +7390,6 @@ if (
 
 
 
-
-
-
-
-
-
-
           {
             image: "images/comercios/restaurante/portal/portal.png",
             name: "Portal",
@@ -7431,18 +7478,18 @@ if (
           {
             image: "images/comercios/restaurante/selaht/selaht.png",
             name: "Selaht Grill",
-            hours: "<span style='color:#FF0000;font-weight:bold;'>VOLTAMOS DIA 10/07/2025</span>",
-            /*
-            statusAberto:".",
-                horarios: {                    
-                  seg: [],
-                  ter: [{ inicio: "11:00", fim: "23:00" }],
-                  qua: [{ inicio: "11:00", fim: "23:00" }],
-                  qui: [{ inicio: "11:00", fim: "23:00" }],
-                  sex: [{ inicio: "11:00", fim: "23:00" }],
-                  sab: [{ inicio: "11:00", fim: "23:00" }],
-                  dom: [{ inicio: "11:00", fim: "23:00" }]
-                },*/
+           /* hours: "<span style='color:#FF0000;font-weight:bold;'>VOLTAMOS DIA 10/07/2025</span>",*/
+           hours: "Seg a Sab: 11:00h - 00:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "11:00", fim: "00:00" }],
+              ter: [{ inicio: "11:00", fim: "00:00" }],
+              qua: [{ inicio: "11:00", fim: "00:00" }],
+              qui: [{ inicio: "11:00", fim: "21:30" }],
+              sex: [{ inicio: "11:00", fim: "21:30" }],
+              sab: [{ inicio: "11:00", fim: "21:30" }],
+              dom: []
+            },
             address: "R. Padre Hugo, 460 - Carlopolis",
             contact: "(43) 99160-5120",
             delivery: "Sim / Com Taxa",
