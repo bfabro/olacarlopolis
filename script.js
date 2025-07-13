@@ -7485,9 +7485,9 @@ if (
               seg: [{ inicio: "11:00", fim: "00:00" }],
               ter: [{ inicio: "11:00", fim: "00:00" }],
               qua: [{ inicio: "11:00", fim: "00:00" }],
-              qui: [{ inicio: "11:00", fim: "21:30" }],
-              sex: [{ inicio: "11:00", fim: "21:30" }],
-              sab: [{ inicio: "11:00", fim: "21:30" }],
+              qui: [{ inicio: "11:00", fim: "00:00" }],
+              sex: [{ inicio: "11:00", fim: "00:00" }],
+              sab: [{ inicio: "11:00", fim: "00:00" }],
               dom: []
             },
             address: "R. Padre Hugo, 460 - Carlopolis",
