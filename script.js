@@ -194,6 +194,43 @@ document.addEventListener("DOMContentLoaded", function () {
   if (iconeEl) {
     iconeEl.style.color = "#808080";
   }
+/// inicio detecta usuarios online e desconecta
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  registrarAcesso();
+
+  const onlineUsersRef = firebase.database().ref("onlineUsers");
+
+  // Cria um ID único para cada usuário
+  const userId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const userRef = onlineUsersRef.child(userId);
+
+  // Salva o usuário como online
+  userRef.set({
+    hora: new Date().toLocaleTimeString(),
+    navegador: navigator.userAgent,
+    tela: `${window.screen.width}x${window.screen.height}`
+  });
+
+  // Remove automaticamente do banco quando o usuário fecha o site
+  userRef.onDisconnect().remove();
+
+  // Atualiza o contador de usuários online
+  onlineUsersRef.on("value", (snapshot) => {
+    const userCount = snapshot.numChildren();
+    const contador = document.getElementById("contador");
+    if (contador) {
+      contador.textContent = userCount;
+    }
+  });
+});
+
+
+
+
+/// inicio detecta usuarios online e desconecta
+
 
   onlineUsersRef.on("value", (snapshot) => {
     const userCount = snapshot.numChildren();
