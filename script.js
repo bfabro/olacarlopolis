@@ -9249,5 +9249,35 @@ function registrarCliqueNaPromocao(nomeComercio) {
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
 }
 
+function vindoDoInstagram() {
+  return navigator.userAgent.toLowerCase().includes('instagram');
+}
+
+function mostrarAvisoInstagram() {
+  if (vindoDoInstagram()) {
+    const aviso = document.createElement('div');
+    aviso.style = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 15px;
+      background: #ffcc00;
+      color: #000;
+      font-weight: bold;
+      text-align: center;
+      z-index: 9999;
+    `;
+    aviso.innerHTML = `
+      ⚠️ Para salvar o app na tela inicial, abra no navegador do seu celular (Chrome ou Safari).
+      <span style="margin-left:10px; cursor:pointer;" onclick="this.parentElement.remove()">✖️</span>
+    `;
+    document.body.appendChild(aviso);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  mostrarAvisoInstagram();
+});
 
 
