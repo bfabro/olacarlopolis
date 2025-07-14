@@ -4915,11 +4915,11 @@ if (
             hours: "Seg a Sex: 08:30h as 11:30h - 13:30h as 17:30h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
-              ter: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
-              qua: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
-              qui: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
-              sex: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
+              seg: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
+              ter: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
+              qua: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
+              qui: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
+              sex: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
               sab: [],
               dom: []
             },
