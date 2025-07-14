@@ -9249,35 +9249,51 @@ function registrarCliqueNaPromocao(nomeComercio) {
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
 }
 
+
+
+
+
+
+
 function vindoDoInstagram() {
   return navigator.userAgent.toLowerCase().includes('instagram');
 }
 
 function mostrarAvisoInstagram() {
-  if (vindoDoInstagram()) {
-    const aviso = document.createElement('div');
-    aviso.style = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 15px;
-      background: #ffcc00;
-      color: #000;
-      font-weight: bold;
-      text-align: center;
-      z-index: 9999;
-    `;
-    aviso.innerHTML = `
-      ⚠️ Para salvar o app na tela inicial, abra no navegador do seu celular (Chrome ou Safari).
-      <span style="margin-left:10px; cursor:pointer;" onclick="this.parentElement.remove()">✖️</span>
-    `;
-    document.body.appendChild(aviso);
-  }
+  const aviso = document.createElement('div');
+  aviso.style = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    background: #ffcc00;
+    color: #000;
+    font-weight: bold;
+    text-align: center;
+    z-index: 9999;
+  `;
+  aviso.innerHTML = `
+    ⚠️ Para adicionar o App em seu celular, abra o site no navegador (Chrome ou Safari). <a href="googlechrome://www.olacarlopolis.com" target="_blank">Site</a>.
+    <span style="margin-left:10px; cursor:pointer;" onclick="this.parentElement.remove()">✖️</span>
+  `;
+  document.body.appendChild(aviso);
 }
 
+// Quando o DOM estiver carregado
 document.addEventListener("DOMContentLoaded", () => {
-  mostrarAvisoInstagram();
+  const botaoApp = document.getElementById("menuApp"); // ⬅️ Substitua pelo ID correto, se for diferente
+
+  if (botaoApp) {
+    botaoApp.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      if (vindoDoInstagram()) {
+        mostrarAvisoInstagram();
+      } else {
+        // Redireciona para a explicação ou inicia instalação
+        window.location.href = "#menuApp"; // ou qualquer outra ação que você deseje
+      }
+    });
+  }
 });
-
-
