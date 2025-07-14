@@ -2991,7 +2991,7 @@ if (
               sab: [{ inicio: "18:00", fim: "23:30" }],
               dom: [{ inicio: "18:00", fim: "23:30" }]
             },
-            address: "R. Padre Hugo, 478 , Carlópolis",
+            address: "R. Padre Hugo, 478 - Carlópolis",
             contact: "(43) 99604-9187",
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/cantinhodapraca043/",
