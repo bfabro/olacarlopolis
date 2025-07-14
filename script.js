@@ -9274,8 +9274,8 @@ function mostrarAvisoInstagram() {
     z-index: 9999;
   `;
   aviso.innerHTML = `
-    ⚠️ Para adicionar o App em seu celular, abra o site no navegador (Chrome ou Safari). <a href="googlechrome://www.olacarlopolis.com" target="_blank">Site</a>.
-    <span style="margin-left:10px; cursor:pointer;" onclick="this.parentElement.remove()">✖️</span>
+    ⚠️ Voce esta utilizando o acesso pelo Instagram!<br>Para instalar o App, toque nos 3 pontinhos (⋮) no canto superior e selecione "Abrir no navegador".
+        <span style="margin-left:10px; cursor:pointer;" onclick="this.parentElement.remove()">✖️</span>
   `;
   document.body.appendChild(aviso);
 }
