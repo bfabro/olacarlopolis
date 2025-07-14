@@ -7254,15 +7254,15 @@ if (
           {
             image: "images/comercios/restaurante/namigo/perfil.jpg",
             name: "NamiGO Japanese Restaurant",
-            hours: "Seg a Sab: 11:00h - 00:00h",
+            hours: "Seg a Sab: 11:00h as 15:00h - 18:00h as 00:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "11:00", fim: "00:00" }],
-              ter: [{ inicio: "11:00", fim: "00:00" }],
-              qua: [{ inicio: "11:00", fim: "00:00" }],
-              qui: [{ inicio: "11:00", fim: "00:00" }],
-              sex: [{ inicio: "11:00", fim: "00:00" }],
-              sab: [{ inicio: "11:00", fim: "00:00" }],
+              seg: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
+              ter: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
+              qua: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
+              qui: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
+              sex: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
+              sab: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
               dom: []
             },
             address: "R. Padre Hugo, 460 - Carlopolis",
