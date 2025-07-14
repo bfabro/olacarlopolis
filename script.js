@@ -4907,7 +4907,7 @@ if (
       //// vidraçaria
 {
         link: document.querySelector("#menuVidracaria"),
-        title: "Vidraçãria",
+        title: "Vidraçaria",
         establishments: [
           {
             image: "images/comercios/vidracaria/sallesVidros/perfil.jpg",
