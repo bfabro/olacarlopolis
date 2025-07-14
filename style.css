@@ -2993,3 +2993,11 @@ a:focus {
 
 
 
+
+
+.status-tag_comer .ate-hora {
+  font-size: 12px;
+  font-weight: normal;
+  margin-top: 2px;
+  color: #0d0f80;
+}

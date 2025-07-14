@@ -1064,9 +1064,13 @@ if (
     <div class="onde-comer-info">
     
       <span class="onde-comer-categoria">${est.categoria}</span> ${est.horarios ? `
-    <span class="status-tag_comer ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
-      ${estaAbertoAgora(est.horarios) ? 'ABERTO' : 'FECHADO'}
-    </span>` : ""}
+   <span class="status-tag_comer ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
+  ${estaAbertoAgora(est.horarios) 
+    ? `ABERTO <div class="ate-hora">até ${horarioFechamentoAtual(est.horarios) || '--:--'}</div>` 
+    : 'FECHADO'}
+</span>` : ""}
+
+    
       <h3>${est.name}</h3>
       
       <span class="onde-comer-endereco">
@@ -6624,6 +6628,16 @@ if (
         ],
       },
 
+
+
+///
+///
+      ////////
+      ////////
+      ////////
+
+      ///////
+      
       {
         link: document.querySelector("#menuBrinquedos"),
         title: "Loja de Brinquedo",
@@ -9341,3 +9355,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
