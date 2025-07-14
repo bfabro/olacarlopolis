@@ -4912,15 +4912,15 @@ if (
           {
             image: "images/comercios/vidracaria/sallesVidros/perfil.jpg",
             name: "Salles Vidros",
-            hours: "Seg a Sex: 08:00h as 17:30h<br>Sab: 08:00h as 12:00h",
+            hours: "Seg a Sex: 08:30h as 11:30h - 13:30h as 17:30h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "17:30" },],
-              ter: [{ inicio: "08:00", fim: "17:30" },],
-              qua: [{ inicio: "08:00", fim: "17:30" },],
-              qui: [{ inicio: "08:00", fim: "17:30" },],
-              sex: [{ inicio: "08:00", fim: "17:30" },],
-              sab: [{ inicio: "08:00", fim: "12:00" },],
+              seg: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
+              ter: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
+              qua: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
+              qui: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
+              sex: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "71:30" }],
+              sab: [],
               dom: []
             },
             address: "R. Benedito Salles, 1225 - Carlópolis",
