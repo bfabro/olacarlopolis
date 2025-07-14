@@ -595,7 +595,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ione: "s",
     cantinhodapraca: "s",
     caldodecanaamaral: "s",
-    levisalgados: "s",
+    levisalgados: "n",
     espacogourmet: "s",
     kidoglanches: "s",
     pracalanches: "s",
