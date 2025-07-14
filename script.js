@@ -488,6 +488,9 @@ document.addEventListener("DOMContentLoaded", function () {
     paulinhoautopecas: "s",
     norbaautopecas: "s",
 
+    //autoeletrica
+    renanautoeletrica:"s",
+
     // artesanato
     judite: "s",
 
@@ -503,7 +506,7 @@ document.addEventListener("DOMContentLoaded", function () {
     panacea: "s",
 
     // borracharia
-    vidanova: "s",
+    vidanova: "n",
     // deposito de gas
     liagas: "s",
     cncasadogas: "s",
@@ -6576,6 +6579,47 @@ if (
             address: "R. Laurindo Franco de Godoi, 90",
             contact: "(43) 99951-1540",
             delivery: "Sim / Sem Taxa",
+          },
+        ],
+      },
+
+
+      {
+        link: document.querySelector("#menuAutoEletrico"),
+        title: "Auto Eletrico",
+        establishments: [
+          {
+             image: "images/comercios/autoEletrica/renan/perfil.jpg",
+            name: "Renan Auto Elétrica",
+            hours: "Seg a Sex: 08:00h as 18:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [],
+              dom: [],
+            },
+            address: "R. Genova, 20 - Carlopolis",
+            contact: "(43) 99956-2443",
+            instagram:"https://www.instagram.com/renan_autoeletrica/",
+            infoAdicional:"🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos<br>🚗 - Serviço de Leva e Tras!",
+          novidadesImages: [
+              "images/comercios/autoEletrica/renan/divulgacao/1.jpg",
+          
+
+            ],
+            novidadesDescriptions: [
+              "Ampla area para tambem atendimento em Caminhoes, Tratores e maquinario agricola",
+                 
+              
+
+            ],
+          
+          
+          
           },
         ],
       },
