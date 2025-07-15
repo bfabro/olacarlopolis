@@ -4546,13 +4546,13 @@ if (
             hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "21:00" }],
-              ter: [{ inicio: "08:00", fim: "21:00" }],
-              qua: [{ inicio: "08:00", fim: "21:00" }],
-              qui: [{ inicio: "08:00", fim: "21:00" }],
-              sex: [{ inicio: "08:00", fim: "21:00" }],
-              sab: [{ inicio: "08:00", fim: "21:00" }],
-              dom: [{ inicio: "08:00", fim: "21:00" }]
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
+              dom: []
             },
             address: "R. Benedito Salles, 903 - Carlopolis",
             contact: "(43) 98411-9145",
