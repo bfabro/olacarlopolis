@@ -771,8 +771,6 @@ document.addEventListener("DOMContentLoaded", function () {
     frutfest: "s",
     campeonatopescaesportivatucunare: "s",
     coloniadeferias: "s",
-    beachvolleyball: "s",
-    cafebingo: "s",
     encontrocarroantigo: "s",
     circuitomonisakdevoleidepraia: "s",
     festadosenhorbomjesus: "s",
@@ -5355,23 +5353,6 @@ if (
 
 
 
-
-
-
-
-          {
-            image: "images/informacoes/eventos/cafeBingo.jpg",
-            name: "Cafe Bingo",
-            date: "13/07/2025",
-            address: "Rotary Clube",
-            infoAdicional: "Café Beneficiente ao Amigos de Patas",
-            contact: "(43) 99145-3387",
-            instagram: "https://www.instagram.com/anjos_depatasclps/",
-            facebook: "https://www.facebook.com/Anjos-de-Patas-Carl%C3%B3polis-PR-100083209006791/?_rdr",
-
-
-
-          },
 
 
           {
