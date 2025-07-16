@@ -9318,7 +9318,7 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('appinstalled', () => {
   console.log('✅ PWA instalado detectado');
 
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = new Date().toLocaleDateString('pt-BR').split('/').reverse().join('-');
 
   fetch(`https://contadoracessos-default-rtdb.firebaseio.com/instalacoesPWA/${hoje}.json`, {
     method: "POST",
