@@ -7729,6 +7729,41 @@ if (
           ///
           ///
 
+
+//15/07
+
+
+{
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/22.jpg",
+            descricaoFalecido: "Faleceu em Londrina aos 47 anos de idade, Sra 'IRACI DA SILVA PEREIRA'.<Br>A cerimônia iniciará hoje às 10:45 horas no velório municipal de Carlópolis.<Br>Seu sepultamento será hoje às 16:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏"
+
+          },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/21.jpg",
+            descricaoFalecido: "Faleceu em Joaquim Távora aos 74 anos de idade, Sra 'JOANA NOGUEIRA BRESSANI', mais conhecida como: filha do Expedicionário Agrícola Alves Nogueira.<br>A cerimônia iniciará hoje às 19:15 horas desta Quarta - Feira no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às 11:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏"
+
+          },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/20.jpg",
+            descricaoFalecido: "Faleceu em Carlópolis aos 76 anos de idade, Sra 'SUZANA LOURDES DE SOUSA HERNANDES', mais conhecida como: Mãe do Daniel pedreiro.<br>A cerimônia iniciará hoje às 17:45 horas desta Segunda - Feira no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às 13:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏"
+
+          },
+
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/19.jpg",
+            descricaoFalecido: "Faleceu em Carlópolis aos 80 anos de idade, Sra 'MARIA APARECIDA DE OLIVEIRA', mais conhecida como: Mãe da Preta Manicure.<br>A cerimônia iniciará hoje às 02:00 horas desta Segunda - Feira no velório municipal de Carlópolis.<br>Seu sepultamento será hoje às 13:30 horas Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏"
+
+          },
+
+
+
           //01/07
 
           {
