@@ -9353,3 +9353,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// (seu conteúdo original permanece acima)
+
+// ✅ REGISTRO DO SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+    .then(reg => {
+      console.log('🛡️ Service Worker registrado com sucesso:', reg.scope);
+    })
+    .catch(err => {
+      console.error('❌ Falha ao registrar o Service Worker:', err);
+    });
+}
+
+// ✅ DETECÇÃO DE INSTALAÇÃO DO PWA
+window.addEventListener('appinstalled', () => {
+  console.log('✅ PWA instalado detectado');
+
+  const hoje = new Date().toISOString().split('T')[0];
+
+  fetch(`https://contadoracessos-default-rtdb.firebaseio.com/instalacoesPWA/${hoje}.json`, {
+    method: "POST",
+    body: JSON.stringify({
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(() => {
+    console.log('📤 Instalação registrada no Firebase');
+  })
+  .catch((err) => {
+    console.error('❌ Erro ao registrar instalação:', err);
+  });
+});
