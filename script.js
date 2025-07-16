@@ -9004,7 +9004,19 @@ ${!establishment.descricaoFalecido ? `
 
 
   // Detecta quando o app for instalado como PWA
-  window.addEventListener('appinstalled', () => {
+  // ✅ 1. REGISTRO DO SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+    .then(reg => {
+      console.log('🛡️ Service Worker registrado com sucesso:', reg.scope);
+    })
+    .catch(err => {
+      console.error('❌ Falha ao registrar o Service Worker:', err);
+    });
+}
+
+// ✅ 2. DETECÇÃO DE INSTALAÇÃO DO PWA
+window.addEventListener('appinstalled', () => {
   console.log('✅ PWA instalado detectado');
 
   const hoje = new Date().toISOString().split('T')[0];
@@ -9018,12 +9030,15 @@ ${!establishment.descricaoFalecido ? `
     headers: {
       "Content-Type": "application/json"
     }
-  }).then(() => {
-    console.log('📦 Instalação registrada no Firebase');
-  }).catch((err) => {
-    console.error('❌ Falha ao registrar instalação:', err);
+  })
+  .then(() => {
+    console.log('📤 Instalação registrada no Firebase');
+  })
+  .catch((err) => {
+    console.error('❌ Erro ao registrar instalação:', err);
   });
 });
+
 
 
 
