@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-     "biofarma", "thebestacai","relojoariamartini", "racoessaojose", "flaviogiovani", "esquinadopao", "vania",
+     "biofarma", "thebestacai","esquinadopao","relojoariamartini", "racoessaojose", "flaviogiovani",  "vania",
 
   ];
 
