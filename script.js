@@ -9054,7 +9054,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 if (window.matchMedia('(display-mode: standalone)').matches) {
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = getHojeBR();
 
   const tipoConexao = navigator.connection?.effectiveType || "desconhecido";
 
