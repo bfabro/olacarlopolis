@@ -9005,25 +9005,19 @@ ${!establishment.descricaoFalecido ? `
 
   // Detecta quando o app for instalado como PWA
   window.addEventListener('appinstalled', () => {
-    console.log('✅ PWA instalado detectado');
+  console.log('✅ PWA instalado detectado');
 
-    const hoje = new Date().toISOString().split('T')[0];
-
-    fetch(`https://contadoracessos-default-rtdb.firebaseio.com/instalacoesPWA/${hoje}.json`, {
-      method: "POST",
-      body: JSON.stringify({
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent
-      }),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(() => {
-      console.log('📦 Instalação registrada no Firebase');
-    }).catch((err) => {
-      console.error('❌ Falha ao registrar instalação:', err);
-    });
+  const hoje = new Date().toISOString().split('T')[0];
+  const ref = firebase.database().ref(`instalacoesPWA/${hoje}`);
+  ref.push({
+    timestamp: new Date().toISOString(),
+    userAgent: navigator.userAgent
+  }).then(() => {
+    console.log('📦 Instalação registrada no Firebase');
+  }).catch((err) => {
+    console.error('❌ Falha ao registrar instalação:', err);
   });
+});
 
 
 
