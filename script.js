@@ -700,7 +700,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // taxista
     douglasdotaxi: "s",
     lucianodotaxi: "s",
-    rogerdotaxi: "s",
+    dorivalmattos: "s",
 
     // VETERINARIO
 
@@ -7725,6 +7725,19 @@ if (
         link: document.querySelector("#menuTaxista"),
         title: "Taxista",
         establishments: [
+
+
+            {
+              image: "images/servicos/taxi/dorival/perfil.jpg",
+            name: "Dorival Mattos",
+            hours: "Dom a Dom: <span style='color:red'>24horas</span>",
+            address: "Ponto N2 - Em Frente a Igreja Matriz",
+            contact: "(43) 99620-9900",
+             contact2: "(43) 98830-2110",
+           
+             facebook:"https://www.facebook.com/dorival.mattos.1",
+             infoAdicional:"Viagens e Serviços <span style='color:red'>24horas</span><br> Area Rural, Urbana e Aeroporto",
+          },
           {
             name: "Douglas do Taxi",
             hours: "Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
@@ -7739,12 +7752,7 @@ if (
             contact: "(43) 99631-5034",
           },
 
-          {
-            name: "Roger do Taxi",
-            hours: "Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
-            address: "Em Frente ao banco Itau",
-            contact: "(43) 99175-8283",
-          },
+          
         ],
       },
 
