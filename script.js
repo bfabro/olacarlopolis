@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-     "biofarma", "thebestacai","esquinadopao","relojoariamartini", "racoessaojose", "flaviogiovani",  "vania",
+     "biofarma", "thebestacai","esquinadopao","relojoariamartini",  "gustavinho","sallesvidros",  "vania",
 
   ];
 
@@ -777,6 +777,10 @@ document.addEventListener("DOMContentLoaded", function () {
     lowcity: "s",
     toroonagashi: "s",
     passeiociclisticorotary: "s",
+    aniversariomclobosdafronteira:"s",
+    torneiofutebolsuico:"s",
+    escolhadarainhafrutfest:"s",
+    cafedamanharotapr218:"s",
 
 
 
@@ -5418,6 +5422,28 @@ if (
           },
 
 
+
+
+           {
+            image: "images/informacoes/eventos/escolhaRainha.jpg",
+            name: "Escolha da Rainha Frut Fest",
+            date: "16/08/2025",
+            address: "Caravela Clube",
+            contact: "-",
+            instagram: "https://www.instagram.com/caravelaclube/",
+          },
+
+
+           {
+            image: "images/informacoes/eventos/torneioFutebol.jpg",
+            name: "Torneio Futebol Suiço",
+            date: "24/08/2025",
+            address: "Vale dos Sonhos",
+            contact: "(43) 99667-4021",
+            instagram: "https://www.instagram.com/clubevaledossonhos/",
+          },
+
+
           {
             image: "images/informacoes/eventos/frutFest.png",
             name: "FrutFest",
@@ -5429,6 +5455,17 @@ if (
 
           },
 
+            {
+            image: "images/informacoes/eventos/rotapr218.jpg",
+            name: "Café da manha Rota PR218",
+            date: "21/09/25",
+            address: "Caldo de Cana Amaral",
+            contact: "(43) 99837-5390",
+            instagram: "https://www.instagram.com/rotapr218/",
+
+
+          },
+
           {
             image: "images/informacoes/eventos/lowCity.png",
             name: "LowCity",
@@ -5436,6 +5473,18 @@ if (
             address: "Centro de Eventos Ilha do Ponciano",
             contact: "-",
             instagram: "https://www.instagram.com/lowcity_043club/",
+
+
+          },
+
+
+          {
+            image: "images/informacoes/eventos/loboFronteira.jpg",
+            name: "Aniversario MC Lobos da Fronteira",
+            date: "11/10/2025 e 12/10/2025",
+            address: "Centro de Eventos Ilha do Ponciano",
+            contact: "(43) 99909-2933",
+            instagram: "https://www.instagram.com/lobosdafronteiramc/",
 
 
           },
