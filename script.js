@@ -1057,6 +1057,8 @@ if (
 
 
 
+ 
+
 
 
 
@@ -1083,13 +1085,23 @@ if (
   <br>
 </span>
 
-      <span class="onde-comer-telefone">
-        ${est.contact ? `<a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent(gerarMensagemWhatsApp())}" target="_blank" class="zap-link">
-  <i class="fab fa-whatsapp whatsapp-icon"></i> ${est.contact}
-</a>
+   <span class="onde-comer-telefone">
+  ${est.contact ? `
+    <a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent(gerarMensagemWhatsApp())}" target="_blank" class="zap-link">
+      <i class="fab fa-whatsapp whatsapp-icon"></i> ${est.contact}
+    </a>
+  ` : ""}
+</span>
+${est.novidadesImages && est.novidadesImages.length ? `
+  <div class="fotos-abaixo-telefone">
+    <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')">Fotos</button>
+  </div>
 ` : ""}
-      </span>
-      
+
+
+   
+
+
     </div>
     
   </div>
@@ -1113,6 +1125,70 @@ if (
   });
 
 
+  
+
+
+function mostrarFotos(nomeNormalizado) {
+  // Procura o estabelecimento pelo nome normalizado
+  let est = null;
+  categories.forEach(cat => {
+    cat.establishments.forEach(e => {
+      if (normalizeName(e.name) === nomeNormalizado && e.novidadesImages && e.novidadesImages.length) {
+        est = e;
+      }
+    });
+  });
+
+  if (!est) {
+    alert("Nenhuma foto de divulgação encontrada!");
+    return;
+  }
+
+  // Remove qualquer modal anterior
+  document.querySelectorAll('.modal-fotos-overlay').forEach(el => el.remove());
+
+  // Monta o HTML do modal de fotos
+  let html = `
+    <div class="modal-fotos-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.90); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+      <div class="modal-fotos" style="background: #fff; border-radius: 16px; max-width: 90vw; max-height: 90vh; overflow: auto; padding: 24px; position: relative;">
+        <button class="close-modal-fotos" style="position: absolute; top: 12px; right: 16px; font-size: 2rem; background: none; border: none; color: #333; cursor: pointer;">&times;</button>
+        <h2 style="text-align: center; margin-bottom: 20px;">Fotos de ${est.name}</h2>
+        <div class="modal-fotos-imgs" style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;">
+  `;
+
+  est.novidadesImages.forEach((img, idx) => {
+    const descricao = est.novidadesDescriptions?.[idx] || '';
+    html += `
+      <div style="text-align: center;">
+        <img src="${img}" alt="Foto ${idx + 1}" style="max-width: 320px; max-height: 260px; border-radius: 10px; box-shadow:0 2px 12px #0002;" loading="lazy">
+        <div style="margin-top:8px; color: #444; font-size: 1rem;">${descricao}</div>
+      </div>
+    `;
+  });
+
+  html += `
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Insere o modal no body
+  document.body.insertAdjacentHTML('beforeend', html);
+
+  // Evento para fechar ao clicar no botão
+  document.querySelector('.close-modal-fotos').onclick = function () {
+    document.querySelector('.modal-fotos-overlay').remove();
+  };
+
+  // Fecha ao clicar fora do modal
+  document.querySelector('.modal-fotos-overlay').onclick = function (e) {
+    if (e.target === this) this.remove();
+  };
+}
+window.mostrarFotos = mostrarFotos;
+
+
+
 
   function mostrarCardapio(nomeNormalizado) {
     // Procura sempre o PRIMEIRO que tem menuImages
@@ -1124,7 +1200,12 @@ if (
         }
       });
     });
+
+   
     if (!est) return;
+
+  
+
 
     // Remove modal antiga se existir
     document.querySelectorAll('.modal-cardapio-overlay').forEach(el => el.remove());
@@ -1166,7 +1247,7 @@ if (
   ///////// fim onde comer
 
 
-
+  
 
 
 
@@ -1512,12 +1593,6 @@ if (
     },
 
 
-
-
-    
-
-
-
     {
       nome: "Quitanda Pimenta Doce",
       imagem: "images/comercios/quitanda/pimentaDoce/pimentadoce.png",
@@ -1563,20 +1638,6 @@ if (
 
       ]
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -7298,6 +7359,8 @@ if (
             address: "R. Padre Hugo, 460 - Carlopolis",
             contact: "(43) 99166-5381",
             delivery: "Sim / Com Taxa",
+             infoAdicional: "<a target='_blank' style='color:#2da6ff;' href='https://namigocarlopolis.eatfood.app/'>Cardapio On Line</a>",
+            
             instagram: "https://www.instagram.com/nami_g0/",
             cardapioLink: "https://namigocarlopolis.eatfood.app/",
            
@@ -9430,3 +9493,10 @@ window.addEventListener('appinstalled', () => {
     console.error('❌ Erro ao registrar instalação:', err);
   });
 });
+
+
+
+
+
+
+

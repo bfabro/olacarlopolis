@@ -2681,7 +2681,7 @@ a:focus {
   color: #ff8800;
   font-weight: bold;
   font-size: 0.97em;
-  margin-bottom: 3px;
+  margin-bottom: px;
   display: block;
 }
 .btn-cardapio {
@@ -2696,6 +2696,21 @@ a:focus {
 }
 .btn-cardapio:hover {
   background: #ff8800;
+}
+
+
+.btn-fotos_onde {
+  margin-top: 0px;
+  background: #f48840;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.btn-fotos_onde:hover {
+  background: #2f00ff;
 }
 
 .modal-cardapio-overlay {
@@ -3022,3 +3037,101 @@ a:focus {
   background-color: #2958d4;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+.modal-fotos-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-fotos {
+  background: white;
+  padding: 20px;
+  max-width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  position: relative;
+  text-align: center;
+}
+
+.modal-fotos h2 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  color: #333;
+}
+
+.close-modal-fotos {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-fotos-imgs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.foto-com-descricao {
+  text-align: center;
+  max-width: 300px;
+}
+
+.foto-com-descricao img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.foto-com-descricao p {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #444;
+}
+
+
+
+
+.fotos-abaixo-telefone {
+  margin-top: 4px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.btn-fotos_onde {
+      margin-top: 0px;
+    background: #f4ac40;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: background 0.16s;
+}
+.btn-fotos_onde:hover {
+  background: #3363ff;
+}
