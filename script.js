@@ -1077,8 +1077,12 @@ if (
     
       <h3>${est.name}</h3>
       
-     <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
-  <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank">${est.address}</a>
+    <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
+  ${
+    est.address && est.address.trim().toLowerCase() !== "somente delivery"
+      ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank">${est.address}</a>`
+      : `<span style="color:#ff0000; font-weight:bold">${est.address}</span>`
+  }
 </span>
 
    <span class="onde-comer-telefone">
