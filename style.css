@@ -2785,8 +2785,6 @@ a:focus {
 
 
 
-
-
 .filtro-comidas-card {
   background: #fff;
   border-radius: 18px;
@@ -3134,4 +3132,20 @@ a:focus {
 }
 .btn-fotos_onde:hover {
   background: #3363ff;
+}
+
+
+
+.endereco-uma-linha {
+  display: block;
+  max-width: 310px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+.endereco-uma-linha a {
+  color: inherit;
+  text-decoration: underline;
 }
