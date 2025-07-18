@@ -7380,13 +7380,19 @@ window.mostrarFotos = mostrarFotos;
             novidadesImages: [
               "images/comercios/restaurante/namigo/divulgacao/1.jpg",
               "images/comercios/restaurante/namigo/divulgacao/2.jpg",
+              "images/comercios/restaurante/namigo/divulgacao/3.jpg",
+              "images/comercios/restaurante/namigo/divulgacao/4.jpg",
+              "images/comercios/restaurante/namigo/divulgacao/5.jpg",
+             
            
               
 
             ], novidadesDescriptions: [
-               "Uramaki Philadelphia especial",
-              "Do jeitinho que o Cliente pediu!",
-             
+               "🍔 Sushi Burger: criatividade japonesa com alma brasileira! <br>Unindo tradição e inovação, o Sushi Burger traz uma explosão de texturas e sabores. No lugar do pão, discos empanados de arroz temperado com cream cheese, douradinhos por fora e cremosos por dentro.<br>🐟 O recheio é montado com salmão (grelhado ou cru), couve crispy, batata-doce crocante e um toque generoso de cream cheese — tudo finalizado com molho tarê.<br>✨ No NamiGO, cada Sushi Burger é uma experiência única: ousado, surpreendente e irresistível desde a primeira mordida.",
+              "🍄 Shimeji na manteiga: simplicidade que encanta!<br>Clássico da culinária japonesa, o shimeji é um cogumelo delicado, de sabor marcante e textura macia. Salteado na manteiga com shoyu, ele se transforma em um prato aromático, reconfortante e cheio de umami.<br>🔥 No NamiGO, o shimeji é preparado na hora, com manteiga derretida e o ponto perfeito entre maciez e sabor intenso. Ideal como entrada ou acompanhamento — impossível resistir!",
+             "🌊 Ceviche: frescor, tradição e sabor no mesmo prato!<br>De origem peruana, originalmente o ceviche é um prato à base de peixe cru marinado no limão, com toques de cebola roxa, coentro e pimenta. Uma explosão cítrica e refrescante que atravessou fronteiras e ganhou o coração dos amantes da culinária oriental e latino-americana.<br>🐟 No NamiGO, o ceviche é preparado com cortes frescos e tempero equilibrado especial da casa, perfeito para quem busca leveza sem abrir mão do sabor.",
+             "🍣 Joy (jyo ou Jow): o sushi que virou paixão nacional!<BR>Inspirado no gunkan maki, o Joy é um sushi envolto em salmão fresco, recheado com combinações cremosas e irresistíveis — como shimeji, camarão ou o clássico salmão com cream cheese.<Br>✨ No NamiGO, cada Joy é montado na hora, com cortes delicados e sabor que derrete na boca. Uma explosão de textura e frescor em cada mordida!",
+              "🔥 Você já provou um verdadeiro Teppan-yaki?<Br>Tradicional e cheio de técnica, o teppan-yaki nasceu no Japão pós-guerra e conquistou o mundo com sua combinação de sabor, performance e frescor.<BR>Na chapa quente (teppan), carnes, legumes e frutos do mar ganham vida em uma explosão de aromas e texturas!<BR>🍱 No NamiGO, o teppan é preparado na hora, com ingredientes selecionados e aquele toque que transforma cada refeição em experiência.",
              
 
             ],
