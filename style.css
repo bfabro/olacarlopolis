@@ -3001,3 +3001,24 @@ a:focus {
   margin-top: 2px;
   color: #0d0f80;
 }
+
+
+
+
+.btn-gerar-card {
+  background-color: #4070f4;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-block;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-gerar-card:hover {
+  background-color: #2958d4;
+}
+

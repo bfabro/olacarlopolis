@@ -7299,6 +7299,7 @@ if (
             contact: "(43) 99166-5381",
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/nami_g0/",
+            cardapioLink: "https://namigocarlopolis.eatfood.app/",
            
             menuImages: [
               "images/comercios/restaurante/namigo/cardapio/1.jpg",
