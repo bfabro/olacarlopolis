@@ -3172,7 +3172,7 @@ window.mostrarFotos = mostrarFotos;
               sab: [{ inicio: "17:30", fim: "23:30" }],
               dom: [{ inicio: "15:00", fim: "23:30" }]
             },
-            address: "Av. Turística Elias Mehi Mansur, 738 - Carlopolis",
+            address: "Av. Turística Elias Mansur, 738 - Carlopolis",
             contact: "(43) 99105-6257",
             delivery: "Sim / Com Taxa",
 
