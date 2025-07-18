@@ -2712,7 +2712,8 @@ a:focus {
 
 .btn-fotos_onde {
   margin-top: 0px;
-  background: #f48840;
+ /* background: #f48840;*/
+  background: #ff8200e0;
   color: #fff;
   border: none;
   border-radius: 8px;

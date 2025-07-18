@@ -1090,7 +1090,7 @@ if (
 </span>
 ${est.novidadesImages && est.novidadesImages.length ? `
   <div class="fotos-abaixo-telefone">
-    <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')">Fotos</button>
+    <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')">📷 Fotos</button>
   </div>
 ` : ""}
 
@@ -1939,7 +1939,7 @@ window.mostrarFotos = mostrarFotos;
               sex: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "20:30" }],
               sab: [{ inicio: "15:00", fim: "18:00" }]
             },
-            address: "R. Delfino Mendes, 264 - Centro",
+            address: "R. Delfino Mendes, 264 - Carlopolis",
             contact: "(43) 99112-1009",
             facebook: "https://www.facebook.com/teamlobofitnesscarlopolis",
             instagram: "https://www.instagram.com/academialobocarlopolis/",
@@ -2360,7 +2360,7 @@ window.mostrarFotos = mostrarFotos;
               sab: [],
               dom: [],
             },
-            address: "R. Nicolau Miguel, 452 - sala 1 - centro, Carlópolis",
+            address: "R. Nicolau Miguel, 452 - Carlópolis",
             contact: "(43) 99135-4012",
             infoAdicional: "IAT e Armeiro Credenciado • Port. SR/PF/PR N° 1821 de 08/23<br> Perito cred TJPR<br>Despachante<br>Assessoria<br>Cursos",
 
@@ -2526,7 +2526,7 @@ window.mostrarFotos = mostrarFotos;
 
             name: "Paulinho auto peças",
             hours: "Seg a Sex: 07:00h as 18:00h<br> Sab: 07:00h as 12:00h",
-            address: "R. Paul Harris, 98 - Centro, Carlópolis",
+            address: "R. Paul Harris, 98 - Carlópolis",
             contact: "(43) 3566-1306",
             instagram: "https://www.instagram.com/autopecas_paulinho/",
             novidadesImages: [
@@ -2738,7 +2738,7 @@ window.mostrarFotos = mostrarFotos;
               sab: [{ inicio: "08:00", fim: "12:00" }],
               dom: [],
             },
-            address: "Padre Hugo, 475, Centro - Carlópolis",
+            address: "Padre Hugo, 475 - Carlópolis",
             contact: "(43) 99606-1356",
             contact2: "(43) 3566-1383",
             instagram: "https://www.instagram.com/panaceaconfeccoes/",
@@ -2878,7 +2878,7 @@ window.mostrarFotos = mostrarFotos;
               sab: [{ inicio: "08:00", fim: "18:00" }],
               dom: [],
             },
-            address: "Rua Capitão Estácio, 329 - Centro, Carlópolis",
+            address: "Rua Capitão Estácio, 329 - Carlópolis",
             contact: "(43) 99668-9078",
             contact2: "(43) 99972-2809",
             contact3: "(43) 99932-1983",
@@ -2963,7 +2963,7 @@ window.mostrarFotos = mostrarFotos;
               sab: [{ inicio: "08:00", fim: "12:00" }],
               dom: []
             },
-            address: "Rua Benedito Salles n°1.033 - Centro, Carlópolis",
+            address: "Rua Benedito Salles n°1.033 - Carlópolis",
             contact: "(43) 99686-4716",
             infoAdicional: "Somos Correspondente Caixa",
             instagram: "https://www.instagram.com/imobiliariacarlopolis/",
@@ -3313,7 +3313,7 @@ window.mostrarFotos = mostrarFotos;
               sab: [],
               dom: [{ inicio: "13:00", fim: "20:00" }]
             },
-            address: "R. Benedito Salles, 1205 - Centro",
+            address: "R. Benedito Salles, 1205 - Carlopolis",
             contact: "(43) 99126-5705",
             delivery: "Não",
             instagram: "https://www.instagram.com/mycoffeecarlopolis/",
@@ -3940,7 +3940,7 @@ window.mostrarFotos = mostrarFotos;
               sab: [{ inicio: "13:00", fim: "23:00" }],
               dom: [{ inicio: "13:00", fim: "22:00" }],
             },
-            address: "R. Kalil Keder, 583 - Centro  - Carlopolis",
+            address: "R. Kalil Keder, 583 - Carlopolis",
             contact: "(43) 99971-3535",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/santtinogelateria/?locale=pt_BR",
@@ -6254,7 +6254,7 @@ window.mostrarFotos = mostrarFotos;
           {
             image: "images/setorPublico/prefeitura/prefeitura.png",
             name: "Prefeitura",
-            address: "R. Benedito Salles, 1060 - Centro",
+            address: "R. Benedito Salles, 1060 - Carlopolis",
             contact: "(43) 3566-1291",
             hours: "Seg a Sex: 08:00h as 11:30 - 13:00h as 17:00h",
 
