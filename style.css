@@ -3138,7 +3138,7 @@ a:focus {
 
 .endereco-uma-linha {
   display: block;
-  max-width: 280px;
+  max-width: 260px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
