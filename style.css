@@ -2693,6 +2693,17 @@ a:focus {
   padding: 4px 12px;
   cursor: pointer;
   transition: background 0.16s;
+ 
+   box-shadow:
+    0 6px 24px 0 #0004,       /* sombra externa para profundidade */
+    0 1.5px 6px #0002,
+    0 1.5px 0px #fff9 inset;  /* leve brilho no topo (efeito 3D) */
+  transform: translateY(0);
+  transition:
+    background 0.18s,
+    box-shadow 0.18s,
+    transform 0.13s;
+  will-change: transform, box-shadow;
 }
 .btn-cardapio:hover {
   background: #ff8800;
@@ -2708,6 +2719,16 @@ a:focus {
   padding: 4px 12px;
   cursor: pointer;
   transition: background 0.16s;
+    box-shadow:
+    0 6px 24px 0 #0004,       /* sombra externa para profundidade */
+    0 1.5px 6px #0002,
+    0 1.5px 0px #fff9 inset;  /* leve brilho no topo (efeito 3D) */
+  transform: translateY(0);
+  transition:
+    background 0.18s,
+    box-shadow 0.18s,
+    transform 0.13s;
+  will-change: transform, box-shadow;
 }
 .btn-fotos_onde:hover {
   background: #2f00ff;
@@ -3121,14 +3142,16 @@ a:focus {
 }
 
 .btn-fotos_onde {
-      margin-top: 0px;
-    background: #f4ac40;
+   
+    background: #ff8200;
     color: #fff;
     border: none;
     border-radius: 8px;
     padding: 4px 12px;
     cursor: pointer;
     transition: background 0.16s;
+     box-shadow: 0 8px 28px 0px #0004, 0 2px 8px #0002;
+    
 }
 .btn-fotos_onde:hover {
   background: #3363ff;
@@ -3138,7 +3161,7 @@ a:focus {
 
 .endereco-uma-linha {
   display: block;
-  max-width: 256px;
+  max-width: 260px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
