@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-     "biofarma", "thebestacai","esquinadopao","relojoariamartini",  "gustavinho","sallesvidros",  "vania",
+     "masterfarma", "oficinadocelular","thebestacai","prelie",  "gustavinho","sallesvidros", "relojoariamartini", "vania",
 
   ];
 
@@ -782,7 +782,7 @@ document.addEventListener("DOMContentLoaded", function () {
     torneiofutebolsuico:"s",
     escolhadarainhafrutfest:"s",
     cafedamanharotapr218:"s",
-cavalgadadafrutfest:"s",
+    cavalgadadafrutfest:"s",
 
 
     /// FIM EVENTOS 
@@ -2482,12 +2482,13 @@ window.mostrarFotos = mostrarFotos;
             facebook: "https://www.facebook.com/oficinadocelularclps/",
             instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
             novidadesImages: [
-              "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/2.png",
-              "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/1.png"
+               "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/1.jpg",
+              "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/2.jpg",
+             
             ],
             novidadesDescriptions: [
-              "Fazemos sua capinha!",
-              "Temos Assistencia Tecnica!"
+              "CURTIR O POST!<br>• SEGUIR O INSTAGRAM DA LOJA!<br>• COMPARTILHAR NO STORY E MARCAR A LOJA!<br>• MARCAR 5 AMIGOS NOS COMENTÁRIOS (quanto mais amigos marcar, maior a chance de ganhar) obs: não pode marcar a mesma pessoa 2 vezes!<br>•Ganhador ou ganhadora deve estar seguindo todas as regras do sorteio corretamente, caso contrário será sorteado novamente!!!<br>O SORTEIO OCORRERÁ NO DIA 22/12/2025 BOA SORTE A TODOS",
+              "Temos Assistencia Tecnica, todos modelos de celular"
 
             ],
           },
@@ -3996,16 +3997,21 @@ window.mostrarFotos = mostrarFotos;
               "images/comercios/padaria/bomjesus/cardapio/3.png",
             ],
             novidadesImages: [
-              "images/comercios/padaria/bomjesus/novidades/1.png",
-              "images/comercios/padaria/bomjesus/novidades/2.png",
+              "images/comercios/padaria/bomjesus/novidades/1.jpg",
+              "images/comercios/padaria/bomjesus/novidades/2.jpg",
               "images/comercios/padaria/bomjesus/novidades/3.png",
               "images/comercios/padaria/bomjesus/novidades/4.png",
               "images/comercios/padaria/bomjesus/novidades/5.png",
 
             ],
             novidadesDescriptions: [
-              "Pão Frances", "Tortinhas", "Mini Churros", "Mistos Quente", "Sucos de Frutas",
-
+              "Quer um bolo decorado mas não teve tempo de encomendar ? Aqui no Bom Jesus temos a pronto entrega esperando por vocês ! 🎂💖", 
+              "Pães de queijo quentinho aqui na Panificadora Lilia",
+               "Temos Pizzas em pedaços, varios sabores",
+                "Coxinhas Diferenciadas, venha conferir", 
+                "Bom dia, para deixar seu café ainda mais gostoso que tal um pão Curitibano?",
+                "Seja para um café da manhã fresquinho ou um churrasco de dar água na boca, a Panificadora e Churrascaria Bom Jesus é parada obrigatória!<BR>Com um ambiente acolhedor, atendimento atencioso e uma seleção impecável de pães e carnes, o local é uma excelente opção para quem deseja vivenciar a culinária local.",
+              "Balcão de pães e roscas no capricho 😋",
             ],
 
           },
