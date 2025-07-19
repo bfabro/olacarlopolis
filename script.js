@@ -4521,17 +4521,16 @@ window.mostrarFotos = mostrarFotos;
             name: "Bio Farma",
             address: "R. Laurindo Franco Godoy, 464 - Carlopolis",
             hours: "Seg a Sex:</strong> 08:00h as 18:00h </br>Sab: </strong>08:00h as 12:00h",
-             plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"12/07 a 18/07",  
+          
             statusAberto: ".",
            horarios: {                          
-                seg: [{ inicio: "08:00", fim: "21:00" }],
-                ter: [{ inicio: "08:00", fim: "21:00" }],
-                qua: [{ inicio: "08:00", fim: "21:00" }],
-                qui: [{ inicio: "08:00", fim: "21:00" }],
-                sex: [{ inicio: "08:00", fim: "21:00" }],
-                sab: [{ inicio: "08:00", fim: "21:00" }],
-                dom: [{ inicio: "08:00", fim: "21:00" }]
+                seg: [{ inicio: "08:00", fim: "18:00" }],
+                ter: [{ inicio: "08:00", fim: "18:00" }],
+                qua: [{ inicio: "08:00", fim: "18:00" }],
+                qui: [{ inicio: "08:00", fim: "18:00" }],
+                sex: [{ inicio: "08:00", fim: "18:00" }],
+                sab: [{ inicio: "08:00", fim: "12:00" }],
+                dom: []
               },    
             
             contact:"(43) 99988-9376",
@@ -4541,7 +4540,7 @@ window.mostrarFotos = mostrarFotos;
             instagram: "https://www.instagram.com/farmaciabiofarmaa/",
 
             novidadesImages: [
-"images/comercios/farmacia/bioFarma/divulgacao/1.jpg", 
+              "images/comercios/farmacia/bioFarma/divulgacao/1.jpg", 
               "images/comercios/farmacia/bioFarma/divulgacao/2.png",
               "images/comercios/farmacia/bioFarma/divulgacao/3.png",
               "images/comercios/farmacia/bioFarma/divulgacao/4.png",
@@ -4757,16 +4756,18 @@ window.mostrarFotos = mostrarFotos;
             name: "Master Farma",
             address: "R. Laurindo Franco de Godoi, 90 - Carlopolis",
             hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
-              dom: []
-            },
+            plantaoHorario: "08:00h às 21:00h", 
+              plantaoData:"19/07 a 25/07", 
+             statusAberto:".",
+              horarios: {                          
+                seg: [{ inicio: "08:00", fim: "21:00" }],
+                ter: [{ inicio: "08:00", fim: "21:00" }],
+                qua: [{ inicio: "08:00", fim: "21:00" }],
+                qui: [{ inicio: "08:00", fim: "21:00" }],
+                sex: [{ inicio: "08:00", fim: "21:00" }],
+                sab: [{ inicio: "08:00", fim: "21:00" }],
+                dom: [{ inicio: "08:00", fim: "21:00" }]
+              }, 
             contact: "(43) 99951-1540",
             contact2: "(43) 3566-1141",
             delivery: "Sim / Sem Taxa",
@@ -5683,7 +5684,7 @@ window.mostrarFotos = mostrarFotos;
           },
 
 */
-          /* [ 3 ]*/
+          /* [ 3 ]
 
             {
               image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
@@ -5723,48 +5724,52 @@ window.mostrarFotos = mostrarFotos;
               ],
           },
           
-
-          /* [ 4 ]
+              */
+             
+          /* [ 4 ]*/
           {
             image: "images/comercios/farmacia/masterFarma/masterfarma.png",
             name: "Master Farma",
-            address: "R. Laurindo Franco de Godoi, 90",
-            
+            address: "R. Laurindo Franco de Godoi, 90 - Carlopolis",
             plantaoHorario: "08:00h às 21:00h", 
-            plantaoData:"Sab 10/05 a Sex 16/05", 
+              plantaoData:"19/07 a 25/07",  
+            hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
             statusAberto:".",
-            horarios: {                          
-              seg: [{ inicio: "08:00", fim: "21:00" }],
-              ter: [{ inicio: "08:00", fim: "21:00" }],
-              qua: [{ inicio: "08:00", fim: "21:00" }],
-              qui: [{ inicio: "08:00", fim: "21:00" }],
-              sex: [{ inicio: "08:00", fim: "21:00" }],
-              sab: [{ inicio: "08:00", fim: "21:00" }],
-              dom: [{ inicio: "08:00", fim: "21:00" }]
-            },  
+              horarios: {                          
+                seg: [{ inicio: "08:00", fim: "21:00" }],
+                ter: [{ inicio: "08:00", fim: "21:00" }],
+                qua: [{ inicio: "08:00", fim: "21:00" }],
+                qui: [{ inicio: "08:00", fim: "21:00" }],
+                sex: [{ inicio: "08:00", fim: "21:00" }],
+                sab: [{ inicio: "08:00", fim: "21:00" }],
+                dom: [{ inicio: "08:00", fim: "21:00" }]
+              },   
             contact: "(43) 99951-1540",
-            contact2:"(43) 3566-1141",
+            contact2: "(43) 3566-1141",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
             instagram: "https://www.instagram.com/masterfarma_carlopolis/",
 
-            novidadesImages: [               
+            novidadesImages: [
               "images/comercios/farmacia/masterFarma/divulgacao/1.png",
               "images/comercios/farmacia/masterFarma/divulgacao/2.png",
               "images/comercios/farmacia/masterFarma/divulgacao/3.png",
               "images/comercios/farmacia/masterFarma/divulgacao/4.png",
               "images/comercios/farmacia/masterFarma/divulgacao/5.png",
-            ], 
-            novidadesDescriptions: [                            
-              "Estamos de Plantão!",
-              "Cólicas do trato gastrintestinal",
-              "Analgésico (para dor) antitérmico (para febre)",
-              "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-              "Redução da febre e para o alívio de dores",
-            ],
-        },
+              "images/comercios/farmacia/masterFarma/divulgacao/6.png",
 
-        */
+            ],
+            novidadesDescriptions: [
+              "Pensado para atender às necessidades do organismo feminino, MASTERFORCE Pró Mulher auxilia na sua saúde e bem-estar diário! ",
+              "Coração saudável e mente afiada! 🧠Conheça os benefícios do Ômega 3 para o seu bem-estar diário.",
+              "Para os pequenos explorarem o mundo com mais disposição! 🌟 Cuidar da imunidade é um ato de amor.",
+              "MELATONINA LÍQUIDA Dormir bem faz toda a diferença para a sua saúde! 😴 A melatonina ajuda a regular o sono de forma natural, promovendo noites mais tranquilas",
+              "Com o Cartão Crediário da Master Farma, você parcela suas compras e cuida da sua saúde sem pesar no bolso!",
+              "Venha nos conhecer!"
+            ],
+          },
+
+        
 
           /* [ 5 ]
         {
