@@ -507,6 +507,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // borracharia
     vidanova: "n",
+    borrachariajr:"s",
     // deposito de gas
     liagas: "s",
     cncasadogas: "s",
@@ -781,7 +782,7 @@ document.addEventListener("DOMContentLoaded", function () {
     torneiofutebolsuico:"s",
     escolhadarainhafrutfest:"s",
     cafedamanharotapr218:"s",
-
+cavalgadadafrutfest:"s",
 
 
     /// FIM EVENTOS 
@@ -5507,6 +5508,16 @@ window.mostrarFotos = mostrarFotos;
 
 
           {
+            image: "images/informacoes/eventos/cavalgada.jpg",
+            name: "Cavalgada da FrutFest",
+            date: "31/08/2025",
+            address: "Caldo de Cana Amaral",
+            contact: "-",
+            instagram: "https://www.instagram.com/frutfestoficial/",
+          },
+
+
+          {
             image: "images/informacoes/eventos/frutFest.png",
             name: "FrutFest",
             date: "04/09/25 a 07/09/25",
@@ -6665,6 +6676,28 @@ window.mostrarFotos = mostrarFotos;
               "Manutenção no local",
 
             ],
+          },
+
+
+          {
+            image: "images/comercios/borracharia/juninho/perfil.jpg",
+            name: "Borracharia JR",
+            hours: "Seg a Sex: 06:30h as 18:00h <br>Sab: 06:30 as 14:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "06:30", fim: "18:00" }],
+              ter: [{ inicio: "06:30", fim: "18:00" }],
+              qua: [{ inicio: "06:30", fim: "18:00" }],
+              qui: [{ inicio: "06:30", fim: "18:00" }],
+              sex: [{ inicio: "06:30", fim: "18:00" }],
+              sab: [{ inicio: "06:30", fim: "14:00" }],
+              dom: [],
+            },
+             address: "R. Benedito Sales, 1560 - Carlopolis",
+            contact: "(43) 99167-4917",
+            infoAdicional:"Balanceamento de carro e caminhonete<br>Vulcanização laterais<br>Pneus Remoldi<br>Camera de Ar",
+            instagram: "#",
+           
           },
         ],
       },
