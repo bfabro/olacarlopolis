@@ -3999,9 +3999,11 @@ window.mostrarFotos = mostrarFotos;
             novidadesImages: [
               "images/comercios/padaria/bomjesus/novidades/1.jpg",
               "images/comercios/padaria/bomjesus/novidades/2.jpg",
-              "images/comercios/padaria/bomjesus/novidades/3.png",
-              "images/comercios/padaria/bomjesus/novidades/4.png",
-              "images/comercios/padaria/bomjesus/novidades/5.png",
+              "images/comercios/padaria/bomjesus/novidades/3.jpg",
+              "images/comercios/padaria/bomjesus/novidades/4.jpg",
+              "images/comercios/padaria/bomjesus/novidades/5.jpg",
+              "images/comercios/padaria/bomjesus/novidades/6.jpg",
+              "images/comercios/padaria/bomjesus/novidades/7.jpg",
 
             ],
             novidadesDescriptions: [
