@@ -4784,15 +4784,17 @@ window.mostrarFotos = mostrarFotos;
             instagram: "https://www.instagram.com/masterfarma_carlopolis/",
 
             novidadesImages: [
-              "images/comercios/farmacia/masterFarma/divulgacao/1.png",
+              "images/comercios/farmacia/masterFarma/divulgacao/1.jpg",
               "images/comercios/farmacia/masterFarma/divulgacao/2.png",
               "images/comercios/farmacia/masterFarma/divulgacao/3.png",
               "images/comercios/farmacia/masterFarma/divulgacao/4.png",
               "images/comercios/farmacia/masterFarma/divulgacao/5.png",
               "images/comercios/farmacia/masterFarma/divulgacao/6.png",
+              "images/comercios/farmacia/masterFarma/divulgacao/7.png",
 
             ],
             novidadesDescriptions: [
+              "Estamos de Plantão!!",
               "Pensado para atender às necessidades do organismo feminino, MASTERFORCE Pró Mulher auxilia na sua saúde e bem-estar diário! ",
               "Coração saudável e mente afiada! 🧠Conheça os benefícios do Ômega 3 para o seu bem-estar diário.",
               "Para os pequenos explorarem o mundo com mais disposição! 🌟 Cuidar da imunidade é um ato de amor.",
@@ -5770,15 +5772,17 @@ window.mostrarFotos = mostrarFotos;
             instagram: "https://www.instagram.com/masterfarma_carlopolis/",
 
             novidadesImages: [
-              "images/comercios/farmacia/masterFarma/divulgacao/1.png",
+              "images/comercios/farmacia/masterFarma/divulgacao/1.jpg",
               "images/comercios/farmacia/masterFarma/divulgacao/2.png",
               "images/comercios/farmacia/masterFarma/divulgacao/3.png",
               "images/comercios/farmacia/masterFarma/divulgacao/4.png",
               "images/comercios/farmacia/masterFarma/divulgacao/5.png",
               "images/comercios/farmacia/masterFarma/divulgacao/6.png",
+              "images/comercios/farmacia/masterFarma/divulgacao/7.png",
 
             ],
             novidadesDescriptions: [
+              "Estamos de Plantão!!",
               "Pensado para atender às necessidades do organismo feminino, MASTERFORCE Pró Mulher auxilia na sua saúde e bem-estar diário! ",
               "Coração saudável e mente afiada! 🧠Conheça os benefícios do Ômega 3 para o seu bem-estar diário.",
               "Para os pequenos explorarem o mundo com mais disposição! 🌟 Cuidar da imunidade é um ato de amor.",
