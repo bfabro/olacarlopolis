@@ -1601,7 +1601,7 @@ window.mostrarFotos = mostrarFotos;
         {
           imagem: "images/comercios/quitanda/pimentaDoce/promocao/1.jpg",
           descricao: "Maracuja Azedo",
-          validade: "2025-07-15T20:00:00",
+          validade: "2025-07-30T20:00:00",
           preco: "6,99",
           preco_com_desconto: "4,99",
           whatsapp: "43988065747"
@@ -1611,7 +1611,7 @@ window.mostrarFotos = mostrarFotos;
         {
           imagem: "images/comercios/quitanda/pimentaDoce/promocao/2.jpg",
           descricao: "Caixa Cerveja Cristal",
-          validade: "2025-07-15T20:00:00",
+          validade: "2025-07-30T20:00:00",
           preco: "34,99",
           preco_com_desconto: "29,95",
           whatsapp: "43988065747"
@@ -1620,7 +1620,7 @@ window.mostrarFotos = mostrarFotos;
         {
           imagem: "images/comercios/quitanda/pimentaDoce/promocao/3.jpg",
           descricao: "Cerveja Heineken Und",
-          validade: "2025-07-15T20:00:00",
+          validade: "2025-07-30T20:00:00",
           preco: "7,95",
           preco_com_desconto: "5,95",
           whatsapp: "43988065747"
@@ -1629,7 +1629,7 @@ window.mostrarFotos = mostrarFotos;
         {
           imagem: "images/comercios/quitanda/pimentaDoce/promocao/4.jpg",
           descricao: "Vassoura Caipira",
-          validade: "2025-07-15T20:00:00",
+          validade: "2025-07-30T20:00:00",
           preco: "24,00",
           preco_com_desconto: "19,50",
           whatsapp: "43988065747"
@@ -1650,7 +1650,7 @@ window.mostrarFotos = mostrarFotos;
         {
           imagem: "images/promocoes/zerojapan/1.jpg",
           descricao: "Perfume YARA ARABIC",
-          validade: "2025-07-05T21:00:00",
+          validade: "2025-07-30T21:00:00",
           preco: "220,00",
           preco_com_desconto: "199,99 a vista",
           whatsapp: "4331422005"
@@ -1659,7 +1659,7 @@ window.mostrarFotos = mostrarFotos;
         {
           imagem: "images/promocoes/zerojapan/2.jpg",
           descricao: "Perfume Body Splash",
-          validade: "2025-07-05T21:00:00",
+          validade: "2025-07-30T21:00:00",
           preco: "280,00",
           preco_com_desconto: "250,00 a vista",
           whatsapp: "4331422005"
@@ -1668,7 +1668,7 @@ window.mostrarFotos = mostrarFotos;
         {
           imagem: "images/promocoes/zerojapan/3.jpg",
           descricao: "Perfume Shaghaf Silver",
-          validade: "2025-07-05T21:00:00",
+          validade: "2025-07-30T21:00:00",
           preco: "330,00",
           preco_com_desconto: "299,00 a vista",
           whatsapp: "4331422005"
@@ -1677,7 +1677,7 @@ window.mostrarFotos = mostrarFotos;
         {
           imagem: "images/promocoes/zerojapan/4.jpg",
           descricao: "Perfume Hareem Al Sultan",
-          validade: "2025-07-05T21:00:00",
+          validade: "2025-07-30T21:00:00",
           preco: "550,00",
           preco_com_desconto: "499,00 a vista",
           whatsapp: "4331422005"
@@ -1686,7 +1686,7 @@ window.mostrarFotos = mostrarFotos;
         {
           imagem: "images/promocoes/zerojapan/5.jpg",
           descricao: "Perfume Atheeri",
-          validade: "2025-07-05T21:00:00",
+          validade: "2025-07-30T21:00:00",
           preco: "830,00",
           preco_com_desconto: "750,00 a vista",
 
