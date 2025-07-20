@@ -2027,7 +2027,7 @@ window.mostrarFotos = mostrarFotos;
               sab: [{ inicio: "14:00", fim: "23:00" }]
             },
             address: "R. Benedito Salles, 409 - Carlopolis",
-            contact: "(43) 99176-7871",
+            contact: "(43) 99639-9374",
           
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/turminha_do_acai/",
