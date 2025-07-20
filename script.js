@@ -7904,7 +7904,14 @@ window.mostrarFotos = mostrarFotos;
         establishments: [
           ///
           ///
-          ///
+          /// 20/07
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/23.jpg",
+            descricaoFalecido: "Faleceu em Bandeirantes aos 79 anos de idade, Sr 'MILTON ALVES DA SILVA', mais conhecido como: Cunhado da Zuzu.<br>A cerimônia iniciou-se hoje às 10:00 horas deste Sabado no velório municipal de Carlópolis.<br>Seu sepultamento será hoje às 15:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏"
+
+          },
 
 
 //15/07
