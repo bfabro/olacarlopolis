@@ -7858,6 +7858,7 @@ window.mostrarFotos = mostrarFotos;
              contact2: "(43) 98830-2110",
            
              facebook:"https://www.facebook.com/dorival.mattos.1",
+             instagram:"https://www.instagram.com/mattostaxi/",
              infoAdicional:"Viagens e Serviços <span style='color:red'>24horas</span><br> Area Rural, Urbana e Aeroporto",
           },
           {
