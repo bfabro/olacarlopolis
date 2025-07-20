@@ -2039,12 +2039,14 @@ window.mostrarFotos = mostrarFotos;
               "images/comercios/acai/turminhaAcai/novidades/2.png",
               "images/comercios/acai/turminhaAcai/novidades/3.png",
               "images/comercios/acai/turminhaAcai/novidades/4.png",
+              "images/comercios/acai/turminhaAcai/novidades/5.jpg",
             ],
             novidadesDescriptions: [
               "Marmita de Açai! Voce só encontra aqui!",
               "Nossos espetos montados na hora",
-              "3",
+              "Açai com bombom, irresistivel",
               "Espetinhos Diferenciados",
+              "O nosso lanche é tradicional com pão francês, molho especial da casa, hambúrguer de costela com mussarela, alface, tomate e cebola roxa.",
             ],
             menuImages: [
               "images/comercios/acai/turminhaAcai/cardapio/1.png",
