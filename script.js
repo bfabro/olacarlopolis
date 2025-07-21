@@ -6347,10 +6347,10 @@ window.mostrarFotos = mostrarFotos;
 
 
           {
-            image: "images/setorPublico/escolaPublica/benedito.png",
+            
             name: "Benedito Rodrigues de Camargo",
             hours: "Seg a Sex: 09:00h - 18:00h",
-            address: "Av. Elson Soares, 295",
+            address: "Av. Elson Soares, 295 - Carlopolis",
             contact: "(43) 3566-1496",
             infoAdicional: "Turno: Manha e Tarde",
           },
@@ -6358,8 +6358,8 @@ window.mostrarFotos = mostrarFotos;
           {
             image: "images/setorPublico/escolaPublica/carolinaLupion.png",
             name: "Carolina Lupion",
-            hours: "Seg a Sex: 09:00h - 18:00h",
-            address: "R. Jorge Barros, 1095",
+            hours: "Seg a Sex: 09:00h as 18:00h",
+            address: "R. Jorge Barros, 1095 - Carlopolis",
             contact: "(43) 3566-1295",
             infoAdicional: "Turno: Manha e Tarde",
           },
@@ -6369,8 +6369,8 @@ window.mostrarFotos = mostrarFotos;
           {
             image: "images/setorPublico/escolaPublica/raymunda.png",
             name: "CMEI Raymunda Santana Salles",
-            hours: "Seg a sex: 09:00h - 18:00h",
-            address: "Rua Nicolau Miguel, 233",
+            hours: "Seg a Sex: 09:00h as 18:00h",
+            address: "Rua Nicolau Miguel, 233 - Carlopolis",
             contact: "(43) 3566-2273",
             infoAdicional: "Turno: Manha",
           },
