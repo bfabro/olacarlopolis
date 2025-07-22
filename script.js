@@ -493,7 +493,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // artesanato
     judite: "s",
-    patricia:"s",
+    patymaosdeouro:"s",
 
     // cartorio
     registrocivileimoveis: "s",
@@ -2214,7 +2214,7 @@ window.mostrarFotos = mostrarFotos;
 
           {
             image: "images/comercios/artesanato/patricia/perfil.jpg",
-            name: "Patricia",
+            name: "Paty Mãos De Ouro",
             contact: "(43) 99954-0753",
             hours:"Somente encomendas!",
             infoAdicional:"<br>🧵 Serviços oferecidos:<br>👗 Bordados personalizados<br>🎨 Artesanato criativo<br>🎁 Lembrancinhas para datas especiais<br>🛍️ Presentes únicos feitos à mão<br>🏡 Itens decorativos<br>📦 Produtos sob encomenda<Br><br>📬 Entregas e Encomendas<br>Trabalho por encomenda e envio tudo com muito cuidado! Combinamos tudo certinho pelo WhatsApp<br><br>Cada peça é feita com amor e atenção aos detalhes — ideal para presentear, decorar ou guardar como lembrança! Se você procura algo único, artesanal e cheio de afeto, fale comigo. Vai ser um prazer criar algo para você!",
