@@ -7145,6 +7145,8 @@ window.mostrarFotos = mostrarFotos;
             contact: "(43) 99103-4187",
             delivery: "Sim / Sem Taxa",
             instagram: "https://www.instagram.com/seizapr/",
+         infoAdicional: "Link para nosso Grupo de Ofertas e Novidades: <a target='_blank' style='color:#2da6ff;' href='https://chat.whatsapp.com/CFr4ebifZzgE6fFu4CXb6F?fbclid=PAZXh0bgNhZW0CMTEAAacHiXLLmyzhMTzrCrfIEnjku_fr9ECJp14YSjDGVRbWZkWDjd3JsGY_K91mEg_aem_SLISaT9eNaCaW5Q1NUGKJQ'>Entrar</a>",
+     
             novidadesImages: [
               "images/comercios/produtosOrientais/seiza/divulgacao/9.jpg",
               "images/comercios/produtosOrientais/seiza/divulgacao/2.png",
