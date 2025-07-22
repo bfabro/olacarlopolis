@@ -7923,12 +7923,7 @@ window.mostrarFotos = mostrarFotos;
              instagram:"https://www.instagram.com/mattostaxi/",
              infoAdicional:"Viagens e Serviços <span style='color:red'>24horas</span><br> Area Rural, Urbana e Aeroporto",
           },
-          {
-            name: "Douglas do Taxi",
-            hours: "Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
-            address: "Em Frente ao banco Itau",
-            contact: "(43) 88807-8515",
-          },
+         
 
           {
             name: "Luciano do Taxi",
