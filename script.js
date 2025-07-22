@@ -493,6 +493,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // artesanato
     judite: "s",
+    patricia:"s",
 
     // cartorio
     registrocivileimoveis: "s",
@@ -770,9 +771,6 @@ document.addEventListener("DOMContentLoaded", function () {
     feiradalua: "s",
     calendarioeventos: "s",
     frutfest: "s",
-    campeonatopescaesportivatucunare: "s",
-    coloniadeferias: "s",
-    encontrocarroantigo: "s",
     circuitomonisakdevoleidepraia: "s",
     festadosenhorbomjesus: "s",
     lowcity: "s",
@@ -2211,8 +2209,47 @@ window.mostrarFotos = mostrarFotos;
 
             ],
           },
+
+
+
+          {
+            image: "images/comercios/artesanato/patricia/perfil.jpg",
+            name: "Patricia",
+            contact: "(43) 99954-0753",
+            hours:"Somente encomendas!",
+            infoAdicional:"<br>🧵 Serviços oferecidos:<br>👗 Bordados personalizados<br>🎨 Artesanato criativo<br>🎁 Lembrancinhas para datas especiais<br>🛍️ Presentes únicos feitos à mão<br>🏡 Itens decorativos<br>📦 Produtos sob encomenda<Br><br>📬 Entregas e Encomendas<br>Trabalho por encomenda e envio tudo com muito cuidado! Combinamos tudo certinho pelo WhatsApp<br><br>Cada peça é feita com amor e atenção aos detalhes — ideal para presentear, decorar ou guardar como lembrança! Se você procura algo único, artesanal e cheio de afeto, fale comigo. Vai ser um prazer criar algo para você!",
+            instagram:"https://www.instagram.com/patymaosdeouro/",
+            novidadesImages: [
+              "images/comercios/artesanato/patricia/divulgacao/1.jpg",
+              "images/comercios/artesanato/patricia/divulgacao/2.jpg",
+              "images/comercios/artesanato/patricia/divulgacao/3.jpg",
+              "images/comercios/artesanato/patricia/divulgacao/4.jpg",
+              "images/comercios/artesanato/patricia/divulgacao/5.jpg",
+              "images/comercios/artesanato/patricia/divulgacao/6.jpg",
+              "images/comercios/artesanato/patricia/divulgacao/7.jpg",
+              "images/comercios/artesanato/patricia/divulgacao/8.jpg",
+             
+            ],
+            novidadesDescriptions: [
+              "Capas exclusivas para almofadas, produzidas artesanalmente e sob medida para o seu espaço. Perfeitas para presentear ou dar um toque especial à decoração.",
+              "Panos de prato bordados à mão, perfeitos para dar charme e personalidade à sua cozinha!",
+              "Aconchego e beleza em cada detalhe: capas de travesseiro feitas para você!",
+              "Dê um toque especial aos seus livros com marca páginas únicos, criados artesanalmente para encantar leitores de todas as idades.",
+              "Fraldinhas de ombro feitas à mão, um mimo indispensável para enxoval ou para presentear com carinho!",
+              "Fraldinhas de boca exclusivas, perfeitas para completar o enxoval ou presentear com afeto.",
+              "Sobre lençóis personalizados, confeccionados com atenção aos detalhes para proporcionar noites de sono ainda mais agradáveis.",
+              "Deixe seu banho ainda mais especial com toalhas personalizadas, únicas como você! Ideais para dar um toque pessoal ao seu dia a dia ou surpreender alguém querido.",
+             
+
+            ],
+          },
+
+
+
         ],
       },
+
+
 
 
 
@@ -5426,37 +5463,6 @@ window.mostrarFotos = mostrarFotos;
             contact: "(43) 99983-8897 ",
             contact2: "(43) 98814-2008 ",
             instagram: "https://www.instagram.com/espacodobrincareserfeliz/",
-
-
-          },
-
-
-
-
-
-          {
-            image: "images/informacoes/eventos/paranaFishing.jpg",
-            name: "Campeonato Pesca Esportiva Tucunaré",
-            date: "19/07/25",
-            address: "Represa Chavantes",
-            contact: "(43) 99980-0495",
-
-            instagram: "https://www.instagram.com/parana_fishing/",
-            infoAdicional: "",
-            infoAdicional: "Inscrições até 17 de Julho",
-
-
-          },
-
-
-          {
-            image: "images/informacoes/eventos/carroAntigo.png",
-            name: "Encontro Carro Antigo",
-            date: "20/07/2025",
-            address: "Centro de Eventos Ilha do Ponciano",
-            contact: "(43) 99825-0570",
-            instagram: "https://www.instagram.com/turismocarlopolis/",
-
 
 
           },
