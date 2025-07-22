@@ -1865,6 +1865,60 @@ window.mostrarFotos = mostrarFotos;
     },
 
 
+
+
+    {
+
+      nome: "Paty mãos de ouro",
+      imagem: "images/comercios/artesanato/patricia/perfil.jpg",
+      promocoes: [
+        {
+          imagem: "images/comercios/artesanato/patricia/promocoes/1.jpg",
+          descricao: "Pano de prato - Flores ",
+          validade: "2025-07-31T18:00:00",
+          preco: "40,00",
+          preco_com_desconto: "35,00 a vista",
+          // desconto: "5",
+          whatsapp: "43999540753"
+        },
+
+         {
+          imagem: "images/comercios/artesanato/patricia/promocoes/2.jpg",
+          descricao: "Pano de prato - Frutas ",
+          validade: "2025-07-31T18:00:00",
+          preco: "40,00",
+          preco_com_desconto: "35,00 a vista",
+          // desconto: "5",
+          whatsapp: "43999540753"
+        },
+
+         {
+          imagem: "images/comercios/artesanato/patricia/promocoes/3.jpg",
+          descricao: "Pano de prato - Plantas ",
+          validade: "2025-07-31T18:00:00",
+          preco: "40,00",
+          preco_com_desconto: "35,00 a vista",
+          // desconto: "5",
+          whatsapp: "43999540753"
+        },
+
+         {
+          imagem: "images/comercios/artesanato/patricia/promocoes/4.jpg",
+          descricao: "Pano de prato - Melancia ",
+          validade: "2025-07-31T18:00:00",
+          preco: "40,00",
+          preco_com_desconto: "35,00 a vista",
+          // desconto: "5",
+          whatsapp: "43999540753"
+        },
+       
+
+       
+
+      ]
+    },
+
+
     {
 
       nome: "Agro São José",
