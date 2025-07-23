@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-     "masterfarma", "oficinadocelular","thebestacai","prelie",  "gustavinho","sallesvidros", "relojoariamartini", "vania",
+    "feiradalua", "masterfarma", "oficinadocelular","thebestacai","prelie",  "gustavinho","sallesvidros", "relojoariamartini", "vania",
 
   ];
 
@@ -453,7 +453,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //academia
     lobofitness: "s",
-
+    teamvieira:"s",
     //AÇAI
     turminhadoacai: "s",
     thebestacai: "s",
@@ -2022,28 +2022,31 @@ window.mostrarFotos = mostrarFotos;
             image: "images/comercios/academiaLuta/teamVieira/perfil.jpg",
 
             name: "Team Vieira",
-            hours: "Seg a Qui: 06:00h as 13:00h - 15:00h as 21:00h <br> Sex: 06:00h as 13:00h - 15:00h as 20:30h<br> Sab: 15:00h as 18:00h <br>Dom: Fechado ",
+            hours: "Seg a Sex: 06:00h as 08:00h - 17:00h as 21:00h ",
             statusAberto: " ",
             horarios: {
               dom: [], // fechado
-              seg: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "21:00" }],
-              ter: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "21:00" }],
-              qua: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "21:00" }],
-              qui: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "21:00" }],
-              sex: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "20:30" }],
-              sab: [{ inicio: "15:00", fim: "18:00" }]
+              seg: [{ inicio: "06:00", fim: "08:00" }],
+              ter: [{ inicio: "06:00", fim: "08:00" }],
+              qua: [{ inicio: "06:00", fim: "08:00" }],
+              qui: [{ inicio: "06:00", fim: "08:00" }],
+              sex: [{ inicio: "06:00", fim: "08:00" }],
+              sab: []
             },
-            address: "R. Delfino Mendes, 264 - Carlopolis",
-            contact: "(43) 99112-1009",
-            facebook: "https://www.facebook.com/teamlobofitnesscarlopolis",
-            instagram: "https://www.instagram.com/academialobocarlopolis/",
+            address: "Rua Dr. Paulo e Silva, 1182 - Carlopolis",
+            contact: "(43) 99136-5029",
+            
+            instagram: "https://www.instagram.com/romeuteamvieira_oficial/",
+            infoAdicional:"🔸Muay Thay<Br>🔸MMA<Br>🔸Jiu-Jitsu",
             novidadesImages: [
-              "images/comercios/academia/lobofitness/divulgacao/1.png",
-              "images/comercios/academia/lobofitness/divulgacao/2.png",
-              "images/comercios/academia/lobofitness/divulgacao/3.webp",
+              "images/comercios/academiaLuta/teamVieira/divulgacao/1.png",
+              "images/comercios/academiaLuta/teamVieira/divulgacao/2.png",
+              "images/comercios/academiaLuta/teamVieira/divulgacao/3.jpg",
             ],
             novidadesDescriptions: [
-              "Venham Conferir nosso espaço",
+              "Venham conferir nosso espaço, e fazer uma aula gratis!",
+              "Nosso time em peso",
+              "Confira nossos treinos e melhore seu bem estar!"
             ],
           },
         ],
@@ -2941,7 +2944,6 @@ window.mostrarFotos = mostrarFotos;
             contact: "(43) 99965-2084",
             instagram: "https://www.instagram.com/feiradaluacarlopolis/",
             novidadesImages: [
-
               "images/comercios/feiraLua/divulgacao/1.jpg",
               "images/comercios/feiraLua/divulgacao/2.png",
               "images/comercios/feiraLua/divulgacao/3.png",
@@ -2953,8 +2955,6 @@ window.mostrarFotos = mostrarFotos;
 
             novidadesDescriptions: [
               "Cantando para vocês Zé Carlos <br>25/07 a partir das 19:00hrs",
-
-
             ],
           },
         ],
