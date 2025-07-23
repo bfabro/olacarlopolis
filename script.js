@@ -577,7 +577,7 @@ document.addEventListener("DOMContentLoaded", function () {
     binhomotocenter: "s",
 
     // padaria
-    bomjesus: "s",
+    bomjesus: "n",
     esquinadopao: "s",
     //saofrancisco:"s",
     prelie: "s",
@@ -4099,7 +4099,7 @@ window.mostrarFotos = mostrarFotos;
 
 
 
-
+/*
       {
         link: document.querySelector("#menuPadaria"),
         title: "Padaria",
@@ -4149,7 +4149,7 @@ window.mostrarFotos = mostrarFotos;
             ],
 
           },
-
+*/
 
           {
             image: "images/comercios/padaria/esquinadopao/perfil.png",
@@ -8276,28 +8276,7 @@ window.mostrarFotos = mostrarFotos;
 
 
 
-          {
-            image: "images/comercios/padaria/bom jesus/bomjesus.png",
-            name: "Bom Jesus",
-            hours: "Seg a Sab: 6:00h as 19:00h </br> Dom: 06:00h as 14:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "06:00", fim: "19:00" }],
-              ter: [{ inicio: "06:00", fim: "19:00" }],
-              qua: [{ inicio: "06:00", fim: "19:00" }],
-              qui: [{ inicio: "06:00", fim: "19:00" }],
-              sex: [{ inicio: "06:00", fim: "19:00" }],
-              sab: [{ inicio: "06:00", fim: "19:00" }],
-              dom: [{ inicio: "06:00", fim: "14:00" }],
-            },
-            address: "R. Benedito Salles, 615",
-            contact: "(43) 99653-9285",
-            facebook: "https://www.facebook.com/PanificadoraRestauranteBomJesus/?locale=pt_BR",
-            instagram: "https://www.instagram.com/bom_jesus_panificadora/",
-            infoVagaTrabalho: "1 Vaga Para Balconista<br> 1 Vaga Para Serviços Gerais<br>1 Vaga Para Auxiliar de Cozinha<br>1 Vaga Para Padeiro / Confeiteiro<br> ",
-
-
-          },
+          
 
 
 
