@@ -577,7 +577,7 @@ document.addEventListener("DOMContentLoaded", function () {
     binhomotocenter: "s",
 
     // padaria
-    bomjesus: "n",
+    bomjesus: "s",
     esquinadopao: "s",
     //saofrancisco:"s",
     prelie: "s",
@@ -4099,7 +4099,7 @@ window.mostrarFotos = mostrarFotos;
 
 
 
-/*
+
       {
         link: document.querySelector("#menuPadaria"),
         title: "Padaria",
@@ -4149,7 +4149,7 @@ window.mostrarFotos = mostrarFotos;
             ],
 
           },
-*/
+
 
           {
             image: "images/comercios/padaria/esquinadopao/perfil.png",
