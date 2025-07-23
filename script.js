@@ -2013,6 +2013,45 @@ window.mostrarFotos = mostrarFotos;
       },
 
 
+
+{
+        link: document.querySelector("#menuAcademiaLuta"),
+        title: "Academia",
+        establishments: [
+          {
+            image: "images/comercios/academiaLuta/teamVieira/perfil.jpg",
+
+            name: "Team Vieira",
+            hours: "Seg a Qui: 06:00h as 13:00h - 15:00h as 21:00h <br> Sex: 06:00h as 13:00h - 15:00h as 20:30h<br> Sab: 15:00h as 18:00h <br>Dom: Fechado ",
+            statusAberto: " ",
+            horarios: {
+              dom: [], // fechado
+              seg: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "21:00" }],
+              ter: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "21:00" }],
+              qua: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "21:00" }],
+              qui: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "21:00" }],
+              sex: [{ inicio: "06:00", fim: "13:00" }, { inicio: "15:00", fim: "20:30" }],
+              sab: [{ inicio: "15:00", fim: "18:00" }]
+            },
+            address: "R. Delfino Mendes, 264 - Carlopolis",
+            contact: "(43) 99112-1009",
+            facebook: "https://www.facebook.com/teamlobofitnesscarlopolis",
+            instagram: "https://www.instagram.com/academialobocarlopolis/",
+            novidadesImages: [
+              "images/comercios/academia/lobofitness/divulgacao/1.png",
+              "images/comercios/academia/lobofitness/divulgacao/2.png",
+              "images/comercios/academia/lobofitness/divulgacao/3.webp",
+            ],
+            novidadesDescriptions: [
+              "Venham Conferir nosso espaço",
+            ],
+          },
+        ],
+      },
+
+
+
+
       {
         link: document.querySelector("#menuAcai"),
         title: "Açai",
@@ -2913,7 +2952,7 @@ window.mostrarFotos = mostrarFotos;
             ],
 
             novidadesDescriptions: [
-              "Cantando para vocês Fernando e Mary <br>11/07 a partir das 19:00hrs",
+              "Cantando para vocês Zé Carlos <br>25/07 a partir das 19:00hrs",
 
 
             ],
