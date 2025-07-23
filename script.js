@@ -6196,6 +6196,7 @@ window.mostrarFotos = mostrarFotos;
             name: "Agendamento De Viagens",
             hours: "Seg a Sex: 8:30h as 12:00h, 13:30 as 17:00h",
             address: "-",
+            
             contact: "(43) 99825-1005",
 
 
@@ -6211,6 +6212,16 @@ window.mostrarFotos = mostrarFotos;
             image: "images/setorPublico/ambulatorio/perfil.jpg",
             name: "Ambulatorio Do Hospital",
             hours: "Seg a Sex: 8:00h as 17:00h",
+             statusAberto:".",
+            horarios: {                          
+              seg: [{ inicio: "08:00", fim: "17:00" }],
+              ter: [{ inicio: "08:00", fim: "17:00" }],
+              qua: [{ inicio: "08:00", fim: "17:00" }],
+              qui: [{ inicio: "08:00", fim: "17:00" }],
+              sex: [{ inicio: "08:00", fim: "17:00" }],
+              sab: [],
+              dom: []
+            },
             address: "R. Marcos Rodrigues do Amaral, S/N - Carlopolis",
             contact: "(43) 99113-3084",
 
@@ -6231,6 +6242,16 @@ window.mostrarFotos = mostrarFotos;
             image: "images/setorPublico/asilo/asilo.png",
             name: "Asilo",
             hours: "Seg a Sex: 09:00h as 12:00h",
+             statusAberto:".",
+            horarios: {                          
+              seg: [{ inicio: "09:00", fim: "12:00" }],
+              ter: [{ inicio: "09:00", fim: "12:00" }],
+              qua: [{ inicio: "09:00", fim: "12:00" }],
+              qui: [{ inicio: "09:00", fim: "12:00" }],
+              sex: [{ inicio: "09:00", fim: "12:00" }],
+              sab: [],
+              dom: []
+            },
             address: "Rua Andrino Soares, 26",
             contact: "(43) 3566-1196",
           },
@@ -6244,7 +6265,17 @@ window.mostrarFotos = mostrarFotos;
           {
             image: "images/setorPublico/agenciaTrabalhador/AgenciaTrabalhador.png",
             name: "Agencia Trabalhador",
-            hours: "Seg a Sex: 9h - 15h",
+            hours: "Seg a Sex: 09:00h as 15:00h",
+             statusAberto:".",
+            horarios: {                          
+              seg: [{ inicio: "09:00", fim: "15:00" }],
+              ter: [{ inicio: "09:00", fim: "15:00" }],
+              qua: [{ inicio: "09:00", fim: "15:00" }],
+              qui: [{ inicio: "09:00", fim: "15:00" }],
+              sex: [{ inicio: "09:00", fim: "15:00" }],
+              sab: [],
+              dom: []
+            },
             address: "Rua Padre Hugo, 1025",
             contact: "(43) 3566-1291",
           },
@@ -6259,6 +6290,16 @@ window.mostrarFotos = mostrarFotos;
             image: "images/setorPublico/cras/cras.png",
             name: "Cras",
             hours: "Seg a Sex: 09:00h as 15:00h",
+              statusAberto:".",
+            horarios: {                          
+              seg: [{ inicio: "09:00", fim: "15:00" }],
+              ter: [{ inicio: "09:00", fim: "15:00" }],
+              qua: [{ inicio: "09:00", fim: "15:00" }],
+              qui: [{ inicio: "09:00", fim: "15:00" }],
+              sex: [{ inicio: "09:00", fim: "15:00" }],
+              sab: [],
+              dom: []
+            },
             address: "R. Salvira Marquês, 366",
             contact: "(43) 98485-1626",
             facebook: "https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
@@ -6300,7 +6341,17 @@ window.mostrarFotos = mostrarFotos;
           {
             image: "images/setorPublico/correio/correio.png",
             name: "Correio",
-            hours: "Seg a Sex: 10:00h as 12;00h e 13:30h as 15:30h",
+            hours: "Seg a Sex: 08:30h as 12:30h ",
+            statusAberto:".",
+            horarios: {                          
+              seg: [{ inicio: "08:30", fim: "12:30" }],
+              ter: [{ inicio: "08:30", fim: "12:30" }],
+              qua: [{ inicio: "08:30", fim: "12:30" }],
+              qui: [{ inicio: "08:30", fim: "12:30" }],
+              sex: [{ inicio: "08:30", fim: "12:30" }],
+              sab: [],
+              dom: []
+            },
             address: "R. Padre Hugo, 843 ",
             contact: "(43) 3377-5023",
             facebook: "https://www.facebook.com/p/Cras-Carl%C3%B3polis-100013825331932/?locale=pt_PT",
