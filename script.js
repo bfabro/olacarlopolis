@@ -194,42 +194,42 @@ document.addEventListener("DOMContentLoaded", function () {
   if (iconeEl) {
     iconeEl.style.color = "#808080";
   }
-/// inicio detecta usuarios online e desconecta
+  /// inicio detecta usuarios online e desconecta
 
 
-document.addEventListener("DOMContentLoaded", function () {
-  registrarAcesso();
+  document.addEventListener("DOMContentLoaded", function () {
+    registrarAcesso();
 
-  const onlineUsersRef = firebase.database().ref("onlineUsers");
+    const onlineUsersRef = firebase.database().ref("onlineUsers");
 
-  // Cria um ID único para cada usuário
-  const userId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  const userRef = onlineUsersRef.child(userId);
+    // Cria um ID único para cada usuário
+    const userId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const userRef = onlineUsersRef.child(userId);
 
-  // Salva o usuário como online
-  userRef.set({
-    hora: new Date().toLocaleTimeString(),
-    navegador: navigator.userAgent,
-    tela: `${window.screen.width}x${window.screen.height}`
+    // Salva o usuário como online
+    userRef.set({
+      hora: new Date().toLocaleTimeString(),
+      navegador: navigator.userAgent,
+      tela: `${window.screen.width}x${window.screen.height}`
+    });
+
+    // Remove automaticamente do banco quando o usuário fecha o site
+    userRef.onDisconnect().remove();
+
+    // Atualiza o contador de usuários online
+    onlineUsersRef.on("value", (snapshot) => {
+      const userCount = snapshot.numChildren();
+      const contador = document.getElementById("contador");
+      if (contador) {
+        contador.textContent = userCount;
+      }
+    });
   });
 
-  // Remove automaticamente do banco quando o usuário fecha o site
-  userRef.onDisconnect().remove();
-
-  // Atualiza o contador de usuários online
-  onlineUsersRef.on("value", (snapshot) => {
-    const userCount = snapshot.numChildren();
-    const contador = document.getElementById("contador");
-    if (contador) {
-      contador.textContent = userCount;
-    }
-  });
-});
 
 
 
-
-/// inicio detecta usuarios online e desconecta
+  /// inicio detecta usuarios online e desconecta
 
 
   onlineUsersRef.on("value", (snapshot) => {
@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "feiradalua", "masterfarma", "oficinadocelular","thebestacai","prelie",  "gustavinho","sallesvidros", "relojoariamartini", "vania",
+    "feiradalua", "masterfarma", "oficinadocelular", "thebestacai", "prelie", "gustavinho", "sallesvidros", "relojoariamartini", "vania",
 
   ];
 
@@ -453,7 +453,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //academia
     lobofitness: "s",
-    teamvieira:"s",
+    teamvieira: "s",
     //AÇAI
     turminhadoacai: "s",
     thebestacai: "s",
@@ -489,11 +489,11 @@ document.addEventListener("DOMContentLoaded", function () {
     norbaautopecas: "s",
 
     //autoeletrica
-    renanautoeletrica:"s",
+    renanautoeletrica: "s",
 
     // artesanato
     judite: "s",
-    patymaosdeouro:"s",
+    patymaosdeouro: "s",
 
     // cartorio
     registrocivileimoveis: "s",
@@ -508,7 +508,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // borracharia
     vidanova: "n",
-    borrachariajr:"s",
+    borrachariajr: "s",
     // deposito de gas
     liagas: "s",
     cncasadogas: "s",
@@ -520,6 +520,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //DESPACHANTE
     rodriguinho: "s",
+
+    //desentupidora
+    gcyvazamentos: "s",
 
     //farmacia
     elshaday: "s",
@@ -639,7 +642,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pesqueirodogalego: "s",
     portal: "s",
     neia: "n",
-    namigojapaneserestaurant:"s",
+    namigojapaneserestaurant: "s",
     //oficinadosabor:"s",
     paiol: "n",
     restaurantedadi: "s",
@@ -661,7 +664,7 @@ document.addEventListener("DOMContentLoaded", function () {
     da2engenharia: "s",
 
     //vidraçadia
-    sallesvidros:"s",
+    sallesvidros: "s",
 
     //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -691,8 +694,10 @@ document.addEventListener("DOMContentLoaded", function () {
     fabiosushimoto: "s",
 
     //eletrecista
-    cyberneticosinstalacoes:"s",
+    cyberneticosinstalacoes: "s",
 
+    //encanador
+gerson:"s",
     // montador de moveis
     hirancastro: "s",
 
@@ -776,11 +781,11 @@ document.addEventListener("DOMContentLoaded", function () {
     lowcity: "s",
     toroonagashi: "s",
     passeiociclisticorotary: "s",
-    aniversariomclobosdafronteira:"s",
-    torneiofutebolsuico:"s",
-    escolhadarainhafrutfest:"s",
-    cafedamanharotapr218:"s",
-    cavalgadadafrutfest:"s",
+    aniversariomclobosdafronteira: "s",
+    torneiofutebolsuico: "s",
+    escolhadarainhafrutfest: "s",
+    cafedamanharotapr218: "s",
+    cavalgadadafrutfest: "s",
 
 
     /// FIM EVENTOS 
@@ -1004,17 +1009,16 @@ document.addEventListener("DOMContentLoaded", function () {
       if (categoriasComida.includes(cat.title)) {
         cat.establishments.forEach(est => {
           const nomeNorm = normalizeName(est.name);
-         const abertoAgora = est.horarios ? estaAbertoAgora(est.horarios) : false;
+          const abertoAgora = est.horarios ? estaAbertoAgora(est.horarios) : false;
 
-if (
-  statusEstabelecimentos[nomeNorm] === "s" &&
-  (
-    filtroCategoria === "Todos" ||
-    (filtroCategoria === "Abertos" && abertoAgora) ||
-    (filtroCategoria !== "Abertos" && cat.title === filtroCategoria)
-  )
-)
- {
+          if (
+            statusEstabelecimentos[nomeNorm] === "s" &&
+            (
+              filtroCategoria === "Todos" ||
+              (filtroCategoria === "Abertos" && abertoAgora) ||
+              (filtroCategoria !== "Abertos" && cat.title === filtroCategoria)
+            )
+          ) {
 
             lista.push({
               ...est,
@@ -1068,20 +1072,19 @@ if (
     
       <span class="onde-comer-categoria">${est.categoria}</span> ${est.horarios ? `
    <span class="status-tag_comer ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
-  ${estaAbertoAgora(est.horarios) 
-    ? `ABERTO <div class="ate-hora">até ${horarioFechamentoAtual(est.horarios) || '--:--'}</div>` 
-    : 'FECHADO'}
+  ${estaAbertoAgora(est.horarios)
+            ? `ABERTO <div class="ate-hora">até ${horarioFechamentoAtual(est.horarios) || '--:--'}</div>`
+            : 'FECHADO'}
 </span>` : ""}
 
     
       <h3>${est.name}</h3>
       
     <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
-  ${
-    est.address && est.address.trim().toLowerCase() !== "somente delivery"
-      ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank">${est.address}</a>`
-      : `<span style="color:#ff0000; font-weight:bold">${est.address}</span>`
-  }
+  ${est.address && est.address.trim().toLowerCase() !== "somente delivery"
+          ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank">${est.address}</a>`
+          : `<span style="color:#ff0000; font-weight:bold">${est.address}</span>`
+        }
 </span>
 
    <span class="onde-comer-telefone">
@@ -1124,30 +1127,30 @@ ${est.novidadesImages && est.novidadesImages.length ? `
   });
 
 
-  
 
 
-function mostrarFotos(nomeNormalizado) {
-  // Procura o estabelecimento pelo nome normalizado
-  let est = null;
-  categories.forEach(cat => {
-    cat.establishments.forEach(e => {
-      if (normalizeName(e.name) === nomeNormalizado && e.novidadesImages && e.novidadesImages.length) {
-        est = e;
-      }
+
+  function mostrarFotos(nomeNormalizado) {
+    // Procura o estabelecimento pelo nome normalizado
+    let est = null;
+    categories.forEach(cat => {
+      cat.establishments.forEach(e => {
+        if (normalizeName(e.name) === nomeNormalizado && e.novidadesImages && e.novidadesImages.length) {
+          est = e;
+        }
+      });
     });
-  });
 
-  if (!est) {
-    alert("Nenhuma foto de divulgação encontrada!");
-    return;
-  }
+    if (!est) {
+      alert("Nenhuma foto de divulgação encontrada!");
+      return;
+    }
 
-  // Remove qualquer modal anterior
-  document.querySelectorAll('.modal-fotos-overlay').forEach(el => el.remove());
+    // Remove qualquer modal anterior
+    document.querySelectorAll('.modal-fotos-overlay').forEach(el => el.remove());
 
-  // Monta o HTML do modal de fotos
-  let html = `
+    // Monta o HTML do modal de fotos
+    let html = `
     <div class="modal-fotos-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.90); z-index: 9999; display: flex; align-items: center; justify-content: center;">
       <div class="modal-fotos" style="background: #fff; border-radius: 16px; max-width: 90vw; max-height: 90vh; overflow: auto; padding: 24px; position: relative;">
         <button class="close-modal-fotos" style="position: absolute; top: 12px; right: 16px; font-size: 2rem; background: none; border: none; color: #333; cursor: pointer;">&times;</button>
@@ -1155,36 +1158,36 @@ function mostrarFotos(nomeNormalizado) {
         <div class="modal-fotos-imgs" style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;">
   `;
 
-  est.novidadesImages.forEach((img, idx) => {
-    const descricao = est.novidadesDescriptions?.[idx] || '';
-    html += `
+    est.novidadesImages.forEach((img, idx) => {
+      const descricao = est.novidadesDescriptions?.[idx] || '';
+      html += `
       <div style="text-align: center;">
         <img src="${img}" alt="Foto ${idx + 1}" style="max-width: 320px; max-height: 260px; border-radius: 10px; box-shadow:0 2px 12px #0002;" loading="lazy">
         <div style="margin-top:8px; color: #444; font-size: 1rem;">${descricao}</div>
       </div>
     `;
-  });
+    });
 
-  html += `
+    html += `
         </div>
       </div>
     </div>
   `;
 
-  // Insere o modal no body
-  document.body.insertAdjacentHTML('beforeend', html);
+    // Insere o modal no body
+    document.body.insertAdjacentHTML('beforeend', html);
 
-  // Evento para fechar ao clicar no botão
-  document.querySelector('.close-modal-fotos').onclick = function () {
-    document.querySelector('.modal-fotos-overlay').remove();
-  };
+    // Evento para fechar ao clicar no botão
+    document.querySelector('.close-modal-fotos').onclick = function () {
+      document.querySelector('.modal-fotos-overlay').remove();
+    };
 
-  // Fecha ao clicar fora do modal
-  document.querySelector('.modal-fotos-overlay').onclick = function (e) {
-    if (e.target === this) this.remove();
-  };
-}
-window.mostrarFotos = mostrarFotos;
+    // Fecha ao clicar fora do modal
+    document.querySelector('.modal-fotos-overlay').onclick = function (e) {
+      if (e.target === this) this.remove();
+    };
+  }
+  window.mostrarFotos = mostrarFotos;
 
 
 
@@ -1200,10 +1203,10 @@ window.mostrarFotos = mostrarFotos;
       });
     });
 
-   
+
     if (!est) return;
 
-  
+
 
 
     // Remove modal antiga se existir
@@ -1246,7 +1249,7 @@ window.mostrarFotos = mostrarFotos;
   ///////// fim onde comer
 
 
-  
+
 
 
 
@@ -1349,12 +1352,12 @@ window.mostrarFotos = mostrarFotos;
 
       return validadeA - validadeB;
     });
-/////
-////
-////
-////
+    /////
+    ////
+    ////
+    ////
 
-///
+    ///
     ordenados.forEach((comercio, idx) => {
       const agora = new Date();
       let primeiraPromoValida = null;
@@ -1882,7 +1885,7 @@ window.mostrarFotos = mostrarFotos;
           whatsapp: "43999540753"
         },
 
-         {
+        {
           imagem: "images/comercios/artesanato/patricia/promocoes/2.jpg",
           descricao: "Pano de prato - Frutas ",
           validade: "2025-07-31T18:00:00",
@@ -1892,7 +1895,7 @@ window.mostrarFotos = mostrarFotos;
           whatsapp: "43999540753"
         },
 
-         {
+        {
           imagem: "images/comercios/artesanato/patricia/promocoes/3.jpg",
           descricao: "Pano de prato - Plantas ",
           validade: "2025-07-31T18:00:00",
@@ -1902,7 +1905,7 @@ window.mostrarFotos = mostrarFotos;
           whatsapp: "43999540753"
         },
 
-         {
+        {
           imagem: "images/comercios/artesanato/patricia/promocoes/4.jpg",
           descricao: "Pano de prato - Melancia ",
           validade: "2025-07-31T18:00:00",
@@ -1911,9 +1914,9 @@ window.mostrarFotos = mostrarFotos;
           // desconto: "5",
           whatsapp: "43999540753"
         },
-       
 
-       
+
+
 
       ]
     },
@@ -2014,7 +2017,7 @@ window.mostrarFotos = mostrarFotos;
 
 
 
-{
+      {
         link: document.querySelector("#menuAcademiaLuta"),
         title: "Academia",
         establishments: [
@@ -2035,9 +2038,9 @@ window.mostrarFotos = mostrarFotos;
             },
             address: "Rua Dr. Paulo e Silva, 1182 - Carlopolis",
             contact: "(43) 99136-5029",
-            
+
             instagram: "https://www.instagram.com/romeuteamvieira_oficial/",
-            infoAdicional:"🔸Muay Thay<Br>🔸MMA<Br>🔸Jiu-Jitsu",
+            infoAdicional: "🔸Muay Thay<Br>🔸MMA<Br>🔸Jiu-Jitsu",
             novidadesImages: [
               "images/comercios/academiaLuta/teamVieira/divulgacao/1.png",
               "images/comercios/academiaLuta/teamVieira/divulgacao/2.png",
@@ -2122,7 +2125,7 @@ window.mostrarFotos = mostrarFotos;
             },
             address: "R. Benedito Salles, 409 - Carlopolis",
             contact: "(43) 99639-9374",
-          
+
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/turminha_do_acai/",
 
@@ -2312,9 +2315,9 @@ window.mostrarFotos = mostrarFotos;
             image: "images/comercios/artesanato/patricia/perfil.jpg",
             name: "Paty Mãos De Ouro",
             contact: "(43) 99954-0753",
-            hours:"Somente encomendas!",
-            infoAdicional:"<br>🧵 Serviços oferecidos:<br>👗 Bordados personalizados<br>🎨 Artesanato criativo<br>🎁 Lembrancinhas para datas especiais<br>🛍️ Presentes únicos feitos à mão<br>🏡 Itens decorativos<br>📦 Produtos sob encomenda<Br><br>📬 Entregas e Encomendas<br>Trabalho por encomenda e envio tudo com muito cuidado! Combinamos tudo certinho pelo WhatsApp<br><br>Cada peça é feita com amor e atenção aos detalhes — ideal para presentear, decorar ou guardar como lembrança! Se você procura algo único, artesanal e cheio de afeto, fale comigo. Vai ser um prazer criar algo para você!",
-            instagram:"https://www.instagram.com/patymaosdeouro/",
+            hours: "Somente encomendas!",
+            infoAdicional: "<br>🧵 Serviços oferecidos:<br>👗 Bordados personalizados<br>🎨 Artesanato criativo<br>🎁 Lembrancinhas para datas especiais<br>🛍️ Presentes únicos feitos à mão<br>🏡 Itens decorativos<br>📦 Produtos sob encomenda<Br><br>📬 Entregas e Encomendas<br>Trabalho por encomenda e envio tudo com muito cuidado! Combinamos tudo certinho pelo WhatsApp<br><br>Cada peça é feita com amor e atenção aos detalhes — ideal para presentear, decorar ou guardar como lembrança! Se você procura algo único, artesanal e cheio de afeto, fale comigo. Vai ser um prazer criar algo para você!",
+            instagram: "https://www.instagram.com/patymaosdeouro/",
             novidadesImages: [
               "images/comercios/artesanato/patricia/divulgacao/1.jpg",
               "images/comercios/artesanato/patricia/divulgacao/2.jpg",
@@ -2324,7 +2327,7 @@ window.mostrarFotos = mostrarFotos;
               "images/comercios/artesanato/patricia/divulgacao/6.jpg",
               "images/comercios/artesanato/patricia/divulgacao/7.jpg",
               "images/comercios/artesanato/patricia/divulgacao/8.jpg",
-             
+
             ],
             novidadesDescriptions: [
               "Capas exclusivas para almofadas, produzidas artesanalmente e sob medida para o seu espaço. Perfeitas para presentear ou dar um toque especial à decoração.",
@@ -2335,7 +2338,7 @@ window.mostrarFotos = mostrarFotos;
               "Fraldinhas de boca exclusivas, perfeitas para completar o enxoval ou presentear com afeto.",
               "Sobre lençóis personalizados, confeccionados com atenção aos detalhes para proporcionar noites de sono ainda mais agradáveis.",
               "Deixe seu banho ainda mais especial com toalhas personalizadas, únicas como você! Ideais para dar um toque pessoal ao seu dia a dia ou surpreender alguém querido.",
-             
+
 
             ],
           },
@@ -2617,9 +2620,9 @@ window.mostrarFotos = mostrarFotos;
             facebook: "https://www.facebook.com/oficinadocelularclps/",
             instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
             novidadesImages: [
-               "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/1.jpg",
+              "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/1.jpg",
               "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/2.jpg",
-             
+
             ],
             novidadesDescriptions: [
               "CURTIR O POST!<br>• SEGUIR O INSTAGRAM DA LOJA!<br>• COMPARTILHAR NO STORY E MARCAR A LOJA!<br>• MARCAR 5 AMIGOS NOS COMENTÁRIOS (quanto mais amigos marcar, maior a chance de ganhar) obs: não pode marcar a mesma pessoa 2 vezes!<br>•Ganhador ou ganhadora deve estar seguindo todas as regras do sorteio corretamente, caso contrário será sorteado novamente!!!<br>O SORTEIO OCORRERÁ NO DIA 22/12/2025 BOA SORTE A TODOS",
@@ -4454,7 +4457,7 @@ window.mostrarFotos = mostrarFotos;
             instagram: "https://www.instagram.com/_supermercado.rocha/",
           },
 
-         
+
 
           {
             image: "images/comercios/supermercado/zerojapan/zerojapan.png",
@@ -4663,37 +4666,37 @@ window.mostrarFotos = mostrarFotos;
             name: "Bio Farma",
             address: "R. Laurindo Franco Godoy, 464 - Carlopolis",
             hours: "Seg a Sex:</strong> 08:00h as 18:00h </br>Sab: </strong>08:00h as 12:00h",
-          
+
             statusAberto: ".",
-           horarios: {                          
-                seg: [{ inicio: "08:00", fim: "18:00" }],
-                ter: [{ inicio: "08:00", fim: "18:00" }],
-                qua: [{ inicio: "08:00", fim: "18:00" }],
-                qui: [{ inicio: "08:00", fim: "18:00" }],
-                sex: [{ inicio: "08:00", fim: "18:00" }],
-                sab: [{ inicio: "08:00", fim: "12:00" }],
-                dom: []
-              },    
-            
-            contact:"(43) 99988-9376",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
+              dom: []
+            },
+
+            contact: "(43) 99988-9376",
             contact2: "(43) 3566-1473",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/p/Farm%C3%A1cia-Bio-Farma-100063579070016/?_rdr",
             instagram: "https://www.instagram.com/farmaciabiofarmaa/",
 
             novidadesImages: [
-              "images/comercios/farmacia/bioFarma/divulgacao/1.jpg", 
+              "images/comercios/farmacia/bioFarma/divulgacao/1.jpg",
               "images/comercios/farmacia/bioFarma/divulgacao/2.png",
               "images/comercios/farmacia/bioFarma/divulgacao/3.png",
               "images/comercios/farmacia/bioFarma/divulgacao/4.png",
-              
+
             ],
             novidadesDescriptions: [
-                "Estamos de Plantão!",  
+              "Estamos de Plantão!",
               "Venham Nos Visitar, na BioFarma encontre o que precisa!",
               "Cabelo seco igual a um turista perdido no deserto da Austrália?Sorte a sua que a linha tem tudo o que Você precisa para deixar os cabelos macios e intensamente hidratados!!",
               "Linha completa da Gota Dourada para o seu cabelo ficar Maravilhoso e causar inveja a todoos❤️",
-             
+
             ],
           },
 
@@ -4772,10 +4775,10 @@ window.mostrarFotos = mostrarFotos;
               "images/comercios/farmacia/drogaMais/divulgacao/3.png",
               "images/comercios/farmacia/drogaMais/divulgacao/4.png",
               "images/comercios/farmacia/drogaMais/divulgacao/5.png",
-              
+
             ],
             novidadesDescriptions: [
-            
+
               "Quer garantir o melhor para o seu bebê?<br> Passe na Drogamais ou peça pelos nossos canais de atendimento!",
               "Tudo o que você precisa tem na DROGAMAIS! ❤️ <br>• Medicamentos • Perfumaria • Itens de beleza • Produtos de higiene! Vem pra Drogamais e encontre tudo em um só lugar! ",
               "Em dúvidas sobre sua receita?<br> Passe na Drogamais que a gente te ajuda!",
@@ -4898,18 +4901,18 @@ window.mostrarFotos = mostrarFotos;
             name: "Master Farma",
             address: "R. Laurindo Franco de Godoi, 90 - Carlopolis",
             hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-            plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"19/07 a 25/07", 
-             statusAberto:".",
-              horarios: {                          
-                seg: [{ inicio: "08:00", fim: "21:00" }],
-                ter: [{ inicio: "08:00", fim: "21:00" }],
-                qua: [{ inicio: "08:00", fim: "21:00" }],
-                qui: [{ inicio: "08:00", fim: "21:00" }],
-                sex: [{ inicio: "08:00", fim: "21:00" }],
-                sab: [{ inicio: "08:00", fim: "21:00" }],
-                dom: [{ inicio: "08:00", fim: "21:00" }]
-              }, 
+            plantaoHorario: "08:00h às 21:00h",
+            plantaoData: "19/07 a 25/07",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "21:00" }],
+              ter: [{ inicio: "08:00", fim: "21:00" }],
+              qua: [{ inicio: "08:00", fim: "21:00" }],
+              qui: [{ inicio: "08:00", fim: "21:00" }],
+              sex: [{ inicio: "08:00", fim: "21:00" }],
+              sab: [{ inicio: "08:00", fim: "21:00" }],
+              dom: [{ inicio: "08:00", fim: "21:00" }]
+            },
             contact: "(43) 99951-1540",
             contact2: "(43) 3566-1141",
             delivery: "Sim / Sem Taxa",
@@ -4984,7 +4987,7 @@ window.mostrarFotos = mostrarFotos;
             name: "Santa Maria",
             address: "R. Benedito Salles, nº 711 - Carlopols",
             hours: "Seg a Sex: 08:00h as 18h </br> Sab: 08:00h as 12:00h",
-     
+
             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
@@ -5113,7 +5116,7 @@ window.mostrarFotos = mostrarFotos;
 
 
       //// vidraçaria
-{
+      {
         link: document.querySelector("#menuVidracaria"),
         title: "Vidraçaria",
         establishments: [
@@ -5123,11 +5126,11 @@ window.mostrarFotos = mostrarFotos;
             hours: "Seg a Sex: 08:30h as 11:30h - 13:30h as 17:30h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
-              ter: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
-              qua: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
-              qui: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
-              sex: [{ inicio: "08:30", fim: "11:30" },{ inicio: "13:30", fim: "17:30" }],
+              seg: [{ inicio: "08:30", fim: "11:30" }, { inicio: "13:30", fim: "17:30" }],
+              ter: [{ inicio: "08:30", fim: "11:30" }, { inicio: "13:30", fim: "17:30" }],
+              qua: [{ inicio: "08:30", fim: "11:30" }, { inicio: "13:30", fim: "17:30" }],
+              qui: [{ inicio: "08:30", fim: "11:30" }, { inicio: "13:30", fim: "17:30" }],
+              sex: [{ inicio: "08:30", fim: "11:30" }, { inicio: "13:30", fim: "17:30" }],
               sab: [],
               dom: []
             },
@@ -5311,7 +5314,7 @@ window.mostrarFotos = mostrarFotos;
           {
             image: "images/servicos/eletrecista/cybernetico/perfil.jpg",
             name: "Cyberneticos instalações",
-            address:"R. Laurindo Franco Godoi, 1028 - Carlopolis",
+            address: "R. Laurindo Franco Godoi, 1028 - Carlopolis",
             hours: "Seg a Sab: 08:00h as 18:00h",
             statusAberto: ".",
             horarios: {
@@ -5324,12 +5327,12 @@ window.mostrarFotos = mostrarFotos;
               dom: []
             },
             contact: "(43) 98854-4318",
-            instagram:"https://www.instagram.com/cyberneticos.pr/",
-            infoAdicional:"⚠️ - Atendemos Emergencias <br> 🔧 - Fazemos instalações:<br> 🏭 - Eletrica Industriais<br>🌾 - Eletrica em sitios. ",
+            instagram: "https://www.instagram.com/cyberneticos.pr/",
+            infoAdicional: "⚠️ - Atendemos Emergencias <br> 🔧 - Fazemos instalações:<br> 🏭 - Eletrica Industriais<br>🌾 - Eletrica em sitios. ",
             novidadesImages: [
               "images/servicos/eletrecista/cybernetico/divulgacao/1.jpg",
               "images/servicos/eletrecista/cybernetico/divulgacao/2.jpg",
-              
+
             ],
             novidadesDescriptions: [
               "Instalação completa de consultorio.",
@@ -5337,7 +5340,7 @@ window.mostrarFotos = mostrarFotos;
             ],
           },
 
-         
+
         ],
       },
 
@@ -5346,13 +5349,42 @@ window.mostrarFotos = mostrarFotos;
         title: "Encanador",
         establishments: [
           {
-            name: "Rubens",
-            contact: "(43) 7890-1234",
+            image: "images/servicos/encanador/gerson/perfil.jpg",
+            name: "Gerson",
+            hours: "Seg a Sab: 07:30h as 19:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "07:30", fim: "19:00" }],
+              ter: [{ inicio: "07:30", fim: "19:00" }],
+              qua: [{ inicio: "07:30", fim: "19:00" }],
+              qui: [{ inicio: "07:30", fim: "19:00" }],
+              sex: [{ inicio: "07:30", fim: "19:00" }],
+              sab: [{ inicio: "07:30", fim: "19:00" }],
+              dom: []
+            },
+            address: "R. José Talim, 449 - Carlópolis",
+            contact: "(43) 99196-7618",
+            facebook: "https://www.facebook.com/gcyvazamentos",
+            instagram: "https://www.instagram.com/gcyvazamentos/",
+            infoAdicional: "🚽 Desentupimento de esgotos<br>🔎 Detecção de vazamentos<br>🧼 Limpeza de caixa de gordura<br>🔧 Manutenção hidráulica em geral<br>💧 Ralos e pias<br>🛠️ Ramais de esgoto",
+            novidadesImages: [
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/1.jpg",
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/2.jpg",
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/3.jpg",
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/4.jpg",
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/5.jpg",
+
+            ],
+            novidadesDescriptions: [
+              "Se você procura soluções hidráulicas para seu imóvel como: vazamento, limpeza de caixa d'água, desentupimento, manutenção de esgoto e tubulações, serviços de Geofone para caça vazamentos em profundidade, fale conosco",
+              "O primeiro sinal de um vazamento de água imperceptível antes de conseguir notar a olho nu, é o aumento notável na conta de água da sua casa. Normalmente quando há um vazamento de água, a conta passa a vir muito mais alta. Fique atento, e caso note o aumento, é melhor começar a procurar logo pelo vazamento e evitar maiores danos e transtornos.",
+              "você sabia?<BR>Uma torneira gotejando pode gastar 46 litros por dia, chegando a 1.380 litros por mês? E que um micro vazamento de apenas 2 milímetros no encanamento pode causar um gasto de 3.200 litros por dia? É impressionante o quanto nós podemos gastar sem perceber, por exemplo, se 1m³(que equivale a 1 litro de água) custar R$2,99, com um micro vazamento de 2 milímetros você terá um gasto de R$9,56 por dia, totalizando R$ 286,80 por mês, ou seja, um alto valor que poderia ter outro investimento. Agora pensando no prejuízo que terá durante um ano com o vazamento, o gasto será equivalente a R$3.441,60, isso sem contar o gasto com a mão de obra que terá para reparar os danos causados pelo vazamento. Agora pense em quantas possibilidades você teria para gastar esse valor? Depois de entender os riscos e prejuízos causados por um vazamento, irei apresentar três maneiras fáceis de descobrir se realmente há um vazamento de água.",
+              "Sua piscina está com vazamento? Ou tem suspeita do de algo errado?<bR>Os vazamentos de água são comuns, porém perturbadores. Quando digo perturbadores, me refiro ao trabalho que da para encontrar um simples vazamento, principalmente numa piscina, sem contar a conta de água que vai lá para as alturas.",
+              "1- Para verificar se há vazamentos no vaso sanitário, jogue um pouco de borra de café ou cinzas no fundo do vaso. <BR><BR>2- Caso a parede de sua casa esteja úmida, procure imediatamente um encanador.<BR><BR>3- Vazamentos na torneira podem ser facilmente verificados quando se é fechada .",
+
+            ],
           },
-          {
-            name: "Jose",
-            contact: "(43) 8901-2345",
-          },
+
         ],
       },
 
@@ -5563,7 +5595,7 @@ window.mostrarFotos = mostrarFotos;
 
 
 
- {
+          {
             image: "images/informacoes/eventos/volei_monizak.jpg",
             name: "Circuito Monisak de Vôlei de Praia",
             date: "27/07/2025",
@@ -5599,7 +5631,7 @@ window.mostrarFotos = mostrarFotos;
 
 
 
-           {
+          {
             image: "images/informacoes/eventos/escolhaRainha.jpg",
             name: "Escolha da Rainha Frut Fest",
             date: "16/08/2025",
@@ -5609,7 +5641,7 @@ window.mostrarFotos = mostrarFotos;
           },
 
 
-           {
+          {
             image: "images/informacoes/eventos/torneioFutebol.jpg",
             name: "Torneio Futebol Suiço",
             date: "24/08/2025",
@@ -5640,7 +5672,7 @@ window.mostrarFotos = mostrarFotos;
 
           },
 
-            {
+          {
             image: "images/informacoes/eventos/rotapr218.jpg",
             name: "Café da manha Rota PR218",
             date: "21/09/25",
@@ -5762,51 +5794,51 @@ window.mostrarFotos = mostrarFotos;
 
 
           /* [ 2 ]  */
-/* 
-          {
-            image: "images/comercios/farmacia/santaMaria/santamaria.png",
-            name: "Santa Maria",
-            address: "R. Benedito Salles, nº 711 - Carlopols",
-            hours: "Seg a Sex: 08:00h as 18h </br> Sab: 08:00h as 12:00h",
-            plantaoHorario: "08:00h às 21:00h",
-            plantaoData: "05/07 a 11/07",
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "08:00", fim: "21:00" }],
-              ter: [{ inicio: "08:00", fim: "21:00" }],
-              qua: [{ inicio: "08:00", fim: "21:00" }],
-              qui: [{ inicio: "08:00", fim: "21:00" }],
-              sex: [{ inicio: "08:00", fim: "21:00" }],
-              sab: [{ inicio: "08:00", fim: "21:00" }],
-              dom: [{ inicio: "08:00", fim: "21:00" }]
-            },
-            contact: "(43) 99840-9658",
-            delivery: "Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
-            instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
-
-            novidadesImages: [
-              "images/comercios/farmacia/santaMaria/divulgacao/1.jpg",
-              "images/comercios/farmacia/santaMaria/divulgacao/2.jpg",
-              "images/comercios/farmacia/santaMaria/divulgacao/3.jpg",
-              "images/comercios/farmacia/santaMaria/divulgacao/4.jpg",
-              "images/comercios/farmacia/santaMaria/divulgacao/5.jpg",
-              "images/comercios/farmacia/santaMaria/divulgacao/6.jpg",
-
-            ],
-            novidadesDescriptions: [
-              "Aniversário de 30 anos da Farmácia Santa Maria, e quem ganha o presente é você! ❤️🎁❤️ Venha comemorar com a gente",
-              "Estamos de Plantao! Conte com nós!",
-              "Nutricolin - Silício orgânico!Estimula as proteínas da beleza na pele, cabelos e unhas.Peça já o seu manipulado ❤️",
-              "Emagreça com saúde! Fórmula manipulada completa.",
-              "Colágeno Verisol em sachê.",
-              "Equilibre seu corpo e mente!",
-
-            ],
-          },
-
-*/
+          /* 
+                    {
+                      image: "images/comercios/farmacia/santaMaria/santamaria.png",
+                      name: "Santa Maria",
+                      address: "R. Benedito Salles, nº 711 - Carlopols",
+                      hours: "Seg a Sex: 08:00h as 18h </br> Sab: 08:00h as 12:00h",
+                      plantaoHorario: "08:00h às 21:00h",
+                      plantaoData: "05/07 a 11/07",
+                      hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                      statusAberto: ".",
+                      horarios: {
+                        seg: [{ inicio: "08:00", fim: "21:00" }],
+                        ter: [{ inicio: "08:00", fim: "21:00" }],
+                        qua: [{ inicio: "08:00", fim: "21:00" }],
+                        qui: [{ inicio: "08:00", fim: "21:00" }],
+                        sex: [{ inicio: "08:00", fim: "21:00" }],
+                        sab: [{ inicio: "08:00", fim: "21:00" }],
+                        dom: [{ inicio: "08:00", fim: "21:00" }]
+                      },
+                      contact: "(43) 99840-9658",
+                      delivery: "Sim / Sem Taxa",
+                      facebook: "https://www.facebook.com/farmaciasantamaria.carlopolis/",
+                      instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
+          
+                      novidadesImages: [
+                        "images/comercios/farmacia/santaMaria/divulgacao/1.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/2.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/3.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/4.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/5.jpg",
+                        "images/comercios/farmacia/santaMaria/divulgacao/6.jpg",
+          
+                      ],
+                      novidadesDescriptions: [
+                        "Aniversário de 30 anos da Farmácia Santa Maria, e quem ganha o presente é você! ❤️🎁❤️ Venha comemorar com a gente",
+                        "Estamos de Plantao! Conte com nós!",
+                        "Nutricolin - Silício orgânico!Estimula as proteínas da beleza na pele, cabelos e unhas.Peça já o seu manipulado ❤️",
+                        "Emagreça com saúde! Fórmula manipulada completa.",
+                        "Colágeno Verisol em sachê.",
+                        "Equilibre seu corpo e mente!",
+          
+                      ],
+                    },
+          
+          */
           /* [ 3 ]
 
             {
@@ -5848,25 +5880,25 @@ window.mostrarFotos = mostrarFotos;
           },
           
               */
-             
+
           /* [ 4 ]*/
           {
             image: "images/comercios/farmacia/masterFarma/masterfarma.png",
             name: "Master Farma",
             address: "R. Laurindo Franco de Godoi, 90 - Carlopolis",
-            plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"19/07 a 25/07",  
+            plantaoHorario: "08:00h às 21:00h",
+            plantaoData: "19/07 a 25/07",
             hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-            statusAberto:".",
-              horarios: {                          
-                seg: [{ inicio: "08:00", fim: "21:00" }],
-                ter: [{ inicio: "08:00", fim: "21:00" }],
-                qua: [{ inicio: "08:00", fim: "21:00" }],
-                qui: [{ inicio: "08:00", fim: "21:00" }],
-                sex: [{ inicio: "08:00", fim: "21:00" }],
-                sab: [{ inicio: "08:00", fim: "21:00" }],
-                dom: [{ inicio: "08:00", fim: "21:00" }]
-              },   
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "21:00" }],
+              ter: [{ inicio: "08:00", fim: "21:00" }],
+              qua: [{ inicio: "08:00", fim: "21:00" }],
+              qui: [{ inicio: "08:00", fim: "21:00" }],
+              sex: [{ inicio: "08:00", fim: "21:00" }],
+              sab: [{ inicio: "08:00", fim: "21:00" }],
+              dom: [{ inicio: "08:00", fim: "21:00" }]
+            },
             contact: "(43) 99951-1540",
             contact2: "(43) 3566-1141",
             delivery: "Sim / Sem Taxa",
@@ -5894,7 +5926,7 @@ window.mostrarFotos = mostrarFotos;
             ],
           },
 
-        
+
 
           /* [ 5 ]
         {
@@ -6197,7 +6229,7 @@ window.mostrarFotos = mostrarFotos;
             name: "Agendamento De Viagens",
             hours: "Seg a Sex: 8:30h as 12:00h, 13:30 as 17:00h",
             address: "-",
-            
+
             contact: "(43) 99825-1005",
 
 
@@ -6213,8 +6245,8 @@ window.mostrarFotos = mostrarFotos;
             image: "images/setorPublico/ambulatorio/perfil.jpg",
             name: "Ambulatorio Do Hospital",
             hours: "Seg a Sex: 8:00h as 17:00h",
-             statusAberto:".",
-            horarios: {                          
+            statusAberto: ".",
+            horarios: {
               seg: [{ inicio: "08:00", fim: "17:00" }],
               ter: [{ inicio: "08:00", fim: "17:00" }],
               qua: [{ inicio: "08:00", fim: "17:00" }],
@@ -6243,8 +6275,8 @@ window.mostrarFotos = mostrarFotos;
             image: "images/setorPublico/asilo/asilo.png",
             name: "Asilo",
             hours: "Seg a Sex: 09:00h as 12:00h",
-             statusAberto:".",
-            horarios: {                          
+            statusAberto: ".",
+            horarios: {
               seg: [{ inicio: "09:00", fim: "12:00" }],
               ter: [{ inicio: "09:00", fim: "12:00" }],
               qua: [{ inicio: "09:00", fim: "12:00" }],
@@ -6267,8 +6299,8 @@ window.mostrarFotos = mostrarFotos;
             image: "images/setorPublico/agenciaTrabalhador/AgenciaTrabalhador.png",
             name: "Agencia Trabalhador",
             hours: "Seg a Sex: 09:00h as 15:00h",
-             statusAberto:".",
-            horarios: {                          
+            statusAberto: ".",
+            horarios: {
               seg: [{ inicio: "09:00", fim: "15:00" }],
               ter: [{ inicio: "09:00", fim: "15:00" }],
               qua: [{ inicio: "09:00", fim: "15:00" }],
@@ -6291,8 +6323,8 @@ window.mostrarFotos = mostrarFotos;
             image: "images/setorPublico/cras/cras.png",
             name: "Cras",
             hours: "Seg a Sex: 09:00h as 15:00h",
-              statusAberto:".",
-            horarios: {                          
+            statusAberto: ".",
+            horarios: {
               seg: [{ inicio: "09:00", fim: "15:00" }],
               ter: [{ inicio: "09:00", fim: "15:00" }],
               qua: [{ inicio: "09:00", fim: "15:00" }],
@@ -6343,8 +6375,8 @@ window.mostrarFotos = mostrarFotos;
             image: "images/setorPublico/correio/correio.png",
             name: "Correio",
             hours: "Seg a Sex: 08:30h as 12:30h ",
-            statusAberto:".",
-            horarios: {                          
+            statusAberto: ".",
+            horarios: {
               seg: [{ inicio: "08:30", fim: "12:30" }],
               ter: [{ inicio: "08:30", fim: "12:30" }],
               qua: [{ inicio: "08:30", fim: "12:30" }],
@@ -6498,7 +6530,7 @@ window.mostrarFotos = mostrarFotos;
 
 
           {
-            
+
             name: "Benedito Rodrigues de Camargo",
             hours: "Seg a Sex: 09:00h - 18:00h",
             address: "Av. Elson Soares, 295 - Carlopolis",
@@ -6858,11 +6890,11 @@ window.mostrarFotos = mostrarFotos;
               sab: [{ inicio: "06:30", fim: "14:00" }],
               dom: [],
             },
-             address: "R. Benedito Sales, 1560 - Carlopolis",
+            address: "R. Benedito Sales, 1560 - Carlopolis",
             contact: "(43) 99167-4917",
-            infoAdicional:"Balanceamento de carro e caminhonete<br>Vulcanização laterais<br>Pneus Remoldi<br>Camera de Ar",
+            infoAdicional: "Balanceamento de carro e caminhonete<br>Vulcanização laterais<br>Pneus Remoldi<br>Camera de Ar",
             instagram: "#",
-           
+
           },
         ],
       },
@@ -6887,7 +6919,7 @@ window.mostrarFotos = mostrarFotos;
         title: "Auto Eletrico",
         establishments: [
           {
-             image: "images/comercios/autoEletrica/renan/perfil.jpg",
+            image: "images/comercios/autoEletrica/renan/perfil.jpg",
             name: "Renan Auto Elétrica",
             hours: "Seg a Sex: 08:00h as 18:00h",
             statusAberto: ".",
@@ -6902,36 +6934,36 @@ window.mostrarFotos = mostrarFotos;
             },
             address: "R. Genova, 20 - Carlopolis",
             contact: "(43) 99956-2443",
-            instagram:"https://www.instagram.com/renan_autoeletrica/",
-            infoAdicional:"🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos<br>🚗 - Serviço de Leva e Tras!",
-          novidadesImages: [
+            instagram: "https://www.instagram.com/renan_autoeletrica/",
+            infoAdicional: "🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos<br>🚗 - Serviço de Leva e Tras!",
+            novidadesImages: [
               "images/comercios/autoEletrica/renan/divulgacao/1.jpg",
-          
+
 
             ],
             novidadesDescriptions: [
               "Ampla area para tambem atendimento em Caminhoes, Tratores e maquinario agricola",
-                 
-              
+
+
 
             ],
-          
-          
-          
+
+
+
           },
         ],
       },
 
 
 
-///
-///
+      ///
+      ///
       ////////
       ////////
       ////////
 
       ///////
-      
+
       {
         link: document.querySelector("#menuBrinquedos"),
         title: "Loja de Brinquedo",
@@ -7126,7 +7158,48 @@ window.mostrarFotos = mostrarFotos;
 
 
 
+      {
+        link: document.querySelector("#menuDesentupidora"),
+        title: "Desentupidora",
+        establishments: [
+          {
+            image: "images/comercios/desentupidora/gcyVazamentos/perfil.jpg",
+            name: "GCY VAZAMENTOS",
+            hours: "Seg a Sab: 07:30h as 19:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "07:30", fim: "19:00" }],
+              ter: [{ inicio: "07:30", fim: "19:00" }],
+              qua: [{ inicio: "07:30", fim: "19:00" }],
+              qui: [{ inicio: "07:30", fim: "19:00" }],
+              sex: [{ inicio: "07:30", fim: "19:00" }],
+              sab: [{ inicio: "07:30", fim: "19:00" }],
+              dom: []
+            },
+            address: "R. José Talim, 449 - Carlópolis",
+            contact: "(43) 99196-7618",
+            facebook: "https://www.facebook.com/gcyvazamentos",
+            instagram: "https://www.instagram.com/gcyvazamentos/",
+            infoAdicional: "🚽 Desentupimento de esgotos<br>🔎 Detecção de vazamentos<br>🧼 Limpeza de caixa de gordura<br>🔧 Manutenção hidráulica em geral<br>💧 Ralos e pias<br>🛠️ Ramais de esgoto",
+            novidadesImages: [
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/1.jpg",
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/2.jpg",
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/3.jpg",
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/4.jpg",
+              "images/comercios/desentupidora/gcyVazamentos/divulgacao/5.jpg",
 
+            ],
+            novidadesDescriptions: [
+              "Se você procura soluções hidráulicas para seu imóvel como: vazamento, limpeza de caixa d'água, desentupimento, manutenção de esgoto e tubulações, serviços de Geofone para caça vazamentos em profundidade, fale conosco",
+              "O primeiro sinal de um vazamento de água imperceptível antes de conseguir notar a olho nu, é o aumento notável na conta de água da sua casa. Normalmente quando há um vazamento de água, a conta passa a vir muito mais alta. Fique atento, e caso note o aumento, é melhor começar a procurar logo pelo vazamento e evitar maiores danos e transtornos.",
+              "você sabia?<BR>Uma torneira gotejando pode gastar 46 litros por dia, chegando a 1.380 litros por mês? E que um micro vazamento de apenas 2 milímetros no encanamento pode causar um gasto de 3.200 litros por dia? É impressionante o quanto nós podemos gastar sem perceber, por exemplo, se 1m³(que equivale a 1 litro de água) custar R$2,99, com um micro vazamento de 2 milímetros você terá um gasto de R$9,56 por dia, totalizando R$ 286,80 por mês, ou seja, um alto valor que poderia ter outro investimento. Agora pensando no prejuízo que terá durante um ano com o vazamento, o gasto será equivalente a R$3.441,60, isso sem contar o gasto com a mão de obra que terá para reparar os danos causados pelo vazamento. Agora pense em quantas possibilidades você teria para gastar esse valor? Depois de entender os riscos e prejuízos causados por um vazamento, irei apresentar três maneiras fáceis de descobrir se realmente há um vazamento de água.",
+              "Sua piscina está com vazamento? Ou tem suspeita do de algo errado?<bR>Os vazamentos de água são comuns, porém perturbadores. Quando digo perturbadores, me refiro ao trabalho que da para encontrar um simples vazamento, principalmente numa piscina, sem contar a conta de água que vai lá para as alturas.",
+              "1- Para verificar se há vazamentos no vaso sanitário, jogue um pouco de borra de café ou cinzas no fundo do vaso. <BR><BR>2- Caso a parede de sua casa esteja úmida, procure imediatamente um encanador.<BR><BR>3- Vazamentos na torneira podem ser facilmente verificados quando se é fechada .",
+
+            ],
+          },
+        ],
+      },
 
 
 
@@ -7236,8 +7309,8 @@ window.mostrarFotos = mostrarFotos;
             contact: "(43) 99103-4187",
             delivery: "Sim / Sem Taxa",
             instagram: "https://www.instagram.com/seizapr/",
-         infoAdicional: "Link para nosso Grupo de Ofertas e Novidades: <a target='_blank' style='color:#2da6ff;' href='https://chat.whatsapp.com/CFr4ebifZzgE6fFu4CXb6F?fbclid=PAZXh0bgNhZW0CMTEAAacHiXLLmyzhMTzrCrfIEnjku_fr9ECJp14YSjDGVRbWZkWDjd3JsGY_K91mEg_aem_SLISaT9eNaCaW5Q1NUGKJQ'>Entrar</a>",
-     
+            infoAdicional: "Link para nosso Grupo de Ofertas e Novidades: <a target='_blank' style='color:#2da6ff;' href='https://chat.whatsapp.com/CFr4ebifZzgE6fFu4CXb6F?fbclid=PAZXh0bgNhZW0CMTEAAacHiXLLmyzhMTzrCrfIEnjku_fr9ECJp14YSjDGVRbWZkWDjd3JsGY_K91mEg_aem_SLISaT9eNaCaW5Q1NUGKJQ'>Entrar</a>",
+
             novidadesImages: [
               "images/comercios/produtosOrientais/seiza/divulgacao/9.jpg",
               "images/comercios/produtosOrientais/seiza/divulgacao/2.png",
@@ -7394,19 +7467,19 @@ window.mostrarFotos = mostrarFotos;
               "images/comercios/restaurante/assadaoRussao/divulgacao/2.png",
               "images/comercios/restaurante/assadaoRussao/divulgacao/3.png",
               "images/comercios/restaurante/assadaoRussao/divulgacao/4.jpg",
-               "images/comercios/restaurante/assadaoRussao/divulgacao/5.jpg",
-                
+              "images/comercios/restaurante/assadaoRussao/divulgacao/5.jpg",
 
-              
+
+
 
             ],
             novidadesDescriptions: [
-             "Marmita Churrasco!",
+              "Marmita Churrasco!",
               "Marmita de Salada",
               "Marmita com Feijoada",
               "Frango Assado pupuricado",
               "Todos os Domingos, temos Frangos Assados!, encomende o teu!",
-              
+
 
             ],
 
@@ -7553,32 +7626,32 @@ window.mostrarFotos = mostrarFotos;
             hours: "Seg a Sab: 11:00h as 15:00h - 18:00h as 00:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
-              ter: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
-              qua: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
-              qui: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
-              sex: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
-              sab: [{ inicio: "11:00", fim: "15:00" },{ inicio: "18:00", fim: "00:00" }],
+              seg: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
+              ter: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
+              qua: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
+              qui: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
+              sex: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
+              sab: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
               dom: []
             },
             address: "R. Padre Hugo, 460 - Carlopolis",
             contact: "(43) 99166-5381",
             delivery: "Sim / Com Taxa",
-             infoAdicional: "<a target='_blank' style='color:#2da6ff;' href='https://namigocarlopolis.eatfood.app/'>Cardapio On Line</a>",
-            
+            infoAdicional: "<a target='_blank' style='color:#2da6ff;' href='https://namigocarlopolis.eatfood.app/'>Cardapio On Line</a>",
+
             instagram: "https://www.instagram.com/nami_g0/",
             cardapioLink: "https://namigocarlopolis.eatfood.app/",
-           
+
             menuImages: [
               "images/comercios/restaurante/namigo/cardapio/1.jpg",
-"images/comercios/restaurante/namigo/cardapio/2.jpg",
-"images/comercios/restaurante/namigo/cardapio/3.jpg",
-"images/comercios/restaurante/namigo/cardapio/4.jpg",
-"images/comercios/restaurante/namigo/cardapio/5.jpg",
-"images/comercios/restaurante/namigo/cardapio/6.jpg",
-"images/comercios/restaurante/namigo/cardapio/7.jpg",
-"images/comercios/restaurante/namigo/cardapio/8.jpg",
-"images/comercios/restaurante/namigo/cardapio/9.jpg",
+              "images/comercios/restaurante/namigo/cardapio/2.jpg",
+              "images/comercios/restaurante/namigo/cardapio/3.jpg",
+              "images/comercios/restaurante/namigo/cardapio/4.jpg",
+              "images/comercios/restaurante/namigo/cardapio/5.jpg",
+              "images/comercios/restaurante/namigo/cardapio/6.jpg",
+              "images/comercios/restaurante/namigo/cardapio/7.jpg",
+              "images/comercios/restaurante/namigo/cardapio/8.jpg",
+              "images/comercios/restaurante/namigo/cardapio/9.jpg",
 
             ],
 
@@ -7588,17 +7661,17 @@ window.mostrarFotos = mostrarFotos;
               "images/comercios/restaurante/namigo/divulgacao/3.jpg",
               "images/comercios/restaurante/namigo/divulgacao/4.jpg",
               "images/comercios/restaurante/namigo/divulgacao/5.jpg",
-             
-           
-              
+
+
+
 
             ], novidadesDescriptions: [
-               "🍔 Sushi Burger: criatividade japonesa com alma brasileira! <br>Unindo tradição e inovação, o Sushi Burger traz uma explosão de texturas e sabores. No lugar do pão, discos empanados de arroz temperado com cream cheese, douradinhos por fora e cremosos por dentro.<br>🐟 O recheio é montado com salmão (grelhado ou cru), couve crispy, batata-doce crocante e um toque generoso de cream cheese — tudo finalizado com molho tarê.<br>✨ No NamiGO, cada Sushi Burger é uma experiência única: ousado, surpreendente e irresistível desde a primeira mordida.",
+              "🍔 Sushi Burger: criatividade japonesa com alma brasileira! <br>Unindo tradição e inovação, o Sushi Burger traz uma explosão de texturas e sabores. No lugar do pão, discos empanados de arroz temperado com cream cheese, douradinhos por fora e cremosos por dentro.<br>🐟 O recheio é montado com salmão (grelhado ou cru), couve crispy, batata-doce crocante e um toque generoso de cream cheese — tudo finalizado com molho tarê.<br>✨ No NamiGO, cada Sushi Burger é uma experiência única: ousado, surpreendente e irresistível desde a primeira mordida.",
               "🍄 Shimeji na manteiga: simplicidade que encanta!<br>Clássico da culinária japonesa, o shimeji é um cogumelo delicado, de sabor marcante e textura macia. Salteado na manteiga com shoyu, ele se transforma em um prato aromático, reconfortante e cheio de umami.<br>🔥 No NamiGO, o shimeji é preparado na hora, com manteiga derretida e o ponto perfeito entre maciez e sabor intenso. Ideal como entrada ou acompanhamento — impossível resistir!",
-             "🌊 Ceviche: frescor, tradição e sabor no mesmo prato!<br>De origem peruana, originalmente o ceviche é um prato à base de peixe cru marinado no limão, com toques de cebola roxa, coentro e pimenta. Uma explosão cítrica e refrescante que atravessou fronteiras e ganhou o coração dos amantes da culinária oriental e latino-americana.<br>🐟 No NamiGO, o ceviche é preparado com cortes frescos e tempero equilibrado especial da casa, perfeito para quem busca leveza sem abrir mão do sabor.",
-             "🍣 Joy (jyo ou Jow): o sushi que virou paixão nacional!<BR>Inspirado no gunkan maki, o Joy é um sushi envolto em salmão fresco, recheado com combinações cremosas e irresistíveis — como shimeji, camarão ou o clássico salmão com cream cheese.<Br>✨ No NamiGO, cada Joy é montado na hora, com cortes delicados e sabor que derrete na boca. Uma explosão de textura e frescor em cada mordida!",
+              "🌊 Ceviche: frescor, tradição e sabor no mesmo prato!<br>De origem peruana, originalmente o ceviche é um prato à base de peixe cru marinado no limão, com toques de cebola roxa, coentro e pimenta. Uma explosão cítrica e refrescante que atravessou fronteiras e ganhou o coração dos amantes da culinária oriental e latino-americana.<br>🐟 No NamiGO, o ceviche é preparado com cortes frescos e tempero equilibrado especial da casa, perfeito para quem busca leveza sem abrir mão do sabor.",
+              "🍣 Joy (jyo ou Jow): o sushi que virou paixão nacional!<BR>Inspirado no gunkan maki, o Joy é um sushi envolto em salmão fresco, recheado com combinações cremosas e irresistíveis — como shimeji, camarão ou o clássico salmão com cream cheese.<Br>✨ No NamiGO, cada Joy é montado na hora, com cortes delicados e sabor que derrete na boca. Uma explosão de textura e frescor em cada mordida!",
               "🔥 Você já provou um verdadeiro Teppan-yaki?<Br>Tradicional e cheio de técnica, o teppan-yaki nasceu no Japão pós-guerra e conquistou o mundo com sua combinação de sabor, performance e frescor.<BR>Na chapa quente (teppan), carnes, legumes e frutos do mar ganham vida em uma explosão de aromas e texturas!<BR>🍱 No NamiGO, o teppan é preparado na hora, com ingredientes selecionados e aquele toque que transforma cada refeição em experiência.",
-             
+
 
             ],
 
@@ -7841,8 +7914,8 @@ window.mostrarFotos = mostrarFotos;
           {
             image: "images/comercios/restaurante/selaht/selaht.png",
             name: "Selaht Grill",
-           /* hours: "<span style='color:#FF0000;font-weight:bold;'>VOLTAMOS DIA 10/07/2025</span>",*/
-           hours: "Seg a Sab: 11:00h - 00:00h",
+            /* hours: "<span style='color:#FF0000;font-weight:bold;'>VOLTAMOS DIA 10/07/2025</span>",*/
+            hours: "Seg a Sab: 11:00h - 00:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "11:00", fim: "00:00" }],
@@ -8002,19 +8075,19 @@ window.mostrarFotos = mostrarFotos;
         establishments: [
 
 
-            {
-              image: "images/servicos/taxi/dorival/perfil.jpg",
+          {
+            image: "images/servicos/taxi/dorival/perfil.jpg",
             name: "Dorival Mattos",
             hours: "Dom a Dom: <span style='color:red'>24horas</span>",
             address: "Ponto N2 - Em Frente a Igreja Matriz",
             contact: "(43) 99620-9900",
-             contact2: "(43) 98830-2110",
-           
-             facebook:"https://www.facebook.com/dorival.mattos.1",
-             instagram:"https://www.instagram.com/mattostaxi/",
-             infoAdicional:"Viagens e Serviços <span style='color:red'>24horas</span><br> Area Rural, Urbana e Aeroporto",
+            contact2: "(43) 98830-2110",
+
+            facebook: "https://www.facebook.com/dorival.mattos.1",
+            instagram: "https://www.instagram.com/mattostaxi/",
+            infoAdicional: "Viagens e Serviços <span style='color:red'>24horas</span><br> Area Rural, Urbana e Aeroporto",
           },
-         
+
 
           {
             name: "Luciano do Taxi",
@@ -8023,7 +8096,7 @@ window.mostrarFotos = mostrarFotos;
             contact: "(43) 99631-5034",
           },
 
-          
+
         ],
       },
 
@@ -8065,10 +8138,10 @@ window.mostrarFotos = mostrarFotos;
           },
 
 
-//15/07
+          //15/07
 
 
-{
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/22.jpg",
             descricaoFalecido: "Faleceu em Londrina aos 47 anos de idade, Sra 'IRACI DA SILVA PEREIRA'.<Br>A cerimônia iniciará hoje às 10:45 horas no velório municipal de Carlópolis.<Br>Seu sepultamento será hoje às 16:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏"
@@ -8277,7 +8350,7 @@ window.mostrarFotos = mostrarFotos;
 
 
 
-          
+
 
 
 
@@ -9679,12 +9752,12 @@ window.addEventListener('appinstalled', () => {
       "Content-Type": "application/json"
     }
   })
-  .then(() => {
-    console.log('📤 Instalação registrada no Firebase');
-  })
-  .catch((err) => {
-    console.error('❌ Erro ao registrar instalação:', err);
-  });
+    .then(() => {
+      console.log('📤 Instalação registrada no Firebase');
+    })
+    .catch((err) => {
+      console.error('❌ Erro ao registrar instalação:', err);
+    });
 });
 
 
