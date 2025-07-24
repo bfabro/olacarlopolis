@@ -785,6 +785,7 @@ gerson:"s",
     torneiofutebolsuico: "s",
     escolhadarainhafrutfest: "s",
     cafedamanharotapr218: "s",
+    campeonatodepescaesportivaaotucunare:"s",
     cavalgadadafrutfest: "s",
 
 
@@ -3301,17 +3302,17 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           {
             image: "images/comercios/lanchonete/espacoGourmet/perfil.png",
             name: "Espaço Gourmet",
-            hours: "Ter a Sab: 17:00h as 23:30h<br>Dom: 15:00h a 23:30h",
+            hours: "Ter a Sab: 11:00h as 23:00h",
             statusAberto: ".",
             horarios: {
 
               seg: [],
-              ter: [{ inicio: "17:00", fim: "23:30" }],
-              qua: [{ inicio: "17:00", fim: "23:30" }],
-              qui: [{ inicio: "17:00", fim: "23:30" }],
-              sex: [{ inicio: "17:00", fim: "23:30" }],
-              sab: [{ inicio: "17:30", fim: "23:30" }],
-              dom: [{ inicio: "15:00", fim: "23:30" }]
+              ter: [{ inicio: "11:00", fim: "23:00" }],
+              qua: [{ inicio: "11:00", fim: "23:00" }],
+              qui: [{ inicio: "11:00", fim: "23:00" }],
+              sex: [{ inicio: "11:00", fim: "23:00" }],
+              sab: [{ inicio: "11:00", fim: "23:00" }],
+              dom: []
             },
             address: "Av. Turística Elias Mansur, 738 - Carlopolis",
             contact: "(43) 99105-6257",
@@ -5668,6 +5669,18 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             address: "Centro de Eventos Ilha do Ponciano",
             contact: "(43) 99825-0570",
             instagram: "https://www.instagram.com/frutfestoficial/",
+
+
+          },
+
+
+           {
+            image: "images/informacoes/eventos/paranafishingDuo.jpg",
+            name: "Campeonato de Pesca Esportiva ao Tucunaré",
+            date: "20/09/25",
+            address: "Centro de Eventos Ilha do Ponciano",
+            contact: "(43) 99980-0495",
+            instagram: "https://www.instagram.com/thiago.aguera/",
 
 
           },
