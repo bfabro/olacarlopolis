@@ -3347,7 +3347,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           {
             image: "images/comercios/lanchonete/ione/ione.png",
             name: "Ione",
-            hours: "Seg a Sab: 9:30h as 19:30h",
+            hours: "Seg a Sab: 09:30h as 19:30h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "09:30", fim: "19:30" }],
