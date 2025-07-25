@@ -2638,13 +2638,8 @@ a:focus {
   touch-action: pinch-zoom; /* Ajuda no iOS/Safari */
   
 }
-.modal-promocao {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.swiper-wrapper {
-  touch-action: pan-y;
-}
+
+
 
 .onde-comer-lista {
   display: flex;
