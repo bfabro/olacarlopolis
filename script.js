@@ -8244,7 +8244,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             address: "Ponto N2 - Em Frente a Igreja Matriz",
             contact: "(43) 99933-6915",
             contact2: "(43) 98860-7629",
-            infoAdicional:"Aceitamos Cartões de Credito!",
+            
            
           },
 
