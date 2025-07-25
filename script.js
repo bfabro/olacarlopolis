@@ -7894,50 +7894,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
 
-          {
-            image: "images/comercios/restaurante/toninhoParana/perfil.jpg",
-            name: "Toninho Parana",
-            hours: "Seg a Sab: 11:00h as 14:30h - 19:00h as 23:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              ter: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              qua: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              qui: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              sex: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              sab: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              dom: []
-            },
-            address: "R. Benedito Salles, 1287 - Carlópolis",
-            contact: "(43) 99938-2720",
-            delivery: "Sim / Com Taxa",
-            instagram: "https://www.instagram.com/restaurante_toninho_parana/",
-            infoAdicional:"Temos Janta para entragas tambem",
-            menuImages: [
-              "images/comercios/restaurante/toninhoParana/cardapio/1.jpg",
-              "images/comercios/restaurante/toninhoParana/cardapio/2.jpg",
-              "images/comercios/restaurante/toninhoParana/cardapio/3.jpg",
-              "images/comercios/restaurante/toninhoParana/cardapio/4.jpg",
-
-
-            ],
-
-            novidadesImages: [
-              "images/comercios/restaurante/toninhoParana/divulgacao/1.jpg",
-              "images/comercios/restaurante/toninhoParana/divulgacao/2.jpg",
-              "images/comercios/restaurante/toninhoParana/divulgacao/3.jpg",
-              "images/comercios/restaurante/toninhoParana/divulgacao/4.jpg",
-              
-
-            ], novidadesDescriptions: [
-              "Venha se deliciar com nosso buffet completo, fresquinho e variado todos os dias!<Br>➡️ Comida feita com carinho, tempero de casa e aquele toque especial da roça!<Br>✅ Arroz, feijão, saladas, carnes, legumes, frituras, farofas, ovos e muito mais!<Br>Ideal para quem busca qualidade, fartura e preço justo",
-              "🥗 Buffet de Saladas Fresquinhas e Coloridas! 🌈<br>Comece sua refeição com leveza, sabor e muita variedade!<br>Nosso buffet conta com:<br>✅ Alface crocante com cebola<br>✅ Ovos cozidos com tempero especial<br>✅ Maionese, beterraba, cenoura, tomate, vinagrete e muito mais!<br>Tudo preparado com ingredientes selecionados, higiene e carinho para garantir sua saúde e satisfação.<br>🕛 Servido todos os dias no almoço!<br>📍 Venha conferir de perto ou faça sua encomenda!",
-              "🥣 Sábado é dia de Feijoada Completa!<br>Preparada com ingredientes selecionados, carnes nobres e muito sabor!<br>Feijão bem cozido, aquele tempero caseiro e o aroma que conquista de longe... é tradição que se sente no paladar!<br>✅ Acompanhada de arroz, couve refogada, farofa, laranja e torresmo (opcional).<br>📍 No prato ou marmitex!",
-               "🔥 Leitão à Pururuca Especial da Casa 🔥<br>Sabor, tradição e crocância em cada pedaço!<br>Nosso leitão assado inteiro é preparado com tempero caseiro, assado lentamente até atingir o ponto perfeito de maciez por dentro e pele pururuca por fora.<br>Servido sobre uma cama de folhas frescas, ideal para compartilhar em ocasiões especiais."
-
-            ],
-
-          },
+          
 
 
 
@@ -7996,7 +7953,50 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           },
 
 
+{
+            image: "images/comercios/restaurante/toninhoParana/perfil.jpg",
+            name: "Toninho Parana",
+            hours: "Seg a Sab: 11:00h as 14:30h - 19:00h as 23:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              ter: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              qua: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              qui: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              sex: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              sab: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              dom: []
+            },
+            address: "R. Benedito Salles, 1287 - Carlópolis",
+            contact: "(43) 99938-2720",
+            delivery: "Sim / Com Taxa",
+            instagram: "https://www.instagram.com/restaurante_toninho_parana/",
+            infoAdicional:"Temos Janta para entragas tambem",
+            menuImages: [
+              "images/comercios/restaurante/toninhoParana/cardapio/1.jpg",
+              "images/comercios/restaurante/toninhoParana/cardapio/2.jpg",
+              "images/comercios/restaurante/toninhoParana/cardapio/3.jpg",
+              "images/comercios/restaurante/toninhoParana/cardapio/4.jpg",
 
+
+            ],
+
+            novidadesImages: [
+              "images/comercios/restaurante/toninhoParana/divulgacao/1.jpg",
+              "images/comercios/restaurante/toninhoParana/divulgacao/2.jpg",
+              "images/comercios/restaurante/toninhoParana/divulgacao/3.jpg",
+              "images/comercios/restaurante/toninhoParana/divulgacao/4.jpg",
+              
+
+            ], novidadesDescriptions: [
+              "Venha se deliciar com nosso buffet completo, fresquinho e variado todos os dias!<Br>➡️ Comida feita com carinho, tempero de casa e aquele toque especial da roça!<Br>✅ Arroz, feijão, saladas, carnes, legumes, frituras, farofas, ovos e muito mais!<Br>Ideal para quem busca qualidade, fartura e preço justo",
+              "🥗 Buffet de Saladas Fresquinhas e Coloridas! 🌈<br>Comece sua refeição com leveza, sabor e muita variedade!<br>Nosso buffet conta com:<br>✅ Alface crocante com cebola<br>✅ Ovos cozidos com tempero especial<br>✅ Maionese, beterraba, cenoura, tomate, vinagrete e muito mais!<br>Tudo preparado com ingredientes selecionados, higiene e carinho para garantir sua saúde e satisfação.<br>🕛 Servido todos os dias no almoço!<br>📍 Venha conferir de perto ou faça sua encomenda!",
+              "🥣 Sábado é dia de Feijoada Completa!<br>Preparada com ingredientes selecionados, carnes nobres e muito sabor!<br>Feijão bem cozido, aquele tempero caseiro e o aroma que conquista de longe... é tradição que se sente no paladar!<br>✅ Acompanhada de arroz, couve refogada, farofa, laranja e torresmo (opcional).<br>📍 No prato ou marmitex!",
+               "🔥 Leitão à Pururuca Especial da Casa 🔥<br>Sabor, tradição e crocância em cada pedaço!<br>Nosso leitão assado inteiro é preparado com tempero caseiro, assado lentamente até atingir o ponto perfeito de maciez por dentro e pele pururuca por fora.<br>Servido sobre uma cama de folhas frescas, ideal para compartilhar em ocasiões especiais."
+
+            ],
+
+          },
 
 
           {
