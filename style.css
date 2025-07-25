@@ -2635,11 +2635,16 @@ a:focus {
   border-radius: 10px;
   box-shadow: 0 0 20px #000;
   cursor: zoom-out;
-  /*touch-action: pinch-zoom; /* Ajuda no iOS/Safari */
-  touch-action: auto; /* Ajuda no iOS/Safari */
+  touch-action: pinch-zoom; /* Ajuda no iOS/Safari */
+  
 }
-
-
+.modal-promocao {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.swiper-wrapper {
+  touch-action: pan-y;
+}
 
 .onde-comer-lista {
   display: flex;

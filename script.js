@@ -1062,14 +1062,6 @@ gerson:"s",
 ` : '')}
 
 
-
-
- 
-
-
-
-
-
       
     </div>
     <div class="onde-comer-info">
