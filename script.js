@@ -513,6 +513,9 @@ document.addEventListener("DOMContentLoaded", function () {
     liagas: "s",
     cncasadogas: "s",
 
+    //doces e chocolates
+    cacaushow:"s",
+
     // clinica veterinaria
 
     veterinariacarlopolis: "s",
@@ -1594,6 +1597,65 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         },
       ]
     },
+
+
+
+{
+      nome: "Cacau Show",                   
+      imagem: "images/comercios/docesChocolates/cacauShow/perfil.jpg",
+      promocoes: [
+        {                                     
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
+          descricao: "Bombons de Chocolate ao Leite",
+          validade: "2025-07-31T18:00:00",
+          preco: "42,99",
+          preco_com_desconto: "30,99",
+          whatsapp: "43991053711"
+        },
+
+       {
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
+          descricao: "Chocolate Surpresa Turma Do Snoopy",
+          validade: "2025-07-31T18:00:00",
+          preco: "19,99",
+          preco_com_desconto: "13,99",
+          whatsapp: "43991053711"
+        },
+
+         {
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
+          descricao: "Bombons de chocolate ao leite com recheios nos sabores: avelã, trufa ao leite e cereja ao licor.",
+          validade: "2025-07-31T18:00:00",
+          preco: "49,99",
+          preco_com_desconto: "44,99",
+          whatsapp: "43991053711"
+        },
+
+
+        {
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
+          descricao: "Caixa Angel Gourmet | 200 g Bombons nos sabores chocolate 55% de cacau com recheio intenso e chocolate ao leite com recheio sabor creme e morango.",
+          validade: "2025-07-31T18:00:00",
+          preco: "54,99",
+          preco_com_desconto: "43,99",
+          whatsapp: "43991053711"
+        },
+
+
+         {
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/5.jpg",
+          descricao: "Promoçao Mini Show",
+          validade: "2025-08-30T18:00:00",         
+          whatsapp: "43991053711"
+        },
+      ]
+
+
+
+      
+    },
+
+
 
 
     {
@@ -7294,7 +7356,50 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
       ////////////
 
-      //////////
+      {
+        link: document.querySelector("#menuDoces"),
+        title: "Doces e Chocolates",
+        establishments: [
+
+          {
+            image: "images/comercios/docesChocolates/cacauShow/perfil.jpg",
+            name: "Cacau Show",
+            hours: "Seg a Sab: 11:00h as 23:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "11:00", fim: "23:00" }],
+              ter: [{ inicio: "11:00", fim: "23:00" }],
+              qua: [{ inicio: "11:00", fim: "23:00" }],
+              qui: [{ inicio: "11:00", fim: "23:00" }],
+              sex: [{ inicio: "11:00", fim: "23:00" }],
+              sab: [{ inicio: "11:00", fim: "23:00" }],
+              dom: []
+            },
+            address: "Rua: Padre Hugo, 460 - Carlopolis",
+            contact: "(43) 99105-3711",
+            delivery: "Não",
+           
+            instagram: "https://www.instagram.com/lojacacaushowcarlopolis/",
+            novidadesImages: [
+              "images/comercios/docesChocolates/cacauShow/divulgacao/1.png",
+              "images/comercios/docesChocolates/cacauShow/divulgacao/2.jpg",
+              "images/comercios/docesChocolates/cacauShow/divulgacao/3.jpg",
+
+
+            ],
+            novidadesDescriptions: [
+              "É hora de LaNut e LaCreme<br>Nessa campanha, nas quintas temos promoção desses tabletes deliciosos!😋<br>2 Tabletes especiais de 100g por apenas R$ 29,99.",
+              "Biscoitos crocantes com o melhor chocolate!",
+              "Quando o amor é verdadeiro, a combinação é perfeita.",
+             "Tem carinho que se transforma em chocolate.<br>E tem presente que carrega todo o amor do mundo.<br>Quando o amor é único, o presente também precisa ser.",
+            ],
+          },
+
+          
+
+
+        ],
+      },
 
       //////////////
 
