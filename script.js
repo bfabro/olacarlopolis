@@ -706,8 +706,7 @@ gerson:"s",
     vania: "s",
 
     // taxista
-    douglasdotaxi: "s",
-    lucianodotaxi: "s",
+    sereia:"s",
     dorivalmattos: "s",
 
     // VETERINARIO
@@ -7913,7 +7912,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             contact: "(43) 99938-2720",
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/restaurante_toninho_parana/",
-            facebook: "",
+            infoAdicional:"Temos Janta para entragas tambem",
             menuImages: [
               "images/comercios/restaurante/toninhoParana/cardapio/1.jpg",
               "images/comercios/restaurante/toninhoParana/cardapio/2.jpg",
@@ -7934,7 +7933,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "Venha se deliciar com nosso buffet completo, fresquinho e variado todos os dias!<Br>➡️ Comida feita com carinho, tempero de casa e aquele toque especial da roça!<Br>✅ Arroz, feijão, saladas, carnes, legumes, frituras, farofas, ovos e muito mais!<Br>Ideal para quem busca qualidade, fartura e preço justo",
               "🥗 Buffet de Saladas Fresquinhas e Coloridas! 🌈<br>Comece sua refeição com leveza, sabor e muita variedade!<br>Nosso buffet conta com:<br>✅ Alface crocante com cebola<br>✅ Ovos cozidos com tempero especial<br>✅ Maionese, beterraba, cenoura, tomate, vinagrete e muito mais!<br>Tudo preparado com ingredientes selecionados, higiene e carinho para garantir sua saúde e satisfação.<br>🕛 Servido todos os dias no almoço!<br>📍 Venha conferir de perto ou faça sua encomenda!",
               "🥣 Sábado é dia de Feijoada Completa!<br>Preparada com ingredientes selecionados, carnes nobres e muito sabor!<br>Feijão bem cozido, aquele tempero caseiro e o aroma que conquista de longe... é tradição que se sente no paladar!<br>✅ Acompanhada de arroz, couve refogada, farofa, laranja e torresmo (opcional).<br>📍 No prato ou marmitex!",
-               "🔥 Leitão à Pururuca Especial da Casa 🔥<Br>Nosso leitão assado inteiro é preparado com tempero caseiro, assado lentamente até atingir o ponto perfeito de maciez por dentro e pele pururuca por fora.<br>Servido sobre uma cama de folhas frescas, ideal para compartilhar em ocasiões especiais."
+               "🔥 Leitão à Pururuca Especial da Casa 🔥"
 
             ],
 
@@ -8141,10 +8140,15 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
           {
-            name: "Luciano do Taxi",
-            hours: "Seg a Sab: 7h - 20h </br> Dom: 07 - 00h",
-            address: "Em Frente ao banco Itau",
-            contact: "(43) 99631-5034",
+           
+            image: "images/servicos/taxi/sereia/perfil2.jpg",
+            name: "Sereia",
+            hours: "Dom a Dom: <span style='color:red'>24horas</span>",
+            address: "Ponto N2 - Em Frente a Igreja Matriz",
+            contact: "(43) 99933-6915",
+            contact2: "(43) 98860-7629",
+            infoAdicional:"Aceitamos Cartões de Credito",
+           
           },
 
 
