@@ -1163,7 +1163,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
       const descricao = est.novidadesDescriptions?.[idx] || '';
       html += `
       <div style="text-align: center;">
-        <img src="${img}" alt="Foto ${idx + 1}" style="max-width: 320px; max-height: 260px; object-fit: contain;border-radius: 10px; box-shadow:0 2px 12px #0002;" loading="lazy">
+        <img src="${img}" alt="Foto ${idx + 1}" style="max-width: 320px; max-height: 260px; object-fit: cover;border-radius: 10px; box-shadow:0 2px 12px #0002;" loading="lazy">
         <div style="margin-top:8px; color: #444; font-size: 1rem;">${descricao}</div>
       </div>
     `;
