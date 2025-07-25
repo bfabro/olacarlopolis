@@ -8141,13 +8141,13 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
           {
            
-            image: "images/servicos/taxi/sereia/perfil2.jpg",
+            image: "images/servicos/taxi/sereia/perfil.jpg",
             name: "Sereia",
             hours: "Dom a Dom: <span style='color:red'>24horas</span>",
             address: "Ponto N2 - Em Frente a Igreja Matriz",
             contact: "(43) 99933-6915",
             contact2: "(43) 98860-7629",
-            infoAdicional:"Aceitamos Cartões de Credito",
+            infoAdicional:"Aceitamos Cartões de Credito!",
            
           },
 
