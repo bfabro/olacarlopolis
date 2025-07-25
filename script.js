@@ -646,6 +646,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //oficinadosabor:"s",
     paiol: "n",
     restaurantedadi: "s",
+    toninhoparana:"s",
     sabordaroca: "s",
     selahtgrill: "s",
     yingyang: "s",
@@ -7625,10 +7626,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "Sabiam quem temos Rodizio todas as Sextas-ferias?  ",
               "Nosso famoso Yaki Soba!",
               "Amplo espaço para atendermos toda sua familia! ",
-
-
-
-            ],
+                        ],
 
           },
 
@@ -7675,9 +7673,6 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "images/comercios/restaurante/namigo/divulgacao/4.jpg",
               "images/comercios/restaurante/namigo/divulgacao/5.jpg",
 
-
-
-
             ], novidadesDescriptions: [
               "🍔 Sushi Burger: criatividade japonesa com alma brasileira! <br>Unindo tradição e inovação, o Sushi Burger traz uma explosão de texturas e sabores. No lugar do pão, discos empanados de arroz temperado com cream cheese, douradinhos por fora e cremosos por dentro.<br>🐟 O recheio é montado com salmão (grelhado ou cru), couve crispy, batata-doce crocante e um toque generoso de cream cheese — tudo finalizado com molho tarê.<br>✨ No NamiGO, cada Sushi Burger é uma experiência única: ousado, surpreendente e irresistível desde a primeira mordida.",
               "🍄 Shimeji na manteiga: simplicidade que encanta!<br>Clássico da culinária japonesa, o shimeji é um cogumelo delicado, de sabor marcante e textura macia. Salteado na manteiga com shoyu, ele se transforma em um prato aromático, reconfortante e cheio de umami.<br>🔥 No NamiGO, o shimeji é preparado na hora, com manteiga derretida e o ponto perfeito entre maciez e sabor intenso. Ideal como entrada ou acompanhamento — impossível resistir!",
@@ -7710,11 +7705,6 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             delivery: "Sim / Com Taxa",
 
           },
-
-
-
-
-
 
           {
             image: "images/comercios/restaurante/oficinaSabor/perfil.png",
@@ -7898,6 +7888,54 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "Todo Sabado temos Feijoada",
               "Todo Sábado temos A Porção de Feijoada ( 3 pessoas)",
               "Todo Domingo temos os Assados",
+            ],
+
+          },
+
+
+
+
+          {
+            image: "images/comercios/restaurante/toninhoParana/perfil.jpg",
+            name: "Toninho Parana",
+            hours: "Seg a Sab: 11:00h as 14:30h - 19:00h as 23:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              ter: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              qua: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              qui: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              sex: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              sab: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              dom: []
+            },
+            address: "R. Benedito Salles, 1287 - Carlópolis",
+            contact: "(43) 99938-2720",
+            delivery: "Sim / Com Taxa",
+            instagram: "https://www.instagram.com/restaurante_toninho_parana/",
+            facebook: "",
+            menuImages: [
+              "images/comercios/restaurante/toninhoParana/cardapio/1.jpg",
+              "images/comercios/restaurante/toninhoParana/cardapio/2.jpg",
+              "images/comercios/restaurante/toninhoParana/cardapio/3.jpg",
+              "images/comercios/restaurante/toninhoParana/cardapio/4.jpg",
+
+
+            ],
+
+            novidadesImages: [
+              "images/comercios/restaurante/toninhoParana/divulgacao/1.jpg",
+              "images/comercios/restaurante/toninhoParana/divulgacao/2.jpg",
+              "images/comercios/restaurante/toninhoParana/divulgacao/3.jpg",
+              "images/comercios/restaurante/toninhoParana/divulgacao/4.jpg",
+              
+
+            ], novidadesDescriptions: [
+              "Venha se deliciar com nosso buffet completo, fresquinho e variado todos os dias!<Br>➡️ Comida feita com carinho, tempero de casa e aquele toque especial da roça!<Br>✅ Arroz, feijão, saladas, carnes, legumes, frituras, farofas, ovos e muito mais!<Br>Ideal para quem busca qualidade, fartura e preço justo",
+              "🥗 Buffet de Saladas Fresquinhas e Coloridas! 🌈<br>Comece sua refeição com leveza, sabor e muita variedade!<br>Nosso buffet conta com:<br>✅ Alface crocante com cebola<br>✅ Ovos cozidos com tempero especial<br>✅ Maionese, beterraba, cenoura, tomate, vinagrete e muito mais!<br>Tudo preparado com ingredientes selecionados, higiene e carinho para garantir sua saúde e satisfação.<br>🕛 Servido todos os dias no almoço!<br>📍 Venha conferir de perto ou faça sua encomenda!",
+              "🥣 Sábado é dia de Feijoada Completa!<br>Preparada com ingredientes selecionados, carnes nobres e muito sabor!<br>Feijão bem cozido, aquele tempero caseiro e o aroma que conquista de longe... é tradição que se sente no paladar!<br>✅ Acompanhada de arroz, couve refogada, farofa, laranja e torresmo (opcional).<br>📍 No prato ou marmitex!",
+               "🔥 Leitão à Pururuca Especial da Casa 🔥<Br>Nosso leitão assado inteiro é preparado com tempero caseiro, assado lentamente até atingir o ponto perfeito de maciez por dentro e pele pururuca por fora.<br>Servido sobre uma cama de folhas frescas, ideal para compartilhar em ocasiões especiais."
+
             ],
 
           },
