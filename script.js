@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "feiradalua", "masterfarma", "oficinadocelular", "thebestacai", "prelie", "gustavinho", "sallesvidros", "relojoariamartini", "vania",
+     "farmais", "oficinadocelular", "toninhoparana", "gerson", "cacaushow", "seiza", "vania","thebestacai", 
 
   ];
 
@@ -6027,9 +6027,11 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "images/comercios/farmacia/farmais/divulgacao/1.jpg",
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
+              "images/comercios/farmacia/farmais/divulgacao/4.jpg",
 
             ],
             novidadesDescriptions: [
+              "Estamos de Plantão!",
               "Tome no horário certo – Respeite os intervalos indicados.",
               "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
               "Tome no horário certo – Respeite os intervalos indicados.",
@@ -7376,7 +7378,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
            
             instagram: "https://www.instagram.com/lojacacaushowcarlopolis/",
             novidadesImages: [
-              "images/comercios/docesChocolates/cacauShow/divulgacao/1.png",
+              "images/comercios/docesChocolates/cacauShow/divulgacao/1.jpg",
               "images/comercios/docesChocolates/cacauShow/divulgacao/2.jpg",
               "images/comercios/docesChocolates/cacauShow/divulgacao/3.jpg",
 
