@@ -4747,7 +4747,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
             ],
             novidadesDescriptions: [
-              "Estamos de Plantão!",
+              
               "Venham Nos Visitar, na BioFarma encontre o que precisa!",
               "Cabelo seco igual a um turista perdido no deserto da Austrália?Sorte a sua que a linha tem tudo o que Você precisa para deixar os cabelos macios e intensamente hidratados!!",
               "Linha completa da Gota Dourada para o seu cabelo ficar Maravilhoso e causar inveja a todoos❤️",
@@ -4920,8 +4920,11 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/comercios/farmacia/farmais/farmais.png",
             name: "FarMais",
             address: "R. Benedito Salles, 979 - Carlopolis",
+            plantaoHorario: "08:00h às 21:00h", 
+            plantaoData:"Sab 26/07 a Sex 01/08", 
 
             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "18:00" }],
@@ -4956,17 +4959,16 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             name: "Master Farma",
             address: "R. Laurindo Franco de Godoi, 90 - Carlopolis",
             hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-            plantaoHorario: "08:00h às 21:00h",
-            plantaoData: "19/07 a 25/07",
+            
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "21:00" }],
-              ter: [{ inicio: "08:00", fim: "21:00" }],
-              qua: [{ inicio: "08:00", fim: "21:00" }],
-              qui: [{ inicio: "08:00", fim: "21:00" }],
-              sex: [{ inicio: "08:00", fim: "21:00" }],
-              sab: [{ inicio: "08:00", fim: "21:00" }],
-              dom: [{ inicio: "08:00", fim: "21:00" }]
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
+              dom: []
             },
             contact: "(43) 99951-1540",
             contact2: "(43) 3566-1141",
@@ -4975,7 +4977,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             instagram: "https://www.instagram.com/masterfarma_carlopolis/",
 
             novidadesImages: [
-              "images/comercios/farmacia/masterFarma/divulgacao/1.jpg",
+             
               "images/comercios/farmacia/masterFarma/divulgacao/2.png",
               "images/comercios/farmacia/masterFarma/divulgacao/3.png",
               "images/comercios/farmacia/masterFarma/divulgacao/4.png",
@@ -4985,7 +4987,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
             ],
             novidadesDescriptions: [
-              "Estamos de Plantão!!",
+              
               "Pensado para atender às necessidades do organismo feminino, MASTERFORCE Pró Mulher auxilia na sua saúde e bem-estar diário! ",
               "Coração saudável e mente afiada! 🧠Conheça os benefícios do Ômega 3 para o seu bem-estar diário.",
               "Para os pequenos explorarem o mundo com mais disposição! 🌟 Cuidar da imunidade é um ato de amor.",
@@ -5949,6 +5951,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               */
 
           /* [ 4 ]*/
+          /*
           {
             image: "images/comercios/farmacia/masterFarma/masterfarma.png",
             name: "Master Farma",
@@ -5992,16 +5995,18 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "Venha nos conhecer!"
             ],
           },
+*/
 
 
+          /* [ 5 ]*/
 
-          /* [ 5 ]
         {
             image: "images/comercios/farmacia/farmais/farmais.png",
             name: "FarMais",
             address: "R. Benedito Salles, 979 - Carlopolis",
+             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
             plantaoHorario: "08:00h às 21:00h", 
-            plantaoData:"Sab 17/05 a Sex 23/05", 
+            plantaoData:"Sab 26/07 a Sex 01/08", 
             statusAberto:".",
             horarios: {                          
               seg: [{ inicio: "08:00", fim: "21:00" }],
@@ -6015,25 +6020,23 @@ ${est.novidadesImages && est.novidadesImages.length ? `
                    
                   contact: "(43) 3566-1211",
                   delivery: "Sim / Sem Taxa",
-                  facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
+                  facebook: "https://www.facebook.com/farmaiscarlopolis1/",
                   instagram: "https://www.instagram.com/farmaiscarlopolis/",
                   
-                  novidadesImages: [               
-                    "images/comercios/farmacia/farmais/divulgacao/1.png",
-                    "images/comercios/farmacia/farmais/divulgacao/2.png",
-                    "images/comercios/farmacia/farmais/divulgacao/3.png",
-                    "images/comercios/farmacia/farmais/divulgacao/4.png",
-                    "images/comercios/farmacia/farmais/divulgacao/5.png",
-                  ], 
-                  novidadesDescriptions: [                            
-                    "Analgésico de alívio eficaz para dores intensas",
-                    "Cólicas do trato gastrintestinal",
-                    "Analgésico (para dor) antitérmico (para febre)",
-                    "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                    "Redução da febre e para o alívio de dores",
-                  ],
+               novidadesImages: [
+              "images/comercios/farmacia/farmais/divulgacao/1.jpg",
+              "images/comercios/farmacia/farmais/divulgacao/2.jpg",
+              "images/comercios/farmacia/farmais/divulgacao/3.jpg",
+
+            ],
+            novidadesDescriptions: [
+              "Tome no horário certo – Respeite os intervalos indicados.",
+              "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
+              "Tome no horário certo – Respeite os intervalos indicados.",
+
+            ],
               },
-          */
+          
 
           /* [ 6 ]
           {
