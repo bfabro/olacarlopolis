@@ -3497,7 +3497,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           {
             image: "images/comercios/lanchonete/mycoffe/perfil.png",
             name: "My Coffee",
-            hours: "Seg: Fechado<br>Ter a Qui: 13:00h as 19:00h <br>Sex: 13:00h as 18:00h<br>Sab: 13:00h as 20:00h<br>Dom: 13:00h as 20:00h",
+            hours: "Seg: Fechado<br>Ter a Qui: 13:00h as 19:00h <br>Sex: 13:00h as 18:00h<br>Sab e Dom: 13:00h as 20:00h",
             statusAberto: ".",
             horarios: {
 
@@ -3506,7 +3506,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               qua: [{ inicio: "13:00", fim: "19:00" }],
               qui: [{ inicio: "13:00", fim: "19:00" }],
               sex: [{ inicio: "13:00", fim: "19:00" }],
-              sab: [{ inicio: "13:00", fim: "19:00" }],
+              sab: [{ inicio: "13:00", fim: "20:00" }],
               dom: [{ inicio: "13:00", fim: "20:00" }]
             },
             address: "R. Benedito Salles, 1205 - Carlopolis",
