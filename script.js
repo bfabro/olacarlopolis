@@ -4939,14 +4939,15 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
             instagram: "https://www.instagram.com/farmaiscarlopolis/",
-
-            novidadesImages: [
+ novidadesImages: [
               "images/comercios/farmacia/farmais/divulgacao/1.jpg",
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
+              "images/comercios/farmacia/farmais/divulgacao/4.jpg",
 
             ],
             novidadesDescriptions: [
+              "Estamos de Plantão!",
               "Tome no horário certo – Respeite os intervalos indicados.",
               "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
               "Tome no horário certo – Respeite os intervalos indicados.",
