@@ -643,7 +643,7 @@ document.addEventListener("DOMContentLoaded", function () {
     emporiosaovictor: "s",
     hime: "s",
     pesqueirodogalego: "s",
-    portal: "s",
+    portal: "n",
     neia: "n",
     namigojapaneserestaurant: "s",
     //oficinadosabor:"s",
