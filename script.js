@@ -485,7 +485,7 @@ document.addEventListener("DOMContentLoaded", function () {
     efcell: "s",
 
     // auto peças
-    paulinhoautopecas: "s",
+    paulinhoautopecas: "n",
     norbaautopecas: "s",
 
     //autoeletrica
