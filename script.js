@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-     "farmais", "oficinadocelular", "toninhoparana", "gerson", "cacaushow", "seiza", "vania","thebestacai", 
+    "farmais", "oficinadocelular", "toninhoparana", "gerson", "cacaushow", "seiza", "vania", "thebestacai",
 
   ];
 
@@ -514,7 +514,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cncasadogas: "s",
 
     //doces e chocolates
-    cacaushow:"s",
+    cacaushow: "s",
 
     // clinica veterinaria
 
@@ -649,7 +649,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //oficinadosabor:"s",
     paiol: "n",
     restaurantedadi: "s",
-    toninhoparana:"s",
+    toninhoparana: "s",
     sabordaroca: "s",
     selahtgrill: "s",
     yingyang: "s",
@@ -701,15 +701,15 @@ document.addEventListener("DOMContentLoaded", function () {
     cyberneticosinstalacoes: "s",
 
     //encanador
-gerson:"s",
+    gerson: "s",
     // montador de moveis
-    hirancastro: "s",
+    hirancastro: "n",
 
     //podologa
     vania: "s",
 
     // taxista
-    sereia:"s",
+    sereia: "s",
     dorivalmattos: "s",
 
     // VETERINARIO
@@ -788,7 +788,7 @@ gerson:"s",
     torneiofutebolsuico: "s",
     escolhadarainhafrutfest: "s",
     cafedamanharotapr218: "s",
-    campeonatodepescaesportivaaotucunare:"s",
+    campeonatodepescaesportivaaotucunare: "s",
     cavalgadadafrutfest: "s",
 
 
@@ -1592,11 +1592,11 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
 
-{
-      nome: "Cacau Show",                   
+    {
+      nome: "Cacau Show",
       imagem: "images/comercios/docesChocolates/cacauShow/perfil.jpg",
       promocoes: [
-        {                                     
+        {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
           descricao: "Bombons de Chocolate ao Leite",
           validade: "2025-07-31T18:00:00",
@@ -1605,7 +1605,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           whatsapp: "43991053711"
         },
 
-       {
+        {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
           descricao: "Chocolate Surpresa Turma Do Snoopy",
           validade: "2025-07-31T18:00:00",
@@ -1614,7 +1614,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           whatsapp: "43991053711"
         },
 
-         {
+        {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
           descricao: "Bombons de chocolate ao leite com recheios nos sabores: avelã, trufa ao leite e cereja ao licor.",
           validade: "2025-07-31T18:00:00",
@@ -1634,17 +1634,17 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         },
 
 
-         {
+        {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/5.jpg",
           descricao: "Promoçao Mini Show",
-          validade: "2025-08-30T18:00:00",         
+          validade: "2025-08-30T18:00:00",
           whatsapp: "43991053711"
         },
       ]
 
 
 
-      
+
     },
 
 
@@ -3513,8 +3513,6 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             contact: "(43) 99126-5705",
             delivery: "Não",
             instagram: "https://www.instagram.com/mycoffeecarlopolis/",
-
-
             novidadesImages: [
 
               "images/comercios/lanchonete/mycoffe/divulgacao/1.png",
@@ -3533,7 +3531,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           {
             image: "images/comercios/lanchonete/mrpotato/perfil.jpg",
             name: "Mr Potato",
-            hours: "Qui a Ter: 18:30h as 23:00h <br> Qua: Fechado",
+            hours: "Qui a Ter: 18:30h as 23:00h",
             statusAberto: ".",
             horarios: {
 
@@ -4747,7 +4745,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
             ],
             novidadesDescriptions: [
-              
+
               "Venham Nos Visitar, na BioFarma encontre o que precisa!",
               "Cabelo seco igual a um turista perdido no deserto da Austrália?Sorte a sua que a linha tem tudo o que Você precisa para deixar os cabelos macios e intensamente hidratados!!",
               "Linha completa da Gota Dourada para o seu cabelo ficar Maravilhoso e causar inveja a todoos❤️",
@@ -4920,8 +4918,8 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/comercios/farmacia/farmais/farmais.png",
             name: "FarMais",
             address: "R. Benedito Salles, 979 - Carlopolis",
-            plantaoHorario: "08:00h às 21:00h", 
-            plantaoData:"Sab 26/07 a Sex 01/08", 
+            plantaoHorario: "08:00h às 21:00h",
+            plantaoData: "Sab 26/07 a Sex 01/08",
 
             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
 
@@ -4939,7 +4937,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
             instagram: "https://www.instagram.com/farmaiscarlopolis/",
- novidadesImages: [
+            novidadesImages: [
               "images/comercios/farmacia/farmais/divulgacao/1.jpg",
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
@@ -4960,7 +4958,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             name: "Master Farma",
             address: "R. Laurindo Franco de Godoi, 90 - Carlopolis",
             hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-            
+
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "18:00" }],
@@ -4978,7 +4976,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             instagram: "https://www.instagram.com/masterfarma_carlopolis/",
 
             novidadesImages: [
-             
+
               "images/comercios/farmacia/masterFarma/divulgacao/2.png",
               "images/comercios/farmacia/masterFarma/divulgacao/3.png",
               "images/comercios/farmacia/masterFarma/divulgacao/4.png",
@@ -4988,7 +4986,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
             ],
             novidadesDescriptions: [
-              
+
               "Pensado para atender às necessidades do organismo feminino, MASTERFORCE Pró Mulher auxilia na sua saúde e bem-estar diário! ",
               "Coração saudável e mente afiada! 🧠Conheça os benefícios do Ômega 3 para o seu bem-estar diário.",
               "Para os pequenos explorarem o mundo com mais disposição! 🌟 Cuidar da imunidade é um ato de amor.",
@@ -5731,7 +5729,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           },
 
 
-           {
+          {
             image: "images/informacoes/eventos/paranafishingDuo.jpg",
             name: "Campeonato de Pesca Esportiva ao Tucunaré",
             date: "20/09/25",
@@ -6001,15 +5999,15 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
           /* [ 5 ]*/
 
-        {
+          {
             image: "images/comercios/farmacia/farmais/farmais.png",
             name: "FarMais",
             address: "R. Benedito Salles, 979 - Carlopolis",
-             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
-            plantaoHorario: "08:00h às 21:00h", 
-            plantaoData:"Sab 26/07 a Sex 01/08", 
-            statusAberto:".",
-            horarios: {                          
+            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            plantaoHorario: "08:00h às 21:00h",
+            plantaoData: "Sab 26/07 a Sex 01/08",
+            statusAberto: ".",
+            horarios: {
               seg: [{ inicio: "08:00", fim: "21:00" }],
               ter: [{ inicio: "08:00", fim: "21:00" }],
               qua: [{ inicio: "08:00", fim: "21:00" }],
@@ -6017,14 +6015,14 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               sex: [{ inicio: "08:00", fim: "21:00" }],
               sab: [{ inicio: "08:00", fim: "21:00" }],
               dom: [{ inicio: "08:00", fim: "21:00" }]
-            },  
-                   
-                  contact: "(43) 3566-1211",
-                  delivery: "Sim / Sem Taxa",
-                  facebook: "https://www.facebook.com/farmaiscarlopolis1/",
-                  instagram: "https://www.instagram.com/farmaiscarlopolis/",
-                  
-               novidadesImages: [
+            },
+
+            contact: "(43) 3566-1211",
+            delivery: "Sim / Sem Taxa",
+            facebook: "https://www.facebook.com/farmaiscarlopolis1/",
+            instagram: "https://www.instagram.com/farmaiscarlopolis/",
+
+            novidadesImages: [
               "images/comercios/farmacia/farmais/divulgacao/1.jpg",
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
@@ -6038,8 +6036,8 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "Tome no horário certo – Respeite os intervalos indicados.",
 
             ],
-              },
-          
+          },
+
 
           /* [ 6 ]
           {
@@ -7376,7 +7374,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             address: "Rua: Padre Hugo, 460 - Carlopolis",
             contact: "(43) 99105-3711",
             delivery: "Não",
-           
+
             instagram: "https://www.instagram.com/lojacacaushowcarlopolis/",
             novidadesImages: [
               "images/comercios/docesChocolates/cacauShow/divulgacao/1.jpg",
@@ -7389,11 +7387,11 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "É hora de LaNut e LaCreme<br>Nessa campanha, nas quintas temos promoção desses tabletes deliciosos!😋<br>2 Tabletes especiais de 100g por apenas R$ 29,99.",
               "Biscoitos crocantes com o melhor chocolate!",
               "Quando o amor é verdadeiro, a combinação é perfeita.",
-             "Tem carinho que se transforma em chocolate.<br>E tem presente que carrega todo o amor do mundo.<br>Quando o amor é único, o presente também precisa ser.",
+              "Tem carinho que se transforma em chocolate.<br>E tem presente que carrega todo o amor do mundo.<br>Quando o amor é único, o presente também precisa ser.",
             ],
           },
 
-          
+
 
 
         ],
@@ -7728,7 +7726,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "Sabiam quem temos Rodizio todas as Sextas-ferias?  ",
               "Nosso famoso Yaki Soba!",
               "Amplo espaço para atendermos toda sua familia! ",
-                        ],
+            ],
 
           },
 
@@ -7997,7 +7995,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
 
-          
+
 
 
 
@@ -8056,25 +8054,25 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           },
 
 
-{
+          {
             image: "images/comercios/restaurante/toninhoParana/perfil.jpg",
             name: "Toninho Parana",
             hours: "Seg a Sab: 11:00h as 14:30h - 19:00h as 23:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              ter: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              qua: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              qui: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              sex: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
-              sab: [{ inicio: "11:00", fim: "14:30" },{ inicio: "19:00", fim: "23:00" }],
+              seg: [{ inicio: "11:00", fim: "14:30" }, { inicio: "19:00", fim: "23:00" }],
+              ter: [{ inicio: "11:00", fim: "14:30" }, { inicio: "19:00", fim: "23:00" }],
+              qua: [{ inicio: "11:00", fim: "14:30" }, { inicio: "19:00", fim: "23:00" }],
+              qui: [{ inicio: "11:00", fim: "14:30" }, { inicio: "19:00", fim: "23:00" }],
+              sex: [{ inicio: "11:00", fim: "14:30" }, { inicio: "19:00", fim: "23:00" }],
+              sab: [{ inicio: "11:00", fim: "14:30" }, { inicio: "19:00", fim: "23:00" }],
               dom: []
             },
             address: "R. Benedito Salles, 1287 - Carlópolis",
             contact: "(43) 99938-2720",
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/restaurante_toninho_parana/",
-            infoAdicional:"Temos Janta para entragas tambem",
+            infoAdicional: "Temos Janta para entragas tambem",
             menuImages: [
               "images/comercios/restaurante/toninhoParana/cardapio/1.jpg",
               "images/comercios/restaurante/toninhoParana/cardapio/2.jpg",
@@ -8089,13 +8087,13 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "images/comercios/restaurante/toninhoParana/divulgacao/2.jpg",
               "images/comercios/restaurante/toninhoParana/divulgacao/3.jpg",
               "images/comercios/restaurante/toninhoParana/divulgacao/4.jpg",
-              
+
 
             ], novidadesDescriptions: [
               "Venha se deliciar com nosso buffet completo, fresquinho e variado todos os dias!<Br>➡️ Comida feita com carinho, tempero de casa e aquele toque especial da roça!<Br>✅ Arroz, feijão, saladas, carnes, legumes, frituras, farofas, ovos e muito mais!<Br>Ideal para quem busca qualidade, fartura e preço justo",
               "🥗 Buffet de Saladas Fresquinhas e Coloridas! 🌈<br>Comece sua refeição com leveza, sabor e muita variedade!<br>Nosso buffet conta com:<br>✅ Alface crocante com cebola<br>✅ Ovos cozidos com tempero especial<br>✅ Maionese, beterraba, cenoura, tomate, vinagrete e muito mais!<br>Tudo preparado com ingredientes selecionados, higiene e carinho para garantir sua saúde e satisfação.<br>🕛 Servido todos os dias no almoço!<br>📍 Venha conferir de perto ou faça sua encomenda!",
               "🥣 Sábado é dia de Feijoada Completa!<br>Preparada com ingredientes selecionados, carnes nobres e muito sabor!<br>Feijão bem cozido, aquele tempero caseiro e o aroma que conquista de longe... é tradição que se sente no paladar!<br>✅ Acompanhada de arroz, couve refogada, farofa, laranja e torresmo (opcional).<br>📍 No prato ou marmitex!",
-               "🔥 Leitão à Pururuca Especial da Casa 🔥<br>Sabor, tradição e crocância em cada pedaço!<br>Nosso leitão assado inteiro é preparado com tempero caseiro, assado lentamente até atingir o ponto perfeito de maciez por dentro e pele pururuca por fora.<br>Servido sobre uma cama de folhas frescas, ideal para compartilhar em ocasiões especiais."
+              "🔥 Leitão à Pururuca Especial da Casa 🔥<br>Sabor, tradição e crocância em cada pedaço!<br>Nosso leitão assado inteiro é preparado com tempero caseiro, assado lentamente até atingir o ponto perfeito de maciez por dentro e pele pururuca por fora.<br>Servido sobre uma cama de folhas frescas, ideal para compartilhar em ocasiões especiais."
 
             ],
 
@@ -8243,15 +8241,15 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
           {
-           
+
             image: "images/servicos/taxi/sereia/perfil.jpg",
             name: "Sereia",
             hours: "Dom a Dom: <span style='color:red'>24horas</span>",
             address: "Ponto N2 - Em Frente a Igreja Matriz",
             contact: "(43) 99933-6915",
             contact2: "(43) 98860-7629",
-            
-           
+
+
           },
 
 
