@@ -771,6 +771,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO NOTA DE FALECIMENTO
     funerariacristorei: "s",
     funerariagrupocastilho: "s",
+    funerariasaovicentedepaulo:"s",
 
     // FIM NOTA DE FALECIMENTO
 
@@ -8283,6 +8284,21 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         title: "Nota de Falecimento",
         establishments: [
           ///
+
+
+           {
+            name: "Funeraria São Vicente de Paulo",
+            image: "images/informacoes/notaFalecimento/cristoRei/24.jpg",
+            descricaoFalecido: "Faleceu em Carlopolis, Sr 'ALFREDO VARASQUIM',<br>Seu sepultamento será (31/07) às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏 "
+
+          },
+
+         {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/25.jpg",
+            descricaoFalecido: "Faleceu em Londrina aos 75 anos de idade, Sr 'LUIS LEANDRO', mais conhecido como: Pai do Jaba.<Br>A cerimônia iniciará hoje às 08:00 horas deste Terça - feira no velório municipal de Carlópolis.<Br>Seu sepultamento será hoje às 13:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏"
+
+          },
           ///
           /// 20/07
 
