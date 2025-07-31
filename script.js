@@ -8498,6 +8498,29 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         link: document.querySelector("#menuVagasTrabalho"),
         title: "Vagas de Trabalho",
         establishments: [
+
+          {
+            image: "images/comercios/restaurante/delfino/delfino.png",
+            name: "Emporio São Victor",
+            hours: "Seg a Sex: 11:00h as 15:00h - 18:00h as 22:30h</br> Sab: 11:00h as 16:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
+              ter: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
+              qua: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
+              qui: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
+              sex: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
+              sab: [{ inicio: "11:00", fim: "16:00" }],
+              dom: []
+            },
+            address: "R. Kalil Keder, 90 - Carlopolis",
+            contact: "(43) 99111-9484",            
+            instagram: "https://www.instagram.com/delfinos.mendes1/",
+            infoVagaTrabalho: "1 - Vaga Para Garçon ",
+
+           
+
+          },
           {
             image: "images/comercios/supermercado/rocha/perfil.jpg",
             name: "Rocha",
@@ -8517,11 +8540,11 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
             facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
             instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
-            infoVagaTrabalho: "1 Vaga Para Açougueiro<br> 1 Vaga Para Feira<br>2 Vagas Para Padaria<br>1 Vaga Para Repositor<br> ",
+            infoVagaTrabalho: "1 - Vaga Para Açougueiro<br>1 - Vaga Para Feira<br>1 - Vagas Para Padaria<br>1 - Vaga Para Repositor<br> ",
           },
 
 
-
+          
 
 
 
