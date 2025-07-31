@@ -779,8 +779,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     feiradalua: "s",
     calendarioeventos: "s",
-    frutfest: "s",
-    circuitomonisakdevoleidepraia: "s",
+    frutfest: "s",    
     festadosenhorbomjesus: "s",
     lowcity: "s",
     toroonagashi: "s",
@@ -1600,7 +1599,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
           descricao: "Bombons de Chocolate ao Leite",
-          validade: "2025-07-31T18:00:00",
+          validade: "2025-07-31T23:00:00",
           preco: "42,99",
           preco_com_desconto: "30,99",
           whatsapp: "43991053711"
@@ -1609,7 +1608,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
           descricao: "Chocolate Surpresa Turma Do Snoopy",
-          validade: "2025-07-31T18:00:00",
+          validade: "2025-07-31T23:00:00",
           preco: "19,99",
           preco_com_desconto: "13,99",
           whatsapp: "43991053711"
@@ -1618,7 +1617,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
           descricao: "Bombons de chocolate ao leite com recheios nos sabores: avelã, trufa ao leite e cereja ao licor.",
-          validade: "2025-07-31T18:00:00",
+          validade: "2025-07-31T23:00:00",
           preco: "49,99",
           preco_com_desconto: "44,99",
           whatsapp: "43991053711"
@@ -1628,7 +1627,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
           descricao: "Caixa Angel Gourmet | 200 g Bombons nos sabores chocolate 55% de cacau com recheio intenso e chocolate ao leite com recheio sabor creme e morango.",
-          validade: "2025-07-31T18:00:00",
+          validade: "2025-07-31T23:00:00",
           preco: "54,99",
           preco_com_desconto: "43,99",
           whatsapp: "43991053711"
@@ -1638,7 +1637,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/5.jpg",
           descricao: "Promoçao Mini Show",
-          validade: "2025-08-30T18:00:00",
+          validade: "2025-08-30T23:00:00",
           whatsapp: "43991053711"
         },
       ]
@@ -1880,48 +1879,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
     },
 
 
-
-
-
-
-
-
-
-    {
-
-      nome: "Judite",
-      imagem: "images/comercios/artesanato/judite/perfil.jpg",
-      promocoes: [
-        {
-          imagem: "images/promocoes/boneca1.jpg",
-          descricao: "Boneca de Pano Moranguinho",
-          validade: "2025-07-30T18:00:00",
-          preco: "180,00",
-          preco_com_desconto: "150,00 a vista",
-          // desconto: "5",
-          whatsapp: "43998713498"
-        },
-
-        {
-          imagem: "images/promocoes/boneca2.jpg",
-          descricao: "Boneca de Pano Emilia",
-          validade: "2025-07-30T18:00:00",
-          preco: "180,00",
-          preco_com_desconto: "150,00 a vista",
-          whatsapp: "43998713498"
-        },
-
-        {
-          imagem: "images/promocoes/bolsa1.jpg",
-          descricao: "Bolsa de croche 24x26cm",
-          validade: "2025-07-30T18:00:00",
-          preco: "100,00",
-          preco_com_desconto: "90,00 a vista",
-          whatsapp: "43998713498"
-        },
-
-      ]
-    },
+    
 
 
 
@@ -1988,7 +1946,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/promocoes/agro/saojose/1.jpg",
           descricao: "Casinha de plastico N4",
-          validade: "2025-07-30T18:00:00",
+          validade: "2025-07-31T18:00:00",
           preco: "180,00",
           preco_com_desconto: "162,00 a vista",
           whatsapp: "43996829898"
@@ -1997,7 +1955,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/promocoes/agro/saojose/2.jpg",
           descricao: "Botina ",
-          validade: "2025-07-30T18:00:00",
+          validade: "2025-07-31T18:00:00",
           preco: "124,90",
           preco_com_desconto: "85,00 a vista",
           whatsapp: "43996829898"
@@ -2006,7 +1964,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/promocoes/agro/saojose/3.jpg",
           descricao: "Toquinha G",
-          validade: "2025-07-30T18:00:00",
+          validade: "2025-07-31T18:00:00",
           preco: "75,00",
           preco_com_desconto: "67,50 a vista",
           whatsapp: "43996829898"
@@ -2015,7 +1973,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/promocoes/agro/saojose/4.jpg",
           descricao: "Ração Aysha 15kg ",
-          validade: "2025-07-30T18:00:00",
+          validade: "2025-07-31T18:00:00",
           preco: "60,00",
           preco_com_desconto: "55,00 a vista",
           whatsapp: "43996829898"
