@@ -7276,7 +7276,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           {
             image: "images/comercios/depositoGas/liaGas/liaGas.png",
             name: "Lia Gas",
-            hours: "Seg a Sab: 08:00h as 20:00h",
+            hours: "Seg a Sex: 08:00h as 20:00h<br>Sab: 08:00h as 19:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -7284,7 +7284,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               qua: [{ inicio: "08:00", fim: "20:00" }],
               qui: [{ inicio: "08:00", fim: "20:00" }],
               sex: [{ inicio: "08:00", fim: "20:00" }],
-              sab: [{ inicio: "08:00", fim: "20:00" }],
+              sab: [{ inicio: "08:00", fim: "19:00" }],
               dom: []
             },
             address: "R. Kalil Keder, 910 - Carlopolis",
