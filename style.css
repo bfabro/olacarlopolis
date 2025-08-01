@@ -1,5 +1,6 @@
 /* Import Google font - Poppins */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap");
 
 * {
   margin: 0;
@@ -3198,4 +3199,20 @@ a:focus {
 
 .balanco {
   animation: wiggle 1s infinite;
+}
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
+
+.info-estab-promo h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  background: linear-gradient(90deg, #e72121 40%, #810606 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  text-shadow: 0px 2px 10px rgba(0,0,0,0.15);
 }
