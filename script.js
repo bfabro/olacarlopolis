@@ -2430,10 +2430,6 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           },
 
 
-
-
-
-
           {
             image: "images/comercios/agropecuaria/agroVida/agrovida.png",
             name: "Agro Vida",
