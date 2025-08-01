@@ -496,7 +496,7 @@ document.addEventListener("DOMContentLoaded", function () {
     patymaosdeouro: "s",
 
     //calhas
-    nelsoncalhas:"s",
+    nelsoncalhas: "s",
 
     // cartorio
     registrocivileimoveis: "s",
@@ -595,7 +595,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cantinhosaudavel: "s",
 
     //piscina
-    mhpiscinas:"s",
+    mhpiscinas: "s",
 
     //pizzaria
     fornalhapizzaria: "s",
@@ -777,7 +777,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO NOTA DE FALECIMENTO
     funerariacristorei: "s",
     funerariagrupocastilho: "s",
-    funerariasaovicentedepaulo:"s",
+    funerariasaovicentedepaulo: "s",
 
     // FIM NOTA DE FALECIMENTO
 
@@ -785,7 +785,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     feiradalua: "s",
     calendarioeventos: "s",
-    frutfest: "s",    
+    frutfest: "s",
     festadosenhorbomjesus: "s",
     lowcity: "s",
     toroonagashi: "s",
@@ -1571,6 +1571,8 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
   const promocoesPorComercio = [
+
+    /*
     {
       nome: "Seiza",
       imagem: "images/comercios/mercearia/seiza/seiza.png",
@@ -1596,64 +1598,62 @@ ${est.novidadesImages && est.novidadesImages.length ? `
       ]
     },
 
-
-
-    {
-      nome: "Cacau Show",
-      imagem: "images/comercios/docesChocolates/cacauShow/perfil.jpg",
-      promocoes: [
+*/
+    /*
         {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
-          descricao: "Bombons de Chocolate ao Leite",
-          validade: "2025-07-31T23:00:00",
-          preco: "42,99",
-          preco_com_desconto: "30,99",
-          whatsapp: "43991053711"
+          nome: "Cacau Show",
+          imagem: "images/comercios/docesChocolates/cacauShow/perfil.jpg",
+          promocoes: [
+            {
+              imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
+              descricao: "Bombons de Chocolate ao Leite",
+              validade: "2025-07-31T23:00:00",
+              preco: "42,99",
+              preco_com_desconto: "30,99",
+              whatsapp: "43991053711"
+            },
+    
+            {
+              imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
+              descricao: "Chocolate Surpresa Turma Do Snoopy",
+              validade: "2025-07-31T23:00:00",
+              preco: "19,99",
+              preco_com_desconto: "13,99",
+              whatsapp: "43991053711"
+            },
+    
+            {
+              imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
+              descricao: "Bombons de chocolate ao leite com recheios nos sabores: avelã, trufa ao leite e cereja ao licor.",
+              validade: "2025-07-31T23:00:00",
+              preco: "49,99",
+              preco_com_desconto: "44,99",
+              whatsapp: "43991053711"
+            },
+    
+    
+            {
+              imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
+              descricao: "Caixa Angel Gourmet | 200 g Bombons nos sabores chocolate 55% de cacau com recheio intenso e chocolate ao leite com recheio sabor creme e morango.",
+              validade: "2025-07-31T23:00:00",
+              preco: "54,99",
+              preco_com_desconto: "43,99",
+              whatsapp: "43991053711"
+            },
+    
+    
+            {
+              imagem: "images/comercios/docesChocolates/cacauShow/promocao/5.jpg",
+              descricao: "Promoçao Mini Show",
+              validade: "2025-08-30T23:00:00",
+              whatsapp: "43991053711"
+            },
+          ]
+    
+    
         },
-
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
-          descricao: "Chocolate Surpresa Turma Do Snoopy",
-          validade: "2025-07-31T23:00:00",
-          preco: "19,99",
-          preco_com_desconto: "13,99",
-          whatsapp: "43991053711"
-        },
-
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
-          descricao: "Bombons de chocolate ao leite com recheios nos sabores: avelã, trufa ao leite e cereja ao licor.",
-          validade: "2025-07-31T23:00:00",
-          preco: "49,99",
-          preco_com_desconto: "44,99",
-          whatsapp: "43991053711"
-        },
-
-
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
-          descricao: "Caixa Angel Gourmet | 200 g Bombons nos sabores chocolate 55% de cacau com recheio intenso e chocolate ao leite com recheio sabor creme e morango.",
-          validade: "2025-07-31T23:00:00",
-          preco: "54,99",
-          preco_com_desconto: "43,99",
-          whatsapp: "43991053711"
-        },
-
-
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/5.jpg",
-          descricao: "Promoçao Mini Show",
-          validade: "2025-08-30T23:00:00",
-          whatsapp: "43991053711"
-        },
-      ]
-
-
-
-
-    },
-
-
+    
+    */
 
 
     {
@@ -1662,36 +1662,18 @@ ${est.novidadesImages && est.novidadesImages.length ? `
       promocoes: [
         {
           imagem: "images/comercios/quitanda/pimentaDoce/promocao/1.jpg",
-          descricao: "Maracuja Azedo",
-          validade: "2025-07-30T20:00:00",
-          preco: "6,99",
-          preco_com_desconto: "4,99",
+          descricao: "Abobora Madura",
+          validade: "2025-08-30T20:00:00",
+          preco: "4,50",
+          preco_com_desconto: "2,99",
           whatsapp: "43988065747"
         },
 
-
-        {
-          imagem: "images/comercios/quitanda/pimentaDoce/promocao/2.jpg",
-          descricao: "Caixa Cerveja Cristal",
-          validade: "2025-07-30T20:00:00",
-          preco: "34,99",
-          preco_com_desconto: "29,95",
-          whatsapp: "43988065747"
-        },
-
-        {
-          imagem: "images/comercios/quitanda/pimentaDoce/promocao/3.jpg",
-          descricao: "Cerveja Heineken Und",
-          validade: "2025-07-30T20:00:00",
-          preco: "7,95",
-          preco_com_desconto: "5,95",
-          whatsapp: "43988065747"
-        },
 
         {
           imagem: "images/comercios/quitanda/pimentaDoce/promocao/4.jpg",
           descricao: "Vassoura Caipira",
-          validade: "2025-07-30T20:00:00",
+          validade: "2025-08-30T20:00:00",
           preco: "24,00",
           preco_com_desconto: "19,50",
           whatsapp: "43988065747"
@@ -1768,33 +1750,57 @@ ${est.novidadesImages && est.novidadesImages.length ? `
       imagem: "images/comercios/moveis/movepar/perfil.png",
       promocoes: [
         {
-          imagem: "images/promocoes/m1.jpg",
-          descricao: "CJ BOX MOLAS ENSACADAS CASAL 1.38",
-          validade: "2025-07-30T18:00:00",
-          preco: "1.200,00",
-          preco_com_desconto: "999,00 a vista",
+          imagem: "images/comercios/moveis/movepar/promocao/1.jpg",
+          descricao: "XIAOMI POCO C71 3GB RAM 64GB MEMÓRIA ",
+          validade: "2025-08-15T18:00:00",
+          preco: "1.190,00",
+          preco_com_desconto: "699,00 a vista",
           // desconto: "5",
           whatsapp: "43991186909"
         },
 
         {
-          imagem: "images/promocoes/m2.jpg",
-          descricao: "ESTOFADO 3X2 LUGARES",
-          validade: "2025-07-30T18:00:00",
-          preco: "1.200,00",
-          preco_com_desconto: "999,00 a vista",
+          imagem: "images/comercios/moveis/movepar/promocao/2.jpg",
+          descricao: "XIAOMI REDMI A5 4GB RAM 128GB MEMÓRIA",
+          validade: "2025-08-15T18:00:00",
+          preco: "1.590,00",
+          preco_com_desconto: "799,00 a vista",
           whatsapp: "43991186909"
         },
 
+      ]
+    },
+
+
+
+
+    {
+
+      nome: "Agro Vida",
+      imagem: "images/comercios/agropecuaria/agroVida/agrovida.png",
+      promocoes: [
         {
-          imagem: "images/promocoes/m3.jpg",
-          descricao: "Roupeiro 6 portas e 2 gavetas",
-          validade: "2025-07-30T18:00:00",
-          preco: "1.090,00",
-          preco_com_desconto: "699,00 a vista",
-          whatsapp: "43991186909"
+          imagem: "images/comercios/agropecuaria/agroVida/promocao/1.jpg",
+          descricao: "Ração Unna 15kg cães adultos",
+          validade: "2025-08-25T18:00:00",
+          preco: "110,00",
+          preco_com_desconto: "99,90 a vista",
+          // desconto: "5",
+          whatsapp: "43991589047"
         },
 
+           {
+          imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
+          descricao: "Kit Churrasco Karanda",
+          validade: "2025-08-15T18:00:00",
+          preco: "340,00",
+          preco_com_desconto: "300,00 a vista",
+          // desconto: "5",
+          whatsapp: "43991589047"
+        },
+
+
+        
 
       ]
     },
@@ -1877,15 +1883,11 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           whatsapp: "43999178632"
         },
 
-
-
-
-
       ]
     },
 
 
-    
+
 
 
 
@@ -1898,7 +1900,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/comercios/artesanato/patricia/promocoes/1.jpg",
           descricao: "Pano de prato - Flores ",
-          validade: "2025-07-31T18:00:00",
+          validade: "2025-08-31T18:00:00",
           preco: "40,00",
           preco_com_desconto: "35,00 a vista",
           // desconto: "5",
@@ -1908,7 +1910,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/comercios/artesanato/patricia/promocoes/2.jpg",
           descricao: "Pano de prato - Frutas ",
-          validade: "2025-07-31T18:00:00",
+          validade: "2025-08-31T18:00:00",
           preco: "40,00",
           preco_com_desconto: "35,00 a vista",
           // desconto: "5",
@@ -1918,7 +1920,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/comercios/artesanato/patricia/promocoes/3.jpg",
           descricao: "Pano de prato - Plantas ",
-          validade: "2025-07-31T18:00:00",
+          validade: "2025-08-31T18:00:00",
           preco: "40,00",
           preco_com_desconto: "35,00 a vista",
           // desconto: "5",
@@ -1928,7 +1930,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         {
           imagem: "images/comercios/artesanato/patricia/promocoes/4.jpg",
           descricao: "Pano de prato - Melancia ",
-          validade: "2025-07-31T18:00:00",
+          validade: "2025-08-31T18:00:00",
           preco: "40,00",
           preco_com_desconto: "35,00 a vista",
           // desconto: "5",
@@ -2453,13 +2455,26 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             facebook: "https://www.facebook.com/AgroVidaCarlopolis/?locale=pt_BR",
             instagram: "https://www.instagram.com/agrovida_carlopolis/",
             novidadesImages: [
-
-              "images/comercios/agropecuaria/agroVida/divulgacao/2.png",
-              "images/comercios/agropecuaria/agroVida/divulgacao/1.png",
+              "images/comercios/agropecuaria/agroVida/divulgacao/1.jpg",
+              "images/comercios/agropecuaria/agroVida/divulgacao/2.jpg",
+              "images/comercios/agropecuaria/agroVida/divulgacao/3.jpg",
+              "images/comercios/agropecuaria/agroVida/divulgacao/4.jpg",
+              "images/comercios/agropecuaria/agroVida/divulgacao/5.jpg",
+              "images/comercios/agropecuaria/agroVida/divulgacao/6.jpg",
+              "images/comercios/agropecuaria/agroVida/divulgacao/7.jpg",
+              "images/comercios/agropecuaria/agroVida/divulgacao/8.jpg",
+               "images/comercios/agropecuaria/agroVida/divulgacao/9.jpg",
+              
             ],
             novidadesDescriptions: [
-              "Temos sacos de milho 40kg",
-              "Special Dog no Precinho",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
 
             ],
           },
@@ -2746,7 +2761,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
       },
 
 
-{
+      {
         link: document.querySelector("#menuCalhas"),
         title: "Calhas",
         establishments: [
@@ -2770,8 +2785,8 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             address: "Atendimento a domicílio",
             contact: "(43) 9.9938-8281",
             infoAdicional: "🏗️ Instalação de novas calhas<Br>🛠️ Reformas<Br>🧹 Manutenção e limpeza para residências e comércios<Br>💡 Soluções sob medida para evitar entupimentos e vazamentos<Br>✅ Garantia de funcionamento eficiente do seu sistema de calhas",
-facebook:"https://www.facebook.com/nelsoncalhaa",
- novidadesImages: [
+            facebook: "https://www.facebook.com/nelsoncalhaa",
+            novidadesImages: [
               "images/comercios/calhas/nelson/divulgacao/1.jpg",
               "images/comercios/calhas/nelson/divulgacao/2.jpg",
               "images/comercios/calhas/nelson/divulgacao/3.jpg",
@@ -3737,7 +3752,7 @@ facebook:"https://www.facebook.com/nelsoncalhaa",
 
 
 
-{
+      {
         link: document.querySelector("#menuPiscina"),
         title: "Piscinas",
         establishments: [
@@ -3757,8 +3772,8 @@ facebook:"https://www.facebook.com/nelsoncalhaa",
             },
             address: "Atendimento a domicílio",
             contact: "(43)  9.9985-4044",
-            instagram:"https://www.instagram.com/mhpiscinas/",
-            infoAdicional:"⏲️ Instalação de timer<br>🧪 + 🧹 Limpezas química e física<br>🏖️ Troca de areia<br>💧 Recuperação de água,",
+            instagram: "https://www.instagram.com/mhpiscinas/",
+            infoAdicional: "⏲️ Instalação de timer<br>🧪 + 🧹 Limpezas química e física<br>🏖️ Troca de areia<br>💧 Recuperação de água,",
 
 
           },
@@ -8345,14 +8360,14 @@ facebook:"https://www.facebook.com/nelsoncalhaa",
           ///
 
 
-           {
+          {
             name: "Funeraria São Vicente de Paulo",
             image: "images/informacoes/notaFalecimento/cristoRei/24.jpg",
             descricaoFalecido: "Faleceu em Carlopolis, Sr 'ALFREDO VARASQUIM',<br>Seu sepultamento será (31/07) às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏 "
 
           },
 
-         {
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/25.jpg",
             descricaoFalecido: "Faleceu em Londrina aos 75 anos de idade, Sr 'LUIS LEANDRO', mais conhecido como: Pai do Jaba.<Br>A cerimônia iniciará hoje às 08:00 horas deste Terça - feira no velório municipal de Carlópolis.<Br>Seu sepultamento será hoje às 13:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏"
@@ -8573,11 +8588,11 @@ facebook:"https://www.facebook.com/nelsoncalhaa",
               dom: []
             },
             address: "R. Kalil Keder, 90 - Carlopolis",
-            contact: "(43) 99111-9484",            
+            contact: "(43) 99111-9484",
             instagram: "https://www.instagram.com/delfinos.mendes1/",
             infoVagaTrabalho: "1 - Vaga Para Garçon ",
 
-           
+
 
           },
           {
@@ -8603,7 +8618,7 @@ facebook:"https://www.facebook.com/nelsoncalhaa",
           },
 
 
-          
+
 
 
 
