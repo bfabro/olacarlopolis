@@ -495,6 +495,9 @@ document.addEventListener("DOMContentLoaded", function () {
     judite: "s",
     patymaosdeouro: "s",
 
+    //calhas
+    nelsoncalhas:"s",
+
     // cartorio
     registrocivileimoveis: "s",
 
@@ -590,6 +593,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //produtosNaturais
     cantinhosaudavel: "s",
+
+    //piscina
+    mhpiscinas:"s",
 
     //pizzaria
     fornalhapizzaria: "s",
@@ -2740,7 +2746,59 @@ ${est.novidadesImages && est.novidadesImages.length ? `
       },
 
 
+{
+        link: document.querySelector("#menuCalhas"),
+        title: "Calhas",
+        establishments: [
 
+
+          {
+            image: "images/comercios/calhas/nelson/perfil.jpg",
+            name: "Nelson Calhas",
+            hours: "Seg a Sex: 8:00h as 18:00h<br>Sab:08:0h as 12:00h",
+            statusAberto: "a",
+            horarios: {
+
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
+              dom: [],
+            },
+            address: "Atendimento a domicílio",
+            contact: "(43) 9.9938-8281",
+            infoAdicional: "🏗️ Instalação de novas calhas<Br>🛠️ Reformas<Br>🧹 Manutenção e limpeza para residências e comércios<Br>💡 Soluções sob medida para evitar entupimentos e vazamentos<Br>✅ Garantia de funcionamento eficiente do seu sistema de calhas",
+facebook:"https://www.facebook.com/nelsoncalhaa",
+ novidadesImages: [
+              "images/comercios/calhas/nelson/divulgacao/1.jpg",
+              "images/comercios/calhas/nelson/divulgacao/2.jpg",
+              "images/comercios/calhas/nelson/divulgacao/3.jpg",
+              "images/comercios/calhas/nelson/divulgacao/4.jpg",
+              "images/comercios/calhas/nelson/divulgacao/5.jpg",
+              "images/comercios/calhas/nelson/divulgacao/6.jpg",
+              "images/comercios/calhas/nelson/divulgacao/7.jpg",
+              "images/comercios/calhas/nelson/divulgacao/8.jpg",
+              "images/comercios/calhas/nelson/divulgacao/9.jpg",
+            ],
+            novidadesDescriptions: [
+              "Trabalho finalizado! Calhas limpas, instaladas e funcionando perfeitamente com a qualidade Nelson Calhas.",
+              "Trabalho finalizado! Calhas limpas, instaladas e funcionando perfeitamente com a qualidade Nelson Calhas.",
+              "Trabalho finalizado! Calhas limpas, instaladas e funcionando perfeitamente com a qualidade Nelson Calhas.",
+              "Trabalho finalizado! Calhas limpas, instaladas e funcionando perfeitamente com a qualidade Nelson Calhas.",
+              "Trabalho finalizado! Calhas limpas, instaladas e funcionando perfeitamente com a qualidade Nelson Calhas.",
+              "Trabalho finalizado! Calhas limpas, instaladas e funcionando perfeitamente com a qualidade Nelson Calhas.",
+              "Trabalho finalizado! Calhas limpas, instaladas e funcionando perfeitamente com a qualidade Nelson Calhas.",
+              "Trabalho finalizado! Calhas limpas, instaladas e funcionando perfeitamente com a qualidade Nelson Calhas.",
+              "Trabalho finalizado! Calhas limpas, instaladas e funcionando perfeitamente com a qualidade Nelson Calhas.",
+            ],
+
+          },
+
+
+        ],
+      },
 
 
       {
@@ -3676,6 +3734,49 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
         ],
       },
+
+
+
+{
+        link: document.querySelector("#menuPiscina"),
+        title: "Piscinas",
+        establishments: [
+          {
+            image: "images/comercios/piscina/mhpiscinas/perfil.jpg",
+            name: "MH Piscinas",
+            hours: "Seg a Sex: 07:30h as 17:30h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "07:30", fim: "17:30" }],
+              ter: [{ inicio: "07:30", fim: "17:30" }],
+              qua: [{ inicio: "07:30", fim: "17:30" }],
+              qui: [{ inicio: "07:30", fim: "17:30" }],
+              sex: [{ inicio: "07:30", fim: "17:30" }],
+              sab: [],
+              dom: [],
+            },
+            address: "Atendimento a domicílio",
+            contact: "(43)  9.9985-4044",
+            instagram:"https://www.instagram.com/mhpiscinas/",
+            infoAdicional:"⏲️ Instalação de timer<br>🧪 + 🧹 Limpezas química e física<br>🏖️ Troca de areia<br>💧 Recuperação de água,",
+
+
+          },
+        ],
+      },
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
       // pizzaria
