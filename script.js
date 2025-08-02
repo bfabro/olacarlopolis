@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "farmais", "oficinadocelular", "toninhoparana", "gerson", "cacaushow", "seiza", "vania", "thebestacai",
+    "elshaday", "mhpiscinas", "namigo", "seiza", "nelsoncalhas","oficinadocelular","Team Vieira"
 
   ];
 
@@ -3030,7 +3030,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             contact: "(43) 99965-2084",
             instagram: "https://www.instagram.com/feiradaluacarlopolis/",
             novidadesImages: [
-              "images/comercios/feiraLua/divulgacao/1.jpg",
+            //  "images/comercios/feiraLua/divulgacao/1.jpg",
               "images/comercios/feiraLua/divulgacao/2.png",
               "images/comercios/feiraLua/divulgacao/3.png",
               "images/comercios/feiraLua/divulgacao/4.png",
@@ -3040,7 +3040,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             ],
 
             novidadesDescriptions: [
-              "Cantando para vocês Zé Carlos <br>25/07 a partir das 19:00hrs",
+            //  "Cantando para vocês Zé Carlos <br>25/07 a partir das 19:00hrs",
             ],
           },
         ],
@@ -3770,7 +3770,17 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             contact: "(43)  9.9985-4044",
             instagram: "https://www.instagram.com/mhpiscinas/",
             infoAdicional: "⏲️ Instalação de timer<br>🧪 + 🧹 Limpezas química e física<br>🏖️ Troca de areia<br>💧 Recuperação de água,",
+ novidadesImages: [
 
+              "images/comercios/piscina/mhpiscinas/divulgacao/1.jpg",
+         
+            ],
+
+            novidadesDescriptions: [
+              "Sua Piscina merece um cuidado especial! <br>Com a MhPiscinas voce pode contar!",
+              
+
+            ],
 
           },
         ],
@@ -4916,21 +4926,23 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/comercios/farmacia/elShaday/elshaday.png",
             name: "El Shaday",
             address: "R. Benedito Sales, 353 - Carlopolis",
+              plantaoHorario: "08:00h às 21:00h", 
+              plantaoData:"Sab 02/08 a Sex 08/08", 
             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
 
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
-              dom: []
+              seg: [{ inicio: "08:00", fim: "21:00" }],
+                ter: [{ inicio: "08:00", fim: "21:00" }],
+                qua: [{ inicio: "08:00", fim: "21:00" }],
+                qui: [{ inicio: "08:00", fim: "21:00" }],
+                sex: [{ inicio: "08:00", fim: "21:00" }],
+                sab: [{ inicio: "08:00", fim: "21:00" }],
+                dom: [{ inicio: "08:00", fim: "21:00" }]
             },
             contact: "(43) 98488-9420",
             delivery: "Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
+            facebook: "https://www.facebook.com/fciaelshaday",
             instagram: "https://www.instagram.com/farmaciaels/",
 
             novidadesImages: [
@@ -4989,11 +5001,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/comercios/farmacia/farmais/farmais.png",
             name: "FarMais",
             address: "R. Benedito Salles, 979 - Carlopolis",
-            plantaoHorario: "08:00h às 21:00h",
-            plantaoData: "Sab 26/07 a Sex 01/08",
-
             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
-
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "18:00" }],
@@ -5009,14 +5017,14 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
             instagram: "https://www.instagram.com/farmaiscarlopolis/",
             novidadesImages: [
-              "images/comercios/farmacia/farmais/divulgacao/1.jpg",
+            //  "images/comercios/farmacia/farmais/divulgacao/1.jpg",
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
               "images/comercios/farmacia/farmais/divulgacao/4.jpg",
 
             ],
             novidadesDescriptions: [
-              "Estamos de Plantão!",
+             // "Estamos de Plantão!",
               "Tome no horário certo – Respeite os intervalos indicados.",
               "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
               "Tome no horário certo – Respeite os intervalos indicados.",
@@ -6068,7 +6076,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 */
 
 
-          /* [ 5 ]*/
+          /* [ 5 ]
 
           {
             image: "images/comercios/farmacia/farmais/farmais.png",
@@ -6109,14 +6117,15 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             ],
           },
 
+*/
+          /* [ 6 ]*/
 
-          /* [ 6 ]
           {
                     image: "images/comercios/farmacia/elShaday/elshaday.png",
                     name: "El Shaday",
                     address: "Rua Benedito Sales, 353 - Carlopolis",
                     plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"Sab 24/05 a Sex 30/05", 
+              plantaoData:"Sab 02/08 a Sex 08/08", 
               statusAberto:".",
               horarios: {                          
                 seg: [{ inicio: "08:00", fim: "21:00" }],
@@ -6131,7 +6140,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
                     contact: "(43) 98488-9420",
                     contact2: "(43) 3566-2789",
                     delivery: "Sim / Sem Taxa",
-                    facebook: "https://www.facebook.com/fciaelshaday/?locale=pt_BR",
+                    facebook: "https://www.facebook.com/fciaelshaday",
                     instagram: "https://www.instagram.com/farmaciaels/",
                     
                    novidadesImages: [               
@@ -6150,7 +6159,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
                     ],
                 },
 
-                */
+               
 
 
           /* [ 7 ]
