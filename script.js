@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "elshaday", "mhpiscinas", "namigo", "seiza", "nelsoncalhas","oficinadocelular","Team Vieira"
+    "elshaday", "mhpiscinas", "namigo", "seiza", "nelsoncalhas", "oficinadocelular", "Team Vieira"
 
   ];
 
@@ -796,6 +796,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cafedamanharotapr218: "s",
     campeonatodepescaesportivaaotucunare: "s",
     cavalgadadafrutfest: "s",
+    erosprado: "s",
 
 
     /// FIM EVENTOS 
@@ -1789,7 +1790,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           whatsapp: "43991589047"
         },
 
-           {
+        {
           imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
           descricao: "Kit Churrasco Karanda",
           validade: "2025-08-15T18:00:00",
@@ -1800,7 +1801,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         },
 
 
-        
+
 
       ]
     },
@@ -2459,8 +2460,8 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "images/comercios/agropecuaria/agroVida/divulgacao/6.jpg",
               "images/comercios/agropecuaria/agroVida/divulgacao/7.jpg",
               "images/comercios/agropecuaria/agroVida/divulgacao/8.jpg",
-               "images/comercios/agropecuaria/agroVida/divulgacao/9.jpg",
-              
+              "images/comercios/agropecuaria/agroVida/divulgacao/9.jpg",
+
             ],
             novidadesDescriptions: [
               "",
@@ -3030,7 +3031,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             contact: "(43) 99965-2084",
             instagram: "https://www.instagram.com/feiradaluacarlopolis/",
             novidadesImages: [
-            //  "images/comercios/feiraLua/divulgacao/1.jpg",
+              //  "images/comercios/feiraLua/divulgacao/1.jpg",
               "images/comercios/feiraLua/divulgacao/2.png",
               "images/comercios/feiraLua/divulgacao/3.png",
               "images/comercios/feiraLua/divulgacao/4.png",
@@ -3040,7 +3041,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             ],
 
             novidadesDescriptions: [
-            //  "Cantando para vocês Zé Carlos <br>25/07 a partir das 19:00hrs",
+              //  "Cantando para vocês Zé Carlos <br>25/07 a partir das 19:00hrs",
             ],
           },
         ],
@@ -3770,15 +3771,15 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             contact: "(43)  9.9985-4044",
             instagram: "https://www.instagram.com/mhpiscinas/",
             infoAdicional: "⏲️ Instalação de timer<br>🧪 + 🧹 Limpezas química e física<br>🏖️ Troca de areia<br>💧 Recuperação de água,",
- novidadesImages: [
+            novidadesImages: [
 
               "images/comercios/piscina/mhpiscinas/divulgacao/1.jpg",
-         
+
             ],
 
             novidadesDescriptions: [
               "Sua Piscina merece um cuidado especial! <br>Com a MhPiscinas voce pode contar!",
-              
+
 
             ],
 
@@ -4926,19 +4927,19 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/comercios/farmacia/elShaday/elshaday.png",
             name: "El Shaday",
             address: "R. Benedito Sales, 353 - Carlopolis",
-              plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"Sab 02/08 a Sex 08/08", 
+            plantaoHorario: "08:00h às 21:00h",
+            plantaoData: "Sab 02/08 a Sex 08/08",
             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
 
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "21:00" }],
-                ter: [{ inicio: "08:00", fim: "21:00" }],
-                qua: [{ inicio: "08:00", fim: "21:00" }],
-                qui: [{ inicio: "08:00", fim: "21:00" }],
-                sex: [{ inicio: "08:00", fim: "21:00" }],
-                sab: [{ inicio: "08:00", fim: "21:00" }],
-                dom: [{ inicio: "08:00", fim: "21:00" }]
+              ter: [{ inicio: "08:00", fim: "21:00" }],
+              qua: [{ inicio: "08:00", fim: "21:00" }],
+              qui: [{ inicio: "08:00", fim: "21:00" }],
+              sex: [{ inicio: "08:00", fim: "21:00" }],
+              sab: [{ inicio: "08:00", fim: "21:00" }],
+              dom: [{ inicio: "08:00", fim: "21:00" }]
             },
             contact: "(43) 98488-9420",
             delivery: "Sim / Sem Taxa",
@@ -4946,6 +4947,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             instagram: "https://www.instagram.com/farmaciaels/",
 
             novidadesImages: [
+              "images/comercios/farmacia/elShaday/divulgacao/11.jpg",
               "images/comercios/farmacia/elShaday/divulgacao/1.png",
               "images/comercios/farmacia/elShaday/divulgacao/2.png",
               "images/comercios/farmacia/elShaday/divulgacao/3.png",
@@ -4953,6 +4955,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "images/comercios/farmacia/elShaday/divulgacao/5.png",
             ],
             novidadesDescriptions: [
+              "Estamos de Plantão!",
               "Agora ficou ainda mais fácil cuidar da sua saúde! Na Farmácia El Shaday, você encontra os medicamentos do Programa Farmácia Popular, com preços acessíveis e descontos especiais para quem precisa!",
               "Tosse, febre, cansaço ou dor no corpo? Pode ser COVID-19! Não fique na dúvida!<br>Na Farmácia El Shaday, você faz o teste rápido de COVID-19 e tem o resultado em poucos minutos! Rápido, seguro e confiável!",
               "Dengue não é brincadeira! Se você está com febre alta, dor no corpo, manchas na pele e fraqueza, faça já o teste rápido de dengue!<br>Na Farmácia El Shaday, você tem um resultado confiável em poucos minutos, sem precisar esperar para saber o diagnóstico!",
@@ -5017,14 +5020,14 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
             instagram: "https://www.instagram.com/farmaiscarlopolis/",
             novidadesImages: [
-            //  "images/comercios/farmacia/farmais/divulgacao/1.jpg",
+              //  "images/comercios/farmacia/farmais/divulgacao/1.jpg",
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
               "images/comercios/farmacia/farmais/divulgacao/4.jpg",
 
             ],
             novidadesDescriptions: [
-             // "Estamos de Plantão!",
+              // "Estamos de Plantão!",
               "Tome no horário certo – Respeite os intervalos indicados.",
               "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
               "Tome no horário certo – Respeite os intervalos indicados.",
@@ -5713,39 +5716,6 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           },
 
 
-
-
-          {
-            image: "images/informacoes/eventos/espacoBrincar.jpg",
-            name: "Colonia de Ferias",
-            date: "10/07/2025 a 25/07/2025",
-            address: "Rua Capitão Estácio,356 - Carlopolis",
-            infoAdicional: "De 10 a 25 de julho, o Espaço do Brincar está preparando dias incríveis de muita diversão, aprendizado e carinho para as crianças!<br>Nossa Colônia de Férias foi pensada com todo amor para oferecer:<br> ✨ Atividades lúdicas e Oficinas criativas <br>✨Brincadeiras dirigidas <br>✨Lanchinhos gostosos<br>✨Um ambiente acolhedor e seguro!<br>Temos pacotes especiais para atender à sua rotina:<br>- Meio período ou integral<br>- Diárias avulsas<br>- Planos semanais e quinzenais <br>👉🏻Garanta a vaga do seu pequeno e proporcione momentos inesquecíveis nessas férias!",
-            contact: "(43) 99983-8897 ",
-            contact2: "(43) 98814-2008 ",
-            instagram: "https://www.instagram.com/espacodobrincareserfeliz/",
-
-
-          },
-
-
-
-          {
-            image: "images/informacoes/eventos/volei_monizak.jpg",
-            name: "Circuito Monisak de Vôlei de Praia",
-            date: "27/07/2025",
-            address: "Clube Caravela",
-            infoAdicional: "Em homenagem ao inesquecível Monisak, grande incentivador do esporte e inspiração para todos nós, realizaremos este evento especial reunindo atletas, amigos e a comunidade em uma grande celebração ao vôlei de praia.<Br>🎫 Inscrição: R$ 60,00 por dupla<br>💰 Premiação:<br>🥇 1º lugar – R$ 300,00 + troféu<Br>🥈 2º lugar – R$ 200,00+ troféu<Br>🥉 3º lugar – R$ 100,00+ troféu<Br>🎖️Medalha a todos os participantes",
-            contact: "(43) 99627-2094 ",
-            contact2: "(43) 99659-5510 ",
-            contact3: "(43) 99123-6711 ",
-            instagram: "https://www.instagram.com/volleyball_beach_carlopolis/",
-
-
-          },
-
-
-
           {
             image: "images/informacoes/eventos/senhorbomjesus.png",
             name: "Festa Do Senhor Bom Jesus",
@@ -5764,8 +5734,6 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           },
 
 
-
-
           {
             image: "images/informacoes/eventos/escolhaRainha.jpg",
             name: "Escolha da Rainha Frut Fest",
@@ -5773,6 +5741,17 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             address: "Caravela Clube",
             contact: "-",
             instagram: "https://www.instagram.com/caravelaclube/",
+          },
+
+
+          {
+            image: "images/informacoes/eventos/erosPrado.jpg",
+            name: "Eros Prado",
+            date: "24/08/2025",
+            address: "Thac Thal",
+            contact: "(43) 99667-4021",
+            instagram: "https://www.instagram.com/clubevaledossonhos/",
+            infoAdicional: "Se prepara que o riso vai ser garantido! 😂<br>Eros Prado, direto do “Pagode da Ofensa”, tá chegando no nosso palco com aquele stand up que não perdoa ninguém!<br> Adquira teu ingresso aqui: <a target='_blank' style='color:#2da6ff;' href='https://ingressosweb.com.br/shop/eros-prado/stand-up-eros-prado'>Comprar Ingresso</a>"
           },
 
 
@@ -6121,45 +6100,47 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           /* [ 6 ]*/
 
           {
-                    image: "images/comercios/farmacia/elShaday/elshaday.png",
-                    name: "El Shaday",
-                    address: "Rua Benedito Sales, 353 - Carlopolis",
-                    plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"Sab 02/08 a Sex 08/08", 
-              statusAberto:".",
-              horarios: {                          
-                seg: [{ inicio: "08:00", fim: "21:00" }],
-                ter: [{ inicio: "08:00", fim: "21:00" }],
-                qua: [{ inicio: "08:00", fim: "21:00" }],
-                qui: [{ inicio: "08:00", fim: "21:00" }],
-                sex: [{ inicio: "08:00", fim: "21:00" }],
-                sab: [{ inicio: "08:00", fim: "21:00" }],
-                dom: [{ inicio: "08:00", fim: "21:00" }]
-              },  
-                     
-                    contact: "(43) 98488-9420",
-                    contact2: "(43) 3566-2789",
-                    delivery: "Sim / Sem Taxa",
-                    facebook: "https://www.facebook.com/fciaelshaday",
-                    instagram: "https://www.instagram.com/farmaciaels/",
-                    
-                   novidadesImages: [               
-                      "images/comercios/farmacia/elShaday/divulgacao/1.png",
-                      "images/comercios/farmacia/elShaday/divulgacao/2.png",
-                      "images/comercios/farmacia/elShaday/divulgacao/3.png",
-                      "images/comercios/farmacia/elShaday/divulgacao/4.png",
-                      "images/comercios/farmacia/elShaday/divulgacao/5.png",
-                    ], 
-                    novidadesDescriptions: [                            
-                      "Agora ficou ainda mais fácil cuidar da sua saúde! Na Farmácia El Shaday, você encontra os medicamentos do Programa Farmácia Popular, com preços acessíveis e descontos especiais para quem precisa!",
-                      "Tosse, febre, cansaço ou dor no corpo? Pode ser COVID-19! Não fique na dúvida!<br>Na Farmácia El Shaday, você faz o teste rápido de COVID-19 e tem o resultado em poucos minutos! Rápido, seguro e confiável!",
-                      "Dengue não é brincadeira! Se você está com febre alta, dor no corpo, manchas na pele e fraqueza, faça já o teste rápido de dengue!<br>Na Farmácia El Shaday, você tem um resultado confiável em poucos minutos, sem precisar esperar para saber o diagnóstico!",
-                      "Manter os níveis de glicose sob controle é essencial para quem vive com diabetes ou busca prevenir problemas de saúde. O teste rápido de glicemia é um exame simples e eficaz, que permite acompanhar os níveis de açúcar no sangue e identificar eventuais alterações.<br>Em nossa farmácia, você pode realizar o teste de glicemia com rapidez e segurança, sempre com o acompanhamento de profissionais qualificados.",
-                      "A hipertensão, conhecida como “pressão alta”, é uma condição que pode levar a sérios problemas de saúde se não for monitorada e tratada adequadamente. Felizmente, pequenas mudanças na rotina ajudam a controlar a pressão e a proteger o coração.",
-                    ],
-                },
+            image: "images/comercios/farmacia/elShaday/elshaday.png",
+            name: "El Shaday",
+            address: "Rua Benedito Sales, 353 - Carlopolis",
+            plantaoHorario: "08:00h às 21:00h",
+            plantaoData: "Sab 02/08 a Sex 08/08",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "21:00" }],
+              ter: [{ inicio: "08:00", fim: "21:00" }],
+              qua: [{ inicio: "08:00", fim: "21:00" }],
+              qui: [{ inicio: "08:00", fim: "21:00" }],
+              sex: [{ inicio: "08:00", fim: "21:00" }],
+              sab: [{ inicio: "08:00", fim: "21:00" }],
+              dom: [{ inicio: "08:00", fim: "21:00" }]
+            },
 
-               
+            contact: "(43) 98488-9420",
+            contact2: "(43) 3566-2789",
+            delivery: "Sim / Sem Taxa",
+            facebook: "https://www.facebook.com/fciaelshaday",
+            instagram: "https://www.instagram.com/farmaciaels/",
+
+            novidadesImages: [
+              "images/comercios/farmacia/elShaday/divulgacao/11.jpg",
+              "images/comercios/farmacia/elShaday/divulgacao/1.png",
+              "images/comercios/farmacia/elShaday/divulgacao/2.png",
+              "images/comercios/farmacia/elShaday/divulgacao/3.png",
+              "images/comercios/farmacia/elShaday/divulgacao/4.png",
+              "images/comercios/farmacia/elShaday/divulgacao/5.png",
+            ],
+            novidadesDescriptions: [
+              "Estamos de Plantão!",
+              "Agora ficou ainda mais fácil cuidar da sua saúde! Na Farmácia El Shaday, você encontra os medicamentos do Programa Farmácia Popular, com preços acessíveis e descontos especiais para quem precisa!",
+              "Tosse, febre, cansaço ou dor no corpo? Pode ser COVID-19! Não fique na dúvida!<br>Na Farmácia El Shaday, você faz o teste rápido de COVID-19 e tem o resultado em poucos minutos! Rápido, seguro e confiável!",
+              "Dengue não é brincadeira! Se você está com febre alta, dor no corpo, manchas na pele e fraqueza, faça já o teste rápido de dengue!<br>Na Farmácia El Shaday, você tem um resultado confiável em poucos minutos, sem precisar esperar para saber o diagnóstico!",
+              "Manter os níveis de glicose sob controle é essencial para quem vive com diabetes ou busca prevenir problemas de saúde. O teste rápido de glicemia é um exame simples e eficaz, que permite acompanhar os níveis de açúcar no sangue e identificar eventuais alterações.<br>Em nossa farmácia, você pode realizar o teste de glicemia com rapidez e segurança, sempre com o acompanhamento de profissionais qualificados.",
+              "A hipertensão, conhecida como “pressão alta”, é uma condição que pode levar a sérios problemas de saúde se não for monitorada e tratada adequadamente. Felizmente, pequenas mudanças na rotina ajudam a controlar a pressão e a proteger o coração.",
+            ],
+          },
+
+
 
 
           /* [ 7 ]
