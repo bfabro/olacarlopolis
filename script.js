@@ -599,7 +599,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //pizzaria
     fornalhapizzaria: "s",
-    tonnypizzaria: "s",
+    tonnypizzaria: "n",
 
     // quitanda
     pimentadoce: "s",
@@ -634,7 +634,7 @@ document.addEventListener("DOMContentLoaded", function () {
     coopanorpi: "s",
 
     // pesqueiro
-    peskepagueaguamarine: "s",
+    peskepagueaguamarine: "n",
 
     // radio
     carlopolitana: "s",
