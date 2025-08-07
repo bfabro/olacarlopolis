@@ -1686,6 +1686,28 @@ ${est.novidadesImages && est.novidadesImages.length ? `
     },
 
 
+    {
+      nome: "Loja Ferreira",
+      imagem: "images/comercios/materialConstrucao/ferreira/perfil.jpg",
+      promocoes: [
+       
+
+
+        {
+          imagem: "images/comercios/materialConstrucao/ferreira/promocao/1.jpg",
+          descricao: "Esmerilheiradeira Angular Bosh / GWS700",
+          validade: "2025-08-13T18:00:00",
+          preco: "415,00",
+          preco_com_desconto: "390,00",
+          whatsapp: "43996538400"
+        },
+
+
+
+      ]
+    },
+
+
 
     {
 
