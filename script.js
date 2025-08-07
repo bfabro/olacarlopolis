@@ -1688,7 +1688,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
     {
       nome: "Loja Ferreira",
-      imagem: "images/comercios/materialConstrucao/ferreira/perfil.jpg",
+      imagem: "images/comercios/materialConstrucao/ferreira/perfil.png",
       promocoes: [
        
 
