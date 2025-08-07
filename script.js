@@ -8914,7 +8914,7 @@ ${!establishment.descricaoFalecido ? `
 
                 ${establishment.date ? `
                     <div class="info-box">
-                      <i class="fas fa-calendar-alt info-icon calendar"></i>
+                      <i class="fas fa-calendar-alt info-icon" style="color: #000000ff;font-size:20px;"></i>
                       <div>
                         <div class="info-label">Data</div>
                         <div class="info-value">${establishment.date}</div>
@@ -8973,24 +8973,24 @@ ${!establishment.descricaoFalecido ? `
         <div style="display: flex; align-items: center;  margin-bottom: 4px;">
           <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
             <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-          </a>
-          <span>${establishment.contact}</span>
+          
+          <span>${establishment.contact}</span></a>
         </div>` : ""}
 
       ${secondNumber ? `
         <div style="display: flex; align-items: center;  margin-bottom: 4px;">
           <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
             <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-          </a>
-          <span>${establishment.contact2}</span>
+          
+          <span>${establishment.contact2}</span></a>
         </div>` : ""}
 
       ${thirdNumber ? `
         <div style="display: flex; align-items: center; ">
           <a href="https://api.whatsapp.com/send?phone=${thirdNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
             <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-          </a>
-          <span>${establishment.contact3}</span>
+          
+          <span>${establishment.contact3}</span></a>
         </div>` : ""}
     </div>
   </div>
