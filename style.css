@@ -1555,6 +1555,12 @@ img {
   min-width: 24px;
 }
 
+.info-icon .calendar {
+  font-size: 20px;
+  color: #000000;
+  min-width: 24px;
+}
+
 .info-label {
   font-weight: 600;
   font-size: 16px;

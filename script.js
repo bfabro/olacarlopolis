@@ -797,6 +797,7 @@ document.addEventListener("DOMContentLoaded", function () {
     campeonatodepescaesportivaaotucunare: "s",
     cavalgadadafrutfest: "s",
     erosprado: "s",
+    costeladafogodechao:"s",
 
 
     /// FIM EVENTOS 
@@ -5796,6 +5797,15 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             instagram: "https://www.instagram.com/frutfestoficial/",
           },
 
+          {
+            image: "images/informacoes/eventos/fogodechao.jpg",
+            name: "Costelada Fogo de Chão",
+            date: "31/08/2025",
+            address: "Rancho Brasil",
+            contact: "(43) 99875-976",
+            instagram: "https://www.instagram.com/danilo.vieira.378537/",
+          },
+
 
           {
             image: "images/informacoes/eventos/frutFest.png",
@@ -8365,14 +8375,44 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         link: document.querySelector("#menuNotaFalecimento"),
         title: "Nota de Falecimento",
         establishments: [
-          ///
+          
+
+
+           {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/28.jpg",
+            date: "05/08/2025",
+            descricaoFalecido: "Faleceu em Carlópolis aos 91 anos de idade, Sra 'OLIBIA RIBEIRO LEITE' mãe da Nilza.<Br>A cerimônia iniciará hoje às 18:00 horas no velório municipal de Carlópolis.<Br>Seu sepultamento será amanhã às 13:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
+            
+          },
+
+           {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/27.jpg",
+            date: "04/08/2025",
+            descricaoFalecido: "Faleceu em Carlópolis aos 65 anos de idade, o Sr 'JOSÉ MARCOS BARBOSA', mais conhecido Márcio do Bar<br>A cerimônia iniciará hoje às 18:00 horas no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às 12:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
+            
+          },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/26.jpg",
+            date: "02/08/2025",
+            descricaoFalecido: "Faleceu em Carlópolis aos 72 anos de idade, o Sr 'Francisco Gonçalves dos Santos' mais conhecido como: Irmão do Zé do óculos<br>A cerimônia iniciará hoje às 21:30 horas no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às 16:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
+            
+          },
+
+
+
+          ///////////////////////////////
 
 
           {
             name: "Funeraria São Vicente de Paulo",
             image: "images/informacoes/notaFalecimento/cristoRei/24.jpg",
-            descricaoFalecido: "Faleceu em Carlopolis, Sr 'ALFREDO VARASQUIM',<br>Seu sepultamento será (31/07) às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏 "
-
+            date: "31/07/2025",
+            descricaoFalecido: "Faleceu em Carlopolis, Sr 'ALFREDO VARASQUIM',<br>Seu sepultamento será (31/07) às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏 ",
+            
           },
 
           {
@@ -8874,9 +8914,9 @@ ${!establishment.descricaoFalecido ? `
 
                 ${establishment.date ? `
                     <div class="info-box">
-                      <i class="fas fa-calendar-alt info-icon"></i>
+                      <i class="fas fa-calendar-alt info-icon calendar"></i>
                       <div>
-                        <div class="info-label">Data do Evento</div>
+                        <div class="info-label">Data</div>
                         <div class="info-value">${establishment.date}</div>
                       </div>
                     </div>` : ""
