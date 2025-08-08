@@ -261,6 +261,20 @@
 			</table>
 		</div>
 
+		<!-- NOVO CARD - Origem dos Acessos -->
+  <div class="card">
+    <h2 class="section-title">🔗 Origem dos Acessos</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Origem</th>
+          <th>Acessos</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaOrigem"></tbody>
+    </table>
+  </div>
+
 		<div class="card">
 			<h2 class="section-title">📂 Cliques por Categoria</h2>
 			<table>
@@ -292,48 +306,14 @@
 			</table>
 		</div>
 
-		<div class="card">
-			<h2 class="section-title">🕒 Acessos por Faixa de Horário</h2>
-			<table>
-				<thead>
-					<tr>
-						<th>Faixa</th>
-						<th>Acessos</th>
-					</tr>
-				</thead>
-				<tbody id="tabelaHorarios"></tbody>
-			</table>
-		</div>
+		
 
-		<div class="card">
-			<h2 class="section-title">🌍 Resumo por Cidade</h2>
-			<table>
-				<thead>
-					<tr>
-						<th>Cidade</th>
-						<th>Acessos</th>
-					</tr>
-				</thead>
-				<tbody id="tabelaCidades"></tbody>
-			</table>
-		</div>
+		
 
 
 
 		
- <!-- NOVO CARD - Origem dos Acessos -->
-  <div class="card">
-    <h2 class="section-title">🔗 Origem dos Acessos</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Origem</th>
-          <th>Acessos</th>
-        </tr>
-      </thead>
-      <tbody id="tabelaOrigem"></tbody>
-    </table>
-  </div>
+ 
 
   <!-- Adicione aqui os outros cards de relatório existentes -->
 
@@ -343,6 +323,40 @@
 
 
 
+
+	
+<div class="card">
+  <h2 class="section-title">📋 Cardápios (Onde Comer)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Estabelecimento</th>
+        <th>Cliques</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaOndeComerCardapio">
+      <tr>
+        <td colspan="2" style="text-align:center; color: #999;">Carregando...</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+		<div class="card" id="cardPromocoesClicadas" style="display: none;">
+			<h2 class="section-title">🔥 Promoções Acessadas</h2>
+			<table>
+				<thead>
+				<tr>
+					<th>Estabelecimento</th>
+					<th style="text-align: center;">Total de Cliques</th>
+				</tr>
+				</thead>
+				<tbody id="tabelaPromocoes"></tbody>
+			</table>
+		</div>
+
+		
 		<div class="card">
 			<h2 class="section-title">📲 Instalações do App (PWA)</h2>
 			<table>
@@ -379,39 +393,31 @@
 			</table>
 		</div>
 
-	
 <div class="card">
-  <h2 class="section-title">📋 Cardápios (Onde Comer)</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Estabelecimento</th>
-        <th>Cliques</th>
-      </tr>
-    </thead>
-    <tbody id="tabelaOndeComerCardapio">
-      <tr>
-        <td colspan="2" style="text-align:center; color: #999;">Carregando...</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-
-		<div class="card" id="cardPromocoesClicadas" style="display: none;">
-			<h2 class="section-title">🔥 Promoções Acessadas</h2>
+			<h2 class="section-title">🕒 Acessos por Faixa de Horário</h2>
 			<table>
 				<thead>
-				<tr>
-					<th>Estabelecimento</th>
-					<th style="text-align: center;">Total de Cliques</th>
-				</tr>
+					<tr>
+						<th>Faixa</th>
+						<th>Acessos</th>
+					</tr>
 				</thead>
-				<tbody id="tabelaPromocoes"></tbody>
+				<tbody id="tabelaHorarios"></tbody>
 			</table>
 		</div>
 
-
+		<div class="card">
+			<h2 class="section-title">🌍 Resumo por Cidade</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Cidade</th>
+						<th>Acessos</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaCidades"></tbody>
+			</table>
+		</div>
 
 		<!-- Firebase -->
 		<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
