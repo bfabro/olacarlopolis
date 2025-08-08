@@ -2606,7 +2606,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               dom: [],
             },
             address: "R. Dra. Paula e Silva, 445 - Carlópolis",
-            contact: "14 99607-5513",
+            contact: "(14) 99607-5513",
             instagram: "https://www.instagram.com/claudiamira225/",
             novidadesImages: [
               "images/comercios/assistenciaCelular/cev/divulgacao/1.jpg",
@@ -2803,7 +2803,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               dom: [],
             },
             address: "Atendimento a domicílio",
-            contact: "(43) 9.9938-8281",
+            contact: "(43) 99938-8281",
             infoAdicional: "🏗️ Instalação de novas calhas<Br>🛠️ Reformas<Br>🧹 Manutenção e limpeza para residências e comércios<Br>💡 Soluções sob medida para evitar entupimentos e vazamentos<Br>✅ Garantia de funcionamento eficiente do seu sistema de calhas",
             facebook: "https://www.facebook.com/nelsoncalhaa",
             novidadesImages: [
@@ -3514,6 +3514,58 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           },
 
 
+
+
+{
+            image: "images/comercios/sorveteria/limone/limone.png",
+            name: "Limone",
+            hours: "Seg a Sab: 13:00h as 23:00h<br>Dom: 14:00h as 00:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "13:00", fim: "23:00" }],
+              ter: [{ inicio: "13:00", fim: "23:00" }],
+              qua: [{ inicio: "13:00", fim: "23:00" }],
+              qui: [{ inicio: "13:00", fim: "23:00" }],
+              sex: [{ inicio: "13:00", fim: "23:00" }],
+              sab: [{ inicio: "13:00", fim: "23:00" }],
+              dom: [{ inicio: "14:00", fim: "00:00" }],
+            },
+            address: "R. Benedito Salles, 619 - Carlopolis",
+            contact: "(43) 99922-8336",
+            contact2: "(43) 98863-3040",
+            delivery: "Sim / Com Taxa",
+            facebook: "#",
+            instagram: "https://www.instagram.com/limone.sorvetes/?hl=pt",
+            menuImages: [
+
+              "images/comercios/sorveteria/limone/cardapio/1.jpeg",
+              "images/comercios/sorveteria/limone/cardapio/2.jpeg",
+              "images/comercios/sorveteria/limone/cardapio/3.jpeg",
+              "images/comercios/sorveteria/limone/cardapio/4.jpeg",
+              "images/comercios/sorveteria/limone/cardapio/5.jpeg",
+              "images/comercios/sorveteria/limone/cardapio/6.jpeg",
+            ],
+
+            novidadesImages: [
+              "images/comercios/sorveteria/limone/divulgacao/1.jpeg",
+              "images/comercios/sorveteria/limone/divulgacao/2.jpeg",
+              "images/comercios/sorveteria/limone/divulgacao/3.jpeg",
+              "images/comercios/sorveteria/limone/divulgacao/4.jpeg",
+              "images/comercios/sorveteria/limone/divulgacao/5.jpeg",
+            ],
+          },
+
+
+
+
+
+
+
+
+
+
+
+
           {
             image: "images/comercios/lanchonete/kidog/perfil.png",
             name: "Ki Dog lanches",
@@ -4122,44 +4174,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
 
-          {
-            image: "images/comercios/sorveteria/limone/limone.png",
-            name: "Limone",
-            hours: "Seg a Sab: 13:00h as 23:00h<br>Dom: 14:00h as 00:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "13:00", fim: "23:00" }],
-              ter: [{ inicio: "13:00", fim: "23:00" }],
-              qua: [{ inicio: "13:00", fim: "23:00" }],
-              qui: [{ inicio: "13:00", fim: "23:00" }],
-              sex: [{ inicio: "13:00", fim: "23:00" }],
-              sab: [{ inicio: "13:00", fim: "23:00" }],
-              dom: [{ inicio: "14:00", fim: "00:00" }],
-            },
-            address: "R. Benedito Salles, 619 - Carlopolis",
-            contact: "(43) 99922-8336",
-            contact2: "(43) 98863-3040",
-            delivery: "Sim / Com Taxa",
-            facebook: "#",
-            instagram: "https://www.instagram.com/limone.sorvetes/?hl=pt",
-            menuImages: [
-
-              "images/comercios/sorveteria/limone/cardapio/1.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/2.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/3.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/4.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/5.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/6.jpeg",
-            ],
-
-            novidadesImages: [
-              "images/comercios/sorveteria/limone/divulgacao/1.jpeg",
-              "images/comercios/sorveteria/limone/divulgacao/2.jpeg",
-              "images/comercios/sorveteria/limone/divulgacao/3.jpeg",
-              "images/comercios/sorveteria/limone/divulgacao/4.jpeg",
-              "images/comercios/sorveteria/limone/divulgacao/5.jpeg",
-            ],
-          },
+          
 
 
 
@@ -8971,15 +8986,17 @@ ${!establishment.descricaoFalecido ? `
     <div class="info-value">
       ${establishment.contact ? `
         <div style="display: flex; align-items: center;  margin-bottom: 4px;">
-          <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
-            <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-          
+
+          <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank"  class="zap-link">
+            <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>          
           <span>${establishment.contact}</span></a>
+
+
         </div>` : ""}
 
       ${secondNumber ? `
         <div style="display: flex; align-items: center;  margin-bottom: 4px;">
-          <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
+          <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank" class="link-whatsapp">
             <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
           
           <span>${establishment.contact2}</span></a>
