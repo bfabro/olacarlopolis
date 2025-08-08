@@ -2088,8 +2088,8 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             instagram: "https://www.instagram.com/romeuteamvieira_oficial/",
             infoAdicional: "🔸Muay Thay<Br>🔸MMA<Br>🔸Jiu-Jitsu",
             novidadesImages: [
-              "images/comercios/academiaLuta/teamVieira/divulgacao/1.png",
-              "images/comercios/academiaLuta/teamVieira/divulgacao/2.png",
+              "images/comercios/academiaLuta/teamVieira/divulgacao/1.jpg",
+              "images/comercios/academiaLuta/teamVieira/divulgacao/2.jpg",
               "images/comercios/academiaLuta/teamVieira/divulgacao/3.jpg",
             ],
             novidadesDescriptions: [
