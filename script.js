@@ -4987,7 +4987,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             instagram: "https://www.instagram.com/farmaciaels/",
 
             novidadesImages: [
-              "images/comercios/farmacia/elShaday/divulgacao/11.jpg",
+              
               "images/comercios/farmacia/elShaday/divulgacao/1.png",
               "images/comercios/farmacia/elShaday/divulgacao/2.png",
               "images/comercios/farmacia/elShaday/divulgacao/3.png",
