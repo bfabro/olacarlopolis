@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "elshaday", "thebestacai", "mhpiscinas", "namigo",  "nelsoncalhas", "oficinadocelular", "Team Vieira"
+    "thebestacai", "mhpiscinas", "namigo", "nelsoncalhas", "oficinadocelular", "Team Vieira"
 
   ];
 
@@ -797,7 +797,7 @@ document.addEventListener("DOMContentLoaded", function () {
     campeonatodepescaesportivaaotucunare: "s",
     cavalgadadafrutfest: "s",
     erosprado: "s",
-    costeladafogodechao:"s",
+    costeladafogodechao: "s",
 
 
     /// FIM EVENTOS 
@@ -1691,7 +1691,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
       nome: "Loja Ferreira",
       imagem: "images/comercios/materialConstrucao/ferreira/perfil.png",
       promocoes: [
-       
+
 
 
         {
@@ -2135,7 +2135,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
               "images/comercios/acai/thebestacai/divulgacao/5.jpg",
               "images/comercios/acai/thebestacai/divulgacao/6.jpg",
               "images/comercios/acai/thebestacai/divulgacao/7.jpg",
-               "images/comercios/acai/thebestacai/divulgacao/8.jpg",
+              "images/comercios/acai/thebestacai/divulgacao/8.jpg",
             ],
             novidadesDescriptions: [
               "Monte seu THE BEST Waffle - Depois, só ano que vem!",
@@ -3518,7 +3518,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
 
-{
+          {
             image: "images/comercios/sorveteria/limone/limone.png",
             name: "Limone",
             hours: "Seg a Sab: 13:00h as 23:00h<br>Dom: 14:00h as 00:00h",
@@ -4176,7 +4176,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
 
-          
+
 
 
 
@@ -4928,15 +4928,17 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/comercios/farmacia/drogaMais/drogamais.png",
             name: "DrogaMais",
             hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
+               plantaoHorario: "08:00h às 21:00h",
+            plantaoData: "Sab 09/08 a Sex 15/08",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
-              dom: []
+              seg: [{ inicio: "08:00", fim: "21:00" }],
+              ter: [{ inicio: "08:00", fim: "21:00" }],
+              qua: [{ inicio: "08:00", fim: "21:00" }],
+              qui: [{ inicio: "08:00", fim: "21:00" }],
+              sex: [{ inicio: "08:00", fim: "21:00" }],
+              sab: [{ inicio: "08:00", fim: "21:00" }],
+              dom: [{ inicio: "08:00", fim: "21:00" }]
             },
             address: "R. Benedito Salles, 903 - Carlopolis",
             contact: "(43) 98411-9145",
@@ -4966,20 +4968,18 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           {
             image: "images/comercios/farmacia/elShaday/elshaday.png",
             name: "El Shaday",
-            address: "R. Benedito Sales, 353 - Carlopolis",
-            plantaoHorario: "08:00h às 21:00h",
-            plantaoData: "Sab 02/08 a Sex 08/08",
+            address: "R. Benedito Sales, 353 - Carlopolis",            
             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
 
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "21:00" }],
-              ter: [{ inicio: "08:00", fim: "21:00" }],
-              qua: [{ inicio: "08:00", fim: "21:00" }],
-              qui: [{ inicio: "08:00", fim: "21:00" }],
-              sex: [{ inicio: "08:00", fim: "21:00" }],
-              sab: [{ inicio: "08:00", fim: "21:00" }],
-              dom: [{ inicio: "08:00", fim: "21:00" }]
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
+              dom: []
             },
             contact: "(43) 98488-9420",
             delivery: "Sim / Sem Taxa",
@@ -5126,13 +5126,13 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "18:00" }],
-              dom: [{ inicio: "08:00", fim: "18:00" }]
+              seg: [{ inicio: "08:00", fim: "22:00" }],
+              ter: [{ inicio: "08:00", fim: "22:00" }],
+              qua: [{ inicio: "08:00", fim: "22:00" }],
+              qui: [{ inicio: "08:00", fim: "22:00" }],
+              sex: [{ inicio: "08:00", fim: "22:00" }],
+              sab: [{ inicio: "08:00", fim: "22:00" }],
+              dom: [{ inicio: "08:00", fim: "22:00" }]
             },
             contact: "(43) 99647-6266",
             delivery: "Sim / Sem Taxa",
@@ -6146,7 +6146,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           },
 
 */
-          /* [ 6 ]*/
+          /* [ 6 ]
 
           {
             image: "images/comercios/farmacia/elShaday/elshaday.png",
@@ -6190,7 +6190,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           },
 
 
-
+*/
 
           /* [ 7 ]
 
@@ -6237,52 +6237,54 @@ ${est.novidadesImages && est.novidadesImages.length ? `
 
 
 
-          /* [ 8 ]
+          /* [ 8 ] */
 
           {
-              image: "images/comercios/farmacia/drogaMais/drogamais.png",
-              name: "DrogaMais",
-              hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-              statusAberto:".",
-              horarios: {                          
-               seg: [{ inicio: "08:00", fim: "21:00" }],
-                ter: [{ inicio: "08:00", fim: "21:00" }],
-                qua: [{ inicio: "08:00", fim: "21:00" }],
-                qui: [{ inicio: "08:00", fim: "21:00" }],
-                sex: [{ inicio: "08:00", fim: "21:00" }],
-                sab: [{ inicio: "08:00", fim: "21:00" }],
-                dom: [{ inicio: "08:00", fim: "21:00" }]
-              },  
-              address: "Rua Benedito Salles, 903 - Carlopolis",
+            image: "images/comercios/farmacia/drogaMais/drogamais.png",
+            name: "DrogaMais",
+            hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
+            plantaoHorario: "08:00h às 21:00h",
+            plantaoData: "Sab 09/08 a Sex 15/08",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "21:00" }],
+              ter: [{ inicio: "08:00", fim: "21:00" }],
+              qua: [{ inicio: "08:00", fim: "21:00" }],
+              qui: [{ inicio: "08:00", fim: "21:00" }],
+              sex: [{ inicio: "08:00", fim: "21:00" }],
+              sab: [{ inicio: "08:00", fim: "21:00" }],
+              dom: [{ inicio: "08:00", fim: "21:00" }]
+            },
+            address: "Rua Benedito Salles, 903 - Carlopolis",
 
-               plantaoHorario: "08:00h às 21:00h", 
-              plantaoData:"Sab 07/06 a Sex 13/06",
-              contact: "(43) 98411-9145",
-              delivery: "Sim / Sem Taxa",
-              facebook:"https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
-              instagram: "https://www.instagram.com/drogamaisjorginho/",
-              
-              novidadesImages: [               
-                "images/comercios/farmacia/drogaMais/divulgacao/1.png",
-                "images/comercios/farmacia/drogaMais/divulgacao/2.png",
-                "images/comercios/farmacia/drogaMais/divulgacao/3.png",
-                "images/comercios/farmacia/drogaMais/divulgacao/4.png",
-                "images/comercios/farmacia/drogaMais/divulgacao/5.png",
-                "images/comercios/farmacia/drogaMais/divulgacao/6.png",
-              ], 
-              novidadesDescriptions: [   
-                "Arraia de Ofertas na semana do plantão! Venha conferir!"  ,                           
-               "Quer garantir o melhor para o seu bebê?<br> Passe na Drogamais ou peça pelos nossos canais de atendimento!",
-                "Tudo o que você precisa tem na DROGAMAIS! ❤️ <br>• Medicamentos • Perfumaria • Itens de beleza • Produtos de higiene! Vem pra Drogamais e encontre tudo em um só lugar! ",
-                "Em dúvidas sobre sua receita?<br> Passe na Drogamais que a gente te ajuda!",
-                "Aqui na Drogamais do Jorginho você encontra! <br>✨Uma linha completa de brinquedos e acessórios infantis Pimpolho! 👶 • Produtos de qualidade para deixar a infância ainda mais divertida e segura.• Tudo o que seu filho precisa para brincar com alegria!",
-               "Você conhece a Linha LIFE, a própria marca da Drogamais?<br> ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
-                
-              ],
+            plantaoHorario: "08:00h às 21:00h",
+            plantaoData: "Sab 09/08 a Sex 15/08",
+            contact: "(43) 98411-9145",
+            delivery: "Sim / Sem Taxa",
+            facebook: "https://www.facebook.com/p/Drogamais-Jorginho-61560211252826/?locale=pt_BR",
+            instagram: "https://www.instagram.com/drogamaisjorginho/",
+
+            novidadesImages: [
+              "images/comercios/farmacia/drogaMais/divulgacao/1.png",
+              "images/comercios/farmacia/drogaMais/divulgacao/2.png",
+              "images/comercios/farmacia/drogaMais/divulgacao/3.png",
+              "images/comercios/farmacia/drogaMais/divulgacao/4.png",
+              "images/comercios/farmacia/drogaMais/divulgacao/5.png",
+              "images/comercios/farmacia/drogaMais/divulgacao/6.png",
+            ],
+            novidadesDescriptions: [
+              "Arraia de Ofertas na semana do plantão! Venha conferir!",
+              "Quer garantir o melhor para o seu bebê?<br> Passe na Drogamais ou peça pelos nossos canais de atendimento!",
+              "Tudo o que você precisa tem na DROGAMAIS! ❤️ <br>• Medicamentos • Perfumaria • Itens de beleza • Produtos de higiene! Vem pra Drogamais e encontre tudo em um só lugar! ",
+              "Em dúvidas sobre sua receita?<br> Passe na Drogamais que a gente te ajuda!",
+              "Aqui na Drogamais do Jorginho você encontra! <br>✨Uma linha completa de brinquedos e acessórios infantis Pimpolho! 👶 • Produtos de qualidade para deixar a infância ainda mais divertida e segura.• Tudo o que seu filho precisa para brincar com alegria!",
+              "Você conhece a Linha LIFE, a própria marca da Drogamais?<br> ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
+
+            ],
           },
 
 
-        */
+
 
 
           /* [ 9 ]
@@ -8392,23 +8394,23 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         link: document.querySelector("#menuNotaFalecimento"),
         title: "Nota de Falecimento",
         establishments: [
-          
 
 
-           {
+
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/28.jpg",
             date: "05/08/2025",
             descricaoFalecido: "Faleceu em Carlópolis aos 91 anos de idade, Sra 'OLIBIA RIBEIRO LEITE' mãe da Nilza.<Br>A cerimônia iniciará hoje às 18:00 horas no velório municipal de Carlópolis.<Br>Seu sepultamento será amanhã às 13:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
-            
+
           },
 
-           {
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/27.jpg",
             date: "04/08/2025",
             descricaoFalecido: "Faleceu em Carlópolis aos 65 anos de idade, o Sr 'JOSÉ MARCOS BARBOSA', mais conhecido Márcio do Bar<br>A cerimônia iniciará hoje às 18:00 horas no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às 12:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
-            
+
           },
 
           {
@@ -8416,7 +8418,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/informacoes/notaFalecimento/cristoRei/26.jpg",
             date: "02/08/2025",
             descricaoFalecido: "Faleceu em Carlópolis aos 72 anos de idade, o Sr 'Francisco Gonçalves dos Santos' mais conhecido como: Irmão do Zé do óculos<br>A cerimônia iniciará hoje às 21:30 horas no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às 16:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
-            
+
           },
 
 
@@ -8429,7 +8431,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/informacoes/notaFalecimento/cristoRei/24.jpg",
             date: "31/07/2025",
             descricaoFalecido: "Faleceu em Carlopolis, Sr 'ALFREDO VARASQUIM',<br>Seu sepultamento será (31/07) às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏 ",
-            
+
           },
 
           {
