@@ -6682,7 +6682,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/setorPublico/copel/copel.png",
             name: "Copel",
             hours: "Seg a Sex: 08:00h - 12:00h",
-            address: "R. Benedito Salles, 1094",
+            address: "R. Benedito Salles, 1232 - Carlopolis",
             contact: "(41) 3013-8973",
           },
         ],
