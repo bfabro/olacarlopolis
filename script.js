@@ -786,7 +786,7 @@ document.addEventListener("DOMContentLoaded", function () {
     feiradalua: "s",
     calendarioeventos: "s",
     frutfest: "s",
-    festadosenhorbomjesus: "s",
+    
     lowcity: "s",
     toroonagashi: "s",
     passeiociclisticorotary: "s",
