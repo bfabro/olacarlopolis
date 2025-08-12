@@ -6830,7 +6830,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: []
             },
             address: "R. Laurindo Franco de Godói, 71 - Carlópolis",
-            contact: "#",
+            contact: "(43) 99177-9432",
 
           },
 
