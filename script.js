@@ -1096,9 +1096,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   <div class="botoes-abaixo-nome">
     ${
       est.cardapioLink ? `
-        <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); window.open('${est.cardapioLink}', '_blank')">🍽️ Cardápio</button>
+        <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
       ` : (est.menuImages && est.menuImages.length ? `
-        <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">🍽️ Cardápio</button>
+        <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
       ` : '')
     }
     ${est.contact ? `
