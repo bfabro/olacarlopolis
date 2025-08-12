@@ -3245,15 +3245,15 @@ a:focus {
   margin-top: 0px;
   background-color: #056f2c;
   color: rgb(255, 255, 255);
-   padding: 4px 12px;
+   padding: 4px 8px;
   border: none;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 142px;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin: 0px 6px;
+  margin: 0px 4px;
   cursor: pointer;
   transition: background 0.16s;
     box-shadow:
