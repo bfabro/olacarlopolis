@@ -4928,7 +4928,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             image: "images/comercios/farmacia/drogaMais/drogamais.png",
             name: "DrogaMais",
             hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-               plantaoHorario: "08:00h às 21:00h",
+            plantaoHorario: "08:00h às 21:00h",
             plantaoData: "Sab 09/08 a Sex 15/08",
             statusAberto: ".",
             horarios: {
@@ -4968,7 +4968,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
           {
             image: "images/comercios/farmacia/elShaday/elshaday.png",
             name: "El Shaday",
-            address: "R. Benedito Sales, 353 - Carlopolis",            
+            address: "R. Benedito Sales, 353 - Carlopolis",
             hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
 
             statusAberto: ".",
@@ -4987,7 +4987,7 @@ ${est.novidadesImages && est.novidadesImages.length ? `
             instagram: "https://www.instagram.com/farmaciaels/",
 
             novidadesImages: [
-              
+
               "images/comercios/farmacia/elShaday/divulgacao/1.png",
               "images/comercios/farmacia/elShaday/divulgacao/2.png",
               "images/comercios/farmacia/elShaday/divulgacao/3.png",
@@ -8395,7 +8395,42 @@ ${est.novidadesImages && est.novidadesImages.length ? `
         title: "Nota de Falecimento",
         establishments: [
 
+            {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/castilho/32.jpg",
+            date: "09/08/2025",
+            descricaoFalecido: "Comunicamos o falecimento da Sr. CONCEIÇÃO DE SOUZA NAVARRO aos 85 anos de idade.<Br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR.<Br>O sepultamento será realizado 10/08/2025 as 16:00 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
 
+          },
+
+           {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/30.jpg",
+            date: "08/08/2025",
+            descricaoFalecido: "Faleceu em Londrina aos 59 anos de idade, a Sra. 'LILIAN ZURDO COSTA'<br>A cerimônia de velório iniciará hoje às 07:00 horas no Velório Municipal de Carlópolis.<br>Sua despedida e sepultamento será hoje 08/08/2025 às 16:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/29.jpg",
+            date: "08/08/2025",
+            descricaoFalecido: "Faleceu em Carlópolis aos 90 anos de idade, a Sra. 'BEATRIZ DE MIRANDA SANTOS'.<Br>A cerimônia de velório iniciará hoje às 01:30 horas no Velório Municipal de Carlópolis.<Br>Sua despedida e sepultamento será hoje 08/08/2025 às 16:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+
+
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/castilho/31.jpg",
+            date: "06/08/2025",
+            descricaoFalecido: "Comunicamos o falecimento do Sr. FAUSTINO BERNARDO RIBEIRO aos 79 anos de idade.<Br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR.<Br>O sepultamento será realizado 06/08/2025 as 16:00 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
+
+          },
+
+         
 
           {
             name: "Funeraria Cristo Rei",
