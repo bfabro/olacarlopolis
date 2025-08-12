@@ -5131,7 +5131,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             name: "PopularMais",
             address: "Elson Soares, 787, Sala 2 - Carlopolis",
-            hours: "Seg a Sex: 08:00h as 18:00h <br>Sab: 08:00h as 12:00h",
+            hours: "Dom a Dom: 08:00h as 22:00h",
 
             statusAberto: ".",
             horarios: {
@@ -5215,16 +5215,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/saudeFarma/saudeFarma.png",
             name: "Saude Farma",
             address: "Rua Benedito Salles, 951 - Carlopolis",
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            hours: "Dom a Dom: 08:00h as 22:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
-              dom: []
+              seg: [{ inicio: "08:00", fim: "22:00" }],
+              ter: [{ inicio: "08:00", fim: "22:00" }],
+              qua: [{ inicio: "08:00", fim: "22:00" }],
+              qui: [{ inicio: "08:00", fim: "22:00" }],
+              sex: [{ inicio: "08:00", fim: "22:00" }],
+              sab: [{ inicio: "08:00", fim: "22:00" }],
+              dom: [{ inicio: "08:00", fim: "22:00" }]
             },
             contact: "(43) 99956-8938",
             delivery: "Sim / Sem Taxa",
