@@ -1062,13 +1062,11 @@ document.addEventListener("DOMContentLoaded", function () {
    
   
     <div class="onde-comer-card-esq">
-      <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel">
-    ${est.cardapioLink ? `
-  <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
-` : (est.menuImages && est.menuImages.length ? `
-  <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
-` : '')}
 
+      <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel">
+  ${est.novidadesImages && est.novidadesImages.length ? `
+    <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')">📷 Fotos</button>
+  ` : ''}
 
       
     </div>
@@ -1094,11 +1092,15 @@ document.addEventListener("DOMContentLoaded", function () {
    
 
 
-${(est.novidadesImages && est.novidadesImages.length) || est.contact ? `
+${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact) ? `
   <div class="botoes-abaixo-nome">
-    ${est.novidadesImages && est.novidadesImages.length ? `
-      <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')">📷 Fotos</button>
-    ` : ""}
+    ${
+      est.cardapioLink ? `
+        <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); window.open('${est.cardapioLink}', '_blank')">🍽️ Cardápio</button>
+      ` : (est.menuImages && est.menuImages.length ? `
+        <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">🍽️ Cardápio</button>
+      ` : '')
+    }
     ${est.contact ? `
       <a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
          target="_blank"
@@ -1109,6 +1111,7 @@ ${(est.novidadesImages && est.novidadesImages.length) || est.contact ? `
     ` : ""}
   </div>
 ` : ""}
+
 
 
    

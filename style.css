@@ -2684,7 +2684,7 @@ a:focus {
   height: 78px;
   object-fit: cover;
   border-radius: 8px;
-  margin-right: 15px;
+  margin-right: 10px;
 }
 .onde-comer-info h3 {
   margin: 0 0 3px 0;
@@ -2731,7 +2731,7 @@ a:focus {
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 4px 12px;
+  padding: 4px 14px;
   cursor: pointer;
   transition: background 0.16s;
     box-shadow:
