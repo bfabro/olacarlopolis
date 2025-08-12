@@ -2731,7 +2731,7 @@ a:focus {
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 4px 14px;
+  padding: 4px 13px;
   cursor: pointer;
   transition: background 0.16s;
     box-shadow:
@@ -3157,24 +3157,6 @@ a:focus {
   align-items: flex-start;
 }
 
-.btn-fotos_onde {
-   
-    background: #ff8200;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 4px 12px;
-    cursor: pointer;
-    transition: background 0.16s;
-     box-shadow: 0 8px 28px 0px #0004, 0 2px 8px #0002;
-    
-}
-.btn-fotos_onde:hover {
-  background: #3363ff;
-}
-
-
-
 .endereco-uma-linha {
   display: block;
   max-width: 260px;
@@ -3183,7 +3165,7 @@ a:focus {
   text-overflow: ellipsis;
   line-height: 1.4;
   margin-bottom: 2px;
-      padding: 0px 0px 23px 0px;
+      padding: 0px 0px 20px 0px;
 }
 .endereco-uma-linha a {
   color: inherit;
