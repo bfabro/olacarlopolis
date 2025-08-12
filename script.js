@@ -1091,16 +1091,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 </span>
 
-   <span class="onde-comer-telefone">
-  ${est.contact ? `
-    <a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent(gerarMensagemWhatsApp())}" target="_blank" class="zap-link">
-      <i class="fab fa-whatsapp whatsapp-icon"></i> ${est.contact}
-    </a>
-  ` : ""}
-</span>
-${est.novidadesImages && est.novidadesImages.length ? `
-  <div class="fotos-abaixo-telefone">
-    <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')">📷 Fotos</button>
+   
+
+
+${(est.novidadesImages && est.novidadesImages.length) || est.contact ? `
+  <div class="botoes-abaixo-nome">
+    ${est.novidadesImages && est.novidadesImages.length ? `
+      <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')">📷 Fotos</button>
+    ` : ""}
+    ${est.contact ? `
+      <a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
+         target="_blank"
+         class="btn-whatsapp_onde"
+         onclick="registrarCliqueBotao('whatsapp','${normalizeName(est.name)}')">
+        <i class="fab fa-whatsapp"></i> ${est.contact}
+      </a>
+    ` : ""}
   </div>
 ` : ""}
 
