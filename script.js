@@ -1839,86 +1839,33 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ]
     },
 
-
-
     {
 
-      nome: "Relojoaria Martini ",
-      imagem: "images/comercios/relojoaria/martini/perfil.jpg",
+      nome: "Oficina do Celular",
+      imagem: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
       promocoes: [
-
         {
-          imagem: "images/promocoes/martini/1.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
+          imagem: "images/comercios/assistenciaCelular/oficinaCelular/promocao/1.jpg",
+          descricao: "Pelicula 3D",
+          validade: "2025-08-31T18:00:00",
+          preco: "20,00",
+          preco_com_desconto: "15,00 a vista",
+          // desconto: "5",
+          whatsapp: "43998204580"
         },
 
-        {
-          imagem: "images/promocoes/martini/2.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
-        },
+       
 
-        {
-          imagem: "images/promocoes/martini/3.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
-        },
 
-        {
-          imagem: "images/promocoes/martini/4.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
-        },
 
-        {
-          imagem: "images/promocoes/martini/5.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
-        },
-
-        {
-          imagem: "images/promocoes/martini/6.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
-        },
-
-        {
-          imagem: "images/promocoes/martini/7.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
-        },
-
-        {
-          imagem: "images/promocoes/martini/8.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
-        },
-
-        {
-          imagem: "images/promocoes/martini/9.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
-        },
-
-        {
-          imagem: "images/promocoes/martini/10.jpg",
-          descricao: "Comprando um relógio Champion masculino Até o dia dos Pais, você ganha um desodorante Eudora!",
-          validade: "2025-08-12T18:00:00",
-          whatsapp: "43999178632"
-        },
 
       ]
     },
+
+
+
+
+    
 
 
 
