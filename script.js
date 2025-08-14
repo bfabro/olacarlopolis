@@ -500,6 +500,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // cartorio
     registrocivileimoveis: "s",
+    tabelionatodenotas: "s",
 
     //chaveiro
     chaveirocentral: "s",
@@ -2876,7 +2877,41 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
+
+          {
+            image: "images/comercios/cartorio/tabelionatoNotas/perfil.jpg",
+            name: "Tabelionato de Notas",
+            hours: "Seg a Sex: 8:30h as 11:00h - 13:00h as 17:00h",
+            statusAberto: "a",
+            horarios: {
+
+              seg: [{ inicio: "08:30", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              ter: [{ inicio: "08:30", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              qua: [{ inicio: "08:30", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              qui: [{ inicio: "08:30", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              sex: [{ inicio: "08:30", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              sab: [],
+              dom: [],
+            },
+            address: "R. Antônio Jonas Ferreira Pinto, 279 - Carlópolis",
+            contact: "(43) 99600-1801",
+            infoAdicional: "📄 Ata Notarial<br>🖋️ Autenticação<br>📜 Carta de Sentença<br>📝 Declaração Pública<br>💔 Divórcio<br>👶 Emancipação<br>🏠 Escritura de Compra e Venda<br>🎁 Escritura de Doação<br>📂 Inventário<br>💍 Pacto Antenupcial<br>✒️ Reconhecimento de Firma<br>📑 Testamento Público<br>👥 União Estável<br>🗺️ Usucapião<br>📃 Certidões e E-Notariado",
+            instagram:"https://www.instagram.com/tabelionatocarlopolispr/",
+             novidadesImages: [
+
+              "images/comercios/cartorio/tabelionatoNotas/divulgacao/1.jpg",
+              "images/comercios/cartorio/tabelionatoNotas/divulgacao/2.jpg",
+              
+            ],
+
+          },
+
+
         ],
+
+
+
+        
       },
 
 
