@@ -787,7 +787,7 @@ document.addEventListener("DOMContentLoaded", function () {
     feiradalua: "s",
     calendarioeventos: "s",
     frutfest: "s",
-    
+
     lowcity: "s",
     toroonagashi: "s",
     passeiociclisticorotary: "s",
@@ -1095,13 +1095,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact) ? `
   <div class="botoes-abaixo-nome">
-    ${
-      est.cardapioLink ? `
+    ${est.cardapioLink ? `
         <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
       ` : (est.menuImages && est.menuImages.length ? `
         <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
       ` : '')
-    }
+          }
     ${est.contact ? `
       <a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
          target="_blank"
@@ -1718,7 +1717,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ]
     },
 
-
+/*
 
     {
 
@@ -1774,7 +1773,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       ]
     },
-
+*/
     ////
     ////aquiiii
 
@@ -1786,7 +1785,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/moveis/movepar/promocao/1.jpg",
           descricao: "XIAOMI POCO C71 3GB RAM 64GB MEMÓRIA ",
-          validade: "2025-08-15T18:00:00",
+          validade: "2025-08-25T18:00:00",
           preco: "1.190,00",
           preco_com_desconto: "699,00 a vista",
           // desconto: "5",
@@ -1796,7 +1795,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/moveis/movepar/promocao/2.jpg",
           descricao: "XIAOMI REDMI A5 4GB RAM 128GB MEMÓRIA",
-          validade: "2025-08-15T18:00:00",
+          validade: "2025-08-25T18:00:00",
           preco: "1.590,00",
           preco_com_desconto: "799,00 a vista",
           whatsapp: "43991186909"
@@ -1854,23 +1853,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           whatsapp: "43998204580"
         },
 
-       
-
-
-
 
       ]
     },
-
-
-
-
-    
-
-
-
-
-
 
 
     {
@@ -1924,7 +1909,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ]
     },
 
-
+/*
     {
 
       nome: "Agro São José",
@@ -1971,7 +1956,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ]
     },
 
-
+*/
     // ...outros comércios
   ];
 
@@ -2843,12 +2828,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Antônio Jonas Ferreira Pinto, 279 - Carlópolis",
             contact: "(43) 99600-1801",
             infoAdicional: "📄 Ata Notarial<br>🖋️ Autenticação<br>📜 Carta de Sentença<br>📝 Declaração Pública<br>💔 Divórcio<br>👶 Emancipação<br>🏠 Escritura de Compra e Venda<br>🎁 Escritura de Doação<br>📂 Inventário<br>💍 Pacto Antenupcial<br>✒️ Reconhecimento de Firma<br>📑 Testamento Público<br>👥 União Estável<br>🗺️ Usucapião<br>📃 Certidões e E-Notariado",
-            instagram:"https://www.instagram.com/tabelionatocarlopolispr/",
-             novidadesImages: [
+            instagram: "https://www.instagram.com/tabelionatocarlopolispr/",
+            novidadesImages: [
 
               "images/comercios/cartorio/tabelionatoNotas/divulgacao/1.jpg",
               "images/comercios/cartorio/tabelionatoNotas/divulgacao/2.jpg",
-              
+
             ],
 
           },
@@ -2858,7 +2843,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-        
+
       },
 
 
@@ -8386,7 +8371,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Nota de Falecimento",
         establishments: [
 
-            {
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/castilho/32.jpg",
             date: "09/08/2025",
@@ -8394,7 +8379,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
           },
 
-           {
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/30.jpg",
             date: "08/08/2025",
@@ -8421,7 +8406,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
           },
 
-         
+
 
           {
             name: "Funeraria Cristo Rei",
