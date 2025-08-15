@@ -10163,50 +10163,67 @@ window.addEventListener('appinstalled', () => {
 });
 
 /* TABS ABAS HANDLER */
+/* TABS ABAS HANDLER */
 document.addEventListener('click', function (e) {
   if (!e.target.classList.contains('aba-tab')) return;
 
   const tab = e.target;
-  const container = tab.closest('li');
-
-  // ativa botão
+  const container = tab.closest('li') || tab.closest('.estabelecimento-card') || document;
+  
+  // Desativa todas as abas do item
   container.querySelectorAll('.aba-tab').forEach(b => b.classList.remove('active'));
   tab.classList.add('active');
 
-  // esconde conteúdos
+  // Esconde todos os conteúdos
   container.querySelectorAll('.aba').forEach(sec => {
     sec.style.display = 'none';
     sec.classList.remove('visible');
   });
 
   const targetId = tab.getAttribute('data-target');
-  const alvo = targetId ? container.querySelector('#' + CSS.escape(targetId)) : null;
+
+  // 🔢 CONTADOR DE CLIQUES (Fotos / Cardápio)
+  // extrai o nome normalizado a partir do id do alvo
+  const nomeNormalizado = (targetId || '').replace(/^(info-|fotos-|cardapio-)/, '');
+  if (targetId && targetId.startsWith('fotos-')) {
+    (window.registrarCliqueBotao || registrarCliqueBotao)('fotos', nomeNormalizado);
+  }
+  if (targetId && targetId.startsWith('cardapio-')) {
+    (window.registrarCliqueBotao || registrarCliqueBotao)('cardapio', nomeNormalizado);
+  }
+
+  const alvo = container.querySelector('#' + CSS.escape(targetId));
 
   if (alvo) {
     alvo.style.display = 'block';
     alvo.classList.add('visible');
 
-    // inicializa o Swiper ao abrir Fotos/Cardápio
-    const swiperNode = alvo.querySelector('.swiper');
-    if (swiperNode && !alvo.swiperInstance) {
-      alvo.swiperInstance = new Swiper(swiperNode, {
+    // se tiver swiper, (re)inicializa
+    if (alvo.querySelector('.swiper') && !alvo.swiperInstance) {
+      const node = alvo.querySelector('.swiper');
+      alvo.swiperInstance = new Swiper(node, {
         loop: true,
         navigation: {
-          nextEl: swiperNode.querySelector('.swiper-button-next'),
-          prevEl: swiperNode.querySelector('.swiper-button-prev')
+          nextEl: node.querySelector('.swiper-button-next'),
+          prevEl: node.querySelector('.swiper-button-prev'),
         },
-        pagination: {
-          el: swiperNode.querySelector('.swiper-pagination'),
-          clickable: true
-        }
+        pagination: { el: node.querySelector('.swiper-pagination'), clickable: true },
       });
     }
+
+    // rola suavemente até as imagens/menú aparecerem
+    setTimeout(() => {
+      alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   } else {
-    // Cardápio apenas link (quando não há imagens)
-    const link = tab.dataset.link;
-    if (link) window.open(link, '_blank');
+    // Se for Cardápio com link externo (sem conteúdo interno), ainda contamos e abrimos o link
+    if (targetId && targetId.startsWith('cardapio-')) {
+      const link = tab.dataset.cardapioLink;
+      if (link) window.open(link, '_blank');
+    }
   }
 });
+
 
 
 /* INIT ABAS: garante que todas as abas (exceto Info) comecem fechadas */
@@ -10352,3 +10369,12 @@ document.addEventListener('click', function(e){
 });
 
 
+// Função para registrar clique no Firebase
+function registrarCliqueBotao(tipo, idEstabelecimento) {
+  const hoje = getHojeBR(); // ou new Date().toISOString().slice(0,10) se for o seu caso
+  const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
+  ref.transaction((atual) => (atual || 0) + 1);
+}
+
+// 👇 adicione esta linha logo após a função:
+window.registrarCliqueBotao = registrarCliqueBotao;
