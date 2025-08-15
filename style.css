@@ -3587,6 +3587,7 @@ a:focus {
 /* === ABA CARROSSEL VIEWPORT FIT === */
 .abas-conteudo .swiper{
   width: 100%;
+  min-height: var(--aba-swiper-max-h, 72vh); /* reserva altura para evitar flicker */
   /* altura máxima dinâmica por JS via --aba-swiper-max-h */
 }
 .abas-conteudo .swiper .swiper-wrapper{
@@ -3605,3 +3606,9 @@ a:focus {
   object-fit: contain;
   border-radius: 10px;
 }
+/* ANTI-FLICKER: disable animation on fotos/cardapio panes */
+.abas-conteudo .aba[id^="fotos-"],
+.abas-conteudo .aba[id^="cardapio-"]{
+  animation: none !important;
+}
+

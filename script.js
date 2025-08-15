@@ -10291,15 +10291,30 @@ function _abaHeaderOffset(pane){
 
 function ajustarAbaViewport(pane){
   if(!pane) return;
-  const { headerH, navH, margem } = _abaHeaderOffset(pane);
-  const disponivel = Math.max(220, window.innerHeight - headerH - navH - margem*2);
-  const swiperEl = pane.querySelector('.swiper');
-  if(swiperEl){
-    swiperEl.style.setProperty('--aba-swiper-max-h', disponivel + 'px');
-  }
-  const top = pane.getBoundingClientRect().top + window.pageYOffset - (headerH + navH + margem);
-  window.scrollTo({ top, behavior: 'smooth' });
+  // Debounce por aba para evitar múltiplos ajustes no mesmo clique
+  if(pane._ajusteRAF){ cancelAnimationFrame(pane._ajusteRAF); }
+  pane._ajusteRAF = requestAnimationFrame(function(){
+    const { headerH, navH, margem } = _abaHeaderOffset(pane);
+    const disponivel = Math.max(220, window.innerHeight - headerH - navH - margem*2);
+    const swiperEl = pane.querySelector('.swiper');
+    if(swiperEl){
+      // reserva altura — evita “piscada” do item de baixo
+      swiperEl.style.setProperty('--aba-swiper-max-h', disponivel + 'px');
+      swiperEl.style.height = disponivel + 'px';
+      swiperEl.style.minHeight = disponivel + 'px';
+    }
+    // compensa navbar + abas com scroll-margin-top
+    pane.style.scrollMarginTop = (headerH + navH + margem) + 'px';
+    try{
+      pane.scrollIntoView({ behavior:'smooth', block:'start' });
+    }catch(_e){
+      const top = pane.getBoundingClientRect().top + window.pageYOffset - (headerH + navH + margem);
+      window.scrollTo({ top, behavior:'smooth' });
+    }
+    pane._ajusteRAF = null;
+  });
 }
+
 
 /* RESIZE GUARDED FOR FOTOS/CARDAPIO */
 window.addEventListener('resize', function(){
@@ -10335,3 +10350,5 @@ document.addEventListener('click', function(e){
   if(!pane) return;
   requestAnimationFrame(()=> ajustarAbaViewport(pane));
 });
+
+
