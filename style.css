@@ -3578,7 +3578,16 @@ a:focus {
   transition:left .25s ease, width .25s ease;
 }
 /* conteúdo (seu JS já alterna .visible) */
-.abas-conteudo{ margin-top:10px; }
+/* deixa o conteúdo colado nas abas */
+.abas-conteudo{
+  margin-top: 2px;   /* antes 10px */
+  padding-top: 0;
+}
+
+/* garante que não há margem extra no painel/imagem */
+.abas-conteudo .aba{ margin-top: 0; padding-top: 0; }
+.abas-conteudo .swiper{ margin-top: 0; }
+
 .abas-conteudo .aba{ display:none; }
 .abas-conteudo .aba.visible{ display:block; }
 
@@ -3612,3 +3621,19 @@ a:focus {
   animation: none !important;
 }
 
+
+
+/* ===== Correção do gap entre abas e imagens ===== */
+.abas-nav{ margin-bottom: 2px; }
+
+.abas-conteudo{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+.abas-conteudo .aba{
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.abas-conteudo .swiper{ margin: 0 !important; }
+.abas-conteudo .swiper .swiper-slide{ padding: 0 !important; }
+.abas-conteudo .swiper .swiper-slide img{ margin: 0 !important; }

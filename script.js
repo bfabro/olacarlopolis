@@ -10284,7 +10284,7 @@ function _abaHeaderOffset(pane){
     let nav = pane.closest('.estabelecimento-card, .onde-comer-card, li, [data-estab]');
     nav = nav ? nav.querySelector('.abas-nav') : null;
     const navH = nav ? nav.offsetHeight : 0;
-    const margem = 12;
+    const margem = 2;
     return { headerH, navH, margem };
   }catch(_e){ return { headerH:0, navH:0, margem:12 }; }
 }
