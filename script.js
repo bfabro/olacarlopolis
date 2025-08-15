@@ -4836,10 +4836,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/farmaciabiofarmaa/",
 
             novidadesImages: [
-              "images/comercios/farmacia/bioFarma/divulgacao/1.jpg",
+              "images/comercios/farmacia/bioFarma/divulgacao/1.png",
               "images/comercios/farmacia/bioFarma/divulgacao/2.png",
               "images/comercios/farmacia/bioFarma/divulgacao/3.png",
-              "images/comercios/farmacia/bioFarma/divulgacao/4.png",
+           
 
             ],
             novidadesDescriptions: [
