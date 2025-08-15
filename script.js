@@ -6457,14 +6457,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/setorPublico/agenciaTrabalhador/AgenciaTrabalhador.png",
             name: "Agencia Trabalhador",
-            hours: "Seg a Sex: 09:00h as 15:00h",
+            hours: "Seg a Sex: 08:00h as 12:00h - 13:00h as 17:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "09:00", fim: "15:00" }],
-              ter: [{ inicio: "09:00", fim: "15:00" }],
-              qua: [{ inicio: "09:00", fim: "15:00" }],
-              qui: [{ inicio: "09:00", fim: "15:00" }],
-              sex: [{ inicio: "09:00", fim: "15:00" }],
+              seg: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
+              ter: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
+              qua: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
+              qui: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
+              sex: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
               sab: [],
               dom: []
             },
