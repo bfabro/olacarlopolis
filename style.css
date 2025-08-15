@@ -364,7 +364,7 @@ body {
   padding: 10px;
   border-bottom: 0px solid #ddd;
   /* Linha separadora */
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 .content_area ul li {
@@ -1676,7 +1676,7 @@ screen and (width: 820px) {
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 7px 5px 4px rgba(0, 0, 0, 0.05);
-  margin: 10px -4px;
+  margin: 10px;
 }
 
 .info-icon {
@@ -3558,55 +3558,26 @@ a:focus {
 
 
 
-
-
-
-
-
-
-
-
-
-/* === ABAS: Pílulas === */
+/* === ABAS: Pílula deslizante === */
 .abas-nav{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  padding:6px;
-  border-radius:9999px;
-  background:#ffffff;
-  box-shadow:0 6px 18px rgba(0,0,0,.06);
-  border:1px solid rgba(0,0,0,.06);
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
+  position:relative; display:flex; gap:8px; padding:6px;
+  border:1px solid #e5e7eb; border-radius:12px; background:#fff;
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
 }
-.abas-nav::-webkit-scrollbar{ display:none; }
-
 .abas-nav .aba-tab{
-  appearance:none;
-  border:0;
-  padding:8px 14px;
-  border-radius:9999px;
-  font-weight:600;
-  color:#334155; /* slate-700 */
-  background:transparent;
-  cursor:pointer;
-  transition:transform .15s ease, box-shadow .15s ease, background .2s ease, color .2s ease;
-  white-space:nowrap;
+  position:relative; z-index:1; border:0; background:transparent;
+  padding:8px 14px; border-radius:10px; font-weight:700; color:#334155; cursor:pointer;
+  white-space:nowrap; transition:color .2s ease;
 }
-.abas-nav .aba-tab:hover{ transform:translateY(-1px); }
-.abas-nav .aba-tab:focus-visible{
-  outline:2px solid #93c5fd; /* azul leve */
-  outline-offset:2px;
-  border-radius:9999px;
+.abas-nav .aba-tab.active{ color:#fff; }
+/* fundo que "anda" para a aba ativa */
+.abas-nav .tab-slider{
+  position:absolute; z-index:0; top:6px; left:6px; height:calc(100% - 12px);
+  width:0; border-radius:10px; background:var(--blue-color, #4070f4);
+  box-shadow:0 8px 20px rgba(64,112,244,.30);
+  transition:left .25s ease, width .25s ease;
 }
-.abas-nav .aba-tab.active{
-  background:var(--blue-color);
-  color:#fff;
-  box-shadow:0 8px 16px rgba(64,112,244,.35);
-}
-
-/* conteúdo das abas */
+/* conteúdo (seu JS já alterna .visible) */
 .abas-conteudo{ margin-top:10px; }
 .abas-conteudo .aba{ display:none; }
 .abas-conteudo .aba.visible{ display:block; }

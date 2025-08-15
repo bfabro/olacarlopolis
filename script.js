@@ -10229,3 +10229,46 @@ document.addEventListener('click', function (e) {
 
 
 
+
+
+
+
+/* TAB SLIDER (pílula deslizante) */
+function moveTabSlider(nav){
+  if(!nav) return;
+  let s = nav.querySelector('.tab-slider');
+  if(!s){
+    s = document.createElement('div');
+    s.className = 'tab-slider';
+    nav.appendChild(s);
+  }
+  const active = nav.querySelector('.aba-tab.active') || nav.querySelector('.aba-tab');
+  if(!active) return;
+  const r = active.getBoundingClientRect();
+  const rn = nav.getBoundingClientRect();
+  s.style.left = (r.left - rn.left + nav.scrollLeft) + 'px';
+  s.style.width = r.width + 'px';
+}
+
+/* atualiza quando clica numa aba (depois do handler marcar .active) */
+document.addEventListener('click', function(e){
+  const tab = e.target.closest('.aba-tab');
+  if(!tab) return;
+  const nav = tab.closest('.abas-nav');
+  requestAnimationFrame(()=> moveTabSlider(nav));
+});
+
+/* posiciona ao abrir a tela e ao redimensionar */
+window.addEventListener('load',  ()=> document.querySelectorAll('.abas-nav').forEach(moveTabSlider));
+window.addEventListener('resize',()=> document.querySelectorAll('.abas-nav').forEach(moveTabSlider));
+
+/* se os cards são inseridos dinamicamente, observa o DOM e posiciona o slider quando surgir uma nova .abas-nav */
+new MutationObserver((mutations)=>{
+  for(const m of mutations){
+    m.addedNodes && m.addedNodes.forEach(node=>{
+      if(!(node instanceof HTMLElement)) return;
+      if(node.classList && node.classList.contains('abas-nav')) moveTabSlider(node);
+      else node.querySelectorAll?.('.abas-nav').forEach(moveTabSlider);
+    });
+  }
+}).observe(document.body, {childList:true, subtree:true});
