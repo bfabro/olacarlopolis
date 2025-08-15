@@ -3581,3 +3581,27 @@ a:focus {
 .abas-conteudo{ margin-top:10px; }
 .abas-conteudo .aba{ display:none; }
 .abas-conteudo .aba.visible{ display:block; }
+
+
+
+/* === ABA CARROSSEL VIEWPORT FIT === */
+.abas-conteudo .swiper{
+  width: 100%;
+  /* altura máxima dinâmica por JS via --aba-swiper-max-h */
+}
+.abas-conteudo .swiper .swiper-wrapper{
+  align-items: center;
+}
+.abas-conteudo .swiper .swiper-slide{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.abas-conteudo .swiper .swiper-slide img{
+  width:auto;
+  height:auto;
+  max-width:100%;
+  max-height: var(--aba-swiper-max-h, 72vh);
+  object-fit: contain;
+  border-radius: 10px;
+}

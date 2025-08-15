@@ -10272,3 +10272,49 @@ new MutationObserver((mutations)=>{
     });
   }
 }).observe(document.body, {childList:true, subtree:true});
+
+
+
+
+/* === AJUSTE DE VIEWPORT PARA FOTOS/CARDÁPIO === */
+function _abaHeaderOffset(pane){
+  try{
+    const header = document.querySelector('.navbar');
+    const headerH = header ? header.offsetHeight : 0;
+    let nav = pane.closest('.estabelecimento-card, .onde-comer-card, li, [data-estab]');
+    nav = nav ? nav.querySelector('.abas-nav') : null;
+    const navH = nav ? nav.offsetHeight : 0;
+    const margem = 12;
+    return { headerH, navH, margem };
+  }catch(_e){ return { headerH:0, navH:0, margem:12 }; }
+}
+
+function ajustarAbaViewport(pane){
+  if(!pane) return;
+  const { headerH, navH, margem } = _abaHeaderOffset(pane);
+  const disponivel = Math.max(220, window.innerHeight - headerH - navH - margem*2);
+  const swiperEl = pane.querySelector('.swiper');
+  if(swiperEl){
+    swiperEl.style.setProperty('--aba-swiper-max-h', disponivel + 'px');
+  }
+  const top = pane.getBoundingClientRect().top + window.pageYOffset - (headerH + navH + margem);
+  window.scrollTo({ top, behavior: 'smooth' });
+}
+
+/* Reajusta em resize para a aba atualmente visível */
+window.addEventListener('resize', function(){
+  document.querySelectorAll('.aba.visible').forEach(ajustarAbaViewport);
+});
+
+/* Hook de clique: ao abrir FOTOS/CARDÁPIO, ajustar viewport e rolar até o carrossel ficar visível */
+document.addEventListener('click', function(e){
+  const tab = e.target.closest('.aba-tab');
+  if(!tab) return;
+  const tgt = tab.dataset && tab.dataset.target || '';
+  if(!/^fotos-|^cardapio-/.test(tgt)) return;
+  const container = tab.closest('.estabelecimento-card, .onde-comer-card, li, [data-estab]');
+  if(!container) return;
+  const pane = container.querySelector('#'+CSS.escape(tgt));
+  if(!pane) return;
+  requestAnimationFrame(()=> ajustarAbaViewport(pane));
+});
