@@ -6468,8 +6468,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               sab: [],
               dom: []
             },
-            address: "Rua Padre Hugo, 1025",
-            contact: "(43) 3566-1291",
+            address: "Rua Padre Hugo, 1025 - Carlopolis",
+            contact: "(43) 3566-2354",
           },
         ],
       },
