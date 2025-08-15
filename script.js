@@ -8666,8 +8666,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
           {
             image: "images/comercios/supermercado/rocha/perfil.jpg",
-            name: "Rocha",
-            
+            name: "Rocha",         
           
             address: "Av. Elson Soares, 767 - Carlopolis",
             contact: "(43) 99105-9324",
@@ -8678,15 +8677,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             infoVagaTrabalho: "1 - Vaga Para Açougueiro<br>1 - Vaga Para Feira<br>1 - Vaga Para Padaria<br>1 - Vaga Para Repositor<br> ",
             
           },
-
-
-
-
-
-
-
-
-
 
         ],
       },
@@ -8708,10 +8698,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       window.open("https://www.ipmetradar.com.br/2animRadar.php", "_blank");
     });
   }
-
-
-
-
 
 
   montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
