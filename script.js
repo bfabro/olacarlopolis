@@ -8654,20 +8654,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/restaurante/delfino/delfino.png",
             name: "Emporio São Victor",
-            hours: "Seg a Sex: 11:00h as 15:00h - 18:00h as 22:30h</br> Sab: 11:00h as 16:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
-              ter: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
-              qua: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
-              qui: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
-              sex: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
-              sab: [{ inicio: "11:00", fim: "16:00" }],
-              dom: []
-            },
+            
             address: "R. Kalil Keder, 90 - Carlopolis",
             contact: "(43) 99111-9484",
             instagram: "https://www.instagram.com/delfinos.mendes1/",
+            vagaPreRequisito:"Ter experiência como garçon",
             infoVagaTrabalho: "1 - Vaga Para Garçon ",
 
 
@@ -8676,23 +8667,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/supermercado/rocha/perfil.jpg",
             name: "Rocha",
-            hours: "Seg a Sex: 06:30h as 20:00h <br> Dom: 06:00h as 12:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "06:30", fim: "20:00" }],
-              ter: [{ inicio: "06:30", fim: "20:00" }],
-              qua: [{ inicio: "06:30", fim: "20:00" }],
-              qui: [{ inicio: "06:30", fim: "20:00" }],
-              sex: [{ inicio: "06:30", fim: "20:00" }],
-              sab: [{ inicio: "06:30", fim: "20:00" }],
-              dom: [{ inicio: "06:30", fim: "20:00" }],
-            },
+            
+          
             address: "Av. Elson Soares, 767 - Carlopolis",
             contact: "(43) 99105-9324",
 
             facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
             instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
-            infoVagaTrabalho: "1 - Vaga Para Açougueiro<br>1 - Vaga Para Feira<br>1 - Vagas Para Padaria<br>1 - Vaga Para Repositor<br> ",
+           
+            infoVagaTrabalho: "1 - Vaga Para Açougueiro<br>1 - Vaga Para Feira<br>1 - Vaga Para Padaria<br>1 - Vaga Para Repositor<br> ",
+            
           },
 
 
@@ -8908,7 +8892,20 @@ ${!establishment.descricaoFalecido ? `
   
 
 
-
+${establishment.infoVagaTrabalho
+  ? `
+    <div class="card-plantao detalhe-esquerda">
+      <div class="conteudo-plantao">
+        <div class="titulo-plantao">
+          <i class="fas fa-briefcase"></i> Vaga de Trabalho
+        </div>
+        <p>${establishment.infoVagaTrabalho}</p>
+        ${establishment.vagaPreRequisito ? `<p><strong><i class="fas fa-list-check"></i> Pré-requisito:</strong> ${establishment.vagaPreRequisito}</p>` : ""}
+      </div>
+    </div>
+  `
+  : ""
+}
       
         ${establishment.plantaoHorario
           ? `
@@ -9056,15 +9053,7 @@ ${!establishment.descricaoFalecido ? `
                     </div>` : ""
         }
 
-                  ${establishment.infoVagaTrabalho ? `
-                    <div class="info-box vaga">
-                      <i class="fas fa-briefcase info-icon"></i>
-                      <div>
-                        <div class="info-label">Vaga de Trabalho</div>
-                        <div class="info-value">${establishment.infoVagaTrabalho}</div>
-                      </div>
-                    </div>` : ""
-        }
+                 
 
                   ${establishment.infoAdicional ? `
                     <div class="info-box">
