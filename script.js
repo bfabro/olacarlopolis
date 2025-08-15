@@ -10301,10 +10301,27 @@ function ajustarAbaViewport(pane){
   window.scrollTo({ top, behavior: 'smooth' });
 }
 
-/* Reajusta em resize para a aba atualmente visível */
+/* RESIZE GUARDED FOR FOTOS/CARDAPIO */
 window.addEventListener('resize', function(){
-  document.querySelectorAll('.aba.visible').forEach(ajustarAbaViewport);
+  document.querySelectorAll('.aba.visible').forEach(function(pane){
+    const id = pane.id || '';
+    if ((/^fotos-|^cardapio-/.test(id)) && pane.querySelector('.swiper')) {
+      ajustarAbaViewport(pane);
+    }
+  });
 });
+
+
+// Só ajusta quando a aba aberta é FOTOS ou CARDÁPIO (evita rolar pelos "Info" de todos os cards)
+window.addEventListener('resize', function(){
+  document.querySelectorAll('.aba.visible').forEach(function(pane){
+    const id = pane.id || '';
+    if ((/^fotos-|^cardapio-/.test(id)) && pane.querySelector('.swiper')) {
+      ajustarAbaViewport(pane);
+    }
+  });
+});
+
 
 /* Hook de clique: ao abrir FOTOS/CARDÁPIO, ajustar viewport e rolar até o carrossel ficar visível */
 document.addEventListener('click', function(e){
