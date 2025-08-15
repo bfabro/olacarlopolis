@@ -1663,7 +1663,7 @@ screen and (width: 820px) {
   display: flex;
   flex-direction: column;
 
-  margin-top: 10px -4px;
+  margin-top: 10px ;
 }
 
 .info-box {
@@ -1676,7 +1676,7 @@ screen and (width: 820px) {
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 7px 5px 4px rgba(0, 0, 0, 0.05);
-  margin: 10px;
+  margin: 10px -4px;
 }
 
 .info-icon {

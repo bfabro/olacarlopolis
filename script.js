@@ -10162,67 +10162,50 @@ window.addEventListener('appinstalled', () => {
     });
 });
 
-/* TABS ABAS HANDLER */
-/* TABS ABAS HANDLER */
-document.addEventListener('click', function (e) {
-  if (!e.target.classList.contains('aba-tab')) return;
 
-  const tab = e.target;
+/* TABS ABAS HANDLER — ÚNICO */
+document.addEventListener('click', function (e) {
+  const tab = e.target.closest('.aba-tab');   // <— pega o botão mesmo se clicar no ícone/texto
+  if (!tab) return;
+
   const container = tab.closest('li') || tab.closest('.estabelecimento-card') || document;
-  
-  // Desativa todas as abas do item
+
+  // ativa/desativa botões
   container.querySelectorAll('.aba-tab').forEach(b => b.classList.remove('active'));
   tab.classList.add('active');
 
-  // Esconde todos os conteúdos
-  container.querySelectorAll('.aba').forEach(sec => {
-    sec.style.display = 'none';
-    sec.classList.remove('visible');
-  });
+  // esconde/mostra conteúdos
+  container.querySelectorAll('.aba').forEach(sec => { sec.style.display = 'none'; sec.classList.remove('visible'); });
 
-  const targetId = tab.getAttribute('data-target');
+  const targetId = tab.dataset.target || tab.getAttribute('data-target') || '';
+  const nome = targetId.replace(/^(info-|fotos-|cardapio-)/, '');
 
-  // 🔢 CONTADOR DE CLIQUES (Fotos / Cardápio)
-  // extrai o nome normalizado a partir do id do alvo
-  const nomeNormalizado = (targetId || '').replace(/^(info-|fotos-|cardapio-)/, '');
-  if (targetId && targetId.startsWith('fotos-')) {
-    (window.registrarCliqueBotao || registrarCliqueBotao)('fotos', nomeNormalizado);
-  }
-  if (targetId && targetId.startsWith('cardapio-')) {
-    (window.registrarCliqueBotao || registrarCliqueBotao)('cardapio', nomeNormalizado);
-  }
+  // 🔢 CONTAGEM
+  if (targetId.startsWith('fotos-'))    window.registrarCliqueBotao?.('fotos', nome);
+  if (targetId.startsWith('cardapio-')) window.registrarCliqueBotao?.('cardapio', nome);
 
+  // abre a seção alvo
   const alvo = container.querySelector('#' + CSS.escape(targetId));
-
   if (alvo) {
     alvo.style.display = 'block';
     alvo.classList.add('visible');
 
-    // se tiver swiper, (re)inicializa
-    if (alvo.querySelector('.swiper') && !alvo.swiperInstance) {
-      const node = alvo.querySelector('.swiper');
+    // inicia Swiper se existir
+    const node = alvo.querySelector('.swiper');
+    if (node && !alvo.swiperInstance) {
       alvo.swiperInstance = new Swiper(node, {
         loop: true,
-        navigation: {
-          nextEl: node.querySelector('.swiper-button-next'),
-          prevEl: node.querySelector('.swiper-button-prev'),
-        },
+        navigation: { nextEl: node.querySelector('.swiper-button-next'), prevEl: node.querySelector('.swiper-button-prev') },
         pagination: { el: node.querySelector('.swiper-pagination'), clickable: true },
       });
     }
-
-    // rola suavemente até as imagens/menú aparecerem
-    setTimeout(() => {
-      alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-  } else {
-    // Se for Cardápio com link externo (sem conteúdo interno), ainda contamos e abrimos o link
-    if (targetId && targetId.startsWith('cardapio-')) {
-      const link = tab.dataset.cardapioLink;
-      if (link) window.open(link, '_blank');
-    }
+  } else if (targetId.startsWith('cardapio-')) {
+    // cardápio com link externo
+    const link = tab.dataset.cardapioLink || tab.dataset.link;
+    if (link) window.open(link, '_blank');
   }
 });
+
 
 
 
