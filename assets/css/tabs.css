@@ -1,0 +1,13 @@
+/* Tabs component (accessible, lightweight) */
+.tabs { display:flex; gap:.5rem; flex-wrap:wrap; }
+.tab { padding:.5rem 1rem; border-radius:.75rem; border:1px solid #E3E6EF; background:#fff; cursor:pointer; font-weight:600; }
+.tab[aria-selected="true"] { background:#F3F6FF; border-color:#C8D2FF; }
+.tab:focus { outline: 2px solid #AAB7FF; outline-offset: 2px; }
+.tabpanels { margin-top:.75rem; }
+.tabpanel { display:none; padding:.5rem 0; }
+.tabpanel.is-active { display:block; }
+@media (hover:hover){
+  .tab:hover { background:#F8FAFF; }
+}
+/* Utility to visually hide (for conditional Cardápio) */
+.is-hidden { display:none !important; }

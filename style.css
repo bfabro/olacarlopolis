@@ -1662,7 +1662,7 @@ screen and (width: 820px) {
 .info-boxes-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+
   margin-top: 10px;
 }
 
@@ -1676,6 +1676,7 @@ screen and (width: 820px) {
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 7px 5px 4px rgba(0, 0, 0, 0.05);
+  margin: 10px -4px;
 }
 
 .info-icon {
@@ -3545,3 +3546,67 @@ a:focus {
   background-color: #056f2c !important;
   outline: none;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* === ABAS: Pílulas === */
+.abas-nav{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:6px;
+  border-radius:9999px;
+  background:#ffffff;
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+  border:1px solid rgba(0,0,0,.06);
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.abas-nav::-webkit-scrollbar{ display:none; }
+
+.abas-nav .aba-tab{
+  appearance:none;
+  border:0;
+  padding:8px 14px;
+  border-radius:9999px;
+  font-weight:600;
+  color:#334155; /* slate-700 */
+  background:transparent;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, background .2s ease, color .2s ease;
+  white-space:nowrap;
+}
+.abas-nav .aba-tab:hover{ transform:translateY(-1px); }
+.abas-nav .aba-tab:focus-visible{
+  outline:2px solid #93c5fd; /* azul leve */
+  outline-offset:2px;
+  border-radius:9999px;
+}
+.abas-nav .aba-tab.active{
+  background:var(--blue-color);
+  color:#fff;
+  box-shadow:0 8px 16px rgba(64,112,244,.35);
+}
+
+/* conteúdo das abas */
+.abas-conteudo{ margin-top:10px; }
+.abas-conteudo .aba{ display:none; }
+.abas-conteudo .aba.visible{ display:block; }

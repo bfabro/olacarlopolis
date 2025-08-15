@@ -1717,63 +1717,63 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ]
     },
 
-/*
-
-    {
-
-      nome: "Supermercado Zero Japan",
-      imagem: "images/comercios/supermercado/zerojapan/zerojapan.png",
-      promocoes: [
+    /*
+    
         {
-          imagem: "images/promocoes/zerojapan/1.jpg",
-          descricao: "Perfume YARA ARABIC",
-          validade: "2025-07-30T21:00:00",
-          preco: "220,00",
-          preco_com_desconto: "199,99 a vista",
-          whatsapp: "4331422005"
+    
+          nome: "Supermercado Zero Japan",
+          imagem: "images/comercios/supermercado/zerojapan/zerojapan.png",
+          promocoes: [
+            {
+              imagem: "images/promocoes/zerojapan/1.jpg",
+              descricao: "Perfume YARA ARABIC",
+              validade: "2025-07-30T21:00:00",
+              preco: "220,00",
+              preco_com_desconto: "199,99 a vista",
+              whatsapp: "4331422005"
+            },
+    
+            {
+              imagem: "images/promocoes/zerojapan/2.jpg",
+              descricao: "Perfume Body Splash",
+              validade: "2025-07-30T21:00:00",
+              preco: "280,00",
+              preco_com_desconto: "250,00 a vista",
+              whatsapp: "4331422005"
+            },
+    
+            {
+              imagem: "images/promocoes/zerojapan/3.jpg",
+              descricao: "Perfume Shaghaf Silver",
+              validade: "2025-07-30T21:00:00",
+              preco: "330,00",
+              preco_com_desconto: "299,00 a vista",
+              whatsapp: "4331422005"
+            },
+    
+            {
+              imagem: "images/promocoes/zerojapan/4.jpg",
+              descricao: "Perfume Hareem Al Sultan",
+              validade: "2025-07-30T21:00:00",
+              preco: "550,00",
+              preco_com_desconto: "499,00 a vista",
+              whatsapp: "4331422005"
+            },
+    
+            {
+              imagem: "images/promocoes/zerojapan/5.jpg",
+              descricao: "Perfume Atheeri",
+              validade: "2025-07-30T21:00:00",
+              preco: "830,00",
+              preco_com_desconto: "750,00 a vista",
+    
+              whatsapp: "4331422005"
+            },
+    
+    
+          ]
         },
-
-        {
-          imagem: "images/promocoes/zerojapan/2.jpg",
-          descricao: "Perfume Body Splash",
-          validade: "2025-07-30T21:00:00",
-          preco: "280,00",
-          preco_com_desconto: "250,00 a vista",
-          whatsapp: "4331422005"
-        },
-
-        {
-          imagem: "images/promocoes/zerojapan/3.jpg",
-          descricao: "Perfume Shaghaf Silver",
-          validade: "2025-07-30T21:00:00",
-          preco: "330,00",
-          preco_com_desconto: "299,00 a vista",
-          whatsapp: "4331422005"
-        },
-
-        {
-          imagem: "images/promocoes/zerojapan/4.jpg",
-          descricao: "Perfume Hareem Al Sultan",
-          validade: "2025-07-30T21:00:00",
-          preco: "550,00",
-          preco_com_desconto: "499,00 a vista",
-          whatsapp: "4331422005"
-        },
-
-        {
-          imagem: "images/promocoes/zerojapan/5.jpg",
-          descricao: "Perfume Atheeri",
-          validade: "2025-07-30T21:00:00",
-          preco: "830,00",
-          preco_com_desconto: "750,00 a vista",
-
-          whatsapp: "4331422005"
-        },
-
-
-      ]
-    },
-*/
+    */
     ////
     ////aquiiii
 
@@ -1909,54 +1909,54 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ]
     },
 
-/*
-    {
-
-      nome: "Agro São José",
-      imagem: "images/comercios/agropecuaria/saojose/perfil.png",
-      promocoes: [
-
-
+    /*
         {
-          imagem: "images/promocoes/agro/saojose/1.jpg",
-          descricao: "Casinha de plastico N4",
-          validade: "2025-07-31T18:00:00",
-          preco: "180,00",
-          preco_com_desconto: "162,00 a vista",
-          whatsapp: "43996829898"
+    
+          nome: "Agro São José",
+          imagem: "images/comercios/agropecuaria/saojose/perfil.png",
+          promocoes: [
+    
+    
+            {
+              imagem: "images/promocoes/agro/saojose/1.jpg",
+              descricao: "Casinha de plastico N4",
+              validade: "2025-07-31T18:00:00",
+              preco: "180,00",
+              preco_com_desconto: "162,00 a vista",
+              whatsapp: "43996829898"
+            },
+    
+            {
+              imagem: "images/promocoes/agro/saojose/2.jpg",
+              descricao: "Botina ",
+              validade: "2025-07-31T18:00:00",
+              preco: "124,90",
+              preco_com_desconto: "85,00 a vista",
+              whatsapp: "43996829898"
+            },
+    
+            {
+              imagem: "images/promocoes/agro/saojose/3.jpg",
+              descricao: "Toquinha G",
+              validade: "2025-07-31T18:00:00",
+              preco: "75,00",
+              preco_com_desconto: "67,50 a vista",
+              whatsapp: "43996829898"
+            },
+    
+            {
+              imagem: "images/promocoes/agro/saojose/4.jpg",
+              descricao: "Ração Aysha 15kg ",
+              validade: "2025-07-31T18:00:00",
+              preco: "60,00",
+              preco_com_desconto: "55,00 a vista",
+              whatsapp: "43996829898"
+            },
+            // ...até 10 promoções
+          ]
         },
-
-        {
-          imagem: "images/promocoes/agro/saojose/2.jpg",
-          descricao: "Botina ",
-          validade: "2025-07-31T18:00:00",
-          preco: "124,90",
-          preco_com_desconto: "85,00 a vista",
-          whatsapp: "43996829898"
-        },
-
-        {
-          imagem: "images/promocoes/agro/saojose/3.jpg",
-          descricao: "Toquinha G",
-          validade: "2025-07-31T18:00:00",
-          preco: "75,00",
-          preco_com_desconto: "67,50 a vista",
-          whatsapp: "43996829898"
-        },
-
-        {
-          imagem: "images/promocoes/agro/saojose/4.jpg",
-          descricao: "Ração Aysha 15kg ",
-          validade: "2025-07-31T18:00:00",
-          preco: "60,00",
-          preco_com_desconto: "55,00 a vista",
-          whatsapp: "43996829898"
-        },
-        // ...até 10 promoções
-      ]
-    },
-
-*/
+    
+    */
     // ...outros comércios
   ];
 
@@ -8654,11 +8654,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/restaurante/delfino/delfino.png",
             name: "Emporio São Victor",
-            
+
             address: "R. Kalil Keder, 90 - Carlopolis",
             contact: "(43) 99111-9484",
             instagram: "https://www.instagram.com/delfinos.mendes1/",
-            vagaPreRequisito:"Ter experiência como garçon",
+            vagaPreRequisito: "Ter experiência como garçon",
             infoVagaTrabalho: "1 - Vaga Para Garçon ",
 
 
@@ -8666,16 +8666,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
           {
             image: "images/comercios/supermercado/rocha/perfil.jpg",
-            name: "Rocha",         
-          
+            name: "Rocha",
+
             address: "Av. Elson Soares, 767 - Carlopolis",
             contact: "(43) 99105-9324",
 
             facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
             instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
-           
+
             infoVagaTrabalho: "1 - Vaga Para Açougueiro<br>1 - Vaga Para Feira<br>1 - Vaga Para Padaria<br>1 - Vaga Para Repositor<br> ",
-            
+
           },
 
         ],
@@ -8816,6 +8816,46 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // teste de trocar abas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // teste de trocar abas
+
+
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
     const paidEstablishments = establishments.filter((establishment) => {
@@ -8879,7 +8919,7 @@ ${!establishment.descricaoFalecido ? `
 
 
 ${establishment.infoVagaTrabalho
-  ? `
+          ? `
     <div class="card-plantao detalhe-esquerda">
       <div class="conteudo-plantao">
         <div class="titulo-plantao">
@@ -8890,8 +8930,8 @@ ${establishment.infoVagaTrabalho
       </div>
     </div>
   `
-  : ""
-}
+          : ""
+        }
       
         ${establishment.plantaoHorario
           ? `
@@ -8912,9 +8952,29 @@ ${establishment.infoVagaTrabalho
 
                 <div class="info-boxes-container">
 
-               
 
-                 ${establishment.statusAberto ? `
+
+
+            <div class="abas-nav">
+          <button class="aba-tab active"  data-target="info-${normalizeName(establishment.name)}">ℹ️ Info</button>
+
+  ${(establishment.novidadesImages && establishment.novidadesImages.length) ? `
+    <button class="aba-tab"   data-target="fotos-${normalizeName(establishment.name)}">📷 Fotos (${establishment.novidadesImages.length})</button>
+  ` : ''}
+
+  ${((establishment.menuImages && establishment.menuImages.length) || establishment.cardapioLink) ? `
+    <button class="aba-tab"       data-target="cardapio-${normalizeName(establishment.name)}"
+            ${establishment.cardapioLink ? `data-link="${establishment.cardapioLink}"` : ''}>
+      🍽️ Cardápio${(establishment.menuImages && establishment.menuImages.length) ? ` (${establishment.menuImages.length})` : ``}
+    </button>
+  ` : ''}
+</div>
+
+<div class="abas-conteudo" data-estab="${normalizeName(establishment.name)}">
+  <div class="aba aba-info visible" id="info-${normalizeName(establishment.name)}">
+       <!-- TODO: aqui ficam as info-box (funcionamento, endereço, etc.) -->
+
+         ${establishment.statusAberto ? `
                     <div class="info-box">
                       
                       <div>
@@ -8922,97 +8982,104 @@ ${establishment.infoVagaTrabalho
                         
                       </div>
                     </div>` : ""
-        }
+         }
 
 
-                ${establishment.date ? `
-                    <div class="info-box">
-                      <i class="fas fa-calendar-alt info-icon" style="color: #000000ff;font-size:20px;"></i>
-                      <div>
-                        <div class="info-label">Data</div>
-                        <div class="info-value">${establishment.date}</div>
-                      </div>
-                    </div>` : ""
+        ${establishment.date ? `
+            <div class="info-box">
+              <i class="fas fa-calendar-alt info-icon" style="color: #000000ff;font-size:20px;"></i>
+              <div>
+                <div class="info-label">Data</div>
+                <div class="info-value">${establishment.date}</div>
+              </div>
+            </div>` : ""
         }
 
                   
 
 
 
-                  ${establishment.hours ? `
-                    <div class="info-box">
-                      <i class="fas fa-clock info-icon"></i>
-                      <div>
-                        <div class="info-label">Funcionamento: </div>
-                        <div class="info-value">${establishment.hours}</div>
-                      </div>
-                    </div>` : ""
+        ${establishment.hours ? `
+          <div class="info-box">
+            <i class="fas fa-clock info-icon"></i>
+            <div>
+              <div class="info-label">Funcionamento: </div>
+              <div class="info-value">${establishment.hours}</div>
+            </div>
+          </div>` : ""
         }
 
-                ${establishment.address ? `
-                  <div class="info-box">
-                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address.replace(/<br>/g, " "))}" 
-                      target="_blank">
-                      <i class='bx bx-map info-icon' style="color: #f44336;font-size:26px;"></i>
-                    </a>
-                    <div>
-                      <div class="info-label">Endereço</div>
-                      <div class="info-value">${establishment.address}</div>
-                    </div>
-                  </div>
-                ` : ""}
+        ${establishment.address ? `
+          <div class="info-box">
+            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address.replace(/<br>/g, " "))}" 
+              target="_blank">
+              <i class='bx bx-map info-icon' style="color: #f44336;font-size:26px;"></i>
+            </a>
+            <div>
+              <div class="info-label">Endereço</div>
+              <div class="info-value">${establishment.address}</div>
+            </div>
+          </div>
+        ` : ""
+        }
 
 
 
 
-                ${establishment.contact || establishment.contact2 || establishment.contact3 ? (() => {
+        ${establishment.contact || establishment.contact2 || establishment.contact3 ? (() => {
           const formatPhone = (number) => {
             const rawNumber = (number || "").replace(/\D/g, "");
             const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
             return fullNumber;
-          }
+        }
 
           const firstNumber = formatPhone(establishment.whatsapp || establishment.contact || "");
           const secondNumber = establishment.contact2 ? formatPhone(establishment.contact2) : null;
           const thirdNumber = establishment.contact3 ? formatPhone(establishment.contact3) : null;
 
-          return `
-                    <div class="info-box">
-  <i class="fas fa-phone info-icon"></i>
-  <div>
-    <div class="info-label">Contato</div>
-    <div class="info-value">
-      ${establishment.contact ? `
-        <div style="display: flex; align-items: center;  margin-bottom: 4px;">
+              return `
 
-          <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank"  class="zap-link">
-            <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>          
-          <span>${establishment.contact}</span></a>
+              <div class="info-box">
+                <i class="fas fa-phone info-icon"></i>
+                <div>
+                  <div class="info-label">Contato</div>
+                  <div class="info-value">
+                    ${establishment.contact ? `
+                      <div style="display: flex; align-items: center;  margin-bottom: 4px;">
+
+                        <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank"  class="zap-link">
+                          <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>          
+                        <span>${establishment.contact}</span></a>
 
 
-        </div>` : ""}
+                      </div>` : ""
+                    }
 
-      ${secondNumber ? `
-        <div style="display: flex; align-items: center;  margin-bottom: 4px;">
-          <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank" class="link-whatsapp">
-            <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-          
-          <span>${establishment.contact2}</span></a>
-        </div>` : ""}
+                    ${secondNumber ? `
+                        <div style="display: flex; align-items: center;  margin-bottom: 4px;">
+                          <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank" class="link-whatsapp">
+                                        <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+                                  
+                                                <span>${establishment.contact2}</span></a>
+                      </div>` : ""
+                    }
 
-      ${thirdNumber ? `
-        <div style="display: flex; align-items: center; ">
-          <a href="https://api.whatsapp.com/send?phone=${thirdNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
-            <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-          
-          <span>${establishment.contact3}</span></a>
-        </div>` : ""}
-    </div>
-  </div>
-</div>
+                  ${thirdNumber ? `
+                  <div style="display: flex; align-items: center; ">
+                    <a href="https://api.whatsapp.com/send?phone=${thirdNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
+                      <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+                    
+                    <span>${establishment.contact3}</span></a>
+                  </div>` : ""
+                                      }
+                                </div>
+                              </div>
+                            </div>
 
-                  `;
-        })() : ""}
+                            `;
+                        })() : ""
+                        
+                      }
 
 
 
@@ -9027,17 +9094,17 @@ ${establishment.infoVagaTrabalho
                         <div class="info-value">${establishment.delivery}</div>
                       </div>
                     </div>` : ""
-        }
+                    }
 
-                  ${establishment.taxaEntrega ? `
-                    <div class="info-box">
-                      <i class="fas fa-money-bill-wave info-icon"></i>
-                      <div>
-                        <div class="info-label">Taxa de Entrega</div>
-                        <div class="info-value">${establishment.taxaEntrega === 'sim' ? 'Possui taxa' : 'Sem taxa'}</div>
-                      </div>
-                    </div>` : ""
-        }
+                    ${establishment.taxaEntrega ? `
+                      <div class="info-box">
+                        <i class="fas fa-money-bill-wave info-icon"></i>
+                        <div>
+                          <div class="info-label">Taxa de Entrega</div>
+                          <div class="info-value">${establishment.taxaEntrega === 'sim' ? 'Possui taxa' : 'Sem taxa'}</div>
+                        </div>
+                      </div>` : ""
+                  }
 
                  
 
@@ -9049,7 +9116,7 @@ ${establishment.infoVagaTrabalho
                         <div class="info-value">${establishment.infoAdicional}</div>
                       </div>
                     </div>` : ""
-        }
+                   }
 
                       ${establishment.funeraria ? `
                     <div class="info-box">
@@ -9059,7 +9126,7 @@ ${establishment.infoVagaTrabalho
                         <div class="info-value">${establishment.funeraria}</div>
                       </div>
                     </div>` : ""
-        }
+                    }
 
                       ${establishment.descricaoFalecido ? `
                     <div class="info-box">
@@ -9069,7 +9136,7 @@ ${establishment.infoVagaTrabalho
                         <div class="info-value">${establishment.descricaoFalecido}</div>
                       </div>
                     </div>` : ""
-        }
+                   }
 
                    
                 
@@ -9087,68 +9154,79 @@ ${establishment.infoVagaTrabalho
                         </div>
                       </div>
                     </div>` : ""
-        }
-                </div>
+                  }
 
-                  
-                      <br>
-                  
 
-                 <div class="button-container">
-  ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
-    <button id="novidadesButton" class="novidades-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}"
-      onclick="registrarClique('${normalizeName(establishment.name)}', 'divulgacao')">
-      <i class="fas fa-camera"></i> Divulgação (${establishment.novidadesImages.length})
-    </button>
-  ` : ''}
 
-  ${establishment.menuImages && establishment.menuImages.length > 0 ? `
-    <button id="cardapioButton" class="menu-btn" data-name="${establishment.name}" data-id="${normalizeName(establishment.name)}"
-      onclick="registrarClique('${normalizeName(establishment.name)}', 'cardapio')">
-      <i class="fas fa-utensils"></i> Cardápio (${establishment.menuImages.length})
-    </button>
-  ` : ''}
+            </div>
+
+
+
+    </div>
+
+
+
+
+ 
+   
+
+       <!-- FOTOS -->
+${(establishment.novidadesImages && establishment.novidadesImages.length > 0) ? `
+  <div class="aba" id="fotos-${normalizeName(establishment.name)}" style="display:none">
+    <div class="swiper" id="novidades-${encodeURIComponent(establishment.name)}">
+      <div class="swiper-wrapper">
+        ${establishment.novidadesImages.map((img, idx) => `
+          <div class="swiper-slide">
+            <img src="${img}" alt="Foto ${idx + 1}" loading="lazy">
+            ${establishment.novidadesDescriptions && establishment.novidadesDescriptions[idx]
+              ? `<div class="descricao-foto">${establishment.novidadesDescriptions[idx]}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </div>
+` : ``}
+
+<!-- CARDÁPIO -->
+${(establishment.menuImages && establishment.menuImages.length > 0) ? `
+  <div class="aba" id="cardapio-${normalizeName(establishment.name)}" style="display:none">
+    <div class="swiper" id="menu-${encodeURIComponent(establishment.name)}">
+      <div class="swiper-wrapper">
+        ${establishment.menuImages.map((img, idx) => `
+          <div class="swiper-slide">
+            <img src="${img}" alt="Cardápio ${idx + 1}" loading="lazy">
+            ${establishment.menuDescriptions && establishment.menuDescriptions[idx]
+              ? `<div class="descricao-foto">${establishment.menuDescriptions[idx]}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </div>
+` : ``}
+
+
+
+
+
+
+</div>
+
+
 
   
-</div>
+
+                
+
+                
                         
                       
-                            ${establishment.novidadesImages && establishment.novidadesImages.length > 0 ? `
-                                <div class="novidades-container swiper" id="novidades-${encodeURIComponent(establishment.name)}">
-                                    <div class="swiper-wrapper">
-                                      ${establishment.novidadesImages.map((img, index) => `
-                  <div class="swiper-slide">
-                    <img src="${img}" alt="Novidades ${index + 1} de ${establishment.name}">
-                    ${establishment.novidadesDescriptions && establishment.novidadesDescriptions[index] ? `
-                      <p class="novidade-descricao">${establishment.novidadesDescriptions[index]}</p>
-                    ` : ""}
-                  </div>
-                `).join('')}
-
-                                    </div>
-
-                                    <div class="swiper-button-next"></div>
-                                    <div class="swiper-button-prev"></div>
-                                    <div class="swiper-pagination"></div>
-                                
-                                </div>
-                                ` : ''}
-                          
-                          ${establishment.menuImages && establishment.menuImages.length > 0 ? `
-                                <div class="menu-cardapio swiper" id="menu-${encodeURIComponent(establishment.name)}">
-                                    <div class="swiper-wrapper">
-                                        ${establishment.menuImages.map((img, index) => `
-                                        <div class="swiper-slide">
-                                            <img src="${img}" alt="Cardápio ${index + 1} de ${establishment.name}" >
-                                        </div>
-                                        `).join('')}
-                                    </div>
-                                    <div class="swiper-button-next"></div>
-                                    <div class="swiper-button-prev"></div>
-                                    <div class="swiper-pagination"></div>
-                                      
-                                </div>
-                                ` : ''}
+                       
                       
                         <div class="separador_categorias"></div> <!-- Separador visual entre os itens -->
                     
@@ -10084,9 +10162,70 @@ window.addEventListener('appinstalled', () => {
     });
 });
 
+/* TABS ABAS HANDLER */
+document.addEventListener('click', function (e) {
+  if (!e.target.classList.contains('aba-tab')) return;
+
+  const tab = e.target;
+  const container = tab.closest('li');
+
+  // ativa botão
+  container.querySelectorAll('.aba-tab').forEach(b => b.classList.remove('active'));
+  tab.classList.add('active');
+
+  // esconde conteúdos
+  container.querySelectorAll('.aba').forEach(sec => {
+    sec.style.display = 'none';
+    sec.classList.remove('visible');
+  });
+
+  const targetId = tab.getAttribute('data-target');
+  const alvo = targetId ? container.querySelector('#' + CSS.escape(targetId)) : null;
+
+  if (alvo) {
+    alvo.style.display = 'block';
+    alvo.classList.add('visible');
+
+    // inicializa o Swiper ao abrir Fotos/Cardápio
+    const swiperNode = alvo.querySelector('.swiper');
+    if (swiperNode && !alvo.swiperInstance) {
+      alvo.swiperInstance = new Swiper(swiperNode, {
+        loop: true,
+        navigation: {
+          nextEl: swiperNode.querySelector('.swiper-button-next'),
+          prevEl: swiperNode.querySelector('.swiper-button-prev')
+        },
+        pagination: {
+          el: swiperNode.querySelector('.swiper-pagination'),
+          clickable: true
+        }
+      });
+    }
+  } else {
+    // Cardápio apenas link (quando não há imagens)
+    const link = tab.dataset.link;
+    if (link) window.open(link, '_blank');
+  }
+});
 
 
-
+/* INIT ABAS: garante que todas as abas (exceto Info) comecem fechadas */
+(function initAbasDefault(){
+  try{
+    document.querySelectorAll('.abas-conteudo').forEach(wrapper => {
+      wrapper.querySelectorAll('.aba').forEach(sec => {
+        if(!sec.classList.contains('aba-info')){
+          sec.style.display = 'none';
+          sec.classList.remove('visible');
+        } else {
+          // Info aberta por padrão
+          sec.style.display = 'block';
+          sec.classList.add('visible');
+        }
+      });
+    });
+  }catch(err){ console.warn('initAbasDefault:', err); }
+})();
 
 
 
