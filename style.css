@@ -3664,10 +3664,10 @@ html {
 /* Aumenta fonte e padding das abas */
 .abas-nav .aba-tab{
   /* 16–18px, adaptando ao viewport */
-  font-size: clamp(16px, 3.6vw, 18px);
+  font-size: clamp(14px, 3.2vw, 18px);
   padding: 10px 14px;
   min-height: 44px;         /* recomendado pela Apple p/ toque */
-  line-height: 1.2;
+  line-height: 1;
   letter-spacing: .2px;
 }
 

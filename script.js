@@ -2603,6 +2603,54 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+
+{
+            image: "images/comercios/assistenciaCelular/imperiumCell/perfil.jpg",
+            name: "Imperium Cell",
+            hours: "Seg a Sex: 8:00h as 18:00h<br> Sab: 08:00h as 17:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "17:00" }],
+              dom: [],
+            },
+            address: "R. Dra. Paula e Silva, 676 - Carlopolis",
+            contact: "(43) 3566-1600",
+            facebook: "https://www.facebook.com/oficinadocelularclps/",
+            instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
+            novidadesImages: [
+              "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/1.jpg",
+              "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/2.jpg",
+
+            ],
+            novidadesDescriptions: [
+              "CURTIR O POST!<br>• SEGUIR O INSTAGRAM DA LOJA!<br>• COMPARTILHAR NO STORY E MARCAR A LOJA!<br>• MARCAR 5 AMIGOS NOS COMENTÁRIOS (quanto mais amigos marcar, maior a chance de ganhar) obs: não pode marcar a mesma pessoa 2 vezes!<br>•Ganhador ou ganhadora deve estar seguindo todas as regras do sorteio corretamente, caso contrário será sorteado novamente!!!<br>O SORTEIO OCORRERÁ NO DIA 22/12/2025 BOA SORTE A TODOS",
+              "Temos Assistencia Tecnica, todos modelos de celular"
+
+            ],
+          },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           {
             image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
             name: "Oficina do Celular",
@@ -7008,11 +7056,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 {
-        link: document.querySelector("#menuMotoCenter"),
+        link: document.querySelector("#menuMotoTaxi"),
         title: "Moto Taxi",
         establishments: [
           {
-            image: "images/comercios/motoCenter/binho/perfil.png",
+            image: "images/comercios/motoTaxi/modesto/perfil.jpg",
             name: "Moto Taxi Modesto",
             hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 14:00h",
             statusAberto: ".",
@@ -7025,22 +7073,25 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               sab: [{ inicio: "08:00", fim: "14:00" }],
               dom: [],
             },
-            address: "R. Luis Consulmagno de Proenca, 451 - Carlópolis",
-            contact: " (43) 99903-3447",
-            delivery: "Sim / Sem Taxa",
-            infoAdicional:"Formas de Pagamento:<br>Cartão de Credito<br>Dinheiro em especie<br> Pix",
-            instagram: "https://www.instagram.com/binhomotocenter/",
-            facebook: "https://www.facebook.com/Motocenterbinho/?locale=pt_BR",
+            address: "R. Andrino Soares, 370 - Carlópolis",
+            contact: " (43) 99137-5516",
+            contact2: " (43) 98831-1691",
+           
+            infoAdicional:"Coletar<br>Encomendas<br>Entregas<br>Transporte de pessoas<br><br>Formas de Pagamento:<br>Cartão de Credito<br>Dinheiro em especie<br> Pix",
+            instagram: "https://www.instagram.com/mototaximodesto_carlopolis/",
+           
             novidadesImages: [
-              "images/comercios/motoCenter/binho/divulgacao/1.png",
-              "images/comercios/motoCenter/binho/divulgacao/2.png",
-              "images/comercios/motoCenter/binho/divulgacao/3.png",
+              "images/comercios/motoTaxi/modesto/divulgacao/1.jpg",
+               "images/comercios/motoTaxi/modesto/divulgacao/2.jpg",
+                "images/comercios/motoTaxi/modesto/divulgacao/3.jpg",
+                 //"images/comercios/motoTaxi/modesto/divulgacao/4.jpg",
+            
 
             ],
             novidadesDescriptions: [
-              "Venha conhecer nosso espaço",
-              "2",
-              "3",
+             
+              "",
+             
 
             ],
           },
@@ -9007,14 +9058,11 @@ ${establishment.infoVagaTrabalho
         }
   
 
-
                 <div class="info-boxes-container">
 
 
-
-
             <div class="abas-nav">
-          <button class="aba-tab active"  data-target="info-${normalizeName(establishment.name)}">ℹ️ Info</button>
+          <button class="aba-tab active"  data-target="info-${normalizeName(establishment.name)}"><i class="fas fa-circle-info tab-icon"></i> Info</button>
 
   ${(establishment.novidadesImages && establishment.novidadesImages.length) ? `
     <button class="aba-tab"   data-target="fotos-${normalizeName(establishment.name)}">📷 Fotos (${establishment.novidadesImages.length})</button>
