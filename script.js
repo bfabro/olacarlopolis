@@ -4860,18 +4860,19 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Desconto Facil 1",
             address: "R. Benedito Salles, 574 - Carlopolis",
 
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
-
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
-              dom: []
-            },
+             plantaoHorario: "08:00h às 20:00h", 
+                  plantaoData:"Sab 16/08 a Sex 22/08",
+                  hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 20:00h",
+                  statusAberto:".",
+                  horarios: {                          
+                   seg: [{ inicio: "08:00", fim: "20:00" }],
+                    ter: [{ inicio: "08:00", fim: "20:00" }],
+                    qua: [{ inicio: "08:00", fim: "20:00" }],
+                    qui: [{ inicio: "08:00", fim: "20:00" }],
+                    sex: [{ inicio: "08:00", fim: "20:00" }],
+                    sab: [{ inicio: "08:00", fim: "20:00" }],
+                    dom: [{ inicio: "08:00", fim: "20:00" }]
+                  },  
             contact: "(43) 99966-9812",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
@@ -4906,18 +4907,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/farmacia/drogaMais/drogamais.png",
             name: "DrogaMais",
-            hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
-            plantaoHorario: "08:00h às 21:00h",
-            plantaoData: "Sab 09/08 a Sex 15/08",
+            hours: "Seg a Sex: 08:00h as 20:00h </br>Sab: 08:00h as 20:00h",          
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "21:00" }],
-              ter: [{ inicio: "08:00", fim: "21:00" }],
-              qua: [{ inicio: "08:00", fim: "21:00" }],
-              qui: [{ inicio: "08:00", fim: "21:00" }],
-              sex: [{ inicio: "08:00", fim: "21:00" }],
-              sab: [{ inicio: "08:00", fim: "21:00" }],
-              dom: [{ inicio: "08:00", fim: "21:00" }]
+              seg: [{ inicio: "08:00", fim: "20:00" }],
+              ter: [{ inicio: "08:00", fim: "20:00" }],
+              qua: [{ inicio: "08:00", fim: "20:00" }],
+              qui: [{ inicio: "08:00", fim: "20:00" }],
+              sex: [{ inicio: "08:00", fim: "20:00" }],
+              sab: [{ inicio: "08:00", fim: "20:00" }],
+              dom: [{ inicio: "08:00", fim: "20:00" }]
             },
             address: "R. Benedito Salles, 903 - Carlopolis",
             contact: "(43) 98411-9145",
@@ -6171,25 +6170,25 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 */
 
-          /* [ 7 ]
+          /* [ 7 ]*/
 
 
               {
                   image: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg",
                   name: "Desconto Facil 1",
                   address: "R. Benedito Salles, 574 - Carlopolis",
-                  plantaoHorario: "08:00h às 21:00h", 
-                  plantaoData:"Sab 31/05 a Sex 06/06",
-                  hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+                  plantaoHorario: "08:00h às 20:00h", 
+                  plantaoData:"Sab 16/08 a Sex 22/08",
+                  hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 20:00h",
                   statusAberto:".",
                   horarios: {                          
-                   seg: [{ inicio: "08:00", fim: "21:00" }],
-                    ter: [{ inicio: "08:00", fim: "21:00" }],
-                    qua: [{ inicio: "08:00", fim: "21:00" }],
-                    qui: [{ inicio: "08:00", fim: "21:00" }],
-                    sex: [{ inicio: "08:00", fim: "21:00" }],
-                    sab: [{ inicio: "08:00", fim: "21:00" }],
-                    dom: [{ inicio: "08:00", fim: "21:00" }]
+                   seg: [{ inicio: "08:00", fim: "20:00" }],
+                    ter: [{ inicio: "08:00", fim: "20:00" }],
+                    qua: [{ inicio: "08:00", fim: "20:00" }],
+                    qui: [{ inicio: "08:00", fim: "20:00" }],
+                    sex: [{ inicio: "08:00", fim: "20:00" }],
+                    sab: [{ inicio: "08:00", fim: "20:00" }],
+                    dom: [{ inicio: "08:00", fim: "20:00" }]
                   },  
                   contact: "(43) 99966-9812",
                   delivery: "Sim / Sem Taxa",
@@ -6212,11 +6211,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                   ],
               },
 
-                */
+                
 
 
 
-          /* [ 8 ] */
+          /* [ 8 ] 
 
           {
             image: "images/comercios/farmacia/drogaMais/drogamais.png",
@@ -6263,8 +6262,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-
-
+*/
 
           /* [ 9 ]
                           {
@@ -7000,6 +6998,63 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
         ],
       },
+
+
+
+
+
+
+
+
+
+{
+        link: document.querySelector("#menuMotoCenter"),
+        title: "Moto Taxi",
+        establishments: [
+          {
+            image: "images/comercios/motoCenter/binho/perfil.png",
+            name: "Moto Taxi Modesto",
+            hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 14:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "14:00" }],
+              dom: [],
+            },
+            address: "R. Luis Consulmagno de Proenca, 451 - Carlópolis",
+            contact: " (43) 99903-3447",
+            delivery: "Sim / Sem Taxa",
+            infoAdicional:"Formas de Pagamento:<br>Cartão de Credito<br>Dinheiro em especie<br> Pix",
+            instagram: "https://www.instagram.com/binhomotocenter/",
+            facebook: "https://www.facebook.com/Motocenterbinho/?locale=pt_BR",
+            novidadesImages: [
+              "images/comercios/motoCenter/binho/divulgacao/1.png",
+              "images/comercios/motoCenter/binho/divulgacao/2.png",
+              "images/comercios/motoCenter/binho/divulgacao/3.png",
+
+            ],
+            novidadesDescriptions: [
+              "Venha conhecer nosso espaço",
+              "2",
+              "3",
+
+            ],
+          },
+        ],
+      },
+
+
+
+
+
+
+
+
+
 
 
       {

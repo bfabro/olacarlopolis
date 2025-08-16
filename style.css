@@ -3656,3 +3656,32 @@ a:focus {
 
 
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Aumenta fonte e padding das abas */
+.abas-nav .aba-tab{
+  /* 16–18px, adaptando ao viewport */
+  font-size: clamp(16px, 3.6vw, 18px);
+  padding: 10px 14px;
+  min-height: 44px;         /* recomendado pela Apple p/ toque */
+  line-height: 1.2;
+  letter-spacing: .2px;
+}
+
+/* Espaçamento um pouco menor entre as abas no mobile */
+.abas-nav{ gap: 6px; }
+
+/* iPhones menores (ex.: SE/8) */
+@media (max-width: 375px){
+  .abas-nav .aba-tab{ font-size: 17px; }
+}
+
+/* Refino só para Safari iOS */
+@supports (-webkit-touch-callout: none){
+  .abas-nav .aba-tab{
+    font-size: clamp(17px, 4vw, 19px);
+  }
+}
