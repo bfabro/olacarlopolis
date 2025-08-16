@@ -1066,7 +1066,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel">
   ${est.novidadesImages && est.novidadesImages.length ? `
-    <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')">📷 Fotos</button>
+   <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')"">
+  📷 Fotos
+</button>
   ` : ''}
 
       
@@ -1105,7 +1107,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       <a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
          target="_blank"
          class="btn-whatsapp_onde"
-         onclick="registrarCliqueBotao('whatsapp','${normalizeName(est.name)}')">
+         onclick="registrarCliqueWhatsOndeComer('${normalizeName(est.name)}');">
+         
         <i class="fab fa-whatsapp"></i> ${est.contact}
       </a>
     ` : ""}
@@ -4839,7 +4842,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/farmacia/bioFarma/divulgacao/1.png",
               "images/comercios/farmacia/bioFarma/divulgacao/2.png",
               "images/comercios/farmacia/bioFarma/divulgacao/3.png",
-           
+
 
             ],
             novidadesDescriptions: [
@@ -6460,11 +6463,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             hours: "Seg a Sex: 08:00h as 12:00h - 13:00h as 17:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
-              ter: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
-              qua: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
-              qui: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
-              sex: [{ inicio: "08:00", fim: "12:00" },{ inicio: "13:00", fim: "17:00" }],
+              seg: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" }],
+              ter: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" }],
+              qua: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" }],
+              qui: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" }],
+              sex: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" }],
               sab: [],
               dom: []
             },
@@ -8982,7 +8985,7 @@ ${establishment.infoVagaTrabalho
                         
                       </div>
                     </div>` : ""
-         }
+        }
 
 
         ${establishment.date ? `
@@ -9031,13 +9034,13 @@ ${establishment.infoVagaTrabalho
             const rawNumber = (number || "").replace(/\D/g, "");
             const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
             return fullNumber;
-        }
+          }
 
           const firstNumber = formatPhone(establishment.whatsapp || establishment.contact || "");
           const secondNumber = establishment.contact2 ? formatPhone(establishment.contact2) : null;
           const thirdNumber = establishment.contact3 ? formatPhone(establishment.contact3) : null;
 
-              return `
+          return `
 
               <div class="info-box">
                 <i class="fas fa-phone info-icon"></i>
@@ -9053,7 +9056,7 @@ ${establishment.infoVagaTrabalho
 
 
                       </div>` : ""
-                    }
+            }
 
                     ${secondNumber ? `
                         <div style="display: flex; align-items: center;  margin-bottom: 4px;">
@@ -9062,7 +9065,7 @@ ${establishment.infoVagaTrabalho
                                   
                                                 <span>${establishment.contact2}</span></a>
                       </div>` : ""
-                    }
+            }
 
                   ${thirdNumber ? `
                   <div style="display: flex; align-items: center; ">
@@ -9071,15 +9074,15 @@ ${establishment.infoVagaTrabalho
                     
                     <span>${establishment.contact3}</span></a>
                   </div>` : ""
-                                      }
+            }
                                 </div>
                               </div>
                             </div>
 
                             `;
-                        })() : ""
-                        
-                      }
+        })() : ""
+
+        }
 
 
 
@@ -9094,7 +9097,7 @@ ${establishment.infoVagaTrabalho
                         <div class="info-value">${establishment.delivery}</div>
                       </div>
                     </div>` : ""
-                    }
+        }
 
                     ${establishment.taxaEntrega ? `
                       <div class="info-box">
@@ -9104,7 +9107,7 @@ ${establishment.infoVagaTrabalho
                           <div class="info-value">${establishment.taxaEntrega === 'sim' ? 'Possui taxa' : 'Sem taxa'}</div>
                         </div>
                       </div>` : ""
-                  }
+        }
 
                  
 
@@ -9116,7 +9119,7 @@ ${establishment.infoVagaTrabalho
                         <div class="info-value">${establishment.infoAdicional}</div>
                       </div>
                     </div>` : ""
-                   }
+        }
 
                       ${establishment.funeraria ? `
                     <div class="info-box">
@@ -9126,7 +9129,7 @@ ${establishment.infoVagaTrabalho
                         <div class="info-value">${establishment.funeraria}</div>
                       </div>
                     </div>` : ""
-                    }
+        }
 
                       ${establishment.descricaoFalecido ? `
                     <div class="info-box">
@@ -9136,7 +9139,7 @@ ${establishment.infoVagaTrabalho
                         <div class="info-value">${establishment.descricaoFalecido}</div>
                       </div>
                     </div>` : ""
-                   }
+        }
 
                    
                 
@@ -9154,7 +9157,7 @@ ${establishment.infoVagaTrabalho
                         </div>
                       </div>
                     </div>` : ""
-                  }
+        }
 
 
 
@@ -9179,7 +9182,7 @@ ${(establishment.novidadesImages && establishment.novidadesImages.length > 0) ? 
           <div class="swiper-slide">
             <img src="${img}" alt="Foto ${idx + 1}" loading="lazy">
             ${establishment.novidadesDescriptions && establishment.novidadesDescriptions[idx]
-              ? `<div class="descricao-foto">${establishment.novidadesDescriptions[idx]}</div>` : ''}
+            ? `<div class="descricao-foto">${establishment.novidadesDescriptions[idx]}</div>` : ''}
           </div>
         `).join('')}
       </div>
@@ -9199,7 +9202,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
           <div class="swiper-slide">
             <img src="${img}" alt="Cardápio ${idx + 1}" loading="lazy">
             ${establishment.menuDescriptions && establishment.menuDescriptions[idx]
-              ? `<div class="descricao-foto">${establishment.menuDescriptions[idx]}</div>` : ''}
+                ? `<div class="descricao-foto">${establishment.menuDescriptions[idx]}</div>` : ''}
           </div>
         `).join('')}
       </div>
@@ -9607,9 +9610,8 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
   // Função para registrar clique no Firebase
   function registrarCliqueBotao(tipo, idEstabelecimento) {
-    const hoje = new Date().toISOString().slice(0, 10);
+    const hoje = getHojeBR();
     const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
-
     ref.transaction((atual) => (atual || 0) + 1);
   }
 
@@ -10070,6 +10072,12 @@ function registrarCliqueCardapioOndeComer(nomeEstabelecimento) {
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
 }
 
+function registrarCliqueWhatsOndeComer(nomeEstabelecimento) {
+  const hoje = getHojeBR();
+  const ref = firebase.database().ref(`cliquesWhatsOndeComer/${hoje}/${nomeEstabelecimento}`);
+  ref.transaction(valorAtual => (valorAtual || 0) + 1);
+}
+
 function registrarCliqueNaPromocao(nomeComercio) {
   const hoje = getHojeBR();
   const ref = firebase.database().ref(`cliquesPromocoesPorComercio/${hoje}/${nomeComercio}`);
@@ -10181,7 +10189,7 @@ document.addEventListener('click', function (e) {
   const nome = targetId.replace(/^(info-|fotos-|cardapio-)/, '');
 
   // 🔢 CONTAGEM
-  if (targetId.startsWith('fotos-'))    window.registrarCliqueBotao?.('fotos', nome);
+  if (targetId.startsWith('fotos-')) window.registrarCliqueBotao?.('fotos', nome);
   if (targetId.startsWith('cardapio-')) window.registrarCliqueBotao?.('cardapio', nome);
 
   // abre a seção alvo
@@ -10210,11 +10218,11 @@ document.addEventListener('click', function (e) {
 
 
 /* INIT ABAS: garante que todas as abas (exceto Info) comecem fechadas */
-(function initAbasDefault(){
-  try{
+(function initAbasDefault() {
+  try {
     document.querySelectorAll('.abas-conteudo').forEach(wrapper => {
       wrapper.querySelectorAll('.aba').forEach(sec => {
-        if(!sec.classList.contains('aba-info')){
+        if (!sec.classList.contains('aba-info')) {
           sec.style.display = 'none';
           sec.classList.remove('visible');
         } else {
@@ -10224,7 +10232,7 @@ document.addEventListener('click', function (e) {
         }
       });
     });
-  }catch(err){ console.warn('initAbasDefault:', err); }
+  } catch (err) { console.warn('initAbasDefault:', err); }
 })();
 
 
@@ -10234,16 +10242,16 @@ document.addEventListener('click', function (e) {
 
 
 /* TAB SLIDER (pílula deslizante) */
-function moveTabSlider(nav){
-  if(!nav) return;
+function moveTabSlider(nav) {
+  if (!nav) return;
   let s = nav.querySelector('.tab-slider');
-  if(!s){
+  if (!s) {
     s = document.createElement('div');
     s.className = 'tab-slider';
     nav.appendChild(s);
   }
   const active = nav.querySelector('.aba-tab.active') || nav.querySelector('.aba-tab');
-  if(!active) return;
+  if (!active) return;
   const r = active.getBoundingClientRect();
   const rn = nav.getBoundingClientRect();
   s.style.left = (r.left - rn.left + nav.scrollLeft) + 'px';
@@ -10251,34 +10259,34 @@ function moveTabSlider(nav){
 }
 
 /* atualiza quando clica numa aba (depois do handler marcar .active) */
-document.addEventListener('click', function(e){
+document.addEventListener('click', function (e) {
   const tab = e.target.closest('.aba-tab');
-  if(!tab) return;
+  if (!tab) return;
   const nav = tab.closest('.abas-nav');
-  requestAnimationFrame(()=> moveTabSlider(nav));
+  requestAnimationFrame(() => moveTabSlider(nav));
 });
 
 /* posiciona ao abrir a tela e ao redimensionar */
-window.addEventListener('load',  ()=> document.querySelectorAll('.abas-nav').forEach(moveTabSlider));
-window.addEventListener('resize',()=> document.querySelectorAll('.abas-nav').forEach(moveTabSlider));
+window.addEventListener('load', () => document.querySelectorAll('.abas-nav').forEach(moveTabSlider));
+window.addEventListener('resize', () => document.querySelectorAll('.abas-nav').forEach(moveTabSlider));
 
 /* se os cards são inseridos dinamicamente, observa o DOM e posiciona o slider quando surgir uma nova .abas-nav */
-new MutationObserver((mutations)=>{
-  for(const m of mutations){
-    m.addedNodes && m.addedNodes.forEach(node=>{
-      if(!(node instanceof HTMLElement)) return;
-      if(node.classList && node.classList.contains('abas-nav')) moveTabSlider(node);
+new MutationObserver((mutations) => {
+  for (const m of mutations) {
+    m.addedNodes && m.addedNodes.forEach(node => {
+      if (!(node instanceof HTMLElement)) return;
+      if (node.classList && node.classList.contains('abas-nav')) moveTabSlider(node);
       else node.querySelectorAll?.('.abas-nav').forEach(moveTabSlider);
     });
   }
-}).observe(document.body, {childList:true, subtree:true});
+}).observe(document.body, { childList: true, subtree: true });
 
 
 
 
 /* === AJUSTE DE VIEWPORT PARA FOTOS/CARDÁPIO === */
-function _abaHeaderOffset(pane){
-  try{
+function _abaHeaderOffset(pane) {
+  try {
     const header = document.querySelector('.navbar');
     const headerH = header ? header.offsetHeight : 0;
     let nav = pane.closest('.estabelecimento-card, .onde-comer-card, li, [data-estab]');
@@ -10286,18 +10294,18 @@ function _abaHeaderOffset(pane){
     const navH = nav ? nav.offsetHeight : 0;
     const margem = 2;
     return { headerH, navH, margem };
-  }catch(_e){ return { headerH:0, navH:0, margem:12 }; }
+  } catch (_e) { return { headerH: 0, navH: 0, margem: 12 }; }
 }
 
-function ajustarAbaViewport(pane){
-  if(!pane) return;
+function ajustarAbaViewport(pane) {
+  if (!pane) return;
   // Debounce por aba para evitar múltiplos ajustes no mesmo clique
-  if(pane._ajusteRAF){ cancelAnimationFrame(pane._ajusteRAF); }
-  pane._ajusteRAF = requestAnimationFrame(function(){
+  if (pane._ajusteRAF) { cancelAnimationFrame(pane._ajusteRAF); }
+  pane._ajusteRAF = requestAnimationFrame(function () {
     const { headerH, navH, margem } = _abaHeaderOffset(pane);
-    const disponivel = Math.max(220, window.innerHeight - headerH - navH - margem*2);
+    const disponivel = Math.max(220, window.innerHeight - headerH - navH - margem * 2);
     const swiperEl = pane.querySelector('.swiper');
-    if(swiperEl){
+    if (swiperEl) {
       // reserva altura — evita “piscada” do item de baixo
       swiperEl.style.setProperty('--aba-swiper-max-h', disponivel + 'px');
       swiperEl.style.height = disponivel + 'px';
@@ -10305,11 +10313,11 @@ function ajustarAbaViewport(pane){
     }
     // compensa navbar + abas com scroll-margin-top
     pane.style.scrollMarginTop = (headerH + navH + margem) + 'px';
-    try{
-      pane.scrollIntoView({ behavior:'smooth', block:'start' });
-    }catch(_e){
+    try {
+      pane.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (_e) {
       const top = pane.getBoundingClientRect().top + window.pageYOffset - (headerH + navH + margem);
-      window.scrollTo({ top, behavior:'smooth' });
+      window.scrollTo({ top, behavior: 'smooth' });
     }
     pane._ajusteRAF = null;
   });
@@ -10317,8 +10325,8 @@ function ajustarAbaViewport(pane){
 
 
 /* RESIZE GUARDED FOR FOTOS/CARDAPIO */
-window.addEventListener('resize', function(){
-  document.querySelectorAll('.aba.visible').forEach(function(pane){
+window.addEventListener('resize', function () {
+  document.querySelectorAll('.aba.visible').forEach(function (pane) {
     const id = pane.id || '';
     if ((/^fotos-|^cardapio-/.test(id)) && pane.querySelector('.swiper')) {
       ajustarAbaViewport(pane);
@@ -10328,8 +10336,8 @@ window.addEventListener('resize', function(){
 
 
 // Só ajusta quando a aba aberta é FOTOS ou CARDÁPIO (evita rolar pelos "Info" de todos os cards)
-window.addEventListener('resize', function(){
-  document.querySelectorAll('.aba.visible').forEach(function(pane){
+window.addEventListener('resize', function () {
+  document.querySelectorAll('.aba.visible').forEach(function (pane) {
     const id = pane.id || '';
     if ((/^fotos-|^cardapio-/.test(id)) && pane.querySelector('.swiper')) {
       ajustarAbaViewport(pane);
@@ -10339,16 +10347,16 @@ window.addEventListener('resize', function(){
 
 
 /* Hook de clique: ao abrir FOTOS/CARDÁPIO, ajustar viewport e rolar até o carrossel ficar visível */
-document.addEventListener('click', function(e){
+document.addEventListener('click', function (e) {
   const tab = e.target.closest('.aba-tab');
-  if(!tab) return;
+  if (!tab) return;
   const tgt = tab.dataset && tab.dataset.target || '';
-  if(!/^fotos-|^cardapio-/.test(tgt)) return;
+  if (!/^fotos-|^cardapio-/.test(tgt)) return;
   const container = tab.closest('.estabelecimento-card, .onde-comer-card, li, [data-estab]');
-  if(!container) return;
-  const pane = container.querySelector('#'+CSS.escape(tgt));
-  if(!pane) return;
-  requestAnimationFrame(()=> ajustarAbaViewport(pane));
+  if (!container) return;
+  const pane = container.querySelector('#' + CSS.escape(tgt));
+  if (!pane) return;
+  requestAnimationFrame(() => ajustarAbaViewport(pane));
 });
 
 
