@@ -949,7 +949,7 @@ img {
   justify-content: center;
   align-items: center;
   margin: 0;
-  padding: 10px;
+  padding: 2px;
   flex-shrink: 0;
   /* Impede que os slides encolham */
   box-sizing: border-box;
@@ -1230,9 +1230,9 @@ img {
   background-color: #ff3333 !important;
 }
 
-/* Container dos carrosséis */
+/* Container dos carrosséis    margin-top: 10px;*/
 .carrossel-container {
-  margin-top: 10px;
+
   transition: height 0.3s ease;
   position: relative;
 
@@ -3623,17 +3623,36 @@ a:focus {
 
 
 
-/* ===== Correção do gap entre abas e imagens ===== */
-.abas-nav{ margin-bottom: 2px; }
 
-.abas-conteudo{
+
+
+
+
+
+
+/* Tabs: impedir que o Swiper “estique” */
+.abas-conteudo .swiper,
+.abas-conteudo .swiper-wrapper,
+.abas-conteudo .swiper-slide{
+  height: auto !important;
+}
+
+/* Imagens sem distorção e sem “vão” de baseline */
+.abas-conteudo .swiper-slide img{
+  display: block;
+  width: auto;        /* mantém tamanho natural */
+  max-width: 100%;    /* não passa da largura do card */
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* Se houver container do carrossel, zere top-gap */
+.abas-conteudo .carrossel-container{
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
-.abas-conteudo .aba{
-  margin: 0 !important;
-  padding: 0 !important;
-}
-.abas-conteudo .swiper{ margin: 0 !important; }
-.abas-conteudo .swiper .swiper-slide{ padding: 0 !important; }
-.abas-conteudo .swiper .swiper-slide img{ margin: 0 !important; }
+
+
+
+
+

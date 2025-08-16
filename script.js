@@ -10197,6 +10197,7 @@ document.addEventListener('click', function (e) {
   if (alvo) {
     alvo.style.display = 'block';
     alvo.classList.add('visible');
+    ajustarAbaViewport(alvo); // <<< adicione esta linha
 
     // inicia Swiper se existir
     const node = alvo.querySelector('.swiper');
@@ -10297,31 +10298,7 @@ function _abaHeaderOffset(pane) {
   } catch (_e) { return { headerH: 0, navH: 0, margem: 12 }; }
 }
 
-function ajustarAbaViewport(pane) {
-  if (!pane) return;
-  // Debounce por aba para evitar múltiplos ajustes no mesmo clique
-  if (pane._ajusteRAF) { cancelAnimationFrame(pane._ajusteRAF); }
-  pane._ajusteRAF = requestAnimationFrame(function () {
-    const { headerH, navH, margem } = _abaHeaderOffset(pane);
-    const disponivel = Math.max(220, window.innerHeight - headerH - navH - margem * 2);
-    const swiperEl = pane.querySelector('.swiper');
-    if (swiperEl) {
-      // reserva altura — evita “piscada” do item de baixo
-      swiperEl.style.setProperty('--aba-swiper-max-h', disponivel + 'px');
-      swiperEl.style.height = disponivel + 'px';
-      swiperEl.style.minHeight = disponivel + 'px';
-    }
-    // compensa navbar + abas com scroll-margin-top
-    pane.style.scrollMarginTop = (headerH + navH + margem) + 'px';
-    try {
-      pane.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (_e) {
-      const top = pane.getBoundingClientRect().top + window.pageYOffset - (headerH + navH + margem);
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
-    pane._ajusteRAF = null;
-  });
-}
+
 
 
 /* RESIZE GUARDED FOR FOTOS/CARDAPIO */
@@ -10369,3 +10346,6 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 
 // 👇 adicione esta linha logo após a função:
 window.registrarCliqueBotao = registrarCliqueBotao;
+
+
+
