@@ -482,6 +482,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // assistencia celular
     oficinadocelular: "s",
     cevassistenciacelular: "s",
+    imperiumcell:"s",
     efcell: "s",
 
     // auto peças
@@ -2618,18 +2619,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               sab: [{ inicio: "08:00", fim: "17:00" }],
               dom: [],
             },
-            address: "R. Dra. Paula e Silva, 676 - Carlopolis",
-            contact: "(43) 3566-1600",
-            facebook: "https://www.facebook.com/oficinadocelularclps/",
-            instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
+            address: "R. Benedito Salles, 1076 - Carlopolis",
+            contact: "(43) 99661-1347",            
+            instagram: "https://www.instagram.com/imperiumcell043/",
             novidadesImages: [
-              "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/1.jpg",
-              "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/2.jpg",
+              "images/comercios/assistenciaCelular/imperiumCell/divulgacao/1.jpg",
+              "images/comercios/assistenciaCelular/imperiumCell/divulgacao/2.jpg",
+               "images/comercios/assistenciaCelular/imperiumCell/divulgacao/3.jpg",
+ 
 
             ],
             novidadesDescriptions: [
-              "CURTIR O POST!<br>• SEGUIR O INSTAGRAM DA LOJA!<br>• COMPARTILHAR NO STORY E MARCAR A LOJA!<br>• MARCAR 5 AMIGOS NOS COMENTÁRIOS (quanto mais amigos marcar, maior a chance de ganhar) obs: não pode marcar a mesma pessoa 2 vezes!<br>•Ganhador ou ganhadora deve estar seguindo todas as regras do sorteio corretamente, caso contrário será sorteado novamente!!!<br>O SORTEIO OCORRERÁ NO DIA 22/12/2025 BOA SORTE A TODOS",
-              "Temos Assistencia Tecnica, todos modelos de celular"
+               " ",
 
             ],
           },
@@ -7077,7 +7078,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: " (43) 99137-5516",
             contact2: " (43) 98831-1691",
            
-            infoAdicional:"Coletar<br>Encomendas<br>Entregas<br>Transporte de pessoas<br><br>Formas de Pagamento:<br>Cartão de Credito<br>Dinheiro em especie<br> Pix",
+            infoAdicional:"Nossos Serviços:<br><br>📦 Coletar<br>📦📦Encomendas<br>🚚 Entregas<br>🛵 Transporte de pessoas<br><br>Formas de Pagamento:<br><br>💳 Cartão de Credito<br>💵 Dinheiro em especie<br> 📲 Pix",
             instagram: "https://www.instagram.com/mototaximodesto_carlopolis/",
            
             novidadesImages: [
