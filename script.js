@@ -10299,30 +10299,33 @@ function _abaHeaderOffset(pane) {
 }
 
 function ajustarAbaViewport(pane) {
-  if (!pane) return;
-  // Debounce por aba para evitar múltiplos ajustes no mesmo clique
-  if (pane._ajusteRAF) { cancelAnimationFrame(pane._ajusteRAF); }
-  pane._ajusteRAF = requestAnimationFrame(function () {
-    const { headerH, navH, margem } = _abaHeaderOffset(pane);
-    const disponivel = Math.max(420, window.innerHeight - headerH - navH - margem * 2);
-    const swiperEl = pane.querySelector('.swiper');
-    if (swiperEl) {
-      // reserva altura — evita “piscada” do item de baixo
-      swiperEl.style.setProperty('--aba-swiper-max-h', disponivel + 'px');
-      swiperEl.style.height = disponivel + 'px';
-      swiperEl.style.minHeight = disponivel + 'px';
-    }
-    // compensa navbar + abas com scroll-margin-top
-    pane.style.scrollMarginTop = (headerH + navH + margem) + 'px';
-    try {
-      pane.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (_e) {
-      const top = pane.getBoundingClientRect().top + window.pageYOffset - (headerH + navH + margem);
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
-    pane._ajusteRAF = null;
-  });
+  // alturas de topo/abas (ajuste os seletores se forem diferentes no seu HTML)
+  const headerH = document.querySelector('.topo, header')?.offsetHeight || 0;
+  const tabsH   = pane.closest('.abas-container')?.offsetHeight
+               || document.querySelector('.tabs, .abas')?.offsetHeight
+               || 0;
+  const margem  = 8;
+
+  // espaço disponível na tela (mínimo pra evitar "colapso")
+  const disponivel = Math.max(220, window.innerHeight - headerH - tabsH - margem);
+
+  // limita a altura do carrossel para não empurrar o layout
+  const swiperEl = pane.querySelector('.swiper-fotos');
+  if (swiperEl) {
+    swiperEl.style.maxHeight = disponivel + 'px';
+  }
+
+  // mantém o carrossel esperto com a nova altura
+  const swiper = swiperEl?.swiper;
+  if (swiper?.updateAutoHeight) {
+    swiper.updateAutoHeight();
+    // garante ajuste depois que o DOM assenta
+    setTimeout(() => { swiper.updateAutoHeight(); swiper.update(); }, 0);
+  }
+
+  // ✅ sem scrollIntoView e sem window.scrollTo aqui
 }
+
 
 
 /* RESIZE GUARDED FOR FOTOS/CARDAPIO */
