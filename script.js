@@ -482,7 +482,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // assistencia celular
     oficinadocelular: "s",
     cevassistenciacelular: "s",
-    imperiumcell:"s",
+    imperiumcell: "s",
     efcell: "s",
 
     // auto peças
@@ -1347,56 +1347,79 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     );
   }
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  /////////
+  ///////
+  //////
 
 
-  function mostrarPromocoes() {
-    let html = `<h2 class="highlighted">Promoções</h2>
-    <div class="estab-promos-lista">`;
+  /////
+  ////////
 
+  ///////////
+
+  // AJUDE: retorna a data válida mais próxima (futura) de um comércio
+  function proximaValidade(comercio) {
     const agora = new Date();
+    const futuras = comercio.promocoes
+      .map(p => new Date(p.validade))
+      .filter(d => d > agora);
+    if (!futuras.length) return null;
+    futuras.sort((a, b) => a - b);
+    return futuras[0];
+  }
 
-    // Ordena os estabelecimentos pela promoção com validade mais próxima
+  function diasRestantes(date) {
+    const ms = (new Date(date)) - new Date();
+    return Math.ceil(ms / (1000 * 60 * 60 * 24));
+  }
+
+  // SUBSTITUA sua função mostrarPromocoes() por esta versão (Mod 1)
+  function mostrarPromocoes() {
+    let html = `
+    <h2 class="highlighted">Promoções</h2>
+    <p class="promo-subtitle">Confira as melhores ofertas da cidade</p>
+
+    <div class="grid-promos-mod1">
+  `;
+
+    // ordena por validade mais próxima
     const ordenados = [...promocoesPorComercio].sort((a, b) => {
-      const validadeA = a.promocoes
-        .map(p => new Date(p.validade))
-        .filter(d => d > agora)
-        .sort((x, y) => x - y)[0] || new Date("9999-12-31");
-
-      const validadeB = b.promocoes
-        .map(p => new Date(p.validade))
-        .filter(d => d > agora)
-        .sort((x, y) => x - y)[0] || new Date("9999-12-31");
-
-      return validadeA - validadeB;
+      const va = proximaValidade(a) || new Date('9999-12-31');
+      const vb = proximaValidade(b) || new Date('9999-12-31');
+      return va - vb;
     });
-    /////
-    ////
-    ////
-    ////
 
-    ///
     ordenados.forEach((comercio, idx) => {
-      const agora = new Date();
-      let primeiraPromoValida = null;
-      for (const p of comercio.promocoes) {
-        if (new Date(p.validade) > agora) {
-          primeiraPromoValida = p;
-          break;
-        }
-      }
-
+      const prox = proximaValidade(comercio);
+      const temAtivas = !!prox;
+      const qtd = comercio.promocoes.length;
       html += `
+      <div class="promo-card-mod1 ${temAtivas ? '' : 'inativa'}">
       
-      <div class="card-estab-promo ${primeiraPromoValida ? '' : 'inativo'}" data-idx="${idx}">
-        <img src="${comercio.imagem}" alt="Promoções ${comercio.nome}" class="logo-estab-promo" />
-        
-        <div class="info-estab-promo">
-          <h3>${comercio.nome}</h3>
-          <div class="badge-promocoes">Confira as ${comercio.promocoes.length} promoções</div>
-          ${primeiraPromoValida
-          ? `<div class="promo-countdown-lista" data-expira="${primeiraPromoValida.validade}" id="countdown-lista-${idx}"></div>`
-          : `<span style="color:#B22222;font-weight:bold;">Sem promoções ativas</span>`
+${(() => {
+          const img =       
+          comercio.capaPromocoes || comercio.banner || comercio.imagem ||        
+          comercio.image || comercio.fotoPerfil || comercio.logo || "";      
+          const hasImg = !!img;     return `
+       <div class="promo-card-hero ${hasImg ? '' : 'skeleton'}">         
+       ${hasImg ? `<img src="${img}" alt="${comercio.nome}" loading="lazy">` : ""}       
+              </div>     `;    })()}
+        <div class="promo-card-body">
+          <h3 class="promo-title">${comercio.nome}</h3>
+          <div class="promo-meta">
+            <span>${qtd} itens em promoção</span>
+            ${temAtivas
+          ? `<span class="promo-dia"><i class="fa-regular fa-clock"></i> ${diasRestantes(prox)} dia${diasRestantes(prox) > 1 ? 's' : ''}</span>`
+          : `<span class="promo-dia off">sem ativa</span>`
         }
+          </div>
+
+         <button class="btn-ver-promos" data-idx="${promocoesPorComercio.indexOf(comercio)}" 
+  ${temAtivas ? "" : "disabled"}>
+  Ver Promoções
+</button>
         </div>
       </div>
     `;
@@ -1405,25 +1428,91 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     html += `</div>`;
     document.querySelector(".content_area").innerHTML = html;
 
-
-
-    document.querySelectorAll('.card-estab-promo').forEach((card, i) => {
-      card.addEventListener('click', function () {
-        const comercio = ordenados[i];
+    // clique abre Mod 2 (reuso do seu carrossel existente)
+    document.querySelectorAll(".btn-ver-promos").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const idx = Number(e.currentTarget.getAttribute("data-idx"));
+        // registra clique e abre o detalhamento (Mod 2)
+        const comercio = promocoesPorComercio[idx];
         registrarCliqueNaPromocao(comercio.nome);
-        abrirCarrosselPromocoes(promocoesPorComercio.indexOf(comercio));
+        abrirCarrosselPromocoes(idx);
+        //abrirPaginaPromocoes(idx);
       });
     });
+  }
+
+  // === PROMOÇÕES - MOD 2 (página de produtos do comércio) ===
+  function abrirPaginaPromocoes(idxComercio) {
+    const comercio = promocoesPorComercio[idxComercio];
+    if (!comercio) return;
 
 
+    
 
-    document.querySelectorAll('.promo-countdown-lista').forEach(el => {
-      iniciarCountdown(el);
+    // helpers
+    const fmt = v => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const telefone = (comercio.whatsapp || comercio.telefone || comercio.contact || "").replace(/\D/g, "");
+    const msg = encodeURIComponent("Olá! Vi suas promoções no Olá Carlópolis e gostaria de saber mais.");
+
+    let html = `
+    <div class="mod2-head">
+      <button class="mod2-back" onclick="mostrarPromocoes()">← Voltar</button>
+      <div>
+        <h2 class="mod2-title">${comercio.nome}</h2>
+        <div class="mod2-sub">Produtos em promoção</div>
+      </div>
+    </div>
+
+    <div class="mod2-grid">
+  `;
+
+    (comercio.promocoes || []).forEach(p => {
+      const temDesconto = p.preco && p.preco_com_desconto;
+      const badge = p.desconto ? `<span class="mod2-badge">% ${p.desconto}% OFF</span>` : "";
+      html += `
+      <div class="mod2-card">
+        <div class="mod2-thumb">
+          ${badge}
+          <img src="${p.imagem || p.image || ""}" alt="${p.descricao || ""}" loading="lazy">
+        </div>
+        <div class="mod2-body">
+          <h3 class="mod2-prod">${p.descricao || "Produto"}</h3>
+          ${p.detalhe ? `<p class="mod2-desc">${p.detalhe}</p>` : (p.subtitulo ? `<p class="mod2-desc">${p.subtitulo}</p>` : "")}
+          <div class="mod2-precos">
+            ${temDesconto ? `<span class="mod2-de">${fmt(p.preco)}</span>` : ""}
+            <span class="mod2-por">${fmt(temDesconto ? p.preco_com_desconto : (p.preco_com_desconto || p.preco || 0))}</span>
+          </div>
+          ${telefone
+          ? `<a class="mod2-whats" target="_blank"
+                    href="https://wa.me/55${telefone}?text=${msg}">
+                   <i class="fab fa-whatsapp"></i> Enviar para WhatsApp
+                 </a>`
+          : ""
+        }
+        </div>
+      </div>
+    `;
+    });
+
+    html += `</div>`;
+    document.querySelector(".content_area").innerHTML = html;
+  }
+
+
+  // GARANTA que o item do menu "Promoções" chame mostrarPromocoes()
+  const menuPromocoes = document.getElementById("menuPromocoes");
+  if (menuPromocoes) {
+    menuPromocoes.addEventListener("click", (e) => {
+      e.preventDefault();
+      mostrarPromocoes();
     });
   }
 
 
 
+  ////////////////////////
+  ////////////////////
+  /////////////////////
 
   function abrirCarrosselPromocoes(idxComercio) {
     // Remove overlay antigo se existir
@@ -1546,7 +1635,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   }
 
 
-
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////
 
 
   // inicio relogio contador
@@ -2605,7 +2695,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-{
+          {
             image: "images/comercios/assistenciaCelular/imperiumCell/perfil.jpg",
             name: "Imperium Cell",
             hours: "Seg a Sex: 8:00h as 18:00h<br> Sab: 08:00h as 17:00h",
@@ -2620,17 +2710,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: [],
             },
             address: "R. Benedito Salles, 1076 - Carlopolis",
-            contact: "(43) 99661-1347",            
+            contact: "(43) 99661-1347",
             instagram: "https://www.instagram.com/imperiumcell043/",
             novidadesImages: [
               "images/comercios/assistenciaCelular/imperiumCell/divulgacao/1.jpg",
               "images/comercios/assistenciaCelular/imperiumCell/divulgacao/2.jpg",
-               "images/comercios/assistenciaCelular/imperiumCell/divulgacao/3.jpg",
- 
+              "images/comercios/assistenciaCelular/imperiumCell/divulgacao/3.jpg",
+
 
             ],
             novidadesDescriptions: [
-               " ",
+              " ",
 
             ],
           },
@@ -4909,18 +4999,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Desconto Facil 1",
             address: "R. Benedito Salles, 574 - Carlopolis",
 
-        
-                   hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 15:00h",
-                   statusAberto:".",
-                  horarios: {                          
-                   seg: [{ inicio: "08:00", fim: "20:00" }],
-                    ter: [{ inicio: "08:00", fim: "20:00" }],
-                    qua: [{ inicio: "08:00", fim: "20:00" }],
-                    qui: [{ inicio: "08:00", fim: "20:00" }],
-                    sex: [{ inicio: "08:00", fim: "20:00" }],
-                    sab: [{ inicio: "08:00", fim: "15:00" }],
-                    dom: []
-                  },
+
+            hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 15:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "20:00" }],
+              ter: [{ inicio: "08:00", fim: "20:00" }],
+              qua: [{ inicio: "08:00", fim: "20:00" }],
+              qui: [{ inicio: "08:00", fim: "20:00" }],
+              sex: [{ inicio: "08:00", fim: "20:00" }],
+              sab: [{ inicio: "08:00", fim: "15:00" }],
+              dom: []
+            },
             contact: "(43) 99966-9812",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
@@ -4955,7 +5045,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/farmacia/drogaMais/drogamais.png",
             name: "DrogaMais",
-            hours: "Seg a Sab: 08:00h as 20:00h",          
+            hours: "Seg a Sab: 08:00h as 20:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -5190,7 +5280,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/santaMaria/santamaria.png",
             name: "Santa Maria",
             address: "R. Benedito Salles, nº 711 - Carlopols",
-            hours: "Seg a Sab: 08:00h as 20h </br> Dom: 08:00h as 13:00h",           
+            hours: "Seg a Sab: 08:00h as 20h </br> Dom: 08:00h as 13:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -5724,16 +5814,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             novidadesImages: [
               "images/servicos/podologa/vania/divulgacao/1.png",
-               "images/servicos/podologa/vania/divulgacao/2.jpg",
-
-
-
+              "images/servicos/podologa/vania/divulgacao/2.jpg",
             ],
             novidadesDescriptions: [
               "Especialista no Tratamento em Diabético",
-
-
-
             ],
 
 
@@ -5741,11 +5825,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
         ],
       },
-
-
-
-
-
 
 
 
@@ -6220,43 +6299,43 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           /* [ 7 ]*/
 
 
-              {
-                  image: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg",
-                  name: "Desconto Facil 1",
-                  address: "R. Benedito Salles, 574 - Carlopolis",                
-                  hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 15:00h",
-                  statusAberto:".",
-                  horarios: {                          
-                   seg: [{ inicio: "08:00", fim: "20:00" }],
-                    ter: [{ inicio: "08:00", fim: "20:00" }],
-                    qua: [{ inicio: "08:00", fim: "20:00" }],
-                    qui: [{ inicio: "08:00", fim: "20:00" }],
-                    sex: [{ inicio: "08:00", fim: "20:00" }],
-                    sab: [{ inicio: "08:00", fim: "15:00" }],
-                    dom: []
-                  },  
-                  contact: "(43) 99966-9812",
-                  delivery: "Sim / Sem Taxa",
-                  facebook:"https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
-                  instagram: "https://www.instagram.com/descontofacil.clps/",
-                  site: "https://www.grupoasfar.com.br/",
-                  novidadesImages: [               
-                    "images/comercios/farmacia/descontoFacil/divulgacao/1.png",
-                    "images/comercios/farmacia/descontoFacil/divulgacao/2.png",
-                    "images/comercios/farmacia/descontoFacil/divulgacao/3.png",
-                    "images/comercios/farmacia/descontoFacil/divulgacao/4.png",
-                    "images/comercios/farmacia/descontoFacil/divulgacao/5.png",
-                  ], 
-                  novidadesDescriptions: [                            
-                    "Carmed",
-                    "Proteja e cuide da sua pele!",
-                    "Analgésico (para dor) antitérmico (para febre)",
-                    "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
-                    "Redução da febre e para o alívio de dores",
-                  ],
-              },
+          {
+            image: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg",
+            name: "Desconto Facil 1",
+            address: "R. Benedito Salles, 574 - Carlopolis",
+            hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 15:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "20:00" }],
+              ter: [{ inicio: "08:00", fim: "20:00" }],
+              qua: [{ inicio: "08:00", fim: "20:00" }],
+              qui: [{ inicio: "08:00", fim: "20:00" }],
+              sex: [{ inicio: "08:00", fim: "20:00" }],
+              sab: [{ inicio: "08:00", fim: "15:00" }],
+              dom: []
+            },
+            contact: "(43) 99966-9812",
+            delivery: "Sim / Sem Taxa",
+            facebook: "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
+            instagram: "https://www.instagram.com/descontofacil.clps/",
+            site: "https://www.grupoasfar.com.br/",
+            novidadesImages: [
+              "images/comercios/farmacia/descontoFacil/divulgacao/1.png",
+              "images/comercios/farmacia/descontoFacil/divulgacao/2.png",
+              "images/comercios/farmacia/descontoFacil/divulgacao/3.png",
+              "images/comercios/farmacia/descontoFacil/divulgacao/4.png",
+              "images/comercios/farmacia/descontoFacil/divulgacao/5.png",
+            ],
+            novidadesDescriptions: [
+              "Carmed",
+              "Proteja e cuide da sua pele!",
+              "Analgésico (para dor) antitérmico (para febre)",
+              "Alívio da dor associada a contraturas musculares, incluindo dor de cabeça tensional.",
+              "Redução da febre e para o alívio de dores",
+            ],
+          },
 
-                
+
 
 
 
@@ -7052,7 +7131,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-{
+      {
         link: document.querySelector("#menuMotoTaxi"),
         title: "Moto Taxi",
         establishments: [
@@ -7073,22 +7152,22 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Andrino Soares, 370 - Carlópolis",
             contact: " (43) 99137-5516",
             contact2: " (43) 98831-1691",
-           
-            infoAdicional:"Nossos Serviços:<br><br>📦 Coletar<br>📦📦Encomendas<br>🚚 Entregas<br>🛵 Transporte de pessoas<br><br>Formas de Pagamento:<br><br>💳 Cartão de Credito<br>💵 Dinheiro em especie<br> 📲 Pix",
+
+            infoAdicional: "Nossos Serviços:<br><br>📦 Coletar<br>📦📦Encomendas<br>🚚 Entregas<br>🛵 Transporte de pessoas<br><br>Formas de Pagamento:<br><br>💳 Cartão de Credito<br>💵 Dinheiro em especie<br> 📲 Pix",
             instagram: "https://www.instagram.com/mototaximodesto_carlopolis/",
-           
+
             novidadesImages: [
               "images/comercios/motoTaxi/modesto/divulgacao/1.jpg",
-               "images/comercios/motoTaxi/modesto/divulgacao/2.jpg",
-                "images/comercios/motoTaxi/modesto/divulgacao/3.jpg",
-                 //"images/comercios/motoTaxi/modesto/divulgacao/4.jpg",
-            
+              "images/comercios/motoTaxi/modesto/divulgacao/2.jpg",
+              "images/comercios/motoTaxi/modesto/divulgacao/3.jpg",
+              //"images/comercios/motoTaxi/modesto/divulgacao/4.jpg",
+
 
             ],
             novidadesDescriptions: [
-             
+
               "",
-             
+
 
             ],
           },
@@ -8758,13 +8837,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         establishments: [
 
 
-           {
-           image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
+          {
+            image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
             name: "Oficina do Celular",
-address: "R. Dra. Paula e Silva, 676 - Carlopolis",
+            address: "R. Dra. Paula e Silva, 676 - Carlopolis",
             contact: "(43) 3566-1600",
-            
-             facebook: "https://www.facebook.com/oficinadocelularclps/",
+
+            facebook: "https://www.facebook.com/oficinadocelularclps/",
             instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
             vagaPreRequisito: "<br> Responsável<br> Pontual<BR>Boa Comunicação<br>Disponibilidade de Horário",
             infoVagaTrabalho: "1 - Atendimento ao publico",
@@ -8778,9 +8857,9 @@ address: "R. Dra. Paula e Silva, 676 - Carlopolis",
             image: "images/comercios/motoTaxi/modesto/perfil.jpg",
             name: "Moto Taxi Modesto",
 
-             address: "R. Andrino Soares, 370 - Carlópolis",
+            address: "R. Andrino Soares, 370 - Carlópolis",
             contact: " (41) 99982-3075",
-            
+
             instagram: "https://www.instagram.com/mototaximodesto_carlopolis/",
             vagaPreRequisito: "<br> CNH<br>Experiência<br>Boa Comunicação<br>Responsabilidade<br>Disponibilidade de Horário<br>Compromisso",
             infoVagaTrabalho: "1 - MotoBoy / MotoGirl ",
@@ -8789,13 +8868,13 @@ address: "R. Dra. Paula e Silva, 676 - Carlopolis",
 
           },
 
-           {
-             image: "images/comercios/restaurante/toninhoParana/perfil.jpg",
+          {
+            image: "images/comercios/restaurante/toninhoParana/perfil.jpg",
             name: "Toninho Parana",
 
-             address: "R. Benedito Salles, 1287 - Carlópolis",
-               contact: "(43) 99938-2720",
-            
+            address: "R. Benedito Salles, 1287 - Carlópolis",
+            contact: "(43) 99938-2720",
+
             instagram: "https://www.instagram.com/restaurante_toninho_parana/",
             vagaPreRequisito: "<br> Maior de 18 Anos",
             infoVagaTrabalho: "1 - Auxiliar de Serviços Gerais ",
@@ -10450,10 +10529,10 @@ function _abaHeaderOffset(pane) {
 function ajustarAbaViewport(pane) {
   // alturas de topo/abas (ajuste os seletores se forem diferentes no seu HTML)
   const headerH = document.querySelector('.topo, header')?.offsetHeight || 0;
-  const tabsH   = pane.closest('.abas-container')?.offsetHeight
-               || document.querySelector('.tabs, .abas')?.offsetHeight
-               || 0;
-  const margem  = 8;
+  const tabsH = pane.closest('.abas-container')?.offsetHeight
+    || document.querySelector('.tabs, .abas')?.offsetHeight
+    || 0;
+  const margem = 8;
 
   // espaço disponível na tela (mínimo pra evitar "colapso")
   const disponivel = Math.max(220, window.innerHeight - headerH - tabsH - margem);
