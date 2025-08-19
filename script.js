@@ -5724,6 +5724,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             novidadesImages: [
               "images/servicos/podologa/vania/divulgacao/1.png",
+               "images/servicos/podologa/vania/divulgacao/2.jpg",
 
 
 
