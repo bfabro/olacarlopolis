@@ -4909,19 +4909,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Desconto Facil 1",
             address: "R. Benedito Salles, 574 - Carlopolis",
 
-             plantaoHorario: "08:00h às 20:00h", 
-                  plantaoData:"Sab 16/08 a Sex 22/08",
-                  hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 20:00h",
-                  statusAberto:".",
+        
+                   hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 15:00h",
+                   statusAberto:".",
                   horarios: {                          
                    seg: [{ inicio: "08:00", fim: "20:00" }],
                     ter: [{ inicio: "08:00", fim: "20:00" }],
                     qua: [{ inicio: "08:00", fim: "20:00" }],
                     qui: [{ inicio: "08:00", fim: "20:00" }],
                     sex: [{ inicio: "08:00", fim: "20:00" }],
-                    sab: [{ inicio: "08:00", fim: "20:00" }],
-                    dom: [{ inicio: "08:00", fim: "20:00" }]
-                  },  
+                    sab: [{ inicio: "08:00", fim: "15:00" }],
+                    dom: []
+                  },
             contact: "(43) 99966-9812",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/people/Farm%C3%A1cias-Desconto-F%C3%A1cil-Carl%C3%B3polis/100054221361992/",
@@ -4956,7 +4955,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/farmacia/drogaMais/drogamais.png",
             name: "DrogaMais",
-            hours: "Seg a Sex: 08:00h as 20:00h </br>Sab: 08:00h as 20:00h",          
+            hours: "Seg a Sab: 08:00h as 20:00h",          
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -5071,14 +5070,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/farmais/farmais.png",
             name: "FarMais",
             address: "R. Benedito Salles, 979 - Carlopolis",
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            hours: "Seg a Sex: 08:00h as 19:00h </br> Sab: 08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
+              seg: [{ inicio: "08:00", fim: "19:00" }],
+              ter: [{ inicio: "08:00", fim: "19:00" }],
+              qua: [{ inicio: "08:00", fim: "19:00" }],
+              qui: [{ inicio: "08:00", fim: "19:00" }],
+              sex: [{ inicio: "08:00", fim: "19:00" }],
               sab: [{ inicio: "08:00", fim: "12:00" }],
               dom: []
             },
@@ -5106,23 +5105,23 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/masterFarma/masterfarma.png",
             name: "Master Farma",
             address: "R. Laurindo Franco de Godoi, 90 - Carlopolis",
-            hours: "Seg a Sex: 08:00h as 18:00h </br>Sab: 08:00h as 12:00h",
+            hours: "Seg a Sab: 08:00h as 20:00h </br>Dom: 08:00h as 13:00h",
 
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
-              dom: []
+              seg: [{ inicio: "08:00", fim: "20:00" }],
+              ter: [{ inicio: "08:00", fim: "20:00" }],
+              qua: [{ inicio: "08:00", fim: "20:00" }],
+              qui: [{ inicio: "08:00", fim: "20:00" }],
+              sex: [{ inicio: "08:00", fim: "20:00" }],
+              sab: [{ inicio: "08:00", fim: "20:00" }],
+              dom: [{ inicio: "08:00", fim: "13:00" }]
             },
             contact: "(43) 99951-1540",
             contact2: "(43) 3566-1141",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/zurdo.farmacentro/?locale=pt_BR",
-            instagram: "https://www.instagram.com/masterfarma_carlopolis/",
+            instagram: "https://www.instagram.com/masterfarmacarlopolis/",
 
             novidadesImages: [
 
@@ -5191,18 +5190,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/santaMaria/santamaria.png",
             name: "Santa Maria",
             address: "R. Benedito Salles, nº 711 - Carlopols",
-            hours: "Seg a Sex: 08:00h as 18h </br> Sab: 08:00h as 12:00h",
-
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            hours: "Seg a Sab: 08:00h as 20h </br> Dom: 08:00h as 13:00h",           
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
-              dom: []
+              seg: [{ inicio: "08:00", fim: "20:00" }],
+              ter: [{ inicio: "08:00", fim: "20:00" }],
+              qua: [{ inicio: "08:00", fim: "20:00" }],
+              qui: [{ inicio: "08:00", fim: "20:00" }],
+              sex: [{ inicio: "08:00", fim: "20:00" }],
+              sab: [{ inicio: "08:00", fim: "20:00" }],
+              dom: [{ inicio: "08:00", fim: "13:00" }]
             },
             contact: "(43) 99840-9658",
             delivery: "Sim / Sem Taxa",
@@ -6225,10 +6222,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               {
                   image: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg",
                   name: "Desconto Facil 1",
-                  address: "R. Benedito Salles, 574 - Carlopolis",
-                  plantaoHorario: "08:00h às 20:00h", 
-                  plantaoData:"Sab 16/08 a Sex 22/08",
-                  hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 20:00h",
+                  address: "R. Benedito Salles, 574 - Carlopolis",                
+                  hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 15:00h",
                   statusAberto:".",
                   horarios: {                          
                    seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -6236,8 +6231,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                     qua: [{ inicio: "08:00", fim: "20:00" }],
                     qui: [{ inicio: "08:00", fim: "20:00" }],
                     sex: [{ inicio: "08:00", fim: "20:00" }],
-                    sab: [{ inicio: "08:00", fim: "20:00" }],
-                    dom: [{ inicio: "08:00", fim: "20:00" }]
+                    sab: [{ inicio: "08:00", fim: "15:00" }],
+                    dom: []
                   },  
                   contact: "(43) 99966-9812",
                   delivery: "Sim / Sem Taxa",
@@ -7944,7 +7939,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: []
             },
             address: "R. Padre Hugo, 460 - Carlopolis",
-            contact: "(43) 99166-5381",
+            contact: "(43) 99160-5120",
             delivery: "Sim / Com Taxa",
             infoAdicional: "<a target='_blank' style='color:#2da6ff;' href='https://namigocarlopolis.eatfood.app/'>Cardapio On Line</a>",
 
@@ -8761,6 +8756,55 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Vagas de Trabalho",
         establishments: [
 
+
+           {
+           image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
+            name: "Oficina do Celular",
+address: "R. Dra. Paula e Silva, 676 - Carlopolis",
+            contact: "(43) 3566-1600",
+            
+             facebook: "https://www.facebook.com/oficinadocelularclps/",
+            instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
+            vagaPreRequisito: "<br> Responsável<br> Pontual<BR>Boa Comunicação<br>Disponibilidade de Horário",
+            infoVagaTrabalho: "1 - Atendimento ao publico",
+
+
+
+          },
+
+
+          {
+            image: "images/comercios/motoTaxi/modesto/perfil.jpg",
+            name: "Moto Taxi Modesto",
+
+             address: "R. Andrino Soares, 370 - Carlópolis",
+            contact: " (41) 99982-3075",
+            
+            instagram: "https://www.instagram.com/mototaximodesto_carlopolis/",
+            vagaPreRequisito: "<br> CNH<br>Experiência<br>Boa Comunicação<br>Responsabilidade<br>Disponibilidade de Horário<br>Compromisso",
+            infoVagaTrabalho: "1 - MotoBoy / MotoGirl ",
+
+
+
+          },
+
+           {
+             image: "images/comercios/restaurante/toninhoParana/perfil.jpg",
+            name: "Toninho Parana",
+
+             address: "R. Benedito Salles, 1287 - Carlópolis",
+               contact: "(43) 99938-2720",
+            
+            instagram: "https://www.instagram.com/restaurante_toninho_parana/",
+            vagaPreRequisito: "<br> Maior de 18 Anos",
+            infoVagaTrabalho: "1 - Auxiliar de Serviços Gerais ",
+
+
+
+          },
+
+
+
           {
             image: "images/comercios/restaurante/delfino/delfino.png",
             name: "Emporio São Victor",
@@ -8768,7 +8812,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Kalil Keder, 90 - Carlopolis",
             contact: "(43) 99111-9484",
             instagram: "https://www.instagram.com/delfinos.mendes1/",
-            vagaPreRequisito: "Ter experiência como garçon",
+            vagaPreRequisito: "<br> Ter experiência como garçon",
             infoVagaTrabalho: "1 - Vaga Para Garçon ",
 
 
