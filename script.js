@@ -1347,79 +1347,63 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     );
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  /////////
-  ///////
-  //////
+/////////
+///////
+//////
 
 
-  /////
-  ////////
+/////
 
-  ///////////
-
-  // AJUDE: retorna a data válida mais próxima (futura) de um comércio
-  function proximaValidade(comercio) {
-    const agora = new Date();
-    const futuras = comercio.promocoes
-      .map(p => new Date(p.validade))
-      .filter(d => d > agora);
-    if (!futuras.length) return null;
-    futuras.sort((a, b) => a - b);
-    return futuras[0];
-  }
-
-  function diasRestantes(date) {
-    const ms = (new Date(date)) - new Date();
-    return Math.ceil(ms / (1000 * 60 * 60 * 24));
-  }
-
-  // SUBSTITUA sua função mostrarPromocoes() por esta versão (Mod 1)
   function mostrarPromocoes() {
-    let html = `
-    <h2 class="highlighted">Promoções</h2>
-    <p class="promo-subtitle">Confira as melhores ofertas da cidade</p>
+    let html = `<h2 class="highlighted">Promoções</h2>
+    <div class="estab-promos-lista">`;
 
-    <div class="grid-promos-mod1">
-  `;
+    const agora = new Date();
 
-    // ordena por validade mais próxima
+    // Ordena os estabelecimentos pela promoção com validade mais próxima
     const ordenados = [...promocoesPorComercio].sort((a, b) => {
-      const va = proximaValidade(a) || new Date('9999-12-31');
-      const vb = proximaValidade(b) || new Date('9999-12-31');
-      return va - vb;
+      const validadeA = a.promocoes
+        .map(p => new Date(p.validade))
+        .filter(d => d > agora)
+        .sort((x, y) => x - y)[0] || new Date("9999-12-31");
+
+      const validadeB = b.promocoes
+        .map(p => new Date(p.validade))
+        .filter(d => d > agora)
+        .sort((x, y) => x - y)[0] || new Date("9999-12-31");
+
+      return validadeA - validadeB;
     });
+    /////
+    ////
+    ////
+    ////
 
+    ///
     ordenados.forEach((comercio, idx) => {
-      const prox = proximaValidade(comercio);
-      const temAtivas = !!prox;
-      const qtd = comercio.promocoes.length;
-      html += `
-      <div class="promo-card-mod1 ${temAtivas ? '' : 'inativa'}">
-      
-${(() => {
-          const img =       
-          comercio.capaPromocoes || comercio.banner || comercio.imagem ||        
-          comercio.image || comercio.fotoPerfil || comercio.logo || "";      
-          const hasImg = !!img;     return `
-       <div class="promo-card-hero ${hasImg ? '' : 'skeleton'}">         
-       ${hasImg ? `<img src="${img}" alt="${comercio.nome}" loading="lazy">` : ""}       
-              </div>     `;    })()}
-        <div class="promo-card-body">
-          <h3 class="promo-title">${comercio.nome}</h3>
-          <div class="promo-meta">
-            <span>${qtd} itens em promoção</span>
-            ${temAtivas
-          ? `<span class="promo-dia"><i class="fa-regular fa-clock"></i> ${diasRestantes(prox)} dia${diasRestantes(prox) > 1 ? 's' : ''}</span>`
-          : `<span class="promo-dia off">sem ativa</span>`
+      const agora = new Date();
+      let primeiraPromoValida = null;
+      for (const p of comercio.promocoes) {
+        if (new Date(p.validade) > agora) {
+          primeiraPromoValida = p;
+          break;
         }
-          </div>
+      }
 
-         <button class="btn-ver-promos" data-idx="${promocoesPorComercio.indexOf(comercio)}" 
-  ${temAtivas ? "" : "disabled"}>
-  Ver Promoções
-</button>
+      html += `
+      
+      <div class="card-estab-promo ${primeiraPromoValida ? '' : 'inativo'}" data-idx="${idx}">
+        <img src="${comercio.imagem}" alt="Promoções ${comercio.nome}" class="logo-estab-promo" />
+        
+        <div class="info-estab-promo">
+          <h3>${comercio.nome}</h3>
+          <div class="badge-promocoes">Confira as ${comercio.promocoes.length} promoções</div>
+          ${primeiraPromoValida
+          ? `<div class="promo-countdown-lista" data-expira="${primeiraPromoValida.validade}" id="countdown-lista-${idx}"></div>`
+          : `<span style="color:#B22222;font-weight:bold;">Sem promoções ativas</span>`
+        }
         </div>
       </div>
     `;
@@ -1428,91 +1412,25 @@ ${(() => {
     html += `</div>`;
     document.querySelector(".content_area").innerHTML = html;
 
-    // clique abre Mod 2 (reuso do seu carrossel existente)
-    document.querySelectorAll(".btn-ver-promos").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        const idx = Number(e.currentTarget.getAttribute("data-idx"));
-        // registra clique e abre o detalhamento (Mod 2)
-        const comercio = promocoesPorComercio[idx];
+
+
+    document.querySelectorAll('.card-estab-promo').forEach((card, i) => {
+      card.addEventListener('click', function () {
+        const comercio = ordenados[i];
         registrarCliqueNaPromocao(comercio.nome);
-        abrirCarrosselPromocoes(idx);
-        //abrirPaginaPromocoes(idx);
+        abrirCarrosselPromocoes(promocoesPorComercio.indexOf(comercio));
       });
     });
-  }
-
-  // === PROMOÇÕES - MOD 2 (página de produtos do comércio) ===
-  function abrirPaginaPromocoes(idxComercio) {
-    const comercio = promocoesPorComercio[idxComercio];
-    if (!comercio) return;
 
 
-    
 
-    // helpers
-    const fmt = v => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    const telefone = (comercio.whatsapp || comercio.telefone || comercio.contact || "").replace(/\D/g, "");
-    const msg = encodeURIComponent("Olá! Vi suas promoções no Olá Carlópolis e gostaria de saber mais.");
-
-    let html = `
-    <div class="mod2-head">
-      <button class="mod2-back" onclick="mostrarPromocoes()">← Voltar</button>
-      <div>
-        <h2 class="mod2-title">${comercio.nome}</h2>
-        <div class="mod2-sub">Produtos em promoção</div>
-      </div>
-    </div>
-
-    <div class="mod2-grid">
-  `;
-
-    (comercio.promocoes || []).forEach(p => {
-      const temDesconto = p.preco && p.preco_com_desconto;
-      const badge = p.desconto ? `<span class="mod2-badge">% ${p.desconto}% OFF</span>` : "";
-      html += `
-      <div class="mod2-card">
-        <div class="mod2-thumb">
-          ${badge}
-          <img src="${p.imagem || p.image || ""}" alt="${p.descricao || ""}" loading="lazy">
-        </div>
-        <div class="mod2-body">
-          <h3 class="mod2-prod">${p.descricao || "Produto"}</h3>
-          ${p.detalhe ? `<p class="mod2-desc">${p.detalhe}</p>` : (p.subtitulo ? `<p class="mod2-desc">${p.subtitulo}</p>` : "")}
-          <div class="mod2-precos">
-            ${temDesconto ? `<span class="mod2-de">${fmt(p.preco)}</span>` : ""}
-            <span class="mod2-por">${fmt(temDesconto ? p.preco_com_desconto : (p.preco_com_desconto || p.preco || 0))}</span>
-          </div>
-          ${telefone
-          ? `<a class="mod2-whats" target="_blank"
-                    href="https://wa.me/55${telefone}?text=${msg}">
-                   <i class="fab fa-whatsapp"></i> Enviar para WhatsApp
-                 </a>`
-          : ""
-        }
-        </div>
-      </div>
-    `;
-    });
-
-    html += `</div>`;
-    document.querySelector(".content_area").innerHTML = html;
-  }
-
-
-  // GARANTA que o item do menu "Promoções" chame mostrarPromocoes()
-  const menuPromocoes = document.getElementById("menuPromocoes");
-  if (menuPromocoes) {
-    menuPromocoes.addEventListener("click", (e) => {
-      e.preventDefault();
-      mostrarPromocoes();
+    document.querySelectorAll('.promo-countdown-lista').forEach(el => {
+      iniciarCountdown(el);
     });
   }
 
 
 
-  ////////////////////////
-  ////////////////////
-  /////////////////////
 
   function abrirCarrosselPromocoes(idxComercio) {
     // Remove overlay antigo se existir
@@ -1635,8 +1553,7 @@ ${(() => {
   }
 
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
   // inicio relogio contador
