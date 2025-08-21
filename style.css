@@ -3694,3 +3694,67 @@ html {
 
 
 
+.coleta-wrap { max-width: 980px; margin: 8px auto; padding: 8px; }
+.coleta-header { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin: 6px 0 10px;  justify-content: center;              /* centraliza horizontalmente */
+  text-align: center; }
+.coleta-header select, .coleta-header input { padding:8px 10px; border:1px solid #ddd; border-radius:10px; }
+.coleta-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:10px; }
+.coleta-card { background:#fff; border-radius:14px; padding:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.coleta-hora { font-weight:700; font-size:18px; margin-bottom:6px; color:#2e8b57; }
+.coleta-bairros { margin:0; padding-left:18px; }
+.coleta-bairros li { margin:4px 0; }
+.badge-dia { font-size:12px; padding:2px 8px; border-radius:999px; background:#e7f2fd; color:#4070f4; margin-left:6px; }
+/* Coleta de lixo – estilos especiais */
+.coleta-card.apoio { background:#e8f5e9; border-left:5px solid #ff9800; }  /* Ponto de apoio (Usina) */
+.coleta-card.garagem { background:#e8f5e9; border-left:5px solid #2e7d32; } /* Garagem */
+.coleta-etq {
+  display:inline-block; font-size:12px; font-weight:600;
+  padding:2px 8px; border-radius:999px; margin-left:8px;
+  background:#0000000d; color:#333;
+}
+
+/* Coleta – centralizar controles e destacar "agora" */
+
+.coleta-header #buscaBairro{ min-width: 240px; }
+.coleta-header #seletorDia{ min-width: 180px; }
+.coleta-header small{ flex-basis: 100%; text-align: center; }
+
+.coleta-card.agora{
+  background: #fff7b2;                  /* amarelinho */
+  border-left: 5px solid #f0b400;       /* faixa à esquerda */
+}
+
+
+/* Aviso da coleta (topo) */
+.coleta-alert {
+  background: #fff3cd;
+  color: #664d03;
+  border: 1px solid #ffec99;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 6px 0 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Linha de metadados do card (caminhão etc.) */
+.coleta-meta { margin-top: 6px; display:flex; gap:6px; flex-wrap:wrap; }
+
+/* Chips de caminhão */
+.truck-chip {
+  display:inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+}
+.truck-chip.t1 { background:#e6f4ff; border-color:#b6e0fe; } /* Caminhão 1 */
+.truck-chip.t2 { background:#f3e8ff; border-color:#e9d5ff; } /* Caminhão 2 */
+
+/* Aviso em vermelho (coleta) */
+.coleta-aviso-vermelho{
+  color: #d32f2f;        /* vermelho */
+  font-weight: 700;      /* destaque */
+}

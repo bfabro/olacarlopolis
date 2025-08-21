@@ -1347,14 +1347,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     );
   }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/////////
-///////
-//////
+  /////////
+  ///////
+  //////
 
 
-/////
+  /////
 
   function mostrarPromocoes() {
     let html = `<h2 class="highlighted">Promoções</h2>
@@ -10521,3 +10521,280 @@ window.registrarCliqueBotao = registrarCliqueBotao;
 
 
 
+// ====== COLETA DE LIXO — DIA A DIA ======
+// Preenchido: segunda-feira (como você enviou)
+// Os demais dias ficam prontos pra você editar livremente
+const COLETA_LIXO = {
+  seg: [
+    { hora: "06:05", bairros: ["Saída da garagem"], caminhao: 1 },
+    { hora: "06:10", bairros: ["CTG"], caminhao: 1 },
+    { hora: "06:35", bairros: ["Centro"], caminhao: 1 },
+    { hora: "07:10", bairros: ["Rocha"], caminhao: 1 },
+    { hora: "07:30", bairros: ["Caravela"], caminhao: 1 },
+    { hora: "08:40", bairros: ["SABESP"], caminhao: 1 },
+    { hora: "10:00", bairros: ["Fogaça"], caminhao: 1 },
+    { hora: "10:20", bairros: ["Descarrega na Usina"], caminhao: 1 },
+    { hora: "10:30", bairros: ["Amaral"], caminhao: 1 },
+    { hora: "10:50", bairros: ["Matadouro"], caminhao: 1 },
+    { hora: "11:00", bairros: ["Caixa na Vila"], caminhao: 1 },
+    { hora: "11:30", bairros: ["Mosteiro"], caminhao: 1 },
+    { hora: "12:00", bairros: ["Caixa Ilha Bela"], caminhao: 1 },
+    { hora: "12:10", bairros: ["Harmonia"], caminhao: 1 },
+    { hora: "12:20", bairros: ["Tanque Rede"], caminhao: 1 },
+    { hora: "12:35", bairros: ["Garden"], caminhao: 1 },
+    { hora: "12:55", bairros: ["Marina"], caminhao: 1 },
+    { hora: "13:30", bairros: ["Ilha Bela"], caminhao: 1 },
+    { hora: "13:50", bairros: ["Kaliu Keder"], caminhao: 1 },
+  ],
+
+  // Edite dia a dia aqui embaixo:
+  ter: [
+    { hora: "06:05", bairros: ["Saída da garagem"] },
+    { hora: "06:10", bairros: ["CTG"] },
+    { hora: "06:35", bairros: ["Centro"] },
+    { hora: "07:30", bairros: ["Rocha"] },
+    { hora: "07:50", bairros: ["Caravela"] },
+    { hora: "08:20", bairros: ["SABESP"] },
+    { hora: "09:20", bairros: ["Fogaça"] },
+    { hora: "10:20", bairros: ["Descarrega na Usina"] },
+    { hora: "10:30", bairros: ["Amaral"] },
+    { hora: "10:50", bairros: ["Matadouro"] },
+    { hora: "11:00", bairros: ["Caixa na Vila"] },
+    { hora: "11:30", bairros: ["Mosteiro"] },
+    { hora: "12:00", bairros: ["Caixa Ilha Bela"] },
+    { hora: "12:10", bairros: ["Harmonia"] },
+    { hora: "12:20", bairros: ["Tanque Rede"] },
+    { hora: "12:35", bairros: ["Garden"] },
+    { hora: "12:55", bairros: ["Marina"] },
+    { hora: "13:30", bairros: ["Ilha Bela"] },
+    { hora: "13:50", bairros: ["Kaliu Keder"] },
+  ],
+  qua: [
+  ],
+  qui: [
+     { hora: "06:05", bairros: ["Saída da garagem"] , caminhao: 1},
+    { hora: "06:10", bairros: ["CTG"], caminhao: 1 },
+    { hora: "06:35", bairros: ["Centro"], caminhao: 1 },
+    { hora: "07:30", bairros: ["Rocha"], caminhao: 2 },
+    { hora: "07:50", bairros: ["Caravela"], caminhao: 2  },
+    { hora: "08:20", bairros: ["SABESP"], caminhao: 2  },
+    { hora: "09:20", bairros: ["Fogaça"], caminhao: 2  },
+    { hora: "10:20", bairros: ["Descarrega na Usina"], caminhao: 2  },
+    { hora: "10:30", bairros: ["Amaral"] },
+    { hora: "10:50", bairros: ["Matadouro"] },
+    { hora: "11:00", bairros: ["Caixa na Vila"] },
+    { hora: "11:30", bairros: ["Mosteiro"] },
+    { hora: "12:00", bairros: ["Caixa Ilha Bela"] },
+    { hora: "12:10", bairros: ["Harmonia"] },
+    { hora: "12:20", bairros: ["Tanque Rede"] },
+    { hora: "12:35", bairros: ["Garden"] },
+    { hora: "12:55", bairros: ["Marina"] },
+    { hora: "13:30", bairros: ["Ilha Bela"] },
+    { hora: "13:50", bairros: ["R. Kaliu Keder"] },
+    
+  ],
+  sex: [
+  ],
+  sab: [
+  ],
+  dom: [
+  ],
+
+  // Se quiser um "padrão" pra quando um dia estiver vazio, preencha aqui.
+  // Se não quiser padrão, deixe como []:
+  geral: []
+};
+
+// (Opcional) helper pra você adicionar horários rapidamente no console:
+// addHorario("ter","07:00","Centro","Vila Nova");
+window.addHorario = function (dia, hora, ...bairros) {
+  if (!COLETA_LIXO[dia]) { alert("Dia inválido. Use: seg, ter, qua, qui, sex, sab, dom."); return; }
+  COLETA_LIXO[dia].push({ hora, bairros });
+};
+
+
+
+// Util para ordenar "HH:mm"
+function toMin(hhmm) { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; }
+
+// Renderizador
+function montarPaginaColetaLixo() {
+  // métricas (ok se falhar)
+  try {
+    const hoje = getHojeBR();
+    const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/coletaDeLixo/abrir`);
+    ref.transaction(v => (v || 0) + 1);
+  } catch (e) { console.warn("Métrica coleta:", e); }
+
+  // dia atual
+  const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
+  const hojeKey = dias[new Date().getDay()];
+
+  // UI
+  const html = `
+    <h2 class="highlighted">🧹 Coleta de Lixo</h2>
+    <div class="coleta-wrap">
+      <div class="coleta-header">
+       <!-- AVISO DE ATUALIZAÇÃO -->
+    <div class="coleta-alert">
+      Estamos em atualização. Em breve horários corretos ✅
+    </div>
+        <input id="buscaBairro" type="text" placeholder="Pesquisar bairro.">
+        <select id="seletorDia">
+          
+          <option value="seg">Segunda</option>
+          <option value="ter">Terça</option>
+          <option value="qua">Quarta</option>
+          <option value="qui">Quinta</option>
+          <option value="sex">Sexta</option>
+          <option value="sab">Sábado</option>
+          <option value="dom">Domingo</option>
+        </select>
+        <small class="coleta-aviso-vermelho">** Atenção! São horarios aproximados<br> utilize como referência</small>
+      </div>
+      <div id="coletaGrid" class="coleta-grid"></div>
+    </div>
+  `;
+  document.querySelector(".content_area").innerHTML = html;
+
+  // Atualiza destaque "agora" a cada 60s respeitando o dia escolhido e o filtro de texto
+setInterval(() => {
+  const seletor = document.getElementById("seletorDia");
+  const dia = seletor.value;
+  const base = (COLETA_LIXO[dia] && COLETA_LIXO[dia].length) ? COLETA_LIXO[dia] : COLETA_LIXO.geral;
+
+  const txt = (document.getElementById("buscaBairro").value || "").trim().toLowerCase();
+  const dados = txt
+    ? base.map(item => ({ hora: item.hora, bairros: item.bairros.filter(b => b.toLowerCase().includes(txt)) }))
+          .filter(item => item.bairros.length)
+    : base;
+
+  desenhar(dados, dia);
+}, 60000);
+
+
+  // helpers p/ rótulos/cores
+  const norm = t => (t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  function tipoCard(bloco) {
+    const txt = bloco.bairros.map(norm).join(" | ");
+    if (txt.includes("usina"))   return "apoio";   // "Descarrega na Usina"
+    if (txt.includes("garagem")) return "garagem"; // "Saída da garagem"
+    return "";
+  }
+
+  function desenhar(dados, diaUsado) {
+  const grid = document.getElementById("coletaGrid");
+  grid.innerHTML = "";
+
+  // ordena por horário
+  const ordenado = [...dados].sort((a, b) => {
+    const [h1, m1] = a.hora.split(":").map(Number);
+    const [h2, m2] = b.hora.split(":").map(Number);
+    return h1 * 60 + m1 - (h2 * 60 + m2);
+  });
+
+  // calcula índice "agora" apenas se o dia exibido é o dia atual
+  const dias = ["dom","seg","ter","qua","qui","sex","sab"];
+  const hojeKey = dias[new Date().getDay()];
+  let ativoIdx = -1;
+  if (diaUsado === hojeKey) {
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    for (let i = 0; i < ordenado.length; i++) {
+      const atual = parseInt(ordenado[i].hora.slice(0,2),10) * 60 + parseInt(ordenado[i].hora.slice(3),10);
+      const prox  = (i < ordenado.length - 1)
+        ? parseInt(ordenado[i+1].hora.slice(0,2),10) * 60 + parseInt(ordenado[i+1].hora.slice(3),10)
+        : Infinity;
+      if (nowMin >= atual && nowMin < prox) { ativoIdx = i; break; }
+    }
+  }
+
+  ordenado.forEach((bloco, idx) => {
+  const classeTipo = tipoCard(bloco); // "", "apoio" ou "garagem"
+  const classeAgora = (idx === ativoIdx) ? "agora" : "";
+  const badgeDia = diaUsado ? `<span class="badge-dia">${diaUsado.toUpperCase()}</span>` : "";
+  const rotulo =
+    classeTipo === "apoio"   ? `<span class="coleta-etq">Ponto de apoio (Usina)</span>` :
+    classeTipo === "garagem" ? `<span class="coleta-etq">Garagem</span>` : "";
+
+  // >>> NOVO: chips de caminhão
+  const chipsCaminhao = (() => {
+    // suporte a 3 formatos de dado:
+    // 1) bloco.caminhoes = [1,2]   2) bloco.caminhao = 1    3) sem nada => [1,2] (padrão)
+    let arr = Array.isArray(bloco.caminhoes) ? bloco.caminhoes
+            : (bloco.caminhao ? [bloco.caminhao] : [1,2]);
+    return arr.map(n => `<span class="truck-chip t${n}">Caminhão ${n}</span>`).join("");
+  })();
+
+  const bairrosLi = bloco.bairros.map(b => `<li>${b}</li>`).join("");
+  grid.innerHTML += `
+    <div class="coleta-card ${classeTipo} ${classeAgora}">
+      <div class="coleta-hora">${bloco.hora}${badgeDia}${rotulo}</div>
+
+      <div class="coleta-meta">
+        ${chipsCaminhao}
+      </div>
+
+      <ul class="coleta-bairros">${bairrosLi}</ul>
+    </div>`;
+});
+
+}
+
+  // seleciona HOJE por padrão (se não houver, cai para "geral")
+  const seletor = document.getElementById("seletorDia");
+  const temHoje = COLETA_LIXO[hojeKey] && COLETA_LIXO[hojeKey].length;
+  seletor.value = temHoje ? hojeKey : "geral";
+  desenhar(temHoje ? COLETA_LIXO[hojeKey] : COLETA_LIXO.geral, seletor.value);
+
+  // trocar dia
+  seletor.addEventListener("change", (e)=>{
+    const dia = e.target.value;
+    const base = (COLETA_LIXO[dia] && COLETA_LIXO[dia].length) ? COLETA_LIXO[dia] : COLETA_LIXO.geral;
+    desenhar(base, dia);
+  });
+
+  // busca por bairro
+  document.getElementById("buscaBairro").addEventListener("input", (e)=>{
+    const txt = e.target.value.trim().toLowerCase();
+    const dia = seletor.value;
+    const base = (COLETA_LIXO[dia] && COLETA_LIXO[dia].length) ? COLETA_LIXO[dia] : COLETA_LIXO.geral;
+    const filtrado = base.map(item => ({
+      hora: item.hora,
+      bairros: item.bairros.filter(b => b.toLowerCase().includes(txt))
+    })).filter(item => item.bairros.length);
+    desenhar(filtrado, dia);
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Listener do menu (segue seu padrão)
+document.addEventListener("DOMContentLoaded", () => {
+  const menuColeta = document.getElementById("menuColetaLixo");
+  if (menuColeta) {
+    menuColeta.addEventListener("click", (e) => {
+      e.preventDefault();
+      montarPaginaColetaLixo();
+      // Fecha o menu lateral no mobile, como você já faz nos outros itens
+      const sidebar = document.querySelector(".sidebar");
+      const overlay = document.querySelector("#overlay");
+      if (sidebar && overlay) { sidebar.classList.remove("open"); overlay.classList.remove("active"); }
+    });
+  }
+});
