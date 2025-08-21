@@ -10612,7 +10612,8 @@ const COLETA_LIXO = {
     { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
   ],
   qui: [
-{ hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Bruno" },
     { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
     { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
     { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
@@ -10621,7 +10622,7 @@ const COLETA_LIXO = {
     { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
     { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
     { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
- { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
     { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
     { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
     { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
@@ -10640,7 +10641,8 @@ const COLETA_LIXO = {
     { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
     
   ],
-  sex: [{ hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+  sex: [
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
     { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
     { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
     { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
@@ -10761,10 +10763,33 @@ setInterval(() => {
   const base = (COLETA_LIXO[dia] && COLETA_LIXO[dia].length) ? COLETA_LIXO[dia] : COLETA_LIXO.geral;
 
   const txt = (document.getElementById("buscaBairro").value || "").trim().toLowerCase();
-  const dados = txt
-    ? base.map(item => ({ hora: item.hora, bairros: item.bairros.filter(b => b.toLowerCase().includes(txt)) }))
-          .filter(item => item.bairros.length)
-    : base;
+const norm = s => String(s || "")
+  .toLowerCase()
+  .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // acento-insensível
+
+const txtNorm = norm(txt);
+
+const dados = txt
+  ? base
+      .map(item => {
+        // equipes podem vir em chaves diferentes
+        const eqRaw = item.Equipe ?? item.equipe ?? item.caminhao ?? item.caminhoes;
+        const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
+
+        const matchEquipe  = eqArr.some(v => norm(v).includes(txtNorm));
+        const bairrosOrig  = Array.isArray(item.bairros) ? item.bairros : [];
+        const bairrosFiltr = bairrosOrig.filter(b => norm(b).includes(txtNorm));
+
+        // Se bateu por bairro, mantém só os bairros filtrados;
+        // Se bateu pela equipe, mantém todos os bairros (pra não “sumir” o contexto).
+        if (bairrosFiltr.length || matchEquipe) {
+          return { ...item, bairros: bairrosFiltr.length ? bairrosFiltr : bairrosOrig };
+        }
+        return null;
+      })
+      .filter(Boolean)
+  : base;
+
 
   desenhar(dados, dia);
 }, 60000);
@@ -10779,93 +10804,110 @@ setInterval(() => {
     return "";
   }
 
-  function desenhar(dados, diaUsado) {
+
+
+function desenhar(dados, diaUsado) {
   const grid = document.getElementById("coletaGrid");
+  if (!grid) return;
   grid.innerHTML = "";
 
-  // ordena por horário
+  // --- ordena por horário (HH:MM)
   const ordenado = [...dados].sort((a, b) => {
-    const [h1, m1] = a.hora.split(":").map(Number);
-    const [h2, m2] = b.hora.split(":").map(Number);
-    return h1 * 60 + m1 - (h2 * 60 + m2);
+    const [h1, m1] = String(a.hora || "00:00").split(":").map(Number);
+    const [h2, m2] = String(b.hora || "00:00").split(":").map(Number);
+    return (h1 * 60 + m1) - (h2 * 60 + m2);
   });
 
-  // calcula índice "agora" apenas se o dia exibido é o dia atual
+  // --- índice do "agora" somente se diaUsado == hoje
   const dias = ["dom","seg","ter","qua","qui","sex","sab"];
   const hojeKey = dias[new Date().getDay()];
   let ativoIdx = -1;
   if (diaUsado === hojeKey) {
     const now = new Date();
-    const nowMin = now.getHours() * 60 + now.getMinutes();
-    for (let i = 0; i < ordenado.length; i++) {
-      const atual = parseInt(ordenado[i].hora.slice(0,2),10) * 60 + parseInt(ordenado[i].hora.slice(3),10);
-      const prox  = (i < ordenado.length - 1)
-        ? parseInt(ordenado[i+1].hora.slice(0,2),10) * 60 + parseInt(ordenado[i+1].hora.slice(3),10)
-        : Infinity;
-      if (nowMin >= atual && nowMin < prox) { ativoIdx = i; break; }
-    }
+    const minutos = now.getHours() * 60 + now.getMinutes();
+    ativoIdx = ordenado.findIndex(b => {
+      const [h, m] = String(b.hora || "00:00").split(":").map(Number);
+      return (h * 60 + m) >= minutos;
+    });
   }
 
-  ordenado.forEach((bloco, idx) => {
-  const classeTipo = tipoCard(bloco);           // "", "apoio" ou "garagem" (cores mantidas)
-  const classeAgora = (idx === ativoIdx) ? "agora" : "";
-  const badgeDia = diaUsado ? `<span class="badge-dia">${diaUsado.toUpperCase()}</span>` : "";
-
-
-   // chips de bairros (cada bairro vira um “pill”)
-  const chipsBairros = bloco.bairros.map(b => `<span class="bairro-chip">${b}</span>`).join("");
-
-  const bairrosLi = bloco.bairros.map(b => `<li>${b}</li>`).join("");
-  // Detecta se a equipe do item é "Bruno"
-// Detecta equipes a partir do dado do item
-const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
-const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
-
-const norm = s => String(s).toLowerCase()
-  .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-const hasBruno  = eqArr.some(v => norm(v).includes("bruno"));
-const hasLeonil = eqArr.some(v => {
-  const n = norm(v);
-  return n.includes("leonil") || n.includes("lionil"); // cobre as duas grafias
-});
-
-
-  grid.innerHTML += `
-    <div class="coleta-card ${classeTipo} ${classeAgora} ${hasBruno ? 'eq-bruno-card' : ''} ${hasLeonil ? 'eq-leonil-card' : ''}">
-   <div class="coleta-hora">${bloco.hora}${badgeDia}</div>
-   <div class="coleta-meta">${chipsBairros}</div>
-      <div class="coleta-meta">
-      
-        ${(() => {
-  // pode vir como 'Equipe', 'equipe', 'caminhao' ou 'caminhoes'
-  const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
-  const arr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
-
-  const norm = s => String(s).toLowerCase()
+  // --- util p/ normalizar texto
+  const norm = s => String(s || "")
+    .toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  return arr.map(val => {
-    // monta o texto do chip
-    let label = String(val).trim();
-    const texto = /^equipe/i.test(label)
-      ? label
-      : (isNaN(label) ? `Equipe ${label}` : `Equipe ${val}`);
+  // --- vai ficar lado a lado: esquerda (Leonel) | direita (Bruno)
+  const leftCards  = []; // Leonel / sem equipe
+  const rightCards = []; // Bruno
 
-    // aplica classe especial se contiver "bruno"
-    const extra = norm(texto).includes("bruno") ? "eq-bruno" : "";
-    return `<span class="truck-chip ${extra}">${texto}</span>`;
-  }).join("");
-})()}
+  function buildCard(bloco, idx, extraColClass) {
+    const classeTipo  = (typeof tipoCard === "function") ? tipoCard(bloco) : ""; // "", "apoio", "garagem"
+    const classeAgora = (idx === ativoIdx) ? "agora" : "";
+    const badgeDia    = diaUsado ? `<span class="badge-dia">${diaUsado.toUpperCase()}</span>` : "";
 
+    // chips de bairros
+    const chipsBairros = (bloco.bairros || []).map(b => `<span class="bairro-chip">${b}</span>`).join("");
+
+    // equipe pode vir em chaves diferentes
+    const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
+    const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
+
+    const chipsEquipe = eqArr.map(val => {
+      const label = String(val).trim();
+      const texto = /^equipe/i.test(label) ? label : (isNaN(label) ? `Equipe ${label}` : `Equipe ${val}`);
+      const extra = norm(texto).includes("bruno") ? "eq-bruno" : "";
+      return `<span class="truck-chip ${extra}">${texto}</span>`;
+    }).join("");
+
+    // detecção da equipe
+    const hasBruno  = eqArr.some(v => norm(v).includes("bruno"));
+    const hasLeonel = eqArr.some(v => {
+      const n = norm(v);
+      return n.includes("leonel") || n.includes("leonil") || n.includes("lionil");
+    });
+
+    // classes de borda já usadas no seu CSS
+    const equipeClass = (hasBruno ? "eq-bruno-card " : "") + (hasLeonel ? "eq-leonel-card " : "");
+
+    return `
+      <div class="coleta-card ${extraColClass} ${classeTipo} ${classeAgora} ${equipeClass}">
+        <div class="coleta-hora">${bloco.hora || ""}${badgeDia}</div>
+        <div class="coleta-meta">${chipsBairros}</div>
+        <div class="coleta-meta">${chipsEquipe}</div>
       </div>
-     
-    </div>`;
-});
+    `;
+  }
 
-///////////////
-////////////
+  // --- separa por equipe
+  ordenado.forEach((bloco, idx) => {
+    const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
+    const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
+    const hasBruno  = eqArr.some(v => norm(v).includes("bruno"));
+    const hasLeonel = eqArr.some(v => {
+      const n = norm(v);
+      return n.includes("leonel") || n.includes("leonil") || n.includes("lionil");
+    });
+
+    if (hasLeonel) leftCards.push(  buildCard(bloco, idx, "col-left")  );
+    if (hasBruno)  rightCards.push( buildCard(bloco, idx, "col-right") );
+
+    // sem equipe → vai para a esquerda
+    if (!hasBruno && !hasLeonel) leftCards.push(buildCard(bloco, idx, "col-left"));
+  });
+
+  // --- marca o grid para 2 colunas no desktop
+  grid.classList.add("colunas-por-equipe");
+
+  // --- intercala: [esq1][dir1][esq2][dir2] ... (garante lado a lado linha a linha)
+  let html = "";
+  const max = Math.max(leftCards.length, rightCards.length);
+  for (let i = 0; i < max; i++) {
+    if (leftCards[i])  html += leftCards[i];
+    if (rightCards[i]) html += rightCards[i];
+  }
+  grid.innerHTML = html;
 }
+
 
   // seleciona HOJE por padrão (se não houver, cai para "geral")
   const seletor = document.getElementById("seletorDia");

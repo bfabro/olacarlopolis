@@ -3842,3 +3842,13 @@ html {
   border: 2px solid #1976d2 !important; /* azul */
   box-shadow: 0 2px 8px rgba(25,118,210,.12);
 }
+
+/* === Coleta: âncoras de coluna === */
+.coleta-card.col-left  { grid-column: 1; }
+.coleta-card.col-right { grid-column: 2; }
+
+/* === Coleta: força 2 colunas quando a página marcar === */
+.coleta-grid.colunas-por-equipe { grid-template-columns: 1fr; }
+@media (min-width: 680px){
+  .coleta-grid.colunas-por-equipe { grid-template-columns: 1fr 1fr !important; }
+}
