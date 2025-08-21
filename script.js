@@ -10817,16 +10817,22 @@ setInterval(() => {
 
   const bairrosLi = bloco.bairros.map(b => `<li>${b}</li>`).join("");
   // Detecta se a equipe do item é "Bruno"
+// Detecta equipes a partir do dado do item
 const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
 const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
-const hasBruno = eqArr.some(v =>
-  String(v).toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .includes("bruno")
-);
+
+const norm = s => String(s).toLowerCase()
+  .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+const hasBruno  = eqArr.some(v => norm(v).includes("bruno"));
+const hasLeonil = eqArr.some(v => {
+  const n = norm(v);
+  return n.includes("leonil") || n.includes("lionil"); // cobre as duas grafias
+});
+
 
   grid.innerHTML += `
-    <div class="coleta-card ${classeTipo} ${classeAgora} ${hasBruno ? 'eq-bruno-card' : ''}">
+    <div class="coleta-card ${classeTipo} ${classeAgora} ${hasBruno ? 'eq-bruno-card' : ''} ${hasLeonil ? 'eq-leonil-card' : ''}">
    <div class="coleta-hora">${bloco.hora}${badgeDia}</div>
    <div class="coleta-meta">${chipsBairros}</div>
       <div class="coleta-meta">

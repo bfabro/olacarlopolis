@@ -3836,3 +3836,9 @@ html {
   border: 2px solid #d32f2f !important;
   box-shadow: 0 2px 8px rgba(211,47,47,.12);
 }
+
+/* Card da Equipe Leonil/Lionil: borda azul */
+.coleta-card.eq-leonil-card{
+  border: 2px solid #1976d2 !important; /* azul */
+  box-shadow: 0 2px 8px rgba(25,118,210,.12);
+}
