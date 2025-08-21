@@ -10526,14 +10526,14 @@ window.registrarCliqueBotao = registrarCliqueBotao;
 // Os demais dias ficam prontos pra você editar livremente
 const COLETA_LIXO = {
   seg: [
-    { hora: "06:05", bairros: ["Saída da garagem"], caminhao: 1 },
+    { hora: "06:05", bairros: ["Garagem"], caminhao: 1 },
     { hora: "06:10", bairros: ["CTG"], caminhao: 1 },
     { hora: "06:35", bairros: ["Centro"], caminhao: 1 },
     { hora: "07:10", bairros: ["Rocha"], caminhao: 1 },
     { hora: "07:30", bairros: ["Caravela"], caminhao: 1 },
     { hora: "08:40", bairros: ["SABESP"], caminhao: 1 },
     { hora: "10:00", bairros: ["Fogaça"], caminhao: 1 },
-    { hora: "10:20", bairros: ["Descarrega na Usina"], caminhao: 1 },
+    { hora: "10:20", bairros: ["Usina"], caminhao: 1 },
     { hora: "10:30", bairros: ["Amaral"], caminhao: 1 },
     { hora: "10:50", bairros: ["Matadouro"], caminhao: 1 },
     { hora: "11:00", bairros: ["Caixa na Vila"], caminhao: 1 },
@@ -10549,7 +10549,7 @@ const COLETA_LIXO = {
 
   // Edite dia a dia aqui embaixo:
   ter: [
-    { hora: "06:05", bairros: ["Saída da garagem"] },
+    { hora: "06:05", bairros: ["Garagem"] },
     { hora: "06:10", bairros: ["CTG"] },
     { hora: "06:35", bairros: ["Centro"] },
     { hora: "07:30", bairros: ["Rocha"] },
@@ -10572,14 +10572,14 @@ const COLETA_LIXO = {
   qua: [
   ],
   qui: [
-     { hora: "06:05", bairros: ["Saída da garagem"] , caminhao: 1},
+     { hora: "06:05", bairros: ["Garagem"] , caminhao: 1},
     { hora: "06:10", bairros: ["CTG"], caminhao: 1 },
     { hora: "06:35", bairros: ["Centro"], caminhao: 1 },
     { hora: "07:30", bairros: ["Rocha"], caminhao: 2 },
     { hora: "07:50", bairros: ["Caravela"], caminhao: 2  },
     { hora: "08:20", bairros: ["SABESP"], caminhao: 2  },
     { hora: "09:20", bairros: ["Fogaça"], caminhao: 2  },
-    { hora: "10:20", bairros: ["Descarrega na Usina"], caminhao: 2  },
+    { hora: "10:20", bairros: ["Usina"], caminhao: 2  },
     { hora: "10:30", bairros: ["Amaral"] },
     { hora: "10:50", bairros: ["Matadouro"] },
     { hora: "11:00", bairros: ["Caixa na Vila"] },
@@ -10710,34 +10710,25 @@ setInterval(() => {
   }
 
   ordenado.forEach((bloco, idx) => {
-  const classeTipo = tipoCard(bloco); // "", "apoio" ou "garagem"
+  const classeTipo = tipoCard(bloco);           // "", "apoio" ou "garagem" (cores mantidas)
   const classeAgora = (idx === ativoIdx) ? "agora" : "";
   const badgeDia = diaUsado ? `<span class="badge-dia">${diaUsado.toUpperCase()}</span>` : "";
-  const rotulo =
-    classeTipo === "apoio"   ? `<span class="coleta-etq">Ponto de apoio (Usina)</span>` :
-    classeTipo === "garagem" ? `<span class="coleta-etq">Garagem</span>` : "";
-
-  // >>> NOVO: chips de caminhão
-  const chipsCaminhao = (() => {
-    // suporte a 3 formatos de dado:
-    // 1) bloco.caminhoes = [1,2]   2) bloco.caminhao = 1    3) sem nada => [1,2] (padrão)
-    let arr = Array.isArray(bloco.caminhoes) ? bloco.caminhoes
-            : (bloco.caminhao ? [bloco.caminhao] : [1,2]);
-    return arr.map(n => `<span class="truck-chip t${n}">Caminhão ${n}</span>`).join("");
-  })();
 
   const bairrosLi = bloco.bairros.map(b => `<li>${b}</li>`).join("");
   grid.innerHTML += `
     <div class="coleta-card ${classeTipo} ${classeAgora}">
-      <div class="coleta-hora">${bloco.hora}${badgeDia}${rotulo}</div>
-
+      <div class="coleta-hora">${bloco.hora}${badgeDia}</div>
       <div class="coleta-meta">
-        ${chipsCaminhao}
+        ${(() => {
+          let arr = Array.isArray(bloco.caminhoes) ? bloco.caminhoes
+                  : (bloco.caminhao ? [bloco.caminhao] : [1,2]);
+          return arr.map(n => `<span class="truck-chip t${n}">Caminhão ${n}</span>`).join("");
+        })()}
       </div>
-
       <ul class="coleta-bairros">${bairrosLi}</ul>
     </div>`;
 });
+
 
 }
 

@@ -3758,3 +3758,59 @@ html {
   color: #d32f2f;        /* vermelho */
   font-weight: 700;      /* destaque */
 }
+
+
+/* === Coleta: visual maior e com destaque === */
+.coleta-card{ font-size: 16px; } /* base maior dentro do card */
+
+.coleta-hora{
+  font-size: clamp(24px, 5.5vw, 30px); /* horário bem maior */
+  line-height: 1.1;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.coleta-bairros{
+  margin-top: 8px;
+  padding: 0;
+  list-style: none;              /* remove marcadores */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;                      /* vira “chips” lado a lado */
+}
+
+.coleta-bairros li{
+  font-size: clamp(15px, 3.8vw, 18px); /* bairros maiores */
+  font-weight: 700;                    /* destaque no texto */
+  background: #f6f8ff;                 /* leve realce */
+  border: 1px solid #e0e7ff;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+/* === Coleta: 2 cards por linha (desktop/tablet) === */
+.coleta-grid{
+  display: grid;
+  grid-template-columns: 1fr;          /* 1 por linha no mobile */
+  gap: 12px;
+}
+
+@media (min-width: 680px){
+  .coleta-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));  /* 2 por linha */
+  }
+}
+
+/* Opcional: dar uma “enxugada” no card pra caber melhor em 2 colunas */
+.coleta-card{ padding: 10px; }
+.coleta-bairros{ gap: 6px; }
+/* === Coleta: sempre 2 colunas === */
+.coleta-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px;
+}
+
+/* (opcional) dar uma compactada nos cards, se apertar muito em telas pequenas */
+.coleta-card{ padding: 10px; }
