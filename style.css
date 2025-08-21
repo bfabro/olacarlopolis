@@ -3747,7 +3747,7 @@ html {
   font-weight: 600;
   padding: 2px 10px;
   border-radius: 999px;
-  background: #eef2ff;
+  background: #18fff6;
   border: 1px solid #c7d2fe;
 }
 .truck-chip.t1 { background:#e6f4ff; border-color:#b6e0fe; } /* Caminhão 1 */
@@ -3814,3 +3814,25 @@ html {
 
 /* (opcional) dar uma compactada nos cards, se apertar muito em telas pequenas */
 .coleta-card{ padding: 10px; }
+
+
+
+.truck-chip.eq-bruno{
+  background: #ffe6f2;      /* rosa claro */
+  border-color: #ffb3d1;
+  color: #7a1a43;           /* texto mais escuro */
+}
+
+
+.coleta-meta{ display:flex; flex-wrap:wrap; gap:6px;  margin-top:6px; }
+.bairro-chip{
+  font-size: clamp(15px,3.8vw,18px);
+  font-weight:700;
+  background:#f6f8ff; border:1px solid #e0e7ff;
+  padding:6px 10px; border-radius:10px;
+}
+
+.coleta-card.eq-bruno-card{
+  border: 2px solid #d32f2f !important;
+  box-shadow: 0 2px 8px rgba(211,47,47,.12);
+}

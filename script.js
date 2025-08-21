@@ -10526,76 +10526,173 @@ window.registrarCliqueBotao = registrarCliqueBotao;
 // Os demais dias ficam prontos pra você editar livremente
 const COLETA_LIXO = {
   seg: [
-    { hora: "06:05", bairros: ["Garagem"], caminhao: 1 },
-    { hora: "06:10", bairros: ["CTG"], caminhao: 1 },
-    { hora: "06:35", bairros: ["Centro"], caminhao: 1 },
-    { hora: "07:10", bairros: ["Rocha"], caminhao: 1 },
-    { hora: "07:30", bairros: ["Caravela"], caminhao: 1 },
-    { hora: "08:40", bairros: ["SABESP"], caminhao: 1 },
-    { hora: "10:00", bairros: ["Fogaça"], caminhao: 1 },
-    { hora: "10:20", bairros: ["Usina"], caminhao: 1 },
-    { hora: "10:30", bairros: ["Amaral"], caminhao: 1 },
-    { hora: "10:50", bairros: ["Matadouro"], caminhao: 1 },
-    { hora: "11:00", bairros: ["Caixa na Vila"], caminhao: 1 },
-    { hora: "11:30", bairros: ["Mosteiro"], caminhao: 1 },
-    { hora: "12:00", bairros: ["Caixa Ilha Bela"], caminhao: 1 },
-    { hora: "12:10", bairros: ["Harmonia"], caminhao: 1 },
-    { hora: "12:20", bairros: ["Tanque Rede"], caminhao: 1 },
-    { hora: "12:35", bairros: ["Garden"], caminhao: 1 },
-    { hora: "12:55", bairros: ["Marina"], caminhao: 1 },
-    { hora: "13:30", bairros: ["Ilha Bela"], caminhao: 1 },
-    { hora: "13:50", bairros: ["Kaliu Keder"], caminhao: 1 },
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
+    { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
+    { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Caravela"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
+    { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
+  { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
+    { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
+    { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
+    { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
+    { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
+    { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
+    { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
+    { hora: "11:30", bairros: ["Mosteiro"], Equipe: "Leonil" },
+    { hora: "12:00", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
+    { hora: "12:05", bairros: ["Lazaro"], Equipe: "Bruno" },
+    { hora: "12:10", bairros: ["Harmonia"], Equipe: "Leonil" },
+    { hora: "12:20", bairros: ["Tanque Rede"], Equipe: "Leonil" },
+    { hora: "12:35", bairros: ["Garden"], Equipe: "Leonil" },
+    { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
+    { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
+    { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
   ],
 
   // Edite dia a dia aqui embaixo:
   ter: [
-    { hora: "06:05", bairros: ["Garagem"] },
-    { hora: "06:10", bairros: ["CTG"] },
-    { hora: "06:35", bairros: ["Centro"] },
-    { hora: "07:30", bairros: ["Rocha"] },
-    { hora: "07:50", bairros: ["Caravela"] },
-    { hora: "08:20", bairros: ["SABESP"] },
-    { hora: "09:20", bairros: ["Fogaça"] },
-    { hora: "10:20", bairros: ["Descarrega na Usina"] },
-    { hora: "10:30", bairros: ["Amaral"] },
-    { hora: "10:50", bairros: ["Matadouro"] },
-    { hora: "11:00", bairros: ["Caixa na Vila"] },
-    { hora: "11:30", bairros: ["Mosteiro"] },
-    { hora: "12:00", bairros: ["Caixa Ilha Bela"] },
-    { hora: "12:10", bairros: ["Harmonia"] },
-    { hora: "12:20", bairros: ["Tanque Rede"] },
-    { hora: "12:35", bairros: ["Garden"] },
-    { hora: "12:55", bairros: ["Marina"] },
-    { hora: "13:30", bairros: ["Ilha Bela"] },
-    { hora: "13:50", bairros: ["Kaliu Keder"] },
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
+    { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
+    { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Caravela"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
+    { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
+ { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
+    { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
+    { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
+    { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
+    { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
+    { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
+    { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
+    { hora: "11:30", bairros: ["Mosteiro"], Equipe: "Leonil" },
+    { hora: "12:00", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
+    { hora: "12:05", bairros: ["Lazaro"], Equipe: "Bruno" },
+    { hora: "12:10", bairros: ["Harmonia"], Equipe: "Leonil" },
+    { hora: "12:20", bairros: ["Tanque Rede"], Equipe: "Leonil" },
+    { hora: "12:35", bairros: ["Garden"], Equipe: "Leonil" },
+    { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
+    { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
+    { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
   ],
   qua: [
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
+    { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
+    { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Caravela"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
+    { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
+  { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
+    { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
+    { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
+    { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
+    { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
+    { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
+    { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
+    { hora: "11:30", bairros: ["Mosteiro"], Equipe: "Leonil" },
+    { hora: "12:00", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
+    { hora: "12:05", bairros: ["Lazaro"], Equipe: "Bruno" },
+    { hora: "12:10", bairros: ["Harmonia"], Equipe: "Leonil" },
+    { hora: "12:20", bairros: ["Tanque Rede"], Equipe: "Leonil" },
+    { hora: "12:35", bairros: ["Garden"], Equipe: "Leonil" },
+    { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
+    { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
+    { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
   ],
   qui: [
-     { hora: "06:05", bairros: ["Garagem"] , caminhao: 1},
-    { hora: "06:10", bairros: ["CTG"], caminhao: 1 },
-    { hora: "06:35", bairros: ["Centro"], caminhao: 1 },
-    { hora: "07:30", bairros: ["Rocha"], caminhao: 2 },
-    { hora: "07:50", bairros: ["Caravela"], caminhao: 2  },
-    { hora: "08:20", bairros: ["SABESP"], caminhao: 2  },
-    { hora: "09:20", bairros: ["Fogaça"], caminhao: 2  },
-    { hora: "10:20", bairros: ["Usina"], caminhao: 2  },
-    { hora: "10:30", bairros: ["Amaral"] },
-    { hora: "10:50", bairros: ["Matadouro"] },
-    { hora: "11:00", bairros: ["Caixa na Vila"] },
-    { hora: "11:30", bairros: ["Mosteiro"] },
-    { hora: "12:00", bairros: ["Caixa Ilha Bela"] },
-    { hora: "12:10", bairros: ["Harmonia"] },
-    { hora: "12:20", bairros: ["Tanque Rede"] },
-    { hora: "12:35", bairros: ["Garden"] },
-    { hora: "12:55", bairros: ["Marina"] },
-    { hora: "13:30", bairros: ["Ilha Bela"] },
-    { hora: "13:50", bairros: ["R. Kaliu Keder"] },
+{ hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
+    { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
+    { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Caravela"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
+    { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
+ { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
+    { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
+    { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
+    { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
+    { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
+    { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
+    { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
+    { hora: "11:30", bairros: ["Mosteiro"], Equipe: "Leonil" },
+    { hora: "12:00", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
+    { hora: "12:05", bairros: ["Lazaro"], Equipe: "Bruno" },
+    { hora: "12:10", bairros: ["Harmonia"], Equipe: "Leonil" },
+    { hora: "12:20", bairros: ["Tanque Rede"], Equipe: "Leonil" },
+    { hora: "12:35", bairros: ["Garden"], Equipe: "Leonil" },
+    { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
+    { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
+    { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
     
   ],
-  sex: [
+  sex: [{ hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
+    { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
+    { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Caravela"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
+    { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
+    { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
+    { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
+    { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
+    { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
+    { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
+    { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
+    { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
+    { hora: "11:30", bairros: ["Mosteiro"], Equipe: "Leonil" },
+    { hora: "12:00", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
+    { hora: "12:05", bairros: ["Lazaro"], Equipe: "Bruno" },
+    { hora: "12:10", bairros: ["Harmonia"], Equipe: "Leonil" },
+    { hora: "12:20", bairros: ["Tanque Rede"], Equipe: "Leonil" },
+    { hora: "12:35", bairros: ["Garden"], Equipe: "Leonil" },
+    { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
+    { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
+    { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
   ],
-  sab: [
+  sab: [{ hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
+    { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
+    { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Caravela"], Equipe: "Leonil" },
+    { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
+    { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
+    { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
+    { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
+    { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
+    { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
+    { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
+    { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
+    { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
+    { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
+    { hora: "11:30", bairros: ["Mosteiro"], Equipe: "Leonil" },
+    { hora: "12:00", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
+    { hora: "12:05", bairros: ["Lazaro"], Equipe: "Bruno" },
+    { hora: "12:10", bairros: ["Harmonia"], Equipe: "Leonil" },
+    { hora: "12:20", bairros: ["Tanque Rede"], Equipe: "Leonil" },
+    { hora: "12:35", bairros: ["Garden"], Equipe: "Leonil" },
+    { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
+    { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
+    { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
   ],
   dom: [
   ],
@@ -10650,7 +10747,7 @@ function montarPaginaColetaLixo() {
           <option value="sab">Sábado</option>
           <option value="dom">Domingo</option>
         </select>
-        <small class="coleta-aviso-vermelho">** Atenção! São horarios aproximados<br> utilize como referência</small>
+        <small class="coleta-aviso-vermelho">** Atenção! São horarios aproximados<br> utilize como referência!</small>
       </div>
       <div id="coletaGrid" class="coleta-grid"></div>
     </div>
@@ -10714,22 +10811,54 @@ setInterval(() => {
   const classeAgora = (idx === ativoIdx) ? "agora" : "";
   const badgeDia = diaUsado ? `<span class="badge-dia">${diaUsado.toUpperCase()}</span>` : "";
 
+
+   // chips de bairros (cada bairro vira um “pill”)
+  const chipsBairros = bloco.bairros.map(b => `<span class="bairro-chip">${b}</span>`).join("");
+
   const bairrosLi = bloco.bairros.map(b => `<li>${b}</li>`).join("");
+  // Detecta se a equipe do item é "Bruno"
+const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
+const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
+const hasBruno = eqArr.some(v =>
+  String(v).toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .includes("bruno")
+);
+
   grid.innerHTML += `
-    <div class="coleta-card ${classeTipo} ${classeAgora}">
-      <div class="coleta-hora">${bloco.hora}${badgeDia}</div>
+    <div class="coleta-card ${classeTipo} ${classeAgora} ${hasBruno ? 'eq-bruno-card' : ''}">
+   <div class="coleta-hora">${bloco.hora}${badgeDia}</div>
+   <div class="coleta-meta">${chipsBairros}</div>
       <div class="coleta-meta">
+      
         ${(() => {
-          let arr = Array.isArray(bloco.caminhoes) ? bloco.caminhoes
-                  : (bloco.caminhao ? [bloco.caminhao] : [1,2]);
-          return arr.map(n => `<span class="truck-chip t${n}">Caminhão ${n}</span>`).join("");
-        })()}
+  // pode vir como 'Equipe', 'equipe', 'caminhao' ou 'caminhoes'
+  const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
+  const arr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
+
+  const norm = s => String(s).toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  return arr.map(val => {
+    // monta o texto do chip
+    let label = String(val).trim();
+    const texto = /^equipe/i.test(label)
+      ? label
+      : (isNaN(label) ? `Equipe ${label}` : `Equipe ${val}`);
+
+    // aplica classe especial se contiver "bruno"
+    const extra = norm(texto).includes("bruno") ? "eq-bruno" : "";
+    return `<span class="truck-chip ${extra}">${texto}</span>`;
+  }).join("");
+})()}
+
       </div>
-      <ul class="coleta-bairros">${bairrosLi}</ul>
+     
     </div>`;
 });
 
-
+///////////////
+////////////
 }
 
   // seleciona HOJE por padrão (se não houver, cai para "geral")
