@@ -3715,7 +3715,7 @@ html {
 
 /* Coleta – centralizar controles e destacar "agora" */
 
-.coleta-header #buscaBairro{ min-width: 215px; }
+.coleta-header #buscaBairro{ min-width: 205px; }
 .coleta-header #seletorDia{ min-width: 100px; }
 .coleta-header small{ flex-basis: 100%; text-align: center; }
 
@@ -3908,7 +3908,7 @@ html {
 .coleta-input-wrap .clear-btn:hover{ color: #111827; }
 
 #seletorDia{
-  width: 90%; padding: 12px 14px; font-size: 16px;
+  width: 88%; padding: 12px 14px; font-size: 16px;
   border: 1px solid #d1d5db; border-radius: 10px; background: #fff;
 }
 
@@ -3964,7 +3964,7 @@ html {
 /* ícones mais juntinhos */
 .coleta-header .coleta-input-wrap .input-icon{ left: 10px; }
 .coleta-header .coleta-input-wrap .clear-btn{
-  right: 6px;
+  right: 10px;
   font-size: 18px;
   line-height: 1;
 }
