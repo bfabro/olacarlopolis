@@ -794,11 +794,11 @@ document.addEventListener("DOMContentLoaded", function () {
     passeiociclisticorotary: "s",
     aniversariomclobosdafronteira: "s",
     torneiofutebolsuico: "s",
-    escolhadarainhafrutfest: "s",
+   
     cafedamanharotapr218: "s",
     campeonatodepescaesportivaaotucunare: "s",
     cavalgadadafrutfest: "s",
-    erosprado: "s",
+    
     costeladafogodechao: "s",
 
 
