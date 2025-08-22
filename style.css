@@ -3823,6 +3823,15 @@ html {
   color: #7a1a43;           /* texto mais escuro */
 }
 
+/* Chip da Equipe Leonil/Leonel (azul, combinando com a borda) */
+.truck-chip.eq-leonil,
+.truck-chip.eq-leonel {
+  background: #e8f2ff;     /* azul clarinho */
+  border-color: #bcdcff;   /* contorno azul claro */
+  color: #1455a3;          /* texto azul mais forte */
+}
+
+
 
 .coleta-meta{ display:flex; flex-wrap:wrap; gap:6px;  margin-top:6px; }
 .bairro-chip{
@@ -3838,8 +3847,10 @@ html {
 }
 
 /* Card da Equipe Leonil/Lionil: borda azul */
-.coleta-card.eq-leonil-card{
-  border: 2px solid #1976d2 !important; /* azul */
+/* Card da Equipe Leonil/Leonel: borda azul */
+.coleta-card.eq-leonil-card,
+.coleta-card.eq-leonel-card {
+  border: 2px solid #1976d2 !important;
   box-shadow: 0 2px 8px rgba(25,118,210,.12);
 }
 
@@ -3852,3 +3863,65 @@ html {
 @media (min-width: 680px){
   .coleta-grid.colunas-por-equipe { grid-template-columns: 1fr 1fr !important; }
 }
+
+
+/* === Coleta: Toolbar de filtros (topo) === */
+.coleta-toolbar{
+  position: sticky; /* fica grudado no topo da área de conteúdo */
+  top: 0;           /* a .content_area já tem margem para a navbar */
+  z-index: 5;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,.04);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 680px){
+  .coleta-toolbar{ grid-template-columns: 2fr 1fr; align-items: end; }
+}
+
+.coleta-field label{
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .02em; color: #374151; margin-bottom: 6px;
+}
+
+.coleta-input-wrap{ position: relative; }
+.coleta-input-wrap .input-icon{
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  opacity: .6; pointer-events: none;
+}
+.coleta-input-wrap input{
+  width: 100%;
+  padding: 12px 40px 12px 36px; /* espaço p/ ícone e X */
+  border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px;
+  outline: none;
+}
+.coleta-input-wrap .clear-btn{
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  border: 0; background: transparent; cursor: pointer;
+  font-size: 20px; line-height: 1; color: #9ca3af;
+}
+.coleta-input-wrap .clear-btn:hover{ color: #111827; }
+
+#seletorDia{
+  width: 100%; padding: 12px 14px; font-size: 16px;
+  border: 1px solid #d1d5db; border-radius: 10px; background: #fff;
+}
+
+/* === Coleta: Aviso “horários aproximados” (muito visível) === */
+.coleta-aten{
+  margin-top: 10px;
+  display: flex; align-items: center; gap: 10px;
+  background: #fff7ed;       /* laranja bem claro */
+  color: #7c2d12;            /* marrom/laranja escuro */
+  border: 1px solid #fed7aa; /* contorno */
+  border-left: 6px solid #f97316; /* faixa lateral chamativa */
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 700;
+}
+.coleta-aten i{ font-size: 18px; }

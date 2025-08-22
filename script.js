@@ -10531,27 +10531,42 @@ const COLETA_LIXO = {
     { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
     { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
     { hora: "07:30", bairros: ["Caravela"], Equipe: "Leonil" },
-    { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
     { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
-    { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
-    { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
-  { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
-    { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
-    { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
-    { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
-    { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
-    { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
-    { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
-    { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
-    { hora: "11:30", bairros: ["Mosteiro"], Equipe: "Leonil" },
-    { hora: "12:00", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
-    { hora: "12:05", bairros: ["Lazaro"], Equipe: "Bruno" },
-    { hora: "12:10", bairros: ["Harmonia"], Equipe: "Leonil" },
-    { hora: "12:20", bairros: ["Tanque Rede"], Equipe: "Leonil" },
-    { hora: "12:35", bairros: ["Garden"], Equipe: "Leonil" },
-    { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
-    { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
-    { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
+    { hora: "09:00", bairros: ["Fogaça"], Equipe: "Leonil" },
+    { hora: "09:20", bairros: ["Usina"], Equipe: "Leonil" },
+    { hora: "09:40", bairros: ["Amaral"], Equipe: "Leonil" },
+    { hora: "09:55", bairros: ["Matadouro"], Equipe: "Leonil" },
+    { hora: "10:05", bairros: ["Caixa na Vila Rural"], Equipe: "Leonil" },
+    { hora: "10:10", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
+    { hora: "10:20", bairros: ["Harmonia"], Equipe: "Leonil" },
+    { hora: "10:30", bairros: ["Tanque Rede"], Equipe: "Leonil" },
+    { hora: "10:40", bairros: ["Marina"], Equipe: "Leonil" },
+    { hora: "10:50", bairros: ["Garden"], Equipe: "Leonil" },
+    { hora: "11:15", bairros: ["Ilha Bela"], Equipe: "Leonil" },
+    { hora: "12:00", bairros: ["Mosteiro"], Equipe: "Leonil" },
+    { hora: "12:20", bairros: ["Agua da Limeira"], Equipe: "Leonil" },
+    { hora: "12:30", bairros: ["Bairro dos Diogo"], Equipe: "Leonil" },
+    { hora: "10:50", bairros: ["Pedra de Fogo"], Equipe: "Leonil" },
+    { hora: "11:50", bairros: ["Graciana"], Equipe: "Leonil" },
+    { hora: "11:30", bairros: ["Fazendinha"], Equipe: "Leonil" },
+    { hora: "11:30", bairros: ["Lagoa Azul"], Equipe: "Leonil" },
+    { hora: "11:30", bairros: ["Pedro Salles"], Equipe: "Leonil" },
+    { hora: "13:50", bairros: ["Nova Brasilia"], Equipe: "Leonil" },
+    { hora: "14:00", bairros: ["Caixa 1 Nova Brasilia"], Equipe: "Leonil" },
+    { hora: "14:20", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
+
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Bruno" },
+    { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
+    { hora: "08:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
+    { hora: "08:30", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "09:00", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
+    { hora: "09:30", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
+    { hora: "10:00", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
+    { hora: "10:20", bairros: ["Usina"], Equipe: "Bruno" },
+    { hora: "10:35", bairros: ["Lazaro"], Equipe: "Bruno" },
+    { hora: "12:05", bairros: ["Bairro da Cachoeira"], Equipe: "Bruno" },
+
+
   ],
 
   // Edite dia a dia aqui embaixo:
@@ -10565,7 +10580,7 @@ const COLETA_LIXO = {
     { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
     { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
     { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
- { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
     { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
     { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
     { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
@@ -10593,7 +10608,7 @@ const COLETA_LIXO = {
     { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
     { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
     { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
-  { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+    { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
     { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
     { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
     { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
@@ -10639,7 +10654,7 @@ const COLETA_LIXO = {
     { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
     { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
     { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
-    
+
   ],
   sex: [
     { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
@@ -10656,6 +10671,7 @@ const COLETA_LIXO = {
     { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
     { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
     { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
+    { hora: "10:20", bairros: ["Usina"], Equipe: "Bruno" },
     { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
     { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
     { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
@@ -10670,31 +10686,31 @@ const COLETA_LIXO = {
     { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
   ],
   sab: [{ hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
-    { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
-    { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
-    { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
-    { hora: "07:30", bairros: ["Caravela"], Equipe: "Leonil" },
-    { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
-    { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
-    { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
-    { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
-    { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
-    { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
-    { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
-    { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
-    { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
-    { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
-    { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
-    { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
-    { hora: "11:30", bairros: ["Mosteiro"], Equipe: "Leonil" },
-    { hora: "12:00", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
-    { hora: "12:05", bairros: ["Lazaro"], Equipe: "Bruno" },
-    { hora: "12:10", bairros: ["Harmonia"], Equipe: "Leonil" },
-    { hora: "12:20", bairros: ["Tanque Rede"], Equipe: "Leonil" },
-    { hora: "12:35", bairros: ["Garden"], Equipe: "Leonil" },
-    { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
-    { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
-    { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
+  { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
+  { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
+  { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
+  { hora: "07:30", bairros: ["Caravela"], Equipe: "Leonil" },
+  { hora: "07:30", bairros: ["Murador"], Equipe: "Bruno" },
+  { hora: "08:40", bairros: ["SABESP"], Equipe: "Leonil" },
+  { hora: "10:00", bairros: ["Fogaça"], Equipe: "Leonil" },
+  { hora: "10:00", bairros: ["Vista Alegre"], Equipe: "Bruno" },
+  { hora: "10:10", bairros: ["Novo Horizonte 1"], Equipe: "Bruno" },
+  { hora: "10:30", bairros: ["Novo Horizonte 2"], Equipe: "Bruno" },
+  { hora: "10:50", bairros: ["Novo Horizonte 3"], Equipe: "Bruno" },
+  { hora: "11:10", bairros: ["Novo Horizonte 4"], Equipe: "Bruno" },
+  { hora: "10:20", bairros: ["Usina"], Equipe: "Leonil" },
+  { hora: "10:30", bairros: ["Amaral"], Equipe: "Leonil" },
+  { hora: "10:50", bairros: ["Matadouro"], Equipe: "Leonil" },
+  { hora: "11:00", bairros: ["Caixa na Vila"], Equipe: "Leonil" },
+  { hora: "11:30", bairros: ["Mosteiro"], Equipe: "Leonil" },
+  { hora: "12:00", bairros: ["Caixa Ilha Bela"], Equipe: "Leonil" },
+  { hora: "12:05", bairros: ["Lazaro"], Equipe: "Bruno" },
+  { hora: "12:10", bairros: ["Harmonia"], Equipe: "Leonil" },
+  { hora: "12:20", bairros: ["Tanque Rede"], Equipe: "Leonil" },
+  { hora: "12:35", bairros: ["Garden"], Equipe: "Leonil" },
+  { hora: "12:55", bairros: ["Marina"], Equipe: "Leonil" },
+  { hora: "13:30", bairros: ["Ilha Bela"], Equipe: "Leonil" },
+  { hora: "13:50", bairros: ["Kaliu Keder"], Equipe: "Leonil" },
   ],
   dom: [
   ],
@@ -10730,183 +10746,261 @@ function montarPaginaColetaLixo() {
   const hojeKey = dias[new Date().getDay()];
 
   // UI
-  const html = `
-    <h2 class="highlighted">🧹 Coleta de Lixo</h2>
-    <div class="coleta-wrap">
-      <div class="coleta-header">
-       <!-- AVISO DE ATUALIZAÇÃO -->
-    <div class="coleta-alert">
-      Estamos em atualização. Em breve horários corretos ✅
-    </div>
-        <input id="buscaBairro" type="text" placeholder="Pesquisar bairro.">
-        <select id="seletorDia">
-          
-          <option value="seg">Segunda</option>
-          <option value="ter">Terça</option>
-          <option value="qua">Quarta</option>
-          <option value="qui">Quinta</option>
-          <option value="sex">Sexta</option>
-          <option value="sab">Sábado</option>
-          <option value="dom">Domingo</option>
-        </select>
-        <small class="coleta-aviso-vermelho">** Atenção! São horarios aproximados<br> utilize como referência!</small>
+ const html = `
+  <h2 class="highlighted">🧹 Coleta de Lixo</h2>
+  <div class="coleta-wrap">
+
+    <div class="coleta-header">
+      <!-- Toolbar de filtros (visual + intuitiva) -->
+      <div class="coleta-toolbar" role="region" aria-label="Filtros da coleta">
+
+        <div class="coleta-field">
+          <label for="buscaBairro">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Bairro
+          </label>
+          <div class="coleta-input-wrap">
+            <span class="input-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input id="buscaBairro" type="text" placeholder="Ex.: Centro, Vista Alegre" autocomplete="off" inputmode="search" />
+            <button type="button" id="coletaClear" class="clear-btn" aria-label="Limpar busca">&times;</button>
+          </div>
+        </div>
+
+        <div class="coleta-field">
+          <label for="seletorDia">
+            <i class="fa-regular fa-calendar"></i>
+            Dia
+          </label>
+          <select id="seletorDia">
+            <option value="seg">Segunda</option>
+            <option value="ter">Terça</option>
+            <option value="qua">Quarta</option>
+            <option value="qui">Quinta</option>
+            <option value="sex">Sexta</option>
+            <option value="sab">Sábado</option>
+            <option value="dom">Domingo</option>
+          </select>
+        </div>
+
+      </div><!-- /.coleta-toolbar -->
+
+      <!-- Aviso: horários aproximados (bem chamativo) -->
+      <div class="coleta-aten" role="alert">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span><strong>Atenção!</strong> Os horários são aproximados — use como referência.</span>
       </div>
-      <div id="coletaGrid" class="coleta-grid"></div>
-    </div>
-  `;
+
+      <!-- (Opcional) seu aviso de atualização existente -->
+      <div class="coleta-alert">Estamos em atualização. <br>Em breve horários corretos ✅</div>
+    </div><!-- /.coleta-header -->
+
+    <!-- >>> ESTE CONTAINER É OBRIGATÓRIO PARA OS CARDS APARECEREM <<< -->
+    <div id="coletaGrid" class="coleta-grid"></div>
+
+  </div><!-- /.coleta-wrap -->
+`;
+
   document.querySelector(".content_area").innerHTML = html;
 
+  // Botão "X" para limpar e manter o render funcionando
+const _busca = document.getElementById("buscaBairro");
+const _clear = document.getElementById("coletaClear");
+if (_clear && _busca) {
+  _clear.addEventListener("click", () => {
+    _busca.value = "";
+    _busca.dispatchEvent(new Event("input"));
+    _busca.focus();
+  });
+}
+
+
   // Atualiza destaque "agora" a cada 60s respeitando o dia escolhido e o filtro de texto
-setInterval(() => {
-  const seletor = document.getElementById("seletorDia");
-  const dia = seletor.value;
-  const base = (COLETA_LIXO[dia] && COLETA_LIXO[dia].length) ? COLETA_LIXO[dia] : COLETA_LIXO.geral;
+  setInterval(() => {
+    const seletor = document.getElementById("seletorDia");
+    const dia = seletor.value;
+    const base = (COLETA_LIXO[dia] && COLETA_LIXO[dia].length) ? COLETA_LIXO[dia] : COLETA_LIXO.geral;
 
-  const txt = (document.getElementById("buscaBairro").value || "").trim().toLowerCase();
-const norm = s => String(s || "")
-  .toLowerCase()
-  .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // acento-insensível
+    const txt = (document.getElementById("buscaBairro").value || "").trim().toLowerCase();
+    const norm = s => String(s || "")
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // acento-insensível
 
-const txtNorm = norm(txt);
+    const txtNorm = norm(txt);
 
-const dados = txt
-  ? base
-      .map(item => {
-        // equipes podem vir em chaves diferentes
-        const eqRaw = item.Equipe ?? item.equipe ?? item.caminhao ?? item.caminhoes;
-        const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
+    const dados = txt
+      ? base
+        .map(item => {
+          // equipes podem vir em chaves diferentes
+          const eqRaw = item.Equipe ?? item.equipe ?? item.caminhao ?? item.caminhoes;
+          const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
 
-        const matchEquipe  = eqArr.some(v => norm(v).includes(txtNorm));
-        const bairrosOrig  = Array.isArray(item.bairros) ? item.bairros : [];
-        const bairrosFiltr = bairrosOrig.filter(b => norm(b).includes(txtNorm));
+          const matchEquipe = eqArr.some(v => norm(v).includes(txtNorm));
+          const bairrosOrig = Array.isArray(item.bairros) ? item.bairros : [];
+          const bairrosFiltr = bairrosOrig.filter(b => norm(b).includes(txtNorm));
 
-        // Se bateu por bairro, mantém só os bairros filtrados;
-        // Se bateu pela equipe, mantém todos os bairros (pra não “sumir” o contexto).
-        if (bairrosFiltr.length || matchEquipe) {
-          return { ...item, bairros: bairrosFiltr.length ? bairrosFiltr : bairrosOrig };
-        }
-        return null;
-      })
-      .filter(Boolean)
-  : base;
+          // Se bateu por bairro, mantém só os bairros filtrados;
+          // Se bateu pela equipe, mantém todos os bairros (pra não “sumir” o contexto).
+          if (bairrosFiltr.length || matchEquipe) {
+            return { ...item, bairros: bairrosFiltr.length ? bairrosFiltr : bairrosOrig };
+          }
+          return null;
+        })
+        .filter(Boolean)
+      : base;
 
 
-  desenhar(dados, dia);
-}, 60000);
+    desenhar(dados, dia);
+  }, 300);
 
 
   // helpers p/ rótulos/cores
   const norm = t => (t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   function tipoCard(bloco) {
     const txt = bloco.bairros.map(norm).join(" | ");
-    if (txt.includes("usina"))   return "apoio";   // "Descarrega na Usina"
+    if (txt.includes("usina")) return "apoio";   // "Descarrega na Usina"
     if (txt.includes("garagem")) return "garagem"; // "Saída da garagem"
     return "";
   }
+  // Filtra mantendo equipes (acento-insensível)
+  function filtraDados(base, texto) {
+    const norm = s => String(s || "")
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // remove acentos
 
+    const txtNorm = norm(texto || "");
 
+    if (!txtNorm) return base;
 
-function desenhar(dados, diaUsado) {
-  const grid = document.getElementById("coletaGrid");
-  if (!grid) return;
-  grid.innerHTML = "";
+    return base
+      .map(item => {
+        // equipes podem vir em várias chaves
+        const eqRaw = item.Equipe ?? item.equipe ?? item.caminhao ?? item.caminhoes;
+        const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
 
-  // --- ordena por horário (HH:MM)
-  const ordenado = [...dados].sort((a, b) => {
-    const [h1, m1] = String(a.hora || "00:00").split(":").map(Number);
-    const [h2, m2] = String(b.hora || "00:00").split(":").map(Number);
-    return (h1 * 60 + m1) - (h2 * 60 + m2);
-  });
+        const matchEquipe = eqArr.some(v => norm(v).includes(txtNorm));
+        const bairrosOrig = Array.isArray(item.bairros) ? item.bairros : [];
+        const bairrosFiltr = bairrosOrig.filter(b => norm(b).includes(txtNorm));
 
-  // --- índice do "agora" somente se diaUsado == hoje
-  const dias = ["dom","seg","ter","qua","qui","sex","sab"];
-  const hojeKey = dias[new Date().getDay()];
-  let ativoIdx = -1;
-  if (diaUsado === hojeKey) {
-    const now = new Date();
-    const minutos = now.getHours() * 60 + now.getMinutes();
-    ativoIdx = ordenado.findIndex(b => {
-      const [h, m] = String(b.hora || "00:00").split(":").map(Number);
-      return (h * 60 + m) >= minutos;
-    });
+        // Bateu por bairro → devolve só os bairros filtrados
+        // Bateu por equipe → devolve todos os bairros
+        if (bairrosFiltr.length || matchEquipe) {
+          return { ...item, bairros: bairrosFiltr.length ? bairrosFiltr : bairrosOrig };
+        }
+        return null;
+      })
+      .filter(Boolean);
   }
 
-  // --- util p/ normalizar texto
-  const norm = s => String(s || "")
-    .toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  // --- vai ficar lado a lado: esquerda (Leonel) | direita (Bruno)
-  const leftCards  = []; // Leonel / sem equipe
-  const rightCards = []; // Bruno
 
-  function buildCard(bloco, idx, extraColClass) {
-    const classeTipo  = (typeof tipoCard === "function") ? tipoCard(bloco) : ""; // "", "apoio", "garagem"
-    const classeAgora = (idx === ativoIdx) ? "agora" : "";
-    const badgeDia    = diaUsado ? `<span class="badge-dia">${diaUsado.toUpperCase()}</span>` : "";
+  function desenhar(dados, diaUsado) {
+    const grid = document.getElementById("coletaGrid");
+    if (!grid) return;
+    grid.innerHTML = "";
 
-    // chips de bairros
-    const chipsBairros = (bloco.bairros || []).map(b => `<span class="bairro-chip">${b}</span>`).join("");
-
-    // equipe pode vir em chaves diferentes
-    const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
-    const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
-
-    const chipsEquipe = eqArr.map(val => {
-      const label = String(val).trim();
-      const texto = /^equipe/i.test(label) ? label : (isNaN(label) ? `Equipe ${label}` : `Equipe ${val}`);
-      const extra = norm(texto).includes("bruno") ? "eq-bruno" : "";
-      return `<span class="truck-chip ${extra}">${texto}</span>`;
-    }).join("");
-
-    // detecção da equipe
-    const hasBruno  = eqArr.some(v => norm(v).includes("bruno"));
-    const hasLeonel = eqArr.some(v => {
-      const n = norm(v);
-      return n.includes("leonel") || n.includes("leonil") || n.includes("lionil");
+    // --- ordena por horário (HH:MM)
+    const ordenado = [...dados].sort((a, b) => {
+      const [h1, m1] = String(a.hora || "00:00").split(":").map(Number);
+      const [h2, m2] = String(b.hora || "00:00").split(":").map(Number);
+      return (h1 * 60 + m1) - (h2 * 60 + m2);
     });
 
-    // classes de borda já usadas no seu CSS
-    const equipeClass = (hasBruno ? "eq-bruno-card " : "") + (hasLeonel ? "eq-leonel-card " : "");
+    // --- índice do "agora" somente se diaUsado == hoje
+    const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
+    const hojeKey = dias[new Date().getDay()];
+    let ativoIdx = -1;
+    if (diaUsado === hojeKey) {
+      const now = new Date();
+      const minutos = now.getHours() * 60 + now.getMinutes();
+      ativoIdx = ordenado.findIndex(b => {
+        const [h, m] = String(b.hora || "00:00").split(":").map(Number);
+        return (h * 60 + m) >= minutos;
+      });
+    }
 
-    return `
+    // --- util p/ normalizar texto
+    const norm = s => String(s || "")
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    // --- vai ficar lado a lado: esquerda (Leonel) | direita (Bruno)
+    const leftCards = []; // Leonel / sem equipe
+    const rightCards = []; // Bruno
+
+    function buildCard(bloco, idx, extraColClass) {
+      const classeTipo = (typeof tipoCard === "function") ? tipoCard(bloco) : ""; // "", "apoio", "garagem"
+      const classeAgora = (idx === ativoIdx) ? "agora" : "";
+      const badgeDia = diaUsado ? `<span class="badge-dia">${diaUsado.toUpperCase()}</span>` : "";
+
+      // chips de bairros
+      const chipsBairros = (bloco.bairros || []).map(b => `<span class="bairro-chip">${b}</span>`).join("");
+
+      // equipe pode vir em chaves diferentes
+      const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
+      const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
+
+      const chipsEquipe = eqArr.map(val => {
+        const label = String(val).trim();
+        const texto = /^equipe/i.test(label) ? label : (isNaN(label) ? `Equipe ${label}` : `Equipe ${val}`);
+        const n = norm(texto);
+        let extra = "";
+        if (n.includes("bruno")) {
+          extra = "eq-bruno";
+        } else if (n.includes("leonel") || n.includes("leonil") || n.includes("lionil")) {
+          extra = "eq-leonil";
+        }
+
+        return `<span class="truck-chip ${extra}">${texto}</span>`;
+      }).join("");
+
+      // detecção da equipe
+      const hasBruno = eqArr.some(v => norm(v).includes("bruno"));
+      const hasLeonel = eqArr.some(v => {
+        const n = norm(v);
+        return n.includes("leonel") || n.includes("leonil") || n.includes("lionil");
+      });
+
+      // classes de borda já usadas no seu CSS
+      const equipeClass = (hasBruno ? "eq-bruno-card " : "") + (hasLeonel ? "eq-leonel-card " : "");
+
+      return `
       <div class="coleta-card ${extraColClass} ${classeTipo} ${classeAgora} ${equipeClass}">
         <div class="coleta-hora">${bloco.hora || ""}${badgeDia}</div>
         <div class="coleta-meta">${chipsBairros}</div>
         <div class="coleta-meta">${chipsEquipe}</div>
       </div>
     `;
-  }
+    }
 
-  // --- separa por equipe
-  ordenado.forEach((bloco, idx) => {
-    const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
-    const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
-    const hasBruno  = eqArr.some(v => norm(v).includes("bruno"));
-    const hasLeonel = eqArr.some(v => {
-      const n = norm(v);
-      return n.includes("leonel") || n.includes("leonil") || n.includes("lionil");
+    // --- separa por equipe
+    ordenado.forEach((bloco, idx) => {
+      const eqRaw = bloco.Equipe ?? bloco.equipe ?? bloco.caminhao ?? bloco.caminhoes;
+      const eqArr = Array.isArray(eqRaw) ? eqRaw : (eqRaw != null ? [eqRaw] : []);
+      const hasBruno = eqArr.some(v => norm(v).includes("bruno"));
+      const hasLeonel = eqArr.some(v => {
+        const n = norm(v);
+        return n.includes("leonel") || n.includes("leonil") || n.includes("lionil");
+      });
+
+      if (hasLeonel) leftCards.push(buildCard(bloco, idx, "col-left"));
+      if (hasBruno) rightCards.push(buildCard(bloco, idx, "col-right"));
+
+      // sem equipe → vai para a esquerda
+      if (!hasBruno && !hasLeonel) leftCards.push(buildCard(bloco, idx, "col-left"));
     });
 
-    if (hasLeonel) leftCards.push(  buildCard(bloco, idx, "col-left")  );
-    if (hasBruno)  rightCards.push( buildCard(bloco, idx, "col-right") );
+    // --- marca o grid para 2 colunas no desktop
+    grid.classList.add("colunas-por-equipe");
 
-    // sem equipe → vai para a esquerda
-    if (!hasBruno && !hasLeonel) leftCards.push(buildCard(bloco, idx, "col-left"));
-  });
-
-  // --- marca o grid para 2 colunas no desktop
-  grid.classList.add("colunas-por-equipe");
-
-  // --- intercala: [esq1][dir1][esq2][dir2] ... (garante lado a lado linha a linha)
-  let html = "";
-  const max = Math.max(leftCards.length, rightCards.length);
-  for (let i = 0; i < max; i++) {
-    if (leftCards[i])  html += leftCards[i];
-    if (rightCards[i]) html += rightCards[i];
+    // --- intercala: [esq1][dir1][esq2][dir2] ... (garante lado a lado linha a linha)
+    let html = "";
+    const max = Math.max(leftCards.length, rightCards.length);
+    for (let i = 0; i < max; i++) {
+      if (leftCards[i]) html += leftCards[i];
+      if (rightCards[i]) html += rightCards[i];
+    }
+    grid.innerHTML = html;
   }
-  grid.innerHTML = html;
-}
 
 
   // seleciona HOJE por padrão (se não houver, cai para "geral")
@@ -10916,14 +11010,14 @@ function desenhar(dados, diaUsado) {
   desenhar(temHoje ? COLETA_LIXO[hojeKey] : COLETA_LIXO.geral, seletor.value);
 
   // trocar dia
-  seletor.addEventListener("change", (e)=>{
+  seletor.addEventListener("change", (e) => {
     const dia = e.target.value;
     const base = (COLETA_LIXO[dia] && COLETA_LIXO[dia].length) ? COLETA_LIXO[dia] : COLETA_LIXO.geral;
     desenhar(base, dia);
   });
 
   // busca por bairro
-  document.getElementById("buscaBairro").addEventListener("input", (e)=>{
+  document.getElementById("buscaBairro").addEventListener("input", (e) => {
     const txt = e.target.value.trim().toLowerCase();
     const dia = seletor.value;
     const base = (COLETA_LIXO[dia] && COLETA_LIXO[dia].length) ? COLETA_LIXO[dia] : COLETA_LIXO.geral;
