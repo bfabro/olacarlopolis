@@ -4007,7 +4007,7 @@ html {
   display: block;
   font-weight: 700;
   text-transform: none;        /* sem UPPERCASE */
-  font-size: clamp(14px, 2.1vw, 18px);
+  font-size: clamp(16px, 2.1vw, 18px);
   line-height: 1.15;
   color: #111827;
   margin-bottom: 6px;
