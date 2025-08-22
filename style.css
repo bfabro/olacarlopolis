@@ -3908,7 +3908,7 @@ html {
 .coleta-input-wrap .clear-btn:hover{ color: #111827; }
 
 #seletorDia{
-  width: 88%; padding: 12px 14px; font-size: 16px;
+  width: 100%; padding: 12px 14px; font-size: 16px;
   border: 1px solid #d1d5db; border-radius: 10px; background: #fff;
 }
 
@@ -3999,4 +3999,23 @@ html {
 /* se quiser reduzir um pouco em telas muito estreitas */
 @media (max-width: 360px){
   .coleta-header .coleta-field label{ font-size: 13px; }
+}
+
+
+/* === Coleta: rótulos só com texto, alinhados à esquerda === */
+.coleta-header .coleta-field .coleta-label{
+  display: block;
+  font-weight: 700;
+  text-transform: none;        /* sem UPPERCASE */
+  font-size: clamp(14px, 2.1vw, 18px);
+  line-height: 1.15;
+  color: #111827;
+  margin-bottom: 6px;
+  text-align: left;
+}
+
+/* esconder qualquer ícone antigo e corrigir o padding do input */
+.coleta-header .coleta-input-wrap .input-icon{ display: none !important; }
+.coleta-header .coleta-input-wrap input{
+  padding-left: 12px !important; /* antes havia padding maior por causa do ícone */
 }

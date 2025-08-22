@@ -10819,10 +10819,7 @@ function montarPaginaColetaLixo() {
       <div class="coleta-toolbar" role="region" aria-label="Filtros da coleta">
 
         <div class="coleta-field">
-          <label for="buscaBairro">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            Bairro
-          </label>
+           <label for="buscaBairro" class="coleta-label">Bairro</label>
           <div class="coleta-input-wrap">
             <span class="input-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
             <input id="buscaBairro" type="text" placeholder="Ex.: Vista Alegre" autocomplete="off" inputmode="search" />
@@ -10831,10 +10828,7 @@ function montarPaginaColetaLixo() {
         </div>
 
         <div class="coleta-field">
-          <label for="seletorDia">
-            <i class="fa-regular fa-calendar"></i>
-            Dia
-          </label>
+          <label for="seletorDia" class="coleta-label">Dia</label>
           <select id="seletorDia">
             <option value="seg">Segunda</option>
             <option value="ter">Terça</option>
