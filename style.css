@@ -3715,8 +3715,8 @@ html {
 
 /* Coleta – centralizar controles e destacar "agora" */
 
-.coleta-header #buscaBairro{ min-width: 240px; }
-.coleta-header #seletorDia{ min-width: 180px; }
+.coleta-header #buscaBairro{ min-width: 215px; }
+.coleta-header #seletorDia{ min-width: 100px; }
 .coleta-header small{ flex-basis: 100%; text-align: center; }
 
 .coleta-card.agora{
@@ -3908,7 +3908,7 @@ html {
 .coleta-input-wrap .clear-btn:hover{ color: #111827; }
 
 #seletorDia{
-  width: 100%; padding: 12px 14px; font-size: 16px;
+  width: 90%; padding: 12px 14px; font-size: 16px;
   border: 1px solid #d1d5db; border-radius: 10px; background: #fff;
 }
 
@@ -3925,3 +3925,61 @@ html {
   font-weight: 700;
 }
 .coleta-aten i{ font-size: 18px; }
+
+
+/* === Coleta: "Bairro" + "Dia" na mesma linha (sempre) === */
+.coleta-header .coleta-toolbar{
+  display: grid;
+  grid-template-columns: minmax(0, 62%) minmax(0, 38%); /* 1ª coluna maior p/ o bairro */
+  align-items: end;
+  gap: 8px;
+}
+
+/* evita quebra por largura mínima dos filhos */
+.coleta-header .coleta-field,
+.coleta-header .coleta-input-wrap { min-width: 0; }
+
+.coleta-header .coleta-field label{
+  font-size: 11px;
+  margin-bottom: 4px;
+  letter-spacing: .02em;
+}
+
+/* input menor */
+.coleta-header .coleta-input-wrap input{
+  height: 36px;
+  padding: 8px 32px 8px 30px; /* espaço p/ ícone e botão X */
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+/* select menor */
+.coleta-header #seletorDia{
+  height: 36px;
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+/* ícones mais juntinhos */
+.coleta-header .coleta-input-wrap .input-icon{ left: 10px; }
+.coleta-header .coleta-input-wrap .clear-btn{
+  right: 6px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* telas MUITO estreitas: aperta um pouco mais e mantém lado a lado */
+@media (max-width: 380px){
+  .coleta-header .coleta-toolbar{
+    grid-template-columns: minmax(0, 58%) minmax(0, 42%);
+    gap: 6px;
+  }
+  .coleta-header .coleta-input-wrap input,
+  .coleta-header #seletorDia{
+    height: 32px;
+    font-size: 13px;
+    padding: 6px 28px 6px 28px;
+  }
+  .coleta-header .coleta-field label{ font-size: 10px; }
+}
