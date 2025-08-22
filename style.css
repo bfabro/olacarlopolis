@@ -3715,7 +3715,7 @@ html {
 
 /* Coleta – centralizar controles e destacar "agora" */
 
-.coleta-header #buscaBairro{ min-width: 205px; }
+.coleta-header #buscaBairro{ min-width: 200px; }
 .coleta-header #seletorDia{ min-width: 100px; }
 .coleta-header small{ flex-basis: 100%; text-align: center; }
 
@@ -3982,4 +3982,21 @@ html {
     padding: 6px 28px 6px 28px;
   }
   .coleta-header .coleta-field label{ font-size: 10px; }
+}
+
+
+/* === Coleta: aumentar tamanho dos rótulos "Bairro" e "Dia" === */
+.coleta-header .coleta-field label{
+  font-size: clamp(14px, 2.2vw, 18px); /* maior e responsivo */
+  line-height: 1.1;
+}
+
+/* opcional: deixar o ícone do label um pouco maior também */
+.coleta-header .coleta-field label i{
+  font-size: 1.15em;
+}
+
+/* se quiser reduzir um pouco em telas muito estreitas */
+@media (max-width: 360px){
+  .coleta-header .coleta-field label{ font-size: 13px; }
 }
