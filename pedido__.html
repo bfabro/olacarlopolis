@@ -171,7 +171,15 @@ h2.highlighted {
 }
 .oc-brand:hover{text-decoration:underline}
 .oc-brand small{font-weight:600;color:var(--grey-color,#707070);margin-left:6px}
-</style></head>
+</style>
+<style>
+/* --- Cart visibility improvements --- */
+.oc-cart-line .oc-item-name{font-size:17px; font-weight:800; color:#111;}
+.oc-cart-line .oc-item-desc{font-size:14px; color:#222; margin-top:2px;}
+.oc-cart-line .oc-mini.oc-muted{color:#4b5563;} /* slightly darker for readability */
+</style>
+
+</head>
 <body><div class="oc-page"><div class="oc-brandbar"><div class="logo_item"><a href="index.html" style="  font-size: 1.5rem;
                font-weight: bold;
                color: white;
@@ -364,23 +372,25 @@ h2.highlighted {
   const dd = String(agora.getDate()).padStart(2,"0");
   const HH = String(agora.getHours()).padStart(2,"0");
   const MM = String(agora.getMinutes()).padStart(2,"0");
-  const idLinha = `Pedido - ${yy}${mm}${dd} - ${HH}:${MM}`;
+  const idLinha = `Pedido: ${yy}${mm}${dd} - ${HH}:${MM}`;
 
-  const taxaEntrega = (dados.tipo === 'Entrega')
-    ? (est.taxasEntrega?.[dados.bairroEntrega] || 0) : 0;
+  const taxaEntrega = (dados.tipo === 'Entrega') ? (est.taxasEntrega?.[dados.bairroEntrega] || 0) : 0;
   const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
 
+  // itens: nome em negrito, descrição abaixo, extras/obs; linha em branco ENTRE itens
   const itensTxt = carrinho.map(it => {
     const adds = (it.adicionais || []).map(a => `+${a.nome}`).join(', ');
-    const obs  = it.obs ? `[${it.obs}]` : '';
-    const addsTxt = adds ? ` [${adds}]` : '';
-    return `- ${it.qtd}x ${it.nome} (${money(it.preco)})${addsTxt} ${obs}`.trim();
-  }).join('\n');
+    const obs  = it.obs ? ` [${it.obs}]` : '';
+    const linha1 = `• ${it.qtd}x *${it.nome}* (${money(it.preco)})`;
+    const linha2 = it.desc ? `   - ${it.desc}` : null;
+    const linha3 = adds ? `   - ${adds}` : null;
+    const linha4 = obs ? `   -${obs}` : null;
+    return [linha1, linha2, linha3, linha4].filter(Boolean).join('\n');
+  }).join('\n\n'); // << linha em branco entre cada item
 
   // 1) Dados do cliente
   const linhasCliente = [];
   linhasCliente.push(idLinha);
-//  linhasCliente.push(`Loja: ${est.nome}`);
   linhasCliente.push(`Cliente: ${dados.nome || '-'}`);
   linhasCliente.push(`Tel: ${dados.telefone || '-'}`);
   if (MESA) linhasCliente.push(`Mesa: ${MESA}`);
@@ -392,10 +402,10 @@ h2.highlighted {
     linhasCliente.push('Retirada no balcão');
   }
 
-  // 2) Informações do pedido
-  const linhasPedido = ['Itens:', itensTxt];
+  // 2) Informações do pedido (linha vazia após o título)
+  const linhasPedido = ['Itens do Pedido:', '', itensTxt];
 
-  // 3) Valores do pedido
+  // 3) Valores
   const linhasValores = ['Valores do Pedido:', `Subtotal: ${money(subtotal)}`];
   if (taxaEntrega) linhasValores.push(`Taxa (${dados.bairroEntrega}): ${money(taxaEntrega)}`);
   linhasValores.push(`Total: ${money(total)}`);
@@ -406,11 +416,12 @@ h2.highlighted {
     linhasCliente.join('\n'),
     linhasPedido.join('\n'),
     linhasValores.join('\n'),
-    `Origem: ola carlopolis`
+    `Origem: Ola Carlopolis`
   ];
 
-  return partes.join('\n\n'); // <-- linhas em branco entre seções
+  return partes.join('\n\n'); // linhas em branco entre as seções
 }
+
 
 
     function enviarPedido(est, carrinho, dados) {
@@ -517,7 +528,8 @@ h2.highlighted {
             <button aria-label="aumentar">+</button>
           </div>
           <div>
-            <div><strong>${it.nome}</strong></div>
+            <div class="oc-item-name"><strong>${it.nome}</strong></div>
+            ${it.desc ? `<div class="oc-item-desc">${it.desc}</div>` : ''}
             <div class="oc-mini oc-muted">${adds}${obs}</div>
           </div>
           <div><strong>${money((it.preco + (it.adicionais||[]).reduce((a,x)=>a+x.preco,0)) * it.qtd)}</strong></div>

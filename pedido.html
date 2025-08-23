@@ -171,7 +171,15 @@ h2.highlighted {
 }
 .oc-brand:hover{text-decoration:underline}
 .oc-brand small{font-weight:600;color:var(--grey-color,#707070);margin-left:6px}
-</style></head>
+</style>
+<style>
+/* --- Cart visibility improvements --- */
+.oc-cart-line .oc-item-name{font-size:17px; font-weight:800; color:#111;}
+.oc-cart-line .oc-item-desc{font-size:14px; color:#222; margin-top:2px;}
+.oc-cart-line .oc-mini.oc-muted{color:#4b5563;} /* slightly darker for readability */
+</style>
+
+</head>
 <body><div class="oc-page"><div class="oc-brandbar"><div class="logo_item"><a href="index.html" style="  font-size: 1.5rem;
                font-weight: bold;
                color: white;
@@ -278,9 +286,9 @@ h2.highlighted {
      * CONFIG EXEMPLO  *
      *******************/
     const EST = {
-      slug: "burger-do-centro",
+      slug: "Ki Dog",
       nome: "Ki Dog",
-      whatsapp: "43 99999-9999",
+      whatsapp: "11 998985930",
       descricao: "Atendemos Carlópolis e região. Taxas por bairro e retirada no balcão.",
       horarios: { // use 24h HH:MM-HH:MM. Dias: dom, seg, ter, qua, qui, sex, sab
         seg: "18:00-23:00",
@@ -288,7 +296,7 @@ h2.highlighted {
         qua: "18:00-23:00",
         qui: "18:00-23:00",
         sex: "18:00-00:30",
-        sab: "18:00-00:30",
+        sab: "14:00-00:30",
         dom: "18:00-23:00"
       },
       taxasEntrega: { "Centro": 3.0, "Vila Nova": 5.0, "Jardim América": 6.0 },
@@ -358,45 +366,64 @@ h2.highlighted {
     }
 
     function montarTextoPedido(est, carrinho, dados) {
-      const agora = new Date();
-      const id = `${est.nome.split(' ')[0].toUpperCase().slice(0,3)}-${String(agora.getFullYear()).slice(2)}${String(agora.getMonth()+1).padStart(2,"0")}${String(agora.getDate()).padStart(2,"0")}-${String(agora.getHours()).padStart(2,"0")}${String(agora.getMinutes()).padStart(2,"0")}`;
+  const agora = new Date();
+  const yy = String(agora.getFullYear()).slice(2);
+  const mm = String(agora.getMonth()+1).padStart(2,"0");
+  const dd = String(agora.getDate()).padStart(2,"0");
+  const HH = String(agora.getHours()).padStart(2,"0");
+  const MM = String(agora.getMinutes()).padStart(2,"0");
+  const idLinha = `Pedido: ${yy}${mm}${dd} - ${HH}:${MM}`;
 
-      const taxaEntrega = (dados.tipo === 'Entrega')
-        ? (est.taxasEntrega?.[dados.bairroEntrega] || 0)
-        : 0;
+  const taxaEntrega = (dados.tipo === 'Entrega') ? (est.taxasEntrega?.[dados.bairroEntrega] || 0) : 0;
+  const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
 
-      const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
+  // itens: nome em negrito, descrição abaixo, extras/obs; linha em branco ENTRE itens
+  const itensTxt = carrinho.map(it => {
+    const adds = (it.adicionais || []).map(a => `+${a.nome}`).join(', ');
+    const obs  = it.obs ? ` [${it.obs}]` : '';
+    const linha1 = `• ${it.qtd}x *${it.nome}* (${money(it.preco)})`;
+    const linha2 = it.desc ? `   - ${it.desc}` : null;
+    const linha3 = adds ? `   - ${adds}` : null;
+    const linha4 = obs ? `   -${obs}` : null;
+    return [linha1, linha2, linha3, linha4].filter(Boolean).join('\n');
+  }).join('\n\n'); // << linha em branco entre cada item
 
-      const itensTxt = carrinho.map(it => {
-        const adds = (it.adicionais || []).map(a => `+${a.nome}`).join(', ');
-        const obs  = it.obs ? `[${it.obs}]` : '';
-        const addsTxt = adds ? ` [${adds}]` : '';
-        return `- ${it.qtd}x ${it.nome} (${money(it.preco)})${addsTxt} ${obs}`.trim();
-      }).join('\n');
+  // 1) Dados do cliente
+  const linhasCliente = [];
+  linhasCliente.push(idLinha);
+  linhasCliente.push('');
+linhasCliente.push(`Cliente: ${dados.nome || '-'}`);
+  linhasCliente.push(`Tel: ${dados.telefone || '-'}`);
+  if (MESA) linhasCliente.push(`Mesa: ${MESA}`);
+  linhasCliente.push(`Tipo: ${dados.tipo}`);
+  if (dados.tipo === 'Entrega') {
+    linhasCliente.push(`Bairro: ${dados.bairroEntrega}`);
+    linhasCliente.push(`Endereço: ${dados.endereco}${dados.referencia?` (${dados.referencia})`:''}`);
+  } else {
+    linhasCliente.push('Retirada no balcão');
+  }
 
-      const enderecoTxt = (dados.tipo === 'Entrega')
-        ? `Bairro: ${dados.bairroEntrega}\nEndereço: ${dados.endereco}${dados.referencia?` (${dados.referencia})`:''}\n`
-        : `Retirada no balcão\n`;
+  // 2) Informações do pedido (linha vazia após o título)
+  const linhasPedido = ['Itens do Pedido:', '', itensTxt];
 
-      const mesaTxt = MESA ? `Mesa: ${MESA}\n` : '';
+  // 3) Valores
+  const linhasValores = ['Valores do Pedido:', `Subtotal: ${money(subtotal)}`];
+  if (taxaEntrega) linhasValores.push(`Taxa (${dados.bairroEntrega}): ${money(taxaEntrega)}`);
+  linhasValores.push(`Total: ${money(total)}`);
+  linhasValores.push(`Pagamento: ${dados.pagamento || '-'}`);
+  if (dados.obsGeral) linhasValores.push(`Obs: ${dados.obsGeral}`);
 
-      return [
-        `Pedido #${id}`,
-        `Loja: ${est.nome}`,
-        `Tipo: ${dados.tipo}`,
-        mesaTxt + enderecoTxt + `Cliente: ${dados.nome || '-'} • Tel: ${dados.telefone || '-'}`,
-        ``,
-        `Itens:\n${itensTxt}`,
-        ``,
-        `Subtotal: ${money(subtotal)}`,
-        (taxaEntrega? `Taxa (${dados.bairroEntrega}): ${money(taxaEntrega)}` : null),
-        `Total: ${money(total)}`,
-        `Pagamento: ${dados.pagamento || '-'}`,
-        (dados.obsGeral ? `Obs: ${dados.obsGeral}` : null),
-        ``,
-        `Origem: olacarlopolis.com/lanches/${est.slug}${UTM ? ` (utm=${UTM})` : ''}`
-      ].filter(Boolean).join('\n');
-    }
+  const partes = [
+    linhasCliente.join('\n'),
+    linhasPedido.join('\n'),
+    linhasValores.join('\n'),
+    `Origem: Ola Carlopolis`
+  ];
+
+  return partes.join('\n\n'); // linhas em branco entre as seções
+}
+
+
 
     function enviarPedido(est, carrinho, dados) {
       if (!carrinho?.length) { alert('Seu carrinho está vazio.'); return; }
@@ -408,19 +435,13 @@ h2.highlighted {
         }
       }
       const texto = montarTextoPedido(est, carrinho, dados);
-      const url = `https://wa.me/${normalizePhone(est.whatsapp)}?text=${encodeURIComponent(texto)}`;
-
-      // (Opcional) salvar stub do pedido (Firebase) – descomente e ajuste
-      // firebase.database().ref(`pedidos/${Date.now()}`).set({
-      //   loja: est.slug,
-      //   totalEstimado: calcularTotais(carrinho).total,
-      //   tipo: dados.tipo,
-      //   bairro: dados.bairroEntrega || null,
-      //   mesa: MESA || null,
-      //   origem: UTM || 'direct'
-      // });
-
-      window.open(url, '_blank');
+      const urlEst = `https://wa.me/${normalizePhone(est.whatsapp)}?text=${encodeURIComponent(texto)}`;
+      window.open(urlEst, '_blank');
+      // Send a copy to the customer if they provided a phone
+      if (dados.telefone && dados.telefone.trim()) {
+        const urlCli = `https://wa.me/${normalizePhone(dados.telefone)}?text=${encodeURIComponent(texto)}`;
+        setTimeout(() => window.open(urlCli, '_blank'), 800);
+      }
     }
 
     /*******************
@@ -502,7 +523,8 @@ h2.highlighted {
             <button aria-label="aumentar">+</button>
           </div>
           <div>
-            <div><strong>${it.nome}</strong></div>
+            <div class="oc-item-name"><strong>${it.nome}</strong></div>
+            ${it.desc ? `<div class="oc-item-desc">${it.desc}</div>` : ''}
             <div class="oc-mini oc-muted">${adds}${obs}</div>
           </div>
           <div><strong>${money((it.preco + (it.adicionais||[]).reduce((a,x)=>a+x.preco,0)) * it.qtd)}</strong></div>
