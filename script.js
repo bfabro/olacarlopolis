@@ -8208,6 +8208,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Benedito Salles, 365 - Carlopolis",
             contact: "(43) 99832-3050",
             delivery: "Sim / Sem Taxa",
+              novidadesImages: [
+              "images/comercios/restaurante/saborRoca/divulgacao/1.jpg",
+              ],
+
+               novidadesDescriptions: [
+              "Nosso Buffet",
+          
+            ],
 
           },
 
