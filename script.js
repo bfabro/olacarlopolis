@@ -798,7 +798,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cafedamanharotapr218: "s",
     campeonatodepescaesportivaaotucunare: "s",
     cavalgadadafrutfest: "s",
-    
+    erosprado: "s",
     costeladafogodechao: "s",
 
 
@@ -5805,15 +5805,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-          {
-            image: "images/informacoes/eventos/erosPrado.jpg",
-            name: "Eros Prado",
-            date: "24/08/2025",
-            address: "Thac Thal",
-            contact: "(43) 99667-4021",
-            instagram: "https://www.instagram.com/clubevaledossonhos/",
-            infoAdicional: "Se prepara que o riso vai ser garantido! 😂<br>Eros Prado, direto do “Pagode da Ofensa”, tá chegando no nosso palco com aquele stand up que não perdoa ninguém!<br> Adquira teu ingresso aqui: <a target='_blank' style='color:#2da6ff;' href='https://ingressosweb.com.br/shop/eros-prado/stand-up-eros-prado'>Comprar Ingresso</a>"
-          },
+          
 
 
           {
@@ -5923,6 +5915,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+          },
+
+          {
+            image: "images/informacoes/eventos/erosPrado.jpg",
+            name: "Eros Prado",
+            date: "16/11/2025",
+            address: "Thac Thal",
+            contact: "(43) 99667-4021",
+            instagram: "https://www.instagram.com/clubevaledossonhos/",
+            infoAdicional: "Se prepara que o riso vai ser garantido! 😂<br>Eros Prado, direto do “Pagode da Ofensa”, tá chegando no nosso palco com aquele stand up que não perdoa ninguém!<br> Adquira teu ingresso aqui: <a target='_blank' style='color:#2da6ff;' href='https://ingressosweb.com.br/shop/eros-prado/stand-up-eros-prado'>Comprar Ingresso</a>"
           },
 
 
