@@ -1,11 +1,24 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Lanches – Pedido por WhatsApp (MVP)</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lanches – Pedido por WhatsApp (MVP)</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card: #171a20;
+      --muted: #96a0b5;
+      --text: #e7ecf3;
+      --brand: #4f8cff;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --chip: #243044;
+      --chip-text: #cfe0ff;
+      --border: #242a35;
+    }
+    html, body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
     * { box-sizing: border-box; }
 
     .oc-lanches-wrap { max-width: 1100px; margin: 24px auto; padding: 16px; }
@@ -64,222 +77,114 @@
 
     .oc-muted { color: var(--muted); }
   </style>
-<link href="style.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;family=Montserrat:wght@800&amp;display=swap" rel="stylesheet"/><style>
-/* --- Overrides to match Olá Carlópolis theme --- */
-:root {
-  /* use site variables from style.css if present */
-  --oc-card-bg: var(--white-color, #fff);
-  --oc-border: rgba(0,0,0,0.08);
-  --oc-text: #222;
-  --oc-muted: var(--grey-color, #707070);
-  --oc-brand: var(--blue-color, #4070f4);
-  --oc-ok: #25D366; /* WhatsApp green */
-}
-body {
-  background: #f4f4f4; /* matches .content_area bg in site */
-  color: var(--oc-text);
-  font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-}
+</head>
+<body>
+  <div class="oc-lanches-wrap" id="app">
+    <div class="oc-grid">
+      <!-- COLUNA ESQ: Produtos -->
+      <section class="oc-card">
+        <div class="oc-row">
+          <h2 class="oc-title" id="est-name">Loja</h2>
+          <span id="openBadge" class="oc-badge warn">Verificando horário…</span>
+        </div>
+        <div class="oc-sub" id="est-desc">Monte seu pedido e envie por WhatsApp. O pedido só é confirmado após resposta da loja.</div>
 
-/* Container aligns with site .content_area spacing */
-.oc-page {
-  margin: 12px auto 24px auto;
-  padding: 0 12px;
-  max-width: 1200px;
-}
+        <div class="oc-field">
+          <label>Como você quer receber?</label>
+          <div class="oc-flex cols-2">
+            <select id="tipoPedido">
+              <option value="Entrega">Entrega</option>
+              <option value="Retirada">Retirada</option>
+            </select>
+            <select id="bairroSelect"></select>
+          </div>
+        </div>
+        <div id="enderecoFields" class="oc-flex cols-2">
+          <div class="oc-field">
+            <label>Endereço</label>
+            <input id="endereco" type="text" placeholder="Rua, número, complemento" />
+          </div>
+          <div class="oc-field">
+            <label>Referência (opcional)</label>
+            <input id="referencia" type="text" placeholder="Portaria, bloco, ponto de referência" />
+          </div>
+        </div>
 
-/* Card look like site cards */
-.oc-card {
-  background: var(--oc-card-bg) !important;
-  border: 1px solid var(--oc-border) !important;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-  border-radius: 14px !important;
-}
+        <div class="oc-prod-list" id="prodList"></div>
+      </section>
 
-/* Headings use Montserrat heavy like site highlights */
-.oc-title, h3.oc-title {
-  font-family: "Montserrat", "Poppins", sans-serif;
-  font-weight: 800;
-  letter-spacing: .3px;
-  color: #111;
-}
+      <!-- COLUNA DIR: Carrinho & Envio -->
+      <aside class="oc-card oc-cart">
+        <h3 class="oc-title">Seu pedido</h3>
+        <div id="cartContainer" class="oc-cart-empty">Seu carrinho está vazio.</div>
 
-.oc-sub { color: var(--oc-muted) !important; }
+        <div class="oc-field oc-flex cols-2" style="margin-top:12px;">
+          <div>
+            <label>Seu nome</label>
+            <input id="cliNome" type="text" placeholder="Seu nome" />
+          </div>
+          <div>
+            <label>Seu telefone</label>
+            <input id="cliFone" type="tel" placeholder="(43) 9xxxx-xxxx" />
+          </div>
+        </div>
+        <div class="oc-field">
+          <label>Forma de pagamento</label>
+          <select id="pagamento">
+            <option value="PIX">PIX</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartão">Cartão</option>
+          </select>
+        </div>
+        <div class="oc-field">
+          <label>Observações gerais (opcional)</label>
+          <textarea id="obsGeral" rows="2" placeholder="Ex.: Coca bem gelada; sem pimenta"></textarea>
+        </div>
 
-/* Product cards */
-.oc-prod {
-  background: #fff !important;
-  border: 1px solid var(--oc-border) !important;
-}
-.oc-price { color: #111; }
+        <div class="oc-cart-totals" id="totalsBox"></div>
+        <button id="btnEnviar" class="oc-send" disabled>Enviar pedido pelo WhatsApp</button>
+        <div class="oc-mini oc-muted" id="minimoMsg"></div>
+      </aside>
+    </div>
+  </div>
 
-/* Buttons */
-.oc-add {
-  background: var(--oc-brand) !important;
-  transition: transform .06s ease, filter .2s ease;
-}
-.oc-add:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  <!-- Modal item/adicionais -->
+  <dialog class="oc-modal" id="itemModal">
+    <header>
+      <strong id="mNome">Item</strong>
+      <button class="oc-btn-sec" onclick="document.getElementById('itemModal').close()">Fechar</button>
+    </header>
+    <div class="oc-content">
+      <div class="oc-muted" id="mDesc"></div>
+      <div style="margin-top:10px;">
+        <div style="margin:8px 0 6px; font-weight:700;">Adicionais</div>
+        <div id="mAdds"></div>
+      </div>
+      <div class="oc-field" style="margin-top:8px;">
+        <label>Observações</label>
+        <input id="mObs" type="text" placeholder="Ex.: sem cebola, ponto da carne" />
+      </div>
+      <div class="oc-row" style="margin-top:10px;">
+        <div class="oc-qty">
+          <button id="mMenos">−</button>
+          <span id="mQtd">1</span>
+          <button id="mMais">+</button>
+        </div>
+        <div class="oc-right"><span class="oc-muted">Subtotal item: </span><strong id="mSubtotal">R$ 0,00</strong></div>
+      </div>
+    </div>
+    <div class="oc-actions">
+      <button class="oc-btn-pri" id="mAddBtn">Adicionar ao carrinho</button>
+    </div>
+  </dialog>
 
-.oc-send {
-  background: var(--oc-ok) !important;
-  color: #053b1a !important;
-  box-shadow: 0 8px 18px rgba(37,211,102,.25);
-  transition: transform .06s ease, filter .2s ease;
-}
-.oc-send:hover { transform: translateY(-1px); filter: brightness(1.05); }
-
-/* Inputs to match site rounded white inputs */
-.oc-field input, .oc-field select, .oc-field textarea {
-  background: #fff !important;
-  border: 1px solid var(--oc-border) !important;
-  color: #222 !important;
-  border-radius: 12px !important;
-}
-
-/* Badges tuned to site palette */
-.oc-badge { background: #eef3ff !important; color: #2f4fa8 !important; border: 1px solid #dfe7ff !important; }
-.oc-badge.ok { background: #e8f7ef !important; color: #1c7d43 !important; border-color: #cdeedb !important; }
-.oc-badge.danger { background: #fff1f1 !important; color: #9b1c1c !important; border-color: #ffd6d6 !important; }
-.oc-badge.warn { background: #fff6e8 !important; color: #8a5700 !important; border-color: #ffe3ba !important; }
-
-/* Grid tweaks for tighter look */
-.oc-lanches-wrap { padding: 0 !important; }
-.oc-grid { gap: 18px !important; }
-.oc-cart { top: 88px !important; } /* keep sticky under navbar */
-
-/* Modal polish */
-dialog.oc-modal {
-  background: #fff !important;
-  color: #111 !important;
-  border: 1px solid var(--oc-border) !important;
-  box-shadow: 0 20px 50px rgba(0,0,0,.18);
-}
-.oc-btn-sec { background:#fff !important; border:1px solid var(--oc-border) !important; }
-.oc-btn-pri { background: var(--oc-brand) !important; }
-
-/* Highlight title like site .highlighted */
-h2.highlighted {
-  font-family: "Montserrat", "Poppins", sans-serif;
-  margin: 0 0 12px 0;
-}
-</style><style>
-/* Brand bar - Olá Carlópolis */
-.oc-brandbar{display:flex;align-items:center;gap:10px;margin:0 0 8px 0}
-.oc-brand{font-family:"Montserrat","Poppins",sans-serif;font-weight:800;
-  color: var(--blue-color, #4070f4); text-decoration:none; font-size:1.15rem;
-  text-shadow: 0 0 5px rgba(64,112,244,.15);
-}
-.oc-brand:hover{text-decoration:underline}
-.oc-brand small{font-weight:600;color:var(--grey-color,#707070);margin-left:6px}
-</style></head>
-<body><div class="oc-page"><div class="oc-brandbar"><div class="logo_item"><a href="index.html" style="  font-size: 1.5rem;
-               font-weight: bold;
-               color: white;
-               text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 12px var(--blue-color);
-               margin :0px 0px 0px 40px">Olá Carlópolis
-            </a></div></div><h2 class="highlighted">🍔 Pedido Online 🍔 <span style="  font-size: 1.5rem;
-               font-weight: bold;
-               color: white;
-               text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 12px var(--blue-color);
-               margin :0px 0px 0px 40px"></span></h2><div class="oc-lanches-wrap" id="app">
-<div class="oc-grid">
-<!-- COLUNA ESQ: Produtos -->
-<section class="oc-card">
-<div class="oc-row">
-<h2 class="oc-title" id="est-name">Loja</h2>
-<span class="oc-badge warn" id="openBadge">Verificando horário…</span>
-</div>
-<div class="oc-sub" id="est-desc">Monte seu pedido e envie por WhatsApp. O pedido só é confirmado após resposta da loja.</div>
-<div class="oc-field">
-<label>Como você quer receber?</label>
-<div class="oc-flex cols-2">
-<select id="tipoPedido">
-<option value="Entrega">Entrega</option>
-<option value="Retirada">Retirada</option>
-</select>
-<select id="bairroSelect"></select>
-</div>
-</div>
-<div class="oc-flex cols-2" id="enderecoFields">
-<div class="oc-field">
-<label>Endereço</label>
-<input id="endereco" placeholder="Rua, número, complemento" type="text"/>
-</div>
-<div class="oc-field">
-<label>Referência (opcional)</label>
-<input id="referencia" placeholder="Portaria, bloco, ponto de referência" type="text"/>
-</div>
-</div>
-<div class="oc-prod-list" id="prodList"></div>
-</section>
-<!-- COLUNA DIR: Carrinho & Envio -->
-<aside class="oc-card oc-cart">
-<h3 class="oc-title">Seu pedido</h3>
-<div class="oc-cart-empty" id="cartContainer">Seu carrinho está vazio.</div>
-<div class="oc-field oc-flex cols-2" style="margin-top:12px;">
-<div>
-<label>Seu nome</label>
-<input id="cliNome" placeholder="Seu nome" type="text"/>
-</div>
-<div>
-<label>Seu telefone</label>
-<input id="cliFone" placeholder="(43) 9xxxx-xxxx" type="tel"/>
-</div>
-</div>
-<div class="oc-field">
-<label>Forma de pagamento</label>
-<select id="pagamento">
-<option value="PIX">PIX</option>
-<option value="Dinheiro">Dinheiro</option>
-<option value="Cartão">Cartão</option>
-</select>
-</div>
-<div class="oc-field">
-<label>Observações gerais (opcional)</label>
-<textarea id="obsGeral" placeholder="Ex.: Coca bem gelada; sem pimenta" rows="2"></textarea>
-</div>
-<div class="oc-cart-totals" id="totalsBox"></div>
-<button class="oc-send" disabled="" id="btnEnviar">Enviar pedido pelo WhatsApp</button>
-<div class="oc-mini oc-muted" id="minimoMsg"></div>
-</aside>
-</div>
-</div></div>
-<!-- Modal item/adicionais -->
-<dialog class="oc-modal" id="itemModal">
-<header>
-<strong id="mNome">Item</strong>
-<button class="oc-btn-sec" onclick="document.getElementById('itemModal').close()">Fechar</button>
-</header>
-<div class="oc-content">
-<div class="oc-muted" id="mDesc"></div>
-<div style="margin-top:10px;">
-<div style="margin:8px 0 6px; font-weight:700;">Adicionais</div>
-<div id="mAdds"></div>
-</div>
-<div class="oc-field" style="margin-top:8px;">
-<label>Observações</label>
-<input id="mObs" placeholder="Ex.: sem cebola, ponto da carne" type="text"/>
-</div>
-<div class="oc-row" style="margin-top:10px;">
-<div class="oc-qty">
-<button id="mMenos">−</button>
-<span id="mQtd">1</span>
-<button id="mMais">+</button>
-</div>
-<div class="oc-right"><span class="oc-muted">Subtotal item: </span><strong id="mSubtotal">R$ 0,00</strong></div>
-</div>
-</div>
-<div class="oc-actions">
-<button class="oc-btn-pri" id="mAddBtn">Adicionar ao carrinho</button>
-</div>
-</dialog>
-<script>
+  <script>
     /*******************
      * CONFIG EXEMPLO  *
      *******************/
     const EST = {
       slug: "burger-do-centro",
-      nome: "Ki Dog",
+      nome: "Burger do Centro",
       whatsapp: "43 99999-9999",
       descricao: "Atendemos Carlópolis e região. Taxas por bairro e retirada no balcão.",
       horarios: { // use 24h HH:MM-HH:MM. Dias: dom, seg, ter, qua, qui, sex, sab
