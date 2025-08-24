@@ -1528,7 +1528,7 @@
   const merAcc = emv('26', gui + key + desc);
 
   const pfi   = '000201';             // Payload Format Indicator
-  const pInit = emv('01','12');       // << ESTÁTICO (valor fixo)
+ const pInit = emv('01','11');
   const mcc   = emv('52','0000');
   const moeda = emv('53','986');      // BRL
   const val   = emv('54', Number(valor).toFixed(2));
@@ -1550,7 +1550,7 @@
       const chave = (chaveUi && chaveUi.value.trim()) ? chaveUi.value.trim() : PIX_CONFIG.chave;
       document.getElementById('pixChaveShow').value = chave;
       const now = new Date();
-      const txid = (PIX_CONFIG.txidPrefix || 'OC') + '-' + now.getFullYear().toString().slice(2) + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '-' + String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+     const txid = '***';
       const code = buildPixCopiaCola({ valor: total, txid, chavePix: chave });
       const qrBox = document.getElementById('pixQr');
 if (qrBox) { qrBox.innerHTML = ''; new QRCode(qrBox, { text: code, width: 180, height: 180 }); }
