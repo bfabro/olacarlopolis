@@ -7734,7 +7734,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             ],
             novidadesDescriptions: [
 
-              "Temos Assados agora todo domingo",
+              "Temos Porco, Costela e Frango Assados todos os domingos",
               "Temos Massas todas as quartas",
               "Frutas exoticas",
               "Frutas Frescas",
@@ -7783,7 +7783,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Marmita Churrasco!",
               "Marmita de Salada",
               "Marmita com Feijoada",
-              "Frango Assado pupuricado",
+              "Temos Assados aos domingos: Frango Assado pupuricado",
               "Todos os Domingos, temos Frangos Assados!, encomende o teu!",
 
 
