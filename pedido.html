@@ -5,7 +5,9 @@
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1" name="viewport" />
-  <title>Lanches – Pedido por WhatsApp (MVP)</title>
+  <title>Ki Dog – Pedido On Line</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+
   <style>
     /* Mini-índice (tabs/âncoras) */
     .oc-miniindex {
@@ -79,7 +81,7 @@
     .oc-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 16px;
+      gap: 2px;
     }
 
     @media (min-width: 980px) {
@@ -1514,25 +1516,34 @@
       }
       return crc.toString(16).toUpperCase().padStart(4, '0');
     }
-    function buildPixCopiaCola({ valor, txid = 'TXID', chavePix = null }) {
-      const chave = (chavePix ?? PIX_CONFIG.chave);
-      const gui = emv('00', 'br.gov.bcb.pix');
-      const key = emv('01', chave);
-      const merAcc = emv('26', gui + key);
-      const mcc = emv('52', '0000');
-      const moeda = emv('53', '986'); // BRL
-      const valorStr = Number(valor).toFixed(2);
-      const val = emv('54', valorStr);
-      const pais = emv('58', 'BR');
-      const nome = emv('59', PIX_CONFIG.nome);
-      const cidade = emv('60', PIX_CONFIG.cidade);
-      const txidField = emv('05', String(txid).slice(0, 25));
-      const add = emv('62', txidField);
-      let payload = '000201' + merAcc + mcc + moeda + val + pais + nome + cidade + add;
-      payload += '6304';
-      const checksum = crc16(payload);
-      return payload + checksum;
-    }
+    function buildPixCopiaCola({ valor, txid = 'TXID', chavePix = null, descricao = '' }) {
+  const chave = (chavePix ?? PIX_CONFIG.chave).trim();
+  const ascii = (s,max) => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().slice(0,max);
+  const nome   = ascii(PIX_CONFIG.nome, 25);
+  const cidade = ascii(PIX_CONFIG.cidade, 15);
+
+  const gui  = emv('00','br.gov.bcb.pix');
+  const key  = emv('01', chave);
+  const desc = descricao ? emv('02', String(descricao).slice(0,99)) : '';
+  const merAcc = emv('26', gui + key + desc);
+
+  const pfi   = '000201';             // Payload Format Indicator
+  const pInit = emv('01','12');       // << ESTÁTICO (valor fixo)
+  const mcc   = emv('52','0000');
+  const moeda = emv('53','986');      // BRL
+  const val   = emv('54', Number(valor).toFixed(2));
+  const pais  = emv('58','BR');
+  const nm    = emv('59', nome);
+  const cid   = emv('60', cidade);
+  const txidF = emv('05', String(txid).slice(0,25));
+  const add   = emv('62', txidF);
+
+  let payload = pfi + pInit + merAcc + mcc + moeda + val + pais + nm + cid + add;
+  payload += '6304';
+  const checksum = crc16(payload);
+  return payload + checksum;
+}
+
     function openPixModal(total) {
       const modal = document.getElementById('pixModal');
       const chaveUi = document.getElementById('pixChaveInput');
@@ -1541,14 +1552,19 @@
       const now = new Date();
       const txid = (PIX_CONFIG.txidPrefix || 'OC') + '-' + now.getFullYear().toString().slice(2) + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '-' + String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
       const code = buildPixCopiaCola({ valor: total, txid, chavePix: chave });
+      const qrBox = document.getElementById('pixQr');
+if (qrBox) { qrBox.innerHTML = ''; new QRCode(qrBox, { text: code, width: 180, height: 180 }); }
+
       document.getElementById('pixCopiaCola').value = code;
       modal.showModal();
     }
-    function copyTextById(id) {
-      const el = document.getElementById(id);
-      el.select();
-      document.execCommand('copy');
-    }
+    async function copyTextById(id){
+  const el = document.getElementById(id);
+  const txt = (el?.value ?? el?.textContent ?? '').trim();
+  try { await navigator.clipboard.writeText(txt); }
+  catch(e){ if(el.select){ el.select(); document.execCommand('copy'); } }
+}
+
     document.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'btnCopyPix') { copyTextById('pixChaveInput'); }
       else if (e.target && e.target.id === 'btnCopyPix2') { copyTextById('pixChaveShow'); }
@@ -1570,6 +1586,7 @@
       </div>
       <div class="oc-field">
         <label>Código PIX (copia e cola) – valor total</label>
+        <div id="pixQr" style="display:flex;justify-content:center;margin:12px 0;"></div>
         <textarea id="pixCopiaCola" readonly="" rows="4"></textarea>
         <div class="oc-row" style="justify-content:flex-end; margin-top:8px;">
           <button class="oc-btn-pri" id="btnCopyCopiaCola">Copiar código</button>
