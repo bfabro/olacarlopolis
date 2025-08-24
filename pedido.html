@@ -1,11 +1,71 @@
 <!DOCTYPE html>
 
 <html lang="pt-BR">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Lanches – Pedido por WhatsApp (MVP)</title>
-<style>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>Lanches – Pedido por WhatsApp (MVP)</title>
+  <style>
+    /* Mini-índice (tabs/âncoras) */
+    .oc-miniindex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 6px 0 14px;
+    }
+
+    .oc-miniindex a {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--oc-border);
+      background: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      color: #111;
+      transition: box-shadow .15s ease, transform .06s ease;
+    }
+
+    .oc-miniindex a:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, .07);
+      transform: translateY(-1px);
+    }
+
+    /* Cada “divisória” vira um card interno com título */
+    .oc-cat-card {
+      background: #fff;
+      border: 1px solid var(--oc-border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+      scroll-margin-top: 90px;
+      /* compensa header fixo */
+    }
+
+    .oc-sec-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .oc-empty {
+      color: var(--oc-muted);
+      font-size: 13px;
+      padding: 10px 2px;
+    }
+
+    /* Rolagem suave para as âncoras */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+
+  <style>
     * {
       box-sizing: border-box;
     }
@@ -78,6 +138,7 @@
       margin: 0;
       color: var(--muted);
       font-size: 13px;
+      
     }
 
     .oc-price {
@@ -317,9 +378,11 @@
       color: var(--muted);
     }
   </style>
-<link href="style.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;family=Montserrat:wght@800&amp;display=swap" rel="stylesheet"/>
-<style>
+  <link href="style.css" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;family=Montserrat:wght@800&amp;display=swap"
+    rel="stylesheet" />
+  <style>
     /* --- Overrides to match Olá Carlópolis theme --- */
     :root {
       /* use site variables from style.css if present */
@@ -473,7 +536,7 @@
       margin: 0 0 12px 0;
     }
   </style>
-<style>
+  <style>
     /* Brand bar - Olá Carlópolis */
     .oc-brandbar {
       display: flex;
@@ -501,7 +564,7 @@
       margin-left: 6px
     }
   </style>
-<style>
+  <style>
     /* --- Cart visibility improvements --- */
     .oc-cart-line .oc-item-name {
       font-size: 17px;
@@ -521,7 +584,7 @@
 
     /* slightly darker for readability */
   </style>
-<style>
+  <style>
     /* PIX & Foto additions */
     #pixChaveInput,
     #pixChaveShow,
@@ -541,7 +604,7 @@
       margin-right: 8px;
     }
   </style>
-<style>
+  <style>
     .oc-logo {
       width: 140px;
       height: 95px;
@@ -562,149 +625,401 @@
       }
     }
   </style>
+  <style>
+    /* Clean, clickable product tiles */
+    .oc-prod {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      background: #fff !important;
+      border: 1px solid var(--oc-border) !important;
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: box-shadow .15s ease, transform .06s ease;
+    }
+
+    .oc-prod:hover {
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .08);
+      transform: translateY(-1px);
+    }
+
+    .oc-prod h4 {
+      margin: 0 0 4px;
+      font-size: 16px;
+    }
+
+    .oc-prod p {
+      margin: 0;
+      color: var(--oc-muted);
+      font-size: 13px;
+    }
+
+    .oc-prod .oc-price {
+      font-weight: 800;
+      font-size: 14px;
+      color: #111
+    }
+  </style>
+
+  <style>
+    /* Paleta suave por categoria (combina com o tema do site) */
+    :root {
+      --cat-lanche-from: #fff7ed;
+      --cat-lanche-to: #ffedd5;
+      --cat-lanche-border: #ffd6aa;
+      --cat-bebida-from: #eef3ff;
+      --cat-bebida-to: #e0ecff;
+      --cat-bebida-border: #cfe0ff;
+      --cat-doce-from: #fdf2f8;
+      --cat-doce-to: #fce1ff;
+      --cat-doce-border: #f7c8ef;
+    }
+
+    /* Base do card de categoria permite o brilho suave atrás dos produtos */
+    .oc-cat-card {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--oc-border);
+      padding: 12px;
+      margin-bottom: 14px;
+      background: #fff;
+      /* fallback */
+    }
+
+    /* Faixa lateral de acento */
+    .oc-cat-card::after {
+      content: "";
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      bottom: -1px;
+      width: 6px;
+      border-radius: 12px 0 0 12px;
+    }
+
+    /* Degradê de fundo por categoria */
+    .oc-cat-lanche {
+      background: linear-gradient(180deg, var(--cat-lanche-from), var(--cat-lanche-to));
+      border-color: var(--cat-lanche-border);
+    }
+
+    .oc-cat-lanche::after {
+      background: linear-gradient(180deg, #ffb74d, #ff7043);
+    }
+
+    .oc-cat-bebida {
+      background: linear-gradient(180deg, var(--cat-bebida-from), var(--cat-bebida-to));
+      border-color: var(--cat-bebida-border);
+    }
+
+    .oc-cat-bebida::after {
+      background: linear-gradient(180deg, #6aa5ff, #4070f4);
+    }
+
+    .oc-cat-doce {
+      background: linear-gradient(180deg, var(--cat-doce-from), var(--cat-doce-to));
+      border-color: var(--cat-doce-border);
+    }
+
+    .oc-cat-doce::after {
+      background: linear-gradient(180deg, #f78fb3, #c084fc);
+    }
+
+    /* Título da seção mantém leitura forte */
+    .oc-sec-title {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Produtos continuam brancos para legibilidade */
+    .oc-cat-card .oc-prod-list {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Mini-índice com cores por categoria */
+    .oc-miniindex a {
+      border-width: 1px;
+    }
+
+    .oc-miniindex a.oc-tab-lanche {
+      background: linear-gradient(180deg, var(--cat-lanche-from), var(--cat-lanche-to));
+      border-color: var(--cat-lanche-border);
+    }
+
+    .oc-miniindex a.oc-tab-bebida {
+      background: linear-gradient(180deg, var(--cat-bebida-from), var(--cat-bebida-to));
+      border-color: var(--cat-bebida-border);
+    }
+
+    .oc-miniindex a.oc-tab-doce {
+      background: linear-gradient(180deg, var(--cat-doce-from), var(--cat-doce-to));
+      border-color: var(--cat-doce-border);
+    }
+  </style>
+
+
 <style>
-/* Clean, clickable product tiles */
-.oc-prod {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: center;
-  background: #fff !important;
-  border: 1px solid var(--oc-border) !important;
-  border-radius: 12px;
-  padding: 12px 14px;
-  cursor: pointer;
-  transition: box-shadow .15s ease, transform .06s ease;
+  :root{
+    /* Paleta verde suave para a seção de entrega */
+    --delivery-from:#e8f9f0;
+    --delivery-to:#dbf6e9;
+    --delivery-border:#c8eedc;
+    --delivery-accent-from:#36c786; /* topo do filete */
+    --delivery-accent-to:#25D366;   /* base do filete (WhatsApp green) */
+  }
+
+  /* Card de entrega com o mesmo padrão dos cards de categoria */
+  #dadosCard.oc-delivery{
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--delivery-from), var(--delivery-to)) !important;
+    border: 1px solid var(--delivery-border) !important;
+    border-radius: 14px;
+  }
+  #dadosCard.oc-delivery::after{
+    content: "";
+    position: absolute;
+    left: -1px; top: -1px; bottom: -1px;
+    width: 6px;
+    border-radius: 14px 0 0 14px;
+    background: linear-gradient(180deg, var(--delivery-accent-from), var(--delivery-accent-to));
+  }
+
+  /* Título e labels com leve reforço de contraste */
+  #dadosCard.oc-delivery .oc-title{ color:#0f3b24; }
+  #dadosCard.oc-delivery .oc-field label{ color:#1a5e33; }
+
+  /* Campos com borda e foco em verde sutil */
+  #dadosCard.oc-delivery .oc-field input,
+  #dadosCard.oc-delivery .oc-field select,
+  #dadosCard.oc-delivery .oc-field textarea{
+    border-color: rgba(37,211,102,.35) !important;
+    background: #fff !important;
+    color: #222 !important;
+  }
+  #dadosCard.oc-delivery .oc-field input:focus,
+  #dadosCard.oc-delivery .oc-field select:focus,
+  #dadosCard.oc-delivery .oc-field textarea:focus{
+    outline: none;
+    border-color: rgba(37,211,102,.7) !important;
+    box-shadow: 0 0 0 3px rgba(37,211,102,.22);
+  }
+</style>
+
+
+
+<style>
+  :root{
+    /* Paleta suave do Resumo (harmoniza com o azul da marca) */
+    --summary-from:#f2f4ff;
+    --summary-to:#f6f0ff;
+    --summary-border:#e3dcff;
+    --summary-accent-from:#7c4dff; /* topo do filete */
+    --summary-accent-to:#4070f4;   /* base do filete (brand) */
+  }
+
+  /* Card Resumo no mesmo padrão dos outros */
+  #resumoCard.oc-summary{
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg,var(--summary-from),var(--summary-to)) !important;
+    border: 1px solid var(--summary-border) !important;
+    border-radius: 14px;
+  }
+  #resumoCard.oc-summary::after{
+    content:"";
+    position:absolute; left:-1px; top:-1px; bottom:-1px; width:6px;
+    border-radius:14px 0 0 14px;
+    background: linear-gradient(180deg,var(--summary-accent-from),var(--summary-accent-to));
+  }
+
+  /* Título e textos */
+  #resumoCard.oc-summary .oc-title{ color:#1e235a; }
+  #resumoCard.oc-summary .oc-cart-totals div span:first-child{ color:#2b2e4a; }
+
+  /* Destaque do Total */
+  #resumoCard.oc-summary .oc-total{
+    font-size:18px;
+  }
+  #resumoCard.oc-summary .oc-total span:last-child{
+    background:#fff;
+    border:1px solid var(--oc-border);
+    border-radius:10px;
+    padding:2px 10px;
+  }
+
+  /* Centraliza os títulos principais dos cards */
+#cardapioCard .oc-title,
+#dadosCard .oc-title,
+#resumoCard .oc-title{
+  text-align: center;
+  width: 100%;
 }
-.oc-prod:hover { box-shadow: 0 10px 24px rgba(0,0,0,.08); transform: translateY(-1px); }
-.oc-prod h4 { margin: 0 0 4px; font-size: 16px; }
-.oc-prod p { margin: 0; color: var(--oc-muted); font-size: 13px; }
-.oc-prod .oc-price { font-weight: 800; font-size: 14px; color:#111 }
-</style></head>
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
 <body>
-<div class="oc-page">
-<div class="oc-brandbar">
-<div class="logo_item"><a href="index.html" style="  font-size: 1.5rem;
+  <div class="oc-page">
+    <div class="oc-brandbar">
+      <div class="logo_item"><a href="index.html" style="  font-size: 1.5rem;
                font-weight: bold;
                color: white;
                text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 12px var(--blue-color);
                margin :0px 0px 0px 40px" target="_self">Olá Carlópolis
         </a></div>
-</div>
-<h2 class="highlighted">🍔 Pedido Online 🍔 <span style="  font-size: 1.5rem;
+    </div>
+    <h2 class="highlighted">🍔 Pedido Online 🍔 <span style="  font-size: 1.5rem;
                font-weight: bold;
                color: white;
                text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 12px var(--blue-color);
                margin :0px 0px 0px 40px"></span></h2>
-<div class="oc-lanches-wrap" id="app">
-<div class="oc-grid">
-<section class="oc-card oc-store">
-<div class="oc-row" style="align-items:center; gap:14px;">
-<img alt="Logo do estabelecimento" class="oc-logo" id="est-logo"/>
-<div>
-<h2 class="oc-title" id="est-name">Loja</h2>
-<span class="oc-badge warn" id="openBadge">Verificando horário…</span>
-<div class="oc-sub" id="est-desc">Monte seu pedido e envie por WhatsApp.</div>
-</div>
-</div>
-</section>
-<div class="oc-divider"></div>
-<section class="oc-card">
-<h3 class="oc-title">Cardápio</h3>
-<div class="oc-prod-list" id="prodList"></div>
-</section>
-<div class="oc-divider"></div>
-<section class="oc-card" id="dadosCard">
-<h3 class="oc-title">Dados para Entrega/Retirada</h3>
-<div class="oc-field">
-<label>Como você quer receber?</label>
-<div class="oc-flex cols-2">
-<select id="tipoPedido">
-<option value="Entrega">Entrega</option>
-<option value="Retirada">Retirada</option>
-</select>
-<select id="bairroSelect"></select>
-</div>
-</div>
-<div class="oc-flex cols-2" id="enderecoFields">
-<div class="oc-field">
-<label>Endereço</label>
-<input id="endereco" placeholder="Rua, avenida..." type="text"/>
-</div>
-<div class="oc-field">
-<label>Número</label>
-<input id="numeroEndereco" placeholder="Nº" type="text"/>
-</div>
-</div>
-<div class="oc-field">
-<label>Referência (opcional)</label>
-<input id="referencia" placeholder="Portaria, bloco, ponto de referência" type="text"/>
-</div>
-<div class="oc-field oc-flex cols-2" style="margin-top:8px;">
-<div>
-<label>Seu nome</label>
-<input id="cliNome" placeholder="Seu nome" type="text"/>
-</div>
-<div>
-<label>Seu telefone</label>
-<input id="cliFone" placeholder="(43) 9xxxx-xxxx" type="tel"/>
-</div>
-</div>
-<div class="oc-field">
-<label>Forma de pagamento</label>
-<select id="pagamento">
-<option value="PIX">PIX</option>
-<option value="Dinheiro">Dinheiro</option>
-<option value="Cartão">Cartão</option>
-</select>
-</div>
-<div class="oc-field">
-<label>Observações (opcional)</label>
-<textarea id="obsGeral" placeholder="Ex.: Coca bem gelada; sem pimenta" rows="2"></textarea>
-</div>
-</section>
-<div class="oc-divider"></div>
-<section class="oc-card" id="resumoCard">
-<h3 class="oc-title">Resumo do Pedido</h3>
-<div class="oc-cart-empty" id="cartContainer">Seu carrinho está vazio.</div>
-<div class="oc-cart-totals" id="totalsBox" style="margin-top:12px;"></div>
-<div class="oc-mini oc-muted" id="minimoMsg" style="margin-top:4px;"></div>
-<button class="oc-send" disabled="" id="btnEnviar">Enviar pedido pelo WhatsApp</button>
-<button class="oc-btn-pri" id="btnPix" style="width:100%; margin-top:10px;">Gerar PIX (copia e cola)</button>
-</section>
-</div>
-</div>
-</div>
-<!-- Modal item/adicionais -->
-<dialog class="oc-modal" id="itemModal">
-<header>
-<strong id="mNome">Item</strong>
-<button class="oc-btn-sec" onclick="document.getElementById('itemModal').close()">Fechar</button>
-</header>
-<div class="oc-content">
-<div id="mImgWrap" style="text-align:center; margin-bottom:10px;"><img alt="Imagem do produto" id="mImg" style="max-width:100%; border-radius:12px; border:1px solid var(--oc-border, rgba(0,0,0,0.08));"/></div><div class="oc-muted" id="mDesc"></div>
-<div style="margin-top:10px;">
-<div style="margin:8px 0 6px; font-weight:700;">Adicionais</div>
-<div id="mAdds"></div>
-</div>
-<div class="oc-field" style="margin-top:8px;">
-<label>Observações</label>
-<input id="mObs" placeholder="Ex.: sem cebola, ponto da carne" type="text"/>
-</div>
-<div class="oc-row" style="margin-top:10px;">
-<div class="oc-qty">
-<button id="mMenos">−</button>
-<span id="mQtd">1</span>
-<button id="mMais">+</button>
-</div>
-<div class="oc-right"><span class="oc-muted">Subtotal item: </span><strong id="mSubtotal">R$ 0,00</strong></div>
-</div>
-</div>
-<div class="oc-actions">
-<button class="oc-btn-pri" id="mAddBtn">Adicionar ao carrinho</button>
-</div>
-</dialog>
-<script>
+    <div class="oc-lanches-wrap" id="app">
+      <div class="oc-grid">
+        <section class="oc-card oc-store">
+          <div class="oc-row" style="align-items:center; gap:14px;">
+            <img alt="Logo do estabelecimento" class="oc-logo" id="est-logo" />
+            <div>
+              <h2 class="oc-title" id="est-name">Loja</h2>
+              <span class="oc-badge warn" id="openBadge">Verificando horário…</span>
+              <div class="oc-sub" id="est-desc">Monte seu pedido e envie por WhatsApp.</div>
+            </div>
+          </div>
+        </section>
+        <div class="oc-divider"></div>
+      <section class="oc-card" id="cardapioCard">
+          <h3 class="oc-title">Cardápio</h3>
+
+          <!-- Mini-índice com âncoras -->
+          <nav class="oc-miniindex" id="miniIndex"></nav>
+
+          <!-- Aqui vão as seções de categorias (cada uma vira um “card” interno) -->
+          <div id="prodList"></div>
+        </section>
+
+        <div class="oc-divider"></div>
+      <section class="oc-card oc-delivery" id="dadosCard">
+          <h3 class="oc-title">Dados para Entrega/Retirada</h3>
+          <div class="oc-field">
+            <label>Como você quer receber?</label>
+            <div class="oc-flex cols-2">
+              <select id="tipoPedido">
+                <option value="Entrega">Entrega</option>
+                <option value="Retirada">Retirada</option>
+              </select>
+              <select id="bairroSelect"></select>
+            </div>
+          </div>
+          <div class="oc-flex cols-2" id="enderecoFields">
+            <div class="oc-field">
+              <label>Endereço</label>
+              <input id="endereco" placeholder="Rua, avenida..." type="text" />
+            </div>
+            <div class="oc-field">
+              <label>Número</label>
+              <input id="numeroEndereco" placeholder="Nº" type="text" />
+            </div>
+          </div>
+          <div class="oc-field">
+            <label>Referência (opcional)</label>
+            <input id="referencia" placeholder="Portaria, bloco, ponto de referência" type="text" />
+          </div>
+          <div class="oc-field oc-flex cols-2" style="margin-top:8px;">
+            <div>
+              <label>Seu nome</label>
+              <input id="cliNome" placeholder="Seu nome" type="text" />
+            </div>
+            <div>
+              <label>Seu telefone</label>
+              <input id="cliFone" placeholder="(43) 9xxxx-xxxx" type="tel" />
+            </div>
+          </div>
+          <div class="oc-field">
+            <label>Forma de pagamento</label>
+            <select id="pagamento">
+              <option value="PIX">PIX</option>
+              <option value="Dinheiro">Dinheiro</option>
+              <option value="Cartão">Cartão</option>
+            </select>
+          </div>
+          <div class="oc-field">
+            <label>Observações (opcional)</label>
+            <textarea id="obsGeral" placeholder="Ex.: Coca bem gelada; sem pimenta" rows="2"></textarea>
+          </div>
+        </section>
+        <div class="oc-divider"></div>
+       <section class="oc-card oc-summary" id="resumoCard">
+          <h3 class="oc-title">Resumo do Pedido</h3>
+          <div class="oc-cart-empty" id="cartContainer">Seu carrinho está vazio.</div>
+          <div class="oc-cart-totals" id="totalsBox" style="margin-top:12px;"></div>
+          <div class="oc-mini oc-muted" id="minimoMsg" style="margin-top:4px;"></div>
+          <button class="oc-send" disabled="" id="btnEnviar">Enviar pedido pelo WhatsApp</button>
+          <button class="oc-btn-pri" id="btnPix" style="width:100%; margin-top:10px;">Gerar PIX (copia e cola)</button>
+        </section>
+      </div>
+    </div>
+  </div>
+  <!-- Modal item/adicionais -->
+  <dialog class="oc-modal" id="itemModal">
+    <header>
+      <strong id="mNome">Item</strong>
+      <button class="oc-btn-sec" onclick="document.getElementById('itemModal').close()">Fechar</button>
+    </header>
+    <div class="oc-content">
+      <div id="mImgWrap" style="text-align:center; margin-bottom:10px;"><img alt="Imagem do produto" id="mImg"
+          style="max-width:100%; border-radius:12px; border:1px solid var(--oc-border, rgba(0,0,0,0.08));" /></div>
+      <div class="oc-muted" id="mDesc"></div>
+      <div style="margin-top:10px;">
+        <div style="margin:8px 0 6px; font-weight:700;">Adicionais</div>
+        <div id="mAdds"></div>
+      </div>
+      <div class="oc-field" style="margin-top:8px;">
+        <label>Observações</label>
+        <input id="mObs" placeholder="Ex.: sem cebola, ponto da carne" type="text" />
+      </div>
+      <div class="oc-row" style="margin-top:10px;">
+        <div class="oc-qty">
+          <button id="mMenos">−</button>
+          <span id="mQtd">1</span>
+          <button id="mMais">+</button>
+        </div>
+        <div class="oc-right"><span class="oc-muted">Subtotal item: </span><strong id="mSubtotal">R$ 0,00</strong></div>
+      </div>
+    </div>
+    <div class="oc-actions">
+      <button class="oc-btn-pri" id="mAddBtn">Adicionar ao carrinho</button>
+    </div>
+  </dialog>
+  <script>
     /*******************
      * CONFIG EXEMPLO  *
      *******************/
@@ -725,25 +1040,36 @@
         dom: "00:01-23:00"
       },
       taxasEntrega: { "Centro": 3.0, "Vila Nova": 5.0, "Jardim América": 6.0 },
-      pedidoMinimo: { Entrega: 20 },
+
       cardapio: [
         {
-          id: "xs1", nome: "X-Salada", preco: 18.9, desc: "Pão, hambúrguer 120g, queijo, alface, tomate, maionese.", adicionais: [
+          id: "xs1", nome: "X-Salada", preco: 18.9, desc: "Pão, hambúrguer 120g, queijo, alface, tomate, maionese.", tipo: "lanche", adicionais: [
             { id: "bacon", nome: "Bacon", preco: 3.0 },
             { id: "cheddar", nome: "Cheddar", preco: 2.5 },
             { id: "ovo", nome: "Ovo", preco: 2.0 }
           ]
         },
         {
-          id: "xb1", nome: "X-Bacon", preco: 22.9, desc: "Com bacon crocante.", adicionais: [
+          id: "xb1", nome: "X-Bacon", preco: 22.9, desc: "Com bacon crocante.", tipo: "lanche", adicionais: [
             { id: "bacon2x", nome: "Bacon extra", preco: 3.0 },
             { id: "cheddar", nome: "Cheddar", preco: 2.5 }
           ]
         },
-        { id: "fr1", nome: "Fritas média", preco: 12.0, desc: "300g" },
-        { id: "coca350", nome: "Coca 350ml", preco: 6.0 },
-        { id: "guarana1l", nome: "Guaraná 1L", preco: 9.0 }
+        // BEBIDAS
+        { id: "fr1", nome: "Fritas média", preco: 12.0, desc: "300g", tipo: "lanche" },
+        { id: "coca350", nome: "Coca 350ml", preco: 6.0, tipo: "bebida" },
+        { id: "guarana1l", nome: "Guaraná 1L", preco: 9.0, tipo: "bebida" },
+        { id: "SUCO1", nome: "Suco de Laranja do Bill", preco: 4.0, tipo: "bebida" },
+
+
+        // DOCES
+        { id: "choc1", nome: "Ouro Branco", preco: 2.0, tipo: "doce",desc: "Bombom",},
+         { id: "pudim", nome: "Pudim", preco: 8.0, desc: "Fatia", tipo: "doce" },
+         { id: "prestigio", nome: "Prestigio", preco: 4.0, desc: "Barrinha", tipo: "doce" },
+         { id: "brigadeiro", nome: "Brigadeiro", preco: 5.0, desc: "Unidade", tipo: "doce" },
+         { id: "laka", nome: "Laka", preco: 4.0, desc: "Unidade", tipo: "doce" }
       ]
+
     };
 
     // Captura utm e mesa (se houver)
@@ -875,13 +1201,7 @@
 
     function enviarPedido(est, carrinho, dados) {
       if (!carrinho?.length) { alert('Seu carrinho está vazio.'); return; }
-      if (dados.tipo === 'Entrega' && est.pedidoMinimo?.Entrega) {
-        const { subtotal } = calcularTotais(carrinho, 0);
-        if (subtotal < est.pedidoMinimo.Entrega) {
-          alert(`Pedido mínimo para entrega: ${money(est.pedidoMinimo.Entrega)}`);
-          return;
-        }
-      }
+
       const texto = montarTextoPedido(est, carrinho, dados);
       const urlEst = `https://wa.me/${normalizePhone(WHATS_ESTAB_FIXO)}?text=${encodeURIComponent(texto)}`;
       window.open(urlEst, '_blank');
@@ -900,10 +1220,11 @@
 
     function renderEst() {
       document.getElementById('est-name').textContent = state.est.nome;
-      const logoEl = document.getElementById('est-logo'); 
-      if (logoEl) 
-      { logoEl.src = getLogo(state.est);
-         logoEl.alt = `Logo de ${state.est.nome}`; }
+      const logoEl = document.getElementById('est-logo');
+      if (logoEl) {
+        logoEl.src = getLogo(state.est);
+        logoEl.alt = `Logo de ${state.est.nome}`;
+      }
       document.getElementById('est-desc').textContent = state.est.descricao || '';
 
       // Status aberto/fechado
@@ -934,26 +1255,81 @@
       applyTipo();
       const pixInput = document.getElementById('pixChaveInput'); if (pixInput) { pixInput.value = PIX_CONFIG.chave; }
     }
+    // Categorias do cardápio (ordem e rótulos do mini-índice)
+    const CATS = [
+      { key: 'lanche', label: 'Lanches', emoji: '🍔' },
+      { key: 'bebida', label: 'Bebidas', emoji: '🥤' },
+      { key: 'doce', label: 'Doces', emoji: '🍰' },
+    ];
+
 
     function renderProdutos() {
       const list = document.getElementById('prodList');
+      const mini = document.getElementById('miniIndex');
       list.innerHTML = '';
-      state.est.cardapio.forEach((p) => {
-        const wrap = document.createElement('div');
-        wrap.className = 'oc-prod';
-        wrap.innerHTML = `
+      mini.innerHTML = '';
+
+      // Mini-índice (âncoras)
+
+
+      mini.innerHTML = CATS.map(c =>
+        `<a href="#sec-${c.key}" data-target="sec-${c.key}" class="oc-tab-${c.key}">${c.emoji} ${c.label}</a>`
+      ).join('');
+
+      // Clique do mini-índice com rolagem suave (evita pulo seco)
+      mini.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', ev => {
+          ev.preventDefault();
+          const id = a.getAttribute('data-target');
+          const el = document.getElementById(id);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // opcional: atualizar hash
+          history.replaceState(null, '', `#${id}`);
+        });
+      });
+
+      // Render por categoria em “cards” internos
+      CATS.forEach(c => {
+        const container = document.createElement('section');
+        container.className = `oc-cat-card oc-cat-${c.key}`; // << aqui
+        container.id = `sec-${c.key}`;
+        container.innerHTML = `
+      <h4 class="oc-sec-title">${c.emoji} ${c.label}</h4>
+      <div class="oc-prod-list"></div>
+    `;
+
+        const grid = container.querySelector('.oc-prod-list');
+
+        // Itens cuja .tipo bate com a categoria (default = 'lanche' se não vier preenchido)
+        const items = (state.est.cardapio || []).filter(p => (p.tipo || 'lanche') === c.key);
+
+        if (!items.length) {
+          grid.outerHTML = `<div class="oc-empty">Sem itens nesta seção.</div>`;
+        } else {
+          items.forEach(p => {
+            const wrap = document.createElement('div');
+            wrap.className = 'oc-prod';
+            wrap.innerHTML = `
           <div>
             <h4>${p.nome}</h4>
             <p>${p.desc || ''}</p>
           </div>
           <div class="oc-price">${money(p.preco)}</div>
         `;
-        wrap.setAttribute('role','button'); wrap.tabIndex = 0;
-        wrap.addEventListener('click', () => openItemModal(p));
-        wrap.addEventListener('keydown', (ev)=>{ if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); openItemModal(p);} });
-        list.appendChild(wrap);
+            wrap.setAttribute('role', 'button');
+            wrap.tabIndex = 0;
+            wrap.addEventListener('click', () => openItemModal(p));
+            wrap.addEventListener('keydown', (ev) => {
+              if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openItemModal(p); }
+            });
+            grid.appendChild(wrap);
+          });
+        }
+
+        list.appendChild(container);
       });
     }
+
 
     function renderCart() {
       const box = document.getElementById('cartContainer');
@@ -1033,7 +1409,7 @@
       modalItem.qtd = 1; modalItem._addsSel = new Set();
       document.getElementById('mNome').textContent = p.nome;
       document.getElementById('mDesc').textContent = p.desc || '';
-      const mImg = document.getElementById('mImg'); if (mImg) { mImg.src = (typeof getFoto==='function' ? getFoto(p) : (p.foto||'')); mImg.alt = `Foto de ${p.nome}`; }
+      const mImg = document.getElementById('mImg'); if (mImg) { mImg.src = (typeof getFoto === 'function' ? getFoto(p) : (p.foto || '')); mImg.alt = `Foto de ${p.nome}`; }
       document.getElementById('mObs').value = '';
       document.getElementById('mQtd').textContent = '1';
       renderAdds(p);
@@ -1172,37 +1548,39 @@
       else if (e.target && e.target.id === 'btnCopyCopiaCola') { copyTextById('pixCopiaCola'); }
     });
   </script>
-<dialog class="oc-modal" id="pixModal">
-<header>
-<strong>Pagamento via PIX</strong>
-<button class="oc-btn-sec" onclick="document.getElementById('pixModal').close()">Fechar</button>
-</header>
-<div class="oc-content">
-<div class="oc-field">
-<label>Chave PIX</label>
-<div class="oc-row" style="gap:8px;">
-<input id="pixChaveShow" readonly="" type="text"/>
-<button class="oc-btn-sec" id="btnCopyPix2">Copiar</button>
-</div>
-</div>
-<div class="oc-field">
-<label>Código PIX (copia e cola) – valor total</label>
-<textarea id="pixCopiaCola" readonly="" rows="4"></textarea>
-<div class="oc-row" style="justify-content:flex-end; margin-top:8px;">
-<button class="oc-btn-pri" id="btnCopyCopiaCola">Copiar código</button>
-</div>
-<div class="oc-mini oc-muted">Cole este código no seu banco para pagar. O valor já vem preenchido.</div>
-</div>
-</div>
-</dialog>
-<dialog class="oc-modal" id="fotoModal">
-<header>
-<strong id="fotoTitulo">Foto</strong>
-<button class="oc-btn-sec" onclick="document.getElementById('fotoModal').close()">Fechar</button>
-</header>
-<div class="oc-content" style="text-align:center">
-<img alt="Foto do item" id="fotoImg" style="max-width:100%; border-radius:12px; border:1px solid var(--oc-border, rgba(0,0,0,0.08));"/>
-</div>
-</dialog>
+  <dialog class="oc-modal" id="pixModal">
+    <header>
+      <strong>Pagamento via PIX</strong>
+      <button class="oc-btn-sec" onclick="document.getElementById('pixModal').close()">Fechar</button>
+    </header>
+    <div class="oc-content">
+      <div class="oc-field">
+        <label>Chave PIX</label>
+        <div class="oc-row" style="gap:8px;">
+          <input id="pixChaveShow" readonly="" type="text" />
+          <button class="oc-btn-sec" id="btnCopyPix2">Copiar</button>
+        </div>
+      </div>
+      <div class="oc-field">
+        <label>Código PIX (copia e cola) – valor total</label>
+        <textarea id="pixCopiaCola" readonly="" rows="4"></textarea>
+        <div class="oc-row" style="justify-content:flex-end; margin-top:8px;">
+          <button class="oc-btn-pri" id="btnCopyCopiaCola">Copiar código</button>
+        </div>
+        <div class="oc-mini oc-muted">Cole este código no seu banco para pagar. O valor já vem preenchido.</div>
+      </div>
+    </div>
+  </dialog>
+  <dialog class="oc-modal" id="fotoModal">
+    <header>
+      <strong id="fotoTitulo">Foto</strong>
+      <button class="oc-btn-sec" onclick="document.getElementById('fotoModal').close()">Fechar</button>
+    </header>
+    <div class="oc-content" style="text-align:center">
+      <img alt="Foto do item" id="fotoImg"
+        style="max-width:100%; border-radius:12px; border:1px solid var(--oc-border, rgba(0,0,0,0.08));" />
+    </div>
+  </dialog>
 </body>
+
 </html>
