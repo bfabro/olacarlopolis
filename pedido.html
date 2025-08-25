@@ -140,7 +140,7 @@
       margin: 0;
       color: var(--muted);
       font-size: 13px;
-      
+
     }
 
     .oc-price {
@@ -379,6 +379,24 @@
     .oc-muted {
       color: var(--muted);
     }
+
+
+
+    /* Botões "Fechar" vermelhos em todos os modais */
+.oc-modal header .oc-btn-sec{
+  background: #ef4444 !important;   /* red-500 */
+  color: #fff !important;
+  border: 1px solid #dc2626 !important; /* red-600 */
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 700;
+  transition: transform .06s ease, filter .2s ease;
+}
+.oc-modal header .oc-btn-sec:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
   </style>
   <link href="style.css" rel="stylesheet" />
   <link
@@ -764,105 +782,159 @@
   </style>
 
 
-<style>
-  :root{
-    /* Paleta verde suave para a seção de entrega */
-    --delivery-from:#e8f9f0;
-    --delivery-to:#dbf6e9;
-    --delivery-border:#c8eedc;
-    --delivery-accent-from:#36c786; /* topo do filete */
-    --delivery-accent-to:#25D366;   /* base do filete (WhatsApp green) */
-  }
+  <style>
+    :root {
+      /* Paleta verde suave para a seção de entrega */
+      --delivery-from: #e8f9f0;
+      --delivery-to: #dbf6e9;
+      --delivery-border: #c8eedc;
+      --delivery-accent-from: #36c786;
+      /* topo do filete */
+      --delivery-accent-to: #25D366;
+      /* base do filete (WhatsApp green) */
+    }
 
-  /* Card de entrega com o mesmo padrão dos cards de categoria */
-  #dadosCard.oc-delivery{
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(180deg, var(--delivery-from), var(--delivery-to)) !important;
-    border: 1px solid var(--delivery-border) !important;
-    border-radius: 14px;
-  }
-  #dadosCard.oc-delivery::after{
-    content: "";
-    position: absolute;
-    left: -1px; top: -1px; bottom: -1px;
-    width: 6px;
-    border-radius: 14px 0 0 14px;
-    background: linear-gradient(180deg, var(--delivery-accent-from), var(--delivery-accent-to));
-  }
+    /* Card de entrega com o mesmo padrão dos cards de categoria */
+    #dadosCard.oc-delivery {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--delivery-from), var(--delivery-to)) !important;
+      border: 1px solid var(--delivery-border) !important;
+      border-radius: 14px;
+    }
 
-  /* Título e labels com leve reforço de contraste */
-  #dadosCard.oc-delivery .oc-title{ color:#0f3b24; }
-  #dadosCard.oc-delivery .oc-field label{ color:#1a5e33; }
+    #dadosCard.oc-delivery::after {
+      content: "";
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      bottom: -1px;
+      width: 6px;
+      border-radius: 14px 0 0 14px;
+      background: linear-gradient(180deg, var(--delivery-accent-from), var(--delivery-accent-to));
+    }
 
-  /* Campos com borda e foco em verde sutil */
-  #dadosCard.oc-delivery .oc-field input,
-  #dadosCard.oc-delivery .oc-field select,
-  #dadosCard.oc-delivery .oc-field textarea{
-    border-color: rgba(37,211,102,.35) !important;
-    background: #fff !important;
-    color: #222 !important;
-  }
-  #dadosCard.oc-delivery .oc-field input:focus,
-  #dadosCard.oc-delivery .oc-field select:focus,
-  #dadosCard.oc-delivery .oc-field textarea:focus{
-    outline: none;
-    border-color: rgba(37,211,102,.7) !important;
-    box-shadow: 0 0 0 3px rgba(37,211,102,.22);
-  }
-</style>
+    /* Título e labels com leve reforço de contraste */
+    #dadosCard.oc-delivery .oc-title {
+      color: #0f3b24;
+    }
+
+    #dadosCard.oc-delivery .oc-field label {
+      color: #1a5e33;
+    }
+
+    /* Campos com borda e foco em verde sutil */
+    #dadosCard.oc-delivery .oc-field input,
+    #dadosCard.oc-delivery .oc-field select,
+    #dadosCard.oc-delivery .oc-field textarea {
+      border-color: rgba(37, 211, 102, .35) !important;
+      background: #fff !important;
+      color: #222 !important;
+    }
+
+    #dadosCard.oc-delivery .oc-field input:focus,
+    #dadosCard.oc-delivery .oc-field select:focus,
+    #dadosCard.oc-delivery .oc-field textarea:focus {
+      outline: none;
+      border-color: rgba(37, 211, 102, .7) !important;
+      box-shadow: 0 0 0 3px rgba(37, 211, 102, .22);
+    }
+  </style>
 
 
 
-<style>
-  :root{
-    /* Paleta suave do Resumo (harmoniza com o azul da marca) */
-    --summary-from:#f2f4ff;
-    --summary-to:#f6f0ff;
-    --summary-border:#e3dcff;
-    --summary-accent-from:#7c4dff; /* topo do filete */
-    --summary-accent-to:#4070f4;   /* base do filete (brand) */
-  }
+  <style>
+    :root {
+      /* Paleta suave do Resumo (harmoniza com o azul da marca) */
+      --summary-from: #f2f4ff;
+      --summary-to: #f6f0ff;
+      --summary-border: #e3dcff;
+      --summary-accent-from: #7c4dff;
+      /* topo do filete */
+      --summary-accent-to: #4070f4;
+      /* base do filete (brand) */
+    }
 
-  /* Card Resumo no mesmo padrão dos outros */
-  #resumoCard.oc-summary{
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(180deg,var(--summary-from),var(--summary-to)) !important;
-    border: 1px solid var(--summary-border) !important;
-    border-radius: 14px;
-  }
-  #resumoCard.oc-summary::after{
-    content:"";
-    position:absolute; left:-1px; top:-1px; bottom:-1px; width:6px;
-    border-radius:14px 0 0 14px;
-    background: linear-gradient(180deg,var(--summary-accent-from),var(--summary-accent-to));
-  }
+    /* Card Resumo no mesmo padrão dos outros */
+    #resumoCard.oc-summary {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--summary-from), var(--summary-to)) !important;
+      border: 1px solid var(--summary-border) !important;
+      border-radius: 14px;
+    }
 
-  /* Título e textos */
-  #resumoCard.oc-summary .oc-title{ color:#1e235a; }
-  #resumoCard.oc-summary .oc-cart-totals div span:first-child{ color:#2b2e4a; }
+    #resumoCard.oc-summary::after {
+      content: "";
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      bottom: -1px;
+      width: 6px;
+      border-radius: 14px 0 0 14px;
+      background: linear-gradient(180deg, var(--summary-accent-from), var(--summary-accent-to));
+    }
 
-  /* Destaque do Total */
-  #resumoCard.oc-summary .oc-total{
-    font-size:18px;
-  }
-  #resumoCard.oc-summary .oc-total span:last-child{
-    background:#fff;
-    border:1px solid var(--oc-border);
-    border-radius:10px;
-    padding:2px 10px;
-  }
+    /* Título e textos */
+    #resumoCard.oc-summary .oc-title {
+      color: #1e235a;
+    }
 
-  /* Centraliza os títulos principais dos cards */
-#cardapioCard .oc-title,
-#dadosCard .oc-title,
-#resumoCard .oc-title{
-  text-align: center;
-  width: 100%;
+    #resumoCard.oc-summary .oc-cart-totals div span:first-child {
+      color: #2b2e4a;
+    }
+
+    /* Destaque do Total */
+    #resumoCard.oc-summary .oc-total {
+      font-size: 18px;
+    }
+
+    #resumoCard.oc-summary .oc-total span:last-child {
+      background: #fff;
+      border: 1px solid var(--oc-border);
+      border-radius: 10px;
+      padding: 2px 10px;
+    }
+
+    /* Centraliza os títulos principais dos cards */
+    #cardapioCard .oc-title,
+    #dadosCard .oc-title,
+    #resumoCard .oc-title {
+      text-align: center;
+      width: 100%;
+    }
+
+
+    /* Centralizar todos os modais */
+dialog.oc-modal{
+  position: fixed;
+  inset: 50% auto auto 50%;   /* top/left em 50% */
+  transform: translate(-50%, -50%);
+  margin: 0;                  /* evita centrais "por margem" do UA */
+  max-height: 90vh;           /* scroll interno se ficar alto */
+  overflow: auto;
+}
+dialog.oc-modal::backdrop{
+  background: rgba(0,0,0,.45);
 }
 
-</style>
+
+/* Quantidade estática (sem +/−) no resumo */
+.oc-qty-static{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:42px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:800;
+  background:#eef3ff;
+  border:1px solid #dfe7ff;
+  color:#2f4fa8;
+}
+
+
+  </style>
 
 
 
@@ -918,7 +990,7 @@
           </div>
         </section>
         <div class="oc-divider"></div>
-      <section class="oc-card" id="cardapioCard">
+        <section class="oc-card" id="cardapioCard">
           <h3 class="oc-title">Cardápio</h3>
 
           <!-- Mini-índice com âncoras -->
@@ -929,7 +1001,7 @@
         </section>
 
         <div class="oc-divider"></div>
-      <section class="oc-card oc-delivery" id="dadosCard">
+        <section class="oc-card oc-delivery" id="dadosCard">
           <h3 class="oc-title">Dados para Entrega/Retirada</h3>
           <div class="oc-field">
             <label>Como você quer receber?</label>
@@ -938,9 +1010,20 @@
                 <option value="Entrega">Entrega</option>
                 <option value="Retirada">Retirada</option>
               </select>
-              <select id="bairroSelect"></select>
+              <!-- NOVO: seletor de zona para definir a taxa -->
+              <select id="zonaEntrega">
+                <option value="cidade">Dentro da cidade</option>
+                <option value="fora">Fora da cidade</option>
+              </select>
             </div>
           </div>
+
+          <!-- NOVO: campo de bairro digitável -->
+          <div class="oc-field" id="bairroWrap">
+            <label>Bairro</label>
+            <input id="bairroInput" placeholder="Digite seu bairro" type="text" />
+          </div>
+
           <div class="oc-flex cols-2" id="enderecoFields">
             <div class="oc-field">
               <label>Endereço</label>
@@ -979,7 +1062,7 @@
           </div>
         </section>
         <div class="oc-divider"></div>
-       <section class="oc-card oc-summary" id="resumoCard">
+        <section class="oc-card oc-summary" id="resumoCard">
           <h3 class="oc-title">Resumo do Pedido</h3>
           <div class="oc-cart-empty" id="cartContainer">Seu carrinho está vazio.</div>
           <div class="oc-cart-totals" id="totalsBox" style="margin-top:12px;"></div>
@@ -1033,15 +1116,23 @@
       whatsapp: "11 98985930",
       descricao: "O Cachorro quente mais famoso de Carlopolis",
       horarios: { // use 24h HH:MM-HH:MM. Dias: dom, seg, ter, qua, qui, sex, sab
-        seg: "18:00-23:00",
+        seg: "00:00-23:00",
         ter: "18:00-23:00",
         qua: "18:00-23:00",
         qui: "18:00-23:00",
         sex: "18:00-00:30",
         sab: "14:00-00:30",
-        dom: "00:01-23:00"
+        dom: "00:01-00:00"
       },
-      taxasEntrega: { "Centro": 3.0, "Vila Nova": 5.0, "Jardim América": 6.0 },
+      taxasEntrega: { Cidade: 5.00, Fora: 30.00 },
+      taxaPorBairro: {
+  "centro": 5.00,
+  "vila-nova": 7.00,
+  "conj-aurora": 8.00,
+  "zona-rural": 20.00
+},
+// (opcional) fallback caso não reconheça o bairro digitado:
+taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
 
       cardapio: [
         {
@@ -1052,31 +1143,31 @@
           ]
         },
         {
-          id: "xb1",nome: "X-Bacon", preco: 22.9, desc: "Com bacon crocante.", tipo: "lanche", adicionais: [
+          id: "xb1", nome: "X-Bacon", preco: 22.9, desc: "Com bacon crocante.", tipo: "lanche", adicionais: [
             { id: "bacon2x", nome: "Bacon extra", preco: 3.0 },
             { id: "cheddar", nome: "Cheddar", preco: 2.5 }
           ]
         },
 
-         {
-          id: "xdog", foto: "images/comercios/lanchonete/kidog/produtos/1.jpg",nome: "X-Dog", preco: 19.90, desc: "Clássico brasileiro: salsicha no pão macio com molho de tomate caseiro, queijo derretido, milho e vinagrete, finalizado com maionese e batata-palha crocante.", tipo: "lanche", adicionais: [
+        {
+          id: "xdog", foto: "images/comercios/lanchonete/kidog/produtos/1.jpg", nome: "X-Dog", preco: 19.90, desc: "Clássico brasileiro: salsicha no pão macio com molho de tomate caseiro, queijo derretido, milho e vinagrete, finalizado com maionese e batata-palha crocante.", tipo: "lanche", adicionais: [
             { id: "salsicha_1", nome: "Salsicha", preco: 2.0 },
             { id: "cheddar", nome: "Cheddar", preco: 2.5 }
           ]
         },
         // BEBIDAS
-        { id: "fr1" , nome: "Fritas média", preco: 12.0, desc: "300g", tipo: "lanche" },
+        { id: "fr1", nome: "Fritas média", preco: 12.0, desc: "300g", tipo: "lanche" },
         { id: "coca350", nome: "Coca 350ml", preco: 6.0, tipo: "bebida" },
         { id: "guarana1l", nome: "Guaraná 1L", preco: 9.0, tipo: "bebida" },
         { id: "SUCO1", nome: "Suco de Laranja do Bill", preco: 4.0, tipo: "bebida" },
 
 
         // DOCES
-        { id: "choc1", nome: "Ouro Branco", preco: 2.0, tipo: "doce",desc: "Bombom",},
-         { id: "pudim", nome: "Pudim", preco: 8.0, desc: "Fatia", tipo: "doce" },
-         { id: "prestigio", nome: "Prestigio", preco: 4.0, desc: "Barrinha", tipo: "doce" },
-         { id: "brigadeiro", nome: "Brigadeiro", preco: 5.0, desc: "Unidade", tipo: "doce" },
-         { id: "laka", nome: "Laka", preco: 4.0, desc: "Unidade", tipo: "doce" }
+        { id: "choc1", nome: "Ouro Branco", preco: 2.0, tipo: "doce", desc: "Bombom", },
+        { id: "pudim", nome: "Pudim", preco: 8.0, desc: "Fatia", tipo: "doce" },
+        { id: "prestigio", nome: "Prestigio", preco: 4.0, desc: "Barrinha", tipo: "doce" },
+        { id: "brigadeiro", nome: "Brigadeiro", preco: 5.0, desc: "Unidade", tipo: "doce" },
+        { id: "laka", nome: "Laka", preco: 4.0, desc: "Unidade", tipo: "doce" }
       ]
 
     };
@@ -1089,6 +1180,11 @@
     const slug = s => (s || '').toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const normBairro = s => (s||'')
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .toLowerCase().replace(/[^a-z0-9]+/g,'-')
+  .replace(/(^-|-$)/g,'');
+
     const getFoto = (p) => p.foto || (IMAGENS_DIR + slug(p.nome) + '.jpg');
     const LOGOS_DIR = 'images/comercios/restaurante/selaht/selaht.png';
     const getLogo = (est) => est.logo || (LOGOS_DIR + slug(est.nome) + '.png');
@@ -1108,6 +1204,10 @@
      * HELPERS         *
      *******************/
     const money = v => (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const toNumber = (x) => {
+  if (typeof x === 'string') return Number(x.replace(',', '.')) || 0;
+  return Number(x) || 0;
+};
 
     function normalizePhone(raw) {
       let n = (raw || "").replace(/\D/g, "");
@@ -1138,80 +1238,98 @@
       return { open, faixa };
     }
 
-    function calcularTotais(carrinho, taxaEntrega = 0) {
-      const subtotal = carrinho.reduce((acc, item) => {
-        const base = item.preco * item.qtd;
-        const add = (item.adicionais || []).reduce((a, ad) => a + ad.preco, 0) * item.qtd;
-        return acc + base + add;
-      }, 0);
-      const total = subtotal + (taxaEntrega || 0);
-      return { subtotal, total };
+   function calcularTotais(carrinho, taxaEntrega = 0) {
+  const subtotal = (carrinho || []).reduce((acc, item) => {
+    const qtd = Number(item.qtd) || 1;
+    const base = (Number(item.preco) || 0) * qtd;
+    const add  = (item.adicionais || [])
+      .reduce((a, ad) => a + (Number(ad.preco) || 0), 0) * qtd;
+    return acc + base + add;
+  }, 0);
+  const total = subtotal + (Number(taxaEntrega) || 0);
+  return { subtotal, total };
+}
+
+
+    function montarTextoPedido(carrinho, est, dados) {
+  // 1) calcula taxa: prioriza bairro; se não achar, usa dentro/fora
+  const normBairro = s => (s||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'-')
+    .replace(/(^-|-$)/g,'');
+
+  const mapa = est.taxaPorBairro || {};
+  const keyB = normBairro(dados.bairroEntrega || '');
+  const pad  = est.taxaEntregaPadrao || {};
+
+  let taxaEntrega = 0;
+  let labelTaxa = '';
+
+  if (dados.tipo === 'Entrega') {
+    if (keyB && Object.prototype.hasOwnProperty.call(mapa, keyB)) {
+      taxaEntrega = Number(mapa[keyB]) || 0;
+      labelTaxa = `Taxa (${dados.bairroEntrega})`;
+    } else {
+      taxaEntrega = (dados.zonaEntrega === 'cidade') ? (Number(pad.cidade)||0)
+                 : (dados.zonaEntrega === 'fora')   ? (Number(pad.fora)||0) : 0;
+      labelTaxa = `Taxa (${dados.zonaEntrega === 'cidade' ? 'Dentro da cidade' : 'Fora da cidade'})`;
     }
+  }
 
-    function montarTextoPedido(est, carrinho, dados) {
-      const agora = new Date();
-      const yy = String(agora.getFullYear()).slice(2);
-      const mm = String(agora.getMonth() + 1).padStart(2, "0");
-      const dd = String(agora.getDate()).padStart(2, "0");
-      const HH = String(agora.getHours()).padStart(2, "0");
-      const MM = String(agora.getMinutes()).padStart(2, "0");
-      const idLinha = `Pedido: ${yy}${mm}${dd} - ${HH}:${MM}`;
+  const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
 
-      const taxaEntrega = (dados.tipo === 'Entrega') ? (est.taxasEntrega?.[dados.bairroEntrega] || 0) : 0;
-      const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
+  // 2) cabeçalho
+  const linhas = [];
+  linhas.push('*Novo pedido*');
+  linhas.push(`Loja: ${est.name}`);
+ 
+  linhas.push('');
 
-      // itens: nome em negrito, descrição abaixo, extras/obs; linha em branco ENTRE itens
-      const itensTxt = carrinho.map(it => {
-        const adds = (it.adicionais || []).map(a => `+${a.nome}`).join(', ');
-        const obs = it.obs ? ` [${it.obs}]` : '';
-        const linha1 = `• ${it.qtd}x *${it.nome}* (${money(it.preco)})`;
-        const linha2 = it.desc ? `   - ${it.desc}` : null;
-        const linha3 = adds ? `   - ${adds}` : null;
-        const linha4 = obs ? `   -${obs}` : null;
-        return [linha1, linha2, linha3, linha4].filter(Boolean).join('\n');
-      }).join('\n\n'); // << linha em branco entre cada item
+  // 3) itens
+  carrinho.forEach((it, idx) => {
+    const obs = it.obs ? `\n  _Obs:_ ${it.obs}` : '';
+    const ad = (it.adicionais && it.adicionais.length)
+      ? ('\n  + ' + it.adicionais.map(a => `${a.nome} (${money(a.preco)})`).join('\n  + '))
+      : '';
+    linhas.push(`${idx+1}. ${it.qtd}x ${it.nome} — ${money(it.preco)}${ad}${obs}`);
+  });
+  linhas.push('');
 
-      // 1) Dados do cliente
-      const linhasCliente = [];
-      linhasCliente.push(idLinha);
-      linhasCliente.push('');
-      linhasCliente.push(`Cliente: ${dados.nome || '-'}`);
-      linhasCliente.push(`Tel: ${dados.telefone || '-'}`);
-      if (MESA) linhasCliente.push(`Mesa: ${MESA}`);
-      linhasCliente.push(`Tipo: ${dados.tipo}`);
-      if (dados.tipo === 'Entrega') {
-        linhasCliente.push(`Bairro: ${dados.bairroEntrega}`);
-        linhasCliente.push(`Endereço: ${dados.endereco}${dados.numero ? ', ' + dados.numero : ''}${dados.referencia ? ` (${dados.referencia})` : ''}`);
-      } else {
-        linhasCliente.push('Retirada no balcão');
-      }
+  // 4) valores
+  const linhasValores = ['*Valores do Pedido:*', `Subtotal: ${money(subtotal)}`];
+  if (taxaEntrega) linhasValores.push(`${labelTaxa}: ${money(taxaEntrega)}`);
+  linhasValores.push(`*Total: ${money(total)}*`);
+  linhas.push(...linhasValores, '');
 
-      // 2) Informações do pedido (linha vazia após o título)
-      const linhasPedido = ['Itens do Pedido:', '', itensTxt];
-
-      // 3) Valores
-      const linhasValores = ['Valores do Pedido:', `Subtotal: ${money(subtotal)}`];
-      if (taxaEntrega) linhasValores.push(`Taxa (${dados.bairroEntrega}): ${money(taxaEntrega)}`);
-      linhasValores.push(`Total: ${money(total)}`);
-      linhasValores.push(`Pagamento: ${dados.pagamento || '-'}`);
-      if (dados.obsGeral) linhasValores.push(`Obs: ${dados.obsGeral}`);
-
-      const partes = [
-        linhasCliente.join('\n'),
-        linhasPedido.join('\n'),
-        linhasValores.join('\n'),
-        `Origem: Ola Carlopolis`
-      ];
-
-      return partes.join('\n\n'); // linhas em branco entre as seções
+  // 5) dados do cliente
+  const linhasCliente = ['*Dados do Cliente:*', `Tipo: ${dados.tipo}`];
+  if (dados.tipo === 'Entrega') {
+    if (dados.zonaEntrega) {
+      linhasCliente.push(`Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
     }
+    if (dados.bairroEntrega) linhasCliente.push(`Bairro: ${dados.bairroEntrega}`);
+    if (dados.endereco)      linhasCliente.push(`Endereço: ${dados.endereco}`);
+    if (dados.numero)        linhasCliente.push(`Número: ${dados.numero}`);
+    if (dados.complemento)   linhasCliente.push(`Compl.: ${dados.complemento}`);
+    if (dados.referencia)    linhasCliente.push(`Ref.: ${dados.referencia}`);
+  } else {
+    if (dados.retiradaNome)  linhasCliente.push(`Para: ${dados.retiradaNome}`);
+  }
+  if (dados.nome) linhasCliente.push(`Nome: ${dados.nome}`);
+  if (dados.tel)  linhasCliente.push(`Telefone: ${dados.tel}`);
+
+  linhas.push(...linhasCliente);
+
+  return linhas.join('\n');
+}
+
 
 
 
     function enviarPedido(est, carrinho, dados) {
       if (!carrinho?.length) { alert('Seu carrinho está vazio.'); return; }
 
-      const texto = montarTextoPedido(est, carrinho, dados);
+     const texto = montarTextoPedido(carrinho, est, dados);
       const urlEst = `https://wa.me/${normalizePhone(WHATS_ESTAB_FIXO)}?text=${encodeURIComponent(texto)}`;
       window.open(urlEst, '_blank');
 
@@ -1247,17 +1365,30 @@
         badge.className = 'oc-badge danger';
       }
 
-      // Bairros
-      const bairroSel = document.getElementById('bairroSelect');
-      bairroSel.innerHTML = '';
-      const opt0 = document.createElement('option');
-      opt0.value = ''; opt0.textContent = 'Selecione o bairro';
-      bairroSel.appendChild(opt0);
-      Object.keys(state.est.taxasEntrega || {}).forEach(b => {
-        const op = document.createElement('option');
-        op.value = b; op.textContent = `${b} (${money(state.est.taxasEntrega[b])})`;
-        bairroSel.appendChild(op);
-      });
+
+
+
+
+
+      // Padrões de entrega (default)
+      const zonaSel = document.getElementById('zonaEntrega');
+      if (zonaSel) zonaSel.value = 'cidade';
+      const bi = document.getElementById('bairroInput');
+      if (bi) bi.value = '';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       renderProdutos();
       renderCart();
@@ -1323,7 +1454,8 @@
             <h4>${p.nome}</h4>
             <p>${p.desc || ''}</p>
           </div>
-          <div class="oc-price">${money(p.preco)}</div>
+          
+          <div class="oc-price">${money(toNumber(p.preco))}</div>
         `;
             wrap.setAttribute('role', 'button');
             wrap.tabIndex = 0;
@@ -1341,89 +1473,143 @@
 
 
     function renderCart() {
-      const box = document.getElementById('cartContainer');
-      if (!state.carrinho.length) { box.className = 'oc-cart-empty'; box.textContent = 'Seu carrinho está vazio.'; updateTotals(); return; }
-      box.className = '';
-      box.innerHTML = '';
-      state.carrinho.forEach((it, idx) => {
-        const line = document.createElement('div');
-        line.className = 'oc-cart-line';
-        const adds = (it.adicionais || []).map(a => `+${a.nome}`).join(', ');
-        const obs = it.obs ? ` • ${it.obs}` : '';
-        line.innerHTML = `
-          <div class="oc-qty">
-            <button aria-label="diminuir">−</button>
-            <span>${it.qtd}</span>
-            <button aria-label="aumentar">+</button>
-          </div>
-          <div>
-            <div class="oc-item-name"><strong>${it.nome}</strong></div>
-            ${it.desc ? `<div class="oc-item-desc">${it.desc}</div>` : ''}
-            <div class="oc-mini oc-muted">${adds}${obs}</div>
-          </div>
-          <div><strong>${money((it.preco + (it.adicionais || []).reduce((a, x) => a + x.preco, 0)) * it.qtd)}</strong></div>
-        `;
-        const [btnMenos, , btnMais] = line.querySelectorAll('.oc-qty button');
-        btnMenos.addEventListener('click', () => { it.qtd = Math.max(1, it.qtd - 1); renderCart(); });
-        btnMais.addEventListener('click', () => { it.qtd++; renderCart(); });
-        // clique no nome para remover
-        line.querySelector('div:nth-child(2) > div strong').addEventListener('contextmenu', (e) => {
-          e.preventDefault(); if (confirm('Remover item?')) { state.carrinho.splice(idx, 1); renderCart(); }
-        });
-        box.appendChild(line);
+  const box = document.getElementById('cartContainer');
+  if (!state.carrinho.length) {
+    box.className = 'oc-cart-empty';
+    box.textContent = 'Seu carrinho está vazio.';
+    updateTotals();
+    return;
+  }
+
+  box.className = '';
+  box.innerHTML = '';
+
+  state.carrinho.forEach((it, idx) => {
+    const line = document.createElement('div');
+    line.className = 'oc-cart-line';
+
+    const adds = (it.adicionais || []).map(a => `+${a.nome}`).join(', ');
+    const obs  = it.obs ? ` • ${it.obs}` : '';
+
+    const lineTotal = (
+      (Number(it.preco) || 0) +
+      (it.adicionais || []).reduce((a, x) => a + (Number(x.preco) || 0), 0)
+    ) * (Number(it.qtd) || 1);
+
+    line.innerHTML = `
+      <div class="oc-qty-static" aria-label="Quantidade">${Number(it.qtd) || 1}x</div>
+      <div>
+        <div class="oc-item-name"><strong>${it.nome}</strong></div>
+        ${it.desc ? `<div class="oc-item-desc">${it.desc}</div>` : ''}
+        <div class="oc-mini oc-muted">${adds}${obs}</div>
+      </div>
+      <div><strong>${money(lineTotal)}</strong></div>
+    `;
+
+    // (opcional) manter remoção por clique direito no nome:
+    const nameEl = line.querySelector('div:nth-child(2) > div strong');
+    if (nameEl) {
+      nameEl.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        if (confirm('Remover item?')) { state.carrinho.splice(idx, 1); renderCart(); }
       });
-      updateTotals();
     }
+
+    box.appendChild(line);
+  });
+
+  updateTotals();
+}
+
 
     function updateTotals() {
-      const tipo = document.getElementById('tipoPedido').value;
-      const bairro = document.getElementById('bairroSelect').value;
-      const taxa = (tipo === 'Entrega') ? (state.est.taxasEntrega?.[bairro] || 0) : 0;
-      const { subtotal, total } = calcularTotais(state.carrinho, taxa);
+  const tipo   = document.getElementById('tipoPedido').value;
+  const zona   = document.getElementById('zonaEntrega')?.value || '';
+  const bairro = document.getElementById('bairroInput')?.value.trim() || '';
 
-      const minimoMsg = document.getElementById('minimoMsg');
-      minimoMsg.textContent = '';
-
-      const box = document.getElementById('totalsBox');
-      box.innerHTML = `
-        <div><span>Subtotal</span><span>${money(subtotal)}</span></div>
-        ${tipo === 'Entrega' ? `<div><span>Taxa (${bairro || '-'})</span><span>${money(taxa)}</span></div>` : ''}
-        <div class="oc-total"><span>Total</span><span>${money(total)}</span></div>
-      `;
-
-      const st = isOpenNow(state.est.horarios);
-      const btn = document.getElementById('btnEnviar');
-      btn.disabled = !state.carrinho.length || !st.open || (tipo === 'Entrega' && !bairro);
-      btn.textContent = st.open ? 'Enviar pedido pelo WhatsApp' : 'Fechado agora';
+  let taxa = 0, taxaLabel = '';
+  if (tipo === 'Entrega') {
+    const mapa = state.est.taxaPorBairro || {};
+    const key  = normBairro(bairro);
+    if (key && Object.prototype.hasOwnProperty.call(mapa, key)) {
+      taxa = Number(mapa[key]) || 0;
+      taxaLabel = `Taxa (${bairro})`;
+    } else {
+      const pad = state.est.taxaEntregaPadrao || {};
+      taxa = (zona === 'cidade') ? (Number(pad.cidade)||0)
+           : (zona === 'fora')   ? (Number(pad.fora)||0) : 0;
+      taxaLabel = `Taxa (${zona === 'cidade' ? 'Dentro da cidade' : 'Fora da cidade'})`;
     }
+  }
+
+  const { subtotal, total } = calcularTotais(state.carrinho, taxa);
+
+  document.getElementById('minimoMsg').textContent = '';
+  const box = document.getElementById('totalsBox');
+  box.innerHTML = `
+    <div><span>Subtotal</span><span>${money(subtotal)}</span></div>
+    ${tipo === 'Entrega' ? `<div><span>${taxaLabel}</span><span>${money(taxa)}</span></div>` : ''}
+    <div class="oc-total"><span>Total</span><span>${money(total)}</span></div>
+  `;
+
+  const st = isOpenNow(state.est.horarios);
+  const btn = document.getElementById('btnEnviar');
+  const entregaOk = (tipo !== 'Entrega') || (bairro && zona);
+  btn.disabled = !state.carrinho.length || !st.open || !entregaOk;
+  btn.textContent = st.open ? 'Enviar pedido pelo WhatsApp' : 'Fechado agora';
+}
+
+
 
     function applyTipo() {
       const tipo = document.getElementById('tipoPedido').value;
       const endWrap = document.getElementById('enderecoFields');
-      const bairroSel = document.getElementById('bairroSelect');
+      const zonaSel = document.getElementById('zonaEntrega');
+      const bairroWrap = document.getElementById('bairroWrap');
+
       if (tipo === 'Entrega') {
         endWrap.style.display = 'grid';
-        bairroSel.disabled = false;
+        if (zonaSel) zonaSel.disabled = false;
+        if (bairroWrap) bairroWrap.style.display = '';
       } else {
         endWrap.style.display = 'none';
-        bairroSel.disabled = true; bairroSel.value = '';
+        if (zonaSel) { zonaSel.disabled = true; zonaSel.value = 'cidade'; }
+        if (bairroWrap) {
+          bairroWrap.style.display = 'none';
+          const bi = document.getElementById('bairroInput'); if (bi) bi.value = '';
+        }
       }
       updateTotals();
     }
 
+
     // Modal item
     let modalItem = null;
     function openItemModal(p) {
-      modalItem = JSON.parse(JSON.stringify(p));
-      modalItem.qtd = 1; modalItem._addsSel = new Set();
-      document.getElementById('mNome').textContent = p.nome;
-      document.getElementById('mDesc').textContent = p.desc || '';
-      const mImg = document.getElementById('mImg'); if (mImg) { mImg.src = (typeof getFoto === 'function' ? getFoto(p) : (p.foto || '')); mImg.alt = `Foto de ${p.nome}`; }
-      document.getElementById('mObs').value = '';
-      document.getElementById('mQtd').textContent = '1';
-      renderAdds(p);
-      updateModalSubtotal();
-      document.getElementById('itemModal').showModal();
+     modalItem = JSON.parse(JSON.stringify(p));
+modalItem.qtd = 1; 
+modalItem._addsSel = new Set();
+
+document.getElementById('mNome').textContent = p.nome;
+document.getElementById('mDesc').textContent = p.desc || '';
+const mImg = document.getElementById('mImg');
+if (mImg) {
+  mImg.src = (typeof getFoto === 'function' ? getFoto(p) : (p.foto || ''));
+  mImg.alt = `Foto de ${p.nome}`;
+}
+document.getElementById('mObs').value = '';
+document.getElementById('mQtd').textContent = '1';
+renderAdds(p);
+
+/* NOVO: já mostra o preço base imediatamente 
+document.getElementById('mSubtotal').textContent = money(p.preco);*/
+
+/* mantém o cálculo (considera adicionais e quantidade = 1) */
+updateModalSubtotal();
+
+document.getElementById('itemModal').showModal();
+/* garante pintura imediata em todos navegadores */
+requestAnimationFrame(updateModalSubtotal);
     }
 
     function renderAdds(p) {
@@ -1444,12 +1630,21 @@
       }
     }
 
-    function updateModalSubtotal() {
-      const qtd = Number(document.getElementById('mQtd').textContent) || 1;
-      const addsPreco = (modalItem.adicionais || []).filter(a => modalItem._addsSel.has(a.id)).reduce((s, a) => s + a.preco, 0);
-      const val = (modalItem.preco + addsPreco) * qtd;
-      document.getElementById('mSubtotal').textContent = money(val);
-    }
+
+
+
+function updateModalSubtotal() {
+  const qtd = toNumber(document.getElementById('mQtd')?.textContent) || 1;
+  const base = toNumber(modalItem?.preco);
+  const addsPreco = (modalItem?.adicionais || [])
+    .filter(a => modalItem._addsSel?.has(a.id))
+    .reduce((s, a) => s + toNumber(a.preco), 0);
+
+  const val = (base + addsPreco) * qtd;
+  document.getElementById('mSubtotal').textContent = money(val);
+}
+
+
 
     document.getElementById('mMais').addEventListener('click', () => { const el = document.getElementById('mQtd'); el.textContent = String(Number(el.textContent) + 1); updateModalSubtotal(); });
     document.getElementById('mMenos').addEventListener('click', () => { const el = document.getElementById('mQtd'); el.textContent = String(Math.max(1, Number(el.textContent) - 1)); updateModalSubtotal(); });
@@ -1459,16 +1654,20 @@
       const adds = (modalItem.adicionais || []).filter(a => modalItem._addsSel.has(a.id));
       state.carrinho.push({ id: modalItem.id, nome: modalItem.nome, preco: modalItem.preco, qtd, adicionais: adds, obs });
       document.getElementById('itemModal').close();
-      renderCart();
+     renderCart();            // re-render do carrinho
+  updateTotals();          // ⬅️ força o total agora
+  requestAnimationFrame(updateTotals); // ⬅️ garante pintura em alguns navegadores
     });
 
     // Eventos principais
     document.getElementById('tipoPedido').addEventListener('change', applyTipo);
-    document.getElementById('bairroSelect').addEventListener('change', updateTotals);
+    document.getElementById('zonaEntrega').addEventListener('change', updateTotals);
+    document.getElementById('bairroInput').addEventListener('input', updateTotals);
     document.getElementById('btnEnviar').addEventListener('click', () => {
       const dados = {
         tipo: document.getElementById('tipoPedido').value,
-        bairroEntrega: document.getElementById('bairroSelect').value || null,
+        bairroEntrega: document.getElementById('bairroInput').value.trim() || null,
+        zonaEntrega: document.getElementById('zonaEntrega').value || null,
         endereco: document.getElementById('endereco').value,
         numero: document.getElementById('numeroEndereco').value,
         referencia: document.getElementById('referencia').value,
@@ -1484,13 +1683,36 @@
     renderEst();
 
     // Gera PIX (copia e cola) com o valor total
-    document.getElementById('btnPix').addEventListener('click', () => {
-      const tipo = document.getElementById('tipoPedido').value;
-      const bairro = document.getElementById('bairroSelect').value;
-      const taxa = (tipo === 'Entrega') ? (state.est.taxasEntrega?.[bairro] || 0) : 0;
-      const { total } = calcularTotais(state.carrinho, taxa);
-      openPixModal(total);
-    });
+  document.getElementById('btnPix').addEventListener('click', () => {
+  const tipo   = document.getElementById('tipoPedido').value;
+  const zona   = document.getElementById('zonaEntrega')?.value || '';
+  const bairro = document.getElementById('bairroInput')?.value.trim() || '';
+
+  const normBairro = s => (s||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'-')
+    .replace(/(^-|-$)/g,'');
+
+  let taxa = 0;
+  if (tipo === 'Entrega') {
+    const mapa = state.est.taxaPorBairro || {};
+    const key  = normBairro(bairro);
+    if (key && Object.prototype.hasOwnProperty.call(mapa, key)) {
+      taxa = Number(mapa[key]) || 0;
+    } else {
+      const pad = state.est.taxaEntregaPadrao || {};
+      taxa = (zona === 'cidade') ? (Number(pad.cidade)||0)
+           : (zona === 'fora')   ? (Number(pad.fora)||0) : 0;
+    }
+  }
+
+  const { total } = calcularTotais(state.carrinho, taxa);
+  if (total < 0.01) { alert('Selecione ao menos 1 item.'); return; }
+
+  openPixModal(total);
+});
+
+
     function openFotoModal(p) {
       const modal = document.getElementById('fotoModal');
       document.getElementById('fotoTitulo').textContent = p.nome;
@@ -1517,32 +1739,32 @@
       return crc.toString(16).toUpperCase().padStart(4, '0');
     }
     function buildPixCopiaCola({ valor, txid = 'TXID', chavePix = null, descricao = '' }) {
-  const chave = (chavePix ?? PIX_CONFIG.chave).trim();
-  const ascii = (s,max) => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().slice(0,max);
-  const nome   = ascii(PIX_CONFIG.nome, 25);
-  const cidade = ascii(PIX_CONFIG.cidade, 15);
+      const chave = (chavePix ?? PIX_CONFIG.chave).trim();
+      const ascii = (s, max) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().slice(0, max);
+      const nome = ascii(PIX_CONFIG.nome, 25);
+      const cidade = ascii(PIX_CONFIG.cidade, 15);
 
-  const gui  = emv('00','br.gov.bcb.pix');
-  const key  = emv('01', chave);
-  const desc = descricao ? emv('02', String(descricao).slice(0,99)) : '';
-  const merAcc = emv('26', gui + key + desc);
+      const gui = emv('00', 'br.gov.bcb.pix');
+      const key = emv('01', chave);
+    const desc = descricao ? emv('02', ascii(descricao, 99)) : '';
+      const merAcc = emv('26', gui + key + desc);
 
-  const pfi   = '000201';             // Payload Format Indicator
- const pInit = emv('01','11');
-  const mcc   = emv('52','0000');
-  const moeda = emv('53','986');      // BRL
-  const val   = emv('54', Number(valor).toFixed(2));
-  const pais  = emv('58','BR');
-  const nm    = emv('59', nome);
-  const cid   = emv('60', cidade);
-  const txidF = emv('05', String(txid).slice(0,25));
-  const add   = emv('62', txidF);
+      const pfi = '000201';             // Payload Format Indicator
+      const pInit = emv('01', '11');
+      const mcc = emv('52', '0000');
+      const moeda = emv('53', '986');      // BRL
+      const val = emv('54', Number(valor).toFixed(2));
+      const pais = emv('58', 'BR');
+      const nm = emv('59', nome);
+      const cid = emv('60', cidade);
+      const txidF = emv('05', String(txid).slice(0, 25));
+      const add = emv('62', txidF);
 
-  let payload = pfi + pInit + merAcc + mcc + moeda + val + pais + nm + cid + add;
-  payload += '6304';
-  const checksum = crc16(payload);
-  return payload + checksum;
-}
+      let payload = pfi + pInit + merAcc + mcc + moeda + val + pais + nm + cid + add;
+      payload += '6304';
+      const checksum = crc16(payload);
+      return payload + checksum;
+    }
 
     function openPixModal(total) {
       const modal = document.getElementById('pixModal');
@@ -1550,20 +1772,25 @@
       const chave = (chaveUi && chaveUi.value.trim()) ? chaveUi.value.trim() : PIX_CONFIG.chave;
       document.getElementById('pixChaveShow').value = chave;
       const now = new Date();
-     const txid = '***';
-      const code = buildPixCopiaCola({ valor: total, txid, chavePix: chave });
+      const txid = '***';
+      const code = buildPixCopiaCola({
+  valor: total,
+  txid,
+  chavePix: chave,
+  descricao: EST.nome   // <- nome da loja na descrição do PIX
+});
       const qrBox = document.getElementById('pixQr');
-if (qrBox) { qrBox.innerHTML = ''; new QRCode(qrBox, { text: code, width: 180, height: 180 }); }
+      if (qrBox) { qrBox.innerHTML = ''; new QRCode(qrBox, { text: code, width: 180, height: 180 }); }
 
       document.getElementById('pixCopiaCola').value = code;
       modal.showModal();
     }
-    async function copyTextById(id){
-  const el = document.getElementById(id);
-  const txt = (el?.value ?? el?.textContent ?? '').trim();
-  try { await navigator.clipboard.writeText(txt); }
-  catch(e){ if(el.select){ el.select(); document.execCommand('copy'); } }
-}
+    async function copyTextById(id) {
+      const el = document.getElementById(id);
+      const txt = (el?.value ?? el?.textContent ?? '').trim();
+      try { await navigator.clipboard.writeText(txt); }
+      catch (e) { if (el.select) { el.select(); document.execCommand('copy'); } }
+    }
 
     document.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'btnCopyPix') { copyTextById('pixChaveInput'); }

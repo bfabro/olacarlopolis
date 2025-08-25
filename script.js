@@ -8179,7 +8179,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Toda Sexta-feira temos Parmegiana",
               "Todo Sabado temos Feijoada",
               "Todo Sábado temos A Porção de Feijoada ( 3 pessoas)",
-              "Todo Domingo temos os Assados",
+              "Todo Domingo temos os Assados e maionese",
             ],
 
           },
