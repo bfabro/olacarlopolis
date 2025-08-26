@@ -3319,13 +3319,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: [{ inicio: "13:00", fim: "18:30" }]
             },
             address: "R. Benedito Salles, 2639 - Carlópolis",
-            contact: "(43) 99977-8839",
-            delivery: "Sim / Com Taxa",
-            infoAdicional: "<a target='_blank' style='color:#2da6ff;' href='https://www.youtube.com/watch?v=LkTSbakmFrE'>Conheça nossas especiarias!</a>",
-
-
+            contact: "(43) 99977-8839",         
             instagram: "https://www.instagram.com/caldodecanaamaral/",
             facebook: "https://www.facebook.com/CaldodecanaAmaral",
+            delivery: "Sim / Com Taxa",
+            infoAdicional: "<a target='_blank' style='color:#2da6ff;' href='https://www.youtube.com/watch?v=LkTSbakmFrE'>Conheça nossas especiarias!</a>",
             menuImages: [
               "images/comercios/lanchonete/caldodecanaamaral/cardapio/1.jpg",
               "images/comercios/lanchonete/caldodecanaamaral/cardapio/2.jpg",
@@ -3616,14 +3614,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/sorveteria/limone/divulgacao/5.jpeg",
             ],
           },
-
-
-
-
-
-
-
-
 
 
 
@@ -4223,7 +4213,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             ],
             novidadesDescriptions: [
               "Salada de fruta com açai!",
-
               "Milk Kinder ❤💕🥤",
               "Milk Sundae fini💕🎀",
               "",
@@ -4231,14 +4220,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             ],
           },
-
-
-
-
-
-
-
-
 
 
 
@@ -7912,15 +7893,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/restaurante/namigo/perfil.jpg",
             name: "NamiGO Japanese Restaurant",
-            hours: "Seg a Sab: 11:00h as 15:00h - 18:00h as 00:00h",
+            hours: "Seg a Sab:16:00h as 00:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
-              ter: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
-              qua: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
-              qui: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
-              sex: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
-              sab: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "00:00" }],
+              seg: [{ inicio: "16:00", fim: "00:00" }],
+              ter: [{ inicio: "16:00", fim: "00:00" }],
+              qua: [{ inicio: "16:00", fim: "00:00" }],
+              qui: [{ inicio: "16:00", fim: "00:00" }],
+              sex: [{ inicio: "16:00", fim: "00:00" }],
+              sab: [{ inicio: "16:00", fim: "00:00" }],
               dom: []
             },
             address: "R. Padre Hugo, 460 - Carlopolis",
@@ -8794,6 +8775,32 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuVagasTrabalho"),
         title: "Vagas de Trabalho",
         establishments: [
+
+
+          
+
+
+          {
+            image: "images/comercios/sorveteria/salles/perfil.png",
+            name: "Sorvetes Salles Ferreira",
+            address: "R. Kalil Keder, n° 525 - Carlópolis",
+            contact: "(43) 99600-1919",
+            facebook: "https://www.facebook.com/sorvetessalles/?locale=pt_BR",
+            instagram: "https://www.instagram.com/sorvetessalles/",
+            vagaPreRequisito: "<br> Ser Maior de 18 anos<br> Ser Comunicativa",
+            infoVagaTrabalho: "1 - Atendimento ao publico",
+          },
+
+          {
+            image: "images/comercios/lanchonete/caldodecanaamaral/perfil.png",
+            name: "Caldo de Cana Amaral",
+            address: "R. Benedito Salles, 2639 - Carlópolis",
+            contact: "(43) 99977-8839",         
+            instagram: "https://www.instagram.com/caldodecanaamaral/",
+            facebook: "https://www.facebook.com/CaldodecanaAmaral",
+            vagaPreRequisito: "<br> Que possa trabalhar aos finais de semana e feriados",
+            infoVagaTrabalho: "1 - Auxiliar de Restaurante<br>1 - Atendente<br>1 - Auxiliar de Cozinha<br>1 - Garçom",
+          },
 
 
           {
