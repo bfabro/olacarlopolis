@@ -780,7 +780,7 @@ document.addEventListener("DOMContentLoaded", function () {
     funerariacristorei: "s",
     funerariagrupocastilho: "s",
     funerariasaovicentedepaulo: "s",
-    funerariabomjesus:"s",
+    funerariabomjesus: "s",
 
     // FIM NOTA DE FALECIMENTO
 
@@ -1622,61 +1622,66 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     },
 
 */
-    /*
+    /*   */
+    {
+      nome: "Cacau Show",
+      imagem: "images/comercios/docesChocolates/cacauShow/perfil.jpg",
+      promocoes: [
         {
-          nome: "Cacau Show",
-          imagem: "images/comercios/docesChocolates/cacauShow/perfil.jpg",
-          promocoes: [
-            {
-              imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
-              descricao: "Bombons de Chocolate ao Leite",
-              validade: "2025-07-31T23:00:00",
-              preco: "42,99",
-              preco_com_desconto: "30,99",
-              whatsapp: "43991053711"
-            },
-    
-            {
-              imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
-              descricao: "Chocolate Surpresa Turma Do Snoopy",
-              validade: "2025-07-31T23:00:00",
-              preco: "19,99",
-              preco_com_desconto: "13,99",
-              whatsapp: "43991053711"
-            },
-    
-            {
-              imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
-              descricao: "Bombons de chocolate ao leite com recheios nos sabores: avelã, trufa ao leite e cereja ao licor.",
-              validade: "2025-07-31T23:00:00",
-              preco: "49,99",
-              preco_com_desconto: "44,99",
-              whatsapp: "43991053711"
-            },
-    
-    
-            {
-              imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
-              descricao: "Caixa Angel Gourmet | 200 g Bombons nos sabores chocolate 55% de cacau com recheio intenso e chocolate ao leite com recheio sabor creme e morango.",
-              validade: "2025-07-31T23:00:00",
-              preco: "54,99",
-              preco_com_desconto: "43,99",
-              whatsapp: "43991053711"
-            },
-    
-    
-            {
-              imagem: "images/comercios/docesChocolates/cacauShow/promocao/5.jpg",
-              descricao: "Promoçao Mini Show",
-              validade: "2025-08-30T23:00:00",
-              whatsapp: "43991053711"
-            },
-          ]
-    
-    
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
+          descricao: "Trufas 13,5g",
+          validade: "2025-08-31T23:00:00",
+
+          whatsapp: "43991053711"
         },
-    
-    */
+
+        {
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
+          descricao: "Trufas 30g",
+          validade: "2025-08-31T23:00:00",
+
+          whatsapp: "43991053711"
+        },
+
+        {
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
+          descricao: "Trufas Artesanais 30g",
+          validade: "2025-08-31T23:00:00",
+
+          whatsapp: "43991053711"
+        },
+
+
+        {
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
+          descricao: "Trufas Zero Açucar 30g",
+          validade: "2025-08-31T23:00:00",
+
+          whatsapp: "43991053711"
+        },
+
+        {
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
+          descricao: "Caixa Angel Gourmet | 200 g Bombons nos sabores chocolate 55% de cacau com recheio intenso e chocolate ao leite com recheio sabor creme e morango.",
+          validade: "2025-08-31T23:00:00",
+          preco: "54,99",
+          preco_com_desconto: "43,99",
+          whatsapp: "43991053711"
+        },
+
+
+        {
+          imagem: "images/comercios/docesChocolates/cacauShow/promocao/5.jpg",
+          descricao: "Promoçao Mini Show",
+          validade: "2025-08-30T23:00:00",
+          whatsapp: "43991053711"
+        },
+      ]
+
+
+    },
+
+
 
 
     {
@@ -1797,7 +1802,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/moveis/movepar/promocao/1.jpg",
           descricao: "XIAOMI POCO C71 3GB RAM 64GB MEMÓRIA ",
-          validade: "2025-08-25T18:00:00",
+          validade: "2025-08-30T18:00:00",
           preco: "1.190,00",
           preco_com_desconto: "699,00 a vista",
           // desconto: "5",
@@ -1807,9 +1812,28 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/moveis/movepar/promocao/2.jpg",
           descricao: "XIAOMI REDMI A5 4GB RAM 128GB MEMÓRIA",
-          validade: "2025-08-25T18:00:00",
+          validade: "2025-08-30T18:00:00",
           preco: "1.590,00",
           preco_com_desconto: "799,00 a vista",
+          whatsapp: "43991186909"
+        },
+
+
+        {
+          imagem: "images/comercios/moveis/movepar/promocao/3.jpg",
+          descricao: "Fogão Monaco Atlas 5 Bocas",
+          validade: "2025-08-30T18:00:00",
+          preco: "1.990,00",
+          preco_com_desconto: "1.190,00",
+          whatsapp: "43991186909"
+        },
+
+        {
+          imagem: "images/comercios/moveis/movepar/promocao/3.jpg",
+          descricao: "Guarda Roupa Fit Andira",
+          validade: "2025-08-30T18:00:00",
+          preco: "1.290,00",
+          preco_com_desconto: "599,00",
           whatsapp: "43991186909"
         },
 
@@ -1827,7 +1851,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/agropecuaria/agroVida/promocao/1.jpg",
           descricao: "Ração Unna 15kg cães adultos",
-          validade: "2025-08-25T18:00:00",
+          validade: "2025-08-30T18:00:00",
           preco: "110,00",
           preco_com_desconto: "99,90 a vista",
           // desconto: "5",
@@ -1837,7 +1861,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
           descricao: "Kit Churrasco Karanda",
-          validade: "2025-08-15T18:00:00",
+          validade: "2025-08-30T18:00:00",
           preco: "340,00",
           preco_com_desconto: "300,00 a vista",
           // desconto: "5",
@@ -5056,7 +5080,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             },
             contact: "(43) 99148-8478",
             delivery: "Sim / Sem Taxa",
-         
+
             instagram: "https://www.instagram.com/farmaciadavilaclps/",
 
             novidadesImages: [
@@ -7533,18 +7557,19 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/docesChocolates/cacauShow/divulgacao/1.jpg",
               "images/comercios/docesChocolates/cacauShow/divulgacao/2.jpg",
               "images/comercios/docesChocolates/cacauShow/divulgacao/3.jpg",
-
-
+              "images/comercios/docesChocolates/cacauShow/divulgacao/4.jpg",
+              "images/comercios/docesChocolates/cacauShow/divulgacao/5.jpg",
+              "images/comercios/docesChocolates/cacauShow/divulgacao/6.jpg",
             ],
             novidadesDescriptions: [
+              "O Cacau é a moeda digital do programa Cacau Lovers! Acesse o Link <a href='https://lovers.cacaushow.com.br/momentos-especiais'>-- Cacau Lovers --</a> e venha ser cliente Cacau Lovers ",
+              "Resgate Lovers",
               "É hora de LaNut e LaCreme<br>Nessa campanha, nas quintas temos promoção desses tabletes deliciosos!😋<br>2 Tabletes especiais de 100g por apenas R$ 29,99.",
               "Biscoitos crocantes com o melhor chocolate!",
               "Quando o amor é verdadeiro, a combinação é perfeita.",
               "Tem carinho que se transforma em chocolate.<br>E tem presente que carrega todo o amor do mundo.<br>Quando o amor é único, o presente também precisa ser.",
             ],
           },
-
-
 
 
         ],
@@ -8175,7 +8200,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/restaurante/saborRoca/divulgacao/3.jpg",
               "images/comercios/restaurante/saborRoca/divulgacao/4.jpg",
               "images/comercios/restaurante/saborRoca/divulgacao/5.jpg",
-       
+
             ],
 
             novidadesDescriptions: [
@@ -8184,7 +8209,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Do campo direto para o prato — saladas fresquinhas, nutritivas e cheias de vida",
               "Nada de industrial — aqui é tudo feito na hora, com ingredientes frescos e tempero de verdade",
               "Nada de industrial — aqui é tudo feito na hora, com ingredientes frescos e tempero de verdade",
-           
+
 
 
             ],
@@ -8455,7 +8480,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Nota de Falecimento",
         establishments: [
 
- {
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/33.jpg",
             date: "19/08/2025",
@@ -8464,10 +8489,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-            
 
 
-           {
+
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/31.jpg",
             date: "16/08/2025",
@@ -8477,7 +8502,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
- {
+          {
             name: "Funeraria Bom Jesus",
             image: "images/informacoes/notaFalecimento/bomjesus/1.jpg",
             date: "14/08/2025",
