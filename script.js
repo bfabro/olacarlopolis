@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "thebestacai", "mhpiscinas", "namigo", "nelsoncalhas", "oficinadocelular", "Team Vieira"
+    "oficinadocelular", "seiza"
 
   ];
 
@@ -794,7 +794,7 @@ document.addEventListener("DOMContentLoaded", function () {
     passeiociclisticorotary: "s",
     aniversariomclobosdafronteira: "s",
     torneiofutebolsuico: "s",
-   
+
     cafedamanharotapr218: "s",
     campeonatodepescaesportivaaotucunare: "s",
     cavalgadadafrutfest: "s",
@@ -5777,46 +5777,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-          {
-            image: "images/informacoes/eventos/senhorbomjesus.png",
-            name: "Festa Do Senhor Bom Jesus",
-            date: "28/07/25 Programação Religiosa<br> 01/08/2025 Programação Social",
-            address: "Em Frente a Igreja Matriz",
-            contact: "(43) 99833-9638",
-            instagram: "https://www.instagram.com/paroquiacarlopolis/",
-            novidadesImages: [
-              "images/informacoes/eventos/senhorbomjesus_premios.jpg",
-
-            ], novidadesDescriptions: [
-              "Show de Premios",
-            ],
-
-
-          },
-
-
-          {
-            image: "images/informacoes/eventos/escolhaRainha.jpg",
-            name: "Escolha da Rainha Frut Fest",
-            date: "16/08/2025",
-            address: "Caravela Clube",
-            contact: "-",
-            instagram: "https://www.instagram.com/caravelaclube/",
-          },
-
-
-          
-
-
-          {
-            image: "images/informacoes/eventos/torneioFutebol.jpg",
-            name: "Torneio Futebol Suiço",
-            date: "24/08/2025",
-            address: "Vale dos Sonhos",
-            contact: "(43) 99667-4021",
-            instagram: "https://www.instagram.com/clubevaledossonhos/",
-          },
-
 
           {
             image: "images/informacoes/eventos/cavalgada.jpg",
@@ -8208,13 +8168,24 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Benedito Salles, 365 - Carlopolis",
             contact: "(43) 99832-3050",
             delivery: "Sim / Sem Taxa",
-              novidadesImages: [
+            novidadesImages: [
               "images/comercios/restaurante/saborRoca/divulgacao/1.jpg",
-              ],
+              "images/comercios/restaurante/saborRoca/divulgacao/2.jpg",
+              "images/comercios/restaurante/saborRoca/divulgacao/3.jpg",
+              "images/comercios/restaurante/saborRoca/divulgacao/4.jpg",
+              "images/comercios/restaurante/saborRoca/divulgacao/5.jpg",
+       
+            ],
 
-               novidadesDescriptions: [
-              "Nosso Buffet",
-          
+            novidadesDescriptions: [
+              "Cada prato carrega o aroma da roça, o tempero da tradição e o carinho de quem cozinha com alma.",
+              "Cada prato carrega o aroma da roça, o tempero da tradição e o carinho de quem cozinha com alma.",
+              "Do campo direto para o prato — saladas fresquinhas, nutritivas e cheias de vida",
+              "Nada de industrial — aqui é tudo feito na hora, com ingredientes frescos e tempero de verdade",
+              "Nada de industrial — aqui é tudo feito na hora, com ingredientes frescos e tempero de verdade",
+           
+
+
             ],
 
           },
@@ -10581,7 +10552,7 @@ const COLETA_LIXO = {
 
   // Edite dia a dia aqui embaixo:
   ter: [
-     { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
     { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
     { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
     { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
@@ -10622,7 +10593,7 @@ const COLETA_LIXO = {
     { hora: "12:05", bairros: ["Bairro da Cachoeira"], Equipe: "Bruno" },
   ],
   qua: [
-   { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
     { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
     { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
     { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
@@ -10705,7 +10676,7 @@ const COLETA_LIXO = {
 
   ],
   sex: [
-     { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
+    { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
     { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
     { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
     { hora: "07:10", bairros: ["Rocha"], Equipe: "Leonil" },
@@ -10745,7 +10716,7 @@ const COLETA_LIXO = {
     { hora: "10:35", bairros: ["Lazaro"], Equipe: "Bruno" },
     { hora: "12:05", bairros: ["Bairro da Cachoeira"], Equipe: "Bruno" },
   ],
-  sab: [ 
+  sab: [
     { hora: "06:05", bairros: ["Garagem"], Equipe: "Leonil" },
     { hora: "06:10", bairros: ["CTG"], Equipe: "Leonil" },
     { hora: "06:35", bairros: ["Centro"], Equipe: "Leonil" },
@@ -10820,7 +10791,7 @@ function montarPaginaColetaLixo() {
   const hojeKey = dias[new Date().getDay()];
 
   // UI
- const html = `
+  const html = `
   <h2 class="highlighted">🧹 Coleta de Lixo</h2>
   <div class="coleta-wrap">
 
@@ -10871,15 +10842,15 @@ function montarPaginaColetaLixo() {
   document.querySelector(".content_area").innerHTML = html;
 
   // Botão "X" para limpar e manter o render funcionando
-const _busca = document.getElementById("buscaBairro");
-const _clear = document.getElementById("coletaClear");
-if (_clear && _busca) {
-  _clear.addEventListener("click", () => {
-    _busca.value = "";
-    _busca.dispatchEvent(new Event("input"));
-    _busca.focus();
-  });
-}
+  const _busca = document.getElementById("buscaBairro");
+  const _clear = document.getElementById("coletaClear");
+  if (_clear && _busca) {
+    _clear.addEventListener("click", () => {
+      _busca.value = "";
+      _busca.dispatchEvent(new Event("input"));
+      _busca.focus();
+    });
+  }
 
 
   // Atualiza destaque "agora" a cada 60s respeitando o dia escolhido e o filtro de texto
