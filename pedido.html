@@ -383,20 +383,22 @@
 
 
     /* Botões "Fechar" vermelhos em todos os modais */
-.oc-modal header .oc-btn-sec{
-  background: #ef4444 !important;   /* red-500 */
-  color: #fff !important;
-  border: 1px solid #dc2626 !important; /* red-600 */
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-weight: 700;
-  transition: transform .06s ease, filter .2s ease;
-}
-.oc-modal header .oc-btn-sec:hover{
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-}
+    .oc-modal header .oc-btn-sec {
+      background: #ef4444 !important;
+      /* red-500 */
+      color: #fff !important;
+      border: 1px solid #dc2626 !important;
+      /* red-600 */
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-weight: 700;
+      transition: transform .06s ease, filter .2s ease;
+    }
 
+    .oc-modal header .oc-btn-sec:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
   </style>
   <link href="style.css" rel="stylesheet" />
   <link
@@ -906,34 +908,36 @@
 
 
     /* Centralizar todos os modais */
-dialog.oc-modal{
-  position: fixed;
-  inset: 50% auto auto 50%;   /* top/left em 50% */
-  transform: translate(-50%, -50%);
-  margin: 0;                  /* evita centrais "por margem" do UA */
-  max-height: 90vh;           /* scroll interno se ficar alto */
-  overflow: auto;
-}
-dialog.oc-modal::backdrop{
-  background: rgba(0,0,0,.45);
-}
+    dialog.oc-modal {
+      position: fixed;
+      inset: 50% auto auto 50%;
+      /* top/left em 50% */
+      transform: translate(-50%, -50%);
+      margin: 0;
+      /* evita centrais "por margem" do UA */
+      max-height: 90vh;
+      /* scroll interno se ficar alto */
+      overflow: auto;
+    }
+
+    dialog.oc-modal::backdrop {
+      background: rgba(0, 0, 0, .45);
+    }
 
 
-/* Quantidade estática (sem +/−) no resumo */
-.oc-qty-static{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-width:42px;
-  padding:6px 10px;
-  border-radius:999px;
-  font-weight:800;
-  background:#eef3ff;
-  border:1px solid #dfe7ff;
-  color:#2f4fa8;
-}
-
-
+    /* Quantidade estática (sem +/−) no resumo */
+    .oc-qty-static {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 42px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      background: #eef3ff;
+      border: 1px solid #dfe7ff;
+      color: #2f4fa8;
+    }
   </style>
 
 
@@ -1126,24 +1130,24 @@ dialog.oc-modal::backdrop{
       },
       taxasEntrega: { Cidade: 5.00, Fora: 30.00 },
       taxaPorBairro: {
-  "centro": 5.00,
-  "vila-nova": 7.00,
-  "conj-aurora": 8.00,
-  "zona-rural": 20.00
-},
-// (opcional) fallback caso não reconheça o bairro digitado:
-taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
+        "centro": 5.00,
+        "vila-nova": 7.00,
+        "conj-aurora": 8.00,
+        "zona-rural": 20.00
+      },
+      // (opcional) fallback caso não reconheça o bairro digitado:
+      taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
 
       cardapio: [
- {
+        {
           id: "001", nome: "X - Pernil", preco: 23.00, desc: "Pão, hambúrguer, Tomate, Cebola, Milho, Batata Palha, Pernil, Mussarela, Alface, Maione e Catchup.", tipo: "lanche", adicionais: [
-           
+
           ]
         },
 
         {
           id: "002", nome: "X-Dog", preco: 20.00, desc: "Pão de cachorro quente, tomate, cebola,calabresa,presunto, mussarela, milho, salsicha, batata palha, bacon, alface, maionese, catchup e hamburguer.", tipo: "lanche", adicionais: [
-            { id: "bacon", nome: "Bacon", preco: 3.0 },           
+            { id: "bacon", nome: "Bacon", preco: 3.0 },
           ]
         },
 
@@ -1153,19 +1157,23 @@ taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
           ]
         },
 
-          {
+        {
           id: "004", nome: "X-Milho", preco: 22.00, desc: "Pao de Hamburguer, tomate, cebola, milho, bacon, presunto, mussarela, alface, maionese, catchup e hamburguer.", tipo: "lanche", adicionais: [
-          
+
           ]
-          },
+        },
+
+        {
+          id: "005", nome: "X-Salada", preco: 18.00, desc: "Pao de Hamburguer, tomate, presunto, mussarela, alface, maionese, catchup e hamburguer.", tipo: "lanche", adicionais: [
+
+          ]
+        },
 
  {
-          id: "005", nome: "X-Salada", preco: 18.00, desc: "Pao de Hamburguer, tomate, presunto, mussarela, alface, maionese, catchup e hamburguer.", tipo: "lanche", adicionais: [
-            
+          id: "006", nome: "X-Salada Especial", preco: 20.00, desc: "Pao de Hamburguer, tomate, presunto, mussarela, alface, maionese, catchup e hamburguer e catupiry.", tipo: "lanche", adicionais: [
+
           ]
-          },
-
-
+        },
 
 
         {
@@ -1182,10 +1190,15 @@ taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
           ]
         },
         // BEBIDAS
-        { id: "fr1", nome: "Fritas média", preco: 12.0, desc: "300g", tipo: "lanche" },
-        { id: "coca350", nome: "Coca 350ml", preco: 6.0, tipo: "bebida" },
-        { id: "guarana1l", nome: "Guaraná 1L", preco: 9.0, tipo: "bebida" },
-        { id: "SUCO1", nome: "Suco de Laranja do Bill", preco: 4.0, tipo: "bebida" },
+        
+        { id: "b001", nome: "Coca cola Lata 350ml", preco: 6.0, tipo: "bebida" },
+        { id: "b002", nome: "Fanta Lata 350ml", preco: 6.0, tipo: "bebida" },
+        { id: "b003", nome: "Guarana Lata 350ml", preco: 6.0, tipo: "bebida" },
+        { id: "b004", nome: "H2OH 600ml", preco: 8.0, tipo: "bebida" },
+        { id: "b005", nome: "Tubaina", preco: 5.0, tipo: "bebida" },
+        { id: "b006", nome: "Coca Cola 1L", preco: 12.0, tipo: "bebida" },
+        { id: "b007", nome: "Coca Cola 2L", preco: 16.0, tipo: "bebida" },
+        { id: "b008", nome: "Conquista 2L", preco: 10.0, tipo: "bebida" },
 
 
         // DOCES
@@ -1206,10 +1219,10 @@ taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
     const slug = s => (s || '').toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      const normBairro = s => (s||'')
-  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-  .toLowerCase().replace(/[^a-z0-9]+/g,'-')
-  .replace(/(^-|-$)/g,'');
+    const normBairro = s => (s || '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
 
     const getFoto = (p) => p.foto || (IMAGENS_DIR + slug(p.nome) + '.jpg');
     const LOGOS_DIR = 'images/comercios/restaurante/selaht/selaht.png';
@@ -1231,9 +1244,9 @@ taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
      *******************/
     const money = v => (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const toNumber = (x) => {
-  if (typeof x === 'string') return Number(x.replace(',', '.')) || 0;
-  return Number(x) || 0;
-};
+      if (typeof x === 'string') return Number(x.replace(',', '.')) || 0;
+      return Number(x) || 0;
+    };
 
     function normalizePhone(raw) {
       let n = (raw || "").replace(/\D/g, "");
@@ -1264,90 +1277,90 @@ taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
       return { open, faixa };
     }
 
-   function calcularTotais(carrinho, taxaEntrega = 0) {
-  const subtotal = (carrinho || []).reduce((acc, item) => {
-    const qtd = Number(item.qtd) || 1;
-    const base = (Number(item.preco) || 0) * qtd;
-    const add  = (item.adicionais || [])
-      .reduce((a, ad) => a + (Number(ad.preco) || 0), 0) * qtd;
-    return acc + base + add;
-  }, 0);
-  const total = subtotal + (Number(taxaEntrega) || 0);
-  return { subtotal, total };
-}
+    function calcularTotais(carrinho, taxaEntrega = 0) {
+      const subtotal = (carrinho || []).reduce((acc, item) => {
+        const qtd = Number(item.qtd) || 1;
+        const base = (Number(item.preco) || 0) * qtd;
+        const add = (item.adicionais || [])
+          .reduce((a, ad) => a + (Number(ad.preco) || 0), 0) * qtd;
+        return acc + base + add;
+      }, 0);
+      const total = subtotal + (Number(taxaEntrega) || 0);
+      return { subtotal, total };
+    }
 
 
     function montarTextoPedido(carrinho, est, dados) {
-  // 1) calcula taxa: prioriza bairro; se não achar, usa dentro/fora
-  const normBairro = s => (s||'')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .toLowerCase().replace(/[^a-z0-9]+/g,'-')
-    .replace(/(^-|-$)/g,'');
+      // 1) calcula taxa: prioriza bairro; se não achar, usa dentro/fora
+      const normBairro = s => (s || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
 
-  const mapa = est.taxaPorBairro || {};
-  const keyB = normBairro(dados.bairroEntrega || '');
-  const pad  = est.taxaEntregaPadrao || {};
+      const mapa = est.taxaPorBairro || {};
+      const keyB = normBairro(dados.bairroEntrega || '');
+      const pad = est.taxaEntregaPadrao || {};
 
-  let taxaEntrega = 0;
-  let labelTaxa = '';
+      let taxaEntrega = 0;
+      let labelTaxa = '';
 
-  if (dados.tipo === 'Entrega') {
-    if (keyB && Object.prototype.hasOwnProperty.call(mapa, keyB)) {
-      taxaEntrega = Number(mapa[keyB]) || 0;
-      labelTaxa = `Taxa (${dados.bairroEntrega})`;
-    } else {
-      taxaEntrega = (dados.zonaEntrega === 'cidade') ? (Number(pad.cidade)||0)
-                 : (dados.zonaEntrega === 'fora')   ? (Number(pad.fora)||0) : 0;
-      labelTaxa = `Taxa (${dados.zonaEntrega === 'cidade' ? 'Dentro da cidade' : 'Fora da cidade'})`;
+      if (dados.tipo === 'Entrega') {
+        if (keyB && Object.prototype.hasOwnProperty.call(mapa, keyB)) {
+          taxaEntrega = Number(mapa[keyB]) || 0;
+          labelTaxa = `Taxa (${dados.bairroEntrega})`;
+        } else {
+          taxaEntrega = (dados.zonaEntrega === 'cidade') ? (Number(pad.cidade) || 0)
+            : (dados.zonaEntrega === 'fora') ? (Number(pad.fora) || 0) : 0;
+          labelTaxa = `Taxa (${dados.zonaEntrega === 'cidade' ? 'Dentro da cidade' : 'Fora da cidade'})`;
+        }
+      }
+
+      const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
+
+      // 2) cabeçalho
+      const linhas = [];
+      linhas.push('*Novo pedido*');
+      linhas.push(`Loja: ${est.name}`);
+
+      linhas.push('');
+
+      // 3) itens
+      carrinho.forEach((it, idx) => {
+        const obs = it.obs ? `\n  _Obs:_ ${it.obs}` : '';
+        const ad = (it.adicionais && it.adicionais.length)
+          ? ('\n  + ' + it.adicionais.map(a => `${a.nome} (${money(a.preco)})`).join('\n  + '))
+          : '';
+        linhas.push(`${idx + 1}. ${it.qtd}x ${it.nome} — ${money(it.preco)}${ad}${obs}`);
+      });
+      linhas.push('');
+
+      // 4) valores
+      const linhasValores = ['*Valores do Pedido:*', `Subtotal: ${money(subtotal)}`];
+      if (taxaEntrega) linhasValores.push(`${labelTaxa}: ${money(taxaEntrega)}`);
+      linhasValores.push(`*Total: ${money(total)}*`);
+      linhas.push(...linhasValores, '');
+
+      // 5) dados do cliente
+      const linhasCliente = ['*Dados do Cliente:*', `Tipo: ${dados.tipo}`];
+      if (dados.tipo === 'Entrega') {
+        if (dados.zonaEntrega) {
+          linhasCliente.push(`Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
+        }
+        if (dados.bairroEntrega) linhasCliente.push(`Bairro: ${dados.bairroEntrega}`);
+        if (dados.endereco) linhasCliente.push(`Endereço: ${dados.endereco}`);
+        if (dados.numero) linhasCliente.push(`Número: ${dados.numero}`);
+        if (dados.complemento) linhasCliente.push(`Compl.: ${dados.complemento}`);
+        if (dados.referencia) linhasCliente.push(`Ref.: ${dados.referencia}`);
+      } else {
+        if (dados.retiradaNome) linhasCliente.push(`Para: ${dados.retiradaNome}`);
+      }
+      if (dados.nome) linhasCliente.push(`Nome: ${dados.nome}`);
+      if (dados.tel) linhasCliente.push(`Telefone: ${dados.tel}`);
+
+      linhas.push(...linhasCliente);
+
+      return linhas.join('\n');
     }
-  }
-
-  const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
-
-  // 2) cabeçalho
-  const linhas = [];
-  linhas.push('*Novo pedido*');
-  linhas.push(`Loja: ${est.name}`);
- 
-  linhas.push('');
-
-  // 3) itens
-  carrinho.forEach((it, idx) => {
-    const obs = it.obs ? `\n  _Obs:_ ${it.obs}` : '';
-    const ad = (it.adicionais && it.adicionais.length)
-      ? ('\n  + ' + it.adicionais.map(a => `${a.nome} (${money(a.preco)})`).join('\n  + '))
-      : '';
-    linhas.push(`${idx+1}. ${it.qtd}x ${it.nome} — ${money(it.preco)}${ad}${obs}`);
-  });
-  linhas.push('');
-
-  // 4) valores
-  const linhasValores = ['*Valores do Pedido:*', `Subtotal: ${money(subtotal)}`];
-  if (taxaEntrega) linhasValores.push(`${labelTaxa}: ${money(taxaEntrega)}`);
-  linhasValores.push(`*Total: ${money(total)}*`);
-  linhas.push(...linhasValores, '');
-
-  // 5) dados do cliente
-  const linhasCliente = ['*Dados do Cliente:*', `Tipo: ${dados.tipo}`];
-  if (dados.tipo === 'Entrega') {
-    if (dados.zonaEntrega) {
-      linhasCliente.push(`Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
-    }
-    if (dados.bairroEntrega) linhasCliente.push(`Bairro: ${dados.bairroEntrega}`);
-    if (dados.endereco)      linhasCliente.push(`Endereço: ${dados.endereco}`);
-    if (dados.numero)        linhasCliente.push(`Número: ${dados.numero}`);
-    if (dados.complemento)   linhasCliente.push(`Compl.: ${dados.complemento}`);
-    if (dados.referencia)    linhasCliente.push(`Ref.: ${dados.referencia}`);
-  } else {
-    if (dados.retiradaNome)  linhasCliente.push(`Para: ${dados.retiradaNome}`);
-  }
-  if (dados.nome) linhasCliente.push(`Nome: ${dados.nome}`);
-  if (dados.tel)  linhasCliente.push(`Telefone: ${dados.tel}`);
-
-  linhas.push(...linhasCliente);
-
-  return linhas.join('\n');
-}
 
 
 
@@ -1355,7 +1368,7 @@ taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
     function enviarPedido(est, carrinho, dados) {
       if (!carrinho?.length) { alert('Seu carrinho está vazio.'); return; }
 
-     const texto = montarTextoPedido(carrinho, est, dados);
+      const texto = montarTextoPedido(carrinho, est, dados);
       const urlEst = `https://wa.me/${normalizePhone(WHATS_ESTAB_FIXO)}?text=${encodeURIComponent(texto)}`;
       window.open(urlEst, '_blank');
 
@@ -1499,30 +1512,30 @@ taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
 
 
     function renderCart() {
-  const box = document.getElementById('cartContainer');
-  if (!state.carrinho.length) {
-    box.className = 'oc-cart-empty';
-    box.textContent = 'Seu carrinho está vazio.';
-    updateTotals();
-    return;
-  }
+      const box = document.getElementById('cartContainer');
+      if (!state.carrinho.length) {
+        box.className = 'oc-cart-empty';
+        box.textContent = 'Seu carrinho está vazio.';
+        updateTotals();
+        return;
+      }
 
-  box.className = '';
-  box.innerHTML = '';
+      box.className = '';
+      box.innerHTML = '';
 
-  state.carrinho.forEach((it, idx) => {
-    const line = document.createElement('div');
-    line.className = 'oc-cart-line';
+      state.carrinho.forEach((it, idx) => {
+        const line = document.createElement('div');
+        line.className = 'oc-cart-line';
 
-    const adds = (it.adicionais || []).map(a => `+${a.nome}`).join(', ');
-    const obs  = it.obs ? ` • ${it.obs}` : '';
+        const adds = (it.adicionais || []).map(a => `+${a.nome}`).join(', ');
+        const obs = it.obs ? ` • ${it.obs}` : '';
 
-    const lineTotal = (
-      (Number(it.preco) || 0) +
-      (it.adicionais || []).reduce((a, x) => a + (Number(x.preco) || 0), 0)
-    ) * (Number(it.qtd) || 1);
+        const lineTotal = (
+          (Number(it.preco) || 0) +
+          (it.adicionais || []).reduce((a, x) => a + (Number(x.preco) || 0), 0)
+        ) * (Number(it.qtd) || 1);
 
-    line.innerHTML = `
+        line.innerHTML = `
       <div class="oc-qty-static" aria-label="Quantidade">${Number(it.qtd) || 1}x</div>
       <div>
         <div class="oc-item-name"><strong>${it.nome}</strong></div>
@@ -1532,58 +1545,58 @@ taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
       <div><strong>${money(lineTotal)}</strong></div>
     `;
 
-    // (opcional) manter remoção por clique direito no nome:
-    const nameEl = line.querySelector('div:nth-child(2) > div strong');
-    if (nameEl) {
-      nameEl.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        if (confirm('Remover item?')) { state.carrinho.splice(idx, 1); renderCart(); }
+        // (opcional) manter remoção por clique direito no nome:
+        const nameEl = line.querySelector('div:nth-child(2) > div strong');
+        if (nameEl) {
+          nameEl.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            if (confirm('Remover item?')) { state.carrinho.splice(idx, 1); renderCart(); }
+          });
+        }
+
+        box.appendChild(line);
       });
+
+      updateTotals();
     }
-
-    box.appendChild(line);
-  });
-
-  updateTotals();
-}
 
 
     function updateTotals() {
-  const tipo   = document.getElementById('tipoPedido').value;
-  const zona   = document.getElementById('zonaEntrega')?.value || '';
-  const bairro = document.getElementById('bairroInput')?.value.trim() || '';
+      const tipo = document.getElementById('tipoPedido').value;
+      const zona = document.getElementById('zonaEntrega')?.value || '';
+      const bairro = document.getElementById('bairroInput')?.value.trim() || '';
 
-  let taxa = 0, taxaLabel = '';
-  if (tipo === 'Entrega') {
-    const mapa = state.est.taxaPorBairro || {};
-    const key  = normBairro(bairro);
-    if (key && Object.prototype.hasOwnProperty.call(mapa, key)) {
-      taxa = Number(mapa[key]) || 0;
-      taxaLabel = `Taxa (${bairro})`;
-    } else {
-      const pad = state.est.taxaEntregaPadrao || {};
-      taxa = (zona === 'cidade') ? (Number(pad.cidade)||0)
-           : (zona === 'fora')   ? (Number(pad.fora)||0) : 0;
-      taxaLabel = `Taxa (${zona === 'cidade' ? 'Dentro da cidade' : 'Fora da cidade'})`;
-    }
-  }
+      let taxa = 0, taxaLabel = '';
+      if (tipo === 'Entrega') {
+        const mapa = state.est.taxaPorBairro || {};
+        const key = normBairro(bairro);
+        if (key && Object.prototype.hasOwnProperty.call(mapa, key)) {
+          taxa = Number(mapa[key]) || 0;
+          taxaLabel = `Taxa (${bairro})`;
+        } else {
+          const pad = state.est.taxaEntregaPadrao || {};
+          taxa = (zona === 'cidade') ? (Number(pad.cidade) || 0)
+            : (zona === 'fora') ? (Number(pad.fora) || 0) : 0;
+          taxaLabel = `Taxa (${zona === 'cidade' ? 'Dentro da cidade' : 'Fora da cidade'})`;
+        }
+      }
 
-  const { subtotal, total } = calcularTotais(state.carrinho, taxa);
+      const { subtotal, total } = calcularTotais(state.carrinho, taxa);
 
-  document.getElementById('minimoMsg').textContent = '';
-  const box = document.getElementById('totalsBox');
-  box.innerHTML = `
+      document.getElementById('minimoMsg').textContent = '';
+      const box = document.getElementById('totalsBox');
+      box.innerHTML = `
     <div><span>Subtotal</span><span>${money(subtotal)}</span></div>
     ${tipo === 'Entrega' ? `<div><span>${taxaLabel}</span><span>${money(taxa)}</span></div>` : ''}
     <div class="oc-total"><span>Total</span><span>${money(total)}</span></div>
   `;
 
-  const st = isOpenNow(state.est.horarios);
-  const btn = document.getElementById('btnEnviar');
-  const entregaOk = (tipo !== 'Entrega') || (bairro && zona);
-  btn.disabled = !state.carrinho.length || !st.open || !entregaOk;
-  btn.textContent = st.open ? 'Enviar pedido pelo WhatsApp' : 'Fechado agora';
-}
+      const st = isOpenNow(state.est.horarios);
+      const btn = document.getElementById('btnEnviar');
+      const entregaOk = (tipo !== 'Entrega') || (bairro && zona);
+      btn.disabled = !state.carrinho.length || !st.open || !entregaOk;
+      btn.textContent = st.open ? 'Enviar pedido pelo WhatsApp' : 'Fechado agora';
+    }
 
 
 
@@ -1612,30 +1625,30 @@ taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
     // Modal item
     let modalItem = null;
     function openItemModal(p) {
-     modalItem = JSON.parse(JSON.stringify(p));
-modalItem.qtd = 1; 
-modalItem._addsSel = new Set();
+      modalItem = JSON.parse(JSON.stringify(p));
+      modalItem.qtd = 1;
+      modalItem._addsSel = new Set();
 
-document.getElementById('mNome').textContent = p.nome;
-document.getElementById('mDesc').textContent = p.desc || '';
-const mImg = document.getElementById('mImg');
-if (mImg) {
-  mImg.src = (typeof getFoto === 'function' ? getFoto(p) : (p.foto || ''));
-  mImg.alt = `Foto de ${p.nome}`;
-}
-document.getElementById('mObs').value = '';
-document.getElementById('mQtd').textContent = '1';
-renderAdds(p);
+      document.getElementById('mNome').textContent = p.nome;
+      document.getElementById('mDesc').textContent = p.desc || '';
+      const mImg = document.getElementById('mImg');
+      if (mImg) {
+        mImg.src = (typeof getFoto === 'function' ? getFoto(p) : (p.foto || ''));
+        mImg.alt = `Foto de ${p.nome}`;
+      }
+      document.getElementById('mObs').value = '';
+      document.getElementById('mQtd').textContent = '1';
+      renderAdds(p);
 
-/* NOVO: já mostra o preço base imediatamente 
-document.getElementById('mSubtotal').textContent = money(p.preco);*/
+      /* NOVO: já mostra o preço base imediatamente 
+      document.getElementById('mSubtotal').textContent = money(p.preco);*/
 
-/* mantém o cálculo (considera adicionais e quantidade = 1) */
-updateModalSubtotal();
+      /* mantém o cálculo (considera adicionais e quantidade = 1) */
+      updateModalSubtotal();
 
-document.getElementById('itemModal').showModal();
-/* garante pintura imediata em todos navegadores */
-requestAnimationFrame(updateModalSubtotal);
+      document.getElementById('itemModal').showModal();
+      /* garante pintura imediata em todos navegadores */
+      requestAnimationFrame(updateModalSubtotal);
     }
 
     function renderAdds(p) {
@@ -1659,16 +1672,16 @@ requestAnimationFrame(updateModalSubtotal);
 
 
 
-function updateModalSubtotal() {
-  const qtd = toNumber(document.getElementById('mQtd')?.textContent) || 1;
-  const base = toNumber(modalItem?.preco);
-  const addsPreco = (modalItem?.adicionais || [])
-    .filter(a => modalItem._addsSel?.has(a.id))
-    .reduce((s, a) => s + toNumber(a.preco), 0);
+    function updateModalSubtotal() {
+      const qtd = toNumber(document.getElementById('mQtd')?.textContent) || 1;
+      const base = toNumber(modalItem?.preco);
+      const addsPreco = (modalItem?.adicionais || [])
+        .filter(a => modalItem._addsSel?.has(a.id))
+        .reduce((s, a) => s + toNumber(a.preco), 0);
 
-  const val = (base + addsPreco) * qtd;
-  document.getElementById('mSubtotal').textContent = money(val);
-}
+      const val = (base + addsPreco) * qtd;
+      document.getElementById('mSubtotal').textContent = money(val);
+    }
 
 
 
@@ -1680,9 +1693,9 @@ function updateModalSubtotal() {
       const adds = (modalItem.adicionais || []).filter(a => modalItem._addsSel.has(a.id));
       state.carrinho.push({ id: modalItem.id, nome: modalItem.nome, preco: modalItem.preco, qtd, adicionais: adds, obs });
       document.getElementById('itemModal').close();
-     renderCart();            // re-render do carrinho
-  updateTotals();          // ⬅️ força o total agora
-  requestAnimationFrame(updateTotals); // ⬅️ garante pintura em alguns navegadores
+      renderCart();            // re-render do carrinho
+      updateTotals();          // ⬅️ força o total agora
+      requestAnimationFrame(updateTotals); // ⬅️ garante pintura em alguns navegadores
     });
 
     // Eventos principais
@@ -1709,34 +1722,34 @@ function updateModalSubtotal() {
     renderEst();
 
     // Gera PIX (copia e cola) com o valor total
-  document.getElementById('btnPix').addEventListener('click', () => {
-  const tipo   = document.getElementById('tipoPedido').value;
-  const zona   = document.getElementById('zonaEntrega')?.value || '';
-  const bairro = document.getElementById('bairroInput')?.value.trim() || '';
+    document.getElementById('btnPix').addEventListener('click', () => {
+      const tipo = document.getElementById('tipoPedido').value;
+      const zona = document.getElementById('zonaEntrega')?.value || '';
+      const bairro = document.getElementById('bairroInput')?.value.trim() || '';
 
-  const normBairro = s => (s||'')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .toLowerCase().replace(/[^a-z0-9]+/g,'-')
-    .replace(/(^-|-$)/g,'');
+      const normBairro = s => (s || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
 
-  let taxa = 0;
-  if (tipo === 'Entrega') {
-    const mapa = state.est.taxaPorBairro || {};
-    const key  = normBairro(bairro);
-    if (key && Object.prototype.hasOwnProperty.call(mapa, key)) {
-      taxa = Number(mapa[key]) || 0;
-    } else {
-      const pad = state.est.taxaEntregaPadrao || {};
-      taxa = (zona === 'cidade') ? (Number(pad.cidade)||0)
-           : (zona === 'fora')   ? (Number(pad.fora)||0) : 0;
-    }
-  }
+      let taxa = 0;
+      if (tipo === 'Entrega') {
+        const mapa = state.est.taxaPorBairro || {};
+        const key = normBairro(bairro);
+        if (key && Object.prototype.hasOwnProperty.call(mapa, key)) {
+          taxa = Number(mapa[key]) || 0;
+        } else {
+          const pad = state.est.taxaEntregaPadrao || {};
+          taxa = (zona === 'cidade') ? (Number(pad.cidade) || 0)
+            : (zona === 'fora') ? (Number(pad.fora) || 0) : 0;
+        }
+      }
 
-  const { total } = calcularTotais(state.carrinho, taxa);
-  if (total < 0.01) { alert('Selecione ao menos 1 item.'); return; }
+      const { total } = calcularTotais(state.carrinho, taxa);
+      if (total < 0.01) { alert('Selecione ao menos 1 item.'); return; }
 
-  openPixModal(total);
-});
+      openPixModal(total);
+    });
 
 
     function openFotoModal(p) {
@@ -1772,7 +1785,7 @@ function updateModalSubtotal() {
 
       const gui = emv('00', 'br.gov.bcb.pix');
       const key = emv('01', chave);
-    const desc = descricao ? emv('02', ascii(descricao, 99)) : '';
+      const desc = descricao ? emv('02', ascii(descricao, 99)) : '';
       const merAcc = emv('26', gui + key + desc);
 
       const pfi = '000201';             // Payload Format Indicator
@@ -1800,11 +1813,11 @@ function updateModalSubtotal() {
       const now = new Date();
       const txid = '***';
       const code = buildPixCopiaCola({
-  valor: total,
-  txid,
-  chavePix: chave,
-  descricao: EST.nome   // <- nome da loja na descrição do PIX
-});
+        valor: total,
+        txid,
+        chavePix: chave,
+        descricao: EST.nome   // <- nome da loja na descrição do PIX
+      });
       const qrBox = document.getElementById('pixQr');
       if (qrBox) { qrBox.innerHTML = ''; new QRCode(qrBox, { text: code, width: 180, height: 180 }); }
 
