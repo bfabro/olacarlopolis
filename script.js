@@ -5810,6 +5810,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Centro de Eventos Ilha do Ponciano",
             contact: "(43) 99825-0570",
             instagram: "https://www.instagram.com/frutfestoficial/",
+             novidadesImages: [
+              "images/informacoes/eventos/frutfest/1.jpg",
+              "images/informacoes/eventos/frutfest/2.jpg",
+              "images/informacoes/eventos/frutfest/3.jpg",
+
+            ],
+           
 
 
           },
