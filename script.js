@@ -10892,7 +10892,7 @@ function montarPaginaColetaLixo() {
             <option value="qui">Quinta</option>
             <option value="sex">Sexta</option>
             <option value="sab">Sábado</option>
-            <option value="dom">Domingo</option>
+           
           </select>
         </div>
 
