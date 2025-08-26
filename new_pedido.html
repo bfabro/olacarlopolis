@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pedido Online — Mobile First</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <style>
+    :root{
+      --bg:#0f172a;          /* slate-900 */
+      --surface:#0b1226;     /* deeper */
+      --card:#0e1a35;        /* cards */
+      --muted:#a8b3cf;       /* text muted */
+      --ink:#f8fbff;         /* text */
+      --line:rgba(255,255,255,.08);
+      --grad:linear-gradient(90deg,#38bdf8,#22d3ee,#a78bfa);
+      --brand:#60a5fa;       /* blue */
+      --ok:#22c55e;          /* green */
+      --danger:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0; background:radial-gradient(1200px 600px at 20% -10%, rgba(56,189,248,.15), transparent 60%),radial-gradient(800px 400px at 110% -10%, rgba(167,139,250,.18), transparent 50%), var(--bg); color:var(--ink); font-family:"Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif}
+    img{display:block; max-width:100%}
+    a{color:inherit; text-decoration:none}
+    button{font:inherit}
+
+    .wrap{max-width:1120px; margin:0 auto; padding:0 14px}
+
+    /* HEADER */
+    .appbar{position:sticky; top:0; z-index:50; background:rgba(10,16,34,.65); backdrop-filter:saturate(1.2) blur(12px); border-bottom:1px solid var(--line)}
+    .appbar .inner{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px}
+    .brand{display:flex; align-items:center; gap:10px}
+    .logo{width:36px; height:36px; border-radius:10px; background:var(--grad)}
+    .title{font-weight:800; letter-spacing:.3px}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px; border:1px solid var(--line); background:rgba(255,255,255,.04)}
+
+    /* HERO */
+    .hero{padding:18px 0}
+    .store{display:flex; gap:14px; align-items:center}
+    .store .avatar{width:72px; height:72px; border-radius:16px; border:1px solid var(--line); background:#000; overflow:hidden}
+    .store h2{margin:0 0 4px; font-size:22px}
+    .store .sub{color:var(--muted); font-size:13px}
+
+    /* CHIPS (SCROLLER) */
+    .chips{display:flex; gap:8px; overflow-x:auto; padding:8px 2px 14px; -webkit-overflow-scrolling:touch}
+    .chip{flex:0 0 auto; border:1px solid var(--line); background:rgba(255,255,255,.04); padding:8px 12px; border-radius:999px; font-weight:700; font-size:13px}
+
+    /* GRID */
+    .grid{display:grid; grid-template-columns:1fr; gap:14px}
+    @media(min-width:1024px){ .grid{ grid-template-columns: 1fr 360px } }
+
+    /* CATEGORY + PRODUCT CARDS */
+    .card{border:1px solid var(--line); border-radius:16px; background:rgba(255,255,255,.03)}
+    .card .hd{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; border-bottom:1px solid var(--line)}
+    .card .hd h3{margin:0; font-size:16px}
+    .plist{padding:10px}
+    .prod{display:grid; grid-template-columns:72px 1fr auto; gap:10px; align-items:center; padding:10px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.02); margin-bottom:10px}
+    .prod .thumb{width:72px; height:56px; border-radius:10px; overflow:hidden; background:linear-gradient(135deg, rgba(56,189,248,.15), rgba(167,139,250,.15))}
+    .prod h4{margin:0 0 3px; font-size:15px}
+    .prod p{margin:0; color:var(--muted); font-size:12px}
+    .price{font-weight:800; font-size:14px; padding:8px 10px; border-radius:999px; background:rgba(56,189,248,.14); border:1px solid var(--line)}
+
+    /* DELIVERY */
+    .form{padding:10px 14px}
+    .field{margin-bottom:10px}
+    .label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    .input,.select,.textarea{width:100%; background:rgba(0,0,0,.35); color:var(--ink); border:1px solid var(--line); border-radius:12px; padding:10px}
+    .textarea{min-height:84px}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media(max-width:600px){ .grid2{grid-template-columns:1fr} }
+
+    /* DESKTOP SUMMARY */
+    .summary{position:sticky; top:72px; height:max-content}
+    .cart-line{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; padding:10px 0; border-bottom:1px dashed var(--line)}
+    .qty{display:inline-flex; align-items:center; justify-content:center; min-width:38px; padding:6px 8px; border-radius:999px; background:rgba(56,189,248,.12); border:1px solid var(--line); font-weight:800}
+    .muted{color:var(--muted); font-size:12px}
+    .totals{margin-top:10px; font-size:14px}
+    .totals div{display:flex; justify-content:space-between; margin:4px 0}
+    .total{font-weight:800}
+
+    /* BOTTOM BAR (MOBILE) */
+    .bbar{position:sticky; bottom:0; z-index:45; background:rgba(10,16,34,.85); backdrop-filter:saturate(1.2) blur(10px); border-top:1px solid var(--line)}
+    .bbar .inner{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 14px}
+    .bbtn{flex:0 0 auto; border:0; background:var(--grad); color:#06121a; font-weight:900; padding:12px 16px; border-radius:12px; cursor:pointer}
+    .bmeta{display:flex; flex-direction:column; line-height:1.1}
+    .bmeta small{color:var(--muted)}
+
+    /* CART SHEET (MOBILE) */
+    .sheet{position:fixed; inset:auto 0 0 0; z-index:60; transform:translateY(100%); transition:transform .25s ease; background:rgba(9,13,29,.98); border-top:1px solid var(--line); border-radius:14px 14px 0 0; max-height:85vh; overflow:auto}
+    .sheet.open{transform:translateY(0)}
+    .sheet .hd{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; border-bottom:1px solid var(--line)}
+    .btn-ghost{background:transparent; border:1px solid var(--line); color:var(--ink); padding:10px 12px; border-radius:12px; cursor:pointer}
+
+    .btn-pri{width:100%; margin-top:10px; background:var(--grad); color:#06121a; border:0; border-radius:12px; padding:12px; cursor:pointer; font-weight:900}
+    .btn-danger{background:var(--danger); color:#fff; border:0; border-radius:10px; padding:10px 12px; font-weight:800; cursor:pointer}
+
+    /* MODALS */
+    dialog.modal{position:fixed; inset:50% auto auto 50%; transform:translate(-50%,-50%); margin:0; width:min(520px,96vw); max-height:88vh; overflow:auto; background:rgba(9,13,29,.98); color:var(--ink); border:1px solid var(--line); border-radius:16px; padding:0}
+    dialog.modal::backdrop{background:rgba(0,0,0,.5)}
+    .modal header{padding:14px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center}
+    .modal .content{padding:14px 16px}
+    .modal .actions{padding:14px 16px; border-top:1px solid var(--line); display:flex; gap:8px; justify-content:flex-end}
+  </style>
+</head>
+<body>
+  <header class="appbar">
+    <div class="wrap inner">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">Olá Carlópolis · Pedido</div>
+          <div id="openBadge" class="pill">Verificando…</div>
+        </div>
+      </div>
+      <a href="index.html" class="btn-ghost" style="display:none">Voltar</a>
+    </div>
+  </header>
+
+  <main class="wrap" id="app" style="padding-bottom:76px">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="store">
+        <div class="avatar"><img id="est-logo" alt="Logo" style="width:100%; height:100%; object-fit:cover"></div>
+        <div>
+          <h2 id="est-name">Loja</h2>
+          <div id="est-desc" class="sub">Monte seu pedido e envie por WhatsApp.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHIPS -->
+    <div class="chips" id="miniIndex"></div>
+
+    <!-- GRID -->
+    <div class="grid">
+      <!-- MENU -->
+      <section class="card" id="menuCard">
+        <div class="hd"><h3>Cardápio</h3></div>
+        <div class="plist" id="prodList"></div>
+      </section>
+
+      <!-- SUMMARY (desktop only) -->
+      <aside class="card summary" id="deskSummary" style="display:none">
+        <div class="hd"><h3>Resumo do Pedido</h3></div>
+        <div class="plist" id="cartContainer">Seu carrinho está vazio.</div>
+        <div class="plist" id="totalsBox"></div>
+        <div class="plist"><button id="btnEnviarDesk" class="btn-pri" disabled>Enviar pelo WhatsApp</button><button id="btnPixDesk" class="btn-ghost">Gerar PIX</button></div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- BOTTOM BAR (mobile) -->
+  <div class="bbar">
+    <div class="wrap inner">
+      <div class="bmeta"><strong id="bTotal">Total R$ 0,00</strong><small id="bSub">Subtotal R$ 0,00</small></div>
+      <div style="display:flex; gap:8px">
+        <button id="btnCartSheet" class="btn-ghost">Carrinho</button>
+        <button id="btnEnviar" class="bbtn" disabled>Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CART SHEET -->
+  <aside class="sheet" id="cartSheet">
+    <div class="hd">
+      <strong>Seu pedido</strong>
+      <button class="btn-ghost" id="closeSheet">Fechar</button>
+    </div>
+    <div class="plist" id="sheetCart"></div>
+    <div class="plist" id="minimoMsg" class="muted"></div>
+    <div class="plist" id="sheetTotals"></div>
+    <div class="plist" style="padding:10px 14px">
+      <div class="card" style="margin-bottom:10px">
+        <div class="hd"><h3>Entrega / Retirada</h3></div>
+        <div class="form">
+          <div class="grid2">
+            <label class="field"><span class="label">Como receber</span><select id="tipoPedido" class="select"><option value="Entrega">Entrega</option><option value="Retirada">Retirada</option></select></label>
+            <label class="field"><span class="label">Zona</span><select id="zonaEntrega" class="select"><option value="cidade">Dentro da cidade</option><option value="fora">Fora da cidade</option></select></label>
+          </div>
+          <label class="field" id="bairroWrap"><span class="label">Bairro</span><input id="bairroInput" class="input" type="text" placeholder="Digite seu bairro"></label>
+          <div class="grid2" id="enderecoFields">
+            <label class="field"><span class="label">Endereço</span><input id="endereco" class="input" type="text" placeholder="Rua, avenida…"></label>
+            <label class="field"><span class="label">Número</span><input id="numeroEndereco" class="input" type="text" placeholder="Nº"></label>
+          </div>
+          <label class="field"><span class="label">Referência (opcional)</span><input id="referencia" class="input" type="text" placeholder="Portaria, bloco…"></label>
+          <div class="grid2">
+            <label class="field"><span class="label">Seu nome</span><input id="cliNome" class="input" type="text" placeholder="Seu nome"></label>
+            <label class="field"><span class="label">Seu telefone</span><input id="cliFone" class="input" type="tel" placeholder="(43) 9xxxx-xxxx"></label>
+          </div>
+          <label class="field"><span class="label">Pagamento</span><select id="pagamento" class="select"><option value="PIX">PIX</option><option value="Dinheiro">Dinheiro</option><option value="Cartão">Cartão</option></select></label>
+          <label class="field"><span class="label">Observações</span><textarea id="obsGeral" class="textarea" rows="2" placeholder="Ex.: sem pimenta, coca gelada"></textarea></label>
+        </div>
+      </div>
+      <button id="btnPix" class="btn-ghost" style="width:100%">Gerar PIX</button>
+      <button id="btnEnviarSheet" class="btn-pri" disabled>Enviar pedido pelo WhatsApp</button>
+    </div>
+  </aside>
+
+  <!-- ITEM MODAL -->
+  <dialog id="itemModal" class="modal">
+    <header>
+      <strong id="mNome">Item</strong>
+      <button class="btn-danger" onclick="document.getElementById('itemModal').close()">Fechar</button>
+    </header>
+    <div class="content">
+      <div id="mImgWrap" style="text-align:center; margin-bottom:10px;"><img id="mImg" alt="Imagem" style="max-width:100%; border-radius:12px; border:1px solid var(--line)"></div>
+      <div id="mDesc" class="muted"></div>
+      <div style="margin-top:10px">
+        <div style="margin:8px 0 6px; font-weight:800">Adicionais</div>
+        <div id="mAdds"></div>
+      </div>
+      <div class="field" style="margin-top:8px"><span class="label">Observações</span><input id="mObs" class="input" type="text" placeholder="Ex.: sem cebola"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:10px">
+        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.06); border:1px solid var(--line); border-radius:10px; padding:4px">
+          <button id="mMenos" style="background:transparent; border:0; width:26px; height:26px; font-size:20px; color:var(--ink); cursor:pointer">−</button>
+          <span id="mQtd">1</span>
+          <button id="mMais" style="background:transparent; border:0; width:26px; height:26px; font-size:20px; color:var(--ink); cursor:pointer">+</button>
+        </div>
+        <div><span class="muted">Subtotal item: </span><strong id="mSubtotal">R$ 0,00</strong></div>
+      </div>
+    </div>
+    <div class="actions"><button id="mAddBtn" class="btn-pri" style="width:auto">Adicionar ao carrinho</button></div>
+  </dialog>
+
+  <!-- PIX MODAL -->
+  <dialog id="pixModal" class="modal">
+    <header>
+      <strong>Pagamento via PIX</strong>
+      <button class="btn-danger" onclick="document.getElementById('pixModal').close()">Fechar</button>
+    </header>
+    <div class="content">
+      <div class="field"><span class="label">Chave PIX</span><div style="display:flex; gap:8px; align-items:center"><input id="pixChaveShow" class="input" type="text" readonly><button class="btn-ghost" id="btnCopyPix2">Copiar</button></div></div>
+      <div class="field"><span class="label">Código PIX (copia e cola)</span><div id="pixQr" style="display:flex; justify-content:center; margin:12px 0"></div><textarea id="pixCopiaCola" class="textarea" rows="4" readonly></textarea><div style="display:flex; justify-content:flex-end; margin-top:8px"><button class="btn-pri" id="btnCopyCopiaCola" style="width:auto">Copiar código</button></div><div class="muted">Cole este código no seu banco para pagar. O valor já vem preenchido.</div></div>
+    </div>
+  </dialog>
+
+  <script>
+    /* ====== CONFIG ====== */
+    const EST = {
+      slug: "Ki Dog",
+      nome: "Ki Dog",
+      logo: "images/comercios/lanchonete/kidog/perfil.png",
+      whatsapp: "11 98985930",
+      descricao: "O Cachorro quente mais famoso de Carlopolis",
+      horarios: { seg: "00:00-23:00", ter: "18:00-23:00", qua: "18:00-23:00", qui: "18:00-23:00", sex: "18:00-00:30", sab: "14:00-00:30", dom: "00:01-00:00" },
+      taxasEntrega: { Cidade: 5.00, Fora: 30.00 },
+      taxaPorBairro: { "centro":5.00, "vila-nova":7.00, "conj-aurora":8.00, "zona-rural":20.00 },
+      taxaEntregaPadrao: { cidade: 5.00, fora: 10.00 },
+      cardapio: [
+        { id:"xs1", nome:"X-Salada", preco:18.9, desc:"Pão, hambúrguer 120g, queijo, alface, tomate, maionese.", tipo:"lanche", adicionais:[{id:"bacon",nome:"Bacon",preco:3.0},{id:"cheddar",nome:"Cheddar",preco:2.5},{id:"ovo",nome:"Ovo",preco:2.0}] },
+        { id:"xb1", nome:"X-Bacon",  preco:22.9, desc:"Com bacon crocante.", tipo:"lanche", adicionais:[{id:"bacon2x",nome:"Bacon extra",preco:3.0},{id:"cheddar",nome:"Cheddar",preco:2.5}] },
+        { id:"xdog", foto:"images/comercios/lanchonete/kidog/produtos/1.jpg", nome:"X-Dog", preco:19.90, desc:"Salsicha, molho da casa, queijo, milho, vinagrete, maionese e batata-palha.", tipo:"lanche", adicionais:[{id:"salsicha_1",nome:"Salsicha",preco:2.0},{id:"cheddar",nome:"Cheddar",preco:2.5}] },
+        { id:"fr1", nome:"Fritas média", preco:12.0, desc:"300g", tipo:"lanche" },
+        { id:"coca350", nome:"Coca 350ml", preco:6.0, tipo:"bebida" },
+        { id:"guarana1l", nome:"Guaraná 1L", preco:9.0, tipo:"bebida" },
+        { id:"SUCO1", nome:"Suco de Laranja do Bill", preco:4.0, tipo:"bebida" },
+        { id:"choc1", nome:"Ouro Branco", preco:2.0, tipo:"doce", desc:"Bombom" },
+        { id:"pudim", nome:"Pudim", preco:8.0, desc:"Fatia", tipo:"doce" },
+        { id:"prestigio", nome:"Prestigio", preco:4.0, desc:"Barrinha", tipo:"doce" },
+        { id:"brigadeiro", nome:"Brigadeiro", preco:5.0, desc:"Unidade", tipo:"doce" },
+        { id:"laka", nome:"Laka", preco:4.0, desc:"Unidade", tipo:"doce" }
+      ]
+    };
+
+    const UTM = new URLSearchParams(location.search).get('utm') || null;
+    const MESA = new URLSearchParams(location.search).get('mesa') || null;
+
+    const IMAGENS_DIR = "images/comercios/restaurante/selaht/lanches/"; // fallback
+    const LOGOS_DIR   = 'images/comercios/restaurante/selaht/selaht.png';
+
+    const slug = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    const normBairro = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    const getFoto = p => p.foto || (IMAGENS_DIR + slug(p.nome) + '.jpg');
+    const getLogo = est => est.logo || (LOGOS_DIR + slug(est.nome) + '.png');
+
+    const PIX_CONFIG = { chave: "39075442858", nome: (EST && EST.nome) ? EST.nome.toUpperCase().slice(0,25) : "ESTABELECIMENTO", cidade: "CARLOPOLIS", txidPrefix: "OC" };
+    const WHATS_ESTAB_FIXO = '11 98985930';
+
+    const money = v => (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    const toNumber = x => (typeof x === 'string') ? (Number(x.replace(',', '.'))||0) : (Number(x)||0);
+    const normalizePhone = raw => { let n=(raw||"").replace(/\D/g,""); if(n.startsWith("0")) n=n.replace(/^0+/,''); if(n.startsWith("55")) return n; return "55"+n; };
+    const parseHM = s => { const [h,m] = s.split(":").map(Number); return {h,m}; };
+
+    function isOpenNow(horarios){ const mapa=['dom','seg','ter','qua','qui','sex','sab']; const now=new Date(); const dia=mapa[now.getDay()]; const faixa=horarios?.[dia]; if(!faixa) return {open:false}; const [ini,fim]=faixa.split('-'); const {h:hi,m:mi}=parseHM(ini); const {h:hf,m:mf}=parseHM(fim); const t=now.getHours()*60+now.getMinutes(); const a=hi*60+mi; const b=hf*60+mf; let open=false; if(b>=a) open=(t>=a && t<=b); else open=(t>=a || t<=b); return {open, faixa}; }
+
+    function calcularTotais(carrinho, taxaEntrega=0){
+      const subtotal=(carrinho||[]).reduce((acc,item)=>{
+        const qtd=Number(item.qtd)||1;
+        const base=(Number(item.preco)||0)*qtd;
+        const add=(item.adicionais||[]).reduce((a,ad)=>a+(Number(ad.preco)||0),0)*qtd;
+        return acc + base + add;
+      },0);
+      const total = subtotal + (Number(taxaEntrega)||0);
+      return {subtotal,total};
+    }
+
+    function montarTextoPedido(carrinho, est, dados){
+      const mapa = est.taxaPorBairro || {}; const keyB = normBairro(dados.bairroEntrega || ''); const pad = est.taxaEntregaPadrao || {};
+      let taxaEntrega=0, labelTaxa='';
+      if(dados.tipo==='Entrega'){
+        if(keyB && Object.prototype.hasOwnProperty.call(mapa,keyB)){ taxaEntrega=Number(mapa[keyB])||0; labelTaxa=`Taxa (${dados.bairroEntrega})`; }
+        else{ taxaEntrega=(dados.zonaEntrega==='cidade')?(Number(pad.cidade)||0):(dados.zonaEntrega==='fora')?(Number(pad.fora)||0):0; labelTaxa=`Taxa (${dados.zonaEntrega==='cidade'?'Dentro da cidade':'Fora da cidade'})`; }
+      }
+      const {subtotal,total}=calcularTotais(carrinho, taxaEntrega);
+      const linhas=[]; linhas.push('*Novo pedido*'); linhas.push(`Loja: ${est.nome}`); linhas.push('');
+      carrinho.forEach((it,idx)=>{ const obs = it.obs ? `\n  _Obs:_ ${it.obs}` : ''; const ad = (it.adicionais && it.adicionais.length) ? ('\n  + ' + it.adicionais.map(a=>`${a.nome} (${money(a.preco)})`).join('\n  + ')) : ''; linhas.push(`${idx+1}. ${it.qtd}x ${it.nome} — ${money(it.preco)}${ad}${obs}`); });
+      linhas.push(''); const linhasValores=['*Valores do Pedido:*', `Subtotal: ${money(subtotal)}`]; if(taxaEntrega) linhasValores.push(`${labelTaxa}: ${money(taxaEntrega)}`); linhasValores.push(`*Total: ${money(total)}*`); linhas.push(...linhasValores,'');
+      const linhasCliente=['*Dados do Cliente:*', `Tipo: ${dados.tipo}`];
+      if(dados.tipo==='Entrega'){ if(dados.zonaEntrega) linhasCliente.push(`Zona: ${dados.zonaEntrega==='fora'?'Fora da cidade':'Dentro da cidade'}`); if(dados.bairroEntrega) linhasCliente.push(`Bairro: ${dados.bairroEntrega}`); if(dados.endereco) linhasCliente.push(`Endereço: ${dados.endereco}`); if(dados.numero) linhasCliente.push(`Número: ${dados.numero}`); if(dados.referencia) linhasCliente.push(`Ref.: ${dados.referencia}`);} 
+      if(dados.nome) linhasCliente.push(`Nome: ${dados.nome}`); if(dados.tel)  linhasCliente.push(`Telefone: ${dados.tel}`); linhas.push(...linhasCliente); return linhas.join('\n');
+    }
+
+    function enviarPedido(est, carrinho, dados){ if(!carrinho?.length){ alert('Seu carrinho está vazio.'); return; } const texto = montarTextoPedido(carrinho, est, dados); const urlEst = `https://wa.me/${normalizePhone(WHATS_ESTAB_FIXO)}?text=${encodeURIComponent(texto)}`; window.open(urlEst,'_blank'); }
+
+    const state = { est: EST, carrinho: [], selecionado: null };
+
+    function renderEst(){
+      document.getElementById('est-name').textContent = state.est.nome;
+      const logoEl=document.getElementById('est-logo'); if(logoEl){ logoEl.src=getLogo(state.est); logoEl.alt=`Logo de ${state.est.nome}`; }
+      document.getElementById('est-desc').textContent = state.est.descricao || '';
+      const st=isOpenNow(state.est.horarios); const badge=document.getElementById('openBadge'); if(st.open){ badge.textContent=`Aberto agora • ${st.faixa}`; } else { badge.textContent= st.faixa ? `Fechado • Hoje: ${st.faixa}` : 'Fechado hoje'; }
+      renderProdutos(); renderCart(); applyTipo();
+      // show desktop summary if wide
+      if(window.matchMedia('(min-width:1024px)').matches){ document.getElementById('deskSummary').style.display='block'; }
+    }
+
+    const CATS=[ {key:'lanche', label:'Lanches', emoji:'🍔'}, {key:'bebida', label:'Bebidas', emoji:'🥤'}, {key:'doce', label:'Doces', emoji:'🍰'} ];
+
+    function renderProdutos(){
+      const list=document.getElementById('prodList'); const chips=document.getElementById('miniIndex'); list.innerHTML=''; chips.innerHTML='';
+      CATS.forEach(c=>{ const a=document.createElement('a'); a.href=`#sec-${c.key}`; a.className='chip'; a.textContent=`${c.emoji} ${c.label}`; a.addEventListener('click',ev=>{ ev.preventDefault(); document.getElementById(`sec-${c.key}`)?.scrollIntoView({behavior:'smooth', block:'start'}); }); chips.appendChild(a); });
+      CATS.forEach(c=>{ const sec=document.createElement('div'); sec.className='plist'; sec.id=`sec-${c.key}`; const hd=document.createElement('div'); hd.className='hd'; hd.innerHTML=`<h3>${c.emoji} ${c.label}</h3>`; const wrap=document.createElement('div');
+        const items=(state.est.cardapio||[]).filter(p=> (p.tipo||'lanche')===c.key);
+        if(!items.length){ wrap.innerHTML='<div class="muted">Sem itens nesta seção.</div>'; }
+        else{
+          items.forEach(p=>{ const card=document.createElement('div'); card.className='prod'; card.setAttribute('role','button'); card.tabIndex=0; card.innerHTML=`<div class='thumb'><img alt='' src='${getFoto(p)}' style='width:100%; height:100%; object-fit:cover; opacity:.95'></div><div><h4>${p.nome}</h4><p>${p.desc||''}</p></div><div class='price'>${money(toNumber(p.preco))}</div>`; card.addEventListener('click',()=>openItemModal(p)); card.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openItemModal(p); } }); wrap.appendChild(card); });
+        }
+        const catCard=document.createElement('section'); catCard.className='card'; catCard.appendChild(hd); const cont=document.createElement('div'); cont.className='plist'; cont.appendChild(wrap); catCard.appendChild(cont); list.appendChild(catCard); });
+    }
+
+    function renderCart(){
+      // desktop panel
+      const box=document.getElementById('cartContainer'); if(box){ if(!state.carrinho.length){ box.textContent='Seu carrinho está vazio.'; } else { box.innerHTML=''; state.carrinho.forEach((it,idx)=>{ const line=document.createElement('div'); line.className='cart-line'; const adds=(it.adicionais||[]).map(a=>`+${a.nome}`).join(', '); const obs = it.obs ? ` • ${it.obs}` : ''; const lineTotal = ((Number(it.preco)||0) + (it.adicionais||[]).reduce((a,x)=>a+(Number(x.preco)||0),0)) * (Number(it.qtd)||1); line.innerHTML=`<div class='qty'>${Number(it.qtd)||1}x</div><div><div style='font-weight:800'>${it.nome}</div>${it.desc?`<div class='muted'>${it.desc}</div>`:''}<div class='muted'>${adds}${obs}</div></div><div><strong>${money(lineTotal)}</strong></div>`; line.addEventListener('contextmenu',e=>{ e.preventDefault(); if(confirm('Remover item?')){ state.carrinho.splice(idx,1); renderCart(); } }); box.appendChild(line); }); } }
+      // sheet list
+      const sbox=document.getElementById('sheetCart'); if(sbox){ if(!state.carrinho.length){ sbox.innerHTML='<div class="plist muted">Seu carrinho está vazio.</div>'; } else { sbox.innerHTML=''; state.carrinho.forEach((it,idx)=>{ const line=document.createElement('div'); line.className='cart-line'; const adds=(it.adicionais||[]).map(a=>`+${a.nome}`).join(', '); const obs = it.obs ? ` • ${it.obs}` : ''; const lineTotal = ((Number(it.preco)||0) + (it.adicionais||[]).reduce((a,x)=>a+(Number(x.preco)||0),0)) * (Number(it.qtd)||1); line.innerHTML=`<div class='qty'>${Number(it.qtd)||1}x</div><div><div style='font-weight:800'>${it.nome}</div>${it.desc?`<div class='muted'>${it.desc}</div>`:''}<div class='muted'>${adds}${obs}</div></div><div><strong>${money(lineTotal)}</strong></div>`; line.addEventListener('contextmenu',e=>{ e.preventDefault(); if(confirm('Remover item?')){ state.carrinho.splice(idx,1); renderCart(); } }); sbox.appendChild(line); }); } }
+      updateTotals();
+    }
+
+    function updateTotals(){
+      const tipo=document.getElementById('tipoPedido')?.value || 'Entrega';
+      const zona=document.getElementById('zonaEntrega')?.value || 'cidade';
+      const bairro=document.getElementById('bairroInput')?.value?.trim() || '';
+      let taxa=0, taxaLabel='';
+      if(tipo==='Entrega'){
+        const mapa=state.est.taxaPorBairro || {}; const key=normBairro(bairro);
+        if(key && Object.prototype.hasOwnProperty.call(mapa,key)){ taxa=Number(mapa[key])||0; taxaLabel=`Taxa (${bairro})`; }
+        else{ const pad=state.est.taxaEntregaPadrao || {}; taxa=(zona==='cidade')?(Number(pad.cidade)||0):(zona==='fora')?(Number(pad.fora)||0):0; taxaLabel=`Taxa (${zona==='cidade'?'Dentro da cidade':'Fora da cidade'})`; }
+      }
+      const {subtotal,total}=calcularTotais(state.carrinho, taxa);
+      // desktop totals
+      const box=document.getElementById('totalsBox'); if(box){ box.innerHTML=`<div><span>Subtotal</span><span>${money(subtotal)}</span></div>${tipo==='Entrega'?`<div><span>${taxaLabel}</span><span>${money(taxa)}</span></div>`:''}<div class='total'><span>Total</span><span>${money(total)}</span></div>`; }
+      // sheet totals
+      const sTot=document.getElementById('sheetTotals'); if(sTot){ sTot.innerHTML=`<div class='totals'><div><span>Subtotal</span><span>${money(subtotal)}</span></div>${tipo==='Entrega'?`<div><span>${taxaLabel}</span><span>${money(taxa)}</span></div>`:''}<div class='total'><span>Total</span><span>${money(total)}</span></div></div>`; }
+      // bottom bar
+      document.getElementById('bSub').textContent = `Subtotal ${money(subtotal)}`;
+      document.getElementById('bTotal').textContent = `Total ${money(total)}`;
+      const st=isOpenNow(state.est.horarios);
+      const entregaOk=(tipo!=='Entrega') || (bairro && zona);
+      const hasItems=!!state.carrinho.length;
+      // enable/disable buttons
+      const btns=[document.getElementById('btnEnviar'), document.getElementById('btnEnviarSheet'), document.getElementById('btnEnviarDesk')].filter(Boolean);
+      btns.forEach(b=> b.disabled = !hasItems || !st.open || !entregaOk);
+    }
+
+    function applyTipo(){
+      const tipo=document.getElementById('tipoPedido')?.value || 'Entrega';
+      const endWrap=document.getElementById('enderecoFields'); const zonaSel=document.getElementById('zonaEntrega'); const bairroWrap=document.getElementById('bairroWrap');
+      if(tipo==='Entrega'){ if(endWrap) endWrap.style.display='grid'; if(zonaSel) zonaSel.disabled=false; if(bairroWrap) bairroWrap.style.display=''; }
+      else{ if(endWrap) endWrap.style.display='none'; if(zonaSel){ zonaSel.disabled=true; zonaSel.value='cidade'; } if(bairroWrap){ bairroWrap.style.display='none'; const bi=document.getElementById('bairroInput'); if(bi) bi.value=''; } }
+      updateTotals();
+    }
+
+    let modalItem=null;
+    function openItemModal(p){
+      modalItem=JSON.parse(JSON.stringify(p)); modalItem.qtd=1; modalItem._addsSel=new Set();
+      document.getElementById('mNome').textContent=p.nome; document.getElementById('mDesc').textContent=p.desc || '';
+      const mImg=document.getElementById('mImg'); if(mImg){ mImg.src = getFoto(p); mImg.alt = `Foto de ${p.nome}`; }
+      document.getElementById('mObs').value=''; document.getElementById('mQtd').textContent='1'; renderAdds(p); updateModalSubtotal();
+      document.getElementById('itemModal').showModal();
+    }
+
+    function renderAdds(p){ const box=document.getElementById('mAdds'); box.innerHTML=''; (p.adicionais||[]).forEach(ad=>{ const span=document.createElement('label'); span.style.display='inline-flex'; span.style.alignItems='center'; span.style.gap='6px'; span.style.padding='6px 10px'; span.style.border='1px solid var(--line)'; span.style.borderRadius='10px'; span.style.background='rgba(255,255,255,.06)'; span.style.margin='4px 6px 4px 0'; span.innerHTML=`<input type="checkbox" data-id="${ad.id}" /> ${ad.nome} (+${money(ad.preco)})`; span.querySelector('input').addEventListener('change',e=>{ if(e.target.checked) modalItem._addsSel.add(ad.id); else modalItem._addsSel.delete(ad.id); updateModalSubtotal(); }); box.appendChild(span); }); if(!p.adicionais || !p.adicionais.length){ box.innerHTML='<span class="muted">Sem adicionais para este item.</span>'; } }
+
+    function updateModalSubtotal(){ const qtd = toNumber(document.getElementById('mQtd')?.textContent) || 1; const base = toNumber(modalItem?.preco); const addsPreco = (modalItem?.adicionais||[]).filter(a=>modalItem._addsSel?.has(a.id)).reduce((s,a)=>s+toNumber(a.preco),0); const val=(base+addsPreco)*qtd; document.getElementById('mSubtotal').textContent=money(val); }
+
+    document.getElementById('mMais').addEventListener('click',()=>{ const el=document.getElementById('mQtd'); el.textContent=String(Number(el.textContent)+1); updateModalSubtotal(); });
+    document.getElementById('mMenos').addEventListener('click',()=>{ const el=document.getElementById('mQtd'); el.textContent=String(Math.max(1, Number(el.textContent)-1)); updateModalSubtotal(); });
+    document.getElementById('mAddBtn').addEventListener('click',()=>{ const qtd=Number(document.getElementById('mQtd').textContent)||1; const obs=document.getElementById('mObs').value.trim(); const adds=(modalItem.adicionais||[]).filter(a=>modalItem._addsSel.has(a.id)); state.carrinho.push({ id:modalItem.id, nome:modalItem.nome, preco:modalItem.preco, qtd, adicionais:adds, obs, desc:modalItem.desc }); document.getElementById('itemModal').close(); renderCart(); updateTotals(); });
+
+    // PIX helpers
+    function emv(tag,value){ const len=String(value.length).padStart(2,'0'); return tag + len + value; }
+    function crc16(str){ let crc=0xFFFF; for(let i=0;i<str.length;i++){ crc ^= str.charCodeAt(i) << 8; for(let j=0;j<8;j++){ if(crc & 0x8000) crc=(crc<<1)^0x1021; else crc=crc<<1; crc &= 0xFFFF; } } return crc.toString(16).toUpperCase().padStart(4,'0'); }
+    function buildPixCopiaCola({valor, txid='TXID', chavePix=null, descricao=''}){ const chave=(chavePix ?? PIX_CONFIG.chave).trim(); const ascii=(s,max)=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().slice(0,max); const nome=ascii(PIX_CONFIG.nome,25); const cidade=ascii(PIX_CONFIG.cidade,15); const gui=emv('00','br.gov.bcb.pix'); const key=emv('01',chave); const desc= descricao ? emv('02',ascii(descricao,99)) : ''; const merAcc=emv('26', gui+key+desc); const pfi='000201'; const pInit=emv('01','11'); const mcc=emv('52','0000'); const moeda=emv('53','986'); const val=emv('54', Number(valor).toFixed(2)); const pais=emv('58','BR'); const nm=emv('59',nome); const cid=emv('60',cidade); const txidF=emv('05', String(txid).slice(0,25)); const add=emv('62', txidF); let payload=pfi+pInit+merAcc+mcc+moeda+val+pais+nm+cid+add; payload+='6304'; const checksum=crc16(payload); return payload+checksum; }
+
+    function openPixModal(total){ const modal=document.getElementById('pixModal'); const chave=(PIX_CONFIG.chave); document.getElementById('pixChaveShow').value=chave; const txid='***'; const code=buildPixCopiaCola({ valor: total, txid, chavePix: chave, descricao: EST.nome }); const qrBox=document.getElementById('pixQr'); if(qrBox){ qrBox.innerHTML=''; new QRCode(qrBox,{ text: code, width:180, height:180 }); } document.getElementById('pixCopiaCola').value=code; modal.showModal(); }
+
+    // EVENTS
+    document.getElementById('btnPix').addEventListener('click',()=>{ const tipo=document.getElementById('tipoPedido')?.value||'Entrega'; const zona=document.getElementById('zonaEntrega')?.value||''; const bairro=document.getElementById('bairroInput')?.value?.trim()||''; let taxa=0; if(tipo==='Entrega'){ const mapa=state.est.taxaPorBairro||{}; const key=normBairro(bairro); if(key && Object.prototype.hasOwnProperty.call(mapa,key)){ taxa=Number(mapa[key])||0; } else { const pad=state.est.taxaEntregaPadrao||{}; taxa=(zona==='cidade')?(Number(pad.cidade)||0):(zona==='fora')?(Number(pad.fora)||0):0; } } const { total } = calcularTotais(state.carrinho, taxa); if(total < 0.01){ alert('Selecione ao menos 1 item.'); return; } openPixModal(total); });
+
+    document.getElementById('btnPixDesk')?.addEventListener('click',()=>{ const tipo=document.getElementById('tipoPedido')?.value||'Entrega'; const zona=document.getElementById('zonaEntrega')?.value||''; const bairro=document.getElementById('bairroInput')?.value?.trim()||''; let taxa=0; if(tipo==='Entrega'){ const mapa=state.est.taxaPorBairro||{}; const key=normBairro(bairro); if(key && Object.prototype.hasOwnProperty.call(mapa,key)){ taxa=Number(mapa[key])||0; } else { const pad=state.est.taxaEntregaPadrao||{}; taxa=(zona==='cidade')?(Number(pad.cidade)||0):(zona==='fora')?(Number(pad.fora)||0):0; } } const { total } = calcularTotais(state.carrinho, taxa); if(total < 0.01){ alert('Selecione ao menos 1 item.'); return; } openPixModal(total); });
+
+    document.getElementById('btnCopyPix2').addEventListener('click', async ()=>{ const el=document.getElementById('pixChaveShow'); try{ await navigator.clipboard.writeText(el.value); } catch(e){ el.select(); document.execCommand('copy'); } });
+    document.getElementById('btnCopyCopiaCola').addEventListener('click', async ()=>{ const el=document.getElementById('pixCopiaCola'); try{ await navigator.clipboard.writeText(el.value); } catch(e){ el.select(); document.execCommand('copy'); } });
+
+    document.getElementById('btnCartSheet').addEventListener('click',()=>{ document.getElementById('cartSheet').classList.add('open'); });
+    document.getElementById('closeSheet').addEventListener('click',()=>{ document.getElementById('cartSheet').classList.remove('open'); });
+
+    // Send buttons
+    function collectDados(){ return { tipo:document.getElementById('tipoPedido')?.value||'Entrega', bairroEntrega:document.getElementById('bairroInput')?.value?.trim()||null, zonaEntrega:document.getElementById('zonaEntrega')?.value||null, endereco:document.getElementById('endereco')?.value||'', numero:document.getElementById('numeroEndereco')?.value||'', referencia:document.getElementById('referencia')?.value||'', nome:document.getElementById('cliNome')?.value||'', telefone:document.getElementById('cliFone')?.value||'', pagamento:document.getElementById('pagamento')?.value||'PIX', obsGeral:document.getElementById('obsGeral')?.value||'' }; }
+    function handleEnviar(){ enviarPedido(state.est, state.carrinho, collectDados()); }
+    document.getElementById('btnEnviar').addEventListener('click', handleEnviar);
+    document.getElementById('btnEnviarSheet').addEventListener('click', handleEnviar);
+    document.getElementById('btnEnviarDesk')?.addEventListener('click', handleEnviar);
+
+    // Reactive inputs
+    ['tipoPedido','zonaEntrega','bairroInput'].forEach(id=>{ document.getElementById(id)?.addEventListener('change',()=>{ applyTipo(); updateTotals(); }); document.getElementById(id)?.addEventListener('input',updateTotals); });
+
+    // Boot
+    renderEst();
+  </script>
+</body>
+</html>
