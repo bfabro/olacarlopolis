@@ -1320,7 +1320,7 @@
       // 2) cabeçalho
       const linhas = [];
       linhas.push('*Novo pedido*');
-      linhas.push(`Loja: ${est.name}`);
+      linhas.push(`Loja: ${est.nome}`);
 
       linhas.push('');
 
@@ -1365,15 +1365,23 @@
 
 
 
-    function enviarPedido(est, carrinho, dados) {
-      if (!carrinho?.length) { alert('Seu carrinho está vazio.'); return; }
+   function enviarPedido(est, carrinho, dados) {
+  if (!carrinho?.length) { alert('Seu carrinho está vazio.'); return; }
 
-      const texto = montarTextoPedido(carrinho, est, dados);
-      const urlEst = `https://wa.me/${normalizePhone(WHATS_ESTAB_FIXO)}?text=${encodeURIComponent(texto)}`;
-      window.open(urlEst, '_blank');
+  const texto = montarTextoPedido(carrinho, est, dados);
 
+  // usa o whatsapp do EST ou cai no fixo; normaliza p/ DDI 55
+  const alvo = normalizePhone(est.whatsapp || WHATS_ESTAB_FIXO);
 
-    }
+  // se o número ficar curto (ex.: sem o '9'), avisa
+  if (alvo.length < 13) {
+    alert('Número de WhatsApp do estabelecimento parece incompleto. Verifique o DDD e o 9º dígito.');
+  }
+
+  const urlEst = `https://wa.me/${alvo}?text=${encodeURIComponent(texto)}`;
+  window.open(urlEst, '_blank');
+}
+
 
     /*******************
      * ESTADO & RENDER *
@@ -1712,6 +1720,7 @@
         referencia: document.getElementById('referencia').value,
         nome: document.getElementById('cliNome').value,
         telefone: document.getElementById('cliFone').value,
+        tel: document.getElementById('cliFone').value, // <-- add esta linha
         pagamento: document.getElementById('pagamento').value,
         obsGeral: document.getElementById('obsGeral').value
       };
