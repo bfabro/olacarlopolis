@@ -780,6 +780,7 @@ document.addEventListener("DOMContentLoaded", function () {
     funerariacristorei: "s",
     funerariagrupocastilho: "s",
     funerariasaovicentedepaulo: "s",
+    funerariabomjesus:"s",
 
     // FIM NOTA DE FALECIMENTO
 
@@ -4962,7 +4963,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/farmacia/drogaMais/drogamais.png",
             name: "DrogaMais",
-            hours: "Seg a Sab: 08:00h as 20:00h",
+            hours: "Seg a Sab: 08:00h as 20:00h<br>Dom: 08:00h as 13:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -4971,7 +4972,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               qui: [{ inicio: "08:00", fim: "20:00" }],
               sex: [{ inicio: "08:00", fim: "20:00" }],
               sab: [{ inicio: "08:00", fim: "20:00" }],
-              dom: [{ inicio: "08:00", fim: "20:00" }]
+              dom: [{ inicio: "08:00", fim: "13:00" }]
             },
             address: "R. Benedito Salles, 903 - Carlopolis",
             contact: "(43) 98411-9145",
@@ -5041,7 +5042,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
             name: "Farmacia da Vila",
             address: "R. Manguba, 320 - Carlopolis",
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            hours: "Seg a Sab: 08:00h as 18:00h",
 
             statusAberto: ".",
             horarios: {
@@ -5050,12 +5051,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               qua: [{ inicio: "08:00", fim: "18:00" }],
               qui: [{ inicio: "08:00", fim: "18:00" }],
               sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
+              sab: [{ inicio: "08:00", fim: "18:00" }],
               dom: []
             },
             contact: "(43) 99148-8478",
             delivery: "Sim / Sem Taxa",
-            facebook: "#",
+         
             instagram: "https://www.instagram.com/farmaciadavilaclps/",
 
             novidadesImages: [
@@ -8454,8 +8455,43 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Nota de Falecimento",
         establishments: [
 
-          {
+ {
             name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/33.jpg",
+            date: "19/08/2025",
+            descricaoFalecido: "Faleceu em Jacarezinho aos 64 anos de idade, a Sra. NEIDE APARECIDA BRAZ mais conhecida como: mãe da Débora machado<br>A cerimônia de velório iniciará hoje às 16:30 horas no Velório Municipal de Carlópolis.<br>Sua despedida e sepultamento será amanhã às 08:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+
+            
+
+
+           {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/31.jpg",
+            date: "16/08/2025",
+            descricaoFalecido: "Faleceu em Carlópolis aos 82 anos de idade, o Sr 'JORGE FERREIRA' mais conhecido como: pai do José do lojão<br>A cerimônia iniciará hoje às 19:00 horas no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às 09:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+
+
+ {
+            name: "Funeraria Bom Jesus",
+            image: "images/informacoes/notaFalecimento/bomjesus/1.jpg",
+            date: "14/08/2025",
+            descricaoFalecido: "É com profundo pesar que anunciamos o falecimento de SILVIO DE PAULA<br>Nossas condolencias aos familiares e amigos por essa perda irreparavel<br>Sera velado na Capela Municipal de Carlopolis",
+
+          },
+
+
+
+
+
+
+          {
+            name: "Funeraria Grupo Castilho",
             image: "images/informacoes/notaFalecimento/castilho/32.jpg",
             date: "09/08/2025",
             descricaoFalecido: "Comunicamos o falecimento da Sr. CONCEIÇÃO DE SOUZA NAVARRO aos 85 anos de idade.<Br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR.<Br>O sepultamento será realizado 10/08/2025 as 16:00 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
