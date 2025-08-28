@@ -5075,8 +5075,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "A gripe é uma doença respiratória altamente transmissível causada pelos vírus Influenza A e B, sendo mais comum durante os meses frios. Com a chegada do inverno, realizar um teste de influenza é essencial para um diagnóstico rápido e preciso.",
               "🦟 FIQUE ATENTO AOS SINTOMAS DA DENGUE! 🚨A dengue pode começar com sintomas parecidos com os da gripe, mas merece atenção! Se sentir:",
 
-
-            ],
+           ],
           },
 
           {
