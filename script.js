@@ -5047,7 +5047,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
             name: "Farmacia da Vila",
             address: "R. Manguba, 320 - Carlopolis",
-            hours: "Seg a Sex: 08:00h as 19:00h<br>Sab: 08:00 as 18:00",
+            hours: "Seg a Sex: 08:00h as 19:00h<br>Sab: 08:00h as 15:00h",
 
             statusAberto: ".",
             horarios: {
@@ -5056,7 +5056,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               qua: [{ inicio: "08:00", fim: "19:00" }],
               qui: [{ inicio: "08:00", fim: "19:00" }],
               sex: [{ inicio: "08:00", fim: "19:00" }],
-              sab: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "15:00" }],
               dom: []
             },
             contact: "(43) 99148-8478",
