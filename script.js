@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "oficinadocelular", "seiza"
+    "feiradalua","oficinadocelular", "seiza"
 
   ];
 
@@ -3116,7 +3116,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99965-2084",
             instagram: "https://www.instagram.com/feiradaluacarlopolis/",
             novidadesImages: [
-              //  "images/comercios/feiraLua/divulgacao/1.jpg",
+               "images/comercios/feiraLua/divulgacao/1.jpg",
               "images/comercios/feiraLua/divulgacao/2.png",
               "images/comercios/feiraLua/divulgacao/3.png",
               "images/comercios/feiraLua/divulgacao/4.png",
@@ -3126,7 +3126,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             ],
 
             novidadesDescriptions: [
-              //  "Cantando para vocês Zé Carlos <br>25/07 a partir das 19:00hrs",
+                "Cantando para vocês Celso e Adriano <br>29/08 a partir das 19:00hrs",
             ],
           },
         ],
