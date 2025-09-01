@@ -1882,7 +1882,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/assistenciaCelular/oficinaCelular/promocao/1.jpg",
           descricao: "Pelicula 3D",
-          validade: "2025-08-31T18:00:00",
+          validade: "2025-09-30T18:00:00",
           preco: "20,00",
           preco_com_desconto: "15,00 a vista",
           // desconto: "5",
@@ -1902,7 +1902,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/artesanato/patricia/promocoes/1.jpg",
           descricao: "Pano de prato - Flores ",
-          validade: "2025-08-31T18:00:00",
+          validade: "2025-09-30T18:00:00",
           preco: "40,00",
           preco_com_desconto: "35,00 a vista",
           // desconto: "5",
@@ -1912,7 +1912,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/artesanato/patricia/promocoes/2.jpg",
           descricao: "Pano de prato - Frutas ",
-          validade: "2025-08-31T18:00:00",
+          validade: "2025-09-30T18:00:00",
           preco: "40,00",
           preco_com_desconto: "35,00 a vista",
           // desconto: "5",
@@ -1922,7 +1922,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/artesanato/patricia/promocoes/3.jpg",
           descricao: "Pano de prato - Plantas ",
-          validade: "2025-08-31T18:00:00",
+          validade: "2025-09-30T18:00:00",
           preco: "40,00",
           preco_com_desconto: "35,00 a vista",
           // desconto: "5",
@@ -1932,7 +1932,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/artesanato/patricia/promocoes/4.jpg",
           descricao: "Pano de prato - Melancia ",
-          validade: "2025-08-31T18:00:00",
+          validade: "2025-09-30T18:00:00",
           preco: "40,00",
           preco_com_desconto: "35,00 a vista",
           // desconto: "5",
