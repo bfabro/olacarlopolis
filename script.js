@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "feiradalua","oficinadocelular", "seiza"
+  "seiza", "oficinadocelular"
 
   ];
 
@@ -5781,25 +5781,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "",
           },
 
-
-
-          {
-            image: "images/informacoes/eventos/cavalgada.jpg",
-            name: "Cavalgada da FrutFest",
-            date: "31/08/2025",
-            address: "Caldo de Cana Amaral",
-            contact: "-",
-            instagram: "https://www.instagram.com/frutfestoficial/",
-          },
-
-          {
-            image: "images/informacoes/eventos/fogodechao.jpg",
-            name: "Costelada Fogo de Chão",
-            date: "31/08/2025",
-            address: "Rancho Brasil",
-            contact: "(43) 99875-976",
-            instagram: "https://www.instagram.com/danilo.vieira.378537/",
-          },
 
 
           {
