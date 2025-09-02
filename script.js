@@ -1631,7 +1631,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
           descricao: "Trufas 13,5g",
-          validade: "2025-08-31T23:00:00",
+          validade: "2025-09-21T23:00:00",
 
           whatsapp: "43991053711"
         },
@@ -1639,7 +1639,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
           descricao: "Trufas 30g",
-          validade: "2025-08-31T23:00:00",
+          validade: "2025-09-21T23:00:00",
 
           whatsapp: "43991053711"
         },
@@ -1647,7 +1647,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
           descricao: "Trufas Artesanais 30g",
-          validade: "2025-08-31T23:00:00",
+          validade: "2025-09-21T23:00:00",
 
           whatsapp: "43991053711"
         },
@@ -1656,7 +1656,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
           descricao: "Trufas Zero Açucar 30g",
-          validade: "2025-08-31T23:00:00",
+          validade: "2025-09-21T23:00:00",
 
           whatsapp: "43991053711"
         },
