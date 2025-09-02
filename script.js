@@ -1638,7 +1638,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
         {
           imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
-          descricao: "Trufas 30g",
+          descricao: "Trufas Classicas 30g",
           validade: "2025-09-21T23:00:00",
 
           whatsapp: "43991053711"
@@ -1661,22 +1661,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           whatsapp: "43991053711"
         },
 
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
-          descricao: "Caixa Angel Gourmet | 200 g Bombons nos sabores chocolate 55% de cacau com recheio intenso e chocolate ao leite com recheio sabor creme e morango.",
-          validade: "2025-08-31T23:00:00",
-          preco: "54,99",
-          preco_com_desconto: "43,99",
-          whatsapp: "43991053711"
-        },
-
-
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/5.jpg",
-          descricao: "Promoçao Mini Show",
-          validade: "2025-08-30T23:00:00",
-          whatsapp: "43991053711"
-        },
+    
       ]
 
 
@@ -1689,20 +1674,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       nome: "Quitanda Pimenta Doce",
       imagem: "images/comercios/quitanda/pimentaDoce/pimentadoce.png",
       promocoes: [
-        {
-          imagem: "images/comercios/quitanda/pimentaDoce/promocao/1.jpg",
-          descricao: "Abobora Madura",
-          validade: "2025-08-30T20:00:00",
-          preco: "4,50",
-          preco_com_desconto: "2,99",
-          whatsapp: "43988065747"
-        },
+       
 
 
         {
           imagem: "images/comercios/quitanda/pimentaDoce/promocao/4.jpg",
           descricao: "Vassoura Caipira",
-          validade: "2025-08-30T20:00:00",
+          validade: "2025-09-30T20:00:00",
           preco: "24,00",
           preco_com_desconto: "19,50",
           whatsapp: "43988065747"
