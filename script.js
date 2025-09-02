@@ -789,6 +789,7 @@ document.addEventListener("DOMContentLoaded", function () {
     feiradalua: "s",
     calendarioeventos: "s",
     frutfest: "s",
+    yakisobadaacecar:"s",
 
     lowcity: "s",
     toroonagashi: "s",
@@ -5812,6 +5813,21 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
           },
+
+
+           {
+            image: "images/informacoes/eventos/acecar.jpg",
+            name: "Yakisoba da Acecar",
+            date: "21/09/25",
+            address: "Acecar",
+            contact: "#",
+           
+
+
+          },
+
+
+          
 
           {
             image: "images/informacoes/eventos/rotapr218.jpg",
