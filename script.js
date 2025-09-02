@@ -6976,19 +6976,33 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             },
             address: "R. Luis Consulmagno de Proenca, 451 - Carlópolis",
             contact: " (43) 99903-3447",
+            contact2: " (43) 99630-7501",
             delivery: "Sim / Sem Taxa",
             instagram: "https://www.instagram.com/binhomotocenter/",
-            facebook: "https://www.facebook.com/Motocenterbinho/?locale=pt_BR",
+            facebook: "https://www.facebook.com/Motocenterbinho",
             novidadesImages: [
-              "images/comercios/motoCenter/binho/divulgacao/1.png",
-              "images/comercios/motoCenter/binho/divulgacao/2.png",
-              "images/comercios/motoCenter/binho/divulgacao/3.png",
+              "images/comercios/motoCenter/binho/divulgacao/1.jpg",
+              "images/comercios/motoCenter/binho/divulgacao/2.jpg",
+              "images/comercios/motoCenter/binho/divulgacao/3.jpg",
+
+               "images/comercios/motoCenter/binho/divulgacao/4.jpg",
+              "images/comercios/motoCenter/binho/divulgacao/5.jpg",
+              "images/comercios/motoCenter/binho/divulgacao/6.jpg",
+
+               "images/comercios/motoCenter/binho/divulgacao/7.jpg",
+            
+             
 
             ],
             novidadesDescriptions: [
-              "Venha conhecer nosso espaço",
-              "2",
-              "3",
+              "Linha completa em capacetes!",
+              "Muitos acessorios",
+              "Muitos acessorios",
+              "Linha de oleo para todos os tipos de motores de motos",
+              "Linha de escapamentos",
+              "Temos pneus para todas as rodagens",
+              "Uma Oficina ampla e estruturada",
+            
 
             ],
           },
