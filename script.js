@@ -5797,8 +5797,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/informacoes/eventos/acecar.jpg",
             name: "Yakisoba da Acecar",
             date: "21/09/25",
-            address: "Acecar",
-            contact: "#",
+            address: "R. Delfino Mendes, 252 - Carlopolis",
+            contact: "(43) 99908-4808",
            
 
 
