@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-  "seiza", "oficinadocelular"
+    "seiza", "oficinadocelular"
 
   ];
 
@@ -789,7 +789,7 @@ document.addEventListener("DOMContentLoaded", function () {
     feiradalua: "s",
     calendarioeventos: "s",
     frutfest: "s",
-    yakisobadaacecar:"s",
+    yakisobadaacecar: "s",
 
     lowcity: "s",
     toroonagashi: "s",
@@ -1661,7 +1661,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           whatsapp: "43991053711"
         },
 
-    
+
       ]
 
 
@@ -1674,7 +1674,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       nome: "Quitanda Pimenta Doce",
       imagem: "images/comercios/quitanda/pimentaDoce/pimentadoce.png",
       promocoes: [
-       
+
 
 
         {
@@ -3095,7 +3095,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99965-2084",
             instagram: "https://www.instagram.com/feiradaluacarlopolis/",
             novidadesImages: [
-               "images/comercios/feiraLua/divulgacao/1.jpg",
+              "images/comercios/feiraLua/divulgacao/1.jpg",
               "images/comercios/feiraLua/divulgacao/2.png",
               "images/comercios/feiraLua/divulgacao/3.png",
               "images/comercios/feiraLua/divulgacao/4.png",
@@ -3105,7 +3105,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             ],
 
             novidadesDescriptions: [
-                "Cantando para vocês Celso e Adriano <br>29/08 a partir das 19:00hrs",
+              "Cantando para vocês Celso e Adriano <br>29/08 a partir das 19:00hrs",
             ],
           },
         ],
@@ -3298,7 +3298,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: [{ inicio: "13:00", fim: "18:30" }]
             },
             address: "R. Benedito Salles, 2639 - Carlópolis",
-            contact: "(43) 99977-8839",         
+            contact: "(43) 99977-8839",
             instagram: "https://www.instagram.com/caldodecanaamaral/",
             facebook: "https://www.facebook.com/CaldodecanaAmaral",
             delivery: "Sim / Com Taxa",
@@ -5054,7 +5054,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "A gripe é uma doença respiratória altamente transmissível causada pelos vírus Influenza A e B, sendo mais comum durante os meses frios. Com a chegada do inverno, realizar um teste de influenza é essencial para um diagnóstico rápido e preciso.",
               "🦟 FIQUE ATENTO AOS SINTOMAS DA DENGUE! 🚨A dengue pode começar com sintomas parecidos com os da gripe, mas merece atenção! Se sentir:",
 
-           ],
+            ],
           },
 
           {
@@ -5769,13 +5769,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Centro de Eventos Ilha do Ponciano",
             contact: "(43) 99825-0570",
             instagram: "https://www.instagram.com/frutfestoficial/",
-             novidadesImages: [
+            novidadesImages: [
               "images/informacoes/eventos/frutfest/1.jpg",
               "images/informacoes/eventos/frutfest/2.jpg",
               "images/informacoes/eventos/frutfest/3.jpg",
 
             ],
-           
+
 
 
           },
@@ -5793,19 +5793,19 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-           {
+          {
             image: "images/informacoes/eventos/acecar.jpg",
             name: "Yakisoba da Acecar",
             date: "21/09/25",
             address: "R. Delfino Mendes, 252 - Carlopolis",
             contact: "(43) 99908-4808",
-           
+
 
 
           },
 
 
-          
+
 
           {
             image: "images/informacoes/eventos/rotapr218.jpg",
@@ -6601,7 +6601,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/setorPublico/rodoviaria/rodoviaria.png",
             name: "Rodoviaria",
-            address: "R. Kaliu keder, 0",
+            address: "R. Kaliu keder, 620 - Carlopolis",
             contact: "Rodoviaria: (43) 3566-1393",
             contact2: "Princesa: (43) 99926-6484",
             contact3: "Pedro (43) 99641-0412",
@@ -6664,7 +6664,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/setorPublico/delegacia/1.png",
             name: "Delegacia",
             hours: "Seg a Sex: 09:00h - 18:00h",
-            address: "R. Alfeneiro, 215 ",
+            address: "R. Kali Keder, 350 - Carlopolis ",
             contact: "(43) 3566-1202",
           },
         ],
@@ -6979,13 +6979,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/motoCenter/binho/divulgacao/2.jpg",
               "images/comercios/motoCenter/binho/divulgacao/3.jpg",
 
-               "images/comercios/motoCenter/binho/divulgacao/4.jpg",
+              "images/comercios/motoCenter/binho/divulgacao/4.jpg",
               "images/comercios/motoCenter/binho/divulgacao/5.jpg",
               "images/comercios/motoCenter/binho/divulgacao/6.jpg",
 
-               "images/comercios/motoCenter/binho/divulgacao/7.jpg",
-            
-             
+              "images/comercios/motoCenter/binho/divulgacao/7.jpg",
+
+
 
             ],
             novidadesDescriptions: [
@@ -6996,7 +6996,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Linha de escapamentos",
               "Temos pneus para todas as rodagens",
               "Uma Oficina ampla e estruturada",
-            
+
 
             ],
           },
@@ -8772,7 +8772,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         establishments: [
 
 
-          
+
 
 
           {
@@ -8790,7 +8790,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/lanchonete/caldodecanaamaral/perfil.png",
             name: "Caldo de Cana Amaral",
             address: "R. Benedito Salles, 2639 - Carlópolis",
-            contact: "(43) 99977-8839",         
+            contact: "(43) 99977-8839",
             instagram: "https://www.instagram.com/caldodecanaamaral/",
             facebook: "https://www.facebook.com/CaldodecanaAmaral",
             vagaPreRequisito: "<br> Que possa trabalhar aos finais de semana e feriados",
