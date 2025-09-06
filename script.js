@@ -3889,6 +3889,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                   "images/comercios/lavaRapido/leozin/divulgacao/3.jpg",
                   "images/comercios/lavaRapido/leozin/divulgacao/4.jpg",
                   "images/comercios/lavaRapido/leozin/divulgacao/5.jpg",
+                    "images/comercios/lavaRapido/leozin/divulgacao/6.jpg",
 
             ],
 
@@ -3898,6 +3899,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Amplo espaço e preparado para um trabalho de qualidade",
               "Produtos importados com o minimo de agreção a sua pintura",
               "Polimento Tecnico e Proteção",
+              "Lavagem Detalhada",
 
 
             ],
