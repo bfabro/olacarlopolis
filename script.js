@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "seiza", "oficinadocelular"
+    "seiza", "vania","oficinadocelular"
 
   ];
 
@@ -598,6 +598,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //piscina
     mhpiscinas: "s",
+
+    //Lava Rapido
+    leozindetailer:"s",
 
     //pizzaria
     fornalhapizzaria: "s",
@@ -3850,6 +3853,56 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+        ],
+      },
+
+
+
+
+      {
+        link: document.querySelector("#menuLavaRapido"),
+        title: "Lava Rapido",
+        establishments: [
+          {
+            image: "images/comercios/lavaRapido/leozin/perfil.jpg",
+            name: "Leozin Detailer",
+            hours: "Seg a Sex: 08:30h as 18:00h<br>Sab: 08:00h as 13:00",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:30", fim: "18:00" }],
+              ter: [{ inicio: "08:30", fim: "18:00" }],
+              qua: [{ inicio: "08:30", fim: "18:00" }],
+              qui: [{ inicio: "08:30", fim: "18:00" }],
+              sex: [{ inicio: "08:30", fim: "18:00" }],
+              sab: [{ inicio: "08:30", fim: "13:00" }],
+              dom: [],
+            },
+            address: "R. Benedito Salles, 400 - Carlopolis",
+            contact: "(43) 99166-0768",
+            instagram: "https://www.instagram.com/leozin_detailer/",
+            infoAdicional: "🚘 Lavagem Tradicional e Detalhada <Br>🚘 Polimento Tecnico e Comercial<br>🚘 Polimento em Farois<br>🚘 Vitrificação<br>🚘 Higienização<br>🚘 Enceramento<br>🚘 Limpeza de Bancos e Estofados<br>🚘 Higienização de Bancos de Couro",
+            novidadesImages: [
+
+              
+                  "images/comercios/lavaRapido/leozin/divulgacao/1.jpg",
+                  "images/comercios/lavaRapido/leozin/divulgacao/2.jpg",
+                  "images/comercios/lavaRapido/leozin/divulgacao/3.jpg",
+                  "images/comercios/lavaRapido/leozin/divulgacao/4.jpg",
+                  "images/comercios/lavaRapido/leozin/divulgacao/5.jpg",
+
+            ],
+
+            novidadesDescriptions: [
+              "Agende e garanta teu atendimento exclusivo!",
+              "Garantido e especializado!",
+              "Amplo espaço e preparado para um trabalho de qualidade",
+              "Produtos importados com o minimo de agreção a sua pintura",
+              "Polimento Tecnico e Proteção",
+
+
+            ],
+
+          },
         ],
       },
 
