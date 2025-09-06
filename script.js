@@ -3877,7 +3877,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               sab: [{ inicio: "08:30", fim: "13:00" }],
               dom: [],
             },
-            address: "R. Benedito Salles, 400 - Carlopolis",
+            address: "R. Benedito Salles, 1284 - Carlopolis",
             contact: "(43) 99166-0768",
             instagram: "https://www.instagram.com/leozin_detailer/",
             infoAdicional: "🚘 Lavagem Tradicional e Detalhada <Br>🚘 Polimento Tecnico e Comercial<br>🚘 Polimento em Farois<br>🚘 Vitrificação<br>🚘 Higienização<br>🚘 Enceramento<br>🚘 Limpeza de Bancos e Estofados<br>🚘 Higienização de Bancos de Couro",
