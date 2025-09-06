@@ -3880,7 +3880,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Benedito Salles, 1284 - Carlopolis",
             contact: "(43) 99166-0168",
             instagram: "https://www.instagram.com/leozin_detailer/",
-            infoAdicional: "📗 <a href='images/comercios/lavaRapido/leozin/divulgacao/catalogo.pdf' target='_blank' rel='noopener'>Catálogo</a><Br>🚘 Lavagem Tradicional e Detalhada <Br>🚘 Polimento Tecnico e Comercial<br>🚘 Polimento em Farois<br>🚘 Vitrificação<br>🚘 Higienização<br>🚘 Enceramento<br>🚘 Limpeza de Bancos e Estofados<br>🚘 Higienização de Bancos de Couro",
+            infoAdicional: "📗 <a href='images/comercios/lavaRapido/leozin/divulgacao/catalogo.pdf' target='_blank' rel='noopener'>Acesse Nosso Catálogo</a><Br><Br>🚘 Lavagem Tradicional e Detalhada <Br>🚘 Polimento Tecnico e Comercial<br>🚘 Polimento em Farois<br>🚘 Vitrificação<br>🚘 Higienização<br>🚘 Enceramento<br>🚘 Limpeza de Bancos e Estofados<br>🚘 Higienização de Bancos de Couro",
             novidadesImages: [
 
               
