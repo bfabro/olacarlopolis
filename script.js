@@ -791,7 +791,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     feiradalua: "s",
     calendarioeventos: "s",
-    frutfest: "s",
+  
     yakisobadaacecar: "s",
 
     lowcity: "s",
