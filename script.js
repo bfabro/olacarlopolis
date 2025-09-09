@@ -424,7 +424,9 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="info_divulgacao">
         <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
         <p>${texto}</p>
-        ${est.instagram ? `<a href="${est.instagram}" target="_blank" class="mais-info">+ informações</a>` : ""}
+
+        ${est.instagram ? `<a href="${fixUrl(est.instagram)}" target="_blank" rel="noopener noreferrer" class="mais-info">+ informações</a>` : ""}
+
       </div>
     `;
 
@@ -1345,6 +1347,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       .replace(/[ç]/g, "c")            // substitui cedilha
       .replace(/\s+/g, "");            // remove espaços
   }
+
+  function fixUrl(u) {
+  if (!u) return "";
+  u = String(u).trim();
+  // se não começar com http/https, prefixa https://
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u.replace(/^\/+/, "");
+  return u;
+}
 
   function sendPaymentReminder(establishment) {
     alert(
@@ -3929,7 +3939,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: [],
             },
             address: "Atendimento a domicílio",
-            contact: "(43)  9.9985-4044",
+            contact: "(43) 99985-4044",
             instagram: "https://www.instagram.com/mhpiscinas/",
             infoAdicional: "⏲️ Instalação de timer<br>🧪 + 🧹 Limpezas química e física<br>🏖️ Troca de areia<br>💧 Recuperação de água,",
             novidadesImages: [
@@ -9395,9 +9405,16 @@ ${establishment.infoVagaTrabalho
                       <div>
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
-                        ${establishment.facebook ? `<a href="${establishment.facebook}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
-                          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram</a>` : ""}          
-                          ${establishment.site ? `<a href="${establishment.site}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
+                      
+
+
+
+
+      ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
+                          ${establishment.instagram ? `<a href="${fixUrl(establishment.instagram)}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram</a>` : ""}          
+                          ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
+                       
+
                         </div>
                       </div>
                     </div>` : ""
