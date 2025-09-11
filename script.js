@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "seiza", "leozindetailer","vania","oficinadocelular"
+    "seiza", "leozindetailer", "vania", "oficinadocelular"
 
   ];
 
@@ -602,7 +602,7 @@ document.addEventListener("DOMContentLoaded", function () {
     mhpiscinas: "s",
 
     //Lava Rapido
-    leozindetailer:"s",
+    leozindetailer: "s",
 
     //pizzaria
     fornalhapizzaria: "s",
@@ -793,7 +793,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     feiradalua: "s",
     calendarioeventos: "s",
-  
+
     yakisobadaacecar: "s",
 
     lowcity: "s",
@@ -1349,12 +1349,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   }
 
   function fixUrl(u) {
-  if (!u) return "";
-  u = String(u).trim();
-  // se não começar com http/https, prefixa https://
-  if (!/^https?:\/\//i.test(u)) u = "https://" + u.replace(/^\/+/, "");
-  return u;
-}
+    if (!u) return "";
+    u = String(u).trim();
+    // se não começar com http/https, prefixa https://
+    if (!/^https?:\/\//i.test(u)) u = "https://" + u.replace(/^\/+/, "");
+    return u;
+  }
 
   function sendPaymentReminder(establishment) {
     alert(
@@ -3893,13 +3893,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             infoAdicional: "📗 <a href='images/comercios/lavaRapido/leozin/divulgacao/catalogo.pdf' target='_blank' rel='noopener'><br>Acesse Nosso Catálogo</a><Br>🚘 Lavagem Tradicional e Detalhada <Br>🚘 Polimento Tecnico e Comercial<br>🚘 Polimento em Farois<br>🚘 Vitrificação<br>🚘 Higienização<br>🚘 Enceramento<br>🚘 Limpeza de Bancos e Estofados<br>🚘 Higienização de Bancos de Couro",
             novidadesImages: [
 
-              
-                  "images/comercios/lavaRapido/leozin/divulgacao/1.jpg",
-                  "images/comercios/lavaRapido/leozin/divulgacao/2.jpg",
-                  "images/comercios/lavaRapido/leozin/divulgacao/3.jpg",
-                  "images/comercios/lavaRapido/leozin/divulgacao/4.jpg",
-                  "images/comercios/lavaRapido/leozin/divulgacao/5.jpg",
-                    "images/comercios/lavaRapido/leozin/divulgacao/6.jpg",
+
+              "images/comercios/lavaRapido/leozin/divulgacao/1.jpg",
+              "images/comercios/lavaRapido/leozin/divulgacao/2.jpg",
+              "images/comercios/lavaRapido/leozin/divulgacao/3.jpg",
+              "images/comercios/lavaRapido/leozin/divulgacao/4.jpg",
+              "images/comercios/lavaRapido/leozin/divulgacao/5.jpg",
+              "images/comercios/lavaRapido/leozin/divulgacao/6.jpg",
 
             ],
 
@@ -8521,6 +8521,62 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Nota de Falecimento",
         establishments: [
 
+
+
+
+  {
+            name: "Funeraria Grupo Castilho",
+            image: "images/informacoes/notaFalecimento/castilho/33.jpg",
+            descricaoFalecido: "Comunicamos o falecimento do Sr. CEME ELIAS MANSUR aos 93 anos de idade.<Br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR.<Br>O sepultamento será realizado 10/09/2025 as 16:30 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
+                 date: "09/09/2025"
+          },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/33.jpg",
+            date: "07/09/2025",
+            descricaoFalecido: "Faleceu em Arapongas aos 71 anos de idade, o Sr. LUIS CARLOS DE MOURA mais conhecido como: Fião.<Br>A cerimônia iniciará hoje às 06:00 horas no velório municipal de Carlópolis.<Br>Sua despedida e sepultamento será hoje em horário a ser definido no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/37.jpg",
+            date: "06/09/2025",
+            descricaoFalecido: "Hoje nos despedimos de uma alma querida, alegre e inesquecível: *Maria de Fátima Marcelino Terra*, que aos 45 anos partiu deixando saudade, sorrisos e lembranças que jamais se apagarão.<br>A cerimônia de velório teve início às 15:00 horas e seu sepultamento será amanhã, às 10:00 horas da manhã, no Cemitério Municipal<br>Nosso coração chora sua partida, mas a gratidão pela sua vida e pelo privilégio de tê-la conhecido é ainda maior. Que Deus a receba em paz e conforte toda a família.<br>*Você sempre será lembrada com alegria, Fátima.* 🕊️💐",
+
+          },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/36.jpg",
+            date: "06/09/2025",
+            descricaoFalecido: "Faleceu em Monte Mor aos 62 anos de idade, o Sr. LIOVALDO GARCIA DUARTE, mais conhecido como: filho da dona Lurdinha da loja.<Br>A cerimônia iniciará hoje às 18:00 horas no velório municipal de Carlópolis.<Br>Sua despedida e sepultamento será amanhã às 16:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/35.jpg",
+            date: "05/09/2025",
+            descricaoFalecido: "Faleceu em Carlópolis aos 88 anos de idade, o Sr. LAURA RIBEIRO DE QUEIROZ.<br>A cerimônia iniciará hoje às 00:00 horas no velório municipal de Carlópolis.<br>Sua despedida e sepultamento será amanhã às 11:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+
+
+         {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/34.jpg",
+            date: "04/09/2025",
+            descricaoFalecido: "Faleceu em Carlópolis aos 78 anos de idade, Sr Pedro Soares da Silva.<br>A cerimônia de velório será hoje às 00:00 horas em sua residência, Sítio São João Bairro espírito santo.<br>Sua despedida e sepultamento será amanhã às 16:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+
+
+
+
           {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/33.jpg",
@@ -9405,12 +9461,7 @@ ${establishment.infoVagaTrabalho
                       <div>
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
-                      
-
-
-
-
-      ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
+                          ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
                           ${establishment.instagram ? `<a href="${fixUrl(establishment.instagram)}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram</a>` : ""}          
                           ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
                        
