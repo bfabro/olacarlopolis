@@ -640,6 +640,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // peixaria
     coopanorpi: "s",
 
+    //corretora de seguros
+    promissorseguros:"s",
+
     // pesqueiro
     peskepagueaguamarine: "n",
 
@@ -4108,6 +4111,50 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Filé de Tilapia",
               "Postas de Tilapia",
               "Pintado",
+
+            ],
+          },
+        ],
+      },
+
+
+
+
+      {
+        link: document.querySelector("#menuCorretoraSeguros"),
+        title: "Corretora de Seguros",
+        establishments: [
+          {
+            image: "images/comercios/corretoraSeguros/promissor/perfil.jpg",
+            name: "Promissor Seguros",
+            hours: "Seg a Sex: 08:00h as 18:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [],
+              dom: [],
+            },
+            address: "Rua Fidêncio de Melo, 240 - Sala B, Carlópolis",
+            contact: " (43) 99197-9235", 
+            instagram: "https://www.instagram.com/promissorseguroscarlopolis/",
+
+            novidadesImages: [
+
+              "images/comercios/corretoraSeguros/promissor/divulgacao/1.jpg",
+              "images/comercios/corretoraSeguros/promissor/divulgacao/2.jpg",
+             
+
+
+
+            ],
+            novidadesDescriptions: [
+              "Viajar é viver novas experiências — e estar protegido é parte essencial desse roteiro.<Br>Com um bom seguro, você garante assistência médica, cobertura de bagagem, suporte em imprevistos e muito mais.<Br>🌍 Vá longe. Mas vá seguro.",
+              "Seu veículo é mais que um meio de transporte — é parte do seu patrimônio.<BR>Não deixe seu patrimônio desprotegido.<BR>Conte com um seguro que oferece a proteção que você merece, para dirigir tranquilo em qualquer situação. 🔒 🚗",
+             
 
             ],
           },
