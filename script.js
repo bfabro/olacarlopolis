@@ -454,7 +454,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // COMERCIOS:
 
     //academia
-    lobofitness: "s",
+    lobofitness: "n",
     teamvieira: "s",
     //AÇAI
     turminhadoacai: "s",
@@ -1794,30 +1794,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       nome: "MovePar",
       imagem: "images/comercios/moveis/movepar/perfil.png",
       promocoes: [
-        {
-          imagem: "images/comercios/moveis/movepar/promocao/1.jpg",
-          descricao: "XIAOMI POCO C71 3GB RAM 64GB MEMÓRIA ",
-          validade: "2025-08-30T18:00:00",
-          preco: "1.190,00",
-          preco_com_desconto: "699,00 a vista",
-          // desconto: "5",
-          whatsapp: "43991186909"
-        },
-
-        {
-          imagem: "images/comercios/moveis/movepar/promocao/2.jpg",
-          descricao: "XIAOMI REDMI A5 4GB RAM 128GB MEMÓRIA",
-          validade: "2025-08-30T18:00:00",
-          preco: "1.590,00",
-          preco_com_desconto: "799,00 a vista",
-          whatsapp: "43991186909"
-        },
+       
 
 
         {
           imagem: "images/comercios/moveis/movepar/promocao/3.jpg",
           descricao: "Fogão Monaco Atlas 5 Bocas",
-          validade: "2025-08-30T18:00:00",
+          validade: "2025-09-30T18:00:00",
           preco: "1.990,00",
           preco_com_desconto: "1.190,00",
           whatsapp: "43991186909"
@@ -1826,7 +1809,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/moveis/movepar/promocao/3.jpg",
           descricao: "Guarda Roupa Fit Andira",
-          validade: "2025-08-30T18:00:00",
+          validade: "2025-09-30T18:00:00",
           preco: "1.290,00",
           preco_com_desconto: "599,00",
           whatsapp: "43991186909"
@@ -1846,7 +1829,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/agropecuaria/agroVida/promocao/1.jpg",
           descricao: "Ração Unna 15kg cães adultos",
-          validade: "2025-08-30T18:00:00",
+          validade: "2025-09-30T18:00:00",
           preco: "110,00",
           preco_com_desconto: "99,90 a vista",
           // desconto: "5",
@@ -1856,7 +1839,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         {
           imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
           descricao: "Kit Churrasco Karanda",
-          validade: "2025-08-30T18:00:00",
+          validade: "2025-09-30T18:00:00",
           preco: "340,00",
           preco_com_desconto: "300,00 a vista",
           // desconto: "5",
@@ -1940,7 +1923,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ]
     },
 
-    /*
+    
         {
     
           nome: "Agro São José",
@@ -1949,45 +1932,20 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     
     
             {
-              imagem: "images/promocoes/agro/saojose/1.jpg",
-              descricao: "Casinha de plastico N4",
+              imagem: "images/comercios/agropecuaria/saojose/promocao/1.jpg",
+              descricao: "Cintos",
               validade: "2025-07-31T18:00:00",
-              preco: "180,00",
-              preco_com_desconto: "162,00 a vista",
+              preco: "130,00",
+              preco_com_desconto: "99,00 a vista",
               whatsapp: "43996829898"
             },
     
-            {
-              imagem: "images/promocoes/agro/saojose/2.jpg",
-              descricao: "Botina ",
-              validade: "2025-07-31T18:00:00",
-              preco: "124,90",
-              preco_com_desconto: "85,00 a vista",
-              whatsapp: "43996829898"
-            },
-    
-            {
-              imagem: "images/promocoes/agro/saojose/3.jpg",
-              descricao: "Toquinha G",
-              validade: "2025-07-31T18:00:00",
-              preco: "75,00",
-              preco_com_desconto: "67,50 a vista",
-              whatsapp: "43996829898"
-            },
-    
-            {
-              imagem: "images/promocoes/agro/saojose/4.jpg",
-              descricao: "Ração Aysha 15kg ",
-              validade: "2025-07-31T18:00:00",
-              preco: "60,00",
-              preco_com_desconto: "55,00 a vista",
-              whatsapp: "43996829898"
-            },
+            
             // ...até 10 promoções
           ]
         },
     
-    */
+    
     // ...outros comércios
   ];
 
