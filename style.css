@@ -4654,3 +4654,26 @@ html {
   transform: translateY(-10px);
   transition: opacity .4s ease, transform .4s ease;
 }
+/* Estilo do filtro de Promoções igual ao Onde Comer */
+.filtro-comidas-card label,
+.filtro-comidas-card select {
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 6px;
+  color: #333;
+}
+
+.filtro-comidas-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 20px 0;
+}
+
+.filtro-comidas-card select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
