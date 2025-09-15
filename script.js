@@ -2675,8 +2675,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               {
                imagem: "images/comercios/assistenciaCelular/oficinaCelular/promocao/1.jpg",
                 titulo: "Pelicula 3D",
-                precoAntigo: "R$ 20,00",
-                preco: "15,00",
+                precoAntigo: 20.00,
+                preco: 15.00,
                 unidade: "A UNIDADE",
                 validadeFim: "2025-09-30",
                 obs: "Oferta válida até durar o estoque",
@@ -7860,8 +7860,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               {
                 imagem: "images/comercios/quitanda/pimentaDoce/promocao/4.jpg",
                 titulo: "Vassoura Caipira",
-                precoAntigo: "24,00",
-                preco: "19,50",
+                precoAntigo: 24.00,
+                preco: 19.50,
                 unidade: "A UNIDADE",
                 validadeFim: "2025-09-30",
                 obs: "Oferta válida até durar o estoque",
@@ -9048,7 +9048,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Oficina do Celular",
             address: "R. Dra. Paula e Silva, 676 - Carlopolis",
             contact: "(43) 3566-1600",
-
             facebook: "https://www.facebook.com/oficinadocelularclps/",
             instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
             vagaPreRequisito: "<br> Responsável<br> Pontual<BR>Boa Comunicação<br>Disponibilidade de Horário",
