@@ -4428,7 +4428,7 @@ html {
 
 .promo-obs {
   font-size: 11px;
-  color: #9ca3af;
+  color: #747a83;
 }
 
 .promo-preco {
@@ -4446,7 +4446,7 @@ html {
 
 .promo-preco-antigo {
   font-size: 12px;
-  color: #9ca3af;
+  color: #484a4d;
   text-decoration: line-through;
   margin-bottom: 2px;
 }
@@ -4550,7 +4550,7 @@ html {
 }
 
 .promo-validade {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: #444;
   margin-top: 4px;
   margin-bottom: 8px;

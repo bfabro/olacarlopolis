@@ -1313,9 +1313,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   <div class="promo-preco-atual">${precoFmt}</div>
   ${i.unidade ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
   ${(i.validadeInicio && i.validadeFim)
-            ? `<div class="promo-validade">Ofertas válidas de ${i.validadeInicio} a ${i.validadeFim}</div>`
-            : (i.validadeFim ? `<div class="promo-validade">Até ${i.validadeFim}</div>`
-              : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${i.validadeInicio}</div>` : ""))}
+  ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
+  : (i.validadeFim ? `<div class="promo-validade">Até ${formatarDataBR(i.validadeFim)}</div>`
+  : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
 </div>
 
 
@@ -1371,6 +1371,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+// Converte "2025-09-15" em "15-09-2025"
+function formatarDataBR(dataISO) {
+  if (!dataISO) return "";
+  const [ano, mes, dia] = dataISO.split("-");
+  return `${dia}/${mes}/${ano.slice(-2)}`;
+}
 
 
     // === Auto-remover com animação se virar o dia/validade durante a sessão ===
