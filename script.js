@@ -7751,8 +7751,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/quitanda/pimentaDoce/pimentadoce.png",
             name: "Pimenta Doce",
-            hours: "Dom a Dom: 08:00h as 20:00h",
-            address: "Rua kalil keder, 491 - Carlopolis",
+            hours: "Ter a Sab: 08:00h as 21:00h<BR>Dom: 08:00h as 20:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [],
+              ter: [{ inicio: "08:00", fim: "21:00" }],
+              qua: [{ inicio: "08:00", fim: "21:00" }],
+              qui: [{ inicio: "08:00", fim: "21:00" }],
+              sex: [{ inicio: "08:00", fim: "21:00" }],
+              sab: [{ inicio: "08:00", fim: "21:00" }],
+              dom: [{ inicio: "08:00", fim: "20:00" }]
+            },
+            address: "R Kalil Keder, 491 - Carlopolis",
             contact: "(43) 98806-5747",
             delivery: "Não",
             instagram: "https://www.instagram.com/quintanda.pimenta.doce/",
