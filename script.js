@@ -1658,18 +1658,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     );
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  /////////
-  ///////
-  //////
-
-
-  /////
-
-
-
-
 
 
   function abrirCarrosselPromocoes(idxComercio) {
@@ -1829,79 +1817,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
   /// fim relogio contador
-
-
-
-
-
-
-  const promocoesPorComercio = [
-
-
-
-    
-
-
-
-    {
-
-      nome: "Paty mãos de ouro",
-      imagem: "images/comercios/artesanato/patricia/perfil.jpg",
-      promocoes: [
-        {
-          imagem: "images/comercios/artesanato/patricia/promocoes/1.jpg",
-          descricao: "Pano de prato - Flores ",
-          validade: "2025-09-30T18:00:00",
-          preco: "40,00",
-          preco_com_desconto: "35,00 a vista",
-          // desconto: "5",
-          whatsapp: "43999540753"
-        },
-
-        {
-          imagem: "images/comercios/artesanato/patricia/promocoes/2.jpg",
-          descricao: "Pano de prato - Frutas ",
-          validade: "2025-09-30T18:00:00",
-          preco: "40,00",
-          preco_com_desconto: "35,00 a vista",
-          // desconto: "5",
-          whatsapp: "43999540753"
-        },
-
-        {
-          imagem: "images/comercios/artesanato/patricia/promocoes/3.jpg",
-          descricao: "Pano de prato - Plantas ",
-          validade: "2025-09-30T18:00:00",
-          preco: "40,00",
-          preco_com_desconto: "35,00 a vista",
-          // desconto: "5",
-          whatsapp: "43999540753"
-        },
-
-        {
-          imagem: "images/comercios/artesanato/patricia/promocoes/4.jpg",
-          descricao: "Pano de prato - Melancia ",
-          validade: "2025-09-30T18:00:00",
-          preco: "40,00",
-          preco_com_desconto: "35,00 a vista",
-          // desconto: "5",
-          whatsapp: "43999540753"
-        },
-
-
-
-
-      ]
-    },
-
-
-   
-
-
-    // ...outros comércios
-  ];
-
-
 
 
 
@@ -2276,6 +2191,47 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
             ],
+             promocoes: [
+              {
+                 imagem: "images/comercios/artesanato/patricia/promocoes/1.jpg",
+                titulo: "Pano de prato - Flores ", 
+                precoAntigo:40.00,             
+                preco: 35.00,                
+                unidade: "A UNIDADE",                
+                validadeFim: "2025-09-30",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+              {
+                imagem: "images/comercios/artesanato/patricia/promocoes/2.jpg",
+                titulo: "Pano de prato - Frutas ",         
+                precoAntigo:40.00,             
+                preco: 35.00,     
+                unidade: "A UNIDADE",         
+                validadeFim: "2025-09-28",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+               {
+                imagem: "images/comercios/artesanato/patricia/promocoes/3.jpg",
+                titulo: "Pano de prato - Plantas ",         
+                precoAntigo:40.00,             
+                preco: 35.00,   
+                unidade: "A UNIDADE",             
+                validadeFim: "2025-09-28",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+               {
+                imagem: "images/comercios/artesanato/patricia/promocoes/4.jpg",
+                titulo: "Pano de prato - Melancia ",         
+                precoAntigo: 40.00,             
+                preco: 35.00,      
+                unidade: "A UNIDADE",         
+                validadeFim: "2025-09-28",
+                obs: "Oferta válida até durar o estoque"
+              }
+            ]
           },
 
 
