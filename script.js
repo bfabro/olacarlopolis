@@ -8476,7 +8476,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: []
             },
             address: "R. Benedito Salles, 627 - Carlópolis",
-            contact: "(43) 3566-2749",
+            contact:"(43) 99118-6909",
+            contact2: "(43) 3566-2749",
+            
             instagram: "https://www.instagram.com/movepar_carlopolis/",
             novidadesImages: [
               "images/comercios/moveis/movepar/divulgacao/1.png",
