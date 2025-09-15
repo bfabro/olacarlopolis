@@ -2356,15 +2356,27 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               },
 
               {
-                titulo: "Kit Churrasco Karanda",
+                titulo: "Petisco Turma da Monica - Frutas Vermelhas",
                 // volume: "2L",
                 //  embalagem: "fardo c/6",
 
-                precoAntigo: 349.00,
-                preco: "R$ 300,00",
+                precoAntigo: 24.00,
+                preco: 20.00,
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
                 // validade: "2025-09-28"
-                validadeFim: "2025-09-28"
+                validadeFim: "2025-10-15"
+              }
+
+               {
+                titulo: "Petisco Turma da Monica - Enriquecido com Whey Protein",
+                // volume: "2L",
+                //  embalagem: "fardo c/6",
+
+                precoAntigo: 24.00,
+                preco: 20.00,
+                imagem: "images/comercios/agropecuaria/agroVida/promocao/3.jpg",
+                // validade: "2025-09-28"
+                validadeFim: "2025-10-15"
               }
             ]
           },
