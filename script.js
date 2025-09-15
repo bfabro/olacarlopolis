@@ -2365,7 +2365,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
                 // validade: "2025-09-28"
                 validadeFim: "2025-10-15"
-              }
+              },
 
                {
                 titulo: "Petisco Turma da Monica - Enriquecido com Whey Protein",
