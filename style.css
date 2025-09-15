@@ -1663,7 +1663,7 @@ screen and (width: 820px) {
   display: flex;
   flex-direction: column;
 
-  margin-top: 10px ;
+  margin-top: 10px;
 }
 
 .info-box {
@@ -3559,65 +3559,108 @@ a:focus {
 
 
 /* === ABAS: Pílula deslizante === */
-.abas-nav{
-  position:relative; display:flex; gap:8px; padding:6px;
-  border:1px solid #e5e7eb; border-radius:12px; background:#fff;
-  overflow-x:auto; -webkit-overflow-scrolling:touch;
+.abas-nav {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
-.abas-nav .aba-tab{
-  position:relative; z-index:1; border:0; background:transparent;
-  padding:8px 14px; border-radius:10px; font-weight:700; color:#334155; cursor:pointer;
-  white-space:nowrap; transition:color .2s ease;
+
+.abas-nav .aba-tab {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .2s ease;
 }
-.abas-nav .aba-tab.active{ color:#fff; }
+
+.abas-nav .aba-tab.active {
+  color: #fff;
+}
+
 /* fundo que "anda" para a aba ativa */
-.abas-nav .tab-slider{
-  position:absolute; z-index:0; top:6px; left:6px; height:calc(100% - 12px);
-  width:0; border-radius:10px; background:var(--blue-color, #4070f4);
-  box-shadow:0 8px 20px rgba(64,112,244,.30);
-  transition:left .25s ease, width .25s ease;
+.abas-nav .tab-slider {
+  position: absolute;
+  z-index: 0;
+  top: 6px;
+  left: 6px;
+  height: calc(100% - 12px);
+  width: 0;
+  border-radius: 10px;
+  background: var(--blue-color, #4070f4);
+  box-shadow: 0 8px 20px rgba(64, 112, 244, .30);
+  transition: left .25s ease, width .25s ease;
 }
+
 /* conteúdo (seu JS já alterna .visible) */
 /* deixa o conteúdo colado nas abas */
-.abas-conteudo{
-  margin-top: 2px;   /* antes 10px */
+.abas-conteudo {
+  margin-top: 2px;
+  /* antes 10px */
   padding-top: 0;
 }
 
 /* garante que não há margem extra no painel/imagem */
-.abas-conteudo .aba{ margin-top: 0; padding-top: 0; }
-.abas-conteudo .swiper{ margin-top: 0; }
+.abas-conteudo .aba {
+  margin-top: 0;
+  padding-top: 0;
+}
 
-.abas-conteudo .aba{ display:none; }
-.abas-conteudo .aba.visible{ display:block; }
+.abas-conteudo .swiper {
+  margin-top: 0;
+}
+
+.abas-conteudo .aba {
+  display: none;
+}
+
+.abas-conteudo .aba.visible {
+  display: block;
+}
 
 
 
 /* === ABA CARROSSEL VIEWPORT FIT === */
-.abas-conteudo .swiper{
+.abas-conteudo .swiper {
   width: 100%;
-  min-height: var(--aba-swiper-max-h, 72vh); /* reserva altura para evitar flicker */
+  min-height: var(--aba-swiper-max-h, 72vh);
+  /* reserva altura para evitar flicker */
   /* altura máxima dinâmica por JS via --aba-swiper-max-h */
 }
-.abas-conteudo .swiper .swiper-wrapper{
+
+.abas-conteudo .swiper .swiper-wrapper {
   align-items: center;
 }
-.abas-conteudo .swiper .swiper-slide{
-  display:flex;
-  align-items:center;
-  justify-content:center;
+
+.abas-conteudo .swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.abas-conteudo .swiper .swiper-slide img{
-  width:auto;
-  height:auto;
-  max-width:100%;
+
+.abas-conteudo .swiper .swiper-slide img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
   max-height: var(--aba-swiper-max-h, 72vh);
   object-fit: contain;
   border-radius: 10px;
 }
+
 /* ANTI-FLICKER: disable animation on fotos/cardapio panes */
 .abas-conteudo .aba[id^="fotos-"],
-.abas-conteudo .aba[id^="cardapio-"]{
+.abas-conteudo .aba[id^="cardapio-"] {
   animation: none !important;
 }
 
@@ -3633,21 +3676,23 @@ a:focus {
 /* Tabs: impedir que o Swiper “estique” */
 .abas-conteudo .swiper,
 .abas-conteudo .swiper-wrapper,
-.abas-conteudo .swiper-slide{
+.abas-conteudo .swiper-slide {
   height: auto !important;
 }
 
 /* Imagens sem distorção e sem “vão” de baseline */
-.abas-conteudo .swiper-slide img{
+.abas-conteudo .swiper-slide img {
   display: block;
-  width: auto;        /* mantém tamanho natural */
-  max-width: 100%;    /* não passa da largura do card */
+  width: auto;
+  /* mantém tamanho natural */
+  max-width: 100%;
+  /* não passa da largura do card */
   height: auto !important;
   margin: 0 !important;
 }
 
 /* Se houver container do carrossel, zere top-gap */
-.abas-conteudo .carrossel-container{
+.abas-conteudo .carrossel-container {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
@@ -3662,26 +3707,31 @@ html {
 }
 
 /* Aumenta fonte e padding das abas */
-.abas-nav .aba-tab{
+.abas-nav .aba-tab {
   /* 16–18px, adaptando ao viewport */
   font-size: clamp(14px, 3.2vw, 18px);
   padding: 10px 14px;
-  min-height: 44px;         /* recomendado pela Apple p/ toque */
+  min-height: 44px;
+  /* recomendado pela Apple p/ toque */
   line-height: 1;
   letter-spacing: .2px;
 }
 
 /* Espaçamento um pouco menor entre as abas no mobile */
-.abas-nav{ gap: 6px; }
+.abas-nav {
+  gap: 6px;
+}
 
 /* iPhones menores (ex.: SE/8) */
-@media (max-width: 375px){
-  .abas-nav .aba-tab{ font-size: 17px; }
+@media (max-width: 375px) {
+  .abas-nav .aba-tab {
+    font-size: 17px;
+  }
 }
 
 /* Refino só para Safari iOS */
-@supports (-webkit-touch-callout: none){
-  .abas-nav .aba-tab{
+@supports (-webkit-touch-callout: none) {
+  .abas-nav .aba-tab {
     font-size: clamp(17px, 4vw, 19px);
   }
 }
@@ -3694,34 +3744,112 @@ html {
 
 
 
-.coleta-wrap { max-width: 980px; margin: 8px auto; padding: 8px; }
-.coleta-header { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin: 6px 0 10px;  justify-content: center;              /* centraliza horizontalmente */
-  text-align: center; }
-.coleta-header select, .coleta-header input { padding:8px 10px; border:1px solid #ddd; border-radius:10px; }
-.coleta-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:10px; }
-.coleta-card { background:#fff; border-radius:14px; padding:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
-.coleta-hora { font-weight:700; font-size:18px; margin-bottom:6px; color:#2e8b57; }
-.coleta-bairros { margin:0; padding-left:18px; }
-.coleta-bairros li { margin:4px 0; }
-.badge-dia { font-size:12px; padding:2px 8px; border-radius:999px; background:#e7f2fd; color:#4070f4; margin-left:6px; }
+.coleta-wrap {
+  max-width: 980px;
+  margin: 8px auto;
+  padding: 8px;
+}
+
+.coleta-header {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 6px 0 10px;
+  justify-content: center;
+  /* centraliza horizontalmente */
+  text-align: center;
+}
+
+.coleta-header select,
+.coleta-header input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.coleta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.coleta-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+}
+
+.coleta-hora {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 6px;
+  color: #2e8b57;
+}
+
+.coleta-bairros {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.coleta-bairros li {
+  margin: 4px 0;
+}
+
+.badge-dia {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e7f2fd;
+  color: #4070f4;
+  margin-left: 6px;
+}
+
 /* Coleta de lixo – estilos especiais */
-.coleta-card.apoio { background:#e8f5e9; border-left:5px solid #ff9800; }  /* Ponto de apoio (Usina) */
-.coleta-card.garagem { background:#e8f5e9; border-left:5px solid #2e7d32; } /* Garagem */
+.coleta-card.apoio {
+  background: #e8f5e9;
+  border-left: 5px solid #ff9800;
+}
+
+/* Ponto de apoio (Usina) */
+.coleta-card.garagem {
+  background: #e8f5e9;
+  border-left: 5px solid #2e7d32;
+}
+
+/* Garagem */
 .coleta-etq {
-  display:inline-block; font-size:12px; font-weight:600;
-  padding:2px 8px; border-radius:999px; margin-left:8px;
-  background:#0000000d; color:#333;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+  background: #0000000d;
+  color: #333;
 }
 
 /* Coleta – centralizar controles e destacar "agora" */
 
-.coleta-header #buscaBairro{ min-width: 200px; }
-.coleta-header #seletorDia{ min-width: 100px; }
-.coleta-header small{ flex-basis: 100%; text-align: center; }
+.coleta-header #buscaBairro {
+  min-width: 200px;
+}
 
-.coleta-card.agora{
-  background: #fff7b2;                  /* amarelinho */
-  border-left: 5px solid #f0b400;       /* faixa à esquerda */
+.coleta-header #seletorDia {
+  min-width: 100px;
+}
+
+.coleta-header small {
+  flex-basis: 100%;
+  text-align: center;
+}
+
+.coleta-card.agora {
+  background: #fff7b2;
+  /* amarelinho */
+  border-left: 5px solid #f0b400;
+  /* faixa à esquerda */
 }
 
 
@@ -3738,11 +3866,16 @@ html {
 }
 
 /* Linha de metadados do card (caminhão etc.) */
-.coleta-meta { margin-top: 6px; display:flex; gap:6px; flex-wrap:wrap; }
+.coleta-meta {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
 
 /* Chips de caminhão */
 .truck-chip {
-  display:inline-block;
+  display: inline-block;
   font-size: 12px;
   font-weight: 600;
   padding: 2px 10px;
@@ -3750,100 +3883,146 @@ html {
   background: #18fff6;
   border: 1px solid #c7d2fe;
 }
-.truck-chip.t1 { background:#e6f4ff; border-color:#b6e0fe; } /* Caminhão 1 */
-.truck-chip.t2 { background:#f3e8ff; border-color:#e9d5ff; } /* Caminhão 2 */
+
+.truck-chip.t1 {
+  background: #e6f4ff;
+  border-color: #b6e0fe;
+}
+
+/* Caminhão 1 */
+.truck-chip.t2 {
+  background: #f3e8ff;
+  border-color: #e9d5ff;
+}
+
+/* Caminhão 2 */
 
 /* Aviso em vermelho (coleta) */
-.coleta-aviso-vermelho{
-  color: #d32f2f;        /* vermelho */
-  font-weight: 700;      /* destaque */
+.coleta-aviso-vermelho {
+  color: #d32f2f;
+  /* vermelho */
+  font-weight: 700;
+  /* destaque */
 }
 
 
 /* === Coleta: visual maior e com destaque === */
-.coleta-card{ font-size: 16px; } /* base maior dentro do card */
-
-.coleta-hora{
-  font-size: clamp(24px, 5.5vw, 30px); /* horário bem maior */
-  line-height: 1.1;
-  display:flex;
-  align-items:center;
-  gap:6px;
+.coleta-card {
+  font-size: 16px;
 }
 
-.coleta-bairros{
+/* base maior dentro do card */
+
+.coleta-hora {
+  font-size: clamp(24px, 5.5vw, 30px);
+  /* horário bem maior */
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.coleta-bairros {
   margin-top: 8px;
   padding: 0;
-  list-style: none;              /* remove marcadores */
+  list-style: none;
+  /* remove marcadores */
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;                      /* vira “chips” lado a lado */
+  gap: 6px;
+  /* vira “chips” lado a lado */
 }
 
-.coleta-bairros li{
-  font-size: clamp(15px, 3.8vw, 18px); /* bairros maiores */
-  font-weight: 700;                    /* destaque no texto */
-  background: #f6f8ff;                 /* leve realce */
+.coleta-bairros li {
+  font-size: clamp(15px, 3.8vw, 18px);
+  /* bairros maiores */
+  font-weight: 700;
+  /* destaque no texto */
+  background: #f6f8ff;
+  /* leve realce */
   border: 1px solid #e0e7ff;
   padding: 6px 10px;
   border-radius: 10px;
 }
 
 /* === Coleta: 2 cards por linha (desktop/tablet) === */
-.coleta-grid{
+.coleta-grid {
   display: grid;
-  grid-template-columns: 1fr;          /* 1 por linha no mobile */
+  grid-template-columns: 1fr;
+  /* 1 por linha no mobile */
   gap: 12px;
 }
 
-@media (min-width: 680px){
-  .coleta-grid{
-    grid-template-columns: repeat(2, minmax(0, 1fr));  /* 2 por linha */
+@media (min-width: 680px) {
+  .coleta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* 2 por linha */
   }
 }
 
 /* Opcional: dar uma “enxugada” no card pra caber melhor em 2 colunas */
-.coleta-card{ padding: 10px; }
-.coleta-bairros{ gap: 6px; }
+.coleta-card {
+  padding: 10px;
+}
+
+.coleta-bairros {
+  gap: 6px;
+}
+
 /* === Coleta: sempre 2 colunas === */
-.coleta-grid{
+.coleta-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 12px;
 }
 
 /* (opcional) dar uma compactada nos cards, se apertar muito em telas pequenas */
-.coleta-card{ padding: 10px; }
+.coleta-card {
+  padding: 10px;
+}
 
 
 
-.truck-chip.eq-bruno{
-  background: #ffe6f2;      /* rosa claro */
+.truck-chip.eq-bruno {
+  background: #ffe6f2;
+  /* rosa claro */
   border-color: #ffb3d1;
-  color: #7a1a43;           /* texto mais escuro */
+  color: #7a1a43;
+  /* texto mais escuro */
 }
 
 /* Chip da Equipe Leonil/Leonel (azul, combinando com a borda) */
 .truck-chip.eq-leonil,
 .truck-chip.eq-leonel {
-  background: #e8f2ff;     /* azul clarinho */
-  border-color: #bcdcff;   /* contorno azul claro */
-  color: #1455a3;          /* texto azul mais forte */
+  background: #e8f2ff;
+  /* azul clarinho */
+  border-color: #bcdcff;
+  /* contorno azul claro */
+  color: #1455a3;
+  /* texto azul mais forte */
 }
 
 
 
-.coleta-meta{ display:flex; flex-wrap:wrap; gap:6px;  margin-top:6px; }
-.bairro-chip{
-  font-size: clamp(15px,3.8vw,18px);
-  font-weight:700;
-  background:#f6f8ff; border:1px solid #e0e7ff;
-  padding:6px 10px; border-radius:10px;
+.coleta-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
 }
 
-.coleta-card.eq-bruno-card{
+.bairro-chip {
+  font-size: clamp(15px, 3.8vw, 18px);
+  font-weight: 700;
+  background: #f6f8ff;
+  border: 1px solid #e0e7ff;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.coleta-card.eq-bruno-card {
   border: 2px solid #d32f2f !important;
-  box-shadow: 0 2px 8px rgba(211,47,47,.12);
+  box-shadow: 0 2px 8px rgba(211, 47, 47, .12);
 }
 
 /* Card da Equipe Leonil/Lionil: borda azul */
@@ -3851,110 +4030,171 @@ html {
 .coleta-card.eq-leonil-card,
 .coleta-card.eq-leonel-card {
   border: 2px solid #1976d2 !important;
-  box-shadow: 0 2px 8px rgba(25,118,210,.12);
+  box-shadow: 0 2px 8px rgba(25, 118, 210, .12);
 }
 
 /* === Coleta: âncoras de coluna === */
-.coleta-card.col-left  { grid-column: 1; }
-.coleta-card.col-right { grid-column: 2; }
+.coleta-card.col-left {
+  grid-column: 1;
+}
+
+.coleta-card.col-right {
+  grid-column: 2;
+}
 
 /* === Coleta: força 2 colunas quando a página marcar === */
-.coleta-grid.colunas-por-equipe { grid-template-columns: 1fr; }
-@media (min-width: 680px){
-  .coleta-grid.colunas-por-equipe { grid-template-columns: 1fr 1fr !important; }
+.coleta-grid.colunas-por-equipe {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 680px) {
+  .coleta-grid.colunas-por-equipe {
+    grid-template-columns: 1fr 1fr !important;
+  }
 }
 
 
 /* === Coleta: Toolbar de filtros (topo) === */
-.coleta-toolbar{
-  position: sticky; /* fica grudado no topo da área de conteúdo */
-  top: 0;           /* a .content_area já tem margem para a navbar */
+.coleta-toolbar {
+  position: sticky;
+  /* fica grudado no topo da área de conteúdo */
+  top: 0;
+  /* a .content_area já tem margem para a navbar */
   z-index: 5;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 12px;
-  box-shadow: 0 6px 12px rgba(0,0,0,.04);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .04);
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
 }
-@media (min-width: 680px){
-  .coleta-toolbar{ grid-template-columns: 2fr 1fr; align-items: end; }
+
+@media (min-width: 680px) {
+  .coleta-toolbar {
+    grid-template-columns: 2fr 1fr;
+    align-items: end;
+  }
 }
 
-.coleta-field label{
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .02em; color: #374151; margin-bottom: 6px;
+.coleta-field label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  color: #374151;
+  margin-bottom: 6px;
 }
 
-.coleta-input-wrap{ position: relative; }
-.coleta-input-wrap .input-icon{
-  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-  opacity: .6; pointer-events: none;
+.coleta-input-wrap {
+  position: relative;
 }
-.coleta-input-wrap input{
+
+.coleta-input-wrap .input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: .6;
+  pointer-events: none;
+}
+
+.coleta-input-wrap input {
   width: 100%;
-  padding: 12px 40px 12px 36px; /* espaço p/ ícone e X */
-  border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px;
+  padding: 12px 40px 12px 36px;
+  /* espaço p/ ícone e X */
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 16px;
   outline: none;
 }
-.coleta-input-wrap .clear-btn{
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-  border: 0; background: transparent; cursor: pointer;
-  font-size: 20px; line-height: 1; color: #9ca3af;
-}
-.coleta-input-wrap .clear-btn:hover{ color: #111827; }
 
-#seletorDia{
-  width: 100%; padding: 12px 14px; font-size: 16px;
-  border: 1px solid #d1d5db; border-radius: 10px; background: #fff;
+.coleta-input-wrap .clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  color: #9ca3af;
+}
+
+.coleta-input-wrap .clear-btn:hover {
+  color: #111827;
+}
+
+#seletorDia {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
 }
 
 /* === Coleta: Aviso “horários aproximados” (muito visível) === */
-.coleta-aten{
+.coleta-aten {
   margin-top: 10px;
-  display: flex; align-items: center; gap: 10px;
-  background: #fff7ed;       /* laranja bem claro */
-  color: #7c2d12;            /* marrom/laranja escuro */
-  border: 1px solid #fed7aa; /* contorno */
-  border-left: 6px solid #f97316; /* faixa lateral chamativa */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff7ed;
+  /* laranja bem claro */
+  color: #7c2d12;
+  /* marrom/laranja escuro */
+  border: 1px solid #fed7aa;
+  /* contorno */
+  border-left: 6px solid #f97316;
+  /* faixa lateral chamativa */
   border-radius: 10px;
   padding: 10px 12px;
   font-weight: 700;
 }
-.coleta-aten i{ font-size: 18px; }
+
+.coleta-aten i {
+  font-size: 18px;
+}
 
 
 /* === Coleta: "Bairro" + "Dia" na mesma linha (sempre) === */
-.coleta-header .coleta-toolbar{
+.coleta-header .coleta-toolbar {
   display: grid;
-  grid-template-columns: minmax(0, 62%) minmax(0, 38%); /* 1ª coluna maior p/ o bairro */
+  grid-template-columns: minmax(0, 62%) minmax(0, 38%);
+  /* 1ª coluna maior p/ o bairro */
   align-items: end;
   gap: 8px;
 }
 
 /* evita quebra por largura mínima dos filhos */
 .coleta-header .coleta-field,
-.coleta-header .coleta-input-wrap { min-width: 0; }
+.coleta-header .coleta-input-wrap {
+  min-width: 0;
+}
 
-.coleta-header .coleta-field label{
+.coleta-header .coleta-field label {
   font-size: 11px;
   margin-bottom: 4px;
   letter-spacing: .02em;
 }
 
 /* input menor */
-.coleta-header .coleta-input-wrap input{
+.coleta-header .coleta-input-wrap input {
   height: 36px;
-  padding: 8px 32px 8px 30px; /* espaço p/ ícone e botão X */
+  padding: 8px 32px 8px 30px;
+  /* espaço p/ ícone e botão X */
   font-size: 14px;
   border-radius: 10px;
 }
 
 /* select menor */
-.coleta-header #seletorDia{
+.coleta-header #seletorDia {
   height: 36px;
   padding: 8px 10px;
   font-size: 14px;
@@ -3962,51 +4202,62 @@ html {
 }
 
 /* ícones mais juntinhos */
-.coleta-header .coleta-input-wrap .input-icon{ left: 10px; }
-.coleta-header .coleta-input-wrap .clear-btn{
+.coleta-header .coleta-input-wrap .input-icon {
+  left: 10px;
+}
+
+.coleta-header .coleta-input-wrap .clear-btn {
   right: 10px;
   font-size: 18px;
   line-height: 1;
 }
 
 /* telas MUITO estreitas: aperta um pouco mais e mantém lado a lado */
-@media (max-width: 380px){
-  .coleta-header .coleta-toolbar{
+@media (max-width: 380px) {
+  .coleta-header .coleta-toolbar {
     grid-template-columns: minmax(0, 58%) minmax(0, 42%);
     gap: 6px;
   }
+
   .coleta-header .coleta-input-wrap input,
-  .coleta-header #seletorDia{
+  .coleta-header #seletorDia {
     height: 32px;
     font-size: 13px;
     padding: 6px 28px 6px 28px;
   }
-  .coleta-header .coleta-field label{ font-size: 10px; }
+
+  .coleta-header .coleta-field label {
+    font-size: 10px;
+  }
 }
 
 
 /* === Coleta: aumentar tamanho dos rótulos "Bairro" e "Dia" === */
-.coleta-header .coleta-field label{
-  font-size: clamp(14px, 2.2vw, 18px); /* maior e responsivo */
+.coleta-header .coleta-field label {
+  font-size: clamp(14px, 2.2vw, 18px);
+  /* maior e responsivo */
   line-height: 1.1;
 }
 
 /* opcional: deixar o ícone do label um pouco maior também */
-.coleta-header .coleta-field label i{
+.coleta-header .coleta-field label i {
   font-size: 1.15em;
 }
 
 /* se quiser reduzir um pouco em telas muito estreitas */
-@media (max-width: 360px){
-  .coleta-header .coleta-field label{ font-size: 13px; }
+@media (max-width: 360px) {
+  .coleta-header .coleta-field label {
+    font-size: 13px;
+  }
 }
 
 
 /* === Coleta: rótulos só com texto, alinhados à esquerda === */
-.coleta-header .coleta-field .coleta-label{
+.coleta-header .coleta-field .coleta-label {
   display: block;
   font-weight: 700;
-  text-transform: none;        /* sem UPPERCASE */
+  text-transform: none;
+  /* sem UPPERCASE */
   font-size: clamp(16px, 2.1vw, 18px);
   line-height: 1.15;
   color: #111827;
@@ -4015,7 +4266,391 @@ html {
 }
 
 /* esconder qualquer ícone antigo e corrigir o padding do input */
-.coleta-header .coleta-input-wrap .input-icon{ display: none !important; }
-.coleta-header .coleta-input-wrap input{
-  padding-left: 12px !important; /* antes havia padding maior por causa do ícone */
+.coleta-header .coleta-input-wrap .input-icon {
+  display: none !important;
+}
+
+.coleta-header .coleta-input-wrap input {
+  padding-left: 12px !important;
+  /* antes havia padding maior por causa do ícone */
+}
+
+
+
+
+
+
+
+/* ====== PROMOÇÕES ====== */
+.promo-hero {
+  margin: 4px 0 14px 0;
+  text-align: left;
+}
+
+.promo-title {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, #ffd54f 0%, #ffb300 100%);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .12);
+  letter-spacing: .5px;
+}
+
+.promo-sub {
+  color: #6b7280;
+  margin: 6px 2px 10px;
+  font-size: 13px;
+}
+
+.promo-filtros {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 2px 0;
+}
+
+.promo-filtros select {
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.promo-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 1200px) {
+  .promo-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .promo-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .promo-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 460px) {
+  .promo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.promo-card {
+  grid-column: span ;
+  /* 3 cards por linha em desktop grande */
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+  overflow: hidden;
+  border: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 900px) {
+  .promo-card {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 460px) {
+  .promo-card {
+    grid-column: span 2;
+  }
+}
+
+.promo-card-body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 2px;
+}
+
+.promo-produto {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.promo-produto img,
+.promo-sem-imagem {
+  width: 86px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #fff8e1;
+  display: block;
+}
+
+.promo-sem-imagem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.promo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.promo-nome {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.promo-det {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.promo-estab {
+  font-size: 12px;
+  color: #111827;
+}
+
+.promo-obs {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.promo-preco {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  min-width: 120px;
+  background: #fff7cc;
+  border-left: 1px dashed #fbbf24;
+  padding: 6px 4px;
+  border-radius: 10px;
+  height: 100px;
+}
+
+.promo-preco-antigo {
+  font-size: 12px;
+  color: #9ca3af;
+  text-decoration: line-through;
+  margin-bottom: 2px;
+}
+
+.promo-preco-atual {
+  font-size: 22px;
+  font-weight: 800;
+  color: #e11d48;
+  /* vermelho estilo oferta */
+  line-height: 1;
+}
+
+.promo-unidade {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+
+
+.promo-vazio {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #9ca3af;
+  padding: 20px;
+}
+
+
+/* botão fechar do zoom de imagem */
+.fullscreen-img-bg .fullscreen-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: #000c;
+  color: #fff;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+/* Promoções: rodapé */
+.promo-rodape {
+  display: flex;
+  justify-content: space-between;
+  /* validade à esquerda, botão à direita */
+  align-items: center;
+  margin-top: 0px;
+  gap: 2px;
+  /* espaço entre eles */
+  font-size: 11px;
+  color: #6b7280;
+  background: #f9fafb;
+  padding: 8px 10px;
+  border-top: 1px solid #f3f4f6;
+}
+
+
+
+
+.promo-rodape div {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.btn-whatsapp-promo {
+  background-color: #25d366;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-whatsapp-promo i {
+  font-size: 1rem;
+}
+
+
+.promo-preco {
+  margin-bottom: 6px;
+  /* espaço para a validade */
+}
+
+.promo-validade {
+  font-size: 0.85rem;
+  color: #444;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.promo-rodape {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 0px;
+}
+
+.btn-whatsapp-promo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #25d366;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn-whatsapp-promo i {
+  font-size: 16px;
+}
+
+.promo-rodape {
+  display: flex;
+  justify-content: flex-start;
+  /* ou space-between se quiser mais separado */
+  gap: 12px;
+  font-size: 0.8rem;
+  /* menor que o normal */
+  margin-top: 0px;
+  align-items: center;
+}
+
+.promo-rodape .icon-link {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.promo-rodape .icon-link i {
+  font-size: 16px;
+}
+
+.promo-rodape {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+ border-radius: 24px;
+  font-size: 0.8rem;
+  align-items: center;
+}
+
+.promo-rodape .icon-link {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.promo-rodape .icon-link i {
+  font-size: 16px;
+}
+
+
+/* Layout da lista de promoções */
+.promo-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;           /* mobile: 1 por linha */
+}
+
+/* Desktop: 2 por linha */
+@media (min-width: 1024px) {
+  .promo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    max-width: 1100px;                   /* opcional: centraliza e limita largura */
+    margin: 0 auto;
+  }
+}
+
+/* Garante que o card se comporte bem dentro do grid */
+.promo-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Opcional: limita altura da imagem pra manter cards alinhados */
+.promo-img-zoom {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+/* Promo expirada: suavemente sobe e some */
+.promo-hide {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity .4s ease, transform .4s ease;
 }

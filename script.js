@@ -23,6 +23,20 @@ function gerarMensagemWhatsApp() {
   return `${saudacao} Encontrei seu numero no Ola Carlopolis.`;
 }
 
+// Retorna o primeiro telefone do contact (array ou string)
+function getPrimeiroContato(contact) {
+  if (!contact) return "";
+  if (Array.isArray(contact)) return String(contact.find(Boolean) || "").trim();
+  // divide por separadores comuns: / , ; " e " " ou "
+  return String(contact).split(/\s*(?:\/|,|;|\bou\b|\be\b)\s*/i)[0].trim();
+}
+
+// Mantém só dígitos (para montar o link do WhatsApp)
+function somenteDigitos(str) {
+  return String(str || "").replace(/\D/g, "");
+}
+
+
 
 
 
@@ -31,6 +45,18 @@ function getHojeBR() {
   agora.setHours(agora.getHours() - 3); // UTC-3 (Brasília)
   return agora.toISOString().slice(0, 10);
 }
+
+
+// === VALIDADE: helpers (expira só DEPOIS da data final) ===
+function isDepoisDeHojeStr(dataISO) {
+  const hoje = getHojeBR();              // 'YYYY-MM-DD' em UTC-3
+  return hoje > String(dataISO || "");   // só considera expirado no DIA SEGUINTE
+}
+
+function promoExpirada(p) {
+  return Boolean(p?.validadeFim) && isDepoisDeHojeStr(p.validadeFim);
+}
+
 
 
 
@@ -641,7 +667,7 @@ document.addEventListener("DOMContentLoaded", function () {
     coopanorpi: "s",
 
     //corretora de seguros
-    promissorseguros:"s",
+    promissorseguros: "s",
 
     // pesqueiro
     peskepagueaguamarine: "n",
@@ -1154,6 +1180,273 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   });
 
 
+  ///
+  ///
+  ///
+
+
+  // ============ PROMOÇÕES ============
+
+  // Coleta TODAS as promoções percorrendo categories/establishments
+  function coletarTodasPromocoes() {
+    const itens = [];
+    (categories || []).forEach(cat => {
+      (cat.establishments || []).forEach(est => {
+        const nomeEst = est.name;
+        const idEst = normalizeName(nomeEst);
+        const lista = est.promocoes || est.promotions || [];
+        lista.forEach(p => {
+          itens.push({
+            estabelecimento: nomeEst,
+            estabelecimentoId: idEst,
+            titulo: p.titulo || p.nome || "",
+            volume: p.volume || "",             // ex: "350 ml", "600 ml"
+            embalagem: p.embalagem || "",       // ex: "caixa c/18", "fardo c/6"
+            preco: p.preco,                     // número ou string
+            precoAntigo: p.precoAntigo || null, // opcional
+            unidade: p.unidade || "",           // ex: "A UNIDADE", "NO FARDO"
+            imagem: p.imagem || p.image || "",  // url opcional
+            validadeInicio: p.validadeInicio || p.validade || null,
+            validadeFim: p.validadeFim || null,
+            obs: p.obs || "",                    // qualquer extra
+            contact: getPrimeiroContato(est.contact) || ""
+          });
+        });
+      });
+    });
+    return itens;
+  }
+
+
+
+
+
+
+
+
+
+
+  // Renderiza a página Promoções
+  function mostrarPromocoes(filtroEstabId = "todos") {
+    const todos = coletarTodasPromocoes();
+
+    // prepara lista de estabelecimentos que têm promo
+    const estabelecimentos = Array.from(
+      new Set(todos.map(i => JSON.stringify({ id: i.estabelecimentoId, nome: i.estabelecimento })))
+    ).map(s => JSON.parse(s))
+      .sort((a, b) => a.nome.localeCompare(b.nome));
+
+    // aplica filtro
+    const itens = (filtroEstabId === "todos")
+      ? todos
+      : todos.filter(i => i.estabelecimentoId === filtroEstabId);
+
+    // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
+    const itensFiltrados = itens.filter(i => !promoExpirada(i));
+
+    // título + filtro
+    let html = `
+    <section class="promo-hero">
+       <h2 class="highlighted">🔥 Promoções</h2>
+    
+     <div class="filtro-comidas-card">
+  <label for="filtroEstab">Filtrar por:</label>
+  <select id="filtroEstab">
+    <option value="todos">🔥 Todos</option>
+    ${estabelecimentos.map(e => `
+      <option value="${e.id}" ${filtroEstabId === e.id ? 'selected' : ''}>${e.nome}</option>
+    `).join("")}
+  </select>
+</div>
+
+    </section>
+  `;
+
+    // grid de cards
+    html += `<section class="promo-grid">`;
+
+    if (itensFiltrados.length === 0) {
+      html += `<div class="promo-vazio">Nenhuma promoção cadastrada.</div>`;
+    } else {
+      itensFiltrados.forEach(i => {
+        const precoFmt = (typeof i.preco === "number")
+          ? i.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+          : i.preco;
+
+        const precoAntFmt = (i.precoAntigo && typeof i.precoAntigo === "number")
+          ? i.precoAntigo.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+          : (i.precoAntigo || "");
+
+        // validade
+        let validadeTxt = "";
+        if (i.validadeInicio && i.validadeFim) {
+          validadeTxt = `Ofertas válidas de ${i.validadeInicio} a ${i.validadeFim}`;
+        } else if (i.validadeFim) {
+          validadeTxt = `Válidade: ${i.validadeFim}`;
+        } else if (i.validadeInicio) {
+          validadeTxt = `Válido a partir de ${i.validadeInicio}`;
+        }
+
+
+
+
+        html += `
+  <article class="promo-card">
+    <div class="promo-card-body">
+      <div class="promo-produto">
+        ${i.imagem
+            ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
+            : `<div class="promo-sem-imagem">sem imagem</div>`}
+        
+        <div class="promo-info">
+          <div class="promo-nome">${i.titulo}</div>
+          ${(i.volume || i.embalagem)
+            ? `<div class="promo-det">${[i.volume, i.embalagem].filter(Boolean).join(" · ")}</div>` : ""}
+          <div class="promo-estab">${i.estabelecimento}</div>
+          ${i.obs ? `<div class="promo-obs">${i.obs}</div>` : ""}
+          
+        </div>
+      </div>
+
+     <div class="promo-preco">
+  ${precoAntFmt ? `<div class="promo-preco-antigo">${precoAntFmt}</div>` : ""}
+  <div class="promo-preco-atual">${precoFmt}</div>
+  ${i.unidade ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
+  ${(i.validadeInicio && i.validadeFim)
+            ? `<div class="promo-validade">Ofertas válidas de ${i.validadeInicio} a ${i.validadeFim}</div>`
+            : (i.validadeFim ? `<div class="promo-validade">Até ${i.validadeFim}</div>`
+              : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${i.validadeInicio}</div>` : ""))}
+</div>
+
+
+     
+    </div>
+
+  <div class="promo-rodape">
+  ${i.contact
+            ? `<a href="https://wa.me/55${somenteDigitos(getPrimeiroContato(i.contact))}?text=${encodeURIComponent(`Olá, encontrei o produto ${i.titulo} no Olá Carlópolis. Está disponível ainda?`)
+            }" 
+        target="_blank" 
+        class="icon-link">
+        <i class="fab fa-whatsapp" style="color:#25D366"></i>${i.contact}
+      </a>`
+            : ""}
+
+  ${i.estabelecimentoId && categories
+            .flatMap(c => c.establishments || [])
+            .find(e => normalizeName(e.name) === i.estabelecimentoId)?.instagram
+            ? `<a href="${fixUrl(categories.flatMap(c => c.establishments || [])
+              .find(e => normalizeName(e.name) === i.estabelecimentoId).instagram)}"
+        target="_blank"
+        class="icon-link">
+        <i class="fab fa-instagram" style="color:#C13584"></i> Instagram
+      </a>`
+            : ""}
+
+    
+</div>
+
+  </article>
+`;
+
+
+      });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    html += `</section>`;
+
+    document.querySelector(".content_area").innerHTML = html;
+
+
+
+
+
+    // === Auto-remover com animação se virar o dia/validade durante a sessão ===
+    function removerExpiradasComAnimacao() {
+      const cards = document.querySelectorAll('.promo-card[data-validade-fim]');
+      const hoje = getHojeBR();
+      cards.forEach(card => {
+        const fim = card.getAttribute('data-validade-fim');
+        if (fim && hoje >= fim && !card.classList.contains('promo-hide')) {
+          card.classList.add('promo-hide');           // aplica animação
+          setTimeout(() => card.remove(), 450);       // remove após a transição
+        }
+      });
+    }
+
+    // roda na entrada e a cada 60s (leve)
+    removerExpiradasComAnimacao();
+    if (!window.__promoExpireTimer) {
+      window.__promoExpireTimer = setInterval(removerExpiradasComAnimacao, 60000);
+    }
+
+
+
+
+
+    // Ampliar imagem do produto
+    document.querySelectorAll('.promo-img-zoom').forEach(img => {
+      img.addEventListener('click', () => {
+        const overlay = document.createElement('div');
+        overlay.className = 'fullscreen-img-bg';
+        overlay.innerHTML = `
+      <button class="fullscreen-close" aria-label="Fechar">&times;</button>
+      <img src="${img.src}" alt="${img.alt}">
+    `;
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay || e.target.classList.contains('fullscreen-close')) {
+            overlay.remove();
+          }
+        });
+        document.body.appendChild(overlay);
+      });
+    });
+
+
+    // listeners do filtro
+    const select = document.getElementById("filtroEstab");
+    if (select) {
+      select.addEventListener("change", (e) => {
+        mostrarPromocoes(e.target.value);
+      });
+    }
+  }
+
+  // Atalho no menu
+  const linkPromo = document.getElementById("menuPromocoes");
+  if (linkPromo) {
+    linkPromo.addEventListener("click", (e) => {
+      e.preventDefault();
+      mostrarPromocoes("todos"); // sempre abre com todas as promoções
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+  ///
+  ///
+  ///
+
 
 
 
@@ -1374,78 +1667,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
   /////
 
-  function mostrarPromocoes() {
-    let html = `<h2 class="highlighted">Promoções</h2>
-    <div class="estab-promos-lista">`;
 
-    const agora = new Date();
-
-    // Ordena os estabelecimentos pela promoção com validade mais próxima
-    const ordenados = [...promocoesPorComercio].sort((a, b) => {
-      const validadeA = a.promocoes
-        .map(p => new Date(p.validade))
-        .filter(d => d > agora)
-        .sort((x, y) => x - y)[0] || new Date("9999-12-31");
-
-      const validadeB = b.promocoes
-        .map(p => new Date(p.validade))
-        .filter(d => d > agora)
-        .sort((x, y) => x - y)[0] || new Date("9999-12-31");
-
-      return validadeA - validadeB;
-    });
-    /////
-    ////
-    ////
-    ////
-
-    ///
-    ordenados.forEach((comercio, idx) => {
-      const agora = new Date();
-      let primeiraPromoValida = null;
-      for (const p of comercio.promocoes) {
-        if (new Date(p.validade) > agora) {
-          primeiraPromoValida = p;
-          break;
-        }
-      }
-
-      html += `
-      
-      <div class="card-estab-promo ${primeiraPromoValida ? '' : 'inativo'}" data-idx="${idx}">
-        <img src="${comercio.imagem}" alt="Promoções ${comercio.nome}" class="logo-estab-promo" />
-        
-        <div class="info-estab-promo">
-          <h3>${comercio.nome}</h3>
-          <div class="badge-promocoes">Confira as ${comercio.promocoes.length} promoções</div>
-          ${primeiraPromoValida
-          ? `<div class="promo-countdown-lista" data-expira="${primeiraPromoValida.validade}" id="countdown-lista-${idx}"></div>`
-          : `<span style="color:#B22222;font-weight:bold;">Sem promoções ativas</span>`
-        }
-        </div>
-      </div>
-    `;
-    });
-
-    html += `</div>`;
-    document.querySelector(".content_area").innerHTML = html;
-
-
-
-    document.querySelectorAll('.card-estab-promo').forEach((card, i) => {
-      card.addEventListener('click', function () {
-        const comercio = ordenados[i];
-        registrarCliqueNaPromocao(comercio.nome);
-        abrirCarrosselPromocoes(promocoesPorComercio.indexOf(comercio));
-      });
-    });
-
-
-
-    document.querySelectorAll('.promo-countdown-lista').forEach(el => {
-      iniciarCountdown(el);
-    });
-  }
 
 
 
@@ -1486,7 +1708,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 ` : ""}
         <div class="promo-card validade">
           <i class="fa-solid fa-clock"></i>
-          <span class="preco-desconto"><b>Valido até:</b> ${new Date(promo.validade).toLocaleDateString()}</span>
+          <span class="preco-desconto"><b>Validade:</b> ${new Date(promo.validade).toLocaleDateString()}</span>
           
         </div>
        ${promo.whatsapp ? `
@@ -1610,266 +1832,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+
+
+
   const promocoesPorComercio = [
 
-    /*
-    {
-      nome: "Seiza",
-      imagem: "images/comercios/mercearia/seiza/seiza.png",
-      promocoes: [
-        {
-          imagem: "images/promocoes/seiza/1.jpg",
-          descricao: "Molho Tare Maruiti 500ml",
-          validade: "2025-07-31T18:00:00",
-          preco: "26,99",
-          preco_com_desconto: "23,99",
-          whatsapp: "43991034187"
-        },
 
 
-        {
-          imagem: "images/promocoes/seiza/2.jpg",
-          descricao: "Natto Nippo Kyoka Agronippo 100g",
-          validade: "2025-07-31T18:00:00",
-          preco: "15,20",
-          preco_com_desconto: "13,49",
-          whatsapp: "43991034187"
-        },
-      ]
-    },
-
-*/
-    /*   */
-    {
-      nome: "Cacau Show",
-      imagem: "images/comercios/docesChocolates/cacauShow/perfil.jpg",
-      promocoes: [
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
-          descricao: "Trufas 13,5g",
-          validade: "2025-09-21T23:00:00",
-
-          whatsapp: "43991053711"
-        },
-
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
-          descricao: "Trufas Classicas 30g",
-          validade: "2025-09-21T23:00:00",
-
-          whatsapp: "43991053711"
-        },
-
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
-          descricao: "Trufas Artesanais 30g",
-          validade: "2025-09-21T23:00:00",
-
-          whatsapp: "43991053711"
-        },
-
-
-        {
-          imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
-          descricao: "Trufas Zero Açucar 30g",
-          validade: "2025-09-21T23:00:00",
-
-          whatsapp: "43991053711"
-        },
-
-
-      ]
-
-
-    },
-
-
-
-
-    {
-      nome: "Quitanda Pimenta Doce",
-      imagem: "images/comercios/quitanda/pimentaDoce/pimentadoce.png",
-      promocoes: [
-
-
-
-        {
-          imagem: "images/comercios/quitanda/pimentaDoce/promocao/4.jpg",
-          descricao: "Vassoura Caipira",
-          validade: "2025-09-30T20:00:00",
-          preco: "24,00",
-          preco_com_desconto: "19,50",
-          whatsapp: "43988065747"
-        },
-
-
-
-      ]
-    },
-
-
-    {
-      nome: "Loja Ferreira",
-      imagem: "images/comercios/materialConstrucao/ferreira/perfil.png",
-      promocoes: [
-
-
-
-        {
-          imagem: "images/comercios/materialConstrucao/ferreira/promocao/1.jpg",
-          descricao: "Esmerilheiradeira Angular Bosh / GWS700",
-          validade: "2025-08-13T18:00:00",
-          preco: "415,00",
-          preco_com_desconto: "390,00",
-          whatsapp: "43996538400"
-        },
-
-
-
-      ]
-    },
-
-    /*
     
-        {
-    
-          nome: "Supermercado Zero Japan",
-          imagem: "images/comercios/supermercado/zerojapan/zerojapan.png",
-          promocoes: [
-            {
-              imagem: "images/promocoes/zerojapan/1.jpg",
-              descricao: "Perfume YARA ARABIC",
-              validade: "2025-07-30T21:00:00",
-              preco: "220,00",
-              preco_com_desconto: "199,99 a vista",
-              whatsapp: "4331422005"
-            },
-    
-            {
-              imagem: "images/promocoes/zerojapan/2.jpg",
-              descricao: "Perfume Body Splash",
-              validade: "2025-07-30T21:00:00",
-              preco: "280,00",
-              preco_com_desconto: "250,00 a vista",
-              whatsapp: "4331422005"
-            },
-    
-            {
-              imagem: "images/promocoes/zerojapan/3.jpg",
-              descricao: "Perfume Shaghaf Silver",
-              validade: "2025-07-30T21:00:00",
-              preco: "330,00",
-              preco_com_desconto: "299,00 a vista",
-              whatsapp: "4331422005"
-            },
-    
-            {
-              imagem: "images/promocoes/zerojapan/4.jpg",
-              descricao: "Perfume Hareem Al Sultan",
-              validade: "2025-07-30T21:00:00",
-              preco: "550,00",
-              preco_com_desconto: "499,00 a vista",
-              whatsapp: "4331422005"
-            },
-    
-            {
-              imagem: "images/promocoes/zerojapan/5.jpg",
-              descricao: "Perfume Atheeri",
-              validade: "2025-07-30T21:00:00",
-              preco: "830,00",
-              preco_com_desconto: "750,00 a vista",
-    
-              whatsapp: "4331422005"
-            },
-    
-    
-          ]
-        },
-    */
-    ////
-    ////aquiiii
 
-    {
-
-      nome: "MovePar",
-      imagem: "images/comercios/moveis/movepar/perfil.png",
-      promocoes: [
-       
-
-
-        {
-          imagem: "images/comercios/moveis/movepar/promocao/3.jpg",
-          descricao: "Fogão Monaco Atlas 5 Bocas",
-          validade: "2025-09-30T18:00:00",
-          preco: "1.990,00",
-          preco_com_desconto: "1.190,00",
-          whatsapp: "43991186909"
-        },
-
-        {
-          imagem: "images/comercios/moveis/movepar/promocao/3.jpg",
-          descricao: "Guarda Roupa Fit Andira",
-          validade: "2025-09-30T18:00:00",
-          preco: "1.290,00",
-          preco_com_desconto: "599,00",
-          whatsapp: "43991186909"
-        },
-
-      ]
-    },
-
-
-
-
-    {
-
-      nome: "Agro Vida",
-      imagem: "images/comercios/agropecuaria/agroVida/agrovida.png",
-      promocoes: [
-        {
-          imagem: "images/comercios/agropecuaria/agroVida/promocao/1.jpg",
-          descricao: "Ração Unna 15kg cães adultos",
-          validade: "2025-09-30T18:00:00",
-          preco: "110,00",
-          preco_com_desconto: "99,90 a vista",
-          // desconto: "5",
-          whatsapp: "43991589047"
-        },
-
-        {
-          imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
-          descricao: "Kit Churrasco Karanda",
-          validade: "2025-09-30T18:00:00",
-          preco: "340,00",
-          preco_com_desconto: "300,00 a vista",
-          // desconto: "5",
-          whatsapp: "43991589047"
-        },
-
-
-
-
-      ]
-    },
-
-    {
-
-      nome: "Oficina do Celular",
-      imagem: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
-      promocoes: [
-        {
-          imagem: "images/comercios/assistenciaCelular/oficinaCelular/promocao/1.jpg",
-          descricao: "Pelicula 3D",
-          validade: "2025-09-30T18:00:00",
-          preco: "20,00",
-          preco_com_desconto: "15,00 a vista",
-          // desconto: "5",
-          whatsapp: "43998204580"
-        },
-
-
-      ]
-    },
 
 
     {
@@ -1923,29 +1894,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ]
     },
 
-    
-        {
-    
-          nome: "Agro São José",
-          imagem: "images/comercios/agropecuaria/saojose/perfil.png",
-          promocoes: [
-    
-    
-            {
-              imagem: "images/comercios/agropecuaria/saojose/promocao/1.jpg",
-              descricao: "Cintos",
-              validade: "2025-07-31T18:00:00",
-              preco: "130,00",
-              preco_com_desconto: "99,00 a vista",
-              whatsapp: "43996829898"
-            },
-    
-            
-            // ...até 10 promoções
-          ]
-        },
-    
-    
+
+   
+
+
     // ...outros comércios
   ];
 
@@ -1956,6 +1908,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   // Carregar informações de categorias
   const categories =
     [
+
+
+      // dentro de um establishment
+
       // DADOS COMERCIOS
       {
         link: document.querySelector("#menuAcademia"),
@@ -2430,6 +2386,31 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "",
 
             ],
+
+            promocoes: [
+              {
+                titulo: "Ração Unna ",
+                volume: "15kg",
+                preco: 99.90,
+                precoAntigo: 110.00,
+                unidade: "A UNIDADE",
+                imagem: "images/comercios/agropecuaria/agroVida/promocao/1.jpg",
+                validadeFim: "2025-09-30",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+              {
+                titulo: "Kit Churrasco Karanda",
+                // volume: "2L",
+                //  embalagem: "fardo c/6",
+
+                precoAntigo: 349.00,
+                preco: "R$ 300,00",
+                imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
+                // validade: "2025-09-28"
+                validadeFim: "2025-09-28"
+              }
+            ]
           },
 
 
@@ -2465,6 +2446,29 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
             ],
+
+
+
+ promocoes: [
+              {
+               imagem: "images/comercios/agropecuaria/saojose/promocao/1.jpg",
+                titulo: "Cintos",
+                precoAntigo: "R$ 130,00",
+                preco: "R$ 99,00",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-09-30",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+
+            ]
+
+
+
+
+
+
           },
 
 
@@ -2665,6 +2669,34 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Temos Assistencia Tecnica, todos modelos de celular"
 
             ],
+
+
+  promocoes: [
+              {
+               imagem: "images/comercios/assistenciaCelular/oficinaCelular/promocao/1.jpg",
+                titulo: "Pelicula 3D",
+                precoAntigo: "R$ 20,00",
+                preco: "15,00",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-09-30",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+
+            ]
+
+
+
+
+
+
+
+
+
+
+
+
           },
 
 
@@ -4097,14 +4129,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: [],
             },
             address: "Rua Fidêncio de Melo, 240 - Sala B, Carlópolis",
-            contact: " (43) 99197-9235", 
+            contact: " (43) 99197-9235",
             instagram: "https://www.instagram.com/promissorseguroscarlopolis/",
 
             novidadesImages: [
 
               "images/comercios/corretoraSeguros/promissor/divulgacao/1.jpg",
               "images/comercios/corretoraSeguros/promissor/divulgacao/2.jpg",
-             
+
 
 
 
@@ -4112,7 +4144,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             novidadesDescriptions: [
               "Viajar é viver novas experiências — e estar protegido é parte essencial desse roteiro.<Br>Com um bom seguro, você garante assistência médica, cobertura de bagagem, suporte em imprevistos e muito mais.<Br>🌍 Vá longe. Mas vá seguro.",
               "Seu veículo é mais que um meio de transporte — é parte do seu patrimônio.<BR>Não deixe seu patrimônio desprotegido.<BR>Conte com um seguro que oferece a proteção que você merece, para dirigir tranquilo em qualquer situação. 🔒 🚗",
-             
+
 
             ],
           },
@@ -7615,6 +7647,48 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Quando o amor é verdadeiro, a combinação é perfeita.",
               "Tem carinho que se transforma em chocolate.<br>E tem presente que carrega todo o amor do mundo.<br>Quando o amor é único, o presente também precisa ser.",
             ],
+
+
+
+ promocoes: [
+              {
+                imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
+                titulo: "Trufas 13,5g",              
+                preco: 2.62,                
+                unidade: "A UNIDADE",                
+                validadeFim: "2025-09-30",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+              {
+                imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
+                titulo: "Trufas Classicas 30g",         
+                preco: "R$ 3,74",     
+                unidade: "A UNIDADE",         
+                validadeFim: "2025-09-28",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+               {
+                imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
+                titulo: "Trufas Artesanais 30g",         
+                preco: "R$ 4,49", 
+                unidade: "A UNIDADE",             
+                validadeFim: "2025-09-28",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+               {
+                imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
+                titulo: "Trufas Zero Açucar 30g",         
+                preco: "R$ 4,87",     
+                unidade: "A UNIDADE",         
+                validadeFim: "2025-09-28",
+                obs: "Oferta válida até durar o estoque"
+              }
+            ]
+
+
           },
 
 
@@ -7781,9 +7855,30 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Frutas exoticas",
               "Frutas Frescas",
               "Verduras frescas",
-
-
             ],
+ promocoes: [
+              {
+                imagem: "images/comercios/quitanda/pimentaDoce/promocao/4.jpg",
+                titulo: "Vassoura Caipira",
+                precoAntigo: "24,00",
+                preco: "19,50",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-09-30",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+
+            ]
+
+
+  
+
+
+
+
+
+
           },
         ],
       },
@@ -8438,6 +8533,20 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Venha conferir nossos eletronicos",
 
             ],
+            promocoes: [
+              {
+                imagem: "images/comercios/moveis/movepar/promocao/3.jpg",
+                titulo: "Fogão Monaco Atlas 5 Bocas",
+                precoAntigo: "R$ 1.990,00",
+                preco: "R$ 1.190,00",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-09-30",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+
+            ]
           },
         ],
       },
@@ -8539,11 +8648,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-  {
+          {
             name: "Funeraria Grupo Castilho",
             image: "images/informacoes/notaFalecimento/castilho/33.jpg",
             descricaoFalecido: "Comunicamos o falecimento do Sr. CEME ELIAS MANSUR aos 93 anos de idade.<Br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR.<Br>O sepultamento será realizado 10/09/2025 as 16:30 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
-                 date: "09/09/2025"
+            date: "09/09/2025"
           },
 
           {
@@ -8580,7 +8689,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-         {
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/34.jpg",
             date: "04/09/2025",
