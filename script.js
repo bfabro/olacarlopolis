@@ -1177,7 +1177,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     // Evento do botão de compartilhar
 document.getElementById("shareOndeComer").addEventListener("click", function () {
-  const url = `${window.location.origin}#ondecomer`;
+  const url = `${window.location.origin}${window.location.pathname}#ondecomer`;
 
   if (navigator.share) {
     navigator.share({
@@ -1198,6 +1198,7 @@ document.getElementById("shareOndeComer").addEventListener("click", function () 
 
   document.getElementById("menuOndeComer").addEventListener("click", function (e) {
     e.preventDefault();
+    location.hash = "ondecomer";   // atualiza a URL
     mostrarOndeComer();
   });
 
@@ -10028,6 +10029,15 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   }
 
 
+function handleHashRoute() {
+  const h = (location.hash || "").toLowerCase();
+  if (h === "#ondecomer") {
+    mostrarOndeComer();
+  }
+}
+
+window.addEventListener("hashchange", handleHashRoute);
+window.addEventListener("DOMContentLoaded", handleHashRoute);
 
 
   ////
