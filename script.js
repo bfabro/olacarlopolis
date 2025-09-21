@@ -1270,8 +1270,10 @@ document.getElementById("shareOndeComer").addEventListener("click", function () 
     // título + filtro
     let html = `
     <section class="promo-hero">
-       <h2 class="highlighted">🔥 Promoções</h2>
-    
+       <h2 class="highlighted"><span>🔥 Promoções</span>
+     <button id="sharePromocoes" class="btn-share" title="Compartilhar página Promoções">
+        <i class="fas fa-share-alt"></i>
+      </button></h2>
      <div class="filtro-comidas-card">
   <label for="filtroEstab">Filtrar por:</label>
   <select id="filtroEstab">
@@ -1383,7 +1385,21 @@ document.getElementById("shareOndeComer").addEventListener("click", function () 
     html += `</section>`;
 
     document.querySelector(".content_area").innerHTML = html;
-
+// handler do botão de compartilhar
+  document.getElementById("sharePromocoes").addEventListener("click", function () {
+    const url = `${window.location.origin}${window.location.pathname}#promocoes`;
+    if (navigator.share) {
+      navigator.share({
+        title: "⭐ Promoções - Olá Carlópolis",
+        text: "Veja as promoções ativas em Carlópolis!",
+        url
+      }).catch(() => mostrarToast("❌ Não foi possível compartilhar."));
+    } else {
+      navigator.clipboard.writeText(url)
+        .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
+        .catch(() => alert("Não foi possível copiar o link."));
+    }
+  });
 
 
 // Converte "2025-09-15" em "15-09-2025"
@@ -9117,6 +9133,7 @@ function formatarDataBR(dataISO) {
     ];
   document.getElementById("menuPromocoes").addEventListener("click", function (e) {
     e.preventDefault();
+     location.hash = "promocoes";
     mostrarPromocoes();
   });
 
@@ -10031,13 +10048,14 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 function handleHashRoute() {
   const h = (location.hash || "").toLowerCase();
-  if (h === "#ondecomer") {
-    mostrarOndeComer();
-  }
+  if (h === "#ondecomer") { return mostrarOndeComer(); }
+  if (h === "#promocoes") { return mostrarPromocoes(); }
 }
-
 window.addEventListener("hashchange", handleHashRoute);
 window.addEventListener("DOMContentLoaded", handleHashRoute);
+
+
+
 
 
   ////
