@@ -1049,6 +1049,9 @@ document.addEventListener("DOMContentLoaded", function () {
       `<option value="${cat}" ${filtroCategoria === cat ? 'selected' : ''}>${iconesCategorias[cat] || '🍽️'} ${cat}</option>`
     ).join("")}
 </select>
+<button id="shareOndeComer" class="btn-share">
+      <i class="fas fa-share-alt"></i>
+    </button>
   </div>
   <div class="onde-comer-lista">
 `;
@@ -1170,6 +1173,25 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     document.getElementById("filtroComidas").addEventListener("change", function () {
       mostrarOndeComer(this.value);
     });
+
+
+    // Evento do botão de compartilhar
+document.getElementById("shareOndeComer").addEventListener("click", function () {
+  const url = `${window.location.origin}#ondecomer`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: "🍽️ Onde Comer - Olá Carlópolis",
+      text: "Confira os restaurantes e lanchonetes em Carlópolis!",
+      url: url
+    }).catch(() => mostrarToast("❌ Não foi possível compartilhar."));
+  } else {
+    navigator.clipboard.writeText(url)
+      .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
+      .catch(() => alert("Não foi possível copiar o link."));
+  }
+});
+
   }
 
 
@@ -1352,14 +1374,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       });
     }
-
-
-
-
-
-
-
-
 
 
 

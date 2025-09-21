@@ -4677,3 +4677,39 @@ html {
   background: #fff;
   cursor: pointer;
 }
+
+
+.filtro-comidas-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.filtro-comidas-card label {
+  font-weight: bold;
+}
+
+.filtro-comidas-card select {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.btn-share {
+  background: #4070f4;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.btn-share:hover {
+  background: #3058c7;
+}
