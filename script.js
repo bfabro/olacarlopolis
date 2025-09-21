@@ -1182,7 +1182,7 @@ document.getElementById("shareOndeComer").addEventListener("click", function () 
   if (navigator.share) {
     navigator.share({
       title: "🍽️ Onde Comer - Olá Carlópolis",
-      text: "Confira os restaurantes e lanchonetes em Carlópolis!",
+      text: "Confira Onde Comer em Carlópolis!",
       url: url
     }).catch(() => mostrarToast("❌ Não foi possível compartilhar."));
   } else {
