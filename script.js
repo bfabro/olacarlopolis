@@ -633,6 +633,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //pizzaria
     fornalhapizzaria: "s",
     tonnypizzaria: "n",
+    happyhour:"s",
 
     // quitanda
     pimentadoce: "s",
@@ -4017,6 +4018,67 @@ function formatarDataBR(dataISO) {
 
             ]
           },
+
+
+
+
+ {
+            image: "images/comercios/pizzaria/happyhour/perfil.jpg",
+            name: "Happy Hour",
+            hours: "Dom a Dom: 11:00h as 23:00h ",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "11:00", fim: "23:00" }],
+              ter: [{ inicio: "11:00", fim: "23:00" }],
+              qua: [{ inicio: "11:00", fim: "23:00" }],
+              qui: [{ inicio: "11:00", fim: "23:00" }],
+              sex: [{ inicio: "11:00", fim: "23:00" }],
+              sab: [{ inicio: "11:00", fim: "23:00" }],
+              dom: [{ inicio: "11:00", fim: "23:00" }],
+            },
+            address: "Somente Delivery",
+            contact: "(43) 99636-3463",
+            delivery: "Sim / Com Taxa",
+
+              menuImages: [
+              "images/comercios/pizzaria/happyhour/cardapio/1.jpg",
+             
+            
+
+            ],
+          
+
+            novidadesImages: [
+
+              "images/comercios/pizzaria/happyhour/divulgacao/1.jpg",
+              "images/comercios/pizzaria/happyhour/divulgacao/2.jpg",
+              "images/comercios/pizzaria/happyhour/divulgacao/3.jpg",
+              "images/comercios/pizzaria/happyhour/divulgacao/4.jpg",
+             
+            ],
+            novidadesDescriptions: [
+
+              "",
+              "",
+              "",
+              "",
+              "",
+       
+
+            ]
+          },
+
+
+
+
+
+
+
+
+
+
+
+
 
 
           {
@@ -10044,6 +10106,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     const loader = document.getElementById("loader");
     if (loader) loader.style.display = "none";
   }
+  
 
 
 function handleHashRoute() {
