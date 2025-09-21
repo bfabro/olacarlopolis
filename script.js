@@ -1040,7 +1040,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 1. Monta o filtro
     let html = `
-  <h2 class="highlighted">🍽️ Onde Comer</h2>
+  <h2 class="highlighted">🍽️ Onde Comer <button id="shareOndeComer" class="btn-share">
+      <i class="fas fa-share-alt"></i>
+    </button></h2>
   <div class="filtro-comidas-card">
     <label for="filtroComidas">Filtrar por:</label>
   <select id="filtroComidas">
@@ -1049,9 +1051,7 @@ document.addEventListener("DOMContentLoaded", function () {
       `<option value="${cat}" ${filtroCategoria === cat ? 'selected' : ''}>${iconesCategorias[cat] || '🍽️'} ${cat}</option>`
     ).join("")}
 </select>
-<button id="shareOndeComer" class="btn-share">
-      <i class="fas fa-share-alt"></i>
-    </button>
+
   </div>
   <div class="onde-comer-lista">
 `;

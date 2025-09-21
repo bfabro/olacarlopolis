@@ -4713,3 +4713,41 @@ html {
 .btn-share:hover {
   background: #3058c7;
 }
+
+
+/* deixa o título como uma barra com o botão no canto direito */
+.highlighted {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;   /* título à esquerda, botão à direita */
+  gap: 10px;
+}
+
+.highlighted .titulo-oc {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* espaço entre o emoji e o texto */
+}
+
+/* botão de compartilhar “inline” no título */
+.btn-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255,255,255,0.2);
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: transform .08s ease, background .2s ease;
+}
+
+.btn-share:hover { background: rgba(255,255,255,0.3); }
+.btn-share:active { transform: scale(0.97); }
+
+/* opcional: diminui um pouco em telas muito estreitas */
+@media (max-width: 400px) {
+  .btn-share { padding: 5px 8px; font-size: 15px; }
+}
