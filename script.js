@@ -821,7 +821,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // INICIO EVENTOS 
-    calendarioeventos: "s",
+    //calendarioeventos: "s",
     feiradalua: "s",
     copacomerciomunicipal: "s",
     campeonatovoleideareiamunicipal: "s",
