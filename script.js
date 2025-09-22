@@ -633,7 +633,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //pizzaria
     fornalhapizzaria: "s",
     tonnypizzaria: "n",
-    happyhour:"s",
+    happyhour: "s",
 
     // quitanda
     pimentadoce: "s",
@@ -821,22 +821,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // INICIO EVENTOS 
-    feiradalua: "s",
     calendarioeventos: "s",
-
-    yakisobadaacecar: "s",
-
+    feiradalua: "s",
+    copacomerciomunicipal: "s",
+    campeonatovoleideareiamunicipal: "s",
+    torneiodepenalti: "s",
     lowcity: "s",
-    toroonagashi: "s",
-    passeiociclisticorotary: "s",
     aniversariomclobosdafronteira: "s",
-    torneiofutebolsuico: "s",
-
-    cafedamanharotapr218: "s",
-    campeonatodepescaesportivaaotucunare: "s",
-    cavalgadadafrutfest: "s",
+    regisdanese: "s",
+    passeiociclisticorotary: "s",
+    toroonagashi: "s",
     erosprado: "s",
-    costeladafogodechao: "s",
+
 
 
     /// FIM EVENTOS 
@@ -1177,21 +1173,21 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
     // Evento do botão de compartilhar
-document.getElementById("shareOndeComer").addEventListener("click", function () {
-  const url = `${window.location.origin}${window.location.pathname}#ondecomer`;
+    document.getElementById("shareOndeComer").addEventListener("click", function () {
+      const url = `${window.location.origin}${window.location.pathname}#ondecomer`;
 
-  if (navigator.share) {
-    navigator.share({
-      title: "🍽️ Onde Comer - Olá Carlópolis",
-      text: "Confira Onde Comer em Carlópolis!",
-      url: url
-    }).catch(() => mostrarToast("❌ Não foi possível compartilhar."));
-  } else {
-    navigator.clipboard.writeText(url)
-      .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
-      .catch(() => alert("Não foi possível copiar o link."));
-  }
-});
+      if (navigator.share) {
+        navigator.share({
+          title: "🍽️ Onde Comer - Olá Carlópolis",
+          text: "Confira Onde Comer em Carlópolis!",
+          url: url
+        }).catch(() => mostrarToast("❌ Não foi possível compartilhar."));
+      } else {
+        navigator.clipboard.writeText(url)
+          .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
+          .catch(() => alert("Não foi possível copiar o link."));
+      }
+    });
 
   }
 
@@ -1339,9 +1335,9 @@ document.getElementById("shareOndeComer").addEventListener("click", function () 
   <div class="promo-preco-atual">${precoFmt}</div>
   ${i.unidade ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
   ${(i.validadeInicio && i.validadeFim)
-  ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
-  : (i.validadeFim ? `<div class="promo-validade">Até ${formatarDataBR(i.validadeFim)}</div>`
-  : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
+            ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
+            : (i.validadeFim ? `<div class="promo-validade">Até ${formatarDataBR(i.validadeFim)}</div>`
+              : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
 </div>
 
 
@@ -1386,29 +1382,29 @@ document.getElementById("shareOndeComer").addEventListener("click", function () 
     html += `</section>`;
 
     document.querySelector(".content_area").innerHTML = html;
-// handler do botão de compartilhar
-  document.getElementById("sharePromocoes").addEventListener("click", function () {
-    const url = `${window.location.origin}${window.location.pathname}#promocoes`;
-    if (navigator.share) {
-      navigator.share({
-        title: "⭐ Promoções - Olá Carlópolis",
-        text: "Veja as promoções ativas em Carlópolis!",
-        url
-      }).catch(() => mostrarToast("❌ Não foi possível compartilhar."));
-    } else {
-      navigator.clipboard.writeText(url)
-        .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
-        .catch(() => alert("Não foi possível copiar o link."));
+    // handler do botão de compartilhar
+    document.getElementById("sharePromocoes").addEventListener("click", function () {
+      const url = `${window.location.origin}${window.location.pathname}#promocoes`;
+      if (navigator.share) {
+        navigator.share({
+          title: "⭐ Promoções - Olá Carlópolis",
+          text: "Veja as promoções ativas em Carlópolis!",
+          url
+        }).catch(() => mostrarToast("❌ Não foi possível compartilhar."));
+      } else {
+        navigator.clipboard.writeText(url)
+          .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
+          .catch(() => alert("Não foi possível copiar o link."));
+      }
+    });
+
+
+    // Converte "2025-09-15" em "15-09-2025"
+    function formatarDataBR(dataISO) {
+      if (!dataISO) return "";
+      const [ano, mes, dia] = dataISO.split("-");
+      return `${dia}/${mes}/${ano.slice(-2)}`;
     }
-  });
-
-
-// Converte "2025-09-15" em "15-09-2025"
-function formatarDataBR(dataISO) {
-  if (!dataISO) return "";
-  const [ano, mes, dia] = dataISO.split("-");
-  return `${dia}/${mes}/${ano.slice(-2)}`;
-}
 
 
     // === Auto-remover com animação se virar o dia/validade durante a sessão ===
@@ -2229,43 +2225,43 @@ function formatarDataBR(dataISO) {
 
 
             ],
-             promocoes: [
+            promocoes: [
               {
-                 imagem: "images/comercios/artesanato/patricia/promocoes/1.jpg",
-                titulo: "Pano de prato - Flores ", 
-                precoAntigo:40.00,             
-                preco: 35.00,                
-                unidade: "A UNIDADE",                
+                imagem: "images/comercios/artesanato/patricia/promocoes/1.jpg",
+                titulo: "Pano de prato - Flores ",
+                precoAntigo: 40.00,
+                preco: 35.00,
+                unidade: "A UNIDADE",
                 validadeFim: "2025-09-30",
                 obs: "Oferta válida até durar o estoque"
               },
 
               {
                 imagem: "images/comercios/artesanato/patricia/promocoes/2.jpg",
-                titulo: "Pano de prato - Frutas ",         
-                precoAntigo:40.00,             
-                preco: 35.00,     
-                unidade: "A UNIDADE",         
+                titulo: "Pano de prato - Frutas ",
+                precoAntigo: 40.00,
+                preco: 35.00,
+                unidade: "A UNIDADE",
                 validadeFim: "2025-09-28",
                 obs: "Oferta válida até durar o estoque"
               },
 
-               {
+              {
                 imagem: "images/comercios/artesanato/patricia/promocoes/3.jpg",
-                titulo: "Pano de prato - Plantas ",         
-                precoAntigo:40.00,             
-                preco: 35.00,   
-                unidade: "A UNIDADE",             
+                titulo: "Pano de prato - Plantas ",
+                precoAntigo: 40.00,
+                preco: 35.00,
+                unidade: "A UNIDADE",
                 validadeFim: "2025-09-28",
                 obs: "Oferta válida até durar o estoque"
               },
 
-               {
+              {
                 imagem: "images/comercios/artesanato/patricia/promocoes/4.jpg",
-                titulo: "Pano de prato - Melancia ",         
-                precoAntigo: 40.00,             
-                preco: 35.00,      
-                unidade: "A UNIDADE",         
+                titulo: "Pano de prato - Melancia ",
+                precoAntigo: 40.00,
+                preco: 35.00,
+                unidade: "A UNIDADE",
                 validadeFim: "2025-09-28",
                 obs: "Oferta válida até durar o estoque"
               }
@@ -2405,7 +2401,7 @@ function formatarDataBR(dataISO) {
                 validadeFim: "2025-10-15"
               },
 
-               {
+              {
                 titulo: "Petisco Turma da Monica - Enriquecido com Whey Protein",
                 // volume: "2L",
                 //  embalagem: "fardo c/6",
@@ -2455,9 +2451,9 @@ function formatarDataBR(dataISO) {
 
 
 
- promocoes: [
+            promocoes: [
               {
-               imagem: "images/comercios/agropecuaria/saojose/promocao/1.jpg",
+                imagem: "images/comercios/agropecuaria/saojose/promocao/1.jpg",
                 titulo: "Cintos",
                 precoAntigo: "R$ 130,00",
                 preco: "R$ 99,00",
@@ -2677,9 +2673,9 @@ function formatarDataBR(dataISO) {
             ],
 
 
-  promocoes: [
+            promocoes: [
               {
-               imagem: "images/comercios/assistenciaCelular/oficinaCelular/promocao/1.jpg",
+                imagem: "images/comercios/assistenciaCelular/oficinaCelular/promocao/1.jpg",
                 titulo: "Pelicula 3D",
                 precoAntigo: 20.00,
                 preco: 15.00,
@@ -4022,7 +4018,7 @@ function formatarDataBR(dataISO) {
 
 
 
- {
+          {
             image: "images/comercios/pizzaria/happyhour/perfil.jpg",
             name: "Happy Hour",
             hours: "Dom a Dom: 11:00h as 23:00h ",
@@ -4040,13 +4036,13 @@ function formatarDataBR(dataISO) {
             contact: "(43) 99636-3463",
             delivery: "Sim / Com Taxa",
 
-              menuImages: [
+            menuImages: [
               "images/comercios/pizzaria/happyhour/cardapio/1.jpg",
-             
-            
+
+
 
             ],
-          
+
 
             novidadesImages: [
 
@@ -4054,7 +4050,7 @@ function formatarDataBR(dataISO) {
               "images/comercios/pizzaria/happyhour/divulgacao/2.jpg",
               "images/comercios/pizzaria/happyhour/divulgacao/3.jpg",
               "images/comercios/pizzaria/happyhour/divulgacao/4.jpg",
-             
+
             ],
             novidadesDescriptions: [
 
@@ -4063,7 +4059,7 @@ function formatarDataBR(dataISO) {
               "",
               "",
               "",
-       
+
 
             ]
           },
@@ -5930,44 +5926,28 @@ function formatarDataBR(dataISO) {
           },
 
 
-
-          {
-            image: "images/informacoes/eventos/frutFest.png",
-            name: "FrutFest",
-            date: "04/09/25 a 07/09/25",
-            address: "Centro de Eventos Ilha do Ponciano",
-            contact: "(43) 99825-0570",
-            instagram: "https://www.instagram.com/frutfestoficial/",
-            novidadesImages: [
-              "images/informacoes/eventos/frutfest/1.jpg",
-              "images/informacoes/eventos/frutfest/2.jpg",
-              "images/informacoes/eventos/frutfest/3.jpg",
-
-            ],
+           {
+            image: "images/informacoes/eventos/copaComercio.jpg",
+            name: "Copa Comercio Municipal",
+            date: "23/09/2025",
+            address: "Av Turistica Elias Merhi Mansur",
+            contact: "(43) 99825-0870",
+            infoAdicional:"🚨 Vem aí a Copa dos Comércios! ⚽<br>Chegou a hora de reunir sua equipe e representar o comércio do nosso município em mais um grande campeonato.<br>✅ Garanta já a inscrição do seu time – as vagas são limitadas!<br>ℹ️ Para mais informações, procure a Secretaria de Esportes e Lazer.<br>Não fique de fora dessa disputa que promete agitar Carlópolis!",
+            instagram: "https://www.instagram.com/esportes_carlopolis/",
 
 
 
           },
 
 
-          {
-            image: "images/informacoes/eventos/paranafishingDuo.jpg",
-            name: "Campeonato de Pesca Esportiva ao Tucunaré",
-            date: "20/09/25",
-            address: "Centro de Eventos Ilha do Ponciano",
-            contact: "(43) 99980-0495",
-            instagram: "https://www.instagram.com/thiago.aguera/",
-
-
-          },
-
-
-          {
-            image: "images/informacoes/eventos/acecar.jpg",
-            name: "Yakisoba da Acecar",
-            date: "21/09/25",
-            address: "R. Delfino Mendes, 252 - Carlopolis",
-            contact: "(43) 99908-4808",
+            {
+            image: "images/informacoes/eventos/CampeonatoVoleiAreia.jpg",
+            name: "Campeonato Volei de Areia Municipal",
+            date: "23/09/2025",
+            address: "Av Turistica Elias Merhi Mansur",
+            contact: "(43) 99825-0870",
+            infoAdicional:"🏐 Preparem-se!<br>Setembro promete muita emoção no esporte de Carlópolis!<br>Vem aí o Torneio Municipal de Vôlei de Areia – Dupla Mista.<br>Não fique de fora! Para mais informações, procure a Secretaria de Esportes e Lazer.",
+            instagram: "https://www.instagram.com/esportes_carlopolis/",
 
 
 
@@ -5975,17 +5955,31 @@ function formatarDataBR(dataISO) {
 
 
 
-
-          {
-            image: "images/informacoes/eventos/rotapr218.jpg",
-            name: "Café da manha Rota PR218",
-            date: "21/09/25",
-            address: "Caldo de Cana Amaral",
-            contact: "(43) 99837-5390",
-            instagram: "https://www.instagram.com/rotapr218/",
+           {
+            image: "images/informacoes/eventos/torneioPenalti.jpg",
+            name: "Torneio Penalti Municipal",
+            date: "28/09/2025",
+            address: "Campo Society do Vista Alegre",
+           contact: "(43) 99825-0870",
+            infoAdicional:"Torneio de pênaltis!!!<br>Prepare sua dupla e venha participar do torneio municipal de pênaltis.<br>Garanta sua vaga, inscrições limitadas.<br>Mais informações entre em contato com a Secretaria de Esportes e Lazer.",
+             instagram: "https://www.instagram.com/esportes_carlopolis/",
 
 
           },
+
+
+
+         
+
+
+
+          //////
+
+          ////
+
+          ////
+
+
 
           {
             image: "images/informacoes/eventos/lowCity.png",
@@ -6006,6 +6000,22 @@ function formatarDataBR(dataISO) {
             address: "Centro de Eventos Ilha do Ponciano",
             contact: "(43) 99909-2933",
             instagram: "https://www.instagram.com/lobosdafronteiramc/",
+
+
+          },
+
+
+
+
+
+            {
+            image: "images/informacoes/eventos/regisDanese.jpg",
+            name: "Regis Danese",
+            date: "18/10/2025",
+            address: "Centro de Eventos Ilha do Ponciano",
+            contact: "-",
+            infoAdicional:"Prepare-se para uma noite INESQUECÍVEL! Regis Danese traz um SUPER SHOW GOSPEL que vai TOCAR SEU CORAÇÃO  🎤❤️<Br>Uma experiência PODEROSA de música e fé que você NÃO PODE PERDER!",
+            instagram: "https://www.instagram.com/turismocarlopolis/",
 
 
           },
@@ -7717,39 +7727,39 @@ function formatarDataBR(dataISO) {
 
 
 
- promocoes: [
+            promocoes: [
               {
                 imagem: "images/comercios/docesChocolates/cacauShow/promocao/1.jpg",
-                titulo: "Trufas 13,5g",              
-                preco: 2.62,                
-                unidade: "A UNIDADE",                
+                titulo: "Trufas 13,5g",
+                preco: 2.62,
+                unidade: "A UNIDADE",
                 validadeFim: "2025-09-30",
                 obs: "Oferta válida até durar o estoque"
               },
 
               {
                 imagem: "images/comercios/docesChocolates/cacauShow/promocao/2.jpg",
-                titulo: "Trufas Classicas 30g",         
-                preco: "R$ 3,74",     
-                unidade: "A UNIDADE",         
+                titulo: "Trufas Classicas 30g",
+                preco: "R$ 3,74",
+                unidade: "A UNIDADE",
                 validadeFim: "2025-09-28",
                 obs: "Oferta válida até durar o estoque"
               },
 
-               {
+              {
                 imagem: "images/comercios/docesChocolates/cacauShow/promocao/3.jpg",
-                titulo: "Trufas Artesanais 30g",         
-                preco: "R$ 4,49", 
-                unidade: "A UNIDADE",             
+                titulo: "Trufas Artesanais 30g",
+                preco: "R$ 4,49",
+                unidade: "A UNIDADE",
                 validadeFim: "2025-09-28",
                 obs: "Oferta válida até durar o estoque"
               },
 
-               {
+              {
                 imagem: "images/comercios/docesChocolates/cacauShow/promocao/4.jpg",
-                titulo: "Trufas Zero Açucar 30g",         
-                preco: "R$ 4,87",     
-                unidade: "A UNIDADE",         
+                titulo: "Trufas Zero Açucar 30g",
+                preco: "R$ 4,87",
+                unidade: "A UNIDADE",
                 validadeFim: "2025-09-28",
                 obs: "Oferta válida até durar o estoque"
               }
@@ -7923,7 +7933,7 @@ function formatarDataBR(dataISO) {
               "Frutas Frescas",
               "Verduras frescas",
             ],
- promocoes: [
+            promocoes: [
               {
                 imagem: "images/comercios/quitanda/pimentaDoce/promocao/4.jpg",
                 titulo: "Vassoura Caipira",
@@ -7939,7 +7949,7 @@ function formatarDataBR(dataISO) {
             ]
 
 
-  
+
 
 
 
@@ -8587,9 +8597,9 @@ function formatarDataBR(dataISO) {
               dom: []
             },
             address: "R. Benedito Salles, 627 - Carlópolis",
-            contact:"(43) 99118-6909",
+            contact: "(43) 99118-6909",
             contact2: "(43) 3566-2749",
-            
+
             instagram: "https://www.instagram.com/movepar_carlopolis/",
             novidadesImages: [
               "images/comercios/moveis/movepar/divulgacao/1.png",
@@ -8717,6 +8727,29 @@ function formatarDataBR(dataISO) {
 
 
 
+
+
+{
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/40.jpg",
+            date: "19/09/2025",
+            descricaoFalecido: "Faleceu em Carlópolis aos 52 anos de idade, a Sra. KATIA APARECIDA LEMES carinhosamente conhecida como esposa do Toninho Abeeiro.<Br>A cerimônia terá início nessa madrugada de sexta-feira às 03:00 horas no velório Municipal<Br>Sua despedida e sepultamento será realizada hoje às 16:30 horas no cemitério Municipal de Carlópolis!<Br>Nossos profundos sentimentos aos familiares e amigos! 🙏",
+
+          },
+
+
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/39.jpg",
+            date: "11/09/2025",
+            descricaoFalecido: "Faleceu em Londrina aos 86 anos de idade, a Sra MARIA APARECIDA DA SILVA ABÍLIO<br>A cerimônia iniciará hoje às 20:00 horas no velório municipal de Carlópolis.<br>Sua despedida e sepultamento será amanhã às 09:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+
+////
+
           {
             name: "Funeraria Grupo Castilho",
             image: "images/informacoes/notaFalecimento/castilho/33.jpg",
@@ -8726,7 +8759,7 @@ function formatarDataBR(dataISO) {
 
           {
             name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/33.jpg",
+            image: "images/informacoes/notaFalecimento/cristoRei/38.jpg",
             date: "07/09/2025",
             descricaoFalecido: "Faleceu em Arapongas aos 71 anos de idade, o Sr. LUIS CARLOS DE MOURA mais conhecido como: Fião.<Br>A cerimônia iniciará hoje às 06:00 horas no velório municipal de Carlópolis.<Br>Sua despedida e sepultamento será hoje em horário a ser definido no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
 
@@ -9195,7 +9228,7 @@ function formatarDataBR(dataISO) {
     ];
   document.getElementById("menuPromocoes").addEventListener("click", function (e) {
     e.preventDefault();
-     location.hash = "promocoes";
+    location.hash = "promocoes";
     mostrarPromocoes();
   });
 
@@ -10106,16 +10139,16 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     const loader = document.getElementById("loader");
     if (loader) loader.style.display = "none";
   }
-  
 
 
-function handleHashRoute() {
-  const h = (location.hash || "").toLowerCase();
-  if (h === "#ondecomer") { return mostrarOndeComer(); }
-  if (h === "#promocoes") { return mostrarPromocoes(); }
-}
-window.addEventListener("hashchange", handleHashRoute);
-window.addEventListener("DOMContentLoaded", handleHashRoute);
+
+  function handleHashRoute() {
+    const h = (location.hash || "").toLowerCase();
+    if (h === "#ondecomer") { return mostrarOndeComer(); }
+    if (h === "#promocoes") { return mostrarPromocoes(); }
+  }
+  window.addEventListener("hashchange", handleHashRoute);
+  window.addEventListener("DOMContentLoaded", handleHashRoute);
 
 
 
