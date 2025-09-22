@@ -5926,13 +5926,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-           {
+          {
             image: "images/informacoes/eventos/copaComercio.jpg",
             name: "Copa Comercio Municipal",
             date: "23/09/2025",
             address: "Av Turistica Elias Merhi Mansur",
             contact: "(43) 99825-0870",
-            infoAdicional:"🚨 Vem aí a Copa dos Comércios! ⚽<br>Chegou a hora de reunir sua equipe e representar o comércio do nosso município em mais um grande campeonato.<br>✅ Garanta já a inscrição do seu time – as vagas são limitadas!<br>ℹ️ Para mais informações, procure a Secretaria de Esportes e Lazer.<br>Não fique de fora dessa disputa que promete agitar Carlópolis!",
+            infoAdicional: "🚨 Vem aí a Copa dos Comércios! ⚽<br>Chegou a hora de reunir sua equipe e representar o comércio do nosso município em mais um grande campeonato.<br>✅ Garanta já a inscrição do seu time – as vagas são limitadas!<br>ℹ️ Para mais informações, procure a Secretaria de Esportes e Lazer.<br>Não fique de fora dessa disputa que promete agitar Carlópolis!",
             instagram: "https://www.instagram.com/esportes_carlopolis/",
 
 
@@ -5940,13 +5940,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-            {
+          {
             image: "images/informacoes/eventos/CampeonatoVoleiAreia.jpg",
             name: "Campeonato Volei de Areia Municipal",
             date: "23/09/2025",
             address: "Av Turistica Elias Merhi Mansur",
             contact: "(43) 99825-0870",
-            infoAdicional:"🏐 Preparem-se!<br>Setembro promete muita emoção no esporte de Carlópolis!<br>Vem aí o Torneio Municipal de Vôlei de Areia – Dupla Mista.<br>Não fique de fora! Para mais informações, procure a Secretaria de Esportes e Lazer.",
+            infoAdicional: "🏐 Preparem-se!<br>Setembro promete muita emoção no esporte de Carlópolis!<br>Vem aí o Torneio Municipal de Vôlei de Areia – Dupla Mista.<br>Não fique de fora! Para mais informações, procure a Secretaria de Esportes e Lazer.",
             instagram: "https://www.instagram.com/esportes_carlopolis/",
 
 
@@ -5955,21 +5955,21 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-           {
+          {
             image: "images/informacoes/eventos/torneioPenalti.jpg",
             name: "Torneio Penalti Municipal",
             date: "28/09/2025",
             address: "Campo Society do Vista Alegre",
-           contact: "(43) 99825-0870",
-            infoAdicional:"Torneio de pênaltis!!!<br>Prepare sua dupla e venha participar do torneio municipal de pênaltis.<br>Garanta sua vaga, inscrições limitadas.<br>Mais informações entre em contato com a Secretaria de Esportes e Lazer.",
-             instagram: "https://www.instagram.com/esportes_carlopolis/",
+            contact: "(43) 99825-0870",
+            infoAdicional: "Torneio de pênaltis!!!<br>Prepare sua dupla e venha participar do torneio municipal de pênaltis.<br>Garanta sua vaga, inscrições limitadas.<br>Mais informações entre em contato com a Secretaria de Esportes e Lazer.",
+            instagram: "https://www.instagram.com/esportes_carlopolis/",
 
 
           },
 
 
 
-         
+
 
 
 
@@ -6008,13 +6008,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-            {
+          {
             image: "images/informacoes/eventos/regisDanese.jpg",
             name: "Regis Danese",
             date: "18/10/2025",
             address: "Centro de Eventos Ilha do Ponciano",
             contact: "-",
-            infoAdicional:"Prepare-se para uma noite INESQUECÍVEL! Regis Danese traz um SUPER SHOW GOSPEL que vai TOCAR SEU CORAÇÃO  🎤❤️<Br>Uma experiência PODEROSA de música e fé que você NÃO PODE PERDER!",
+            infoAdicional: "Prepare-se para uma noite INESQUECÍVEL! Regis Danese traz um SUPER SHOW GOSPEL que vai TOCAR SEU CORAÇÃO  🎤❤️<Br>Uma experiência PODEROSA de música e fé que você NÃO PODE PERDER!",
             instagram: "https://www.instagram.com/turismocarlopolis/",
 
 
@@ -8729,7 +8729,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-{
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/40.jpg",
             date: "19/09/2025",
@@ -8748,7 +8748,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-////
+          ////
 
           {
             name: "Funeraria Grupo Castilho",
@@ -9016,110 +9016,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
           },
 
-          //06/06
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/12.png",
-            descricaoFalecido: "Faleceu em Carlópolis o Anjinho 'LUIS MIGUEL' com pouco meses de vida.<br> A cerimônia do velório iniciará hoje às 11:10 horas no Cemitério Municipal de Carlópolis.<br>Sua despedida será hoje às 13:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
 
-          },
-
-
-
-          //05/06
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/11.png",
-            descricaoFalecido: "Faleceu em Carlópolis aos 95 anos de idade, Sr 'OLIVINO CÂNDIDO DE SOUZA', mais conhecido como: Livino Souza<br>O horário da cerimônia será às 12:00 horas desta Quinta - feira no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às 09:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigo"
-
-          },
-
-
-
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/10.png",
-            descricaoFalecido: "Faleceu em Carlópolis aos 66 anos de idade, Sr 'JOSÉ RODRIGUES CAMARGO', mais conhecido como: Zé Gordo<br> O horário da cerimônia será definido juntamente com os familiares no velório municipal de Carlópolis.<br>Seu sepultamento será amanhã às  09:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos"
-
-          },
-
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/9.png",
-            descricaoFalecido: "Faleceu em Carlópolis aos 81 anos de idade, Sra 'ANGÉLICA BERGAMO GABRIEL'.<br>A cerimônia do velório iniciará hoje às 12:00 horas no Velório Municipal de Carlópolis.<br>Seu sepultamento será hoje às 16:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
-
-          },
-
-
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/8.png",
-            descricaoFalecido: "Faleceu em Carlópolis aos 78 anos de idade, Sr 'ANTÔNIO BARBOSA DA SILVA'.<Br> A cerimônia iniciará a pedido da família às 08:00 desta Sexta-Feira 30.05.25 no velório Municipal de Carlópolis.<Br>Seu sepultamento será hoje às 16:45 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a toda família e amigos"
-          },
-
-          {
-            name: "Funeraria Grupo Castilho",
-            image: "images/informacoes/notaFalecimento/castilho/1.png",
-            descricaoFalecido: "Comunicamos o falecimento da Sr. ANA MARIA TELES ALVES aos 83 anos de idade.<br>‌O velório será na CAPELA MUNICIPAL DE CARLÓPOLIS - PR.<br>O sepultamento será realizado 23/05/2025 as 09:00 no CEMITÉRIO MUNICIPAL DE CARLÓPOLIS - PR."
-          },
-
-
-          /// 25/05
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/6.png",
-            descricaoFalecido: "Faleceu em Carlópolis aos 79 anos de idade, Sr 'JOSÉ PEREIRA VIEIRA', mais conhecido como: Zé do Margarida Lima.<br>A cerimônia iniciará nesta madrugada de Domingo às 02:00 horas no velório Municipal de Carlópolis.<br>Seu sepultamento será hoje às 17:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigo"
-          },
-
-          //24/05
-
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/5.png",
-            descricaoFalecido: "Faleceu em Carlópolis aos 85 anos de idade, Sr 'WENCESLAU GONÇALVES DE ALMEIDA'. Mais conhecido como: Wenceslau Gino.<br>A cerimônia iniciará nesta madrugada de sábado às 02:00 horas no velório Municipal de Carlópolis.<br>Seu sepultamento será hoje às 16:30 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos"
-          },
-
-
-          // 20/05
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/4.png",
-            descricaoFalecido: "Faleceu em Jacarezinho aos 80 anos de idade, Sra 'IRACEMA DA SILVA DE OLIVEIRA'.<br>A cerimônia do velório iniciará hoje às 19:00 horas na Igreja Paróquia  Senhor Bom Jesus (Matriz).<br>Seu sepultamento será amanhã às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
-          },
-
-
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/3.png",
-            descricaoFalecido: " Faleceu em Jacarezinho aos 75 anos de idade, Sr 'GERALDO MAJOR DA SILVA', mais conhecido como: De Reto.<br> A cerimônia do velório iniciará às 14:30 horas em sua residência na vila rural do lado do sapé.<br>Seu sepultamento será amanhã às 09:00 horas no Cemitério Municipal de Quatiguá.<br>Nossos profundos sentimentos a toda família e amigos!"
-          },
-
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/1.png",
-            descricaoFalecido: "Faleceu em Campo Largo aos 79 anos de idade, Sr 'NELSON DE OLIVEIRA', mais conhecido como: Nelson Marinho.<br> A cerimônia do velório iniciou às 11:30 horas no Velório Municipal.<br>Seu sepultamento será hoje às 17:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
-          },
-
-          // 20/05/2025
-          {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/2.png",
-            descricaoFalecido: "Faleceu em Carlópolis aos 88 anos de idade, Sr 'JOÃO ANTÔNIO DE OLIVEIRA NETO' mais conhecido como: João Amâncio <br>A cerimônia do velório iniciará hoje às 17:00 horas no Cemitério Municipal de Carlópolis.<br>Sua despedida será amanhã às 12:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos profundos sentimentos a toda família e amigos!"
-          }
         ]
       },
-
-
-
 
 
       {
         link: document.querySelector("#menuVagasTrabalho"),
         title: "Vagas de Trabalho",
         establishments: [
-
-
-
 
 
           {
