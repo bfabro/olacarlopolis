@@ -395,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "seiza", "leozindetailer", "vania", "oficinadocelular"
+    "oficinadocelular","vania", "hime", "seiza", "nelsoncalhas"
 
   ];
 
