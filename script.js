@@ -3850,11 +3850,20 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             ],
             novidadesImages: [
 
-              "images/comercios/lanchonete/xisBauinea/divulgacao/1.png",
-              "images/comercios/lanchonete/xisBauinea/divulgacao/2.png",
-              "images/comercios/lanchonete/xisBauinea/divulgacao/3.png",
-              "images/comercios/lanchonete/xisBauinea/divulgacao/4.png",
-              "images/comercios/lanchonete/xisBauinea/divulgacao/5.png",
+              "images/comercios/lanchonete/xisBauinea/divulgacao/1.jpg",
+              "images/comercios/lanchonete/xisBauinea/divulgacao/2.jpg",
+              "images/comercios/lanchonete/xisBauinea/divulgacao/3.jpg",
+              "images/comercios/lanchonete/xisBauinea/divulgacao/4.jpg",
+              "images/comercios/lanchonete/xisBauinea/divulgacao/5.jpg",
+
+            ],
+             novidadesDescriptions: [
+              "Xis Bacon adicional de frango desfiado ao molho",
+              "Xis Calabacon",
+              "Xis Bacon",
+              "Xis Salada com adicional de frango desfiado ao molho",
+              "Cachorro Quente simples com adicional de bacon",
+              
 
             ],
           },
