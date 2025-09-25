@@ -5030,16 +5030,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/estudioDeBeleza/veronica/perfil2.jpg",
             name: "Veronica Kataoka",
-            hours: "Seg a Sex: 08:00h as 18:00h<br> Sab: 09:00h as 14:00h ",
+            hours: "Seg a Sab: 13:00h as 19:00h",
             statusAberto: " ",
             horarios: {
 
-              seg: [{ inicio: "09:00", fim: "18:00" }],
-              ter: [{ inicio: "09:00", fim: "18:00" }],
-              qua: [{ inicio: "09:00", fim: "18:00" }],
-              qui: [{ inicio: "09:00", fim: "18:00" }],
-              sex: [{ inicio: "09:00", fim: "18:00" }],
-              sab: [{ inicio: "09:00", fim: "14:00" }],
+              seg: [{ inicio: "13:00", fim: "19:00" }],
+              ter: [{ inicio: "13:00", fim: "19:00" }],
+              qua: [{ inicio: "13:00", fim: "19:00" }],
+              qui: [{ inicio: "13:00", fim: "19:00" }],
+              sex: [{ inicio: "13:00", fim: "19:00" }],
+              sab: [{ inicio: "13:00", fim: "19:00" }],
               dom: [], // fechado
             },
             address: "R. Antonio Jonas Ferreira, 744 - Carlopolis",
