@@ -395,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "oficinadocelular","veronicakataoka", "hime", "seiza", "nelsoncalhas"
+    "oficinadocelular", "veronicakataoka", "hime", "seiza", "nelsoncalhas"
 
   ];
 
@@ -561,7 +561,7 @@ document.addEventListener("DOMContentLoaded", function () {
     gcyvazamentos: "s",
 
     // estudio de beleza
-    veronicakataoka:"s",
+    veronicakataoka: "s",
 
     //farmacia
     elshaday: "s",
@@ -4032,7 +4032,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               qua: [{ inicio: "07:00", fim: "23:00" }],
               qui: [{ inicio: "07:00", fim: "23:00" }],
               sex: [{ inicio: "07:00", fim: "23:00" }],
-              sab: [{ inicio: "07:00", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }],
+              sab: [{ inicio: "07:00", fim: "14:00" }, { inicio: "18:00", fim: "23:00" }],
               dom: [{ inicio: "18:00", fim: "23:00" }],
             },
             address: "R. Kalil Keder, 753 - Carlopolis",
@@ -4042,11 +4042,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             menuImages: [
               "images/comercios/pizzaria/happyhour/cardapio/1.jpg",
 
-               "images/comercios/pizzaria/happyhour/cardapio/2.jpg",
-                "images/comercios/pizzaria/happyhour/cardapio/3.jpg",
-                 "images/comercios/pizzaria/happyhour/cardapio/4.jpg",
-                 "images/comercios/pizzaria/happyhour/cardapio/5.jpg",
-                 "images/comercios/pizzaria/happyhour/cardapio/6.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/2.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/3.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/4.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/5.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/6.jpg",
 
 
 
@@ -4201,13 +4201,22 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: [],
             },
             address: "Rua Fidêncio de Melo, 240 - Sala B, Carlópolis",
-            contact: " (43) 99197-9235",
+            contact: " (43) 99144-7164",
+            contact2: " (43) 99197-9235",
             instagram: "https://www.instagram.com/promissorseguroscarlopolis/",
 
             novidadesImages: [
 
               "images/comercios/corretoraSeguros/promissor/divulgacao/1.jpg",
               "images/comercios/corretoraSeguros/promissor/divulgacao/2.jpg",
+              "images/comercios/corretoraSeguros/promissor/divulgacao/3.jpg",
+              "images/comercios/corretoraSeguros/promissor/divulgacao/4.jpg",
+              "images/comercios/corretoraSeguros/promissor/divulgacao/5.jpg",
+              "images/comercios/corretoraSeguros/promissor/divulgacao/6.jpg",
+              "images/comercios/corretoraSeguros/promissor/divulgacao/7.jpg",
+              "images/comercios/corretoraSeguros/promissor/divulgacao/8.jpg",
+              "images/comercios/corretoraSeguros/promissor/divulgacao/9.jpg",
+              "images/comercios/corretoraSeguros/promissor/divulgacao/10.jpg",
 
 
 
@@ -4216,8 +4225,19 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             novidadesDescriptions: [
               "Viajar é viver novas experiências — e estar protegido é parte essencial desse roteiro.<Br>Com um bom seguro, você garante assistência médica, cobertura de bagagem, suporte em imprevistos e muito mais.<Br>🌍 Vá longe. Mas vá seguro.",
               "Seu veículo é mais que um meio de transporte — é parte do seu patrimônio.<BR>Não deixe seu patrimônio desprotegido.<BR>Conte com um seguro que oferece a proteção que você merece, para dirigir tranquilo em qualquer situação. 🔒 🚗",
+              "🚛 Seguro de frotas: a ferramenta poderosa para sua empresa!<br>Se você quer mais economia, proteção e segurança na gestão dos seus veículos, essa é a solução ideal.<br>Garanta tranquilidade para sua operação e cuide do seu patrimônio com quem entende do assunto.",
 
+              "🏡✨ Tranquilidade começa com proteção!<Br>Seu lar é o seu refúgio — e merece estar sempre seguro.<Br>Com o seguro residencial certo, você protege não só o imóvel, mas também todos os seus momentos mais importantes.",
 
+              "🚁 Com essa tecnologia, o produtor ganha em agilidade, economia e melhores resultados na lavoura. Monitoramento detalhado, aplicação precisa e muito mais controle, tudo do alto!<Br>E para proteger esse investimento tecnológico, conte com o seguro especializado para drones. Segurança que acompanha a inovação no campo!",
+              "Imprevistos acontecem — e quando você trabalha por conta própria, qualquer erro pode virar um grande prejuízo!<br>O Seguro de Responsabilidade Civil protege você de danos involuntários causados a terceiros durante a sua atividade profissional.<br>📌 Desde um equipamento que quebra até um serviço que não sai como o esperado, você não precisa arcar com tudo sozinho.<br>💬 Fale com a gente e descubra como esse seguro pode te dar mais tranquilidade para focar no que você faz de melhor.",
+
+              "Hoje, o celular carrega muito mais do que contatos e fotos…<br>Ele guarda sua vida digital, seus acessos, seu trabalho, sua rotina.<br>🔐 Um bom seguro pode evitar transtornos e garantir reposição rápida.<br>Fale com a Promissor e proteja seu aparelho com quem entende do assunto!",
+              "O frio chega de repente, mas a proteção pode estar garantida com antecedência…<Br>🌬❄ Se você cultiva e se dedica ao campo, não deixe a geada te pegar desprevenido.<Br>📲 Fale com a Promissor e conheça as opções de seguro agrícola com cobertura para GEADA, ideal para proteger sua lavoura neste inverno. Link direto na Bio!",
+
+              "A estrada pode ser cheia de desafios, mas com a proteção certa, você pode aproveitar cada momento com mais tranquilidade. Tenha sempre um seguro para garantir sua segurança em qualquer imprevisto! 🏍️✅<br>⚠️ Não arrisque, proteja-se! Fale com a Promissor e saiba como garantir o seu seguro. 📲",
+
+              "🐶🐱💙 Proteção e cuidado para quem você ama! 💙🐾<br>Seu pet faz parte da família e merece toda a segurança e assistência necessárias para viver com saúde e bem-estar. Com a cobertura certa, você garante tranquilidade para qualquer imprevisto!",
             ],
           },
         ],
@@ -5023,7 +5043,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-{
+      {
         link: document.querySelector("#menuEstudioBeleza"),
         title: "Estudio De Beleza",
         establishments: [
@@ -5044,8 +5064,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             },
             address: "R. Antonio Jonas Ferreira, 744 - Carlopolis",
             contact: "(14) 99830-8893",
-            infoAdicional:"<b>Agende seu Horario:</b><br> <br>✍️ Designer de sobrancelha: Precisão e detalhe no traço<br> 🔄 Lash Lifting: Cílios levantados e efeito de curvatura<br>🎀 Brow Lamination: Sobrancelha modelada e organizada<br>👁️ Extensão de cílios: Destaque direto no olho<br>💄 Hidragloss: Brilho e hidratação nos lábios",
-            facebook:"https://www.facebook.com/people/Veronica-Kataoka-Lash-Designer/61578629999055/#",
+            infoAdicional: "<b>Agende seu Horario:</b><br> <br>✍️ Designer de sobrancelha: Precisão e detalhe no traço<br> 🔄 Lash Lifting: Cílios levantados e efeito de curvatura<br>🎀 Brow Lamination: Sobrancelha modelada e organizada<br>👁️ Extensão de cílios: Destaque direto no olho<br>💄 Hidragloss: Brilho e hidratação nos lábios",
+            facebook: "https://www.facebook.com/people/Veronica-Kataoka-Lash-Designer/61578629999055/#",
             instagram: "https://www.instagram.com/veronicakataokalashdesigner",
             novidadesImages: [
               "images/comercios/estudioDeBeleza/veronica/divulgacao/0.jpg",
@@ -5054,7 +5074,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/estudioDeBeleza/veronica/divulgacao/3.jpg",
               "images/comercios/estudioDeBeleza/veronica/divulgacao/4.jpg",
               "images/comercios/estudioDeBeleza/veronica/divulgacao/5.jpg",
-           
+
             ],
             novidadesDescriptions: [
               "",
@@ -5065,7 +5085,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
               "",
 
-               "",
+              "",
 
 
             ],
@@ -8182,7 +8202,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               qua: [{ inicio: "07:00", fim: "23:00" }],
               qui: [{ inicio: "07:00", fim: "23:00" }],
               sex: [{ inicio: "07:00", fim: "23:00" }],
-              sab: [{ inicio: "07:00", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }],
+              sab: [{ inicio: "07:00", fim: "14:00" }, { inicio: "18:00", fim: "23:00" }],
               dom: [{ inicio: "18:00", fim: "23:00" }],
             },
             address: "R. Kalil Keder, 753 - Carlopolis",
@@ -8190,14 +8210,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             delivery: "Sim / Com Taxa",
 
             menuImages: [
-              
+
               "images/comercios/pizzaria/happyhour/cardapio/1.jpg",
 
-               "images/comercios/pizzaria/happyhour/cardapio/2.jpg",
-                "images/comercios/pizzaria/happyhour/cardapio/3.jpg",
-                 "images/comercios/pizzaria/happyhour/cardapio/4.jpg",
-                 "images/comercios/pizzaria/happyhour/cardapio/5.jpg",
-                 "images/comercios/pizzaria/happyhour/cardapio/6.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/2.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/3.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/4.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/5.jpg",
+              "images/comercios/pizzaria/happyhour/cardapio/6.jpg",
 
 
 
