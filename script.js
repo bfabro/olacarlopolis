@@ -2877,7 +2877,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             },
             address: "R. Salvira Marquês, 453 - Carlópolis",
             contact: "(43) 99621-5094",
-            infoAdicional: "Cartório de registro de imóveis, cumulado com cartório de registro civil e títulos, documentos de pessoas jurídicas.",
+            infoAdicional: "📜 Registro de Imóveis<br>➡️ Segurança jurídica na compra, venda e regularização de imóveis<br><br>👨‍👩‍👧‍👦 Registro Civil<br>➡️ Certidões de nascimento, casamento e óbito com validade oficial<br><br>📂 Títulos e Documentos<br>➡️ Autenticação, registro e conservação de documentos importantes<br><br>🏢 Registro de Pessoas Jurídicas<br>➡️ Constituição, alteração e dissolução de empresas e associações.",
 
 
           },
