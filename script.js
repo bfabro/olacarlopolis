@@ -395,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "oficinadocelular","vania", "hime", "seiza", "nelsoncalhas"
+    "oficinadocelular","veronicakataoka", "hime", "seiza", "nelsoncalhas"
 
   ];
 
@@ -5048,6 +5048,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             facebook:"https://www.facebook.com/people/Veronica-Kataoka-Lash-Designer/61578629999055/#",
             instagram: "https://www.instagram.com/veronicakataokalashdesigner",
             novidadesImages: [
+              "images/comercios/estudioDeBeleza/veronica/divulgacao/0.jpg",
               "images/comercios/estudioDeBeleza/veronica/divulgacao/1.jpg",
               "images/comercios/estudioDeBeleza/veronica/divulgacao/2.jpg",
               "images/comercios/estudioDeBeleza/veronica/divulgacao/3.jpg",
