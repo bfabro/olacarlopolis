@@ -5044,7 +5044,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             },
             address: "R. Antonio Jonas Ferreira, 744 - Carlopolis",
             contact: "(14) 99830-8893",
-            infoAdicional:"<b>Agende seu Horario:</b><br> <br>✍️ Designer de sobrancelha (remete a precisão/detalhe no traço)<br> 🔄 Lash Lifting (cílios levantados, efeito de curvatura)<br>🎀 Brow Lamination (sobrancelha modelada e organizada, pode remeter a laço ou alinhamento)<br>👁️ Extensão de cílios (destaque direto no olho)<br>💄 Hidragloss (brilho e hidratação nos lábios)",
+            infoAdicional:"<b>Agende seu Horario:</b><br> <br>✍️ Designer de sobrancelha: Precisão e detalhe no traço<br> 🔄 Lash Lifting: Cílios levantados e efeito de curvatura<br>🎀 Brow Lamination: Sobrancelha modelada e organizada<br>👁️ Extensão de cílios: Destaque direto no olho<br>💄 Hidragloss: Brilho e hidratação nos lábios",
             facebook:"https://www.facebook.com/people/Veronica-Kataoka-Lash-Designer/61578629999055/#",
             instagram: "https://www.instagram.com/veronicakataokalashdesigner",
             novidadesImages: [
