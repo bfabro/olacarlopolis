@@ -4045,6 +4045,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                "images/comercios/pizzaria/happyhour/cardapio/2.jpg",
                 "images/comercios/pizzaria/happyhour/cardapio/3.jpg",
                  "images/comercios/pizzaria/happyhour/cardapio/4.jpg",
+                 "images/comercios/pizzaria/happyhour/cardapio/5.jpg",
+                 "images/comercios/pizzaria/happyhour/cardapio/6.jpg",
 
 
 
@@ -8165,6 +8167,60 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             ],
 
+          },
+
+
+          {
+            image: "images/comercios/pizzaria/happyhour/perfil.jpg",
+            name: "Happy Hour",
+            hours: "Seg a Ter: 07:00h as 18:00h<br>Qua a Sex: 07:00 as 23:00<br>Sab: 07:00h as 14:00h - 18:00 as 23:00<br>Dom: 18:00h as 23:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "07:00", fim: "18:00" }],
+              ter: [{ inicio: "07:00", fim: "18:00" }],
+              qua: [{ inicio: "07:00", fim: "23:00" }],
+              qui: [{ inicio: "07:00", fim: "23:00" }],
+              sex: [{ inicio: "07:00", fim: "23:00" }],
+              sab: [{ inicio: "07:00", fim: "14:00" },{ inicio: "18:00", fim: "23:00" }],
+              dom: [{ inicio: "18:00", fim: "23:00" }],
+            },
+            address: "R. Kalil Keder, 753 - Carlopolis",
+            contact: "(43) 99636-3463",
+            delivery: "Sim / Com Taxa",
+
+            menuImages: [
+              
+              "images/comercios/pizzaria/happyhour/cardapio/1.jpg",
+
+               "images/comercios/pizzaria/happyhour/cardapio/2.jpg",
+                "images/comercios/pizzaria/happyhour/cardapio/3.jpg",
+                 "images/comercios/pizzaria/happyhour/cardapio/4.jpg",
+                 "images/comercios/pizzaria/happyhour/cardapio/5.jpg",
+                 "images/comercios/pizzaria/happyhour/cardapio/6.jpg",
+
+
+
+            ],
+
+
+            novidadesImages: [
+
+              "images/comercios/pizzaria/happyhour/divulgacao/1.jpg",
+              "images/comercios/pizzaria/happyhour/divulgacao/2.jpg",
+              "images/comercios/pizzaria/happyhour/divulgacao/3.jpg",
+              "images/comercios/pizzaria/happyhour/divulgacao/4.jpg",
+
+            ],
+            novidadesDescriptions: [
+
+              "",
+              "",
+              "",
+              "",
+              "",
+
+
+            ]
           },
 
 
