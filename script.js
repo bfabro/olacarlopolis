@@ -560,6 +560,9 @@ document.addEventListener("DOMContentLoaded", function () {
     //desentupidora
     gcyvazamentos: "s",
 
+    // estudio de beleza
+    veronicakataoka:"s",
+
     //farmacia
     elshaday: "s",
     farmais: "s",
@@ -586,7 +589,7 @@ document.addEventListener("DOMContentLoaded", function () {
     imobiliariacarlopolis: "s",
 
     // foodtruck
-    celeiro: "s",
+    celeiro: "n",
 
     //funeraria
     cristorei: "s",
@@ -695,7 +698,7 @@ document.addEventListener("DOMContentLoaded", function () {
     toninhoparana: "s",
     sabordaroca: "s",
     selahtgrill: "s",
-    yingyang: "s",
+    yingyang: "n",
 
     // produtos de limpeza
     jmprodutosdelimpeza: "s",
@@ -5013,6 +5016,82 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
         ],
       },
+
+
+
+
+
+{
+        link: document.querySelector("#menuEstudioBeleza"),
+        title: "Estudio De Beleza",
+        establishments: [
+          {
+            image: "images/comercios/estudioDeBeleza/veronica/perfil2.jpg",
+            name: "Veronica Kataoka",
+            hours: "Seg a Sex: 08:00h as 18:00h<br> Sab: 09:00h as 14:00h ",
+            statusAberto: " ",
+            horarios: {
+
+              seg: [{ inicio: "09:00", fim: "18:00" }],
+              ter: [{ inicio: "09:00", fim: "18:00" }],
+              qua: [{ inicio: "09:00", fim: "18:00" }],
+              qui: [{ inicio: "09:00", fim: "18:00" }],
+              sex: [{ inicio: "09:00", fim: "18:00" }],
+              sab: [{ inicio: "09:00", fim: "14:00" }],
+              dom: [], // fechado
+            },
+            address: "R. Antonio Jonas Ferreira, 744 - Carlopolis",
+            contact: "(14) 99830-8893",
+            infoAdicional:"<b>Agende seu Horario:</b><br> <br>✍️ Designer de sobrancelha (remete a precisão/detalhe no traço)<br> 🔄 Lash Lifting (cílios levantados, efeito de curvatura)<br>🎀 Brow Lamination (sobrancelha modelada e organizada, pode remeter a laço ou alinhamento)<br>👁️ Extensão de cílios (destaque direto no olho)<br>💄 Hidragloss (brilho e hidratação nos lábios)",
+            facebook:"https://www.facebook.com/people/Veronica-Kataoka-Lash-Designer/61578629999055/#",
+            instagram: "https://www.instagram.com/veronicakataokalashdesigner",
+            novidadesImages: [
+              "images/comercios/estudioDeBeleza/veronica/divulgacao/1.jpg",
+              "images/comercios/estudioDeBeleza/veronica/divulgacao/2.jpg",
+              "images/comercios/estudioDeBeleza/veronica/divulgacao/3.jpg",
+              "images/comercios/estudioDeBeleza/veronica/divulgacao/4.jpg",
+              "images/comercios/estudioDeBeleza/veronica/divulgacao/5.jpg",
+           
+            ],
+            novidadesDescriptions: [
+              "",
+
+              "",
+
+              "",
+
+              "",
+
+               "",
+
+
+            ],
+          },
+        ],
+      },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
