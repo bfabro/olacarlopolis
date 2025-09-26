@@ -8060,6 +8060,28 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
               },
 
+                {
+                imagem: "images/comercios/quitanda/pimentaDoce/promocao/5.jpg",
+                titulo: "Tomate",
+                precoAntigo: 4.50,
+                preco: 2.99,
+                unidade: "KG",
+                validadeFim: "2025-09-28",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+                {
+                imagem: "images/comercios/quitanda/pimentaDoce/promocao/6.jpg",
+                titulo: "Alface Crespa",
+                precoAntigo: 3.50,
+                preco: 1.95,
+                unidade: "A unidade",
+                validadeFim: "2025-09-28",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
 
             ]
 
