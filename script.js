@@ -8915,8 +8915,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Nota de Falecimento",
         establishments: [
 
+//26/09
+ {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/41.jpg",
+            date: "26/09/2025",
+            descricaoFalecido: "Hoje nossos corações se entristecem com a partida da querida *Andressa*, uma alma doce, cheia de luz, que marcou a vida de todos com sua alegria, fé e coragem.<br>Foram dias de luta, esperança e oração... mas Deus, em Sua infinita sabedoria, decidiu acolhê-la em Seus braços, concedendo-lhe o descanso eterno.<br>À família e amigos, nosso carinho, respeito e solidariedade. Que o consolo divino alcance cada coração e que a saudade seja suavizada pelas doces lembranças que ela nos deixou.<br>*Andressa jamais será esquecida.<Br>*Seu sorriso, sua força e sua essência viverão para sempre entre nós",
 
-
+          },
 
 
 
