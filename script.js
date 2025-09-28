@@ -1335,32 +1335,35 @@ function mostrarTetrix() {
 
 //// flayyoo canos
 
+
+// ======== CAPIVARINHA (rio serpenteando) — FUNÇÃO ÚNICA, LIMPA ========
+// ====================== CAPIVARINHA — RIO SERPENTEANDO (LIMPO) ======================
 function mostrarCanos() {
   const html = `
     <div class="game-wrap">
       <div class="game-header">
-        <h2> Capivarinha</h2>
+        <h2>Capivarinha</h2>
         <div class="flappy-ui">
           <div class="scorebox">Pontos: <span id="f-score">0</span></div>
           <div class="scorebox">Recorde: <span id="f-best">0</span></div>
           <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
         </div>
       </div>
-      <canvas id="flappyCanvas" width="288" height="512" aria-label="Jogo Caninhos"></canvas>
+
+      <canvas id="flappyCanvas" width="288" height="512" aria-label="Capivarinha"></canvas>
+
       <div class="flappy-buttons">
         <button id="f-jump">Pular</button>
         <button id="f-restart">Reiniciar</button>
       </div>
-      <small>Controles: Clique/Toque/Barra de espaço/Seta ↑ para pular. Quanto mais longe, mais rápido!</small>
+      <small>Toque/Barra/Seta ↑ para pular. Quanto mais longe, mais rápido!</small>
     </div>
   `;
   document.querySelector(".content_area").innerHTML = html;
 
-  // --- Estado & Utilidades ---
+  // Canvas com DPR
   const cvs = document.getElementById("flappyCanvas");
   const ctx = cvs.getContext("2d");
-
-  // Suporte a alta densidade (DPR) para canvas mais nítido
   (function scaleForDPR(){
     const dpr = window.devicePixelRatio || 1;
     const w = cvs.width, h = cvs.height;
@@ -1371,324 +1374,169 @@ function mostrarCanos() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   })();
 
-  // Dimensões de jogo (lógicas)
   const W = 288, H = 512;
 
-  // Pássaro
-  const bird = {
-    x: 50,
-    y: H * 0.5,
-    r: 12,           // raio (desenho do "pássaro")
-    vy: 0,
-    gravity: 0.35,   // gravidade
-    jump: -6.0       // impulso do pulo
-  };
+  // Capivara
+  const capy = { x: 50, y: H*0.5, r: 12, vy: 0, gravity: 0.35, jump: -6.0 };
 
-  // Canos
-  const pipes = [];
-  const PIPE_W = 52;          // largura do cano
-  const GAP0   = 110;         // gap base entre canos
-  const GAP_MIN = 80;         // gap mínimo ao ficar difícil
-  const SPAWN0 = 1500;        // intervalo base para nascer um par de canos (ms)
-  const SPEED0 = 2.0;         // velocidade base
-  const SPEED_MAX = 5.5;
+  // Rio
+  const RIVER_STEP = 8;
+  const GAP0 = 120, GAP_MIN = 80;
+  const SPEED0 = 2.0, SPEED_MAX = 5.5;
+  let gap = GAP0, speed = SPEED0, phase = 0;
+  let timeSinceStart = 0, distForScore = 0;
+  const SCORE_EVERY = 120;
 
-  // Dificuldade dinâmica
-  let speed = SPEED0;         // pixels por frame
-  let nextSpawn = 0;          // ms para o próximo spawn
-  let gap = GAP0;
+  // Curvas
+  const amp1 = 70, freq1 = 0.010;
+  const amp2 = 28, freq2 = 0.022;
 
-  // Pontuação
+  const riverCenterAt  = (x) => H*0.5
+    + Math.sin((x + phase) * freq1) * amp1
+    + Math.sin((x*0.5 + phase*1.3) * freq2) * amp2;
+  const riverTopAt     = (x) => riverCenterAt(x) - gap/2;
+  const riverBottomAt  = (x) => riverCenterAt(x) + gap/2;
+
+  // HUD
   let score = 0;
-  let passedSet = new Set();  // ids de canos já pontuados
-  const BEST_KEY = "flappy_best";
+  const BEST_KEY = "capivarinha_best";
   let best = +(localStorage.getItem(BEST_KEY) || 0);
-  document.getElementById("f-best").textContent = best;
-
-  // Game loop
-  let last = 0;
-  let running = true;
-  let started = false;        // ainda parado até primeiro pulo
-  let timeSinceStart = 0;
-
-  function reset() {
-    pipes.length = 0;
-    bird.x = 50;
-    bird.y = H * 0.5;
-    bird.vy = 0;
-    score = 0;
-    speed = SPEED0;
-    gap = GAP0;
-    nextSpawn = 0;
-    passedSet.clear();
-    running = true;
-    started = false;
-    timeSinceStart = 0;
-    updateHUD();
-    draw(); // tela “pronta”
-  }
-
-  function spawnPipePair() {
-    const marginTop = 40, marginBottom = 80;
-    const maxTop = H - marginBottom - gap - marginTop;
-    const top = marginTop + Math.random() * Math.max(10, maxTop);
-    const id = performance.now(); // id simples
-    pipes.push({
-      id,
-      x: W + 10,
-      top: top,           // altura do cano de cima (fundo para baixo)
-      gap: gap,
-      w: PIPE_W,
-      scored: false
-    });
-  }
-
-  function updateHUD() {
+  const updateHUD = () => {
     document.getElementById("f-score").textContent = score;
     document.getElementById("f-best").textContent  = best;
-  }
+  };
+  updateHUD();
 
-  function jump() {
-    if (!running) return;
-    bird.vy = bird.jump;
-    started = true;
-  }
+  // Estado do loop
+  let running = true, started = false, last = 0, rafId = null;
+  const GRACE_MS = 300; // pequeno período sem colisão ao iniciar
+
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  const reset = () => {
+    // fase e dificuldade base
+    phase = 0; speed = SPEED0; gap = GAP0;
+    timeSinceStart = 0; distForScore = 0;
+    started = false; running = true; last = 0;
+
+    // reposiciona a capivara DENTRO do canal do rio
+    const top0 = riverTopAt(capy.x);
+    const bot0 = riverBottomAt(capy.x);
+    const safeTop = top0 + capy.r + 1;
+    const safeBot = bot0 - capy.r - 1;
+    capy.y = clamp(riverCenterAt(capy.x), safeTop, safeBot);
+    capy.vy = 0;
+
+    score = 0; updateHUD();
+    draw();
+  };
+
+  const jump = () => { if (!running) return; capy.vy = capy.jump; started = true; };
 
   // Controles
   document.getElementById("f-jump").onclick = jump;
- document.getElementById("f-restart").onclick = () => {
-  reset();
-  requestAnimationFrame(loop); // garante que a animação volte
-};
-
-
-  function onKey(e) {
-    if (e.code === "Space" || e.key === "ArrowUp") {
-      e.preventDefault();
-      jump();
-    }
-  }
-  window.addEventListener("keydown", onKey);
+  document.getElementById("f-restart").onclick = () => {
+    if (rafId) cancelAnimationFrame(rafId);
+    reset();
+    rafId = requestAnimationFrame(loop);
+  };
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" || e.key === "ArrowUp") { e.preventDefault(); jump(); }
+  }, { passive:false });
   cvs.addEventListener("pointerdown", jump);
 
-  function update(dt) {
+  const gameOver = () => { running = false; draw(); };
+
+  function update(dt){
     if (!running) return;
 
     timeSinceStart += dt;
+    const t = timeSinceStart / 1000;
 
-    // Aumenta dificuldade suavemente ao longo do tempo
-    // a cada 8s acelera um pouco, reduz gap até um mínimo
-    const t = timeSinceStart / 1000; // em segundos
-    speed = Math.min(SPEED_MAX, SPEED0 + t * 0.12); // cresce 0.12 px/s por segundo
-    gap   = Math.max(GAP_MIN, GAP0 - t * 2);        // reduz 2px no gap por segundo (até GAP_MIN)
+    // Dificuldade
+    speed = Math.min(SPEED_MAX, SPEED0 + t*0.12);
+    gap   = Math.max(GAP_MIN, GAP0 - t*2.0);
+    phase += speed * 0.9;
 
+    // Física
     if (started) {
-      // Física do pássaro
-      bird.vy += bird.gravity;
-      bird.y  += bird.vy;
-
-      // chão/teto
-      if (bird.y - bird.r < 0) {
-        bird.y = bird.r;
-        bird.vy = 0;
-      }
-      if (bird.y + bird.r > H - 20) { // “chão”
-        bird.y = H - 20 - bird.r;
-        gameOver();
-      }
+      capy.vy += capy.gravity;
+      capy.y  += capy.vy;
+      if (capy.y - capy.r < 0) { capy.y = capy.r; capy.vy = 0; }
+      if (capy.y + capy.r > H - 20) { capy.y = H - 20 - capy.r; gameOver(); }
     }
 
-    // Spawning de canos
-    nextSpawn -= dt;
-    if (nextSpawn <= 0) {
-      spawnPipePair();
-      // intervalo dinâmico com base na velocidade (mantém densidade parecida)
-      const base = SPAWN0 * (SPEED0 / speed);
-      nextSpawn = Math.max(700, base); // não menor que 700ms
+    // Colisão com margens do rio (só após começar ou passar a graça)
+    if (started || timeSinceStart > GRACE_MS) {
+      const top = riverTopAt(capy.x), bot = riverBottomAt(capy.x);
+      if (capy.y - capy.r < top || capy.y + capy.r > bot) gameOver();
     }
 
-    // Mover canos e checar colisão/pontuação
-    for (let i = pipes.length - 1; i >= 0; i--) {
-      const p = pipes[i];
-      p.x -= speed;
-
-      // colisão (bird círculo vs retângulos dos canos)
-      const topRect = { x: p.x, y: 0, w: p.w, h: p.top };
-      const bottomRect = { x: p.x, y: p.top + p.gap, w: p.w, h: H - (p.top + p.gap) };
-
-      if (circleRectCollide(bird.x, bird.y, bird.r, topRect) ||
-          circleRectCollide(bird.x, bird.y, bird.r, bottomRect)) {
-        gameOver();
-      }
-
-      // pontuação quando o centro do pássaro cruza o centro do cano
-      const pipeCenter = p.x + p.w / 2;
-      if (!p.scored && pipeCenter < bird.x) {
-        p.scored = true;
-        score++;
-        if (score > best) { best = score; localStorage.setItem(BEST_KEY, best); }
-        updateHUD();
-      }
-
-      // remover canos fora da tela
-      if (p.x + p.w < -20) pipes.splice(i, 1);
+    // Pontos por distância
+    distForScore += speed;
+    if (distForScore >= SCORE_EVERY) {
+      distForScore -= SCORE_EVERY;
+      score++;
+      if (score > best) { best = score; localStorage.setItem(BEST_KEY, best); }
+      updateHUD();
     }
   }
 
-  function circleRectCollide(cx, cy, cr, r) {
-    // aproximação: clamp do centro do círculo ao retângulo e mede distância
-    const dx = Math.max(r.x, Math.min(cx, r.x + r.w));
-    const dy = Math.max(r.y, Math.min(cy, r.y + r.h));
-    const dist2 = (cx - dx) ** 2 + (cy - dy) ** 2;
-    return dist2 <= cr ** 2;
+  function drawCapivara(x, y, r){
+    ctx.fillStyle = "#8b5a2b";
+    ctx.beginPath(); ctx.ellipse(x, y, r*1.4, r, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + r*1.2, y - r*0.3, r*0.8, r*0.6, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + r*1.4, y - r*0.3, r*0.15, 0, Math.PI*2); ctx.fillStyle = "#000"; ctx.fill();
+    ctx.beginPath(); ctx.arc(x + r*0.8, y - r*0.9, r*0.2, 0, Math.PI*2); ctx.fillStyle = "#5a3820"; ctx.fill();
   }
 
-  // Capivara no lugar do pássaro
-function drawCapivara(x, y, size) {
-  ctx.fillStyle = "#8b5a2b"; // marrom corpo
-  ctx.beginPath();
-  ctx.ellipse(x, y, size * 1.4, size, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Cabeça
-  ctx.beginPath();
-  ctx.ellipse(x + size * 1.2, y - size * 0.3, size * 0.8, size * 0.6, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Olho
-  ctx.beginPath();
-  ctx.arc(x + size * 1.4, y - size * 0.3, size * 0.15, 0, Math.PI * 2);
-  ctx.fillStyle = "#000";
-  ctx.fill();
-
-  // Orelha
-  ctx.beginPath();
-  ctx.arc(x + size * 0.8, y - size * 0.9, size * 0.2, 0, Math.PI * 2);
-  ctx.fillStyle = "#5a3820";
-  ctx.fill();
-}
-
-
-
-// 1) Adicione esta função logo acima de draw()
-function drawCapivara(x, y, r) {
-  // corpo (oval)
-  ctx.fillStyle = "#8b5a2b";
-  ctx.beginPath();
-  ctx.ellipse(x, y, r * 1.4, r, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // cabeça (oval menor)
-  ctx.beginPath();
-  ctx.ellipse(x + r * 1.2, y - r * 0.3, r * 0.8, r * 0.6, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // orelha
-  ctx.fillStyle = "#5a3820";
-  ctx.beginPath();
-  ctx.arc(x + r * 0.8, y - r * 0.9, r * 0.2, 0, Math.PI * 2);
-  ctx.fill();
-
-  // olho
-  ctx.fillStyle = "#000";
-  ctx.beginPath();
-  ctx.arc(x + r * 1.4, y - r * 0.3, r * 0.15, 0, Math.PI * 2);
-  ctx.fill();
-
-  // focinho (triangulo simples)
-  ctx.fillStyle = "#5a3820";
-  ctx.beginPath();
-  ctx.moveTo(x + r * 1.8, y - r * 0.2);
-  ctx.lineTo(x + r * 1.55, y - r * 0.05);
-  ctx.lineTo(x + r * 1.55, y - r * 0.35);
-  ctx.closePath();
-  ctx.fill();
-}
-
-// 2) Dentro do draw(), troque o bloco que desenha o pássaro por:
-drawCapivara(bird.x, bird.y, bird.r);
-
-
-
-
-
-  function draw() {
-    // fundo
+  function draw(){
+    // Céu
     ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = "#70c5ce"; ctx.fillRect(0,0,W,H);
+    // Chão
+    ctx.fillStyle = "#c9d09a"; ctx.fillRect(0, H-20, W, 20);
 
-    // chão simples
-    ctx.fillStyle = "#ded895";
-    ctx.fillRect(0, H - 20, W, 20);
-
-    // canos
-    for (const p of pipes) {
-      ctx.fillStyle = "#2ecc71";
-      // topo
-      ctx.fillRect(p.x, 0, p.w, p.top);
-      // “borda” do topo
-      ctx.fillRect(p.x - 2, p.top - 14, p.w + 4, 14);
-
-      // base
-      const by = p.top + p.gap;
-      ctx.fillRect(p.x, by, p.w, H - by);
-      // “borda” da base
-      ctx.fillRect(p.x - 2, by, p.w + 4, 14);
-    }
-
-    drawCapivara(bird.x, bird.y, bird.r);
-
-
-    // olho
+    // Rio
+    const topY = (x)=>riverTopAt(x), botY = (x)=>riverBottomAt(x);
     ctx.beginPath();
-    ctx.arc(bird.x + 4, bird.y - 4, 3, 0, Math.PI * 2);
-    ctx.fillStyle = "#000";
-    ctx.fill();
-
-    // bico
-    ctx.fillStyle = "#ff6a00";
-    ctx.beginPath();
-    ctx.moveTo(bird.x + bird.r, bird.y);
-    ctx.lineTo(bird.x + bird.r + 8, bird.y - 3);
-    ctx.lineTo(bird.x + bird.r + 8, bird.y + 3);
+    ctx.moveTo(0, topY(0));
+    for (let x=0; x<=W; x+=RIVER_STEP) ctx.lineTo(x, topY(x));
+    ctx.lineTo(W, topY(W));
+    for (let x=W; x>=0; x-=RIVER_STEP) ctx.lineTo(x, botY(x));
     ctx.closePath();
-    ctx.fill();
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0, "#46a6d8"); grad.addColorStop(1, "#2e89b8");
+    ctx.fillStyle = grad; ctx.fill();
 
+    // Capivara
+    drawCapivara(capy.x, capy.y, capy.r);
+
+    // Overlays
+    if (!started && running) {
+      ctx.fillStyle="#fff"; ctx.font="16px Poppins,Arial";
+      ctx.fillText("Toque em Pular para começar", 30, 240);
+    }
     if (!running) {
-      ctx.fillStyle = "#000";
-      ctx.globalAlpha = 0.4;
-      ctx.fillRect(0, 0, W, H);
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = "#fff";
-      ctx.font = "bold 22px Poppins, Arial";
+      ctx.fillStyle = "#000"; ctx.globalAlpha = 0.4; ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha = 1; ctx.fillStyle = "#fff"; ctx.font = "bold 22px Poppins, Arial";
       ctx.fillText("GAME OVER", 80, 200);
-      ctx.font = "16px Poppins, Arial";
-      ctx.fillText("Clique em Reiniciar", 82, 230);
+      ctx.font = "16px Poppins, Arial"; ctx.fillText("Clique em Reiniciar", 82, 230);
     }
   }
 
-  function gameOver() {
-    running = false;
-    draw();
-  }
-
-  function loop(ts) {
+  function loop(ts){
     if (!last) last = ts;
-    const dt = ts - last;
-    last = ts;
-
-    if (running) {
-      update(dt);
-      draw();
-      requestAnimationFrame(loop);
-    } else {
-      draw(); // garantir overlay
-    }
+    const dt = ts - last; last = ts;
+    if (running) { update(dt); draw(); rafId = requestAnimationFrame(loop); }
+    else { draw(); }
   }
 
-  // Iniciar
+  // start
   reset();
-  requestAnimationFrame(loop);
+  rafId = requestAnimationFrame(loop);
 }
+
 
 
 
