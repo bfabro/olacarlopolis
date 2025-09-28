@@ -1565,10 +1565,10 @@ function drawRiverCapy(rc){
   // Mensagens de fim de jogo
 let deathMsg = "";
 const MSGS = {
-  peixe: "A capivara parou pra comer um peixe",
-  capivara: "A capivara parou pra conversar",
-  default: "A capivara saiu do rio",
-  barco: "A capivara bateu no barco",
+  peixe: "A Capivarinha parou pra comer o peixe",
+  capivara: "A Capivarinha parou pra conversar",
+  default: "A Capivarinha saiu da represa",
+  barco: "A Capivarinha bateu no barco",
 };
 
 
