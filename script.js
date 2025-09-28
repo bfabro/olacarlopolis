@@ -1836,7 +1836,20 @@ const MSGS = {
   window.addEventListener("keydown", (e) => {
     if (e.code === "Space" || e.key === "ArrowUp") { e.preventDefault(); jump(); }
   }, { passive:false });
-  cvs.addEventListener("pointerdown", jump);
+  // Antes estava: cvs.addEventListener("pointerdown", jump);
+cvs.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  if (!running) {
+    // se o jogo estiver parado (game over), um toque reinicia
+    if (rafId) cancelAnimationFrame(rafId);
+    reset();
+    rafId = requestAnimationFrame(loop);
+    return;
+  }
+  // se estiver rodando, mantém o comportamento de pular
+  jump();
+});
+
 
   const gameOver = (reason = "default") => {
   deathMsg = MSGS[reason] || MSGS.default;
@@ -2070,7 +2083,7 @@ function drawMultiline(ctx, text, x, y, lineHeight = 18) {
   });
 
   ctx.font = "14px Poppins, Arial";
-  ctx.fillText("Toque em Reiniciar", W / 2, H * 0.75);
+  ctx.fillText("Toque na tela para reiniciar", W / 2, H * 0.75);
 }
 
   }
