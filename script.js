@@ -1213,7 +1213,7 @@ function mostrarTetrix() {
  
 </div>
 
-      <small style="text-align:center;opacity:.8">Controles: Clique na tela, e gire a peça, segure apertado e acelere a queda</small>
+      <small style="text-align:center;opacity:.8">Controles: 👆 Toque rápido</b>: Gira a peça <br>• ✋ <b>Segurar</b>: Queda rápida <br>• ↔️ <b>Arrastar</b>: mover para os lados</small>
     </div>
   `;
 
