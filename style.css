@@ -5076,4 +5076,13 @@ html {
 .game-actions .btn-play {
   padding: 8px 12px;
   border: 0;
-  bor
+  border-radius: 10px;
+  background: #4070f4;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.game-actions .btn-play:hover {
+  filter: brightness(1.05);
+}

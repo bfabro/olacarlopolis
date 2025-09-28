@@ -1555,6 +1555,16 @@ function drawRiverCapy(rc){
   let running = true, started = false, last = 0, rafId = null;
   const GRACE_MS = 300;
 
+  // Mensagens de fim de jogo
+let deathMsg = "";
+const MSGS = {
+  peixe: "A capivara parou pra comer um peixe",
+  capivara: "A capivara parou pra conversar",
+  default: "A capivara saiu do rio",
+  barco: "A capivara bateu no barco",
+};
+
+
   function snapIntoRiver() {
     const x = 50; // posição de jogo
     const top = riverTopAt(x), bot = riverBottomAt(x);
@@ -1564,16 +1574,30 @@ function drawRiverCapy(rc){
   }
 
   const reset = () => {
-    phase = 0; speed = SPEED0;
-    // reabre o rio no início:
-    gap = GAP0;
-    timeSinceStart = 0; distForScore = 0;
-    boats.length = 0; nextBoatIn = 3000 + Math.random()*5000;
+  phase = 0; speed = SPEED0;
 
-    started = false; running = true; last = 0;
-    capy.x = 28; capy.y = H - 40; capy.vy = 0;
-    score = 0; updateHUD(); draw();
-  };
+  // reabre o rio no início
+  gap = GAP0;
+
+  // zera relógios/placar e reprograma spawns
+  timeSinceStart = 0; distForScore = 0;
+  boats.length = 0; nextBoatIn = 3000 + Math.random()*5000;
+
+  // NOVO: limpar peixes e capivara do rio e reagendar
+  fishes.length = 0;
+  riverCapy = null;
+  nextFishIn = 3000 + Math.random()*5000;
+  nextRiverCapyIn = 4000 + Math.random()*7000;
+
+  // NOVO: limpar mensagem de morte
+  deathMsg = "";
+
+  started = false; running = true; last = 0;
+  capy.x = 28; capy.y = H - 40; capy.vy = 0;
+
+  score = 0; updateHUD(); draw();
+};
+
 
   const jump = () => {
     if (!running) return;
@@ -1599,7 +1623,12 @@ function drawRiverCapy(rc){
   }, { passive:false });
   cvs.addEventListener("pointerdown", jump);
 
-  const gameOver = () => { running = false; draw(); };
+  const gameOver = (reason = "default") => {
+  deathMsg = MSGS[reason] || MSGS.default;
+  running = false;
+  draw();
+};
+
 
   function update(dt){
     if (!running) return;
@@ -1636,10 +1665,25 @@ function drawRiverCapy(rc){
         b.y = riverCenterAt(b.x);
         // colisão
         const rect = { x: b.x - b.w/2, y: b.y - b.h/2, w: b.w, h: b.h };
-        if (circleRectCollide(capy.x, capy.y, capy.r, rect)) gameOver();
+     if (circleRectCollide(capy.x, capy.y, capy.r, rect)) gameOver("barco");
         // saiu da tela à esquerda?
         if (b.x + b.w/2 < -10) boats.splice(i,1);
       }
+
+      
+
+      // colisão com PEIXES (capy vs círculo do peixe)
+for (let i = 0; i < fishes.length; i++) {
+  const f = fishes[i];
+  const dx = capy.x - f.x;
+  const dy = capy.y - f.y;
+  const rr = (capy.r + f.r) * (capy.r + f.r);
+  if (dx*dx + dy*dy <= rr) {
+      gameOver("peixe"); // <- aqui!
+    break;
+  }
+}
+
 
       // capivara do rio: spawn e movimento
 nextRiverCapyIn -= dt;
@@ -1658,6 +1702,17 @@ if (riverCapy) {
   // saiu da tela?
   if (riverCapy.x < -30) riverCapy = null;
 }
+
+// colisão com a outra capivara no rio
+if (riverCapy) {
+  const dxRC = capy.x - riverCapy.x;
+  const dyRC = capy.y - riverCapy.y;
+  const rrRC = (capy.r + RIVERCAPY_R) * (capy.r + RIVERCAPY_R);
+  if (dxRC*dxRC + dyRC*dyRC <= rrRC) {
+    gameOver("capivara");
+  }
+}
+
 // === Peixes ===
 nextFishIn -= dt;
 if (nextFishIn <= 0) {
@@ -1755,16 +1810,42 @@ for (const f of fishes) drawFish(f);
     // Overlays
     if (!started && running) {
       ctx.fillStyle="#fff"; ctx.font="16px Poppins,Arial";
-      ctx.fillText("Toque em Pular para entrar no rio", 24, 240);
+      ctx.fillText("Toque em Pular para entrar no rio", 30, 180);
     }
-    if (!running) {
-      ctx.fillStyle = "#000"; 
-      ctx.globalAlpha = 0.4; 
-      ctx.fillRect(0,0,W,H);ctx.textAlign = "center";
-      ctx.globalAlpha = 1; ctx.fillStyle = "#fff"; ctx.font = "bold 22px Poppins, Arial";
-      ctx.fillText("A capivara saiu do rio", W / 2, H / 2);
-      
+  if (!running) {
+  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 20px Poppins, Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  // quebra mensagem em várias linhas se for grande
+  const palavras = (deathMsg || "A capivara saiu do rio").split(" ");
+  const linhas = [];
+  let atual = "";
+
+  for (let p of palavras) {
+    const teste = atual ? atual + " " + p : p;
+    if (ctx.measureText(teste).width > W * 0.8) {
+      linhas.push(atual);
+      atual = p;
+    } else {
+      atual = teste;
     }
+  }
+  if (atual) linhas.push(atual);
+
+  const startY = H / 2 - (linhas.length - 1) * 14; // centraliza vertical
+  linhas.forEach((linha, i) => {
+    ctx.fillText(linha, W / 2, startY + i * 28);
+  });
+
+  ctx.font = "14px Poppins, Arial";
+  ctx.fillText("Toque em Reiniciar", W / 2, H * 0.75);
+}
+
   }
 
   function loop(ts){
