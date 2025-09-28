@@ -5085,4 +5085,48 @@ html {
 
 .game-actions .btn-play:hover {
   filter: brightness(1.05);
+}/* Header de páginas (Jogos, Promoções etc.) */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: radial-gradient(circle, rgba(255, 140, 0, 0.85), rgba(0, 123, 255, 0.85));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
+
+.page-header h2 {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.page-header .share-btn {
+  font-size: 1.2em;
+  cursor: pointer;
+  color: #fff;
+  margin-left: 10px;
+  transition: transform .2s ease;
+}
+
+.page-header .share-btn:hover {
+  transform: scale(1.2);
+}
+.games-message {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 10px 0 20px;
+  color: #ff6600;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }

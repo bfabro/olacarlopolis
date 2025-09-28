@@ -1117,26 +1117,17 @@ iniciarShareObserver();
 
 function mostrarJogos() {
   const html = `
-    <div class="games-wrap">
-      <div class="games-header">
-        <h2 class="highlighted">🎮 Jogos</h2>
-        <button class="fechar-menu" onclick="history.back()">Voltar</button>
-      </div>
+    <div class="page-header">
+  <h2>🎮 Jogos</h2>
+  <i class="fa-solid fa-share-nodes share-btn" onclick="compartilharPagina()"></i>
+</div>
 
-      <p style="margin:6px 0 14px;color:#333">Escolha um jogo para começar:</p>
+<div class="games-message">🎉 Divirta-se nesta sessão!</div>
+
+      
 
       <div class="games-list">
-        <!-- Jogo 1: Tetrix -->
-        <div class="game-item">
-          <div class="game-icon"><i class="fa-solid fa-puzzle-piece" style="color:#6a5acd"></i></div>
-          <div class="game-body">
-            <div class="game-title">Tetrix</div>
-            <div class="game-desc">Tetris clássico com placar, níveis e controles mobile.</div>
-          </div>
-          <div class="game-actions">
-            <button class="btn-play" id="playTetrix">Jogar</button>
-          </div>
-        </div>
+       
 
         <!-- Jogo 2: Capivarinha -->
         <div class="game-item">
@@ -1149,6 +1140,21 @@ function mostrarJogos() {
             <button class="btn-play" id="playCanos">Jogar</button>
           </div>
         </div>
+
+
+
+
+           <!-- Jogo 1: Tetrix -->
+        <div class="game-item">
+          <div class="game-icon"><i class="fa-solid fa-puzzle-piece" style="color:#6a5acd"></i></div>
+          <div class="game-body">
+            <div class="game-title">Tetrix</div>
+            <div class="game-desc">Tetris clássico com placar, níveis e controles mobile.</div>
+          </div>
+          <div class="game-actions">
+            <button class="btn-play" id="playTetrix">Jogar</button>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -1156,7 +1162,6 @@ function mostrarJogos() {
   const area = document.querySelector(".content_area");
   area.innerHTML = html;
 
-  // handlers dos botões
   const t = document.getElementById("playTetrix");
   if (t) t.addEventListener("click", (e) => {
     e.preventDefault();
@@ -1171,6 +1176,7 @@ function mostrarJogos() {
     mostrarCanos();
   });
 }
+
 
 
 
