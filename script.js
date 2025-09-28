@@ -1146,7 +1146,7 @@ function mostrarJogos() {
 
 function mostrarTetrix() {
   const html = `
-    <div class="game-wrap tetrix-wrap">
+     <div class="game-wrap tetrix-page">
       <div class="game-header">
         <h2>🧩 Tetrix</h2>
         <div class="game-info">

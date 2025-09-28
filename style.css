@@ -4888,6 +4888,57 @@ html {
 .tetrix-actions .t-btn.secondary { background:#6b7280; }
 
 
+/* ====== Tetrix: preencher a tela do celular sem scroll ====== */
+:root { --app-top: 72px; } /* altura aproximada da sua navbar + margem superior da content_area */
+
+.tetrix-page {                /* wrapper da página do jogo */
+  height: calc(100dvh - var(--app-top));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tetrix-stage {               /* área que segura o canvas e os pads */
+  position: relative;
+  flex: 1;                    /* ocupa todo o espaço vertical que sobrar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;           /* evita transbordar */
+  touch-action: manipulation; /* melhora toques em mobile */
+}
+
+#tetrixCanvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  background:#111; border:6px solid #222; border-radius:12px;
+}
+
+/* Pads laterais (já tinha; apenas garantimos que respeitem o espaço) */
+.tetrix-pad {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 10px;
+  z-index: 2;
+}
+.tetrix-left  { left: 6px; }
+.tetrix-right { right: 6px; }
+.tetrix-btn {
+  padding: 10px 12px; border: 0; border-radius: 12px;
+  background: rgba(64,112,244,0.92); color: #fff; font-weight: 700;
+  backdrop-filter: blur(2px);
+}
+
+/* Esconde pads em telas grandes, onde o teclado é melhor */
+@media (min-width: 1024px) { .tetrix-pad { display: none; } }
+
+/* Ações (Voltar/Reiniciar) acima do canvas, não “empurram” além da tela */
+.tetrix-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.t-btn { padding: 8px 12px; border:0; border-radius:10px; background:#16a34a; color:#fff; font-weight:700; }
+.t-btn.secondary { background:#6b7280; }
+
+
 
 
 /* fim tetrix */
