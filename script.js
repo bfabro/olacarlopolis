@@ -117,7 +117,7 @@ function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", t
       .catch(() => alert("Não foi possível copiar o link."));
   }
 }
-
+window.compartilharPagina = compartilharPagina; // <<< adicione isto
 // Cria um botão flutuante único que sempre compartilha a página atual
 function criarShareFAB() {
   if (document.querySelector(".fab-share")) return; // evita duplicar
@@ -1116,10 +1116,11 @@ iniciarShareObserver();
 /// mostrar jogos
 
 function mostrarJogos() {
+  if (location.hash !== "#jogos") location.hash = "#jogos"; // garante URL compartilhável
   const html = `
     <div class="page-header">
   <h2>🎮 Jogos</h2>
-  <i class="fa-solid fa-share-nodes share-btn" onclick="compartilharPagina()"></i>
+  <i class="fa-solid fa-share-nodes share-btn"  onclick="compartilharPagina('#jogos','Jogos','Venha jogar no Olá Carlópolis!')"></i>
 </div>
 
 <div class="games-message">🎉 Divirta-se nesta sessão!</div>
