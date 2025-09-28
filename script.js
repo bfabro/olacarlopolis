@@ -11260,6 +11260,7 @@ function handleHashRoute() {
   if (h === "#ondecomer")  { return mostrarOndeComer(); }
   if (h === "#promocoes")  { return mostrarPromocoes(); }
   if (h === "#coletalixo") { return montarPaginaColetaLixo(); }
+  if (h === "#jogos") { return mostrarJogos(); }
 
   // categorias de "Comércios"
   const m = h.match(/^#comercios-(.+)$/);
