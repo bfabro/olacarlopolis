@@ -1191,7 +1191,7 @@ function mostrarTetrix() {
         <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
       </div>
 
-      <canvas id="tetrixCanvas" width="288" height="512" aria-label="Tetrix"></canvas>
+      <canvas id="tetrixCanvas" width="350" height="512" aria-label="Tetrix"></canvas>
 
       <div class="tetrix-actions" style="display:flex;gap:8px;justify-content:center">
         <button id="t-restart" class="tbtn" style="padding:8px 12px;border:0;border-radius:10px;background:#16a34a;color:#fff;font-weight:700">Reiniciar</button>
@@ -1221,7 +1221,7 @@ function mostrarTetrix() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   })();
 
-  const W = 288, H = 512;
+  const W = 350, H = 512;
   const COLS = 10, ROWS = 20;
 
   // campo 10x20 centralizado dentro de 288x512
