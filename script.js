@@ -1125,18 +1125,23 @@ function mostrarJogos() {
       <p>Escolha um jogo para começar:</p>
       <ul>
         <li><a href="#tetrix" id="linkTetrix">Tetrix (Tetris clássico)</a></li>
-        <!-- futuro: outros jogos aqui -->
+        <li><a href="#canos" id="linkCanos">Caninhos (passa pelos canos)</a></li>
       </ul>
     </div>
   `;
-  document.querySelector(".content_area").innerHTML = html; // container principal já existe :contentReference[oaicite:4]{index=4}
-  const l = document.getElementById("linkTetrix");
-  if (l) l.addEventListener("click", (e) => {
-    e.preventDefault();
-    location.hash = "tetrix";
-    mostrarTetrix();
+  document.querySelector(".content_area").innerHTML = html;
+
+  const l1 = document.getElementById("linkTetrix");
+  if (l1) l1.addEventListener("click", (e) => {
+    e.preventDefault(); location.hash = "tetrix"; mostrarTetrix();
+  });
+
+  const l2 = document.getElementById("linkCanos");
+  if (l2) l2.addEventListener("click", (e) => {
+    e.preventDefault(); location.hash = "canos"; mostrarCanos();
   });
 }
+
 
 
 function mostrarTetrix() {
@@ -1166,7 +1171,12 @@ function mostrarTetrix() {
   // ---- LÓGICA DO TETRIS ----
   const cvs = document.getElementById("tetrixCanvas");
   const ctx = cvs.getContext("2d");
-  const COLS = 10, ROWS = 20, SIZE = 20; // 10x20, 20px
+  const COLS = 10, ROWS = 20; // 10x20, 20px
+  // calcula tamanho do quadrado conforme a largura do canvas
+const SIZE = Math.floor(cvs.clientWidth / COLS);
+// garante altura proporcional
+cvs.height = SIZE * ROWS;
+cvs.width  = SIZE * COLS;
   const board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
   const colors = [ "#000", "#00f0f0", "#0000f0", "#f0a000", "#f0f000", "#00f000", "#a000f0", "#f00000" ]; // I J L O S T Z
 
@@ -1326,6 +1336,296 @@ function mostrarTetrix() {
   draw();
   requestAnimationFrame(update);
 }
+
+
+//// flayyoo canos
+
+function mostrarCanos() {
+  const html = `
+    <div class="game-wrap">
+      <div class="game-header">
+        <h2>🐦 Caninhos</h2>
+        <div class="flappy-ui">
+          <div class="scorebox">Pontos: <span id="f-score">0</span></div>
+          <div class="scorebox">Recorde: <span id="f-best">0</span></div>
+          <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
+        </div>
+      </div>
+      <canvas id="flappyCanvas" width="288" height="512" aria-label="Jogo Caninhos"></canvas>
+      <div class="flappy-buttons">
+        <button id="f-jump">Pular</button>
+        <button id="f-restart">Reiniciar</button>
+      </div>
+      <small>Controles: Clique/Toque/Barra de espaço/Seta ↑ para pular. Quanto mais longe, mais rápido!</small>
+    </div>
+  `;
+  document.querySelector(".content_area").innerHTML = html;
+
+  // --- Estado & Utilidades ---
+  const cvs = document.getElementById("flappyCanvas");
+  const ctx = cvs.getContext("2d");
+
+  // Suporte a alta densidade (DPR) para canvas mais nítido
+  (function scaleForDPR(){
+    const dpr = window.devicePixelRatio || 1;
+    const w = cvs.width, h = cvs.height;
+    cvs.width  = Math.round(w * dpr);
+    cvs.height = Math.round(h * dpr);
+    cvs.style.width  = w + "px";
+    cvs.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  })();
+
+  // Dimensões de jogo (lógicas)
+  const W = 288, H = 512;
+
+  // Pássaro
+  const bird = {
+    x: 50,
+    y: H * 0.5,
+    r: 12,           // raio (desenho do "pássaro")
+    vy: 0,
+    gravity: 0.35,   // gravidade
+    jump: -6.0       // impulso do pulo
+  };
+
+  // Canos
+  const pipes = [];
+  const PIPE_W = 52;          // largura do cano
+  const GAP0   = 110;         // gap base entre canos
+  const GAP_MIN = 80;         // gap mínimo ao ficar difícil
+  const SPAWN0 = 1500;        // intervalo base para nascer um par de canos (ms)
+  const SPEED0 = 2.0;         // velocidade base
+  const SPEED_MAX = 5.5;
+
+  // Dificuldade dinâmica
+  let speed = SPEED0;         // pixels por frame
+  let nextSpawn = 0;          // ms para o próximo spawn
+  let gap = GAP0;
+
+  // Pontuação
+  let score = 0;
+  let passedSet = new Set();  // ids de canos já pontuados
+  const BEST_KEY = "flappy_best";
+  let best = +(localStorage.getItem(BEST_KEY) || 0);
+  document.getElementById("f-best").textContent = best;
+
+  // Game loop
+  let last = 0;
+  let running = true;
+  let started = false;        // ainda parado até primeiro pulo
+  let timeSinceStart = 0;
+
+  function reset() {
+    pipes.length = 0;
+    bird.x = 50;
+    bird.y = H * 0.5;
+    bird.vy = 0;
+    score = 0;
+    speed = SPEED0;
+    gap = GAP0;
+    nextSpawn = 0;
+    passedSet.clear();
+    running = true;
+    started = false;
+    timeSinceStart = 0;
+    updateHUD();
+    draw(); // tela “pronta”
+  }
+
+  function spawnPipePair() {
+    const marginTop = 40, marginBottom = 80;
+    const maxTop = H - marginBottom - gap - marginTop;
+    const top = marginTop + Math.random() * Math.max(10, maxTop);
+    const id = performance.now(); // id simples
+    pipes.push({
+      id,
+      x: W + 10,
+      top: top,           // altura do cano de cima (fundo para baixo)
+      gap: gap,
+      w: PIPE_W,
+      scored: false
+    });
+  }
+
+  function updateHUD() {
+    document.getElementById("f-score").textContent = score;
+    document.getElementById("f-best").textContent  = best;
+  }
+
+  function jump() {
+    if (!running) return;
+    bird.vy = bird.jump;
+    started = true;
+  }
+
+  // Controles
+  document.getElementById("f-jump").onclick = jump;
+  document.getElementById("f-restart").onclick = reset;
+
+  function onKey(e) {
+    if (e.code === "Space" || e.key === "ArrowUp") {
+      e.preventDefault();
+      jump();
+    }
+  }
+  window.addEventListener("keydown", onKey);
+  cvs.addEventListener("pointerdown", jump);
+
+  function update(dt) {
+    if (!running) return;
+
+    timeSinceStart += dt;
+
+    // Aumenta dificuldade suavemente ao longo do tempo
+    // a cada 8s acelera um pouco, reduz gap até um mínimo
+    const t = timeSinceStart / 1000; // em segundos
+    speed = Math.min(SPEED_MAX, SPEED0 + t * 0.12); // cresce 0.12 px/s por segundo
+    gap   = Math.max(GAP_MIN, GAP0 - t * 2);        // reduz 2px no gap por segundo (até GAP_MIN)
+
+    if (started) {
+      // Física do pássaro
+      bird.vy += bird.gravity;
+      bird.y  += bird.vy;
+
+      // chão/teto
+      if (bird.y - bird.r < 0) {
+        bird.y = bird.r;
+        bird.vy = 0;
+      }
+      if (bird.y + bird.r > H - 20) { // “chão”
+        bird.y = H - 20 - bird.r;
+        gameOver();
+      }
+    }
+
+    // Spawning de canos
+    nextSpawn -= dt;
+    if (nextSpawn <= 0) {
+      spawnPipePair();
+      // intervalo dinâmico com base na velocidade (mantém densidade parecida)
+      const base = SPAWN0 * (SPEED0 / speed);
+      nextSpawn = Math.max(700, base); // não menor que 700ms
+    }
+
+    // Mover canos e checar colisão/pontuação
+    for (let i = pipes.length - 1; i >= 0; i--) {
+      const p = pipes[i];
+      p.x -= speed;
+
+      // colisão (bird círculo vs retângulos dos canos)
+      const topRect = { x: p.x, y: 0, w: p.w, h: p.top };
+      const bottomRect = { x: p.x, y: p.top + p.gap, w: p.w, h: H - (p.top + p.gap) };
+
+      if (circleRectCollide(bird.x, bird.y, bird.r, topRect) ||
+          circleRectCollide(bird.x, bird.y, bird.r, bottomRect)) {
+        gameOver();
+      }
+
+      // pontuação quando o centro do pássaro cruza o centro do cano
+      const pipeCenter = p.x + p.w / 2;
+      if (!p.scored && pipeCenter < bird.x) {
+        p.scored = true;
+        score++;
+        if (score > best) { best = score; localStorage.setItem(BEST_KEY, best); }
+        updateHUD();
+      }
+
+      // remover canos fora da tela
+      if (p.x + p.w < -20) pipes.splice(i, 1);
+    }
+  }
+
+  function circleRectCollide(cx, cy, cr, r) {
+    // aproximação: clamp do centro do círculo ao retângulo e mede distância
+    const dx = Math.max(r.x, Math.min(cx, r.x + r.w));
+    const dy = Math.max(r.y, Math.min(cy, r.y + r.h));
+    const dist2 = (cx - dx) ** 2 + (cy - dy) ** 2;
+    return dist2 <= cr ** 2;
+  }
+
+  function draw() {
+    // fundo
+    ctx.clearRect(0,0,W,H);
+
+    // chão simples
+    ctx.fillStyle = "#ded895";
+    ctx.fillRect(0, H - 20, W, 20);
+
+    // canos
+    for (const p of pipes) {
+      ctx.fillStyle = "#2ecc71";
+      // topo
+      ctx.fillRect(p.x, 0, p.w, p.top);
+      // “borda” do topo
+      ctx.fillRect(p.x - 2, p.top - 14, p.w + 4, 14);
+
+      // base
+      const by = p.top + p.gap;
+      ctx.fillRect(p.x, by, p.w, H - by);
+      // “borda” da base
+      ctx.fillRect(p.x - 2, by, p.w + 4, 14);
+    }
+
+    // pássaro
+    ctx.beginPath();
+    ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffcc00";
+    ctx.fill();
+    ctx.closePath();
+
+    // olho
+    ctx.beginPath();
+    ctx.arc(bird.x + 4, bird.y - 4, 3, 0, Math.PI * 2);
+    ctx.fillStyle = "#000";
+    ctx.fill();
+
+    // bico
+    ctx.fillStyle = "#ff6a00";
+    ctx.beginPath();
+    ctx.moveTo(bird.x + bird.r, bird.y);
+    ctx.lineTo(bird.x + bird.r + 8, bird.y - 3);
+    ctx.lineTo(bird.x + bird.r + 8, bird.y + 3);
+    ctx.closePath();
+    ctx.fill();
+
+    if (!running) {
+      ctx.fillStyle = "#000";
+      ctx.globalAlpha = 0.4;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 22px Poppins, Arial";
+      ctx.fillText("GAME OVER", 80, 200);
+      ctx.font = "16px Poppins, Arial";
+      ctx.fillText("Clique em Reiniciar", 82, 230);
+    }
+  }
+
+  function gameOver() {
+    running = false;
+    draw();
+  }
+
+  function loop(ts) {
+    if (!last) last = ts;
+    const dt = ts - last;
+    last = ts;
+
+    if (running) {
+      update(dt);
+      draw();
+      requestAnimationFrame(loop);
+    } else {
+      draw(); // garantir overlay
+    }
+  }
+
+  // Iniciar
+  reset();
+  requestAnimationFrame(loop);
+}
+
 
 
 
@@ -1490,14 +1790,17 @@ document.getElementById("menuJogos").addEventListener("click", function (e) {
 
 window.addEventListener("DOMContentLoaded", () => {
   const h = (location.hash || "").replace("#", "");
-  if (h === "jogos")      mostrarJogos();
+  if (h === "jogos")       mostrarJogos();
   else if (h === "tetrix") mostrarTetrix();
+  else if (h === "canos")  mostrarCanos();
 });
 window.addEventListener("hashchange", () => {
   const h = (location.hash || "").replace("#", "");
-  if (h === "jogos")      mostrarJogos();
+  if (h === "jogos")       mostrarJogos();
   else if (h === "tetrix") mostrarTetrix();
+  else if (h === "canos")  mostrarCanos();
 });
+
 
 
 

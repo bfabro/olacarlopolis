@@ -4831,6 +4831,31 @@ html {
 .game-wrap { display:flex; flex-direction:column; gap:12px; max-width:420px; }
 .game-header { display:flex; align-items:center; justify-content:space-between; }
 .game-info { font-weight:600; }
-#tetrixCanvas { background:#111; border:6px solid #222; border-radius:12px; width:100%; height:auto; image-rendering: pixelated; }
+/* Tetrix responsivo */
+#tetrixCanvas {
+  width: 100%;         /* ocupa toda a largura disponível */
+  height: auto;        /* mantém proporção */
+  max-width: 360px;    /* limite para não estourar em desktop */
+  display: block;
+  margin: 0 auto;      /* centraliza */
+}
+
 .game-keys { display:flex; gap:8px; flex-wrap:wrap; }
 .game-keys button { padding:10px 14px; border:0; border-radius:10px; background:#4070f4; color:#fff; font-weight:600; }
+
+
+/* ===== Caninhos (Flappy) ===== */
+#flappyCanvas {
+  background: linear-gradient(#70c5ce, #ffffff);
+  border: 6px solid #222;
+  border-radius: 12px;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+.flappy-ui { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.flappy-ui .scorebox { font-weight:700; }
+.flappy-buttons { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.flappy-buttons button {
+  padding:10px 14px; border:0; border-radius:10px; background:#16a34a; color:#fff; font-weight:700;
+}
