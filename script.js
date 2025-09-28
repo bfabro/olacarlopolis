@@ -1219,7 +1219,7 @@ function mostrarTetrix() {
  
 </div>
 
-      <small style="text-align:center;opacity:.8">👆 <b>Toque rápido</b>: Gira a peça <br>• ✋ <b>Segurar</b>: Queda rápida <br>• ↔️ <b>Arrastar</b>: mover para os lados</small>
+     
     </div>
   `;
 
