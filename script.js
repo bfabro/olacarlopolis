@@ -1200,7 +1200,13 @@ function mostrarTetrix() {
         <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
       </div>
 
-      <canvas id="tetrixCanvas" width="350" height="512" aria-label="Tetrix"></canvas>
+     <div class="canvas-box">
+  <canvas id="tetrixCanvas" width="350" height="512" aria-label="Tetrix"></canvas>
+  <div class="game-hint" id="tetrixHint">
+    👆 Toque rápido = girar • ✋ Segurar = queda rápida • ↔️ Arrastar = mover
+  </div>
+</div>
+
 
       <div class="tetrix-actions" style="display:flex;gap:8px;justify-content:center">
         <button id="t-restart" class="tbtn" style="padding:8px 12px;border:0;border-radius:10px;background:#16a34a;color:#fff;font-weight:700">Reiniciar</button>
@@ -1220,6 +1226,14 @@ function mostrarTetrix() {
   // ===== Canvas 288x512 (mesmo esquema do Capivarinha) =====
   const cvs = document.getElementById("tetrixCanvas");
   const ctx = cvs.getContext("2d");
+
+
+  // esconde a dica após 3.5s ou no primeiro toque
+const hint = document.getElementById("tetrixHint");
+const sumir = () => hint && hint.classList.add("hidden");
+setTimeout(sumir, 3500);
+cvs.addEventListener("pointerdown", sumir, { once: true });
+
   (function scaleForDPR(){
     const dpr = window.devicePixelRatio || 1;
     const w = cvs.width, h = cvs.height; // 288x512
@@ -1229,6 +1243,27 @@ function mostrarTetrix() {
     cvs.style.height = h + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   })();
+
+
+  // responsivo: reduz o canvas no browser conforme a largura disponível
+(function ajustarCanvasCSS() {
+  const box = document.querySelector(".canvas-box");
+  if (!box) return;
+
+  function setSize() {
+    // espaço máximo e mínimo para o canvas (desktop fica mais enxuto)
+    const maxW = Math.min(360, box.clientWidth - 8);
+    const target = Math.max(260, maxW);     // clamp
+    const ratio = 512 / 350;                // mesmo aspecto do jogo
+
+    cvs.style.width  = target + "px";
+    cvs.style.height = Math.round(target * ratio) + "px";
+  }
+
+  setSize();
+  window.addEventListener("resize", setSize);
+})();
+
 
   const W = 350, H = 512;
   const COLS = 10, ROWS = 20;

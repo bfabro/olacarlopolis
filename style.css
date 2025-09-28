@@ -4821,6 +4821,17 @@ html {
 .game-header .btn-share {
   display: none !important;
 }
+
+.game-wrap { position: relative; align-items: center; }
+.canvas-box { position: relative; }
+
+.game-hint{
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.65); color: #fff; padding: 6px 10px;
+  border-radius: 12px; font-size: 12px; line-height: 1.3; text-align: center;
+  max-width: 92%; pointer-events: none; user-select: none;
+}
+
 /* Tetrix responsivo */
 #tetrixCanvas {
   width: 100%;         /* ocupa toda a largura disponível */
