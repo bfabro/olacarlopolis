@@ -4844,6 +4844,54 @@ html {
 .game-keys button { padding:10px 14px; border:0; border-radius:10px; background:#4070f4; color:#fff; font-weight:600; }
 
 
+
+/* ====== Tetrix: layout mobile com controles laterais ====== */
+.tetrix-wrap { max-width: 420px; margin: 0 auto; }
+.tetrix-stage { position: relative; }
+
+#tetrixCanvas {
+  width: 100%; height: auto; display: block; margin: 0 auto;
+  max-width: 360px; image-rendering: pixelated;
+  background:#111; border:6px solid #222; border-radius:12px;
+}
+
+/* Pads laterais fixos ao canvas */
+.tetrix-pad {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.tetrix-left  { left: 6px; }
+.tetrix-right { right: 6px; }
+
+.tetrix-btn {
+  padding: 10px 12px; border: 0; border-radius: 12px;
+  background: rgba(64,112,244,0.92); color: #fff; font-weight: 700;
+  backdrop-filter: blur(2px);
+}
+
+/* Esconde os pads no desktop (setas do teclado já bastam) */
+@media (min-width: 1024px) {
+  .tetrix-pad { display: none; }
+}
+
+/* Header e info */
+.game-wrap { display:flex; flex-direction:column; gap:12px; }
+.game-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.game-info { font-weight:600; }
+
+/* Botões auxiliares (Voltar / Reiniciar) acima do canvas */
+.tetrix-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.tetrix-actions .t-btn {
+  padding: 8px 12px; border:0; border-radius:10px; background:#16a34a; color:#fff; font-weight:700;
+}
+.tetrix-actions .t-btn.secondary { background:#6b7280; }
+
+
+
+
+/* fim tetrix */
+
 /* ===== Caninhos (Flappy) ===== */
 #flappyCanvas {
   background: linear-gradient(#70c5ce, #ffffff);

@@ -1146,24 +1146,35 @@ function mostrarJogos() {
 
 function mostrarTetrix() {
   const html = `
-    <div class="game-wrap">
+    <div class="game-wrap tetrix-wrap">
       <div class="game-header">
         <h2>🧩 Tetrix</h2>
         <div class="game-info">
           Pontos: <span id="t-score">0</span> • Linhas: <span id="t-lines">0</span> • Nível: <span id="t-level">1</span>
         </div>
-        <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
       </div>
-      <canvas id="tetrixCanvas" width="200" height="400"></canvas>
-      <div class="game-keys">
-        <button id="t-left">◀</button>
-        <button id="t-rot">⟳</button>
-        <button id="t-right">▶</button>
-        <button id="t-down">▼</button>
-        <button id="t-drop">DROP</button>
-        <button id="t-restart">Reiniciar</button>
+
+      <div class="tetrix-actions">
+        <button class="t-btn secondary" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
+        <button id="t-restart" class="t-btn">Reiniciar</button>
       </div>
-      <small>Dicas: Setas movem, ⟳ gira (ou ↑), Espaço = Drop.</small>
+
+      <div class="tetrix-stage">
+        <canvas id="tetrixCanvas" width="200" height="400" aria-label="Tetrix"></canvas>
+
+        <!-- Pads laterais mobile -->
+        <div class="tetrix-pad tetrix-left">
+          <button id="t-left" class="tetrix-btn" aria-label="Esquerda">◀</button>
+          <button id="t-rot"  class="tetrix-btn" aria-label="Girar">⟳</button>
+        </div>
+        <div class="tetrix-pad tetrix-right">
+          <button id="t-right" class="tetrix-btn" aria-label="Direita">▶</button>
+          <button id="t-down"  class="tetrix-btn" aria-label="Descer">▼</button>
+          <button id="t-drop"  class="tetrix-btn" aria-label="Drop">DROP</button>
+        </div>
+      </div>
+
+      <small>Dicas: Setas movem, ↑ gira, Espaço = Drop. No celular, use os botões laterais.</small>
     </div>
   `;
   document.querySelector(".content_area").innerHTML = html;
