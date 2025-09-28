@@ -11258,6 +11258,7 @@ function handleHashRoute() {
 
   if (h === "#ondecomer")  { return mostrarOndeComer(); }
   if (h === "#promocoes")  { return mostrarPromocoes(); }
+  if (h === "#coletalixo") { return montarPaginaColetaLixo(); }
 
   // categorias de "Comércios"
   const m = h.match(/^#comercios-(.+)$/);
