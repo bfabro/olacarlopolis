@@ -1349,7 +1349,7 @@ function mostrarCanos() {
         </div>
       </div>
 
-      <canvas id="flappyCanvas" width="480" height="512" aria-label="Capivarinha"></canvas>
+      <canvas id="flappyCanvas" width="350" height="512" aria-label="Capivarinha"></canvas>
 
       <div class="flappy-buttons">
         <button id="f-jump">Pular</button>
@@ -1373,7 +1373,7 @@ function mostrarCanos() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   })();
 
-  const W = 480, H = 512;
+  const W = 350, H = 512;
 
   // Capivara (inicia na grama)
   const capy = { x: 28, y: H - 40, r: 12, vy: 0, gravity: 0.35, jump: -6.0 };
