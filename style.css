@@ -4830,6 +4830,12 @@ html {
   margin: 0 auto;      /* centraliza */
 }
 
+/* melhora toques em mobile na área do jogo */
+.tetrix-stage { touch-action: manipulation; }
+/* garante que o canvas não role/zoom ao arrastar */
+#tetrixCanvas { touch-action: none; }
+
+
 .game-keys { display:flex; gap:8px; flex-wrap:wrap; }
 .game-keys button { padding:10px 14px; border:0; border-radius:10px; background:#4070f4; color:#fff; font-weight:600; }
 

@@ -1199,11 +1199,7 @@ function mostrarTetrix() {
 
       <!-- NOVO: controles mobile -->
       <div class="tetrix-keys">
-  <button id="t-left">◀</button>
-  <button id="t-rot">⟳</button>
-  <button id="t-right">▶</button>
-  <button id="t-down">▼</button>
-  <button id="t-drop">DROP</button>
+
   <!-- NOVO: segure para descer continuamente -->
   <button id="t-fast" title="Segure para descer rápido">▼▼</button>
 </div>
@@ -1245,6 +1241,96 @@ function mostrarTetrix() {
     Z:[[7,7,0],[0,7,7],[0,0,0]]
   };
   const TYPES  = Object.keys(SHAPES);
+
+
+
+  // ===== Gestos no canvas: arrastar move, toque curto gira =====
+(() => {
+  const rectOf = () => cvs.getBoundingClientRect();
+
+  const gesture = {
+    active: false,
+    startX: 0,
+    lastStepX: 0,
+    moved: false,
+    t0: 0
+  };
+
+  // largura mínima em pixels para considerar 1 "passo" lateral
+  const STEP_PX = Math.max(10, Math.floor(SIZE * 0.6));
+
+  function toCanvasX(clientX) {
+    const r = rectOf();
+    return clientX - r.left;
+  }
+
+  function onDown(e) {
+    e.preventDefault();
+    const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+    const x = toCanvasX(clientX);
+
+    gesture.active = true;
+    gesture.startX = x;
+    gesture.lastStepX = x;
+    gesture.moved = false;
+    gesture.t0 = performance.now();
+
+    // captura do ponteiro (melhor para desktop)
+    if (cvs.setPointerCapture && e.pointerId !== undefined) {
+      cvs.setPointerCapture(e.pointerId);
+    }
+  }
+
+  function onMove(e) {
+    if (!gesture.active) return;
+    const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+    const x = toCanvasX(clientX);
+
+    const dx = x - gesture.lastStepX;
+    if (Math.abs(dx) >= STEP_PX) {
+      const steps = Math.trunc(dx / STEP_PX);
+      const dir = Math.sign(steps);
+      const times = Math.abs(steps);
+      for (let i = 0; i < times; i++) move(dir, 0);
+      gesture.lastStepX += steps * STEP_PX;
+      gesture.moved = true;
+    }
+  }
+
+  function onUp(e) {
+    if (!gesture.active) return;
+    e.preventDefault();
+    const elapsed = performance.now() - gesture.t0;
+
+    // Se não arrastou e foi um toque/clique rápido -> gira
+    if (!gesture.moved && elapsed < 250) {
+      rotateTry();
+    }
+
+    gesture.active = false;
+
+    if (cvs.releasePointerCapture && e.pointerId !== undefined) {
+      try { cvs.releasePointerCapture(e.pointerId); } catch {}
+    }
+  }
+
+  // Pointer Events (desktop e mobile modernos)
+  if ("onpointerdown" in window) {
+    cvs.addEventListener("pointerdown", onDown, { passive: false });
+    cvs.addEventListener("pointermove", onMove, { passive: false });
+    cvs.addEventListener("pointerup", onUp, { passive: false });
+    cvs.addEventListener("pointercancel", onUp, { passive: false });
+  } else {
+    // Fallback: touch + mouse
+    cvs.addEventListener("touchstart", onDown, { passive: false });
+    cvs.addEventListener("touchmove", onMove, { passive: false });
+    cvs.addEventListener("touchend", onUp, { passive: false });
+    cvs.addEventListener("mousedown", onDown);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }
+})();
+
 
   let grid, px, py, running = true;
   let score=0, lines=0, level=1, drop=800, last=0, acc=0;
