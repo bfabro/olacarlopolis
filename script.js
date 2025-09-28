@@ -1201,7 +1201,7 @@ function mostrarTetrix() {
       <div class="tetrix-keys">
 
   <!-- NOVO: segure para descer continuamente -->
-  <button id="t-fast" title="Segure para descer rápido">▼▼</button>
+ 
 </div>
 
       <small style="text-align:center;opacity:.8">Controles: ← → ↓ movem, ↑ gira, Espaço = Drop. No celular, use os botões.</small>
@@ -1245,6 +1245,7 @@ function mostrarTetrix() {
 
 
   // ===== Gestos no canvas: arrastar move, toque curto gira =====
+// ===== Gestos no canvas: arrastar move, toque curto gira, segurar = queda rápida =====
 (() => {
   const rectOf = () => cvs.getBoundingClientRect();
 
@@ -1256,13 +1257,26 @@ function mostrarTetrix() {
     t0: 0
   };
 
-  // largura mínima em pixels para considerar 1 "passo" lateral
-  const STEP_PX = Math.max(10, Math.floor(SIZE * 0.6));
+  const STEP_PX = Math.max(10, Math.floor(SIZE * 0.6)); // deslocamento p/ 1 passo lateral
+  const LONG_PRESS_MS = 300;  // tempo para acionar queda rápida
+  const FAST_INTERVAL_MS = 30;
 
-  function toCanvasX(clientX) {
-    const r = rectOf();
-    return clientX - r.left;
-  }
+  let longTO = null;   // timeout para começar a queda rápida
+  let fastTimer = null;// interval enquanto segurando
+  let fastActive = false;
+
+  const startFast = () => {
+    if (fastActive) return;
+    fastActive = true;
+    fastTimer = setInterval(() => { move(0, 1); }, FAST_INTERVAL_MS);
+  };
+  const stopFast = () => {
+    fastActive = false;
+    if (fastTimer) { clearInterval(fastTimer); fastTimer = null; }
+  };
+  const clearLong = () => { if (longTO) { clearTimeout(longTO); longTO = null; } };
+
+  const toCanvasX = (clientX) => clientX - rectOf().left;
 
   function onDown(e) {
     e.preventDefault();
@@ -1275,7 +1289,11 @@ function mostrarTetrix() {
     gesture.moved = false;
     gesture.t0 = performance.now();
 
-    // captura do ponteiro (melhor para desktop)
+    // programa long-press (queda rápida)
+    clearLong();
+    stopFast();
+    longTO = setTimeout(startFast, LONG_PRESS_MS);
+
     if (cvs.setPointerCapture && e.pointerId !== undefined) {
       cvs.setPointerCapture(e.pointerId);
     }
@@ -1287,6 +1305,12 @@ function mostrarTetrix() {
     const x = toCanvasX(clientX);
 
     const dx = x - gesture.lastStepX;
+
+    // Se começou a arrastar lateral, cancela o long-press (para não ativar queda)
+    if (!gesture.moved && Math.abs(x - gesture.startX) > 12) {
+      clearLong();
+    }
+
     if (Math.abs(dx) >= STEP_PX) {
       const steps = Math.trunc(dx / STEP_PX);
       const dir = Math.sign(steps);
@@ -1300,28 +1324,30 @@ function mostrarTetrix() {
   function onUp(e) {
     if (!gesture.active) return;
     e.preventDefault();
+
     const elapsed = performance.now() - gesture.t0;
 
-    // Se não arrastou e foi um toque/clique rápido -> gira
-    if (!gesture.moved && elapsed < 250) {
+    // Se não arrastou, não acionou fast e foi um toque curto -> gira
+    if (!gesture.moved && !fastActive && elapsed < 250) {
       rotateTry();
     }
 
+    // encerra estados do gesto
     gesture.active = false;
+    clearLong();
+    stopFast();
 
     if (cvs.releasePointerCapture && e.pointerId !== undefined) {
       try { cvs.releasePointerCapture(e.pointerId); } catch {}
     }
   }
 
-  // Pointer Events (desktop e mobile modernos)
   if ("onpointerdown" in window) {
     cvs.addEventListener("pointerdown", onDown, { passive: false });
     cvs.addEventListener("pointermove", onMove, { passive: false });
     cvs.addEventListener("pointerup", onUp, { passive: false });
     cvs.addEventListener("pointercancel", onUp, { passive: false });
   } else {
-    // Fallback: touch + mouse
     cvs.addEventListener("touchstart", onDown, { passive: false });
     cvs.addEventListener("touchmove", onMove, { passive: false });
     cvs.addEventListener("touchend", onUp, { passive: false });
@@ -1330,6 +1356,7 @@ function mostrarTetrix() {
     window.addEventListener("mouseup", onUp);
   }
 })();
+
 
 
   let grid, px, py, running = true;
@@ -1422,15 +1449,7 @@ function mostrarTetrix() {
   }
 
 
-  // Toque/clique no canvas = girar a peça
-cvs.addEventListener("click", (e) => {
-  e.preventDefault();
-  rotateTry();
-});
-cvs.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  rotateTry();
-}, { passive: false });
+
 
 
   // Teclado (desktop)
