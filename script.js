@@ -1990,7 +1990,7 @@ for (const f of fishes) drawFish(f);
     // Overlays
     if (!started && running) {
       ctx.fillStyle="#fff"; ctx.font="16px Poppins,Arial";
-      ctx.fillText("Toque em Pular para entrar no rio", 30, 180);
+      ctx.fillText("Toque em Pular para entrar no rio", 50, 180);
     }
   if (!running) {
   ctx.fillStyle = "rgba(0,0,0,0.6)";
