@@ -1480,6 +1480,19 @@ function mostrarTetrix() {
   // Descer continuamente enquanto o botão estiver pressionado
 (function setupFastHold(){
   const fastBtn = document.getElementById("t-fast");
+
+
+  if (fastBtn) {
+  // bloqueia seleção, clique padrão e menu de contexto
+  ["selectstart", "contextmenu"].forEach(ev =>
+    fastBtn.addEventListener(ev, e => e.preventDefault())
+  );
+
+  // já deve existir algo assim para acelerar; garanta preventDefault/stopPropagation:
+  fastBtn.addEventListener("mousedown", (e) => { e.preventDefault(); e.stopPropagation(); /* startFast() */ });
+  fastBtn.addEventListener("touchstart", (e) => { e.preventDefault(); e.stopPropagation(); /* startFast() */ }, { passive: false });
+}
+
   if (!fastBtn) return;
 
   let fastTimer = null;
