@@ -1213,7 +1213,7 @@ function mostrarTetrix() {
  
 </div>
 
-      <small style="text-align:center;opacity:.8">Controles: 👆 Toque rápido</b>: Gira a peça <br>• ✋ <b>Segurar</b>: Queda rápida <br>• ↔️ <b>Arrastar</b>: mover para os lados</small>
+      <small style="text-align:center;opacity:.8">👆 <b>Toque rápido</b>: Gira a peça <br>• ✋ <b>Segurar</b>: Queda rápida <br>• ↔️ <b>Arrastar</b>: mover para os lados</small>
     </div>
   `;
 
@@ -1990,7 +1990,7 @@ for (const f of fishes) drawFish(f);
     // Overlays
     if (!started && running) {
       ctx.fillStyle="#fff"; ctx.font="16px Poppins,Arial";
-      ctx.fillText("Toque em Pular para entrar no rio", 45, 180);
+      ctx.fillText("Toque em Pular para entrar na represa", 45, 180);
     }
   if (!running) {
   ctx.fillStyle = "rgba(0,0,0,0.6)";
