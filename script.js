@@ -11519,12 +11519,24 @@ window.addEventListener('beforeinstallprompt', (e) => {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
 
- document.addEventListener("DOMContentLoaded", () => {
+// iOS: caixinha fixa
+document.addEventListener("DOMContentLoaded", () => {
   if (isIos() && !isInStandaloneMode() && !estaNosJogos()) {
     const box = document.getElementById("iosInstallBox");
     if (box) box.classList.remove("hidden");
   }
 });
+
+// iOS (Safari): modal temporizada
+document.addEventListener("DOMContentLoaded", () => {
+  if (isIosSafari() && !isInStandaloneMode() && !estaNosJogos()) {
+    setTimeout(() => {
+      const modal = document.getElementById("iosInstallPrompt");
+      if (modal) modal.classList.remove("hidden");
+    }, 2500);
+  }
+});
+
 
 
 
@@ -11592,15 +11604,22 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
 
 let promptInstalacao = null;
 
-// Detecta o momento em que o navegador permite instalar o PWA
 window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault(); // Impede o prompt automático
-  promptInstalacao = e;
+  // NUNCA mostrar no hub de jogos ou dentro dos jogos
+  if (estaNosJogos()) {
+    e.preventDefault();
+    promptInstalacao = null;
+    document.getElementById("instalarAppBox")?.classList.add("hidden");
+    document.getElementById("barraInstalacao")?.style && (document.getElementById("barraInstalacao").style.display = "none");
+    return;
+  }
 
-  // Exibe a modal personalizada
-  const box = document.getElementById("instalarAppBox");
-  if (box) box.classList.remove("hidden");
+  // fora dos jogos, segue o fluxo normal
+  e.preventDefault();
+  promptInstalacao = e;
+  document.getElementById("instalarAppBox")?.classList.remove("hidden");
 });
+
 
 // Quando o usuário clicar no botão "Adicionar"
 document.getElementById("btnInstalarPWA")?.addEventListener("click", () => {
