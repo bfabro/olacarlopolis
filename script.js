@@ -1574,11 +1574,12 @@ function drawRiverCapy(rc){
     if (!running) return;
 
     // o rio “vive” mesmo antes de começar
-    phase += speed * 0.6;
+    
 
     if (started) {
       timeSinceStart += dt;
       const t = timeSinceStart / 1000;
+      phase += speed * 0.6;
 
       // velocidade/dificuldade
       speed = Math.min(SPEED_MAX, SPEED0 + t*0.12);
@@ -1726,10 +1727,12 @@ for (const f of fishes) drawFish(f);
       ctx.fillText("Toque em Pular para entrar no rio", 24, 240);
     }
     if (!running) {
-      ctx.fillStyle = "#000"; ctx.globalAlpha = 0.4; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = "#000"; 
+      ctx.globalAlpha = 0.4; 
+      ctx.fillRect(0,0,W,H);ctx.textAlign = "center";
       ctx.globalAlpha = 1; ctx.fillStyle = "#fff"; ctx.font = "bold 22px Poppins, Arial";
-      ctx.fillText("GAME OVER", 80, 200);
-      ctx.font = "16px Poppins, Arial"; ctx.fillText("Clique em Reiniciar", 82, 230);
+      ctx.fillText("A capivara saiu do rio", W / 2, H / 2);
+      
     }
   }
 
