@@ -1199,12 +1199,14 @@ function mostrarTetrix() {
 
       <!-- NOVO: controles mobile -->
       <div class="tetrix-keys">
-        <button id="t-left">◀</button>
-        <button id="t-rot">⟳</button>
-        <button id="t-right">▶</button>
-        <button id="t-down">▼</button>
-        <button id="t-drop">DROP</button>
-      </div>
+  <button id="t-left">◀</button>
+  <button id="t-rot">⟳</button>
+  <button id="t-right">▶</button>
+  <button id="t-down">▼</button>
+  <button id="t-drop">DROP</button>
+  <!-- NOVO: segure para descer continuamente -->
+  <button id="t-fast" title="Segure para descer rápido">▼▼</button>
+</div>
 
       <small style="text-align:center;opacity:.8">Controles: ← → ↓ movem, ↑ gira, Espaço = Drop. No celular, use os botões.</small>
     </div>
@@ -1333,6 +1335,18 @@ function mostrarTetrix() {
     draw(); requestAnimationFrame(loop);
   }
 
+
+  // Toque/clique no canvas = girar a peça
+cvs.addEventListener("click", (e) => {
+  e.preventDefault();
+  rotateTry();
+});
+cvs.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  rotateTry();
+}, { passive: false });
+
+
   // Teclado (desktop)
   addEventListener("keydown", e=>{
     if(!running) return;
@@ -1356,6 +1370,38 @@ function mostrarTetrix() {
   onTap("t-down",  () => move(0,1));
   onTap("t-rot",   () => rotateTry());
   onTap("t-drop",  () => hardDrop());
+
+
+  // Descer continuamente enquanto o botão estiver pressionado
+(function setupFastHold(){
+  const fastBtn = document.getElementById("t-fast");
+  if (!fastBtn) return;
+
+  let fastTimer = null;
+
+  const startFast = () => {
+    if (!running || fastTimer) return;
+    // desce suavemente a cada 30ms
+    fastTimer = setInterval(() => { move(0, 1); }, 30);
+  };
+  const stopFast = () => {
+    if (fastTimer) {
+      clearInterval(fastTimer);
+      fastTimer = null;
+    }
+  };
+
+  // mouse
+  fastBtn.addEventListener("mousedown", (e) => { e.preventDefault(); startFast(); });
+  window.addEventListener("mouseup", stopFast);
+  fastBtn.addEventListener("mouseleave", stopFast);
+
+  // touch
+  fastBtn.addEventListener("touchstart", (e) => { e.preventDefault(); startFast(); }, { passive: false });
+  window.addEventListener("touchend", stopFast);
+  window.addEventListener("touchcancel", stopFast);
+})();
+
 
   document.getElementById("t-restart").onclick = ()=>{
     for(let y=0;y<ROWS;y++) board[y].fill(0);
