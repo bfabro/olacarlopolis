@@ -1145,208 +1145,190 @@ function mostrarJogos() {
 
 
 function mostrarTetrix() {
-  const html = `
-     <div class="game-wrap tetrix-page">
-      <div class="game-header">
+  // === Markup mínimo, tudo dentro da content_area ===
+  document.querySelector(".content_area").innerHTML = `
+    <div class="tetrix-screen">
+      <div class="tetrix-bar">
         <h2>🧩 Tetrix</h2>
-        <div class="game-info">
-          Pontos: <span id="t-score">0</span> • Linhas: <span id="t-lines">0</span> • Nível: <span id="t-level">1</span>
-        </div>
+        <div class="tetrix-info">Pontos: <span id="t-score">0</span> • Linhas: <span id="t-lines">0</span> • Nível: <span id="t-level">1</span></div>
       </div>
 
       <div class="tetrix-actions">
-        <button class="t-btn secondary" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
-        <button id="t-restart" class="t-btn">Reiniciar</button>
+        <button class="tbtn secondary" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
+        <button id="t-restart" class="tbtn">Reiniciar</button>
       </div>
 
       <div class="tetrix-stage">
         <canvas id="tetrixCanvas" width="200" height="400" aria-label="Tetrix"></canvas>
-
-        <!-- Pads laterais mobile -->
-        <div class="tetrix-pad tetrix-left">
-          <button id="t-left" class="tetrix-btn" aria-label="Esquerda">◀</button>
-          <button id="t-rot"  class="tetrix-btn" aria-label="Girar">⟳</button>
-        </div>
-        <div class="tetrix-pad tetrix-right">
-          <button id="t-right" class="tetrix-btn" aria-label="Direita">▶</button>
-          <button id="t-down"  class="tetrix-btn" aria-label="Descer">▼</button>
-          <button id="t-drop"  class="tetrix-btn" aria-label="Drop">DROP</button>
-        </div>
       </div>
 
-      <small>Dicas: Setas movem, ↑ gira, Espaço = Drop. No celular, use os botões laterais.</small>
+      <div class="tips">Controles: ← → ↓ movem, ↑ gira, Espaço = Drop</div>
     </div>
   `;
-  document.querySelector(".content_area").innerHTML = html;
 
-  // ---- LÓGICA DO TETRIS ----
+  // === Setup e dimensionamento SEM SCROLL ===
   const cvs = document.getElementById("tetrixCanvas");
   const ctx = cvs.getContext("2d");
-  const COLS = 10, ROWS = 20; // 10x20, 20px
-  // calcula tamanho do quadrado conforme a largura do canvas
-const SIZE = Math.floor(cvs.clientWidth / COLS);
-// garante altura proporcional
-cvs.height = SIZE * ROWS;
-cvs.width  = SIZE * COLS;
-  const board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
-  const colors = [ "#000", "#00f0f0", "#0000f0", "#f0a000", "#f0f000", "#00f000", "#a000f0", "#f00000" ]; // I J L O S T Z
+  const stage = document.querySelector(".tetrix-stage");
+  const bar   = document.querySelector(".tetrix-bar");
+  const acts  = document.querySelector(".tetrix-actions");
+  const tips  = document.querySelector(".tips");
 
-  // Peças (matrizes 4x4)
+  const COLS = 10, ROWS = 20;
+  let SIZE = 20; // será recalculado
+  function sizeCanvas() {
+    // espaço horizontal disponível
+    const availW = stage.clientWidth;
+
+    // altura da viewport menos (barra + ações + dicas + paddings)
+    const used = bar.offsetHeight + acts.offsetHeight + tips.offsetHeight + 16 /*margem interna*/;
+    const availH = Math.max(120, window.innerHeight - used);
+
+    // cada célula é o mínimo entre caber na largura (10 colunas) e na altura (20 linhas)
+    SIZE = Math.max(8, Math.floor(Math.min(availW / COLS, availH / ROWS)));
+
+    cvs.width  = SIZE * COLS;
+    cvs.height = SIZE * ROWS;
+    // não seto style.width/height: o elemento já encaixa sem estourar
+  }
+
+  sizeCanvas();
+  addEventListener("resize", sizeCanvas, { passive:true });
+  addEventListener("orientationchange", sizeCanvas, { passive:true });
+
+  // === Estado & peças essenciais (limpo) ===
+  const board  = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+  const colors = ["#000","#00f0f0","#0000f0","#f0a000","#f0f000","#00f000","#a000f0","#f00000"]; // I J L O S T Z
   const SHAPES = {
-    I: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
-    J: [[2,0,0],[2,2,2],[0,0,0]],
-    L: [[0,0,3],[3,3,3],[0,0,0]],
-    O: [[4,4],[4,4]],
-    S: [[0,5,5],[5,5,0],[0,0,0]],
-    T: [[0,6,0],[6,6,6],[0,0,0]],
-    Z: [[7,7,0],[0,7,7],[0,0,0]],
+    I:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
+    J:[[2,0,0],[2,2,2],[0,0,0]],
+    L:[[0,0,3],[3,3,3],[0,0,0]],
+    O:[[4,4],[4,4]],
+    S:[[0,5,5],[5,5,0],[0,0,0]],
+    T:[[0,6,0],[6,6,6],[0,0,0]],
+    Z:[[7,7,0],[0,7,7],[0,0,0]]
   };
-  const TYPES = Object.keys(SHAPES);
+  const TYPES  = Object.keys(SHAPES);
 
-  let piece, px, py, grid, score=0, lines=0, level=1, dropInterval=800, lastTime=0, acc=0, running=true;
+  let grid, px, py, running = true;
+  let score=0, lines=0, level=1, drop=800, last=0, acc=0;
 
-  function newPiece() {
+  function newPiece(){
     const t = TYPES[(Math.random()*TYPES.length)|0];
     grid = SHAPES[t].map(r => r.slice());
     px = ((COLS/2)|0) - ((grid[0].length/2)|0);
     py = 0;
-    piece = t;
-    if (collide(px, py, grid)) { // game over
-      running = false;
-      draw(); // mostra "GAME OVER"
-    }
+    if (collide(px,py,grid)) { running=false; draw(); }
   }
 
-  function rotate(g) {
-    const N = g.length;
-    const r = Array.from({length:N}, () => Array(N).fill(0));
-    for (let y=0;y<N;y++) for (let x=0;x<N;x++) r[x][N-1-y]=g[y][x];
+  function rotate(m){
+    const N=m.length, r=Array.from({length:N},()=>Array(N).fill(0));
+    for(let y=0;y<N;y++) for(let x=0;x<N;x++) r[x][N-1-y]=m[y][x];
     return r;
   }
 
-  function collide(nx, ny, g) {
-    for (let y=0;y<g.length;y++) for (let x=0;x<g[y].length;x++) {
-      if (!g[y][x]) continue;
-      const X = nx + x, Y = ny + y;
-      if (X<0 || X>=COLS || Y>=ROWS) return true;
-      if (Y>=0 && board[Y][X]) return true;
+  function collide(nx,ny,m){
+    for(let y=0;y<m.length;y++) for(let x=0;x<m[y].length;x++){
+      if(!m[y][x]) continue;
+      const X=nx+x, Y=ny+y;
+      if(X<0||X>=COLS||Y>=ROWS) return true;
+      if(Y>=0 && board[Y][X])   return true;
     }
     return false;
   }
 
-  function merge() {
-    for (let y=0;y<grid.length;y++) for (let x=0;x<grid[y].length;x++) {
-      if (grid[y][x] && py+y>=0) board[py+y][px+x] = grid[y][x];
-    }
+  function merge(){
+    for(let y=0;y<grid.length;y++)
+      for(let x=0;x<grid[y].length;x++)
+        if(grid[y][x] && py+y>=0) board[py+y][px+x]=grid[y][x];
+
     // limpar linhas
-    let cleared=0;
-    outer: for (let y=ROWS-1;y>=0;y--) {
-      for (let x=0;x<COLS;x++) if (!board[y][x]) continue outer;
-      // linha cheia
-      board.splice(y,1);
-      board.unshift(Array(COLS).fill(0));
-      cleared++; y++;
+    let c=0;
+    outer: for(let y=ROWS-1;y>=0;y--){
+      for(let x=0;x<COLS;x++) if(!board[y][x]) continue outer;
+      board.splice(y,1); board.unshift(Array(COLS).fill(0));
+      c++; y++;
     }
-    if (cleared>0) {
-      lines += cleared;
-      score += [0, 40, 100, 300, 1200][cleared] * level;
-      if (lines >= level*10 && level < 20) { level++; dropInterval = Math.max(100, dropInterval-60); }
-      updateHUD();
+    if(c){
+      lines+=c;
+      score += [0,40,100,300,1200][c]*level;
+      if(lines >= level*10 && level<20){ level++; drop=Math.max(100, drop-60); }
+      hud();
     }
   }
 
-  function hardDrop() {
-    while (!collide(px, py+1, grid)) py++;
-    step();
+  function move(dx,dy){
+    if(!running) return false;
+    const nx=px+dx, ny=py+dy;
+    if(!collide(nx,ny,grid)){ px=nx; py=ny; return true; }
+    return false;
   }
 
-  function drawCell(x, y, v) {
+  function rotateTry(){
+    const r = rotate(grid);
+    if(!collide(px,py,r)) { grid=r; return; }
+    if(!collide(px-1,py,r)){ px--; grid=r; return; }
+    if(!collide(px+1,py,r)){ px++; grid=r; return; }
+  }
+
+  function hardDrop(){ while(!collide(px,py+1,grid)) py++; step(); }
+
+  function step(){ merge(); newPiece(); }
+
+  function drawCell(x,y,v){
     ctx.fillStyle = colors[v];
     ctx.fillRect(x*SIZE, y*SIZE, SIZE-1, SIZE-1);
   }
 
-  function draw() {
-    // fundo
+  function draw(){
     ctx.fillStyle="#000"; ctx.fillRect(0,0,cvs.width,cvs.height);
-    // board
-    for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++) drawCell(x,y,board[y][x]);
-    // peça
-    if (running) {
-      for (let y=0;y<grid.length;y++) for (let x=0;x<grid[y].length;x++) {
-        const v = grid[y][x]; if (!v) continue;
-        const Y = py+y; const X = px+x;
-        if (Y>=0) drawCell(X, Y, v);
-      }
+    for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++) drawCell(x,y,board[y][x]);
+    if(running){
+      for(let y=0;y<grid.length;y++)
+        for(let x=0;x<grid[y].length;x++){
+          const v=grid[y][x]; if(!v) continue;
+          const Y=py+y, X=px+x; if(Y>=0) drawCell(X,Y,v);
+        }
     } else {
-      ctx.fillStyle="#fff";
-      ctx.font="bold 20px Poppins";
-      ctx.fillText("GAME OVER", 30, 180);
-      ctx.fillText("Reinicie para jogar", 16, 210);
+      ctx.fillStyle="#fff"; ctx.font="bold 20px Poppins,Arial";
+      ctx.fillText("GAME OVER", 24, Math.floor(cvs.height/2)-10);
+      ctx.font="14px Poppins,Arial"; ctx.fillText("Toque em Reiniciar", 28, Math.floor(cvs.height/2)+16);
     }
   }
 
-  function update(t=0) {
-    if (!running) return;
-    const dt = t - lastTime; lastTime = t; acc += dt;
-    if (acc >= dropInterval) { acc = 0; if (!move(0,1)) step(); }
-    draw();
-    requestAnimationFrame(update);
-  }
-
-  function step() { // fixa peça e gera outra
-    merge();
-    newPiece();
-  }
-
-  function move(dx, dy) {
-    if (!running) return false;
-    const nx = px + dx, ny = py + dy;
-    if (!collide(nx, ny, grid)) { px=nx; py=ny; return true; }
-    return false;
-  }
-
-  function rotateTry() {
-    const r = rotate(grid);
-    if (!collide(px, py, r)) { grid = r; return; }
-    // pequenos "kicks"
-    if (!collide(px-1, py, r)) { px--; grid=r; return; }
-    if (!collide(px+1, py, r)) { px++; grid=r; return; }
-  }
-
-  function updateHUD() {
+  function hud(){
     document.getElementById("t-score").textContent = score;
     document.getElementById("t-lines").textContent = lines;
     document.getElementById("t-level").textContent = level;
   }
 
-  // Controles teclado
-  function keyHandler(e) {
-    if (!running) return;
-    if (e.key === "ArrowLeft")  move(-1,0);
-    else if (e.key === "ArrowRight") move(1,0);
-    else if (e.key === "ArrowDown")  move(0,1);
-    else if (e.key === "ArrowUp")    rotateTry();
-    else if (e.code === "Space")     hardDrop();
+  // === Loop
+  function loop(t=0){
+    if(!running) return draw();
+    const dt = t - last; last = t; acc += dt;
+    if(acc >= drop){ acc=0; if(!move(0,1)) step(); }
+    draw(); requestAnimationFrame(loop);
   }
-  window.addEventListener("keydown", keyHandler);
 
-  // Controles touch/botões
-  document.getElementById("t-left").onclick = () => move(-1,0);
-  document.getElementById("t-right").onclick = () => move(1,0);
-  document.getElementById("t-down").onclick = () => move(0,1);
-  document.getElementById("t-rot").onclick  = () => rotateTry();
-  document.getElementById("t-drop").onclick = () => hardDrop();
-  document.getElementById("t-restart").onclick = () => {
-    for (let y=0;y<ROWS;y++) board[y].fill(0);
-    score=0; lines=0; level=1; dropInterval=800; running=true; updateHUD(); newPiece(); lastTime=0; acc=0; update();
+  // === Controles essenciais ===
+  addEventListener("keydown", e=>{
+    if(!running) return;
+    if(e.key==="ArrowLeft")  move(-1,0);
+    else if(e.key==="ArrowRight") move(1,0);
+    else if(e.key==="ArrowDown")  move(0,1);
+    else if(e.key==="ArrowUp")    rotateTry();
+    else if(e.code==="Space")     hardDrop();
+  });
+
+  document.getElementById("t-restart").onclick = ()=>{
+    for(let y=0;y<ROWS;y++) board[y].fill(0);
+    score=0; lines=0; level=1; drop=800; running=true; hud(); newPiece(); last=0; acc=0; sizeCanvas();
   };
 
-  // Início
-  updateHUD();
-  newPiece();
-  draw();
-  requestAnimationFrame(update);
+  // === Start
+  hud(); newPiece(); draw(); requestAnimationFrame(loop);
 }
+
 
 
 //// flayyoo canos
@@ -1355,7 +1337,7 @@ function mostrarCanos() {
   const html = `
     <div class="game-wrap">
       <div class="game-header">
-        <h2>🐦 Caninhos</h2>
+        <h2> Capivarinha</h2>
         <div class="flappy-ui">
           <div class="scorebox">Pontos: <span id="f-score">0</span></div>
           <div class="scorebox">Recorde: <span id="f-best">0</span></div>
@@ -1472,7 +1454,11 @@ function mostrarCanos() {
 
   // Controles
   document.getElementById("f-jump").onclick = jump;
-  document.getElementById("f-restart").onclick = reset;
+ document.getElementById("f-restart").onclick = () => {
+  reset();
+  requestAnimationFrame(loop); // garante que a animação volte
+};
+
 
   function onKey(e) {
     if (e.code === "Space" || e.key === "ArrowUp") {
@@ -1555,6 +1541,75 @@ function mostrarCanos() {
     return dist2 <= cr ** 2;
   }
 
+  // Capivara no lugar do pássaro
+function drawCapivara(x, y, size) {
+  ctx.fillStyle = "#8b5a2b"; // marrom corpo
+  ctx.beginPath();
+  ctx.ellipse(x, y, size * 1.4, size, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Cabeça
+  ctx.beginPath();
+  ctx.ellipse(x + size * 1.2, y - size * 0.3, size * 0.8, size * 0.6, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Olho
+  ctx.beginPath();
+  ctx.arc(x + size * 1.4, y - size * 0.3, size * 0.15, 0, Math.PI * 2);
+  ctx.fillStyle = "#000";
+  ctx.fill();
+
+  // Orelha
+  ctx.beginPath();
+  ctx.arc(x + size * 0.8, y - size * 0.9, size * 0.2, 0, Math.PI * 2);
+  ctx.fillStyle = "#5a3820";
+  ctx.fill();
+}
+
+
+
+// 1) Adicione esta função logo acima de draw()
+function drawCapivara(x, y, r) {
+  // corpo (oval)
+  ctx.fillStyle = "#8b5a2b";
+  ctx.beginPath();
+  ctx.ellipse(x, y, r * 1.4, r, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // cabeça (oval menor)
+  ctx.beginPath();
+  ctx.ellipse(x + r * 1.2, y - r * 0.3, r * 0.8, r * 0.6, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // orelha
+  ctx.fillStyle = "#5a3820";
+  ctx.beginPath();
+  ctx.arc(x + r * 0.8, y - r * 0.9, r * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // olho
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(x + r * 1.4, y - r * 0.3, r * 0.15, 0, Math.PI * 2);
+  ctx.fill();
+
+  // focinho (triangulo simples)
+  ctx.fillStyle = "#5a3820";
+  ctx.beginPath();
+  ctx.moveTo(x + r * 1.8, y - r * 0.2);
+  ctx.lineTo(x + r * 1.55, y - r * 0.05);
+  ctx.lineTo(x + r * 1.55, y - r * 0.35);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// 2) Dentro do draw(), troque o bloco que desenha o pássaro por:
+drawCapivara(bird.x, bird.y, bird.r);
+
+
+
+
+
   function draw() {
     // fundo
     ctx.clearRect(0,0,W,H);
@@ -1578,12 +1633,8 @@ function mostrarCanos() {
       ctx.fillRect(p.x - 2, by, p.w + 4, 14);
     }
 
-    // pássaro
-    ctx.beginPath();
-    ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
-    ctx.fillStyle = "#ffcc00";
-    ctx.fill();
-    ctx.closePath();
+    drawCapivara(bird.x, bird.y, bird.r);
+
 
     // olho
     ctx.beginPath();

@@ -4939,6 +4939,24 @@ html {
 .t-btn.secondary { background:#6b7280; }
 
 
+/* ==== Tetrix: sem scroll e enxuto ==== */
+.tetrix-screen{
+  height:100dvh;           /* ocupa a viewport inteira no mobile */
+  display:flex;flex-direction:column;gap:8px;padding:8px;
+}
+.tetrix-bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tetrix-info{font-weight:700;font-size:0.95rem}
+.tetrix-stage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#tetrixCanvas{
+  display:block;max-width:100%;height:auto;
+  background:#111;border:6px solid #222;border-radius:12px;image-rendering:pixelated;
+}
+.tetrix-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tbtn{padding:8px 12px;border:0;border-radius:10px;font-weight:700;color:#fff;background:#16a34a}
+.tbtn.secondary{background:#6b7280}
+.tips{font-size:.8rem;opacity:.8;text-align:center}
+
+
 
 
 /* fim tetrix */
