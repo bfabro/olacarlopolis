@@ -172,7 +172,7 @@ function iniciarShareObserver() {
 
 
 
-criarShareFAB();
+//criarShareFAB();
 iniciarShareObserver();
 
 
@@ -1186,7 +1186,7 @@ function mostrarTetrix() {
     <div class="game-wrap">
       <div class="game-header">
         
-        <h2 class="highlighted">🧩 Tetrix</h2>
+        <h2 >🧩 Tetrix</h2>
         <div class="tetrix-info">Pontos: <span id="t-score">0</span> • Linhas: <span id="t-lines">0</span> • Nível: <span id="t-level">1</span></div>
         <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
       </div>

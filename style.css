@@ -4815,6 +4815,12 @@ html {
 .game-wrap { display:flex; flex-direction:column; gap:12px; max-width:420px; }
 .game-header { display:flex; align-items:center; justify-content:space-between; }
 .game-info { font-weight:600; }
+
+/* Não mostrar botão de compartilhar dentro das telas de jogo */
+.game-wrap .btn-share,
+.game-header .btn-share {
+  display: none !important;
+}
 /* Tetrix responsivo */
 #tetrixCanvas {
   width: 100%;         /* ocupa toda a largura disponível */
