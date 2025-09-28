@@ -1160,6 +1160,14 @@ function mostrarJogos() {
     </div>
   `;
 
+  const barra = document.getElementById("barraInstalacao");
+if (barra) barra.style.display = "none";
+const iosBox = document.getElementById("iosInstallBox");
+if (iosBox) iosBox.classList.add("hidden");
+const iosModal = document.getElementById("iosInstallPrompt");
+if (iosModal) iosModal.classList.add("hidden");
+
+
   const area = document.querySelector(".content_area");
   area.innerHTML = html;
 
@@ -1205,7 +1213,7 @@ function mostrarTetrix() {
  
 </div>
 
-      <small style="text-align:center;opacity:.8">Controles: ← → ↓ movem, ↑ gira, Espaço = Drop. No celular, use os botões.</small>
+      <small style="text-align:center;opacity:.8">Controles: Clique na tela, e gire a peça, segure apertado e acelere a queda</small>
     </div>
   `;
 
@@ -1558,7 +1566,7 @@ function mostrarCanos() {
         <button id="f-jump">Pular</button>
         <button id="f-restart">Reiniciar</button>
       </div>
-      <small>Começa na grama → toque em Pular para entrar no rio. Às vezes passa um barco 😉</small>
+      <small>“👆 Toque para pular <br>• ⛵🐟 Desvie dos obstáculos <br>• 🚫 Não encoste nas margens”</small>
     </div>
   `;
   document.querySelector(".content_area").innerHTML = html;
@@ -11402,15 +11410,26 @@ window.addEventListener("DOMContentLoaded", handleHashRoute);
 
 
   // Captura o evento nativo do Android
-  window.addEventListener('beforeinstallprompt', (e) => {
-    if (isAppInstalado()) return; // já instalado? então não mostra
+window.addEventListener('beforeinstallprompt', (e) => {
+  // se já instalado, não mostra nunca
+  if (isAppInstalado()) return;
 
+  // se estiver nos jogos, não guarda o prompt nem mostra barra
+  if (estaNosJogos()) {
     e.preventDefault();
-    deferredPrompt = e;
-
+    deferredPrompt = null;
     const barra = document.getElementById("barraInstalacao");
-    if (barra) barra.style.display = "flex";
-  });
+    if (barra) barra.style.display = "none";
+    return;
+  }
+
+  // fora dos jogos, seguir fluxo normal
+  e.preventDefault();
+  deferredPrompt = e;
+  const barra = document.getElementById("barraInstalacao");
+  if (barra) barra.style.display = "flex";
+});
+
 
 
 
@@ -11500,12 +11519,12 @@ window.addEventListener("DOMContentLoaded", handleHashRoute);
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    if (isIos() && !isInStandaloneMode()) {
-      const box = document.getElementById("iosInstallBox");
-      if (box) box.classList.remove("hidden");
-    }
-  });
+ document.addEventListener("DOMContentLoaded", () => {
+  if (isIos() && !isInStandaloneMode() && !estaNosJogos()) {
+    const box = document.getElementById("iosInstallBox");
+    if (box) box.classList.remove("hidden");
+  }
+});
 
 
 
@@ -11518,14 +11537,15 @@ window.addEventListener("DOMContentLoaded", handleHashRoute);
     return 'standalone' in window.navigator && window.navigator.standalone;
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    if (isIosSafari() && !isInStandaloneMode()) {
-      setTimeout(() => {
-        const modal = document.getElementById("iosInstallPrompt");
-        if (modal) modal.classList.remove("hidden");
-      }, 2500);
-    }
-  });
+ document.addEventListener("DOMContentLoaded", () => {
+  if (isIosSafari() && !isInStandaloneMode() && !estaNosJogos()) {
+    setTimeout(() => {
+      const modal = document.getElementById("iosInstallPrompt");
+      if (modal) modal.classList.remove("hidden");
+    }, 2500);
+  }
+});
+
 
 
 });
@@ -11759,6 +11779,12 @@ function registrarCliqueNaPromocao(nomeComercio) {
 
 
 
+function estaNosJogos() {
+  // via hash OU pela presença de um container de jogo
+  const h = (location.hash || '').toLowerCase();
+  if (h.includes('jogos') || h.includes('tetrix') || h.includes('canos')) return true;
+  return !!document.querySelector('.game-wrap');
+}
 
 
 
