@@ -1337,7 +1337,6 @@ function mostrarTetrix() {
 
 
 // ======== CAPIVARINHA (rio serpenteando) — FUNÇÃO ÚNICA, LIMPA ========
-// ====================== CAPIVARINHA — RIO SERPENTEANDO (LIMPO) ======================
 function mostrarCanos() {
   const html = `
     <div class="game-wrap">
@@ -1350,13 +1349,13 @@ function mostrarCanos() {
         </div>
       </div>
 
-      <canvas id="flappyCanvas" width="288" height="512" aria-label="Capivarinha"></canvas>
+      <canvas id="flappyCanvas" width="480" height="512" aria-label="Capivarinha"></canvas>
 
       <div class="flappy-buttons">
         <button id="f-jump">Pular</button>
         <button id="f-restart">Reiniciar</button>
       </div>
-      <small>Toque/Barra/Seta ↑ para pular. Quanto mais longe, mais rápido!</small>
+      <small>Começa na grama → toque em Pular para entrar no rio. Às vezes passa um barco 😉</small>
     </div>
   `;
   document.querySelector(".content_area").innerHTML = html;
@@ -1374,20 +1373,27 @@ function mostrarCanos() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   })();
 
-  const W = 288, H = 512;
+  const W = 480, H = 512;
 
-  // Capivara
-  const capy = { x: 50, y: H*0.5, r: 12, vy: 0, gravity: 0.35, jump: -6.0 };
+  // Capivara (inicia na grama)
+  const capy = { x: 28, y: H - 40, r: 12, vy: 0, gravity: 0.35, jump: -6.0 };
 
-  // Rio
+  // ===== Rio serpenteando =====
   const RIVER_STEP = 8;
-  const GAP0 = 120, GAP_MIN = 80;
-  const SPEED0 = 2.0, SPEED_MAX = 5.5;
+
+  // Agora mais largo por padrão:
+  const GAP0 = 300;          // era 120
+  const GAP_MIN = 180;       // era 80 (mantém um mínimo confortável)
+  const BOAT_GAP = 220;      // largura alvo quando há barco na tela
+
+  // Velocidade do “mundo”
+  const SPEED0 = 2.0, SPEED_MAX = 5.0;
+
   let gap = GAP0, speed = SPEED0, phase = 0;
   let timeSinceStart = 0, distForScore = 0;
   const SCORE_EVERY = 120;
 
-  // Curvas
+  // Meandros do rio
   const amp1 = 70, freq1 = 0.010;
   const amp2 = 28, freq2 = 0.022;
 
@@ -1396,6 +1402,113 @@ function mostrarCanos() {
     + Math.sin((x*0.5 + phase*1.3) * freq2) * amp2;
   const riverTopAt     = (x) => riverCenterAt(x) - gap/2;
   const riverBottomAt  = (x) => riverCenterAt(x) + gap/2;
+
+  // ===== Barcos ocasionais =====
+  const boats = [];
+  const BOAT_W = 36, BOAT_H = 14;
+  const BOAT_EXTRA_SPEED = 0.9;        // barco “vem” mais rápido que o rio
+  let nextBoatIn = 3000 + Math.random()*5000; // 3–8s para o primeiro
+
+
+  // ===== Capivara no rio (extra) =====
+let riverCapy = null;
+let nextRiverCapyIn = 4000 + Math.random()*7000;  // 4–11s para a primeira
+const RIVERCAPY_R = 10;            // raio para desenhar/colisão se quiser
+const RIVERCAPY_EXTRA_SPEED = 0.6; // um pouco mais “rápida” que o rio
+
+
+
+// ===== Peixes no rio =====
+let fishes = [];
+let nextFishIn = 3000 + Math.random() * 5000; // de 3 a 8s para spawn
+
+function spawnFish() {
+  const x = W + 20;
+  const y = riverCenterAt(x) + (Math.random() * 20 - 10); // um pouco acima/abaixo do centro
+  fishes.push({
+    x, y,
+    r: 6 + Math.random() * 4, // tamanho aleatório
+    speed: speed + 1 + Math.random() * 0.5,
+    dir: Math.random() < 0.5 ? 1 : -1, // peixe pode virar para cima/baixo
+    bob: 0
+  });
+}
+
+function drawFish(f) {
+  ctx.save();
+  ctx.translate(f.x, f.y);
+
+  // corpo oval
+  ctx.fillStyle = "#ff9933";
+  ctx.beginPath();
+  ctx.ellipse(0, 0, f.r * 1.6, f.r, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // cauda
+  ctx.beginPath();
+  ctx.moveTo(-f.r * 1.6, 0);
+  ctx.lineTo(-f.r * 2.2, f.r * 0.8);
+  ctx.lineTo(-f.r * 2.2, -f.r * 0.8);
+  ctx.closePath();
+  ctx.fill();
+
+  // olho
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(f.r * 0.8, -f.r * 0.3, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+
+function spawnRiverCapy() {
+  // nasce à direita, no centro do rio naquele x
+  const x = W + 20;
+  const y = riverCenterAt(x);
+  riverCapy = {
+    x, y, r: RIVERCAPY_R, alive:true,
+    bob: 0, bobAmp: 2 + Math.random()*2 // balancinho na água
+  };
+}
+
+function drawRiverCapy(rc){
+  // corpo simples (marrom) + focinho
+  ctx.fillStyle = "#7a5d3a";
+  ctx.beginPath();
+  ctx.ellipse(rc.x, rc.y, rc.r+6, rc.r, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // cabecinha
+  ctx.beginPath();
+  ctx.arc(rc.x + rc.r, rc.y - 2, rc.r*0.7, 0, Math.PI*2);
+  ctx.fill();
+
+  // orelhinhas
+  ctx.fillRect(rc.x + rc.r + 3, rc.y - 8, 2, 4);
+  ctx.fillRect(rc.x + rc.r + 1, rc.y - 8, 2, 4);
+
+  // olho
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(rc.x + rc.r + 3, rc.y - 3, 1.2, 0, Math.PI*2);
+  ctx.fill();
+}
+
+
+  function spawnBoat() {
+    // nasce à direita, no centro do rio naquele x
+    const x = W + BOAT_W + 10;
+    const y = riverCenterAt(x);
+    boats.push({ x, y, w: BOAT_W, h: BOAT_H, alive:true });
+  }
+
+  function circleRectCollide(cx, cy, cr, r) {
+    const nx = Math.max(r.x, Math.min(cx, r.x + r.w));
+    const ny = Math.max(r.y, Math.min(cy, r.y + r.h));
+    const dx = cx - nx, dy = cy - ny;
+    return dx*dx + dy*dy <= cr*cr;
+  }
 
   // HUD
   let score = 0;
@@ -1407,31 +1520,41 @@ function mostrarCanos() {
   };
   updateHUD();
 
-  // Estado do loop
+  // Estado geral
   let running = true, started = false, last = 0, rafId = null;
-  const GRACE_MS = 300; // pequeno período sem colisão ao iniciar
+  const GRACE_MS = 300;
 
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  function snapIntoRiver() {
+    const x = 50; // posição de jogo
+    const top = riverTopAt(x), bot = riverBottomAt(x);
+    const center = (top + bot) / 2;
+    capy.x = x;
+    capy.y = Math.max(top + capy.r + 1, Math.min(center, bot - capy.r - 1));
+  }
 
   const reset = () => {
-    // fase e dificuldade base
-    phase = 0; speed = SPEED0; gap = GAP0;
+    phase = 0; speed = SPEED0;
+    // reabre o rio no início:
+    gap = GAP0;
     timeSinceStart = 0; distForScore = 0;
+    boats.length = 0; nextBoatIn = 3000 + Math.random()*5000;
+
     started = false; running = true; last = 0;
-
-    // reposiciona a capivara DENTRO do canal do rio
-    const top0 = riverTopAt(capy.x);
-    const bot0 = riverBottomAt(capy.x);
-    const safeTop = top0 + capy.r + 1;
-    const safeBot = bot0 - capy.r - 1;
-    capy.y = clamp(riverCenterAt(capy.x), safeTop, safeBot);
-    capy.vy = 0;
-
-    score = 0; updateHUD();
-    draw();
+    capy.x = 28; capy.y = H - 40; capy.vy = 0;
+    score = 0; updateHUD(); draw();
   };
 
-  const jump = () => { if (!running) return; capy.vy = capy.jump; started = true; };
+  const jump = () => {
+    if (!running) return;
+    if (!started) {
+      snapIntoRiver();
+      capy.vy = capy.jump;
+      started = true;
+      timeSinceStart = 0;
+      return;
+    }
+    capy.vy = capy.jump;
+  };
 
   // Controles
   document.getElementById("f-jump").onclick = jump;
@@ -1450,35 +1573,96 @@ function mostrarCanos() {
   function update(dt){
     if (!running) return;
 
-    timeSinceStart += dt;
-    const t = timeSinceStart / 1000;
+    // o rio “vive” mesmo antes de começar
+    phase += speed * 0.6;
 
-    // Dificuldade
-    speed = Math.min(SPEED_MAX, SPEED0 + t*0.12);
-    gap   = Math.max(GAP_MIN, GAP0 - t*2.0);
-    phase += speed * 0.9;
-
-    // Física
     if (started) {
+      timeSinceStart += dt;
+      const t = timeSinceStart / 1000;
+
+      // velocidade/dificuldade
+      speed = Math.min(SPEED_MAX, SPEED0 + t*0.12);
+
+      // alvo de largura do rio:
+      let targetGap = Math.max(GAP_MIN, GAP0 - t*1.2); // fecha mais devagar (mais largo no geral)
+      if (boats.length) targetGap = Math.max(targetGap, BOAT_GAP); // ABRE BEM quando tem barco
+      // aproxima suavemente do alvo
+      gap += (targetGap - gap) * 0.1;
+
+      // barcos: spawn e movimento
+      nextBoatIn -= dt;
+      if (nextBoatIn <= 0) {
+        spawnBoat();
+        nextBoatIn = 5000 + Math.random()*8000; // novo barco entre 5–13s
+      }
+
+      for (let i=boats.length-1; i>=0; i--){
+        const b = boats[i];
+        // “vem descendo”:
+        b.x -= (speed + BOAT_EXTRA_SPEED);
+        // acompanha o leito:
+        b.y = riverCenterAt(b.x);
+        // colisão
+        const rect = { x: b.x - b.w/2, y: b.y - b.h/2, w: b.w, h: b.h };
+        if (circleRectCollide(capy.x, capy.y, capy.r, rect)) gameOver();
+        // saiu da tela à esquerda?
+        if (b.x + b.w/2 < -10) boats.splice(i,1);
+      }
+
+      // capivara do rio: spawn e movimento
+nextRiverCapyIn -= dt;
+if (!riverCapy && nextRiverCapyIn <= 0) {
+  spawnRiverCapy();
+  nextRiverCapyIn = 6000 + Math.random()*9000; // próximas em 6–15s
+}
+
+if (riverCapy) {
+  // “vem descendo” como o barco: anda para a esquerda
+  riverCapy.x -= (speed + RIVERCAPY_EXTRA_SPEED);
+  // acompanha o leito do rio e balança um pouquinho
+  riverCapy.bob += dt * 0.006;
+  riverCapy.y = riverCenterAt(riverCapy.x) + Math.sin(riverCapy.bob) * riverCapy.bobAmp;
+
+  // saiu da tela?
+  if (riverCapy.x < -30) riverCapy = null;
+}
+// === Peixes ===
+nextFishIn -= dt;
+if (nextFishIn <= 0) {
+  spawnFish();
+  nextFishIn = 4000 + Math.random() * 6000; // próximos em 4 a 10s
+}
+
+for (let i = fishes.length - 1; i >= 0; i--) {
+  const f = fishes[i];
+  f.x -= f.speed; // anda para a esquerda
+  f.bob += dt * 0.004;
+  f.y = riverCenterAt(f.x) + Math.sin(f.bob) * 6 * f.dir;
+
+  if (f.x < -40) fishes.splice(i, 1); // remove quando sai da tela
+}
+
+
+      // Física da capivara
       capy.vy += capy.gravity;
       capy.y  += capy.vy;
       if (capy.y - capy.r < 0) { capy.y = capy.r; capy.vy = 0; }
       if (capy.y + capy.r > H - 20) { capy.y = H - 20 - capy.r; gameOver(); }
-    }
 
-    // Colisão com margens do rio (só após começar ou passar a graça)
-    if (started || timeSinceStart > GRACE_MS) {
-      const top = riverTopAt(capy.x), bot = riverBottomAt(capy.x);
-      if (capy.y - capy.r < top || capy.y + capy.r > bot) gameOver();
-    }
+      // colisão com as margens (após GRACE)
+      if (timeSinceStart > GRACE_MS) {
+        const top = riverTopAt(capy.x), bot = riverBottomAt(capy.x);
+        if (capy.y - capy.r < top || capy.y + capy.r > bot) gameOver();
+      }
 
-    // Pontos por distância
-    distForScore += speed;
-    if (distForScore >= SCORE_EVERY) {
-      distForScore -= SCORE_EVERY;
-      score++;
-      if (score > best) { best = score; localStorage.setItem(BEST_KEY, best); }
-      updateHUD();
+      // Pontuação por distância
+      distForScore += speed;
+      if (distForScore >= SCORE_EVERY) {
+        distForScore -= SCORE_EVERY;
+        score++;
+        if (score > best) { best = score; localStorage.setItem(BEST_KEY, best); }
+        updateHUD();
+      }
     }
   }
 
@@ -1490,14 +1674,29 @@ function mostrarCanos() {
     ctx.beginPath(); ctx.arc(x + r*0.8, y - r*0.9, r*0.2, 0, Math.PI*2); ctx.fillStyle = "#5a3820"; ctx.fill();
   }
 
+  function drawBoat(b){
+    // casco simples com proa
+    ctx.fillStyle = "#5b4636";
+    ctx.fillRect(b.x - b.w/2, b.y - b.h/2, b.w, b.h);
+    ctx.beginPath();
+    ctx.moveTo(b.x + b.w/2, b.y - b.h/2);
+    ctx.lineTo(b.x + b.w/2 + 6, b.y);
+    ctx.lineTo(b.x + b.w/2, b.y + b.h/2);
+    ctx.closePath();
+    ctx.fill();
+    // cabine
+    ctx.fillStyle = "#c7c7c7";
+    ctx.fillRect(b.x - b.w*0.15, b.y - b.h*0.6, b.w*0.3, b.h*0.5);
+  }
+
   function draw(){
-    // Céu
+    // Céu + chão + grama
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle = "#70c5ce"; ctx.fillRect(0,0,W,H);
-    // Chão
     ctx.fillStyle = "#c9d09a"; ctx.fillRect(0, H-20, W, 20);
+    ctx.fillStyle = "#7ec850"; ctx.fillRect(0, 0, 56, H-20);
 
-    // Rio
+    // Rio (polígono entre top e bottom)
     const topY = (x)=>riverTopAt(x), botY = (x)=>riverBottomAt(x);
     ctx.beginPath();
     ctx.moveTo(0, topY(0));
@@ -1509,13 +1708,22 @@ function mostrarCanos() {
     grad.addColorStop(0, "#46a6d8"); grad.addColorStop(1, "#2e89b8");
     ctx.fillStyle = grad; ctx.fill();
 
+    // Barcos (desenha por cima da água)
+    for (const b of boats) drawBoat(b);
+
+    // Capivara no rio (extra)
+if (riverCapy) drawRiverCapy(riverCapy);
+
+// Peixes
+for (const f of fishes) drawFish(f);
+
     // Capivara
     drawCapivara(capy.x, capy.y, capy.r);
 
     // Overlays
     if (!started && running) {
       ctx.fillStyle="#fff"; ctx.font="16px Poppins,Arial";
-      ctx.fillText("Toque em Pular para começar", 30, 240);
+      ctx.fillText("Toque em Pular para entrar no rio", 24, 240);
     }
     if (!running) {
       ctx.fillStyle = "#000"; ctx.globalAlpha = 0.4; ctx.fillRect(0,0,W,H);
@@ -1536,7 +1744,6 @@ function mostrarCanos() {
   reset();
   rafId = requestAnimationFrame(loop);
 }
-
 
 
 

@@ -4982,6 +4982,14 @@ html {
 @media (min-width: 1024px) {
   .tetrix-keys { display: none; } /* no desktop some: usa teclado */
 }
+.placa {
+  font-weight: bold;
+  color: white;
+  background: brown;
+  border: 2px solid #000;
+  border-radius: 4px;
+  padding: 2px 8px;
+}
 
 
 /* fim tetrix */
@@ -4994,6 +5002,9 @@ html {
   width: 100%;
   height: auto;
   image-rendering: pixelated;
+   max-width: 100%;
+   display: block;
+     margin: 0 auto;
 }
 .flappy-ui { display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .flappy-ui .scorebox { font-weight:700; }
