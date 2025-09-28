@@ -1117,30 +1117,61 @@ iniciarShareObserver();
 
 function mostrarJogos() {
   const html = `
-    <div class="game-wrap">
-      <div class="game-header">
-        <h2>🎮 Jogos</h2>
-        <button class="fechar-menu" onclick="history.back()">Fechar</button>
+    <div class="games-wrap">
+      <div class="games-header">
+        <h2 class="highlighted">🎮 Jogos</h2>
+        <button class="fechar-menu" onclick="history.back()">Voltar</button>
       </div>
-      <p>Escolha um jogo para começar:</p>
-      <ul>
-        <li><a href="#tetrix" id="linkTetrix">Tetrix (Tetris clássico)</a></li>
-        <li><a href="#canos" id="linkCanos">Caninhos (passa pelos canos)</a></li>
-      </ul>
+
+      <p style="margin:6px 0 14px;color:#333">Escolha um jogo para começar:</p>
+
+      <div class="games-list">
+        <!-- Jogo 1: Tetrix -->
+        <div class="game-item">
+          <div class="game-icon"><i class="fa-solid fa-puzzle-piece" style="color:#6a5acd"></i></div>
+          <div class="game-body">
+            <div class="game-title">Tetrix</div>
+            <div class="game-desc">Tetris clássico com placar, níveis e controles mobile.</div>
+          </div>
+          <div class="game-actions">
+            <button class="btn-play" id="playTetrix">Jogar</button>
+          </div>
+        </div>
+
+        <!-- Jogo 2: Capivarinha -->
+        <div class="game-item">
+          <div class="game-icon"><i class="fa-solid fa-water" style="color:#0ea5e9"></i></div>
+          <div class="game-body">
+            <div class="game-title">Capivarinha</div>
+            <div class="game-desc">Entre no rio, desvie e acumule pontos (barcos, peixes e mais).</div>
+          </div>
+          <div class="game-actions">
+            <button class="btn-play" id="playCanos">Jogar</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
-  document.querySelector(".content_area").innerHTML = html;
 
-  const l1 = document.getElementById("linkTetrix");
-  if (l1) l1.addEventListener("click", (e) => {
-    e.preventDefault(); location.hash = "tetrix"; mostrarTetrix();
+  const area = document.querySelector(".content_area");
+  area.innerHTML = html;
+
+  // handlers dos botões
+  const t = document.getElementById("playTetrix");
+  if (t) t.addEventListener("click", (e) => {
+    e.preventDefault();
+    location.hash = "tetrix";
+    mostrarTetrix();
   });
 
-  const l2 = document.getElementById("linkCanos");
-  if (l2) l2.addEventListener("click", (e) => {
-    e.preventDefault(); location.hash = "canos"; mostrarCanos();
+  const c = document.getElementById("playCanos");
+  if (c) c.addEventListener("click", (e) => {
+    e.preventDefault();
+    location.hash = "canos";
+    mostrarCanos();
   });
 }
+
 
 
 
