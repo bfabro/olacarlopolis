@@ -4788,3 +4788,41 @@ html {
 }
 .btn-share:hover { background: rgba(255,255,255,0.3); }
 .btn-share:active { transform: scale(0.97); }
+
+
+/* Botão de compartilhar genérico (nos títulos) */
+.btn-share {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 8px;
+  line-height: 1;
+  color: #fefefe;
+}
+.btn-share:hover { color: #ff8800; }
+
+/* FAB global de compartilhar (canto inferior direito) */
+.fab-share {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 8px 20px rgba(0,0,0,.2);
+  background: #ffffff;
+  color: #fff;
+  cursor: pointer;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+}
+.fab-share:hover { filter: brightness(1.05); }
+
+/* em telas pequenas, sobe um pouco para não conflitar com barras do dispositivo */
+@media (max-width: 768px) {
+  .fab-share { bottom: 76px; right: 14px; }
+}

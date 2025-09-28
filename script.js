@@ -102,7 +102,85 @@ function mostrarToast(mensagem) {
 document.addEventListener("DOMContentLoaded", function () {
 
 
+/// funçao para todas as paginas
+///
 
+// Compartilha a página atual (inclui hash) ou copia o link
+function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
+  const url = `${location.origin}${location.pathname}${hash || ""}`;
+  if (navigator.share) {
+    navigator.share({ title: titulo, text: texto, url })
+      .catch(() => mostrarToast("❌ Não foi possível compartilhar."));
+  } else {
+    navigator.clipboard.writeText(url)
+      .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
+      .catch(() => alert("Não foi possível copiar o link."));
+  }
+}
+
+// Cria um botão flutuante único que sempre compartilha a página atual
+function criarShareFAB() {
+  if (document.querySelector(".fab-share")) return; // evita duplicar
+
+  const fab = document.createElement("button");
+  fab.className = "fab-share";
+  fab.title = "Compartilhar esta página";
+  fab.innerHTML = '<i class="fas fa-share-alt"></i>';
+  document.body.appendChild(fab);
+
+  fab.addEventListener("click", () => {
+    const titulo = document.title || "Olá Carlópolis";
+    // tenta pegar o título H2 atual para enriquecer o texto
+    const h2 = document.querySelector(".content_area h2");
+    const texto = h2 ? h2.textContent.trim() : "Confira esta página!";
+    compartilharPagina(location.hash, titulo, texto);
+  });
+}
+
+// Injeta um botão de compartilhar ao lado do H2 da tela, automaticamente
+function injetarShareNoTitulo() {
+  const h2 = document.querySelector(".content_area h2.highlighted");
+  if (!h2) return;
+
+  // evita duplicar
+  if (h2.querySelector(".btn-share")) return;
+
+  const btn = document.createElement("button");
+  btn.className = "btn-share";
+  btn.title = "Compartilhar esta página";
+  btn.innerHTML = '<i class="fas fa-share-alt"></i>';
+  h2.appendChild(btn);
+
+  btn.addEventListener("click", () => {
+    const titulo = document.title || "Olá Carlópolis";
+    const texto = h2.textContent.trim() || "Confira esta página!";
+    compartilharPagina(location.hash, titulo, texto);
+  });
+}
+
+// Observa mudanças na área de conteúdo para reinjetar o botão no título
+function iniciarShareObserver() {
+  const area = document.querySelector(".content_area");
+  if (!area) return;
+
+  // roda uma vez agora
+  injetarShareNoTitulo();
+
+  const obs = new MutationObserver(() => injetarShareNoTitulo());
+  obs.observe(area, { childList: true, subtree: true });
+}
+
+
+
+criarShareFAB();
+iniciarShareObserver();
+
+
+
+
+
+///
+///
 
 
 
@@ -1032,6 +1110,32 @@ document.addEventListener("DOMContentLoaded", function () {
     "Açai": "🥤",
 
   };
+
+
+
+
+
+
+
+
+
+
+
+
+  ////
+  /// funçao para comaprtilahr todas as paginas
+  ///
+
+
+
+
+
+
+
+
+  ////
+  ///
+  ///
   // mostrar onde comer
   function mostrarOndeComer(filtroCategoria = "Todos") {
     const categoriasComida = [
@@ -1040,9 +1144,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 1. Monta o filtro
     let html = `
-  <h2 class="highlighted">🍽️ Onde Comer <button id="shareOndeComer" class="btn-share">
-      <i class="fas fa-share-alt"></i>
-    </button></h2>
+  <h2 class="highlighted">🍽️ Onde Comer </h2>
   <div class="filtro-comidas-card">
     <label for="filtroComidas">Filtrar por:</label>
   <select id="filtroComidas">
@@ -1175,22 +1277,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     });
 
 
-    // Evento do botão de compartilhar
-    document.getElementById("shareOndeComer").addEventListener("click", function () {
-      const url = `${window.location.origin}${window.location.pathname}#ondecomer`;
+   
 
-      if (navigator.share) {
-        navigator.share({
-          title: "🍽️ Onde Comer - Olá Carlópolis",
-          text: "Confira Onde Comer em Carlópolis!",
-          url: url
-        }).catch(() => mostrarToast("❌ Não foi possível compartilhar."));
-      } else {
-        navigator.clipboard.writeText(url)
-          .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
-          .catch(() => alert("Não foi possível copiar o link."));
-      }
-    });
 
   }
 
@@ -1271,9 +1359,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     let html = `
     <section class="promo-hero">
        <h2 class="highlighted"><span>🔥 Promoções</span>
-     <button id="sharePromocoes" class="btn-share" title="Compartilhar página Promoções">
-        <i class="fas fa-share-alt"></i>
-      </button></h2>
+    </h2>
      <div class="filtro-comidas-card">
   <label for="filtroEstab">Filtrar por:</label>
   <select id="filtroEstab">
@@ -10179,25 +10265,23 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
   // Adicionar eventos para os links do menu
-  categories.forEach((category) => {
-    if (category.link) {
-      // 🔹 Só adicionamos o evento se o link existir
-      category.link.addEventListener("click", function (event) {
-        event.preventDefault();
-        // Remove a classe ativa de todos os itens
-        categories.forEach((cat) => cat.link?.classList.remove("active"));
-        // Adiciona a classe ativa ao item clicado
-        this.classList.add("active");
-        // Carrega o conteúdo correspondente
-        loadContent(category.title, category.establishments);
+categories.forEach((category) => {
+  if (!category.link) return;
+  category.link.addEventListener("click", function (event) {
+    event.preventDefault();
+    categories.forEach((cat) => cat.link?.classList.remove("active"));
+    this.classList.add("active");
 
-        // Expande a sidebar, se estiver fechada
-        if (sidebar.classList.contains("close")) {
-          sidebar.classList.remove("close");
-        }
-      });
+    // define a rota da categoria; o roteador renderiza
+    location.hash = "#comercios-" + normalizeName(category.title);
+
+    if (sidebar.classList.contains("close")) {
+      sidebar.classList.remove("close");
     }
   });
+});
+
+
 
 
 
@@ -10244,13 +10328,24 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
 
-  function handleHashRoute() {
-    const h = (location.hash || "").toLowerCase();
-    if (h === "#ondecomer") { return mostrarOndeComer(); }
-    if (h === "#promocoes") { return mostrarPromocoes(); }
+function handleHashRoute() {
+  const h = (location.hash || "").toLowerCase();
+
+  if (h === "#ondecomer")  { return mostrarOndeComer(); }
+  if (h === "#promocoes")  { return mostrarPromocoes(); }
+
+  // categorias de "Comércios"
+  const m = h.match(/^#comercios-(.+)$/);
+  if (m) {
+    const slug = m[1]; // ex.: "adega"
+    const cat = categories.find(c => normalizeName(c.title) === slug);
+    if (cat) return loadContent(cat.title, cat.establishments);
   }
-  window.addEventListener("hashchange", handleHashRoute);
-  window.addEventListener("DOMContentLoaded", handleHashRoute);
+}
+window.addEventListener("hashchange", handleHashRoute);
+window.addEventListener("DOMContentLoaded", handleHashRoute);
+
+
 
 
 
@@ -11295,6 +11390,12 @@ window.addHorario = function (dia, hora, ...bairros) {
   if (!COLETA_LIXO[dia]) { alert("Dia inválido. Use: seg, ter, qua, qui, sex, sab, dom."); return; }
   COLETA_LIXO[dia].push({ hora, bairros });
 };
+
+
+function categoriaHash(catTitle) {
+  // usa o mesmo normalizador que você já usa para nomes
+  return "#comercios-" + normalizeName(catTitle);
+}
 
 
 
