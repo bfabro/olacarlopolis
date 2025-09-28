@@ -1145,7 +1145,6 @@ function mostrarJogos() {
 
 
 function mostrarTetrix() {
-  // UI compacta como no Capivarinha
   document.querySelector(".content_area").innerHTML = `
     <div class="game-wrap">
       <div class="game-header">
@@ -1153,40 +1152,49 @@ function mostrarTetrix() {
         <div class="tetrix-info">Pontos: <span id="t-score">0</span> • Linhas: <span id="t-lines">0</span> • Nível: <span id="t-level">1</span></div>
         <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
       </div>
+
       <canvas id="tetrixCanvas" width="288" height="512" aria-label="Tetrix"></canvas>
+
       <div class="tetrix-actions" style="display:flex;gap:8px;justify-content:center">
         <button id="t-restart" class="tbtn" style="padding:8px 12px;border:0;border-radius:10px;background:#16a34a;color:#fff;font-weight:700">Reiniciar</button>
       </div>
-      <small style="text-align:center;opacity:.8">Controles: ← → ↓ movem, ↑ gira, Espaço = Drop</small>
+
+      <!-- NOVO: controles mobile -->
+      <div class="tetrix-keys">
+        <button id="t-left">◀</button>
+        <button id="t-rot">⟳</button>
+        <button id="t-right">▶</button>
+        <button id="t-down">▼</button>
+        <button id="t-drop">DROP</button>
+      </div>
+
+      <small style="text-align:center;opacity:.8">Controles: ← → ↓ movem, ↑ gira, Espaço = Drop. No celular, use os botões.</small>
     </div>
   `;
 
-  // ===== Canvas no mesmo esquema do Capivarinha (288x512 + DPR) =====
+  // ===== Canvas 288x512 (mesmo esquema do Capivarinha) =====
   const cvs = document.getElementById("tetrixCanvas");
   const ctx = cvs.getContext("2d");
   (function scaleForDPR(){
     const dpr = window.devicePixelRatio || 1;
-    const w = cvs.width, h = cvs.height; // 288x512 (lógico)
+    const w = cvs.width, h = cvs.height; // 288x512
     cvs.width  = Math.round(w * dpr);
     cvs.height = Math.round(h * dpr);
     cvs.style.width  = w + "px";
     cvs.style.height = h + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // desenhar em coordenadas "lógicas"
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   })();
 
-  // Dimensões lógicas idênticas ao Capivarinha
   const W = 288, H = 512;
-
-  // ===== Jogo (higienizado) =====
   const COLS = 10, ROWS = 20;
 
-  // Tamanho do bloco para CABER dentro de 288×512 (proporção 1:2) e centralizar
-  const SIZE = Math.floor(Math.min(W / COLS, H / ROWS)); // 25 px (porque min(28.8,25.6))
+  // campo 10x20 centralizado dentro de 288x512
+  const SIZE = Math.floor(Math.min(W / COLS, H / ROWS));
   const OFFSET_X = Math.floor((W - (SIZE * COLS)) / 2);
   const OFFSET_Y = Math.floor((H - (SIZE * ROWS)) / 2);
 
   const board  = Array.from({length: ROWS}, () => Array(COLS).fill(0));
-  const colors = ["#000","#00f0f0","#0000f0","#f0a000","#f0f000","#00f000","#a000f0","#f00000"]; // I J L O S T Z
+  const colors = ["#000","#00f0f0","#0000f0","#f0a000","#f0f000","#00f000","#a000f0","#f00000"];
   const SHAPES = {
     I:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
     J:[[2,0,0],[2,2,2],[0,0,0]],
@@ -1208,13 +1216,11 @@ function mostrarTetrix() {
     py = 0;
     if (collide(px,py,grid)) { running=false; draw(); }
   }
-
   function rotate(m){
     const N=m.length, r=Array.from({length:N},()=>Array(N).fill(0));
     for(let y=0;y<N;y++) for(let x=0;x<N;x++) r[x][N-1-y]=m[y][x];
     return r;
   }
-
   function collide(nx,ny,m){
     for(let y=0;y<m.length;y++) for(let x=0;x<m[y].length;x++){
       if(!m[y][x]) continue;
@@ -1224,13 +1230,10 @@ function mostrarTetrix() {
     }
     return false;
   }
-
   function merge(){
     for(let y=0;y<grid.length;y++)
       for(let x=0;x<grid[y].length;x++)
         if(grid[y][x] && py+y>=0) board[py+y][px+x]=grid[y][x];
-
-    // limpar linhas
     let c=0;
     outer: for(let y=ROWS-1;y>=0;y--){
       for(let x=0;x<COLS;x++) if(!board[y][x]) continue outer;
@@ -1244,21 +1247,18 @@ function mostrarTetrix() {
       hud();
     }
   }
-
   function move(dx,dy){
     if(!running) return false;
     const nx=px+dx, ny=py+dy;
     if(!collide(nx,ny,grid)){ px=nx; py=ny; return true; }
     return false;
   }
-
   function rotateTry(){
     const r = rotate(grid);
     if(!collide(px,py,r)) { grid=r; return; }
     if(!collide(px-1,py,r)){ px--; grid=r; return; }
     if(!collide(px+1,py,r)){ px++; grid=r; return; }
   }
-
   function hardDrop(){ while(!collide(px,py+1,grid)) py++; step(); }
   function step(){ merge(); newPiece(); }
 
@@ -1266,17 +1266,10 @@ function mostrarTetrix() {
     ctx.fillStyle = colors[v];
     ctx.fillRect(OFFSET_X + x*SIZE, OFFSET_Y + y*SIZE, SIZE-1, SIZE-1);
   }
-
   function draw(){
-    // fundo
     ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
-
-    // área do campo (apenas para visual, opcional)
-    ctx.strokeStyle="#222";
-    ctx.lineWidth=2;
+    ctx.strokeStyle="#222"; ctx.lineWidth=2;
     ctx.strokeRect(OFFSET_X-2, OFFSET_Y-2, SIZE*COLS+4, SIZE*ROWS+4);
-
-    // board + peça
     for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++) drawCell(x,y,board[y][x]);
     if(running){
       for(let y=0;y<grid.length;y++)
@@ -1290,13 +1283,11 @@ function mostrarTetrix() {
       ctx.font="14px Poppins,Arial"; ctx.fillText("Toque em Reiniciar", 86, 278);
     }
   }
-
   function hud(){
     document.getElementById("t-score").textContent = score;
     document.getElementById("t-lines").textContent = lines;
     document.getElementById("t-level").textContent = level;
   }
-
   function loop(t=0){
     if(!running) return draw();
     const dt = t - last; last = t; acc += dt;
@@ -1304,7 +1295,7 @@ function mostrarTetrix() {
     draw(); requestAnimationFrame(loop);
   }
 
-  // Controles essenciais (como você já usa)
+  // Teclado (desktop)
   addEventListener("keydown", e=>{
     if(!running) return;
     if(e.key==="ArrowLeft")      move(-1,0);
@@ -1314,15 +1305,30 @@ function mostrarTetrix() {
     else if(e.code==="Space")     hardDrop();
   });
 
+  // Botões mobile (NOVO)
+  const onTap = (id, fn) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const handler = (e)=>{ e.preventDefault(); fn(); };
+    el.addEventListener("click", handler);
+    el.addEventListener("touchstart", handler, { passive:false });
+  };
+  onTap("t-left",  () => move(-1,0));
+  onTap("t-right", () => move(1,0));
+  onTap("t-down",  () => move(0,1));
+  onTap("t-rot",   () => rotateTry());
+  onTap("t-drop",  () => hardDrop());
+
   document.getElementById("t-restart").onclick = ()=>{
     for(let y=0;y<ROWS;y++) board[y].fill(0);
     score=0; lines=0; level=1; drop=800; running=true; hud(); newPiece(); last=0; acc=0;
-    requestAnimationFrame(loop); // garante que o loop recomece após game over
+    requestAnimationFrame(loop);
   };
 
   // Start
   hud(); newPiece(); draw(); requestAnimationFrame(loop);
 }
+
 
 
 

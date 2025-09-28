@@ -4963,6 +4963,25 @@ html {
 .tips{font-size:.8rem;opacity:.8;text-align:center}
 
 
+/* === Tetrix: controles mobile (sem scroll) === */
+.tetrix-keys {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+.tetrix-keys button {
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: #4070f4;
+  color: #fff;
+  font-weight: 700;
+  touch-action: manipulation;
+}
+@media (min-width: 1024px) {
+  .tetrix-keys { display: none; } /* no desktop some: usa teclado */
+}
 
 
 /* fim tetrix */
