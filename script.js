@@ -1145,58 +1145,46 @@ function mostrarJogos() {
 
 
 function mostrarTetrix() {
-  // === Markup mínimo, tudo dentro da content_area ===
+  // UI compacta como no Capivarinha
   document.querySelector(".content_area").innerHTML = `
-    <div class="tetrix-screen">
-      <div class="tetrix-bar">
+    <div class="game-wrap">
+      <div class="game-header">
         <h2>🧩 Tetrix</h2>
         <div class="tetrix-info">Pontos: <span id="t-score">0</span> • Linhas: <span id="t-lines">0</span> • Nível: <span id="t-level">1</span></div>
+        <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
       </div>
-
-      <div class="tetrix-actions">
-        <button class="tbtn secondary" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
-        <button id="t-restart" class="tbtn">Reiniciar</button>
+      <canvas id="tetrixCanvas" width="288" height="512" aria-label="Tetrix"></canvas>
+      <div class="tetrix-actions" style="display:flex;gap:8px;justify-content:center">
+        <button id="t-restart" class="tbtn" style="padding:8px 12px;border:0;border-radius:10px;background:#16a34a;color:#fff;font-weight:700">Reiniciar</button>
       </div>
-
-      <div class="tetrix-stage">
-        <canvas id="tetrixCanvas" width="200" height="400" aria-label="Tetrix"></canvas>
-      </div>
-
-      <div class="tips">Controles: ← → ↓ movem, ↑ gira, Espaço = Drop</div>
+      <small style="text-align:center;opacity:.8">Controles: ← → ↓ movem, ↑ gira, Espaço = Drop</small>
     </div>
   `;
 
-  // === Setup e dimensionamento SEM SCROLL ===
+  // ===== Canvas no mesmo esquema do Capivarinha (288x512 + DPR) =====
   const cvs = document.getElementById("tetrixCanvas");
   const ctx = cvs.getContext("2d");
-  const stage = document.querySelector(".tetrix-stage");
-  const bar   = document.querySelector(".tetrix-bar");
-  const acts  = document.querySelector(".tetrix-actions");
-  const tips  = document.querySelector(".tips");
+  (function scaleForDPR(){
+    const dpr = window.devicePixelRatio || 1;
+    const w = cvs.width, h = cvs.height; // 288x512 (lógico)
+    cvs.width  = Math.round(w * dpr);
+    cvs.height = Math.round(h * dpr);
+    cvs.style.width  = w + "px";
+    cvs.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // desenhar em coordenadas "lógicas"
+  })();
 
+  // Dimensões lógicas idênticas ao Capivarinha
+  const W = 288, H = 512;
+
+  // ===== Jogo (higienizado) =====
   const COLS = 10, ROWS = 20;
-  let SIZE = 20; // será recalculado
-  function sizeCanvas() {
-    // espaço horizontal disponível
-    const availW = stage.clientWidth;
 
-    // altura da viewport menos (barra + ações + dicas + paddings)
-    const used = bar.offsetHeight + acts.offsetHeight + tips.offsetHeight + 16 /*margem interna*/;
-    const availH = Math.max(120, window.innerHeight - used);
+  // Tamanho do bloco para CABER dentro de 288×512 (proporção 1:2) e centralizar
+  const SIZE = Math.floor(Math.min(W / COLS, H / ROWS)); // 25 px (porque min(28.8,25.6))
+  const OFFSET_X = Math.floor((W - (SIZE * COLS)) / 2);
+  const OFFSET_Y = Math.floor((H - (SIZE * ROWS)) / 2);
 
-    // cada célula é o mínimo entre caber na largura (10 colunas) e na altura (20 linhas)
-    SIZE = Math.max(8, Math.floor(Math.min(availW / COLS, availH / ROWS)));
-
-    cvs.width  = SIZE * COLS;
-    cvs.height = SIZE * ROWS;
-    // não seto style.width/height: o elemento já encaixa sem estourar
-  }
-
-  sizeCanvas();
-  addEventListener("resize", sizeCanvas, { passive:true });
-  addEventListener("orientationchange", sizeCanvas, { passive:true });
-
-  // === Estado & peças essenciais (limpo) ===
   const board  = Array.from({length: ROWS}, () => Array(COLS).fill(0));
   const colors = ["#000","#00f0f0","#0000f0","#f0a000","#f0f000","#00f000","#a000f0","#f00000"]; // I J L O S T Z
   const SHAPES = {
@@ -1272,16 +1260,23 @@ function mostrarTetrix() {
   }
 
   function hardDrop(){ while(!collide(px,py+1,grid)) py++; step(); }
-
   function step(){ merge(); newPiece(); }
 
   function drawCell(x,y,v){
     ctx.fillStyle = colors[v];
-    ctx.fillRect(x*SIZE, y*SIZE, SIZE-1, SIZE-1);
+    ctx.fillRect(OFFSET_X + x*SIZE, OFFSET_Y + y*SIZE, SIZE-1, SIZE-1);
   }
 
   function draw(){
-    ctx.fillStyle="#000"; ctx.fillRect(0,0,cvs.width,cvs.height);
+    // fundo
+    ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
+
+    // área do campo (apenas para visual, opcional)
+    ctx.strokeStyle="#222";
+    ctx.lineWidth=2;
+    ctx.strokeRect(OFFSET_X-2, OFFSET_Y-2, SIZE*COLS+4, SIZE*ROWS+4);
+
+    // board + peça
     for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++) drawCell(x,y,board[y][x]);
     if(running){
       for(let y=0;y<grid.length;y++)
@@ -1291,8 +1286,8 @@ function mostrarTetrix() {
         }
     } else {
       ctx.fillStyle="#fff"; ctx.font="bold 20px Poppins,Arial";
-      ctx.fillText("GAME OVER", 24, Math.floor(cvs.height/2)-10);
-      ctx.font="14px Poppins,Arial"; ctx.fillText("Toque em Reiniciar", 28, Math.floor(cvs.height/2)+16);
+      ctx.fillText("GAME OVER", 84, 250);
+      ctx.font="14px Poppins,Arial"; ctx.fillText("Toque em Reiniciar", 86, 278);
     }
   }
 
@@ -1302,7 +1297,6 @@ function mostrarTetrix() {
     document.getElementById("t-level").textContent = level;
   }
 
-  // === Loop
   function loop(t=0){
     if(!running) return draw();
     const dt = t - last; last = t; acc += dt;
@@ -1310,10 +1304,10 @@ function mostrarTetrix() {
     draw(); requestAnimationFrame(loop);
   }
 
-  // === Controles essenciais ===
+  // Controles essenciais (como você já usa)
   addEventListener("keydown", e=>{
     if(!running) return;
-    if(e.key==="ArrowLeft")  move(-1,0);
+    if(e.key==="ArrowLeft")      move(-1,0);
     else if(e.key==="ArrowRight") move(1,0);
     else if(e.key==="ArrowDown")  move(0,1);
     else if(e.key==="ArrowUp")    rotateTry();
@@ -1322,12 +1316,14 @@ function mostrarTetrix() {
 
   document.getElementById("t-restart").onclick = ()=>{
     for(let y=0;y<ROWS;y++) board[y].fill(0);
-    score=0; lines=0; level=1; drop=800; running=true; hud(); newPiece(); last=0; acc=0; sizeCanvas();
+    score=0; lines=0; level=1; drop=800; running=true; hud(); newPiece(); last=0; acc=0;
+    requestAnimationFrame(loop); // garante que o loop recomece após game over
   };
 
-  // === Start
+  // Start
   hud(); newPiece(); draw(); requestAnimationFrame(loop);
 }
+
 
 
 
