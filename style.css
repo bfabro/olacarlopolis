@@ -4986,6 +4986,18 @@ html {
   border-radius: 4px;
   padding: 2px 8px;
 }
+/* Tetrix: impedir seleção/foco visual e gestos nativos nos botões */
+.game-wrap button,
+.tetrix-keys button,
+.tbtn {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;              /* evita rolagem/zoom no toque */
+  outline: none;                   /* remove contorno ao focar */
+}
 
 
 /* fim tetrix */
