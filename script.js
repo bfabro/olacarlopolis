@@ -1601,7 +1601,7 @@ function mostrarCanos() {
         <button id="f-jump">Pular</button>
         <button id="f-restart">Reiniciar</button>
       </div>
-      <small>👆 Toque para pular <br>• ⛵🐟 Desvie dos obstáculos <br>• 🚫 Não encoste nas margens</small>
+      
     </div>
   `;
   document.querySelector(".content_area").innerHTML = html;
@@ -2024,9 +2024,21 @@ for (const f of fishes) drawFish(f);
 
     // Overlays
     if (!started && running) {
-      ctx.fillStyle="#fff"; ctx.font="16px Poppins,Arial";
-      ctx.fillText("Toque em Pular para entrar na represa", 45, 180);
-    }
+  ctx.fillStyle = "#fff";
+  ctx.font = "16px Poppins,Arial";
+  ctx.textAlign = "center";              // centraliza no x informado
+
+  const msg = "Toque em Pular\npara entrar na represa\n\nToque na Tela para nadar\n\nDesvie dos obstaculos\n\nNao deixe voltar para as margens";
+  drawMultiline(ctx, msg, W/2, 160, 18); // x, y inicial e altura da linha
+}
+
+// helper: quebra por \n
+function drawMultiline(ctx, text, x, y, lineHeight = 18) {
+  text.split("\n").forEach((line, i) => {
+    ctx.fillText(line, x, y + i * lineHeight);
+  });
+}
+
   if (!running) {
   ctx.fillStyle = "rgba(0,0,0,0.6)";
   ctx.fillRect(0, 0, W, H);
