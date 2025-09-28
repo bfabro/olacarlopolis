@@ -1566,7 +1566,7 @@ function mostrarCanos() {
         <button id="f-jump">Pular</button>
         <button id="f-restart">Reiniciar</button>
       </div>
-      <small>“👆 Toque para pular <br>• ⛵🐟 Desvie dos obstáculos <br>• 🚫 Não encoste nas margens”</small>
+      <small>👆 Toque para pular <br>• ⛵🐟 Desvie dos obstáculos <br>• 🚫 Não encoste nas margens</small>
     </div>
   `;
   document.querySelector(".content_area").innerHTML = html;
@@ -1990,7 +1990,7 @@ for (const f of fishes) drawFish(f);
     // Overlays
     if (!started && running) {
       ctx.fillStyle="#fff"; ctx.font="16px Poppins,Arial";
-      ctx.fillText("Toque em Pular para entrar no rio", 50, 180);
+      ctx.fillText("👆 Toque para pular <br>• ⛵🐟 Desvie dos obstáculos <br>• 🚫 Não encoste nas margens", 45, 180);
     }
   if (!running) {
   ctx.fillStyle = "rgba(0,0,0,0.6)";
