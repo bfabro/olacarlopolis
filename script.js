@@ -144,68 +144,111 @@ function mostrarRankingCapivarinha() {
          onclick="compartilharPagina('#ranking-capivarinha','Ranking Capivarinha','Veja o ranking do jogo Capivarinha!')"></i>
     </div>
 
-    <div style="padding:8px 12px">
-      <p style="margin:6px 0 12px">Top recordes (melhor pontuação por jogador):</p>
+    <div class="rank-wrap" style="padding:8px 12px">
+      <div class="rank-title">
+  🏅 Top Records <span><br>(melhor pontuação por jogador)</span>
+</div>
       <ul id="rankList" class="rank-list"></ul>
 
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-rank" onclick="location.hash='canos'; mostrarCanos()">⬅️ Voltar ao Capivarinha</button>
-
-        
-        <button class="btn-rank" id="btnTrocarNome">✏️ Trocar nome</button>
+        <!--<button class="btn-rank" id="btnTrocarNome">✏️ Trocar nome</button>-->
         <button class="btn-rank" id="btnMeuRecorde">👤 Meu recorde</button>
       </div>
     </div>
   `;
 
   const ul = document.getElementById("rankList");
+
+  // segurança: sem Firebase, mostra aviso e sai
   if (!window.firebase || !firebase.database) {
-    ul.innerHTML = `<li>⚠️ Firebase indisponível.</li>`;
+    ul.innerHTML = `<li class="rank-empty">⚠️ Firebase indisponível.</li>`;
     return;
   }
 
-  // Lê os usuários e ordena pelos melhores (best)
-  const ref = firebase.database().ref("jogos/capivarinha/users").orderByChild("best").limitToLast(50);
+  // pega/gera meu id local (já existe no seu arquivo)
+  const myUid = getOrCreatePlayerId();
+
+  // consulta os usuários ordenando por "best" (melhor recorde) — pega até 50
+  const ref = firebase.database()
+    .ref("jogos/capivarinha/users")
+    .orderByChild("best")
+    .limitToLast(50);
+
+  // listener que redesenha a lista
   ref.on("value", (snap) => {
     const arr = [];
     snap.forEach(ch => {
       const v = ch.val();
-      if (v && typeof v.best === "number") arr.push(v);
+      if (v && typeof v.best === "number") {
+        // guardo a chave do nó para identificar quem sou eu
+        arr.push({ ...v, _id: ch.key });
+      }
     });
+
+    // ordena do maior para o menor
     arr.sort((a, b) => b.best - a.best);
 
-    ul.innerHTML = arr.map((it, i) => `
-      <li>
-        <div class="pos">#${i+1}</div>
-        <div class="nm">${(it.name || "Jogador").toString().slice(0,30)}</div>
-        <div class="sc">${Number(it.best || 0)}</div>
-      </li>
-    `).join("") || `<li>Ninguém no ranking ainda. Jogue e salve seu score! 🎮</li>`;
+    if (!arr.length) {
+      ul.innerHTML = `<li class="rank-empty">Ninguém no ranking ainda. Jogue e salve seu score! 🎮</li>`;
+      return;
+    }
+
+    const top = arr[0]?.best || 1;
+
+    ul.innerHTML = arr.map((it, i) => {
+  const pos = i + 1;
+  const medalClass = pos === 1 ? "medal-1" : pos === 2 ? "medal-2" : pos === 3 ? "medal-3" : "";
+  const top = arr[0]?.best || 1;
+  const fillPct = Math.max(6, Math.round((Number(it.best || 0) / top) * 100));
+  const isMe = it._id === myUid;
+
+  return `
+    <li class="rank-item rank-item--compact ${isMe ? "me" : ""}">
+      <div class="rank-pos ${medalClass}">${pos}</div>
+
+      <div class="rank-main">
+        <div class="rank-row">
+          <div class="rank-name" title="${(it.name || "Jogador").toString().slice(0,60)}">
+            ${(it.name || "Jogador").toString().slice(0,30)}
+          </div>
+          <div class="score-number">${Number(it.best || 0)}</div>
+        </div>
+        <div class="score-bar">
+          <div class="score-fill" style="width:${fillPct}%"></div>
+        </div>
+      </div>
+    </li>
+  `;
+}).join("");
+
+
+    // rolar até minha posição (se eu estiver na lista)
+    const myItem = ul.querySelector(".rank-item.me");
+    if (myItem) myItem.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
-  // Botões extras
+  // Botão "Trocar nome"
   const btnTrocar = document.getElementById("btnTrocarNome");
   if (btnTrocar) btnTrocar.addEventListener("click", () => {
     const novo = prompt("Novo nome para o Ranking:");
     if (setPlayerName(novo)) {
-      // opcional: reflete imediatamente no nó do usuário
       const uid = getOrCreatePlayerId();
-      firebase.database().ref(`jogos/capivarinha/users/${uid}/name`).set(localStorage.getItem("capivarinha_player_name"));
-      alert("Nome atualizado!");
+      firebase.database().ref(`jogos/capivarinha/users/${uid}/name`)
+        .set(localStorage.getItem("capivarinha_player_name"))
+        .then(() => alert("Nome atualizado!"));
     }
   });
 
-  const btnMeuRec = document.getElementById("btnMeuRecorde");
-  if (btnMeuRec) btnMeuRec.addEventListener("click", () => {
-    const uid = getOrCreatePlayerId();
-    firebase.database().ref(`jogos/capivarinha/users/${uid}`).once("value").then(s => {
-      const v = s.val();
-      const rec = v?.best ?? 0;
-      const nm = v?.name || localStorage.getItem("capivarinha_player_name") || "Você";
-      alert(`${nm}, seu recorde é ${rec} pontos!`);
-    });
+  // Botão "Meu recorde" — rola até mim
+  const btnMeuRecorde = document.getElementById("btnMeuRecorde");
+  if (btnMeuRecorde) btnMeuRecorde.addEventListener("click", () => {
+    const myItem = document.querySelector(".rank-item.me");
+    if (myItem) myItem.scrollIntoView({ behavior: "smooth", block: "center" });
+    else alert("Jogue uma partida para entrar no ranking!");
   });
 }
+
 
 
 
