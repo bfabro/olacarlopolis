@@ -11552,7 +11552,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
     if (h === "#ondecomer") { return mostrarOndeComer(); }
     if (h === "#promocoes") { return mostrarPromocoes(); }
-    if (h === "#coletalixo") { return montarPaginaColetaLixo(); }
+    if (h === "#menuColetaLixo") { return montarPaginaColetaLixo(); }
     if (h === "#jogos") { return mostrarJogos(); }
 
     // categorias de "Comércios"
