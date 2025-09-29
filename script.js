@@ -57,6 +57,156 @@ function promoExpirada(p) {
   return Boolean(p?.validadeFim) && isDepoisDeHojeStr(p.validadeFim);
 }
 
+// === Identidade local do jogador (permite atualizar recorde sem repedir nome) ===
+function getOrCreatePlayerId() {
+  let id = localStorage.getItem("capivarinha_player_id");
+  if (!id) {
+    id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`;
+    localStorage.setItem("capivarinha_player_id", id);
+  }
+  return id;
+}
+
+// === Capivarinha: helpers para ranking ===
+function getPlayerName() {
+  // guarda localmente para não perguntar toda hora
+  let nm = localStorage.getItem("capivarinha_player_name") || "";
+  if (!nm) {
+    nm = prompt("Qual seu nome para o Ranking? (exibido publicamente)") || "";
+    nm = nm.trim().slice(0, 30);
+    if (nm) localStorage.setItem("capivarinha_player_name", nm);
+  }
+  return nm;
+}
+
+function setPlayerName(newName) {
+  const nm = String(newName || "").trim().slice(0, 30);
+  if (!nm) return false;
+  localStorage.setItem("capivarinha_player_name", nm);
+  return true;
+}
+
+function salvarScoreCapivarinha(score) {
+  try {
+    if (!window.firebase || !firebase.database) {
+      console.warn("Firebase não disponível");
+      return;
+    }
+    if (!(score > 0)) return;
+
+    const uid = getOrCreatePlayerId();
+    const name = getPlayerName();
+    if (!name) return;
+
+    const db = firebase.database();
+    const userRef = db.ref(`jogos/capivarinha/users/${uid}`);
+
+    // Atualiza histórico opcional (mantém cada partida, se você quiser estatística)
+    db.ref("jogos/capivarinha/scores").push({
+      uid, name, score: Number(score),
+      ts: firebase.database.ServerValue.TIMESTAMP
+    }).catch(()=>{});
+
+    // Transaction para manter o MELHOR score (best) do usuário
+    userRef.transaction((curr) => {
+      const best = curr?.best ?? 0;
+      if (!curr) {
+        // primeira vez
+        return {
+          name,
+          best: Number(score),
+          updatedAt: firebase.database.ServerValue.TIMESTAMP
+        };
+      }
+      // atualiza nome (pode ter sido trocado) e recorde se for maior
+      return {
+        name,
+        best: Math.max(Number(best), Number(score)),
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      };
+    }).then(() => {
+      console.log("Recorde verificado/atualizado:", name, score);
+    }).catch(err => console.error("Falha ao salvar/atualizar recorde:", err));
+  } catch (e) {
+    console.error("Erro salvarScoreCapivarinha:", e);
+  }
+}
+
+
+function mostrarRankingCapivarinha() {
+  if (location.hash !== "#ranking-capivarinha") location.hash = "#ranking-capivarinha";
+
+  const area = document.querySelector(".content_area");
+  area.innerHTML = `
+    <div class="page-header">
+      <h2>🏆 Ranking Capivarinha</h2>
+      <i class="fa-solid fa-share-nodes share-btn"
+         onclick="compartilharPagina('#ranking-capivarinha','Ranking Capivarinha','Veja o ranking do jogo Capivarinha!')"></i>
+    </div>
+
+    <div style="padding:8px 12px">
+      <p style="margin:6px 0 12px">Top recordes (melhor pontuação por jogador):</p>
+      <ul id="rankList" class="rank-list"></ul>
+
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-rank" onclick="location.hash='canos'; mostrarCanos()">⬅️ Voltar ao Capivarinha</button>
+
+        
+        <button class="btn-rank" id="btnTrocarNome">✏️ Trocar nome</button>
+        <button class="btn-rank" id="btnMeuRecorde">👤 Meu recorde</button>
+      </div>
+    </div>
+  `;
+
+  const ul = document.getElementById("rankList");
+  if (!window.firebase || !firebase.database) {
+    ul.innerHTML = `<li>⚠️ Firebase indisponível.</li>`;
+    return;
+  }
+
+  // Lê os usuários e ordena pelos melhores (best)
+  const ref = firebase.database().ref("jogos/capivarinha/users").orderByChild("best").limitToLast(50);
+  ref.on("value", (snap) => {
+    const arr = [];
+    snap.forEach(ch => {
+      const v = ch.val();
+      if (v && typeof v.best === "number") arr.push(v);
+    });
+    arr.sort((a, b) => b.best - a.best);
+
+    ul.innerHTML = arr.map((it, i) => `
+      <li>
+        <div class="pos">#${i+1}</div>
+        <div class="nm">${(it.name || "Jogador").toString().slice(0,30)}</div>
+        <div class="sc">${Number(it.best || 0)}</div>
+      </li>
+    `).join("") || `<li>Ninguém no ranking ainda. Jogue e salve seu score! 🎮</li>`;
+  });
+
+  // Botões extras
+  const btnTrocar = document.getElementById("btnTrocarNome");
+  if (btnTrocar) btnTrocar.addEventListener("click", () => {
+    const novo = prompt("Novo nome para o Ranking:");
+    if (setPlayerName(novo)) {
+      // opcional: reflete imediatamente no nó do usuário
+      const uid = getOrCreatePlayerId();
+      firebase.database().ref(`jogos/capivarinha/users/${uid}/name`).set(localStorage.getItem("capivarinha_player_name"));
+      alert("Nome atualizado!");
+    }
+  });
+
+  const btnMeuRec = document.getElementById("btnMeuRecorde");
+  if (btnMeuRec) btnMeuRec.addEventListener("click", () => {
+    const uid = getOrCreatePlayerId();
+    firebase.database().ref(`jogos/capivarinha/users/${uid}`).once("value").then(s => {
+      const v = s.val();
+      const rec = v?.best ?? 0;
+      const nm = v?.name || localStorage.getItem("capivarinha_player_name") || "Você";
+      alert(`${nm}, seu recorde é ${rec} pontos!`);
+    });
+  });
+}
+
 
 
 
@@ -102,85 +252,85 @@ function mostrarToast(mensagem) {
 document.addEventListener("DOMContentLoaded", function () {
 
 
-/// funçao para todas as paginas
-///
+  /// funçao para todas as paginas
+  ///
 
-// Compartilha a página atual (inclui hash) ou copia o link
-function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
-  const url = `${location.origin}${location.pathname}${hash || ""}`;
-  if (navigator.share) {
-    navigator.share({ title: titulo, text: texto, url })
-      .catch(() => mostrarToast("❌ Não foi possível compartilhar."));
-  } else {
-    navigator.clipboard.writeText(url)
-      .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
-      .catch(() => alert("Não foi possível copiar o link."));
+  // Compartilha a página atual (inclui hash) ou copia o link
+  function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
+    const url = `${location.origin}${location.pathname}${hash || ""}`;
+    if (navigator.share) {
+      navigator.share({ title: titulo, text: texto, url })
+        .catch(() => mostrarToast("❌ Não foi possível compartilhar."));
+    } else {
+      navigator.clipboard.writeText(url)
+        .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
+        .catch(() => alert("Não foi possível copiar o link."));
+    }
   }
-}
-window.compartilharPagina = compartilharPagina; // <<< adicione isto
-// Cria um botão flutuante único que sempre compartilha a página atual
-function criarShareFAB() {
-  if (document.querySelector(".fab-share")) return; // evita duplicar
+  window.compartilharPagina = compartilharPagina; // <<< adicione isto
+  // Cria um botão flutuante único que sempre compartilha a página atual
+  function criarShareFAB() {
+    if (document.querySelector(".fab-share")) return; // evita duplicar
 
-  const fab = document.createElement("button");
-  fab.className = "fab-share";
-  fab.title = "Compartilhar esta página";
-  fab.innerHTML = '<i class="fas fa-share-alt"></i>';
-  document.body.appendChild(fab);
+    const fab = document.createElement("button");
+    fab.className = "fab-share";
+    fab.title = "Compartilhar esta página";
+    fab.innerHTML = '<i class="fas fa-share-alt"></i>';
+    document.body.appendChild(fab);
 
-  fab.addEventListener("click", () => {
-    const titulo = document.title || "Olá Carlópolis";
-    // tenta pegar o título H2 atual para enriquecer o texto
-    const h2 = document.querySelector(".content_area h2");
-    const texto = h2 ? h2.textContent.trim() : "Confira esta página!";
-    compartilharPagina(location.hash, titulo, texto);
-  });
-}
+    fab.addEventListener("click", () => {
+      const titulo = document.title || "Olá Carlópolis";
+      // tenta pegar o título H2 atual para enriquecer o texto
+      const h2 = document.querySelector(".content_area h2");
+      const texto = h2 ? h2.textContent.trim() : "Confira esta página!";
+      compartilharPagina(location.hash, titulo, texto);
+    });
+  }
 
-// Injeta um botão de compartilhar ao lado do H2 da tela, automaticamente
-function injetarShareNoTitulo() {
-  const h2 = document.querySelector(".content_area h2.highlighted");
-  if (!h2) return;
+  // Injeta um botão de compartilhar ao lado do H2 da tela, automaticamente
+  function injetarShareNoTitulo() {
+    const h2 = document.querySelector(".content_area h2.highlighted");
+    if (!h2) return;
 
-  // evita duplicar
-  if (h2.querySelector(".btn-share")) return;
+    // evita duplicar
+    if (h2.querySelector(".btn-share")) return;
 
-  const btn = document.createElement("button");
-  btn.className = "btn-share";
-  btn.title = "Compartilhar esta página";
-  btn.innerHTML = '<i class="fas fa-share-alt"></i>';
-  h2.appendChild(btn);
+    const btn = document.createElement("button");
+    btn.className = "btn-share";
+    btn.title = "Compartilhar esta página";
+    btn.innerHTML = '<i class="fas fa-share-alt"></i>';
+    h2.appendChild(btn);
 
-  btn.addEventListener("click", () => {
-    const titulo = document.title || "Olá Carlópolis";
-    const texto = h2.textContent.trim() || "Confira esta página!";
-    compartilharPagina(location.hash, titulo, texto);
-  });
-}
+    btn.addEventListener("click", () => {
+      const titulo = document.title || "Olá Carlópolis";
+      const texto = h2.textContent.trim() || "Confira esta página!";
+      compartilharPagina(location.hash, titulo, texto);
+    });
+  }
 
-// Observa mudanças na área de conteúdo para reinjetar o botão no título
-function iniciarShareObserver() {
-  const area = document.querySelector(".content_area");
-  if (!area) return;
+  // Observa mudanças na área de conteúdo para reinjetar o botão no título
+  function iniciarShareObserver() {
+    const area = document.querySelector(".content_area");
+    if (!area) return;
 
-  // roda uma vez agora
-  injetarShareNoTitulo();
+    // roda uma vez agora
+    injetarShareNoTitulo();
 
-  const obs = new MutationObserver(() => injetarShareNoTitulo());
-  obs.observe(area, { childList: true, subtree: true });
-}
-
+    const obs = new MutationObserver(() => injetarShareNoTitulo());
+    obs.observe(area, { childList: true, subtree: true });
+  }
 
 
-//criarShareFAB();
-iniciarShareObserver();
 
+  //criarShareFAB();
+  iniciarShareObserver();
 
 
 
 
-///
-///
+
+  ///
+  ///
 
 
 
@@ -1112,12 +1262,12 @@ iniciarShareObserver();
   };
 
 
-///
-/// mostrar jogos
+  ///
+  /// mostrar jogos
 
-function mostrarJogos() {
-  if (location.hash !== "#jogos") location.hash = "#jogos"; // garante URL compartilhável
-  const html = `
+  function mostrarJogos() {
+    if (location.hash !== "#jogos") location.hash = "#jogos"; // garante URL compartilhável
+    const html = `
     <div class="page-header">
   <h2>🎮 Jogos</h2>
   <i class="fa-solid fa-share-nodes share-btn"  onclick="compartilharPagina('#jogos','Jogos','Venha jogar no Olá Carlópolis!')"></i>
@@ -1160,38 +1310,38 @@ function mostrarJogos() {
     </div>
   `;
 
-  const barra = document.getElementById("barraInstalacao");
-if (barra) barra.style.display = "none";
-const iosBox = document.getElementById("iosInstallBox");
-if (iosBox) iosBox.classList.add("hidden");
-const iosModal = document.getElementById("iosInstallPrompt");
-if (iosModal) iosModal.classList.add("hidden");
+    const barra = document.getElementById("barraInstalacao");
+    if (barra) barra.style.display = "none";
+    const iosBox = document.getElementById("iosInstallBox");
+    if (iosBox) iosBox.classList.add("hidden");
+    const iosModal = document.getElementById("iosInstallPrompt");
+    if (iosModal) iosModal.classList.add("hidden");
 
 
-  const area = document.querySelector(".content_area");
-  area.innerHTML = html;
+    const area = document.querySelector(".content_area");
+    area.innerHTML = html;
 
-  const t = document.getElementById("playTetrix");
-  if (t) t.addEventListener("click", (e) => {
-    e.preventDefault();
-    location.hash = "tetrix";
-    mostrarTetrix();
-  });
+    const t = document.getElementById("playTetrix");
+    if (t) t.addEventListener("click", (e) => {
+      e.preventDefault();
+      location.hash = "tetrix";
+      mostrarTetrix();
+    });
 
-  const c = document.getElementById("playCanos");
-  if (c) c.addEventListener("click", (e) => {
-    e.preventDefault();
-    location.hash = "canos";
-    mostrarCanos();
-  });
-}
-
-
+    const c = document.getElementById("playCanos");
+    if (c) c.addEventListener("click", (e) => {
+      e.preventDefault();
+      location.hash = "canos";
+      mostrarCanos();
+    });
+  }
 
 
 
-function mostrarTetrix() {
-  document.querySelector(".content_area").innerHTML = `
+
+
+  function mostrarTetrix() {
+    document.querySelector(".content_area").innerHTML = `
     <div class="game-wrap">
       <div class="game-header">
         
@@ -1223,375 +1373,375 @@ function mostrarTetrix() {
     </div>
   `;
 
-  // ===== Canvas 288x512 (mesmo esquema do Capivarinha) =====
-  const cvs = document.getElementById("tetrixCanvas");
-  const ctx = cvs.getContext("2d");
+    // ===== Canvas 288x512 (mesmo esquema do Capivarinha) =====
+    const cvs = document.getElementById("tetrixCanvas");
+    const ctx = cvs.getContext("2d");
 
 
-  // esconde a dica após 3.5s ou no primeiro toque
-const hint = document.getElementById("tetrixHint");
-const sumir = () => hint && hint.classList.add("hidden");
-setTimeout(sumir, 3500);
-cvs.addEventListener("pointerdown", sumir, { once: true });
+    // esconde a dica após 3.5s ou no primeiro toque
+    const hint = document.getElementById("tetrixHint");
+    const sumir = () => hint && hint.classList.add("hidden");
+    setTimeout(sumir, 3500);
+    cvs.addEventListener("pointerdown", sumir, { once: true });
 
-  (function scaleForDPR(){
-    const dpr = window.devicePixelRatio || 1;
-    const w = cvs.width, h = cvs.height; // 288x512
-    cvs.width  = Math.round(w * dpr);
-    cvs.height = Math.round(h * dpr);
-    cvs.style.width  = w + "px";
-    cvs.style.height = h + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  })();
-
-
-  // responsivo: reduz o canvas no browser conforme a largura disponível
-(function ajustarCanvasCSS() {
-  const box = document.querySelector(".canvas-box");
-  if (!box) return;
-
-  function setSize() {
-    // espaço máximo e mínimo para o canvas (desktop fica mais enxuto)
-    const maxW = Math.min(360, box.clientWidth - 8);
-    const target = Math.max(260, maxW);     // clamp
-    const ratio = 512 / 350;                // mesmo aspecto do jogo
-
-    cvs.style.width  = target + "px";
-    cvs.style.height = Math.round(target * ratio) + "px";
-  }
-
-  setSize();
-  window.addEventListener("resize", setSize);
-})();
+    (function scaleForDPR() {
+      const dpr = window.devicePixelRatio || 1;
+      const w = cvs.width, h = cvs.height; // 288x512
+      cvs.width = Math.round(w * dpr);
+      cvs.height = Math.round(h * dpr);
+      cvs.style.width = w + "px";
+      cvs.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    })();
 
 
-  const W = 350, H = 512;
-  const COLS = 10, ROWS = 20;
+    // responsivo: reduz o canvas no browser conforme a largura disponível
+    (function ajustarCanvasCSS() {
+      const box = document.querySelector(".canvas-box");
+      if (!box) return;
 
-  // campo 10x20 centralizado dentro de 288x512
-  const SIZE = Math.floor(Math.min(W / COLS, H / ROWS));
-  const OFFSET_X = Math.floor((W - (SIZE * COLS)) / 2);
-  const OFFSET_Y = Math.floor((H - (SIZE * ROWS)) / 2);
+      function setSize() {
+        // espaço máximo e mínimo para o canvas (desktop fica mais enxuto)
+        const maxW = Math.min(360, box.clientWidth - 8);
+        const target = Math.max(260, maxW);     // clamp
+        const ratio = 512 / 350;                // mesmo aspecto do jogo
 
-  const board  = Array.from({length: ROWS}, () => Array(COLS).fill(0));
-  const colors = ["#000","#00f0f0","#0000f0","#f0a000","#f0f000","#00f000","#a000f0","#f00000"];
-  const SHAPES = {
-    I:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
-    J:[[2,0,0],[2,2,2],[0,0,0]],
-    L:[[0,0,3],[3,3,3],[0,0,0]],
-    O:[[4,4],[4,4]],
-    S:[[0,5,5],[5,5,0],[0,0,0]],
-    T:[[0,6,0],[6,6,6],[0,0,0]],
-    Z:[[7,7,0],[0,7,7],[0,0,0]]
-  };
-  const TYPES  = Object.keys(SHAPES);
+        cvs.style.width = target + "px";
+        cvs.style.height = Math.round(target * ratio) + "px";
+      }
+
+      setSize();
+      window.addEventListener("resize", setSize);
+    })();
 
 
+    const W = 350, H = 512;
+    const COLS = 10, ROWS = 20;
 
-  // ===== Gestos no canvas: arrastar move, toque curto gira =====
-// ===== Gestos no canvas: arrastar move, toque curto gira, segurar = queda rápida =====
-(() => {
-  const rectOf = () => cvs.getBoundingClientRect();
+    // campo 10x20 centralizado dentro de 288x512
+    const SIZE = Math.floor(Math.min(W / COLS, H / ROWS));
+    const OFFSET_X = Math.floor((W - (SIZE * COLS)) / 2);
+    const OFFSET_Y = Math.floor((H - (SIZE * ROWS)) / 2);
 
-  const gesture = {
-    active: false,
-    startX: 0,
-    lastStepX: 0,
-    moved: false,
-    t0: 0
-  };
-
-  const STEP_PX = Math.max(10, Math.floor(SIZE * 0.6)); // deslocamento p/ 1 passo lateral
-  const LONG_PRESS_MS = 300;  // tempo para acionar queda rápida
-  const FAST_INTERVAL_MS = 30;
-
-  let longTO = null;   // timeout para começar a queda rápida
-  let fastTimer = null;// interval enquanto segurando
-  let fastActive = false;
-
-  const startFast = () => {
-    if (fastActive) return;
-    fastActive = true;
-    fastTimer = setInterval(() => { move(0, 1); }, FAST_INTERVAL_MS);
-  };
-  const stopFast = () => {
-    fastActive = false;
-    if (fastTimer) { clearInterval(fastTimer); fastTimer = null; }
-  };
-  const clearLong = () => { if (longTO) { clearTimeout(longTO); longTO = null; } };
-
-  const toCanvasX = (clientX) => clientX - rectOf().left;
-
-  function onDown(e) {
-    e.preventDefault();
-    const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
-    const x = toCanvasX(clientX);
-
-    gesture.active = true;
-    gesture.startX = x;
-    gesture.lastStepX = x;
-    gesture.moved = false;
-    gesture.t0 = performance.now();
-
-    // programa long-press (queda rápida)
-    clearLong();
-    stopFast();
-    longTO = setTimeout(startFast, LONG_PRESS_MS);
-
-    if (cvs.setPointerCapture && e.pointerId !== undefined) {
-      cvs.setPointerCapture(e.pointerId);
-    }
-  }
-
-  function onMove(e) {
-    if (!gesture.active) return;
-    const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
-    const x = toCanvasX(clientX);
-
-    const dx = x - gesture.lastStepX;
-
-    // Se começou a arrastar lateral, cancela o long-press (para não ativar queda)
-    if (!gesture.moved && Math.abs(x - gesture.startX) > 12) {
-      clearLong();
-    }
-
-    if (Math.abs(dx) >= STEP_PX) {
-      const steps = Math.trunc(dx / STEP_PX);
-      const dir = Math.sign(steps);
-      const times = Math.abs(steps);
-      for (let i = 0; i < times; i++) move(dir, 0);
-      gesture.lastStepX += steps * STEP_PX;
-      gesture.moved = true;
-    }
-  }
-
-  function onUp(e) {
-    if (!gesture.active) return;
-    e.preventDefault();
-
-    const elapsed = performance.now() - gesture.t0;
-
-    // Se não arrastou, não acionou fast e foi um toque curto -> gira
-    if (!gesture.moved && !fastActive && elapsed < 250) {
-      rotateTry();
-    }
-
-    // encerra estados do gesto
-    gesture.active = false;
-    clearLong();
-    stopFast();
-
-    if (cvs.releasePointerCapture && e.pointerId !== undefined) {
-      try { cvs.releasePointerCapture(e.pointerId); } catch {}
-    }
-  }
-
-  if ("onpointerdown" in window) {
-    cvs.addEventListener("pointerdown", onDown, { passive: false });
-    cvs.addEventListener("pointermove", onMove, { passive: false });
-    cvs.addEventListener("pointerup", onUp, { passive: false });
-    cvs.addEventListener("pointercancel", onUp, { passive: false });
-  } else {
-    cvs.addEventListener("touchstart", onDown, { passive: false });
-    cvs.addEventListener("touchmove", onMove, { passive: false });
-    cvs.addEventListener("touchend", onUp, { passive: false });
-    cvs.addEventListener("mousedown", onDown);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-  }
-})();
+    const board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    const colors = ["#000", "#00f0f0", "#0000f0", "#f0a000", "#f0f000", "#00f000", "#a000f0", "#f00000"];
+    const SHAPES = {
+      I: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+      J: [[2, 0, 0], [2, 2, 2], [0, 0, 0]],
+      L: [[0, 0, 3], [3, 3, 3], [0, 0, 0]],
+      O: [[4, 4], [4, 4]],
+      S: [[0, 5, 5], [5, 5, 0], [0, 0, 0]],
+      T: [[0, 6, 0], [6, 6, 6], [0, 0, 0]],
+      Z: [[7, 7, 0], [0, 7, 7], [0, 0, 0]]
+    };
+    const TYPES = Object.keys(SHAPES);
 
 
 
-  let grid, px, py, running = true;
-  let score=0, lines=0, level=1, drop=800, last=0, acc=0;
+    // ===== Gestos no canvas: arrastar move, toque curto gira =====
+    // ===== Gestos no canvas: arrastar move, toque curto gira, segurar = queda rápida =====
+    (() => {
+      const rectOf = () => cvs.getBoundingClientRect();
 
-  function newPiece(){
-    const t = TYPES[(Math.random()*TYPES.length)|0];
-    grid = SHAPES[t].map(r => r.slice());
-    px = ((COLS/2)|0) - ((grid[0].length/2)|0);
-    py = 0;
-    if (collide(px,py,grid)) { running=false; draw(); }
-  }
-  function rotate(m){
-    const N=m.length, r=Array.from({length:N},()=>Array(N).fill(0));
-    for(let y=0;y<N;y++) for(let x=0;x<N;x++) r[x][N-1-y]=m[y][x];
-    return r;
-  }
-  function collide(nx,ny,m){
-    for(let y=0;y<m.length;y++) for(let x=0;x<m[y].length;x++){
-      if(!m[y][x]) continue;
-      const X=nx+x, Y=ny+y;
-      if(X<0||X>=COLS||Y>=ROWS) return true;
-      if(Y>=0 && board[Y][X])   return true;
-    }
-    return false;
-  }
-  function merge(){
-    for(let y=0;y<grid.length;y++)
-      for(let x=0;x<grid[y].length;x++)
-        if(grid[y][x] && py+y>=0) board[py+y][px+x]=grid[y][x];
-    let c=0;
-    outer: for(let y=ROWS-1;y>=0;y--){
-      for(let x=0;x<COLS;x++) if(!board[y][x]) continue outer;
-      board.splice(y,1); board.unshift(Array(COLS).fill(0));
-      c++; y++;
-    }
-    if(c){
-      lines+=c;
-      score += [0,40,100,300,1200][c]*level;
-      if(lines >= level*10 && level<20){ level++; drop=Math.max(100, drop-60); }
-      hud();
-    }
-  }
-  function move(dx,dy){
-    if(!running) return false;
-    const nx=px+dx, ny=py+dy;
-    if(!collide(nx,ny,grid)){ px=nx; py=ny; return true; }
-    return false;
-  }
-  function rotateTry(){
-    const r = rotate(grid);
-    if(!collide(px,py,r)) { grid=r; return; }
-    if(!collide(px-1,py,r)){ px--; grid=r; return; }
-    if(!collide(px+1,py,r)){ px++; grid=r; return; }
-  }
-  function hardDrop(){ while(!collide(px,py+1,grid)) py++; step(); }
-  function step(){ merge(); newPiece(); }
+      const gesture = {
+        active: false,
+        startX: 0,
+        lastStepX: 0,
+        moved: false,
+        t0: 0
+      };
 
-  function drawCell(x,y,v){
-    ctx.fillStyle = colors[v];
-    ctx.fillRect(OFFSET_X + x*SIZE, OFFSET_Y + y*SIZE, SIZE-1, SIZE-1);
-  }
-  function draw(){
-    ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle="#222"; ctx.lineWidth=2;
-    ctx.strokeRect(OFFSET_X-2, OFFSET_Y-2, SIZE*COLS+4, SIZE*ROWS+4);
-    for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++) drawCell(x,y,board[y][x]);
-    if(running){
-      for(let y=0;y<grid.length;y++)
-        for(let x=0;x<grid[y].length;x++){
-          const v=grid[y][x]; if(!v) continue;
-          const Y=py+y, X=px+x; if(Y>=0) drawCell(X,Y,v);
+      const STEP_PX = Math.max(10, Math.floor(SIZE * 0.6)); // deslocamento p/ 1 passo lateral
+      const LONG_PRESS_MS = 300;  // tempo para acionar queda rápida
+      const FAST_INTERVAL_MS = 30;
+
+      let longTO = null;   // timeout para começar a queda rápida
+      let fastTimer = null;// interval enquanto segurando
+      let fastActive = false;
+
+      const startFast = () => {
+        if (fastActive) return;
+        fastActive = true;
+        fastTimer = setInterval(() => { move(0, 1); }, FAST_INTERVAL_MS);
+      };
+      const stopFast = () => {
+        fastActive = false;
+        if (fastTimer) { clearInterval(fastTimer); fastTimer = null; }
+      };
+      const clearLong = () => { if (longTO) { clearTimeout(longTO); longTO = null; } };
+
+      const toCanvasX = (clientX) => clientX - rectOf().left;
+
+      function onDown(e) {
+        e.preventDefault();
+        const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+        const x = toCanvasX(clientX);
+
+        gesture.active = true;
+        gesture.startX = x;
+        gesture.lastStepX = x;
+        gesture.moved = false;
+        gesture.t0 = performance.now();
+
+        // programa long-press (queda rápida)
+        clearLong();
+        stopFast();
+        longTO = setTimeout(startFast, LONG_PRESS_MS);
+
+        if (cvs.setPointerCapture && e.pointerId !== undefined) {
+          cvs.setPointerCapture(e.pointerId);
         }
-    } else {
-      ctx.fillStyle="#fff"; ctx.font="bold 20px Poppins,Arial";
-      ctx.fillText("GAME OVER", 84, 250);
-      ctx.font="14px Poppins,Arial"; ctx.fillText("Toque em Reiniciar", 86, 278);
+      }
+
+      function onMove(e) {
+        if (!gesture.active) return;
+        const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+        const x = toCanvasX(clientX);
+
+        const dx = x - gesture.lastStepX;
+
+        // Se começou a arrastar lateral, cancela o long-press (para não ativar queda)
+        if (!gesture.moved && Math.abs(x - gesture.startX) > 12) {
+          clearLong();
+        }
+
+        if (Math.abs(dx) >= STEP_PX) {
+          const steps = Math.trunc(dx / STEP_PX);
+          const dir = Math.sign(steps);
+          const times = Math.abs(steps);
+          for (let i = 0; i < times; i++) move(dir, 0);
+          gesture.lastStepX += steps * STEP_PX;
+          gesture.moved = true;
+        }
+      }
+
+      function onUp(e) {
+        if (!gesture.active) return;
+        e.preventDefault();
+
+        const elapsed = performance.now() - gesture.t0;
+
+        // Se não arrastou, não acionou fast e foi um toque curto -> gira
+        if (!gesture.moved && !fastActive && elapsed < 250) {
+          rotateTry();
+        }
+
+        // encerra estados do gesto
+        gesture.active = false;
+        clearLong();
+        stopFast();
+
+        if (cvs.releasePointerCapture && e.pointerId !== undefined) {
+          try { cvs.releasePointerCapture(e.pointerId); } catch { }
+        }
+      }
+
+      if ("onpointerdown" in window) {
+        cvs.addEventListener("pointerdown", onDown, { passive: false });
+        cvs.addEventListener("pointermove", onMove, { passive: false });
+        cvs.addEventListener("pointerup", onUp, { passive: false });
+        cvs.addEventListener("pointercancel", onUp, { passive: false });
+      } else {
+        cvs.addEventListener("touchstart", onDown, { passive: false });
+        cvs.addEventListener("touchmove", onMove, { passive: false });
+        cvs.addEventListener("touchend", onUp, { passive: false });
+        cvs.addEventListener("mousedown", onDown);
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onUp);
+      }
+    })();
+
+
+
+    let grid, px, py, running = true;
+    let score = 0, lines = 0, level = 1, drop = 800, last = 0, acc = 0;
+
+    function newPiece() {
+      const t = TYPES[(Math.random() * TYPES.length) | 0];
+      grid = SHAPES[t].map(r => r.slice());
+      px = ((COLS / 2) | 0) - ((grid[0].length / 2) | 0);
+      py = 0;
+      if (collide(px, py, grid)) { running = false; draw(); }
     }
-  }
-  function hud(){
-    document.getElementById("t-score").textContent = score;
-    document.getElementById("t-lines").textContent = lines;
-    document.getElementById("t-level").textContent = level;
-  }
-  function loop(t=0){
-    if(!running) return draw();
-    const dt = t - last; last = t; acc += dt;
-    if(acc >= drop){ acc=0; if(!move(0,1)) step(); }
-    draw(); requestAnimationFrame(loop);
-  }
-
-
-
-
-
-  // Teclado (desktop)
-  addEventListener("keydown", e=>{
-    if(!running) return;
-    if(e.key==="ArrowLeft")      move(-1,0);
-    else if(e.key==="ArrowRight") move(1,0);
-    else if(e.key==="ArrowDown")  move(0,1);
-    else if(e.key==="ArrowUp")    rotateTry();
-    else if(e.code==="Space")     hardDrop();
-  });
-
-  // Botões mobile (NOVO)
-  const onTap = (id, fn) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const handler = (e)=>{ e.preventDefault(); fn(); };
-    el.addEventListener("click", handler);
-    el.addEventListener("touchstart", handler, { passive:false });
-  };
-  onTap("t-left",  () => move(-1,0));
-  onTap("t-right", () => move(1,0));
-  onTap("t-down",  () => move(0,1));
-  onTap("t-rot",   () => rotateTry());
-  onTap("t-drop",  () => hardDrop());
-
-
-  // Descer continuamente enquanto o botão estiver pressionado
-(function setupFastHold(){
-  const fastBtn = document.getElementById("t-fast");
-
-
-  if (fastBtn) {
-  // bloqueia seleção, clique padrão e menu de contexto
-  ["selectstart", "contextmenu"].forEach(ev =>
-    fastBtn.addEventListener(ev, e => e.preventDefault())
-  );
-
-  // já deve existir algo assim para acelerar; garanta preventDefault/stopPropagation:
-  fastBtn.addEventListener("mousedown", (e) => { e.preventDefault(); e.stopPropagation(); /* startFast() */ });
-  fastBtn.addEventListener("touchstart", (e) => { e.preventDefault(); e.stopPropagation(); /* startFast() */ }, { passive: false });
-}
-
-  if (!fastBtn) return;
-
-  let fastTimer = null;
-
-  const startFast = () => {
-    if (!running || fastTimer) return;
-    // desce suavemente a cada 30ms
-    fastTimer = setInterval(() => { move(0, 1); }, 30);
-  };
-  const stopFast = () => {
-    if (fastTimer) {
-      clearInterval(fastTimer);
-      fastTimer = null;
+    function rotate(m) {
+      const N = m.length, r = Array.from({ length: N }, () => Array(N).fill(0));
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) r[x][N - 1 - y] = m[y][x];
+      return r;
     }
-  };
+    function collide(nx, ny, m) {
+      for (let y = 0; y < m.length; y++) for (let x = 0; x < m[y].length; x++) {
+        if (!m[y][x]) continue;
+        const X = nx + x, Y = ny + y;
+        if (X < 0 || X >= COLS || Y >= ROWS) return true;
+        if (Y >= 0 && board[Y][X]) return true;
+      }
+      return false;
+    }
+    function merge() {
+      for (let y = 0; y < grid.length; y++)
+        for (let x = 0; x < grid[y].length; x++)
+          if (grid[y][x] && py + y >= 0) board[py + y][px + x] = grid[y][x];
+      let c = 0;
+      outer: for (let y = ROWS - 1; y >= 0; y--) {
+        for (let x = 0; x < COLS; x++) if (!board[y][x]) continue outer;
+        board.splice(y, 1); board.unshift(Array(COLS).fill(0));
+        c++; y++;
+      }
+      if (c) {
+        lines += c;
+        score += [0, 40, 100, 300, 1200][c] * level;
+        if (lines >= level * 10 && level < 20) { level++; drop = Math.max(100, drop - 60); }
+        hud();
+      }
+    }
+    function move(dx, dy) {
+      if (!running) return false;
+      const nx = px + dx, ny = py + dy;
+      if (!collide(nx, ny, grid)) { px = nx; py = ny; return true; }
+      return false;
+    }
+    function rotateTry() {
+      const r = rotate(grid);
+      if (!collide(px, py, r)) { grid = r; return; }
+      if (!collide(px - 1, py, r)) { px--; grid = r; return; }
+      if (!collide(px + 1, py, r)) { px++; grid = r; return; }
+    }
+    function hardDrop() { while (!collide(px, py + 1, grid)) py++; step(); }
+    function step() { merge(); newPiece(); }
 
-  // mouse
-  fastBtn.addEventListener("mousedown", (e) => { e.preventDefault(); startFast(); });
-  window.addEventListener("mouseup", stopFast);
-  fastBtn.addEventListener("mouseleave", stopFast);
+    function drawCell(x, y, v) {
+      ctx.fillStyle = colors[v];
+      ctx.fillRect(OFFSET_X + x * SIZE, OFFSET_Y + y * SIZE, SIZE - 1, SIZE - 1);
+    }
+    function draw() {
+      ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "#222"; ctx.lineWidth = 2;
+      ctx.strokeRect(OFFSET_X - 2, OFFSET_Y - 2, SIZE * COLS + 4, SIZE * ROWS + 4);
+      for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) drawCell(x, y, board[y][x]);
+      if (running) {
+        for (let y = 0; y < grid.length; y++)
+          for (let x = 0; x < grid[y].length; x++) {
+            const v = grid[y][x]; if (!v) continue;
+            const Y = py + y, X = px + x; if (Y >= 0) drawCell(X, Y, v);
+          }
+      } else {
+        ctx.fillStyle = "#fff"; ctx.font = "bold 20px Poppins,Arial";
+        ctx.fillText("GAME OVER", 84, 250);
+        ctx.font = "14px Poppins,Arial"; ctx.fillText("Toque em Reiniciar", 86, 278);
+      }
+    }
+    function hud() {
+      document.getElementById("t-score").textContent = score;
+      document.getElementById("t-lines").textContent = lines;
+      document.getElementById("t-level").textContent = level;
+    }
+    function loop(t = 0) {
+      if (!running) return draw();
+      const dt = t - last; last = t; acc += dt;
+      if (acc >= drop) { acc = 0; if (!move(0, 1)) step(); }
+      draw(); requestAnimationFrame(loop);
+    }
 
-  // touch
-  fastBtn.addEventListener("touchstart", (e) => { e.preventDefault(); startFast(); }, { passive: false });
-  window.addEventListener("touchend", stopFast);
-  window.addEventListener("touchcancel", stopFast);
-})();
-
-
-  document.getElementById("t-restart").onclick = ()=>{
-    for(let y=0;y<ROWS;y++) board[y].fill(0);
-    score=0; lines=0; level=1; drop=800; running=true; hud(); newPiece(); last=0; acc=0;
-    requestAnimationFrame(loop);
-  };
-
-  // Start
-  hud(); newPiece(); draw(); requestAnimationFrame(loop);
-}
 
 
 
 
+    // Teclado (desktop)
+    addEventListener("keydown", e => {
+      if (!running) return;
+      if (e.key === "ArrowLeft") move(-1, 0);
+      else if (e.key === "ArrowRight") move(1, 0);
+      else if (e.key === "ArrowDown") move(0, 1);
+      else if (e.key === "ArrowUp") rotateTry();
+      else if (e.code === "Space") hardDrop();
+    });
 
-//// flayyoo canos
+    // Botões mobile (NOVO)
+    const onTap = (id, fn) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const handler = (e) => { e.preventDefault(); fn(); };
+      el.addEventListener("click", handler);
+      el.addEventListener("touchstart", handler, { passive: false });
+    };
+    onTap("t-left", () => move(-1, 0));
+    onTap("t-right", () => move(1, 0));
+    onTap("t-down", () => move(0, 1));
+    onTap("t-rot", () => rotateTry());
+    onTap("t-drop", () => hardDrop());
 
 
-// ======== CAPIVARINHA (rio serpenteando) — FUNÇÃO ÚNICA, LIMPA ========
-function mostrarCanos() {
-  const html = `
+    // Descer continuamente enquanto o botão estiver pressionado
+    (function setupFastHold() {
+      const fastBtn = document.getElementById("t-fast");
+
+
+      if (fastBtn) {
+        // bloqueia seleção, clique padrão e menu de contexto
+        ["selectstart", "contextmenu"].forEach(ev =>
+          fastBtn.addEventListener(ev, e => e.preventDefault())
+        );
+
+        // já deve existir algo assim para acelerar; garanta preventDefault/stopPropagation:
+        fastBtn.addEventListener("mousedown", (e) => { e.preventDefault(); e.stopPropagation(); /* startFast() */ });
+        fastBtn.addEventListener("touchstart", (e) => { e.preventDefault(); e.stopPropagation(); /* startFast() */ }, { passive: false });
+      }
+
+      if (!fastBtn) return;
+
+      let fastTimer = null;
+
+      const startFast = () => {
+        if (!running || fastTimer) return;
+        // desce suavemente a cada 30ms
+        fastTimer = setInterval(() => { move(0, 1); }, 30);
+      };
+      const stopFast = () => {
+        if (fastTimer) {
+          clearInterval(fastTimer);
+          fastTimer = null;
+        }
+      };
+
+      // mouse
+      fastBtn.addEventListener("mousedown", (e) => { e.preventDefault(); startFast(); });
+      window.addEventListener("mouseup", stopFast);
+      fastBtn.addEventListener("mouseleave", stopFast);
+
+      // touch
+      fastBtn.addEventListener("touchstart", (e) => { e.preventDefault(); startFast(); }, { passive: false });
+      window.addEventListener("touchend", stopFast);
+      window.addEventListener("touchcancel", stopFast);
+    })();
+
+
+    document.getElementById("t-restart").onclick = () => {
+      for (let y = 0; y < ROWS; y++) board[y].fill(0);
+      score = 0; lines = 0; level = 1; drop = 800; running = true; hud(); newPiece(); last = 0; acc = 0;
+      requestAnimationFrame(loop);
+    };
+
+    // Start
+    hud(); newPiece(); draw(); requestAnimationFrame(loop);
+  }
+
+
+
+
+
+  //// flayyoo canos
+
+
+  // ======== CAPIVARINHA (rio serpenteando) — FUNÇÃO ÚNICA, LIMPA ========
+  function mostrarCanos() {
+    const html = `
     <div class="game-wrap">
       <div class="game-header">
         <h2>Capivarinha</h2>
         <div class="flappy-ui">
           <div class="scorebox">Pontos: <span id="f-score">0</span></div>
           <div class="scorebox">Recorde: <span id="f-best">0</span></div>
-          <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
+          
         </div>
       </div>
 
@@ -1600,511 +1750,525 @@ function mostrarCanos() {
       <div class="flappy-buttons">
         <button id="f-jump">Pular</button>
         <button id="f-restart">Reiniciar</button>
+        <button id="f-ranking" class="btn-rank">🏆 Ranking</button>
+        <button id="f-voltar" class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
+        
+        
       </div>
-      
     </div>
-  `;
-  document.querySelector(".content_area").innerHTML = html;
+    `;
+    document.querySelector(".content_area").innerHTML = html;
 
-  // Canvas com DPR
-  const cvs = document.getElementById("flappyCanvas");
-  const ctx = cvs.getContext("2d");
-  (function scaleForDPR(){
-    const dpr = window.devicePixelRatio || 1;
-    const w = cvs.width, h = cvs.height;
-    cvs.width  = Math.round(w * dpr);
-    cvs.height = Math.round(h * dpr);
-    cvs.style.width  = w + "px";
-    cvs.style.height = h + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  })();
+    // Canvas com DPR
+    const cvs = document.getElementById("flappyCanvas");
+    const ctx = cvs.getContext("2d");
+    (function scaleForDPR() {
+      const dpr = window.devicePixelRatio || 1;
+      const w = cvs.width, h = cvs.height;
+      cvs.width = Math.round(w * dpr);
+      cvs.height = Math.round(h * dpr);
+      cvs.style.width = w + "px";
+      cvs.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    })();
 
-  const W = 350, H = 512;
+    const W = 350, H = 512;
 
-  // Capivara (inicia na grama)
-  const capy = { x: 28, y: H - 40, r: 12, vy: 0, gravity: 0.35, jump: -6.0 };
+    // Capivara (inicia na grama)
+    const capy = { x: 28, y: H - 40, r: 12, vy: 0, gravity: 0.35, jump: -6.0 };
 
-  // ===== Rio serpenteando =====
-  const RIVER_STEP = 8;
+    // ===== Rio serpenteando =====
+    const RIVER_STEP = 8;
 
-  // Agora mais largo por padrão:
-  const GAP0 = 300;          // era 120
-  const GAP_MIN = 180;       // era 80 (mantém um mínimo confortável)
-  const BOAT_GAP = 220;      // largura alvo quando há barco na tela
+    // Agora mais largo por padrão:
+    const GAP0 = 300;          // era 120
+    const GAP_MIN = 180;       // era 80 (mantém um mínimo confortável)
+    const BOAT_GAP = 220;      // largura alvo quando há barco na tela
 
-  // Velocidade do “mundo”
-  const SPEED0 = 2.0, SPEED_MAX = 5.0;
+    // Velocidade do “mundo”
+    const SPEED0 = 2.0, SPEED_MAX = 5.0;
 
-  let gap = GAP0, speed = SPEED0, phase = 0;
-  let timeSinceStart = 0, distForScore = 0;
-  const SCORE_EVERY = 120;
+    let gap = GAP0, speed = SPEED0, phase = 0;
+    let timeSinceStart = 0, distForScore = 0;
+    const SCORE_EVERY = 120;
 
-  // Meandros do rio
-  const amp1 = 70, freq1 = 0.010;
-  const amp2 = 28, freq2 = 0.022;
+    // Meandros do rio
+    const amp1 = 70, freq1 = 0.010;
+    const amp2 = 28, freq2 = 0.022;
 
-  const riverCenterAt  = (x) => H*0.5
-    + Math.sin((x + phase) * freq1) * amp1
-    + Math.sin((x*0.5 + phase*1.3) * freq2) * amp2;
-  const riverTopAt     = (x) => riverCenterAt(x) - gap/2;
-  const riverBottomAt  = (x) => riverCenterAt(x) + gap/2;
+    const riverCenterAt = (x) => H * 0.5
+      + Math.sin((x + phase) * freq1) * amp1
+      + Math.sin((x * 0.5 + phase * 1.3) * freq2) * amp2;
+    const riverTopAt = (x) => riverCenterAt(x) - gap / 2;
+    const riverBottomAt = (x) => riverCenterAt(x) + gap / 2;
 
-  // ===== Barcos ocasionais =====
-  const boats = [];
-  const BOAT_W = 36, BOAT_H = 14;
-  const BOAT_EXTRA_SPEED = 0.9;        // barco “vem” mais rápido que o rio
-  let nextBoatIn = 3000 + Math.random()*5000; // 3–8s para o primeiro
-
-
-  // ===== Capivara no rio (extra) =====
-let riverCapy = null;
-let nextRiverCapyIn = 4000 + Math.random()*7000;  // 4–11s para a primeira
-const RIVERCAPY_R = 10;            // raio para desenhar/colisão se quiser
-const RIVERCAPY_EXTRA_SPEED = 0.6; // um pouco mais “rápida” que o rio
+    // ===== Barcos ocasionais =====
+    const boats = [];
+    const BOAT_W = 36, BOAT_H = 14;
+    const BOAT_EXTRA_SPEED = 0.9;        // barco “vem” mais rápido que o rio
+    let nextBoatIn = 3000 + Math.random() * 5000; // 3–8s para o primeiro
 
 
-
-// ===== Peixes no rio =====
-let fishes = [];
-let nextFishIn = 3000 + Math.random() * 5000; // de 3 a 8s para spawn
-
-function spawnFish() {
-  const x = W + 20;
-  const y = riverCenterAt(x) + (Math.random() * 20 - 10); // um pouco acima/abaixo do centro
-  fishes.push({
-    x, y,
-    r: 6 + Math.random() * 4, // tamanho aleatório
-    speed: speed + 1 + Math.random() * 0.5,
-    dir: Math.random() < 0.5 ? 1 : -1, // peixe pode virar para cima/baixo
-    bob: 0
-  });
-}
-
-function drawFish(f) {
-  ctx.save();
-  ctx.translate(f.x, f.y);
-
-  // corpo oval
-  ctx.fillStyle = "#ff9933";
-  ctx.beginPath();
-  ctx.ellipse(0, 0, f.r * 1.6, f.r, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // cauda
-  ctx.beginPath();
-  ctx.moveTo(-f.r * 1.6, 0);
-  ctx.lineTo(-f.r * 2.2, f.r * 0.8);
-  ctx.lineTo(-f.r * 2.2, -f.r * 0.8);
-  ctx.closePath();
-  ctx.fill();
-
-  // olho
-  ctx.fillStyle = "#000";
-  ctx.beginPath();
-  ctx.arc(f.r * 0.8, -f.r * 0.3, 1.5, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.restore();
-}
+    // ===== Capivara no rio (extra) =====
+    let riverCapy = null;
+    let nextRiverCapyIn = 4000 + Math.random() * 7000;  // 4–11s para a primeira
+    const RIVERCAPY_R = 10;            // raio para desenhar/colisão se quiser
+    const RIVERCAPY_EXTRA_SPEED = 0.6; // um pouco mais “rápida” que o rio
 
 
-function spawnRiverCapy() {
-  // nasce à direita, no centro do rio naquele x
-  const x = W + 20;
-  const y = riverCenterAt(x);
-  riverCapy = {
-    x, y, r: RIVERCAPY_R, alive:true,
-    bob: 0, bobAmp: 2 + Math.random()*2 // balancinho na água
-  };
-}
 
-function drawRiverCapy(rc){
-  // corpo simples (marrom) + focinho
-  ctx.fillStyle = "#7a5d3a";
-  ctx.beginPath();
-  ctx.ellipse(rc.x, rc.y, rc.r+6, rc.r, 0, 0, Math.PI*2);
-  ctx.fill();
+    // ===== Peixes no rio =====
+    let fishes = [];
+    let nextFishIn = 3000 + Math.random() * 5000; // de 3 a 8s para spawn
 
-  // cabecinha
-  ctx.beginPath();
-  ctx.arc(rc.x + rc.r, rc.y - 2, rc.r*0.7, 0, Math.PI*2);
-  ctx.fill();
+    function spawnFish() {
+      const x = W + 20;
+      const y = riverCenterAt(x) + (Math.random() * 20 - 10); // um pouco acima/abaixo do centro
+      fishes.push({
+        x, y,
+        r: 6 + Math.random() * 4, // tamanho aleatório
+        speed: speed + 1 + Math.random() * 0.5,
+        dir: Math.random() < 0.5 ? 1 : -1, // peixe pode virar para cima/baixo
+        bob: 0
+      });
+    }
 
-  // orelhinhas
-  ctx.fillRect(rc.x + rc.r + 3, rc.y - 8, 2, 4);
-  ctx.fillRect(rc.x + rc.r + 1, rc.y - 8, 2, 4);
+    function drawFish(f) {
+      ctx.save();
+      ctx.translate(f.x, f.y);
 
-  // olho
-  ctx.fillStyle = "#000";
-  ctx.beginPath();
-  ctx.arc(rc.x + rc.r + 3, rc.y - 3, 1.2, 0, Math.PI*2);
-  ctx.fill();
-}
+      // corpo oval
+      ctx.fillStyle = "#ff9933";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, f.r * 1.6, f.r, 0, 0, Math.PI * 2);
+      ctx.fill();
 
+      // cauda
+      ctx.beginPath();
+      ctx.moveTo(-f.r * 1.6, 0);
+      ctx.lineTo(-f.r * 2.2, f.r * 0.8);
+      ctx.lineTo(-f.r * 2.2, -f.r * 0.8);
+      ctx.closePath();
+      ctx.fill();
 
-  function spawnBoat() {
-    // nasce à direita, no centro do rio naquele x
-    const x = W + BOAT_W + 10;
-    const y = riverCenterAt(x);
-    boats.push({ x, y, w: BOAT_W, h: BOAT_H, alive:true });
-  }
+      // olho
+      ctx.fillStyle = "#000";
+      ctx.beginPath();
+      ctx.arc(f.r * 0.8, -f.r * 0.3, 1.5, 0, Math.PI * 2);
+      ctx.fill();
 
-  function circleRectCollide(cx, cy, cr, r) {
-    const nx = Math.max(r.x, Math.min(cx, r.x + r.w));
-    const ny = Math.max(r.y, Math.min(cy, r.y + r.h));
-    const dx = cx - nx, dy = cy - ny;
-    return dx*dx + dy*dy <= cr*cr;
-  }
-
-  // HUD
-  let score = 0;
-  const BEST_KEY = "capivarinha_best";
-  let best = +(localStorage.getItem(BEST_KEY) || 0);
-  const updateHUD = () => {
-    document.getElementById("f-score").textContent = score;
-    document.getElementById("f-best").textContent  = best;
-  };
-  updateHUD();
-
-  // Estado geral
-  let running = true, started = false, last = 0, rafId = null;
-  const GRACE_MS = 300;
-
-  // Mensagens de fim de jogo
-let deathMsg = "";
-const MSGS = {
-  peixe: "A Capivarinha parou pra comer o peixe",
-  capivara: "A Capivarinha parou pra conversar",
-  default: "A Capivarinha saiu da represa",
-  barco: "A Capivarinha bateu no barco",
-};
+      ctx.restore();
+    }
 
 
-  function snapIntoRiver() {
-    const x = 50; // posição de jogo
-    const top = riverTopAt(x), bot = riverBottomAt(x);
-    const center = (top + bot) / 2;
-    capy.x = x;
-    capy.y = Math.max(top + capy.r + 1, Math.min(center, bot - capy.r - 1));
-  }
+    function spawnRiverCapy() {
+      // nasce à direita, no centro do rio naquele x
+      const x = W + 20;
+      const y = riverCenterAt(x);
+      riverCapy = {
+        x, y, r: RIVERCAPY_R, alive: true,
+        bob: 0, bobAmp: 2 + Math.random() * 2 // balancinho na água
+      };
+    }
 
-  const reset = () => {
-  phase = 0; speed = SPEED0;
+    function drawRiverCapy(rc) {
+      // corpo simples (marrom) + focinho
+      ctx.fillStyle = "#7a5d3a";
+      ctx.beginPath();
+      ctx.ellipse(rc.x, rc.y, rc.r + 6, rc.r, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-  // reabre o rio no início
-  gap = GAP0;
+      // cabecinha
+      ctx.beginPath();
+      ctx.arc(rc.x + rc.r, rc.y - 2, rc.r * 0.7, 0, Math.PI * 2);
+      ctx.fill();
 
-  // zera relógios/placar e reprograma spawns
-  timeSinceStart = 0; distForScore = 0;
-  boats.length = 0; nextBoatIn = 3000 + Math.random()*5000;
+      // orelhinhas
+      ctx.fillRect(rc.x + rc.r + 3, rc.y - 8, 2, 4);
+      ctx.fillRect(rc.x + rc.r + 1, rc.y - 8, 2, 4);
 
-  // NOVO: limpar peixes e capivara do rio e reagendar
-  fishes.length = 0;
-  riverCapy = null;
-  nextFishIn = 3000 + Math.random()*5000;
-  nextRiverCapyIn = 4000 + Math.random()*7000;
-
-  // NOVO: limpar mensagem de morte
-  deathMsg = "";
-
-  started = false; running = true; last = 0;
-  capy.x = 28; capy.y = H - 40; capy.vy = 0;
-
-  score = 0; updateHUD(); draw();
-};
+      // olho
+      ctx.fillStyle = "#000";
+      ctx.beginPath();
+      ctx.arc(rc.x + rc.r + 3, rc.y - 3, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
 
-  const jump = () => {
-    if (!running) return;
-    if (!started) {
-      snapIntoRiver();
+    function spawnBoat() {
+      // nasce à direita, no centro do rio naquele x
+      const x = W + BOAT_W + 10;
+      const y = riverCenterAt(x);
+      boats.push({ x, y, w: BOAT_W, h: BOAT_H, alive: true });
+    }
+
+    function circleRectCollide(cx, cy, cr, r) {
+      const nx = Math.max(r.x, Math.min(cx, r.x + r.w));
+      const ny = Math.max(r.y, Math.min(cy, r.y + r.h));
+      const dx = cx - nx, dy = cy - ny;
+      return dx * dx + dy * dy <= cr * cr;
+    }
+
+    // HUD
+    let score = 0;
+    const BEST_KEY = "capivarinha_best";
+    let best = +(localStorage.getItem(BEST_KEY) || 0);
+    const updateHUD = () => {
+      document.getElementById("f-score").textContent = score;
+      document.getElementById("f-best").textContent = best;
+    };
+    updateHUD();
+
+    // Estado geral
+    let running = true, started = false, last = 0, rafId = null;
+    const GRACE_MS = 300;
+
+    // Mensagens de fim de jogo
+    let deathMsg = "";
+    const MSGS = {
+      peixe: "A Capivarinha parou pra comer o peixe",
+      capivara: "A Capivarinha parou pra conversar",
+      default: "A Capivarinha saiu da represa",
+      barco: "A Capivarinha bateu no barco",
+    };
+
+
+    function snapIntoRiver() {
+      const x = 50; // posição de jogo
+      const top = riverTopAt(x), bot = riverBottomAt(x);
+      const center = (top + bot) / 2;
+      capy.x = x;
+      capy.y = Math.max(top + capy.r + 1, Math.min(center, bot - capy.r - 1));
+    }
+
+    const reset = () => {
+      phase = 0; speed = SPEED0;
+
+      // reabre o rio no início
+      gap = GAP0;
+
+      // zera relógios/placar e reprograma spawns
+      timeSinceStart = 0; distForScore = 0;
+      boats.length = 0; nextBoatIn = 3000 + Math.random() * 5000;
+
+      // NOVO: limpar peixes e capivara do rio e reagendar
+      fishes.length = 0;
+      riverCapy = null;
+      nextFishIn = 3000 + Math.random() * 5000;
+      nextRiverCapyIn = 4000 + Math.random() * 7000;
+
+      // NOVO: limpar mensagem de morte
+      deathMsg = "";
+
+      started = false; running = true; last = 0;
+      capy.x = 28; capy.y = H - 40; capy.vy = 0;
+
+      score = 0; updateHUD(); draw();
+    };
+
+
+    const jump = () => {
+      if (!running) return;
+      if (!started) {
+        snapIntoRiver();
+        capy.vy = capy.jump;
+        started = true;
+        timeSinceStart = 0;
+        return;
+      }
       capy.vy = capy.jump;
-      started = true;
-      timeSinceStart = 0;
-      return;
-    }
-    capy.vy = capy.jump;
-  };
+    };
 
-  // Controles
-  document.getElementById("f-jump").onclick = jump;
-  document.getElementById("f-restart").onclick = () => {
-    if (rafId) cancelAnimationFrame(rafId);
+    // Controles
+    document.getElementById("f-jump").onclick = jump;
+    document.getElementById("f-restart").onclick = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      reset();
+      rafId = requestAnimationFrame(loop);
+    };
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" || e.key === "ArrowUp") { e.preventDefault(); jump(); }
+    }, { passive: false });
+    // Antes estava: cvs.addEventListener("pointerdown", jump);
+    cvs.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      if (!running) {
+        // se o jogo estiver parado (game over), um toque reinicia
+        if (rafId) cancelAnimationFrame(rafId);
+        reset();
+        rafId = requestAnimationFrame(loop);
+        return;
+      }
+      // se estiver rodando, mantém o comportamento de pular
+      jump();
+    });
+
+
+    const gameOver = (reason = "default") => {
+      deathMsg = MSGS[reason] || MSGS.default;
+      running = false;
+      salvarScoreCapivarinha(score); // <<< salva no Firebase pedindo o nome
+      draw();
+    };
+
+
+    function update(dt) {
+      if (!running) return;
+
+      // o rio “vive” mesmo antes de começar
+
+
+      if (started) {
+        timeSinceStart += dt;
+        const t = timeSinceStart / 1000;
+        phase += speed * 0.6;
+
+        // velocidade/dificuldade
+        speed = Math.min(SPEED_MAX, SPEED0 + t * 0.12);
+
+        // alvo de largura do rio:
+        let targetGap = Math.max(GAP_MIN, GAP0 - t * 1.2); // fecha mais devagar (mais largo no geral)
+        if (boats.length) targetGap = Math.max(targetGap, BOAT_GAP); // ABRE BEM quando tem barco
+        // aproxima suavemente do alvo
+        gap += (targetGap - gap) * 0.1;
+
+        // barcos: spawn e movimento
+        nextBoatIn -= dt;
+        if (nextBoatIn <= 0) {
+          spawnBoat();
+          nextBoatIn = 5000 + Math.random() * 8000; // novo barco entre 5–13s
+        }
+
+        for (let i = boats.length - 1; i >= 0; i--) {
+          const b = boats[i];
+          // “vem descendo”:
+          b.x -= (speed + BOAT_EXTRA_SPEED);
+          // acompanha o leito:
+          b.y = riverCenterAt(b.x);
+          // colisão
+          const rect = { x: b.x - b.w / 2, y: b.y - b.h / 2, w: b.w, h: b.h };
+          if (circleRectCollide(capy.x, capy.y, capy.r, rect)) gameOver("barco");
+          // saiu da tela à esquerda?
+          if (b.x + b.w / 2 < -10) boats.splice(i, 1);
+        }
+
+
+
+        // colisão com PEIXES (capy vs círculo do peixe)
+        for (let i = 0; i < fishes.length; i++) {
+          const f = fishes[i];
+          const dx = capy.x - f.x;
+          const dy = capy.y - f.y;
+          const rr = (capy.r + f.r) * (capy.r + f.r);
+          if (dx * dx + dy * dy <= rr) {
+            gameOver("peixe"); // <- aqui!
+            break;
+          }
+        }
+
+
+        // capivara do rio: spawn e movimento
+        nextRiverCapyIn -= dt;
+        if (!riverCapy && nextRiverCapyIn <= 0) {
+          spawnRiverCapy();
+          nextRiverCapyIn = 6000 + Math.random() * 9000; // próximas em 6–15s
+        }
+
+        if (riverCapy) {
+          // “vem descendo” como o barco: anda para a esquerda
+          riverCapy.x -= (speed + RIVERCAPY_EXTRA_SPEED);
+          // acompanha o leito do rio e balança um pouquinho
+          riverCapy.bob += dt * 0.006;
+          riverCapy.y = riverCenterAt(riverCapy.x) + Math.sin(riverCapy.bob) * riverCapy.bobAmp;
+
+          // saiu da tela?
+          if (riverCapy.x < -30) riverCapy = null;
+        }
+
+        // colisão com a outra capivara no rio
+        if (riverCapy) {
+          const dxRC = capy.x - riverCapy.x;
+          const dyRC = capy.y - riverCapy.y;
+          const rrRC = (capy.r + RIVERCAPY_R) * (capy.r + RIVERCAPY_R);
+          if (dxRC * dxRC + dyRC * dyRC <= rrRC) {
+            gameOver("capivara");
+          }
+        }
+
+        // === Peixes ===
+        nextFishIn -= dt;
+        if (nextFishIn <= 0) {
+          spawnFish();
+          nextFishIn = 4000 + Math.random() * 6000; // próximos em 4 a 10s
+        }
+
+        for (let i = fishes.length - 1; i >= 0; i--) {
+          const f = fishes[i];
+          f.x -= f.speed; // anda para a esquerda
+          f.bob += dt * 0.004;
+          f.y = riverCenterAt(f.x) + Math.sin(f.bob) * 6 * f.dir;
+
+          if (f.x < -40) fishes.splice(i, 1); // remove quando sai da tela
+        }
+
+
+        // Física da capivara
+        capy.vy += capy.gravity;
+        capy.y += capy.vy;
+        if (capy.y - capy.r < 0) { capy.y = capy.r; capy.vy = 0; }
+        if (capy.y + capy.r > H - 20) { capy.y = H - 20 - capy.r; gameOver(); }
+
+        // colisão com as margens (após GRACE)
+        if (timeSinceStart > GRACE_MS) {
+          const top = riverTopAt(capy.x), bot = riverBottomAt(capy.x);
+          if (capy.y - capy.r < top || capy.y + capy.r > bot) gameOver();
+        }
+
+        // Pontuação por distância
+        distForScore += speed;
+        if (distForScore >= SCORE_EVERY) {
+          distForScore -= SCORE_EVERY;
+          score++;
+          if (score > best) { best = score; localStorage.setItem(BEST_KEY, best); }
+          updateHUD();
+        }
+      }
+    }
+
+    function drawCapivara(x, y, r) {
+      ctx.fillStyle = "#8b5a2b";
+      ctx.beginPath(); ctx.ellipse(x, y, r * 1.4, r, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x + r * 1.2, y - r * 0.3, r * 0.8, r * 0.6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + r * 1.4, y - r * 0.3, r * 0.15, 0, Math.PI * 2); ctx.fillStyle = "#000"; ctx.fill();
+      ctx.beginPath(); ctx.arc(x + r * 0.8, y - r * 0.9, r * 0.2, 0, Math.PI * 2); ctx.fillStyle = "#5a3820"; ctx.fill();
+    }
+
+    function drawBoat(b) {
+      // casco simples com proa
+      ctx.fillStyle = "#5b4636";
+      ctx.fillRect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h);
+      ctx.beginPath();
+      ctx.moveTo(b.x + b.w / 2, b.y - b.h / 2);
+      ctx.lineTo(b.x + b.w / 2 + 6, b.y);
+      ctx.lineTo(b.x + b.w / 2, b.y + b.h / 2);
+      ctx.closePath();
+      ctx.fill();
+      // cabine
+      ctx.fillStyle = "#c7c7c7";
+      ctx.fillRect(b.x - b.w * 0.15, b.y - b.h * 0.6, b.w * 0.3, b.h * 0.5);
+    }
+
+    function draw() {
+      // Céu + chão + grama
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#70c5ce"; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#c9d09a"; ctx.fillRect(0, H - 20, W, 20);
+      ctx.fillStyle = "#7ec850"; ctx.fillRect(0, 0, 56, H - 20);
+
+      // Rio (polígono entre top e bottom)
+      const topY = (x) => riverTopAt(x), botY = (x) => riverBottomAt(x);
+      ctx.beginPath();
+      ctx.moveTo(0, topY(0));
+      for (let x = 0; x <= W; x += RIVER_STEP) ctx.lineTo(x, topY(x));
+      ctx.lineTo(W, topY(W));
+      for (let x = W; x >= 0; x -= RIVER_STEP) ctx.lineTo(x, botY(x));
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, "#46a6d8"); grad.addColorStop(1, "#2e89b8");
+      ctx.fillStyle = grad; ctx.fill();
+
+      // Barcos (desenha por cima da água)
+      for (const b of boats) drawBoat(b);
+
+      // Capivara no rio (extra)
+      if (riverCapy) drawRiverCapy(riverCapy);
+
+      // Peixes
+      for (const f of fishes) drawFish(f);
+
+      // Capivara
+      drawCapivara(capy.x, capy.y, capy.r);
+
+      // Overlays
+      if (!started && running) {
+        ctx.fillStyle = "#fff";
+        ctx.font = "16px Poppins,Arial";
+        ctx.textAlign = "center";              // centraliza no x informado
+
+        const msg = "Toque em Pular\npara entrar na represa\n\nToque na Tela para nadar\n\nDesvie dos obstaculos\n\nNao deixe voltar para as margens";
+        drawMultiline(ctx, msg, W / 2, 160, 18); // x, y inicial e altura da linha
+      }
+
+      // helper: quebra por \n
+      function drawMultiline(ctx, text, x, y, lineHeight = 18) {
+        text.split("\n").forEach((line, i) => {
+          ctx.fillText(line, x, y + i * lineHeight);
+        });
+      }
+
+      if (!running) {
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 20px Poppins, Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // quebra mensagem em várias linhas se for grande
+        const palavras = (deathMsg || "A capivara saiu do rio").split(" ");
+        const linhas = [];
+        let atual = "";
+
+        for (let p of palavras) {
+          const teste = atual ? atual + " " + p : p;
+          if (ctx.measureText(teste).width > W * 0.8) {
+            linhas.push(atual);
+            atual = p;
+          } else {
+            atual = teste;
+          }
+        }
+        if (atual) linhas.push(atual);
+
+        const startY = H / 2 - (linhas.length - 1) * 14; // centraliza vertical
+        linhas.forEach((linha, i) => {
+          ctx.fillText(linha, W / 2, startY + i * 28);
+        });
+
+        ctx.font = "14px Poppins, Arial";
+        ctx.fillText("Toque na tela para reiniciar", W / 2, H * 0.75);
+      }
+
+    }
+
+    function loop(ts) {
+      if (!last) last = ts;
+      const dt = ts - last; last = ts;
+      if (running) { update(dt); draw(); rafId = requestAnimationFrame(loop); }
+      else { draw(); }
+    }
+
+      // Botões de Ranking
+  const btnRank = document.getElementById("f-ranking");
+  const btnLink = document.getElementById("f-ranking-link");
+  if (btnRank) btnRank.addEventListener("click", () => mostrarRankingCapivarinha());
+  if (btnLink) btnLink.addEventListener("click", () => {
+    location.hash = "#ranking-capivarinha";
+    mostrarRankingCapivarinha();
+  });
+
+
+    // start
     reset();
     rafId = requestAnimationFrame(loop);
-  };
-  window.addEventListener("keydown", (e) => {
-    if (e.code === "Space" || e.key === "ArrowUp") { e.preventDefault(); jump(); }
-  }, { passive:false });
-  // Antes estava: cvs.addEventListener("pointerdown", jump);
-cvs.addEventListener("pointerdown", (e) => {
-  e.preventDefault();
-  if (!running) {
-    // se o jogo estiver parado (game over), um toque reinicia
-    if (rafId) cancelAnimationFrame(rafId);
-    reset();
-    rafId = requestAnimationFrame(loop);
-    return;
-  }
-  // se estiver rodando, mantém o comportamento de pular
-  jump();
-});
-
-
-  const gameOver = (reason = "default") => {
-  deathMsg = MSGS[reason] || MSGS.default;
-  running = false;
-  draw();
-};
-
-
-  function update(dt){
-    if (!running) return;
-
-    // o rio “vive” mesmo antes de começar
-    
-
-    if (started) {
-      timeSinceStart += dt;
-      const t = timeSinceStart / 1000;
-      phase += speed * 0.6;
-
-      // velocidade/dificuldade
-      speed = Math.min(SPEED_MAX, SPEED0 + t*0.12);
-
-      // alvo de largura do rio:
-      let targetGap = Math.max(GAP_MIN, GAP0 - t*1.2); // fecha mais devagar (mais largo no geral)
-      if (boats.length) targetGap = Math.max(targetGap, BOAT_GAP); // ABRE BEM quando tem barco
-      // aproxima suavemente do alvo
-      gap += (targetGap - gap) * 0.1;
-
-      // barcos: spawn e movimento
-      nextBoatIn -= dt;
-      if (nextBoatIn <= 0) {
-        spawnBoat();
-        nextBoatIn = 5000 + Math.random()*8000; // novo barco entre 5–13s
-      }
-
-      for (let i=boats.length-1; i>=0; i--){
-        const b = boats[i];
-        // “vem descendo”:
-        b.x -= (speed + BOAT_EXTRA_SPEED);
-        // acompanha o leito:
-        b.y = riverCenterAt(b.x);
-        // colisão
-        const rect = { x: b.x - b.w/2, y: b.y - b.h/2, w: b.w, h: b.h };
-     if (circleRectCollide(capy.x, capy.y, capy.r, rect)) gameOver("barco");
-        // saiu da tela à esquerda?
-        if (b.x + b.w/2 < -10) boats.splice(i,1);
-      }
-
-      
-
-      // colisão com PEIXES (capy vs círculo do peixe)
-for (let i = 0; i < fishes.length; i++) {
-  const f = fishes[i];
-  const dx = capy.x - f.x;
-  const dy = capy.y - f.y;
-  const rr = (capy.r + f.r) * (capy.r + f.r);
-  if (dx*dx + dy*dy <= rr) {
-      gameOver("peixe"); // <- aqui!
-    break;
-  }
-}
-
-
-      // capivara do rio: spawn e movimento
-nextRiverCapyIn -= dt;
-if (!riverCapy && nextRiverCapyIn <= 0) {
-  spawnRiverCapy();
-  nextRiverCapyIn = 6000 + Math.random()*9000; // próximas em 6–15s
-}
-
-if (riverCapy) {
-  // “vem descendo” como o barco: anda para a esquerda
-  riverCapy.x -= (speed + RIVERCAPY_EXTRA_SPEED);
-  // acompanha o leito do rio e balança um pouquinho
-  riverCapy.bob += dt * 0.006;
-  riverCapy.y = riverCenterAt(riverCapy.x) + Math.sin(riverCapy.bob) * riverCapy.bobAmp;
-
-  // saiu da tela?
-  if (riverCapy.x < -30) riverCapy = null;
-}
-
-// colisão com a outra capivara no rio
-if (riverCapy) {
-  const dxRC = capy.x - riverCapy.x;
-  const dyRC = capy.y - riverCapy.y;
-  const rrRC = (capy.r + RIVERCAPY_R) * (capy.r + RIVERCAPY_R);
-  if (dxRC*dxRC + dyRC*dyRC <= rrRC) {
-    gameOver("capivara");
-  }
-}
-
-// === Peixes ===
-nextFishIn -= dt;
-if (nextFishIn <= 0) {
-  spawnFish();
-  nextFishIn = 4000 + Math.random() * 6000; // próximos em 4 a 10s
-}
-
-for (let i = fishes.length - 1; i >= 0; i--) {
-  const f = fishes[i];
-  f.x -= f.speed; // anda para a esquerda
-  f.bob += dt * 0.004;
-  f.y = riverCenterAt(f.x) + Math.sin(f.bob) * 6 * f.dir;
-
-  if (f.x < -40) fishes.splice(i, 1); // remove quando sai da tela
-}
-
-
-      // Física da capivara
-      capy.vy += capy.gravity;
-      capy.y  += capy.vy;
-      if (capy.y - capy.r < 0) { capy.y = capy.r; capy.vy = 0; }
-      if (capy.y + capy.r > H - 20) { capy.y = H - 20 - capy.r; gameOver(); }
-
-      // colisão com as margens (após GRACE)
-      if (timeSinceStart > GRACE_MS) {
-        const top = riverTopAt(capy.x), bot = riverBottomAt(capy.x);
-        if (capy.y - capy.r < top || capy.y + capy.r > bot) gameOver();
-      }
-
-      // Pontuação por distância
-      distForScore += speed;
-      if (distForScore >= SCORE_EVERY) {
-        distForScore -= SCORE_EVERY;
-        score++;
-        if (score > best) { best = score; localStorage.setItem(BEST_KEY, best); }
-        updateHUD();
-      }
-    }
   }
 
-  function drawCapivara(x, y, r){
-    ctx.fillStyle = "#8b5a2b";
-    ctx.beginPath(); ctx.ellipse(x, y, r*1.4, r, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(x + r*1.2, y - r*0.3, r*0.8, r*0.6, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x + r*1.4, y - r*0.3, r*0.15, 0, Math.PI*2); ctx.fillStyle = "#000"; ctx.fill();
-    ctx.beginPath(); ctx.arc(x + r*0.8, y - r*0.9, r*0.2, 0, Math.PI*2); ctx.fillStyle = "#5a3820"; ctx.fill();
-  }
-
-  function drawBoat(b){
-    // casco simples com proa
-    ctx.fillStyle = "#5b4636";
-    ctx.fillRect(b.x - b.w/2, b.y - b.h/2, b.w, b.h);
-    ctx.beginPath();
-    ctx.moveTo(b.x + b.w/2, b.y - b.h/2);
-    ctx.lineTo(b.x + b.w/2 + 6, b.y);
-    ctx.lineTo(b.x + b.w/2, b.y + b.h/2);
-    ctx.closePath();
-    ctx.fill();
-    // cabine
-    ctx.fillStyle = "#c7c7c7";
-    ctx.fillRect(b.x - b.w*0.15, b.y - b.h*0.6, b.w*0.3, b.h*0.5);
-  }
-
-  function draw(){
-    // Céu + chão + grama
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = "#70c5ce"; ctx.fillRect(0,0,W,H);
-    ctx.fillStyle = "#c9d09a"; ctx.fillRect(0, H-20, W, 20);
-    ctx.fillStyle = "#7ec850"; ctx.fillRect(0, 0, 56, H-20);
-
-    // Rio (polígono entre top e bottom)
-    const topY = (x)=>riverTopAt(x), botY = (x)=>riverBottomAt(x);
-    ctx.beginPath();
-    ctx.moveTo(0, topY(0));
-    for (let x=0; x<=W; x+=RIVER_STEP) ctx.lineTo(x, topY(x));
-    ctx.lineTo(W, topY(W));
-    for (let x=W; x>=0; x-=RIVER_STEP) ctx.lineTo(x, botY(x));
-    ctx.closePath();
-    const grad = ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0, "#46a6d8"); grad.addColorStop(1, "#2e89b8");
-    ctx.fillStyle = grad; ctx.fill();
-
-    // Barcos (desenha por cima da água)
-    for (const b of boats) drawBoat(b);
-
-    // Capivara no rio (extra)
-if (riverCapy) drawRiverCapy(riverCapy);
-
-// Peixes
-for (const f of fishes) drawFish(f);
-
-    // Capivara
-    drawCapivara(capy.x, capy.y, capy.r);
-
-    // Overlays
-    if (!started && running) {
-  ctx.fillStyle = "#fff";
-  ctx.font = "16px Poppins,Arial";
-  ctx.textAlign = "center";              // centraliza no x informado
-
-  const msg = "Toque em Pular\npara entrar na represa\n\nToque na Tela para nadar\n\nDesvie dos obstaculos\n\nNao deixe voltar para as margens";
-  drawMultiline(ctx, msg, W/2, 160, 18); // x, y inicial e altura da linha
-}
-
-// helper: quebra por \n
-function drawMultiline(ctx, text, x, y, lineHeight = 18) {
-  text.split("\n").forEach((line, i) => {
-    ctx.fillText(line, x, y + i * lineHeight);
-  });
-}
-
-  if (!running) {
-  ctx.fillStyle = "rgba(0,0,0,0.6)";
-  ctx.fillRect(0, 0, W, H);
-
-  ctx.fillStyle = "#fff";
-  ctx.font = "bold 20px Poppins, Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  // quebra mensagem em várias linhas se for grande
-  const palavras = (deathMsg || "A capivara saiu do rio").split(" ");
-  const linhas = [];
-  let atual = "";
-
-  for (let p of palavras) {
-    const teste = atual ? atual + " " + p : p;
-    if (ctx.measureText(teste).width > W * 0.8) {
-      linhas.push(atual);
-      atual = p;
-    } else {
-      atual = teste;
-    }
-  }
-  if (atual) linhas.push(atual);
-
-  const startY = H / 2 - (linhas.length - 1) * 14; // centraliza vertical
-  linhas.forEach((linha, i) => {
-    ctx.fillText(linha, W / 2, startY + i * 28);
-  });
-
-  ctx.font = "14px Poppins, Arial";
-  ctx.fillText("Toque na tela para reiniciar", W / 2, H * 0.75);
-}
-
-  }
-
-  function loop(ts){
-    if (!last) last = ts;
-    const dt = ts - last; last = ts;
-    if (running) { update(dt); draw(); rafId = requestAnimationFrame(loop); }
-    else { draw(); }
-  }
-
-  // start
-  reset();
-  rafId = requestAnimationFrame(loop);
-}
 
 
 
-
-///
-///
+  ///
+  ///
 
 
 
@@ -2250,30 +2414,30 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     });
 
 
-   
+
 
 
   }
 
-// ====== JOGOS (lista) ======
-document.getElementById("menuJogos").addEventListener("click", function (e) {
-  e.preventDefault();
-  location.hash = "jogos";
-  mostrarJogos();
-});
+  // ====== JOGOS (lista) ======
+  document.getElementById("menuJogos").addEventListener("click", function (e) {
+    e.preventDefault();
+    location.hash = "jogos";
+    mostrarJogos();
+  });
 
-window.addEventListener("DOMContentLoaded", () => {
-  const h = (location.hash || "").replace("#", "");
-  if (h === "jogos")       mostrarJogos();
-  else if (h === "tetrix") mostrarTetrix();
-  else if (h === "canos")  mostrarCanos();
-});
-window.addEventListener("hashchange", () => {
-  const h = (location.hash || "").replace("#", "");
-  if (h === "jogos")       mostrarJogos();
-  else if (h === "tetrix") mostrarTetrix();
-  else if (h === "canos")  mostrarCanos();
-});
+  window.addEventListener("DOMContentLoaded", () => {
+    const h = (location.hash || "").replace("#", "");
+    if (h === "jogos") mostrarJogos();
+    else if (h === "tetrix") mostrarTetrix();
+    else if (h === "canos") mostrarCanos();
+  });
+  window.addEventListener("hashchange", () => {
+    const h = (location.hash || "").replace("#", "");
+    if (h === "jogos") mostrarJogos();
+    else if (h === "tetrix") mostrarTetrix();
+    else if (h === "canos") mostrarCanos();
+  });
 
 
 
@@ -4937,13 +5101,13 @@ window.addEventListener("hashchange", () => {
               "images/comercios/lanchonete/xisBauinea/divulgacao/5.jpg",
 
             ],
-             novidadesDescriptions: [
+            novidadesDescriptions: [
               "Xis Bacon adicional de frango desfiado ao molho",
               "Xis Calabacon",
               "Xis Bacon",
               "Xis Salada com adicional de frango desfiado ao molho",
               "Cachorro Quente simples com adicional de bacon",
-              
+
 
             ],
           },
@@ -9140,7 +9304,7 @@ window.addEventListener("hashchange", () => {
 
               },
 
-                {
+              {
                 imagem: "images/comercios/quitanda/pimentaDoce/promocao/5.jpg",
                 titulo: "Tomate",
                 precoAntigo: 4.50,
@@ -9151,7 +9315,7 @@ window.addEventListener("hashchange", () => {
 
               },
 
-                {
+              {
                 imagem: "images/comercios/quitanda/pimentaDoce/promocao/6.jpg",
                 titulo: "Alface Crespa",
                 precoAntigo: 3.50,
@@ -9995,8 +10159,8 @@ window.addEventListener("hashchange", () => {
         title: "Nota de Falecimento",
         establishments: [
 
-//26/09
- {
+          //26/09
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/41.jpg",
             date: "26/09/2025",
@@ -11259,21 +11423,21 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
   // Adicionar eventos para os links do menu
-categories.forEach((category) => {
-  if (!category.link) return;
-  category.link.addEventListener("click", function (event) {
-    event.preventDefault();
-    categories.forEach((cat) => cat.link?.classList.remove("active"));
-    this.classList.add("active");
+  categories.forEach((category) => {
+    if (!category.link) return;
+    category.link.addEventListener("click", function (event) {
+      event.preventDefault();
+      categories.forEach((cat) => cat.link?.classList.remove("active"));
+      this.classList.add("active");
 
-    // define a rota da categoria; o roteador renderiza
-    location.hash = "#comercios-" + normalizeName(category.title);
+      // define a rota da categoria; o roteador renderiza
+      location.hash = "#comercios-" + normalizeName(category.title);
 
-    if (sidebar.classList.contains("close")) {
-      sidebar.classList.remove("close");
-    }
+      if (sidebar.classList.contains("close")) {
+        sidebar.classList.remove("close");
+      }
+    });
   });
-});
 
 
 
@@ -11322,24 +11486,24 @@ categories.forEach((category) => {
 
 
 
-function handleHashRoute() {
-  const h = (location.hash || "").toLowerCase();
+  function handleHashRoute() {
+    const h = (location.hash || "").toLowerCase();
 
-  if (h === "#ondecomer")  { return mostrarOndeComer(); }
-  if (h === "#promocoes")  { return mostrarPromocoes(); }
-  if (h === "#coletalixo") { return montarPaginaColetaLixo(); }
-  if (h === "#jogos") { return mostrarJogos(); }
+    if (h === "#ondecomer") { return mostrarOndeComer(); }
+    if (h === "#promocoes") { return mostrarPromocoes(); }
+    if (h === "#coletalixo") { return montarPaginaColetaLixo(); }
+    if (h === "#jogos") { return mostrarJogos(); }
 
-  // categorias de "Comércios"
-  const m = h.match(/^#comercios-(.+)$/);
-  if (m) {
-    const slug = m[1]; // ex.: "adega"
-    const cat = categories.find(c => normalizeName(c.title) === slug);
-    if (cat) return loadContent(cat.title, cat.establishments);
+    // categorias de "Comércios"
+    const m = h.match(/^#comercios-(.+)$/);
+    if (m) {
+      const slug = m[1]; // ex.: "adega"
+      const cat = categories.find(c => normalizeName(c.title) === slug);
+      if (cat) return loadContent(cat.title, cat.establishments);
+    }
   }
-}
-window.addEventListener("hashchange", handleHashRoute);
-window.addEventListener("DOMContentLoaded", handleHashRoute);
+  window.addEventListener("hashchange", handleHashRoute);
+  window.addEventListener("DOMContentLoaded", handleHashRoute);
 
 
 
@@ -11470,25 +11634,25 @@ window.addEventListener("DOMContentLoaded", handleHashRoute);
 
 
   // Captura o evento nativo do Android
-window.addEventListener('beforeinstallprompt', (e) => {
-  // se já instalado, não mostra nunca
-  if (isAppInstalado()) return;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // se já instalado, não mostra nunca
+    if (isAppInstalado()) return;
 
-  // se estiver nos jogos, não guarda o prompt nem mostra barra
-  if (estaNosJogos()) {
+    // se estiver nos jogos, não guarda o prompt nem mostra barra
+    if (estaNosJogos()) {
+      e.preventDefault();
+      deferredPrompt = null;
+      const barra = document.getElementById("barraInstalacao");
+      if (barra) barra.style.display = "none";
+      return;
+    }
+
+    // fora dos jogos, seguir fluxo normal
     e.preventDefault();
-    deferredPrompt = null;
+    deferredPrompt = e;
     const barra = document.getElementById("barraInstalacao");
-    if (barra) barra.style.display = "none";
-    return;
-  }
-
-  // fora dos jogos, seguir fluxo normal
-  e.preventDefault();
-  deferredPrompt = e;
-  const barra = document.getElementById("barraInstalacao");
-  if (barra) barra.style.display = "flex";
-});
+    if (barra) barra.style.display = "flex";
+  });
 
 
 
@@ -11579,23 +11743,23 @@ window.addEventListener('beforeinstallprompt', (e) => {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
 
-// iOS: caixinha fixa
-document.addEventListener("DOMContentLoaded", () => {
-  if (isIos() && !isInStandaloneMode() && !estaNosJogos()) {
-    const box = document.getElementById("iosInstallBox");
-    if (box) box.classList.remove("hidden");
-  }
-});
+  // iOS: caixinha fixa
+  document.addEventListener("DOMContentLoaded", () => {
+    if (isIos() && !isInStandaloneMode() && !estaNosJogos()) {
+      const box = document.getElementById("iosInstallBox");
+      if (box) box.classList.remove("hidden");
+    }
+  });
 
-// iOS (Safari): modal temporizada
-document.addEventListener("DOMContentLoaded", () => {
-  if (isIosSafari() && !isInStandaloneMode() && !estaNosJogos()) {
-    setTimeout(() => {
-      const modal = document.getElementById("iosInstallPrompt");
-      if (modal) modal.classList.remove("hidden");
-    }, 2500);
-  }
-});
+  // iOS (Safari): modal temporizada
+  document.addEventListener("DOMContentLoaded", () => {
+    if (isIosSafari() && !isInStandaloneMode() && !estaNosJogos()) {
+      setTimeout(() => {
+        const modal = document.getElementById("iosInstallPrompt");
+        if (modal) modal.classList.remove("hidden");
+      }, 2500);
+    }
+  });
 
 
 
@@ -11609,14 +11773,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return 'standalone' in window.navigator && window.navigator.standalone;
   }
 
- document.addEventListener("DOMContentLoaded", () => {
-  if (isIosSafari() && !isInStandaloneMode() && !estaNosJogos()) {
-    setTimeout(() => {
-      const modal = document.getElementById("iosInstallPrompt");
-      if (modal) modal.classList.remove("hidden");
-    }, 2500);
-  }
-});
+  document.addEventListener("DOMContentLoaded", () => {
+    if (isIosSafari() && !isInStandaloneMode() && !estaNosJogos()) {
+      setTimeout(() => {
+        const modal = document.getElementById("iosInstallPrompt");
+        if (modal) modal.classList.remove("hidden");
+      }, 2500);
+    }
+  });
 
 
 
