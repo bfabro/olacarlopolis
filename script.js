@@ -11554,6 +11554,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#promocoes") { return mostrarPromocoes(); }
     if (h === "#menuColetaLixo") { return montarPaginaColetaLixo(); }
     if (h === "#jogos") { return mostrarJogos(); }
+    if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
 
     // categorias de "Comércios"
     const m = h.match(/^#comercios-(.+)$/);
