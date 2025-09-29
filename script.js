@@ -1905,21 +1905,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // define a cor conforme a faixa de pontos
   let fishColor = "#56da2e"; // verde
-  if (sc >= 30) {
+  if (sc >= 150) {
     fishColor = "#ffffffff";   // vermelho
-  } else if (sc >= 20) {
+  } else if (sc >= 100) {
     fishColor = "#ff1d1dff";   // amarelo
-  } else if (sc >= 10) {
+  } else if (sc >= 50) {
     fishColor = "#fcfc27ff";   // azul
   }
 
     // define a cor conforme a faixa de pontos
   let fishColorA = "#000000ff"; // verde
-  if (sc >= 30) {
+  if (sc >= 150) {
     fishColorA = "#3444f2ff";   // vermelho
-  } else if (sc >= 20) {
+  } else if (sc >= 100) {
     fishColorA = "#ffffffff";   // amarelo
-  } else if (sc >= 10) {
+  } else if (sc >= 50) {
     fishColorA = "#fc2727ff";   // azul
   }
 
@@ -1989,7 +1989,12 @@ document.addEventListener("DOMContentLoaded", function () {
       // nasce à direita, no centro do rio naquele x
       const x = W + BOAT_W + 10;
       const y = riverCenterAt(x);
-      boats.push({ x, y, w: BOAT_W, h: BOAT_H, alive: true });
+      boats.push({
+  x, y,
+  w: 48, h: 24,       // ajuste se quiser maior/menor
+  bob: Math.random()*Math.PI*2,
+  bobAmp: 0.8 + Math.random()*0.6 // amplitude do “balanço”
+});
     }
 
     function circleRectCollide(cx, cy, cr, r) {
@@ -2233,173 +2238,22 @@ document.addEventListener("DOMContentLoaded", function () {
       ctx.beginPath(); ctx.arc(x + r * 0.8, y - r * 0.9, r * 0.2, 0, Math.PI * 2); ctx.fillStyle = "#5a3820"; ctx.fill();
     }
 
- function drawBoat(b) {
-  const w = b.w, h = b.h;
+    function drawBoat(b) {
+      // casco simples com proa
+      ctx.fillStyle = "#5b4636";
+      ctx.fillRect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h);
+      ctx.beginPath();
+      ctx.moveTo(b.x + b.w / 2, b.y - b.h / 2);
+      ctx.lineTo(b.x + b.w / 2 + 6, b.y);
+      ctx.lineTo(b.x + b.w / 2, b.y + b.h / 2);
+      ctx.closePath();
+      ctx.fill();
+      // cabine
+      ctx.fillStyle = "#c7c7c7";
+      ctx.fillRect(b.x - b.w * 0.15, b.y - b.h * 0.6, b.w * 0.3, b.h * 0.5);
+    }
 
-  // inclinação suave conforme o rio
-  const yPrev = riverCenterAt(b.x - 6);
-  const yNext = riverCenterAt(b.x + 6);
-  const ang   = Math.atan2(yNext - yPrev, 12) * 0.7;
-
-  // cores (fáceis de trocar)
-  const HULL_TOP = "#7a2d1a";   // bordo escuro
-  const HULL_BOT = "#b64a2d";   // bordo claro
-  const GUNWALE  = "#f2e8d8";   // borda superior
-  const CABIN    = "#d9dee6";   // cabine
-  const GLASS    = "#87c7ff";   // vidro
-  const MOTOR    = "#3a3a3a";   // motor
-  const STRIPE   = "#ffffff";   // faixa lateral
-
-  // linha mais bonitinha
-  const prevLC = ctx.lineCap, prevLJ = ctx.lineJoin;
-  ctx.lineCap = "round"; ctx.lineJoin = "round";
-
-  ctx.save();
-  ctx.translate(b.x, b.y);
-  ctx.rotate(ang);
-
-  // desenhar em coordenadas normalizadas ~100x50 (facilita proporções)
-  ctx.scale(w / 100, h / 50);
-
-  // ===== sombra sob o casco =====
-  ctx.save();
-  ctx.globalAlpha = 0.25;
-  ctx.fillStyle = "#000";
-  ctx.beginPath();
-  ctx.ellipse(0, 18, 30, 12, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-
-  // ===== CASCO com quilha e proa pontuda =====
-  const grad = ctx.createLinearGradient(0, 4, 0, 26);
-  grad.addColorStop(0, HULL_TOP);
-  grad.addColorStop(1, HULL_BOT);
-  ctx.fillStyle = grad;
-
-  ctx.beginPath();
-  // costado superior quase reto até proa
-  ctx.moveTo(-42, 6);
-  ctx.lineTo( 22, 6);
-  // proa pontuda
-  ctx.quadraticCurveTo( 40, 8,  44, 14);
-  // leme até base da popa (linha inferior)
-  ctx.lineTo( 38, 22);
-  ctx.lineTo(-34, 22);
-  // popa reta com leve curva (transom)
-  ctx.quadraticCurveTo(-48, 16, -42, 6);
-  ctx.closePath();
-  ctx.fill();
-
-  // faixa lateral (pinta cara de barco)
-  ctx.strokeStyle = STRIPE;
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.moveTo(-36, 14);
-  ctx.lineTo( 36, 14);
-  ctx.stroke();
-
-  // gunwale (borda superior clara)
-  ctx.strokeStyle = GUNWALE;
-  ctx.lineWidth = 2.2;
-  ctx.beginPath();
-  ctx.moveTo(-40, 5);
-  ctx.lineTo( 24, 5);
-  ctx.quadraticCurveTo( 39, 7,  42, 13);
-  ctx.stroke();
-
-  // ===== DECK (madeira clara) =====
-  ctx.fillStyle = "#f4f1e8";
-  roundRect(-35, 3, 50, 6.5, 2, true);
-
-  // ripas do deck
-  ctx.strokeStyle = "rgba(120,100,80,0.35)";
-  ctx.lineWidth = 0.8;
-  for (let x = -32; x <= 12; x += 6) {
-    ctx.beginPath();
-    ctx.moveTo(x, 3);
-    ctx.lineTo(x, 9.5);
-    ctx.stroke();
-  }
-
-  // ===== CABINE + PARA-BRISA inclinado =====
-  ctx.fillStyle = CABIN;
-  roundRect(-10, -1, 24, 10, 3, true);
-
-  // para-brisa (triângulo trapezoidal)
-  ctx.fillStyle = GLASS;
-  ctx.beginPath();
-  ctx.moveTo(4, -1);
-  ctx.lineTo(12, -1.5);
-  ctx.lineTo(12, 6);
-  ctx.lineTo(4, 6);
-  ctx.closePath();
-  ctx.fill();
-
-  // moldura do vidro
-  ctx.strokeStyle = "rgba(60,80,100,0.7)";
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  // ===== MOTOR DE POPA =====
-  // base do motor
-  ctx.fillStyle = MOTOR;
-  roundRect(-44.5, 12, 7, 6, 1.5, true);
-  // rabeta
-  roundRect(-47, 13.5, 3.2, 4.2, 1, true);
-  // hélice (duas folhas)
-  ctx.beginPath();
-  ctx.moveTo(-48.2, 15.6);
-  ctx.quadraticCurveTo(-51, 14.2, -48.2, 13.0);
-  ctx.quadraticCurveTo(-46.2, 14.6, -48.2, 15.6);
-  ctx.fillStyle = "#c0c0c0";
-  ctx.fill();
-
-  // ===== FENDERS (boias) =====
-  ctx.fillStyle = "#fff";
-  circle(-18, 10, 1.8);
-  circle(  2,  9, 1.8);
-  ctx.strokeStyle = "#ff3b30";
-  ctx.lineWidth = 1;
-  circleStroke(-18, 10, 1.8);
-  circleStroke(  2,  9, 1.8);
-
-  // ===== MAROLA / ESTEIRA =====
-  ctx.strokeStyle = "rgba(255,255,255,0.65)";
-  ctx.lineWidth = 1.2;
-  wave(-50, 12, -70, 16);
-  wave(-46, 18, -66, 22);
-
-  ctx.restore();
-  ctx.lineCap = prevLC; ctx.lineJoin = prevLJ;
-
-  // ===== Helpers normalizados =====
-  function roundRect(x, y, w, h, r, fill) {
-    if (w < 2 * r) r = w / 2;
-    if (h < 2 * r) r = h / 2;
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y,     x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x,     y + h, r);
-    ctx.arcTo(x,     y + h, x,     y,     r);
-    ctx.arcTo(x,     y,     x + w, y,     r);
-    ctx.closePath();
-    if (fill) ctx.fill(); else ctx.stroke();
-  }
-  function circle(cx, cy, r) {
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-  }
-  function circleStroke(cx, cy, r) {
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
-  }
-  function wave(x1, y1, x2, y2) {
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2 - 4;
-    ctx.quadraticCurveTo(mx, my, x2, y2);
-    ctx.stroke();
-  }
-}
-
+  
 
     function draw() {
       // Céu + chão + grama
@@ -2423,7 +2277,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Barcos (desenha por cima da água)
       for (const b of boats) drawBoat(b);
 
-      // Capivara no rio (extra)
+       // Capivara no rio (extra)
       if (riverCapy) drawRiverCapy(riverCapy);
 
       // Peixes
