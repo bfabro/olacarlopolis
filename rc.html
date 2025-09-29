@@ -199,6 +199,21 @@
 		.card table {
 			min-height: 50px;
 		}
+
+
+		/* Loader global */
+.loader-overlay{
+  position:fixed; inset:0; display:none; place-items:center;
+  background:rgba(0,0,0,.55); z-index:20000;
+}
+.loader-box{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+.loader{
+  width:54px; height:54px; border:6px solid #2a2a2a; border-top-color:#00bcd4;
+  border-radius:50%; animation:spin .9s linear infinite;
+}
+@keyframes spin{to{ transform:rotate(360deg)}}
+.loader-text{ color:#00bcd4; font-weight:600; font-size:14px; }
+
 	</style>
 </head>
 
@@ -422,6 +437,8 @@
 		<!-- Firebase -->
 		<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+		
 		<script>
 			const firebaseConfig = {
 				apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -435,6 +452,34 @@
 			firebase.initializeApp(firebaseConfig);
 			const db = firebase.database();
 		</script>
+
+		<script>
+  const overlayEl = document.getElementById('loadingOverlay');
+  let loadCount = 0;
+
+  function startLoading(){
+    loadCount++;
+    if (overlayEl) overlayEl.style.display = 'grid';
+    const btn = document.getElementById('btnBuscar');
+    if (btn){
+      if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
+      btn.innerHTML = 'Buscando…';
+      btn.setAttribute('disabled','disabled');
+    }
+  }
+  function stopLoading(){
+    loadCount = Math.max(0, loadCount - 1);
+    if (loadCount === 0){
+      if (overlayEl) overlayEl.style.display = 'none';
+      const btn = document.getElementById('btnBuscar');
+      if (btn){
+        btn.removeAttribute('disabled');
+        if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
+      }
+    }
+  }
+</script>
+
 
 		<script>
 			const tipoRelatorioEl = document.getElementById("tipoRelatorio");
@@ -1024,6 +1069,19 @@ async function carregarTabelaOndeComer() {
   const tbody = document.getElementById('tabelaOndeComerCardapio');
   if (!tbody) return;
 
+   startLoading();
+  try {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Carregando...</td></tr>`;
+    const datas = await listarDatasPeriodo();
+    const [totCardapio, totWhats] = await Promise.all([
+      somarNoPorDatas('cliquesCardapiosOndeComer', datas),
+      somarNoPorDatas('cliquesWhatsOndeComer',    datas)
+    ]);
+    // ... resto da função como já está ...
+  } finally {
+    stopLoading();
+  }
+
   // UI feedback
   tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Carregando...</td></tr>`;
 
@@ -1043,7 +1101,7 @@ async function carregarTabelaOndeComer() {
   const linhas = [];
   estabSet.forEach(id => {
     linhas.push({ id, cardapio: totCardapio[id] || 0, whatsapp: totWhats[id] || 0 });
-});
+	});
 
   // Ordena pelo total desc
   linhas.sort((a,b)=> (b.cardapio + b.whatsapp) - (a.cardapio + a.whatsapp));
@@ -1072,6 +1130,12 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 
+<div id="loadingOverlay" class="loader-overlay" aria-live="polite" aria-busy="true">
+  <div class="loader-box">
+    <div class="loader" role="status" aria-label="Carregando"></div>
+    <div class="loader-text">Carregando…</div>
+  </div>
+</div>
 
 
 

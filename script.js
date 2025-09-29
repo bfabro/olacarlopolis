@@ -1346,7 +1346,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <div class="game-icon"><i class="fa-solid fa-water" style="color:#0ea5e9"></i></div>
           <div class="game-body">
             <div class="game-title">Capivarinha</div>
-            <div class="game-desc">Entre no rio, desvie e acumule pontos (barcos, peixes e mais).</div>
+            <div class="game-desc">Entre na represa, desvie dos objetos e acumule pontos. E confira o Ranking</div>
           </div>
           <div class="game-actions">
             <button class="btn-play" id="playCanos">Jogar</button>
@@ -1895,31 +1895,60 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function drawFish(f) {
-      ctx.save();
-      ctx.translate(f.x, f.y);
+  ctx.save();
+  ctx.translate(f.x, f.y);
 
-      // corpo oval
-      ctx.fillStyle = "#ff9933";
-      ctx.beginPath();
-      ctx.ellipse(0, 0, f.r * 1.6, f.r, 0, 0, Math.PI * 2);
-      ctx.fill();
+  // usa o score do Capivarinha (variável local do jogo)
+  const sc = score;
 
-      // cauda
-      ctx.beginPath();
-      ctx.moveTo(-f.r * 1.6, 0);
-      ctx.lineTo(-f.r * 2.2, f.r * 0.8);
-      ctx.lineTo(-f.r * 2.2, -f.r * 0.8);
-      ctx.closePath();
-      ctx.fill();
 
-      // olho
-      ctx.fillStyle = "#000";
-      ctx.beginPath();
-      ctx.arc(f.r * 0.8, -f.r * 0.3, 1.5, 0, Math.PI * 2);
-      ctx.fill();
 
-      ctx.restore();
-    }
+  // define a cor conforme a faixa de pontos
+  let fishColor = "#56da2e"; // verde
+  if (sc >= 30) {
+    fishColor = "#ffffffff";   // vermelho
+  } else if (sc >= 20) {
+    fishColor = "#ff1d1dff";   // amarelo
+  } else if (sc >= 10) {
+    fishColor = "#fcfc27ff";   // azul
+  }
+
+    // define a cor conforme a faixa de pontos
+  let fishColorA = "#000000ff"; // verde
+  if (sc >= 30) {
+    fishColorA = "#3444f2ff";   // vermelho
+  } else if (sc >= 20) {
+    fishColorA = "#ffffffff";   // amarelo
+  } else if (sc >= 10) {
+    fishColorA = "#fc2727ff";   // azul
+  }
+
+
+
+  // corpo
+  ctx.fillStyle = fishColor;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, f.r * 1.6, f.r, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // cauda (mesma cor)
+  ctx.fillStyle = fishColorA;
+  ctx.beginPath();
+  ctx.moveTo(-f.r * 1.6, 0);
+  ctx.lineTo(-f.r * 2.2, f.r * 0.8);
+  ctx.lineTo(-f.r * 2.2, -f.r * 0.8);
+  ctx.closePath();
+  ctx.fill();
+
+  // olho
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(f.r * 0.8, -f.r * 0.3, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
 
 
     function spawnRiverCapy() {
@@ -2204,27 +2233,180 @@ document.addEventListener("DOMContentLoaded", function () {
       ctx.beginPath(); ctx.arc(x + r * 0.8, y - r * 0.9, r * 0.2, 0, Math.PI * 2); ctx.fillStyle = "#5a3820"; ctx.fill();
     }
 
-    function drawBoat(b) {
-      // casco simples com proa
-      ctx.fillStyle = "#5b4636";
-      ctx.fillRect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h);
-      ctx.beginPath();
-      ctx.moveTo(b.x + b.w / 2, b.y - b.h / 2);
-      ctx.lineTo(b.x + b.w / 2 + 6, b.y);
-      ctx.lineTo(b.x + b.w / 2, b.y + b.h / 2);
-      ctx.closePath();
-      ctx.fill();
-      // cabine
-      ctx.fillStyle = "#c7c7c7";
-      ctx.fillRect(b.x - b.w * 0.15, b.y - b.h * 0.6, b.w * 0.3, b.h * 0.5);
-    }
+ function drawBoat(b) {
+  const w = b.w, h = b.h;
+
+  // inclinação suave conforme o rio
+  const yPrev = riverCenterAt(b.x - 6);
+  const yNext = riverCenterAt(b.x + 6);
+  const ang   = Math.atan2(yNext - yPrev, 12) * 0.7;
+
+  // cores (fáceis de trocar)
+  const HULL_TOP = "#7a2d1a";   // bordo escuro
+  const HULL_BOT = "#b64a2d";   // bordo claro
+  const GUNWALE  = "#f2e8d8";   // borda superior
+  const CABIN    = "#d9dee6";   // cabine
+  const GLASS    = "#87c7ff";   // vidro
+  const MOTOR    = "#3a3a3a";   // motor
+  const STRIPE   = "#ffffff";   // faixa lateral
+
+  // linha mais bonitinha
+  const prevLC = ctx.lineCap, prevLJ = ctx.lineJoin;
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+
+  ctx.save();
+  ctx.translate(b.x, b.y);
+  ctx.rotate(ang);
+
+  // desenhar em coordenadas normalizadas ~100x50 (facilita proporções)
+  ctx.scale(w / 100, h / 50);
+
+  // ===== sombra sob o casco =====
+  ctx.save();
+  ctx.globalAlpha = 0.25;
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.ellipse(0, 18, 30, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // ===== CASCO com quilha e proa pontuda =====
+  const grad = ctx.createLinearGradient(0, 4, 0, 26);
+  grad.addColorStop(0, HULL_TOP);
+  grad.addColorStop(1, HULL_BOT);
+  ctx.fillStyle = grad;
+
+  ctx.beginPath();
+  // costado superior quase reto até proa
+  ctx.moveTo(-42, 6);
+  ctx.lineTo( 22, 6);
+  // proa pontuda
+  ctx.quadraticCurveTo( 40, 8,  44, 14);
+  // leme até base da popa (linha inferior)
+  ctx.lineTo( 38, 22);
+  ctx.lineTo(-34, 22);
+  // popa reta com leve curva (transom)
+  ctx.quadraticCurveTo(-48, 16, -42, 6);
+  ctx.closePath();
+  ctx.fill();
+
+  // faixa lateral (pinta cara de barco)
+  ctx.strokeStyle = STRIPE;
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(-36, 14);
+  ctx.lineTo( 36, 14);
+  ctx.stroke();
+
+  // gunwale (borda superior clara)
+  ctx.strokeStyle = GUNWALE;
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(-40, 5);
+  ctx.lineTo( 24, 5);
+  ctx.quadraticCurveTo( 39, 7,  42, 13);
+  ctx.stroke();
+
+  // ===== DECK (madeira clara) =====
+  ctx.fillStyle = "#f4f1e8";
+  roundRect(-35, 3, 50, 6.5, 2, true);
+
+  // ripas do deck
+  ctx.strokeStyle = "rgba(120,100,80,0.35)";
+  ctx.lineWidth = 0.8;
+  for (let x = -32; x <= 12; x += 6) {
+    ctx.beginPath();
+    ctx.moveTo(x, 3);
+    ctx.lineTo(x, 9.5);
+    ctx.stroke();
+  }
+
+  // ===== CABINE + PARA-BRISA inclinado =====
+  ctx.fillStyle = CABIN;
+  roundRect(-10, -1, 24, 10, 3, true);
+
+  // para-brisa (triângulo trapezoidal)
+  ctx.fillStyle = GLASS;
+  ctx.beginPath();
+  ctx.moveTo(4, -1);
+  ctx.lineTo(12, -1.5);
+  ctx.lineTo(12, 6);
+  ctx.lineTo(4, 6);
+  ctx.closePath();
+  ctx.fill();
+
+  // moldura do vidro
+  ctx.strokeStyle = "rgba(60,80,100,0.7)";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // ===== MOTOR DE POPA =====
+  // base do motor
+  ctx.fillStyle = MOTOR;
+  roundRect(-44.5, 12, 7, 6, 1.5, true);
+  // rabeta
+  roundRect(-47, 13.5, 3.2, 4.2, 1, true);
+  // hélice (duas folhas)
+  ctx.beginPath();
+  ctx.moveTo(-48.2, 15.6);
+  ctx.quadraticCurveTo(-51, 14.2, -48.2, 13.0);
+  ctx.quadraticCurveTo(-46.2, 14.6, -48.2, 15.6);
+  ctx.fillStyle = "#c0c0c0";
+  ctx.fill();
+
+  // ===== FENDERS (boias) =====
+  ctx.fillStyle = "#fff";
+  circle(-18, 10, 1.8);
+  circle(  2,  9, 1.8);
+  ctx.strokeStyle = "#ff3b30";
+  ctx.lineWidth = 1;
+  circleStroke(-18, 10, 1.8);
+  circleStroke(  2,  9, 1.8);
+
+  // ===== MAROLA / ESTEIRA =====
+  ctx.strokeStyle = "rgba(255,255,255,0.65)";
+  ctx.lineWidth = 1.2;
+  wave(-50, 12, -70, 16);
+  wave(-46, 18, -66, 22);
+
+  ctx.restore();
+  ctx.lineCap = prevLC; ctx.lineJoin = prevLJ;
+
+  // ===== Helpers normalizados =====
+  function roundRect(x, y, w, h, r, fill) {
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y,     x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x,     y + h, r);
+    ctx.arcTo(x,     y + h, x,     y,     r);
+    ctx.arcTo(x,     y,     x + w, y,     r);
+    ctx.closePath();
+    if (fill) ctx.fill(); else ctx.stroke();
+  }
+  function circle(cx, cy, r) {
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  }
+  function circleStroke(cx, cy, r) {
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  }
+  function wave(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2 - 4;
+    ctx.quadraticCurveTo(mx, my, x2, y2);
+    ctx.stroke();
+  }
+}
+
 
     function draw() {
       // Céu + chão + grama
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#70c5ce"; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#66ae39ff"; ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#c9d09a"; ctx.fillRect(0, H - 20, W, 20);
-      ctx.fillStyle = "#7ec850"; ctx.fillRect(0, 0, 56, H - 20);
+      ctx.fillStyle = "#66ae39ff"; ctx.fillRect(0, 0, 56, H - 20);
 
       // Rio (polígono entre top e bottom)
       const topY = (x) => riverTopAt(x), botY = (x) => riverBottomAt(x);
