@@ -196,17 +196,15 @@ function mostrarRankingCapivarinha() {
 
     const top = arr[0]?.best || 1;
 
-    ul.innerHTML = arr.map((it, i) => {
+ul.innerHTML = arr.map((it, i) => {
   const pos = i + 1;
   const medalClass = pos === 1 ? "medal-1" : pos === 2 ? "medal-2" : pos === 3 ? "medal-3" : "";
-  const top = arr[0]?.best || 1;
   const fillPct = Math.max(6, Math.round((Number(it.best || 0) / top) * 100));
   const isMe = it._id === myUid;
 
   return `
     <li class="rank-item rank-item--compact ${isMe ? "me" : ""}">
       <div class="rank-pos ${medalClass}">${pos}</div>
-
       <div class="rank-main">
         <div class="rank-row">
           <div class="rank-name" title="${(it.name || "Jogador").toString().slice(0,60)}">
@@ -221,6 +219,7 @@ function mostrarRankingCapivarinha() {
     </li>
   `;
 }).join("");
+
 
 
     // rolar até minha posição (se eu estiver na lista)
@@ -241,12 +240,31 @@ function mostrarRankingCapivarinha() {
   });
 
   // Botão "Meu recorde" — rola até mim
-  const btnMeuRecorde = document.getElementById("btnMeuRecorde");
-  if (btnMeuRecorde) btnMeuRecorde.addEventListener("click", () => {
-    const myItem = document.querySelector(".rank-item.me");
-    if (myItem) myItem.scrollIntoView({ behavior: "smooth", block: "center" });
-    else alert("Jogue uma partida para entrar no ranking!");
-  });
+ // Botão "Meu recorde" — mostra o valor e rola até mim
+const btnMeuRecorde = document.getElementById("btnMeuRecorde");
+if (btnMeuRecorde) btnMeuRecorde.addEventListener("click", async () => {
+  try {
+    const uid = getOrCreatePlayerId();
+    const snap = await firebase.database()
+      .ref(`jogos/capivarinha/users/${uid}`)
+      .once("value");
+
+    const data = snap.val();
+    if (data && typeof data.best === "number") {
+      alert(`Seu recorde: ${data.best}`);
+
+      // tenta rolar até sua linha, se ela estiver no Top exibido
+      const myItem = document.querySelector(".rank-item.me");
+      if (myItem) myItem.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      alert("Você ainda não tem recorde salvo. Jogue uma partida para entrar no ranking!");
+    }
+  } catch (e) {
+    console.error(e);
+    alert("Não consegui carregar seu recorde agora. Tente novamente.");
+  }
+});
+
 }
 
 
