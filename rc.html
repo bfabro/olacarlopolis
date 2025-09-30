@@ -321,14 +321,15 @@ button.loading {
 						<!-- <th>Divulgação</th> -->
 						<th>Fotos</th>
 						<th>Cardápio</th>
+						<th>Telefone</th> <!-- NOVO -->
 
 					</tr>
 				</thead>
 				<tbody id="tabelaBotoes">
-					<tr>
-						<td colspan="3" style="text-align:center; color: #999;">Nenhum dado carregado ainda</td>
-					</tr>
-				</tbody>
+  <tr>
+    <td colspan="4" style="text-align:center; color: #999;">Nenhum dado carregado ainda</td>
+  </tr>
+</tbody>
 			</table>
 		</div>
 
@@ -579,6 +580,8 @@ function stopLoading(){
 					]);
 
 					diasFiltrados = Array.from(diasDaSemana);
+
+					
 				}
 
 
@@ -857,58 +860,64 @@ function stopLoading(){
 					});
 
 
-				const tabelaBotoes = document.getElementById("tabelaBotoes");
-				tabelaBotoes.innerHTML = "";
 
-				const totaisEstab = {};
-				let encontrouDadosBotao = false;
 
-				let botoesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresBotoes") || "{}");
-				const botoesAnterioresTemp = { ...botoesAnteriores }; // Cópia para comparação
-				botoesAnteriores = {}; // Reiniciar antes de preencher
 
-				diasFiltrados.forEach(dia => {
-					const cliquesDoDia = dadosBotoes[dia] || {};
-					Object.entries(cliquesDoDia).forEach(([estabId, botoes]) => {
-						encontrouDadosBotao = true;
-						if (!totaisEstab[estabId]) {
-							totaisEstab[estabId] = { divulgacao: 0, cardapio: 0, fotos: 0, whatsapp: 0 };
-						}
-						// totaisEstab[estabId].divulgacao += botoes.divulgacao || 0;
-						totaisEstab[estabId].cardapio += botoes.cardapio || 0;
-						totaisEstab[estabId].fotos += botoes.fotos || 0;
-						//totaisEstab[estabId].whatsapp += botoes.whatsapp || 0;
 
-					});
-				});
 
-				if (encontrouDadosBotao) {
-					Object.entries(totaisEstab)
-  .sort((a, b) => (b[1].divulgacao + b[1].cardapio + b[1].fotos) - (a[1].divulgacao + a[1].cardapio + a[1].fotos)).forEach(([estabId, dados]) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${estabId}</td>
-      <!-- <td style="text-align:center">${dados.divulgacao}</td> -->
-      <td style="text-align:center">${dados.fotos}</td>
-      <td style="text-align:center">${dados.cardapio}</td>
+					const tabelaBotoes = document.getElementById("tabelaBotoes");
+tabelaBotoes.innerHTML = "";
+
+// Agrega por estabelecimento: fotos, cardapio, telefone
+const agregBotoes = {}; // { estId: { fotos:0, cardapio:0, telefone:0 } }
+
+for (const dia of diasFiltrados) {
+  const porDia = dadosBotoes[dia] || {};
+  for (const estId of Object.keys(porDia)) {
+    const tipos = porDia[estId] || {};
+    if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0 };
+    agregBotoes[estId].fotos    += Number(tipos.fotos    || 0);
+    agregBotoes[estId].cardapio += Number(tipos.cardapio || 0);
+    agregBotoes[estId].telefone += Number(tipos.telefone || 0);
+  }
+}
+
+// comparar com valores anteriores para destaque
+let botoesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresBotoes") || "{}");
+const botoesAnterioresTemp = { ...botoesAnteriores };
+botoesAnteriores = {};
+
+const itensOrdenados = Object.entries(agregBotoes)
+  .map(([estId, v]) => ({ estId, ...v }))
+  .sort((a, b) => (b.fotos + b.cardapio + b.telefone) - (a.fotos + a.cardapio + a.telefone));
+
+if (!itensOrdenados.length) {
+  tabelaBotoes.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
+} else {
+  tabelaBotoes.innerHTML = itensOrdenados.map(it => {
+    const anterior = botoesAnterioresTemp[it.estId] || {};
+    const alterou = (anterior.fotos !== it.fotos) ||
+                    (anterior.cardapio !== it.cardapio) ||
+                    (anterior.telefone !== it.telefone);
+
+    return `
+      <tr style="${alterou ? 'color:yellow; font-weight:bold;' : ''}">
+        <td>${it.estId}</td>
+        <td style="text-align:center">${it.fotos}</td>
+        <td style="text-align:center">${it.cardapio}</td>
+        <td style="text-align:center">${it.telefone}</td>
+      </tr>
     `;
+  }).join("");
 
-    const anterior = botoesAnterioresTemp[estabId];
-    if (!anterior ||
-        anterior.cardapio !== dados.cardapio || anterior.fotos !== dados.fotos) {
-      row.style.color = "yellow";
-      row.style.fontWeight = "bold";
-    }
-
-    botoesAnteriores[estabId] = { fotos: dados.fotos, cardapio: dados.cardapio };
-    tabelaBotoes.appendChild(row);
+  // salvar os atuais para comparação futura
+  itensOrdenados.forEach(it => {
+    botoesAnteriores[it.estId] = { fotos: it.fotos, cardapio: it.cardapio, telefone: it.telefone };
   });
+}
 
-				} else {
-					tabelaBotoes.innerHTML = `<tr><td colspan="3" style="text-align:center; color: #999;">Nenhum clique encontrado</td></tr>`;
-				}
+localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores));
 
-				localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores));
 
 
 			    // ⚠️ só libere o botão depois de carregar também a tabela "Onde Comer"
@@ -918,6 +927,8 @@ function stopLoading(){
   }
 });
    
+
+
 
 
 			////////////

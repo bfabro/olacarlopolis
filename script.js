@@ -11451,19 +11451,75 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
         },
       ];
 
-      infos.forEach(({ icon, label, valor }) => {
-        const card = document.createElement("div");
-        card.className = "info-card";
-        card.innerHTML = `
-                          <i class="fas ${icon}"></i>
-                          <div class="info-card-text">
-                            <span class="info-card-label">${label}</span>
-                            <span class="info-card-value">${valor}</span>
-                          </div>
-                        `;
-        wrapper.appendChild(card);
-      });
+      // ***** SUBSTITUA a criação do card dentro do infos.forEach(...) por este bloco *****
+infos.forEach(({ icon, label, valor }) => {
+  const card = document.createElement("div");
+  card.className = "info-card";
 
+  // Se for o contato, renderiza como link clicável com classe e atributos
+  if (label === "Contato") {
+    // tenta extrair o primeiro contato legível (reaproveite sua função getPrimeiroContato/somenteDigitos se quiser)
+    const numeroRaw = valor || "";
+    const numeroApenasDigitos = somenteDigitos(numeroRaw);
+    // id do estabelecimento — ajuste se sua variável com o nome normalizado for diferente
+    const estId = normalizeName(establishment.name);
+
+    card.innerHTML = `
+      <i class="fas ${icon}"></i>
+      <div class="info-card-text">
+        <span class="info-card-label">${label}</span>
+        <span class="info-card-value">
+          <a href="tel:${numeroApenasDigitos}" 
+             class="telefone-link" 
+             data-id="${estId}" 
+             data-tel="${numeroApenasDigitos}">
+            ${numeroRaw}
+          </a>
+        </span>
+      </div>
+    `;
+  } else {
+    // comportamento padrão para os outros cards
+    card.innerHTML = `
+      <i class="fas ${icon}"></i>
+      <div class="info-card-text">
+        <span class="info-card-label">${label}</span>
+        <span class="info-card-value">${valor}</span>
+      </div>
+    `;
+  }
+
+  wrapper.appendChild(card);
+});
+
+///////////
+/////
+/////
+// Delegated listener para cliques em telefones
+wrapper.addEventListener('click', function (ev) {
+  const a = ev.target.closest && ev.target.closest('.telefone-link');
+  if (!a) return;
+
+  ev.preventDefault(); // evita navegar antes de registrar
+
+  const estId = a.dataset.id || normalizeName(establishment.name || "");
+  const tel = a.dataset.tel || somenteDigitos(a.getAttribute('href') || "");
+
+  // registra no Firebase
+  try {
+    registrarCliqueBotao('telefone', estId);
+  } catch (err) {
+    console.warn('Erro ao registrar clique telefone:', err);
+  }
+
+  // segue para ligação
+  setTimeout(() => {
+    window.location.href = `tel:${tel}`;
+  }, 120);
+});
+
+
+/////
       return wrapper;
     }
 
