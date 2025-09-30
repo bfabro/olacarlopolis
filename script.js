@@ -2791,13 +2791,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     ).map(s => JSON.parse(s))
       .sort((a, b) => a.nome.localeCompare(b.nome));
 
-    // aplica filtro
-    const itens = (filtroEstabId === "todos")
+    // aplica filtro (força comparação por string para evitar mismatch)
+    const filtro = String(filtroEstabId || "todos").trim();
+    const itens = (filtro === "todos")
       ? todos
-      : todos.filter(i => i.estabelecimentoId === filtroEstabId);
+      : todos.filter(i => String(i.estabelecimentoId).trim() === filtro);
 
     // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
     const itensFiltrados = itens.filter(i => !promoExpirada(i));
+
 
     // título + filtro
     let html = `
@@ -2805,17 +2807,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
        <h2 class="highlighted"><span>🔥 Promoções</span>
     </h2>
      <div class="filtro-comidas-card">
-  <label for="filtroEstab">Filtrar por:</label>
-  <select id="filtroEstab">
+    <label for="filtroEstab">Filtrar por:</label>
+    <select id="filtroEstab">
     <option value="todos">🔥 Todos</option>
     ${estabelecimentos.map(e => `
       <option value="${e.id}" ${filtroEstabId === e.id ? 'selected' : ''}>${e.nome}</option>
     `).join("")}
-  </select>
-</div>
+    </select>
+    </div>
 
     </section>
-  `;
+    `;
 
     // grid de cards
     html += `<section class="promo-grid">`;
@@ -2846,7 +2848,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
         html += `
-  <article class="promo-card">
+    <article class="promo-card">
     <div class="promo-card-body">
       <div class="promo-produto">
         ${i.imagem
@@ -2864,31 +2866,31 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       </div>
 
      <div class="promo-preco">
-  ${precoAntFmt ? `<div class="promo-preco-antigo">${precoAntFmt}</div>` : ""}
-  <div class="promo-preco-atual">${precoFmt}</div>
-  ${i.unidade ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
-  ${(i.validadeInicio && i.validadeFim)
-            ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
-            : (i.validadeFim ? `<div class="promo-validade">Até ${formatarDataBR(i.validadeFim)}</div>`
-              : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
-</div>
+      ${precoAntFmt ? `<div class="promo-preco-antigo">${precoAntFmt}</div>` : ""}
+      <div class="promo-preco-atual">${precoFmt}</div>
+      ${i.unidade ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
+      ${(i.validadeInicio && i.validadeFim)
+                ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
+                : (i.validadeFim ? `<div class="promo-validade">Até ${formatarDataBR(i.validadeFim)}</div>`
+                  : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
+    </div>
 
 
      
     </div>
 
-  <div class="promo-rodape">
-  ${i.contact
-            ? `<a href="https://wa.me/55${somenteDigitos(getPrimeiroContato(i.contact))}?text=${encodeURIComponent(`Olá, encontrei o produto ${i.titulo} no Olá Carlópolis. Está disponível ainda?`)
-            }" 
-        target="_blank" 
-        class="icon-link">
-        <i class="fab fa-whatsapp" style="color:#25D366"></i>${i.contact}
-      </a>`
-            : ""}
+    <div class="promo-rodape">
+    ${i.contact
+              ? `<a href="https://wa.me/55${somenteDigitos(getPrimeiroContato(i.contact))}?text=${encodeURIComponent(`Olá, encontrei o produto ${i.titulo} no Olá Carlópolis. Está disponível ainda?`)
+              }" 
+          target="_blank" 
+          class="icon-link">
+          <i class="fab fa-whatsapp" style="color:#25D366"></i>${i.contact}
+        </a>`
+              : ""}
 
-  ${i.estabelecimentoId && categories
-            .flatMap(c => c.establishments || [])
+    ${i.estabelecimentoId && categories
+              .flatMap(c => c.establishments || [])
             .find(e => normalizeName(e.name) === i.estabelecimentoId)?.instagram
             ? `<a href="${fixUrl(categories.flatMap(c => c.establishments || [])
               .find(e => normalizeName(e.name) === i.estabelecimentoId).instagram)}"
@@ -2899,13 +2901,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             : ""}
 
     
-</div>
+    </div>
 
-  </article>
-`;
+      </article>
+    `;
 
 
-      });
+    });
     }
 
 
@@ -2985,53 +2987,46 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     // listeners do filtro
     const select = document.getElementById("filtroEstab");
     if (select) {
+
+
       select.addEventListener("change", (e) => {
+
         mostrarPromocoes(e.target.value);
       });
     }
-  }
 
-  // Atalho no menu
-  const linkPromo = document.getElementById("menuPromocoes");
-  if (linkPromo) {
-    linkPromo.addEventListener("click", (e) => {
-      e.preventDefault();
-      mostrarPromocoes("todos"); // sempre abre com todas as promoções
-    });
-  }
-
-
-
-
-
-
-
-
-
-
-
-  ///
-  ///
-  ///
-
-
-
-
-  function mostrarFotos(nomeNormalizado) {
-    // Procura o estabelecimento pelo nome normalizado
-    let est = null;
-    categories.forEach(cat => {
-      cat.establishments.forEach(e => {
-        if (normalizeName(e.name) === nomeNormalizado && e.novidadesImages && e.novidadesImages.length) {
-          est = e;
-        }
-      });
-    });
-
-    if (!est) {
-      alert("Nenhuma foto de divulgação encontrada!");
-      return;
     }
+
+
+    /////
+
+    // Atalho no menu
+    const linkPromo = document.getElementById("menuPromocoes");
+    if (linkPromo) {
+      linkPromo.addEventListener("click", (e) => {
+        e.preventDefault();
+        mostrarPromocoes("todos"); // sempre abre com todas as promoções
+      });
+    }
+
+
+  
+
+    function mostrarFotos(nomeNormalizado) {
+      // Procura o estabelecimento pelo nome normalizado
+      let est = null;
+      categories.forEach(cat => {
+        cat.establishments.forEach(e => {
+          if (normalizeName(e.name) === nomeNormalizado && e.novidadesImages && e.novidadesImages.length) {
+            est = e;
+          }
+        });
+      });
+
+      if (!est) {
+        alert("Nenhuma foto de divulgação encontrada!");
+        return;
+      }
 
     // Remove qualquer modal anterior
     document.querySelectorAll('.modal-fotos-overlay').forEach(el => el.remove());
@@ -3043,23 +3038,23 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         <button class="close-modal-fotos" style="position: absolute; top: 12px; right: 16px; font-size: 2rem; background: none; border: none; color: #333; cursor: pointer;">&times;</button>
         <h2 style="text-align: center; margin-bottom: 20px;">Fotos de ${est.name}</h2>
         <div class="modal-fotos-imgs" style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;">
-  `;
-
-    est.novidadesImages.forEach((img, idx) => {
-      const descricao = est.novidadesDescriptions?.[idx] || '';
-      html += `
-      <div style="text-align: center;">
-        <img src="${img}" alt="Foto ${idx + 1}" style="max-width: 370px; max-height: 425px;border-radius: 10px; box-shadow:0 2px 12px #0002;" loading="lazy">
-        <div style="margin-top:8px; color: #444; font-size: 1rem;">${descricao}</div>
-      </div>
     `;
-    });
 
-    html += `
+      est.novidadesImages.forEach((img, idx) => {
+        const descricao = est.novidadesDescriptions?.[idx] || '';
+        html += `
+        <div style="text-align: center;">
+          <img src="${img}" alt="Foto ${idx + 1}" style="max-width: 370px; max-height: 425px;border-radius: 10px; box-shadow:0 2px 12px #0002;" loading="lazy">
+          <div style="margin-top:8px; color: #444; font-size: 1rem;">${descricao}</div>
+        </div>
+      `;
+      });
+
+      html += `
+          </div>
         </div>
       </div>
-    </div>
-  `;
+    `;
 
     // Insere o modal no body
     document.body.insertAdjacentHTML('beforeend', html);
@@ -3073,22 +3068,22 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     document.querySelector('.modal-fotos-overlay').onclick = function (e) {
       if (e.target === this) this.remove();
     };
-  }
-  window.mostrarFotos = mostrarFotos;
+    }
+    window.mostrarFotos = mostrarFotos;
 
 
 
 
-  function mostrarCardapio(nomeNormalizado) {
-    // Procura sempre o PRIMEIRO que tem menuImages
-    let est = null;
-    categories.forEach(cat => {
-      cat.establishments.forEach(e => {
-        if (normalizeName(e.name) === nomeNormalizado && e.menuImages && e.menuImages.length) {
-          est = e;
-        }
+    function mostrarCardapio(nomeNormalizado) {
+      // Procura sempre o PRIMEIRO que tem menuImages
+      let est = null;
+      categories.forEach(cat => {
+        cat.establishments.forEach(e => {
+          if (normalizeName(e.name) === nomeNormalizado && e.menuImages && e.menuImages.length) {
+            est = e;
+          }
+        });
       });
-    });
 
 
     if (!est) return;
@@ -3106,17 +3101,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         <button class="close-modal-cardapio" title="Fechar">&times;</button>
         <h2>Cardápio - ${est.name}</h2>
         <div class="modal-cardapio-imgs">
-  `;
+    `;
 
-    est.menuImages.forEach(img => {
-      html += `<img src="${img}" class="cardapio-img" loading="lazy">`;
-    });
+      est.menuImages.forEach(img => {
+        html += `<img src="${img}" class="cardapio-img" loading="lazy">`;
+      });
 
-    html += `
+      html += `
+          </div>
         </div>
       </div>
-    </div>
-  `;
+    `;
 
     // Adiciona modal ao body
     document.body.insertAdjacentHTML('beforeend', html);
@@ -3130,12 +3125,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     document.querySelector('.modal-cardapio-overlay').onclick = function (e) {
       if (e.target === this) this.remove();
     };
-  }
-  window.mostrarCardapio = mostrarCardapio;
+    }
+    window.mostrarCardapio = mostrarCardapio;
 
-  ///////// fim onde comer
-
-
+    ///////// fim onde comer
 
 
 
@@ -3143,7 +3136,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-  function resetarMenuLateral() {
+
+
+    function resetarMenuLateral() {
     // Restaura visual
     document.querySelectorAll(".menu_items > li").forEach(item => {
       item.style.display = "block";
@@ -11818,7 +11813,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
   function handleHashRoute() {
-   const h = (location.hash || "").toLowerCase();
+    const h = (location.hash || "").toLowerCase();
 
     if (h === "#ondecomer") { return mostrarOndeComer(); }
     if (h === "#promocoes") { return mostrarPromocoes(); }
@@ -11871,17 +11866,17 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
     // se for link do WhatsApp, mantenha o href original (com text=...);
-  // senão, caia para tel:
-  const isWhats = /^https?:\/\/(?:api\.whatsapp\.com|wa\.me)\//i.test(href);
-  const navegar = () => {
-  if (isWhats) {
-    window.open(href, '_blank');  // abre Whats em nova aba
-  } else {
-    window.open(`tel:${tel}`, '_blank');  // abre discador em nova aba
-  }
-};
+    // senão, caia para tel:
+    const isWhats = /^https?:\/\/(?:api\.whatsapp\.com|wa\.me)\//i.test(href);
+    const navegar = () => {
+      if (isWhats) {
+        window.open(href, '_blank');  // abre Whats em nova aba
+      } else {
+        window.open(`tel:${tel}`, '_blank');  // abre discador em nova aba
+      }
+    };
 
- 
+
 
     let navegou = false;
     registrarCliqueBotao('telefone', estId || '')
@@ -12331,19 +12326,34 @@ function preCarregarImagensCardapio(imagens) {
 
 
 
+
+
+
 document.body.addEventListener('click', function (e) {
-  if (
-    e.target.classList.contains('promo-carousel-img') ||
-    e.target.classList.contains('imagem-cardapio')
-  ) {
-    const src = e.target.src;
-    const bg = document.createElement('div');
-    bg.className = 'fullscreen-img-bg';
-    bg.innerHTML = `<img src="${src}" alt="Ampliada" />`;
-    bg.onclick = () => bg.remove();
-    document.body.appendChild(bg);
-  }
+  const img = e.target.closest('.promo-img-zoom, .promo-carousel-img, .imagem-cardapio, .imagem-expandivel');
+  if (!img) return;
+
+  const src = img.src;
+  const bg = document.createElement('div');
+  bg.className = 'fullscreen-img-bg';
+  bg.innerHTML = `<img src="${src}" alt="Ampliada" />`;
+  bg.onclick = () => bg.remove();
+  document.body.appendChild(bg);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 document.body.addEventListener('click', function (e) {
   if (e.target.classList.contains('btn-cardapio')) {
@@ -12362,16 +12372,6 @@ document.body.addEventListener('click', function (e) {
 
 
 
-document.body.addEventListener('click', function (e) {
-  if (e.target.classList.contains('imagem-expandivel')) {
-    const src = e.target.src;
-    const bg = document.createElement('div');
-    bg.className = 'fullscreen-img-bg';
-    bg.innerHTML = `<img src="${src}" alt="Ampliada" />`;
-    bg.onclick = () => bg.remove();
-    document.body.appendChild(bg);
-  }
-});
 
 
 
