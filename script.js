@@ -61,7 +61,7 @@ function promoExpirada(p) {
 function getOrCreatePlayerId() {
   let id = localStorage.getItem("capivarinha_player_id");
   if (!id) {
-    id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`;
+    id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
     localStorage.setItem("capivarinha_player_id", id);
   }
   return id;
@@ -105,7 +105,7 @@ function salvarScoreCapivarinha(score) {
     db.ref("jogos/capivarinha/scores").push({
       uid, name, score: Number(score),
       ts: firebase.database.ServerValue.TIMESTAMP
-    }).catch(()=>{});
+    }).catch(() => { });
 
     // Transaction para manter o MELHOR score (best) do usuário
     userRef.transaction((curr) => {
@@ -196,19 +196,19 @@ function mostrarRankingCapivarinha() {
 
     const top = arr[0]?.best || 1;
 
-ul.innerHTML = arr.map((it, i) => {
-  const pos = i + 1;
-  const medalClass = pos === 1 ? "medal-1" : pos === 2 ? "medal-2" : pos === 3 ? "medal-3" : "";
-  const fillPct = Math.max(6, Math.round((Number(it.best || 0) / top) * 100));
-  const isMe = it._id === myUid;
+    ul.innerHTML = arr.map((it, i) => {
+      const pos = i + 1;
+      const medalClass = pos === 1 ? "medal-1" : pos === 2 ? "medal-2" : pos === 3 ? "medal-3" : "";
+      const fillPct = Math.max(6, Math.round((Number(it.best || 0) / top) * 100));
+      const isMe = it._id === myUid;
 
-  return `
+      return `
     <li class="rank-item rank-item--compact ${isMe ? "me" : ""}">
       <div class="rank-pos ${medalClass}">${pos}</div>
       <div class="rank-main">
         <div class="rank-row">
-          <div class="rank-name" title="${(it.name || "Jogador").toString().slice(0,60)}">
-            ${(it.name || "Jogador").toString().slice(0,30)}
+          <div class="rank-name" title="${(it.name || "Jogador").toString().slice(0, 60)}">
+            ${(it.name || "Jogador").toString().slice(0, 30)}
           </div>
           <div class="score-number">${Number(it.best || 0)}</div>
         </div>
@@ -218,7 +218,7 @@ ul.innerHTML = arr.map((it, i) => {
       </div>
     </li>
   `;
-}).join("");
+    }).join("");
 
 
 
@@ -240,30 +240,30 @@ ul.innerHTML = arr.map((it, i) => {
   });
 
   // Botão "Meu recorde" — rola até mim
- // Botão "Meu recorde" — mostra o valor e rola até mim
-const btnMeuRecorde = document.getElementById("btnMeuRecorde");
-if (btnMeuRecorde) btnMeuRecorde.addEventListener("click", async () => {
-  try {
-    const uid = getOrCreatePlayerId();
-    const snap = await firebase.database()
-      .ref(`jogos/capivarinha/users/${uid}`)
-      .once("value");
+  // Botão "Meu recorde" — mostra o valor e rola até mim
+  const btnMeuRecorde = document.getElementById("btnMeuRecorde");
+  if (btnMeuRecorde) btnMeuRecorde.addEventListener("click", async () => {
+    try {
+      const uid = getOrCreatePlayerId();
+      const snap = await firebase.database()
+        .ref(`jogos/capivarinha/users/${uid}`)
+        .once("value");
 
-    const data = snap.val();
-    if (data && typeof data.best === "number") {
-      alert(`Seu recorde: ${data.best}`);
+      const data = snap.val();
+      if (data && typeof data.best === "number") {
+        alert(`Seu recorde: ${data.best}`);
 
-      // tenta rolar até sua linha, se ela estiver no Top exibido
-      const myItem = document.querySelector(".rank-item.me");
-      if (myItem) myItem.scrollIntoView({ behavior: "smooth", block: "center" });
-    } else {
-      alert("Você ainda não tem recorde salvo. Jogue uma partida para entrar no ranking!");
+        // tenta rolar até sua linha, se ela estiver no Top exibido
+        const myItem = document.querySelector(".rank-item.me");
+        if (myItem) myItem.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        alert("Você ainda não tem recorde salvo. Jogue uma partida para entrar no ranking!");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Não consegui carregar seu recorde agora. Tente novamente.");
     }
-  } catch (e) {
-    console.error(e);
-    alert("Não consegui carregar seu recorde agora. Tente novamente.");
-  }
-});
+  });
 
 }
 
@@ -1820,6 +1820,17 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
     document.querySelector(".content_area").innerHTML = html;
 
+         // ===== Plaquinha comemorativa (aparece ao bater 50 pts) =====
+      //  let olacShown = false;       // garante que só aparece uma vez
+      
+
+// ===== Plaquinhas olacarlopolis =====
+const SIGN_FIRST = 5;   // valor inicial para aparecer
+const SIGN_STEP  = 50;   // repete a cada 50
+
+
+
+
     // Canvas com DPR
     const cvs = document.getElementById("flappyCanvas");
     const ctx = cvs.getContext("2d");
@@ -1849,9 +1860,20 @@ document.addEventListener("DOMContentLoaded", function () {
     // Velocidade do “mundo”
     const SPEED0 = 2.0, SPEED_MAX = 5.0;
 
+    
+
     let gap = GAP0, speed = SPEED0, phase = 0;
     let timeSinceStart = 0, distForScore = 0;
     const SCORE_EVERY = 120;
+
+    // === Velocidade do rio em km/h (de-para) ===
+const KMH_START = 0;   // km/h quando speed = SPEED0
+const KMH_MAX   = 50;  // km/h quando speed = SPEED_MAX
+function kmhFromSpeed(v) {
+  const t = Math.max(0, Math.min(1, (v - SPEED0) / (SPEED_MAX - SPEED0)));
+  return Math.round(KMH_START + t * (KMH_MAX - KMH_START));
+}
+
 
     // Meandros do rio
     const amp1 = 70, freq1 = 0.010;
@@ -1876,6 +1898,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const RIVERCAPY_R = 10;            // raio para desenhar/colisão se quiser
     const RIVERCAPY_EXTRA_SPEED = 0.6; // um pouco mais “rápida” que o rio
 
+    // ===== Plaquinhas olacarlopolis =====
+    let nextSignAt = 50;      // primeira meta de pontos
+    const signs = [];         // lista de plaquinhas na tela
+
 
 
     // ===== Peixes no rio =====
@@ -1895,59 +1921,101 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function drawFish(f) {
+      ctx.save();
+      ctx.translate(f.x, f.y);
+
+      // usa o score do Capivarinha (variável local do jogo)
+      const sc = score;
+
+     
+
+
+      // define a cor conforme a faixa de pontos
+      let fishColor = "#56da2e"; // verde
+      if (sc >= 150) {
+        fishColor = "#ffffffff";   // vermelho
+      } else if (sc >= 100) {
+        fishColor = "#ff1d1dff";   // amarelo
+      } else if (sc >= 50) {
+        fishColor = "#fcfc27ff";   // azul
+      }
+
+      // define a cor conforme a faixa de pontos
+      let fishColorA = "#000000ff"; // verde
+      if (sc >= 150) {
+        fishColorA = "#3444f2ff";   // vermelho
+      } else if (sc >= 100) {
+        fishColorA = "#ffffffff";   // amarelo
+      } else if (sc >= 50) {
+        fishColorA = "#fc2727ff";   // azul
+      }
+
+
+
+      // corpo
+      ctx.fillStyle = fishColor;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, f.r * 1.6, f.r, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // cauda (mesma cor)
+      ctx.fillStyle = fishColorA;
+      ctx.beginPath();
+      ctx.moveTo(-f.r * 1.6, 0);
+      ctx.lineTo(-f.r * 2.2, f.r * 0.8);
+      ctx.lineTo(-f.r * 2.2, -f.r * 0.8);
+      ctx.closePath();
+      ctx.fill();
+
+      // olho
+      ctx.fillStyle = "#000";
+      ctx.beginPath();
+      ctx.arc(f.r * 0.8, -f.r * 0.3, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function spawnOlacSign() {
+  const x = W + 30;                 // nasce fora da tela
+  const sideTop = Math.random() < 0.5; // escolhe margem
+  const yRiver = riverCenterAt(x);
+  const gapHalf = gap / 2;
+  const y = sideTop ? (yRiver - gapHalf - 12) : (yRiver + gapHalf + 12);
+
+  signs.push({ x, y, sideTop, wobble: 0 });
+}
+
+function drawOlacSign(s) {
   ctx.save();
-  ctx.translate(f.x, f.y);
+  ctx.translate(s.x, s.y);
 
-  // usa o score do Capivarinha (variável local do jogo)
-  const sc = score;
+  // balanço
+  s.wobble += 0.06;
+  ctx.rotate(Math.sin(s.wobble) * 0.06);
 
+  // poste
+  ctx.fillStyle = "#7a5d3a";
+  ctx.fillRect(-2, -22, 4, 24);
 
+  // placa
+  const PW = 84, PH = 22;
+  ctx.fillStyle = "#fff8d6";
+  ctx.strokeStyle = "#b39b6a";
+  ctx.lineWidth = 2;
+  ctx.fillRect(-PW/2, -22 - PH, PW, PH);
+  ctx.strokeRect(-PW/2, -22 - PH, PW, PH);
 
-  // define a cor conforme a faixa de pontos
-  let fishColor = "#56da2e"; // verde
-  if (sc >= 150) {
-    fishColor = "#ffffffff";   // vermelho
-  } else if (sc >= 100) {
-    fishColor = "#ff1d1dff";   // amarelo
-  } else if (sc >= 50) {
-    fishColor = "#fcfc27ff";   // azul
-  }
-
-    // define a cor conforme a faixa de pontos
-  let fishColorA = "#000000ff"; // verde
-  if (sc >= 150) {
-    fishColorA = "#3444f2ff";   // vermelho
-  } else if (sc >= 100) {
-    fishColorA = "#ffffffff";   // amarelo
-  } else if (sc >= 50) {
-    fishColorA = "#fc2727ff";   // azul
-  }
-
-
-
-  // corpo
-  ctx.fillStyle = fishColor;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, f.r * 1.6, f.r, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // cauda (mesma cor)
-  ctx.fillStyle = fishColorA;
-  ctx.beginPath();
-  ctx.moveTo(-f.r * 1.6, 0);
-  ctx.lineTo(-f.r * 2.2, f.r * 0.8);
-  ctx.lineTo(-f.r * 2.2, -f.r * 0.8);
-  ctx.closePath();
-  ctx.fill();
-
-  // olho
-  ctx.fillStyle = "#000";
-  ctx.beginPath();
-  ctx.arc(f.r * 0.8, -f.r * 0.3, 1.5, 0, Math.PI * 2);
-  ctx.fill();
+  // texto
+  ctx.fillStyle = "#1f2937";
+  ctx.font = "bold 12px Poppins,Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("olacarlopolis", 0, -22 - PH/2);
 
   ctx.restore();
 }
+
 
 
 
@@ -1990,11 +2058,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const x = W + BOAT_W + 10;
       const y = riverCenterAt(x);
       boats.push({
-  x, y,
-  w: 48, h: 24,       // ajuste se quiser maior/menor
-  bob: Math.random()*Math.PI*2,
-  bobAmp: 0.8 + Math.random()*0.6 // amplitude do “balanço”
-});
+        x, y,
+        w: 48, h: 24,       // ajuste se quiser maior/menor
+        bob: Math.random() * Math.PI * 2,
+        bobAmp: 0.8 + Math.random() * 0.6 // amplitude do “balanço”
+      });
     }
 
     function circleRectCollide(cx, cy, cr, r) {
@@ -2121,6 +2189,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // velocidade/dificuldade
         speed = Math.min(SPEED_MAX, SPEED0 + t * 0.12);
 
+   
+
+
         // alvo de largura do rio:
         let targetGap = Math.max(GAP_MIN, GAP0 - t * 1.2); // fecha mais devagar (mais largo no geral)
         if (boats.length) targetGap = Math.max(targetGap, BOAT_GAP); // ABRE BEM quando tem barco
@@ -2227,8 +2298,71 @@ document.addEventListener("DOMContentLoaded", function () {
           if (score > best) { best = score; localStorage.setItem(BEST_KEY, best); }
           updateHUD();
         }
+
+        // Dispara placa sempre que atingir a meta atual (50, 100, 150, ...)
+while (score >= nextSignAt) {
+  spawnOlacSign();
+  nextSignAt += SIGN_STEP;  // prepara a próxima
+}
+
+        // === Item 3: dispara plaquinha sempre que bater a meta (50, 100, 150...) ===
+if (score >= nextSignAt) {
+  spawnOlacSign();   // sua função que cria a plaquinha
+  nextSignAt += 50;  // prepara a próxima meta
+}
+
       }
     }
+
+
+    function spawnOlacSign() {
+      const x = W + 30;                 // nasce fora da tela à direita
+      const sideTop = Math.random() < 0.5;  // escolhe margem superior ou inferior
+      const yRiver = riverCenterAt(x);
+      const gapHalf = gap / 2;
+
+      // posição na margem (um pouco afastado da água)
+      const y = sideTop ? (yRiver - gapHalf - 12) : (yRiver + gapHalf + 12);
+
+      signs.push({
+        x,
+        y,
+        sideTop,        // true = margem superior, false = margem inferior
+        wobble: 0       // leve balanço
+      });
+    }
+
+    function drawOlacSign(s) {
+      ctx.save();
+      ctx.translate(s.x, s.y);
+
+      // Leve balanço para dar vida
+      s.wobble += 0.06;
+      const tilt = Math.sin(s.wobble) * 0.06; // ~3.5°
+      ctx.rotate(tilt * (s.sideTop ? -1 : 1));
+
+      // Poste
+      ctx.fillStyle = "#7a5d3a";
+      ctx.fillRect(-2, -22, 4, 24);
+
+      // Placa
+      const PW = 84, PH = 22;
+      ctx.fillStyle = "#fff8d6";
+      ctx.strokeStyle = "#b39b6a";
+      ctx.lineWidth = 2;
+      ctx.fillRect(-PW / 2, -22 - PH, PW, PH);
+      ctx.strokeRect(-PW / 2, -22 - PH, PW, PH);
+
+      // Texto
+      ctx.fillStyle = "#1f2937";
+      ctx.font = "bold 12px Poppins,Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("olacarlopolis", 0, -22 - PH / 2);
+
+      ctx.restore();
+    }
+
 
     function drawCapivara(x, y, r) {
       ctx.fillStyle = "#8b5a2b";
@@ -2239,21 +2373,37 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function drawBoat(b) {
-      // casco simples com proa
-      ctx.fillStyle = "#5b4636";
-      ctx.fillRect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h);
+      ctx.save();
+      ctx.translate(b.x, b.y);
+
+      // Casco do barco
+      ctx.fillStyle = "#8B4513"; // marrom
       ctx.beginPath();
-      ctx.moveTo(b.x + b.w / 2, b.y - b.h / 2);
-      ctx.lineTo(b.x + b.w / 2 + 6, b.y);
-      ctx.lineTo(b.x + b.w / 2, b.y + b.h / 2);
+      ctx.moveTo(-BOAT_W / 2, 0);
+      ctx.lineTo(0, BOAT_H);
+      ctx.lineTo(BOAT_W / 2, 0);
       ctx.closePath();
       ctx.fill();
-      // cabine
-      ctx.fillStyle = "#c7c7c7";
-      ctx.fillRect(b.x - b.w * 0.15, b.y - b.h * 0.6, b.w * 0.3, b.h * 0.5);
+
+      // Detalhe do casco (borda)
+      ctx.strokeStyle = "#5C3317";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Vela (opcional, deixa mais visível)
+      ctx.fillStyle = "#fefefe";
+      ctx.beginPath();
+      ctx.moveTo(0, -BOAT_H * 1.5);
+      ctx.lineTo(0, 0);
+      ctx.lineTo(BOAT_W / 2.5, -BOAT_H * 0.5);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
     }
 
-  
+
+
 
     function draw() {
       // Céu + chão + grama
@@ -2274,10 +2424,38 @@ document.addEventListener("DOMContentLoaded", function () {
       grad.addColorStop(0, "#46a6d8"); grad.addColorStop(1, "#2e89b8");
       ctx.fillStyle = grad; ctx.fill();
 
-      // Barcos (desenha por cima da água)
-      for (const b of boats) drawBoat(b);
 
-       // Capivara no rio (extra)
+      // === HUD: velocidade do rio (km/h) no canto superior esquerdo ===
+ctx.save();
+ctx.font = "bold 12px Poppins,Arial";
+ctx.textAlign = "left";
+ctx.textBaseline = "top";
+// contorno para legibilidade
+ctx.fillStyle = "rgba(0,0,0,0.35)";
+ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 9, 9);
+ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 8, 9);
+ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 9, 8);
+// texto principal
+ctx.fillStyle = "#fff";
+ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 8, 8);
+ctx.restore();
+
+
+      // Barcos (desenha por cima da água)
+     // Barcos (por cima da água)
+
+for (const b of boats) drawBoat(b);
+
+// Plaquinhas
+for (let i = signs.length - 1; i >= 0; i--) {
+  const s = signs[i];
+  s.x -= speed;
+  drawOlacSign(s);
+  if (s.x < -100) signs.splice(i, 1);
+}
+
+
+      // Capivara no rio (extra)
       if (riverCapy) drawRiverCapy(riverCapy);
 
       // Peixes
@@ -2346,26 +2524,25 @@ document.addEventListener("DOMContentLoaded", function () {
       else { draw(); }
     }
 
-      // Botões de Ranking
-  const btnRank = document.getElementById("f-ranking");
-  const btnLink = document.getElementById("f-ranking-link");
-  if (btnRank) btnRank.addEventListener("click", () => mostrarRankingCapivarinha());
-  if (btnLink) btnLink.addEventListener("click", () => {
-    location.hash = "#ranking-capivarinha";
-    mostrarRankingCapivarinha();
-  });
+    // Botões de Ranking
+    const btnRank = document.getElementById("f-ranking");
+    const btnLink = document.getElementById("f-ranking-link");
+    if (btnRank) btnRank.addEventListener("click", () => mostrarRankingCapivarinha());
+    if (btnLink) btnLink.addEventListener("click", () => {
+      location.hash = "#ranking-capivarinha";
+      mostrarRankingCapivarinha();
+    });
 
 
     // start
     reset();
+    // === Item 5: reset das plaquinhas ===
+nextSignAt = SIGN_FIRST;
+signs.length = 0;
+spawnOlacSign();
     rafId = requestAnimationFrame(loop);
   }
 
-
-
-
-  ///
-  ///
 
 
 
