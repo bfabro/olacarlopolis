@@ -11817,7 +11817,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
     if (h === "#ondecomer") { return mostrarOndeComer(); }
     if (h === "#promocoes") { return mostrarPromocoes(); }
-    if (h === "#menucoletralixo") { return montarPaginaColetaLixo(); }
+   if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
 
@@ -13291,11 +13291,22 @@ document.addEventListener("DOMContentLoaded", () => {
   if (menuColeta) {
     menuColeta.addEventListener("click", (e) => {
       e.preventDefault();
-      montarPaginaColetaLixo();
-      // Fecha o menu lateral no mobile, como você já faz nos outros itens
+      location.hash = "coletalixo";     // ✅ define o hash
+      montarPaginaColetaLixo();         // abre a página
+      // fecha a sidebar no mobile
       const sidebar = document.querySelector(".sidebar");
       const overlay = document.querySelector("#overlay");
       if (sidebar && overlay) { sidebar.classList.remove("open"); overlay.classList.remove("active"); }
     });
   }
 });
+
+document.addEventListener("click", (e) => {
+  const a = e.target.closest('a[href="#coletalixo"], a[href="#menuColetaLixo"], a[href="#menucoletralixo"]');
+  if (!a) return;
+  e.preventDefault();
+  location.hash = "coletalixo";
+  montarPaginaColetaLixo();
+});
+
+
