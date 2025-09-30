@@ -11818,11 +11818,11 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
   function handleHashRoute() {
-    const h = (location.hash || "").toLowerCase();
+   const h = (location.hash || "").toLowerCase();
 
     if (h === "#ondecomer") { return mostrarOndeComer(); }
     if (h === "#promocoes") { return mostrarPromocoes(); }
-    if (h === "#menuColetaLixo") { return montarPaginaColetaLixo(); }
+    if (h === "#menucoletralixo") { return montarPaginaColetaLixo(); }
     if (h === "#jogos") { return mostrarJogos(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
 
