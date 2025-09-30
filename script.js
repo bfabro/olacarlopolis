@@ -6379,6 +6379,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: [{ inicio: "06:00", fim: "20:00" }],
             },
             address: "Av. Elson Soares, 767 - Carlopolis",
+            contact: "(43) 99149-8546",
             contact: "(43) 99105-9324",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/supermercadorochaclps",
