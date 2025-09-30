@@ -1847,7 +1847,8 @@ const SIGN_STEP  = 50;   // repete a cada 50
     const W = 350, H = 512;
 
     // Capivara (inicia na grama)
-    const capy = { x: 28, y: H - 40, r: 12, vy: 0, gravity: 0.35, jump: -6.0 };
+    //const capy = { x: 28, y: H - 40, r: 12, vy: 0, gravity: 0.35, jump: -6.0 };
+    const capy = { x: 28, y: H - 40, r: 12, vy: 0, gravity: 0.35, jump: -6.0, lookRight: true };
 
     // ===== Rio serpenteando =====
     const RIVER_STEP = 8;
@@ -2125,13 +2126,15 @@ function drawOlacSign(s) {
 
       started = false; running = true; last = 0;
       capy.x = 28; capy.y = H - 40; capy.vy = 0;
-
+ capy.lookRight = true; // garante início olhando para a direita
       score = 0; updateHUD(); draw();
     };
 
 
     const jump = () => {
       if (!running) return;
+        // vira a cabeça a cada pulo
+  capy.lookRight = !capy.lookRight;
       if (!started) {
         snapIntoRiver();
         capy.vy = capy.jump;
@@ -2156,6 +2159,8 @@ function drawOlacSign(s) {
     cvs.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       if (!running) {
+         // vira também no toque que reinicia (opcional)
+    capy.lookRight = !capy.lookRight;
         // se o jogo estiver parado (game over), um toque reinicia
         if (rafId) cancelAnimationFrame(rafId);
         reset();
@@ -2365,8 +2370,10 @@ if (score >= nextSignAt) {
 
 
     function drawCapivara(x, y, r) {
+      const dir = capy.lookRight ? 1 : -1;
       ctx.fillStyle = "#8b5a2b";
       ctx.beginPath(); ctx.ellipse(x, y, r * 1.4, r, 0, 0, Math.PI * 2); ctx.fill();
+      
       ctx.beginPath(); ctx.ellipse(x + r * 1.2, y - r * 0.3, r * 0.8, r * 0.6, 0, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.arc(x + r * 1.4, y - r * 0.3, r * 0.15, 0, Math.PI * 2); ctx.fillStyle = "#000"; ctx.fill();
       ctx.beginPath(); ctx.arc(x + r * 0.8, y - r * 0.9, r * 0.2, 0, Math.PI * 2); ctx.fillStyle = "#5a3820"; ctx.fill();

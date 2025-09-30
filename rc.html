@@ -214,6 +214,12 @@
 @keyframes spin{to{ transform:rotate(360deg)}}
 .loader-text{ color:#00bcd4; font-weight:600; font-size:14px; }
 
+
+button.loading {
+  background: linear-gradient(135deg, #e53935, #b71c1c) !important;
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.6) !important;
+}
+
 	</style>
 </head>
 
@@ -457,27 +463,31 @@
   const overlayEl = document.getElementById('loadingOverlay');
   let loadCount = 0;
 
-  function startLoading(){
-    loadCount++;
-    if (overlayEl) overlayEl.style.display = 'grid';
+function startLoading(){
+  loadCount++;
+  if (overlayEl) overlayEl.style.display = 'grid';
+  const btn = document.getElementById('btnBuscar');
+  if (btn){
+    if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
+    btn.innerHTML = 'Buscando…';
+    btn.setAttribute('disabled','disabled');
+    btn.classList.add('loading');   // 🔴 deixa vermelho
+  }
+}
+
+function stopLoading(){
+  loadCount = Math.max(0, loadCount - 1);
+  if (loadCount === 0){
+    if (overlayEl) overlayEl.style.display = 'none';
     const btn = document.getElementById('btnBuscar');
     if (btn){
-      if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
-      btn.innerHTML = 'Buscando…';
-      btn.setAttribute('disabled','disabled');
+      btn.removeAttribute('disabled');
+      if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
+      btn.classList.remove('loading'); // 🔵 volta para azul
     }
   }
-  function stopLoading(){
-    loadCount = Math.max(0, loadCount - 1);
-    if (loadCount === 0){
-      if (overlayEl) overlayEl.style.display = 'none';
-      const btn = document.getElementById('btnBuscar');
-      if (btn){
-        btn.removeAttribute('disabled');
-        if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
-      }
-    }
-  }
+}
+
 </script>
 
 
@@ -499,7 +509,10 @@
 			let cidadesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresCidades") || "{}");
 
 
-			document.getElementById("btnBuscar").addEventListener("click", async () => {
+		document.getElementById("btnBuscar").addEventListener("click", async () => {
+  startLoading();                // 🔴 fica vermelho + overlay
+  try {
+
 
 
 				const tipo = tipoRelatorioEl.value;
@@ -898,7 +911,16 @@
 				localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores));
 
 
-			});
+			    // ⚠️ só libere o botão depois de carregar também a tabela "Onde Comer"
+    await carregarTabelaOndeComer();
+  } finally {
+    stopLoading();               // 🔵 volta ao azul só depois de TUDO
+  }
+});
+   
+
+
+			////////////
 		</script>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -1065,48 +1087,34 @@ async function somarNoPorDatas(basePath, datas) {
 
 
 // Popula a tabela 📋 Cardápios (Onde Comer) somando Cardápio + WhatsApp (+ Fotos opcional)
+// Popula a tabela 📋 Cardápios (Onde Comer) somando Cardápio + WhatsApp
 async function carregarTabelaOndeComer() {
   const tbody = document.getElementById('tabelaOndeComerCardapio');
   if (!tbody) return;
 
-   startLoading();
-  try {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Carregando...</td></tr>`;
-    const datas = await listarDatasPeriodo();
-    const [totCardapio, totWhats] = await Promise.all([
-      somarNoPorDatas('cliquesCardapiosOndeComer', datas),
-      somarNoPorDatas('cliquesWhatsOndeComer',    datas)
-    ]);
-    // ... resto da função como já está ...
-  } finally {
-    stopLoading();
-  }
-
-  // UI feedback
+  // feedback visual local da própria tabela
   tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Carregando...</td></tr>`;
 
-  const datas = await listarDatasPeriodo(); // usa os filtros já existentes do rc.html
-  // Lê e soma cada fonte
+  // usa os filtros já existentes do rc.html
+  const datas = await listarDatasPeriodo();
+
+  // lê e soma cada fonte em paralelo
   const [totCardapio, totWhats] = await Promise.all([
     somarNoPorDatas('cliquesCardapiosOndeComer', datas),
     somarNoPorDatas('cliquesWhatsOndeComer',    datas)
   ]);
 
-  // Junta por estabelecimento
-  const estabSet = new Set([
-    ...Object.keys(totCardapio),
-    ...Object.keys(totWhats)
-  ]);
-
+  // consolida por estabelecimento
+  const estabSet = new Set([...Object.keys(totCardapio), ...Object.keys(totWhats)]);
   const linhas = [];
   estabSet.forEach(id => {
     linhas.push({ id, cardapio: totCardapio[id] || 0, whatsapp: totWhats[id] || 0 });
-	});
+  });
 
-  // Ordena pelo total desc
+  // ordena por total desc
   linhas.sort((a,b)=> (b.cardapio + b.whatsapp) - (a.cardapio + a.whatsapp));
 
-  // Render
+  // render
   if (!linhas.length) {
     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Nenhum clique encontrado</td></tr>`;
     return;
@@ -1120,6 +1128,7 @@ async function carregarTabelaOndeComer() {
     </tr>
   `).join('');
 }
+
 
 // Chame ao abrir a página e também no botão "Buscar"
 document.addEventListener('DOMContentLoaded', () => {
