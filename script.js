@@ -680,7 +680,12 @@ document.addEventListener("DOMContentLoaded", function () {
   function registrarCliqueBotao(tipo, idEstabelecimento) {
     const hoje = getHojeBR();
     const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
-    ref.transaction((atual) => (atual || 0) + 1);
+    return new Promise((resolve) => {
+      ref.transaction(
+        (atual) => (atual || 0) + 1,
+        (_erro, _committed, _snap) => resolve({ ok: !_erro })
+      );
+    });
   }
 
   const destaquesFixos = [
@@ -1820,13 +1825,13 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
     document.querySelector(".content_area").innerHTML = html;
 
-         // ===== Plaquinha comemorativa (aparece ao bater 50 pts) =====
-      //  let olacShown = false;       // garante que só aparece uma vez
-      
+    // ===== Plaquinha comemorativa (aparece ao bater 50 pts) =====
+    //  let olacShown = false;       // garante que só aparece uma vez
 
-// ===== Plaquinhas olacarlopolis =====
-const SIGN_FIRST = 5;   // valor inicial para aparecer
-const SIGN_STEP  = 50;   // repete a cada 50
+
+    // ===== Plaquinhas olacarlopolis =====
+    const SIGN_FIRST = 5;   // valor inicial para aparecer
+    const SIGN_STEP = 50;   // repete a cada 50
 
 
 
@@ -1861,19 +1866,19 @@ const SIGN_STEP  = 50;   // repete a cada 50
     // Velocidade do “mundo”
     const SPEED0 = 2.0, SPEED_MAX = 5.0;
 
-    
+
 
     let gap = GAP0, speed = SPEED0, phase = 0;
     let timeSinceStart = 0, distForScore = 0;
     const SCORE_EVERY = 120;
 
     // === Velocidade do rio em km/h (de-para) ===
-const KMH_START = 0;   // km/h quando speed = SPEED0
-const KMH_MAX   = 50;  // km/h quando speed = SPEED_MAX
-function kmhFromSpeed(v) {
-  const t = Math.max(0, Math.min(1, (v - SPEED0) / (SPEED_MAX - SPEED0)));
-  return Math.round(KMH_START + t * (KMH_MAX - KMH_START));
-}
+    const KMH_START = 0;   // km/h quando speed = SPEED0
+    const KMH_MAX = 50;  // km/h quando speed = SPEED_MAX
+    function kmhFromSpeed(v) {
+      const t = Math.max(0, Math.min(1, (v - SPEED0) / (SPEED_MAX - SPEED0)));
+      return Math.round(KMH_START + t * (KMH_MAX - KMH_START));
+    }
 
 
     // Meandros do rio
@@ -1928,7 +1933,7 @@ function kmhFromSpeed(v) {
       // usa o score do Capivarinha (variável local do jogo)
       const sc = score;
 
-     
+
 
 
       // define a cor conforme a faixa de pontos
@@ -1978,44 +1983,44 @@ function kmhFromSpeed(v) {
     }
 
     function spawnOlacSign() {
-  const x = W + 30;                 // nasce fora da tela
-  const sideTop = Math.random() < 0.5; // escolhe margem
-  const yRiver = riverCenterAt(x);
-  const gapHalf = gap / 2;
-  const y = sideTop ? (yRiver - gapHalf - 12) : (yRiver + gapHalf + 12);
+      const x = W + 30;                 // nasce fora da tela
+      const sideTop = Math.random() < 0.5; // escolhe margem
+      const yRiver = riverCenterAt(x);
+      const gapHalf = gap / 2;
+      const y = sideTop ? (yRiver - gapHalf - 12) : (yRiver + gapHalf + 12);
 
-  signs.push({ x, y, sideTop, wobble: 0 });
-}
+      signs.push({ x, y, sideTop, wobble: 0 });
+    }
 
-function drawOlacSign(s) {
-  ctx.save();
-  ctx.translate(s.x, s.y);
+    function drawOlacSign(s) {
+      ctx.save();
+      ctx.translate(s.x, s.y);
 
-  // balanço
-  s.wobble += 0.06;
-  ctx.rotate(Math.sin(s.wobble) * 0.06);
+      // balanço
+      s.wobble += 0.06;
+      ctx.rotate(Math.sin(s.wobble) * 0.06);
 
-  // poste
-  ctx.fillStyle = "#7a5d3a";
-  ctx.fillRect(-2, -22, 4, 24);
+      // poste
+      ctx.fillStyle = "#7a5d3a";
+      ctx.fillRect(-2, -22, 4, 24);
 
-  // placa
-  const PW = 84, PH = 22;
-  ctx.fillStyle = "#fff8d6";
-  ctx.strokeStyle = "#b39b6a";
-  ctx.lineWidth = 2;
-  ctx.fillRect(-PW/2, -22 - PH, PW, PH);
-  ctx.strokeRect(-PW/2, -22 - PH, PW, PH);
+      // placa
+      const PW = 84, PH = 22;
+      ctx.fillStyle = "#fff8d6";
+      ctx.strokeStyle = "#b39b6a";
+      ctx.lineWidth = 2;
+      ctx.fillRect(-PW / 2, -22 - PH, PW, PH);
+      ctx.strokeRect(-PW / 2, -22 - PH, PW, PH);
 
-  // texto
-  ctx.fillStyle = "#1f2937";
-  ctx.font = "bold 12px Poppins,Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("olacarlopolis", 0, -22 - PH/2);
+      // texto
+      ctx.fillStyle = "#1f2937";
+      ctx.font = "bold 12px Poppins,Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("olacarlopolis", 0, -22 - PH / 2);
 
-  ctx.restore();
-}
+      ctx.restore();
+    }
 
 
 
@@ -2126,15 +2131,15 @@ function drawOlacSign(s) {
 
       started = false; running = true; last = 0;
       capy.x = 28; capy.y = H - 40; capy.vy = 0;
- capy.lookRight = true; // garante início olhando para a direita
+      capy.lookRight = true; // garante início olhando para a direita
       score = 0; updateHUD(); draw();
     };
 
 
     const jump = () => {
       if (!running) return;
-        // vira a cabeça a cada pulo
-  capy.lookRight = !capy.lookRight;
+      // vira a cabeça a cada pulo
+      capy.lookRight = !capy.lookRight;
       if (!started) {
         snapIntoRiver();
         capy.vy = capy.jump;
@@ -2159,8 +2164,8 @@ function drawOlacSign(s) {
     cvs.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       if (!running) {
-         // vira também no toque que reinicia (opcional)
-    capy.lookRight = !capy.lookRight;
+        // vira também no toque que reinicia (opcional)
+        capy.lookRight = !capy.lookRight;
         // se o jogo estiver parado (game over), um toque reinicia
         if (rafId) cancelAnimationFrame(rafId);
         reset();
@@ -2194,7 +2199,7 @@ function drawOlacSign(s) {
         // velocidade/dificuldade
         speed = Math.min(SPEED_MAX, SPEED0 + t * 0.12);
 
-   
+
 
 
         // alvo de largura do rio:
@@ -2305,16 +2310,16 @@ function drawOlacSign(s) {
         }
 
         // Dispara placa sempre que atingir a meta atual (50, 100, 150, ...)
-while (score >= nextSignAt) {
-  spawnOlacSign();
-  nextSignAt += SIGN_STEP;  // prepara a próxima
-}
+        while (score >= nextSignAt) {
+          spawnOlacSign();
+          nextSignAt += SIGN_STEP;  // prepara a próxima
+        }
 
         // === Item 3: dispara plaquinha sempre que bater a meta (50, 100, 150...) ===
-if (score >= nextSignAt) {
-  spawnOlacSign();   // sua função que cria a plaquinha
-  nextSignAt += 50;  // prepara a próxima meta
-}
+        if (score >= nextSignAt) {
+          spawnOlacSign();   // sua função que cria a plaquinha
+          nextSignAt += 50;  // prepara a próxima meta
+        }
 
       }
     }
@@ -2373,7 +2378,7 @@ if (score >= nextSignAt) {
       const dir = capy.lookRight ? 1 : -1;
       ctx.fillStyle = "#8b5a2b";
       ctx.beginPath(); ctx.ellipse(x, y, r * 1.4, r, 0, 0, Math.PI * 2); ctx.fill();
-      
+
       ctx.beginPath(); ctx.ellipse(x + r * 1.2, y - r * 0.3, r * 0.8, r * 0.6, 0, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.arc(x + r * 1.4, y - r * 0.3, r * 0.15, 0, Math.PI * 2); ctx.fillStyle = "#000"; ctx.fill();
       ctx.beginPath(); ctx.arc(x + r * 0.8, y - r * 0.9, r * 0.2, 0, Math.PI * 2); ctx.fillStyle = "#5a3820"; ctx.fill();
@@ -2433,33 +2438,33 @@ if (score >= nextSignAt) {
 
 
       // === HUD: velocidade do rio (km/h) no canto superior esquerdo ===
-ctx.save();
-ctx.font = "bold 12px Poppins,Arial";
-ctx.textAlign = "left";
-ctx.textBaseline = "top";
-// contorno para legibilidade
-ctx.fillStyle = "rgba(0,0,0,0.35)";
-ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 9, 9);
-ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 8, 9);
-ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 9, 8);
-// texto principal
-ctx.fillStyle = "#fff";
-ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 8, 8);
-ctx.restore();
+      ctx.save();
+      ctx.font = "bold 12px Poppins,Arial";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      // contorno para legibilidade
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 9, 9);
+      ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 8, 9);
+      ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 9, 8);
+      // texto principal
+      ctx.fillStyle = "#fff";
+      ctx.fillText(`🌊 ${kmhFromSpeed(speed)} km/h`, 8, 8);
+      ctx.restore();
 
 
       // Barcos (desenha por cima da água)
-     // Barcos (por cima da água)
+      // Barcos (por cima da água)
 
-for (const b of boats) drawBoat(b);
+      for (const b of boats) drawBoat(b);
 
-// Plaquinhas
-for (let i = signs.length - 1; i >= 0; i--) {
-  const s = signs[i];
-  s.x -= speed;
-  drawOlacSign(s);
-  if (s.x < -100) signs.splice(i, 1);
-}
+      // Plaquinhas
+      for (let i = signs.length - 1; i >= 0; i--) {
+        const s = signs[i];
+        s.x -= speed;
+        drawOlacSign(s);
+        if (s.x < -100) signs.splice(i, 1);
+      }
 
 
       // Capivara no rio (extra)
@@ -2544,9 +2549,9 @@ for (let i = signs.length - 1; i >= 0; i--) {
     // start
     reset();
     // === Item 5: reset das plaquinhas ===
-nextSignAt = SIGN_FIRST;
-signs.length = 0;
-spawnOlacSign();
+    nextSignAt = SIGN_FIRST;
+    signs.length = 0;
+    spawnOlacSign();
     rafId = requestAnimationFrame(loop);
   }
 
@@ -11213,9 +11218,14 @@ ${establishment.infoVagaTrabalho
                     ${establishment.contact ? `
                       <div style="display: flex; align-items: center;  margin-bottom: 4px;">
 
-                        <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank"  class="zap-link">
-                          <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>          
-                        <span>${establishment.contact}</span></a>
+                      <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent('Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!')}"
+   target="_blank"
+   class="zap-link telefone-link"
+   data-id="${normalizeName(establishment.name)}"
+   data-tel="${firstNumber}">
+  <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
+  <span>${establishment.contact}</span>
+</a>
 
 
                       </div>` : ""
@@ -11452,74 +11462,57 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
       ];
 
       // ***** SUBSTITUA a criação do card dentro do infos.forEach(...) por este bloco *****
-infos.forEach(({ icon, label, valor }) => {
-  const card = document.createElement("div");
-  card.className = "info-card";
+      infos.forEach(({ icon, label, valor }) => {
+        const card = document.createElement("div");
+        card.className = "info-card";
 
-  // Se for o contato, renderiza como link clicável com classe e atributos
-  if (label === "Contato") {
-    // tenta extrair o primeiro contato legível (reaproveite sua função getPrimeiroContato/somenteDigitos se quiser)
-    const numeroRaw = valor || "";
-    const numeroApenasDigitos = somenteDigitos(numeroRaw);
-    // id do estabelecimento — ajuste se sua variável com o nome normalizado for diferente
-    const estId = normalizeName(establishment.name);
+        // Se for o contato, renderiza como link clicável com classe e atributos
+        if (label === "Contato") {
+          if (label === "Contato") {
+            // 1) string bonita
+            const numeroRaw = getPrimeiroContato(valor || "");
+            // 2) apenas dígitos (para href tel:)
+            const numeroDigits = somenteDigitos(numeroRaw);
+            // 3) id do estabelecimento normalizado (igual ao usado nos outros contadores)
+            const estId = normalizeName(establishment.name);
 
-    card.innerHTML = `
-      <i class="fas ${icon}"></i>
-      <div class="info-card-text">
-        <span class="info-card-label">${label}</span>
-        <span class="info-card-value">
-          <a href="tel:${numeroApenasDigitos}" 
-             class="telefone-link" 
-             data-id="${estId}" 
-             data-tel="${numeroApenasDigitos}">
-            ${numeroRaw}
-          </a>
-        </span>
-      </div>
-    `;
-  } else {
-    // comportamento padrão para os outros cards
-    card.innerHTML = `
-      <i class="fas ${icon}"></i>
-      <div class="info-card-text">
-        <span class="info-card-label">${label}</span>
-        <span class="info-card-value">${valor}</span>
-      </div>
-    `;
-  }
-
-  wrapper.appendChild(card);
-});
-
-///////////
-/////
-/////
-// Delegated listener para cliques em telefones
-wrapper.addEventListener('click', function (ev) {
-  const a = ev.target.closest && ev.target.closest('.telefone-link');
-  if (!a) return;
-
-  ev.preventDefault(); // evita navegar antes de registrar
-
-  const estId = a.dataset.id || normalizeName(establishment.name || "");
-  const tel = a.dataset.tel || somenteDigitos(a.getAttribute('href') || "");
-
-  // registra no Firebase
-  try {
-    registrarCliqueBotao('telefone', estId);
-  } catch (err) {
-    console.warn('Erro ao registrar clique telefone:', err);
-  }
-
-  // segue para ligação
-  setTimeout(() => {
-    window.location.href = `tel:${tel}`;
-  }, 120);
-});
+            card.innerHTML = `
+    <i class="fas ${icon}"></i>
+    <div class="info-card-text">
+      <span class="info-card-label">${label}</span>
+      <span class="info-card-value">
+        <a href="tel:${numeroDigits}"
+           class="telefone-link"
+           data-id="${estId}"
+           data-tel="${numeroDigits}">
+          ${numeroRaw}
+        </a>
+      </span>
+    </div>
+  `;
+          } else {
+            card.innerHTML = `
+    <i class="fas ${icon}"></i>
+    <div class="info-card-text">
+      <span class="info-card-label">${label}</span>
+      <span class="info-card-value">${valor}</span>
+    </div>
+  `;
+          }
+        }
 
 
-/////
+        wrapper.appendChild(card);
+      });
+
+      ///////////
+      /////
+      /////
+      // Delegated listener para cliques em telefones
+
+
+
+      /////
       return wrapper;
     }
 
@@ -11855,8 +11848,49 @@ wrapper.addEventListener('click', function (ev) {
   function registrarCliqueBotao(tipo, idEstabelecimento) {
     const hoje = getHojeBR();
     const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
-    ref.transaction((atual) => (atual || 0) + 1);
+    // retorna uma Promise e resolve quando a transação completa
+    return new Promise((resolve) => {
+      ref.transaction(
+        (atual) => (atual || 0) + 1,
+        (_erro, _committed, _snap) => resolve({ ok: !_erro })
+      );
+    });
   }
+
+  // === Contador: clique em telefone (link tel: dentro da área de info) ===
+  document.addEventListener('click', function (ev) {
+    const a = ev.target.closest?.('.telefone-link');
+    if (!a) return;
+
+    ev.preventDefault(); // registra primeiro
+
+    const href = a.getAttribute('href') || '';
+    const tel = a.dataset.tel || somenteDigitos(href);
+    const estId = a.dataset.id || a.closest('[data-est-id]')?.dataset.estId || '';
+
+
+    // se for link do WhatsApp, mantenha o href original (com text=...);
+  // senão, caia para tel:
+  const isWhats = /^https?:\/\/(?:api\.whatsapp\.com|wa\.me)\//i.test(href);
+  const navegar = () => {
+  if (isWhats) {
+    window.open(href, '_blank');  // abre Whats em nova aba
+  } else {
+    window.open(`tel:${tel}`, '_blank');  // abre discador em nova aba
+  }
+};
+
+ 
+
+    let navegou = false;
+    registrarCliqueBotao('telefone', estId || '')
+      .finally(() => { navegou = true; navegar(); });
+
+    // fallback caso a rede esteja lenta: garante navegação mesmo sem callback
+    setTimeout(() => { if (!navegou) navegar(); }, 600);
+  });
+
+
 
 
 
@@ -12648,7 +12682,12 @@ document.addEventListener('click', function (e) {
 function registrarCliqueBotao(tipo, idEstabelecimento) {
   const hoje = getHojeBR(); // ou new Date().toISOString().slice(0,10) se for o seu caso
   const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
-  ref.transaction((atual) => (atual || 0) + 1);
+  return new Promise((resolve) => {
+    ref.transaction(
+      (atual) => (atual || 0) + 1,
+      (_erro, _committed, _snap) => resolve({ ok: !_erro })
+    );
+  });
 }
 
 // 👇 adicione esta linha logo após a função:
