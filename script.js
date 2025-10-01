@@ -2800,6 +2800,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
     const itensFiltrados = itens.filter(i => !promoExpirada(i));
 
+  
+
 
     // título + filtro
     let html = `
@@ -2809,11 +2811,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
      <div class="filtro-comidas-card">
     <label for="filtroEstab">Filtrar por:</label>
     <select id="filtroEstab">
-    <option value="todos">🔥 Todos</option>
-    ${estabelecimentos.map(e => `
-      <option value="${e.id}" ${filtroEstabId === e.id ? 'selected' : ''}>${e.nome}</option>
-    `).join("")}
-    </select>
+  <option value="todos">🔥 Todos</option>
+ ${estabelecimentos.map(e => `
+  <option value="${String(e.id).trim()}" ${String(filtroEstabId||"todos").trim() === String(e.id).trim() ? "selected" : ""}>
+    ${e.nome}
+  </option>
+`).join("")}
+</select>
+
     </div>
 
     </section>
@@ -2917,21 +2922,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     html += `</section>`;
 
     document.querySelector(".content_area").innerHTML = html;
-    // handler do botão de compartilhar
-    document.getElementById("sharePromocoes").addEventListener("click", function () {
-      const url = `${window.location.origin}${window.location.pathname}#promocoes`;
-      if (navigator.share) {
-        navigator.share({
-          title: "⭐ Promoções - Olá Carlópolis",
-          text: "Veja as promoções ativas em Carlópolis!",
-          url
-        }).catch(() => mostrarToast("❌ Não foi possível compartilhar."));
-      } else {
-        navigator.clipboard.writeText(url)
-          .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
-          .catch(() => alert("Não foi possível copiar o link."));
-      }
-    });
+
 
 
     // Converte "2025-09-15" em "15-09-2025"
@@ -2985,15 +2976,24 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
     // listeners do filtro
-    const select = document.getElementById("filtroEstab");
-    if (select) {
+  
+    document.querySelector(".content_area").innerHTML = html;
 
+const select = document.getElementById("filtroEstab");
+if (select) {
+  // remove listeners antigos se houverem (via cloneNode)
+  const clone = select.cloneNode(true);
+  select.parentNode.replaceChild(clone, select);
 
-      select.addEventListener("change", (e) => {
+  clone.value = String(filtroEstabId || "todos").trim();
+  clone.addEventListener("change", (e) => {
+    // Atualiza a URL para permitir voltar/compartilhar já filtrado
+    const id = String(e.target.value || "todos").trim();
+    location.hash = id === "todos" ? "#promocoes" : `#promocoes-${id}`;
+    mostrarPromocoes(id);
+  });
+}
 
-        mostrarPromocoes(e.target.value);
-      });
-    }
 
     }
 
@@ -11810,6 +11810,8 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (loader) loader.style.display = "none";
   }
 
+  
+
 
 
   function handleHashRoute() {
@@ -11833,6 +11835,36 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   window.addEventListener("DOMContentLoaded", handleHashRoute);
 
 
+function getPromoFiltroFromHash() {
+  const h = (location.hash || "").toLowerCase();
+  // aceita "#promocoes" ou "#promocoes-<id>"
+  const m = h.match(/^#promocoes-([a-z0-9\-_.]+)$/i);
+  return m ? m[1] : "todos";
+}
+
+// quando clicar no menu, define o hash base
+
+if (linkPromo) {
+  linkPromo.addEventListener("click", (e) => {
+    e.preventDefault();
+    location.hash = "#promocoes";
+    mostrarPromocoes("todos");
+  });
+}
+
+// ao carregar a página e ao trocar o hash, re-renderiza com o filtro
+window.addEventListener("DOMContentLoaded", () => {
+  const h = (location.hash || "").toLowerCase();
+  if (h.startsWith("#promocoes")) {
+    mostrarPromocoes(getPromoFiltroFromHash());
+  }
+});
+window.addEventListener("hashchange", () => {
+  const h = (location.hash || "").toLowerCase();
+  if (h.startsWith("#promocoes")) {
+    mostrarPromocoes(getPromoFiltroFromHash());
+  }
+});
 
 
 
