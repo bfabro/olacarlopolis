@@ -5207,6 +5207,11 @@ html {
 }
 
 
+#f-jump {
+  background-color: #5a1cf5;
+  color: #fff;
+}
+
 
 /* ===== Ranking Capivarinha (UI) ===== */
 .rank-wrap {

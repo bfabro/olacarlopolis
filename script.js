@@ -1825,10 +1825,11 @@ document.addEventListener("DOMContentLoaded", function () {
       <canvas id="flappyCanvas" width="350" height="512" aria-label="Capivarinha"></canvas>
 
       <div class="flappy-buttons">
-        <button id="f-jump">Pular</button>
+      <button id="f-voltar" class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
+        
         <button id="f-restart">Reiniciar</button>
         <button id="f-ranking" class="btn-rank">🏆 Ranking</button>
-        <button id="f-voltar" class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
+        <button id="f-jump">Pular</button>
         
         
       </div>
