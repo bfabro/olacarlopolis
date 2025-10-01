@@ -768,6 +768,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
+  function abrirPromocoes() {
+  location.hash = "#promocoes"; 
+  if (typeof mostrarPromocoes === "function") {
+    mostrarPromocoes(); // chama a função já existente que monta a página de promoções
+  } else {
+    console.warn("Função mostrarPromocoes não encontrada.");
+  }
+}
+
+
+
   // pagou? defina por s pago n nao pago // PAGx
   const statusEstabelecimentos = {
 
