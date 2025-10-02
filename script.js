@@ -689,7 +689,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "oficinadocelular", "veronicakataoka", "lojaferreira","hime", "seiza", "nelsoncalhas"
+    "oficinadocelular", "veronicakataoka", "lojaferreira", "hime", "seiza", "nelsoncalhas"
 
   ];
 
@@ -769,13 +769,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   function abrirPromocoes() {
-  location.hash = "#promocoes"; 
-  if (typeof mostrarPromocoes === "function") {
-    mostrarPromocoes(); // chama a função já existente que monta a página de promoções
-  } else {
-    console.warn("Função mostrarPromocoes não encontrada.");
+    location.hash = "#promocoes";
+    if (typeof mostrarPromocoes === "function") {
+      mostrarPromocoes(); // chama a função já existente que monta a página de promoções
+    } else {
+      console.warn("Função mostrarPromocoes não encontrada.");
+    }
   }
-}
 
 
 
@@ -904,6 +904,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // grafica
 
     serigraf: "s",
+
+    // hotel
+    nortepioneiro:"s",
+    pousadanortepioneiro:"s",
 
     //loja de pesca
     pescaepresente: "s",
@@ -1131,7 +1135,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "s",
-    
+
     lowcity: "s",
     aniversariomclobosdafronteira: "s",
     regisdanese: "s",
@@ -2810,7 +2814,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
     const itensFiltrados = itens.filter(i => !promoExpirada(i));
 
-  
+
 
 
     // título + filtro
@@ -2823,7 +2827,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     <select id="filtroEstab">
   <option value="todos">🔥 Todos</option>
  ${estabelecimentos.map(e => `
-  <option value="${String(e.id).trim()}" ${String(filtroEstabId||"todos").trim() === String(e.id).trim() ? "selected" : ""}>
+  <option value="${String(e.id).trim()}" ${String(filtroEstabId || "todos").trim() === String(e.id).trim() ? "selected" : ""}>
     ${e.nome}
   </option>
 `).join("")}
@@ -2885,9 +2889,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       <div class="promo-preco-atual">${precoFmt}</div>
       ${i.unidade ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
       ${(i.validadeInicio && i.validadeFim)
-                ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
-                : (i.validadeFim ? `<div class="promo-validade">Até ${formatarDataBR(i.validadeFim)}</div>`
-                  : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
+            ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
+            : (i.validadeFim ? `<div class="promo-validade">Até ${formatarDataBR(i.validadeFim)}</div>`
+              : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
     </div>
 
 
@@ -2896,16 +2900,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     <div class="promo-rodape">
     ${i.contact
-              ? `<a href="https://wa.me/55${somenteDigitos(getPrimeiroContato(i.contact))}?text=${encodeURIComponent(`Olá, encontrei o produto ${i.titulo} no Olá Carlópolis. Está disponível ainda?`)
-              }" 
+            ? `<a href="https://wa.me/55${somenteDigitos(getPrimeiroContato(i.contact))}?text=${encodeURIComponent(`Olá, encontrei o produto ${i.titulo} no Olá Carlópolis. Está disponível ainda?`)
+            }" 
           target="_blank" 
           class="icon-link">
           <i class="fab fa-whatsapp" style="color:#25D366"></i>${i.contact}
         </a>`
-              : ""}
+            : ""}
 
     ${i.estabelecimentoId && categories
-              .flatMap(c => c.establishments || [])
+            .flatMap(c => c.establishments || [])
             .find(e => normalizeName(e.name) === i.estabelecimentoId)?.instagram
             ? `<a href="${fixUrl(categories.flatMap(c => c.establishments || [])
               .find(e => normalizeName(e.name) === i.estabelecimentoId).instagram)}"
@@ -2922,7 +2926,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     `;
 
 
-    });
+      });
     }
 
 
@@ -2986,57 +2990,57 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
     // listeners do filtro
-  
+
     document.querySelector(".content_area").innerHTML = html;
 
-const select = document.getElementById("filtroEstab");
-if (select) {
-  // remove listeners antigos se houverem (via cloneNode)
-  const clone = select.cloneNode(true);
-  select.parentNode.replaceChild(clone, select);
+    const select = document.getElementById("filtroEstab");
+    if (select) {
+      // remove listeners antigos se houverem (via cloneNode)
+      const clone = select.cloneNode(true);
+      select.parentNode.replaceChild(clone, select);
 
-  clone.value = String(filtroEstabId || "todos").trim();
-  clone.addEventListener("change", (e) => {
-    // Atualiza a URL para permitir voltar/compartilhar já filtrado
-    const id = String(e.target.value || "todos").trim();
-    location.hash = id === "todos" ? "#promocoes" : `#promocoes-${id}`;
-    mostrarPromocoes(id);
-  });
-}
-
-
-    }
-
-
-    /////
-
-    // Atalho no menu
-    const linkPromo = document.getElementById("menuPromocoes");
-    if (linkPromo) {
-      linkPromo.addEventListener("click", (e) => {
-        e.preventDefault();
-        mostrarPromocoes("todos"); // sempre abre com todas as promoções
+      clone.value = String(filtroEstabId || "todos").trim();
+      clone.addEventListener("change", (e) => {
+        // Atualiza a URL para permitir voltar/compartilhar já filtrado
+        const id = String(e.target.value || "todos").trim();
+        location.hash = id === "todos" ? "#promocoes" : `#promocoes-${id}`;
+        mostrarPromocoes(id);
       });
     }
 
 
-  
+  }
 
-    function mostrarFotos(nomeNormalizado) {
-      // Procura o estabelecimento pelo nome normalizado
-      let est = null;
-      categories.forEach(cat => {
-        cat.establishments.forEach(e => {
-          if (normalizeName(e.name) === nomeNormalizado && e.novidadesImages && e.novidadesImages.length) {
-            est = e;
-          }
-        });
+
+  /////
+
+  // Atalho no menu
+  const linkPromo = document.getElementById("menuPromocoes");
+  if (linkPromo) {
+    linkPromo.addEventListener("click", (e) => {
+      e.preventDefault();
+      mostrarPromocoes("todos"); // sempre abre com todas as promoções
+    });
+  }
+
+
+
+
+  function mostrarFotos(nomeNormalizado) {
+    // Procura o estabelecimento pelo nome normalizado
+    let est = null;
+    categories.forEach(cat => {
+      cat.establishments.forEach(e => {
+        if (normalizeName(e.name) === nomeNormalizado && e.novidadesImages && e.novidadesImages.length) {
+          est = e;
+        }
       });
+    });
 
-      if (!est) {
-        alert("Nenhuma foto de divulgação encontrada!");
-        return;
-      }
+    if (!est) {
+      alert("Nenhuma foto de divulgação encontrada!");
+      return;
+    }
 
     // Remove qualquer modal anterior
     document.querySelectorAll('.modal-fotos-overlay').forEach(el => el.remove());
@@ -3050,17 +3054,17 @@ if (select) {
         <div class="modal-fotos-imgs" style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;">
     `;
 
-      est.novidadesImages.forEach((img, idx) => {
-        const descricao = est.novidadesDescriptions?.[idx] || '';
-        html += `
+    est.novidadesImages.forEach((img, idx) => {
+      const descricao = est.novidadesDescriptions?.[idx] || '';
+      html += `
         <div style="text-align: center;">
           <img src="${img}" alt="Foto ${idx + 1}" style="max-width: 370px; max-height: 425px;border-radius: 10px; box-shadow:0 2px 12px #0002;" loading="lazy">
           <div style="margin-top:8px; color: #444; font-size: 1rem;">${descricao}</div>
         </div>
       `;
-      });
+    });
 
-      html += `
+    html += `
           </div>
         </div>
       </div>
@@ -3078,22 +3082,22 @@ if (select) {
     document.querySelector('.modal-fotos-overlay').onclick = function (e) {
       if (e.target === this) this.remove();
     };
-    }
-    window.mostrarFotos = mostrarFotos;
+  }
+  window.mostrarFotos = mostrarFotos;
 
 
 
 
-    function mostrarCardapio(nomeNormalizado) {
-      // Procura sempre o PRIMEIRO que tem menuImages
-      let est = null;
-      categories.forEach(cat => {
-        cat.establishments.forEach(e => {
-          if (normalizeName(e.name) === nomeNormalizado && e.menuImages && e.menuImages.length) {
-            est = e;
-          }
-        });
+  function mostrarCardapio(nomeNormalizado) {
+    // Procura sempre o PRIMEIRO que tem menuImages
+    let est = null;
+    categories.forEach(cat => {
+      cat.establishments.forEach(e => {
+        if (normalizeName(e.name) === nomeNormalizado && e.menuImages && e.menuImages.length) {
+          est = e;
+        }
       });
+    });
 
 
     if (!est) return;
@@ -3113,11 +3117,11 @@ if (select) {
         <div class="modal-cardapio-imgs">
     `;
 
-      est.menuImages.forEach(img => {
-        html += `<img src="${img}" class="cardapio-img" loading="lazy">`;
-      });
+    est.menuImages.forEach(img => {
+      html += `<img src="${img}" class="cardapio-img" loading="lazy">`;
+    });
 
-      html += `
+    html += `
           </div>
         </div>
       </div>
@@ -3135,12 +3139,10 @@ if (select) {
     document.querySelector('.modal-cardapio-overlay').onclick = function (e) {
       if (e.target === this) this.remove();
     };
-    }
-    window.mostrarCardapio = mostrarCardapio;
+  }
+  window.mostrarCardapio = mostrarCardapio;
 
-    ///////// fim onde comer
-
-
+  ///////// fim onde comer
 
 
 
@@ -3148,7 +3150,9 @@ if (select) {
 
 
 
-    function resetarMenuLateral() {
+
+
+  function resetarMenuLateral() {
     // Restaura visual
     document.querySelectorAll(".menu_items > li").forEach(item => {
       item.style.display = "block";
@@ -4776,6 +4780,100 @@ if (select) {
           },
         ],
       },
+
+
+      {
+        link: document.querySelector("#menuHotel"),
+        title: "Hotel / Pousadas",
+        establishments: [
+          {
+            image: "images/comercios/hotel/nortepioneiro/perfil.JPG",
+            name: "Norte Pioneiro",
+            hours: "24 horas",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "00:00", fim: "23:59" }],
+              ter: [{ inicio: "00:00", fim: "23:59" }],
+              qua: [{ inicio: "00:00", fim: "23:59" }],
+              qui: [{ inicio: "00:00", fim: "00:00" }],
+              sex: [{ inicio: "00:00", fim: "23:59" }],
+              sab: [{ inicio: "00:00", fim: "23:59" }],
+              dom: [{ inicio: "00:00", fim: "23:59" }],
+            },
+            address: "Rua Benedito Sales, 556 - Carlópolis",
+
+            contact: "(43) 99961-4308",
+            contact2: "(43) 3566-2682",
+            infoAdicional: "Temos 3 opções de quartos disponíveis. Os preços variam de acordo com cada quarto ( Opções com Banheiro Privativo e Ar-Condicionado).<Br><Br> Verifique a disponibilidade através dos nossos telefones.<Br>🛏️ 11 QUARTOS (7 SUÍTES)<Br>☕ CAFÉ DA MANHÃ<Br>📶 WI-FI GRÁTIS<Br>🛎️ RECEPÇÃO 24 HORAS<Br>🧊 FRIGOBAR<Br>❄️ AR-CONDICIONADO<Br>📺 TV<Br>🧴 TOALHAS DE BANHO<Br>🛁 KIT BANHO",
+            instagram: "https://www.instagram.com/nortepioneirohotel/",
+            site: "https://hotelnortepioneiro.com.br/",
+            novidadesImages: [
+
+              "images/comercios/hotel/nortepioneiro/divulgacao/1.jpg",
+              "images/comercios/hotel/nortepioneiro/divulgacao/1.jpg",
+              "images/comercios/hotel/nortepioneiro/divulgacao/1.jpg",
+              "images/comercios/hotel/nortepioneiro/divulgacao/1.jpg",
+              "images/comercios/hotel/nortepioneiro/divulgacao/1.jpg",
+
+            ],
+            novidadesDescriptions: [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+
+            ],
+          },
+
+
+          {
+            image: "images/comercios/hotel/pousadanortepioneiro/perfil.jpg",
+            name: "Pousada Norte Pioneiro",
+            hours: "Seg a Sex: 08:00h as 12:00h - 13:00h as 17:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" },],
+              ter: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" },],
+              qua: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" },],
+              qui: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" },],
+              sex: [{ inicio: "08:00", fim: "12:00" }, { inicio: "13:00", fim: "17:00" },],
+              sab: [],
+              dom: [],
+            },
+            address: "Rua Capitão Estacio, 800 - Carlópolis",
+
+            contact: "(43) 99989-0255",
+           
+            infoAdicional: "Temos 3 opções de quartos disponíveis. Os preços variam de acordo com cada quarto ( Opções com Banheiro Privativo e Ar-Condicionado).<Br> Verifique a disponibilidade através dos nossos telefones.<Br>11 QUARTOS (7 SUÍTES)<Br>CAFÉ DA MANHÃ<Br>WI-FI GRÁTIS<Br>RECEPÇÃO 24 HORAS<Br>FRIGOBAR<Br>AR-CONDICIONADO<Br>TV<Br>TOALHAS DE BANHO<Br>KIT BANHO",
+            instagram: "https://www.instagram.com/nortepioneirohotel/",
+            site: "https://hotelnortepioneiro.com.br/",
+            novidadesImages: [
+
+              "images/comercios/hotel/nortepioneiro/divulgacao/1.jpg",
+              "images/comercios/hotel/nortepioneiro/divulgacao/2.jpg",
+              "images/comercios/hotel/nortepioneiro/divulgacao/3.jpg",
+              "images/comercios/hotel/nortepioneiro/divulgacao/4.jpg",
+              "images/comercios/hotel/nortepioneiro/divulgacao/5.jpg",
+              "images/comercios/hotel/nortepioneiro/divulgacao/6.jpg",
+              
+
+            ],
+            novidadesDescriptions: [
+              "Suíte principal: Cama de casal box, banheiro espaçoso, armário, mesa, Tv, ar condicionado e frigobar.",
+              "Quarto Duplo solteiro: Duas camas de solteiro, armário, mesa, Tv e frigobar",
+              "Amplo espaço",
+              "Cozinha aconchegante e familiar",
+              "Quarto Duplo solteiro: Duas camas de solteiro, armário, mesa, Tv e frigobar",
+              "Quarto Família: Cama de casal + cama de solteiro, armário, mesa, Tv, ar condicionado e frigobar. (Com ou sem banheiro, opcional).",
+             
+
+            ],
+          },
+        ],
+      },
+
 
 
 
@@ -9508,16 +9606,16 @@ if (select) {
             delivery: "Sim / Sem Taxa",
             instagram: "https://www.instagram.com/lojaferreira1/",
             novidadesImages: [
-               "images/comercios/materialConstrucao/ferreira/divulgacao/1.jpg",
-            //  "images/comercios/materialConstrucao/ferreira/divulgacao/11.png",
+              "images/comercios/materialConstrucao/ferreira/divulgacao/1.jpg",
+              //  "images/comercios/materialConstrucao/ferreira/divulgacao/11.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/2.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/3.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/4.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/5.png",
             ],
             novidadesDescriptions: [
-"A Loja Ferreira está completando 6 anos e quem ganha o presente é você! 🎁<br>Estamos sorteando uma Furadeira Worker 550W 🔧⚡<br>📌 Para participar é simples:<br>➡️ Acesse a página @carlopolitanafm<br>➡️ Siga as regras do post oficial<br>🗓 O sorteio será no dia 11 de Outubro!<br>💙 Quanto mais cedo participar, mais chances de ganhar!",
-            //  "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
+              "A Loja Ferreira está completando 6 anos e quem ganha o presente é você! 🎁<br>Estamos sorteando uma Furadeira Worker 550W 🔧⚡<br>📌 Para participar é simples:<br>➡️ Acesse a página @carlopolitanafm<br>➡️ Siga as regras do post oficial<br>🗓 O sorteio será no dia 11 de Outubro!<br>💙 Quanto mais cedo participar, mais chances de ganhar!",
+              //  "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
               "tela Morlan na Loja Ferreira!Se você está procurando qualidade e resistência para cercas e proteções, aqui TEM!",
               "A Loja Ferreira tem tudo que você precisa! Luvas, lonas, rastelos e muito mais para a colheita do café. ",
               "Precisando de um container para sua obra?Na Loja Ferreira, você aluga por apenas R$200,00 por mês!Ideal para guardar ferramentas, materiais e manter tudo organizado e seguro.",
@@ -11821,7 +11919,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (loader) loader.style.display = "none";
   }
 
-  
+
 
 
 
@@ -11830,7 +11928,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
     if (h === "#ondecomer") { return mostrarOndeComer(); }
     if (h === "#promocoes") { return mostrarPromocoes(); }
-   if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
+    if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
 
@@ -11846,36 +11944,36 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   window.addEventListener("DOMContentLoaded", handleHashRoute);
 
 
-function getPromoFiltroFromHash() {
-  const h = (location.hash || "").toLowerCase();
-  // aceita "#promocoes" ou "#promocoes-<id>"
-  const m = h.match(/^#promocoes-([a-z0-9\-_.]+)$/i);
-  return m ? m[1] : "todos";
-}
+  function getPromoFiltroFromHash() {
+    const h = (location.hash || "").toLowerCase();
+    // aceita "#promocoes" ou "#promocoes-<id>"
+    const m = h.match(/^#promocoes-([a-z0-9\-_.]+)$/i);
+    return m ? m[1] : "todos";
+  }
 
-// quando clicar no menu, define o hash base
+  // quando clicar no menu, define o hash base
 
-if (linkPromo) {
-  linkPromo.addEventListener("click", (e) => {
-    e.preventDefault();
-    location.hash = "#promocoes";
-    mostrarPromocoes("todos");
+  if (linkPromo) {
+    linkPromo.addEventListener("click", (e) => {
+      e.preventDefault();
+      location.hash = "#promocoes";
+      mostrarPromocoes("todos");
+    });
+  }
+
+  // ao carregar a página e ao trocar o hash, re-renderiza com o filtro
+  window.addEventListener("DOMContentLoaded", () => {
+    const h = (location.hash || "").toLowerCase();
+    if (h.startsWith("#promocoes")) {
+      mostrarPromocoes(getPromoFiltroFromHash());
+    }
   });
-}
-
-// ao carregar a página e ao trocar o hash, re-renderiza com o filtro
-window.addEventListener("DOMContentLoaded", () => {
-  const h = (location.hash || "").toLowerCase();
-  if (h.startsWith("#promocoes")) {
-    mostrarPromocoes(getPromoFiltroFromHash());
-  }
-});
-window.addEventListener("hashchange", () => {
-  const h = (location.hash || "").toLowerCase();
-  if (h.startsWith("#promocoes")) {
-    mostrarPromocoes(getPromoFiltroFromHash());
-  }
-});
+  window.addEventListener("hashchange", () => {
+    const h = (location.hash || "").toLowerCase();
+    if (h.startsWith("#promocoes")) {
+      mostrarPromocoes(getPromoFiltroFromHash());
+    }
+  });
 
 
 
