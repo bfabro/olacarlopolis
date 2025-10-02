@@ -1424,8 +1424,10 @@ function injetarShareNoTitulo() {
     const html = `
     <div class="page-header" data-share-hash="#grupos">
   <h2>🤝 Grupos de WhatsApp</h2>
-  <i class="fa-solid fa-share-nodes share-btn"  onclick="compartilharPagina('#grupos','Grupos WhatsApp','Encontre e entre nos grupos de Carlópolis')"></i>
-</div>
+  <i class="fa-solid fa-share-nodes share-btn"  onclick="compartilharPagina('#grupos','Grupos de WhatsApp','Encontre e entre nos grupos de Carlópolis')"></i>
+
+
+  </div>
 
     <div class="grupos-wrap">
       <div class="grupos-top">
@@ -12050,6 +12052,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#promocoes") { return mostrarPromocoes(); }
     if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
+     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
 
     // categorias de "Comércios"
