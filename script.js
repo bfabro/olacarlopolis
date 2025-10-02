@@ -1345,17 +1345,12 @@ function injetarShareNoTitulo() {
 
 
 
-
-
-
-
-
   // ====== GRUPOS WHATSAPP ======
   const gruposWhatsapp = [
     // Edite/adicione aqui:
-    { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/JuvQ7V58aOXBP85fvxXtjl?mode=ems_wa_t" },
-     { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t" },
-      { id: "farmais", nome: "Farmacia Desconto Facil", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT" },
+    { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/JuvQ7V58aOXBP85fvxXtjl?mode=ems_wa_t" , imagem: "images/informacoes/gruposWhats/2.jpg"},
+     { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/1.jpg"},
+      { id: "farmais", nome: "Farmacia Desconto Facil", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
       // { id: "comprasVendas", nome: "Compras & Vendas", descricao: "Classificados locais.", link: "https://chat.whatsapp.com/..." },
   ];
 
@@ -1366,12 +1361,15 @@ function injetarShareNoTitulo() {
       .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   }
 
-  function cardGrupoHTML(g) {
-    const id = g.id || slug(g.nome);
-    return `
+ function cardGrupoHTML(g) {
+  const id = g.id || slug(g.nome);
+  const foto = g.imagem || "img/grupos/default.jpg"; // fallback opcional
+  return `
     <div class="grupo-card" data-id="${id}">
       <div class="grupo-head">
-        <div class="grupo-icon"><i class="fa-brands fa-whatsapp"></i></div>
+        <div class="grupo-icon">
+          <img src="${foto}" alt="Imagem do grupo ${g.nome}" class="grupo-img" loading="lazy">
+        </div>
         <div class="grupo-txt">
           <div class="grupo-title">${g.nome}</div>
           ${g.descricao ? `<div class="grupo-desc">${g.descricao}</div>` : ""}
@@ -1386,7 +1384,8 @@ function injetarShareNoTitulo() {
       </div>
     </div>
   `;
-  }
+}
+
 
   function montarListaGrupos(lista) {
     const wrap = document.getElementById("gruposLista");
