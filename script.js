@@ -9881,7 +9881,7 @@ if (select) {
               dom: []
             },
             address: "R. Padre Hugo, 460 - Carlopolis",
-            contact: "(43) 99160-5120",
+            contact: "(43) 99166-5381",
             delivery: "Sim / Com Taxa",
             infoAdicional: "<a target='_blank' style='color:#2da6ff;' href='https://namigocarlopolis.eatfood.app/'>Cardapio On Line</a>",
 
