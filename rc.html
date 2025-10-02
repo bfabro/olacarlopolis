@@ -202,24 +202,48 @@
 
 
 		/* Loader global */
-.loader-overlay{
-  position:fixed; inset:0; display:none; place-items:center;
-  background:rgba(0,0,0,.55); z-index:20000;
-}
-.loader-box{ display:flex; flex-direction:column; align-items:center; gap:10px; }
-.loader{
-  width:54px; height:54px; border:6px solid #2a2a2a; border-top-color:#00bcd4;
-  border-radius:50%; animation:spin .9s linear infinite;
-}
-@keyframes spin{to{ transform:rotate(360deg)}}
-.loader-text{ color:#00bcd4; font-weight:600; font-size:14px; }
+		.loader-overlay {
+			position: fixed;
+			inset: 0;
+			display: none;
+			place-items: center;
+			background: rgba(0, 0, 0, .55);
+			z-index: 20000;
+		}
+
+		.loader-box {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.loader {
+			width: 54px;
+			height: 54px;
+			border: 6px solid #2a2a2a;
+			border-top-color: #00bcd4;
+			border-radius: 50%;
+			animation: spin .9s linear infinite;
+		}
+
+		@keyframes spin {
+			to {
+				transform: rotate(360deg)
+			}
+		}
+
+		.loader-text {
+			color: #00bcd4;
+			font-weight: 600;
+			font-size: 14px;
+		}
 
 
-button.loading {
-  background: linear-gradient(135deg, #e53935, #b71c1c) !important;
-  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.6) !important;
-}
-
+		button.loading {
+			background: linear-gradient(135deg, #e53935, #b71c1c) !important;
+			box-shadow: 0 2px 8px rgba(229, 57, 53, 0.6) !important;
+		}
 	</style>
 </head>
 
@@ -326,10 +350,10 @@ button.loading {
 					</tr>
 				</thead>
 				<tbody id="tabelaBotoes">
-  <tr>
-    <td colspan="4" style="text-align:center; color: #999;">Nenhum dado carregado ainda</td>
-  </tr>
-</tbody>
+					<tr>
+						<td colspan="4" style="text-align:center; color: #999;">Nenhum dado carregado ainda</td>
+					</tr>
+				</tbody>
 			</table>
 		</div>
 
@@ -377,6 +401,23 @@ button.loading {
 				<tbody id="tabelaPromocoes"></tbody>
 			</table>
 		</div>
+
+		<!-- 📲 Cliques – Grupos de WhatsApp -->
+<div class="card" style="margin-top:14px;">
+  <h3 style="margin:0 0 8px;">📲 Cliques – Grupos de WhatsApp</h3>
+  <table style="width:100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th style="text-align:left;">Grupo (id)</th>
+        <th style="text-align:center;">Entrar no grupo</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaGruposWhats">
+      <tr><td colspan="2" style="text-align:center; color:#999;">Carregando...</td></tr>
+    </tbody>
+  </table>
+</div>
+
 
 
 		<div class="card">
@@ -445,7 +486,7 @@ button.loading {
 		<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-		
+
 		<script>
 			const firebaseConfig = {
 				apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -461,35 +502,35 @@ button.loading {
 		</script>
 
 		<script>
-  const overlayEl = document.getElementById('loadingOverlay');
-  let loadCount = 0;
+			const overlayEl = document.getElementById('loadingOverlay');
+			let loadCount = 0;
 
-function startLoading(){
-  loadCount++;
-  if (overlayEl) overlayEl.style.display = 'grid';
-  const btn = document.getElementById('btnBuscar');
-  if (btn){
-    if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
-    btn.innerHTML = 'Buscando…';
-    btn.setAttribute('disabled','disabled');
-    btn.classList.add('loading');   // 🔴 deixa vermelho
-  }
-}
+			function startLoading() {
+				loadCount++;
+				if (overlayEl) overlayEl.style.display = 'grid';
+				const btn = document.getElementById('btnBuscar');
+				if (btn) {
+					if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
+					btn.innerHTML = 'Buscando…';
+					btn.setAttribute('disabled', 'disabled');
+					btn.classList.add('loading');   // 🔴 deixa vermelho
+				}
+			}
 
-function stopLoading(){
-  loadCount = Math.max(0, loadCount - 1);
-  if (loadCount === 0){
-    if (overlayEl) overlayEl.style.display = 'none';
-    const btn = document.getElementById('btnBuscar');
-    if (btn){
-      btn.removeAttribute('disabled');
-      if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
-      btn.classList.remove('loading'); // 🔵 volta para azul
-    }
-  }
-}
+			function stopLoading() {
+				loadCount = Math.max(0, loadCount - 1);
+				if (loadCount === 0) {
+					if (overlayEl) overlayEl.style.display = 'none';
+					const btn = document.getElementById('btnBuscar');
+					if (btn) {
+						btn.removeAttribute('disabled');
+						if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
+						btn.classList.remove('loading'); // 🔵 volta para azul
+					}
+				}
+			}
 
-</script>
+		</script>
 
 
 		<script>
@@ -510,354 +551,354 @@ function stopLoading(){
 			let cidadesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresCidades") || "{}");
 
 
-		document.getElementById("btnBuscar").addEventListener("click", async () => {
-  startLoading();                // 🔴 fica vermelho + overlay
-  try {
+			document.getElementById("btnBuscar").addEventListener("click", async () => {
+				startLoading();                // 🔴 fica vermelho + overlay
+				try {
 
 
 
-				const tipo = tipoRelatorioEl.value;
-				const resultados = {};
-				const unicos = new Set();
+					const tipo = tipoRelatorioEl.value;
+					const resultados = {};
+					const unicos = new Set();
 
-				const snapCliques = await db.ref("cliquesPorMenu").once("value");
-				const snapUsuarios = await db.ref("usuariosUnicos").once("value");
-				const snapAcessos = await db.ref("acessosPorDia").once("value");
+					const snapCliques = await db.ref("cliquesPorMenu").once("value");
+					const snapUsuarios = await db.ref("usuariosUnicos").once("value");
+					const snapAcessos = await db.ref("acessosPorDia").once("value");
 
-				const snapBotoes = await db.ref("cliquesPorBotao").once("value");
+					const snapBotoes = await db.ref("cliquesPorBotao").once("value");
 
-				const snapPWA = await db.ref("instalacoesPWA").once("value");
-				const dadosPWA = snapPWA.val() || {};
+					const snapPWA = await db.ref("instalacoesPWA").once("value");
+					const dadosPWA = snapPWA.val() || {};
 
-				const dadosBotoes = snapBotoes.val() || {};
+					const dadosBotoes = snapBotoes.val() || {};
 
-				const dadosCliques = snapCliques.val() || {};
-				const dadosUsuarios = snapUsuarios.val() || {};
-				const dadosAcessos = snapAcessos.val() || {};
-
-
-
-
-
-				let diasFiltrados = [];
-
-				const getDiaNum = d => parseInt(d.split("-")[2]);
+					const dadosCliques = snapCliques.val() || {};
+					const dadosUsuarios = snapUsuarios.val() || {};
+					const dadosAcessos = snapAcessos.val() || {};
 
 
 
 
 
-				if (tipo === "diario") {
-					const dia = document.getElementById("filtroData").value;
-					diasFiltrados = [dia];
+					let diasFiltrados = [];
 
-				} else if (tipo === "mensal") {
-					const mes = document.getElementById("filtroMes").value;
-					const diasDoMes = new Set([
-						...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
-						...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
-					]);
-					diasFiltrados = Array.from(diasDoMes);
-				} else if (tipo === "semanal") {
-					const mesSelecionado = document.getElementById("filtroMes").value;
-					const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
+					const getDiaNum = d => parseInt(d.split("-")[2]);
 
-					if (!mesSelecionado || isNaN(semanaSelecionada)) {
-						alert("Selecione um mês e uma semana para o relatório semanal.");
+
+
+
+
+					if (tipo === "diario") {
+						const dia = document.getElementById("filtroData").value;
+						diasFiltrados = [dia];
+
+					} else if (tipo === "mensal") {
+						const mes = document.getElementById("filtroMes").value;
+						const diasDoMes = new Set([
+							...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
+							...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
+						]);
+						diasFiltrados = Array.from(diasDoMes);
+					} else if (tipo === "semanal") {
+						const mesSelecionado = document.getElementById("filtroMes").value;
+						const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
+
+						if (!mesSelecionado || isNaN(semanaSelecionada)) {
+							alert("Selecione um mês e uma semana para o relatório semanal.");
+							return;
+						}
+
+						const inicio = (semanaSelecionada - 1) * 7 + 1;
+						const fim = semanaSelecionada * 7;
+
+						const diasDaSemana = new Set([
+							...Object.keys(dadosCliques).filter(dia =>
+								dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+							),
+							...Object.keys(dadosBotoes).filter(dia =>
+								dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+							)
+						]);
+
+						diasFiltrados = Array.from(diasDaSemana);
+
+
+					}
+
+
+					if (diasFiltrados.length === 0 || !diasFiltrados[0]) {
+						alert("Nenhuma data selecionada ou nenhum dado encontrado.");
 						return;
 					}
 
-					const inicio = (semanaSelecionada - 1) * 7 + 1;
-					const fim = semanaSelecionada * 7;
 
-					const diasDaSemana = new Set([
-						...Object.keys(dadosCliques).filter(dia =>
-							dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-						),
-						...Object.keys(dadosBotoes).filter(dia =>
-							dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-						)
-					]);
+					let totalAcessos = 0;
 
-					diasFiltrados = Array.from(diasDaSemana);
+					diasFiltrados.forEach(dia => {
+						const categorias = dadosCliques[dia] || {};
+						Object.entries(categorias).forEach(([nome, info]) => {
+							if (!resultados[nome]) resultados[nome] = 0;
+							resultados[nome] += info.total || 0;
+						});
 
-					
-				}
+						if (dadosUsuarios[dia]) {
+							Object.keys(dadosUsuarios[dia]).forEach(ip => unicos.add(ip));
+						}
 
-
-				if (diasFiltrados.length === 0 || !diasFiltrados[0]) {
-					alert("Nenhuma data selecionada ou nenhum dado encontrado.");
-					return;
-				}
-
-
-				let totalAcessos = 0;
-
-				diasFiltrados.forEach(dia => {
-					const categorias = dadosCliques[dia] || {};
-					Object.entries(categorias).forEach(([nome, info]) => {
-						if (!resultados[nome]) resultados[nome] = 0;
-						resultados[nome] += info.total || 0;
-					});
-
-					if (dadosUsuarios[dia]) {
-						Object.keys(dadosUsuarios[dia]).forEach(ip => unicos.add(ip));
-					}
-
-					const acessosDetalhados = dadosAcessos[dia]?.detalhados;
-					if (acessosDetalhados) {
-						totalAcessos += Object.keys(acessosDetalhados).length;
-					}
-				});
-
-
-				// Tabela de Origem dos Acessos
-				const origens = {};
-				diasFiltrados.forEach(dia => {
-					const acessosDia = dadosAcessos[dia]?.detalhados || {};
-					Object.values(acessosDia).forEach(acesso => {
-						const origem = acesso.origem || "acesso direto";
-						if (!origens[origem]) origens[origem] = 0;
-						origens[origem]++;
-					});
-				});
-
-				const tabelaOrigem = document.getElementById("tabelaOrigem");
-				tabelaOrigem.innerHTML = "";
-
-				Object.entries(origens)
-					.sort((a, b) => b[1] - a[1])
-					.forEach(([origem, total]) => {
-						const row = document.createElement("tr");
-						row.innerHTML = `<td>${origem}</td><td style="text-align:center">${total}</td>`;
-						tabelaOrigem.appendChild(row);
+						const acessosDetalhados = dadosAcessos[dia]?.detalhados;
+						if (acessosDetalhados) {
+							totalAcessos += Object.keys(acessosDetalhados).length;
+						}
 					});
 
 
-				/// inicio contabilizar promoçoes
-
-				const snapPromos = await db.ref("cliquesPromocoesPorComercio").once("value");
-				const dadosPromos = snapPromos.val() || {};
-
-				const tabelaPromocoes = document.getElementById("tabelaPromocoes");
-				const cardPromocoes = document.getElementById("cardPromocoesClicadas");
-
-				tabelaPromocoes.innerHTML = "";
-				let totalPorComercio = {};
-
-				diasFiltrados.forEach(dia => {
-					const dadosDia = dadosPromos[dia] || {};
-					Object.entries(dadosDia).forEach(([comercio, total]) => {
-						totalPorComercio[comercio] = (totalPorComercio[comercio] || 0) + total;
+					// Tabela de Origem dos Acessos
+					const origens = {};
+					diasFiltrados.forEach(dia => {
+						const acessosDia = dadosAcessos[dia]?.detalhados || {};
+						Object.values(acessosDia).forEach(acesso => {
+							const origem = acesso.origem || "acesso direto";
+							if (!origens[origem]) origens[origem] = 0;
+							origens[origem]++;
+						});
 					});
-				});
 
-				Object.entries(totalPorComercio)
-					.sort((a, b) => b[1] - a[1])
-					.forEach(([comercio, total]) => {
-						const row = document.createElement("tr");
-						row.innerHTML = `
+					const tabelaOrigem = document.getElementById("tabelaOrigem");
+					tabelaOrigem.innerHTML = "";
+
+					Object.entries(origens)
+						.sort((a, b) => b[1] - a[1])
+						.forEach(([origem, total]) => {
+							const row = document.createElement("tr");
+							row.innerHTML = `<td>${origem}</td><td style="text-align:center">${total}</td>`;
+							tabelaOrigem.appendChild(row);
+						});
+
+
+					/// inicio contabilizar promoçoes
+
+					const snapPromos = await db.ref("cliquesPromocoesPorComercio").once("value");
+					const dadosPromos = snapPromos.val() || {};
+
+					const tabelaPromocoes = document.getElementById("tabelaPromocoes");
+					const cardPromocoes = document.getElementById("cardPromocoesClicadas");
+
+					tabelaPromocoes.innerHTML = "";
+					let totalPorComercio = {};
+
+					diasFiltrados.forEach(dia => {
+						const dadosDia = dadosPromos[dia] || {};
+						Object.entries(dadosDia).forEach(([comercio, total]) => {
+							totalPorComercio[comercio] = (totalPorComercio[comercio] || 0) + total;
+						});
+					});
+
+					Object.entries(totalPorComercio)
+						.sort((a, b) => b[1] - a[1])
+						.forEach(([comercio, total]) => {
+							const row = document.createElement("tr");
+							row.innerHTML = `
       <td>${comercio}</td>
       <td style="text-align:center;">${total}</td>
     `;
-						tabelaPromocoes.appendChild(row);
-					});
-
-				cardPromocoes.style.display = Object.keys(totalPorComercio).length ? "block" : "none";
-
-
-				/// fim contabilizar promoçoes 
-
-				const snapUsoPWA = await db.ref("usoPWA").once("value");
-				const dadosUsoPWA = snapUsoPWA.val() || {};
-
-				const tabelaUsoPWA = document.getElementById("tabelaUsoPWA");
-				tabelaUsoPWA.innerHTML = "";
-
-				let totalUsoPWA = 0;
-
-
-
-
-
-				diasFiltrados.forEach(dia => {
-					const registros = dadosUsoPWA[dia];
-					const quantidade = registros ? Object.keys(registros).length : 0;
-					totalUsoPWA += quantidade;
-
-					// Contar tipos de conexão
-					const contagemConexoes = {};
-					if (registros) {
-						Object.values(registros).forEach(reg => {
-							const tipo = reg.conexao || "desconhecido";
-							contagemConexoes[tipo] = (contagemConexoes[tipo] || 0) + 1;
+							tabelaPromocoes.appendChild(row);
 						});
-					}
 
-					const listaConexoes = Object.entries(contagemConexoes)
-						.map(([tipo, qtd]) => `${tipo}: ${qtd}`)
-						.join("<br>");
+					cardPromocoes.style.display = Object.keys(totalPorComercio).length ? "block" : "none";
 
-					const row = document.createElement("tr");
-					row.innerHTML = `
+
+					/// fim contabilizar promoçoes 
+
+					const snapUsoPWA = await db.ref("usoPWA").once("value");
+					const dadosUsoPWA = snapUsoPWA.val() || {};
+
+					const tabelaUsoPWA = document.getElementById("tabelaUsoPWA");
+					tabelaUsoPWA.innerHTML = "";
+
+					let totalUsoPWA = 0;
+
+
+
+
+
+					diasFiltrados.forEach(dia => {
+						const registros = dadosUsoPWA[dia];
+						const quantidade = registros ? Object.keys(registros).length : 0;
+						totalUsoPWA += quantidade;
+
+						// Contar tipos de conexão
+						const contagemConexoes = {};
+						if (registros) {
+							Object.values(registros).forEach(reg => {
+								const tipo = reg.conexao || "desconhecido";
+								contagemConexoes[tipo] = (contagemConexoes[tipo] || 0) + 1;
+							});
+						}
+
+						const listaConexoes = Object.entries(contagemConexoes)
+							.map(([tipo, qtd]) => `${tipo}: ${qtd}`)
+							.join("<br>");
+
+						const row = document.createElement("tr");
+						row.innerHTML = `
     <td>${dia}</td>
     <td style="text-align:center;">${quantidade}</td>
     <td style="text-align:center;">${listaConexoes}</td>
   `;
-					tabelaUsoPWA.appendChild(row);
-				});
+						tabelaUsoPWA.appendChild(row);
+					});
 
 
 
 
 
 
-				if (totalUsoPWA === 0) {
-					tabelaUsoPWA.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum uso registrado</td></tr>`;
-				}
+					if (totalUsoPWA === 0) {
+						tabelaUsoPWA.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum uso registrado</td></tr>`;
+					}
 
 
-				document.getElementById("totalAcessos").textContent = totalAcessos;
-				document.getElementById("usuariosUnicos").textContent = unicos.size;
+					document.getElementById("totalAcessos").textContent = totalAcessos;
+					document.getElementById("usuariosUnicos").textContent = unicos.size;
 
-				const tabela = document.getElementById("tabelaResultados");
-				tabela.innerHTML = "";
+					const tabela = document.getElementById("tabelaResultados");
+					tabela.innerHTML = "";
 
 
-				// Criar uma cópia dos valores anteriores para comparar
-				const anteriores = { ...valoresAnteriores };
-				valoresAnteriores = {}; // Reset para regravar os novos ao final
+					// Criar uma cópia dos valores anteriores para comparar
+					const anteriores = { ...valoresAnteriores };
+					valoresAnteriores = {}; // Reset para regravar os novos ao final
 
-				Object.entries(resultados)
-					.sort((a, b) => b[1] - a[1])
-					.forEach(([nome, total]) => {
-						const nomeFormatado = nome.startsWith("menu") ? nome.replace("menu", "") : nome;
+					Object.entries(resultados)
+						.sort((a, b) => b[1] - a[1])
+						.forEach(([nome, total]) => {
+							const nomeFormatado = nome.startsWith("menu") ? nome.replace("menu", "") : nome;
 
-						// Oculta as categorias indesejadas
-						const nomesOcultos = ["horizontal", "comercio", "eventos"];
-						if (nomesOcultos.includes(nomeFormatado.toLowerCase())) return;
+							// Oculta as categorias indesejadas
+							const nomesOcultos = ["horizontal", "comercio", "eventos"];
+							if (nomesOcultos.includes(nomeFormatado.toLowerCase())) return;
+
+							const row = document.createElement("tr");
+							row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
+
+							// Destaque amarelo para novos ou alterados
+							if (anteriores[nome] === undefined || anteriores[nome] !== total) {
+								row.style.color = "yellow";
+								row.style.fontWeight = "bold";
+							}
+
+							valoresAnteriores[nome] = total;
+							tabela.appendChild(row);
+						});
+
+					localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriores));
+
+
+
+
+					// Mostrar data do relatório
+					document.getElementById("dataRelatorio").textContent = `Data do Relatório: ${diasFiltrados.join(", ")}`;
+
+					// Criar tabela de cidades
+					const cidadesContagem = {};
+					diasFiltrados.forEach(dia => {
+						const acessosDia = dadosAcessos[dia]?.detalhados || {};
+						Object.values(acessosDia).forEach(acesso => {
+							const cidade = acesso.cidade || "Desconhecida";
+							if (!cidadesContagem[cidade]) cidadesContagem[cidade] = 0;
+							cidadesContagem[cidade]++;
+						});
+					});
+
+					const tabelaCidades = document.getElementById("tabelaCidades");
+					tabelaCidades.innerHTML = "";
+
+
+
+
+
+
+
+
+
+
+					const tabelaInstalacoes = document.getElementById("tabelaInstalacoesPWA");
+					tabelaInstalacoes.innerHTML = "";
+
+					let totalInstalacoes = 0;
+
+					diasFiltrados.forEach(dia => {
+						const registros = dadosPWA[dia];
+						const quantidade = registros ? Object.keys(registros).length : 0;
+						totalInstalacoes += quantidade;
 
 						const row = document.createElement("tr");
-						row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
-
-						// Destaque amarelo para novos ou alterados
-						if (anteriores[nome] === undefined || anteriores[nome] !== total) {
-							row.style.color = "yellow";
-							row.style.fontWeight = "bold";
-						}
-
-						valoresAnteriores[nome] = total;
-						tabela.appendChild(row);
+						row.innerHTML = `<td>${dia}</td><td style="text-align:center;">${quantidade}</td>`;
+						tabelaInstalacoes.appendChild(row);
 					});
 
-				localStorage.setItem("valoresAnterioresCliques", JSON.stringify(valoresAnteriores));
+					if (totalInstalacoes === 0) {
+						tabelaInstalacoes.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhuma instalação registrada</td></tr>`;
+					}
 
 
 
+					const cidadesAnterioresTemp = { ...cidadesAnteriores };
+					cidadesAnteriores = {}; // Resetar antes de salvar os novos dados
 
-				// Mostrar data do relatório
-				document.getElementById("dataRelatorio").textContent = `Data do Relatório: ${diasFiltrados.join(", ")}`;
+					Object.entries(cidadesContagem)
+						.sort((a, b) => b[1] - a[1])
+						.forEach(([cidade, total]) => {
+							const row = document.createElement("tr");
+							row.innerHTML = `<td>${cidade}</td><td style="text-align:center">${total}</td>`;
 
-				// Criar tabela de cidades
-				const cidadesContagem = {};
-				diasFiltrados.forEach(dia => {
-					const acessosDia = dadosAcessos[dia]?.detalhados || {};
-					Object.values(acessosDia).forEach(acesso => {
-						const cidade = acesso.cidade || "Desconhecida";
-						if (!cidadesContagem[cidade]) cidadesContagem[cidade] = 0;
-						cidadesContagem[cidade]++;
-					});
-				});
+							if (cidadesAnterioresTemp[cidade] === undefined) {
+								// Nova cidade
+								row.style.color = "yellow";
+								row.style.fontWeight = "bold";
+							} else if (cidadesAnterioresTemp[cidade] !== total) {
+								// Cidade existente com valor alterado
+								row.style.color = "yellow";
+								row.style.fontWeight = "bold";
+							}
 
-				const tabelaCidades = document.getElementById("tabelaCidades");
-				tabelaCidades.innerHTML = "";
+							cidadesAnteriores[cidade] = total;
+							tabelaCidades.appendChild(row);
+						});
 
-
-
-
-
-
-
-
-
-
-				const tabelaInstalacoes = document.getElementById("tabelaInstalacoesPWA");
-				tabelaInstalacoes.innerHTML = "";
-
-				let totalInstalacoes = 0;
-
-				diasFiltrados.forEach(dia => {
-					const registros = dadosPWA[dia];
-					const quantidade = registros ? Object.keys(registros).length : 0;
-					totalInstalacoes += quantidade;
-
-					const row = document.createElement("tr");
-					row.innerHTML = `<td>${dia}</td><td style="text-align:center;">${quantidade}</td>`;
-					tabelaInstalacoes.appendChild(row);
-				});
-
-				if (totalInstalacoes === 0) {
-					tabelaInstalacoes.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhuma instalação registrada</td></tr>`;
-				}
+					localStorage.setItem("valoresAnterioresCidades", JSON.stringify(cidadesAnteriores));
 
 
 
-				const cidadesAnterioresTemp = { ...cidadesAnteriores };
-				cidadesAnteriores = {}; // Resetar antes de salvar os novos dados
+					// Resumo por faixa de horário
+					const horarios = {};
 
-				Object.entries(cidadesContagem)
-					.sort((a, b) => b[1] - a[1])
-					.forEach(([cidade, total]) => {
-						const row = document.createElement("tr");
-						row.innerHTML = `<td>${cidade}</td><td style="text-align:center">${total}</td>`;
+					diasFiltrados.forEach(dia => {
+						const acessos = dadosAcessos[dia]?.detalhados || {};
+						Object.values(acessos).forEach(acesso => {
+							const horaCompleta = acesso.horario || "00:00:00";
+							const hora = parseInt(horaCompleta.split(":")[0]);
+							const faixa = `${hora}:00 – ${hora + 1}:00`;
 
-						if (cidadesAnterioresTemp[cidade] === undefined) {
-							// Nova cidade
-							row.style.color = "yellow";
-							row.style.fontWeight = "bold";
-						} else if (cidadesAnterioresTemp[cidade] !== total) {
-							// Cidade existente com valor alterado
-							row.style.color = "yellow";
-							row.style.fontWeight = "bold";
-						}
-
-						cidadesAnteriores[cidade] = total;
-						tabelaCidades.appendChild(row);
+							if (!horarios[faixa]) horarios[faixa] = 0;
+							horarios[faixa]++;
+						});
 					});
 
-				localStorage.setItem("valoresAnterioresCidades", JSON.stringify(cidadesAnteriores));
-
-
-				
-				// Resumo por faixa de horário
-				const horarios = {};
-
-				diasFiltrados.forEach(dia => {
-					const acessos = dadosAcessos[dia]?.detalhados || {};
-					Object.values(acessos).forEach(acesso => {
-						const horaCompleta = acesso.horario || "00:00:00";
-						const hora = parseInt(horaCompleta.split(":")[0]);
-						const faixa = `${hora}:00 – ${hora + 1}:00`;
-
-						if (!horarios[faixa]) horarios[faixa] = 0;
-						horarios[faixa]++;
-					});
-				});
-
-				const tabelaHorarios = document.getElementById("tabelaHorarios");
-				tabelaHorarios.innerHTML = "";
-				Object.entries(horarios)
-					.sort((a, b) => {
-						// Extrai o número da hora inicial
-						const horaA = parseInt(a[0].split(":")[0]);
-						const horaB = parseInt(b[0].split(":")[0]);
-						return horaA - horaB;
-					})
-					.forEach(([faixa, total]) => {
-						const row = document.createElement("tr");
-						row.innerHTML = `<td>${faixa}</td><td style="text-align:center">${total}</td>`;
-						tabelaHorarios.appendChild(row);
-					});
+					const tabelaHorarios = document.getElementById("tabelaHorarios");
+					tabelaHorarios.innerHTML = "";
+					Object.entries(horarios)
+						.sort((a, b) => {
+							// Extrai o número da hora inicial
+							const horaA = parseInt(a[0].split(":")[0]);
+							const horaB = parseInt(b[0].split(":")[0]);
+							return horaA - horaB;
+						})
+						.forEach(([faixa, total]) => {
+							const row = document.createElement("tr");
+							row.innerHTML = `<td>${faixa}</td><td style="text-align:center">${total}</td>`;
+							tabelaHorarios.appendChild(row);
+						});
 
 
 
@@ -866,41 +907,48 @@ function stopLoading(){
 
 
 					const tabelaBotoes = document.getElementById("tabelaBotoes");
-tabelaBotoes.innerHTML = "";
+					tabelaBotoes.innerHTML = "";
 
-// Agrega por estabelecimento: fotos, cardapio, telefone
-const agregBotoes = {}; // { estId: { fotos:0, cardapio:0, telefone:0 } }
+					// Agrega por estabelecimento: fotos, cardapio, telefone
+					const agregBotoes = {}; // { estId: { fotos:0, cardapio:0, telefone:0 } }
 
-for (const dia of diasFiltrados) {
-  const porDia = dadosBotoes[dia] || {};
-  for (const estId of Object.keys(porDia)) {
-    const tipos = porDia[estId] || {};
-    if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0 };
-    agregBotoes[estId].fotos    += Number(tipos.fotos    || 0);
-    agregBotoes[estId].cardapio += Number(tipos.cardapio || 0);
-    agregBotoes[estId].telefone += Number(tipos.telefone || 0);
-  }
+					for (const dia of diasFiltrados) {
+						const porDia = dadosBotoes[dia] || {};
+						for (const estId of Object.keys(porDia)) {
+							const tipos = porDia[estId] || {};
+							// depois:
+const f = Number(tipos.fotos    || 0);
+const c = Number(tipos.cardapio || 0);
+const t = Number(tipos.telefone || 0);
+if (f || c || t) {
+  if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0 };
+  agregBotoes[estId].fotos    += f;
+  agregBotoes[estId].cardapio += c;
+  agregBotoes[estId].telefone += t;
 }
+						}
+					}
 
-// comparar com valores anteriores para destaque
-let botoesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresBotoes") || "{}");
-const botoesAnterioresTemp = { ...botoesAnteriores };
-botoesAnteriores = {};
+					// comparar com valores anteriores para destaque
+					let botoesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresBotoes") || "{}");
+					const botoesAnterioresTemp = { ...botoesAnteriores };
+					botoesAnteriores = {};
 
-const itensOrdenados = Object.entries(agregBotoes)
-  .map(([estId, v]) => ({ estId, ...v }))
-  .sort((a, b) => (b.fotos + b.cardapio + b.telefone) - (a.fotos + a.cardapio + a.telefone));
+					const itensOrdenados = Object.entries(agregBotoes)
+						.map(([estId, v]) => ({ estId, ...v }))
+						  .filter(it => (it.fotos + it.cardapio + it.telefone) > 0) // <-- filtra “fantasmas”
+						.sort((a, b) => (b.fotos + b.cardapio + b.telefone) - (a.fotos + a.cardapio + a.telefone));
 
-if (!itensOrdenados.length) {
-  tabelaBotoes.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
-} else {
-  tabelaBotoes.innerHTML = itensOrdenados.map(it => {
-    const anterior = botoesAnterioresTemp[it.estId] || {};
-    const alterou = (anterior.fotos !== it.fotos) ||
-                    (anterior.cardapio !== it.cardapio) ||
-                    (anterior.telefone !== it.telefone);
+					if (!itensOrdenados.length) {
+						tabelaBotoes.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
+					} else {
+						tabelaBotoes.innerHTML = itensOrdenados.map(it => {
+							const anterior = botoesAnterioresTemp[it.estId] || {};
+							const alterou = (anterior.fotos !== it.fotos) ||
+								(anterior.cardapio !== it.cardapio) ||
+								(anterior.telefone !== it.telefone);
 
-    return `
+							return `
       <tr style="${alterou ? 'color:yellow; font-weight:bold;' : ''}">
         <td>${it.estId}</td>
         <td style="text-align:center">${it.fotos}</td>
@@ -908,25 +956,25 @@ if (!itensOrdenados.length) {
         <td style="text-align:center">${it.telefone}</td>
       </tr>
     `;
-  }).join("");
+						}).join("");
 
-  // salvar os atuais para comparação futura
-  itensOrdenados.forEach(it => {
-    botoesAnteriores[it.estId] = { fotos: it.fotos, cardapio: it.cardapio, telefone: it.telefone };
-  });
-}
+						// salvar os atuais para comparação futura
+						itensOrdenados.forEach(it => {
+							botoesAnteriores[it.estId] = { fotos: it.fotos, cardapio: it.cardapio, telefone: it.telefone };
+						});
+					}
 
-localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores));
+					localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores));
 
 
 
-			    // ⚠️ só libere o botão depois de carregar também a tabela "Onde Comer"
-    await carregarTabelaOndeComer();
-  } finally {
-    stopLoading();               // 🔵 volta ao azul só depois de TUDO
-  }
-});
-   
+					// ⚠️ só libere o botão depois de carregar também a tabela "Onde Comer"
+					await carregarTabelaOndeComer();
+				} finally {
+					stopLoading();               // 🔵 volta ao azul só depois de TUDO
+				}
+			});
+
 
 
 
@@ -1026,7 +1074,7 @@ localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores)
 				const inputData = document.getElementById("filtroData");
 				if (inputData) inputData.value = hoje;
 			});
-			 
+
 		</script>
 
 
@@ -1044,118 +1092,183 @@ localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores)
 
 
 		<script>
-// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
-async function listarDatasPeriodo(tipo) {
-  const hoje = new Date();
-  const pad = n => String(n).padStart(2, '0');
+			// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
+			async function listarDatasPeriodo(tipo) {
+				const hoje = new Date();
+				const pad = n => String(n).padStart(2, '0');
 
-  // lê UI já existente (rc.html tem "Tipo de Relatório" e campos de data) 
-  const tipoRel = tipo || document.getElementById('tipoRelatorio').value; // diario, semanal, mensal
-  let datas = [];
+				// lê UI já existente (rc.html tem "Tipo de Relatório" e campos de data) 
+				const tipoRel = tipo || document.getElementById('tipoRelatorio').value; // diario, semanal, mensal
+				let datas = [];
 
-  if (tipoRel === 'diario') {
-    const d = document.getElementById('filtroData').value || hoje.toISOString().slice(0,10);
-    datas = [d];
-  } else if (tipoRel === 'semanal') {
-    // usa mês atual do filtroMes se existir; e semana do filtroSemana
-    const m = (document.getElementById('filtroMes').value || hoje.toISOString().slice(0,7)); // YYYY-MM
-    const semana = Number(document.getElementById('filtroSemana').value || 1);
-    const [ano, mes] = m.split('-').map(Number);
-    const faixas = {
-      1:[1,7], 2:[8,14], 3:[15,21], 4:[22,28], 5:[29,31]
-    }[semana] || [1,7];
-    for (let dia = faixas[0]; dia <= faixas[1]; dia++) {
-      const data = new Date(ano, mes-1, dia);
-      if (data.getMonth()+1 === mes) {
-        datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
-      }
-    }
-  } else { // mensal
-    const m = (document.getElementById('filtroMes').value || hoje.toISOString().slice(0,7)); // YYYY-MM
-    const [ano, mes] = m.split('-').map(Number);
-    const ultimo = new Date(ano, mes, 0).getDate();
-    for (let dia = 1; dia <= ultimo; dia++) {
-      datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
-    }
-  }
-  return datas;
-}
+				if (tipoRel === 'diario') {
+					const d = document.getElementById('filtroData').value || hoje.toISOString().slice(0, 10);
+					datas = [d];
+				} else if (tipoRel === 'semanal') {
+					// usa mês atual do filtroMes se existir; e semana do filtroSemana
+					const m = (document.getElementById('filtroMes').value || hoje.toISOString().slice(0, 7)); // YYYY-MM
+					const semana = Number(document.getElementById('filtroSemana').value || 1);
+					const [ano, mes] = m.split('-').map(Number);
+					const faixas = {
+						1: [1, 7], 2: [8, 14], 3: [15, 21], 4: [22, 28], 5: [29, 31]
+					}[semana] || [1, 7];
+					for (let dia = faixas[0]; dia <= faixas[1]; dia++) {
+						const data = new Date(ano, mes - 1, dia);
+						if (data.getMonth() + 1 === mes) {
+							datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
+						}
+					}
+				} else { // mensal
+					const m = (document.getElementById('filtroMes').value || hoje.toISOString().slice(0, 7)); // YYYY-MM
+					const [ano, mes] = m.split('-').map(Number);
+					const ultimo = new Date(ano, mes, 0).getDate();
+					for (let dia = 1; dia <= ultimo; dia++) {
+						datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
+					}
+				}
+				return datas;
+			}
 
-// Lê um nó "1 nível" (ex.: cliquesCardapiosOndeComer/2025-08-16) e acumula por estabelecimento
-async function somarNoPorDatas(basePath, datas) {
-  const db = firebase.database();
-  const total = {}; // { estabId: numero }
+			// Lê um nó "1 nível" (ex.: cliquesCardapiosOndeComer/2025-08-16) e acumula por estabelecimento
+			async function somarNoPorDatas(basePath, datas) {
+				const db = firebase.database();
+				const total = {}; // { estabId: numero }
 
-  for (const d of datas) {
-    const snap = await db.ref(`${basePath}/${d}`).once('value');
-    const val = snap.val() || {};
-    Object.keys(val).forEach(id => {
-      total[id] = (total[id] || 0) + (typeof val[id] === 'number' ? val[id] : 0);
-    });
-  }
-  return total;
-}
+				for (const d of datas) {
+					const snap = await db.ref(`${basePath}/${d}`).once('value');
+					const val = snap.val() || {};
+					Object.keys(val).forEach(id => {
+						total[id] = (total[id] || 0) + (typeof val[id] === 'number' ? val[id] : 0);
+					});
+				}
+				return total;
+			}
 
 
-// Popula a tabela 📋 Cardápios (Onde Comer) somando Cardápio + WhatsApp (+ Fotos opcional)
-// Popula a tabela 📋 Cardápios (Onde Comer) somando Cardápio + WhatsApp
-async function carregarTabelaOndeComer() {
-  const tbody = document.getElementById('tabelaOndeComerCardapio');
-  if (!tbody) return;
+			// Popula a tabela 📋 Cardápios (Onde Comer) somando Cardápio + WhatsApp (+ Fotos opcional)
+			// Popula a tabela 📋 Cardápios (Onde Comer) somando Cardápio + WhatsApp
+			async function carregarTabelaOndeComer() {
+				const tbody = document.getElementById('tabelaOndeComerCardapio');
+				if (!tbody) return;
 
-  // feedback visual local da própria tabela
-  tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Carregando...</td></tr>`;
+				// feedback visual local da própria tabela
+				tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Carregando...</td></tr>`;
 
-  // usa os filtros já existentes do rc.html
-  const datas = await listarDatasPeriodo();
+				// usa os filtros já existentes do rc.html
+				const datas = await listarDatasPeriodo();
 
-  // lê e soma cada fonte em paralelo
-  const [totCardapio, totWhats] = await Promise.all([
-    somarNoPorDatas('cliquesCardapiosOndeComer', datas),
-    somarNoPorDatas('cliquesWhatsOndeComer',    datas)
-  ]);
+				// lê e soma cada fonte em paralelo
+				const [totCardapio, totWhats] = await Promise.all([
+					somarNoPorDatas('cliquesCardapiosOndeComer', datas),
+					somarNoPorDatas('cliquesWhatsOndeComer', datas)
+				]);
 
-  // consolida por estabelecimento
-  const estabSet = new Set([...Object.keys(totCardapio), ...Object.keys(totWhats)]);
-  const linhas = [];
-  estabSet.forEach(id => {
-    linhas.push({ id, cardapio: totCardapio[id] || 0, whatsapp: totWhats[id] || 0 });
-  });
+				// consolida por estabelecimento
+				const estabSet = new Set([...Object.keys(totCardapio), ...Object.keys(totWhats)]);
+				const linhas = [];
+				estabSet.forEach(id => {
+					linhas.push({ id, cardapio: totCardapio[id] || 0, whatsapp: totWhats[id] || 0 });
+				});
 
-  // ordena por total desc
-  linhas.sort((a,b)=> (b.cardapio + b.whatsapp) - (a.cardapio + a.whatsapp));
+				// ordena por total desc
+				linhas.sort((a, b) => (b.cardapio + b.whatsapp) - (a.cardapio + a.whatsapp));
 
-  // render
-  if (!linhas.length) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Nenhum clique encontrado</td></tr>`;
-    return;
-  }
+				// render
+				if (!linhas.length) {
+					tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Nenhum clique encontrado</td></tr>`;
+					return;
+				}
 
-  tbody.innerHTML = linhas.map(({id,cardapio,whatsapp}) => `
+				tbody.innerHTML = linhas.map(({ id, cardapio, whatsapp }) => `
     <tr>
       <td>${id}</td>
       <td style="text-align:center">${cardapio}</td>
       <td style="text-align:center">${whatsapp}</td>
     </tr>
   `).join('');
-}
+			}
 
 
-// Chame ao abrir a página e também no botão "Buscar"
-document.addEventListener('DOMContentLoaded', () => {
-  carregarTabelaOndeComer();        // inicial
-  const btn = document.getElementById('btnBuscar');
-  if (btn) btn.addEventListener('click', carregarTabelaOndeComer);
-});
-</script>
+
+// Lê os dias do período já selecionado no filtro (diário/semanal/mensal)
+  // A página já usa listarDatasPeriodo() em outras tabelas.
+  // Vamos reaproveitar exatamente o mesmo helper.
+  async function carregarTabelaGruposWhats() {
+    const tbody = document.getElementById('tabelaGruposWhats');
+    if (!tbody) return;
+
+    // feedback visual
+    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+
+    const db = firebase.database();
+    const datas = await listarDatasPeriodo(); // já existe e é usada na tabela "Onde Comer" :contentReference[oaicite:1]{index=1}
+
+    // totalizador por ID de grupo (id = slug/nó usado quando registra o clique do botão)
+    const totais = {}; // { grupoId: total }
+
+    // Para cada dia, lemos cliquesPorBotao/<data> e somamos apenas o tipo 'grupoWhatsapp'
+    for (const d of datas) {
+      const snap = await db.ref(`cliquesPorBotao/${d}`).once('value');
+      const val = snap.val() || {};
+      // val = { [id]: { grupoWhatsapp: number, ...outros tipos } }
+      Object.entries(val).forEach(([id, tipos]) => {
+        const qtd = Number(tipos?.grupoWhatsapp || 0);
+        if (qtd > 0) {
+          totais[id] = (totais[id] || 0) + qtd;
+        }
+      });
+    }
+
+    // monta linhas ordenadas por total desc
+    const linhas = Object.entries(totais)
+      .map(([id, total]) => ({ id, total }))
+      .sort((a, b) => b.total - a.total);
+
+    if (!linhas.length) {
+      tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = linhas.map(({ id, total }) => `
+      <tr>
+        <td>${id}</td>
+        <td style="text-align:center">${total}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Chamar junto com as outras tabelas:
+  document.addEventListener('DOMContentLoaded', () => {
+    carregarTabelaGruposWhats(); // inicial, como já é feito para Onde Comer :contentReference[oaicite:2]{index=2}
+  });
+
+  // E também no botão "Buscar", junto com as demais atualizações:
+  const _btn = document.getElementById('btnBuscar');
+  if (_btn) _btn.addEventListener('click', carregarTabelaGruposWhats);
 
 
-<div id="loadingOverlay" class="loader-overlay" aria-live="polite" aria-busy="true">
-  <div class="loader-box">
-    <div class="loader" role="status" aria-label="Carregando"></div>
-    <div class="loader-text">Carregando…</div>
-  </div>
-</div>
+
+
+
+
+
+
+
+			// Chame ao abrir a página e também no botão "Buscar"
+			document.addEventListener('DOMContentLoaded', () => {
+				carregarTabelaOndeComer();        // inicial
+				const btn = document.getElementById('btnBuscar');
+				if (btn) btn.addEventListener('click', carregarTabelaOndeComer);
+			});
+		</script>
+
+
+		<div id="loadingOverlay" class="loader-overlay" aria-live="polite" aria-busy="true">
+			<div class="loader-box">
+				<div class="loader" role="status" aria-label="Carregando"></div>
+				<div class="loader-text">Carregando…</div>
+			</div>
+		</div>
 
 
 
