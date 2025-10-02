@@ -5548,7 +5548,7 @@ html {
   text-decoration: none !important;
   transition: transform 0.2s, box-shadow 0.2s;
 
-  margin: 12px auto 0 auto; /* centralizado */
+  margin: 2px auto 0 auto; /* centralizado */
   width: fit-content;
 }
 
