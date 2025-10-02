@@ -1422,10 +1422,9 @@ function injetarShareNoTitulo() {
     if (location.hash !== "#grupos") location.hash = "#grupos";
 
     const html = `
-    <div class="page-header">
+    <div class="page-header" data-share-hash="#grupos">
   <h2>🤝 Grupos de WhatsApp</h2>
-  <i class="fa-solid fa-share-nodes share-btn"
-     onclick="compartilharPagina('#grupos','Grupos WhatsApp','Encontre e entre nos grupos de Carlópolis')"></i>
+  <i class="fa-solid fa-share-nodes share-btn"  onclick="compartilharPagina('#jogos','Jogos','Venha jogar no Olá Carlópolis!')"></i>
 </div>
 
     <div class="grupos-wrap">
