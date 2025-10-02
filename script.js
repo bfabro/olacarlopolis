@@ -1355,7 +1355,7 @@ function injetarShareNoTitulo() {
     // Edite/adicione aqui:
     { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/JuvQ7V58aOXBP85fvxXtjl?mode=ems_wa_t" },
      { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t" },
-      { id: "farmais", nome: "Farmacia Farmais", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT" },
+      { id: "farmais", nome: "Farmacia Desconto Facil", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT" },
       // { id: "comprasVendas", nome: "Compras & Vendas", descricao: "Classificados locais.", link: "https://chat.whatsapp.com/..." },
   ];
 
