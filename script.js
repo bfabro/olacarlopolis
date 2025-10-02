@@ -689,7 +689,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "oficinadocelular", "veronicakataoka", "hime", "seiza", "nelsoncalhas"
+    "oficinadocelular", "veronicakataoka", "lojaferreira","hime", "seiza", "nelsoncalhas"
 
   ];
 
@@ -1131,9 +1131,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "s",
-    copacomerciomunicipal: "s",
-    campeonatovoleideareiamunicipal: "s",
-    torneiodepenalti: "s",
+    
     lowcity: "s",
     aniversariomclobosdafronteira: "s",
     regisdanese: "s",
@@ -3925,7 +3923,7 @@ if (select) {
                 precoAntigo: 110.00,
                 unidade: "A UNIDADE",
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/1.jpg",
-                validadeFim: "2025-09-30",
+                validadeFim: "2025-10-30",
                 obs: "Oferta válida até durar o estoque"
               },
 
@@ -3998,7 +3996,7 @@ if (select) {
                 precoAntigo: "R$ 130,00",
                 preco: "R$ 99,00",
                 unidade: "A UNIDADE",
-                validadeFim: "2025-09-30",
+                validadeFim: "2025-10-30",
                 obs: "Oferta válida até durar o estoque",
 
               },
@@ -4220,7 +4218,7 @@ if (select) {
                 precoAntigo: 20.00,
                 preco: 15.00,
                 unidade: "A UNIDADE",
-                validadeFim: "2025-09-30",
+                validadeFim: "2025-10-30",
                 obs: "Oferta válida até durar o estoque",
 
               },
@@ -9510,15 +9508,16 @@ if (select) {
             delivery: "Sim / Sem Taxa",
             instagram: "https://www.instagram.com/lojaferreira1/",
             novidadesImages: [
-              "images/comercios/materialConstrucao/ferreira/divulgacao/1.png",
+               "images/comercios/materialConstrucao/ferreira/divulgacao/1.jpg",
+            //  "images/comercios/materialConstrucao/ferreira/divulgacao/11.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/2.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/3.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/4.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/5.png",
             ],
             novidadesDescriptions: [
-
-              "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
+"A Loja Ferreira está completando 6 anos e quem ganha o presente é você! 🎁<br>Estamos sorteando uma Furadeira Worker 550W 🔧⚡<br>📌 Para participar é simples:<br>➡️ Acesse a página @carlopolitanafm<br>➡️ Siga as regras do post oficial<br>🗓 O sorteio será no dia 11 de Outubro!<br>💙 Quanto mais cedo participar, mais chances de ganhar!",
+            //  "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
               "tela Morlan na Loja Ferreira!Se você está procurando qualidade e resistência para cercas e proteções, aqui TEM!",
               "A Loja Ferreira tem tudo que você precisa! Luvas, lonas, rastelos e muito mais para a colheita do café. ",
               "Precisando de um container para sua obra?Na Loja Ferreira, você aluga por apenas R$200,00 por mês!Ideal para guardar ferramentas, materiais e manter tudo organizado e seguro.",
@@ -9593,7 +9592,7 @@ if (select) {
                 precoAntigo: 24.00,
                 preco: 19.50,
                 unidade: "A UNIDADE",
-                validadeFim: "2025-09-30",
+                validadeFim: "2025-10-30",
                 obs: "Oferta válida até durar o estoque",
 
               },
