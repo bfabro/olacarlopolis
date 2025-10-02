@@ -349,25 +349,24 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Injeta um botão de compartilhar ao lado do H2 da tela, automaticamente
-  function injetarShareNoTitulo() {
-    const h2 = document.querySelector(".content_area h2.highlighted");
-    if (!h2) return;
+function injetarShareNoTitulo() {
+  const h2 = document.querySelector(".content_area h2.highlighted");
+  if (!h2) return;
+  if (h2.querySelector(".btn-share")) return; // já tem, não duplica
 
-    // evita duplicar
-    if (h2.querySelector(".btn-share")) return;
+  const btn = document.createElement("i");
+  btn.className = "fa-solid fa-share-nodes btn-share";
+  btn.title = "Compartilhar esta página";
 
-    const btn = document.createElement("button");
-    btn.className = "btn-share";
-    btn.title = "Compartilhar esta página";
-    btn.innerHTML = '<i class="fas fa-share-alt"></i>';
-    h2.appendChild(btn);
+  // usa o hash atual como rota; ajuste o título/descrição se quiser
+  btn.onclick = () => {
+    const titulo = h2.textContent.trim() || "Página";
+    const hash = location.hash || "#grupos";
+    compartilharPagina(hash, titulo, "Compartilhe esta página");
+  };
 
-    btn.addEventListener("click", () => {
-      const titulo = document.title || "Olá Carlópolis";
-      const texto = h2.textContent.trim() || "Confira esta página!";
-      compartilharPagina(location.hash, titulo, texto);
-    });
-  }
+  h2.appendChild(btn);
+}
 
   // Observa mudanças na área de conteúdo para reinjetar o botão no título
   function iniciarShareObserver() {
@@ -906,8 +905,8 @@ document.addEventListener("DOMContentLoaded", function () {
     serigraf: "s",
 
     // hotel
-    nortepioneiro:"s",
-    pousadanortepioneiro:"s",
+    nortepioneiro: "s",
+    pousadanortepioneiro: "s",
 
     //loja de pesca
     pescaepresente: "s",
@@ -1130,7 +1129,8 @@ document.addEventListener("DOMContentLoaded", function () {
     funerariabomjesus: "s",
 
     // FIM NOTA DE FALECIMENTO
-
+    // GRUPO WHATS
+    carlopolis24hrs: "s",
 
     // INICIO EVENTOS 
     //calendarioeventos: "s",
@@ -1339,6 +1339,125 @@ document.addEventListener("DOMContentLoaded", function () {
     "Açai": "🥤",
 
   };
+
+
+
+
+
+
+
+
+
+
+
+  // ====== GRUPOS WHATSAPP ======
+  const gruposWhatsapp = [
+    // Edite/adicione aqui:
+    { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/JuvQ7V58aOXBP85fvxXtjl?mode=ems_wa_t" },
+     { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t" },
+     // { id: "comprasVendas", nome: "Compras & Vendas", descricao: "Classificados locais.", link: "https://chat.whatsapp.com/..." },
+      // { id: "comprasVendas", nome: "Compras & Vendas", descricao: "Classificados locais.", link: "https://chat.whatsapp.com/..." },
+  ];
+
+  function slug(s) {
+    return String(s || "")
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  function cardGrupoHTML(g) {
+    const id = g.id || slug(g.nome);
+    return `
+    <div class="grupo-card" data-id="${id}">
+      <div class="grupo-head">
+        <div class="grupo-icon"><i class="fa-brands fa-whatsapp"></i></div>
+        <div class="grupo-txt">
+          <div class="grupo-title">${g.nome}</div>
+          ${g.descricao ? `<div class="grupo-desc">${g.descricao}</div>` : ""}
+        </div>
+      </div>
+      <div class="grupo-actions">
+        <a class="btn-grupo" target="_blank" rel="noopener noreferrer"
+           href="${g.link}"
+           data-id="${id}">
+          Entrar no grupo
+        </a>
+      </div>
+    </div>
+  `;
+  }
+
+  function montarListaGrupos(lista) {
+    const wrap = document.getElementById("gruposLista");
+    if (!wrap) return;
+    if (!lista?.length) {
+      wrap.innerHTML = `<div class="grupos-empty">Nenhum grupo encontrado.</div>`;
+      return;
+    }
+    wrap.innerHTML = lista.map(cardGrupoHTML).join("");
+
+    // Clique -> registra e abre
+    wrap.querySelectorAll(".btn-grupo").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-id");
+        // registra clique (não bloqueia navegação)
+        if (typeof registrarCliqueBotao === "function") {
+          registrarCliqueBotao("grupoWhatsapp", id);
+        }
+      });
+    });
+  }
+
+  function filtrarGrupos(term) {
+    const t = (term || "").trim().toLowerCase();
+    if (!t) return gruposWhatsapp;
+    return gruposWhatsapp.filter(g =>
+      String(g.nome).toLowerCase().includes(t) ||
+      String(g.descricao || "").toLowerCase().includes(t)
+    );
+  }
+
+  function mostrarGruposWhatsApp() {
+    if (location.hash !== "#grupos") location.hash = "#grupos";
+
+    const html = `
+   <div class="page-header">
+  <h2 class="highlighted">🤝 Grupos de WhatsApp</h2>
+</div>
+
+    <div class="grupos-wrap">
+      <div class="grupos-top">
+        <input id="buscaGrupos" class="grupos-search" placeholder="Pesquisar grupos por nome..." autocomplete="off" />
+      </div>
+      <div class="grupos-note"><b>⚠️ Respeite as regras de cada grupo.<Br>⚠️ Links são de responsabilidade dos administradores.</b></div>
+      <div id="gruposLista" class="grupos-list"></div>
+      
+    </div>
+  `;
+
+    const area = document.querySelector(".content_area");
+    area.innerHTML = html;
+
+    const input = document.getElementById("buscaGrupos");
+    montarListaGrupos(gruposWhatsapp);
+
+    input.addEventListener("input", () => {
+      montarListaGrupos(filtrarGrupos(input.value));
+    });
+  }
+
+  // ativar pelo menu
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("#menuGruposWhats");
+    if (a) {
+      e.preventDefault();
+      mostrarGruposWhatsApp();
+    }
+  });
+
+
+
 
 
   ///
@@ -4845,7 +4964,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Rua Capitão Estacio, 800 - Carlópolis",
 
             contact: "(43) 99989-0255",
-           
+
             infoAdicional: "Temos 3 opções de quartos disponíveis. Os preços variam de acordo com cada quarto ( Opções com Banheiro Privativo e Ar-Condicionado).<Br> Verifique a disponibilidade através dos nossos telefones.<Br>11 QUARTOS (7 SUÍTES)<Br>CAFÉ DA MANHÃ<Br>WI-FI GRÁTIS<Br>RECEPÇÃO 24 HORAS<Br>FRIGOBAR<Br>AR-CONDICIONADO<Br>TV<Br>TOALHAS DE BANHO<Br>KIT BANHO",
             instagram: "https://www.instagram.com/nortepioneirohotel/",
             site: "https://hotelnortepioneiro.com.br/",
@@ -4857,7 +4976,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/hotel/nortepioneiro/divulgacao/4.jpg",
               "images/comercios/hotel/nortepioneiro/divulgacao/5.jpg",
               "images/comercios/hotel/nortepioneiro/divulgacao/6.jpg",
-              
+
 
             ],
             novidadesDescriptions: [
@@ -4867,7 +4986,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Cozinha aconchegante e familiar",
               "Quarto Duplo solteiro: Duas camas de solteiro, armário, mesa, Tv e frigobar",
               "Quarto Família: Cama de casal + cama de solteiro, armário, mesa, Tv, ar condicionado e frigobar. (Com ou sem banheiro, opcional).",
-             
+
 
             ],
           },
