@@ -906,7 +906,7 @@ function injetarShareNoTitulo() {
 
     // hotel
     nortepioneiro: "s",
-    pousadanortepioneiro: "s",
+    pousadanortepioneiro: "n",
 
     //loja de pesca
     pescaepresente: "s",
