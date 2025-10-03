@@ -1356,6 +1356,10 @@ function injetarShareNoTitulo() {
    
      { id: "descontofacil", nome: "Farmacia Desconto Facil", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
    
+
+  { id: "movepar", nome: "Movepar Promoções", descricao: "Todos os dias promoções imperdíveis para renovar os moveis e eletros da sua casa!", link: "https://chat.whatsapp.com/L2hNB5RAoRhAAoWx2XrRUw?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/8.jpg"},
+    
+
      { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/1.jpg"},
     //{ id: "clubexadres", nome: "Clube Xadrez Carlopolis", descricao: "Bate papo e dicas sobre Xadrez", link: "https://chat.whatsapp.com/C1dqXx9vtDq9wJHarQSVEj?mode=ems_copy_t", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
     { id: "oficinadeXadrez", nome: "Oficina Xadrez Carlopolis", descricao: "A Oficina de Xadrez tem como objetivo ensinar fundamentos, estimular o raciocínio lógico e desenvolver habilidades estratégicas por meio da prática do jogo", link: "https://chat.whatsapp.com/HAJ1N5n0BlK2IM3J8CUbpz?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/4.jpg" },
