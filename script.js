@@ -3791,6 +3791,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/adega/cuenca/divulgacao/4.png",
               "images/comercios/adega/cuenca/divulgacao/5.png",
               "images/comercios/adega/cuenca/divulgacao/6.png",
+               "images/comercios/adega/cuenca/divulgacao/7.jpg",
             ],
             novidadesDescriptions: [
               "Chop Brahma encontra aqui!",
@@ -3799,6 +3800,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               " ",
               " ",
               "Pediu chegou! Delivery de bebidas!",
+              "NOVIDADE! Caipirinha congelada!",
             ],
 
           },
