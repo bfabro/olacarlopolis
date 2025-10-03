@@ -5417,7 +5417,7 @@ html {
 
 
 .btn-grupo {
-  background: #25d366;
+  background: #12833c;
   color: white;
   padding: 10px 18px;
   border-radius: 6px;
@@ -5502,7 +5502,7 @@ html {
 /* botão (verde whatsapp) */
 .btn-grupo {
   display: inline-block;
-  background: linear-gradient(135deg, #25d366, #128c7e);
+  background: linear-gradient(135deg, #12833c, #128c7e);
   color: #fff;
   font-weight: 700;
   padding: 10px 16px;
@@ -5538,7 +5538,7 @@ html {
   justify-content: center;
   gap: 8px;
 
-  background: #25d366; /* Verde WhatsApp */
+  background: #12833c; /* Verde WhatsApp */
   color: #fff !important; /* Sempre branco */
   font-weight: bold;
   font-size: 15px;
@@ -5568,7 +5568,7 @@ html {
 .btn-grupo:focus,
 .btn-grupo:visited {
   color: #fff !important; /* nunca muda de cor */
-  background: #25d366;    /* mantém verde */
+  background: #12833c;    /* mantém verde */
 }
 
 .grupo-icon {
