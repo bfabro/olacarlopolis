@@ -1348,7 +1348,7 @@ function injetarShareNoTitulo() {
   // ====== GRUPOS WHATSAPP ======
   const gruposWhatsapp = [
     // Edite/adicione aqui:
-     { id: "amigosdopet", nome: "Amigos do Pet", descricao: "Amigos do Pet é um grupo dedicado ao cuidado e bem-estar animal. <Br>Aqui você encontra apoio para resgates, doações, adoções responsáveis e orientações gerais sobre animais. <br>🚫 Não é um grupo de vendas.", link: " https://chat.whatsapp.com/FtIOQRQzHgw0gFYPnxoodS?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/5.jpg" },
+     { id: "amigosdopet", nome: "Amigos do Pet", descricao: "Aqui você encontra apoio para resgates, doações, adoções responsáveis e orientações gerais sobre animais. <br>🚫 Não é um grupo de vendas.", link: " https://chat.whatsapp.com/FtIOQRQzHgw0gFYPnxoodS?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/5.jpg" },
        { id: "adegacuenca", nome: "Adega Cuenca Carlopolis", descricao: "Acesse e acompanhe nossas novidades e promoções", link: "https://chat.whatsapp.com/GeYROS9KhCOESMJ4n4jm9p", imagem: "images/informacoes/gruposWhats/7.jpg" },
       
      
