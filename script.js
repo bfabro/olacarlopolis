@@ -1356,6 +1356,7 @@ function injetarShareNoTitulo() {
      { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/1.jpg"},
     //{ id: "clubexadres", nome: "Clube Xadrez Carlopolis", descricao: "Bate papo e dicas sobre Xadrez", link: "https://chat.whatsapp.com/C1dqXx9vtDq9wJHarQSVEj?mode=ems_copy_t", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
     { id: "oficinadeXadrez", nome: "Oficina Xadrez Carlopolis", descricao: "A Oficina de Xadrez tem como objetivo ensinar fundamentos, estimular o raciocínio lógico e desenvolver habilidades estratégicas por meio da prática do jogo", link: "https://chat.whatsapp.com/HAJ1N5n0BlK2IM3J8CUbpz?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/4.jpg" },
+    { id: "seiza", nome: "Seiza Produtos Orientais", descricao: "Receba Novidades, Promoções e tambem informativos da loja.", link: "https://chat.whatsapp.com/CFr4ebifZzgE6fFu4CXb6F?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/6.jpg" },
    
 
   ];
@@ -9687,6 +9688,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/produtosOrientais/seiza/divulgacao/7.png",
               "images/comercios/produtosOrientais/seiza/divulgacao/8.png",
 
+              "images/comercios/produtosOrientais/seiza/divulgacao/10.jpg",
+              "images/comercios/produtosOrientais/seiza/divulgacao/11.jpg",
+              "images/comercios/produtosOrientais/seiza/divulgacao/12.jpg",
+              "images/comercios/produtosOrientais/seiza/divulgacao/13.jpg",
+              "images/comercios/produtosOrientais/seiza/divulgacao/14.jpg",
+
 
 
             ],
@@ -9703,7 +9710,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Aqui na Seiza você encontra uma seleção especial de balas japonesas e coreanas!",
               "Clássicos orientais que encantam todas as idades! Famosos biscoitos Pocky, Pepero, Koalas, Toppo e muitos mais!",
               "Tradição e sabor em cada mordida! Temos os doces tradicionais da culinária japonesa com recheio de feijão azuki (anko) sempre fresquinhos para vocês!",
+"Shiro Moti: feito de arroz glutinoso (motigome), geralmente assado na chapa até ficar crocante por fora e macio por dentro, servido com açúcar e shoyu!",
 
+
+
+"Yaki manju: doce oriental assado com recheio de anko (doce de feijão azuki)",
+"Ampan: Pão fofinho com recheio de anko (pasta de doce de feijão azuki)",
+"Moti com anko: massa de moti recheado de anko (pasta de doce de feijão azuki)",
+"Kanten: Doce de gelatina de algas",
             ],
 
           },
