@@ -9216,7 +9216,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Auto Center",
         establishments: [
           {
-            image: "images/comercios/autoCenter/body/perfil.jpg",
+            image: "images/comercios/autoCenter/body/perfil2.jpg",
             name: "Body Som e Acessorios",
             hours: "Seg a Sex: 08:00h as 18:00h<br>Sab: 08:00h as 12:00h",
             statusAberto: ".",
@@ -9233,14 +9233,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99921-2122",
             contact2:"(43) 3566-2419",
             instagram: "https://www.instagram.com/bodysomacessorios/",
-            infoAdicional: "🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos<br>🚗 - Serviço de Leva e Tras!<br> Insufilme<br>Baterias<br>Pneus<br>Remap<br>Freios",
+            infoAdicional: "🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos<br>🚗 - Serviço de Leva e Tras!<br> Insufilme<br>🔋 Baterias<br>Pneus<br>⚡ Remap<br>🛑 Freios",
             novidadesImages: [
               "images/comercios/autoCenter/body/divulgacao/1.jpg",
              "images/comercios/autoCenter/body/divulgacao/2.jpg",
              "images/comercios/autoCenter/body/divulgacao/3.jpg",
              "images/comercios/autoCenter/body/divulgacao/4.jpg",
              "images/comercios/autoCenter/body/divulgacao/5.jpg",
-                "images/comercios/autoCenter/body/divulgacao/6.jpg",
+            "images/comercios/autoCenter/body/divulgacao/6.jpg",
              "images/comercios/autoCenter/body/divulgacao/7.jpg",
              "images/comercios/autoCenter/body/divulgacao/8.jpg",
              "images/comercios/autoCenter/body/divulgacao/9.jpg",
