@@ -824,6 +824,10 @@ document.addEventListener("DOMContentLoaded", function () {
     //autoeletrica
     renanautoeletrica: "s",
 
+    //autocenter
+    bodysomeacessorios: "s",
+ 
+
     // artesanato
     judite: "s",
     patymaosdeouro: "s",
@@ -4355,25 +4359,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
               },
 
-
             ]
-
-
-
-
-
-
-
-
-
-
-
-
           },
-
-
-
-
         ],
       },
 
@@ -9179,19 +9166,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         ],
       },
 
-      {
-        link: document.querySelector("#menuAutoCenter"),
-        title: "Auto Center",
-        establishments: [
-          {
-            name: "Auto center bairro",
-            hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
-        ],
-      },
+     
 
 
       {
@@ -9236,11 +9211,55 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-      ///
-      ///
-      ////////
-      ////////
-      ////////
+      {
+        link: document.querySelector("#menuAutoCenter"),
+        title: "Auto Center",
+        establishments: [
+          {
+            image: "images/comercios/autoCenter/body/perfil.jpg",
+            name: "Body Som e Acessorios",
+            hours: "Seg a Sex: 08:00h as 18:00h<br>Sab: 08:00h as 12:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
+              dom: [],
+            },
+            address: "R. Nicolau Miguel, 577 - Carlopolis",
+            contact: "(43) 99921-2122",
+            contact2:"(43) 3566-2419",
+            instagram: "https://www.instagram.com/bodysomacessorios/",
+            infoAdicional: "🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos<br>🚗 - Serviço de Leva e Tras!<br> Insufilme<br>Baterias<br>Pneus<br>Remap<br>Freios",
+            novidadesImages: [
+              "images/comercios/autoCenter/body/divulgacao/1.jpg",
+             "images/comercios/autoCenter/body/divulgacao/2.jpg",
+             "images/comercios/autoCenter/body/divulgacao/3.jpg",
+             "images/comercios/autoCenter/body/divulgacao/4.jpg",
+             "images/comercios/autoCenter/body/divulgacao/5.jpg",
+                "images/comercios/autoCenter/body/divulgacao/6.jpg",
+             "images/comercios/autoCenter/body/divulgacao/7.jpg",
+             "images/comercios/autoCenter/body/divulgacao/8.jpg",
+             "images/comercios/autoCenter/body/divulgacao/9.jpg",
+
+
+            ],
+            novidadesDescriptions: [
+              "Rodas procuradas em toda América Latina, qualidade e com preço só aqui no Body",
+         
+
+
+
+            ],
+
+
+
+          },
+        ],
+      },
 
       ///////
 
@@ -9732,7 +9751,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/marmoraria/2irmaos/perfil.jpg",
             name: "Marmoraria 2 Irmaos",
-            hours: "Seg a Sex: 07:00h as 18:00h </br> Sab: 08:00h as 17:00h",
+            hours: "Seg a Sex: 07:00h as 18:00h </br> Sab: 08:00h as 13:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "07:00", fim: "18:00" }],
