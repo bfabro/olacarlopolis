@@ -349,24 +349,24 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Injeta um botão de compartilhar ao lado do H2 da tela, automaticamente
-function injetarShareNoTitulo() {
-  const h2 = document.querySelector(".content_area h2.highlighted");
-  if (!h2) return;
-  if (h2.querySelector(".btn-share")) return; // já tem, não duplica
+  function injetarShareNoTitulo() {
+    const h2 = document.querySelector(".content_area h2.highlighted");
+    if (!h2) return;
+    if (h2.querySelector(".btn-share")) return; // já tem, não duplica
 
-  const btn = document.createElement("i");
-  btn.className = "fa-solid fa-share-nodes btn-share";
-  btn.title = "Compartilhar esta página";
+    const btn = document.createElement("i");
+    btn.className = "fa-solid fa-share-nodes btn-share";
+    btn.title = "Compartilhar esta página";
 
-  // usa o hash atual como rota; ajuste o título/descrição se quiser
-  btn.onclick = () => {
-    const titulo = h2.textContent.trim() || "Página";
-    const hash = location.hash || "#grupos";
-    compartilharPagina(hash, titulo, "Compartilhe esta página");
-  };
+    // usa o hash atual como rota; ajuste o título/descrição se quiser
+    btn.onclick = () => {
+      const titulo = h2.textContent.trim() || "Página";
+      const hash = location.hash || "#grupos";
+      compartilharPagina(hash, titulo, "Compartilhe esta página");
+    };
 
-  h2.appendChild(btn);
-}
+    h2.appendChild(btn);
+  }
 
   // Observa mudanças na área de conteúdo para reinjetar o botão no título
   function iniciarShareObserver() {
@@ -1340,31 +1340,19 @@ function injetarShareNoTitulo() {
 
   };
 
-
-
-
-
-
   // ====== GRUPOS WHATSAPP ======
   const gruposWhatsapp = [
     // Edite/adicione aqui:
-     { id: "amigosdopet", nome: "Amigos do Pet", descricao: "Aqui você encontra apoio para resgates, doações, adoções responsáveis e orientações gerais sobre animais. <br>🚫 Não é um grupo de vendas.", link: " https://chat.whatsapp.com/FtIOQRQzHgw0gFYPnxoodS?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/5.jpg" },
-       { id: "adegacuenca", nome: "Adega Cuenca Carlopolis", descricao: "Acesse e acompanhe nossas novidades e promoções", link: "https://chat.whatsapp.com/GeYROS9KhCOESMJ4n4jm9p", imagem: "images/informacoes/gruposWhats/7.jpg" },
-      
-     
-     { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/JuvQ7V58aOXBP85fvxXtjl?mode=ems_wa_t" , imagem: "images/informacoes/gruposWhats/2.jpg"},
-   
-     { id: "descontofacil", nome: "Farmacia Desconto Facil", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
-   
-
-  { id: "movepar", nome: "Movepar Promoções", descricao: "Todos os dias promoções imperdíveis para renovar os moveis e eletros da sua casa!", link: "https://chat.whatsapp.com/L2hNB5RAoRhAAoWx2XrRUw?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/8.jpg"},
-    
-
-     { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/1.jpg"},
-    //{ id: "clubexadres", nome: "Clube Xadrez Carlopolis", descricao: "Bate papo e dicas sobre Xadrez", link: "https://chat.whatsapp.com/C1dqXx9vtDq9wJHarQSVEj?mode=ems_copy_t", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
+    { id: "adegacuenca", nome: "Adega Cuenca Carlopolis", descricao: "Acesse e acompanhe nossas novidades e promoções", link: "https://chat.whatsapp.com/GeYROS9KhCOESMJ4n4jm9p", imagem: "images/informacoes/gruposWhats/7.jpg" },
+    { id: "amigosdopet", nome: "Amigos do Pet", descricao: "Aqui você encontra apoio para resgates, doações, adoções responsáveis e orientações gerais sobre animais. <br>🚫 Não é um grupo de vendas.", link: " https://chat.whatsapp.com/FtIOQRQzHgw0gFYPnxoodS?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/5.jpg" },
+    { id: "brechoAmigosPet", nome: "Brecho Amigos do Pet", descricao: "Vendas em prol de animais em risco", link: "https://chat.whatsapp.com/DW7AdwoVHIg8WfLaIqhGHa", imagem: "images/informacoes/gruposWhats/9.jpg" },
+    { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/JuvQ7V58aOXBP85fvxXtjl?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/2.jpg" },
+    { id: "descontofacil", nome: "Farmacia Desconto Facil", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
+    { id: "movepar", nome: "Movepar Promoções", descricao: "Todos os dias promoções imperdíveis para renovar os moveis e eletros da sua casa!", link: "https://chat.whatsapp.com/L2hNB5RAoRhAAoWx2XrRUw?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/8.jpg" },
+    { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/1.jpg" },
     { id: "oficinadeXadrez", nome: "Oficina Xadrez Carlopolis", descricao: "A Oficina de Xadrez tem como objetivo ensinar fundamentos, estimular o raciocínio lógico e desenvolver habilidades estratégicas por meio da prática do jogo", link: "https://chat.whatsapp.com/HAJ1N5n0BlK2IM3J8CUbpz?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/4.jpg" },
     { id: "seiza", nome: "Seiza Produtos Orientais", descricao: "Receba Novidades, Promoções e tambem informativos da loja.", link: "https://chat.whatsapp.com/CFr4ebifZzgE6fFu4CXb6F?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/6.jpg" },
-   
+
 
   ];
 
@@ -1375,10 +1363,10 @@ function injetarShareNoTitulo() {
       .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   }
 
- function cardGrupoHTML(g) {
-  const id = g.id || slug(g.nome);
-  const foto = g.imagem || "img/grupos/default.jpg"; // fallback opcional
-  return `
+  function cardGrupoHTML(g) {
+    const id = g.id || slug(g.nome);
+    const foto = g.imagem || "img/grupos/default.jpg"; // fallback opcional
+    return `
     <div class="grupo-card" data-id="${id}">
       <div class="grupo-head">
         <div class="grupo-icon">
@@ -1398,7 +1386,7 @@ function injetarShareNoTitulo() {
       </div>
     </div>
   `;
-}
+  }
 
 
   function montarListaGrupos(lista) {
@@ -3798,7 +3786,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/adega/cuenca/divulgacao/4.png",
               "images/comercios/adega/cuenca/divulgacao/5.png",
               "images/comercios/adega/cuenca/divulgacao/6.png",
-               "images/comercios/adega/cuenca/divulgacao/7.jpg",
+              "images/comercios/adega/cuenca/divulgacao/7.jpg",
             ],
             novidadesDescriptions: [
               "Chop Brahma encontra aqui!",
@@ -9719,14 +9707,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Aqui na Seiza você encontra uma seleção especial de balas japonesas e coreanas!",
               "Clássicos orientais que encantam todas as idades! Famosos biscoitos Pocky, Pepero, Koalas, Toppo e muitos mais!",
               "Tradição e sabor em cada mordida! Temos os doces tradicionais da culinária japonesa com recheio de feijão azuki (anko) sempre fresquinhos para vocês!",
-"Shiro Moti: feito de arroz glutinoso (motigome), geralmente assado na chapa até ficar crocante por fora e macio por dentro, servido com açúcar e shoyu!",
+              "Shiro Moti: feito de arroz glutinoso (motigome), geralmente assado na chapa até ficar crocante por fora e macio por dentro, servido com açúcar e shoyu!",
 
 
 
-"Yaki manju: doce oriental assado com recheio de anko (doce de feijão azuki)",
-"Ampan: Pão fofinho com recheio de anko (pasta de doce de feijão azuki)",
-"Moti com anko: massa de moti recheado de anko (pasta de doce de feijão azuki)",
-"Kanten: Doce de gelatina de algas",
+              "Yaki manju: doce oriental assado com recheio de anko (doce de feijão azuki)",
+              "Ampan: Pão fofinho com recheio de anko (pasta de doce de feijão azuki)",
+              "Moti com anko: massa de moti recheado de anko (pasta de doce de feijão azuki)",
+              "Kanten: Doce de gelatina de algas",
             ],
 
           },
@@ -12080,7 +12068,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#promocoes") { return mostrarPromocoes(); }
     if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
-     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
+    if (h === "#grupos") { return mostrarGruposWhatsApp(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
 
     // categorias de "Comércios"
