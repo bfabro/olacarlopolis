@@ -826,7 +826,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //autocenter
     bodysomeacessorios: "s",
- 
+
 
     // artesanato
     judite: "s",
@@ -971,7 +971,7 @@ document.addEventListener("DOMContentLoaded", function () {
     lojaferreira: "s",
 
     //marmoraria
-    marmoraria2irmaos:"s",
+    marmoraria2irmaos: "s",
 
     //supermercado
     bompreco: "s",
@@ -9166,7 +9166,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         ],
       },
 
-     
+
 
 
       {
@@ -9216,7 +9216,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Auto Center",
         establishments: [
           {
-            image: "images/comercios/autoCenter/body/perfil2.jpg",
+            image: "images/comercios/autoCenter/body/perfil.jpg",
             name: "Body Som e Acessorios",
             hours: "Seg a Sex: 08:00h as 18:00h<br>Sab: 08:00h as 12:00h",
             statusAberto: ".",
@@ -9231,25 +9231,25 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             },
             address: "R. Nicolau Miguel, 577 - Carlopolis",
             contact: "(43) 99921-2122",
-            contact2:"(43) 3566-2419",
+            contact2: "(43) 3566-2419",
             instagram: "https://www.instagram.com/bodysomacessorios/",
             infoAdicional: "🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos<br>🚗 - Serviço de Leva e Tras!<br> Insufilme<br>🔋 Baterias<br>Pneus<br>⚡ Remap<br>🛑 Freios",
             novidadesImages: [
               "images/comercios/autoCenter/body/divulgacao/1.jpg",
-             "images/comercios/autoCenter/body/divulgacao/2.jpg",
-             "images/comercios/autoCenter/body/divulgacao/3.jpg",
-             "images/comercios/autoCenter/body/divulgacao/4.jpg",
-             "images/comercios/autoCenter/body/divulgacao/5.jpg",
-            "images/comercios/autoCenter/body/divulgacao/6.jpg",
-             "images/comercios/autoCenter/body/divulgacao/7.jpg",
-             "images/comercios/autoCenter/body/divulgacao/8.jpg",
-             "images/comercios/autoCenter/body/divulgacao/9.jpg",
+              "images/comercios/autoCenter/body/divulgacao/2.jpg",
+              "images/comercios/autoCenter/body/divulgacao/3.jpg",
+              "images/comercios/autoCenter/body/divulgacao/4.jpg",
+              "images/comercios/autoCenter/body/divulgacao/5.jpg",
+              "images/comercios/autoCenter/body/divulgacao/6.jpg",
+              "images/comercios/autoCenter/body/divulgacao/7.jpg",
+              "images/comercios/autoCenter/body/divulgacao/8.jpg",
+              "images/comercios/autoCenter/body/divulgacao/9.jpg",
 
 
             ],
             novidadesDescriptions: [
               "Rodas procuradas em toda América Latina, qualidade e com preço só aqui no Body",
-         
+
 
 
 
@@ -9744,7 +9744,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       },
 
 
-{
+      {
         link: document.querySelector("#menuMarmoraria"),
         title: "Marmoraria",
         establishments: [
@@ -9763,25 +9763,25 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: []
             },
             address: "Rua Paul Harris, 116 - Carlópolis",
-            contact: "(43) 99181-1412",        
+            contact: "(43) 99181-1412",
             instagram: "https://www.instagram.com/marmoraria2irmaos.oficial/",
-            infoAdicional:"⛰️ MÁRMORES E GRANITOS<br>🧼 PIAS<br>🚰 LAVATÓRIOS<br>⚰️ TÚMULOS<br>🚪 Soleiras",
+            infoAdicional: "⛰️ MÁRMORES E GRANITOS<br>🧼 PIAS<br>🚰 LAVATÓRIOS<br>⚰️ TÚMULOS<br>🚪 Soleiras",
             novidadesImages: [
               "images/comercios/marmoraria/2irmaos/divulgacao/1.jpg",
               "images/comercios/marmoraria/2irmaos/divulgacao/2.jpg",
               "images/comercios/marmoraria/2irmaos/divulgacao/3.jpg",
               "images/comercios/marmoraria/2irmaos/divulgacao/4.jpg",
 
-            
+
             ],
             novidadesDescriptions: [
               "Pia no preto Negresco",
               "Cozinha no branco Siena.",
               "Banheira no Mármore branco",
               "Escada feita no mármore Crema Marfil",
-            
 
-             
+
+
 
 
             ],
