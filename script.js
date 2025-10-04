@@ -825,7 +825,7 @@ document.addEventListener("DOMContentLoaded", function () {
     renanautoeletrica: "s",
 
     //autocenter
-    bodysomeacessorios: "s",
+    bodyautocenter: "s",
 
 
     // artesanato
@@ -9217,7 +9217,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         establishments: [
           {
             image: "images/comercios/autoCenter/body/perfil.jpg",
-            name: "Body Som e Acessorios",
+            name: "Body Auto Center",
             hours: "Seg a Sex: 08:00h as 18:00h<br>Sab: 08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
