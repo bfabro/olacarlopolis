@@ -5592,3 +5592,253 @@ html {
   object-fit: cover;  /* mantém proporção cortando o excesso */
   border-radius: 12px; /* borda arredondada (opcional) */
 }
+
+
+/* === IMÓVEIS 2.0 (sidebar + grid + mapa) === */
+.imoveis-wrap {
+  display: grid;
+  grid-template-columns: 280px 1fr 420px;
+  gap: 14px;
+  padding: 10px 12px 18px;
+}
+
+@media (max-width: 1200px) {
+  .imoveis-wrap { grid-template-columns: 1fr; }
+  .im-filtros { order: 1; }
+  .im-grid   { order: 2; }
+  .im-mapa   { order: 3; height: 340px; }
+}
+
+.im-filtros {
+  position: sticky; top: 84px;
+  align-self: start;
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  padding: 12px;
+}
+.im-filtros h4 { margin-bottom: 8px; color:#2E8B57; }
+.im-filtros .field { margin-bottom: 10px; }
+.im-filtros label { font-size: 13px; color:#444; display:block; margin-bottom:4px; }
+.im-filtros input, .im-filtros select {
+  width:100%; padding:8px 10px; border:1px solid #ddd; border-radius:8px; background:#fff;
+}
+.im-filtros .amenities { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+.amenity-chip {
+  font-size:12px; padding:6px 10px; border:1px solid #ddd; border-radius:20px; cursor:pointer; user-select:none;
+}
+.amenity-chip.active { background:#2E8B57; color:#fff; border-color:#2E8B57; }
+
+.im-grid {
+  display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+.card-imovel {
+  background:#fff; border-radius:14px; overflow:hidden;
+  box-shadow:0 6px 16px rgba(0,0,0,.08);
+  transition: transform .25s ease;
+}
+.card-imovel:hover { transform: translateY(-3px); }
+.card-top { position: relative; }
+.card-top .tag {
+  position:absolute; left:10px; top:10px;
+  padding:6px 10px; border-radius:10px; font-size:12px; color:#fff; font-weight:600;
+}
+.tag.venda { background:#1f6feb; } .tag.aluguel { background:#8e44ad; }
+.tag.vendido { background:#dc3545; } .tag.alugado { background:#ff9800; }
+
+.card-body { padding: 12px 12px 14px; }
+.card-title { font-weight:700; color:#2E8B57; font-size:16px; margin-bottom:2px; }
+.card-addr  { font-size:13px; color:#666; margin-bottom:8px; display:flex; gap:6px; align-items:center; }
+.specs { display:flex; gap:10px; font-size:13px; margin-bottom:6px; flex-wrap:wrap; }
+.specs span { background:#f5f7fb; padding:6px 8px; border-radius:8px; }
+.extras { font-size:12px; color:#4b5563; margin-bottom:8px; }
+.price-line { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
+.price { font-weight:800; font-size:18px; }
+.badges { display:flex; gap:6px; flex-wrap:wrap; }
+.badge { font-size:11px; padding:4px 8px; border-radius:999px; background:#eef2ff; }
+
+.card-actions { display:flex; gap:8px; margin-top:10px; }
+.btn-whats, .btn-fotos, .btn-favorito {
+  flex:1; border:none; border-radius:10px; padding:10px; cursor:pointer; font-weight:600;
+}
+.btn-whats { background:#25D366; color:#fff; }
+.btn-fotos { background:#f1f5f9; }
+.btn-favorito { background:#fff3cd; }
+
+.im-mapa {
+  position: sticky; top: 84px; align-self: start; height: calc(100vh - 120px);
+  border-radius: 12px; overflow: hidden; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+
+/* Modal de galeria */
+.im-modal {
+  position: fixed; inset:0; display:none;
+  background: rgba(0,0,0,.75);
+  z-index: 2000; align-items:center; justify-content:center;
+}
+.im-modal.open { display:flex; }
+.im-modal .inner { width:min(960px, 92vw); background:#000; border-radius:12px; overflow:hidden; position:relative; }
+.im-modal .close { position:absolute; right:10px; top:10px; background:#fff; border:none; border-radius:10px; padding:6px 10px; cursor:pointer; }
+.im-modal .title { position:absolute; left:12px; top:10px; color:#fff; font-weight:600; }
+.im-modal .swiper-imovel-full { width:100%; height:70vh; }
+.im-modal img { width:100%; height:100%; object-fit:cover; }
+
+/* Leaflet já está no projeto (CSS incluído no index) */
+.leaflet-container { width:100%; height:100%; }
+/* --- IMÓVEIS: ficha textual --- */
+.specs-text {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 6px 14px;
+  margin: 10px 0 6px;
+  font-size: 14px;
+}
+.specs-text .row {
+  background: #f7f9fc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.specs-text .label {
+  color: #374151;
+  font-weight: 600;
+  margin-right: 6px;
+}
+.specs-text .value {
+  color: #111827;
+}
+@media (max-width: 560px) {
+  .specs-text { grid-template-columns: 1fr; }
+}
+
+/* === IMÓVEIS: resumo em linha + grade compacta === */
+
+/* Linha com bullets (palavras completas) */
+.specs-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin: 8px 0 6px;
+  font-size: 14px;
+  color: #1f2937;
+}
+.specs-inline .item {
+  position: relative;
+  padding-left: 12px;
+}
+.specs-inline .item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #9ca3af;
+}
+/* remove o bullet no primeiro item visual da linha */
+.specs-inline .item:first-child::before { content: ""; }
+
+/* Grade 3 colunas com cards mini (label em cima, valor embaixo) */
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 8px 0 0;
+}
+.specs-grid .cell {
+  background: #f7f9fc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 58px;
+}
+.specs-grid .label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+.specs-grid .value {
+  font-size: 14px;
+  color: #111827;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .specs-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .specs-grid { grid-template-columns: 1fr; }
+}
+
+/* === IMÓVEIS: grade textual 3-2-1 por card === */
+.specs-grid2 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 10px 12px;
+  margin: 8px 0 0;
+}
+.specs-grid2 .cell {
+  background: #f7f9fc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.specs-grid2 .txt {
+  font-size: 14px;
+  color: #111827;
+  line-height: 1.25rem;
+}
+.specs-grid2 .txt b {
+  color: #374151;
+  font-weight: 700;
+}
+
+/* Quebras responsivas: 2 colunas (tablets), 1 coluna (mobile) */
+@media (max-width: 920px) {
+  .specs-grid2 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 540px) {
+  .specs-grid2 { grid-template-columns: 1fr; }
+}
+/* === IMÓVEIS: chips 3→2 colunas, compactos === */
+.specs-chips{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(120px,1fr));
+  gap:8px;
+  margin-top:8px;
+}
+@media (max-width: 900px){
+  .specs-chips{ grid-template-columns: repeat(2, minmax(120px,1fr)); }
+}
+@media (max-width: 520px){
+  .specs-chips{ grid-template-columns: repeat(2, minmax(110px,1fr)); }
+}
+
+.spec-chip{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:8px 10px;
+  min-height:64px;               /* quadradinho “respira”, mas fica pequeno */
+  display:flex; flex-direction:column; justify-content:center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+}
+
+.spec-chip .k{
+  font-size:11px; line-height:1; letter-spacing:.3px;
+  text-transform:uppercase;
+  color:#6b7280;
+  margin-bottom:4px;
+}
+.spec-chip .v{
+  font-size:14px; font-weight:700; color:#111827; line-height:1.15;
+}
+
+/* chips menores para comodidades (piscina/churras) */
+.specs-chips .chip-mini{
+  min-height:52px;
+  padding:8px 10px;
+}
+
+
