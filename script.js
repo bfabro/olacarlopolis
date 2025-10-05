@@ -7427,8 +7427,8 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
                {
                 imagem: "images/comercios/farmacia/drogamais/promocao/7.jpg",
                 titulo: "Creme Dental Colgate Luminous White 70g",
-                precoAntigo: "R$ 11,65",
-                preco: "R$ 9,90",
+                precoAntigo: "R$ 8,85",
+                preco: "R$ 7,49",
                 unidade: "A UNIDADE",
                 validadeFim: "2025-10-31",
                 obs: "Oferta válida até durar o estoque",
@@ -7440,6 +7440,18 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
                 titulo: "Absorvente sempre livre adpat c16un",
                 precoAntigo: "R$ 12,35",
                 preco: "R$ 10,49",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-31",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+
+                 {
+                imagem: "images/comercios/farmacia/drogamais/promocao/9.jpg",
+                titulo: "Toalhas Umedecidas Petty Baby c50",
+                precoAntigo: "R$ 5,75",
+                preco: "R$ 4,90",
                 unidade: "A UNIDADE",
                 validadeFim: "2025-10-31",
                 obs: "Oferta válida até durar o estoque",
