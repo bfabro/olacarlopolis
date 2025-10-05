@@ -7356,6 +7356,101 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
               "Você conhece a Linha LIFE, a própria marca da Drogamais?<br> ✨Produtos de ótima qualidade com um preço que você só encontra aqui! Venha conferir e aproveite!",
 
             ],
+
+             promocoes: [
+              {
+                imagem: "images/comercios/farmacia/drogamais/promocao/1.jpg",
+                titulo: "Repelente Infantil Off Kids 200ml",
+                precoAntigo: "R$ 26.50",
+                preco: "R$ 17,90",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-31",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+               {
+                imagem: "images/comercios/farmacia/drogamais/promocao/2.jpg",
+                titulo: "Protetor Solar Facial Principia 60",
+                precoAntigo: "R$ 51.75",
+                preco: "R$ 44,00",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-31",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+                {
+                imagem: "images/comercios/farmacia/drogamais/promocao/3.jpg",
+                titulo: "Oleo + Serum Bifasico Dove Bond 110Mml",
+                precoAntigo: "R$ 36,45",
+                preco: "R$ 30,99",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-31",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+              {
+                imagem: "images/comercios/farmacia/drogamais/promocao/4.jpg",
+                titulo: "Gel Fixador Red Apple Capilar 230g",
+                precoAntigo: "R$ 11,65",
+                preco: "R$ 9,90",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-31",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+                {
+                imagem: "images/comercios/farmacia/drogamais/promocao/5.jpg",
+                titulo: "Sabonete Farnese 85g",
+                precoAntigo: "R$ 2,10",
+                preco: "R$ 1,75",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-31",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+                 {
+                imagem: "images/comercios/farmacia/drogamais/promocao/6.jpg",
+                titulo: "Desodorante axe aerosol 89g urban",
+                precoAntigo: "R$ 11,65",
+                preco: "R$ 9,90",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-31",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+               {
+                imagem: "images/comercios/farmacia/drogamais/promocao/7.jpg",
+                titulo: "Creme Dental Colgate Luminous White 70g",
+                precoAntigo: "R$ 11,65",
+                preco: "R$ 9,90",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-31",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+                 {
+                imagem: "images/comercios/farmacia/drogamais/promocao/8.jpg",
+                titulo: "Absorvente sempre livre adpat c16un",
+                precoAntigo: "R$ 12,35",
+                preco: "R$ 10,49",
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-31",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+
+            ]
+
+
+            
           },
 
           {
