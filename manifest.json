@@ -3,10 +3,10 @@
   "short_name": "Olá Carlópolis",
   "description": "Encontre Locais e Serviços em Carlópolis.",
   "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#ffffff",
+  "display": "fullscreen",
+  "background_color": "#000000",
   "theme_color": "#4070f4",
-  "orientation": "portrait",
+  "orientation": "any",
   "icons": [
       {
       "src": "images/img_padrao_site/icon512_maskable.png",
