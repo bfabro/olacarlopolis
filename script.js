@@ -977,9 +977,9 @@ document.addEventListener("DOMContentLoaded", function () {
     bompreco: "s",
     carreiro: "n",
     comprebemmais: "s",
-     kelve: "n",
+    kelve: "n",
     obarateiro: "s",
-   mercadodoze:"s",
+    mercadodoze: "s",
     rocha: "s",
     zerojapan: "s",
 
@@ -2917,46 +2917,46 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     return itens;
   }
 
-function boolStr(v){ return v ? "Sim" : "Não"; }
-function m2(v){ return v ? `${v} m²` : "-"; }
+  function boolStr(v) { return v ? "Sim" : "Não"; }
+  function m2(v) { return v ? `${v} m²` : "-"; }
 
 
 
 
-// ---------- IMÓVEIS 2.0 ----------
-const IM_DADOS = [
-  // Substitua depois por dados do Firebase
-  {
-    id: "imv1",
-    tipo: "venda", status: "disponível",
-    titulo: "Casa ampla no Centro",
-    endereco: "Rua Paraná, 250 - Centro",
-    lat: -23.3953, lng: -49.7232,
-    quartos: 3, banheiros: 2, vagas: 2, salas: 2, cozinhas: 1,
-    piscina: true, churrasqueira: true, area: 240,
-    valor: 420000, telefone: "43 99999-8888",
-    imagens: ["images/imoveis/casa1a.jpg","images/imoveis/casa1b.jpg","images/imoveis/casa1c.jpg"],
-    descricao: "Casa iluminada, próxima a escolas e comércio. Documentação ok."
-  },
-  {
-    id: "imv2",
-    tipo: "aluguel", status: "alugado",
-    titulo: "Apartamento Jardim Primavera",
-    endereco: "Av. Brasil, 1234 - Jardim Primavera",
-    lat: -23.3979, lng: -49.7285,
-    quartos: 2, banheiros: 1, vagas: 1, salas: 1, cozinhas: 1,
-    piscina: false, churrasqueira: true, area: 68,
-    valor: 1200, telefone: "43 98888-7777",
-    imagens: ["images/imoveis/apt1.jpg","images/imoveis/apt1b.jpg"],
-    descricao: "Apartamento novo, bem ventilado e com ótima vista."
-  }
-];
+  // ---------- IMÓVEIS 2.0 ----------
+  const IM_DADOS = [
+    // Substitua depois por dados do Firebase
+    {
+      id: "imv1",
+      tipo: "venda", status: "disponível",
+      titulo: "Casa ampla no Centro",
+      endereco: "Rua Paraná, 250 - Centro",
+      lat: -23.3953, lng: -49.7232,
+      quartos: 3, banheiros: 2, vagas: 2, salas: 2, cozinhas: 1,
+      piscina: true, churrasqueira: true, area: 240,
+      valor: 420000, telefone: "43 99999-8888",
+      imagens: ["images/imoveis/casa1a.jpg", "images/imoveis/casa1b.jpg", "images/imoveis/casa1c.jpg"],
+      descricao: "Casa iluminada, próxima a escolas e comércio. Documentação ok."
+    },
+    {
+      id: "imv2",
+      tipo: "aluguel", status: "alugado",
+      titulo: "Apartamento Jardim Primavera",
+      endereco: "Av. Brasil, 1234 - Jardim Primavera",
+      lat: -23.3979, lng: -49.7285,
+      quartos: 2, banheiros: 1, vagas: 1, salas: 1, cozinhas: 1,
+      piscina: false, churrasqueira: true, area: 68,
+      valor: 1200, telefone: "43 98888-7777",
+      imagens: ["images/imoveis/apt1.jpg", "images/imoveis/apt1b.jpg"],
+      descricao: "Apartamento novo, bem ventilado e com ótima vista."
+    }
+  ];
 
-// monta página
-function mostrarImoveisV2() {
-  location.hash = "#imoveis";
-  const area = document.querySelector(".content_area");
-  area.innerHTML = `
+  // monta página
+  function mostrarImoveisV2() {
+    location.hash = "#imoveis";
+    const area = document.querySelector(".content_area");
+    area.innerHTML = `
     <div class="page-header">
       <h2 class="highlighted">🏠 Imóveis</h2>
       <i class="fa-solid fa-share-nodes share-btn"
@@ -3022,94 +3022,94 @@ function mostrarImoveisV2() {
     </div>
   `;
 
-  // listeners filtros
-  document.querySelectorAll(".im-filtros select").forEach(s=>s.addEventListener("change", aplicarFiltrosImoveis));
-  document.querySelectorAll(".amenity-chip").forEach(chip=>{
-    chip.addEventListener("click", ()=>{
-      chip.classList.toggle("active");
-      aplicarFiltrosImoveis();
+    // listeners filtros
+    document.querySelectorAll(".im-filtros select").forEach(s => s.addEventListener("change", aplicarFiltrosImoveis));
+    document.querySelectorAll(".amenity-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        chip.classList.toggle("active");
+        aplicarFiltrosImoveis();
+      });
     });
-  });
 
-  // inicia grid + mapa
-  stateImoveis.all = IM_DADOS.slice();
-  stateImoveis.filtered = stateImoveis.all.slice();
-  desenharGridImoveis(stateImoveis.filtered);
-  iniciarMapaImoveis();
-  plotarPinsImoveis(stateImoveis.filtered);
-}
-
-const stateImoveis = { all: [], filtered: [], map: null, markers: [] };
-
-function aplicarFiltrosImoveis() {
-  const tipo = document.getElementById("imTipo").value;
-  const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
-  const p = parseInt(document.getElementById("imPreco").value || 0, 10);
-  const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c=>c.dataset.key);
-
-  stateImoveis.filtered = stateImoveis.all.filter(im => {
-    const tipoOk = !tipo || im.tipo === tipo;
-    const qOk = !q || (im.quartos >= q);
-    const pOk = !p || (im.tipo === "aluguel" ? im.valor <= p : im.valor <= p);
-    let amenOk = true;
-    if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
-    if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
-    if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
-    return tipoOk && qOk && pOk && amenOk;
-  });
-
-  desenharGridImoveis(stateImoveis.filtered);
-  plotarPinsImoveis(stateImoveis.filtered);
-}
-
-function desenharGridImoveis(lista) {
-  const el = document.getElementById("imGrid");
-  if (!lista.length) {
-    el.innerHTML = `<p style="text-align:center">Nenhum imóvel encontrado.</p>`;
-    return;
+    // inicia grid + mapa
+    stateImoveis.all = IM_DADOS.slice();
+    stateImoveis.filtered = stateImoveis.all.slice();
+    desenharGridImoveis(stateImoveis.filtered);
+    iniciarMapaImoveis();
+    plotarPinsImoveis(stateImoveis.filtered);
   }
-  el.innerHTML = lista.map(im => cardImovelHTML(im)).join("");
 
-  // inicia swipers compactos por card
-  setTimeout(()=>{
-    document.querySelectorAll(".swiper-imovel-mini").forEach((box)=>{
-      new Swiper(box, { loop:true, autoplay:{delay:4000} });
+  const stateImoveis = { all: [], filtered: [], map: null, markers: [] };
+
+  function aplicarFiltrosImoveis() {
+    const tipo = document.getElementById("imTipo").value;
+    const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
+    const p = parseInt(document.getElementById("imPreco").value || 0, 10);
+    const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
+
+    stateImoveis.filtered = stateImoveis.all.filter(im => {
+      const tipoOk = !tipo || im.tipo === tipo;
+      const qOk = !q || (im.quartos >= q);
+      const pOk = !p || (im.tipo === "aluguel" ? im.valor <= p : im.valor <= p);
+      let amenOk = true;
+      if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
+      if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
+      if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
+      return tipoOk && qOk && pOk && amenOk;
     });
-  }, 0);
 
-  // conecta botões
-  el.querySelectorAll("[data-action='fotos']").forEach(btn=>{
-    btn.addEventListener("click", (ev)=>{
-      const id = ev.currentTarget.getAttribute("data-id");
-      abrirModalImoveis( stateImoveis.all.find(x=>x.id===id) );
+    desenharGridImoveis(stateImoveis.filtered);
+    plotarPinsImoveis(stateImoveis.filtered);
+  }
+
+  function desenharGridImoveis(lista) {
+    const el = document.getElementById("imGrid");
+    if (!lista.length) {
+      el.innerHTML = `<p style="text-align:center">Nenhum imóvel encontrado.</p>`;
+      return;
+    }
+    el.innerHTML = lista.map(im => cardImovelHTML(im)).join("");
+
+    // inicia swipers compactos por card
+    setTimeout(() => {
+      document.querySelectorAll(".swiper-imovel-mini").forEach((box) => {
+        new Swiper(box, { loop: true, autoplay: { delay: 4000 } });
+      });
+    }, 0);
+
+    // conecta botões
+    el.querySelectorAll("[data-action='fotos']").forEach(btn => {
+      btn.addEventListener("click", (ev) => {
+        const id = ev.currentTarget.getAttribute("data-id");
+        abrirModalImoveis(stateImoveis.all.find(x => x.id === id));
+      });
     });
-  });
 
-  el.querySelectorAll("[data-action='whats']").forEach(btn=>{
-    btn.addEventListener("click", (ev)=>{
-      const id = ev.currentTarget.getAttribute("data-id");
-      const im = stateImoveis.all.find(x=>x.id===id);
-      if (!im) return;
-      const numero = (im.telefone || "").replace(/\D/g,"");
-      const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
-      window.open(`https://wa.me/55${numero}?text=${txt}`, "_blank");
+    el.querySelectorAll("[data-action='whats']").forEach(btn => {
+      btn.addEventListener("click", (ev) => {
+        const id = ev.currentTarget.getAttribute("data-id");
+        const im = stateImoveis.all.find(x => x.id === id);
+        if (!im) return;
+        const numero = (im.telefone || "").replace(/\D/g, "");
+        const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
+        window.open(`https://wa.me/55${numero}?text=${txt}`, "_blank");
+      });
     });
-  });
-}
+  }
 
-function cardImovelHTML(im){
-  const tag = im.tipo; // venda | aluguel
-  const st  = (im.status||"").toLowerCase();
-  const precoFmt = im.tipo === "aluguel"
-    ? `R$ ${Number(im.valor).toLocaleString()} / mês`
-    : `R$ ${Number(im.valor).toLocaleString()}`;
+  function cardImovelHTML(im) {
+    const tag = im.tipo; // venda | aluguel
+    const st = (im.status || "").toLowerCase();
+    const precoFmt = im.tipo === "aluguel"
+      ? `R$ ${Number(im.valor).toLocaleString()} / mês`
+      : `R$ ${Number(im.valor).toLocaleString()}`;
 
-  return `
+    return `
   <article class="card-imovel" data-id="${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
     <div class="card-top">
       <div class="swiper swiper-imovel-mini">
         <div class="swiper-wrapper">
-          ${im.imagens.map(src=>`<div class="swiper-slide"><img src="${src}" alt="${im.titulo}"></div>`).join("")}
+          ${im.imagens.map(src => `<div class="swiper-slide"><img src="${src}" alt="${im.titulo}"></div>`).join("")}
         </div>
       </div>
       <span class="tag ${tag}">${tag.toUpperCase()}</span>
@@ -3137,7 +3137,7 @@ function cardImovelHTML(im){
       <div class="price-line" style="margin-top:12px">
         <div class="price">${precoFmt}</div>
         <div class="badges">
-          ${st && st!=="disponível" ? `<span class="badge">${im.status}</span>` : ""}
+          ${st && st !== "disponível" ? `<span class="badge">${im.status}</span>` : ""}
         </div>
       </div>
 
@@ -3152,72 +3152,72 @@ function cardImovelHTML(im){
       </div>
     </div>
   </article>`;
-}
-
-
-
-
-// ---------- Modal (galeria full) ----------
-function abrirModalImoveis(im) {
-  if (!im) return;
-  const modal = document.getElementById("imModal");
-  const title = document.getElementById("imModalTitle");
-  const slides = document.getElementById("imModalSlides");
-  title.textContent = im.titulo;
-  slides.innerHTML = im.imagens.map(src=>`<div class="swiper-slide"><img src="${src}"/></div>`).join("");
-  modal.classList.add("open");
-  // inicia/renova swiper
-  setTimeout(()=> new Swiper(".swiper-imovel-full", { loop:true }), 0);
-
-  // atalhos teclado
-  document.addEventListener("keydown", escFecharModal);
-}
-function fecharModalImoveis(){ 
-  document.getElementById("imModal").classList.remove("open");
-  document.removeEventListener("keydown", escFecharModal);
-}
-function escFecharModal(e){ if(e.key==="Escape") fecharModalImoveis(); }
-
-// ---------- Mapa (Leaflet) ----------
-function iniciarMapaImoveis() {
-  // Leaflet CSS já está no index; use o bundle padrão
-  stateImoveis.map = L.map('imMap', { scrollWheelZoom: true }).setView([-23.3958, -49.7240], 14);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(stateImoveis.map);
-}
-function plotarPinsImoveis(lista) {
-  // limpa marcadores antigos
-  stateImoveis.markers.forEach(m=> stateImoveis.map.removeLayer(m));
-  stateImoveis.markers = [];
-
-  lista.forEach(im=>{
-    const marker = L.marker([im.lat, im.lng]).addTo(stateImoveis.map);
-    marker.on("click", ()=> {
-      // centraliza e abre galeria mini
-      stateImoveis.map.panTo([im.lat, im.lng]);
-      // destaque visual: dá scroll pro card
-      const card = document.querySelector(`.card-imovel[data-id="${im.id}"]`);
-      if (card) card.scrollIntoView({ behavior:"smooth", block:"center" });
-    });
-    stateImoveis.markers.push(marker);
-  });
-
-  if (lista.length) {
-    const group = new L.featureGroup(stateImoveis.markers);
-    try { stateImoveis.map.fitBounds(group.getBounds().pad(0.2)); } catch(e){}
   }
-}
-function focarNoMapa(id) {
-  const im = stateImoveis.all.find(x=>x.id===id);
-  if (!im || !stateImoveis.map) return;
-  stateImoveis.map.setView([im.lat, im.lng], 16);
-}
 
-// conectar no menu
-const elMenuImoveis = document.getElementById("menuImoveis");
-if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
+
+
+
+  // ---------- Modal (galeria full) ----------
+  function abrirModalImoveis(im) {
+    if (!im) return;
+    const modal = document.getElementById("imModal");
+    const title = document.getElementById("imModalTitle");
+    const slides = document.getElementById("imModalSlides");
+    title.textContent = im.titulo;
+    slides.innerHTML = im.imagens.map(src => `<div class="swiper-slide"><img src="${src}"/></div>`).join("");
+    modal.classList.add("open");
+    // inicia/renova swiper
+    setTimeout(() => new Swiper(".swiper-imovel-full", { loop: true }), 0);
+
+    // atalhos teclado
+    document.addEventListener("keydown", escFecharModal);
+  }
+  function fecharModalImoveis() {
+    document.getElementById("imModal").classList.remove("open");
+    document.removeEventListener("keydown", escFecharModal);
+  }
+  function escFecharModal(e) { if (e.key === "Escape") fecharModalImoveis(); }
+
+  // ---------- Mapa (Leaflet) ----------
+  function iniciarMapaImoveis() {
+    // Leaflet CSS já está no index; use o bundle padrão
+    stateImoveis.map = L.map('imMap', { scrollWheelZoom: true }).setView([-23.3958, -49.7240], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(stateImoveis.map);
+  }
+  function plotarPinsImoveis(lista) {
+    // limpa marcadores antigos
+    stateImoveis.markers.forEach(m => stateImoveis.map.removeLayer(m));
+    stateImoveis.markers = [];
+
+    lista.forEach(im => {
+      const marker = L.marker([im.lat, im.lng]).addTo(stateImoveis.map);
+      marker.on("click", () => {
+        // centraliza e abre galeria mini
+        stateImoveis.map.panTo([im.lat, im.lng]);
+        // destaque visual: dá scroll pro card
+        const card = document.querySelector(`.card-imovel[data-id="${im.id}"]`);
+        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      stateImoveis.markers.push(marker);
+    });
+
+    if (lista.length) {
+      const group = new L.featureGroup(stateImoveis.markers);
+      try { stateImoveis.map.fitBounds(group.getBounds().pad(0.2)); } catch (e) { }
+    }
+  }
+  function focarNoMapa(id) {
+    const im = stateImoveis.all.find(x => x.id === id);
+    if (!im || !stateImoveis.map) return;
+    stateImoveis.map.setView([im.lat, im.lng], 16);
+  }
+
+  // conectar no menu
+  const elMenuImoveis = document.getElementById("menuImoveis");
+  if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
 
 
@@ -6866,14 +6866,14 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
               dom: [{ inicio: "08:00", fim: "13:30" }],
             },
             address: "R. Buinea, 520 - Carlopolis",
-            contact: "(43) 99654-8573",           
-            delivery: "Não",            
+            contact: "(43) 99654-8573",
+            delivery: "Não",
             instagram: "https://www.instagram.com/mercado_do__ze/",
             novidadesImages: [
               "images/comercios/supermercado/mercadoDoZe/divulgacao/1.jpg",
               "images/comercios/supermercado/mercadoDoZe/divulgacao/2.jpg",
               "images/comercios/supermercado/mercadoDoZe/divulgacao/3.jpg",
-              
+
 
 
             ],
@@ -6881,19 +6881,19 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
               "",
               "",
               "",
-             
+
             ],
           },
-////
-/////
-/////
-////
-/////
+          ////
+          /////
+          /////
+          ////
+          /////
 
 
-////
-////
-///
+          ////
+          ////
+          ///
 
 
 
@@ -7357,7 +7357,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
             ],
 
-             promocoes: [
+            promocoes: [
               {
                 imagem: "images/comercios/farmacia/drogamais/promocao/1.jpg",
                 titulo: "Repelente Infantil Off Kids 200ml",
@@ -7369,7 +7369,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
               },
 
-               {
+              {
                 imagem: "images/comercios/farmacia/drogamais/promocao/2.jpg",
                 titulo: "Protetor Solar Facial Principia 60",
                 precoAntigo: "R$ 51.75",
@@ -7380,7 +7380,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
               },
 
-                {
+              {
                 imagem: "images/comercios/farmacia/drogamais/promocao/3.jpg",
                 titulo: "Oleo + Serum Bifasico Dove Bond 110Mml",
                 precoAntigo: "R$ 36,45",
@@ -7402,7 +7402,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
               },
 
-                {
+              {
                 imagem: "images/comercios/farmacia/drogamais/promocao/5.jpg",
                 titulo: "Sabonete Farnese 85g",
                 precoAntigo: "R$ 2,10",
@@ -7413,7 +7413,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
               },
 
-                 {
+              {
                 imagem: "images/comercios/farmacia/drogamais/promocao/6.jpg",
                 titulo: "Desodorante axe aerosol 89g urban",
                 precoAntigo: "R$ 11,65",
@@ -7424,7 +7424,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
               },
 
-               {
+              {
                 imagem: "images/comercios/farmacia/drogamais/promocao/7.jpg",
                 titulo: "Creme Dental Colgate Luminous White 70g",
                 precoAntigo: "R$ 8,85",
@@ -7435,7 +7435,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
               },
 
-                 {
+              {
                 imagem: "images/comercios/farmacia/drogamais/promocao/8.jpg",
                 titulo: "Absorvente sempre livre adpat c16un",
                 precoAntigo: "R$ 12,35",
@@ -7447,7 +7447,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
               },
 
 
-                 {
+              {
                 imagem: "images/comercios/farmacia/drogamais/promocao/9.jpg",
                 titulo: "Toalhas Umedecidas Petty Baby c50",
                 precoAntigo: "R$ 5,75",
@@ -7462,7 +7462,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
             ]
 
 
-            
+
           },
 
           {
@@ -8014,7 +8014,7 @@ if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
             novidadesDescriptions: [
               "Instalação completa de consultorio.",
               "Instalação de TV de de 72pol.",
-              "",""
+              "", ""
             ],
           },
 
