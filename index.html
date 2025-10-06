@@ -55,8 +55,8 @@
   #customSplash {
     position: fixed;
     top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 90vw;
+    height: 90vh;
     background-color: #000; /* mesma cor do manifest */
     display: flex;
     justify-content: center;
@@ -160,7 +160,7 @@
                font-weight: bold;
                color: white;
                text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 12px var(--blue-color);
-               margin :0px 0px 0px 40px">Olá Carlópolis...
+               margin :0px 0px 0px 40px">Olá Carlópolis
             </a>
 
 
@@ -1638,9 +1638,9 @@
   window.addEventListener("load", () => {
     const splash = document.getElementById("customSplash");
     if (splash) {
-      splash.style.transition = "opacity 5.0s";
+      splash.style.transition = "opacity 3.0s";
       splash.style.opacity = 0;
-      setTimeout(() => splash.remove(), 5000);
+      setTimeout(() => splash.remove(), 3000);
     }
   });
 </script>
