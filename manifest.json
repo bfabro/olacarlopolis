@@ -19,8 +19,7 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
-    },
-      { "src": "images/img_padrao_site/icon512_monochrome.png", "sizes": "512x512", "type": "image/png", "purpose": "monochrome" }
-
+    }
+    
   ]
 }
