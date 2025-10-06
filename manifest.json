@@ -3,17 +3,20 @@
   "short_name": "Olá Carlópolis",
   "description": "Encontre Locais e Serviços em Carlópolis.",
   "start_url": "index.html",
-  "display": "fullscreen",
+ "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
-  "orientation": "any",
-    "icons": [
-    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "512x512", "type": "image/png" },
-
-    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-
-    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "monochrome" }
+ "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/img_padrao_site/icon-192_2.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/img_padrao_site/icon-512_2.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
