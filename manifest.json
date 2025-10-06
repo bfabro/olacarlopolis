@@ -7,18 +7,13 @@
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "any",
-  "icons": [
-      {
-      "src": "images/img_padrao_site/icon512_maskable.png",
-      "sizes": "192x192",
-      "type": "image/png",
-       "purpose": "any maskable"
-    },
-    {
-      "src": "images/img_padrao_site/icon512_maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-       "purpose": "any maskable"
-    }
+    "icons": [
+    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "512x512", "type": "image/png" },
+
+    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+
+    { "src": "images/img_padrao_site/icon512_maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "monochrome" }
   ]
 }
