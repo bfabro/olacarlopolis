@@ -64,8 +64,8 @@
     z-index: 9999;
   }
   #customSplash img {
-  width: 100%;
-    height: 100%;
+  width: 99%;
+    height: 99%;
     object-fit: cover; /* cobre toda a tela */
   }
     #customSplash.sai {
@@ -160,7 +160,7 @@
                font-weight: bold;
                color: white;
                text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 12px var(--blue-color);
-               margin :0px 0px 0px 40px">Olá Carlópolis....
+               margin :0px 0px 0px 40px">Olá Carlópolis
             </a>
 
 
@@ -1638,9 +1638,9 @@
   window.addEventListener("load", () => {
     const splash = document.getElementById("customSplash");
     if (splash) {
-      splash.style.transition = "opacity 3.0s";
+      splash.style.transition = "opacity 2.5s";
       splash.style.opacity = 0;
-      setTimeout(() => splash.remove(), 3000);
+      setTimeout(() => splash.remove(), 2500);
     }
   });
 </script>
