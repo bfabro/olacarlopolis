@@ -68,6 +68,10 @@
     height: 100%;
     object-fit: cover; /* cobre toda a tela */
   }
+    #customSplash.sai {
+    opacity: 0;
+    transition: opacity .6s ease;
+  }
 </style>
 
 
@@ -156,7 +160,7 @@
                font-weight: bold;
                color: white;
                text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 12px var(--blue-color);
-               margin :0px 0px 0px 40px">Olá Carlópolis..
+               margin :0px 0px 0px 40px">Olá Carlópolis
             </a>
 
 
@@ -1639,6 +1643,36 @@
       setTimeout(() => splash.remove(), 2000);
     }
   });
+</script>
+
+<script>
+  // tempo mínimo que a splash deve ficar visível (em ms)
+  const MIN_SPLASH_MS = 1500; // ajuste como quiser
+
+  // marca o início
+  const splashStart = Date.now();
+
+  function esconderSplash() {
+    const el = document.getElementById('customSplash');
+    if (!el) return;
+
+    // aplica fade
+    el.classList.add('sai');
+    // remove do DOM após o fade
+    setTimeout(() => el.remove(), 650);
+  }
+
+  // garante que fique no mínimo MIN_SPLASH_MS,
+  // mesmo que a página carregue antes.
+  window.addEventListener('load', () => {
+    const elapsed = Date.now() - splashStart;
+    const restante = Math.max(0, MIN_SPLASH_MS - elapsed);
+    setTimeout(esconderSplash, restante);
+  });
+
+  // (opcional) se quiser um teto máximo, por exemplo 6s,
+  // para não travar caso algo dê errado:
+  setTimeout(esconderSplash, 6000);
 </script>
 
 
