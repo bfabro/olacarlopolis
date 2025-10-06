@@ -160,7 +160,7 @@
                font-weight: bold;
                color: white;
                text-shadow: 0 0 5px var(--blue-color), 0 0 10px var(--blue-color), 0 0 12px var(--blue-color);
-               margin :0px 0px 0px 40px">Olá Carlópolis
+               margin :0px 0px 0px 40px">Olá Carlópolis..
             </a>
 
 
@@ -1647,7 +1647,7 @@
 
 <script>
   // tempo mínimo que a splash deve ficar visível (em ms)
-  const MIN_SPLASH_MS = 1500; // ajuste como quiser
+  const MIN_SPLASH_MS = 5000; // ajuste como quiser
 
   // marca o início
   const splashStart = Date.now();
@@ -1659,7 +1659,7 @@
     // aplica fade
     el.classList.add('sai');
     // remove do DOM após o fade
-    setTimeout(() => el.remove(), 650);
+    setTimeout(() => el.remove(), 1650);
   }
 
   // garante que fique no mínimo MIN_SPLASH_MS,
