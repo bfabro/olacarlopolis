@@ -8,17 +8,15 @@
   "theme_color": "#4070f4",
   "orientation": "portrait",
   "icons": [
+      {
+      "src": "images/img_padrao_site/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
     {
-           
-            "sizes": "512x512",
-            "src": "icon512_maskable.png",
-            "type": "image/png"
-        },
-        {
-           
-            "sizes": "512x512",
-            "src": "icon512_rounded.png",
-            "type": "image/png"
-        }
+      "src": "images/img_padrao_site/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
