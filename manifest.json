@@ -9,8 +9,8 @@
  "orientation": "portrait",
   "icons": [
     {
-      "src": "images/img_padrao_site/icon-192_2.png",
-      "sizes": "192x192",
+      "src": "images/img_padrao_site/icon-512_2.png",
+      "sizes": "512x512",
       "type": "image/png"
     },
     {
