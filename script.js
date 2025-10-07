@@ -1144,7 +1144,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //calendarioeventos: "s",
     feiradalua: "s",
 
-    lowcity: "s",
+    lowcity: "n",
     aniversariomclobosdafronteira: "s",
     regisdanese: "s",
     passeiociclisticorotary: "s",
