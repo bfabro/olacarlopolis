@@ -6865,7 +6865,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               sab: [{ inicio: "08:00", fim: "20:30" }],
               dom: [{ inicio: "08:00", fim: "13:30" }],
             },
-            address: "R. Buinea, 520 - Carlopolis",
+            address: "R. Magnólia, 616 - Carlopolis",
             contact: "(43) 99654-8573",
             delivery: "Não",
             instagram: "https://www.instagram.com/mercado_do__ze/",
