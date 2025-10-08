@@ -10287,7 +10287,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/materialConstrucao/ferreira/divulgacao/5.png",
             ],
             novidadesDescriptions: [
-              "A Loja Ferreira está completando 6 anos e quem ganha o presente é você! 🎁<br>Estamos sorteando uma Furadeira Worker 550W 🔧⚡<br>📌 Para participar é simples:<br>➡️ Acesse a página @carlopolitanafm<br>➡️ Siga as regras do post oficial<br>🗓 O sorteio será no dia 11 de Outubro!<br>💙 Quanto mais cedo participar, mais chances de ganhar!",
+              "Venha participar! e tambem teremos o sorteio de Furadeira Worker 550W 🔧⚡<br>📌 Para participar é simples:<br>➡️ Acesse a página @carlopolitanafm<br>➡️ Siga as regras do post oficial<br>🗓 O sorteio será no dia 11 de Outubro!<br>💙 Quanto mais cedo participar, mais chances de ganhar!",
               //  "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
               "tela Morlan na Loja Ferreira!Se você está procurando qualidade e resistência para cercas e proteções, aqui TEM!",
               "A Loja Ferreira tem tudo que você precisa! Luvas, lonas, rastelos e muito mais para a colheita do café. ",
