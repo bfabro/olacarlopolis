@@ -688,7 +688,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "lojaferreira","oficinadocelular", "gerson","promissorseguros", "sabordaroca"
+    "lojaferreira", "oficinadocelular", "gerson", "promissorseguros", "sabordaroca"
 
   ];
 
@@ -1359,12 +1359,12 @@ document.addEventListener("DOMContentLoaded", function () {
     { id: "movepar", nome: "Movepar Promoções", descricao: "Todos os dias promoções imperdíveis para renovar os moveis e eletros da sua casa!", link: "https://chat.whatsapp.com/L2hNB5RAoRhAAoWx2XrRUw?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/8.jpg" },
     { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/1.jpg" },
     { id: "oficinadeXadrez", nome: "Oficina Xadrez Carlopolis", descricao: "A Oficina de Xadrez tem como objetivo ensinar fundamentos, estimular o raciocínio lógico e desenvolver habilidades estratégicas por meio da prática do jogo", link: "https://chat.whatsapp.com/HAJ1N5n0BlK2IM3J8CUbpz?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/4.jpg" },
-    
-     { id: "lojaThiagoAgueraRifa", nome: "Loja Thiago Aguera - Rifa", descricao: "Grupo exclusivo para as rifas do Thiago Aguera.<br>Venda de materiais de pesca em até 12x no cartão.", link: "https://chat.whatsapp.com/EOXDZReaRDYLY3OOXmUYIt", imagem: "images/informacoes/gruposWhats/11.jpg"},
+
+    { id: "lojaThiagoAgueraRifa", nome: "Loja Thiago Aguera - Rifa", descricao: "Grupo exclusivo para as rifas do Thiago Aguera.<br>Venda de materiais de pesca em até 12x no cartão.", link: "https://chat.whatsapp.com/EOXDZReaRDYLY3OOXmUYIt", imagem: "images/informacoes/gruposWhats/11.jpg" },
     // { id: "lojaThiagoAgueraOfertas", nome: "Loja Thiago Aguera - Ofertas", descricao: "Grupo exclusivo para as rifas do Thiago Aguera.<br>Venda de materiais de pesca em até 12x no cartão.", link: "https://tr.ee/EylHAMYMbS", imagem: "images/informacoes/gruposWhats/11.jpg"},
-    
-  
-    https://chat.whatsapp.com/CR005sVrqUf9ZYf8WYyabx
+
+
+   
     { id: "seiza", nome: "Seiza Produtos Orientais", descricao: "Receba Novidades, Promoções e tambem informativos da loja.", link: "https://chat.whatsapp.com/CFr4ebifZzgE6fFu4CXb6F?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/6.jpg" },
     { id: "vagasEmprego1", nome: "Vagas de Empregos 1", descricao: "Acompanhe as vagas de empregos pelo grupo.", link: "https://chat.whatsapp.com/EKbKwH3hnbHF85tUC2Nb8Q?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/10.jpg" },
 
@@ -1512,17 +1512,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-           <!-- Jogo 1: Tetrix -->
+           <!-- Jogo 1: Tetrix 
         <div class="game-item">
-          <div class="game-icon"><i class="fa-solid fa-puzzle-piece" style="color:#6a5acd"></i></div>
-          <div class="game-body">
-            <div class="game-title">Tetrix</div>
-            <div class="game-desc">Tetris clássico com placar, níveis e controles mobile.</div>
-          </div>
+            <div class="game-icon"><i class="fa-solid fa-puzzle-piece" style="color:#6a5acd"></i></div>
+            <div class="game-body">
+               <div class="game-title">Tetrix</div>
+               <div class="game-desc">Tetris clássico com placar, níveis e controles mobile.</div>
+            </div>
+
+
+
           <div class="game-actions">
             <button class="btn-play" id="playTetrix">Jogar</button>
           </div>
         </div>
+
+-->
+
+
       </div>
     </div>
   `;
