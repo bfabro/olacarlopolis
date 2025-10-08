@@ -1037,7 +1037,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //// INICIO SERVIÇOS ////////////////////////////////////////////////////////////////////////////////////////////////
 
     //anuncio
-    piodoanuncio: "s",
+    piodoanuncio: "n",
 
     //barbeiro
     luisbarbeiro: "s",
@@ -1050,7 +1050,7 @@ document.addEventListener("DOMContentLoaded", function () {
     gustavinho: "s",
 
     //diarista
-    rose: "s",
+    rose: "n",
 
     //frete
     anselmofrete: "s",
