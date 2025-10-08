@@ -3886,7 +3886,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       {
         link: document.querySelector("#menuAcademiaLuta"),
-        title: "Academia",
+        title: "Academia de Luta",
         establishments: [
           {
             image: "images/comercios/academiaLuta/teamVieira/perfil.jpg",
