@@ -6240,7 +6240,7 @@ html {
   font-size: 11px;
   padding: 4px 8px;
   border-radius: 999px;
-  background: #eef2ff;
+  background: #4dcf4c;
 }
 
 .card-actions {
@@ -6503,7 +6503,7 @@ html {
 
 @media (max-width: 520px) {
   .specs-chips {
-    grid-template-columns: repeat(3, minmax(110px, 1fr));
+    grid-template-columns: repeat(3, minmax(104px, 1fr));
   }
 }
 
@@ -6512,7 +6512,7 @@ html {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 8px 10px;
-  min-height: 64px;
+  min-height: 52px;
   /* quadradinho “respira”, mas fica pequeno */
   display: flex;
   flex-direction: column;
@@ -6521,12 +6521,13 @@ html {
 }
 
 .spec-chip .k {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   letter-spacing: .3px;
   text-transform: uppercase;
   color: #6b7280;
   margin-bottom: 4px;
+  text-align: center;
 }
 
 .spec-chip .v {
@@ -6534,6 +6535,7 @@ html {
   font-weight: 700;
   color: #111827;
   line-height: 1.15;
+  text-align: center;
 }
 
 /* chips menores para comodidades (piscina/churras) */

@@ -2957,8 +2957,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       churrasqueira: true, 
       area: 240,
       valor: 420000, 
-      telefone: "43 99999-8888",
-      imagens: ["images/imoveis/cesar/venda/1.jpg", "images/imoveis/cesar/venda/1.jpg", "images/imoveis/cesar/venda/1.jpg"],
+      telefone: "11 99898-5930",
+      imagens: ["images/imoveis/cesar/venda/1.jpg", "images/imoveis/cesar/venda/2.jpg", "images/imoveis/cesar/venda/3.jpg"],
       descricao: "Casa iluminada, próxima a escolas e comércio. Documentação ok.",
       suite:"Sim", 
       quintal: "Sim",          
@@ -2981,8 +2981,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       churrasqueira: true, 
       area: 68,
       valor: 1200, 
-      telefone: "43 98888-7777",
-      imagens: ["images/imoveis/cesar/aluguel/1.jpg", "images/imoveis/apt1b.jpg"],
+      telefone: "11 99898-5930",
+      imagens: ["images/imoveis/cesar/aluguel/1.jpg", "images/imoveis/cesar/aluguel/2.jpg", "images/imoveis/cesar/aluguel/3.jpg"],
       descricao: "Apartamento novo, bem ventilado e com ótima vista.",
       suite:"Sim", 
       quintal: "Sim",  
@@ -3255,7 +3255,7 @@ document.getElementById("imTipo").addEventListener("change", (e) => {
           <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
         </button>
         <button class="btn-fotos" data-action="fotos" data-id="${im.id}">📷 Ver fotos</button>
-        <button class="btn-favorito" title="Salvar">⭐ Salvar</button>
+      
       </div>
     </div>
   </article>`;
