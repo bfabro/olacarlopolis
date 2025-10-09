@@ -3279,6 +3279,7 @@ document.getElementById("imTipo").addEventListener("change", (e) => {
     // atalhos teclado
     document.addEventListener("keydown", escFecharModal);
   }
+  
   function fecharModalImoveis() {
     document.getElementById("imModal").classList.remove("open");
     document.removeEventListener("keydown", escFecharModal);
