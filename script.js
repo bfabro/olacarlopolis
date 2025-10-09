@@ -2954,7 +2954,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       salas: 2, 
       cozinhas: 1,
       piscina: true, 
-      churrasqueira: true, 
+      churrasqueira: false, 
       area: 240,
       valor: 420000, 
       telefone: "11 99898-5930",
