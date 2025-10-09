@@ -2942,27 +2942,50 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     // Substitua depois por dados do Firebase
     {
       id: "imv1",
-      tipo: "venda", status: "disponível",
+      tipo: "venda", 
+      status: "disponível",
       titulo: "Casa ampla no Centro",
       endereco: "Rua Paraná, 250 - Centro",
-      lat: -23.3953, lng: -49.7232,
-      quartos: 3, banheiros: 2, vagas: 2, salas: 2, cozinhas: 1,
-      piscina: true, churrasqueira: true, area: 240,
-      valor: 420000, telefone: "43 99999-8888",
-      imagens: ["images/imoveis/casa1a.jpg", "images/imoveis/casa1b.jpg", "images/imoveis/casa1c.jpg"],
-      descricao: "Casa iluminada, próxima a escolas e comércio. Documentação ok."
+      lat: -23.3953, 
+      lng: -49.7232,
+      quartos: 3, 
+      banheiros: 2,
+      vagas: 2, 
+      salas: 2, 
+      cozinhas: 1,
+      piscina: true, 
+      churrasqueira: true, 
+      area: 240,
+      valor: 420000, 
+      telefone: "43 99999-8888",
+      imagens: ["images/imoveis/cesar/venda/1.jpg", "images/imoveis/cesar/venda/1.jpg", "images/imoveis/cesar/venda/1.jpg"],
+      descricao: "Casa iluminada, próxima a escolas e comércio. Documentação ok.",
+      suite:"Sim", 
+      quintal: "Sim",          
+
     },
     {
       id: "imv2",
-      tipo: "aluguel", status: "alugado",
+      tipo: "aluguel", 
+      status: "Disponivel",
       titulo: "Apartamento Jardim Primavera",
       endereco: "Av. Brasil, 1234 - Jardim Primavera",
-      lat: -23.3979, lng: -49.7285,
-      quartos: 2, banheiros: 1, vagas: 1, salas: 1, cozinhas: 1,
-      piscina: false, churrasqueira: true, area: 68,
-      valor: 1200, telefone: "43 98888-7777",
-      imagens: ["images/imoveis/apt1.jpg", "images/imoveis/apt1b.jpg"],
-      descricao: "Apartamento novo, bem ventilado e com ótima vista."
+      lat: -23.3979, 
+      lng: -49.7285,
+      quartos: 2, 
+      banheiros: 1, 
+      vagas: 1, 
+      salas: 1, 
+      cozinhas: 1,
+      piscina: false, 
+      churrasqueira: true, 
+      area: 68,
+      valor: 1200, 
+      telefone: "43 98888-7777",
+      imagens: ["images/imoveis/cesar/aluguel/1.jpg", "images/imoveis/apt1b.jpg"],
+      descricao: "Apartamento novo, bem ventilado e com ótima vista.",
+      suite:"Sim", 
+      quintal: "Sim",  
     }
   ];
 
@@ -2972,7 +2995,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     const area = document.querySelector(".content_area");
     area.innerHTML = `
     <div class="page-header">
-      <h2 class="highlighted">🏠 Imóveis</h2>
+      <h2 >🏠 Imóveis</h2>
       <i class="fa-solid fa-share-nodes share-btn"
          onclick="compartilharPagina('#imoveis','Imóveis em Carlópolis','Veja o mapa e imóveis disponíveis!')"></i>
     </div>
@@ -2989,7 +3012,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           </select>
         </div>
         <div class="field">
-          <label>Quartos (mín.)</label>
+          <label>Quantidade de Quartos (mín.)</label>
           <select id="imQuartos">
             <option value="">Qualquer</option>
             <option value="1">1+</option>
@@ -3002,14 +3025,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           <label>Preço até</label>
           <select id="imPreco">
             <option value="">Sem teto</option>
-            <option value="1200">R$ 1.200 (aluguel)</option>
+            <option value="600">R$ 600 (aluguel)</option>
+            <option value="1200">R$ 1.200 (aluguel)</option>            
             <option value="200000">R$ 200 mil</option>
             <option value="500000">R$ 500 mil</option>
             <option value="1000000">R$ 1 milhão</option>
           </select>
         </div>
 
-        <div class="field"><label>Comodidades</label>
+        <div class="field"><label>Comodidades ( Selecione para filtro )</label>
           <div class="amenities">
             <span class="amenity-chip" data-key="piscina">🏊 Piscina</span>
             <span class="amenity-chip" data-key="churrasqueira">🍖 Churrasqueira</span>
@@ -3020,9 +3044,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       <section class="im-grid" id="imGrid"></section>
 
-      <aside class="im-mapa">
-        <div id="imMap"></div>
-      </aside>
+    
     </div>
 
     <div class="im-modal" id="imModal">
@@ -3035,6 +3057,74 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       </div>
     </div>
   `;
+
+  function updatePrecoOptions(tipo) {
+  const sel = document.getElementById("imPreco");
+  if (!sel) return;
+  const prev = sel.value; // lembra a escolha anterior
+
+  // limpa
+  sel.innerHTML = "";
+
+  // opção padrão
+  const opt0 = document.createElement("option");
+  opt0.value = "";
+  opt0.textContent = " ";
+  sel.appendChild(opt0);
+
+  // opções por tipo
+  if (tipo === "aluguel") {
+    [
+      ["600", "R$ 600"],
+      ["1200", "R$ 1.200"],
+      ["2000", "R$ 2.000"],    
+      ["3000", "R$ 3.000"],
+      ["4000", "R$ 4.000"],
+      ["5000", "R$ 5.000"],
+    ].forEach(([v, t]) => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = t;
+      sel.appendChild(o);
+    });
+  } else if (tipo === "venda") {
+    [
+      ["200000", "R$ 200 mil"],     
+      ["400000", "R$ 400 mil"],
+      ["800000", "R$ 800 mil"],     
+      ["1500000", "R$ 1.500 milhão"],
+      ["3000000", "R$ 3.000 milhões"],
+      ["10000000", "R$ 10.000 milhões"],
+    ].forEach(([v, t]) => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = t;
+      sel.appendChild(o);
+    });
+  } else {
+    // "Todos": pode mostrar um mix ou deixar só “Sem teto”
+    [
+      ["1200", "R$ 1.200 (aluguel)"],
+      ["200000", "R$ 200 mil (venda)"],
+      ["500000", "R$ 500 mil (venda)"]
+    ].forEach(([v, t]) => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = t;
+      sel.appendChild(o);
+    });
+  }
+
+  // se a seleção anterior não existir mais, fica no "Sem teto"
+  if (![...sel.options].some(o => o.value === prev)) sel.value = "";
+}
+
+// chama ao iniciar
+updatePrecoOptions(document.getElementById("imTipo").value);
+
+// atualiza quando mudar o tipo
+document.getElementById("imTipo").addEventListener("change", (e) => {
+  updatePrecoOptions(e.target.value);
+  // dispara o filtro para refletir a troca
+  aplicarFiltrosImoveis();
+});
 
     // listeners filtros
     document.querySelectorAll(".im-filtros select").forEach(s => s.addEventListener("change", aplicarFiltrosImoveis));
@@ -3135,9 +3225,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       <!-- Chips compactos, harmoniosos -->
       <div class="specs-chips">
+      
         <div class="spec-chip"><span class="k">Quartos</span><span class="v">${im.quartos ?? "-"}</span></div>
+        ${im.suite ? `<div class="spec-chip chip-mini"><span class="k">Suíte</span><span class="v">${boolStr(!!im.suite)}</span></div>` : ``}
         <div class="spec-chip"><span class="k">Banheiros</span><span class="v">${im.banheiros ?? "-"}</span></div>
-        <div class="spec-chip"><span class="k">Vagas (carro)</span><span class="v">${im.vagas ?? "-"}</span></div>
+        <div class="spec-chip"><span class="k">Vagas</span><span class="v">${im.vagas ?? "-"}</span></div>
 
         <div class="spec-chip"><span class="k">Salas</span><span class="v">${im.salas ?? "-"}</span></div>
         <div class="spec-chip"><span class="k">Cozinhas</span><span class="v">${im.cozinhas ?? "-"}</span></div>
@@ -3145,7 +3237,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
         <div class="spec-chip chip-mini"><span class="k">Piscina</span><span class="v">${boolStr(!!im.piscina)}</span></div>
         <div class="spec-chip chip-mini"><span class="k">Churrasqueira</span><span class="v">${boolStr(!!im.churrasqueira)}</span></div>
-        ${im.suite ? `<div class="spec-chip chip-mini"><span class="k">Suíte</span><span class="v">${boolStr(!!im.suite)}</span></div>` : ``}
+        <div class="spec-chip chip-mini"><span class="k">Quintal</span><span class="v">${boolStr(!!im.quintal)}</span></div>
+        
       </div>
 
       <div class="price-line" style="margin-top:12px">

@@ -6078,6 +6078,8 @@ html {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, .06);
   padding: 12px;
+  position: static !important;
+  top: auto !important;
 }
 
 .im-filtros h4 {
@@ -6495,13 +6497,13 @@ html {
 
 @media (max-width: 900px) {
   .specs-chips {
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
   }
 }
 
 @media (max-width: 520px) {
   .specs-chips {
-    grid-template-columns: repeat(2, minmax(110px, 1fr));
+    grid-template-columns: repeat(3, minmax(110px, 1fr));
   }
 }
 
@@ -6539,3 +6541,113 @@ html {
   min-height: 52px;
   padding: 8px 10px;
 }
+
+/* ====== FIX GLOBAL: não deixar o conteúdo atrás da navbar fixa ====== */
+.content_area {
+  /* mantém a margem lateral da sidebar, mas repõe o respiro do topo */
+  margin-top: 84px !important; /* altura aproximada da navbar */
+}
+.sidebar.close ~ .content_area {
+  margin-top: 84px !important;
+}
+
+/* ====== IMÓVEIS: Listagem vertical apenas nessa página (>=768px) ====== */
+/* Escopo: só quando a página de Imóveis estiver montada (.imoveis-wrap dentro da .content_area) */
+@media (min-width: 768px) {
+  .content_area .imoveis-wrap {
+    grid-template-columns: 1fr !important; /* filtros -> lista -> mapa, um abaixo do outro */
+    gap: 16px !important;
+  }
+  .content_area .im-grid {
+    grid-template-columns: 1fr !important; /* 1 card por linha */
+    gap: 16px !important;
+  }
+
+  /* Filtros “respiráveis”, sem sticky (rolam junto) */
+  .content_area .im-filtros {
+    position: static !important;
+    top: auto !important;
+    padding: 16px !important;
+  }
+  .content_area .im-filtros label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .content_area .im-filtros select,
+  .content_area .im-filtros input {
+    width: 100%;
+    height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .content_area .im-filtros select:focus,
+  .content_area .im-filtros input:focus {
+    outline: none;
+    border-color: #4070f4;
+    box-shadow: 0 0 0 3px rgba(64,112,244,.15);
+  }
+
+  /* Card em “list view”: thumb à esquerda, info à direita — só na página de Imóveis */
+  .content_area .card-imovel {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 14px;
+    align-items: stretch;
+    border-radius: 14px;
+  }
+  .content_area .card-imovel .img {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .content_area .card-imovel .card-body {
+    padding: 12px 12px 14px;
+  }
+  .content_area .card-imovel .card-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .content_area .card-imovel .card-addr {
+    font-size: .95rem;
+    opacity: .9;
+    margin-bottom: 8px;
+  }
+  .content_area .specs, 
+  .content_area .specs-inline {
+    gap: 10px 12px;
+    font-size: 14px;
+  }
+}
+
+/* --- Grade de características dos imóveis (3 por linha) --- */
+.im-detalhes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 colunas iguais */
+  gap: 10px; /* Espaçamento entre os itens */
+  align-items: start;
+}
+
+.im-detalhes div {
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Responsivo: no celular, volta a 2 por linha */
+@media (max-width: 768px) {
+  .im-detalhes {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
