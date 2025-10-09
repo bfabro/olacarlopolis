@@ -3236,7 +3236,7 @@ document.getElementById("imTipo").addEventListener("change", (e) => {
         <div class="spec-chip"><span class="k">Área</span><span class="v">${m2(im.area)}</span></div>
 
         <div class="spec-chip chip-mini"><span class="k">Piscina</span><span class="v">${boolStr(!!im.piscina)}</span></div>
-        <div class="spec-chip chip-mini"><span class="k">Churrasqueira</span><span class="v">${boolStr(!!im.churrasqueira)}</span></div>
+        <div class="spec-chip chip-mini"><span class="k">Área de lazer</span><span class="v">${boolStr(!!im.churrasqueira)}</span></div>
         <div class="spec-chip chip-mini"><span class="k">Quintal</span><span class="v">${boolStr(!!im.quintal)}</span></div>
         
       </div>

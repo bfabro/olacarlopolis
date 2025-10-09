@@ -6490,20 +6490,20 @@ html {
 /* === IMÓVEIS: chips 3→2 colunas, compactos === */
 .specs-chips {
   display: grid;
-  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
   gap: 8px;
   margin-top: 8px;
 }
 
 @media (max-width: 900px) {
   .specs-chips {
-    grid-template-columns: repeat(3, minmax(120px, 1fr));
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
   }
 }
 
 @media (max-width: 520px) {
   .specs-chips {
-    grid-template-columns: repeat(3, minmax(110px, 1fr));
+    grid-template-columns: repeat(4, minmax(110px, 1fr));
   }
 }
 
@@ -6646,7 +6646,7 @@ html {
 /* Responsivo: no celular, volta a 2 por linha */
 @media (max-width: 768px) {
   .im-detalhes {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
