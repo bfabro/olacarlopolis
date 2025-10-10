@@ -6670,4 +6670,13 @@ html {
   margin: 4px 0;
   width: 100%;
 }
+.corretor-info {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #333;
+  background: #f7f7f7;
+  border-left: 3px solid #4070f4;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
 

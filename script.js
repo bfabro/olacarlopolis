@@ -2934,6 +2934,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   function boolStr(v) { return v ? "Sim" : "Não"; }
   function m2(v) { return v ? `${v} m²` : "-"; }
 
+  function nomeResponsavel(im) {
+    if (im.corretor) return String(im.corretor);
+    if (Array.isArray(im.corretores) && im.corretores.length) return String(im.corretores[0]);
+    return "";
+  }
 
 
 
@@ -2962,7 +2967,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       descricao: "Casa iluminada, próxima a escolas e comércio. Documentação ok.",
       suite: "Sim",
       quintal: "Sim",
-      procura: "casa", // ou "terreno", "rural", etc.         
+      procura: "casa", // ou "terreno", "rural", etc.   
+      construcao: 180,          // << NOVO: m² de construção      
+      corretores: ["Cezar Melo - 38.105 F", "João Souza", "Ana Lima"]
 
     },
     {
@@ -2987,7 +2994,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       descricao: "Apartamento novo, bem ventilado e com ótima vista.",
       suite: "Sim",
       quintal: "Sim",
-      corretores: ["Cezinha", "João Souza", "Ana Lima"]
+      corretores: ["Cezar Melo - 38.105 F", "João Souza", "Ana Lima"],
+      construcao: 68,           // << NOVO
     }
   ];
 
@@ -3258,6 +3266,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     const precoFmt = im.tipo === "aluguel"
       ? `R$ ${Number(im.valor).toLocaleString()} / mês`
       : `R$ ${Number(im.valor).toLocaleString()}`;
+    const responsavel = nomeResponsavel(im); // << NOVO
 
     return `
   <article class="card-imovel" data-id="${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
@@ -3289,9 +3298,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         <div class="spec-chip chip-mini"><span class="k">Piscina</span><span class="v">${boolStr(!!im.piscina)}</span></div>
         <div class="spec-chip chip-mini"><span class="k">Área de lazer</span><span class="v">${boolStr(!!im.churrasqueira)}</span></div>
         <div class="spec-chip chip-mini"><span class="k">Quintal</span><span class="v">${boolStr(!!im.quintal)}</span></div>
-        
+        <div class="spec-chip"><span class="k">Construção</span><span class="v">${m2(im.construcao)}</span></div>
       </div>
 
+        
+ 
+      </div>
       <div class="price-line" style="margin-top:12px">
         <div class="price">${precoFmt}</div>
         <div class="badges">
@@ -3306,8 +3318,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
         </button>
         <button class="btn-fotos" data-action="fotos" data-id="${im.id}">📷 Ver fotos</button>
-      
+       
       </div>
+ <div><br>
+            ${responsavel ? `<div class="spec-chip chip-mini"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}</div>
+
+      
+       
     </div>
   </article>`;
   }
