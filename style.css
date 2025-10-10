@@ -6288,12 +6288,13 @@ html {
 .im-modal {
   position: fixed;
   inset: 0;
-  display: none;
-  background: rgba(0, 0, 0, .75);
-  z-index: 2000;
+  background: rgba(0,0,0,0.88);
+  display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 9998;
 }
+
 
 .im-modal.open {
   display: flex;
@@ -6805,3 +6806,68 @@ html {
 
 /* Opcional: cursor de "fechar" quando passar o mouse */
 .im-modal .swiper-slide img { cursor: zoom-out; }
+/* MODAL IMÓVEIS — garantir área clicável fora do conteúdo */
+.im-modal { 
+  padding: 12px; /* cria borda de fundo ao redor do conteúdo */
+}
+
+.im-modal-content {
+  position: relative;
+  width: auto;           /* não ocupar 100% */
+  height: auto;          /* não ocupar 100% */
+  max-width: 95vw;       /* cabe na tela */
+  max-height: 90vh;      /* cabe na tela */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Imagem no modal: tamanho real sem cortar */
+.im-modal .swiper-slide { 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+}
+.im-modal .swiper-slide img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 95vw !important;
+  max-height: 90vh !important;
+  object-fit: contain !important; /* não corta */
+}
+/* MODAL IMÓVEIS — cria área de fundo clicável e mantém a foto inteira */
+.im-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  padding: 12px;               /* ← cria “margem” de fundo clicável */
+}
+
+.im-modal-content {
+  position: relative;
+  width: auto;                 /* ← não ocupar 100% */
+  height: auto;                /* ← não ocupar 100% */
+  max-width: 95vw;             /* cabe na tela */
+  max-height: 90vh;            /* cabe na tela */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* imagem grande, sem cortes */
+.im-modal .swiper-slide { 
+  display: flex; align-items: center; justify-content: center;
+}
+.im-modal .swiper-slide img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 95vw !important;
+  max-height: 90vh !important;
+  object-fit: contain !important;   /* ← nunca corta */
+  margin: 0 !important;
+  cursor: zoom-out;
+}

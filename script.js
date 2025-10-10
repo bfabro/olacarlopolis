@@ -3354,46 +3354,50 @@ function abrirModalImoveis(im) {
   const existente = document.querySelector(".im-modal");
   if (existente) existente.remove();
 
-  // Cria o container principal do modal
+  // Cria e injeta o modal
   const modal = document.createElement("div");
   modal.className = "im-modal";
-
-  // Cria o conteúdo do modal
   modal.innerHTML = `
     <div class="im-modal-content">
       <button class="btn-fechar-modal" title="Fechar">&times;</button>
       <div class="swiper swiper-imovel-full">
         <div class="swiper-wrapper">
           ${im.imagens.map(src => `
-            <div class="swiper-slide">
-              <img src="${src}" alt="${im.titulo || ''}">
-            </div>
+            <div class="swiper-slide"><img src="${src}" alt="${im.titulo || ''}"></div>
           `).join("")}
         </div>
         <div class="swiper-pagination"></div>
       </div>
-    </div>
-  `;
-
-  // Adiciona o modal na página
+    </div>`;
   document.body.appendChild(modal);
 
-  // Inicia o Swiper (carrossel de imagens)
+  // Swiper
   new Swiper(".swiper-imovel-full", {
     loop: true,
     pagination: { el: ".swiper-pagination" },
     autoplay: { delay: 3000 },
   });
 
-  // Botão fechar (×)
-  modal.querySelector(".btn-fechar-modal").addEventListener("click", () => {
-    modal.remove();
-  });
+  // Fechamentos centralizados
+  function cleanup() {
+  document.removeEventListener("keydown", onEsc);
+  modal.remove();
+}
+function onEsc(e){ if (e.key === "Escape") cleanup(); }
+document.addEventListener("keydown", onEsc);
 
-  // Clicar fora da imagem também fecha
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) modal.remove();
-  });
+// fechar no botão × (se existir)
+const btnX = modal.querySelector(".btn-fechar-modal");
+if (btnX) btnX.addEventListener("click", cleanup);
+
+// fechar quando clicar FORA do conteúdo
+modal.addEventListener("click", (e) => {
+  const content = modal.querySelector(".im-modal");
+  if (!content || !content.contains(e.target)) {
+    cleanup();
+  }
+});
+
 }
 
 
