@@ -2962,14 +2962,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       churrasqueira: false,
       area: 240,
       valor: 420000,
-      telefone: "11 99898-5930",
+      telefone: "43 99678-9652",
       imagens: ["images/imoveis/cesar/venda/1.jpg", "images/imoveis/cesar/venda/2.jpg", "images/imoveis/cesar/venda/3.jpg"],
       descricao: "Casa iluminada, próxima a escolas e comércio. Documentação ok.",
       suite: "Sim",
       quintal: "Sim",
       procura: "casa", // ou "terreno", "rural", etc.   
       construcao: 180,          // << NOVO: m² de construção      
-      corretores: ["Cezar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
 
     },
     {
@@ -2989,12 +2989,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       churrasqueira: true,
       area: 68,
       valor: 1200,
-      telefone: "11 99898-5930",
+      telefone: "43 99678-9652",
       imagens: ["images/imoveis/cesar/aluguel/1.jpg", "images/imoveis/cesar/aluguel/2.jpg", "images/imoveis/cesar/aluguel/3.jpg"],
       descricao: "Apartamento novo, bem ventilado e com ótima vista.",
       suite: "Sim",
       quintal: "Sim",
-      corretores: ["Cezar Melo - 38.105 F", "João Souza", "Ana Lima"],
+      corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"],
       construcao: 68,           // << NOVO
     },
 
@@ -3005,10 +3005,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       endereco: "Residencial Amaral ll",
       area: 308,
       valor: 120000,
-      telefone: "11 99898-5930",
+      telefone: "43 99678-9652",
       imagens: ["images/imoveis/cesar/venda/terreno/1.jpg", "images/imoveis/cesar/venda/terreno/2.jpg"],
       descricao: "Terreno de esquina Comercial / Residencial com ótima vista para represa<br>Loteamento com rampa náutica",
-      corretores: ["Cezar Melo - 38.105 F"],
+      corretores: ["Cesar Melo - 38.105 F"],
 
     },
 
@@ -3019,10 +3019,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       endereco: "Novo horizonte 1",
       area: 180,
       valor: 65000,
-      telefone: "11 99898-5930",
+      telefone: "43 99678-9652",
       imagens: ["images/imoveis/cesar/venda/terreno/3.jpg",],
       descricao: "Terreno Residencial",
-      corretores: ["Cezar Melo - 38.105 F"],
+      corretores: ["Cesar Melo - 38.105 F"],
 
     }
   ];
