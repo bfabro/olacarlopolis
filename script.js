@@ -2975,7 +2975,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     {
       id: "imv2",
       tipo: "aluguel",
-      status: "Disponivel",
+   //   status: "Disponivel",
       titulo: "Apartamento Jardim Primavera",
       endereco: "Av. Brasil, 1234 - Jardim Primavera",
       lat: -23.3979,
@@ -3258,6 +3258,19 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         window.open(`https://wa.me/55${numero}?text=${txt}`, "_blank");
       });
     });
+
+    // permitir abrir a galeria clicando na imagem ou no botão de lupa
+el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb").forEach(node => {
+  node.addEventListener("click", (ev) => {
+    ev.stopPropagation(); // evita acionar o click do card (mapa)
+    const card = ev.currentTarget.closest(".card-imovel");
+    const id = card?.getAttribute("data-id") || ev.currentTarget.getAttribute("data-id");
+    if (!id) return;
+    const im = stateImoveis.all.find(x => x.id === id);
+    if (im) abrirModalImoveis(im);
+  });
+});
+
   }
 
   function cardImovelHTML(im) {
@@ -3276,6 +3289,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           ${im.imagens.map(src => `<div class="swiper-slide"><img src="${src}" alt="${im.titulo}"></div>`).join("")}
         </div>
       </div>
+      <button class="zoom-thumb" data-id="${im.id}" title="Ampliar">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
       <span class="tag ${tag}">${tag.toUpperCase()}</span>
     </div>
 
@@ -3317,7 +3333,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         <button class="btn-whats" data-action="whats" data-id="${im.id}">
           <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
         </button>
-        <button class="btn-fotos" data-action="fotos" data-id="${im.id}">📷 Ver fotos</button>
+        
        
       </div>
  <div><br>
