@@ -2946,34 +2946,120 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   const IM_DADOS = [
     // Substitua depois por dados do Firebase
     {
-      id: "imv1",
+      id: "casa1v",
       tipo: "venda",
       status: "disponível",
-      titulo: "Casa ampla no Centro",
-      endereco: "Rua Paraná, 250 - Centro",
+      titulo: "Residencial Villa Ray (Horizonte 3)",
+      endereco: "--",
+      lat: -23.3953,
+      lng: -49.7232,
+      quartos: 2,
+      banheiros: 2,
+      vagas: 1,
+      salas: 1,
+      cozinhas: 1,
+      piscina: false,
+      churrasqueira: false,
+      area: 90,
+      construcao: 63,          // << NOVO: m² de construção   
+      valor: 200000,
+      telefone: "43 99678-9652",
+      imagens: [
+        "images/imoveis/cesar/venda/casa1/1.png",
+        "images/imoveis/cesar/venda/casa1/2.jpg",
+        "images/imoveis/cesar/venda/casa1/3.JPG",
+        "images/imoveis/cesar/venda/casa1/4.jpg",
+        "images/imoveis/cesar/venda/casa1/5.jpg",
+        "images/imoveis/cesar/venda/casa1/6.jpg",
+        "images/imoveis/cesar/venda/casa1/7.jpg",
+        "images/imoveis/cesar/venda/casa1/8.jpg",
+        "images/imoveis/cesar/venda/casa1/9.jpg"
+       ],
+      descricao: "Casa nova, impecavel Documentação ok.",
+      suite: "1",
+      quintal: "Não",
+      procura: "casa", // ou "terreno", "rural", etc.   
+
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      corretores: ["Cesar Melo - 38.105 F"]
+
+    },
+
+
+    {
+      id: "casa2v",
+      tipo: "venda",
+      
+      titulo: "Casa nova a venda em Carlópolis.",
+      descricao: "Casa nova, impecavel Documentação ok. Aceita financiamento, “minha casa minha vida “",
+      endereco: "--",
       lat: -23.3953,
       lng: -49.7232,
       quartos: 3,
-      banheiros: 2,
+      banheiros: 1,
       vagas: 2,
-      salas: 2,
+      salas: 1,
       cozinhas: 1,
-      piscina: true,
-      churrasqueira: false,
-      area: 240,
-      valor: 420000,
-      telefone: "43 99678-9652",
-      imagens: ["images/imoveis/cesar/venda/1.jpg", "images/imoveis/cesar/venda/2.jpg", "images/imoveis/cesar/venda/3.jpg"],
-      descricao: "Casa iluminada, próxima a escolas e comércio. Documentação ok.",
-      suite: "Sim",
+      piscina: false,
+      churrasqueira: false,      
+      suite: "1",
       quintal: "Sim",
-      procura: "casa", // ou "terreno", "rural", etc.   
-      construcao: 180,          // << NOVO: m² de construção      
-      corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      procura: "casa", // ou "terreno", "rural", etc.
+      area: 90,
+      construcao: 63,          // << NOVO: m² de construção   
+      valor: 250000,
+      telefone: "43 99678-9652",
+      imagens: [
+        "images/imoveis/cesar/venda/casa2/1.jpg",
+        "images/imoveis/cesar/venda/casa2/2.jpg",
+        "images/imoveis/cesar/venda/casa2/3.JPG",
+        "images/imoveis/cesar/venda/casa2/4.jpg",
+        "images/imoveis/cesar/venda/casa2/5.jpg",
+        "images/imoveis/cesar/venda/casa2/6.jpg",
+        "images/imoveis/cesar/venda/casa2/7.jpg",
+        "images/imoveis/cesar/venda/casa2/8.jpg"
+
+       ],      
+
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      corretores: ["Cesar Melo - 38.105 F"]
 
     },
+
+    
+
     {
-      id: "imv2",
+      id: "ter1",
+      tipo: "venda",
+      titulo: "Terreno Esquina - Loteamento Amaral",
+      endereco: "Residencial Amaral ll",
+      area: 308,
+      valor: 130000,
+      telefone: "43 99678-9652",
+      imagens: ["images/imoveis/cesar/venda/terreno/1.jpg", "images/imoveis/cesar/venda/terreno/2.jpg"],
+      descricao: "Terreno de esquina Comercial / Residencial com ótima vista para represa<br>Loteamento com rampa náutica",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      corretores: ["Cesar Melo - 38.105 F"],
+
+    },
+
+    {
+      id: "ter2",
+      tipo: "venda",
+      titulo: "Terreno - Novo horizonte 1",
+      endereco: "Novo horizonte 1",
+      area: 180,
+      valor: 65000,
+      telefone: "43 99678-9652",
+      imagens: ["images/imoveis/cesar/venda/terreno/3.jpg",],
+      descricao: "Terreno Residencial",
+       procura: "terreno", // ou "terreno", "rural", etc.
+      corretores: ["Cesar Melo - 38.105 F"],
+
+    },
+
+    {
+      id: "casa1a",
       tipo: "aluguel",
       //   status: "Disponivel",
       titulo: "Apartamento Jardim Primavera",
@@ -2990,41 +3076,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       area: 68,
       valor: 1200,
       telefone: "43 99678-9652",
-      imagens: ["images/imoveis/cesar/aluguel/1.jpg", "images/imoveis/cesar/aluguel/2.jpg", "images/imoveis/cesar/aluguel/3.jpg"],
+      imagens: [ "images/imoveis/cesar/aluguel/2.jpg", "images/imoveis/cesar/aluguel/3.jpg"],
       descricao: "Apartamento novo, bem ventilado e com ótima vista.",
       suite: "Sim",
       quintal: "Sim",
+       procura: "casa", // ou "terreno", "rural", etc.
       corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"],
       construcao: 68,           // << NOVO
     },
-
-    {
-      id: "ter1",
-      tipo: "venda",
-      titulo: "Terreno Esquina - Loteamento Amaral",
-      endereco: "Residencial Amaral ll",
-      area: 308,
-      valor: 120000,
-      telefone: "43 99678-9652",
-      imagens: ["images/imoveis/cesar/venda/terreno/1.jpg", "images/imoveis/cesar/venda/terreno/2.jpg"],
-      descricao: "Terreno de esquina Comercial / Residencial com ótima vista para represa<br>Loteamento com rampa náutica",
-      corretores: ["Cesar Melo - 38.105 F"],
-
-    },
-
-    {
-      id: "ter2",
-      tipo: "venda",
-      titulo: "Terreno - Novo horizonte 1",
-      endereco: "Novo horizonte 1",
-      area: 180,
-      valor: 65000,
-      telefone: "43 99678-9652",
-      imagens: ["images/imoveis/cesar/venda/terreno/3.jpg",],
-      descricao: "Terreno Residencial",
-      corretores: ["Cesar Melo - 38.105 F"],
-
-    }
   ];
 
   // monta página
@@ -3517,30 +3576,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
 
-  function mostrarConsultaCEP() {
-   
-   if ((location.hash || "").toLowerCase().split("?")[0] !== "#cep") {
-    location.hash = "#cep"; // garante a rota certa para o botão de compartilhar
-  }
 
-    const area = document.querySelector(".content_area");
-    area.innerHTML = `
-    <div class="page-header">
-      <h2 >📍 Buscar CEP por Endereço</h2>
-      <i class="fa-solid fa-share-nodes share-btn"
-         onclick="compartilharPagina('#consulta-cep','Consulta CEP','Descubra o CEP de qualquer rua em Carlópolis!')"></i>
-    </div>
-
-    <div class="cep-container">
-      <p>Digite o endereço abaixo (rua, cidade e estado):</p>
-      <input type="text" id="logradouro" placeholder="Rua / Avenida" />
-      <input type="text" id="cidade" placeholder="Cidade" value="Carlópolis" />
-      <input type="text" id="uf" placeholder="UF" maxlength="2" value="PR" />
-      <button onclick="buscarCEPPorEndereco()">Buscar CEP</button>
-      <div id="resultadoCEP" class="cep-resultado"></div>
-    </div>
-  `;
-  }
 
   // Função que consulta a API ViaCEP
   // ===== CEP: rota #cep + busca por endereço (ViaCEP) =====
@@ -3573,12 +3609,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             <input id="cepCidade" class="cep-input" type="text" placeholder="Ex.: Carlópolis" value="Carlópolis">
             <i class="bx bx-current-location cep-ico"></i>
           </div>
+         
           <div class="cep-field">
             <label class="cep-label">Endereço</label>
-            <input id="cepRua" class="cep-input" type="text" placeholder="Ex.: Rua Paraná">
-            <i class="bx bx-road cep-ico"></i>
+            <input id="cepEndereco" class="cep-input" type="text" placeholder="Ex.: Rua Paraná">
+            <i class="bx bx-map cep-ico"></i>
           </div>
           <button id="btnBuscarCep" class="cep-btn" type="submit"><i class="bx bx-search"></i>&nbsp;Buscar CEP</button>
+        
         </form>
 
         <div class="cep-tips">Dica: quanto mais específico o logradouro (ex.: “Av. Paraná, Centro”), melhores os resultados.</div>
@@ -3594,7 +3632,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     // suporta deep-link: #cep?uf=PR&cidade=Carlópolis&rua=Paraná
     const params = new URLSearchParams(location.hash.split("?")[1] || "");
-    if (params.get("rua")) document.getElementById("cepRua").value = decodeURIComponent(params.get("rua"));
+    if (params.get("rua")) document.getElementById("cepEndereco").value = decodeURIComponent(params.get("rua"));
     if (params.get("cidade")) document.getElementById("cepCidade").value = decodeURIComponent(params.get("cidade"));
     if (params.get("uf")) document.getElementById("cepUf").value = params.get("uf").toUpperCase();
   }
@@ -3606,7 +3644,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     const uf = (document.getElementById("cepUf").value || "").trim().toUpperCase();
     let cidade = (document.getElementById("cepCidade").value || "").trim();
-    let rua = (document.getElementById("cepRua").value || "").trim();
+    let rua = (document.getElementById("cepEndereco").value || "").trim();
 
     out.innerHTML = "";
     stt.textContent = "";
@@ -3691,7 +3729,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     const uf = (document.getElementById("cepUf").value || "").trim().toUpperCase();
     let cidade = (document.getElementById("cepCidade").value || "").trim();
-    let rua = (document.getElementById("cepRua").value || "").trim();
+    let rua = (document.getElementById("cepEndereco").value || "").trim();
 
     out.innerHTML = "";
     stt.textContent = "";
@@ -13180,6 +13218,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
+
 
 
     // categorias de "Comércios"

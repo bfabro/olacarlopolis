@@ -7119,3 +7119,46 @@ html {
   .cep-btn { grid-column: 1 / -1; }
   .cep-results { grid-template-columns: 1fr; }
 }
+
+/* ====== Ajuste específico da página de Busca CEP ====== */
+.cep-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.cep-field {
+  flex: 1 1 180px; /* base padrão para UF e Cidade */
+  position: relative;
+}
+
+.cep-field:nth-child(3) { /* Endereço */
+  flex: 1 1 auto;          /* ocupa todo o espaço restante */
+  min-width: 100%;         /* garante largura total */
+}
+
+.cep-field input,
+.cep-select {
+  width: 100%;
+  padding: 10px 35px 10px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.cep-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(45deg, #007bff, #00bfff);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.3s;
+}
+
+.cep-btn:hover {
+  background: linear-gradient(45deg, #005fcc, #0099cc);
+}
