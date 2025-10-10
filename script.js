@@ -1364,7 +1364,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // { id: "lojaThiagoAgueraOfertas", nome: "Loja Thiago Aguera - Ofertas", descricao: "Grupo exclusivo para as rifas do Thiago Aguera.<br>Venda de materiais de pesca em até 12x no cartão.", link: "https://tr.ee/EylHAMYMbS", imagem: "images/informacoes/gruposWhats/11.jpg"},
 
 
-   
+
     { id: "seiza", nome: "Seiza Produtos Orientais", descricao: "Receba Novidades, Promoções e tambem informativos da loja.", link: "https://chat.whatsapp.com/CFr4ebifZzgE6fFu4CXb6F?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/6.jpg" },
     { id: "vagasEmprego1", nome: "Vagas de Empregos 1", descricao: "Acompanhe as vagas de empregos pelo grupo.", link: "https://chat.whatsapp.com/EKbKwH3hnbHF85tUC2Nb8Q?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/10.jpg" },
 
@@ -2937,55 +2937,57 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-  // ---------- IMÓVEIS 2.0 ----------
+  // ---------- IMÓVEIS 2.0 ---------- CADASTRO IMOVEIS
   const IM_DADOS = [
     // Substitua depois por dados do Firebase
     {
       id: "imv1",
-      tipo: "venda", 
+      tipo: "venda",
       status: "disponível",
       titulo: "Casa ampla no Centro",
       endereco: "Rua Paraná, 250 - Centro",
-      lat: -23.3953, 
+      lat: -23.3953,
       lng: -49.7232,
-      quartos: 3, 
+      quartos: 3,
       banheiros: 2,
-      vagas: 2, 
-      salas: 2, 
+      vagas: 2,
+      salas: 2,
       cozinhas: 1,
-      piscina: true, 
-      churrasqueira: false, 
+      piscina: true,
+      churrasqueira: false,
       area: 240,
-      valor: 420000, 
+      valor: 420000,
       telefone: "11 99898-5930",
       imagens: ["images/imoveis/cesar/venda/1.jpg", "images/imoveis/cesar/venda/2.jpg", "images/imoveis/cesar/venda/3.jpg"],
       descricao: "Casa iluminada, próxima a escolas e comércio. Documentação ok.",
-      suite:"Sim", 
-      quintal: "Sim",          
+      suite: "Sim",
+      quintal: "Sim",
+      procura: "casa", // ou "terreno", "rural", etc.         
 
     },
     {
       id: "imv2",
-      tipo: "aluguel", 
+      tipo: "aluguel",
       status: "Disponivel",
       titulo: "Apartamento Jardim Primavera",
       endereco: "Av. Brasil, 1234 - Jardim Primavera",
-      lat: -23.3979, 
+      lat: -23.3979,
       lng: -49.7285,
-      quartos: 2, 
-      banheiros: 1, 
-      vagas: 1, 
-      salas: 1, 
+      quartos: 2,
+      banheiros: 1,
+      vagas: 1,
+      salas: 1,
       cozinhas: 1,
-      piscina: false, 
-      churrasqueira: true, 
+      piscina: false,
+      churrasqueira: true,
       area: 68,
-      valor: 1200, 
+      valor: 1200,
       telefone: "11 99898-5930",
       imagens: ["images/imoveis/cesar/aluguel/1.jpg", "images/imoveis/cesar/aluguel/2.jpg", "images/imoveis/cesar/aluguel/3.jpg"],
       descricao: "Apartamento novo, bem ventilado e com ótima vista.",
-      suite:"Sim", 
-      quintal: "Sim",  
+      suite: "Sim",
+      quintal: "Sim",
+      corretores: ["Cezinha", "João Souza", "Ana Lima"]
     }
   ];
 
@@ -3004,13 +3006,36 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       <aside class="im-filtros">
         <h4>Filtrar</h4>
         <div class="field">
-          <label>Tipo</label>
+          <label>Tipo Negociação</label>
           <select id="imTipo">
             <option value="">Todos</option>
+             <option value="aluguel">Aluguel</option>
             <option value="venda">Venda</option>
-            <option value="aluguel">Aluguel</option>
+           
           </select>
         </div>
+
+        <!-- Filtro: O que procura -->
+<label for="filtroProcura">O que procura:</label>
+<select id="filtroProcura">
+  <option value="">Todos</option>
+  <option value="casa">Casa</option>
+   <option value="comercial">Comercial</option>
+   <option value="condominio">Condomínio</option>
+<option value="galpao">Galpão</option>
+<option value="represa">Represa</option>  
+  <option value="rural">Rural</option>
+  <option value="terreno">Terreno</option>
+  
+ 
+  
+  
+</select>
+
+
+
+
+
         <div class="field">
           <label>Quantidade de Quartos (mín.)</label>
           <select id="imQuartos">
@@ -3040,6 +3065,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             <span class="amenity-chip" data-key="vagas">🚗 2+ vagas</span>
           </div>
         </div>
+
+        <!-- Filtro Corretor -->
+        <label for="filtroCorretor">Corretor / Imobiliaria:</label>
+        <select id="filtroCorretor">
+          <option value="">Todos</option>
+          <!-- Opções via JS -->
+        </select>
+
       </aside>
 
       <section class="im-grid" id="imGrid"></section>
@@ -3058,73 +3091,73 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     </div>
   `;
 
-  function updatePrecoOptions(tipo) {
-  const sel = document.getElementById("imPreco");
-  if (!sel) return;
-  const prev = sel.value; // lembra a escolha anterior
+    function updatePrecoOptions(tipo) {
+      const sel = document.getElementById("imPreco");
+      if (!sel) return;
+      const prev = sel.value; // lembra a escolha anterior
 
-  // limpa
-  sel.innerHTML = "";
+      // limpa
+      sel.innerHTML = "";
 
-  // opção padrão
-  const opt0 = document.createElement("option");
-  opt0.value = "";
-  opt0.textContent = " ";
-  sel.appendChild(opt0);
+      // opção padrão
+      const opt0 = document.createElement("option");
+      opt0.value = "";
+      opt0.textContent = " ";
+      sel.appendChild(opt0);
 
-  // opções por tipo
-  if (tipo === "aluguel") {
-    [
-      ["600", "R$ 600"],
-      ["1200", "R$ 1.200"],
-      ["2000", "R$ 2.000"],    
-      ["3000", "R$ 3.000"],
-      ["4000", "R$ 4.000"],
-      ["5000", "R$ 5.000"],
-    ].forEach(([v, t]) => {
-      const o = document.createElement("option");
-      o.value = v; o.textContent = t;
-      sel.appendChild(o);
+      // opções por tipo
+      if (tipo === "aluguel") {
+        [
+          ["600", "R$ 600"],
+          ["1200", "R$ 1.200"],
+          ["2000", "R$ 2.000"],
+          ["3000", "R$ 3.000"],
+          ["4000", "R$ 4.000"],
+          ["5000", "R$ 5.000"],
+        ].forEach(([v, t]) => {
+          const o = document.createElement("option");
+          o.value = v; o.textContent = t;
+          sel.appendChild(o);
+        });
+      } else if (tipo === "venda") {
+        [
+          ["200000", "R$ 200 mil"],
+          ["400000", "R$ 400 mil"],
+          ["800000", "R$ 800 mil"],
+          ["1500000", "R$ 1.500 milhão"],
+          ["3000000", "R$ 3.000 milhões"],
+          ["10000000", "R$ 10.000 milhões"],
+        ].forEach(([v, t]) => {
+          const o = document.createElement("option");
+          o.value = v; o.textContent = t;
+          sel.appendChild(o);
+        });
+      } else {
+        // "Todos": pode mostrar um mix ou deixar só “Sem teto”
+        [
+          ["1200", "R$ 1.200 (aluguel)"],
+          ["200000", "R$ 200 mil (venda)"],
+          ["500000", "R$ 500 mil (venda)"]
+        ].forEach(([v, t]) => {
+          const o = document.createElement("option");
+          o.value = v; o.textContent = t;
+          sel.appendChild(o);
+        });
+      }
+
+      // se a seleção anterior não existir mais, fica no "Sem teto"
+      if (![...sel.options].some(o => o.value === prev)) sel.value = "";
+    }
+
+    // chama ao iniciar
+    updatePrecoOptions(document.getElementById("imTipo").value);
+
+    // atualiza quando mudar o tipo
+    document.getElementById("imTipo").addEventListener("change", (e) => {
+      updatePrecoOptions(e.target.value);
+      // dispara o filtro para refletir a troca
+      aplicarFiltrosImoveis();
     });
-  } else if (tipo === "venda") {
-    [
-      ["200000", "R$ 200 mil"],     
-      ["400000", "R$ 400 mil"],
-      ["800000", "R$ 800 mil"],     
-      ["1500000", "R$ 1.500 milhão"],
-      ["3000000", "R$ 3.000 milhões"],
-      ["10000000", "R$ 10.000 milhões"],
-    ].forEach(([v, t]) => {
-      const o = document.createElement("option");
-      o.value = v; o.textContent = t;
-      sel.appendChild(o);
-    });
-  } else {
-    // "Todos": pode mostrar um mix ou deixar só “Sem teto”
-    [
-      ["1200", "R$ 1.200 (aluguel)"],
-      ["200000", "R$ 200 mil (venda)"],
-      ["500000", "R$ 500 mil (venda)"]
-    ].forEach(([v, t]) => {
-      const o = document.createElement("option");
-      o.value = v; o.textContent = t;
-      sel.appendChild(o);
-    });
-  }
-
-  // se a seleção anterior não existir mais, fica no "Sem teto"
-  if (![...sel.options].some(o => o.value === prev)) sel.value = "";
-}
-
-// chama ao iniciar
-updatePrecoOptions(document.getElementById("imTipo").value);
-
-// atualiza quando mudar o tipo
-document.getElementById("imTipo").addEventListener("change", (e) => {
-  updatePrecoOptions(e.target.value);
-  // dispara o filtro para refletir a troca
-  aplicarFiltrosImoveis();
-});
 
     // listeners filtros
     document.querySelectorAll(".im-filtros select").forEach(s => s.addEventListener("change", aplicarFiltrosImoveis));
@@ -3138,6 +3171,9 @@ document.getElementById("imTipo").addEventListener("change", (e) => {
     // inicia grid + mapa
     stateImoveis.all = IM_DADOS.slice();
     stateImoveis.filtered = stateImoveis.all.slice();
+    popularFiltroCorretor();
+    document.getElementById("filtroCorretor")
+      ?.addEventListener("change", aplicarFiltrosImoveis);
     desenharGridImoveis(stateImoveis.filtered);
     iniciarMapaImoveis();
     plotarPinsImoveis(stateImoveis.filtered);
@@ -3149,22 +3185,37 @@ document.getElementById("imTipo").addEventListener("change", (e) => {
     const tipo = document.getElementById("imTipo").value;
     const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
     const p = parseInt(document.getElementById("imPreco").value || 0, 10);
-    const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
+    const amen = Array.from(document.querySelectorAll(".amenity-chip.active"))
+      .map(c => c.dataset.key);
+    const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
+    const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
 
     stateImoveis.filtered = stateImoveis.all.filter(im => {
       const tipoOk = !tipo || im.tipo === tipo;
       const qOk = !q || (im.quartos >= q);
-      const pOk = !p || (im.tipo === "aluguel" ? im.valor <= p : im.valor <= p);
+      const pOk = !p || (im.valor <= p);
+      const corretorOk =
+        !corretorSelecionado ||
+        (Array.isArray(im.corretores)
+          ? im.corretores.includes(corretorSelecionado)
+          : im.corretor === corretorSelecionado);
+      const procuraOk =
+        !procuraSelecionado ||
+        (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
+
       let amenOk = true;
       if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
       if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
       if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
-      return tipoOk && qOk && pOk && amenOk;
+
+      return tipoOk && qOk && pOk && corretorOk && procuraOk && amenOk;
     });
 
     desenharGridImoveis(stateImoveis.filtered);
     plotarPinsImoveis(stateImoveis.filtered);
   }
+
+
 
   function desenharGridImoveis(lista) {
     const el = document.getElementById("imGrid");
@@ -3279,7 +3330,7 @@ document.getElementById("imTipo").addEventListener("change", (e) => {
     // atalhos teclado
     document.addEventListener("keydown", escFecharModal);
   }
-  
+
   function fecharModalImoveis() {
     document.getElementById("imModal").classList.remove("open");
     document.removeEventListener("keydown", escFecharModal);
@@ -3322,6 +3373,32 @@ document.getElementById("imTipo").addEventListener("change", (e) => {
     if (!im || !stateImoveis.map) return;
     stateImoveis.map.setView([im.lat, im.lng], 16);
   }
+
+  function popularFiltroCorretor() {
+    const sel = document.getElementById("filtroCorretor");
+    if (!sel) return;
+
+    // Coleta TODOS os corretores (string ou array) e cria um conjunto único
+    const set = new Set();
+    stateImoveis.all.forEach(im => {
+      if (Array.isArray(im.corretores)) {
+        im.corretores.filter(Boolean).forEach(nome => set.add(String(nome).trim()));
+      } else if (im.corretor) {
+        set.add(String(im.corretor).trim());
+      }
+    });
+
+    // Limpa e recria opções (mantém "Todos")
+    sel.innerHTML = `<option value="">Todos</option>` +
+      Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"))
+        .map(nome => `<option value="${nome}">${nome}</option>`).join("");
+  }
+
+  // Exemplo: após carregar os imóveis
+  // stateImoveis.all = ... (carregou)
+  // popularFiltroCorretor();
+  // document.getElementById("filtroCorretor").addEventListener("change", aplicarFiltrosImoveis);
+
 
   // conectar no menu
   const elMenuImoveis = document.getElementById("menuImoveis");

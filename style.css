@@ -6652,4 +6652,22 @@ html {
   }
 }
 
+#filtroCorretor {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 14px;
+  margin: 4px 0;
+  width: 100%;
+}
+#filtroProcura {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 14px;
+  margin: 4px 0;
+  width: 100%;
+}
 
