@@ -3000,30 +3000,30 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter1",
-      tipo: "venda",     
+      tipo: "venda",
       titulo: "Terreno Esquina - Loteamento Amaral",
-      endereco: "Residencial Amaral ll",      
+      endereco: "Residencial Amaral ll",
       area: 308,
       valor: 120000,
       telefone: "11 99898-5930",
       imagens: ["images/imoveis/cesar/venda/terreno/1.jpg", "images/imoveis/cesar/venda/terreno/2.jpg"],
-      descricao: "Terreno de esquina Comercial / Residencial com ótima vista para represa<br>Loteamento com rampa náutica",    
+      descricao: "Terreno de esquina Comercial / Residencial com ótima vista para represa<br>Loteamento com rampa náutica",
       corretores: ["Cezar Melo - 38.105 F"],
-     
+
     },
 
-      {
+    {
       id: "ter2",
-      tipo: "venda",     
+      tipo: "venda",
       titulo: "Terreno - Novo horizonte 1",
-      endereco: "Novo horizonte 1",      
+      endereco: "Novo horizonte 1",
       area: 180,
       valor: 65000,
       telefone: "11 99898-5930",
-      imagens: ["images/imoveis/cesar/venda/terreno/3.jpg", ],
-      descricao: "Terreno Residencial",    
+      imagens: ["images/imoveis/cesar/venda/terreno/3.jpg",],
+      descricao: "Terreno Residencial",
       corretores: ["Cezar Melo - 38.105 F"],
-     
+
     }
   ];
 
@@ -3299,44 +3299,44 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       });
     });
 
-  }function isTerreno(im) {
-  const t = String(im.procura || im.tipoImovel || im.categoria || "").toLowerCase();
-  const noTitulo = String(im.titulo || "").toLowerCase().includes("terreno");
-  return t === "terreno" || noTitulo;
-}
-function hasNum(v){ return Number.isFinite(Number(v)) && Number(v) > 0; }
+  } function isTerreno(im) {
+    const t = String(im.procura || im.tipoImovel || im.categoria || "").toLowerCase();
+    const noTitulo = String(im.titulo || "").toLowerCase().includes("terreno");
+    return t === "terreno" || noTitulo;
+  }
+  function hasNum(v) { return Number.isFinite(Number(v)) && Number(v) > 0; }
 
-function renderChips(im){
-  const terr = isTerreno(im);
-  const chips = [];
+  function renderChips(im) {
+    const terr = isTerreno(im);
+    const chips = [];
 
-  // Para casas/apês (não mostra em terreno se não fizer sentido)
-  if (!terr && hasNum(im.quartos))   chips.push(`<div class="spec-chip"><span class="k">Quartos</span><span class="v">${im.quartos}</span></div>`);
-  if (!terr && im.suite)             chips.push(`<div class="spec-chip chip-mini"><span class="k">Suíte</span><span class="v">Sim</span></div>`);
-  if (!terr && hasNum(im.banheiros)) chips.push(`<div class="spec-chip"><span class="k">Banheiros</span><span class="v">${im.banheiros}</span></div>`);
-  if (!terr && hasNum(im.vagas))     chips.push(`<div class="spec-chip"><span class="k">Vagas</span><span class="v">${im.vagas}</span></div>`);
-  if (!terr && hasNum(im.salas))     chips.push(`<div class="spec-chip"><span class="k">Salas</span><span class="v">${im.salas}</span></div>`);
-  if (!terr && hasNum(im.cozinhas))  chips.push(`<div class="spec-chip"><span class="k">Cozinhas</span><span class="v">${im.cozinhas}</span></div>`);
+    // Para casas/apês (não mostra em terreno se não fizer sentido)
+    if (!terr && hasNum(im.quartos)) chips.push(`<div class="spec-chip"><span class="k">Quartos</span><span class="v">${im.quartos}</span></div>`);
+    if (!terr && im.suite) chips.push(`<div class="spec-chip chip-mini"><span class="k">Suíte</span><span class="v">Sim</span></div>`);
+    if (!terr && hasNum(im.banheiros)) chips.push(`<div class="spec-chip"><span class="k">Banheiros</span><span class="v">${im.banheiros}</span></div>`);
+    if (!terr && hasNum(im.vagas)) chips.push(`<div class="spec-chip"><span class="k">Vagas</span><span class="v">${im.vagas}</span></div>`);
+    if (!terr && hasNum(im.salas)) chips.push(`<div class="spec-chip"><span class="k">Salas</span><span class="v">${im.salas}</span></div>`);
+    if (!terr && hasNum(im.cozinhas)) chips.push(`<div class="spec-chip"><span class="k">Cozinhas</span><span class="v">${im.cozinhas}</span></div>`);
 
-  // Área (relevante para qualquer imóvel, inclusive terreno)
-  if (hasNum(im.area)) chips.push(`<div class="spec-chip"><span class="k">Área</span><span class="v">${Number(im.area)} m²</span></div>`);
+    // Área (relevante para qualquer imóvel, inclusive terreno)
+    if (hasNum(im.area)) chips.push(`<div class="spec-chip"><span class="k">Área</span><span class="v">${Number(im.area)} m²</span></div>`);
 
-  // Construção (normalmente não para terreno)
-  if (!terr && hasNum(im.construcao)) chips.push(`<div class="spec-chip"><span class="k">Construção</span><span class="v">${Number(im.construcao)} m²</span></div>`);
+    // Construção (normalmente não para terreno)
+    if (!terr && hasNum(im.construcao)) chips.push(`<div class="spec-chip"><span class="k">Construção</span><span class="v">${Number(im.construcao)} m²</span></div>`);
 
-  return chips.join("");
-}
+    return chips.join("");
+  }
 
 
- function cardImovelHTML(im) {
-  const tag = im.tipo; // "venda" | "aluguel"
-  const st = (im.status || "").toLowerCase();
-  const precoFmt = im.tipo === "aluguel"
-    ? `R$ ${Number(im.valor).toLocaleString()} / mês`
-    : `R$ ${Number(im.valor).toLocaleString()}`;
-  const responsavel = nomeResponsavel(im);
+  function cardImovelHTML(im) {
+    const tag = im.tipo; // "venda" | "aluguel"
+    const st = (im.status || "").toLowerCase();
+    const precoFmt = im.tipo === "aluguel"
+      ? `R$ ${Number(im.valor).toLocaleString()} / mês`
+      : `R$ ${Number(im.valor).toLocaleString()}`;
+    const responsavel = nomeResponsavel(im);
 
-  return `
+    return `
   <article class="card-imovel ${tag}" data-id="${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
     <div class="card-top">
       <div class="swiper swiper-imovel-mini">
@@ -3354,9 +3354,9 @@ function renderChips(im){
       <!-- Selo de preço no topo-direito -->
       <div class="price-pill ${tag}">
         ${im.tipo === "aluguel"
-          ? `R$ ${Number(im.valor).toLocaleString()} <span class="pill-sub">/ mês</span>`
-          : `R$ ${Number(im.valor).toLocaleString()}`
-        }
+        ? `R$ ${Number(im.valor).toLocaleString()} <span class="pill-sub">/ mês</span>`
+        : `R$ ${Number(im.valor).toLocaleString()}`
+      }
       </div>
     </div>
 
@@ -3384,7 +3384,7 @@ function renderChips(im){
       ${responsavel ? `<div class="spec-chip chip-mini"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
     </div>
   </article>`;
-}
+  }
 
 
 
@@ -3517,11 +3517,14 @@ function renderChips(im){
   if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
 
-function mostrarConsultaCEP() {
-  location.hash = "#consulta-cep";
+  function mostrarConsultaCEP() {
+   
+   if ((location.hash || "").toLowerCase().split("?")[0] !== "#cep") {
+    location.hash = "#cep"; // garante a rota certa para o botão de compartilhar
+  }
 
-  const area = document.querySelector(".content_area");
-  area.innerHTML = `
+    const area = document.querySelector(".content_area");
+    area.innerHTML = `
     <div class="page-header">
       <h2 >📍 Buscar CEP por Endereço</h2>
       <i class="fa-solid fa-share-nodes share-btn"
@@ -3537,20 +3540,20 @@ function mostrarConsultaCEP() {
       <div id="resultadoCEP" class="cep-resultado"></div>
     </div>
   `;
-}
+  }
 
-// Função que consulta a API ViaCEP
-// ===== CEP: rota #cep + busca por endereço (ViaCEP) =====
+  // Função que consulta a API ViaCEP
+  // ===== CEP: rota #cep + busca por endereço (ViaCEP) =====
 
-// normaliza acentos p/ ViaCEP
-// ===== CEP: rota #cep + busca por endereço (ViaCEP) [v2 layout] =====
-function stripDiacritics(s){return String(s||"").normalize("NFD").replace(/\p{Diacritic}/gu,"");}
+  // normaliza acentos p/ ViaCEP
+  // ===== CEP: rota #cep + busca por endereço (ViaCEP) [v2 layout] =====
+  function stripDiacritics(s) { return String(s || "").normalize("NFD").replace(/\p{Diacritic}/gu, ""); }
 
-function mostrarConsultaCEP(){
-  const area = document.querySelector(".content_area");
-  if(!area) return;
+  function mostrarConsultaCEP() {
+    const area = document.querySelector(".content_area");
+    if (!area) return;
 
-  area.innerHTML = `
+    area.innerHTML = `
     <div class="cep-wrap">
       <h2 class="highlighted">Buscar CEP por endereço</h2>
    
@@ -3585,56 +3588,56 @@ function mostrarConsultaCEP(){
     </div>
   `;
 
-  document.getElementById("cepForm").addEventListener("submit",(e)=>{
-    e.preventDefault(); buscarCepPorEndereco();
-  });
+    document.getElementById("cepForm").addEventListener("submit", (e) => {
+      e.preventDefault(); buscarCepPorEndereco();
+    });
 
-  // suporta deep-link: #cep?uf=PR&cidade=Carlópolis&rua=Paraná
-  const params = new URLSearchParams(location.hash.split("?")[1]||"");
-  if(params.get("rua")) document.getElementById("cepRua").value = decodeURIComponent(params.get("rua"));
-  if(params.get("cidade")) document.getElementById("cepCidade").value = decodeURIComponent(params.get("cidade"));
-  if(params.get("uf")) document.getElementById("cepUf").value = params.get("uf").toUpperCase();
-}
+    // suporta deep-link: #cep?uf=PR&cidade=Carlópolis&rua=Paraná
+    const params = new URLSearchParams(location.hash.split("?")[1] || "");
+    if (params.get("rua")) document.getElementById("cepRua").value = decodeURIComponent(params.get("rua"));
+    if (params.get("cidade")) document.getElementById("cepCidade").value = decodeURIComponent(params.get("cidade"));
+    if (params.get("uf")) document.getElementById("cepUf").value = params.get("uf").toUpperCase();
+  }
 
-async function buscarCepPorEndereco(){
-  const btn = document.getElementById("btnBuscarCep");
-  const out = document.getElementById("cepResultados");
-  const stt = document.getElementById("cepStatus");
+  async function buscarCepPorEndereco() {
+    const btn = document.getElementById("btnBuscarCep");
+    const out = document.getElementById("cepResultados");
+    const stt = document.getElementById("cepStatus");
 
-  const uf = (document.getElementById("cepUf").value||"").trim().toUpperCase();
-  let cidade = (document.getElementById("cepCidade").value||"").trim();
-  let rua = (document.getElementById("cepRua").value||"").trim();
+    const uf = (document.getElementById("cepUf").value || "").trim().toUpperCase();
+    let cidade = (document.getElementById("cepCidade").value || "").trim();
+    let rua = (document.getElementById("cepRua").value || "").trim();
 
-  out.innerHTML = "";
-  stt.textContent = "";
+    out.innerHTML = "";
+    stt.textContent = "";
 
-  if(!rua || !cidade || !uf){ stt.textContent = "Preencha UF, cidade e logradouro."; return; }
+    if (!rua || !cidade || !uf) { stt.textContent = "Preencha UF, cidade e logradouro."; return; }
 
-  // skeletons de carregamento
-  out.innerHTML = `<div class="cep-skel"></div><div class="cep-skel"></div><div class="cep-skel"></div>`;
-  btn.disabled = true;
-  stt.textContent = "Buscando…";
+    // skeletons de carregamento
+    out.innerHTML = `<div class="cep-skel"></div><div class="cep-skel"></div><div class="cep-skel"></div>`;
+    btn.disabled = true;
+    stt.textContent = "Buscando…";
 
-  const url = `https://viacep.com.br/ws/${uf}/${encodeURIComponent(stripDiacritics(cidade))}/${encodeURIComponent(stripDiacritics(rua))}/json/`;
+    const url = `https://viacep.com.br/ws/${uf}/${encodeURIComponent(stripDiacritics(cidade))}/${encodeURIComponent(stripDiacritics(rua))}/json/`;
 
-  try{
-    const resp = await fetch(url);
-    const data = await resp.json();
+    try {
+      const resp = await fetch(url);
+      const data = await resp.json();
 
-    btn.disabled = false;
+      btn.disabled = false;
 
-    if(!Array.isArray(data) || !data.length || data?.erro){
-      stt.textContent = "Nenhum CEP encontrado para esse endereço.";
-      out.innerHTML = "";
-      return;
-    }
+      if (!Array.isArray(data) || !data.length || data?.erro) {
+        stt.textContent = "Nenhum CEP encontrado para esse endereço.";
+        out.innerHTML = "";
+        return;
+      }
 
-    stt.textContent = `Encontrados ${data.length} resultado(s).`;
-    out.innerHTML = data.map((it)=>{
-      const cep = it.cep || "—";
-      const addr = `${it.logradouro||"—"}${it.bairro? ", "+it.bairro:""} — ${it.localidade||""}/${it.uf||""}`;
-      const mapQ = encodeURIComponent(`${it.logradouro||""}, ${it.localidade||""} - ${it.uf||""}`);
-      return `
+      stt.textContent = `Encontrados ${data.length} resultado(s).`;
+      out.innerHTML = data.map((it) => {
+        const cep = it.cep || "—";
+        const addr = `${it.logradouro || "—"}${it.bairro ? ", " + it.bairro : ""} — ${it.localidade || ""}/${it.uf || ""}`;
+        const mapQ = encodeURIComponent(`${it.logradouro || ""}, ${it.localidade || ""} - ${it.uf || ""}`);
+        return `
         <div class="cep-card-item">
           <span class="cep-badge">CEP: <b>${cep}</b></span>
           <div class="cep-addr">${addr}</div>
@@ -3646,82 +3649,82 @@ async function buscarCepPorEndereco(){
           </div>
         </div>
       `;
-    }).join("");
+      }).join("");
 
-    // copiar CEP
-    out.querySelectorAll(".cep-copy").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const val = btn.getAttribute("data-cep")||"";
-        navigator.clipboard.writeText(val).then(()=>{
-          stt.textContent = `CEP ${val} copiado.`;
-        }).catch(()=>{ stt.textContent = "Não consegui copiar o CEP."; });
+      // copiar CEP
+      out.querySelectorAll(".cep-copy").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const val = btn.getAttribute("data-cep") || "";
+          navigator.clipboard.writeText(val).then(() => {
+            stt.textContent = `CEP ${val} copiado.`;
+          }).catch(() => { stt.textContent = "Não consegui copiar o CEP."; });
+        });
       });
-    });
 
-  }catch(e){
-    console.error("ViaCEP erro:", e);
-    btn.disabled = false;
-    stt.textContent = "Falha na consulta. Tente novamente.";
+    } catch (e) {
+      console.error("ViaCEP erro:", e);
+      btn.disabled = false;
+      stt.textContent = "Falha na consulta. Tente novamente.";
+      out.innerHTML = "";
+    }
+  }
+
+  // roteador mínimo p/ #cep
+  function rotaCEPIntercept() {
+    const h = (location.hash || "").toLowerCase();
+    if (h.startsWith("#cep")) {
+      document.querySelector(".content_area")?.classList.remove("hidden");
+      mostrarConsultaCEP();
+      return true;
+    }
+    return false;
+  }
+  addEventListener("hashchange", rotaCEPIntercept);
+  addEventListener("DOMContentLoaded", rotaCEPIntercept);
+
+
+  // chama ViaCEP /ws/UF/Cidade/Logradouro/json/
+  async function buscarCepPorEndereco() {
+    const btn = document.getElementById("btnBuscarCep");
+    const out = document.getElementById("cepResultados");
+    const stt = document.getElementById("cepStatus");
+
+    const uf = (document.getElementById("cepUf").value || "").trim().toUpperCase();
+    let cidade = (document.getElementById("cepCidade").value || "").trim();
+    let rua = (document.getElementById("cepRua").value || "").trim();
+
     out.innerHTML = "";
-  }
-}
+    stt.textContent = "";
 
-// roteador mínimo p/ #cep
-function rotaCEPIntercept(){
-  const h = (location.hash||"").toLowerCase();
-  if(h.startsWith("#cep")){
-    document.querySelector(".content_area")?.classList.remove("hidden");
-    mostrarConsultaCEP();
-    return true;
-  }
-  return false;
-}
-addEventListener("hashchange", rotaCEPIntercept);
-addEventListener("DOMContentLoaded", rotaCEPIntercept);
-
-
-// chama ViaCEP /ws/UF/Cidade/Logradouro/json/
-async function buscarCepPorEndereco() {
-  const btn = document.getElementById("btnBuscarCep");
-  const out = document.getElementById("cepResultados");
-  const stt = document.getElementById("cepStatus");
-
-  const uf = (document.getElementById("cepUf").value || "").trim().toUpperCase();
-  let cidade = (document.getElementById("cepCidade").value || "").trim();
-  let rua = (document.getElementById("cepRua").value || "").trim();
-
-  out.innerHTML = "";
-  stt.textContent = "";
-
-  if (!rua || !cidade || !uf) {
-    stt.textContent = "Preencha UF, cidade e logradouro.";
-    return;
-  }
-
-  // ViaCEP não lida bem com acentos; removemos diacríticos
-  const cidadeQuery = encodeURIComponent(stripDiacritics(cidade));
-  const ruaQuery = encodeURIComponent(stripDiacritics(rua));
-  const url = `https://viacep.com.br/ws/${uf}/${cidadeQuery}/${ruaQuery}/json/`;
-
-  btn.disabled = true;
-  stt.textContent = "Buscando…";
-
-  try {
-    const resp = await fetch(url);
-    const data = await resp.json();
-
-    btn.disabled = false;
-
-    if (!Array.isArray(data) || data.length === 0 || data?.erro) {
-      stt.textContent = "Nenhum CEP encontrado para esse endereço.";
+    if (!rua || !cidade || !uf) {
+      stt.textContent = "Preencha UF, cidade e logradouro.";
       return;
     }
 
-    stt.textContent = `Encontrados ${data.length} resultado(s).`;
-    out.innerHTML = data.map((it) => {
-      const endereco = [it.logradouro, it.bairro, it.localidade, it.uf, it.cep].filter(Boolean).join(", ");
-      const mapQ = encodeURIComponent(`${it.logradouro || ""}, ${it.localidade || ""} - ${it.uf || ""}`);
-      return `
+    // ViaCEP não lida bem com acentos; removemos diacríticos
+    const cidadeQuery = encodeURIComponent(stripDiacritics(cidade));
+    const ruaQuery = encodeURIComponent(stripDiacritics(rua));
+    const url = `https://viacep.com.br/ws/${uf}/${cidadeQuery}/${ruaQuery}/json/`;
+
+    btn.disabled = true;
+    stt.textContent = "Buscando…";
+
+    try {
+      const resp = await fetch(url);
+      const data = await resp.json();
+
+      btn.disabled = false;
+
+      if (!Array.isArray(data) || data.length === 0 || data?.erro) {
+        stt.textContent = "Nenhum CEP encontrado para esse endereço.";
+        return;
+      }
+
+      stt.textContent = `Encontrados ${data.length} resultado(s).`;
+      out.innerHTML = data.map((it) => {
+        const endereco = [it.logradouro, it.bairro, it.localidade, it.uf, it.cep].filter(Boolean).join(", ");
+        const mapQ = encodeURIComponent(`${it.logradouro || ""}, ${it.localidade || ""} - ${it.uf || ""}`);
+        return `
         <div class="cep-item">
           <b>${it.cep || "—"}</b>
           ${it.logradouro || "—"}<br>
@@ -3729,67 +3732,67 @@ async function buscarCepPorEndereco() {
           <a class="map-icon" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${mapQ}">Ver no mapa</a>
         </div>
       `;
-    }).join("");
+      }).join("");
 
-  } catch (err) {
-    btn.disabled = false;
-    stt.textContent = "Falha na consulta. Tente novamente.";
-    console.error("ViaCEP erro:", err);
-  }
-}
-
-// roteador mínimo: integra com o seu hash router existente
-function rotaCEPIntercept() {
-  const h = (location.hash || "").toLowerCase();
-  if (h.startsWith("#cep")) {
-    // garante que a área de conteúdo apareça quando for sublink
-    document.querySelector(".content_area")?.classList.remove("hidden");
-    mostrarConsultaCEP();
-    return true;
-  }
-  return false;
-}
-
-// liga o roteador para #cep sem brigar com o restante
-window.addEventListener("hashchange", () => { rotaCEPIntercept(); });
-document.addEventListener("DOMContentLoaded", () => {
-  // se o usuário entrar direto em #cep
-  rotaCEPIntercept();
-});
-
-
-
-// Função da busca
-function buscarCEP() {
-  const cep = document.getElementById("cepInput").value.replace(/\D/g, "");
-  const resultado = document.getElementById("resultadoCEP");
-
-  if (cep.length !== 8) {
-    resultado.innerHTML = "<p style='color:red'>❌ CEP inválido. Digite 8 números.</p>";
-    return;
+    } catch (err) {
+      btn.disabled = false;
+      stt.textContent = "Falha na consulta. Tente novamente.";
+      console.error("ViaCEP erro:", err);
+    }
   }
 
-  resultado.innerHTML = "<p>🔎 Buscando informações...</p>";
+  // roteador mínimo: integra com o seu hash router existente
+  function rotaCEPIntercept() {
+    const h = (location.hash || "").toLowerCase();
+    if (h.startsWith("#cep")) {
+      // garante que a área de conteúdo apareça quando for sublink
+      document.querySelector(".content_area")?.classList.remove("hidden");
+      mostrarConsultaCEP();
+      return true;
+    }
+    return false;
+  }
 
-  fetch(`https://viacep.com.br/ws/${cep}/json/`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.erro) {
-        resultado.innerHTML = "<p style='color:red'>⚠️ CEP não encontrado.</p>";
-      } else {
-        resultado.innerHTML = `
+  // liga o roteador para #cep sem brigar com o restante
+  window.addEventListener("hashchange", () => { rotaCEPIntercept(); });
+  document.addEventListener("DOMContentLoaded", () => {
+    // se o usuário entrar direto em #cep
+    rotaCEPIntercept();
+  });
+
+
+
+  // Função da busca
+  function buscarCEP() {
+    const cep = document.getElementById("cepInput").value.replace(/\D/g, "");
+    const resultado = document.getElementById("resultadoCEP");
+
+    if (cep.length !== 8) {
+      resultado.innerHTML = "<p style='color:red'>❌ CEP inválido. Digite 8 números.</p>";
+      return;
+    }
+
+    resultado.innerHTML = "<p>🔎 Buscando informações...</p>";
+
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.erro) {
+          resultado.innerHTML = "<p style='color:red'>⚠️ CEP não encontrado.</p>";
+        } else {
+          resultado.innerHTML = `
           <p><b>Logradouro:</b> ${data.logradouro || '-'}</p>
           <p><b>Bairro:</b> ${data.bairro || '-'}</p>
           <p><b>Cidade:</b> ${data.localidade || '-'}</p>
           <p><b>Estado:</b> ${data.uf || '-'}</p>
           <p><b>IBGE:</b> ${data.ibge || '-'}</p>
         `;
-      }
-    })
-    .catch(() => {
-      resultado.innerHTML = "<p style='color:red'>⚠️ Erro ao consultar o CEP.</p>";
-    });
-}
+        }
+      })
+      .catch(() => {
+        resultado.innerHTML = "<p style='color:red'>⚠️ Erro ao consultar o CEP.</p>";
+      });
+  }
 
 
 
@@ -13176,8 +13179,8 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#jogos") { return mostrarJogos(); }
     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
-     if (h === "#menuConsultaCEP") { return buscarCepPorEndereco(); }
-    
+    if (h === "#cep") { return mostrarConsultaCEP(); }
+
 
     // categorias de "Comércios"
     const m = h.match(/^#comercios-(.+)$/);
