@@ -2975,7 +2975,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     {
       id: "imv2",
       tipo: "aluguel",
-   //   status: "Disponivel",
+      //   status: "Disponivel",
       titulo: "Apartamento Jardim Primavera",
       endereco: "Av. Brasil, 1234 - Jardim Primavera",
       lat: -23.3979,
@@ -2996,6 +2996,34 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quintal: "Sim",
       corretores: ["Cezar Melo - 38.105 F", "João Souza", "Ana Lima"],
       construcao: 68,           // << NOVO
+    },
+
+    {
+      id: "ter1",
+      tipo: "venda",     
+      titulo: "Terreno Esquina - Loteamento Amaral",
+      endereco: "Residencial Amaral ll",      
+      area: 308,
+      valor: 120000,
+      telefone: "11 99898-5930",
+      imagens: ["images/imoveis/cesar/venda/terreno/1.jpg", "images/imoveis/cesar/venda/terreno/2.jpg"],
+      descricao: "Terreno de esquina Comercial / Residencial com ótima vista para represa<br>Loteamento com rampa náutica",    
+      corretores: ["Cezar Melo - 38.105 F"],
+     
+    },
+
+      {
+      id: "ter2",
+      tipo: "venda",     
+      titulo: "Terreno - Novo horizonte 1",
+      endereco: "Novo horizonte 1",      
+      area: 180,
+      valor: 65000,
+      telefone: "11 99898-5930",
+      imagens: ["images/imoveis/cesar/venda/terreno/3.jpg", ],
+      descricao: "Terreno Residencial",    
+      corretores: ["Cezar Melo - 38.105 F"],
+     
     }
   ];
 
@@ -3260,66 +3288,86 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     });
 
     // permitir abrir a galeria clicando na imagem ou no botão de lupa
-el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb").forEach(node => {
-  node.addEventListener("click", (ev) => {
-    ev.stopPropagation(); // evita acionar o click do card (mapa)
-    const card = ev.currentTarget.closest(".card-imovel");
-    const id = card?.getAttribute("data-id") || ev.currentTarget.getAttribute("data-id");
-    if (!id) return;
-    const im = stateImoveis.all.find(x => x.id === id);
-    if (im) abrirModalImoveis(im);
-  });
-});
+    el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb").forEach(node => {
+      node.addEventListener("click", (ev) => {
+        ev.stopPropagation(); // evita acionar o click do card (mapa)
+        const card = ev.currentTarget.closest(".card-imovel");
+        const id = card?.getAttribute("data-id") || ev.currentTarget.getAttribute("data-id");
+        if (!id) return;
+        const im = stateImoveis.all.find(x => x.id === id);
+        if (im) abrirModalImoveis(im);
+      });
+    });
 
-  }
+  }function isTerreno(im) {
+  const t = String(im.procura || im.tipoImovel || im.categoria || "").toLowerCase();
+  const noTitulo = String(im.titulo || "").toLowerCase().includes("terreno");
+  return t === "terreno" || noTitulo;
+}
+function hasNum(v){ return Number.isFinite(Number(v)) && Number(v) > 0; }
 
-  function cardImovelHTML(im) {
-    const tag = im.tipo; // venda | aluguel
-    const st = (im.status || "").toLowerCase();
-    const precoFmt = im.tipo === "aluguel"
-      ? `R$ ${Number(im.valor).toLocaleString()} / mês`
-      : `R$ ${Number(im.valor).toLocaleString()}`;
-    const responsavel = nomeResponsavel(im); // << NOVO
+function renderChips(im){
+  const terr = isTerreno(im);
+  const chips = [];
 
-    return `
-  <article class="card-imovel" data-id="${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
+  // Para casas/apês (não mostra em terreno se não fizer sentido)
+  if (!terr && hasNum(im.quartos))   chips.push(`<div class="spec-chip"><span class="k">Quartos</span><span class="v">${im.quartos}</span></div>`);
+  if (!terr && im.suite)             chips.push(`<div class="spec-chip chip-mini"><span class="k">Suíte</span><span class="v">Sim</span></div>`);
+  if (!terr && hasNum(im.banheiros)) chips.push(`<div class="spec-chip"><span class="k">Banheiros</span><span class="v">${im.banheiros}</span></div>`);
+  if (!terr && hasNum(im.vagas))     chips.push(`<div class="spec-chip"><span class="k">Vagas</span><span class="v">${im.vagas}</span></div>`);
+  if (!terr && hasNum(im.salas))     chips.push(`<div class="spec-chip"><span class="k">Salas</span><span class="v">${im.salas}</span></div>`);
+  if (!terr && hasNum(im.cozinhas))  chips.push(`<div class="spec-chip"><span class="k">Cozinhas</span><span class="v">${im.cozinhas}</span></div>`);
+
+  // Área (relevante para qualquer imóvel, inclusive terreno)
+  if (hasNum(im.area)) chips.push(`<div class="spec-chip"><span class="k">Área</span><span class="v">${Number(im.area)} m²</span></div>`);
+
+  // Construção (normalmente não para terreno)
+  if (!terr && hasNum(im.construcao)) chips.push(`<div class="spec-chip"><span class="k">Construção</span><span class="v">${Number(im.construcao)} m²</span></div>`);
+
+  return chips.join("");
+}
+
+
+ function cardImovelHTML(im) {
+  const tag = im.tipo; // "venda" | "aluguel"
+  const st = (im.status || "").toLowerCase();
+  const precoFmt = im.tipo === "aluguel"
+    ? `R$ ${Number(im.valor).toLocaleString()} / mês`
+    : `R$ ${Number(im.valor).toLocaleString()}`;
+  const responsavel = nomeResponsavel(im);
+
+  return `
+  <article class="card-imovel ${tag}" data-id="${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
     <div class="card-top">
       <div class="swiper swiper-imovel-mini">
         <div class="swiper-wrapper">
           ${im.imagens.map(src => `<div class="swiper-slide"><img src="${src}" alt="${im.titulo}"></div>`).join("")}
         </div>
       </div>
+
       <button class="zoom-thumb" data-id="${im.id}" title="Ampliar">
-  <i class="fa-solid fa-magnifying-glass"></i>
-</button>
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+
       <span class="tag ${tag}">${tag.toUpperCase()}</span>
+
+      <!-- Selo de preço no topo-direito -->
+      <div class="price-pill ${tag}">
+        ${im.tipo === "aluguel"
+          ? `R$ ${Number(im.valor).toLocaleString()} <span class="pill-sub">/ mês</span>`
+          : `R$ ${Number(im.valor).toLocaleString()}`
+        }
+      </div>
     </div>
 
     <div class="card-body">
       <div class="card-title">${im.titulo}</div>
+      ${im.descricao ? `<div class="descricao" style="margin-top:8px">${im.descricao}</div>` : ""}
       <div class="card-addr"><i class="fa-solid fa-map-pin"></i> ${im.endereco}</div>
 
-      <!-- Chips compactos, harmoniosos -->
-      <div class="specs-chips">
-      
-        <div class="spec-chip"><span class="k">Quartos</span><span class="v">${im.quartos ?? "-"}</span></div>
-        ${im.suite ? `<div class="spec-chip chip-mini"><span class="k">Suíte</span><span class="v">${boolStr(!!im.suite)}</span></div>` : ``}
-        <div class="spec-chip"><span class="k">Banheiros</span><span class="v">${im.banheiros ?? "-"}</span></div>
-        <div class="spec-chip"><span class="k">Vagas</span><span class="v">${im.vagas ?? "-"}</span></div>
+      <div class="specs-chips">${renderChips(im)}</div>
 
-        <div class="spec-chip"><span class="k">Salas</span><span class="v">${im.salas ?? "-"}</span></div>
-        <div class="spec-chip"><span class="k">Cozinhas</span><span class="v">${im.cozinhas ?? "-"}</span></div>
-        <div class="spec-chip"><span class="k">Área</span><span class="v">${m2(im.area)}</span></div>
-
-        <div class="spec-chip chip-mini"><span class="k">Piscina</span><span class="v">${boolStr(!!im.piscina)}</span></div>
-        <div class="spec-chip chip-mini"><span class="k">Área de lazer</span><span class="v">${boolStr(!!im.churrasqueira)}</span></div>
-        <div class="spec-chip chip-mini"><span class="k">Quintal</span><span class="v">${boolStr(!!im.quintal)}</span></div>
-        <div class="spec-chip"><span class="k">Construção</span><span class="v">${m2(im.construcao)}</span></div>
-      </div>
-
-        
- 
-      </div>
+      <!-- Faixa de baixo (vamos ocultar só em venda via CSS) -->
       <div class="price-line" style="margin-top:12px">
         <div class="price">${precoFmt}</div>
         <div class="badges">
@@ -3327,37 +3375,31 @@ el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-th
         </div>
       </div>
 
-      ${im.descricao ? `<div class="descricao" style="margin-top:8px">${im.descricao}</div>` : ""}
-
       <div class="card-actions">
         <button class="btn-whats" data-action="whats" data-id="${im.id}">
           <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
         </button>
-        
-       
       </div>
- <div><br>
-            ${responsavel ? `<div class="spec-chip chip-mini"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}</div>
-
-      
-       
+<Br>
+      ${responsavel ? `<div class="spec-chip chip-mini"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
     </div>
   </article>`;
-  }
+}
+
 
 
 
 
   // ---------- Modal (galeria full) ----------
-function abrirModalImoveis(im) {
-  // Remove qualquer modal aberto antes
-  const existente = document.querySelector(".im-modal");
-  if (existente) existente.remove();
+  function abrirModalImoveis(im) {
+    // Remove qualquer modal aberto antes
+    const existente = document.querySelector(".im-modal");
+    if (existente) existente.remove();
 
-  // Cria e injeta o modal
-  const modal = document.createElement("div");
-  modal.className = "im-modal";
-  modal.innerHTML = `
+    // Cria e injeta o modal
+    const modal = document.createElement("div");
+    modal.className = "im-modal";
+    modal.innerHTML = `
     <div class="im-modal-content">
       <button class="btn-fechar-modal" title="Fechar">&times;</button>
       <div class="swiper swiper-imovel-full">
@@ -3369,36 +3411,36 @@ function abrirModalImoveis(im) {
         <div class="swiper-pagination"></div>
       </div>
     </div>`;
-  document.body.appendChild(modal);
+    document.body.appendChild(modal);
 
-  // Swiper
-  new Swiper(".swiper-imovel-full", {
-    loop: true,
-    pagination: { el: ".swiper-pagination" },
-    autoplay: { delay: 3000 },
-  });
+    // Swiper
+    new Swiper(".swiper-imovel-full", {
+      loop: true,
+      pagination: { el: ".swiper-pagination" },
+      autoplay: { delay: 3000 },
+    });
 
-  // Fechamentos centralizados
-  function cleanup() {
-  document.removeEventListener("keydown", onEsc);
-  modal.remove();
-}
-function onEsc(e){ if (e.key === "Escape") cleanup(); }
-document.addEventListener("keydown", onEsc);
+    // Fechamentos centralizados
+    function cleanup() {
+      document.removeEventListener("keydown", onEsc);
+      modal.remove();
+    }
+    function onEsc(e) { if (e.key === "Escape") cleanup(); }
+    document.addEventListener("keydown", onEsc);
 
-// fechar no botão × (se existir)
-const btnX = modal.querySelector(".btn-fechar-modal");
-if (btnX) btnX.addEventListener("click", cleanup);
+    // fechar no botão × (se existir)
+    const btnX = modal.querySelector(".btn-fechar-modal");
+    if (btnX) btnX.addEventListener("click", cleanup);
 
-// fechar quando clicar FORA do conteúdo
-modal.addEventListener("click", (e) => {
-  const content = modal.querySelector(".im-modal");
-  if (!content || !content.contains(e.target)) {
-    cleanup();
+    // fechar quando clicar FORA do conteúdo
+    modal.addEventListener("click", (e) => {
+      const content = modal.querySelector(".im-modal");
+      if (!content || !content.contains(e.target)) {
+        cleanup();
+      }
+    });
+
   }
-});
-
-}
 
 
   function fecharModalImoveis() {

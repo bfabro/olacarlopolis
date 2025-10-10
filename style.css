@@ -6261,7 +6261,7 @@ html {
 }
 
 .btn-whats {
-  background: #25D366;
+  background: #217942;
   color: #fff;
 }
 
@@ -6871,3 +6871,174 @@ html {
   margin: 0 !important;
   cursor: zoom-out;
 }
+/* Some com o bloco se não houver chips */
+.specs-chips:empty { display: none; }
+
+
+/* ===== IMÓVEIS: Título aprimorado para itens à venda ===== */
+.im-card { 
+  border: 1px solid #e8e8e8; 
+  border-radius: 14px; 
+  padding: 12px; 
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  margin-bottom: 16px;
+}
+
+.im-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.im-badge {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #ff7a00, #ffb84d);
+  color: #111;
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+.im-title {
+  display: grid;
+  gap: 4px;
+}
+
+.im-name {
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 800;
+  margin: 0;
+  color: #1f2937; /* cinza-900 */
+}
+
+.im-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0b7a2a; /* verde mais sóbrio */
+}
+
+.im-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.im-chip {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f3f4f6;   /* cinza claro */
+  color: #374151;        /* cinza-700 */
+  border: 1px solid #e5e7eb;
+}
+
+/* Opcional: se ainda existir a classe antiga em uso, neutraliza o verde */
+.locais_nomes {
+  color: #1f2937 !important;
+  text-shadow: none !important;
+  border: 0 !important;
+  padding-bottom: 0 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+/* === Selo de preço no topo da imagem === */
+.price-pill {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 1;
+  backdrop-filter: blur(2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.18);
+}
+
+.price-pill.venda {
+  background: linear-gradient(135deg, #1f6feb, #0ea5e9);
+}
+
+.price-pill.aluguel {
+  background: linear-gradient(135deg, #8e44ad, #a855f7);
+}
+
+.price-pill .pill-sub {
+  font-weight: 600;
+  opacity: 0.95;
+  font-size: 12px;
+}
+
+/* Opcional: para VENDA, esconda a linha inferior de preço,
+   já que o selo no topo cumpre o papel de destaque */
+.tag.venda ~ .price-pill.venda + * {}
+.card-imovel.venda .price-line { display: none; }
+
+/* Versão “mobile friendly” do selo */
+@media (max-width: 560px) {
+  .price-pill {
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 10px;
+  }
+  .price-pill .pill-sub {
+    font-size: 11px;
+  }
+}
+
+/* Caso queira reforçar o peso visual do preço na linha (se mantiver) */
+.price-line { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-top: 6px;
+}
+.price-line .price { 
+  font-weight: 800; 
+  font-size: 18px; 
+}
+/* === Selo de preço no canto superior esquerdo === */
+/* === PREÇO COMPACTO NO CANTO SUPERIOR ESQUERDO === */
+.card-top { position: relative; } /* garante referência para o absolute */
+
+.price-pill {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: auto;            /* não deixar encostar do lado direito */
+  display: inline-block;  /* ocupa só o conteúdo */
+  width: auto;            /* não estica */
+  white-space: nowrap;    /* tudo numa linha */
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 15px;
+  color: #fff;
+  z-index: 3;
+  pointer-events: none;   /* não atrapalha cliques na imagem/lupa */
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+  backdrop-filter: blur(2px);
+}
+
+.price-pill .pill-sub {
+  font-weight: 600;
+  font-size: 12px;
+  opacity: .9;
+}
+
+.price-pill.venda   { background: linear-gradient(135deg, #1f6feb, #0ea5e9); }
+.price-pill.aluguel { background: linear-gradient(135deg, #8e44ad, #a855f7); }
+
+/* se quiser mostrar SOMENTE o selo (sem a faixa de baixo) */
+.card-imovel.venda .price-line,
+.card-imovel.aluguel .price-line { display: none; }
