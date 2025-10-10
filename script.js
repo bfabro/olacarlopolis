@@ -13176,6 +13176,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#jogos") { return mostrarJogos(); }
     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
+     if (h === "#menuConsultaCEP") { return buscarCepPorEndereco(); }
     
 
     // categorias de "Comércios"
