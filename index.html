@@ -51,28 +51,33 @@
    <link rel="manifest" href="manifest.json">
 
    <!-- Splash screen customizada -->
-<style>
-  #customSplash {
-    position: fixed;
-    top: 0; left: 0;
-      width: 100%;
-    height: 100%;
-    background-color: #000; /* mesma cor do manifest */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-  #customSplash img {
-  width: 99%;
-    height: 99%;
-    object-fit: cover; /* cobre toda a tela */
-  }
-    #customSplash.sai {
-    opacity: 0;
-    transition: opacity .6s ease;
-  }
-</style>
+   <style>
+      #customSplash {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background-color: #000;
+         /* mesma cor do manifest */
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         z-index: 9999;
+      }
+
+      #customSplash img {
+         width: 99%;
+         height: 99%;
+         object-fit: cover;
+         /* cobre toda a tela */
+      }
+
+      #customSplash.sai {
+         opacity: 0;
+         transition: opacity .6s ease;
+      }
+   </style>
 
 
    <meta name="theme-color" content="#4070f4">
@@ -85,7 +90,7 @@
    <link rel="icon" type="image/png" sizes="192x192" href="images/img_padrao_site/icon-192_2.png">
    <link rel="apple-touch-icon" href="images/img_padrao_site/icon-512_2.png">
 
-   
+
    <!-- Nome do app (usado como nome do ícone) -->
    <meta name="apple-mobile-web-app-title" content="Olá Carlópolis">
 
@@ -140,7 +145,7 @@
 </head>
 
 <body>
-<!--   <div id="customSplash">
+   <!--   <div id="customSplash">
   <img src="images/img_padrao_site/splashscreen.jpg" alt="Olá Carlópolis">
 </div>-->
    <div id="loader" class="loader-overlay">
@@ -205,8 +210,8 @@
 
                   </a>
                </li>
-              
-<li class="separadorr"></li>
+
+               <li class="separadorr"></li>
 
 
                <li class="item">
@@ -1034,19 +1039,25 @@
                         </span>
                         <span class="navlink">Coleta de Lixo</span>
                      </a>
+                     <a id="menuConsultaCEP" href="#" class="nav_link sublink">
+                        <span class="navlink_icon">
+                           <i style="color:#f7cb3a"  class="fa-solid fa-map-location-dot"></i>
+                        </span>
+                        <span class="navlink">Consulta CEP</span>
+                     </a>
                      <a id="menuEventos" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(44, 192, 180)"
                               class="fa-regular fa-calendar-days"></i></span>
                         <span class="navlink">Eventos</span>
                      </a>
 
-                      <a id="menuGruposWhats" href="#" class="nav_link sublink">
+                     <a id="menuGruposWhats" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(55, 189, 17)"
                               class="fa-brands fa-whatsapp"></i></span>
                         <span class="navlink">Grupos WhatsApp</span>
                      </a>
 
-               
+
 
                      <!--
                      <a id="menuFarmaciaPlantao" href="#" class="nav_link sublink">
@@ -1087,7 +1098,7 @@
                   </ul>
                </li>
 
-                <li class="separadorr"></li>
+               <li class="separadorr"></li>
                <li class="item">
 
                <li class="item">
@@ -1103,7 +1114,7 @@
                   </span>
                   <span class="navlink bold">Promoções</span>
                </a>
-<!-- 
+               <!-- 
                <a id="menuImoveis" href="#" class="nav_link">
   <span class="navlink_icon"><i style="color:#2E8B57" class="fa-solid fa-house-chimney"></i></span>
   <span class="navlink bold">Imóveis</span>
@@ -1112,14 +1123,14 @@
 
                </li>
                <li class="separadorr"></li>
-<li class="item">
-  <a id="menuJogos" href="#" class="nav_link">
-    <span class="navlink_icon">
-      <i class="fa-solid fa-gamepad" style="color:#6a5acd"></i>
-    </span>
-    <span class="navlink bold">Jogos</span>
-  </a>
-</li>
+               <li class="item">
+                  <a id="menuJogos" href="#" class="nav_link">
+                     <span class="navlink_icon">
+                        <i class="fa-solid fa-gamepad" style="color:#6a5acd"></i>
+                     </span>
+                     <span class="navlink bold">Jogos</span>
+                  </a>
+               </li>
 
             </ul>
             <!-- end -->
@@ -1595,7 +1606,7 @@
 
 -->
 
- <!--  
+   <!--  
 <script>
   window.addEventListener("load", () => {
     const splash = document.getElementById("customSplash");
@@ -1610,7 +1621,7 @@
 -->
 
 
-   <!--  -->
+   <!--  
 
    <script>
       // Bloqueia Ctrl+U (ver código-fonte)
@@ -1637,7 +1648,7 @@
       });
    </script>
 
-
+-->
 
 
 

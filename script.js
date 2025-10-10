@@ -3517,6 +3517,279 @@ function renderChips(im){
   if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
 
+function mostrarConsultaCEP() {
+  location.hash = "#consulta-cep";
+
+  const area = document.querySelector(".content_area");
+  area.innerHTML = `
+    <div class="page-header">
+      <h2 >📍 Buscar CEP por Endereço</h2>
+      <i class="fa-solid fa-share-nodes share-btn"
+         onclick="compartilharPagina('#consulta-cep','Consulta CEP','Descubra o CEP de qualquer rua em Carlópolis!')"></i>
+    </div>
+
+    <div class="cep-container">
+      <p>Digite o endereço abaixo (rua, cidade e estado):</p>
+      <input type="text" id="logradouro" placeholder="Rua / Avenida" />
+      <input type="text" id="cidade" placeholder="Cidade" value="Carlópolis" />
+      <input type="text" id="uf" placeholder="UF" maxlength="2" value="PR" />
+      <button onclick="buscarCEPPorEndereco()">Buscar CEP</button>
+      <div id="resultadoCEP" class="cep-resultado"></div>
+    </div>
+  `;
+}
+
+// Função que consulta a API ViaCEP
+// ===== CEP: rota #cep + busca por endereço (ViaCEP) =====
+
+// normaliza acentos p/ ViaCEP
+// ===== CEP: rota #cep + busca por endereço (ViaCEP) [v2 layout] =====
+function stripDiacritics(s){return String(s||"").normalize("NFD").replace(/\p{Diacritic}/gu,"");}
+
+function mostrarConsultaCEP(){
+  const area = document.querySelector(".content_area");
+  if(!area) return;
+
+  area.innerHTML = `
+    <div class="cep-wrap">
+      <h2 class="highlighted">Buscar CEP por endereço</h2>
+   
+      <div class="cep-card">
+       
+
+        <form class="cep-form" id="cepForm">
+          <div class="cep-field">
+            <label class="cep-label">UF</label>
+            <select id="cepUf" class="cep-select">
+              <option value="PR" selected>PR</option><option>SP</option><option>RJ</option><option>MG</option><option>SC</option><option>RS</option>
+            </select>
+            <i class="bx bx-buildings cep-ico"></i>
+          </div>
+          <div class="cep-field">
+            <label class="cep-label">Cidade</label>
+            <input id="cepCidade" class="cep-input" type="text" placeholder="Ex.: Carlópolis" value="Carlópolis">
+            <i class="bx bx-current-location cep-ico"></i>
+          </div>
+          <div class="cep-field">
+            <label class="cep-label">Endereço</label>
+            <input id="cepRua" class="cep-input" type="text" placeholder="Ex.: Rua Paraná">
+            <i class="bx bx-road cep-ico"></i>
+          </div>
+          <button id="btnBuscarCep" class="cep-btn" type="submit"><i class="bx bx-search"></i>&nbsp;Buscar CEP</button>
+        </form>
+
+        <div class="cep-tips">Dica: quanto mais específico o logradouro (ex.: “Av. Paraná, Centro”), melhores os resultados.</div>
+        <div id="cepStatus" class="cep-status"></div>
+        <div id="cepResultados" class="cep-results"></div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("cepForm").addEventListener("submit",(e)=>{
+    e.preventDefault(); buscarCepPorEndereco();
+  });
+
+  // suporta deep-link: #cep?uf=PR&cidade=Carlópolis&rua=Paraná
+  const params = new URLSearchParams(location.hash.split("?")[1]||"");
+  if(params.get("rua")) document.getElementById("cepRua").value = decodeURIComponent(params.get("rua"));
+  if(params.get("cidade")) document.getElementById("cepCidade").value = decodeURIComponent(params.get("cidade"));
+  if(params.get("uf")) document.getElementById("cepUf").value = params.get("uf").toUpperCase();
+}
+
+async function buscarCepPorEndereco(){
+  const btn = document.getElementById("btnBuscarCep");
+  const out = document.getElementById("cepResultados");
+  const stt = document.getElementById("cepStatus");
+
+  const uf = (document.getElementById("cepUf").value||"").trim().toUpperCase();
+  let cidade = (document.getElementById("cepCidade").value||"").trim();
+  let rua = (document.getElementById("cepRua").value||"").trim();
+
+  out.innerHTML = "";
+  stt.textContent = "";
+
+  if(!rua || !cidade || !uf){ stt.textContent = "Preencha UF, cidade e logradouro."; return; }
+
+  // skeletons de carregamento
+  out.innerHTML = `<div class="cep-skel"></div><div class="cep-skel"></div><div class="cep-skel"></div>`;
+  btn.disabled = true;
+  stt.textContent = "Buscando…";
+
+  const url = `https://viacep.com.br/ws/${uf}/${encodeURIComponent(stripDiacritics(cidade))}/${encodeURIComponent(stripDiacritics(rua))}/json/`;
+
+  try{
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    btn.disabled = false;
+
+    if(!Array.isArray(data) || !data.length || data?.erro){
+      stt.textContent = "Nenhum CEP encontrado para esse endereço.";
+      out.innerHTML = "";
+      return;
+    }
+
+    stt.textContent = `Encontrados ${data.length} resultado(s).`;
+    out.innerHTML = data.map((it)=>{
+      const cep = it.cep || "—";
+      const addr = `${it.logradouro||"—"}${it.bairro? ", "+it.bairro:""} — ${it.localidade||""}/${it.uf||""}`;
+      const mapQ = encodeURIComponent(`${it.logradouro||""}, ${it.localidade||""} - ${it.uf||""}`);
+      return `
+        <div class="cep-card-item">
+          <span class="cep-badge">CEP: <b>${cep}</b></span>
+          <div class="cep-addr">${addr}</div>
+          <div class="cep-actions">
+            <button class="cep-copy" data-cep="${cep}" type="button"><i class="bx bx-copy"></i> Copiar CEP</button>
+            <a class="cep-map" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${mapQ}">
+              <i class="bx bx-map"></i> Ver no mapa
+            </a>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    // copiar CEP
+    out.querySelectorAll(".cep-copy").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const val = btn.getAttribute("data-cep")||"";
+        navigator.clipboard.writeText(val).then(()=>{
+          stt.textContent = `CEP ${val} copiado.`;
+        }).catch(()=>{ stt.textContent = "Não consegui copiar o CEP."; });
+      });
+    });
+
+  }catch(e){
+    console.error("ViaCEP erro:", e);
+    btn.disabled = false;
+    stt.textContent = "Falha na consulta. Tente novamente.";
+    out.innerHTML = "";
+  }
+}
+
+// roteador mínimo p/ #cep
+function rotaCEPIntercept(){
+  const h = (location.hash||"").toLowerCase();
+  if(h.startsWith("#cep")){
+    document.querySelector(".content_area")?.classList.remove("hidden");
+    mostrarConsultaCEP();
+    return true;
+  }
+  return false;
+}
+addEventListener("hashchange", rotaCEPIntercept);
+addEventListener("DOMContentLoaded", rotaCEPIntercept);
+
+
+// chama ViaCEP /ws/UF/Cidade/Logradouro/json/
+async function buscarCepPorEndereco() {
+  const btn = document.getElementById("btnBuscarCep");
+  const out = document.getElementById("cepResultados");
+  const stt = document.getElementById("cepStatus");
+
+  const uf = (document.getElementById("cepUf").value || "").trim().toUpperCase();
+  let cidade = (document.getElementById("cepCidade").value || "").trim();
+  let rua = (document.getElementById("cepRua").value || "").trim();
+
+  out.innerHTML = "";
+  stt.textContent = "";
+
+  if (!rua || !cidade || !uf) {
+    stt.textContent = "Preencha UF, cidade e logradouro.";
+    return;
+  }
+
+  // ViaCEP não lida bem com acentos; removemos diacríticos
+  const cidadeQuery = encodeURIComponent(stripDiacritics(cidade));
+  const ruaQuery = encodeURIComponent(stripDiacritics(rua));
+  const url = `https://viacep.com.br/ws/${uf}/${cidadeQuery}/${ruaQuery}/json/`;
+
+  btn.disabled = true;
+  stt.textContent = "Buscando…";
+
+  try {
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    btn.disabled = false;
+
+    if (!Array.isArray(data) || data.length === 0 || data?.erro) {
+      stt.textContent = "Nenhum CEP encontrado para esse endereço.";
+      return;
+    }
+
+    stt.textContent = `Encontrados ${data.length} resultado(s).`;
+    out.innerHTML = data.map((it) => {
+      const endereco = [it.logradouro, it.bairro, it.localidade, it.uf, it.cep].filter(Boolean).join(", ");
+      const mapQ = encodeURIComponent(`${it.logradouro || ""}, ${it.localidade || ""} - ${it.uf || ""}`);
+      return `
+        <div class="cep-item">
+          <b>${it.cep || "—"}</b>
+          ${it.logradouro || "—"}<br>
+          ${it.bairro || "—"} — ${it.localidade || ""}/${it.uf || ""}<br>
+          <a class="map-icon" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${mapQ}">Ver no mapa</a>
+        </div>
+      `;
+    }).join("");
+
+  } catch (err) {
+    btn.disabled = false;
+    stt.textContent = "Falha na consulta. Tente novamente.";
+    console.error("ViaCEP erro:", err);
+  }
+}
+
+// roteador mínimo: integra com o seu hash router existente
+function rotaCEPIntercept() {
+  const h = (location.hash || "").toLowerCase();
+  if (h.startsWith("#cep")) {
+    // garante que a área de conteúdo apareça quando for sublink
+    document.querySelector(".content_area")?.classList.remove("hidden");
+    mostrarConsultaCEP();
+    return true;
+  }
+  return false;
+}
+
+// liga o roteador para #cep sem brigar com o restante
+window.addEventListener("hashchange", () => { rotaCEPIntercept(); });
+document.addEventListener("DOMContentLoaded", () => {
+  // se o usuário entrar direto em #cep
+  rotaCEPIntercept();
+});
+
+
+
+// Função da busca
+function buscarCEP() {
+  const cep = document.getElementById("cepInput").value.replace(/\D/g, "");
+  const resultado = document.getElementById("resultadoCEP");
+
+  if (cep.length !== 8) {
+    resultado.innerHTML = "<p style='color:red'>❌ CEP inválido. Digite 8 números.</p>";
+    return;
+  }
+
+  resultado.innerHTML = "<p>🔎 Buscando informações...</p>";
+
+  fetch(`https://viacep.com.br/ws/${cep}/json/`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.erro) {
+        resultado.innerHTML = "<p style='color:red'>⚠️ CEP não encontrado.</p>";
+      } else {
+        resultado.innerHTML = `
+          <p><b>Logradouro:</b> ${data.logradouro || '-'}</p>
+          <p><b>Bairro:</b> ${data.bairro || '-'}</p>
+          <p><b>Cidade:</b> ${data.localidade || '-'}</p>
+          <p><b>Estado:</b> ${data.uf || '-'}</p>
+          <p><b>IBGE:</b> ${data.ibge || '-'}</p>
+        `;
+      }
+    })
+    .catch(() => {
+      resultado.innerHTML = "<p style='color:red'>⚠️ Erro ao consultar o CEP.</p>";
+    });
+}
 
 
 
@@ -11938,6 +12211,8 @@ function renderChips(im){
     mostrarPromocoes();
   });
 
+  document.getElementById("menuConsultaCEP").addEventListener("click", mostrarConsultaCEP);
+
   const menuPrevisaoTempo = document.getElementById("menuPrevisaoTempo");
 
   if (menuPrevisaoTempo) {
@@ -12901,6 +13176,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#jogos") { return mostrarJogos(); }
     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
+    
 
     // categorias de "Comércios"
     const m = h.match(/^#comercios-(.+)$/);
