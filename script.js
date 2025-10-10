@@ -3349,20 +3349,53 @@ el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-th
 
 
   // ---------- Modal (galeria full) ----------
-  function abrirModalImoveis(im) {
-    if (!im) return;
-    const modal = document.getElementById("imModal");
-    const title = document.getElementById("imModalTitle");
-    const slides = document.getElementById("imModalSlides");
-    title.textContent = im.titulo;
-    slides.innerHTML = im.imagens.map(src => `<div class="swiper-slide"><img src="${src}"/></div>`).join("");
-    modal.classList.add("open");
-    // inicia/renova swiper
-    setTimeout(() => new Swiper(".swiper-imovel-full", { loop: true }), 0);
+function abrirModalImoveis(im) {
+  // Remove qualquer modal aberto antes
+  const existente = document.querySelector(".im-modal");
+  if (existente) existente.remove();
 
-    // atalhos teclado
-    document.addEventListener("keydown", escFecharModal);
-  }
+  // Cria o container principal do modal
+  const modal = document.createElement("div");
+  modal.className = "im-modal";
+
+  // Cria o conteúdo do modal
+  modal.innerHTML = `
+    <div class="im-modal-content">
+      <button class="btn-fechar-modal" title="Fechar">&times;</button>
+      <div class="swiper swiper-imovel-full">
+        <div class="swiper-wrapper">
+          ${im.imagens.map(src => `
+            <div class="swiper-slide">
+              <img src="${src}" alt="${im.titulo || ''}">
+            </div>
+          `).join("")}
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+  `;
+
+  // Adiciona o modal na página
+  document.body.appendChild(modal);
+
+  // Inicia o Swiper (carrossel de imagens)
+  new Swiper(".swiper-imovel-full", {
+    loop: true,
+    pagination: { el: ".swiper-pagination" },
+    autoplay: { delay: 3000 },
+  });
+
+  // Botão fechar (×)
+  modal.querySelector(".btn-fechar-modal").addEventListener("click", () => {
+    modal.remove();
+  });
+
+  // Clicar fora da imagem também fecha
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
 
   function fecharModalImoveis() {
     document.getElementById("imModal").classList.remove("open");
