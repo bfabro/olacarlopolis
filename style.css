@@ -7071,7 +7071,7 @@ html {
 }
 .cep-input:focus, .cep-select:focus { border-color: var(--blue-color); box-shadow: 0 0 0 3px rgba(64,112,244,.15); }
 .cep-ico {
-  position:absolute; right:10px; bottom:12px; font-size:18px; color:#9aa3b2; pointer-events:none;
+  position:absolute; right:16px; bottom:12px; font-size:18px; color:#9aa3b2; pointer-events:none;
 }
 .cep-btn {
   align-self:end; padding:12px 14px; border:0; border-radius:10px; font-weight:600; cursor:pointer;
@@ -7107,7 +7107,7 @@ html {
 @keyframes cepShimmer { 0%{background-position: 100% 0} 100%{background-position: -100% 0} }
 
 @media (max-width: 900px){
-  .cep-form { margin:5px;grid-template-columns: 1fr 1fr; }
+  .cep-form { margin:0px;grid-template-columns: 1fr 1fr; }
   .cep-btn { grid-column: 1 / -1; }
   .cep-results { grid-template-columns: 1fr; }
 }
