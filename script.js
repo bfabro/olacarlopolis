@@ -2950,7 +2950,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       status: "disponível",
       titulo: "Residencial Villa Ray (Horizonte 3)",
-      endereco: "--",
+      endereco: "Agende uma visita",
       lat: -23.3953,
       lng: -49.7232,
       quartos: 2,
@@ -3043,7 +3043,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 ////////////////////////////////////////////////////////////
       titulo: "Imóvel no Residencial Ilhabela",
       descricao: "Casa impecavel Documentação ok",
-      endereco: "Agende uma Visita",
+      endereco: "Condominio Ilha bela",
       suite: "Não",      
       banheiros: 1,      
       salas: 1,
