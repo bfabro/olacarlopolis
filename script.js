@@ -3051,7 +3051,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       area: 390,
       construcao: 120,          // << NOVO: m² de construção
       quintal: "Sim",       
-      telefone: "43 99678-9652",  // Corretor ou propretario
+      telefone: "43 99686-4716", // Corretor ou propretario
         imagens: ["images/imoveis/rafaelBandeira/venda/casa/1/1.jpg",
      "images/imoveis/rafaelBandeira/venda/casa/1/2.jpg",
      "images/imoveis/rafaelBandeira/venda/casa/1/3.jpg",
