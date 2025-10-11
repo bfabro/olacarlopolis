@@ -2985,30 +2985,30 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
-
+// Modelo
     {
       id: "casa2v",
-      tipo: "venda",
-      
+      tipo: "venda",   
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 3,   
+      valor: 250000,
+      piscina: false,
+      churrasqueira: false, 
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"] ,
+   // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+////////////////////////////////////////////////////////////
       titulo: "Casa nova a venda em Carlópolis.",
       descricao: "Casa nova, impecavel Documentação ok. Aceita financiamento, “minha casa minha vida “",
-      endereco: "--",
-      lat: -23.3953,
-      lng: -49.7232,
-      quartos: 3,
-      banheiros: 1,
-      vagas: 2,
+      endereco: "Agende uma Visita",
+      suite: "1",      
+      banheiros: 1,      
       salas: 1,
       cozinhas: 1,
-      piscina: false,
-      churrasqueira: false,      
-      suite: "1",
-      quintal: "Sim",
-      procura: "casa", // ou "terreno", "rural", etc.
       area: 90,
-      construcao: 63,          // << NOVO: m² de construção   
-      valor: 250000,
-      telefone: "43 99678-9652",
+      construcao: 63,          // << NOVO: m² de construção
+      quintal: "Sim",       
+      telefone: "43 99678-9652",  // Corretor ou propretario
       imagens: [
         "images/imoveis/cesar/venda/casa2/1.jpg",
         "images/imoveis/cesar/venda/casa2/2.jpg",
@@ -3019,10 +3019,51 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa2/7.jpg",
         "images/imoveis/cesar/venda/casa2/8.jpg"
 
-       ],      
+       ],           
+       //lat: -23.3953,
+      //lng: -49.7232,
 
-      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-      corretores: ["Cesar Melo - 38.105 F"]
+    },
+
+    
+
+
+
+    {
+      id: "casa4v",
+      tipo: "venda",   
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 2,   
+      valor: 1150000,
+      piscina: true,
+      churrasqueira: false, 
+      vagas: 4,
+      corretores: ["Rafael Bandeira - 29.802"],
+   // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+////////////////////////////////////////////////////////////
+      titulo: "Imóvel no Residencial Ilhabela",
+      descricao: "Casa impecavel Documentação ok",
+      endereco: "Agende uma Visita",
+      suite: "Não",      
+      banheiros: 1,      
+      salas: 1,
+      cozinhas: 1,
+      area: 390,
+      construcao: 120,          // << NOVO: m² de construção
+      quintal: "Sim",       
+      telefone: "43 99678-9652",  // Corretor ou propretario
+        imagens: ["images/imoveis/rafaelBandeira/venda/casa/1/1.jpg",
+     "images/imoveis/rafaelBandeira/venda/casa/1/2.jpg",
+     "images/imoveis/rafaelBandeira/venda/casa/1/3.jpg",
+     "images/imoveis/rafaelBandeira/venda/casa/1/4.jpg",
+     "images/imoveis/rafaelBandeira/venda/casa/1/5.jpg",
+     "images/imoveis/rafaelBandeira/venda/casa/1/6.jpg",
+     "images/imoveis/rafaelBandeira/venda/casa/1/7.jpg",
+     "images/imoveis/rafaelBandeira/venda/casa/1/8.jpg",
+     "images/imoveis/rafaelBandeira/venda/casa/1/9.jpg",
+      ],          
+       //lat: -23.3953,
+      //lng: -49.7232,
 
     },
 
@@ -3032,6 +3073,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       id: "ter1",
       tipo: "venda",
       titulo: "Terreno Esquina - Loteamento Amaral",
+      descricao: "Residencial Amaral ll",
       endereco: "Residencial Amaral ll",
       area: 308,
       valor: 130000,
@@ -3043,21 +3085,43 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
+
+    //Modelo
     {
       id: "ter2",
       tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Novo horizonte 1",
-      endereco: "Novo horizonte 1",
+      descricao: "Terreno Residencial",
+      endereco: "Novo horizonte 1",      
       area: 180,
       valor: 65000,
       telefone: "43 99678-9652",
       imagens: ["images/imoveis/cesar/venda/terreno/3.jpg",],
-      descricao: "Terreno Residencial",
-       procura: "terreno", // ou "terreno", "rural", etc.
       corretores: ["Cesar Melo - 38.105 F"],
 
     },
 
+    {
+      id: "ter3",
+      tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      titulo: "Terreno em Condomínio - Lagoa azul 2",
+      descricao: "Agende uma visita",
+      endereco: "Lagoa azul 2",      
+      area: 388 ,
+      valor: 120000,
+      telefone: "43 99686-4716",
+      imagens: ["images/imoveis/rafaelBandeira/venda/terreno/1.jpg",
+        "images/imoveis/rafaelBandeira/venda/terreno/2.jpg",
+        "images/imoveis/rafaelBandeira/venda/terreno/3.jpg",
+        "images/imoveis/rafaelBandeira/venda/terreno/4.jpg",
+        "images/imoveis/rafaelBandeira/venda/terreno/5.jpg",
+      ],
+      corretores: ["Rafael Bandeira - 29.802"],
+
+    },
+/*
     {
       id: "casa1a",
       tipo: "aluguel",
@@ -3081,9 +3145,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       suite: "Sim",
       quintal: "Sim",
        procura: "casa", // ou "terreno", "rural", etc.
-      corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"],
+      corretores: ["Rubao - 11.111 F"],
       construcao: 68,           // << NOVO
     },
+
+
+
+
+    */
   ];
 
   // monta página
