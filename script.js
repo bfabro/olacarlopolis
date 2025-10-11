@@ -10300,7 +10300,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99921-2122",
             contact2: "(43) 3566-2419",
             instagram: "https://www.instagram.com/bodysomacessorios/",
-            infoAdicional: "🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos<br>🚗 - Serviço de Leva e Tras!<br> Insufilme<br>🔋 Baterias<br>Pneus<br>⚡ Remap<br>🛑 Freios",
+            infoAdicional: "🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>🚗 - Serviço de Leva e Tras!<br>🔲 - Insufilme<br>🔋 - Baterias<br>🚙 - Pneus<br>⚡ - Remap<br>🛑 - Freios<Br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos",
             novidadesImages: [
               "images/comercios/autoCenter/body/divulgacao/1.jpg",
               "images/comercios/autoCenter/body/divulgacao/2.jpg",
