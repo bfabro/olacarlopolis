@@ -14251,6 +14251,15 @@ function keyImovel(im) {
 }
 
 // salva CONTADOR por dia, mantendo também o titulo no nó do dia
+  // util: pega o 1º corretor do imóvel
+function getCorretorPrincipal(im) {
+  if (!im) return "";
+  if (Array.isArray(im.corretores) && im.corretores.length) return String(im.corretores[0]);
+  if (im.corretor) return String(im.corretor);
+  return "";
+}
+
+// salva CONTADOR por dia + titulo + corretor
 function registrarCliqueImovelDia(tipo, im) {
   if (!window.firebase || !firebase.database) return Promise.resolve(false);
   const hoje  = getHojeBR(); // YYYY-MM-DD
@@ -14259,13 +14268,14 @@ function registrarCliqueImovelDia(tipo, im) {
 
   return ref.transaction(curr => {
     const base = curr || {};
-    base.titulo = im?.titulo || base.titulo || ""; // garante o título
-    base[tipo]  = (base[tipo] || 0) + 1;           // incrementa fotos/whatsapp
+    base.titulo   = im?.titulo || base.titulo || "";
+    base.corretor = getCorretorPrincipal(im) || base.corretor || "";
+    base[tipo]    = (base[tipo] || 0) + 1;   // incrementa fotos/whatsapp
     return base;
   });
 }
 
-// salva RESUMO acumulado com titulo e totais
+// salva RESUMO acumulado + corretor
 function registrarCliqueImovelResumo(tipo, im) {
   if (!window.firebase || !firebase.database) return Promise.resolve(false);
   const chave = keyImovel(im);
@@ -14273,14 +14283,15 @@ function registrarCliqueImovelResumo(tipo, im) {
 
   return ref.transaction(curr => {
     const base = curr || { totalFotos: 0, totalWhats: 0 };
-    // mantém título sempre atualizado
-    base.titulo = im?.titulo || base.titulo || "";
+    base.titulo   = im?.titulo || base.titulo || "";
+    base.corretor = getCorretorPrincipal(im) || base.corretor || "";
     if (tipo === "fotos")    base.totalFotos = (base.totalFotos || 0) + 1;
     if (tipo === "whatsapp") base.totalWhats = (base.totalWhats || 0) + 1;
     base.ultimoClique = firebase.database.ServerValue.TIMESTAMP;
     return base;
   });
 }
+
 
 // atalho: registra nos dois nós (dia + resumo)
 function registrarCliqueImovel(tipo, im) {
