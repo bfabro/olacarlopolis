@@ -3149,7 +3149,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       id: "galpao1venda",
       tipo: "venda",
       procura: "galpao", // ou "terreno", "rural", etc.
-      titulo: "Galpão - Residencial Murador, ",
+      titulo: "Galpão - Residencial Murador",
       descricao: "Galpão 300m2",
       endereco: "Residencial Murador",    
       banheiros: 1, 
