@@ -3511,7 +3511,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
         </button>
       </div>
-<Br>
+
       ${responsavel ? `<div class="spec-chip chip-mini corretor-banner"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
     </div>
   </article>`;
