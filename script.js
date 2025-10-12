@@ -3414,48 +3414,14 @@ el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-th
 });
 
 
-// WhatsApp: abre o wa.me e registra clique "whatsapp" (salvando o titulo)
-el.querySelectorAll("[data-action='whats']").forEach(btn => {
-  btn.addEventListener("click", (ev) => {
-    ev.preventDefault();
-
-    const id = ev.currentTarget.getAttribute("data-id");
-    const im = stateImoveis.all.find(x => x.id === id);
-    if (!im) return;
-
-    registrarCliqueImovel("whatsapp", im); // <<< grava (dia + resumo) c/ titulo
-
-    const numero = (im.telefone || "").replace(/\D/g, "");
-    const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
-    window.open(`https://wa.me/55${numero}?text=${txt}`, "_blank");
-  });
-});
-
-
-// [WHATS] – abre o WhatsApp E registra clique "whatsapp"
-el.querySelectorAll("[data-action='whats']").forEach(btn => {
-  btn.addEventListener("click", (ev) => {
-    ev.preventDefault();
-
-    const id = ev.currentTarget.getAttribute("data-id");
-    const im = stateImoveis.all.find(x => x.id === id);
-    if (!im) return;
-
-    // novo: registra clique por imóvel
-    registrarCliqueImovel('whatsapp', im);
-
-    // (opcional) manter seu contador geral por botão, se quiser histórico legado
-    // registrarCliqueBotao('whatsapp', id);
-
-    const numero = (im.telefone || "").replace(/\D/g, "");
-    const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
-    window.open(`https://wa.me/55${numero}?text=${txt}`, "_blank");
-  });
-});
-
 
  // substitua o bloco antigo por este
+// WhatsApp – UM ÚNICO LISTENER, com proteção anti-rebind
+// WhatsApp – abrir aba imediatamente; registrar em paralelo
 el.querySelectorAll("[data-action='whats']").forEach(btn => {
+  if (btn.dataset.bindWhats === "1") return; // evita rebind
+  btn.dataset.bindWhats = "1";
+
   btn.addEventListener("click", (ev) => {
     ev.preventDefault();
 
@@ -3467,20 +3433,18 @@ el.querySelectorAll("[data-action='whats']").forEach(btn => {
     const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
     const url = `https://wa.me/55${numero}?text=${txt}`;
 
-    // tenta registrar o clique no Firebase; navega depois que a transação finalizar
-    let navegou = false;
-    registrarCliqueBotao('whatsapp', im.titulo)
-      .finally(() => {
-        navegou = true;
-        window.open(url, "_blank");
-      });
+    // 🔑 Abre a aba/janela imediatamente (sincrono ao clique)
+    const win = window.open(url, "_blank"); // pode retornar null se o usuário bloquear tudo
 
-    // fallback: força navegação caso o registro trave por >600ms
-    setTimeout(() => {
-      if (!navegou) window.open(url, "_blank");
-    }, 600);
+    // 📊 Registros assíncronos, sem segurar a abertura
+    registrarCliqueImovel("whatsapp", im).catch(()=>{});
+    if (typeof logEventoCliqueImovel === "function") {
+      logEventoCliqueImovel("whatsapp", im);
+    }
   });
 });
+
+
 
 
     // permitir abrir a galeria clicando na imagem ou no botão de lupa
