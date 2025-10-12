@@ -3124,7 +3124,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Residencial Itália ll",
-      descricao: "Ideal para quem deseja investir em moradia ou construção de aluguel",
+      descricao: "Ideal para quem busca tranquilidade e qualidade de vida sem abrir mão da praticidade",
       endereco: "Próximo ao mercado carriel",      
       area: 336,
       valor: 185000,
