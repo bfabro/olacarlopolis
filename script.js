@@ -3137,7 +3137,28 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       corretores: ["Cesar Melo - 38.105 F"],
 
     },
+/*
 
+    {
+      id: "ter5",
+      tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      titulo: "Terreno - Residencial Murador ",
+      descricao: "Bairro em expansão, com valorização garantida nos próximos anos",
+      endereco: "Residencial Murador ",      
+      area: 180,
+      valor: 108000,
+      telefone: "43 99678-9652",
+      imagens: [
+        "images/imoveis/cesar/venda/terreno/terreno2/1.jpg",
+         "images/imoveis/cesar/venda/terreno/terreno2/2.jpg",
+       
+      
+      ],
+      corretores: ["Cesar Melo - 38.105 F"],
+
+    },
+*/
 
     /////////////////// GALPAO
 
