@@ -688,7 +688,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "lojaferreira", "oficinadocelular", "gerson", "promissorseguros", "sabordaroca"
+     "oficinadocelular", "gerson", "promissorseguros", "sabordaroca"
 
   ];
 
