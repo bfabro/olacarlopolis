@@ -3121,6 +3121,83 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       corretores: ["Rafael Bandeira - 29.802"],
 
     },
+
+     {
+      id: "ter4",
+      tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      titulo: "Terreno - Residencial Itália ll",
+      descricao: "Terreno Residencial",
+      endereco: "Próximo ao mercado carriel",      
+      area: 336,
+      valor: 185000,
+      telefone: "43 99678-9652",
+      imagens: [
+        "images/imoveis/cesar/venda/terreno/terreno1/1.jpg",
+        "images/imoveis/cesar/venda/terreno/terreno1/2.jpg",
+      
+      ],
+      corretores: ["Cesar Melo - 38.105 F"],
+
+    },
+
+
+    /////////////////// GALPAO
+
+     //Modelo
+    {
+      id: "galpao1venda",
+      tipo: "venda",
+      procura: "galpao", // ou "terreno", "rural", etc.
+      titulo: "Galpão - Residencial Murador, ",
+      descricao: "Galpão 300m2",
+      endereco: "Residencial Murador",    
+      banheiros: 1, 
+      outros:"Mezanino",
+      escritorio:"Sim",
+      area: 300,
+      valor: 600000,
+      telefone: "43 99678-9652",
+      imagens: [
+        "images/imoveis/cesar/venda/galpao/galpao1/1.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao1/2.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao1/3.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao1/4.jpg",
+
+        "images/imoveis/cesar/venda/galpao/galpao1/5.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao1/6.jpg",
+      ],
+      corretores: ["Cesar Melo - 38.105 F"],
+
+    },
+
+
+      //Modelo
+    {
+      id: "galpao1aluguel",
+      tipo: "aluguel",
+      procura: "galpao", // ou "terreno", "rural", etc.
+      titulo: "Galpão - Residencial Murador, ",
+      descricao: "Galpão 300m2",
+      endereco: "Residencial Murador",    
+      banheiros: 1, 
+      outros:"Mezanino",
+      escritorio:"Sim",
+      area: 300,
+      valor: 5000,
+      telefone: "43 99678-9652",
+      imagens: [
+        "images/imoveis/cesar/venda/galpao/galpao1/1.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao1/2.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao1/3.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao1/4.jpg",
+
+        "images/imoveis/cesar/venda/galpao/galpao1/5.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao1/6.jpg",
+      ],
+      corretores: ["Cesar Melo - 38.105 F"],
+
+    },
 /*
     {
       id: "casa1a",
@@ -3479,6 +3556,9 @@ el.querySelectorAll("[data-action='whats']").forEach(btn => {
     if (!terr && hasNum(im.cozinhas)) chips.push(`<div class="spec-chip"><span class="k">Cozinhas</span><span class="v">${im.cozinhas}</span></div>`);
 
     if (!terr && im.quintal) chips.push(`<div class="spec-chip chip-mini"><span class="k">Quintal</span><span class="v">${im.quintal}</span></div>`);
+
+        if (!terr && im.escritorio) chips.push(`<div class="spec-chip chip-mini"><span class="k">Escritorio</span><span class="v">${im.escritorio}</span></div>`);
+            if (!terr && im.outros) chips.push(`<div class="spec-chip chip-mini"><span class="k">Outros</span><span class="v">${im.outros}</span></div>`);
 
     // Área (relevante para qualquer imóvel, inclusive terreno)
     if (hasNum(im.area)) chips.push(`<div class="spec-chip"><span class="k">Área</span><span class="v">${Number(im.area)} m²</span></div>`);
