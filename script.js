@@ -3440,11 +3440,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     // Para casas/apês (não mostra em terreno se não fizer sentido)
     if (!terr && hasNum(im.quartos)) chips.push(`<div class="spec-chip"><span class="k">Quartos</span><span class="v">${im.quartos}</span></div>`);
-    if (!terr && im.suite) chips.push(`<div class="spec-chip chip-mini"><span class="k">Suíte</span><span class="v">Sim</span></div>`);
+    if (!terr && im.suite) chips.push(`<div class="spec-chip chip-mini"><span class="k">Suíte</span><span class="v">${im.suite}</span></div>`);
     if (!terr && hasNum(im.banheiros)) chips.push(`<div class="spec-chip"><span class="k">Banheiros</span><span class="v">${im.banheiros}</span></div>`);
     if (!terr && hasNum(im.vagas)) chips.push(`<div class="spec-chip"><span class="k">Vagas</span><span class="v">${im.vagas}</span></div>`);
     if (!terr && hasNum(im.salas)) chips.push(`<div class="spec-chip"><span class="k">Salas</span><span class="v">${im.salas}</span></div>`);
     if (!terr && hasNum(im.cozinhas)) chips.push(`<div class="spec-chip"><span class="k">Cozinhas</span><span class="v">${im.cozinhas}</span></div>`);
+
+    if (!terr && im.quintal) chips.push(`<div class="spec-chip chip-mini"><span class="k">Quintal</span><span class="v">${im.quintal}</span></div>`);
 
     // Área (relevante para qualquer imóvel, inclusive terreno)
     if (hasNum(im.area)) chips.push(`<div class="spec-chip"><span class="k">Área</span><span class="v">${Number(im.area)} m²</span></div>`);
@@ -3490,8 +3492,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     <div class="card-body">
       <div class="card-title">${im.titulo}</div>
-      ${im.descricao ? `<div class="descricao" style="margin-top:8px">${im.descricao}</div>` : ""}
-      <div class="card-addr"><i class="fa-solid fa-map-pin"></i> ${im.endereco}</div>
+      ${im.descricao ? `<div class="descricaoImovel" style="margin-top:8px"><p>${im.descricao}</p></div>` : ""}
+      <div class="card-addr2"><i class="fa-solid fa-map-pin"></i> ${im.endereco}</div>
+      
 
       <div class="specs-chips">${renderChips(im)}</div>
 
@@ -3509,7 +3512,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         </button>
       </div>
 <Br>
-      ${responsavel ? `<div class="spec-chip chip-mini"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
+      ${responsavel ? `<div class="spec-chip chip-mini corretor-banner"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
     </div>
   </article>`;
   }

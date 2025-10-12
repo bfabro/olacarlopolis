@@ -7154,3 +7154,43 @@ html {
 .cep-btn:hover {
   background: linear-gradient(45deg, #005fcc, #0099cc);
 }
+
+
+.corretor-banner {
+ display: flex;
+  align-items: center;
+  background: #fffaf3;
+  border: 1px solid #ffcc80;
+  border-radius: 10px;
+  padding: 8px;
+  
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.corretor-banner i { margin-right: 6px; }
+
+
+.descricaoImovel { 
+  border-bottom: 3px solid #FF8C00;
+  padding: 10px 0;
+   background: #e0f7fa;
+  color: #00695c;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+
+
+}
+
+
+.card-addr2{
+ border-bottom: 3px solid #FF8C00;
+  padding: 10px 0;
+   background: #e0f7fa;
+  color: #00695c;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
