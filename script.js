@@ -2975,7 +2975,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa1/8.jpg",
         "images/imoveis/cesar/venda/casa1/9.jpg"
        ],
-      descricao: "Casa nova, impecavel Documentação ok.",
+      descricao: "Ambientes bem iluminados e ventilados, prontos para receber sua família. Documentação OK",
       suite: "1",
       quintal: "Não",
       procura: "casa", // ou "terreno", "rural", etc.   
@@ -2999,7 +2999,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
    // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
 ////////////////////////////////////////////////////////////
       titulo: "Casa nova a venda em Carlópolis.",
-      descricao: "Casa nova, impecavel Documentação ok. Aceita financiamento, “minha casa minha vida “",
+      descricao: "Casa nova, impecavel! Documentação OK. Aceita financiamento, “Minha casa minha vida “",
       endereco: "Agende uma Visita",
       suite: "1",      
       banheiros: 1,      
@@ -3026,9 +3026,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     },
 
     
-
-
-
     {
       id: "casa4v",
       tipo: "venda",   
@@ -3042,7 +3039,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
    // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
 ////////////////////////////////////////////////////////////
       titulo: "Imóvel no Residencial Ilhabela",
-      descricao: "Casa impecavel Documentação ok",
+      descricao: "Acabamentos sofisticados, design moderno e ambientes integrados. Documentação OK",
       endereco: "Condominio Ilha bela",
       suite: "Não",      
       banheiros: 1,      
@@ -3073,7 +3070,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       id: "ter1",
       tipo: "venda",
       titulo: "Terreno Esquina - Loteamento Amaral",
-      descricao: "Residencial Amaral ll",
+      descricao: "Bairro em expansão, com valorização garantida nos próximos anos",
       endereco: "Residencial Amaral ll",
       area: 308,
       valor: 130000,
@@ -3092,7 +3089,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Novo horizonte 1",
-      descricao: "Terreno Residencial",
+      descricao: "Ideal para quem deseja investir em moradia ou construção de aluguel",
       endereco: "Novo horizonte 1",      
       area: 180,
       valor: 65000,
@@ -3107,7 +3104,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno em Condomínio - Lagoa azul 2",
-      descricao: "Agende uma visita",
+      descricao: "Vista privilegiada e excelente topografia para construção de alto padrão",
       endereco: "Lagoa azul 2",      
       area: 388 ,
       valor: 120000,
@@ -3127,7 +3124,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Residencial Itália ll",
-      descricao: "Terreno Residencial",
+      descricao: "Ideal para quem deseja investir em moradia ou construção de aluguel",
       endereco: "Próximo ao mercado carriel",      
       area: 336,
       valor: 185000,
@@ -3150,7 +3147,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       procura: "galpao", // ou "terreno", "rural", etc.
       titulo: "Galpão - Residencial Murador",
-      descricao: "Galpão 300m2",
+      descricao: "Galpão amplo, ideal para indústria, depósito ou centro de distribuição",
       endereco: "Residencial Murador",    
       banheiros: 1, 
       outros:"Mezanino",
@@ -3178,7 +3175,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "aluguel",
       procura: "galpao", // ou "terreno", "rural", etc.
       titulo: "Galpão - Residencial Murador, ",
-      descricao: "Galpão 300m2",
+      descricao: "Galpão amplo, ideal para indústria, depósito ou centro de distribuição",
       endereco: "Residencial Murador",    
       banheiros: 1, 
       outros:"Mezanino",
