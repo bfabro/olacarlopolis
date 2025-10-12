@@ -3397,23 +3397,91 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     }, 0);
 
     // conecta botões
-    el.querySelectorAll("[data-action='fotos']").forEach(btn => {
-      btn.addEventListener("click", (ev) => {
-        const id = ev.currentTarget.getAttribute("data-id");
-        abrirModalImoveis(stateImoveis.all.find(x => x.id === id));
-      });
-    });
+  // [FOTOS] – abre a galeria E registra clique "fotos"
+// permitir abrir a galeria clicando na imagem ou no botão de lupa
+el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb").forEach(node => {
+  node.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    const card = ev.currentTarget.closest(".card-imovel");
+    const id = card?.getAttribute("data-id") || ev.currentTarget.getAttribute("data-id");
+    if (!id) return;
+    const im = stateImoveis.all.find(x => x.id === id);
+    if (im) {
+      registrarCliqueImovel('fotos', im);   // <<< ADICIONE ESTA LINHA
+      abrirModalImoveis(im);
+    }
+  });
+});
 
-    el.querySelectorAll("[data-action='whats']").forEach(btn => {
-      btn.addEventListener("click", (ev) => {
-        const id = ev.currentTarget.getAttribute("data-id");
-        const im = stateImoveis.all.find(x => x.id === id);
-        if (!im) return;
-        const numero = (im.telefone || "").replace(/\D/g, "");
-        const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
-        window.open(`https://wa.me/55${numero}?text=${txt}`, "_blank");
+
+// WhatsApp: abre o wa.me e registra clique "whatsapp" (salvando o titulo)
+el.querySelectorAll("[data-action='whats']").forEach(btn => {
+  btn.addEventListener("click", (ev) => {
+    ev.preventDefault();
+
+    const id = ev.currentTarget.getAttribute("data-id");
+    const im = stateImoveis.all.find(x => x.id === id);
+    if (!im) return;
+
+    registrarCliqueImovel("whatsapp", im); // <<< grava (dia + resumo) c/ titulo
+
+    const numero = (im.telefone || "").replace(/\D/g, "");
+    const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
+    window.open(`https://wa.me/55${numero}?text=${txt}`, "_blank");
+  });
+});
+
+
+// [WHATS] – abre o WhatsApp E registra clique "whatsapp"
+el.querySelectorAll("[data-action='whats']").forEach(btn => {
+  btn.addEventListener("click", (ev) => {
+    ev.preventDefault();
+
+    const id = ev.currentTarget.getAttribute("data-id");
+    const im = stateImoveis.all.find(x => x.id === id);
+    if (!im) return;
+
+    // novo: registra clique por imóvel
+    registrarCliqueImovel('whatsapp', im);
+
+    // (opcional) manter seu contador geral por botão, se quiser histórico legado
+    // registrarCliqueBotao('whatsapp', id);
+
+    const numero = (im.telefone || "").replace(/\D/g, "");
+    const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
+    window.open(`https://wa.me/55${numero}?text=${txt}`, "_blank");
+  });
+});
+
+
+ // substitua o bloco antigo por este
+el.querySelectorAll("[data-action='whats']").forEach(btn => {
+  btn.addEventListener("click", (ev) => {
+    ev.preventDefault();
+
+    const id = ev.currentTarget.getAttribute("data-id");
+    const im = stateImoveis.all.find(x => x.id === id);
+    if (!im) return;
+
+    const numero = (im.telefone || "").replace(/\D/g, "");
+    const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
+    const url = `https://wa.me/55${numero}?text=${txt}`;
+
+    // tenta registrar o clique no Firebase; navega depois que a transação finalizar
+    let navegou = false;
+    registrarCliqueBotao('whatsapp', im.titulo)
+      .finally(() => {
+        navegou = true;
+        window.open(url, "_blank");
       });
-    });
+
+    // fallback: força navegação caso o registro trave por >600ms
+    setTimeout(() => {
+      if (!navegou) window.open(url, "_blank");
+    }, 600);
+  });
+});
+
 
     // permitir abrir a galeria clicando na imagem ou no botão de lupa
     el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb").forEach(node => {
@@ -14197,6 +14265,70 @@ function registrarCliqueBotao(tipo, idEstabelecimento) {
 window.registrarCliqueBotao = registrarCliqueBotao;
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////// inicio salvar imoveis
+// gera a chave do imóvel: usa id; se não tiver, usa titulo higienizado
+function keyImovel(im) {
+  if (im?.id) return String(im.id);
+  const titulo = String(im?.titulo || "imovel-sem-titulo");
+  return titulo.replace(/[.#$/[\]]/g, "-");
+}
+
+// salva CONTADOR por dia, mantendo também o titulo no nó do dia
+function registrarCliqueImovelDia(tipo, im) {
+  if (!window.firebase || !firebase.database) return Promise.resolve(false);
+  const hoje  = getHojeBR(); // YYYY-MM-DD
+  const chave = keyImovel(im);
+  const ref   = firebase.database().ref(`imoveisCliquesPorDia/${hoje}/${chave}`);
+
+  return ref.transaction(curr => {
+    const base = curr || {};
+    base.titulo = im?.titulo || base.titulo || ""; // garante o título
+    base[tipo]  = (base[tipo] || 0) + 1;           // incrementa fotos/whatsapp
+    return base;
+  });
+}
+
+// salva RESUMO acumulado com titulo e totais
+function registrarCliqueImovelResumo(tipo, im) {
+  if (!window.firebase || !firebase.database) return Promise.resolve(false);
+  const chave = keyImovel(im);
+  const ref   = firebase.database().ref(`imoveisCliquesResumo/${chave}`);
+
+  return ref.transaction(curr => {
+    const base = curr || { totalFotos: 0, totalWhats: 0 };
+    // mantém título sempre atualizado
+    base.titulo = im?.titulo || base.titulo || "";
+    if (tipo === "fotos")    base.totalFotos = (base.totalFotos || 0) + 1;
+    if (tipo === "whatsapp") base.totalWhats = (base.totalWhats || 0) + 1;
+    base.ultimoClique = firebase.database.ServerValue.TIMESTAMP;
+    return base;
+  });
+}
+
+// atalho: registra nos dois nós (dia + resumo)
+function registrarCliqueImovel(tipo, im) {
+  return Promise.allSettled([
+    registrarCliqueImovelDia(tipo, im),
+    registrarCliqueImovelResumo(tipo, im)
+  ]);
+}
+
+
+
+/////////////// fim salvar  imoveis
 
 // ====== COLETA DE LIXO — DIA A DIA ======
 // Preenchido: segunda-feira (como você enviou)

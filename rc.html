@@ -418,6 +418,24 @@
   </table>
 </div>
 
+<div class="card">
+  <h2 class="section-title">🏠 Cliques de Imóveis</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Imóvel</th>
+        <th style="text-align:center">WhatsApp</th>
+        <th style="text-align:center">Fotos</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaCliquesImoveis">
+      <tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+
 
 
 		<div class="card">
@@ -1236,6 +1254,76 @@ if (f || c || t) {
       </tr>
     `).join('');
   }
+
+
+
+async function carregarTabelaCliquesImoveis() {
+  const tbody = document.getElementById('tabelaCliquesImoveis');
+  if (!tbody) return;
+  tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+
+  const datas = await listarDatasPeriodo(); // helper já existente no rc.html
+  const db = firebase.database();
+
+  // Acumuladores: soma por chave + catálogo de títulos
+  const tot = {};        // { chave: { whats:0, fotos:0 } }
+  const titulos = {};    // { chave: "Título do Imóvel" }
+
+  for (const d of datas) {
+    const snap = await db.ref(`imoveisCliquesPorDia/${d}`).once('value');
+    const dia = snap.val() || {};
+    Object.entries(dia).forEach(([chave, info]) => {
+      const w = Number(info?.whatsapp || 0);
+      const f = Number(info?.fotos    || 0);
+
+      // guarda título se existir (preserva primeiro não vazio)
+      const t = (info && typeof info.titulo === 'string') ? info.titulo : '';
+      if (t && !titulos[chave]) titulos[chave] = t;
+
+      // só acumula quem teve fotos/whats
+      if ((w + f) > 0) {
+        if (!tot[chave]) tot[chave] = { whats:0, fotos:0 };
+        tot[chave].whats += w;
+        tot[chave].fotos += f;
+      }
+    });
+  }
+
+  const linhas = Object.entries(tot)
+    .map(([chave, v]) => ({
+      titulo: titulos[chave] || chave, // mostra título se houver; senão, a chave
+      whats: v.whats,
+      fotos: v.fotos
+    }))
+    .filter(r => (r.whats + r.fotos) > 0)
+    .sort((a, b) => (b.whats + b.fotos) - (a.whats + a.fotos));
+
+  if (!linhas.length) {
+    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = linhas.map(({ titulo, whats, fotos }) => `
+    <tr>
+      <td>${titulo}</td>
+      <td style="text-align:center">${whats}</td>
+      <td style="text-align:center">${fotos}</td>
+    </tr>
+  `).join('');
+}
+
+// mantém as chamadas já existentes:
+document.addEventListener('DOMContentLoaded', carregarTabelaCliquesImoveis);
+document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaCliquesImoveis);
+
+
+
+
+
+
+
+
+
 
   // Chamar junto com as outras tabelas:
   document.addEventListener('DOMContentLoaded', () => {
