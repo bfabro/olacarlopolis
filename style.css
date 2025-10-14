@@ -7195,3 +7195,52 @@ html {
   font-size: 0.85rem;
   font-weight: 500;
 }
+
+
+/* ==== Modal de Nome para WhatsApp (Imóveis) ==== */
+.im-contato-modal{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.78);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+
+.im-contato-box{
+  width: min(520px, 92vw);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.28);
+  padding: 18px 16px 14px;
+  position: relative;
+}
+
+.im-contato-close{
+  position: absolute; top: 6px; right: 8px;
+  width: 36px; height: 36px;
+  border: 0; border-radius: 999px;
+  background: rgba(0,0,0,.1);
+  font-size: 22px; cursor: pointer;
+}
+
+.im-contato-box h3{
+  margin: 6px 0 6px; color: #2E8B57;
+  font-size: 18px;
+}
+.im-contato-box p{ margin: 0 0 10px; color:#333; }
+
+.im-contato-label{ font-size: 13px; color:#555; display:block; margin-bottom:6px; }
+.im-contato-input{
+  width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:10px;
+  font-size:16px; outline: none; transition: box-shadow .2s ease, border-color .2s ease;
+}
+.im-contato-input:focus{ border-color:#2E8B57; box-shadow: 0 0 0 3px rgba(46,139,87,.15); }
+.im-contato-input--err{ border-color:#dc3545 !important; box-shadow: 0 0 0 3px rgba(220,53,69,.15) !important; }
+
+.im-contato-actions{
+  display:flex; gap:10px; justify-content:flex-end; margin-top:14px;
+}
+.im-contato-actions button{
+  border:0; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:600;
+}
+.im-contato-actions .im-contato-cancel{ background:#f1f5f9; color:#333; }
+.im-contato-actions .im-contato-send{ background:#217942; color:#fff; display:inline-flex; align-items:center; gap:8px; }

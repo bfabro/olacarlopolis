@@ -3093,7 +3093,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       endereco: "Novo horizonte 1",      
       area: 180,
       valor: 65000,
-      telefone: "43 99678-9652",
+     // telefone: "43 99678-9652",
+       telefone: "11 99898-5930",
+      
       imagens: ["images/imoveis/cesar/venda/terreno/3.jpg",],
       corretores: ["Cesar Melo - 38.105 F"],
 
@@ -3513,31 +3515,118 @@ el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-th
  // substitua o bloco antigo por este
 // WhatsApp – UM ÚNICO LISTENER, com proteção anti-rebind
 // WhatsApp – abrir aba imediatamente; registrar em paralelo
-el.querySelectorAll("[data-action='whats']").forEach(btn => {
-  if (btn.dataset.bindWhats === "1") return; // evita rebind
-  btn.dataset.bindWhats = "1";
+// --- Modal de nome + envio WhatsApp + log no Firebase ---
+function abrirModalContatoImovel(im) {
+  // remove modais anteriores
+  document.querySelectorAll(".im-contato-modal").forEach(m => m.remove());
 
+  const modal = document.createElement("div");
+  modal.className = "im-contato-modal";
+  modal.innerHTML = `
+    <div class="im-contato-box" role="dialog" aria-modal="true">
+      <button class="im-contato-close" title="Fechar">&times;</button>
+      <h3>Antes de falar no WhatsApp</h3>
+      <p>Digite seu nome para eu me apresentar ao corretor:</p>
+      <label class="im-contato-label" for="imContatoNome">Seu nome</label>
+      <input id="imContatoNome" class="im-contato-input" type="text" placeholder="Ex.: Maria Silva" maxlength="40">
+      <div class="im-contato-actions">
+        <button class="im-contato-cancel">Cancelar</button>
+        <button class="im-contato-send">
+          <i class="fa-brands fa-whatsapp"></i> Enviar no WhatsApp
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // prefill de nome salvo
+  const input = modal.querySelector("#imContatoNome");
+  const salvo = localStorage.getItem("visitante_nome") || "";
+  if (salvo) input.value = salvo;
+
+  // focar
+  setTimeout(() => input.focus(), 50);
+
+  // fechar helpers
+  function fechar() { modal.remove(); }
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) fechar();
+  });
+  modal.querySelector(".im-contato-close").addEventListener("click", fechar);
+  modal.querySelector(".im-contato-cancel").addEventListener("click", fechar);
+
+  // enviar
+  modal.querySelector(".im-contato-send").addEventListener("click", async () => {
+    let nome = (input.value || "").trim().slice(0, 40);
+    if (!nome) {
+      input.focus();
+      input.classList.add("im-contato-input--err");
+      setTimeout(() => input.classList.remove("im-contato-input--err"), 600);
+      return;
+    }
+
+    // persiste localmente p/ próximos contatos
+    localStorage.setItem("visitante_nome", nome);
+
+    // monta mensagem
+    const numero = somenteDigitos(im.telefone || "");
+    const saud = (typeof gerarMensagemWhatsApp === "function")
+      ? gerarMensagemWhatsApp().replace(/Encontrei seu numero no Ola Carlopolis\./i, "").trim()
+      : "";
+    const prefixo = saud ? `${saud} ` : "";
+    const msg = `${prefixo}Meu nome é ${nome}. Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`;
+
+    const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`;
+
+    // logs não bloqueiam a abertura
+    try {
+      registrarCliqueImovel && registrarCliqueImovel("whatsapp", im).catch(()=>{});
+      if (typeof logEventoCliqueImovel === "function") {
+        logEventoCliqueImovel("whatsapp", im);
+      }
+      // salva confirmação no Firebase
+      salvarContatoImovel(im, nome);
+    } catch(e){ /* silencioso */ }
+
+    // abre Whats (user-gesture)
+    window.open(url, "_blank");
+    fechar();
+  });
+}
+
+// salva confirmação de contato no Firebase
+function salvarContatoImovel(im, nome) {
+  try {
+    if (!window.firebase || !firebase.database) return;
+
+    const hoje = getHojeBR ? getHojeBR() : new Date().toISOString().slice(0,10);
+    const ref = firebase.database()
+      .ref(`imoveis/contatos/${hoje}/${im.id}`)
+      .push();
+
+    ref.set({
+      nome: String(nome || "").slice(0, 40),
+      imovelId: im.id,
+      imovelTitulo: im.titulo || "",
+      destinoFone: somenteDigitos(im.telefone || ""),
+      pagina: location.href,
+      userAgent: navigator.userAgent,
+      ts: firebase.database.ServerValue.TIMESTAMP
+    }).catch(()=>{});
+  } catch(e){ /* silencioso */ }
+}
+
+// Conecta os botões "Falar no WhatsApp" para abrir a modal
+el.querySelectorAll("[data-action='whats']").forEach(btn => {
   btn.addEventListener("click", (ev) => {
     ev.preventDefault();
-
     const id = ev.currentTarget.getAttribute("data-id");
     const im = stateImoveis.all.find(x => x.id === id);
     if (!im) return;
-
-    const numero = (im.telefone || "").replace(/\D/g, "");
-    const txt = encodeURIComponent(`Olá! Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`);
-    const url = `https://wa.me/55${numero}?text=${txt}`;
-
-    // 🔑 Abre a aba/janela imediatamente (sincrono ao clique)
-    const win = window.open(url, "_blank"); // pode retornar null se o usuário bloquear tudo
-
-    // 📊 Registros assíncronos, sem segurar a abertura
-    registrarCliqueImovel("whatsapp", im).catch(()=>{});
-    if (typeof logEventoCliqueImovel === "function") {
-      logEventoCliqueImovel("whatsapp", im);
-    }
+    abrirModalContatoImovel(im);
   });
 });
+
 
 
 
@@ -13484,6 +13573,35 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
       );
     });
   }
+
+
+  ///
+  ///
+  ///
+
+
+  ///
+
+  ///
+  ///
+
+
+
+
+
+
+
+
+
+
+
+  //// inicio validador nome imoveis
+
+
+  
+
+
+  //// fim valdador nome imoveis
 
   // === Contador: clique em telefone (link tel: dentro da área de info) ===
   document.addEventListener('click', function (ev) {
