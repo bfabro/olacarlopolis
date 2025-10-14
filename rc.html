@@ -436,6 +436,25 @@
 </div>
 
 
+<div class="card">
+  <h2 class="section-title">📇 Contatos de Imóveis (WhatsApp)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Data/Hora</th>
+        <th>Imóvel</th>
+        <th>Nome Cliente</th>
+        <th>Tel Corretor</th>
+		<th>Corretor</th> <!-- NOVO -->
+      </tr>
+    </thead>
+    <tbody id="tabelaContatosImoveis">
+      <tr><td colspan="4" style="text-align:center; color:#999;">Carregando...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
 
 
 
@@ -1322,7 +1341,59 @@ document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaCl
 
 
 
+async function carregarTabelaContatosImoveis() {
+  const tbody = document.getElementById('tabelaContatosImoveis');
+  if (!tbody) return;
+  tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
+  const datas = await listarDatasPeriodo();
+  const db = firebase.database();
+  const linhas = []; // { ts, dataHora, titulo, nome, fone }
+
+  for (const d of datas) {
+    const snapDia = await db.ref(`imoveis/contatos/${d}`).once('value');
+    const porImovel = snapDia.val() || {};
+    Object.entries(porImovel).forEach(([imovelId, contatos]) => {
+      Object.values(contatos || {}).forEach(c => {
+        const ts = Number(c.ts || 0);
+        const dt = ts ? new Date(ts) : null;
+        const dataHora = dt
+          ? `${dt.toLocaleDateString()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`
+          : d;
+        linhas.push({
+          ts,
+          dataHora,
+          titulo: c.imovelTitulo || imovelId,
+          nome: c.nome || "—",
+          fone: c.destinoFone ? `(${c.destinoFone.slice(0,2)}) ${c.destinoFone.slice(2)}` : "—",
+		  corretor: c.corretor || "—"// NOVO
+        });
+      });
+    });
+  }
+
+  // ordena do mais recente pro mais antigo
+  linhas.sort((a,b) => (b.ts||0) - (a.ts||0));
+
+  if (!linhas.length) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum contato encontrado</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = linhas.map(l => `
+    <tr>
+      <td>${l.dataHora}</td>
+      <td>${l.titulo}</td>
+      <td>${l.nome}</td>
+      <td style="white-space:nowrap">${l.fone}</td>
+	   <td>${l.corretor}</td> <!-- NOVO -->
+    </tr>
+  `).join('');
+}
+
+// dispara junto com os outros carregamentos do relatório
+document.addEventListener('DOMContentLoaded', carregarTabelaContatosImoveis);
+document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaContatosImoveis);
 
 
 

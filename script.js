@@ -3093,8 +3093,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       endereco: "Novo horizonte 1",      
       area: 180,
       valor: 65000,
-     // telefone: "43 99678-9652",
-       telefone: "11 99898-5930",
+      telefone: "43 99678-9652",     
       
       imagens: ["images/imoveis/cesar/venda/terreno/3.jpg",],
       corretores: ["Cesar Melo - 38.105 F"],
@@ -3512,11 +3511,17 @@ el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-th
 
 
 
- // substitua o bloco antigo por este
-// WhatsApp – UM ÚNICO LISTENER, com proteção anti-rebind
+
 // WhatsApp – abrir aba imediatamente; registrar em paralelo
-// --- Modal de nome + envio WhatsApp + log no Firebase ---
 function abrirModalContatoImovel(im) {
+  const nomeSalvo = localStorage.getItem("visitante_nome");
+
+  // ✅ Se já existir nome salvo, pula a modal e envia direto
+  if (nomeSalvo) {
+    enviarWhatsAppImovel(im, nomeSalvo);
+    return;
+  }
+
   // remove modais anteriores
   document.querySelectorAll(".im-contato-modal").forEach(m => m.remove());
 
@@ -3539,25 +3544,17 @@ function abrirModalContatoImovel(im) {
   `;
   document.body.appendChild(modal);
 
-  // prefill de nome salvo
   const input = modal.querySelector("#imContatoNome");
-  const salvo = localStorage.getItem("visitante_nome") || "";
-  if (salvo) input.value = salvo;
-
-  // focar
   setTimeout(() => input.focus(), 50);
 
-  // fechar helpers
   function fechar() { modal.remove(); }
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) fechar();
-  });
+  modal.addEventListener("click", (e) => { if (e.target === modal) fechar(); });
   modal.querySelector(".im-contato-close").addEventListener("click", fechar);
   modal.querySelector(".im-contato-cancel").addEventListener("click", fechar);
 
-  // enviar
-  modal.querySelector(".im-contato-send").addEventListener("click", async () => {
-    let nome = (input.value || "").trim().slice(0, 40);
+  // botão enviar
+  modal.querySelector(".im-contato-send").addEventListener("click", () => {
+    let nome = (input.value || "").trim();
     if (!nome) {
       input.focus();
       input.classList.add("im-contato-input--err");
@@ -3565,34 +3562,115 @@ function abrirModalContatoImovel(im) {
       return;
     }
 
-    // persiste localmente p/ próximos contatos
     localStorage.setItem("visitante_nome", nome);
-
-    // monta mensagem
-    const numero = somenteDigitos(im.telefone || "");
-    const saud = (typeof gerarMensagemWhatsApp === "function")
-      ? gerarMensagemWhatsApp().replace(/Encontrei seu numero no Ola Carlopolis\./i, "").trim()
-      : "";
-    const prefixo = saud ? `${saud} ` : "";
-    const msg = `${prefixo}Meu nome é ${nome}. Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`;
-
-    const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`;
-
-    // logs não bloqueiam a abertura
-    try {
-      registrarCliqueImovel && registrarCliqueImovel("whatsapp", im).catch(()=>{});
-      if (typeof logEventoCliqueImovel === "function") {
-        logEventoCliqueImovel("whatsapp", im);
-      }
-      // salva confirmação no Firebase
-      salvarContatoImovel(im, nome);
-    } catch(e){ /* silencioso */ }
-
-    // abre Whats (user-gesture)
-    window.open(url, "_blank");
+    enviarWhatsAppImovel(im, nome);
     fechar();
   });
 }
+
+// --- Função para abrir WhatsApp com saudação e salvar no Firebase ---
+function enviarWhatsAppImovel(im, nome) {
+  const numero = somenteDigitos(im.telefone || "");
+
+  // Saudação (sem “Encontrei seu número no Olá Carlópolis”)
+  let saudacao = (typeof gerarMensagemWhatsApp === "function")
+    ? (gerarMensagemWhatsApp().trim() || "Olá!")
+    : "Olá!";
+  saudacao = saudacao.replace(/Encontrei seu numero no Ola Carlopolis\.?/i, "")
+                     .replace(/Encontrei seu número no Olá Carlópolis\.?/i, "")
+                     .trim();
+
+  const msg = `${saudacao ? saudacao + " " : ""}Meu nome é ${nome}. Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`;
+  const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`;
+
+  // 1) sempre registra o clique do botão (contador)
+  try {
+    // se você já tem essa função, mantém:
+    if (typeof registrarCliqueImovel === "function") {
+      registrarCliqueImovel("whatsapp", im).catch(()=>{});
+    } else if (window.firebase && firebase.database) {
+      // fallback simples: soma em imoveisCliquesPorDia/YYYY-MM-DD/<imovelId>/whatsapp
+      const hoje = new Date().toISOString().slice(0,10);
+      const ref = firebase.database().ref(`imoveisCliquesPorDia/${hoje}/${im.id}`);
+      ref.transaction(cur => {
+        const v = cur || {};
+        v.whatsapp = (Number(v.whatsapp || 0) + 1);
+        if (!v.titulo && im.titulo) v.titulo = im.titulo;
+        if (!v.corretor && im.corretor) v.corretor = im.corretor;
+        return v;
+      }).catch(()=>{});
+    }
+
+    // 2) salva a confirmação com o NOME (para aparecer no relatório)
+    salvarContatoImovel(im, nome);
+
+    if (typeof logEventoCliqueImovel === "function") {
+      logEventoCliqueImovel("whatsapp", im);
+    }
+  } catch(e){}
+
+  // abre o WhatsApp (gesto do usuário)
+  window.open(url, "_blank");
+}
+
+function salvarContatoImovel(im, nome) {
+  try {
+    if (!window.firebase || !firebase.database) return;
+    const hoje = new Date().toISOString().slice(0,10);
+    const ref = firebase.database()
+      .ref(`imoveis/contatos/${hoje}/${im.id}`)
+      .push();
+
+    ref.set({
+      nome: String(nome || "").slice(0, 80),
+      imovelId: im.id,
+      imovelTitulo: im.titulo || "",
+      destinoFone: somenteDigitos(im.telefone || ""),
+      pagina: location.href,
+      userAgent: navigator.userAgent,
+      ts: firebase.database.ServerValue.TIMESTAMP
+    }).catch(()=>{});
+  } catch(e){}
+}
+
+
+
+// --- Salva no Firebase a confirmação de contato ---
+function salvarContatoImovel(im, nome) {
+  try {
+    if (!window.firebase || !firebase.database) return;
+    const hoje = new Date().toISOString().slice(0,10);
+    const ref = firebase.database()
+      .ref(`imoveis/contatos/${hoje}/${im.id}`)
+      .push();
+
+    ref.set({
+      nome,
+      imovelId: im.id,
+      imovelTitulo: im.titulo || "",
+      destinoFone: somenteDigitos(im.telefone || ""),
+      pagina: location.href,
+      ts: firebase.database.ServerValue.TIMESTAMP
+    }).catch(()=>{});
+  } catch(e){}
+}
+
+// --- Conecta os botões Whats ---
+// --- Conecta os botões "Falar no WhatsApp" (um único listener por botão)
+el.querySelectorAll("[data-action='whats']").forEach(btn => {
+  if (btn.dataset.bindWhats === "1") return; // evita rebind
+  btn.dataset.bindWhats = "1";
+
+  btn.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    const id = ev.currentTarget.getAttribute("data-id");
+    const im = stateImoveis.all.find(x => x.id === id);
+    if (!im) return;
+    abrirModalContatoImovel(im); // aqui NÃO registra clique
+  });
+});
+
+
 
 // salva confirmação de contato no Firebase
 function salvarContatoImovel(im, nome) {
@@ -3605,27 +3683,19 @@ function salvarContatoImovel(im, nome) {
       .push();
 
     ref.set({
-      nome: String(nome || "").slice(0, 40),
+      nome: String(nome || "").slice(0, 80),
       imovelId: im.id,
       imovelTitulo: im.titulo || "",
       destinoFone: somenteDigitos(im.telefone || ""),
+        corretor: (typeof getCorretorPrincipal === "function" ? getCorretorPrincipal(im) : (im.corretor || "")) || "",
+ 
       pagina: location.href,
+      
       userAgent: navigator.userAgent,
       ts: firebase.database.ServerValue.TIMESTAMP
     }).catch(()=>{});
   } catch(e){ /* silencioso */ }
 }
-
-// Conecta os botões "Falar no WhatsApp" para abrir a modal
-el.querySelectorAll("[data-action='whats']").forEach(btn => {
-  btn.addEventListener("click", (ev) => {
-    ev.preventDefault();
-    const id = ev.currentTarget.getAttribute("data-id");
-    const im = stateImoveis.all.find(x => x.id === id);
-    if (!im) return;
-    abrirModalContatoImovel(im);
-  });
-});
 
 
 
@@ -14494,8 +14564,9 @@ function registrarCliqueImovelDia(tipo, im) {
 // salva RESUMO acumulado + corretor
 function registrarCliqueImovelResumo(tipo, im) {
   if (!window.firebase || !firebase.database) return Promise.resolve(false);
+  const hoje  = getHojeBR(); // YYYY-MM-DD
   const chave = keyImovel(im);
-  const ref   = firebase.database().ref(`imoveisCliquesResumo/${chave}`);
+  const ref   = firebase.database().ref(`imoveisCliquesResumo/${hoje}/${chave}`);
 
   return ref.transaction(curr => {
     const base = curr || { totalFotos: 0, totalWhats: 0 };
@@ -14507,6 +14578,7 @@ function registrarCliqueImovelResumo(tipo, im) {
     return base;
   });
 }
+
 
 
 // atalho: registra nos dois nós (dia + resumo)
