@@ -3025,6 +3025,46 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
+    {
+      id: "casa3v",
+      tipo: "venda",   
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 3,   
+      valor: 380000,
+      piscina: false,
+      churrasqueira: true, 
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"] ,
+   // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+////////////////////////////////////////////////////////////
+      titulo: "Casa a venda em Carlópolis",
+      descricao: "Documentação OK.",
+      endereco: "Novo Horizonte 1",
+      suite: "1",      
+      banheiros: 3,      
+      salas: 1,
+      cozinhas: 1,
+      area: 180,
+      construcao: 125,          // << NOVO: m² de construção
+      quintal: "Não",       
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa3/1.jpg",
+        "images/imoveis/cesar/venda/casa3/2.jpg",
+        "images/imoveis/cesar/venda/casa3/3.JPG",
+        "images/imoveis/cesar/venda/casa3/4.jpg",
+        "images/imoveis/cesar/venda/casa3/5.jpg",
+        "images/imoveis/cesar/venda/casa3/6.jpg",
+        "images/imoveis/cesar/venda/casa3/7.jpg",
+        "images/imoveis/cesar/venda/casa3/8.jpg",
+        "images/imoveis/cesar/venda/casa3/9.jpg"
+
+       ],           
+       //lat: -23.3953,
+      //lng: -49.7232,
+
+    },
+
     
     {
       id: "casa4v",
