@@ -2999,7 +2999,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
    // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
 ////////////////////////////////////////////////////////////
       titulo: "Casa nova a venda em Carlópolis.",
-      descricao: "Casa nova, impecavel! Documentação OK. Aceita financiamento, “Minha casa minha vida “",
+      descricao: "Casa nova, impecavel! Documentação OK. Aceita financiamento, “Minha casa minha vida“",
       endereco: "Agende uma Visita",
       suite: "1",      
       banheiros: 1,      
@@ -6653,6 +6653,7 @@ function salvarContatoImovel(im, nome) {
               "images/comercios/sorveteria/limone/cardapio/4.jpeg",
               "images/comercios/sorveteria/limone/cardapio/5.jpeg",
               "images/comercios/sorveteria/limone/cardapio/6.jpeg",
+              "images/comercios/sorveteria/limone/cardapio/7.jpeg",
             ],
 
             novidadesImages: [
@@ -9313,28 +9314,10 @@ function salvarContatoImovel(im, nome) {
 
 
 
-          {
-            image: "images/informacoes/eventos/lowCity.png",
-            name: "LowCity",
-            date: "05/10/2025",
-            address: "Centro de Eventos Ilha do Ponciano",
-            contact: "-",
-            instagram: "https://www.instagram.com/lowcity_043club/",
+          
 
 
-          },
-
-
-          {
-            image: "images/informacoes/eventos/loboFronteira.jpg",
-            name: "Aniversario MC Lobos da Fronteira",
-            date: "11/10/2025 e 12/10/2025",
-            address: "Centro de Eventos Ilha do Ponciano",
-            contact: "(43) 99909-2933",
-            instagram: "https://www.instagram.com/lobosdafronteiramc/",
-
-
-          },
+         
 
 
 
@@ -12233,6 +12216,57 @@ function salvarContatoImovel(im, nome) {
         link: document.querySelector("#menuNotaFalecimento"),
         title: "Nota de Falecimento",
         establishments: [
+/*
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/42.jpg",
+            date: "01/10/2025",
+            descricaoFalecido: "",
+
+          },
+*/
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/45.jpg",
+            date: "13/10/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. ALZIRA FERNANDES DA SILVA, aos 81 anos, ocorrido em Carlópolis. A Sra. Alzira era irmã do saudoso Ataíde.<br>O velório será realizado hoje, segunda-feira, a partir das 17:00 horas, no Velório Municipal.<br>A cerimônia de despedida e o sepultamento ocorrerão amanhã, às 13:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos sinceros sentimentos aos familiares e amigos neste momento de dor. 🙏",
+
+          },
+
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/44.jpg",
+            date: "11/10/2025",
+            descricaoFalecido: "Faleceu em Santo Antônio da Platina aos 63 anos de idade, o Sr. JOSÉ PAULO FERREIRA DO PRADO<Br>A cerimônia iniciará hoje às 07:00 horas no velório municipal de Carlópolis.<Br>Sua despedida e sepultamento será hoje às 16:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/43.jpg",
+            date: "03/10/2025",
+            descricaoFalecido: "Faleceu em Carlópolis aos 55 anos de idade, a Sra. CLEIDE DO NASCIMENTO SILVA<br>A cerimônia terá início hoje sexta-feira às 07:30 horas no velório Municipal.<br>Sua despedida e sepultamento será realizada hoje às 16:30 horas no cemitério Municipal de Carlópolis!<br>Nossos profundos sentimentos aos familiares e amigos! 🙏",
+
+          },
+
+
+
+  //01/10
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/42.jpg",
+            date: "01/10/2025",
+            descricaoFalecido: "Faleceu em Jacarezinho aos 95 anos de idade, o Sr. EZOARDO DIAS<Br>A cerimônia iniciará hoje às 21:30 horas no velório municipal de Carlópolis.<Br>Sua despedida e sepultamento será amanhã às 10:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+
+
+
 
           //26/09
           {
