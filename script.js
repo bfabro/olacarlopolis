@@ -6654,7 +6654,7 @@ function salvarContatoImovel(im, nome) {
               "images/comercios/sorveteria/limone/cardapio/4.jpeg",
               "images/comercios/sorveteria/limone/cardapio/5.jpeg",
               "images/comercios/sorveteria/limone/cardapio/6.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/7.jpeg",
+              "images/comercios/sorveteria/limone/cardapio/7.jpg",
             ],
 
             novidadesImages: [
