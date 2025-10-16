@@ -146,7 +146,7 @@ function mostrarRankingCapivarinha() {
 
     <div class="rank-wrap" style="padding:8px 12px">
       <div class="rank-title">
-  🏅 Top Records <span><br>(melhor pontuação por jogador)</span>
+  🏅 Top 20 Records <span><br>(melhor pontuação por jogador)</span>
 </div>
       <ul id="rankList" class="rank-list"></ul>
 
@@ -1144,10 +1144,11 @@ document.addEventListener("DOMContentLoaded", function () {
     //calendarioeventos: "s",
     feiradalua: "s",
 
-    lowcity: "n",
-    aniversariomclobosdafronteira: "s",
+   
     regisdanese: "s",
+
     passeiociclisticorotary: "s",
+    jogosaventura:"s",
     toroonagashi: "s",
     erosprado: "s",
 
@@ -9345,6 +9346,24 @@ function salvarContatoImovel(im, nome) {
 
 
 
+          },
+
+
+          
+          {
+            image: "images/informacoes/eventos/jogosAventura1.jpg",
+            name: "Jogos Aventura",
+            date: "20/10/2025",
+            address: "Centro de Eventos",
+            contact: "-",
+          },
+
+          {
+            image: "images/informacoes/eventos/jogosAventura2.jpg",
+            name: "Jogos Aventura",
+            date: "25/10/2025",
+            address: "Centro de Eventos",
+            contact: "-",
           },
 
 
