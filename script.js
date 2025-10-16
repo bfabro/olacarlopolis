@@ -688,7 +688,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-     "oficinadocelular", "gerson", "promissorseguros", "sabordaroca"
+    "hime", "oficinadocelular", "gerson", "promissorseguros", "sabordaroca"
 
   ];
 
@@ -3293,7 +3293,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
   // monta página
   function mostrarImoveisV2() {
-    location.hash = "#imoveis";
+    if (location.hash !== "#imoveis") location.hash = "#imoveis";
+    
     const area = document.querySelector(".content_area");
     area.innerHTML = `
     <div class="page-header">
@@ -11617,11 +11618,14 @@ function salvarContatoImovel(im, nome) {
               "images/comercios/restaurante/hime/divulgacao/1.jpg",
               "images/comercios/restaurante/hime/divulgacao/2.jpg",
               "images/comercios/restaurante/hime/divulgacao/3.jpg",
+              "images/comercios/restaurante/hime/divulgacao/4.jpg",
+              "images/comercios/restaurante/hime/divulgacao/5.jpg",
 
 
 
             ],
             novidadesDescriptions: [
+               "Reserve sua mesa!  ",
               "Sabiam quem temos Rodizio todas as Sextas-ferias?  ",
               "Nosso famoso Yaki Soba!",
               "Amplo espaço para atendermos toda sua familia! ",
@@ -13653,6 +13657,10 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
+    if (h === "#imoveis") { return mostrarImoveisV2(); }
+
+
+    
 
 
 
