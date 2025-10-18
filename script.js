@@ -6649,12 +6649,12 @@ function salvarContatoImovel(im, nome) {
             instagram: "https://www.instagram.com/limone.sorvetes/?hl=pt",
             menuImages: [
 
-              "images/comercios/sorveteria/limone/cardapio/1.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/2.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/3.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/4.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/5.jpeg",
-              "images/comercios/sorveteria/limone/cardapio/6.jpeg",
+              "images/comercios/sorveteria/limone/cardapio/1.jpg",
+              "images/comercios/sorveteria/limone/cardapio/2.jpg",
+              "images/comercios/sorveteria/limone/cardapio/3.jpg",
+              "images/comercios/sorveteria/limone/cardapio/4.jpg",
+              "images/comercios/sorveteria/limone/cardapio/5.jpg",
+              "images/comercios/sorveteria/limone/cardapio/6.jpg",
               "images/comercios/sorveteria/limone/cardapio/7.jpg",
               "images/comercios/sorveteria/limone/cardapio/8.jpg",
               "images/comercios/sorveteria/limone/cardapio/9.jpg",
@@ -6663,11 +6663,11 @@ function salvarContatoImovel(im, nome) {
             ],
 
             novidadesImages: [
-              "images/comercios/sorveteria/limone/divulgacao/1.jpeg",
-              "images/comercios/sorveteria/limone/divulgacao/2.jpeg",
-              "images/comercios/sorveteria/limone/divulgacao/3.jpeg",
-              "images/comercios/sorveteria/limone/divulgacao/4.jpeg",
-              "images/comercios/sorveteria/limone/divulgacao/5.jpeg",
+              "images/comercios/sorveteria/limone/divulgacao/1.jpg",
+              "images/comercios/sorveteria/limone/divulgacao/2.jpg",
+              "images/comercios/sorveteria/limone/divulgacao/3.jpg",
+              "images/comercios/sorveteria/limone/divulgacao/4.jpg",
+              "images/comercios/sorveteria/limone/divulgacao/5.jpg",
             ],
           },
 
