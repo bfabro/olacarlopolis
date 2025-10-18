@@ -12250,6 +12250,30 @@ function salvarContatoImovel(im, nome) {
           },
 */
 
+  {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/47.jpg",
+            date: "17/10/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. João Carlos Roviler, carinhosamente conhecido como Jhonny, aos 58 anos. Ocorrido em Carlópolis.<Br>A cerimônia de despedida terá início hoje, às 23h30, no Velório Municipal de Carlópolis.<Br>O sepultamento será realizado amanhã, às 16h00, no Cemitério Municipal de Carlópolis.<Br>Nossos sinceros sentimentos à família e amigos neste momento de dor. 🙏",
+
+          },
+
+            {
+            name: "Funeraria Grupo Castilho",
+            image: "images/informacoes/notaFalecimento/castilho/35.jpg",
+            date: "16/10/2025",
+            descricaoFalecido: "Comunicamos o falecimento da Sr. VILMA CLEA MARQUES aos 90 anos de idade.<Br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR<Br>O sepultamento será realizado 17/10/2025 as 16:00 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
+
+          },
+
+            {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/46.jpg",
+            date: "16/10/2025",
+            descricaoFalecido: "Faleceu em Santo Antônio da Platina aos 47 anos de idade, o Sr. ALTAMIR PEREIRA DE SOUZA mais conhecido como Tamiro.<Br>A pedido da família a cerimônia e sepultamento será hoje 16:45 horas no velório municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
           {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/45.jpg",
@@ -12264,6 +12288,14 @@ function salvarContatoImovel(im, nome) {
             image: "images/informacoes/notaFalecimento/cristoRei/44.jpg",
             date: "11/10/2025",
             descricaoFalecido: "Faleceu em Santo Antônio da Platina aos 63 anos de idade, o Sr. JOSÉ PAULO FERREIRA DO PRADO<Br>A cerimônia iniciará hoje às 07:00 horas no velório municipal de Carlópolis.<Br>Sua despedida e sepultamento será hoje às 16:30 horas no Cemitério Municipal de Carlópolis.<Br>Nossos profundos sentimentos a todos familiares 🙏",
+
+          },
+
+            {
+            name: "Funeraria Grupo Castilho",
+            image: "images/informacoes/notaFalecimento/castilho/34.jpg",
+            date: "05/10/2025",
+            descricaoFalecido: "Comunicamos o falecimento do Sr. JOSE CARLOS DE SALES aos 59 anos de idade.<Br>‌O velório será a partir das 08:30 na CAPELA MUNICIPAL DE CARLOPOLIS - PR<Br>O sepultamento será realizado 06/10/2025 as 16:00 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - ",
 
           },
 
