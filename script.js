@@ -13873,7 +13873,7 @@ function mostrarSol(dateISO) {
 
   area.innerHTML = `
     <div class="page-header">
-      <h2 >🌞 Nascer & Pôr do Sol – Carlópolis</h2>
+      <h2 >🌞 Duração do Dia</h2>
       <i class="fa-solid fa-share-nodes share-btn"
          onclick="compartilharPagina('#sol','Nascer & Pôr do Sol','Veja os horários do Sol em Carlópolis')"></i>
     </div>
