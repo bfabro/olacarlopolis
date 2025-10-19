@@ -12247,12 +12247,20 @@ function salvarContatoImovel(im, nome) {
 
           {
             name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/42.jpg",
+            image: "images/informacoes/notaFalecimento/cristoRei/49.jpg",
             date: "01/10/2025",
             descricaoFalecido: "",
 
           },
 */
+
+ {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/48.jpg",
+            date: "19/10/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. ZÉLIA CASSIMIRO NAGAKI, aos 79 anos, ocorrido em Santo Antônio da Platina.<br>O velório será realizado hoje Domingo em horário a ser definido em sua residência na Rua: Jorge Barros 1197.<br>A cerimônia do sepultamento ocorrerá hoje às 16:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos sinceros sentimentos aos familiares e amigos neste momento de dor. 🙏",
+
+          },
 
   {
             name: "Funeraria Cristo Rei",
