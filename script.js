@@ -12768,6 +12768,15 @@ function salvarContatoImovel(im, nome) {
 
   montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
 
+  // Menu: Nascer & Pôr do Sol
+document.addEventListener("click", (ev) => {
+  const t = ev.target.closest("#menuSol");
+  if (!t) return;
+  ev.preventDefault();
+  mostrarSol(); // abre a página
+});
+
+
 
 
   searchInput.addEventListener("input", function () {
@@ -13721,6 +13730,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
+    if (location.hash === "#sol") { mostrarSol(); }
 
 
     
@@ -13790,22 +13800,145 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   }
 
 
-  ///
-  ///
-  ///
+// === NASCER & PÔR DO SOL (Carlópolis-PR) ===
+
+// Coordenadas fixas de Carlópolis-PR
+const COORDS_CARLOPOLIS = { lat: -23.4267, lng: -49.7239 };
+
+// Formata data YYYY-MM-DD no fuso de São Paulo
+function hojeISO_BR() {
+  const tz = 'America/Sao_Paulo';
+  const d = new Date();
+  // garante data local correta:
+  const y = d.toLocaleString('en-CA', { timeZone: tz, year:'numeric' });
+  const m = d.toLocaleString('en-CA', { timeZone: tz, month:'2-digit' });
+  const dd = d.toLocaleString('en-CA', { timeZone: tz, day:'2-digit' });
+  return `${y}-${m}-${dd}`;
+}
+
+// Converte um ISO para "HH:mm" em São Paulo
+function toHoraMinBR(iso) {
+  if (!iso) return "--:--";
+  const d = new Date(iso);
+  return d.toLocaleTimeString("pt-BR", {
+    hour: "2-digit", minute: "2-digit",
+    timeZone: "America/Sao_Paulo"
+  });
+}
+
+// Converte "HH:MM:SS" (day_length) para "H h M min"
+function duracaoHumana(valor) {
+  // Se vier número (Open-Meteo): converte para "HH:MM:SS"
+  if (typeof valor === "number" && Number.isFinite(valor)) {
+    const h = Math.floor(valor / 3600);
+    const m = Math.floor((valor % 3600) / 60);
+    // s não é necessário para o texto final, mas calculo por completude
+    // const s = Math.floor(valor % 60);
+    const partes = [];
+    if (h) partes.push(`${h} h`);
+    if (m || !h) partes.push(`${m} min`);
+    return partes.join(" ");
+  }
+
+  // Se vier string "HH:MM:SS" (sunrise-sunset.org): trata como antes
+  if (typeof valor === "string" && valor.includes(":")) {
+    const [h, m] = valor.split(":").map(Number);
+    const partes = [];
+    if (h) partes.push(`${h} h`);
+    if (m || !h) partes.push(`${m} min`);
+    return partes.join(" ");
+  }
+
+  return "-";
+}
 
 
-  ///
+// Busca na API sunrise-sunset (UTC; formatted=0 entrega ISO)
+async function buscarSol(dateISO) {
+  const { lat, lng } = COORDS_CARLOPOLIS;
+  const url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${dateISO}&formatted=0`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error("Falha ao consultar horários");
+  const j = await r.json();
+  if (j.status !== "OK") throw new Error("Resposta inválida");
+  return j.results; // sunrise, sunset, solar_noon, day_length, civil_twilight_begin/end, etc.
+}
 
-  ///
-  ///
+function mostrarSol(dateISO) {
+  if (location.hash !== "#sol") location.hash = "#sol";
 
+  const area = document.querySelector(".content_area");
+  const hoje = hojeISO_BR();
+  const dataInicial = dateISO || hoje;
 
+  area.innerHTML = `
+    <div class="page-header">
+      <h2 >🌞 Nascer & Pôr do Sol – Carlópolis</h2>
+      <i class="fa-solid fa-share-nodes share-btn"
+         onclick="compartilharPagina('#sol','Nascer & Pôr do Sol','Veja os horários do Sol em Carlópolis')"></i>
+    </div>
 
+    <div class="sol-wrap">
+      <div class="sol-toolbar">
+        <label for="solData"><b>Escolha a data:</b></label>
+        <input id="solData" type="date" value="${dataInicial}">
+        <button id="solAtualizar" class="btn-rank">Atualizar</button>
+      </div>
 
+      <div class="sol-card">
+        <div id="solStatus" style="margin-bottom:10px">⏳ Carregando horários...</div>
+        <div class="sol-row">
+          <div class="sol-box">
+            <h4>Nascer do Sol</h4>
+            <div class="time" id="solSunrise">--:--</div>
+          </div>
+          <div class="sol-box">
+            <h4>Pôr do Sol</h4>
+            <div class="time" id="solSunset">--:--</div>
+          </div>
+          <div class="sol-box">
+            <h4>Meio-dia Solar</h4>
+            <div class="time" id="solNoon">--:--</div>
+          </div>
+          <div class="sol-box">
+            <h4>Duração do dia</h4>
+            <div class="time" id="solDuracao">-</div>
+          </div>
+        </div>
 
+        <div style="margin-top:12px; font-size:13px; opacity:.85">
+          <span>📍 Coordenadas: ${COORDS_CARLOPOLIS.lat.toFixed(4)}, ${COORDS_CARLOPOLIS.lng.toFixed(4)}</span>
+        </div>
+      </div>
+    </div>
+  `;
 
+  // função interna para carregar/atualizar
+  async function carregar(dateStr) {
+    const st = document.getElementById("solStatus");
+    try {
+      st.textContent = "⏳ Carregando horários...";
+      const res = await buscarSol(dateStr);
+      document.getElementById("solSunrise").textContent = toHoraMinBR(res.sunrise);
+      document.getElementById("solSunset").textContent  = toHoraMinBR(res.sunset);
+      document.getElementById("solNoon").textContent    = toHoraMinBR(res.solar_noon);
+      document.getElementById("solDuracao").textContent = duracaoHumana(res.day_length);
+      st.textContent = `✅ Horários para ${dateStr.split("-").reverse().join("/")}`;
+    } catch (e) {
+      console.error(e);
+      st.textContent = "⚠️ Não foi possível carregar os horários. Tente novamente.";
+    }
+  }
 
+  // listeners
+  const inp = document.getElementById("solData");
+  const btn = document.getElementById("solAtualizar");
+  if (btn) btn.addEventListener("click", () => carregar(inp.value || hoje));
+  if (inp) inp.addEventListener("change", () => carregar(inp.value || hoje));
+
+  // carrega inicial
+  carregar(dataInicial);
+}
 
 
 
