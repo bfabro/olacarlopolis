@@ -13906,7 +13906,7 @@ function mostrarSol(dateISO) {
     <div class="page-header">
       <h2 >🌞 Clima do Dia</h2>
       <i class="fa-solid fa-share-nodes share-btn"
-         onclick="compartilharPagina('#sol','Nascer & Pôr do Sol','Veja os horários do Sol em Carlópolis')"></i>
+         onclick="compartilharPagina('#sol','Nascer & Pôr do Sol','Veja o clima do Dia em Carlópolis')"></i>
     </div>
 
     <div class="sol-wrap">
