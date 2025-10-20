@@ -13919,14 +13919,15 @@ function mostrarSol(dateISO) {
        <div class="sol-card" style="margin-top:12px">
   <div style="margin-bottom:10px"><b>☁️ Clima do dia em Carlópolis</b></div>
   <div class="sol-row-4">
+  <div class="sol-box">
+      <h4>Temp. Mínima</h4>
+      <div class="time" id="wxMin">--°C</div>
+    </div>
     <div class="sol-box">
       <h4>Temp. Máxima</h4>
       <div class="time" id="wxMax">--°C</div>
     </div>
-    <div class="sol-box">
-      <h4>Temp. Mínima</h4>
-      <div class="time" id="wxMin">--°C</div>
-    </div>
+    
     <div class="sol-box">
       <h4>Vento Máx</h4>
       <div class="time" id="wxWind">-- km/h</div>

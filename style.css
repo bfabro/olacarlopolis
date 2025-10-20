@@ -7253,16 +7253,25 @@ html {
   background: #fff; border-radius: 14px; padding: 14px;
   box-shadow: 0 4px 12px rgba(0,0,0,.08);
 }
-.sol-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sol-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .sol-box {
   background:#f7f9ff; border:1px solid #e6ecff; border-radius:12px; padding:12px; text-align:center;
 }
-.sol-box h4 { font-size:14px; margin-bottom:6px; color:#4070f4; text-transform:uppercase; letter-spacing:.5px; }
-.sol-box .time { font-size:22px; font-weight:700; }
+.sol-box h4 { font-size:12px; margin-bottom:6px; color:#4070f4; text-transform:uppercase; letter-spacing:.5px; }
+.sol-box .time { font-size:18px; font-weight:700; }
 .sol-toolbar { display:flex; gap:10px; align-items:center; margin:10px 0 14px 0; flex-wrap:wrap; }
 .sol-toolbar input[type="date"]{ padding:8px 10px; border:1px solid #dcdcdc; border-radius:8px; }
 @media (max-width:768px){
   .sol-row{ grid-template-columns: 1fr; }
+}
+/* tablets e telas médias continuam 2 colunas */
+@media (max-width: 1024px) {
+  .sol-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* celulares: mantém 2 colunas (não cair para 1) */
+@media (max-width: 540px) {
+  .sol-row { grid-template-columns: repeat(2, 1fr); }
 }
 
 
@@ -7278,5 +7287,5 @@ html {
   .sol-row-4 { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 540px){
-  .sol-row-4 { grid-template-columns: 1fr; }
+.sol-row-4 { grid-template-columns: repeat(2, 1fr); }
 }
