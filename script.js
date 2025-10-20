@@ -943,6 +943,9 @@ document.addEventListener("DOMContentLoaded", function () {
     mhpiscinas: "s",
 
     //Lava Rapido
+
+    //revendedor
+    taticonik:"s",
     leozindetailer: "s",
 
     //pizzaria
@@ -9223,6 +9226,55 @@ function salvarContatoImovel(im, nome) {
             ],
             novidadesDescriptions: [
               "Especialista no Tratamento em Diabético",
+            ],
+
+
+          },
+
+        ],
+      },
+
+
+
+      {
+        link: document.querySelector("#menuRevendedor"),
+        title: "Revendedor",
+        establishments: [
+          {
+            image: "images/servicos/revendedor/tati/perfil.jpg",
+            name: "Tati Conik",
+
+            hours: "Seg a Sab: 08:00h as 18:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "18:00" }],
+              dom: []
+            },
+            address: "R.  Dra. Paula e Silva, 648 - Carlópolis",
+                        contact: "(43) 99153-4883",
+
+            instagram: "https://www.instagram.com/eu_tatyconik/",
+            infoAdicional: "📗 <a href='images/servicos/revendedor/tati/divulgacao/catalogo.pdf' target='_blank' rel='noopener'><br>Acesse Nosso Catálogo</a>",
+           
+            novidadesImages: [
+              "images/servicos/revendedor/tati/divulgacao/1.jpg",
+              "images/servicos/revendedor/tati/divulgacao/2.jpg",
+              "images/servicos/revendedor/tati/divulgacao/3.jpg",
+              "images/servicos/revendedor/tati/divulgacao/4.jpg",
+              "images/servicos/revendedor/tati/divulgacao/5.jpg",
+              "images/servicos/revendedor/tati/divulgacao/6.jpg",
+              "images/servicos/revendedor/tati/divulgacao/7.jpg",
+              "images/servicos/revendedor/tati/divulgacao/8.jpg",
+              "images/servicos/revendedor/tati/divulgacao/9.jpg",
+              "images/servicos/revendedor/tati/divulgacao/10.jpg",
+            ],
+            novidadesDescriptions: [
+              "",
             ],
 
 
