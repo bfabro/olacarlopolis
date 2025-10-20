@@ -13730,7 +13730,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
-    if (location.hash === "#sol") { mostrarSol(); }
+    if (location.hash === "#climaDoDia") { mostrarSol(); }
 
 
     
@@ -13896,7 +13896,7 @@ async function buscarTempo(dateISO) {
 
 
 function mostrarSol(dateISO) {
-  if (location.hash !== "#sol") location.hash = "#sol";
+  if (location.hash !== "#climaDoDia") location.hash = "#climaDoDia";
 
   const area = document.querySelector(".content_area");
   const hoje = hojeISO_BR();
@@ -13906,7 +13906,7 @@ function mostrarSol(dateISO) {
     <div class="page-header">
       <h2 >🌞 Clima do Dia</h2>
       <i class="fa-solid fa-share-nodes share-btn"
-         onclick="compartilharPagina('#sol','Nascer & Pôr do Sol','Veja o clima do Dia em Carlópolis')"></i>
+         onclick="compartilharPagina('#climaDoDia','Nascer & Pôr do Sol','Veja o clima do Dia em Carlópolis')"></i>
     </div>
 
     <div class="sol-wrap">
