@@ -9259,7 +9259,7 @@ function salvarContatoImovel(im, nome) {
                         contact: "(43) 99153-4883",
 
             instagram: "https://www.instagram.com/eu_tatyconik/",
-            infoAdicional: "📗 <a href='images/servicos/revendedor/tati/divulgacao/catalogo.pdf' target='_blank' rel='noopener'><br>Acesse Nosso Catálogo</a>",
+            infoAdicional: "Especialistas em cuidados capilares, desenvolvemos produtos de alta performance para salões de beleza.<br> Nossas linhas unem tecnologia e qualidade profissional para proporcionar fios mais saudáveis, lisos e radiantes.<br>📗 <a href='images/servicos/revendedor/tati/divulgacao/Catalogo.pdf' target='_blank' rel='noopener'><br>Acesse Nosso Catálogo</a>",
            
             novidadesImages: [
               "images/servicos/revendedor/tati/divulgacao/1.jpg",
