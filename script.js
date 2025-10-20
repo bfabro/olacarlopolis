@@ -13864,6 +13864,37 @@ async function buscarSol(dateISO) {
   return j.results; // sunrise, sunset, solar_noon, day_length, civil_twilight_begin/end, etc.
 }
 
+
+// === Clima diário (Open-Meteo) ===
+// Retorna { tmax, tmin, wind, rainProb } para a data
+async function buscarTempo(dateISO) {
+  const { lat, lng } = COORDS_CARLOPOLIS;
+  const base = "https://api.open-meteo.com/v1/forecast";
+  const params = new URLSearchParams({
+    latitude: lat,
+    longitude: lng,
+    daily: "temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max",
+    timezone: "America/Sao_Paulo",
+    temperature_unit: "celsius",
+    wind_speed_unit: "kmh",
+    start_date: dateISO,
+    end_date: dateISO
+  });
+  const resp = await fetch(`${base}?${params.toString()}`);
+  if (!resp.ok) throw new Error("Falha ao consultar clima");
+  const j = await resp.json();
+  if (!j?.daily) throw new Error("Resposta inválida (clima)");
+
+  const i = 0; // só 1 dia
+  return {
+    tmax: j.daily.temperature_2m_max?.[i],
+    tmin: j.daily.temperature_2m_min?.[i],
+    wind: j.daily.wind_speed_10m_max?.[i],
+    rainProb: j.daily.precipitation_probability_max?.[i]
+  };
+}
+
+
 function mostrarSol(dateISO) {
   if (location.hash !== "#sol") location.hash = "#sol";
 
@@ -13873,7 +13904,7 @@ function mostrarSol(dateISO) {
 
   area.innerHTML = `
     <div class="page-header">
-      <h2 >🌞 Duração do Dia</h2>
+      <h2 >🌞 Clima do Dia</h2>
       <i class="fa-solid fa-share-nodes share-btn"
          onclick="compartilharPagina('#sol','Nascer & Pôr do Sol','Veja os horários do Sol em Carlópolis')"></i>
     </div>
@@ -13882,8 +13913,30 @@ function mostrarSol(dateISO) {
       <div class="sol-toolbar">
         <label for="solData"><b>Escolha a data:</b></label>
         <input id="solData" type="date" value="${dataInicial}">
-        <button id="solAtualizar" class="btn-rank">Atualizar</button>
+<!-- <button id="solAtualizar" class="btn-rank">Atualizar</button> -->
       </div>
+
+       <div class="sol-card" style="margin-top:12px">
+  <div style="margin-bottom:10px"><b>☁️ Clima do dia em Carlópolis</b></div>
+  <div class="sol-row-4">
+    <div class="sol-box">
+      <h4>Temp. Máxima</h4>
+      <div class="time" id="wxMax">--°C</div>
+    </div>
+    <div class="sol-box">
+      <h4>Temp. Mínima</h4>
+      <div class="time" id="wxMin">--°C</div>
+    </div>
+    <div class="sol-box">
+      <h4>Vento Máx</h4>
+      <div class="time" id="wxWind">-- km/h</div>
+    </div>
+    <div class="sol-box">
+      <h4>Prob. de Chuva</h4>
+      <div class="time" id="wxRain">--%</div>
+    </div>
+  </div>
+</div>
 
       <div class="sol-card">
         <div id="solStatus" style="margin-bottom:10px">⏳ Carregando horários...</div>
@@ -13906,6 +13959,9 @@ function mostrarSol(dateISO) {
           </div>
         </div>
 
+       
+
+
         <div style="margin-top:12px; font-size:13px; opacity:.85">
           <span>📍 Coordenadas: ${COORDS_CARLOPOLIS.lat.toFixed(4)}, ${COORDS_CARLOPOLIS.lng.toFixed(4)}</span>
         </div>
@@ -13923,6 +13979,13 @@ function mostrarSol(dateISO) {
       document.getElementById("solSunset").textContent  = toHoraMinBR(res.sunset);
       document.getElementById("solNoon").textContent    = toHoraMinBR(res.solar_noon);
       document.getElementById("solDuracao").textContent = duracaoHumana(res.day_length);
+      // depois de preencher os horários do sol...
+const tempo = await buscarTempo(dateStr);
+document.getElementById("wxMax").textContent  = (tempo.tmax ?? "--") + "°C";
+document.getElementById("wxMin").textContent  = (tempo.tmin ?? "--") + "°C";
+document.getElementById("wxWind").textContent = (tempo.wind ?? "--") + " km/h";
+document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
+
       st.textContent = `✅ Horários para ${dateStr.split("-").reverse().join("/")}`;
     } catch (e) {
       console.error(e);
