@@ -7289,3 +7289,90 @@ html {
 @media (max-width: 540px){
 .sol-row-4 { grid-template-columns: repeat(2, 1fr); }
 }
+
+
+/* ===== Tarja diagonal de VENDIDO/ALUGADO ===== */
+.card-top { position: relative; }
+
+.ribbon {
+  position: absolute;
+  right: -28px;
+  top:28px;
+  transform: rotate(35deg);
+  background: #dc3545;            /* padrão: vendido */
+  color: #fff;
+  text-align: center;
+  font-weight: 800;
+  letter-spacing:3.5px;
+  padding: 8px 50px;
+  font-size: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+  z-index: 3;
+  pointer-events: none; width: 200px;
+}
+
+/* Variações por status */
+.ribbon-vendido { background: #dc3545; }  /* vermelho */
+.ribbon-alugado { background: #ff9800; }  /* laranja */
+.ribbon-negociado { background: #6b7280; }/* cinza */
+
+/* Efeito visual quando vendido/alugado */
+.card-imovel.is-sold .swiper-imovel-mini,
+.card-imovel.is-sold .swiper-imovel-mini img {
+  filter: grayscale(1) brightness(.9);
+}
+
+.card-imovel.is-sold .btn-whats[disabled] {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* Opcional: esconder a badge de status de baixo se quiser só a tarja */
+.card-imovel.is-sold .badges .badge {
+  display: none;
+}
+.checkbox-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.im-filtros .field label.checkbox-line { font-weight: 600; }
+/* Barra de topo do painel de filtros */
+.im-filtros .filters-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Checkbox em linha, sem quebrar */
+.im-filtros .filters-head .checkbox-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;           /* tira margem extra do label padrão */
+  font-weight: 600;
+}
+
+/* melhora o visual do checkbox */
+.im-filtros input[type="checkbox"] {
+  width: auto;         /* não ocupar 100% (regra padrão do painel) */
+  accent-color: #2E8B57;
+}
+
+/* Responsivo: no mobile, coloca o checkbox embaixo do título */
+@media (max-width: 768px) {
+  .im-filtros .filters-head {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .im-filtros .filters-head h4 {
+    width: 100%;
+    margin: 0;
+  }
+  .im-filtros .filters-head .checkbox-line {
+    order: 2;          /* aparece logo abaixo do "Filtrar" */
+  }
+}

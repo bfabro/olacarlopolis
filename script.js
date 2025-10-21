@@ -3112,6 +3112,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter1",
+      status: "Vendido",   // <= adicione isto quando estiver vendido
       tipo: "venda",
       titulo: "Terreno Esquina - Loteamento Amaral",
       descricao: "Bairro em expansão, com valorização garantida nos próximos anos",
@@ -3309,7 +3310,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     <div class="imoveis-wrap">
       <aside class="im-filtros">
-        <h4>Filtrar</h4>
+
+      <div class="filters-head">
+    <h4>Filtrar</h4>
+
+    <label class="checkbox-line only-available">
+      <input type="checkbox" id="somenteDisponiveis">
+      <span>Somente Disponíveis</span>
+    </label>
+  </div>
+
+
+
         <div class="field">
           <label>Tipo Negociação</label>
           <select id="imTipo">
@@ -3319,6 +3331,20 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
            
           </select>
         </div>
+
+
+       
+
+<div class="field" style="margin-top:8px">
+  <label>Ordenação</label>
+  <select id="ordenacaoImoveis">
+    <option value="">Padrão</option>
+    <option value="disponiveis">Disponíveis primeiro</option>
+    <option value="preco_asc">Preço: menor → maior</option>
+    <option value="preco_desc">Preço: maior → menor</option>
+  </select>
+</div>
+
 
         <!-- Filtro: O que procura -->
 <label for="filtroProcura">O que procura:</label>
@@ -3395,6 +3421,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       </div>
     </div>
   `;
+
+  // 'Somente disponíveis'
+const chkDisp = document.getElementById("somenteDisponiveis");
+if (chkDisp) chkDisp.addEventListener("change", aplicarFiltrosImoveis);
 
     function updatePrecoOptions(tipo) {
       const sel = document.getElementById("imPreco");
@@ -3487,38 +3517,66 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   const stateImoveis = { all: [], filtered: [], map: null, markers: [] };
 
   function aplicarFiltrosImoveis() {
-    const tipo = document.getElementById("imTipo").value;
-    const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
-    const p = parseInt(document.getElementById("imPreco").value || 0, 10);
-    const amen = Array.from(document.querySelectorAll(".amenity-chip.active"))
-      .map(c => c.dataset.key);
-    const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
-    const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
+  const tipo = document.getElementById("imTipo").value;
+  const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
+  const p = parseInt(document.getElementById("imPreco").value || 0, 10);
+  const amen = Array.from(document.querySelectorAll(".amenity-chip.active"))
+    .map(c => c.dataset.key);
+  const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
+  const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
+  const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
+  const ordenacao = document.getElementById("ordenacaoImoveis")?.value || "";
 
-    stateImoveis.filtered = stateImoveis.all.filter(im => {
-      const tipoOk = !tipo || im.tipo === tipo;
-      const qOk = !q || (im.quartos >= q);
-      const pOk = !p || (im.valor <= p);
-      const corretorOk =
-        !corretorSelecionado ||
-        (Array.isArray(im.corretores)
-          ? im.corretores.includes(corretorSelecionado)
-          : im.corretor === corretorSelecionado);
-      const procuraOk =
-        !procuraSelecionado ||
-        (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
+  const isFechado = (st) => {
+    if (!st) return false;
+    const s = String(st).toLowerCase();
+    return s.includes("vendido") || s.includes("alugado") || s.includes("negociado");
+  };
 
-      let amenOk = true;
-      if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
-      if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
-      if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
+  // 1) FILTRAR
+  stateImoveis.filtered = stateImoveis.all.filter(im => {
+    const tipoOk = !tipo || im.tipo === tipo;
+    const qOk = !q || (im.quartos >= q);
+    const pOk = !p || (im.valor <= p);
 
-      return tipoOk && qOk && pOk && corretorOk && procuraOk && amenOk;
+    const corretorOk =
+      !corretorSelecionado ||
+      (Array.isArray(im.corretores)
+        ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
+        : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
+
+    const procuraOk =
+      !procuraSelecionado ||
+      (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
+
+    let amenOk = true;
+    if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
+    if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
+    if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
+
+    const disponivelOk = !somenteDisp || !isFechado(im.status);
+
+    return tipoOk && qOk && pOk && corretorOk && procuraOk && amenOk && disponivelOk;
+  });
+
+  // 2) ORDENAR
+  if (ordenacao === "disponiveis") {
+    stateImoveis.filtered.sort((a, b) => {
+      const A = isFechado(a.status) ? 1 : 0;
+      const B = isFechado(b.status) ? 1 : 0;
+      if (A !== B) return A - B; // disponíveis (0) antes de vendidos (1)
+      return 0;
     });
-
-    desenharGridImoveis(stateImoveis.filtered);
-    plotarPinsImoveis(stateImoveis.filtered);
+  } else if (ordenacao === "preco_asc") {
+    stateImoveis.filtered.sort((a, b) => (a.valor || 0) - (b.valor || 0));
+  } else if (ordenacao === "preco_desc") {
+    stateImoveis.filtered.sort((a, b) => (b.valor || 0) - (a.valor || 0));
   }
+
+  desenharGridImoveis(stateImoveis.filtered);
+  plotarPinsImoveis(stateImoveis.filtered);
+}
+
 
 
 
@@ -3793,15 +3851,18 @@ function salvarContatoImovel(im, nome) {
 
 
   function cardImovelHTML(im) {
-    const tag = im.tipo; // "venda" | "aluguel"
-    const st = (im.status || "").toLowerCase();
-    const precoFmt = im.tipo === "aluguel"
-      ? `R$ ${Number(im.valor).toLocaleString()} / mês`
-      : `R$ ${Number(im.valor).toLocaleString()}`;
-    const responsavel = nomeResponsavel(im);
+  const tag = im.tipo; // "venda" | "aluguel"
+  const st = (im.status || "").toLowerCase();
+  const isFechado = ["vendido","alugado","negociado"].includes(st);
 
-    return `
-  <article class="card-imovel ${tag}" data-id="${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
+  const precoFmt = im.tipo === "aluguel"
+    ? `R$ ${Number(im.valor).toLocaleString()} / mês`
+    : `R$ ${Number(im.valor).toLocaleString()}`;
+
+  const responsavel = nomeResponsavel(im);
+
+  return `
+  <article class="card-imovel ${tag} ${isFechado ? "is-sold" : ""}" data-id="${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
     <div class="card-top">
       <div class="swiper swiper-imovel-mini">
         <div class="swiper-wrapper">
@@ -3815,12 +3876,13 @@ function salvarContatoImovel(im, nome) {
 
       <span class="tag ${tag}">${tag.toUpperCase()}</span>
 
-      <!-- Selo de preço no topo-direito -->
+      ${isFechado ? `<div class="ribbon ribbon-${st}">${st.toUpperCase()}</div>` : ""}
+
       <div class="price-pill ${tag}">
         ${im.tipo === "aluguel"
-        ? `R$ ${Number(im.valor).toLocaleString()} <span class="pill-sub">/ mês</span>`
-        : `R$ ${Number(im.valor).toLocaleString()}`
-      }
+          ? `R$ ${Number(im.valor).toLocaleString()} <span class="pill-sub">/ mês</span>`
+          : `R$ ${Number(im.valor).toLocaleString()}`
+        }
       </div>
     </div>
 
@@ -3828,11 +3890,9 @@ function salvarContatoImovel(im, nome) {
       <div class="card-title">${im.titulo}</div>
       ${im.descricao ? `<div class="descricaoImovel" style="margin-top:8px"><p>${im.descricao}</p></div>` : ""}
       <div class="card-addr2"><i class="fa-solid fa-map-pin"></i> ${im.endereco}</div>
-      
 
       <div class="specs-chips">${renderChips(im)}</div>
 
-      <!-- Faixa de baixo (vamos ocultar só em venda via CSS) -->
       <div class="price-line" style="margin-top:12px">
         <div class="price">${precoFmt}</div>
         <div class="badges">
@@ -3841,7 +3901,7 @@ function salvarContatoImovel(im, nome) {
       </div>
 
       <div class="card-actions">
-        <button class="btn-whats" data-action="whats" data-id="${im.id}">
+        <button class="btn-whats" data-action="whats" data-id="${im.id}" ${isFechado ? 'disabled aria-disabled="true"' : ""}>
           <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
         </button>
       </div>
@@ -3849,7 +3909,8 @@ function salvarContatoImovel(im, nome) {
       ${responsavel ? `<div class="spec-chip chip-mini corretor-banner"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
     </div>
   </article>`;
-  }
+}
+
 
 
 
