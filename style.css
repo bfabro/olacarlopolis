@@ -7510,3 +7510,84 @@ html {
 }
 #filtrosImoveis .btn-prim { background:#3b82f6; color:#fff; }
 #filtrosImoveis .btn-sec { background:#f3f4f6; color:#111827; }
+
+
+
+/* ======== Filtros da página de imóveis (2 colunas) ======== */
+.painel-filtros {
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.painel-filtros .grid-filtros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  gap: 14px 20px;
+  align-items: end;
+}
+
+.painel-filtros .campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.painel-filtros .campo label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.painel-filtros .campo select {
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #d3d3d3;
+  padding: 0 10px;
+  font-size: 0.95rem;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.painel-filtros .campo select:focus {
+  border-color: #007bff;
+}
+
+/* Campos que precisam ocupar a linha inteira (como comodidades e corretor) */
+.painel-filtros .grid-span-2 {
+  grid-column: 1 / -1;
+}
+
+/* Chips de comodidades */
+.painel-filtros .chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.painel-filtros .chip {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 6px 12px;
+  background: #f7f7f7;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+.painel-filtros .chip:hover {
+  background: #eaf2ff;
+  border-color: #aac4ff;
+}
+.painel-filtros .chip.is-active {
+  background: #dce8ff;
+  border-color: #5a8eff;
+}
+
+/* Responsivo: uma coluna em telas pequenas */
+@media (max-width: 640px) {
+  .painel-filtros .grid-filtros {
+    grid-template-columns: 1fr;
+  }
+}
