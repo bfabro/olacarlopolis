@@ -3386,7 +3386,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       </div>
 
        <div class="campo">
-        <label for="imQuartos">Quantidade de Quartos</label>
+        <label for="imQuartos">Qtd de Quartos</label>
         <select id="imQuartos">
           <option value="">Qualquer</option>
           <option value="1">1+</option>
@@ -3408,9 +3408,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         <label>Comodidades <span class="help">(selecione para filtrar)</span></label>
         <div class="chips amenities">
           <!-- Mantém a classe/atributo usados no seu JS -->
-          <button type="button" class="chip amenity-chip" data-key="piscina">🏊 Piscina</button>
-          <button type="button" class="chip amenity-chip" data-key="churrasqueira">🍖 Churrasqueira</button>
-          <button type="button" class="chip amenity-chip" data-key="vagas">🚗 2+ vagas</button>
+          <button type="button" class="chip amenity-chip" data-key="vagas">+2 vagas</button>
+          <button type="button" class="chip amenity-chip" data-key="churrasqueira">Churrasqueira</button>
+          <button type="button" class="chip amenity-chip" data-key="piscina">Piscina</button>          
+          
         </div>
       </div>
 
