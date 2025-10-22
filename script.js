@@ -3333,13 +3333,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       <label class="switch">
         <input type="checkbox" id="somenteDisponiveis">
         <span class="track"><span class="thumb"></span></span>
-        <span>Somente Disponíveis</span>
+        <span>Disponíveis</span>
       </label>
     </div>
 
     <div class="grid-filtros">
       <div class="campo">
-        <label for="imTipo">Tipo Negociação</label>
+        <label for="imTipo">Tipo de Negociação</label>
         <select id="imTipo">
           <option value="">Todos</option>
           <option value="aluguel">Aluguel</option>
@@ -3348,17 +3348,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       </div>
 
       <div class="campo">
-        <label for="ordenacaoImoveis">Ordenação</label>
+        <label for="ordenacaoImoveis">Ordenar por</label>
         <select id="ordenacaoImoveis">
           <option value="">Padrão</option>
-          <option value="disponiveis">Disponíveis primeiro</option>
-          <option value="preco_asc">Preço: menor → maior</option>
-          <option value="preco_desc">Preço: maior → menor</option>
+          <!-- <option value="disponiveis">Disponíveis primeiro</option> -->
+          <option value="preco_asc">Preço: Menor → Maior</option>
+          <option value="preco_desc">Preço: Maior → Menor</option>
         </select>
       </div>
 
       <div class="campo">
-        <label for="filtroProcura">O que procura:</label>
+        <label for="filtroProcura">Procuro por</label>
         <select id="filtroProcura">
           <option value="">Todos</option>
           <option value="casa">Casa</option>
@@ -3371,16 +3371,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         </select>
       </div>
 
-      <div class="campo">
-        <label for="imQuartos">Quantidade de Quartos (mín.)</label>
-        <select id="imQuartos">
-          <option value="">Qualquer</option>
-          <option value="1">1+</option>
-          <option value="2">2+</option>
-          <option value="3">3+</option>
-          <option value="4">4+</option>
-        </select>
-      </div>
+     
 
       <div class="campo">
         <label for="imPreco">Preço até</label>
@@ -3394,6 +3385,25 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         </select>
       </div>
 
+       <div class="campo">
+        <label for="imQuartos">Quantidade de Quartos</label>
+        <select id="imQuartos">
+          <option value="">Qualquer</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="filtroCorretor">Corretor / Imobiliaria</label>
+        <select id="filtroCorretor">
+          <option value="">Todos</option>
+          <!-- opções via JS -->
+        </select>
+      </div>
+
       <div class="campo grid-span-2">
         <label>Comodidades <span class="help">(selecione para filtrar)</span></label>
         <div class="chips amenities">
@@ -3404,13 +3414,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         </div>
       </div>
 
-      <div class="campo grid-span-2">
-        <label for="filtroCorretor">Corretor / Imobiliaria</label>
-        <select id="filtroCorretor">
-          <option value="">Todos</option>
-          <!-- opções via JS -->
-        </select>
-      </div>
+      
     </div>
   </aside>
 

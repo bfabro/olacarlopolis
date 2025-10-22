@@ -7466,7 +7466,7 @@ html {
   background: #fff;
   color: #374151;
   font-weight: 600;
-  font-size: .9rem;
+  font-size: .75rem;
   cursor: pointer;
   transition: all .15s ease-in-out;
 }
@@ -7621,3 +7621,28 @@ html {
   box-shadow: 0 0 14px rgba(0, 160, 255, 0.75),
               inset 0 0 6px rgba(255, 255, 255, 0.3);
 }
+
+
+
+
+/* Imóveis > filtros: 2 colunas também no mobile */
+#filtrosImoveis.painel-filtros .grid-filtros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr)); /* 2 colunas compactas */
+  gap: 10px 12px;
+  align-items: end;
+}
+
+/* Deixa os controles mais compactos pra caber bem em telas pequenas */
+#filtrosImoveis .campo label { font-size: .85rem; }
+#filtrosImoveis select,
+#filtrosImoveis input[type="text"],
+#filtrosImoveis input[type="number"] {
+  height: 38px; padding: 8px 10px; font-size: .9rem;
+}
+
+/* Se quiser que "Comodidades" e "Corretor" continuem ocupando a linha toda, mantenha: */
+#filtrosImoveis .grid-span-2 { grid-column: 1 / -1; }
+
+/* …ou, se quiser que eles também sigam a regra de 2 colunas, neutralize assim: */
+/* #filtrosImoveis .grid-span-2 { grid-column: auto; } */
