@@ -7376,3 +7376,8 @@ html {
     order: 2;          /* aparece logo abaixo do "Filtrar" */
   }
 }
+
+
+/* Esconde o preço quando o imóvel estiver vendido/alugado/negociado */
+.card-imovel.is-sold .price-pill { display: none !important; }   /* tarja flutuante no topo da foto */
+.card-imovel.is-sold .price-line .price { display: none !important; } /* linha de preço na descrição */
