@@ -3323,112 +3323,117 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     
 
     <div class="imoveis-wrap">
-  <!-- Painel de filtros -->
-  <aside id="filtrosImoveis" class="im-filtros painel-filtros">
+      <aside class="im-filtros">
 
-    <div class="topbar">
-      <h4 class="filtro-titulo">Filtrar</h4>
+      <div class="filters-head">
+    <h4>Filtrar</h4>
 
-      <!-- Mantém o mesmo checkbox -->
-      <label class="switch">
-        <input type="checkbox" id="somenteDisponiveis">
-        <span class="track"><span class="thumb"></span></span>
-        <span>Somente Disponíveis</span>
-      </label>
-    </div>
+    <label class="checkbox-line only-available">
+      <input type="checkbox" id="somenteDisponiveis">
+      <span>Somente Disponíveis</span>
+    </label>
+  </div>
 
-    <div class="grid-filtros">
-      <div class="campo">
-        <label for="imTipo">Tipo Negociação</label>
-        <select id="imTipo">
-          <option value="">Todos</option>
-          <option value="aluguel">Aluguel</option>
-          <option value="venda">Venda</option>
-        </select>
-      </div>
 
-      <div class="campo">
-        <label for="ordenacaoImoveis">Ordenação</label>
-        <select id="ordenacaoImoveis">
-          <option value="">Padrão</option>
-          <option value="disponiveis">Disponíveis primeiro</option>
-          <option value="preco_asc">Preço: menor → maior</option>
-          <option value="preco_desc">Preço: maior → menor</option>
-        </select>
-      </div>
 
-      <div class="campo">
-        <label for="filtroProcura">O que procura:</label>
-        <select id="filtroProcura">
-          <option value="">Todos</option>
-          <option value="casa">Casa</option>
-          <option value="comercial">Comercial</option>
-          <option value="condominio">Condomínio</option>
-          <option value="galpao">Galpão</option>
-          <option value="represa">Represa</option>
-          <option value="rural">Rural</option>
-          <option value="terreno">Terreno</option>
-        </select>
-      </div>
-
-      <div class="campo">
-        <label for="imQuartos">Quantidade de Quartos (mín.)</label>
-        <select id="imQuartos">
-          <option value="">Qualquer</option>
-          <option value="1">1+</option>
-          <option value="2">2+</option>
-          <option value="3">3+</option>
-          <option value="4">4+</option>
-        </select>
-      </div>
-
-      <div class="campo">
-        <label for="imPreco">Preço até</label>
-        <select id="imPreco">
-          <option value="">Sem teto</option>
-          <option value="600">R$ 600 (aluguel)</option>
-          <option value="1200">R$ 1.200 (aluguel)</option>
-          <option value="200000">R$ 200 mil</option>
-          <option value="500000">R$ 500 mil</option>
-          <option value="1000000">R$ 1 milhão</option>
-        </select>
-      </div>
-
-      <div class="campo grid-span-2">
-        <label>Comodidades <span class="help">(selecione para filtrar)</span></label>
-        <div class="chips amenities">
-          <!-- Mantém a classe/atributo usados no seu JS -->
-          <button type="button" class="chip amenity-chip" data-key="piscina">🏊 Piscina</button>
-          <button type="button" class="chip amenity-chip" data-key="churrasqueira">🍖 Churrasqueira</button>
-          <button type="button" class="chip amenity-chip" data-key="vagas">🚗 2+ vagas</button>
+        <div class="field">
+          <label>Tipo Negociação</label>
+          <select id="imTipo">
+            <option value="">Todos</option>
+             <option value="aluguel">Aluguel</option>
+            <option value="venda">Venda</option>
+           
+          </select>
         </div>
-      </div>
 
-      <div class="campo grid-span-2">
-        <label for="filtroCorretor">Corretor / Imobiliaria</label>
+
+       
+
+<div class="field" style="margin-top:8px">
+  <label>Ordenação</label>
+  <select id="ordenacaoImoveis">
+    <option value="">Padrão</option>
+    <option value="disponiveis">Disponíveis primeiro</option>
+    <option value="preco_asc">Preço: menor → maior</option>
+    <option value="preco_desc">Preço: maior → menor</option>
+  </select>
+</div>
+
+
+        <!-- Filtro: O que procura -->
+<label for="filtroProcura">O que procura:</label>
+<select id="filtroProcura">
+  <option value="">Todos</option>
+  <option value="casa">Casa</option>
+   <option value="comercial">Comercial</option>
+   <option value="condominio">Condomínio</option>
+<option value="galpao">Galpão</option>
+<option value="represa">Represa</option>  
+  <option value="rural">Rural</option>
+  <option value="terreno">Terreno</option>
+  
+ 
+  
+  
+</select>
+
+
+
+
+
+        <div class="field">
+          <label>Quantidade de Quartos (mín.)</label>
+          <select id="imQuartos">
+            <option value="">Qualquer</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Preço até</label>
+          <select id="imPreco">
+            <option value="">Sem teto</option>
+            <option value="600">R$ 600 (aluguel)</option>
+            <option value="1200">R$ 1.200 (aluguel)</option>            
+            <option value="200000">R$ 200 mil</option>
+            <option value="500000">R$ 500 mil</option>
+            <option value="1000000">R$ 1 milhão</option>
+          </select>
+        </div>
+
+        <div class="field"><label>Comodidades ( Selecione para filtro )</label>
+          <div class="amenities">
+            <span class="amenity-chip" data-key="piscina">🏊 Piscina</span>
+            <span class="amenity-chip" data-key="churrasqueira">🍖 Churrasqueira</span>
+            <span class="amenity-chip" data-key="vagas">🚗 2+ vagas</span>
+          </div>
+        </div>
+
+        <!-- Filtro Corretor -->
+        <label for="filtroCorretor">Corretor / Imobiliaria:</label>
         <select id="filtroCorretor">
           <option value="">Todos</option>
-          <!-- opções via JS -->
+          <!-- Opções via JS -->
         </select>
+
+      </aside>
+
+      <section class="im-grid" id="imGrid"></section>
+
+    
+    </div>
+
+    <div class="im-modal" id="imModal">
+      <div class="inner">
+        <button class="close" onclick="fecharModalImoveis()">Fechar ✖</button>
+        <div class="title" id="imModalTitle"></div>
+        <div class="swiper swiper-imovel-full">
+          <div class="swiper-wrapper" id="imModalSlides"></div>
+        </div>
       </div>
     </div>
-  </aside>
-
-  <!-- Lista/grade de imóveis -->
-  <section class="im-grid" id="imGrid"></section>
-</div>
-
-<!-- Modal de imagens de imóveis (inalterado) -->
-<div class="im-modal" id="imModal">
-  <div class="inner">
-    <button class="close" onclick="fecharModalImoveis()">Fechar ✖</button>
-    <div class="title" id="imModalTitle"></div>
-    <div class="swiper swiper-imovel-full">
-      <div class="swiper-wrapper" id="imModalSlides"></div>
-    </div>
-  </div>
-</div>
-
   `;
 
   // 'Somente disponíveis'
