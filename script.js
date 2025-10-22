@@ -3431,6 +3431,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
   `;
 
+
+
+  // === Controle visual dos botões de comodidades ===
+document.querySelectorAll('.amenity-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Alterna a classe de seleção
+    btn.classList.toggle('is-active');
+  });
+});
+
   // 'Somente disponíveis'
 const chkDisp = document.getElementById("somenteDisponiveis");
 if (chkDisp) chkDisp.addEventListener("change", aplicarFiltrosImoveis);

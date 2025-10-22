@@ -7591,3 +7591,33 @@ html {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ====== Botões de comodidades (amenities) ====== */
+.amenity-chip {
+  border: 2px solid #ccc;
+  border-radius: 25px;
+  padding: 8px 16px;
+  background: #f7f7f7;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.amenity-chip:hover {
+  background: #eef6ff;
+  border-color: #66aaff;
+}
+
+.amenity-chip.is-active {
+  background: linear-gradient(135deg, #007bff, #00c3ff);
+  border-color: #0047b3;
+  color: #fff;
+  font-weight: 600;
+  transform: scale(1.06);
+  box-shadow: 0 0 14px rgba(0, 160, 255, 0.75),
+              inset 0 0 6px rgba(255, 255, 255, 0.3);
+}
