@@ -688,7 +688,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "oficinadocelular", "nelsoncalhas","gerson", "promissorseguros", "sabordaroca"
+"taticonik","oficinadocelular", "nelsoncalhas","gerson", "promissorseguros", "sabordaroca"
 
   ];
 
@@ -9352,8 +9352,9 @@ function salvarContatoImovel(im, nome) {
             infoAdicional: "Especialistas em cuidados capilares, desenvolvemos produtos de alta performance para salões de beleza.<br> Nossas linhas unem tecnologia e qualidade profissional para proporcionar fios mais saudáveis, lisos e radiantes.<br>📗 <a href='images/servicos/revendedor/tati/divulgacao/Catalogo.pdf' target='_blank' rel='noopener'><br>Acesse Nosso Catálogo</a>",
            
             novidadesImages: [
-              "images/servicos/revendedor/tati/divulgacao/1.jpg",
               "images/servicos/revendedor/tati/divulgacao/2.jpg",
+
+              "images/servicos/revendedor/tati/divulgacao/1.jpg",
               "images/servicos/revendedor/tati/divulgacao/3.jpg",
               "images/servicos/revendedor/tati/divulgacao/4.jpg",
               "images/servicos/revendedor/tati/divulgacao/5.jpg",
@@ -9471,29 +9472,7 @@ function salvarContatoImovel(im, nome) {
 
 
 
-          {
-            image: "images/informacoes/eventos/regisDanese.jpg",
-            name: "Regis Danese",
-            date: "18/10/2025",
-            address: "Centro de Eventos Ilha do Ponciano",
-            contact: "-",
-            infoAdicional: "Prepare-se para uma noite INESQUECÍVEL! Regis Danese traz um SUPER SHOW GOSPEL que vai TOCAR SEU CORAÇÃO  🎤❤️<Br>Uma experiência PODEROSA de música e fé que você NÃO PODE PERDER!",
-            instagram: "https://www.instagram.com/turismocarlopolis/",
-
-
-          },
-
-          {
-            image: "images/informacoes/eventos/rotary.png",
-            name: "Passeio Ciclistico Rotary",
-            date: "19/10/2025",
-            address: "Rodovia PR218",
-            contact: "-",
-
-
-
-          },
-
+        
 
           
           {
