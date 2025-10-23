@@ -2,17 +2,18 @@
   "name": "Olá Carlópolis",
   "short_name": "Olá Carlópolis",
   "description": "Encontre Locais e Serviços em Carlópolis.",
-  "start_url": "index.html",
+  "id": "/",
+  "start_url": "/",
+   "scope": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
-    {
-      "src": "images/img_padrao_site/icon-192_2.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
+    { "src": "images/img_padrao_site/icon-192_2.png", "sizes": "192x192", "type": "image/png" },
+
+    
+    
     {
       "src": "images/img_padrao_site/icon-512_2.png",
       "sizes": "512x512",
