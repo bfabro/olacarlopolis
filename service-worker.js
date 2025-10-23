@@ -5,8 +5,8 @@ const assets = [
   '/style.css',
   '/script.js',
   '/images/img_padrao_site/banner.jpg',
-  '/images/img_padrao_site/icon-192.png',
-  '/images/img_padrao_site/icon-512.png'
+  '/images/img_padrao_site/icon-192_2.png',
+  '/images/img_padrao_site/icon-512_2.png'
 ];
 
 // Instala o service worker
