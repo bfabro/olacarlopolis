@@ -2966,10 +2966,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       churrasqueira: false,
       area: 90,
       construcao: 63,          // << NOVO: m² de construção   
-      valor: 200000,
+      valor: 230000,
       telefone: "43 99678-9652",
       imagens: [
         "images/imoveis/cesar/venda/casa1/1.png",
+         "images/imoveis/cesar/venda/casa1/10.jpg",
         "images/imoveis/cesar/venda/casa1/2.jpg",
         "images/imoveis/cesar/venda/casa1/3.JPG",
         "images/imoveis/cesar/venda/casa1/4.jpg",
@@ -2978,6 +2979,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa1/7.jpg",
         "images/imoveis/cesar/venda/casa1/8.jpg",
         "images/imoveis/cesar/venda/casa1/9.jpg"
+       
+
        ],
       descricao: "Ambientes bem iluminados e ventilados, prontos para receber sua família. Documentação OK",
       suite: "1",
@@ -9365,7 +9368,7 @@ function salvarContatoImovel(im, nome) {
               "images/servicos/revendedor/tati/divulgacao/10.jpg",
             ],
             novidadesDescriptions: [
-              "",
+              "Quer fios mais fortes, hidratados e com brilho de salão? ✨<br>Experimente o poder da linha Lizz Ante Profissional <br>Resultado que se vê, sente e apaixona! 💕",
             ],
 
 
