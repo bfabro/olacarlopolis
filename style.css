@@ -7646,3 +7646,13 @@ html {
 
 /* …ou, se quiser que eles também sigam a regra de 2 colunas, neutralize assim: */
 /* #filtrosImoveis .grid-span-2 { grid-column: auto; } */
+
+
+.card-represa {
+  background:#fff; border-radius:12px; padding:14px; box-shadow:0 4px 14px rgba(0,0,0,.06);
+  max-width:520px;
+}
+.card-represa .linha { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #eee; }
+.card-represa .linha:last-child { border-bottom:0; }
+.card-represa .mini { color:#666; font-size:12px; margin-top:6px; }
+.card-represa .erro { color:#b00020; font-weight:600; }

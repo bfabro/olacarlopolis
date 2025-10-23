@@ -2978,7 +2978,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa1/6.jpg",
         "images/imoveis/cesar/venda/casa1/7.jpg",
         "images/imoveis/cesar/venda/casa1/8.jpg",
-        "images/imoveis/cesar/venda/casa1/9.jpg"
+        "images/imoveis/cesar/venda/casa1/9.jpg",
        
 
        ],
@@ -4086,6 +4086,7 @@ function salvarContatoImovel(im, nome) {
 
   function mostrarConsultaCEP() {
     const area = document.querySelector(".content_area");
+    if (location.hash !== "#cep") location.hash = "#cep";
     if (!area) return;
 
     area.innerHTML = `
@@ -12903,6 +12904,8 @@ document.addEventListener("click", (ev) => {
 
 
 
+
+
   searchInput.addEventListener("input", function () {
     const termo = searchInput.value.toLowerCase().trim();
     clearSearch.style.display = termo ? "inline-block" : "none";
@@ -15639,6 +15642,33 @@ function montarPaginaColetaLixo() {
 
 
 
+async function mostrarNivelRepresa() {
+  const area = document.querySelector(".content_area");
+  area.innerHTML = `
+    <h2 class="highlighted">💧 Nível da Represa de Chavantes</h2>
+    <div id="nivelContainer">Carregando nível...</div>
+  `;
+
+  try {
+    const resposta = await fetch("https://sispshiweb.ana.gov.br/api/estacoes/64650000/dados");
+    if (!resposta.ok) throw new Error("Erro na resposta da ANA");
+
+    const dados = await resposta.json();
+    const ultimo = dados[dados.length - 1];
+    const nivel = ultimo?.nivel || ultimo?.cota || "Indisponível";
+    const data = ultimo?.datahora ? new Date(ultimo.datahora).toLocaleString("pt-BR") : "—";
+
+    document.getElementById("nivelContainer").innerHTML = `
+      <p><b>Nível atual:</b> ${nivel} m</p>
+      <p><b>Última atualização:</b> ${data}</p>
+      <small>Fonte: Agência Nacional de Águas (ANA)</small>
+    `;
+  } catch (erro) {
+    console.error("Erro ao carregar nível:", erro);
+    document.getElementById("nivelContainer").textContent =
+      "❌ Não foi possível carregar o nível da represa no momento.";
+  }
+}
 
 
 
