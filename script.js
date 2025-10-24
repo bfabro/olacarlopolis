@@ -318,7 +318,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Compartilha a página atual (inclui hash) ou copia o link
   function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
-    const url = `${location.origin}${location.pathname}${hash || ""}`;
+    let cleanHash = hash.replace("comercios-", "");
+    const url = `${location.origin}${cleanHash || ""}`;
+    
     if (navigator.share) {
       navigator.share({ title: titulo, text: texto, url })
         .catch(() => mostrarToast("❌ Não foi possível compartilhar."));
@@ -3083,9 +3085,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       piscina: true,
       churrasqueira: false,
       vagas: 4,
-      corretores: ["Rafael Bandeira - 29.802"],
-      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-      ////////////////////////////////////////////////////////////
+      corretores: ["Rafael Bandeira - 29.802"],      
       titulo: "Imóvel no Residencial Ilhabela",
       descricao: "Acabamentos sofisticados, design moderno e ambientes integrados. Documentação OK",
       endereco: "Condominio Ilha bela",
@@ -3111,6 +3111,63 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       //lng: -49.7232,
 
     },
+
+
+
+
+
+    {
+      id: "casa5v",
+      tipo: "venda",
+      procura: "Chacara", // ou "terreno", "rural", etc.
+      quartos: 3,
+      valor: 8000000,
+      piscina: false,
+      churrasqueira: false,    
+      titulo: "Chacara a 12km Da Cidade",
+      descricao: "Chacara toda cercada de arame liso, Gramado ao redor da casa, Estrada empedrada até a represa podendo descer embarcações, Quartos com ar condicionado<br>Barracão grande de estrutura metalica com cozinha, deck de madeira e banheiro<br>Edicula com cozinha, banheiro e quarto com ar condicionado",
+      endereco: "Bairro Espirito Santo",
+      suite: "0",
+      banheiros: 1,
+      salas: 1,
+      cozinhas: 1,
+      area: 5000,
+      construcao: 150,   // << NOVO: m² de construção
+             
+      quintal: "Sim",
+      telefone: "43 99154-5096",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/caioGabriel/1.jpg",
+         "images/imoveis/caioGabriel/2.jpg",
+         "images/imoveis/caioGabriel/3.jpg",
+         "images/imoveis/caioGabriel/4.jpg",
+         "images/imoveis/caioGabriel/5.jpg",
+         "images/imoveis/caioGabriel/6.jpg",
+         "images/imoveis/caioGabriel/7.jpg"
+         
+
+      ],
+      //lat: -23.3953,
+      //lng: -49.7232,
+
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3366,8 +3423,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         <select id="filtroProcura">
           <option value="">Todos</option>
           <option value="casa">Casa</option>
+          <option value="chacara">Chacara</option>
           <option value="comercial">Comercial</option>
-          <option value="condominio">Condomínio</option>
+          <option value="condominio">Condomínio</option>          
           <option value="galpao">Galpão</option>
           <option value="represa">Represa</option>
           <option value="rural">Rural</option>
@@ -9400,8 +9458,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-
-
       // inicio Eventos
       {
         link: document.querySelector("#menuEventos"),
@@ -9412,33 +9468,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/informacoes/eventos/calendario_evento.png",
             contact: "",
           },
-
-
-
-
-
-
-
-
-
-
-          //////
-
-          ////
-
-          ////
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -9454,9 +9483,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/informacoes/eventos/toroonagashi.png",
             name: "Toroonagashi",
             date: "25/10/2025",
-            address: "Ponte interstadual Benedito Garcia Ribeiro (Carlopolis x Fartura)",
-            
-
+            address: "Ponte interstadual Benedito Garcia Ribeiro (Carlopolis x Fartura)",          
 
 
           },
@@ -9467,10 +9494,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             date: "25/10/2025",
             address: "Ilha do Ponciano",
             infoAdicional: "Prepare-se para um fim de semana de adrenalina e emoção!<br>Nos dias 25 e 26 de outubro, o Centro de Eventos Ilha do Ponciano será palco do Campeonato Paranaense de Motocross Sportbay!<br>Venha prestigiar e torcer pelos melhores pilotos do estado, em disputas cheias de velocidade, saltos incríveis e muita energia!<br>Não fique de fora desse grande espetáculo sobre duas rodas!",
-
-            
-
-
+          
 
           },
 
@@ -9481,8 +9505,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Centro de Eventos",
            
           },
-
-
 
 
           {
