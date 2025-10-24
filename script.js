@@ -3123,7 +3123,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quartos: 3,
       valor: 800000,
       piscina: false,
-      churrasqueira: false,    
+      churrasqueira: true,    
       titulo: "Chacara a 12km Da Cidade",
       descricao: "Chacara toda cercada de arame liso, Gramado ao redor da casa, Estrada empedrada até a represa podendo descer embarcações, Quartos com ar condicionado<br>Barracão grande de estrutura metalica com cozinha, deck de madeira e banheiro<br>Edicula com cozinha, banheiro e quarto com ar condicionado",
       endereco: "Bairro Espirito Santo",
@@ -3143,7 +3143,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
          "images/imoveis/caioGabriel/4.jpg",
          "images/imoveis/caioGabriel/5.jpg",
          "images/imoveis/caioGabriel/6.jpg",
-         "images/imoveis/caioGabriel/7.jpg"
+         "images/imoveis/caioGabriel/7.jpg",
+            "images/imoveis/caioGabriel/8.jpg",
          
 
       ],
