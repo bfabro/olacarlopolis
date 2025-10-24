@@ -3143,8 +3143,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
          "images/imoveis/caioGabriel/4.jpg",
          "images/imoveis/caioGabriel/5.jpg",
          "images/imoveis/caioGabriel/6.jpg",
-         "images/imoveis/caioGabriel/7.jpg",
-            "images/imoveis/caioGabriel/8.jpg",
+         "images/imoveis/caioGabriel/7.jpg"
+         
          
 
       ],
