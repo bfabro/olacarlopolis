@@ -3042,7 +3042,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quartos: 3,
       valor: 380000,
       piscina: false,
-      churrasqueira: true,
+      churrasqueira: "Sim",
       vagas: 2,
       corretores: ["Cesar Melo - 38.105 F"],
       // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
@@ -3082,7 +3082,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 2,
       valor: 1150000,
-      piscina: true,
+      piscina: "Sim",
       churrasqueira: false,
       vagas: 4,
       corretores: ["Rafael Bandeira - 29.802"],      
@@ -3123,7 +3123,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quartos: 3,
       valor: 800000,
       piscina: false,
-      churrasqueira: true,    
+      churrasqueira: "Sim",    
       titulo: "Chacara a 12km Da Cidade",
       descricao: "Chacara toda cercada de arame liso, Gramado ao redor da casa, Estrada empedrada até a represa podendo descer embarcações, Quartos com ar condicionado<br>Barracão grande de estrutura metalica com cozinha, deck de madeira e banheiro<br>Edicula com cozinha, banheiro e quarto com ar condicionado",
       endereco: "Bairro Espirito Santo",
@@ -3152,23 +3152,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       //lng: -49.7232,
 
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -3921,7 +3904,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     if (!terr && hasNum(im.vagas)) chips.push(`<div class="spec-chip"><span class="k">Vagas</span><span class="v">${im.vagas}</span></div>`);
     if (!terr && hasNum(im.salas)) chips.push(`<div class="spec-chip"><span class="k">Salas</span><span class="v">${im.salas}</span></div>`);
     if (!terr && hasNum(im.cozinhas)) chips.push(`<div class="spec-chip"><span class="k">Cozinhas</span><span class="v">${im.cozinhas}</span></div>`);
-
+    if (!terr && im.churrasqueira) chips.push(`<div class="spec-chip"><span class="k">Churrasqueira</span><span class="v">${im.churrasqueira}</span></div>`);
+     if (!terr && im.piscina) chips.push(`<div class="spec-chip"><span class="k">Piscina</span><span class="v">${im.piscina}</span></div>`);
     if (!terr && im.quintal) chips.push(`<div class="spec-chip chip-mini"><span class="k">Quintal</span><span class="v">${im.quintal}</span></div>`);
 
     if (!terr && im.escritorio) chips.push(`<div class="spec-chip chip-mini"><span class="k">Escritorio</span><span class="v">${im.escritorio}</span></div>`);
