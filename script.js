@@ -688,7 +688,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-"taticonik","oficinadocelular", "nelsoncalhas","gerson", "promissorseguros", "sabordaroca"
+    "taticonik", "oficinadocelular", "nelsoncalhas", "gerson", "promissorseguros", "sabordaroca"
 
   ];
 
@@ -945,7 +945,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //Lava Rapido
 
     //revendedor
-    taticonik:"s",
+    taticonik: "s",
     leozindetailer: "s",
 
     //pizzaria
@@ -1147,11 +1147,12 @@ document.addEventListener("DOMContentLoaded", function () {
     //calendarioeventos: "s",
     feiradalua: "s",
 
-   
+
     regisdanese: "s",
 
     passeiociclisticorotary: "s",
-    jogosaventura:"s",
+    jogosaventura: "s",
+    campeonatoparanaensemotocross: "s",
     toroonagashi: "s",
     erosprado: "s",
 
@@ -2970,7 +2971,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       telefone: "43 99678-9652",
       imagens: [
         "images/imoveis/cesar/venda/casa1/1.png",
-         "images/imoveis/cesar/venda/casa1/10.jpg",
+        "images/imoveis/cesar/venda/casa1/10.jpg",
         "images/imoveis/cesar/venda/casa1/2.jpg",
         "images/imoveis/cesar/venda/casa1/3.JPG",
         "images/imoveis/cesar/venda/casa1/4.jpg",
@@ -2979,9 +2980,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa1/7.jpg",
         "images/imoveis/cesar/venda/casa1/8.jpg",
         "images/imoveis/cesar/venda/casa1/9.jpg",
-       
 
-       ],
+
+      ],
       descricao: "Ambientes bem iluminados e ventilados, prontos para receber sua família. Documentação OK",
       suite: "1",
       quintal: "Não",
@@ -2992,29 +2993,29 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
-// Modelo
+    // Modelo
     {
       id: "casa2v",
-      tipo: "venda",   
+      tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
-      quartos: 3,   
+      quartos: 3,
       valor: 250000,
       piscina: false,
-      churrasqueira: false, 
+      churrasqueira: false,
       vagas: 2,
-      corretores: ["Cesar Melo - 38.105 F"] ,
-   // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-////////////////////////////////////////////////////////////
+      corretores: ["Cesar Melo - 38.105 F"],
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      ////////////////////////////////////////////////////////////
       titulo: "Casa nova a venda em Carlópolis.",
       descricao: "Casa nova, impecavel! Documentação OK. Aceita financiamento, “Minha casa minha vida“",
       endereco: "Agende uma Visita",
-      suite: "1",      
-      banheiros: 1,      
+      suite: "1",
+      banheiros: 1,
       salas: 1,
       cozinhas: 1,
       area: 90,
       construcao: 63,          // << NOVO: m² de construção
-      quintal: "Sim",       
+      quintal: "Sim",
       telefone: "43 99678-9652",  // Corretor ou propretario
       imagens: [
         "images/imoveis/cesar/venda/casa2/1.jpg",
@@ -3026,34 +3027,34 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa2/7.jpg",
         "images/imoveis/cesar/venda/casa2/8.jpg"
 
-       ],           
-       //lat: -23.3953,
+      ],
+      //lat: -23.3953,
       //lng: -49.7232,
 
     },
 
     {
       id: "casa3v",
-      tipo: "venda",   
+      tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
-      quartos: 3,   
+      quartos: 3,
       valor: 380000,
       piscina: false,
-      churrasqueira: true, 
+      churrasqueira: true,
       vagas: 2,
-      corretores: ["Cesar Melo - 38.105 F"] ,
-   // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-////////////////////////////////////////////////////////////
+      corretores: ["Cesar Melo - 38.105 F"],
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      ////////////////////////////////////////////////////////////
       titulo: "Casa a venda em Carlópolis",
       descricao: "Documentação OK.",
       endereco: "Novo Horizonte 1",
-      suite: "1",      
-      banheiros: 3,      
+      suite: "1",
+      banheiros: 3,
       salas: 1,
       cozinhas: 1,
       area: 180,
       construcao: 125,          // << NOVO: m² de construção
-      quintal: "Não",       
+      quintal: "Não",
       telefone: "43 99678-9652",  // Corretor ou propretario
       imagens: [
         "images/imoveis/cesar/venda/casa3/1.jpg",
@@ -3066,52 +3067,52 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa3/8.jpg",
         "images/imoveis/cesar/venda/casa3/9.jpg"
 
-       ],           
-       //lat: -23.3953,
+      ],
+      //lat: -23.3953,
       //lng: -49.7232,
 
     },
 
-    
+
     {
       id: "casa4v",
-      tipo: "venda",   
+      tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
-      quartos: 2,   
+      quartos: 2,
       valor: 1150000,
       piscina: true,
-      churrasqueira: false, 
+      churrasqueira: false,
       vagas: 4,
       corretores: ["Rafael Bandeira - 29.802"],
-   // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-////////////////////////////////////////////////////////////
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      ////////////////////////////////////////////////////////////
       titulo: "Imóvel no Residencial Ilhabela",
       descricao: "Acabamentos sofisticados, design moderno e ambientes integrados. Documentação OK",
       endereco: "Condominio Ilha bela",
-      suite: "Não",      
-      banheiros: 1,      
+      suite: "Não",
+      banheiros: 1,
       salas: 1,
       cozinhas: 1,
       area: 390,
       construcao: 120,          // << NOVO: m² de construção
-      quintal: "Sim",       
+      quintal: "Sim",
       telefone: "43 99686-4716", // Corretor ou propretario
-        imagens: ["images/imoveis/rafaelBandeira/venda/casa/1/1.jpg",
-     "images/imoveis/rafaelBandeira/venda/casa/1/2.jpg",
-     "images/imoveis/rafaelBandeira/venda/casa/1/3.jpg",
-     "images/imoveis/rafaelBandeira/venda/casa/1/4.jpg",
-     "images/imoveis/rafaelBandeira/venda/casa/1/5.jpg",
-     "images/imoveis/rafaelBandeira/venda/casa/1/6.jpg",
-     "images/imoveis/rafaelBandeira/venda/casa/1/7.jpg",
-     "images/imoveis/rafaelBandeira/venda/casa/1/8.jpg",
-     "images/imoveis/rafaelBandeira/venda/casa/1/9.jpg",
-      ],          
-       //lat: -23.3953,
+      imagens: ["images/imoveis/rafaelBandeira/venda/casa/1/1.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa/1/2.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa/1/3.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa/1/4.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa/1/5.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa/1/6.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa/1/7.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa/1/8.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa/1/9.jpg",
+      ],
+      //lat: -23.3953,
       //lng: -49.7232,
 
     },
 
-    
+
 
     {
       id: "ter1",
@@ -3138,11 +3139,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Novo horizonte 1",
       descricao: "Ideal para quem deseja investir em moradia ou construção de aluguel",
-      endereco: "Novo horizonte 1",      
+      endereco: "Novo horizonte 1",
       area: 180,
       valor: 65000,
-      telefone: "43 99678-9652",     
-      
+      telefone: "43 99678-9652",
+
       imagens: ["images/imoveis/cesar/venda/terreno/3.jpg",],
       corretores: ["Cesar Melo - 38.105 F"],
 
@@ -3154,8 +3155,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno em Condomínio - Lagoa azul 2",
       descricao: "Vista privilegiada e excelente topografia para construção de alto padrão",
-      endereco: "Lagoa azul 2",      
-      area: 388 ,
+      endereco: "Lagoa azul 2",
+      area: 388,
       valor: 120000,
       telefone: "43 99686-4716",
       imagens: ["images/imoveis/rafaelBandeira/venda/terreno/1.jpg",
@@ -3168,60 +3169,60 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
-     {
+    {
       id: "ter4",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Residencial Itália ll",
       descricao: "Ideal para quem busca tranquilidade e qualidade de vida sem abrir mão da praticidade",
-      endereco: "Próximo ao mercado carriel",      
+      endereco: "Próximo ao mercado carriel",
       area: 336,
       valor: 185000,
       telefone: "43 99678-9652",
       imagens: [
         "images/imoveis/cesar/venda/terreno/terreno1/1.jpg",
         "images/imoveis/cesar/venda/terreno/terreno1/2.jpg",
-      
+
       ],
       corretores: ["Cesar Melo - 38.105 F"],
 
     },
-/*
-
-    {
-      id: "ter5",
-      tipo: "venda",
-      procura: "terreno", // ou "terreno", "rural", etc.
-      titulo: "Terreno - Residencial Murador ",
-      descricao: "Bairro em expansão, com valorização garantida nos próximos anos",
-      endereco: "Residencial Murador ",      
-      area: 180,
-      valor: 108000,
-      telefone: "43 99678-9652",
-      imagens: [
-        "images/imoveis/cesar/venda/terreno/terreno2/1.jpg",
-         "images/imoveis/cesar/venda/terreno/terreno2/2.jpg",
-       
-      
-      ],
-      corretores: ["Cesar Melo - 38.105 F"],
-
-    },
-*/
+    /*
+    
+        {
+          id: "ter5",
+          tipo: "venda",
+          procura: "terreno", // ou "terreno", "rural", etc.
+          titulo: "Terreno - Residencial Murador ",
+          descricao: "Bairro em expansão, com valorização garantida nos próximos anos",
+          endereco: "Residencial Murador ",      
+          area: 180,
+          valor: 108000,
+          telefone: "43 99678-9652",
+          imagens: [
+            "images/imoveis/cesar/venda/terreno/terreno2/1.jpg",
+             "images/imoveis/cesar/venda/terreno/terreno2/2.jpg",
+           
+          
+          ],
+          corretores: ["Cesar Melo - 38.105 F"],
+    
+        },
+    */
 
     /////////////////// GALPAO
 
-     //Modelo
+    //Modelo
     {
       id: "galpao1venda",
       tipo: "venda",
       procura: "galpao", // ou "terreno", "rural", etc.
       titulo: "Galpão - Residencial Murador",
       descricao: "Galpão amplo, ideal para indústria, depósito ou centro de distribuição",
-      endereco: "Residencial Murador",    
-      banheiros: 1, 
-      outros:"Mezanino",
-      escritorio:"Sim",
+      endereco: "Residencial Murador",
+      banheiros: 1,
+      outros: "Mezanino",
+      escritorio: "Sim",
       area: 300,
       valor: 600000,
       telefone: "43 99678-9652",
@@ -3239,17 +3240,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     },
 
 
-      //Modelo
+    //Modelo
     {
       id: "galpao1aluguel",
       tipo: "aluguel",
       procura: "galpao", // ou "terreno", "rural", etc.
       titulo: "Galpão - Residencial Murador, ",
       descricao: "Galpão amplo, ideal para indústria, depósito ou centro de distribuição",
-      endereco: "Residencial Murador",    
-      banheiros: 1, 
-      outros:"Mezanino",
-      escritorio:"Sim",
+      endereco: "Residencial Murador",
+      banheiros: 1,
+      outros: "Mezanino",
+      escritorio: "Sim",
       area: 300,
       valor: 5000,
       telefone: "43 99678-9652",
@@ -3265,44 +3266,44 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       corretores: ["Cesar Melo - 38.105 F"],
 
     },
-/*
-    {
-      id: "casa1a",
-      tipo: "aluguel",
-      //   status: "Disponivel",
-      titulo: "Apartamento Jardim Primavera",
-      endereco: "Av. Brasil, 1234 - Jardim Primavera",
-      lat: -23.3979,
-      lng: -49.7285,
-      quartos: 2,
-      banheiros: 1,
-      vagas: 1,
-      salas: 1,
-      cozinhas: 1,
-      piscina: false,
-      churrasqueira: true,
-      area: 68,
-      valor: 1200,
-      telefone: "43 99678-9652",
-      imagens: [ "images/imoveis/cesar/aluguel/2.jpg", "images/imoveis/cesar/aluguel/3.jpg"],
-      descricao: "Apartamento novo, bem ventilado e com ótima vista.",
-      suite: "Sim",
-      quintal: "Sim",
-       procura: "casa", // ou "terreno", "rural", etc.
-      corretores: ["Rubao - 11.111 F"],
-      construcao: 68,           // << NOVO
-    },
-
-
-
-
-    */
+    /*
+        {
+          id: "casa1a",
+          tipo: "aluguel",
+          //   status: "Disponivel",
+          titulo: "Apartamento Jardim Primavera",
+          endereco: "Av. Brasil, 1234 - Jardim Primavera",
+          lat: -23.3979,
+          lng: -49.7285,
+          quartos: 2,
+          banheiros: 1,
+          vagas: 1,
+          salas: 1,
+          cozinhas: 1,
+          piscina: false,
+          churrasqueira: true,
+          area: 68,
+          valor: 1200,
+          telefone: "43 99678-9652",
+          imagens: [ "images/imoveis/cesar/aluguel/2.jpg", "images/imoveis/cesar/aluguel/3.jpg"],
+          descricao: "Apartamento novo, bem ventilado e com ótima vista.",
+          suite: "Sim",
+          quintal: "Sim",
+           procura: "casa", // ou "terreno", "rural", etc.
+          corretores: ["Rubao - 11.111 F"],
+          construcao: 68,           // << NOVO
+        },
+    
+    
+    
+    
+        */
   ];
 
   // monta página
   function mostrarImoveisV2() {
     if (location.hash !== "#imoveis") location.hash = "#imoveis";
-    
+
     const area = document.querySelector(".content_area");
     area.innerHTML = `
     <div class="page-header">
@@ -3441,17 +3442,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-  // === Controle visual dos botões de comodidades ===
-document.querySelectorAll('.amenity-chip').forEach(btn => {
-  btn.addEventListener('click', () => {
-    // Alterna a classe de seleção
-    btn.classList.toggle('is-active');
-  });
-});
+    // === Controle visual dos botões de comodidades ===
+    document.querySelectorAll('.amenity-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Alterna a classe de seleção
+        btn.classList.toggle('is-active');
+      });
+    });
 
-  // 'Somente disponíveis'
-const chkDisp = document.getElementById("somenteDisponiveis");
-if (chkDisp) chkDisp.addEventListener("change", aplicarFiltrosImoveis);
+    // 'Somente disponíveis'
+    const chkDisp = document.getElementById("somenteDisponiveis");
+    if (chkDisp) chkDisp.addEventListener("change", aplicarFiltrosImoveis);
 
     function updatePrecoOptions(tipo) {
       const sel = document.getElementById("imPreco");
@@ -3544,65 +3545,65 @@ if (chkDisp) chkDisp.addEventListener("change", aplicarFiltrosImoveis);
   const stateImoveis = { all: [], filtered: [], map: null, markers: [] };
 
   function aplicarFiltrosImoveis() {
-  const tipo = document.getElementById("imTipo").value;
-  const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
-  const p = parseInt(document.getElementById("imPreco").value || 0, 10);
-  const amen = Array.from(document.querySelectorAll(".amenity-chip.active"))
-    .map(c => c.dataset.key);
-  const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
-  const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
-  const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
-  const ordenacao = document.getElementById("ordenacaoImoveis")?.value || "";
+    const tipo = document.getElementById("imTipo").value;
+    const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
+    const p = parseInt(document.getElementById("imPreco").value || 0, 10);
+    const amen = Array.from(document.querySelectorAll(".amenity-chip.active"))
+      .map(c => c.dataset.key);
+    const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
+    const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
+    const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
+    const ordenacao = document.getElementById("ordenacaoImoveis")?.value || "";
 
-  const isFechado = (st) => {
-    if (!st) return false;
-    const s = String(st).toLowerCase();
-    return s.includes("vendido") || s.includes("alugado") || s.includes("negociado");
-  };
+    const isFechado = (st) => {
+      if (!st) return false;
+      const s = String(st).toLowerCase();
+      return s.includes("vendido") || s.includes("alugado") || s.includes("negociado");
+    };
 
-  // 1) FILTRAR
-  stateImoveis.filtered = stateImoveis.all.filter(im => {
-    const tipoOk = !tipo || im.tipo === tipo;
-    const qOk = !q || (im.quartos >= q);
-    const pOk = !p || (im.valor <= p);
+    // 1) FILTRAR
+    stateImoveis.filtered = stateImoveis.all.filter(im => {
+      const tipoOk = !tipo || im.tipo === tipo;
+      const qOk = !q || (im.quartos >= q);
+      const pOk = !p || (im.valor <= p);
 
-    const corretorOk =
-      !corretorSelecionado ||
-      (Array.isArray(im.corretores)
-        ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
-        : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
+      const corretorOk =
+        !corretorSelecionado ||
+        (Array.isArray(im.corretores)
+          ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
+          : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
 
-    const procuraOk =
-      !procuraSelecionado ||
-      (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
+      const procuraOk =
+        !procuraSelecionado ||
+        (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
 
-    let amenOk = true;
-    if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
-    if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
-    if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
+      let amenOk = true;
+      if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
+      if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
+      if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
 
-    const disponivelOk = !somenteDisp || !isFechado(im.status);
+      const disponivelOk = !somenteDisp || !isFechado(im.status);
 
-    return tipoOk && qOk && pOk && corretorOk && procuraOk && amenOk && disponivelOk;
-  });
-
-  // 2) ORDENAR
-  if (ordenacao === "disponiveis") {
-    stateImoveis.filtered.sort((a, b) => {
-      const A = isFechado(a.status) ? 1 : 0;
-      const B = isFechado(b.status) ? 1 : 0;
-      if (A !== B) return A - B; // disponíveis (0) antes de vendidos (1)
-      return 0;
+      return tipoOk && qOk && pOk && corretorOk && procuraOk && amenOk && disponivelOk;
     });
-  } else if (ordenacao === "preco_asc") {
-    stateImoveis.filtered.sort((a, b) => (a.valor || 0) - (b.valor || 0));
-  } else if (ordenacao === "preco_desc") {
-    stateImoveis.filtered.sort((a, b) => (b.valor || 0) - (a.valor || 0));
-  }
 
-  desenharGridImoveis(stateImoveis.filtered);
-  plotarPinsImoveis(stateImoveis.filtered);
-}
+    // 2) ORDENAR
+    if (ordenacao === "disponiveis") {
+      stateImoveis.filtered.sort((a, b) => {
+        const A = isFechado(a.status) ? 1 : 0;
+        const B = isFechado(b.status) ? 1 : 0;
+        if (A !== B) return A - B; // disponíveis (0) antes de vendidos (1)
+        return 0;
+      });
+    } else if (ordenacao === "preco_asc") {
+      stateImoveis.filtered.sort((a, b) => (a.valor || 0) - (b.valor || 0));
+    } else if (ordenacao === "preco_desc") {
+      stateImoveis.filtered.sort((a, b) => (b.valor || 0) - (a.valor || 0));
+    }
+
+    desenharGridImoveis(stateImoveis.filtered);
+    plotarPinsImoveis(stateImoveis.filtered);
+  }
 
 
 
@@ -3623,41 +3624,41 @@ if (chkDisp) chkDisp.addEventListener("change", aplicarFiltrosImoveis);
     }, 0);
 
     // conecta botões
-  // [FOTOS] – abre a galeria E registra clique "fotos"
-// permitir abrir a galeria clicando na imagem ou no botão de lupa
-el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb").forEach(node => {
-  node.addEventListener("click", (ev) => {
-    ev.stopPropagation();
-    const card = ev.currentTarget.closest(".card-imovel");
-    const id = card?.getAttribute("data-id") || ev.currentTarget.getAttribute("data-id");
-    if (!id) return;
-    const im = stateImoveis.all.find(x => x.id === id);
-    if (im) {
-      registrarCliqueImovel('fotos', im);   // <<< ADICIONE ESTA LINHA
-      abrirModalImoveis(im);
-    }
-  });
-});
+    // [FOTOS] – abre a galeria E registra clique "fotos"
+    // permitir abrir a galeria clicando na imagem ou no botão de lupa
+    el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb").forEach(node => {
+      node.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const card = ev.currentTarget.closest(".card-imovel");
+        const id = card?.getAttribute("data-id") || ev.currentTarget.getAttribute("data-id");
+        if (!id) return;
+        const im = stateImoveis.all.find(x => x.id === id);
+        if (im) {
+          registrarCliqueImovel('fotos', im);   // <<< ADICIONE ESTA LINHA
+          abrirModalImoveis(im);
+        }
+      });
+    });
 
 
 
 
-// WhatsApp – abrir aba imediatamente; registrar em paralelo
-function abrirModalContatoImovel(im) {
-  const nomeSalvo = localStorage.getItem("visitante_nome");
+    // WhatsApp – abrir aba imediatamente; registrar em paralelo
+    function abrirModalContatoImovel(im) {
+      const nomeSalvo = localStorage.getItem("visitante_nome");
 
-  // ✅ Se já existir nome salvo, pula a modal e envia direto
-  if (nomeSalvo) {
-    enviarWhatsAppImovel(im, nomeSalvo);
-    return;
-  }
+      // ✅ Se já existir nome salvo, pula a modal e envia direto
+      if (nomeSalvo) {
+        enviarWhatsAppImovel(im, nomeSalvo);
+        return;
+      }
 
-  // remove modais anteriores
-  document.querySelectorAll(".im-contato-modal").forEach(m => m.remove());
+      // remove modais anteriores
+      document.querySelectorAll(".im-contato-modal").forEach(m => m.remove());
 
-  const modal = document.createElement("div");
-  modal.className = "im-contato-modal";
-  modal.innerHTML = `
+      const modal = document.createElement("div");
+      modal.className = "im-contato-modal";
+      modal.innerHTML = `
     <div class="im-contato-box" role="dialog" aria-modal="true">
       <button class="im-contato-close" title="Fechar">&times;</button>
       <h3>Antes de falar no WhatsApp</h3>
@@ -3672,160 +3673,160 @@ function abrirModalContatoImovel(im) {
       </div>
     </div>
   `;
-  document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-  const input = modal.querySelector("#imContatoNome");
-  setTimeout(() => input.focus(), 50);
+      const input = modal.querySelector("#imContatoNome");
+      setTimeout(() => input.focus(), 50);
 
-  function fechar() { modal.remove(); }
-  modal.addEventListener("click", (e) => { if (e.target === modal) fechar(); });
-  modal.querySelector(".im-contato-close").addEventListener("click", fechar);
-  modal.querySelector(".im-contato-cancel").addEventListener("click", fechar);
+      function fechar() { modal.remove(); }
+      modal.addEventListener("click", (e) => { if (e.target === modal) fechar(); });
+      modal.querySelector(".im-contato-close").addEventListener("click", fechar);
+      modal.querySelector(".im-contato-cancel").addEventListener("click", fechar);
 
-  // botão enviar
-  modal.querySelector(".im-contato-send").addEventListener("click", () => {
-    let nome = (input.value || "").trim();
-    if (!nome) {
-      input.focus();
-      input.classList.add("im-contato-input--err");
-      setTimeout(() => input.classList.remove("im-contato-input--err"), 600);
-      return;
+      // botão enviar
+      modal.querySelector(".im-contato-send").addEventListener("click", () => {
+        let nome = (input.value || "").trim();
+        if (!nome) {
+          input.focus();
+          input.classList.add("im-contato-input--err");
+          setTimeout(() => input.classList.remove("im-contato-input--err"), 600);
+          return;
+        }
+
+        localStorage.setItem("visitante_nome", nome);
+        enviarWhatsAppImovel(im, nome);
+        fechar();
+      });
     }
 
-    localStorage.setItem("visitante_nome", nome);
-    enviarWhatsAppImovel(im, nome);
-    fechar();
-  });
-}
+    // --- Função para abrir WhatsApp com saudação e salvar no Firebase ---
+    function enviarWhatsAppImovel(im, nome) {
+      const numero = somenteDigitos(im.telefone || "");
 
-// --- Função para abrir WhatsApp com saudação e salvar no Firebase ---
-function enviarWhatsAppImovel(im, nome) {
-  const numero = somenteDigitos(im.telefone || "");
+      // Saudação (sem “Encontrei seu número no Olá Carlópolis”)
+      let saudacao = (typeof gerarMensagemWhatsApp === "function")
+        ? (gerarMensagemWhatsApp().trim() || "Olá!")
+        : "Olá!";
+      saudacao = saudacao.replace(/Encontrei seu numero no Ola Carlopolis\.?/i, "")
+        .replace(/Encontrei seu número no Olá Carlópolis\.?/i, "")
+        .trim();
 
-  // Saudação (sem “Encontrei seu número no Olá Carlópolis”)
-  let saudacao = (typeof gerarMensagemWhatsApp === "function")
-    ? (gerarMensagemWhatsApp().trim() || "Olá!")
-    : "Olá!";
-  saudacao = saudacao.replace(/Encontrei seu numero no Ola Carlopolis\.?/i, "")
-                     .replace(/Encontrei seu número no Olá Carlópolis\.?/i, "")
-                     .trim();
+      const msg = `${saudacao ? saudacao + " " : ""}Meu nome é ${nome}. Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`;
+      const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`;
 
-  const msg = `${saudacao ? saudacao + " " : ""}Meu nome é ${nome}. Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`;
-  const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`;
+      // 1) sempre registra o clique do botão (contador)
+      try {
+        // se você já tem essa função, mantém:
+        if (typeof registrarCliqueImovel === "function") {
+          registrarCliqueImovel("whatsapp", im).catch(() => { });
+        } else if (window.firebase && firebase.database) {
+          // fallback simples: soma em imoveisCliquesPorDia/YYYY-MM-DD/<imovelId>/whatsapp
+          const hoje = new Date().toISOString().slice(0, 10);
+          const ref = firebase.database().ref(`imoveisCliquesPorDia/${hoje}/${im.id}`);
+          ref.transaction(cur => {
+            const v = cur || {};
+            v.whatsapp = (Number(v.whatsapp || 0) + 1);
+            if (!v.titulo && im.titulo) v.titulo = im.titulo;
+            if (!v.corretor && im.corretor) v.corretor = im.corretor;
+            return v;
+          }).catch(() => { });
+        }
 
-  // 1) sempre registra o clique do botão (contador)
-  try {
-    // se você já tem essa função, mantém:
-    if (typeof registrarCliqueImovel === "function") {
-      registrarCliqueImovel("whatsapp", im).catch(()=>{});
-    } else if (window.firebase && firebase.database) {
-      // fallback simples: soma em imoveisCliquesPorDia/YYYY-MM-DD/<imovelId>/whatsapp
-      const hoje = new Date().toISOString().slice(0,10);
-      const ref = firebase.database().ref(`imoveisCliquesPorDia/${hoje}/${im.id}`);
-      ref.transaction(cur => {
-        const v = cur || {};
-        v.whatsapp = (Number(v.whatsapp || 0) + 1);
-        if (!v.titulo && im.titulo) v.titulo = im.titulo;
-        if (!v.corretor && im.corretor) v.corretor = im.corretor;
-        return v;
-      }).catch(()=>{});
+        // 2) salva a confirmação com o NOME (para aparecer no relatório)
+        salvarContatoImovel(im, nome);
+
+        if (typeof logEventoCliqueImovel === "function") {
+          logEventoCliqueImovel("whatsapp", im);
+        }
+      } catch (e) { }
+
+      // abre o WhatsApp (gesto do usuário)
+      window.open(url, "_blank");
     }
 
-    // 2) salva a confirmação com o NOME (para aparecer no relatório)
-    salvarContatoImovel(im, nome);
+    function salvarContatoImovel(im, nome) {
+      try {
+        if (!window.firebase || !firebase.database) return;
+        const hoje = new Date().toISOString().slice(0, 10);
+        const ref = firebase.database()
+          .ref(`imoveis/contatos/${hoje}/${im.id}`)
+          .push();
 
-    if (typeof logEventoCliqueImovel === "function") {
-      logEventoCliqueImovel("whatsapp", im);
+        ref.set({
+          nome: String(nome || "").slice(0, 80),
+          imovelId: im.id,
+          imovelTitulo: im.titulo || "",
+          destinoFone: somenteDigitos(im.telefone || ""),
+          pagina: location.href,
+          userAgent: navigator.userAgent,
+          ts: firebase.database.ServerValue.TIMESTAMP
+        }).catch(() => { });
+      } catch (e) { }
     }
-  } catch(e){}
-
-  // abre o WhatsApp (gesto do usuário)
-  window.open(url, "_blank");
-}
-
-function salvarContatoImovel(im, nome) {
-  try {
-    if (!window.firebase || !firebase.database) return;
-    const hoje = new Date().toISOString().slice(0,10);
-    const ref = firebase.database()
-      .ref(`imoveis/contatos/${hoje}/${im.id}`)
-      .push();
-
-    ref.set({
-      nome: String(nome || "").slice(0, 80),
-      imovelId: im.id,
-      imovelTitulo: im.titulo || "",
-      destinoFone: somenteDigitos(im.telefone || ""),
-      pagina: location.href,
-      userAgent: navigator.userAgent,
-      ts: firebase.database.ServerValue.TIMESTAMP
-    }).catch(()=>{});
-  } catch(e){}
-}
 
 
 
-// --- Salva no Firebase a confirmação de contato ---
-function salvarContatoImovel(im, nome) {
-  try {
-    if (!window.firebase || !firebase.database) return;
-    const hoje = new Date().toISOString().slice(0,10);
-    const ref = firebase.database()
-      .ref(`imoveis/contatos/${hoje}/${im.id}`)
-      .push();
+    // --- Salva no Firebase a confirmação de contato ---
+    function salvarContatoImovel(im, nome) {
+      try {
+        if (!window.firebase || !firebase.database) return;
+        const hoje = new Date().toISOString().slice(0, 10);
+        const ref = firebase.database()
+          .ref(`imoveis/contatos/${hoje}/${im.id}`)
+          .push();
 
-    ref.set({
-      nome,
-      imovelId: im.id,
-      imovelTitulo: im.titulo || "",
-      destinoFone: somenteDigitos(im.telefone || ""),
-      pagina: location.href,
-      ts: firebase.database.ServerValue.TIMESTAMP
-    }).catch(()=>{});
-  } catch(e){}
-}
+        ref.set({
+          nome,
+          imovelId: im.id,
+          imovelTitulo: im.titulo || "",
+          destinoFone: somenteDigitos(im.telefone || ""),
+          pagina: location.href,
+          ts: firebase.database.ServerValue.TIMESTAMP
+        }).catch(() => { });
+      } catch (e) { }
+    }
 
-// --- Conecta os botões Whats ---
-// --- Conecta os botões "Falar no WhatsApp" (um único listener por botão)
-el.querySelectorAll("[data-action='whats']").forEach(btn => {
-  if (btn.dataset.bindWhats === "1") return; // evita rebind
-  btn.dataset.bindWhats = "1";
+    // --- Conecta os botões Whats ---
+    // --- Conecta os botões "Falar no WhatsApp" (um único listener por botão)
+    el.querySelectorAll("[data-action='whats']").forEach(btn => {
+      if (btn.dataset.bindWhats === "1") return; // evita rebind
+      btn.dataset.bindWhats = "1";
 
-  btn.addEventListener("click", (ev) => {
-    ev.preventDefault();
-    const id = ev.currentTarget.getAttribute("data-id");
-    const im = stateImoveis.all.find(x => x.id === id);
-    if (!im) return;
-    abrirModalContatoImovel(im); // aqui NÃO registra clique
-  });
-});
+      btn.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        const id = ev.currentTarget.getAttribute("data-id");
+        const im = stateImoveis.all.find(x => x.id === id);
+        if (!im) return;
+        abrirModalContatoImovel(im); // aqui NÃO registra clique
+      });
+    });
 
 
 
-// salva confirmação de contato no Firebase
-function salvarContatoImovel(im, nome) {
-  try {
-    if (!window.firebase || !firebase.database) return;
+    // salva confirmação de contato no Firebase
+    function salvarContatoImovel(im, nome) {
+      try {
+        if (!window.firebase || !firebase.database) return;
 
-    const hoje = getHojeBR ? getHojeBR() : new Date().toISOString().slice(0,10);
-    const ref = firebase.database()
-      .ref(`imoveis/contatos/${hoje}/${im.id}`)
-      .push();
+        const hoje = getHojeBR ? getHojeBR() : new Date().toISOString().slice(0, 10);
+        const ref = firebase.database()
+          .ref(`imoveis/contatos/${hoje}/${im.id}`)
+          .push();
 
-    ref.set({
-      nome: String(nome || "").slice(0, 80),
-      imovelId: im.id,
-      imovelTitulo: im.titulo || "",
-      destinoFone: somenteDigitos(im.telefone || ""),
-        corretor: (typeof getCorretorPrincipal === "function" ? getCorretorPrincipal(im) : (im.corretor || "")) || "",
- 
-      pagina: location.href,
-      
-      userAgent: navigator.userAgent,
-      ts: firebase.database.ServerValue.TIMESTAMP
-    }).catch(()=>{});
-  } catch(e){ /* silencioso */ }
-}
+        ref.set({
+          nome: String(nome || "").slice(0, 80),
+          imovelId: im.id,
+          imovelTitulo: im.titulo || "",
+          destinoFone: somenteDigitos(im.telefone || ""),
+          corretor: (typeof getCorretorPrincipal === "function" ? getCorretorPrincipal(im) : (im.corretor || "")) || "",
+
+          pagina: location.href,
+
+          userAgent: navigator.userAgent,
+          ts: firebase.database.ServerValue.TIMESTAMP
+        }).catch(() => { });
+      } catch (e) { /* silencioso */ }
+    }
 
 
 
@@ -3864,8 +3865,8 @@ function salvarContatoImovel(im, nome) {
 
     if (!terr && im.quintal) chips.push(`<div class="spec-chip chip-mini"><span class="k">Quintal</span><span class="v">${im.quintal}</span></div>`);
 
-        if (!terr && im.escritorio) chips.push(`<div class="spec-chip chip-mini"><span class="k">Escritorio</span><span class="v">${im.escritorio}</span></div>`);
-            if (!terr && im.outros) chips.push(`<div class="spec-chip chip-mini"><span class="k">Outros</span><span class="v">${im.outros}</span></div>`);
+    if (!terr && im.escritorio) chips.push(`<div class="spec-chip chip-mini"><span class="k">Escritorio</span><span class="v">${im.escritorio}</span></div>`);
+    if (!terr && im.outros) chips.push(`<div class="spec-chip chip-mini"><span class="k">Outros</span><span class="v">${im.outros}</span></div>`);
 
     // Área (relevante para qualquer imóvel, inclusive terreno)
     if (hasNum(im.area)) chips.push(`<div class="spec-chip"><span class="k">Área</span><span class="v">${Number(im.area)} m²</span></div>`);
@@ -3878,21 +3879,21 @@ function salvarContatoImovel(im, nome) {
 
 
   function cardImovelHTML(im) {
-  const tag = im.tipo; // "venda" | "aluguel"
-  const st = (im.status || "").toLowerCase();
-  const isFechado = ["vendido","alugado","negociado"].includes(st);
-  
-
-  const precoFmt = im.tipo === "aluguel"
-    ? `R$ ${Number(im.valor).toLocaleString()} / mês`
-    : `R$ ${Number(im.valor).toLocaleString()}`;
-
-  const responsavel = nomeResponsavel(im);
+    const tag = im.tipo; // "venda" | "aluguel"
+    const st = (im.status || "").toLowerCase();
+    const isFechado = ["vendido", "alugado", "negociado"].includes(st);
 
 
-  
+    const precoFmt = im.tipo === "aluguel"
+      ? `R$ ${Number(im.valor).toLocaleString()} / mês`
+      : `R$ ${Number(im.valor).toLocaleString()}`;
 
-  return `
+    const responsavel = nomeResponsavel(im);
+
+
+
+
+    return `
   <article class="card-imovel ${tag} ${isFechado ? "is-sold" : ""}" data-id="${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
     <div class="card-top">
       <div class="swiper swiper-imovel-mini">
@@ -3912,9 +3913,9 @@ function salvarContatoImovel(im, nome) {
 
       <div class="price-pill ${tag}">
         ${im.tipo === "aluguel"
-          ? `R$ ${Number(im.valor).toLocaleString()} <span class="pill-sub">/ mês</span>`
-          : `R$ ${Number(im.valor).toLocaleString()}`
-        }
+        ? `R$ ${Number(im.valor).toLocaleString()} <span class="pill-sub">/ mês</span>`
+        : `R$ ${Number(im.valor).toLocaleString()}`
+      }
       </div>
     </div>
 
@@ -3941,7 +3942,7 @@ function salvarContatoImovel(im, nome) {
       ${responsavel ? `<div class="spec-chip chip-mini corretor-banner"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
     </div>
   </article>`;
-}
+  }
 
 
 
@@ -7855,7 +7856,7 @@ function salvarContatoImovel(im, nome) {
             address: "Rodovia PR 218, 91 - Carlopolis",
             contact: "(43) 99812-5120",
             infoAdicional: "⚠️ 2° Via CRV,<br>⚠️ Atpv-e,<br> ⚠️ Comunicação de Venda,<br> ⚠️ Emplacamentos,<br>⚠️ Guia de Multas, IPVA,<br>⚠️ Licenciamento, <br>⚠️ Transferências  ",
-         instagram:"https://www.instagram.com/despachante_rodriguinho/",
+            instagram: "https://www.instagram.com/despachante_rodriguinho/",
           },
         ],
       },
@@ -9351,11 +9352,11 @@ function salvarContatoImovel(im, nome) {
               dom: []
             },
             address: "R.  Dra. Paula e Silva, 648 - Carlópolis",
-                        contact: "(43) 99153-4883",
+            contact: "(43) 99153-4883",
 
             instagram: "https://www.instagram.com/eu_tatyconik/",
             infoAdicional: "Especialistas em cuidados capilares, desenvolvemos produtos de alta performance para salões de beleza.<br> Nossas linhas unem tecnologia e qualidade profissional para proporcionar fios mais saudáveis, lisos e radiantes.<br>📗 <a href='images/servicos/revendedor/tati/divulgacao/Catalogo.pdf' target='_blank' rel='noopener'><br>Acesse Nosso Catálogo</a>",
-           
+
             novidadesImages: [
               "images/servicos/revendedor/tati/divulgacao/2.jpg",
 
@@ -9413,46 +9414,7 @@ function salvarContatoImovel(im, nome) {
           },
 
 
-          {
-            image: "images/informacoes/eventos/copaComercio.jpg",
-            name: "Copa Comercio Municipal",
-            date: "23/09/2025",
-            address: "Av Turistica Elias Merhi Mansur",
-            contact: "(43) 99825-0870",
-            infoAdicional: "🚨 Vem aí a Copa dos Comércios! ⚽<br>Chegou a hora de reunir sua equipe e representar o comércio do nosso município em mais um grande campeonato.<br>✅ Garanta já a inscrição do seu time – as vagas são limitadas!<br>ℹ️ Para mais informações, procure a Secretaria de Esportes e Lazer.<br>Não fique de fora dessa disputa que promete agitar Carlópolis!",
-            instagram: "https://www.instagram.com/esportes_carlopolis/",
 
-
-
-          },
-
-
-          {
-            image: "images/informacoes/eventos/CampeonatoVoleiAreia.jpg",
-            name: "Campeonato Volei de Areia Municipal",
-            date: "23/09/2025",
-            address: "Av Turistica Elias Merhi Mansur",
-            contact: "(43) 99825-0870",
-            infoAdicional: "🏐 Preparem-se!<br>Setembro promete muita emoção no esporte de Carlópolis!<br>Vem aí o Torneio Municipal de Vôlei de Areia – Dupla Mista.<br>Não fique de fora! Para mais informações, procure a Secretaria de Esportes e Lazer.",
-            instagram: "https://www.instagram.com/esportes_carlopolis/",
-
-
-
-          },
-
-
-
-          {
-            image: "images/informacoes/eventos/torneioPenalti.jpg",
-            name: "Torneio Penalti Municipal",
-            date: "28/09/2025",
-            address: "Campo Society do Vista Alegre",
-            contact: "(43) 99825-0870",
-            infoAdicional: "Torneio de pênaltis!!!<br>Prepare sua dupla e venha participar do torneio municipal de pênaltis.<br>Garanta sua vaga, inscrições limitadas.<br>Mais informações entre em contato com a Secretaria de Esportes e Lazer.",
-            instagram: "https://www.instagram.com/esportes_carlopolis/",
-
-
-          },
 
 
 
@@ -9468,24 +9430,48 @@ function salvarContatoImovel(im, nome) {
 
 
 
-          
-
-
-         
 
 
 
 
 
-        
 
-          
+
+
+
+
+
+
           {
             image: "images/informacoes/eventos/jogosAventura1.jpg",
             name: "Jogos Aventura",
             date: "20/10/2025",
             address: "Centro de Eventos",
-            contact: "-",
+            
+          },
+
+          {
+            image: "images/informacoes/eventos/toroonagashi.png",
+            name: "Toroonagashi",
+            date: "25/10/2025",
+            address: "Ponte interstadual Benedito Garcia Ribeiro (Carlopolis x Fartura)",
+            
+
+
+
+          },
+
+          {
+            image: "images/informacoes/eventos/motocross.jpg",
+            name: "Campeonato Paranaense Motocross",
+            date: "25/10/2025",
+            address: "Ilha do Ponciano",
+            infoAdicional: "Prepare-se para um fim de semana de adrenalina e emoção!<br>Nos dias 25 e 26 de outubro, o Centro de Eventos Ilha do Ponciano será palco do Campeonato Paranaense de Motocross Sportbay!<br>Venha prestigiar e torcer pelos melhores pilotos do estado, em disputas cheias de velocidade, saltos incríveis e muita energia!<br>Não fique de fora desse grande espetáculo sobre duas rodas!",
+
+            
+
+
+
           },
 
           {
@@ -9493,20 +9479,11 @@ function salvarContatoImovel(im, nome) {
             name: "Jogos Aventura",
             date: "25/10/2025",
             address: "Centro de Eventos",
-            contact: "-",
+           
           },
 
 
-          {
-            image: "images/informacoes/eventos/toroonagashi.png",
-            name: "Toroonagashi",
-            date: "25/10/2025",
-            address: "Ponte interstadual Benedito Garcia Ribeiro (Carlopolis x Fartura)",
-            contact: "-",
 
-
-
-          },
 
           {
             image: "images/informacoes/eventos/erosPrado.jpg",
@@ -11774,7 +11751,7 @@ function salvarContatoImovel(im, nome) {
 
             ],
             novidadesDescriptions: [
-               "Reserve sua mesa!  ",
+              "Reserve sua mesa!  ",
               "Sabiam quem temos Rodizio todas as Sextas-ferias?  ",
               "Nosso famoso Yaki Soba!",
               "Amplo espaço para atendermos toda sua familia! ",
@@ -12369,18 +12346,18 @@ function salvarContatoImovel(im, nome) {
         link: document.querySelector("#menuNotaFalecimento"),
         title: "Nota de Falecimento",
         establishments: [
-/*
+          /*
+          
+                    {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/49.jpg",
+                      date: "01/10/2025",
+                      descricaoFalecido: "",
+          
+                    },
+          */
 
           {
-            name: "Funeraria Cristo Rei",
-            image: "images/informacoes/notaFalecimento/cristoRei/49.jpg",
-            date: "01/10/2025",
-            descricaoFalecido: "",
-
-          },
-*/
-
- {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/48.jpg",
             date: "19/10/2025",
@@ -12388,7 +12365,7 @@ function salvarContatoImovel(im, nome) {
 
           },
 
-  {
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/47.jpg",
             date: "17/10/2025",
@@ -12396,7 +12373,7 @@ function salvarContatoImovel(im, nome) {
 
           },
 
-            {
+          {
             name: "Funeraria Grupo Castilho",
             image: "images/informacoes/notaFalecimento/castilho/35.jpg",
             date: "16/10/2025",
@@ -12404,7 +12381,7 @@ function salvarContatoImovel(im, nome) {
 
           },
 
-            {
+          {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/46.jpg",
             date: "16/10/2025",
@@ -12429,7 +12406,7 @@ function salvarContatoImovel(im, nome) {
 
           },
 
-            {
+          {
             name: "Funeraria Grupo Castilho",
             image: "images/informacoes/notaFalecimento/castilho/34.jpg",
             date: "05/10/2025",
@@ -12448,7 +12425,7 @@ function salvarContatoImovel(im, nome) {
 
 
 
-  //01/10
+          //01/10
           {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/42.jpg",
@@ -12895,12 +12872,12 @@ function salvarContatoImovel(im, nome) {
   montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
 
   // Menu: Nascer & Pôr do Sol
-document.addEventListener("click", (ev) => {
-  const t = ev.target.closest("#menuSol");
-  if (!t) return;
-  ev.preventDefault();
-  mostrarSol(); // abre a página
-});
+  document.addEventListener("click", (ev) => {
+    const t = ev.target.closest("#menuSol");
+    if (!t) return;
+    ev.preventDefault();
+    mostrarSol(); // abre a página
+  });
 
 
 
@@ -13861,7 +13838,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (location.hash === "#climaDoDia") { mostrarSol(); }
 
 
-    
+
 
 
 
@@ -13928,109 +13905,109 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   }
 
 
-// === NASCER & PÔR DO SOL (Carlópolis-PR) ===
+  // === NASCER & PÔR DO SOL (Carlópolis-PR) ===
 
-// Coordenadas fixas de Carlópolis-PR
-const COORDS_CARLOPOLIS = { lat: -23.4267, lng: -49.7239 };
+  // Coordenadas fixas de Carlópolis-PR
+  const COORDS_CARLOPOLIS = { lat: -23.4267, lng: -49.7239 };
 
-// Formata data YYYY-MM-DD no fuso de São Paulo
-function hojeISO_BR() {
-  const tz = 'America/Sao_Paulo';
-  const d = new Date();
-  // garante data local correta:
-  const y = d.toLocaleString('en-CA', { timeZone: tz, year:'numeric' });
-  const m = d.toLocaleString('en-CA', { timeZone: tz, month:'2-digit' });
-  const dd = d.toLocaleString('en-CA', { timeZone: tz, day:'2-digit' });
-  return `${y}-${m}-${dd}`;
-}
-
-// Converte um ISO para "HH:mm" em São Paulo
-function toHoraMinBR(iso) {
-  if (!iso) return "--:--";
-  const d = new Date(iso);
-  return d.toLocaleTimeString("pt-BR", {
-    hour: "2-digit", minute: "2-digit",
-    timeZone: "America/Sao_Paulo"
-  });
-}
-
-// Converte "HH:MM:SS" (day_length) para "H h M min"
-function duracaoHumana(valor) {
-  // Se vier número (Open-Meteo): converte para "HH:MM:SS"
-  if (typeof valor === "number" && Number.isFinite(valor)) {
-    const h = Math.floor(valor / 3600);
-    const m = Math.floor((valor % 3600) / 60);
-    // s não é necessário para o texto final, mas calculo por completude
-    // const s = Math.floor(valor % 60);
-    const partes = [];
-    if (h) partes.push(`${h} h`);
-    if (m || !h) partes.push(`${m} min`);
-    return partes.join(" ");
+  // Formata data YYYY-MM-DD no fuso de São Paulo
+  function hojeISO_BR() {
+    const tz = 'America/Sao_Paulo';
+    const d = new Date();
+    // garante data local correta:
+    const y = d.toLocaleString('en-CA', { timeZone: tz, year: 'numeric' });
+    const m = d.toLocaleString('en-CA', { timeZone: tz, month: '2-digit' });
+    const dd = d.toLocaleString('en-CA', { timeZone: tz, day: '2-digit' });
+    return `${y}-${m}-${dd}`;
   }
 
-  // Se vier string "HH:MM:SS" (sunrise-sunset.org): trata como antes
-  if (typeof valor === "string" && valor.includes(":")) {
-    const [h, m] = valor.split(":").map(Number);
-    const partes = [];
-    if (h) partes.push(`${h} h`);
-    if (m || !h) partes.push(`${m} min`);
-    return partes.join(" ");
+  // Converte um ISO para "HH:mm" em São Paulo
+  function toHoraMinBR(iso) {
+    if (!iso) return "--:--";
+    const d = new Date(iso);
+    return d.toLocaleTimeString("pt-BR", {
+      hour: "2-digit", minute: "2-digit",
+      timeZone: "America/Sao_Paulo"
+    });
   }
 
-  return "-";
-}
+  // Converte "HH:MM:SS" (day_length) para "H h M min"
+  function duracaoHumana(valor) {
+    // Se vier número (Open-Meteo): converte para "HH:MM:SS"
+    if (typeof valor === "number" && Number.isFinite(valor)) {
+      const h = Math.floor(valor / 3600);
+      const m = Math.floor((valor % 3600) / 60);
+      // s não é necessário para o texto final, mas calculo por completude
+      // const s = Math.floor(valor % 60);
+      const partes = [];
+      if (h) partes.push(`${h} h`);
+      if (m || !h) partes.push(`${m} min`);
+      return partes.join(" ");
+    }
+
+    // Se vier string "HH:MM:SS" (sunrise-sunset.org): trata como antes
+    if (typeof valor === "string" && valor.includes(":")) {
+      const [h, m] = valor.split(":").map(Number);
+      const partes = [];
+      if (h) partes.push(`${h} h`);
+      if (m || !h) partes.push(`${m} min`);
+      return partes.join(" ");
+    }
+
+    return "-";
+  }
 
 
-// Busca na API sunrise-sunset (UTC; formatted=0 entrega ISO)
-async function buscarSol(dateISO) {
-  const { lat, lng } = COORDS_CARLOPOLIS;
-  const url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${dateISO}&formatted=0`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error("Falha ao consultar horários");
-  const j = await r.json();
-  if (j.status !== "OK") throw new Error("Resposta inválida");
-  return j.results; // sunrise, sunset, solar_noon, day_length, civil_twilight_begin/end, etc.
-}
+  // Busca na API sunrise-sunset (UTC; formatted=0 entrega ISO)
+  async function buscarSol(dateISO) {
+    const { lat, lng } = COORDS_CARLOPOLIS;
+    const url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${dateISO}&formatted=0`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error("Falha ao consultar horários");
+    const j = await r.json();
+    if (j.status !== "OK") throw new Error("Resposta inválida");
+    return j.results; // sunrise, sunset, solar_noon, day_length, civil_twilight_begin/end, etc.
+  }
 
 
-// === Clima diário (Open-Meteo) ===
-// Retorna { tmax, tmin, wind, rainProb } para a data
-async function buscarTempo(dateISO) {
-  const { lat, lng } = COORDS_CARLOPOLIS;
-  const base = "https://api.open-meteo.com/v1/forecast";
-  const params = new URLSearchParams({
-    latitude: lat,
-    longitude: lng,
-    daily: "temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max",
-    timezone: "America/Sao_Paulo",
-    temperature_unit: "celsius",
-    wind_speed_unit: "kmh",
-    start_date: dateISO,
-    end_date: dateISO
-  });
-  const resp = await fetch(`${base}?${params.toString()}`);
-  if (!resp.ok) throw new Error("Falha ao consultar clima");
-  const j = await resp.json();
-  if (!j?.daily) throw new Error("Resposta inválida (clima)");
+  // === Clima diário (Open-Meteo) ===
+  // Retorna { tmax, tmin, wind, rainProb } para a data
+  async function buscarTempo(dateISO) {
+    const { lat, lng } = COORDS_CARLOPOLIS;
+    const base = "https://api.open-meteo.com/v1/forecast";
+    const params = new URLSearchParams({
+      latitude: lat,
+      longitude: lng,
+      daily: "temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max",
+      timezone: "America/Sao_Paulo",
+      temperature_unit: "celsius",
+      wind_speed_unit: "kmh",
+      start_date: dateISO,
+      end_date: dateISO
+    });
+    const resp = await fetch(`${base}?${params.toString()}`);
+    if (!resp.ok) throw new Error("Falha ao consultar clima");
+    const j = await resp.json();
+    if (!j?.daily) throw new Error("Resposta inválida (clima)");
 
-  const i = 0; // só 1 dia
-  return {
-    tmax: j.daily.temperature_2m_max?.[i],
-    tmin: j.daily.temperature_2m_min?.[i],
-    wind: j.daily.wind_speed_10m_max?.[i],
-    rainProb: j.daily.precipitation_probability_max?.[i]
-  };
-}
+    const i = 0; // só 1 dia
+    return {
+      tmax: j.daily.temperature_2m_max?.[i],
+      tmin: j.daily.temperature_2m_min?.[i],
+      wind: j.daily.wind_speed_10m_max?.[i],
+      rainProb: j.daily.precipitation_probability_max?.[i]
+    };
+  }
 
 
-function mostrarSol(dateISO) {
-  if (location.hash !== "#climaDoDia") location.hash = "#climaDoDia";
+  function mostrarSol(dateISO) {
+    if (location.hash !== "#climaDoDia") location.hash = "#climaDoDia";
 
-  const area = document.querySelector(".content_area");
-  const hoje = hojeISO_BR();
-  const dataInicial = dateISO || hoje;
+    const area = document.querySelector(".content_area");
+    const hoje = hojeISO_BR();
+    const dataInicial = dateISO || hoje;
 
-  area.innerHTML = `
+    area.innerHTML = `
     <div class="page-header">
       <h2 >🌞 Clima do Dia</h2>
       <i class="fa-solid fa-share-nodes share-btn"
@@ -14098,39 +14075,39 @@ function mostrarSol(dateISO) {
     </div>
   `;
 
-  // função interna para carregar/atualizar
-  async function carregar(dateStr) {
-    const st = document.getElementById("solStatus");
-    try {
-      st.textContent = "⏳ Carregando horários...";
-      const res = await buscarSol(dateStr);
-      document.getElementById("solSunrise").textContent = toHoraMinBR(res.sunrise);
-      document.getElementById("solSunset").textContent  = toHoraMinBR(res.sunset);
-      document.getElementById("solNoon").textContent    = toHoraMinBR(res.solar_noon);
-      document.getElementById("solDuracao").textContent = duracaoHumana(res.day_length);
-      // depois de preencher os horários do sol...
-const tempo = await buscarTempo(dateStr);
-document.getElementById("wxMax").textContent  = (tempo.tmax ?? "--") + "°C";
-document.getElementById("wxMin").textContent  = (tempo.tmin ?? "--") + "°C";
-document.getElementById("wxWind").textContent = (tempo.wind ?? "--") + " km/h";
-document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
+    // função interna para carregar/atualizar
+    async function carregar(dateStr) {
+      const st = document.getElementById("solStatus");
+      try {
+        st.textContent = "⏳ Carregando horários...";
+        const res = await buscarSol(dateStr);
+        document.getElementById("solSunrise").textContent = toHoraMinBR(res.sunrise);
+        document.getElementById("solSunset").textContent = toHoraMinBR(res.sunset);
+        document.getElementById("solNoon").textContent = toHoraMinBR(res.solar_noon);
+        document.getElementById("solDuracao").textContent = duracaoHumana(res.day_length);
+        // depois de preencher os horários do sol...
+        const tempo = await buscarTempo(dateStr);
+        document.getElementById("wxMax").textContent = (tempo.tmax ?? "--") + "°C";
+        document.getElementById("wxMin").textContent = (tempo.tmin ?? "--") + "°C";
+        document.getElementById("wxWind").textContent = (tempo.wind ?? "--") + " km/h";
+        document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
 
-      st.textContent = `✅ Horários para ${dateStr.split("-").reverse().join("/")}`;
-    } catch (e) {
-      console.error(e);
-      st.textContent = "⚠️ Não foi possível carregar os horários. Tente novamente.";
+        st.textContent = `✅ Horários para ${dateStr.split("-").reverse().join("/")}`;
+      } catch (e) {
+        console.error(e);
+        st.textContent = "⚠️ Não foi possível carregar os horários. Tente novamente.";
+      }
     }
+
+    // listeners
+    const inp = document.getElementById("solData");
+    const btn = document.getElementById("solAtualizar");
+    if (btn) btn.addEventListener("click", () => carregar(inp.value || hoje));
+    if (inp) inp.addEventListener("change", () => carregar(inp.value || hoje));
+
+    // carrega inicial
+    carregar(dataInicial);
   }
-
-  // listeners
-  const inp = document.getElementById("solData");
-  const btn = document.getElementById("solAtualizar");
-  if (btn) btn.addEventListener("click", () => carregar(inp.value || hoje));
-  if (inp) inp.addEventListener("change", () => carregar(inp.value || hoje));
-
-  // carrega inicial
-  carregar(dataInicial);
-}
 
 
 
@@ -14138,7 +14115,7 @@ document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
   //// inicio validador nome imoveis
 
 
-  
+
 
 
   //// fim valdador nome imoveis
@@ -15007,7 +14984,7 @@ function keyImovel(im) {
 }
 
 // salva CONTADOR por dia, mantendo também o titulo no nó do dia
-  // util: pega o 1º corretor do imóvel
+// util: pega o 1º corretor do imóvel
 function getCorretorPrincipal(im) {
   if (!im) return "";
   if (Array.isArray(im.corretores) && im.corretores.length) return String(im.corretores[0]);
@@ -15018,15 +14995,15 @@ function getCorretorPrincipal(im) {
 // salva CONTADOR por dia + titulo + corretor
 function registrarCliqueImovelDia(tipo, im) {
   if (!window.firebase || !firebase.database) return Promise.resolve(false);
-  const hoje  = getHojeBR(); // YYYY-MM-DD
+  const hoje = getHojeBR(); // YYYY-MM-DD
   const chave = keyImovel(im);
-  const ref   = firebase.database().ref(`imoveisCliquesPorDia/${hoje}/${chave}`);
+  const ref = firebase.database().ref(`imoveisCliquesPorDia/${hoje}/${chave}`);
 
   return ref.transaction(curr => {
     const base = curr || {};
-    base.titulo   = im?.titulo || base.titulo || "";
+    base.titulo = im?.titulo || base.titulo || "";
     base.corretor = getCorretorPrincipal(im) || base.corretor || "";
-    base[tipo]    = (base[tipo] || 0) + 1;   // incrementa fotos/whatsapp
+    base[tipo] = (base[tipo] || 0) + 1;   // incrementa fotos/whatsapp
     return base;
   });
 }
@@ -15034,15 +15011,15 @@ function registrarCliqueImovelDia(tipo, im) {
 // salva RESUMO acumulado + corretor
 function registrarCliqueImovelResumo(tipo, im) {
   if (!window.firebase || !firebase.database) return Promise.resolve(false);
-  const hoje  = getHojeBR(); // YYYY-MM-DD
+  const hoje = getHojeBR(); // YYYY-MM-DD
   const chave = keyImovel(im);
-  const ref   = firebase.database().ref(`imoveisCliquesResumo/${hoje}/${chave}`);
+  const ref = firebase.database().ref(`imoveisCliquesResumo/${hoje}/${chave}`);
 
   return ref.transaction(curr => {
     const base = curr || { totalFotos: 0, totalWhats: 0 };
-    base.titulo   = im?.titulo || base.titulo || "";
+    base.titulo = im?.titulo || base.titulo || "";
     base.corretor = getCorretorPrincipal(im) || base.corretor || "";
-    if (tipo === "fotos")    base.totalFotos = (base.totalFotos || 0) + 1;
+    if (tipo === "fotos") base.totalFotos = (base.totalFotos || 0) + 1;
     if (tipo === "whatsapp") base.totalWhats = (base.totalWhats || 0) + 1;
     base.ultimoClique = firebase.database.ServerValue.TIMESTAMP;
     return base;
