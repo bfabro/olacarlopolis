@@ -3308,7 +3308,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     <div class="page-header">
       <h2 >🏠 Imóveis</h2>
       <i class="fa-solid fa-share-nodes share-btn"
-         onclick="compartilharPagina('#imoveis','Imóveis em Carlópolis','Veja o mapa e imóveis disponíveis!')"></i>
+         onclick="compartilharPagina('#imoveis','Imóveis em Carlópolis','Encontre imóveis disponíveis!')"></i>
     </div>
 
 
@@ -7854,7 +7854,8 @@ function salvarContatoImovel(im, nome) {
             },
             address: "Rodovia PR 218, 91 - Carlopolis",
             contact: "(43) 99812-5120",
-            infoAdicional: "⚠️ 2° Via CRV,<br>⚠️ Atpv-e,<br> ⚠️ Comunicação de Venda,<br> ⚠️ Emplacamentos,<br>⚠️ Guia de Multas, IPVA,<br>⚠️ Licenciamento, <br>⚠️ Transferências  "
+            infoAdicional: "⚠️ 2° Via CRV,<br>⚠️ Atpv-e,<br> ⚠️ Comunicação de Venda,<br> ⚠️ Emplacamentos,<br>⚠️ Guia de Multas, IPVA,<br>⚠️ Licenciamento, <br>⚠️ Transferências  ",
+         instagram:"https://www.instagram.com/despachante_rodriguinho/",
           },
         ],
       },
