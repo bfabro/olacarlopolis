@@ -3121,7 +3121,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       procura: "Chacara", // ou "terreno", "rural", etc.
       quartos: 3,
-      valor: 8000000,
+      valor: 800000,
       piscina: false,
       churrasqueira: false,    
       titulo: "Chacara a 12km Da Cidade",
