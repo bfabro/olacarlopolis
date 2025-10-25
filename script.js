@@ -9417,6 +9417,20 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Quer fios mais fortes, hidratados e com brilho de salão? ✨<br>Experimente o poder da linha Lizz Ante Profissional <br>Resultado que se vê, sente e apaixona! 💕",
             ],
 
+              promocoes: [
+              {
+                imagem: "images/servicos/revendedor/tati/promocao/1.jpg",
+                titulo: "Combo de Hidratação",
+                precoAntigo: 299.00,
+                preco: 199.00,
+                unidade: "A UNIDADE",
+                validadeFim: "2025-10-26",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
+            ]
+
 
           },
 
