@@ -932,6 +932,11 @@ document.addEventListener("DOMContentLoaded", function () {
     //motocenter
     binhomotocenter: "s",
 
+
+    //otica
+
+    oticavisualcenter:"s",
+
     // padaria
     bomjesus: "n",
     esquinadopao: "s",
@@ -12270,6 +12275,51 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
             ]
+          },
+        ],
+      },
+
+
+
+
+
+      {
+        link: document.querySelector("#menuOtica"),
+        title: "Otica",
+        establishments: [
+          {
+            image: "images/comercios/otica/oticaVisual/perfil.jpg",
+            name: "Otica Visual Center",
+            hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 12:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
+              dom: []
+            },
+            address: "R. Benedito Salles, 583 - Carlópolis",
+            contact: "(43) 99908-1510", 
+            instagram: "https://www.instagram.com/oticavisualcenter.oficial/",
+            novidadesImages: [
+              "images/comercios/otica/oticaVisual/divulgacao/1.jpg",
+              "images/comercios/otica/oticaVisual/divulgacao/2.jpg",
+                  "images/comercios/otica/oticaVisual/divulgacao/3.jpg",
+              "images/comercios/otica/oticaVisual/divulgacao/4.jpg",
+         
+
+            ],
+            novidadesDescriptions: [
+
+              "Diga adeus aos reflexos e olá à visão nítida de verdade! 👋✨<Br>O tratamento Antirreflexo é aquele upgrade que transforma suas lentes — e sua rotina.<Br>👁️ Mais beleza: fotos sem brilhos e olhar sempre em destaque.<Br>💻 Mais conforto: menos cansaço com telas e luzes fortes.<Br>🚗 Mais segurança: visão noturna mais clara pra dirigir tranquilo.<Br>💪 Mais durabilidade: protege suas lentes de arranhões leves.<Br>Experimente o poder da clareza total e enxergue o mundo com outros olhos.Venha conferir nossos moveis",
+               "Diga adeus aos reflexos e olá à visão nítida de verdade! 👋✨<Br>O tratamento Antirreflexo é aquele upgrade que transforma suas lentes — e sua rotina.<Br>👁️ Mais beleza: fotos sem brilhos e olhar sempre em destaque.<Br>💻 Mais conforto: menos cansaço com telas e luzes fortes.<Br>🚗 Mais segurança: visão noturna mais clara pra dirigir tranquilo.<Br>💪 Mais durabilidade: protege suas lentes de arranhões leves.<Br>Experimente o poder da clareza total e enxergue o mundo com outros olhos.Venha conferir nossos moveis",
+                "Dificuldade pra enxergar de longe e de perto?<br>Você pode estar precisando de lentes multifocais.<br>Elas têm vários campos de visão em uma só lente:<br>🔹 Parte superior: visão de longe<br>🔹 Meio da lente: visão intermediária (computador, por exemplo)<br>🔹 Parte inferior: leitura e visão de perto<br>✅ Sem precisar trocar de óculos o tempo todo.<br>✅ Sem aquele “sobe e desce” do modelo bifocal.<br>✅ Com adaptação cada vez mais fácil, graças à tecnologia atual.<br>Na Ótica Visual Center, a gente te orienta sobre o melhor tipo de multifocal pra sua rotina.<br>Tem diferença entre marcas, tratamentos e modelos — e a escolha certa faz TODA a diferença.",
+"🚨Agende agora mesmo o seu exame de vista!!<br>Lembre se que a troca periódica dos óculos é muito importante para a saúde dos seus olhos. 👀🧐👓",
+            ],
+          
           },
         ],
       },
