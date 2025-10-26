@@ -267,7 +267,12 @@ function mostrarRankingCapivarinha() {
 
 }
 
+/////////////////////////////////
+////////////////////////////////
 
+
+////////////////////////////////
+///////////////////////////////////
 
 
 
@@ -279,7 +284,7 @@ function compartilharEstabelecimento(id) {
     return;
   }
 
-  const url = `${window.location.origin}#${id}`;
+  const url = `${window.location.origin}${window.location.pathname}#${id}`;
 
   if (navigator.share) {
     navigator.share({
@@ -315,11 +320,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /// funçao para todas as paginas
   ///
+document.addEventListener("click", (ev) => {
+  const btn = ev.target.closest(".share-btn");
+  if (!btn) return;
+  const id = btn.getAttribute("data-share-id");
+  if (id) {
+    compartilharEstabelecimento(id);
+  }
+});
 
   // Compartilha a página atual (inclui hash) ou copia o link
   function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
     let cleanHash = hash.replace("comercios-", "");
-    const url = `${location.origin}${cleanHash || ""}`;
+const url = `${location.origin}${location.pathname}${cleanHash || ""}`;
     
     if (navigator.share) {
       navigator.share({ title: titulo, text: texto, url })
@@ -13193,7 +13206,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
               
-     <li  id="${normalizeName(establishment.name)}">  
+     <li id="${normalizeName(establishment.name)}" data-id="${normalizeName(establishment.name)}">
+
 
 
     
@@ -13211,7 +13225,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
    <span class="locais_nomes">${establishment.name}</span>
 ${!establishment.descricaoFalecido ? `
   <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
-    <i class="fas fa-share-alt"></i>
+    <i class="fa-solid fa-share-nodes"></i>
   </button>
 ` : ""}
   

@@ -28,7 +28,9 @@
    <link rel="canonical" href="https://www.olacarlopolis.com" />
 
 
-
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+   <link rel="dns-prefetch" href="https://unpkg.com">
 
 
    <!-- ✅ Bloco de dados estruturados Schema.org -->
@@ -1058,12 +1060,8 @@
                         <span class="navlink">Consulta CEP</span>
                      </a>
 
-  <!--
-         <a id="menuNivelRepresa" href="#nivel-represa" class="nav_link sublink">
-  <span class="navlink_icon"><i class="fa-solid fa-water" style="color:#1982ff"></i></span>
-  <span class="navlink">Nível da Represa</span>
-</a>
--->
+                   
+
 
 
                      <a id="menuSol" href="#" class="nav_link sublink">
@@ -1283,29 +1281,6 @@
 
 
 
-                  <div class="swiper-slide">
-                     <img src="images/informacoes/eventos/jogosAventura1.jpg" alt="Jogos de Aventura" loading="lazy">
-                     <p>
-                        Jogos de Aventura<br> 20/10/2025</br>
-                        <!-- Ícone de link para mais informações -->
-                        <a href="https://www.instagram.com/esportes_carlopolis/" target="_blank" class="info-link">
-                           <i class='bx bx-link-external'></i> Mais informações
-                        </a>
-                     </p>
-                  </div>
-
-
-                  <div class="swiper-slide">
-                     <img src="images/informacoes/eventos/toroonagashi.png" alt="toroonagashi" loading="lazy">
-                     <p>
-                        TooroNagashi <br> 25/10/2025</br>
-                        <!-- Ícone de link para mais informações -->
-                        <a href="https://pt.wikipedia.org/wiki/T%C5%8Dr%C5%8D_nagashi" target="_blank"
-                           class="info-link">
-                           <i class='bx bx-link-external'></i> Mais informações
-                        </a>
-                     </p>
-                  </div>
 
 
                   <div class="swiper-slide">
@@ -1405,6 +1380,37 @@
 
 
          </div>
+
+         <!-- Seção: Nível da Represa -->
+         <div id="secao-nivel-represa" class="carrossel-container" style="display:none">
+            <div class="nr-wrap">
+               <h2>💧 Nível da Represa de Chavantes</h2>
+               <p class="nr-sub">Fonte: ONS – Dados Hidráulicos (base diária)</p>
+
+               <div class="nr-card">
+                  <div class="nr-row">
+                     <div class="nr-metric">
+                        <div class="nr-label">Cota (nível)</div>
+                        <div class="nr-value" id="nr-cota">—</div>
+                        <div class="nr-unit">m</div>
+                     </div>
+                     <div class="nr-metric">
+                        <div class="nr-label">Volume Útil</div>
+                        <div class="nr-value" id="nr-volume">—</div>
+                        <div class="nr-unit">%</div>
+                     </div>
+                  </div>
+
+                  <div class="nr-foot">
+                     <span id="nr-data">—</span>
+                     <span>•</span>
+                     <a href="https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/"
+                        target="_blank">Ver fonte</a>
+                  </div>
+               </div>
+            </div>
+         </div>
+
 
 
 
