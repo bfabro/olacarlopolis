@@ -277,30 +277,39 @@ function mostrarRankingCapivarinha() {
 
 
 
+// 1) Compartilhar um estabelecimento específico (por id)
 function compartilharEstabelecimento(id) {
   if (!id || typeof id !== "string") {
     console.warn("ID inválido para compartilhamento:", id);
     mostrarToast("❌ Erro ao compartilhar: ID inválido");
     return;
   }
-
   const url = `${window.location.origin}${window.location.pathname}#${id}`;
-
   if (navigator.share) {
-    navigator.share({
-      title: "Olá Carlópolis",
-      text: "Segue o Link!",
-      url: url
-    }).catch((err) => {
-      console.warn("Compartilhamento cancelado ou falhou:", err);
-      mostrarToast("❌ Não foi possível compartilhar.");
-    });
+    navigator.share({ title: "Olá Carlópolis", text: "Segue o Link!", url })
+      .catch(() => mostrarToast("❌ Não foi possível compartilhar."));
   } else {
     navigator.clipboard.writeText(url)
       .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
       .catch(() => alert("Não foi possível copiar o link."));
   }
 }
+
+// 2) Compartilhar a página/rota atual
+function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
+  const cleanHash = (hash || "").replace("comercios-", "");
+  const url = `${location.origin}${location.pathname}${cleanHash || ""}`;
+  if (navigator.share) {
+    navigator.share({ title: titulo, text: texto, url })
+      .catch(() => mostrarToast("❌ Não foi possível compartilhar."));
+  } else {
+    navigator.clipboard.writeText(url)
+      .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
+      .catch(() => alert("Não foi possível copiar o link."));
+  }
+}
+window.compartilharPagina = compartilharPagina;
+
 
 
 function mostrarToast(mensagem) {
@@ -12999,11 +13008,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       window.open("https://www.ipmetradar.com.br/2animRadar.php", "_blank");
     });
   }
-
-
-  montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
-
-  // Menu: Nascer & Pôr do Sol
+// Menu: Nascer & Pôr do Sol
   document.addEventListener("click", (ev) => {
     const t = ev.target.closest("#menuSol");
     if (!t) return;
@@ -13011,6 +13016,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     mostrarSol(); // abre a página
   });
 
+
+  montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
+
+  
 
 
 
