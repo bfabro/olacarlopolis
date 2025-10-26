@@ -313,29 +313,7 @@ async function compartilharEstabelecimento(id) {
 }
 
 
-// 2) Compartilhar a página/rota atual
-async function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
-  const cleanHash = (hash || "").replace("comercios-", "");
-  const url = `${location.origin}${location.pathname}${cleanHash || ""}`;
 
-  try {
-    if (navigator.share) {
-      await navigator.share({ title: titulo, text: texto, url });
-      // mostrarToast("✅ Link compartilhado!");
-    } else {
-      await navigator.clipboard.writeText(url);
-      mostrarToast("🔗 Link copiado com sucesso!");
-    }
-  } catch (err) {
-    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) {
-      // silencioso
-    } else {
-      mostrarToast("❌ Não foi possível compartilhar.");
-    }
-  }
-}
-window.compartilharPagina = compartilharPagina;
-// 
 
 
 
@@ -365,27 +343,39 @@ document.addEventListener("click", (ev) => {
   }
 });
 
+// Compartilhar a página/rota atual (normaliza vários prefixos de hash)
 async function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
-  const cleanHash = (hash || "").replace("comercios-", "");
-  const url = `${location.origin}${location.pathname}${cleanHash || ""}`;
+  // garante string e # no começo (se vier "ranking-capivarinha", vira "#ranking-capivarinha")
+  let h = String(hash || "");
+  if (h && !h.startsWith("#")) h = "#" + h;
+
+  // remove prefixos de grupos no início do hash: #comercios-..., #servicos-..., #setorpublico-..., #informacoes-..., #turismo-...
+  h = h.replace(/^#(?:comercios-|servicos-|setorpublico-|informacoes-|turismo-)/i, "#");
+
+  // se sobrar só "#", remove para não ficar feio (vira URL sem hash)
+  if (h === "#") h = "";
+
+  const url = `${location.origin}${location.pathname}${h}`;
 
   try {
     if (navigator.share) {
       await navigator.share({ title: titulo, text: texto, url });
+      // se quiser, pode mostrar um toast de sucesso aqui
       // mostrarToast("✅ Link compartilhado!");
     } else {
       await navigator.clipboard.writeText(url);
       mostrarToast("🔗 Link copiado com sucesso!");
     }
   } catch (err) {
+    // se o usuário apenas fechou a folha de compartilhamento, não mostre erro
     if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) {
-      // silencioso
-    } else {
-      mostrarToast("❌ Não foi possível compartilhar.");
+      return;
     }
+    mostrarToast("❌ Não foi possível compartilhar.");
   }
 }
 window.compartilharPagina = compartilharPagina;
+
 
 
   // Cria um botão flutuante único que sempre compartilha a página atual
