@@ -439,7 +439,7 @@ body {
 .locais_nomes {
   color: #2E8B57;
   /* Verde folha para um visual mais confiável */
-  font-size: 1.2rem;
+  font-size: 1.16rem;
   /* Um pouco maior para mais destaque */
   font-weight: bold;
   text-transform: uppercase;

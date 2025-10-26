@@ -1017,7 +1017,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pesqueirodogalego: "s",
     portal: "n",
     neia: "n",
-    namigojapaneserestaurant: "s",
+    namigojapanese: "s",
     //oficinadosabor:"s",
     paiol: "n",
     restaurantedadi: "s",
@@ -1029,6 +1029,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // produtos de limpeza
     jmprodutosdelimpeza: "s",
 
+
+    //materiais eletricos
+
+acendemateriaiseletricos:"s",
 
     // sorveteria
     limone: "s",
@@ -11451,6 +11455,48 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+
+
+      {
+        link: document.querySelector("#menuMaterialEletrico"),
+        title: "Materiais Eletricos",
+        establishments: [
+          {
+            image: "images/comercios/materiaisEletricos/acende/perfil.jpg",
+            name: "Acende Materiais Eletricos",
+            hours: "Seg a Sex: 07:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "07:00", fim: "18:00" }],
+              ter: [{ inicio: "07:00", fim: "18:00" }],
+              qua: [{ inicio: "07:00", fim: "18:00" }],
+              qui: [{ inicio: "07:00", fim: "18:00" }],
+              sex: [{ inicio: "07:00", fim: "18:00" }],
+              sab: [{ inicio: "07:00", fim: "12:00" }],
+              dom: []
+            },
+            address: "R. Benedito Salles, 467 - Carlopolis",
+            contact: "(43) 99185-2185",
+            delivery: "Sim / Sem Taxa",
+            instagram: "https://www.instagram.com/acendeclps01/",
+            novidadesImages: [
+              "images/comercios/materiaisEletricos/acende/divulgacao/1.jpg",
+           
+            ],
+            novidadesDescriptions: [
+          "🌟 Pendente Lupi<br>Um toque de design e personalidade para o seu ambiente!<br>Com curvas elegantes e luz aconchegante, o Lupi é perfeito para quem quer transformar o espaço com modernidade e estilo.",
+          "Tesoura de Poda DeWalt! 🌳<Br>Chegou a ferramenta que vai transformar sua poda: Tesoura de Poda DeWalt a bateria, com alto desempenho, corte preciso e praticidade no dia a dia.<Br>Ideal para jardinagem, agricultura e manutenção de áreas verdes e o melhor: com a qualidade e durabilidade que só a DeWalt oferece!",
+           "Verniz Imbuia e Mogno<br>✨ Deixe seus móveis ou madeiras com acabamento impecável e sofisticado.<Br>✨ Luxo, elegância e economia no mesmo pacote.<Br>⚠️ Promoção até durar o estoque.",
+        
+        
+        ],
+
+          },
+        ],
+      },
+
+
+
       {
         link: document.querySelector("#menuPetShop"),
         title: "Pet Shop",
@@ -11749,7 +11795,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               sab: [{ inicio: "19:00", fim: "22:00" }],
               dom: []
             },
-            address: "R. Kalil Keder, 1204 - saída para Ribeirão Claro",
+            address: "R. Kalil Keder, 1204 - Carlopolis",
             contact: "(43) 99686-5040",
             delivery: "Sim / Com Taxa",
             menuImages: [
@@ -11788,7 +11834,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
           {
             image: "images/comercios/restaurante/namigo/perfil.jpg",
-            name: "NamiGO Japanese Restaurant",
+            name: "NamiGO Japanese",
             hours: "Seg a Sab:16:00h as 00:00h",
             statusAberto: ".",
             horarios: {
