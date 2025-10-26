@@ -277,38 +277,65 @@ function mostrarRankingCapivarinha() {
 
 
 
-// 1) Compartilhar um estabelecimento específico (por id)
-function compartilharEstabelecimento(id) {
+let _sharing = false;
+
+async function compartilharEstabelecimento(id) {
   if (!id || typeof id !== "string") {
-    console.warn("ID inválido para compartilhamento:", id);
+    console.warn("ID inválido:", id);
     mostrarToast("❌ Erro ao compartilhar: ID inválido");
     return;
   }
+  if (_sharing) return; // evita chamadas duplas
+  _sharing = true;
+
   const url = `${window.location.origin}${window.location.pathname}#${id}`;
-  if (navigator.share) {
-    navigator.share({ title: "Olá Carlópolis", text: "Segue o Link!", url })
-      .catch(() => mostrarToast("❌ Não foi possível compartilhar."));
-  } else {
-    navigator.clipboard.writeText(url)
-      .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
-      .catch(() => alert("Não foi possível copiar o link."));
+
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: "Olá Carlópolis", text: "Segue o Link!", url });
+      // opcional: sucesso silencioso ou um toast rápido de OK
+      // mostrarToast("✅ Link compartilhado!");
+    } else {
+      await navigator.clipboard.writeText(url);
+      mostrarToast("🔗 Link copiado com sucesso!");
+    }
+  } catch (err) {
+    // Se o usuário fechar o share sheet, não é erro de verdade.
+    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) {
+      // silencioso
+    } else {
+      console.warn("Falha ao compartilhar:", err);
+      mostrarToast("❌ Não foi possível compartilhar.");
+    }
+  } finally {
+    _sharing = false;
   }
 }
 
+
 // 2) Compartilhar a página/rota atual
-function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
+async function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
   const cleanHash = (hash || "").replace("comercios-", "");
   const url = `${location.origin}${location.pathname}${cleanHash || ""}`;
-  if (navigator.share) {
-    navigator.share({ title: titulo, text: texto, url })
-      .catch(() => mostrarToast("❌ Não foi possível compartilhar."));
-  } else {
-    navigator.clipboard.writeText(url)
-      .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
-      .catch(() => alert("Não foi possível copiar o link."));
+
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: titulo, text: texto, url });
+      // mostrarToast("✅ Link compartilhado!");
+    } else {
+      await navigator.clipboard.writeText(url);
+      mostrarToast("🔗 Link copiado com sucesso!");
+    }
+  } catch (err) {
+    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) {
+      // silencioso
+    } else {
+      mostrarToast("❌ Não foi possível compartilhar.");
+    }
   }
 }
 window.compartilharPagina = compartilharPagina;
+// 
 
 
 
@@ -338,21 +365,29 @@ document.addEventListener("click", (ev) => {
   }
 });
 
-  // Compartilha a página atual (inclui hash) ou copia o link
-  function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
-    let cleanHash = hash.replace("comercios-", "");
-const url = `${location.origin}${location.pathname}${cleanHash || ""}`;
-    
+async function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
+  const cleanHash = (hash || "").replace("comercios-", "");
+  const url = `${location.origin}${location.pathname}${cleanHash || ""}`;
+
+  try {
     if (navigator.share) {
-      navigator.share({ title: titulo, text: texto, url })
-        .catch(() => mostrarToast("❌ Não foi possível compartilhar."));
+      await navigator.share({ title: titulo, text: texto, url });
+      // mostrarToast("✅ Link compartilhado!");
     } else {
-      navigator.clipboard.writeText(url)
-        .then(() => mostrarToast("🔗 Link copiado com sucesso!"))
-        .catch(() => alert("Não foi possível copiar o link."));
+      await navigator.clipboard.writeText(url);
+      mostrarToast("🔗 Link copiado com sucesso!");
+    }
+  } catch (err) {
+    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) {
+      // silencioso
+    } else {
+      mostrarToast("❌ Não foi possível compartilhar.");
     }
   }
-  window.compartilharPagina = compartilharPagina; // <<< adicione isto
+}
+window.compartilharPagina = compartilharPagina;
+
+
   // Cria um botão flutuante único que sempre compartilha a página atual
   function criarShareFAB() {
     if (document.querySelector(".fab-share")) return; // evita duplicar
@@ -777,15 +812,7 @@ const url = `${location.origin}${location.pathname}${cleanHash || ""}`;
     });
 
 
-    setTimeout(() => {
-      document.querySelectorAll(".share-btn").forEach((botao) => {
-        botao.addEventListener("click", () => {
-          const id = botao.getAttribute("data-share-id");
-          if (id) compartilharEstabelecimento(id);
-        });
-      });
-    }, 300);
-
+ 
 
 
   }
