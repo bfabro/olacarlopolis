@@ -344,15 +344,12 @@ document.addEventListener("click", (ev) => {
 });
 
 // Compartilhar a página/rota atual (normaliza vários prefixos de hash)
-async function compartilharPagina(hash = location.hash, titulo = "Olá Carlópolis", texto = "Confira esta página!") {
-  // garante string e # no começo (se vier "ranking-capivarinha", vira "#ranking-capivarinha")
+// --- COMPARTILHAR PÁGINA (única versão) ---
+async function compartilharPagina(hash = location.hash, titulo = document.title || "Olá Carlópolis", texto = "Confira esta página!") {
+  // normaliza hash: garante # e remove prefixos de grupos
   let h = String(hash || "");
   if (h && !h.startsWith("#")) h = "#" + h;
-
-  // remove prefixos de grupos no início do hash: #comercios-..., #servicos-..., #setorpublico-..., #informacoes-..., #turismo-...
   h = h.replace(/^#(?:comercios-|servicos-|setorpublico-|informacoes-|turismo-)/i, "#");
-
-  // se sobrar só "#", remove para não ficar feio (vira URL sem hash)
   if (h === "#") h = "";
 
   const url = `${location.origin}${location.pathname}${h}`;
@@ -360,17 +357,14 @@ async function compartilharPagina(hash = location.hash, titulo = "Olá Carlópol
   try {
     if (navigator.share) {
       await navigator.share({ title: titulo, text: texto, url });
-      // se quiser, pode mostrar um toast de sucesso aqui
-      // mostrarToast("✅ Link compartilhado!");
+      // opcional: mostrarToast("✅ Link compartilhado!");
     } else {
       await navigator.clipboard.writeText(url);
       mostrarToast("🔗 Link copiado com sucesso!");
     }
   } catch (err) {
-    // se o usuário apenas fechou a folha de compartilhamento, não mostre erro
-    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) {
-      return;
-    }
+    // usuário cancelou/fechou? não exibe erro
+    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
     mostrarToast("❌ Não foi possível compartilhar.");
   }
 }
