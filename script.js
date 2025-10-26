@@ -11481,6 +11481,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/acendeclps01/",
             novidadesImages: [
               "images/comercios/materiaisEletricos/acende/divulgacao/1.jpg",
+              "images/comercios/materiaisEletricos/acende/divulgacao/2.jpg",
+              "images/comercios/materiaisEletricos/acende/divulgacao/3.jpg",
            
             ],
             novidadesDescriptions: [
