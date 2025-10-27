@@ -8105,11 +8105,24 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "O Barateiro",
             address: "Bendito Salles, 1168 - Carlopolis",
             hours: "Seg a Sex: 8:00h as 21:00h </br> Dom: 08:00h as 12:00h",
+              statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "21:00" }],
+              ter: [{ inicio: "08:00", fim: "21:00" }],
+              qua: [{ inicio: "08:00", fim: "21:00" }],
+              qui: [{ inicio: "08:00", fim: "21:00" }],
+              sex: [{ inicio: "08:00", fim: "21:00" }],
+              sab: [{ inicio: "08:00", fim: "21:00" }],
+              dom: [{ inicio: "08:00", fim: "12:00" }],
+            },
             contact: "(43) 99196-7816",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/MercadoObarateiro",
             instagram: "https://www.instagram.com/supermercado_obarateiro/p/DFgIRupxbr-/",
           },
+
+
+
           {
             image: "images/comercios/supermercado/kelve.png",
             name: "Kelve",
