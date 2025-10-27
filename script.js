@@ -5968,7 +5968,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/calhas/nelson/perfil.jpg",
             name: "Nelson Calhas",
-            hours: "Seg a Sex: 8:00h as 18:00h<br>Sab:08:0h as 12:00h",
+            hours: "Seg a Sex: 08:00h as 18:00h<br>Sab: 08:0h as 12:00h",
             statusAberto: "a",
             horarios: {
 
