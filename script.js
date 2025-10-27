@@ -351,8 +351,11 @@ document.addEventListener("click", (ev) => {
 // Compartilhar a página/rota atual (preserva a rota exata)
 async function compartilharPagina(hash = location.hash, titulo = document.title || "Olá Carlópolis", texto = "Confira esta página!") {
   let h = String(hash || "");
-  if (h && !h.startsWith("#")) h = "#" + h;   // garante o #
-  const url = `${location.origin}${location.pathname}${h}`;
+  if (h && !h.startsWith("#")) h = "#" + h;
+
+  // 🔧 remove index.html do caminho
+  const base = location.origin + location.pathname.replace(/index\.html$/i, "");
+  const url = `${base}${h}`;
 
   try {
     if (navigator.share) {
@@ -362,10 +365,11 @@ async function compartilharPagina(hash = location.hash, titulo = document.title 
       mostrarToast("🔗 Link copiado com sucesso!");
     }
   } catch (err) {
-    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return; // cancelou = silencioso
+    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
     mostrarToast("❌ Não foi possível compartilhar.");
   }
 }
+
 window.compartilharPagina = compartilharPagina;
 
 
