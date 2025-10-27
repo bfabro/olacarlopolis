@@ -7695,3 +7695,46 @@ html {
 @media (max-width: 900px){
   .nr-grid{ grid-template-columns: 1fr; }
 }
+
+
+
+
+
+
+
+
+.clima-wrap {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+}
+
+.lua-card {
+  background: #101020;
+  color: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+  min-width: 240px;
+  text-align: center;
+      margin-top: 10px;
+}
+
+.lua-img {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 10px;
+}
+
+.lua-fase {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.lua-iluminacao {
+  font-size: 0.92rem;
+  color: #cfd3ff;
+}

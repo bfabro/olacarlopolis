@@ -14247,9 +14247,37 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
         <div style="margin-top:12px; font-size:13px; opacity:.85">
           <span>📍 Coordenadas: ${COORDS_CARLOPOLIS.lat.toFixed(4)}, ${COORDS_CARLOPOLIS.lng.toFixed(4)}</span>
         </div>
+
       </div>
     </div>
-  `;
+  `
+  
+  
+  
+  
+  
+  // após area.innerHTML = `...` em mostrarSol()
+const luaCard = document.createElement("div");
+luaCard.className = "lua-card";
+luaCard.innerHTML = `
+  <div id="lua-desenho" class="lua-img" aria-hidden="true"></div>
+  <p id="lua-fase" class="lua-fase">Carregando fase da Lua...</p>
+  <p id="lua-iluminacao" class="lua-iluminacao"></p>
+`;
+
+// insira o card dentro do container principal do clima
+const wrap = area.querySelector(".sol-wrap") || area;
+wrap.appendChild(luaCard);
+
+// calcula e desenha a Lua
+const fase = obterFaseLua(new Date());
+const iluminacaoPct = Math.round(
+  fase.fraction <= 0.5 ? fase.fraction * 2 * 100 : (1 - fase.fraction) * 2 * 100
+);
+area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
+area.querySelector("#lua-fase").textContent = `Fase: ${fase.name}`;
+area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
+;
 
     // função interna para carregar/atualizar
     async function carregar(dateStr) {
@@ -15867,3 +15895,130 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(tentarRolarParaEst, 0);
   });
 });
+
+
+
+
+
+/***** ================== CLIMA DO DIA — LUA DINÂMICA ================== *****/
+
+/* 1) Função de fase da Lua (aproximação robusta, erro típico < ~1 dia)
+   Retorna: { fraction: 0..1 (0=nova, 0.5=cheia), waxing: true/false, name: "..." }
+*/
+function obterFaseLua(date = new Date()) {
+  // Algoritmo baseado em aproximação de período sinódico
+  // Referência geral: período sinódico ~29.530588861 dias
+  const msDia = 86400000;
+  const data = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const jd = Math.floor(data.getTime() / msDia) + 2440587.5; // Julian Day aproximado
+
+  // Época de Lua Nova de referência (2000-01-06 18:14 UT) ~ JD 2451550.1
+  const epoch = 2451550.1;
+  const periodo = 29.530588861;
+
+  let dias = jd - epoch;
+  dias = dias % periodo;
+  if (dias < 0) dias += periodo;
+
+  const fraction = dias / periodo;              // [0..1]
+  const waxing = fraction < 0.5;                // antes da cheia = crescente
+  const nome = (function (f) {
+    if (f < 0.03 || f > 0.97) return "Lua Nova";
+    if (f < 0.22) return "Crescente Inicial";
+    if (f < 0.28) return "Quarto Crescente";
+    if (f < 0.47) return "Gibosa Crescente";
+    if (f < 0.53) return "Lua Cheia";
+    if (f < 0.72) return "Gibosa Minguante";
+    if (f < 0.78) return "Quarto Minguante";
+    if (f < 0.97) return "Minguante Final";
+    return "Lua Nova";
+  })(fraction);
+
+  return { fraction, waxing, name: nome };
+}
+
+/* 2) Gera o SVG da Lua conforme a fração iluminada */
+function svgLua(fraction, waxing) {
+  // converte fração (0..1) em “percentual iluminado” aproximado
+  // para o desenho, mapeamos 0..1 -> -1..1 (disco sombra deslocado)
+  const f = fraction <= 0.5 ? fraction * 2 : (1 - fraction) * 2; // 0..1..0
+  // raio do disco
+  const R = 60;
+  const cx = 70, cy = 70;
+
+  // deslocamento horizontal da sombra (quanto mais perto de 0.5, mais distante)
+  // e direção (crescente = sombra à esquerda; minguante = sombra à direita)
+  const offset = (1 - f) * R; 
+  const dx = waxing ? -offset : offset;
+
+  return `
+  <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Fase da Lua">
+    <!-- disco base (cor da Lua) -->
+    <defs>
+      <radialGradient id="g" cx="50%" cy="45%">
+        <stop offset="0%" stop-color="#e8e8ea"/>
+        <stop offset="70%" stop-color="#cfcfd4"/>
+        <stop offset="100%" stop-color="#bdbdc4"/>
+      </radialGradient>
+    </defs>
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)"/>
+    <!-- máscara da sombra (disco escuro deslocado) -->
+    <circle cx="${cx + dx}" cy="${cy}" r="${R}" fill="#0c0f1a" />
+    <!-- brilho sutil -->
+    <circle cx="${cx-20}" cy="${cy-20}" r="${R*0.15}" fill="#ffffff20"/>
+  </svg>`;
+}
+
+/* 3) Monta a página dinâmica dentro de .content_area (mesmo padrão das outras) */
+function mostrarClimaDoDia() {
+  if (location.hash !== "#clima-do-dia") location.hash = "#clima-do-dia";
+
+  const area = document.querySelector(".content_area"); // sua área principal
+  if (!area) return;
+
+  // Cabeçalho no mesmo estilo do ranking (usa h2.highlighted p/ botão compartilhar automático)
+  area.innerHTML = `
+    <div class="page-header">
+      <h2 class="highlighted">☀️ Clima do Dia</h2>
+    </div>
+
+    <div class="clima-wrap">
+      <div class="lua-card">
+        <div id="lua-desenho" class="lua-img" aria-hidden="true"></div>
+        <p id="lua-fase" class="lua-fase">Carregando fase da Lua...</p>
+        <p id="lua-iluminacao" class="lua-iluminacao"></p>
+      </div>
+      <!-- (opcional) aqui você pode injetar seus outros cards do clima/UV depois -->
+    </div>
+  `;
+
+  // Calcula fase e desenha
+  const fase = obterFaseLua(new Date());
+  const iluminacaoPct = Math.round(
+    fase.fraction <= 0.5
+      ? fase.fraction * 2 * 100          // 0..50 -> 0..100
+      : (1 - fase.fraction) * 2 * 100    // 50..100 -> 100..0
+  );
+
+  const containerLua = area.querySelector("#lua-desenho");
+  containerLua.innerHTML = svgLua(fase.fraction, fase.waxing);
+
+  area.querySelector("#lua-fase").textContent = `Fase: ${fase.name}`;
+  area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
+}
+
+/* 4) Roteamento simples para abrir via hash */
+function routerClima() {
+  if (location.hash === "#clima-do-dia") {
+    mostrarClimaDoDia();
+  }
+}
+window.addEventListener("hashchange", routerClima);
+
+// Torna acessível globalmente (caso você chame a partir do menu)
+window.mostrarClimaDoDia = mostrarClimaDoDia;
+
+// Se a página abrir já com #clima-do-dia, monta imediatamente
+if (location.hash === "#clima-do-dia") {
+  mostrarClimaDoDia();
+}
