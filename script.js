@@ -395,9 +395,6 @@ window.compartilharPagina = compartilharPagina;
     });
   }
 
-
-
-
   // Injeta um botão de compartilhar ao lado do H2 da tela, automaticamente
   function injetarShareNoTitulo() {
     const h2 = document.querySelector(".content_area h2.highlighted");
@@ -411,7 +408,7 @@ window.compartilharPagina = compartilharPagina;
     // usa o hash atual como rota; ajuste o título/descrição se quiser
    btn.onclick = () => {
   const titulo = h2.textContent.trim() || "Página";
-  let texto = "Compartilhe esta página";
+  let texto = "Segue o Link para Pagina referente";
 
   // Se a página for a de busca CEP, muda a mensagem
   if (location.hash.includes("busca-cep")) {
@@ -3405,8 +3402,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     <div class="page-header">
       <h2 >🏠 Imóveis</h2>
       <i class="fa-solid fa-share-nodes share-btn"
-         onclick="compartilharPagina('#imoveis','Imóveis em Carlópolis','Encontre Imóveis disponíveis!')"></i>
+         onclick="compartilharPagina('#imoveis','Imóveis em Carlópolis','Encontre imóveis disponíveis!')"></i>
     </div>
+
+
+    
+
+
+
+
+
+
+
 
 
 
@@ -15860,29 +15867,3 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(tentarRolarParaEst, 0);
   });
 });
-
-
-
-// Texto de compartilhar conforme a rota/título
-function getShareTextForRoute(hash, titulo) {
-  const h = String(hash || "").toLowerCase();
-  const t = String(titulo || "").trim();
-
-  // mensagens específicas por rota
-  const regras = [
-    { test: /#(cep|busca-cep)/,              text: "Pesquise o CEP da sua rua" },
-    { test: /#(coletalixo|menucoletralixo)/, text: "Consulte os horários de coleta de lixo" },
-    { test: /#climadodia/,                   text: "Confira o clima de hoje em Carlópolis" },
-    { test: /#ranking-capivarinha/,          text: "Veja o ranking do jogo Capivarinha!" },
-
-    // ⬇️ ADICIONE ESTAS DUAS LINHAS
-    { test: /#ondecomer/,                    text: "Veja onde comer em Carlópolis" },
-    { test: /#promocoes/,                    text: "Confira as promoções de hoje em Carlópolis" },
-
-    // Imóveis (mantém)
-    { test: /#imoveis/,                      text: t ? `Veja imóveis em: ${t}` : "Veja imóveis disponíveis" },
-  ];
-
-  for (const r of regras) if (r.test(h)) return r.text;
-  return t ? `Segue a página contendo: ${t}` : "Confira esta página!";
-}
