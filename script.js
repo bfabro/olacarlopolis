@@ -14257,6 +14257,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   
   
   // após area.innerHTML = `...` em mostrarSol()
+// após area.innerHTML = `...` em mostrarSol()
 const luaCard = document.createElement("div");
 luaCard.className = "lua-card";
 luaCard.innerHTML = `
@@ -14268,6 +14269,7 @@ luaCard.innerHTML = `
 // insira o card dentro do container principal do clima
 const wrap = area.querySelector(".sol-wrap") || area;
 wrap.appendChild(luaCard);
+
 
 // calcula e desenha a Lua
 const fase = obterFaseLua(new Date());
@@ -14295,6 +14297,22 @@ area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${
         document.getElementById("wxMin").textContent = (tempo.tmin ?? "--") + "°C";
         document.getElementById("wxWind").textContent = (tempo.wind ?? "--") + " km/h";
         document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
+
+        // === Atualiza a Lua com base em dateStr ===
+const dataLua = new Date(dateStr + "T00:00:00");
+const f = obterFaseLua(dataLua);
+const iluminacaoPctLua = Math.round(
+  f.fraction <= 0.5 ? f.fraction * 2 * 100 : (1 - f.fraction) * 2 * 100
+);
+
+const slotLua = area.querySelector("#lua-desenho");
+if (slotLua) slotLua.innerHTML = svgLua(f.fraction, f.waxing);
+
+const lblFase = area.querySelector("#lua-fase");
+const lblIlum = area.querySelector("#lua-iluminacao");
+if (lblFase) lblFase.textContent = `Fase: ${f.name}`;
+if (lblIlum) lblIlum.textContent = `Iluminação aproximada: ${iluminacaoPctLua}%`;
+
 
         st.textContent = `✅ Horários para ${dateStr.split("-").reverse().join("/")}`;
       } catch (e) {
@@ -15938,22 +15956,23 @@ function obterFaseLua(date = new Date()) {
 }
 
 /* 2) Gera o SVG da Lua conforme a fração iluminada */
+// SUBSTITUA a função svgLua atual por esta:
 function svgLua(fraction, waxing) {
-  // converte fração (0..1) em “percentual iluminado” aproximado
-  // para o desenho, mapeamos 0..1 -> -1..1 (disco sombra deslocado)
+  // f cresce até a Cheia e depois volta (0..1..0)
   const f = fraction <= 0.5 ? fraction * 2 : (1 - fraction) * 2; // 0..1..0
-  // raio do disco
   const R = 60;
   const cx = 70, cy = 70;
 
-  // deslocamento horizontal da sombra (quanto mais perto de 0.5, mais distante)
-  // e direção (crescente = sombra à esquerda; minguante = sombra à direita)
-  const offset = (1 - f) * R; 
+  // deslocamento da sombra; quanto mais perto da Cheia, menor o offset
+  const offset = (1 - f) * R;
   const dx = waxing ? -offset : offset;
+
+  // ⚠️ Se estiver praticamente Cheia, NÃO desenha a sombra
+  // (evita escurecer o disco quando offset ~ 0)
+  const isFull = offset < 0.5; // tolerância ~0.5px
 
   return `
   <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Fase da Lua">
-    <!-- disco base (cor da Lua) -->
     <defs>
       <radialGradient id="g" cx="50%" cy="45%">
         <stop offset="0%" stop-color="#e8e8ea"/>
@@ -15961,13 +15980,13 @@ function svgLua(fraction, waxing) {
         <stop offset="100%" stop-color="#bdbdc4"/>
       </radialGradient>
     </defs>
+    <!-- Disco iluminado -->
     <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)"/>
-    <!-- máscara da sombra (disco escuro deslocado) -->
-    <circle cx="${cx + dx}" cy="${cy}" r="${R}" fill="#0c0f1a" />
-    <!-- brilho sutil -->
+    ${isFull ? "" : `<circle cx="${cx + dx}" cy="${cy}" r="${R}" fill="#0c0f1a"/>`}
     <circle cx="${cx-20}" cy="${cy-20}" r="${R*0.15}" fill="#ffffff20"/>
   </svg>`;
 }
+
 
 /* 3) Monta a página dinâmica dentro de .content_area (mesmo padrão das outras) */
 function mostrarClimaDoDia() {
