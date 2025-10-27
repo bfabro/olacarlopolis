@@ -408,7 +408,7 @@ window.compartilharPagina = compartilharPagina;
     // usa o hash atual como rota; ajuste o título/descrição se quiser
    btn.onclick = () => {
   const titulo = h2.textContent.trim() || "Página";
-  let texto = "Segue o Link para Pagina referente";
+  let texto = "Segue o Link referente:";
 
   // Se a página for a de busca CEP, muda a mensagem
   if (location.hash.includes("busca-cep")) {
