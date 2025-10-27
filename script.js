@@ -280,6 +280,9 @@ function mostrarRankingCapivarinha() {
 let _sharing = false;
 
 async function compartilharEstabelecimento(id) {
+
+
+  
   if (!id || typeof id !== "string") {
     console.warn("ID inválido:", id);
     mostrarToast("❌ Erro ao compartilhar: ID inválido");
@@ -343,9 +346,9 @@ document.addEventListener("click", (ev) => {
   }
 });
 
-// Compartilhar a página/rota atual (normaliza vários prefixos de hash)
-// --- COMPARTILHAR PÁGINA (única versão) ---
-// === COMPARTILHAR PÁGINA (versão única, preserva a rota) ===
+
+// Compartilhar a página/rota atual (preserva a rota exata)
+// Compartilhar a página/rota atual (preserva a rota exata)
 async function compartilharPagina(hash = location.hash, titulo = document.title || "Olá Carlópolis", texto = "Confira esta página!") {
   let h = String(hash || "");
   if (h && !h.startsWith("#")) h = "#" + h;   // garante o #
@@ -354,7 +357,6 @@ async function compartilharPagina(hash = location.hash, titulo = document.title 
   try {
     if (navigator.share) {
       await navigator.share({ title: titulo, text: texto, url });
-      // opcional: mostrarToast("✅ Link compartilhado!");
     } else {
       await navigator.clipboard.writeText(url);
       mostrarToast("🔗 Link copiado com sucesso!");
@@ -365,6 +367,7 @@ async function compartilharPagina(hash = location.hash, titulo = document.title 
   }
 }
 window.compartilharPagina = compartilharPagina;
+
 
 
 
@@ -400,9 +403,8 @@ window.compartilharPagina = compartilharPagina;
 
     // usa o hash atual como rota; ajuste o título/descrição se quiser
     btn.onclick = () => {
-      const titulo = h2.textContent.trim() || "Página";
-     compartilharPagina(location.hash, titulo, "Compartilhe esta página");
-      compartilharPagina(hash, titulo, "Compartilhe esta página");
+       const titulo = h2.textContent.trim() || "Página";
+  compartilharPagina(location.hash, titulo, "Compartilhe esta página");
     };
 
     h2.appendChild(btn);
@@ -15808,3 +15810,49 @@ document.addEventListener("click", (e) => {
 });
 
 
+// === Âncora de estabelecimento via ?est=ID (scroll após render) ===
+let _pendingEstId = null;
+
+function lerEstIdDaQuery() {
+  const q = new URLSearchParams(location.search);
+  const id = q.get("est");
+  _pendingEstId = id ? String(id) : null;
+}
+
+function tentarRolarParaEst() {
+  if (!_pendingEstId) return;
+  const alvo =
+    document.getElementById(_pendingEstId) ||
+    document.querySelector(`[data-id="${_pendingEstId}"]`);
+  if (!alvo) return; // ainda não renderizou
+
+  alvo.scrollIntoView({ behavior: "smooth", block: "start" });
+  _pendingEstId = null;
+
+  // limpa a query (?est=...) e mantém apenas origin+pathname+hash
+  const urlLimpa = `${location.origin}${location.pathname}${location.hash}`;
+  history.replaceState({}, "", urlLimpa);
+}
+
+// ler no carregamento
+document.addEventListener("DOMContentLoaded", lerEstIdDaQuery);
+
+// observar a área de conteúdo; assim que a página montar, faz o scroll
+document.addEventListener("DOMContentLoaded", () => {
+  const area = document.querySelector(".content_area");
+  if (!area) return;
+
+  // tenta já (caso a página já esteja pronta)
+  tentarRolarParaEst();
+
+  const obs = new MutationObserver(() => tentarRolarParaEst());
+  obs.observe(area, { childList: true, subtree: true });
+
+  // também tenta quando o hash muda (você troca de tela)
+  window.addEventListener("hashchange", () => {
+    // se a query desaparecer, não há mais o que rolar
+    lerEstIdDaQuery();
+    // dá um tempo mínimo pro conteúdo montar e tenta de novo
+    setTimeout(tentarRolarParaEst, 0);
+  });
+});
