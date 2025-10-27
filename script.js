@@ -345,13 +345,10 @@ document.addEventListener("click", (ev) => {
 
 // Compartilhar a página/rota atual (normaliza vários prefixos de hash)
 // --- COMPARTILHAR PÁGINA (única versão) ---
+// === COMPARTILHAR PÁGINA (versão única, preserva a rota) ===
 async function compartilharPagina(hash = location.hash, titulo = document.title || "Olá Carlópolis", texto = "Confira esta página!") {
-  // normaliza hash: garante # e remove prefixos de grupos
   let h = String(hash || "");
-  if (h && !h.startsWith("#")) h = "#" + h;
-  h = h.replace(/^#(?:comercios-|servicos-|setorpublico-|informacoes-|turismo-)/i, "#");
-  if (h === "#") h = "";
-
+  if (h && !h.startsWith("#")) h = "#" + h;   // garante o #
   const url = `${location.origin}${location.pathname}${h}`;
 
   try {
@@ -363,12 +360,12 @@ async function compartilharPagina(hash = location.hash, titulo = document.title 
       mostrarToast("🔗 Link copiado com sucesso!");
     }
   } catch (err) {
-    // usuário cancelou/fechou? não exibe erro
-    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
+    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return; // cancelou = silencioso
     mostrarToast("❌ Não foi possível compartilhar.");
   }
 }
 window.compartilharPagina = compartilharPagina;
+
 
 
 
@@ -404,7 +401,7 @@ window.compartilharPagina = compartilharPagina;
     // usa o hash atual como rota; ajuste o título/descrição se quiser
     btn.onclick = () => {
       const titulo = h2.textContent.trim() || "Página";
-      const hash = location.hash || "#grupos";
+     compartilharPagina(location.hash, titulo, "Compartilhe esta página");
       compartilharPagina(hash, titulo, "Compartilhe esta página");
     };
 
