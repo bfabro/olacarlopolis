@@ -3207,6 +3207,59 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+
+
+{
+      id: "casa6v",
+      tipo: "venda",
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 2,
+      valor: 320000,
+      piscina: false,
+      churrasqueira: "Sim",
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"],
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      ////////////////////////////////////////////////////////////
+      titulo: "Casa a venda com área gourmet",
+      descricao: "Documentação Ok.",
+      endereco: "Residencial Murador ",
+      suite: "Não",
+      banheiros: 2,
+      salas: 1,
+      cozinhas: 1,
+      area: 180,
+      construcao: 97,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa6/1.jpg",
+        "images/imoveis/cesar/venda/casa6/2.jpg",
+        "images/imoveis/cesar/venda/casa6/3.JPG",
+        "images/imoveis/cesar/venda/casa6/4.jpg",
+        "images/imoveis/cesar/venda/casa6/5.jpg",
+        "images/imoveis/cesar/venda/casa6/6.jpg",
+        "images/imoveis/cesar/venda/casa6/7.jpg",
+        "images/imoveis/cesar/venda/casa6/8.jpg",
+        "images/imoveis/cesar/venda/casa6/9.jpg",
+        "images/imoveis/cesar/venda/casa6/10.jpg",
+
+      ],
+      //lat: -23.3953,
+      //lng: -49.7232,
+
+    },
+
+
+
+
+
+
+
+
+
+
+
     {
       id: "ter1",
       status: "Vendido",   // <= adicione isto quando estiver vendido
