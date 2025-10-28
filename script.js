@@ -3209,7 +3209,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-{
+  {   
       id: "casa6v",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
@@ -3250,6 +3250,47 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
+
+     {   
+      id: "casa7v",
+      tipo: "venda",
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 3,
+      valor: 300000,
+      piscina: false,
+      churrasqueira: "Não",
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"],
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      ////////////////////////////////////////////////////////////
+      titulo: "Casa com Piscina",
+      descricao: "Documentação Ok.",
+      endereco: "Residencial Murador ",
+      suite: "1",
+      banheiros: 3,
+      salas: 1,
+      cozinhas: 1,
+      area: 180,
+      construcao: 120,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa7/1.jpg",
+        "images/imoveis/cesar/venda/casa7/2.jpg",
+        "images/imoveis/cesar/venda/casa7/3.JPG",
+        "images/imoveis/cesar/venda/casa7/4.jpg",
+        "images/imoveis/cesar/venda/casa7/5.jpg",
+        "images/imoveis/cesar/venda/casa7/6.jpg",
+        "images/imoveis/cesar/venda/casa7/7.jpg",
+        "images/imoveis/cesar/venda/casa7/8.jpg",
+        "images/imoveis/cesar/venda/casa7/9.jpg",
+        "images/imoveis/cesar/venda/casa7/10.jpg",
+
+      ],
+      //lat: -23.3953,
+      //lng: -49.7232,
+
+    },
 
 
 
