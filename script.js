@@ -9537,12 +9537,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
               promocoes: [
               {
-                imagem: "images/servicos/revendedor/tati/promocao/1.jpg",
-                titulo: "Combo de Hidratação",
-                precoAntigo: 299.00,
-                preco: 199.00,
+                imagem: "images/servicos/revendedor/tati/promocao/2.jpg",
+                titulo: "Combo Safira - 2 kits",
+                precoAntigo: 208.00,
+                preco: 129.00,
                 unidade: "A UNIDADE",
-                validadeFim: "2025-10-26",
+                validadeFim: "2025-10-31",
                 obs: "Oferta válida até durar o estoque",
 
               },
