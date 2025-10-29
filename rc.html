@@ -403,56 +403,63 @@
 		</div>
 
 		<!-- 📲 Cliques – Grupos de WhatsApp -->
-<div class="card" style="margin-top:14px;">
-  <h3 style="margin:0 0 8px;">📲 Cliques – Grupos de WhatsApp</h3>
-  <table style="width:100%; border-collapse: collapse;">
-    <thead>
-      <tr>
-        <th style="text-align:left;">Grupo (id)</th>
-        <th style="text-align:center;">Entrar no grupo</th>
-      </tr>
-    </thead>
-    <tbody id="tabelaGruposWhats">
-      <tr><td colspan="2" style="text-align:center; color:#999;">Carregando...</td></tr>
-    </tbody>
-  </table>
-</div>
+		<div class="card" style="margin-top:14px;">
+			<h3 style="margin:0 0 8px;">📲 Cliques – Grupos de WhatsApp</h3>
+			<table style="width:100%; border-collapse: collapse;">
+				<thead>
+					<tr>
+						<th style="text-align:left;">Grupo (id)</th>
+						<th style="text-align:center;">Entrar no grupo</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaGruposWhats">
+					<tr>
+						<td colspan="2" style="text-align:center; color:#999;">Carregando...</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
-<div class="card">
-  <h2 class="section-title">🏠 Cliques de Imóveis</h2>
-  <table>
-  <thead>
-  <tr>
-    <th>Imóvel</th>
+		<div class="card">
+			<h2 class="section-title">🏠 Cliques de Imóveis</h2>
+			<table>
+				<thead>
+					<tr>
+						 <th>Imóvel</th>
+    <th>Proprietário</th>
     <th>Corretor</th>
     <th style="text-align:center">WhatsApp</th>
     <th style="text-align:center">Fotos</th>
-  </tr>
-</thead>
-    <tbody id="tabelaCliquesImoveis">
-      <tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>
-    </tbody>
-  </table>
-</div>
+					</tr>
+				</thead>
+				<tbody id="tabelaCliquesImoveis">
+					<tr>
+						<td colspan="3" style="text-align:center; color:#999;">Carregando...</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
 
-<div class="card">
-  <h2 class="section-title">📇 Contatos de Imóveis (WhatsApp)</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Data/Hora</th>
-        <th>Imóvel</th>
-        <th>Nome Cliente</th>
-        <th>Tel Corretor</th>
-		<th>Corretor</th> <!-- NOVO -->
-      </tr>
-    </thead>
-    <tbody id="tabelaContatosImoveis">
-      <tr><td colspan="4" style="text-align:center; color:#999;">Carregando...</td></tr>
-    </tbody>
-  </table>
-</div>
+		<div class="card">
+			<h2 class="section-title">📇 Contatos de Imóveis (WhatsApp)</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Data/Hora</th>
+						<th>Imóvel</th>
+						<th>Nome Cliente</th>
+						<th>Tel Responsavel</th>
+						<th>Responsavel</th> <!-- NOVO -->
+					</tr>
+				</thead>
+				<tbody id="tabelaContatosImoveis">
+					<tr>
+						<td colspan="4" style="text-align:center; color:#999;">Carregando...</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
 
 
@@ -955,15 +962,15 @@
 						for (const estId of Object.keys(porDia)) {
 							const tipos = porDia[estId] || {};
 							// depois:
-const f = Number(tipos.fotos    || 0);
-const c = Number(tipos.cardapio || 0);
-const t = Number(tipos.telefone || 0);
-if (f || c || t) {
-  if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0 };
-  agregBotoes[estId].fotos    += f;
-  agregBotoes[estId].cardapio += c;
-  agregBotoes[estId].telefone += t;
-}
+							const f = Number(tipos.fotos || 0);
+							const c = Number(tipos.cardapio || 0);
+							const t = Number(tipos.telefone || 0);
+							if (f || c || t) {
+								if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0 };
+								agregBotoes[estId].fotos += f;
+								agregBotoes[estId].cardapio += c;
+								agregBotoes[estId].telefone += t;
+							}
 						}
 					}
 
@@ -974,7 +981,7 @@ if (f || c || t) {
 
 					const itensOrdenados = Object.entries(agregBotoes)
 						.map(([estId, v]) => ({ estId, ...v }))
-						  .filter(it => (it.fotos + it.cardapio + it.telefone) > 0) // <-- filtra “fantasmas”
+						.filter(it => (it.fotos + it.cardapio + it.telefone) > 0) // <-- filtra “fantasmas”
 						.sort((a, b) => (b.fotos + b.cardapio + b.telefone) - (a.fotos + a.cardapio + a.telefone));
 
 					if (!itensOrdenados.length) {
@@ -1228,185 +1235,222 @@ if (f || c || t) {
 
 
 
-// Lê os dias do período já selecionado no filtro (diário/semanal/mensal)
-  // A página já usa listarDatasPeriodo() em outras tabelas.
-  // Vamos reaproveitar exatamente o mesmo helper.
-  async function carregarTabelaGruposWhats() {
-    const tbody = document.getElementById('tabelaGruposWhats');
-    if (!tbody) return;
+			// Lê os dias do período já selecionado no filtro (diário/semanal/mensal)
+			// A página já usa listarDatasPeriodo() em outras tabelas.
+			// Vamos reaproveitar exatamente o mesmo helper.
+			async function carregarTabelaGruposWhats() {
+				const tbody = document.getElementById('tabelaGruposWhats');
+				if (!tbody) return;
 
-    // feedback visual
-    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+				// feedback visual
+				tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
-    const db = firebase.database();
-    const datas = await listarDatasPeriodo(); // já existe e é usada na tabela "Onde Comer" :contentReference[oaicite:1]{index=1}
+				const db = firebase.database();
+				const datas = await listarDatasPeriodo(); // já existe e é usada na tabela "Onde Comer" :contentReference[oaicite:1]{index=1}
 
-    // totalizador por ID de grupo (id = slug/nó usado quando registra o clique do botão)
-    const totais = {}; // { grupoId: total }
+				// totalizador por ID de grupo (id = slug/nó usado quando registra o clique do botão)
+				const totais = {}; // { grupoId: total }
 
-    // Para cada dia, lemos cliquesPorBotao/<data> e somamos apenas o tipo 'grupoWhatsapp'
-    for (const d of datas) {
-      const snap = await db.ref(`cliquesPorBotao/${d}`).once('value');
-      const val = snap.val() || {};
-      // val = { [id]: { grupoWhatsapp: number, ...outros tipos } }
-      Object.entries(val).forEach(([id, tipos]) => {
-        const qtd = Number(tipos?.grupoWhatsapp || 0);
-        if (qtd > 0) {
-          totais[id] = (totais[id] || 0) + qtd;
-        }
-      });
-    }
+				// Para cada dia, lemos cliquesPorBotao/<data> e somamos apenas o tipo 'grupoWhatsapp'
+				for (const d of datas) {
+					const snap = await db.ref(`cliquesPorBotao/${d}`).once('value');
+					const val = snap.val() || {};
+					// val = { [id]: { grupoWhatsapp: number, ...outros tipos } }
+					Object.entries(val).forEach(([id, tipos]) => {
+						const qtd = Number(tipos?.grupoWhatsapp || 0);
+						if (qtd > 0) {
+							totais[id] = (totais[id] || 0) + qtd;
+						}
+					});
+				}
 
-    // monta linhas ordenadas por total desc
-    const linhas = Object.entries(totais)
-      .map(([id, total]) => ({ id, total }))
-      .sort((a, b) => b.total - a.total);
+				// monta linhas ordenadas por total desc
+				const linhas = Object.entries(totais)
+					.map(([id, total]) => ({ id, total }))
+					.sort((a, b) => b.total - a.total);
 
-    if (!linhas.length) {
-      tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
-      return;
-    }
+				if (!linhas.length) {
+					tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
+					return;
+				}
 
-    tbody.innerHTML = linhas.map(({ id, total }) => `
+				tbody.innerHTML = linhas.map(({ id, total }) => `
       <tr>
         <td>${id}</td>
         <td style="text-align:center">${total}</td>
       </tr>
     `).join('');
-  }
+			}
 
 
 
-async function carregarTabelaCliquesImoveis() {
+		async function carregarTabelaCliquesImoveis() {
   const tbody = document.getElementById('tabelaCliquesImoveis');
   if (!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
   const datas = await listarDatasPeriodo();
   const db = firebase.database();
 
-  const tot = {};          // { chave: { whats:0, fotos:0 } }
-  const titulos = {};      // { chave: "Título" }
-  const corretores = {};   // { chave: "Corretor" }
+  const tot = {};                 // { id: {whats, fotos} }
+  const titulos = {};             // { id: titulo }
+  const mapCorretor = {};         // { id: corretor }
+  const mapProprietario = {};     // { id: proprietario }
 
+  const norm = (raw) => {
+    if (!raw) return '';
+    if (Array.isArray(raw)) return raw.filter(Boolean).join(', ');
+    if (typeof raw === 'object') return String(raw.nome || raw.label || raw.titulo || raw.text || '').trim();
+    return String(raw).trim();
+  };
+
+  // 1) Soma cliques por dia e captura rótulos do nó diário
   for (const d of datas) {
     const snap = await db.ref(`imoveisCliquesPorDia/${d}`).once('value');
     const dia = snap.val() || {};
-    Object.entries(dia).forEach(([chave, info]) => {
+    Object.entries(dia).forEach(([id, info]) => {
       const w = Number(info?.whatsapp || 0);
-      const f = Number(info?.fotos    || 0);
+      const f = Number(info?.fotos || 0);
 
-      // guarda título/corretor se existirem (não sobrescreve se já tem)
-      const t = (info && typeof info.titulo === 'string')   ? info.titulo   : '';
-      const c = (info && typeof info.corretor === 'string') ? info.corretor : '';
-      if (t && !titulos[chave]) titulos[chave] = t;
-      if (c && !corretores[chave]) corretores[chave] = c;
+      const t = (typeof info?.titulo === 'string' && info.titulo) || '';
+      const corretor = norm(info?.corretor ?? info?.corretores);
+      const proprietario = norm(info?.proprietario ?? info?.proprietaria);
 
-      if ((w + f) > 0) {
-        if (!tot[chave]) tot[chave] = { whats:0, fotos:0 };
-        tot[chave].whats += w;
-        tot[chave].fotos += f;
+      if (t && !titulos[id]) titulos[id] = t;
+      if (corretor && !mapCorretor[id]) mapCorretor[id] = corretor;
+      if (proprietario && !mapProprietario[id]) mapProprietario[id] = proprietario;
+
+      if (w + f > 0) {
+        if (!tot[id]) tot[id] = { whats: 0, fotos: 0 };
+        tot[id].whats += w;
+        tot[id].fotos += f;
       }
     });
   }
 
+  // 2) Completa faltantes pelo cadastro do imóvel
+  const faltantes = Object.keys(tot).filter(id => !mapCorretor[id] || !mapProprietario[id] || !titulos[id]);
+  await Promise.all(faltantes.map(async (id) => {
+    for (const path of [`imoveis/dados/${id}`, `imoveis/${id}`]) {
+      const s = await db.ref(path).once('value');
+      const v = s.val();
+      if (!v) continue;
+      if (!titulos[id] && v?.titulo) titulos[id] = String(v.titulo);
+      if (!mapCorretor[id]) {
+        const c = norm(v?.corretor ?? v?.corretores);
+        if (c) mapCorretor[id] = c;
+      }
+      if (!mapProprietario[id]) {
+        const p = norm(v?.proprietario ?? v?.proprietaria ?? v?.owner);
+        if (p) mapProprietario[id] = p;
+      }
+      if (titulos[id] && mapCorretor[id] && mapProprietario[id]) break;
+    }
+  }));
+
+  // 3) Monta linhas
   const linhas = Object.entries(tot)
-    .map(([chave, v]) => ({
-      titulo: titulos[chave] || chave,
-      corretor: corretores[chave] || "—",
+    .map(([id, v]) => ({
+      titulo: titulos[id] || id,
+      proprietario: mapProprietario[id] || "—",
+      corretor: mapCorretor[id] || "—",
       whats: v.whats,
       fotos: v.fotos
     }))
-    .filter(r => (r.whats + r.fotos) > 0)
+    .filter(r => r.whats + r.fotos > 0)
     .sort((a, b) => (b.whats + b.fotos) - (a.whats + a.fotos));
 
   if (!linhas.length) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = linhas.map(({ titulo, corretor, whats, fotos }) => `
-    <tr>
-      <td>${titulo}</td>
-      <td>${corretor}</td>
-      <td style="text-align:center">${whats}</td>
-      <td style="text-align:center">${fotos}</td>
-    </tr>
-  `).join('');
-}
-
-// mantém as chamadas já existentes
-document.addEventListener('DOMContentLoaded', carregarTabelaCliquesImoveis);
-document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaCliquesImoveis);
-
-
-
-async function carregarTabelaContatosImoveis() {
-  const tbody = document.getElementById('tabelaContatosImoveis');
-  if (!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Carregando...</td></tr>`;
-
-  const datas = await listarDatasPeriodo();
-  const db = firebase.database();
-  const linhas = []; // { ts, dataHora, titulo, nome, fone }
-
-  for (const d of datas) {
-    const snapDia = await db.ref(`imoveis/contatos/${d}`).once('value');
-    const porImovel = snapDia.val() || {};
-    Object.entries(porImovel).forEach(([imovelId, contatos]) => {
-      Object.values(contatos || {}).forEach(c => {
-        const ts = Number(c.ts || 0);
-        const dt = ts ? new Date(ts) : null;
-        const dataHora = dt
-          ? `${dt.toLocaleDateString()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`
-          : d;
-        linhas.push({
-          ts,
-          dataHora,
-          titulo: c.imovelTitulo || imovelId,
-          nome: c.nome || "—",
-          fone: c.destinoFone ? `(${c.destinoFone.slice(0,2)}) ${c.destinoFone.slice(2)}` : "—",
-		  corretor: c.corretor || "—"// NOVO
-        });
-      });
-    });
-  }
-
-  // ordena do mais recente pro mais antigo
-  linhas.sort((a,b) => (b.ts||0) - (a.ts||0));
-
-  if (!linhas.length) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum contato encontrado</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
     return;
   }
 
   tbody.innerHTML = linhas.map(l => `
     <tr>
-      <td>${l.dataHora}</td>
       <td>${l.titulo}</td>
-      <td>${l.nome}</td>
-      <td style="white-space:nowrap">${l.fone}</td>
-	   <td>${l.corretor}</td> <!-- NOVO -->
+      <td>${l.proprietario}</td>
+      <td>${l.corretor}</td>
+      <td style="text-align:center">${l.whats}</td>
+      <td style="text-align:center">${l.fotos}</td>
     </tr>
   `).join('');
 }
 
-// dispara junto com os outros carregamentos do relatório
-document.addEventListener('DOMContentLoaded', carregarTabelaContatosImoveis);
-document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaContatosImoveis);
+
+
+			// mantém as chamadas já existentes
+			document.addEventListener('DOMContentLoaded', carregarTabelaCliquesImoveis);
+			document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaCliquesImoveis);
+
+
+
+			async function carregarTabelaContatosImoveis() {
+				const tbody = document.getElementById('tabelaContatosImoveis');
+				if (!tbody) return;
+				tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+
+				const datas = await listarDatasPeriodo();
+				const db = firebase.database();
+				const linhas = []; // { ts, dataHora, titulo, nome, fone }
+
+				for (const d of datas) {
+					const snapDia = await db.ref(`imoveis/contatos/${d}`).once('value');
+					const porImovel = snapDia.val() || {};
+					Object.entries(porImovel).forEach(([imovelId, contatos]) => {
+						Object.values(contatos || {}).forEach(c => {
+							const ts = Number(c.ts || 0);
+							const dt = ts ? new Date(ts) : null;
+							const dataHora = dt
+								? `${dt.toLocaleDateString()} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`
+								: d;
+							linhas.push({
+								ts,
+								dataHora,
+								titulo: c.imovelTitulo || imovelId,
+								nome: c.nome || "—",
+								fone: c.destinoFone ? `(${c.destinoFone.slice(0, 2)}) ${c.destinoFone.slice(2)}` : "—",
+								corretor: (c.corretor || c.responsavel || "—")
+
+							});
+						});
+					});
+				}
+
+				// ordena do mais recente pro mais antigo
+				linhas.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+				if (!linhas.length) {
+					tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum contato encontrado</td></tr>`;
+					return;
+				}
+
+				tbody.innerHTML = linhas.map(l => `
+    <tr>
+      <td>${l.dataHora}</td>
+      <td>${l.titulo}</td>
+      <td>${l.nome}</td>
+      <td style="white-space:nowrap">${l.fone}</td>
+	 <td>${l.corretor}</td>
+    </tr>
+  `).join('');
+			}
+
+			// dispara junto com os outros carregamentos do relatório
+			document.addEventListener('DOMContentLoaded', carregarTabelaContatosImoveis);
+			document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaContatosImoveis);
 
 
 
 
 
-  // Chamar junto com as outras tabelas:
-  document.addEventListener('DOMContentLoaded', () => {
-    carregarTabelaGruposWhats(); // inicial, como já é feito para Onde Comer :contentReference[oaicite:2]{index=2}
-  });
+			// Chamar junto com as outras tabelas:
+			document.addEventListener('DOMContentLoaded', () => {
+				carregarTabelaGruposWhats(); // inicial, como já é feito para Onde Comer :contentReference[oaicite:2]{index=2}
+			});
 
-  // E também no botão "Buscar", junto com as demais atualizações:
-  const _btn = document.getElementById('btnBuscar');
-  if (_btn) _btn.addEventListener('click', carregarTabelaGruposWhats);
+			// E também no botão "Buscar", junto com as demais atualizações:
+			const _btn = document.getElementById('btnBuscar');
+			if (_btn) _btn.addEventListener('click', carregarTabelaGruposWhats);
 
 
 

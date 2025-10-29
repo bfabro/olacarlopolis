@@ -38,6 +38,22 @@ function somenteDigitos(str) {
 
 
 
+// Responsável do imóvel mesmo sem "corretor" explícito
+function getResponsavelImovel(im) {
+  // Se já houver util oficial, prioriza
+  if (typeof getCorretorPrincipal === "function") {
+    const c = getCorretorPrincipal(im);
+    if (c) return c;
+  }
+  // Fallbacks comuns de dados
+  return (
+    im.proprietario ||
+    im.dono ||
+    (Array.isArray(im.corretores) && im.corretores.length ? im.corretores[0] : "") ||
+    im.corretor ||
+    "Proprietário não informado"
+  );
+}
 
 
 function getHojeBR() {
@@ -3186,6 +3202,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       cozinhas: 1,
       area: 5000,
       construcao: 150,   // << NOVO: m² de construção
+      proprietario :"Caio Gabriel",
 
       quintal: "Sim",
       telefone: "43 99154-5096",  // Corretor ou propretario
@@ -3413,6 +3430,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       area: "180 m² (10x18)",
       valor: 52000,
       telefone: "43 99637-2328",
+      proprietario:"Paulo Tobia",
       imagens: [
         "images/imoveis/pauloTobias/venda/terreno/terreno2/1.jpg",
         "images/imoveis/pauloTobias/venda/terreno/terreno2/2.jpg",
@@ -3431,7 +3449,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       descricao: "Excelente localização para investimento ou residência.<Br>Lote 04 da quadra 05 <br> Terreno quitado.<br>Obs: Pego carro no negócio!",
       endereco: "Novo Horizonte 3",
       area: "234 m² (13x18)",
-      valor: 100000,
+      valor: 70000,
+      proprietario:"Vitor Tobia",
       telefone: "43 99630-1627",
       imagens: [
         "images/imoveis/vitorTobia/venda/terreno/terreno1/1.jpg",
@@ -3455,6 +3474,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       area: "180 m² (10x18)",
       valor: 50000,
       telefone: "43 99975-7785",
+      proprietario:"Fabio Tobia",
       imagens: [
         "images/imoveis/fabioTobia/venda/terreno/terreno1/1.jpg",
 
@@ -3930,6 +3950,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       <button class="im-contato-close" title="Fechar">&times;</button>
       <h3>Antes de falar no WhatsApp</h3>
       <p>Digite seu nome para eu me apresentar ao corretor:</p>
+      <input type="hidden" id="imResponsavel" value="${getResponsavelImovel(im)}"> <!-- NOVO -->
       <label class="im-contato-label" for="imContatoNome">Seu nome</label>
       <input id="imContatoNome" class="im-contato-input" type="text" placeholder="Ex.: Maria Silva" maxlength="40">
       <div class="im-contato-actions">
@@ -3994,7 +4015,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             const v = cur || {};
             v.whatsapp = (Number(v.whatsapp || 0) + 1);
             if (!v.titulo && im.titulo) v.titulo = im.titulo;
-            if (!v.corretor && im.corretor) v.corretor = im.corretor;
+            
+
+if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getCorretorPrincipal(im) : (im.corretor || ""));
+  if (!v.responsavel) v.responsavel = getResponsavelImovel(im); // <-- NOVO
+
+
             return v;
           }).catch(() => { });
         }
@@ -4024,6 +4050,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           imovelId: im.id,
           imovelTitulo: im.titulo || "",
           destinoFone: somenteDigitos(im.telefone || ""),
+          corretor: (typeof getCorretorPrincipal === "function" ? getCorretorPrincipal(im) : (im.corretor || "")) || "",
+          responsavel: getResponsavelImovel(im), // <-- NOVO: sempre preenche
           pagina: location.href,
           userAgent: navigator.userAgent,
           ts: firebase.database.ServerValue.TIMESTAMP
@@ -4033,27 +4061,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-    // --- Salva no Firebase a confirmação de contato ---
-    function salvarContatoImovel(im, nome) {
-      try {
-        if (!window.firebase || !firebase.database) return;
-        const hoje = new Date().toISOString().slice(0, 10);
-        const ref = firebase.database()
-          .ref(`imoveis/contatos/${hoje}/${im.id}`)
-          .push();
-
-        ref.set({
-          nome,
-          imovelId: im.id,
-          imovelTitulo: im.titulo || "",
-          destinoFone: somenteDigitos(im.telefone || ""),
-          pagina: location.href,
-          ts: firebase.database.ServerValue.TIMESTAMP
-        }).catch(() => { });
-      } catch (e) { }
-    }
-
-    // --- Conecta os botões Whats ---
+    
     // --- Conecta os botões "Falar no WhatsApp" (um único listener por botão)
     el.querySelectorAll("[data-action='whats']").forEach(btn => {
       if (btn.dataset.bindWhats === "1") return; // evita rebind
@@ -4070,30 +4078,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-    // salva confirmação de contato no Firebase
-    function salvarContatoImovel(im, nome) {
-      try {
-        if (!window.firebase || !firebase.database) return;
-
-        const hoje = getHojeBR ? getHojeBR() : new Date().toISOString().slice(0, 10);
-        const ref = firebase.database()
-          .ref(`imoveis/contatos/${hoje}/${im.id}`)
-          .push();
-
-        ref.set({
-          nome: String(nome || "").slice(0, 80),
-          imovelId: im.id,
-          imovelTitulo: im.titulo || "",
-          destinoFone: somenteDigitos(im.telefone || ""),
-          corretor: (typeof getCorretorPrincipal === "function" ? getCorretorPrincipal(im) : (im.corretor || "")) || "",
-
-          pagina: location.href,
-
-          userAgent: navigator.userAgent,
-          ts: firebase.database.ServerValue.TIMESTAMP
-        }).catch(() => { });
-      } catch (e) { /* silencioso */ }
-    }
+   
 
 
 
@@ -15399,6 +15384,7 @@ function getCorretorPrincipal(im) {
 }
 
 // salva CONTADOR por dia + titulo + corretor
+// salva CONTADOR por dia + titulo + corretor + proprietario
 function registrarCliqueImovelDia(tipo, im) {
   if (!window.firebase || !firebase.database) return Promise.resolve(false);
   const hoje = getHojeBR(); // YYYY-MM-DD
@@ -15409,10 +15395,31 @@ function registrarCliqueImovelDia(tipo, im) {
     const base = curr || {};
     base.titulo = im?.titulo || base.titulo || "";
     base.corretor = getCorretorPrincipal(im) || base.corretor || "";
-    base[tipo] = (base[tipo] || 0) + 1;   // incrementa fotos/whatsapp
+    base.proprietario = im?.proprietario || im?.proprietaria || base.proprietario || ""; // ← NOVO
+    base[tipo] = (base[tipo] || 0) + 1;
     return base;
   });
 }
+
+// salva RESUMO acumulado + corretor + proprietario
+function registrarCliqueImovelResumo(tipo, im) {
+  if (!window.firebase || !firebase.database) return Promise.resolve(false);
+  const hoje = getHojeBR(); // YYYY-MM-DD
+  const chave = keyImovel(im);
+  const ref = firebase.database().ref(`imoveisCliquesResumo/${hoje}/${chave}`);
+
+  return ref.transaction(curr => {
+    const base = curr || { totalFotos: 0, totalWhats: 0 };
+    base.titulo = im?.titulo || base.titulo || "";
+    base.corretor = getCorretorPrincipal(im) || base.corretor || "";
+    base.proprietario = im?.proprietario || im?.proprietaria || base.proprietario || ""; // ← NOVO
+    if (tipo === "fotos") base.totalFotos = (base.totalFotos || 0) + 1;
+    if (tipo === "whatsapp") base.totalWhats = (base.totalWhats || 0) + 1;
+    base.ultimoClique = firebase.database.ServerValue.TIMESTAMP;
+    return base;
+  });
+}
+
 
 // salva RESUMO acumulado + corretor
 function registrarCliqueImovelResumo(tipo, im) {
