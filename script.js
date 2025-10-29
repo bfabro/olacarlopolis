@@ -3257,7 +3257,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
       valor: 300000,
-      piscina: false,
+      piscina: "Sim",
       churrasqueira: "Não",
       vagas: 2,
       corretores: ["Cesar Melo - 38.105 F"],
