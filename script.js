@@ -282,7 +282,7 @@ let _sharing = false;
 async function compartilharEstabelecimento(id) {
 
 
-  
+
   if (!id || typeof id !== "string") {
     console.warn("ID inválido:", id);
     mostrarToast("❌ Erro ao compartilhar: ID inválido");
@@ -337,40 +337,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /// funçao para todas as paginas
   ///
-document.addEventListener("click", (ev) => {
-  const btn = ev.target.closest(".share-btn");
-  if (!btn) return;
-  const id = btn.getAttribute("data-share-id");
-  if (id) {
-    compartilharEstabelecimento(id);
-  }
-});
-
-
-// Compartilhar a página/rota atual (preserva a rota exata)
-// Compartilhar a página/rota atual (preserva a rota exata)
-async function compartilharPagina(hash = location.hash, titulo = document.title || "Olá Carlópolis", texto = "Confira esta página!") {
-  let h = String(hash || "");
-  if (h && !h.startsWith("#")) h = "#" + h;
-
-  // 🔧 remove index.html do caminho
-  const base = location.origin + location.pathname.replace(/index\.html$/i, "");
-  const url = `${base}${h}`;
-
-  try {
-    if (navigator.share) {
-      await navigator.share({ title: titulo, text: texto, url });
-    } else {
-      await navigator.clipboard.writeText(url);
-      mostrarToast("🔗 Link copiado com sucesso!");
+  document.addEventListener("click", (ev) => {
+    const btn = ev.target.closest(".share-btn");
+    if (!btn) return;
+    const id = btn.getAttribute("data-share-id");
+    if (id) {
+      compartilharEstabelecimento(id);
     }
-  } catch (err) {
-    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
-    mostrarToast("❌ Não foi possível compartilhar.");
-  }
-}
+  });
 
-window.compartilharPagina = compartilharPagina;
+
+  // Compartilhar a página/rota atual (preserva a rota exata)
+  // Compartilhar a página/rota atual (preserva a rota exata)
+  async function compartilharPagina(hash = location.hash, titulo = document.title || "Olá Carlópolis", texto = "Confira esta página!") {
+    let h = String(hash || "");
+    if (h && !h.startsWith("#")) h = "#" + h;
+
+    // 🔧 remove index.html do caminho
+    const base = location.origin + location.pathname.replace(/index\.html$/i, "");
+    const url = `${base}${h}`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: titulo, text: texto, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        mostrarToast("🔗 Link copiado com sucesso!");
+      }
+    } catch (err) {
+      if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
+      mostrarToast("❌ Não foi possível compartilhar.");
+    }
+  }
+
+  window.compartilharPagina = compartilharPagina;
 
 
 
@@ -406,17 +406,17 @@ window.compartilharPagina = compartilharPagina;
     btn.title = "Compartilhar esta página";
 
     // usa o hash atual como rota; ajuste o título/descrição se quiser
-   btn.onclick = () => {
-  const titulo = h2.textContent.trim() || "Página";
-  let texto = "Segue o Link referente:";
+    btn.onclick = () => {
+      const titulo = h2.textContent.trim() || "Página";
+      let texto = "Segue o Link referente:";
 
-  // Se a página for a de busca CEP, muda a mensagem
-  if (location.hash.includes("busca-cep")) {
-    texto = "Pesquise o CEP da sua rua";
-  }
+      // Se a página for a de busca CEP, muda a mensagem
+      if (location.hash.includes("busca-cep")) {
+        texto = "Pesquise o CEP da sua rua";
+      }
 
-  compartilharPagina(location.hash, titulo, texto);
-};
+      compartilharPagina(location.hash, titulo, texto);
+    };
 
     h2.appendChild(btn);
   }
@@ -806,7 +806,7 @@ window.compartilharPagina = compartilharPagina;
     });
 
 
- 
+
 
 
   }
@@ -978,7 +978,7 @@ window.compartilharPagina = compartilharPagina;
 
     //otica
 
-    oticavisualcenter:"s",
+    oticavisualcenter: "s",
 
     // padaria
     bomjesus: "n",
@@ -1075,7 +1075,7 @@ window.compartilharPagina = compartilharPagina;
 
     //materiais eletricos
 
-acendemateriaiseletricos:"s",
+    acendemateriaiseletricos: "s",
 
     // sorveteria
     limone: "s",
@@ -1418,7 +1418,7 @@ acendemateriaiseletricos:"s",
     { id: "movepar", nome: "Movepar Promoções", descricao: "Todos os dias promoções imperdíveis para renovar os moveis e eletros da sua casa!", link: "https://chat.whatsapp.com/L2hNB5RAoRhAAoWx2XrRUw?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/8.jpg" },
     { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/1.jpg" },
     { id: "oficinadeXadrez", nome: "Oficina Xadrez Carlopolis", descricao: "A Oficina de Xadrez tem como objetivo ensinar fundamentos, estimular o raciocínio lógico e desenvolver habilidades estratégicas por meio da prática do jogo", link: "https://chat.whatsapp.com/HAJ1N5n0BlK2IM3J8CUbpz?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/4.jpg" },
-{ id: "soberanoLanches", nome: "Soberano Lanches", descricao: "Acompanhe nossas novidades e promoçoes", link: "https://chat.whatsapp.com/F2B9b5YGBvA0sEoqfe1ovW?mode=wwt", imagem: "images/informacoes/gruposWhats/12.jpg" },
+    { id: "soberanoLanches", nome: "Soberano Lanches", descricao: "Acompanhe nossas novidades e promoçoes", link: "https://chat.whatsapp.com/F2B9b5YGBvA0sEoqfe1ovW?mode=wwt", imagem: "images/informacoes/gruposWhats/12.jpg" },
 
     { id: "lojaThiagoAgueraRifa", nome: "Loja Thiago Aguera - Rifa", descricao: "Grupo exclusivo para as rifas do Thiago Aguera.<br>Venda de materiais de pesca em até 12x no cartão.", link: "https://chat.whatsapp.com/EOXDZReaRDYLY3OOXmUYIt", imagem: "images/informacoes/gruposWhats/11.jpg" },
     // { id: "lojaThiagoAgueraOfertas", nome: "Loja Thiago Aguera - Ofertas", descricao: "Grupo exclusivo para as rifas do Thiago Aguera.<br>Venda de materiais de pesca em até 12x no cartão.", link: "https://tr.ee/EylHAMYMbS", imagem: "images/informacoes/gruposWhats/11.jpg"},
@@ -3138,7 +3138,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       piscina: "Sim",
       churrasqueira: false,
       vagas: 4,
-      corretores: ["Rafael Bandeira - 29.802"],      
+      corretores: ["Rafael Bandeira - 29.802"],
       titulo: "Imóvel no Residencial Ilhabela",
       descricao: "Acabamentos sofisticados, design moderno e ambientes integrados. Documentação OK",
       endereco: "Condominio Ilha bela",
@@ -3176,7 +3176,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quartos: 3,
       valor: 800000,
       piscina: false,
-      churrasqueira: "Sim",    
+      churrasqueira: "Sim",
       titulo: "Chacara a 12km Da Cidade",
       descricao: "Chacara toda cercada de arame liso, Gramado ao redor da casa, Estrada empedrada até a represa podendo descer embarcações, Quartos com ar condicionado<br>Barracão grande de estrutura metalica com cozinha, deck de madeira e banheiro<br>Edicula com cozinha, banheiro e quarto com ar condicionado",
       endereco: "Bairro Espirito Santo",
@@ -3186,19 +3186,19 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       cozinhas: 1,
       area: 5000,
       construcao: 150,   // << NOVO: m² de construção
-             
+
       quintal: "Sim",
       telefone: "43 99154-5096",  // Corretor ou propretario
       imagens: [
         "images/imoveis/caioGabriel/1.jpg",
-         "images/imoveis/caioGabriel/2.jpg",
-         "images/imoveis/caioGabriel/3.jpg",
-         "images/imoveis/caioGabriel/4.jpg",
-         "images/imoveis/caioGabriel/5.jpg",
-         "images/imoveis/caioGabriel/6.jpg",
-         "images/imoveis/caioGabriel/7.jpg"
-         
-         
+        "images/imoveis/caioGabriel/2.jpg",
+        "images/imoveis/caioGabriel/3.jpg",
+        "images/imoveis/caioGabriel/4.jpg",
+        "images/imoveis/caioGabriel/5.jpg",
+        "images/imoveis/caioGabriel/6.jpg",
+        "images/imoveis/caioGabriel/7.jpg"
+
+
 
       ],
       //lat: -23.3953,
@@ -3210,7 +3210,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-  {   
+    {
       id: "casa6v",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
@@ -3252,7 +3252,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     },
 
 
-     {   
+    {
       id: "casa7v",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
@@ -3375,6 +3375,76 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       corretores: ["Cesar Melo - 38.105 F"],
 
     },
+
+
+
+
+    //Modelo
+    {
+      id: "ter5",
+      tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      titulo: "Terreno na Principal no Murador",
+      descricao: "Próxima as Igrejas Quadrangular, Assembleia de Deus, Posto de Saúde<br>Rua já asfaltada com excelente localização para investimento, residência ou comercio.",
+      endereco: "Murador",
+      area: "250 m² (10x25)",
+      valor: 85000,
+      telefone: "43 99637-2328",
+      imagens: [
+        "images/imoveis/pauloTobias/venda/terreno/1.jpg",
+        "images/imoveis/pauloTobias/venda/terreno/2.jpg",
+        "images/imoveis/pauloTobias/venda/terreno/3.jpg",
+        "images/imoveis/pauloTobias/venda/terreno/4.jpg",
+
+      ],
+
+
+    },
+
+
+
+      {
+      id: "ter6",
+      tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      titulo: "Terreno no Murador",
+      descricao: "Excelente localização para investimento ou residência.<Br> Terreno quitado.",
+      endereco: "Murador",
+      area: "180 m² (10x18)",
+      valor: 52000,
+      telefone: "43 99637-2328",
+      imagens: [
+        "images/imoveis/pauloTobias/venda/terreno/terreno2/1.jpg",
+         "images/imoveis/pauloTobias/venda/terreno/terreno2/2.jpg",
+
+      ],
+
+
+    },
+
+
+ {
+      id: "ter7",
+      tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      titulo: "Terreno bem localizado no bairro Novo Horizonte 3",
+      descricao: "Excelente localização para investimento ou residência.<Br>Lote 04 da quadra 05 <br> Terreno quitado.<br>Obs: Pego carro no negócio!",
+      endereco: "Novo Horizonte 3",
+      area: "234 m² (13x18)",
+      valor: 100000,
+      telefone: "43 99630-1627",
+      imagens: [
+        "images/imoveis/vitorTobia/venda/terreno/terreno1/1.jpg",
+         "images/imoveis/vitorTobia/venda/terreno/terreno1/2.jpg",
+          "images/imoveis/vitorTobia/venda/terreno/terreno1/3.jpg",
+
+
+      ],
+
+
+    },
+
+
     /*
     
         {
@@ -3725,8 +3795,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     const tipo = document.getElementById("imTipo").value;
     const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
     const p = parseInt(document.getElementById("imPreco").value || 0, 10);
-    const amen = Array.from(document.querySelectorAll(".amenity-chip.active"))
-      .map(c => c.dataset.key);
+    const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
     const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
     const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
     const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
@@ -4040,14 +4109,22 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     if (!terr && hasNum(im.salas)) chips.push(`<div class="spec-chip"><span class="k">Salas</span><span class="v">${im.salas}</span></div>`);
     if (!terr && hasNum(im.cozinhas)) chips.push(`<div class="spec-chip"><span class="k">Cozinhas</span><span class="v">${im.cozinhas}</span></div>`);
     if (!terr && im.churrasqueira) chips.push(`<div class="spec-chip"><span class="k">Churrasqueira</span><span class="v">${im.churrasqueira}</span></div>`);
-     if (!terr && im.piscina) chips.push(`<div class="spec-chip"><span class="k">Piscina</span><span class="v">${im.piscina}</span></div>`);
+    if (!terr && im.piscina) chips.push(`<div class="spec-chip"><span class="k">Piscina</span><span class="v">${im.piscina}</span></div>`);
     if (!terr && im.quintal) chips.push(`<div class="spec-chip chip-mini"><span class="k">Quintal</span><span class="v">${im.quintal}</span></div>`);
 
     if (!terr && im.escritorio) chips.push(`<div class="spec-chip chip-mini"><span class="k">Escritorio</span><span class="v">${im.escritorio}</span></div>`);
     if (!terr && im.outros) chips.push(`<div class="spec-chip chip-mini"><span class="k">Outros</span><span class="v">${im.outros}</span></div>`);
 
-    // Área (relevante para qualquer imóvel, inclusive terreno)
-    if (hasNum(im.area)) chips.push(`<div class="spec-chip"><span class="k">Área</span><span class="v">${Number(im.area)} m²</span></div>`);
+
+    // Área (aceita TEXTO ou NÚMERO)
+    if (im.area !== undefined && im.area !== null && String(im.area).trim() !== "") {
+      const areaStr = hasNum(im.area) ? `${Number(im.area)} m²` : String(im.area);
+      chips.push(
+        `<div class="spec-chip"><span class="k">Área</span><span class="v">${areaStr} </span></div>`
+      );
+    }
+
+
 
     // Construção (normalmente não para terreno)
     if (!terr && hasNum(im.construcao)) chips.push(`<div class="spec-chip"><span class="k">Construção</span><span class="v">${Number(im.construcao)} m²</span></div>`);
@@ -8198,7 +8275,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "O Barateiro",
             address: "Bendito Salles, 1168 - Carlopolis",
             hours: "Seg a Sex: 8:00h as 21:00h </br> Dom: 08:00h as 12:00h",
-              statusAberto: ".",
+            statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "21:00" }],
               ter: [{ inicio: "08:00", fim: "21:00" }],
@@ -9565,7 +9642,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Quer fios mais fortes, hidratados e com brilho de salão? ✨<br>Experimente o poder da linha Lizz Ante Profissional <br>Resultado que se vê, sente e apaixona! 💕",
             ],
 
-              promocoes: [
+            promocoes: [
               {
                 imagem: "images/servicos/revendedor/tati/promocao/2.jpg",
                 titulo: "Combo Safira - 2 kits",
@@ -9623,14 +9700,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Jogos Aventura",
             date: "20/10/2025",
             address: "Centro de Eventos",
-            
+
           },
 
           {
             image: "images/informacoes/eventos/toroonagashi.png",
             name: "Toroonagashi",
             date: "25/10/2025",
-            address: "Ponte interstadual Benedito Garcia Ribeiro (Carlopolis x Fartura)",          
+            address: "Ponte interstadual Benedito Garcia Ribeiro (Carlopolis x Fartura)",
 
 
           },
@@ -9641,7 +9718,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             date: "25/10/2025",
             address: "Ilha do Ponciano",
             infoAdicional: "Prepare-se para um fim de semana de adrenalina e emoção!<br>Nos dias 25 e 26 de outubro, o Centro de Eventos Ilha do Ponciano será palco do Campeonato Paranaense de Motocross Sportbay!<br>Venha prestigiar e torcer pelos melhores pilotos do estado, em disputas cheias de velocidade, saltos incríveis e muita energia!<br>Não fique de fora desse grande espetáculo sobre duas rodas!",
-          
+
 
           },
 
@@ -9650,7 +9727,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Jogos Aventura",
             date: "25/10/2025",
             address: "Centro de Eventos",
-           
+
           },
 
 
@@ -11622,15 +11699,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/materiaisEletricos/acende/divulgacao/1.jpg",
               "images/comercios/materiaisEletricos/acende/divulgacao/2.jpg",
               "images/comercios/materiaisEletricos/acende/divulgacao/3.jpg",
-           
+
             ],
             novidadesDescriptions: [
-          "🌟 Pendente Lupi<br>Um toque de design e personalidade para o seu ambiente!<br>Com curvas elegantes e luz aconchegante, o Lupi é perfeito para quem quer transformar o espaço com modernidade e estilo.",
-          "Tesoura de Poda DeWalt! 🌳<Br>Chegou a ferramenta que vai transformar sua poda: Tesoura de Poda DeWalt a bateria, com alto desempenho, corte preciso e praticidade no dia a dia.<Br>Ideal para jardinagem, agricultura e manutenção de áreas verdes e o melhor: com a qualidade e durabilidade que só a DeWalt oferece!",
-           "Verniz Imbuia e Mogno<br>✨ Deixe seus móveis ou madeiras com acabamento impecável e sofisticado.<Br>✨ Luxo, elegância e economia no mesmo pacote.<Br>⚠️ Promoção até durar o estoque.",
-        
-        
-        ],
+              "🌟 Pendente Lupi<br>Um toque de design e personalidade para o seu ambiente!<br>Com curvas elegantes e luz aconchegante, o Lupi é perfeito para quem quer transformar o espaço com modernidade e estilo.",
+              "Tesoura de Poda DeWalt! 🌳<Br>Chegou a ferramenta que vai transformar sua poda: Tesoura de Poda DeWalt a bateria, com alto desempenho, corte preciso e praticidade no dia a dia.<Br>Ideal para jardinagem, agricultura e manutenção de áreas verdes e o melhor: com a qualidade e durabilidade que só a DeWalt oferece!",
+              "Verniz Imbuia e Mogno<br>✨ Deixe seus móveis ou madeiras com acabamento impecável e sofisticado.<Br>✨ Luxo, elegância e economia no mesmo pacote.<Br>⚠️ Promoção até durar o estoque.",
+
+
+            ],
 
           },
         ],
@@ -12489,24 +12566,24 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: []
             },
             address: "R. Benedito Salles, 583 - Carlópolis",
-            contact: "(43) 99908-1510", 
+            contact: "(43) 99908-1510",
             instagram: "https://www.instagram.com/oticavisualcenter.oficial/",
             novidadesImages: [
               "images/comercios/otica/oticaVisual/divulgacao/1.jpg",
               "images/comercios/otica/oticaVisual/divulgacao/2.jpg",
-                  "images/comercios/otica/oticaVisual/divulgacao/3.jpg",
+              "images/comercios/otica/oticaVisual/divulgacao/3.jpg",
               "images/comercios/otica/oticaVisual/divulgacao/4.jpg",
-         
+
 
             ],
             novidadesDescriptions: [
 
               "Diga adeus aos reflexos e olá à visão nítida de verdade! 👋✨<Br>O tratamento Antirreflexo é aquele upgrade que transforma suas lentes — e sua rotina.<Br>👁️ Mais beleza: fotos sem brilhos e olhar sempre em destaque.<Br>💻 Mais conforto: menos cansaço com telas e luzes fortes.<Br>🚗 Mais segurança: visão noturna mais clara pra dirigir tranquilo.<Br>💪 Mais durabilidade: protege suas lentes de arranhões leves.<Br>Experimente o poder da clareza total e enxergue o mundo com outros olhos.Venha conferir nossos moveis",
-               "Diga adeus aos reflexos e olá à visão nítida de verdade! 👋✨<Br>O tratamento Antirreflexo é aquele upgrade que transforma suas lentes — e sua rotina.<Br>👁️ Mais beleza: fotos sem brilhos e olhar sempre em destaque.<Br>💻 Mais conforto: menos cansaço com telas e luzes fortes.<Br>🚗 Mais segurança: visão noturna mais clara pra dirigir tranquilo.<Br>💪 Mais durabilidade: protege suas lentes de arranhões leves.<Br>Experimente o poder da clareza total e enxergue o mundo com outros olhos.Venha conferir nossos moveis",
-                "Dificuldade pra enxergar de longe e de perto?<br>Você pode estar precisando de lentes multifocais.<br>Elas têm vários campos de visão em uma só lente:<br>🔹 Parte superior: visão de longe<br>🔹 Meio da lente: visão intermediária (computador, por exemplo)<br>🔹 Parte inferior: leitura e visão de perto<br>✅ Sem precisar trocar de óculos o tempo todo.<br>✅ Sem aquele “sobe e desce” do modelo bifocal.<br>✅ Com adaptação cada vez mais fácil, graças à tecnologia atual.<br>Na Ótica Visual Center, a gente te orienta sobre o melhor tipo de multifocal pra sua rotina.<br>Tem diferença entre marcas, tratamentos e modelos — e a escolha certa faz TODA a diferença.",
-"🚨Agende agora mesmo o seu exame de vista!!<br>Lembre se que a troca periódica dos óculos é muito importante para a saúde dos seus olhos. 👀🧐👓",
+              "Diga adeus aos reflexos e olá à visão nítida de verdade! 👋✨<Br>O tratamento Antirreflexo é aquele upgrade que transforma suas lentes — e sua rotina.<Br>👁️ Mais beleza: fotos sem brilhos e olhar sempre em destaque.<Br>💻 Mais conforto: menos cansaço com telas e luzes fortes.<Br>🚗 Mais segurança: visão noturna mais clara pra dirigir tranquilo.<Br>💪 Mais durabilidade: protege suas lentes de arranhões leves.<Br>Experimente o poder da clareza total e enxergue o mundo com outros olhos.Venha conferir nossos moveis",
+              "Dificuldade pra enxergar de longe e de perto?<br>Você pode estar precisando de lentes multifocais.<br>Elas têm vários campos de visão em uma só lente:<br>🔹 Parte superior: visão de longe<br>🔹 Meio da lente: visão intermediária (computador, por exemplo)<br>🔹 Parte inferior: leitura e visão de perto<br>✅ Sem precisar trocar de óculos o tempo todo.<br>✅ Sem aquele “sobe e desce” do modelo bifocal.<br>✅ Com adaptação cada vez mais fácil, graças à tecnologia atual.<br>Na Ótica Visual Center, a gente te orienta sobre o melhor tipo de multifocal pra sua rotina.<br>Tem diferença entre marcas, tratamentos e modelos — e a escolha certa faz TODA a diferença.",
+              "🚨Agende agora mesmo o seu exame de vista!!<br>Lembre se que a troca periódica dos óculos é muito importante para a saúde dos seus olhos. 👀🧐👓",
             ],
-          
+
           },
         ],
       },
@@ -13125,7 +13202,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       window.open("https://www.ipmetradar.com.br/2animRadar.php", "_blank");
     });
   }
-// Menu: Nascer & Pôr do Sol
+  // Menu: Nascer & Pôr do Sol
   document.addEventListener("click", (ev) => {
     const t = ev.target.closest("#menuSol");
     if (!t) return;
@@ -13136,7 +13213,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
   montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
 
-  
+
 
 
 
@@ -14334,35 +14411,35 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
       </div>
     </div>
   `
-  
-  
-  
-  
-  
-  // após area.innerHTML = `...` em mostrarSol()
-// após area.innerHTML = `...` em mostrarSol()
-const luaCard = document.createElement("div");
-luaCard.className = "lua-card";
-luaCard.innerHTML = `
+
+
+
+
+
+    // após area.innerHTML = `...` em mostrarSol()
+    // após area.innerHTML = `...` em mostrarSol()
+    const luaCard = document.createElement("div");
+    luaCard.className = "lua-card";
+    luaCard.innerHTML = `
   <div id="lua-desenho" class="lua-img" aria-hidden="true"></div>
   <p id="lua-fase" class="lua-fase">Carregando fase da Lua...</p>
   <p id="lua-iluminacao" class="lua-iluminacao"></p>
 `;
 
-// insira o card dentro do container principal do clima
-const wrap = area.querySelector(".sol-wrap") || area;
-wrap.appendChild(luaCard);
+    // insira o card dentro do container principal do clima
+    const wrap = area.querySelector(".sol-wrap") || area;
+    wrap.appendChild(luaCard);
 
 
-// calcula e desenha a Lua
-const fase = obterFaseLua(new Date());
-const iluminacaoPct = Math.round(
-  fase.fraction <= 0.5 ? fase.fraction * 2 * 100 : (1 - fase.fraction) * 2 * 100
-);
-area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
-area.querySelector("#lua-fase").textContent = `Fase: ${fase.name}`;
-area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
-;
+    // calcula e desenha a Lua
+    const fase = obterFaseLua(new Date());
+    const iluminacaoPct = Math.round(
+      fase.fraction <= 0.5 ? fase.fraction * 2 * 100 : (1 - fase.fraction) * 2 * 100
+    );
+    area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
+    area.querySelector("#lua-fase").textContent = `Fase: ${fase.name}`;
+    area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
+    ;
 
     // função interna para carregar/atualizar
     async function carregar(dateStr) {
@@ -14382,19 +14459,19 @@ area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${
         document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
 
         // === Atualiza a Lua com base em dateStr ===
-const dataLua = new Date(dateStr + "T00:00:00");
-const f = obterFaseLua(dataLua);
-const iluminacaoPctLua = Math.round(
-  f.fraction <= 0.5 ? f.fraction * 2 * 100 : (1 - f.fraction) * 2 * 100
-);
+        const dataLua = new Date(dateStr + "T00:00:00");
+        const f = obterFaseLua(dataLua);
+        const iluminacaoPctLua = Math.round(
+          f.fraction <= 0.5 ? f.fraction * 2 * 100 : (1 - f.fraction) * 2 * 100
+        );
 
-const slotLua = area.querySelector("#lua-desenho");
-if (slotLua) slotLua.innerHTML = svgLua(f.fraction, f.waxing);
+        const slotLua = area.querySelector("#lua-desenho");
+        if (slotLua) slotLua.innerHTML = svgLua(f.fraction, f.waxing);
 
-const lblFase = area.querySelector("#lua-fase");
-const lblIlum = area.querySelector("#lua-iluminacao");
-if (lblFase) lblFase.textContent = `Fase: ${f.name}`;
-if (lblIlum) lblIlum.textContent = `Iluminação aproximada: ${iluminacaoPctLua}%`;
+        const lblFase = area.querySelector("#lua-fase");
+        const lblIlum = area.querySelector("#lua-iluminacao");
+        if (lblFase) lblFase.textContent = `Fase: ${f.name}`;
+        if (lblIlum) lblIlum.textContent = `Iluminação aproximada: ${iluminacaoPctLua}%`;
 
 
         st.textContent = `✅ Horários para ${dateStr.split("-").reverse().join("/")}`;
@@ -16066,7 +16143,7 @@ function svgLua(fraction, waxing) {
     <!-- Disco iluminado -->
     <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)"/>
     ${isFull ? "" : `<circle cx="${cx + dx}" cy="${cy}" r="${R}" fill="#0c0f1a"/>`}
-    <circle cx="${cx-20}" cy="${cy-20}" r="${R*0.15}" fill="#ffffff20"/>
+    <circle cx="${cx - 20}" cy="${cy - 20}" r="${R * 0.15}" fill="#ffffff20"/>
   </svg>`;
 }
 
