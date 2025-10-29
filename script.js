@@ -3500,18 +3500,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     </div>
 
 
-    
-
-
-
-
-
-
-
-
-
-
-    
 
     <div class="imoveis-wrap">
   <!-- Painel de filtros -->
