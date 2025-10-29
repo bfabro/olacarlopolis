@@ -3403,7 +3403,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-      {
+    {
       id: "ter6",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
@@ -3415,7 +3415,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       telefone: "43 99637-2328",
       imagens: [
         "images/imoveis/pauloTobias/venda/terreno/terreno2/1.jpg",
-         "images/imoveis/pauloTobias/venda/terreno/terreno2/2.jpg",
+        "images/imoveis/pauloTobias/venda/terreno/terreno2/2.jpg",
 
       ],
 
@@ -3423,7 +3423,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     },
 
 
- {
+    {
       id: "ter7",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
@@ -3435,8 +3435,29 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       telefone: "43 99630-1627",
       imagens: [
         "images/imoveis/vitorTobia/venda/terreno/terreno1/1.jpg",
-         "images/imoveis/vitorTobia/venda/terreno/terreno1/2.jpg",
-          "images/imoveis/vitorTobia/venda/terreno/terreno1/3.jpg",
+        "images/imoveis/vitorTobia/venda/terreno/terreno1/2.jpg",
+        "images/imoveis/vitorTobia/venda/terreno/terreno1/3.jpg",
+
+
+      ],
+
+
+    },
+
+
+    {
+      id: "ter8",
+      tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      titulo: "Terreno no bairro Novo Horizonte 4",
+      descricao: "Documento Ok",
+      endereco: "Novo Horizonte 4",
+      area: "180 m² (10x18)",
+      valor: 50000,
+      telefone: "43 99975-7785",
+      imagens: [
+        "images/imoveis/fabioTobia/venda/terreno/terreno1/1.jpg",
+
 
 
       ],
@@ -7820,7 +7841,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/sorveteria/fortyshake/divulgacao/11.jpg",
             ],
             novidadesDescriptions: [
-            "",
+              "",
 
             ],
           },
