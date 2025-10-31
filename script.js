@@ -12688,10 +12688,39 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
                       name: "Funeraria Cristo Rei",
                       image: "images/informacoes/notaFalecimento/cristoRei/49.jpg",
                       date: "01/10/2025",
-                      descricaoFalecido: "",
-          
+                      descricaoFalecido: "",          
+                    },
+
+                     {
+                      name: "Funeraria Grupo Castilho",
+                      image: "images/informacoes/notaFalecimento/castilho/36.jpg",
+                      date: "21/10/2025",
+                      descricaoFalecido: "",          
                     },
           */
+
+                     {
+                      name: "Funeraria Grupo Castilho",
+                      image: "images/informacoes/notaFalecimento/castilho/37.jpg",
+                      date: "23/10/2025",
+                      descricaoFalecido: "Comunicamos o falecimento do Sr. ERNESTO RODRIGUES LOBO aos 71 anos de idade.<Br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR<Br>O sepultamento será realizado 24/10/2025 as 08:00 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",          
+                    },
+
+                      {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/49.jpg",
+                      date: "22/10/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. CLAUDIO CARMO DE SOUZA aos 60 anos. Ocorrido em Carlópolis.<br>A cerimônia de despedida terá início amanhã , às 08:00 horas no Velório Municipal de Carlópolis.<br>O sepultamento será realizado amanhã, às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos sinceros sentimentos à família e amigos neste momento de dor. 🙏",
+          
+                    },
+
+                       {
+                      name: "Funeraria Grupo Castilho",
+                      image: "images/informacoes/notaFalecimento/castilho/36.jpg",
+                      date: "21/10/2025",
+                      descricaoFalecido: "Comunicamos o falecimento do Sr. SALVADOR RODRIGUES DE CAMPOS aos 62 anos de idade.<br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR<br>O sepultamento será realizado 22/10/2025 as 10:30 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
+          
+                    },
 
           {
             name: "Funeraria Cristo Rei",
