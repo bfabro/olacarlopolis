@@ -1216,15 +1216,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "s",
-
-
-    regisdanese: "s",
-
-    passeiociclisticorotary: "s",
-    jogosaventura: "s",
-    campeonatoparanaensemotocross: "s",
     toroonagashi: "s",
     erosprado: "s",
+    bazarescoteiro:"s",
+    festivalbandasefanfarras:"s",
+    cafedamanhadosamigos:"s",
 
 
 
@@ -9708,40 +9704,21 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
 
 
           {
-            image: "images/informacoes/eventos/jogosAventura1.jpg",
-            name: "Jogos Aventura",
-            date: "20/10/2025",
-            address: "Centro de Eventos",
-
+            image: "images/informacoes/eventos/1.jpg",
+            name: "Bazar Escoteiro",
+            date: "01/11/2025",
+            address: "Praça Central", 
+            infoAdicional: "Venha conferir o Bazar do Escoteiro"
           },
 
-          {
-            image: "images/informacoes/eventos/toroonagashi.png",
-            name: "Toroonagashi",
-            date: "25/10/2025",
-            address: "Ponte interstadual Benedito Garcia Ribeiro (Carlopolis x Fartura)",
 
-
+           {
+            image: "images/informacoes/eventos/3.jpg",
+            name: "Festival Bandas e Fanfarras",
+            date: "08/11/2025",
+            address: "Ilha do Ponciano", 
+            infoAdicional: "Venha Prestigiar esse grande festival em nossa cidade"
           },
-
-          {
-            image: "images/informacoes/eventos/motocross.jpg",
-            name: "Campeonato Paranaense Motocross",
-            date: "25/10/2025",
-            address: "Ilha do Ponciano",
-            infoAdicional: "Prepare-se para um fim de semana de adrenalina e emoção!<br>Nos dias 25 e 26 de outubro, o Centro de Eventos Ilha do Ponciano será palco do Campeonato Paranaense de Motocross Sportbay!<br>Venha prestigiar e torcer pelos melhores pilotos do estado, em disputas cheias de velocidade, saltos incríveis e muita energia!<br>Não fique de fora desse grande espetáculo sobre duas rodas!",
-
-
-          },
-
-          {
-            image: "images/informacoes/eventos/jogosAventura2.jpg",
-            name: "Jogos Aventura",
-            date: "25/10/2025",
-            address: "Centro de Eventos",
-
-          },
-
 
           {
             image: "images/informacoes/eventos/erosPrado.jpg",
@@ -9751,6 +9728,18 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
             contact: "(43) 99667-4021",
             instagram: "https://www.instagram.com/clubevaledossonhos/",
             infoAdicional: "Se prepara que o riso vai ser garantido! 😂<br>Eros Prado, direto do “Pagode da Ofensa”, tá chegando no nosso palco com aquele stand up que não perdoa ninguém!<br> Adquira teu ingresso aqui: <a target='_blank' style='color:#2da6ff;' href='https://ingressosweb.com.br/shop/eros-prado/stand-up-eros-prado'>Comprar Ingresso</a>"
+          },
+
+
+
+
+           {
+            image: "images/informacoes/eventos/2.jpg",
+            name: "Cafe da manha dos amigos",
+            date: "28/03/2026",
+            address: "ROTA PR-218",            
+            instagram: "https://www.instagram.com/rotapr218/",
+            infoAdicional: "A partir do dia 28 de março, já estaremos recebendo os irmãos de estrada!<br>Durante o fim de semana, teremos passeios mototurísticos pela região Angra Doce"
           },
 
 
