@@ -12549,15 +12549,15 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
           {
             image: "images/comercios/otica/oticaVisual/perfil.jpg",
             name: "Otica Visual Center",
-            hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 12:00h",
+            hours: "Seg a Sex: 08:30h as 18:00h <br> Sab: 08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
+              seg: [{ inicio: "08:30", fim: "18:00" }],
+              ter: [{ inicio: "08:30", fim: "18:00" }],
+              qua: [{ inicio: "08:30", fim: "18:00" }],
+              qui: [{ inicio: "08:30", fim: "18:00" }],
+              sex: [{ inicio: "08:30", fim: "18:00" }],
+              sab: [{ inicio: "09:00", fim: "13:00" }],
               dom: []
             },
             address: "R. Benedito Salles, 583 - Carlópolis",
