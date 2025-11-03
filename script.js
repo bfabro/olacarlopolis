@@ -12549,7 +12549,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
           {
             image: "images/comercios/otica/oticaVisual/perfil.jpg",
             name: "Otica Visual Center",
-            hours: "Seg a Sex: 08:30h as 18:00h <br> Sab: 08:00h as 12:00h",
+            hours: "Seg a Sex: 08:30h as 18:00h <br> Sab: 09:00h as 13:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:30", fim: "18:00" }],
