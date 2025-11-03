@@ -144,6 +144,10 @@
    <!-- Adicione antes do seu script.js -->
    <!-- <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>-->
    <!-- <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />-->
+   <meta property="og:title" content="Olá Carlópolis">
+   <meta property="og:description" content="Descubra comércios, serviços e promoções em Carlópolis-PR.">
+   <meta property="og:image" content="https://www.olacarlopolis.com/images/og-image.jpg">
+   <meta property="og:url" content="https://www.olacarlopolis.com">
 
 
    <title>Bem vindo ao OLÁ Carlópolis !!!</title>
@@ -185,6 +189,14 @@
 
             <!-- <i class='bx bx-bell' ></i>-->
          </div>
+ <!--
+         <div class="navbar_content">
+            <a href="#admin" id="linkAdmin" title="Área administrativa" style="text-decoration:none; color:inherit;">
+               <i id="iconeUsuarios" class="fas fa-users" style="margin-left: 10px; cursor: pointer;"></i>
+            </a>
+            <span id="contador" style="margin-left: 10px;">0</span>
+         </div>
+-->
 
 
       </nav>
@@ -1054,7 +1066,7 @@
                         <span class="navlink">Coleta de Lixo</span>
                      </a> -->
 
-                       <a id="menuSol" href="#" class="nav_link sublink">
+                     <a id="menuSol" href="#" class="nav_link sublink">
                         <span class="navlink_icon">
                            <i style="color:#d6a913" class="fa-solid fa-sun"></i>
                         </span>
@@ -1062,7 +1074,7 @@
                      </a>
 
 
-                     
+
                      <a id="menuConsultaCEP" href="#" class="nav_link sublink">
                         <span class="navlink_icon">
                            <i style="color:#1b60d6" class="fa-solid fa-map-location-dot"></i>
@@ -1070,11 +1082,11 @@
                         <span class="navlink">Consulta CEP</span>
                      </a>
 
-                   
 
 
 
-                   
+
+
 
 
                      <a id="menuEventos" href="#" class="nav_link sublink">
@@ -1285,27 +1297,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
                   <div class="swiper-slide">
-                     <img src="images/informacoes/eventos/1.jpg" alt="Bazar Escoteiros" loading="lazy">
-                     <p>
-                        Bazar Escoteiros <br> 01/11/2025</br>
-                        <!-- Ícone de link para mais informações -->
-                        <a href="#" target="_blank" class="info-link">
-                           <i class='bx bx-link-external'></i> Mais informações
-                        </a>
-                     </p>
-                  </div>
-
-                      <div class="swiper-slide">
                      <img src="images/informacoes/eventos/3.jpg" alt="Festival Bandas e Fanfarras" loading="lazy">
                      <p>
                         Festival Bandas e Fanfarras <br> 08/11/2025</br>
@@ -1316,7 +1308,7 @@
                      </p>
                   </div>
 
-                   
+
 
 
 
@@ -1680,7 +1672,7 @@
 -->
 
 
-   <!-- -->
+   <!-- 
 
    <script>
       // Bloqueia Ctrl+U (ver código-fonte)
@@ -1708,9 +1700,16 @@
    </script>
 
      
+-->
 
-
-
+   <!-- ===== ADMIN APP (casca) ===== -->
+   <section id="page-admin" class="page" style="display:none">
+      <div class="admin-wrap">
+         <div id="admin-auth"></div>
+         <div id="admin-content" style="display:none"></div>
+      </div>
+   </section>
+   <!-- ===== /ADMIN APP ===== -->
 
 
 </body>

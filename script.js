@@ -757,7 +757,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "taticonik", "oficinadocelular", "nelsoncalhas", "gerson", "promissorseguros", "sabordaroca"
+    "oticavisualcenter", "oficinadocelular", "nelsoncalhas", "gerson", "promissorseguros", "sabordaroca"
 
   ];
 
@@ -9703,13 +9703,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
 
 
 
-          {
-            image: "images/informacoes/eventos/1.jpg",
-            name: "Bazar Escoteiro",
-            date: "01/11/2025",
-            address: "Praça Central", 
-            infoAdicional: "Venha conferir o Bazar do Escoteiro"
-          },
+        
 
 
            {
@@ -12570,6 +12564,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
             contact: "(43) 99908-1510",
             instagram: "https://www.instagram.com/oticavisualcenter.oficial/",
             novidadesImages: [
+              "images/comercios/otica/oticaVisual/divulgacao/0.jpg",
               "images/comercios/otica/oticaVisual/divulgacao/1.jpg",
               "images/comercios/otica/oticaVisual/divulgacao/2.jpg",
               "images/comercios/otica/oticaVisual/divulgacao/3.jpg",
@@ -12578,7 +12573,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
 
             ],
             novidadesDescriptions: [
-
+              "Venha realizar seu exame de vista com a Otica Visual Center",
               "Diga adeus aos reflexos e olá à visão nítida de verdade! 👋✨<Br>O tratamento Antirreflexo é aquele upgrade que transforma suas lentes — e sua rotina.<Br>👁️ Mais beleza: fotos sem brilhos e olhar sempre em destaque.<Br>💻 Mais conforto: menos cansaço com telas e luzes fortes.<Br>🚗 Mais segurança: visão noturna mais clara pra dirigir tranquilo.<Br>💪 Mais durabilidade: protege suas lentes de arranhões leves.<Br>Experimente o poder da clareza total e enxergue o mundo com outros olhos.Venha conferir nossos moveis",
               "Diga adeus aos reflexos e olá à visão nítida de verdade! 👋✨<Br>O tratamento Antirreflexo é aquele upgrade que transforma suas lentes — e sua rotina.<Br>👁️ Mais beleza: fotos sem brilhos e olhar sempre em destaque.<Br>💻 Mais conforto: menos cansaço com telas e luzes fortes.<Br>🚗 Mais segurança: visão noturna mais clara pra dirigir tranquilo.<Br>💪 Mais durabilidade: protege suas lentes de arranhões leves.<Br>Experimente o poder da clareza total e enxergue o mundo com outros olhos.Venha conferir nossos moveis",
               "Dificuldade pra enxergar de longe e de perto?<br>Você pode estar precisando de lentes multifocais.<br>Elas têm vários campos de visão em uma só lente:<br>🔹 Parte superior: visão de longe<br>🔹 Meio da lente: visão intermediária (computador, por exemplo)<br>🔹 Parte inferior: leitura e visão de perto<br>✅ Sem precisar trocar de óculos o tempo todo.<br>✅ Sem aquele “sobe e desce” do modelo bifocal.<br>✅ Com adaptação cada vez mais fácil, graças à tecnologia atual.<br>Na Ótica Visual Center, a gente te orienta sobre o melhor tipo de multifocal pra sua rotina.<br>Tem diferença entre marcas, tratamentos e modelos — e a escolha certa faz TODA a diferença.",
@@ -16253,3 +16248,272 @@ window.mostrarClimaDoDia = mostrarClimaDoDia;
 if (location.hash === "#clima-do-dia") {
   mostrarClimaDoDia();
 }
+
+
+////////////////////
+/////////////////////
+///////////////////////
+//////////////////////
+
+
+/* ====== ADMIN CASCA — MOCK AUTH + DATAPROVIDER (localStorage) ====== 
+
+// Login fake só para navegar na casca do Admin (sem backend)
+const MockAuth = {
+  getCurrentUser(){ try{ return JSON.parse(localStorage.getItem("__mock_user__")||"null"); }catch{return null} },
+  signIn(email){ const u={uid:"mock-uid",email}; localStorage.setItem("__mock_user__", JSON.stringify(u)); return u; },
+  signOut(){ localStorage.removeItem("__mock_user__"); }
+};
+
+// DataProvider: a UI do admin usa APENAS estes métodos.
+// Depois, quando for ligar no Firebase, criamos um FirebaseProvider com as MESMAS funções.
+const DataProvider = {
+  async getRoles(){ return { admin: true, estIds: { "demo-pizzaria": true } }; },
+
+  async listEstIds(){
+    const m = _load("estIdx") || {"demo-pizzaria":true};
+    _save("estIdx", m);
+    return Object.keys(m);
+  },
+
+  async getEstabelecimento(estId){
+    return _load(`est:${estId}`) || {
+      nome:"Demo Pizzaria", ramo:"comida", categoria:"pizzaria",
+      endereco:"Av. Central, 100", telefone:["(43) 9XXXX-XXXX"], whatsapp:"(43) 9XXXX-XXXX",
+      instagram:"", facebook:"", site:"", logoUrl:"", capaUrl:"", statusPlano:"ativo"
+    };
+  },
+
+  async updateEstabelecimento(estId, patch){
+    const cur = await this.getEstabelecimento(estId);
+    const novo = {...cur, ...patch, updatedAt: Date.now()};
+    _save(`est:${estId}`, novo);
+    return novo;
+  },
+
+  async uploadLogo(estId, file){
+    const url = await _fileToDataURL(file);
+    const e = await this.getEstabelecimento(estId);
+    e.logoUrl = url; _save(`est:${estId}`, e); return url;
+  },
+
+  async uploadCapa(estId, file){
+    const url = await _fileToDataURL(file);
+    const e = await this.getEstabelecimento(estId);
+    e.capaUrl = url; _save(`est:${estId}`, e); return url;
+  },
+
+  async listCardapio(estId){ return _load(`menu:${estId}`) || {}; },
+
+  async upsertItemCardapio(estId, itemId, data){
+    const map = _load(`menu:${estId}`) || {};
+    const id = itemId || _id();
+    map[id] = { ordem: map[id]?.ordem || Date.now(), ativo:true, ...map[id], ...data };
+    _save(`menu:${estId}`, map);
+    return id;
+  },
+
+  async removeItemCardapio(estId, itemId){
+    const map = _load(`menu:${estId}`) || {};
+    delete map[itemId]; _save(`menu:${estId}`, map);
+  },
+
+  async uploadFotoItemCardapio(estId, itemId, file){
+    const url = await _fileToDataURL(file);
+    const map = _load(`menu:${estId}`) || {};
+    map[itemId] = { ...(map[itemId]||{}), fotoUrl: url };
+    _save(`menu:${estId}`, map);
+    return url;
+  },
+
+  async listImoveis(estId){ return _load(`imv:${estId}`) || {}; },
+
+  async upsertImovel(estId, imovelId, data){
+    const map = _load(`imv:${estId}`) || {};
+    const id = imovelId || _id();
+    map[id] = { status:"disponível", ...map[id], ...data, updatedAt: Date.now() };
+    _save(`imv:${estId}`, map);
+    return id;
+  },
+
+  async removeImovel(estId, imovelId){
+    const map = _load(`imv:${estId}`) || {};
+    delete map[imovelId]; _save(`imv:${estId}`, map);
+  },
+
+  async uploadFotoImovel(estId, imovelId, file){
+    const url = await _fileToDataURL(file);
+    const map = _load(`imv:${estId}`) || {};
+    if(!map[imovelId]) map[imovelId] = { status:"disponível" };
+    (map[imovelId].fotos ||= {})[_id()] = url;
+    _save(`imv:${estId}`, map);
+    return url;
+  }
+};
+
+// helpers mock
+function _save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+function _load(k){ try{ return JSON.parse(localStorage.getItem(k)||"null"); }catch{return null} }
+function _id(){ return Math.random().toString(36).slice(2,9); }
+function _fileToDataURL(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
+  });
+}
+
+
+/* ====== ADMIN CASCA — ROUTER + UI ====== 
+
+// Roteia #admin sem encostar no seu router principal
+window.addEventListener("hashchange", () => { if (location.hash === "#admin") renderAdminCasca(); });
+document.addEventListener("DOMContentLoaded", () => { if (location.hash === "#admin") renderAdminCasca(); });
+
+function renderAdminCasca(){
+  const page = document.querySelector("#page-admin");
+  if(!page) return; // se não colou o HTML ainda
+  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+  page.style.display = "block";
+
+  const authBox = document.querySelector("#admin-auth");
+  const content = document.querySelector("#admin-content");
+  const user = MockAuth.getCurrentUser();
+
+  if (!user){
+    authBox.innerHTML = _loginHTML();
+    content.style.display = "none";
+    _bindLoginForm();
+    return;
+  }
+
+  authBox.innerHTML = `
+    <div class="section">
+      <div class="toolbar">
+        <span class="small">Logado como: <b>${user.email}</b></span>
+        <button class="btn-admin" id="btnSair">Sair</button>
+      </div>
+    </div>`;
+  document.querySelector("#btnSair").onclick = () => { MockAuth.signOut(); renderAdminCasca(); };
+
+  content.style.display = "block";
+  _renderDashboard();
+}
+
+function _loginHTML(){
+  return `
+  <div class="section">
+    <h3>Acesso Administrativo (mock)</h3>
+    <div class="form-row">
+      <label>Email <input id="admEmail" type="email" placeholder="voce@exemplo.com"></label>
+    </div>
+    <div class="toolbar">
+      <button class="btn-admin" id="btnEntrar">Entrar</button>
+    </div>
+    <p class="small">* Login de rascunho sem backend (apenas para montar a UI).</p>
+  </div>`;
+}
+function _bindLoginForm(){
+  document.querySelector("#btnEntrar").onclick = ()=>{
+    const email = (document.querySelector("#admEmail").value||"").trim() || "voce@mock.com";
+    MockAuth.signIn(email);
+    renderAdminCasca();
+  };
+}
+
+async function _renderDashboard(){
+  const roles = await DataProvider.getRoles();
+  const estIds = Object.keys(roles.estIds || {});
+  const cards = await Promise.all(estIds.map(async estId=>{
+    const e = await DataProvider.getEstabelecimento(estId);
+    const acoes = [
+      `<button class="btn-admin" data-est="${estId}" data-op="perfil">Perfil</button>`,
+      ...(e.ramo==="comida" ? [`<button class="btn-admin" data-est="${estId}" data-op="cardapio">Cardápio</button>`] : []),
+      ...(e.ramo==="imobiliaria" ? [`<button class="btn-admin" data-est="${estId}" data-op="imoveis">Imóveis</button>`] : []),
+      `<button class="btn-admin" data-est="${estId}" data-op="midia">Mídia</button>`
+    ].join("");
+    return `
+      <div class="card-est">
+        <img src="${e.capaUrl || e.logoUrl || ''}" alt="">
+        <h3>${e.nome || estId}</h3>
+        <p class="small">${e.endereco || ""}</p>
+        <div class="acoes">${acoes}</div>
+      </div>`;
+  }));
+
+  document.querySelector("#admin-content").innerHTML = `
+    <h2 class="highlighted">Painel do Estabelecimento</h2>
+    <div class="admin-grid">${cards.join("")}</div>
+    <div id="admin-modal"></div>
+  `;
+
+  document.querySelectorAll(".btn-admin").forEach(b=>{
+    const op=b.dataset.op; const est=b.dataset.est;
+    if(op==="perfil") b.onclick=()=> _uiPerfil(est);
+    if(op==="cardapio") b.onclick=()=> _uiCardapio(est);
+    if(op==="imoveis") b.onclick=()=> _uiImoveis(est);
+    if(op==="midia") b.onclick=()=> _uiMidia(est);
+  });
+}
+
+function _showModal(html){ document.querySelector("#admin-modal").innerHTML = `<div class="section">${html}</div>`; window.scrollTo({top:0,behavior:"smooth"}); }
+function _closeModal(){ document.querySelector("#admin-modal").innerHTML = ""; }
+
+// ===== PERFIL (exemplo; depois ajustamos Cardápio/Imóveis/Mídia) =====
+async function _uiPerfil(estId){
+  const e = await DataProvider.getEstabelecimento(estId);
+  _showModal(`
+    <h3>Perfil — ${e.nome||estId}</h3>
+    <div class="form-row">
+      <label>Nome <input id="fNome" value="${e.nome||""}"></label>
+      <label>Ramo
+        <select id="fRamo">
+          <option value="">Selecione</option>
+          <option value="comida" ${e.ramo==="comida"?"selected":""}>Comida</option>
+          <option value="imobiliaria" ${e.ramo==="imobiliaria"?"selected":""}>Imobiliária</option>
+          <option value="servico" ${e.ramo==="servico"?"selected":""}>Serviço</option>
+        </select>
+      </label>
+      <label>Categoria <input id="fCategoria" value="${e.categoria||""}" placeholder="pizzaria, lanchonete..."></label>
+    </div>
+    <div class="form-row">
+      <label>Endereço <input id="fEnd" value="${e.endereco||""}"></label>
+      <label>WhatsApp <input id="fZap" value="${e.whatsapp||""}"></label>
+      <label>Telefone(s) (vírgula) <input id="fFones" value="${(e.telefone||[]).join(", ")}"></label>
+    </div>
+    <div class="form-row">
+      <label>Instagram <input id="fInsta" value="${e.instagram||""}"></label>
+      <label>Facebook <input id="fFace" value="${e.facebook||""}"></label>
+      <label>Site <input id="fSite" value="${e.site||""}"></label>
+    </div>
+    <div class="form-row">
+      <label>Logo <input id="fLogo" type="file" accept="image/*"></label>
+      <label>Capa <input id="fCapa" type="file" accept="image/*"></label>
+    </div>
+    <div class="toolbar">
+      <button class="btn-admin" id="btnSalvarPerfil">Salvar (rascunho)</button>
+      <button class="btn-admin" id="btnFecharPerfil">Fechar</button>
+    </div>
+  `);
+  document.querySelector("#btnFecharPerfil").onclick = _closeModal;
+  document.querySelector("#btnSalvarPerfil").onclick = async ()=>{
+    const patch = {
+      nome: _val("#fNome"), ramo: _val("#fRamo"), categoria: _val("#fCategoria"),
+      endereco: _val("#fEnd"), whatsapp: _val("#fZap"),
+      telefone: _val("#fFones").split(",").map(s=>s.trim()).filter(Boolean),
+      instagram: _val("#fInsta"), facebook: _val("#fFace"), site: _val("#fSite")
+    };
+    const lf = document.querySelector("#fLogo").files[0]; if(lf) patch.logoUrl = await DataProvider.uploadLogo(estId, lf);
+    const cf = document.querySelector("#fCapa").files[0]; if(cf) patch.capaUrl = await DataProvider.uploadCapa(estId, cf);
+    await DataProvider.updateEstabelecimento(estId, patch);
+    alert("Perfil salvo (mock) ✅");
+    _closeModal(); _renderDashboard();
+  };
+}
+
+// Placeholders (a gente completa depois, se quiser já te mando prontos)
+function _uiCardapio(estId){ _showModal(`<h3>Cardápio — ${estId}</h3><p class="small">Casca pronta. Quer que eu já cole o CRUD mock aqui?</p><div class="toolbar"><button class="btn-admin" onclick="_closeModal()">Fechar</button></div>`); }
+function _uiImoveis(estId){ _showModal(`<h3>Imóveis — ${estId}</h3><p class="small">Casca pronta. Quer que eu já cole o CRUD mock aqui?</p><div class="toolbar"><button class="btn-admin" onclick="_closeModal()">Fechar</button></div>`); }
+function _uiMidia(estId){ _showModal(`<h3>Mídia — ${estId}</h3><p class="small">Casca pronta. Upload mock pode vir aqui.</p><div class="toolbar"><button class="btn-admin" onclick="_closeModal()">Fechar</button></div>`); }
+
+function _val(s){ return (document.querySelector(s)?.value || "").trim(); }
+
+*/
