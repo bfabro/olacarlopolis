@@ -5730,7 +5730,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
                 precoAntigo: 110.00,
                 unidade: "A UNIDADE",
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/1.jpg",
-                validadeFim: "2025-10-30",
+                validadeFim: "2025-11-30",
                 obs: "Oferta válida até durar o estoque"
               },
 
@@ -5743,7 +5743,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
                 preco: 20.00,
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
                 // validade: "2025-09-28"
-                validadeFim: "2025-10-15"
+                validadeFim: "2025-11-15"
               },
 
               {
@@ -5755,7 +5755,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
                 preco: 20.00,
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/3.jpg",
                 // validade: "2025-09-28"
-                validadeFim: "2025-10-15"
+                validadeFim: "2025-11-15"
               }
             ]
           },
@@ -6025,7 +6025,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
                 precoAntigo: 20.00,
                 preco: 15.00,
                 unidade: "A UNIDADE",
-                validadeFim: "2025-10-30",
+                validadeFim: "2025-11-30",
                 obs: "Oferta válida até durar o estoque",
 
               },
@@ -11769,7 +11769,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
                 precoAntigo: 24.00,
                 preco: 19.50,
                 unidade: "A UNIDADE",
-                validadeFim: "2025-10-30",
+                validadeFim: "2025-11-30",
                 obs: "Oferta válida até durar o estoque",
 
               },
