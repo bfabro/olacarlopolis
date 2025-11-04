@@ -10669,7 +10669,8 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
               dom: []
             },
             address: "Rua Bauínea,79 - Carlópolis",
-            contact: "(43) 3566-1932",
+            contact:" (43) 99157-5835",
+            contact2: "(43) 3566-1932",
 
           },
         ],
