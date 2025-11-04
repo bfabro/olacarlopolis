@@ -940,7 +940,7 @@ document.addEventListener("DOMContentLoaded", function () {
     masterfarma: "s",
     popularmais: "s",
     santamaria: "s",
-    saudefarma: "s",
+    saudefarma: "n",
     popular: "s",
     biofarma: "s",
     farmaciadavila: "s",
@@ -8937,15 +8937,15 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
             image: "images/comercios/farmacia/farmais/farmais.png",
             name: "FarMais",
             address: "R. Benedito Salles, 979 - Carlopolis",
-            hours: "Seg a Sex: 08:00h as 19:00h </br> Sab: 08:00h as 12:00h",
+            hours: "Dom a Dom: 08:00h as 22:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "08:00", fim: "19:00" }],
-              ter: [{ inicio: "08:00", fim: "19:00" }],
-              qua: [{ inicio: "08:00", fim: "19:00" }],
-              qui: [{ inicio: "08:00", fim: "19:00" }],
-              sex: [{ inicio: "08:00", fim: "19:00" }],
-              sab: [{ inicio: "08:00", fim: "12:00" }],
+              seg: [{ inicio: "08:00", fim: "22:00" }],
+              ter: [{ inicio: "08:00", fim: "22:00" }],
+              qua: [{ inicio: "08:00", fim: "22:00" }],
+              qui: [{ inicio: "08:00", fim: "22:00" }],
+              sex: [{ inicio: "08:00", fim: "22:00" }],
+              sab: [{ inicio: "08:00", fim: "22:00" }],
               dom: []
             },
             contact: "(43) 3566-1211",
@@ -9093,42 +9093,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
             ],
           },
 
-          {
-            image: "images/comercios/farmacia/saudeFarma/saudeFarma.png",
-            name: "Saude Farma",
-            address: "Rua Benedito Salles, 951 - Carlopolis",
-            hours: "Dom a Dom: 08:00h as 22:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "08:00", fim: "22:00" }],
-              ter: [{ inicio: "08:00", fim: "22:00" }],
-              qua: [{ inicio: "08:00", fim: "22:00" }],
-              qui: [{ inicio: "08:00", fim: "22:00" }],
-              sex: [{ inicio: "08:00", fim: "22:00" }],
-              sab: [{ inicio: "08:00", fim: "22:00" }],
-              dom: [{ inicio: "08:00", fim: "22:00" }]
-            },
-            contact: "(43) 99956-8938",
-            delivery: "Sim / Sem Taxa",
-            facebook: "https://www.facebook.com/share/1BrGP14Pbc/",
-            instagram: "https://www.instagram.com/saudefarmacarlopolis/",
-
-            novidadesImages: [
-              "images/comercios/farmacia/saudeFarma/divulgacao/2.jpg",
-              "images/comercios/farmacia/saudeFarma/divulgacao/1.jpg",
-
-              "images/comercios/farmacia/saudeFarma/divulgacao/3.jpg",
-
-            ],
-            novidadesDescriptions: [
-              "Esses são alguns dos sinais que sua pressão pode estar alta, é importante ficar atento nesse checklisk!",
-              "Faça o aferimento de glicemia e pressão aqui conosco!",
-
-              "Fraudas e lenço do Scooby doo você encontra na Saúde Farma, venha conferir!",
-
-
-            ],
-          },
+          
         ],
       },
 
