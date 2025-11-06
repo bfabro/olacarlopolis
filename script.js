@@ -1222,6 +1222,8 @@ document.addEventListener("DOMContentLoaded", function () {
     festivalbandasefanfarras: "s",
     cafedamanhadosamigos: "s",
 
+    campeonatoeliteredai:"s",
+
 
 
     /// FIM EVENTOS 
@@ -9765,6 +9767,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             infoAdicional: "Se prepara que o riso vai ser garantido! 😂<br>Eros Prado, direto do “Pagode da Ofensa”, tá chegando no nosso palco com aquele stand up que não perdoa ninguém!<br> Adquira teu ingresso aqui: <a target='_blank' style='color:#2da6ff;' href='https://ingressosweb.com.br/shop/eros-prado/stand-up-eros-prado'>Comprar Ingresso</a>"
           },
 
+          {
+            image: "images/informacoes/eventos/4.jpg",
+            name: "Campeonato Elite Redai",
+            date: "12/12/2025",
+            address: "Represa de Chavantes",
+            contact:"(43) 99177-5226",
+            instagram: "https://www.instagram.com/p/DQrRkEkgCno/",
+            infoAdicional: "Prova individual, 3 dias de competição, maior visibilidade com a transmissão ao vivo e muita grana aos campeões!<br>Entre em contato e faça sua inscrição!"
+          },
+
 
 
 
@@ -16225,7 +16237,6 @@ function obterFaseLua(date = new Date()) {
 }
 
 /* 2) Gera o SVG da Lua conforme a fração iluminada */
-// SUBSTITUA a função svgLua atual por esta:
 function svgLua(fraction, waxing) {
   // f cresce até a Cheia e depois volta (0..1..0)
   const f = fraction <= 0.5 ? fraction * 2 : (1 - fraction) * 2; // 0..1..0
@@ -16236,8 +16247,7 @@ function svgLua(fraction, waxing) {
   const offset = (1 - f) * R;
   const dx = waxing ? -offset : offset;
 
-  // ⚠️ Se estiver praticamente Cheia, NÃO desenha a sombra
-  // (evita escurecer o disco quando offset ~ 0)
+  // Se estiver praticamente Cheia, NÃO desenha a sombra
   const isFull = offset < 0.5; // tolerância ~0.5px
 
   return `
@@ -16255,6 +16265,7 @@ function svgLua(fraction, waxing) {
     <circle cx="${cx - 20}" cy="${cy - 20}" r="${R * 0.15}" fill="#ffffff20"/>
   </svg>`;
 }
+
 
 
 /* 3) Monta a página dinâmica dentro de .content_area (mesmo padrão das outras) */
