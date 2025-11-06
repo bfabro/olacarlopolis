@@ -757,7 +757,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "oticavisualcenter", "oficinadocelular", "nelsoncalhas", "gerson", "promissorseguros", "sabordaroca"
+    "oticavisualcenter", "veronicakataoka", "vania", "mhpiscinas", "sereia", "oficinadocelular"
 
   ];
 
@@ -12735,6 +12735,26 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                       descricaoFalecido: "",          
                     },
           */
+
+
+
+{
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/51.jpg",
+                      date: "02/10/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. NADIR MARIA FERNANDES DA SILVA, aos 88 anos, ocorrido em Jacarezinho.<br>O velório será realizado hoje á partir das 19:30 horas no velório municipal<br>A cerimônia do sepultamento ocorrerá amanhã às 11:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+
+                    {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/50.jpg",
+                      date: "02/11/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Anjo RODRIGO DE FARIAS, aos 40 anos. Ocorrido em Carlópolis.<br>A cerimônia de despedida terá início hoje às 16:30 horas no Velório Municipal de Carlópolis.<br>O sepultamento será realizado amanhã, às 09:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos sinceros sentimentos à família e amigos neste momento de dor. 🙏",          
+                    },
+
+
+
 
           {
             name: "Funeraria Grupo Castilho",
