@@ -14270,7 +14270,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
-    if (location.hash === "#climaDoDia") { mostrarSol(); }
+   if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
 
 
 
@@ -14519,11 +14519,17 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     // após area.innerHTML = `...` em mostrarSol()
     const luaCard = document.createElement("div");
     luaCard.className = "lua-card";
-    luaCard.innerHTML = `
+luaCard.innerHTML = `
   <div id="lua-desenho" class="lua-img" aria-hidden="true"></div>
   <p id="lua-fase" class="lua-fase">Carregando fase da Lua...</p>
   <p id="lua-iluminacao" class="lua-iluminacao"></p>
+  <hr style="border-color:#223;opacity:.35;margin:10px 0">
+  <div style="font-weight:700;margin-bottom:6px;">🌠 Meteoros</div>
+  <p id="meteor-prob" class="lua-fase">Calculando...</p>
+  <p id="meteor-det" class="lua-iluminacao"></p>
 `;
+
+
 
     // insira o card dentro do container principal do clima
     const wrap = area.querySelector(".sol-wrap") || area;
@@ -14538,7 +14544,10 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
     area.querySelector("#lua-fase").textContent = `Fase: ${fase.name}`;
     area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
-    ;
+    const met0 = calcularProbMeteoros(new Date(), fase.fraction);
+area.querySelector("#meteor-prob").textContent = `Probabilidade: ${met0.classe} (${met0.score}%)`;
+area.querySelector("#meteor-det").textContent  = met0.detalhe + " • Obs.: sem nuvens/seeing";
+    
 
     // função interna para carregar/atualizar
     async function carregar(dateStr) {
@@ -14571,6 +14580,14 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
         const lblIlum = area.querySelector("#lua-iluminacao");
         if (lblFase) lblFase.textContent = `Fase: ${f.name}`;
         if (lblIlum) lblIlum.textContent = `Iluminação aproximada: ${iluminacaoPctLua}%`;
+
+        // === Meteoros para a data escolhida ===
+const met = calcularProbMeteoros(dataLua, f.fraction);
+const mProb = area.querySelector("#meteor-prob");
+const mDet  = area.querySelector("#meteor-det");
+if (mProb) mProb.textContent = `Probabilidade: ${met.classe} (${met.score}%)`;
+if (mDet)  mDet.textContent  = met.detalhe + " • Obs.: sem nuvens/seeing";
+
 
 
         st.textContent = `✅ Horários para ${dateStr.split("-").reverse().join("/")}`;
@@ -16237,38 +16254,150 @@ function obterFaseLua(date = new Date()) {
 }
 
 /* 2) Gera o SVG da Lua conforme a fração iluminada */
+// 2) Gera o SVG da Lua conforme a fração iluminada (corrigido)
+// 2) Gera o SVG da Lua conforme a fração iluminada — versão final
 function svgLua(fraction, waxing) {
-  // f cresce até a Cheia e depois volta (0..1..0)
-  const f = fraction <= 0.5 ? fraction * 2 : (1 - fraction) * 2; // 0..1..0
-  const R = 60;
+  // f sobe até 1 (Cheia) e volta para 0 (Nova): 0..1..0
+  const f = fraction <= 0.5 ? fraction * 2 : (1 - fraction) * 2; 
+  const R  = 60;
   const cx = 70, cy = 70;
 
-  // deslocamento da sombra; quanto mais perto da Cheia, menor o offset
-  const offset = (1 - f) * R;
-  const dx = waxing ? -offset : offset;
+  // Casos especiais para “calendário”
+  const isNova  = (fraction <= 0.02) || (fraction >= 0.98);
+  const isCheia = (fraction >= 0.48 && fraction <= 0.52); // tolerância mais larga
 
-  // Se estiver praticamente Cheia, NÃO desenha a sombra
-  const isFull = offset < 0.5; // tolerância ~0.5px
+  // Base escura (céu)
+  const baseDark = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#0c0f1a"/>`;
+
+  if (isNova) {
+    // Lua nova: só o disco escuro
+    return `
+      <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Lua Nova">
+        ${baseDark}
+      </svg>`;
+  }
+
+  if (isCheia) {
+    // Lua cheia: sem sombra nenhuma
+    return `
+      <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Lua Cheia">
+        <defs>
+          <radialGradient id="g" cx="50%" cy="45%">
+            <stop offset="0%"  stop-color="#e8e8ea"/>
+            <stop offset="70%" stop-color="#cfcfd4"/>
+            <stop offset="100%" stop-color="#bdbdc4"/>
+          </radialGradient>
+        </defs>
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)"/>
+        <circle cx="${cx - 20}" cy="${cy - 20}" r="${R * 0.15}" fill="#ffffff20"/>
+      </svg>`;
+  }
+
+  // Demais fases: desenha “sombra” com orientação do hemisfério sul
+  const offset = (1 - f) * R;
+  const dx = waxing ? -offset : offset; // crescente: sombra p/ direita (iluminado à esquerda)
+
+  // Se o brilho já está MUITO alto (quase cheia), não desenha a sombra
+  const sumirSombra = f >= 0.98;
 
   return `
-  <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Fase da Lua">
-    <defs>
-      <radialGradient id="g" cx="50%" cy="45%">
-        <stop offset="0%" stop-color="#e8e8ea"/>
-        <stop offset="70%" stop-color="#cfcfd4"/>
-        <stop offset="100%" stop-color="#bdbdc4"/>
-      </radialGradient>
-    </defs>
-    <!-- Disco iluminado -->
-    <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)"/>
-    ${isFull ? "" : `<circle cx="${cx + dx}" cy="${cy}" r="${R}" fill="#0c0f1a"/>`}
-    <circle cx="${cx - 20}" cy="${cy - 20}" r="${R * 0.15}" fill="#ffffff20"/>
-  </svg>`;
+    <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Fase da Lua">
+      <defs>
+        <radialGradient id="g" cx="50%" cy="45%">
+          <stop offset="0%"  stop-color="#e8e8ea"/>
+          <stop offset="70%" stop-color="#cfcfd4"/>
+          <stop offset="100%" stop-color="#bdbdc4"/>
+        </radialGradient>
+      </defs>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)"/>
+      ${sumirSombra ? "" : `<circle cx="${cx + dx}" cy="${cy}" r="${R}" fill="#0c0f1a"/>`}
+      <circle cx="${cx - 20}" cy="${cy - 20}" r="${R * 0.15}" fill="#ffffff20"/>
+    </svg>`;
+}
+
+
+// === Utilitários: iluminação percentual e janelinhas de pico
+function iluminacaoPctDaFracao(frac) {
+  // 0..1 -> 0..100 (simétrica em torno da Cheia)
+  return Math.round(frac <= 0.5 ? frac * 2 * 100 : (1 - frac) * 2 * 100);
+}
+
+// Tabela mínima de chuvas de meteoros (valores típicos de ZHR; aproximação)
+const CHUVAS_METEOROS = [
+  { nome: "Quadrântidas",    inicio: "01-01", pico: "01-03", fim: "01-05", zhr: 110, hemisferio: "N" },
+  { nome: "Líridas",         inicio: "04-14", pico: "04-22", fim: "04-30", zhr: 18,  hemisferio: "N" },
+  { nome: "Eta Aquáridas",   inicio: "04-19", pico: "05-05", fim: "05-28", zhr: 50,  hemisferio: "S" },
+  { nome: "Delta Aquáridas", inicio: "07-12", pico: "07-29", fim: "08-23", zhr: 20,  hemisferio: "S" },
+  { nome: "Perseidas",       inicio: "07-17", pico: "08-12", fim: "08-24", zhr: 100, hemisferio: "N" },
+  { nome: "Oriônidas",       inicio: "10-02", pico: "10-21", fim: "11-07", zhr: 20,  hemisferio: "ambos" },
+  { nome: "Taurídeas",       inicio: "10-20", pico: "11-05", fim: "11-20", zhr: 10,  hemisferio: "ambos" },
+  { nome: "Leônidas",        inicio: "11-06", pico: "11-17", fim: "11-30", zhr: 15,  hemisferio: "N" },
+  { nome: "Geminidas",       inicio: "12-04", pico: "12-14", fim: "12-17", zhr: 120, hemisferio: "ambos" },
+];
+
+// Carlópolis ~ Hemisfério Sul: penaliza levemente chuvas do Norte, e favorece as do Sul
+function fatorHemisphere(chuva) {
+  if (chuva.hemisferio === "ambos") return 1.0;
+  if (chuva.hemisferio === "S")     return 1.0;
+  if (chuva.hemisferio === "N")     return 0.6; // visíveis, mas mais baixas no céu
+  return 0.9;
+}
+
+// Proximidade do pico (janela ±3 dias em torno do “pico” = 1.0; caindo até as bordas)
+function fatorProximidadeDaData(date, chuva) {
+  const y = date.getFullYear();
+  const toDate = (mmdd) => new Date(`${y}-${mmdd}T00:00:00`);
+  const di = toDate(chuva.inicio), dp = toDate(chuva.pico), df = toDate(chuva.fim);
+
+  if (date < di || date > df) return 0;
+
+  const d = (a,b) => Math.abs((a - b) / 86400000);
+  const distanciaDoPico = d(date, dp);
+  // Dentro de ±3 dias do pico: 1; depois decai linear até bordas da janela
+  if (distanciaDoPico <= 3) return 1.0;
+
+  // Atenua conforme distância ao pico e às bordas
+  const span = Math.max(d(di, dp), d(df, dp));
+  const decai = 1 - (distanciaDoPico / (span || 1));
+  return Math.max(0, Math.min(1, decai));
+}
+
+// Calcula um “score” 0–100 baseado em (ZHR normalizada) × (céu escuro) × (hemisfério) × (proximidade do pico)
+function calcularProbMeteoros(date, fracLua) {
+  const ilum = iluminacaoPctDaFracao(fracLua) / 100; // 0..1
+  const ceuEscuro = 1 - ilum;                        // 1 = escuro, 0 = claro (lua cheia)
+  let melhor = { score: 0, detalhe: "Sem chuvas relevantes hoje." };
+
+  for (const chuva of CHUVAS_METEOROS) {
+    const prox = fatorProximidadeDaData(date, chuva);
+    if (prox <= 0) continue;
+
+    const hemis = fatorHemisphere(chuva);
+    const zhrNorm = Math.min(1, chuva.zhr / 120); // 120 ~ Gemínidas como base alta
+    const score = Math.round(100 * zhrNorm * ceuEscuro * hemis * prox);
+
+    if (score > melhor.score) {
+      melhor = {
+        score,
+        detalhe: `${chuva.nome} • pico: ${chuva.pico} • céu: ${Math.round(ceuEscuro*100)}% escuro`
+      };
+    }
+  }
+
+  // Classificação textual
+  let classe = "Baixa";
+  if (melhor.score >= 65) classe = "Alta";
+  else if (melhor.score >= 35) classe = "Média";
+
+  return { score: melhor.score, classe, detalhe: melhor.detalhe };
 }
 
 
 
-/* 3) Monta a página dinâmica dentro de .content_area (mesmo padrão das outras) */
+
+
+
+/* 3) Monta a página dinâmica dentro de .content_area (mesmo padrão das outras) 
 function mostrarClimaDoDia() {
   if (location.hash !== "#clima-do-dia") location.hash = "#clima-do-dia";
 
@@ -16289,6 +16418,14 @@ function mostrarClimaDoDia() {
       </div>
       <!-- (opcional) aqui você pode injetar seus outros cards do clima/UV depois -->
     </div>
+
+
+     <div class="lua-card" id="meteor-card">
+      <div style="font-weight:700;margin-bottom:6px;">🌠 Meteoros</div>
+      <div id="meteor-prob" class="lua-fase">Calculando...</div>
+      <div id="meteor-det" class="lua-iluminacao"></div>
+    </div>
+  </div>
   `;
 
   // Calcula fase e desenha
@@ -16304,9 +16441,14 @@ function mostrarClimaDoDia() {
 
   area.querySelector("#lua-fase").textContent = `Fase: ${fase.name}`;
   area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
+
+  // === Meteoros hoje ===
+const met = calcularProbMeteoros(hoje, fase.fraction);
+area.querySelector("#meteor-prob").textContent = `Probabilidade: ${met.classe} (${met.score}%)`;
+area.querySelector("#meteor-det").textContent  = met.detalhe + " • Obs.: sem nuvens/seeing";
 }
 
-/* 4) Roteamento simples para abrir via hash */
+/* 4) Roteamento simples para abrir via hash 
 function routerClima() {
   if (location.hash === "#clima-do-dia") {
     mostrarClimaDoDia();
@@ -16321,7 +16463,7 @@ window.mostrarClimaDoDia = mostrarClimaDoDia;
 if (location.hash === "#clima-do-dia") {
   mostrarClimaDoDia();
 }
-
+*/
 
 ////////////////////
 /////////////////////

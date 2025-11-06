@@ -7771,3 +7771,5 @@ html {
 
 
 
+/* separador discreto dentro do card escuro */
+.lua-card hr { border: 0; border-top: 1px solid #243; opacity: .4; }
