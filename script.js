@@ -1218,9 +1218,9 @@ document.addEventListener("DOMContentLoaded", function () {
     feiradalua: "s",
     toroonagashi: "s",
     erosprado: "s",
-    bazarescoteiro:"s",
-    festivalbandasefanfarras:"s",
-    cafedamanhadosamigos:"s",
+    bazarescoteiro: "s",
+    festivalbandasefanfarras: "s",
+    cafedamanhadosamigos: "s",
 
 
 
@@ -1427,9 +1427,9 @@ document.addEventListener("DOMContentLoaded", function () {
     { id: "brechoAmigosPet", nome: "Brecho Amigos do Pet", descricao: "Vendas em prol de animais em risco", link: "https://chat.whatsapp.com/DW7AdwoVHIg8WfLaIqhGHa", imagem: "images/informacoes/gruposWhats/9.jpg" },
     { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/JuvQ7V58aOXBP85fvxXtjl?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/2.jpg" },
     { id: "descontofacil", nome: "Farmacia Desconto Facil", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
-     { id: "farmaciaVila", nome: "Farmacia da Vila", descricao: "Para vocês ficarem por dentro de todas as PROMOÇÕES e NOVIDADES aqui da Farmácia da Vila ❤️", link: "https://chat.whatsapp.com/DD4Q5CZVsXLGeraeSNjyhK?mode=wwt", imagem: "images/informacoes/gruposWhats/13.jpg" },
-   
-    
+    { id: "farmaciaVila", nome: "Farmacia da Vila", descricao: "Para vocês ficarem por dentro de todas as PROMOÇÕES e NOVIDADES aqui da Farmácia da Vila ❤️", link: "https://chat.whatsapp.com/DD4Q5CZVsXLGeraeSNjyhK?mode=wwt", imagem: "images/informacoes/gruposWhats/13.jpg" },
+
+
     { id: "movepar", nome: "Movepar Promoções", descricao: "Todos os dias promoções imperdíveis para renovar os moveis e eletros da sua casa!", link: "https://chat.whatsapp.com/L2hNB5RAoRhAAoWx2XrRUw?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/8.jpg" },
     { id: "noticiasclps", nome: "Noticias CLPS & REGIÃO", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/FpIvEbPjLrxHqwtcCnVp3G?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/1.jpg" },
     { id: "oficinadeXadrez", nome: "Oficina Xadrez Carlopolis", descricao: "A Oficina de Xadrez tem como objetivo ensinar fundamentos, estimular o raciocínio lógico e desenvolver habilidades estratégicas por meio da prática do jogo", link: "https://chat.whatsapp.com/HAJ1N5n0BlK2IM3J8CUbpz?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/4.jpg" },
@@ -3201,7 +3201,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       cozinhas: 1,
       area: 5000,
       construcao: 150,   // << NOVO: m² de construção
-      proprietario :"Caio Gabriel",
+      proprietario: "Caio Gabriel",
 
       quintal: "Sim",
       telefone: "43 99154-5096",  // Corretor ou propretario
@@ -3311,8 +3311,84 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+    {
+      id: "casa8v",
+      tipo: "venda",
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 3,
+      valor: 500000,
+      piscina: "Sim",
+      churrasqueira: "Sim",
+      vagas: 3,
+      corretores: ["Cesar Melo - 38.105 F"],
+      titulo: "Casa a venda mobiliada (chave na porta)",
+      descricao: "Conta com uma área de churrasqueira. Documentação Ok.",
+      endereco: "Novo Horizonte l",
+      suite: "Não",
+      banheiros: 2,
+      salas: 1,
+      cozinhas: 1,
+      area: 180,
+      construcao: 165,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa8/1.jpg",
+        "images/imoveis/cesar/venda/casa8/2.jpg",
+        "images/imoveis/cesar/venda/casa8/3.jpg",
+        "images/imoveis/cesar/venda/casa8/4.jpg",
+        "images/imoveis/cesar/venda/casa8/5.jpg",
+        "images/imoveis/cesar/venda/casa8/6.jpg",
+        "images/imoveis/cesar/venda/casa8/7.jpg",
+        "images/imoveis/cesar/venda/casa8/8.jpg",
+        "images/imoveis/cesar/venda/casa8/9.jpg",
+        "images/imoveis/cesar/venda/casa8/10.jpg",
+        "images/imoveis/cesar/venda/casa8/11.jpg",
+
+      ],
+      //lat: -23.3953,
+      //lng: -49.7232,
+
+    },
 
 
+
+    {
+      id: "casa9v",
+      procura: "casa", // ou "terreno", "rural", etc.
+      tipo: "venda",
+      titulo: "Casa moderna a venda",
+      descricao: "Documentação Ok.",
+      endereco: "Residencial Lê Blanc",
+      valor: 420000,
+      construcao: 110,          // << NOVO: m² de construção
+      area: 165,
+      banheiros: 2,
+      churrasqueira: "Sim",
+      cozinhas: 1,
+      quartos: 3,
+      quintal: "Sim",
+      piscina: "Não",
+      salas: 1,
+      suite: "sIM",
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"],
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa9/1.jpg",
+        "images/imoveis/cesar/venda/casa9/2.jpg",
+        "images/imoveis/cesar/venda/casa9/3.jpg",
+        "images/imoveis/cesar/venda/casa9/4.jpg",
+        "images/imoveis/cesar/venda/casa9/5.jpg",
+        "images/imoveis/cesar/venda/casa9/6.jpg",
+        "images/imoveis/cesar/venda/casa9/7.jpg",
+        "images/imoveis/cesar/venda/casa9/8.jpg",
+        "images/imoveis/cesar/venda/casa9/9.jpg",
+
+
+      ],
+
+    },
 
 
 
@@ -3429,7 +3505,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       area: "180 m² (10x18)",
       valor: 52000,
       telefone: "43 99637-2328",
-      proprietario:"Paulo Tobia",
+      proprietario: "Paulo Tobia",
       imagens: [
         "images/imoveis/pauloTobias/venda/terreno/terreno2/1.jpg",
         "images/imoveis/pauloTobias/venda/terreno/terreno2/2.jpg",
@@ -3449,7 +3525,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       endereco: "Novo Horizonte 3",
       area: "234 m² (13x18)",
       valor: 70000,
-      proprietario:"Vitor Tobia",
+      proprietario: "Vitor Tobia",
       telefone: "43 99630-1627",
       imagens: [
         "images/imoveis/vitorTobia/venda/terreno/terreno1/1.jpg",
@@ -3473,7 +3549,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       area: "180 m² (10x18)",
       valor: 50000,
       telefone: "43 99975-7785",
-      proprietario:"Fabio Tobia",
+      proprietario: "Fabio Tobia",
       imagens: [
         "images/imoveis/fabioTobia/venda/terreno/terreno1/1.jpg",
 
@@ -4014,10 +4090,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             const v = cur || {};
             v.whatsapp = (Number(v.whatsapp || 0) + 1);
             if (!v.titulo && im.titulo) v.titulo = im.titulo;
-            
 
-if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getCorretorPrincipal(im) : (im.corretor || ""));
-  if (!v.responsavel) v.responsavel = getResponsavelImovel(im); // <-- NOVO
+
+            if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getCorretorPrincipal(im) : (im.corretor || ""));
+            if (!v.responsavel) v.responsavel = getResponsavelImovel(im); // <-- NOVO
 
 
             return v;
@@ -4060,7 +4136,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
 
 
 
-    
+
     // --- Conecta os botões "Falar no WhatsApp" (um único listener por botão)
     el.querySelectorAll("[data-action='whats']").forEach(btn => {
       if (btn.dataset.bindWhats === "1") return; // evita rebind
@@ -4077,7 +4153,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
 
 
 
-   
+
 
 
 
@@ -9093,7 +9169,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
             ],
           },
 
-          
+
         ],
       },
 
@@ -9668,14 +9744,14 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
 
 
 
-        
 
 
-           {
+
+          {
             image: "images/informacoes/eventos/3.jpg",
             name: "Festival Bandas e Fanfarras",
             date: "08/11/2025",
-            address: "Ilha do Ponciano", 
+            address: "Ilha do Ponciano",
             infoAdicional: "Venha Prestigiar esse grande festival em nossa cidade"
           },
 
@@ -9692,11 +9768,11 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
 
 
 
-           {
+          {
             image: "images/informacoes/eventos/2.jpg",
             name: "Cafe da manha dos amigos",
             date: "28/03/2026",
-            address: "ROTA PR-218",            
+            address: "ROTA PR-218",
             instagram: "https://www.instagram.com/rotapr218/",
             infoAdicional: "A partir do dia 28 de março, já estaremos recebendo os irmãos de estrada!<br>Durante o fim de semana, teremos passeios mototurísticos pela região Angra Doce"
           },
@@ -10634,7 +10710,7 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
               dom: []
             },
             address: "Rua Bauínea,79 - Carlópolis",
-            contact:" (43) 99157-5835",
+            contact: " (43) 99157-5835",
             contact2: "(43) 3566-1932",
 
           },
@@ -12660,28 +12736,28 @@ if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getC
                     },
           */
 
-                     {
-                      name: "Funeraria Grupo Castilho",
-                      image: "images/informacoes/notaFalecimento/castilho/37.jpg",
-                      date: "23/10/2025",
-                      descricaoFalecido: "Comunicamos o falecimento do Sr. ERNESTO RODRIGUES LOBO aos 71 anos de idade.<Br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR<Br>O sepultamento será realizado 24/10/2025 as 08:00 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",          
-                    },
+          {
+            name: "Funeraria Grupo Castilho",
+            image: "images/informacoes/notaFalecimento/castilho/37.jpg",
+            date: "23/10/2025",
+            descricaoFalecido: "Comunicamos o falecimento do Sr. ERNESTO RODRIGUES LOBO aos 71 anos de idade.<Br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR<Br>O sepultamento será realizado 24/10/2025 as 08:00 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
+          },
 
-                      {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/49.jpg",
-                      date: "22/10/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. CLAUDIO CARMO DE SOUZA aos 60 anos. Ocorrido em Carlópolis.<br>A cerimônia de despedida terá início amanhã , às 08:00 horas no Velório Municipal de Carlópolis.<br>O sepultamento será realizado amanhã, às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos sinceros sentimentos à família e amigos neste momento de dor. 🙏",
-          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/49.jpg",
+            date: "22/10/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. CLAUDIO CARMO DE SOUZA aos 60 anos. Ocorrido em Carlópolis.<br>A cerimônia de despedida terá início amanhã , às 08:00 horas no Velório Municipal de Carlópolis.<br>O sepultamento será realizado amanhã, às 10:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos sinceros sentimentos à família e amigos neste momento de dor. 🙏",
 
-                       {
-                      name: "Funeraria Grupo Castilho",
-                      image: "images/informacoes/notaFalecimento/castilho/36.jpg",
-                      date: "21/10/2025",
-                      descricaoFalecido: "Comunicamos o falecimento do Sr. SALVADOR RODRIGUES DE CAMPOS aos 62 anos de idade.<br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR<br>O sepultamento será realizado 22/10/2025 as 10:30 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
-          
-                    },
+          },
+
+          {
+            name: "Funeraria Grupo Castilho",
+            image: "images/informacoes/notaFalecimento/castilho/36.jpg",
+            date: "21/10/2025",
+            descricaoFalecido: "Comunicamos o falecimento do Sr. SALVADOR RODRIGUES DE CAMPOS aos 62 anos de idade.<br>‌O velório será na CAPELA MUNICIPAL DE CARLOPOLIS - PR<br>O sepultamento será realizado 22/10/2025 as 10:30 no CEMITÉRIO MUNICIPAL DE CARLOPOLIS - PR.",
+
+          },
 
           {
             name: "Funeraria Cristo Rei",

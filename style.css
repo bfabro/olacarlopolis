@@ -7767,3 +7767,7 @@ html {
 .form-row > label { flex:1 1 240px; display:flex; flex-direction:column; gap:6px; }
 .form-row input, .form-row select, .form-row textarea { background:#0f0f0f; border:1px solid #222; color:#fff; border-radius:8px; padding:10px; }
 .small { font-size:.92rem; color:#aaa; }
+
+
+
+
