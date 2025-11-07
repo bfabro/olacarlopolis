@@ -16913,6 +16913,12 @@ function mostrarRepresaChavantes() {
 
   // Carrega os dados ao abrir a página
   carregarDadosRepresa();
+
+  // e, no botão "Atualizar Dados", mantenha:
+document.addEventListener('click', (ev) => {
+  const t = ev.target.closest('.btn-refresh');
+  if (t) carregarDadosRepresa();
+});
   
   // Atualização automática a cada 5 minutos
   if (window.represaInterval) clearInterval(window.represaInterval);
