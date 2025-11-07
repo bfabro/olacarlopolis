@@ -1222,7 +1222,7 @@ document.addEventListener("DOMContentLoaded", function () {
     festivalbandasefanfarras: "s",
     cafedamanhadosamigos: "s",
 
-    campeonatoeliteredai:"s",
+    campeonatoeliteredai: "s",
 
 
 
@@ -9772,7 +9772,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Campeonato Elite Redai",
             date: "12/12/2025",
             address: "Represa de Chavantes",
-            contact:"(43) 99177-5226",
+            contact: "(43) 99177-5226",
             instagram: "https://www.instagram.com/p/DQrRkEkgCno/",
             infoAdicional: "Prova individual, 3 dias de competição, maior visibilidade com a transmissão ao vivo e muita grana aos campeões!<br>Entre em contato e faça sua inscrição!"
           },
@@ -12750,20 +12750,20 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-{
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/51.jpg",
-                      date: "02/10/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. NADIR MARIA FERNANDES DA SILVA, aos 88 anos, ocorrido em Jacarezinho.<br>O velório será realizado hoje á partir das 19:30 horas no velório municipal<br>A cerimônia do sepultamento ocorrerá amanhã às 11:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/51.jpg",
+            date: "02/10/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. NADIR MARIA FERNANDES DA SILVA, aos 88 anos, ocorrido em Jacarezinho.<br>O velório será realizado hoje á partir das 19:30 horas no velório municipal<br>A cerimônia do sepultamento ocorrerá amanhã às 11:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
 
-                    {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/50.jpg",
-                      date: "02/11/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Anjo RODRIGO DE FARIAS, aos 40 anos. Ocorrido em Carlópolis.<br>A cerimônia de despedida terá início hoje às 16:30 horas no Velório Municipal de Carlópolis.<br>O sepultamento será realizado amanhã, às 09:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos sinceros sentimentos à família e amigos neste momento de dor. 🙏",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/50.jpg",
+            date: "02/11/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Anjo RODRIGO DE FARIAS, aos 40 anos. Ocorrido em Carlópolis.<br>A cerimônia de despedida terá início hoje às 16:30 horas no Velório Municipal de Carlópolis.<br>O sepultamento será realizado amanhã, às 09:00 horas no Cemitério Municipal de Carlópolis.<br>Nossos sinceros sentimentos à família e amigos neste momento de dor. 🙏",
+          },
 
 
 
@@ -14270,7 +14270,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
-   if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
+    if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
 
 
 
@@ -14515,11 +14515,11 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
 
-    // após area.innerHTML = `...` em mostrarSol()
+
     // após area.innerHTML = `...` em mostrarSol()
     const luaCard = document.createElement("div");
     luaCard.className = "lua-card";
-luaCard.innerHTML = `
+    luaCard.innerHTML = `
   <div id="lua-desenho" class="lua-img" aria-hidden="true"></div>
   <p id="lua-fase" class="lua-fase">Carregando fase da Lua...</p>
   <p id="lua-iluminacao" class="lua-iluminacao"></p>
@@ -14529,73 +14529,58 @@ luaCard.innerHTML = `
   <p id="meteor-det" class="lua-iluminacao"></p>
 `;
 
+(area.querySelector(".sol-wrap") || area).appendChild(luaCard);
 
+  const fase = obterFaseLua(new Date());
+const iluminacaoPct = Math.round((1 - Math.cos(2 * Math.PI * fase.fraction)) * 50);
 
-    // insira o card dentro do container principal do clima
-    const wrap = area.querySelector(".sol-wrap") || area;
-    wrap.appendChild(luaCard);
+area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
+area.querySelector("#lua-fase").textContent = `Fase: ${rotuloFaseParaExibicao(fase.fraction, fase.name)}`;
+area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
 
-
-    // calcula e desenha a Lua
-    const fase = obterFaseLua(new Date());
-    const iluminacaoPct = Math.round(
-      fase.fraction <= 0.5 ? fase.fraction * 2 * 100 : (1 - fase.fraction) * 2 * 100
-    );
-    area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
-    area.querySelector("#lua-fase").textContent = `Fase: ${fase.name}`;
-    area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
-    const met0 = calcularProbMeteoros(new Date(), fase.fraction);
+const met0 = calcularProbMeteoros(new Date(), fase.fraction);
 area.querySelector("#meteor-prob").textContent = `Probabilidade: ${met0.classe} (${met0.score}%)`;
-area.querySelector("#meteor-det").textContent  = met0.detalhe + " • Obs.: sem nuvens/seeing";
-    
+area.querySelector("#meteor-det").textContent = met0.detalhe + " • Obs.: sem nuvens/seeing";
+
 
     // função interna para carregar/atualizar
-    async function carregar(dateStr) {
-      const st = document.getElementById("solStatus");
-      try {
-        st.textContent = "⏳ Carregando horários...";
-        const res = await buscarSol(dateStr);
-        document.getElementById("solSunrise").textContent = toHoraMinBR(res.sunrise);
-        document.getElementById("solSunset").textContent = toHoraMinBR(res.sunset);
-        document.getElementById("solNoon").textContent = toHoraMinBR(res.solar_noon);
-        document.getElementById("solDuracao").textContent = duracaoHumana(res.day_length);
-        // depois de preencher os horários do sol...
-        const tempo = await buscarTempo(dateStr);
-        document.getElementById("wxMax").textContent = (tempo.tmax ?? "--") + "°C";
-        document.getElementById("wxMin").textContent = (tempo.tmin ?? "--") + "°C";
-        document.getElementById("wxWind").textContent = (tempo.wind ?? "--") + " km/h";
-        document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
+    // Dentro de mostrarSol(...), na função interna carregar(dateStr)
+async function carregar(dateStr) {
+  const st = document.getElementById("solStatus");
+  try {
+    st.textContent = "⏳ Carregando horários...";
+    const res = await buscarSol(dateStr);
+    document.getElementById("solSunrise").textContent = toHoraMinBR(res.sunrise);
+    document.getElementById("solSunset").textContent = toHoraMinBR(res.sunset);
+    document.getElementById("solNoon").textContent    = toHoraMinBR(res.solar_noon);
+    document.getElementById("solDuracao").textContent = duracaoHumana(res.day_length);
 
-        // === Atualiza a Lua com base em dateStr ===
-        const dataLua = new Date(dateStr + "T00:00:00");
-        const f = obterFaseLua(dataLua);
-        const iluminacaoPctLua = Math.round(
-          f.fraction <= 0.5 ? f.fraction * 2 * 100 : (1 - f.fraction) * 2 * 100
-        );
+    const tempo = await buscarTempo(dateStr);
+    document.getElementById("wxMax").textContent  = (tempo.tmax  ?? "--") + "°C";
+    document.getElementById("wxMin").textContent  = (tempo.tmin  ?? "--") + "°C";
+    document.getElementById("wxWind").textContent = (tempo.wind  ?? "--") + " km/h";
+    document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
 
-        const slotLua = area.querySelector("#lua-desenho");
-        if (slotLua) slotLua.innerHTML = svgLua(f.fraction, f.waxing);
+    // === Lua na DATA SELECIONADA ===
+    const dataLua = new Date(dateStr + "T12:00:00"); // meio-dia evita trocas por fuso
+    const f = obterFaseLua(dataLua);
+  const iluminacaoPctLua = Math.round((1 - Math.cos(2 * Math.PI * f.fraction)) * 50);
 
-        const lblFase = area.querySelector("#lua-fase");
-        const lblIlum = area.querySelector("#lua-iluminacao");
-        if (lblFase) lblFase.textContent = `Fase: ${f.name}`;
-        if (lblIlum) lblIlum.textContent = `Iluminação aproximada: ${iluminacaoPctLua}%`;
+    const slotLua = document.querySelector("#lua-desenho");
+    if (slotLua) slotLua.innerHTML = svgLua(f.fraction, f.waxing);
 
-        // === Meteoros para a data escolhida ===
-const met = calcularProbMeteoros(dataLua, f.fraction);
-const mProb = area.querySelector("#meteor-prob");
-const mDet  = area.querySelector("#meteor-det");
-if (mProb) mProb.textContent = `Probabilidade: ${met.classe} (${met.score}%)`;
-if (mDet)  mDet.textContent  = met.detalhe + " • Obs.: sem nuvens/seeing";
+    const lblFase = document.querySelector("#lua-fase");
+    const lblIlum = document.querySelector("#lua-iluminacao");
+    if (lblFase) lblFase.textContent = `Fase: ${rotuloFaseParaExibicao(f.fraction, f.name)}`;
+    if (lblIlum) lblIlum.textContent = `Iluminação aproximada: ${iluminacaoPctLua}%`;
+  } catch (e) {
+    st.textContent = "⚠️ Não foi possível carregar os dados.";
+  }
+}
 
 
 
-        st.textContent = `✅ Horários para ${dateStr.split("-").reverse().join("/")}`;
-      } catch (e) {
-        console.error(e);
-        st.textContent = "⚠️ Não foi possível carregar os horários. Tente novamente.";
-      }
-    }
+
 
     // listeners
     const inp = document.getElementById("solData");
@@ -16221,23 +16206,22 @@ document.addEventListener("DOMContentLoaded", () => {
 /* 1) Função de fase da Lua (aproximação robusta, erro típico < ~1 dia)
    Retorna: { fraction: 0..1 (0=nova, 0.5=cheia), waxing: true/false, name: "..." }
 */
+
+// 1) Cálculo da fase (0..1) com nomes humanizados
 function obterFaseLua(date = new Date()) {
-  // Algoritmo baseado em aproximação de período sinódico
-  // Referência geral: período sinódico ~29.530588861 dias
   const msDia = 86400000;
   const data = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const jd = Math.floor(data.getTime() / msDia) + 2440587.5; // Julian Day aproximado
+  const jd = Math.floor(data.getTime() / msDia) + 2440587.5; // Julian Day
 
-  // Época de Lua Nova de referência (2000-01-06 18:14 UT) ~ JD 2451550.1
-  const epoch = 2451550.1;
-  const periodo = 29.530588861;
+  const epoch = 2451550.1;        // 2000-01-06 18:14 UT
+  const periodo = 29.530588861;   // período sinódico
 
   let dias = jd - epoch;
   dias = dias % periodo;
   if (dias < 0) dias += periodo;
 
-  const fraction = dias / periodo;              // [0..1]
-  const waxing = fraction < 0.5;                // antes da cheia = crescente
+  const fraction = dias / periodo;         // [0..1]
+  const waxing = fraction < 0.5;           // crescente antes da cheia
   const nome = (function (f) {
     if (f < 0.03 || f > 0.97) return "Lua Nova";
     if (f < 0.22) return "Crescente Inicial";
@@ -16253,67 +16237,91 @@ function obterFaseLua(date = new Date()) {
   return { fraction, waxing, name: nome };
 }
 
-/* 2) Gera o SVG da Lua conforme a fração iluminada */
-// 2) Gera o SVG da Lua conforme a fração iluminada (corrigido)
-// 2) Gera o SVG da Lua conforme a fração iluminada — versão final
+
+
+
+// 👇 colocar logo depois de obterFaseLua(...)
+// 2) Rótulo humanizado
+function rotuloFaseParaExibicao(fraction, nomeBasico) {
+  const f = Number(fraction);
+
+  if (f >= 0.48 && f <= 0.52) return "Lua Cheia";
+
+  if ((f >= 0.44 && f < 0.48) || (f > 0.52 && f <= 0.56)) {
+    const lado = f < 0.5 ? "gibosa crescente" : "gibosa minguante";
+    return `Quase Cheia (${lado})`;
+  }
+
+  if ((f >= 0.00 && f <= 0.06) || (f >= 0.94 && f <= 1.00)) {
+    const lado = f < 0.5 ? "crescente" : "minguante";
+    return `Quase Nova (${lado})`;
+  }
+
+  return nomeBasico;
+}
+
+
+
+
+
+// === SVG da Lua com CLIP correto e orientação do hemisfério Sul ===
+// 3) Desenho SVG com clip correto e orientação do hemisfério sul
 function svgLua(fraction, waxing) {
-  // f sobe até 1 (Cheia) e volta para 0 (Nova): 0..1..0
-  const f = fraction <= 0.5 ? fraction * 2 : (1 - fraction) * 2; 
-  const R  = 60;
-  const cx = 70, cy = 70;
+  // % de iluminação física: p = (1 - cos(2πf)) / 2  →  0..1
+  const p = (1 - Math.cos(2 * Math.PI * fraction)) / 2;
 
-  // Casos especiais para “calendário”
-  const isNova  = (fraction <= 0.02) || (fraction >= 0.98);
-  const isCheia = (fraction >= 0.48 && fraction <= 0.52); // tolerância mais larga
+  const R = 60, cx = 70, cy = 70;
 
-  // Base escura (céu)
+  const isNova  = p <= 0.02;
+  const isCheia = p >= 0.98;
+
   const baseDark = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#0c0f1a"/>`;
+  const grad = `
+    <defs>
+      <radialGradient id="g" cx="50%" cy="45%">
+        <stop offset="0%"  stop-color="#e8e8ea"/>
+        <stop offset="70%" stop-color="#cfcfd4"/>
+        <stop offset="100%" stop-color="#bdbdc4"/>
+      </radialGradient>
+    </defs>`;
 
   if (isNova) {
-    // Lua nova: só o disco escuro
-    return `
-      <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Lua Nova">
-        ${baseDark}
-      </svg>`;
+    return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Lua Nova">
+      ${baseDark}
+    </svg>`;
   }
 
   if (isCheia) {
-    // Lua cheia: sem sombra nenhuma
-    return `
-      <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Lua Cheia">
-        <defs>
-          <radialGradient id="g" cx="50%" cy="45%">
-            <stop offset="0%"  stop-color="#e8e8ea"/>
-            <stop offset="70%" stop-color="#cfcfd4"/>
-            <stop offset="100%" stop-color="#bdbdc4"/>
-          </radialGradient>
-        </defs>
-        <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)"/>
-        <circle cx="${cx - 20}" cy="${cy - 20}" r="${R * 0.15}" fill="#ffffff20"/>
-      </svg>`;
-  }
-
-  // Demais fases: desenha “sombra” com orientação do hemisfério sul
-  const offset = (1 - f) * R;
-  const dx = waxing ? -offset : offset; // crescente: sombra p/ direita (iluminado à esquerda)
-
-  // Se o brilho já está MUITO alto (quase cheia), não desenha a sombra
-  const sumirSombra = f >= 0.98;
-
-  return `
-    <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Fase da Lua">
-      <defs>
-        <radialGradient id="g" cx="50%" cy="45%">
-          <stop offset="0%"  stop-color="#e8e8ea"/>
-          <stop offset="70%" stop-color="#cfcfd4"/>
-          <stop offset="100%" stop-color="#bdbdc4"/>
-        </radialGradient>
-      </defs>
+    return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Lua Cheia">
+      ${grad}
       <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)"/>
-      ${sumirSombra ? "" : `<circle cx="${cx + dx}" cy="${cy}" r="${R}" fill="#0c0f1a"/>`}
       <circle cx="${cx - 20}" cy="${cy - 20}" r="${R * 0.15}" fill="#ffffff20"/>
     </svg>`;
+  }
+
+  // deslocamento do "círculo de sombra" proporcional à iluminação:
+  // dx = (1 - 2p) * R  →  p=0.5 (meia-lua) dá dx=0, p→1 aproxima dx→-R, p→0 aproxima dx→+R
+  const dxMag = (1 - 2 * p) * R;
+  // Hemisfério Sul: crescente (waxing) = luz à ESQUERDA, minguante = luz à DIREITA
+  const dx = (waxing ? +1 : -1) * dxMag;
+
+  // Máscara: começa tudo visível (retângulo branco + círculo branco),
+  // e “recorta” a parte escura com um círculo preto deslocado por dx.
+  return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Fase da Lua">
+    ${grad}
+    <defs>
+      <mask id="m">
+        <rect x="0" y="0" width="140" height="140" fill="black"/>
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="white"/>
+        <circle cx="${cx + dx}" cy="${cy}" r="${R}" fill="black"/>
+      </mask>
+    </defs>
+    ${baseDark}
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)" mask="url(#m)"/>
+  </svg>`;
 }
+
+
 
 
 // === Utilitários: iluminação percentual e janelinhas de pico
@@ -16322,24 +16330,33 @@ function iluminacaoPctDaFracao(frac) {
   return Math.round(frac <= 0.5 ? frac * 2 * 100 : (1 - frac) * 2 * 100);
 }
 
+// Usa a iluminação para “suavizar” o nome mostrado ao usuário
+function rotuloFaseParaExibicao(fraction, nomeBase) {
+  const pct = iluminacaoPctDaFracao(fraction); // 0..100
+  // Se estiver com 90% ou mais, mostramos "Quase Cheia"
+  if (pct >= 90 && pct < 100) return "Quase Cheia";
+  return nomeBase;
+}
+
+
 // Tabela mínima de chuvas de meteoros (valores típicos de ZHR; aproximação)
 const CHUVAS_METEOROS = [
-  { nome: "Quadrântidas",    inicio: "01-01", pico: "01-03", fim: "01-05", zhr: 110, hemisferio: "N" },
-  { nome: "Líridas",         inicio: "04-14", pico: "04-22", fim: "04-30", zhr: 18,  hemisferio: "N" },
-  { nome: "Eta Aquáridas",   inicio: "04-19", pico: "05-05", fim: "05-28", zhr: 50,  hemisferio: "S" },
-  { nome: "Delta Aquáridas", inicio: "07-12", pico: "07-29", fim: "08-23", zhr: 20,  hemisferio: "S" },
-  { nome: "Perseidas",       inicio: "07-17", pico: "08-12", fim: "08-24", zhr: 100, hemisferio: "N" },
-  { nome: "Oriônidas",       inicio: "10-02", pico: "10-21", fim: "11-07", zhr: 20,  hemisferio: "ambos" },
-  { nome: "Taurídeas",       inicio: "10-20", pico: "11-05", fim: "11-20", zhr: 10,  hemisferio: "ambos" },
-  { nome: "Leônidas",        inicio: "11-06", pico: "11-17", fim: "11-30", zhr: 15,  hemisferio: "N" },
-  { nome: "Geminidas",       inicio: "12-04", pico: "12-14", fim: "12-17", zhr: 120, hemisferio: "ambos" },
+  { nome: "Quadrântidas", inicio: "01-01", pico: "01-03", fim: "01-05", zhr: 110, hemisferio: "N" },
+  { nome: "Líridas", inicio: "04-14", pico: "04-22", fim: "04-30", zhr: 18, hemisferio: "N" },
+  { nome: "Eta Aquáridas", inicio: "04-19", pico: "05-05", fim: "05-28", zhr: 50, hemisferio: "S" },
+  { nome: "Delta Aquáridas", inicio: "07-12", pico: "07-29", fim: "08-23", zhr: 20, hemisferio: "S" },
+  { nome: "Perseidas", inicio: "07-17", pico: "08-12", fim: "08-24", zhr: 100, hemisferio: "N" },
+  { nome: "Oriônidas", inicio: "10-02", pico: "10-21", fim: "11-07", zhr: 20, hemisferio: "ambos" },
+  { nome: "Taurídeas", inicio: "10-20", pico: "11-05", fim: "11-20", zhr: 10, hemisferio: "ambos" },
+  { nome: "Leônidas", inicio: "11-06", pico: "11-17", fim: "11-30", zhr: 15, hemisferio: "N" },
+  { nome: "Geminidas", inicio: "12-04", pico: "12-14", fim: "12-17", zhr: 120, hemisferio: "ambos" },
 ];
 
 // Carlópolis ~ Hemisfério Sul: penaliza levemente chuvas do Norte, e favorece as do Sul
 function fatorHemisphere(chuva) {
   if (chuva.hemisferio === "ambos") return 1.0;
-  if (chuva.hemisferio === "S")     return 1.0;
-  if (chuva.hemisferio === "N")     return 0.6; // visíveis, mas mais baixas no céu
+  if (chuva.hemisferio === "S") return 1.0;
+  if (chuva.hemisferio === "N") return 0.6; // visíveis, mas mais baixas no céu
   return 0.9;
 }
 
@@ -16351,7 +16368,7 @@ function fatorProximidadeDaData(date, chuva) {
 
   if (date < di || date > df) return 0;
 
-  const d = (a,b) => Math.abs((a - b) / 86400000);
+  const d = (a, b) => Math.abs((a - b) / 86400000);
   const distanciaDoPico = d(date, dp);
   // Dentro de ±3 dias do pico: 1; depois decai linear até bordas da janela
   if (distanciaDoPico <= 3) return 1.0;
@@ -16379,7 +16396,7 @@ function calcularProbMeteoros(date, fracLua) {
     if (score > melhor.score) {
       melhor = {
         score,
-        detalhe: `${chuva.nome} • pico: ${chuva.pico} • céu: ${Math.round(ceuEscuro*100)}% escuro`
+        detalhe: `${chuva.nome} • pico: ${chuva.pico} • céu: ${Math.round(ceuEscuro * 100)}% escuro`
       };
     }
   }
@@ -16397,77 +16414,475 @@ function calcularProbMeteoros(date, fracLua) {
 
 
 
-/* 3) Monta a página dinâmica dentro de .content_area (mesmo padrão das outras) 
-function mostrarClimaDoDia() {
-  if (location.hash !== "#clima-do-dia") location.hash = "#clima-do-dia";
 
-  const area = document.querySelector(".content_area"); // sua área principal
-  if (!area) return;
-
-  // Cabeçalho no mesmo estilo do ranking (usa h2.highlighted p/ botão compartilhar automático)
+// Função para mostrar os dados da represa
+function mostrarRepresaChavantes() {
+  if (location.hash !== "#represa") location.hash = "#represa";
+  
+  const area = document.querySelector(".content_area");
   area.innerHTML = `
     <div class="page-header">
-      <h2 class="highlighted">☀️ Clima do Dia</h2>
+      <h2>💧 Represa de Chavantes</h2>
+      <i class="fa-solid fa-share-nodes share-btn" 
+         onclick="compartilharPagina('#represa','Represa de Chavantes','Acompanhe o nível da água da Represa de Chavantes')"></i>
     </div>
 
-    <div class="clima-wrap">
-      <div class="lua-card">
-        <div id="lua-desenho" class="lua-img" aria-hidden="true"></div>
-        <p id="lua-fase" class="lua-fase">Carregando fase da Lua...</p>
-        <p id="lua-iluminacao" class="lua-iluminacao"></p>
+    <div class="represa-wrap">
+      <div class="represa-card">
+        <div class="represa-header">
+          <i class="fas fa-water" style="font-size: 3rem; color: #1e90ff; margin-bottom: 1rem;"></i>
+          <h3>Nível da Água - Tempo Real</h3>
+          <p>Dados fornecidos pela Duke Energy</p>
+        </div>
+
+        <div class="represa-dados">
+          <div class="dado-item">
+            <div class="dado-label">Cota Atual</div>
+            <div class="dado-valor" id="cotaAtual">Carregando...</div>
+            <div class="dado-unidade">metros</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">Vazão Afluente</div>
+            <div class="dado-valor" id="vazaoAfluente">Carregando...</div>
+            <div class="dado-unidade">m³/s</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">Vazão Defluente</div>
+            <div class="dado-valor" id="vazaoDefluente">Carregando...</div>
+            <div class="dado-unidade">m³/s</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">Nível de Referência</div>
+            <div class="dado-valor">416,00</div>
+            <div class="dado-unidade">metros</div>
+          </div>
+        </div>
+
+        <div class="represa-info">
+          <div class="info-box">
+            <h4>📊 Última Atualização</h4>
+            <div id="ultimaAtualizacao">-</div>
+          </div>
+
+          <div class="info-box">
+            <h4>ℹ️ Informações</h4>
+            <p>A Represa de Chavantes está localizada no Rio Paranapanema entre SP e PR</p>
+          </div>
+        </div>
+
+        <div class="represa-actions">
+          <button class="btn-refresh" onclick="carregarDadosRepresa()">
+            <i class="fas fa-sync-alt"></i> Atualizar Dados
+          </button>
+          <a href="https://www.duke-energy.com.br/Operacao/Monitoramento" 
+             target="_blank" 
+             class="btn-external">
+            <i class="fas fa-external-link-alt"></i> Site Oficial
+          </a>
+        </div>
+
+        <div class="represa-note">
+          <p><strong>Nota:</strong> Os dados são atualizados automaticamente pela Duke Energy</p>
+        </div>
       </div>
-      <!-- (opcional) aqui você pode injetar seus outros cards do clima/UV depois -->
     </div>
-
-
-     <div class="lua-card" id="meteor-card">
-      <div style="font-weight:700;margin-bottom:6px;">🌠 Meteoros</div>
-      <div id="meteor-prob" class="lua-fase">Calculando...</div>
-      <div id="meteor-det" class="lua-iluminacao"></div>
-    </div>
-  </div>
   `;
 
-  // Calcula fase e desenha
-  const fase = obterFaseLua(new Date());
-  const iluminacaoPct = Math.round(
-    fase.fraction <= 0.5
-      ? fase.fraction * 2 * 100          // 0..50 -> 0..100
-      : (1 - fase.fraction) * 2 * 100    // 50..100 -> 100..0
-  );
-
-  const containerLua = area.querySelector("#lua-desenho");
-  containerLua.innerHTML = svgLua(fase.fraction, fase.waxing);
-
-  area.querySelector("#lua-fase").textContent = `Fase: ${fase.name}`;
-  area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
-
-  // === Meteoros hoje ===
-const met = calcularProbMeteoros(hoje, fase.fraction);
-area.querySelector("#meteor-prob").textContent = `Probabilidade: ${met.classe} (${met.score}%)`;
-area.querySelector("#meteor-det").textContent  = met.detalhe + " • Obs.: sem nuvens/seeing";
+  // Carrega os dados ao abrir a página
+  carregarDadosRepresa();
 }
 
-/* 4) Roteamento simples para abrir via hash 
-function routerClima() {
-  if (location.hash === "#clima-do-dia") {
-    mostrarClimaDoDia();
+// Função para carregar dados da represa (simulação - você pode integrar com API real)
+async function carregarDadosRepresa() {
+  const btn = document.querySelector('.btn-refresh');
+  const originalText = btn.innerHTML;
+  
+  try {
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
+    btn.disabled = true;
+
+    // Simulação de dados - substitua por API real da Duke Energy
+    // Exemplo de API: https://www.duke-energy.com.br/api/reservatorios
+    const dadosSimulados = await simularDadosRepresa();
+    
+    document.getElementById('cotaAtual').textContent = dadosSimulados.cotaAtual;
+    document.getElementById('vazaoAfluente').textContent = dadosSimulados.vazaoAfluente;
+    document.getElementById('vazaoDefluente').textContent = dadosSimulados.vazaoDefluente;
+    document.getElementById('ultimaAtualizacao').textContent = dadosSimulados.ultimaAtualizacao;
+
+    // Adiciona classe de destaque para mudanças
+    destacarMudancas();
+
+  } catch (error) {
+    console.error('Erro ao carregar dados:', error);
+    document.getElementById('cotaAtual').textContent = 'Erro';
+    document.getElementById('vazaoAfluente').textContent = 'Erro';
+    document.getElementById('vazaoDefluente').textContent = 'Erro';
+    document.getElementById('ultimaAtualizacao').textContent = 'Erro ao carregar';
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
   }
 }
-window.addEventListener("hashchange", routerClima);
 
-// Torna acessível globalmente (caso você chame a partir do menu)
-window.mostrarClimaDoDia = mostrarClimaDoDia;
 
-// Se a página abrir já com #clima-do-dia, monta imediatamente
-if (location.hash === "#clima-do-dia") {
-  mostrarClimaDoDia();
+// Busca os dados diretamente da página pública da CTG usando o reader "r.jina.ai"
+// Esse endpoint retorna o HTML renderizado como texto, liberando CORS para leitura.
+async function buscarCTGviaJina() {
+  const url = 'https://r.jina.ai/http://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/';
+  const resp = await fetch(url, { cache: 'no-store' });
+  if (!resp.ok) throw new Error('Falha ao acessar CTG');
+  const txt = await resp.text();
+
+  // Tenta capturar data/nota de atualização geral da página
+  const atualizacao = extrairAtualizacao(txt) || 'Atualização recente';
+
+  // Localiza o bloco onde aparece "Chavantes" e extrai métricas próximas
+  const parsed = extrairLinhaChavantes(txt);
+  if (!parsed) throw new Error('Não encontrou seção de Chavantes');
+
+  const { cota, volume } = parsed;
+
+  return {
+    cota: cota || '—',
+    volume: volume || '—',
+    // Essas duas não vêm tabeladas de forma estável no site; mantemos traço por enquanto:
+    vazaoAfluente: null,
+    vazaoDefluente: null,
+    atualizacao,
+    fonte: 'CTG Brasil (via r.jina.ai)'
+  };
 }
-*/
 
-////////////////////
-/////////////////////
-///////////////////////
+// Procura uma linha com "Chavantes" e tenta ler números (cota e volume) próximos
+function extrairLinhaChavantes(txt) {
+  const lines = txt.split('\n').map(l => l.trim()).filter(Boolean);
+  const i = lines.findIndex(l => /chavantes/i.test(l));
+  if (i === -1) return null;
+
+  let cota = null, volume = null;
+
+  for (let k = i; k < Math.min(i + 80, lines.length); k++) {
+    const l = lines[k];
+
+    // Procura algo como "Cota 416,32" ou "416,32 m"
+    if (!cota) {
+      const m1 = l.match(/cota[^0-9]*([\d]{3}[.,]\d{1,2})/i);
+      const m2 = l.match(/^([\d]{3}[.,]\d{1,2})\s*m\b/i);
+      if (m1) cota = m1[1].replace(',', '.');
+      else if (m2) cota = m2[1].replace(',', '.');
+    }
+
+    // Procura número com % próximo (ex.: "52,31 %")
+    if (!volume) {
+      const mv = l.match(/(\d{1,3}[.,]\d{1,2})\s*%/);
+      if (mv) volume = mv[1].replace(',', '.');
+    }
+
+    if (cota && volume) break;
+  }
+
+  return { cota, volume };
+}
+
+// Extrai uma data ou linha de "Atualizado em ..." se existir no topo/rodapé
+function extrairAtualizacao(txt) {
+  const m = txt.match(/atualiza(?:do|ção)[^0-9]*(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
+  if (m) {
+    // Formata PT-BR preservando a string da página:
+    return `Atualizado em ${m[1]}`;
+  }
+  return null;
+}
+
+
+async function obterDadosReaisRepresa() {
+  try {
+    const response = await fetch('http://localhost:3001/api/represa/chavantes');
+    const data = await response.json();
+    
+    if (data.success) {
+      return {
+        cotaAtual: data.cotaAtual || 'N/D',
+        vazaoAfluente: data.vazaoAfluente || 'N/D',
+        vazaoDefluente: data.vazaoDefluente || 'N/D',
+        ultimaAtualizacao: new Date().toLocaleString('pt-BR'),
+        fonte: data.fonte
+      };
+    }
+  } catch (error) {
+    console.error('Erro ao acessar proxy:', error);
+    // Fallback para dados locais
+    return await obterDadosHistoricos();
+  }
+}
+
+
+
+async function obterDadosSiteAlternativo() {
+  try {
+    // Exemplo usando site da Duke Energy (ajuste conforme necessário)
+    const response = await fetch('/api/proxy-represa'); // Você precisaria criar um proxy
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        cotaAtual: data.nivel || '416.25',
+        vazaoAfluente: data.afluente || '150',
+        vazaoDefluente: data.defluente || '145',
+        ultimaAtualizacao: new Date().toLocaleString('pt-BR'),
+        fonte: 'Duke Energy'
+      };
+    }
+  } catch (error) {
+    console.log('Fonte alternativa indisponível');
+  }
+
+  // Fallback para dados históricos/estimados
+  return await obterDadosHistoricos();
+}
+
+// Função fallback com dados históricos
+async function obterDadosHistoricos() {
+  // Dados baseados em médias históricas com pequena variação
+  const data = new Date();
+  const hora = data.getHours();
+  
+  // Simula variação diária baseada na hora do dia
+  const variacaoHora = Math.sin(hora * Math.PI / 12) * 0.05;
+  const variacaoAleatoria = (Math.random() - 0.5) * 0.1;
+  
+  const cotaBase = 416.20; // Cota média histórica
+  const cotaAtual = cotaBase + variacaoHora + variacaoAleatoria;
+  
+  // Vazões baseadas em padrões sazonais
+  const vazaoBase = 120;
+  const vazaoVariacao = Math.random() * 50;
+  
+  return {
+    cotaAtual: cotaAtual.toFixed(2),
+    vazaoAfluente: Math.floor(vazaoBase + vazaoVariacao).toString(),
+    vazaoDefluente: Math.floor(vazaoBase + vazaoVariacao * 0.8).toString(),
+    ultimaAtualizacao: new Date().toLocaleString('pt-BR'),
+    fonte: 'Dados Estimados'
+  };
+}
+
+
+
+// Atualize a função carregarDadosRepresa:
+// Função para carregar dados REAIS da represa (CTG via proxy sem CORS)
+async function carregarDadosRepresa() {
+  const btn = document.querySelector('.btn-refresh');
+  const originalText = btn ? btn.innerHTML : null;
+
+  try {
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
+      btn.disabled = true;
+    }
+
+    // 1) Tenta buscar da página oficial da CTG usando o "r.jina.ai" (proxy somente leitura)
+    const dados = await buscarCTGviaJina();
+
+    // Atualiza os cards da página “Represa”
+    setTexto('#cotaAtual', dados.cota);
+    setTexto('#vazaoAfluente', dados.vazaoAfluente ?? '—');
+    setTexto('#vazaoDefluente', dados.vazaoDefluente ?? '—');
+    setTexto('#ultimaAtualizacao', dados.atualizacao);
+    setTexto('#fonteDados', `Fonte: ${dados.fonte}`);
+
+    // (Opcional) Também preenche a UI alternativa “NR” se existir no DOM
+    setTexto('#nr-cota', dados.cota);
+    setTexto('#nr-volume', dados.volume);
+    setTexto('#nr-data', dados.atualizacao);
+
+    // Destaque visual nas mudanças
+    destacarMudancas();
+  } catch (error) {
+    console.error('Erro ao carregar dados:', error);
+    mostrarErroCarregamento(); // você já tem essa função
+  } finally {
+    if (btn) {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  }
+
+  // Utilitário local para setar texto de forma segura
+  function setTexto(sel, val) {
+    const el = document.querySelector(sel);
+    if (el) el.textContent = val ?? '—';
+  }
+}
+
+
+
+// Função para mostrar erro de carregamento
+function mostrarErroCarregamento() {
+  document.getElementById('cotaAtual').textContent = 'Erro';
+  document.getElementById('vazaoAfluente').textContent = 'Erro';
+  document.getElementById('vazaoDefluente').textContent = 'Erro';
+  document.getElementById('ultimaAtualizacao').textContent = 'Falha ao carregar';
+  
+  const erroElement = document.getElementById('erroCarregamento') || (() => {
+    const el = document.createElement('div');
+    el.id = 'erroCarregamento';
+    el.style.cssText = 'background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 6px; margin: 1rem 0;';
+    document.querySelector('.represa-card').insertBefore(el, document.querySelector('.represa-note'));
+    return el;
+  })();
+  
+  erroElement.innerHTML = `
+    <strong>⚠️ Erro de conexão</strong>
+    <div style="font-size: 0.9rem; margin-top: 0.5rem;">
+      Não foi possível conectar às fontes de dados oficiais. 
+      Tente novamente em alguns instantes.
+    </div>
+  `;
+}
+
+
+// Atualize o HTML da página represa para incluir os novos elementos:
+function mostrarRepresaChavantes() {
+  if (location.hash !== "#represa") location.hash = "#represa";
+  
+  const area = document.querySelector(".content_area");
+  area.innerHTML = `
+    <div class="page-header">
+      <h2>💧 Represa de Chavantes</h2>
+      <i class="fa-solid fa-share-nodes share-btn" 
+         onclick="compartilharPagina('#represa','Represa de Chavantes','Acompanhe o nível da água da Represa de Chavantes')"></i>
+    </div>
+
+    <div class="represa-wrap">
+      <div class="represa-card">
+        <div class="represa-header">
+          <i class="fas fa-water" style="font-size: 3rem; color: #1e90ff; margin-bottom: 1rem;"></i>
+          <h3>Nível da Água - Tempo Real</h3>
+          <p>Monitoramento da Represa de Chavantes</p>
+          <div id="fonteDados" style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;"></div>
+        </div>
+
+        <div class="represa-dados">
+          <div class="dado-item">
+            <div class="dado-label">Cota Atual</div>
+            <div class="dado-valor" id="cotaAtual">Carregando...</div>
+            <div class="dado-unidade">metros</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">Vazão Afluente</div>
+            <div class="dado-valor" id="vazaoAfluente">Carregando...</div>
+            <div class="dado-unidade">m³/s</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">Vazão Defluente</div>
+            <div class="dado-valor" id="vazaoDefluente">Carregando...</div>
+            <div class="dado-unidade">m³/s</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">Nível de Referência</div>
+            <div class="dado-valor">416,00</div>
+            <div class="dado-unidade">metros</div>
+          </div>
+        </div>
+
+        <!-- Espaço para análise dinâmica do nível -->
+
+        <div class="represa-info">
+          <div class="info-box">
+            <h4>📊 Última Atualização</h4>
+            <div id="ultimaAtualizacao">-</div>
+          </div>
+
+          <div class="info-box">
+            <h4>ℹ️ Sobre a Represa</h4>
+            <p><strong>Capacidade:</strong> 9.410 hm³<br>
+               <strong>Rio:</strong> Paranapanema<br>
+               <strong>Operadora:</strong> Duke Energy</p>
+          </div>
+        </div>
+
+        <div class="represa-actions">
+          <button class="btn-refresh" onclick="carregarDadosRepresa()">
+            <i class="fas fa-sync-alt"></i> Atualizar Dados
+          </button>
+          <a href="https://www.duke-energy.com.br/Operacao/Monitoramento" 
+             target="_blank" 
+             class="btn-external">
+            <i class="fas fa-external-link-alt"></i> Site Oficial
+          </a>
+        </div>
+
+        <!-- Espaço para mensagens de erro -->
+
+        <div class="represa-note">
+          <p><strong>Nota:</strong> Os dados são atualizados conforme disponibilidade das fontes oficiais</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Carrega os dados ao abrir a página
+  carregarDadosRepresa();
+  
+  // Atualização automática a cada 5 minutos
+  if (window.represaInterval) clearInterval(window.represaInterval);
+  window.represaInterval = setInterval(carregarDadosRepresa, 5 * 60 * 1000);
+}
+
+
+
+
+// Função para destacar mudanças nos valores
+function destacarMudancas() {
+  const valores = document.querySelectorAll('.dado-valor');
+  valores.forEach(valor => {
+    valor.classList.add('destaque');
+    setTimeout(() => {
+      valor.classList.remove('destaque');
+    }, 2000);
+  });
+}
+
+// Adicione este evento listener para o menu (procure onde estão os outros event listeners do menu):
+document.addEventListener("click", (e) => {
+  const menuRepresa = e.target.closest("#menuRepresa");
+  if (menuRepresa) {
+    e.preventDefault();
+    mostrarRepresaChavantes();
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////
+////////////////////////
 //////////////////////
 
 

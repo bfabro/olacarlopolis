@@ -7773,3 +7773,163 @@ html {
 
 /* separador discreto dentro do card escuro */
 .lua-card hr { border: 0; border-top: 1px solid #243; opacity: .4; }
+.clima-wrap{display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center;padding:12px 8px;}
+.lua-card{background:#101020;color:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 4px 10px rgba(0,0,0,.35);min-width:240px;text-align:center;margin-top:10px;}
+.lua-img{width:140px;height:140px;margin:0 auto 10px;}
+.lua-fase{font-size:1.05rem;font-weight:600;}
+.lua-iluminacao{font-size:.92rem;color:#cfd3ff;}
+.lua-card hr{border:0;border-top:1px solid #243;opacity:.4;}
+
+
+.represa-wrap {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.represa-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.represa-header {
+  margin-bottom: 2rem;
+}
+
+.represa-dados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.dado-item {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #1e90ff;
+}
+
+.dado-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.dado-valor {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.dado-valor.destaque {
+  color: #1e90ff;
+  transform: scale(1.1);
+}
+
+.dado-unidade {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 0.25rem;
+}
+
+.represa-info {
+  display: grid;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.info-box {
+  background: #e3f2fd;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.info-box h4 {
+  margin: 0 0 0.5rem 0;
+  color: #1565c0;
+}
+
+.represa-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.btn-refresh, .btn-external {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-refresh {
+  background: #1e90ff;
+  color: white;
+}
+
+.btn-refresh:hover {
+  background: #1565c0;
+}
+
+.btn-external {
+  background: #f8f9fa;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.btn-external:hover {
+  background: #e9ecef;
+}
+
+.represa-note {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border-radius: 6px;
+  border-left: 4px solid #ffc107;
+}
+
+.represa-note p {
+  margin: 0;
+  color: #856404;
+}
+
+@media (max-width: 768px) {
+  .represa-dados {
+    grid-template-columns: 1fr;
+  }
+  
+  .represa-actions {
+    flex-direction: column;
+  }
+}
+
+
+.dado-valor.destaque {
+  color: #1e90ff;
+  transform: scale(1.05);
+  transition: all 0.5s ease;
+}
+
+.btn-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.info-box p {
+  margin: 0.5rem 0 0 0;
+  line-height: 1.4;
+}
