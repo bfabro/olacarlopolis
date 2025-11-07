@@ -16685,77 +16685,74 @@ function setTexto(sel, val) {
 
 async function carregarDadosRepresa() {
   const btn = document.querySelector('.btn-refresh');
-  const originalText = btn ? btn.innerHTML : null;
+  const original = btn ? btn.innerHTML : null;
+
+  const setTxt = (sel, val) => { const el = document.querySelector(sel); if (el) el.textContent = val; };
+  const show   = (sel, yes) => { const el = document.querySelector(sel); if (el) el.style.display = yes ? '' : 'none'; };
+  const fmtBR  = (dIso) => {
+    try {
+      const d = new Date(dIso);
+      return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    } catch { return '—'; }
+  };
 
   try {
-    if (btn) {
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
-      btn.disabled = true;
-    }
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...'; }
 
-    // 1) Tenta a API própria (serverless, sem CORS no cliente)
     const r = await fetch(API_REPRESA, { cache: 'no-store' });
     const data = await r.json();
 
-    if (!data?.success) throw new Error('API retornou sem sucesso');
+    if (!data?.success) throw new Error(data?.error || 'Falha ao obter dados da represa');
 
-    // Preenche UI principal
-    setTexto('#cotaAtual', data.cotaAtual);
-    setTexto('#vazaoAfluente', data.vazaoAfluente ?? '—');
-    setTexto('#vazaoDefluente', data.vazaoDefluente ?? '—');
-    setTexto('#ultimaAtualizacao',
-      new Date(data.atualizadoEm || Date.now()).toLocaleString('pt-BR'));
+    // --- Preenche Cota (m) ---
+    setTxt('#cotaAtual', data.cotaAtual ?? '—');
 
-    // Exibe fonte e, se existir UI “NR” (carrossel da home), também preenche
-    setTexto('#fonteDados', `Fonte: ${data.fonte}`);
-    setTexto('#nr-cota', data.cotaAtual);
-    setTexto('#nr-volume', data.volumeUtil);
-    setTexto('#nr-data', new Date(data.atualizadoEm || Date.now()).toLocaleDateString('pt-BR'));
+    // --- Volume % (pode vir null) ---
+    if (data.volumeUtil != null) {
+      setTxt('#nr-volume', data.volumeUtil);
+      setTxt('#volumeUtil', data.volumeUtil);
+      show('#blocoVolumeUtil', true);     // <div id="blocoVolumeUtil">...</div> (opcional)
+    } else {
+      show('#blocoVolumeUtil', false);
+    }
 
-    // Destaque visual
+    // --- Vazões m³/s (podem vir null) ---
+    if (data.vazaoAfluente != null) {
+      setTxt('#vazaoAfluente', data.vazaoAfluente);
+      show('#linhaVazaoAfluente', true);  // <div id="linhaVazaoAfluente">...</div> (opcional)
+    } else {
+      show('#linhaVazaoAfluente', false);
+    }
+
+    if (data.vazaoDefluente != null) {
+      setTxt('#vazaoDefluente', data.vazaoDefluente);
+      show('#linhaVazaoDefluente', true); // <div id="linhaVazaoDefluente">...</div> (opcional)
+    } else {
+      show('#linhaVazaoDefluente', false);
+    }
+
+    // --- Data / Fonte ---
+    setTxt('#ultimaAtualizacao', fmtBR(data.atualizadoEm || Date.now()));
+    setTxt('#fonteDados', `Fonte: ${data.fonte || '—'}`);
+
+    // --- IDs alternativos (se você usa o bloco NR na home) ---
+    setTxt('#nr-cota', data.cotaAtual ?? '—');
+    setTxt('#nr-data', (data.atualizadoEm ? new Date(data.atualizadoEm).toLocaleDateString('pt-BR') : '—'));
+
+    // realce visual, se você tiver essa função
     if (typeof destacarMudancas === 'function') destacarMudancas();
-  } catch (err) {
-    console.error('Erro ao carregar dados:', err);
 
-    // 2) Fallback: tenta seu leitor atual (se quiser manter)
-    try {
-      if (typeof buscarCTGviaJina === 'function') {
-        const dados = await buscarCTGviaJina(); // mantém seu leitor como 2ª opção
-        setTexto('#cotaAtual', dados.cota);
-        setTexto('#vazaoAfluente', dados.vazaoAfluente ?? '—');
-        setTexto('#vazaoDefluente', dados.vazaoDefluente ?? '—');
-        setTexto('#ultimaAtualizacao', dados.atualizacao);
-        setTexto('#fonteDados', `Fonte: ${dados.fonte}`);
-        setTexto('#nr-cota', dados.cota);
-        setTexto('#nr-volume', dados.volume);
-        setTexto('#nr-data', dados.atualizacao);
-        if (typeof destacarMudancas === 'function') destacarMudancas();
-        return;
-      }
-      // 3) Último fallback (estimado/local) se o leitor também falhar
-      if (typeof obterDadosHistoricos === 'function') {
-        const alt = await obterDadosHistoricos();
-        setTexto('#cotaAtual', alt.cotaAtual);
-        setTexto('#vazaoAfluente', alt.vazaoAfluente);
-        setTexto('#vazaoDefluente', alt.vazaoDefluente);
-        setTexto('#ultimaAtualizacao', alt.ultimaAtualizacao);
-        setTexto('#fonteDados', `Fonte: ${alt.fonte}`);
-        setTexto('#nr-cota', alt.cotaAtual);
-        setTexto('#nr-volume', alt.volumeUtil || alt.volume || '—');
-        setTexto('#nr-data', alt.ultimaAtualizacao);
-        if (typeof destacarMudancas === 'function') destacarMudancas();
-        return;
-      }
-      throw new Error('Sem fallback disponível');
-    } catch (e2) {
-      console.error('Fallback falhou:', e2);
-      if (typeof mostrarErroCarregamento === 'function') mostrarErroCarregamento();
+  } catch (err) {
+    console.error('Represa:', err);
+    // seu fallback visual de erro
+    if (typeof mostrarErroCarregamento === 'function') {
+      mostrarErroCarregamento();
+    } else {
+      // fallback simples
+      alert('Não foi possível atualizar os dados da represa agora.');
     }
   } finally {
-    if (btn) {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-    }
+    if (btn) { btn.disabled = false; btn.innerHTML = original; }
   }
 }
 
@@ -16870,7 +16867,15 @@ function mostrarRepresaChavantes() {
   `;
 
   // Carrega os dados ao abrir a página
-  carregarDadosRepresa();
+  // depois de renderizar o HTML da página:
+carregarDadosRepresa();
+
+// e, no botão "Atualizar Dados", mantenha:
+document.addEventListener('click', (ev) => {
+  const t = ev.target.closest('.btn-refresh');
+  if (t) carregarDadosRepresa();
+});
+
   
   // Atualização automática a cada 5 minutos
   if (window.represaInterval) clearInterval(window.represaInterval);
