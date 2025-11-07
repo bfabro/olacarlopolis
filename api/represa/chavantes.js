@@ -33,26 +33,26 @@ function toFloatBR(s) {
 function getPlantPanel(html, plant = 'Chavantes') {
   const want = norm(`uhe ${plant}`);
 
-  // 1) acha o button do acordeão
-  // pega id do data-bs-target (ex: flush-c2) e o texto do botão
+  // 1) acha o botão do acordeão e pega o data-bs-target="#ID"
   const btnRe = /<button[^>]*data-bs-target="#([^"]+)"[^>]*>([\s\S]*?)<\/button>/gi;
   let m;
   while ((m = btnRe.exec(html))) {
     const collapseId = m[1];
     const btnText = m[2].replace(/<[^>]+>/g, ' ');
-    if (norm(btnText).includes(want)) {
-      // 2) abre o conteúdo do collapse com o id encontrado
-      const escId = collapseId.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-      const panelRe = new RegExp(
-        `<div[^>]*id="${escId}"[^>]*class="[^"]*accordion-collapse[^"]*"[^>]*>([\\s\\S]*?)<\\/div>`,
-        'i'
-      );
-      const p = panelRe.exec(html);
-      if (p) return p[1];
-    }
+    if (!norm(btnText).includes(want)) continue;
+
+    // 2) em vez de regex fechando </div>, pegamos uma JANELA grande após o id
+    const idx = html.indexOf(`id="${collapseId}"`);
+    if (idx === -1) return null;
+
+    // janela generosa (pega todo o conteúdo do painel)
+    const start = Math.max(0, idx - 200);          // um pouco antes do <div id="...">
+    const end   = Math.min(html.length, idx + 12000); // 12k chars normalmente cobre o painel inteiro
+    return html.slice(start, end);
   }
   return null;
 }
+
 
 /* -------- extrai métricas dentro do painel --------
    O HTML é tipo:
@@ -61,22 +61,28 @@ function getPlantPanel(html, plant = 'Chavantes') {
    <div> Vazão Defluente </div>  ... <div>254,70</div>
 ------------------------------------------------------------------ */
 function parsePanel(panelHtml) {
-  // procura o número até ~200 chars depois do rótulo
-  const rxNivel = /N[ií]vel[\s\S]{0,200}?>([\d.,]+)<\/div>/i;
-  const rxAflu  = /Vaz[aã]o\s*Aflu[aê]nte[\s\S]{0,200}?>([\d.,]+)<\/div>/i;
-  const rxDefl  = /Vaz[aã]o\s*Deflu[aê]nte[\s\S]{0,200}?>([\d.,]+)<\/div>/i;
+  // Localiza rótulo no TEXTO NORMALIZADO, mas coleta números no HTML bruto
+  const raw = panelHtml;
+  const normText = norm(panelHtml);
 
-  const n = panelHtml.match(rxNivel);
-  const a = panelHtml.match(rxAflu);
-  const d = panelHtml.match(rxDefl);
+  function pickNumberAfter(labelNorm, maxLookahead = 1200) {
+    const at = normText.indexOf(labelNorm);
+    if (at === -1) return null;
+    // Mapeia para a posição aproximada no HTML bruto (mesmo índice funciona bem nas páginas da CTG)
+    const start = Math.max(0, at);
+    const window = raw.slice(start, Math.min(raw.length, start + maxLookahead));
+    const num = window.match(/(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})/);
+    return num ? toFloatBR(num[1]) : null;
+  }
 
-  const cota = toFloatBR(n?.[1]);
-  const vazaoAfluente = toFloatBR(a?.[1]);
-  const vazaoDefluente = toFloatBR(d?.[1]);
+  const nivel         = pickNumberAfter('nivel');                 // Nível
+  const vazaoAfluente = pickNumberAfter('vazao afluente');        // Vazão Afluente
+  const vazaoDefluente= pickNumberAfter('vazao defluente');       // Vazão Defluente
 
-  if (cota == null && vazaoAfluente == null && vazaoDefluente == null) return null;
-  return { cota, vazaoAfluente, vazaoDefluente };
+  if (nivel == null && vazaoAfluente == null && vazaoDefluente == null) return null;
+  return { cota: nivel, vazaoAfluente, vazaoDefluente };
 }
+
 
 /* ---------------- handler ---------------- */
 export default async function handler(req) {
