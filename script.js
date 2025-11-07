@@ -16941,47 +16941,15 @@ function mostrarRepresaChavantes() {
           <div id="fonteDados" style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;"></div>
         </div>
 
-        <div class="represa-dados">
-
-          <div class="dado-item">
-            <div class="dado-label">Nível de Referência</div>
-            <div class="dado-valor">416,00</div>
-            <div class="dado-unidade">metros</div>
-          </div>
-
-          <div class="dado-item">
-            <div class="dado-label">Cota Atual</div>
-            <div class="dado-valor" id="cotaAtual">Carregando...</div>
-            <div class="dado-unidade">metros</div>
-          </div>
-
-          <div class="dado-item">
-            <div class="dado-label">Vazão Afluente</div>
-            <div class="dado-valor" id="vazaoAfluente">Carregando...</div>
-            <div class="dado-unidade">m³/s</div>
-          </div>
-
-          <div class="dado-item">
-            <div class="dado-label">Vazão Defluente</div>
-            <div class="dado-valor" id="vazaoDefluente">Carregando...</div>
-            <div class="dado-unidade">m³/s</div>
-          </div>
-
-         
-
-
-        </div>
+       
 
         <!-- Espaço para análise dinâmica do nível -->
 
         <div class="represa-info">
-          <div class="info-box">
-            <h4>📊 Última Atualização</h4>
-            <div id="ultimaAtualizacao">-</div>
-          </div>
+         
 
           <div class="info-box">
-            <h4>ℹ️ Sobre a Represa</h4>
+            <h4>ℹ️ A Represa</h4>
             <p><strong>Capacidade:</strong> 9.410 hm³<br>
                <strong>Rio:</strong> Paranapanema<br>
                <strong>Operadora:</strong> Duke Energy</p>
@@ -16989,21 +16957,17 @@ function mostrarRepresaChavantes() {
         </div>
 
         <div class="represa-actions">
-          <button class="btn-refresh" onclick="carregarDadosRepresa()">
-            <i class="fas fa-sync-alt"></i> Atualizar Dados
-          </button>
-          <a href="https://www.duke-energy.com.br/Operacao/Monitoramento" 
+          
+          <a href="https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/" 
              target="_blank" 
              class="btn-external">
             <i class="fas fa-external-link-alt"></i> Site Oficial
           </a>
         </div>
 
-        <!-- Espaço para mensagens de erro -->
+      
 
-        <div class="represa-note">
-          <p><strong>Nota:</strong> Os dados são atualizados conforme disponibilidade das fontes oficiais</p>
-        </div>
+     
       </div>
     </div>
   `;
