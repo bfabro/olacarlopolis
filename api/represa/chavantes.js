@@ -1,6 +1,6 @@
 export const config = { runtime: 'edge' };
 
-/** Fetch com UA de navegador (evita bloqueios) */
+/** Fetch com UA de navegador (evita bloqueios de WAF) */
 async function fetchText(url) {
   const r = await fetch(url, {
     headers: {
@@ -12,9 +12,9 @@ async function fetchText(url) {
   return r.text();
 }
 
-/** Normaliza texto: minúsculas + remove acentos + comprime espaços */
+/** Normaliza: minúsculas, sem acentos, espaços comprimidos */
 function normalize(s) {
-  return s
+  return (s || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -22,50 +22,60 @@ function normalize(s) {
     .trim();
 }
 
-/** Converte número PT-BR -> float (aceita 1.234,56 / 1234,56 / 1234.56) */
+/** Converte número PT-BR -> float (suporta 1.234,56 / 1234,56 / 1234.56) */
 function toFloatBR(s) {
   if (!s) return null;
-  let t = (s + '').trim();
-  // remove separador de milhar . (se houver) e troca , por .
+  let t = String(s).trim();
   t = t.replace(/\.(?=\d{3}\b)/g, '').replace(',', '.');
   const v = parseFloat(t);
   return Number.isFinite(v) ? v : null;
 }
 
-/** Extrai o bloco HTML de uma UHE específica do HTML geral */
-function extractPlantBlock(html, plantName) {
-  const normHtml = normalize(html);
-  const key = normalize(plantName); // ex.: "uhe chavantes" ou "chavantes"
-
-  // tenta encontrar "uhe <nome>" primeiro
-  let idx = normHtml.indexOf(`uhe ${key}`);
-  if (idx === -1) {
-    // tenta só pelo nome
-    idx = normHtml.indexOf(key);
+/**
+ * Divide a página em "blocos de UHE" pegando cada <h2 ...>UHE ...</h2> e seu conteúdo até o próximo <h2>.
+ * Assim, não dependemos de classes (accordion/acordeão).
+ */
+function splitUHEBlocks(html) {
+  const blocks = [];
+  const h2Re = /<h2[^>]*>([\s\S]*?)<\/h2>/gi;
+  let m;
+  const idxs = [];
+  while ((m = h2Re.exec(html))) {
+    idxs.push({ start: m.index, end: h2Re.lastIndex, titleRaw: m[1] });
   }
-  if (idx === -1) return null;
-
-  // janela generosa ao redor do cabeçalho da UHE
-  const start = Math.max(0, idx - 1500);
-  const end = Math.min(html.length, idx + 8000);
-  const windowHtml = html.slice(start, end);
-
-  // tenta cortar o bloco do accordion-item da UHE até o próximo accordion-item
-  const startMatch = windowHtml.match(/<div[^>]*class=["'][^"']*accordion-item[^"']*["'][^>]*>/i);
-  if (!startMatch) return windowHtml; // devolve janela se não achar o contêiner
-  const startPos = startMatch.index ?? 0;
-  const rest = windowHtml.slice(startPos);
-  const nextItem = rest.search(/<div[^>]*class=["'][^"']*accordion-item[^"']*["'][^>]*>/i);
-  // se aparecer outro accordion-item, corta antes dele; senão devolve o restante
-  return nextItem > 0 ? rest.slice(0, nextItem) : rest;
+  for (let i = 0; i < idxs.length; i++) {
+    const head = idxs[i];
+    const next = idxs[i + 1]?.start ?? html.length;
+    const blockHtml = html.slice(head.end, next); // conteúdo após o h2 até o próximo h2
+    blocks.push({ titleRaw: head.titleRaw, blockHtml });
+  }
+  return blocks;
 }
 
-/** Faz o parse do bloco da UHE: Nível (m), Vazão Afluente e Vazão Defluente (m³/s) */
+/** Localiza o bloco pelo título que contenha "UHE Chavantes" (normalizado) */
+function findChavantesBlock(html, plant = 'Chavantes') {
+  const blocks = splitUHEBlocks(html);
+  const want = normalize(`uhe ${plant}`);
+  // tenta match exato no título do h2
+  for (const b of blocks) {
+    const titleNorm = normalize(b.titleRaw);
+    if (titleNorm.includes(want)) return b.blockHtml;
+  }
+  // fallback: tenta só pelo nome (às vezes vem "Usina Hidrelétrica de Chavantes")
+  const wantLoose = normalize(plant);
+  for (const b of blocks) {
+    const titleNorm = normalize(b.titleRaw);
+    if (titleNorm.includes(wantLoose)) return b.blockHtml;
+  }
+  return null;
+}
+
+/** Extrai Nível (m), Vazão Afluente e Vazão Defluente (m³/s) de um bloco de UHE */
 function parseMetricsFromBlock(blockHtml) {
-  // Regex tolerantes aos acentos
-  const rxNivel = /N[ií]vel[\s\S]{0,80}?(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})/i;
-  const rxAflu = /Vaz[aã]o\s*Afluente[\s\S]{0,80}?(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})/i;
-  const rxDefl = /Vaz[aã]o\s*Defluente[\s\S]{0,80}?(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})/i;
+  // Regex tolerantes (acentos/variações)
+  const rxNivel = /N[ií]vel[\s\S]{0,80}?(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})\s*(?:m\b|metros?)?/i;
+  const rxAflu  = /Vaz[aã]o\s*Afluente[\s\S]{0,80}?(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})/i;
+  const rxDefl  = /Vaz[aã]o\s*Defluente[\s\S]{0,80}?(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})/i;
 
   const mNivel = blockHtml.match(rxNivel);
   const mAflu  = blockHtml.match(rxAflu);
@@ -84,10 +94,9 @@ function parseMetricsFromBlock(blockHtml) {
 export default async function handler(req) {
   const url = new URL(req.url);
   const debug = url.searchParams.get('debug') === '1' || url.searchParams.get('debug') === '2';
-  // permite forçar outra usina p/ teste: ?plant=capivara
   const plant = (url.searchParams.get('plant') || 'Chavantes').toString();
-
   const tried = [];
+
   try {
     // 1) direto
     let html;
@@ -125,7 +134,7 @@ export default async function handler(req) {
       return respond(false, { error: 'Não foi possível baixar a página da CTG.', fonte: 'CTG Brasil', _debug: debug ? { tried } : undefined });
     }
 
-    const block = extractPlantBlock(html, plant);
+    const block = findChavantesBlock(html, plant);
     if (!block) {
       return respond(false, { error: `Não foi possível localizar a UHE '${plant}'.`, fonte: 'CTG Brasil', _debug: debug ? { tried } : undefined });
     }
@@ -143,7 +152,7 @@ export default async function handler(req) {
       success: true,
       fonte: 'CTG Brasil',
       cotaAtual: metrics.cota != null ? metrics.cota.toFixed(2) : null,
-      volumeUtil: null, // página atual não expõe % de volume de forma estável
+      volumeUtil: null, // a página não mostra % estável; mantemos null
       vazaoAfluente: metrics.vazaoAfluente != null ? metrics.vazaoAfluente.toFixed(2) : null,
       vazaoDefluente: metrics.vazaoDefluente != null ? metrics.vazaoDefluente.toFixed(2) : null,
       atualizadoEm: new Date().toISOString(),
@@ -156,9 +165,7 @@ export default async function handler(req) {
 }
 
 function respond(ok, body) {
-  const payload = ok
-    ? body
-    : { success: false, ...body };
+  const payload = ok ? body : { success: false, ...body };
   if (ok && payload.success === undefined) payload.success = true;
 
   return new Response(JSON.stringify(payload), {
