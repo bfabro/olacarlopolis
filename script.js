@@ -16674,6 +16674,15 @@ async function obterDadosHistoricos() {
 
 // Atualize a função carregarDadosRepresa:
 // Função para carregar dados REAIS da represa (CTG via proxy sem CORS)
+// === NOVO: URL do seu endpoint (troque pelo seu domínio do Vercel) ===
+const API_REPRESA = 'https://olacarlopolis.vercel.app/api/represa/chavantes';
+
+// === util: setar texto seguro no DOM ===
+function setTexto(sel, val) {
+  const el = document.querySelector(sel);
+  if (el) el.textContent = (val ?? '—');
+}
+
 async function carregarDadosRepresa() {
   const btn = document.querySelector('.btn-refresh');
   const originalText = btn ? btn.innerHTML : null;
@@ -16684,37 +16693,69 @@ async function carregarDadosRepresa() {
       btn.disabled = true;
     }
 
-    // 1) Tenta buscar da página oficial da CTG usando o "r.jina.ai" (proxy somente leitura)
-    const dados = await buscarCTGviaJina();
+    // 1) Tenta a API própria (serverless, sem CORS no cliente)
+    const r = await fetch(API_REPRESA, { cache: 'no-store' });
+    const data = await r.json();
 
-    // Atualiza os cards da página “Represa”
-    setTexto('#cotaAtual', dados.cota);
-    setTexto('#vazaoAfluente', dados.vazaoAfluente ?? '—');
-    setTexto('#vazaoDefluente', dados.vazaoDefluente ?? '—');
-    setTexto('#ultimaAtualizacao', dados.atualizacao);
-    setTexto('#fonteDados', `Fonte: ${dados.fonte}`);
+    if (!data?.success) throw new Error('API retornou sem sucesso');
 
-    // (Opcional) Também preenche a UI alternativa “NR” se existir no DOM
-    setTexto('#nr-cota', dados.cota);
-    setTexto('#nr-volume', dados.volume);
-    setTexto('#nr-data', dados.atualizacao);
+    // Preenche UI principal
+    setTexto('#cotaAtual', data.cotaAtual);
+    setTexto('#vazaoAfluente', data.vazaoAfluente ?? '—');
+    setTexto('#vazaoDefluente', data.vazaoDefluente ?? '—');
+    setTexto('#ultimaAtualizacao',
+      new Date(data.atualizadoEm || Date.now()).toLocaleString('pt-BR'));
 
-    // Destaque visual nas mudanças
-    destacarMudancas();
-  } catch (error) {
-    console.error('Erro ao carregar dados:', error);
-    mostrarErroCarregamento(); // você já tem essa função
+    // Exibe fonte e, se existir UI “NR” (carrossel da home), também preenche
+    setTexto('#fonteDados', `Fonte: ${data.fonte}`);
+    setTexto('#nr-cota', data.cotaAtual);
+    setTexto('#nr-volume', data.volumeUtil);
+    setTexto('#nr-data', new Date(data.atualizadoEm || Date.now()).toLocaleDateString('pt-BR'));
+
+    // Destaque visual
+    if (typeof destacarMudancas === 'function') destacarMudancas();
+  } catch (err) {
+    console.error('Erro ao carregar dados:', err);
+
+    // 2) Fallback: tenta seu leitor atual (se quiser manter)
+    try {
+      if (typeof buscarCTGviaJina === 'function') {
+        const dados = await buscarCTGviaJina(); // mantém seu leitor como 2ª opção
+        setTexto('#cotaAtual', dados.cota);
+        setTexto('#vazaoAfluente', dados.vazaoAfluente ?? '—');
+        setTexto('#vazaoDefluente', dados.vazaoDefluente ?? '—');
+        setTexto('#ultimaAtualizacao', dados.atualizacao);
+        setTexto('#fonteDados', `Fonte: ${dados.fonte}`);
+        setTexto('#nr-cota', dados.cota);
+        setTexto('#nr-volume', dados.volume);
+        setTexto('#nr-data', dados.atualizacao);
+        if (typeof destacarMudancas === 'function') destacarMudancas();
+        return;
+      }
+      // 3) Último fallback (estimado/local) se o leitor também falhar
+      if (typeof obterDadosHistoricos === 'function') {
+        const alt = await obterDadosHistoricos();
+        setTexto('#cotaAtual', alt.cotaAtual);
+        setTexto('#vazaoAfluente', alt.vazaoAfluente);
+        setTexto('#vazaoDefluente', alt.vazaoDefluente);
+        setTexto('#ultimaAtualizacao', alt.ultimaAtualizacao);
+        setTexto('#fonteDados', `Fonte: ${alt.fonte}`);
+        setTexto('#nr-cota', alt.cotaAtual);
+        setTexto('#nr-volume', alt.volumeUtil || alt.volume || '—');
+        setTexto('#nr-data', alt.ultimaAtualizacao);
+        if (typeof destacarMudancas === 'function') destacarMudancas();
+        return;
+      }
+      throw new Error('Sem fallback disponível');
+    } catch (e2) {
+      console.error('Fallback falhou:', e2);
+      if (typeof mostrarErroCarregamento === 'function') mostrarErroCarregamento();
+    }
   } finally {
     if (btn) {
       btn.innerHTML = originalText;
       btn.disabled = false;
     }
-  }
-
-  // Utilitário local para setar texto de forma segura
-  function setTexto(sel, val) {
-    const el = document.querySelector(sel);
-    if (el) el.textContent = val ?? '—';
   }
 }
 
