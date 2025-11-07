@@ -925,7 +925,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "oticavisualcenter", "veronicakataoka", "vania", "mhpiscinas", "sereia", "oficinadocelular"
+    "taticonik","oticavisualcenter", "vania", "mhpiscinas", "sereia", "oficinadocelular"
 
   ];
 
@@ -9845,6 +9845,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             infoAdicional: "Especialistas em cuidados capilares, desenvolvemos produtos de alta performance para salões de beleza.<br> Nossas linhas unem tecnologia e qualidade profissional para proporcionar fios mais saudáveis, lisos e radiantes.<br>📗 <a href='images/servicos/revendedor/tati/divulgacao/Catalogo.pdf' target='_blank' rel='noopener'><br>Acesse Nosso Catálogo</a>",
 
             novidadesImages: [
+              "images/servicos/revendedor/tati/divulgacao/0.jpg",
               "images/servicos/revendedor/tati/divulgacao/2.jpg",
 
               "images/servicos/revendedor/tati/divulgacao/1.jpg",
@@ -9858,6 +9859,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/servicos/revendedor/tati/divulgacao/10.jpg",
             ],
             novidadesDescriptions: [
+              "30% De desconto em todos os produtos, entre em contato e aproveite!!!",
               "Quer fios mais fortes, hidratados e com brilho de salão? ✨<br>Experimente o poder da linha Lizz Ante Profissional <br>Resultado que se vê, sente e apaixona! 💕",
             ],
 
