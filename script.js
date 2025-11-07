@@ -16640,7 +16640,7 @@ function extrairAtualizacao(txt) {
   return null;
 }
 
-
+/*
 async function obterDadosReaisRepresa() {
   try {
     const response = await fetch('http://localhost:3001/api/represa/chavantes');
@@ -16662,7 +16662,7 @@ async function obterDadosReaisRepresa() {
   }
 }
 
-
+*/
 
 async function obterDadosSiteAlternativo() {
   try {
