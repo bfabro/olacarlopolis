@@ -7934,3 +7934,27 @@ html {
   line-height: 1.4;
 }
 
+
+
+/* ====== Represa: card comparativo ====== */
+.represa-compare{
+  display:grid; gap:10px;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 4px 0 6px;
+}
+.represa-compare .rep-item{ background:#fff; border:1px dashed #e6e6e6; border-radius:10px; padding:8px; }
+.represa-compare .rep-title{ font-size:12px; color:#555; text-transform:uppercase; letter-spacing:.5px; }
+.represa-compare .rep-value{ font-size:20px; font-weight:800; line-height:1.1; }
+.represa-compare .unit{ font-size:12px; color:#777; font-weight:600; margin-left:2px; }
+
+.represa-diff{
+  display:flex; align-items:center; gap:10px; margin-top:2px; flex-wrap:wrap;
+}
+.rep-diff-number{
+  font-weight:800; font-size:14px;
+}
+.rep-note{
+  margin-top:4px; font-size:12px; color:#555;
+}
+
+

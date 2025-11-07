@@ -286,6 +286,174 @@ function mostrarRankingCapivarinha() {
 /////////////////////////////////
 ////////////////////////////////
 
+// ====== Página: Represa de Chavantes ======
+function classificarComparacao(atual, referencia){
+  const a = Number(atual), r = Number(referencia);
+  if (Number.isFinite(a) && Number.isFinite(r)) {
+    if (a > r) return "high";
+    if (a < r) return "low";
+  }
+  return "equal";
+}
+
+// Ajuste aqui se seus campos tiverem outros nomes/origem:
+async function carregarDadosRepresa(){
+  // TODO: substitua por seu fetch real (ONS/Vercel/etc.)
+  // Estrutura sugerida:
+  // { ultimaAtualizacaoISO, sobre, cotaAtual_m, cotaRef_m, volumeAtual_pct, volumeRef_pct }
+  return {
+    ultimaAtualizacaoISO: new Date().toISOString(),
+    sobre: "Reservatório de Chavantes – dados diários do ONS.",
+    cotaAtual_m: window.nivelChavantes?.cota ?? 474.32,    // se já existir algo global, usa
+    cotaRef_m: 474.00,
+    volumeAtual_pct: window.nivelChavantes?.volume ?? 58.7,
+    volumeRef_pct: 60.0
+  };
+}
+
+function formatarDataBR(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+  }catch(_){ return "—"; }
+}
+
+async function mostrarRepresa(){
+  location.hash = "#represa-chavantes"; // âncora amigável
+
+  const area = document.querySelector(".content_area");
+  if (!area) return;
+
+  // carrega dados (troque pelo seu fetch real)
+  const dados = await carregarDadosRepresa();
+
+  const statusCota  = classificarComparacao(dados.cotaAtual_m,   dados.cotaRef_m);
+  const statusVol   = classificarComparacao(dados.volumeAtual_pct, dados.volumeRef_pct);
+
+  // --- Comparação direta: Nível de Referência x Cota Atual ---
+  const nivelRef = Number(dados.cotaRef_m ?? 0);
+  const cotaAtual = Number(dados.cotaAtual_m ?? 0);
+  const statusComparativo = classificarComparacao(cotaAtual, nivelRef);
+  const badgeComp = statusComparativo === "high" ? "high" : (statusComparativo === "low" ? "low" : "equal");
+  const cardClasseComp = statusComparativo === "high" ? "status-high" : (statusComparativo === "low" ? "status-low" : "");
+  const diffAbs = (Number.isFinite(cotaAtual) && Number.isFinite(nivelRef)) ? (cotaAtual - nivelRef) : 0;
+  const diffPct = (Number.isFinite(nivelRef) && nivelRef !== 0) ? (diffAbs / nivelRef) * 100 : 0;
+
+
+
+  const badgeCota = statusCota === "high" ? "high" : (statusCota === "low" ? "low" : "equal");
+  const badgeVol  = statusVol  === "high" ? "high" : (statusVol  === "low"  ? "low"  : "equal");
+
+  const cardClasseCota = statusCota === "high" ? "status-high" : (statusCota === "low" ? "status-low" : "");
+  const cardClasseVol  = statusVol  === "high" ? "status-high" : (statusVol  === "low"  ? "status-low"  : "");
+
+  const ultima = formatarDataBR(dados.ultimaAtualizacaoISO);
+
+  area.innerHTML = `
+    <div class="represa-wrap">
+      <div class="represa-header">
+        <h2>💧 Represa de Chavantes</h2>
+        <div class="sub">Fonte: ONS • Atualização diária</div>
+      </div>
+
+      <div class="represa-grid">
+
+        <!-- Card: Cota (nível) com comparação -->
+        <div class="represa-card ${cardClasseCota}">
+          <div class="card-meta">
+            <div class="meta-row"><b>Última Atualização:</b> ${ultima}</div>
+            <div class="meta-row"><b>Sobre a Represa:</b> ${dados.sobre}</div>
+          </div>
+          <div class="card-body">
+            <div class="represa-label">Cota (nível)</div>
+            <div class="represa-metric">
+              <div class="val">${Number(dados.cotaAtual_m ?? 0).toFixed(2)}</div>
+              <div class="unit">m</div>
+            </div>
+            <div>
+              Ref.: <b>${Number(dados.cotaRef_m ?? 0).toFixed(2)} m</b>
+              &nbsp;•&nbsp;
+              <span class="represa-badge ${badgeCota}">
+                ${statusCota === "high" ? "ALTO" : statusCota === "low" ? "BAIXO" : "IGUAL"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+                <!-- Card: Volume Útil (%) com comparação -->
+        <div class="represa-card ${cardClasseVol}">
+          <div class="card-meta">
+            <div class="meta-row"><b>Última Atualização:</b> ${ultima}</div>
+            <div class="meta-row"><b>Sobre a Represa:</b> ${dados.sobre}</div>
+          </div>
+          <div class="card-body">
+            <div class="represa-label">Volume Útil</div>
+            <div class="represa-metric">
+              <div class="val">${Number(dados.volumeAtual_pct ?? 0).toFixed(1)}</div>
+              <div class="unit">%</div>
+            </div>
+            <div>
+              Ref.: <b>${Number(dados.volumeRef_pct ?? 0).toFixed(1)}%</b>
+              &nbsp;•&nbsp;
+              <span class="represa-badge ${badgeVol}">
+                ${statusVol === "high" ? "ALTO" : statusVol === "low" ? "BAIXO" : "IGUAL"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Comparação Nível de Referência × Cota Atual -->
+        <div class="represa-card ${cardClasseComp}">
+          <div class="card-meta">
+            <div class="meta-row"><b>Última Atualização:</b> ${ultima}</div>
+            <div class="meta-row"><b>Sobre a Represa:</b> ${dados.sobre}</div>
+          </div>
+          <div class="card-body">
+            <div class="represa-label">Nível de Referência × Cota Atual</div>
+
+            <div class="represa-compare">
+              <div class="rep-item">
+                <div class="rep-title">Referência</div>
+                <div class="rep-value">${nivelRef.toFixed(2)} <span class="unit">m</span></div>
+              </div>
+              <div class="rep-item">
+                <div class="rep-title">Cota Atual</div>
+                <div class="rep-value">${cotaAtual.toFixed(2)} <span class="unit">m</span></div>
+              </div>
+            </div>
+
+            <div class="represa-diff">
+              <span class="rep-diff-number">${diffAbs >= 0 ? "+" : ""}${diffAbs.toFixed(2)} m</span>
+              <span class="rep-diff-number">(${diffPct >= 0 ? "+" : ""}${diffPct.toFixed(2)}%)</span>
+              <span class="represa-badge ${badgeComp}">
+                ${statusComparativo === "high" ? "ALTO" : statusComparativo === "low" ? "BAIXO" : "IGUAL"}
+              </span>
+            </div>
+
+            <div class="rep-note">Comparação direta entre o valor de referência configurado e a cota atual.</div>
+          </div>
+        </div>
+
+
+        <!-- Exemplo de mais um card informativo (opcional) -->
+        <div class="represa-card">
+          <div class="card-meta">
+            <div class="meta-row"><b>Última Atualização:</b> ${ultima}</div>
+            <div class="meta-row"><b>Sobre a Represa:</b> ${dados.sobre}</div>
+          </div>
+          <div class="card-body">
+            <div class="represa-label">Observações</div>
+            <div style="font-size:13px;color:#333">
+              • Valores sujeitos a revisão pelo ONS<br>
+              • Comparação feita contra o valor de referência configurado
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
 
 ////////////////////////////////
 ///////////////////////////////////
@@ -14271,6 +14439,8 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
+    if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
+    if (h === "#represa-chavantes") { return mostrarRepresa(); };
 
 
 
@@ -16415,85 +16585,7 @@ function calcularProbMeteoros(date, fracLua) {
 
 
 
-// Função para mostrar os dados da represa
-function mostrarRepresaChavantes() {
-  if (location.hash !== "#represa") location.hash = "#represa";
-  
-  const area = document.querySelector(".content_area");
-  area.innerHTML = `
-    <div class="page-header">
-      <h2>💧 Represa de Chavantes</h2>
-      <i class="fa-solid fa-share-nodes share-btn" 
-         onclick="compartilharPagina('#represa','Represa de Chavantes','Acompanhe o nível da água da Represa de Chavantes')"></i>
-    </div>
 
-    <div class="represa-wrap">
-      <div class="represa-card">
-        <div class="represa-header">
-          <i class="fas fa-water" style="font-size: 3rem; color: #1e90ff; margin-bottom: 1rem;"></i>
-          <h3>Nível da Água - Tempo Real</h3>
-          <p>Dados fornecidos pela Duke Energy</p>
-        </div>
-
-        <div class="represa-dados">
-          <div class="dado-item">
-            <div class="dado-label">Cota Atual</div>
-            <div class="dado-valor" id="cotaAtual">Carregando...</div>
-            <div class="dado-unidade">metros</div>
-          </div>
-
-          <div class="dado-item">
-            <div class="dado-label">Vazão Afluente</div>
-            <div class="dado-valor" id="vazaoAfluente">Carregando...</div>
-            <div class="dado-unidade">m³/s</div>
-          </div>
-
-          <div class="dado-item">
-            <div class="dado-label">Vazão Defluente</div>
-            <div class="dado-valor" id="vazaoDefluente">Carregando...</div>
-            <div class="dado-unidade">m³/s</div>
-          </div>
-
-          <div class="dado-item">
-            <div class="dado-label">Nível de Referência</div>
-            <div class="dado-valor">416,00</div>
-            <div class="dado-unidade">metros</div>
-          </div>
-        </div>
-
-        <div class="represa-info">
-          <div class="info-box">
-            <h4>📊 Última Atualização</h4>
-            <div id="ultimaAtualizacao">-</div>
-          </div>
-
-          <div class="info-box">
-            <h4>ℹ️ Informações</h4>
-            <p>A Represa de Chavantes está localizada no Rio Paranapanema entre SP e PR</p>
-          </div>
-        </div>
-
-        <div class="represa-actions">
-          <button class="btn-refresh" onclick="carregarDadosRepresa()">
-            <i class="fas fa-sync-alt"></i> Atualizar Dados
-          </button>
-          <a href="https://www.duke-energy.com.br/Operacao/Monitoramento" 
-             target="_blank" 
-             class="btn-external">
-            <i class="fas fa-external-link-alt"></i> Site Oficial
-          </a>
-        </div>
-
-        <div class="represa-note">
-          <p><strong>Nota:</strong> Os dados são atualizados automaticamente pela Duke Energy</p>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Carrega os dados ao abrir a página
-  carregarDadosRepresa();
-}
 
 // Função para carregar dados da represa (simulação - você pode integrar com API real)
 async function carregarDadosRepresa() {
@@ -16955,6 +17047,13 @@ document.addEventListener("click", (e) => {
 
 
 
+const linkRepresa = document.getElementById("menuRepresa");
+if (linkRepresa){
+  linkRepresa.addEventListener("click", (e)=>{
+    e.preventDefault();
+    mostrarRepresaChavantes();
+  });
+}
 
 
 
