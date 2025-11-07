@@ -16675,7 +16675,7 @@ async function obterDadosHistoricos() {
 // Atualize a função carregarDadosRepresa:
 // Função para carregar dados REAIS da represa (CTG via proxy sem CORS)
 // === NOVO: URL do seu endpoint (troque pelo seu domínio do Vercel) ===
-const API_REPRESA = 'https://olacarlopolis.vercel.app/api/represa/chavantes';
+const API_REPRESA ='https://olacarlopolis.vercel.app/api/represa/chavantes';
 
 // === util: setar texto seguro no DOM ===
 function setTexto(sel, val) {

@@ -1,109 +1,97 @@
 export const config = { runtime: 'edge' };
 
-/**
- * Busca texto de uma URL com user-agent de navegador (alguns WAFs bloqueiam UA genérico)
- */
+/** Fetch com UA de navegador (evita bloqueios) */
 async function fetchText(url) {
   const r = await fetch(url, {
     headers: {
-      "user-agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     },
-    cache: "no-store",
+    cache: 'no-store'
   });
   if (!r.ok) throw new Error(`HTTP ${r.status} em ${url}`);
   return r.text();
 }
 
-/**
- * Normaliza: minúsculas, remove acentos, comprime espaços.
- */
+/** Normaliza texto: minúsculas + remove acentos + comprime espaços */
 function normalize(s) {
   return s
     .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")      // remove acentos
-    .replace(/\s+/g, " ")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
-/**
- * Tenta extrair cota (m) e volume (%) a partir de um ponto onde aparece “chavantes”
- * Faz o parse no HTML original, mas usa a posição obtida no texto normalizado
- */
-function parseChavantes(html) {
-  const norm = normalize(html);
+/** Converte número PT-BR -> float (aceita 1.234,56 / 1234,56 / 1234.56) */
+function toFloatBR(s) {
+  if (!s) return null;
+  let t = (s + '').trim();
+  // remove separador de milhar . (se houver) e troca , por .
+  t = t.replace(/\.(?=\d{3}\b)/g, '').replace(',', '.');
+  const v = parseFloat(t);
+  return Number.isFinite(v) ? v : null;
+}
 
-  // palavras-chave possíveis perto do nome
-  const needles = [
-    "chavantes",
-    "uhe chavantes",
-    "usina chavantes",
-    "reservatorio chavantes",
-  ];
+/** Extrai o bloco HTML de uma UHE específica do HTML geral */
+function extractPlantBlock(html, plantName) {
+  const normHtml = normalize(html);
+  const key = normalize(plantName); // ex.: "uhe chavantes" ou "chavantes"
 
-  // acha o primeiro índice que aparecer
-  let at = -1;
-  for (const n of needles) {
-    at = norm.indexOf(n);
-    if (at !== -1) break;
+  // tenta encontrar "uhe <nome>" primeiro
+  let idx = normHtml.indexOf(`uhe ${key}`);
+  if (idx === -1) {
+    // tenta só pelo nome
+    idx = normHtml.indexOf(key);
   }
-  if (at === -1) return { ok: false, why: "keyword_not_found" };
+  if (idx === -1) return null;
 
-  // converte índice do normalizado para uma janela do HTML bruto
-  // (usamos uma janela generosa para capturar números próximos)
-  const start = Math.max(0, at - 1500);
-  const end = Math.min(html.length, at + 3000);
+  // janela generosa ao redor do cabeçalho da UHE
+  const start = Math.max(0, idx - 1500);
+  const end = Math.min(html.length, idx + 8000);
   const windowHtml = html.slice(start, end);
 
-  // padrões de números
-  // cota: 3-4 dígitos + , ou . + duas casas — ex: 416,32 / 416.32
-  // volume: número seguido de % — ex: 52,31 %
-  // fazemos múltiplas tentativas
-  const tryPatterns = [
-    // 1) ...Chavantes... Cota 416,32 ... 52,31%
-    /(?:Cota[^0-9]{0,15})?(\d{3,4}[.,]\d{1,2})[\s\S]{0,400}?(\d{1,3}[.,]\d{1,2})\s*%/i,
-    // 2) ... 416,32 m ... 52,31 %
-    /(\d{3,4}[.,]\d{1,2})\s*m[\s\S]{0,400}?(\d{1,3}[.,]\d{1,2})\s*%/i,
-    // 3) volume antes da cota (algumas páginas mudam a ordem)
-    /(\d{1,3}[.,]\d{1,2})\s*%[\s\S]{0,400}?(\d{3,4}[.,]\d{1,2})\s*m?/i,
-  ];
+  // tenta cortar o bloco do accordion-item da UHE até o próximo accordion-item
+  const startMatch = windowHtml.match(/<div[^>]*class=["'][^"']*accordion-item[^"']*["'][^>]*>/i);
+  if (!startMatch) return windowHtml; // devolve janela se não achar o contêiner
+  const startPos = startMatch.index ?? 0;
+  const rest = windowHtml.slice(startPos);
+  const nextItem = rest.search(/<div[^>]*class=["'][^"']*accordion-item[^"']*["'][^>]*>/i);
+  // se aparecer outro accordion-item, corta antes dele; senão devolve o restante
+  return nextItem > 0 ? rest.slice(0, nextItem) : rest;
+}
 
-  for (const rx of tryPatterns) {
-    const m = windowHtml.match(rx);
-    if (m) {
-      // decide qual é cota e qual é volume conforme o pattern
-      let cotaStr, volStr;
+/** Faz o parse do bloco da UHE: Nível (m), Vazão Afluente e Vazão Defluente (m³/s) */
+function parseMetricsFromBlock(blockHtml) {
+  // Regex tolerantes aos acentos
+  const rxNivel = /N[ií]vel[\s\S]{0,80}?(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})/i;
+  const rxAflu = /Vaz[aã]o\s*Afluente[\s\S]{0,80}?(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})/i;
+  const rxDefl = /Vaz[aã]o\s*Defluente[\s\S]{0,80}?(\d{1,3}(?:\.\d{3})*[.,]\d{1,2})/i;
 
-      if (rx === tryPatterns[2]) {
-        volStr = m[1];
-        cotaStr = m[2];
-      } else {
-        cotaStr = m[1];
-        volStr = m[2];
-      }
+  const mNivel = blockHtml.match(rxNivel);
+  const mAflu  = blockHtml.match(rxAflu);
+  const mDefl  = blockHtml.match(rxDefl);
 
-      const cota = parseFloat(cotaStr.replace(",", "."));
-      const volume = parseFloat(volStr.replace(",", "."));
-      if (!Number.isNaN(cota) && !Number.isNaN(volume)) {
-        return { ok: true, cota, volume, windowHtml };
-      }
-    }
+  const cota = toFloatBR(mNivel?.[1]);
+  const vazaoAfluente = toFloatBR(mAflu?.[1]);
+  const vazaoDefluente = toFloatBR(mDefl?.[1]);
+
+  if (cota == null && vazaoAfluente == null && vazaoDefluente == null) {
+    return null;
   }
-
-  return { ok: false, why: "numbers_not_found", windowHtml };
+  return { cota, vazaoAfluente, vazaoDefluente };
 }
 
 export default async function handler(req) {
   const url = new URL(req.url);
-  const debug = url.searchParams.get("debug"); // "1" ou "2" para mais detalhes
-  const tried = [];
+  const debug = url.searchParams.get('debug') === '1' || url.searchParams.get('debug') === '2';
+  // permite forçar outra usina p/ teste: ?plant=capivara
+  const plant = (url.searchParams.get('plant') || 'Chavantes').toString();
 
+  const tried = [];
   try {
-    // 1) Tenta direto (Edge não sofre CORS de navegador)
-    const u1 =
-      "https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/";
+    // 1) direto
     let html;
+    const u1 = 'https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/';
     try {
       html = await fetchText(u1);
       tried.push({ url: u1, ok: true });
@@ -111,10 +99,9 @@ export default async function handler(req) {
       tried.push({ url: u1, ok: false, why: String(e1) });
     }
 
-    // 2) Proxy https→https (se o direto falhar)
+    // 2) proxy https→https
     if (!html) {
-      const u2 =
-        "https://r.jina.ai/https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/";
+      const u2 = 'https://r.jina.ai/https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/';
       try {
         html = await fetchText(u2);
         tried.push({ url: u2, ok: true });
@@ -123,10 +110,9 @@ export default async function handler(req) {
       }
     }
 
-    // 3) Variação de host (sem www)
+    // 3) variação sem www
     if (!html) {
-      const u3 =
-        "https://r.jina.ai/https://ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/";
+      const u3 = 'https://r.jina.ai/https://ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/';
       try {
         html = await fetchText(u3);
         tried.push({ url: u3, ok: true });
@@ -136,56 +122,51 @@ export default async function handler(req) {
     }
 
     if (!html) {
-      return respondFail(
-        "Não foi possível baixar a página da CTG.",
-        debug && { tried }
-      );
+      return respond(false, { error: 'Não foi possível baixar a página da CTG.', fonte: 'CTG Brasil', _debug: debug ? { tried } : undefined });
     }
 
-    const parsed = parseChavantes(html);
-    if (!parsed.ok) {
-      return respondFail(
-        parsed.why === "keyword_not_found"
-          ? "Não foi possível localizar 'Chavantes' no HTML."
-          : "Não foi possível localizar números de cota/volume próximos.",
-        debug && {
-          tried,
-          // no debug=2 devolvemos um pedaço do HTML para inspeção
-          sample:
-            debug === "2" && parsed.windowHtml
-              ? parsed.windowHtml.slice(0, 2000)
-              : undefined,
-        }
-      );
+    const block = extractPlantBlock(html, plant);
+    if (!block) {
+      return respond(false, { error: `Não foi possível localizar a UHE '${plant}'.`, fonte: 'CTG Brasil', _debug: debug ? { tried } : undefined });
+    }
+
+    const metrics = parseMetricsFromBlock(block);
+    if (!metrics) {
+      return respond(false, {
+        error: 'Não foi possível extrair Nível/Vazões do bloco da UHE.',
+        fonte: 'CTG Brasil',
+        _debug: debug ? { tried, sample: url.searchParams.get('debug') === '2' ? block.slice(0, 2000) : undefined } : undefined
+      });
     }
 
     const body = {
       success: true,
-      fonte: "CTG Brasil",
-      cotaAtual: parsed.cota.toFixed(2),
-      volumeUtil: parsed.volume.toFixed(2),
-      vazaoAfluente: null,
-      vazaoDefluente: null,
+      fonte: 'CTG Brasil',
+      cotaAtual: metrics.cota != null ? metrics.cota.toFixed(2) : null,
+      volumeUtil: null, // página atual não expõe % de volume de forma estável
+      vazaoAfluente: metrics.vazaoAfluente != null ? metrics.vazaoAfluente.toFixed(2) : null,
+      vazaoDefluente: metrics.vazaoDefluente != null ? metrics.vazaoDefluente.toFixed(2) : null,
       atualizadoEm: new Date().toISOString(),
-      ...(debug ? { _debug: { tried } } : {}),
+      ...(debug ? { _debug: { tried } } : {})
     };
-
-    return new Response(JSON.stringify(body), {
-      status: 200,
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        "cache-control": "no-store",
-        "access-control-allow-origin": "*",
-      },
-    });
+    return respond(true, body);
   } catch (err) {
-    return respondFail(String(err), debug && { tried });
+    return respond(false, { error: String(err), fonte: 'CTG Brasil', _debug: debug ? { tried } : undefined });
   }
 }
 
-function respondFail(msg, extra) {
-  return new Response(
-    JSON.stringify({ success: false, error: msg, fonte: "CTG Brasil", ...(extra ? { _debug: extra } : {}) }),
-    { status: 200, headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" } }
-  );
+function respond(ok, body) {
+  const payload = ok
+    ? body
+    : { success: false, ...body };
+  if (ok && payload.success === undefined) payload.success = true;
+
+  return new Response(JSON.stringify(payload), {
+    status: 200,
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      'cache-control': 'no-store',
+      'access-control-allow-origin': '*'
+    }
+  });
 }
