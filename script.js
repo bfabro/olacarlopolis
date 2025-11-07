@@ -16951,7 +16951,7 @@ function mostrarRepresaChavantes() {
          
 
           <div class="info-box">
-            <h4>ℹ️ A Represa</h4>
+            <h4>ℹ️ Represa:</h4>
             <p><strong>Capacidade:</strong> 9.410 hm³<br>
                <strong>Rio:</strong> Paranapanema<br>
                <strong>Operadora:</strong> Duke Energy</p>

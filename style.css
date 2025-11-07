@@ -7782,7 +7782,7 @@ html {
 
 
 .represa-wrap {
-  padding: 1rem;
+  padding: 6px;
   max-width: 600px;
   margin: 0 auto;
 }
@@ -7790,7 +7790,7 @@ html {
 .represa-card {
   background: white;
   border-radius: 12px;
-  padding: 2rem;
+  padding: 0px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
@@ -7840,26 +7840,18 @@ html {
 .represa-info {
   display: grid;
   gap: 1rem;
-  margin: 2rem 0;
+  margin: 1rem 0;
+
 }
 
-.info-box {
-  background: #e3f2fd;
-  padding: 1rem;
-  border-radius: 8px;
-  text-align: left;
-}
 
-.info-box h4 {
-  margin: 0 0 0.5rem 0;
-  color: #1565c0;
-}
 
 .represa-actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
   margin: 2rem 0;
+  align-items: center;
 }
 
 .btn-refresh, .btn-external {
