@@ -14441,7 +14441,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
-    if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
+ 
     if (h === "#represa-chavantes") { return mostrarRepresa(); };
 
 
@@ -16924,7 +16924,7 @@ function mostrarErroCarregamento() {
 
 // Atualize o HTML da página represa para incluir os novos elementos:
 function mostrarRepresaChavantes() {
-  if (location.hash !== "#represa") location.hash = "#represa";
+  if (location.hash !== "#represa-chavantes") location.hash = "#represa-chavantes";
   
   const area = document.querySelector(".content_area");
   area.innerHTML = `
