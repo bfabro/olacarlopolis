@@ -16850,6 +16850,13 @@ function mostrarRepresaChavantes() {
         </div>
 
         <div class="represa-dados">
+
+          <div class="dado-item">
+            <div class="dado-label">Nível de Referência</div>
+            <div class="dado-valor">416,00</div>
+            <div class="dado-unidade">metros</div>
+          </div>
+
           <div class="dado-item">
             <div class="dado-label">Cota Atual</div>
             <div class="dado-valor" id="cotaAtual">Carregando...</div>
@@ -16868,11 +16875,9 @@ function mostrarRepresaChavantes() {
             <div class="dado-unidade">m³/s</div>
           </div>
 
-          <div class="dado-item">
-            <div class="dado-label">Nível de Referência</div>
-            <div class="dado-valor">416,00</div>
-            <div class="dado-unidade">metros</div>
-          </div>
+         
+
+
         </div>
 
         <!-- Espaço para análise dinâmica do nível -->
