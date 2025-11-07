@@ -16498,35 +16498,77 @@ function mostrarRepresaChavantes() {
 // Função para carregar dados da represa (simulação - você pode integrar com API real)
 async function carregarDadosRepresa() {
   const btn = document.querySelector('.btn-refresh');
-  const originalText = btn.innerHTML;
-  
+  const original = btn ? btn.innerHTML : null;
+
+  const setTxt = (sel, val) => { const el = document.querySelector(sel); if (el) el.textContent = val; };
+  const show   = (sel, yes) => { const el = document.querySelector(sel); if (el) el.style.display = yes ? '' : 'none'; };
+  const fmtBR  = (dIso) => {
+    try {
+      const d = new Date(dIso);
+      return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    } catch { return '—'; }
+  };
+
   try {
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
-    btn.disabled = true;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...'; }
 
-    // Simulação de dados - substitua por API real da Duke Energy
-    // Exemplo de API: https://www.duke-energy.com.br/api/reservatorios
-    const dadosSimulados = await simularDadosRepresa();
-    
-    document.getElementById('cotaAtual').textContent = dadosSimulados.cotaAtual;
-    document.getElementById('vazaoAfluente').textContent = dadosSimulados.vazaoAfluente;
-    document.getElementById('vazaoDefluente').textContent = dadosSimulados.vazaoDefluente;
-    document.getElementById('ultimaAtualizacao').textContent = dadosSimulados.ultimaAtualizacao;
+    const r = await fetch(API_REPRESA, { cache: 'no-store' });
+    const data = await r.json();
 
-    // Adiciona classe de destaque para mudanças
-    destacarMudancas();
+    if (!data?.success) throw new Error(data?.error || 'Falha ao obter dados da represa');
 
-  } catch (error) {
-    console.error('Erro ao carregar dados:', error);
-    document.getElementById('cotaAtual').textContent = 'Erro';
-    document.getElementById('vazaoAfluente').textContent = 'Erro';
-    document.getElementById('vazaoDefluente').textContent = 'Erro';
-    document.getElementById('ultimaAtualizacao').textContent = 'Erro ao carregar';
+    // --- Preenche Cota (m) ---
+    setTxt('#cotaAtual', data.cotaAtual ?? '—');
+
+    // --- Volume % (pode vir null) ---
+    if (data.volumeUtil != null) {
+      setTxt('#nr-volume', data.volumeUtil);
+      setTxt('#volumeUtil', data.volumeUtil);
+      show('#blocoVolumeUtil', true);     // <div id="blocoVolumeUtil">...</div> (opcional)
+    } else {
+      show('#blocoVolumeUtil', false);
+    }
+
+    // --- Vazões m³/s (podem vir null) ---
+    if (data.vazaoAfluente != null) {
+      setTxt('#vazaoAfluente', data.vazaoAfluente);
+      show('#linhaVazaoAfluente', true);  // <div id="linhaVazaoAfluente">...</div> (opcional)
+    } else {
+      show('#linhaVazaoAfluente', false);
+    }
+
+    if (data.vazaoDefluente != null) {
+      setTxt('#vazaoDefluente', data.vazaoDefluente);
+      show('#linhaVazaoDefluente', true); // <div id="linhaVazaoDefluente">...</div> (opcional)
+    } else {
+      show('#linhaVazaoDefluente', false);
+    }
+
+    // --- Data / Fonte ---
+    setTxt('#ultimaAtualizacao', fmtBR(data.atualizadoEm || Date.now()));
+    setTxt('#fonteDados', `Fonte: ${data.fonte || '—'}`);
+
+    // --- IDs alternativos (se você usa o bloco NR na home) ---
+    setTxt('#nr-cota', data.cotaAtual ?? '—');
+    setTxt('#nr-data', (data.atualizadoEm ? new Date(data.atualizadoEm).toLocaleDateString('pt-BR') : '—'));
+
+    // realce visual, se você tiver essa função
+    if (typeof destacarMudancas === 'function') destacarMudancas();
+
+  } catch (err) {
+    console.error('Represa:', err);
+    // seu fallback visual de erro
+    if (typeof mostrarErroCarregamento === 'function') {
+      mostrarErroCarregamento();
+    } else {
+      // fallback simples
+      alert('Não foi possível atualizar os dados da represa agora.');
+    }
   } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    if (btn) { btn.disabled = false; btn.innerHTML = original; }
   }
 }
+
 
 
 // Busca os dados diretamente da página pública da CTG usando o reader "r.jina.ai"
