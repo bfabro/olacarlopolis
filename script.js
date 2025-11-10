@@ -1145,6 +1145,9 @@ document.addEventListener("DOMContentLoaded", function () {
     pescaepresente: "s",
     lojathiagoaguera: "s",
 
+    //lojaderoupas
+    tsmcollection:"s",
+
     // mercearia
     seiza: "s",
 
@@ -11386,10 +11389,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuLojaPesca"),
         title: "Loja de Pesca",
         establishments: [
-
-
-
-
           {
             image: "images/comercios/lojadepesca/thiago/perfil.jpg",
             name: "Loja Thiago Aguera",
@@ -11431,20 +11430,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Pescaria top de inverno ! Pouco tempo de pesca e bastante tucunaré amarelo na linha.<br>Todos peixes foram capturado na isca cometa da @itaipujigs",
             ],
           },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -11492,6 +11477,44 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Variedade em Oculos UV",
 
 
+            ],
+          },
+        ],
+      },
+
+
+
+
+      {
+        link: document.querySelector("#menuLojaRoupas"),
+        title: "Loja de Roupa",
+        establishments: [
+          {
+            image: "images/comercios/lojaDeRoupa/tsmCollection/perfil.jpg",
+            name: "TSM Collection",
+            hours: "Seg a Sab: 08:30h as 19:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:30", fim: "19:00" }],
+              ter: [{ inicio: "08:30", fim: "19:00" }],
+              qua: [{ inicio: "08:30", fim: "19:00" }],
+              qui: [{ inicio: "08:30", fim: "19:00" }],
+              sex: [{ inicio: "08:30", fim: "19:00" }],
+              sab: [{ inicio: "08:30", fim: "19:00" }],
+              dom: []
+            },
+            address: " R. Sadatoshi Hamada, 96 - Vista Bella - Carlópolis",
+            contact: "(11) 97217-8952",
+          
+            instagram: "https://www.instagram.com/_temcollection/",
+            infoAdicional: "Dom e Feriados Atendimento Agendado Personalizado<Br>Enviamos para todo Brasil ",
+            novidadesImages: [
+              "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/1.jpg",
+           
+
+            ],
+            novidadesDescriptions: [
+          "Temos muitas camisas de times",
             ],
           },
         ],
