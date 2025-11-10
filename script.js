@@ -11507,7 +11507,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(11) 97217-8952",
           
             instagram: "https://www.instagram.com/_temcollection/",
-            infoAdicional: "Dom e Feriados Atendimento Agendado Personalizado<Br>Enviamos para todo Brasil ",
+            infoAdicional: "📅 Dom e Feriados: Atendimento Agendado Personalizado<Br>📦 Enviamos para todo o Brasil",
             novidadesImages: [
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/1.jpg",
            
