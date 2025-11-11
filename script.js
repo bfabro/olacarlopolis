@@ -1146,7 +1146,8 @@ document.addEventListener("DOMContentLoaded", function () {
     lojathiagoaguera: "s",
 
     //lojaderoupas
-    tsmcollection: "s",
+   
+    "t&mcollection": "s",
 
     // mercearia
     seiza: "s",
@@ -11536,7 +11537,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         establishments: [
           {
             image: "images/comercios/lojaDeRoupa/tsmCollection/perfil.jpg",
-            name: "TSM Collection",
+            name: "T&M Collection",
             hours: "Seg a Sab: 08:30h as 19:00h",
             statusAberto: ".",
             horarios: {
