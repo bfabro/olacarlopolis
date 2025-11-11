@@ -925,7 +925,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "taticonik", "oticavisualcenter", "vania", "mhpiscinas", "sereia", "oficinadocelular"
+    "taticonik", "tsmcollection", "vania", "mhpiscinas", "sereia", "oficinadocelular"
 
   ];
 
@@ -11554,6 +11554,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/_temcollection/",
             infoAdicional: "📅 Dom e Feriados: Atendimento Agendado Personalizado<Br>📦 Enviamos para todo o Brasil",
             novidadesImages: [
+                 "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/11.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/1.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/2.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/3.jpg",
@@ -11564,11 +11565,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/8.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/9.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/10.jpg",
-              "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/11.jpg",
+           
 
 
             ],
             novidadesDescriptions: [
+              "",
               "Temos varios modelos e tamanhos, encontrea sua preferido por aqui!",
             ],
           },
