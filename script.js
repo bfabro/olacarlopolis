@@ -1309,7 +1309,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //encanador
     gerson: "s",
     // montador de moveis
-    hirancastro: "n",
+    hirancastro: "s",
 
     //podologa
     vania: "s",
@@ -9746,16 +9746,61 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuMontadorMoveis"),
         title: "Montador de Moveis",
         establishments: [
-          {
-            image: "images/servicos/montadorMoveis/hiran/hiran.png",
+        
+
+
+
+{
+            image: "images/servicos/montadorMoveis/hiran/perfil.jpg",
             name: "Hiran Castro",
             contact: "(43) 99174-4396",
+
+            hours: "Seg a Sex: 08:00h as 19:00h<br>Sab:08:00h as 16:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "19:00" }],
+              ter: [{ inicio: "08:00", fim: "19:00" }],
+              qua: [{ inicio: "08:00", fim: "19:00" }],
+              qui: [{ inicio: "08:00", fim: "19:00" }],
+              sex: [{ inicio: "08:00", fim: "19:00" }],
+              sab: [{ inicio: "08:00", fim: "16:00" }],
+              dom: [],
+            },
+            
+          
+
+            infoAdicional: "Se você precisa montar um móvel na caixa, desmontar e montar, fazer instalações ou outros tipos de serviço:<br><br>🪑 Montagens de móveis convencionais e planejados!<br>🧰 Assistência técnica em geral!<br>🚿 Instalação de acessórios de cozinha e banheiro <br>🖼️ Instalação de nichos, prateleiras, painéis de TV, cortinas, quadros etc!<br><br>🚚 Faço sua mudança com responsabilidade, qualidade e preço justo!",
+            instagram: "https://www.instagram.com/montador_de_moveis_hiran/",
+
             novidadesImages: [
-              "images/servicos/montadorMoveis/hiran/novidades/1.png",
-              "images/servicos/montadorMoveis/hiran/novidades/2.png",
-              "images/servicos/montadorMoveis/hiran/novidades/3.png",
+              "images/servicos/montadorMoveis/hiran/divulgacao/1.jpg",
+                "images/servicos/montadorMoveis/hiran/divulgacao/2.jpg",
+                  "images/servicos/montadorMoveis/hiran/divulgacao/3.jpg",
+                
+            
+
+
+            ],
+            novidadesDescriptions: [
+
+              "",
+
+
             ],
           },
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         ],
       },
