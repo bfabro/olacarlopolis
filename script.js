@@ -287,7 +287,7 @@ function mostrarRankingCapivarinha() {
 ////////////////////////////////
 
 // ====== Página: Represa de Chavantes ======
-function classificarComparacao(atual, referencia){
+function classificarComparacao(atual, referencia) {
   const a = Number(atual), r = Number(referencia);
   if (Number.isFinite(a) && Number.isFinite(r)) {
     if (a > r) return "high";
@@ -297,7 +297,7 @@ function classificarComparacao(atual, referencia){
 }
 
 // Ajuste aqui se seus campos tiverem outros nomes/origem:
-async function carregarDadosRepresa(){
+async function carregarDadosRepresa() {
   // TODO: substitua por seu fetch real (ONS/Vercel/etc.)
   // Estrutura sugerida:
   // { ultimaAtualizacaoISO, sobre, cotaAtual_m, cotaRef_m, volumeAtual_pct, volumeRef_pct }
@@ -311,14 +311,14 @@ async function carregarDadosRepresa(){
   };
 }
 
-function formatarDataBR(iso){
-  try{
+function formatarDataBR(iso) {
+  try {
     const d = new Date(iso);
-    return d.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
-  }catch(_){ return "—"; }
+    return d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  } catch (_) { return "—"; }
 }
 
-async function mostrarRepresa(){
+async function mostrarRepresa() {
   location.hash = "#represa-chavantes"; // âncora amigável
 
   const area = document.querySelector(".content_area");
@@ -327,8 +327,8 @@ async function mostrarRepresa(){
   // carrega dados (troque pelo seu fetch real)
   const dados = await carregarDadosRepresa();
 
-  const statusCota  = classificarComparacao(dados.cotaAtual_m,   dados.cotaRef_m);
-  const statusVol   = classificarComparacao(dados.volumeAtual_pct, dados.volumeRef_pct);
+  const statusCota = classificarComparacao(dados.cotaAtual_m, dados.cotaRef_m);
+  const statusVol = classificarComparacao(dados.volumeAtual_pct, dados.volumeRef_pct);
 
   // --- Comparação direta: Nível de Referência x Cota Atual ---
   const nivelRef = Number(dados.cotaRef_m ?? 0);
@@ -342,10 +342,10 @@ async function mostrarRepresa(){
 
 
   const badgeCota = statusCota === "high" ? "high" : (statusCota === "low" ? "low" : "equal");
-  const badgeVol  = statusVol  === "high" ? "high" : (statusVol  === "low"  ? "low"  : "equal");
+  const badgeVol = statusVol === "high" ? "high" : (statusVol === "low" ? "low" : "equal");
 
   const cardClasseCota = statusCota === "high" ? "status-high" : (statusCota === "low" ? "status-low" : "");
-  const cardClasseVol  = statusVol  === "high" ? "status-high" : (statusVol  === "low"  ? "status-low"  : "");
+  const cardClasseVol = statusVol === "high" ? "status-high" : (statusVol === "low" ? "status-low" : "");
 
   const ultima = formatarDataBR(dados.ultimaAtualizacaoISO);
 
@@ -925,7 +925,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "taticonik","oticavisualcenter", "vania", "mhpiscinas", "sereia", "oficinadocelular"
+    "taticonik", "oticavisualcenter", "vania", "mhpiscinas", "sereia", "oficinadocelular"
 
   ];
 
@@ -1146,7 +1146,7 @@ document.addEventListener("DOMContentLoaded", function () {
     lojathiagoaguera: "s",
 
     //lojaderoupas
-    tsmcollection:"s",
+    tsmcollection: "s",
 
     // mercearia
     seiza: "s",
@@ -9746,11 +9746,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuMontadorMoveis"),
         title: "Montador de Moveis",
         establishments: [
-        
 
 
 
-{
+
+          {
             image: "images/servicos/montadorMoveis/hiran/perfil.jpg",
             name: "Hiran Castro",
             contact: "(43) 99174-4396",
@@ -9766,18 +9766,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               sab: [{ inicio: "08:00", fim: "16:00" }],
               dom: [],
             },
-            
-          
 
-            infoAdicional: "Se você precisa montar um móvel na caixa, desmontar e montar, fazer instalações ou outros tipos de serviço:<br><br>🪑 Montagens de móveis convencionais e planejados!<br>🧰 Assistência técnica em geral!<br>🚿 Instalação de acessórios de cozinha e banheiro <br>🖼️ Instalação de nichos, prateleiras, painéis de TV, cortinas, quadros etc!<br><br>🚚 Faço sua mudança com responsabilidade, qualidade e preço justo!",
+
+
+            infoAdicional: "Se você precisa montar um móvel na caixa, desmontar e montar, fazer instalações ou outros tipos de serviço, solicite um orçamento!:<br><br>🪑 Montagens de móveis convencionais e planejados!<br>🧰 Assistência técnica em geral!<br>🚿 Instalação de acessórios de cozinha e banheiro <br>🖼️ Instalação de nichos, prateleiras, painéis de TV, cortinas, quadros etc!<br><br>🚚 Faço sua mudança com responsabilidade, qualidade e preço justo!",
             instagram: "https://www.instagram.com/montador_de_moveis_hiran/",
 
             novidadesImages: [
               "images/servicos/montadorMoveis/hiran/divulgacao/1.jpg",
-                "images/servicos/montadorMoveis/hiran/divulgacao/2.jpg",
-                  "images/servicos/montadorMoveis/hiran/divulgacao/3.jpg",
-                
-            
+              "images/servicos/montadorMoveis/hiran/divulgacao/2.jpg",
+              "images/servicos/montadorMoveis/hiran/divulgacao/3.jpg",
+
+
 
 
             ],
@@ -11550,16 +11550,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             },
             address: " R. Sadatoshi Hamada, 96 - Vista Bella - Carlópolis",
             contact: "(11) 97217-8952",
-          
+
             instagram: "https://www.instagram.com/_temcollection/",
             infoAdicional: "📅 Dom e Feriados: Atendimento Agendado Personalizado<Br>📦 Enviamos para todo o Brasil",
             novidadesImages: [
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/1.jpg",
-           
+
 
             ],
             novidadesDescriptions: [
-          "Temos muitas camisas de times",
+              "Temos muitas camisas de times",
             ],
           },
         ],
@@ -14509,7 +14509,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
- 
+
     if (h === "#represa-chavantes") { return mostrarRepresa(); };
 
 
@@ -14769,54 +14769,54 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   <p id="meteor-det" class="lua-iluminacao"></p>
 `;
 
-(area.querySelector(".sol-wrap") || area).appendChild(luaCard);
+    (area.querySelector(".sol-wrap") || area).appendChild(luaCard);
 
-  const fase = obterFaseLua(new Date());
-const iluminacaoPct = Math.round((1 - Math.cos(2 * Math.PI * fase.fraction)) * 50);
+    const fase = obterFaseLua(new Date());
+    const iluminacaoPct = Math.round((1 - Math.cos(2 * Math.PI * fase.fraction)) * 50);
 
-area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
-area.querySelector("#lua-fase").textContent = `Fase: ${rotuloFaseParaExibicao(fase.fraction, fase.name)}`;
-area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
+    area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
+    area.querySelector("#lua-fase").textContent = `Fase: ${rotuloFaseParaExibicao(fase.fraction, fase.name)}`;
+    area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
 
-const met0 = calcularProbMeteoros(new Date(), fase.fraction);
-area.querySelector("#meteor-prob").textContent = `Probabilidade: ${met0.classe} (${met0.score}%)`;
-area.querySelector("#meteor-det").textContent = met0.detalhe + " • Obs.: sem nuvens/seeing";
+    const met0 = calcularProbMeteoros(new Date(), fase.fraction);
+    area.querySelector("#meteor-prob").textContent = `Probabilidade: ${met0.classe} (${met0.score}%)`;
+    area.querySelector("#meteor-det").textContent = met0.detalhe + " • Obs.: sem nuvens/seeing";
 
 
     // função interna para carregar/atualizar
     // Dentro de mostrarSol(...), na função interna carregar(dateStr)
-async function carregar(dateStr) {
-  const st = document.getElementById("solStatus");
-  try {
-    st.textContent = "⏳ Carregando horários...";
-    const res = await buscarSol(dateStr);
-    document.getElementById("solSunrise").textContent = toHoraMinBR(res.sunrise);
-    document.getElementById("solSunset").textContent = toHoraMinBR(res.sunset);
-    document.getElementById("solNoon").textContent    = toHoraMinBR(res.solar_noon);
-    document.getElementById("solDuracao").textContent = duracaoHumana(res.day_length);
+    async function carregar(dateStr) {
+      const st = document.getElementById("solStatus");
+      try {
+        st.textContent = "⏳ Carregando horários...";
+        const res = await buscarSol(dateStr);
+        document.getElementById("solSunrise").textContent = toHoraMinBR(res.sunrise);
+        document.getElementById("solSunset").textContent = toHoraMinBR(res.sunset);
+        document.getElementById("solNoon").textContent = toHoraMinBR(res.solar_noon);
+        document.getElementById("solDuracao").textContent = duracaoHumana(res.day_length);
 
-    const tempo = await buscarTempo(dateStr);
-    document.getElementById("wxMax").textContent  = (tempo.tmax  ?? "--") + "°C";
-    document.getElementById("wxMin").textContent  = (tempo.tmin  ?? "--") + "°C";
-    document.getElementById("wxWind").textContent = (tempo.wind  ?? "--") + " km/h";
-    document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
+        const tempo = await buscarTempo(dateStr);
+        document.getElementById("wxMax").textContent = (tempo.tmax ?? "--") + "°C";
+        document.getElementById("wxMin").textContent = (tempo.tmin ?? "--") + "°C";
+        document.getElementById("wxWind").textContent = (tempo.wind ?? "--") + " km/h";
+        document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
 
-    // === Lua na DATA SELECIONADA ===
-    const dataLua = new Date(dateStr + "T12:00:00"); // meio-dia evita trocas por fuso
-    const f = obterFaseLua(dataLua);
-  const iluminacaoPctLua = Math.round((1 - Math.cos(2 * Math.PI * f.fraction)) * 50);
+        // === Lua na DATA SELECIONADA ===
+        const dataLua = new Date(dateStr + "T12:00:00"); // meio-dia evita trocas por fuso
+        const f = obterFaseLua(dataLua);
+        const iluminacaoPctLua = Math.round((1 - Math.cos(2 * Math.PI * f.fraction)) * 50);
 
-    const slotLua = document.querySelector("#lua-desenho");
-    if (slotLua) slotLua.innerHTML = svgLua(f.fraction, f.waxing);
+        const slotLua = document.querySelector("#lua-desenho");
+        if (slotLua) slotLua.innerHTML = svgLua(f.fraction, f.waxing);
 
-    const lblFase = document.querySelector("#lua-fase");
-    const lblIlum = document.querySelector("#lua-iluminacao");
-    if (lblFase) lblFase.textContent = `Fase: ${rotuloFaseParaExibicao(f.fraction, f.name)}`;
-    if (lblIlum) lblIlum.textContent = `Iluminação aproximada: ${iluminacaoPctLua}%`;
-  } catch (e) {
-    st.textContent = "⚠️ Não foi possível carregar os dados.";
-  }
-}
+        const lblFase = document.querySelector("#lua-fase");
+        const lblIlum = document.querySelector("#lua-iluminacao");
+        if (lblFase) lblFase.textContent = `Fase: ${rotuloFaseParaExibicao(f.fraction, f.name)}`;
+        if (lblIlum) lblIlum.textContent = `Iluminação aproximada: ${iluminacaoPctLua}%`;
+      } catch (e) {
+        st.textContent = "⚠️ Não foi possível carregar os dados.";
+      }
+    }
 
 
 
@@ -16512,7 +16512,7 @@ function svgLua(fraction, waxing) {
 
   const R = 60, cx = 70, cy = 70;
 
-  const isNova  = p <= 0.02;
+  const isNova = p <= 0.02;
   const isCheia = p >= 0.98;
 
   const baseDark = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#0c0f1a"/>`;
@@ -16663,8 +16663,8 @@ async function carregarDadosRepresa() {
   const original = btn ? btn.innerHTML : null;
 
   const setTxt = (sel, val) => { const el = document.querySelector(sel); if (el) el.textContent = val; };
-  const show   = (sel, yes) => { const el = document.querySelector(sel); if (el) el.style.display = yes ? '' : 'none'; };
-  const fmtBR  = (dIso) => {
+  const show = (sel, yes) => { const el = document.querySelector(sel); if (el) el.style.display = yes ? '' : 'none'; };
+  const fmtBR = (dIso) => {
     try {
       const d = new Date(dIso);
       return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
@@ -16853,18 +16853,18 @@ async function obterDadosHistoricos() {
   // Dados baseados em médias históricas com pequena variação
   const data = new Date();
   const hora = data.getHours();
-  
+
   // Simula variação diária baseada na hora do dia
   const variacaoHora = Math.sin(hora * Math.PI / 12) * 0.05;
   const variacaoAleatoria = (Math.random() - 0.5) * 0.1;
-  
+
   const cotaBase = 416.20; // Cota média histórica
   const cotaAtual = cotaBase + variacaoHora + variacaoAleatoria;
-  
+
   // Vazões baseadas em padrões sazonais
   const vazaoBase = 120;
   const vazaoVariacao = Math.random() * 50;
-  
+
   return {
     cotaAtual: cotaAtual.toFixed(2),
     vazaoAfluente: Math.floor(vazaoBase + vazaoVariacao).toString(),
@@ -16879,7 +16879,7 @@ async function obterDadosHistoricos() {
 // Atualize a função carregarDadosRepresa:
 // Função para carregar dados REAIS da represa (CTG via proxy sem CORS)
 // === NOVO: URL do seu endpoint (troque pelo seu domínio do Vercel) ===
-const API_REPRESA ='https://olacarlopolis.vercel.app/api/represa/chavantes';
+const API_REPRESA = 'https://olacarlopolis.vercel.app/api/represa/chavantes';
 
 // === util: setar texto seguro no DOM ===
 function setTexto(sel, val) {
@@ -16971,7 +16971,7 @@ function mostrarErroCarregamento() {
   document.getElementById('vazaoAfluente').textContent = 'Erro';
   document.getElementById('vazaoDefluente').textContent = 'Erro';
   document.getElementById('ultimaAtualizacao').textContent = 'Falha ao carregar';
-  
+
   const erroElement = document.getElementById('erroCarregamento') || (() => {
     const el = document.createElement('div');
     el.id = 'erroCarregamento';
@@ -16979,7 +16979,7 @@ function mostrarErroCarregamento() {
     document.querySelector('.represa-card').insertBefore(el, document.querySelector('.represa-note'));
     return el;
   })();
-  
+
   erroElement.innerHTML = `
     <strong>⚠️ Erro de conexão</strong>
     <div style="font-size: 0.9rem; margin-top: 0.5rem;">
@@ -16993,7 +16993,7 @@ function mostrarErroCarregamento() {
 // Atualize o HTML da página represa para incluir os novos elementos:
 function mostrarRepresaChavantes() {
   if (location.hash !== "#represa-chavantes") location.hash = "#represa-chavantes";
-  
+
   const area = document.querySelector(".content_area");
   area.innerHTML = `
     <div class="page-header">
@@ -17046,11 +17046,11 @@ function mostrarRepresaChavantes() {
   carregarDadosRepresa();
 
   // e, no botão "Atualizar Dados", mantenha:
-document.addEventListener('click', (ev) => {
-  const t = ev.target.closest('.btn-refresh');
-  if (t) carregarDadosRepresa();
-});
-  
+  document.addEventListener('click', (ev) => {
+    const t = ev.target.closest('.btn-refresh');
+    if (t) carregarDadosRepresa();
+  });
+
   // Atualização automática a cada 5 minutos
   if (window.represaInterval) clearInterval(window.represaInterval);
   window.represaInterval = setInterval(carregarDadosRepresa, 5 * 60 * 1000);
@@ -17082,8 +17082,8 @@ document.addEventListener("click", (e) => {
 
 
 const linkRepresa = document.getElementById("menuRepresa");
-if (linkRepresa){
-  linkRepresa.addEventListener("click", (e)=>{
+if (linkRepresa) {
+  linkRepresa.addEventListener("click", (e) => {
     e.preventDefault();
     mostrarRepresaChavantes();
   });
