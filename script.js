@@ -9924,6 +9924,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
               },
 
+               {
+                imagem: "images/servicos/revendedor/tati/promocao/3.jpg",
+                titulo: "Super Promo - 11.11",
+                
+                preco: 199.00,
+              
+                validadeFim: "2025-11-11",
+                obs: "Oferta válida até durar o estoque",
+
+              },
+
             ]
 
 
