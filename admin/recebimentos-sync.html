@@ -84,6 +84,37 @@
   font-size:12px;
 }
  .mchip input{ transform:translateY(1px); }
+
+ /* linha com scroll próprio */
+.rowwrap { padding:0 !important; }
+.row-scroll{
+  display:flex; align-items:flex-start; gap:12px;
+  overflow-x:auto; overflow-y:hidden;
+  padding:10px; max-width:100%;
+  -webkit-overflow-scrolling:touch; scrollbar-width:thin;
+  background:#0f141b;
+  border:1px solid var(--soft);
+  border-radius:10px;
+}
+
+/* “sub-células” dentro do carrossel */
+.rcell{ display:flex; flex-direction:column; gap:6px; }
+.rcell.status { min-width:160px }
+.rcell.nome   { min-width:260px }
+.rcell.payer  { min-width:240px }
+.rcell.obs    { min-width:300px }
+.rcell.meses  { min-width:560px }   /* largura visível antes do scroll interno */
+.rcell.acao   { min-width:160px; align-items:center; justify-content:center }
+
+/* reaproveita seus chips de mês dentro do carrossel */
+.row-scroll .months-scroll{
+  display:flex; gap:10px; align-items:center;
+  overflow-x:auto; overflow-y:hidden;
+  padding:6px 6px 8px;
+  -webkit-overflow-scrolling:touch; scrollbar-width:thin;
+  background:#0c1218; border:1px solid var(--soft); border-radius:10px;
+}
+
 </style>
 
 </head>
@@ -128,17 +159,12 @@
 
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-           <th class="idx">#</th>
-    <th class="cat">Status</th>
-    <th class="nome">Comércio / Prestador</th>
-    <th class="payer">Nome usado p/ pagamento</th>
-    <th class="obs">Observações</th>
-    <th class="months">Meses</th>
-    <th class="acao">Ação</th>
-          </tr>
-        </thead>
+       <thead>
+  <tr>
+    <th class="idx">#</th>
+    <th>Cliente (Status • Nome • Pagador • Observações • Meses • Ação)</th>
+  </tr>
+</thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
@@ -384,13 +410,13 @@ function renderStatusChip(isPaid){
   `;
 }
 function updateRowStatusFromCheckboxes(tr){
-  // olha o checkbox do mês atual na linha e atualiza o chip
   const cur = getCurrentMonthKey();
   const chkCur = tr.querySelector(`.months .chk[data-mm="${cur}"]`);
   const isPaid = !!(chkCur && chkCur.checked);
-  const tdStatus = tr.querySelector('.cat');
-  if (tdStatus) tdStatus.innerHTML = renderStatusChip(isPaid);
+  const hold = tr.querySelector('.status-holder');
+  if (hold) hold.innerHTML = renderStatusChip(isPaid);
 }
+
 
 
 
@@ -436,12 +462,39 @@ const isPaidNow = computeStatusForRow(mesesData);
 
 tr.innerHTML = `
   <td class="idx">${i}</td>
-  <td class="cat">${renderStatusChip(isPaidNow)}</td>
-  <td class="nome">${escapeHtml(m.name||m.id)}</td>
-  <td class="payer"><input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" /></td>
-  <td class="obs"><textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea></td>
-  <td class="months"><div class="months-scroll">${monthsHtml}</div></td>
-  <td class="acao"><button class="btn-save">Atualizar</button></td>`;
+  <td class="rowwrap">
+    <div class="row-scroll">
+      <div class="rcell status">
+        <div class="label muted">Status</div>
+        <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
+      </div>
+
+      <div class="rcell nome">
+        <div class="label muted">Nome</div>
+        <div class="nome-holder">${escapeHtml(m.name||m.id)}</div>
+      </div>
+
+      <div class="rcell payer">
+        <div class="label muted">Pagador</div>
+        <input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" />
+      </div>
+
+      <div class="rcell obs">
+        <div class="label muted">Observações</div>
+        <textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea>
+      </div>
+
+      <div class="rcell meses">
+        <div class="label muted">Meses</div>
+        <div class="months"><div class="months-scroll">${monthsHtml}</div></div>
+      </div>
+
+      <div class="rcell acao">
+        <button class="btn-save">Atualizar</button>
+      </div>
+    </div>
+  </td>`;
+
 
 
     tbody.appendChild(tr);
@@ -470,11 +523,12 @@ tr.querySelector('.months').addEventListener('change', (e)=>{
 function applyFilter(){
   const q = filtro.value.trim().toLowerCase();
   Array.from(tbody.children).forEach(tr=>{
-    const nome   = tr.children[2].textContent.toLowerCase();   // coluna Nome
-    const status = tr.children[1].textContent.toLowerCase();   // coluna Status
+    const nome   = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
+    const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
     tr.style.display = (!q || nome.includes(q) || status.includes(q)) ? '' : 'none';
   });
 }
+
 
   filtro.addEventListener('input', applyFilter);
 
@@ -506,17 +560,17 @@ chks.forEach(c=>{
   // ===== CSV =====
   function exportCSV(){
     const year = selAno.value;
-    const rows = [['status','nome','pagador','observacao','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']];
+  const rows = [['status','nome','pagador','observacao','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']];
 
-Array.from(tbody.children).forEach(tr=>{
-  if (tr.style.display==='none') return;
-  const status = tr.children[1].textContent.trim(); // "Pago" ou "Pendente"
-  const nome   = tr.children[2].textContent.trim();
-  const pagador= tr.querySelector('.inp-nome').value.trim();
-  const obs    = tr.querySelector('.inp-obs').value.trim();
-  const chks   = Array.from(tr.querySelectorAll('.months .chk')).map(c=> c.checked ? '1' : '0');
-  rows.push([status,nome,pagador,obs, ...chks]);
-});
+  Array.from(tbody.children).forEach(tr=>{
+    if (tr.style.display==='none') return;
+    const status = (tr.querySelector('.status-holder')?.textContent || '').trim();
+    const nome   = (tr.querySelector('.nome-holder')?.textContent || '').trim();
+    const pagador= tr.querySelector('.inp-nome')?.value.trim() || '';
+    const obs    = tr.querySelector('.inp-obs')?.value.trim() || '';
+    const chks   = Array.from(tr.querySelectorAll('.months .chk')).map(c=> c.checked ? '1' : '0');
+    rows.push([status,nome,pagador,obs, ...chks]);
+  });
 
     const csv = rows.map(r=> r.map(s=> '"'+(String(s).replace(/"/g,'""'))+'"').join(',')).join('\n');
     const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
