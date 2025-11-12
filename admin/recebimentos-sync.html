@@ -225,10 +225,52 @@ async function loadStatusFromMainScript(){
 
 
 
+function getComerciosFromStatus(map){
+  const out = []; let i = 0;
+  for (const [id, val] of Object.entries(map || {})){
+    i++;
+    out.push({
+      id,
+      name: id,
+      category: val === "s" ? "Pago" : "Em aberto",
+      sort: i
+    });
+  }
+  return out;
+}
+
+async function doSyncFromScript(){
+  const status = window.__STATUS__ || await loadStatusFromMainScript();
+  if (!status){ alert('statusEstabelecimentos não encontrado (veja o Console).'); return; }
+
+  const locals = getComerciosFromStatus(status);
+
+  // ===== sincroniza 'merchants' no Firestore =====
+  const qMer = query(collection(db, 'merchants'), orderBy('sort'));
+  const snap = await getDocs(qMer);
+  const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
+
+  let created=0, updated=0;
+  for (const m of locals){
+    const ref = doc(db, 'merchants', m.id);
+    const has = remote.get(m.id);
+    if (!has){
+      await setDoc(ref, m);
+      created++;
+    } else {
+      const need = (has.name!==m.name) || (has.category!==m.category) || (has.sort!==m.sort);
+      if (need){ await updateDoc(ref, m); updated++; }
+    }
+  }
+  alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
+}
 
 
 
-  
+
+
+
+
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db   = getFirestore(app);
@@ -329,30 +371,7 @@ async function loadStatusFromMainScript(){
   return out;
 }
 
-async function doSyncFromScript(){
-  const locals = getComerciosFromStatus();
-  if (!locals.length){ alert('statusEstabelecimentos não encontrado'); return; }
 
-  const qMer = query(collection(db, 'merchants'), orderBy('sort'));
-  const snap = await getDocs(qMer);
-  const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
-
-  let created=0, updated=0;
-  for (const m of locals){
-    const has = remote.get(m.id);
-    if (!has){
-      await setDoc(doc(db, 'merchants', m.id), m);
-      created++;
-    } else {
-      const needUpdate = (has.name!==m.name) || (has.category!==m.category);
-      if (needUpdate){
-        await updateDoc(doc(db, 'merchants', m.id), m);
-        updated++;
-      }
-    }
-  }
-  alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
-}
 
 
   // ===== TABELA =====
@@ -466,5 +485,32 @@ async function doSyncFromScript(){
       .replace(/(^-|-$)/g,'')
   }
 </script>
+
+<script>
+  window.__STATUS__ = null;
+
+  async function loadStatusFromMainScript(){
+    try{
+      const res  = await fetch('/script.js', { cache: 'no-store' });
+      const code = await res.text();
+
+      // Extrai: const statusEstabelecimentos = { ... };
+      const m = code.match(/const\s+statusEstabelecimentos\s*=\s*\{[\s\S]*?^\};/m);
+      if(!m){ console.warn('statusEstabelecimentos não encontrado no script.js'); return null; }
+
+      const objCode = m[0]
+        .replace(/^const\s+statusEstabelecimentos\s*=\s*/,'')
+        .replace(/;?\s*$/,'');
+
+      const obj = (new Function('return ('+ objCode +')'))();
+      window.__STATUS__ = obj;
+      return obj;
+    }catch(e){
+      console.error('Falha ao ler statusEstabelecimentos do script.js', e);
+      return null;
+    }
+  }
+</script>
+
 </body>
 </html>
