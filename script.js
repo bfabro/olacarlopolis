@@ -3361,6 +3361,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa5v",
+      status: "Vendido",   // <= adicione isto quando estiver vendido
       tipo: "venda",
       procura: "Chacara", // ou "terreno", "rural", etc.
       quartos: 3,
