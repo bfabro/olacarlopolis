@@ -1010,7 +1010,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // pagou? defina por s pago n nao pago // PAGx
   const statusEstabelecimentos = {
 
-    // COMERCIOS:
+    // INICIO COMERCIOS
 
     //academia
     lobofitness: "n",
@@ -1281,9 +1281,9 @@ document.addEventListener("DOMContentLoaded", function () {
     //vidraçadia
     sallesvidros: "s",
 
-    //// FIM COMERCIO ////////////////////////////////////////////////////////////////////////////////////////
+    // FIM COMERCIOS
 
-    //// INICIO SERVIÇOS ////////////////////////////////////////////////////////////////////////////////////////////////
+    // INICIO SERVIÇOS 
 
     //anuncio
     piodoanuncio: "n",
@@ -1329,9 +1329,7 @@ document.addEventListener("DOMContentLoaded", function () {
     jurandirmachado: "s",
 
 
-
-
-    // FIMMMM SERVIÇOSSSSSS
+ // INICIO SERVIÇOS 
 
     /// INICIO SETOR PUBLICO
     agendamentosaude: "s",

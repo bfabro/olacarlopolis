@@ -141,24 +141,27 @@ async function loadAllowedKeysFromScript(){
   const res  = await fetch('/script.js', { cache: 'no-store' });
   const code = await res.text();
 
-  // 1) bloco COMÉRCIO: tudo antes do marcador "FIM COMERCIO"
-  const ateFimComercio = code.split('//// FIM COMERCIO')[0] || '';
+  // 1) BLOCO COMÉRCIOS: do começo até "// FIM COMERCIOS"
+  const ateFimComercios = code.split('// FIM COMERCIOS')[0] || '';
 
-  // 2) bloco SERVIÇOS: entre "INICIO SERVIÇOS" e "FIMMMM SERVIÇOSSSSSS"
+  // 2) BLOCO SERVIÇOS: entre "// INICIO SERVIÇOS" e "/// INICIO SETOR PUBLICO"
   let blocoServ = '';
-  const p1 = code.indexOf('//// INICIO SERVIÇOS');
-  const p2 = code.indexOf('// FIMMMM SERVIÇOSSSSSS');
-  if (p1 !== -1 && p2 !== -1 && p2 > p1) blocoServ = code.slice(p1, p2);
+  const iniServ = code.indexOf('// INICIO SERVIÇOS');
+  const iniSetorPublico = code.indexOf('/// INICIO SETOR PUBLICO');
+  if (iniServ !== -1 && iniSetorPublico !== -1 && iniSetorPublico > iniServ){
+    blocoServ = code.slice(iniServ, iniSetorPublico);
+  }
 
-  // 3) extrai keys no formato:  nome: "s"  |  nome: "n"
+  // 3) extrai chaves no formato:  nome: "s"  |  nome: "n"
   const rx = /\b([a-z0-9_]+)\s*:\s*"(?:s|n)"/gi;
   const allow = new Set();
-  for (const m of ateFimComercio.matchAll(rx)) allow.add(m[1]);
+  for (const m of ateFimComercios.matchAll(rx)) allow.add(m[1]);
   for (const m of blocoServ.matchAll(rx))      allow.add(m[1]);
 
   return allow;
 }
 </script>
+
 
 
 
@@ -233,20 +236,25 @@ async function loadAllowedKeysFromScript(){
   // merchants/{id} => { name, category, sort }
   // recebimentos/{year}/{merchantId} => { pagadorPadrao, observacao, meses: {"01": {pago, updatedAt, by}, ...} }
 
-  async function initPainel(){
-    const yNow = new Date().getFullYear();
-    selAno.innerHTML = '';
-    [yNow-1,yNow,yNow+1].forEach(y=>{
-      const o=document.createElement('option'); o.value=y; o.textContent=y; if(y===yNow)o.selected=true; selAno.appendChild(o);
-    });
-    selAno.onchange = loadTabela;
-    filtro.oninput = applyFilter;
-    btnCSV.onclick = exportCSV;
-    btnSync.onclick = doSyncFromScript;
+ async function initPainel(){
+  const yNow = new Date().getFullYear();
+  selAno.innerHTML = '';
+  [yNow-1,yNow,yNow+1].forEach(y=>{
+    const o=document.createElement('option'); o.value=y; o.textContent=y; if(y===yNow)o.selected=true; selAno.appendChild(o);
+  });
+  selAno.onchange = loadTabela;
+  filtro.oninput = applyFilter;
+  btnCSV.onclick = exportCSV;
 
-    await doSyncFromScript(); // auto-sync ao abrir
-    await loadTabela();
-  }
+  // <-- NOVO: guarda globalmente
+  window.__ALLOWED__ = await loadAllowedKeysFromScript();
+
+  btnSync.onclick = ()=>doSyncFromScript(window.__ALLOWED__);
+
+  await doSyncFromScript(window.__ALLOWED__); // auto-sync ao abrir
+  await loadTabela();
+}
+
 
  function getComerciosFromStatus(map, allowedSet){
   const out = []; let i = 0;
@@ -264,12 +272,12 @@ async function loadAllowedKeysFromScript(){
 }
 
 
-  async function doSyncFromScript(){
+  async function doSyncFromScript(allowed){
   const status = window.__STATUS__ || await loadStatusFromMainScript();
   if (!status){ alert('statusEstabelecimentos não encontrado (veja Console).'); return; }
 
-  const allowed = await loadAllowedKeysFromScript();   // <-- NOVO
-  const locals  = getComerciosFromStatus(status, allowed);
+  const allowedSet = allowed || window.__ALLOWED__ || await loadAllowedKeysFromScript();
+  const locals     = getComerciosFromStatus(status, allowedSet);
 
   const qMer = query(collection(db, 'merchants'), orderBy('sort'));
   const snap = await getDocs(qMer);
@@ -287,6 +295,7 @@ async function loadAllowedKeysFromScript(){
   }
   alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
 }
+
 
 
   // ===== FIRESTORE HELPERS =====
@@ -312,33 +321,38 @@ async function saveReceb(year, merchantId, payload){
 
   // ===== TABELA =====
   async function loadTabela(){
-    tbody.innerHTML = '';
-    const year = selAno.value;
-    const merchants = await loadMerchants();
-    let i=0; let totalPagos=0, totalMeses=0;
-    for (const m of merchants){
-      i++;
-      const dados = await readReceb(year, m.id);
-      const mesesData = dados.meses || {};
-      const tr = document.createElement('tr');
-      tr.dataset.id = m.id;
-      tr.innerHTML = `
-        <td class="idx">${i}</td>
-        <td class="cat">${escapeHtml(m.category||'')}</td>
-        <td class="nome">${escapeHtml(m.name||m.id)}</td>
-        <td class="payer"><input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" /></td>
-        <td class="obs"><textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea></td>
-        ${["01","02","03","04","05","06","07","08","09","10","11","12"].map(mm=>{
-          const pago = !!(mesesData[mm]?.pago);
-          if (pago) totalPagos++;
-          totalMeses++;
-          return `<td class="month"><label><input type="checkbox" class="chk" ${pago?'checked':''}/><span class="sr-only">pago</span></label></td>`;
-        }).join('')}
-        <td class="acao"><button class="btn-save">Atualizar</button></td>`;
-      tbody.appendChild(tr);
-    }
-    updateSummary(totalPagos, totalMeses);
+  tbody.innerHTML = '';
+  const year = selAno.value;
+
+  const allowed = window.__ALLOWED__ || await loadAllowedKeysFromScript();
+  const merchantsAll = await loadMerchants();
+  const merchants = allowed ? merchantsAll.filter(m => allowed.has(m.id)) : merchantsAll;
+
+  let i=0; let totalPagos=0, totalMeses=0;
+  for (const m of merchants){
+    i++;
+    const dados = await readReceb(year, m.id);
+    const mesesData = dados.meses || {};
+    const tr = document.createElement('tr');
+    tr.dataset.id = m.id;
+    tr.innerHTML = `
+      <td class="idx">${i}</td>
+      <td class="cat">${escapeHtml(m.category||'')}</td>
+      <td class="nome">${escapeHtml(m.name||m.id)}</td>
+      <td class="payer"><input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" /></td>
+      <td class="obs"><textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea></td>
+      ${["01","02","03","04","05","06","07","08","09","10","11","12"].map(mm=>{
+        const pago = !!(mesesData[mm]?.pago);
+        if (pago) totalPagos++;
+        totalMeses++;
+        return `<td class="month"><label><input type="checkbox" class="chk" ${pago?'checked':''}/><span class="sr-only">pago</span></label></td>`;
+      }).join('')}
+      <td class="acao"><button class="btn-save">Atualizar</button></td>`;
+    tbody.appendChild(tr);
   }
+  updateSummary(totalPagos, totalMeses);
+}
+
 
   function updateSummary(pagos, total){
     const pct = total? Math.round((pagos/total)*100):0;
