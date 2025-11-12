@@ -21,21 +21,20 @@
     button{ border:0; border-radius:10px; background:var(--brand); color:#061018; font-weight:700; padding:8px 12px; cursor:pointer }
     button[disabled]{ opacity:.6; cursor:not-allowed }
     .table-wrap{
-  background:var(--panel);
+background:var(--panel);
   border:1px solid var(--soft);
   border-radius:14px;
-  /* bloqueia barra geral */
-  overflow-x:hidden;          /* <--- aqui é o pulo do gato */
+  overflow-x:hidden;   /* <— mantém a barra geral oculta */
   overflow-y:auto;
 }
     table{
-  width:100%;
+   width:100%;
   border-collapse:separate;
   border-spacing:0;
-  table-layout:fixed;         /* <--- garante largura fixa por coluna */
-  min-width:0;                /* não força largura mínima gigante */
+  table-layout:fixed;
+  min-width:0;
 }
-    thead th{ width: 240px;position:sticky; top:0; background:linear-gradient(#121923,#0e141c); border-bottom:1px solid var(--soft); color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; padding:10px 8px; text-align:left }
+    thead th{ position:sticky; top:0; background:linear-gradient(#121923,#0e141c); border-bottom:1px solid var(--soft); color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; padding:10px 8px; text-align:left }
     td{ padding:10px 8px; border-bottom:1px solid #121921 }
     tbody tr:hover{ background:#0f151d }
     .idx{ width:46px; text-align:center }
@@ -88,8 +87,9 @@
  /* linha com scroll próprio */
 .rowwrap { padding:0 !important; }
 .row-scroll{
+ position: relative;               /* necessário p/ sticky funcionar */
   display:flex; align-items:flex-start; gap:12px;
-  overflow-x:auto; overflow-y:hidden;
+  overflow-x:auto; overflow-y:hidden; /* <— único scroll por cliente */
   padding:10px; max-width:100%;
   -webkit-overflow-scrolling:touch; scrollbar-width:thin;
   background:#0f141b;
@@ -99,19 +99,23 @@
 
 /* “sub-células” dentro do carrossel */
 .rcell{ display:flex; flex-direction:column; gap:6px; }
-.rcell.status { min-width:160px }
-.rcell.nome   { min-width:260px }
-.rcell.payer  { min-width:240px }
-.rcell.obs    { min-width:300px }
-.rcell.meses  { min-width:560px }   /* largura visível antes do scroll interno */
-.rcell.acao   { min-width:160px; align-items:center; justify-content:center }
+.rcell.status {   position: sticky; left: 0; z-index: 2;   /* <— fixa o status */
+  min-width: 160px; flex: 0 0 160px;       /* largura fixa */
+  background:#0f141b;                      /* cor de fundo p/ cobrir atrás */
+  box-shadow: 10px 0 12px -10px rgba(0,0,0,.6); /* leve sombreado na borda */
+  border-right: 1px solid var(--soft);min-width:160px }
+.rcell.nome  { min-width:260px }
+.rcell.payer { min-width:240px }
+.rcell.obs   { min-width:300px }
+.rcell.meses { min-width:560px }
+.rcell.acao  { min-width:160px; align-items:center; justify-content:center }
 
 /* reaproveita seus chips de mês dentro do carrossel */
 .row-scroll .months-scroll{
   display:flex; gap:10px; align-items:center;
-  overflow-x:auto; overflow-y:hidden;
+  overflow:visible;                 /* <— sem scroll aqui */
   padding:6px 6px 8px;
-  -webkit-overflow-scrolling:touch; scrollbar-width:thin;
+  -webkit-overflow-scrolling:auto;
   background:#0c1218; border:1px solid var(--soft); border-radius:10px;
 }
 
