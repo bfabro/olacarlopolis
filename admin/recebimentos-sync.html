@@ -480,12 +480,12 @@ tr.innerHTML = `
 
       <div class="rcell payer">
         <div class="label muted">Pagador</div>
-        <input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" />
+        <input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Nome" />
       </div>
 
       <div class="rcell obs">
         <div class="label muted">Observações</div>
-        <textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea>
+        <textarea class="inp-obs" placeholder="-">${escapeHtml(dados.observacao||'')}</textarea>
       </div>
 
       <div class="rcell meses">
