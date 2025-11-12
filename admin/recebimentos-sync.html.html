@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Recebimentos (Auto‑Sync)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#0b0f14; --panel:#11161d; --soft:#182029; --text:#e3e7ee; --muted:#9aa6b2; --brand:#5dd4ff; --ok:#22c55e; --no:#ef4444 }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif }
+    .wrap{ max-width:1240px; margin:0 auto; padding:24px }
+    header{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px }
+    h1{ margin:0; font-size:22px }
+    .card{ background:var(--panel); border:1px solid var(--soft); border-radius:14px; padding:14px }
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px }
+    input, select, button, textarea{ font:inherit; color:var(--text) }
+    input[type=text], input[type=email], input[type=password], textarea, select{ background:#0f141b; border:1px solid var(--soft); border-radius:10px; padding:8px 10px; outline:none }
+    input::placeholder, textarea::placeholder{ color:var(--muted) }
+    button{ border:0; border-radius:10px; background:var(--brand); color:#061018; font-weight:700; padding:8px 12px; cursor:pointer }
+    button[disabled]{ opacity:.6; cursor:not-allowed }
+    .table-wrap{ background:var(--panel); border:1px solid var(--soft); border-radius:14px; overflow:auto }
+    table{ width:100%; border-collapse:separate; border-spacing:0; min-width:1100px }
+    thead th{ position:sticky; top:0; background:linear-gradient(#121923,#0e141c); border-bottom:1px solid var(--soft); color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; padding:10px 8px; text-align:left }
+    td{ padding:10px 8px; border-bottom:1px solid #121921 }
+    tbody tr:hover{ background:#0f151d }
+    .idx{ width:46px; text-align:center }
+    .cat{ width:160px; color:var(--muted) }
+    .nome{ min-width:240px; font-weight:600 }
+    .payer{ min-width:200px }
+    .obs{ min-width:260px }
+    .month{ width:82px; text-align:center }
+    .acao{ width:160px; text-align:center; position:sticky; right:0; background:linear-gradient(90deg,#0f151d, #0e141c) }
+    .chip{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:10px; background:#0f141b; border:1px solid var(--soft); color:var(--muted); font-size:12px }
+    .status-dot{ width:10px; height:10px; border-radius:50% }
+    .dot-ok{ background:var(--ok) } .dot-no{ background:var(--no) }
+    .muted{ color:var(--muted); font-size:12px }
+    .right{ text-align:right }
+    .sr-only{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div style="display:flex; align-items:center; gap:12px">
+      <h1>📒 Recebimentos (auto‑sync do script.js)</h1>
+      <span class="chip"><span class="status-dot dot-ok"></span> Pago</span>
+      <span class="chip"><span class="status-dot dot-no"></span> Em aberto</span>
+    </div>
+    <div class="chip" id="userBox" style="display:none">
+      <span id="userEmail">—</span>
+      <button id="btnLogout">Sair</button>
+    </div>
+  </header>
+
+  <section id="viewLogin" class="card" style="max-width:380px; margin:10vh auto">
+    <h2 style="margin:0 0 12px; font-size:18px">Entrar</h2>
+    <div style="display:grid; gap:10px">
+      <input id="email" type="email" placeholder="Seu e-mail" autocomplete="username" />
+      <input id="senha" type="password" placeholder="Sua senha" autocomplete="current-password" />
+      <button id="btnLogin">Entrar</button>
+      <div class="muted">Crie usuários no Firebase Auth → Users.</div>
+      <div id="loginMsg" class="muted"></div>
+    </div>
+  </section>
+
+  <section id="viewPainel" style="display:none">
+    <div class="toolbar">
+      <div class="card">
+        <label for="ano">Ano:&nbsp;</label>
+        <select id="ano"></select>
+      </div>
+      <div class="card"><input id="filtro" type="text" placeholder="Pesquisar por nome ou categoria…" /></div>
+      <div class="card"><button id="btnSync">Sincronizar com script.js</button></div>
+      <div class="card"><button id="btnCSV">Exportar CSV</button></div>
+      <div class="card muted" id="sumario">—</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="idx">#</th>
+            <th class="cat">Categoria</th>
+            <th class="nome">Comércio / Prestador</th>
+            <th class="payer">Nome usado p/ pagamento</th>
+            <th class="obs">Observações</th>
+            <th class="month">Jan</th><th class="month">Fev</th><th class="month">Mar</th><th class="month">Abr</th>
+            <th class="month">Mai</th><th class="month">Jun</th><th class="month">Jul</th><th class="month">Ago</th>
+            <th class="month">Set</th><th class="month">Out</th><th class="month">Nov</th><th class="month">Dez</th>
+            <th class="acao">Ação</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- 1) Carregue seu script.js do site (onde está const categories = [...] ) -->
+<script src="../script.js"></script>
+<!-- 2) Bridge: expõe as categories para window, mesmo se forem const/let -->
+<script>
+  (function(){
+    try{ window.__CATEGORIES__ = (typeof categories !== 'undefined') ? categories : (window.categories||null); }
+    catch(e){ window.__CATEGORIES__ = window.categories || null; }
+  })();
+</script>
+
+<!-- 3) Firebase modular + app -->
+<script type="module">
+  // ===== CONFIGURE AQUI =====
+  const firebaseConfig = {  apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+         authDomain: "contadoracessos.firebaseapp.com",
+         databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+         projectId: "contadoracessos",
+         storageBucket: "contadoracessos.firebasestorage.app",
+         messagingSenderId: "521517291315",
+         appId: "1:521517291315:web:74f8d878d2d8769460d046",
+         measurementId: "G-BXPWYWK61F" };
+
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // ===== ELEMENTOS =====
+  const viewLogin = document.getElementById('viewLogin');
+  const viewPainel= document.getElementById('viewPainel');
+  const email = document.getElementById('email');
+  const senha = document.getElementById('senha');
+  const btnLogin = document.getElementById('btnLogin');
+  const loginMsg = document.getElementById('loginMsg');
+  const userBox = document.getElementById('userBox');
+  const userEmail = document.getElementById('userEmail');
+  const btnLogout = document.getElementById('btnLogout');
+  const selAno = document.getElementById('ano');
+  const filtro = document.getElementById('filtro');
+  const tbody = document.getElementById('tbody');
+  const btnCSV = document.getElementById('btnCSV');
+  const btnSync= document.getElementById('btnSync');
+  const sumario = document.getElementById('sumario');
+
+  const mesesKeys = ["01","02","03","04","05","06","07","08","09","10","11","12"];
+
+  // ===== LOGIN =====
+  btnLogin.addEventListener('click', async ()=>{
+    btnLogin.disabled = true; loginMsg.textContent = 'Entrando…';
+    try{
+      await signInWithEmailAndPassword(auth, email.value.trim(), senha.value.trim());
+      loginMsg.textContent = '';
+    }catch(e){
+      loginMsg.textContent = 'Falha ao entrar: ' + (e.message || e.code);
+    }finally{ btnLogin.disabled = false; }
+  });
+  btnLogout.addEventListener('click', ()=> signOut(auth));
+
+  onAuthStateChanged(auth, async user => {
+    if (user){
+      userBox.style.display = 'inline-flex';
+      userEmail.textContent = user.email || 'Usuário';
+      viewLogin.style.display = 'none';
+      viewPainel.style.display = '';
+      await initPainel();
+    }else{
+      userBox.style.display = 'none';
+      viewLogin.style.display = '';
+      viewPainel.style.display = 'none';
+    }
+  });
+
+  // ===== MODELO DE DADOS (FIRESTORE) =====
+  // merchants/{id} => { name, category, sort }
+  // recebimentos/{year}/{merchantId} => { pagadorPadrao, observacao, meses: {"01": {pago, updatedAt, by}, ...} }
+
+  async function initPainel(){
+    // anos
+    const yNow = new Date().getFullYear();
+    selAno.innerHTML = '';
+    ;[yNow-1,yNow,yNow+1].forEach(y=>{
+      const o=document.createElement('option'); o.value=y; o.textContent=y; if(y===yNow)o.selected=true; selAno.appendChild(o);
+    });
+    selAno.onchange = loadTabela;
+    filtro.oninput = applyFilter;
+    btnCSV.onclick = exportCSV;
+    btnSync.onclick = doSyncFromScript;
+
+    await doSyncFromScript(); // auto‑sync ao abrir
+    await loadTabela();
+  }
+
+  // ===== SYNC: lê window.__CATEGORIES__ e sincroniza 'merchants' =====
+  function getCategoriesArray(){
+    const cats = window.__CATEGORIES__;
+    if (!cats || !Array.isArray(cats)) return [];
+    const out = [];
+    let k=0;
+    for (const cat of cats){
+      const catTitle = cat.title || '';
+      for (const est of (cat.establishments||[])){
+        k++; out.push({ id: slug(est.name), name: est.name, category: catTitle, sort: k });
+      }
+    }
+    return out;
+  }
+
+  async function doSyncFromScript(){
+    const locals = getCategoriesArray();
+    if (!locals.length){ alert('Não encontrei window.__CATEGORIES__. Tenha certeza que o script.js foi carregado antes.'); return; }
+
+    // lê merchants atuais
+    const qMer = query(collection(db, 'merchants'), orderBy('sort'));
+    const snap = await getDocs(qMer);
+    const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
+
+    // adiciona/atualiza conforme script.js (preserva recebimentos em outra coleção)
+    let created=0, updated=0;
+    for (const m of locals){
+      const has = remote.get(m.id);
+      if (!has){
+        await setDoc(doc(db, 'merchants', m.id), { name:m.name, category:m.category, sort:m.sort });
+        created++;
+      } else {
+        // atualiza se mudou nome/categoria/sort (não mexe em recibos)
+        const needUpdate = (has.name!==m.name) || (has.category!==m.category) || (has.sort!==m.sort);
+        if (needUpdate){
+          await updateDoc(doc(db, 'merchants', m.id), { name:m.name, category:m.category, sort:m.sort });
+          updated++;
+        }
+      }
+    }
+    alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
+  }
+
+  // ===== TABELA =====
+  async function loadMerchants(){
+    const q = query(collection(db, 'merchants'), orderBy('sort'));
+    const snap = await getDocs(q);
+    return snap.docs.map(d=>({ id:d.id, ...d.data() }));
+  }
+  async function readReceb(year, merchantId){
+    const dref = doc(db, 'recebimentos', String(year), merchantId);
+    const d = await getDoc(dref);
+    return d.exists() ? d.data() : {};
+  }
+  async function saveReceb(year, merchantId, payload){
+    const dref = doc(db, 'recebimentos', String(year), merchantId);
+    await setDoc(dref, payload, { merge:true });
+  }
+
+  async function loadTabela(){
+    tbody.innerHTML = '';
+    const year = selAno.value;
+    const merchants = await loadMerchants();
+    let i=0; let totalPagos=0, totalMeses=0;
+    for (const m of merchants){
+      i++;
+      const dados = await readReceb(year, m.id);
+      const mesesData = dados.meses || {};
+      const tr = document.createElement('tr');
+      tr.dataset.id = m.id;
+      tr.innerHTML = `
+        <td class="idx">${i}</td>
+        <td class="cat">${escapeHtml(m.category||'')}</td>
+        <td class="nome">${escapeHtml(m.name||m.id)}</td>
+        <td class="payer"><input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" /></td>
+        <td class="obs"><textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea></td>
+        ${mesesKeys.map(mm=>{
+          const pago = !!(mesesData[mm]?.pago);
+          if (pago) totalPagos++;
+          totalMeses++;
+          return `<td class=\"month\"><label><input type=\"checkbox\" class=\"chk\" ${pago?'checked':''}/><span class=\"sr-only\">pago</span></label></td>`
+        }).join('')}
+        <td class="acao"><button class="btn-save">Atualizar</button></td>`;
+      tbody.appendChild(tr);
+    }
+    updateSummary(totalPagos, totalMeses);
+  }
+
+  function updateSummary(pagos, total){
+    const pct = total? Math.round((pagos/total)*100):0;
+    sumario.textContent = `Pagos: ${pagos}/${total} (${pct}%)`;
+  }
+
+  function applyFilter(){
+    const q = filtro.value.trim().toLowerCase();
+    Array.from(tbody.children).forEach(tr=>{
+      const nome = tr.children[2].textContent.toLowerCase();
+      const cat  = tr.children[1].textContent.toLowerCase();
+      tr.style.display = (!q || nome.includes(q) || cat.includes(q))? '':'none';
+    });
+  }
+  filtro.addEventListener('input', applyFilter);
+
+  tbody.addEventListener('click', async (ev)=>{
+    const btn = ev.target.closest('.btn-save');
+    if (!btn) return;
+    const tr = btn.closest('tr');
+    btn.disabled = true; btn.textContent = 'Salvando…';
+    try{
+      const merchantId = tr.dataset.id;
+      const year = selAno.value;
+      const inpNome = tr.querySelector('.inp-nome');
+      const inpObs  = tr.querySelector('.inp-obs');
+      const chks = Array.from(tr.querySelectorAll('input.chk'));
+      const meses = {};
+      chks.forEach((c, idx)=>{
+        const mm = mesesKeys[idx];
+        meses[mm] = { pago: !!c.checked, updatedAt: serverTimestamp(), by: (auth.currentUser?.uid||null) };
+      });
+      await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
+      btn.textContent = '✅ Salvo'; setTimeout(()=> btn.textContent = 'Atualizar', 1000);
+    }catch(e){ console.error(e); btn.textContent = 'Erro'; setTimeout(()=> btn.textContent = 'Atualizar', 1200); }
+    finally{ btn.disabled=false }
+  });
+
+  // ===== CSV =====
+  function exportCSV(){
+    const year = selAno.value;
+    const rows = [['categoria','nome','pagador','observacao','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']];
+    Array.from(tbody.children).forEach(tr=>{
+      if (tr.style.display==='none') return;
+      const cat = tr.children[1].textContent.trim();
+      const nome = tr.children[2].textContent.trim();
+      const pagador = tr.querySelector('.inp-nome').value.trim();
+      const obs = tr.querySelector('.inp-obs').value.trim();
+      const chks = Array.from(tr.querySelectorAll('input.chk')).map(c=> c.checked? '1':'0');
+      rows.push([cat,nome,pagador,obs, ...chks]);
+    });
+    const csv = rows.map(r=> r.map(s=> '"'+(String(s).replace(/"/g,'""'))+'"').join(',')).join('\n');
+    const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `recebimentos-${year}.csv`; a.click();
+  }
+
+  // ===== UTILS =====
+  function escapeHtml(s){ return String(s).replace(/[&<>\"]/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m])) }
+  function slug(s){
+    return String(s||'').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/&/g,'e')
+      .replace(/[^a-z0-9]+/g,'-')
+      .replace(/(^-|-$)/g,'')
+  }
+</script>
+</body>
+</html>
