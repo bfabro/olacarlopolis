@@ -20,8 +20,21 @@
     input::placeholder, textarea::placeholder{ color:var(--muted) }
     button{ border:0; border-radius:10px; background:var(--brand); color:#061018; font-weight:700; padding:8px 12px; cursor:pointer }
     button[disabled]{ opacity:.6; cursor:not-allowed }
-    .table-wrap{ background:var(--panel); border:1px solid var(--soft); border-radius:14px; overflow:auto }
-    table{ width:100%; border-collapse:separate; border-spacing:0; min-width:1100px }
+    .table-wrap{
+  background:var(--panel);
+  border:1px solid var(--soft);
+  border-radius:14px;
+  /* bloqueia barra geral */
+  overflow-x:hidden;          /* <--- aqui é o pulo do gato */
+  overflow-y:auto;
+}
+    table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  table-layout:fixed;         /* <--- garante largura fixa por coluna */
+  min-width:0;                /* não força largura mínima gigante */
+}
     thead th{ position:sticky; top:0; background:linear-gradient(#121923,#0e141c); border-bottom:1px solid var(--soft); color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; padding:10px 8px; text-align:left }
     td{ padding:10px 8px; border-bottom:1px solid #121921 }
     tbody tr:hover{ background:#0f151d }
@@ -41,17 +54,34 @@
 
   <style>
   /* === meses com scroll por linha === */
-  .months{ width:520px; }
-  .months-scroll{
-    display:flex; gap:10px; align-items:center;
-    overflow-x:auto; padding-bottom:6px;   /* deixa aparecer a barra */
-    -webkit-overflow-scrolling: touch;     /* suave no mobile */
-    scrollbar-width: thin;
-  }
-  .mchip{ display:inline-flex; align-items:center; gap:6px;
-          white-space:nowrap; background:#0f141b; border:1px solid var(--soft);
-          border-radius:10px; padding:6px 8px; font-size:12px; }
-  .mchip input{ transform:translateY(1px); }
+  .months{
+  width:520px;                /* ajuste se quiser mais/menos visível */
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+ .months-scroll{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  max-width:100%;             /* <--- respeita a largura da célula */
+  overflow-x:auto;            /* <--- barra por linha */
+  overflow-y:hidden;
+  padding:6px 8px 8px;        /* espaço pra barra aparecer */
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+}
+  .mchip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  white-space:nowrap;
+  background:#0f141b;
+  border:1px solid var(--soft);
+  border-radius:10px;
+  padding:6px 8px;
+  font-size:12px;
+}
+ .mchip input{ transform:translateY(1px); }
 </style>
 
 </head>
@@ -428,7 +458,7 @@ chks.forEach(c=>{
       const nome = tr.children[2].textContent.trim();
       const pagador = tr.querySelector('.inp-nome').value.trim();
       const obs = tr.querySelector('.inp-obs').value.trim();
-      const chks = Array.from(tr.querySelectorAll('input.chk')).map(c=> c.checked? '1':'0');
+      const chks = Array.from(tr.querySelectorAll('.months .chk')).map(c=> c.checked ? '1' : '0');
       rows.push([cat,nome,pagador,obs, ...chks]);
     });
     const csv = rows.map(r=> r.map(s=> '"'+(String(s).replace(/"/g,'""'))+'"').join(',')).join('\n');
