@@ -136,6 +136,31 @@
   }
 </script>
 
+<script>
+async function loadAllowedKeysFromScript(){
+  const res  = await fetch('/script.js', { cache: 'no-store' });
+  const code = await res.text();
+
+  // 1) bloco COMÉRCIO: tudo antes do marcador "FIM COMERCIO"
+  const ateFimComercio = code.split('//// FIM COMERCIO')[0] || '';
+
+  // 2) bloco SERVIÇOS: entre "INICIO SERVIÇOS" e "FIMMMM SERVIÇOSSSSSS"
+  let blocoServ = '';
+  const p1 = code.indexOf('//// INICIO SERVIÇOS');
+  const p2 = code.indexOf('// FIMMMM SERVIÇOSSSSSS');
+  if (p1 !== -1 && p2 !== -1 && p2 > p1) blocoServ = code.slice(p1, p2);
+
+  // 3) extrai keys no formato:  nome: "s"  |  nome: "n"
+  const rx = /\b([a-z0-9_]+)\s*:\s*"(?:s|n)"/gi;
+  const allow = new Set();
+  for (const m of ateFimComercio.matchAll(rx)) allow.add(m[1]);
+  for (const m of blocoServ.matchAll(rx))      allow.add(m[1]);
+
+  return allow;
+}
+</script>
+
+
 
 <!-- Firebase + App -->
 <script type="module">
@@ -223,36 +248,46 @@
     await loadTabela();
   }
 
-  function getComerciosFromStatus(map){
-    const out = []; let i = 0;
-    for (const [id, val] of Object.entries(map || {})){
-      i++;
-      out.push({ id, name:id, category: (val === "s" ? "Pago" : "Em aberto"), sort:i });
-    }
-    return out;
+ function getComerciosFromStatus(map, allowedSet){
+  const out = []; let i = 0;
+  for (const [id, val] of Object.entries(map || {})){
+    if (allowedSet && !allowedSet.has(id)) continue;  // <-- filtro
+    i++;
+    out.push({
+      id,
+      name: id,
+      category: (val === "s" ? "Pago" : "Em aberto"),
+      sort: i
+    });
   }
+  return out;
+}
+
 
   async function doSyncFromScript(){
-    const status = window.__STATUS__ || await loadStatusFromMainScript();
-    if (!status){ alert('statusEstabelecimentos não encontrado (veja Console).'); return; }
-    const locals = getComerciosFromStatus(status);
+  const status = window.__STATUS__ || await loadStatusFromMainScript();
+  if (!status){ alert('statusEstabelecimentos não encontrado (veja Console).'); return; }
 
-    const qMer = query(collection(db, 'merchants'), orderBy('sort'));
-    const snap = await getDocs(qMer);
-    const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
+  const allowed = await loadAllowedKeysFromScript();   // <-- NOVO
+  const locals  = getComerciosFromStatus(status, allowed);
 
-    let created=0, updated=0;
-    for (const m of locals){
-      const ref = doc(db, 'merchants', m.id);
-      const has = remote.get(m.id);
-      if (!has){ await setDoc(ref, m); created++; }
-      else{
-        const need = (has.name!==m.name) || (has.category!==m.category) || (has.sort!==m.sort);
-        if (need){ await updateDoc(ref, m); updated++; }
-      }
+  const qMer = query(collection(db, 'merchants'), orderBy('sort'));
+  const snap = await getDocs(qMer);
+  const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
+
+  let created=0, updated=0;
+  for (const m of locals){
+    const ref = doc(db, 'merchants', m.id);
+    const has = remote.get(m.id);
+    if (!has){ await setDoc(ref, m); created++; }
+    else{
+      const need = (has.name!==m.name) || (has.category!==m.category) || (has.sort!==m.sort);
+      if (need){ await updateDoc(ref, m); updated++; }
     }
-    alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
   }
+  alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
+}
+
 
   // ===== FIRESTORE HELPERS =====
   async function loadMerchants(){

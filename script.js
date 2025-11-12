@@ -1260,6 +1260,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // produtos de limpeza
     jmprodutosdelimpeza: "s",
 
+    funerariacristorei: "s",
+    funerariagrupocastilho: "s",
+    
+
 
     //materiais eletricos
 
@@ -1298,11 +1302,11 @@ document.addEventListener("DOMContentLoaded", function () {
     rose: "n",
 
     //frete
-    anselmofrete: "s",
-    erickson: "s",
+    anselmofrete: "n",
+    erickson: "n",
 
     // guia de pesca
-    fabiosushimoto: "s",
+    fabiosushimoto: "n",
 
     //eletrecista
     cyberneticosinstalacoes: "s",
@@ -1342,10 +1346,12 @@ document.addEventListener("DOMContentLoaded", function () {
     clubedexadrez: "s",
     ubsceleiderobles: "s",
 
-    // cheches:
+    // creches:
     ainzararossisallescmei: "s",
     isabeldallabdasilvacmeiprofa: "s",
     marinhafogacadeoliveiracmei: "s",
+
+    //delegacia
 
     delegacia: "s",
 
@@ -1375,9 +1381,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // INFORMAÇOES
 
-    // INICIO NOTA DE FALECIMENTO
-    funerariacristorei: "s",
-    funerariagrupocastilho: "s",
     funerariasaovicentedepaulo: "s",
     funerariabomjesus: "s",
 
