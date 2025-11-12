@@ -177,6 +177,56 @@ background:var(--panel);
 }
 
 
+.status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0f141b;
+  border: 1px solid var(--soft);
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+}
+
+.status-header .cliente-nome {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-save-sticky {
+  background: var(--brand);
+  color: #061018;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 9px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-save-sticky:hover {
+  background: #79ddff;
+}
+
+@media (max-width: 768px) {
+  .status-header {
+    flex-direction: row;
+    gap: 6px;
+    padding: 6px 8px;
+  }
+  .status-header .cliente-nome {
+    font-size: 12px;
+    max-width: 140px;
+  }
+  .btn-save-sticky {
+    font-size: 16px;
+    padding: 4px 6px;
+  }
+}
 
 
 </style>
@@ -529,14 +579,13 @@ tr.innerHTML = `
   <td class="rowwrap">
     <div class="row-scroll">
       <div class="rcell status">
-        <div class="label muted">Status</div>
+        <div class="status-header">
+          <div class="cliente-nome">${escapeHtml(m.name || m.id)}</div>
+          <button class="btn-save btn-save-sticky" title="Salvar alterações">
+            💾
+          </button>
+        </div>
         <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
-        <button class="btn-save btn-save-sticky">Atualizar</button>
-      </div>
-
-      <div class="rcell nome">
-        <div class="label muted">Nome</div>
-        <div class="nome-holder">${escapeHtml(m.name||m.id)}</div>
       </div>
 
       <div class="rcell payer">
@@ -555,6 +604,7 @@ tr.innerHTML = `
       </div>
     </div>
   </td>`;
+
 
 
 
