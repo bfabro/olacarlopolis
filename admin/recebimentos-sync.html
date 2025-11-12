@@ -228,6 +228,57 @@ background:var(--panel);
   }
 }
 
+/* bloco status reformulado */
+.status-title{
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  margin-bottom:6px;
+}
+
+.cliente-nome{
+  font-weight:700;
+  font-size:15px;      /* maior e legível */
+  line-height:1.2;
+  color:var(--text);
+  white-space:normal;  /* permite 2 linhas no mobile */
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+
+.status-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;            /* no mobile pode quebrar */
+  background:#0f141b;
+  border:1px solid var(--soft);
+  border-radius:10px;
+  padding:6px 8px;
+}
+
+.btn-icon{
+  background:var(--brand);
+  color:#061018;
+  border:0;
+  border-radius:10px;
+  padding:6px 10px;
+  font-size:16px;           /* ícone maior */
+  cursor:pointer;
+}
+.btn-icon:hover{ background:#79ddff; }
+
+/* dá um pouco mais de largura pro status “grudar” melhor o conteúdo */
+.rcell.status{ min-width:190px; flex:0 0 190px; }
+
+/* MOBILE */
+@media (max-width:768px){
+  .rcell.status{ min-width:180px; flex:0 0 180px; }
+  .cliente-nome{ font-size:14px; -webkit-line-clamp:2; }
+  .status-row{ gap:8px; padding:6px; }
+  .btn-icon{ font-size:18px; padding:6px 8px; }
+}
+
+
 
 </style>
 
@@ -578,15 +629,27 @@ tr.innerHTML = `
   <td class="idx">${i}</td>
   <td class="rowwrap">
     <div class="row-scroll">
-      <div class="rcell status">
-        <div class="status-header">
-          <div class="cliente-nome">${escapeHtml(m.name || m.id)}</div>
-          <button class="btn-save btn-save-sticky" title="Salvar alterações">
-            💾
-          </button>
-        </div>
-        <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
-      </div>
+
+
+     <div class="rcell status">
+  <div class="status-title">
+    <span class="cliente-nome" title="${escapeHtml(m.name || m.id)}">
+      ${escapeHtml(m.name || m.id)}
+    </span>
+    <!-- mantém compatível com o filtro -->
+    <span class="sr-only nome-holder">${escapeHtml(m.name || m.id)}</span>
+  </div>
+
+  <div class="status-row">
+    <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
+    <button class="btn-save btn-icon" title="Salvar alterações" aria-label="Salvar alterações">
+      💾
+    </button>
+  </div>
+</div>
+
+
+
 
       <div class="rcell payer">
         <div class="label muted">Pagador</div>
