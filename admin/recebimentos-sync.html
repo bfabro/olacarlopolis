@@ -354,6 +354,7 @@ async function saveReceb(year, merchantId, payload){
 }
 
 
+
   function updateSummary(pagos, total){
     const pct = total? Math.round((pagos/total)*100):0;
     sumario.textContent = `Pagos: ${pagos}/${total} (${pct}%)`;
