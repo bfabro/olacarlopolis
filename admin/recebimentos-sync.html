@@ -159,10 +159,40 @@
 
 
 
-<!-- 1) Carregue seu script.js do site (onde está const categories = [...] ) -->
-<script src="/script.js?v=sync1"></script>
+<!-- 1) Carregue seu script.js do site (onde está const categories = [...] ) 
+<script src="/script.js?v=sync1"></script>-->
 
 
+<!-- Loader: baixa /script.js como texto e extrai apenas o objeto statusEstabelecimentos -->
+<script>
+async function loadStatusFromMainScript(){
+  try{
+    const res  = await fetch('/script.js', { cache: 'no-store' });
+    const code = await res.text();
+
+    // pega: const statusEstabelecimentos = { ... };
+    const m = code.match(/const\s+statusEstabelecimentos\s*=\s*\{[\s\S]*?^\};/m);
+    if(!m){
+      alert('statusEstabelecimentos não encontrado dentro do script.js');
+      return null;
+    }
+
+    // transforma em objeto JS
+    const objCode = m[0]
+      .replace(/^const\s+statusEstabelecimentos\s*=\s*/,'') // remove "const statusEstabelecimentos ="
+      .replace(/;?\s*$/,'');                                // remove ; final
+
+    const obj = (new Function('return ('+ objCode +')'))(); // avalia só o literal
+
+    window.__STATUS__ = obj;
+    return obj;
+  }catch(e){
+    console.error('Falha ao ler statusEstabelecimentos do script.js', e);
+    alert('Erro ao ler statusEstabelecimentos do script.js');
+    return null;
+  }
+}
+</script>
 
 
 
@@ -192,6 +222,54 @@
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+
+
+function getComerciosFromStatus(map){
+  const out = []; let i = 0;
+  for (const [id, val] of Object.entries(map || {})){
+    i++;
+    out.push({
+      id,
+      name: id,                    // usa a própria key como nome legível (ajuste se quiser)
+      category: val === "s" ? "Pago" : "Em aberto",
+      sort: i
+    });
+  }
+  return out;
+}
+
+async function doSyncFromScript(){
+  // tenta usar cache global; se não tiver, baixa e extrai agora
+  const status = window.__STATUS__ || await loadStatusFromMainScript();
+  if (!status){ alert('statusEstabelecimentos não encontrado'); return; }
+
+  const locals = getComerciosFromStatus(status);
+
+  // ===== sincroniza no Firestore (coleção merchants) =====
+  const qMer = query(collection(db, 'merchants'), orderBy('sort'));
+  const snap = await getDocs(qMer);
+  const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
+
+  let created=0, updated=0;
+  for (const m of locals){
+    const ref = doc(db, 'merchants', m.id);
+    const has = remote.get(m.id);
+    if (!has){
+      await setDoc(ref, m);
+      created++;
+    } else {
+      const need = (has.name!==m.name) || (has.category!==m.category) || (has.sort!==m.sort);
+      if (need){ await updateDoc(ref, m); updated++; }
+    }
+  }
+  alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
+}
+
+
+
+
+
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
