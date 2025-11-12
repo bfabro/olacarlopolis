@@ -119,6 +119,17 @@ background:var(--panel);
   background:#0c1218; border:1px solid var(--soft); border-radius:10px;
 }
 
+/* Botão “Atualizar” fixo dentro do bloco Status */
+.rcell.status .btn-save-sticky{
+  margin-top: 8px;
+  width: 100%;
+  white-space: nowrap;
+  position: sticky;    /* gruda junto com o próprio bloco que já é sticky */
+  left: 0;             /* acompanha o status à esquerda */
+  z-index: 3;
+}
+
+
 </style>
 
 </head>
@@ -166,7 +177,7 @@ background:var(--panel);
        <thead>
   <tr>
     <th class="idx">#</th>
-    <th>Cliente (Status • Nome • Pagador • Observações • Meses • Ação)</th>
+  <th>Cliente (Status • Nome • Pagador • Observações • Meses)</th>
   </tr>
 </thead>
         <tbody id="tbody"></tbody>
@@ -471,6 +482,7 @@ tr.innerHTML = `
       <div class="rcell status">
         <div class="label muted">Status</div>
         <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
+        <button class="btn-save btn-save-sticky">Atualizar</button>
       </div>
 
       <div class="rcell nome">
@@ -492,12 +504,9 @@ tr.innerHTML = `
         <div class="label muted">Meses</div>
         <div class="months"><div class="months-scroll">${monthsHtml}</div></div>
       </div>
-
-      <div class="rcell acao">
-        <button class="btn-save">Atualizar</button>
-      </div>
     </div>
   </td>`;
+
 
 
 
