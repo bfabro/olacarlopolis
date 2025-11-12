@@ -171,10 +171,11 @@
 
 <script>
   (function(){
-    try{ window.__CATEGORIES__ = (typeof categories !== 'undefined') ? categories : (window.categories||null); }
-    catch(e){ window.__CATEGORIES__ = window.categories || null; }
+    try{ window.__STATUS__ = window.statusEstabelecimentos || null; }
+    catch(e){ window.__STATUS__ = null; }
   })();
 </script>
+
 
 <!-- 3) Firebase modular + app -->
 <script type="module">
@@ -263,7 +264,7 @@
 
   // ===== SYNC: lê window.__CATEGORIES__ e sincroniza 'merchants' =====
   function getCategoriesArray(){
-    const cats = window.__CATEGORIES__;
+    const locals = getComerciosFromStatus();
     if (!cats || !Array.isArray(cats)) return [];
     const out = [];
     let k=0;
@@ -276,33 +277,47 @@
     return out;
   }
 
-  async function doSyncFromScript(){
-    const locals = getCategoriesArray();
-    if (!locals.length){ alert('Não encontrei window.__CATEGORIES__. Tenha certeza que o script.js foi carregado antes.'); return; }
+  function getComerciosFromStatus(){
+  const s = window.__STATUS__;
+  if (!s) return [];
+  const out = []; let i=0;
+  for (const [id, val] of Object.entries(s)){
+    i++;
+    out.push({
+      id,
+      name: id,
+      category: val === "s" ? "Pago" : "Em aberto",
+      sort: i
+    });
+  }
+  return out;
+}
 
-    // lê merchants atuais
-    const qMer = query(collection(db, 'merchants'), orderBy('sort'));
-    const snap = await getDocs(qMer);
-    const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
+async function doSyncFromScript(){
+  const locals = getComerciosFromStatus();
+  if (!locals.length){ alert('statusEstabelecimentos não encontrado'); return; }
 
-    // adiciona/atualiza conforme script.js (preserva recebimentos em outra coleção)
-    let created=0, updated=0;
-    for (const m of locals){
-      const has = remote.get(m.id);
-      if (!has){
-        await setDoc(doc(db, 'merchants', m.id), { name:m.name, category:m.category, sort:m.sort });
-        created++;
-      } else {
-        // atualiza se mudou nome/categoria/sort (não mexe em recibos)
-        const needUpdate = (has.name!==m.name) || (has.category!==m.category) || (has.sort!==m.sort);
-        if (needUpdate){
-          await updateDoc(doc(db, 'merchants', m.id), { name:m.name, category:m.category, sort:m.sort });
-          updated++;
-        }
+  const qMer = query(collection(db, 'merchants'), orderBy('sort'));
+  const snap = await getDocs(qMer);
+  const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
+
+  let created=0, updated=0;
+  for (const m of locals){
+    const has = remote.get(m.id);
+    if (!has){
+      await setDoc(doc(db, 'merchants', m.id), m);
+      created++;
+    } else {
+      const needUpdate = (has.name!==m.name) || (has.category!==m.category);
+      if (needUpdate){
+        await updateDoc(doc(db, 'merchants', m.id), m);
+        updated++;
       }
     }
-    alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
   }
+  alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
+}
+
 
   // ===== TABELA =====
   async function loadMerchants(){
