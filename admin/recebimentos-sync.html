@@ -38,6 +38,22 @@
     .muted{ color:var(--muted); font-size:12px }
     .sr-only{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden }
   </style>
+
+  <style>
+  /* === meses com scroll por linha === */
+  .months{ width:520px; }
+  .months-scroll{
+    display:flex; gap:10px; align-items:center;
+    overflow-x:auto; padding-bottom:6px;   /* deixa aparecer a barra */
+    -webkit-overflow-scrolling: touch;     /* suave no mobile */
+    scrollbar-width: thin;
+  }
+  .mchip{ display:inline-flex; align-items:center; gap:6px;
+          white-space:nowrap; background:#0f141b; border:1px solid var(--soft);
+          border-radius:10px; padding:6px 8px; font-size:12px; }
+  .mchip input{ transform:translateY(1px); }
+</style>
+
 </head>
 <body>
 <div class="wrap">
@@ -82,15 +98,13 @@
       <table>
         <thead>
           <tr>
-            <th class="idx">#</th>
-            <th class="cat">Categoria</th>
-            <th class="nome">Comércio / Prestador</th>
-            <th class="payer">Nome usado p/ pagamento</th>
-            <th class="obs">Observações</th>
-            <th class="month">Jan</th><th class="month">Fev</th><th class="month">Mar</th><th class="month">Abr</th>
-            <th class="month">Mai</th><th class="month">Jun</th><th class="month">Jul</th><th class="month">Ago</th>
-            <th class="month">Set</th><th class="month">Out</th><th class="month">Nov</th><th class="month">Dez</th>
-            <th class="acao">Ação</th>
+           <th class="idx">#</th>
+    <th class="cat">Categoria</th>
+    <th class="nome">Comércio / Prestador</th>
+    <th class="payer">Nome usado p/ pagamento</th>
+    <th class="obs">Observações</th>
+    <th class="months">Meses</th>
+    <th class="acao">Ação</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -335,19 +349,30 @@ async function saveReceb(year, merchantId, payload){
     const mesesData = dados.meses || {};
     const tr = document.createElement('tr');
     tr.dataset.id = m.id;
-    tr.innerHTML = `
-      <td class="idx">${i}</td>
-      <td class="cat">${escapeHtml(m.category||'')}</td>
-      <td class="nome">${escapeHtml(m.name||m.id)}</td>
-      <td class="payer"><input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" /></td>
-      <td class="obs"><textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea></td>
-      ${["01","02","03","04","05","06","07","08","09","10","11","12"].map(mm=>{
-        const pago = !!(mesesData[mm]?.pago);
-        if (pago) totalPagos++;
-        totalMeses++;
-        return `<td class="month"><label><input type="checkbox" class="chk" ${pago?'checked':''}/><span class="sr-only">pago</span></label></td>`;
-      }).join('')}
-      <td class="acao"><button class="btn-save">Atualizar</button></td>`;
+
+// antes de montar tr.innerHTML
+const monthsHtml = ["01","02","03","04","05","06","07","08","09","10","11","12"].map((mm,idx)=>{
+  const pago = !!(mesesData[mm]?.pago);
+  if (pago) totalPagos++;
+  totalMeses++;
+  const label = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][idx];
+  return `<label class="mchip">
+            <input type="checkbox" class="chk" data-mm="${mm}" ${pago?'checked':''}/>
+            <span>${label}</span>
+          </label>`;
+}).join('');
+
+
+
+ tr.innerHTML = `
+  <td class="idx">${i}</td>
+  <td class="cat">${escapeHtml(m.category||'')}</td>
+  <td class="nome">${escapeHtml(m.name||m.id)}</td>
+  <td class="payer"><input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" /></td>
+  <td class="obs"><textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea></td>
+  <td class="months"><div class="months-scroll">${monthsHtml}</div></td>
+  <td class="acao"><button class="btn-save">Atualizar</button></td>`;
+
     tbody.appendChild(tr);
   }
   updateSummary(totalPagos, totalMeses);
@@ -380,12 +405,13 @@ async function saveReceb(year, merchantId, payload){
       const year = selAno.value;
       const inpNome = tr.querySelector('.inp-nome');
       const inpObs  = tr.querySelector('.inp-obs');
-      const chks = Array.from(tr.querySelectorAll('input.chk'));
+     const chks = Array.from(tr.querySelectorAll('.months .chk'));
       const meses = {};
-      chks.forEach((c, idx)=>{
-        const mm = String(idx+1).padStart(2,'0');
-        meses[mm] = { pago: !!c.checked, updatedAt: serverTimestamp(), by: (auth.currentUser?.uid||null) };
-      });
+chks.forEach(c=>{
+  const mm = c.getAttribute('data-mm'); // "01".."12"
+  meses[mm] = { pago: !!c.checked, updatedAt: serverTimestamp(), by: (auth.currentUser?.uid||null) };
+});
+
       await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
       btn.textContent = '✅ Salvo'; setTimeout(()=> btn.textContent = 'Atualizar', 1000);
     }catch(e){ console.error(e); btn.textContent = 'Erro'; setTimeout(()=> btn.textContent = 'Atualizar', 1200); }
