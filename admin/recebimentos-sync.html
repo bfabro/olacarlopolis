@@ -102,14 +102,31 @@
 <!-- Loader: baixa /script.js e extrai apenas const statusEstabelecimentos = { ... } -->
 <script>
   window.__STATUS__ = null;
+
   async function loadStatusFromMainScript(){
     try{
       const res  = await fetch('/script.js', { cache: 'no-store' });
       const code = await res.text();
-      const m = code.match(/const\s+statusEstabelecimentos\s*=\s*\{[\s\S]*?^\};/m);
-      if(!m){ console.warn('statusEstabelecimentos não encontrado no script.js'); return null; }
-      const objCode = m[0].replace(/^const\s+statusEstabelecimentos\s*=\s*/,'').replace(/;?\s*$/,'');
-      const obj = (new Function('return ('+ objCode +')'))();
+
+      // 1) Captura SOMENTE o objeto (sem o ;)
+      //    Ex.: const statusEstabelecimentos = { ... };
+      const m = code.match(/const\s+statusEstabelecimentos\s*=\s*(\{[\s\S]*?\});?/m);
+      if(!m || !m[1]){
+        console.warn('statusEstabelecimentos não encontrado no script.js');
+        return null;
+      }
+
+      // 2) Só o literal do objeto
+      let objCode = m[1];
+
+      // 3) (robusto) Remove vírgula à direita antes de fechar bloco, caso exista em alguma linha
+      //    (não deveria quebrar em JS moderno, mas deixa compatível)
+      objCode = objCode.replace(/,(\s*[}\]])/g, '$1');
+
+      // 4) Avalia só o objeto
+      const obj = (new Function('return (' + objCode + ')'))();
+
+      // 5) Armazena em cache global
       window.__STATUS__ = obj;
       return obj;
     }catch(e){
@@ -118,6 +135,7 @@
     }
   }
 </script>
+
 
 <!-- Firebase + App -->
 <script type="module">
