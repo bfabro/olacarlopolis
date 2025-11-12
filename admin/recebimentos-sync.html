@@ -260,15 +260,20 @@
     const snap = await getDocs(q);
     return snap.docs.map(d=>({ id:d.id, ...d.data() }));
   }
-  async function readReceb(year, merchantId){
-    const dref = doc(db, 'recebimentos', String(year), merchantId);
-    const d = await getDoc(dref);
-    return d.exists() ? d.data() : {};
-  }
-  async function saveReceb(year, merchantId, payload){
-    const dref = doc(db, 'recebimentos', String(year), merchantId);
-    await setDoc(dref, payload, { merge:true });
-  }
+ // caminho: recebimentos/{ANO}/itens/{merchantId}
+function recebCol(year){
+  return collection(db, 'recebimentos', String(year), 'itens');
+}
+async function readReceb(year, merchantId){
+  const dref = doc(recebCol(year), merchantId);
+  const d = await getDoc(dref);
+  return d.exists() ? d.data() : {};
+}
+async function saveReceb(year, merchantId, payload){
+  const dref = doc(recebCol(year), merchantId);
+  await setDoc(dref, payload, { merge:true });
+}
+
 
   // ===== TABELA =====
   async function loadTabela(){
