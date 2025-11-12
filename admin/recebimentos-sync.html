@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Recebimentos (Auto‑Sync)</title>
+  <title>Admin • Recebimentos (Auto-Sync)</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{ --bg:#0b0f14; --panel:#11161d; --soft:#182029; --text:#e3e7ee; --muted:#9aa6b2; --brand:#5dd4ff; --ok:#22c55e; --no:#ef4444 }
     *{ box-sizing:border-box }
     html,body{ height:100% }
-    body{ margin:0; background:var(--bg); color:var(--text); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif }
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,"Helvetica Neue",sans-serif }
     .wrap{ max-width:1240px; margin:0 auto; padding:24px }
     header{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px }
     h1{ margin:0; font-size:22px }
@@ -31,12 +31,11 @@
     .payer{ min-width:200px }
     .obs{ min-width:260px }
     .month{ width:82px; text-align:center }
-    .acao{ width:160px; text-align:center; position:sticky; right:0; background:linear-gradient(90deg,#0f151d, #0e141c) }
+    .acao{ width:160px; text-align:center; position:sticky; right:0; background:linear-gradient(90deg,#0f151d,#0e141c) }
     .chip{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:10px; background:#0f141b; border:1px solid var(--soft); color:var(--muted); font-size:12px }
     .status-dot{ width:10px; height:10px; border-radius:50% }
     .dot-ok{ background:var(--ok) } .dot-no{ background:var(--no) }
     .muted{ color:var(--muted); font-size:12px }
-    .right{ text-align:right }
     .sr-only{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden }
   </style>
 </head>
@@ -44,7 +43,7 @@
 <div class="wrap">
   <header>
     <div style="display:flex; align-items:center; gap:12px">
-      <h1>📒 Recebimentos (auto‑sync do script.js)</h1>
+      <h1>📒 Recebimentos (auto-sync do script.js)</h1>
       <span class="chip"><span class="status-dot dot-ok"></span> Pago</span>
       <span class="chip"><span class="status-dot dot-no"></span> Em aberto</span>
     </div>
@@ -54,6 +53,7 @@
     </div>
   </header>
 
+  <!-- LOGIN -->
   <section id="viewLogin" class="card" style="max-width:380px; margin:10vh auto">
     <h2 style="margin:0 0 12px; font-size:18px">Entrar</h2>
     <div style="display:grid; gap:10px">
@@ -65,6 +65,7 @@
     </div>
   </section>
 
+  <!-- PAINEL -->
   <section id="viewPainel" style="display:none">
     <div class="toolbar">
       <div class="card">
@@ -98,120 +99,45 @@
   </section>
 </div>
 
-
-
-<!-- 1) Carregue seu script.js do site (onde está const categories = [...] ) 
-<script src="/script.js?v=sync1"></script>-->
-
-
-<!-- Loader: baixa /script.js como texto e extrai apenas o objeto statusEstabelecimentos -->
+<!-- Loader: baixa /script.js e extrai apenas const statusEstabelecimentos = { ... } -->
 <script>
-async function loadStatusFromMainScript(){
-  try{
-    const res  = await fetch('/script.js', { cache: 'no-store' });
-    const code = await res.text();
-
-    // pega: const statusEstabelecimentos = { ... };
-    const m = code.match(/const\s+statusEstabelecimentos\s*=\s*\{[\s\S]*?^\};/m);
-    if(!m){
-      alert('statusEstabelecimentos não encontrado dentro do script.js');
+  window.__STATUS__ = null;
+  async function loadStatusFromMainScript(){
+    try{
+      const res  = await fetch('/script.js', { cache: 'no-store' });
+      const code = await res.text();
+      const m = code.match(/const\s+statusEstabelecimentos\s*=\s*\{[\s\S]*?^\};/m);
+      if(!m){ console.warn('statusEstabelecimentos não encontrado no script.js'); return null; }
+      const objCode = m[0].replace(/^const\s+statusEstabelecimentos\s*=\s*/,'').replace(/;?\s*$/,'');
+      const obj = (new Function('return ('+ objCode +')'))();
+      window.__STATUS__ = obj;
+      return obj;
+    }catch(e){
+      console.error('Falha ao ler statusEstabelecimentos do script.js', e);
       return null;
     }
-
-    // transforma em objeto JS
-    const objCode = m[0]
-      .replace(/^const\s+statusEstabelecimentos\s*=\s*/,'') // remove "const statusEstabelecimentos ="
-      .replace(/;?\s*$/,'');                                // remove ; final
-
-    const obj = (new Function('return ('+ objCode +')'))(); // avalia só o literal
-
-    window.__STATUS__ = obj;
-    return obj;
-  }catch(e){
-    console.error('Falha ao ler statusEstabelecimentos do script.js', e);
-    alert('Erro ao ler statusEstabelecimentos do script.js');
-    return null;
   }
-}
 </script>
 
-
-
-
-<!-- 2) Bridge: expõe as categories para window, mesmo se forem const/let -->
-
-<script>
-  (function(){
-    try{ window.__STATUS__ = window.statusEstabelecimentos || null; }
-    catch(e){ window.__STATUS__ = null; }
-  })();
-</script>
-
-
-<!-- 3) Firebase modular + app -->
+<!-- Firebase + App -->
 <script type="module">
-  // ===== CONFIGURE AQUI =====
-  const firebaseConfig = {  apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
-         authDomain: "contadoracessos.firebaseapp.com",
-         databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
-         projectId: "contadoracessos",
-         storageBucket: "contadoracessos.firebasestorage.app",
-         messagingSenderId: "521517291315",
-         appId: "1:521517291315:web:74f8d878d2d8769460d046",
-         measurementId: "G-BXPWYWK61F" };
+  // ==== SUA CONFIG DO FIREBASE (já colada por você) ====
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+    authDomain: "contadoracessos.firebaseapp.com",
+    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+    projectId: "contadoracessos",
+    storageBucket: "contadoracessos.firebasestorage.app",
+    messagingSenderId: "521517291315",
+    appId: "1:521517291315:web:74f8d878d2d8769460d046",
+    measurementId: "G-BXPWYWK61F"
+  };
 
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-
-
-function getComerciosFromStatus(map){
-  const out = []; let i = 0;
-  for (const [id, val] of Object.entries(map || {})){
-    i++;
-    out.push({
-      id,
-      name: id,
-      category: val === "s" ? "Pago" : "Em aberto",
-      sort: i
-    });
-  }
-  return out;
-}
-
-async function doSyncFromScript(){
-  const status = window.__STATUS__ || await loadStatusFromMainScript();
-  if (!status){ alert('statusEstabelecimentos não encontrado (veja o Console).'); return; }
-
-  const locals = getComerciosFromStatus(status);
-
-  // ===== sincroniza 'merchants' no Firestore =====
-  const qMer = query(collection(db, 'merchants'), orderBy('sort'));
-  const snap = await getDocs(qMer);
-  const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
-
-  let created=0, updated=0;
-  for (const m of locals){
-    const ref = doc(db, 'merchants', m.id);
-    const has = remote.get(m.id);
-    if (!has){
-      await setDoc(ref, m);
-      created++;
-    } else {
-      const need = (has.name!==m.name) || (has.category!==m.category) || (has.sort!==m.sort);
-      if (need){ await updateDoc(ref, m); updated++; }
-    }
-  }
-  alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
-}
-
-
-
-
-
-
-
+  // Init
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db   = getFirestore(app);
@@ -232,7 +158,6 @@ async function doSyncFromScript(){
   const btnCSV = document.getElementById('btnCSV');
   const btnSync= document.getElementById('btnSync');
   const sumario = document.getElementById('sumario');
-
   const mesesKeys = ["01","02","03","04","05","06","07","08","09","10","11","12"];
 
   // ===== LOGIN =====
@@ -242,7 +167,7 @@ async function doSyncFromScript(){
       await signInWithEmailAndPassword(auth, email.value.trim(), senha.value.trim());
       loginMsg.textContent = '';
     }catch(e){
-      loginMsg.textContent = 'Falha ao entrar: ' + (e.message || e.code);
+      loginMsg.textContent = 'Falha ao entrar: ' + (e.code || e.message);
     }finally{ btnLogin.disabled = false; }
   });
   btnLogout.addEventListener('click', ()=> signOut(auth));
@@ -261,15 +186,14 @@ async function doSyncFromScript(){
     }
   });
 
-  // ===== MODELO DE DADOS (FIRESTORE) =====
+  // ===== MODELO =====
   // merchants/{id} => { name, category, sort }
   // recebimentos/{year}/{merchantId} => { pagadorPadrao, observacao, meses: {"01": {pago, updatedAt, by}, ...} }
 
   async function initPainel(){
-    // anos
     const yNow = new Date().getFullYear();
     selAno.innerHTML = '';
-    ;[yNow-1,yNow,yNow+1].forEach(y=>{
+    [yNow-1,yNow,yNow+1].forEach(y=>{
       const o=document.createElement('option'); o.value=y; o.textContent=y; if(y===yNow)o.selected=true; selAno.appendChild(o);
     });
     selAno.onchange = loadTabela;
@@ -277,45 +201,42 @@ async function doSyncFromScript(){
     btnCSV.onclick = exportCSV;
     btnSync.onclick = doSyncFromScript;
 
-    await doSyncFromScript(); // auto‑sync ao abrir
+    await doSyncFromScript(); // auto-sync ao abrir
     await loadTabela();
   }
 
-  // ===== SYNC: lê window.__CATEGORIES__ e sincroniza 'merchants' =====
-  function getCategoriesArray(){
-    const locals = getComerciosFromStatus();
-    if (!cats || !Array.isArray(cats)) return [];
-    const out = [];
-    let k=0;
-    for (const cat of cats){
-      const catTitle = cat.title || '';
-      for (const est of (cat.establishments||[])){
-        k++; out.push({ id: slug(est.name), name: est.name, category: catTitle, sort: k });
-      }
+  function getComerciosFromStatus(map){
+    const out = []; let i = 0;
+    for (const [id, val] of Object.entries(map || {})){
+      i++;
+      out.push({ id, name:id, category: (val === "s" ? "Pago" : "Em aberto"), sort:i });
     }
     return out;
   }
 
-  function getComerciosFromStatus(){
-  const s = window.__STATUS__;
-  if (!s) return [];
-  const out = []; let i=0;
-  for (const [id, val] of Object.entries(s)){
-    i++;
-    out.push({
-      id,
-      name: id,
-      category: val === "s" ? "Pago" : "Em aberto",
-      sort: i
-    });
+  async function doSyncFromScript(){
+    const status = window.__STATUS__ || await loadStatusFromMainScript();
+    if (!status){ alert('statusEstabelecimentos não encontrado (veja Console).'); return; }
+    const locals = getComerciosFromStatus(status);
+
+    const qMer = query(collection(db, 'merchants'), orderBy('sort'));
+    const snap = await getDocs(qMer);
+    const remote = new Map(snap.docs.map(d=>[d.id, { id:d.id, ...d.data() }]));
+
+    let created=0, updated=0;
+    for (const m of locals){
+      const ref = doc(db, 'merchants', m.id);
+      const has = remote.get(m.id);
+      if (!has){ await setDoc(ref, m); created++; }
+      else{
+        const need = (has.name!==m.name) || (has.category!==m.category) || (has.sort!==m.sort);
+        if (need){ await updateDoc(ref, m); updated++; }
+      }
+    }
+    alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
   }
-  return out;
-}
 
-
-
-
-  // ===== TABELA =====
+  // ===== FIRESTORE HELPERS =====
   async function loadMerchants(){
     const q = query(collection(db, 'merchants'), orderBy('sort'));
     const snap = await getDocs(q);
@@ -331,6 +252,7 @@ async function doSyncFromScript(){
     await setDoc(dref, payload, { merge:true });
   }
 
+  // ===== TABELA =====
   async function loadTabela(){
     tbody.innerHTML = '';
     const year = selAno.value;
@@ -348,11 +270,11 @@ async function doSyncFromScript(){
         <td class="nome">${escapeHtml(m.name||m.id)}</td>
         <td class="payer"><input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" /></td>
         <td class="obs"><textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea></td>
-        ${mesesKeys.map(mm=>{
+        ${["01","02","03","04","05","06","07","08","09","10","11","12"].map(mm=>{
           const pago = !!(mesesData[mm]?.pago);
           if (pago) totalPagos++;
           totalMeses++;
-          return `<td class=\"month\"><label><input type=\"checkbox\" class=\"chk\" ${pago?'checked':''}/><span class=\"sr-only\">pago</span></label></td>`
+          return `<td class="month"><label><input type="checkbox" class="chk" ${pago?'checked':''}/><span class="sr-only">pago</span></label></td>`;
         }).join('')}
         <td class="acao"><button class="btn-save">Atualizar</button></td>`;
       tbody.appendChild(tr);
@@ -388,7 +310,7 @@ async function doSyncFromScript(){
       const chks = Array.from(tr.querySelectorAll('input.chk'));
       const meses = {};
       chks.forEach((c, idx)=>{
-        const mm = mesesKeys[idx];
+        const mm = String(idx+1).padStart(2,'0');
         meses[mm] = { pago: !!c.checked, updatedAt: serverTimestamp(), by: (auth.currentUser?.uid||null) };
       });
       await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
@@ -417,41 +339,7 @@ async function doSyncFromScript(){
   }
 
   // ===== UTILS =====
-  function escapeHtml(s){ return String(s).replace(/[&<>\"]/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m])) }
-  function slug(s){
-    return String(s||'').toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .replace(/&/g,'e')
-      .replace(/[^a-z0-9]+/g,'-')
-      .replace(/(^-|-$)/g,'')
-  }
+  function escapeHtml(s){ return String(s).replace(/[&<>"]/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])) }
 </script>
-
-<script>
-  window.__STATUS__ = null;
-
-  async function loadStatusFromMainScript(){
-    try{
-      const res  = await fetch('/script.js', { cache: 'no-store' });
-      const code = await res.text();
-
-      // Extrai: const statusEstabelecimentos = { ... };
-      const m = code.match(/const\s+statusEstabelecimentos\s*=\s*\{[\s\S]*?^\};/m);
-      if(!m){ console.warn('statusEstabelecimentos não encontrado no script.js'); return null; }
-
-      const objCode = m[0]
-        .replace(/^const\s+statusEstabelecimentos\s*=\s*/,'')
-        .replace(/;?\s*$/,'');
-
-      const obj = (new Function('return ('+ objCode +')'))();
-      window.__STATUS__ = obj;
-      return obj;
-    }catch(e){
-      console.error('Falha ao ler statusEstabelecimentos do script.js', e);
-      return null;
-    }
-  }
-</script>
-
 </body>
 </html>
