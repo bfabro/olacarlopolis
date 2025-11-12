@@ -39,7 +39,9 @@
     td{ padding:10px 8px; border-bottom:1px solid #121921 }
     tbody tr:hover{ background:#0f151d }
     .idx{ width:46px; text-align:center }
-    .cat{ width:160px; color:var(--muted) }
+    .cat { width:160px; } /* mantém a largura da coluna de status */
+    .status-chip.is-ok  { border-color: rgba(34,197,94,.35); }
+.status-chip.is-no  { border-color: rgba(239,68,68,.35); }
     .nome{ min-width:240px; font-weight:600 }
     .payer{ min-width:200px }
     .obs{ min-width:260px }
@@ -129,7 +131,7 @@
         <thead>
           <tr>
            <th class="idx">#</th>
-    <th class="cat">Categoria</th>
+    <th class="cat">Status</th>
     <th class="nome">Comércio / Prestador</th>
     <th class="payer">Nome usado p/ pagamento</th>
     <th class="obs">Observações</th>
@@ -363,6 +365,42 @@ async function saveReceb(year, merchantId, payload){
 }
 
 
+
+
+function getCurrentMonthKey(){
+  const m = new Date().getMonth() + 1; // 1..12
+  return String(m).padStart(2,'0');     // "01".."12"
+}
+function computeStatusForRow(mesesData){
+  const cur = getCurrentMonthKey();
+  return !!(mesesData?.[cur]?.pago);
+}
+function renderStatusChip(isPaid){
+  return `
+    <span class="chip status-chip ${isPaid ? 'is-ok' : 'is-no'}">
+      <span class="status-dot ${isPaid ? 'dot-ok' : 'dot-no'}"></span>
+      ${isPaid ? 'Pago' : 'Pendente'}
+    </span>
+  `;
+}
+function updateRowStatusFromCheckboxes(tr){
+  // olha o checkbox do mês atual na linha e atualiza o chip
+  const cur = getCurrentMonthKey();
+  const chkCur = tr.querySelector(`.months .chk[data-mm="${cur}"]`);
+  const isPaid = !!(chkCur && chkCur.checked);
+  const tdStatus = tr.querySelector('.cat');
+  if (tdStatus) tdStatus.innerHTML = renderStatusChip(isPaid);
+}
+
+
+
+
+
+
+
+
+
+
   // ===== TABELA =====
   async function loadTabela(){
   tbody.innerHTML = '';
@@ -391,19 +429,33 @@ const monthsHtml = ["01","02","03","04","05","06","07","08","09","10","11","12"]
             <span>${label}</span>
           </label>`;
 }).join('');
+const isPaidNow = computeStatusForRow(mesesData);
 
 
 
- tr.innerHTML = `
+
+tr.innerHTML = `
   <td class="idx">${i}</td>
-  <td class="cat">${escapeHtml(m.category||'')}</td>
+  <td class="cat">${renderStatusChip(isPaidNow)}</td>
   <td class="nome">${escapeHtml(m.name||m.id)}</td>
   <td class="payer"><input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao||'')}" placeholder="ex.: Maria / Empresa X" /></td>
   <td class="obs"><textarea class="inp-obs" placeholder="Observações">${escapeHtml(dados.observacao||'')}</textarea></td>
   <td class="months"><div class="months-scroll">${monthsHtml}</div></td>
   <td class="acao"><button class="btn-save">Atualizar</button></td>`;
 
+
     tbody.appendChild(tr);
+
+    // sempre que marcar/desmarcar um mês, recalcula o status da linha
+tr.querySelector('.months').addEventListener('change', (e)=>{
+  if (!e.target.matches('.chk')) return;
+  // só precisa reavaliar quando o mês alterado é o mês atual
+  const cur = getCurrentMonthKey();
+  if (e.target.getAttribute('data-mm') === cur){
+    updateRowStatusFromCheckboxes(tr);
+  }
+});
+
   }
   updateSummary(totalPagos, totalMeses);
 }
@@ -415,14 +467,15 @@ const monthsHtml = ["01","02","03","04","05","06","07","08","09","10","11","12"]
     sumario.textContent = `Pagos: ${pagos}/${total} (${pct}%)`;
   }
 
-  function applyFilter(){
-    const q = filtro.value.trim().toLowerCase();
-    Array.from(tbody.children).forEach(tr=>{
-      const nome = tr.children[2].textContent.toLowerCase();
-      const cat  = tr.children[1].textContent.toLowerCase();
-      tr.style.display = (!q || nome.includes(q) || cat.includes(q))? '':'none';
-    });
-  }
+function applyFilter(){
+  const q = filtro.value.trim().toLowerCase();
+  Array.from(tbody.children).forEach(tr=>{
+    const nome   = tr.children[2].textContent.toLowerCase();   // coluna Nome
+    const status = tr.children[1].textContent.toLowerCase();   // coluna Status
+    tr.style.display = (!q || nome.includes(q) || status.includes(q)) ? '' : 'none';
+  });
+}
+
   filtro.addEventListener('input', applyFilter);
 
   tbody.addEventListener('click', async (ev)=>{
@@ -443,6 +496,8 @@ chks.forEach(c=>{
 });
 
       await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
+      updateRowStatusFromCheckboxes(tr);
+
       btn.textContent = '✅ Salvo'; setTimeout(()=> btn.textContent = 'Atualizar', 1000);
     }catch(e){ console.error(e); btn.textContent = 'Erro'; setTimeout(()=> btn.textContent = 'Atualizar', 1200); }
     finally{ btn.disabled=false }
@@ -451,16 +506,18 @@ chks.forEach(c=>{
   // ===== CSV =====
   function exportCSV(){
     const year = selAno.value;
-    const rows = [['categoria','nome','pagador','observacao','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']];
-    Array.from(tbody.children).forEach(tr=>{
-      if (tr.style.display==='none') return;
-      const cat = tr.children[1].textContent.trim();
-      const nome = tr.children[2].textContent.trim();
-      const pagador = tr.querySelector('.inp-nome').value.trim();
-      const obs = tr.querySelector('.inp-obs').value.trim();
-      const chks = Array.from(tr.querySelectorAll('.months .chk')).map(c=> c.checked ? '1' : '0');
-      rows.push([cat,nome,pagador,obs, ...chks]);
-    });
+    const rows = [['status','nome','pagador','observacao','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']];
+
+Array.from(tbody.children).forEach(tr=>{
+  if (tr.style.display==='none') return;
+  const status = tr.children[1].textContent.trim(); // "Pago" ou "Pendente"
+  const nome   = tr.children[2].textContent.trim();
+  const pagador= tr.querySelector('.inp-nome').value.trim();
+  const obs    = tr.querySelector('.inp-obs').value.trim();
+  const chks   = Array.from(tr.querySelectorAll('.months .chk')).map(c=> c.checked ? '1' : '0');
+  rows.push([status,nome,pagador,obs, ...chks]);
+});
+
     const csv = rows.map(r=> r.map(s=> '"'+(String(s).replace(/"/g,'""'))+'"').join(',')).join('\n');
     const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
