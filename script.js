@@ -17118,7 +17118,8 @@ if (linkRepresa) {
 
 
 
-
+// Torna o array categories acessível para o painel admin
+try { window.categories = window.categories || categories; } catch (e) {}
 
 
 
