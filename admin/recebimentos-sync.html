@@ -100,65 +100,6 @@
 
 
 
-<!-- SHIM: neutraliza chamadas de DOM que não existem nesta página -->
-<!-- SHIM: neutraliza DOM + MutationObserver p/ o script.js não quebrar nesta página -->
-<script>
-(function(){
-  // 1) Dummy element/Node
-  const makeDummy = () => new Proxy({}, {
-    get(_, prop){
-      if (prop === 'addEventListener') return function(){};
-      if (prop === 'removeEventListener') return function(){};
-      if (prop === 'appendChild') return function(){};
-      if (prop === 'prepend') return function(){};
-      if (prop === 'insertBefore') return function(){};
-      if (prop === 'setAttribute') return function(){};
-      if (prop === 'getAttribute') return function(){ return null };
-      if (prop === 'querySelector') return function(){ return makeDummy() };
-      if (prop === 'querySelectorAll') return function(){ return [] };
-      if (prop === 'closest') return function(){ return makeDummy() };
-      if (prop === 'classList') return { add(){}, remove(){}, toggle(){}, contains(){ return false } };
-      if (prop === 'style') return {};
-      if (prop === 'value') return '';
-      return undefined;
-    }
-  });
-
-  // 2) Patch básicos do document
-  const docQS  = Document.prototype.querySelector;
-  const docQSA = Document.prototype.querySelectorAll;
-  const docGEBI= Document.prototype.getElementById;
-
-  Document.prototype.querySelector = function(sel){
-    try { return docQS.call(this, sel) || makeDummy(); } catch(_) { return makeDummy(); }
-  };
-  Document.prototype.querySelectorAll = function(sel){
-    try { return docQSA.call(this, sel) || []; } catch(_) { return []; }
-  };
-  Document.prototype.getElementById = function(id){
-    try { return docGEBI.call(this, id) || makeDummy(); } catch(_) { return makeDummy(); }
-  };
-
-  // 3) Neutraliza MutationObserver (se seu script cria observadores)
-  try{
-    window.MutationObserver = function(){
-      this.observe = function(){};
-      this.disconnect = function(){};
-      this.takeRecords = function(){ return [] };
-    };
-  }catch(_){}
-
-  // 4) Evita handlers que assumem DOM cheio
-  const _addEventListener = window.addEventListener;
-  window.addEventListener = function(type, listener, opts){
-    if (type === 'DOMContentLoaded') return; // ignora
-    try{ return _addEventListener.call(window, type, listener, opts); }catch(_){}
-  };
-})();
-</script>
-
-
-
 <!-- 1) Carregue seu script.js do site (onde está const categories = [...] ) 
 <script src="/script.js?v=sync1"></script>-->
 
