@@ -129,6 +129,50 @@ background:var(--panel);
   z-index: 3;
 }
 
+/* ===== MOBILE TWEAKS ===== */
+@media (max-width: 768px){
+  .wrap{ padding:16px }
+
+  /* deixa a tabela toda rolável na horizontal no mobile */
+  .table-wrap{
+    overflow-x:auto;          /* antes estava hidden */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    padding-bottom: 6px;      /* espaço para a barra aparecer */
+    mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 32px), transparent 100%);
+  }
+
+  /* garante largura “maior que a tela” para permitir arrastar */
+  table{
+    min-width: 980px;         /* ajuste se quiser mais/menos */
+  }
+
+  /* cada linha continua podendo rolar, mas mais “solta” */
+  .row-scroll{
+    gap:10px;
+    padding:10px 8px;
+    touch-action: pan-x;      /* prioridade para gesto horizontal */
+    -ms-touch-action: pan-x;
+    min-width: 980px;         /* casa com a largura mínima da tabela */
+  }
+
+  /* colunas mais compactas no celular */
+  .rcell.status{ min-width:140px; flex:0 0 140px }
+  .rcell.nome  { min-width:210px }
+  .rcell.payer { min-width:200px }
+  .rcell.obs   { min-width:240px }
+  .rcell.meses { min-width:520px }
+  .rcell.acao  { min-width:140px }
+
+  /* chips de mês um pouco menores */
+  .mchip{ padding:5px 7px; font-size:11px; gap:6px }
+  .months-scroll{ gap:8px; padding:6px 6px 8px }
+
+  /* células “label” mais discretas para ganhar espaço */
+  .label.muted{ font-size:11px }
+}
+
+
 
 </style>
 
@@ -593,6 +637,40 @@ chks.forEach(c=>{
 
   // ===== UTILS =====
   function escapeHtml(s){ return String(s).replace(/[&<>"]/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])) }
+
+
+
+
+
+   // Enable click-and-drag horizontal scroll (mouse) — no mobile já funciona por toque
+  function enableDragScroll(el){
+    let isDown = false, startX = 0, scrollStart = 0;
+    el.addEventListener('mousedown', (e)=>{
+      isDown = true;
+      startX = e.pageX;
+      scrollStart = el.scrollLeft;
+      el.classList.add('dragging');
+    });
+    window.addEventListener('mouseup', ()=>{ isDown=false; el.classList.remove('dragging'); });
+    window.addEventListener('mousemove', (e)=>{
+      if(!isDown) return;
+      const dx = e.pageX - startX;
+      el.scrollLeft = scrollStart - dx;
+    });
+  }
+
+  // aplica no container geral e em cada linha
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const tw = document.querySelector('.table-wrap');
+    if (tw) enableDragScroll(tw);
+  });
+
+  // quando a tabela é recarregada, aplicar nas linhas novas
+  const _origLoadTabela = window.loadTabela;
+  window.loadTabela = async function(){
+    await _origLoadTabela();
+    document.querySelectorAll('.row-scroll').forEach(enableDragScroll);
+  }
 </script>
 </body>
 </html>
