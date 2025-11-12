@@ -133,32 +133,30 @@ background:var(--panel);
 @media (max-width: 768px){
   .wrap{ padding:10px }
 
-  /* Permite rolar lateralmente a tabela inteira */
+  /* Permite rolar lateralmente toda a tabela */
   .table-wrap{
+    display:block;
     overflow-x:auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
     padding-bottom: 10px;
   }
 
-  /* Faz a tabela ser mais larga que a tela para forçar o scroll lateral */
+  /* Força a tabela a ocupar largura total e liberar scroll */
   table{
-    min-width: 1200px; /* Aumente se quiser ver mais colunas */
+    display:block;
+    width:max-content;       /* ocupa só o necessário */
+    min-width:1000px;        /* largura mínima útil */
   }
 
-  /* Cada linha também permite rolar horizontalmente junto */
+  /* Cada linha agora herda o scroll do container */
   .row-scroll{
-    display:flex;
-    gap:10px;
-    padding:8px;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:thin;
-    touch-action: pan-x;
-    min-width: 1200px;
+    flex-wrap:nowrap;
+    overflow:visible;        /* desativa scroll individual */
+    min-width:auto;
   }
 
-  /* Compacta as colunas para caber mais */
+  /* Colunas mais compactas */
   .rcell.status{ min-width:120px; flex:0 0 120px }
   .rcell.nome  { min-width:180px }
   .rcell.payer { min-width:180px }
@@ -166,14 +164,12 @@ background:var(--panel);
   .rcell.meses { min-width:520px }
   .rcell.acao  { min-width:120px }
 
-  /* Chips de mês menores e mais próximos */
+  /* Chips menores e mais próximos */
   .mchip{ padding:4px 6px; font-size:11px; gap:5px }
   .months-scroll{ gap:6px; padding:5px 5px 7px }
 
-  /* Deixa os rótulos menores e discretos */
+  /* Deixa rótulos e botões mais leves */
   .label.muted{ font-size:10px }
-
-  /* Faz os botões ocuparem toda a largura da célula no mobile */
   .btn-save-sticky{
     font-size:12px;
     padding:6px 8px;
