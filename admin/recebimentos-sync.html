@@ -562,21 +562,11 @@ function getCurrentMonthKey(){
   const m = new Date().getMonth() + 1; // 1..12
   return String(m).padStart(2,'0');     // "01".."12"
 }
-function computeStatusForRow(mesesData, isInactive){
-  if (isInactive) return null; // null = não considerar
+function computeStatusForRow(mesesData){
   const cur = getCurrentMonthKey();
   return !!(mesesData?.[cur]?.pago);
 }
-
-function renderStatusChip(isPaid, isInactive){
-  if (isInactive){
-    return `
-      <span class="chip status-chip" style="border-color: rgba(122,122,122,.35); color:#bbb">
-        <span class="status-dot" style="background:#7a7a7a"></span>
-        Inativo
-      </span>
-    `;
-  }
+function renderStatusChip(isPaid){
   return `
     <span class="chip status-chip ${isPaid ? 'is-ok' : 'is-no'}">
       <span class="status-dot ${isPaid ? 'dot-ok' : 'dot-no'}"></span>
@@ -584,23 +574,12 @@ function renderStatusChip(isPaid, isInactive){
     </span>
   `;
 }
-
-function computeStatusForRow(mesesData, isInactive){
-  if (isInactive) return null; // ignora na lógica de pago/pendente
-  const cur = getCurrentMonthKey();
-  return !!(mesesData?.[cur]?.pago);
-}
-
-
 function updateRowStatusFromCheckboxes(tr){
-  const isInactive = tr.querySelector('.chk-inativo')?.checked;
   const cur = getCurrentMonthKey();
   const chkCur = tr.querySelector(`.months .chk[data-mm="${cur}"]`);
   const isPaid = !!(chkCur && chkCur.checked);
   const hold = tr.querySelector('.status-holder');
-  if (!hold) return;
-  hold.innerHTML = renderStatusChip(isPaid, isInactive);
-  tr.querySelectorAll('.months .chk').forEach(c=> c.disabled = !!isInactive);
+  if (hold) hold.innerHTML = renderStatusChip(isPaid);
 }
 
 
@@ -626,25 +605,22 @@ function updateRowStatusFromCheckboxes(tr){
   for (const m of merchants){
     i++;
     const dados = await readReceb(year, m.id);
-const mesesData = dados.meses || {};
-const isInativo = !!dados.inativo;  // <- DECLARE AQUI, antes do monthsHtml
+    const mesesData = dados.meses || {};
+    const tr = document.createElement('tr');
+    tr.dataset.id = m.id;
 
-const labelMeses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-const monthsHtml = ["01","02","03","04","05","06","07","08","09","10","11","12"].map((mm, idx)=>{
+// antes de montar tr.innerHTML
+const monthsHtml = ["01","02","03","04","05","06","07","08","09","10","11","12"].map((mm,idx)=>{
   const pago = !!(mesesData[mm]?.pago);
-  if (!isInativo){           // não entra na contagem se inativo
-    if (pago) totalPagos++;
-    totalMeses++;
-  }
+  if (pago) totalPagos++;
+  totalMeses++;
+  const label = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][idx];
   return `<label class="mchip">
-            <input type="checkbox" class="chk" data-mm="${mm}" ${pago?'checked':''} ${isInativo?'disabled':''}/>
-            <span>${labelMeses[idx]}</span>
+            <input type="checkbox" class="chk" data-mm="${mm}" ${pago?'checked':''}/>
+            <span>${label}</span>
           </label>`;
 }).join('');
-
-const isPaidNow = computeStatusForRow(mesesData, isInativo);
-
-
+const isPaidNow = computeStatusForRow(mesesData);
 
 
 
@@ -664,18 +640,12 @@ tr.innerHTML = `
     <span class="sr-only nome-holder">${escapeHtml(m.name || m.id)}</span>
   </div>
 
- <div class="status-row">
-  <div class="status-holder">${renderStatusChip(isPaidNow === true, isInativo)}</div>
-  <label class="mchip" title="Marcar cliente como inativo">
-    <input type="checkbox" class="chk-inativo" />
-    <span>Inativo</span>
-  </label>
-  <button class="btn-save btn-icon" title="Salvar alterações" aria-label="Salvar alterações">💾</button>
-</div>
-
-
-
-
+  <div class="status-row">
+    <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
+    <button class="btn-save btn-icon" title="Salvar alterações" aria-label="Salvar alterações">
+      💾
+    </button>
+  </div>
 </div>
 
 
@@ -703,39 +673,16 @@ tr.innerHTML = `
 
 
     tbody.appendChild(tr);
-    tr.querySelector('.chk-inativo').checked = isInativo;
-
-
-    
 
     // sempre que marcar/desmarcar um mês, recalcula o status da linha
 tr.querySelector('.months').addEventListener('change', (e)=>{
   if (!e.target.matches('.chk')) return;
-  if (tr.querySelector('.chk-inativo')?.checked) return; // se inativo, ignora
+  // só precisa reavaliar quando o mês alterado é o mês atual
   const cur = getCurrentMonthKey();
   if (e.target.getAttribute('data-mm') === cur){
     updateRowStatusFromCheckboxes(tr);
   }
 });
-
-
-
-
-// alterna inativo: atualiza chip e (des)abilita meses
-tr.querySelector('.chk-inativo').addEventListener('change', ()=>{
-  const nowInactive = tr.querySelector('.chk-inativo').checked;
-  // (re)desabilita meses
-  tr.querySelectorAll('.months .chk').forEach(c=> c.disabled = nowInactive);
-  // reavalia chip
-  const cur = getCurrentMonthKey();
-  const chkCur = tr.querySelector(`.months .chk[data-mm="${cur}"]`);
-  const isPaid = !!(chkCur && chkCur.checked);
-  tr.querySelector('.status-holder').innerHTML = renderStatusChip(isPaid, nowInactive);
-  // opcional: recontar sumário sem recarregar tudo (simples é dar um reload da tabela)
-  // updateSummaryOnTheFly(); // se não tiver, deixe para próxima recarga completa
-});
-
-
 
   }
   updateSummary(totalPagos, totalMeses);
@@ -776,15 +723,9 @@ chks.forEach(c=>{
   const mm = c.getAttribute('data-mm'); // "01".."12"
   meses[mm] = { pago: !!c.checked, updatedAt: serverTimestamp(), by: (auth.currentUser?.uid||null) };
 });
-const inativo = tr.querySelector('.chk-inativo')?.checked || false;
-      await saveReceb(year, merchantId, {
-  pagadorPadrao: inpNome.value.trim(),
-  observacao: inpObs.value.trim(),
-  inativo,
-  meses
-});
-updateRowStatusFromCheckboxes(tr);
-      
+
+      await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
+      updateRowStatusFromCheckboxes(tr);
 
       btn.textContent = '✅ Salvo'; setTimeout(()=> btn.textContent = 'Atualizar', 1000);
     }catch(e){ console.error(e); btn.textContent = 'Erro'; setTimeout(()=> btn.textContent = 'Atualizar', 1200); }
@@ -794,18 +735,16 @@ updateRowStatusFromCheckboxes(tr);
   // ===== CSV =====
   function exportCSV(){
     const year = selAno.value;
- const rows = [['status','inativo','nome','pagador','observacao','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']];
-
+  const rows = [['status','nome','pagador','observacao','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']];
 
   Array.from(tbody.children).forEach(tr=>{
     if (tr.style.display==='none') return;
-    const status = (tr.querySelector('.status-holder')?.textContent || '').trim(); 
-    const inativo = tr.querySelector('.chk-inativo')?.checked ? '1' : '0';
+    const status = (tr.querySelector('.status-holder')?.textContent || '').trim();
     const nome   = (tr.querySelector('.nome-holder')?.textContent || '').trim();
     const pagador= tr.querySelector('.inp-nome')?.value.trim() || '';
     const obs    = tr.querySelector('.inp-obs')?.value.trim() || '';
     const chks   = Array.from(tr.querySelectorAll('.months .chk')).map(c=> c.checked ? '1' : '0');
-    rows.push([status, inativo, nome, pagador, obs, ...chks]);
+    rows.push([status,nome,pagador,obs, ...chks]);
   });
 
     const csv = rows.map(r=> r.map(s=> '"'+(String(s).replace(/"/g,'""'))+'"').join(',')).join('\n');
