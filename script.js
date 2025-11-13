@@ -1098,7 +1098,7 @@ document.addEventListener("DOMContentLoaded", function () {
     gcyvazamentos: "s",
 
     // estudio de beleza
-    veronicakataoka: "n",
+    veronicakataoka: "s",
 
     //farmacia
     elshaday: "s",
@@ -8819,6 +8819,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/veronicakataokalashdesigner",
             novidadesImages: [
               "images/comercios/estudioDeBeleza/veronica/divulgacao/0.jpg",
+              "images/comercios/estudioDeBeleza/veronica/divulgacao/6.jpg",
               "images/comercios/estudioDeBeleza/veronica/divulgacao/1.jpg",
               "images/comercios/estudioDeBeleza/veronica/divulgacao/2.jpg",
               "images/comercios/estudioDeBeleza/veronica/divulgacao/3.jpg",
@@ -8827,9 +8828,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             ],
             novidadesDescriptions: [
-              "",
+              "Meninasaaaass aproveitemmmm🤩🤩<Br>Ja imagino ficar mais lindas ainda nesse final de ano e ainda com preços arrasadores🤩🤩<Br>📍 Estúdio Beleza e Harmonia – Verônica Kataoka<Br>📞 (14) 99830-8893<Br>Lembrando que atendemos no horario noturno também, olha só que maravilha 😍<Br>Então o que você está esperando para agendar e ficar mais bela ainda??<Br>Você pode também presentear alguém da sua família com um vale combo especifico🤩Para seu natal ",
 
-              "",
+              "Presentão de fim de ano? Beleza renovada com preços que cabem no bolso!",
 
               "",
 
