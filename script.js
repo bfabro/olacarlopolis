@@ -3546,7 +3546,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quintal: "Sim",
       piscina: "Não",
       salas: 1,
-      suite: "sIM",
+      suite: "Sim",
       vagas: 2,
       corretores: ["Cesar Melo - 38.105 F"],
       telefone: "43 99678-9652",  // Corretor ou propretario
