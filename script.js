@@ -9982,13 +9982,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/informacoes/eventos/3.jpg",
-            name: "Festival Bandas e Fanfarras",
-            date: "08/11/2025",
-            address: "Ilha do Ponciano",
-            infoAdicional: "Venha Prestigiar esse grande festival em nossa cidade"
-          },
 
           {
             image: "images/informacoes/eventos/erosPrado.jpg",
