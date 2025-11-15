@@ -474,7 +474,7 @@ async function compartilharEstabelecimento(id, nome, categoria) {
   _sharing = true;
 
   const url = `${window.location.origin}${window.location.pathname}#${id}`;
-  const texto = `Confira ${nome} (${categoria}) no Olá Carlópolis!`;
+  const texto = `Confira: ${nome} (${categoria}) no Olá Carlópolis!`;
 
   try {
     if (navigator.share) {
@@ -3595,9 +3595,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       titulo: "Apartamento a Venda, Condominio Alvorada",
       descricao: "Condominio fechado, Aceita financiamento, Guarda roupa e cabiceira planejado e Documentação Ok.",
       endereco: "Residencial Lê Blanc",
-      valor: 420000,
+      valor: 250000,
       construcao: 75,          // << NOVO: m² de construção
-      area: 165,
+       //area: 165,
       banheiros: 1,
       churrasqueira: "Sim",
       cozinhas: 1,
