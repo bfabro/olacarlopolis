@@ -594,17 +594,21 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.title = "Compartilhar esta página";
 
     // usa o hash atual como rota; ajuste o título/descrição se quiser
-    btn.onclick = () => {
+       btn.onclick = () => {
       const titulo = h2.textContent.trim() || "Página";
-      let texto = "Segue o Link referente:";
+      let texto;
 
-      // Se a página for a de busca CEP, muda a mensagem
+      // Se a página for a de busca CEP, mantém mensagem especial
       if (location.hash.includes("busca-cep")) {
         texto = "Pesquise o CEP da sua rua";
+      } else {
+        // Mensagem padrão para qualquer setor/categoria
+        texto = `Segue página referente a "${titulo}"`;
       }
 
       compartilharPagina(location.hash, titulo, texto);
     };
+
 
     h2.appendChild(btn);
   }
