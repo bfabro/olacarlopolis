@@ -3485,6 +3485,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa7/8.jpg",
         "images/imoveis/cesar/venda/casa7/9.jpg",
         "images/imoveis/cesar/venda/casa7/10.jpg",
+        "images/imoveis/cesar/venda/casa7/11.jpg",
+        "images/imoveis/cesar/venda/casa7/12.jpg",
+
 
       ],
       //lat: -23.3953,
