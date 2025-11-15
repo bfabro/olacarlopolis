@@ -3579,6 +3579,50 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     },
 
 
+    {
+      id: "casa10v",
+      codRef: "C_010",
+      procura: "casa", // ou "terreno", "rural", etc.
+      tipo: "venda",
+      titulo: "Apartamento a Venda, Condominio Alvorada",
+      descricao: "Condominio fechado, Aceita financiamento, Guarda roupa e cabiceira planejado e Documentação Ok.",
+      endereco: "Residencial Lê Blanc",
+      valor: 420000,
+      construcao: 75,          // << NOVO: m² de construção
+      area: 165,
+      banheiros: 1,
+      churrasqueira: "Sim",
+      cozinhas: 1,
+      quartos: 3,
+      quintal: "Sim",
+      piscina: "Não",
+      salas: 1,
+      suite: "Não",
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"],
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa10/1.jpg",
+        "images/imoveis/cesar/venda/casa10/2.jpg",
+        "images/imoveis/cesar/venda/casa10/3.jpg",
+        "images/imoveis/cesar/venda/casa10/4.jpg",
+        "images/imoveis/cesar/venda/casa10/5.jpg",
+        "images/imoveis/cesar/venda/casa10/6.jpg",
+        "images/imoveis/cesar/venda/casa10/7.jpg",
+        "images/imoveis/cesar/venda/casa10/8.jpg",
+        "images/imoveis/cesar/venda/casa10/9.jpg",
+        "images/imoveis/cesar/venda/casa10/10.jpg",
+        "images/imoveis/cesar/venda/casa10/11.jpg",
+        "images/imoveis/cesar/venda/casa10/12.jpg",
+        "images/imoveis/cesar/venda/casa10/13.jpg",
+        "images/imoveis/cesar/venda/casa10/14.jpg",
+
+
+      ],
+
+    },
+
+
 
 
 
