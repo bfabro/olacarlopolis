@@ -1037,8 +1037,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // assessocia balistica
     betogunsassessoriaarmaria: "s",
-    //agencia turismo
-    cvccarlopolis: "s",
+
+ 
 
     // assistencia celular
     oficinadocelular: "s",
