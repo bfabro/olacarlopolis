@@ -463,34 +463,32 @@ async function mostrarRepresa() {
 
 let _sharing = false;
 
-async function compartilharEstabelecimento(id) {
-
-
+async function compartilharEstabelecimento(id, nome, categoria) {
 
   if (!id || typeof id !== "string") {
     console.warn("ID inválido:", id);
     mostrarToast("❌ Erro ao compartilhar: ID inválido");
     return;
   }
-  if (_sharing) return; // evita chamadas duplas
+  if (_sharing) return;
   _sharing = true;
 
   const url = `${window.location.origin}${window.location.pathname}#${id}`;
+  const texto = `Confira ${nome} (${categoria}) no Olá Carlópolis!`;
 
   try {
     if (navigator.share) {
-      await navigator.share({ title: "Olá Carlópolis", text: "Segue o Link!", url });
-      // opcional: sucesso silencioso ou um toast rápido de OK
-      // mostrarToast("✅ Link compartilhado!");
+      await navigator.share({
+        title: nome,
+        text: texto,
+        url
+      });
     } else {
-      await navigator.clipboard.writeText(url);
-      mostrarToast("🔗 Link copiado com sucesso!");
+      await navigator.clipboard.writeText(`${texto}\n${url}`);
+      mostrarToast("🔗 Link copiado com descrição!");
     }
   } catch (err) {
-    // Se o usuário fechar o share sheet, não é erro de verdade.
-    if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) {
-      // silencioso
-    } else {
+    if (!(err && (err.name === "AbortError" || err.name === "NotAllowedError"))) {
       console.warn("Falha ao compartilhar:", err);
       mostrarToast("❌ Não foi possível compartilhar.");
     }
@@ -498,6 +496,7 @@ async function compartilharEstabelecimento(id) {
     _sharing = false;
   }
 }
+
 
 
 
@@ -521,17 +520,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /// funçao para todas as paginas
   ///
-  document.addEventListener("click", (ev) => {
-    const btn = ev.target.closest(".share-btn");
-    if (!btn) return;
-    const id = btn.getAttribute("data-share-id");
-    if (id) {
-      compartilharEstabelecimento(id);
-    }
-  });
+document.addEventListener("click", (ev) => {
+  const btn = ev.target.closest(".share-btn");
+  if (!btn) return;
+
+  const id        = btn.getAttribute("data-share-id");
+  const nome      = btn.getAttribute("data-share-nome") || "";
+  const categoria = btn.getAttribute("data-share-categoria") || "";
+
+  if (id) {
+    compartilharEstabelecimento(id, nome, categoria);
+  }
+});
 
 
-  // Compartilhar a página/rota atual (preserva a rota exata)
+
   // Compartilhar a página/rota atual (preserva a rota exata)
   async function compartilharPagina(hash = location.hash, titulo = document.title || "Olá Carlópolis", texto = "Confira esta página!") {
     let h = String(hash || "");
@@ -13867,12 +13870,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   
      
      
-   <span class="locais_nomes">${establishment.name}</span>
+ <span class="locais_nomes">${establishment.name}</span>
 ${!establishment.descricaoFalecido ? `
-  <button class="share-btn" data-share-id="${normalizeName(establishment.name)}">
+  <button 
+    class="share-btn" 
+    data-share-id="${normalizeName(establishment.name)}"
+    data-share-nome="${establishment.name}"
+    data-share-categoria="${title}">
     <i class="fa-solid fa-share-nodes"></i>
   </button>
 ` : ""}
+
   
 
 
