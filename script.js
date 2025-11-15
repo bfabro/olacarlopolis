@@ -3282,6 +3282,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa3v",
+       codRef: "C_003",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
@@ -3323,6 +3324,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa4v",
+       codRef: "C_004",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 2,
@@ -3363,6 +3365,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa5v",
+       codRef: "C_005",
       status: "Vendido",   // <= adicione isto quando estiver vendido
       tipo: "venda",
       procura: "Chacara", // ou "terreno", "rural", etc.
@@ -3406,6 +3409,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa6v",
+       codRef: "C_006",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 2,
@@ -3448,6 +3452,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa7v",
+       codRef: "C_007",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
@@ -3491,6 +3496,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa8v",
+       codRef: "C_008",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
@@ -3533,6 +3539,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa9v",
+       codRef: "C_009",
       procura: "casa", // ou "terreno", "rural", etc.
       tipo: "venda",
       titulo: "Casa moderna a venda",
@@ -3574,6 +3581,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter1",
+       codRef: "T_001",
       status: "Vendido",   // <= adicione isto quando estiver vendido
       tipo: "venda",
       titulo: "Terreno Esquina - Loteamento Amaral",
@@ -3593,6 +3601,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     //Modelo
     {
       id: "ter2",
+       codRef: "T_002",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Novo horizonte 1",
@@ -3609,6 +3618,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter3",
+       codRef: "T_003",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno em Condomínio - Lagoa azul 2",
@@ -3629,6 +3639,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter4",
+       codRef: "T_004",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Residencial Itália ll",
@@ -3652,6 +3663,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     //Modelo
     {
       id: "ter5",
+       codRef: "T_005",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno na Principal no Murador",
@@ -3675,6 +3687,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter6",
+       codRef: "T_006",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno no Murador",
@@ -3696,6 +3709,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter7",
+       codRef: "T_007",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno bem localizado no bairro Novo Horizonte 3",
@@ -3719,6 +3733,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter8",
+       codRef: "T_008",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno no bairro Novo Horizonte 4",
@@ -3767,6 +3782,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     //Modelo
     {
       id: "galpao1venda",
+      codRef: "G_001",
       tipo: "venda",
       procura: "galpao", // ou "terreno", "rural", etc.
       titulo: "Galpão - Residencial Murador",
@@ -3795,6 +3811,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     //Modelo
     {
       id: "galpao1aluguel",
+       codRef: "G_002",
       tipo: "aluguel",
       procura: "galpao", // ou "terreno", "rural", etc.
       titulo: "Galpão - Residencial Murador, ",
