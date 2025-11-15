@@ -4,14 +4,83 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
 
-
-<url>
-  <loc>https://www.olacarlopolis.com/</loc>
-  <lastmod>2025-03-17T02:17:23+00:00</lastmod>
+  <!-- Home -->
+  <url>
+    <loc>https://www.olacarlopolis.com/</loc>
+    <lastmod>2025-11-15</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.00</priority>
-</url>
+  </url>
 
+  <!-- Onde Comer -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#ondecomer</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Promoções -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#promocoes</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Imóveis -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#imoveis</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Clima do Dia -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#clima-do-dia</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Represa Chavantes -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#represa-chavantes</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Coleta de Lixo -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#coletalixo</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Grupos WhatsApp -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#grupos</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Jogos -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#jogos</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Ranking Capivarinha -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#ranking-capivarinha</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Busca CEP -->
+  <url>
+    <loc>https://www.olacarlopolis.com/#cep</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
 
 </urlset>

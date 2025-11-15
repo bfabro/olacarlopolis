@@ -1,3 +1,27 @@
 User-agent: *
 Allow: /
+
+# Impede que mecanismos indexem parâmetros inúteis (evita conteúdo duplicado)
+Disallow: /*?o=
+Disallow: /*?ref=
+Disallow: /*?utm_*
+Disallow: /*&utm_*
+
+# Impede que serviços indexem páginas internas da PWA ou arquivos desnecessários
+Disallow: /manifest.json
+Disallow: /worker.js
+Disallow: /service-worker.js
+
+# Permite indexação total do conteúdo principal
+Allow: /images/
+Allow: /css/
+Allow: /js/
+
+# Delay para evitar excesso de crawlers (ajuda no desempenho do seu host)
+Crawl-delay: 2
+
+# Indica localização do sitemap
 Sitemap: https://www.olacarlopolis.com/sitemap.xml
+
+# Ajuda buscadores a identificar o site como seguro
+Host: https://www.olacarlopolis.com
