@@ -7195,13 +7195,17 @@ html {
 
 .card-addr2{
  border-bottom: 3px solid #FF8C00;
-  padding: 10px 0;
-   background: #e0f7fa;
-  color: #00695c;
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 0.85rem;
-  font-weight: 500;
+ padding: 10px 0;
+  background: #e0f7fa;
+ color: #00695c;
+ border-radius: 20px;
+ padding: 4px 10px;
+ font-size: 0.85rem;
+ font-weight: 500;
+}
+
+.card-ref{
+  margin-top: 4px; /* só dá um respiro entre bairro e código */
 }
 
 

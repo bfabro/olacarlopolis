@@ -3197,6 +3197,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     // Substitua depois por dados do Firebase
     {
       id: "casa1v",
+      codRef: "C_001",
       tipo: "venda",
       status: "disponível",
       titulo: "Residencial Villa Ray (Horizonte 3)",
@@ -3241,6 +3242,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     // Modelo
     {
       id: "casa2v",
+       codRef: "C_002",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
@@ -4250,7 +4252,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         .replace(/Encontrei seu número no Olá Carlópolis\.?/i, "")
         .trim();
 
-      const msg = `${saudacao ? saudacao + " " : ""}Meu nome é ${nome}. Vi o imóvel "${im.titulo}" no site Olá Carlópolis e gostaria de mais informações.`;
+        const codigo = im.codRef ? im.codRef : (im.id ? im.id.toUpperCase() : "N/D");
+      const msg = `${saudacao ? saudacao + " " : ""}Meu nome é ${nome}. Vi o imóvel "${im.titulo}", cod de ref: ( ${codigo} ) no Olá Carlópolis e gostaria de mais informações.`;
       const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`;
 
       // 1) sempre registra o clique do botão (contador)
@@ -4431,12 +4434,19 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       </div>
     </div>
 
-    <div class="card-body">
-      <div class="card-title">${im.titulo}</div>
-      ${im.descricao ? `<div class="descricaoImovel" style="margin-top:8px"><p>${im.descricao}</p></div>` : ""}
-      <div class="card-addr2"><i class="fa-solid fa-map-pin"></i> ${im.endereco}</div>
+   <div class="card-body">
+  <div class="card-title">${im.titulo}</div>
+  ${im.descricao ? `<div class="descricaoImovel" style="margin-top:8px"><p>${im.descricao}</p></div>` : ""}
+  
+  <!-- Bairro -->
+  <div class="card-addr2">
+    <i class="fa-solid fa-map-pin"></i> ${im.endereco}
+  </div>
 
-      <div class="specs-chips">${renderChips(im)}</div>
+  
+
+  <div class="specs-chips">${renderChips(im)}</div>
+
 
       <div class="price-line" style="margin-top:12px">
         <div class="price">${precoFmt}</div>
@@ -4444,6 +4454,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           ${st && st !== "disponível" ? `<span class="badge">${im.status}</span>` : ""}
         </div>
       </div>
+  
+
 
       <div class="card-actions">
         <button class="btn-whats" data-action="whats" data-id="${im.id}" ${isFechado ? 'disabled aria-disabled="true"' : ""}>
@@ -4451,8 +4463,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         </button>
       </div>
 
+   
+
       ${responsavel ? `<div class="spec-chip chip-mini corretor-banner"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
-    </div>
+
+     <!-- Código de referência -->
+  <div class="card-addr2 card-ref">
+    <i class="fa-solid fa-hashtag"></i>
+    Ref.: ${String(im.codRef || im.id || "").toUpperCase()}
+  </div>  </div>
+
+    
   </article>`;
   }
 
