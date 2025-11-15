@@ -13871,7 +13871,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   
      
      
-    <span class="locais_nomes">${establishment.name}</span>
+  <span class="locais_nomes">${establishment.name}</span>
 ${!establishment.descricaoFalecido ? `
   <button 
     class="share-btn" 
@@ -14208,17 +14208,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
                   </ul>
                     `;
 
-    // Ativa os botões de compartilhar
-    setTimeout(() => {
-      document.querySelectorAll(".share-btn").forEach((botao) => {
-        botao.addEventListener("click", () => {
-          const id = botao.getAttribute("data-share-id");
-          if (id) compartilharEstabelecimento(id);
-        });
-      });
-    }, 300);
-
-
+   
 
 
 
