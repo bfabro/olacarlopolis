@@ -520,18 +520,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /// funçao para todas as paginas
   ///
-document.addEventListener("click", (ev) => {
-  const btn = ev.target.closest(".share-btn");
-  if (!btn) return;
+  document.addEventListener("click", (ev) => {
+    const btn = ev.target.closest(".share-btn");
+    if (!btn) return;
 
-  const id        = btn.getAttribute("data-share-id");
-  const nome      = btn.getAttribute("data-share-nome") || "";
-  const categoria = btn.getAttribute("data-share-categoria") || "";
+    const id        = btn.getAttribute("data-share-id");
+    const nome      = btn.getAttribute("data-share-nome") || "";
+    const categoria = btn.getAttribute("data-share-categoria") || "";
 
-  if (id) {
-    compartilharEstabelecimento(id, nome, categoria);
-  }
-});
+    if (id) {
+      compartilharEstabelecimento(id, nome, categoria);
+    }
+  });
+
 
 
 
@@ -1041,7 +1042,7 @@ document.addEventListener("click", (ev) => {
     // assessocia balistica
     betogunsassessoriaarmaria: "s",
 
- 
+
 
     // assistencia celular
     oficinadocelular: "s",
@@ -1149,7 +1150,7 @@ document.addEventListener("click", (ev) => {
     lojathiagoaguera: "s",
 
     //lojaderoupas
-   
+
     "t&mcollection": "s",
 
     // mercearia
@@ -1265,7 +1266,7 @@ document.addEventListener("click", (ev) => {
 
     funerariacristorei: "s",
     funerariagrupocastilho: "s",
-    
+
 
 
     //materiais eletricos
@@ -1332,7 +1333,7 @@ document.addEventListener("click", (ev) => {
     jurandirmachado: "s",
 
 
- // INICIO SERVIÇOS 
+    // INICIO SERVIÇOS 
 
     /// INICIO SETOR PUBLICO
     agendamentosaude: "s",
@@ -3245,7 +3246,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     // Modelo
     {
       id: "casa2v",
-       codRef: "C_002",
+      codRef: "C_002",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
@@ -3285,7 +3286,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa3v",
-       codRef: "C_003",
+      codRef: "C_003",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
@@ -3327,7 +3328,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa4v",
-       codRef: "C_004",
+      codRef: "C_004",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 2,
@@ -3368,7 +3369,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa5v",
-       codRef: "C_005",
+      codRef: "C_005",
       status: "Vendido",   // <= adicione isto quando estiver vendido
       tipo: "venda",
       procura: "Chacara", // ou "terreno", "rural", etc.
@@ -3412,7 +3413,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa6v",
-       codRef: "C_006",
+      codRef: "C_006",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 2,
@@ -3455,7 +3456,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa7v",
-       codRef: "C_007",
+      codRef: "C_007",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
@@ -3502,7 +3503,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa8v",
-       codRef: "C_008",
+      codRef: "C_008",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
@@ -3545,7 +3546,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "casa9v",
-       codRef: "C_009",
+      codRef: "C_009",
       procura: "casa", // ou "terreno", "rural", etc.
       tipo: "venda",
       titulo: "Casa moderna a venda",
@@ -3631,7 +3632,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter1",
-       codRef: "T_001",
+      codRef: "T_001",
       status: "Vendido",   // <= adicione isto quando estiver vendido
       tipo: "venda",
       titulo: "Terreno Esquina - Loteamento Amaral",
@@ -3651,7 +3652,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     //Modelo
     {
       id: "ter2",
-       codRef: "T_002",
+      codRef: "T_002",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Novo horizonte 1",
@@ -3668,7 +3669,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter3",
-       codRef: "T_003",
+      codRef: "T_003",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno em Condomínio - Lagoa azul 2",
@@ -3689,7 +3690,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter4",
-       codRef: "T_004",
+      codRef: "T_004",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno - Residencial Itália ll",
@@ -3713,7 +3714,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     //Modelo
     {
       id: "ter5",
-       codRef: "T_005",
+      codRef: "T_005",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno na Principal no Murador",
@@ -3737,7 +3738,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter6",
-       codRef: "T_006",
+      codRef: "T_006",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno no Murador",
@@ -3759,7 +3760,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter7",
-       codRef: "T_007",
+      codRef: "T_007",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno bem localizado no bairro Novo Horizonte 3",
@@ -3783,7 +3784,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     {
       id: "ter8",
-       codRef: "T_008",
+      codRef: "T_008",
       tipo: "venda",
       procura: "terreno", // ou "terreno", "rural", etc.
       titulo: "Terreno no bairro Novo Horizonte 4",
@@ -3861,7 +3862,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     //Modelo
     {
       id: "galpao1aluguel",
-       codRef: "G_002",
+      codRef: "G_002",
       tipo: "aluguel",
       procura: "galpao", // ou "terreno", "rural", etc.
       titulo: "Galpão - Residencial Murador, ",
@@ -4319,7 +4320,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         .replace(/Encontrei seu número no Olá Carlópolis\.?/i, "")
         .trim();
 
-        const codigo = im.codRef ? im.codRef : (im.id ? im.id.toUpperCase() : "N/D");
+      const codigo = im.codRef ? im.codRef : (im.id ? im.id.toUpperCase() : "N/D");
       const msg = `${saudacao ? saudacao + " " : ""}Meu nome é ${nome}. Vi o imóvel "${im.titulo}", cod de ref: ( ${codigo} ) no Olá Carlópolis e gostaria de mais informações.`;
       const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`;
 
@@ -10015,12 +10016,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
               },
 
-               {
+              {
                 imagem: "images/servicos/revendedor/tati/promocao/3.jpg",
                 titulo: "Super Promo - 11.11",
-                
+
                 preco: 199.00,
-              
+
                 validadeFim: "2025-11-11",
                 obs: "Oferta válida até durar o estoque",
 
@@ -11650,7 +11651,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/_temcollection/",
             infoAdicional: "📅 Dom e Feriados: Atendimento Agendado Personalizado<Br>📦 Enviamos para todo o Brasil",
             novidadesImages: [
-                 "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/11.jpg",
+              "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/11.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/1.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/2.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/3.jpg",
@@ -11661,7 +11662,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/8.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/9.jpg",
               "images/comercios/lojaDeRoupa/tsmCollection/divulgacao/10.jpg",
-           
+
 
 
             ],
@@ -13870,7 +13871,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   
      
      
- <span class="locais_nomes">${establishment.name}</span>
+    <span class="locais_nomes">${establishment.name}</span>
 ${!establishment.descricaoFalecido ? `
   <button 
     class="share-btn" 
@@ -13880,6 +13881,7 @@ ${!establishment.descricaoFalecido ? `
     <i class="fa-solid fa-share-nodes"></i>
   </button>
 ` : ""}
+
 
   
 
@@ -17208,7 +17210,7 @@ if (linkRepresa) {
 
 
 // Torna o array categories acessível para o painel admin
-try { window.statusEstabelecimentos = statusEstabelecimentos; } catch(e) {}
+try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
 
 
 
