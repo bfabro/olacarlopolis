@@ -5711,7 +5711,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/acai/turminhaAcai/novidades/5.jpg",
             ],
             novidadesDescriptions: [
-              "Marmita de Açai! Voce só encontra aqui!",
+              "Pizza de Açai! Voce só encontra aqui!",
               "Nossos espetos montados na hora",
               "Açai com bombom, irresistivel",
               "Espetinhos Diferenciados",
