@@ -13090,6 +13090,35 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                     },
           */
 
+                     {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/55.jpg",
+                      date: "17/11/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. HELENA ALMEIDA CARDOSO aos 82 anos, ocorrido em Carlópolis.<BR>O velório está sendo realizado no Velório Municipal Lauro Soares.<BR>A cerimônia do sepultamento ocorrerá amanhã 18/11/2025 às 14:00 horas, no Cemitério Municipal de Carlópolis<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+                     {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/54.jpg",
+                      date: "17/11/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da a Jovem GISELE APARECIDA DE PAULA aos 38 anos, ocorrido em Carlópolis<br>O velório será realizado hoje em horário a ser definido no velório Municipal de Ribeirão Claro<br>A cerimônia do sepultamento ocorrerá amanhã em horário a ser definido, no Cemitério Municipal de Ribeirão Claro<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+                     {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/52.jpg",
+                      date: "16/11/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. MARIA LEITE DA SILVA RODRIGUES, aos 79 anos, ocorrido em Sorocaba.<br>O velório será realizado amanhã à partir das 07:30 horas no velório Municipal de Carlópolis<br>A cerimônia do sepultamento ocorrerá amanhã às 14:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+                    
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/53.jpg",
+            date: "16/11/2025",
+            descricaoFalecido: "Com muito pesar comunicamos o falecimento do jovem ESLEY BRUNO DA ROCHA, aos 26 anos, ocorrido em Carlópolis.<Br>Seu corpo será encaminhado ao IML de Jacarezinho.<Br>O velório e sepultamento serão realizados amanhã, em data e horário a serem confirmados no cemitério municipal de Carlópolis.<Br>Manifestamos nossos sentimentos de solidariedade e força aos familiares e amigos neste momento de profunda dor. 🙏🏼",
+          },
+
 
 
           {
