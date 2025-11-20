@@ -9552,8 +9552,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
 
             novidadesImages: [
-              "images/comercios/farmacia/santaMaria/divulgacao/1.jpg",
-              "images/comercios/farmacia/santaMaria/divulgacao/2.jpg",
+          
               "images/comercios/farmacia/santaMaria/divulgacao/3.jpg",
               "images/comercios/farmacia/santaMaria/divulgacao/4.jpg",
               "images/comercios/farmacia/santaMaria/divulgacao/5.jpg",
@@ -9561,8 +9560,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             ],
             novidadesDescriptions: [
-              "Aniversário de 30 anos da Farmácia Santa Maria, e quem ganha o presente é você! ❤️🎁❤️ Venha comemorar com a gente",
-              "Estamos de Plantao! Conte com nós!",
+           
               "Nutricolin - Silício orgânico!Estimula as proteínas da beleza na pele, cabelos e unhas.Peça já o seu manipulado ❤️",
               "Emagreça com saúde! Fórmula manipulada completa.",
               "Colágeno Verisol em sachê.",
