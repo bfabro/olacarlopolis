@@ -7954,3 +7954,75 @@ html {
 }
 
 
+
+
+
+
+
+/* ===============================
+   Grade de divulgação na página inicial
+   =============================== */
+
+.grade-divulgacao {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.card-divulgacao-pequeno {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: default; /* mude para pointer se quiser clique */
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-divulgacao-pequeno:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card-divulgacao-img-wrap {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.card-divulgacao-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-divulgacao-info {
+  padding: 6px 8px 8px 8px;
+}
+
+.card-divulgacao-info h4 {
+  font-size: 0.8rem;
+  margin: 2px 0 0;
+  line-height: 1.2;
+  color: #222;
+}
+
+.card-divulgacao-categoria {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #777;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 768px) {
+  .card-divulgacao-img-wrap {
+    height: 200px;
+  }
+
+  .card-divulgacao-info h4 {
+    font-size: 0.85rem;
+  }
+}

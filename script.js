@@ -938,70 +938,91 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
 
   function montarCarrosselDivulgacao() {
-    const listaTodos = [];
+  const listaTodos = [];
 
-    categories.forEach(cat => {
-      cat.establishments?.forEach(est => {
-        const nomeNormalizado = normalizeName(est.name);
-        const imagens = est.novidadesImages || [];
+  // monta lista com todos os estabelecimentos que têm novidades ativas
+  categories.forEach(cat => {
+    cat.establishments?.forEach(est => {
+      const nomeNormalizado = normalizeName(est.name);
+      const imagens = est.novidadesImages || [];
 
-        if (statusEstabelecimentos[nomeNormalizado] === "s" && imagens.length > 0) {
-          listaTodos.push({ ...est, nomeNormalizado });
-        }
-      });
+      if (statusEstabelecimentos[nomeNormalizado] === "s" && imagens.length > 0) {
+        listaTodos.push({ ...est, nomeNormalizado });
+      }
     });
+  });
 
-    const fixos = destaquesFixos
-      .map(nome => listaTodos.find(e => e.nomeNormalizado === nome))
-      .filter(Boolean);
+  const fixos = destaquesFixos
+    .map(nome => listaTodos.find(e => e.nomeNormalizado === nome))
+    .filter(Boolean);
 
-    const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
-    //const sorteados = restantes.sort(() => Math.random() - 0.5).slice(0, Math.max(0, 20 - fixos.length)); RAMDOMICO
-    //const sorteados = restantes.slice(0, Math.max(0, 20 - fixos.length)); fixo sempre os primeiro do
-    const sorteados = restantes.sort(() => Math.random() - 0.5).slice(0, Math.max(0, 20 - fixos.length));
+  const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
+  const sorteados = restantes
+    .sort(() => Math.random() - 0.5)
+    .slice(0, Math.max(0, 20 - fixos.length));
 
+  const totalExibir = [...fixos, ...sorteados].slice(0, 22);
 
-    const totalExibir = [...fixos, ...sorteados].slice(0, 22);
+  const swiperWrapper = document.querySelector(".swiper-novidades .swiper-wrapper");
+  const gradeDivulgacao = document.getElementById("grade-divulgacao");
 
-    const swiperWrapper = document.querySelector(".swiper-novidades .swiper-wrapper");
-    if (!swiperWrapper) return;
+  if (!swiperWrapper) return;
 
-    swiperWrapper.innerHTML = ""; // Limpa conteúdo atual
+  swiperWrapper.innerHTML = "";
+  if (gradeDivulgacao) gradeDivulgacao.innerHTML = "";
 
-    totalExibir.forEach(est => {
-      const categoria = categories.find(cat =>
-        cat.establishments?.some(e => e.name === est.name)
-      )?.title || "";
+  totalExibir.forEach(est => {
+    const categoria = categories.find(cat =>
+      cat.establishments?.some(e => e.name === est.name)
+    )?.title || "";
 
-      const imagem = destaquesFixos.includes(est.nomeNormalizado)
-        ? est.novidadesImages[0] // sempre a primeira imagem para fixos
-        : est.novidadesImages[Math.floor(Math.random() * est.novidadesImages.length)];
+    const imagem = destaquesFixos.includes(est.nomeNormalizado)
+      ? est.novidadesImages[0] // sempre a primeira imagem para fixos
+      : est.novidadesImages[Math.floor(Math.random() * est.novidadesImages.length)];
 
-      const indexImagem = est.novidadesImages.indexOf(imagem);
-      const texto = est.novidadesDescriptions?.[indexImagem] || "Confira nossas novidades!";
+    const indexImagem = est.novidadesImages.indexOf(imagem);
+    const texto = est.novidadesDescriptions?.[indexImagem] || "Confira nossas novidades!";
 
-      const slide = document.createElement("div");
-      slide.classList.add("swiper-slide");
+    // ====== SLIDE GRANDE DO CARROSSEL (mantém como era) ======
+    const slide = document.createElement("div");
+    slide.classList.add("swiper-slide");
 
-      slide.innerHTML = `
+    slide.innerHTML = `
       <img class="content_image" src="${imagem}" alt="${est.name}" loading="lazy">
       <div class="info_divulgacao">
         <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
         <p>${texto}</p>
 
         ${est.instagram ? `<a href="${fixUrl(est.instagram)}" target="_blank" rel="noopener noreferrer" class="mais-info">+ informações</a>` : ""}
-
       </div>
     `;
 
-      swiperWrapper.appendChild(slide);
-    });
+    swiperWrapper.appendChild(slide);
 
+    // ====== NOVO: CARD PEQUENO NA GRADE DE DESTAQUES ======
+    if (gradeDivulgacao) {
+      const card = document.createElement("div");
+      card.className = "card-divulgacao-pequeno";
 
+      card.innerHTML = `
+        <div class="card-divulgacao-img-wrap">
+          <img src="${imagem}" alt="${est.name}" loading="lazy">
+        </div>
+        <div class="card-divulgacao-info">
+          <span class="card-divulgacao-categoria">
+            ${categoria || "Divulgação"}
+          </span>
+          <h4>${est.name}</h4>
+        </div>
+      `;
 
+      // se quiser, no futuro dá pra transformar isso em clique pra abrir o comércio
 
+      gradeDivulgacao.appendChild(card);
+    }
+  });
+}
 
-  }
 
 
   function abrirPromocoes() {
@@ -1245,7 +1266,7 @@ document.addEventListener("DOMContentLoaded", function () {
     carlopolitana: "s",
 
     // relojoaria
-    relojoariamartini: "s",
+    relojoariamartini: "n",
 
     // restaurantes
     assadaodorussao: "s",
