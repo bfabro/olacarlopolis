@@ -7868,7 +7868,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             infoAdicional: "⏲️ Instalação de timer<br>🧪 + 🧹 Limpezas química e física<br>🏖️ Troca de areia<br>💧 Recuperação de água,",
             novidadesImages: [
 
-              "images/comercios/piscina/mhpiscinas/divulgacao/1.jpg",
+             
               "images/comercios/piscina/mhpiscinas/divulgacao/2.jpg",
               "images/comercios/piscina/mhpiscinas/divulgacao/3.jpg",
               "images/comercios/piscina/mhpiscinas/divulgacao/4.jpg",
