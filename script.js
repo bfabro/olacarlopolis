@@ -524,8 +524,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const btn = ev.target.closest(".share-btn");
     if (!btn) return;
 
-    const id        = btn.getAttribute("data-share-id");
-    const nome      = btn.getAttribute("data-share-nome") || "";
+    const id = btn.getAttribute("data-share-id");
+    const nome = btn.getAttribute("data-share-nome") || "";
     const categoria = btn.getAttribute("data-share-categoria") || "";
 
     if (id) {
@@ -594,7 +594,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.title = "Compartilhar esta página";
 
     // usa o hash atual como rota; ajuste o título/descrição se quiser
-       btn.onclick = () => {
+    btn.onclick = () => {
       const titulo = h2.textContent.trim() || "Página";
       let texto;
 
@@ -938,56 +938,56 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
 
   function montarCarrosselDivulgacao() {
-  const listaTodos = [];
+    const listaTodos = [];
 
-  // monta lista com todos os estabelecimentos que têm novidades ativas
-  categories.forEach(cat => {
-    cat.establishments?.forEach(est => {
-      const nomeNormalizado = normalizeName(est.name);
-      const imagens = est.novidadesImages || [];
+    // monta lista com todos os estabelecimentos que têm novidades ativas
+    categories.forEach(cat => {
+      cat.establishments?.forEach(est => {
+        const nomeNormalizado = normalizeName(est.name);
+        const imagens = est.novidadesImages || [];
 
-      if (statusEstabelecimentos[nomeNormalizado] === "s" && imagens.length > 0) {
-        listaTodos.push({ ...est, nomeNormalizado });
-      }
+        if (statusEstabelecimentos[nomeNormalizado] === "s" && imagens.length > 0) {
+          listaTodos.push({ ...est, nomeNormalizado });
+        }
+      });
     });
-  });
 
-  const fixos = destaquesFixos
-    .map(nome => listaTodos.find(e => e.nomeNormalizado === nome))
-    .filter(Boolean);
+    const fixos = destaquesFixos
+      .map(nome => listaTodos.find(e => e.nomeNormalizado === nome))
+      .filter(Boolean);
 
-  const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
-  const sorteados = restantes
-    .sort(() => Math.random() - 0.5)
-    .slice(0, Math.max(0, 20 - fixos.length));
+    const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
+    const sorteados = restantes
+      .sort(() => Math.random() - 0.5)
+      .slice(0, Math.max(0, 20 - fixos.length));
 
-  const totalExibir = [...fixos, ...sorteados].slice(0, 22);
+    const totalExibir = [...fixos, ...sorteados].slice(0, 22);
 
-  const swiperWrapper = document.querySelector(".swiper-novidades .swiper-wrapper");
-  const gradeDivulgacao = document.getElementById("grade-divulgacao");
+    const swiperWrapper = document.querySelector(".swiper-novidades .swiper-wrapper");
+    const gradeDivulgacao = document.getElementById("grade-divulgacao");
 
-  if (!swiperWrapper) return;
+    if (!swiperWrapper) return;
 
-  swiperWrapper.innerHTML = "";
-  if (gradeDivulgacao) gradeDivulgacao.innerHTML = "";
+    swiperWrapper.innerHTML = "";
+    if (gradeDivulgacao) gradeDivulgacao.innerHTML = "";
 
-  totalExibir.forEach(est => {
-    const categoria = categories.find(cat =>
-      cat.establishments?.some(e => e.name === est.name)
-    )?.title || "";
+    totalExibir.forEach(est => {
+      const categoria = categories.find(cat =>
+        cat.establishments?.some(e => e.name === est.name)
+      )?.title || "";
 
-    const imagem = destaquesFixos.includes(est.nomeNormalizado)
-      ? est.novidadesImages[0] // sempre a primeira imagem para fixos
-      : est.novidadesImages[Math.floor(Math.random() * est.novidadesImages.length)];
+      const imagem = destaquesFixos.includes(est.nomeNormalizado)
+        ? est.novidadesImages[0] // sempre a primeira imagem para fixos
+        : est.novidadesImages[Math.floor(Math.random() * est.novidadesImages.length)];
 
-    const indexImagem = est.novidadesImages.indexOf(imagem);
-    const texto = est.novidadesDescriptions?.[indexImagem] || "Confira nossas novidades!";
+      const indexImagem = est.novidadesImages.indexOf(imagem);
+      const texto = est.novidadesDescriptions?.[indexImagem] || "Confira nossas novidades!";
 
-    // ====== SLIDE GRANDE DO CARROSSEL (mantém como era) ======
-    const slide = document.createElement("div");
-    slide.classList.add("swiper-slide");
+      // ====== SLIDE GRANDE DO CARROSSEL (mantém como era) ======
+      const slide = document.createElement("div");
+      slide.classList.add("swiper-slide");
 
-    slide.innerHTML = `
+      slide.innerHTML = `
       <img class="content_image" src="${imagem}" alt="${est.name}" loading="lazy">
       <div class="info_divulgacao">
         <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
@@ -997,20 +997,20 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
     `;
 
-    swiperWrapper.appendChild(slide);
+      swiperWrapper.appendChild(slide);
 
-    
-   // ====== NOVO: CARD PEQUENO NA GRADE DE DESTAQUES ======
-if (gradeDivulgacao) {
- const card = document.createElement("div");
-card.className = "card-divulgacao-pequeno";
-const idEst = est.nomeNormalizado || normalizeName(est.name || "");
-card.dataset.id = idEst;  // 🔥 AQUI adiciona o ID
 
-  // id do estabelecimento (igual ao usado no menu/card principal)
-  
+      // ====== NOVO: CARD PEQUENO NA GRADE DE DESTAQUES ======
+      if (gradeDivulgacao) {
+        const card = document.createElement("div");
+        card.className = "card-divulgacao-pequeno";
+        const idEst = est.nomeNormalizado || normalizeName(est.name || "");
+        card.dataset.id = idEst;  // 🔥 AQUI adiciona o ID
 
-  card.innerHTML = `
+        // id do estabelecimento (igual ao usado no menu/card principal)
+
+
+        card.innerHTML = `
   
     <div class="card-divulgacao-img-wrap">
       <img src="${imagem}" alt="${est.name}" loading="lazy">
@@ -1022,118 +1022,117 @@ card.dataset.id = idEst;  // 🔥 AQUI adiciona o ID
       </span>
       <div class="card-divulgacao-linha">
   <h4>${est.name}</h4>
-  ${
-    est.instagram
-      ? `<button type="button" class="card-divulgacao-ig-btn" aria-label="Abrir Instagram" data-ig="${fixUrl(est.instagram)}">
+  ${est.instagram
+            ? `<button type="button" class="card-divulgacao-ig-btn" aria-label="Abrir Instagram" data-ig="${fixUrl(est.instagram)}">
            <i class="fa-brands fa-instagram"></i>
          </button>`
-      : ""
-  }
+            : ""
+          }
 </div>
 
     </div>
   `;
 
 
-// 👉 Clique no CARD leva para o comércio dentro do site
-// 👉 Clique no CARD: só muda o hash, o listener de hash vai abrir a página
-card.addEventListener("click", () => {
-  location.hash = "#" + idEst;
-});
+        // 👉 Clique no CARD leva para o comércio dentro do site
+        // 👉 Clique no CARD: só muda o hash, o listener de hash vai abrir a página
+        card.addEventListener("click", () => {
+          location.hash = "#" + idEst;
+        });
 
 
 
-  // 👉 Clique no ícone do Instagram abre o insta, sem perder o clique do card
-  const igBtn = card.querySelector(".card-divulgacao-ig-btn");
-  if (igBtn && est.instagram) {
-    igBtn.addEventListener("click", (ev) => {
-      ev.stopPropagation(); // não dispara o clique do card
-      window.open(fixUrl(est.instagram), "_blank");
-    });
-  }
+        // 👉 Clique no ícone do Instagram abre o insta, sem perder o clique do card
+        const igBtn = card.querySelector(".card-divulgacao-ig-btn");
+        if (igBtn && est.instagram) {
+          igBtn.addEventListener("click", (ev) => {
+            ev.stopPropagation(); // não dispara o clique do card
+            window.open(fixUrl(est.instagram), "_blank");
+          });
+        }
 
-  gradeDivulgacao.appendChild(card);
-}
-
-  });
-}
-
-// Abre a categoria certa e rola até o comércio correspondente
-function abrirEstabelecimentoDaHome(idEst) {
-  if (!idEst) return;
-
-  // 1) Descobre em qual categoria esse estabelecimento está
-  let categoriaEncontrada = null;
-
-  categories.forEach(cat => {
-    if (categoriaEncontrada) return;
-    cat.establishments?.forEach(est => {
-      const norm = normalizeName(est.name || "");
-      if (norm === idEst) {
-        categoriaEncontrada = cat;
+        gradeDivulgacao.appendChild(card);
       }
+
     });
-  });
-
-  if (!categoriaEncontrada) {
-    console.warn("Estabelecimento não encontrado para id:", idEst);
-    return;
   }
 
-  // 2) Se existir link no menu lateral para essa categoria, clica nele
-  if (categoriaEncontrada.link && typeof categoriaEncontrada.link.click === "function") {
-    categoriaEncontrada.link.click();
-  } else if (typeof loadContent === "function") {
-    // fallback: monta a categoria manualmente
-    loadContent(categoriaEncontrada.title, categoriaEncontrada.establishments);
-  }
+  // Abre a categoria certa e rola até o comércio correspondente
+  function abrirEstabelecimentoDaHome(idEst) {
+    if (!idEst) return;
 
-  // 3) Atualiza o hash amigável
+    // 1) Descobre em qual categoria esse estabelecimento está
+    let categoriaEncontrada = null;
 
+    categories.forEach(cat => {
+      if (categoriaEncontrada) return;
+      cat.establishments?.forEach(est => {
+        const norm = normalizeName(est.name || "");
+        if (norm === idEst) {
+          categoriaEncontrada = cat;
+        }
+      });
+    });
 
-  // 4) Depois que a categoria carregar, rola até o li do comércio e destaca
-  setTimeout(() => {
-    const alvo = document.getElementById(idEst);
-    if (alvo) {
-      alvo.scrollIntoView({ behavior: "smooth", block: "start" });
-      alvo.classList.add("destaque-home");
-      setTimeout(() => alvo.classList.remove("destaque-home"), 1500);
+    if (!categoriaEncontrada) {
+      console.warn("Estabelecimento não encontrado para id:", idEst);
+      return;
     }
-  }, 500);
-}
 
-// Observa o hash (#alguma-coisa) e, se for um estabelecimento válido,
-// abre a categoria correta e rola até o comércio
-function tratarHashEstabelecimento() {
-  const h = window.location.hash || "";
-  if (!h.startsWith("#")) return;
+    // 2) Se existir link no menu lateral para essa categoria, clica nele
+    if (categoriaEncontrada.link && typeof categoriaEncontrada.link.click === "function") {
+      categoriaEncontrada.link.click();
+    } else if (typeof loadContent === "function") {
+      // fallback: monta a categoria manualmente
+      loadContent(categoriaEncontrada.title, categoriaEncontrada.establishments);
+    }
 
-  const id = h.slice(1).trim();
-  if (!id) return;
+    // 3) Atualiza o hash amigável
 
-  // Verifica se esse id corresponde a algum comércio
-  let existe = false;
-  categories.forEach(cat => {
-    if (existe) return;
-    cat.establishments?.forEach(est => {
-      const norm = normalizeName(est.name || "");
-      if (norm === id) {
-        existe = true;
+
+    // 4) Depois que a categoria carregar, rola até o li do comércio e destaca
+    setTimeout(() => {
+      const alvo = document.getElementById(idEst);
+      if (alvo) {
+        alvo.scrollIntoView({ behavior: "smooth", block: "start" });
+        alvo.classList.add("destaque-home");
+        setTimeout(() => alvo.classList.remove("destaque-home"), 1500);
       }
+    }, 500);
+  }
+
+  // Observa o hash (#alguma-coisa) e, se for um estabelecimento válido,
+  // abre a categoria correta e rola até o comércio
+  function tratarHashEstabelecimento() {
+    const h = window.location.hash || "";
+    if (!h.startsWith("#")) return;
+
+    const id = h.slice(1).trim();
+    if (!id) return;
+
+    // Verifica se esse id corresponde a algum comércio
+    let existe = false;
+    categories.forEach(cat => {
+      if (existe) return;
+      cat.establishments?.forEach(est => {
+        const norm = normalizeName(est.name || "");
+        if (norm === id) {
+          existe = true;
+        }
+      });
     });
-  });
 
-  // Se não for um comércio, deixa outras rotas funcionarem normalmente
-  if (!existe) return;
+    // Se não for um comércio, deixa outras rotas funcionarem normalmente
+    if (!existe) return;
 
-  // Agora sim abre o comércio
-  abrirEstabelecimentoDaHome(id);
-}
+    // Agora sim abre o comércio
+    abrirEstabelecimentoDaHome(id);
+  }
 
-// Ao carregar a página e quando o hash mudar (#thebestacai, #cacaushow, etc.)
-// verifica se precisa abrir um comércio específico
-window.addEventListener("hashchange", tratarHashEstabelecimento);
-document.addEventListener("DOMContentLoaded", tratarHashEstabelecimento);
+  // Ao carregar a página e quando o hash mudar (#thebestacai, #cacaushow, etc.)
+  // verifica se precisa abrir um comércio específico
+  window.addEventListener("hashchange", tratarHashEstabelecimento);
+  document.addEventListener("DOMContentLoaded", tratarHashEstabelecimento);
 
 
   function abrirPromocoes() {
@@ -1529,10 +1528,10 @@ document.addEventListener("DOMContentLoaded", tratarHashEstabelecimento);
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "n",
-   
-   
-   
-  
+
+
+
+
     cafedamanhadosamigos: "s",
 
     campeonatoeliteredai: "s",
@@ -3729,7 +3728,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       endereco: "Residencial Lê Blanc",
       valor: 250000,
       construcao: 75,          // << NOVO: m² de construção
-       //area: 165,
+      //area: 165,
       banheiros: 1,
       churrasqueira: "Sim",
       cozinhas: 1,
@@ -7567,7 +7566,24 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/lanchonete/mycoffe/divulgacao/3.png",
               "images/comercios/lanchonete/mycoffe/divulgacao/4.png",
               "images/comercios/lanchonete/mycoffe/divulgacao/5.png",
+              "images/comercios/lanchonete/mycoffe/divulgacao/6.jpg",
 
+
+            ],
+
+            novidadesDescriptions: [
+
+              "",
+              "",
+              "",
+              "",
+              "",
+              "Torta de Doce de Leite com Crocante de Amendoim — doce, cremosa ",
+              "Fubá + goiabada = a dupla perfeita 💛 <br>Agora em versão bolo nuvem, fofinho e delicado",
+              " bolo Chiffon de morango — leve, fofinho e com o toque delicado do morango na massa!",
+              "Torta de Limão",
+              "A Cheesecake Japonesa é diferente de tudo o que você já provou! Com textura super leve e sabor delicado, ela desmancha na boca e conquista no primeiro pedaço.",
+"Tonkatsu Obentô!<Br>Um prato perfeito para quem ama a cozinha japonesa: tonkatsu crocante (porco empanado e frito), acompanhado de arroz japonês e salada de repolho.",
 
             ],
           },
@@ -9560,7 +9576,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/santamaria.farmaciaclps/",
 
             novidadesImages: [
-          
+
               "images/comercios/farmacia/santaMaria/divulgacao/3.jpg",
               "images/comercios/farmacia/santaMaria/divulgacao/4.jpg",
               "images/comercios/farmacia/santaMaria/divulgacao/5.jpg",
@@ -9568,7 +9584,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             ],
             novidadesDescriptions: [
-           
+
               "Nutricolin - Silício orgânico!Estimula as proteínas da beleza na pele, cabelos e unhas.Peça já o seu manipulado ❤️",
               "Emagreça com saúde! Fórmula manipulada completa.",
               "Colágeno Verisol em sachê.",
@@ -12183,8 +12199,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/materialConstrucao/ferreira/divulgacao/5.png",
             ],
             novidadesDescriptions: [
-            
-                "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
+
+              "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
               "tela Morlan na Loja Ferreira!Se você está procurando qualidade e resistência para cercas e proteções, aqui TEM!",
               "A Loja Ferreira tem tudo que você precisa! Luvas, lonas, rastelos e muito mais para a colheita do café. ",
               "Precisando de um container para sua obra?Na Loja Ferreira, você aluga por apenas R$200,00 por mês!Ideal para guardar ferramentas, materiais e manter tudo organizado e seguro.",
@@ -13228,28 +13244,28 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                     },
           */
 
-                     {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/55.jpg",
-                      date: "17/11/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. HELENA ALMEIDA CARDOSO aos 82 anos, ocorrido em Carlópolis.<BR>O velório está sendo realizado no Velório Municipal Lauro Soares.<BR>A cerimônia do sepultamento ocorrerá amanhã 18/11/2025 às 14:00 horas, no Cemitério Municipal de Carlópolis<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/55.jpg",
+            date: "17/11/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. HELENA ALMEIDA CARDOSO aos 82 anos, ocorrido em Carlópolis.<BR>O velório está sendo realizado no Velório Municipal Lauro Soares.<BR>A cerimônia do sepultamento ocorrerá amanhã 18/11/2025 às 14:00 horas, no Cemitério Municipal de Carlópolis<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-                     {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/54.jpg",
-                      date: "17/11/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da a Jovem GISELE APARECIDA DE PAULA aos 38 anos, ocorrido em Carlópolis<br>O velório será realizado hoje em horário a ser definido no velório Municipal de Ribeirão Claro<br>A cerimônia do sepultamento ocorrerá amanhã em horário a ser definido, no Cemitério Municipal de Ribeirão Claro<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/54.jpg",
+            date: "17/11/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da a Jovem GISELE APARECIDA DE PAULA aos 38 anos, ocorrido em Carlópolis<br>O velório será realizado hoje em horário a ser definido no velório Municipal de Ribeirão Claro<br>A cerimônia do sepultamento ocorrerá amanhã em horário a ser definido, no Cemitério Municipal de Ribeirão Claro<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-                     {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/52.jpg",
-                      date: "16/11/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. MARIA LEITE DA SILVA RODRIGUES, aos 79 anos, ocorrido em Sorocaba.<br>O velório será realizado amanhã à partir das 07:30 horas no velório Municipal de Carlópolis<br>A cerimônia do sepultamento ocorrerá amanhã às 14:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/52.jpg",
+            date: "16/11/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. MARIA LEITE DA SILVA RODRIGUES, aos 79 anos, ocorrido em Sorocaba.<br>O velório será realizado amanhã à partir das 07:30 horas no velório Municipal de Carlópolis<br>A cerimônia do sepultamento ocorrerá amanhã às 14:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-                    
+
           {
             name: "Funeraria Cristo Rei",
             image: "images/informacoes/notaFalecimento/cristoRei/53.jpg",
@@ -14370,7 +14386,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
                   </ul>
                     `;
 
-   
+
 
 
 
