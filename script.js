@@ -1246,7 +1246,7 @@ function abrirEstabelecimentoDaHome(idEst) {
     pousadanortepioneiro: "n",
 
     //loja de pesca
-    pescaepresente: "s",
+    pescaepresente: "n",
     lojathiagoaguera: "s",
 
     //lojaderoupas
@@ -1288,7 +1288,7 @@ function abrirEstabelecimentoDaHome(idEst) {
 
     //revendedor
     taticonik: "s",
-    leozindetailer: "s",
+    leozindetailer: "n",
 
     //pizzaria
     fornalhapizzaria: "s",
@@ -1492,11 +1492,11 @@ function abrirEstabelecimentoDaHome(idEst) {
 
     // INICIO EVENTOS 
     //calendarioeventos: "s",
-    feiradalua: "s",
-    toroonagashi: "s",
-    erosprado: "s",
-    bazarescoteiro: "s",
-    festivalbandasefanfarras: "s",
+    feiradalua: "n",
+   
+   
+   
+  
     cafedamanhadosamigos: "s",
 
     campeonatoeliteredai: "s",
@@ -12133,7 +12133,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             delivery: "Sim / Sem Taxa",
             instagram: "https://www.instagram.com/lojaferreira1/",
             novidadesImages: [
-              "images/comercios/materialConstrucao/ferreira/divulgacao/1.jpg",
+              "images/comercios/materialConstrucao/ferreira/divulgacao/1.png",
               //  "images/comercios/materialConstrucao/ferreira/divulgacao/11.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/2.png",
               "images/comercios/materialConstrucao/ferreira/divulgacao/3.png",
@@ -12141,8 +12141,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/materialConstrucao/ferreira/divulgacao/5.png",
             ],
             novidadesDescriptions: [
-              "Venha participar! e tambem teremos o sorteio de Furadeira Worker 550W 🔧⚡<br>📌 Para participar é simples:<br>➡️ Acesse a página @carlopolitanafm<br>➡️ Siga as regras do post oficial<br>🗓 O sorteio será no dia 11 de Outubro!<br>💙 Quanto mais cedo participar, mais chances de ganhar!",
-              //  "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
+            
+                "Proteja o que é seu com segurança e qualidade! A Loja Ferreira TEM fechadura trava lateral DOVALE, ideal para garantir mais proteção ao seu espaço",
               "tela Morlan na Loja Ferreira!Se você está procurando qualidade e resistência para cercas e proteções, aqui TEM!",
               "A Loja Ferreira tem tudo que você precisa! Luvas, lonas, rastelos e muito mais para a colheita do café. ",
               "Precisando de um container para sua obra?Na Loja Ferreira, você aluga por apenas R$200,00 por mês!Ideal para guardar ferramentas, materiais e manter tudo organizado e seguro.",
