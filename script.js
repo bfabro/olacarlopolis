@@ -976,11 +976,14 @@ document.addEventListener("DOMContentLoaded", function () {
         cat.establishments?.some(e => e.name === est.name)
       )?.title || "";
 
-      const imagem = destaquesFixos.includes(est.nomeNormalizado)
-        ? est.novidadesImages[0] // sempre a primeira imagem para fixos
-        : est.novidadesImages[Math.floor(Math.random() * est.novidadesImages.length)];
+      const imagens = est.novidadesImages || [];
 
-      const indexImagem = est.novidadesImages.indexOf(imagem);
+      // imagem inicial (como já era)
+      const imagemInicial = destaquesFixos.includes(est.nomeNormalizado)
+        ? imagens[0] // sempre a primeira imagem para fixos
+        : imagens[Math.floor(Math.random() * imagens.length)];
+
+      const indexImagem = imagens.indexOf(imagemInicial);
       const texto = est.novidadesDescriptions?.[indexImagem] || "Confira nossas novidades!";
 
       // ====== SLIDE GRANDE DO CARROSSEL (mantém como era) ======
@@ -988,7 +991,7 @@ document.addEventListener("DOMContentLoaded", function () {
       slide.classList.add("swiper-slide");
 
       slide.innerHTML = `
-      <img class="content_image" src="${imagem}" alt="${est.name}" loading="lazy">
+      <img class="content_image" src="${imagemInicial}" alt="${est.name}" loading="lazy">
       <div class="info_divulgacao">
         <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
         <p>${texto}</p>
@@ -999,63 +1002,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
       swiperWrapper.appendChild(slide);
 
-
-      // ====== NOVO: CARD PEQUENO NA GRADE DE DESTAQUES ======
+      // ====== CARD PEQUENO NA GRADE DE DESTAQUES ======
       if (gradeDivulgacao) {
         const card = document.createElement("div");
         card.className = "card-divulgacao-pequeno";
         const idEst = est.nomeNormalizado || normalizeName(est.name || "");
-        card.dataset.id = idEst;  // 🔥 AQUI adiciona o ID
-
-        // id do estabelecimento (igual ao usado no menu/card principal)
-
+        card.dataset.id = idEst;
 
         card.innerHTML = `
-  
-    <div class="card-divulgacao-img-wrap">
-      <img src="${imagem}" alt="${est.name}" loading="lazy">
-     
-    </div>
-    <div class="card-divulgacao-info">
-      <span class="card-divulgacao-categoria">
-        ${categoria || "Divulgação"}
-      </span>
-      <div class="card-divulgacao-linha">
-  <h4>${est.name}</h4>
-  ${est.instagram
+        <div class="card-divulgacao-img-wrap">
+          <img src="${imagemInicial}" alt="${est.name}" loading="lazy">
+        </div>
+        <div class="card-divulgacao-info">
+          <span class="card-divulgacao-categoria">
+            ${categoria || "Divulgação"}
+          </span>
+          <div class="card-divulgacao-linha">
+            <h4>${est.name}</h4>
+            ${est.instagram
             ? `<button type="button" class="card-divulgacao-ig-btn" aria-label="Abrir Instagram" data-ig="${fixUrl(est.instagram)}">
-           <i class="fa-brands fa-instagram"></i>
-         </button>`
+                     <i class="fa-brands fa-instagram"></i>
+                   </button>`
             : ""
           }
-</div>
-
-    </div>
-  `;
-
+          </div>
+        </div>
+      `;
 
         // 👉 Clique no CARD leva para o comércio dentro do site
-        // 👉 Clique no CARD: só muda o hash, o listener de hash vai abrir a página
         card.addEventListener("click", () => {
-          location.hash = "#" + idEst;
+          abrirEstabelecimentoDaHome(idEst);
         });
-
-
 
         // 👉 Clique no ícone do Instagram abre o insta, sem perder o clique do card
         const igBtn = card.querySelector(".card-divulgacao-ig-btn");
         if (igBtn && est.instagram) {
           igBtn.addEventListener("click", (ev) => {
-            ev.stopPropagation(); // não dispara o clique do card
+            ev.stopPropagation();
             window.open(fixUrl(est.instagram), "_blank");
           });
         }
 
+        // 👉 MINI CARROSSEL: troca automática das imagens desse estabelecimento
+        if (imagens.length > 1) {
+          const imgTag = card.querySelector(".card-divulgacao-img-wrap img");
+          let idx = imagens.indexOf(imagemInicial);
+          if (idx < 0) idx = 0;
+
+          setInterval(() => {
+            idx = (idx + 1) % imagens.length;
+            imgTag.src = imagens[idx];
+          }, 5000); // troca a cada 4 segundos (ajuste se quiser)
+        }
+
         gradeDivulgacao.appendChild(card);
       }
-
     });
   }
+
 
   // Abre a categoria certa e rola até o comércio correspondente
   function abrirEstabelecimentoDaHome(idEst) {
@@ -7583,7 +7587,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               " bolo Chiffon de morango — leve, fofinho e com o toque delicado do morango na massa!",
               "Torta de Limão",
               "A Cheesecake Japonesa é diferente de tudo o que você já provou! Com textura super leve e sabor delicado, ela desmancha na boca e conquista no primeiro pedaço.",
-"Tonkatsu Obentô!<Br>Um prato perfeito para quem ama a cozinha japonesa: tonkatsu crocante (porco empanado e frito), acompanhado de arroz japonês e salada de repolho.",
+              "Tonkatsu Obentô!<Br>Um prato perfeito para quem ama a cozinha japonesa: tonkatsu crocante (porco empanado e frito), acompanhado de arroz japonês e salada de repolho.",
 
             ],
           },
@@ -7868,7 +7872,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             infoAdicional: "⏲️ Instalação de timer<br>🧪 + 🧹 Limpezas química e física<br>🏖️ Troca de areia<br>💧 Recuperação de água,",
             novidadesImages: [
 
-             
+
               "images/comercios/piscina/mhpiscinas/divulgacao/2.jpg",
               "images/comercios/piscina/mhpiscinas/divulgacao/3.jpg",
               "images/comercios/piscina/mhpiscinas/divulgacao/4.jpg",
@@ -7891,19 +7895,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       },
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+      ////////
+      //////
+      ////////
       // pizzaria
       {
         link: document.querySelector("#menuPizzaria"),
@@ -10541,7 +10535,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 */
 
-          /* [ 7 ]*/
+          /* [ 7 ]
 
 
           {
@@ -10582,7 +10576,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-
+*/
 
           /* [ 8 ] 
 
