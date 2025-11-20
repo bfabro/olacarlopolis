@@ -1087,7 +1087,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // artesanato
-    judite: "s",
+    judite: "n",
     patymaosdeouro: "s",
 
     //calhas
