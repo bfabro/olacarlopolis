@@ -8069,3 +8069,12 @@ width: 100%;
     font-size: 0.85rem;
   }
 }
+
+
+/* Destaque quando o comércio vem da página inicial */
+.destaque-home {
+  outline: 3px solid #00bcd4;
+  border-radius: 12px;
+  background: rgba(0, 188, 212, 0.08);
+  transition: background 0.3s ease, outline 0.3s ease;
+}
