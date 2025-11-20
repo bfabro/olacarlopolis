@@ -1002,11 +1002,13 @@ document.addEventListener("DOMContentLoaded", function () {
     
    // ====== NOVO: CARD PEQUENO NA GRADE DE DESTAQUES ======
 if (gradeDivulgacao) {
-  const card = document.createElement("div");
-  card.className = "card-divulgacao-pequeno";
+ const card = document.createElement("div");
+card.className = "card-divulgacao-pequeno";
+const idEst = est.nomeNormalizado || normalizeName(est.name || "");
+card.dataset.id = idEst;  // 🔥 AQUI adiciona o ID
 
   // id do estabelecimento (igual ao usado no menu/card principal)
-  const idEst = est.nomeNormalizado || normalizeName(est.name || "");
+  
 
   card.innerHTML = `
     <div class="card-divulgacao-img-wrap">
@@ -1032,10 +1034,11 @@ if (gradeDivulgacao) {
   `;
 
   // 👉 Clique no CARD leva para o comércio dentro do site
-  card.addEventListener("click", () => {
-    if (!idEst) return;
-    abrirEstabelecimentoDaHome(idEst);
-  });
+ card.addEventListener("click", () => {
+  window.location.hash = idEst;   // 🔥 Abre o comércio dentro do site
+  mostrarEstabelecimentoPorId(idEst);  // 🔥 Função já existente que abre a página
+});
+
 
   // 👉 Clique no ícone do Instagram abre o insta, sem perder o clique do card
   const igBtn = card.querySelector(".card-divulgacao-ig-btn");
