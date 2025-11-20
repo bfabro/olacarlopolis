@@ -7571,6 +7571,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/lanchonete/mycoffe/divulgacao/4.png",
               "images/comercios/lanchonete/mycoffe/divulgacao/5.png",
               "images/comercios/lanchonete/mycoffe/divulgacao/6.jpg",
+              "images/comercios/lanchonete/mycoffe/divulgacao/7.jpg",
+              "images/comercios/lanchonete/mycoffe/divulgacao/8.jpg",
+              "images/comercios/lanchonete/mycoffe/divulgacao/9.jpg",
+              "images/comercios/lanchonete/mycoffe/divulgacao/10.jpg",
+              "images/comercios/lanchonete/mycoffe/divulgacao/11.jpg",
 
 
             ],
