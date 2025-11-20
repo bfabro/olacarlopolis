@@ -1099,7 +1099,7 @@ function abrirEstabelecimentoDaHome(idEst) {
       alvo.classList.add("destaque-home");
       setTimeout(() => alvo.classList.remove("destaque-home"), 1500);
     }
-  }, 400);
+  }, 500);
 }
 
 // Observa o hash (#alguma-coisa) e, se for um estabelecimento válido,
