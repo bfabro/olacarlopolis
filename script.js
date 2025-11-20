@@ -1374,7 +1374,7 @@ document.addEventListener("DOMContentLoaded", tratarHashEstabelecimento);
     peskepagueaguamarine: "n",
 
     // radio
-    carlopolitana: "s",
+    carlopolitana: "n",
 
     // relojoaria
     relojoariamartini: "n",
