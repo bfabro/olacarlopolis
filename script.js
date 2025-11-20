@@ -1011,6 +1011,7 @@ card.dataset.id = idEst;  // 🔥 AQUI adiciona o ID
   
 
   card.innerHTML = `
+  
     <div class="card-divulgacao-img-wrap">
       <img src="${imagem}" alt="${est.name}" loading="lazy">
      
@@ -1033,11 +1034,13 @@ card.dataset.id = idEst;  // 🔥 AQUI adiciona o ID
     </div>
   `;
 
-  // 👉 Clique no CARD leva para o comércio dentro do site
- card.addEventListener("click", () => {
-  window.location.hash = idEst;   // 🔥 Abre o comércio dentro do site
-  mostrarEstabelecimentoPorId(idEst);  // 🔥 Função já existente que abre a página
+
+// 👉 Clique no CARD leva para o comércio dentro do site
+// 👉 Clique no CARD: só muda o hash, o listener de hash vai abrir a página
+card.addEventListener("click", () => {
+  location.hash = "#" + idEst;
 });
+
 
 
   // 👉 Clique no ícone do Instagram abre o insta, sem perder o clique do card
@@ -1086,7 +1089,7 @@ function abrirEstabelecimentoDaHome(idEst) {
   }
 
   // 3) Atualiza o hash amigável
-  location.hash = "#" + idEst;
+
 
   // 4) Depois que a categoria carregar, rola até o li do comércio e destaca
   setTimeout(() => {
@@ -1098,6 +1101,39 @@ function abrirEstabelecimentoDaHome(idEst) {
     }
   }, 400);
 }
+
+// Observa o hash (#alguma-coisa) e, se for um estabelecimento válido,
+// abre a categoria correta e rola até o comércio
+function tratarHashEstabelecimento() {
+  const h = window.location.hash || "";
+  if (!h.startsWith("#")) return;
+
+  const id = h.slice(1).trim();
+  if (!id) return;
+
+  // Verifica se esse id corresponde a algum comércio
+  let existe = false;
+  categories.forEach(cat => {
+    if (existe) return;
+    cat.establishments?.forEach(est => {
+      const norm = normalizeName(est.name || "");
+      if (norm === id) {
+        existe = true;
+      }
+    });
+  });
+
+  // Se não for um comércio, deixa outras rotas funcionarem normalmente
+  if (!existe) return;
+
+  // Agora sim abre o comércio
+  abrirEstabelecimentoDaHome(id);
+}
+
+// Ao carregar a página e quando o hash mudar (#thebestacai, #cacaushow, etc.)
+// verifica se precisa abrir um comércio específico
+window.addEventListener("hashchange", tratarHashEstabelecimento);
+document.addEventListener("DOMContentLoaded", tratarHashEstabelecimento);
 
 
   function abrirPromocoes() {
