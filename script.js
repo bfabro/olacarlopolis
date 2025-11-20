@@ -7853,6 +7853,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             novidadesImages: [
 
               "images/comercios/piscina/mhpiscinas/divulgacao/1.jpg",
+              "images/comercios/piscina/mhpiscinas/divulgacao/2.jpg",
+              "images/comercios/piscina/mhpiscinas/divulgacao/3.jpg",
+              "images/comercios/piscina/mhpiscinas/divulgacao/4.jpg",
+              "images/comercios/piscina/mhpiscinas/divulgacao/5.jpg",
+              "images/comercios/piscina/mhpiscinas/divulgacao/6.jpg",
+              "images/comercios/piscina/mhpiscinas/divulgacao/7.jpg",
+              "images/comercios/piscina/mhpiscinas/divulgacao/8.jpg",
+              "images/comercios/piscina/mhpiscinas/divulgacao/9.jpg",
 
             ],
 
