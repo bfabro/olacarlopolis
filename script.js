@@ -999,30 +999,102 @@ document.addEventListener("DOMContentLoaded", function () {
 
     swiperWrapper.appendChild(slide);
 
-    // ====== NOVO: CARD PEQUENO NA GRADE DE DESTAQUES ======
-    if (gradeDivulgacao) {
-      const card = document.createElement("div");
-      card.className = "card-divulgacao-pequeno";
+    
+   // ====== NOVO: CARD PEQUENO NA GRADE DE DESTAQUES ======
+if (gradeDivulgacao) {
+  const card = document.createElement("div");
+  card.className = "card-divulgacao-pequeno";
 
-      card.innerHTML = `
-        <div class="card-divulgacao-img-wrap">
-          <img src="${imagem}" alt="${est.name}" loading="lazy">
-        </div>
-        <div class="card-divulgacao-info">
-          <span class="card-divulgacao-categoria">
-            ${categoria || "Divulgação"}
-          </span>
-          <h4>${est.name}</h4>
-        </div>
-      `;
+  // id do estabelecimento (igual ao usado no menu/card principal)
+  const idEst = est.nomeNormalizado || normalizeName(est.name || "");
 
-      // se quiser, no futuro dá pra transformar isso em clique pra abrir o comércio
+  card.innerHTML = `
+    <div class="card-divulgacao-img-wrap">
+      <img src="${imagem}" alt="${est.name}" loading="lazy">
+     
+    </div>
+    <div class="card-divulgacao-info">
+      <span class="card-divulgacao-categoria">
+        ${categoria || "Divulgação"}
+      </span>
+      <div class="card-divulgacao-linha">
+  <h4>${est.name}</h4>
+  ${
+    est.instagram
+      ? `<button type="button" class="card-divulgacao-ig-btn" aria-label="Abrir Instagram" data-ig="${fixUrl(est.instagram)}">
+           <i class="fa-brands fa-instagram"></i>
+         </button>`
+      : ""
+  }
+</div>
 
-      gradeDivulgacao.appendChild(card);
-    }
+    </div>
+  `;
+
+  // 👉 Clique no CARD leva para o comércio dentro do site
+  card.addEventListener("click", () => {
+    if (!idEst) return;
+    abrirEstabelecimentoDaHome(idEst);
+  });
+
+  // 👉 Clique no ícone do Instagram abre o insta, sem perder o clique do card
+  const igBtn = card.querySelector(".card-divulgacao-ig-btn");
+  if (igBtn && est.instagram) {
+    igBtn.addEventListener("click", (ev) => {
+      ev.stopPropagation(); // não dispara o clique do card
+      window.open(fixUrl(est.instagram), "_blank");
+    });
+  }
+
+  gradeDivulgacao.appendChild(card);
+}
+
   });
 }
 
+// Abre a categoria certa e rola até o comércio correspondente
+function abrirEstabelecimentoDaHome(idEst) {
+  if (!idEst) return;
+
+  // 1) Descobre em qual categoria esse estabelecimento está
+  let categoriaEncontrada = null;
+
+  categories.forEach(cat => {
+    if (categoriaEncontrada) return;
+    cat.establishments?.forEach(est => {
+      const norm = normalizeName(est.name || "");
+      if (norm === idEst) {
+        categoriaEncontrada = cat;
+      }
+    });
+  });
+
+  if (!categoriaEncontrada) {
+    console.warn("Estabelecimento não encontrado para id:", idEst);
+    return;
+  }
+
+  // 2) Se existir link no menu lateral para essa categoria, clica nele
+  if (categoriaEncontrada.link && typeof categoriaEncontrada.link.click === "function") {
+    categoriaEncontrada.link.click();
+  } else if (typeof loadContent === "function") {
+    // fallback: monta a categoria manualmente
+    loadContent(categoriaEncontrada.title, categoriaEncontrada.establishments);
+  }
+
+  // 3) Atualiza o hash amigável
+  location.hash = "#" + idEst;
+
+  // 4) Depois que a categoria carregar, rola até o li do comércio e destaca
+  setTimeout(() => {
+    const alvo = document.getElementById(idEst);
+    if (alvo) {
+      alvo.scrollIntoView({ behavior: "smooth", block: "start" });
+      alvo.classList.add("destaque-home");
+      setTimeout(() => alvo.classList.remove("destaque-home"), 1500);
+    }
+  }, 400);
+}
 
 
   function abrirPromocoes() {

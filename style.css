@@ -7977,7 +7977,7 @@ html {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  cursor: default; /* mude para pointer se quiser clique */
+  cursor: pointer; /* agora o card é claramente clicável */
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -7987,9 +7987,10 @@ html {
 }
 
 .card-divulgacao-img-wrap {
-  width: 100%;
+width: 100%;
   height: 200px;
   overflow: hidden;
+  position: relative; /* importante pro botão do Instagram ficar em cima da imagem */
 }
 
 .card-divulgacao-img-wrap img {
@@ -8010,6 +8011,45 @@ html {
   color: #222;
 }
 
+
+/* Botão do Instagram em cima da imagem do card da home */
+/* Botão Instagram agora ao lado do nome */
+.card-divulgacao-ig-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.card-divulgacao-ig-btn i {
+  font-size: 18px;
+  color: #E1306C; /* rosa do Instagram */
+}
+
+/* Linha com nome + ícone */
+.card-divulgacao-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/* Destaque visual quando chega no comércio vindo da home */
+.destaque-home {
+  animation: destaqueHomePulse 1.2s ease-out 1;
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px #ff9800;
+  background-color: rgba(255, 235, 188, 0.4);
+}
+
+@keyframes destaqueHomePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255,152,0,0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(255,152,0,0);
+  }
+}
+
+
 .card-divulgacao-categoria {
   font-size: 0.7rem;
   text-transform: uppercase;
@@ -8019,7 +8059,10 @@ html {
 /* Ajuste para telas menores */
 @media (max-width: 768px) {
   .card-divulgacao-img-wrap {
-    height: 200px;
+   width: 100%;
+  height: 200px;
+  overflow: hidden;
+  position: relative; /* NECESSÁRIO PARA O BOTÃO FICAR NO CANTO CERTO */
   }
 
   .card-divulgacao-info h4 {
