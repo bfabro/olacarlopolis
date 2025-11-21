@@ -3857,6 +3857,48 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
+    {
+      id: "casa11v",
+      codRef: "C_011",
+      procura: "casa", // ou "terreno", "rural", etc.
+      tipo: "venda",
+      titulo: "Casa recém construída em Carlópolis-PR, Condominio Alvorada",
+      descricao: "Casa Nova com piscina, Portão Eletronico, Sala ampla com porta pivotante, Aceita Financiamento de TODOS OS BANCOS,Documentação Ok.",
+      endereco: "Residencial Murador ",
+      valor: 500000,
+      construcao: 138,          // << NOVO: m² de construção
+      area: 180,
+      banheiros: 2,
+      churrasqueira: "Sim",
+      cozinhas: 1,
+      quartos: 3,
+      quintal: "Sim",
+      piscina: "Sim",
+      salas: 1,
+      suite: "Sim",
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"],
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa11/1.jpg",
+        "images/imoveis/cesar/venda/casa11/2.jpg",
+        "images/imoveis/cesar/venda/casa11/3.jpg",
+        "images/imoveis/cesar/venda/casa11/4.jpg",
+        "images/imoveis/cesar/venda/casa11/5.jpg",
+        "images/imoveis/cesar/venda/casa11/6.jpg",
+        "images/imoveis/cesar/venda/casa11/7.jpg",
+        "images/imoveis/cesar/venda/casa11/8.jpg",
+        "images/imoveis/cesar/venda/casa11/9.jpg",
+        "images/imoveis/cesar/venda/casa11/10.jpg",
+        "images/imoveis/cesar/venda/casa11/11.jpg",
+        "images/imoveis/cesar/venda/casa11/12.jpg",
+    
+
+
+      ],
+
+    },
+
 
 
 
