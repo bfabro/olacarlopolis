@@ -1061,6 +1061,98 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
+
+
+
+
+
+  function montarGradeEventos() {
+  const grade = document.getElementById("grade-eventos");
+  if (!grade) return;
+
+  // Usa a mesma fonte de dados dos comércios (categories)
+  const fonteCategorias =
+    typeof categories !== "undefined"
+      ? categories
+      : (window.categories || []);
+
+  const eventosCat = fonteCategorias.find(
+    (cat) => cat.title === "Eventos em Carlópolis"
+  );
+
+  if (!eventosCat || !Array.isArray(eventosCat.establishments)) {
+    console.warn("Categoria 'Eventos em Carlópolis' não encontrada ou sem establishments.");
+    grade.innerHTML = "";
+    return;
+  }
+
+  // Só pega os eventos "reais" (com imagem, nome e instagram)
+  const listaEventos = eventosCat.establishments.filter(
+    (ev) => ev && ev.image && ev.name && ev.instagram
+  );
+
+  grade.innerHTML = "";
+
+  listaEventos.forEach((ev, idx) => {
+    const card = document.createElement("div");
+    card.className = "card-divulgacao-pequeno";
+
+    const nome = ev.name || "Evento";
+    const data = ev.date || "";
+    const endereco = ev.address || "";
+
+    card.innerHTML = `
+      <div class="card-divulgacao-img-wrap">
+        <img src="${ev.image}" alt="${nome}" loading="lazy">
+      </div>
+      <div class="card-divulgacao-info">
+        <span class="card-divulgacao-categoria">Evento</span>
+        <div class="card-divulgacao-linha">
+          <h4>${nome}</h4>
+          ${
+            ev.instagram
+              ? `<button type="button" class="card-divulgacao-ig-btn"
+                         aria-label="Abrir Instagram do evento"
+                         data-ig="${fixUrl(ev.instagram)}">
+                   <i class="fa-brands fa-instagram"></i>
+                 </button>`
+              : ""
+          }
+        </div>
+        ${
+          data || endereco
+            ? `<small>${[data, endereco].filter(Boolean).join(" • ")}</small>`
+            : ""
+        }
+      </div>
+    `;
+
+    // Clique no CARD → abre a seção de eventos e vai pro slide correspondente
+ card.addEventListener("click", () => {
+    const id = normalizeName(ev.name); // mesmo formato dos comércios
+    if (id) {
+        location.hash = "#" + id;       // ativa o carregamento automático
+        carregarEstabelecimentoPeloHash(); // força a abertura imediata
+    }
+});
+
+
+    // Clique no ícone do Instagram → abre o Insta sem disparar o clique do card
+    const igBtn = card.querySelector(".card-divulgacao-ig-btn");
+    if (igBtn && ev.instagram) {
+      igBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        window.open(fixUrl(ev.instagram), "_blank");
+      });
+    }
+
+    grade.appendChild(card);
+  });
+}
+
+
+
+
   // Abre a categoria certa e rola até o comércio correspondente
   function abrirEstabelecimentoDaHome(idEst) {
     if (!idEst) return;
@@ -10217,11 +10309,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuEventos"),
         title: "Eventos em Carlópolis",
         establishments: [
-          {
-            name: "Calendario Eventos",
-            image: "images/informacoes/eventos/calendario_evento.png",
-            contact: "",
-          },
+       
 
 
 
@@ -10247,7 +10335,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/informacoes/eventos/2.jpg",
             name: "Cafe da manha dos amigos",
             date: "28/03/2026",
-            address: "ROTA PR-218",
+            address: "R. Benedito Salles, 2671 - Carlópolis",
+            contact: "(43)99837-5390",
             instagram: "https://www.instagram.com/rotapr218/",
             infoAdicional: "A partir do dia 28 de março, já estaremos recebendo os irmãos de estrada!<br>Durante o fim de semana, teremos passeios mototurísticos pela região Angra Doce"
           },
@@ -13835,6 +13924,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
   montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
+  window.addEventListener("DOMContentLoaded", () => {
+    montarGradeEventos();
+});
 
 
 
