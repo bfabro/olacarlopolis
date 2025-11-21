@@ -10359,6 +10359,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             infoAdicional: "Especialistas em cuidados capilares, desenvolvemos produtos de alta performance para salões de beleza.<br> Nossas linhas unem tecnologia e qualidade profissional para proporcionar fios mais saudáveis, lisos e radiantes.<br>📗 <a href='images/servicos/revendedor/tati/divulgacao/Catalogo.pdf' target='_blank' rel='noopener'><br>Acesse Nosso Catálogo</a>",
 
             novidadesImages: [
+              "images/servicos/revendedor/tati/divulgacao/00.jpg",
               "images/servicos/revendedor/tati/divulgacao/0.jpg",
               "images/servicos/revendedor/tati/divulgacao/2.jpg",
 
