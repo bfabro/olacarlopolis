@@ -3912,7 +3912,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       banheiros: 1,
       churrasqueira: "Não",
       cozinhas: 1,
-      quartos: 3,
+      quartos: 1,
       quintal: "Sim",
       piscina: "Não",
       salas: 1,
