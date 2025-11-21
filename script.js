@@ -1067,41 +1067,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   function montarGradeEventos() {
-  const grade = document.getElementById("grade-eventos");
-  if (!grade) return;
+    const grade = document.getElementById("grade-eventos");
+    if (!grade) return;
 
-  // Usa a mesma fonte de dados dos comércios (categories)
-  const fonteCategorias =
-    typeof categories !== "undefined"
-      ? categories
-      : (window.categories || []);
+    // Usa a mesma fonte de dados dos comércios (categories)
+    const fonteCategorias =
+      typeof categories !== "undefined"
+        ? categories
+        : (window.categories || []);
 
-  const eventosCat = fonteCategorias.find(
-    (cat) => cat.title === "Eventos em Carlópolis"
-  );
+    const eventosCat = fonteCategorias.find(
+      (cat) => cat.title === "Eventos em Carlópolis"
+    );
 
-  if (!eventosCat || !Array.isArray(eventosCat.establishments)) {
-    console.warn("Categoria 'Eventos em Carlópolis' não encontrada ou sem establishments.");
+    if (!eventosCat || !Array.isArray(eventosCat.establishments)) {
+      console.warn("Categoria 'Eventos em Carlópolis' não encontrada ou sem establishments.");
+      grade.innerHTML = "";
+      return;
+    }
+
+    // Só pega os eventos "reais" (com imagem, nome e instagram)
+    const listaEventos = eventosCat.establishments.filter(
+      (ev) => ev && ev.image && ev.name && ev.instagram
+    );
+
     grade.innerHTML = "";
-    return;
-  }
 
-  // Só pega os eventos "reais" (com imagem, nome e instagram)
-  const listaEventos = eventosCat.establishments.filter(
-    (ev) => ev && ev.image && ev.name && ev.instagram
-  );
+    listaEventos.forEach((ev, idx) => {
+      const card = document.createElement("div");
+      card.className = "card-divulgacao-pequeno";
 
-  grade.innerHTML = "";
+      const nome = ev.name || "Evento";
+      const data = ev.date || "";
+      const endereco = ev.address || "";
 
-  listaEventos.forEach((ev, idx) => {
-    const card = document.createElement("div");
-    card.className = "card-divulgacao-pequeno";
-
-    const nome = ev.name || "Evento";
-    const data = ev.date || "";
-    const endereco = ev.address || "";
-
-    card.innerHTML = `
+      card.innerHTML = `
       <div class="card-divulgacao-img-wrap">
         <img src="${ev.image}" alt="${nome}" loading="lazy">
       </div>
@@ -1109,46 +1109,44 @@ document.addEventListener("DOMContentLoaded", function () {
         <span class="card-divulgacao-categoria">Evento</span>
         <div class="card-divulgacao-linha">
           <h4>${nome}</h4>
-          ${
-            ev.instagram
-              ? `<button type="button" class="card-divulgacao-ig-btn"
+          ${ev.instagram
+          ? `<button type="button" class="card-divulgacao-ig-btn"
                          aria-label="Abrir Instagram do evento"
                          data-ig="${fixUrl(ev.instagram)}">
                    <i class="fa-brands fa-instagram"></i>
                  </button>`
-              : ""
-          }
+          : ""
+        }
         </div>
-        ${
-          data || endereco
-            ? `<small>${[data, endereco].filter(Boolean).join(" • ")}</small>`
-            : ""
+        ${data || endereco
+          ? `<small>${[data, endereco].filter(Boolean).join(" • ")}</small>`
+          : ""
         }
       </div>
     `;
 
-    // Clique no CARD → abre a seção de eventos e vai pro slide correspondente
- card.addEventListener("click", () => {
-    const id = normalizeName(ev.name); // mesmo formato dos comércios
-    if (id) {
-        location.hash = "#" + id;       // ativa o carregamento automático
-        carregarEstabelecimentoPeloHash(); // força a abertura imediata
-    }
-});
-
-
-    // Clique no ícone do Instagram → abre o Insta sem disparar o clique do card
-    const igBtn = card.querySelector(".card-divulgacao-ig-btn");
-    if (igBtn && ev.instagram) {
-      igBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        window.open(fixUrl(ev.instagram), "_blank");
+      // Clique no CARD → abre a seção de eventos e vai pro slide correspondente
+      card.addEventListener("click", () => {
+        const id = normalizeName(ev.name); // mesmo formato dos comércios
+        if (id) {
+          location.hash = "#" + id;       // ativa o carregamento automático
+          carregarEstabelecimentoPeloHash(); // força a abertura imediata
+        }
       });
-    }
 
-    grade.appendChild(card);
-  });
-}
+
+      // Clique no ícone do Instagram → abre o Insta sem disparar o clique do card
+      const igBtn = card.querySelector(".card-divulgacao-ig-btn");
+      if (igBtn && ev.instagram) {
+        igBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          window.open(fixUrl(ev.instagram), "_blank");
+        });
+      }
+
+      grade.appendChild(card);
+    });
+  }
 
 
 
@@ -3579,15 +3577,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       construcao: 120,          // << NOVO: m² de construção
       quintal: "Sim",
       telefone: "43 99686-4716", // Corretor ou propretario
-      imagens: ["images/imoveis/rafaelBandeira/venda/casa/1/1.jpg",
-        "images/imoveis/rafaelBandeira/venda/casa/1/2.jpg",
-        "images/imoveis/rafaelBandeira/venda/casa/1/3.jpg",
-        "images/imoveis/rafaelBandeira/venda/casa/1/4.jpg",
-        "images/imoveis/rafaelBandeira/venda/casa/1/5.jpg",
-        "images/imoveis/rafaelBandeira/venda/casa/1/6.jpg",
-        "images/imoveis/rafaelBandeira/venda/casa/1/7.jpg",
-        "images/imoveis/rafaelBandeira/venda/casa/1/8.jpg",
-        "images/imoveis/rafaelBandeira/venda/casa/1/9.jpg",
+      imagens: [
+        "images/imoveis/rafaelBandeira/venda/casa1/1.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa1/2.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa1/3.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa1/4.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa1/5.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa1/6.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa1/7.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa1/8.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa1/9.jpg",
       ],
       //lat: -23.3953,
       //lng: -49.7232,
@@ -3862,8 +3861,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       codRef: "C_011",
       procura: "casa", // ou "terreno", "rural", etc.
       tipo: "venda",
-      titulo: "Casa recém construída em Carlópolis-PR, Condominio Alvorada",
-      descricao: "Casa Nova com piscina, Portão Eletronico, Sala ampla com porta pivotante, Aceita Financiamento de TODOS OS BANCOS,Documentação Ok.",
+      titulo: "Casa recém construída",
+      descricao: "Casa Nova com piscina, Portão Eletronico, Sala ampla com porta pivotante, Aceita Financiamento de TODOS OS BANCOS, Documentação Ok.",
       endereco: "Residencial Murador ",
       valor: 500000,
       construcao: 138,          // << NOVO: m² de construção
@@ -3892,10 +3891,93 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa11/10.jpg",
         "images/imoveis/cesar/venda/casa11/11.jpg",
         "images/imoveis/cesar/venda/casa11/12.jpg",
-    
+
 
 
       ],
+
+    },
+
+    {
+      id: "casa12v",
+      codRef: "C_012",
+      procura: "casa", // ou "terreno", "rural", etc.
+      tipo: "venda",
+      titulo: "Casa Arejada",
+      descricao: "Documentação Ok.",
+      endereco: "Vista Bela",
+      valor: 250000,
+      construcao: 70,          // << NOVO: m² de construção
+      area: 284,
+      banheiros: 1,
+      churrasqueira: "Não",
+      cozinhas: 1,
+      quartos: 3,
+      quintal: "Sim",
+      piscina: "Não",
+      salas: 1,
+      suite: "Não",
+      vagas: 2,
+      corretores: ["Imobiliaria Carlopolis"],
+      telefone: "43 99956-0522",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/imobiliariaCarlopolis/venda/casa1/1.jpg",
+        "images/imoveis/imobiliariaCarlopolis/venda/casa1/2.jpg",
+        "images/imoveis/imobiliariaCarlopolis/venda/casa1/3.jpg",
+        "images/imoveis/imobiliariaCarlopolis/venda/casa1/4.jpg",
+        "images/imoveis/imobiliariaCarlopolis/venda/casa1/5.jpg",
+        "images/imoveis/imobiliariaCarlopolis/venda/casa1/6.jpg",
+        "images/imoveis/imobiliariaCarlopolis/venda/casa1/7.jpg",
+
+
+
+      ],
+
+    },
+
+
+    {
+      id: "casa13v",
+      codRef: "C_013",
+      tipo: "venda",
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 4,
+      valor: 3000000,
+      piscina: "Sim",
+      churrasqueira: "Sim",
+      vagas: 8,
+      corretores: ["Rafael Bandeira - 29.802"],
+      titulo: "Imóvel no Residencial Garden Club",
+      descricao: "Piscina privativa com espaço gourmet, Living espaçoso e integrado, Acabamentos de alto padrão, Iluminação natural e ambientes climatizados. Documentação OK",
+      endereco: "Residencial Garden Club - Carlópolis",
+      suite: "Sim",
+      banheiros: 4,
+      salas: 2,
+      cozinhas: 1,
+      area: 1000,
+      //construcao: 120,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 99686-4716", // Corretor ou propretario
+      imagens: [
+    
+        "images/imoveis/rafaelBandeira/venda/casa2/2.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/3.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/4.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/5.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/6.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/7.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/8.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/9.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/10.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/11.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/12.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/13.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/14.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/15.jpg",
+        "images/imoveis/rafaelBandeira/venda/casa2/16.jpg",
+      ],
+      //lat: -23.3953,
+      //lng: -49.7232,
 
     },
 
@@ -10351,7 +10433,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuEventos"),
         title: "Eventos em Carlópolis",
         establishments: [
-       
+
 
 
 
@@ -13968,7 +14050,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
   window.addEventListener("DOMContentLoaded", () => {
     montarGradeEventos();
-});
+  });
 
 
 
