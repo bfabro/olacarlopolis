@@ -10334,7 +10334,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/informacoes/eventos/2.jpg",
             name: "Cafe da manha dos amigos",
-            date: "28/03/2026",
+            date: "29/03/2026",
             address: "R. Benedito Salles, 2671 - Carlópolis",
             contact: "(43)99837-5390",
             instagram: "https://www.instagram.com/rotapr218/",
