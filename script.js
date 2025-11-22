@@ -5989,7 +5989,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Piso laminado é perfeito para deixar o ambiente aconchegante e com um visual lindíssimo!",
               "Papel de parede<BR> ✨Ótimo para mudar o visual do seu ambiente. Deixando da forma que você quiser, prático e rápido!",
               "Persianas são um investimento excelente para o seu ambiente, deixando um espaço confortável e extremamente lindo.",
-"Realizamos serviços completos desde a base até os acabamentos finais, garantindo qualidade em todas as etapas da obra.",
+              "Realizamos serviços completos desde a base até os acabamentos finais, garantindo qualidade em todas as etapas da obra.",
 
             ],
           },
@@ -13477,6 +13477,21 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Ponto N2 - Em Frente a Igreja Matriz",
             contact: "(43) 99933-6915",
             contact2: "(43) 98860-7629",
+
+
+
+
+            novidadesImages: [
+              "images/servicos/taxi/sereia/divulgacao/1.jpg",
+
+
+
+            ],
+            novidadesDescriptions: [
+              "Atendimento 24hrs",],
+
+
+
 
 
           },
