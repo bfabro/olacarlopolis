@@ -5962,9 +5962,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               sab: [{ inicio: "08:00", fim: "12:00" }],
               dom: []
             },
-            address: "Rua do cedro, 35 - Carlópolis",
+            address: "Rodovia Jayme Canet, 1490 - Carlópolis",
             contact: "(43) 99971-2977",
-            infoAdicional: "<br>🧱 Serviços oferecidos:<br>🧩 Piso laminado<br>🧩 Piso vinílico<br>📏 Persianas sob medida<br>🧱 Papel de parede (instalação e venda)<br>🌱 Grama sintética<br>💎 Mármore e acabamentos<br>🚪 Cortinas sob medida<Br><br>📐 Projetos e Instalação<br>Trabalhamos com instalação profissional e materiais de alta qualidade, garantindo acabamento perfeito para qualquer ambiente.<br><br>🏡 Transforme seu espaço<br>Se você quer renovar sua casa com estilo, conforto e durabilidade, fale com a gente! Temos soluções completas para interiores, com consultoria personalizada.<br><br>Será um prazer ajudar você a criar um ambiente ainda mais bonito e acolhedor!",
+            infoAdicional: "<br>🧱 Serviços oferecidos e ja instalados!<br>🚪 Cortinas sob medida<br>🌱 Grama sintética<br>💎 Mármore e acabamentos<br>🧱 Papel de parede (instalação e venda)<br>📏 Persianas sob medida<br>🧩 Piso laminado<br>🧩 Piso vinílico<Br><br>📐 Projetos e Instalação<br>Trabalhamos com instalação profissional e materiais de alta qualidade, garantindo acabamento perfeito para qualquer ambiente.<br><br>🏡 Transforme seu espaço<br>Se você quer renovar sua casa com estilo, conforto e durabilidade, fale com a gente! Temos soluções completas para interiores, com consultoria personalizada.<br><br>Será um prazer ajudar você a criar um ambiente ainda mais bonito e acolhedor!",
+
             instagram: "https://www.instagram.com/tokfinodecor/",
             facebook: "https://www.facebook.com/tokfinodecor/",
             novidadesImages: [
