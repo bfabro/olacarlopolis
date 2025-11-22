@@ -933,7 +933,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "taticonik", "tsmcollection", "vania", "mhpiscinas", "sereia", "oficinadocelular"
+    "taticonik", "tsmcollection", "vania", "tokfino", "sereia", "oficinadocelular"
 
   ];
 
