@@ -10374,6 +10374,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/servicos/revendedor/tati/divulgacao/10.jpg",
             ],
             novidadesDescriptions: [
+              "Promoçao de Fim de semana!",
               "30% De desconto em todos os produtos, entre em contato e aproveite!!!",
               "Quer fios mais fortes, hidratados e com brilho de salão? ✨<br>Experimente o poder da linha Lizz Ante Profissional <br>Resultado que se vê, sente e apaixona! 💕",
             ],
