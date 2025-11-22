@@ -1248,6 +1248,11 @@ document.addEventListener("DOMContentLoaded", function () {
     //academia
     lobofitness: "n",
     teamvieira: "s",
+
+    //acabamento
+    tokfino: "s",
+
+
     //AÇAI
     turminhadoacai: "s",
     thebestacai: "s",
@@ -3959,7 +3964,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quintal: "Sim",
       telefone: "43 99686-4716", // Corretor ou propretario
       imagens: [
-    
+
         "images/imoveis/rafaelBandeira/venda/casa2/2.jpg",
         "images/imoveis/rafaelBandeira/venda/casa2/3.jpg",
         "images/imoveis/rafaelBandeira/venda/casa2/4.jpg",
@@ -5939,6 +5944,70 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
       {
+        link: document.querySelector("#menuAcabamentos"),
+        title: "Decoração e Acabamentos",
+        establishments: [
+          {
+            image: "images/comercios/acabamentos/tokfino/perfil.jpg",
+            name: "Tok Fino",
+            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            statusAberto: "a",
+            horarios: {
+
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
+              dom: []
+            },
+            address: "Rua do cedro, 35 - Carlópolis",
+            contact: "(43) 99971-2977",
+            infoAdicional: "<br>🧱 Serviços oferecidos:<br>🧩 Piso laminado<br>🧩 Piso vinílico<br>📏 Persianas sob medida<br>🧱 Papel de parede (instalação e venda)<br>🌱 Grama sintética<br>💎 Mármore e acabamentos<br>🚪 Cortinas sob medida<Br><br>📐 Projetos e Instalação<br>Trabalhamos com instalação profissional e materiais de alta qualidade, garantindo acabamento perfeito para qualquer ambiente.<br><br>🏡 Transforme seu espaço<br>Se você quer renovar sua casa com estilo, conforto e durabilidade, fale com a gente! Temos soluções completas para interiores, com consultoria personalizada.<br><br>Será um prazer ajudar você a criar um ambiente ainda mais bonito e acolhedor!",
+            instagram: "https://www.instagram.com/tokfinodecor/",
+            facebook: "https://www.facebook.com/tokfinodecor/",
+            novidadesImages: [
+              "images/comercios/acabamentos/tokfino/divulgacao/1.jpg",
+              "images/comercios/acabamentos/tokfino/divulgacao/2.jpg",
+              "images/comercios/acabamentos/tokfino/divulgacao/3.jpg",
+              "images/comercios/acabamentos/tokfino/divulgacao/4.jpg",
+              "images/comercios/acabamentos/tokfino/divulgacao/5.jpg",
+              "images/comercios/acabamentos/tokfino/divulgacao/6.jpg",
+              "images/comercios/acabamentos/tokfino/divulgacao/7.jpg",
+              "images/comercios/acabamentos/tokfino/divulgacao/8.jpg",
+              "images/comercios/acabamentos/tokfino/divulgacao/9.jpg",
+
+            ],
+            novidadesDescriptions: [
+              "Papel de parede, mude o visual do teu ambiente de forma rapida e pratica",
+              "Grama sintética instalada.<br>A grama sintética além de super prática. Ela é extremamente linda, causa um conforto tanto visualmente quanto utilizando-a",
+              "A sofisticação e praticidade que uma persiana proporciona é fora de base.",
+              "Cortinas em tecido, para quem não abre mão do bom gosto e sofisticação.",
+              "Piso vinílico passa um ar de aconchego e praticidade, deixa o ambiente ainda mais belo!",
+              "Piso laminado é perfeito para deixar o ambiente aconchegante e com um visual lindíssimo!",
+              "Papel de parede<BR> ✨Ótimo para mudar o visual do seu ambiente. Deixando da forma que você quiser, prático e rápido!",
+              "Persianas são um investimento excelente para o seu ambiente, deixando um espaço confortável e extremamente lindo.",
+
+
+            ],
+          },
+        ],
+      },
+
+
+
+
+
+
+
+
+
+
+
+
+
+      {
         link: document.querySelector("#menuAcademiaLuta"),
         title: "Academia de Luta",
         establishments: [
@@ -6099,7 +6168,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               sab: [{ inicio: "08:00", fim: "20:00" }],
               dom: [{ inicio: "08:00", fim: "12:00" }]
             },
-            address: "Rua Benedito Salles, 409",
+            address: "Rua Benedito Salles, 409 - Carlopolis",
             contact: "(43) 99635-1001",
             delivery: "Sim / Sem Taxa",
             infoAdicional: "Fazemos espetinhos assados de quarta e sabado até as 20:00hrs",
