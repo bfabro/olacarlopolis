@@ -5964,7 +5964,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             },
             address: "Rodovia Jayme Canet, 1490 - Carlópolis",
             contact: "(43) 99971-2977",
-            infoAdicional: "<br>🧱 Serviços oferecidos e ja instalados!<br>🚪 Cortinas sob medida<br>🌱 Grama sintética<br>💎 Mármore e acabamentos<br>🧱 Papel de parede (instalação e venda)<br>📏 Persianas sob medida<br>🧩 Piso laminado<br>🧩 Piso vinílico<Br><br>📐 Projetos e Instalação<br>Trabalhamos com instalação profissional e materiais de alta qualidade, garantindo acabamento perfeito para qualquer ambiente.<br><br>🏗️ Atendemos também obras e projetos de construção civil.<Br><br>🏡 Transforme seu espaço<br>Se você quer renovar sua casa com estilo, conforto e durabilidade, fale com a gente! Temos soluções completas para interiores, com consultoria personalizada.<br><br>Será um prazer ajudar você a criar um ambiente ainda mais bonito e acolhedor!",
+            infoAdicional: "<br>⏰ Atendimento 24h conforme demanda do cliente. <br>🧱 Serviços oferecidos e ja instalados!<br>🚪 Cortinas sob medida<br>🌱 Grama sintética<br>💎 Mármore e acabamentos<br>🧱 Papel de parede (instalação e venda)<br>📏 Persianas sob medida<br>🧩 Piso laminado<br>🧩 Piso vinílico<Br><br>📐 Projetos e Instalação<br>Trabalhamos com instalação profissional e materiais de alta qualidade, garantindo acabamento perfeito para qualquer ambiente.<br><br>🏗️ Atendemos também obras e projetos de construção civil.<Br><br>🏡 Transforme seu espaço<br>Se você quer renovar sua casa com estilo, conforto e durabilidade, fale com a gente! Temos soluções completas para interiores, com consultoria personalizada.<br><br>Será um prazer ajudar você a criar um ambiente ainda mais bonito e acolhedor!",
 
             instagram: "https://www.instagram.com/tokfinodecor/",
             facebook: "https://www.facebook.com/tokfinodecor/",
@@ -5989,7 +5989,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Piso laminado é perfeito para deixar o ambiente aconchegante e com um visual lindíssimo!",
               "Papel de parede<BR> ✨Ótimo para mudar o visual do seu ambiente. Deixando da forma que você quiser, prático e rápido!",
               "Persianas são um investimento excelente para o seu ambiente, deixando um espaço confortável e extremamente lindo.",
-
+"Realizamos serviços completos desde a base até os acabamentos finais, garantindo qualidade em todas as etapas da obra.",
 
             ],
           },
