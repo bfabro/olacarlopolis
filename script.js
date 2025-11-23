@@ -5945,7 +5945,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       {
         link: document.querySelector("#menuAcabamentos"),
-        title: "Decoração e Acabamentos",
+        title: "Acabamentos e Decoração",
         establishments: [
           {
             image: "images/comercios/acabamentos/tokfino/perfil.jpg",
