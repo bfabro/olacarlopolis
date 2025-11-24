@@ -36,6 +36,165 @@ function somenteDigitos(str) {
   return String(str || "").replace(/\D/g, "");
 }
 
+// === GERAR CARD MINIMALISTA PARA DIVULGAÇÃO ===
+function gerarImagemCardEstabelecimento(establishment, categoriaAtual) {
+  try {
+    // Nome
+    const nome = establishment.name || "Comércio em Carlópolis";
+
+    // Categoria (tira o "Comércios – " se vier junto)
+    let categoria = String(categoriaAtual || "").trim();
+    categoria = categoria.replace(/^com[eé]rcios?\s*[–-]\s*/i, "") || "Destaque";
+
+    // Endereço em uma linha
+    const endereco = (establishment.address || "")
+      .replace(/<br\s*\/?>/gi, " ")
+      .trim() || "Carlópolis - PR";
+
+    // Telefone (primeiro contato)
+    const telefoneRaw = getPrimeiroContato(
+      establishment.contact || establishment.whatsapp || ""
+    );
+    const telefone = telefoneRaw || "Contato não informado";
+
+    // Instagram em formato @user
+    let insta = "";
+    if (establishment.instagram) {
+      insta = String(establishment.instagram)
+        .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
+        .replace(/\/$/, "");
+      if (insta && !insta.startsWith("@")) insta = "@" + insta;
+    }
+
+    // Imagem principal (prioriza novidades, depois imagem de capa)
+    const imagens = establishment.novidadesImages || [];
+    const imgSrc =
+      (imagens && imagens.length ? imagens[0] : establishment.image) ||
+      "images/img_padrao_site/padrao.jpg";
+
+    // Container fora da tela só para o html2canvas
+    const host = document.createElement("div");
+    host.id = "card-pub-temp";
+    host.style.position = "fixed";
+    host.style.left = "-9999px";
+    host.style.top = "0";
+    host.style.zIndex = "99999";
+
+    host.innerHTML = `
+      <div class="card-pub-wrap">
+        <div class="card-pub-top">
+          <div class="card-pub-badge">
+            <i class="fa-solid fa-star"></i>
+            <span>${categoria}</span>
+          </div>
+          <div class="card-pub-name">${nome}</div>
+          <div class="card-pub-sub">Carlópolis • PR</div>
+        </div>
+
+        <div class="card-pub-img-area">
+          <img src="${imgSrc}" alt="${nome}">
+        </div>
+
+        <div class="card-pub-bottom">
+          <div class="card-pub-info-line">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>${endereco}</span>
+          </div>
+          <div class="card-pub-info-line">
+            <i class="fa-solid fa-phone"></i>
+            <span>${telefone}</span>
+          </div>
+          ${
+            insta
+              ? `
+          <div class="card-pub-info-line">
+            <i class="fa-brands fa-instagram"></i>
+            <span>${insta}</span>
+          </div>`
+              : ""
+          }
+          <div class="card-pub-brand">
+            <span><strong>Olá Carlópolis</strong> • olacarlopolis.com</span>
+            <span>#Carlópolis</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(host);
+
+    const cardEl = host.querySelector(".card-pub-wrap");
+
+    html2canvas(cardEl, {
+      useCORS: true,
+      backgroundColor: null,
+      scale: 2
+    })
+      .then((canvas) => {
+        const link = document.createElement("a");
+        const nomeSlug = (typeof normalizeName === "function"
+          ? normalizeName(nome)
+          : nome.toLowerCase().replace(/\s+/g, "-")
+        ) || "olacarlopolis";
+
+        link.download = `card-${nomeSlug}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      })
+      .catch((err) => {
+        console.error("Erro ao gerar card:", err);
+        if (typeof mostrarToast === "function") {
+          mostrarToast("❌ Não consegui gerar o card agora.");
+        } else {
+          alert("Não consegui gerar o card agora.");
+        }
+      })
+      .finally(() => {
+        document.body.removeChild(host);
+      });
+  } catch (e) {
+    console.error("Falha geral ao montar card:", e);
+    if (typeof mostrarToast === "function") {
+      mostrarToast("❌ Erro inesperado ao gerar o card.");
+    } else {
+      alert("Erro inesperado ao gerar o card.");
+    }
+  }
+}
+
+// Clique no botão "Gerar card para divulgação" dentro da aba Info
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".btn-gerar-card");
+  if (!btn) return;
+
+  const estId = btn.dataset.estabId;
+
+  // Pega o texto da categoria atual (título da página)
+  const tituloH2 = document.querySelector(".content_area h2.highlighted");
+  const categoriaTxt = tituloH2 ? tituloH2.textContent.trim() : "";
+
+  // Encontra o estabelecimento correspondente no array categories
+  let estabEncontrado = null;
+  outer: for (const cat of categories) {
+    if (!cat.establishments) continue;
+    for (const est of cat.establishments) {
+      const id = est.nomeNormalizado || normalizeName(est.name || "");
+      if (id === estId) {
+        estabEncontrado = est;
+        break outer;
+      }
+    }
+  }
+
+  if (!estabEncontrado) {
+    alert("Não encontrei os dados desse estabelecimento para gerar o card.");
+    return;
+  }
+
+  // Chama a função que monta o layout minimalista e gera a imagem
+  gerarImagemCardEstabelecimento(estabEncontrado, categoriaTxt);
+});
+
 
 
 // Responsável do imóvel mesmo sem "corretor" explícito
@@ -933,7 +1092,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "taticonik", "tsmcollection", "vania", "tokfino", "sereia", "oficinadocelular"
+    "taticonik", "tokfino", "oficinadocelular", "sereia" ,"t&mcollection",
 
   ];
 
@@ -10429,7 +10588,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             infoAdicional: "Especialistas em cuidados capilares, desenvolvemos produtos de alta performance para salões de beleza.<br> Nossas linhas unem tecnologia e qualidade profissional para proporcionar fios mais saudáveis, lisos e radiantes.<br>📗 <a href='images/servicos/revendedor/tati/divulgacao/Catalogo.pdf' target='_blank' rel='noopener'><br>Acesse Nosso Catálogo</a>",
 
             novidadesImages: [
-              "images/servicos/revendedor/tati/divulgacao/00.jpg",
+              //"images/servicos/revendedor/tati/divulgacao/00.jpg",
               "images/servicos/revendedor/tati/divulgacao/0.jpg",
               "images/servicos/revendedor/tati/divulgacao/2.jpg",
 
@@ -10444,7 +10603,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/servicos/revendedor/tati/divulgacao/10.jpg",
             ],
             novidadesDescriptions: [
-              "Promoçao de Fim de semana!",
+            //  "Promoçao de Fim de semana!",
               "30% De desconto em todos os produtos, entre em contato e aproveite!!!",
               "Quer fios mais fortes, hidratados e com brilho de salão? ✨<br>Experimente o poder da linha Lizz Ante Profissional <br>Resultado que se vê, sente e apaixona! 💕",
             ],
@@ -14532,7 +14691,7 @@ ${establishment.infoVagaTrabalho
         }
 
 
-
+    
 
 
 
@@ -14607,6 +14766,16 @@ ${establishment.infoVagaTrabalho
                       </div>
                     </div>` : ""
         }
+
+            <!-- BOTÃO GERAR CARD PARA DIVULGAÇÃO -->
+        <div class="info-box">
+          <button 
+            class="btn-gerar-card" 
+            data-estab-id="${normalizeName(establishment.name)}">
+            <i class="fa-solid fa-image"></i> Gerar card para divulgação
+          </button>
+        </div>
+
 
 
 
@@ -14688,97 +14857,6 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
                   </ul>
                     `;
 
-
-
-
-
-    function criarInfoCards(establishment) {
-      const wrapper = document.createElement("div");
-
-      const infos = [
-
-        {
-          icon: "fa-clock",
-          label: "Status",
-          valor: statusAberto,
-        },
-
-        {
-          icon: "fa-clock",
-          label: "Horário",
-          valor: establishment.hours?.replace(/<br>/g, " | ") || "Não informado",
-        },
-        {
-          icon: "fa-map-marker-alt",
-          label: "Endereço",
-          valor: establishment.address?.replace(/<br>/g, "") || "Não informado",
-        },
-        {
-          icon: "fa-phone",
-          label: "Contato",
-          valor: establishment.contact || establishment.whatsapp || "Não informado",
-        },
-        {
-          icon: "fa-truck",
-          label: "Entrega",
-          valor: establishment.delivery || "Não informado",
-        },
-      ];
-
-      // ***** SUBSTITUA a criação do card dentro do infos.forEach(...) por este bloco *****
-      infos.forEach(({ icon, label, valor }) => {
-        const card = document.createElement("div");
-        card.className = "info-card";
-
-        // Se for o contato, renderiza como link clicável com classe e atributos
-        if (label === "Contato") {
-          if (label === "Contato") {
-            // 1) string bonita
-            const numeroRaw = getPrimeiroContato(valor || "");
-            // 2) apenas dígitos (para href tel:)
-            const numeroDigits = somenteDigitos(numeroRaw);
-            // 3) id do estabelecimento normalizado (igual ao usado nos outros contadores)
-            const estId = normalizeName(establishment.name);
-
-            card.innerHTML = `
-    <i class="fas ${icon}"></i>
-    <div class="info-card-text">
-      <span class="info-card-label">${label}</span>
-      <span class="info-card-value">
-        <a href="tel:${numeroDigits}"
-           class="telefone-link"
-           data-id="${estId}"
-           data-tel="${numeroDigits}">
-          ${numeroRaw}
-        </a>
-      </span>
-    </div>
-  `;
-          } else {
-            card.innerHTML = `
-    <i class="fas ${icon}"></i>
-    <div class="info-card-text">
-      <span class="info-card-label">${label}</span>
-      <span class="info-card-value">${valor}</span>
-    </div>
-  `;
-          }
-        }
-
-
-        wrapper.appendChild(card);
-      });
-
-      ///////////
-      /////
-      /////
-      // Delegated listener para cliques em telefones
-
-
-
-      /////
-      return wrapper;
-    }
 
 
 

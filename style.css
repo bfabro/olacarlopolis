@@ -8085,3 +8085,104 @@ width: 100%;
   background: rgba(0, 188, 212, 0.08);
   transition: background 0.3s ease, outline 0.3s ease;
 }
+
+
+
+/* === CARD PARA DIVULGAÇÃO (GERADO PELO BOTÃO "GERAR CARD") === */
+
+.card-pub-wrap {
+  width: 1080px;
+  height: 1350px;
+  box-sizing: border-box;
+  padding: 40px 40px 32px;
+  border-radius: 32px;
+  background: radial-gradient(circle at top left, #4f46e5 0, #111827 45%, #020617 100%);
+  color: #f9fafb;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* topo: categoria + nome */
+.card-pub-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-pub-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #e5e7eb;
+}
+
+.card-pub-name {
+  font-size: 40px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.card-pub-sub {
+  font-size: 16px;
+  color: #9ca3af;
+}
+
+/* área da imagem principal */
+.card-pub-img-area {
+  margin: 24px 0;
+  flex: 1;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #020617;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+}
+
+.card-pub-img-area img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* parte de baixo: texto e marca */
+.card-pub-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-pub-info-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #e5e7eb;
+}
+
+.card-pub-info-line i {
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+  color: #60a5fa;
+}
+
+.card-pub-brand {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #9ca3af;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-pub-brand span strong {
+  color: #f9fafb;
+}
