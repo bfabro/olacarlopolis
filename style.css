@@ -1153,7 +1153,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-
+  transform: translateY(-50%);
 
 }
 
@@ -8088,101 +8088,237 @@ width: 100%;
 
 
 
+
+
+
+
+
+
+
+/* === SETAS DO CARROSSEL DENTRO DO COMÉRCIO === */
+.est-fotos-seta {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 42px;           /* seta maior */
+  color: #ffffffee;          /* branca com leve transparência */
+  z-index: 20;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);  /* bolha escura */
+  transition: 0.2s;
+}
+
+.est-fotos-seta:hover {
+  background: rgba(0,0,0,0.75);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.est-fotos-seta.esq {
+  left: 8px;
+}
+
+.est-fotos-seta.dir {
+  right: 8px;
+}
+
+
+
 /* === CARD PARA DIVULGAÇÃO (GERADO PELO BOTÃO "GERAR CARD") === */
 
-.card-pub-wrap {
+
+
+
+
+
+
+
+/* === CARD FINAL DE DIVULGAÇÃO – OLÁ CARLÓPOLIS ======================= */
+
+.card-pub-wrap.card-pub-final {
   width: 1080px;
-  height: 1350px;
+  height: 1920px;
   box-sizing: border-box;
-  padding: 40px 40px 32px;
-  border-radius: 32px;
-  background: radial-gradient(circle at top left, #4f46e5 0, #111827 45%, #020617 100%);
-  color: #f9fafb;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: 80px 96px 110px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: stretch;
+  background: linear-gradient(
+    to bottom,
+    #0f172a 0%,
+    #0b3a63 18%,
+    #e0f2fe 55%,
+    #fef3c7 100%
+  );
+  color: #0f172a;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* topo: categoria + nome */
-.card-pub-top {
+/* TOPO: logo + site */
+.card-final-top {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.card-pub-badge {
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #e5e7eb;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
 }
 
-.card-pub-name {
-  font-size: 40px;
-  line-height: 1.1;
-  font-weight: 800;
+.card-final-logo-box {
+  flex-shrink: 0;
 }
 
-.card-pub-sub {
-  font-size: 16px;
-  color: #9ca3af;
+.card-final-logo {
+  height: 220px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.45));
 }
 
-/* área da imagem principal */
-.card-pub-img-area {
-  margin: 24px 0;
+.card-final-site {
   flex: 1;
-  border-radius: 24px;
-  overflow: hidden;
-  background: #020617;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+  text-align: right;
+  font-size: 40px;
+  font-weight: 600;
+  color: #bae6fd;
+  text-shadow: 0 0 10px rgba(15, 118, 210, 0.9);
 }
 
-.card-pub-img-area img {
+/* FOTO DO COMÉRCIO */
+.card-final-photo-area {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.card-final-photo-circle {
+  width: 720px;
+  height: 720px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 34px solid #0b3a63;
+  box-shadow: 0 40px 90px rgba(15, 23, 42, 0.6);
+  background: radial-gradient(circle at 30% 20%, #38bdf8, #0b3a63 70%);
+}
+
+.card-final-photo-circle img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
-/* parte de baixo: texto e marca */
-.card-pub-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* BLOCO DE INFORMAÇÕES */
+.card-final-info-area {
+  margin-top: 18px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 32px;
+  padding: 28px 36px 32px;
+  box-shadow: 0 26px 55px rgba(15, 23, 42, 0.25);
 }
 
-.card-pub-info-line {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 16px;
+.card-final-name {
+  font-size: 56px;
+  font-weight: 800;
+  margin-bottom: 18px;
+  color: #0f172a;
+}
+
+.card-final-info-group + .card-final-info-group {
+  margin-top: 14px;
+}
+
+.card-final-label {
+  font-size: 34px;
+  font-weight: 700;
+  color: #0369a1;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+
+.card-final-text {
+  font-size: 40px;
+  line-height: 1.4;
+  color: #111827;
+}
+
+/* RODAPÉ */
+.card-final-footer {
+  margin-top: 26px;
+  width: 100%;
+  border-radius: 28px;
+  padding: 22px 32px;
+  background: linear-gradient(to right, #0b3a63, #1d4ed8);
   color: #e5e7eb;
-}
-
-.card-pub-info-line i {
-  font-size: 18px;
-  width: 22px;
+  font-size: 44px;
+  font-weight: 500;
   text-align: center;
-  color: #60a5fa;
-}
-
-.card-pub-brand {
-  margin-top: 12px;
-  font-size: 14px;
-  color: #9ca3af;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 22px 40px rgba(15, 23, 42, 0.45);
 }
 
-.card-pub-brand span strong {
-  color: #f9fafb;
+.card-final-footer-highlight {
+  font-weight: 800;
+  color: #fb923c;
 }
+
+
+/* ---- SETAS PERSONALIZADAS DO SWIPER ---- */
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: #fff !important;        /* seta branca */
+  width: 10px !important;
+  height: 5px !important;
+  border-radius: 50%;
+  background: rgba(0,0,0,0);  /* bolha escura */
+  backdrop-filter: blur(4px);
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  font-size: 26px !important;    /* seta maior */
+  transition: 0.2s ease-in-out;
+   transform: scale(0.50);
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background: rgba(0,0,0,0);
+  transform: scale(0.50);
+}
+
+/* remover setas padrão do Swiper */
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 0px !important;  /* esconde a seta feia */
+  content: "";
+}
+
+/* posição das setas */
+.swiper-button-prev {
+  left: 10px !important;
+}
+
+.swiper-button-next {
+  right: 10px !important;
+}
+
+.swiper-button-prev::before {
+  content: "\f053"; /* FA chevron-left */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 26px;
+}
+
+.swiper-button-next::before {
+  content: "\f054"; /* chevron-right */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 26px;
+}
+

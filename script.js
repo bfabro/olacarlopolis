@@ -37,42 +37,61 @@ function somenteDigitos(str) {
 }
 
 // === GERAR CARD MINIMALISTA PARA DIVULGAÇÃO ===
-function gerarImagemCardEstabelecimento(establishment, categoriaAtual) {
+// === GERAR CARD ESTILO LOGO OLÁ CARLÓPOLIS (STORIES) ===
+function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
-    // Nome
+    // Nome do comércio
     const nome = establishment.name || "Comércio em Carlópolis";
 
-    // Categoria (tira o "Comércios – " se vier junto)
-    let categoria = String(categoriaAtual || "").trim();
-    categoria = categoria.replace(/^com[eé]rcios?\s*[–-]\s*/i, "") || "Destaque";
+    // Funcionamento (tenta vários campos possíveis)
+    let funcionamento =
+      establishment.funcionamento ||
+      establishment.horario ||
+      establishment.hours ||
+      establishment.schedule ||
+      "";
+
+    funcionamento = String(funcionamento || "")
+      .replace(/<br\s*\/?>/gi, " • ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!funcionamento) funcionamento = "Consulte no site";
 
     // Endereço em uma linha
     const endereco = (establishment.address || "")
       .replace(/<br\s*\/?>/gi, " ")
       .trim() || "Carlópolis - PR";
 
-    // Telefone (primeiro contato)
-    const telefoneRaw = getPrimeiroContato(
-      establishment.contact || establishment.whatsapp || ""
-    );
-    const telefone = telefoneRaw || "Contato não informado";
+    // ID/slug para montar link do site
+    const slug =
+      slugId ||
+      establishment.nomeNormalizado ||
+      (typeof normalizeName === "function"
+        ? normalizeName(establishment.name || "")
+        : String(establishment.name || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, "-"));
 
-    // Instagram em formato @user
-    let insta = "";
-    if (establishment.instagram) {
-      insta = String(establishment.instagram)
-        .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
-        .replace(/\/$/, "");
-      if (insta && !insta.startsWith("@")) insta = "@" + insta;
-    }
+    const linkOla = slug
+      ? `www.olacarlopolis.com/#${slug}`
+      : "www.olacarlopolis.com";
 
-    // Imagem principal (prioriza novidades, depois imagem de capa)
+
+      // Imagem principal: prioriza SEMPRE a foto de perfil do comércio
+    // (establishment.image). Se não tiver, usa a primeira imagem de novidades.
     const imagens = establishment.novidadesImages || [];
     const imgSrc =
-      (imagens && imagens.length ? imagens[0] : establishment.image) ||
-      "images/img_padrao_site/padrao.jpg";
+      establishment.image ||
+      (imagens && imagens.length ? imagens[0] : "images/img_padrao_site/padrao.jpg");
 
-    // Container fora da tela só para o html2canvas
+
+
+   
+
+         // Container fora da tela só para o html2canvas
     const host = document.createElement("div");
     host.id = "card-pub-temp";
     host.style.position = "fixed";
@@ -81,42 +100,45 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual) {
     host.style.zIndex = "99999";
 
     host.innerHTML = `
-      <div class="card-pub-wrap">
-        <div class="card-pub-top">
-          <div class="card-pub-badge">
-            <i class="fa-solid fa-star"></i>
-            <span>${categoria}</span>
+      <div class="card-pub-wrap card-pub-final">
+        <!-- TOPO: LOGO + SITE -->
+        <div class="card-final-top">
+          <div class="card-final-logo-box">
+            <img src="images/img_padrao_site/logo_.png"
+                 alt="Olá Carlópolis"
+                 class="card-final-logo" />
           </div>
-          <div class="card-pub-name">${nome}</div>
-          <div class="card-pub-sub">Carlópolis • PR</div>
+          <div class="card-final-site">
+            www.olacarlopolis.com
+          </div>
         </div>
 
-        <div class="card-pub-img-area">
-          <img src="${imgSrc}" alt="${nome}">
+        <!-- FOTO DO COMÉRCIO EM DESTAQUE -->
+        <div class="card-final-photo-area">
+          <div class="card-final-photo-circle">
+            <img src="${imgSrc}" alt="${nome}" />
+          </div>
         </div>
 
-        <div class="card-pub-bottom">
-          <div class="card-pub-info-line">
-            <i class="fa-solid fa-location-dot"></i>
-            <span>${endereco}</span>
+        <!-- BLOCO DE INFORMAÇÕES -->
+        <div class="card-final-info-area">
+          <div class="card-final-name">${nome}</div>
+
+          <div class="card-final-info-group">
+            <div class="card-final-label">Funcionamento</div>
+            <div class="card-final-text">${funcionamento}</div>
           </div>
-          <div class="card-pub-info-line">
-            <i class="fa-solid fa-phone"></i>
-            <span>${telefone}</span>
+
+          <div class="card-final-info-group">
+            <div class="card-final-label">Endereço</div>
+            <div class="card-final-text">${endereco}</div>
           </div>
-          ${
-            insta
-              ? `
-          <div class="card-pub-info-line">
-            <i class="fa-brands fa-instagram"></i>
-            <span>${insta}</span>
-          </div>`
-              : ""
-          }
-          <div class="card-pub-brand">
-            <span><strong>Olá Carlópolis</strong> • olacarlopolis.com</span>
-            <span>#Carlópolis</span>
-          </div>
+        </div>
+
+        <!-- RODAPÉ -->
+        <div class="card-final-footer">
+          <span>Nos encontre no</span>
+          <span class="card-final-footer-highlight">Olá Carlópolis</span>
         </div>
       </div>
     `;
@@ -132,14 +154,17 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual) {
     })
       .then((canvas) => {
         const link = document.createElement("a");
-        const nomeSlug = (typeof normalizeName === "function"
-          ? normalizeName(nome)
-          : nome.toLowerCase().replace(/\s+/g, "-")
-        ) || "olacarlopolis";
+        const nomeSlug =
+          (typeof normalizeName === "function"
+            ? normalizeName(nome)
+            : nome.toLowerCase().replace(/\s+/g, "-")) || "olacarlopolis";
 
         link.download = `card-${nomeSlug}.png`;
         link.href = canvas.toDataURL("image/png");
+
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
       })
       .catch((err) => {
         console.error("Erro ao gerar card:", err);
@@ -162,38 +187,28 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual) {
   }
 }
 
-// Clique no botão "Gerar card para divulgação" dentro da aba Info
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".btn-gerar-card");
-  if (!btn) return;
 
-  const estId = btn.dataset.estabId;
 
-  // Pega o texto da categoria atual (título da página)
-  const tituloH2 = document.querySelector(".content_area h2.highlighted");
-  const categoriaTxt = tituloH2 ? tituloH2.textContent.trim() : "";
 
-  // Encontra o estabelecimento correspondente no array categories
-  let estabEncontrado = null;
-  outer: for (const cat of categories) {
-    if (!cat.establishments) continue;
-    for (const est of cat.establishments) {
-      const id = est.nomeNormalizado || normalizeName(est.name || "");
-      if (id === estId) {
-        estabEncontrado = est;
-        break outer;
-      }
-    }
-  }
+// === INJETAR BOTÃO DE GERAR CARD DENTRO DA ABA INFO ===
+function injetarBotaoGerarCard(establishment, containerInfo) {
+    if (!containerInfo) return;
 
-  if (!estabEncontrado) {
-    alert("Não encontrei os dados desse estabelecimento para gerar o card.");
-    return;
-  }
+    const estId = establishment.nomeNormalizado || normalizeName(establishment.name || "");
 
-  // Chama a função que monta o layout minimalista e gera a imagem
-  gerarImagemCardEstabelecimento(estabEncontrado, categoriaTxt);
-});
+    const box = document.createElement("div");
+    box.className = "info-box";
+
+    box.innerHTML = `
+        <button class="btn-gerar-card"
+                data-estab-id="${estId}">
+            <i class="fa-solid fa-image"></i> Gerar card para divulgação
+        </button>
+    `;
+
+    containerInfo.appendChild(box);
+}
+
 
 
 
@@ -691,6 +706,243 @@ document.addEventListener("DOMContentLoaded", function () {
       compartilharEstabelecimento(id, nome, categoria);
     }
   });
+
+
+  // 🔹 Botão "Gerar card para divulgação"
+  document.addEventListener("click", (ev) => {
+    const btnCard = ev.target.closest(".btn-gerar-card");
+    if (!btnCard) return;
+
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    const estId = btnCard.getAttribute("data-estab-id");
+    if (!estId) {
+      console.warn("Botão de gerar card sem data-estab-id");
+      if (typeof mostrarToast === "function") {
+        mostrarToast("❌ Não consegui identificar o comércio.");
+      }
+      return;
+    }
+
+    // Procura o estabelecimento e sua categoria
+    const fonteCategorias =
+      typeof categories !== "undefined"
+        ? categories
+        : (window.categories || []);
+
+    let estEncontrado = null;
+    let categoriaAtual = "";
+
+    for (const cat of fonteCategorias) {
+      if (!cat || !Array.isArray(cat.establishments)) continue;
+
+      for (const est of cat.establishments) {
+        const norm =
+          est.nomeNormalizado ||
+          (typeof normalizeName === "function"
+            ? normalizeName(est.name || "")
+            : String(est.name || "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, "-"));
+
+        if (norm === estId) {
+          estEncontrado = est;
+          categoriaAtual = cat.title || "";
+          break;
+        }
+      }
+
+      if (estEncontrado) break;
+    }
+
+    if (!estEncontrado) {
+      console.warn("Estabelecimento não encontrado para gerar card:", estId);
+      if (typeof mostrarToast === "function") {
+        mostrarToast("❌ Não encontrei os dados deste comércio para gerar o card.");
+      } else {
+        alert("Não encontrei os dados deste comércio para gerar o card.");
+      }
+      return;
+    }
+
+    // Gera a imagem do card
+    if (typeof gerarImagemCardEstabelecimento === "function") {
+gerarImagemCardEstabelecimento(estEncontrado, categoriaAtual, estId);
+    } else {
+      console.error("Função gerarImagemCardEstabelecimento não disponível");
+      if (typeof mostrarToast === "function") {
+        mostrarToast("❌ Função de gerar card não está disponível.");
+      } else {
+        alert("Função de gerar card não está disponível.");
+      }
+      return;
+    }
+
+    // 🔸 Registra clique no Firebase (opcional, já que você tem registrarCliqueBotao)
+    if (typeof registrarCliqueBotao === "function") {
+      registrarCliqueBotao("gerar-card", estId).catch(() => {});
+    }
+  });
+
+  // 🔹 Botão "Gerar card para divulgação"
+  document.addEventListener("click", (ev) => {
+    const btnCard = ev.target.closest(".btn-gerar-card");
+    if (!btnCard) return;
+
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    const estId = btnCard.getAttribute("data-estab-id");
+    if (!estId) {
+      console.warn("Botão de gerar card sem data-estab-id");
+      if (typeof mostrarToast === "function") {
+        mostrarToast("❌ Não consegui identificar o comércio.");
+      }
+      return;
+    }
+
+    // Procura o estabelecimento e sua categoria
+    const fonteCategorias =
+      typeof categories !== "undefined"
+        ? categories
+        : (window.categories || []);
+
+    let estEncontrado = null;
+    let categoriaAtual = "";
+
+    for (const cat of fonteCategorias) {
+      if (!cat || !Array.isArray(cat.establishments)) continue;
+
+      for (const est of cat.establishments) {
+        const norm =
+          est.nomeNormalizado ||
+          (typeof normalizeName === "function"
+            ? normalizeName(est.name || "")
+            : String(est.name || "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, "-"));
+
+        if (norm === estId) {
+          estEncontrado = est;
+          categoriaAtual = cat.title || "";
+          break;
+        }
+      }
+
+      if (estEncontrado) break;
+    }
+
+    if (!estEncontrado) {
+      console.warn("Estabelecimento não encontrado para gerar card:", estId);
+      if (typeof mostrarToast === "function") {
+        mostrarToast("❌ Não encontrei os dados deste comércio para gerar o card.");
+      } else {
+        alert("Não encontrei os dados deste comércio para gerar o card.");
+      }
+      return;
+    }
+
+    // Gera a imagem do card
+    if (typeof gerarImagemCardEstabelecimento === "function") {
+      gerarImagemCardEstabelecimento(estEncontrado, categoriaAtual);
+    } else {
+      console.error("Função gerarImagemCardEstabelecimento não disponível");
+      if (typeof mostrarToast === "function") {
+        mostrarToast("❌ Função de gerar card não está disponível.");
+      } else {
+        alert("Função de gerar card não está disponível.");
+      }
+      return;
+    }
+
+    // 🔸 Registra clique no Firebase (opcional, já que você tem registrarCliqueBotao)
+    if (typeof registrarCliqueBotao === "function") {
+      registrarCliqueBotao("gerar-card", estId).catch(() => {});
+    }
+  });
+
+
+
+
+// === ÍCONE info-icon (fa-share-alt) TAMBÉM GERA O CARD ===
+document.addEventListener("click", (ev) => {
+  // só reage ao ícone de compartilhar das redes sociais
+  const icone = ev.target.closest(".info-icon.fa-share-alt");
+  if (!icone) return;
+
+  ev.preventDefault();
+  ev.stopPropagation();
+
+  // pega o ID do estabelecimento a partir do container das abas
+  const abasConteudo = icone.closest(".abas-conteudo");
+  const estId = abasConteudo?.dataset.estab;
+
+  if (!estId) {
+    console.warn("Não consegui achar data-estab no container das abas");
+    if (typeof mostrarToast === "function") {
+      mostrarToast("❌ Não consegui identificar o comércio.");
+    }
+    return;
+  }
+
+  const fonteCategorias =
+    typeof categories !== "undefined"
+      ? categories
+      : (window.categories || []);
+
+  let est = null;
+  let categoriaAtual = "";
+
+  for (const cat of fonteCategorias) {
+    if (!cat?.establishments) continue;
+
+    for (const e of cat.establishments) {
+      const norm = e.nomeNormalizado ||
+        (typeof normalizeName === "function"
+          ? normalizeName(e.name || "")
+          : String(e.name || "")
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/\s+/g, "-"));
+
+      if (norm === estId) {
+        est = e;
+        categoriaAtual = cat.title || "";
+        break;
+      }
+    }
+    if (est) break;
+  }
+
+  if (!est) {
+    console.warn("Dados do comércio não encontrados para gerar card:", estId);
+    if (typeof mostrarToast === "function") {
+      mostrarToast("❌ Dados do comércio não encontrados.");
+    }
+    return;
+  }
+
+  if (typeof gerarImagemCardEstabelecimento === "function") {
+    gerarImagemCardEstabelecimento(est, categoriaAtual, estId);
+  } else {
+    console.error("Função gerarImagemCardEstabelecimento não disponível");
+    if (typeof mostrarToast === "function") {
+      mostrarToast("❌ Função de gerar card não está disponível.");
+    }
+    return;
+  }
+
+  // registra clique no firebase (se quiser manter a métrica)
+  if (typeof registrarCliqueBotao === "function") {
+    registrarCliqueBotao("gerar-card", estId).catch(() => {});
+  }
+});
 
 
 
@@ -11941,6 +12193,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99167-4917",
             infoAdicional: "Balanceamento de carro e caminhonete<br>Vulcanização laterais<br>Pneus Remoldi<br>Camera de Ar",
             instagram: "#",
+              novidadesImages: [
+              "images/comercios/borracharia/juninho/divulgacao/perfil.jpg",
+              
+
+            ],
+            novidadesDescriptions: [
+              "",
+            
+             
+
+            ],
 
           },
         ],
@@ -11973,6 +12236,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             infoAdicional: "🏠 - Atendemos a Domicilio<br>🚜 - Fazemos Socorro em sitios<br>❄️ - Manutençao e instalaçao de ar condicionados em veiculos<br>🚗 - Serviço de Leva e Tras!",
             novidadesImages: [
               "images/comercios/autoEletrica/renan/divulgacao/1.jpg",
+              "images/comercios/autoEletrica/renan/divulgacao/2.jpg",
 
 
             ],
@@ -14767,15 +15031,7 @@ ${establishment.infoVagaTrabalho
                     </div>` : ""
         }
 
-            <!-- BOTÃO GERAR CARD PARA DIVULGAÇÃO -->
-        <div class="info-box">
-          <button 
-            class="btn-gerar-card" 
-            data-estab-id="${normalizeName(establishment.name)}">
-            <i class="fa-solid fa-image"></i> Gerar card para divulgação
-          </button>
-        </div>
-
+       
 
 
 
