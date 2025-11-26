@@ -70,17 +70,17 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       (typeof normalizeName === "function"
         ? normalizeName(establishment.name || "")
         : String(establishment.name || "")
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, "-"));
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, "-"));
 
     const linkOla = slug
       ? `www.olacarlopolis.com/#${slug}`
       : "www.olacarlopolis.com";
 
 
-      // Imagem principal: prioriza SEMPRE a foto de perfil do comércio
+    // Imagem principal: prioriza SEMPRE a foto de perfil do comércio
     // (establishment.image). Se não tiver, usa a primeira imagem de novidades.
     const imagens = establishment.novidadesImages || [];
     const imgSrc =
@@ -89,9 +89,9 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
 
 
-   
 
-         // Container fora da tela só para o html2canvas
+
+    // Container fora da tela só para o html2canvas
     const host = document.createElement("div");
     host.id = "card-pub-temp";
     host.style.position = "fixed";
@@ -192,21 +192,21 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
 // === INJETAR BOTÃO DE GERAR CARD DENTRO DA ABA INFO ===
 function injetarBotaoGerarCard(establishment, containerInfo) {
-    if (!containerInfo) return;
+  if (!containerInfo) return;
 
-    const estId = establishment.nomeNormalizado || normalizeName(establishment.name || "");
+  const estId = establishment.nomeNormalizado || normalizeName(establishment.name || "");
 
-    const box = document.createElement("div");
-    box.className = "info-box";
+  const box = document.createElement("div");
+  box.className = "info-box";
 
-    box.innerHTML = `
+  box.innerHTML = `
         <button class="btn-gerar-card"
                 data-estab-id="${estId}">
             <i class="fa-solid fa-image"></i> Gerar card para divulgação
         </button>
     `;
 
-    containerInfo.appendChild(box);
+  containerInfo.appendChild(box);
 }
 
 
@@ -743,10 +743,10 @@ document.addEventListener("DOMContentLoaded", function () {
           (typeof normalizeName === "function"
             ? normalizeName(est.name || "")
             : String(est.name || "")
-                .toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .replace(/\s+/g, "-"));
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/\s+/g, "-"));
 
         if (norm === estId) {
           estEncontrado = est;
@@ -770,7 +770,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Gera a imagem do card
     if (typeof gerarImagemCardEstabelecimento === "function") {
-gerarImagemCardEstabelecimento(estEncontrado, categoriaAtual, estId);
+      gerarImagemCardEstabelecimento(estEncontrado, categoriaAtual, estId);
     } else {
       console.error("Função gerarImagemCardEstabelecimento não disponível");
       if (typeof mostrarToast === "function") {
@@ -783,7 +783,7 @@ gerarImagemCardEstabelecimento(estEncontrado, categoriaAtual, estId);
 
     // 🔸 Registra clique no Firebase (opcional, já que você tem registrarCliqueBotao)
     if (typeof registrarCliqueBotao === "function") {
-      registrarCliqueBotao("gerar-card", estId).catch(() => {});
+      registrarCliqueBotao("gerar-card", estId).catch(() => { });
     }
   });
 
@@ -822,10 +822,10 @@ gerarImagemCardEstabelecimento(estEncontrado, categoriaAtual, estId);
           (typeof normalizeName === "function"
             ? normalizeName(est.name || "")
             : String(est.name || "")
-                .toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .replace(/\s+/g, "-"));
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/\s+/g, "-"));
 
         if (norm === estId) {
           estEncontrado = est;
@@ -862,87 +862,87 @@ gerarImagemCardEstabelecimento(estEncontrado, categoriaAtual, estId);
 
     // 🔸 Registra clique no Firebase (opcional, já que você tem registrarCliqueBotao)
     if (typeof registrarCliqueBotao === "function") {
-      registrarCliqueBotao("gerar-card", estId).catch(() => {});
+      registrarCliqueBotao("gerar-card", estId).catch(() => { });
     }
   });
 
 
 
 
-// === ÍCONE info-icon (fa-share-alt) TAMBÉM GERA O CARD ===
-document.addEventListener("click", (ev) => {
-  // só reage ao ícone de compartilhar das redes sociais
-  const icone = ev.target.closest(".info-icon.fa-share-alt");
-  if (!icone) return;
+  // === ÍCONE info-icon (fa-share-alt) TAMBÉM GERA O CARD ===
+  document.addEventListener("click", (ev) => {
+    // só reage ao ícone de compartilhar das redes sociais
+    const icone = ev.target.closest(".info-icon.fa-share-alt");
+    if (!icone) return;
 
-  ev.preventDefault();
-  ev.stopPropagation();
+    ev.preventDefault();
+    ev.stopPropagation();
 
-  // pega o ID do estabelecimento a partir do container das abas
-  const abasConteudo = icone.closest(".abas-conteudo");
-  const estId = abasConteudo?.dataset.estab;
+    // pega o ID do estabelecimento a partir do container das abas
+    const abasConteudo = icone.closest(".abas-conteudo");
+    const estId = abasConteudo?.dataset.estab;
 
-  if (!estId) {
-    console.warn("Não consegui achar data-estab no container das abas");
-    if (typeof mostrarToast === "function") {
-      mostrarToast("❌ Não consegui identificar o comércio.");
+    if (!estId) {
+      console.warn("Não consegui achar data-estab no container das abas");
+      if (typeof mostrarToast === "function") {
+        mostrarToast("❌ Não consegui identificar o comércio.");
+      }
+      return;
     }
-    return;
-  }
 
-  const fonteCategorias =
-    typeof categories !== "undefined"
-      ? categories
-      : (window.categories || []);
+    const fonteCategorias =
+      typeof categories !== "undefined"
+        ? categories
+        : (window.categories || []);
 
-  let est = null;
-  let categoriaAtual = "";
+    let est = null;
+    let categoriaAtual = "";
 
-  for (const cat of fonteCategorias) {
-    if (!cat?.establishments) continue;
+    for (const cat of fonteCategorias) {
+      if (!cat?.establishments) continue;
 
-    for (const e of cat.establishments) {
-      const norm = e.nomeNormalizado ||
-        (typeof normalizeName === "function"
-          ? normalizeName(e.name || "")
-          : String(e.name || "")
+      for (const e of cat.establishments) {
+        const norm = e.nomeNormalizado ||
+          (typeof normalizeName === "function"
+            ? normalizeName(e.name || "")
+            : String(e.name || "")
               .toLowerCase()
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "")
               .replace(/\s+/g, "-"));
 
-      if (norm === estId) {
-        est = e;
-        categoriaAtual = cat.title || "";
-        break;
+        if (norm === estId) {
+          est = e;
+          categoriaAtual = cat.title || "";
+          break;
+        }
       }
+      if (est) break;
     }
-    if (est) break;
-  }
 
-  if (!est) {
-    console.warn("Dados do comércio não encontrados para gerar card:", estId);
-    if (typeof mostrarToast === "function") {
-      mostrarToast("❌ Dados do comércio não encontrados.");
+    if (!est) {
+      console.warn("Dados do comércio não encontrados para gerar card:", estId);
+      if (typeof mostrarToast === "function") {
+        mostrarToast("❌ Dados do comércio não encontrados.");
+      }
+      return;
     }
-    return;
-  }
 
-  if (typeof gerarImagemCardEstabelecimento === "function") {
-    gerarImagemCardEstabelecimento(est, categoriaAtual, estId);
-  } else {
-    console.error("Função gerarImagemCardEstabelecimento não disponível");
-    if (typeof mostrarToast === "function") {
-      mostrarToast("❌ Função de gerar card não está disponível.");
+    if (typeof gerarImagemCardEstabelecimento === "function") {
+      gerarImagemCardEstabelecimento(est, categoriaAtual, estId);
+    } else {
+      console.error("Função gerarImagemCardEstabelecimento não disponível");
+      if (typeof mostrarToast === "function") {
+        mostrarToast("❌ Função de gerar card não está disponível.");
+      }
+      return;
     }
-    return;
-  }
 
-  // registra clique no firebase (se quiser manter a métrica)
-  if (typeof registrarCliqueBotao === "function") {
-    registrarCliqueBotao("gerar-card", estId).catch(() => {});
-  }
-});
+    // registra clique no firebase (se quiser manter a métrica)
+    if (typeof registrarCliqueBotao === "function") {
+      registrarCliqueBotao("gerar-card", estId).catch(() => { });
+    }
+  });
 
 
 
@@ -1344,7 +1344,7 @@ document.addEventListener("click", (ev) => {
   }
 
   const destaquesFixos = [
-    "taticonik", "tokfino", "oficinadocelular", "sereia" ,"t&mcollection",
+    "taticonik", "tokfino", "oficinadocelular", "sereia", "t&mcollection",
 
   ];
 
@@ -10855,7 +10855,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/servicos/revendedor/tati/divulgacao/10.jpg",
             ],
             novidadesDescriptions: [
-            //  "Promoçao de Fim de semana!",
+              //  "Promoçao de Fim de semana!",
               "30% De desconto em todos os produtos, entre em contato e aproveite!!!",
               "Quer fios mais fortes, hidratados e com brilho de salão? ✨<br>Experimente o poder da linha Lizz Ante Profissional <br>Resultado que se vê, sente e apaixona! 💕",
             ],
@@ -12193,15 +12193,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99167-4917",
             infoAdicional: "Balanceamento de carro e caminhonete<br>Vulcanização laterais<br>Pneus Remoldi<br>Camera de Ar",
             instagram: "#",
-              novidadesImages: [
-              "images/comercios/borracharia/juninho/divulgacao/perfil.jpg",
-              
+            novidadesImages: [
+              "images/comercios/borracharia/juninho/divulgacao/1.jpg",
+
 
             ],
             novidadesDescriptions: [
               "",
-            
-             
+
+
 
             ],
 
