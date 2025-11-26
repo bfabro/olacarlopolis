@@ -65,14 +65,54 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       ? `www.olacarlopolis.com/#${slug}`
       : "www.olacarlopolis.com";
 
-    // 🔹 foto de perfil do cliente (imagem principal)
-    const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
-    const imgPerfil =
-      establishment.image ||
-      (Array.isArray(imagens) && imagens.length ? imagens[0] : "images/img_padrao_site/padrao.jpg");
-
-    // Fundo → usa a sua logo.png grandona
+    // 🔹 Fundo: sua logo grandona
     const fundoRepresa = "images/img_padrao_site/logo.png";
+
+    // === HORÁRIOS DINÂMICOS ===
+    let textoHorarioPrincipal = establishment.hours || "";
+    if (!textoHorarioPrincipal && establishment.horarios) {
+      // se não tiver o texto "hours", mas tiver a estrutura de horários, monta algo simples
+      textoHorarioPrincipal = "Horário conforme agenda";
+    }
+    if (!textoHorarioPrincipal) {
+      textoHorarioPrincipal = "Horário não informado";
+    }
+
+    // Status dinâmico (Aberto agora / Fechado - Abre tal hora)
+    let resumoStatus = "";
+    try {
+      if (establishment.horarios) {
+        const aberto = estaAbertoAgora(establishment.horarios);
+        if (aberto) {
+          const fechamento = horarioFechamentoAtual(establishment.horarios);
+          resumoStatus = fechamento
+            ? `Aberto agora • Fecha às ${fechamento}`
+            : "Aberto agora";
+        } else {
+          const proximo = proximoHorarioDeAbertura(establishment.horarios);
+          resumoStatus = `Fechado • Abre ${proximo}`;
+        }
+      }
+    } catch (e) {
+      console.warn("Falha ao montar status de horário:", e);
+    }
+
+    // 🔹 Contato simples (primeiro telefone/whatsapp)
+    let contatoTexto = "";
+    try {
+      const primeiro =
+        getPrimeiroContato(
+          establishment.whatsapp ||
+          establishment.contact ||
+          establishment.contact2 ||
+          establishment.contact3
+        );
+      if (primeiro) {
+        contatoTexto = primeiro;
+      }
+    } catch (e) {
+      console.warn("Erro ao obter contato para card:", e);
+    }
 
     // Container fora da tela para html2canvas
     const host = document.createElement("div");
@@ -82,7 +122,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     host.style.top = "0";
     host.style.zIndex = "99999";
 
-    // STORIES → 1080 x 1920
+    // 🔹 Tamanho STORIES → 1080 x 1920
     host.innerHTML = `
       <div class="card-pub-wrap card-pub-final"
            style="
@@ -101,13 +141,13 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           background-position:center;
         "></div>
 
-        <!-- GRADIENTE PARA DAR LEITURA AO TEXTO -->
+        <!-- CAMADA DE GRADIENTE SUAVE PARA TEXTO LER BEM -->
         <div style="
           position:absolute;
           inset:0;
           background:linear-gradient(to top,
-            rgba(0,0,0,0.80),
-            rgba(0,0,0,0.15),
+            rgba(0,0,0,0.75),
+            rgba(0,0,0,0.10),
             rgba(255,255,255,0.0)
           );
         "></div>
@@ -124,9 +164,9 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           color:#ffffff;
         ">
 
-          <!-- TOPO: NOME DO COMÉRCIO LOGO ABAIXO DA LOGO.PNG -->
+          <!-- TOPO: NOME DO COMÉRCIO ABAIXO DA LOGO -->
           <div style="
-            margin-top:520px;   /* mantém o nome logo abaixo da logo.png */
+            margin-top:520px;   /* logo abaixo da logo.png */
             text-align:center;
           ">
             <div style="
@@ -147,35 +187,9 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
             </div>
           </div>
 
-          <!-- FOTO DE PERFIL DO CLIENTE -->
+          <!-- MEIO: HORÁRIOS EM TARJA HORIZONTAL -->
           <div style="
-            margin-top:40px;
-            display:flex;
-            justify-content:center;
-          ">
-            <div style="
-              width:260px;
-              height:260px;
-              border-radius:50%;
-              overflow:hidden;
-              border:6px solid rgba(255,255,255,0.96);
-              box-shadow:0 10px 30px rgba(0,0,0,0.8);
-              background:#ffffff;
-            ">
-              <img src="${imgPerfil}"
-                   alt="${nome}"
-                   crossorigin="anonymous"
-                   style="
-                     width:100%;
-                     height:100%;
-                     object-fit:cover;
-                   ">
-            </div>
-          </div>
-
-          <!-- HORÁRIOS EM TARJA HORIZONTAL -->
-          <div style="
-            margin-top:70px;
+            margin-top:120px;
             display:flex;
             justify-content:center;
           ">
@@ -193,13 +207,16 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
               flex-wrap:wrap;
             ">
               <span style="font-weight:600;">Horário de funcionamento:</span>
-              <span>Segunda a Sexta: <b>08h às 18h</b></span>
-              <span>•</span>
-              <span>Sábados: <b>08h às 12h</b></span>
+              <span>${textoHorarioPrincipal}</span>
+              ${
+                resumoStatus
+                  ? `<span>•</span><span>${resumoStatus}</span>`
+                  : ""
+              }
             </div>
           </div>
 
-          <!-- RODAPÉ: ENDEREÇO + FRASE OLA CARLÓPOLIS -->
+          <!-- RODAPÉ: ENDEREÇO + CONTATO + FRASE OLA CARLÓPOLIS -->
           <div style="
             margin-top:auto;
             display:flex;
@@ -214,6 +231,21 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
               <span style="font-weight:600;">Endereço:</span>
               ${endereco}
             </div>
+
+            ${
+              contatoTexto
+                ? `
+            <div style="
+              font-size:22px;
+              max-width:70%;
+              text-shadow:0 3px 10px rgba(0,0,0,0.9);
+            ">
+              <span style="font-weight:600;">Contato:</span>
+              ${contatoTexto}
+            </div>
+            `
+                : ""
+            }
 
             <div style="text-align:center; margin-top:20px;">
               <div style="
@@ -285,6 +317,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     }
   }
 }
+
 
 
 
@@ -3997,6 +4030,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       id: "casa2v",
       codRef: "C_002",
       tipo: "venda",
+      status: "Vendido",   // <= adicione isto quando estiver vendido
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
       valor: 250000,
