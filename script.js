@@ -36,62 +36,45 @@ function somenteDigitos(str) {
   return String(str || "").replace(/\D/g, "");
 }
 
-// === GERAR CARD MINIMALISTA PARA DIVULGAÇÃO ===
+
+// === GERAR CARD ESTILO LOGO OLÁ CARLÓPOLIS (STORIES) ===
+
 // === GERAR CARD ESTILO LOGO OLÁ CARLÓPOLIS (STORIES) ===
 function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
-    // Nome do comércio
     const nome = establishment.name || "Comércio em Carlópolis";
-
-    // Funcionamento (tenta vários campos possíveis)
-    let funcionamento =
-      establishment.funcionamento ||
-      establishment.horario ||
-      establishment.hours ||
-      establishment.schedule ||
-      "";
-
-    funcionamento = String(funcionamento || "")
-      .replace(/<br\s*\/?>/gi, " • ")
-      .replace(/\s+/g, " ")
-      .trim();
-
-    if (!funcionamento) funcionamento = "Consulte no site";
 
     // Endereço em uma linha
     const endereco = (establishment.address || "")
       .replace(/<br\s*\/?>/gi, " ")
       .trim() || "Carlópolis - PR";
 
-    // ID/slug para montar link do site
+    // slug para link no rodapé
     const slug =
       slugId ||
       establishment.nomeNormalizado ||
       (typeof normalizeName === "function"
         ? normalizeName(establishment.name || "")
         : String(establishment.name || "")
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "-"));
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, "-"));
 
     const linkOla = slug
       ? `www.olacarlopolis.com/#${slug}`
       : "www.olacarlopolis.com";
 
-
-    // Imagem principal: prioriza SEMPRE a foto de perfil do comércio
-    // (establishment.image). Se não tiver, usa a primeira imagem de novidades.
-    const imagens = establishment.novidadesImages || [];
-    const imgSrc =
+    // 🔹 foto de perfil do cliente (imagem principal)
+    const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
+    const imgPerfil =
       establishment.image ||
-      (imagens && imagens.length ? imagens[0] : "images/img_padrao_site/padrao.jpg");
+      (Array.isArray(imagens) && imagens.length ? imagens[0] : "images/img_padrao_site/padrao.jpg");
 
+    // Fundo → usa a sua logo.png grandona
+    const fundoRepresa = "images/img_padrao_site/logo.png";
 
-
-
-
-    // Container fora da tela só para o html2canvas
+    // Container fora da tela para html2canvas
     const host = document.createElement("div");
     host.id = "card-pub-temp";
     host.style.position = "fixed";
@@ -99,46 +82,162 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     host.style.top = "0";
     host.style.zIndex = "99999";
 
+    // STORIES → 1080 x 1920
     host.innerHTML = `
-      <div class="card-pub-wrap card-pub-final">
-        <!-- TOPO: LOGO + SITE -->
-        <div class="card-final-top">
-          <div class="card-final-logo-box">
-            <img src="images/img_padrao_site/logo_.png"
-                 alt="Olá Carlópolis"
-                 class="card-final-logo" />
-          </div>
-          <div class="card-final-site">
-            www.olacarlopolis.com
-          </div>
-        </div>
+      <div class="card-pub-wrap card-pub-final"
+           style="
+             width:1080px;
+             height:1920px;
+             position:relative;
+             font-family:'Poppins',sans-serif;
+           ">
 
-        <!-- FOTO DO COMÉRCIO EM DESTAQUE -->
-        <div class="card-final-photo-area">
-          <div class="card-final-photo-circle">
-            <img src="${imgSrc}" alt="${nome}" />
+        <!-- FUNDO: LOGO + REPRESA -->
+        <div style="
+          position:absolute;
+          inset:0;
+          background-image:url('${fundoRepresa}');
+          background-size:cover;
+          background-position:center;
+        "></div>
+
+        <!-- GRADIENTE PARA DAR LEITURA AO TEXTO -->
+        <div style="
+          position:absolute;
+          inset:0;
+          background:linear-gradient(to top,
+            rgba(0,0,0,0.80),
+            rgba(0,0,0,0.15),
+            rgba(255,255,255,0.0)
+          );
+        "></div>
+
+        <!-- CONTEÚDO -->
+        <div style="
+          position:relative;
+          z-index:2;
+          padding:90px 80px 80px 80px;
+          display:flex;
+          flex-direction:column;
+          justify-content:flex-start;
+          height:100%;
+          color:#ffffff;
+        ">
+
+          <!-- TOPO: NOME DO COMÉRCIO LOGO ABAIXO DA LOGO.PNG -->
+          <div style="
+            margin-top:520px;   /* mantém o nome logo abaixo da logo.png */
+            text-align:center;
+          ">
+            <div style="
+              font-size:64px;
+              font-weight:700;
+              line-height:1.05;
+              text-shadow:0 4px 14px rgba(0,0,0,0.8);
+            ">
+              ${nome}
+            </div>
+            <div style="
+              font-size:28px;
+              margin-top:10px;
+              opacity:0.95;
+              text-shadow:0 3px 10px rgba(0,0,0,0.8);
+            ">
+              ${categoriaAtual || "Carlópolis - PR"}
+            </div>
           </div>
-        </div>
 
-        <!-- BLOCO DE INFORMAÇÕES -->
-        <div class="card-final-info-area">
-          <div class="card-final-name">${nome}</div>
-
-          <div class="card-final-info-group">
-            <div class="card-final-label">Funcionamento</div>
-            <div class="card-final-text">${funcionamento}</div>
+          <!-- FOTO DE PERFIL DO CLIENTE -->
+          <div style="
+            margin-top:40px;
+            display:flex;
+            justify-content:center;
+          ">
+            <div style="
+              width:260px;
+              height:260px;
+              border-radius:50%;
+              overflow:hidden;
+              border:6px solid rgba(255,255,255,0.96);
+              box-shadow:0 10px 30px rgba(0,0,0,0.8);
+              background:#ffffff;
+            ">
+              <img src="${imgPerfil}"
+                   alt="${nome}"
+                   crossorigin="anonymous"
+                   style="
+                     width:100%;
+                     height:100%;
+                     object-fit:cover;
+                   ">
+            </div>
           </div>
 
-          <div class="card-final-info-group">
-            <div class="card-final-label">Endereço</div>
-            <div class="card-final-text">${endereco}</div>
+          <!-- HORÁRIOS EM TARJA HORIZONTAL -->
+          <div style="
+            margin-top:70px;
+            display:flex;
+            justify-content:center;
+          ">
+            <div style="
+              display:inline-flex;
+              align-items:center;
+              gap:22px;
+              padding:18px 36px;
+              border-radius:999px;
+              background:rgba(0,0,0,0.55);
+              backdrop-filter:blur(4px);
+              font-size:26px;
+              box-shadow:0 10px 26px rgba(0,0,0,0.7);
+              text-align:center;
+              flex-wrap:wrap;
+            ">
+              <span style="font-weight:600;">Horário de funcionamento:</span>
+              <span>Segunda a Sexta: <b>08h às 18h</b></span>
+              <span>•</span>
+              <span>Sábados: <b>08h às 12h</b></span>
+            </div>
           </div>
-        </div>
 
-        <!-- RODAPÉ -->
-        <div class="card-final-footer">
-          <span>Nos encontre no</span>
-          <span class="card-final-footer-highlight">Olá Carlópolis</span>
+          <!-- RODAPÉ: ENDEREÇO + FRASE OLA CARLÓPOLIS -->
+          <div style="
+            margin-top:auto;
+            display:flex;
+            flex-direction:column;
+            gap:18px;
+          ">
+            <div style="
+              font-size:24px;
+              max-width:70%;
+              text-shadow:0 3px 10px rgba(0,0,0,0.9);
+            ">
+              <span style="font-weight:600;">Endereço:</span>
+              ${endereco}
+            </div>
+
+            <div style="text-align:center; margin-top:20px;">
+              <div style="
+                display:inline-block;
+                font-size:30px;
+                font-weight:700;
+                padding:14px 32px;
+                border-radius:999px;
+                background:rgba(255,255,255,0.96);
+                color:#00539b;
+                box-shadow:0 10px 28px rgba(0,0,0,0.8);
+              ">
+                Nos encontre no Olá Carlópolis
+              </div>
+              <div style="
+                margin-top:10px;
+                font-size:20px;
+                text-shadow:0 2px 6px rgba(0,0,0,0.8);
+              ">
+                ${linkOla}
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     `;
@@ -186,6 +285,11 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     }
   }
 }
+
+
+
+
+
 
 
 

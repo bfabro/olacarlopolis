@@ -8125,147 +8125,7 @@ width: 100%;
 
 
 
-/* === CARD PARA DIVULGAÇÃO (GERADO PELO BOTÃO "GERAR CARD") === */
 
-
-
-
-
-
-
-
-/* === CARD FINAL DE DIVULGAÇÃO – OLÁ CARLÓPOLIS ======================= */
-
-.card-pub-wrap.card-pub-final {
-  width: 1080px;
-  height: 1920px;
-  box-sizing: border-box;
-  padding: 80px 96px 110px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: stretch;
-  background: linear-gradient(
-    to bottom,
-    #0f172a 0%,
-    #0b3a63 18%,
-    #e0f2fe 55%,
-    #fef3c7 100%
-  );
-  color: #0f172a;
-  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-/* TOPO: logo + site */
-.card-final-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
-}
-
-.card-final-logo-box {
-  flex-shrink: 0;
-}
-
-.card-final-logo {
-  height: 220px;
-  width: auto;
-  display: block;
-  filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.45));
-}
-
-.card-final-site {
-  flex: 1;
-  text-align: right;
-  font-size: 40px;
-  font-weight: 600;
-  color: #bae6fd;
-  text-shadow: 0 0 10px rgba(15, 118, 210, 0.9);
-}
-
-/* FOTO DO COMÉRCIO */
-.card-final-photo-area {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-
-.card-final-photo-circle {
-  width: 720px;
-  height: 720px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 34px solid #0b3a63;
-  box-shadow: 0 40px 90px rgba(15, 23, 42, 0.6);
-  background: radial-gradient(circle at 30% 20%, #38bdf8, #0b3a63 70%);
-}
-
-.card-final-photo-circle img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* BLOCO DE INFORMAÇÕES */
-.card-final-info-area {
-  margin-top: 18px;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 32px;
-  padding: 28px 36px 32px;
-  box-shadow: 0 26px 55px rgba(15, 23, 42, 0.25);
-}
-
-.card-final-name {
-  font-size: 56px;
-  font-weight: 800;
-  margin-bottom: 18px;
-  color: #0f172a;
-}
-
-.card-final-info-group + .card-final-info-group {
-  margin-top: 14px;
-}
-
-.card-final-label {
-  font-size: 34px;
-  font-weight: 700;
-  color: #0369a1;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 2px;
-}
-
-.card-final-text {
-  font-size: 40px;
-  line-height: 1.4;
-  color: #111827;
-}
-
-/* RODAPÉ */
-.card-final-footer {
-  margin-top: 26px;
-  width: 100%;
-  border-radius: 28px;
-  padding: 22px 32px;
-  background: linear-gradient(to right, #0b3a63, #1d4ed8);
-  color: #e5e7eb;
-  font-size: 44px;
-  font-weight: 500;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  box-shadow: 0 22px 40px rgba(15, 23, 42, 0.45);
-}
-
-.card-final-footer-highlight {
-  font-weight: 800;
-  color: #fb923c;
-}
 
 
 /* ---- SETAS PERSONALIZADAS DO SWIPER ---- */
@@ -8322,3 +8182,139 @@ width: 100%;
   font-size: 26px;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* === CARD PARA DIVULGAÇÃO (GERADO PELO BOTÃO "GERAR CARD") === */
+/* ===========================
+   CARD DE DIVULGAÇÃO - LOGO OLÁ + CARD BRANCO
+   =========================== */
+/* === NOVO MODELO DO CARD – IGUAL AO EXEMPLO ENVIADO === */
+
+.card-pub-wrap.card-pub-final {
+  width: 1080px;
+  height: 1920px;
+
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+ 
+
+  /* Fundo com a logo + represa SEM cortar nas laterais */
+  background-image: url('images/img_padrao_site/logo.png');
+  background-size: 100% auto;       /* usa toda a largura */
+ 
+  background-repeat: no-repeat;
+
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+/* Topo onde vamos usar a região da ponte para colocar a foto */
+.card-final-top-ola {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  margin-top: 40px;
+  margin-bottom: 100px; /* o espaçamento vertical agora será controlado pelo card branco */
+}
+
+/* “Caixa” imaginária em cima da área da ponte */
+.card-pub-final .logo-ola-wrapper {
+  position: relative;
+  width: 920px;
+  height: 920px; /* mantém uma área grande em cima da ponte */
+}
+
+/* Círculo com a foto do comércio – posicionado na região da ponte */
+.card-pub-final .logo-miolo {
+  position: absolute;
+
+  /* quanto maior o top, mais perto da água/ponte – ajuste fino se quiser */
+  top: 78%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 64%;
+  height: 64%;
+
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.card-pub-final .logo-miolo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* CARD BRANCO COM INFORMAÇÕES DO CLIENTE – MAIS ABAIXO, ENCOSTANDO NA ÁGUA */
+.card-final-info-area.card-final-info-ola {
+  width: 100%;
+  max-width: 950px;
+  background: #ffffff;
+  border-radius: 30px;
+  border: 8px solid #2943c0; /* azul forte */
+  padding: 60px 70px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+
+  /* empurra o card branco para baixo do layout */
+  margin-top: auto;
+}
+
+/* Nome grande, em destaque, igual ao exemplo */
+.card-final-name-ola,
+.card-final-name.card-final-name-ola {
+  font-size: 72px;
+  font-weight: 800;
+  text-align: center;
+  color: #2943c0;
+  letter-spacing: 0.06em;
+  margin-bottom: 40px;
+}
+
+/* Rótulos (Funcionamento, Endereço) */
+.card-final-label-ola,
+.card-final-label.card-final-label-ola {
+  font-size: 44px;
+  font-weight: 700;
+  color: #2943c0;
+  margin-bottom: 6px;
+}
+
+/* Texto dos campos */
+.card-final-text-ola,
+.card-final-text.card-final-text-ola {
+  font-size: 42px;
+  line-height: 1.4;
+  color: #1f2933;
+}
+
+/* Espaço entre os blocos de info */
+.card-final-info-ola .card-final-info-group + .card-final-info-group,
+.card-final-info-group + .card-final-info-group {
+  margin-top: 30px;
+}
+
+/* Frase de rodapé */
+.card-final-info-footer-ola,
+.card-final-info-footer.card-final-info-footer-ola {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+  color: #2943c0;
+}
