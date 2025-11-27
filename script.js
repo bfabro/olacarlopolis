@@ -93,8 +93,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
 
         <!-- FUNDO AJUSTADO (SEM SOBRAR NADA EM CIMA) -->
-        <div style="
-          position:absolute;
+        <div style=" position:absolute;
           top:0; left:0;
           width:100%; height:100%;
           background:url('${fundoRepresa}') top center/cover no-repeat;
@@ -117,6 +116,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           max-width:900px;
           background:rgba(0,0,0,0.35);
           padding:60px 55px;
+          
           border-radius:40px;
           backdrop-filter:blur(7px);
           color:#fff;
