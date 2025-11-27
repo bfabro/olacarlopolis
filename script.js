@@ -167,7 +167,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
               opacity:.95;
               font-weight:600;
             ">
-              ${categoriaAtual || "Carlópolis - PR"}
+              ${categoriaAtual || "Carlópolis - PR "}
             </div>
           </div>
 
@@ -176,7 +176,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
             width:70%;
             height:2px;
             background:linear-gradient(90deg, transparent, #d4af37, transparent);
-          "></div>
+          "><Br></div>
 
           <!-- FRASE FINAL + LINK -->
           <div style="margin-top:6px;">
@@ -199,7 +199,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
               margin-top:10px;
               opacity:.97;
             ">
-              ${linkOla}
+              <Br>>
             </div>
           </div>
 
