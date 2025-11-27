@@ -40,6 +40,7 @@ function somenteDigitos(str) {
 // === GERAR CARD ESTILO LOGO OLÁ CARLÓPOLIS (STORIES) ===
 
 // === GERAR CARD ESTILO LOGO OLÁ CARLÓPOLIS (STORIES) ===
+// === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, CARD FUMÊ CENTRAL) ===
 function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
     const nome = establishment.name || "Comércio em Carlópolis";
@@ -68,10 +69,16 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     // 🔹 Fundo: sua logo grandona
     const fundoRepresa = "images/img_padrao_site/logo.png";
 
+    // 🔹 Logo/foto do cliente
+    const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
+    const imgLogoCliente =
+      establishment.logo ||
+      establishment.image ||
+      (Array.isArray(imagens) && imagens.length ? imagens[0] : "images/img_padrao_site/padrao.jpg");
+
     // === HORÁRIOS DINÂMICOS ===
     let textoHorarioPrincipal = establishment.hours || "";
     if (!textoHorarioPrincipal && establishment.horarios) {
-      // se não tiver o texto "hours", mas tiver a estrutura de horários, monta algo simples
       textoHorarioPrincipal = "Horário conforme agenda";
     }
     if (!textoHorarioPrincipal) {
@@ -100,13 +107,12 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     // 🔹 Contato simples (primeiro telefone/whatsapp)
     let contatoTexto = "";
     try {
-      const primeiro =
-        getPrimeiroContato(
-          establishment.whatsapp ||
-          establishment.contact ||
-          establishment.contact2 ||
-          establishment.contact3
-        );
+      const primeiro = getPrimeiroContato(
+        establishment.whatsapp ||
+        establishment.contact ||
+        establishment.contact2 ||
+        establishment.contact3
+      );
       if (primeiro) {
         contatoTexto = primeiro;
       }
@@ -122,7 +128,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     host.style.top = "0";
     host.style.zIndex = "99999";
 
-    // 🔹 Tamanho STORIES → 1080 x 1920
+    // 🔹 STORIES → 1080 x 1920
     host.innerHTML = `
       <div class="card-pub-wrap card-pub-final"
            style="
@@ -132,7 +138,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
              font-family:'Poppins',sans-serif;
            ">
 
-        <!-- FUNDO: LOGO + REPRESA -->
+        <!-- FUNDO: LOGO OLÁ CARLÓPOLIS -->
         <div style="
           position:absolute;
           inset:0;
@@ -141,132 +147,155 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           background-position:center;
         "></div>
 
-        <!-- CAMADA DE GRADIENTE SUAVE PARA TEXTO LER BEM -->
+        <!-- GRADIENTE GERAL PARA MELHOR LEITURA -->
         <div style="
           position:absolute;
           inset:0;
-          background:linear-gradient(to top,
-            rgba(0,0,0,0.75),
-            rgba(0,0,0,0.10),
-            rgba(255,255,255,0.0)
+          background:linear-gradient(to bottom,
+            rgba(0,0,0,0.60),
+            rgba(0,0,0,0.75)
           );
         "></div>
 
-        <!-- CONTEÚDO -->
+        <!-- CARD FUMÊ CENTRAL COM TODAS AS INFORMAÇÕES -->
         <div style="
-          position:relative;
-          z-index:2;
-          padding:90px 80px 80px 80px;
+          position:absolute;
+          top:50%;
+          left:50%;
+          transform:translate(-50%,-50%);
+          width:82%;
+          max-width:880px;
+          background:rgba(0,0,0,0.72);
+          backdrop-filter:blur(6px);
+          border-radius:36px;
+          padding:42px 40px 36px 40px;
           display:flex;
           flex-direction:column;
-          justify-content:flex-start;
-          height:100%;
+          align-items:center;
+          gap:22px;
           color:#ffffff;
+          box-shadow:0 18px 40px rgba(0,0,0,0.85);
         ">
 
-          <!-- TOPO: NOME DO COMÉRCIO ABAIXO DA LOGO -->
+          <!-- LOGO DO CLIENTE -->
           <div style="
-            margin-top:520px;   /* logo abaixo da logo.png */
-            text-align:center;
+            width:210px;
+            height:210px;
+            border-radius:50%;
+            overflow:hidden;
+            border:6px solid rgba(255,255,255,0.96);
+            box-shadow:0 10px 32px rgba(0,0,0,0.9);
+            background:#ffffff;
+            margin-bottom:10px;
           ">
+            <img src="${imgLogoCliente}"
+                 alt="${nome}"
+                 crossorigin="anonymous"
+                 style="
+                   width:100%;
+                   height:100%;
+                   object-fit:cover;
+                 ">
+          </div>
+
+          <!-- NOME DO COMÉRCIO + CATEGORIA -->
+          <div style="text-align:center; max-width:90%;">
             <div style="
-              font-size:64px;
+              font-size:52px;
               font-weight:700;
               line-height:1.05;
-              text-shadow:0 4px 14px rgba(0,0,0,0.8);
+              text-shadow:0 4px 16px rgba(0,0,0,0.9);
             ">
               ${nome}
             </div>
             <div style="
-              font-size:28px;
-              margin-top:10px;
-              opacity:0.95;
-              text-shadow:0 3px 10px rgba(0,0,0,0.8);
+              font-size:24px;
+              margin-top:6px;
+              opacity:0.9;
             ">
               ${categoriaAtual || "Carlópolis - PR"}
             </div>
           </div>
 
-          <!-- MEIO: HORÁRIOS EM TARJA HORIZONTAL -->
+          <!-- LINHA DIVISÓRIA SUTIL -->
           <div style="
-            margin-top:120px;
-            display:flex;
-            justify-content:center;
-          ">
-            <div style="
-              display:inline-flex;
-              align-items:center;
-              gap:22px;
-              padding:18px 36px;
-              border-radius:999px;
-              background:rgba(0,0,0,0.55);
-              backdrop-filter:blur(4px);
-              font-size:26px;
-              box-shadow:0 10px 26px rgba(0,0,0,0.7);
-              text-align:center;
-              flex-wrap:wrap;
-            ">
-              <span style="font-weight:600;">Horário de funcionamento:</span>
-              <span>${textoHorarioPrincipal}</span>
-              ${
-                resumoStatus
-                  ? `<span>•</span><span>${resumoStatus}</span>`
-                  : ""
-              }
-            </div>
-          </div>
+            width:80%;
+            height:1px;
+            background:linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+            margin:8px 0 6px 0;
+          "></div>
 
-          <!-- RODAPÉ: ENDEREÇO + CONTATO + FRASE OLA CARLÓPOLIS -->
+          <!-- HORÁRIO / STATUS / ENDEREÇO / CONTATO -->
           <div style="
-            margin-top:auto;
+            width:100%;
             display:flex;
             flex-direction:column;
-            gap:18px;
+            gap:10px;
+            font-size:22px;
           ">
-            <div style="
-              font-size:24px;
-              max-width:70%;
-              text-shadow:0 3px 10px rgba(0,0,0,0.9);
-            ">
-              <span style="font-weight:600;">Endereço:</span>
-              ${endereco}
+
+            <!-- Horário -->
+            <div style="text-align:center;">
+              <span style="font-weight:600;">Horário de funcionamento:</span>
+              <span> ${textoHorarioPrincipal}</span>
             </div>
 
             ${
-              contatoTexto
-                ? `
-            <div style="
-              font-size:22px;
-              max-width:70%;
-              text-shadow:0 3px 10px rgba(0,0,0,0.9);
-            ">
-              <span style="font-weight:600;">Contato:</span>
-              ${contatoTexto}
-            </div>
-            `
+              resumoStatus
+                ? `<div style="text-align:center; font-size:20px; opacity:0.9;">
+                     ${resumoStatus}
+                   </div>`
                 : ""
             }
 
-            <div style="text-align:center; margin-top:20px;">
-              <div style="
-                display:inline-block;
-                font-size:30px;
-                font-weight:700;
-                padding:14px 32px;
-                border-radius:999px;
-                background:rgba(255,255,255,0.96);
-                color:#00539b;
-                box-shadow:0 10px 28px rgba(0,0,0,0.8);
-              ">
-                Nos encontre no Olá Carlópolis
-              </div>
-              <div style="
-                margin-top:10px;
-                font-size:20px;
-                text-shadow:0 2px 6px rgba(0,0,0,0.8);
-              ">
-                ${linkOla}
-              </div>
+            <!-- Endereço -->
+            <div style="
+              margin-top:6px;
+              text-align:center;
+            ">
+              <span style="font-weight:600;">Endereço:</span>
+              <span> ${endereco}</span>
+            </div>
+
+            <!-- Contato -->
+            ${
+              contatoTexto
+                ? `<div style="text-align:center;">
+                     <span style="font-weight:600;">Contato:</span>
+                     <span> ${contatoTexto}</span>
+                   </div>`
+                : ""
+            }
+          </div>
+
+          <!-- LINHA DIVISÓRIA INFERIOR -->
+          <div style="
+            width:80%;
+            height:1px;
+            background:linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+            margin:6px 0 4px 0;
+          "></div>
+
+          <!-- FRASE OLA CARLÓPOLIS + SITE -->
+          <div style="text-align:center; margin-top:4px;">
+            <div style="
+              display:inline-block;
+              font-size:26px;
+              font-weight:700;
+              padding:10px 26px;
+              border-radius:999px;
+              background:rgba(255,255,255,0.96);
+              color:#00539b;
+              box-shadow:0 10px 28px rgba(0,0,0,0.9);
+              margin-bottom:8px;
+            ">
+              Nos encontre no Olá Carlópolis
+            </div>
+            <div style="
+              font-size:19px;
+              opacity:0.95;
+            ">
+              ${linkOla}
             </div>
           </div>
 
@@ -317,6 +346,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     }
   }
 }
+
 
 
 
