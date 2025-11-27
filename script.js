@@ -93,8 +93,10 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
 
         <!-- FUNDO AJUSTADO (SEM SOBRAR NADA EM CIMA) -->
-        <div style=" position:absolute;
-          top:0; left:0;
+        <div style=" 
+        position:absolute;
+        margin: 10px;
+          
           width:100%; height:100%;
           background:url('${fundoRepresa}') top center/cover no-repeat;
           filter:brightness(0.90);
@@ -109,7 +111,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         <!-- CARD FUMÊ MINIMALISTA -->
         <div style="
           position:absolute;
-          top:63%;
+          top:53%;
           left:50%;
           transform:translate(-50%, -50%);
           width:82%;
@@ -130,21 +132,21 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
           <!-- IMAGEM DO CLIENTE – GIGANTE -->
           <div style="
-            width:auto;
-            height:auto;
-            border-radius:35px;
-            overflow:hidden;
-           // border:4px solid #d4af37;
-            box-shadow:
-              0 0 25px rgba(212,175,55,.40),
-              0 10px 40px rgba(0,0,0,.7);
-          ">
-            <img src="${imgLogoCliente}" style="
-              width:100%;
-              height:100%;
-              object-fit:cover;
-            ">
-          </div>
+  width:auto;
+  height:auto;
+  border-radius:40px;
+  overflow:hidden;
+  //border:4px solid #d4af37;
+  box-shadow:
+    0 0 35px rgba(212,175,55,.40),
+    0 15px 50px rgba(0,0,0,.7);
+">
+  <img src="${imgLogoCliente}" style="
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  ">
+</div>
 
           <!-- NOME + CATEGORIA -->
           <div style="max-width:95%;">
