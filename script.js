@@ -122,106 +122,151 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     host.innerHTML = `
       <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
 
-        <!-- FUNDO -->
-        <div style="
-          position:absolute;inset:0;
-          background:url('${fundoRepresa}') center/cover;
-        "></div>
+        <!-- FUNDO AJUSTADO (logo mais enquadrada) -->
+<div style="
+    position:absolute;inset:0;
+    background:url('images/img_padrao_site/logo.png') center center/contain no-repeat;
+    background-size:120%; /* aumenta o enquadramento geral */
+    filter:brightness(1.05);
+"></div>
 
-        <!-- GRADIENTE -->
-        <div style="
-          position:absolute;inset:0;
-          background:linear-gradient(to bottom, rgba(0,0,0,.6), rgba(0,0,0,.75));
-        "></div>
+<!-- GRADIENTE MAIS BONITO -->
+<div style="
+    position:absolute;inset:0;
+    background:linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.85));
+"></div>
 
-        <!-- CARD FUMÊ CENTRAL (MAIS PARA BAIXO) -->
-        <div style="
-          position:absolute;
-          top:63%; /* antes 50%, agora mais embaixo */
-          left:50%;
-          transform:translate(-50%,-50%);
-          width:82%;max-width:880px;
-          background:rgba(0,0,0,.72);
-          padding:60px 50px;
-          border-radius:40px;
-          backdrop-filter:blur(6px);
-          color:#fff;
-          display:flex;flex-direction:column;align-items:center;gap:35px;
-        ">
 
-          <!-- LOGO DO CLIENTE (AUMENTADA) -->
-       <div style="
-  width:auto;
-  height:auto;
-  border-radius:20px; /* opcional: arredondado leve */
-  overflow:hidden;
-  box-shadow:0 12px 40px rgba(161, 153, 153, 0.9);
+<!-- CARD FUMÊ PREMIUM (ASSENTADO MAIS PARA BAIXO) -->
+<div style="
+    position:absolute;
+    top:70%;   /* DESCI MAIS */
+    left:50%;
+    transform:translate(-50%, -50%);
+    width:85%;
+    max-width:900px;
+    background:rgba(0,0,0,.75);
+    padding:70px 60px;
+    border-radius:45px;
+    backdrop-filter:blur(8px);
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:45px;
+    box-shadow:0 20px 60px rgba(0,0,0,.65);
 ">
-            <img src="${imgLogoCliente}" style="width:100%;height:100%;object-fit:cover;">
-          </div>
 
-          <!-- NOME + CATEGORIA (FONTE MAIOR) -->
-          <div style="text-align:center;max-width:90%;">
-            <div style="font-size:70px;font-weight:800;line-height:1.05;text-shadow:0 4px 16px rgba(0,0,0,.9);">
-              ${nome}
-            </div>
-            <div style="font-size:32px;margin-top:8px;opacity:.9;">
-              ${categoriaAtual || "Carlópolis - PR"}
-            </div>
-          </div>
+    <!-- FOTO DO CLIENTE – SEM CORTE E COM MOLDURA DOURADA -->
+    <div style="
+        width:380px;
+        height:380px;
+        border-radius:25px;
+        overflow:hidden;
+        border:10px solid #d4af37; /* dourado premium */
+        box-shadow:
+            0 0 25px rgba(212,175,55,.4),
+            0 10px 40px rgba(0,0,0,.55);
+    ">
+        <img src="${imgLogoCliente}"
+             style="width:100%;height:100%;object-fit:cover;">
+    </div>
 
-          <!-- LINHA -->
-          <div style="width:80%;height:1px;background:rgba(255,255,255,.5);"></div>
-
-          <!-- INFORMAÇÕES DO CARD (FONTE MAIOR) -->
-          <div style="width:100%;font-size:32px;display:flex;flex-direction:column;gap:16px;text-align:center;">
-
-            <!-- Funcionamento em duas linhas -->
-            <div>
-              <b>Funcionamento:</b><br>
-              ${textoHorarioPrincipal}
-            </div>
-
-            ${resumoStatus ? `<div style="font-size:28px;opacity:.9;">${resumoStatus}</div>` : ""}
-
-            <!-- Endereço em duas linhas -->
-            <div>
-              <b>Endereço:</b><br>
-              ${endereco}
-            </div>
-
-            <!-- Contato em duas linhas -->
-            ${
-              contatoTexto
-                ? `<div>
-                     <b>Contato:</b><br>
-                     ${contatoTexto}
-                   </div>`
-                : ""
-            }
-          </div>
-
-          <!-- LINHA -->
-          <div style="width:80%;height:1px;background:rgba(255,255,255,.5);margin-top:10px;"></div>
-
-          <!-- RODAPÉ / FRASE CENTRALIZADA -->
-          <div style="text-align:center;margin-top:10px;">
-            <div style="
-              display:inline-block;
-              padding:18px 45px;
-              font-size:34px;font-weight:800;
-              border-radius:999px;
-              background:#fff;color:#00539b;
-              box-shadow:0 10px 28px rgba(0,0,0,.9);
-            ">
-              Nos encontre no Olá Carlópolis
-            </div>
-            <div style="font-size:26px;margin-top:10px;opacity:.95;">
-              ${linkOla}
-            </div>
-          </div>
-
+    <!-- NOME + CATEGORIA COM TIPOGRAFIA INSTAGRAM-FRIENDLY -->
+    <div style="text-align:center;max-width:90%;">
+        <div style="
+            font-size:82px;
+            font-weight:800;
+            line-height:1.05;
+            text-shadow:0 5px 20px rgba(0,0,0,.9);
+            letter-spacing:-1px;
+        ">
+            ${nome}
         </div>
+        <div style="
+            font-size:40px;
+            margin-top:10px;
+            opacity:.92;
+            font-weight:600;
+        ">
+            ${categoriaAtual || "Carlópolis - PR"}
+        </div>
+    </div>
+
+    <!-- LINHA DIVISÓRIA PREMIUM -->
+    <div style="
+        width:80%;
+        height:2px;
+        background:linear-gradient(90deg, transparent, #d4af37, transparent);
+    "></div>
+
+    <!-- BLOCO DE INFORMAÇÕES (TUDO ALINHADO) -->
+    <div style="
+        width:100%;
+        font-size:38px;
+        line-height:1.4;
+        display:flex;
+        flex-direction:column;
+        gap:30px;
+        text-align:center;
+    ">
+
+        <div>
+            <b style="color:#d4af37;">Funcionamento:</b><br>
+            ${textoHorarioPrincipal}
+        </div>
+
+        ${resumoStatus
+            ? `<div style="font-size:34px;opacity:.9;">${resumoStatus}</div>`
+            : ""}
+
+        <div>
+            <b style="color:#d4af37;">Endereço:</b><br>
+            ${endereco}
+        </div>
+
+        ${
+          contatoTexto
+            ? `<div>
+                 <b style="color:#d4af37;">Contato:</b><br>
+                 ${contatoTexto}
+               </div>`
+            : ""
+        }
+
+    </div>
+
+    <!-- LINHA -->
+    <div style="
+        width:75%;
+        height:2px;
+        background:linear-gradient(90deg, transparent, #d4af37, transparent);
+        margin-top:5px;
+    "></div>
+
+    <!-- FRASE FINAL CENTRALIZADA -->
+    <div style="text-align:center;margin-top:15px;">
+        <div style="
+            background:#fff;
+            color:#00539b;
+            display:inline-block;
+            padding:20px 55px;
+            font-size:42px;
+            font-weight:800;
+            border-radius:999px;
+            box-shadow:
+                0 8px 22px rgba(0,0,0,.4),
+                0 0 18px rgba(255,255,255,.8);
+        ">
+            Nos encontre no Olá Carlópolis
+        </div>
+        <div style="font-size:32px;margin-top:10px;opacity:.95;">
+            ${linkOla}
+        </div>
+    </div>
+
+</div>
+
       </div>
     `;
 
