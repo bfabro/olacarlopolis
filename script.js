@@ -134,9 +134,12 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           background:linear-gradient(to bottom, rgba(0,0,0,.6), rgba(0,0,0,.75));
         "></div>
 
-        <!-- CARD FUMÊ CENTRAL -->
+        <!-- CARD FUMÊ CENTRAL (MAIS PARA BAIXO) -->
         <div style="
-          position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+          position:absolute;
+          top:60%; /* antes 50%, agora mais embaixo */
+          left:50%;
+          transform:translate(-50%,-50%);
           width:82%;max-width:880px;
           background:rgba(0,0,0,.72);
           padding:60px 50px;
@@ -173,23 +176,35 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           <!-- INFORMAÇÕES DO CARD (FONTE MAIOR) -->
           <div style="width:100%;font-size:32px;display:flex;flex-direction:column;gap:16px;text-align:center;">
 
+            <!-- Funcionamento em duas linhas -->
             <div>
-              <b>Horário de funcionamento:</b> ${textoHorarioPrincipal}
+              <b>Funcionamento:</b><br>
+              ${textoHorarioPrincipal}
             </div>
 
             ${resumoStatus ? `<div style="font-size:28px;opacity:.9;">${resumoStatus}</div>` : ""}
 
+            <!-- Endereço em duas linhas -->
             <div>
-              <b>Endereço:</b> ${endereco}
+              <b>Endereço:</b><br>
+              ${endereco}
             </div>
 
-            ${contatoTexto ? `<div><b>Contato:</b> ${contatoTexto}</div>` : ""}
+            <!-- Contato em duas linhas -->
+            ${
+              contatoTexto
+                ? `<div>
+                     <b>Contato:</b><br>
+                     ${contatoTexto}
+                   </div>`
+                : ""
+            }
           </div>
 
           <!-- LINHA -->
           <div style="width:80%;height:1px;background:rgba(255,255,255,.5);margin-top:10px;"></div>
 
-          <!-- RODAPÉ / FRASE MAIOR -->
+          <!-- RODAPÉ / FRASE CENTRALIZADA -->
           <div style="text-align:center;margin-top:10px;">
             <div style="
               display:inline-block;
@@ -229,6 +244,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     console.error("Erro ao gerar card:", e);
   }
 }
+
 
 
 
