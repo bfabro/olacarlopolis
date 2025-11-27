@@ -137,7 +137,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         <!-- CARD FUMÊ CENTRAL (MAIS PARA BAIXO) -->
         <div style="
           position:absolute;
-          top:65%; /* antes 50%, agora mais embaixo */
+          top:63%; /* antes 50%, agora mais embaixo */
           left:50%;
           transform:translate(-50%,-50%);
           width:82%;max-width:880px;
@@ -151,11 +151,11 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
           <!-- LOGO DO CLIENTE (AUMENTADA) -->
        <div style="
-  width:350px;
-  height:350px;
+  width:auto;
+  height:auto;
   border-radius:20px; /* opcional: arredondado leve */
   overflow:hidden;
-  box-shadow:0 12px 40px rgba(0,0,0,.9);
+  box-shadow:0 12px 40px rgba(161, 153, 153, 0.9);
 ">
             <img src="${imgLogoCliente}" style="width:100%;height:100%;object-fit:cover;">
           </div>
