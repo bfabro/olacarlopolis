@@ -163,11 +163,11 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
           <!-- FOTO DO CLIENTE – COM MOLDURA DOURADA FINA -->
           <div style="
-            width:360px;
-            height:360px;
+            width:auto;
+            height:auto;
             border-radius:22px;
             overflow:hidden;
-            border:3px solid #d4af37; /* borda dourada fina */
+            border:2px solid #d4af37; /* borda dourada fina */
             box-shadow:
               0 0 16px rgba(212,175,55,.35),
               0 10px 30px rgba(0,0,0,.55);
@@ -179,7 +179,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           <!-- NOME + CATEGORIA -->
           <div style="text-align:center;max-width:90%;">
             <div style="
-              font-size:60px;          /* um pouco menor para caber melhor */
+              font-size:65px;          /* um pouco menor para caber melhor */
               font-weight:800;
               line-height:1.05;
               text-shadow:0 4px 18px rgba(0,0,0,.9);
@@ -188,7 +188,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
               ${nome}
             </div>
             <div style="
-              font-size:34px;
+              font-size:38px;
               margin-top:8px;
               opacity:.92;
               font-weight:600;
@@ -207,7 +207,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           <!-- BLOCO DE INFORMAÇÕES (COMPACTADO) -->
           <div style="
             width:100%;
-            font-size:32px;
+            font-size:34px;
             line-height:1.35;
             display:flex;
             flex-direction:column;
@@ -262,7 +262,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
               border-radius:999px;
               box-shadow:
                 0 7px 20px rgba(0,0,0,.4),
-                0 0 14px rgba(255,255,255,.8);
+                0 0 14px rgba(214, 214, 214, 0.8);
             ">
               Nos encontre no Olá Carlópolis
             </div>
