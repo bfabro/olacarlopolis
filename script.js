@@ -130,11 +130,11 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
           <!-- IMAGEM DO CLIENTE – GIGANTE -->
           <div style="
-            width:600px;
-            height:600px;
+            width:auto;
+            height:auto;
             border-radius:35px;
             overflow:hidden;
-            border:4px solid #d4af37;
+           // border:4px solid #d4af37;
             box-shadow:
               0 0 25px rgba(212,175,55,.40),
               0 10px 40px rgba(0,0,0,.7);
