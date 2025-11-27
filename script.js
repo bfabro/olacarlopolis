@@ -51,6 +51,7 @@ function somenteDigitos(str) {
 //
 
 // === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, CARD FUMÊ CENTRAL) ===
+// === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, LOGO GRANDE) ===
 function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
     const nome = establishment.name || "Comércio em Carlópolis";
@@ -73,7 +74,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     // Fundo (logo Olá Carlópolis)
     const fundoRepresa = "images/img_padrao_site/logo.png";
 
-    // Logo do cliente
+    // Logo / foto do cliente
     const imagens =
       establishment.novidadesImages || establishment.divulgacaoImages || [];
     const imgLogoCliente =
@@ -93,10 +94,9 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
 
         <!-- FUNDO AJUSTADO (SEM SOBRAR NADA EM CIMA) -->
-        <div style=" 
-        position:absolute;
-        margin: 10px;
-          
+        <div style="
+          position:absolute;
+          top:0; left:0;
           width:100%; height:100%;
           background:url('${fundoRepresa}') top center/cover no-repeat;
           filter:brightness(0.90);
@@ -108,44 +108,44 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.85));
         "></div>
 
-        <!-- CARD FUMÊ MINIMALISTA -->
+        <!-- CARD FUMÊ COM LOGO GRANDE -->
         <div style="
           position:absolute;
-          top:53%;
+          top:55%;                 /* sobe/desce o bloco todo */
           left:50%;
           transform:translate(-50%, -50%);
           width:82%;
           max-width:900px;
           background:rgba(0,0,0,0.35);
-          padding:60px 55px;
-          
+          padding:55px 50px 50px 50px;
           border-radius:40px;
           backdrop-filter:blur(7px);
           color:#fff;
           display:flex;
           flex-direction:column;
           align-items:center;
-          gap:35px;
+          gap:32px;
           text-align:center;
           box-shadow:0 20px 50px rgba(0,0,0,.55);
         ">
 
-      <!-- IMAGEM DO CLIENTE – GIGANTE -->
-<div style="
-  width: 900px;
-  height: 900px;
-  border-radius: 40px;
-  overflow: hidden;
-  box-shadow: 0 0 35px rgba(212,175,55,.40),
-              0 15px 50px rgba(0,0,0,.7);
-">
-  <img src="${imgLogoCliente}" style="
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  ">
-</div>
-
+          <!-- LOGO DO CLIENTE – BEM GRANDE, DENTRO DO CARD -->
+          <div style="
+            width:86%;
+            max-width:820px;
+            border-radius:32px;
+            overflow:hidden;
+         
+            box-shadow:
+              0 0 30px rgba(212,175,55,.40),
+              0 18px 45px rgba(0,0,0,.70);
+          ">
+            <img src="${imgLogoCliente}" style="
+              width:100%;
+              display:block;
+              object-fit:cover;
+            ">
+          </div>
 
           <!-- NOME + CATEGORIA -->
           <div style="max-width:95%;">
@@ -159,7 +159,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
             </div>
             <div style="
               font-size:40px;
-              margin-top:10px;
+              margin-top:8px;
               opacity:.95;
               font-weight:600;
             ">
@@ -175,13 +175,13 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           "></div>
 
           <!-- FRASE FINAL + LINK -->
-          <div style="margin-top:10px;">
+          <div style="margin-top:6px;">
             <div style="
               background:#fff;
               color:#00539b;
               display:inline-block;
               padding:18px 52px;
-              font-size:40px;
+              font-size:38px;
               font-weight:800;
               border-radius:999px;
               box-shadow:
@@ -191,8 +191,8 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
               Nos encontre no Olá Carlópolis
             </div>
             <div style="
-              font-size:30px;
-              margin-top:12px;
+              font-size:28px;
+              margin-top:10px;
               opacity:.97;
             ">
               ${linkOla}
@@ -222,6 +222,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     console.error("Erro ao gerar card:", e);
   }
 }
+
 
 
 
