@@ -130,23 +130,22 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           box-shadow:0 20px 50px rgba(0,0,0,.55);
         ">
 
-          <!-- IMAGEM DO CLIENTE – GIGANTE -->
-          <div style="
-  width:auto;
-  height:auto;
-  border-radius:40px;
-  overflow:hidden;
-  //border:4px solid #d4af37;
-  box-shadow:
-    0 0 35px rgba(212,175,55,.40),
-    0 15px 50px rgba(0,0,0,.7);
+      <!-- IMAGEM DO CLIENTE – GIGANTE -->
+<div style="
+  width: auto;
+  height: auto;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 0 35px rgba(212,175,55,.40),
+              0 15px 50px rgba(0,0,0,.7);
 ">
   <img src="${imgLogoCliente}" style="
-    width:100%;
-    height:100%;
-    object-fit:cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   ">
 </div>
+
 
           <!-- NOME + CATEGORIA -->
           <div style="max-width:95%;">
