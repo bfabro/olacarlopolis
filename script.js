@@ -149,7 +149,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           transform:translate(-50%, -50%);
           width:82%;
           max-width:880px;
-          background:rgba(50, 50, 50, 0.75);
+          background:rgba(0, 0, 0, 0.40);
           padding:52px 46px;
           border-radius:40px;
           backdrop-filter:blur(8px);
@@ -167,7 +167,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
             height:auto;
             border-radius:22px;
             overflow:hidden;
-            border:2px solid #d4af37; /* borda dourada fina */
+            /*border:2px solid #d4af37; /* borda dourada fina */
             box-shadow:
               0 0 16px rgba(212,175,55,.35),
               0 10px 30px rgba(0,0,0,.55);
