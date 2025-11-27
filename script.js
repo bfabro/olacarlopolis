@@ -149,7 +149,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           transform:translate(-50%, -50%);
           width:82%;
           max-width:880px;
-          background:rgba(0,0,0,.75);
+          background:rgba(50, 50, 50, 0.75);
           padding:52px 46px;
           border-radius:40px;
           backdrop-filter:blur(8px);
