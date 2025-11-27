@@ -39,7 +39,6 @@ function somenteDigitos(str) {
 
 // === GERAR CARD ESTILO LOGO OLÁ CARLÓPOLIS (STORIES) ===
 
-// === GERAR CARD ESTILO LOGO OLÁ CARLÓPOLIS (STORIES) ===
 // === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, CARD FUMÊ CENTRAL) ===
 function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
@@ -69,11 +68,14 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     const fundoRepresa = "images/img_padrao_site/logo.png";
 
     // Foto/logo do cliente
-    const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
+    const imagens =
+      establishment.novidadesImages || establishment.divulgacaoImages || [];
     const imgLogoCliente =
       establishment.logo ||
       establishment.image ||
-      (Array.isArray(imagens) && imagens.length ? imagens[0] : "images/img_padrao_site/padrao.jpg");
+      (Array.isArray(imagens) && imagens.length
+        ? imagens[0]
+        : "images/img_padrao_site/padrao.jpg");
 
     // Horário
     let textoHorarioPrincipal = establishment.hours || "";
@@ -106,9 +108,9 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     try {
       const primeiro = getPrimeiroContato(
         establishment.whatsapp ||
-        establishment.contact ||
-        establishment.contact2 ||
-        establishment.contact3
+          establishment.contact ||
+          establishment.contact2 ||
+          establishment.contact3
       );
       if (primeiro) contatoTexto = primeiro;
     } catch (e) {}
@@ -122,150 +124,155 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     host.innerHTML = `
       <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
 
-        <!-- FUNDO AJUSTADO (logo mais enquadrada) -->
-<div style="
-    position:absolute;inset:0;
-    background:url('images/img_padrao_site/logo.png') center center/contain no-repeat;
-    background-size:120%; /* aumenta o enquadramento geral */
-    filter:brightness(1.05);
+        <!-- FUNDO AJUSTADO (logo mais enquadrada e um pouco menor) -->
+       <div style="
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:url('${fundoRepresa}') center top/cover no-repeat;
+  background-position: top center;
+  background-size: cover; /* garante que NÃO sobra espaço */
+  filter:brightness(0.85);
 "></div>
 
-<!-- GRADIENTE MAIS BONITO -->
-<div style="
-    position:absolute;inset:0;
-    background:linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.85));
-"></div>
-
-
-<!-- CARD FUMÊ PREMIUM (ASSENTADO MAIS PARA BAIXO) -->
-<div style="
-    position:absolute;
-    top:70%;   /* DESCI MAIS */
-    left:50%;
-    transform:translate(-50%, -50%);
-    width:85%;
-    max-width:900px;
-    background:rgba(0,0,0,.75);
-    padding:70px 60px;
-    border-radius:45px;
-    backdrop-filter:blur(8px);
-    color:#fff;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:45px;
-    box-shadow:0 20px 60px rgba(0,0,0,.65);
-">
-
-    <!-- FOTO DO CLIENTE – SEM CORTE E COM MOLDURA DOURADA -->
-    <div style="
-        width:380px;
-        height:380px;
-        border-radius:25px;
-        overflow:hidden;
-        border:10px solid #d4af37; /* dourado premium */
-        box-shadow:
-            0 0 25px rgba(212,175,55,.4),
-            0 10px 40px rgba(0,0,0,.55);
-    ">
-        <img src="${imgLogoCliente}"
-             style="width:100%;height:100%;object-fit:cover;">
-    </div>
-
-    <!-- NOME + CATEGORIA COM TIPOGRAFIA INSTAGRAM-FRIENDLY -->
-    <div style="text-align:center;max-width:90%;">
+        <!-- GRADIENTE -->
         <div style="
-            font-size:82px;
-            font-weight:800;
-            line-height:1.05;
-            text-shadow:0 5px 20px rgba(0,0,0,.9);
-            letter-spacing:-1px;
+          position:absolute;inset:0;
+          background:linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.86));
+        "></div>
+
+        <!-- CARD FUMÊ PREMIUM (UM POUCO MAIS PARA CIMA E MAIS COMPACTO) -->
+        <div style="
+          position:absolute;
+          top:60%;   /* antes 70% → sobe um pouco para não cortar embaixo */
+          left:50%;
+          transform:translate(-50%, -50%);
+          width:82%;
+          max-width:880px;
+          background:rgba(0,0,0,.75);
+          padding:52px 46px;
+          border-radius:40px;
+          backdrop-filter:blur(8px);
+          color:#fff;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:25px;
+          box-shadow:0 18px 50px rgba(0,0,0,.65);
         ">
-            ${nome}
-        </div>
-        <div style="
-            font-size:40px;
-            margin-top:10px;
-            opacity:.92;
-            font-weight:600;
-        ">
-            ${categoriaAtual || "Carlópolis - PR"}
-        </div>
-    </div>
 
-    <!-- LINHA DIVISÓRIA PREMIUM -->
-    <div style="
-        width:80%;
-        height:2px;
-        background:linear-gradient(90deg, transparent, #d4af37, transparent);
-    "></div>
-
-    <!-- BLOCO DE INFORMAÇÕES (TUDO ALINHADO) -->
-    <div style="
-        width:100%;
-        font-size:38px;
-        line-height:1.4;
-        display:flex;
-        flex-direction:column;
-        gap:30px;
-        text-align:center;
-    ">
-
-        <div>
-            <b style="color:#d4af37;">Funcionamento:</b><br>
-            ${textoHorarioPrincipal}
-        </div>
-
-        ${resumoStatus
-            ? `<div style="font-size:34px;opacity:.9;">${resumoStatus}</div>`
-            : ""}
-
-        <div>
-            <b style="color:#d4af37;">Endereço:</b><br>
-            ${endereco}
-        </div>
-
-        ${
-          contatoTexto
-            ? `<div>
-                 <b style="color:#d4af37;">Contato:</b><br>
-                 ${contatoTexto}
-               </div>`
-            : ""
-        }
-
-    </div>
-
-    <!-- LINHA -->
-    <div style="
-        width:75%;
-        height:2px;
-        background:linear-gradient(90deg, transparent, #d4af37, transparent);
-        margin-top:5px;
-    "></div>
-
-    <!-- FRASE FINAL CENTRALIZADA -->
-    <div style="text-align:center;margin-top:15px;">
-        <div style="
-            background:#fff;
-            color:#00539b;
-            display:inline-block;
-            padding:20px 55px;
-            font-size:42px;
-            font-weight:800;
-            border-radius:999px;
+          <!-- FOTO DO CLIENTE – COM MOLDURA DOURADA FINA -->
+          <div style="
+            width:360px;
+            height:360px;
+            border-radius:22px;
+            overflow:hidden;
+            border:3px solid #d4af37; /* borda dourada fina */
             box-shadow:
-                0 8px 22px rgba(0,0,0,.4),
-                0 0 18px rgba(255,255,255,.8);
-        ">
-            Nos encontre no Olá Carlópolis
-        </div>
-        <div style="font-size:32px;margin-top:10px;opacity:.95;">
-            ${linkOla}
-        </div>
-    </div>
+              0 0 16px rgba(212,175,55,.35),
+              0 10px 30px rgba(0,0,0,.55);
+          ">
+            <img src="${imgLogoCliente}"
+                style="width:100%;height:100%;object-fit:cover;">
+          </div>
 
-</div>
+          <!-- NOME + CATEGORIA -->
+          <div style="text-align:center;max-width:90%;">
+            <div style="
+              font-size:60px;          /* um pouco menor para caber melhor */
+              font-weight:800;
+              line-height:1.05;
+              text-shadow:0 4px 18px rgba(0,0,0,.9);
+              letter-spacing:-0.5px;
+            ">
+              ${nome}
+            </div>
+            <div style="
+              font-size:34px;
+              margin-top:8px;
+              opacity:.92;
+              font-weight:600;
+            ">
+              ${categoriaAtual || "Carlópolis - PR"}
+            </div>
+          </div>
+
+          <!-- LINHA DIVISÓRIA -->
+          <div style="
+            width:78%;
+            height:2px;
+            background:linear-gradient(90deg, transparent, #d4af37, transparent);
+          "></div>
+
+          <!-- BLOCO DE INFORMAÇÕES (COMPACTADO) -->
+          <div style="
+            width:100%;
+            font-size:32px;
+            line-height:1.35;
+            display:flex;
+            flex-direction:column;
+            gap:20px;
+            text-align:center;
+          ">
+
+            <div>
+              <b style="color:#d4af37;">Funcionamento:</b><br>
+              ${textoHorarioPrincipal}
+            </div>
+
+            ${
+              resumoStatus
+                ? `<div style="font-size:28px;opacity:.9;">${resumoStatus}</div>`
+                : ""
+            }
+
+            <div>
+              <b style="color:#d4af37;">Endereço:</b><br>
+              ${endereco}
+            </div>
+
+            ${
+              contatoTexto
+                ? `<div>
+                    <b style="color:#d4af37;">Contato:</b><br>
+                    ${contatoTexto}
+                  </div>`
+                : ""
+            }
+
+          </div>
+
+          <!-- LINHA INFERIOR -->
+          <div style="
+            width:72%;
+            height:2px;
+            background:linear-gradient(90deg, transparent, #d4af37, transparent);
+            margin-top:2px;
+          "></div>
+
+          <!-- FRASE FINAL + LINK (CENTRALIZADOS E MAIS ENXUTOS) -->
+          <div style="text-align:center;margin-top:8px;">
+            <div style="
+              background:#fff;
+              color:#00539b;
+              display:inline-block;
+              padding:16px 44px;
+              font-size:34px;
+              font-weight:800;
+              border-radius:999px;
+              box-shadow:
+                0 7px 20px rgba(0,0,0,.4),
+                0 0 14px rgba(255,255,255,.8);
+            ">
+              Nos encontre no Olá Carlópolis
+            </div>
+            <div style="font-size:26px;margin-top:8px;opacity:.95;">
+              <Br>
+            </div>
+            
+          </div>
+
+        </div>
 
       </div>
     `;
@@ -279,16 +286,16 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     })
       .then((canvas) => {
         const link = document.createElement("a");
-        link.download = `card-${nome.replace(/\s+/g,"-")}.png`;
+        link.download = `card-${nome.replace(/\s+/g, "-")}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
       })
       .finally(() => host.remove());
-
   } catch (e) {
     console.error("Erro ao gerar card:", e);
   }
 }
+
 
 
 
