@@ -129,25 +129,26 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           box-shadow:0 20px 50px rgba(0,0,0,.55);
         ">
 
-          <!-- LOGO DO CLIENTE – REALMENTE GRANDE -->
+         <!-- IMAGEM DO CLIENTE – GIGANTE, SEM DISTORCER -->
 <div style="
   width:92%;
   max-width:950px;
-  aspect-ratio:4/3;
   border-radius:32px;
   overflow:hidden;
+  background:#000;  /* ajuda quando a logo tem fundo recortado */
   box-shadow:
     0 0 30px rgba(212,175,55,.40),
     0 18px 45px rgba(0,0,0,.70);
 ">
   <img src="${imgLogoCliente}" style="
-    width:100%;
-    height:100%;
-    max-width:none;          /* 🔥 quebra o limite global de 425px */
     display:block;
-    object-fit:cover;
+    width:100%;
+    height:auto;      /* mantém proporção original */
+    max-width:none;   /* não limita a 425px do CSS global */
+    object-fit:contain;  /* mostra a logo inteira, sem corte */
   ">
 </div>
+
 
 
           <!-- NOME + CATEGORIA -->
