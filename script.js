@@ -325,7 +325,7 @@ function gerarImagemCardImovel(imovel, slugId) {
           transform:translate(-50%, -50%);
           width:92%;
           max-width:900px;
-          background:rgba(0,0,0,0.38);
+          background:rgba(0,0,0,0.35);
           padding:55px 50px 50px 50px;
           border-radius:40px;
           backdrop-filter:blur(7px);
@@ -335,7 +335,7 @@ function gerarImagemCardImovel(imovel, slugId) {
           align-items:center;
           gap:30px;
           text-align:center;
-          box-shadow:0 20px 50px rgba(0,0,0,.55);
+          box-shadow:0 20px 50px rgba(0,0,0,.50);
         ">
 
           <!-- FOTO DO IMÓVEL: área fixa, estilo “mobile banner” -->
