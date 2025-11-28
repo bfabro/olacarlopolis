@@ -111,6 +111,8 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           width:82%;
           max-width:900px;
           background:rgba(0,0,0,0.35);
+          width:96%;
+          max-width:1050px;
           padding:55px 50px 50px 50px;
           border-radius:40px;
           backdrop-filter:blur(7px);
@@ -125,8 +127,8 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
          <!-- IMAGEM DO CLIENTE – GIGANTE, SEM DISTORCER -->
 <div style="
-  width:92%;
-  max-width:950px;
+  width:96%;
+  max-width:1050px;
   border-radius:32px;
   overflow:hidden;
   background:#000;  /* ajuda quando a logo tem fundo recortado */
