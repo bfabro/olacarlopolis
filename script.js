@@ -4721,6 +4721,58 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+{
+      id: "casa14v",
+      codRef: "C_014",
+      tipo: "venda",
+      procura: "casa", 
+      titulo: "Casa à venda no Residencial Itália",
+      quartos: 3,
+      valor: 400000,
+      piscina: "Não",
+      churrasqueira: "Não",
+      vagas: 2,
+      corretores: ["Luiz Vilas Boas - 52.194"],
+      
+      descricao: "Imóvel moderno, bem distribuído e projetado para oferecer conforto e praticidade no dia a dia. Localizada em um dos bairros mais tranquilos e valorizados da cidade. Aceita-se veículo como parte do pagamento, tornando a negociação ainda mais facilitada.",
+      endereco: "Residencial Itália",
+      suite: "Sim",
+      banheiros: 1,
+      salas: 1,
+      cozinhas: 1,
+      area: 180,
+      construcao: 78,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 98803-4095", // Corretor ou propretario
+      imagens: [
+        "images/imoveis/luiz/venda/casa1/1.jpg",
+        "images/imoveis/luiz/venda/casa1/2.jpg",
+        "images/imoveis/luiz/venda/casa1/3.jpg",
+        "images/imoveis/luiz/venda/casa1/4.jpg",
+        "images/imoveis/luiz/venda/casa1/5.jpg",
+        "images/imoveis/luiz/venda/casa1/6.jpg",
+        "images/imoveis/luiz/venda/casa1/7.jpg",
+        "images/imoveis/luiz/venda/casa1/8.jpg",
+        "images/imoveis/luiz/venda/casa1/9.jpg",
+        "images/imoveis/luiz/venda/casa1/10.jpg",
+        "images/imoveis/luiz/venda/casa1/11.jpg",
+       
+      ],
+   
+
+    },
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     {
