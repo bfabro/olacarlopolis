@@ -136,9 +136,9 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 ">
   <img src="${imgLogoCliente}" style="
     display:block;
-    width:100%;
-    height:auto;      /* mantém proporção original */
-    max-width:none;   /* não limita a 425px do CSS global */
+    width:425px;
+    height:425px;      /* mantém proporção original */
+    max-width:425px;   /* não limita a 425px do CSS global */
     object-fit:contain;  /* mostra a logo inteira, sem corte */
   ">
 </div>
@@ -232,28 +232,32 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 // === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
 
 // === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
+// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
 function gerarImagemCardImovel(imovel, slugId) {
   try {
     const titulo = imovel.titulo || imovel.nome || "Imóvel em Carlópolis";
     const cidade = imovel.cidade || "Carlópolis - PR";
-    const bairro = imovel.bairro ? `${imovel.bairro} • ${cidade}` : cidade;
 
-    const preco = imovel.preco || imovel.valor || "";
-    const precoFmt = preco
-      ? `R$ ${String(preco).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
-      : "";
+    // 🔹 DESCRIÇÃO – vamos usar isso no lugar de quartos/banheiros/preço
+    const descricaoBruta =
+      imovel.descricao ||
+      imovel.descricaoImovel ||
+      imovel.observacao ||
+      imovel.obs ||
+      "";
 
-    const quartos   = imovel.quartos   || imovel.dormitorios || 0;
-    const banheiros = imovel.banheiros || 0;
-    const vagas     = imovel.vagas     || imovel.garagens    || 0;
-    const area      = imovel.area      || imovel.m2          || "";
+    // limpa HTML e quebra-linha
+    const descricaoTexto = String(descricaoBruta)
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/p>/gi, "\n")
+      .replace(/<[^>]+>/g, "")
+      .replace(/\n{2,}/g, "\n")
+      .trim();
 
-    const detalhes = [
-      quartos   ? `${quartos} dorm`                     : "",
-      banheiros ? `${banheiros} banh`                   : "",
-      vagas     ? `${vagas} vaga${vagas > 1 ? "s" : ""}`: "",
-      area      ? `${area} m²`                          : ""
-    ].filter(Boolean).join(" • ");
+    const descricaoCurta =
+      descricaoTexto.length > 260
+        ? descricaoTexto.slice(0, 257) + "..."
+        : descricaoTexto;
 
     const slug =
       slugId ||
@@ -270,17 +274,24 @@ function gerarImagemCardImovel(imovel, slugId) {
       ? `www.olacarlopolis.com/#${slug}`
       : "www.olacarlopolis.com/imoveis";
 
-    // fundo com logo
+    // 🔹 FUNDO (logo Olá Carlópolis)
     const fundoRepresa = "images/img_padrao_site/logo.png";
 
-    // ⬇⬇⬇ FOTO PRINCIPAL DO IMÓVEL (usa imovel.imagens) ⬇⬇⬇
-    const fotos = imovel.imagens || imovel.fotos || imovel.images || imovel.divulgacaoImages || [];
+    // 🔹 FOTO PRINCIPAL DO IMÓVEL – mesma fonte de imagens que você usa no site
+    const fotos =
+      imovel.imagens ||           // principal
+      imovel.fotos ||
+      imovel.images ||
+      imovel.divulgacaoImages ||
+      [];
+
     const imgImovel =
       imovel.capa ||
       (Array.isArray(fotos) && fotos.length
         ? fotos[0]
         : "images/img_padrao_site/padrao.jpg");
 
+    // container invisível para o html2canvas
     const host = document.createElement("div");
     host.style.position = "fixed";
     host.style.left = "-9999px";
@@ -289,7 +300,7 @@ function gerarImagemCardImovel(imovel, slugId) {
     host.innerHTML = `
       <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
 
-        <!-- FUNDO -->
+        <!-- FUNDO OLA CARLÓPOLIS -->
         <div style="
           position:absolute;
           top:0; left:0;
@@ -325,27 +336,28 @@ function gerarImagemCardImovel(imovel, slugId) {
           box-shadow:0 20px 50px rgba(0,0,0,.55);
         ">
 
-          <!-- FOTO DO IMÓVEL -->
-          <div style="
-            width:100%;
-            max-width:950px;
-            border-radius:32px;
-            overflow:hidden;
-            background:#000;
-            box-shadow:
-              0 0 30px rgba(212,175,55,.30),
-              0 18px 45px rgba(0,0,0,.70);
-          ">
-            <img src="${imgImovel}" style="
-              display:block;
-              width:100%;
-              height:auto;
-              max-width:none;
-              object-fit:cover;
-            ">
-          </div>
+          <!-- FOTO DO IMÓVEL: área fixa, estilo “mobile banner” -->
+       <div style="
+  width:100%;
+  max-width:950px;
+  border-radius:32px;
+  overflow:hidden;
+  box-shadow:
+    0 0 30px rgba(212,175,55,.30),
+    0 18px 45px rgba(0,0,0,.70);
+">
+  <img src="${imgImovel}" style="
+    display:block;
+    width:100%;
+    height:auto;
+    max-width:none;      /* 🔥 ignora o max-width:425px global */
+    object-fit:cover;    /* preenche como no mobile, cortando só o excesso */
+  ">
+</div>
 
-          <!-- TÍTULO / DETALHES / BAIRRO / PREÇO -->
+
+
+          <!-- TÍTULO + DESCRIÇÃO + CIDADE -->
           <div style="max-width:95%;">
             <div style="
               font-size:60px;
@@ -356,35 +368,29 @@ function gerarImagemCardImovel(imovel, slugId) {
               ${titulo}
             </div>
 
-            ${detalhes ? `
-              <div style="
-                font-size:34px;
-                margin-top:10px;
-                opacity:.95;
-              ">
-                ${detalhes}
-              </div>
-            ` : ""}
-
+            ${
+              descricaoCurta
+                ? `
             <div style="
               font-size:30px;
-              margin-top:8px;
+              margin-top:14px;
+              opacity:.95;
+              line-height:1.4;
+              white-space:pre-line;
+            ">
+              ${descricaoCurta}
+            </div>
+            `
+                : ""
+            }
+
+            <div style="
+              font-size:28px;
+              margin-top:10px;
               opacity:.9;
             ">
-              ${bairro}
+              ${cidade}
             </div>
-
-            ${precoFmt ? `
-              <div style="
-                font-size:46px;
-                font-weight:800;
-                color:#ffd966;
-                margin-top:14px;
-                text-shadow:0 0 16px rgba(0,0,0,.9);
-              ">
-                ${precoFmt}
-              </div>
-            ` : ""}
           </div>
 
           <!-- LINHA DOURADA -->
@@ -394,7 +400,7 @@ function gerarImagemCardImovel(imovel, slugId) {
             background:linear-gradient(90deg, transparent, #d4af37, transparent);
           "></div>
 
-          <!-- FRASE + LINK -->
+          <!-- CHAMADA FINAL -->
           <div>
             <div style="
               background:#fff;
@@ -415,7 +421,7 @@ function gerarImagemCardImovel(imovel, slugId) {
               margin-top:10px;
               opacity:.97;
             ">
-              <br<br>
+              ${linkOla}
             </div>
           </div>
 
@@ -441,7 +447,6 @@ function gerarImagemCardImovel(imovel, slugId) {
     console.error("Erro ao gerar card do imóvel:", e);
   }
 }
-
 
 
 
