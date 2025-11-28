@@ -136,9 +136,9 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 ">
   <img src="${imgLogoCliente}" style="
     display:block;
-    width:425px;
-    height:425px;      /* mantém proporção original */
-    max-width:425px;   /* não limita a 425px do CSS global */
+    width:100%;
+    height:auto;      /* mantém proporção original */
+    max-width:none;   /* não limita a 425px do CSS global */
     object-fit:contain;  /* mostra a logo inteira, sem corte */
   ">
 </div>
@@ -231,6 +231,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
 // === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
 
+// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
 // === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
 // === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
 function gerarImagemCardImovel(imovel, slugId) {
@@ -337,23 +338,40 @@ function gerarImagemCardImovel(imovel, slugId) {
         ">
 
           <!-- FOTO DO IMÓVEL: área fixa, estilo “mobile banner” -->
-       <div style="
-  width:100%;
+        
+
+      <!-- IMAGEM DO CLIENTE – GIGANTE, SEM DISTORCER -->
+<div style="
+  width:92%;
   max-width:950px;
   border-radius:32px;
   overflow:hidden;
+  background:#000;  /* ajuda quando a logo tem fundo recortado */
   box-shadow:
-    0 0 30px rgba(212,175,55,.30),
+    0 0 30px rgba(212,175,55,.40),
     0 18px 45px rgba(0,0,0,.70);
 ">
   <img src="${imgImovel}" style="
     display:block;
     width:100%;
-    height:auto;
-    max-width:none;      /* 🔥 ignora o max-width:425px global */
-    object-fit:cover;    /* preenche como no mobile, cortando só o excesso */
+    height:auto;      /* mantém proporção original */
+    max-width:none;   /* não limita a 425px do CSS global */
+    object-fit:contain;  /* mostra a logo inteira, sem corte */
   ">
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -384,13 +402,7 @@ function gerarImagemCardImovel(imovel, slugId) {
                 : ""
             }
 
-            <div style="
-              font-size:28px;
-              margin-top:10px;
-              opacity:.9;
-            ">
-              ${cidade}
-            </div>
+        <Br>
           </div>
 
           <!-- LINHA DOURADA -->
@@ -421,7 +433,7 @@ function gerarImagemCardImovel(imovel, slugId) {
               margin-top:10px;
               opacity:.97;
             ">
-              ${linkOla}
+            <Br><br>
             </div>
           </div>
 
@@ -447,8 +459,6 @@ function gerarImagemCardImovel(imovel, slugId) {
     console.error("Erro ao gerar card do imóvel:", e);
   }
 }
-
-
 
 
 
