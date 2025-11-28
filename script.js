@@ -323,9 +323,9 @@ function gerarImagemCardImovel(imovel, slugId) {
           top:55%;
           left:50%;
           transform:translate(-50%, -50%);
-          width:92%;
-          max-width:900px;
-          background:rgba(0,0,0,0.35);
+          width:96%;
+          max-width:1050px;
+          background:rgba(19, 19, 19, 0.3);
           padding:55px 50px 50px 50px;
           border-radius:40px;
           backdrop-filter:blur(7px);
@@ -335,7 +335,7 @@ function gerarImagemCardImovel(imovel, slugId) {
           align-items:center;
           gap:30px;
           text-align:center;
-          box-shadow:0 20px 50px rgba(0,0,0,.50);
+          box-shadow:0 20px 50px rgba(0,0,0,.40);
         ">
 
           <!-- FOTO DO IMÓVEL: área fixa, estilo “mobile banner” -->
@@ -384,36 +384,50 @@ function gerarImagemCardImovel(imovel, slugId) {
 
 
 
+<!-- BLOCO DE TEXTO COM BORDA APENAS AO REDOR DO TEXTO -->
+<div style="
+  width:100%;
+  max-width:900px;
+  padding:35px 40px;
+  border-radius:22px;
 
+  /* 🔥 BORDA FINA SOMENTE NO TEXTO */
+  border:1.6px solid rgba(255,255,255,0.22);
 
-          <!-- TÍTULO + DESCRIÇÃO + CIDADE -->
-          <div style="max-width:95%;">
-            <div style="
-              font-size:60px;
-              font-weight:800;
-              line-height:1.05;
-              text-shadow:0 5px 18px rgba(0,0,0,.9);
-            ">
-              ${titulo}
-            </div>
+  background:rgba(0,0,0,0.20);
+  backdrop-filter:blur(4px);
 
-            ${descricaoCurta
-        ? `
-            <div style="
-              font-size:38px;
-              margin-top:10px;
-              opacity:.95;
-              line-height:1.4;
-              white-space:pre-line;
-            ">
-              ${descricaoCurta}<Br>
-            </div>
-            `
-        : ""
-      }
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+">
+    
+    <!-- TÍTULO -->
+    <div style="
+      font-size:60px;
+      font-weight:800;
+      line-height:1.05;
+      text-shadow:0 5px 18px rgba(0,0,0,.9);
+    ">
+      ${titulo}
+    </div>
 
-        <Br>
-          </div>
+    <!-- DESCRIÇÃO -->
+    ${descricaoCurta ? `
+    <div style="
+      font-size:34px;
+      opacity:.97;
+      line-height:1.45;
+      white-space:pre-line;
+    ">
+      ${descricaoCurta}
+    </div>` : ""}
+
+   
+
+</div>
+<br>
 
           <!-- LINHA DOURADA -->
           <div style="
@@ -4734,7 +4748,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       vagas: 2,
       corretores: ["Luiz Vilas Boas - 52.194"],
       
-      descricao: "Imóvel moderno, bem distribuído e projetado para oferecer conforto e praticidade no dia a dia. Localizada em um dos bairros mais tranquilos e valorizados da cidade. Aceita-se veículo como parte do pagamento, tornando a negociação ainda mais facilitada.",
+      descricao: "Imóvel moderno, bem distribuído e projetado para oferecer conforto e praticidade no dia a dia. Localizada em um dos bairros mais tranquilos e valorizados da cidade. <br>Aceita-se veículo como parte do pagamento, tornando a negociação ainda mais facilitada.",
       endereco: "Residencial Itália",
       suite: "Sim",
       banheiros: 1,
