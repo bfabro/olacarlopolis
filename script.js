@@ -44,13 +44,7 @@ function somenteDigitos(str) {
 }
 
 
-// === GERAR CARD ESTILO LOGO OLÁ CARLÓPOLIS (STORIES) ===
-// Ate aqui OK qualquer coisa volta até aqui - funcionando.
-//
-//
-//
 
-// === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, CARD FUMÊ CENTRAL) ===
 // === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, LOGO GRANDE) ===
 function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
@@ -231,7 +225,222 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
 
 
+//
+//
+//
 
+// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
+
+// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
+function gerarImagemCardImovel(imovel, slugId) {
+  try {
+    const titulo = imovel.titulo || imovel.nome || "Imóvel em Carlópolis";
+    const cidade = imovel.cidade || "Carlópolis - PR";
+    const bairro = imovel.bairro ? `${imovel.bairro} • ${cidade}` : cidade;
+
+    const preco = imovel.preco || imovel.valor || "";
+    const precoFmt = preco
+      ? `R$ ${String(preco).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+      : "";
+
+    const quartos   = imovel.quartos   || imovel.dormitorios || 0;
+    const banheiros = imovel.banheiros || 0;
+    const vagas     = imovel.vagas     || imovel.garagens    || 0;
+    const area      = imovel.area      || imovel.m2          || "";
+
+    const detalhes = [
+      quartos   ? `${quartos} dorm`                     : "",
+      banheiros ? `${banheiros} banh`                   : "",
+      vagas     ? `${vagas} vaga${vagas > 1 ? "s" : ""}`: "",
+      area      ? `${area} m²`                          : ""
+    ].filter(Boolean).join(" • ");
+
+    const slug =
+      slugId ||
+      imovel.slug ||
+      (typeof normalizeName === "function"
+        ? normalizeName(titulo)
+        : String(titulo)
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, "-"));
+
+    const linkOla = slug
+      ? `www.olacarlopolis.com/#${slug}`
+      : "www.olacarlopolis.com/imoveis";
+
+    // fundo com logo
+    const fundoRepresa = "images/img_padrao_site/logo.png";
+
+    // ⬇⬇⬇ FOTO PRINCIPAL DO IMÓVEL (usa imovel.imagens) ⬇⬇⬇
+    const fotos = imovel.imagens || imovel.fotos || imovel.images || imovel.divulgacaoImages || [];
+    const imgImovel =
+      imovel.capa ||
+      (Array.isArray(fotos) && fotos.length
+        ? fotos[0]
+        : "images/img_padrao_site/padrao.jpg");
+
+    const host = document.createElement("div");
+    host.style.position = "fixed";
+    host.style.left = "-9999px";
+    host.style.top = "0";
+
+    host.innerHTML = `
+      <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
+
+        <!-- FUNDO -->
+        <div style="
+          position:absolute;
+          top:0; left:0;
+          width:100%; height:100%;
+          background:url('${fundoRepresa}') top center/cover no-repeat;
+          filter:brightness(0.90);
+        "></div>
+
+        <!-- GRADIENTE -->
+        <div style="
+          position:absolute;inset:0;
+          background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.90));
+        "></div>
+
+        <!-- CARD FUMÊ -->
+        <div style="
+          position:absolute;
+          top:55%;
+          left:50%;
+          transform:translate(-50%, -50%);
+          width:82%;
+          max-width:900px;
+          background:rgba(0,0,0,0.38);
+          padding:55px 50px 50px 50px;
+          border-radius:40px;
+          backdrop-filter:blur(7px);
+          color:#fff;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:30px;
+          text-align:center;
+          box-shadow:0 20px 50px rgba(0,0,0,.55);
+        ">
+
+          <!-- FOTO DO IMÓVEL -->
+          <div style="
+            width:100%;
+            max-width:950px;
+            border-radius:32px;
+            overflow:hidden;
+            background:#000;
+            box-shadow:
+              0 0 30px rgba(212,175,55,.30),
+              0 18px 45px rgba(0,0,0,.70);
+          ">
+            <img src="${imgImovel}" style="
+              display:block;
+              width:100%;
+              height:auto;
+              max-width:none;
+              object-fit:cover;
+            ">
+          </div>
+
+          <!-- TÍTULO / DETALHES / BAIRRO / PREÇO -->
+          <div style="max-width:95%;">
+            <div style="
+              font-size:60px;
+              font-weight:800;
+              line-height:1.05;
+              text-shadow:0 5px 18px rgba(0,0,0,.9);
+            ">
+              ${titulo}
+            </div>
+
+            ${detalhes ? `
+              <div style="
+                font-size:34px;
+                margin-top:10px;
+                opacity:.95;
+              ">
+                ${detalhes}
+              </div>
+            ` : ""}
+
+            <div style="
+              font-size:30px;
+              margin-top:8px;
+              opacity:.9;
+            ">
+              ${bairro}
+            </div>
+
+            ${precoFmt ? `
+              <div style="
+                font-size:46px;
+                font-weight:800;
+                color:#ffd966;
+                margin-top:14px;
+                text-shadow:0 0 16px rgba(0,0,0,.9);
+              ">
+                ${precoFmt}
+              </div>
+            ` : ""}
+          </div>
+
+          <!-- LINHA DOURADA -->
+          <div style="
+            width:70%;
+            height:2px;
+            background:linear-gradient(90deg, transparent, #d4af37, transparent);
+          "></div>
+
+          <!-- FRASE + LINK -->
+          <div>
+            <div style="
+              background:#fff;
+              color:#00539b;
+              display:inline-block;
+              padding:18px 52px;
+              font-size:38px;
+              font-weight:800;
+              border-radius:999px;
+              box-shadow:
+                0 7px 20px rgba(0,0,0,.45),
+                0 0 14px rgba(255,255,255,.9);
+            ">
+              Imóveis no Olá Carlópolis
+            </div>
+            <div style="
+              font-size:28px;
+              margin-top:10px;
+              opacity:.97;
+            ">
+              <br<br>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(host);
+
+    html2canvas(host.firstElementChild, {
+      useCORS: true,
+      backgroundColor: null,
+      scale: 2
+    })
+      .then((canvas) => {
+        const link = document.createElement("a");
+        link.download = `imovel-${titulo.replace(/\s+/g, "-")}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      })
+      .finally(() => host.remove());
+  } catch (e) {
+    console.error("Erro ao gerar card do imóvel:", e);
+  }
+}
 
 
 
@@ -996,6 +1205,39 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+// === Botão para gerar card de IMÓVEL ===
+document.addEventListener("click", (ev) => {
+    const btn = ev.target.closest(".btn-gerar-card-imovel");
+    if (!btn) return;
+
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    const imovelId = btn.getAttribute("data-imovel-id");
+    if (!imovelId) {
+        mostrarToast("❌ Não consegui identificar o imóvel.");
+        return;
+    }
+
+    // procura o imóvel na lista global
+    const lista = window.imoveis || [];
+    const imovel = lista.find(im => 
+        im.slug === imovelId || 
+        im.id === imovelId ||
+        im.nomeNormalizado === imovelId
+    );
+
+    if (!imovel) {
+        mostrarToast("❌ Imóvel não encontrado.");
+        return;
+    }
+
+    if (typeof gerarImagemCardImovel === "function") {
+        gerarImagemCardImovel(imovel, imovelId);
+    } else {
+        mostrarToast("❌ Função de gerar card não disponível.");
+    }
+});
 
 
 
@@ -2097,6 +2339,8 @@ document.addEventListener("DOMContentLoaded", function () {
     cafedamanhadosamigos: "s",
 
     campeonatoeliteredai: "s",
+    campeonatodepenalti:"s",
+    pedalaparana:"s",
 
 
 
@@ -5360,10 +5604,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ${responsavel ? `<div class="spec-chip chip-mini corretor-banner"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
 
      <!-- Código de referência -->
-  <div class="card-addr2 card-ref">
-    <i class="fa-solid fa-hashtag"></i>
-    Ref.: ${String(im.codRef || im.id || "").toUpperCase()}
-  </div>  </div>
+  <div class="card-addr2 card-ref"
+     style="cursor:pointer"
+     onclick="gerarImagemCardImovel(${JSON.stringify(im).replace(/"/g, '&quot;')})">
+  <i class="fa-solid fa-hashtag"></i>
+  Ref.: ${String(im.codRef || im.id || "").toUpperCase()}
+</div>
+  </div>
 
     
   </article>`;
@@ -10975,6 +11222,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+          {
+            image: "images/informacoes/eventos/5.jpg",
+            name: "Campeonato de Penalti",
+            date: "30/11/2025",
+            address: "Campo Vista Alegre",
+            
+            instagram: "https://www.instagram.com/p/DReuJFzAKy0/",
+            infoAdicional: "👉 Inscrições abertas até sábado!<br>👥 Duplas competindo juntas<Br>🏆 Premiação para 1º, 2º e 3º lugar"
+          },
 
 
 
@@ -10986,6 +11242,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99177-5226",
             instagram: "https://www.instagram.com/p/DQrRkEkgCno/",
             infoAdicional: "Prova individual, 3 dias de competição, maior visibilidade com a transmissão ao vivo e muita grana aos campeões!<br>Entre em contato e faça sua inscrição!"
+          },
+
+
+          {
+            image: "images/informacoes/eventos/6.jpg",
+            name: "Pedala Parana",
+            date: "14/12/2025",
+            address: "Bendito Salles, 2639 ( Caldo de Cana Amaral )",
+            contact: "(41) 99950-9291",
+            instagram: "https://www.instagram.com/p/DRhwprDAC-D/",
+            infoAdicional: "Vem aí a 3ª Edição do Pedala Paraná – Carlópolis!<br>Para fechar 2025 com chave de ouro, estamos preparando mais um grande evento que vai movimentar o esporte e reunir apaixonados por ciclismo em nossa cidade e região.<Br>No dia 14 de dezembro, acontece a 3ª edição do Pedala Paraná"
           },
 
 
