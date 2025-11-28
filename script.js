@@ -234,26 +234,44 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 function gerarImagemCardImovel(imovel, slugId) {
   try {
     const titulo = imovel.titulo || imovel.nome || "Imóvel em Carlópolis";
-    const cidade = imovel.cidade || "Carlópolis - PR";
-     const quartos   = imovel.quartos   || imovel.dormitorios || 0;
-    const banheiros = imovel.banheiros || 0;
-    const vagas     = imovel.vagas     || imovel.garagens    || 0;
-    const area      = imovel.area      || imovel.m2          || "";
+const cidade = imovel.cidade || "Carlópolis - PR";
 
-    // 🔹 DESCRIÇÃO – vamos usar isso no lugar de quartos/banheiros/preço
-    const descricaoBruta =
-      imovel.descricao ||
-      imovel.descricaoImovel ||
-      imovel.observacao ||
-      imovel.obs ||
-      "";
+const quartos   = imovel.quartos   || imovel.dormitorios || 0;
+const banheiros = imovel.banheiros || 0;
+const vagas     = imovel.vagas     || imovel.garagens    || 0;
+const area      = imovel.construcao || imovel.area || imovel.m2 || "";
 
-       const detalhes = [
-      quartos   ? `${quartos} dorm`                     : "",
-      banheiros ? `${banheiros} banh`                   : "",
-      vagas     ? `${vagas} vaga${vagas > 1 ? "s" : ""}`: "",
-      area      ? `${area} m²`                          : ""
-    ].filter(Boolean).join(" • ");
+// 🔹 pega valor bruto de suítes de várias formas possíveis
+const suitesFonte =
+  imovel.suite ??
+  imovel.suites ??
+  imovel.qtSuite ??
+  imovel.qtdSuites ??
+  imovel.qtd_suite ??
+  imovel.qtsuite ??
+  imovel.suiteQuantidade ??
+  0;
+
+// 🔹 normaliza (garante número mesmo se vier "1 suíte")
+const suites = Number(String(suitesFonte).replace(/\D/g, "")) || 0;
+
+// 🔹 DESCRIÇÃO – vamos usar isso no lugar de quartos/banheiros/preço
+const descricaoBruta =
+  imovel.descricao ||
+  imovel.descricaoImovel ||
+  imovel.observacao ||
+  imovel.obs ||
+  "";
+
+// 🔹 linha de detalhes: dorm, suíte (se tiver), banh, vagas, área
+const detalhes = [
+  quartos   ? `${quartos} dorm` : "",
+  suites > 0 ? `${suites} suíte${suites > 1 ? "s" : ""}` : "",
+  banheiros ? `${banheiros} banh` : "",
+  vagas     ? `${vagas} vaga${vagas > 1 ? "s" : ""}` : "",
+  area      ? `${area} m²` : ""
+].filter(Boolean).join(" • ");
+
 
     // limpa HTML e quebra-linha
     const descricaoTexto = String(descricaoBruta)
@@ -4405,7 +4423,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       titulo: "Chacara a 12km Da Cidade",
       descricao: "Chacara toda cercada de arame liso, Gramado ao redor da casa, Estrada empedrada até a represa podendo descer embarcações, Quartos com ar condicionado<br>Barracão grande de estrutura metalica com cozinha, deck de madeira e banheiro<br>Edicula com cozinha, banheiro e quarto com ar condicionado",
       endereco: "Bairro Espirito Santo",
-      suite: "0",
+      suite: "Não",
       banheiros: 1,
       salas: 1,
       cozinhas: 1,
@@ -4587,7 +4605,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quintal: "Sim",
       piscina: "Não",
       salas: 1,
-      suite: "Sim",
+      suite: "1",
       vagas: 2,
       corretores: ["Cesar Melo - 38.105 F"],
       telefone: "43 99678-9652",  // Corretor ou propretario
@@ -4669,7 +4687,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quintal: "Sim",
       piscina: "Sim",
       salas: 1,
-      suite: "Sim",
+      suite: "1",
       vagas: 2,
       corretores: ["Cesar Melo - 38.105 F"],
       telefone: "43 99678-9652",  // Corretor ou propretario
@@ -4745,7 +4763,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       titulo: "Imóvel no Residencial Garden Club",
       descricao: "Piscina privativa com espaço gourmet, Living espaçoso e integrado, Acabamentos de alto padrão, Iluminação natural e ambientes climatizados. Documentação OK",
       endereco: "Residencial Garden Club - Carlópolis",
-      suite: "Sim",
+      suite: "1",
       banheiros: 4,
       salas: 2,
       cozinhas: 1,
@@ -4793,7 +4811,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       
       descricao: "Imóvel moderno e bem distribuído, localizado em bairro tranquilo e valorizado. Aceita veículo na negociação.",
       endereco: "Residencial Itália",
-      suite: "Sim",
+      suite: "1",
       banheiros: 1,
       salas: 1,
       cozinhas: 1,
