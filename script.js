@@ -235,6 +235,10 @@ function gerarImagemCardImovel(imovel, slugId) {
   try {
     const titulo = imovel.titulo || imovel.nome || "Imóvel em Carlópolis";
     const cidade = imovel.cidade || "Carlópolis - PR";
+     const quartos   = imovel.quartos   || imovel.dormitorios || 0;
+    const banheiros = imovel.banheiros || 0;
+    const vagas     = imovel.vagas     || imovel.garagens    || 0;
+    const area      = imovel.area      || imovel.m2          || "";
 
     // 🔹 DESCRIÇÃO – vamos usar isso no lugar de quartos/banheiros/preço
     const descricaoBruta =
@@ -243,6 +247,13 @@ function gerarImagemCardImovel(imovel, slugId) {
       imovel.observacao ||
       imovel.obs ||
       "";
+
+       const detalhes = [
+      quartos   ? `${quartos} dorm`                     : "",
+      banheiros ? `${banheiros} banh`                   : "",
+      vagas     ? `${vagas} vaga${vagas > 1 ? "s" : ""}`: "",
+      area      ? `${area} m²`                          : ""
+    ].filter(Boolean).join(" • ");
 
     // limpa HTML e quebra-linha
     const descricaoTexto = String(descricaoBruta)
@@ -429,6 +440,36 @@ function gerarImagemCardImovel(imovel, slugId) {
    
 
 </div>
+
+${detalhes ? `
+<!-- CARD DE DETALHES DO IMÓVEL -->
+<div style="
+  width:100%;
+  max-width:900px;
+  padding:30px 40px;
+  border-radius:22px;
+
+  border:1.6px solid rgba(255,255,255,0.22); /* borda fina */
+  background:rgba(0,0,0,0.20);
+  backdrop-filter:blur(4px);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+">
+   
+
+    <div style="
+      font-size:34px;
+      opacity:.96;
+      line-height:1.5;
+    ">
+      ${detalhes}
+    </div>
+</div>
+` : ""}
+
 <br>
 
           <!-- LINHA DOURADA -->
