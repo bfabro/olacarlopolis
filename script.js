@@ -323,7 +323,7 @@ function gerarImagemCardImovel(imovel, slugId) {
           top:55%;
           left:50%;
           transform:translate(-50%, -50%);
-          width:82%;
+          width:92%;
           max-width:900px;
           background:rgba(0,0,0,0.38);
           padding:55px 50px 50px 50px;
@@ -342,33 +342,32 @@ function gerarImagemCardImovel(imovel, slugId) {
         
 
       <!-- IMAGEM DO CLIENTE – GIGANTE, SEM DISTORCER -->
-<div style="
-  width:92%;
-  max-width:950px;
-  border-radius:32px;
-  overflow:hidden;
-  background:#000;  /* ajuda quando a logo tem fundo recortado */
-  box-shadow:
-    0 0 30px rgba(212,175,55,.40),
-    0 18px 45px rgba(0,0,0,.70);
-">
-  <img src="${imgImovel}" style="
-    display:block;
-    width:100%;
-    height:auto;      /* mantém proporção original */
-    max-width:none;   /* não limita a 425px do CSS global */
-    object-fit:contain;  /* mostra a logo inteira, sem corte */
-  ">
-</div>
+      <div style="
+        width:98%;
+        max-width:950px;
+        border-radius:32px;
+        overflow:hidden;
+        background:#000;  /* ajuda quando a logo tem fundo recortado */
+        box-shadow:
+          0 0 30px rgba(212,175,55,.40),
+          0 18px 45px rgba(0,0,0,.70);
+      ">
+        <img src="${imgImovel}" style="
+          display:block;
+          width:100%;
+          height:auto;      /* mantém proporção original */
+          max-width:none;   /* não limita a 425px do CSS global */
+          object-fit:cover;  /* mostra a logo inteira, sem corte */
+        ">
 
-<div style="
+        <div style="
   position:absolute;
-  top:25px;
-  left:30px;
+  top:55px;
+  left:57px;
   background:linear-gradient(135deg, #1f1f1f, #000000);
-  padding:22px 36px;
+  padding:20px 30px;
   border-radius:22px;
-  font-size:30px;
+  font-size:28px;
   font-weight:900;
   color:#ffffff;
   z-index:50;
@@ -380,6 +379,9 @@ function gerarImagemCardImovel(imovel, slugId) {
 ">
   ${valorBr}
 </div>
+      </div>
+
+
 
 
 
@@ -398,8 +400,8 @@ function gerarImagemCardImovel(imovel, slugId) {
             ${descricaoCurta
         ? `
             <div style="
-              font-size:30px;
-              margin-top:14px;
+              font-size:34px;
+              margin-top:12px;
               opacity:.95;
               line-height:1.4;
               white-space:pre-line;
