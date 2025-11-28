@@ -269,7 +269,7 @@ const detalhes = [
   suites > 0 ? `${suites} suíte${suites > 1 ? "s" : ""}` : "",
   banheiros ? `${banheiros} banh` : "",
   vagas     ? `${vagas} vaga${vagas > 1 ? "s" : ""}` : "",
-  area      ? `${area} m²` : ""
+  area      ? `${area} m² constr` : ""
 ].filter(Boolean).join(" • ");
 
 
