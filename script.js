@@ -4791,7 +4791,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       vagas: 2,
       corretores: ["Luiz Vilas Boas - 52.194"],
       
-      descricao: "Imóvel moderno, bem distribuído e projetado para oferecer conforto e praticidade no dia a dia. Localizada em um dos bairros mais tranquilos e valorizados da cidade. <br>Aceita-se veículo como parte do pagamento, tornando a negociação ainda mais facilitada.",
+      descricao: "Imóvel moderno e bem distribuído, localizado em bairro tranquilo e valorizado. Aceita veículo na negociação.",
       endereco: "Residencial Itália",
       suite: "Sim",
       banheiros: 1,
