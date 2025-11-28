@@ -228,11 +228,6 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 //
 //
 //
-
-// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
-
-// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
-// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
 // === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
 function gerarImagemCardImovel(imovel, slugId) {
   try {
@@ -363,18 +358,6 @@ function gerarImagemCardImovel(imovel, slugId) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
           <!-- TÍTULO + DESCRIÇÃO + CIDADE -->
           <div style="max-width:95%;">
             <div style="
@@ -396,7 +379,7 @@ function gerarImagemCardImovel(imovel, slugId) {
               line-height:1.4;
               white-space:pre-line;
             ">
-              ${descricaoCurta}
+              ${descricaoCurta}<Br>
             </div>
             `
                 : ""
