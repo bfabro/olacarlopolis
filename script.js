@@ -400,8 +400,8 @@ function gerarImagemCardImovel(imovel, slugId) {
             ${descricaoCurta
         ? `
             <div style="
-              font-size:34px;
-              margin-top:12px;
+              font-size:38px;
+              margin-top:10px;
               opacity:.95;
               line-height:1.4;
               white-space:pre-line;
