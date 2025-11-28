@@ -56,10 +56,10 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       (typeof normalizeName === "function"
         ? normalizeName(establishment.name || "")
         : String(establishment.name || "")
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, "-"));
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, "-"));
 
     const linkOla = slug
       ? `www.olacarlopolis.com/#${slug}`
@@ -261,10 +261,10 @@ function gerarImagemCardImovel(imovel, slugId) {
       (typeof normalizeName === "function"
         ? normalizeName(titulo)
         : String(titulo)
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, "-"));
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, "-"));
 
     const linkOla = slug
       ? `www.olacarlopolis.com/#${slug}`
@@ -292,7 +292,13 @@ function gerarImagemCardImovel(imovel, slugId) {
     host.style.position = "fixed";
     host.style.left = "-9999px";
     host.style.top = "0";
-
+    const valorBr =
+      imovel.valor
+        ? Number(String(imovel.valor).replace(/\D/g, "")).toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL"
+        })
+        : "";
     host.innerHTML = `
       <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
 
@@ -355,6 +361,26 @@ function gerarImagemCardImovel(imovel, slugId) {
   ">
 </div>
 
+<div style="
+  position:absolute;
+  top:25px;
+  left:30px;
+  background:linear-gradient(135deg, #1f1f1f, #000000);
+  padding:22px 36px;
+  border-radius:22px;
+  font-size:30px;
+  font-weight:900;
+  color:#ffffff;
+  z-index:50;
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.45),
+    0 0 12px rgba(255,255,255,.25);
+  backdrop-filter:blur(5px);
+  border:2px solid rgba(255,255,255,0.35);
+">
+  ${valorBr}
+</div>
+
 
 
 
@@ -369,9 +395,8 @@ function gerarImagemCardImovel(imovel, slugId) {
               ${titulo}
             </div>
 
-            ${
-              descricaoCurta
-                ? `
+            ${descricaoCurta
+        ? `
             <div style="
               font-size:30px;
               margin-top:14px;
@@ -382,8 +407,8 @@ function gerarImagemCardImovel(imovel, slugId) {
               ${descricaoCurta}<Br>
             </div>
             `
-                : ""
-            }
+        : ""
+      }
 
         <Br>
           </div>
@@ -1203,8 +1228,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-// === Botão para gerar card de IMÓVEL ===
-document.addEventListener("click", (ev) => {
+  // === Botão para gerar card de IMÓVEL ===
+  document.addEventListener("click", (ev) => {
     const btn = ev.target.closest(".btn-gerar-card-imovel");
     if (!btn) return;
 
@@ -1213,29 +1238,29 @@ document.addEventListener("click", (ev) => {
 
     const imovelId = btn.getAttribute("data-imovel-id");
     if (!imovelId) {
-        mostrarToast("❌ Não consegui identificar o imóvel.");
-        return;
+      mostrarToast("❌ Não consegui identificar o imóvel.");
+      return;
     }
 
     // procura o imóvel na lista global
     const lista = window.imoveis || [];
-    const imovel = lista.find(im => 
-        im.slug === imovelId || 
-        im.id === imovelId ||
-        im.nomeNormalizado === imovelId
+    const imovel = lista.find(im =>
+      im.slug === imovelId ||
+      im.id === imovelId ||
+      im.nomeNormalizado === imovelId
     );
 
     if (!imovel) {
-        mostrarToast("❌ Imóvel não encontrado.");
-        return;
+      mostrarToast("❌ Imóvel não encontrado.");
+      return;
     }
 
     if (typeof gerarImagemCardImovel === "function") {
-        gerarImagemCardImovel(imovel, imovelId);
+      gerarImagemCardImovel(imovel, imovelId);
     } else {
-        mostrarToast("❌ Função de gerar card não disponível.");
+      mostrarToast("❌ Função de gerar card não disponível.");
     }
-});
+  });
 
 
 
@@ -2337,8 +2362,8 @@ document.addEventListener("click", (ev) => {
     cafedamanhadosamigos: "s",
 
     campeonatoeliteredai: "s",
-    campeonatodepenalti:"s",
-    pedalaparana:"s",
+    campeonatodepenalti: "s",
+    pedalaparana: "s",
 
 
 
@@ -11225,7 +11250,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Campeonato de Penalti",
             date: "30/11/2025",
             address: "Campo Vista Alegre",
-            
+
             instagram: "https://www.instagram.com/p/DReuJFzAKy0/",
             infoAdicional: "👉 Inscrições abertas até sábado!<br>👥 Duplas competindo juntas<Br>🏆 Premiação para 1º, 2º e 3º lugar"
           },
