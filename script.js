@@ -4804,7 +4804,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       titulo: "Casa à venda no Residencial Itália",
       quartos: 3,
       valor: 400000,
-      piscina: "Não",
+      piscina: false,
       churrasqueira: "Não",
       vagas: 2,
       corretores: ["Luiz Vilas Boas - 52.194"],      
