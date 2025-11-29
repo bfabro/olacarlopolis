@@ -99,7 +99,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         <!-- GRADIENTE SUAVE -->
         <div style="
           position:absolute;inset:0;
-          background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.85));
+           background:linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.45));
         "></div>
 
         <!-- CARD FUMÊ COM LOGO GRANDE -->
@@ -344,8 +344,8 @@ const detalhes = [
 
         <!-- GRADIENTE -->
         <div style="
-          position:absolute;inset:0;
-          background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.90));
+          position:absolute;inset:0;      
+          background:linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.45));
         "></div>
 
         <!-- CARD FUMÊ -->
