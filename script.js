@@ -4848,7 +4848,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       churrasqueira: false,
       vagas: 1,
       corretores: ["Luiz Vilas Boas - 52.194"],      
-      descricao: "Imóvel pronto para morar, bem planejado e situado em terreno de esquina. Fica em um bairro tranquilo e valorizado, ideal para quem quer sair do aluguel. Aceita financiamento e negociações com carro ou terreno como parte do pagamento.",
+      descricao: "Imóvel pronto para morar, bem planejado, terreno de esquina. Fica em um bairro tranquilo e valorizado, ideal para sair do aluguel. Aceita financiamento e negociações com carro ou terreno como parte do pagamento.",
       endereco: "Novo Horizonte III",
       suite: "Não",
       banheiros: 1,
