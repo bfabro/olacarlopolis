@@ -93,7 +93,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           top:0; left:0;
           width:100%; height:100%;
           background:url('${fundoRepresa}') top center/cover no-repeat;
-          filter:brightness(0.90);
+          filter:brightness(1.20);
         "></div>
 
         <!-- GRADIENTE SUAVE -->
@@ -339,7 +339,7 @@ const detalhes = [
           top:0; left:0;
           width:100%; height:100%;
           background:url('${fundoRepresa}') top center/cover no-repeat;
-          filter:brightness(0.90);
+          filter:brightness(1.75) contrast(0.85);
         "></div>
 
         <!-- GRADIENTE -->
