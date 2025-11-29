@@ -4862,7 +4862,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/casa2/01.jpeg",
         "images/imoveis/luiz/venda/casa2/02.jpeg",
         "images/imoveis/luiz/venda/casa2/03.jpeg",
-        "images/imoveis/luiz/venda/casa1/04.jpeg",
+        "images/imoveis/luiz/venda/casa2/04.jpeg",
         "images/imoveis/luiz/venda/casa2/05.jpeg",
         "images/imoveis/luiz/venda/casa2/04.jpeg",
         "images/imoveis/luiz/venda/casa2/07.jpeg",
