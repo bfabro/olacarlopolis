@@ -4841,7 +4841,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       codRef: "C_015",
       tipo: "venda",
       procura: "casa", 
-      titulo: "Casa à venda no Residencial Novo Horizonte III",
+      titulo: "Casa no Residencial Novo Horizonte III",
       quartos: 2,
       valor: 215000,
       piscina: false,
