@@ -4796,7 +4796,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-{
+    {
       id: "casa14v",
       codRef: "C_014",
       tipo: "venda",
@@ -4807,8 +4807,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       piscina: "Não",
       churrasqueira: "Não",
       vagas: 2,
-      corretores: ["Luiz Vilas Boas - 52.194"],
-      
+      corretores: ["Luiz Vilas Boas - 52.194"],      
       descricao: "Imóvel moderno e bem distribuído, localizado em bairro tranquilo e valorizado. Aceita veículo na negociação.",
       endereco: "Residencial Itália",
       suite: "1",
@@ -4831,6 +4830,46 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/casa1/9.jpg",
         "images/imoveis/luiz/venda/casa1/10.jpg",
         "images/imoveis/luiz/venda/casa1/11.jpg",
+       
+      ],
+   
+
+    },
+
+    {
+      id: "casa15v",
+      codRef: "C_015",
+      tipo: "venda",
+      procura: "casa", 
+      titulo: "Casa à venda no Residencial Novo Horizonte III – Carlópolis/PR",
+      quartos: 2,
+      valor: 215000,
+      piscina: "Não",
+      churrasqueira: "Não",
+      vagas: 1,
+      corretores: ["Luiz Vilas Boas - 52.194"],      
+      descricao: "Imóvel pronto para morar, bem planejado e situado em terreno de esquina. Fica em um bairro tranquilo e valorizado, ideal para quem quer sair do aluguel. Aceita financiamento e negociações com carro ou terreno como parte do pagamento.",
+      endereco: "Novo Horizonte III",
+      suite: "Não",
+      banheiros: 1,
+      salas: 1,
+      cozinhas: 1,
+      area: 117,
+      construcao: 49,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 98803-4095", // Corretor ou propretario
+      imagens: [
+        "images/imoveis/luiz/venda/casa2/01.jpeg",
+        "images/imoveis/luiz/venda/casa2/02.jpeg",
+        "images/imoveis/luiz/venda/casa2/03.jpeg",
+        "images/imoveis/luiz/venda/casa1/04.jpeg",
+        "images/imoveis/luiz/venda/casa2/05.jpeg",
+        "images/imoveis/luiz/venda/casa2/04.jpeg",
+        "images/imoveis/luiz/venda/casa2/07.jpeg",
+        "images/imoveis/luiz/venda/casa2/08.jpeg",
+        "images/imoveis/luiz/venda/casa2/09.jpeg",
+        "images/imoveis/luiz/venda/casa2/10.jpeg",
+        "images/imoveis/luiz/venda/casa2/11.jpeg",
        
       ],
    
@@ -13665,6 +13704,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             ],
 
           },
+
+
+          
+
+
+
 
 
 
