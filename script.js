@@ -78,6 +78,16 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         ? imagens[0]
         : "images/img_padrao_site/padrao.jpg");
 
+
+
+        //
+        //
+
+        //
+
+        //
+
+        //
     // Área oculta onde o html2canvas captura
     const host = document.createElement("div");
     host.style.position = "fixed";
@@ -1738,8 +1748,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "taticonik", "tokfino", "oficinadocelular", "sereia", "t&mcollection",
-
+    "tokfino", "oficinadocelular", "seiza", 
   ];
 
   function montarCarrosselDivulgacao() {
@@ -1781,12 +1790,26 @@ document.addEventListener("DOMContentLoaded", function () {
         cat.establishments?.some(e => e.name === est.name)
       )?.title || "";
 
-      const imagens = est.novidadesImages || [];
+     // 🔹 Monta o array de imagens da home:
+//    - primeiro a foto de perfil / logo
+//    - depois as fotos de novidades
+const imagensPerfil = [];
+if (est.image) imagensPerfil.push(est.image);     // foto de perfil do comércio
+if (est.logo && est.logo !== est.image) {
+  imagensPerfil.push(est.logo);                   // logo, se for diferente
+}
 
-      // imagem inicial (como já era)
-      const imagemInicial = destaquesFixos.includes(est.nomeNormalizado)
-        ? imagens[0] // sempre a primeira imagem para fixos
-        : imagens[Math.floor(Math.random() * imagens.length)];
+const imagensBase = Array.isArray(est.novidadesImages)
+  ? est.novidadesImages
+  : [];
+
+const imagens = [...new Set([...imagensPerfil, ...imagensBase])]; // remove duplicadas
+
+// 🔥 Sempre começa pela foto de perfil/logo
+const imagemInicial = imagens[0];
+
+
+   
 
       const indexImagem = imagens.indexOf(imagemInicial);
       const texto = est.novidadesDescriptions?.[indexImagem] || "Confira nossas novidades!";
@@ -5178,6 +5201,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     
         */
   ];
+
+
+
+
+  /// C
+
+  
 
   // monta página
   function mostrarImoveisV2() {
