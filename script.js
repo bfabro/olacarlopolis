@@ -5087,28 +5087,32 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     },
 
 
-    /*
-    
+
         {
-          id: "ter5",
-          tipo: "venda",
-          procura: "terreno", // ou "terreno", "rural", etc.
-          titulo: "Terreno - Residencial Murador ",
-          descricao: "Bairro em expansão, com valorização garantida nos próximos anos",
-          endereco: "Residencial Murador ",      
-          area: 180,
-          valor: 108000,
-          telefone: "43 99678-9652",
-          imagens: [
-            "images/imoveis/cesar/venda/terreno/terreno2/1.jpg",
-             "images/imoveis/cesar/venda/terreno/terreno2/2.jpg",
-           
-          
-          ],
-          corretores: ["Cesar Melo - 38.105 F"],
-    
-        },
-    */
+      id: "ter9",
+      codRef: "T_009",     
+      tipo: "venda",
+      titulo: "Terreno de esquina à venda no Residencial Novo Horizonte II",
+      descricao: "Terreno murado, pronto para iniciar a obra, com padrão de energia elétrica e água já instalados",
+      endereco: "Residencial Novo Horizonte II",
+      area: "234m² 13x18",
+      valor: 95000,
+      telefone: "43 98803-4095",
+      corretores: ["Luiz Vilas Boas - 52.194"],
+      imagens: [
+        
+        "images/imoveis/luiz/venda/terreno1/01.jpg",
+        "images/imoveis/luiz/venda/terreno1/02.jpg",
+        "images/imoveis/luiz/venda/terreno1/03.jpg",
+        "images/imoveis/luiz/venda/terreno1/04.jpg",
+       
+        
+        
+        
+        ],
+     
+
+    },
 
     /////////////////// GALPAO
 
