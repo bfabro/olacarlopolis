@@ -5090,7 +5090,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
         {
       id: "ter9",
-      codRef: "T_009",     
+      codRef: "T_009",  
+      procura: "terreno", // ou "terreno", "rural", etc.   
       tipo: "venda",
       titulo: "Terreno de esquina à venda no Residencial Novo Horizonte II",
       descricao: "Terreno murado, pronto para iniciar a obra, com padrão de energia elétrica e água já instalados",
