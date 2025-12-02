@@ -5105,9 +5105,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/terreno1/02.jpg",
         "images/imoveis/luiz/venda/terreno1/03.jpg",
         "images/imoveis/luiz/venda/terreno1/04.jpg",
-       
-        
-        
         
         ],
      
