@@ -2462,7 +2462,7 @@ const imagemInicial = imagens[0];
     cafedamanhadosamigos: "s",
 
     campeonatoeliteredai: "s",
-    campeonatodepenalti: "s",
+  
     pedalaparana: "s",
 
 
@@ -5078,9 +5078,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       proprietario: "Fabio Tobia",
       imagens: [
         "images/imoveis/fabioTobia/venda/terreno/terreno1/1.jpg",
-
-
-
       ],
 
 
@@ -11447,15 +11444,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/informacoes/eventos/5.jpg",
-            name: "Campeonato de Penalti",
-            date: "30/11/2025",
-            address: "Campo Vista Alegre",
-
-            instagram: "https://www.instagram.com/p/DReuJFzAKy0/",
-            infoAdicional: "👉 Inscrições abertas até sábado!<br>👥 Duplas competindo juntas<Br>🏆 Premiação para 1º, 2º e 3º lugar"
-          },
+         
 
 
 
