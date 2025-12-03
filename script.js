@@ -2490,7 +2490,6 @@ const imagemInicial = imagens[0];
 
 
 
-
   // Função para adicionar contadores de slides
 
 
