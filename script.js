@@ -46,6 +46,7 @@ function somenteDigitos(str) {
 
 
 // === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, LOGO GRANDE) ===
+// === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, LOGO GRANDE) ===
 function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
     const nome = establishment.name || "Comércio em Carlópolis";
@@ -56,10 +57,10 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       (typeof normalizeName === "function"
         ? normalizeName(establishment.name || "")
         : String(establishment.name || "")
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "-"));
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, "-"));
 
     const linkOla = slug
       ? `www.olacarlopolis.com/#${slug}`
@@ -68,7 +69,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     // Fundo (logo Olá Carlópolis)
     const fundoRepresa = "images/img_padrao_site/logo.png";
 
-    // Logo / foto do cliente
+    // Logo / foto do cliente (MANTIDA COMO ESTÁ)
     const imagens =
       establishment.novidadesImages || establishment.divulgacaoImages || [];
     const imgLogoCliente =
@@ -78,16 +79,28 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         ? imagens[0]
         : "images/img_padrao_site/padrao.jpg");
 
+    // 🔹 Horário de funcionamento (pega de vários campos possíveis)
+// Captura todos os campos possíveis
+let funcionamento =
+  establishment.horario ||
+  establishment.funcionamento ||
+  establishment.horarioFuncionamento ||
+  establishment.horarioAtendimento ||
+  establishment.operacao ||
+  establishment.hours ||
+  establishment.aberto ||
+  (establishment.schedule ? establishment.schedule.text || establishment.schedule.horario : "") ||
+  "";
+
+// Se vier um objeto → transformar em texto legível
+if (typeof funcionamento === "object" && funcionamento !== null) {
+  // Se for um objeto do tipo { segunda: "...", terca: "...", ... }
+  funcionamento = Object.entries(funcionamento)
+    .map(([dia, valor]) => `${dia}: ${valor}`)
+    .join(" | ");
+}
 
 
-    //
-    //
-
-    //
-
-    //
-
-    //
     // Área oculta onde o html2canvas captura
     const host = document.createElement("div");
     host.style.position = "fixed";
@@ -97,7 +110,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     host.innerHTML = `
       <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
 
-        <!-- FUNDO AJUSTADO (SEM SOBRAR NADA EM CIMA) -->
+        <!-- FUNDO AJUSTADO -->
         <div style="
           position:absolute;
           top:0; left:0;
@@ -109,20 +122,18 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         <!-- GRADIENTE SUAVE -->
         <div style="
           position:absolute;inset:0;
-           background:linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.45));
+          background:linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.45));
         "></div>
 
-        <!-- CARD FUMÊ COM LOGO GRANDE -->
+        <!-- CARD FUMÊ -->
         <div style="
           position:absolute;
-          top:55%;                 /* sobe/desce o bloco todo */
+          top:45%;
           left:50%;
           transform:translate(-50%, -50%);
-          width:82%;
-          max-width:900px;
-          background:rgba(0,0,0,0.35);
           width:96%;
           max-width:1050px;
+          background:rgba(0,0,0,0.35);
           padding:55px 50px 50px 50px;
           border-radius:40px;
           backdrop-filter:blur(7px);
@@ -135,48 +146,73 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
           box-shadow:0 20px 50px rgba(0,0,0,.55);
         ">
 
-         <!-- IMAGEM DO CLIENTE – GIGANTE, SEM DISTORCER -->
-<div style="
-  width:96%;
-  max-width:1050px;
-  border-radius:32px;
-  overflow:hidden;
-  background:#000;  /* ajuda quando a logo tem fundo recortado */
-  box-shadow:
-    0 0 30px rgba(212,175,55,.40),
-    0 18px 45px rgba(0,0,0,.70);
-">
-  <img src="${imgLogoCliente}" style="
-    display:block;
-    width:100%;
-    height:auto;      /* mantém proporção original */
-    max-width:none;   /* não limita a 425px do CSS global */
-    object-fit:contain;  /* mostra a logo inteira, sem corte */
-  ">
-</div>
+          <!-- IMAGEM DO CLIENTE – MANTIDA -->
+          <div style="
+            width:96%;
+            max-width:1050px;
+            border-radius:32px;
+            overflow:hidden;
+            background:#000;
+            box-shadow:
+              0 0 30px rgba(212,175,55,.40),
+              0 18px 45px rgba(0,0,0,.70);
+          ">
+            <img src="${imgLogoCliente}" style="
+              display:block;
+              width:100%;
+              height:auto;
+              max-width:none;
+              object-fit:contain;
+            ">
+          </div>
 
-
-
-          <!-- NOME + CATEGORIA -->
-          <div style="max-width:95%;">
+          <!-- BLOCO DE INFORMAÇÕES COM BORDA (PADRÃO IMÓVEIS) -->
+          <div style="
+            width:100%;
+            max-width:900px;
+            padding:35px 40px;
+            border-radius:22px;
+            border:1.6px solid rgba(255,255,255,0.22);
+            background:rgba(0,0,0,0.20);
+            backdrop-filter:blur(4px);
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:18px;
+          ">
+            <!-- NOME -->
             <div style="
-              font-size:70px;
+              font-size:60px;
               font-weight:800;
               line-height:1.05;
               text-shadow:0 5px 18px rgba(0,0,0,.9);
             ">
               ${nome}
             </div>
-            <div style="
-              font-size:40px;
-              margin-top:8px;
-              opacity:.95;
-              font-weight:600;
-            ">
-              ${categoriaAtual || "Carlópolis - PR "}<Br> <Br>
-            </div>
-          </div>
 
+            <!-- CATEGORIA -->
+            <div style="
+              font-size:38px;
+              opacity:.96;
+            ">
+              ${categoriaAtual || "Carlópolis - PR"}
+            </div>
+
+            <!-- HORÁRIO DE FUNCIONAMENTO -->
+            ${
+              funcionamento
+                ? `
+            <div style="
+              font-size:34px;
+              opacity:.96;
+              margin-top:4px;
+            ">
+              ⏰ ${funcionamento}
+            </div>`
+                : ""
+            }
+          </div>
+<br>
           <!-- LINHA DOURADA -->
           <div style="
             width:70%;
@@ -184,7 +220,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
             background:linear-gradient(90deg, transparent, #d4af37, transparent);
           "></div>
 
-          <!-- FRASE FINAL + LINK -->
+          <!-- FRASE FINAL -->
           <div style="margin-top:6px;">
             <div style="
               background:#fff;
@@ -205,12 +241,11 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
               margin-top:10px;
               opacity:.97;
             ">
-              <Br>
+              <br> <br>
             </div>
           </div>
 
         </div>
-
       </div>
     `;
 
@@ -232,6 +267,7 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
     console.error("Erro ao gerar card:", e);
   }
 }
+
 
 
 
