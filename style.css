@@ -8326,6 +8326,476 @@ width: 100%;
 
 
 
+/* ================== PÁGINA PLANO ACADEMIA COM IA – NOVO LAYOUT ================== */
+
+.ia-academia-page {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Cabeçalho da página */
+
+.ia-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: radial-gradient(circle at top left, #1b60d6 0, #0c1729 45%, #050711 100%);
+  color: #fff;
+}
+
+.ia-page-title h2 {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+}
+
+.ia-page-title p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.ia-page-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  margin-bottom: 6px;
+  font-size: 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.ia-header-share {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.ia-header-share:hover {
+  transform: translateY(-1px) scale(1.03);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Faixa de passos */
+
+.ia-steps-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ia-step-chip {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.ia-step-label {
+  font-weight: 600;
+  color: #1b60d6;
+}
+
+.ia-step-text {
+  color: #333;
+}
+
+/* Grid principal */
+
+.ia-academia-grid.ia-new-layout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.2fr);
+  gap: 14px;
+}
+
+.ia-sidebar-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Cards base */
+
+.ia-card {
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ia-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.ia-card-head h4 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.ia-card-head p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.ia-card-kicker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1b60d6;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.ia-card-icon,
+.ia-card-icon-ai {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(27, 96, 214, 0.08);
+  color: #1b60d6;
+  flex-shrink: 0;
+}
+
+.ia-card-icon-ai {
+  background: rgba(250, 204, 21, 0.08);
+  color: #d97706;
+}
+
+.ia-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ia-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.ia-footer-note {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Form */
+
+.ia-academia-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+}
+
+.ia-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.85rem;
+}
+
+.ia-field-full {
+  grid-column: 1 / -1;
+}
+
+.ia-academia-form label {
+  font-weight: 500;
+  color: #222;
+}
+
+.ia-academia-form input,
+.ia-academia-form select,
+.ia-academia-form textarea {
+  padding: 7px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.ia-academia-form input:focus,
+.ia-academia-form select:focus,
+.ia-academia-form textarea:focus {
+  border-color: #1b60d6;
+  box-shadow: 0 0 0 1px rgba(27, 96, 214, 0.25);
+}
+
+.ia-academia-form textarea {
+  resize: vertical;
+}
+
+.ia-help-text {
+  font-size: 0.7rem;
+  color: #777;
+}
+
+/* Objetivos em formato chip */
+
+.objetivos-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.objetivo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fafafa;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.objetivo-chip input {
+  display: none;
+}
+
+.objetivo-chip span {
+  white-space: nowrap;
+}
+
+.objetivo-chip input:checked + span,
+.objetivo-chip:hover span {
+  color: #1b60d6;
+  font-weight: 600;
+}
+
+/* Botão gerar IA */
+
+.ia-academia-btn {
+  width: 100%;
+  border-radius: 999px;
+  padding: 9px 12px;
+  border: none;
+  background: linear-gradient(90deg, #1b60d6, #2563eb);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+}
+
+.ia-academia-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
+  filter: brightness(1.03);
+}
+
+.ia-academia-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Lista lateral de passos */
+
+.ia-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.ia-steps-list li {
+  display: flex;
+  gap: 8px;
+}
+
+.ia-step-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #1b60d6;
+  color: #fff;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ia-side-alert {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* Card de dica */
+
+.ia-card-tip {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #e5e7eb;
+}
+
+.ia-card-tip p {
+  font-size: 0.8rem;
+  margin: 0 0 4px;
+}
+
+/* Resultado */
+
+.ia-academia-resultado {
+  margin-top: 10px;
+}
+
+.ia-result-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.ia-result-header h3 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+}
+
+.ia-result-header p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #444;
+}
+
+.ia-result-pill {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  white-space: nowrap;
+}
+
+.ia-result-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ia-result-block h4 {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+}
+
+.ia-result-content {
+  padding: 8px;
+  border-radius: 8px;
+  background: #f9fafb;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 0.8rem;
+}
+
+.ia-result-share {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ia-share-btn {
+  border-radius: 999px;
+  padding: 7px 12px;
+  border: 1px solid rgba(37, 99, 235, 0.6);
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #1b60d6;
+  transition: background 0.1s ease, transform 0.1s ease;
+}
+
+.ia-share-btn:hover {
+  background: #eff6ff;
+  transform: translateY(-1px);
+}
+
+.ia-aviso {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Responsivo */
+
+@media (max-width: 900px) {
+  .ia-academia-grid.ia-new-layout-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ia-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ia-result-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .ia-academia-form {
+    grid-template-columns: 1fr;
+  }
+
+  .ia-steps-strip {
+    flex-direction: column;
+  }
+}
+
+
+
+
+
+
 
 
 
