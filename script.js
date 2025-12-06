@@ -80,14 +80,14 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
 
 
-        //
-        //
+    //
+    //
 
-        //
+    //
 
-        //
+    //
 
-        //
+    //
     // Área oculta onde o html2canvas captura
     const host = document.createElement("div");
     host.style.position = "fixed";
@@ -244,43 +244,43 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 function gerarImagemCardImovel(imovel, slugId) {
   try {
     const titulo = imovel.titulo || imovel.nome || "Imóvel em Carlópolis";
-const cidade = imovel.cidade || "Carlópolis - PR";
+    const cidade = imovel.cidade || "Carlópolis - PR";
 
-const quartos   = imovel.quartos   || imovel.dormitorios || 0;
-const banheiros = imovel.banheiros || 0;
-const vagas     = imovel.vagas     || imovel.garagens    || 0;
-const area      = imovel.construcao || imovel.area || imovel.m2 || "";
+    const quartos = imovel.quartos || imovel.dormitorios || 0;
+    const banheiros = imovel.banheiros || 0;
+    const vagas = imovel.vagas || imovel.garagens || 0;
+    const area = imovel.construcao || imovel.area || imovel.m2 || "";
 
-// 🔹 pega valor bruto de suítes de várias formas possíveis
-const suitesFonte =
-  imovel.suite ??
-  imovel.suites ??
-  imovel.qtSuite ??
-  imovel.qtdSuites ??
-  imovel.qtd_suite ??
-  imovel.qtsuite ??
-  imovel.suiteQuantidade ??
-  0;
+    // 🔹 pega valor bruto de suítes de várias formas possíveis
+    const suitesFonte =
+      imovel.suite ??
+      imovel.suites ??
+      imovel.qtSuite ??
+      imovel.qtdSuites ??
+      imovel.qtd_suite ??
+      imovel.qtsuite ??
+      imovel.suiteQuantidade ??
+      0;
 
-// 🔹 normaliza (garante número mesmo se vier "1 suíte")
-const suites = Number(String(suitesFonte).replace(/\D/g, "")) || 0;
+    // 🔹 normaliza (garante número mesmo se vier "1 suíte")
+    const suites = Number(String(suitesFonte).replace(/\D/g, "")) || 0;
 
-// 🔹 DESCRIÇÃO – vamos usar isso no lugar de quartos/banheiros/preço
-const descricaoBruta =
-  imovel.descricao ||
-  imovel.descricaoImovel ||
-  imovel.observacao ||
-  imovel.obs ||
-  "";
+    // 🔹 DESCRIÇÃO – vamos usar isso no lugar de quartos/banheiros/preço
+    const descricaoBruta =
+      imovel.descricao ||
+      imovel.descricaoImovel ||
+      imovel.observacao ||
+      imovel.obs ||
+      "";
 
-// 🔹 linha de detalhes: dorm, suíte (se tiver), banh, vagas, área
-const detalhes = [
-  quartos   ? `${quartos} dorm` : "",
-  suites > 0 ? `${suites} suíte${suites > 1 ? "s" : ""}` : "",
-  banheiros ? `${banheiros} banh` : "",
-  vagas     ? `${vagas} vaga${vagas > 1 ? "s" : ""}` : "",
-  area      ? `${area} m² constr` : ""
-].filter(Boolean).join(" • ");
+    // 🔹 linha de detalhes: dorm, suíte (se tiver), banh, vagas, área
+    const detalhes = [
+      quartos ? `${quartos} dorm` : "",
+      suites > 0 ? `${suites} suíte${suites > 1 ? "s" : ""}` : "",
+      banheiros ? `${banheiros} banh` : "",
+      vagas ? `${vagas} vaga${vagas > 1 ? "s" : ""}` : "",
+      area ? `${area} m² constr` : ""
+    ].filter(Boolean).join(" • ");
 
 
     // limpa HTML e quebra-linha
@@ -1748,7 +1748,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "tokfino", "oficinadocelular", "seiza", 
+    "tokfino", "oficinadocelular", "seiza",
   ];
 
   function montarCarrosselDivulgacao() {
@@ -1790,26 +1790,26 @@ document.addEventListener("DOMContentLoaded", function () {
         cat.establishments?.some(e => e.name === est.name)
       )?.title || "";
 
-     // 🔹 Monta o array de imagens da home:
-//    - primeiro a foto de perfil / logo
-//    - depois as fotos de novidades
-const imagensPerfil = [];
-if (est.image) imagensPerfil.push(est.image);     // foto de perfil do comércio
-if (est.logo && est.logo !== est.image) {
-  imagensPerfil.push(est.logo);                   // logo, se for diferente
-}
+      // 🔹 Monta o array de imagens da home:
+      //    - primeiro a foto de perfil / logo
+      //    - depois as fotos de novidades
+      const imagensPerfil = [];
+      if (est.image) imagensPerfil.push(est.image);     // foto de perfil do comércio
+      if (est.logo && est.logo !== est.image) {
+        imagensPerfil.push(est.logo);                   // logo, se for diferente
+      }
 
-const imagensBase = Array.isArray(est.novidadesImages)
-  ? est.novidadesImages
-  : [];
+      const imagensBase = Array.isArray(est.novidadesImages)
+        ? est.novidadesImages
+        : [];
 
-const imagens = [...new Set([...imagensPerfil, ...imagensBase])]; // remove duplicadas
+      const imagens = [...new Set([...imagensPerfil, ...imagensBase])]; // remove duplicadas
 
-// 🔥 Sempre começa pela foto de perfil/logo
-const imagemInicial = imagens[0];
+      // 🔥 Sempre começa pela foto de perfil/logo
+      const imagemInicial = imagens[0];
 
 
-   
+
 
       const indexImagem = imagens.indexOf(imagemInicial);
       const texto = est.novidadesDescriptions?.[indexImagem] || "Confira nossas novidades!";
@@ -2462,7 +2462,7 @@ const imagemInicial = imagens[0];
     cafedamanhadosamigos: "s",
 
     campeonatoeliteredai: "s",
-  
+
     pedalaparana: "s",
 
 
@@ -2508,7 +2508,7 @@ const imagemInicial = imagens[0];
     }
 
 
-    
+
 
     // Adiciona o contador ao container
     container.appendChild(counter);
@@ -2754,17 +2754,17 @@ const imagemInicial = imagens[0];
     );
   }
 
-// ================== PÁGINA PLANO ACADEMIA COM IA ==================
-function mostrarPaginaAcademiaIA() {
-  const area = document.querySelector(".content_area");
-  if (!area) return;
+  // ================== PÁGINA PLANO ACADEMIA COM IA ==================
+  function mostrarPaginaAcademiaIA() {
+    const area = document.querySelector(".content_area");
+    if (!area) return;
 
-  // garante URL compartilhável
-  if (location.hash !== "#academia-ia") {
-    location.hash = "#academia-ia";
-  }
+    // garante URL compartilhável
+    if (location.hash !== "#academia-ia") {
+      location.hash = "#academia-ia";
+    }
 
-  area.innerHTML = `
+    area.innerHTML = `
     <div class="ia-academia-page">
       <!-- TOPO / CABEÇALHO -->
       <header class="ia-page-header">
@@ -3000,250 +3000,250 @@ function mostrarPaginaAcademiaIA() {
     </div>
   `;
 
-  // liga o botão à função de geração já existente
-  const btn = document.getElementById("btnGerarPlanoIA");
-  if (btn) {
-    btn.addEventListener("click", gerarPlanoAcademiaIA);
+    // liga o botão à função de geração já existente
+    const btn = document.getElementById("btnGerarPlanoIA");
+    if (btn) {
+      btn.addEventListener("click", gerarPlanoAcademiaIA);
+    }
   }
-}
 
 
 
   // Função que SIMULA a IA no front-end.
   function gerarPlanoAcademiaIA() {
-  const objetivoRadio = document.querySelector('input[name="objetivoAcademia"]:checked');
-  const objetivo = objetivoRadio ? objetivoRadio.value : "";
+    const objetivoRadio = document.querySelector('input[name="objetivoAcademia"]:checked');
+    const objetivo = objetivoRadio ? objetivoRadio.value : "";
 
-  const idade   = parseInt(document.getElementById("idadeAcademia")?.value || "0", 10) || null;
-  const peso    = parseFloat(document.getElementById("pesoAcademia")?.value || "0") || null;
-  const altura  = parseInt(document.getElementById("alturaAcademia")?.value || "0", 10) || null;
-  const nivel   = document.getElementById("nivelAcademia")?.value || "iniciante";
-  let   dias    = parseInt(document.getElementById("diasSemanaAcademia")?.value || "0", 10) || null;
-  const obs     = document.getElementById("obsAcademia")?.value?.trim() || "";
+    const idade = parseInt(document.getElementById("idadeAcademia")?.value || "0", 10) || null;
+    const peso = parseFloat(document.getElementById("pesoAcademia")?.value || "0") || null;
+    const altura = parseInt(document.getElementById("alturaAcademia")?.value || "0", 10) || null;
+    const nivel = document.getElementById("nivelAcademia")?.value || "iniciante";
+    let dias = parseInt(document.getElementById("diasSemanaAcademia")?.value || "0", 10) || null;
+    const obs = document.getElementById("obsAcademia")?.value?.trim() || "";
 
-  const btn          = document.getElementById("btnGerarPlanoIA");
-  const boxResultado = document.getElementById("resultadoAcademiaIA");
-  const divTreino    = document.getElementById("resultadoTreinoIA");
-  const divDieta     = document.getElementById("resultadoDietaIA");
+    const btn = document.getElementById("btnGerarPlanoIA");
+    const boxResultado = document.getElementById("resultadoAcademiaIA");
+    const divTreino = document.getElementById("resultadoTreinoIA");
+    const divDieta = document.getElementById("resultadoDietaIA");
 
-  // validações básicas
-  if (!objetivo) {
-    alert("Escolha um objetivo principal (perder barriga, ganhar massa ou definir abdômen).");
-    return;
-  }
-  if (!dias || dias < 1) {
-    alert("Informe quantos dias por semana você pretende treinar (entre 1 e 7).");
-    return;
-  }
+    // validações básicas
+    if (!objetivo) {
+      alert("Escolha um objetivo principal (perder barriga, ganhar massa ou definir abdômen).");
+      return;
+    }
+    if (!dias || dias < 1) {
+      alert("Informe quantos dias por semana você pretende treinar (entre 1 e 7).");
+      return;
+    }
 
-  // trava um range de 1 a 7 dias
-  if (dias < 1) dias = 1;
-  if (dias > 7) dias = 7;
+    // trava um range de 1 a 7 dias
+    if (dias < 1) dias = 1;
+    if (dias > 7) dias = 7;
 
-  // estado do botão
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = "Gerando plano...";
-  }
+    // estado do botão
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = "Gerando plano...";
+    }
 
-  // mapeia objetivo para chave simples
-  const objKey =
-    objetivo === "perder barriga" ? "perder"
-    : objetivo === "ganhar massa muscular" ? "massa"
-    : "abdomen";
+    // mapeia objetivo para chave simples
+    const objKey =
+      objetivo === "perder barriga" ? "perder"
+        : objetivo === "ganhar massa muscular" ? "massa"
+          : "abdomen";
 
-  // --------------- FOCO DO TREINO (texto explicando a lógica) ---------------
-  let focoCardio = "";
-  let focoForca  = "";
-  let focoDieta  = "";
+    // --------------- FOCO DO TREINO (texto explicando a lógica) ---------------
+    let focoCardio = "";
+    let focoForca = "";
+    let focoDieta = "";
 
-  if (objKey === "perder") {
-    focoCardio = `
+    if (objKey === "perder") {
+      focoCardio = `
       <p><strong>Foco do treino:</strong> alta queima calórica, priorizando grandes grupos musculares
       (pernas, costas e peito) e bastante cardio em intensidade moderada.</p>
     `;
-    focoForca = `
+      focoForca = `
       <p>Use cargas moderadas, com 10–15 repetições por série e pouco descanso (40–60 segundos).
       Mantenha boa técnica e aumente o tempo de cardio ao longo das semanas.</p>
     `;
-    focoDieta = `
+      focoDieta = `
       <p><strong>Estratégia nutricional:</strong> leve déficit calórico, priorizando proteínas magras,
       carboidratos integrais e vegetais, reduzindo excesso de açúcar e frituras.</p>
     `;
-  } else if (objKey === "massa") {
-    focoCardio = `
+    } else if (objKey === "massa") {
+      focoCardio = `
       <p><strong>Foco do treino:</strong> ganho de massa muscular, priorizando exercícios compostos,
       com séries mais pesadas e cardio apenas para saúde geral.</p>
     `;
-    focoForca = `
+      focoForca = `
       <p>Use cargas mais altas, 6–12 repetições, descanso entre 60–90 segundos
       e foque em progressão de carga ao longo das semanas.</p>
     `;
-    focoDieta = `
+      focoDieta = `
       <p><strong>Estratégia nutricional:</strong> leve superávit calórico, alta ingestão de proteína
       (frango, ovos, carne magra), bons carboidratos (arroz, batata, aveia) e gorduras boas
       (azeite, castanhas, abacate).</p>
     `;
-  } else {
-    // definir abdômen
-    focoCardio = `
+    } else {
+      // definir abdômen
+      focoCardio = `
       <p><strong>Foco do treino:</strong> redução de gordura corporal + fortalecimento de core
       (abdômen, lombar) com treinos de força e cardio.</p>
     `;
-    focoForca = `
+      focoForca = `
       <p>Priorize exercícios multiarticulares + blocos específicos para abdômen
       (prancha, elevação de pernas, crunch, abdominal máquina).</p>
     `;
-    focoDieta = `
+      focoDieta = `
       <p><strong>Estratégia nutricional:</strong> alimentação controlada em calorias,
       alto teor de proteína e foco em alimentos menos processados para ajudar na definição.</p>
     `;
-  }
-
-  // --------------- TREINOS POR DIA – respeitando a quantidade de dias ---------------
-  function montarTreinosPorDias(objKey, nivel, dias) {
-    const planosBase = {
-      perder: [
-        {
-          titulo: "Inferiores + cardio",
-          itens: [
-            "Aquecimento: 5–10min de esteira ou bicicleta leve",
-            "Agachamento livre ou no Smith – 3x10–12",
-            "Leg press – 3x12–15",
-            "Cadeira extensora – 3x12–15",
-            "Cadeira flexora – 3x12–15",
-            "Abdominal supra no colchonete – 3x15–20",
-            "Cardio: +15–25min de caminhada rápida ou elíptico"
-          ]
-        },
-        {
-          titulo: "Superiores + core",
-          itens: [
-            "Aquecimento: 5min elíptico ou corda",
-            "Puxada frontal na barra ou polia – 3x10–12",
-            "Remada baixa ou unilateral – 3x10–12",
-            "Supino máquina ou halteres – 3x10–12",
-            "Desenvolvimento de ombros – 3x10–12",
-            "Rosca direta – 3x12–15",
-            "Tríceps corda – 3x12–15",
-            "Prancha isométrica – 3x30–45s"
-          ]
-        },
-        {
-          titulo: "Full body + HIIT leve",
-          itens: [
-            "Agachamento no Smith – 3x10–12",
-            "Levantamento terra romeno leve – 3x10–12",
-            "Remada curvada ou máquina – 3x10–12",
-            "Supino inclinado – 3x10–12",
-            "Elevação lateral – 3x12–15",
-            "Abdominal infra (elevando pernas) – 3x15",
-            "Cardio: 10–15min de intervalos (1min rápido / 1min leve)"
-          ]
-        }
-      ],
-      massa: [
-        {
-          titulo: "Peito + tríceps",
-          itens: [
-            "Supino reto barra – 4x6–10",
-            "Supino inclinado halteres – 3x8–10",
-            "Crucifixo máquina ou halteres – 3x10–12",
-            "Paralelas (assistida se precisar) – 3x8–10",
-            "Tríceps testa ou francês – 3x8–10",
-            "Tríceps corda – 3x10–12"
-          ]
-        },
-        {
-          titulo: "Costas + bíceps",
-          itens: [
-            "Puxada na frente – 4x8–10",
-            "Remada baixa – 3x8–10",
-            "Remada unilateral halteres – 3x10–12",
-            "Rosca direta barra – 3x8–10",
-            "Rosca alternada – 3x10–12",
-            "Abdominal prancha – 3x30–45s"
-          ]
-        },
-        {
-          titulo: "Pernas + ombros",
-          itens: [
-            "Agachamento livre ou Smith – 4x8–10",
-            "Leg press – 3x10–12",
-            "Cadeira extensora – 3x10–12",
-            "Mesa flexora – 3x10–12",
-            "Desenvolvimento militar – 3x8–10",
-            "Elevação lateral – 3x12–15",
-            "Gêmeos em pé – 3x15–20"
-          ]
-        },
-        {
-          titulo: "Full body pesado (opcional)",
-          itens: [
-            "Levantamento terra romeno – 3x8–10",
-            "Barra fixa (assistida se precisar) – 3x6–10",
-            "Supino reto – 3x8–10",
-            "Afundo ou passada – 3x10 cada perna",
-            "Abdominal máquina – 3x12–15"
-          ]
-        }
-      ],
-      abdomen: [
-        {
-          titulo: "Inferiores + core",
-          itens: [
-            "Agachamento livre ou Smith – 3x10–12",
-            "Leg press – 3x12–15",
-            "Cadeira extensora – 3x12–15",
-            "Abdominal infra (elevação de pernas) – 3x15–20",
-            "Prancha frontal – 3x30–45s",
-            "Cardio moderado: 15–20min"
-          ]
-        },
-        {
-          titulo: "Superiores + abdômen",
-          itens: [
-            "Puxada frontal – 3x10–12",
-            "Remada sentada – 3x10–12",
-            "Supino máquina – 3x10–12",
-            "Desenvolvimento halteres – 3x10–12",
-            "Abdominal supra – 3x15–20",
-            "Prancha lateral – 3x20–30s cada lado"
-          ]
-        },
-        {
-          titulo: "Circuito de core + cardio",
-          itens: [
-            "Prancha frontal – 3x30–45s",
-            "Prancha lateral – 3x20–30s",
-            "Abdominal bicicleta – 3x20 reps",
-            "Abdominal oblíquo – 3x15–20",
-            "Cardio: 20–25min (esteira, bike ou elíptico)"
-          ]
-        }
-      ]
-    };
-
-    const base = planosBase[objKey] || planosBase.perder;
-
-    // escolhe quantos dias usar a partir do base
-    const selecionados = [];
-    for (let i = 0; i < dias; i++) {
-      const idx = i % base.length; // se tiver mais dias que templates, repete
-      selecionados.push(base[idx]);
     }
 
-    let html = `<p><strong>Divisão sugerida: ${dias}x por semana</strong></p>`;
+    // --------------- TREINOS POR DIA – respeitando a quantidade de dias ---------------
+    function montarTreinosPorDias(objKey, nivel, dias) {
+      const planosBase = {
+        perder: [
+          {
+            titulo: "Inferiores + cardio",
+            itens: [
+              "Aquecimento: 5–10min de esteira ou bicicleta leve",
+              "Agachamento livre ou no Smith – 3x10–12",
+              "Leg press – 3x12–15",
+              "Cadeira extensora – 3x12–15",
+              "Cadeira flexora – 3x12–15",
+              "Abdominal supra no colchonete – 3x15–20",
+              "Cardio: +15–25min de caminhada rápida ou elíptico"
+            ]
+          },
+          {
+            titulo: "Superiores + core",
+            itens: [
+              "Aquecimento: 5min elíptico ou corda",
+              "Puxada frontal na barra ou polia – 3x10–12",
+              "Remada baixa ou unilateral – 3x10–12",
+              "Supino máquina ou halteres – 3x10–12",
+              "Desenvolvimento de ombros – 3x10–12",
+              "Rosca direta – 3x12–15",
+              "Tríceps corda – 3x12–15",
+              "Prancha isométrica – 3x30–45s"
+            ]
+          },
+          {
+            titulo: "Full body + HIIT leve",
+            itens: [
+              "Agachamento no Smith – 3x10–12",
+              "Levantamento terra romeno leve – 3x10–12",
+              "Remada curvada ou máquina – 3x10–12",
+              "Supino inclinado – 3x10–12",
+              "Elevação lateral – 3x12–15",
+              "Abdominal infra (elevando pernas) – 3x15",
+              "Cardio: 10–15min de intervalos (1min rápido / 1min leve)"
+            ]
+          }
+        ],
+        massa: [
+          {
+            titulo: "Peito + tríceps",
+            itens: [
+              "Supino reto barra – 4x6–10",
+              "Supino inclinado halteres – 3x8–10",
+              "Crucifixo máquina ou halteres – 3x10–12",
+              "Paralelas (assistida se precisar) – 3x8–10",
+              "Tríceps testa ou francês – 3x8–10",
+              "Tríceps corda – 3x10–12"
+            ]
+          },
+          {
+            titulo: "Costas + bíceps",
+            itens: [
+              "Puxada na frente – 4x8–10",
+              "Remada baixa – 3x8–10",
+              "Remada unilateral halteres – 3x10–12",
+              "Rosca direta barra – 3x8–10",
+              "Rosca alternada – 3x10–12",
+              "Abdominal prancha – 3x30–45s"
+            ]
+          },
+          {
+            titulo: "Pernas + ombros",
+            itens: [
+              "Agachamento livre ou Smith – 4x8–10",
+              "Leg press – 3x10–12",
+              "Cadeira extensora – 3x10–12",
+              "Mesa flexora – 3x10–12",
+              "Desenvolvimento militar – 3x8–10",
+              "Elevação lateral – 3x12–15",
+              "Gêmeos em pé – 3x15–20"
+            ]
+          },
+          {
+            titulo: "Full body pesado (opcional)",
+            itens: [
+              "Levantamento terra romeno – 3x8–10",
+              "Barra fixa (assistida se precisar) – 3x6–10",
+              "Supino reto – 3x8–10",
+              "Afundo ou passada – 3x10 cada perna",
+              "Abdominal máquina – 3x12–15"
+            ]
+          }
+        ],
+        abdomen: [
+          {
+            titulo: "Inferiores + core",
+            itens: [
+              "Agachamento livre ou Smith – 3x10–12",
+              "Leg press – 3x12–15",
+              "Cadeira extensora – 3x12–15",
+              "Abdominal infra (elevação de pernas) – 3x15–20",
+              "Prancha frontal – 3x30–45s",
+              "Cardio moderado: 15–20min"
+            ]
+          },
+          {
+            titulo: "Superiores + abdômen",
+            itens: [
+              "Puxada frontal – 3x10–12",
+              "Remada sentada – 3x10–12",
+              "Supino máquina – 3x10–12",
+              "Desenvolvimento halteres – 3x10–12",
+              "Abdominal supra – 3x15–20",
+              "Prancha lateral – 3x20–30s cada lado"
+            ]
+          },
+          {
+            titulo: "Circuito de core + cardio",
+            itens: [
+              "Prancha frontal – 3x30–45s",
+              "Prancha lateral – 3x20–30s",
+              "Abdominal bicicleta – 3x20 reps",
+              "Abdominal oblíquo – 3x15–20",
+              "Cardio: 20–25min (esteira, bike ou elíptico)"
+            ]
+          }
+        ]
+      };
 
-    selecionados.forEach((diaPlano, i) => {
-      html += `
+      const base = planosBase[objKey] || planosBase.perder;
+
+      // escolhe quantos dias usar a partir do base
+      const selecionados = [];
+      for (let i = 0; i < dias; i++) {
+        const idx = i % base.length; // se tiver mais dias que templates, repete
+        selecionados.push(base[idx]);
+      }
+
+      let html = `<p><strong>Divisão sugerida: ${dias}x por semana</strong></p>`;
+
+      selecionados.forEach((diaPlano, i) => {
+        html += `
         <p><strong>Dia ${i + 1} – ${diaPlano.titulo}</strong><br>
           ${diaPlano.itens.map(ex => `• ${ex}`).join("<br>")}
         </p>
       `;
-    });
+      });
 
-    html += `
+      html += `
       <p class="ia-treino-nota">
         Ajuste cargas, tempo de descanso e duração do cardio conforme seu nível
         (<strong>${nivel}</strong>) e converse com um profissional caso sinta dor ou desconforto.
@@ -3254,18 +3254,18 @@ function mostrarPaginaAcademiaIA() {
       </p>
     `;
 
-    return html;
-  }
+      return html;
+    }
 
-  const semanaTreinoHTML = montarTreinosPorDias(objKey, nivel, dias);
+    const semanaTreinoHTML = montarTreinosPorDias(objKey, nivel, dias);
 
-  // --------------- TABELA NUTRICIONAL (ajuste simples por objetivo) ---------------
-  let dietaHTML = `
+    // --------------- TABELA NUTRICIONAL (ajuste simples por objetivo) ---------------
+    let dietaHTML = `
     <p><strong>Observação importante:</strong> os horários e quantidades são sugestões gerais.
     Ideal é ajustar com um nutricionista, principalmente em caso de doenças pré-existentes.</p>
   `;
 
-  dietaHTML += `
+    dietaHTML += `
     ${focoDieta}
     <ul>
       <li><strong>Café da manhã (06h00–08h30):</strong> ovo mexido ou cozido, pão integral ou tapioca,
@@ -3284,49 +3284,49 @@ function mostrarPaginaAcademiaIA() {
     </ul>
   `;
 
-  if (objKey === "perder") {
-    dietaHTML += `
+    if (objKey === "perder") {
+      dietaHTML += `
       <p class="ia-treino-nota">
         Para perder gordura, mantenha porções um pouco menores no jantar e evite beber calorias
         em excesso (refrigerante, sucos muito açucarados).
       </p>
     `;
-  } else if (objKey === "massa") {
-    dietaHTML += `
+    } else if (objKey === "massa") {
+      dietaHTML += `
       <p class="ia-treino-nota">
         Para ganhar massa, aumente um pouco a porção de carboidratos no almoço e no pós-treino
         e garanta proteína em todas as refeições principais.
       </p>
     `;
-  } else {
-    dietaHTML += `
+    } else {
+      dietaHTML += `
       <p class="ia-treino-nota">
         Para definição de abdômen, priorize alimentos menos processados e mantenha constância
         nos horários para melhorar saciedade e controle de fome.
       </p>
     `;
-  }
+    }
 
-  if (obs) {
-    dietaHTML += `
+    if (obs) {
+      dietaHTML += `
       <p class="ia-treino-nota"><strong>Observações que você informou:</strong> ${obs}</p>
     `;
-  }
+    }
 
-  // monta saída final no HTML
-  if (divTreino) divTreino.innerHTML = focoCardio + focoForca + semanaTreinoHTML;
-  if (divDieta)  divDieta.innerHTML  = dietaHTML;
+    // monta saída final no HTML
+    if (divTreino) divTreino.innerHTML = focoCardio + focoForca + semanaTreinoHTML;
+    if (divDieta) divDieta.innerHTML = dietaHTML;
 
-  if (boxResultado) {
-    boxResultado.classList.remove("hidden");
-    boxResultado.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+    if (boxResultado) {
+      boxResultado.classList.remove("hidden");
+      boxResultado.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
 
-  if (btn) {
-    btn.disabled = false;
-    btn.innerHTML = "🤖 Gerar plano com IA";
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = "🤖 Gerar plano com IA";
+    }
   }
-}
 
   // ================== FIM PÁGINA PLANO ACADEMIA COM IA ==================
 
@@ -5171,7 +5171,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       quartos: 3,
       valor: 300000,
       piscina: "Sim",
-       churrasqueira: false,
+      churrasqueira: false,
       vagas: 2,
       corretores: ["Cesar Melo - 38.105 F"],
       // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
@@ -5389,7 +5389,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       construcao: 70,          // << NOVO: m² de construção
       area: 284,
       banheiros: 1,
-       churrasqueira: false,
+      churrasqueira: false,
       cozinhas: 1,
       quartos: 1,
       quintal: "Sim",
@@ -5466,14 +5466,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       id: "casa14v",
       codRef: "C_014",
       tipo: "venda",
-      procura: "casa", 
+      procura: "casa",
       titulo: "Casa à venda no Residencial Itália",
       quartos: 3,
       valor: 400000,
       piscina: false,
-       churrasqueira: false,
+      churrasqueira: false,
       vagas: 2,
-      corretores: ["Luiz Vilas Boas - 52.194"],      
+      corretores: ["Luiz Vilas Boas - 52.194"],
       descricao: "Imóvel moderno e bem distribuído, localizado em bairro tranquilo e valorizado. Aceita veículo na negociação.",
       endereco: "Residencial Itália",
       suite: "1",
@@ -5496,9 +5496,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/casa1/9.jpg",
         "images/imoveis/luiz/venda/casa1/10.jpg",
         "images/imoveis/luiz/venda/casa1/11.jpg",
-       
+
       ],
-   
+
 
     },
 
@@ -5506,14 +5506,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       id: "casa15v",
       codRef: "C_015",
       tipo: "venda",
-      procura: "casa", 
+      procura: "casa",
       titulo: "Casa no Residencial Novo Horizonte III",
       quartos: 2,
       valor: 215000,
       piscina: false,
       churrasqueira: false,
       vagas: 1,
-      corretores: ["Luiz Vilas Boas - 52.194"],      
+      corretores: ["Luiz Vilas Boas - 52.194"],
       descricao: "Imóvel pronto para morar, bem planejado, terreno de esquina. Fica em um bairro tranquilo e valorizado, ideal para sair do aluguel. Aceita financiamento e negociações com carro ou terreno como parte do pagamento.",
       endereco: "Novo Horizonte III",
       suite: "Não",
@@ -5536,9 +5536,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/casa2/09.jpeg",
         "images/imoveis/luiz/venda/casa2/10.jpeg",
         "images/imoveis/luiz/venda/casa2/11.jpeg",
-       
+
       ],
-   
+
 
     },
 
@@ -5548,7 +5548,38 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+    // SITIO
 
+    {
+      id: "sitio1v",
+      codRef: "ST_001",
+      tipo: "venda",
+      procura: "sitio",
+      titulo: "Sítio à Beira da Represa",
+
+      valor: 600000,
+
+
+      corretores: ["Luiz Vilas Boas - 52.194"],
+      descricao: "Sítio com acesso exclusivo à represa, linha elétrica instalada e documentação pronta para transferência. Localizado a menos de 6 km do centro de Carlópolis, ideal para lazer, investimento ou construção",
+
+
+      area: "22.550 m²",
+
+
+      telefone: "43 98803-4095", // Corretor ou propretario
+      imagens: [
+        "images/imoveis/luiz/venda/sitio1/1.jpg",
+        "images/imoveis/luiz/venda/sitio1/2.jpg",
+        "images/imoveis/luiz/venda/sitio1/3.jpg",
+        "images/imoveis/luiz/venda/sitio1/4.jpg",
+        "images/imoveis/luiz/venda/sitio1/5.jpg",
+        "images/imoveis/luiz/venda/sitio1/6.jpg",
+
+      ],
+
+
+    },
 
 
 
@@ -5728,9 +5759,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-        {
+    {
       id: "ter9",
-      codRef: "T_009",  
+      codRef: "T_009",
       procura: "terreno", // ou "terreno", "rural", etc.   
       tipo: "venda",
       titulo: "Terreno de esquina à venda no Residencial Novo Horizonte II",
@@ -5741,14 +5772,39 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       telefone: "43 98803-4095",
       corretores: ["Luiz Vilas Boas - 52.194"],
       imagens: [
-        
+
         "images/imoveis/luiz/venda/terreno1/01.jpg",
         "images/imoveis/luiz/venda/terreno1/02.jpg",
         "images/imoveis/luiz/venda/terreno1/03.jpg",
         "images/imoveis/luiz/venda/terreno1/04.jpg",
-        
-        ],
-     
+
+      ],
+
+
+    },
+
+
+    {
+      id: "ter10",
+      codRef: "T_010",
+      procura: "terreno", // ou "terreno", "rural", etc.   
+      tipo: "venda",
+      titulo: "Terreno à venda no Residencial Amaral",
+      descricao: "Terreno plano e acima do nível da rua, localizado em um bairro tranquilo e em crescimento, oferece um excelente custo-benefício. Aceita veículo como parte do pagamento.",
+      endereco: "Residencial Amaral",
+      area: "242m² 11x22",
+      valor: 87000,
+      telefone: "43 98803-4095",
+      corretores: ["Luiz Vilas Boas - 52.194"],
+      imagens: [
+
+        "images/imoveis/luiz/venda/terreno2/01.jpeg",
+        "images/imoveis/luiz/venda/terreno2/02.jpeg",
+        "images/imoveis/luiz/venda/terreno2/03.jpeg",
+        "images/imoveis/luiz/venda/terreno2/04.jpeg",
+
+      ],
+
 
     },
 
@@ -5849,7 +5905,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
   /// C
 
-  
+
 
   // monta página
   function mostrarImoveisV2() {
@@ -5910,7 +5966,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           <option value="condominio">Condomínio</option>          
           <option value="galpao">Galpão</option>
           <option value="represa">Represa</option>
-          <option value="rural">Rural</option>
+          <option value="sitio">Sitio</option>
           <option value="terreno">Terreno</option>
         </select>
       </div>
@@ -12087,7 +12143,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-         
+
 
 
 
@@ -14370,7 +14426,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-          
+
 
 
 
