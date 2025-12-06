@@ -5416,6 +5416,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     {
       id: "casa12v",
       codRef: "C_012",
+      status: "Vendido",   // <= adicione isto quando estiver vendido
       procura: "casa", // ou "terreno", "rural", etc.
       tipo: "venda",
       titulo: "Casa Arejada",
@@ -5575,6 +5576,45 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       ],
 
+
+    },
+
+    {
+      id: "casa16v",
+      codRef: "C_016",
+      procura: "casa", // ou "terreno", "rural", etc.
+      tipo: "venda",
+      titulo: "Casa Nova à venda",
+      descricao: "Ao lado da área de laser com um lago e um lindo pôr do sol, Documentação Ok.",
+      endereco: "Residencial Vila Ray (horizonte 3)",
+      valor: 280000,
+      construcao: 56 ,          // << NOVO: m² de construção
+      area: "180 m²",
+      banheiros: 1,      
+      cozinhas: 1,
+      quartos: 2,
+      quintal: "Sim",
+      piscina: "Não",
+      salas: 1,      
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"],
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa12/1.jpg",
+        "images/imoveis/cesar/venda/casa12/2.jpg",
+        "images/imoveis/cesar/venda/casa12/3.jpg",
+        "images/imoveis/cesar/venda/casa12/4.jpg",
+        "images/imoveis/cesar/venda/casa12/5.jpg",
+        "images/imoveis/cesar/venda/casa12/6.jpg",
+        "images/imoveis/cesar/venda/casa12/7.jpg",
+        "images/imoveis/cesar/venda/casa12/8.jpg",
+        "images/imoveis/cesar/venda/casa12/9.jpg",
+       
+      
+
+
+
+      ],
 
     },
 
