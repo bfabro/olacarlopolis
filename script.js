@@ -46,7 +46,7 @@ function somenteDigitos(str) {
 
 
 // === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, LOGO GRANDE) ===
-// === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, LOGO GRANDE) ===
+
 function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
     const nome = establishment.name || "Comércio em Carlópolis";
@@ -79,27 +79,42 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         ? imagens[0]
         : "images/img_padrao_site/padrao.jpg");
 
-    // 🔹 Horário de funcionamento (pega de vários campos possíveis)
-// Captura todos os campos possíveis
-let funcionamento =
-  establishment.horario ||
-  establishment.funcionamento ||
-  establishment.horarioFuncionamento ||
-  establishment.horarioAtendimento ||
-  establishment.operacao ||
-  establishment.hours ||
-  establishment.aberto ||
-  (establishment.schedule ? establishment.schedule.text || establishment.schedule.horario : "") ||
-  "";
+    // 🔹 HORÁRIO DE FUNCIONAMENTO – captura vários campos possíveis
+    let funcionamento =
+      establishment.horario ||
+      establishment.funcionamento ||
+      establishment.horarioFuncionamento ||
+      establishment.horarioAtendimento ||
+      establishment.operacao ||
+      establishment.hours ||
+      establishment.aberto ||
+      (establishment.schedule
+        ? establishment.schedule.text || establishment.schedule.horario
+        : "") ||
+      "";
 
-// Se vier um objeto → transformar em texto legível
-if (typeof funcionamento === "object" && funcionamento !== null) {
-  // Se for um objeto do tipo { segunda: "...", terca: "...", ... }
-  funcionamento = Object.entries(funcionamento)
-    .map(([dia, valor]) => `${dia}: ${valor}`)
-    .join(" | ");
-}
+    // Se vier um objeto → transformar em texto legível
+    if (typeof funcionamento === "object" && funcionamento !== null) {
+      funcionamento = Object.entries(funcionamento)
+        .map(([dia, valor]) => `${dia}: ${valor}`)
+        .join(" | ");
+    }
 
+    // 🔹 ENDEREÇO – vários campos possíveis
+    let endereco =
+      establishment.endereco ||
+      establishment.enderecoCompleto ||
+      establishment.address ||
+      establishment.logradouro ||
+      establishment.rua ||
+      "";
+
+    if (typeof endereco === "object" && endereco !== null) {
+      // Se for algo do tipo { rua: "...", numero: "...", bairro: "..." }
+      endereco = Object.entries(endereco)
+        .map(([chave, valor]) => `${valor}`)
+        .join(" - ");
+    }
 
     // Área oculta onde o html2canvas captura
     const host = document.createElement("div");
@@ -182,7 +197,7 @@ if (typeof funcionamento === "object" && funcionamento !== null) {
           ">
             <!-- NOME -->
             <div style="
-              font-size:60px;
+              font-size:64px;
               font-weight:800;
               line-height:1.05;
               text-shadow:0 5px 18px rgba(0,0,0,.9);
@@ -198,6 +213,19 @@ if (typeof funcionamento === "object" && funcionamento !== null) {
               ${categoriaAtual || "Carlópolis - PR"}
             </div>
 
+            <!-- ENDEREÇO -->
+            ${
+              endereco
+                ? `
+            <div style="
+              font-size:32px;
+              opacity:.96;
+            ">
+              📍 ${endereco}
+            </div>`
+                : ""
+            }
+
             <!-- HORÁRIO DE FUNCIONAMENTO -->
             ${
               funcionamento
@@ -212,7 +240,9 @@ if (typeof funcionamento === "object" && funcionamento !== null) {
                 : ""
             }
           </div>
-<br>
+
+          <br>
+
           <!-- LINHA DOURADA -->
           <div style="
             width:70%;
@@ -241,7 +271,7 @@ if (typeof funcionamento === "object" && funcionamento !== null) {
               margin-top:10px;
               opacity:.97;
             ">
-              <br> <br>
+              <br><br>
             </div>
           </div>
 
@@ -267,6 +297,7 @@ if (typeof funcionamento === "object" && funcionamento !== null) {
     console.error("Erro ao gerar card:", e);
   }
 }
+
 
 
 
