@@ -5190,6 +5190,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     {
       id: "casa6v",
       codRef: "C_006",
+      status:"vendido",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 2,
