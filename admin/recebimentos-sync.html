@@ -278,7 +278,36 @@ background:var(--panel);
   .btn-icon{ font-size:18px; padding:6px 8px; }
 }
 
-
+.modal-pix {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.65);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.modal-box {
+  background: #11161d;
+  padding: 20px;
+  border-radius: 14px;
+  width: 320px;
+  text-align: center;
+  border: 1px solid #182029;
+}
+.pix-line {
+  background: #0f141b;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  word-break: break-all;
+  margin-top: 10px;
+}
+.btn-close {
+  margin-top: 12px;
+  background: #ef4444;
+  color: white;
+}
+.btn-copy {
+  margin-top: 8px;
+}
 
 </style>
 
@@ -645,6 +674,10 @@ tr.innerHTML = `
     <button class="btn-save btn-icon" title="Salvar alterações" aria-label="Salvar alterações">
       💾
     </button>
+
+    <button class="btn-icon btn-pix" title="Gerar QR Code PIX">
+  🔗
+</button>
   </div>
 </div>
 
@@ -732,6 +765,33 @@ chks.forEach(c=>{
     finally{ btn.disabled=false }
   });
 
+
+
+
+
+
+  tbody.addEventListener('click', async (ev)=>{
+  const btnPix = ev.target.closest('.btn-pix');
+  if(btnPix){
+    const tr = btnPix.closest('tr');
+    const nome = tr.querySelector('.nome-holder').textContent.trim();
+
+    const chks = Array.from(tr.querySelectorAll('.months .chk'));
+
+    let total = 0;
+    chks.forEach(c=>{
+      if(!c.checked){ total += VALOR_MENSAL; }
+    });
+
+    const brcode = gerarBRCodePix(nome, total);
+
+    abrirModalPIX(null, brcode, total);
+    return;
+  }
+
+  // ... RESTO DO CÓDIGO DO SALVAR JÁ EXISTENTE ...
+});
+
   // ===== CSV =====
   function exportCSV(){
     const year = selAno.value;
@@ -789,6 +849,58 @@ chks.forEach(c=>{
     await _origLoadTabela();
     document.querySelectorAll('.row-scroll').forEach(enableDragScroll);
   }
+
+  ////////////////////////////////////////// pix
+
+
+  const VALOR_MENSAL = 30.00; // 🔧 ajuste o valor que quiser
+
+function gerarBRCodePix(nomeCliente, valor){
+  const payload = `00020126360014BR.GOV.BCB.PIX0114+55119999999980208Cobrança520400005303986540${valor.toFixed(2).replace('.', '')}5802BR5910${nomeCliente}6009São Paulo62070503***6304`;
+  return payload;
+}
+
+function abrirModalPIX(qr, linha, valor){
+  const modal = document.createElement("div");
+  modal.className = "modal-pix";
+
+  modal.innerHTML = `
+    <div class="modal-box">
+      <h3>QR Code PIX</h3>
+      <canvas id="pixCanvas"></canvas>
+
+      <div class="pix-line">${linha}</div>
+      <button class="btn-copy">Copiar linha</button>
+
+      <div style="margin-top:8px;color:#9aa6b2">Valor: R$ ${valor.toFixed(2)}</div>
+
+      <button class="btn-close">Fechar</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // gera QR
+  new QRious({
+    element: document.getElementById('pixCanvas'),
+    value: linha,
+    size: 220,
+    background: '#11161d',
+    foreground: '#5dd4ff'
+  });
+
+  // copiar linha
+  modal.querySelector(".btn-copy").onclick = () => {
+    navigator.clipboard.writeText(linha);
+    alert("Linha PIX copiada!");
+  };
+
+  // fechar
+  modal.querySelector(".btn-close").onclick = () => modal.remove();
+}
+
+
+
 </script>
 </body>
 </html>
