@@ -851,16 +851,74 @@ chks.forEach(c=>{
   }
 
   ////////////////////////////////////////// pix
+////////////////////////////////////////// PIX
 
+// valor de cada mensalidade pendente
+const VALOR_MENSAL = 30.00; // ajuste se quiser
 
-  const VALOR_MENSAL = 30.00; // 🔧 ajuste o valor que quiser
-
-function gerarBRCodePix(nomeCliente, valor){
-  const payload = `00020126360014BR.GOV.BCB.PIX0114+55119999999980208Cobrança520400005303986540${valor.toFixed(2).replace('.', '')}5802BR5910${nomeCliente}6009São Paulo62070503***6304`;
-  return payload;
+// helper para montar campos EMV (ID + tamanho + valor)
+function emvField(id, value) {
+  const len = String(value.length).padStart(2, '0');
+  return id + len + value;
 }
 
-function abrirModalPIX(qr, linha, valor){
+// cálculo do CRC16 CCITT (obrigatório no BR Code)
+function crc16(str) {
+  let crc = 0xFFFF;
+  for (let i = 0; i < str.length; i++) {
+    crc ^= str.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      if (crc & 0x8000) {
+        crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+      } else {
+        crc = (crc << 1) & 0xFFFF;
+      }
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+
+// Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
+function gerarBRCodePix(nomeCliente, valor) {
+  const pixKey = '52608228000162'; // CNPJ só com números
+  const gui = 'BR.GOV.BCB.PIX';
+
+  const nomeComerciante = (nomeCliente || 'OLA CARLOPOLIS')
+    .toUpperCase()
+    .substring(0, 25); // máx 25 chars
+
+  const cidade = 'CARLOPOLIS';
+
+  // Subcampos do 26 = Merchant Account Information
+  const merchantAccountInfo =
+    emvField('00', gui) +        // GUI
+    emvField('01', pixKey);      // chave (CNPJ)
+
+  const merchantAccountField = emvField('26', merchantAccountInfo);
+
+  const valorStr = valor.toFixed(2); // ex: "90.00"
+
+  // Monta o payload sem o CRC
+  let payload =
+    emvField('00', '01') +             // Payload Format Indicator
+    emvField('01', '11') +             // Static (11)
+    merchantAccountField +             // Merchant Account Info
+    emvField('52', '0000') +           // Merchant Category Code
+    emvField('53', '986') +            // Moeda (986 = BRL)
+    emvField('54', valorStr) +         // Valor
+    emvField('58', 'BR') +             // País
+    emvField('59', nomeComerciante) +  // Nome do recebedor
+    emvField('60', cidade) +           // Cidade
+    emvField('62', emvField('05', '***')); // TxId = ***
+
+  // Campo 63 = CRC16
+  const toCrc = payload + '6304';
+  const crc = crc16(toCrc);
+
+  return toCrc + crc;
+}
+
+function abrirModalPIX(qr, linha, valor) {
   const modal = document.createElement("div");
   modal.className = "modal-pix";
 
@@ -889,10 +947,26 @@ function abrirModalPIX(qr, linha, valor){
     foreground: '#5dd4ff'
   });
 
-  // copiar linha
-  modal.querySelector(".btn-copy").onclick = () => {
-    navigator.clipboard.writeText(linha);
-    alert("Linha PIX copiada!");
+  // copiar linha (com fallback se navigator.clipboard não funcionar)
+  modal.querySelector(".btn-copy").onclick = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(linha);
+      } else {
+        const temp = document.createElement('textarea');
+        temp.value = linha;
+        temp.style.position = 'fixed';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+      }
+      alert("Linha PIX copiada!");
+    } catch (e) {
+      console.error(e);
+      alert("Não foi possível copiar automaticamente. Selecione e copie manualmente.");
+    }
   };
 
   // fechar
@@ -901,6 +975,10 @@ function abrirModalPIX(qr, linha, valor){
 
 
 
+
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+
 </body>
 </html>
