@@ -1123,29 +1123,7 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
     foreground: '#5dd4ff'
   });
   // copiar DADOS COMPLETOS (CNPJ + copia e cola) com fallback
-modal.querySelector(".btn-copy-cnpj").onclick = async () => {
-  const cnpj = "52.608.228/0001-62";
-  try {
-    await navigator.clipboard.writeText(cnpj);
-    alert("CNPJ copiado!");
-  } catch(e) {
-    console.error(e);
-    alert("Erro ao copiar. Copie manualmente.");
-  }
-};
-
-modal.querySelector(".btn-copy-line").onclick = async () => {
-  const copiaCola = document.getElementById("linhaPix").textContent.trim();
-  try {
-    await navigator.clipboard.writeText(copiaCola);
-    alert("Código PIX (copia e cola) copiado!");
-  } catch(e) {
-    console.error(e);
-    alert("Erro ao copiar. Copie manualmente.");
-  }
-};
-
-
+  modal.querySelector(".btn-copy").onclick = async () => {
     const textoClipboard =
 `Pagamento ${planoId}
 Valor: R$ ${valor.toFixed(2)}
@@ -1172,6 +1150,28 @@ ${linha}`;
       alert("Não foi possível copiar automaticamente. Selecione e copie manualmente.");
     }
   };
+
+  modal.querySelector(".btn-copy-cnpj").onclick = async () => {
+  const cnpj = "52.608.228/0001-62";
+  try {
+    await navigator.clipboard.writeText(cnpj);
+    alert("CNPJ copiado!");
+  } catch(e) {
+    console.error(e);
+    alert("Erro ao copiar. Copie manualmente.");
+  }
+};
+
+modal.querySelector(".btn-copy-line").onclick = async () => {
+  const copiaCola = document.getElementById("linhaPix").textContent.trim();
+  try {
+    await navigator.clipboard.writeText(copiaCola);
+    alert("Código PIX (copia e cola) copiado!");
+  } catch(e) {
+    console.error(e);
+    alert("Erro ao copiar. Copie manualmente.");
+  }
+};
 
 
   // baixar card como imagem (pra mandar no Whats)
