@@ -859,8 +859,10 @@ tbody.addEventListener('click', async (ev)=>{
         return;
       }
 
+       const merchantId = tr.dataset.id; // id do comércio na tabela/Firestore
       const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoSelecionado);
-      abrirModalPIX(brcode, valorFinal, mesesInfo, tipoSelecionado, nomeCliente);
+      abrirModalPIX(brcode, valorFinal, mesesInfo, tipoSelecionado, nomeCliente, merchantId);
+
     });
 
     return;
@@ -1031,7 +1033,8 @@ function abrirModalPIX(
   valor,
   mesesDevidos,
   tipoLabel = 'MENSAL',
-  nomeCliente = ''
+  nomeCliente = '',
+  merchantId = ''
 ) {
   const modal = document.createElement("div");
   modal.className = "modal-pix";
@@ -1233,100 +1236,82 @@ ${linha}`;
     a.click();
   };
 
-    // enviar por WhatsApp (tenta compartilhar a imagem; se não der, abre WhatsApp Web com texto)
-    // enviar por WhatsApp (tenta compartilhar a imagem; se não der, abre WhatsApp Web com texto)
-  const btnWhats = modal.querySelector(".btn-whats");
-  btnWhats.onclick = async () => {
-    const card = document.getElementById('pixCard');
 
-    // 1) Tenta pegar telefone direto do Firestore (coleção merchants)
+    // enviar por WhatsApp (tenta compartilhar a imagem; se não der, abre WhatsApp Web com texto)
+    const btnWhats = modal.querySelector(".btn-whats");
+  btnWhats.onclick = async () => {
+    // 1) Descobre o telefone do estabelecimento no Firestore
     let phone = "";
+
     try {
-      const merchantId = window.__PIX_MERCHANT_ID__;
       if (merchantId) {
-        const snap = await getDoc(doc(db, "merchants", merchantId));
-        if (snap.exists()) {
-          const data = snap.data();
+        const mRef = doc(db, 'merchants', merchantId);
+        const mSnap = await getDoc(mRef);
+        if (mSnap.exists()) {
+          const data = mSnap.data();
+          // tente aqui os campos que você usa pro telefone/whats
           phone =
-            data.whatsapp ||
-            data.telefone ||
-            data.celular ||
-            data.phone ||
-            "";
+            (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
         }
       }
     } catch (e) {
-      console.error("Erro ao buscar telefone do merchant:", e);
+      console.error('Erro ao buscar telefone do merchant:', e);
     }
 
-    // 2) Fallback: se não achou no Firestore, tenta pegar das Observações da linha
+    // 2) Se não tiver telefone cadastrado, avisa
     if (!phone) {
-      const tr = document.querySelector(`tr[data-id="${window.__PIX_MERCHANT_ID__}"]`);
-      const obsText = tr?.querySelector(".inp-obs")?.value || "";
-      phone = obsText.replace(/\D+/g, "");
-    } else {
-      // limpa qualquer máscara ((), espaços, -) que veio do Firestore
-      phone = String(phone).replace(/\D+/g, "");
+      alert('Telefone do estabelecimento não encontrado.\n' +
+            'Cadastre o Whats/telefone no documento merchants (campos whatsapp / telefone / celular / phone).');
+      return;
     }
 
-    // 3) Ajusta DDI Brasil se for número 10/11 dígitos
+    // 3) Limpa e padroniza o número
+    phone = phone.replace(/\D+/g, ''); // só dígitos
+
+    // se vier só com DDD + número (10 ou 11 dígitos), adiciona 55
     if (phone.length === 10 || phone.length === 11) {
-      phone = "55" + phone;
+      phone = '55' + phone;
     }
 
-    // 4) Validação simples
     if (phone.length < 12) {
-      alert(
-        "Telefone do cliente não encontrado.\n" +
-        "Cadastre o WhatsApp no documento do comércio (whatsapp/telefone) ou coloque no campo Observações."
-      );
+      alert('Telefone do estabelecimento parece inválido: ' + phone);
       return;
     }
 
     const waUrl = `https://wa.me/${phone}`;
 
-    // 5) Gera imagem do card (QR Code)
+    // 4) Gera a imagem do card e já baixa automaticamente
+    const card = document.getElementById('pixCard');
     if (!window.html2canvas) {
-      alert("html2canvas não carregado.");
+      alert('html2canvas não carregado. Verifique o script no final da página.');
       return;
     }
 
-    const canvas = await html2canvas(card, { backgroundColor: "#0b0f14", scale: 2 });
-    const dataUrl = canvas.toDataURL("image/png");
-
-    // 6) Tenta envio direto (Share API – melhor em celular)
     try {
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], "cobranca.png", { type: "image/png" });
+      const canvas = await html2canvas(card, { backgroundColor: '#0b0f14', scale: 2 });
+      const dataUrl = canvas.toDataURL('image/png');
 
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: "Cobrança Ola Carlópolis",
-          text: `Olá! Segue o QR Code para pagamento.
-Plano: ${planoId}
-Cliente: ${nomeMostrar}
-Valor: R$ ${valor.toFixed(2)}`
-        });
-        return;
-      }
+      // baixa a imagem automaticamente (fica pronta pra anexar no Whats)
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `pix-${tipoLabel.toLowerCase()}-${valor.toFixed(2).replace('.','_')}.png`;
+      a.click();
     } catch (e) {
-      console.warn("Share API falhou, usando fallback.", e);
+      console.error('Erro ao gerar imagem do card:', e);
     }
 
-    // 7) Fallback: abre WhatsApp Web com texto pronto + número do cliente
+    // 5) Abre o Whats já no número do estabelecimento com o texto pronto
     const texto = encodeURIComponent(
-`Olá! Segue o QR Code para pagamento.
+`Olá ${nomeMostrar}!
+Segue o QR Code para pagamento.
+
 Plano: ${planoId}
-Cliente: ${nomeMostrar}
 Valor: R$ ${valor.toFixed(2)}
 
-Envio a imagem logo a seguir.`
+Acabei de gerar e baixar a imagem com o QR Code para anexar em seguida.`
     );
 
-    window.open(`${waUrl}?text=${texto}`, "_blank");
-
-    alert("No WhatsApp Web: anexe a imagem gerada automaticamente na pasta de downloads.");
+    window.open(`${waUrl}?text=${texto}`, '_blank');
   };
 
 
