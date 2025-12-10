@@ -428,6 +428,81 @@ async function loadAllowedKeysFromScript(){
 }
 </script>
 
+<script>
+  // Mapa global: idDoComercio -> url da foto de perfil
+  window.__PROFILE_MAP__ = null;
+
+  function normalizeNameLocal(str) {
+    return String(str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[\u0300-\u036f]/g, '')      // remove acentos
+      .replace(/\s+/g, '-')                 // espaços -> hífen
+      .replace(/[^a-z0-9\-]/g, '');         // só letras/números/hífen
+  }
+
+  async function loadProfileMapFromScript() {
+    if (window.__PROFILE_MAP__) return window.__PROFILE_MAP__;
+
+    try {
+      const res  = await fetch('/script.js', { cache: 'no-store' });
+      const code = await res.text();
+
+      // pega só o array categories = [ ... ];
+      const m = code.match(/const\s+categories\s*=\s*(\[[\s\S]*?\]);/m);
+      if (!m || !m[1]) {
+        console.warn('categories não encontrado em script.js');
+        window.__PROFILE_MAP__ = {};
+        return window.__PROFILE_MAP__;
+      }
+
+      let arrCode = m[1];
+
+      // remove vírgulas sobrando antes de ] ou }
+      arrCode = arrCode.replace(/,(\s*[}\]])/g, '$1');
+
+      const categories = (new Function('return (' + arrCode + ')'))();
+
+      const map = {};
+
+      (categories || []).forEach(cat => {
+        (cat.establishments || []).forEach(est => {
+          const id =
+            est.nomeNormalizado ||
+            normalizeNameLocal(est.name || '');
+
+          if (!id) return;
+
+          // tenta usar a foto de perfil principal
+          let img = est.image;
+
+          // se não tiver, usa a primeira de novidades/divulgação (se existir)
+          if (!img && Array.isArray(est.novidadesImages) && est.novidadesImages.length) {
+            img = est.novidadesImages[0];
+          }
+
+          if (img) {
+            map[id] = img;
+          }
+        });
+      });
+
+      window.__PROFILE_MAP__ = map;
+      return map;
+    } catch (e) {
+      console.error('Falha ao montar PROFILE_MAP a partir de script.js', e);
+      window.__PROFILE_MAP__ = {};
+      return window.__PROFILE_MAP__;
+    }
+  }
+
+  async function getProfileUrlFromScript(merchantId) {
+    if (!merchantId) return '';
+    const map = await loadProfileMapFromScript();
+    return map[merchantId] || '';
+  }
+</script>
 
 
 
@@ -812,16 +887,14 @@ function abrirModalTipoCobranca(totalMensal, callback) {
 }
 
 // Listener para o botão PIX de cada linha
-// Listener para o botão PIX de cada linha
 tbody.addEventListener('click', async (ev)=>{
   const btnPix = ev.target.closest('.btn-pix');
   if (btnPix) {
     const tr = btnPix.closest('tr');
-     window.__PIX_MERCHANT_ID__ = tr.dataset.id;   // <-- ADICIONE AQUI
+    window.__PIX_MERCHANT_ID__ = tr.dataset.id;
     const nomeComercio = tr.querySelector('.nome-holder').textContent.trim();
 
     const chks = Array.from(tr.querySelectorAll('.months .chk'));
-
     const mesesNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     let totalMensal = 0;
     const mesesDevidos = [];
@@ -833,12 +906,11 @@ tbody.addEventListener('click', async (ev)=>{
       }
     });
 
-    // nome do cliente: usa o pagador se tiver, senão o nome do comércio
     const pagadorNome = tr.querySelector('.inp-nome')?.value.trim() || '';
     const nomeCliente = pagadorNome || nomeComercio;
 
-    // Abre modal para escolher tipo de cobrança
-    abrirModalTipoCobranca(totalMensal, (tipoSelecionado)=>{
+    // 👇 AQUI: callback async
+    abrirModalTipoCobranca(totalMensal, async (tipoSelecionado)=>{
       let valorFinal = 0;
       let mesesInfo  = [];
 
@@ -848,7 +920,7 @@ tbody.addEventListener('click', async (ev)=>{
           return;
         }
         valorFinal = totalMensal;
-        mesesInfo  = mesesDevidos;         // lista de meses
+        mesesInfo  = mesesDevidos;
       } else if (tipoSelecionado === 'SEMESTRAL') {
         valorFinal = VALOR_SEMESTRAL;
         mesesInfo  = ['Plano semestral'];
@@ -859,17 +931,29 @@ tbody.addEventListener('click', async (ev)=>{
         return;
       }
 
-       const merchantId = tr.dataset.id; // id do comércio na tabela/Firestore
-      const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoSelecionado);
-      abrirModalPIX(brcode, valorFinal, mesesInfo, tipoSelecionado, nomeCliente, merchantId);
+      const merchantId = tr.dataset.id; // id do comércio na tabela/Firestore
 
+      // 🔹 agora o await pode ser usado
+      const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
+
+      const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoSelecionado);
+      abrirModalPIX(
+        brcode,
+        valorFinal,
+        mesesInfo,
+        tipoSelecionado,
+        nomeCliente,
+        merchantId,
+        fotoPerfilUrl   // novo parâmetro
+      );
     });
 
     return;
   }
 
-  // se não foi o botão PIX, permanece o fluxo normal (botão salvar etc.)
+  // resto do handler (botão salvar etc.)
 });
+
 
 
  
@@ -1034,7 +1118,8 @@ function abrirModalPIX(
   mesesDevidos,
   tipoLabel = 'MENSAL',
   nomeCliente = '',
-  merchantId = ''
+  merchantId = '',
+  fotoPerfilUrl = ''
 ) {
   const modal = document.createElement("div");
   modal.className = "modal-pix";
@@ -1065,61 +1150,79 @@ function abrirModalPIX(
   const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
 
   modal.innerHTML = `
-    <div class="modal-box">
-      <h3>QR Code PIX</h3>
+        <div class="modal-box">
+          <h3>QR Code PIX</h3>
 
-      <!-- CARD QUE VIRA IMAGEM -->
-      <div id="pixCard" style="
-        position:relative;
-        border-radius:18px;
-        padding:18px;
-        border:1px solid #182029;
-        width:320px;
-        min-height:420px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        background:url('/images/img_padrao_site/logo_.png') center/cover no-repeat;
-      ">
-        <!-- Card interno escuro -->
-        <div style="
-          background:rgba(6,16,24,0.90);
-          border-radius:18px;
-          padding:16px;
-          width:100%;
-          max-width:260px;
-          display:flex;
-          flex-direction:column;
-          align-items:center;
-          gap:10px;
-          box-shadow:0 10px 25px rgba(0,0,0,0.6);
-        ">
-          <canvas id="pixCanvas"></canvas>
+          <!-- CARD QUE VIRA IMAGEM -->
+          <div id="pixCard" style="
+            position:relative;
+            border-radius:18px;
+            padding:18px;
+            border:1px solid #182029;
+            width:320px;
+            min-height:420px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:url('/images/img_padrao_site/logo_.png') center/cover no-repeat;
+          ">
+            <!-- Card interno escuro -->
+            <div style="
+              background:rgba(6,16,24,0.90);
+              border-radius:18px;
+              padding:16px;
+              width:100%;
+              max-width:260px;
+              display:flex;
+              flex-direction:column;
+              align-items:center;
+              gap:10px;
+              box-shadow:0 10px 25px rgba(0,0,0,0.6);
+            ">
+              <!-- FOTO DE PERFIL NO LUGAR DO QR CODE -->
+              <div style="
+                width:120px;
+                height:120px;
+                border-radius:50%;
+                overflow:hidden;
+                border:3px solid #5dd4ff;
+                background:#0b0f14;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                margin-bottom:4px;
+              ">
+                ${
+                  fotoPerfilUrl
+                    ? `<img src="${fotoPerfilUrl}" alt="${escapeHtml(nomeMostrar)}" style="width:100%;height:100%;object-fit:cover;">`
+                    : `<img src="/images/img_padrao_site/logo_.png" alt="Olá Carlópolis" style="width:100%;height:100%;object-fit:cover;">`
+                }
+              </div>
 
-          <div style="margin-top:4px; font-size:13px; color:#e3e7ee; text-align:left; width:100%;">
-            <div><strong>Cliente:</strong> ${escapeHtml(nomeMostrar)}</div>
+              <div style="margin-top:4px; font-size:13px; color:#e3e7ee; text-align:left; width:100%;">
+                <div><strong>Cliente:</strong> ${escapeHtml(nomeMostrar)}</div>
 
-            <div style="margin-top:4px;">
-              <strong>Valor: </strong> R$ ${valor.toFixed(2)}
-            </div>
+                <div style="margin-top:4px;">
+                  <strong>Valor: </strong> R$ ${valor.toFixed(2)}
+                </div>
 
-            <div style="margin-top:4px;">
-              <strong>Plano:</strong> ${planoId}
-            </div>
+                <div style="margin-top:4px;">
+                  <strong>Plano:</strong> ${planoId}
+                </div>
 
-            ${detalheMesesHtml}
+                ${detalheMesesHtml}
 
-            <div style="margin-top:8px; font-size:12px;">
-              <strong>Chave PIX (CNPJ):</strong><br>
-              52.608.228/0001-62
-            </div>
+                <div style="margin-top:8px; font-size:12px;">
+                  <strong>Chave PIX (CNPJ):</strong><br>
+                  52.608.228/0001-62
+                </div>
 
-            <div style="margin-top:8px; font-size:11px; opacity:.9;">
-              <em>Marketing Ola Carlópolis</em>
+                <div style="margin-top:8px; font-size:11px; opacity:.9;">
+                  <em>Marketing Ola Carlópolis</em>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
       <!-- ÁREA FORA DA IMAGEM: CNPJ + CÓDIGO + BOTÕES -->
       <div style="margin-top:10px; text-align:left; font-size:12px; color:#e3e7ee;">
@@ -1153,15 +1256,8 @@ function abrirModalPIX(
 
   document.body.appendChild(modal);
 
-  // gera QR dentro do card
-  new QRious({
-    element: document.getElementById('pixCanvas'),
-    value: linha,
-    size: 220,
-    background: '#0b0f14',
-    foreground: '#5dd4ff'
-  });
 
+  
   // Copiar TUDO (mensagem completa)
   modal.querySelector(".btn-copy").onclick = async () => {
     const textoClipboard =
