@@ -1033,7 +1033,7 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
   if (tipoLabel === 'MENSAL') {
     detalheMesesHtml = `
       <div style="margin-top:4px;">
-        <strong>Referente aos meses:</strong> ${mesesTexto}
+        <strong>Referente a: </strong> ${mesesTexto}
       </div>
     `;
   } else {
@@ -1050,25 +1050,34 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
 
       <!-- CARD QUE VIRA IMAGEM -->
       <div id="pixCard" style="
-        background:#0b0f14;
-        border-radius:14px;
-        padding:14px;
-        border:1px solid #182029;
-      ">
-        <canvas id="pixCanvas"></canvas>
+  background:#0b0f14;
+  border-radius:14px;
+  padding:14px;
+  border:1px solid #182029;
+">
+  <div style="display:flex; flex-direction:column; align-items:center;">
+    <!-- 🔹 LOGO OLA CARLOPOLIS (AJUSTE O CAMINHO DO SRC) -->
+    <img
+      src="/images/img_padrao_site/logo_.png"
+      alt="Olá Carlópolis"
+      style="width:80px; margin-bottom:8px; border-radius:12px;"
+    />
+    <canvas id="pixCanvas"></canvas>
+  </div>
 
-        <div style="margin-top:10px; font-size:13px; color:#e3e7ee; text-align:left;">
-          <div><strong>Valor total:</strong> R$ ${valor.toFixed(2)}</div>
-          <div style="margin-top:4px;">
-            <strong>Plano:</strong> ${planoId}
-          </div>
-          ${detalheMesesHtml}
-        </div>
+  <div style="margin-top:10px; font-size:13px; color:#e3e7ee; text-align:left;">
+    <div><strong>Valor Total:</strong> R$ ${valor.toFixed(2)}</div>
+    <div style="margin-top:4px;">
+      <strong>Plano:</strong> ${planoId}
+    </div>
+    ${detalheMesesHtml}
+  </div>
 
-        <div class="pix-line" style="margin-top:10px;">
-          ${linha}
-        </div>
-      </div>
+  <div class="pix-line" style="margin-top:10px;">
+    ${linha}
+  </div>
+</div>
+
 
       <button class="btn-copy">Copiar linha</button>
       <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
