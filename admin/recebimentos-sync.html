@@ -634,24 +634,9 @@ function updateRowStatusFromCheckboxes(tr){
   for (const m of merchants){
     i++;
     const dados = await readReceb(year, m.id);
-const mesesData = dados.meses || {};
-const tr = document.createElement('tr');
-tr.dataset.id = m.id;
-
-// tenta pegar a imagem de perfil do comércio (ajuste os campos se precisar)
-const fotoPerfil =
-  m.fotoPerfil ||
-  m.imgPerfil ||
-  m.logo ||
-  m.logoUrl ||
-  m.image ||
-  m.photoUrl ||
-  '';
-
-if (fotoPerfil) {
-  tr.dataset.fotoPerfil = fotoPerfil;
-}
-
+    const mesesData = dados.meses || {};
+    const tr = document.createElement('tr');
+    tr.dataset.id = m.id;
 
 // antes de montar tr.innerHTML
 const monthsHtml = ["01","02","03","04","05","06","07","08","09","10","11","12"].map((mm,idx)=>{
@@ -868,13 +853,8 @@ tbody.addEventListener('click', async (ev)=>{
         return;
       }
 
-      const fotoPerfil = tr.dataset.fotoPerfil || '';
-const pagadorNome = tr.querySelector('.inp-nome')?.value.trim() || '';
-const nomeCliente = pagadorNome || nome; // se não tiver pagador, usa o nome do comércio
-
-const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoSelecionado);
-abrirModalPIX(brcode, valorFinal, mesesInfo, tipoSelecionado, nomeCliente, fotoPerfil);
-
+      const brcode = gerarBRCodePix(nome, valorFinal, tipoSelecionado);
+      abrirModalPIX(brcode, valorFinal, mesesInfo, tipoSelecionado);
     });
 
     return;
@@ -1037,14 +1017,7 @@ function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
 
 
 
-function abrirModalPIX(
-  linha,
-  valor,
-  mesesDevidos,
-  tipoLabel = 'MENSAL',
-  nomeCliente = '',
-  fotoUrl = ''
-) {
+function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
   const modal = document.createElement("div");
   modal.className = "modal-pix";
 
@@ -1060,7 +1033,7 @@ function abrirModalPIX(
   if (tipoLabel === 'MENSAL') {
     detalheMesesHtml = `
       <div style="margin-top:4px;">
-        <strong>Referente a:</strong> ${mesesTexto}
+        <strong>Referente a: </strong> ${mesesTexto}
       </div>
     `;
   } else {
@@ -1071,118 +1044,92 @@ function abrirModalPIX(
     `;
   }
 
-  const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
-  const fotoPerfilUrl = fotoUrl || '/images/img_padrao_site/logo_.png'; // fallback se não tiver foto do comércio
-
   modal.innerHTML = `
     <div class="modal-box">
       <h3>QR Code PIX</h3>
 
-      <!-- 🔹 CARD QUE VIRA IMAGEM -->
-      <div id="pixCard" style="
-        background:#060d13;
-        border-radius:18px;
-        padding:16px;
-        border:1px solid #182029;
-        width:340px;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        gap:10px;
-      ">
-        <!-- topo: logo esquerda, QR no centro, foto comércio à direita -->
-        <div style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:8px;
-          width:100%;
-        ">
-          <img
-            src="/images/img_padrao_site/logo_.png"
-            alt="Olá Carlópolis"
-            style="width:64px;height:64px;border-radius:16px;object-fit:cover;box-shadow:0 0 8px rgba(0,0,0,0.5);"
-          />
-          <canvas
-            id="pixCanvas"
-            style="width:160px;height:160px;"
-          ></canvas>
-          <img
-            src="${fotoPerfilUrl}"
-            alt="${escapeHtml(nomeMostrar)}"
-            style="width:64px;height:64px;border-radius:16px;object-fit:cover;box-shadow:0 0 8px rgba(0,0,0,0.5);"
-          />
-        </div>
+     
+     <!-- CARD QUE VIRA IMAGEM -->
+<div id="pixCard" style="
+  position:relative;
+  border-radius:18px;
+  padding:18px;
+  border:1px solid #182029;
+  width:320px;
+  min-height:420px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:url('/images/img_padrao_site/logo_.png') center/cover no-repeat;
+">
+  <!-- Card interno escuro -->
+  <div style="
+    background:rgba(6,16,24,0.90);
+    border-radius:18px;
+    padding:16px;
+    width:100%;
+    max-width:260px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.6);
+  ">
+    
+    <canvas id="pixCanvas"></canvas>
 
-        <!-- dados do pagamento -->
-        <div style="font-size:13px;color:#e3e7ee;text-align:left;width:100%;margin-top:4px;">
-          <div><strong>Cliente:</strong> ${escapeHtml(nomeMostrar)}</div>
+    <div style="margin-top:6px; font-size:14px; color:#e3e7ee; text-align:left; width:100%;">
+      <div><strong>Valor: </strong> R$ ${valor.toFixed(2)}</div>
 
-          <div style="margin-top:4px;">
-            <strong>Valor Total:</strong> R$ ${valor.toFixed(2)}
-          </div>
-
-          <div style="margin-top:4px;">
-            <strong>Plano:</strong> ${planoId}
-          </div>
-
-          ${detalheMesesHtml}
-
-          <div style="margin-top:6px;font-size:12px;">
-            <strong>Chave PIX (CNPJ):</strong><br>
-            52.608.228/0001-62
-          </div>
-        </div>
-
-        <div style="margin-top:6px;font-size:11px;color:#9aa6b2;width:100%;text-align:left;">
-          Projeto: Marketing Ola Carlópolis
-        </div>
+      <div style="margin-top:4px;">
+        <strong>Plano:</strong> ${planoId}
       </div>
 
-      <!-- 🔹 ÁREA FORA DA IMAGEM: CNPJ + CÓDIGO + BOTÕES -->
-      <div style="margin-top:10px;text-align:left;font-size:12px;color:#e3e7ee;">
-        <div style="margin-bottom:8px;">
-          <strong>Chave PIX (CNPJ):</strong><br>
-          <span id="cnpjPix">52.608.228/0001-62</span><br>
-          <button class="btn-copy-cnpj" style="margin-top:4px;padding:4px 8px;font-size:12px;">
-            📋 Copiar CNPJ
-          </button>
-        </div>
+      ${detalheMesesHtml}
 
-        <div>
-          <strong>PIX copia e cola:</strong><br>
-          <span id="linhaPix">${linha}</span><br>
-          <button class="btn-copy-line" style="margin-top:4px;padding:4px 8px;font-size:12px;">
-            📋 Copiar código
-          </button>
-        </div>
+      <div style="margin-top:8px; font-size:12px;">
+        <strong>Chave PIX (CNPJ):</strong><br>
+        52.608.228/0001-62
       </div>
 
-      <button class="btn-copy">Copiar tudo</button>
-      <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
+      <div style="margin-top:10px; font-size:12px; opacity:.9;">
+        <em>Marketing Ola Carlópolis</em>
+      </div>
+    </div>
 
-      <button class="btn-close">Fechar</button>
+  </div>
+</div>
+
+
+
+
+   
+<button class="btn-copy-cnpj">Copiar CNPJ</button>
+<button class="btn-copy-line">Copiar código PIX</button>
+<button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
+
     </div>
   `;
 
   document.body.appendChild(modal);
 
-  // QR code no centro
+  // gera QR dentro do card
   new QRious({
     element: document.getElementById('pixCanvas'),
     value: linha,
-    size: 160,
-    background: '#060d13',
+    size: 220,
+    background: '#0b0f14',
     foreground: '#5dd4ff'
   });
 
-  // 🔹 Copiar TUDO (mensagem completa)
+  
+  // copiar DADOS COMPLETOS (CNPJ + copia e cola) com fallback
   modal.querySelector(".btn-copy").onclick = async () => {
     const textoClipboard =
-`Pagamento: ${planoId}
+`Pagamento ${planoId}
 Valor: R$ ${valor.toFixed(2)}
 
-CNPJ (chave PIX):
+Chave PIX (CNPJ): 
 52.608.228/0001-62
 
 PIX copia e cola:
@@ -1208,31 +1155,30 @@ ${linha}`;
     }
   };
 
-  // 🔹 Copiar só o CNPJ
   modal.querySelector(".btn-copy-cnpj").onclick = async () => {
-    const cnpj = "52.608.228/0001-62";
-    try {
-      await navigator.clipboard.writeText(cnpj);
-      alert("CNPJ copiado!");
-    } catch(e) {
-      console.error(e);
-      alert("Erro ao copiar. Copie manualmente.");
-    }
-  };
+  const cnpj = "52.608.228/0001-62";
+  try {
+    await navigator.clipboard.writeText(cnpj);
+    alert("CNPJ copiado!");
+  } catch(e) {
+    console.error(e);
+    alert("Erro ao copiar. Copie manualmente.");
+  }
+};
 
-  // 🔹 Copiar só o código PIX (copia e cola)
-  modal.querySelector(".btn-copy-line").onclick = async () => {
-    const copiaCola = document.getElementById("linhaPix").textContent.trim();
-    try {
-      await navigator.clipboard.writeText(copiaCola);
-      alert("Código PIX (copia e cola) copiado!");
-    } catch(e) {
-      console.error(e);
-      alert("Erro ao copiar. Copie manualmente.");
-    }
-  };
+modal.querySelector(".btn-copy-line").onclick = async () => {
+  const copiaCola = document.getElementById("linhaPix").textContent.trim();
+  try {
+    await navigator.clipboard.writeText(copiaCola);
+    alert("Código PIX (copia e cola) copiado!");
+  } catch(e) {
+    console.error(e);
+    alert("Erro ao copiar. Copie manualmente.");
+  }
+};
 
-  // 🔹 Baixar card como imagem (só o #pixCard)
+
+  // baixar card como imagem (pra mandar no Whats)
   const btnDownload = modal.querySelector(".btn-download-img");
   btnDownload.onclick = async () => {
     const card = document.getElementById('pixCard');
@@ -1240,7 +1186,7 @@ ${linha}`;
       alert('html2canvas não carregado. Verifique o script no final da página.');
       return;
     }
-    const canvas = await html2canvas(card, { backgroundColor: '#060d13', scale: 2 });
+    const canvas = await html2canvas(card, { backgroundColor: '#0b0f14', scale: 2 });
     const dataUrl = canvas.toDataURL('image/png');
 
     const a = document.createElement('a');
@@ -1249,10 +1195,9 @@ ${linha}`;
     a.click();
   };
 
-  // fechar modal
+  // fechar
   modal.querySelector(".btn-close").onclick = () => modal.remove();
 }
-
 
 
 
