@@ -919,7 +919,7 @@ function gerarBRCodePix(nomeCliente, valor) {
     emvField('58', 'BR') +             // País
     emvField('59', nomeComerciante) +  // Nome do recebedor
     emvField('60', cidade) +           // Cidade
-    emvField('62', emvField('05', '***')); // TxId = ***
+    emvField('62', emvField('05', 'Ola Carlopolis')); // TxId = ***
 
   // Campo 63 = CRC16
   const toCrc = payload + '6304';
@@ -956,10 +956,7 @@ function abrirModalPIX(linha, valor, mesesDevidos) {
           <div style="margin-top:4px;">
             <strong>Referente aos meses:</strong> ${mesesTexto}
           </div>
-          <div style="margin-top:8px; font-size:12px; color:#9aa6b2;">
-            Ao pagar, escreva na descrição:<br>
-            <strong>"${descricaoPix}"</strong>
-          </div>
+        
         </div>
 
         <div class="pix-line" style="margin-top:10px;">
