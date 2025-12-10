@@ -1049,7 +1049,8 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
       <h3>QR Code PIX</h3>
 
       <!-- CARD QUE VIRA IMAGEM -->
-     <div id="pixCard" style="
+     <!-- CARD QUE VIRA IMAGEM -->
+<div id="pixCard" style="
   position:relative;
   border-radius:18px;
   padding:18px;
@@ -1061,22 +1062,23 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
   justify-content:center;
   background:url('/images/img_padrao_site/logo_.png') center/cover no-repeat;
 ">
-  <!-- “card” central escuro por cima do fundo, igual estilo dos cards -->
+  <!-- Card interno escuro -->
   <div style="
-    background:rgba(6,16,24,0.9);
+    background:rgba(6,16,24,0.90);
     border-radius:18px;
-    padding:14px 16px;
+    padding:16px;
     width:100%;
     max-width:260px;
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:8px;
+    gap:10px;
     box-shadow:0 10px 25px rgba(0,0,0,0.6);
   ">
+    
     <canvas id="pixCanvas"></canvas>
 
-      <div style="margin-top:4px; font-size:13px; color:#e3e7ee; text-align:left; width:100%;">
+    <div style="margin-top:6px; font-size:13px; color:#e3e7ee; text-align:left; width:100%;">
       <div><strong>Valor Total:</strong> R$ ${valor.toFixed(2)}</div>
 
       <div style="margin-top:4px;">
@@ -1085,30 +1087,28 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
 
       ${detalheMesesHtml}
 
-     <div style="margin-top:6px; font-size:12px;">
-  <strong>Chave PIX (CNPJ):</strong><br>
-  <span id="cnpjPix">52.608.228/0001-62</span><br>
-  <button class="btn-copy-cnpj" style="margin-top:4px; padding:4px 8px; font-size:12px;">📋 Copiar CNPJ</button>
-</div>
+      <div style="margin-top:8px; font-size:12px;">
+        <strong>Chave PIX (CNPJ):</strong><br>
+        52.608.228/0001-62
+      </div>
 
+      <div style="margin-top:10px; font-size:12px; opacity:.9;">
+        <em>Estou enviando o valor referente aos meses pendentes.<br>
+        Agradeço sua colaboração.</em>
+      </div>
     </div>
-
-  <div class="pix-line" style="margin-top:4px; width:100%; font-size:12px;">
-  <strong>PIX copia e cola:</strong><br>
-  <span id="linhaPix">${linha}</span>
-  <button class="btn-copy-line" style="margin-top:4px; padding:4px 8px; font-size:12px;">📋 Copiar código</button>
-</div>
-
 
   </div>
 </div>
 
 
 
-      <button class="btn-copy">Copiar linha</button>
-      <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
 
-      <button class="btn-close">Fechar</button>
+     <button class="btn-copy">Copiar linha</button>
+<button class="btn-copy-cnpj">Copiar CNPJ</button>
+<button class="btn-copy-line">Copiar código PIX</button>
+<button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
+
     </div>
   `;
 
