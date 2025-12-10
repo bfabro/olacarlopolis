@@ -817,6 +817,7 @@ tbody.addEventListener('click', async (ev)=>{
   const btnPix = ev.target.closest('.btn-pix');
   if (btnPix) {
     const tr = btnPix.closest('tr');
+     window.__PIX_MERCHANT_ID__ = tr.dataset.id;   // <-- ADICIONE AQUI
     const nomeComercio = tr.querySelector('.nome-holder').textContent.trim();
 
     const chks = Array.from(tr.querySelectorAll('.months .chk'));
@@ -1096,7 +1097,7 @@ function abrirModalPIX(
             <div><strong>Cliente:</strong> ${escapeHtml(nomeMostrar)}</div>
 
             <div style="margin-top:4px;">
-              <strong>Valor Total:</strong> R$ ${valor.toFixed(2)}
+              <strong>Valor: </strong> R$ ${valor.toFixed(2)}
             </div>
 
             <div style="margin-top:4px;">
@@ -1138,8 +1139,11 @@ function abrirModalPIX(
         </div>
       </div>
 
-      <button class="btn-copy">Copiar tudo</button>
+         <button class="btn-copy">Copiar tudo</button>
       <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
+      <button class="btn-whats" style="margin-top:8px; background:#25D366; color:#061018;">
+        Enviar por WhatsApp
+      </button>
       <button class="btn-close">Fechar</button>
     </div>
   `;
@@ -1228,6 +1232,74 @@ ${linha}`;
     a.download = `pix-${tipoLabel.toLowerCase()}-${valor.toFixed(2).replace('.','_')}.png`;
     a.click();
   };
+
+    // enviar por WhatsApp (tenta compartilhar a imagem; se não der, abre WhatsApp Web com texto)
+  const btnWhats = modal.querySelector(".btn-whats");
+  btnWhats.onclick = async () => {
+    const card = document.getElementById('pixCard');
+
+    // 1) Captura número de telefone automaticamente da linha
+    const tr = document.querySelector(`tr[data-id="${window.__PIX_MERCHANT_ID__}"]`);
+    const obsText = tr?.querySelector('.inp-obs')?.value || "";
+
+    // Extrai números do campo Observações
+    let phone = obsText.replace(/\D+/g, "");
+
+    // Se faltar DDI, adiciona 55
+    if (phone.length === 10 || phone.length === 11) {
+        phone = "55" + phone;
+    }
+
+    // Validação simples
+    if (phone.length < 12) {
+        alert("Telefone não encontrado nas observações. Insira no formato: 43 99999-1234");
+        return;
+    }
+
+    const waUrl = `https://wa.me/${phone}`;
+
+    // 2) Gera imagem do card
+    if (!window.html2canvas) {
+        alert('html2canvas não carregado.');
+        return;
+    }
+
+    const canvas = await html2canvas(card, { backgroundColor: '#0b0f14', scale: 2 });
+    const dataUrl = canvas.toDataURL('image/png');
+
+    // 3) Tenta envio direto (celular)
+    try {
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], "cobranca.png", { type: "image/png" });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: "Cobrança Ola Carlópolis",
+                text: `Olá! Segue o QR Code para pagamento.\nValor: R$ ${valor.toFixed(2)}`
+            });
+            return;
+        }
+    } catch (e) {
+        console.warn("Share API falhou, usando fallback.");
+    }
+
+    // 4) Fallback: envia texto + abre Whats do cliente (desktop)
+    const texto = encodeURIComponent(
+`Olá! Segue o QR Code para pagamento.
+Plano: ${planoId}
+Cliente: ${nomeMostrar}
+Valor: R$ ${valor.toFixed(2)}
+
+Envio a imagem logo a seguir.`
+    );
+
+    window.open(`${waUrl}?text=${texto}`, "_blank");
+
+    alert("No WhatsApp Web: anexe a imagem gerada automaticamente na pasta de downloads.");
+};
+
+
 
   // fechar
   modal.querySelector(".btn-close").onclick = () => modal.remove();
