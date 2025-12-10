@@ -1815,7 +1815,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "tokfino", "oficinadocelular", "seiza",
+    "tokfino", "oficinadocelular", "seiza","oticavisualcenter"
   ];
 
   function montarCarrosselDivulgacao() {
