@@ -634,6 +634,24 @@ function updateRowStatusFromCheckboxes(tr){
   for (const m of merchants){
     i++;
     const dados = await readReceb(year, m.id);
+const mesesData = dados.meses || {};
+const tr = document.createElement('tr');
+tr.dataset.id = m.id;
+
+// tenta pegar a imagem de perfil do comércio (ajuste os campos se precisar)
+const fotoPerfil =
+  m.fotoPerfil ||
+  m.imgPerfil ||
+  m.logo ||
+  m.logoUrl ||
+  m.image ||
+  m.photoUrl ||
+  '';
+
+if (fotoPerfil) {
+  tr.dataset.fotoPerfil = fotoPerfil;
+}
+
 
 // antes de montar tr.innerHTML
 const monthsHtml = ["01","02","03","04","05","06","07","08","09","10","11","12"].map((mm,idx)=>{
@@ -850,7 +868,7 @@ tbody.addEventListener('click', async (ev)=>{
         return;
       }
 
- const fotoPerfil = tr.dataset.fotoPerfil || '';
+      const fotoPerfil = tr.dataset.fotoPerfil || '';
 const pagadorNome = tr.querySelector('.inp-nome')?.value.trim() || '';
 const nomeCliente = pagadorNome || nome; // se não tiver pagador, usa o nome do comércio
 
