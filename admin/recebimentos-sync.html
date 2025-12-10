@@ -428,18 +428,21 @@ async function loadAllowedKeysFromScript(){
 }
 </script>
 
+
+
 <script>
-  // Mapa global: idDoComercio -> url da foto de perfil
+  // Agora guardamos DOIS mapas:
+  // byId:        id com hífen (ex.: "lobo-fitness")
+  // byNoHyphen:  id sem hífen (ex.: "lobofitness")
   window.__PROFILE_MAP__ = null;
 
   function normalizeNameLocal(str) {
     return String(str || '')
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[\u0300-\u036f]/g, '')      // remove acentos
-      .replace(/\s+/g, '-')                 // espaços -> hífen
-      .replace(/[^a-z0-9\-]/g, '');         // só letras/números/hífen
+      .replace(/[\u0300-\u036f]/g, '')     // remove acentos
+      .replace(/\s+/g, '-')                // espaços -> hífen
+      .replace(/[^a-z0-9\-]/g, '');        // só letras/números/hífen
   }
 
   async function loadProfileMapFromScript() {
@@ -453,7 +456,7 @@ async function loadAllowedKeysFromScript(){
       const m = code.match(/const\s+categories\s*=\s*(\[[\s\S]*?\]);/m);
       if (!m || !m[1]) {
         console.warn('categories não encontrado em script.js');
-        window.__PROFILE_MAP__ = {};
+        window.__PROFILE_MAP__ = { byId: {}, byNoHyphen: {} };
         return window.__PROFILE_MAP__;
       }
 
@@ -464,15 +467,17 @@ async function loadAllowedKeysFromScript(){
 
       const categories = (new Function('return (' + arrCode + ')'))();
 
-      const map = {};
+      const byId = {};
+      const byNoHyphen = {};
 
       (categories || []).forEach(cat => {
         (cat.establishments || []).forEach(est => {
-          const id =
+          // id "bonito" com hífen
+          const idNorm =
             est.nomeNormalizado ||
             normalizeNameLocal(est.name || '');
 
-          if (!id) return;
+          if (!idNorm) return;
 
           // tenta usar a foto de perfil principal
           let img = est.image;
@@ -482,25 +487,43 @@ async function loadAllowedKeysFromScript(){
             img = est.novidadesImages[0];
           }
 
-          if (img) {
-            map[id] = img;
-          }
+          if (!img) return;
+
+          // chave com hífen (ex.: "lobo-fitness")
+          byId[idNorm] = img;
+
+          // chave sem hífen (ex.: "lobofitness")
+          const semHifen = idNorm.replace(/-/g, '');
+          byNoHyphen[semHifen] = img;
         });
       });
 
-      window.__PROFILE_MAP__ = map;
-      return map;
+      window.__PROFILE_MAP__ = { byId, byNoHyphen };
+      return window.__PROFILE_MAP__;
     } catch (e) {
       console.error('Falha ao montar PROFILE_MAP a partir de script.js', e);
-      window.__PROFILE_MAP__ = {};
+      window.__PROFILE_MAP__ = { byId: {}, byNoHyphen: {} };
       return window.__PROFILE_MAP__;
     }
   }
 
   async function getProfileUrlFromScript(merchantId) {
     if (!merchantId) return '';
-    const map = await loadProfileMapFromScript();
-    return map[merchantId] || '';
+    const maps = await loadProfileMapFromScript();
+    const byId = maps.byId || {};
+    const byNoHyphen = maps.byNoHyphen || {};
+
+    const raw = String(merchantId || '').toLowerCase();
+    const semHifen = raw.replace(/-/g, '');
+
+    // tenta em todas as combinações possíveis
+    return (
+      byId[raw] ||
+      byId[semHifen] ||
+      byNoHyphen[raw] ||
+      byNoHyphen[semHifen] ||
+      ''
+    );
   }
 </script>
 
