@@ -5657,7 +5657,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
     // SITIO
-
+/*
     {
       id: "sitio1v",
       codRef: "ST_001",
@@ -5690,7 +5690,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     },
 
 
-
+*/
 
 
 
