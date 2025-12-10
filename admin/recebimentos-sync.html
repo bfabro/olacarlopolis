@@ -1076,17 +1076,26 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
   ">
     <canvas id="pixCanvas"></canvas>
 
-    <div style="margin-top:4px; font-size:13px; color:#e3e7ee; text-align:left; width:100%;">
+      <div style="margin-top:4px; font-size:13px; color:#e3e7ee; text-align:left; width:100%;">
       <div><strong>Valor Total:</strong> R$ ${valor.toFixed(2)}</div>
+
       <div style="margin-top:4px;">
         <strong>Plano:</strong> ${planoId}
       </div>
+
       ${detalheMesesHtml}
+
+      <div style="margin-top:6px; font-size:12px;">
+        <strong>Chave PIX (CNPJ):</strong><br>
+        52.608.228/0001-62
+      </div>
     </div>
 
-    <div class="pix-line" style="margin-top:4px; width:100%;">
+    <div class="pix-line" style="margin-top:4px; width:100%; font-size:12px;">
+      <strong>PIX copia e cola:</strong><br>
       ${linha}
     </div>
+
   </div>
 </div>
 
@@ -1109,15 +1118,21 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
     background: '#0b0f14',
     foreground: '#5dd4ff'
   });
-
-  // copiar linha (com fallback)
+  // copiar DADOS COMPLETOS (CNPJ + copia e cola) com fallback
   modal.querySelector(".btn-copy").onclick = async () => {
+    const textoClipboard =
+`Pagamento ${planoId}
+Valor: R$ ${valor.toFixed(2)}
+Chave PIX (CNPJ): 52.608.228/0001-62
+PIX copia e cola:
+${linha}`;
+
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(linha);
+        await navigator.clipboard.writeText(textoClipboard);
       } else {
         const temp = document.createElement('textarea');
-        temp.value = linha;
+        temp.value = textoClipboard;
         temp.style.position = 'fixed';
         temp.style.opacity = '0';
         document.body.appendChild(temp);
@@ -1125,12 +1140,13 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
         document.execCommand('copy');
         document.body.removeChild(temp);
       }
-      alert("Linha PIX copiada!");
+      alert("Dados PIX copiados! (CNPJ + copia e cola)");
     } catch (e) {
       console.error(e);
       alert("Não foi possível copiar automaticamente. Selecione e copie manualmente.");
     }
   };
+
 
   // baixar card como imagem (pra mandar no Whats)
   const btnDownload = modal.querySelector(".btn-download-img");
