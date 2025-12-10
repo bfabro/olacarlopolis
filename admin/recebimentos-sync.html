@@ -889,15 +889,35 @@ function crc16(str) {
 }
 
 // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
+// Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
 function gerarBRCodePix(nomeCliente, valor) {
   const pixKey = '52608228000162'; // CNPJ só com números
-  const gui = 'BR.GOV.BCB.PIX';
+  const gui    = 'BR.GOV.BCB.PIX';
 
-  const nomeComerciante = (nomeCliente || 'OLA CARLOPOLIS')
-    .toUpperCase()
-    .substring(0, 25); // máx 25 chars
+  // Normaliza texto para evitar erro em app de banco
+  function normalizeText(s, fallback, maxLen) {
+    s = (s || '').toString().toUpperCase();
 
-  const cidade = 'CARLOPOLIS';
+    // remove acentos
+    s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    // mantém só A-Z, 0-9 e espaço
+    s = s.replace(/[^A-Z0-9 ]/g, '').trim();
+
+    if (!s) s = fallback;
+    return s.substring(0, maxLen);
+  }
+
+  const nomeComerciante = normalizeText(
+    nomeCliente,
+    'OLACARLOPOLIS', // fallback
+    25               // limite do campo 59
+  );
+
+  const cidade = 'CARLOPOLIS'; // já está ok (sem acento, maiúsculo)
+
+  // TxId SEM espaço para evitar rejeição
+  const txid = 'OLACARLOPOLIS';
 
   // Subcampos do 26 = Merchant Account Information
   const merchantAccountInfo =
@@ -906,7 +926,7 @@ function gerarBRCodePix(nomeCliente, valor) {
 
   const merchantAccountField = emvField('26', merchantAccountInfo);
 
-  const valorStr = valor.toFixed(2); // ex: "90.00"
+  const valorStr = valor.toFixed(2); // ex: "150.00"
 
   // Monta o payload sem o CRC
   let payload =
@@ -914,19 +934,20 @@ function gerarBRCodePix(nomeCliente, valor) {
     emvField('01', '11') +             // Static (11)
     merchantAccountField +             // Merchant Account Info
     emvField('52', '0000') +           // Merchant Category Code
-    emvField('53', '986') +            // Moeda (986 = BRL)
+    emvField('53', '986') +           // Moeda (986 = BRL)
     emvField('54', valorStr) +         // Valor
     emvField('58', 'BR') +             // País
     emvField('59', nomeComerciante) +  // Nome do recebedor
     emvField('60', cidade) +           // Cidade
-    emvField('62', emvField('05', 'Ola Carlopolis')); // TxId = ***
+    emvField('62', emvField('05', txid)); // TxId
 
   // Campo 63 = CRC16
   const toCrc = payload + '6304';
-  const crc = crc16(toCrc);
+  const crc   = crc16(toCrc);
 
   return toCrc + crc;
 }
+
 
 function abrirModalPIX(linha, valor, mesesDevidos) {
   const modal = document.createElement("div");
