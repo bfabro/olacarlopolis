@@ -1123,38 +1123,18 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
     foreground: '#5dd4ff'
   });
 
-    // copiar DADOS COMPLETOS (CNPJ + copia e cola) com fallback
+  
+  // copiar DADOS COMPLETOS (CNPJ + copia e cola) com fallback
   modal.querySelector(".btn-copy").onclick = async () => {
     const textoClipboard =
-`Pagamento: ${planoId}
+`Pagamento ${planoId}
 Valor: R$ ${valor.toFixed(2)}
 
-CNPJ (chave PIX):
+Chave PIX (CNPJ): 
 52.608.228/0001-62
 
 PIX copia e cola:
 ${linha}`;
-
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(textoClipboard);
-      } else {
-        const temp = document.createElement('textarea');
-        temp.value = textoClipboard;
-        temp.style.position = 'fixed';
-        temp.style.opacity = '0';
-        document.body.appendChild(temp);
-        temp.select();
-        document.execCommand('copy');
-        document.body.removeChild(temp);
-      }
-      alert("Dados PIX copiados! (CNPJ + copia e cola)");
-    } catch (e) {
-      console.error(e);
-      alert("Não foi possível copiar automaticamente. Selecione e copie manualmente.");
-    }
-  };
-
 
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
