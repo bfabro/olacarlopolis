@@ -1234,57 +1234,87 @@ ${linha}`;
   };
 
     // enviar por WhatsApp (tenta compartilhar a imagem; se não der, abre WhatsApp Web com texto)
+    // enviar por WhatsApp (tenta compartilhar a imagem; se não der, abre WhatsApp Web com texto)
   const btnWhats = modal.querySelector(".btn-whats");
   btnWhats.onclick = async () => {
     const card = document.getElementById('pixCard');
 
-    // 1) Captura número de telefone automaticamente da linha
-    const tr = document.querySelector(`tr[data-id="${window.__PIX_MERCHANT_ID__}"]`);
-    const obsText = tr?.querySelector('.inp-obs')?.value || "";
-
-    // Extrai números do campo Observações
-    let phone = obsText.replace(/\D+/g, "");
-
-    // Se faltar DDI, adiciona 55
-    if (phone.length === 10 || phone.length === 11) {
-        phone = "55" + phone;
+    // 1) Tenta pegar telefone direto do Firestore (coleção merchants)
+    let phone = "";
+    try {
+      const merchantId = window.__PIX_MERCHANT_ID__;
+      if (merchantId) {
+        const snap = await getDoc(doc(db, "merchants", merchantId));
+        if (snap.exists()) {
+          const data = snap.data();
+          phone =
+            data.whatsapp ||
+            data.telefone ||
+            data.celular ||
+            data.phone ||
+            "";
+        }
+      }
+    } catch (e) {
+      console.error("Erro ao buscar telefone do merchant:", e);
     }
 
-    // Validação simples
+    // 2) Fallback: se não achou no Firestore, tenta pegar das Observações da linha
+    if (!phone) {
+      const tr = document.querySelector(`tr[data-id="${window.__PIX_MERCHANT_ID__}"]`);
+      const obsText = tr?.querySelector(".inp-obs")?.value || "";
+      phone = obsText.replace(/\D+/g, "");
+    } else {
+      // limpa qualquer máscara ((), espaços, -) que veio do Firestore
+      phone = String(phone).replace(/\D+/g, "");
+    }
+
+    // 3) Ajusta DDI Brasil se for número 10/11 dígitos
+    if (phone.length === 10 || phone.length === 11) {
+      phone = "55" + phone;
+    }
+
+    // 4) Validação simples
     if (phone.length < 12) {
-        alert("Telefone não encontrado nas observações. Insira no formato: 43 99999-1234");
-        return;
+      alert(
+        "Telefone do cliente não encontrado.\n" +
+        "Cadastre o WhatsApp no documento do comércio (whatsapp/telefone) ou coloque no campo Observações."
+      );
+      return;
     }
 
     const waUrl = `https://wa.me/${phone}`;
 
-    // 2) Gera imagem do card
+    // 5) Gera imagem do card (QR Code)
     if (!window.html2canvas) {
-        alert('html2canvas não carregado.');
-        return;
+      alert("html2canvas não carregado.");
+      return;
     }
 
-    const canvas = await html2canvas(card, { backgroundColor: '#0b0f14', scale: 2 });
-    const dataUrl = canvas.toDataURL('image/png');
+    const canvas = await html2canvas(card, { backgroundColor: "#0b0f14", scale: 2 });
+    const dataUrl = canvas.toDataURL("image/png");
 
-    // 3) Tenta envio direto (celular)
+    // 6) Tenta envio direto (Share API – melhor em celular)
     try {
-        const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob], "cobranca.png", { type: "image/png" });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], "cobranca.png", { type: "image/png" });
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-                files: [file],
-                title: "Cobrança Ola Carlópolis",
-                text: `Olá! Segue o QR Code para pagamento.\nValor: R$ ${valor.toFixed(2)}`
-            });
-            return;
-        }
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Cobrança Ola Carlópolis",
+          text: `Olá! Segue o QR Code para pagamento.
+Plano: ${planoId}
+Cliente: ${nomeMostrar}
+Valor: R$ ${valor.toFixed(2)}`
+        });
+        return;
+      }
     } catch (e) {
-        console.warn("Share API falhou, usando fallback.");
+      console.warn("Share API falhou, usando fallback.", e);
     }
 
-    // 4) Fallback: envia texto + abre Whats do cliente (desktop)
+    // 7) Fallback: abre WhatsApp Web com texto pronto + número do cliente
     const texto = encodeURIComponent(
 `Olá! Segue o QR Code para pagamento.
 Plano: ${planoId}
@@ -1297,7 +1327,8 @@ Envio a imagem logo a seguir.`
     window.open(`${waUrl}?text=${texto}`, "_blank");
 
     alert("No WhatsApp Web: anexe a imagem gerada automaticamente na pasta de downloads.");
-};
+  };
+
 
 
 
