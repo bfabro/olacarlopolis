@@ -1085,16 +1085,20 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
 
       ${detalheMesesHtml}
 
-      <div style="margin-top:6px; font-size:12px;">
-        <strong>Chave PIX (CNPJ):</strong><br>
-        52.608.228/0001-62
-      </div>
+     <div style="margin-top:6px; font-size:12px;">
+  <strong>Chave PIX (CNPJ):</strong><br>
+  <span id="cnpjPix">52.608.228/0001-62</span><br>
+  <button class="btn-copy-cnpj" style="margin-top:4px; padding:4px 8px; font-size:12px;">📋 Copiar CNPJ</button>
+</div>
+
     </div>
 
-    <div class="pix-line" style="margin-top:4px; width:100%; font-size:12px;">
-      <strong>PIX copia e cola:</strong><br>
-      ${linha}
-    </div>
+  <div class="pix-line" style="margin-top:4px; width:100%; font-size:12px;">
+  <strong>PIX copia e cola:</strong><br>
+  <span id="linhaPix">${linha}</span>
+  <button class="btn-copy-line" style="margin-top:4px; padding:4px 8px; font-size:12px;">📋 Copiar código</button>
+</div>
+
 
   </div>
 </div>
@@ -1119,7 +1123,29 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
     foreground: '#5dd4ff'
   });
   // copiar DADOS COMPLETOS (CNPJ + copia e cola) com fallback
-  modal.querySelector(".btn-copy").onclick = async () => {
+modal.querySelector(".btn-copy-cnpj").onclick = async () => {
+  const cnpj = "52.608.228/0001-62";
+  try {
+    await navigator.clipboard.writeText(cnpj);
+    alert("CNPJ copiado!");
+  } catch(e) {
+    console.error(e);
+    alert("Erro ao copiar. Copie manualmente.");
+  }
+};
+
+modal.querySelector(".btn-copy-line").onclick = async () => {
+  const copiaCola = document.getElementById("linhaPix").textContent.trim();
+  try {
+    await navigator.clipboard.writeText(copiaCola);
+    alert("Código PIX (copia e cola) copiado!");
+  } catch(e) {
+    console.error(e);
+    alert("Erro ao copiar. Copie manualmente.");
+  }
+};
+
+
     const textoClipboard =
 `Pagamento ${planoId}
 Valor: R$ ${valor.toFixed(2)}
