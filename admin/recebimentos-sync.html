@@ -768,6 +768,50 @@ chks.forEach(c=>{
 
 
 
+// Abre um mini-modal para escolher o tipo da cobrança
+function abrirModalTipoCobranca(totalMensal, callback) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-pix';
+
+  const totalMensalTxt = totalMensal.toFixed(2).replace('.', ',');
+
+  modal.innerHTML = `
+    <div class="modal-box">
+      <h3>Gerar cobrança</h3>
+      <p style="font-size:13px; color:#e3e7ee; margin-bottom:10px;">
+        Escolha o tipo de cobrança para gerar o PIX.
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:8px; text-align:left; font-size:13px;">
+        <button class="btn-tipo" data-tipo="MENSAL">
+          💳 Mensal – R$ ${totalMensalTxt}
+        </button>
+        <button class="btn-tipo" data-tipo="SEMESTRAL">
+          📆 Semestral – R$ ${VALOR_SEMESTRAL.toFixed(2).replace('.', ',')}
+        </button>
+        <button class="btn-tipo" data-tipo="ANUAL">
+          🗓️ Anual – R$ ${VALOR_ANUAL.toFixed(2).replace('.', ',')}
+        </button>
+      </div>
+
+      <button class="btn-close" style="margin-top:12px;">Fechar</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelectorAll('.btn-tipo').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const tipo = btn.getAttribute('data-tipo');
+      callback(tipo);
+      modal.remove();
+    });
+  });
+
+  modal.querySelector('.btn-close').onclick = () => modal.remove();
+}
+
+// Listener para o botão PIX de cada linha
 tbody.addEventListener('click', async (ev)=>{
   const btnPix = ev.target.closest('.btn-pix');
   if (btnPix) {
@@ -777,29 +821,48 @@ tbody.addEventListener('click', async (ev)=>{
     const chks = Array.from(tr.querySelectorAll('.months .chk'));
 
     const mesesNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    let total = 0;
+    let totalMensal = 0;
     const mesesDevidos = [];
 
     chks.forEach((c, idx)=>{
       if (!c.checked) {
-        total += VALOR_MENSAL;
+        totalMensal += VALOR_MENSAL;
         mesesDevidos.push(mesesNomes[idx]);
       }
     });
 
-    if (total <= 0) {
-      alert('Nenhum mês pendente para este cliente.');
-      return;
-    }
+    // Abre modal para escolher tipo de cobrança
+    abrirModalTipoCobranca(totalMensal, (tipoSelecionado)=>{
+      let valorFinal = 0;
+      let mesesInfo  = [];
 
-    const brcode = gerarBRCodePix(nome, total);
+      if (tipoSelecionado === 'MENSAL') {
+        if (totalMensal <= 0) {
+          alert('Nenhum mês pendente para cobrança mensal.');
+          return;
+        }
+        valorFinal = totalMensal;
+        mesesInfo  = mesesDevidos;         // lista de meses
+      } else if (tipoSelecionado === 'SEMESTRAL') {
+        valorFinal = VALOR_SEMESTRAL;
+        mesesInfo  = ['Plano semestral'];
+      } else if (tipoSelecionado === 'ANUAL') {
+        valorFinal = VALOR_ANUAL;
+        mesesInfo  = ['Plano anual'];
+      } else {
+        return;
+      }
 
-    abrirModalPIX(brcode, total, mesesDevidos);
+      const brcode = gerarBRCodePix(nome, valorFinal, tipoSelecionado);
+      abrirModalPIX(brcode, valorFinal, mesesInfo, tipoSelecionado);
+    });
+
     return;
   }
 
-  // se não foi o botão PIX, cai para o fluxo normal do botão salvar
+  // se não foi o botão PIX, permanece o fluxo normal (botão salvar etc.)
 });
+
 
 
   // ===== CSV =====
@@ -865,6 +928,8 @@ tbody.addEventListener('click', async (ev)=>{
 
 // valor de cada mensalidade pendente
 const VALOR_MENSAL = 30.00; // ajuste se quiser
+const VALOR_SEMESTRAL = 150.00;
+const VALOR_ANUAL     = 250.00;
 
 // helper para montar campos EMV (ID + tamanho + valor)
 function emvField(id, value) {
@@ -890,7 +955,8 @@ function crc16(str) {
 
 // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
 // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
-function gerarBRCodePix(nomeCliente, valor) {
+// tipoLabel: 'MENSAL' | 'SEMESTRAL' | 'ANUAL'
+function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
   const pixKey = '52608228000162'; // CNPJ só com números
   const gui    = 'BR.GOV.BCB.PIX';
 
@@ -914,10 +980,11 @@ function gerarBRCodePix(nomeCliente, valor) {
     25               // limite do campo 59
   );
 
-  const cidade = 'CARLOPOLIS'; // já está ok (sem acento, maiúsculo)
+  const cidade = 'CARLOPOLIS'; // já ok
 
-  // TxId SEM espaço para evitar rejeição
-  const txid = 'OLACARLOPOLIS';
+  // TxId dinâmico com o tipo
+  const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const txid    = `OLA_CARLOPOLIS_${tipoSan}`.substring(0, 25); // limita tamanho
 
   // Subcampos do 26 = Merchant Account Information
   const merchantAccountInfo =
@@ -934,12 +1001,12 @@ function gerarBRCodePix(nomeCliente, valor) {
     emvField('01', '11') +             // Static (11)
     merchantAccountField +             // Merchant Account Info
     emvField('52', '0000') +           // Merchant Category Code
-    emvField('53', '986') +           // Moeda (986 = BRL)
+    emvField('53', '986') +            // Moeda (986 = BRL)
     emvField('54', valorStr) +         // Valor
     emvField('58', 'BR') +             // País
     emvField('59', nomeComerciante) +  // Nome do recebedor
     emvField('60', cidade) +           // Cidade
-    emvField('62', emvField('05', txid)); // TxId
+    emvField('62', emvField('05', txid)); // TxId (ex.: OLA_CARLOPOLIS_MENSAL)
 
   // Campo 63 = CRC16
   const toCrc = payload + '6304';
@@ -949,15 +1016,33 @@ function gerarBRCodePix(nomeCliente, valor) {
 }
 
 
-function abrirModalPIX(linha, valor, mesesDevidos) {
+
+function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
   const modal = document.createElement("div");
   modal.className = "modal-pix";
 
   const mesesTexto = (mesesDevidos && mesesDevidos.length)
     ? mesesDevidos.join(', ')
-    : 'Nenhum (todos em dia)';
+    : '—';
 
-  const descricaoPix = `Valor R$ ${valor.toFixed(2)} marketing OlaCarlopolis`;
+  const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase();
+  const planoId = `OLA_CARLOPOLIS_${tipoSan}`;
+
+  let detalheMesesHtml = '';
+
+  if (tipoLabel === 'MENSAL') {
+    detalheMesesHtml = `
+      <div style="margin-top:4px;">
+        <strong>Referente aos meses:</strong> ${mesesTexto}
+      </div>
+    `;
+  } else {
+    detalheMesesHtml = `
+      <div style="margin-top:4px;">
+        <strong>Referente ao plano:</strong> ${tipoLabel.charAt(0) + tipoLabel.slice(1).toLowerCase()}
+      </div>
+    `;
+  }
 
   modal.innerHTML = `
     <div class="modal-box">
@@ -975,9 +1060,9 @@ function abrirModalPIX(linha, valor, mesesDevidos) {
         <div style="margin-top:10px; font-size:13px; color:#e3e7ee; text-align:left;">
           <div><strong>Valor total:</strong> R$ ${valor.toFixed(2)}</div>
           <div style="margin-top:4px;">
-            <strong>Referente aos meses:</strong> ${mesesTexto}
+            <strong>Plano:</strong> ${planoId}
           </div>
-        
+          ${detalheMesesHtml}
         </div>
 
         <div class="pix-line" style="margin-top:10px;">
@@ -1038,13 +1123,14 @@ function abrirModalPIX(linha, valor, mesesDevidos) {
 
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = `pix-${valor.toFixed(2).replace('.','_')}.png`;
+    a.download = `pix-${tipoLabel.toLowerCase()}-${valor.toFixed(2).replace('.','_')}.png`;
     a.click();
   };
 
   // fechar
   modal.querySelector(".btn-close").onclick = () => modal.remove();
 }
+
 
 
 
