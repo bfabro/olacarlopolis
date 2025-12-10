@@ -1048,73 +1048,80 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
     <div class="modal-box">
       <h3>QR Code PIX</h3>
 
-      <!-- CARD QUE VIRA IMAGEM -->
-     <!-- CARD QUE VIRA IMAGEM -->
-<div id="pixCard" style="
-  position:relative;
-  border-radius:18px;
-  padding:18px;
-  border:1px solid #182029;
-  width:320px;
-  min-height:420px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:url('/images/img_padrao_site/logo_.png') center/cover no-repeat;
-">
-  <!-- Card interno escuro -->
-  <div style="
-    background:rgba(6,16,24,0.90);
-    border-radius:18px;
-    padding:16px;
-    width:100%;
-    max-width:260px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:10px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.6);
-  ">
-    
-    <canvas id="pixCanvas"></canvas>
+      <!-- 🔹 CARD QUE VIRA IMAGEM -->
+      <div id="pixCard" style="
+        position:relative;
+        border-radius:18px;
+        padding:18px;
+        border:1px solid #182029;
+        width:320px;
+        min-height:420px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:url('/images/img_padrao_site/logo_.png') center/cover no-repeat;
+      ">
+        <!-- “card” central escuro por cima do fundo -->
+        <div style="
+          background:rgba(6,16,24,0.9);
+          border-radius:18px;
+          padding:14px 16px;
+          width:100%;
+          max-width:260px;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:8px;
+          box-shadow:0 10px 25px rgba(0,0,0,0.6);
+        ">
+          <canvas id="pixCanvas"></canvas>
 
-    <div style="margin-top:6px; font-size:13px; color:#e3e7ee; text-align:left; width:100%;">
-      <div><strong>Valor Total:</strong> R$ ${valor.toFixed(2)}</div>
+          <div style="margin-top:4px; font-size:13px; color:#e3e7ee; text-align:left; width:100%;">
+            <div><strong>Valor Total:</strong> R$ ${valor.toFixed(2)}</div>
 
-      <div style="margin-top:4px;">
-        <strong>Plano:</strong> ${planoId}
+            <div style="margin-top:4px;">
+              <strong>Plano:</strong> ${planoId}
+            </div>
+
+            ${detalheMesesHtml}
+
+            <div style="margin-top:6px; font-size:12px;">
+              <strong>Chave PIX (CNPJ):</strong><br>
+              52.608.228/0001-62
+            </div>
+          </div>
+
+          <div class="pix-line" style="margin-top:8px; width:100%; font-size:12px; text-align:left;">
+            Estou enviando o valor referente aos meses pendentes. Agradeço sua colaboração.
+          </div>
+        </div>
       </div>
 
-      ${detalheMesesHtml}
+      <!-- 🔹 ÁREA FORA DA IMAGEM: CNPJ + CÓDIGO + BOTÕES -->
+      <div style="margin-top:10px; text-align:left; font-size:12px; color:#e3e7ee;">
+        <div style="margin-bottom:8px;">
+          <strong>Chave PIX (CNPJ):</strong><br>
+          <span id="cnpjPix">52.608.228/0001-62</span><br>
+          <button class="btn-copy-cnpj" style="margin-top:4px; padding:4px 8px; font-size:12px;">📋 Copiar CNPJ</button>
+        </div>
 
-      <div style="margin-top:8px; font-size:12px;">
-        <strong>Chave PIX (CNPJ):</strong><br>
-        52.608.228/0001-62
+        <div>
+          <strong>PIX copia e cola:</strong><br>
+          <span id="linhaPix">${linha}</span><br>
+          <button class="btn-copy-line" style="margin-top:4px; padding:4px 8px; font-size:12px;">📋 Copiar código</button>
+        </div>
       </div>
 
-      <div style="margin-top:10px; font-size:12px; opacity:.9;">
-        <em>Estou enviando o valor referente aos meses pendentes.<br>
-        Agradeço sua colaboração.</em>
-      </div>
-    </div>
+      <button class="btn-copy">Copiar tudo</button>
+      <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
 
-  </div>
-</div>
-
-
-
-
-     <button class="btn-copy">Copiar linha</button>
-<button class="btn-copy-cnpj">Copiar CNPJ</button>
-<button class="btn-copy-line">Copiar código PIX</button>
-<button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
-
+      <button class="btn-close">Fechar</button>
     </div>
   `;
 
   document.body.appendChild(modal);
 
-  // gera QR dentro do card
+  // gera QR dentro do card (imagem)
   new QRious({
     element: document.getElementById('pixCanvas'),
     value: linha,
@@ -1123,14 +1130,13 @@ function abrirModalPIX(linha, valor, mesesDevidos, tipoLabel = 'MENSAL') {
     foreground: '#5dd4ff'
   });
 
-  
-  // copiar DADOS COMPLETOS (CNPJ + copia e cola) com fallback
+  // 🔹 Copiar TUDO (mensagem completa)
   modal.querySelector(".btn-copy").onclick = async () => {
     const textoClipboard =
 `Pagamento ${planoId}
 Valor: R$ ${valor.toFixed(2)}
 
-Chave PIX (CNPJ): 
+Chave PIX (CNPJ):
 52.608.228/0001-62
 
 PIX copia e cola:
@@ -1156,30 +1162,31 @@ ${linha}`;
     }
   };
 
+  // 🔹 Copiar só o CNPJ
   modal.querySelector(".btn-copy-cnpj").onclick = async () => {
-  const cnpj = "52.608.228/0001-62";
-  try {
-    await navigator.clipboard.writeText(cnpj);
-    alert("CNPJ copiado!");
-  } catch(e) {
-    console.error(e);
-    alert("Erro ao copiar. Copie manualmente.");
-  }
-};
+    const cnpj = "52.608.228/0001-62";
+    try {
+      await navigator.clipboard.writeText(cnpj);
+      alert("CNPJ copiado!");
+    } catch(e) {
+      console.error(e);
+      alert("Erro ao copiar. Copie manualmente.");
+    }
+  };
 
-modal.querySelector(".btn-copy-line").onclick = async () => {
-  const copiaCola = document.getElementById("linhaPix").textContent.trim();
-  try {
-    await navigator.clipboard.writeText(copiaCola);
-    alert("Código PIX (copia e cola) copiado!");
-  } catch(e) {
-    console.error(e);
-    alert("Erro ao copiar. Copie manualmente.");
-  }
-};
+  // 🔹 Copiar só o código PIX (copia e cola)
+  modal.querySelector(".btn-copy-line").onclick = async () => {
+    const copiaCola = document.getElementById("linhaPix").textContent.trim();
+    try {
+      await navigator.clipboard.writeText(copiaCola);
+      alert("Código PIX (copia e cola) copiado!");
+    } catch(e) {
+      console.error(e);
+      alert("Erro ao copiar. Copie manualmente.");
+    }
+  };
 
-
-  // baixar card como imagem (pra mandar no Whats)
+  // 🔹 Baixar card como imagem (só o #pixCard)
   const btnDownload = modal.querySelector(".btn-download-img");
   btnDownload.onclick = async () => {
     const card = document.getElementById('pixCard');
@@ -1196,9 +1203,10 @@ modal.querySelector(".btn-copy-line").onclick = async () => {
     a.click();
   };
 
-  // fechar
+  // fechar modal
   modal.querySelector(".btn-close").onclick = () => modal.remove();
 }
+
 
 
 
