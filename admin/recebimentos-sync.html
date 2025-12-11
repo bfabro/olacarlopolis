@@ -734,7 +734,7 @@
       return allow;
     }
   </script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js"></script>
+
 
 
   <script>
@@ -947,12 +947,13 @@ if (est.name) {
 import { getStorage, ref, uploadBytes, getDownloadURL } 
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-const storage = getStorage(app);
+
 
     // Init
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     // ===== ELEMENTOS =====
     const viewLogin = document.getElementById('viewLogin');
@@ -1830,12 +1831,11 @@ function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
   const blob = await (await fetch(dataUrl)).blob();
 
   // 3) ENVIA PARA O FIREBASE STORAGE
-  const storagePath = `pixCards/${merchantId}-${Date.now()}.png`;
-  const storageRef = firebase.storage().ref().child(storagePath);
-  await storageRef.put(blob);
+ const storagePath = `pixCards/${merchantId}-${Date.now()}.png`;
+const storageRef  = ref(storage, storagePath);
+await uploadBytes(storageRef, blob);
+const imageUrl = await getDownloadURL(storageRef);
 
-  // 4) OBTÉM A URL PÚBLICA PARA ENVIAR NO WHATS
-  const imageUrl = await storageRef.getDownloadURL();
 
   // 5) OBTÉM O TELEFONE DO CLIENTE
   let phone = (phoneCliente || '').toString().replace(/\D/g, '');
