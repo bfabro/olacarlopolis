@@ -1231,7 +1231,7 @@ function abrirModalPIX(
   if (tipoLabel === 'MENSAL') {
     detalheMesesHtml = `
       <div style="margin-top:4px;">
-        <strong>Referente a:</strong> ${mesesTexto}
+        <strong>Varlor referente a:</strong> ${mesesTexto}
       </div>
     `;
   } else {
@@ -1288,7 +1288,7 @@ function abrirModalPIX(
           <div style="
             position:absolute;
             inset:0;
-            background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 30%, rgba(0,0,0,0) 100%);
+            background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 5%, rgba(0,0,0,0) 5%);
           "></div>
 
           <!-- nome do cliente em cima da foto -->
@@ -1320,7 +1320,7 @@ function abrirModalPIX(
           color:#e3e7ee;
           font-size:13px;
         ">
-          <div style="font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:#9aa6b2;">
+          <div style="font-size:16px; text-transform:uppercase; letter-spacing:.14em; color:#bfcbd7;">
             Plano • ${tipoSan}
           </div>
 
@@ -1334,7 +1334,7 @@ function abrirModalPIX(
           ${detalheMesesHtml}
           ${phoneHtml}
 
-          <div style="margin-top:6px; font-size:12px;">
+          <div style="margin-top:6px; font-size:12px; letter-spacing: 0.1em;">
             <strong>Chave PIX (CNPJ):</strong><br>
             52.608.228/0001-62
           </div>
