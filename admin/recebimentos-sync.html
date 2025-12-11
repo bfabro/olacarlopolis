@@ -944,16 +944,11 @@ if (est.name) {
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
     import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getStorage, ref, uploadBytes, getDownloadURL } 
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
-
 
     // Init
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     // ===== ELEMENTOS =====
     const viewLogin = document.getElementById('viewLogin');
@@ -1482,75 +1477,66 @@ import { getStorage, ref, uploadBytes, getDownloadURL }
     }
 
     // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
-   
-    // tipoLabel: 'MENSAL' | 'SEMESTRAL' | 'ANUAL'
     // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
-// tipoLabel: 'MENSAL' | 'SEMESTRAL' | 'ANUAL'
-function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
-  const pixKey = '52608228000162'; // CNPJ só com números
-  const gui = 'BR.GOV.BCB.PIX';
+    // tipoLabel: 'MENSAL' | 'SEMESTRAL' | 'ANUAL'
+    function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
+      const pixKey = '52608228000162'; // CNPJ só com números
+      const gui = 'BR.GOV.BCB.PIX';
 
-  // Normaliza texto para o padrão do BR Code (A-Z, 0-9, espaço)
-  function normalizeText(s, fallback, maxLen) {
-    s = (s || '').toString().toUpperCase();
+      // Normaliza texto para evitar erro em app de banco
+      function normalizeText(s, fallback, maxLen) {
+        s = (s || '').toString().toUpperCase();
 
-    // remove acentos
-    s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        // remove acentos
+        s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-    // mantém só A-Z, 0-9 e espaço
-    s = s.replace(/[^A-Z0-9 ]/g, '').trim();
+        // mantém só A-Z, 0-9 e espaço
+        s = s.replace(/[^A-Z0-9 ]/g, '').trim();
 
-    if (!s) s = fallback;
-    return s.substring(0, maxLen);
-  }
+        if (!s) s = fallback;
+        return s.substring(0, maxLen);
+      }
 
-  // ⚠️ Nome do RECEBEDOR (dono da chave), não do cliente
-  const nomeRecebedor = normalizeText(
-    'OLA CARLOPOLIS',  // fixo → igual dona da chave
-    'OLACARLOPOLIS',
-    25                 // limite do campo 59
-  );
+      const nomeComerciante = normalizeText(
+        nomeCliente,
+        'OLACARLOPOLIS', // fallback
+        25               // limite do campo 59
+      );
 
-  const cidade = 'CARLOPOLIS';
+      const cidade = 'CARLOPOLIS'; // já ok
 
-  // TxId só com letras/números, sem underscore
-  const tipoSan = (tipoLabel || 'MENSAL')
-    .toString()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '');
+      // TxId dinâmico com o tipo
+      const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const txid = `OLACARLOPOLIS_${tipoSan}`.substring(0, 25); // limita tamanho
 
-  const txidBase = 'OLACARLOPOLIS' + tipoSan; // ex: OLACARLOPOLISMENSAL
-  const txid = txidBase.substring(0, 25);
+      // Subcampos do 26 = Merchant Account Information
+      const merchantAccountInfo =
+        emvField('00', gui) +        // GUI
+        emvField('01', pixKey);      // chave (CNPJ)
 
-  // Subcampos do 26 = Merchant Account Information
-  const merchantAccountInfo =
-    emvField('00', gui) +     // GUI
-    emvField('01', pixKey);   // chave (CNPJ)
+      const merchantAccountField = emvField('26', merchantAccountInfo);
 
-  const merchantAccountField = emvField('26', merchantAccountInfo);
+      const valorStr = valor.toFixed(2); // ex: "150.00"
 
-  const valorStr = valor.toFixed(2); // ex: "150.00"
+      // Monta o payload sem o CRC
+      let payload =
+        emvField('00', '01') +             // Payload Format Indicator
+        emvField('01', '11') +             // Static (11)
+        merchantAccountField +             // Merchant Account Info
+        emvField('52', '0000') +           // Merchant Category Code
+        emvField('53', '986') +            // Moeda (986 = BRL)
+        emvField('54', valorStr) +         // Valor
+        emvField('58', 'BR') +             // País
+        emvField('59', nomeComerciante) +  // Nome do recebedor
+        emvField('60', cidade) +           // Cidade
+        emvField('62', emvField('05', txid)); // TxId (ex.: OLA_CARLOPOLIS_MENSAL)
 
-  // Monta o payload sem o CRC
-  let payload =
-    emvField('00', '01') +          // Payload Format Indicator
-    emvField('01', '12') +          // 12 = dinâmico (mais comum em copia e cola)
-    merchantAccountField +          // Merchant Account Info
-    emvField('52', '0000') +        // Merchant Category Code (0000 = genérico)
-    emvField('53', '986') +         // Moeda (986 = BRL)
-    emvField('54', valorStr) +      // Valor
-    emvField('58', 'BR') +          // País
-    emvField('59', nomeRecebedor) + // Nome do recebedor
-    emvField('60', cidade) +        // Cidade
-    emvField('62', emvField('05', txid)); // TxId (ex.: OLACARLOPOLISMENSAL)
+      // Campo 63 = CRC16
+      const toCrc = payload + '6304';
+      const crc = crc16(toCrc);
 
-  // Campo 63 = CRC16
-  const toCrc = payload + '6304';
-  const crc = crc16(toCrc);
-
-  return toCrc + crc;
-}
-
+      return toCrc + crc;
+    }
 
     function abrirModalPIX(
       linha,
@@ -1821,40 +1807,61 @@ function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
 
       const btnWhats = modal.querySelector(".btn-whats");
       btnWhats.onclick = async () => {
-  const card = document.getElementById('pixCard');
+        let phone = (phoneCliente || '').toString();
 
-  // 1) GERA A IMAGEM DO CARD
-  const canvas = await html2canvas(card, { backgroundColor: '#050910', scale: 2 });
-  const dataUrl = canvas.toDataURL('image/png');
+        // 1) se não veio no dataset, tenta Firestore
+        if (!phone) {
+          try {
+            if (merchantId) {
+              const mRef = doc(db, 'merchants', merchantId);
+              const mSnap = await getDoc(mRef);
+              if (mSnap.exists()) {
+                const data = mSnap.data();
+                phone =
+                  (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
+              }
+            }
+          } catch (e) {
+            console.error('Erro ao buscar telefone do merchant (Firestore):', e);
+          }
+        }
 
-  // 2) CONVERTE PARA BLOB
-  const blob = await (await fetch(dataUrl)).blob();
+        // 2) se ainda não tiver, busca no script.js (mesmo lugar da imagem)
+        if (!phone) {
+          try {
+            phone = await getPhoneFromScript(merchantId);
+          } catch (e) {
+            console.error('Erro ao buscar telefone no script.js:', e);
+          }
+        }
 
-  // 3) ENVIA PARA O FIREBASE STORAGE
- const storagePath = `pixCards/${merchantId}-${Date.now()}.png`;
-const storageRef  = ref(storage, storagePath);
-await uploadBytes(storageRef, blob);
-const imageUrl = await getDownloadURL(storageRef);
+        if (!phone) {
+          alert('Telefone do estabelecimento não encontrado.\n' +
+            'Cadastre o Whats/telefone no site (contact/whatsapp/telefone).');
+          return;
+        }
 
+        // 3) normaliza o número: só dígitos, força DDI 55
+        let numero = phone.replace(/\D/g, '');
+        if (numero.startsWith('0')) numero = numero.slice(1);
+        if (!numero.startsWith('55')) numero = '55' + numero;
 
-  // 5) OBTÉM O TELEFONE DO CLIENTE
-  let phone = (phoneCliente || '').toString().replace(/\D/g, '');
-  if (!phone.startsWith('55')) phone = '55' + phone;
+        // 4) monta a mensagem do WhatsApp
+        const msg =
+          `Olá! Segue o PIX para pagamento do plano ${tipoLabel.toLowerCase()} no Olá Carlópolis.
 
-  // 6) MONTA A MENSAGEM
-  const msg =
-    `Olá! Segue seu PIX para pagamento:\n\n` +
-    `Cliente: ${nomeMostrar}\n` +
-    `Valor: R$ ${valorBr}\n\n` +
-    `Chave PIX (CNPJ): 52.608.228/0001-62\n\n` +
-    `Código copia e cola:\n${linha}`;
+Cliente: ${nomeMostrar}
+Valor: R$ ${valorBr}
 
-  // 7) URL FINAL COM IMAGEM ANEXADA
-  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}&media=${encodeURIComponent(imageUrl)}`;
+Chave PIX (CNPJ):
+52.608.228/0001-62
 
-  window.open(url, "_blank");
-};
+PIX copia e cola:
+${linha}`;
 
+        const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+      };
 
 
 
