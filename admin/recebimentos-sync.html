@@ -1357,19 +1357,36 @@ function abrirModalPIX(
             52.608.228/0001-62
           </div>
 
-          <div style="margin-top:6px; font-size:11px; opacity:.9; display:flex; justify-content:space-between; align-items:center;">
-            <span>Marketing Ola Carlópolis</span>
-             <!-- LOGO OLA CARLOPOLIS AO LADO DIREITO -->
-    <img src="/images/img_padrao_site/logo_.png"
-         alt="Olá Carlópolis"
-         style="
-           width:26px;
-           height:26px;
-           border-radius:6px;
-           object-fit:cover;
-           opacity:0.9;
-         ">
+
+
+                    <!-- bloco de marca centralizado -->
+          <div style="
+            margin-top:10px;
+            font-size:11px;
+            opacity:.9;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:4px;
+          ">
+            <img src="/images/img_padrao_site/logo_.png"
+                 alt="Olá Carlópolis"
+                 style="
+                   width:40px;
+                   height:40px;
+                   border-radius:10px;
+                   object-fit:cover;
+                   opacity:0.95;
+                 ">
+            <span>Marketing Ola Carlopolis</span>
           </div>
+
+
+
+
+
+
         </div>
       </div>
 
@@ -1409,7 +1426,7 @@ function abrirModalPIX(
         </div>
       </div>
 
-      <button class="btn-copy">Copiar tudo</button>
+   
       <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
       <button class="btn-whats" style="margin-top:8px; background:#25D366; color:#061018;">
         Enviar por WhatsApp
@@ -1420,38 +1437,7 @@ function abrirModalPIX(
 
   document.body.appendChild(modal);
 
-  // Copiar TUDO (mensagem completa)
-  modal.querySelector(".btn-copy").onclick = async () => {
-    const textoClipboard =
-`Pagamento: ${planoId}
-Cliente: ${nomeMostrar}
-Valor: R$ ${valorBr}
-
-Chave PIX (CNPJ):
-52.608.228/0001-62
-
-PIX copia e cola:
-${linha}`;
-
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(textoClipboard);
-      } else {
-        const temp = document.createElement('textarea');
-        temp.value = textoClipboard;
-        temp.style.position = 'fixed';
-        temp.style.opacity = '0';
-        document.body.appendChild(temp);
-        temp.select();
-        document.execCommand('copy');
-        document.body.removeChild(temp);
-      }
-      alert("Dados PIX copiados! (cliente + CNPJ + copia e cola)");
-    } catch (e) {
-      console.error(e);
-      alert("Não foi possível copiar automaticamente. Selecione e copie manualmente.");
-    }
-  };
+  
 
   // Copiar só o CNPJ
   modal.querySelector(".btn-copy-cnpj").onclick = async () => {
