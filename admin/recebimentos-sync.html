@@ -286,9 +286,9 @@ background:var(--panel);
 }
 .modal-box {
   background: #11161d;
-  padding: 20px;
+  padding: 6px;
   border-radius: 14px;
-  width: 320px;
+  width: 350px;
   text-align: center;
   border: 1px solid #182029;
 }
@@ -1258,13 +1258,13 @@ function abrirModalPIX(
       <!-- CARTÃO PREMIUM QUE VIRA IMAGEM -->
       <div id="pixCard" style="
         position:relative;
-        width:340px;
+        width:336px;
         border-radius:24px;
         overflow:hidden;
         background:radial-gradient(circle at top,#1a2635,#050910);
         box-shadow:0 18px 40px rgba(0,0,0,.7);
         border:1px solid rgba(93,212,255,.25);
-        margin:0 auto 8px;
+        margin:0 auto 16px;
       ">
 
         <!-- CAPA COM FOTO DO CLIENTE -->
@@ -1309,23 +1309,7 @@ function abrirModalPIX(
             </span>
           </div>
 
-          <!-- selo Ola Carlópolis -->
-          <div style="
-            position:absolute;
-            top:12px;
-            right:12px;
-            padding:4px 10px;
-            border-radius:999px;
-            background:rgba(6,16,24,.85);
-            border:1px solid rgba(93,212,255,.45);
-            font-size:10px;
-            text-transform:uppercase;
-            letter-spacing:.12em;
-            color:#cbd5f5;
-          ">
-            Ola Carlópolis
-          </div>
-        </div>
+          
 
         <!-- CORPO DO CARTÃO -->
         <div style="
@@ -1345,9 +1329,7 @@ function abrirModalPIX(
             R$ ${valorBr}
           </div>
 
-          <div style="font-size:12px; color:#9aa6b2;">
-            Plano: <span style="color:#e3e7ee;">${planoId}</span>
-          </div>
+          
 
           ${detalheMesesHtml}
           ${phoneHtml}
@@ -1357,19 +1339,36 @@ function abrirModalPIX(
             52.608.228/0001-62
           </div>
 
-          <div style="margin-top:6px; font-size:11px; opacity:.9; display:flex; justify-content:space-between; align-items:center;">
-            <span>Marketing Ola Carlópolis</span>
-             <!-- LOGO OLA CARLOPOLIS AO LADO DIREITO -->
-    <img src="/images/img_padrao_site/logo_.png"
-         alt="Olá Carlópolis"
-         style="
-           width:26px;
-           height:26px;
-           border-radius:6px;
-           object-fit:cover;
-           opacity:0.9;
-         ">
+
+
+                    <!-- bloco de marca centralizado -->
+          <div style="
+            margin-top:10px;
+            font-size:11px;
+            opacity:.9;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:4px;
+          ">
+            <img src="/images/img_padrao_site/logo_.png"
+                 alt="Olá Carlópolis"
+                 style="
+                   width:50px;
+                   height:50px;
+                   border-radius:10px;
+                   object-fit:cover;
+                   opacity:0.95;
+                 ">
+            <span>Marketing Ola Carlopolis</span>
           </div>
+
+
+
+
+
+
         </div>
       </div>
 
@@ -1409,7 +1408,7 @@ function abrirModalPIX(
         </div>
       </div>
 
-      <button class="btn-copy">Copiar tudo</button>
+   
       <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
       <button class="btn-whats" style="margin-top:8px; background:#25D366; color:#061018;">
         Enviar por WhatsApp
@@ -1420,38 +1419,7 @@ function abrirModalPIX(
 
   document.body.appendChild(modal);
 
-  // Copiar TUDO (mensagem completa)
-  modal.querySelector(".btn-copy").onclick = async () => {
-    const textoClipboard =
-`Pagamento: ${planoId}
-Cliente: ${nomeMostrar}
-Valor: R$ ${valorBr}
-
-Chave PIX (CNPJ):
-52.608.228/0001-62
-
-PIX copia e cola:
-${linha}`;
-
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(textoClipboard);
-      } else {
-        const temp = document.createElement('textarea');
-        temp.value = textoClipboard;
-        temp.style.position = 'fixed';
-        temp.style.opacity = '0';
-        document.body.appendChild(temp);
-        temp.select();
-        document.execCommand('copy');
-        document.body.removeChild(temp);
-      }
-      alert("Dados PIX copiados! (cliente + CNPJ + copia e cola)");
-    } catch (e) {
-      console.error(e);
-      alert("Não foi possível copiar automaticamente. Selecione e copie manualmente.");
-    }
-  };
+  
 
   // Copiar só o CNPJ
   modal.querySelector(".btn-copy-cnpj").onclick = async () => {
