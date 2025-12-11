@@ -749,6 +749,10 @@ function updateRowStatusFromCheckboxes(tr){
     const tr = document.createElement('tr');
     tr.dataset.id = m.id;
 
+        const phoneFromMerchant = (m.whatsapp || m.telefone || m.celular || m.phone || '').toString();
+    tr.dataset.phone = phoneFromMerchant;
+
+
 // antes de montar tr.innerHTML
 const monthsHtml = ["01","02","03","04","05","06","07","08","09","10","11","12"].map((mm,idx)=>{
   const pago = !!(mesesData[mm]?.pago);
@@ -973,7 +977,8 @@ tbody.addEventListener('click', async (ev) => {
     }
 
     // 👉 AQUI buscamos a foto no script.js pelo merchantId
-    const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
+      const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
+    const phoneCliente  = tr.dataset.phone || '';
 
     const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoSelecionado);
     abrirModalPIX(
@@ -983,8 +988,10 @@ tbody.addEventListener('click', async (ev) => {
       tipoSelecionado,
       nomeCliente,
       merchantId,
-      fotoPerfilUrl      // 👉 passamos a foto pro modal
+      fotoPerfilUrl,
+      phoneCliente       // 👉 agora também vai o telefone
     );
+
   });
 });
 
@@ -1151,7 +1158,8 @@ function abrirModalPIX(
   tipoLabel = 'MENSAL',
   nomeCliente = '',
   merchantId = '',
-  fotoPerfilUrl = ''
+  fotoPerfilUrl = '',
+  phoneCliente = ''
 ) {
   const modal = document.createElement("div");
   modal.className = "modal-pix";
@@ -1165,6 +1173,15 @@ function abrirModalPIX(
   const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
 
   const valorBr = valor.toFixed(2).replace('.', ',');
+
+
+    const phoneClean = (phoneCliente || '').toString().trim();
+  const phoneHtml = phoneClean ? `
+          <div style="margin-top:4px; font-size:12px; color:#9aa6b2;">
+            Telefone/Whats: <span style="color:#e3e7ee;">${escapeHtml(phoneClean)}</span>
+          </div>
+  ` : '';
+
 
   let detalheMesesHtml = '';
 
@@ -1181,6 +1198,14 @@ function abrirModalPIX(
       </div>
     `;
   }
+// aqui tudo certo
+//
+
+
+//
+//
+///
+///
 
   // monta cartão premium
   modal.innerHTML = `
@@ -1282,6 +1307,7 @@ function abrirModalPIX(
           </div>
 
           ${detalheMesesHtml}
+          ${phoneHtml}
 
           <div style="margin-top:6px; font-size:12px;">
             <strong>Chave PIX (CNPJ):</strong><br>
@@ -1426,22 +1452,25 @@ ${linha}`;
   };
 
   // enviar por WhatsApp (mantém sua lógica atual, só preparamos o telefone)
-  const btnWhats = modal.querySelector(".btn-whats");
+    const btnWhats = modal.querySelector(".btn-whats");
   btnWhats.onclick = async () => {
-    let phone = "";
+    let phone = (phoneCliente || '').toString();
 
-    try {
-      if (merchantId) {
-        const mRef = doc(db, 'merchants', merchantId);
-        const mSnap = await getDoc(mRef);
-        if (mSnap.exists()) {
-          const data = mSnap.data();
-          phone =
-            (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
+    // se não vier do dataset, tenta pegar do Firestore como antes
+    if (!phone) {
+      try {
+        if (merchantId) {
+          const mRef = doc(db, 'merchants', merchantId);
+          const mSnap = await getDoc(mRef);
+          if (mSnap.exists()) {
+            const data = mSnap.data();
+            phone =
+              (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
+          }
         }
+      } catch (e) {
+        console.error('Erro ao buscar telefone do merchant:', e);
       }
-    } catch (e) {
-      console.error('Erro ao buscar telefone do merchant:', e);
     }
 
     if (!phone) {
@@ -1450,9 +1479,9 @@ ${linha}`;
       return;
     }
 
-    // aqui você mantém/cola o mesmo texto de mensagem e montagem de link que já estava usando
-    // (não mexi nessa parte pra não quebrar nada)
+    // daqui pra baixo mantém a mesma lógica que você já tinha pra montar o link do Whats
   };
+
 
   modal.querySelector(".btn-close").onclick = () => modal.remove();
 }
