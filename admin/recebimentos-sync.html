@@ -1480,13 +1480,12 @@ if (est.name) {
       }
       return crc.toString(16).toUpperCase().padStart(4, '0');
     }
-
-   // Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
+// Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
 const NOME_PIX_RECEBEDOR = 'OLA CARLOPOLIS';
 const CIDADE_PIX_RECEBEDOR = 'CARLOPOLIS';
 
 // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
-// tipoLabel: 'MENSAL' | 'SEMESTRAL' | 'ANUAL'
+// tipoLabel continua existindo só para texto (WhatsApp, descrição etc.)
 function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
   const pixKey = '52608228000162'; // CNPJ só com números
   const gui = 'BR.GOV.BCB.PIX';
@@ -1500,13 +1499,9 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
     return s.substring(0, maxLen);
   }
 
-  // Agora o recebedor é sempre o dono da chave PIX
+  // recebedor sempre o dono da chave PIX
   const nomeComerciante = normalizeText(NOME_PIX_RECEBEDOR, NOME_PIX_RECEBEDOR, 25);
   const cidade = normalizeText(CIDADE_PIX_RECEBEDOR, 'CARLOPOLIS', 15);
-
-  // TxId dinâmico com o tipo (ex.: OLA_CARLOPOLIS_MENSAL)
-  const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase().replace(/[^A-Z0-9]/g, '');
-  const txid = `OLACARLOPOLIS_${tipoSan}`.substring(0, 25);
 
   // Subcampos do 26 = Merchant Account Information (PIX)
   const merchantAccountInfo =
@@ -1515,20 +1510,18 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
 
   const merchantAccountField = emvField('26', merchantAccountInfo);
 
-  const valorStr = valor.toFixed(2); // ex: "150.00"
+  const valorStr = valor.toFixed(2); // ex: "90.00"
 
-  // Monta o payload sem o CRC
+  // 🚨 Versão “compatível com tudo”: sem campo 01 e sem campo 62 (TxId)
   let payload =
-    emvField('00', '01') +             // Payload Format Indicator
-        emvField('01', '12') +             // 12 = código dinâmico (recomendado p/ esse caso)
-    merchantAccountField +             // Merchant Account Info
-    emvField('52', '0000') +           // Merchant Category Code (genérico)
-    emvField('53', '986') +            // Moeda (986 = BRL)
-    emvField('54', valorStr) +         // Valor
-    emvField('58', 'BR') +             // País
-    emvField('59', nomeComerciante) +  // Nome do recebedor (fixo)
-    emvField('60', cidade) +           // Cidade
-    emvField('62', emvField('05', txid)); // TxId
+    emvField('00', '01') +         // Payload Format Indicator
+    merchantAccountField +         // Merchant Account Info (GUI + chave)
+    emvField('52', '0000') +       // MCC genérico
+    emvField('53', '986') +        // Moeda BRL
+    emvField('54', valorStr) +     // Valor
+    emvField('58', 'BR') +         // País
+    emvField('59', nomeComerciante) + // Nome recebedor
+    emvField('60', cidade);        // Cidade
 
   // Campo 63 = CRC16 (obrigatório)
   const toCrc = payload + '6304';
@@ -1536,6 +1529,7 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
 
   return toCrc + crc;
 }
+
 
 
 
