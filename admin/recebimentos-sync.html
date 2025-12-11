@@ -1553,81 +1553,71 @@ function formatMesAnoPt(date) {
 }
 
 
+function abrirModalPIX(
+  linha,
+  valor,
+  mesesDevidos,
+  tipoLabel = 'MENSAL',
+  nomeCliente = '',
+  merchantId = '',
+  fotoPerfilUrl = '',
+  phoneCliente = ''
+) {
+  const modal = document.createElement("div");
+  modal.className = "modal-pix";
 
-    function abrirModalPIX(
-      linha,
-      valor,
-      mesesDevidos,
-      tipoLabel = 'MENSAL',
-      nomeCliente = '',
-      merchantId = '',
-      fotoPerfilUrl = '',
-      phoneCliente = ''
-    ) {
-      const modal = document.createElement("div");
-      modal.className = "modal-pix";
+  const mesesTexto = (mesesDevidos && mesesDevidos.length)
+    ? mesesDevidos.join(', ')
+    : '—';
 
-      const mesesTexto = (mesesDevidos && mesesDevidos.length)
-        ? mesesDevidos.join(', ')
-        : '—';
+  // 🔹 primeiro define o tipo normalizado
+  const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase();
 
-      
-      const planoId = `OLA_CARLOPOLIS_${tipoSan}`;
-      const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
+  // (se quiser usar em algum lugar, agora funciona)
+  const planoId = `OLA_CARLOPOLIS_${tipoSan}`;
 
-      const valorBr = valor.toFixed(2).replace('.', ',');
+  const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
+  const valorBr = valor.toFixed(2).replace('.', ',');
 
- const hoje = new Date();
-      const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês atual
-      const fim = new Date(inicio);
+  // 🔹 cálculo da vigência (início = mês atual)
+  const hoje = new Date();
+  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês atual
+  const fim = new Date(inicio);
 
-      const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase();
+  if (tipoSan === 'ANUAL') {
+    fim.setFullYear(fim.getFullYear() + 1);        // +12 meses
+  } else if (tipoSan === 'SEMESTRAL') {
+    fim.setMonth(fim.getMonth() + 6);              // +6 meses
+  } else {
+    fim.setMonth(fim.getMonth() + 1);              // mensal -> próximo mês
+  }
 
-      if (tipoSan === 'ANUAL') {
-        fim.setFullYear(fim.getFullYear() + 1);        // +12 meses
-      } else if (tipoSan === 'SEMESTRAL') {
-        fim.setMonth(fim.getMonth() + 6);              // +6 meses
-      } else {
-        fim.setMonth(fim.getMonth() + 1);              // mensal -> próximo mês
-      }
+  const vigenciaHtml = `
+    <div style="margin-top:4px;">
+      <strong>Vigência:</strong> ${formatMesAnoPt(inicio)} a ${formatMesAnoPt(fim)}
+    </div>
+  `;
 
-      const vigenciaHtml = `
-        <div style="margin-top:4px;">
-          <strong>Vigência:</strong> ${formatMesAnoPt(inicio)} a ${formatMesAnoPt(fim)}
-        </div>
-      `;
-      const phoneClean = (phoneCliente || '').toString().trim();
-      const phoneHtml = phoneClean ? `
-        
-  ` : '';
+  const phoneClean = (phoneCliente || '').toString().trim();
+  const phoneHtml = phoneClean ? `` : '';
 
-
-      let detalheMesesHtml = '';
-
-      if (tipoLabel === 'MENSAL') {
-        detalheMesesHtml = `
+  let detalheMesesHtml = '';
+  if (tipoLabel === 'MENSAL') {
+    detalheMesesHtml = `
       <div style="margin-top:4px;">
         <strong>Valor referente a:</strong> ${mesesTexto}
       </div>
     `;
-      } else {
-        detalheMesesHtml = `
+  } else {
+    detalheMesesHtml = `
       <div style="margin-top:4px;">
         <strong>Referente ao plano:</strong> ${tipoLabel.charAt(0) + tipoLabel.slice(1).toLowerCase()}
       </div>
     `;
-      }
-      // aqui tudo certo
-      //
+  }
 
-
-      //
-      //
-      ///
-      ///
-
-      // monta cartão premium
-      modal.innerHTML = `
+  // monta cartão premium
+  modal.innerHTML = `
     <div class="modal-box">
       <h3>QR Code PIX</h3>
 
@@ -1651,13 +1641,13 @@ function formatMesAnoPt(date) {
           overflow:hidden;
         ">
           ${(fotoPerfilUrl && fotoPerfilUrl.trim())
-          ? `<img src="${fotoPerfilUrl.startsWith('/') ? fotoPerfilUrl : '/' + fotoPerfilUrl}"
+            ? `<img src="${fotoPerfilUrl.startsWith('/') ? fotoPerfilUrl : '/' + fotoPerfilUrl}"
                      alt="${escapeHtml(nomeMostrar)}"
                      style="width:100%;height:100%;object-fit:cover;">`
-          : `<img src="/images/img_padrao_site/logo_.png"
+            : `<img src="/images/img_padrao_site/logo_.png"
                      alt="Olá Carlópolis"
                      style="width:100%;height:100%;object-fit:cover;">`
-        }
+          }
 
           <!-- degradê para leitura do texto -->
           <div style="
@@ -1683,8 +1673,7 @@ function formatMesAnoPt(date) {
               ${escapeHtml(nomeMostrar)}
             </span>
           </div>
-
-          </div>
+        </div>
 
         <!-- CORPO DO CARTÃO -->
         <div style="
@@ -1704,10 +1693,8 @@ function formatMesAnoPt(date) {
             R$ ${valorBr}
           </div>
 
-          
-
           ${detalheMesesHtml}
-            ${vigenciaHtml}
+          ${vigenciaHtml}
           ${phoneHtml}
 
           <div style="margin-top:6px; font-size:12px; letter-spacing: 0.1em;">
@@ -1715,9 +1702,7 @@ function formatMesAnoPt(date) {
             52.608.228/0001-62
           </div>
 
-
-
-                    <!-- bloco de marca centralizado -->
+          <!-- bloco de marca centralizado -->
           <div style="
             margin-top:10px;
             font-size:11px;
@@ -1739,39 +1724,27 @@ function formatMesAnoPt(date) {
                  ">
             <span>Marketing Ola Carlopolis</span>
           </div>
-
-
-
-
-
-
         </div>
       </div>
 
       <!-- ÁREA FORA DO CARTÃO: CNPJ + CÓDIGO + BOTÕES -->
       <div style="margin-top:10px; text-align:left; font-size:12px; color:#e3e7ee;">
-       <div style="margin-bottom:8px; display:flex; flex-direction:column; gap:4px;">
+        <div style="margin-bottom:8px; display:flex; flex-direction:column; gap:4px;">
+          <div style="
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            width:100%;
+          ">
+            <strong>Chave PIX (CNPJ):</strong>
+          </div>
 
-  <!-- Linha com nome + logo -->
-  <div style="
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    width:100%;
-  ">
-    <strong>Chave PIX (CNPJ):</strong>
+          <span id="cnpjPix">52.608.228/0001-62</span>
 
-   
-  </div>
-
-  <!-- CNPJ -->
-  <span id="cnpjPix">52.608.228/0001-62</span>
-
-  <button class="btn-copy-cnpj" style="margin-top:4px; padding:4px 8px; font-size:12px;">
-    📋 Copiar CNPJ
-  </button>
-</div>
-
+          <button class="btn-copy-cnpj" style="margin-top:4px; padding:4px 8px; font-size:12px;">
+            📋 Copiar CNPJ
+          </button>
+        </div>
 
         <div>
           <strong>PIX copia e cola:</strong>
@@ -1784,7 +1757,6 @@ function formatMesAnoPt(date) {
         </div>
       </div>
 
-   
       <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
       <button class="btn-whats" style="margin-top:8px; background:#25D366; color:#061018;">
         Enviar por WhatsApp
@@ -1793,101 +1765,98 @@ function formatMesAnoPt(date) {
     </div>
   `;
 
-      document.body.appendChild(modal);
+  document.body.appendChild(modal);
 
+  // permite fechar clicando fora
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
 
-// permite fechar clicando fora
-modal.addEventListener('click', (e) => {
-  if (e.target === modal) modal.remove();
-});
+  // Copiar só o CNPJ
+  modal.querySelector(".btn-copy-cnpj").onclick = async () => {
+    const cnpj = "52.608.228/0001-62";
+    try {
+      await navigator.clipboard.writeText(cnpj);
+      alert("CNPJ copiado!");
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao copiar. Copie manualmente.");
+    }
+  };
 
-      // Copiar só o CNPJ
-      modal.querySelector(".btn-copy-cnpj").onclick = async () => {
-        const cnpj = "52.608.228/0001-62";
-        try {
-          await navigator.clipboard.writeText(cnpj);
-          alert("CNPJ copiado!");
-        } catch (e) {
-          console.error(e);
-          alert("Erro ao copiar. Copie manualmente.");
-        }
-      };
+  // Copiar só o código PIX (copia e cola)
+  modal.querySelector(".btn-copy-line").onclick = async () => {
+    const copiaCola = document.getElementById("linhaPix").textContent.trim();
+    try {
+      await navigator.clipboard.writeText(copiaCola);
+      alert("Código PIX (copia e cola) copiado!");
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao copiar. Copie manualmente.");
+    }
+  };
 
-      // Copiar só o código PIX (copia e cola)
-      modal.querySelector(".btn-copy-line").onclick = async () => {
-        const copiaCola = document.getElementById("linhaPix").textContent.trim();
-        try {
-          await navigator.clipboard.writeText(copiaCola);
-          alert("Código PIX (copia e cola) copiado!");
-        } catch (e) {
-          console.error(e);
-          alert("Erro ao copiar. Copie manualmente.");
-        }
-      };
+  // baixar cartão como imagem
+  const btnDownload = modal.querySelector(".btn-download-img");
+  btnDownload.onclick = async () => {
+    const card = document.getElementById('pixCard');
+    if (!window.html2canvas) {
+      alert('html2canvas não carregado. Verifique o script no final da página.');
+      return;
+    }
+    const canvas = await html2canvas(card, { backgroundColor: '#050910', scale: 2 });
+    const dataUrl = canvas.toDataURL('image/png');
 
-      // baixar cartão como imagem
-      const btnDownload = modal.querySelector(".btn-download-img");
-      btnDownload.onclick = async () => {
-        const card = document.getElementById('pixCard');
-        if (!window.html2canvas) {
-          alert('html2canvas não carregado. Verifique o script no final da página.');
-          return;
-        }
-        const canvas = await html2canvas(card, { backgroundColor: '#050910', scale: 2 });
-        const dataUrl = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `pix-${tipoLabel.toLowerCase()}-${valor.toFixed(2).replace('.', '_')}.png`;
+    a.click();
+  };
 
-        const a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = `pix-${tipoLabel.toLowerCase()}-${valor.toFixed(2).replace('.', '_')}.png`;
-        a.click();
-      };
+  const btnWhats = modal.querySelector(".btn-whats");
+  btnWhats.onclick = async () => {
+    let phone = (phoneCliente || '').toString();
 
-
-
-      const btnWhats = modal.querySelector(".btn-whats");
-      btnWhats.onclick = async () => {
-        let phone = (phoneCliente || '').toString();
-
-        // 1) se não veio no dataset, tenta Firestore
-        if (!phone) {
-          try {
-            if (merchantId) {
-              const mRef = doc(db, 'merchants', merchantId);
-              const mSnap = await getDoc(mRef);
-              if (mSnap.exists()) {
-                const data = mSnap.data();
-                phone =
-                  (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
-              }
-            }
-          } catch (e) {
-            console.error('Erro ao buscar telefone do merchant (Firestore):', e);
+    // 1) se não veio no dataset, tenta Firestore
+    if (!phone) {
+      try {
+        if (merchantId) {
+          const mRef = doc(db, 'merchants', merchantId);
+          const mSnap = await getDoc(mRef);
+          if (mSnap.exists()) {
+            const data = mSnap.data();
+            phone =
+              (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
           }
         }
+      } catch (e) {
+        console.error('Erro ao buscar telefone do merchant (Firestore):', e);
+      }
+    }
 
-        // 2) se ainda não tiver, busca no script.js (mesmo lugar da imagem)
-        if (!phone) {
-          try {
-            phone = await getPhoneFromScript(merchantId);
-          } catch (e) {
-            console.error('Erro ao buscar telefone no script.js:', e);
-          }
-        }
+    // 2) se ainda não tiver, busca no script.js (mesmo lugar da imagem)
+    if (!phone) {
+      try {
+        phone = await getPhoneFromScript(merchantId);
+      } catch (e) {
+        console.error('Erro ao buscar telefone no script.js:', e);
+      }
+    }
 
-        if (!phone) {
-          alert('Telefone do estabelecimento não encontrado.\n' +
-            'Cadastre o Whats/telefone no site (contact/whatsapp/telefone).');
-          return;
-        }
+    if (!phone) {
+      alert('Telefone do estabelecimento não encontrado.\n' +
+        'Cadastre o Whats/telefone no site (contact/whatsapp/telefone).');
+      return;
+    }
 
-        // 3) normaliza o número: só dígitos, força DDI 55
-        let numero = phone.replace(/\D/g, '');
-        if (numero.startsWith('0')) numero = numero.slice(1);
-        if (!numero.startsWith('55')) numero = '55' + numero;
+    // 3) normaliza o número: só dígitos, força DDI 55
+    let numero = phone.replace(/\D/g, '');
+    if (numero.startsWith('0')) numero = numero.slice(1);
+    if (!numero.startsWith('55')) numero = '55' + numero;
 
-        // 4) monta a mensagem do WhatsApp
-        const msg =
-          `Olá! Segue o PIX para pagamento do plano ${tipoLabel.toLowerCase()} no Olá Carlópolis.
+    // 4) monta a mensagem do WhatsApp
+    const msg =
+      `Olá! Segue o PIX para pagamento do plano ${tipoLabel.toLowerCase()} no Olá Carlópolis.
 
 Cliente: ${nomeMostrar}
 Valor: R$ ${valorBr}
@@ -1898,14 +1867,13 @@ Chave PIX (CNPJ):
 PIX copia e cola:
 ${linha}`;
 
-        const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
-        window.open(url, '_blank');
-      };
+    const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  };
 
+  modal.querySelector(".btn-close").onclick = () => modal.remove();
+}
 
-
-      modal.querySelector(".btn-close").onclick = () => modal.remove();
-    }
 
 
 
