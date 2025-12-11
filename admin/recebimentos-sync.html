@@ -1543,6 +1543,17 @@ if (est.name) {
       return toCrc + crc;
     }
 
+
+    
+function formatMesAnoPt(date) {
+  const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  const mes = meses[date.getMonth()];
+  const ano2 = String(date.getFullYear()).slice(-2);
+  return `${mes}/${ano2}`;
+}
+
+
+
     function abrirModalPIX(
       linha,
       valor,
@@ -1560,13 +1571,31 @@ if (est.name) {
         ? mesesDevidos.join(', ')
         : '—';
 
-      const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase();
+      
       const planoId = `OLA_CARLOPOLIS_${tipoSan}`;
       const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
 
       const valorBr = valor.toFixed(2).replace('.', ',');
 
+ const hoje = new Date();
+      const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês atual
+      const fim = new Date(inicio);
 
+      const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase();
+
+      if (tipoSan === 'ANUAL') {
+        fim.setFullYear(fim.getFullYear() + 1);        // +12 meses
+      } else if (tipoSan === 'SEMESTRAL') {
+        fim.setMonth(fim.getMonth() + 6);              // +6 meses
+      } else {
+        fim.setMonth(fim.getMonth() + 1);              // mensal -> próximo mês
+      }
+
+      const vigenciaHtml = `
+        <div style="margin-top:4px;">
+          <strong>Vigência:</strong> ${formatMesAnoPt(inicio)} a ${formatMesAnoPt(fim)}
+        </div>
+      `;
       const phoneClean = (phoneCliente || '').toString().trim();
       const phoneHtml = phoneClean ? `
         
@@ -1678,6 +1707,7 @@ if (est.name) {
           
 
           ${detalheMesesHtml}
+            ${vigenciaHtml}
           ${phoneHtml}
 
           <div style="margin-top:6px; font-size:12px; letter-spacing: 0.1em;">
