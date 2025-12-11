@@ -1302,6 +1302,11 @@ if (est.name) {
 
       document.body.appendChild(modal);
 
+      modal.addEventListener('click', (e) => {
+  if (e.target === modal) modal.remove();
+});
+
+
       modal.querySelectorAll('.btn-tipo').forEach(btn => {
         btn.addEventListener('click', () => {
           const tipo = btn.getAttribute('data-tipo');
@@ -1761,6 +1766,10 @@ if (est.name) {
       document.body.appendChild(modal);
 
 
+// permite fechar clicando fora
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) modal.remove();
+});
 
       // Copiar só o CNPJ
       modal.querySelector(".btn-copy-cnpj").onclick = async () => {
