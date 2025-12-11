@@ -13035,7 +13035,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Kaliu keder, 620 - Carlopolis",
             contact: "Rodoviaria: (43) 3566-1393",
             contact2: "Princesa: (43) 99926-6484",
-            contact3: "Pedro (43) 99641-0412",
+           
             hours: "Seg a Sex - 08:30 as 11:00<br> 13:30 as 16:00 e 23:00 as 23:40<br>Sab: 08:30 as 11:00<br>Dom: 23:30 as 23:40",
             infoAdicional: "<a target='_blank'  style='color:#2da6ff;' href='https://queropassagem.com.br/rodoviaria-de-carlopolis-pr?wpsrc=Google%20AdWords&wpcid=15361090317&wpsnetn=x&wpkwn=&wpkmatch=&wpcrid=&wpscid=&wpkwid=&gad_source=1&gad_campaignid=15361092411&gbraid=0AAAAADpKqgF9tpsAwMZNVxXOyQz1HO5FS&gclid=Cj0KCQjwt8zABhDKARIsAHXuD7bNWFyJzC0hKW5n8saZVgNqiBJbBtlcDLdxbyVAsun4w8d07isBGGIaAnL7EALw_wcB'>Compre sua Passagem</a>",
 
