@@ -508,23 +508,36 @@ async function loadAllowedKeysFromScript(){
   }
 
   async function getProfileUrlFromScript(merchantId) {
-    if (!merchantId) return '';
-    const maps = await loadProfileMapFromScript();
-    const byId = maps.byId || {};
-    const byNoHyphen = maps.byNoHyphen || {};
+  if (!merchantId) return '';
 
-    const raw = String(merchantId || '').toLowerCase();
-    const semHifen = raw.replace(/-/g, '');
+  const maps = await loadProfileMapFromScript();
+  const byId = maps.byId || {};
+  const byNoHyphen = maps.byNoHyphen || {};
 
-    // tenta em todas as combinações possíveis
-    return (
-      byId[raw] ||
-      byId[semHifen] ||
-      byNoHyphen[raw] ||
-      byNoHyphen[semHifen] ||
-      ''
-    );
-  }
+  const raw = String(merchantId || '').toLowerCase();
+
+  // variações do mesmo id
+  const rawDash     = raw.replace(/_/g, '-');          // lobo_fitness -> lobo-fitness
+  const norm        = normalizeNameLocal(raw);        // usa o mesmo padrão do script.js
+  const normDash    = normalizeNameLocal(rawDash);
+
+  const rawLetters  = raw.replace(/[^a-z0-9]/g, '');   // tira _ - etc
+  const normLetters = norm.replace(/[^a-z0-9]/g, '');
+
+  const found =
+    byId[raw] ||
+    byId[rawDash] ||
+    byId[norm] ||
+    byId[normDash] ||
+    byNoHyphen[rawLetters] ||
+    byNoHyphen[normLetters] ||
+    '';
+
+  console.log('[PIX] fotoPerfilUrl', { merchantId, raw, norm, found });
+
+  return found;
+}
+
 </script>
 
 
