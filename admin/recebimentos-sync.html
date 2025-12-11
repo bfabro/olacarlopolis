@@ -1440,20 +1440,25 @@ ${linha}`;
   // enviar por WhatsApp (mantém sua lógica atual, só preparamos o telefone)
   const btnWhats = modal.querySelector(".btn-whats");
   btnWhats.onclick = async () => {
-    let phone = "";
+    let phone = (phoneCliente || '').toString();
 
-    try {
-      if (merchantId) {
-        const mRef = doc(db, 'merchants', merchantId);
-        const mSnap = await getDoc(mRef);
-        if (mSnap.exists()) {
-          const data = mSnap.data();
-          phone =
-            (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
+
+    
+// se não vier do dataset, tenta pegar do Firestore como antes
+    if (!phone) {
+      try {
+        if (merchantId) {
+          const mRef = doc(db, 'merchants', merchantId);
+          const mSnap = await getDoc(mRef);
+          if (mSnap.exists()) {
+            const data = mSnap.data();
+            phone =
+              (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
+          }
         }
+      } catch (e) {
+        console.error('Erro ao buscar telefone do merchant:', e);
       }
-    } catch (e) {
-      console.error('Erro ao buscar telefone do merchant:', e);
     }
 
     if (!phone) {
