@@ -8655,6 +8655,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99938-8281",
             infoAdicional: "🏗️ Instalação de novas calhas<Br>🛠️ Reformas<Br>🧹 Manutenção e limpeza para residências e comércios<Br>💡 Soluções sob medida para evitar entupimentos e vazamentos<Br>✅ Garantia de funcionamento eficiente do seu sistema de calhas",
             facebook: "https://www.facebook.com/nelsoncalhaa",
+            instagram:"https://www.instagram.com/edias230/",
             novidadesImages: [
               "images/comercios/calhas/nelson/divulgacao/1.jpg",
               "images/comercios/calhas/nelson/divulgacao/2.jpg",
