@@ -1579,24 +1579,40 @@ function abrirModalPIX(
   const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
   const valorBr = valor.toFixed(2).replace('.', ',');
 
-  // 🔹 cálculo da vigência (início = mês atual)
-  const hoje = new Date();
-  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês atual
+  // 🔹 cálculo da vigência (início = mês atual)  const hoje = new Date();
+  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês de referência
   const fim = new Date(inicio);
 
   if (tipoSan === 'ANUAL') {
-    fim.setFullYear(fim.getFullYear() + 1);        // +12 meses
+    // 12 meses de vigência a partir do mês atual
+    fim.setFullYear(fim.getFullYear() + 1);
   } else if (tipoSan === 'SEMESTRAL') {
-    fim.setMonth(fim.getMonth() + 6);              // +6 meses
+    // 6 meses contando o mês atual → +5 meses
+    fim.setMonth(fim.getMonth() + 5);
   } else {
-    fim.setMonth(fim.getMonth() + 1);              // mensal -> próximo mês
+    // MENSAL: só o mês de pagamento (inicio = fim)
+    // se quiser, pode até deixar assim explicitamente:
+    fim.setMonth(fim.getMonth());
   }
 
-  const vigenciaHtml = `
-    <div style="margin-top:4px;">
-      <strong>Vigência:</strong> ${formatMesAnoPt(inicio)} a ${formatMesAnoPt(fim)}
-    </div>
-  `;
+  let vigenciaHtml = '';
+
+  if (tipoSan === 'MENSAL') {
+    // mostra só o mês de pagamento
+    vigenciaHtml = `
+      <div style="margin-top:4px;">
+        <strong>Vigência:</strong> ${formatMesAnoPt(inicio)}
+      </div>
+    `;
+  } else {
+    // semestral / anual → intervalo de meses
+    vigenciaHtml = `
+      <div style="margin-top:4px;">
+        <strong>Vigência:</strong> ${formatMesAnoPt(inicio)} a ${formatMesAnoPt(fim)}
+      </div>
+    `;
+  }
+
 
   const phoneClean = (phoneCliente || '').toString().trim();
   const phoneHtml = phoneClean ? `` : '';
