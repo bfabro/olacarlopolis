@@ -1477,66 +1477,75 @@ if (est.name) {
     }
 
     // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
-    // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
+   
     // tipoLabel: 'MENSAL' | 'SEMESTRAL' | 'ANUAL'
-    function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
-      const pixKey = '52608228000162'; // CNPJ só com números
-      const gui = 'BR.GOV.BCB.PIX';
+    // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
+// tipoLabel: 'MENSAL' | 'SEMESTRAL' | 'ANUAL'
+function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
+  const pixKey = '52608228000162'; // CNPJ só com números
+  const gui = 'BR.GOV.BCB.PIX';
 
-      // Normaliza texto para evitar erro em app de banco
-      function normalizeText(s, fallback, maxLen) {
-        s = (s || '').toString().toUpperCase();
+  // Normaliza texto para o padrão do BR Code (A-Z, 0-9, espaço)
+  function normalizeText(s, fallback, maxLen) {
+    s = (s || '').toString().toUpperCase();
 
-        // remove acentos
-        s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    // remove acentos
+    s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-        // mantém só A-Z, 0-9 e espaço
-        s = s.replace(/[^A-Z0-9 ]/g, '').trim();
+    // mantém só A-Z, 0-9 e espaço
+    s = s.replace(/[^A-Z0-9 ]/g, '').trim();
 
-        if (!s) s = fallback;
-        return s.substring(0, maxLen);
-      }
+    if (!s) s = fallback;
+    return s.substring(0, maxLen);
+  }
 
-      const nomeComerciante = normalizeText(
-        nomeCliente,
-        'OLACARLOPOLIS', // fallback
-        25               // limite do campo 59
-      );
+  // ⚠️ Nome do RECEBEDOR (dono da chave), não do cliente
+  const nomeRecebedor = normalizeText(
+    'OLA CARLOPOLIS',  // fixo → igual dona da chave
+    'OLACARLOPOLIS',
+    25                 // limite do campo 59
+  );
 
-      const cidade = 'CARLOPOLIS'; // já ok
+  const cidade = 'CARLOPOLIS';
 
-      // TxId dinâmico com o tipo
-      const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase().replace(/[^A-Z0-9]/g, '');
-      const txid = `OLA_CARLOPOLIS_${tipoSan}`.substring(0, 25); // limita tamanho
+  // TxId só com letras/números, sem underscore
+  const tipoSan = (tipoLabel || 'MENSAL')
+    .toString()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
 
-      // Subcampos do 26 = Merchant Account Information
-      const merchantAccountInfo =
-        emvField('00', gui) +        // GUI
-        emvField('01', pixKey);      // chave (CNPJ)
+  const txidBase = 'OLACARLOPOLIS' + tipoSan; // ex: OLACARLOPOLISMENSAL
+  const txid = txidBase.substring(0, 25);
 
-      const merchantAccountField = emvField('26', merchantAccountInfo);
+  // Subcampos do 26 = Merchant Account Information
+  const merchantAccountInfo =
+    emvField('00', gui) +     // GUI
+    emvField('01', pixKey);   // chave (CNPJ)
 
-      const valorStr = valor.toFixed(2); // ex: "150.00"
+  const merchantAccountField = emvField('26', merchantAccountInfo);
 
-      // Monta o payload sem o CRC
-      let payload =
-        emvField('00', '01') +             // Payload Format Indicator
-        emvField('01', '11') +             // Static (11)
-        merchantAccountField +             // Merchant Account Info
-        emvField('52', '0000') +           // Merchant Category Code
-        emvField('53', '986') +            // Moeda (986 = BRL)
-        emvField('54', valorStr) +         // Valor
-        emvField('58', 'BR') +             // País
-        emvField('59', nomeComerciante) +  // Nome do recebedor
-        emvField('60', cidade) +           // Cidade
-        emvField('62', emvField('05', txid)); // TxId (ex.: OLA_CARLOPOLIS_MENSAL)
+  const valorStr = valor.toFixed(2); // ex: "150.00"
 
-      // Campo 63 = CRC16
-      const toCrc = payload + '6304';
-      const crc = crc16(toCrc);
+  // Monta o payload sem o CRC
+  let payload =
+    emvField('00', '01') +          // Payload Format Indicator
+    emvField('01', '12') +          // 12 = dinâmico (mais comum em copia e cola)
+    merchantAccountField +          // Merchant Account Info
+    emvField('52', '0000') +        // Merchant Category Code (0000 = genérico)
+    emvField('53', '986') +         // Moeda (986 = BRL)
+    emvField('54', valorStr) +      // Valor
+    emvField('58', 'BR') +          // País
+    emvField('59', nomeRecebedor) + // Nome do recebedor
+    emvField('60', cidade) +        // Cidade
+    emvField('62', emvField('05', txid)); // TxId (ex.: OLACARLOPOLISMENSAL)
 
-      return toCrc + crc;
-    }
+  // Campo 63 = CRC16
+  const toCrc = payload + '6304';
+  const crc = crc16(toCrc);
+
+  return toCrc + crc;
+}
+
 
     function abrirModalPIX(
       linha,
@@ -1629,7 +1638,7 @@ if (est.name) {
           <div style="
             position:absolute;
             inset:0;
-            background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 35%, rgba(0,0,0,0) 0%);
+            background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 1%, rgba(0,0,0,0) 0%);
           "></div>
 
           <!-- nome do cliente em cima da foto -->
