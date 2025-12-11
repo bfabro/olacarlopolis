@@ -1225,9 +1225,9 @@ function abrirModalPIX(
             justify-content:center;
             margin-bottom:4px;
           ">
-            ${
-              fotoPerfilUrl
-                ? `<img src="${fotoPerfilUrl}" alt="${escapeHtml(nomeMostrar)}" style="width:100%;height:100%;object-fit:cover;">`
+         ${
+              (fotoPerfilUrl && fotoPerfilUrl.trim())
+                ? `<img src="${fotoPerfilUrl.startsWith('/') ? fotoPerfilUrl : '/' + fotoPerfilUrl}" alt="${escapeHtml(nomeMostrar)}" style="width:100%;height:100%;object-fit:cover;">`
                 : `<img src="/images/img_padrao_site/logo_.png" alt="Olá Carlópolis" style="width:100%;height:100%;object-fit:cover;">`
             }
           </div>
