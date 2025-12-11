@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Recebimentos (Auto-Sync)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #11161d;
+      --soft: #182029;
+      --text: #e3e7ee;
+      --muted: #9aa6b2;
+      --brand: #5dd4ff;
+      --ok: #22c55e;
+      --no: #ef4444
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif
+    }
+
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--soft);
+      border-radius: 14px;
+      padding: 14px
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px
+    }
+
+    input,
+    select,
+    button,
+    textarea {
+      font: inherit;
+      color: var(--text)
+    }
+
+    input[type=text],
+    input[type=email],
+    input[type=password],
+    textarea,
+    select {
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+      padding: 8px 10px;
+      outline: none
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--muted)
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: var(--brand);
+      color: #061018;
+      font-weight: 700;
+      padding: 8px 12px;
+      cursor: pointer
+    }
+
+    button[disabled] {
+      opacity: .6;
+      cursor: not-allowed
+    }
+
+    .table-wrap {
+      background: var(--panel);
+      border: 1px solid var(--soft);
+      border-radius: 14px;
+      overflow-x: hidden;
+      /* <— mantém a barra geral oculta */
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+      min-width: 0;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(#121923, #0e141c);
+      border-bottom: 1px solid var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      padding: 10px 8px;
+      text-align: left
+    }
+
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #121921
+    }
+
+    tbody tr:hover {
+      background: #0f151d
+    }
+
+    .idx {
+      width: 46px;
+      text-align: center
+    }
+
+    .cat {
+      width: 160px;
+    }
+
+    /* mantém a largura da coluna de status */
+    .status-chip.is-ok {
+      border-color: rgba(34, 197, 94, .35);
+    }
+
+    .status-chip.is-no {
+      border-color: rgba(239, 68, 68, .35);
+    }
+
+    .nome {
+      min-width: 240px;
+      font-weight: 600
+    }
+
+    .payer {
+      min-width: 200px
+    }
+
+    .obs {
+      min-width: 260px
+    }
+
+    .month {
+      width: 82px;
+      text-align: center
+    }
+
+    .acao {
+      width: 160px;
+      text-align: center;
+      position: sticky;
+      right: 0;
+      background: linear-gradient(90deg, #0f151d, #0e141c)
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%
+    }
+
+    .dot-ok {
+      background: var(--ok)
+    }
+
+    .dot-no {
+      background: var(--no)
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .sr-only {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden
+    }
+  </style>
+
+  <style>
+    /* === meses com scroll por linha === */
+    .months {
+      width: 520px;
+      /* ajuste se quiser mais/menos visível */
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    .months-scroll {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      max-width: 100%;
+      /* <--- respeita a largura da célula */
+      overflow-x: auto;
+      /* <--- barra por linha */
+      overflow-y: hidden;
+      padding: 6px 8px 8px;
+      /* espaço pra barra aparecer */
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .mchip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    .mchip input {
+      transform: translateY(1px);
+    }
+
+    /* linha com scroll próprio */
+    .rowwrap {
+      padding: 0 !important;
+    }
+
+    .row-scroll {
+      position: relative;
+      /* necessário p/ sticky funcionar */
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      /* <— único scroll por cliente */
+      padding: 10px;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+    }
+
+    /* “sub-células” dentro do carrossel */
+    .rcell {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rcell.status {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      /* <— fixa o status */
+      min-width: 160px;
+      flex: 0 0 160px;
+      /* largura fixa */
+      background: #0f141b;
+      /* cor de fundo p/ cobrir atrás */
+      box-shadow: 10px 0 12px -10px rgba(0, 0, 0, .6);
+      /* leve sombreado na borda */
+      border-right: 1px solid var(--soft);
+      min-width: 160px
+    }
+
+    .rcell.nome {
+      min-width: 260px
+    }
+
+    .rcell.payer {
+      min-width: 240px
+    }
+
+    .rcell.obs {
+      min-width: 300px
+    }
+
+    .rcell.meses {
+      min-width: 560px
+    }
+
+    .rcell.acao {
+      min-width: 160px;
+      align-items: center;
+      justify-content: center
+    }
+
+    /* reaproveita seus chips de mês dentro do carrossel */
+    .row-scroll .months-scroll {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      overflow: visible;
+      /* <— sem scroll aqui */
+      padding: 6px 6px 8px;
+      -webkit-overflow-scrolling: auto;
+      background: #0c1218;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+    }
+
+    /* Botão “Atualizar” fixo dentro do bloco Status */
+    .rcell.status .btn-save-sticky {
+      margin-top: 8px;
+      width: 100%;
+      white-space: nowrap;
+      position: sticky;
+      /* gruda junto com o próprio bloco que já é sticky */
+      left: 0;
+      /* acompanha o status à esquerda */
+      z-index: 3;
+    }
+
+    /* ===== MOBILE TWEAKS ===== */
+    @media (max-width: 768px) {
+      .wrap {
+        padding: 10px
+      }
+
+      /* Permite rolar lateralmente toda a tabela */
+      .table-wrap {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        padding-bottom: 10px;
+      }
+
+      /* Força a tabela a ocupar largura total e liberar scroll */
+      table {
+        display: block;
+        width: max-content;
+        /* ocupa só o necessário */
+        min-width: 1000px;
+        /* largura mínima útil */
+      }
+
+      /* Cada linha agora herda o scroll do container */
+      .row-scroll {
+        flex-wrap: nowrap;
+        overflow: visible;
+        /* desativa scroll individual */
+        min-width: auto;
+      }
+
+      /* Colunas mais compactas */
+      .rcell.status {
+        min-width: 120px;
+        flex: 0 0 120px
+      }
+
+      .rcell.nome {
+        min-width: 180px
+      }
+
+      .rcell.payer {
+        min-width: 180px
+      }
+
+      .rcell.obs {
+        min-width: 220px
+      }
+
+      .rcell.meses {
+        min-width: 520px
+      }
+
+      .rcell.acao {
+        min-width: 120px
+      }
+
+      /* Chips menores e mais próximos */
+      .mchip {
+        padding: 4px 6px;
+        font-size: 11px;
+        gap: 5px
+      }
+
+      .months-scroll {
+        gap: 6px;
+        padding: 5px 5px 7px
+      }
+
+      /* Deixa rótulos e botões mais leves */
+      .label.muted {
+        font-size: 10px
+      }
+
+      .btn-save-sticky {
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+    }
+
+
+    .status-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+    }
+
+    .status-header .cliente-nome {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-save-sticky {
+      background: var(--brand);
+      color: #061018;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 9px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-save-sticky:hover {
+      background: #79ddff;
+    }
+
+    @media (max-width: 768px) {
+      .status-header {
+        flex-direction: row;
+        gap: 6px;
+        padding: 6px 8px;
+      }
+
+      .status-header .cliente-nome {
+        font-size: 12px;
+        max-width: 140px;
+      }
+
+      .btn-save-sticky {
+        font-size: 16px;
+        padding: 4px 6px;
+      }
+    }
+
+    /* bloco status reformulado */
+    .status-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .cliente-nome {
+      font-weight: 700;
+      font-size: 15px;
+      /* maior e legível */
+      line-height: 1.2;
+      color: var(--text);
+      white-space: normal;
+      /* permite 2 linhas no mobile */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      /* no mobile pode quebrar */
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+      padding: 6px 8px;
+    }
+
+    .btn-icon {
+      background: var(--brand);
+      color: #061018;
+      border: 0;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 16px;
+      /* ícone maior */
+      cursor: pointer;
+    }
+
+    .btn-icon:hover {
+      background: #79ddff;
+    }
+
+    /* dá um pouco mais de largura pro status “grudar” melhor o conteúdo */
+    .rcell.status {
+      min-width: 190px;
+      flex: 0 0 190px;
+    }
+
+    /* MOBILE */
+    @media (max-width:768px) {
+      .rcell.status {
+        min-width: 180px;
+        flex: 0 0 180px;
+      }
+
+      .cliente-nome {
+        font-size: 14px;
+        -webkit-line-clamp: 2;
+      }
+
+      .status-row {
+        gap: 8px;
+        padding: 6px;
+      }
+
+      .btn-icon {
+        font-size: 18px;
+        padding: 6px 8px;
+      }
+    }
+
+    .modal-pix {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .modal-box {
+      background: #11161d;
+      padding: 6px;
+      border-radius: 14px;
+      width: 350px;
+      text-align: center;
+      border: 1px solid #182029;
+    }
+
+    .pix-line {
+      background: #0f141b;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      word-break: break-all;
+      margin-top: 10px;
+    }
+
+    .btn-close {
+      margin-top: 12px;
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-copy {
+      margin-top: 8px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div style="display:flex; align-items:center; gap:12px">
+        <h1>📒 Recebimentos (auto-sync do script.js)</h1>
+        <span class="chip"><span class="status-dot dot-ok"></span> Pago</span>
+        <span class="chip"><span class="status-dot dot-no"></span> Em aberto</span>
+      </div>
+      <div class="chip" id="userBox" style="display:none">
+        <span id="userEmail">—</span>
+        <button id="btnLogout">Sair</button>
+      </div>
+    </header>
+
+    <!-- LOGIN -->
+    <section id="viewLogin" class="card" style="max-width:380px; margin:10vh auto">
+      <h2 style="margin:0 0 12px; font-size:18px">Entrar</h2>
+      <div style="display:grid; gap:10px">
+        <input id="email" type="email" placeholder="Seu e-mail" autocomplete="username" />
+        <input id="senha" type="password" placeholder="Sua senha" autocomplete="current-password" />
+        <button id="btnLogin">Entrar</button>
+        <div class="muted">Crie usuários no Firebase Auth → Users.</div>
+        <div id="loginMsg" class="muted"></div>
+      </div>
+    </section>
+
+    <!-- PAINEL -->
+    <section id="viewPainel" style="display:none">
+      <div class="toolbar">
+        <div class="card">
+          <label for="ano">Ano:&nbsp;</label>
+          <select id="ano"></select>
+        </div>
+        <div class="card"><input id="filtro" type="text" placeholder="Pesquisar por nome ou categoria…" /></div>
+        <div class="card"><button id="btnSync">Sincronizar com script.js</button></div>
+        <div class="card"><button id="btnCSV">Exportar CSV</button></div>
+        <div class="card muted" id="sumario">—</div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="idx">#</th>
+              <th>RECEBIMENTO</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Loader: baixa /script.js e extrai apenas const statusEstabelecimentos = { ... } -->
+  <script>
+    window.__STATUS__ = null;
+
+    async function loadStatusFromMainScript() {
+      try {
+        const res = await fetch('/script.js', { cache: 'no-store' });
+        const code = await res.text();
+
+        // 1) Captura SOMENTE o objeto (sem o ;)
+        //    Ex.: const statusEstabelecimentos = { ... };
+        const m = code.match(/const\s+statusEstabelecimentos\s*=\s*(\{[\s\S]*?\});?/m);
+        if (!m || !m[1]) {
+          console.warn('statusEstabelecimentos não encontrado no script.js');
+          return null;
+        }
+
+        // 2) Só o literal do objeto
+        let objCode = m[1];
+
+        // 3) (robusto) Remove vírgula à direita antes de fechar bloco, caso exista em alguma linha
+        //    (não deveria quebrar em JS moderno, mas deixa compatível)
+        objCode = objCode.replace(/,(\s*[}\]])/g, '$1');
+
+        // 4) Avalia só o objeto
+        const obj = (new Function('return (' + objCode + ')'))();
+
+        // 5) Armazena em cache global
+        window.__STATUS__ = obj;
+        return obj;
+      } catch (e) {
+        console.error('Falha ao ler statusEstabelecimentos do script.js', e);
+        return null;
+      }
+    }
+  </script>
+
+  <script>
+    async function loadAllowedKeysFromScript() {
+      const res = await fetch('/script.js', { cache: 'no-store' });
+      const code = await res.text();
+
+      // 1) BLOCO COMÉRCIOS: do começo até "// FIM COMERCIOS"
+      const ateFimComercios = code.split('// FIM COMERCIOS')[0] || '';
+
+      // 2) BLOCO SERVIÇOS: entre "// INICIO SERVIÇOS" e "/// INICIO SETOR PUBLICO"
+      let blocoServ = '';
+      const iniServ = code.indexOf('// INICIO SERVIÇOS');
+      const iniSetorPublico = code.indexOf('/// INICIO SETOR PUBLICO');
+      if (iniServ !== -1 && iniSetorPublico !== -1 && iniSetorPublico > iniServ) {
+        blocoServ = code.slice(iniServ, iniSetorPublico);
+      }
+
+      // 3) extrai chaves no formato:  nome: "s"  |  nome: "n"
+      const rx = /\b([a-z0-9_]+)\s*:\s*"(?:s|n)"/gi;
+      const allow = new Set();
+      for (const m of ateFimComercios.matchAll(rx)) allow.add(m[1]);
+      for (const m of blocoServ.matchAll(rx)) allow.add(m[1]);
+
+      return allow;
+    }
+  </script>
+
+
+
+  <script>
+
+    window.__PROFILE_MAP__ = null;
+
+    function normalizeNameLocal(str) {
+      return String(str || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')     // remove acentos
+        .replace(/\s+/g, '-')                // espaços -> hífen
+        .replace(/[^a-z0-9\-]/g, '');        // só letras/números/hífen
+    }
+
+    async function loadProfileMapFromScript() {
+      if (window.__PROFILE_MAP__) return window.__PROFILE_MAP__;
+
+      try {
+        const res = await fetch('/script.js', { cache: 'no-store' });
+        const code = await res.text();
+
+        // pega só o array categories = [ ... ];
+        const m = code.match(/const\s+categories\s*=\s*(\[[\s\S]*?\]);/m);
+        if (!m || !m[1]) {
+          console.warn('categories não encontrado em script.js');
+          window.__PROFILE_MAP__ = { byId: {}, byNoHyphen: {}, phonesById: {}, phonesByNoHyphen: {},namesById:{},
+  namesByNoHyphen:{} };
+          return window.__PROFILE_MAP__;
+        }
+
+        let arrCode = m[1];
+
+        // remove vírgulas sobrando antes de ] ou }
+        arrCode = arrCode.replace(/,(\s*[}\]])/g, '$1');
+
+        const categories = (new Function('return (' + arrCode + ')'))();
+
+        const byId = {};
+        const byNoHyphen = {};
+        const phonesById = {};
+        const phonesByNoHyphen = {};
+        const namesById = {};
+        const namesByNoHyphen = {};
+
+        (categories || []).forEach(cat => {
+          (cat.establishments || []).forEach(est => {
+            // id "bonito" com hífen
+            const idNorm =
+              est.nomeNormalizado ||
+              normalizeNameLocal(est.name || '');
+
+            if (!idNorm) return;
+
+            // FOTO
+            let img = est.image;
+            if (!img && Array.isArray(est.novidadesImages) && est.novidadesImages.length) {
+              img = est.novidadesImages[0];
+            }
+            if (img) {
+              byId[idNorm] = img;
+              const semHifen = idNorm.replace(/-/g, '');
+              byNoHyphen[semHifen] = img;
+            }
+
+            // NOME REAL DO CLIENTE / ESTABELECIMENTO
+if (est.name) {
+  namesById[idNorm] = est.name;
+  namesByNoHyphen[idNorm.replace(/-/g, '')] = est.name;
+}
+
+
+            // TELEFONE (pega qualquer um dos campos que você usa no site)
+            const phone =
+              est.whatsapp ||
+              est.telefone ||
+              est.celular ||
+              est.contact ||
+              est.phone ||
+              '';
+
+            if (phone) {
+              phonesById[idNorm] = phone;
+              const semHifen = idNorm.replace(/-/g, '');
+              phonesByNoHyphen[semHifen] = phone;
+            }
+          });
+        });
+
+        window.__PROFILE_MAP__ = { byId, byNoHyphen, phonesById, phonesByNoHyphen,namesById,
+  namesByNoHyphen };
+        return window.__PROFILE_MAP__;
+      } catch (e) {
+        console.error('Falha ao montar PROFILE_MAP a partir de script.js', e);
+        window.__PROFILE_MAP__ = { byId: {}, byNoHyphen: {}, phonesById: {}, phonesByNoHyphen: {} ,namesById:{},
+  namesByNoHyphen:{}};
+        return window.__PROFILE_MAP__;
+      }
+    }
+
+
+    async function getProfileUrlFromScript(merchantId) {
+      if (!merchantId) return '';
+
+      const maps = await loadProfileMapFromScript();
+      const byId = maps.byId || {};
+      const byNoHyphen = maps.byNoHyphen || {};
+
+      const raw = String(merchantId || '').toLowerCase();
+
+      // variações do mesmo id
+      const rawDash = raw.replace(/_/g, '-');          // lobo_fitness -> lobo-fitness
+      const norm = normalizeNameLocal(raw);        // usa o mesmo padrão do script.js
+      const normDash = normalizeNameLocal(rawDash);
+
+      const rawLetters = raw.replace(/[^a-z0-9]/g, '');   // tira _ - etc
+      const normLetters = norm.replace(/[^a-z0-9]/g, '');
+
+      const found =
+        byId[raw] ||
+        byId[rawDash] ||
+        byId[norm] ||
+        byId[normDash] ||
+        byNoHyphen[rawLetters] ||
+        byNoHyphen[normLetters] ||
+        '';
+
+      console.log('[PIX] fotoPerfilUrl', { merchantId, raw, norm, found });
+
+      return found;
+    }
+
+    async function getPhoneFromScript(merchantId) {
+      if (!merchantId) return '';
+
+      const maps = await loadProfileMapFromScript();
+      const phonesById = maps.phonesById || {};
+      const phonesByNoHyphen = maps.phonesByNoHyphen || {};
+
+      const raw = String(merchantId || '').toLowerCase();
+
+      const rawDash = raw.replace(/_/g, '-');
+      const norm = normalizeNameLocal(raw);
+      const normDash = normalizeNameLocal(rawDash);
+
+      const rawLetters = raw.replace(/[^a-z0-9]/g, '');
+      const normLetters = norm.replace(/[^a-z0-9]/g, '');
+
+      const found =
+        phonesById[raw] ||
+        phonesById[rawDash] ||
+        phonesById[norm] ||
+        phonesById[normDash] ||
+        phonesByNoHyphen[rawLetters] ||
+        phonesByNoHyphen[normLetters] ||
+        '';
+
+      console.log('[PIX] phoneCliente', { merchantId, raw, norm, found });
+
+      return found;
+    }
+
+    async function getNameFromScript(merchantId) {
+  if (!merchantId) return '';
+
+  const maps = await loadProfileMapFromScript();
+  const raw = merchantId.toLowerCase();
+
+  const variations = [
+    raw,
+    raw.replace(/_/g,'-'),
+    normalizeNameLocal(raw),
+    normalizeNameLocal(raw.replace(/_/g,'-')),
+    raw.replace(/[^a-z0-9]/g,''),
+    normalizeNameLocal(raw).replace(/[^a-z0-9]/g,'')
+  ];
+
+  for (const key of variations) {
+    if (maps.namesById[key]) return maps.namesById[key];
+    if (maps.namesByNoHyphen[key]) return maps.namesByNoHyphen[key];
+  }
+
+  return '';
+}
+
+
+
+
+  </script>
+
+
+
+  <!-- Firebase + App -->
+  <script type="module">
+    // ==== SUA CONFIG DO FIREBASE (já colada por você) ====
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+      authDomain: "contadoracessos.firebaseapp.com",
+      databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+      projectId: "contadoracessos",
+      storageBucket: "contadoracessos.firebasestorage.app",
+      messagingSenderId: "521517291315",
+      appId: "1:521517291315:web:74f8d878d2d8769460d046",
+      measurementId: "G-BXPWYWK61F"
+    };
+
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    // Init
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ===== ELEMENTOS =====
+    const viewLogin = document.getElementById('viewLogin');
+    const viewPainel = document.getElementById('viewPainel');
+    const email = document.getElementById('email');
+    const senha = document.getElementById('senha');
+    const btnLogin = document.getElementById('btnLogin');
+    const loginMsg = document.getElementById('loginMsg');
+    const userBox = document.getElementById('userBox');
+    const userEmail = document.getElementById('userEmail');
+    const btnLogout = document.getElementById('btnLogout');
+    const selAno = document.getElementById('ano');
+    const filtro = document.getElementById('filtro');
+    const tbody = document.getElementById('tbody');
+    const btnCSV = document.getElementById('btnCSV');
+    const btnSync = document.getElementById('btnSync');
+    const sumario = document.getElementById('sumario');
+    const mesesKeys = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+
+    // ===== LOGIN =====
+    btnLogin.addEventListener('click', async () => {
+      btnLogin.disabled = true; loginMsg.textContent = 'Entrando…';
+      try {
+        await signInWithEmailAndPassword(auth, email.value.trim(), senha.value.trim());
+        loginMsg.textContent = '';
+      } catch (e) {
+        loginMsg.textContent = 'Falha ao entrar: ' + (e.code || e.message);
+      } finally { btnLogin.disabled = false; }
+    });
+    btnLogout.addEventListener('click', () => signOut(auth));
+
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        userBox.style.display = 'inline-flex';
+        userEmail.textContent = user.email || 'Usuário';
+        viewLogin.style.display = 'none';
+        viewPainel.style.display = '';
+        await initPainel();
+      } else {
+        userBox.style.display = 'none';
+        viewLogin.style.display = '';
+        viewPainel.style.display = 'none';
+      }
+    });
+
+    // ===== MODELO =====
+    // merchants/{id} => { name, category, sort }
+    // recebimentos/{year}/{merchantId} => { pagadorPadrao, observacao, meses: {"01": {pago, updatedAt, by}, ...} }
+
+    async function initPainel() {
+      const yNow = new Date().getFullYear();
+      selAno.innerHTML = '';
+      [yNow - 1, yNow, yNow + 1].forEach(y => {
+        const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === yNow) o.selected = true; selAno.appendChild(o);
+      });
+      selAno.onchange = loadTabela;
+      filtro.oninput = applyFilter;
+      btnCSV.onclick = exportCSV;
+
+      // <-- NOVO: guarda globalmente
+      window.__ALLOWED__ = await loadAllowedKeysFromScript();
+
+      btnSync.onclick = () => doSyncFromScript(window.__ALLOWED__);
+
+      await doSyncFromScript(window.__ALLOWED__); // auto-sync ao abrir
+      await loadTabela();
+    }
+
+
+    function getComerciosFromStatus(map, allowedSet) {
+      const out = []; let i = 0;
+      for (const [id, val] of Object.entries(map || {})) {
+        if (allowedSet && !allowedSet.has(id)) continue;  // <-- filtro
+        i++;
+        out.push({
+          id,
+          name: id,
+          category: (val === "s" ? "Pago" : "Em aberto"),
+          sort: i
+        });
+      }
+      return out;
+    }
+
+
+    async function doSyncFromScript(allowed) {
+      const status = window.__STATUS__ || await loadStatusFromMainScript();
+      if (!status) { alert('statusEstabelecimentos não encontrado (veja Console).'); return; }
+
+      const allowedSet = allowed || window.__ALLOWED__ || await loadAllowedKeysFromScript();
+      const locals = getComerciosFromStatus(status, allowedSet);
+
+      const qMer = query(collection(db, 'merchants'), orderBy('sort'));
+      const snap = await getDocs(qMer);
+      const remote = new Map(snap.docs.map(d => [d.id, { id: d.id, ...d.data() }]));
+
+      let created = 0, updated = 0;
+      for (const m of locals) {
+        const ref = doc(db, 'merchants', m.id);
+        const has = remote.get(m.id);
+        if (!has) { await setDoc(ref, m); created++; }
+        else {
+          const need = (has.name !== m.name) || (has.category !== m.category) || (has.sort !== m.sort);
+          if (need) { await updateDoc(ref, m); updated++; }
+        }
+      }
+      alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
+    }
+
+
+
+    // ===== FIRESTORE HELPERS =====
+    async function loadMerchants() {
+      const q = query(collection(db, 'merchants'), orderBy('sort'));
+      const snap = await getDocs(q);
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+    // caminho: recebimentos/{ANO}/itens/{merchantId}
+    function recebCol(year) {
+      return collection(db, 'recebimentos', String(year), 'itens');
+    }
+    async function readReceb(year, merchantId) {
+      const dref = doc(recebCol(year), merchantId);
+      const d = await getDoc(dref);
+      return d.exists() ? d.data() : {};
+    }
+    async function saveReceb(year, merchantId, payload) {
+      const dref = doc(recebCol(year), merchantId);
+      await setDoc(dref, payload, { merge: true });
+    }
+
+
+
+
+    function getCurrentMonthKey() {
+      const m = new Date().getMonth() + 1; // 1..12
+      return String(m).padStart(2, '0');     // "01".."12"
+    }
+    function computeStatusForRow(mesesData) {
+      const cur = getCurrentMonthKey();
+      return !!(mesesData?.[cur]?.pago);
+    }
+    function renderStatusChip(isPaid) {
+      return `
+    <span class="chip status-chip ${isPaid ? 'is-ok' : 'is-no'}">
+      <span class="status-dot ${isPaid ? 'dot-ok' : 'dot-no'}"></span>
+      ${isPaid ? 'Pago' : 'Pendente'}
+    </span>
+  `;
+    }
+    function updateRowStatusFromCheckboxes(tr) {
+      const cur = getCurrentMonthKey();
+      const chkCur = tr.querySelector(`.months .chk[data-mm="${cur}"]`);
+      const isPaid = !!(chkCur && chkCur.checked);
+      const hold = tr.querySelector('.status-holder');
+      if (hold) hold.innerHTML = renderStatusChip(isPaid);
+    }
+
+
+
+
+
+
+
+
+
+
+
+    // ===== TABELA =====
+    async function loadTabela() {
+      tbody.innerHTML = '';
+      const year = selAno.value;
+
+      const allowed = window.__ALLOWED__ || await loadAllowedKeysFromScript();
+      const merchantsAll = await loadMerchants();
+      const merchants = allowed ? merchantsAll.filter(m => allowed.has(m.id)) : merchantsAll;
+
+      let i = 0; let totalPagos = 0, totalMeses = 0;
+      for (const m of merchants) {
+        i++;
+        const dados = await readReceb(year, m.id);
+        const mesesData = dados.meses || {};
+        const tr = document.createElement('tr');
+        tr.dataset.id = m.id;
+
+        // Busca telefone diretamente do script.js (mesma lógica da imagem)
+        const phoneFromMerchant = await getPhoneFromScript(m.id);
+        tr.dataset.phone = (phoneFromMerchant || '').toString();
+
+
+
+        // antes de montar tr.innerHTML
+        const monthsHtml = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"].map((mm, idx) => {
+          const pago = !!(mesesData[mm]?.pago);
+          if (pago) totalPagos++;
+          totalMeses++;
+          const label = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][idx];
+          return `<label class="mchip">
+            <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
+            <span>${label}</span>
+          </label>`;
+        }).join('');
+        const isPaidNow = computeStatusForRow(mesesData);
+
+
+
+
+        tr.innerHTML = `
+  <td class="idx">${i}</td>
+  <td class="rowwrap">
+    <div class="row-scroll">
+
+
+     <div class="rcell status">
+  <div class="status-title">
+    <span class="cliente-nome" title="${escapeHtml(m.name || m.id)}">
+      ${escapeHtml(m.name || m.id)}
+    </span>
+    <!-- mantém compatível com o filtro -->
+    <span class="sr-only nome-holder">${escapeHtml(m.name || m.id)}</span>
+  </div>
+
+  <div class="status-row">
+    <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
+    <button class="btn-save btn-icon" title="Salvar alterações" aria-label="Salvar alterações">
+      💾
+    </button>
+
+    <button class="btn-icon btn-pix" title="Gerar QR Code PIX">
+  🔗
+</button>
+  </div>
+</div>
+
+
+
+
+      <div class="rcell payer">
+        <div class="label muted">Pagador</div>
+        <input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao || '')}" placeholder="ex.: Nome" />
+      </div>
+
+      <div class="rcell obs">
+        <div class="label muted">Observações</div>
+        <textarea class="inp-obs" placeholder="-">${escapeHtml(dados.observacao || '')}</textarea>
+      </div>
+
+      <div class="rcell meses">
+        <div class="label muted">Meses</div>
+        <div class="months"><div class="months-scroll">${monthsHtml}</div></div>
+      </div>
+    </div>
+  </td>`;
+
+
+
+
+
+        tbody.appendChild(tr);
+
+        // sempre que marcar/desmarcar um mês, recalcula o status da linha
+        tr.querySelector('.months').addEventListener('change', (e) => {
+          if (!e.target.matches('.chk')) return;
+          // só precisa reavaliar quando o mês alterado é o mês atual
+          const cur = getCurrentMonthKey();
+          if (e.target.getAttribute('data-mm') === cur) {
+            updateRowStatusFromCheckboxes(tr);
+          }
+        });
+
+      }
+      updateSummary(totalPagos, totalMeses);
+    }
+
+
+
+    function updateSummary(pagos, total) {
+      const pct = total ? Math.round((pagos / total) * 100) : 0;
+      sumario.textContent = `Pagos: ${pagos}/${total} (${pct}%)`;
+    }
+
+    function applyFilter() {
+      const q = filtro.value.trim().toLowerCase();
+      Array.from(tbody.children).forEach(tr => {
+        const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
+        const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
+        tr.style.display = (!q || nome.includes(q) || status.includes(q)) ? '' : 'none';
+      });
+    }
+
+
+    filtro.addEventListener('input', applyFilter);
+
+    tbody.addEventListener('click', async (ev) => {
+      const btn = ev.target.closest('.btn-save');
+      if (!btn) return;
+      const tr = btn.closest('tr');
+      btn.disabled = true; btn.textContent = 'Salvando…';
+      try {
+        const merchantId = tr.dataset.id;
+        const year = selAno.value;
+        const inpNome = tr.querySelector('.inp-nome');
+        const inpObs = tr.querySelector('.inp-obs');
+        const chks = Array.from(tr.querySelectorAll('.months .chk'));
+        const meses = {};
+        chks.forEach(c => {
+          const mm = c.getAttribute('data-mm'); // "01".."12"
+          meses[mm] = { pago: !!c.checked, updatedAt: serverTimestamp(), by: (auth.currentUser?.uid || null) };
+        });
+
+        await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
+        updateRowStatusFromCheckboxes(tr);
+
+        btn.textContent = '✅ Salvo'; setTimeout(() => btn.textContent = 'Atualizar', 1000);
+      } catch (e) { console.error(e); btn.textContent = 'Erro'; setTimeout(() => btn.textContent = 'Atualizar', 1200); }
+      finally { btn.disabled = false }
+    });
+
+
+
+
+    // Abre um mini-modal para escolher o tipo da cobrança
+    function abrirModalTipoCobranca(totalMensal, callback) {
+      const modal = document.createElement('div');
+      modal.className = 'modal-pix';
+
+      const totalMensalTxt = totalMensal.toFixed(2).replace('.', ',');
+
+      modal.innerHTML = `
+    <div class="modal-box">
+      <h3>Gerar cobrança</h3>
+      <p style="font-size:13px; color:#e3e7ee; margin-bottom:10px;">
+        Escolha o tipo de cobrança para gerar o PIX.
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:8px; text-align:left; font-size:13px;">
+        <button class="btn-tipo" data-tipo="MENSAL">
+          💳 Mensal – R$ ${totalMensalTxt}
+        </button>
+        <button class="btn-tipo" data-tipo="SEMESTRAL">
+          📆 Semestral – R$ ${VALOR_SEMESTRAL.toFixed(2).replace('.', ',')}
+        </button>
+        <button class="btn-tipo" data-tipo="ANUAL">
+          🗓️ Anual – R$ ${VALOR_ANUAL.toFixed(2).replace('.', ',')}
+        </button>
+      </div>
+
+      <button class="btn-close" style="margin-top:12px;">Fechar</button>
+    </div>
+  `;
+
+      document.body.appendChild(modal);
+
+      modal.querySelectorAll('.btn-tipo').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tipo = btn.getAttribute('data-tipo');
+          callback(tipo);
+          modal.remove();
+        });
+      });
+
+      modal.querySelector('.btn-close').onclick = () => modal.remove();
+    }
+
+    // Listener para o botão PIX de cada linha
+    // Listener para o botão PIX de cada linha
+    tbody.addEventListener('click', async (ev) => {
+      const btnPix = ev.target.closest('.btn-pix');
+      if (!btnPix) return;
+
+      const tr = btnPix.closest('tr');
+      const merchantId = tr.dataset.id;   // id do comércio (igual ao do script.js / merchants)
+      window.__PIX_MERCHANT_ID__ = merchantId;
+
+      const nomeComercio = tr.querySelector('.nome-holder').textContent.trim();
+
+      const chks = Array.from(tr.querySelectorAll('.months .chk'));
+      const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      let totalMensal = 0;
+      const mesesDevidos = [];
+
+      chks.forEach((c, idx) => {
+        if (!c.checked) {
+          totalMensal += VALOR_MENSAL;
+          mesesDevidos.push(mesesNomes[idx]);
+        }
+      });
+
+      // nome do cliente: usa o pagador se tiver, senão o nome do comércio
+      const pagadorNome = tr.querySelector('.inp-nome')?.value.trim() || '';
+      const nomeCliente = pagadorNome || nomeComercio;
+
+      // Abre modal para escolher tipo de cobrança
+      abrirModalTipoCobranca(totalMensal, async (tipoSelecionado) => {
+        let valorFinal = 0;
+        let mesesInfo = [];
+
+        if (tipoSelecionado === 'MENSAL') {
+          if (totalMensal <= 0) {
+            alert('Nenhum mês pendente para cobrança mensal.');
+            return;
+          }
+          valorFinal = totalMensal;
+          mesesInfo = mesesDevidos;
+        } else if (tipoSelecionado === 'SEMESTRAL') {
+          valorFinal = VALOR_SEMESTRAL;
+          mesesInfo = ['Plano semestral'];
+        } else if (tipoSelecionado === 'ANUAL') {
+          valorFinal = VALOR_ANUAL;
+          mesesInfo = ['Plano anual'];
+        } else {
+          return;
+        }
+
+        // 👉 AQUI buscamos a foto no script.js pelo merchantId
+        const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
+        const phoneCliente = tr.dataset.phone || '';
+
+        const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoSelecionado);
+        abrirModalPIX(
+          brcode,
+          valorFinal,
+          mesesInfo,
+          tipoSelecionado,
+          await getNameFromScript(merchantId),
+          merchantId,
+          fotoPerfilUrl,
+          phoneCliente       // 👉 agora também vai o telefone
+        );
+
+      });
+    });
+
+
+
+
+
+
+
+    // ===== CSV =====
+    function exportCSV() {
+      const year = selAno.value;
+      const rows = [['status', 'nome', 'pagador', 'observacao', 'jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']];
+
+      Array.from(tbody.children).forEach(tr => {
+        if (tr.style.display === 'none') return;
+        const status = (tr.querySelector('.status-holder')?.textContent || '').trim();
+        const nome = (tr.querySelector('.nome-holder')?.textContent || '').trim();
+        const pagador = tr.querySelector('.inp-nome')?.value.trim() || '';
+        const obs = tr.querySelector('.inp-obs')?.value.trim() || '';
+        const chks = Array.from(tr.querySelectorAll('.months .chk')).map(c => c.checked ? '1' : '0');
+        rows.push([status, nome, pagador, obs, ...chks]);
+      });
+
+      const csv = rows.map(r => r.map(s => '"' + (String(s).replace(/"/g, '""')) + '"').join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = `recebimentos-${year}.csv`; a.click();
+    }
+
+    // ===== UTILS =====
+    function escapeHtml(s) { return String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])) }
+
+
+
+
+
+    // Enable click-and-drag horizontal scroll (mouse) — no mobile já funciona por toque
+    function enableDragScroll(el) {
+      let isDown = false, startX = 0, scrollStart = 0;
+      el.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX;
+        scrollStart = el.scrollLeft;
+        el.classList.add('dragging');
+      });
+      window.addEventListener('mouseup', () => { isDown = false; el.classList.remove('dragging'); });
+      window.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const dx = e.pageX - startX;
+        el.scrollLeft = scrollStart - dx;
+      });
+    }
+
+    // aplica no container geral e em cada linha
+    document.addEventListener('DOMContentLoaded', () => {
+      const tw = document.querySelector('.table-wrap');
+      if (tw) enableDragScroll(tw);
+    });
+
+    // quando a tabela é recarregada, aplicar nas linhas novas
+    const _origLoadTabela = window.loadTabela;
+    window.loadTabela = async function () {
+      await _origLoadTabela();
+      document.querySelectorAll('.row-scroll').forEach(enableDragScroll);
+    }
+
+    ////////////////////////////////////////// pix
+    ////////////////////////////////////////// PIX
+
+    // valor de cada mensalidade pendente
+    const VALOR_MENSAL = 30.00; // ajuste se quiser
+    const VALOR_SEMESTRAL = 150.00;
+    const VALOR_ANUAL = 250.00;
+
+    // helper para montar campos EMV (ID + tamanho + valor)
+    function emvField(id, value) {
+      const len = String(value.length).padStart(2, '0');
+      return id + len + value;
+    }
+
+    // cálculo do CRC16 CCITT (obrigatório no BR Code)
+    function crc16(str) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          if (crc & 0x8000) {
+            crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+          } else {
+            crc = (crc << 1) & 0xFFFF;
+          }
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
+   
+    // tipoLabel: 'MENSAL' | 'SEMESTRAL' | 'ANUAL'
+    // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
+// tipoLabel: 'MENSAL' | 'SEMESTRAL' | 'ANUAL'
+function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
+  const pixKey = '52608228000162'; // CNPJ só com números
+  const gui = 'BR.GOV.BCB.PIX';
+
+  // Normaliza texto para o padrão do BR Code (A-Z, 0-9, espaço)
+  function normalizeText(s, fallback, maxLen) {
+    s = (s || '').toString().toUpperCase();
+
+    // remove acentos
+    s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    // mantém só A-Z, 0-9 e espaço
+    s = s.replace(/[^A-Z0-9 ]/g, '').trim();
+
+    if (!s) s = fallback;
+    return s.substring(0, maxLen);
+  }
+
+  // ⚠️ Nome do RECEBEDOR (dono da chave), não do cliente
+  const nomeRecebedor = normalizeText(
+    'OLA CARLOPOLIS',  // fixo → igual dona da chave
+    'OLACARLOPOLIS',
+    25                 // limite do campo 59
+  );
+
+  const cidade = 'CARLOPOLIS';
+
+  // TxId só com letras/números, sem underscore
+  const tipoSan = (tipoLabel || 'MENSAL')
+    .toString()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+
+  const txidBase = 'OLACARLOPOLIS' + tipoSan; // ex: OLACARLOPOLISMENSAL
+  const txid = txidBase.substring(0, 25);
+
+  // Subcampos do 26 = Merchant Account Information
+  const merchantAccountInfo =
+    emvField('00', gui) +     // GUI
+    emvField('01', pixKey);   // chave (CNPJ)
+
+  const merchantAccountField = emvField('26', merchantAccountInfo);
+
+  const valorStr = valor.toFixed(2); // ex: "150.00"
+
+  // Monta o payload sem o CRC
+  let payload =
+    emvField('00', '01') +          // Payload Format Indicator
+    emvField('01', '12') +          // 12 = dinâmico (mais comum em copia e cola)
+    merchantAccountField +          // Merchant Account Info
+    emvField('52', '0000') +        // Merchant Category Code (0000 = genérico)
+    emvField('53', '986') +         // Moeda (986 = BRL)
+    emvField('54', valorStr) +      // Valor
+    emvField('58', 'BR') +          // País
+    emvField('59', nomeRecebedor) + // Nome do recebedor
+    emvField('60', cidade) +        // Cidade
+    emvField('62', emvField('05', txid)); // TxId (ex.: OLACARLOPOLISMENSAL)
+
+  // Campo 63 = CRC16
+  const toCrc = payload + '6304';
+  const crc = crc16(toCrc);
+
+  return toCrc + crc;
+}
+
+
+    function abrirModalPIX(
+      linha,
+      valor,
+      mesesDevidos,
+      tipoLabel = 'MENSAL',
+      nomeCliente = '',
+      merchantId = '',
+      fotoPerfilUrl = '',
+      phoneCliente = ''
+    ) {
+      const modal = document.createElement("div");
+      modal.className = "modal-pix";
+
+      const mesesTexto = (mesesDevidos && mesesDevidos.length)
+        ? mesesDevidos.join(', ')
+        : '—';
+
+      const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase();
+      const planoId = `OLA_CARLOPOLIS_${tipoSan}`;
+      const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
+
+      const valorBr = valor.toFixed(2).replace('.', ',');
+
+
+      const phoneClean = (phoneCliente || '').toString().trim();
+      const phoneHtml = phoneClean ? `
+        
+  ` : '';
+
+
+      let detalheMesesHtml = '';
+
+      if (tipoLabel === 'MENSAL') {
+        detalheMesesHtml = `
+      <div style="margin-top:4px;">
+        <strong>Valor referente a:</strong> ${mesesTexto}
+      </div>
+    `;
+      } else {
+        detalheMesesHtml = `
+      <div style="margin-top:4px;">
+        <strong>Referente ao plano:</strong> ${tipoLabel.charAt(0) + tipoLabel.slice(1).toLowerCase()}
+      </div>
+    `;
+      }
+      // aqui tudo certo
+      //
+
+
+      //
+      //
+      ///
+      ///
+
+      // monta cartão premium
+      modal.innerHTML = `
+    <div class="modal-box">
+      <h3>QR Code PIX</h3>
+
+      <!-- CARTÃO PREMIUM QUE VIRA IMAGEM -->
+      <div id="pixCard" style="
+        position:relative;
+        width:336px;
+        border-radius:24px;
+        overflow:hidden;
+        background:radial-gradient(circle at top,#1a2635,#050910);
+        box-shadow:0 18px 40px rgba(0,0,0,.7);
+        border:1px solid rgba(93,212,255,.25);
+        margin:0 auto 16px;
+      ">
+
+        <!-- CAPA COM FOTO DO CLIENTE -->
+        <div style="
+          position:relative;
+          width:100%;
+          height:auto;
+          overflow:hidden;
+        ">
+          ${(fotoPerfilUrl && fotoPerfilUrl.trim())
+          ? `<img src="${fotoPerfilUrl.startsWith('/') ? fotoPerfilUrl : '/' + fotoPerfilUrl}"
+                     alt="${escapeHtml(nomeMostrar)}"
+                     style="width:100%;height:100%;object-fit:cover;">`
+          : `<img src="/images/img_padrao_site/logo_.png"
+                     alt="Olá Carlópolis"
+                     style="width:100%;height:100%;object-fit:cover;">`
+        }
+
+          <!-- degradê para leitura do texto -->
+          <div style="
+            position:absolute;
+            inset:0;
+            background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 1%, rgba(0,0,0,0) 0%);
+          "></div>
+
+          <!-- nome do cliente em cima da foto -->
+          <div style="
+            position:absolute;
+            left:18px;
+            right:18px;
+            bottom:14px;
+            display:flex;
+            flex-direction:column;
+            gap:2px;
+          ">
+            <span style="font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:#9aa6b2;">
+              Cliente
+            </span>
+            <span style="font-size:17px; font-weight:700; color:#f9fafb; text-shadow:0 2px 6px rgba(0,0,0,.8);">
+              ${escapeHtml(nomeMostrar)}
+            </span>
+          </div>
+
+          </div>
+
+        <!-- CORPO DO CARTÃO -->
+        <div style="
+          padding:14px 18px 16px;
+          display:flex;
+          flex-direction:column;
+          gap:6px;
+          color:#e3e7ee;
+          font-size:13px;
+        ">
+          <div style="font-size:16px; text-transform:uppercase; letter-spacing:.14em; color:#bfcbd7;">
+            Plano • ${tipoSan}
+          </div>
+
+          <!-- valor grande estilo PicPay -->
+          <div style="margin-top:2px; font-size:24px; font-weight:700; color:#f9fafb;">
+            R$ ${valorBr}
+          </div>
+
+          
+
+          ${detalheMesesHtml}
+          ${phoneHtml}
+
+          <div style="margin-top:6px; font-size:12px; letter-spacing: 0.1em;">
+            <strong>Chave PIX (CNPJ):</strong><br>
+            52.608.228/0001-62
+          </div>
+
+
+
+                    <!-- bloco de marca centralizado -->
+          <div style="
+            margin-top:10px;
+            font-size:11px;
+            opacity:.9;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:4px;
+          ">
+            <img src="/images/img_padrao_site/logo_.png"
+                 alt="Olá Carlópolis"
+                 style="
+                   width:50px;
+                   height:50px;
+                   border-radius:10px;
+                   object-fit:cover;
+                   opacity:0.95;
+                 ">
+            <span>Marketing Ola Carlopolis</span>
+          </div>
+
+
+
+
+
+
+        </div>
+      </div>
+
+      <!-- ÁREA FORA DO CARTÃO: CNPJ + CÓDIGO + BOTÕES -->
+      <div style="margin-top:10px; text-align:left; font-size:12px; color:#e3e7ee;">
+       <div style="margin-bottom:8px; display:flex; flex-direction:column; gap:4px;">
+
+  <!-- Linha com nome + logo -->
+  <div style="
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+  ">
+    <strong>Chave PIX (CNPJ):</strong>
+
+   
+  </div>
+
+  <!-- CNPJ -->
+  <span id="cnpjPix">52.608.228/0001-62</span>
+
+  <button class="btn-copy-cnpj" style="margin-top:4px; padding:4px 8px; font-size:12px;">
+    📋 Copiar CNPJ
+  </button>
+</div>
+
+
+        <div>
+          <strong>PIX copia e cola:</strong>
+          <div id="linhaPix" class="pix-line" style="margin-top:4px;">
+            ${linha}
+          </div>
+          <button class="btn-copy-line" style="margin-top:4px; padding:4px 8px; font-size:12px;">
+            📋 Copiar código
+          </button>
+        </div>
+      </div>
+
+   
+      <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
+      <button class="btn-whats" style="margin-top:8px; background:#25D366; color:#061018;">
+        Enviar por WhatsApp
+      </button>
+      <button class="btn-close">Fechar</button>
+    </div>
+  `;
+
+      document.body.appendChild(modal);
+
+
+
+      // Copiar só o CNPJ
+      modal.querySelector(".btn-copy-cnpj").onclick = async () => {
+        const cnpj = "52.608.228/0001-62";
+        try {
+          await navigator.clipboard.writeText(cnpj);
+          alert("CNPJ copiado!");
+        } catch (e) {
+          console.error(e);
+          alert("Erro ao copiar. Copie manualmente.");
+        }
+      };
+
+      // Copiar só o código PIX (copia e cola)
+      modal.querySelector(".btn-copy-line").onclick = async () => {
+        const copiaCola = document.getElementById("linhaPix").textContent.trim();
+        try {
+          await navigator.clipboard.writeText(copiaCola);
+          alert("Código PIX (copia e cola) copiado!");
+        } catch (e) {
+          console.error(e);
+          alert("Erro ao copiar. Copie manualmente.");
+        }
+      };
+
+      // baixar cartão como imagem
+      const btnDownload = modal.querySelector(".btn-download-img");
+      btnDownload.onclick = async () => {
+        const card = document.getElementById('pixCard');
+        if (!window.html2canvas) {
+          alert('html2canvas não carregado. Verifique o script no final da página.');
+          return;
+        }
+        const canvas = await html2canvas(card, { backgroundColor: '#050910', scale: 2 });
+        const dataUrl = canvas.toDataURL('image/png');
+
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `pix-${tipoLabel.toLowerCase()}-${valor.toFixed(2).replace('.', '_')}.png`;
+        a.click();
+      };
+
+
+
+      const btnWhats = modal.querySelector(".btn-whats");
+      btnWhats.onclick = async () => {
+        let phone = (phoneCliente || '').toString();
+
+        // 1) se não veio no dataset, tenta Firestore
+        if (!phone) {
+          try {
+            if (merchantId) {
+              const mRef = doc(db, 'merchants', merchantId);
+              const mSnap = await getDoc(mRef);
+              if (mSnap.exists()) {
+                const data = mSnap.data();
+                phone =
+                  (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
+              }
+            }
+          } catch (e) {
+            console.error('Erro ao buscar telefone do merchant (Firestore):', e);
+          }
+        }
+
+        // 2) se ainda não tiver, busca no script.js (mesmo lugar da imagem)
+        if (!phone) {
+          try {
+            phone = await getPhoneFromScript(merchantId);
+          } catch (e) {
+            console.error('Erro ao buscar telefone no script.js:', e);
+          }
+        }
+
+        if (!phone) {
+          alert('Telefone do estabelecimento não encontrado.\n' +
+            'Cadastre o Whats/telefone no site (contact/whatsapp/telefone).');
+          return;
+        }
+
+        // 3) normaliza o número: só dígitos, força DDI 55
+        let numero = phone.replace(/\D/g, '');
+        if (numero.startsWith('0')) numero = numero.slice(1);
+        if (!numero.startsWith('55')) numero = '55' + numero;
+
+        // 4) monta a mensagem do WhatsApp
+        const msg =
+          `Olá! Segue o PIX para pagamento do plano ${tipoLabel.toLowerCase()} no Olá Carlópolis.
+
+Cliente: ${nomeMostrar}
+Valor: R$ ${valorBr}
+
+Chave PIX (CNPJ):
+52.608.228/0001-62
+
+PIX copia e cola:
+${linha}`;
+
+        const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+      };
+
+
+
+      modal.querySelector(".btn-close").onclick = () => modal.remove();
+    }
+
+
+
+
+
+
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</body>
+
+</html>
