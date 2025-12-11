@@ -2531,6 +2531,8 @@ document.addEventListener("DOMContentLoaded", function () {
     campeonatoeliteredai: "s",
 
     pedalaparana: "s",
+    confradocaravela:"s",
+    showdavirada2026:"s",
 
 
 
@@ -12247,14 +12249,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         establishments: [
 
 
-
-
-
-
-
-
-
-
           {
             image: "images/informacoes/eventos/4.jpg",
             name: "Campeonato Elite Redai",
@@ -12275,6 +12269,27 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/p/DRhwprDAC-D/",
             infoAdicional: "Vem aí a 3ª Edição do Pedala Paraná – Carlópolis!<br>Para fechar 2025 com chave de ouro, estamos preparando mais um grande evento que vai movimentar o esporte e reunir apaixonados por ciclismo em nossa cidade e região.<Br>No dia 14 de dezembro, acontece a 3ª edição do Pedala Paraná"
           },
+
+           {
+            image: "images/informacoes/eventos/7.jpg",
+            name: "Confra do Caravela",
+            date: "27/12/2025",
+            address: "Caravela Country Clube",
+            contact: "(43) 99800-1680",
+            contact2: "(43) 99966-9812",           
+            instagram: "https://www.instagram.com/caravelaclube/",
+         infoAdicional: "​A Confra do Caravela está chegando para encerrar 2025 com chave de ouro! Teremos um super show com Júlya & Maryana, a energia contagiante de Anadark e o som do Deejay Kábelo para não deixar ninguém parado.<br><br><strong>Pontos de Venda:</strong><br>Lojas Eliane<br>Adega Cuenca<br>Farmacia Desconto Facil<br>Portaria do Clube Caravela."
+ },
+
+
+    {
+            image: "images/informacoes/eventos/8.jpg",
+            name: "Show da Virada 2026",
+            date: "31/12/2025",
+            address: "Ilha do Ponciano",                    
+            instagram: "https://www.instagram.com/turismocarlopolis/",
+         infoAdicional: "Show da Virada com Lucas Lucco, entrada Free!"
+ },
 
 
 
