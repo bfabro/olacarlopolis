@@ -774,7 +774,7 @@ function mostrarRankingCapivarinha() {
 
     <div class="rank-wrap" style="padding:8px 12px">
       <div class="rank-title">
-  🏅 Top 20 Records <span><br>(melhor pontuação por jogador)</span>
+  🏅 Top Records <span><br>(melhor pontuação por jogador)</span>
 </div>
       <ul id="rankList" class="rank-list"></ul>
 
