@@ -1144,7 +1144,6 @@ function gerarBRCodePix(nomeCliente, valor, tipoLabel = 'MENSAL') {
   return toCrc + crc;
 }
 
-
 function abrirModalPIX(
   linha,
   valor,
@@ -1163,6 +1162,9 @@ function abrirModalPIX(
 
   const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase();
   const planoId = `OLA_CARLOPOLIS_${tipoSan}`;
+  const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
+
+  const valorBr = valor.toFixed(2).replace('.', ',');
 
   let detalheMesesHtml = '';
 
@@ -1180,89 +1182,120 @@ function abrirModalPIX(
     `;
   }
 
-  const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
-
+  // monta cartão premium
   modal.innerHTML = `
     <div class="modal-box">
       <h3>QR Code PIX</h3>
 
-      <!-- CARD QUE VIRA IMAGEM -->
+      <!-- CARTÃO PREMIUM QUE VIRA IMAGEM -->
       <div id="pixCard" style="
         position:relative;
-        border-radius:18px;
-        padding:18px;
-        border:1px solid #182029;
-        width:320px;
-        min-height:420px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        background:url('/images/img_padrao_site/logo_.png') center/cover no-repeat;
+        width:340px;
+        border-radius:24px;
+        overflow:hidden;
+        background:radial-gradient(circle at top,#1a2635,#050910);
+        box-shadow:0 18px 40px rgba(0,0,0,.7);
+        border:1px solid rgba(93,212,255,.25);
+        margin:0 auto 8px;
       ">
-        <!-- Card interno escuro -->
+
+        <!-- CAPA COM FOTO DO CLIENTE -->
         <div style="
-          background:rgba(6,16,24,0.90);
-          border-radius:18px;
-          padding:16px;
+          position:relative;
           width:100%;
-          max-width:260px;
+          height:190px;
+          overflow:hidden;
+        ">
+          ${
+            (fotoPerfilUrl && fotoPerfilUrl.trim())
+              ? `<img src="${fotoPerfilUrl.startsWith('/') ? fotoPerfilUrl : '/' + fotoPerfilUrl}"
+                     alt="${escapeHtml(nomeMostrar)}"
+                     style="width:100%;height:100%;object-fit:cover;">`
+              : `<img src="/images/img_padrao_site/logo_.png"
+                     alt="Olá Carlópolis"
+                     style="width:100%;height:100%;object-fit:cover;">`
+          }
+
+          <!-- degradê para leitura do texto -->
+          <div style="
+            position:absolute;
+            inset:0;
+            background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 55%, rgba(0,0,0,0) 100%);
+          "></div>
+
+          <!-- nome do cliente em cima da foto -->
+          <div style="
+            position:absolute;
+            left:18px;
+            right:18px;
+            bottom:14px;
+            display:flex;
+            flex-direction:column;
+            gap:2px;
+          ">
+            <span style="font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:#9aa6b2;">
+              Cliente
+            </span>
+            <span style="font-size:17px; font-weight:700; color:#f9fafb; text-shadow:0 2px 6px rgba(0,0,0,.8);">
+              ${escapeHtml(nomeMostrar)}
+            </span>
+          </div>
+
+          <!-- selo Ola Carlópolis -->
+          <div style="
+            position:absolute;
+            top:12px;
+            right:12px;
+            padding:4px 10px;
+            border-radius:999px;
+            background:rgba(6,16,24,.85);
+            border:1px solid rgba(93,212,255,.45);
+            font-size:10px;
+            text-transform:uppercase;
+            letter-spacing:.12em;
+            color:#cbd5f5;
+          ">
+            Ola Carlópolis
+          </div>
+        </div>
+
+        <!-- CORPO DO CARTÃO -->
+        <div style="
+          padding:14px 18px 16px;
           display:flex;
           flex-direction:column;
-          align-items:center;
-          gap:10px;
-          box-shadow:0 10px 25px rgba(0,0,0,0.6);
+          gap:6px;
+          color:#e3e7ee;
+          font-size:13px;
         ">
-          <!-- FOTO DE PERFIL NO LUGAR DO QR CODE -->
-          <!-- FOTO DO CLIENTE GRANDE E EM FORMATO NORMAL -->
-<div style="
-  width:100%;
-  height:180px;
-  border-radius:12px;
-  overflow:hidden;
-  background:#0b0f14;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin-bottom:10px;
-">
-  ${
-    (fotoPerfilUrl && fotoPerfilUrl.trim())
-      ? `<img src="${fotoPerfilUrl.startsWith('/') ? fotoPerfilUrl : '/' + fotoPerfilUrl}"
-             alt="${escapeHtml(nomeMostrar)}"
-             style="width:100%;height:100%;object-fit:cover;">`
-      : `<img src="/images/img_padrao_site/logo_.png"
-             alt="Olá Carlópolis"
-             style="width:100%;height:100%;object-fit:cover;">`
-  }
-</div>
+          <div style="font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:#9aa6b2;">
+            Cobrança PIX • ${tipoSan}
+          </div>
 
+          <!-- valor grande estilo PicPay -->
+          <div style="margin-top:2px; font-size:24px; font-weight:700; color:#f9fafb;">
+            R$ ${valorBr}
+          </div>
 
-          <div style="margin-top:4px; font-size:13px; color:#e3e7ee; text-align:left; width:100%;">
-            <div><strong>Cliente:</strong> ${escapeHtml(nomeMostrar)}</div>
+          <div style="font-size:12px; color:#9aa6b2;">
+            Plano: <span style="color:#e3e7ee;">${planoId}</span>
+          </div>
 
-            <div style="margin-top:4px;">
-              <strong>Valor: </strong> R$ ${valor.toFixed(2)}
-            </div>
+          ${detalheMesesHtml}
 
-            <div style="margin-top:4px;">
-              <strong>Plano:</strong> ${planoId}
-            </div>
+          <div style="margin-top:6px; font-size:12px;">
+            <strong>Chave PIX (CNPJ):</strong><br>
+            52.608.228/0001-62
+          </div>
 
-            ${detalheMesesHtml}
-
-            <div style="margin-top:8px; font-size:12px;">
-              <strong>Chave PIX (CNPJ):</strong><br>
-              52.608.228/0001-62
-            </div>
-
-            <div style="margin-top:8px; font-size:11px; opacity:.9;">
-              <em>Marketing Ola Carlópolis</em>
-            </div>
+          <div style="margin-top:6px; font-size:11px; opacity:.9; display:flex; justify-content:space-between; align-items:center;">
+            <span>Marketing Ola Carlópolis</span>
+            <span style="font-size:10px; color:#9aa6b2;">Gerado automaticamente</span>
           </div>
         </div>
       </div>
 
-      <!-- ÁREA FORA DA IMAGEM: CNPJ + CÓDIGO + BOTÕES -->
+      <!-- ÁREA FORA DO CARTÃO: CNPJ + CÓDIGO + BOTÕES -->
       <div style="margin-top:10px; text-align:left; font-size:12px; color:#e3e7ee;">
         <div style="margin-bottom:8px;">
           <strong>Chave PIX (CNPJ):</strong><br>
@@ -1294,14 +1327,12 @@ function abrirModalPIX(
 
   document.body.appendChild(modal);
 
-  // (não tem mais canvas nem QRious aqui)
-
   // Copiar TUDO (mensagem completa)
   modal.querySelector(".btn-copy").onclick = async () => {
     const textoClipboard =
 `Pagamento: ${planoId}
 Cliente: ${nomeMostrar}
-Valor: R$ ${valor.toFixed(2)}
+Valor: R$ ${valorBr}
 
 Chave PIX (CNPJ):
 52.608.228/0001-62
@@ -1353,7 +1384,7 @@ ${linha}`;
     }
   };
 
-  // baixar card como imagem
+  // baixar cartão como imagem
   const btnDownload = modal.querySelector(".btn-download-img");
   btnDownload.onclick = async () => {
     const card = document.getElementById('pixCard');
@@ -1361,7 +1392,7 @@ ${linha}`;
       alert('html2canvas não carregado. Verifique o script no final da página.');
       return;
     }
-    const canvas = await html2canvas(card, { backgroundColor: '#0b0f14', scale: 2 });
+    const canvas = await html2canvas(card, { backgroundColor: '#050910', scale: 2 });
     const dataUrl = canvas.toDataURL('image/png');
 
     const a = document.createElement('a');
@@ -1370,7 +1401,7 @@ ${linha}`;
     a.click();
   };
 
-  // enviar por WhatsApp
+  // enviar por WhatsApp (mantém sua lógica atual, só preparamos o telefone)
   const btnWhats = modal.querySelector(".btn-whats");
   btnWhats.onclick = async () => {
     let phone = "";
@@ -1395,8 +1426,8 @@ ${linha}`;
       return;
     }
 
-    // aqui entra a mesma lógica que você já tinha pra montar texto/link do Whats...
-    // (mantém igual ao seu código atual)
+    // aqui você mantém/cola o mesmo texto de mensagem e montagem de link que já estava usando
+    // (não mexi nessa parte pra não quebrar nada)
   };
 
   modal.querySelector(".btn-close").onclick = () => modal.remove();
