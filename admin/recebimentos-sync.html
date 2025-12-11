@@ -1579,7 +1579,8 @@ function abrirModalPIX(
   const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
   const valorBr = valor.toFixed(2).replace('.', ',');
 
-  // 🔹 cálculo da vigência (início = mês atual)  const hoje = new Date();
+  // 🔹 cálculo da vigência (início = mês atual)  
+  const hoje = new Date();
   const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês de referência
   const fim = new Date(inicio);
 
