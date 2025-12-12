@@ -8564,7 +8564,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                 precoAntigo: 20.00,
                 preco: 15.00,
                 unidade: "A UNIDADE",
-                validadeFim: "2025-11-30",
+                validadeFim: "2025-12-30",
                 obs: "Oferta válida até durar o estoque",
 
               },
