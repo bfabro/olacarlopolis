@@ -2436,7 +2436,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //frete
     anselmofrete: "n",
-    erickson: "n",
+    erickson: "s",
 
     // guia de pesca
     fabiosushimoto: "n",
