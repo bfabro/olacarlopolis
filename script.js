@@ -15761,7 +15761,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
             name: "Oficina do Celular",
             address: "R. Dra. Paula e Silva, 676 - Carlopolis",
-            contact1: "(43) 99691-6466",
+            contact: "(43) 99691-6466",
             contact2: "(43) 3566-1600",
             facebook: "https://www.facebook.com/oficinadocelularclps/",
             instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
