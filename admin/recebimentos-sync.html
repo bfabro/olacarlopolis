@@ -1521,7 +1521,7 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
     emvField('54', valorStr) +     // Valor
     emvField('58', 'BR') +         // País
     emvField('59', nomeComerciante) + // Nome recebedor
-    emvField('60', cidade);        // Cidade
+    emvField('60', cidade);        // Cidad
 
   // Campo 63 = CRC16 (obrigatório)
   const toCrc = payload + '6304';
