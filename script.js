@@ -15309,7 +15309,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                      {
                       name: "Funeraria Cristo Rei",
                       image: "images/informacoes/notaFalecimento/cristoRei/60.jpg",
-                      date: "01/10/2025",
+                      date: "12/12/2025",
                       descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. ANA FELLET DA SILVA, aos 81 anos, ocorrido em Carlópolis.<Br>O velório está sendo realizado no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá amanhã 12/12/2025 às 16:30 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
                     },
                     {
