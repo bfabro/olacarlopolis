@@ -8230,13 +8230,46 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             promocoes: [
               {
-                titulo: "Ração Unna ",
+                titulo: "Ração Special Dog Carne ",
                 volume: "15kg",
-                preco: 99.90,
+                preco: 95.00,
                 precoAntigo: 110.00,
                 unidade: "A UNIDADE",
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/1.jpg",
-                validadeFim: "2025-11-30",
+                validadeFim: "2025-12-30",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+               {
+                titulo: "Ração Top Canis ",
+                volume: "14kg",
+                preco: 64.90,
+                precoAntigo: 73.00,
+                unidade: "A UNIDADE",
+                imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
+                validadeFim: "2025-12-30",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+               {
+                titulo: "Ração Bionatural ",
+                volume: "15kg",
+                preco: 225.90,
+                precoAntigo: 279.00,
+                unidade: "A UNIDADE",
+                imagem: "images/comercios/agropecuaria/agroVida/promocao/3.jpg",
+                validadeFim: "2025-12-30",
+                obs: "Oferta válida até durar o estoque"
+              },
+
+                 {
+                titulo: "Ração Golden Special - Frango e Carne ",
+                volume: "15kg",
+                preco: 220.00,
+                precoAntigo: 159.90,
+                unidade: "A UNIDADE",
+                imagem: "images/comercios/agropecuaria/agroVida/promocao/4.jpg",
+                validadeFim: "2025-12-30",
                 obs: "Oferta válida até durar o estoque"
               },
 
@@ -8244,7 +8277,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                 titulo: "Petisco Turma da Monica - Frutas Vermelhas",
                 // volume: "2L",
                 //  embalagem: "fardo c/6",
-
                 precoAntigo: 24.00,
                 preco: 20.00,
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/2.jpg",
