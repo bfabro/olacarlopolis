@@ -1481,9 +1481,7 @@ if (est.name) {
       return crc.toString(16).toUpperCase().padStart(4, '0');
     }
 
-
-
-    // Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
+// Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
 const NOME_PIX_RECEBEDOR = 'OLA CARLOPOLIS';
 const CIDADE_PIX_RECEBEDOR = 'CARLOPOLIS';
 
@@ -1491,7 +1489,7 @@ const CIDADE_PIX_RECEBEDOR = 'CARLOPOLIS';
 // tipoLabel continua existindo só para texto (WhatsApp, descrição etc.)
 function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
   const pixKey = '52608228000162';      // CNPJ só com números
-  const gui    = 'br.gov.bcb.pix';      // GUI em minúsculo, como nos exemplos oficiais
+  const gui    = 'br.gov.bcb.pix';      // GUI em minúsculo (padrão oficial)
 
   // Normaliza texto (sem acento, só A-Z 0-9 espaço)
   function normalizeText(s, fallback, maxLen) {
@@ -1515,17 +1513,24 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
 
   const valorStr = valor.toFixed(2); // ex: "90.00"
 
-  // TxId no campo 62, subcampo 05 (mesmo padrão dos exemplos: 62070503***)
+  // TxId no campo 62, subcampo 05
   const tipoSan = (tipoLabel || 'MENSAL')
     .toString()
     .toUpperCase()
     .replace(/[^A-Z0-9]/g, '');
+
   const txid = `OLACARLOPOLIS_${tipoSan}`.substring(0, 25);
   const additionalData = emvField('05', txid);  // 05 = TxId dentro do 62
 
-  // Payload EMV no padrão BR Code
+  // Payload EMV no padrão BR Code:
+  // 00 = formato
+  // 01 = point of initiation (12 = dinâmico)
+  // 26 = merchant account (PIX)
+  // 52,53,54,58,59,60
+  // 62 = TxId
   let payload =
     emvField('00', '01') +         // Payload Format Indicator
+    emvField('01', '12') +         // 12 = código dinâmico
     merchantAccountField +         // Merchant Account Info (GUI + chave)
     emvField('52', '0000') +       // MCC genérico
     emvField('53', '986') +        // Moeda BRL
@@ -1541,6 +1546,7 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
 
   return toCrc + crc;
 }
+
 
 
 
