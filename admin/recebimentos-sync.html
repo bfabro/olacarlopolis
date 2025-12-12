@@ -1480,15 +1480,18 @@ if (est.name) {
       }
       return crc.toString(16).toUpperCase().padStart(4, '0');
     }
-// Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
+
+
+
+    // Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
 const NOME_PIX_RECEBEDOR = 'OLA CARLOPOLIS';
 const CIDADE_PIX_RECEBEDOR = 'CARLOPOLIS';
 
 // Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
 // tipoLabel continua existindo só para texto (WhatsApp, descrição etc.)
 function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
-  const pixKey = '52608228000162'; // CNPJ só com números
-  const gui = 'BR.GOV.BCB.PIX';
+  const pixKey = '52608228000162';      // CNPJ só com números
+  const gui    = 'br.gov.bcb.pix';      // GUI em minúsculo, como nos exemplos oficiais
 
   // Normaliza texto (sem acento, só A-Z 0-9 espaço)
   function normalizeText(s, fallback, maxLen) {
@@ -1499,20 +1502,28 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
     return s.substring(0, maxLen);
   }
 
-  // recebedor sempre o dono da chave PIX
+  // Recebedor sempre o dono da chave PIX
   const nomeComerciante = normalizeText(NOME_PIX_RECEBEDOR, NOME_PIX_RECEBEDOR, 25);
-  const cidade = normalizeText(CIDADE_PIX_RECEBEDOR, 'CARLOPOLIS', 15);
+  const cidade          = normalizeText(CIDADE_PIX_RECEBEDOR, CIDADE_PIX_RECEBEDOR, 15);
 
   // Subcampos do 26 = Merchant Account Information (PIX)
   const merchantAccountInfo =
-    emvField('00', gui) +        // GUI
-    emvField('01', pixKey);      // chave (CNPJ)
+    emvField('00', gui) +      // GUI: br.gov.bcb.pix
+    emvField('01', pixKey);    // chave (CNPJ)
 
   const merchantAccountField = emvField('26', merchantAccountInfo);
 
   const valorStr = valor.toFixed(2); // ex: "90.00"
 
-  // 🚨 Versão “compatível com tudo”: sem campo 01 e sem campo 62 (TxId)
+  // TxId no campo 62, subcampo 05 (mesmo padrão dos exemplos: 62070503***)
+  const tipoSan = (tipoLabel || 'MENSAL')
+    .toString()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+  const txid = `OLACARLOPOLIS_${tipoSan}`.substring(0, 25);
+  const additionalData = emvField('05', txid);  // 05 = TxId dentro do 62
+
+  // Payload EMV no padrão BR Code
   let payload =
     emvField('00', '01') +         // Payload Format Indicator
     merchantAccountField +         // Merchant Account Info (GUI + chave)
@@ -1521,14 +1532,16 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
     emvField('54', valorStr) +     // Valor
     emvField('58', 'BR') +         // País
     emvField('59', nomeComerciante) + // Nome recebedor
-    emvField('60', cidade);        // Cidad
+    emvField('60', cidade) +       // Cidade
+    emvField('62', additionalData); // Additional Data Field Template (TxId)
 
   // Campo 63 = CRC16 (obrigatório)
   const toCrc = payload + '6304';
-  const crc = crc16(toCrc);
+  const crc   = crc16(toCrc);
 
   return toCrc + crc;
 }
+
 
 
 
