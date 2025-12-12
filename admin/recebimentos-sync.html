@@ -1483,7 +1483,7 @@ if (est.name) {
 
 
 
-    
+
 // Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
 const NOME_PIX_RECEBEDOR = 'OLA CARLOPOLIS';
 const CIDADE_PIX_RECEBEDOR = 'CARLOPOLIS';
@@ -1510,7 +1510,7 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, _tipoLabel = 'MENSAL') {
 
   // Campo 62 = Additional Data Field • subcampo 05 = TxId
   // Aqui uso "***" (mesmo padrão do exemplo oficial do Bacen)
-  const additionalData = emvField('05', '***');  // 05 = TxId dentro do 62
+  const additionalData = emvField('05', 'olaCarlopolis');  // 05 = TxId dentro do 62
 
   // Payload EMV no padrão BR Code (PIX estático):
   // 00 = formato
