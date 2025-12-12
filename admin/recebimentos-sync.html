@@ -1481,56 +1481,45 @@ if (est.name) {
       return crc.toString(16).toUpperCase().padStart(4, '0');
     }
 
+
+
+    
 // Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
 const NOME_PIX_RECEBEDOR = 'OLA CARLOPOLIS';
 const CIDADE_PIX_RECEBEDOR = 'CARLOPOLIS';
 
-// Gera o BR Code PIX usando sua chave CNPJ: 52.608.228/0001-62
-// tipoLabel continua existindo só para texto (WhatsApp, descrição etc.)
-function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
-  const pixKey = '52608228000162';      // CNPJ só com números
-  const gui    = 'br.gov.bcb.pix';      // GUI em minúsculo (padrão oficial)
+// Gera BR Code PIX estático (PIX copia e cola) usando a chave CNPJ 52.608.228/0001-62
+// _nomeClienteIgnorado e _tipoLabel são usados só para texto em WhatsApp / tela
+function gerarBRCodePix(_nomeClienteIgnorado, valor, _tipoLabel = 'MENSAL') {
+  const pixKey = '52608228000162';   // CNPJ só com números
+  const gui    = 'BR.GOV.BCB.PIX';   // GUI em MAIÚSCULO, padrão usado nos exemplos
 
-  // Normaliza texto (sem acento, só A-Z 0-9 espaço)
-  function normalizeText(s, fallback, maxLen) {
-    s = (s || '').toString().toUpperCase();
-    s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    s = s.replace(/[^A-Z0-9 ]/g, '').trim();
-    if (!s) s = fallback;
-    return s.substring(0, maxLen);
-  }
+  // Recebedor sempre é o dono da chave (seu CNPJ)
+  const nomeComerciante = NOME_PIX_RECEBEDOR;   // máx. 25 caracteres (já está ok)
+  const cidade          = CIDADE_PIX_RECEBEDOR; // máx. 15 caracteres (já está ok)
 
-  // Recebedor sempre o dono da chave PIX
-  const nomeComerciante = normalizeText(NOME_PIX_RECEBEDOR, NOME_PIX_RECEBEDOR, 25);
-  const cidade          = normalizeText(CIDADE_PIX_RECEBEDOR, CIDADE_PIX_RECEBEDOR, 15);
-
-  // Subcampos do 26 = Merchant Account Information (PIX)
+  // 26 = Merchant Account Information (PIX estático)
   const merchantAccountInfo =
-    emvField('00', gui) +      // GUI: br.gov.bcb.pix
+    emvField('00', gui) +      // GUI: BR.GOV.BCB.PIX
     emvField('01', pixKey);    // chave (CNPJ)
 
   const merchantAccountField = emvField('26', merchantAccountInfo);
 
+  // Valor fixo no payload
   const valorStr = valor.toFixed(2); // ex: "90.00"
 
-  // TxId no campo 62, subcampo 05
-  const tipoSan = (tipoLabel || 'MENSAL')
-    .toString()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '');
+  // Campo 62 = Additional Data Field • subcampo 05 = TxId
+  // Aqui uso "***" (mesmo padrão do exemplo oficial do Bacen)
+  const additionalData = emvField('05', '***');  // 05 = TxId dentro do 62
 
-  const txid = `OLACARLOPOLIS_${tipoSan}`.substring(0, 25);
-  const additionalData = emvField('05', txid);  // 05 = TxId dentro do 62
-
-  // Payload EMV no padrão BR Code:
+  // Payload EMV no padrão BR Code (PIX estático):
   // 00 = formato
-  // 01 = point of initiation (12 = dinâmico)
+  // (NÃO usamos 01 aqui → QR estático)
   // 26 = merchant account (PIX)
   // 52,53,54,58,59,60
   // 62 = TxId
   let payload =
     emvField('00', '01') +         // Payload Format Indicator
-    emvField('01', '12') +         // 12 = código dinâmico
     merchantAccountField +         // Merchant Account Info (GUI + chave)
     emvField('52', '0000') +       // MCC genérico
     emvField('53', '986') +        // Moeda BRL
@@ -1538,7 +1527,7 @@ function gerarBRCodePix(_nomeClienteIgnorado, valor, tipoLabel = 'MENSAL') {
     emvField('58', 'BR') +         // País
     emvField('59', nomeComerciante) + // Nome recebedor
     emvField('60', cidade) +       // Cidade
-    emvField('62', additionalData); // Additional Data Field Template (TxId)
+    emvField('62', additionalData); // Additional Data Field Template (TxId = "***")
 
   // Campo 63 = CRC16 (obrigatório)
   const toCrc = payload + '6304';
