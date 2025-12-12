@@ -15260,18 +15260,54 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           
                     {
                       name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/49.jpg",
-                      date: "01/10/2025",
+                      image: "images/informacoes/notaFalecimento/cristoRei/61.jpg",
+                      date: "01/12/2025",
                       descricaoFalecido: "",          
                     },
 
                      {
                       name: "Funeraria Grupo Castilho",
                       image: "images/informacoes/notaFalecimento/castilho/36.jpg",
-                      date: "21/10/2025",
+                      date: "21/12/2025",
                       descricaoFalecido: "",          
                     },
           */
+
+
+                     {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/60.jpg",
+                      date: "01/10/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. ANA FELLET DA SILVA, aos 81 anos, ocorrido em Carlópolis.<Br>O velório está sendo realizado no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá amanhã 12/12/2025 às 16:30 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+                    {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/59.jpg",
+                      date: "10/12/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. GERSON CORREA DE LIMA aos 71 anos, ocorrido em Ribeirão Claro PR.<Br>O velório dará inicio hoje as 15:00 horas no Velório Municipal.<Br>A cerimônia do sepultamento ocorrerá hoje, 09/12/2025 às 17:30 horas horas, no Cemitério Municipal de Carlópolis<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+
+                     {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/58.jpg",
+                      date: "10/12/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. VALTER LUIS MURADOR aos 67 anos, ocorrido em São Bernardo SP.<Br>O velório iniciará amanhã às 07:45 horas no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá hoje às 09/12/2025 às 16:00 horas, no Cemitério Municipal de Carlópolis<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+                     {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/57.jpg",
+                      date: "08/12/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. AKEMI NISHIGUCH aos 61 anos, ocorrido em Londrina.<Br>O velório iniciará amanhã às 07:00 horas no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá amanhã 08/12/2025 às 09:00 horas, no Cemitério Municipal de Carlópolis<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+                     {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/56.jpg",
+                      date: "04/12/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. LUZIA LIZETE DE LIMA ALMEIDA, aos 82 anos, ocorrido em Arapongas.<br>O velório está sendo realizado no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá hoje 29/11/2025 às 16:45 horas, no Cemitério Municipal de Carlópolis<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
 
           {
             name: "Funeraria Cristo Rei",
@@ -15754,40 +15790,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/caldodecanaamaral/",
             facebook: "https://www.facebook.com/CaldodecanaAmaral",
             vagaPreRequisito: "<br> Que possa trabalhar aos finais de semana e feriados",
-            infoVagaTrabalho: "1 - Auxiliar de Restaurante<br>1 - Atendente<br>1 - Auxiliar de Cozinha<br>1 - Garçom",
+            infoVagaTrabalho: "1 - Atendente<br>1 - Auxiliar de Cozinha",
           },
 
 
-          {
-            image: "images/comercios/assistenciaCelular/oficinaCelular/oficinaCelular.png",
-            name: "Oficina do Celular",
-            address: "R. Dra. Paula e Silva, 676 - Carlopolis",
-            contact: "(43) 99691-6466",
-            contact2: "(43) 3566-1600",
-            facebook: "https://www.facebook.com/oficinadocelularclps/",
-            instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
-            vagaPreRequisito: "<br> Responsável<br> Pontual<BR>Boa Comunicação<br>Disponibilidade de Horário",
-            infoVagaTrabalho: "1 - Atendimento ao publico",
+        
 
 
-
-          },
-
-
-          {
-            image: "images/comercios/motoTaxi/modesto/perfil.jpg",
-            name: "Moto Taxi Modesto",
-
-            address: "R. Andrino Soares, 370 - Carlópolis",
-            contact: " (41) 99982-3075",
-
-            instagram: "https://www.instagram.com/mototaximodesto_carlopolis/",
-            vagaPreRequisito: "<br> CNH<br>Experiência<br>Boa Comunicação<br>Responsabilidade<br>Disponibilidade de Horário<br>Compromisso",
-            infoVagaTrabalho: "1 - MotoBoy / MotoGirl ",
-
-
-
-          },
+       
 
           {
             image: "images/comercios/restaurante/toninhoParana/perfil.jpg",
@@ -15806,19 +15816,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/comercios/restaurante/delfino/delfino.png",
-            name: "Emporio São Victor",
-
-            address: "R. Kalil Keder, 90 - Carlopolis",
-            contact: "(43) 99111-9484",
-            instagram: "https://www.instagram.com/delfinos.mendes1/",
-            vagaPreRequisito: "<br> Ter experiência como garçon",
-            infoVagaTrabalho: "1 - Vaga Para Garçon ",
-
-
-
-          },
+        
           {
             image: "images/comercios/supermercado/rocha/perfil.jpg",
             name: "Rocha",
@@ -15829,7 +15827,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             facebook: "https://www.facebook.com/p/Kelve-Carl%C3%B3polis-100010521284877/?locale=pt_BR",
             instagram: "https://www.instagram.com/kelvesupermercadosoficial/",
 
-            infoVagaTrabalho: "1 - Vaga Para Açougueiro<br>1 - Vaga Para Feira<br>1 - Vaga Para Padaria<br>1 - Vaga Para Repositor<br> ",
+            infoVagaTrabalho: "1 - Vaga Para Padaria<br>1 - Vaga Para Repositor",
 
           },
 
