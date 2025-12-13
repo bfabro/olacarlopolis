@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Recebimentos 2</title>
+  <title>Admin • Recebimentos 3</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -656,7 +656,7 @@
         <div class="card"><button id="btnSync">Sincronizar com script.js</button></div>
         <div class="card"><button id="btnCSV">Exportar CSV</button></div>
         <div class="card">
-          <button id="btnToggleInativos">Mostrar inativos</button>
+          <button id="btnToggleInativos">Ver inativos</button>
         </div>
         <div class="card muted" id="sumario">—</div>
       </div>
@@ -978,6 +978,7 @@
     const mesesKeys = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
     const btnToggleInativos = document.getElementById('btnToggleInativos');
     window.__SHOW_INATIVOS__ = false;
+    window.__LOADSEQ__ = 0; // ✅ evita misturar renders antigos
 
 
     // ===== LOGIN =====
@@ -1133,9 +1134,16 @@
     async function loadTabela() {
       tbody.innerHTML = '';
       const year = selAno.value;
+      const mySeq = ++window.__LOADSEQ__; // ✅ esta chamada é a "mais nova"
 
       const allowed = window.__ALLOWED__ || await loadAllowedKeysFromScript();
+if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
+
+
+
+
       const merchantsAll = await loadMerchants();
+      if (mySeq !== window.__LOADSEQ__) return; // ✅
       const merchants = allowed ? merchantsAll.filter(m => allowed.has(m.id)) : merchantsAll;
       // ✅ ordena por nome (A-Z). Se não tiver name, usa o id
       merchants.sort((a, b) => {
@@ -1152,6 +1160,7 @@
 
       let i = 0; let totalPagos = 0, totalMeses = 0;
       for (const m of merchants) {
+            if (mySeq !== window.__LOADSEQ__) return; // ✅ se clicou de novo, para aqui
         const isInativo = (m.ativo === false);
 
 // ✅ MODO EXCLUSIVO:
@@ -1167,6 +1176,7 @@ if (window.__SHOW_INATIVOS__) {
 
         i++;
         const dados = await readReceb(year, m.id);
+        if (mySeq !== window.__LOADSEQ__) return; // ✅
         const mesesData = dados.meses || {};
         const tr = document.createElement('tr');
         tr.dataset.id = m.id;
@@ -1176,6 +1186,7 @@ if (window.__SHOW_INATIVOS__) {
 
         // Busca telefone diretamente do script.js (mesma lógica da imagem)
         const phoneFromMerchant = await getPhoneFromScript(m.id);
+        if (mySeq !== window.__LOADSEQ__) return; // ✅
         tr.dataset.phone = (phoneFromMerchant || '').toString();
 
 
@@ -1264,6 +1275,7 @@ if (window.__SHOW_INATIVOS__) {
         });
 
       }
+        if (mySeq !== window.__LOADSEQ__) return; // ✅
       updateSummary(totalPagos, totalMeses);
     }
 
