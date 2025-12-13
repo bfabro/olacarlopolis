@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Recebimentos 4</title>
+  <title>Admin • Recebimentos 5</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1298,22 +1298,26 @@ if (window.__SHOW_INATIVOS__) {
 
 
     filtro.addEventListener('input', applyFilter);
-
-    // Marcar todos os meses do cliente (linha)
+// Marcar/Desmarcar todos os meses do cliente (toggle)
 tbody.addEventListener('click', (ev) => {
   const btnAll = ev.target.closest('.btn-allmonths');
   if (!btnAll) return;
 
   const tr = btnAll.closest('tr');
   const chks = Array.from(tr.querySelectorAll('.months .chk'));
-  chks.forEach(c => { c.checked = true; });
+  if (!chks.length) return;
 
-  // Atualiza o chip de status (mês atual) para refletir a marcação
+  // Se TODOS estiverem marcados -> desmarca tudo. Senão -> marca tudo.
+  const allChecked = chks.every(c => c.checked);
+  chks.forEach(c => { c.checked = !allChecked; });
+
+  // Atualiza o chip do mês atual
   updateRowStatusFromCheckboxes(tr);
 
-  btnAll.textContent = '✅';
-  setTimeout(() => btnAll.textContent = '✅12', 800);
+  // Feedback visual no botão
+  btnAll.textContent = allChecked ? '⬜12' : '✅12';
 });
+
 
 
     tbody.addEventListener('click', async (ev) => {
