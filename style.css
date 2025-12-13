@@ -8793,6 +8793,13 @@ width: 100%;
 
 
 
+tr[data-inativo="true"] {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+
+
 
 
 

@@ -1128,6 +1128,7 @@ if (est.name) {
 
       let i = 0; let totalPagos = 0, totalMeses = 0;
       for (const m of merchants) {
+  if (m.ativo === false) continue; // 🔹 IGNORA INATIVOS
         i++;
         const dados = await readReceb(year, m.id);
         const mesesData = dados.meses || {};
@@ -1170,17 +1171,19 @@ if (est.name) {
     <!-- mantém compatível com o filtro -->
     <span class="sr-only nome-holder">${escapeHtml(m.name || m.id)}</span>
   </div>
+<div class="status-row">
+  <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
 
-  <div class="status-row">
-    <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
-    <button class="btn-save btn-icon" title="Salvar alterações" aria-label="Salvar alterações">
-      💾
-    </button>
+  <button class="btn-toggle-ativo btn-icon"
+    title="Ativar / Inativar cliente"
+    data-ativo="${m.ativo !== false}">
+    ${m.ativo === false ? '🚫' : '🟢'}
+  </button>
 
-    <button class="btn-icon btn-pix" title="Gerar QR Code PIX">
-  🔗
-</button>
-  </div>
+  <button class="btn-save btn-icon" title="Salvar alterações">💾</button>
+  <button class="btn-icon btn-pix" title="Gerar QR Code PIX">🔗</button>
+</div>
+
 </div>
 
 
@@ -1267,6 +1270,29 @@ if (est.name) {
       finally { btn.disabled = false }
     });
 
+tbody.addEventListener('click', async (ev) => {
+  const btnAtivo = ev.target.closest('.btn-toggle-ativo');
+  if (!btnAtivo) return;
+
+  const tr = btnAtivo.closest('tr');
+  const merchantId = tr.dataset.id;
+  const ativoAtual = btnAtivo.dataset.ativo === 'true';
+  const novoAtivo = !ativoAtual;
+
+  try {
+    await updateDoc(doc(db, 'merchants', merchantId), {
+      ativo: novoAtivo
+    });
+
+    btnAtivo.dataset.ativo = String(novoAtivo);
+    btnAtivo.textContent = novoAtivo ? '🟢' : '🚫';
+
+    tr.style.opacity = novoAtivo ? '1' : '0.45';
+  } catch (e) {
+    console.error(e);
+    alert('Erro ao atualizar status do cliente.');
+  }
+});
 
 
 
@@ -1325,6 +1351,13 @@ if (est.name) {
       if (!btnPix) return;
 
       const tr = btnPix.closest('tr');
+      const isAtivo = tr.querySelector('.btn-toggle-ativo')?.dataset.ativo !== 'false';
+
+if (!isAtivo) {
+  alert('Este cliente está inativo e não entra em cobranças.');
+  return;
+}
+
       const merchantId = tr.dataset.id;   // id do comércio (igual ao do script.js / merchants)
       window.__PIX_MERCHANT_ID__ = merchantId;
 
