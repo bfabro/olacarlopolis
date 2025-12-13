@@ -2206,7 +2206,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     //confecção
-    yellowjeans: "s",
+   
     panacea: "s",
 
     // borracharia
@@ -2379,7 +2379,7 @@ document.addEventListener("DOMContentLoaded", function () {
     emporiosaovictor: "s",
     hime: "s",
     pesqueirodogalego: "s",
-    portal: "n",
+    restauranteportal: "n",
     neia: "n",
     namigojapanese: "s",
     //oficinadosabor:"s",
@@ -8928,12 +8928,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-          {
-            name: "Yellow Jeans",
-            hours: "Seg a Sex: 9:00h as 11:30h -  13:00h as 17:00h",
-            address: "Rua Maria Pereira da Rocha Aleixo, 435",
-            contact: "(43) 998070671",
-          },
+         
         ],
       },
 
@@ -11895,10 +11890,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Rose",
             contact: "(43) 7890-1234",
           },
-          {
-            name: "Maria",
-            contact: "(43) 8901-2345",
-          },
+          
         ],
       },
 
@@ -11990,11 +11982,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuFretes"),
         title: "Frete",
         establishments: [
-          {
-            image: "images/servicos/fretes/anselmo/anselmo.png",
-            name: "Anselmo Frete",
-            contact: "(43) 99695-7449",
-          },
+        
           {
             image: "images/servicos/fretes/erickson/erickson.png",
             name: "Erickson",
@@ -14841,7 +14829,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
           {
             image: "images/comercios/restaurante/portal/portal.png",
-            name: "Portal",
+            name: "Resraurante Portal",
             hours: "Seg a Sex: 11:30h as 14:00h - 19:00h as 21:00h",
             statusAberto: ".",
             horarios: {

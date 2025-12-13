@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Recebimentos 3</title>
+  <title>Admin • Recebimentos 4</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1231,6 +1231,7 @@ if (window.__SHOW_INATIVOS__) {
     data-ativo="${m.ativo !== false}">
     ${m.ativo === false ? '🚫' : '🟢'}
   </button>
+<button class="btn-allmonths btn-icon" title="Marcar todos os meses como pago">✅12</button>
 
   <button class="btn-save btn-icon" title="Salvar alterações">💾</button>
   <button class="btn-icon btn-pix" title="Gerar QR Code PIX">🔗</button>
@@ -1297,6 +1298,23 @@ if (window.__SHOW_INATIVOS__) {
 
 
     filtro.addEventListener('input', applyFilter);
+
+    // Marcar todos os meses do cliente (linha)
+tbody.addEventListener('click', (ev) => {
+  const btnAll = ev.target.closest('.btn-allmonths');
+  if (!btnAll) return;
+
+  const tr = btnAll.closest('tr');
+  const chks = Array.from(tr.querySelectorAll('.months .chk'));
+  chks.forEach(c => { c.checked = true; });
+
+  // Atualiza o chip de status (mês atual) para refletir a marcação
+  updateRowStatusFromCheckboxes(tr);
+
+  btnAll.textContent = '✅';
+  setTimeout(() => btnAll.textContent = '✅12', 800);
+});
+
 
     tbody.addEventListener('click', async (ev) => {
       const btn = ev.target.closest('.btn-save');
