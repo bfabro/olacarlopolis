@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Recebimentos</title>
+  <title>Admin • Recebimentos 1</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1015,7 +1015,7 @@ window.__SHOW_INATIVOS__ = false;
       btnCSV.onclick = exportCSV;
       btnToggleInativos.onclick = async () => {
   window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
-  btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ocultar inativos' : 'Mostrar inativos';
+  btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver inativos' : 'Ver ativos';
   await loadTabela();
 };
 
@@ -1137,13 +1137,32 @@ window.__SHOW_INATIVOS__ = false;
       const allowed = window.__ALLOWED__ || await loadAllowedKeysFromScript();
       const merchantsAll = await loadMerchants();
       const merchants = allowed ? merchantsAll.filter(m => allowed.has(m.id)) : merchantsAll;
+      // ✅ ordena por nome (A-Z). Se não tiver name, usa o id
+merchants.sort((a, b) => {
+  const an = (a.name || a.id || '').toString().localeCompare(
+    (b.name || b.id || '').toString(),
+    'pt-BR',
+    { sensitivity: 'base' }
+  );
+  return an;
+});
+
+      
+
 
       let i = 0; let totalPagos = 0, totalMeses = 0;
      for (const m of merchants) {
   const isInativo = (m.ativo === false);
 
-  // se NÃO estiver mostrando inativos, continua ignorando
-  if (isInativo && !window.__SHOW_INATIVOS__) continue;
+ // ✅ MODO EXCLUSIVO:
+// - __SHOW_INATIVOS__ = false  => mostra só ATIVOS
+// - __SHOW_INATIVOS__ = true   => mostra só INATIVOS
+if (window.__SHOW_INATIVOS__) {
+  if (!isInativo) continue;   // mostrando inativos => ignora ativos
+} else {
+  if (isInativo) continue;    // mostrando ativos => ignora inativos
+}
+
 
         i++;
         const dados = await readReceb(year, m.id);
