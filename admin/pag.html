@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 2</title>
+  <title>Admin • Pagamentos 3</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1198,7 +1198,7 @@ if (window.__SHOW_INATIVOS__) {
             if (pago) totalPagos++;
             totalMeses++;
           }
-          const label = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][idx];
+          const label = ['Jan', 'Fev.', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago.', 'Set.', 'Out.', 'Nov', 'Dez'][idx];
           return `<label class="mchip">
             <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
             <span>${label}</span>
@@ -1231,7 +1231,7 @@ if (window.__SHOW_INATIVOS__) {
     data-ativo="${m.ativo !== false}">
     ${m.ativo === false ? '🚫' : '🟢'}
   </button>
-<button class="btn-allmonths btn-icon" title="Marcar todos os meses como pago">✅12</button>
+
 
   <button class="btn-save btn-icon" title="Salvar alterações">💾</button>
   <button class="btn-icon btn-pix" title="Gerar QR Code PIX">🔗</button>
@@ -1253,7 +1253,7 @@ if (window.__SHOW_INATIVOS__) {
       </div>
 
       <div class="rcell meses">
-        <div class="label muted">Meses -</div>
+        <div class="label muted">Meses - <button class="btn-allmonths btn-icon" title="Marcar todos os meses como pago">✅12</button></div>
         <div class="months"><div class="months-scroll">${monthsHtml}</div></div>
       </div>
     </div>
