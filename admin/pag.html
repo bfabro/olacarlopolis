@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 3</title>
+  <title>Admin • Pagamentos 4</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1198,7 +1198,7 @@ if (window.__SHOW_INATIVOS__) {
             if (pago) totalPagos++;
             totalMeses++;
           }
-          const label = ['Jan', 'Fev.', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago.', 'Set.', 'Out.', 'Nov', 'Dez'][idx];
+          const label = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][idx];
           return `<label class="mchip">
             <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
             <span>${label}</span>
@@ -1441,7 +1441,7 @@ tbody.addEventListener('click', (ev) => {
       const nomeComercio = tr.querySelector('.nome-holder').textContent.trim();
 
       const chks = Array.from(tr.querySelectorAll('.months .chk'));
-      const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const mesesNomes = ['Jan.', 'Fev.', 'Mar.', 'Abr.', 'Mai.', 'Jun.', 'Jul.', 'Ago.', 'Set.', 'Out.', 'Nov.', 'Dez.'];
       let totalMensal = 0;
       const mesesDevidos = [];
 
