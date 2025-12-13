@@ -623,7 +623,7 @@
   <div class="wrap">
     <header>
       <div style="display:flex; align-items:center; gap:12px">
-        <h1>📒 Recebimentos (auto-sync do script.js)</h1>
+        <h1>📒 Recebimentos</h1>
         <span class="chip"><span class="status-dot dot-ok"></span> Pago</span>
         <span class="chip"><span class="status-dot dot-no"></span> Em aberto</span>
       </div>
@@ -1149,6 +1149,7 @@ window.__SHOW_INATIVOS__ = false;
         const dados = await readReceb(year, m.id);
         const mesesData = dados.meses || {};
         const tr = document.createElement('tr');
+        tr.dataset.id = m.id;
        tr.dataset.inativo = isInativo ? 'true' : 'false';
 tr.style.opacity = isInativo ? '0.45' : '1';
 
@@ -1285,7 +1286,8 @@ tr.style.opacity = isInativo ? '0.45' : '1';
         await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
         updateRowStatusFromCheckboxes(tr);
 
-        btn.textContent = '✅ Salvo'; setTimeout(() => btn.textContent = 'Atualizar', 1000);
+        btn.textContent = '✅';
+setTimeout(() => btn.textContent = '💾', 1000);
       } catch (e) { console.error(e); btn.textContent = 'Erro'; setTimeout(() => btn.textContent = 'Atualizar', 1200); }
       finally { btn.disabled = false }
     });
@@ -1308,6 +1310,7 @@ tbody.addEventListener('click', async (ev) => {
     btnAtivo.textContent = novoAtivo ? '🟢' : '🚫';
 
     tr.style.opacity = novoAtivo ? '1' : '0.45';
+    tr.dataset.inativo = novoAtivo ? 'false' : 'true';
   } catch (e) {
     console.error(e);
     alert('Erro ao atualizar status do cliente.');
