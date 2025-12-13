@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 6</title>
+  <title>Admin • Pagamentos 7</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -661,6 +661,27 @@
         <div class="card muted" id="sumario">—</div>
       </div>
 
+
+
+      <!-- LOADER -->
+      <div id="loaderBox" class="card" style="margin-bottom:12px; display:none">
+        <div style="display:flex; align-items:center; gap:12px">
+          <div style="flex:1">
+            <div class="muted" id="loaderText">Carregando…</div>
+            <div style="height:8px; background:#0f141b; border-radius:6px; overflow:hidden; margin-top:6px">
+              <div id="loaderBar" style="height:100%; width:0%; background:var(--brand); transition:width .2s">
+              </div>
+            </div>
+          </div>
+          <div id="loaderPct" class="muted">0%</div>
+        </div>
+      </div>
+
+
+
+
+
+
       <div class="table-wrap">
         <table>
           <thead>
@@ -1024,7 +1045,7 @@
         window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
         btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
         await loadTabela();
-          applyFilter(); // mantém a busca aplicada
+        applyFilter(); // mantém a busca aplicada
       };
 
 
@@ -1133,11 +1154,21 @@
     // ===== TABELA =====
     async function loadTabela() {
       tbody.innerHTML = '';
+      const loaderBox = document.getElementById('loaderBox');
+      const loaderBar = document.getElementById('loaderBar');
+      const loaderText = document.getElementById('loaderText');
+      const loaderPct = document.getElementById('loaderPct');
+
+      loaderBox.style.display = '';
+      loaderBar.style.width = '0%';
+      loaderPct.textContent = '0%';
+      loaderText.textContent = 'Carregando clientes…';
+
       const year = selAno.value;
       const mySeq = ++window.__LOADSEQ__; // ✅ esta chamada é a "mais nova"
 
       const allowed = window.__ALLOWED__ || await loadAllowedKeysFromScript();
-if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
+      if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
 
 
 
@@ -1145,6 +1176,9 @@ if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
       const merchantsAll = await loadMerchants();
       if (mySeq !== window.__LOADSEQ__) return; // ✅
       const merchants = allowed ? merchantsAll.filter(m => allowed.has(m.id)) : merchantsAll;
+      const total = merchants.length;
+      let carregados = 0;
+
       // ✅ ordena por nome (A-Z). Se não tiver name, usa o id
       merchants.sort((a, b) => {
         const an = (a.name || a.id || '').toString().localeCompare(
@@ -1160,17 +1194,17 @@ if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
 
       let i = 0; let totalPagos = 0, totalMeses = 0;
       for (const m of merchants) {
-            if (mySeq !== window.__LOADSEQ__) return; // ✅ se clicou de novo, para aqui
+        if (mySeq !== window.__LOADSEQ__) return; // ✅ se clicou de novo, para aqui
         const isInativo = (m.ativo === false);
 
-// ✅ MODO EXCLUSIVO:
-// - __SHOW_INATIVOS__ = false  => mostra só ATIVOS
-// - __SHOW_INATIVOS__ = true   => mostra só INATIVOS
-if (window.__SHOW_INATIVOS__) {
-  if (!isInativo) continue;   // mostrando inativos => ignora ativos
-} else {
-  if (isInativo) continue;    // mostrando ativos => ignora inativos
-}
+        // ✅ MODO EXCLUSIVO:
+        // - __SHOW_INATIVOS__ = false  => mostra só ATIVOS
+        // - __SHOW_INATIVOS__ = true   => mostra só INATIVOS
+        if (window.__SHOW_INATIVOS__) {
+          if (!isInativo) continue;   // mostrando inativos => ignora ativos
+        } else {
+          if (isInativo) continue;    // mostrando ativos => ignora inativos
+        }
 
 
 
@@ -1275,10 +1309,25 @@ if (window.__SHOW_INATIVOS__) {
             updateRowStatusFromCheckboxes(tr);
           }
         });
+        carregados++;
+
+        const pct = Math.round((carregados / total) * 100);
+        loaderBar.style.width = pct + '%';
+        loaderPct.textContent = pct + '%';
+        loaderText.textContent = `Carregando ${carregados} de ${total} clientes…`;
 
       }
-        if (mySeq !== window.__LOADSEQ__) return; // ✅
+      if (mySeq !== window.__LOADSEQ__) return; // ✅
       updateSummary(totalPagos, totalMeses);
+
+      loaderText.textContent = 'Concluído';
+      loaderBar.style.width = '100%';
+      loaderPct.textContent = '100%';
+
+      setTimeout(() => {
+        loaderBox.style.display = 'none';
+      }, 400);
+
     }
 
 
@@ -1299,25 +1348,25 @@ if (window.__SHOW_INATIVOS__) {
 
 
     filtro.addEventListener('input', applyFilter);
-// Marcar/Desmarcar todos os meses do cliente (toggle)
-tbody.addEventListener('click', (ev) => {
-  const btnAll = ev.target.closest('.btn-allmonths');
-  if (!btnAll) return;
+    // Marcar/Desmarcar todos os meses do cliente (toggle)
+    tbody.addEventListener('click', (ev) => {
+      const btnAll = ev.target.closest('.btn-allmonths');
+      if (!btnAll) return;
 
-  const tr = btnAll.closest('tr');
-  const chks = Array.from(tr.querySelectorAll('.months .chk'));
-  if (!chks.length) return;
+      const tr = btnAll.closest('tr');
+      const chks = Array.from(tr.querySelectorAll('.months .chk'));
+      if (!chks.length) return;
 
-  // Se TODOS estiverem marcados -> desmarca tudo. Senão -> marca tudo.
-  const allChecked = chks.every(c => c.checked);
-  chks.forEach(c => { c.checked = !allChecked; });
+      // Se TODOS estiverem marcados -> desmarca tudo. Senão -> marca tudo.
+      const allChecked = chks.every(c => c.checked);
+      chks.forEach(c => { c.checked = !allChecked; });
 
-  // Atualiza o chip do mês atual
-  updateRowStatusFromCheckboxes(tr);
+      // Atualiza o chip do mês atual
+      updateRowStatusFromCheckboxes(tr);
 
-  // Feedback visual no botão
-  btnAll.textContent = allChecked ? '⬜12' : '✅12';
-});
+      // Feedback visual no botão
+      btnAll.textContent = allChecked ? '⬜12' : '✅12';
+    });
 
 
 
