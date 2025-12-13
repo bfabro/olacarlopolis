@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Recebimentos 1</title>
+  <title>Admin • Recebimentos 2</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -656,8 +656,8 @@
         <div class="card"><button id="btnSync">Sincronizar com script.js</button></div>
         <div class="card"><button id="btnCSV">Exportar CSV</button></div>
         <div class="card">
-  <button id="btnToggleInativos">Mostrar inativos</button>
-</div>
+          <button id="btnToggleInativos">Mostrar inativos</button>
+        </div>
         <div class="card muted" id="sumario">—</div>
       </div>
 
@@ -764,8 +764,10 @@
         const m = code.match(/const\s+categories\s*=\s*(\[[\s\S]*?\]);/m);
         if (!m || !m[1]) {
           console.warn('categories não encontrado em script.js');
-          window.__PROFILE_MAP__ = { byId: {}, byNoHyphen: {}, phonesById: {}, phonesByNoHyphen: {},namesById:{},
-  namesByNoHyphen:{} };
+          window.__PROFILE_MAP__ = {
+            byId: {}, byNoHyphen: {}, phonesById: {}, phonesByNoHyphen: {}, namesById: {},
+            namesByNoHyphen: {}
+          };
           return window.__PROFILE_MAP__;
         }
 
@@ -804,10 +806,10 @@
             }
 
             // NOME REAL DO CLIENTE / ESTABELECIMENTO
-if (est.name) {
-  namesById[idNorm] = est.name;
-  namesByNoHyphen[idNorm.replace(/-/g, '')] = est.name;
-}
+            if (est.name) {
+              namesById[idNorm] = est.name;
+              namesByNoHyphen[idNorm.replace(/-/g, '')] = est.name;
+            }
 
 
             // TELEFONE (pega qualquer um dos campos que você usa no site)
@@ -827,13 +829,17 @@ if (est.name) {
           });
         });
 
-        window.__PROFILE_MAP__ = { byId, byNoHyphen, phonesById, phonesByNoHyphen,namesById,
-  namesByNoHyphen };
+        window.__PROFILE_MAP__ = {
+          byId, byNoHyphen, phonesById, phonesByNoHyphen, namesById,
+          namesByNoHyphen
+        };
         return window.__PROFILE_MAP__;
       } catch (e) {
         console.error('Falha ao montar PROFILE_MAP a partir de script.js', e);
-        window.__PROFILE_MAP__ = { byId: {}, byNoHyphen: {}, phonesById: {}, phonesByNoHyphen: {} ,namesById:{},
-  namesByNoHyphen:{}};
+        window.__PROFILE_MAP__ = {
+          byId: {}, byNoHyphen: {}, phonesById: {}, phonesByNoHyphen: {}, namesById: {},
+          namesByNoHyphen: {}
+        };
         return window.__PROFILE_MAP__;
       }
     }
@@ -901,27 +907,27 @@ if (est.name) {
     }
 
     async function getNameFromScript(merchantId) {
-  if (!merchantId) return '';
+      if (!merchantId) return '';
 
-  const maps = await loadProfileMapFromScript();
-  const raw = merchantId.toLowerCase();
+      const maps = await loadProfileMapFromScript();
+      const raw = merchantId.toLowerCase();
 
-  const variations = [
-    raw,
-    raw.replace(/_/g,'-'),
-    normalizeNameLocal(raw),
-    normalizeNameLocal(raw.replace(/_/g,'-')),
-    raw.replace(/[^a-z0-9]/g,''),
-    normalizeNameLocal(raw).replace(/[^a-z0-9]/g,'')
-  ];
+      const variations = [
+        raw,
+        raw.replace(/_/g, '-'),
+        normalizeNameLocal(raw),
+        normalizeNameLocal(raw.replace(/_/g, '-')),
+        raw.replace(/[^a-z0-9]/g, ''),
+        normalizeNameLocal(raw).replace(/[^a-z0-9]/g, '')
+      ];
 
-  for (const key of variations) {
-    if (maps.namesById[key]) return maps.namesById[key];
-    if (maps.namesByNoHyphen[key]) return maps.namesByNoHyphen[key];
-  }
+      for (const key of variations) {
+        if (maps.namesById[key]) return maps.namesById[key];
+        if (maps.namesByNoHyphen[key]) return maps.namesByNoHyphen[key];
+      }
 
-  return '';
-}
+      return '';
+    }
 
 
 
@@ -971,7 +977,7 @@ if (est.name) {
     const sumario = document.getElementById('sumario');
     const mesesKeys = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
     const btnToggleInativos = document.getElementById('btnToggleInativos');
-window.__SHOW_INATIVOS__ = false;
+    window.__SHOW_INATIVOS__ = false;
 
 
     // ===== LOGIN =====
@@ -1014,10 +1020,11 @@ window.__SHOW_INATIVOS__ = false;
       filtro.oninput = applyFilter;
       btnCSV.onclick = exportCSV;
       btnToggleInativos.onclick = async () => {
-  window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
-  btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver inativos' : 'Ver ativos';
-  await loadTabela();
-};
+        window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
+        btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
+        await loadTabela();
+          applyFilter(); // mantém a busca aplicada
+      };
 
 
       // <-- NOVO: guarda globalmente
@@ -1122,13 +1129,6 @@ window.__SHOW_INATIVOS__ = false;
 
 
 
-
-
-
-
-
-
-
     // ===== TABELA =====
     async function loadTabela() {
       tbody.innerHTML = '';
@@ -1138,23 +1138,23 @@ window.__SHOW_INATIVOS__ = false;
       const merchantsAll = await loadMerchants();
       const merchants = allowed ? merchantsAll.filter(m => allowed.has(m.id)) : merchantsAll;
       // ✅ ordena por nome (A-Z). Se não tiver name, usa o id
-merchants.sort((a, b) => {
-  const an = (a.name || a.id || '').toString().localeCompare(
-    (b.name || b.id || '').toString(),
-    'pt-BR',
-    { sensitivity: 'base' }
-  );
-  return an;
-});
+      merchants.sort((a, b) => {
+        const an = (a.name || a.id || '').toString().localeCompare(
+          (b.name || b.id || '').toString(),
+          'pt-BR',
+          { sensitivity: 'base' }
+        );
+        return an;
+      });
 
-      
+
 
 
       let i = 0; let totalPagos = 0, totalMeses = 0;
-     for (const m of merchants) {
-  const isInativo = (m.ativo === false);
+      for (const m of merchants) {
+        const isInativo = (m.ativo === false);
 
- // ✅ MODO EXCLUSIVO:
+// ✅ MODO EXCLUSIVO:
 // - __SHOW_INATIVOS__ = false  => mostra só ATIVOS
 // - __SHOW_INATIVOS__ = true   => mostra só INATIVOS
 if (window.__SHOW_INATIVOS__) {
@@ -1164,13 +1164,14 @@ if (window.__SHOW_INATIVOS__) {
 }
 
 
+
         i++;
         const dados = await readReceb(year, m.id);
         const mesesData = dados.meses || {};
         const tr = document.createElement('tr');
         tr.dataset.id = m.id;
-       tr.dataset.inativo = isInativo ? 'true' : 'false';
-tr.style.opacity = isInativo ? '0.45' : '1';
+        tr.dataset.inativo = isInativo ? 'true' : 'false';
+        tr.style.opacity = isInativo ? '0.45' : '1';
 
 
         // Busca telefone diretamente do script.js (mesma lógica da imagem)
@@ -1182,10 +1183,10 @@ tr.style.opacity = isInativo ? '0.45' : '1';
         // antes de montar tr.innerHTML
         const monthsHtml = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"].map((mm, idx) => {
           const pago = !!(mesesData[mm]?.pago);
-         if (!isInativo) {
-  if (pago) totalPagos++;
-  totalMeses++;
-}
+          if (!isInativo) {
+            if (pago) totalPagos++;
+            totalMeses++;
+          }
           const label = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][idx];
           return `<label class="mchip">
             <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
@@ -1306,35 +1307,35 @@ tr.style.opacity = isInativo ? '0.45' : '1';
         updateRowStatusFromCheckboxes(tr);
 
         btn.textContent = '✅';
-setTimeout(() => btn.textContent = '💾', 1000);
+        setTimeout(() => btn.textContent = '💾', 1000);
       } catch (e) { console.error(e); btn.textContent = 'Erro'; setTimeout(() => btn.textContent = 'Atualizar', 1200); }
       finally { btn.disabled = false }
     });
 
-tbody.addEventListener('click', async (ev) => {
-  const btnAtivo = ev.target.closest('.btn-toggle-ativo');
-  if (!btnAtivo) return;
+    tbody.addEventListener('click', async (ev) => {
+      const btnAtivo = ev.target.closest('.btn-toggle-ativo');
+      if (!btnAtivo) return;
 
-  const tr = btnAtivo.closest('tr');
-  const merchantId = tr.dataset.id;
-  const ativoAtual = btnAtivo.dataset.ativo === 'true';
-  const novoAtivo = !ativoAtual;
+      const tr = btnAtivo.closest('tr');
+      const merchantId = tr.dataset.id;
+      const ativoAtual = btnAtivo.dataset.ativo === 'true';
+      const novoAtivo = !ativoAtual;
 
-  try {
-    await updateDoc(doc(db, 'merchants', merchantId), {
-      ativo: novoAtivo
+      try {
+        await updateDoc(doc(db, 'merchants', merchantId), {
+          ativo: novoAtivo
+        });
+
+        btnAtivo.dataset.ativo = String(novoAtivo);
+        btnAtivo.textContent = novoAtivo ? '🟢' : '🚫';
+
+        tr.style.opacity = novoAtivo ? '1' : '0.45';
+        tr.dataset.inativo = novoAtivo ? 'false' : 'true';
+      } catch (e) {
+        console.error(e);
+        alert('Erro ao atualizar status do cliente.');
+      }
     });
-
-    btnAtivo.dataset.ativo = String(novoAtivo);
-    btnAtivo.textContent = novoAtivo ? '🟢' : '🚫';
-
-    tr.style.opacity = novoAtivo ? '1' : '0.45';
-    tr.dataset.inativo = novoAtivo ? 'false' : 'true';
-  } catch (e) {
-    console.error(e);
-    alert('Erro ao atualizar status do cliente.');
-  }
-});
 
 
 
@@ -1371,8 +1372,8 @@ tbody.addEventListener('click', async (ev) => {
       document.body.appendChild(modal);
 
       modal.addEventListener('click', (e) => {
-  if (e.target === modal) modal.remove();
-});
+        if (e.target === modal) modal.remove();
+      });
 
 
       modal.querySelectorAll('.btn-tipo').forEach(btn => {
@@ -1395,10 +1396,10 @@ tbody.addEventListener('click', async (ev) => {
       const tr = btnPix.closest('tr');
       const isAtivo = tr.querySelector('.btn-toggle-ativo')?.dataset.ativo !== 'false';
 
-if (!isAtivo) {
-  alert('Este cliente está inativo e não entra em cobranças.');
-  return;
-}
+      if (!isAtivo) {
+        alert('Este cliente está inativo e não entra em cobranças.');
+        return;
+      }
 
       const merchantId = tr.dataset.id;   // id do comércio (igual ao do script.js / merchants)
       window.__PIX_MERCHANT_ID__ = merchantId;
@@ -1559,154 +1560,154 @@ if (!isAtivo) {
 
 
 
-// Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
-const NOME_PIX_RECEBEDOR = 'OLA CARLOPOLIS';
-const CIDADE_PIX_RECEBEDOR = 'CARLOPOLIS';
+    // Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
+    const NOME_PIX_RECEBEDOR = 'OLA CARLOPOLIS';
+    const CIDADE_PIX_RECEBEDOR = 'CARLOPOLIS';
 
-// Gera BR Code PIX estático (PIX copia e cola) usando a chave CNPJ 52.608.228/0001-62
-// _nomeClienteIgnorado e _tipoLabel são usados só para texto em WhatsApp / tela
-function gerarBRCodePix(_nomeClienteIgnorado, valor, _tipoLabel = 'MENSAL') {
-  const pixKey = '52608228000162';   // CNPJ só com números
-  const gui    = 'BR.GOV.BCB.PIX';   // GUI em MAIÚSCULO, padrão usado nos exemplos
+    // Gera BR Code PIX estático (PIX copia e cola) usando a chave CNPJ 52.608.228/0001-62
+    // _nomeClienteIgnorado e _tipoLabel são usados só para texto em WhatsApp / tela
+    function gerarBRCodePix(_nomeClienteIgnorado, valor, _tipoLabel = 'MENSAL') {
+      const pixKey = '52608228000162';   // CNPJ só com números
+      const gui = 'BR.GOV.BCB.PIX';   // GUI em MAIÚSCULO, padrão usado nos exemplos
 
-  // Recebedor sempre é o dono da chave (seu CNPJ)
-  const nomeComerciante = NOME_PIX_RECEBEDOR;   // máx. 25 caracteres (já está ok)
-  const cidade          = CIDADE_PIX_RECEBEDOR; // máx. 15 caracteres (já está ok)
+      // Recebedor sempre é o dono da chave (seu CNPJ)
+      const nomeComerciante = NOME_PIX_RECEBEDOR;   // máx. 25 caracteres (já está ok)
+      const cidade = CIDADE_PIX_RECEBEDOR; // máx. 15 caracteres (já está ok)
 
-  // 26 = Merchant Account Information (PIX estático)
-  const merchantAccountInfo =
-    emvField('00', gui) +      // GUI: BR.GOV.BCB.PIX
-    emvField('01', pixKey);    // chave (CNPJ)
+      // 26 = Merchant Account Information (PIX estático)
+      const merchantAccountInfo =
+        emvField('00', gui) +      // GUI: BR.GOV.BCB.PIX
+        emvField('01', pixKey);    // chave (CNPJ)
 
-  const merchantAccountField = emvField('26', merchantAccountInfo);
+      const merchantAccountField = emvField('26', merchantAccountInfo);
 
-  // Valor fixo no payload
-  const valorStr = valor.toFixed(2); // ex: "90.00"
+      // Valor fixo no payload
+      const valorStr = valor.toFixed(2); // ex: "90.00"
 
-  // Campo 62 = Additional Data Field • subcampo 05 = TxId
-  // Aqui uso "***" (mesmo padrão do exemplo oficial do Bacen)
-  const additionalData = emvField('05', 'olaCarlopolis');  // 05 = TxId dentro do 62
+      // Campo 62 = Additional Data Field • subcampo 05 = TxId
+      // Aqui uso "***" (mesmo padrão do exemplo oficial do Bacen)
+      const additionalData = emvField('05', 'olaCarlopolis');  // 05 = TxId dentro do 62
 
-  // Payload EMV no padrão BR Code (PIX estático):
-  // 00 = formato
-  // (NÃO usamos 01 aqui → QR estático)
-  // 26 = merchant account (PIX)
-  // 52,53,54,58,59,60
-  // 62 = TxId
-  let payload =
-    emvField('00', '01') +         // Payload Format Indicator
-    merchantAccountField +         // Merchant Account Info (GUI + chave)
-    emvField('52', '0000') +       // MCC genérico
-    emvField('53', '986') +        // Moeda BRL
-    emvField('54', valorStr) +     // Valor
-    emvField('58', 'BR') +         // País
-    emvField('59', nomeComerciante) + // Nome recebedor
-    emvField('60', cidade) +       // Cidade
-    emvField('62', additionalData); // Additional Data Field Template (TxId = "***")
+      // Payload EMV no padrão BR Code (PIX estático):
+      // 00 = formato
+      // (NÃO usamos 01 aqui → QR estático)
+      // 26 = merchant account (PIX)
+      // 52,53,54,58,59,60
+      // 62 = TxId
+      let payload =
+        emvField('00', '01') +         // Payload Format Indicator
+        merchantAccountField +         // Merchant Account Info (GUI + chave)
+        emvField('52', '0000') +       // MCC genérico
+        emvField('53', '986') +        // Moeda BRL
+        emvField('54', valorStr) +     // Valor
+        emvField('58', 'BR') +         // País
+        emvField('59', nomeComerciante) + // Nome recebedor
+        emvField('60', cidade) +       // Cidade
+        emvField('62', additionalData); // Additional Data Field Template (TxId = "***")
 
-  // Campo 63 = CRC16 (obrigatório)
-  const toCrc = payload + '6304';
-  const crc   = crc16(toCrc);
+      // Campo 63 = CRC16 (obrigatório)
+      const toCrc = payload + '6304';
+      const crc = crc16(toCrc);
 
-  return toCrc + crc;
-}
-
-
+      return toCrc + crc;
+    }
 
 
 
 
-    
-function formatMesAnoPt(date) {
-  const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-  const mes = meses[date.getMonth()];
-  const ano2 = String(date.getFullYear()).slice(-2);
-  return `${mes}/${ano2}`;
-}
 
 
-function abrirModalPIX(
-  linha,
-  valor,
-  mesesDevidos,
-  tipoLabel = 'MENSAL',
-  nomeCliente = '',
-  merchantId = '',
-  fotoPerfilUrl = '',
-  phoneCliente = ''
-) {
-  const modal = document.createElement("div");
-  modal.className = "modal-pix";
 
-  const mesesTexto = (mesesDevidos && mesesDevidos.length)
-    ? mesesDevidos.join(', ')
-    : '—';
+    function formatMesAnoPt(date) {
+      const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+      const mes = meses[date.getMonth()];
+      const ano2 = String(date.getFullYear()).slice(-2);
+      return `${mes}/${ano2}`;
+    }
 
-  // 🔹 primeiro define o tipo normalizado
-  const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase();
 
-  // (se quiser usar em algum lugar, agora funciona)
-  const planoId = `OLA_CARLOPOLIS_${tipoSan}`;
+    function abrirModalPIX(
+      linha,
+      valor,
+      mesesDevidos,
+      tipoLabel = 'MENSAL',
+      nomeCliente = '',
+      merchantId = '',
+      fotoPerfilUrl = '',
+      phoneCliente = ''
+    ) {
+      const modal = document.createElement("div");
+      modal.className = "modal-pix";
 
-  const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
-  const valorBr = valor.toFixed(2).replace('.', ',');
+      const mesesTexto = (mesesDevidos && mesesDevidos.length)
+        ? mesesDevidos.join(', ')
+        : '—';
 
-  // 🔹 cálculo da vigência (início = mês atual)  
-  const hoje = new Date();
-  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês de referência
-  const fim = new Date(inicio);
+      // 🔹 primeiro define o tipo normalizado
+      const tipoSan = (tipoLabel || 'MENSAL').toString().toUpperCase();
 
-  if (tipoSan === 'ANUAL') {
-    // 12 meses de vigência a partir do mês atual
-    fim.setFullYear(fim.getFullYear() + 1);
-  } else if (tipoSan === 'SEMESTRAL') {
-    // 6 meses contando o mês atual → +5 meses
-    fim.setMonth(fim.getMonth() + 5);
-  } else {
-    // MENSAL: só o mês de pagamento (inicio = fim)
-    // se quiser, pode até deixar assim explicitamente:
-    fim.setMonth(fim.getMonth());
-  }
+      // (se quiser usar em algum lugar, agora funciona)
+      const planoId = `OLA_CARLOPOLIS_${tipoSan}`;
 
-  let vigenciaHtml = '';
+      const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
+      const valorBr = valor.toFixed(2).replace('.', ',');
 
-  if (tipoSan === 'MENSAL') {
-    // mostra só o mês de pagamento
-    vigenciaHtml = `
+      // 🔹 cálculo da vigência (início = mês atual)  
+      const hoje = new Date();
+      const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês de referência
+      const fim = new Date(inicio);
+
+      if (tipoSan === 'ANUAL') {
+        // 12 meses de vigência a partir do mês atual
+        fim.setFullYear(fim.getFullYear() + 1);
+      } else if (tipoSan === 'SEMESTRAL') {
+        // 6 meses contando o mês atual → +5 meses
+        fim.setMonth(fim.getMonth() + 5);
+      } else {
+        // MENSAL: só o mês de pagamento (inicio = fim)
+        // se quiser, pode até deixar assim explicitamente:
+        fim.setMonth(fim.getMonth());
+      }
+
+      let vigenciaHtml = '';
+
+      if (tipoSan === 'MENSAL') {
+        // mostra só o mês de pagamento
+        vigenciaHtml = `
       <div style="margin-top:4px;">
         <strong>Vigência:</strong> ${formatMesAnoPt(inicio)}
       </div>
     `;
-  } else {
-    // semestral / anual → intervalo de meses
-    vigenciaHtml = `
+      } else {
+        // semestral / anual → intervalo de meses
+        vigenciaHtml = `
       <div style="margin-top:4px;">
         <strong>Vigência:</strong> ${formatMesAnoPt(inicio)} a ${formatMesAnoPt(fim)}
       </div>
     `;
-  }
+      }
 
 
-  const phoneClean = (phoneCliente || '').toString().trim();
-  const phoneHtml = phoneClean ? `` : '';
+      const phoneClean = (phoneCliente || '').toString().trim();
+      const phoneHtml = phoneClean ? `` : '';
 
-  let detalheMesesHtml = '';
-  if (tipoLabel === 'MENSAL') {
-    detalheMesesHtml = `
+      let detalheMesesHtml = '';
+      if (tipoLabel === 'MENSAL') {
+        detalheMesesHtml = `
       <div style="margin-top:4px;">
         <strong>Valor referente a:</strong> ${mesesTexto}
       </div>
     `;
-  } else {
-    detalheMesesHtml = `
+      } else {
+        detalheMesesHtml = `
       <div style="margin-top:4px;">
         <strong>Referente ao plano:</strong> ${tipoLabel.charAt(0) + tipoLabel.slice(1).toLowerCase()}
       </div>
     `;
-  }
+      }
 
-  // monta cartão premium
-  modal.innerHTML = `
+      // monta cartão premium
+      modal.innerHTML = `
     <div class="modal-box">
       <h3>QR Code PIX</h3>
 
@@ -1730,13 +1731,13 @@ function abrirModalPIX(
           overflow:hidden;
         ">
           ${(fotoPerfilUrl && fotoPerfilUrl.trim())
-            ? `<img src="${fotoPerfilUrl.startsWith('/') ? fotoPerfilUrl : '/' + fotoPerfilUrl}"
+          ? `<img src="${fotoPerfilUrl.startsWith('/') ? fotoPerfilUrl : '/' + fotoPerfilUrl}"
                      alt="${escapeHtml(nomeMostrar)}"
                      style="width:100%;height:100%;object-fit:cover;">`
-            : `<img src="/images/img_padrao_site/logo_.png"
+          : `<img src="/images/img_padrao_site/logo_.png"
                      alt="Olá Carlópolis"
                      style="width:100%;height:100%;object-fit:cover;">`
-          }
+        }
 
           <!-- degradê para leitura do texto -->
           <div style="
@@ -1854,98 +1855,98 @@ function abrirModalPIX(
     </div>
   `;
 
-  document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-  // permite fechar clicando fora
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.remove();
-  });
+      // permite fechar clicando fora
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+      });
 
-  // Copiar só o CNPJ
-  modal.querySelector(".btn-copy-cnpj").onclick = async () => {
-    const cnpj = "52.608.228/0001-62";
-    try {
-      await navigator.clipboard.writeText(cnpj);
-      alert("CNPJ copiado!");
-    } catch (e) {
-      console.error(e);
-      alert("Erro ao copiar. Copie manualmente.");
-    }
-  };
+      // Copiar só o CNPJ
+      modal.querySelector(".btn-copy-cnpj").onclick = async () => {
+        const cnpj = "52.608.228/0001-62";
+        try {
+          await navigator.clipboard.writeText(cnpj);
+          alert("CNPJ copiado!");
+        } catch (e) {
+          console.error(e);
+          alert("Erro ao copiar. Copie manualmente.");
+        }
+      };
 
-  // Copiar só o código PIX (copia e cola)
-  modal.querySelector(".btn-copy-line").onclick = async () => {
-    const copiaCola = document.getElementById("linhaPix").textContent.trim();
-    try {
-      await navigator.clipboard.writeText(copiaCola);
-      alert("Código PIX (copia e cola) copiado!");
-    } catch (e) {
-      console.error(e);
-      alert("Erro ao copiar. Copie manualmente.");
-    }
-  };
+      // Copiar só o código PIX (copia e cola)
+      modal.querySelector(".btn-copy-line").onclick = async () => {
+        const copiaCola = document.getElementById("linhaPix").textContent.trim();
+        try {
+          await navigator.clipboard.writeText(copiaCola);
+          alert("Código PIX (copia e cola) copiado!");
+        } catch (e) {
+          console.error(e);
+          alert("Erro ao copiar. Copie manualmente.");
+        }
+      };
 
-  // baixar cartão como imagem
-  const btnDownload = modal.querySelector(".btn-download-img");
-  btnDownload.onclick = async () => {
-    const card = document.getElementById('pixCard');
-    if (!window.html2canvas) {
-      alert('html2canvas não carregado. Verifique o script no final da página.');
-      return;
-    }
-    const canvas = await html2canvas(card, { backgroundColor: '#050910', scale: 2 });
-    const dataUrl = canvas.toDataURL('image/png');
+      // baixar cartão como imagem
+      const btnDownload = modal.querySelector(".btn-download-img");
+      btnDownload.onclick = async () => {
+        const card = document.getElementById('pixCard');
+        if (!window.html2canvas) {
+          alert('html2canvas não carregado. Verifique o script no final da página.');
+          return;
+        }
+        const canvas = await html2canvas(card, { backgroundColor: '#050910', scale: 2 });
+        const dataUrl = canvas.toDataURL('image/png');
 
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = `pix-${tipoLabel.toLowerCase()}-${valor.toFixed(2).replace('.', '_')}.png`;
-    a.click();
-  };
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `pix-${tipoLabel.toLowerCase()}-${valor.toFixed(2).replace('.', '_')}.png`;
+        a.click();
+      };
 
-  const btnWhats = modal.querySelector(".btn-whats");
-  btnWhats.onclick = async () => {
-    let phone = (phoneCliente || '').toString();
+      const btnWhats = modal.querySelector(".btn-whats");
+      btnWhats.onclick = async () => {
+        let phone = (phoneCliente || '').toString();
 
-    // 1) se não veio no dataset, tenta Firestore
-    if (!phone) {
-      try {
-        if (merchantId) {
-          const mRef = doc(db, 'merchants', merchantId);
-          const mSnap = await getDoc(mRef);
-          if (mSnap.exists()) {
-            const data = mSnap.data();
-            phone =
-              (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
+        // 1) se não veio no dataset, tenta Firestore
+        if (!phone) {
+          try {
+            if (merchantId) {
+              const mRef = doc(db, 'merchants', merchantId);
+              const mSnap = await getDoc(mRef);
+              if (mSnap.exists()) {
+                const data = mSnap.data();
+                phone =
+                  (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
+              }
+            }
+          } catch (e) {
+            console.error('Erro ao buscar telefone do merchant (Firestore):', e);
           }
         }
-      } catch (e) {
-        console.error('Erro ao buscar telefone do merchant (Firestore):', e);
-      }
-    }
 
-    // 2) se ainda não tiver, busca no script.js (mesmo lugar da imagem)
-    if (!phone) {
-      try {
-        phone = await getPhoneFromScript(merchantId);
-      } catch (e) {
-        console.error('Erro ao buscar telefone no script.js:', e);
-      }
-    }
+        // 2) se ainda não tiver, busca no script.js (mesmo lugar da imagem)
+        if (!phone) {
+          try {
+            phone = await getPhoneFromScript(merchantId);
+          } catch (e) {
+            console.error('Erro ao buscar telefone no script.js:', e);
+          }
+        }
 
-    if (!phone) {
-      alert('Telefone do estabelecimento não encontrado.\n' +
-        'Cadastre o Whats/telefone no site (contact/whatsapp/telefone).');
-      return;
-    }
+        if (!phone) {
+          alert('Telefone do estabelecimento não encontrado.\n' +
+            'Cadastre o Whats/telefone no site (contact/whatsapp/telefone).');
+          return;
+        }
 
-    // 3) normaliza o número: só dígitos, força DDI 55
-    let numero = phone.replace(/\D/g, '');
-    if (numero.startsWith('0')) numero = numero.slice(1);
-    if (!numero.startsWith('55')) numero = '55' + numero;
+        // 3) normaliza o número: só dígitos, força DDI 55
+        let numero = phone.replace(/\D/g, '');
+        if (numero.startsWith('0')) numero = numero.slice(1);
+        if (!numero.startsWith('55')) numero = '55' + numero;
 
-    // 4) monta a mensagem do WhatsApp
-    const msg =
-      `Olá! Segue o PIX para pagamento do plano ${tipoLabel.toLowerCase()} no Olá Carlópolis.
+        // 4) monta a mensagem do WhatsApp
+        const msg =
+          `Olá! Segue o PIX para pagamento do plano ${tipoLabel.toLowerCase()} no Olá Carlópolis.
 
 Cliente: ${nomeMostrar}
 Valor: R$ ${valorBr}
@@ -1956,12 +1957,12 @@ Chave PIX (CNPJ):
 PIX copia e cola:
 ${linha}`;
 
-    const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
-  };
+        const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+      };
 
-  modal.querySelector(".btn-close").onclick = () => modal.remove();
-}
+      modal.querySelector(".btn-close").onclick = () => modal.remove();
+    }
 
 
 
