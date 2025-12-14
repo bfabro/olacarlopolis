@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Recebimentos 5</title>
+  <title>Admin • Pagamentos 1</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -623,7 +623,7 @@
   <div class="wrap">
     <header>
       <div style="display:flex; align-items:center; gap:12px">
-        <h1>📒 Recebimentos</h1>
+        <h1>📒 Pagamentos</h1>
         <span class="chip"><span class="status-dot dot-ok"></span> Pago</span>
         <span class="chip"><span class="status-dot dot-no"></span> Em aberto</span>
       </div>
@@ -660,6 +660,27 @@
         </div>
         <div class="card muted" id="sumario">—</div>
       </div>
+
+
+
+      <!-- LOADER -->
+      <div id="loaderBox" class="card" style="margin-bottom:12px; display:none">
+        <div style="display:flex; align-items:center; gap:12px">
+          <div style="flex:1">
+            <div class="muted" id="loaderText">Carregando…</div>
+            <div style="height:8px; background:#0f141b; border-radius:6px; overflow:hidden; margin-top:6px">
+              <div id="loaderBar" style="height:100%; width:0%; background:var(--brand); transition:width .2s">
+              </div>
+            </div>
+          </div>
+          <div id="loaderPct" class="muted">0%</div>
+        </div>
+      </div>
+
+
+
+
+
 
       <div class="table-wrap">
         <table>
@@ -1018,14 +1039,20 @@
         const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === yNow) o.selected = true; selAno.appendChild(o);
       });
       selAno.onchange = loadTabela;
-      filtro.oninput = applyFilter;
+     filtro.oninput = applyViewAndFilter;  // em vez de applyFilter
       btnCSV.onclick = exportCSV;
-      btnToggleInativos.onclick = async () => {
-        window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
-        btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
-        await loadTabela();
-          applyFilter(); // mantém a busca aplicada
-      };
+      //
+      //
+      //
+      //
+      //
+      //
+     btnToggleInativos.onclick = () => {
+  window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
+  btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
+  applyViewAndFilter(); // só alterna a visualização (sem recarregar)
+};
+
 
 
       // <-- NOVO: guarda globalmente
@@ -1133,11 +1160,21 @@
     // ===== TABELA =====
     async function loadTabela() {
       tbody.innerHTML = '';
+      const loaderBox = document.getElementById('loaderBox');
+      const loaderBar = document.getElementById('loaderBar');
+      const loaderText = document.getElementById('loaderText');
+      const loaderPct = document.getElementById('loaderPct');
+
+      loaderBox.style.display = '';
+      loaderBar.style.width = '0%';
+      loaderPct.textContent = '0%';
+      loaderText.textContent = 'Carregando clientes…';
+
       const year = selAno.value;
       const mySeq = ++window.__LOADSEQ__; // ✅ esta chamada é a "mais nova"
 
       const allowed = window.__ALLOWED__ || await loadAllowedKeysFromScript();
-if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
+      if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
 
 
 
@@ -1145,6 +1182,9 @@ if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
       const merchantsAll = await loadMerchants();
       if (mySeq !== window.__LOADSEQ__) return; // ✅
       const merchants = allowed ? merchantsAll.filter(m => allowed.has(m.id)) : merchantsAll;
+      const total = merchants.length;
+      let carregados = 0;
+
       // ✅ ordena por nome (A-Z). Se não tiver name, usa o id
       merchants.sort((a, b) => {
         const an = (a.name || a.id || '').toString().localeCompare(
@@ -1159,19 +1199,16 @@ if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
 
 
       let i = 0; let totalPagos = 0, totalMeses = 0;
+      let totalClientesAtivos = 0;
+let pagosMesAtual = 0;
       for (const m of merchants) {
-            if (mySeq !== window.__LOADSEQ__) return; // ✅ se clicou de novo, para aqui
+        if (mySeq !== window.__LOADSEQ__) return; // ✅ se clicou de novo, para aqui
         const isInativo = (m.ativo === false);
 
-// ✅ MODO EXCLUSIVO:
-// - __SHOW_INATIVOS__ = false  => mostra só ATIVOS
-// - __SHOW_INATIVOS__ = true   => mostra só INATIVOS
-if (window.__SHOW_INATIVOS__) {
-  if (!isInativo) continue;   // mostrando inativos => ignora ativos
-} else {
-  if (isInativo) continue;    // mostrando ativos => ignora inativos
-}
-
+        // ✅ MODO EXCLUSIVO:
+        // - __SHOW_INATIVOS__ = false  => mostra só ATIVOS
+        // - __SHOW_INATIVOS__ = true   => mostra só INATIVOS
+       
 
 
         i++;
@@ -1201,10 +1238,17 @@ if (window.__SHOW_INATIVOS__) {
           const label = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][idx];
           return `<label class="mchip">
             <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
-            <span>${label}</span>
+         <span translate="no">${label}</span>
+
           </label>`;
         }).join('');
         const isPaidNow = computeStatusForRow(mesesData);
+        // conta só clientes ATIVOS (os inativos não entram na cobrança)
+if (!isInativo) {
+  totalClientesAtivos++;
+  if (isPaidNow) pagosMesAtual++;
+}
+
 
 
 
@@ -1231,7 +1275,7 @@ if (window.__SHOW_INATIVOS__) {
     data-ativo="${m.ativo !== false}">
     ${m.ativo === false ? '🚫' : '🟢'}
   </button>
-<button class="btn-allmonths btn-icon" title="Marcar todos os meses como pago">✅12</button>
+
 
   <button class="btn-save btn-icon" title="Salvar alterações">💾</button>
   <button class="btn-icon btn-pix" title="Gerar QR Code PIX">🔗</button>
@@ -1253,7 +1297,7 @@ if (window.__SHOW_INATIVOS__) {
       </div>
 
       <div class="rcell meses">
-        <div class="label muted">Meses</div>
+        <div class="label muted">Meses - <button class="btn-allmonths btn-icon" title="Marcar todos os meses como pago">✅12</button></div>
         <div class="months"><div class="months-scroll">${monthsHtml}</div></div>
       </div>
     </div>
@@ -1274,49 +1318,86 @@ if (window.__SHOW_INATIVOS__) {
             updateRowStatusFromCheckboxes(tr);
           }
         });
+        carregados++;
+
+        const pct = Math.round((carregados / total) * 100);
+        loaderBar.style.width = pct + '%';
+        loaderPct.textContent = pct + '%';
+        loaderText.textContent = `Carregando ${carregados} de ${total} clientes…`;
 
       }
-        if (mySeq !== window.__LOADSEQ__) return; // ✅
-      updateSummary(totalPagos, totalMeses);
+      if (mySeq !== window.__LOADSEQ__) return; // ✅
+     const faltamMesAtual = Math.max(0, totalClientesAtivos - pagosMesAtual);
+updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
+
+
+      loaderText.textContent = 'Concluído';
+      loaderBar.style.width = '100%';
+      loaderPct.textContent = '100%';
+
+      setTimeout(() => {
+        loaderBox.style.display = 'none';
+      }, 400);
+
     }
 
 
 
-    function updateSummary(pagos, total) {
-      const pct = total ? Math.round((pagos / total) * 100) : 0;
-      sumario.textContent = `Pagos: ${pagos}/${total} (${pct}%)`;
-    }
+    function updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual) {
+  const pct = totalClientesAtivos ? Math.round((pagosMesAtual / totalClientesAtivos) * 100) : 0;
+  sumario.textContent = `Pagos (mês): ${pagosMesAtual}/${totalClientesAtivos} (${pct}%) • Faltam: ${faltamMesAtual}`;
+}
 
-    function applyFilter() {
-      const q = filtro.value.trim().toLowerCase();
-      Array.from(tbody.children).forEach(tr => {
-        const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
-        const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
-        tr.style.display = (!q || nome.includes(q) || status.includes(q)) ? '' : 'none';
-      });
+
+   function applyViewAndFilter() {
+  const q = filtro.value.trim().toLowerCase();
+
+  let idx = 0;
+  Array.from(tbody.children).forEach(tr => {
+    const isInativo = tr.dataset.inativo === 'true';
+
+    // modo exclusivo
+    const passaModo = window.__SHOW_INATIVOS__ ? isInativo : !isInativo;
+
+    // busca (mantém sua lógica atual)
+    const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
+    const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
+    const passaBusca = (!q || nome.includes(q) || status.includes(q));
+
+    const show = passaModo && passaBusca;
+    tr.style.display = show ? '' : 'none';
+
+    // renumera só os visíveis
+    if (show) {
+      idx++;
+      const tdIdx = tr.querySelector('td.idx');
+      if (tdIdx) tdIdx.textContent = String(idx);
     }
+  });
+}
+
 
 
     filtro.addEventListener('input', applyFilter);
-// Marcar/Desmarcar todos os meses do cliente (toggle)
-tbody.addEventListener('click', (ev) => {
-  const btnAll = ev.target.closest('.btn-allmonths');
-  if (!btnAll) return;
+    // Marcar/Desmarcar todos os meses do cliente (toggle)
+    tbody.addEventListener('click', (ev) => {
+      const btnAll = ev.target.closest('.btn-allmonths');
+      if (!btnAll) return;
 
-  const tr = btnAll.closest('tr');
-  const chks = Array.from(tr.querySelectorAll('.months .chk'));
-  if (!chks.length) return;
+      const tr = btnAll.closest('tr');
+      const chks = Array.from(tr.querySelectorAll('.months .chk'));
+      if (!chks.length) return;
 
-  // Se TODOS estiverem marcados -> desmarca tudo. Senão -> marca tudo.
-  const allChecked = chks.every(c => c.checked);
-  chks.forEach(c => { c.checked = !allChecked; });
+      // Se TODOS estiverem marcados -> desmarca tudo. Senão -> marca tudo.
+      const allChecked = chks.every(c => c.checked);
+      chks.forEach(c => { c.checked = !allChecked; });
 
-  // Atualiza o chip do mês atual
-  updateRowStatusFromCheckboxes(tr);
+      // Atualiza o chip do mês atual
+      updateRowStatusFromCheckboxes(tr);
 
-  // Feedback visual no botão
-  btnAll.textContent = allChecked ? '⬜12' : '✅12';
-});
+      // Feedback visual no botão
+      btnAll.textContent = allChecked ? '⬜12' : '✅12';
+    });
 
 
 
@@ -1441,7 +1522,7 @@ tbody.addEventListener('click', (ev) => {
       const nomeComercio = tr.querySelector('.nome-holder').textContent.trim();
 
       const chks = Array.from(tr.querySelectorAll('.months .chk'));
-      const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const mesesNomes = ['Jan.', 'Fev.', 'Mar.', 'Abr.', 'Mai.', 'Jun.', 'Jul.', 'Ago.', 'Set.', 'Out.', 'Nov.', 'Dez.'];
       let totalMensal = 0;
       const mesesDevidos = [];
 

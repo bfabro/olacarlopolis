@@ -1329,11 +1329,14 @@ if (!isInativo) {
       if (mySeq !== window.__LOADSEQ__) return; // ✅
      const faltamMesAtual = Math.max(0, totalClientesAtivos - pagosMesAtual);
 updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
+      applyViewAndFilter();
 
 
       loaderText.textContent = 'Concluído';
       loaderBar.style.width = '100%';
       loaderPct.textContent = '100%';
+
+      document.querySelectorAll('.row-scroll').forEach(enableDragScroll);
 
       setTimeout(() => {
         loaderBox.style.display = 'none';
@@ -1375,10 +1378,6 @@ updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
     }
   });
 }
-
-
-
-    filtro.addEventListener('input', applyFilter);
     // Marcar/Desmarcar todos os meses do cliente (toggle)
     tbody.addEventListener('click', (ev) => {
       const btnAll = ev.target.closest('.btn-allmonths');
@@ -1634,13 +1633,6 @@ updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
       const tw = document.querySelector('.table-wrap');
       if (tw) enableDragScroll(tw);
     });
-
-    // quando a tabela é recarregada, aplicar nas linhas novas
-    const _origLoadTabela = window.loadTabela;
-    window.loadTabela = async function () {
-      await _origLoadTabela();
-      document.querySelectorAll('.row-scroll').forEach(enableDragScroll);
-    }
 
     ////////////////////////////////////////// pix
     ////////////////////////////////////////// PIX
