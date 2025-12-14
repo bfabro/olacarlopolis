@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 8</title>
+  <title>Admin • Pagamentos 9</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1039,14 +1039,20 @@
         const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === yNow) o.selected = true; selAno.appendChild(o);
       });
       selAno.onchange = loadTabela;
-      filtro.oninput = applyFilter;
+     filtro.oninput = applyViewAndFilter;  // em vez de applyFilter
       btnCSV.onclick = exportCSV;
-      btnToggleInativos.onclick = async () => {
-        window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
-        btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
-        await loadTabela();
-        applyFilter(); // mantém a busca aplicada
-      };
+      //
+      //
+      //
+      //
+      //
+      //
+     btnToggleInativos.onclick = () => {
+  window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
+  btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
+  applyViewAndFilter(); // só alterna a visualização (sem recarregar)
+};
+
 
 
       // <-- NOVO: guarda globalmente
@@ -1202,12 +1208,7 @@ let pagosMesAtual = 0;
         // ✅ MODO EXCLUSIVO:
         // - __SHOW_INATIVOS__ = false  => mostra só ATIVOS
         // - __SHOW_INATIVOS__ = true   => mostra só INATIVOS
-        if (window.__SHOW_INATIVOS__) {
-          if (!isInativo) continue;   // mostrando inativos => ignora ativos
-        } else {
-          if (isInativo) continue;    // mostrando ativos => ignora inativos
-        }
-
+       
 
 
         i++;
@@ -1348,14 +1349,33 @@ updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
 }
 
 
-    function applyFilter() {
-      const q = filtro.value.trim().toLowerCase();
-      Array.from(tbody.children).forEach(tr => {
-        const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
-        const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
-        tr.style.display = (!q || nome.includes(q) || status.includes(q)) ? '' : 'none';
-      });
+   function applyViewAndFilter() {
+  const q = filtro.value.trim().toLowerCase();
+
+  let idx = 0;
+  Array.from(tbody.children).forEach(tr => {
+    const isInativo = tr.dataset.inativo === 'true';
+
+    // modo exclusivo
+    const passaModo = window.__SHOW_INATIVOS__ ? isInativo : !isInativo;
+
+    // busca (mantém sua lógica atual)
+    const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
+    const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
+    const passaBusca = (!q || nome.includes(q) || status.includes(q));
+
+    const show = passaModo && passaBusca;
+    tr.style.display = show ? '' : 'none';
+
+    // renumera só os visíveis
+    if (show) {
+      idx++;
+      const tdIdx = tr.querySelector('td.idx');
+      if (tdIdx) tdIdx.textContent = String(idx);
     }
+  });
+}
+
 
 
     filtro.addEventListener('input', applyFilter);
