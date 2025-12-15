@@ -11553,15 +11553,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-          {
-            image: "images/informacoes/eventos/6.jpg",
-            name: "Pedala Parana",
-            date: "14/12/2025",
-            address: "Bendito Salles, 2639 ( Caldo de Cana Amaral )",
-            contact: "(41) 99950-9291",
-            instagram: "https://www.instagram.com/p/DRhwprDAC-D/",
-            infoAdicional: "Vem aí a 3ª Edição do Pedala Paraná – Carlópolis!<br>Para fechar 2025 com chave de ouro, estamos preparando mais um grande evento que vai movimentar o esporte e reunir apaixonados por ciclismo em nossa cidade e região.<Br>No dia 14 de dezembro, acontece a 3ª edição do Pedala Paraná"
-          },
+        
 
            {
             image: "images/informacoes/eventos/7.jpg",
