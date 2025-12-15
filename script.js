@@ -2521,17 +2521,12 @@ document.addEventListener("DOMContentLoaded", function () {
     //calendarioeventos: "s",
     feiradalua: "n",
 
+    campeonatoeliteredai: "n",
 
-
-
-    cafedamanhadosamigos: "s",
-
-    campeonatoeliteredai: "s",
-
-    pedalaparana: "s",
+    pedalaparana: "n",
     confradocaravela:"s",
     showdavirada2026:"s",
-
+ cafedamanhadosamigos: "s",
 
 
     /// FIM EVENTOS 
