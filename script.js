@@ -2372,7 +2372,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // restaurantes
     assadaodorussao: "s",
-    cabanas: "s",
+    
     cantinaitaliana: "s",
     emporiosaovictor: "s",
     hime: "s",
@@ -7286,34 +7286,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuArtesanato"),
         title: "Artesanato",
         establishments: [
-          {
-            image: "images/comercios/artesanato/judite/perfil.jpg",
-            name: "Judite",
-            hours: "Seg a Sab: 08:00h as 18:00h",
-            statusAberto: "a",
-            horarios: {
-
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [{ inicio: "08:00", fim: "18:00" }],
-              dom: []
-            },
-            address: "Rua Elidia Maria de Jesus, 36 - Carlopolis",
-            contact: "(43) 99871-3498",
-
-            novidadesImages: [
-              "images/comercios/artesanato/judite/divulgacao/1.jpg",
-              "images/comercios/artesanato/judite/divulgacao/2.jpg",
-            ],
-            novidadesDescriptions: [
-              "Bonecas de Pano",
-              "Bolsas de croche!",
-
-            ],
-          },
+          
 
 
 
@@ -7404,12 +7377,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuAdvocacia"),
         title: "Escritorio de Advocacia",
         establishments: [
-          {
-            name: "ADVOCACIA ABILIO",
-            hours: "seg a sex: 9h - 11:30h, 13:00-17:00",
-            address: "R. Salvira Marquês, 315",
-            contact: "(43) 3566-1368",
-          },
+       
         ],
       },
 
@@ -8754,39 +8722,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/comercios/lanchonete/levisalgados/perfil.jpg",
-            name: "Levi Salgados",
-            hours: "Seg a Sab: 08:00h as 19:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "08:00", fim: "19:00" }],
-              ter: [{ inicio: "08:00", fim: "19:00" }],
-              qua: [{ inicio: "08:00", fim: "19:00" }],
-              qui: [{ inicio: "08:00", fim: "19:00" }],
-              sex: [{ inicio: "08:00", fim: "19:00" }],
-              sab: [{ inicio: "08:00", fim: "19:00" }],
-              dom: []
-            },
-            address: "R. Padre Hugo, 488 , Carlópolis",
-            contact: "(43) 98850-7966",
-            delivery: "Sim / Com Taxa",
-            instagram: "https://www.instagram.com/levisalgados.clps/",
-            novidadesImages: [
-              "images/comercios/lanchonete/levisalgados/divulgacao/1.png",
-              "images/comercios/lanchonete/levisalgados/divulgacao/2.png",
-
-            ],
-            novidadesDescriptions: [
-
-              "A melhor coxinha da cidade!",
-              "Mais uma novidade na loja, nosso delicioso kibe com queijo! Uma nova sensação a cada mordida 🥰Venha experimentar 🤤",
-
-
-
-            ],
-
-          },
+          
 
 
 
@@ -9758,53 +9694,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuPadaria"),
         title: "Padaria",
         establishments: [
-          /*
-          {
-            image: "images/comercios/padaria/bomjesus/bomjesus.png",
-            name: "Bom Jesus",
-            hours: "Seg a Sab: 06:00h as 20:00h ",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "06:00", fim: "20:00" }],
-              ter: [{ inicio: "06:00", fim: "20:00" }],
-              qua: [{ inicio: "06:00", fim: "20:00" }],
-              qui: [{ inicio: "06:00", fim: "20:00" }],
-              sex: [{ inicio: "06:00", fim: "20:00" }],
-              sab: [{ inicio: "06:00", fim: "20:00" }],
-              dom: [],
-            },
-            address: "R. Benedito Salles, 615 - Carlopolis",
-            contact: "(43) 99653-9285",
-            delivery: "Sim / Com Taxa",
-            facebook: "https://www.facebook.com/PanificadoraRestauranteBomJesus/?locale=pt_BR",
-            instagram: "https://www.instagram.com/bom_jesus_panificadora/",
-            menuImages: [
-              "images/comercios/padaria/bomjesus/cardapio/1.png",
-              "images/comercios/padaria/bomjesus/cardapio/2.png",
-              "images/comercios/padaria/bomjesus/cardapio/3.png",
-            ],
-            novidadesImages: [
-              "images/comercios/padaria/bomjesus/novidades/1.jpg",
-              "images/comercios/padaria/bomjesus/novidades/2.jpg",
-              "images/comercios/padaria/bomjesus/novidades/3.jpg",
-              "images/comercios/padaria/bomjesus/novidades/4.jpg",
-              "images/comercios/padaria/bomjesus/novidades/5.jpg",
-              "images/comercios/padaria/bomjesus/novidades/6.jpg",
-              "images/comercios/padaria/bomjesus/novidades/7.jpg",
-
-            ],
-            novidadesDescriptions: [
-              "Quer um bolo decorado mas não teve tempo de encomendar ? Aqui no Bom Jesus temos a pronto entrega esperando por vocês ! 🎂💖", 
-              "Pães de queijo quentinho aqui na Panificadora Lilia",
-               "Temos Pizzas em pedaços, varios sabores",
-                "Coxinhas Diferenciadas, venha conferir", 
-                "Bom dia, para deixar seu café ainda mais gostoso que tal um pão Curitibano?",
-                "Seja para um café da manhã fresquinho ou um churrasco de dar água na boca, a Panificadora e Churrascaria Bom Jesus é parada obrigatória!<BR>Com um ambiente acolhedor, atendimento atencioso e uma seleção impecável de pães e carnes, o local é uma excelente opção para quem deseja vivenciar a culinária local.",
-              "Balcão de pães e roscas no capricho 😋",
-            ],
-
-          },
-*/
+       
 
           {
             image: "images/comercios/padaria/esquinadopao/perfil.png",
@@ -11032,10 +10922,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuAnuncio"),
         title: "Anuncio",
         establishments: [
-          {
-            name: "Pio do Anuncio",
-            contact: "(43) 7890-1234",
-          },
+        
         ],
       },
 
@@ -11157,10 +11044,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuDiarista"),
         title: "Diarista",
         establishments: [
-          {
-            name: "Rose",
-            contact: "(43) 7890-1234",
-          },
+       
           
         ],
       },
@@ -13528,25 +13412,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-          {
-            image: "images/comercios/restaurante/neia/neia.png",
-            name: "Neia",
-            hours: "Seg a Sex: 11:00h as 14:00h <br>Sab: 11:00h as 16:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "11:00", fim: "14:00" }],
-              ter: [{ inicio: "11:00", fim: "14:00" }],
-              qua: [{ inicio: "11:00", fim: "14:00" }],
-              qui: [{ inicio: "11:00", fim: "14:00" }],
-              sex: [{ inicio: "11:00", fim: "14:00" }],
-              sab: [{ inicio: "11:00", fim: "16:00" }],
-              dom: []
-            },
-            address: "R. Kalil Keder, 262 - Carlopolis",
-            contact: "(43) 99847-1137",
-            delivery: "Sim / Com Taxa",
-
-          },
+          
 
           {
             image: "images/comercios/restaurante/oficinaSabor/perfil.png",
