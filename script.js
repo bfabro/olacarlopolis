@@ -11542,15 +11542,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         establishments: [
 
 
-          {
-            image: "images/informacoes/eventos/4.jpg",
-            name: "Campeonato Elite Redai",
-            date: "12/12/2025",
-            address: "Represa de Chavantes",
-            contact: "(43) 99177-5226",
-            instagram: "https://www.instagram.com/p/DQrRkEkgCno/",
-            infoAdicional: "Prova individual, 3 dias de competição, maior visibilidade com a transmissão ao vivo e muita grana aos campeões!<br>Entre em contato e faça sua inscrição!"
-          },
+          
 
 
         
