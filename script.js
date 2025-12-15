@@ -4391,47 +4391,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
-    // Modelo
-    {
-      id: "casa2v",
-      codRef: "C_002",
-      tipo: "venda",
-      status: "Vendido",   // <= adicione isto quando estiver vendido
-      procura: "casa", // ou "terreno", "rural", etc.
-      quartos: 3,
-      valor: 250000,
-      piscina: false,
-      churrasqueira: false,
-      vagas: 2,
-      corretores: ["Cesar Melo - 38.105 F"],
-      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-      ////////////////////////////////////////////////////////////
-      titulo: "Casa nova a venda em Carlópolis.",
-      descricao: "Casa nova, impecavel! Documentação OK. Aceita financiamento, “Minha casa minha vida“",
-      endereco: "Agende uma Visita",
-      suite: "1",
-      banheiros: 1,
-      salas: 1,
-      cozinhas: 1,
-      area: 90,
-      construcao: 63,          // << NOVO: m² de construção
-      quintal: "Sim",
-      telefone: "43 99678-9652",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/cesar/venda/casa2/1.jpg",
-        "images/imoveis/cesar/venda/casa2/2.jpg",
-        "images/imoveis/cesar/venda/casa2/3.JPG",
-        "images/imoveis/cesar/venda/casa2/4.jpg",
-        "images/imoveis/cesar/venda/casa2/5.jpg",
-        "images/imoveis/cesar/venda/casa2/6.jpg",
-        "images/imoveis/cesar/venda/casa2/7.jpg",
-        "images/imoveis/cesar/venda/casa2/8.jpg"
-
-      ],
-      //lat: -23.3953,
-      //lng: -49.7232,
-
-    },
 
     {
       id: "casa3v",
@@ -4512,52 +4471,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       //lng: -49.7232,
 
     },
-
-
-
-
-
-    {
-      id: "casa5v",
-      codRef: "C_005",
-      status: "Vendido",   // <= adicione isto quando estiver vendido
-      tipo: "venda",
-      procura: "Chacara", // ou "terreno", "rural", etc.
-      quartos: 3,
-      valor: 800000,
-      piscina: false,
-      churrasqueira: "Sim",
-      titulo: "Chacara a 12km Da Cidade",
-      descricao: "Chacara toda cercada de arame liso, Gramado ao redor da casa, Estrada empedrada até a represa podendo descer embarcações, Quartos com ar condicionado<br>Barracão grande de estrutura metalica com cozinha, deck de madeira e banheiro<br>Edicula com cozinha, banheiro e quarto com ar condicionado",
-      endereco: "Bairro Espirito Santo",
-      suite: "Não",
-      banheiros: 1,
-      salas: 1,
-      cozinhas: 1,
-      area: 5000,
-      construcao: 150,   // << NOVO: m² de construção
-      proprietario: "Caio Gabriel",
-
-      quintal: "Sim",
-      telefone: "43 99154-5096",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/caioGabriel/1.jpg",
-        "images/imoveis/caioGabriel/2.jpg",
-        "images/imoveis/caioGabriel/3.jpg",
-        "images/imoveis/caioGabriel/4.jpg",
-        "images/imoveis/caioGabriel/5.jpg",
-        "images/imoveis/caioGabriel/6.jpg",
-        "images/imoveis/caioGabriel/7.jpg"
-
-
-
-      ],
-      //lat: -23.3953,
-      //lng: -49.7232,
-
-    },
-
-
 
 
 
@@ -4819,43 +4732,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
-    {
-      id: "casa12v",
-      codRef: "C_012",
-      status: "Vendido",   // <= adicione isto quando estiver vendido
-      procura: "casa", // ou "terreno", "rural", etc.
-      tipo: "venda",
-      titulo: "Casa Arejada",
-      descricao: "Documentação Ok.",
-      endereco: "Vista Bela",
-      valor: 250000,
-      construcao: 70,          // << NOVO: m² de construção
-      area: 284,
-      banheiros: 1,
-      churrasqueira: false,
-      cozinhas: 1,
-      quartos: 1,
-      quintal: "Sim",
-      piscina: false,
-      salas: 1,
-      suite: "Não",
-      vagas: 2,
-      corretores: ["Imobiliaria Carlopolis"],
-      telefone: "43 99956-0522",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/imobiliariaCarlopolis/venda/casa1/1.jpg",
-        "images/imoveis/imobiliariaCarlopolis/venda/casa1/2.jpg",
-        "images/imoveis/imobiliariaCarlopolis/venda/casa1/3.jpg",
-        "images/imoveis/imobiliariaCarlopolis/venda/casa1/4.jpg",
-        "images/imoveis/imobiliariaCarlopolis/venda/casa1/5.jpg",
-        "images/imoveis/imobiliariaCarlopolis/venda/casa1/6.jpg",
-        "images/imoveis/imobiliariaCarlopolis/venda/casa1/7.jpg",
 
-
-
-      ],
-
-    },
 
 
     {
@@ -5023,8 +4900,51 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ],
 
     },
+/*
+
+    {
+      id: "casa17v",
+      codRef: "C_017",
+      procura: "casa", // ou "terreno", "rural", etc.
+      tipo: "venda",
+      titulo: "Sua Nova Casa de Luxo Espera por Você!",
+      descricao: "Descubra um refúgio moderno com a vista que você sempre sonhou, Casa Inteligente, toda equipada para sua moradia. Documentação Ok.",
+      endereco: "Ilha Bella",
+      valor: 500000,
+      construcao: 306,          // << NOVO: m² de construção
+      area: 453.33,
+      banheiros: 2,
+      churrasqueira: "Sim",
+      cozinhas: 1,
+      quartos: 3,
+      quintal: "Sim",
+      piscina: "Sim",
+      salas: 1,
+      suite: "4",
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"],
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa17/1.jpg",
+        "images/imoveis/cesar/venda/casa17/2.jpg",
+        "images/imoveis/cesar/venda/casa17/3.jpg",
+        "images/imoveis/cesar/venda/casa17/4.jpg",
+        "images/imoveis/cesar/venda/casa17/5.jpg",
+        "images/imoveis/cesar/venda/casa17/6.jpg",
+        "images/imoveis/cesar/venda/casa17/7.jpg",
+        "images/imoveis/cesar/venda/casa17/8.jpg",
+        "images/imoveis/cesar/venda/casa17/9.jpg",
+        "images/imoveis/cesar/venda/casa17/10.jpg",
+        "images/imoveis/cesar/venda/casa17/11.jpg",
+        "images/imoveis/cesar/venda/casa17/12.jpg",
 
 
+
+      ],
+
+    },
+
+*/
 
 
 
@@ -5068,23 +4988,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-    {
-      id: "ter1",
-      codRef: "T_001",
-      status: "Vendido",   // <= adicione isto quando estiver vendido
-      tipo: "venda",
-      titulo: "Terreno Esquina - Loteamento Amaral",
-      descricao: "Bairro em expansão, com valorização garantida nos próximos anos",
-      endereco: "Residencial Amaral ll",
-      area: 308,
-      valor: 130000,
-      telefone: "43 99678-9652",
-      imagens: ["images/imoveis/cesar/venda/terreno/1.jpg", "images/imoveis/cesar/venda/terreno/2.jpg"],
-      descricao: "Terreno de esquina Comercial / Residencial com ótima vista para represa<br>Loteamento com rampa náutica",
-      procura: "terreno", // ou "terreno", "rural", etc.
-      corretores: ["Cesar Melo - 38.105 F"],
-
-    },
+  
 
 
     //Modelo
