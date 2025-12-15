@@ -11548,7 +11548,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         
 
            {
-            image: "images/informacoes/eventos/7.jpg",
+            image: "images/informacoes/eventos/1.jpg",
             name: "Confra do Caravela",
             date: "27/12/2025",
             address: "Caravela Country Clube",
@@ -11560,7 +11560,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
     {
-            image: "images/informacoes/eventos/8.jpg",
+            image: "images/informacoes/eventos/2.jpg",
             name: "Show da Virada 2026",
             date: "31/12/2025",
             address: "Ilha do Ponciano",                    
@@ -11572,7 +11572,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
           {
-            image: "images/informacoes/eventos/2.jpg",
+            image: "images/informacoes/eventos/3.jpg",
             name: "Cafe da manha dos amigos",
             date: "29/03/2026",
             address: "R. Benedito Salles, 2671 - Carlópolis",
