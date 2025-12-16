@@ -7194,6 +7194,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/acougue/curitiba/divulgacao/6.jpg",
               "images/comercios/acougue/curitiba/divulgacao/7.jpg",
               "images/comercios/acougue/curitiba/divulgacao/8.jpg",
+                "images/comercios/acougue/curitiba/divulgacao/9.jpg",
+
             ],
             novidadesDescriptions: [
               "Aquele Chouriço feito no capricho!",
@@ -7204,6 +7206,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Sabiam que temos, torresmo pré frito? Facilitando sua vida na hora de preparar essa delicia!",
               "Temos Banha suína 1 kg porco caipira, Gordura boa!",
               "Linguiça defumada artesanal mista, boi e porco",
+              "Aquela peça Marmorada",
             ],
           },
         ],
