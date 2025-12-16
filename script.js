@@ -2437,7 +2437,7 @@ document.addEventListener("DOMContentLoaded", function () {
     erickson: "s",
 
     // guia de pesca
-    fabiosushimoto: "s",
+    fabiosushimoto: "n",
 
     //eletrecista
     cyberneticosinstalacoes: "s",
@@ -12249,36 +12249,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuBorracharia"),
         title: "Borracharia",
         establishments: [
-          {
-            image: "images/comercios/borracharia/vidaNova/vidanova.png",
-            name: "Vida Nova",
-            hours: "Seg a Sex: 07:00h as 18:00h <br>Sab: 07:00 as 16:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "07:00", fim: "18:00" }],
-              ter: [{ inicio: "07:00", fim: "18:00" }],
-              qua: [{ inicio: "07:00", fim: "18:00" }],
-              qui: [{ inicio: "07:00", fim: "18:00" }],
-              sex: [{ inicio: "07:00", fim: "18:00" }],
-              sab: [{ inicio: "07:00", fim: "16:00" }],
-              dom: [],
-            },
-            address: "Rua genova 10 Anexo ao Posto Garbelotti - Res. Italia",
-            contact: "(43) 99900-2991",
-            instagram: "https://www.instagram.com/borracharia.vidanova/",
-            novidadesImages: [
-              "images/comercios/borracharia/vidaNova/divulgacao/1.png",
-              "images/comercios/borracharia/vidaNova/divulgacao/2.png",
-              "images/comercios/borracharia/vidaNova/divulgacao/3.png",
-
-            ],
-            novidadesDescriptions: [
-              "Pneus para Tratores",
-              "Manutenção no local",
-              "Manutenção no local",
-
-            ],
-          },
+          
 
 
           {
