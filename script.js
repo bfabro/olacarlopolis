@@ -7183,6 +7183,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Rua Benedito Salles, 409 - Carlopolis",
             contact: "(43) 99635-1001",
             delivery: "Sim / Sem Taxa",
+            instagram:"https://www.instagram.com/acougue.curitiba/",
             infoAdicional: "Fazemos espetinhos assados de quarta e sabado até as 20:00hrs",
             novidadesImages: [
               "images/comercios/acougue/curitiba/divulgacao/1.jpg",
