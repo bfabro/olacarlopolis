@@ -1815,7 +1815,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "tokfino", "oficinadocelular", "seiza","oticavisualcenter"
+    "tokfino", "oficinadocelular", "cacaushow","farmais"
   ];
 
   function montarCarrosselDivulgacao() {
@@ -10676,14 +10676,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
             instagram: "https://www.instagram.com/farmaiscarlopolis/",
             novidadesImages: [
-              //  "images/comercios/farmacia/farmais/divulgacao/1.jpg",
+                "images/comercios/farmacia/farmais/divulgacao/1.jpg",
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
               "images/comercios/farmacia/farmais/divulgacao/4.jpg",
 
             ],
             novidadesDescriptions: [
-              // "Estamos de Plantão!",
+              "Venham Participar desta comemoração",
               "Tome no horário certo – Respeite os intervalos indicados.",
               "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
               "Tome no horário certo – Respeite os intervalos indicados.",
