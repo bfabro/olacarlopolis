@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 2</title>
+  <title>Admin • Pagamentos 3</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -973,7 +973,7 @@
 
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+   import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, Timestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
     // Init
     const app = initializeApp(firebaseConfig);
@@ -1233,6 +1233,22 @@ let pagosMesAtual = 0;
 
         i++;
         const dados = await readReceb(year, m.id);
+        // 🔹 BACKFILL: definir entradaEm para clientes antigos
+if (!m.entradaEm) {
+  const dataInferida = inferirEntradaPorMeses(dados.meses, year);
+
+  if (dataInferida) {
+    await updateDoc(doc(db, 'merchants', m.id), {
+      entradaEm: dataInferida
+    });
+
+    // atualiza em memória para já refletir na tela
+    m.entradaEm = {
+      toDate: () => dataInferida
+    };
+  }
+}
+
         if (mySeq !== window.__LOADSEQ__) return; // ✅
         const mesesData = dados.meses || {};
         const tr = document.createElement('tr');
@@ -1273,6 +1289,12 @@ if (!isInativo) {
 const entradaEmDate = m.entradaEm?.toDate ? m.entradaEm.toDate() : null;
 const entradaEmTxt = entradaEmDate ? formatMesAnoPt(entradaEmDate) : '—';
 
+const entradaDate = (m.entradaEm?.toDate ? m.entradaEm.toDate() : null);
+const entradaYm = entradaDate
+  ? `${entradaDate.getFullYear()}-${String(entradaDate.getMonth() + 1).padStart(2, '0')}`
+  : '';
+
+tr.dataset.entradaYm = entradaYm; // vamos usar no PIX também
 
 
         tr.innerHTML = `
@@ -1292,6 +1314,8 @@ const entradaEmTxt = entradaEmDate ? formatMesAnoPt(entradaEmDate) : '—';
   <div class="muted" style="margin:4px 0 6px;">
   Entrou em: <strong>${entradaEmTxt}</strong>
 </div>
+<div class="label muted" style="margin:6px 0 4px;">Entrada</div>
+<input class="inp-entrada" type="month" value="${entradaYm}" style="width:100%; margin-bottom:6px;" />
 
 <div class="status-row">
   <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
@@ -1444,6 +1468,21 @@ updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
         });
 
         await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
+        // 🔹 salva entradaEm (mês/ano) no merchants
+const inpEntrada = tr.querySelector('.inp-entrada');
+const ym = (inpEntrada?.value || '').trim(); // "YYYY-MM"
+
+if (ym) {
+  const [yy, mm] = ym.split('-').map(Number);
+  const dt = new Date(yy, (mm - 1), 1);
+
+  await updateDoc(doc(db, 'merchants', merchantId), {
+    entradaEm: Timestamp.fromDate(dt)
+  });
+
+  tr.dataset.entradaYm = ym; // mantém atualizado p/ PIX
+}
+
         updateRowStatusFromCheckboxes(tr);
 
         btn.textContent = '✅';
@@ -1643,12 +1682,54 @@ function abrirModalTipoCobranca(totalMensal, callback) {
       let totalMensal = 0;
       const mesesDevidos = [];
 
-      chks.forEach((c, idx) => {
-        if (!c.checked) {
-          totalMensal += VALOR_MENSAL;
-          mesesDevidos.push(mesesNomes[idx]);
-        }
-      });
+     // 🔹 define a partir de qual mês começa a cobrar no ANO selecionado
+const anoSel = Number(selAno.value);
+
+// entradaEm vem do merchants/{id}.entradaEm
+// (se você já aplicou a opção 1, ele vai existir; senão fica null)
+const entradaEmDate = (m?.entradaEm?.toDate ? m.entradaEm.toDate() : null);
+
+// startMonth: 1..12
+let startMonth = 1;
+
+if (entradaEmDate) {
+  const anoEntrada = entradaEmDate.getFullYear();
+  const mesEntrada = entradaEmDate.getMonth() + 1;
+
+  if (anoEntrada > anoSel) {
+    startMonth = 13; // entrou depois do ano selecionado -> não cobra nada neste ano
+  } else if (anoEntrada === anoSel) {
+    startMonth = mesEntrada; // cobra só do mês de entrada em diante
+  } else {
+    startMonth = 1; // entrou em ano anterior -> cobra o ano inteiro (se tiver pendência)
+  }
+}
+
+
+const ymEntrada = (tr.dataset.entradaYm || '').trim(); // "YYYY-MM"
+
+// startMonth: 1..12 (mês mínimo a cobrar no ano selecionado)
+
+
+if (ymEntrada) {
+  const [yy, mm] = ymEntrada.split('-').map(Number);
+
+  if (yy > anoSel) startMonth = 13;        // entrou depois desse ano
+  else if (yy === anoSel) startMonth = mm; // entrou nesse ano: cobra do mês de entrada pra frente
+  else startMonth = 1;                     // entrou antes: cobra o ano todo (se tiver pendência)
+}
+
+chks.forEach((c, idx) => {
+  const mes = idx + 1; // 1..12
+  if (mes < startMonth) return; // ✅ ignora meses antes da entrada
+
+  if (!c.checked) {
+    totalMensal += VALOR_MENSAL;
+    mesesDevidos.push(mesesNomes[idx]);
+  }
+});
+
+
 
       // nome do cliente: usa o pagador se tiver, senão o nome do comércio
       const pagadorNome = tr.querySelector('.inp-nome')?.value.trim() || '';
