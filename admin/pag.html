@@ -674,9 +674,6 @@
         <div class="card">
           <button id="btnToggleInativos">Ver inativos</button>
         </div>
-        <div class="card">
-  <button id="btnTogglePendentes">Ver pendentes</button>
-</div>
         <div class="card muted" id="sumario">—</div>
       </div>
 
@@ -1020,9 +1017,6 @@ for (const m of blocoServ.matchAll(rx)) allow.add(m[1] || m[2]);
     const mesesKeys = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
     const btnToggleInativos = document.getElementById('btnToggleInativos');
     window.__SHOW_INATIVOS__ = false;
-    const btnTogglePendentes = document.getElementById('btnTogglePendentes');
-window.__SHOW_PENDENTES__ = false;
-
     window.__LOADSEQ__ = 0; // ✅ evita misturar renders antigos
 
 
@@ -1076,13 +1070,6 @@ window.__SHOW_PENDENTES__ = false;
         btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
         applyViewAndFilter(); // só alterna a visualização (sem recarregar)
       };
-
-      btnTogglePendentes.onclick = () => {
-  window.__SHOW_PENDENTES__ = !window.__SHOW_PENDENTES__;
-  btnTogglePendentes.textContent = window.__SHOW_PENDENTES__ ? 'Ver todos' : 'Ver pendentes';
-  applyViewAndFilter();
-};
-
 
 
 
@@ -1325,11 +1312,6 @@ window.__SHOW_PENDENTES__ = false;
             if (pago) totalPagos++;
             totalMeses++;
           }
-          // pendente do mês atual (só faz sentido no ano atual)
-const anoSelNum = Number(year);
-const anoAtualNum = new Date().getFullYear();
-tr.dataset.pendenteNow = (!isInativo && anoSelNum === anoAtualNum && !isPaidNow) ? 'true' : 'false';
-
           const label = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][idx];
           return `<label class="mchip" data-mm="${mm}">
   <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
@@ -1469,12 +1451,6 @@ tr.dataset.pendenteNow = (!isInativo && anoSelNum === anoAtualNum && !isPaidNow)
     function updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual) {
       const pct = totalClientesAtivos ? Math.round((pagosMesAtual / totalClientesAtivos) * 100) : 0;
       sumario.textContent = `Pagos (mês): ${pagosMesAtual}/${totalClientesAtivos} (${pct}%) • Faltam: ${faltamMesAtual}`;
-
-      if (btnTogglePendentes) {
-  const base = window.__SHOW_PENDENTES__ ? 'Ver todos' : 'Ver pendentes';
-  btnTogglePendentes.textContent = `${base} (${faltamMesAtual})`;
-}
-
     }
 
 
@@ -1493,9 +1469,7 @@ tr.dataset.pendenteNow = (!isInativo && anoSelNum === anoAtualNum && !isPaidNow)
         const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
         const passaBusca = (!q || nome.includes(q) || status.includes(q));
 
-        const passaPend = (!window.__SHOW_PENDENTES__ || tr.dataset.pendenteNow === 'true');
-const show = passaModo && passaBusca && passaPend;
-
+        const show = passaModo && passaBusca;
         tr.style.display = show ? '' : 'none';
 
         // renumera só os visíveis
