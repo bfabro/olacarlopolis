@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos </title>
+  <title>Admin • Pagamentos 1</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1190,28 +1190,26 @@
     }
 
     function applyEntradaUI(tr, ym) {
-      // limpa marcação anterior
-      tr.querySelectorAll('.mchip.is-entry').forEach(el => el.classList.remove('is-entry'));
+  // limpa marcação anterior
+  tr.querySelectorAll('.mchip.is-entry').forEach(el => el.classList.remove('is-entry'));
 
-      if (!ym) return;
+  if (!ym) return;
 
-      const [yy, mm] = ym.split('-').map(Number);
-      if (!yy || !mm) return;
+  const [yy, mm] = ym.split('-').map(Number);
+  if (!yy || !mm) return;
 
-      // marca no dataset (PIX já usa isso)
-      tr.dataset.entradaYm = ym;
+  // sempre mantém a info salva no dataset (PIX usa isso)
+  tr.dataset.entradaYm = ym;
 
-      // pinta o chip do mês (mm = 1..12 -> "01".."12")
-      const mmKey = String(mm).padStart(2, '0');
-      const chip = tr.querySelector(`.mchip[data-mm="${mmKey}"]`);
-      if (chip) chip.classList.add('is-entry');
+  // ✅ Só marca visualmente se o ANO selecionado for o mesmo ano da entrada
+  const anoSelecionado = Number(selAno.value);
+  if (yy !== anoSelecionado) return;
 
-      // ✅ “flagar” o mês de entrada:
-      // se você quiser que ele *marque o checkbox* do mês de entrada automaticamente,
-      // descomente as 2 linhas abaixo:
-      // const chk = tr.querySelector(`.chk[data-mm="${mmKey}"]`);
-      // if (chk) chk.checked = true;
-    }
+  // pinta o chip do mês (mm = 1..12 -> "01".."12")
+  const mmKey = String(mm).padStart(2, '0');
+  const chip = tr.querySelector(`.mchip[data-mm="${mmKey}"]`);
+  if (chip) chip.classList.add('is-entry');
+}
 
 
 
