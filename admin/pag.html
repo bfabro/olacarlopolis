@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 5</title>
+  <title>Admin • Pagamentos 2</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -631,6 +631,12 @@
       font-size: 12px;
       opacity: .9;
     }
+
+    .chip.is-active{
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand) inset;
+}
+
   </style>
 
 </head>
@@ -640,8 +646,14 @@
     <header>
       <div style="display:flex; align-items:center; gap:12px">
         <h1>📒 Pagamentos</h1>
-        <span class="chip"><span class="status-dot dot-ok"></span> Pago</span>
-        <span class="chip"><span class="status-dot dot-no"></span> Em aberto</span>
+        <span class="chip" id="chipPago" style="cursor:pointer">
+  <span class="status-dot dot-ok"></span> Pago
+</span>
+
+<span class="chip" id="chipAberto" style="cursor:pointer">
+  <span class="status-dot dot-no"></span> Em aberto
+</span>
+
       </div>
       <div class="chip" id="userBox" style="display:none">
         <span id="userEmail">—</span>
@@ -715,6 +727,7 @@
   <!-- Loader: baixa /script.js e extrai apenas const statusEstabelecimentos = { ... } -->
   <script>
     window.__STATUS__ = null;
+    
 
     async function loadStatusFromMainScript() {
       try {
@@ -1018,6 +1031,32 @@ for (const m of blocoServ.matchAll(rx)) allow.add(m[1] || m[2]);
     const btnToggleInativos = document.getElementById('btnToggleInativos');
     window.__SHOW_INATIVOS__ = false;
     window.__LOADSEQ__ = 0; // ✅ evita misturar renders antigos
+    window.__FILTER_PAGO__ = false;
+window.__FILTER_ABERTO__ = false;
+
+const chipPago = document.getElementById('chipPago');
+const chipAberto = document.getElementById('chipAberto');
+
+chipPago.addEventListener('click', () => {
+  window.__FILTER_PAGO__ = !window.__FILTER_PAGO__;
+  if (window.__FILTER_PAGO__) window.__FILTER_ABERTO__ = false;
+
+  chipPago.classList.toggle('is-active', window.__FILTER_PAGO__);
+  chipAberto.classList.remove('is-active');
+
+  applyViewAndFilter();
+});
+
+chipAberto.addEventListener('click', () => {
+  window.__FILTER_ABERTO__ = !window.__FILTER_ABERTO__;
+  if (window.__FILTER_ABERTO__) window.__FILTER_PAGO__ = false;
+
+  chipAberto.classList.toggle('is-active', window.__FILTER_ABERTO__);
+  chipPago.classList.remove('is-active');
+
+  applyViewAndFilter();
+});
+
 
 
     // ===== LOGIN =====
@@ -1455,31 +1494,39 @@ for (const m of blocoServ.matchAll(rx)) allow.add(m[1] || m[2]);
 
 
     function applyViewAndFilter() {
-      const q = filtro.value.trim().toLowerCase();
+  const q = filtro.value.trim().toLowerCase();
 
-      let idx = 0;
-      Array.from(tbody.children).forEach(tr => {
-        const isInativo = tr.dataset.inativo === 'true';
+  let idx = 0;
+  Array.from(tbody.children).forEach(tr => {
+    const isInativo = tr.dataset.inativo === 'true';
 
-        // modo exclusivo
-        const passaModo = window.__SHOW_INATIVOS__ ? isInativo : !isInativo;
+    // modo exclusivo (ativos/inativos)
+    const passaModo = window.__SHOW_INATIVOS__ ? isInativo : !isInativo;
 
-        // busca (mantém sua lógica atual)
-        const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
-        const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
-        const passaBusca = (!q || nome.includes(q) || status.includes(q));
+    // status pago/aberto (baseado no chip da linha: "Pago" ou "Pendente")
+    const statusTxt = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
+    const isPago = statusTxt.includes('pago');
+    const isAberto = !isPago;
 
-        const show = passaModo && passaBusca;
-        tr.style.display = show ? '' : 'none';
+    let passaStatus = true;
+    if (window.__FILTER_PAGO__) passaStatus = isPago;
+    if (window.__FILTER_ABERTO__) passaStatus = isAberto;
 
-        // renumera só os visíveis
-        if (show) {
-          idx++;
-          const tdIdx = tr.querySelector('td.idx');
-          if (tdIdx) tdIdx.textContent = String(idx);
-        }
-      });
+    // busca
+    const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
+    const passaBusca = (!q || nome.includes(q) || statusTxt.includes(q));
+
+    const show = passaModo && passaStatus && passaBusca;
+    tr.style.display = show ? '' : 'none';
+
+    if (show) {
+      idx++;
+      const tdIdx = tr.querySelector('td.idx');
+      if (tdIdx) tdIdx.textContent = String(idx);
     }
+  });
+}
+
     // Marcar/Desmarcar todos os meses do cliente (toggle)
     tbody.addEventListener('click', (ev) => {
       const btnAll = ev.target.closest('.btn-allmonths');
