@@ -615,6 +615,22 @@
     .btn-copy {
       margin-top: 8px;
     }
+
+
+    /* mês marcado como "entrada" */
+.mchip.is-entry {
+  border-color: rgba(93, 212, 255, .75);
+  background: rgba(93, 212, 255, .10);
+  box-shadow: 0 0 0 1px rgba(93, 212, 255, .25) inset;
+}
+
+.mchip.is-entry::after{
+  content: "📌";
+  margin-left: 6px;
+  font-size: 12px;
+  opacity: .9;
+}
+
   </style>
 
 </head>
@@ -1174,6 +1190,31 @@
       if (hold) hold.innerHTML = renderStatusChip(isPaid);
     }
 
+    function applyEntradaUI(tr, ym) {
+  // limpa marcação anterior
+  tr.querySelectorAll('.mchip.is-entry').forEach(el => el.classList.remove('is-entry'));
+
+  if (!ym) return;
+
+  const [yy, mm] = ym.split('-').map(Number);
+  if (!yy || !mm) return;
+
+  // marca no dataset (PIX já usa isso)
+  tr.dataset.entradaYm = ym;
+
+  // pinta o chip do mês (mm = 1..12 -> "01".."12")
+  const mmKey = String(mm).padStart(2, '0');
+  const chip = tr.querySelector(`.mchip[data-mm="${mmKey}"]`);
+  if (chip) chip.classList.add('is-entry');
+
+  // ✅ “flagar” o mês de entrada:
+  // se você quiser que ele *marque o checkbox* do mês de entrada automaticamente,
+  // descomente as 2 linhas abaixo:
+  // const chk = tr.querySelector(`.chk[data-mm="${mmKey}"]`);
+  // if (chk) chk.checked = true;
+}
+
+
 
 
 
@@ -1272,11 +1313,11 @@ if (!m.entradaEm) {
             totalMeses++;
           }
           const label = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][idx];
-          return `<label class="mchip">
-            <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
-         <span translate="no">${label}</span>
+        return `<label class="mchip" data-mm="${mm}">
+  <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
+  <span translate="no">${label}</span>
+</label>`;
 
-          </label>`;
         }).join('');
         const isPaidNow = computeStatusForRow(mesesData);
         // conta só clientes ATIVOS (os inativos não entram na cobrança)
@@ -1355,11 +1396,20 @@ tr.dataset.entradaYm = entradaYm; // vamos usar no PIX também
     </div>
   </td>`;
 
+applyEntradaUI(tr, entradaYm);
 
 
 
 
         tbody.appendChild(tr);
+
+        const inpEntrada = tr.querySelector('.inp-entrada');
+if (inpEntrada) {
+  inpEntrada.addEventListener('change', () => {
+    applyEntradaUI(tr, (inpEntrada.value || '').trim());
+  });
+}
+
 
         // sempre que marcar/desmarcar um mês, recalcula o status da linha
         tr.querySelector('.months').addEventListener('change', (e) => {
