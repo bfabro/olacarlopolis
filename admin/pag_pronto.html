@@ -2013,26 +2013,35 @@ if (tipoBaseSan === 'MENSAL' || tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === '
 const phoneClean = (phoneCliente || '').toString().trim();
       const phoneHtml = phoneClean ? `` : '';
 
-      let detalheMesesHtml = '';
+     let detalheMesesHtml = '';
+
+// 🔹 Plano normal
 if (tipoBaseSan === 'MENSAL') {
   detalheMesesHtml = `
     <div style="margin-top:4px;">
-      <strong>Valor referente a:</strong> ${mesesTexto}
-    </div>
-  `;
-} else if (tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === 'ANUAL') {
-  detalheMesesHtml = `
-    <div style="margin-top:4px;">
-      <strong>Referente ao plano:</strong> ${tipoBaseSan.charAt(0) + tipoBaseSan.slice(1).toLowerCase()}
-    </div>
-  `;
-} else {
-  detalheMesesHtml = `
-    <div style="margin-top:4px;">
-      <strong>Referente a:</strong> Cobrança avulsa
+      <strong>Referente a:</strong> ${mesesTexto}
     </div>
   `;
 }
+
+// 🔹 Semestral / Anual
+else if (tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === 'ANUAL') {
+  detalheMesesHtml = `
+    <div style="margin-top:4px;">
+      <strong>Referente a:</strong> Plano ${tipoBaseSan.toLowerCase()}
+    </div>
+  `;
+}
+
+// 🔹 VALOR LIVRE – AVULSO
+else if (livreInfo && livreInfo.modo === 'FINAL') {
+  detalheMesesHtml = `
+    <div style="margin-top:4px;">
+      <strong>Referente a:</strong> ${escapeHtml(livreInfo.ref)}
+    </div>
+  `;
+}
+
 
 // 🔹 detalhes do valor livre (extra ou avulso), aparece no cartão e no WhatsApp
 let livreHtml = '';
