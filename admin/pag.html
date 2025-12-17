@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 3</title>
+  <title>Admin • Pagamentos 4</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -765,10 +765,12 @@
       }
 
       // 3) extrai chaves no formato:  nome: "s"  |  nome: "n"
-      const rx = /\b([a-z0-9_]+)\s*:\s*"(?:s|n)"/gi;
+      const rx = /(?:["']([^"']+)["']|([a-z0-9_]+))\s*:\s*"(?:s|n)"/gi;
+
       const allow = new Set();
-      for (const m of ateFimComercios.matchAll(rx)) allow.add(m[1]);
-      for (const m of blocoServ.matchAll(rx)) allow.add(m[1]);
+    for (const m of ateFimComercios.matchAll(rx)) allow.add(m[1] || m[2]);
+for (const m of blocoServ.matchAll(rx)) allow.add(m[1] || m[2]);
+
 
       return allow;
     }
@@ -1798,7 +1800,7 @@ chks.forEach((c, idx) => {
 
           } else if (tipoSelecionado === 'ANUAL') {
             valorFinal = VALOR_ANUAL;
-            mesesInfo = ['Plano anual'];
+            mesesInfo = ['Plano Anual'];
             tipoExibicao = 'ANUAL';
             tipoBaseVig = 'ANUAL';
 
