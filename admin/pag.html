@@ -1096,7 +1096,14 @@
       for (const m of locals) {
         const ref = doc(db, 'merchants', m.id);
         const has = remote.get(m.id);
-        if (!has) { await setDoc(ref, m); created++; }
+       if (!has) {
+  await setDoc(ref, {
+    ...m,
+    entradaEm: serverTimestamp() // 👈 salva quando o cliente entrou
+  });
+  created++;
+}
+
         else {
           const need = (has.name !== m.name) || (has.category !== m.category) || (has.sort !== m.sort);
           if (need) { await updateDoc(ref, m); updated++; }
@@ -1250,6 +1257,8 @@ if (!isInativo) {
 }
 
 
+const entradaEmDate = m.entradaEm?.toDate ? m.entradaEm.toDate() : null;
+const entradaEmTxt = entradaEmDate ? formatMesAnoPt(entradaEmDate) : '—';
 
 
 
@@ -1267,6 +1276,10 @@ if (!isInativo) {
     <!-- mantém compatível com o filtro -->
     <span class="sr-only nome-holder">${escapeHtml(m.name || m.id)}</span>
   </div>
+  <div class="muted" style="margin:4px 0 6px;">
+  Entrou em: <strong>${entradaEmTxt}</strong>
+</div>
+
 <div class="status-row">
   <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
 
