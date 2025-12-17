@@ -1145,6 +1145,19 @@
       const cur = getCurrentMonthKey();
       return !!(mesesData?.[cur]?.pago);
     }
+    function inferirEntradaPorMeses(mesesData, ano) {
+  if (!mesesData) return null;
+
+  const mesesPagos = Object.keys(mesesData)
+    .filter(mm => mesesData[mm]?.pago)
+    .sort(); // "01", "02", ...
+
+  if (!mesesPagos.length) return null;
+
+  const primeiroMes = Number(mesesPagos[0]) - 1; // 0..11
+  return new Date(Number(ano), primeiroMes, 1);
+}
+
     function renderStatusChip(isPaid) {
       return `
     <span class="chip status-chip ${isPaid ? 'is-ok' : 'is-no'}">
