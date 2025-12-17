@@ -1986,12 +1986,10 @@ if (tipoBaseSan === 'MENSAL' || tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === '
   const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
   const fim = new Date(inicio);
 
-  if (tipoBaseSan === 'ANUAL') {
+ if (tipoBaseSan === 'ANUAL') {
     fim.setFullYear(fim.getFullYear() + 1);
   } else if (tipoBaseSan === 'SEMESTRAL') {
     fim.setMonth(fim.getMonth() + 5);
-  } else {
-    fim.setMonth(fim.getMonth());
   }
 
   if (tipoBaseSan === 'MENSAL') {

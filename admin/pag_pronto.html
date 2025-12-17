@@ -1954,8 +1954,6 @@ abrirModalTipoCobranca(totalMensal, async (res) => {
       // 🔹 tipoBaseSan = usado para vigência (mensal/semestral/anual). tipoExibSan = o que aparece no cartão.
       const tipoBaseSan = (tipoBaseVigencia || tipoLabel || 'MENSAL').toString().toUpperCase();
       const tipoExibSan = (tipoLabel || tipoBaseSan).toString().toUpperCase();
-      const isAvulsoLivreFinal = (tipoExibSan === 'AVULSO' && livreInfo && livreInfo.modo === 'FINAL');
-
 
       // (se quiser usar em algum lugar, agora funciona)
       const planoId = `OLA_CARLOPOLIS_${tipoExibSan}`;
@@ -1979,15 +1977,13 @@ abrirModalTipoCobranca(totalMensal, async (res) => {
         // se quiser, pode até deixar assim explicitamente:
         fim.setMonth(fim.getMonth());
       }
+let vigenciaHtml = '';
 
-      let vigenciaHtml = '';
-
-// vigência padrão por tipo (mensal/semestral/anual). Para AVULSO, mostra "—".
+// 🔹 só gera vigência se NÃO for avulso
 if (tipoBaseSan === 'MENSAL' || tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === 'ANUAL') {
 
-  // 🔹 cálculo da vigência (início = mês atual)
   const hoje = new Date();
-  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês de referência
+  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
   const fim = new Date(inicio);
 
   if (tipoBaseSan === 'ANUAL') {
@@ -2011,15 +2007,9 @@ if (tipoBaseSan === 'MENSAL' || tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === '
       </div>
     `;
   }
-
-} else {
-  vigenciaHtml = `
-    <div style="margin-top:4px;">
-      <strong>Vigência:</strong> — (cobrança avulsa)
-    </div>
-  `;
 }
 
+// 👉 se for AVULSO, vigenciaHtml fica vazio e NÃO aparece nada
 const phoneClean = (phoneCliente || '').toString().trim();
       const phoneHtml = phoneClean ? `` : '';
 
@@ -2037,9 +2027,13 @@ if (tipoBaseSan === 'MENSAL') {
     </div>
   `;
 } else {
-  // 👉 para AVULSO (valor livre FINAL), não exibimos bloco de referência
-  detalheMesesHtml = ``;
+  detalheMesesHtml = `
+    <div style="margin-top:4px;">
+      <strong>Referente a:</strong> Cobrança avulsa
+    </div>
+  `;
 }
+
 // 🔹 detalhes do valor livre (extra ou avulso), aparece no cartão e no WhatsApp
 let livreHtml = '';
 if (livreInfo && typeof livreInfo === 'object') {
@@ -2066,14 +2060,10 @@ if (livreInfo && typeof livreInfo === 'object') {
       </div>
     `;
   } else {
-    // FINAL = avulso. Se for valor livre FINAL, não exibe cabeçalho/Referência no card.
-    if (isAvulsoLivreFinal) {
-      livreHtml = ``;
-    } else {
-      const vLivre = Number(livreInfo.valorLivre || valor || 0);
-      livreHtml = `$1`;
-    }
+    // modo FINAL (avulso): não exibe bloco extra no cartão
+    livreHtml = '';
   }
+
 }
 
 // monta cartão premium
