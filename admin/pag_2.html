@@ -1096,7 +1096,7 @@
       for (const m of locals) {
         const ref = doc(db, 'merchants', m.id);
         const has = remote.get(m.id);
-        if (!has) { await setDoc(ref, m); created++; }
+        if (!has) { await setDoc(ref, { ...m, clienteDesde: serverTimestamp(), ativo: true }); created++; }
         else {
           const need = (has.name !== m.name) || (has.category !== m.category) || (has.sort !== m.sort);
           if (need) { await updateDoc(ref, m); updated++; }
@@ -1146,6 +1146,20 @@
     </span>
   `;
     }
+
+    function formatClienteDesde(ts) {
+      try {
+        if (!ts) return '';
+        const d = (typeof ts.toDate === 'function') ? ts.toDate()
+          : (typeof ts.seconds === 'number') ? new Date(ts.seconds * 1000)
+          : (ts instanceof Date) ? ts
+          : null;
+        if (!d) return '';
+        return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+      } catch (e) { return ''; }
+    }
+
+
     function updateRowStatusFromCheckboxes(tr) {
       const cur = getCurrentMonthKey();
       const chkCur = tr.querySelector(`.months .chk[data-mm="${cur}"]`);
@@ -1225,6 +1239,7 @@ let pagosMesAtual = 0;
         const phoneFromMerchant = await getPhoneFromScript(m.id);
         if (mySeq !== window.__LOADSEQ__) return; // ✅
         tr.dataset.phone = (phoneFromMerchant || '').toString();
+        tr.dataset.cdesde = m.clienteDesde ? '1' : '0';
 
 
 
@@ -1243,6 +1258,7 @@ let pagosMesAtual = 0;
           </label>`;
         }).join('');
         const isPaidNow = computeStatusForRow(mesesData);
+        const clienteDesdeTxt = formatClienteDesde(m.clienteDesde);
         // conta só clientes ATIVOS (os inativos não entram na cobrança)
 if (!isInativo) {
   totalClientesAtivos++;
@@ -1280,6 +1296,7 @@ if (!isInativo) {
   <button class="btn-save btn-icon" title="Salvar alterações">💾</button>
   <button class="btn-icon btn-pix" title="Gerar QR Code PIX">🔗</button>
 </div>
+  ${clienteDesdeTxt ? `<div class="meta muted">Cliente desde: ${clienteDesdeTxt}</div>` : ''}
 
 </div>
 
@@ -1417,6 +1434,12 @@ updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
           meses[mm] = { pago: !!c.checked, updatedAt: serverTimestamp(), by: (auth.currentUser?.uid || null) };
         });
 
+        // se ainda não tem "Cliente desde", grava a data de início (uma única vez)
+        if (tr.dataset.cdesde !== '1') {
+          await setDoc(doc(db, 'merchants', merchantId), { clienteDesde: serverTimestamp() }, { merge: true });
+          tr.dataset.cdesde = '1';
+        }
+
         await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
         updateRowStatusFromCheckboxes(tr);
 
@@ -1436,6 +1459,12 @@ updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
       const novoAtivo = !ativoAtual;
 
       try {
+        // se ainda não tem "Cliente desde", grava a data de início
+        if (tr.dataset.cdesde !== '1') {
+          await setDoc(doc(db, 'merchants', merchantId), { clienteDesde: serverTimestamp() }, { merge: true });
+          tr.dataset.cdesde = '1';
+        }
+
         await updateDoc(doc(db, 'merchants', merchantId), {
           ativo: novoAtivo
         });

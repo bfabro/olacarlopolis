@@ -2160,7 +2160,7 @@ document.addEventListener("DOMContentLoaded", function () {
     assao: "s",
 
     //ADVOCACIA  
-    advocaciaabilio: "s",
+ 
 
     // Agropecuaria
     agrovida: "s",
