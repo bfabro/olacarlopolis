@@ -632,11 +632,10 @@
       opacity: .9;
     }
 
-    .chip.is-active{
-  border-color: var(--brand);
-  box-shadow: 0 0 0 1px var(--brand) inset;
-}
-
+    .chip.is-active {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 1px var(--brand) inset;
+    }
   </style>
 
 </head>
@@ -647,12 +646,12 @@
       <div style="display:flex; align-items:center; gap:12px">
         <h1>📒 Pagamentos</h1>
         <span class="chip" id="chipPago" style="cursor:pointer">
-  <span class="status-dot dot-ok"></span> Pago
-</span>
+          <span class="status-dot dot-ok"></span> Pago
+        </span>
 
-<span class="chip" id="chipAberto" style="cursor:pointer">
-  <span class="status-dot dot-no"></span> Em aberto
-</span>
+        <span class="chip" id="chipAberto" style="cursor:pointer">
+          <span class="status-dot dot-no"></span> Em aberto
+        </span>
 
       </div>
       <div class="chip" id="userBox" style="display:none">
@@ -727,7 +726,7 @@
   <!-- Loader: baixa /script.js e extrai apenas const statusEstabelecimentos = { ... } -->
   <script>
     window.__STATUS__ = null;
-    
+
 
     async function loadStatusFromMainScript() {
       try {
@@ -782,8 +781,8 @@
       const rx = /(?:["']([^"']+)["']|([a-z0-9_]+))\s*:\s*"(?:s|n)"/gi;
 
       const allow = new Set();
-    for (const m of ateFimComercios.matchAll(rx)) allow.add(m[1] || m[2]);
-for (const m of blocoServ.matchAll(rx)) allow.add(m[1] || m[2]);
+      for (const m of ateFimComercios.matchAll(rx)) allow.add(m[1] || m[2]);
+      for (const m of blocoServ.matchAll(rx)) allow.add(m[1] || m[2]);
 
 
       return allow;
@@ -1032,30 +1031,30 @@ for (const m of blocoServ.matchAll(rx)) allow.add(m[1] || m[2]);
     window.__SHOW_INATIVOS__ = false;
     window.__LOADSEQ__ = 0; // ✅ evita misturar renders antigos
     window.__FILTER_PAGO__ = false;
-window.__FILTER_ABERTO__ = false;
+    window.__FILTER_ABERTO__ = false;
 
-const chipPago = document.getElementById('chipPago');
-const chipAberto = document.getElementById('chipAberto');
+    const chipPago = document.getElementById('chipPago');
+    const chipAberto = document.getElementById('chipAberto');
 
-chipPago.addEventListener('click', () => {
-  window.__FILTER_PAGO__ = !window.__FILTER_PAGO__;
-  if (window.__FILTER_PAGO__) window.__FILTER_ABERTO__ = false;
+    chipPago.addEventListener('click', () => {
+      window.__FILTER_PAGO__ = !window.__FILTER_PAGO__;
+      if (window.__FILTER_PAGO__) window.__FILTER_ABERTO__ = false;
 
-  chipPago.classList.toggle('is-active', window.__FILTER_PAGO__);
-  chipAberto.classList.remove('is-active');
+      chipPago.classList.toggle('is-active', window.__FILTER_PAGO__);
+      chipAberto.classList.remove('is-active');
 
-  applyViewAndFilter();
-});
+      applyViewAndFilter();
+    });
 
-chipAberto.addEventListener('click', () => {
-  window.__FILTER_ABERTO__ = !window.__FILTER_ABERTO__;
-  if (window.__FILTER_ABERTO__) window.__FILTER_PAGO__ = false;
+    chipAberto.addEventListener('click', () => {
+      window.__FILTER_ABERTO__ = !window.__FILTER_ABERTO__;
+      if (window.__FILTER_ABERTO__) window.__FILTER_PAGO__ = false;
 
-  chipAberto.classList.toggle('is-active', window.__FILTER_ABERTO__);
-  chipPago.classList.remove('is-active');
+      chipAberto.classList.toggle('is-active', window.__FILTER_ABERTO__);
+      chipPago.classList.remove('is-active');
 
-  applyViewAndFilter();
-});
+      applyViewAndFilter();
+    });
 
 
 
@@ -1232,26 +1231,26 @@ chipAberto.addEventListener('click', () => {
     }
 
     function applyEntradaUI(tr, ym) {
-  // limpa marcação anterior
-  tr.querySelectorAll('.mchip.is-entry').forEach(el => el.classList.remove('is-entry'));
+      // limpa marcação anterior
+      tr.querySelectorAll('.mchip.is-entry').forEach(el => el.classList.remove('is-entry'));
 
-  if (!ym) return;
+      if (!ym) return;
 
-  const [yy, mm] = ym.split('-').map(Number);
-  if (!yy || !mm) return;
+      const [yy, mm] = ym.split('-').map(Number);
+      if (!yy || !mm) return;
 
-  // sempre mantém a info salva no dataset (PIX usa isso)
-  tr.dataset.entradaYm = ym;
+      // sempre mantém a info salva no dataset (PIX usa isso)
+      tr.dataset.entradaYm = ym;
 
-  // ✅ Só marca visualmente se o ANO selecionado for o mesmo ano da entrada
-  const anoSelecionado = Number(selAno.value);
-  if (yy !== anoSelecionado) return;
+      // ✅ Só marca visualmente se o ANO selecionado for o mesmo ano da entrada
+      const anoSelecionado = Number(selAno.value);
+      if (yy !== anoSelecionado) return;
 
-  // pinta o chip do mês (mm = 1..12 -> "01".."12")
-  const mmKey = String(mm).padStart(2, '0');
-  const chip = tr.querySelector(`.mchip[data-mm="${mmKey}"]`);
-  if (chip) chip.classList.add('is-entry');
-}
+      // pinta o chip do mês (mm = 1..12 -> "01".."12")
+      const mmKey = String(mm).padStart(2, '0');
+      const chip = tr.querySelector(`.mchip[data-mm="${mmKey}"]`);
+      if (chip) chip.classList.add('is-entry');
+    }
 
 
 
@@ -1494,38 +1493,38 @@ chipAberto.addEventListener('click', () => {
 
 
     function applyViewAndFilter() {
-  const q = filtro.value.trim().toLowerCase();
+      const q = filtro.value.trim().toLowerCase();
 
-  let idx = 0;
-  Array.from(tbody.children).forEach(tr => {
-    const isInativo = tr.dataset.inativo === 'true';
+      let idx = 0;
+      Array.from(tbody.children).forEach(tr => {
+        const isInativo = tr.dataset.inativo === 'true';
 
-    // modo exclusivo (ativos/inativos)
-    const passaModo = window.__SHOW_INATIVOS__ ? isInativo : !isInativo;
+        // modo exclusivo (ativos/inativos)
+        const passaModo = window.__SHOW_INATIVOS__ ? isInativo : !isInativo;
 
-    // status pago/aberto (baseado no chip da linha: "Pago" ou "Pendente")
-    const statusTxt = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
-    const isPago = statusTxt.includes('pago');
-    const isAberto = !isPago;
+        // status pago/aberto (baseado no chip da linha: "Pago" ou "Pendente")
+        const statusTxt = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
+        const isPago = statusTxt.includes('pago');
+        const isAberto = !isPago;
 
-    let passaStatus = true;
-    if (window.__FILTER_PAGO__) passaStatus = isPago;
-    if (window.__FILTER_ABERTO__) passaStatus = isAberto;
+        let passaStatus = true;
+        if (window.__FILTER_PAGO__) passaStatus = isPago;
+        if (window.__FILTER_ABERTO__) passaStatus = isAberto;
 
-    // busca
-    const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
-    const passaBusca = (!q || nome.includes(q) || statusTxt.includes(q));
+        // busca
+        const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
+        const passaBusca = (!q || nome.includes(q) || statusTxt.includes(q));
 
-    const show = passaModo && passaStatus && passaBusca;
-    tr.style.display = show ? '' : 'none';
+        const show = passaModo && passaStatus && passaBusca;
+        tr.style.display = show ? '' : 'none';
 
-    if (show) {
-      idx++;
-      const tdIdx = tr.querySelector('td.idx');
-      if (tdIdx) tdIdx.textContent = String(idx);
+        if (show) {
+          idx++;
+          const tdIdx = tr.querySelector('td.idx');
+          if (tdIdx) tdIdx.textContent = String(idx);
+        }
+      });
     }
-  });
-}
 
     // Marcar/Desmarcar todos os meses do cliente (toggle)
     tbody.addEventListener('click', (ev) => {
@@ -1782,33 +1781,33 @@ chipAberto.addEventListener('click', () => {
       const mesesDevidos = [];
 
 
-const anoSel = Number(selAno.value);
-const ymEntrada = (tr.dataset.entradaYm || '').trim(); // "YYYY-MM"
+      const anoSel = Number(selAno.value);
+      const ymEntrada = (tr.dataset.entradaYm || '').trim(); // "YYYY-MM"
 
-// startMonth: 1..12 (mês mínimo a cobrar no ano selecionado)
-let startMonth = 1;
+      // startMonth: 1..12 (mês mínimo a cobrar no ano selecionado)
+      let startMonth = 1;
 
-if (ymEntrada) {
-  const [yy, mm] = ymEntrada.split('-').map(Number);
+      if (ymEntrada) {
+        const [yy, mm] = ymEntrada.split('-').map(Number);
 
-  if (yy > anoSel) startMonth = 13;        // entrou depois desse ano
-  else if (yy === anoSel) startMonth = mm; // entrou nesse ano: cobra do mês de entrada pra frente
-  else startMonth = 1;                     // entrou antes: cobra o ano todo (se tiver pendência)
-}
+        if (yy > anoSel) startMonth = 13;        // entrou depois desse ano
+        else if (yy === anoSel) startMonth = mm; // entrou nesse ano: cobra do mês de entrada pra frente
+        else startMonth = 1;                     // entrou antes: cobra o ano todo (se tiver pendência)
+      }
 
-// zera e calcula só UMA vez
-totalMensal = 0;
-mesesDevidos.length = 0;
+      // zera e calcula só UMA vez
+      totalMensal = 0;
+      mesesDevidos.length = 0;
 
-chks.forEach((c, idx) => {
-  const mes = idx + 1; // 1..12
-  if (mes < startMonth) return; // ignora meses antes da entrada
+      chks.forEach((c, idx) => {
+        const mes = idx + 1; // 1..12
+        if (mes < startMonth) return; // ignora meses antes da entrada
 
-  if (!c.checked) {
-    totalMensal += VALOR_MENSAL;
-    mesesDevidos.push(mesesNomes[idx]);
-  }
-});
+        if (!c.checked) {
+          totalMensal += VALOR_MENSAL;
+          mesesDevidos.push(mesesNomes[idx]);
+        }
+      });
 
 
 
