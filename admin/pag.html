@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 6</title>
+  <title>Admin • Pagamentos </title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -618,19 +618,18 @@
 
 
     /* mês marcado como "entrada" */
-.mchip.is-entry {
-  border-color: rgba(93, 212, 255, .75);
-  background: rgba(93, 212, 255, .10);
-  box-shadow: 0 0 0 1px rgba(93, 212, 255, .25) inset;
-}
+    .mchip.is-entry {
+      border-color: rgba(8, 245, 12, 0.885);
+      background: rgba(93, 212, 255, .10);
+      box-shadow: 0 0 0 1px rgba(93, 212, 255, .25) inset;
+    }
 
-.mchip.is-entry::after{
-  content: "📌";
-  margin-left: 6px;
-  font-size: 12px;
-  opacity: .9;
-}
-
+    .mchip.is-entry::after {
+      content: "📌";
+      margin-left: 6px;
+      font-size: 12px;
+      opacity: .9;
+    }
   </style>
 
 </head>
@@ -989,7 +988,7 @@
 
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-   import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, Timestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, Timestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
     // Init
     const app = initializeApp(firebaseConfig);
@@ -1055,7 +1054,7 @@
         const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === yNow) o.selected = true; selAno.appendChild(o);
       });
       selAno.onchange = loadTabela;
-     filtro.oninput = applyViewAndFilter;  // em vez de applyFilter
+      filtro.oninput = applyViewAndFilter;  // em vez de applyFilter
       btnCSV.onclick = exportCSV;
       //
       //
@@ -1063,11 +1062,11 @@
       //
       //
       //
-     btnToggleInativos.onclick = () => {
-  window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
-  btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
-  applyViewAndFilter(); // só alterna a visualização (sem recarregar)
-};
+      btnToggleInativos.onclick = () => {
+        window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
+        btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
+        applyViewAndFilter(); // só alterna a visualização (sem recarregar)
+      };
 
 
 
@@ -1112,13 +1111,13 @@
       for (const m of locals) {
         const ref = doc(db, 'merchants', m.id);
         const has = remote.get(m.id);
-       if (!has) {
-  await setDoc(ref, {
-    ...m,
-    entradaEm: serverTimestamp() // 👈 salva quando o cliente entrou
-  });
-  created++;
-}
+        if (!has) {
+          await setDoc(ref, {
+            ...m,
+            entradaEm: serverTimestamp() // 👈 salva quando o cliente entrou
+          });
+          created++;
+        }
 
         else {
           const need = (has.name !== m.name) || (has.category !== m.category) || (has.sort !== m.sort);
@@ -1162,17 +1161,17 @@
       return !!(mesesData?.[cur]?.pago);
     }
     function inferirEntradaPorMeses(mesesData, ano) {
-  if (!mesesData) return null;
+      if (!mesesData) return null;
 
-  const mesesPagos = Object.keys(mesesData)
-    .filter(mm => mesesData[mm]?.pago)
-    .sort(); // "01", "02", ...
+      const mesesPagos = Object.keys(mesesData)
+        .filter(mm => mesesData[mm]?.pago)
+        .sort(); // "01", "02", ...
 
-  if (!mesesPagos.length) return null;
+      if (!mesesPagos.length) return null;
 
-  const primeiroMes = Number(mesesPagos[0]) - 1; // 0..11
-  return new Date(Number(ano), primeiroMes, 1);
-}
+      const primeiroMes = Number(mesesPagos[0]) - 1; // 0..11
+      return new Date(Number(ano), primeiroMes, 1);
+    }
 
     function renderStatusChip(isPaid) {
       return `
@@ -1191,28 +1190,28 @@
     }
 
     function applyEntradaUI(tr, ym) {
-  // limpa marcação anterior
-  tr.querySelectorAll('.mchip.is-entry').forEach(el => el.classList.remove('is-entry'));
+      // limpa marcação anterior
+      tr.querySelectorAll('.mchip.is-entry').forEach(el => el.classList.remove('is-entry'));
 
-  if (!ym) return;
+      if (!ym) return;
 
-  const [yy, mm] = ym.split('-').map(Number);
-  if (!yy || !mm) return;
+      const [yy, mm] = ym.split('-').map(Number);
+      if (!yy || !mm) return;
 
-  // marca no dataset (PIX já usa isso)
-  tr.dataset.entradaYm = ym;
+      // marca no dataset (PIX já usa isso)
+      tr.dataset.entradaYm = ym;
 
-  // pinta o chip do mês (mm = 1..12 -> "01".."12")
-  const mmKey = String(mm).padStart(2, '0');
-  const chip = tr.querySelector(`.mchip[data-mm="${mmKey}"]`);
-  if (chip) chip.classList.add('is-entry');
+      // pinta o chip do mês (mm = 1..12 -> "01".."12")
+      const mmKey = String(mm).padStart(2, '0');
+      const chip = tr.querySelector(`.mchip[data-mm="${mmKey}"]`);
+      if (chip) chip.classList.add('is-entry');
 
-  // ✅ “flagar” o mês de entrada:
-  // se você quiser que ele *marque o checkbox* do mês de entrada automaticamente,
-  // descomente as 2 linhas abaixo:
-  // const chk = tr.querySelector(`.chk[data-mm="${mmKey}"]`);
-  // if (chk) chk.checked = true;
-}
+      // ✅ “flagar” o mês de entrada:
+      // se você quiser que ele *marque o checkbox* do mês de entrada automaticamente,
+      // descomente as 2 linhas abaixo:
+      // const chk = tr.querySelector(`.chk[data-mm="${mmKey}"]`);
+      // if (chk) chk.checked = true;
+    }
 
 
 
@@ -1261,7 +1260,7 @@
 
       let i = 0; let totalPagos = 0, totalMeses = 0;
       let totalClientesAtivos = 0;
-let pagosMesAtual = 0;
+      let pagosMesAtual = 0;
       for (const m of merchants) {
         if (mySeq !== window.__LOADSEQ__) return; // ✅ se clicou de novo, para aqui
         const isInativo = (m.ativo === false);
@@ -1269,26 +1268,26 @@ let pagosMesAtual = 0;
         // ✅ MODO EXCLUSIVO:
         // - __SHOW_INATIVOS__ = false  => mostra só ATIVOS
         // - __SHOW_INATIVOS__ = true   => mostra só INATIVOS
-       
+
 
 
         i++;
         const dados = await readReceb(year, m.id);
         // 🔹 BACKFILL: definir entradaEm para clientes antigos
-if (!m.entradaEm) {
-  const dataInferida = inferirEntradaPorMeses(dados.meses, year);
+        if (!m.entradaEm) {
+          const dataInferida = inferirEntradaPorMeses(dados.meses, year);
 
-  if (dataInferida) {
-    await updateDoc(doc(db, 'merchants', m.id), {
-      entradaEm: dataInferida
-    });
+          if (dataInferida) {
+            await updateDoc(doc(db, 'merchants', m.id), {
+              entradaEm: dataInferida
+            });
 
-    // atualiza em memória para já refletir na tela
-    m.entradaEm = {
-      toDate: () => dataInferida
-    };
-  }
-}
+            // atualiza em memória para já refletir na tela
+            m.entradaEm = {
+              toDate: () => dataInferida
+            };
+          }
+        }
 
         if (mySeq !== window.__LOADSEQ__) return; // ✅
         const mesesData = dados.meses || {};
@@ -1313,7 +1312,7 @@ if (!m.entradaEm) {
             totalMeses++;
           }
           const label = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][idx];
-        return `<label class="mchip" data-mm="${mm}">
+          return `<label class="mchip" data-mm="${mm}">
   <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
   <span translate="no">${label}</span>
 </label>`;
@@ -1321,21 +1320,21 @@ if (!m.entradaEm) {
         }).join('');
         const isPaidNow = computeStatusForRow(mesesData);
         // conta só clientes ATIVOS (os inativos não entram na cobrança)
-if (!isInativo) {
-  totalClientesAtivos++;
-  if (isPaidNow) pagosMesAtual++;
-}
+        if (!isInativo) {
+          totalClientesAtivos++;
+          if (isPaidNow) pagosMesAtual++;
+        }
 
 
-const entradaEmDate = m.entradaEm?.toDate ? m.entradaEm.toDate() : null;
-const entradaEmTxt = entradaEmDate ? formatMesAnoPt(entradaEmDate) : '—';
+        const entradaEmDate = m.entradaEm?.toDate ? m.entradaEm.toDate() : null;
+        const entradaEmTxt = entradaEmDate ? formatMesAnoPt(entradaEmDate) : '—';
 
-const entradaDate = (m.entradaEm?.toDate ? m.entradaEm.toDate() : null);
-const entradaYm = entradaDate
-  ? `${entradaDate.getFullYear()}-${String(entradaDate.getMonth() + 1).padStart(2, '0')}`
-  : '';
+        const entradaDate = (m.entradaEm?.toDate ? m.entradaEm.toDate() : null);
+        const entradaYm = entradaDate
+          ? `${entradaDate.getFullYear()}-${String(entradaDate.getMonth() + 1).padStart(2, '0')}`
+          : '';
 
-tr.dataset.entradaYm = entradaYm; // vamos usar no PIX também
+        tr.dataset.entradaYm = entradaYm; // vamos usar no PIX também
 
 
         tr.innerHTML = `
@@ -1396,7 +1395,7 @@ tr.dataset.entradaYm = entradaYm; // vamos usar no PIX também
     </div>
   </td>`;
 
-applyEntradaUI(tr, entradaYm);
+        applyEntradaUI(tr, entradaYm);
 
 
 
@@ -1404,11 +1403,11 @@ applyEntradaUI(tr, entradaYm);
         tbody.appendChild(tr);
 
         const inpEntrada = tr.querySelector('.inp-entrada');
-if (inpEntrada) {
-  inpEntrada.addEventListener('change', () => {
-    applyEntradaUI(tr, (inpEntrada.value || '').trim());
-  });
-}
+        if (inpEntrada) {
+          inpEntrada.addEventListener('change', () => {
+            applyEntradaUI(tr, (inpEntrada.value || '').trim());
+          });
+        }
 
 
         // sempre que marcar/desmarcar um mês, recalcula o status da linha
@@ -1429,8 +1428,8 @@ if (inpEntrada) {
 
       }
       if (mySeq !== window.__LOADSEQ__) return; // ✅
-     const faltamMesAtual = Math.max(0, totalClientesAtivos - pagosMesAtual);
-updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
+      const faltamMesAtual = Math.max(0, totalClientesAtivos - pagosMesAtual);
+      updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
       applyViewAndFilter();
 
 
@@ -1449,37 +1448,37 @@ updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
 
 
     function updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual) {
-  const pct = totalClientesAtivos ? Math.round((pagosMesAtual / totalClientesAtivos) * 100) : 0;
-  sumario.textContent = `Pagos (mês): ${pagosMesAtual}/${totalClientesAtivos} (${pct}%) • Faltam: ${faltamMesAtual}`;
-}
-
-
-   function applyViewAndFilter() {
-  const q = filtro.value.trim().toLowerCase();
-
-  let idx = 0;
-  Array.from(tbody.children).forEach(tr => {
-    const isInativo = tr.dataset.inativo === 'true';
-
-    // modo exclusivo
-    const passaModo = window.__SHOW_INATIVOS__ ? isInativo : !isInativo;
-
-    // busca (mantém sua lógica atual)
-    const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
-    const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
-    const passaBusca = (!q || nome.includes(q) || status.includes(q));
-
-    const show = passaModo && passaBusca;
-    tr.style.display = show ? '' : 'none';
-
-    // renumera só os visíveis
-    if (show) {
-      idx++;
-      const tdIdx = tr.querySelector('td.idx');
-      if (tdIdx) tdIdx.textContent = String(idx);
+      const pct = totalClientesAtivos ? Math.round((pagosMesAtual / totalClientesAtivos) * 100) : 0;
+      sumario.textContent = `Pagos (mês): ${pagosMesAtual}/${totalClientesAtivos} (${pct}%) • Faltam: ${faltamMesAtual}`;
     }
-  });
-}
+
+
+    function applyViewAndFilter() {
+      const q = filtro.value.trim().toLowerCase();
+
+      let idx = 0;
+      Array.from(tbody.children).forEach(tr => {
+        const isInativo = tr.dataset.inativo === 'true';
+
+        // modo exclusivo
+        const passaModo = window.__SHOW_INATIVOS__ ? isInativo : !isInativo;
+
+        // busca (mantém sua lógica atual)
+        const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
+        const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
+        const passaBusca = (!q || nome.includes(q) || status.includes(q));
+
+        const show = passaModo && passaBusca;
+        tr.style.display = show ? '' : 'none';
+
+        // renumera só os visíveis
+        if (show) {
+          idx++;
+          const tdIdx = tr.querySelector('td.idx');
+          if (tdIdx) tdIdx.textContent = String(idx);
+        }
+      });
+    }
     // Marcar/Desmarcar todos os meses do cliente (toggle)
     tbody.addEventListener('click', (ev) => {
       const btnAll = ev.target.closest('.btn-allmonths');
@@ -1521,19 +1520,19 @@ updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
 
         await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
         // 🔹 salva entradaEm (mês/ano) no merchants
-const inpEntrada = tr.querySelector('.inp-entrada');
-const ym = (inpEntrada?.value || '').trim(); // "YYYY-MM"
+        const inpEntrada = tr.querySelector('.inp-entrada');
+        const ym = (inpEntrada?.value || '').trim(); // "YYYY-MM"
 
-if (ym) {
-  const [yy, mm] = ym.split('-').map(Number);
-  const dt = new Date(yy, (mm - 1), 1);
+        if (ym) {
+          const [yy, mm] = ym.split('-').map(Number);
+          const dt = new Date(yy, (mm - 1), 1);
 
-  await updateDoc(doc(db, 'merchants', merchantId), {
-    entradaEm: Timestamp.fromDate(dt)
-  });
+          await updateDoc(doc(db, 'merchants', merchantId), {
+            entradaEm: Timestamp.fromDate(dt)
+          });
 
-  tr.dataset.entradaYm = ym; // mantém atualizado p/ PIX
-}
+          tr.dataset.entradaYm = ym; // mantém atualizado p/ PIX
+        }
 
         updateRowStatusFromCheckboxes(tr);
 
@@ -1571,16 +1570,16 @@ if (ym) {
 
 
     // Abre um mini-modal para escolher o tipo da cobrança (com opção de Valor Livre)
-// callback recebe:
-// - string: "MENSAL" | "SEMESTRAL" | "ANUAL"  (compatível)
-// - ou objeto: { tipo: "LIVRE", modo: "EXTRA"|"FINAL", base: "MENSAL"|"SEMESTRAL"|"ANUAL", valor: number, ref: string }
-function abrirModalTipoCobranca(totalMensal, callback) {
-  const modal = document.createElement('div');
-  modal.className = 'modal-pix';
+    // callback recebe:
+    // - string: "MENSAL" | "SEMESTRAL" | "ANUAL"  (compatível)
+    // - ou objeto: { tipo: "LIVRE", modo: "EXTRA"|"FINAL", base: "MENSAL"|"SEMESTRAL"|"ANUAL", valor: number, ref: string }
+    function abrirModalTipoCobranca(totalMensal, callback) {
+      const modal = document.createElement('div');
+      modal.className = 'modal-pix';
 
-  const totalMensalTxt = totalMensal.toFixed(2).replace('.', ',');
+      const totalMensalTxt = totalMensal.toFixed(2).replace('.', ',');
 
-  modal.innerHTML = `
+      modal.innerHTML = `
     <div class="modal-box">
       <h3>Gerar cobrança</h3>
       <p style="font-size:13px; color:#e3e7ee; margin-bottom:10px;">
@@ -1640,75 +1639,75 @@ function abrirModalTipoCobranca(totalMensal, callback) {
     </div>
   `;
 
-  document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.remove();
-  });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+      });
 
-  // botões padrão
-  modal.querySelectorAll('.btn-tipo').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tipo = btn.getAttribute('data-tipo');
-      callback(tipo); // mantém compatibilidade
-      modal.remove();
-    });
-  });
+      // botões padrão
+      modal.querySelectorAll('.btn-tipo').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tipo = btn.getAttribute('data-tipo');
+          callback(tipo); // mantém compatibilidade
+          modal.remove();
+        });
+      });
 
-  // Valor livre
-  const btnLivre = modal.querySelector('.btn-tipo-livre');
-  const livreBox = modal.querySelector('.livre-box');
-  const inpValor = modal.querySelector('.livre-valor');
-  const inpRef = modal.querySelector('.livre-ref');
-  const selBase = modal.querySelector('.livre-base');
-  const baseWrap = modal.querySelector('.livre-base-wrap');
+      // Valor livre
+      const btnLivre = modal.querySelector('.btn-tipo-livre');
+      const livreBox = modal.querySelector('.livre-box');
+      const inpValor = modal.querySelector('.livre-valor');
+      const inpRef = modal.querySelector('.livre-ref');
+      const selBase = modal.querySelector('.livre-base');
+      const baseWrap = modal.querySelector('.livre-base-wrap');
 
-  function getModo() {
-    const checked = modal.querySelector('input[name="livreModo"]:checked');
-    return checked ? checked.value : 'EXTRA';
-  }
+      function getModo() {
+        const checked = modal.querySelector('input[name="livreModo"]:checked');
+        return checked ? checked.value : 'EXTRA';
+      }
 
-  function syncUI() {
-    const modo = getModo();
-    // base só aparece em EXTRA
-    if (baseWrap) baseWrap.style.display = (modo === 'EXTRA') ? 'flex' : 'none';
-  }
+      function syncUI() {
+        const modo = getModo();
+        // base só aparece em EXTRA
+        if (baseWrap) baseWrap.style.display = (modo === 'EXTRA') ? 'flex' : 'none';
+      }
 
-  modal.querySelectorAll('input[name="livreModo"]').forEach(r => {
-    r.addEventListener('change', syncUI);
-  });
+      modal.querySelectorAll('input[name="livreModo"]').forEach(r => {
+        r.addEventListener('change', syncUI);
+      });
 
-  btnLivre.addEventListener('click', () => {
-    livreBox.style.display = (livreBox.style.display === 'none') ? 'block' : 'none';
-    syncUI();
-    setTimeout(() => inpValor && inpValor.focus(), 50);
-  });
+      btnLivre.addEventListener('click', () => {
+        livreBox.style.display = (livreBox.style.display === 'none') ? 'block' : 'none';
+        syncUI();
+        setTimeout(() => inpValor && inpValor.focus(), 50);
+      });
 
-  modal.querySelector('.btn-livre-confirm').addEventListener('click', () => {
-    const modo = getModo(); // EXTRA | FINAL
-    const base = (selBase && selBase.value) ? selBase.value : 'MENSAL';
+      modal.querySelector('.btn-livre-confirm').addEventListener('click', () => {
+        const modo = getModo(); // EXTRA | FINAL
+        const base = (selBase && selBase.value) ? selBase.value : 'MENSAL';
 
-    let vRaw = (inpValor?.value || '').trim();
-    vRaw = vRaw.replace(/\s/g, '').replace('.', '').replace(',', '.'); // permite "1.234,56"
-    const valorNum = parseFloat(vRaw);
+        let vRaw = (inpValor?.value || '').trim();
+        vRaw = vRaw.replace(/\s/g, '').replace('.', '').replace(',', '.'); // permite "1.234,56"
+        const valorNum = parseFloat(vRaw);
 
-    const ref = (inpRef?.value || '').trim();
+        const ref = (inpRef?.value || '').trim();
 
-    if (!valorNum || isNaN(valorNum) || valorNum <= 0) {
-      alert('Digite um valor válido.');
-      return;
+        if (!valorNum || isNaN(valorNum) || valorNum <= 0) {
+          alert('Digite um valor válido.');
+          return;
+        }
+        if (!ref) {
+          alert('Digite uma referência (ex.: divulgação extra, ajuste, desconto…).');
+          return;
+        }
+
+        callback({ tipo: 'LIVRE', modo, base, valor: valorNum, ref });
+        modal.remove();
+      });
+
+      modal.querySelector('.btn-close').onclick = () => modal.remove();
     }
-    if (!ref) {
-      alert('Digite uma referência (ex.: divulgação extra, ajuste, desconto…).');
-      return;
-    }
-
-    callback({ tipo: 'LIVRE', modo, base, valor: valorNum, ref });
-    modal.remove();
-  });
-
-  modal.querySelector('.btn-close').onclick = () => modal.remove();
-}
 
     // Listener para o botão PIX de cada linha
     // Listener para o botão PIX de cada linha
@@ -1735,8 +1734,7 @@ function abrirModalTipoCobranca(totalMensal, callback) {
       const mesesDevidos = [];
 
 
-
-      const anoSel = Number(selAno.value);
+const anoSel = Number(selAno.value);
 const ymEntrada = (tr.dataset.entradaYm || '').trim(); // "YYYY-MM"
 
 // startMonth: 1..12 (mês mínimo a cobrar no ano selecionado)
@@ -1750,24 +1748,13 @@ if (ymEntrada) {
   else startMonth = 1;                     // entrou antes: cobra o ano todo (se tiver pendência)
 }
 
-
-
-
-
-// startMonth: 1..12 (mês mínimo a cobrar no ano selecionado)
-
-
-if (ymEntrada) {
-  const [yy, mm] = ymEntrada.split('-').map(Number);
-
-  if (yy > anoSel) startMonth = 13;        // entrou depois desse ano
-  else if (yy === anoSel) startMonth = mm; // entrou nesse ano: cobra do mês de entrada pra frente
-  else startMonth = 1;                     // entrou antes: cobra o ano todo (se tiver pendência)
-}
+// zera e calcula só UMA vez
+totalMensal = 0;
+mesesDevidos.length = 0;
 
 chks.forEach((c, idx) => {
   const mes = idx + 1; // 1..12
-  if (mes < startMonth) return; // ✅ ignora meses antes da entrada
+  if (mes < startMonth) return; // ignora meses antes da entrada
 
   if (!c.checked) {
     totalMensal += VALOR_MENSAL;
@@ -1777,156 +1764,157 @@ chks.forEach((c, idx) => {
 
 
 
+
       // nome do cliente: usa o pagador se tiver, senão o nome do comércio
       const pagadorNome = tr.querySelector('.inp-nome')?.value.trim() || '';
       const nomeCliente = pagadorNome || nomeComercio;
 
       // Abre modal para escolher tipo de cobrança
       // Abre modal para escolher tipo de cobrança
-abrirModalTipoCobranca(totalMensal, async (res) => {
-  let valorFinal = 0;
-  let mesesInfo = [];
-  let tipoExibicao = '';      // o que aparece no card (Plano • ...)
-  let tipoBaseVig = '';       // usado para vigência (MENSAL/SEMESTRAL/ANUAL ou vazio p/ avulso)
-  let livreInfo = null;
+      abrirModalTipoCobranca(totalMensal, async (res) => {
+        let valorFinal = 0;
+        let mesesInfo = [];
+        let tipoExibicao = '';      // o que aparece no card (Plano • ...)
+        let tipoBaseVig = '';       // usado para vigência (MENSAL/SEMESTRAL/ANUAL ou vazio p/ avulso)
+        let livreInfo = null;
 
-  // compatibilidade: caso venha string (MENSAL/SEMESTRAL/ANUAL)
-  if (typeof res === 'string') {
-    const tipoSelecionado = res;
+        // compatibilidade: caso venha string (MENSAL/SEMESTRAL/ANUAL)
+        if (typeof res === 'string') {
+          const tipoSelecionado = res;
 
-    if (tipoSelecionado === 'MENSAL') {
-      if (totalMensal <= 0) {
-        alert('Nenhum mês pendente para cobrança mensal.');
-        return;
-      }
-      valorFinal = totalMensal;
-      mesesInfo = mesesDevidos;
-      tipoExibicao = 'MENSAL';
-      tipoBaseVig = 'MENSAL';
+          if (tipoSelecionado === 'MENSAL') {
+            if (totalMensal <= 0) {
+              alert('Nenhum mês pendente para cobrança mensal.');
+              return;
+            }
+            valorFinal = totalMensal;
+            mesesInfo = mesesDevidos;
+            tipoExibicao = 'MENSAL';
+            tipoBaseVig = 'MENSAL';
 
-    } else if (tipoSelecionado === 'SEMESTRAL') {
-      valorFinal = VALOR_SEMESTRAL;
-      mesesInfo = ['Plano semestral'];
-      tipoExibicao = 'SEMESTRAL';
-      tipoBaseVig = 'SEMESTRAL';
+          } else if (tipoSelecionado === 'SEMESTRAL') {
+            valorFinal = VALOR_SEMESTRAL;
+            mesesInfo = ['Plano semestral'];
+            tipoExibicao = 'SEMESTRAL';
+            tipoBaseVig = 'SEMESTRAL';
 
-    } else if (tipoSelecionado === 'ANUAL') {
-      valorFinal = VALOR_ANUAL;
-      mesesInfo = ['Plano anual'];
-      tipoExibicao = 'ANUAL';
-      tipoBaseVig = 'ANUAL';
+          } else if (tipoSelecionado === 'ANUAL') {
+            valorFinal = VALOR_ANUAL;
+            mesesInfo = ['Plano anual'];
+            tipoExibicao = 'ANUAL';
+            tipoBaseVig = 'ANUAL';
 
-    } else {
-      return;
-    }
+          } else {
+            return;
+          }
 
-    // 👉 AQUI buscamos a foto no script.js pelo merchantId
-    const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
-    const phoneCliente = tr.dataset.phone || '';
+          // 👉 AQUI buscamos a foto no script.js pelo merchantId
+          const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
+          const phoneCliente = tr.dataset.phone || '';
 
-    const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoExibicao);
-    abrirModalPIX(
-      brcode,
-      valorFinal,
-      mesesInfo,
-      tipoExibicao,
-      await getNameFromScript(merchantId),
-      merchantId,
-      fotoPerfilUrl,
-      phoneCliente,
-      tipoBaseVig,
-      livreInfo
-    );
-    return;
-  }
-
-  // Valor livre (novo)
-  if (res && res.tipo === 'LIVRE') {
-    const modo = (res.modo || 'EXTRA').toUpperCase();      // EXTRA | FINAL
-    const base = (res.base || 'MENSAL').toUpperCase();     // MENSAL | SEMESTRAL | ANUAL
-    const valorLivre = Number(res.valor || 0);
-    const ref = (res.ref || '').trim();
-
-    if (!valorLivre || valorLivre <= 0 || !ref) return;
-
-    // define base (se for EXTRA)
-    let baseValor = 0;
-    let baseMesesInfo = [];
-    let baseTipo = '';
-
-    if (modo === 'EXTRA') {
-      baseTipo = base;
-
-      if (base === 'MENSAL') {
-        if (totalMensal <= 0) {
-          alert('Nenhum mês pendente para somar no mensal.');
+          const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoExibicao);
+          abrirModalPIX(
+            brcode,
+            valorFinal,
+            mesesInfo,
+            tipoExibicao,
+            await getNameFromScript(merchantId),
+            merchantId,
+            fotoPerfilUrl,
+            phoneCliente,
+            tipoBaseVig,
+            livreInfo
+          );
           return;
         }
-        baseValor = totalMensal;
-        baseMesesInfo = mesesDevidos;
 
-      } else if (base === 'SEMESTRAL') {
-        baseValor = VALOR_SEMESTRAL;
-        baseMesesInfo = ['Plano semestral'];
+        // Valor livre (novo)
+        if (res && res.tipo === 'LIVRE') {
+          const modo = (res.modo || 'EXTRA').toUpperCase();      // EXTRA | FINAL
+          const base = (res.base || 'MENSAL').toUpperCase();     // MENSAL | SEMESTRAL | ANUAL
+          const valorLivre = Number(res.valor || 0);
+          const ref = (res.ref || '').trim();
 
-      } else if (base === 'ANUAL') {
-        baseValor = VALOR_ANUAL;
-        baseMesesInfo = ['Plano anual'];
+          if (!valorLivre || valorLivre <= 0 || !ref) return;
 
-      } else {
-        baseTipo = 'MENSAL';
-        baseValor = totalMensal;
-        baseMesesInfo = mesesDevidos;
-      }
+          // define base (se for EXTRA)
+          let baseValor = 0;
+          let baseMesesInfo = [];
+          let baseTipo = '';
 
-      valorFinal = baseValor + valorLivre;
-      mesesInfo = baseMesesInfo;
-      tipoExibicao = `${baseTipo}+EXTRA`;
-      tipoBaseVig = baseTipo;
+          if (modo === 'EXTRA') {
+            baseTipo = base;
 
-      livreInfo = {
-        modo: 'EXTRA',
-        baseTipo,
-        baseValor,
-        valorLivre,
-        ref
-      };
+            if (base === 'MENSAL') {
+              if (totalMensal <= 0) {
+                alert('Nenhum mês pendente para somar no mensal.');
+                return;
+              }
+              baseValor = totalMensal;
+              baseMesesInfo = mesesDevidos;
 
-    } else {
-      // FINAL = avulso (não soma com nenhum plano)
-      valorFinal = valorLivre;
-      mesesInfo = ['Cobrança avulsa'];
-      tipoExibicao = 'AVULSO';
-      tipoBaseVig = ''; // vigência especial (avulso)
+            } else if (base === 'SEMESTRAL') {
+              baseValor = VALOR_SEMESTRAL;
+              baseMesesInfo = ['Plano semestral'];
 
-      livreInfo = {
-        modo: 'FINAL',
-        valorLivre,
-        ref
-      };
-    }
+            } else if (base === 'ANUAL') {
+              baseValor = VALOR_ANUAL;
+              baseMesesInfo = ['Plano anual'];
 
-    const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
-    const phoneCliente = tr.dataset.phone || '';
+            } else {
+              baseTipo = 'MENSAL';
+              baseValor = totalMensal;
+              baseMesesInfo = mesesDevidos;
+            }
 
-    const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoExibicao);
-    abrirModalPIX(
-      brcode,
-      valorFinal,
-      mesesInfo,
-      tipoExibicao,
-      await getNameFromScript(merchantId),
-      merchantId,
-      fotoPerfilUrl,
-      phoneCliente,
-      tipoBaseVig,
-      livreInfo
-    );
+            valorFinal = baseValor + valorLivre;
+            mesesInfo = baseMesesInfo;
+            tipoExibicao = `${baseTipo}+EXTRA`;
+            tipoBaseVig = baseTipo;
 
-    return;
-  }
-});
-});
+            livreInfo = {
+              modo: 'EXTRA',
+              baseTipo,
+              baseValor,
+              valorLivre,
+              ref
+            };
+
+          } else {
+            // FINAL = avulso (não soma com nenhum plano)
+            valorFinal = valorLivre;
+            mesesInfo = ['Cobrança avulsa'];
+            tipoExibicao = 'AVULSO';
+            tipoBaseVig = ''; // vigência especial (avulso)
+
+            livreInfo = {
+              modo: 'FINAL',
+              valorLivre,
+              ref
+            };
+          }
+
+          const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
+          const phoneCliente = tr.dataset.phone || '';
+
+          const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoExibicao);
+          abrirModalPIX(
+            brcode,
+            valorFinal,
+            mesesInfo,
+            tipoExibicao,
+            await getNameFromScript(merchantId),
+            merchantId,
+            fotoPerfilUrl,
+            phoneCliente,
+            tipoBaseVig,
+            livreInfo
+          );
+
+          return;
+        }
+      });
+    });
 
 
 
@@ -2130,82 +2118,82 @@ abrirModalTipoCobranca(totalMensal, async (res) => {
         // se quiser, pode até deixar assim explicitamente:
         fim.setMonth(fim.getMonth());
       }
-let vigenciaHtml = '';
+      let vigenciaHtml = '';
 
-// 🔹 só gera vigência se NÃO for avulso
-if (tipoBaseSan === 'MENSAL' || tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === 'ANUAL') {
+      // 🔹 só gera vigência se NÃO for avulso
+      if (tipoBaseSan === 'MENSAL' || tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === 'ANUAL') {
 
-  const hoje = new Date();
-  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-  const fim = new Date(inicio);
+        const hoje = new Date();
+        const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        const fim = new Date(inicio);
 
-  if (tipoBaseSan === 'ANUAL') {
-    fim.setFullYear(fim.getFullYear() + 1);
-  } else if (tipoBaseSan === 'SEMESTRAL') {
-    fim.setMonth(fim.getMonth() + 5);
-  } else {
-    fim.setMonth(fim.getMonth());
-  }
+        if (tipoBaseSan === 'ANUAL') {
+          fim.setFullYear(fim.getFullYear() + 1);
+        } else if (tipoBaseSan === 'SEMESTRAL') {
+          fim.setMonth(fim.getMonth() + 5);
+        } else {
+          fim.setMonth(fim.getMonth());
+        }
 
-  if (tipoBaseSan === 'MENSAL') {
-    vigenciaHtml = `
+        if (tipoBaseSan === 'MENSAL') {
+          vigenciaHtml = `
       <div style="margin-top:4px;">
         <strong>Vigência:</strong> ${formatMesAnoPt(inicio)}
       </div>
     `;
-  } else {
-    vigenciaHtml = `
+        } else {
+          vigenciaHtml = `
       <div style="margin-top:4px;">
         <strong>Vigência:</strong> ${formatMesAnoPt(inicio)} a ${formatMesAnoPt(fim)}
       </div>
     `;
-  }
-}
+        }
+      }
 
-// 👉 se for AVULSO, vigenciaHtml fica vazio e NÃO aparece nada
-const phoneClean = (phoneCliente || '').toString().trim();
+      // 👉 se for AVULSO, vigenciaHtml fica vazio e NÃO aparece nada
+      const phoneClean = (phoneCliente || '').toString().trim();
       const phoneHtml = phoneClean ? `` : '';
 
-     let detalheMesesHtml = '';
+      let detalheMesesHtml = '';
 
-// 🔹 Plano normal
-if (tipoBaseSan === 'MENSAL') {
-  detalheMesesHtml = `
+      // 🔹 Plano normal
+      if (tipoBaseSan === 'MENSAL') {
+        detalheMesesHtml = `
     <div style="margin-top:4px;">
       <strong>Referente a:</strong> ${mesesTexto}
     </div>
   `;
-}
+      }
 
-// 🔹 Semestral / Anual
-else if (tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === 'ANUAL') {
-  detalheMesesHtml = `
+      // 🔹 Semestral / Anual
+      else if (tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === 'ANUAL') {
+        detalheMesesHtml = `
     <div style="margin-top:4px;">
       <strong>Referente a:</strong> Plano ${tipoBaseSan.toLowerCase()}
     </div>
   `;
-}
+      }
 
-// 🔹 VALOR LIVRE – AVULSO
-else if (livreInfo && livreInfo.modo === 'FINAL') {
-  detalheMesesHtml = `
+      // 🔹 VALOR LIVRE – AVULSO
+      else if (livreInfo && livreInfo.modo === 'FINAL') {
+        detalheMesesHtml = `
     <div style="margin-top:4px;">
       <strong>Referente a:</strong> ${escapeHtml(livreInfo.ref)}
     </div>
   `;
-}
+      }
 
 
-// 🔹 detalhes do valor livre (extra ou avulso), aparece no cartão e no WhatsApp
-let livreHtml = '';
-if (livreInfo && typeof livreInfo === 'object') {
-  const ref = (livreInfo.ref || '').toString().trim();
-  if (livreInfo.modo === 'EXTRA') {
-    const baseTipo = (livreInfo.baseTipo || tipoBaseSan || '').toString().toUpperCase();
-    const baseValor = Number(livreInfo.baseValor || 0);
-    const vLivre = Number(livreInfo.valorLivre || 0);
+      // 🔹 detalhes do valor livre (extra ou avulso), aparece no cartão e no WhatsApp
+      let livreHtml = '';
+      if (livreInfo && typeof livreInfo === 'object') {
+        const ref = (livreInfo.ref || '').toString().trim();
+        if (livreInfo.modo === 'EXTRA') {
+          const baseTipo = (livreInfo.baseTipo || tipoBaseSan || '').toString().toUpperCase();
+          const baseValor = Number(livreInfo.baseValor || 0);
+          const vLivre = Number(livreInfo.valorLivre || 0);
 
-    livreHtml = `
+          livreHtml = `
       <div style="margin-top:6px; padding:10px; border:1px dashed rgba(93,212,255,.35); border-radius:12px; background:rgba(93,212,255,.06);">
         <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#bfcbd7;">
           Ajuste • Extra
@@ -2221,14 +2209,14 @@ if (livreInfo && typeof livreInfo === 'object') {
         </div>
       </div>
     `;
-  } else {
-    // modo FINAL (avulso): não exibe bloco extra no cartão
-    livreHtml = '';
-  }
+        } else {
+          // modo FINAL (avulso): não exibe bloco extra no cartão
+          livreHtml = '';
+        }
 
-}
+      }
 
-// monta cartão premium
+      // monta cartão premium
       modal.innerHTML = `
     <div class="modal-box">
       <h3>QR Code PIX</h3>
@@ -2468,7 +2456,7 @@ if (livreInfo && typeof livreInfo === 'object') {
         if (!numero.startsWith('55')) numero = '55' + numero;
 
         // 4) monta a mensagem do WhatsApp
-                // 4) monta a mensagem do WhatsApp
+        // 4) monta a mensagem do WhatsApp
         let livreTxt = '';
         if (livreInfo && typeof livreInfo === 'object') {
           const ref = (livreInfo.ref || '').toString().trim();
