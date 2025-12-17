@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Pagamentos 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #11161d;
+      --soft: #182029;
+      --text: #e3e7ee;
+      --muted: #9aa6b2;
+      --brand: #5dd4ff;
+      --ok: #22c55e;
+      --no: #ef4444
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif
+    }
+
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--soft);
+      border-radius: 14px;
+      padding: 14px
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px
+    }
+
+    input,
+    select,
+    button,
+    textarea {
+      font: inherit;
+      color: var(--text)
+    }
+
+    input[type=text],
+    input[type=email],
+    input[type=password],
+    textarea,
+    select {
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+      padding: 8px 10px;
+      outline: none
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--muted)
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: var(--brand);
+      color: #061018;
+      font-weight: 700;
+      padding: 8px 12px;
+      cursor: pointer
+    }
+
+    button[disabled] {
+      opacity: .6;
+      cursor: not-allowed
+    }
+
+    .table-wrap {
+      background: var(--panel);
+      border: 1px solid var(--soft);
+      border-radius: 14px;
+      overflow-x: hidden;
+      /* <— mantém a barra geral oculta */
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+      min-width: 0;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(#121923, #0e141c);
+      border-bottom: 1px solid var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      padding: 10px 8px;
+      text-align: left
+    }
+
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #121921
+    }
+
+    tbody tr:hover {
+      background: #0f151d
+    }
+
+    .idx {
+      width: 46px;
+      text-align: center
+    }
+
+    .cat {
+      width: 160px;
+    }
+
+    /* mantém a largura da coluna de status */
+    .status-chip.is-ok {
+      border-color: rgba(34, 197, 94, .35);
+    }
+
+    .status-chip.is-no {
+      border-color: rgba(239, 68, 68, .35);
+    }
+
+    .nome {
+      min-width: 240px;
+      font-weight: 600
+    }
+
+    .payer {
+      min-width: 200px
+    }
+
+    .obs {
+      min-width: 260px
+    }
+
+    .month {
+      width: 82px;
+      text-align: center
+    }
+
+    .acao {
+      width: 160px;
+      text-align: center;
+      position: sticky;
+      right: 0;
+      background: linear-gradient(90deg, #0f151d, #0e141c)
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%
+    }
+
+    .dot-ok {
+      background: var(--ok)
+    }
+
+    .dot-no {
+      background: var(--no)
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .sr-only {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden
+    }
+  </style>
+
+  <style>
+    /* === meses com scroll por linha === */
+    .months {
+      width: 520px;
+      /* ajuste se quiser mais/menos visível */
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    .months-scroll {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      max-width: 100%;
+      /* <--- respeita a largura da célula */
+      overflow-x: auto;
+      /* <--- barra por linha */
+      overflow-y: hidden;
+      padding: 6px 8px 8px;
+      /* espaço pra barra aparecer */
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .mchip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    .mchip input {
+      transform: translateY(1px);
+    }
+
+    /* linha com scroll próprio */
+    .rowwrap {
+      padding: 0 !important;
+    }
+
+    .row-scroll {
+      position: relative;
+      /* necessário p/ sticky funcionar */
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      /* <— único scroll por cliente */
+      padding: 10px;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+    }
+
+    /* “sub-células” dentro do carrossel */
+    .rcell {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rcell.status {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      /* <— fixa o status */
+      min-width: 160px;
+      flex: 0 0 160px;
+      /* largura fixa */
+      background: #0f141b;
+      /* cor de fundo p/ cobrir atrás */
+      box-shadow: 10px 0 12px -10px rgba(0, 0, 0, .6);
+      /* leve sombreado na borda */
+      border-right: 1px solid var(--soft);
+      min-width: 160px
+    }
+
+    .rcell.nome {
+      min-width: 260px
+    }
+
+    .rcell.payer {
+      min-width: 340px
+    }
+
+    .rcell.obs {
+      min-width: 300px
+    }
+
+    .rcell.meses {
+      min-width: 560px
+    }
+
+    .rcell.acao {
+      min-width: 160px;
+      align-items: center;
+      justify-content: center
+    }
+
+    /* reaproveita seus chips de mês dentro do carrossel */
+    .row-scroll .months-scroll {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      overflow: visible;
+      /* <— sem scroll aqui */
+      padding: 6px 6px 8px;
+      -webkit-overflow-scrolling: auto;
+      background: #0c1218;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+    }
+
+    /* Botão “Atualizar” fixo dentro do bloco Status */
+    .rcell.status .btn-save-sticky {
+      margin-top: 8px;
+      width: 100%;
+      white-space: nowrap;
+      position: sticky;
+      /* gruda junto com o próprio bloco que já é sticky */
+      left: 0;
+      /* acompanha o status à esquerda */
+      z-index: 3;
+    }
+
+    /* ===== MOBILE TWEAKS ===== */
+    @media (max-width: 768px) {
+      .wrap {
+        padding: 10px
+      }
+
+      /* Permite rolar lateralmente toda a tabela */
+      .table-wrap {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        padding-bottom: 10px;
+      }
+
+      /* Força a tabela a ocupar largura total e liberar scroll */
+      table {
+        display: block;
+        width: max-content;
+        /* ocupa só o necessário */
+        min-width: 1000px;
+        /* largura mínima útil */
+      }
+
+      /* Cada linha agora herda o scroll do container */
+      .row-scroll {
+        flex-wrap: nowrap;
+        overflow: visible;
+        /* desativa scroll individual */
+        min-width: auto;
+      }
+
+      /* Colunas mais compactas */
+      .rcell.status {
+        min-width: 120px;
+        flex: 0 0 120px
+      }
+
+      .rcell.nome {
+        min-width: 180px
+      }
+
+      .rcell.payer {
+        min-width: 180px
+      }
+
+      .rcell.obs {
+        min-width: 220px
+      }
+
+      .rcell.meses {
+        min-width: 520px
+      }
+
+      .rcell.acao {
+        min-width: 120px
+      }
+
+      /* Chips menores e mais próximos */
+      .mchip {
+        padding: 4px 6px;
+        font-size: 11px;
+        gap: 5px
+      }
+
+      .months-scroll {
+        gap: 6px;
+        padding: 5px 5px 7px
+      }
+
+      /* Deixa rótulos e botões mais leves */
+      .label.muted {
+        font-size: 10px
+      }
+
+      .btn-save-sticky {
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+    }
+
+
+    .status-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+    }
+
+    .status-header .cliente-nome {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-save-sticky {
+      background: var(--brand);
+      color: #061018;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 9px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-save-sticky:hover {
+      background: #79ddff;
+    }
+
+    @media (max-width: 768px) {
+      .status-header {
+        flex-direction: row;
+        gap: 6px;
+        padding: 6px 8px;
+      }
+
+      .status-header .cliente-nome {
+        font-size: 12px;
+        max-width: 140px;
+      }
+
+      .btn-save-sticky {
+        font-size: 16px;
+        padding: 4px 6px;
+      }
+    }
+
+    /* bloco status reformulado */
+    .status-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .cliente-nome {
+      font-weight: 700;
+      font-size: 15px;
+      /* maior e legível */
+      line-height: 1.2;
+      color: var(--text);
+      white-space: normal;
+      /* permite 2 linhas no mobile */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      /* no mobile pode quebrar */
+      background: #0f141b;
+      border: 1px solid var(--soft);
+      border-radius: 10px;
+      padding: 6px 8px;
+    }
+
+    .btn-icon {
+      background: var(--brand);
+      color: #061018;
+      border: 0;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 16px;
+      /* ícone maior */
+      cursor: pointer;
+    }
+
+    .btn-icon:hover {
+      background: #79ddff;
+    }
+
+    /* dá um pouco mais de largura pro status “grudar” melhor o conteúdo */
+    .rcell.status {
+      min-width: 190px;
+      flex: 0 0 190px;
+    }
+
+    /* MOBILE */
+    @media (max-width:768px) {
+      .rcell.status {
+        min-width: 180px;
+        flex: 0 0 180px;
+      }
+
+      .cliente-nome {
+        font-size: 14px;
+        -webkit-line-clamp: 2;
+      }
+
+      .status-row {
+        gap: 8px;
+        padding: 6px;
+      }
+
+      .btn-icon {
+        font-size: 18px;
+        padding: 6px 8px;
+      }
+    }
+
+    .modal-pix {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .modal-box {
+      background: #11161d;
+      padding: 6px;
+      border-radius: 14px;
+      width: 350px;
+      text-align: center;
+      border: 1px solid #182029;
+    }
+
+    .pix-line {
+      background: #0f141b;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      word-break: break-all;
+      margin-top: 10px;
+    }
+
+    .btn-close {
+      margin-top: 12px;
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-copy {
+      margin-top: 8px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div style="display:flex; align-items:center; gap:12px">
+        <h1>📒 Pagamentos</h1>
+        <span class="chip"><span class="status-dot dot-ok"></span> Pago</span>
+        <span class="chip"><span class="status-dot dot-no"></span> Em aberto</span>
+      </div>
+      <div class="chip" id="userBox" style="display:none">
+        <span id="userEmail">—</span>
+        <button id="btnLogout">Sair</button>
+      </div>
+    </header>
+
+    <!-- LOGIN -->
+    <section id="viewLogin" class="card" style="max-width:380px; margin:10vh auto">
+      <h2 style="margin:0 0 12px; font-size:18px">Entrar</h2>
+      <div style="display:grid; gap:10px">
+        <input id="email" type="email" placeholder="Seu e-mail" autocomplete="username" />
+        <input id="senha" type="password" placeholder="Sua senha" autocomplete="current-password" />
+        <button id="btnLogin">Entrar</button>
+        <div class="muted">Crie usuários no Firebase Auth → Users.</div>
+        <div id="loginMsg" class="muted"></div>
+      </div>
+    </section>
+
+    <!-- PAINEL -->
+    <section id="viewPainel" style="display:none">
+      <div class="toolbar">
+        <div class="card">
+          <label for="ano">Ano:&nbsp;</label>
+          <select id="ano"></select>
+        </div>
+        <div class="card"><input id="filtro" type="text" placeholder="Pesquisar por nome ou categoria…" /></div>
+        <div class="card"><button id="btnSync">Sincronizar com script.js</button></div>
+        <div class="card"><button id="btnCSV">Exportar CSV</button></div>
+        <div class="card">
+          <button id="btnToggleInativos">Ver inativos</button>
+        </div>
+        <div class="card muted" id="sumario">—</div>
+      </div>
+
+
+
+      <!-- LOADER -->
+      <div id="loaderBox" class="card" style="margin-bottom:12px; display:none">
+        <div style="display:flex; align-items:center; gap:12px">
+          <div style="flex:1">
+            <div class="muted" id="loaderText">Carregando…</div>
+            <div style="height:8px; background:#0f141b; border-radius:6px; overflow:hidden; margin-top:6px">
+              <div id="loaderBar" style="height:100%; width:0%; background:var(--brand); transition:width .2s">
+              </div>
+            </div>
+          </div>
+          <div id="loaderPct" class="muted">0%</div>
+        </div>
+      </div>
+
+
+
+
+
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="idx">#</th>
+              <th>RECEBIMENTO</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Loader: baixa /script.js e extrai apenas const statusEstabelecimentos = { ... } -->
+  <script>
+    window.__STATUS__ = null;
+
+    async function loadStatusFromMainScript() {
+      try {
+        const res = await fetch('/script.js', { cache: 'no-store' });
+        const code = await res.text();
+
+        // 1) Captura SOMENTE o objeto (sem o ;)
+        //    Ex.: const statusEstabelecimentos = { ... };
+        const m = code.match(/const\s+statusEstabelecimentos\s*=\s*(\{[\s\S]*?\});?/m);
+        if (!m || !m[1]) {
+          console.warn('statusEstabelecimentos não encontrado no script.js');
+          return null;
+        }
+
+        // 2) Só o literal do objeto
+        let objCode = m[1];
+
+        // 3) (robusto) Remove vírgula à direita antes de fechar bloco, caso exista em alguma linha
+        //    (não deveria quebrar em JS moderno, mas deixa compatível)
+        objCode = objCode.replace(/,(\s*[}\]])/g, '$1');
+
+        // 4) Avalia só o objeto
+        const obj = (new Function('return (' + objCode + ')'))();
+
+        // 5) Armazena em cache global
+        window.__STATUS__ = obj;
+        return obj;
+      } catch (e) {
+        console.error('Falha ao ler statusEstabelecimentos do script.js', e);
+        return null;
+      }
+    }
+  </script>
+
+  <script>
+    async function loadAllowedKeysFromScript() {
+      const res = await fetch('/script.js', { cache: 'no-store' });
+      const code = await res.text();
+
+      // 1) BLOCO COMÉRCIOS: do começo até "// FIM COMERCIOS"
+      const ateFimComercios = code.split('// FIM COMERCIOS')[0] || '';
+
+      // 2) BLOCO SERVIÇOS: entre "// INICIO SERVIÇOS" e "/// INICIO SETOR PUBLICO"
+      let blocoServ = '';
+      const iniServ = code.indexOf('// INICIO SERVIÇOS');
+      const iniSetorPublico = code.indexOf('/// INICIO SETOR PUBLICO');
+      if (iniServ !== -1 && iniSetorPublico !== -1 && iniSetorPublico > iniServ) {
+        blocoServ = code.slice(iniServ, iniSetorPublico);
+      }
+
+      // 3) extrai chaves no formato:  nome: "s"  |  nome: "n"
+      const rx = /\b([a-z0-9_]+)\s*:\s*"(?:s|n)"/gi;
+      const allow = new Set();
+      for (const m of ateFimComercios.matchAll(rx)) allow.add(m[1]);
+      for (const m of blocoServ.matchAll(rx)) allow.add(m[1]);
+
+      return allow;
+    }
+  </script>
+
+
+
+  <script>
+
+    window.__PROFILE_MAP__ = null;
+
+    function normalizeNameLocal(str) {
+      return String(str || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')     // remove acentos
+        .replace(/\s+/g, '-')                // espaços -> hífen
+        .replace(/[^a-z0-9\-]/g, '');        // só letras/números/hífen
+    }
+
+    async function loadProfileMapFromScript() {
+      if (window.__PROFILE_MAP__) return window.__PROFILE_MAP__;
+
+      try {
+        const res = await fetch('/script.js', { cache: 'no-store' });
+        const code = await res.text();
+
+        // pega só o array categories = [ ... ];
+        const m = code.match(/const\s+categories\s*=\s*(\[[\s\S]*?\]);/m);
+        if (!m || !m[1]) {
+          console.warn('categories não encontrado em script.js');
+          window.__PROFILE_MAP__ = {
+            byId: {}, byNoHyphen: {}, phonesById: {}, phonesByNoHyphen: {}, namesById: {},
+            namesByNoHyphen: {}
+          };
+          return window.__PROFILE_MAP__;
+        }
+
+        let arrCode = m[1];
+
+        // remove vírgulas sobrando antes de ] ou }
+        arrCode = arrCode.replace(/,(\s*[}\]])/g, '$1');
+
+        const categories = (new Function('return (' + arrCode + ')'))();
+
+        const byId = {};
+        const byNoHyphen = {};
+        const phonesById = {};
+        const phonesByNoHyphen = {};
+        const namesById = {};
+        const namesByNoHyphen = {};
+
+        (categories || []).forEach(cat => {
+          (cat.establishments || []).forEach(est => {
+            // id "bonito" com hífen
+            const idNorm =
+              est.nomeNormalizado ||
+              normalizeNameLocal(est.name || '');
+
+            if (!idNorm) return;
+
+            // FOTO
+            let img = est.image;
+            if (!img && Array.isArray(est.novidadesImages) && est.novidadesImages.length) {
+              img = est.novidadesImages[0];
+            }
+            if (img) {
+              byId[idNorm] = img;
+              const semHifen = idNorm.replace(/-/g, '');
+              byNoHyphen[semHifen] = img;
+            }
+
+            // NOME REAL DO CLIENTE / ESTABELECIMENTO
+            if (est.name) {
+              namesById[idNorm] = est.name;
+              namesByNoHyphen[idNorm.replace(/-/g, '')] = est.name;
+            }
+
+
+            // TELEFONE (pega qualquer um dos campos que você usa no site)
+            const phone =
+              est.whatsapp ||
+              est.telefone ||
+              est.celular ||
+              est.contact ||
+              est.phone ||
+              '';
+
+            if (phone) {
+              phonesById[idNorm] = phone;
+              const semHifen = idNorm.replace(/-/g, '');
+              phonesByNoHyphen[semHifen] = phone;
+            }
+          });
+        });
+
+        window.__PROFILE_MAP__ = {
+          byId, byNoHyphen, phonesById, phonesByNoHyphen, namesById,
+          namesByNoHyphen
+        };
+        return window.__PROFILE_MAP__;
+      } catch (e) {
+        console.error('Falha ao montar PROFILE_MAP a partir de script.js', e);
+        window.__PROFILE_MAP__ = {
+          byId: {}, byNoHyphen: {}, phonesById: {}, phonesByNoHyphen: {}, namesById: {},
+          namesByNoHyphen: {}
+        };
+        return window.__PROFILE_MAP__;
+      }
+    }
+
+
+    async function getProfileUrlFromScript(merchantId) {
+      if (!merchantId) return '';
+
+      const maps = await loadProfileMapFromScript();
+      const byId = maps.byId || {};
+      const byNoHyphen = maps.byNoHyphen || {};
+
+      const raw = String(merchantId || '').toLowerCase();
+
+      // variações do mesmo id
+      const rawDash = raw.replace(/_/g, '-');          // lobo_fitness -> lobo-fitness
+      const norm = normalizeNameLocal(raw);        // usa o mesmo padrão do script.js
+      const normDash = normalizeNameLocal(rawDash);
+
+      const rawLetters = raw.replace(/[^a-z0-9]/g, '');   // tira _ - etc
+      const normLetters = norm.replace(/[^a-z0-9]/g, '');
+
+      const found =
+        byId[raw] ||
+        byId[rawDash] ||
+        byId[norm] ||
+        byId[normDash] ||
+        byNoHyphen[rawLetters] ||
+        byNoHyphen[normLetters] ||
+        '';
+
+      console.log('[PIX] fotoPerfilUrl', { merchantId, raw, norm, found });
+
+      return found;
+    }
+
+    async function getPhoneFromScript(merchantId) {
+      if (!merchantId) return '';
+
+      const maps = await loadProfileMapFromScript();
+      const phonesById = maps.phonesById || {};
+      const phonesByNoHyphen = maps.phonesByNoHyphen || {};
+
+      const raw = String(merchantId || '').toLowerCase();
+
+      const rawDash = raw.replace(/_/g, '-');
+      const norm = normalizeNameLocal(raw);
+      const normDash = normalizeNameLocal(rawDash);
+
+      const rawLetters = raw.replace(/[^a-z0-9]/g, '');
+      const normLetters = norm.replace(/[^a-z0-9]/g, '');
+
+      const found =
+        phonesById[raw] ||
+        phonesById[rawDash] ||
+        phonesById[norm] ||
+        phonesById[normDash] ||
+        phonesByNoHyphen[rawLetters] ||
+        phonesByNoHyphen[normLetters] ||
+        '';
+
+      console.log('[PIX] phoneCliente', { merchantId, raw, norm, found });
+
+      return found;
+    }
+
+    async function getNameFromScript(merchantId) {
+      if (!merchantId) return '';
+
+      const maps = await loadProfileMapFromScript();
+      const raw = merchantId.toLowerCase();
+
+      const variations = [
+        raw,
+        raw.replace(/_/g, '-'),
+        normalizeNameLocal(raw),
+        normalizeNameLocal(raw.replace(/_/g, '-')),
+        raw.replace(/[^a-z0-9]/g, ''),
+        normalizeNameLocal(raw).replace(/[^a-z0-9]/g, '')
+      ];
+
+      for (const key of variations) {
+        if (maps.namesById[key]) return maps.namesById[key];
+        if (maps.namesByNoHyphen[key]) return maps.namesByNoHyphen[key];
+      }
+
+      return '';
+    }
+
+
+
+
+  </script>
+
+
+
+  <!-- Firebase + App -->
+  <script type="module">
+    // ==== SUA CONFIG DO FIREBASE (já colada por você) ====
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+      authDomain: "contadoracessos.firebaseapp.com",
+      databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+      projectId: "contadoracessos",
+      storageBucket: "contadoracessos.firebasestorage.app",
+      messagingSenderId: "521517291315",
+      appId: "1:521517291315:web:74f8d878d2d8769460d046",
+      measurementId: "G-BXPWYWK61F"
+    };
+
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    // Init
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ===== ELEMENTOS =====
+    const viewLogin = document.getElementById('viewLogin');
+    const viewPainel = document.getElementById('viewPainel');
+    const email = document.getElementById('email');
+    const senha = document.getElementById('senha');
+    const btnLogin = document.getElementById('btnLogin');
+    const loginMsg = document.getElementById('loginMsg');
+    const userBox = document.getElementById('userBox');
+    const userEmail = document.getElementById('userEmail');
+    const btnLogout = document.getElementById('btnLogout');
+    const selAno = document.getElementById('ano');
+    const filtro = document.getElementById('filtro');
+    const tbody = document.getElementById('tbody');
+    const btnCSV = document.getElementById('btnCSV');
+    const btnSync = document.getElementById('btnSync');
+    const sumario = document.getElementById('sumario');
+    const mesesKeys = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+    const btnToggleInativos = document.getElementById('btnToggleInativos');
+    window.__SHOW_INATIVOS__ = false;
+    window.__LOADSEQ__ = 0; // ✅ evita misturar renders antigos
+
+
+    // ===== LOGIN =====
+    btnLogin.addEventListener('click', async () => {
+      btnLogin.disabled = true; loginMsg.textContent = 'Entrando…';
+      try {
+        await signInWithEmailAndPassword(auth, email.value.trim(), senha.value.trim());
+        loginMsg.textContent = '';
+      } catch (e) {
+        loginMsg.textContent = 'Falha ao entrar: ' + (e.code || e.message);
+      } finally { btnLogin.disabled = false; }
+    });
+    btnLogout.addEventListener('click', () => signOut(auth));
+
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        userBox.style.display = 'inline-flex';
+        userEmail.textContent = user.email || 'Usuário';
+        viewLogin.style.display = 'none';
+        viewPainel.style.display = '';
+        await initPainel();
+      } else {
+        userBox.style.display = 'none';
+        viewLogin.style.display = '';
+        viewPainel.style.display = 'none';
+      }
+    });
+
+    // ===== MODELO =====
+    // merchants/{id} => { name, category, sort }
+    // recebimentos/{year}/{merchantId} => { pagadorPadrao, observacao, meses: {"01": {pago, updatedAt, by}, ...} }
+
+    async function initPainel() {
+      const yNow = new Date().getFullYear();
+      selAno.innerHTML = '';
+      [yNow - 1, yNow, yNow + 1].forEach(y => {
+        const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === yNow) o.selected = true; selAno.appendChild(o);
+      });
+      selAno.onchange = loadTabela;
+     filtro.oninput = applyViewAndFilter;  // em vez de applyFilter
+      btnCSV.onclick = exportCSV;
+      //
+      //
+      //
+      //
+      //
+      //
+     btnToggleInativos.onclick = () => {
+  window.__SHOW_INATIVOS__ = !window.__SHOW_INATIVOS__;
+  btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
+  applyViewAndFilter(); // só alterna a visualização (sem recarregar)
+};
+
+
+
+      // <-- NOVO: guarda globalmente
+      window.__ALLOWED__ = await loadAllowedKeysFromScript();
+
+      btnSync.onclick = () => doSyncFromScript(window.__ALLOWED__);
+
+      await doSyncFromScript(window.__ALLOWED__); // auto-sync ao abrir
+      await loadTabela();
+    }
+
+
+    function getComerciosFromStatus(map, allowedSet) {
+      const out = []; let i = 0;
+      for (const [id, val] of Object.entries(map || {})) {
+        if (allowedSet && !allowedSet.has(id)) continue;  // <-- filtro
+        i++;
+        out.push({
+          id,
+          name: id,
+          category: (val === "s" ? "Pago" : "Em aberto"),
+          sort: i
+        });
+      }
+      return out;
+    }
+
+
+    async function doSyncFromScript(allowed) {
+      const status = window.__STATUS__ || await loadStatusFromMainScript();
+      if (!status) { alert('statusEstabelecimentos não encontrado (veja Console).'); return; }
+
+      const allowedSet = allowed || window.__ALLOWED__ || await loadAllowedKeysFromScript();
+      const locals = getComerciosFromStatus(status, allowedSet);
+
+      const qMer = query(collection(db, 'merchants'), orderBy('sort'));
+      const snap = await getDocs(qMer);
+      const remote = new Map(snap.docs.map(d => [d.id, { id: d.id, ...d.data() }]));
+
+      let created = 0, updated = 0;
+      for (const m of locals) {
+        const ref = doc(db, 'merchants', m.id);
+        const has = remote.get(m.id);
+        if (!has) { await setDoc(ref, m); created++; }
+        else {
+          const need = (has.name !== m.name) || (has.category !== m.category) || (has.sort !== m.sort);
+          if (need) { await updateDoc(ref, m); updated++; }
+        }
+      }
+      alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
+    }
+
+
+
+    // ===== FIRESTORE HELPERS =====
+    async function loadMerchants() {
+      const q = query(collection(db, 'merchants'), orderBy('sort'));
+      const snap = await getDocs(q);
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+    // caminho: recebimentos/{ANO}/itens/{merchantId}
+    function recebCol(year) {
+      return collection(db, 'recebimentos', String(year), 'itens');
+    }
+    async function readReceb(year, merchantId) {
+      const dref = doc(recebCol(year), merchantId);
+      const d = await getDoc(dref);
+      return d.exists() ? d.data() : {};
+    }
+    async function saveReceb(year, merchantId, payload) {
+      const dref = doc(recebCol(year), merchantId);
+      await setDoc(dref, payload, { merge: true });
+    }
+
+
+
+
+    function getCurrentMonthKey() {
+      const m = new Date().getMonth() + 1; // 1..12
+      return String(m).padStart(2, '0');     // "01".."12"
+    }
+    function computeStatusForRow(mesesData) {
+      const cur = getCurrentMonthKey();
+      return !!(mesesData?.[cur]?.pago);
+    }
+    function renderStatusChip(isPaid) {
+      return `
+    <span class="chip status-chip ${isPaid ? 'is-ok' : 'is-no'}">
+      <span class="status-dot ${isPaid ? 'dot-ok' : 'dot-no'}"></span>
+      ${isPaid ? 'Pago' : 'Pendente'}
+    </span>
+  `;
+    }
+    function updateRowStatusFromCheckboxes(tr) {
+      const cur = getCurrentMonthKey();
+      const chkCur = tr.querySelector(`.months .chk[data-mm="${cur}"]`);
+      const isPaid = !!(chkCur && chkCur.checked);
+      const hold = tr.querySelector('.status-holder');
+      if (hold) hold.innerHTML = renderStatusChip(isPaid);
+    }
+
+
+
+
+    // ===== TABELA =====
+    async function loadTabela() {
+      tbody.innerHTML = '';
+      const loaderBox = document.getElementById('loaderBox');
+      const loaderBar = document.getElementById('loaderBar');
+      const loaderText = document.getElementById('loaderText');
+      const loaderPct = document.getElementById('loaderPct');
+
+      loaderBox.style.display = '';
+      loaderBar.style.width = '0%';
+      loaderPct.textContent = '0%';
+      loaderText.textContent = 'Carregando clientes…';
+
+      const year = selAno.value;
+      const mySeq = ++window.__LOADSEQ__; // ✅ esta chamada é a "mais nova"
+
+      const allowed = window.__ALLOWED__ || await loadAllowedKeysFromScript();
+      if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
+
+
+
+
+      const merchantsAll = await loadMerchants();
+      if (mySeq !== window.__LOADSEQ__) return; // ✅
+      const merchants = allowed ? merchantsAll.filter(m => allowed.has(m.id)) : merchantsAll;
+      const total = merchants.length;
+      let carregados = 0;
+
+      // ✅ ordena por nome (A-Z). Se não tiver name, usa o id
+      merchants.sort((a, b) => {
+        const an = (a.name || a.id || '').toString().localeCompare(
+          (b.name || b.id || '').toString(),
+          'pt-BR',
+          { sensitivity: 'base' }
+        );
+        return an;
+      });
+
+
+
+
+      let i = 0; let totalPagos = 0, totalMeses = 0;
+      let totalClientesAtivos = 0;
+let pagosMesAtual = 0;
+      for (const m of merchants) {
+        if (mySeq !== window.__LOADSEQ__) return; // ✅ se clicou de novo, para aqui
+        const isInativo = (m.ativo === false);
+
+        // ✅ MODO EXCLUSIVO:
+        // - __SHOW_INATIVOS__ = false  => mostra só ATIVOS
+        // - __SHOW_INATIVOS__ = true   => mostra só INATIVOS
+       
+
+
+        i++;
+        const dados = await readReceb(year, m.id);
+        if (mySeq !== window.__LOADSEQ__) return; // ✅
+        const mesesData = dados.meses || {};
+        const tr = document.createElement('tr');
+        tr.dataset.id = m.id;
+        tr.dataset.inativo = isInativo ? 'true' : 'false';
+        tr.style.opacity = isInativo ? '0.45' : '1';
+
+
+        // Busca telefone diretamente do script.js (mesma lógica da imagem)
+        const phoneFromMerchant = await getPhoneFromScript(m.id);
+        if (mySeq !== window.__LOADSEQ__) return; // ✅
+        tr.dataset.phone = (phoneFromMerchant || '').toString();
+
+
+
+        // antes de montar tr.innerHTML
+        const monthsHtml = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"].map((mm, idx) => {
+          const pago = !!(mesesData[mm]?.pago);
+          if (!isInativo) {
+            if (pago) totalPagos++;
+            totalMeses++;
+          }
+          const label = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][idx];
+          return `<label class="mchip">
+            <input type="checkbox" class="chk" data-mm="${mm}" ${pago ? 'checked' : ''}/>
+         <span translate="no">${label}</span>
+
+          </label>`;
+        }).join('');
+        const isPaidNow = computeStatusForRow(mesesData);
+        // conta só clientes ATIVOS (os inativos não entram na cobrança)
+if (!isInativo) {
+  totalClientesAtivos++;
+  if (isPaidNow) pagosMesAtual++;
+}
+
+
+
+
+
+        tr.innerHTML = `
+  <td class="idx">${i}</td>
+  <td class="rowwrap">
+    <div class="row-scroll">
+
+
+     <div class="rcell status">
+  <div class="status-title">
+    <span class="cliente-nome" title="${escapeHtml(m.name || m.id)}">
+      ${escapeHtml(m.name || m.id)}
+    </span>
+    <!-- mantém compatível com o filtro -->
+    <span class="sr-only nome-holder">${escapeHtml(m.name || m.id)}</span>
+  </div>
+<div class="status-row">
+  <div class="status-holder">${renderStatusChip(isPaidNow)}</div>
+
+  <button class="btn-toggle-ativo btn-icon"
+    title="Ativar / Inativar cliente"
+    data-ativo="${m.ativo !== false}">
+    ${m.ativo === false ? '🚫' : '🟢'}
+  </button>
+
+
+  <button class="btn-save btn-icon" title="Salvar alterações">💾</button>
+  <button class="btn-icon btn-pix" title="Gerar QR Code PIX">🔗</button>
+</div>
+
+</div>
+
+
+
+
+      <div class="rcell payer">
+        <div class="label muted">Pagador</div>
+        <input type="text" class="inp-nome" value="${escapeHtml(dados.pagadorPadrao || '')}" placeholder="ex.: Nome" />
+      </div>
+
+      <div class="rcell obs">
+        <div class="label muted">Observações</div>
+        <textarea class="inp-obs" placeholder="-">${escapeHtml(dados.observacao || '')}</textarea>
+      </div>
+
+      <div class="rcell meses">
+        <div class="label muted">Meses - <button class="btn-allmonths btn-icon" title="Marcar todos os meses como pago">✅12</button></div>
+        <div class="months"><div class="months-scroll">${monthsHtml}</div></div>
+      </div>
+    </div>
+  </td>`;
+
+
+
+
+
+        tbody.appendChild(tr);
+
+        // sempre que marcar/desmarcar um mês, recalcula o status da linha
+        tr.querySelector('.months').addEventListener('change', (e) => {
+          if (!e.target.matches('.chk')) return;
+          // só precisa reavaliar quando o mês alterado é o mês atual
+          const cur = getCurrentMonthKey();
+          if (e.target.getAttribute('data-mm') === cur) {
+            updateRowStatusFromCheckboxes(tr);
+          }
+        });
+        carregados++;
+
+        const pct = Math.round((carregados / total) * 100);
+        loaderBar.style.width = pct + '%';
+        loaderPct.textContent = pct + '%';
+        loaderText.textContent = `Carregando ${carregados} de ${total} clientes…`;
+
+      }
+      if (mySeq !== window.__LOADSEQ__) return; // ✅
+     const faltamMesAtual = Math.max(0, totalClientesAtivos - pagosMesAtual);
+updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual);
+      applyViewAndFilter();
+
+
+      loaderText.textContent = 'Concluído';
+      loaderBar.style.width = '100%';
+      loaderPct.textContent = '100%';
+
+      document.querySelectorAll('.row-scroll').forEach(enableDragScroll);
+
+      setTimeout(() => {
+        loaderBox.style.display = 'none';
+      }, 400);
+
+    }
+
+
+
+    function updateSummary(pagosMesAtual, totalClientesAtivos, faltamMesAtual) {
+  const pct = totalClientesAtivos ? Math.round((pagosMesAtual / totalClientesAtivos) * 100) : 0;
+  sumario.textContent = `Pagos (mês): ${pagosMesAtual}/${totalClientesAtivos} (${pct}%) • Faltam: ${faltamMesAtual}`;
+}
+
+
+   function applyViewAndFilter() {
+  const q = filtro.value.trim().toLowerCase();
+
+  let idx = 0;
+  Array.from(tbody.children).forEach(tr => {
+    const isInativo = tr.dataset.inativo === 'true';
+
+    // modo exclusivo
+    const passaModo = window.__SHOW_INATIVOS__ ? isInativo : !isInativo;
+
+    // busca (mantém sua lógica atual)
+    const nome = (tr.querySelector('.nome-holder')?.textContent || '').toLowerCase();
+    const status = (tr.querySelector('.status-holder')?.textContent || '').toLowerCase();
+    const passaBusca = (!q || nome.includes(q) || status.includes(q));
+
+    const show = passaModo && passaBusca;
+    tr.style.display = show ? '' : 'none';
+
+    // renumera só os visíveis
+    if (show) {
+      idx++;
+      const tdIdx = tr.querySelector('td.idx');
+      if (tdIdx) tdIdx.textContent = String(idx);
+    }
+  });
+}
+    // Marcar/Desmarcar todos os meses do cliente (toggle)
+    tbody.addEventListener('click', (ev) => {
+      const btnAll = ev.target.closest('.btn-allmonths');
+      if (!btnAll) return;
+
+      const tr = btnAll.closest('tr');
+      const chks = Array.from(tr.querySelectorAll('.months .chk'));
+      if (!chks.length) return;
+
+      // Se TODOS estiverem marcados -> desmarca tudo. Senão -> marca tudo.
+      const allChecked = chks.every(c => c.checked);
+      chks.forEach(c => { c.checked = !allChecked; });
+
+      // Atualiza o chip do mês atual
+      updateRowStatusFromCheckboxes(tr);
+
+      // Feedback visual no botão
+      btnAll.textContent = allChecked ? '⬜12' : '✅12';
+    });
+
+
+
+    tbody.addEventListener('click', async (ev) => {
+      const btn = ev.target.closest('.btn-save');
+      if (!btn) return;
+      const tr = btn.closest('tr');
+      btn.disabled = true; btn.textContent = 'Salvando…';
+      try {
+        const merchantId = tr.dataset.id;
+        const year = selAno.value;
+        const inpNome = tr.querySelector('.inp-nome');
+        const inpObs = tr.querySelector('.inp-obs');
+        const chks = Array.from(tr.querySelectorAll('.months .chk'));
+        const meses = {};
+        chks.forEach(c => {
+          const mm = c.getAttribute('data-mm'); // "01".."12"
+          meses[mm] = { pago: !!c.checked, updatedAt: serverTimestamp(), by: (auth.currentUser?.uid || null) };
+        });
+
+        await saveReceb(year, merchantId, { pagadorPadrao: inpNome.value.trim(), observacao: inpObs.value.trim(), meses });
+        updateRowStatusFromCheckboxes(tr);
+
+        btn.textContent = '✅';
+        setTimeout(() => btn.textContent = '💾', 1000);
+      } catch (e) { console.error(e); btn.textContent = 'Erro'; setTimeout(() => btn.textContent = 'Atualizar', 1200); }
+      finally { btn.disabled = false }
+    });
+
+    tbody.addEventListener('click', async (ev) => {
+      const btnAtivo = ev.target.closest('.btn-toggle-ativo');
+      if (!btnAtivo) return;
+
+      const tr = btnAtivo.closest('tr');
+      const merchantId = tr.dataset.id;
+      const ativoAtual = btnAtivo.dataset.ativo === 'true';
+      const novoAtivo = !ativoAtual;
+
+      try {
+        await updateDoc(doc(db, 'merchants', merchantId), {
+          ativo: novoAtivo
+        });
+
+        btnAtivo.dataset.ativo = String(novoAtivo);
+        btnAtivo.textContent = novoAtivo ? '🟢' : '🚫';
+
+        tr.style.opacity = novoAtivo ? '1' : '0.45';
+        tr.dataset.inativo = novoAtivo ? 'false' : 'true';
+      } catch (e) {
+        console.error(e);
+        alert('Erro ao atualizar status do cliente.');
+      }
+    });
+
+
+
+    // Abre um mini-modal para escolher o tipo da cobrança (com opção de Valor Livre)
+// callback recebe:
+// - string: "MENSAL" | "SEMESTRAL" | "ANUAL"  (compatível)
+// - ou objeto: { tipo: "LIVRE", modo: "EXTRA"|"FINAL", base: "MENSAL"|"SEMESTRAL"|"ANUAL", valor: number, ref: string }
+function abrirModalTipoCobranca(totalMensal, callback) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-pix';
+
+  const totalMensalTxt = totalMensal.toFixed(2).replace('.', ',');
+
+  modal.innerHTML = `
+    <div class="modal-box">
+      <h3>Gerar cobrança</h3>
+      <p style="font-size:13px; color:#e3e7ee; margin-bottom:10px;">
+        Escolha o tipo de cobrança para gerar o PIX.
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:8px; text-align:left; font-size:13px;">
+        <button class="btn-tipo" data-tipo="MENSAL">
+          💳 Mensal – R$ ${totalMensalTxt}
+        </button>
+        <button class="btn-tipo" data-tipo="SEMESTRAL">
+          📆 Semestral – R$ ${VALOR_SEMESTRAL.toFixed(2).replace('.', ',')}
+        </button>
+        <button class="btn-tipo" data-tipo="ANUAL">
+          🗓️ Anual – R$ ${VALOR_ANUAL.toFixed(2).replace('.', ',')}
+        </button>
+
+        <button class="btn-tipo-livre" style="background:#0f141b;color:#e3e7ee;border:1px solid #182029;">
+          ✏️ Valor livre (com referência)
+        </button>
+
+        <div class="livre-box" style="display:none; margin-top:6px; padding:10px; border:1px solid #182029; border-radius:12px; background:#0f141b;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+            <label style="display:flex; gap:6px; align-items:center; font-size:12px; color:#e3e7ee;">
+              <input type="radio" name="livreModo" value="EXTRA" checked />
+              Extra (somar)
+            </label>
+            <label style="display:flex; gap:6px; align-items:center; font-size:12px; color:#e3e7ee;">
+              <input type="radio" name="livreModo" value="FINAL" />
+              Valor final (avulso)
+            </label>
+
+            <div class="livre-base-wrap" style="display:flex; gap:6px; align-items:center; margin-left:auto;">
+              <span style="font-size:12px; color:#9aa6b2;">Somar em cima de:</span>
+              <select class="livre-base" style="padding:6px 8px; border-radius:10px;">
+                <option value="MENSAL" selected>Mensal</option>
+                <option value="SEMESTRAL">Semestral</option>
+                <option value="ANUAL">Anual</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; gap:8px;">
+            <input class="livre-valor" type="text" inputmode="decimal" placeholder="Valor (ex.: 50 ou 75,90)" />
+            <input class="livre-ref" type="text" placeholder="Referência (ex.: divulgação extra, ajuste, desconto…)" />
+          </div>
+
+          <button class="btn-livre-confirm" style="margin-top:10px; width:100%;">Gerar PIX</button>
+
+          <div class="muted" style="margin-top:8px;">
+            Dica: use “Extra” para somar com o plano e “Valor final” para cobrar somente o valor digitado.
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-close" style="margin-top:12px;">Fechar</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+
+  // botões padrão
+  modal.querySelectorAll('.btn-tipo').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tipo = btn.getAttribute('data-tipo');
+      callback(tipo); // mantém compatibilidade
+      modal.remove();
+    });
+  });
+
+  // Valor livre
+  const btnLivre = modal.querySelector('.btn-tipo-livre');
+  const livreBox = modal.querySelector('.livre-box');
+  const inpValor = modal.querySelector('.livre-valor');
+  const inpRef = modal.querySelector('.livre-ref');
+  const selBase = modal.querySelector('.livre-base');
+  const baseWrap = modal.querySelector('.livre-base-wrap');
+
+  function getModo() {
+    const checked = modal.querySelector('input[name="livreModo"]:checked');
+    return checked ? checked.value : 'EXTRA';
+  }
+
+  function syncUI() {
+    const modo = getModo();
+    // base só aparece em EXTRA
+    if (baseWrap) baseWrap.style.display = (modo === 'EXTRA') ? 'flex' : 'none';
+  }
+
+  modal.querySelectorAll('input[name="livreModo"]').forEach(r => {
+    r.addEventListener('change', syncUI);
+  });
+
+  btnLivre.addEventListener('click', () => {
+    livreBox.style.display = (livreBox.style.display === 'none') ? 'block' : 'none';
+    syncUI();
+    setTimeout(() => inpValor && inpValor.focus(), 50);
+  });
+
+  modal.querySelector('.btn-livre-confirm').addEventListener('click', () => {
+    const modo = getModo(); // EXTRA | FINAL
+    const base = (selBase && selBase.value) ? selBase.value : 'MENSAL';
+
+    let vRaw = (inpValor?.value || '').trim();
+    vRaw = vRaw.replace(/\s/g, '').replace('.', '').replace(',', '.'); // permite "1.234,56"
+    const valorNum = parseFloat(vRaw);
+
+    const ref = (inpRef?.value || '').trim();
+
+    if (!valorNum || isNaN(valorNum) || valorNum <= 0) {
+      alert('Digite um valor válido.');
+      return;
+    }
+    if (!ref) {
+      alert('Digite uma referência (ex.: divulgação extra, ajuste, desconto…).');
+      return;
+    }
+
+    callback({ tipo: 'LIVRE', modo, base, valor: valorNum, ref });
+    modal.remove();
+  });
+
+  modal.querySelector('.btn-close').onclick = () => modal.remove();
+}
+
+    // Listener para o botão PIX de cada linha
+    // Listener para o botão PIX de cada linha
+    tbody.addEventListener('click', async (ev) => {
+      const btnPix = ev.target.closest('.btn-pix');
+      if (!btnPix) return;
+
+      const tr = btnPix.closest('tr');
+      const isAtivo = tr.querySelector('.btn-toggle-ativo')?.dataset.ativo !== 'false';
+
+      if (!isAtivo) {
+        alert('Este cliente está inativo e não entra em cobranças.');
+        return;
+      }
+
+      const merchantId = tr.dataset.id;   // id do comércio (igual ao do script.js / merchants)
+      window.__PIX_MERCHANT_ID__ = merchantId;
+
+      const nomeComercio = tr.querySelector('.nome-holder').textContent.trim();
+
+      const chks = Array.from(tr.querySelectorAll('.months .chk'));
+      const mesesNomes = ['Jan.', 'Fev.', 'Mar.', 'Abr.', 'Mai.', 'Jun.', 'Jul.', 'Ago.', 'Set.', 'Out.', 'Nov.', 'Dez.'];
+      let totalMensal = 0;
+      const mesesDevidos = [];
+
+      chks.forEach((c, idx) => {
+        if (!c.checked) {
+          totalMensal += VALOR_MENSAL;
+          mesesDevidos.push(mesesNomes[idx]);
+        }
+      });
+
+      // nome do cliente: usa o pagador se tiver, senão o nome do comércio
+      const pagadorNome = tr.querySelector('.inp-nome')?.value.trim() || '';
+      const nomeCliente = pagadorNome || nomeComercio;
+
+      // Abre modal para escolher tipo de cobrança
+      // Abre modal para escolher tipo de cobrança
+abrirModalTipoCobranca(totalMensal, async (res) => {
+  let valorFinal = 0;
+  let mesesInfo = [];
+  let tipoExibicao = '';      // o que aparece no card (Plano • ...)
+  let tipoBaseVig = '';       // usado para vigência (MENSAL/SEMESTRAL/ANUAL ou vazio p/ avulso)
+  let livreInfo = null;
+
+  // compatibilidade: caso venha string (MENSAL/SEMESTRAL/ANUAL)
+  if (typeof res === 'string') {
+    const tipoSelecionado = res;
+
+    if (tipoSelecionado === 'MENSAL') {
+      if (totalMensal <= 0) {
+        alert('Nenhum mês pendente para cobrança mensal.');
+        return;
+      }
+      valorFinal = totalMensal;
+      mesesInfo = mesesDevidos;
+      tipoExibicao = 'MENSAL';
+      tipoBaseVig = 'MENSAL';
+
+    } else if (tipoSelecionado === 'SEMESTRAL') {
+      valorFinal = VALOR_SEMESTRAL;
+      mesesInfo = ['Plano semestral'];
+      tipoExibicao = 'SEMESTRAL';
+      tipoBaseVig = 'SEMESTRAL';
+
+    } else if (tipoSelecionado === 'ANUAL') {
+      valorFinal = VALOR_ANUAL;
+      mesesInfo = ['Plano anual'];
+      tipoExibicao = 'ANUAL';
+      tipoBaseVig = 'ANUAL';
+
+    } else {
+      return;
+    }
+
+    // 👉 AQUI buscamos a foto no script.js pelo merchantId
+    const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
+    const phoneCliente = tr.dataset.phone || '';
+
+    const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoExibicao);
+    abrirModalPIX(
+      brcode,
+      valorFinal,
+      mesesInfo,
+      tipoExibicao,
+      await getNameFromScript(merchantId),
+      merchantId,
+      fotoPerfilUrl,
+      phoneCliente,
+      tipoBaseVig,
+      livreInfo
+    );
+    return;
+  }
+
+  // Valor livre (novo)
+  if (res && res.tipo === 'LIVRE') {
+    const modo = (res.modo || 'EXTRA').toUpperCase();      // EXTRA | FINAL
+    const base = (res.base || 'MENSAL').toUpperCase();     // MENSAL | SEMESTRAL | ANUAL
+    const valorLivre = Number(res.valor || 0);
+    const ref = (res.ref || '').trim();
+
+    if (!valorLivre || valorLivre <= 0 || !ref) return;
+
+    // define base (se for EXTRA)
+    let baseValor = 0;
+    let baseMesesInfo = [];
+    let baseTipo = '';
+
+    if (modo === 'EXTRA') {
+      baseTipo = base;
+
+      if (base === 'MENSAL') {
+        if (totalMensal <= 0) {
+          alert('Nenhum mês pendente para somar no mensal.');
+          return;
+        }
+        baseValor = totalMensal;
+        baseMesesInfo = mesesDevidos;
+
+      } else if (base === 'SEMESTRAL') {
+        baseValor = VALOR_SEMESTRAL;
+        baseMesesInfo = ['Plano semestral'];
+
+      } else if (base === 'ANUAL') {
+        baseValor = VALOR_ANUAL;
+        baseMesesInfo = ['Plano anual'];
+
+      } else {
+        baseTipo = 'MENSAL';
+        baseValor = totalMensal;
+        baseMesesInfo = mesesDevidos;
+      }
+
+      valorFinal = baseValor + valorLivre;
+      mesesInfo = baseMesesInfo;
+      tipoExibicao = `${baseTipo}+EXTRA`;
+      tipoBaseVig = baseTipo;
+
+      livreInfo = {
+        modo: 'EXTRA',
+        baseTipo,
+        baseValor,
+        valorLivre,
+        ref
+      };
+
+    } else {
+      // FINAL = avulso (não soma com nenhum plano)
+      valorFinal = valorLivre;
+      mesesInfo = ['Cobrança avulsa'];
+      tipoExibicao = 'AVULSO';
+      tipoBaseVig = ''; // vigência especial (avulso)
+
+      livreInfo = {
+        modo: 'FINAL',
+        valorLivre,
+        ref
+      };
+    }
+
+    const fotoPerfilUrl = await getProfileUrlFromScript(merchantId);
+    const phoneCliente = tr.dataset.phone || '';
+
+    const brcode = gerarBRCodePix(nomeCliente, valorFinal, tipoExibicao);
+    abrirModalPIX(
+      brcode,
+      valorFinal,
+      mesesInfo,
+      tipoExibicao,
+      await getNameFromScript(merchantId),
+      merchantId,
+      fotoPerfilUrl,
+      phoneCliente,
+      tipoBaseVig,
+      livreInfo
+    );
+
+    return;
+  }
+});
+});
+
+
+
+
+
+
+
+    // ===== CSV =====
+    function exportCSV() {
+      const year = selAno.value;
+      const rows = [['status', 'nome', 'pagador', 'observacao', 'jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']];
+
+      Array.from(tbody.children).forEach(tr => {
+        if (tr.style.display === 'none') return;
+        const status = (tr.querySelector('.status-holder')?.textContent || '').trim();
+        const nome = (tr.querySelector('.nome-holder')?.textContent || '').trim();
+        const pagador = tr.querySelector('.inp-nome')?.value.trim() || '';
+        const obs = tr.querySelector('.inp-obs')?.value.trim() || '';
+        const chks = Array.from(tr.querySelectorAll('.months .chk')).map(c => c.checked ? '1' : '0');
+        rows.push([status, nome, pagador, obs, ...chks]);
+      });
+
+      const csv = rows.map(r => r.map(s => '"' + (String(s).replace(/"/g, '""')) + '"').join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = `recebimentos-${year}.csv`; a.click();
+    }
+
+    // ===== UTILS =====
+    function escapeHtml(s) { return String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])) }
+
+
+
+
+
+    // Enable click-and-drag horizontal scroll (mouse) — no mobile já funciona por toque
+    function enableDragScroll(el) {
+      let isDown = false, startX = 0, scrollStart = 0;
+      el.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX;
+        scrollStart = el.scrollLeft;
+        el.classList.add('dragging');
+      });
+      window.addEventListener('mouseup', () => { isDown = false; el.classList.remove('dragging'); });
+      window.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const dx = e.pageX - startX;
+        el.scrollLeft = scrollStart - dx;
+      });
+    }
+
+    // aplica no container geral e em cada linha
+    document.addEventListener('DOMContentLoaded', () => {
+      const tw = document.querySelector('.table-wrap');
+      if (tw) enableDragScroll(tw);
+    });
+
+    ////////////////////////////////////////// pix
+    ////////////////////////////////////////// PIX
+
+    // valor de cada mensalidade pendente
+    const VALOR_MENSAL = 30.00; // ajuste se quiser
+    const VALOR_SEMESTRAL = 150.00;
+    const VALOR_ANUAL = 250.00;
+
+    // helper para montar campos EMV (ID + tamanho + valor)
+    function emvField(id, value) {
+      const len = String(value.length).padStart(2, '0');
+      return id + len + value;
+    }
+
+    // cálculo do CRC16 CCITT (obrigatório no BR Code)
+    function crc16(str) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          if (crc & 0x8000) {
+            crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+          } else {
+            crc = (crc << 1) & 0xFFFF;
+          }
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
+    }
+
+
+
+
+    // Nome e cidade do recebedor, exatamente como na conta PIX do CNPJ
+    const NOME_PIX_RECEBEDOR = 'OLA CARLOPOLIS';
+    const CIDADE_PIX_RECEBEDOR = 'CARLOPOLIS';
+
+    // Gera BR Code PIX estático (PIX copia e cola) usando a chave CNPJ 52.608.228/0001-62
+    // _nomeClienteIgnorado e _tipoLabel são usados só para texto em WhatsApp / tela
+    function gerarBRCodePix(_nomeClienteIgnorado, valor, _tipoLabel = 'MENSAL') {
+      const pixKey = '52608228000162';   // CNPJ só com números
+      const gui = 'BR.GOV.BCB.PIX';   // GUI em MAIÚSCULO, padrão usado nos exemplos
+
+      // Recebedor sempre é o dono da chave (seu CNPJ)
+      const nomeComerciante = NOME_PIX_RECEBEDOR;   // máx. 25 caracteres (já está ok)
+      const cidade = CIDADE_PIX_RECEBEDOR; // máx. 15 caracteres (já está ok)
+
+      // 26 = Merchant Account Information (PIX estático)
+      const merchantAccountInfo =
+        emvField('00', gui) +      // GUI: BR.GOV.BCB.PIX
+        emvField('01', pixKey);    // chave (CNPJ)
+
+      const merchantAccountField = emvField('26', merchantAccountInfo);
+
+      // Valor fixo no payload
+      const valorStr = valor.toFixed(2); // ex: "90.00"
+
+      // Campo 62 = Additional Data Field • subcampo 05 = TxId
+      // Aqui uso "***" (mesmo padrão do exemplo oficial do Bacen)
+      const additionalData = emvField('05', 'olaCarlopolis');  // 05 = TxId dentro do 62
+
+      // Payload EMV no padrão BR Code (PIX estático):
+      // 00 = formato
+      // (NÃO usamos 01 aqui → QR estático)
+      // 26 = merchant account (PIX)
+      // 52,53,54,58,59,60
+      // 62 = TxId
+      let payload =
+        emvField('00', '01') +         // Payload Format Indicator
+        merchantAccountField +         // Merchant Account Info (GUI + chave)
+        emvField('52', '0000') +       // MCC genérico
+        emvField('53', '986') +        // Moeda BRL
+        emvField('54', valorStr) +     // Valor
+        emvField('58', 'BR') +         // País
+        emvField('59', nomeComerciante) + // Nome recebedor
+        emvField('60', cidade) +       // Cidade
+        emvField('62', additionalData); // Additional Data Field Template (TxId = "***")
+
+      // Campo 63 = CRC16 (obrigatório)
+      const toCrc = payload + '6304';
+      const crc = crc16(toCrc);
+
+      return toCrc + crc;
+    }
+
+
+
+
+
+
+
+    function formatMesAnoPt(date) {
+      const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+      const mes = meses[date.getMonth()];
+      const ano2 = String(date.getFullYear()).slice(-2);
+      return `${mes}/${ano2}`;
+    }
+
+
+    function abrirModalPIX(
+      linha,
+      valor,
+      mesesDevidos,
+      tipoLabel = 'MENSAL',
+      nomeCliente = '',
+      merchantId = '',
+      fotoPerfilUrl = '',
+      phoneCliente = '',
+      tipoBaseVigencia = '',
+      livreInfo = null
+    ) {
+      const modal = document.createElement("div");
+      modal.className = "modal-pix";
+
+      const mesesTexto = (mesesDevidos && mesesDevidos.length)
+        ? mesesDevidos.join(', ')
+        : '—';
+
+      // 🔹 primeiro define o tipo normalizado
+      // 🔹 tipoBaseSan = usado para vigência (mensal/semestral/anual). tipoExibSan = o que aparece no cartão.
+      const tipoBaseSan = (tipoBaseVigencia || tipoLabel || 'MENSAL').toString().toUpperCase();
+      const tipoExibSan = (tipoLabel || tipoBaseSan).toString().toUpperCase();
+
+      // (se quiser usar em algum lugar, agora funciona)
+      const planoId = `OLA_CARLOPOLIS_${tipoExibSan}`;
+
+      const nomeMostrar = (nomeCliente && nomeCliente.trim()) || 'Cliente';
+      const valorBr = valor.toFixed(2).replace('.', ',');
+
+      // 🔹 cálculo da vigência (início = mês atual)  
+      const hoje = new Date();
+      const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês de referência
+      const fim = new Date(inicio);
+
+      if (tipoBaseSan === 'ANUAL') {
+        // 12 meses de vigência a partir do mês atual
+        fim.setFullYear(fim.getFullYear() + 1);
+      } else if (tipoBaseSan === 'SEMESTRAL') {
+        // 6 meses contando o mês atual → +5 meses
+        fim.setMonth(fim.getMonth() + 5);
+      } else {
+        // MENSAL: só o mês de pagamento (inicio = fim)
+        // se quiser, pode até deixar assim explicitamente:
+        fim.setMonth(fim.getMonth());
+      }
+
+      let vigenciaHtml = '';
+
+// vigência padrão por tipo (mensal/semestral/anual). Para AVULSO, mostra "—".
+if (tipoBaseSan === 'MENSAL' || tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === 'ANUAL') {
+
+  // 🔹 cálculo da vigência (início = mês atual)
+  const hoje = new Date();
+  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // mês de referência
+  const fim = new Date(inicio);
+
+  if (tipoBaseSan === 'ANUAL') {
+    fim.setFullYear(fim.getFullYear() + 1);
+  } else if (tipoBaseSan === 'SEMESTRAL') {
+    fim.setMonth(fim.getMonth() + 5);
+  } else {
+    fim.setMonth(fim.getMonth());
+  }
+
+  if (tipoBaseSan === 'MENSAL') {
+    vigenciaHtml = `
+      <div style="margin-top:4px;">
+        <strong>Vigência:</strong> ${formatMesAnoPt(inicio)}
+      </div>
+    `;
+  } else {
+    vigenciaHtml = `
+      <div style="margin-top:4px;">
+        <strong>Vigência:</strong> ${formatMesAnoPt(inicio)} a ${formatMesAnoPt(fim)}
+      </div>
+    `;
+  }
+
+} else {
+  vigenciaHtml = `
+    <div style="margin-top:4px;">
+      <strong>Vigência:</strong> — (cobrança avulsa)
+    </div>
+  `;
+}
+
+const phoneClean = (phoneCliente || '').toString().trim();
+      const phoneHtml = phoneClean ? `` : '';
+
+      let detalheMesesHtml = '';
+if (tipoBaseSan === 'MENSAL') {
+  detalheMesesHtml = `
+    <div style="margin-top:4px;">
+      <strong>Valor referente a:</strong> ${mesesTexto}
+    </div>
+  `;
+} else if (tipoBaseSan === 'SEMESTRAL' || tipoBaseSan === 'ANUAL') {
+  detalheMesesHtml = `
+    <div style="margin-top:4px;">
+      <strong>Referente ao plano:</strong> ${tipoBaseSan.charAt(0) + tipoBaseSan.slice(1).toLowerCase()}
+    </div>
+  `;
+} else {
+  detalheMesesHtml = `
+    <div style="margin-top:4px;">
+      <strong>Referente a:</strong> Cobrança avulsa
+    </div>
+  `;
+}
+
+// 🔹 detalhes do valor livre (extra ou avulso), aparece no cartão e no WhatsApp
+let livreHtml = '';
+if (livreInfo && typeof livreInfo === 'object') {
+  const ref = (livreInfo.ref || '').toString().trim();
+  if (livreInfo.modo === 'EXTRA') {
+    const baseTipo = (livreInfo.baseTipo || tipoBaseSan || '').toString().toUpperCase();
+    const baseValor = Number(livreInfo.baseValor || 0);
+    const vLivre = Number(livreInfo.valorLivre || 0);
+
+    livreHtml = `
+      <div style="margin-top:6px; padding:10px; border:1px dashed rgba(93,212,255,.35); border-radius:12px; background:rgba(93,212,255,.06);">
+        <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#bfcbd7;">
+          Ajuste • Extra
+        </div>
+        <div style="margin-top:4px; font-size:12px;">
+          <strong>Base:</strong> ${baseTipo} (R$ ${baseValor.toFixed(2).replace('.', ',')})
+        </div>
+        <div style="margin-top:4px; font-size:12px;">
+          <strong>Extra:</strong> R$ ${vLivre.toFixed(2).replace('.', ',')}
+        </div>
+        <div style="margin-top:4px; font-size:12px;">
+          <strong>Referência:</strong> ${escapeHtml(ref || '—')}
+        </div>
+      </div>
+    `;
+  } else {
+    const vLivre = Number(livreInfo.valorLivre || valor || 0);
+    livreHtml = `
+      <div style="margin-top:6px; padding:10px; border:1px dashed rgba(93,212,255,.35); border-radius:12px; background:rgba(93,212,255,.06);">
+        <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#bfcbd7;">
+          Cobrança • Avulsa
+        </div>
+        <div style="margin-top:4px; font-size:12px;">
+          <strong>Referência:</strong> ${escapeHtml(ref || '—')}
+        </div>
+      </div>
+    `;
+  }
+}
+
+// monta cartão premium
+      modal.innerHTML = `
+    <div class="modal-box">
+      <h3>QR Code PIX</h3>
+
+      <!-- CARTÃO PREMIUM QUE VIRA IMAGEM -->
+      <div id="pixCard" style="
+        position:relative;
+        width:336px;
+        border-radius:24px;
+        overflow:hidden;
+        background:radial-gradient(circle at top,#1a2635,#050910);
+        box-shadow:0 18px 40px rgba(0,0,0,.7);
+        border:1px solid rgba(93,212,255,.25);
+        margin:0 auto 16px;
+      ">
+
+        <!-- CAPA COM FOTO DO CLIENTE -->
+        <div style="
+          position:relative;
+          width:100%;
+          height:auto;
+          overflow:hidden;
+        ">
+          ${(fotoPerfilUrl && fotoPerfilUrl.trim())
+          ? `<img src="${fotoPerfilUrl.startsWith('/') ? fotoPerfilUrl : '/' + fotoPerfilUrl}"
+                     alt="${escapeHtml(nomeMostrar)}"
+                     style="width:100%;height:100%;object-fit:cover;">`
+          : `<img src="/images/img_padrao_site/logo_.png"
+                     alt="Olá Carlópolis"
+                     style="width:100%;height:100%;object-fit:cover;">`
+        }
+
+          <!-- degradê para leitura do texto -->
+          <div style="
+            position:absolute;
+            inset:0;
+            background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 1%, rgba(0,0,0,0) 0%);
+          "></div>
+
+          <!-- nome do cliente em cima da foto -->
+          <div style="
+            position:absolute;
+            left:18px;
+            right:18px;
+            bottom:14px;
+            display:flex;
+            flex-direction:column;
+            gap:2px;
+          ">
+            <span style="font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:#9aa6b2;">
+              Cliente
+            </span>
+            <span style="font-size:17px; font-weight:700; color:#f9fafb; text-shadow:0 2px 6px rgba(0,0,0,.8);">
+              ${escapeHtml(nomeMostrar)}
+            </span>
+          </div>
+        </div>
+
+        <!-- CORPO DO CARTÃO -->
+        <div style="
+          padding:14px 18px 16px;
+          display:flex;
+          flex-direction:column;
+          gap:6px;
+          color:#e3e7ee;
+          font-size:13px;
+        ">
+          <div style="font-size:16px; text-transform:uppercase; letter-spacing:.14em; color:#bfcbd7;">
+            Plano • ${tipoExibSan}
+          </div>
+
+          <!-- valor grande estilo PicPay -->
+          <div style="margin-top:2px; font-size:24px; font-weight:700; color:#f9fafb;">
+            R$ ${valorBr}
+          </div>
+
+          ${detalheMesesHtml}
+          ${livreHtml}
+          ${vigenciaHtml}
+          ${phoneHtml}
+
+          <div style="margin-top:6px; font-size:12px; letter-spacing: 0.1em;">
+            <strong>Chave PIX (CNPJ):</strong><br>
+            52.608.228/0001-62
+          </div>
+
+          <!-- bloco de marca centralizado -->
+          <div style="
+            margin-top:10px;
+            font-size:11px;
+            opacity:.9;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:4px;
+          ">
+            <img src="/images/img_padrao_site/logo_.png"
+                 alt="Olá Carlópolis"
+                 style="
+                   width:50px;
+                   height:50px;
+                   border-radius:10px;
+                   object-fit:cover;
+                   opacity:0.95;
+                 ">
+            <span>Marketing Ola Carlopolis</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÁREA FORA DO CARTÃO: CNPJ + CÓDIGO + BOTÕES -->
+      <div style="margin-top:10px; text-align:left; font-size:12px; color:#e3e7ee;">
+        <div style="margin-bottom:8px; display:flex; flex-direction:column; gap:4px;">
+          <div style="
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            width:100%;
+          ">
+            <strong>Chave PIX (CNPJ):</strong>
+          </div>
+
+          <span id="cnpjPix">52.608.228/0001-62</span>
+
+          <button class="btn-copy-cnpj" style="margin-top:4px; padding:4px 8px; font-size:12px;">
+            📋 Copiar CNPJ
+          </button>
+        </div>
+
+        <div>
+          <strong>PIX copia e cola:</strong>
+          <div id="linhaPix" class="pix-line" style="margin-top:4px;">
+            ${linha}
+          </div>
+          <button class="btn-copy-line" style="margin-top:4px; padding:4px 8px; font-size:12px;">
+            📋 Copiar código
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-download-img" style="margin-top:8px;">Baixar imagem</button>
+      <button class="btn-whats" style="margin-top:8px; background:#25D366; color:#061018;">
+        Enviar por WhatsApp
+      </button>
+      <button class="btn-close">Fechar</button>
+    </div>
+  `;
+
+      document.body.appendChild(modal);
+
+      // permite fechar clicando fora
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+      });
+
+      // Copiar só o CNPJ
+      modal.querySelector(".btn-copy-cnpj").onclick = async () => {
+        const cnpj = "52.608.228/0001-62";
+        try {
+          await navigator.clipboard.writeText(cnpj);
+          alert("CNPJ copiado!");
+        } catch (e) {
+          console.error(e);
+          alert("Erro ao copiar. Copie manualmente.");
+        }
+      };
+
+      // Copiar só o código PIX (copia e cola)
+      modal.querySelector(".btn-copy-line").onclick = async () => {
+        const copiaCola = document.getElementById("linhaPix").textContent.trim();
+        try {
+          await navigator.clipboard.writeText(copiaCola);
+          alert("Código PIX (copia e cola) copiado!");
+        } catch (e) {
+          console.error(e);
+          alert("Erro ao copiar. Copie manualmente.");
+        }
+      };
+
+      // baixar cartão como imagem
+      const btnDownload = modal.querySelector(".btn-download-img");
+      btnDownload.onclick = async () => {
+        const card = document.getElementById('pixCard');
+        if (!window.html2canvas) {
+          alert('html2canvas não carregado. Verifique o script no final da página.');
+          return;
+        }
+        const canvas = await html2canvas(card, { backgroundColor: '#050910', scale: 2 });
+        const dataUrl = canvas.toDataURL('image/png');
+
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `pix-${tipoLabel.toLowerCase()}-${valor.toFixed(2).replace('.', '_')}.png`;
+        a.click();
+      };
+
+      const btnWhats = modal.querySelector(".btn-whats");
+      btnWhats.onclick = async () => {
+        let phone = (phoneCliente || '').toString();
+
+        // 1) se não veio no dataset, tenta Firestore
+        if (!phone) {
+          try {
+            if (merchantId) {
+              const mRef = doc(db, 'merchants', merchantId);
+              const mSnap = await getDoc(mRef);
+              if (mSnap.exists()) {
+                const data = mSnap.data();
+                phone =
+                  (data.whatsapp || data.telefone || data.celular || data.phone || '').toString();
+              }
+            }
+          } catch (e) {
+            console.error('Erro ao buscar telefone do merchant (Firestore):', e);
+          }
+        }
+
+        // 2) se ainda não tiver, busca no script.js (mesmo lugar da imagem)
+        if (!phone) {
+          try {
+            phone = await getPhoneFromScript(merchantId);
+          } catch (e) {
+            console.error('Erro ao buscar telefone no script.js:', e);
+          }
+        }
+
+        if (!phone) {
+          alert('Telefone do estabelecimento não encontrado.\n' +
+            'Cadastre o Whats/telefone no site (contact/whatsapp/telefone).');
+          return;
+        }
+
+        // 3) normaliza o número: só dígitos, força DDI 55
+        let numero = phone.replace(/\D/g, '');
+        if (numero.startsWith('0')) numero = numero.slice(1);
+        if (!numero.startsWith('55')) numero = '55' + numero;
+
+        // 4) monta a mensagem do WhatsApp
+                // 4) monta a mensagem do WhatsApp
+        let livreTxt = '';
+        if (livreInfo && typeof livreInfo === 'object') {
+          const ref = (livreInfo.ref || '').toString().trim();
+          if (livreInfo.modo === 'EXTRA') {
+            const baseTipo = (livreInfo.baseTipo || tipoBaseSan || '').toString().toUpperCase();
+            const baseValor = Number(livreInfo.baseValor || 0);
+            const vLivre = Number(livreInfo.valorLivre || 0);
+            livreTxt = `
+
+Ajuste (extra):
+Base: ${baseTipo} (R$ ${baseValor.toFixed(2).replace('.', ',')})
+Extra: R$ ${vLivre.toFixed(2).replace('.', ',')}
+Referência: ${ref || '—'}`;
+          } else {
+            livreTxt = `
+
+Referência: ${ref || '—'}`;
+          }
+        }
+
+        const msg =
+          `Olá! Segue o PIX para pagamento no Olá Carlópolis.
+
+Cliente: ${nomeMostrar}
+Plano: ${tipoExibSan}
+Valor total: R$ ${valorBr}${livreTxt}
+
+Chave PIX (CNPJ):
+52.608.228/0001-62
+
+PIX copia e cola:
+${linha}`;
+
+        const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+      };
+
+      modal.querySelector(".btn-close").onclick = () => modal.remove();
+    }
+
+
+
+
+
+
+
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</body>
+
+</html>
