@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 4</title>
+  <title>Admin • Pagamentos 6</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1750,15 +1750,6 @@ if (ymEntrada) {
   else startMonth = 1;                     // entrou antes: cobra o ano todo (se tiver pendência)
 }
 
-chks.forEach((c, idx) => {
-  const mes = idx + 1; // 1..12
-  if (mes < startMonth) return;
-
-  if (!c.checked) {
-    totalMensal += VALOR_MENSAL;
-    mesesDevidos.push(mesesNomes[idx]);
-  }
-});
 
 
 
