@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Pagamentos 3</title>
+  <title>Admin • Pagamentos 4</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1684,31 +1684,34 @@ function abrirModalTipoCobranca(totalMensal, callback) {
       let totalMensal = 0;
       const mesesDevidos = [];
 
-     // 🔹 define a partir de qual mês começa a cobrar no ANO selecionado
-const anoSel = Number(selAno.value);
 
-// entradaEm vem do merchants/{id}.entradaEm
-// (se você já aplicou a opção 1, ele vai existir; senão fica null)
-const entradaEmDate = (m?.entradaEm?.toDate ? m.entradaEm.toDate() : null);
 
-// startMonth: 1..12
+      const anoSel = Number(selAno.value);
+const ymEntrada = (tr.dataset.entradaYm || '').trim(); // "YYYY-MM"
+
+// startMonth: 1..12 (mês mínimo a cobrar no ano selecionado)
 let startMonth = 1;
 
-if (entradaEmDate) {
-  const anoEntrada = entradaEmDate.getFullYear();
-  const mesEntrada = entradaEmDate.getMonth() + 1;
+if (ymEntrada) {
+  const [yy, mm] = ymEntrada.split('-').map(Number);
 
-  if (anoEntrada > anoSel) {
-    startMonth = 13; // entrou depois do ano selecionado -> não cobra nada neste ano
-  } else if (anoEntrada === anoSel) {
-    startMonth = mesEntrada; // cobra só do mês de entrada em diante
-  } else {
-    startMonth = 1; // entrou em ano anterior -> cobra o ano inteiro (se tiver pendência)
-  }
+  if (yy > anoSel) startMonth = 13;        // entrou depois desse ano
+  else if (yy === anoSel) startMonth = mm; // entrou nesse ano: cobra do mês de entrada pra frente
+  else startMonth = 1;                     // entrou antes: cobra o ano todo (se tiver pendência)
 }
 
+chks.forEach((c, idx) => {
+  const mes = idx + 1; // 1..12
+  if (mes < startMonth) return;
 
-const ymEntrada = (tr.dataset.entradaYm || '').trim(); // "YYYY-MM"
+  if (!c.checked) {
+    totalMensal += VALOR_MENSAL;
+    mesesDevidos.push(mesesNomes[idx]);
+  }
+});
+
+
+
 
 // startMonth: 1..12 (mês mínimo a cobrar no ano selecionado)
 
