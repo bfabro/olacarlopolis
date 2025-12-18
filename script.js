@@ -2320,7 +2320,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //pizzaria
     fornalhapizzaria: "s",
     tonnypizzaria: "n",
-    happyhour: "s",
+    happyhour: "n",
 
     // quitanda
     pimentadoce: "s",
