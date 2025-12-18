@@ -5199,7 +5199,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       titulo: "Terreno à venda no Residencial Itália",
       descricao: "Terreno localizado em uma região urbana valorizada, oferece ótimo potencial de aproveitamento, fácil acesso e excelente perspectiva de valorização. Uma oportunidade para quem deseja planejar o futuro em um imóvel bem localizado.",
-      endereco: "Residencial Amaral",
+      endereco: "Residencial Itália",
       area: "360m² 14x25",
       valor: 165000,
       telefone: "43 98803-4095",
