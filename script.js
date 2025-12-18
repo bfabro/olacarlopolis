@@ -4941,6 +4941,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+    
+
+
 
 
 
@@ -5183,6 +5186,33 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/terreno2/02.jpeg",
         "images/imoveis/luiz/venda/terreno2/03.jpeg",
         "images/imoveis/luiz/venda/terreno2/04.jpeg",
+
+      ],
+
+
+    },
+
+    {
+      id: "ter11",
+      codRef: "T_011",
+      procura: "terreno", // ou "terreno", "rural", etc.   
+      tipo: "venda",
+      titulo: "Terreno à venda no Residencial Itália",
+      descricao: "Terreno localizado em uma região urbana valorizada, oferece ótimo potencial de aproveitamento, fácil acesso e excelente perspectiva de valorização. Uma oportunidade para quem deseja planejar o futuro em um imóvel bem localizado.",
+      endereco: "Residencial Amaral",
+      area: "360m² 14x25",
+      valor: 165000,
+      telefone: "43 98803-4095",
+      corretores: ["Luiz Vilas Boas - 52.194"],
+      imagens: [
+
+        "images/imoveis/luiz/venda/terreno3/01.jpeg",
+        "images/imoveis/luiz/venda/terreno3/02.jpeg",
+        "images/imoveis/luiz/venda/terreno3/03.jpeg",
+        "images/imoveis/luiz/venda/terreno3/04.jpeg",
+        "images/imoveis/luiz/venda/terreno3/05.jpeg",
+        "images/imoveis/luiz/venda/terreno3/06.jpeg",
+        "images/imoveis/luiz/venda/terreno3/07.jpeg",
 
       ],
 
