@@ -4895,7 +4895,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ],
 
     },
-/*
+
 
     {
       id: "casa17v",
@@ -4905,18 +4905,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       titulo: "Sua Nova Casa de Luxo Espera por Você!",
       descricao: "Descubra um refúgio moderno com a vista que você sempre sonhou, Casa Inteligente, toda equipada para sua moradia. Documentação Ok.",
       endereco: "Ilha Bella",
-      valor: 500000,
+      valor: 2500000,
       construcao: 306,          // << NOVO: m² de construção
       area: 453.33,
-      banheiros: 2,
+      banheiros: 6,
       churrasqueira: "Sim",
       cozinhas: 1,
-      quartos: 3,
+      quartos: 4,
       quintal: "Sim",
       piscina: "Sim",
       salas: 1,
       suite: "4",
-      vagas: 2,
+      vagas: 4,
       corretores: ["Cesar Melo - 38.105 F"],
       telefone: "43 99678-9652",  // Corretor ou propretario
       imagens: [
@@ -4939,7 +4939,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
-*/
+
 
 
 
