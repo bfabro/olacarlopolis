@@ -836,60 +836,92 @@
         const namesById = {};
         const namesByNoHyphen = {};
 
-        (categories || []).forEach(cat => {
-          (cat.establishments || []).forEach(est => {
-            // id "bonito" com hífen
-            const idNorm =
-              est.nomeNormalizado ||
-              normalizeNameLocal(est.name || '');
+       (categories || []).forEach(cat => {
+  (cat.establishments || []).forEach(est => {
+    const idNorm =
+      est.nomeNormalizado ||
+      normalizeNameLocal(est.name || '');
 
-            if (!idNorm) return;
+    if (!idNorm) return;
 
-            // FOTO
-          // FOTO — usa SOMENTE imagem de perfil
-// FOTO — usa SOMENTE imagem de perfil
-let img =
-  est.image ||
-  est.profileImage ||
-  est.foto ||
-  est.logo ||
-  '';
-// trava: nunca aceitar imagens de nota/falecimento no PIX
-const imgLower = (img || '').toString().toLowerCase();
-if (imgLower.includes('falecimento') || imgLower.includes('obito') || imgLower.includes('nota')) {
-  img = '';
-}
+    // ✅ Alias: categoria + nome (ex.: "funeraria-cristo-rei")
+    const catTitle = (cat.title || cat.name || '').trim();
+    const idWithCat = catTitle
+      ? normalizeNameLocal(`${catTitle} ${est.name || ''}`)
+      : '';
 
+    // ✅ FOTO (somente perfil)
+    let img =
+      est.image ||
+      est.profileImage ||
+      est.foto ||
+      est.logo ||
+      '';
 
-            if (img) {
-              byId[idNorm] = img;
-              const semHifen = idNorm.replace(/-/g, '');
-              byNoHyphen[semHifen] = img;
-            }
+    // ✅ trava: nunca aceitar imagens de nota/falecimento no PIX
+    const imgLower = (img || '').toString().toLowerCase();
+    if (
+      imgLower.includes('notafalecimento') ||
+      imgLower.includes('nota-falecimento') ||
+      imgLower.includes('falecimento') ||
+      imgLower.includes('obito')
+    ) {
+      img = '';
+    }
 
-            // NOME REAL DO CLIENTE / ESTABELECIMENTO
-            if (est.name) {
-              namesById[idNorm] = est.name;
-              namesByNoHyphen[idNorm.replace(/-/g, '')] = est.name;
-            }
+    // helper p/ salvar em todas as variações
+    function put(map, key, value) {
+      if (!key || !value) return;
+      map[key] = value;
+    }
+    function putNoHyphen(map, key, value) {
+      if (!key || !value) return;
+      map[key.replace(/-/g, '')] = value;
+    }
 
+    // FOTO: salva para idNorm e idWithCat
+    if (img) {
+      put(byId, idNorm, img);
+      putNoHyphen(byNoHyphen, idNorm, img);
 
-            // TELEFONE (pega qualquer um dos campos que você usa no site)
-            const phone =
-              est.whatsapp ||
-              est.telefone ||
-              est.celular ||
-              est.contact ||
-              est.phone ||
-              '';
+      if (idWithCat) {
+        put(byId, idWithCat, img);
+        putNoHyphen(byNoHyphen, idWithCat, img);
+      }
+    }
 
-            if (phone) {
-              phonesById[idNorm] = phone;
-              const semHifen = idNorm.replace(/-/g, '');
-              phonesByNoHyphen[semHifen] = phone;
-            }
-          });
-        });
+    // NOME REAL
+    if (est.name) {
+      put(namesById, idNorm, est.name);
+      putNoHyphen(namesByNoHyphen, idNorm, est.name);
+
+      if (idWithCat) {
+        put(namesById, idWithCat, est.name);
+        putNoHyphen(namesByNoHyphen, idWithCat, est.name);
+      }
+    }
+
+    // TELEFONE
+    const phone =
+      est.whatsapp ||
+      est.telefone ||
+      est.celular ||
+      est.contact ||
+      est.phone ||
+      '';
+
+    if (phone) {
+      put(phonesById, idNorm, phone);
+      putNoHyphen(phonesByNoHyphen, idNorm, phone);
+
+      if (idWithCat) {
+        put(phonesById, idWithCat, phone);
+        putNoHyphen(phonesByNoHyphen, idWithCat, phone);
+      }
+    }
+  });
+});
+
 
         window.__PROFILE_MAP__ = {
           byId, byNoHyphen, phonesById, phonesByNoHyphen, namesById,
