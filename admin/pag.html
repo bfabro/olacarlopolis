@@ -847,7 +847,19 @@
 
             // FOTO
           // FOTO — usa SOMENTE imagem de perfil
-let img = est.image || '/images/img_padrao_site/logo_.png';
+// FOTO — usa SOMENTE imagem de perfil
+let img =
+  est.image ||
+  est.profileImage ||
+  est.foto ||
+  est.logo ||
+  '';
+// trava: nunca aceitar imagens de nota/falecimento no PIX
+const imgLower = (img || '').toString().toLowerCase();
+if (imgLower.includes('falecimento') || imgLower.includes('obito') || imgLower.includes('nota')) {
+  img = '';
+}
+
 
             if (img) {
               byId[idNorm] = img;
