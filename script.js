@@ -2222,7 +2222,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // clinica veterinaria
 
     veterinariacarlopolis: "s",
-    suedveterinariaepetshop: "s",
+    suedveterinariaepetshop: "n",
 
     //DESPACHANTE
     rodriguinho: "s",

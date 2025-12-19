@@ -846,10 +846,9 @@
             if (!idNorm) return;
 
             // FOTO
-            let img = est.image;
-            if (!img && Array.isArray(est.novidadesImages) && est.novidadesImages.length) {
-              img = est.novidadesImages[0];
-            }
+          // FOTO — usa SOMENTE imagem de perfil
+let img = est.image || '/images/img_padrao_site/logo_.png';
+
             if (img) {
               byId[idNorm] = img;
               const semHifen = idNorm.replace(/-/g, '');
