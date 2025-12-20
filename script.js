@@ -43,12 +43,33 @@ function somenteDigitos(str) {
   return String(str || "").replace(/\D/g, "");
 }
 
-// === GERAR CARD ESTILO PAGAMENTO (pixCard) PARA COMÉRCIOS ===
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
     const nome = establishment.name || "Comércio em Carlópolis";
 
-    let funcionamento =
+    let funcionamento = 
       establishment.horario ||
       establishment.funcionamento ||
       establishment.horarioFuncionamento ||
@@ -56,8 +77,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       establishment.operacao ||
       establishment.hours ||
       establishment.aberto ||
-      (establishment.schedule
-        ? establishment.schedule.text || establishment.schedule.horario
+      (establishment.schedule 
+        ? establishment.schedule.text || establishment.schedule.horario 
         : "") ||
       "";
 
@@ -68,22 +89,20 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     }
 
     // 🔥 LIMPA QUALQUER HTML DO FUNCIONAMENTO (remove <br>, <p>, etc)
-// 🔥 NORMALIZA FUNCIONAMENTO PARA LINHAS
-let funcionamentoLinhas = [];
+    // 🔥 NORMALIZA FUNCIONAMENTO PARA LINHAS
+    let funcionamentoLinhas = [];
 
-if (typeof funcionamento === "string") {
-  funcionamentoLinhas = funcionamento
-    .replace(/<br\s*\/?>/gi, "|")
-    .replace(/<\/p>/gi, "|")
-    .replace(/<[^>]+>/g, "")
-    .split(/\||;|•/g)
-    .map(l => l.trim())
-    .filter(Boolean);
-}
+    if (typeof funcionamento === "string") {
+      funcionamentoLinhas = funcionamento
+        .replace(/<br\s*\/?>/gi, "|")
+        .replace(/<\/p>/gi, "|")
+        .replace(/<[^>]+>/g, "")
+        .split(/\||;|•/g)
+        .map(l => l.trim())
+        .filter(Boolean);
+    }
 
-
-
-    let endereco =
+    let endereco = 
       establishment.endereco ||
       establishment.enderecoCompleto ||
       establishment.address ||
@@ -98,239 +117,350 @@ if (typeof funcionamento === "string") {
     }
 
     const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
-    let fotoPerfilUrl =
-      establishment.logo ||
-      establishment.image ||
+    let fotoPerfilUrl = 
+      establishment.logo || 
+      establishment.image || 
       (Array.isArray(imagens) && imagens.length ? imagens[0] : "");
 
     fotoPerfilUrl = (fotoPerfilUrl || "").toString().trim();
 
-    const fotoFinal = fotoPerfilUrl
-      ? fotoPerfilUrl
-      : "/images/img_padrao_site/logo_1.png";
+    // CORREÇÃO: URL absoluta para imagens padrão
+    const fotoFinal = fotoPerfilUrl 
+      ? fotoPerfilUrl 
+      : window.location.origin + "/images/img_padrao_site/logo_1.png";
 
-    const logoBrancaSite = "/images/img_padrao_site/logo_1.png";
+    const logoBrancaSite = window.location.origin + "/images/img_padrao_site/logo_1.png";
 
+    // ✅ CRIAR UM CONTAINER TEMPORÁRIO FORA DA TELA COM ESTILOS EXPLÍCITOS
     const host = document.createElement("div");
-    host.style.position = "fixed";
-    host.style.left = "-9999px";
-    host.style.top = "0";
+    host.id = "card-generator-host";
+    host.style.cssText = `
+      position: fixed;
+      left: -9999px;
+      top: 0;
+      width: 360px;
+      height: 640px;
+      z-index: 99999;
+      background: transparent;
+    `;
 
+    // ✅ USAR STYLES INLINE EM TODOS OS ELEMENTOS PARA GARANTIR CAPTURA
     host.innerHTML = `
       <div id="estCard" style="
-          position:relative;
-     width:360px;
-height:640px;              /* 🔥 9:16 REAL */
-box-sizing:border-box;
-
-        
-        border-radius:24px;
-        overflow:hidden;
-        background:radial-gradient(circle at top,#1a2635,#050910);
-        box-shadow:0 18px 40px rgba(0,0,0,.7);
-        border:1px solid rgba(93,212,255,.25);
-        margin:0 auto 16px;
+        position: relative;
+        width: 360px;
+        height: 640px;
+        box-sizing: border-box;
+        border-radius: 24px;
+        overflow: hidden;
+        background: radial-gradient(circle at top, #1a2635, #050910);
+        box-shadow: 0 18px 40px rgba(0,0,0,.7);
+        border: 1px solid rgba(93,212,255,.25);
+        margin: 0;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        color: white;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       ">
 
         <!-- CAPA COM FOTO DO CLIENTE -->
         <div style="
-          position:relative;
-          width:100%;
-          height:auto;      /* ~60% de 640 */
-          overflow:hidden;
-           background:#000;
+          position: relative;
+          width: 100%;
+          height: 300px;
+          overflow: hidden;
+          background: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         ">
+          <img id="fotoEstabelecimento" 
+               src="${fotoFinal}"
+               alt="${String(nome).replace(/"/g, '&quot;')}"
+               style="
+                 max-width: 100%;
+                 max-height: 100%;
+                 object-fit: contain;  /* Alterado para contain */
+                 display: block;
+                 background: #000;
+               "
+               crossorigin="anonymous"
+               onerror="this.onerror=null; this.src='${window.location.origin}/images/img_padrao_site/logo_1.png';">
 
-  <img src="${fotoFinal}"
-       alt="${String(nome).replace(/"/g, "&quot;")}"
-        style="
-         width:100%;
-         height:100%;          /* ✅ IGUAL pag.html */
-         object-fit:cover;     /* ✅ CHAVE DA QUALIDADE */
-         display:block;
-       ">
+          <!-- degradê -->
+          <div style="
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 90px;
+            background: linear-gradient(
+              to top,
+              rgba(0,0,0,.8),
+              rgba(0,0,0,0)
+            );
+          "></div>
 
- <!-- degradê -->
-  <div style="
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:0;
-    height:90px;
-    background:linear-gradient(
-      to top,
-      rgba(0,0,0,.8),
-      rgba(0,0,0,0)
-    );
-  "></div>
+          <!-- categoria + nome -->
+          <div style="
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 18px;
+            text-align: center;
+          ">
+            <div style="
+              font-size: 11px;
+              letter-spacing: .12em;
+              text-transform: uppercase;
+              color: #9aa6b2;
+              margin-bottom: 4px;
+            ">
+              ${categoriaAtual}
+            </div>
 
-<!-- categoria + nome -->
-  <div style="
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:18px;
-    text-align:center;
-  ">
+            <div style="
+              font-size: 18px;
+              font-weight: 800;
+              color: #fff;
+              text-shadow: 0 2px 6px rgba(0,0,0,.85);
+              padding: 0 20px;
+              line-height: 1.2;
+            ">
+              ${nome}
+            </div>
+          </div>
+        </div>
 
-       <div style="
-      font-size:11px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:#9aa6b2;
-    ">
-      ${categoriaAtual}
-    </div>
+        <!-- CONTEÚDO INFERIOR -->
+        <div style="
+          height: 340px;
+          padding: 10px 18px;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+        ">
+          <!-- CARD DE INFORMAÇÕES -->
+          <div style="
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,.35);
+            border-radius: 16px;
+            background: rgba(255,255,255,.12);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: #f2f4f8;
+            flex-grow: 1;
+          ">
+            ${funcionamentoLinhas.length ? `
+            <div style="font-size: 16px; line-height: 1.5;">
+              <strong style="font-size: 16px;">⏰ Funcionamento:</strong>
+              <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 2px;">
+                ${funcionamentoLinhas.map(linha => `
+                  <div style="font-size: 14px; line-height: 1.3;">${linha}</div>
+                `).join("")}
+              </div>
+            </div>
+            ` : ""}
 
-      <div style="
-      font-size:18px;
-      font-weight:800;
-      color:#fff;
-      text-shadow:0 2px 6px rgba(0,0,0,.85);
-    ">
-      ${nome}
-    </div>
-  </div>
-</div>
-
-
-
-      
-
-   <div style="
-  height:calc(640px - 300px);
-  padding:10px 18px;
-  display:flex;
-  flex-direction:column;
-  box-sizing:border-box;
-">
-
-
-       
-
-     <div style="
-  padding:14px;
-  border:1px solid rgba(255,255,255,.35);
-  border-radius:16px;
-  background:rgba(255,255,255,.12);   /* 🔥 MAIS CLARO */
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  color:#f2f4f8;
-">
- ${funcionamentoLinhas.length ? `
-<div style="font-size:16px;line-height:1.5;">
-
-
- <strong style="font-size:16px;">⏰ Funcionamento:</strong>
-  <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px;">
-    ${funcionamentoLinhas.map(linha => `
-      <div>${linha}</div>
-    `).join("")}
-  </div>
-</div>
-` : ""}
-
-
-            ${endereco ? `<div style="font-size:14px;line-height:1.35;"><strong style="font-size:16px;">📍 Endereço:</strong><br>${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : ""}
+            ${endereco ? `
+            <div style="font-size: 14px; line-height: 1.35;">
+              <strong style="font-size: 16px;">📍 Endereço:</strong><br>
+              <div style="font-size: 14px; margin-top: 4px;">${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+            </div>
+            ` : ""}
           </div>
 
-        <!-- BLOCO FIXO INFERIOR -->
-<div style="
-  margin-top:40px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-">
+          <!-- BLOCO FIXO INFERIOR -->
+          <div style="
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+          ">
+            <!-- LINHA AZUL -->
+            <div style="
+              width: 100%;
+              height: 3px;
+              margin-bottom: 12px;
+              border-radius: 999px;
+              background: linear-gradient(
+                90deg,
+                transparent,
+                #5dd4ff,
+                transparent
+              );
+              box-shadow:
+                0 0 12px rgba(93,212,255,.9),
+                0 0 26px rgba(93,212,255,.7);
+            "></div>
 
-  <!-- LINHA AZUL (AGORA SEMPRE APARECE) -->
-  <div style="
-    width:100%;
-    height:3px;
-    margin-bottom:12px;
-    border-radius:999px;
-    background:linear-gradient(
-      90deg,
-      transparent,
-      #5dd4ff,
-      transparent
-    );
-    box-shadow:
-      0 0 12px rgba(93,212,255,.9),
-      0 0 26px rgba(93,212,255,.7);
-  "></div>
+            <!-- TEXTO COM FUNDO BRANCO 
+            <div style="
+              padding: 6px 16px;
+              background: #ffffff;
+              color: #1f7fdc;
+              font-size: 14px;
+              font-weight: 700;
+              border-radius: 999px;
+              letter-spacing: .02em;
+              box-shadow: 0 4px 14px rgba(0,0,0,.25);
+              margin-bottom: 10px;
+              white-space: nowrap;
+            ">
+              Nos encontre no Olá Carlópolis
+            </div>-->
 
-  <!-- TEXTO COM FUNDO BRANCO -->
-  <div style="
-    padding:6px 16px;
-    background:#ffffff;
-    color:#1f7fdc;
-    font-size:14px;
-    font-weight:700;
-    border-radius:999px;
-    letter-spacing:.02em;
-    box-shadow:0 4px 14px rgba(0,0,0,.25);
-    margin-bottom:10px;
-  ">
-    Nos encontre no Olá Carlópolis
-  </div>
-
-  <!-- LOGO -->
-  <img src="${logoBrancaSite}" style="
-    width:150px;
-    display:block;
-    filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
-  ">
-</div>
-
-
-
-
+            <!-- LOGO -->
+            <img id="logoSite" 
+                 src="${logoBrancaSite}" 
+                 style="
+                   width: 100px;
+                   height: auto;
+                   display: block;
+                   filter: drop-shadow(0 6px 18px rgba(0,0,0,.7));
+                   object-fit: contain;
+                 "
+                 crossorigin="anonymous"
+                 onerror="this.onerror=null; this.style.display='none';">
+          </div>
         </div>
       </div>
     `;
 
     document.body.appendChild(host);
 
-    if (!window.html2canvas) {
-      alert("html2canvas não carregado. Verifique o script no final da página.");
-      host.remove();
-      return;
+    // ✅ GARANTIR QUE O HTML2CANVAS ESTÁ CARREGADO
+    if (typeof html2canvas === 'undefined') {
+      throw new Error("html2canvas não está disponível");
     }
 
-    // ✅ esperar fontes/imagens (agora pode, porque a função é async)
+    // ✅ ESPERAR CARREGAMENTO COMPLETO DE TODOS OS RECURSOS
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // ✅ ESPERAR FONTES (SE APLICÁVEL)
     if (document.fonts && document.fonts.ready) {
-      try { await document.fonts.ready; } catch (e) { }
+      try {
+        await document.fonts.ready;
+      } catch (e) {
+        console.warn("Font loading failed:", e);
+      }
     }
 
-    const imgs = host.querySelectorAll("img");
-    await Promise.all([...imgs].map(img => {
-      if (img.complete) return Promise.resolve();
-      return new Promise(res => {
-        img.onload = () => res();
-        img.onerror = () => res();
+    // ✅ ESPERAR IMAGENS CARREGAREM
+    const images = host.querySelectorAll('img');
+    const imagePromises = Array.from(images).map(img => {
+      return new Promise((resolve) => {
+        if (img.complete && img.naturalWidth > 0) {
+          resolve();
+          return;
+        }
+        
+        img.onload = () => {
+          console.log('Imagem carregada:', img.src);
+          resolve();
+        };
+        
+        img.onerror = () => {
+          console.warn(`Imagem falhou ao carregar: ${img.src}`);
+          // Se for a foto do estabelecimento, tenta usar a padrão
+          if (img.id === 'fotoEstabelecimento') {
+            img.src = window.location.origin + '/images/img_padrao_site/logo_1.png';
+          } else {
+            img.style.display = 'none';
+          }
+          resolve();
+        };
+        
+        // Timeout de segurança
+        setTimeout(resolve, 3000);
       });
-    }));
-
-    const card = host.querySelector("#estCard");
-
-    await html2canvas(card, {
-      backgroundColor: null,
-      scale: 2,
-      useCORS: true
-    }).then((canvas) => {
-      const link = document.createElement("a");
-      link.download = `card-${String(nome).toLowerCase().replace(/\s+/g, "-")}.png`;
-      link.href = canvas.toDataURL("image/png", 1.0);
-      link.click();
     });
 
+    await Promise.all(imagePromises);
+
+    // ✅ ESPERAR UM POUCO MAIS PARA GARANTIR QUE TUDO ESTÁ RENDERIZADO
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // ✅ CAPTURAR O CARD
+    const card = host.querySelector('#estCard');
+    
+    if (!card) {
+      throw new Error("Elemento do card não encontrado");
+    }
+
+    // ✅ USAR CONFIGURAÇÕES OTIMIZADAS PARA HTML2CANVAS
+    const canvas = await html2canvas(card, {
+      backgroundColor: null,
+      scale: 2, // Alta resolução
+      useCORS: true, // Para imagens externas
+      allowTaint: false,
+      logging: false,
+      imageTimeout: 10000,
+      removeContainer: true,
+      foreignObjectRendering: false,
+      onclone: function(clonedDoc) {
+        // Garantir que o clone tenha os mesmos estilos
+        const clonedCard = clonedDoc.querySelector('#estCard');
+        if (clonedCard) {
+          clonedCard.style.fontFamily = "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+          clonedCard.style.width = "360px";
+          clonedCard.style.height = "640px";
+        }
+      }
+    });
+
+    // ✅ CRIAR E DISPARAR DOWNLOAD
+    const link = document.createElement('a');
+    const nomeArquivo = `card-${String(nome)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')}-${Date.now()}.png`;
+    
+    link.download = nomeArquivo;
+    link.href = canvas.toDataURL('image/png', 1.0);
+    
+    // Disparar download automaticamente
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // ✅ LIMPEZA
     host.remove();
+
+    // ✅ FEEDBACK PARA O USUÁRIO
+    if (typeof mostrarToast === 'function') {
+      mostrarToast('✅ Card gerado com sucesso!');
+    }
+
   } catch (err) {
     console.error("Erro ao gerar imagem do card:", err);
-    alert("Não foi possível gerar a imagem. Veja o console (F12) para o erro.");
+    
+    // Feedback de erro
+    if (typeof mostrarToast === 'function') {
+      mostrarToast('❌ Erro ao gerar card. Verifique o console.');
+    } else {
+      alert("Não foi possível gerar a imagem. Veja o console (F12) para detalhes.");
+    }
+    
+    // Limpar qualquer elemento temporário
+    const host = document.getElementById('card-generator-host');
+    if (host) host.remove();
   }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
