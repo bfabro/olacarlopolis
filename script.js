@@ -526,14 +526,24 @@ position:relative;
         ` : ""}
       </div>
 
-      <!-- FAIXA RELUZENTE VAZIA -->
-      <div style="
-        width:100%;
-        height:3px;
-        background:linear-gradient(90deg, transparent, #5dd4ff, transparent);
-        box-shadow:0 0 18px rgba(93,212,255,.6);
-        border-radius:999px;
-      "></div>
+     <div style="
+  width:100%;
+  height:6px;
+  margin:14px 0 10px;
+  border-radius:999px;
+  display:block;
+  background:linear-gradient(90deg,
+    rgba(0,0,0,0) 0%,
+    rgba(93,212,255,.35) 25%,
+    rgba(93,212,255,1) 50%,
+    rgba(93,212,255,.35) 75%,
+    rgba(0,0,0,0) 100%
+  );
+  box-shadow:
+    0 0 14px rgba(93,212,255,1),
+    0 0 34px rgba(93,212,255,.8);
+"></div>
+
 
       <!-- LOGO BRANCA DO SITE -->
       <img src="images/img_padrao_site/logo_1.png"
