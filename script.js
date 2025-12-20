@@ -43,13 +43,11 @@ function somenteDigitos(str) {
   return String(str || "").replace(/\D/g, "");
 }
 
-
 // === GERAR CARD ESTILO PAGAMENTO (pixCard) PARA COMÉRCIOS ===
-function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
+async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
     const nome = establishment.name || "Comércio em Carlópolis";
 
-    // 🔹 HORÁRIO DE FUNCIONAMENTO – captura vários campos possíveis
     let funcionamento =
       establishment.horario ||
       establishment.funcionamento ||
@@ -63,14 +61,12 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         : "") ||
       "";
 
-    // Se vier um objeto → transformar em texto legível
     if (typeof funcionamento === "object" && funcionamento !== null) {
       funcionamento = Object.entries(funcionamento)
         .map(([dia, valor]) => `${dia}: ${valor}`)
         .join(" | ");
     }
 
-    // 🔹 ENDEREÇO – vários campos possíveis
     let endereco =
       establishment.endereco ||
       establishment.enderecoCompleto ||
@@ -85,7 +81,6 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         .join(" - ");
     }
 
-    // Logo / foto do cliente (prioriza logo/image, senão pega 1ª divulgação/novidades)
     const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
     let fotoPerfilUrl =
       establishment.logo ||
@@ -94,17 +89,12 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
 
     fotoPerfilUrl = (fotoPerfilUrl || "").toString().trim();
 
-    // Se não tiver foto do comércio, cai no logo branco do site (igual pag.html usa fallback)
     const fotoFinal = fotoPerfilUrl
-      ? (fotoPerfilUrl.startsWith("/") || fotoPerfilUrl.startsWith("http")
-          ? fotoPerfilUrl
-          : fotoPerfilUrl)
+      ? fotoPerfilUrl
       : "/images/img_padrao_site/logo_.png";
 
-    // Logo branca do site (VOCÊ pediu especificamente a branca)
     const logoBrancaSite = "/images/img_padrao_site/logo_.png";
 
-    // container invisível para o html2canvas
     const host = document.createElement("div");
     host.style.position = "fixed";
     host.style.left = "-9999px";
@@ -123,117 +113,40 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
         font-family:'Poppins',sans-serif;
       ">
 
-        <!-- CAPA COM FOTO DO COMÉRCIO (quase totalidade em cima) -->
-        <div style="
-          position:relative;
-          width:100%;
-          height:360px;
-          overflow:hidden;
-          background:#000;
-        ">
-          <img src="${fotoFinal}"
-               alt="${String(nome).replace(/"/g, "&quot;")}"
-               style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:relative;width:100%;height:360px;overflow:hidden;background:#000;">
+          <img src="${fotoFinal}" style="width:100%;height:100%;object-fit:cover;display:block;">
 
-          <!-- degradê para leitura do texto (igual pixCard) -->
-          <div style="
-            position:absolute;
-            inset:0;
+          <div style="position:absolute;inset:0;
             background:linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.18) 55%, rgba(0,0,0,0) 100%);
           "></div>
 
-          <!-- NOME DO CLIENTE EM CIMA DA FOTO (mesma ideia do pag.html) -->
-          <div style="
-            position:absolute;
-            left:18px;
-            right:18px;
-            bottom:14px;
-            display:flex;
-            flex-direction:column;
-            gap:2px;
-          ">
-            <span style="
-              font-size:11px;
-              text-transform:uppercase;
-              letter-spacing:.12em;
-              color:#9aa6b2;
-            ">Comércio</span>
-
-            <span style="
-              font-size:17px;
-              font-weight:800;
-              color:#f9fafb;
-              text-shadow:0 2px 6px rgba(0,0,0,.85);
-              line-height:1.15;
-            ">${String(nome).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</span>
+          <div style="position:absolute;left:18px;right:18px;bottom:14px;display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#9aa6b2;">Comércio</span>
+            <span style="font-size:17px;font-weight:800;color:#f9fafb;text-shadow:0 2px 6px rgba(0,0,0,.85);line-height:1.15;">
+              ${String(nome).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+            </span>
           </div>
         </div>
 
-        <!-- CORPO DO CARTÃO -->
-        <div style="
-          padding:14px 18px 16px;
-          display:flex;
-          flex-direction:column;
-          gap:10px;
-          color:#e3e7ee;
-          font-size:13px;
-        ">
-
+        <div style="padding:14px 18px 16px;display:flex;flex-direction:column;gap:10px;color:#e3e7ee;font-size:13px;">
           ${categoriaAtual ? `
-            <div style="
-              font-size:13px;
-              text-transform:uppercase;
-              letter-spacing:.14em;
-              color:#bfcbd7;
-            ">Categoria • ${String(categoriaAtual).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
-          ` : ""}
+            <div style="font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:#bfcbd7;">
+              Categoria • ${String(categoriaAtual).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+            </div>` : ""}
 
-          <!-- CARD DE INFORMAÇÕES (Funcionamento + Endereço) -->
-          <div style="
-            padding:12px 12px;
-            border:1px solid rgba(255,255,255,.16);
-            border-radius:14px;
-            background:rgba(255,255,255,.06);
-            display:flex;
-            flex-direction:column;
-            gap:10px;
-          ">
-            ${funcionamento ? `
-              <div style="font-size:12px; line-height:1.35;">
-                <strong>⏰ Funcionamento:</strong><br>
-                ${String(funcionamento).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
-              </div>
-            ` : ""}
-
-            ${endereco ? `
-              <div style="font-size:12px; line-height:1.35;">
-                <strong>📍 Endereço:</strong><br>
-                ${String(endereco).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
-              </div>
-            ` : ""}
+          <div style="padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(255,255,255,.06);display:flex;flex-direction:column;gap:10px;">
+            ${funcionamento ? `<div style="font-size:12px;line-height:1.35;"><strong>⏰ Funcionamento:</strong><br>${String(funcionamento).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>` : ""}
+            ${endereco ? `<div style="font-size:12px;line-height:1.35;"><strong>📍 Endereço:</strong><br>${String(endereco).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>` : ""}
           </div>
 
-          <!-- FAIXA RELUZENTE (SEM TEXTO) -->
-          <div style="
-            margin-top:2px;
-            width:100%;
-            height:3px;
-            border-radius:999px;
+          <div style="margin-top:2px;width:100%;height:3px;border-radius:999px;
             background:linear-gradient(90deg, transparent, rgba(93,212,255,.95), transparent);
             box-shadow:0 0 18px rgba(93,212,255,.55);
           "></div>
 
-          <!-- LOGO DO SITE (BRANCA) -->
-          <div style="margin-top:2px; display:flex; justify-content:center;">
-            <img src="${logoBrancaSite}" alt="Olá Carlópolis" style="
-              width:190px;
-              max-width:80%;
-              opacity:.95;
-              filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
-              display:block;
-            ">
+          <div style="margin-top:2px;display:flex;justify-content:center;">
+            <img src="${logoBrancaSite}" style="width:190px;max-width:80%;opacity:.95;filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));display:block;">
           </div>
-
         </div>
       </div>
     `;
@@ -246,24 +159,40 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       return;
     }
 
+    // ✅ esperar fontes/imagens (agora pode, porque a função é async)
+    if (document.fonts && document.fonts.ready) {
+      try { await document.fonts.ready; } catch (e) {}
+    }
+
+    const imgs = host.querySelectorAll("img");
+    await Promise.all([...imgs].map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise(res => {
+        img.onload = () => res();
+        img.onerror = () => res();
+      });
+    }));
+
     const card = host.querySelector("#estCard");
 
-    html2canvas(card, {
-      backgroundColor: "#050910", // mesmo clima do pixCard
-      scale: 3,
+    await html2canvas(card, {
+      backgroundColor: null,
+      scale: window.devicePixelRatio || 2,
       useCORS: true
-    })
-      .then((canvas) => {
-        const link = document.createElement("a");
-        link.download = `card-${String(nome).replace(/\s+/g, "-")}.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      })
-      .finally(() => host.remove());
-  } catch (e) {
-    console.error("Erro ao gerar card:", e);
+    }).then((canvas) => {
+      const link = document.createElement("a");
+      link.download = `card-${String(nome).toLowerCase().replace(/\s+/g,"-")}.png`;
+      link.href = canvas.toDataURL("image/png", 1.0);
+      link.click();
+    });
+
+    host.remove();
+  } catch (err) {
+    console.error("Erro ao gerar imagem do card:", err);
+    alert("Não foi possível gerar a imagem. Veja o console (F12) para o erro.");
   }
 }
+
 
 
 
