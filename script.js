@@ -297,7 +297,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       0 0 26px rgba(93,212,255,.7);
   "></div>--> <!-- REMOVER ESTE BLOCO -->
 
-  <!-- TEXTO COM FUNDO BRANCO -->
+  <!-- TEXTO COM FUNDO BRANCO
   <div style="
     padding: 6px 16px;
     background: #ffffff;
@@ -311,19 +311,19 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     white-space: nowrap;
   ">
     Nos encontre no Olá Carlópolis
-  </div>
+  </div> -->
 
   <!-- LOGO ALINHADA À ESQUERDA -->
   <div style="
     width: 100%;
     display: flex;
     justify-content: flex-start;
-    padding-left: 18px; /* Mesmo padding do conteúdo */
+    padding-left: 10px; /* Mesmo padding do conteúdo */
   ">
     <img id="logoSite" 
          src="${logoBrancaSite}" 
          style="
-           width: 100px;
+           width: 110px;
            height: auto;
            display: block;
            filter: drop-shadow(0 6px 18px rgba(0,0,0,.7));
@@ -7552,8 +7552,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               {
                 titulo: "Ração Golden Special - Frango e Carne ",
                 volume: "15kg",
-                preco: 220.00,
-                precoAntigo: 159.90,
+                preco: 159.90,
+                precoAntigo:  220.00,
                 unidade: "A UNIDADE",
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/4.jpg",
                 validadeFim: "2025-12-30",
