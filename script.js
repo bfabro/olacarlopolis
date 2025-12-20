@@ -107,9 +107,9 @@ if (typeof funcionamento === "string") {
 
     const fotoFinal = fotoPerfilUrl
       ? fotoPerfilUrl
-      : "/images/img_padrao_site/logo_.png";
+      : "/images/img_padrao_site/logo_1.png";
 
-    const logoBrancaSite = "/images/img_padrao_site/logo_.png";
+    const logoBrancaSite = "/images/img_padrao_site/logo_1.png";
 
     const host = document.createElement("div");
     host.style.position = "fixed";
@@ -183,7 +183,7 @@ box-sizing:border-box;
     </div>
 
       <div style="
-      font-size:17px;
+      font-size:18px;
       font-weight:800;
       color:#fff;
       text-shadow:0 2px 6px rgba(0,0,0,.85);
@@ -197,14 +197,14 @@ box-sizing:border-box;
 
       
 
-      <div style="
-  height:calc(640px - 300px);   /* 🔥 RESTANTE DO CARD */
+   <div style="
+  height:calc(640px - 300px);
   padding:10px 18px;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
   box-sizing:border-box;
 ">
+
 
        
 
@@ -219,10 +219,10 @@ box-sizing:border-box;
   color:#f2f4f8;
 ">
  ${funcionamentoLinhas.length ? `
-<div style="font-size:14px;line-height:1.5;">
+<div style="font-size:16px;line-height:1.5;">
 
 
- <strong style="font-size:15px;">⏰ Funcionamento:</strong>
+ <strong style="font-size:16px;">⏰ Funcionamento:</strong>
   <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px;">
     ${funcionamentoLinhas.map(linha => `
       <div>${linha}</div>
@@ -232,17 +232,60 @@ box-sizing:border-box;
 ` : ""}
 
 
-            ${endereco ? `<div style="font-size:12px;line-height:1.35;"><strong style="font-size:15px;">📍 Endereço:</strong><br>${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : ""}
+            ${endereco ? `<div style="font-size:14px;line-height:1.35;"><strong style="font-size:16px;">📍 Endereço:</strong><br>${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : ""}
           </div>
 
-          <div style="margin-top:2px;width:100%;height:3px;border-radius:999px;
-            background:linear-gradient(90deg, transparent, rgba(93,212,255,.95), transparent);
-            box-shadow:0 0 18px rgba(93,212,255,.55);
-          "></div>
+        <!-- BLOCO FIXO INFERIOR -->
+<div style="
+  margin-top:40px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+">
 
-          <div style="margin-top:2px;display:flex;justify-content:flex-start;padding-left:6px;">
-            <img src="${logoBrancaSite}" style="width:80px;max-width:80%;opacity:.95;filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));display:block;">
-          </div>
+  <!-- LINHA AZUL (AGORA SEMPRE APARECE) -->
+  <div style="
+    width:100%;
+    height:3px;
+    margin-bottom:12px;
+    border-radius:999px;
+    background:linear-gradient(
+      90deg,
+      transparent,
+      #5dd4ff,
+      transparent
+    );
+    box-shadow:
+      0 0 12px rgba(93,212,255,.9),
+      0 0 26px rgba(93,212,255,.7);
+  "></div>
+
+  <!-- TEXTO COM FUNDO BRANCO -->
+  <div style="
+    padding:6px 16px;
+    background:#ffffff;
+    color:#1f7fdc;
+    font-size:14px;
+    font-weight:700;
+    border-radius:999px;
+    letter-spacing:.02em;
+    box-shadow:0 4px 14px rgba(0,0,0,.25);
+    margin-bottom:10px;
+  ">
+    Nos encontre no Olá Carlópolis
+  </div>
+
+  <!-- LOGO -->
+  <img src="${logoBrancaSite}" style="
+    width:150px;
+    display:block;
+    filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
+  ">
+</div>
+
+
+
+
         </div>
       </div>
     `;
@@ -493,7 +536,7 @@ position:relative;
       "></div>
 
       <!-- LOGO BRANCA DO SITE -->
-      <img src="images/img_padrao_site/logo_.png"
+      <img src="images/img_padrao_site/logo_1.png"
            style="
              width:180px;
              margin:0 auto;
