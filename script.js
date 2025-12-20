@@ -103,7 +103,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     host.innerHTML = `
       <div id="estCard" style="
         position:relative;
-        width:336px;
+       width:100%;
+  height:auto;
         border-radius:24px;
         overflow:hidden;
         background:radial-gradient(circle at top,#1a2635,#050910);
@@ -117,7 +118,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           <img src="${fotoFinal}" style="width:100%;height:100%;object-fit:cover;display:block;">
 
           <div style="position:absolute;inset:0;
-            background:linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.18) 55%, rgba(0,0,0,0) 100%);
+          background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 1%, rgba(0,0,0,0) 0%);
           "></div>
 
           <div style="position:absolute;left:18px;right:18px;bottom:14px;display:flex;flex-direction:column;gap:2px;">
@@ -177,7 +178,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
     await html2canvas(card, {
       backgroundColor: null,
-      scale: window.devicePixelRatio || 2,
+      scale: 2,
       useCORS: true
     }).then((canvas) => {
       const link = document.createElement("a");
@@ -1014,85 +1015,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Gera a imagem do card
     if (typeof gerarImagemCardEstabelecimento === "function") {
       gerarImagemCardEstabelecimento(estEncontrado, categoriaAtual, estId);
-    } else {
-      console.error("Função gerarImagemCardEstabelecimento não disponível");
-      if (typeof mostrarToast === "function") {
-        mostrarToast("❌ Função de gerar card não está disponível.");
-      } else {
-        alert("Função de gerar card não está disponível.");
-      }
-      return;
-    }
-
-    // 🔸 Registra clique no Firebase (opcional, já que você tem registrarCliqueBotao)
-    if (typeof registrarCliqueBotao === "function") {
-      registrarCliqueBotao("gerar-card", estId).catch(() => { });
-    }
-  });
-
-  // 🔹 Botão "Gerar card para divulgação"
-  document.addEventListener("click", (ev) => {
-    const btnCard = ev.target.closest(".btn-gerar-card");
-    if (!btnCard) return;
-
-    ev.preventDefault();
-    ev.stopPropagation();
-
-    const estId = btnCard.getAttribute("data-estab-id");
-    if (!estId) {
-      console.warn("Botão de gerar card sem data-estab-id");
-      if (typeof mostrarToast === "function") {
-        mostrarToast("❌ Não consegui identificar o comércio.");
-      }
-      return;
-    }
-
-    // Procura o estabelecimento e sua categoria
-    const fonteCategorias =
-      typeof categories !== "undefined"
-        ? categories
-        : (window.categories || []);
-
-    let estEncontrado = null;
-    let categoriaAtual = "";
-
-    for (const cat of fonteCategorias) {
-      if (!cat || !Array.isArray(cat.establishments)) continue;
-
-      for (const est of cat.establishments) {
-        const norm =
-          est.nomeNormalizado ||
-          (typeof normalizeName === "function"
-            ? normalizeName(est.name || "")
-            : String(est.name || "")
-              .toLowerCase()
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .replace(/\s+/g, "-"));
-
-        if (norm === estId) {
-          estEncontrado = est;
-          categoriaAtual = cat.title || "";
-          break;
-        }
-      }
-
-      if (estEncontrado) break;
-    }
-
-    if (!estEncontrado) {
-      console.warn("Estabelecimento não encontrado para gerar card:", estId);
-      if (typeof mostrarToast === "function") {
-        mostrarToast("❌ Não encontrei os dados deste comércio para gerar o card.");
-      } else {
-        alert("Não encontrei os dados deste comércio para gerar o card.");
-      }
-      return;
-    }
-
-    // Gera a imagem do card
-    if (typeof gerarImagemCardEstabelecimento === "function") {
-      gerarImagemCardEstabelecimento(estEncontrado, categoriaAtual);
     } else {
       console.error("Função gerarImagemCardEstabelecimento não disponível");
       if (typeof mostrarToast === "function") {
