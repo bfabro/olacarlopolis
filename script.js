@@ -67,6 +67,22 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         .join(" | ");
     }
 
+    // 🔥 LIMPA QUALQUER HTML DO FUNCIONAMENTO (remove <br>, <p>, etc)
+// 🔥 NORMALIZA FUNCIONAMENTO PARA LINHAS
+let funcionamentoLinhas = [];
+
+if (typeof funcionamento === "string") {
+  funcionamentoLinhas = funcionamento
+    .replace(/<br\s*\/?>/gi, "|")
+    .replace(/<\/p>/gi, "|")
+    .replace(/<[^>]+>/g, "")
+    .split(/\||;|•/g)
+    .map(l => l.trim())
+    .filter(Boolean);
+}
+
+
+
     let endereco =
       establishment.endereco ||
       establishment.enderecoCompleto ||
@@ -124,18 +140,18 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 <div style="
   position:relative;
   width:100%;
-  height:360px;               /* ✅ IGUAL pag.html */
+  height:auto;
   overflow:hidden;
   background:#000;
 ">
   <img src="${fotoFinal}"
-       style="
+       alt="${String(nome).replace(/"/g, "&quot;")}"
+        style="
          width:100%;
          height:100%;          /* ✅ IGUAL pag.html */
          object-fit:cover;     /* ✅ CHAVE DA QUALIDADE */
          display:block;
        ">
-
 
   <!-- degradê (IDÊNTICO pag.html) -->
   <div style="
@@ -145,11 +161,11 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   "></div>
 
   <!-- categoria acima do nome (MESMO alinhamento/cor do pag.html) -->
- <div style="
+  <div style="
   position:absolute;
   left:0;
   right:0;
-  bottom:14px;
+  bottom:18px;
   text-align:center;   /* ✅ CENTRALIZA */
 ">
 
@@ -158,7 +174,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       text-transform:uppercase;
       letter-spacing:.12em;
       color:#9aa6b2;
-      display:block;
+       display:block;
     ">
       ${String(categoriaAtual || "Comércio").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
     </span>
@@ -166,9 +182,9 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     <span style="
       font-size:17px;
       font-weight:800;
-      color:#f9fafb;
-      text-shadow:0 2px 6px rgba(0,0,0,.8);
-      display:block;
+      color:#ffffff;
+       text-shadow:0 2px 6px rgba(0,0,0,.85);
+       display:block;
     ">
       ${String(nome).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
     </span>
@@ -179,11 +195,22 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
       
 
-        <div style="padding:14px 18px 16px;display:flex;flex-direction:column;gap:10px;color:#e3e7ee;font-size:13px;">
+        <div style="padding:0px 18px 2px;display:flex;flex-direction:column;gap:4px;color:#e3e7ee;font-size:13px;">
        
 
           <div style="padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(255,255,255,.06);display:flex;flex-direction:column;gap:10px;">
-            ${funcionamento ? `<div style="font-size:12px;line-height:1.35;"><strong>⏰ Funcionamento:</strong><br>${String(funcionamento).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : ""}
+       ${funcionamentoLinhas.length ? `
+<div style="font-size:12px;line-height:1.35;">
+  <strong>⏰ Funcionamento:</strong>
+  <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px;">
+    ${funcionamentoLinhas.map(linha => `
+      <div>${linha}</div>
+    `).join("")}
+  </div>
+</div>
+` : ""}
+
+
             ${endereco ? `<div style="font-size:12px;line-height:1.35;"><strong>📍 Endereço:</strong><br>${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : ""}
           </div>
 
@@ -193,7 +220,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           "></div>
 
           <div style="margin-top:2px;display:flex;justify-content:center;">
-            <img src="${logoBrancaSite}" style="width:130px;max-width:60%;opacity:.95;filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));display:block;">
+            <img src="${logoBrancaSite}" style="width:80px;max-width:80%;opacity:.95;filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));display:block;">
           </div>
         </div>
       </div>
@@ -377,11 +404,19 @@ position:relative;
 
 
       <!-- DEGRADÊ (IDÊNTICO AO pag.html) -->
-      <div style="
-        position:absolute;
-        inset:0;
-         background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 1%, rgba(0,0,0,0) 0%);
-      "></div>
+     <div style="
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:80px;
+  background:linear-gradient(
+    to top,
+    rgba(0,0,0,.8),
+    rgba(0,0,0,0)
+  );
+"></div>
+
 
       <!-- NOME SOBRE A IMAGEM (MESMA POSIÇÃO) -->
       <div style="
