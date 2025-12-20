@@ -376,204 +376,112 @@ function gerarImagemCardImovel(imovel, slugId) {
         })
         : "";
     host.innerHTML = `
-      <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
+  <div id="pixCard" style="
+    position:relative;
+    width:336px;
+    border-radius:24px;
+    overflow:hidden;
+    background:radial-gradient(circle at top,#1a2635,#050910);
+    box-shadow:0 18px 40px rgba(0,0,0,.7);
+    border:1px solid rgba(93,212,255,.25);
+    font-family:'Poppins',sans-serif;
+  ">
 
-        <!-- FUNDO OLA CARLÓPOLIS -->
-        <div style="
-          position:absolute;
-          top:0; left:0;
-          width:100%; height:100%;
-          background:url('${fundoRepresa}') top center/cover no-repeat;
-          filter:brightness(1.75) contrast(0.85);
-        "></div>
+    <!-- IMAGEM DO COMÉRCIO (MESMO PADRÃO DO pag.html) -->
+    <div style="
+      position:relative;
+      width:100%;
+      height:auto;
+      overflow:hidden;
+      background:#000;
+    ">
+      <img src="${imgLogoCliente}"
+           style="
+             width:100%;
+             height:100%;
+             object-fit:cover;
+             display:block;
+           ">
 
-        <!-- GRADIENTE -->
-        <div style="
-          position:absolute;inset:0;      
-          background:linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.45));
-        "></div>
-
-        <!-- CARD FUMÊ -->
-        <div style="
-          position:absolute;
-          top:55%;
-          left:50%;
-          transform:translate(-50%, -50%);
-          width:96%;
-          max-width:1050px;
-          background:rgba(19, 19, 19, 0.3);
-          padding:55px 50px 50px 50px;
-          border-radius:40px;
-          backdrop-filter:blur(7px);
-          color:#fff;
-          display:flex;
-          flex-direction:column;
-          align-items:center;
-          gap:30px;
-          text-align:center;
-          box-shadow:0 20px 50px rgba(0,0,0,.40);
-        ">
-
-          <!-- FOTO DO IMÓVEL: área fixa, estilo “mobile banner” -->
-        
-
-      <!-- IMAGEM DO CLIENTE – GIGANTE, SEM DISTORCER -->
+      <!-- DEGRADÊ (IDÊNTICO AO pag.html) -->
       <div style="
-        width:98%;
-        max-width:950px;
-        border-radius:32px;
-        overflow:hidden;
-        background:#000;  /* ajuda quando a logo tem fundo recortado */
-        box-shadow:
-          0 0 30px rgba(212,175,55,.40),
-          0 18px 45px rgba(0,0,0,.70);
+        position:absolute;
+        inset:0;
+        background:linear-gradient(
+          to top,
+          rgba(0,0,0,.85) 0%,
+          rgba(0,0,0,.18) 55%,
+          rgba(0,0,0,0) 100%
+        );
+      "></div>
+
+      <!-- NOME SOBRE A IMAGEM (MESMA POSIÇÃO) -->
+      <div style="
+        position:absolute;
+        left:18px;
+        right:18px;
+        bottom:14px;
       ">
-        <img src="${imgImovel}" style="
-          display:block;
-          width:100%;
-          height:auto;      /* mantém proporção original */
-          max-width:none;   /* não limita a 425px do CSS global */
-          object-fit:cover;  /* mostra a logo inteira, sem corte */
+        <span style="
+          font-size:17px;
+          font-weight:800;
+          color:#fff;
+          text-shadow:0 2px 6px rgba(0,0,0,.85);
+          line-height:1.15;
         ">
-
-        <div style="
-  position:absolute;
-  top:55px;
-  left:57px;
-  background:linear-gradient(135deg, #1f1f1f, #000000);
-  padding:20px 30px;
-  border-radius:22px;
-  font-size:28px;
-  font-weight:900;
-  color:#ffffff;
-  z-index:50;
-  box-shadow:
-    0 8px 25px rgba(0,0,0,.45),
-    0 0 12px rgba(255,255,255,.25);
-  backdrop-filter:blur(5px);
-  border:2px solid rgba(255,255,255,0.35);
-">
-  ${valorBr}
-</div>
+          ${nome}
+        </span>
       </div>
-
-
-
-
-<!-- BLOCO DE TEXTO COM BORDA APENAS AO REDOR DO TEXTO -->
-<div style="
-  width:100%;
-  max-width:900px;
-  padding:35px 40px;
-  border-radius:22px;
-
-  /* 🔥 BORDA FINA SOMENTE NO TEXTO */
-  border:1.6px solid rgba(255,255,255,0.22);
-
-  background:rgba(0,0,0,0.20);
-  backdrop-filter:blur(4px);
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:18px;
-">
-    
-    <!-- TÍTULO -->
-    <div style="
-      font-size:60px;
-      font-weight:800;
-      line-height:1.05;
-      text-shadow:0 5px 18px rgba(0,0,0,.9);
-    ">
-      ${titulo}
     </div>
 
-    <!-- DESCRIÇÃO -->
-    ${descricaoCurta ? `
-    <div style="
-      font-size:34px;
-      opacity:.97;
-      line-height:1.45;
-      white-space:pre-line;
-    ">
-      ${descricaoCurta}
-    </div>` : ""}
+    <!-- CONTEÚDO ABAIXO DA IMAGEM -->
+    <div style="padding:14px 18px 16px;display:flex;flex-direction:column;gap:10px;">
 
-   
-
-</div>
-
-${detalhes ? `
-<!-- CARD DE DETALHES DO IMÓVEL -->
-<div style="
-  width:100%;
-  max-width:900px;
-  padding:30px 40px;
-  border-radius:22px;
-
-  border:1.6px solid rgba(255,255,255,0.22); /* borda fina */
-  background:rgba(0,0,0,0.20);
-  backdrop-filter:blur(4px);
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:6px;
-">
-   
-
-    <div style="
-      font-size:34px;
-      opacity:.96;
-      line-height:1.5;
-    ">
-      ${detalhes}
-    </div>
-</div>
-` : ""}
-
-<br>
-
-          <!-- LINHA DOURADA -->
-          <div style="
-            width:70%;
-            height:2px;
-            background:linear-gradient(90deg, transparent, #d4af37, transparent);
-          "></div>
-
-          <!-- CHAMADA FINAL -->
-          <div>
-            <div style="
-              background:#fff;
-              color:#00539b;
-              display:inline-block;
-              padding:18px 52px;
-              font-size:38px;
-              font-weight:800;
-              border-radius:999px;
-              box-shadow:
-                0 7px 20px rgba(0,0,0,.45),
-                0 0 14px rgba(255,255,255,.9);
-            ">
-              Imóveis no Olá Carlópolis
-            </div>
-            <div style="
-              font-size:28px;
-              margin-top:10px;
-              opacity:.97;
-            ">
-            <Br><br>
-            </div>
-          </div>
-
-        </div>
+      <!-- CARD DE INFORMAÇÕES -->
+      <div style="
+        padding:12px;
+        border:1px solid rgba(255,255,255,.16);
+        border-radius:14px;
+        background:rgba(255,255,255,.06);
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+        font-size:12px;
+        color:#e3e7ee;
+      ">
+        ${funcionamento ? `
+          <div><b>⏰ Funcionamento:</b><br>${funcionamento}</div>
+        ` : ""}
+        ${endereco ? `
+          <div><b>📍 Endereço:</b><br>${endereco}</div>
+        ` : ""}
       </div>
-    `;
+
+      <!-- FAIXA RELUZENTE VAZIA -->
+      <div style="
+        width:100%;
+        height:3px;
+        background:linear-gradient(90deg, transparent, #5dd4ff, transparent);
+        box-shadow:0 0 18px rgba(93,212,255,.6);
+        border-radius:999px;
+      "></div>
+
+      <!-- LOGO BRANCA DO SITE -->
+      <img src="images/img_padrao_site/logo_.png"
+           style="
+             width:180px;
+             margin:0 auto;
+             display:block;
+             filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
+           ">
+    </div>
+  </div>
+`;
+
 
     document.body.appendChild(host);
 
-    html2canvas(host.firstElementChild, {
+    html2canvas(document.getElementById("pixCard"), {
       useCORS: true,
       backgroundColor: null,
       scale: 2
