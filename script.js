@@ -338,7 +338,7 @@ function gerarImagemCardImovel(imovel, slugId) {
     <!-- IMAGEM DO COMÉRCIO (MESMO PADRÃO DO pag.html) -->
     <div style="
       position:relative;
-      width:100%;
+      width:336px;
       height:auto;
       overflow:hidden;
       background:#000;
