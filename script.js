@@ -181,102 +181,77 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
             ">
           </div>
 
-          <!-- BLOCO DE INFORMAÇÕES COM BORDA (PADRÃO IMÓVEIS) -->
-          <div style="
-            width:100%;
-            max-width:900px;
-            padding:35px 40px;
-            border-radius:22px;
-            border:1.6px solid rgba(255,255,255,0.22);
-            background:rgba(0,0,0,0.20);
-            backdrop-filter:blur(4px);
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            gap:18px;
-          ">
-            <!-- NOME -->
-            <div style="
-              font-size:64px;
-              font-weight:800;
-              line-height:1.05;
-              text-shadow:0 5px 18px rgba(0,0,0,.9);
-            ">
-              ${nome}
-            </div>
+        <!-- NOME DO CLIENTE (MESMA POSIÇÃO) -->
+<div style="
+  font-size:64px;
+  font-weight:800;
+  line-height:1.05;
+  margin-top:20px;
+  text-align:center;
+  text-shadow:0 5px 18px rgba(0,0,0,.9);
+">
+  ${nome}
+</div>
 
-            <!-- CATEGORIA -->
-            <div style="
-              font-size:38px;
-              opacity:.96;
-            ">
-              ${categoriaAtual || "Carlópolis - PR"}
-            </div>
+<!-- CARD DE INFORMAÇÕES -->
+<div style="
+  width:100%;
+  max-width:900px;
+  margin-top:26px;
+  padding:32px 38px;
+  border-radius:22px;
+  border:1.6px solid rgba(255,255,255,0.25);
+  background:rgba(0,0,0,0.22);
+  backdrop-filter:blur(4px);
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  text-align:center;
+">
 
-            <!-- ENDEREÇO -->
-            ${
-              endereco
-                ? `
-            <div style="
-              font-size:32px;
-              opacity:.96;
-            ">
-              📍 ${endereco}
-            </div>`
-                : ""
-            }
+  ${funcionamento ? `
+  <div style="
+    font-size:34px;
+    line-height:1.4;
+  ">
+    ⏰ <b>Funcionamento</b><br>
+    ${funcionamento}
+  </div>` : ""}
 
-            <!-- HORÁRIO DE FUNCIONAMENTO -->
-            ${
-              funcionamento
-                ? `
-            <div style="
-              font-size:34px;
-              opacity:.96;
-              margin-top:4px;
-            ">
-              ⏰ ${funcionamento}
-            </div>`
-                : ""
-            }
-          </div>
+  ${endereco ? `
+  <div style="
+    font-size:32px;
+    line-height:1.4;
+  ">
+    📍 <b>Endereço</b><br>
+    ${endereco}
+  </div>` : ""}
 
-          <br>
+</div>
 
-          <!-- LINHA DOURADA -->
-          <div style="
-            width:70%;
-            height:2px;
-            background:linear-gradient(90deg, transparent, #d4af37, transparent);
-          "></div>
+<!-- FAIXA RELUZENTE (SEM TEXTO) -->
+<div style="
+  margin-top:34px;
+  width:72%;
+  height:3px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(212,175,55,0.9),
+    transparent
+  );
+  box-shadow:0 0 18px rgba(212,175,55,.6);
+"></div>
 
-          <!-- FRASE FINAL -->
-          <div style="margin-top:6px;">
-            <div style="
-              background:#fff;
-              color:#00539b;
-              display:inline-block;
-              padding:18px 52px;
-              font-size:38px;
-              font-weight:800;
-              border-radius:999px;
-              box-shadow:
-                0 7px 20px rgba(0,0,0,.45),
-                0 0 14px rgba(255,255,255,.9);
-            ">
-              Nos encontre no Olá Carlópolis
-            </div>
-            <div style="
-              font-size:28px;
-              margin-top:10px;
-              opacity:.97;
-            ">
-              <br><br>
-            </div>
-          </div>
+<!-- LOGO DO SITE -->
+<div style="margin-top:30px;">
+  <img src="images/img_padrao_site/logo.png" style="
+    width:260px;
+    max-width:80%;
+    filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
+  ">
+</div>
 
-        </div>
-      </div>
     `;
 
     document.body.appendChild(host);
