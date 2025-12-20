@@ -119,7 +119,10 @@ if (typeof funcionamento === "string") {
     host.innerHTML = `
       <div id="estCard" style="
           position:relative;
-        width:336px;
+     width:360px;
+height:640px;              /* 🔥 9:16 REAL */
+box-sizing:border-box;
+
         
         border-radius:24px;
         overflow:hidden;
@@ -133,17 +136,11 @@ if (typeof funcionamento === "string") {
         <div style="
           position:relative;
           width:100%;
-          height:auto;
+          height:auto;      /* ~60% de 640 */
           overflow:hidden;
+           background:#000;
         ">
-<!-- CAPA (IGUAL pag.html: height:auto + imagem sem cortar) -->
-<div style="
-  position:relative;
-  width:100%;
-  height:auto;
-  overflow:hidden;
-  background:#000;
-">
+
   <img src="${fotoFinal}"
        alt="${String(nome).replace(/"/g, "&quot;")}"
         style="
@@ -153,41 +150,46 @@ if (typeof funcionamento === "string") {
          display:block;
        ">
 
-  <!-- degradê (IDÊNTICO pag.html) -->
+ <!-- degradê -->
   <div style="
     position:absolute;
-    inset:0;
-    background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 1%, rgba(0,0,0,0) 0%);
+    left:0;
+    right:0;
+    bottom:0;
+    height:90px;
+    background:linear-gradient(
+      to top,
+      rgba(0,0,0,.8),
+      rgba(0,0,0,0)
+    );
   "></div>
 
-  <!-- categoria acima do nome (MESMO alinhamento/cor do pag.html) -->
+<!-- categoria + nome -->
   <div style="
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:18px;
-  text-align:center;   /* ✅ CENTRALIZA */
-">
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:18px;
+    text-align:center;
+  ">
 
-    <span style="
+       <div style="
       font-size:11px;
-      text-transform:uppercase;
       letter-spacing:.12em;
+      text-transform:uppercase;
       color:#9aa6b2;
-       display:block;
     ">
-      ${String(categoriaAtual || "Comércio").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
-    </span>
+      ${categoriaAtual}
+    </div>
 
-    <span style="
+      <div style="
       font-size:17px;
       font-weight:800;
-      color:#ffffff;
-       text-shadow:0 2px 6px rgba(0,0,0,.85);
-       display:block;
+      color:#fff;
+      text-shadow:0 2px 6px rgba(0,0,0,.85);
     ">
-      ${String(nome).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
-    </span>
+      ${nome}
+    </div>
   </div>
 </div>
 
@@ -195,13 +197,32 @@ if (typeof funcionamento === "string") {
 
       
 
-        <div style="padding:0px 18px 2px;display:flex;flex-direction:column;gap:4px;color:#e3e7ee;font-size:13px;">
+      <div style="
+  height:calc(640px - 300px);   /* 🔥 RESTANTE DO CARD */
+  padding:10px 18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-sizing:border-box;
+">
+
        
 
-          <div style="padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(255,255,255,.06);display:flex;flex-direction:column;gap:10px;">
-       ${funcionamentoLinhas.length ? `
-<div style="font-size:12px;line-height:1.35;">
-  <strong>⏰ Funcionamento:</strong>
+     <div style="
+  padding:14px;
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:16px;
+  background:rgba(255,255,255,.12);   /* 🔥 MAIS CLARO */
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  color:#f2f4f8;
+">
+ ${funcionamentoLinhas.length ? `
+<div style="font-size:14px;line-height:1.5;">
+
+
+ <strong style="font-size:15px;">⏰ Funcionamento:</strong>
   <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px;">
     ${funcionamentoLinhas.map(linha => `
       <div>${linha}</div>
@@ -211,7 +232,7 @@ if (typeof funcionamento === "string") {
 ` : ""}
 
 
-            ${endereco ? `<div style="font-size:12px;line-height:1.35;"><strong>📍 Endereço:</strong><br>${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : ""}
+            ${endereco ? `<div style="font-size:12px;line-height:1.35;"><strong style="font-size:15px;">📍 Endereço:</strong><br>${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : ""}
           </div>
 
           <div style="margin-top:2px;width:100%;height:3px;border-radius:999px;
@@ -219,7 +240,7 @@ if (typeof funcionamento === "string") {
             box-shadow:0 0 18px rgba(93,212,255,.55);
           "></div>
 
-          <div style="margin-top:2px;display:flex;justify-content:center;">
+          <div style="margin-top:2px;display:flex;justify-content:flex-start;padding-left:6px;">
             <img src="${logoBrancaSite}" style="width:80px;max-width:80%;opacity:.95;filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));display:block;">
           </div>
         </div>
@@ -382,13 +403,15 @@ function gerarImagemCardImovel(imovel, slugId) {
     host.innerHTML = `
   <div id="pixCard" style="
     position:relative;
-    width:336px;
+    width:360px;
+height:640px;      /* proporção 9:16 */
     border-radius:24px;
     overflow:hidden;
     background:radial-gradient(circle at top,#1a2635,#050910);
     box-shadow:0 18px 40px rgba(0,0,0,.7);
     border:1px solid rgba(93,212,255,.25);
     font-family:'Poppins',sans-serif;
+    box-sizing:border-box;
   ">
 
     <!-- IMAGEM DO COMÉRCIO (MESMO PADRÃO DO pag.html) -->
