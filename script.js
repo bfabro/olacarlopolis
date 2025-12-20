@@ -47,10 +47,37 @@ function somenteDigitos(str) {
 
 // === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, LOGO GRANDE) ===
 
-function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {// === GERAR CARD ESTILO PAGAMENTO (pixCard) PARA COMÉRCIOS ===
 function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
     const nome = establishment.name || "Comércio em Carlópolis";
+
+    const slug =
+      slugId ||
+      establishment.nomeNormalizado ||
+      (typeof normalizeName === "function"
+        ? normalizeName(establishment.name || "")
+        : String(establishment.name || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, "-"));
+
+    const linkOla = slug
+      ? `www.olacarlopolis.com/#${slug}`
+      : "www.olacarlopolis.com";
+
+    // Fundo (logo Olá Carlópolis)
+    const fundoRepresa = "images/img_padrao_site/logo.png";
+
+    // Logo / foto do cliente (MANTIDA COMO ESTÁ)
+    const imagens =
+      establishment.novidadesImages || establishment.divulgacaoImages || [];
+    const imgLogoCliente =
+      establishment.logo ||
+      establishment.image ||
+      (Array.isArray(imagens) && imagens.length
+        ? imagens[0]
+        : "images/img_padrao_site/padrao.jpg");
 
     // 🔹 HORÁRIO DE FUNCIONAMENTO – captura vários campos possíveis
     let funcionamento =
@@ -83,182 +110,160 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       "";
 
     if (typeof endereco === "object" && endereco !== null) {
+      // Se for algo do tipo { rua: "...", numero: "...", bairro: "..." }
       endereco = Object.entries(endereco)
-        .map(([_, valor]) => `${valor}`)
+        .map(([chave, valor]) => `${valor}`)
         .join(" - ");
     }
 
-    // Logo / foto do cliente (prioriza logo/image, senão pega 1ª divulgação/novidades)
-    const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
-    let fotoPerfilUrl =
-      establishment.logo ||
-      establishment.image ||
-      (Array.isArray(imagens) && imagens.length ? imagens[0] : "");
-
-    fotoPerfilUrl = (fotoPerfilUrl || "").toString().trim();
-
-    // Se não tiver foto do comércio, cai no logo branco do site (igual pag.html usa fallback)
-    const fotoFinal = fotoPerfilUrl
-      ? (fotoPerfilUrl.startsWith("/") || fotoPerfilUrl.startsWith("http")
-          ? fotoPerfilUrl
-          : fotoPerfilUrl)
-      : "/images/img_padrao_site/logo_.png";
-
-    // Logo branca do site (VOCÊ pediu especificamente a branca)
-    const logoBrancaSite = "/images/img_padrao_site/logo_.png";
-
-    // container invisível para o html2canvas
+    // Área oculta onde o html2canvas captura
     const host = document.createElement("div");
     host.style.position = "fixed";
     host.style.left = "-9999px";
     host.style.top = "0";
 
     host.innerHTML = `
-      <div id="estCard" style="
-        position:relative;
-        width:336px;
-        border-radius:24px;
-        overflow:hidden;
-        background:radial-gradient(circle at top,#1a2635,#050910);
-        box-shadow:0 18px 40px rgba(0,0,0,.7);
-        border:1px solid rgba(93,212,255,.25);
-        margin:0;
-        font-family:'Poppins',sans-serif;
-      ">
+      <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
 
-        <!-- CAPA COM FOTO DO COMÉRCIO (quase totalidade em cima) -->
+        <!-- FUNDO AJUSTADO -->
         <div style="
-          position:relative;
-          width:100%;
-          height:360px;
-          overflow:hidden;
-          background:#000;
-        ">
-          <img src="${fotoFinal}"
-               alt="${String(nome).replace(/"/g, "&quot;")}"
-               style="width:100%;height:100%;object-fit:cover;display:block;">
+          position:absolute;
+          top:0; left:0;
+          width:100%; height:100%;
+          background:url('${fundoRepresa}') top center/cover no-repeat;
+          filter:brightness(1.20);
+        "></div>
 
-          <!-- degradê para leitura do texto (igual pixCard) -->
-          <div style="
-            position:absolute;
-            inset:0;
-            background:linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.18) 55%, rgba(0,0,0,0) 100%);
-          "></div>
-
-          <!-- NOME DO CLIENTE EM CIMA DA FOTO (mesma ideia do pag.html) -->
-          <div style="
-            position:absolute;
-            left:18px;
-            right:18px;
-            bottom:14px;
-            display:flex;
-            flex-direction:column;
-            gap:2px;
-          ">
-            <span style="
-              font-size:11px;
-              text-transform:uppercase;
-              letter-spacing:.12em;
-              color:#9aa6b2;
-            ">Comércio</span>
-
-            <span style="
-              font-size:17px;
-              font-weight:800;
-              color:#f9fafb;
-              text-shadow:0 2px 6px rgba(0,0,0,.85);
-              line-height:1.15;
-            ">${String(nome).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</span>
-          </div>
-        </div>
-
-        <!-- CORPO DO CARTÃO -->
+        <!-- GRADIENTE SUAVE -->
         <div style="
-          padding:14px 18px 16px;
+          position:absolute;inset:0;
+          background:linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.45));
+        "></div>
+
+        <!-- CARD FUMÊ -->
+        <div style="
+          position:absolute;
+          top:45%;
+          left:50%;
+          transform:translate(-50%, -50%);
+          width:96%;
+          max-width:1050px;
+          background:rgba(0,0,0,0.35);
+          padding:55px 50px 50px 50px;
+          border-radius:40px;
+          backdrop-filter:blur(7px);
+          color:#fff;
           display:flex;
           flex-direction:column;
-          gap:10px;
-          color:#e3e7ee;
-          font-size:13px;
+          align-items:center;
+          gap:32px;
+          text-align:center;
+          box-shadow:0 20px 50px rgba(0,0,0,.55);
         ">
 
-          ${categoriaAtual ? `
-            <div style="
-              font-size:13px;
-              text-transform:uppercase;
-              letter-spacing:.14em;
-              color:#bfcbd7;
-            ">Categoria • ${String(categoriaAtual).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
-          ` : ""}
-
-          <!-- CARD DE INFORMAÇÕES (Funcionamento + Endereço) -->
+          <!-- IMAGEM DO CLIENTE – MANTIDA -->
           <div style="
-            padding:12px 12px;
-            border:1px solid rgba(255,255,255,.16);
-            border-radius:14px;
-            background:rgba(255,255,255,.06);
-            display:flex;
-            flex-direction:column;
-            gap:10px;
+            width:96%;
+            max-width:1050px;
+            border-radius:32px;
+            overflow:hidden;
+            background:#000;
+            box-shadow:
+              0 0 30px rgba(212,175,55,.40),
+              0 18px 45px rgba(0,0,0,.70);
           ">
-            ${funcionamento ? `
-              <div style="font-size:12px; line-height:1.35;">
-                <strong>⏰ Funcionamento:</strong><br>
-                ${String(funcionamento).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
-              </div>
-            ` : ""}
-
-            ${endereco ? `
-              <div style="font-size:12px; line-height:1.35;">
-                <strong>📍 Endereço:</strong><br>
-                ${String(endereco).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
-              </div>
-            ` : ""}
-          </div>
-
-          <!-- FAIXA RELUZENTE (SEM TEXTO) -->
-          <div style="
-            margin-top:2px;
-            width:100%;
-            height:3px;
-            border-radius:999px;
-            background:linear-gradient(90deg, transparent, rgba(93,212,255,.95), transparent);
-            box-shadow:0 0 18px rgba(93,212,255,.55);
-          "></div>
-
-          <!-- LOGO DO SITE (BRANCA) -->
-          <div style="margin-top:2px; display:flex; justify-content:center;">
-            <img src="${logoBrancaSite}" alt="Olá Carlópolis" style="
-              width:190px;
-              max-width:80%;
-              opacity:.95;
-              filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
+            <img src="${imgLogoCliente}" style="
               display:block;
+              width:100%;
+              height:auto;
+              max-width:none;
+              object-fit:contain;
             ">
           </div>
 
-        </div>
-      </div>
+        <!-- NOME DO CLIENTE (MESMA POSIÇÃO) -->
+<div style="
+  font-size:64px;
+  font-weight:800;
+  line-height:1.05;
+  margin-top:20px;
+  text-align:center;
+  text-shadow:0 5px 18px rgba(0,0,0,.9);
+">
+  ${nome}
+</div>
+
+<!-- CARD DE INFORMAÇÕES -->
+<div style="
+  width:100%;
+  max-width:900px;
+  margin-top:26px;
+  padding:32px 38px;
+  border-radius:22px;
+  border:1.6px solid rgba(255,255,255,0.25);
+  background:rgba(0,0,0,0.22);
+  backdrop-filter:blur(4px);
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  text-align:center;
+">
+
+  ${funcionamento ? `
+  <div style="
+    font-size:34px;
+    line-height:1.4;
+  ">
+    ⏰ <b>Funcionamento</b><br>
+    ${funcionamento}
+  </div>` : ""}
+
+  ${endereco ? `
+  <div style="
+    font-size:32px;
+    line-height:1.4;
+  ">
+    📍 <b>Endereço</b><br>
+    ${endereco}
+  </div>` : ""}
+
+</div>
+
+<!-- FAIXA RELUZENTE (SEM TEXTO) -->
+<div style="
+  margin-top:34px;
+  width:72%;
+  height:3px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(212,175,55,0.9),
+    transparent
+  );
+  box-shadow:0 0 18px rgba(212,175,55,.6);
+"></div>
+
+<!-- LOGO DO SITE -->
+<div style="margin-top:30px;">
+  <img src="images/img_padrao_site/logo.png" style="
+    width:260px;
+    max-width:80%;
+    filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
+  ">
+</div>
+
     `;
 
     document.body.appendChild(host);
 
-    if (!window.html2canvas) {
-      alert("html2canvas não carregado. Verifique o script no final da página.");
-      host.remove();
-      return;
-    }
-
-    const card = host.querySelector("#estCard");
-
-    html2canvas(card, {
-      backgroundColor: "#050910", // mesmo clima do pixCard
-      scale: 3,
-      useCORS: true
+    html2canvas(host.firstElementChild, {
+      useCORS: true,
+      backgroundColor: null,
+      scale: 2
     })
       .then((canvas) => {
         const link = document.createElement("a");
-        link.download = `card-${String(nome).replace(/\s+/g, "-")}.png`;
+        link.download = `card-${nome.replace(/\s+/g, "-")}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
       })
