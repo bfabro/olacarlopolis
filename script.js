@@ -312,44 +312,18 @@ box-sizing:border-box;
       });
     }));
 
+    const card = host.querySelector("#estCard");
 
-
-    
-   const card = host.querySelector("#estCard");
-
-// 🔥 no celular, evita recorte por viewport/scroll
-const prevScrollX = window.scrollX;
-const prevScrollY = window.scrollY;
-window.scrollTo(0, 0);
-
-// deixa o host fora da tela, mas "fixo" (não depende do scroll)
-host.style.position = "fixed";
-host.style.left = "-10000px";
-host.style.top = "0";
-host.style.zIndex = "2147483647";
-
-
-   const w = card.offsetWidth;
-const h = card.offsetHeight;
-
-canvas = await html2canvas(card, {
-  backgroundColor: null,
-  scale: 2,
-  useCORS: true,
-  allowTaint: false,
-
-  // 🔥 garante que a captura use o tamanho real do card
-  width: w,
-  height: h,
-  windowWidth: w,
-  windowHeight: h,
-
-  // 🔥 evita recorte por scroll
-  scrollX: 0,
-  scrollY: 0,
-});
-
-window.scrollTo(prevScrollX, prevScrollY);
+    await html2canvas(card, {
+      backgroundColor: null,
+      scale: 2,
+      useCORS: true
+    }).then((canvas) => {
+      const link = document.createElement("a");
+      link.download = `card-${String(nome).toLowerCase().replace(/\s+/g, "-")}.png`;
+      link.href = canvas.toDataURL("image/png", 1.0);
+      link.click();
+    });
 
     host.remove();
   } catch (err) {
