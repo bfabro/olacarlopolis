@@ -47,37 +47,10 @@ function somenteDigitos(str) {
 
 // === GERAR CARD ESTILO OLÁ CARLÓPOLIS (STORIES, LOGO GRANDE) ===
 
+function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {// === GERAR CARD ESTILO PAGAMENTO (pixCard) PARA COMÉRCIOS ===
 function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
     const nome = establishment.name || "Comércio em Carlópolis";
-
-    const slug =
-      slugId ||
-      establishment.nomeNormalizado ||
-      (typeof normalizeName === "function"
-        ? normalizeName(establishment.name || "")
-        : String(establishment.name || "")
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, "-"));
-
-    const linkOla = slug
-      ? `www.olacarlopolis.com/#${slug}`
-      : "www.olacarlopolis.com";
-
-    // Fundo (logo Olá Carlópolis)
-    const fundoRepresa = "images/img_padrao_site/logo.png";
-
-    // Logo / foto do cliente (MANTIDA COMO ESTÁ)
-    const imagens =
-      establishment.novidadesImages || establishment.divulgacaoImages || [];
-    const imgLogoCliente =
-      establishment.logo ||
-      establishment.image ||
-      (Array.isArray(imagens) && imagens.length
-        ? imagens[0]
-        : "images/img_padrao_site/padrao.jpg");
 
     // 🔹 HORÁRIO DE FUNCIONAMENTO – captura vários campos possíveis
     let funcionamento =
@@ -110,160 +83,182 @@ function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
       "";
 
     if (typeof endereco === "object" && endereco !== null) {
-      // Se for algo do tipo { rua: "...", numero: "...", bairro: "..." }
       endereco = Object.entries(endereco)
-        .map(([chave, valor]) => `${valor}`)
+        .map(([_, valor]) => `${valor}`)
         .join(" - ");
     }
 
-    // Área oculta onde o html2canvas captura
+    // Logo / foto do cliente (prioriza logo/image, senão pega 1ª divulgação/novidades)
+    const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
+    let fotoPerfilUrl =
+      establishment.logo ||
+      establishment.image ||
+      (Array.isArray(imagens) && imagens.length ? imagens[0] : "");
+
+    fotoPerfilUrl = (fotoPerfilUrl || "").toString().trim();
+
+    // Se não tiver foto do comércio, cai no logo branco do site (igual pag.html usa fallback)
+    const fotoFinal = fotoPerfilUrl
+      ? (fotoPerfilUrl.startsWith("/") || fotoPerfilUrl.startsWith("http")
+          ? fotoPerfilUrl
+          : fotoPerfilUrl)
+      : "/images/img_padrao_site/logo_.png";
+
+    // Logo branca do site (VOCÊ pediu especificamente a branca)
+    const logoBrancaSite = "/images/img_padrao_site/logo_.png";
+
+    // container invisível para o html2canvas
     const host = document.createElement("div");
     host.style.position = "fixed";
     host.style.left = "-9999px";
     host.style.top = "0";
 
     host.innerHTML = `
-      <div style="width:1080px;height:1920px;position:relative;font-family:'Poppins',sans-serif;">
+      <div id="estCard" style="
+        position:relative;
+        width:336px;
+        border-radius:24px;
+        overflow:hidden;
+        background:radial-gradient(circle at top,#1a2635,#050910);
+        box-shadow:0 18px 40px rgba(0,0,0,.7);
+        border:1px solid rgba(93,212,255,.25);
+        margin:0;
+        font-family:'Poppins',sans-serif;
+      ">
 
-        <!-- FUNDO AJUSTADO -->
+        <!-- CAPA COM FOTO DO COMÉRCIO (quase totalidade em cima) -->
         <div style="
-          position:absolute;
-          top:0; left:0;
-          width:100%; height:100%;
-          background:url('${fundoRepresa}') top center/cover no-repeat;
-          filter:brightness(1.20);
-        "></div>
+          position:relative;
+          width:100%;
+          height:360px;
+          overflow:hidden;
+          background:#000;
+        ">
+          <img src="${fotoFinal}"
+               alt="${String(nome).replace(/"/g, "&quot;")}"
+               style="width:100%;height:100%;object-fit:cover;display:block;">
 
-        <!-- GRADIENTE SUAVE -->
-        <div style="
-          position:absolute;inset:0;
-          background:linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.45));
-        "></div>
+          <!-- degradê para leitura do texto (igual pixCard) -->
+          <div style="
+            position:absolute;
+            inset:0;
+            background:linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.18) 55%, rgba(0,0,0,0) 100%);
+          "></div>
 
-        <!-- CARD FUMÊ -->
+          <!-- NOME DO CLIENTE EM CIMA DA FOTO (mesma ideia do pag.html) -->
+          <div style="
+            position:absolute;
+            left:18px;
+            right:18px;
+            bottom:14px;
+            display:flex;
+            flex-direction:column;
+            gap:2px;
+          ">
+            <span style="
+              font-size:11px;
+              text-transform:uppercase;
+              letter-spacing:.12em;
+              color:#9aa6b2;
+            ">Comércio</span>
+
+            <span style="
+              font-size:17px;
+              font-weight:800;
+              color:#f9fafb;
+              text-shadow:0 2px 6px rgba(0,0,0,.85);
+              line-height:1.15;
+            ">${String(nome).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</span>
+          </div>
+        </div>
+
+        <!-- CORPO DO CARTÃO -->
         <div style="
-          position:absolute;
-          top:45%;
-          left:50%;
-          transform:translate(-50%, -50%);
-          width:96%;
-          max-width:1050px;
-          background:rgba(0,0,0,0.35);
-          padding:55px 50px 50px 50px;
-          border-radius:40px;
-          backdrop-filter:blur(7px);
-          color:#fff;
+          padding:14px 18px 16px;
           display:flex;
           flex-direction:column;
-          align-items:center;
-          gap:32px;
-          text-align:center;
-          box-shadow:0 20px 50px rgba(0,0,0,.55);
+          gap:10px;
+          color:#e3e7ee;
+          font-size:13px;
         ">
 
-          <!-- IMAGEM DO CLIENTE – MANTIDA -->
+          ${categoriaAtual ? `
+            <div style="
+              font-size:13px;
+              text-transform:uppercase;
+              letter-spacing:.14em;
+              color:#bfcbd7;
+            ">Categoria • ${String(categoriaAtual).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+          ` : ""}
+
+          <!-- CARD DE INFORMAÇÕES (Funcionamento + Endereço) -->
           <div style="
-            width:96%;
-            max-width:1050px;
-            border-radius:32px;
-            overflow:hidden;
-            background:#000;
-            box-shadow:
-              0 0 30px rgba(212,175,55,.40),
-              0 18px 45px rgba(0,0,0,.70);
+            padding:12px 12px;
+            border:1px solid rgba(255,255,255,.16);
+            border-radius:14px;
+            background:rgba(255,255,255,.06);
+            display:flex;
+            flex-direction:column;
+            gap:10px;
           ">
-            <img src="${imgLogoCliente}" style="
+            ${funcionamento ? `
+              <div style="font-size:12px; line-height:1.35;">
+                <strong>⏰ Funcionamento:</strong><br>
+                ${String(funcionamento).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+              </div>
+            ` : ""}
+
+            ${endereco ? `
+              <div style="font-size:12px; line-height:1.35;">
+                <strong>📍 Endereço:</strong><br>
+                ${String(endereco).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+              </div>
+            ` : ""}
+          </div>
+
+          <!-- FAIXA RELUZENTE (SEM TEXTO) -->
+          <div style="
+            margin-top:2px;
+            width:100%;
+            height:3px;
+            border-radius:999px;
+            background:linear-gradient(90deg, transparent, rgba(93,212,255,.95), transparent);
+            box-shadow:0 0 18px rgba(93,212,255,.55);
+          "></div>
+
+          <!-- LOGO DO SITE (BRANCA) -->
+          <div style="margin-top:2px; display:flex; justify-content:center;">
+            <img src="${logoBrancaSite}" alt="Olá Carlópolis" style="
+              width:190px;
+              max-width:80%;
+              opacity:.95;
+              filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
               display:block;
-              width:100%;
-              height:auto;
-              max-width:none;
-              object-fit:contain;
             ">
           </div>
 
-        <!-- NOME DO CLIENTE (MESMA POSIÇÃO) -->
-<div style="
-  font-size:64px;
-  font-weight:800;
-  line-height:1.05;
-  margin-top:20px;
-  text-align:center;
-  text-shadow:0 5px 18px rgba(0,0,0,.9);
-">
-  ${nome}
-</div>
-
-<!-- CARD DE INFORMAÇÕES -->
-<div style="
-  width:100%;
-  max-width:900px;
-  margin-top:26px;
-  padding:32px 38px;
-  border-radius:22px;
-  border:1.6px solid rgba(255,255,255,0.25);
-  background:rgba(0,0,0,0.22);
-  backdrop-filter:blur(4px);
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  text-align:center;
-">
-
-  ${funcionamento ? `
-  <div style="
-    font-size:34px;
-    line-height:1.4;
-  ">
-    ⏰ <b>Funcionamento</b><br>
-    ${funcionamento}
-  </div>` : ""}
-
-  ${endereco ? `
-  <div style="
-    font-size:32px;
-    line-height:1.4;
-  ">
-    📍 <b>Endereço</b><br>
-    ${endereco}
-  </div>` : ""}
-
-</div>
-
-<!-- FAIXA RELUZENTE (SEM TEXTO) -->
-<div style="
-  margin-top:34px;
-  width:72%;
-  height:3px;
-  background:linear-gradient(
-    90deg,
-    transparent,
-    rgba(212,175,55,0.9),
-    transparent
-  );
-  box-shadow:0 0 18px rgba(212,175,55,.6);
-"></div>
-
-<!-- LOGO DO SITE -->
-<div style="margin-top:30px;">
-  <img src="images/img_padrao_site/logo.png" style="
-    width:260px;
-    max-width:80%;
-    filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
-  ">
-</div>
-
+        </div>
+      </div>
     `;
 
     document.body.appendChild(host);
 
-    html2canvas(host.firstElementChild, {
-      useCORS: true,
-      backgroundColor: null,
-      scale: 2
+    if (!window.html2canvas) {
+      alert("html2canvas não carregado. Verifique o script no final da página.");
+      host.remove();
+      return;
+    }
+
+    const card = host.querySelector("#estCard");
+
+    html2canvas(card, {
+      backgroundColor: "#050910", // mesmo clima do pixCard
+      scale: 3,
+      useCORS: true
     })
       .then((canvas) => {
         const link = document.createElement("a");
-        link.download = `card-${nome.replace(/\s+/g, "-")}.png`;
+        link.download = `card-${String(nome).replace(/\s+/g, "-")}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
       })
@@ -1790,7 +1785,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "tokfino", "oficinadocelular", "cacaushow","farmais"
+    "tokfino", "oficinadocelular", "cacaushow", "farmais"
   ];
 
   function montarCarrosselDivulgacao() {
@@ -2135,7 +2130,7 @@ document.addEventListener("DOMContentLoaded", function () {
     assao: "s",
 
     //ADVOCACIA  
- 
+
 
     // Agropecuaria
     agrovida: "s",
@@ -2181,7 +2176,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     //confecção
-   
+
     panacea: "s",
 
     // borracharia
@@ -2347,7 +2342,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // restaurantes
     assadaodorussao: "s",
-    
+
     cantinaitaliana: "s",
     emporiosaovictor: "s",
     hime: "s",
@@ -2408,7 +2403,7 @@ document.addEventListener("DOMContentLoaded", function () {
     rose: "n",
 
     //frete
-    
+
     erickson: "s",
 
     // guia de pesca
@@ -2499,9 +2494,9 @@ document.addEventListener("DOMContentLoaded", function () {
     campeonatoeliteredai: "n",
 
     pedalaparana: "n",
-    confradocaravela:"s",
-    showdavirada2026:"s",
- cafedamanhadosamigos: "s",
+    confradocaravela: "s",
+    showdavirada2026: "s",
+    cafedamanhadosamigos: "s",
 
 
     /// FIM EVENTOS 
@@ -4447,7 +4442,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     {
       id: "casa6v",
       codRef: "C_006",
-      status:"vendido",
+      status: "vendido",
       tipo: "venda",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 2,
@@ -4841,14 +4836,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       descricao: "Ao lado da área de laser com um lago e um lindo pôr do sol, Documentação Ok.",
       endereco: "Residencial Vila Ray (horizonte 3)",
       valor: 280000,
-      construcao: 56 ,          // << NOVO: m² de construção
+      construcao: 56,          // << NOVO: m² de construção
       area: "180 m²",
-      banheiros: 1,      
+      banheiros: 1,
       cozinhas: 1,
       quartos: 2,
       quintal: "Sim",
       piscina: "Não",
-      salas: 1,      
+      salas: 1,
       vagas: 2,
       corretores: ["Cesar Melo - 38.105 F"],
       telefone: "43 99678-9652",  // Corretor ou propretario
@@ -4862,8 +4857,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa12/7.jpg",
         "images/imoveis/cesar/venda/casa12/8.jpg",
         "images/imoveis/cesar/venda/casa12/9.jpg",
-       
-      
+
+
 
 
 
@@ -4916,7 +4911,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-    
+
 
 
 
@@ -4924,44 +4919,44 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
     // SITIO
-/*
-    {
-      id: "sitio1v",
-      codRef: "ST_001",
-      tipo: "venda",
-      procura: "sitio",
-      titulo: "Sítio à Beira da Represa",
+    /*
+        {
+          id: "sitio1v",
+          codRef: "ST_001",
+          tipo: "venda",
+          procura: "sitio",
+          titulo: "Sítio à Beira da Represa",
+    
+          valor: 600000,
+    
+    
+          corretores: ["Luiz Vilas Boas - 52.194"],
+          descricao: "Sítio com acesso exclusivo à represa, linha elétrica instalada e documentação pronta para transferência. Localizado a menos de 6 km do centro de Carlópolis, ideal para lazer, investimento ou construção",
+    
+    
+          area: "22.550 m²",
+    
+    
+          telefone: "43 98803-4095", // Corretor ou propretario
+          imagens: [
+            "images/imoveis/luiz/venda/sitio1/1.jpg",
+            "images/imoveis/luiz/venda/sitio1/2.jpg",
+            "images/imoveis/luiz/venda/sitio1/3.jpg",
+            "images/imoveis/luiz/venda/sitio1/4.jpg",
+            "images/imoveis/luiz/venda/sitio1/5.jpg",
+            "images/imoveis/luiz/venda/sitio1/6.jpg",
+    
+          ],
+    
+    
+        },
+    
+    
+    */
 
-      valor: 600000,
-
-
-      corretores: ["Luiz Vilas Boas - 52.194"],
-      descricao: "Sítio com acesso exclusivo à represa, linha elétrica instalada e documentação pronta para transferência. Localizado a menos de 6 km do centro de Carlópolis, ideal para lazer, investimento ou construção",
-
-
-      area: "22.550 m²",
-
-
-      telefone: "43 98803-4095", // Corretor ou propretario
-      imagens: [
-        "images/imoveis/luiz/venda/sitio1/1.jpg",
-        "images/imoveis/luiz/venda/sitio1/2.jpg",
-        "images/imoveis/luiz/venda/sitio1/3.jpg",
-        "images/imoveis/luiz/venda/sitio1/4.jpg",
-        "images/imoveis/luiz/venda/sitio1/5.jpg",
-        "images/imoveis/luiz/venda/sitio1/6.jpg",
-
-      ],
-
-
-    },
-
-
-*/
 
 
 
-  
 
 
     //Modelo
@@ -7188,7 +7183,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Rua Benedito Salles, 409 - Carlopolis",
             contact: "(43) 99635-1001",
             delivery: "Sim / Sem Taxa",
-            instagram:"https://www.instagram.com/acougue.curitiba/",
+            instagram: "https://www.instagram.com/acougue.curitiba/",
             infoAdicional: "Fazemos espetinhos assados de quarta e sabado até as 20:00hrs",
             novidadesImages: [
               "images/comercios/acougue/curitiba/divulgacao/1.jpg",
@@ -7199,7 +7194,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/acougue/curitiba/divulgacao/6.jpg",
               "images/comercios/acougue/curitiba/divulgacao/7.jpg",
               "images/comercios/acougue/curitiba/divulgacao/8.jpg",
-                "images/comercios/acougue/curitiba/divulgacao/9.jpg",
+              "images/comercios/acougue/curitiba/divulgacao/9.jpg",
 
             ],
             novidadesDescriptions: [
@@ -7295,7 +7290,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuArtesanato"),
         title: "Artesanato",
         establishments: [
-          
+
 
 
 
@@ -7386,7 +7381,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuAdvocacia"),
         title: "Escritorio de Advocacia",
         establishments: [
-       
+
         ],
       },
 
@@ -7488,7 +7483,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                 obs: "Oferta válida até durar o estoque"
               },
 
-               {
+              {
                 titulo: "Ração Top Canis ",
                 volume: "14kg",
                 preco: 64.90,
@@ -7499,7 +7494,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                 obs: "Oferta válida até durar o estoque"
               },
 
-               {
+              {
                 titulo: "Ração Bionatural ",
                 volume: "15kg",
                 preco: 225.90,
@@ -7510,7 +7505,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
                 obs: "Oferta válida até durar o estoque"
               },
 
-                 {
+              {
                 titulo: "Ração Golden Special - Frango e Carne ",
                 volume: "15kg",
                 preco: 220.00,
@@ -7936,7 +7931,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99938-8281",
             infoAdicional: "🏗️ Instalação de novas calhas<Br>🛠️ Reformas<Br>🧹 Manutenção e limpeza para residências e comércios<Br>💡 Soluções sob medida para evitar entupimentos e vazamentos<Br>✅ Garantia de funcionamento eficiente do seu sistema de calhas",
             facebook: "https://www.facebook.com/nelsoncalhaa",
-            instagram:"https://www.instagram.com/edias230/",
+            instagram: "https://www.instagram.com/edias230/",
             novidadesImages: [
               "images/comercios/calhas/nelson/divulgacao/1.jpg",
               "images/comercios/calhas/nelson/divulgacao/2.jpg",
@@ -8176,7 +8171,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-         
+
         ],
       },
 
@@ -8731,7 +8726,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          
+
 
 
 
@@ -9703,7 +9698,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuPadaria"),
         title: "Padaria",
         establishments: [
-       
+
 
           {
             image: "images/comercios/padaria/esquinadopao/perfil.png",
@@ -10681,7 +10676,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
             instagram: "https://www.instagram.com/farmaiscarlopolis/",
             novidadesImages: [
-                "images/comercios/farmacia/farmais/divulgacao/1.jpg",
+              "images/comercios/farmacia/farmais/divulgacao/1.jpg",
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
               "images/comercios/farmacia/farmais/divulgacao/4.jpg",
@@ -10931,7 +10926,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuAnuncio"),
         title: "Anuncio",
         establishments: [
-        
+
         ],
       },
 
@@ -11053,8 +11048,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuDiarista"),
         title: "Diarista",
         establishments: [
-       
-          
+
+
         ],
       },
 
@@ -11146,7 +11141,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuFretes"),
         title: "Frete",
         establishments: [
-        
+
           {
             image: "images/servicos/fretes/erickson/erickson.png",
             name: "Erickson",
@@ -11435,31 +11430,31 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         establishments: [
 
 
-          
 
 
-        
 
-           {
+
+
+          {
             image: "images/informacoes/eventos/1.jpg",
             name: "Confra do Caravela",
             date: "27/12/2025",
             address: "Caravela Country Clube",
             contact: "(43) 99800-1680",
-            contact2: "(43) 99966-9812",           
+            contact2: "(43) 99966-9812",
             instagram: "https://www.instagram.com/caravelaclube/",
-         infoAdicional: "​A Confra do Caravela está chegando para encerrar 2025 com chave de ouro! Teremos um super show com Júlya & Maryana, a energia contagiante de Anadark e o som do Deejay Kábelo para não deixar ninguém parado.<br><br><strong>Pontos de Venda:</strong><br>Lojas Eliane<br>Adega Cuenca<br>Farmacia Desconto Facil<br>Portaria do Clube Caravela."
- },
+            infoAdicional: "​A Confra do Caravela está chegando para encerrar 2025 com chave de ouro! Teremos um super show com Júlya & Maryana, a energia contagiante de Anadark e o som do Deejay Kábelo para não deixar ninguém parado.<br><br><strong>Pontos de Venda:</strong><br>Lojas Eliane<br>Adega Cuenca<br>Farmacia Desconto Facil<br>Portaria do Clube Caravela."
+          },
 
 
-    {
+          {
             image: "images/informacoes/eventos/2.jpg",
             name: "Show da Virada 2026",
             date: "31/12/2025",
-            address: "Ilha do Ponciano",                    
+            address: "Ilha do Ponciano",
             instagram: "https://www.instagram.com/turismocarlopolis/",
-         infoAdicional: "Show da Virada com Lucas Lucco, entrada Free!"
- },
+            infoAdicional: "Show da Virada com Lucas Lucco, entrada Free!"
+          },
 
 
 
@@ -11793,7 +11788,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Kaliu keder, 620 - Carlopolis",
             contact: "Rodoviaria: (43) 3566-1393",
             contact2: "Princesa: (43) 99926-6484",
-           
+
             hours: "Seg a Sex - 08:30 as 11:00<br> 13:30 as 16:00 e 23:00 as 23:40<br>Sab: 08:30 as 11:00<br>Dom: 23:30 as 23:40",
             infoAdicional: "<a target='_blank'  style='color:#2da6ff;' href='https://queropassagem.com.br/rodoviaria-de-carlopolis-pr?wpsrc=Google%20AdWords&wpcid=15361090317&wpsnetn=x&wpkwn=&wpkmatch=&wpcrid=&wpscid=&wpkwid=&gad_source=1&gad_campaignid=15361092411&gbraid=0AAAAADpKqgF9tpsAwMZNVxXOyQz1HO5FS&gclid=Cj0KCQjwt8zABhDKARIsAHXuD7bNWFyJzC0hKW5n8saZVgNqiBJbBtlcDLdxbyVAsun4w8d07isBGGIaAnL7EALw_wcB'>Compre sua Passagem</a>",
 
@@ -12258,7 +12253,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuBorracharia"),
         title: "Borracharia",
         establishments: [
-          
+
 
 
           {
@@ -13392,7 +13387,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-          
+
 
           {
             image: "images/comercios/restaurante/oficinaSabor/perfil.png",
@@ -13838,7 +13833,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact: "(43) 99908-1510",
             instagram: "https://www.instagram.com/oticavisualcenter.oficial/",
             novidadesImages: [
-             // "images/comercios/otica/oticaVisual/divulgacao/0.jpg",
+              // "images/comercios/otica/oticaVisual/divulgacao/0.jpg",
               "images/comercios/otica/oticaVisual/divulgacao/1.jpg",
               "images/comercios/otica/oticaVisual/divulgacao/2.jpg",
               "images/comercios/otica/oticaVisual/divulgacao/3.jpg",
@@ -13847,7 +13842,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             ],
             novidadesDescriptions: [
-             // "Venha realizar seu exame de vista com a Otica Visual Center",
+              // "Venha realizar seu exame de vista com a Otica Visual Center",
               "Diga adeus aos reflexos e olá à visão nítida de verdade! 👋✨<Br>O tratamento Antirreflexo é aquele upgrade que transforma suas lentes — e sua rotina.<Br>👁️ Mais beleza: fotos sem brilhos e olhar sempre em destaque.<Br>💻 Mais conforto: menos cansaço com telas e luzes fortes.<Br>🚗 Mais segurança: visão noturna mais clara pra dirigir tranquilo.<Br>💪 Mais durabilidade: protege suas lentes de arranhões leves.<Br>Experimente o poder da clareza total e enxergue o mundo com outros olhos.Venha conferir nossos moveis",
               "Diga adeus aos reflexos e olá à visão nítida de verdade! 👋✨<Br>O tratamento Antirreflexo é aquele upgrade que transforma suas lentes — e sua rotina.<Br>👁️ Mais beleza: fotos sem brilhos e olhar sempre em destaque.<Br>💻 Mais conforto: menos cansaço com telas e luzes fortes.<Br>🚗 Mais segurança: visão noturna mais clara pra dirigir tranquilo.<Br>💪 Mais durabilidade: protege suas lentes de arranhões leves.<Br>Experimente o poder da clareza total e enxergue o mundo com outros olhos.Venha conferir nossos moveis",
               "Dificuldade pra enxergar de longe e de perto?<br>Você pode estar precisando de lentes multifocais.<br>Elas têm vários campos de visão em uma só lente:<br>🔹 Parte superior: visão de longe<br>🔹 Meio da lente: visão intermediária (computador, por exemplo)<br>🔹 Parte inferior: leitura e visão de perto<br>✅ Sem precisar trocar de óculos o tempo todo.<br>✅ Sem aquele “sobe e desce” do modelo bifocal.<br>✅ Com adaptação cada vez mais fácil, graças à tecnologia atual.<br>Na Ótica Visual Center, a gente te orienta sobre o melhor tipo de multifocal pra sua rotina.<br>Tem diferença entre marcas, tratamentos e modelos — e a escolha certa faz TODA a diferença.",
@@ -13984,40 +13979,40 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           */
 
 
-                     {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/60.jpg",
-                      date: "12/12/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. ANA FELLET DA SILVA, aos 81 anos, ocorrido em Carlópolis.<Br>O velório está sendo realizado no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá amanhã 12/12/2025 às 16:30 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
-                    {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/59.jpg",
-                      date: "10/12/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. GERSON CORREA DE LIMA aos 71 anos, ocorrido em Ribeirão Claro PR.<Br>O velório dará inicio hoje as 15:00 horas no Velório Municipal.<Br>A cerimônia do sepultamento ocorrerá hoje, 09/12/2025 às 17:30 horas horas, no Cemitério Municipal de Carlópolis<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/60.jpg",
+            date: "12/12/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. ANA FELLET DA SILVA, aos 81 anos, ocorrido em Carlópolis.<Br>O velório está sendo realizado no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá amanhã 12/12/2025 às 16:30 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/59.jpg",
+            date: "10/12/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. GERSON CORREA DE LIMA aos 71 anos, ocorrido em Ribeirão Claro PR.<Br>O velório dará inicio hoje as 15:00 horas no Velório Municipal.<Br>A cerimônia do sepultamento ocorrerá hoje, 09/12/2025 às 17:30 horas horas, no Cemitério Municipal de Carlópolis<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
 
-                     {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/58.jpg",
-                      date: "10/12/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. VALTER LUIS MURADOR aos 67 anos, ocorrido em São Bernardo SP.<Br>O velório iniciará amanhã às 07:45 horas no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá hoje às 09/12/2025 às 16:00 horas, no Cemitério Municipal de Carlópolis<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/58.jpg",
+            date: "10/12/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. VALTER LUIS MURADOR aos 67 anos, ocorrido em São Bernardo SP.<Br>O velório iniciará amanhã às 07:45 horas no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá hoje às 09/12/2025 às 16:00 horas, no Cemitério Municipal de Carlópolis<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-                     {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/57.jpg",
-                      date: "08/12/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. AKEMI NISHIGUCH aos 61 anos, ocorrido em Londrina.<Br>O velório iniciará amanhã às 07:00 horas no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá amanhã 08/12/2025 às 09:00 horas, no Cemitério Municipal de Carlópolis<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/57.jpg",
+            date: "08/12/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. AKEMI NISHIGUCH aos 61 anos, ocorrido em Londrina.<Br>O velório iniciará amanhã às 07:00 horas no Velório Municipal Lauro Soares.<Br>A cerimônia do sepultamento ocorrerá amanhã 08/12/2025 às 09:00 horas, no Cemitério Municipal de Carlópolis<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-                     {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/56.jpg",
-                      date: "04/12/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. LUZIA LIZETE DE LIMA ALMEIDA, aos 82 anos, ocorrido em Arapongas.<br>O velório está sendo realizado no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá hoje 29/11/2025 às 16:45 horas, no Cemitério Municipal de Carlópolis<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/56.jpg",
+            date: "04/12/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. LUZIA LIZETE DE LIMA ALMEIDA, aos 82 anos, ocorrido em Arapongas.<br>O velório está sendo realizado no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá hoje 29/11/2025 às 16:45 horas, no Cemitério Municipal de Carlópolis<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
           {
             name: "Funeraria Cristo Rei",
@@ -14504,10 +14499,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-        
 
 
-       
+
+
 
           {
             image: "images/comercios/restaurante/toninhoParana/perfil.jpg",
@@ -14526,7 +14521,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-        
+
           {
             image: "images/comercios/supermercado/rocha/perfil.jpg",
             name: "Rocha",
