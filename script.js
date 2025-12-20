@@ -271,60 +271,68 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
             ` : ""}
           </div>
 
-          <!-- BLOCO FIXO INFERIOR -->
-          <div style="
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex-shrink: 0;
-          ">
-            <!-- LINHA AZUL -->
-            <div style="
-              width: 100%;
-              height: 3px;
-              margin-bottom: 12px;
-              border-radius: 999px;
-              background: linear-gradient(
-                90deg,
-                transparent,
-                #5dd4ff,
-                transparent
-              );
-              box-shadow:
-                0 0 12px rgba(93,212,255,.9),
-                0 0 26px rgba(93,212,255,.7);
-            "></div>
 
-            <!-- TEXTO COM FUNDO BRANCO 
-            <div style="
-              padding: 6px 16px;
-              background: #ffffff;
-              color: #1f7fdc;
-              font-size: 14px;
-              font-weight: 700;
-              border-radius: 999px;
-              letter-spacing: .02em;
-              box-shadow: 0 4px 14px rgba(0,0,0,.25);
-              margin-bottom: 10px;
-              white-space: nowrap;
-            ">
-              Nos encontre no Olá Carlópolis
-            </div>-->
+<!-- BLOCO FIXO INFERIOR -->
+<div style="
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+">
+  <!-- LINHA AZUL 
+  <div style="
+    width: 100%;
+    height: 3px;
+    margin-bottom: 12px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #5dd4ff,
+      transparent
+    );
+    box-shadow:
+      0 0 12px rgba(93,212,255,.9),
+      0 0 26px rgba(93,212,255,.7);
+  "></div>--> <!-- REMOVER ESTE BLOCO -->
 
-            <!-- LOGO -->
-            <img id="logoSite" 
-                 src="${logoBrancaSite}" 
-                 style="
-                   width: 100px;
-                   height: auto;
-                   display: block;
-                   filter: drop-shadow(0 6px 18px rgba(0,0,0,.7));
-                   object-fit: contain;
-                 "
-                 crossorigin="anonymous"
-                 onerror="this.onerror=null; this.style.display='none';">
-          </div>
+  <!-- TEXTO COM FUNDO BRANCO -->
+  <div style="
+    padding: 6px 16px;
+    background: #ffffff;
+    color: #1f7fdc;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 999px;
+    letter-spacing: .02em;
+    box-shadow: 0 4px 14px rgba(0,0,0,.25);
+    margin-bottom: 10px;
+    white-space: nowrap;
+  ">
+    Nos encontre no Olá Carlópolis
+  </div>
+
+  <!-- LOGO ALINHADA À ESQUERDA -->
+  <div style="
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 18px; /* Mesmo padding do conteúdo */
+  ">
+    <img id="logoSite" 
+         src="${logoBrancaSite}" 
+         style="
+           width: 100px;
+           height: auto;
+           display: block;
+           filter: drop-shadow(0 6px 18px rgba(0,0,0,.7));
+           object-fit: contain;
+         "
+         crossorigin="anonymous"
+         onerror="this.onerror=null; this.style.display='none';">
+  </div>
+</div>
         </div>
       </div>
     `;
