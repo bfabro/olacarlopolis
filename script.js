@@ -102,60 +102,89 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
     host.innerHTML = `
       <div id="estCard" style="
-        position:relative;
-         width:336px;
-        height:auto;
+          position:relative;
+        width:336px;
+        
         border-radius:24px;
         overflow:hidden;
         background:radial-gradient(circle at top,#1a2635,#050910);
         box-shadow:0 18px 40px rgba(0,0,0,.7);
         border:1px solid rgba(93,212,255,.25);
         margin:0 auto 16px;
-        font-family:'Poppins',sans-serif;
-
-
-        
-
-
-
-
       ">
 
-        <div style="position:relative;width:100%;height:360px;overflow:hidden;background:#000;">
-          <img src="${fotoFinal}" style="width:100%;height:100%;object-fit:cover;display:block;">
-
-          <div style="position:absolute;inset:0;
-          background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 1%, rgba(0,0,0,0) 0%);
-          "></div>
-
-        <!-- NOME DO CLIENTE EM CIMA DA FOTO (mesma ideia do pag.html) -->
+        <!-- CAPA COM FOTO DO CLIENTE -->
+        <div style="
+          position:relative;
+          width:100%;
+          height:auto;
+          overflow:hidden;
+        ">
+<!-- CAPA (IGUAL pag.html: height:auto + imagem sem cortar) -->
 <div style="
-  position:absolute;
-  left:18px;
-  right:18px;
-  bottom:14px;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  align-items:center;
-  text-align:center;
+  position:relative;
+  width:100%;
+  height:360px;               /* ✅ IGUAL pag.html */
+  overflow:hidden;
+  background:#000;
 ">
-  <span style="
-    font-size:18px;
-    font-weight:800;
-    color:#f9fafb;
-    text-shadow:0 2px 6px rgba(0,0,0,.85);
-    line-height:1.15;
-  ">${String(nome).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</span>
+  <img src="${fotoFinal}"
+       style="
+         width:100%;
+         height:100%;          /* ✅ IGUAL pag.html */
+         object-fit:cover;     /* ✅ CHAVE DA QUALIDADE */
+         display:block;
+       ">
+
+
+  <!-- degradê (IDÊNTICO pag.html) -->
+  <div style="
+    position:absolute;
+    inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 1%, rgba(0,0,0,0) 0%);
+  "></div>
+
+  <!-- categoria acima do nome (MESMO alinhamento/cor do pag.html) -->
+ <div style="
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:14px;
+  text-align:center;   /* ✅ CENTRALIZA */
+">
+
+    <span style="
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#9aa6b2;
+      display:block;
+    ">
+      ${String(categoriaAtual || "Comércio").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+    </span>
+
+    <span style="
+      font-size:17px;
+      font-weight:800;
+      color:#f9fafb;
+      text-shadow:0 2px 6px rgba(0,0,0,.8);
+      display:block;
+    ">
+      ${String(nome).replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+    </span>
+  </div>
 </div>
-        </div>
+
+
+
+      
 
         <div style="padding:14px 18px 16px;display:flex;flex-direction:column;gap:10px;color:#e3e7ee;font-size:13px;">
-         
+       
 
           <div style="padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(255,255,255,.06);display:flex;flex-direction:column;gap:10px;">
-            ${funcionamento ? `<div style="font-size:12px;line-height:1.35;"><strong>⏰ Funcionamento:</strong><br>${String(funcionamento).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>` : ""}
-            ${endereco ? `<div style="font-size:12px;line-height:1.35;"><strong>📍 Endereço:</strong><br>${String(endereco).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>` : ""}
+            ${funcionamento ? `<div style="font-size:12px;line-height:1.35;"><strong>⏰ Funcionamento:</strong><br>${String(funcionamento).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : ""}
+            ${endereco ? `<div style="font-size:12px;line-height:1.35;"><strong>📍 Endereço:</strong><br>${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : ""}
           </div>
 
           <div style="margin-top:2px;width:100%;height:3px;border-radius:999px;
@@ -180,7 +209,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
     // ✅ esperar fontes/imagens (agora pode, porque a função é async)
     if (document.fonts && document.fonts.ready) {
-      try { await document.fonts.ready; } catch (e) {}
+      try { await document.fonts.ready; } catch (e) { }
     }
 
     const imgs = host.querySelectorAll("img");
@@ -200,7 +229,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       useCORS: true
     }).then((canvas) => {
       const link = document.createElement("a");
-      link.download = `card-${String(nome).toLowerCase().replace(/\s+/g,"-")}.png`;
+      link.download = `card-${String(nome).toLowerCase().replace(/\s+/g, "-")}.png`;
       link.href = canvas.toDataURL("image/png", 1.0);
       link.click();
     });
@@ -337,30 +366,21 @@ function gerarImagemCardImovel(imovel, slugId) {
 
     <!-- IMAGEM DO COMÉRCIO (MESMO PADRÃO DO pag.html) -->
     <div style="
-      position:relative;
-      width:336px;
-      height:auto;
-      overflow:hidden;
-      background:#000;
-    ">
-      <img src="${imgLogoCliente}"
-           style="
-             width:100%;
-             height:100%;
-             object-fit:cover;
-             display:block;
-           ">
+position:relative;
+  width:100%;
+  height:360px;
+  overflow:hidden;
+  background:#000;
+">
+  <img src="${imgLogoCliente}"
+       style="width:100%;height:100%;object-fit:cover;display:block;">
+
 
       <!-- DEGRADÊ (IDÊNTICO AO pag.html) -->
       <div style="
         position:absolute;
         inset:0;
-        background:linear-gradient(
-          to top,
-          rgba(0,0,0,.85) 0%,
-          rgba(0,0,0,.18) 55%,
-          rgba(0,0,0,0) 100%
-        );
+         background:linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 1%, rgba(0,0,0,0) 0%);
       "></div>
 
       <!-- NOME SOBRE A IMAGEM (MESMA POSIÇÃO) -->
