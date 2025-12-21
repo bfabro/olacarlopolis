@@ -232,109 +232,81 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           </div>
         </div>
 
-        <!-- CONTEÚDO INFERIOR -->
-        <div style="
-          height: 340px;
-          padding: 10px 18px;
-          display: flex;
-          flex-direction: column;
-          box-sizing: border-box;
-        ">
-          <!-- CARD DE INFORMAÇÕES -->
-          <div style="
-            padding: 14px;
-            border: 1px solid rgba(255,255,255,.35);
-            border-radius: 16px;
-            background: rgba(255,255,255,.12);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            color: #f2f4f8;
-            flex-grow: 1;
-          ">
-            ${funcionamentoLinhas.length ? `
-            <div style="font-size: 16px; line-height: 1.5;">
-              <strong style="font-size: 16px;">⏰ Funcionamento:</strong>
-              <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 2px;">
-                ${funcionamentoLinhas.map(linha => `
-                  <div style="font-size: 14px; line-height: 1.3;">${linha}</div>
-                `).join("")}
-              </div>
-            </div>
-            ` : ""}
-
-            ${endereco ? `
-            <div style="font-size: 14px; line-height: 1.35;">
-              <strong style="font-size: 16px;">📍 Endereço:</strong><br>
-              <div style="font-size: 14px; margin-top: 4px;">${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
-            </div>
-            ` : ""}
-          </div>
-
-
-<!-- BLOCO FIXO INFERIOR -->
+       <!-- CONTEÚDO INFERIOR -->
 <div style="
-  margin-top: 20px;
+  height: 340px;
+  padding: 10px 18px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
+  box-sizing: border-box;
 ">
-  <!-- LINHA AZUL 
+  <!-- CARD DE INFORMAÇÕES -->
   <div style="
-    width: 100%;
-    height: 3px;
-    margin-bottom: 12px;
-    border-radius: 999px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      #5dd4ff,
-      transparent
-    );
-    box-shadow:
-      0 0 12px rgba(93,212,255,.9),
-      0 0 26px rgba(93,212,255,.7);
-  "></div>--> <!-- REMOVER ESTE BLOCO -->
-
-  <!-- TEXTO COM FUNDO BRANCO
-  <div style="
-    padding: 6px 16px;
-    background: #ffffff;
-    color: #1f7fdc;
-    font-size: 14px;
-    font-weight: 700;
-    border-radius: 999px;
-    letter-spacing: .02em;
-    box-shadow: 0 4px 14px rgba(0,0,0,.25);
-    margin-bottom: 10px;
-    white-space: nowrap;
-  ">
-    Nos encontre no Olá Carlópolis
-  </div> -->
-
-  <!-- LOGO ALINHADA À ESQUERDA -->
-  <div style="
-    width: 100%;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 16px;
+    background: rgba(255,255,255,.12);
     display: flex;
-    justify-content: flex-start;
-    padding-left: 10px; /* Mesmo padding do conteúdo */
+    flex-direction: column;
+    gap: 12px;
+    color: #f2f4f8;
+    flex-grow: 1;
   ">
-    <img id="logoSite" 
-         src="${logoBrancaSite}" 
-         style="
-           width: 110px;
-           height: auto;
-           display: block;
-           filter: drop-shadow(0 6px 18px rgba(0,0,0,.7));
-           object-fit: contain;
-         "
-         crossorigin="anonymous"
-         onerror="this.onerror=null; this.style.display='none';">
-  </div>
-</div>
-        </div>
+    ${funcionamentoLinhas.length ? `
+    <div style="font-size: 16px; line-height: 1.5;">
+      <strong style="font-size: 16px;">⏰ Funcionamento:</strong>
+      <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 2px;">
+        ${funcionamentoLinhas.map(linha => `
+          <div style="font-size: 14px; line-height: 1.3;">${linha}</div>
+        `).join("")}
       </div>
+    </div>
+    ` : ""}
+
+    ${endereco ? `
+    <div style="font-size: 14px; line-height: 1.35;">
+      <strong style="font-size: 16px;">📍 Endereço:</strong><br>
+      <div style="font-size: 14px; margin-top: 4px;">${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+    </div>
+    ` : ""}
+  </div>
+<!-- 🔥 BLOCO LOGO + TEXTO BEM ACIMA (quase colado no card) -->
+<div style="
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 10px 0 10px; <!-- padding-top reduzido para 2px -->
+  margin-top: 0; <!-- margin-top removido -->
+">
+  <!-- Logo à esquerda -->
+  <img id="logoSite" 
+       src="${logoBrancaSite}" 
+       style="
+         width: 110px;
+         height: auto;
+         display: block;
+         filter: drop-shadow(0 6px 18px rgba(0,0,0,.7));
+         object-fit: contain;
+       "
+       crossorigin="anonymous"
+       onerror="this.onerror=null; this.style.display='none';">
+
+  <!-- Texto à direita 
+  <div style="
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: right;
+    line-height: 1.2;
+    max-width: 50%;
+  ">
+    Para mais informações<br>acesse:<br>
+    
+  </div>-->
+</div>
+
+
+</div>
     `;
 
     document.body.appendChild(host);
@@ -480,9 +452,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
 //
 //
-//
-// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
-function gerarImagemCardImovel(imovel, slugId) {
+//// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
+async function gerarImagemCardImovel(imovel, slugId) {
   try {
     const titulo = imovel.titulo || imovel.nome || "Imóvel em Carlópolis";
     const cidade = imovel.cidade || "Carlópolis - PR";
@@ -491,6 +462,12 @@ function gerarImagemCardImovel(imovel, slugId) {
     const banheiros = imovel.banheiros || 0;
     const vagas = imovel.vagas || imovel.garagens || 0;
     const area = imovel.construcao || imovel.area || imovel.m2 || "";
+    const valor = imovel.valor || 0;
+    
+    // Formatar valor
+    const valorFormatado = valor 
+      ? Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+      : "Consulte";
 
     // 🔹 pega valor bruto de suítes de várias formas possíveis
     const suitesFonte =
@@ -506,56 +483,16 @@ function gerarImagemCardImovel(imovel, slugId) {
     // 🔹 normaliza (garante número mesmo se vier "1 suíte")
     const suites = Number(String(suitesFonte).replace(/\D/g, "")) || 0;
 
-    // 🔹 DESCRIÇÃO – vamos usar isso no lugar de quartos/banheiros/preço
-    const descricaoBruta =
-      imovel.descricao ||
-      imovel.descricaoImovel ||
-      imovel.observacao ||
-      imovel.obs ||
-      "";
-
     // 🔹 linha de detalhes: dorm, suíte (se tiver), banh, vagas, área
     const detalhes = [
       quartos ? `${quartos} dorm` : "",
       suites > 0 ? `${suites} suíte${suites > 1 ? "s" : ""}` : "",
       banheiros ? `${banheiros} banh` : "",
       vagas ? `${vagas} vaga${vagas > 1 ? "s" : ""}` : "",
-      area ? `${area} m² constr` : ""
+      area ? `${area} m²` : ""
     ].filter(Boolean).join(" • ");
 
-
-    // limpa HTML e quebra-linha
-    const descricaoTexto = String(descricaoBruta)
-      .replace(/<br\s*\/?>/gi, "\n")
-      .replace(/<\/p>/gi, "\n")
-      .replace(/<[^>]+>/g, "")
-      .replace(/\n{2,}/g, "\n")
-      .trim();
-
-    const descricaoCurta =
-      descricaoTexto.length > 260
-        ? descricaoTexto.slice(0, 257) + "..."
-        : descricaoTexto;
-
-    const slug =
-      slugId ||
-      imovel.slug ||
-      (typeof normalizeName === "function"
-        ? normalizeName(titulo)
-        : String(titulo)
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "-"));
-
-    const linkOla = slug
-      ? `www.olacarlopolis.com/#${slug}`
-      : "www.olacarlopolis.com/imoveis";
-
-    // 🔹 FUNDO (logo Olá Carlópolis)
-    const fundoRepresa = "images/img_padrao_site/logo.png";
-
-    // 🔹 FOTO PRINCIPAL DO IMÓVEL – mesma fonte de imagens que você usa no site
+    // 🔹 FOTO PRINCIPAL DO IMÓVEL
     const fotos =
       imovel.imagens ||           // principal
       imovel.fotos ||
@@ -567,151 +504,312 @@ function gerarImagemCardImovel(imovel, slugId) {
       imovel.capa ||
       (Array.isArray(fotos) && fotos.length
         ? fotos[0]
-        : "images/img_padrao_site/padrao.jpg");
+        : window.location.origin + "/images/img_padrao_site/padrao.jpg");
 
-    // container invisível para o html2canvas
+    // Logo do site
+    const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
+
+    // ✅ CRIAR UM CONTAINER TEMPORÁRIO FORA DA TELA
     const host = document.createElement("div");
-    host.style.position = "fixed";
-    host.style.left = "-9999px";
-    host.style.top = "0";
-    const valorBr =
-      imovel.valor
-        ? Number(String(imovel.valor).replace(/\D/g, "")).toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL"
-        })
-        : "";
+    host.id = "imovel-card-generator-host";
+    host.style.cssText = `
+      position: fixed;
+      left: -9999px;
+      top: 0;
+      width: 360px;
+      height: 640px;
+      z-index: 99999;
+      background: transparent;
+    `;
+
+    // ✅ HTML DO CARD DO IMÓVEL (estilo similar ao dos estabelecimentos)
     host.innerHTML = `
-  <div id="pixCard" style="
-    position:relative;
-    width:360px;
-height:640px;      /* proporção 9:16 */
-    border-radius:24px;
-    overflow:hidden;
-    background:radial-gradient(circle at top,#1a2635,#050910);
-    box-shadow:0 18px 40px rgba(0,0,0,.7);
-    border:1px solid rgba(93,212,255,.25);
-    font-family:'Poppins',sans-serif;
-    box-sizing:border-box;
-  ">
-
-    <!-- IMAGEM DO COMÉRCIO (MESMO PADRÃO DO pag.html) -->
-    <div style="
-position:relative;
-  width:100%;
-  height:360px;
-  overflow:hidden;
-  background:#000;
-">
-  <img src="${imgLogoCliente}"
-       style="width:100%;height:100%;object-fit:cover;display:block;">
-
-
-      <!-- DEGRADÊ (IDÊNTICO AO pag.html) -->
-     <div style="
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  height:80px;
-  background:linear-gradient(
-    to top,
-    rgba(0,0,0,.8),
-    rgba(0,0,0,0)
-  );
-"></div>
-
-
-      <!-- NOME SOBRE A IMAGEM (MESMA POSIÇÃO) -->
-      <div style="
-        position:absolute;
-        left:18px;
-        right:18px;
-        bottom:14px;
+      <div id="imovelCard" style="
+        position: relative;
+        width: 360px;
+        height: 640px;
+        box-sizing: border-box;
+        border-radius: 24px;
+        overflow: hidden;
+        background: radial-gradient(circle at top, #1a2635, #050910);
+        box-shadow: 0 18px 40px rgba(0,0,0,.7);
+        border: 1px solid rgba(93,212,255,.25);
+        margin: 0;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        color: white;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       ">
-        <span style="
-          font-size:17px;
-          font-weight:800;
-          color:#fff;
-          text-shadow:0 2px 6px rgba(0,0,0,.85);
-          line-height:1.15;
+
+        <!-- IMAGEM DO IMÓVEL -->
+        <div style="
+          position: relative;
+          width: 100%;
+          height: 360px;
+          overflow: hidden;
+          background: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         ">
-          ${nome}
-        </span>
+          <img id="fotoImovel" 
+               src="${imgImovel}"
+               alt="${String(titulo).replace(/"/g, '&quot;')}"
+               style="
+                 max-width: 100%;
+                 max-height: 100%;
+                 object-fit: cover;
+                 display: block;
+                 background: #000;
+               "
+               crossorigin="anonymous"
+               onerror="this.onerror=null; this.src='${window.location.origin}/images/img_padrao_site/padrao.jpg';">
+
+          <!-- degradê -->
+          <div style="
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 90px;
+            background: linear-gradient(
+              to top,
+              rgba(0,0,0,.8),
+              rgba(0,0,0,0)
+            );
+          "></div>
+
+          <!-- título + cidade -->
+          <div style="
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 18px;
+            text-align: center;
+            padding: 0 20px;
+          ">
+            <div style="
+              font-size: 18px;
+              font-weight: 800;
+              color: #fff;
+              text-shadow: 0 2px 6px rgba(0,0,0,.85);
+              line-height: 1.2;
+              margin-bottom: 4px;
+            ">
+              ${titulo}
+            </div>
+            <div style="
+              font-size: 14px;
+              color: #9aa6b2;
+            ">
+              ${cidade}
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTEÚDO INFERIOR -->
+        <div style="
+          height: 280px;
+          padding: 20px 18px;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+        ">
+          <!-- VALOR -->
+          <div style="
+            text-align: center;
+            margin-bottom: 16px;
+          ">
+            <div style="
+              font-size: 11px;
+              letter-spacing: .12em;
+              text-transform: uppercase;
+              color: #9aa6b2;
+              margin-bottom: 4px;
+            ">
+              ${imovel.tipo === 'aluguel' ? 'ALUGUEL' : 'VENDA'}
+            </div>
+            <div style="
+              font-size: 24px;
+              font-weight: 800;
+              color: #5dd4ff;
+              text-shadow: 0 2px 8px rgba(93,212,255,.3);
+            ">
+              ${valorFormatado}
+            </div>
+          </div>
+
+          <!-- CARD DE DETALHES -->
+          <div style="
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,.35);
+            border-radius: 16px;
+            background: rgba(255,255,255,.12);
+            color: #f2f4f8;
+            margin-bottom: 16px;
+            flex-grow: 1;
+          ">
+            <div style="font-size: 16px; line-height: 1.5; margin-bottom: 10px;">
+              <strong style="font-size: 16px;">📐 Detalhes:</strong>
+              <div style="font-size: 14px; margin-top: 6px; line-height: 1.4;">
+                ${detalhes || "Informações disponíveis no site"}
+              </div>
+            </div>
+
+            ${imovel.descricao ? `
+            <div style="font-size: 14px; line-height: 1.35; margin-top: 10px;">
+              <strong style="font-size: 14px;">📝 Descrição:</strong>
+              <div style="font-size: 13px; margin-top: 4px; color: #e0e0e0;">
+                ${String(imovel.descricao).substring(0, 150)}${imovel.descricao.length > 150 ? '...' : ''}
+              </div>
+            </div>
+            ` : ""}
+          </div>
+
+          <!-- LOGO DO SITE -->
+          <div style="
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 8px;
+          ">
+            <img id="logoSiteImovel" 
+                 src="${logoSiteUrl}" 
+                 style="
+                   width: 110px;
+                   height: auto;
+                   display: block;
+                   filter: drop-shadow(0 6px 18px rgba(0,0,0,.7));
+                   object-fit: contain;
+                 "
+                 crossorigin="anonymous"
+                 onerror="this.onerror=null; this.style.display='none';">
+          </div>
+        </div>
       </div>
-    </div>
-
-    <!-- CONTEÚDO ABAIXO DA IMAGEM -->
-    <div style="padding:14px 18px 16px;display:flex;flex-direction:column;gap:10px;">
-
-      <!-- CARD DE INFORMAÇÕES -->
-      <div style="
-        padding:12px;
-        border:1px solid rgba(255,255,255,.16);
-        border-radius:14px;
-        background:rgba(255,255,255,.06);
-        display:flex;
-        flex-direction:column;
-        gap:8px;
-        font-size:12px;
-        color:#e3e7ee;
-      ">
-        ${funcionamento ? `
-          <div><b>⏰ Funcionamento:</b><br>${funcionamento}</div>
-        ` : ""}
-        ${endereco ? `
-          <div><b>📍 Endereço:</b><br>${endereco}</div>
-        ` : ""}
-      </div>
-
-     <div style="
-  width:100%;
-  height:6px;
-  margin:14px 0 10px;
-  border-radius:999px;
-  display:block;
-  background:linear-gradient(90deg,
-    rgba(0,0,0,0) 0%,
-    rgba(93,212,255,.35) 25%,
-    rgba(93,212,255,1) 50%,
-    rgba(93,212,255,.35) 75%,
-    rgba(0,0,0,0) 100%
-  );
-  box-shadow:
-    0 0 14px rgba(93,212,255,1),
-    0 0 34px rgba(93,212,255,.8);
-"></div>
-
-
-      <!-- LOGO BRANCA DO SITE -->
-      <img src="images/img_padrao_site/logo_1.png"
-           style="
-             width:180px;
-             margin:0 auto;
-             display:block;
-             filter:drop-shadow(0 6px 18px rgba(0,0,0,.7));
-           ">
-    </div>
-  </div>
-`;
-
+    `;
 
     document.body.appendChild(host);
 
-    html2canvas(document.getElementById("pixCard"), {
-      useCORS: true,
+    // ✅ GARANTIR QUE O HTML2CANVAS ESTÁ CARREGADO
+    if (typeof html2canvas === 'undefined') {
+      throw new Error("html2canvas não está disponível");
+    }
+
+    // ✅ ESPERAR CARREGAMENTO COMPLETO DE TODOS OS RECURSOS
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // ✅ ESPERAR FONTES (SE APLICÁVEL)
+    if (document.fonts && document.fonts.ready) {
+      try {
+        await document.fonts.ready;
+      } catch (e) {
+        console.warn("Font loading failed:", e);
+      }
+    }
+
+    // ✅ ESPERAR IMAGENS CARREGAREM
+    const images = host.querySelectorAll('img');
+    const imagePromises = Array.from(images).map(img => {
+      return new Promise((resolve) => {
+        if (img.complete && img.naturalWidth > 0) {
+          resolve();
+          return;
+        }
+        
+        img.onload = () => {
+          console.log('Imagem carregada:', img.src);
+          resolve();
+        };
+        
+        img.onerror = () => {
+          console.warn(`Imagem falhou ao carregar: ${img.src}`);
+          // Se for a foto do imóvel, tenta usar a padrão
+          if (img.id === 'fotoImovel') {
+            img.src = window.location.origin + '/images/img_padrao_site/padrao.jpg';
+          } else if (img.id === 'logoSiteImovel') {
+            img.style.display = 'none';
+          }
+          resolve();
+        };
+        
+        // Timeout de segurança
+        setTimeout(resolve, 3000);
+      });
+    });
+
+    await Promise.all(imagePromises);
+
+    // ✅ ESPERAR UM POUCO MAIS PARA GARANTIR QUE TUDO ESTÁ RENDERIZADO
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // ✅ CAPTURAR O CARD
+    const card = host.querySelector('#imovelCard');
+    
+    if (!card) {
+      throw new Error("Elemento do card não encontrado");
+    }
+
+    // ✅ USAR CONFIGURAÇÕES OTIMIZADAS PARA HTML2CANVAS
+    const canvas = await html2canvas(card, {
       backgroundColor: null,
-      scale: 2
-    })
-      .then((canvas) => {
-        const link = document.createElement("a");
-        link.download = `imovel-${titulo.replace(/\s+/g, "-")}.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      })
-      .finally(() => host.remove());
-  } catch (e) {
-    console.error("Erro ao gerar card do imóvel:", e);
+      scale: 2, // Alta resolução
+      useCORS: true, // Para imagens externas
+      allowTaint: false,
+      logging: false,
+      imageTimeout: 10000,
+      removeContainer: true,
+      foreignObjectRendering: false,
+      onclone: function(clonedDoc) {
+        // Garantir que o clone tenha os mesmos estilos
+        const clonedCard = clonedDoc.querySelector('#imovelCard');
+        if (clonedCard) {
+          clonedCard.style.fontFamily = "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+          clonedCard.style.width = "360px";
+          clonedCard.style.height = "640px";
+        }
+      }
+    });
+
+    // ✅ CRIAR E DISPARAR DOWNLOAD
+    const link = document.createElement('a');
+    const nomeArquivo = `imovel-${String(titulo)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')}-${Date.now()}.png`;
+    
+    link.download = nomeArquivo;
+    link.href = canvas.toDataURL('image/png', 1.0);
+    
+    // Disparar download automaticamente
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // ✅ LIMPEZA
+    host.remove();
+
+    // ✅ FEEDBACK PARA O USUÁRIO
+    if (typeof mostrarToast === 'function') {
+      mostrarToast('✅ Card do imóvel gerado com sucesso!');
+    }
+
+  } catch (err) {
+    console.error("Erro ao gerar imagem do card do imóvel:", err);
+    
+    // Feedback de erro
+    if (typeof mostrarToast === 'function') {
+      mostrarToast('❌ Erro ao gerar card do imóvel. Verifique o console.');
+    } else {
+      alert("Não foi possível gerar a imagem do imóvel. Veja o console (F12) para detalhes.");
+    }
+    
+    // Limpar qualquer elemento temporário
+    const host = document.getElementById('imovel-card-generator-host');
+    if (host) host.remove();
   }
 }
 
