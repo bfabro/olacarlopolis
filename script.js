@@ -886,7 +886,7 @@ function getOrCreatePlayerId() {
   return id;
 }
 
-// === Capivarinha: helpers para ranking ===
+// === Capivarinha: helpers para ranking ==
 function getPlayerName() {
   // guarda localmente para não perguntar toda hora
   let nm = localStorage.getItem("capivarinha_player_name") || "";
