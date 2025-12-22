@@ -1,15 +1,248 @@
 
 //
-//
-//
-//
-//
 
-const ADMIN_EMAILS = ["bruno.4and@gmail.com"]; // const ADMIN_EMAILS = ["bruno.4and@gmail.com", "outro-admin@gmail.com"];
 
-function isSuperAdmin(user) {
-    return user && ADMIN_EMAILS.includes(user.email);
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const formLogin = document.getElementById("formLogin");
+
+    if (formLogin) {
+        formLogin.addEventListener("submit", function(e) {
+            e.preventDefault(); // Impede a página de recarregar
+
+            const emailDigitado = document.getElementById("usuario").value.trim();
+            const senhaDigitada = document.getElementById("senha").value.trim();
+
+            console.log("Tentativa de login:", emailDigitado);
+
+            // 1. Aceder ao Firebase
+            firebase.database().ref('usuarios').once('value')
+                .then((snapshot) => {
+                    let usuarioLogado = null;
+
+                    if (!snapshot.exists()) {
+                        alert("Erro: Nenhum utilizador cadastrado no banco de dados.");
+                        return;
+                    }
+
+                    snapshot.forEach((childSnapshot) => {
+                        const user = childSnapshot.val();
+                        if (user.email === emailDigitado && user.senha === senhaDigitada) {
+                            usuarioLogado = user;
+                        }
+                    });
+
+                    if (usuarioLogado) {
+                        alert("Acesso concedido!");
+                        document.getElementById("modalLogin").classList.add("hidden");
+                        
+                        // Executa a função que mostra os painéis
+                        liberarPainelPorNivel(usuarioLogado);
+                    } else {
+                        alert("E-mail ou senha incorretos.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro Firebase:", error);
+                    alert("Erro ao conectar ao banco de dados.");
+                });
+        });
+    }
+});
+
+
+
+// 2. Função que REALMENTE mostra as opções na tela
+function mostrarOpcoesCadastro(usuario) {
+    const pageAdmin = document.getElementById("page-admin");
+    const adminSuperPanel = document.getElementById("admin-super-panel");
+    const adminContent = document.getElementById("admin-content");
+
+    // Se o cargo no Firebase for 'superadmin', liberamos a tela de cadastro
+    if (usuario.role === "superadmin") {
+        if (pageAdmin) pageAdmin.style.display = "block"; // Mostra a seção principal
+        if (adminContent) adminContent.style.display = "block"; // Mostra o conteúdo
+        if (adminSuperPanel) {
+            adminSuperPanel.style.display = "block"; // ESTA É A TELA DE OPÇÕES (CADASTRO)
+            console.log("Opções de cadastro liberadas para:", usuario.email);
+        }
+    } else {
+        // Lógica para cliente comum (se houver)
+        alert("Você não tem permissão de Super Admin.");
+    }
 }
+
+
+
+
+
+
+
+
+
+
+// Localize o evento de submit do formLogin e substitua por este:
+document.getElementById("formLogin")?.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const emailDigitado = document.getElementById("usuario").value.trim();
+    const senhaDigitada = document.getElementById("senha").value.trim();
+
+    // Referência para o nó 'usuarios' no seu Firebase
+    const dbRef = firebase.database().ref('usuarios');
+
+    dbRef.once('value').then((snapshot) => {
+        let usuarioEncontrado = null;
+
+        snapshot.forEach((childSnapshot) => {
+            const user = childSnapshot.val();
+            if (user.email === emailDigitado && user.senha === senhaDigitada) {
+                usuarioEncontrado = user;
+            }
+        });
+
+        if (usuarioEncontrado) {
+            alert("Acesso concedido!");
+            document.getElementById("modalLogin").classList.add("hidden");
+            
+            // Chama a função que abre os painéis
+            liberarPainelPorNivel(usuarioEncontrado);
+        } else {
+            alert("E-mail ou senha incorretos.");
+        }
+    }).catch(error => {
+        console.error("Erro ao acessar Firebase:", error);
+        alert("Erro de conexão. Verifique as chaves do Firebase.");
+    });
+});
+
+
+
+// Certifique-se de que esta função está solta no script.js
+function liberarPainelPorNivel(usuario) {
+    const pageAdmin = document.getElementById("page-admin");
+    const adminSuperPanel = document.getElementById("admin-super-panel");
+
+    if (pageAdmin) pageAdmin.style.display = "block";
+
+    if (usuario.role === "superadmin") {
+        if (adminSuperPanel) adminSuperPanel.style.display = "block";
+    }
+}
+
+
+// Função para você cadastrar clientes no seu painel
+document.getElementById("form-config-cliente")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("novo-cliente-email").value;
+    const senha = document.getElementById("novo-cliente-senha").value;
+    const checkboxes = e.target.querySelectorAll('input[type="checkbox"]');
+    
+    let permissoes = {};
+    checkboxes.forEach(cb => {
+        permissoes[cb.value] = cb.checked;
+    });
+
+    const userPath = email.replace(/\./g, '_'); // Firebase não aceita pontos na chave
+    
+    firebase.database().ref('usuarios/' + userPath).set({
+        email: email,
+        senha: senha,
+        role: "cliente",
+        permissoes: permissoes
+    }).then(() => alert("Cliente cadastrado com sucesso!"));
+});
+// Função para SALVAR um novo cliente e suas permissões no Firebase
+document.getElementById("form-permissoes-cliente")?.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const emailCliente = document.getElementById("cliente-id").value.trim();
+    const senhaCliente = document.getElementById("senha-provisoria").value.trim();
+    
+    // Captura quais checkboxes foram marcados
+    const permissoes = {};
+    document.querySelectorAll('input[name="func"]').forEach(checkbox => {
+        permissoes[checkbox.value] = checkbox.checked;
+    });
+
+    const dadosNovoCliente = {
+        email: emailCliente,
+        senha: senhaCliente,
+        role: "cliente",
+        permissoes: permissoes
+    };
+
+    // Gera um ID limpo para o Firebase (substituindo pontos por underscores)
+    const userId = emailCliente.replace(/\./g, '_');
+
+    firebase.database().ref('usuarios/' + userId).set(dadosNovoCliente)
+        .then(() => {
+            alert("Cliente " + emailCliente + " configurado com sucesso no Firebase!");
+            this.reset();
+        })
+        .catch(error => alert("Erro ao salvar: " + error.message));
+});
+
+
+
+// Função para abrir o painel que você usará para configurar clientes
+function mostrarPainelSuperAdmin(dados) {
+    const pageAdmin = document.getElementById("page-admin");
+    const superPanel = document.getElementById("admin-super-panel");
+    
+    if (pageAdmin) pageAdmin.style.display = "block";
+    if (superPanel) superPanel.style.display = "block";
+    
+    console.log("Modo Super Admin: Você pode configurar novos clientes agora.");
+}
+
+// Função para o cliente logar e ver apenas o que você liberou
+function mostrarPainelCliente(dados) {
+    const pageAdmin = document.getElementById("page-admin");
+    const adminContent = document.getElementById("admin-content");
+    
+    if (pageAdmin) pageAdmin.style.display = "block";
+    if (adminContent) adminContent.style.display = "block";
+
+    // Aqui usamos as permissões vindas do Firebase para esconder/mostrar botões
+    console.log("Permissões do cliente:", dados.permissoes);
+    // Exemplo: if (!dados.permissoes.veiculos) document.getElementById('btn-veiculos').remove();
+}
+
+
+
+// Função para simular o salvamento das permissões
+document.getElementById("form-permissoes-cliente")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    
+    const emailCliente = document.getElementById("cliente-id").value;
+    const senhaProvisoria = document.getElementById("senha-provisoria").value;
+    
+    // Captura as permissões marcadas nos checkboxes
+    const permissoes = {};
+    document.querySelectorAll('input[name="func"]').forEach(cb => {
+        permissoes[cb.value] = cb.checked;
+    });
+
+    const novoUsuario = {
+        email: emailCliente,
+        senha: senhaProvisoria,
+        role: "cliente",
+        permissoes: permissoes
+    };
+
+    // Salva no Firebase (substituindo pontos por underscores no email para usar como ID)
+    const userId = emailCliente.replace(/\./g, '_');
+    firebase.database().ref('usuarios/' + userId).set(novoUsuario)
+        .then(() => {
+            alert("Cliente cadastrado e permissões salvas no Firebase!");
+            e.target.reset();
+        })
+        .catch(err => alert("Erro ao salvar: " + err));
+});
+//
+//
 
 
 function isAppInstalado() {
@@ -7057,6 +7290,157 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+  //// MODULOS
+// 1. Definição Universal de Campos (Adicione todos que precisar aqui)
+const CONFIG_MODULOS = {
+    veiculos: { nome: "Veículos", campos: ["Marca", "Modelo", "Ano", "Preço", "Link_Imagem"] },
+    promocoes: { nome: "Promoções", campos: ["Título", "Descrição", "Desconto", "Link_Imagem"] },
+    cardapio: { nome: "Cardápio", campos: ["Prato", "Preço", "Ingredientes", "Link_Imagem"] },
+    imoveis: { nome: "Imóveis", campos: ["Tipo", "Cidade", "Valor", "Link_Imagem"] }
+};
+
+// 2. Função que constrói o Painel após o Login
+function montarPainelAdmin(dadosUsuario) {
+    document.getElementById("page-admin").style.display = "block";
+    document.getElementById("nome-usuario-logado").innerText = dadosUsuario.email;
+
+    const menu = document.getElementById("admin-menu-dinamico");
+    menu.innerHTML = ""; // Limpa menu anterior
+
+    // Se for você, mostra a gestão de clientes
+    if (dadosUsuario.role === "superadmin") {
+        document.getElementById("super-admin-control").style.display = "block";
+    }
+
+    // Cria botões apenas para o que o cliente tem permissão
+    Object.keys(dadosUsuario.permissoes || {}).forEach(chave => {
+        if (dadosUsuario.permissoes[chave] === true) {
+            const btn = document.createElement("button");
+            btn.className = "btn-menu-item";
+            btn.innerHTML = `<i class="fas fa-plus"></i> ${CONFIG_MODULOS[chave].nome}`;
+            btn.onclick = () => abrirFormularioCadastro(chave, dadosUsuario.email);
+            menu.appendChild(btn);
+        }
+    });
+}
+
+// 3. Gera o formulário de cadastro dinamicamente
+function abrirFormularioCadastro(tipo, emailDono) {
+    const editor = document.getElementById("editor-de-conteudo");
+    const container = document.getElementById("container-campos-dinamicos");
+    
+    editor.style.display = "block";
+    document.getElementById("titulo-modulo-atual").innerText = "Gerenciar " + CONFIG_MODULOS[tipo].nome;
+    container.innerHTML = ""; // Limpa campos antigos
+
+    CONFIG_MODULOS[tipo].campos.forEach(campo => {
+        container.innerHTML += `
+            <div class="input-group">
+                <label>${campo}:</label>
+                <input type="text" name="${campo}" required placeholder="Digite o ${campo}">
+            </div>`;
+    });
+
+    // Configura o salvamento para este formulário específico
+    document.getElementById("form-cadastro-geral").onsubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const objetoParaSalvar = Object.fromEntries(formData.entries());
+        
+        objetoParaSalvar.dono = emailDono; // Vincula o item ao cliente
+        objetoParaSalvar.timestamp = Date.now();
+
+        firebase.database().ref(`conteudo/${tipo}`).push(objetoParaSalvar)
+            .then(() => {
+                alert("Sucesso! O item já está disponível no banco de dados.");
+                e.target.reset();
+            });
+    };
+}
+
+
+
+  // FIM MODULOS 
+
+
+
+// FUNCIONALIDADES ON LINE
+
+
+// 1. Definição das funcionalidades possíveis
+const FUNCIONALIDADES = {
+    veiculos: { nome: "Veículos", campos: ["Marca", "Modelo", "Preço", "Ano", "Imagem URL"] },
+    cardapio: { nome: "Cardápio", campos: ["Prato", "Descrição", "Preço", "Imagem URL"] },
+    promocoes: { nome: "Promoções", campos: ["Título", "Desconto", "Validade", "Imagem URL"] }
+    // Adicione as outras conforme sua lista
+};
+
+// 2. Função de Login atualizada com Filtro
+function realizarLogin(email, senha) {
+    firebase.database().ref('usuarios').once('value', (snapshot) => {
+        let user = null;
+        snapshot.forEach(child => {
+            if(child.val().email === email && child.val().senha === senha) user = child.val();
+        });
+
+        if(user) {
+            abrirPainelAdmin(user);
+        } else {
+            alert("Acesso negado.");
+        }
+    });
+}
+
+// 3. Gerador de Menu por Permissão
+function abrirPainelAdmin(user) {
+    document.getElementById("modalLogin").classList.add("hidden");
+    document.getElementById("page-admin").style.display = "flex";
+    
+    const menu = document.getElementById("admin-menu");
+    menu.innerHTML = ""; // Limpa menu
+
+    // Se for Super Admin, ele ganha todos os botões e o filtro de clientes
+    if(user.role === "superadmin") {
+        document.getElementById("super-admin-area").style.display = "block";
+        gerarMenuCompleto();
+    } else {
+        // Se for cliente, gera apenas o que você marcou no checkbox
+        Object.keys(user.permissoes).forEach(key => {
+            if(user.permissoes[key]) {
+                const btn = document.createElement("button");
+                btn.innerText = FUNCIONALIDADES[key].nome;
+                btn.onclick = () => carregarFormulario(key, user.email);
+                menu.appendChild(btn);
+            }
+        });
+    }
+}
+
+
+
+
+
+
+
+
+ // FIM FUNCIONALIDADES ON LINE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // Carregar informações de categorias
   const categories =
     [
@@ -13217,10 +13601,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/quitanda/pimentaDoce/pimentadoce.png",
             name: "Pimenta Doce",
-            hours: "Ter a Sab: 08:00h as 21:00h<BR>Dom: 08:00h as 20:00h",
+            hours: "Seg a Sab: 08:00h as 21:00h<BR>Dom: 08:00h as 20:00h",
             statusAberto: ".",
             horarios: {
-              seg: [],
+              seg: [{ inicio: "08:00", fim: "21:00" }],
               ter: [{ inicio: "08:00", fim: "21:00" }],
               qua: [{ inicio: "08:00", fim: "21:00" }],
               qui: [{ inicio: "08:00", fim: "21:00" }],
@@ -18168,679 +18552,50 @@ if (linkRepresa) {
 }
 
 
+
+
+
+
 // Torna o array categories acessível para o painel admin
 try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
 
 
 
-/* =========================
-   MÓDULO VEÍCULOS (Público + Painel Vendedor)
-   Realtime DB:
-     veiculos/{uid}/{veicId}
-     veiculosPublico/{veicId}
-   Storage:
-     veiculos/{uid}/{veicId}/foto.jpg
-========================= */
 
-(function () {
-  function waitFirebaseReady(cb) {
-    const t = setInterval(() => {
-      if (window.firebase && firebase.apps && firebase.apps.length) {
-        clearInterval(t);
-        cb();
-      }
-    }, 100);
-  }
 
-  function showOnlyPage(pageId) {
-    document.querySelectorAll("section.page").forEach(s => s.style.display = "none");
-    const el = document.getElementById(pageId);
-    if (el) el.style.display = "block";
-  }
+document.addEventListener("DOMContentLoaded", () => {
+  const iconeContador = document.getElementById("iconeUsuarios"); // Altere para o ID real do ícone
+  const modal = document.getElementById("modalLogin");
+  const btnFechar = document.querySelector(".close-modal");
 
-  function norm(str) {
-    return (str || "").toString().trim().toLowerCase();
-  }
-
-  function moneyToNumber(v) {
-    if (v == null) return 0;
-    const s = v.toString().replace(/\./g, "").replace(",", ".").replace(/[^\d.]/g, "");
-    const n = Number(s);
-    return isNaN(n) ? 0 : n;
-  }
-
-  function maskWhatsToLink(whats) {
-    const raw = (whats || "").toString().replace(/\D/g, "");
-    // se vier só 43..., completa com 55
-    const d = raw.startsWith("55") ? raw : ("55" + raw);
-    return d;
-  }
-
-  function renderVeiculoCardPublico(v) {
-    const foto = v.fotoUrl || "images/img_padrao_site/sem-imagem.jpg";
-    const whats = maskWhatsToLink(v.vendedorWhats || v.whats || "");
-    const msg = encodeURIComponent(`Olá! Vi seu veículo no Olá Carlópolis: ${v.modelo || v.nome || "Veículo"} (${v.ano || ""}). Tenho interesse!`);
-    const link = `https://wa.me/${whats}?text=${msg}`;
-
-    const pills = [
-      v.transmissao ? `<span class="veic-pill">${v.transmissao}</span>` : "",
-      v.combustivel ? `<span class="veic-pill">${v.combustivel}</span>` : "",
-      v.direcao ? `<span class="veic-pill">${v.direcao}</span>` : "",
-      (v.arCondicionado === true || v.arCondicionado === "Sim") ? `<span class="veic-pill">Ar</span>` : "",
-    ].join("");
-
-    return `
-      <div class="veic-card">
-        <img src="${foto}" alt="Foto do veículo">
-        <h3>${(v.modelo || v.nome || "Veículo")} ${v.ano ? `• ${v.ano}` : ""}</h3>
-        <div class="meta">
-          <div><b>${v.vendedorNome || "Vendedor"}</b></div>
-          <div class="veic-price">R$ ${moneyToNumber(v.preco).toLocaleString("pt-BR")}</div>
-          <div>${v.km ? `${Number(v.km).toLocaleString("pt-BR")} km` : ""}</div>
-          <div>${pills}</div>
-          <div style="margin-top:8px">${v.descricao ? v.descricao : ""}</div>
-        </div>
-        <div class="acoes">
-          <a class="btn-admin" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px" target="_blank" rel="noopener" href="${link}">
-            <i class="fa-brands fa-whatsapp"></i> Whats do vendedor
-          </a>
-        </div>
-      </div>
-    `;
-  }
-
-  async function loadVeiculosPublico() {
-    const status = document.getElementById("veicStatusPublico");
-    const out = document.getElementById("listaVeiculosPublico");
-    if (!out) return;
-
-    out.innerHTML = "";
-    status.textContent = "Carregando veículos…";
-
-    const snap = await firebase.database().ref("veiculosPublico").once("value");
-    const data = snap.val() || {};
-    const list = Object.keys(data).map(id => ({ id, ...data[id] }))
-      .filter(v => v.ativo !== false && v.status !== "vendido");
-
-    // preencher anos no filtro
-    const anos = [...new Set(list.map(v => Number(v.ano)).filter(Boolean))].sort((a,b)=>b-a);
-    const selAno = document.getElementById("filtroAno");
-    if (selAno && selAno.options.length <= 1) {
-      anos.forEach(a => {
-        const op = document.createElement("option");
-        op.value = String(a);
-        op.textContent = String(a);
-        selAno.appendChild(op);
-      });
-    }
-
-    // aplicar filtros
-    const fVend = norm(document.getElementById("filtroVendedor")?.value);
-    const fAno = document.getElementById("filtroAno")?.value || "";
-    const fPreco = document.getElementById("filtroPreco")?.value || "";
-
-    let filtered = list.slice();
-
-    if (fVend) {
-      filtered = filtered.filter(v => norm(v.vendedorNome).includes(fVend));
-    }
-    if (fAno) {
-      filtered = filtered.filter(v => String(v.ano) === String(fAno));
-    }
-    if (fPreco) {
-      const [minS, maxS] = fPreco.split("-");
-      const min = Number(minS || 0);
-      const max = Number(maxS || 99999999);
-      filtered = filtered.filter(v => {
-        const p = moneyToNumber(v.preco);
-        return p >= min && p <= max;
-      });
-    }
-
-    // ordenar mais novos primeiro
-    filtered.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-    out.innerHTML = filtered.map(renderVeiculoCardPublico).join("");
-    status.textContent = filtered.length ? `${filtered.length} veículo(s) encontrado(s).` : "Nenhum veículo encontrado com esses filtros.";
-  }
-
-  // No script.js, substitua ou adicione:
-
- function renderPainelVendedor(user) {
-    const container = document.getElementById("admin-content");
-    
-    // Se for o ADMIN MASTER (você), habilita TUDO automaticamente
-    if (isSuperAdmin(user)) {
-        container.innerHTML = `
-            <h2>Painel Master: ${user.email}</h2>
-            <div class="modulos-acesso">
-                <button onclick="abrirFormVeiculo()">Gerenciar Veículos</button>
-                <button onclick="abrirFormImoveis()">Gerenciar Imóveis</button>
-                <button onclick="abrirFormCardapio()">Gerenciar Cardápio</button>
-                <button onclick="window.location.hash = '#super-admin'">CADASTRAR NOVOS CLIENTES</button>
-            </div>
-            <div id="area-trabalho-vendedor"></div>
-        `;
-        return;
-    }
-
-    // Se for CLIENTE comum, busca as permissões que você deu a ele no banco
-    firebase.database().ref(`users/${user.uid}`).once('value').then((snap) => {
-        const p = snap.val() || {};
-        
-        container.innerHTML = `
-            <h2>Painel do Parceiro</h2>
-            <div class="modulos-acesso">
-                ${p.acessoVeiculos ? '<button onclick="abrirFormVeiculo()">Veículos</button>' : ''}
-                ${p.acessoImoveis ? '<button onclick="abrirFormImoveis()">Imóveis</button>' : ''}
-                ${p.acessoCardapio ? '<button onclick="abrirFormCardapio()">Cardápio</button>' : ''}
-            </div>
-            <div id="area-trabalho-vendedor"></div>
-        `;
+  if (iconeContador && modal) {
+    iconeContador.addEventListener("click", (e) => {
+      e.preventDefault();
+      modal.classList.remove("hidden");
     });
-}
+  }
 
-function abrirFormVeiculo() {
-  const area = document.getElementById("area-trabalho-vendedor");
-  area.innerHTML = `
-    <div class="card-form">
-      <h3>Novo Veículo</h3>
-      <input type="text" id="v_marca" placeholder="Marca (Ex: Fiat)">
-      <input type="text" id="v_modelo" placeholder="Modelo (Ex: Uno 1.0)">
-      <input type="number" id="v_ano" placeholder="Ano">
-      <input type="number" id="v_preco" placeholder="Preço (Somente números)">
-      <input type="text" id="v_km" placeholder="Quilometragem">
-      <select id="v_combustivel">
-        <option value="Flex">Flex</option>
-        <option value="Gasolina">Gasolina</option>
-        <option value="Etanol">Etanol</option>
-        <option value="Diesel">Diesel</option>
-      </select>
-      <textarea id="v_descricao" placeholder="Descrição/Opcionais (Ar condicionado, trava, etc)"></textarea>
-      <input type="text" id="v_foto" placeholder="URL da Foto do Veículo">
-      <button onclick="salvarVeiculo()" class="btn-sucesso">Salvar e Publicar</button>
-    </div>
-  `;
-}
+  if (btnFechar) {
+    btnFechar.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+  }
 
-function salvarVeiculo() {
-  const user = firebase.auth().currentUser;
-  const novoVeic = {
-    uid: user.uid,
-    vendedor: user.email,
-    marca: document.getElementById("v_marca").value,
-    modelo: document.getElementById("v_modelo").value,
-    ano: parseInt(document.getElementById("v_ano").value),
-    preco: parseFloat(document.getElementById("v_preco").value),
-    km: document.getElementById("v_km").value,
-    combustivel: document.getElementById("v_combustivel").value,
-    descricao: document.getElementById("v_descricao").value,
-    foto: document.getElementById("v_foto").value,
-    timestamp: Date.now()
-  };
-
-  const newKey = firebase.database().ref().child('veiculos').push().key;
-  
-  const updates = {};
-  updates['/veiculos/' + user.uid + '/' + newKey] = novoVeic;
-  updates['/veiculosPublico/' + newKey] = novoVeic; // Para a vitrine geral
-
-  firebase.database().ref().update(updates).then(() => {
-    alert("Veículo publicado com sucesso!");
-    document.getElementById("area-trabalho-vendedor").innerHTML = "";
+  // Fechar ao clicar fora da modal
+  window.addEventListener("click", (event) => {
+    if (event.target == modal) {
+      modal.classList.add("hidden");
+    }
   });
-}
+});
 
-  function renderLoginVendedor() {
-    const authBox = document.getElementById("admin-auth");
-    const content = document.getElementById("admin-content");
-    if (!authBox || !content) return;
 
-    content.style.display = "none";
-    authBox.innerHTML = `
-      <div class="section">
-        <h3>Área do Vendedor — Login</h3>
-        <div class="form-row">
-          <label>E-mail
-            <input id="vendEmail" type="email" placeholder="email@exemplo.com" />
-          </label>
-          <label>Senha
-            <input id="vendSenha" type="password" placeholder="••••••••" />
-          </label>
-        </div>
-        <div class="toolbar">
-          <button id="btnLoginVend" class="btn-admin">Entrar</button>
-          <button id="btnCriarVend" class="btn-admin" style="background:#333">Criar conta</button>
-          <div id="statusLoginVend" class="small"></div>
-        </div>
-        <div class="small">Obs.: você (admin) pode criar os logins manualmente pelo Firebase Auth também.</div>
-      </div>
-    `;
 
-    document.getElementById("btnLoginVend").addEventListener("click", async () => {
-      const st = document.getElementById("statusLoginVend");
-      st.textContent = "Entrando…";
-      try {
-        await firebase.auth().signInWithEmailAndPassword(
-          document.getElementById("vendEmail").value.trim(),
-          document.getElementById("vendSenha").value.trim()
-        );
-        st.textContent = "";
-      } catch (e) {
-        st.textContent = "Falha no login: " + (e.message || e.code);
-      }
-    });
 
-    document.getElementById("btnCriarVend").addEventListener("click", async () => {
-      const st = document.getElementById("statusLoginVend");
-      st.textContent = "Criando conta…";
-      try {
-        await firebase.auth().createUserWithEmailAndPassword(
-          document.getElementById("vendEmail").value.trim(),
-          document.getElementById("vendSenha").value.trim()
-        );
-        st.textContent = "Conta criada! Complete seu nome/Whats e cadastre seus veículos.";
-      } catch (e) {
-        st.textContent = "Falha ao criar: " + (e.message || e.code);
-      }
-    });
-  }
 
-  async function carregarPerfilVendedor() {
-    const user = firebase.auth().currentUser;
-    if (!user) return;
 
-    const snap = await firebase.database().ref(`vendedores/${user.uid}`).once("value");
-    const p = snap.val() || {};
 
-    const nome = document.getElementById("vendNome");
-    const whats = document.getElementById("vendWhats");
-    if (nome) nome.value = p.nome || "";
-    if (whats) whats.value = p.whats || "";
-  }
 
-  async function salvarPerfilVendedor() {
-    const user = firebase.auth().currentUser;
-    if (!user) return;
+// ... (seu código de inicialização do Firebase acima)
 
-    const nome = (document.getElementById("vendNome").value || "").trim();
-    const whats = (document.getElementById("vendWhats").value || "").trim();
-    const st = document.getElementById("statusPerfilVend");
-
-    if (!nome || !whats) { st.textContent = "Preencha nome e Whats."; return; }
-
-    st.textContent = "Salvando…";
-    await firebase.database().ref(`vendedores/${user.uid}`).set({
-      nome,
-      whats,
-      updatedAt: firebase.database.ServerValue.TIMESTAMP
-    });
-    st.textContent = "Salvo!";
-  }
-
-  function limparFormVeiculo() {
-    document.getElementById("veicIdEdit").value = "";
-    document.getElementById("veicModelo").value = "";
-    document.getElementById("veicAno").value = "";
-    document.getElementById("veicKm").value = "";
-    document.getElementById("veicPreco").value = "";
-    document.getElementById("veicTransmissao").value = "";
-    document.getElementById("veicCombustivel").value = "";
-    document.getElementById("veicDirecao").value = "";
-    document.getElementById("veicAr").value = "";
-    document.getElementById("veicDescricao").value = "";
-    const f = document.getElementById("veicFoto");
-    if (f) f.value = "";
-    document.getElementById("statusVeic").textContent = "";
-  }
-
-  async function uploadFoto(uid, veicId, file) {
-    const ref = firebase.storage().ref().child(`veiculos/${uid}/${veicId}/foto.jpg`);
-    await ref.put(file);
-    return await ref.getDownloadURL();
-  }
-
-  async function salvarVeiculo() {
-    const user = firebase.auth().currentUser;
-    if (!user) return;
-
-    const st = document.getElementById("statusVeic");
-    st.textContent = "Salvando…";
-
-    // perfil do vendedor
-    const pSnap = await firebase.database().ref(`vendedores/${user.uid}`).once("value");
-    const perfil = pSnap.val() || {};
-    if (!perfil.nome || !perfil.whats) {
-      st.textContent = "Antes, preencha seu Nome/Whats (perfil do vendedor).";
-      return;
-    }
-
-    const veicIdEdit = document.getElementById("veicIdEdit").value;
-    const veicRef = veicIdEdit
-      ? firebase.database().ref(`veiculos/${user.uid}/${veicIdEdit}`)
-      : firebase.database().ref(`veiculos/${user.uid}`).push();
-
-    const veicId = veicRef.key;
-
-    const file = document.getElementById("veicFoto").files?.[0] || null;
-
-    // se for edição, pega dados antigos (pra manter foto se não trocar)
-    let prev = {};
-    if (veicIdEdit) {
-      const prevSnap = await veicRef.once("value");
-      prev = prevSnap.val() || {};
-    }
-
-    let fotoUrl = prev.fotoUrl || "";
-    if (file) fotoUrl = await uploadFoto(user.uid, veicId, file);
-
-    const payload = {
-      vendedorUid: user.uid,
-      vendedorNome: perfil.nome,
-      vendedorWhats: perfil.whats,
-
-      modelo: (document.getElementById("veicModelo").value || "").trim(),
-      ano: Number(document.getElementById("veicAno").value || 0) || "",
-      km: Number(document.getElementById("veicKm").value || 0) || "",
-      preco: moneyToNumber(document.getElementById("veicPreco").value || 0),
-
-      transmissao: document.getElementById("veicTransmissao").value || "",
-      combustivel: document.getElementById("veicCombustivel").value || "",
-      direcao: document.getElementById("veicDirecao").value || "",
-      arCondicionado: document.getElementById("veicAr").value || "",
-
-      descricao: (document.getElementById("veicDescricao").value || "").trim(),
-      fotoUrl,
-
-      ativo: true,
-      status: "ativo",
-      updatedAt: firebase.database.ServerValue.TIMESTAMP,
-    };
-
-    if (!payload.modelo || !payload.ano || !payload.preco) {
-      st.textContent = "Preencha pelo menos: Modelo, Ano e Preço.";
-      return;
-    }
-
-    // grava no nó privado do vendedor
-    if (!veicIdEdit) payload.createdAt = firebase.database.ServerValue.TIMESTAMP;
-    await veicRef.update(payload);
-
-    // grava/atualiza também a vitrine pública (flat)
-    await firebase.database().ref(`veiculosPublico/${veicId}`).update({
-      ...payload,
-      id: veicId,
-    });
-
-    st.textContent = "Salvo!";
-    limparFormVeiculo();
-    carregarMeusVeiculos();
-
-    // se estiver na vitrine pública em outra aba, quando abrir já aparece
-  }
-
-  async function carregarMeusVeiculos() {
-    const user = firebase.auth().currentUser;
-    if (!user) return;
-
-    const out = document.getElementById("listaMeusVeic");
-    const st = document.getElementById("statusListaMeus");
-    out.innerHTML = "";
-    st.textContent = "Carregando…";
-
-    const snap = await firebase.database().ref(`veiculos/${user.uid}`).once("value");
-    const data = snap.val() || {};
-    const list = Object.keys(data).map(id => ({ id, ...data[id] }))
-      .sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
-
-    out.innerHTML = list.map(v => {
-      const foto = v.fotoUrl || "images/img_padrao_site/sem-imagem.jpg";
-      return `
-        <div class="veic-card">
-          <img src="${foto}" alt="Foto do veículo">
-          <h3>${(v.modelo || "Veículo")} ${v.ano ? `• ${v.ano}` : ""}</h3>
-          <div class="meta">
-            <div class="veic-price">R$ ${moneyToNumber(v.preco).toLocaleString("pt-BR")}</div>
-            <div>${v.km ? `${Number(v.km).toLocaleString("pt-BR")} km` : ""}</div>
-            <div style="margin-top:8px">${v.descricao ? v.descricao : ""}</div>
-          </div>
-          <div class="acoes">
-            <button class="btn-admin" data-edit="${v.id}">Editar</button>
-            <button class="btn-admin" style="background:#8b0000" data-del="${v.id}">Excluir</button>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    out.querySelectorAll("[data-edit]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const id = btn.getAttribute("data-edit");
-        const snap = await firebase.database().ref(`veiculos/${user.uid}/${id}`).once("value");
-        const v = snap.val() || {};
-        document.getElementById("veicIdEdit").value = id;
-        document.getElementById("veicModelo").value = v.modelo || "";
-        document.getElementById("veicAno").value = v.ano || "";
-        document.getElementById("veicKm").value = v.km || "";
-        document.getElementById("veicPreco").value = v.preco || "";
-        document.getElementById("veicTransmissao").value = v.transmissao || "";
-        document.getElementById("veicCombustivel").value = v.combustivel || "";
-        document.getElementById("veicDirecao").value = v.direcao || "";
-        document.getElementById("veicAr").value = v.arCondicionado || "";
-        document.getElementById("veicDescricao").value = v.descricao || "";
-        document.getElementById("statusVeic").textContent = "Editando veículo… (salve para atualizar)";
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-    });
-
-    out.querySelectorAll("[data-del]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const id = btn.getAttribute("data-del");
-        if (!confirm("Excluir este veículo?")) return;
-
-        await firebase.database().ref(`veiculos/${user.uid}/${id}`).remove();
-        await firebase.database().ref(`veiculosPublico/${id}`).remove();
-
-        // tenta remover storage (se existir)
-        try {
-          await firebase.storage().ref().child(`veiculos/${user.uid}/${id}/foto.jpg`).delete();
-        } catch (_) {}
-
-        carregarMeusVeiculos();
-      });
-    });
-
-    st.textContent = list.length ? `${list.length} veículo(s) cadastrado(s).` : "Você ainda não cadastrou veículos.";
-  }
-
-  function route() {
-    const h = (location.hash || "").replace("#", "").split("?")[0];
-    const user = firebase.auth().currentUser;
-
-    // --- ADICIONE ESTE BLOCO AQUI ---
-    if (h === "super-admin") {
-        if (isSuperAdmin(user)) {
-            showOnlyPage("page-super-admin");
-        } else {
-            window.location.hash = "#meus-veiculos";
-            alert("Acesso restrito ao Administrador Master.");
-        }
-        return;
-    }
-    // --------------------------------
-
-    if (h === "veiculos") {
-        showOnlyPage("page-veiculos");
-        loadVeiculosPublico();
-        return;
-    }
-
-    if (h === "meus-veiculos") {
-        showOnlyPage("page-admin");
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) renderPainelVendedor(user);
-            else renderLoginVendedor();
-        });
-        return;
-    }
-}
-
-  function bindPublicButtons() {
-    const btnFiltrar = document.getElementById("btnAplicarFiltroVeic");
-    const btnLimpar = document.getElementById("btnLimparFiltroVeic");
-
-    if (btnFiltrar) btnFiltrar.addEventListener("click", loadVeiculosPublico);
-
-    if (btnLimpar) btnLimpar.addEventListener("click", () => {
-      document.getElementById("filtroVendedor").value = "";
-      document.getElementById("filtroAno").value = "";
-      document.getElementById("filtroPreco").value = "";
-      loadVeiculosPublico();
-    });
-  }
-
-  // Inicialização
-  waitFirebaseReady(() => {
-    window.addEventListener("hashchange", route);
-    window.addEventListener("DOMContentLoaded", () => {
-      bindPublicButtons();
-      route();
-    });
-  });
-})();
-
-// Salva as permissões no nó /users/ do Firebase
-function salvarPermissoesCliente() {
-    const uid = document.getElementById("master-uid").value;
-    const email = document.getElementById("master-email").value;
-    
-    if(!uid) return alert("Insira o UID do usuário");
-
-    const dados = {
-        email: email,
-        acessoVeiculos: document.getElementById("p-veiculos").checked,
-        acessoImoveis: document.getElementById("p-imoveis").checked,
-        acessoCardapio: document.getElementById("p-cardapio").checked,
-        acessoEventos: document.getElementById("p-eventos").checked,
-        acessoPromo: document.getElementById("p-promo").checked,
-        tipo: "vendedor"
-    };
-
-    firebase.database().ref(`users/${uid}`).set(dados)
-        .then(() => alert("Permissões atualizadas com sucesso!"))
-        .catch(e => alert("Erro ao salvar: " + e.message));
-}
-
-// Renderiza o painel correto dependendo de QUEM logou
-function renderPainelVendedor(user) {
-    const container = document.getElementById("admin-content");
-
-    if (isSuperAdmin(user)) {
-        // Se for VOCÊ, mostra o link para o painel master
-        container.innerHTML = `
-            <div class="aviso-admin">
-                <h3>Olá, Administrador Master</h3>
-                <button onclick="window.location.hash = '#super-admin'" class="btn-admin">Gerenciar Clientes</button>
-                <button onclick="abrirFormVeiculo()" class="btn-admin">Postar Veículo Próprio</button>
-            </div>
-        `;
-        return;
-    }
-
-    // Se for um CLIENTE, busca o que ele pode ver
-    firebase.database().ref(`users/${user.uid}`).once('value').then((snap) => {
-        const p = snap.val() || {};
-        
-        container.innerHTML = `
-            <h2>Painel do Parceiro</h2>
-            <div class="modulos-acesso">
-                ${p.acessoVeiculos ? '<button onclick="abrirFormVeiculo()" class="btn-veic">Gerenciar Veículos</button>' : ''}
-                ${p.acessoCardapio ? '<button onclick="abrirFormCardapio()">Gerenciar Cardápio</button>' : ''}
-                ${p.acessoPromo ? '<button onclick="abrirFormPromo()">Criar Promoção</button>' : ''}
-            </div>
-            <div id="area-trabalho-vendedor"></div>
-        `;
-    });
-}
-
-
-
-
-// 1. Você (Admin) cadastra o cliente no banco de dados
-function gerarAcessoCliente() {
-    const email = document.getElementById("master-email").value.trim().toLowerCase();
-    const pass = document.getElementById("master-pass").value;
-    
-    if(!email || !pass) return alert("Preencha e-mail e senha");
-
-    const dadosCliente = {
-        email: email,
-        senhaProvisoria: pass,
-        acessoVeiculos: document.getElementById("p-veiculos").checked,
-        acessoImoveis: document.getElementById("p-imoveis").checked,
-        acessoCardapio: document.getElementById("p-cardapio").checked,
-        acessoPromo: document.getElementById("p-promo").checked,
-        status: "pendente" // Muda para ativo no primeiro login
-    };
-
-    // Salva numa lista de espera usando o email como chave (escapado)
-    const emailKey = email.replace(/\./g, ',');
-    firebase.database().ref(`preCadastros/${emailKey}`).set(dadosCliente)
-        .then(() => {
-            alert("Sucesso! O cliente já pode logar com esses dados.");
-            document.getElementById("master-email").value = "";
-            document.getElementById("master-pass").value = "";
-        });
-}
-
-// 2. Modifique sua função de LOGIN para suportar o Auto-Cadastro
-function realizarLogin(email, senha) {
-    const auth = firebase.auth();
-    const emailKey = email.trim().toLowerCase().replace(/\./g, ',');
-
-    // Primeiro tenta logar normalmente
-    auth.signInWithEmailAndPassword(email, senha)
-        .catch((error) => {
-            // Se o erro for "usuário não encontrado", verificamos se ele está no nosso pré-cadastro
-            if (error.code === 'auth/user-not-found') {
-                firebase.database().ref(`preCadastros/${emailKey}`).once('value').then((snap) => {
-                    const dados = snap.val();
-                    if (dados && dados.senhaProvisoria === senha) {
-                        // Se os dados batem, criamos a conta agora mesmo!
-                        auth.createUserWithEmailAndPassword(email, senha).then((cred) => {
-                            // Movemos as permissões para o nó oficial de users
-                            const user = cred.user;
-                            delete dados.senhaProvisoria;
-                            dados.status = "ativo";
-                            
-                            firebase.database().ref(`users/${user.uid}`).set(dados);
-                            firebase.database().ref(`preCadastros/${emailKey}`).remove();
-                            alert("Bem-vindo! Sua conta foi configurada com sucesso.");
-                        });
-                    } else {
-                        alert("Usuário ou senha incorretos.");
-                    }
-                });
-            } else {
-                alert("Erro: " + error.message);
-            }
-        });
-}
-
-
-function acessarAreaAdmin() {
-    const user = firebase.auth().currentUser;
-
-    if (!user) {
-        // Se não está logado, leva para a seção de login no index.html
-        window.location.hash = "#meus-veiculos"; 
-        return;
-    }
-
-    if (isSuperAdmin(user)) {
-        // SE FOR VOCÊ: Abre o novo arquivo HTML que criamos
-        window.location.href = "admin.html";
-    } else {
-        // SE FOR CLIENTE: Mantém na área de vendedor do index
-        window.location.hash = "#meus-veiculos";
-    }
-}
+// Este observador roda automaticamente sempre que o estado do login muda

@@ -4,50 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin - Olá Carlópolis</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        body { background: #e7f2fd; font-family: sans-serif; }
-        .admin-wrap { padding: 20px; max-width: 450px; margin: auto; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        .btn-blue { background: #4070f4; color: white; }
-        .btn-green { background: #28a745; color: white; }
-        .btn-out { background: #ff4444; color: white; margin-top: 30px; }
-        .hidden { display: none; }
-        .grid-perm { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #e7f2fd; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .admin-card { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h2 { color: #4070f4; margin-top: 0; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-blue { background: #4070f4; color: white; margin-top: 10px; }
+        .btn-green { background: #28a745; color: white; margin-top: 15px; }
+        .hidden { display: none !important; }
+        .back-link { text-decoration: none; color: #666; font-size: 14px; display: block; margin-bottom: 20px; }
+        .perm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
     </style>
 </head>
 <body>
 
-<div class="admin-wrap">
-    <a href="index.html" style="text-decoration:none; color:#4070f4;"><i class="fa-solid fa-house"></i> Voltar ao site</a>
+<div class="admin-card">
+    <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Voltar ao site</a>
 
-    <div id="box-login" class="card hidden">
-        <h2>Identificação</h2>
+    <div id="box-login">
+        <h2>Acesso Admin</h2>
         <input type="email" id="email-log" placeholder="E-mail">
         <input type="password" id="pass-log" placeholder="Senha">
-        <button class="btn-blue" onclick="executarLogin()">Entrar</button>
+        <button class="btn-blue" onclick="login()">Entrar</button>
     </div>
 
-    <div id="box-master" class="card hidden">
-        <h2>Painel Master</h2>
-        <p>Cadastrar Novo Cliente:</p>
-        <input type="email" id="new-client-email" placeholder="E-mail do Cliente">
-        <input type="text" id="new-client-pass" placeholder="Senha Provisória">
-        <div class="grid-perm">
-            <label><input type="checkbox" id="check-veic"> Veículos</label>
-            <label><input type="checkbox" id="check-imob"> Imóveis</label>
+    <div id="box-master" class="hidden">
+        <h2><i class="fa-solid fa-crown"></i> Painel Master</h2>
+        <p style="text-align:center; font-size:13px;">Cadastrar Cliente</p>
+        <input type="email" id="new-email" placeholder="E-mail do Cliente">
+        <input type="text" id="new-pass" placeholder="Senha Provisória">
+        <div class="perm-grid">
+            <label><input type="checkbox" id="p-veic"> Veículos</label>
+            <label><input type="checkbox" id="p-imob"> Imóveis</label>
         </div>
-        <button class="btn-green" onclick="cadastrarNovoNoBanco()">Liberar Acesso</button>
-        <button class="btn-out" onclick="firebase.auth().signOut()">Sair</button>
-    </div>
-
-    <div id="box-vendedor" class="card hidden">
-        <h2>Painel do Cliente</h2>
-        <div id="botoes-dinamicos"></div>
-        <button class="btn-out" onclick="firebase.auth().signOut()">Sair</button>
+        <button class="btn-green" onclick="registrar()">Liberar Acesso</button>
+        <button onclick="logout()" style="background:none; color:red; margin-top:20px;">Sair</button>
     </div>
 </div>
 
@@ -55,43 +49,62 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-<script src="script.js"></script>
-
 <script>
-    // Aguarda o Firebase carregar do script.js
-    function checkState() {
-        firebase.auth().onAuthStateChanged((user) => {
-            document.getElementById('box-login').classList.add('hidden');
-            document.getElementById('box-master').classList.add('hidden');
-            document.getElementById('box-vendedor').classList.add('hidden');
+    // COPIE AS CREDENCIAIS DO SEU SCRIPT.JS E COLE AQUI
+    const firebaseConfig = {
+         apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+         authDomain: "contadoracessos.firebaseapp.com",
+         databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+         projectId: "contadoracessos",
+         storageBucket: "contadoracessos.firebasestorage.app",
+         messagingSenderId: "521517291315",
+         appId: "1:521517291315:web:74f8d878d2d8769460d046",
+         measurementId: "G-BXPWYWK61F"
+    };
+    
+    // Inicializa
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
 
-            if (user) {
-                if (isSuperAdmin(user)) {
-                    document.getElementById('box-master').classList.remove('hidden');
-                } else {
-                    document.getElementById('box-vendedor').classList.remove('hidden');
-                    renderMenuVendedor(user);
-                }
-            } else {
-                document.getElementById('box-login').classList.remove('hidden');
-            }
-        });
-    }
+    const MASTER_EMAIL = "bruno.4and@gmail.com";
 
-    // Inicializa a verificação
-    setTimeout(checkState, 1000);
+    // Monitor de Login
+    auth.onAuthStateChanged(user => {
+        document.getElementById('box-login').classList.toggle('hidden', !!user);
+        document.getElementById('box-master').classList.toggle('hidden', !user || user.email !== MASTER_EMAIL);
+        
+        if(user && user.email !== MASTER_EMAIL) {
+            // Se for cliente, manda pro painel dele no index
+            window.location.href = "index.html#meus-veiculos";
+        }
+    });
 
-    function executarLogin() {
+    function login() {
         const e = document.getElementById('email-log').value;
         const s = document.getElementById('pass-log').value;
-        realizarLogin(e, s); // Esta função já está no seu script.js
+        auth.signInWithEmailAndPassword(e, s).catch(err => alert("Erro: " + err.message));
     }
 
-    function cadastrarNovoNoBanco() {
-        // Aqui chama a função que salva no Firebase (preCadastros)
-        alert("Enviando dados...");
+    function logout() { auth.signOut(); }
+
+    function registrar() {
+        const email = document.getElementById('new-email').value;
+        const pass = document.getElementById('new-pass').value;
+        if(!email || !pass) return alert("Preencha tudo");
+
+        const key = email.replace(/\./g, ',');
+        db.ref('preCadastros/' + key).set({
+            email: email,
+            senhaProvisoria: pass,
+            acessoVeiculos: document.getElementById('p-veic').checked,
+            acessoImoveis: document.getElementById('p-imob').checked
+        }).then(() => {
+            alert("Acesso Criado!");
+            document.getElementById('new-email').value = "";
+            document.getElementById('new-pass').value = "";
+        });
     }
 </script>
-
 </body>
 </html>
