@@ -131,6 +131,10 @@
    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
    <!--  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>-->
 
+   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+
    <!-- Use a versão compatível do Firebase -->
    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -1190,17 +1194,28 @@
                   <span class="navlink_icon"><i style="color:#2E8B57" class="fa-solid fa-house-chimney"></i></span>
                   <span class="navlink bold">Imóveis</span>
                </a>
- <!-- 
+ 
                <li class="item">
-  <a id="menuCarros" href="#" class="nav_link">
+  <a href="#veiculos" class="nav_link">
     <span class="navlink_icon">
-      <i class="fa-solid fa-car" style="color:#0f766e"></i>
+      <i style="color:#1E90FF" class="fa-solid fa-car"></i>
     </span>
-    <span class="navlink bold">Carros</span>
+    <span id="menuVeiculosVenda" class="navlink bold">Veículos à Venda</span>
   </a>
 </li>
 
--->
+<li class="item">
+  <a href="#meus-veiculos" class="nav_link">
+    <span class="navlink_icon">
+      <i style="color:#FFA500" class="fa-solid fa-user-gear"></i>
+    </span>
+    <span id="menuMeusVeiculos" class="navlink bold">Área do Vendedor</span>
+  </a>
+</li>
+
+<li class="separadorr"></li>
+
+
 
 
                </li>
@@ -1683,7 +1698,7 @@
 -->
 
 
-   <!--  
+   <!--   -->
 
    <script>
       // Bloqueia Ctrl+U (ver código-fonte)
@@ -1709,8 +1724,37 @@
          e.preventDefault();
       });
    </script>
-HFFJYFJ
-     -->
+
+    <!-- ===== VEÍCULOS (PÚBLICO) ===== -->
+<section id="page-veiculos" class="page" style="display:none">
+  <div class="admin-wrap">
+    <div class="section">
+      <h3>Veículos à Venda</h3>
+
+      <div class="toolbar">
+        <input id="filtroVendedor" placeholder="Loja/Vendedor" />
+        <select id="filtroAno">
+          <option value="">Ano (todos)</option>
+        </select>
+        <select id="filtroPreco">
+          <option value="">Preço (todos)</option>
+          <option value="0-20000">Até 20 mil</option>
+          <option value="20000-40000">20 a 40 mil</option>
+          <option value="40000-70000">40 a 70 mil</option>
+          <option value="70000-120000">70 a 120 mil</option>
+          <option value="120000-99999999">Acima de 120 mil</option>
+        </select>
+        <button id="btnAplicarFiltroVeic" class="btn-admin">Filtrar</button>
+        <button id="btnLimparFiltroVeic" class="btn-admin" style="background:#333">Limpar</button>
+      </div>
+
+      <div id="listaVeiculosPublico" class="admin-grid"></div>
+      <div id="veicStatusPublico" class="small"></div>
+    </div>
+  </div>
+</section>
+<!-- ===== /VEÍCULOS (PÚBLICO) ===== -->
+
 
 
    <!-- ===== ADMIN APP (casca) ===== -->

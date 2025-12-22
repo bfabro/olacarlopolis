@@ -18162,288 +18162,578 @@ if (linkRepresa) {
 }
 
 
-
-
-
-
 // Torna o array categories acessível para o painel admin
 try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
 
 
 
+/* =========================
+   MÓDULO VEÍCULOS (Público + Painel Vendedor)
+   Realtime DB:
+     veiculos/{uid}/{veicId}
+     veiculosPublico/{veicId}
+   Storage:
+     veiculos/{uid}/{veicId}/foto.jpg
+========================= */
 
-
-
-
-
-
-
-
-
-
-///////////////////////////////
-////////////////////////
-//////////////////////
-
-
-/* ====== ADMIN CASCA — MOCK AUTH + DATAPROVIDER (localStorage) ====== 
-
-// Login fake só para navegar na casca do Admin (sem backend)
-const MockAuth = {
-  getCurrentUser(){ try{ return JSON.parse(localStorage.getItem("__mock_user__")||"null"); }catch{return null} },
-  signIn(email){ const u={uid:"mock-uid",email}; localStorage.setItem("__mock_user__", JSON.stringify(u)); return u; },
-  signOut(){ localStorage.removeItem("__mock_user__"); }
-};
-
-// DataProvider: a UI do admin usa APENAS estes métodos.
-// Depois, quando for ligar no Firebase, criamos um FirebaseProvider com as MESMAS funções.
-const DataProvider = {
-  async getRoles(){ return { admin: true, estIds: { "demo-pizzaria": true } }; },
-
-  async listEstIds(){
-    const m = _load("estIdx") || {"demo-pizzaria":true};
-    _save("estIdx", m);
-    return Object.keys(m);
-  },
-
-  async getEstabelecimento(estId){
-    return _load(`est:${estId}`) || {
-      nome:"Demo Pizzaria", ramo:"comida", categoria:"pizzaria",
-      endereco:"Av. Central, 100", telefone:["(43) 9XXXX-XXXX"], whatsapp:"(43) 9XXXX-XXXX",
-      instagram:"", facebook:"", site:"", logoUrl:"", capaUrl:"", statusPlano:"ativo"
-    };
-  },
-
-  async updateEstabelecimento(estId, patch){
-    const cur = await this.getEstabelecimento(estId);
-    const novo = {...cur, ...patch, updatedAt: Date.now()};
-    _save(`est:${estId}`, novo);
-    return novo;
-  },
-
-  async uploadLogo(estId, file){
-    const url = await _fileToDataURL(file);
-    const e = await this.getEstabelecimento(estId);
-    e.logoUrl = url; _save(`est:${estId}`, e); return url;
-  },
-
-  async uploadCapa(estId, file){
-    const url = await _fileToDataURL(file);
-    const e = await this.getEstabelecimento(estId);
-    e.capaUrl = url; _save(`est:${estId}`, e); return url;
-  },
-
-  async listCardapio(estId){ return _load(`menu:${estId}`) || {}; },
-
-  async upsertItemCardapio(estId, itemId, data){
-    const map = _load(`menu:${estId}`) || {};
-    const id = itemId || _id();
-    map[id] = { ordem: map[id]?.ordem || Date.now(), ativo:true, ...map[id], ...data };
-    _save(`menu:${estId}`, map);
-    return id;
-  },
-
-  async removeItemCardapio(estId, itemId){
-    const map = _load(`menu:${estId}`) || {};
-    delete map[itemId]; _save(`menu:${estId}`, map);
-  },
-
-  async uploadFotoItemCardapio(estId, itemId, file){
-    const url = await _fileToDataURL(file);
-    const map = _load(`menu:${estId}`) || {};
-    map[itemId] = { ...(map[itemId]||{}), fotoUrl: url };
-    _save(`menu:${estId}`, map);
-    return url;
-  },
-
-  async listImoveis(estId){ return _load(`imv:${estId}`) || {}; },
-
-  async upsertImovel(estId, imovelId, data){
-    const map = _load(`imv:${estId}`) || {};
-    const id = imovelId || _id();
-    map[id] = { status:"disponível", ...map[id], ...data, updatedAt: Date.now() };
-    _save(`imv:${estId}`, map);
-    return id;
-  },
-
-  async removeImovel(estId, imovelId){
-    const map = _load(`imv:${estId}`) || {};
-    delete map[imovelId]; _save(`imv:${estId}`, map);
-  },
-
-  async uploadFotoImovel(estId, imovelId, file){
-    const url = await _fileToDataURL(file);
-    const map = _load(`imv:${estId}`) || {};
-    if(!map[imovelId]) map[imovelId] = { status:"disponível" };
-    (map[imovelId].fotos ||= {})[_id()] = url;
-    _save(`imv:${estId}`, map);
-    return url;
-  }
-};
-
-// helpers mock
-function _save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
-function _load(k){ try{ return JSON.parse(localStorage.getItem(k)||"null"); }catch{return null} }
-function _id(){ return Math.random().toString(36).slice(2,9); }
-function _fileToDataURL(file){
-  return new Promise((res,rej)=>{
-    const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
-  });
-}
-
-
-/* ====== ADMIN CASCA — ROUTER + UI ====== 
-
-// Roteia #admin sem encostar no seu router principal
-window.addEventListener("hashchange", () => { if (location.hash === "#admin") renderAdminCasca(); });
-document.addEventListener("DOMContentLoaded", () => { if (location.hash === "#admin") renderAdminCasca(); });
-
-function renderAdminCasca(){
-  const page = document.querySelector("#page-admin");
-  if(!page) return; // se não colou o HTML ainda
-  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
-  page.style.display = "block";
-
-  const authBox = document.querySelector("#admin-auth");
-  const content = document.querySelector("#admin-content");
-  const user = MockAuth.getCurrentUser();
-
-  if (!user){
-    authBox.innerHTML = _loginHTML();
-    content.style.display = "none";
-    _bindLoginForm();
-    return;
+(function () {
+  function waitFirebaseReady(cb) {
+    const t = setInterval(() => {
+      if (window.firebase && firebase.apps && firebase.apps.length) {
+        clearInterval(t);
+        cb();
+      }
+    }, 100);
   }
 
-  authBox.innerHTML = `
-    <div class="section">
-      <div class="toolbar">
-        <span class="small">Logado como: <b>${user.email}</b></span>
-        <button class="btn-admin" id="btnSair">Sair</button>
-      </div>
-    </div>`;
-  document.querySelector("#btnSair").onclick = () => { MockAuth.signOut(); renderAdminCasca(); };
+  function showOnlyPage(pageId) {
+    document.querySelectorAll("section.page").forEach(s => s.style.display = "none");
+    const el = document.getElementById(pageId);
+    if (el) el.style.display = "block";
+  }
 
-  content.style.display = "block";
-  _renderDashboard();
-}
+  function norm(str) {
+    return (str || "").toString().trim().toLowerCase();
+  }
 
-function _loginHTML(){
-  return `
-  <div class="section">
-    <h3>Acesso Administrativo (mock)</h3>
-    <div class="form-row">
-      <label>Email <input id="admEmail" type="email" placeholder="voce@exemplo.com"></label>
-    </div>
-    <div class="toolbar">
-      <button class="btn-admin" id="btnEntrar">Entrar</button>
-    </div>
-    <p class="small">* Login de rascunho sem backend (apenas para montar a UI).</p>
-  </div>`;
-}
-function _bindLoginForm(){
-  document.querySelector("#btnEntrar").onclick = ()=>{
-    const email = (document.querySelector("#admEmail").value||"").trim() || "voce@mock.com";
-    MockAuth.signIn(email);
-    renderAdminCasca();
-  };
-}
+  function moneyToNumber(v) {
+    if (v == null) return 0;
+    const s = v.toString().replace(/\./g, "").replace(",", ".").replace(/[^\d.]/g, "");
+    const n = Number(s);
+    return isNaN(n) ? 0 : n;
+  }
 
-async function _renderDashboard(){
-  const roles = await DataProvider.getRoles();
-  const estIds = Object.keys(roles.estIds || {});
-  const cards = await Promise.all(estIds.map(async estId=>{
-    const e = await DataProvider.getEstabelecimento(estId);
-    const acoes = [
-      `<button class="btn-admin" data-est="${estId}" data-op="perfil">Perfil</button>`,
-      ...(e.ramo==="comida" ? [`<button class="btn-admin" data-est="${estId}" data-op="cardapio">Cardápio</button>`] : []),
-      ...(e.ramo==="imobiliaria" ? [`<button class="btn-admin" data-est="${estId}" data-op="imoveis">Imóveis</button>`] : []),
-      `<button class="btn-admin" data-est="${estId}" data-op="midia">Mídia</button>`
+  function maskWhatsToLink(whats) {
+    const raw = (whats || "").toString().replace(/\D/g, "");
+    // se vier só 43..., completa com 55
+    const d = raw.startsWith("55") ? raw : ("55" + raw);
+    return d;
+  }
+
+  function renderVeiculoCardPublico(v) {
+    const foto = v.fotoUrl || "images/img_padrao_site/sem-imagem.jpg";
+    const whats = maskWhatsToLink(v.vendedorWhats || v.whats || "");
+    const msg = encodeURIComponent(`Olá! Vi seu veículo no Olá Carlópolis: ${v.modelo || v.nome || "Veículo"} (${v.ano || ""}). Tenho interesse!`);
+    const link = `https://wa.me/${whats}?text=${msg}`;
+
+    const pills = [
+      v.transmissao ? `<span class="veic-pill">${v.transmissao}</span>` : "",
+      v.combustivel ? `<span class="veic-pill">${v.combustivel}</span>` : "",
+      v.direcao ? `<span class="veic-pill">${v.direcao}</span>` : "",
+      (v.arCondicionado === true || v.arCondicionado === "Sim") ? `<span class="veic-pill">Ar</span>` : "",
     ].join("");
+
     return `
-      <div class="card-est">
-        <img src="${e.capaUrl || e.logoUrl || ''}" alt="">
-        <h3>${e.nome || estId}</h3>
-        <p class="small">${e.endereco || ""}</p>
-        <div class="acoes">${acoes}</div>
-      </div>`;
-  }));
+      <div class="veic-card">
+        <img src="${foto}" alt="Foto do veículo">
+        <h3>${(v.modelo || v.nome || "Veículo")} ${v.ano ? `• ${v.ano}` : ""}</h3>
+        <div class="meta">
+          <div><b>${v.vendedorNome || "Vendedor"}</b></div>
+          <div class="veic-price">R$ ${moneyToNumber(v.preco).toLocaleString("pt-BR")}</div>
+          <div>${v.km ? `${Number(v.km).toLocaleString("pt-BR")} km` : ""}</div>
+          <div>${pills}</div>
+          <div style="margin-top:8px">${v.descricao ? v.descricao : ""}</div>
+        </div>
+        <div class="acoes">
+          <a class="btn-admin" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px" target="_blank" rel="noopener" href="${link}">
+            <i class="fa-brands fa-whatsapp"></i> Whats do vendedor
+          </a>
+        </div>
+      </div>
+    `;
+  }
 
-  document.querySelector("#admin-content").innerHTML = `
-    <h2 class="highlighted">Painel do Estabelecimento</h2>
-    <div class="admin-grid">${cards.join("")}</div>
-    <div id="admin-modal"></div>
-  `;
+  async function loadVeiculosPublico() {
+    const status = document.getElementById("veicStatusPublico");
+    const out = document.getElementById("listaVeiculosPublico");
+    if (!out) return;
 
-  document.querySelectorAll(".btn-admin").forEach(b=>{
-    const op=b.dataset.op; const est=b.dataset.est;
-    if(op==="perfil") b.onclick=()=> _uiPerfil(est);
-    if(op==="cardapio") b.onclick=()=> _uiCardapio(est);
-    if(op==="imoveis") b.onclick=()=> _uiImoveis(est);
-    if(op==="midia") b.onclick=()=> _uiMidia(est);
-  });
-}
+    out.innerHTML = "";
+    status.textContent = "Carregando veículos…";
 
-function _showModal(html){ document.querySelector("#admin-modal").innerHTML = `<div class="section">${html}</div>`; window.scrollTo({top:0,behavior:"smooth"}); }
-function _closeModal(){ document.querySelector("#admin-modal").innerHTML = ""; }
+    const snap = await firebase.database().ref("veiculosPublico").once("value");
+    const data = snap.val() || {};
+    const list = Object.keys(data).map(id => ({ id, ...data[id] }))
+      .filter(v => v.ativo !== false && v.status !== "vendido");
 
-// ===== PERFIL (exemplo; depois ajustamos Cardápio/Imóveis/Mídia) =====
-async function _uiPerfil(estId){
-  const e = await DataProvider.getEstabelecimento(estId);
-  _showModal(`
-    <h3>Perfil — ${e.nome||estId}</h3>
-    <div class="form-row">
-      <label>Nome <input id="fNome" value="${e.nome||""}"></label>
-      <label>Ramo
-        <select id="fRamo">
-          <option value="">Selecione</option>
-          <option value="comida" ${e.ramo==="comida"?"selected":""}>Comida</option>
-          <option value="imobiliaria" ${e.ramo==="imobiliaria"?"selected":""}>Imobiliária</option>
-          <option value="servico" ${e.ramo==="servico"?"selected":""}>Serviço</option>
-        </select>
-      </label>
-      <label>Categoria <input id="fCategoria" value="${e.categoria||""}" placeholder="pizzaria, lanchonete..."></label>
-    </div>
-    <div class="form-row">
-      <label>Endereço <input id="fEnd" value="${e.endereco||""}"></label>
-      <label>WhatsApp <input id="fZap" value="${e.whatsapp||""}"></label>
-      <label>Telefone(s) (vírgula) <input id="fFones" value="${(e.telefone||[]).join(", ")}"></label>
-    </div>
-    <div class="form-row">
-      <label>Instagram <input id="fInsta" value="${e.instagram||""}"></label>
-      <label>Facebook <input id="fFace" value="${e.facebook||""}"></label>
-      <label>Site <input id="fSite" value="${e.site||""}"></label>
-    </div>
-    <div class="form-row">
-      <label>Logo <input id="fLogo" type="file" accept="image/*"></label>
-      <label>Capa <input id="fCapa" type="file" accept="image/*"></label>
-    </div>
-    <div class="toolbar">
-      <button class="btn-admin" id="btnSalvarPerfil">Salvar (rascunho)</button>
-      <button class="btn-admin" id="btnFecharPerfil">Fechar</button>
-    </div>
-  `);
-  document.querySelector("#btnFecharPerfil").onclick = _closeModal;
-  document.querySelector("#btnSalvarPerfil").onclick = async ()=>{
-    const patch = {
-      nome: _val("#fNome"), ramo: _val("#fRamo"), categoria: _val("#fCategoria"),
-      endereco: _val("#fEnd"), whatsapp: _val("#fZap"),
-      telefone: _val("#fFones").split(",").map(s=>s.trim()).filter(Boolean),
-      instagram: _val("#fInsta"), facebook: _val("#fFace"), site: _val("#fSite")
+    // preencher anos no filtro
+    const anos = [...new Set(list.map(v => Number(v.ano)).filter(Boolean))].sort((a,b)=>b-a);
+    const selAno = document.getElementById("filtroAno");
+    if (selAno && selAno.options.length <= 1) {
+      anos.forEach(a => {
+        const op = document.createElement("option");
+        op.value = String(a);
+        op.textContent = String(a);
+        selAno.appendChild(op);
+      });
+    }
+
+    // aplicar filtros
+    const fVend = norm(document.getElementById("filtroVendedor")?.value);
+    const fAno = document.getElementById("filtroAno")?.value || "";
+    const fPreco = document.getElementById("filtroPreco")?.value || "";
+
+    let filtered = list.slice();
+
+    if (fVend) {
+      filtered = filtered.filter(v => norm(v.vendedorNome).includes(fVend));
+    }
+    if (fAno) {
+      filtered = filtered.filter(v => String(v.ano) === String(fAno));
+    }
+    if (fPreco) {
+      const [minS, maxS] = fPreco.split("-");
+      const min = Number(minS || 0);
+      const max = Number(maxS || 99999999);
+      filtered = filtered.filter(v => {
+        const p = moneyToNumber(v.preco);
+        return p >= min && p <= max;
+      });
+    }
+
+    // ordenar mais novos primeiro
+    filtered.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    out.innerHTML = filtered.map(renderVeiculoCardPublico).join("");
+    status.textContent = filtered.length ? `${filtered.length} veículo(s) encontrado(s).` : "Nenhum veículo encontrado com esses filtros.";
+  }
+
+  function renderPainelVendedor(user) {
+    const authBox = document.getElementById("admin-auth");
+    const content = document.getElementById("admin-content");
+    if (!authBox || !content) return;
+
+    authBox.innerHTML = `
+      <div class="section">
+        <h3>Área do Vendedor</h3>
+        <div class="small">Logado como: <b>${user.email}</b></div>
+        <div class="toolbar">
+          <button id="btnSairVendedor" class="btn-admin" style="background:#333">Sair</button>
+        </div>
+      </div>
+    `;
+
+    content.style.display = "block";
+    content.innerHTML = `
+      <div class="section">
+        <h3>Meu cadastro (nome/Whats)</h3>
+        <div class="form-row">
+          <label>Nome da loja / vendedor
+            <input id="vendNome" placeholder="Ex.: Loja X / João" />
+          </label>
+          <label>WhatsApp (com DDD)
+            <input id="vendWhats" placeholder="Ex.: (43) 99999-9999" />
+          </label>
+        </div>
+        <div class="toolbar">
+          <button id="btnSalvarPerfilVend" class="btn-admin">Salvar perfil</button>
+          <div id="statusPerfilVend" class="small"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Cadastrar / Editar veículo</h3>
+
+        <input type="hidden" id="veicIdEdit" value="" />
+
+        <div class="form-row">
+          <label>Modelo / Nome
+            <input id="veicModelo" placeholder="Ex.: Onix LT / Civic / CG 160" />
+          </label>
+          <label>Ano
+            <input id="veicAno" type="number" placeholder="Ex.: 2018" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>KM
+            <input id="veicKm" type="number" placeholder="Ex.: 85000" />
+          </label>
+          <label>Preço (R$)
+            <input id="veicPreco" placeholder="Ex.: 45900" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>Transmissão
+            <select id="veicTransmissao">
+              <option value="">Selecione</option>
+              <option>Manual</option>
+              <option>Automático</option>
+              <option>CVT</option>
+            </select>
+          </label>
+          <label>Combustível
+            <select id="veicCombustivel">
+              <option value="">Selecione</option>
+              <option>Flex</option>
+              <option>Gasolina</option>
+              <option>Etanol</option>
+              <option>Diesel</option>
+              <option>Elétrico</option>
+              <option>Híbrido</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>Direção
+            <select id="veicDirecao">
+              <option value="">Selecione</option>
+              <option>Hidráulica</option>
+              <option>Elétrica</option>
+              <option>Eletro-hidráulica</option>
+            </select>
+          </label>
+          <label>Ar condicionado
+            <select id="veicAr">
+              <option value="">Selecione</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>Descrição
+            <textarea id="veicDescricao" rows="3" placeholder="Detalhes, estado, opcionais, etc."></textarea>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>Foto principal (1 arquivo)
+            <input id="veicFoto" type="file" accept="image/*" />
+          </label>
+        </div>
+
+        <div class="toolbar">
+          <button id="btnSalvarVeic" class="btn-admin">Salvar veículo</button>
+          <button id="btnCancelarVeic" class="btn-admin" style="background:#333">Cancelar edição</button>
+          <div id="statusVeic" class="small"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Meus veículos</h3>
+        <div id="listaMeusVeic" class="admin-grid"></div>
+        <div id="statusListaMeus" class="small"></div>
+      </div>
+    `;
+
+    document.getElementById("btnSairVendedor").addEventListener("click", () => firebase.auth().signOut());
+
+    document.getElementById("btnSalvarPerfilVend").addEventListener("click", salvarPerfilVendedor);
+    document.getElementById("btnSalvarVeic").addEventListener("click", salvarVeiculo);
+    document.getElementById("btnCancelarVeic").addEventListener("click", limparFormVeiculo);
+
+    carregarPerfilVendedor();
+    carregarMeusVeiculos();
+  }
+
+  function renderLoginVendedor() {
+    const authBox = document.getElementById("admin-auth");
+    const content = document.getElementById("admin-content");
+    if (!authBox || !content) return;
+
+    content.style.display = "none";
+    authBox.innerHTML = `
+      <div class="section">
+        <h3>Área do Vendedor — Login</h3>
+        <div class="form-row">
+          <label>E-mail
+            <input id="vendEmail" type="email" placeholder="email@exemplo.com" />
+          </label>
+          <label>Senha
+            <input id="vendSenha" type="password" placeholder="••••••••" />
+          </label>
+        </div>
+        <div class="toolbar">
+          <button id="btnLoginVend" class="btn-admin">Entrar</button>
+          <button id="btnCriarVend" class="btn-admin" style="background:#333">Criar conta</button>
+          <div id="statusLoginVend" class="small"></div>
+        </div>
+        <div class="small">Obs.: você (admin) pode criar os logins manualmente pelo Firebase Auth também.</div>
+      </div>
+    `;
+
+    document.getElementById("btnLoginVend").addEventListener("click", async () => {
+      const st = document.getElementById("statusLoginVend");
+      st.textContent = "Entrando…";
+      try {
+        await firebase.auth().signInWithEmailAndPassword(
+          document.getElementById("vendEmail").value.trim(),
+          document.getElementById("vendSenha").value.trim()
+        );
+        st.textContent = "";
+      } catch (e) {
+        st.textContent = "Falha no login: " + (e.message || e.code);
+      }
+    });
+
+    document.getElementById("btnCriarVend").addEventListener("click", async () => {
+      const st = document.getElementById("statusLoginVend");
+      st.textContent = "Criando conta…";
+      try {
+        await firebase.auth().createUserWithEmailAndPassword(
+          document.getElementById("vendEmail").value.trim(),
+          document.getElementById("vendSenha").value.trim()
+        );
+        st.textContent = "Conta criada! Complete seu nome/Whats e cadastre seus veículos.";
+      } catch (e) {
+        st.textContent = "Falha ao criar: " + (e.message || e.code);
+      }
+    });
+  }
+
+  async function carregarPerfilVendedor() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const snap = await firebase.database().ref(`vendedores/${user.uid}`).once("value");
+    const p = snap.val() || {};
+
+    const nome = document.getElementById("vendNome");
+    const whats = document.getElementById("vendWhats");
+    if (nome) nome.value = p.nome || "";
+    if (whats) whats.value = p.whats || "";
+  }
+
+  async function salvarPerfilVendedor() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const nome = (document.getElementById("vendNome").value || "").trim();
+    const whats = (document.getElementById("vendWhats").value || "").trim();
+    const st = document.getElementById("statusPerfilVend");
+
+    if (!nome || !whats) { st.textContent = "Preencha nome e Whats."; return; }
+
+    st.textContent = "Salvando…";
+    await firebase.database().ref(`vendedores/${user.uid}`).set({
+      nome,
+      whats,
+      updatedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    st.textContent = "Salvo!";
+  }
+
+  function limparFormVeiculo() {
+    document.getElementById("veicIdEdit").value = "";
+    document.getElementById("veicModelo").value = "";
+    document.getElementById("veicAno").value = "";
+    document.getElementById("veicKm").value = "";
+    document.getElementById("veicPreco").value = "";
+    document.getElementById("veicTransmissao").value = "";
+    document.getElementById("veicCombustivel").value = "";
+    document.getElementById("veicDirecao").value = "";
+    document.getElementById("veicAr").value = "";
+    document.getElementById("veicDescricao").value = "";
+    const f = document.getElementById("veicFoto");
+    if (f) f.value = "";
+    document.getElementById("statusVeic").textContent = "";
+  }
+
+  async function uploadFoto(uid, veicId, file) {
+    const ref = firebase.storage().ref().child(`veiculos/${uid}/${veicId}/foto.jpg`);
+    await ref.put(file);
+    return await ref.getDownloadURL();
+  }
+
+  async function salvarVeiculo() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const st = document.getElementById("statusVeic");
+    st.textContent = "Salvando…";
+
+    // perfil do vendedor
+    const pSnap = await firebase.database().ref(`vendedores/${user.uid}`).once("value");
+    const perfil = pSnap.val() || {};
+    if (!perfil.nome || !perfil.whats) {
+      st.textContent = "Antes, preencha seu Nome/Whats (perfil do vendedor).";
+      return;
+    }
+
+    const veicIdEdit = document.getElementById("veicIdEdit").value;
+    const veicRef = veicIdEdit
+      ? firebase.database().ref(`veiculos/${user.uid}/${veicIdEdit}`)
+      : firebase.database().ref(`veiculos/${user.uid}`).push();
+
+    const veicId = veicRef.key;
+
+    const file = document.getElementById("veicFoto").files?.[0] || null;
+
+    // se for edição, pega dados antigos (pra manter foto se não trocar)
+    let prev = {};
+    if (veicIdEdit) {
+      const prevSnap = await veicRef.once("value");
+      prev = prevSnap.val() || {};
+    }
+
+    let fotoUrl = prev.fotoUrl || "";
+    if (file) fotoUrl = await uploadFoto(user.uid, veicId, file);
+
+    const payload = {
+      vendedorUid: user.uid,
+      vendedorNome: perfil.nome,
+      vendedorWhats: perfil.whats,
+
+      modelo: (document.getElementById("veicModelo").value || "").trim(),
+      ano: Number(document.getElementById("veicAno").value || 0) || "",
+      km: Number(document.getElementById("veicKm").value || 0) || "",
+      preco: moneyToNumber(document.getElementById("veicPreco").value || 0),
+
+      transmissao: document.getElementById("veicTransmissao").value || "",
+      combustivel: document.getElementById("veicCombustivel").value || "",
+      direcao: document.getElementById("veicDirecao").value || "",
+      arCondicionado: document.getElementById("veicAr").value || "",
+
+      descricao: (document.getElementById("veicDescricao").value || "").trim(),
+      fotoUrl,
+
+      ativo: true,
+      status: "ativo",
+      updatedAt: firebase.database.ServerValue.TIMESTAMP,
     };
-    const lf = document.querySelector("#fLogo").files[0]; if(lf) patch.logoUrl = await DataProvider.uploadLogo(estId, lf);
-    const cf = document.querySelector("#fCapa").files[0]; if(cf) patch.capaUrl = await DataProvider.uploadCapa(estId, cf);
-    await DataProvider.updateEstabelecimento(estId, patch);
-    alert("Perfil salvo (mock) ✅");
-    _closeModal(); _renderDashboard();
-  };
-}
 
-// Placeholders (a gente completa depois, se quiser já te mando prontos)
-function _uiCardapio(estId){ _showModal(`<h3>Cardápio — ${estId}</h3><p class="small">Casca pronta. Quer que eu já cole o CRUD mock aqui?</p><div class="toolbar"><button class="btn-admin" onclick="_closeModal()">Fechar</button></div>`); }
-function _uiImoveis(estId){ _showModal(`<h3>Imóveis — ${estId}</h3><p class="small">Casca pronta. Quer que eu já cole o CRUD mock aqui?</p><div class="toolbar"><button class="btn-admin" onclick="_closeModal()">Fechar</button></div>`); }
-function _uiMidia(estId){ _showModal(`<h3>Mídia — ${estId}</h3><p class="small">Casca pronta. Upload mock pode vir aqui.</p><div class="toolbar"><button class="btn-admin" onclick="_closeModal()">Fechar</button></div>`); }
+    if (!payload.modelo || !payload.ano || !payload.preco) {
+      st.textContent = "Preencha pelo menos: Modelo, Ano e Preço.";
+      return;
+    }
 
-function _val(s){ return (document.querySelector(s)?.value || "").trim(); }
+    // grava no nó privado do vendedor
+    if (!veicIdEdit) payload.createdAt = firebase.database.ServerValue.TIMESTAMP;
+    await veicRef.update(payload);
 
-*/
+    // grava/atualiza também a vitrine pública (flat)
+    await firebase.database().ref(`veiculosPublico/${veicId}`).update({
+      ...payload,
+      id: veicId,
+    });
+
+    st.textContent = "Salvo!";
+    limparFormVeiculo();
+    carregarMeusVeiculos();
+
+    // se estiver na vitrine pública em outra aba, quando abrir já aparece
+  }
+
+  async function carregarMeusVeiculos() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const out = document.getElementById("listaMeusVeic");
+    const st = document.getElementById("statusListaMeus");
+    out.innerHTML = "";
+    st.textContent = "Carregando…";
+
+    const snap = await firebase.database().ref(`veiculos/${user.uid}`).once("value");
+    const data = snap.val() || {};
+    const list = Object.keys(data).map(id => ({ id, ...data[id] }))
+      .sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+
+    out.innerHTML = list.map(v => {
+      const foto = v.fotoUrl || "images/img_padrao_site/sem-imagem.jpg";
+      return `
+        <div class="veic-card">
+          <img src="${foto}" alt="Foto do veículo">
+          <h3>${(v.modelo || "Veículo")} ${v.ano ? `• ${v.ano}` : ""}</h3>
+          <div class="meta">
+            <div class="veic-price">R$ ${moneyToNumber(v.preco).toLocaleString("pt-BR")}</div>
+            <div>${v.km ? `${Number(v.km).toLocaleString("pt-BR")} km` : ""}</div>
+            <div style="margin-top:8px">${v.descricao ? v.descricao : ""}</div>
+          </div>
+          <div class="acoes">
+            <button class="btn-admin" data-edit="${v.id}">Editar</button>
+            <button class="btn-admin" style="background:#8b0000" data-del="${v.id}">Excluir</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    out.querySelectorAll("[data-edit]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-edit");
+        const snap = await firebase.database().ref(`veiculos/${user.uid}/${id}`).once("value");
+        const v = snap.val() || {};
+        document.getElementById("veicIdEdit").value = id;
+        document.getElementById("veicModelo").value = v.modelo || "";
+        document.getElementById("veicAno").value = v.ano || "";
+        document.getElementById("veicKm").value = v.km || "";
+        document.getElementById("veicPreco").value = v.preco || "";
+        document.getElementById("veicTransmissao").value = v.transmissao || "";
+        document.getElementById("veicCombustivel").value = v.combustivel || "";
+        document.getElementById("veicDirecao").value = v.direcao || "";
+        document.getElementById("veicAr").value = v.arCondicionado || "";
+        document.getElementById("veicDescricao").value = v.descricao || "";
+        document.getElementById("statusVeic").textContent = "Editando veículo… (salve para atualizar)";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+
+    out.querySelectorAll("[data-del]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-del");
+        if (!confirm("Excluir este veículo?")) return;
+
+        await firebase.database().ref(`veiculos/${user.uid}/${id}`).remove();
+        await firebase.database().ref(`veiculosPublico/${id}`).remove();
+
+        // tenta remover storage (se existir)
+        try {
+          await firebase.storage().ref().child(`veiculos/${user.uid}/${id}/foto.jpg`).delete();
+        } catch (_) {}
+
+        carregarMeusVeiculos();
+      });
+    });
+
+    st.textContent = list.length ? `${list.length} veículo(s) cadastrado(s).` : "Você ainda não cadastrou veículos.";
+  }
+
+  function route() {
+    const h = (location.hash || "").replace("#", "").split("?")[0];
+
+    if (h === "veiculos") {
+      showOnlyPage("page-veiculos");
+      loadVeiculosPublico();
+      return;
+    }
+
+    if (h === "meus-veiculos") {
+      showOnlyPage("page-admin");
+      // mantém o admin como casca do painel vendedor
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) renderPainelVendedor(user);
+        else renderLoginVendedor();
+      });
+      return;
+    }
+
+    // se não for rota do módulo, não mexe no resto do seu site
+  }
+
+  function bindPublicButtons() {
+    const btnFiltrar = document.getElementById("btnAplicarFiltroVeic");
+    const btnLimpar = document.getElementById("btnLimparFiltroVeic");
+
+    if (btnFiltrar) btnFiltrar.addEventListener("click", loadVeiculosPublico);
+
+    if (btnLimpar) btnLimpar.addEventListener("click", () => {
+      document.getElementById("filtroVendedor").value = "";
+      document.getElementById("filtroAno").value = "";
+      document.getElementById("filtroPreco").value = "";
+      loadVeiculosPublico();
+    });
+  }
+
+  // Inicialização
+  waitFirebaseReady(() => {
+    window.addEventListener("hashchange", route);
+    window.addEventListener("DOMContentLoaded", () => {
+      bindPublicButtons();
+      route();
+    });
+  });
+})();
+
