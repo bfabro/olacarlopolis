@@ -5,6 +5,12 @@
 //
 //
 
+const ADMIN_EMAILS = ["bruno.4and@gmail.com"]; // const ADMIN_EMAILS = ["bruno.4and@gmail.com", "outro-admin@gmail.com"];
+
+function isSuperAdmin(user) {
+    return user && ADMIN_EMAILS.includes(user.email);
+}
+
 
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
@@ -18298,137 +18304,92 @@ try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
     status.textContent = filtered.length ? `${filtered.length} veículo(s) encontrado(s).` : "Nenhum veículo encontrado com esses filtros.";
   }
 
-  function renderPainelVendedor(user) {
-    const authBox = document.getElementById("admin-auth");
-    const content = document.getElementById("admin-content");
-    if (!authBox || !content) return;
+  // No script.js, substitua ou adicione:
 
-    authBox.innerHTML = `
-      <div class="section">
-        <h3>Área do Vendedor</h3>
-        <div class="small">Logado como: <b>${user.email}</b></div>
-        <div class="toolbar">
-          <button id="btnSairVendedor" class="btn-admin" style="background:#333">Sair</button>
-        </div>
-      </div>
-    `;
+ function renderPainelVendedor(user) {
+    const container = document.getElementById("admin-content");
+    
+    // Se for o ADMIN MASTER (você), habilita TUDO automaticamente
+    if (isSuperAdmin(user)) {
+        container.innerHTML = `
+            <h2>Painel Master: ${user.email}</h2>
+            <div class="modulos-acesso">
+                <button onclick="abrirFormVeiculo()">Gerenciar Veículos</button>
+                <button onclick="abrirFormImoveis()">Gerenciar Imóveis</button>
+                <button onclick="abrirFormCardapio()">Gerenciar Cardápio</button>
+                <button onclick="window.location.hash = '#super-admin'">CADASTRAR NOVOS CLIENTES</button>
+            </div>
+            <div id="area-trabalho-vendedor"></div>
+        `;
+        return;
+    }
 
-    content.style.display = "block";
-    content.innerHTML = `
-      <div class="section">
-        <h3>Meu cadastro (nome/Whats)</h3>
-        <div class="form-row">
-          <label>Nome da loja / vendedor
-            <input id="vendNome" placeholder="Ex.: Loja X / João" />
-          </label>
-          <label>WhatsApp (com DDD)
-            <input id="vendWhats" placeholder="Ex.: (43) 99999-9999" />
-          </label>
-        </div>
-        <div class="toolbar">
-          <button id="btnSalvarPerfilVend" class="btn-admin">Salvar perfil</button>
-          <div id="statusPerfilVend" class="small"></div>
-        </div>
-      </div>
+    // Se for CLIENTE comum, busca as permissões que você deu a ele no banco
+    firebase.database().ref(`users/${user.uid}`).once('value').then((snap) => {
+        const p = snap.val() || {};
+        
+        container.innerHTML = `
+            <h2>Painel do Parceiro</h2>
+            <div class="modulos-acesso">
+                ${p.acessoVeiculos ? '<button onclick="abrirFormVeiculo()">Veículos</button>' : ''}
+                ${p.acessoImoveis ? '<button onclick="abrirFormImoveis()">Imóveis</button>' : ''}
+                ${p.acessoCardapio ? '<button onclick="abrirFormCardapio()">Cardápio</button>' : ''}
+            </div>
+            <div id="area-trabalho-vendedor"></div>
+        `;
+    });
+}
 
-      <div class="section">
-        <h3>Cadastrar / Editar veículo</h3>
+function abrirFormVeiculo() {
+  const area = document.getElementById("area-trabalho-vendedor");
+  area.innerHTML = `
+    <div class="card-form">
+      <h3>Novo Veículo</h3>
+      <input type="text" id="v_marca" placeholder="Marca (Ex: Fiat)">
+      <input type="text" id="v_modelo" placeholder="Modelo (Ex: Uno 1.0)">
+      <input type="number" id="v_ano" placeholder="Ano">
+      <input type="number" id="v_preco" placeholder="Preço (Somente números)">
+      <input type="text" id="v_km" placeholder="Quilometragem">
+      <select id="v_combustivel">
+        <option value="Flex">Flex</option>
+        <option value="Gasolina">Gasolina</option>
+        <option value="Etanol">Etanol</option>
+        <option value="Diesel">Diesel</option>
+      </select>
+      <textarea id="v_descricao" placeholder="Descrição/Opcionais (Ar condicionado, trava, etc)"></textarea>
+      <input type="text" id="v_foto" placeholder="URL da Foto do Veículo">
+      <button onclick="salvarVeiculo()" class="btn-sucesso">Salvar e Publicar</button>
+    </div>
+  `;
+}
 
-        <input type="hidden" id="veicIdEdit" value="" />
+function salvarVeiculo() {
+  const user = firebase.auth().currentUser;
+  const novoVeic = {
+    uid: user.uid,
+    vendedor: user.email,
+    marca: document.getElementById("v_marca").value,
+    modelo: document.getElementById("v_modelo").value,
+    ano: parseInt(document.getElementById("v_ano").value),
+    preco: parseFloat(document.getElementById("v_preco").value),
+    km: document.getElementById("v_km").value,
+    combustivel: document.getElementById("v_combustivel").value,
+    descricao: document.getElementById("v_descricao").value,
+    foto: document.getElementById("v_foto").value,
+    timestamp: Date.now()
+  };
 
-        <div class="form-row">
-          <label>Modelo / Nome
-            <input id="veicModelo" placeholder="Ex.: Onix LT / Civic / CG 160" />
-          </label>
-          <label>Ano
-            <input id="veicAno" type="number" placeholder="Ex.: 2018" />
-          </label>
-        </div>
+  const newKey = firebase.database().ref().child('veiculos').push().key;
+  
+  const updates = {};
+  updates['/veiculos/' + user.uid + '/' + newKey] = novoVeic;
+  updates['/veiculosPublico/' + newKey] = novoVeic; // Para a vitrine geral
 
-        <div class="form-row">
-          <label>KM
-            <input id="veicKm" type="number" placeholder="Ex.: 85000" />
-          </label>
-          <label>Preço (R$)
-            <input id="veicPreco" placeholder="Ex.: 45900" />
-          </label>
-        </div>
-
-        <div class="form-row">
-          <label>Transmissão
-            <select id="veicTransmissao">
-              <option value="">Selecione</option>
-              <option>Manual</option>
-              <option>Automático</option>
-              <option>CVT</option>
-            </select>
-          </label>
-          <label>Combustível
-            <select id="veicCombustivel">
-              <option value="">Selecione</option>
-              <option>Flex</option>
-              <option>Gasolina</option>
-              <option>Etanol</option>
-              <option>Diesel</option>
-              <option>Elétrico</option>
-              <option>Híbrido</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="form-row">
-          <label>Direção
-            <select id="veicDirecao">
-              <option value="">Selecione</option>
-              <option>Hidráulica</option>
-              <option>Elétrica</option>
-              <option>Eletro-hidráulica</option>
-            </select>
-          </label>
-          <label>Ar condicionado
-            <select id="veicAr">
-              <option value="">Selecione</option>
-              <option value="Sim">Sim</option>
-              <option value="Não">Não</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="form-row">
-          <label>Descrição
-            <textarea id="veicDescricao" rows="3" placeholder="Detalhes, estado, opcionais, etc."></textarea>
-          </label>
-        </div>
-
-        <div class="form-row">
-          <label>Foto principal (1 arquivo)
-            <input id="veicFoto" type="file" accept="image/*" />
-          </label>
-        </div>
-
-        <div class="toolbar">
-          <button id="btnSalvarVeic" class="btn-admin">Salvar veículo</button>
-          <button id="btnCancelarVeic" class="btn-admin" style="background:#333">Cancelar edição</button>
-          <div id="statusVeic" class="small"></div>
-        </div>
-      </div>
-
-      <div class="section">
-        <h3>Meus veículos</h3>
-        <div id="listaMeusVeic" class="admin-grid"></div>
-        <div id="statusListaMeus" class="small"></div>
-      </div>
-    `;
-
-    document.getElementById("btnSairVendedor").addEventListener("click", () => firebase.auth().signOut());
-
-    document.getElementById("btnSalvarPerfilVend").addEventListener("click", salvarPerfilVendedor);
-    document.getElementById("btnSalvarVeic").addEventListener("click", salvarVeiculo);
-    document.getElementById("btnCancelarVeic").addEventListener("click", limparFormVeiculo);
-
-    carregarPerfilVendedor();
-    carregarMeusVeiculos();
-  }
+  firebase.database().ref().update(updates).then(() => {
+    alert("Veículo publicado com sucesso!");
+    document.getElementById("area-trabalho-vendedor").innerHTML = "";
+  });
+}
 
   function renderLoginVendedor() {
     const authBox = document.getElementById("admin-auth");
@@ -18693,25 +18654,35 @@ try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
 
   function route() {
     const h = (location.hash || "").replace("#", "").split("?")[0];
+    const user = firebase.auth().currentUser;
+
+    // --- ADICIONE ESTE BLOCO AQUI ---
+    if (h === "super-admin") {
+        if (isSuperAdmin(user)) {
+            showOnlyPage("page-super-admin");
+        } else {
+            window.location.hash = "#meus-veiculos";
+            alert("Acesso restrito ao Administrador Master.");
+        }
+        return;
+    }
+    // --------------------------------
 
     if (h === "veiculos") {
-      showOnlyPage("page-veiculos");
-      loadVeiculosPublico();
-      return;
+        showOnlyPage("page-veiculos");
+        loadVeiculosPublico();
+        return;
     }
 
     if (h === "meus-veiculos") {
-      showOnlyPage("page-admin");
-      // mantém o admin como casca do painel vendedor
-      firebase.auth().onAuthStateChanged((user) => {
-        if (user) renderPainelVendedor(user);
-        else renderLoginVendedor();
-      });
-      return;
+        showOnlyPage("page-admin");
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) renderPainelVendedor(user);
+            else renderLoginVendedor();
+        });
+        return;
     }
-
-    // se não for rota do módulo, não mexe no resto do seu site
-  }
+}
 
   function bindPublicButtons() {
     const btnFiltrar = document.getElementById("btnAplicarFiltroVeic");
@@ -18737,3 +18708,139 @@ try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
   });
 })();
 
+// Salva as permissões no nó /users/ do Firebase
+function salvarPermissoesCliente() {
+    const uid = document.getElementById("master-uid").value;
+    const email = document.getElementById("master-email").value;
+    
+    if(!uid) return alert("Insira o UID do usuário");
+
+    const dados = {
+        email: email,
+        acessoVeiculos: document.getElementById("p-veiculos").checked,
+        acessoImoveis: document.getElementById("p-imoveis").checked,
+        acessoCardapio: document.getElementById("p-cardapio").checked,
+        acessoEventos: document.getElementById("p-eventos").checked,
+        acessoPromo: document.getElementById("p-promo").checked,
+        tipo: "vendedor"
+    };
+
+    firebase.database().ref(`users/${uid}`).set(dados)
+        .then(() => alert("Permissões atualizadas com sucesso!"))
+        .catch(e => alert("Erro ao salvar: " + e.message));
+}
+
+// Renderiza o painel correto dependendo de QUEM logou
+function renderPainelVendedor(user) {
+    const container = document.getElementById("admin-content");
+
+    if (isSuperAdmin(user)) {
+        // Se for VOCÊ, mostra o link para o painel master
+        container.innerHTML = `
+            <div class="aviso-admin">
+                <h3>Olá, Administrador Master</h3>
+                <button onclick="window.location.hash = '#super-admin'" class="btn-admin">Gerenciar Clientes</button>
+                <button onclick="abrirFormVeiculo()" class="btn-admin">Postar Veículo Próprio</button>
+            </div>
+        `;
+        return;
+    }
+
+    // Se for um CLIENTE, busca o que ele pode ver
+    firebase.database().ref(`users/${user.uid}`).once('value').then((snap) => {
+        const p = snap.val() || {};
+        
+        container.innerHTML = `
+            <h2>Painel do Parceiro</h2>
+            <div class="modulos-acesso">
+                ${p.acessoVeiculos ? '<button onclick="abrirFormVeiculo()" class="btn-veic">Gerenciar Veículos</button>' : ''}
+                ${p.acessoCardapio ? '<button onclick="abrirFormCardapio()">Gerenciar Cardápio</button>' : ''}
+                ${p.acessoPromo ? '<button onclick="abrirFormPromo()">Criar Promoção</button>' : ''}
+            </div>
+            <div id="area-trabalho-vendedor"></div>
+        `;
+    });
+}
+
+
+
+
+// 1. Você (Admin) cadastra o cliente no banco de dados
+function gerarAcessoCliente() {
+    const email = document.getElementById("master-email").value.trim().toLowerCase();
+    const pass = document.getElementById("master-pass").value;
+    
+    if(!email || !pass) return alert("Preencha e-mail e senha");
+
+    const dadosCliente = {
+        email: email,
+        senhaProvisoria: pass,
+        acessoVeiculos: document.getElementById("p-veiculos").checked,
+        acessoImoveis: document.getElementById("p-imoveis").checked,
+        acessoCardapio: document.getElementById("p-cardapio").checked,
+        acessoPromo: document.getElementById("p-promo").checked,
+        status: "pendente" // Muda para ativo no primeiro login
+    };
+
+    // Salva numa lista de espera usando o email como chave (escapado)
+    const emailKey = email.replace(/\./g, ',');
+    firebase.database().ref(`preCadastros/${emailKey}`).set(dadosCliente)
+        .then(() => {
+            alert("Sucesso! O cliente já pode logar com esses dados.");
+            document.getElementById("master-email").value = "";
+            document.getElementById("master-pass").value = "";
+        });
+}
+
+// 2. Modifique sua função de LOGIN para suportar o Auto-Cadastro
+function realizarLogin(email, senha) {
+    const auth = firebase.auth();
+    const emailKey = email.trim().toLowerCase().replace(/\./g, ',');
+
+    // Primeiro tenta logar normalmente
+    auth.signInWithEmailAndPassword(email, senha)
+        .catch((error) => {
+            // Se o erro for "usuário não encontrado", verificamos se ele está no nosso pré-cadastro
+            if (error.code === 'auth/user-not-found') {
+                firebase.database().ref(`preCadastros/${emailKey}`).once('value').then((snap) => {
+                    const dados = snap.val();
+                    if (dados && dados.senhaProvisoria === senha) {
+                        // Se os dados batem, criamos a conta agora mesmo!
+                        auth.createUserWithEmailAndPassword(email, senha).then((cred) => {
+                            // Movemos as permissões para o nó oficial de users
+                            const user = cred.user;
+                            delete dados.senhaProvisoria;
+                            dados.status = "ativo";
+                            
+                            firebase.database().ref(`users/${user.uid}`).set(dados);
+                            firebase.database().ref(`preCadastros/${emailKey}`).remove();
+                            alert("Bem-vindo! Sua conta foi configurada com sucesso.");
+                        });
+                    } else {
+                        alert("Usuário ou senha incorretos.");
+                    }
+                });
+            } else {
+                alert("Erro: " + error.message);
+            }
+        });
+}
+
+
+function acessarAreaAdmin() {
+    const user = firebase.auth().currentUser;
+
+    if (!user) {
+        // Se não está logado, leva para a seção de login no index.html
+        window.location.hash = "#meus-veiculos"; 
+        return;
+    }
+
+    if (isSuperAdmin(user)) {
+        // SE FOR VOCÊ: Abre o novo arquivo HTML que criamos
+        window.location.href = "admin.html";
+    } else {
+        // SE FOR CLIENTE: Mantém na área de vendedor do index
+        window.location.hash = "#meus-veiculos";
+    }
+}

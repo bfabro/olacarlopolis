@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin - Olá Carlópolis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { background: #e7f2fd; font-family: sans-serif; }
+        .admin-wrap { padding: 20px; max-width: 450px; margin: auto; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .btn-blue { background: #4070f4; color: white; }
+        .btn-green { background: #28a745; color: white; }
+        .btn-out { background: #ff4444; color: white; margin-top: 30px; }
+        .hidden { display: none; }
+        .grid-perm { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+<div class="admin-wrap">
+    <a href="index.html" style="text-decoration:none; color:#4070f4;"><i class="fa-solid fa-house"></i> Voltar ao site</a>
+
+    <div id="box-login" class="card hidden">
+        <h2>Identificação</h2>
+        <input type="email" id="email-log" placeholder="E-mail">
+        <input type="password" id="pass-log" placeholder="Senha">
+        <button class="btn-blue" onclick="executarLogin()">Entrar</button>
+    </div>
+
+    <div id="box-master" class="card hidden">
+        <h2>Painel Master</h2>
+        <p>Cadastrar Novo Cliente:</p>
+        <input type="email" id="new-client-email" placeholder="E-mail do Cliente">
+        <input type="text" id="new-client-pass" placeholder="Senha Provisória">
+        <div class="grid-perm">
+            <label><input type="checkbox" id="check-veic"> Veículos</label>
+            <label><input type="checkbox" id="check-imob"> Imóveis</label>
+        </div>
+        <button class="btn-green" onclick="cadastrarNovoNoBanco()">Liberar Acesso</button>
+        <button class="btn-out" onclick="firebase.auth().signOut()">Sair</button>
+    </div>
+
+    <div id="box-vendedor" class="card hidden">
+        <h2>Painel do Cliente</h2>
+        <div id="botoes-dinamicos"></div>
+        <button class="btn-out" onclick="firebase.auth().signOut()">Sair</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script src="script.js"></script>
+
+<script>
+    // Aguarda o Firebase carregar do script.js
+    function checkState() {
+        firebase.auth().onAuthStateChanged((user) => {
+            document.getElementById('box-login').classList.add('hidden');
+            document.getElementById('box-master').classList.add('hidden');
+            document.getElementById('box-vendedor').classList.add('hidden');
+
+            if (user) {
+                if (isSuperAdmin(user)) {
+                    document.getElementById('box-master').classList.remove('hidden');
+                } else {
+                    document.getElementById('box-vendedor').classList.remove('hidden');
+                    renderMenuVendedor(user);
+                }
+            } else {
+                document.getElementById('box-login').classList.remove('hidden');
+            }
+        });
+    }
+
+    // Inicializa a verificação
+    setTimeout(checkState, 1000);
+
+    function executarLogin() {
+        const e = document.getElementById('email-log').value;
+        const s = document.getElementById('pass-log').value;
+        realizarLogin(e, s); // Esta função já está no seu script.js
+    }
+
+    function cadastrarNovoNoBanco() {
+        // Aqui chama a função que salva no Firebase (preCadastros)
+        alert("Enviando dados...");
+    }
+</script>
+
+</body>
+</html>

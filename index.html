@@ -191,11 +191,19 @@
 
 
          <div class="navbar_content">
-            <i id="iconeUsuarios" class="fas fa-users" style="margin-left: 10px;"></i>
-            <span id="contador" style="margin-left: 10px;">0</span>
+            <i id="iconeUsuarios"  class="fas fa-users" style="margin-left: 10px;"></i>
+            <span id="contador" onclick="window.location.href='admin/admin.html'" style="cursor: pointer;" style="margin-left: 10px;">0</span>
 
             <!-- <i class='bx bx-bell' ></i>-->
          </div>
+
+       
+
+
+
+
+
+         
          <!--
          <div class="navbar_content">
             <a href="#admin" id="linkAdmin" title="Área administrativa" style="text-decoration:none; color:inherit;">
@@ -1194,6 +1202,8 @@
                   <span class="navlink_icon"><i style="color:#2E8B57" class="fa-solid fa-house-chimney"></i></span>
                   <span class="navlink bold">Imóveis</span>
                </a>
+
+               
  
                <li class="item">
   <a href="#veiculos" class="nav_link">
@@ -1698,8 +1708,8 @@
 -->
 
 
-   <!--   -->
-
+   <!-- AQUI EU BLOQUEIO  -->
+<!--   
    <script>
       // Bloqueia Ctrl+U (ver código-fonte)
       document.onkeydown = function (e) {
@@ -1723,7 +1733,7 @@
       document.addEventListener('contextmenu', function (e) {
          e.preventDefault();
       });
-   </script>
+   </script>-->
 
     <!-- ===== VEÍCULOS (PÚBLICO) ===== -->
 <section id="page-veiculos" class="page" style="display:none">
@@ -1765,6 +1775,24 @@
       </div>
    </section>
    <!-- ===== /ADMIN APP ===== -->
+
+<section id="page-login-central" class="page-content" style="display:none;">
+  <div class="content-wrap" style="max-width: 400px; margin: 0 auto; padding-top: 50px;">
+    <div class="card-form" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+      <h2 style="text-align: center; color: #4070f4;">Acesso Restrito</h2>
+      <p style="text-align: center; font-size: 0.9rem; color: #666; margin-bottom: 20px;">Identifique-se para continuar</p>
+      
+      <input type="email" id="login-email" placeholder="Seu e-mail" style="width:100%; padding:12px; margin-bottom:10px; border: 1px solid #ddd; border-radius: 8px;">
+      <input type="password" id="login-senha" placeholder="Sua senha" style="width:100%; padding:12px; margin-bottom:10px; border: 1px solid #ddd; border-radius: 8px;">
+      
+      <button onclick="tentarLogar()" class="btn-admin" style="width:100%; height: 45px; background: #4070f4; border-radius: 8px;">Entrar</button>
+      
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="javascript:void(0)" onclick="esqueciSenha()" style="font-size: 0.8rem; color: #4070f4; text-decoration: none;">Esqueci minha senha</a>
+      </div>
+    </div>
+  </div>
+</section>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 

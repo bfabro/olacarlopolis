@@ -8802,7 +8802,10 @@ tr[data-inativo="true"] {
 
 
 
-
+#contador:active {
+    transform: scale(0.9);
+    opacity: 0.7;
+}
 
 
 
