@@ -329,17 +329,36 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
     // 🔥 LIMPA QUALQUER HTML DO FUNCIONAMENTO (remove <br>, <p>, etc)
     // 🔥 NORMALIZA FUNCIONAMENTO PARA LINHAS
-    let funcionamentoLinhas = [];
+   // 🔥 NORMALIZA FUNCIONAMENTO PARA LINHAS
+let funcionamentoLinhas = [];
 
-    if (typeof funcionamento === "string") {
-      funcionamentoLinhas = funcionamento
-        .replace(/<br\s*\/?>/gi, "|")
-        .replace(/<\/p>/gi, "|")
-        .replace(/<[^>]+>/g, "")
-        .split(/\||;|•/g)
-        .map(l => l.trim())
-        .filter(Boolean);
-    }
+if (typeof funcionamento === "string") {
+  let txt = funcionamento
+    .replace(/<br\s*\/?>/gi, "|")
+    .replace(/<\/p>/gi, "|")
+    .replace(/\n/g, "|")                 // ✅ caso venha com \n
+    .replace(/<[^>]+>/g, "");
+
+  // ✅ separadores extras comuns (muito usado em alguns cadastros)
+  txt = txt.replace(/\s*(?:\/|,|\s-\s)\s*/g, "|");
+
+  funcionamentoLinhas = txt
+    .split(/\||;|•/g)
+    .map(l => l.trim())
+    .filter(Boolean);
+
+  // ✅ FALLBACK: se ainda ficou tudo em uma linha, quebra por "dias"
+  if (funcionamentoLinhas.length <= 1) {
+    const diasRegex = /(Dom(?:ingo)?|Seg(?:unda)?|Ter(?:ça)?|Qua(?:rta)?|Qui(?:nta)?|Sex(?:ta)?|S[aá]b(?:ado)?)/gi;
+
+    funcionamentoLinhas = txt
+      .replace(diasRegex, "|$1")   // coloca separador antes de cada dia
+      .split("|")
+      .map(l => l.trim())
+      .filter(Boolean);
+  }
+}
+
 
     let endereco = 
       establishment.endereco ||
@@ -489,7 +508,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     flex-direction: column;
     gap: 12px;
     color: #f2f4f8;
-    flex-grow: 1;
+    
   ">
     ${funcionamentoLinhas.length ? `
     <div style="font-size: 16px; line-height: 1.5;">
@@ -7496,7 +7515,7 @@ function abrirPainelAdmin(user) {
           {
             image: "images/comercios/acabamentos/tokfino/perfil.jpg",
             name: "Tok Fino",
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 12:00h",
             statusAberto: "a",
             horarios: {
 
