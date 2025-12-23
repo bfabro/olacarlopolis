@@ -2879,6 +2879,9 @@ document.addEventListener("DOMContentLoaded", function () {
     showdavirada2026: "s",
     cafedamanhadosamigos: "s",
 
+tardezinhadefimdeano: "s",
+    campeonatovelocross2026: "s",
+
 
     /// FIM EVENTOS 
 
@@ -11978,6 +11981,16 @@ function abrirPainelAdmin(user) {
             infoAdicional: "​A Confra do Caravela está chegando para encerrar 2025 com chave de ouro! Teremos um super show com Júlya & Maryana, a energia contagiante de Anadark e o som do Deejay Kábelo para não deixar ninguém parado.<br><br><strong>Pontos de Venda:</strong><br>Lojas Eliane<br>Adega Cuenca<br>Farmacia Desconto Facil<br>Portaria do Clube Caravela."
           },
 
+             {
+            image: "images/informacoes/eventos/4.jpg",
+            name: "Tardezinha de Fim de Ano",
+            date: "28/12/2025",
+            address: "Centro de Eventos Ilha do Ponciano",
+          
+            instagram: "https://www.instagram.com/p/DSe7vZjkVsZ/",
+            infoAdicional: "Tardezinha de Fim de Ano com Yasmin Santos + Gabi e Rapha, a partir ads 18hrs"
+          },
+
 
           {
             image: "images/informacoes/eventos/2.jpg",
@@ -11987,6 +12000,17 @@ function abrirPainelAdmin(user) {
             instagram: "https://www.instagram.com/turismocarlopolis/",
             infoAdicional: "Show da Virada com Lucas Lucco, entrada Free!"
           },
+
+
+          {
+            image: "images/informacoes/eventos/5.jpg",
+            name: "Campeonato Velocross 2026",
+            date: "24/01/2026",
+            address: "Ilha do Ponciano",
+            instagram: "https://www.instagram.com/p/DScwdE_gJOi/",
+            infoAdicional: "Dois dias de disputas eletrizantes, pilotos feras na pista e aquele clima que só o velocross tem! Chame a galera, traga a família e venha viver essa experiência de perto."
+          },
+
 
 
 
