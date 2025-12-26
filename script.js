@@ -527,7 +527,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           <div style="flex: 1; overflow: hidden; padding-right: 20px;">
             <h2 style="
                 margin: 0; 
-                font-size: 42px; /* Reduzido para garantir uma linha */
+                font-size: 46px; /* Reduzido para garantir uma linha */
                 font-weight: 900; 
                 color: #1a1a1a; 
                 line-height: 1; 
