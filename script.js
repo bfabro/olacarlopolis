@@ -571,8 +571,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
               <div style="display: flex; align-items: flex-start; gap: 20px; padding: 15px 25px; background: #f9f9f9; border-radius: 20px;">
                 <span style="font-size: 40px; margin-top: 5px;">🕒</span>
                 <div>
-                  <small style="display: block; font-size: 22px; color: #bbb; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px;">Horário de Funcionamento</small>
-                  <div style="font-size: 32px; color: #444; font-weight: 600; line-height: 1.4;">
+                  <small style="display: block; font-size: 26px; color: #bbb; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px;">Horário de Funcionamento</small>
+                  <div style="font-size: 36px; color: #444; font-weight: 600; line-height: 1.4;">
                     ${horarioHtmlFinal}
                   </div>
                 </div>
