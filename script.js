@@ -494,7 +494,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
           <div style="display: flex; flex-direction: column; gap: 25px;">
             ${horarioFormatado ? `
-              <div style="display: flex; align-items: flex-start; gap: 20px;">
+              <div style="display: flex; align-items: flex-start; gap: 20px;padding: 15px 25px; background: #f9f9f9; border-radius: 20px;">
                 <span style="font-size: 40px; margin-top: 5px;">🕒</span>
                 <div>
                   <small style="display: block; font-size: 22px; color: #bbb; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Horário de Funcionamento</small>
@@ -7018,7 +7018,7 @@ function abrirPainelAdmin(user) {
             instagram: "https://www.instagram.com/tokfinodecor/",
             facebook: "https://www.facebook.com/tokfinodecor/",
             novidadesImages: [
-              "images/comercios/acabamentos/tokfino/divulgacao/1.jpg",
+              "images/comercios/acabamentos/tokfino/divulgacao/9.jpg",
               "images/comercios/acabamentos/tokfino/divulgacao/2.jpg",
               "images/comercios/acabamentos/tokfino/divulgacao/3.jpg",
               "images/comercios/acabamentos/tokfino/divulgacao/4.jpg",
@@ -7026,11 +7026,12 @@ function abrirPainelAdmin(user) {
               "images/comercios/acabamentos/tokfino/divulgacao/6.jpg",
               "images/comercios/acabamentos/tokfino/divulgacao/7.jpg",
               "images/comercios/acabamentos/tokfino/divulgacao/8.jpg",
-              "images/comercios/acabamentos/tokfino/divulgacao/9.jpg",
+              
+              "images/comercios/acabamentos/tokfino/divulgacao/1.jpg",
 
             ],
             novidadesDescriptions: [
-              "Papel de parede, mude o visual do teu ambiente de forma rapida e pratica",
+             "Realizamos serviços completos desde a base até os acabamentos finais, garantindo qualidade em todas as etapas da obra.",
               "Grama sintética instalada.<br>A grama sintética além de super prática. Ela é extremamente linda, causa um conforto tanto visualmente quanto utilizando-a",
               "A sofisticação e praticidade que uma persiana proporciona é fora de base.",
               "Cortinas em tecido, para quem não abre mão do bom gosto e sofisticação.",
@@ -7038,7 +7039,9 @@ function abrirPainelAdmin(user) {
               "Piso laminado é perfeito para deixar o ambiente aconchegante e com um visual lindíssimo!",
               "Papel de parede<BR> ✨Ótimo para mudar o visual do seu ambiente. Deixando da forma que você quiser, prático e rápido!",
               "Persianas são um investimento excelente para o seu ambiente, deixando um espaço confortável e extremamente lindo.",
-              "Realizamos serviços completos desde a base até os acabamentos finais, garantindo qualidade em todas as etapas da obra.",
+              
+
+               "Papel de parede, mude o visual do teu ambiente de forma rapida e pratica",
 
             ],
           },
