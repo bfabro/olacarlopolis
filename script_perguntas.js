@@ -299,260 +299,435 @@ function somenteDigitos(str) {
 
 
 
+
+
+
+
+
 async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
-    const nome = (establishment.name || "Comércio").toUpperCase();
-    const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
+    const nome = establishment.name || "Comércio em Carlópolis";
     
-    // --- 1. PREPARAÇÃO DOS DADOS ---
-    const telefone = getPrimeiroContato(establishment.contact || establishment.whatsapp || establishment.telefone || "");
-    const endereco = establishment.endereco || establishment.enderecoCompleto || establishment.address || "";
-    
-    // Pega as imagens (prioriza perfil, depois novidades)
-    const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
-    let fotoUrl = establishment.logo || establishment.image || (imagens.length ? imagens[0] : "");
-    const fotoFinal = fotoUrl.trim() ? fotoUrl : logoSiteUrl;
 
-    // --- 2. ESTRUTURA VISUAL (ESTILO INSTAGRAM) ---
-    const host = document.createElement("div");
-    host.id = "insta-card-host";
-    host.style.cssText = "position: fixed; left: -9999px; top: 0; width: 1080px; height: 1920px; z-index: 99999;";
 
-    host.innerHTML = `
-      <div id="instaCard" style="
-        width: 1080px; height: 1920px; position: relative;
-        background: #ffffff; font-family: 'SF Pro Display', 'Helvetica', Arial, sans-serif;
-        display: flex; flex-direction: column; overflow: hidden;
-      ">
-        
-        <div style="padding: 40px; display: flex; align-items: center; gap: 25px; background: white;">
-          <div style="width: 120px; height: 120px; border-radius: 50%; padding: 5px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);">
-             <div style="width: 100%; height: 100%; border-radius: 50%; border: 6px solid white; background: url('${fotoFinal}') center/cover no-repeat; box-sizing: border-box;"></div>
-          </div>
-          <div>
-            <h2 style="margin: 0; font-size: 42px; font-weight: 700; color: #262626;">${nome}</h2>
-            <span style="font-size: 32px; color: #8e8e8e;">${categoriaAtual} • Carlópolis</span>
-          </div>
-        </div>
+    let funcionamento = 
+      establishment.horario ||
+      establishment.funcionamento ||
+      establishment.horarioFuncionamento ||
+      establishment.horarioAtendimento ||
+      establishment.operacao ||
+      establishment.hours ||
+      establishment.aberto ||
+      (establishment.schedule 
+        ? establishment.schedule.text || establishment.schedule.horario 
+        : "") ||
+      "";
 
-        <div style="width: 1080px; height: 1080px; background: #efefef; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <img src="${fotoFinal}" style="width: 100%; height: 100%; object-fit: cover;">
-        </div>
+    if (typeof funcionamento === "object" && funcionamento !== null) {
+      funcionamento = Object.entries(funcionamento)
+        .map(([dia, valor]) => `${dia}: ${valor}`)
+        .join(" | ");
+    }
 
-        <div style="flex: 1; padding: 50px; display: flex; flex-direction: column; gap: 40px; background: white; position: relative;">
-          
-          <div style="display: flex; gap: 30px; margin-bottom: 10px;">
-             <span style="font-size: 45px;">❤️</span> <span style="font-size: 45px;">💬</span> <span style="font-size: 45px;">✈️</span>
-          </div>
+    // 🔥 LIMPA QUALQUER HTML DO FUNCIONAMENTO (remove <br>, <p>, etc)
+    // 🔥 NORMALIZA FUNCIONAMENTO PARA LINHAS
+   // 🔥 NORMALIZA FUNCIONAMENTO PARA LINHAS
+let funcionamentoLinhas = [];
 
-          <div style="border-left: 8px solid #0095f6; padding-left: 30px;">
-            <p style="font-size: 38px; font-weight: 700; margin: 0 0 10px 0; color: #262626;">📍 Onde encontrar:</p>
-            <p style="font-size: 34px; margin: 0; color: #4a4a4a; line-height: 1.4;">${endereco || 'Consulte no site oficial'}</p>
-          </div>
+if (typeof funcionamento === "string") {
+  let txt = funcionamento
+    .replace(/<br\s*\/?>/gi, "|")
+    .replace(/<\/p>/gi, "|")
+    .replace(/\n/g, "|")                 // ✅ caso venha com \n
+    .replace(/<[^>]+>/g, "");
 
-          <div style="background: #fafafa; border-radius: 30px; padding: 40px; border: 2px solid #efefef;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-               <div>
-                 <p style="font-size: 30px; color: #8e8e8e; margin: 0; text-transform: uppercase; letter-spacing: 2px;">Fale agora</p>
-                 <p style="font-size: 52px; font-weight: 800; margin: 5px 0 0 0; color: #25d366;">${telefone || 'Ver no site'}</p>
-               </div>
-               <div style="background: #25d366; color: white; padding: 20px 40px; border-radius: 20px; font-size: 32px; font-weight: bold;">WhatsApp</div>
-            </div>
-          </div>
+  // ✅ separadores extras comuns (muito usado em alguns cadastros)
+  txt = txt.replace(/\s*(?:\/|,|\s-\s)\s*/g, "|");
 
-          <p style="font-size: 32px; color: #262626; line-height: 1.5; margin: 0;">
-            <b>${nome}</b> Confira mais fotos e o cardápio completo acessando nosso perfil no <b>Olá Carlópolis</b>.
-          </p>
+  funcionamentoLinhas = txt
+    .split(/\||;|•/g)
+    .map(l => l.trim())
+    .filter(Boolean);
 
-          <div style="position: absolute; bottom: 50px; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px;">
-            <p style="font-size: 26px; color: #8e8e8e; margin: 0;">Disponível em:</p>
-            <img src="${logoSiteUrl}" style="height: 80px; filter: grayscale(0.2);">
-            <p style="font-size: 28px; font-weight: 600; color: #0095f6; margin: 0;">olacarlopolis.com.br</p>
-          </div>
-        </div>
-      </div>
-    `;
+  // ✅ FALLBACK: se ainda ficou tudo em uma linha, quebra por "dias"
+  if (funcionamentoLinhas.length <= 1) {
+    const diasRegex = /(Dom(?:ingo)?|Seg(?:unda)?|Ter(?:ça)?|Qua(?:rta)?|Qui(?:nta)?|Sex(?:ta)?|S[aá]b(?:ado)?)/gi;
 
-    document.body.appendChild(host);
-
-    // --- 3. RENDERIZAÇÃO ---
-    // Aguarda carregar a foto e a logo
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    const canvas = await html2canvas(document.querySelector("#instaCard"), {
-      scale: 1, // 1080x1920 já é o tamanho real de um Story HD
-      useCORS: true,
-      backgroundColor: "#ffffff"
-    });
-
-    const link = document.createElement('a');
-    link.download = `story-${nome.toLowerCase().replace(/\s+/g, '-')}.png`;
-    link.href = canvas.toDataURL('image/png', 0.9);
-    link.click();
-
-    host.remove();
-    if (typeof mostrarToast === 'function') mostrarToast('✨ Story gerado para o Instagram!');
-
-  } catch (err) {
-    console.error("Erro no Card Instagram:", err);
-    if (document.getElementById("insta-card-host")) document.getElementById("insta-card-host").remove();
+    funcionamentoLinhas = txt
+      .replace(diasRegex, "|$1")   // coloca separador antes de cada dia
+      .split("|")
+      .map(l => l.trim())
+      .filter(Boolean);
   }
 }
 
 
+    let endereco = 
+      establishment.endereco ||
+      establishment.enderecoCompleto ||
+      establishment.address ||
+      establishment.logradouro ||
+      establishment.rua ||
+      "";
+
+      const profissao =
+  establishment.profissao ||
+  establishment.profissão ||
+  establishment.servico ||
+  establishment.serviço ||
+  establishment.categoriaServico ||
+  "";
+
+const telefone = getPrimeiroContato(
+  establishment.contact ||
+  establishment.telefone ||
+  establishment.phone ||
+  ""
+);
+
+// ✅ Detecta "serviço" pelo conteúdo do cadastro (mais confiável)
+const isServico =
+  Boolean(profissao) ||
+  /serv/i.test(String(categoriaAtual || "")) ||
+  /serv/i.test(String(slugId || "")) ||
+  /serv/i.test(String(establishment.tipo || "")) ||
+  /serv/i.test(String(establishment.category || ""));
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
-  try {
-    const nome = (establishment.name || "Estabelecimento").toUpperCase();
-    const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
-    
-    // --- COLETA E TRATAMENTO DE DADOS ---
-    const telefone = getPrimeiroContato(establishment.contact || establishment.whatsapp || establishment.telefone || "");
-    const endereco = establishment.address || establishment.endereco || "";
-    const delivery = establishment.delivery || null;
-    
-    // Tratamento Inteligente de Horário (Quebra de linha)
-    let horarioRaw = establishment.hours || establishment.horario || "";
-    if (typeof horarioRaw === "object") horarioRaw = "Consulte no site";
-    
-    // Remove HTML e prepara as quebras
-    let horarioLimpo = horarioRaw.replace(/<[^>]+>/g, "").trim();
-    
-    // Lógica de quebra: substitui separadores por <br> e isola o Sábado
-    let horarioFormatado = horarioLimpo
-      .replace(/;/g, "<br>") // Troca ponto e vírgula por quebra
-      .replace(/Sab/gi, "<br>Sab") // Garante que o Sábado comece em nova linha
-      .replace(/Sábado/gi, "<br>Sábado")
-      .replace(/,\s/g, "<br>"); // Troca vírgula seguida de espaço por quebra
-
-    const descricoes = establishment.novidadesDescriptions || [];
-    const legendaGourmet = descricoes.length > 0 ? descricoes[0] : "";
+    if (typeof endereco === "object" && endereco !== null) {
+      endereco = Object.entries(endereco)
+        .map(([_, valor]) => `${valor}`)
+        .join(" - ");
+    }
 
     const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
-    let fotoUrl = establishment.image || establishment.logo || (imagens.length ? imagens[0] : "");
-    const fotoFinal = fotoUrl.trim() ? fotoUrl : logoSiteUrl;
+    let fotoPerfilUrl = 
+      establishment.logo || 
+      establishment.image || 
+      (Array.isArray(imagens) && imagens.length ? imagens[0] : "");
 
+    fotoPerfilUrl = (fotoPerfilUrl || "").toString().trim();
+
+    // CORREÇÃO: URL absoluta para imagens padrão
+    const fotoFinal = fotoPerfilUrl 
+      ? fotoPerfilUrl 
+      : window.location.origin + "/images/img_padrao_site/logo_1.png";
+
+    const logoBrancaSite = window.location.origin + "/images/img_padrao_site/logo_1.png";
+
+    // ✅ CRIAR UM CONTAINER TEMPORÁRIO FORA DA TELA COM ESTILOS EXPLÍCITOS
     const host = document.createElement("div");
-    host.id = "insta-card-host";
-    host.style.cssText = "position: fixed; left: -9999px; top: 0; width: 1080px; height: 1920px; z-index: 99999;";
+    host.id = "card-generator-host";
+    host.style.cssText = `
+      position: fixed;
+      left: -9999px;
+      top: 0;
+      width: 360px;
+      height: 640px;
+      z-index: 99999;
+      background: transparent;
+    `;
 
+    // ✅ USAR STYLES INLINE EM TODOS OS ELEMENTOS PARA GARANTIR CAPTURA
     host.innerHTML = `
-      <div id="instaCard" style="
-        width: 1080px; height: 1920px; position: relative;
-        background: #FFFFFF; font-family: 'Poppins', sans-serif;
-        display: flex; flex-direction: column; overflow: hidden;
+      <div id="estCard" style="
+        position: relative;
+        width: 360px;
+        height: 640px;
+        box-sizing: border-box;
+        border-radius: 24px;
+        overflow: hidden;
+        background: radial-gradient(circle at top, #1a2635, #050910);
+        box-shadow: 0 18px 40px rgba(0,0,0,.7);
+        border: 1px solid rgba(93,212,255,.25);
+        margin: 0;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        color: white;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       ">
-        
-        <div style="padding: 70px 60px 30px; display: flex; align-items: center; justify-content: space-between; height: 200px;">
-          <div style="flex: 1;">
-            <h2 style="margin: 0; font-size: 55px; font-weight: 900; color: #1a1a1a; line-height: 1.1; letter-spacing: -2px;">${nome}</h2>
-            <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
-                <span style="width: 50px; height: 6px; background: #0095f6; border-radius: 10px;"></span>
-                <span style="font-size: 28px; color: #0095f6; font-weight: 700; text-transform: uppercase;">${categoriaAtual}</span>
-            </div>
-          </div>
-          <div style="width: 300px; height: 140px; background: url('${logoSiteUrl}') no-repeat center right; background-size: contain;"></div>
-        </div>
 
-        <div style="width: 1080px; height: 900px; padding: 0 60px;">
+        <!-- CAPA COM FOTO DO CLIENTE -->
+        <div style="
+          position: relative;
+          width: 100%;
+          height: 300px;
+          overflow: hidden;
+          background: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <img id="fotoEstabelecimento" 
+               src="${fotoFinal}"
+               alt="${String(nome).replace(/"/g, '&quot;')}"
+               style="
+                 max-width: 100%;
+                 max-height: 100%;
+               object-fit: ${isServico ? "contain" : "cover"};
+                 display: block;
+                 background: #000;
+               "
+               crossorigin="anonymous"
+               onerror="this.onerror=null; this.src='${window.location.origin}/images/img_padrao_site/logo_1.png';">
+
+          <!-- degradê -->
           <div style="
-            width: 100%; height: 100%; border-radius: 40px; 
-            background: #fcfcfc url('${fotoFinal}') center/contain no-repeat;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            border: 1px solid #f0f0f0;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 90px;
+            background: linear-gradient(
+              to top,
+              rgba(0,0,0,.8),
+              rgba(0,0,0,0)
+            );
           "></div>
+
+          <!-- categoria + nome -->
+          <div style="
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 18px;
+            text-align: center;
+          ">
+            <div style="
+              font-size: 11px;
+              letter-spacing: .12em;
+              text-transform: uppercase;
+              color: #9aa6b2;
+              margin-bottom: 4px;
+            ">
+              ${categoriaAtual}
+            </div>
+
+            <div style="
+              font-size: 18px;
+              font-weight: 800;
+              color: #fff;
+              text-shadow: 0 2px 6px rgba(0,0,0,.85);
+              padding: 0 20px;
+              line-height: 1.2;
+            ">
+              ${nome}
+            </div>
+          </div>
         </div>
 
-        <div style="flex: 1; padding: 50px 80px; display: flex; flex-direction: column; gap: 30px;">
-          
-          ${legendaGourmet ? `
-            <div style="background: #fdfdfd; border-left: 10px solid #f0f0f0; padding: 20px 30px; margin-bottom: 5px;">
-              <p style="font-size: 32px; font-style: italic; color: #555; margin: 0; line-height: 1.4;">"${legendaGourmet}"</p>
-            </div>
-          ` : ""}
-
-          <div style="display: flex; flex-direction: column; gap: 25px;">
-            ${horarioFormatado ? `
-              <div style="display: flex; align-items: flex-start; gap: 25px;">
-                <span style="font-size: 45px; margin-top: 5px;">🕒</span>
-                <div>
-                  <small style="display: block; font-size: 20px; color: #bbb; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Horário de Funcionamento</small>
-                  <p style="font-size: 34px; margin: 5px 0 0 0; color: #333; font-weight: 600; line-height: 1.5;">
-                    ${horarioFormatado}
-                  </p>
-                </div>
-              </div>
-            ` : ""}
-
-            ${delivery ? `
-              <div style="display: flex; align-items: center; gap: 25px;">
-                <span style="font-size: 45px;">🛵</span>
-                <div>
-                  <small style="display: block; font-size: 20px; color: #bbb; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Serviço</small>
-                  <p style="font-size: 32px; margin: 0; color: #0095f6; font-weight: 700;">${delivery}</p>
-                </div>
-              </div>
-            ` : ""}
-          </div>
-
-          <div style="background: #e9f7ef; border-radius: 30px; padding: 35px 45px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <small style="display: block; font-size: 22px; color: #2ecc71; text-transform: uppercase; font-weight: 800;">WhatsApp / Pedidos</small>
-              <p style="font-size: 65px; margin: 5px 0 0 0; color: #1ebea5; font-weight: 900; letter-spacing: -2px;">${telefone || 'Ver no site'}</p>
-            </div>
-            <span style="font-size: 70px;">📱</span>
-          </div>
-
-          ${endereco ? `
-            <div style="display: flex; align-items: flex-start; gap: 25px; padding: 10px;">
-              <span style="font-size: 40px;">📍</span>
-              <p style="font-size: 30px; color: #666; margin: 0; line-height: 1.4; font-weight: 500;">${endereco}</p>
-            </div>
-          ` : ""}
-
-          <div style="margin-top: auto; padding-top: 20px;">
-            <div style="width: 100%; height: 2px; background: linear-gradient(to right, transparent, #eee, transparent); margin-bottom: 25px;"></div>
-            <p style="font-size: 26px; color: #ccc; text-align: center; font-weight: 500; margin-bottom: 5px;">Para mais informações:</p>
-            <p style="font-size: 48px; font-weight: 900; color: #1a1a1a; text-align: center; margin: 0;">olacarlopolis.com.br</p>
-          </div>
-
-        </div>
+       <!-- CONTEÚDO INFERIOR -->
+<div style="
+  height: 340px;
+  padding: 10px 18px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+">
+  <!-- CARD DE INFORMAÇÕES -->
+  <div style="
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 16px;
+    background: rgba(255,255,255,.12);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: #f2f4f8;
+    
+  ">
+    ${funcionamentoLinhas.length ? `
+    <div style="font-size: 16px; line-height: 1.5;">
+      <strong style="font-size: 16px;">⏰ Funcionamento:</strong>
+      <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 2px;">
+        ${funcionamentoLinhas.map(linha => `
+          <div style="font-size: 14px; line-height: 1.3;">${linha}</div>
+        `).join("")}
       </div>
+    </div>
+    ` : ""}
+
+    ${endereco ? `
+    <div style="font-size: 14px; line-height: 1.35;">
+      <strong style="font-size: 16px;">📍 Endereço:</strong><br>
+      <div style="font-size: 14px; margin-top: 2px;line-height: 1.25;">${String(endereco).replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+    </div>
+    ` : ""}
+
+
+    ${isServico && (profissao || telefone) ? `
+  <div style="font-size: 14px; line-height: 1.35;">
+    ${profissao ? `<strong style="font-size: 16px;">🛠️ Profissão:</strong>
+    <div style="font-size: 14px; margin-top: 2px;">${String(profissao).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>` : ""}
+
+    ${telefone ? `<div style="margin-top: 8px;">
+      <strong style="font-size: 16px;">📞 Telefone:</strong>
+      <div style="font-size: 14px; margin-top: 2px;">${telefone}</div>
+    </div>` : ""}
+  </div>
+` : ""}
+
+  </div>
+<!-- 🔥 BLOCO LOGO + TEXTO BEM ACIMA (quase colado no card) -->
+<div style="
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 10px 0 10px; <!-- padding-top reduzido para 2px -->
+  margin-top: 0; <!-- margin-top removido -->
+">
+  <!-- Logo à esquerda -->
+  <img id="logoSite" 
+       src="${logoBrancaSite}" 
+       style="
+         width: 110px;
+         height: auto;
+         display: block;
+         filter: drop-shadow(0 6px 18px rgba(0,0,0,.7));
+         object-fit: contain;
+       "
+       crossorigin="anonymous"
+       onerror="this.onerror=null; this.style.display='none';">
+
+  <!-- Texto à direita 
+  <div style="
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: right;
+    line-height: 1.2;
+    max-width: 50%;
+  ">
+    Para mais informações<br>acesse:<br>
+    
+  </div>-->
+</div>
+
+
+</div>
     `;
 
     document.body.appendChild(host);
-    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const canvas = await html2canvas(document.querySelector("#instaCard"), {
-      scale: 1, 
-      useCORS: true,
-      backgroundColor: "#FFFFFF"
+    // ✅ GARANTIR QUE O HTML2CANVAS ESTÁ CARREGADO
+    if (typeof html2canvas === 'undefined') {
+      throw new Error("html2canvas não está disponível");
+    }
+
+    // ✅ ESPERAR CARREGAMENTO COMPLETO DE TODOS OS RECURSOS
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // ✅ ESPERAR FONTES (SE APLICÁVEL)
+    if (document.fonts && document.fonts.ready) {
+      try {
+        await document.fonts.ready;
+      } catch (e) {
+        console.warn("Font loading failed:", e);
+      }
+    }
+
+    // ✅ ESPERAR IMAGENS CARREGAREM
+    const images = host.querySelectorAll('img');
+    const imagePromises = Array.from(images).map(img => {
+      return new Promise((resolve) => {
+        if (img.complete && img.naturalWidth > 0) {
+          resolve();
+          return;
+        }
+        
+        img.onload = () => {
+          console.log('Imagem carregada:', img.src);
+          resolve();
+        };
+        
+        img.onerror = () => {
+          console.warn(`Imagem falhou ao carregar: ${img.src}`);
+          // Se for a foto do estabelecimento, tenta usar a padrão
+          if (img.id === 'fotoEstabelecimento') {
+            img.src = window.location.origin + '/images/img_padrao_site/logo_1.png';
+          } else {
+            img.style.display = 'none';
+          }
+          resolve();
+        };
+        
+        // Timeout de segurança
+        setTimeout(resolve, 3000);
+      });
     });
 
+    await Promise.all(imagePromises);
+
+    // ✅ ESPERAR UM POUCO MAIS PARA GARANTIR QUE TUDO ESTÁ RENDERIZADO
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // ✅ CAPTURAR O CARD
+    const card = host.querySelector('#estCard');
+    
+    if (!card) {
+      throw new Error("Elemento do card não encontrado");
+    }
+
+    // ✅ USAR CONFIGURAÇÕES OTIMIZADAS PARA HTML2CANVAS
+    const canvas = await html2canvas(card, {
+      backgroundColor: null,
+      scale: 2, // Alta resolução
+      useCORS: true, // Para imagens externas
+      allowTaint: false,
+      logging: false,
+      imageTimeout: 10000,
+      removeContainer: true,
+      foreignObjectRendering: false,
+      onclone: function(clonedDoc) {
+        // Garantir que o clone tenha os mesmos estilos
+        const clonedCard = clonedDoc.querySelector('#estCard');
+        if (clonedCard) {
+          clonedCard.style.fontFamily = "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+          clonedCard.style.width = "360px";
+          clonedCard.style.height = "640px";
+        }
+      }
+    });
+
+    // ✅ CRIAR E DISPARAR DOWNLOAD
     const link = document.createElement('a');
-    link.download = `card-${nome.toLowerCase()}.png`;
+    const nomeArquivo = `card-${String(nome)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')}-${Date.now()}.png`;
+    
+    link.download = nomeArquivo;
     link.href = canvas.toDataURL('image/png', 1.0);
+    
+    // Disparar download automaticamente
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+
+    // ✅ LIMPEZA
     host.remove();
+
+    // ✅ FEEDBACK PARA O USUÁRIO
+    if (typeof mostrarToast === 'function') {
+      mostrarToast('✅ Card gerado com sucesso!');
+    }
+
   } catch (err) {
-    console.error("Erro:", err);
-    if (document.getElementById("insta-card-host")) document.getElementById("insta-card-host").remove();
+    console.error("Erro ao gerar imagem do card:", err);
+    
+    // Feedback de erro
+    if (typeof mostrarToast === 'function') {
+      mostrarToast('❌ Erro ao gerar card. Verifique o console.');
+    } else {
+      alert("Não foi possível gerar a imagem. Veja o console (F12) para detalhes.");
+    }
+    
+    // Limpar qualquer elemento temporário
+    const host = document.getElementById('card-generator-host');
+    if (host) host.remove();
   }
 }
 
@@ -560,6 +735,382 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+//
+//// === GERAR CARD PARA IMÓVEIS (Stories 1080x1920) ===
+async function gerarImagemCardImovel(imovel, slugId) {
+  try {
+    const titulo = imovel.titulo || imovel.nome || "Imóvel em Carlópolis";
+    const cidade = imovel.cidade || "Carlópolis - PR";
+
+    const quartos = imovel.quartos || imovel.dormitorios || 0;
+    const banheiros = imovel.banheiros || 0;
+    const vagas = imovel.vagas || imovel.garagens || 0;
+    const area = imovel.construcao || imovel.area || imovel.m2 || "";
+    const valor = imovel.valor || 0;
+    
+    // Formatar valor
+    const valorFormatado = valor 
+      ? Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+      : "Consulte";
+
+    // 🔹 pega valor bruto de suítes de várias formas possíveis
+    const suitesFonte =
+      imovel.suite ??
+      imovel.suites ??
+      imovel.qtSuite ??
+      imovel.qtdSuites ??
+      imovel.qtd_suite ??
+      imovel.qtsuite ??
+      imovel.suiteQuantidade ??
+      0;
+
+    // 🔹 normaliza (garante número mesmo se vier "1 suíte")
+    const suites = Number(String(suitesFonte).replace(/\D/g, "")) || 0;
+
+    // 🔹 linha de detalhes: dorm, suíte (se tiver), banh, vagas, área
+    const detalhes = [
+      quartos ? `${quartos} dorm` : "",
+      suites > 0 ? `${suites} suíte${suites > 1 ? "s" : ""}` : "",
+      banheiros ? `${banheiros} banh` : "",
+      vagas ? `${vagas} vaga${vagas > 1 ? "s" : ""}` : "",
+      area ? `${area} m²` : ""
+    ].filter(Boolean).join(" • ");
+
+    // 🔹 FOTO PRINCIPAL DO IMÓVEL
+    const fotos =
+      imovel.imagens ||           // principal
+      imovel.fotos ||
+      imovel.images ||
+      imovel.divulgacaoImages ||
+      [];
+
+    const imgImovel =
+      imovel.capa ||
+      (Array.isArray(fotos) && fotos.length
+        ? fotos[0]
+        : window.location.origin + "/images/img_padrao_site/padrao.jpg");
+
+    // Logo do site
+    const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
+
+    // ✅ CRIAR UM CONTAINER TEMPORÁRIO FORA DA TELA
+    const host = document.createElement("div");
+    host.id = "imovel-card-generator-host";
+    host.style.cssText = `
+      position: fixed;
+      left: -9999px;
+      top: 0;
+      width: 360px;
+      height: 640px;
+      z-index: 99999;
+      background: transparent;
+    `;
+
+    // ✅ HTML DO CARD DO IMÓVEL (estilo similar ao dos estabelecimentos)
+    host.innerHTML = `
+      <div id="imovelCard" style="
+        position: relative;
+        width: 360px;
+        height: 640px;
+        box-sizing: border-box;
+        border-radius: 24px;
+        overflow: hidden;
+        background: radial-gradient(circle at top, #1a2635, #050910);
+        box-shadow: 0 18px 40px rgba(0,0,0,.7);
+        border: 1px solid rgba(93,212,255,.25);
+        margin: 0;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        color: white;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      ">
+
+        <!-- IMAGEM DO IMÓVEL -->
+        <div style="
+          position: relative;
+          width: 100%;
+          height: 360px;
+          overflow: hidden;
+          background: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <img id="fotoImovel" 
+               src="${imgImovel}"
+               alt="${String(titulo).replace(/"/g, '&quot;')}"
+               style="
+                 max-width: 100%;
+                 max-height: 100%;
+                 object-fit: cover;
+                 display: block;
+                 background: #000;
+               "
+               crossorigin="anonymous"
+               onerror="this.onerror=null; this.src='${window.location.origin}/images/img_padrao_site/padrao.jpg';">
+
+          <!-- degradê -->
+          <div style="
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 90px;
+            background: linear-gradient(
+              to top,
+              rgba(0,0,0,.8),
+              rgba(0,0,0,0)
+            );
+          "></div>
+
+          <!-- título + cidade -->
+          <div style="
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 18px;
+            text-align: center;
+            padding: 0 20px;
+          ">
+            <div style="
+              font-size: 18px;
+              font-weight: 800;
+              color: #fff;
+              text-shadow: 0 2px 6px rgba(0,0,0,.85);
+              line-height: 1.2;
+              margin-bottom: 4px;
+            ">
+              ${titulo}
+            </div>
+            <div style="
+              font-size: 14px;
+              color: #9aa6b2;
+            ">
+              ${cidade}
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTEÚDO INFERIOR -->
+        <div style="
+          height: 280px;
+          padding: 20px 18px;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+        ">
+          <!-- VALOR -->
+          <div style="
+            text-align: center;
+            margin-bottom: 16px;
+          ">
+            <div style="
+              font-size: 11px;
+              letter-spacing: .12em;
+              text-transform: uppercase;
+              color: #9aa6b2;
+              margin-bottom: 4px;
+            ">
+              ${imovel.tipo === 'aluguel' ? 'ALUGUEL' : 'VENDA'}
+            </div>
+            <div style="
+              font-size: 24px;
+              font-weight: 800;
+              color: #5dd4ff;
+              text-shadow: 0 2px 8px rgba(93,212,255,.3);
+            ">
+              ${valorFormatado}
+            </div>
+          </div>
+
+          <!-- CARD DE DETALHES -->
+          <div style="
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,.35);
+            border-radius: 16px;
+            background: rgba(255,255,255,.12);
+            color: #f2f4f8;
+            margin-bottom: 16px;
+            flex-grow: 1;
+          ">
+            <div style="font-size: 16px; line-height: 1.5; margin-bottom: 10px;">
+              <strong style="font-size: 16px;">📐 Detalhes:</strong>
+              <div style="font-size: 14px; margin-top: 6px; line-height: 1.4;">
+                ${detalhes || "Informações disponíveis no site"}
+              </div>
+            </div>
+
+            ${imovel.descricao ? `
+            <div style="font-size: 14px; line-height: 1.35; margin-top: 10px;">
+              <strong style="font-size: 14px;">📝 Descrição:</strong>
+              <div style="font-size: 13px; margin-top: 4px; color: #e0e0e0;">
+                ${String(imovel.descricao).substring(0, 150)}${imovel.descricao.length > 150 ? '...' : ''}
+              </div>
+            </div>
+            ` : ""}
+          </div>
+
+          <!-- LOGO DO SITE -->
+          <div style="
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 8px;
+          ">
+            <img id="logoSiteImovel" 
+                 src="${logoSiteUrl}" 
+                 style="
+                   width: 110px;
+                   height: auto;
+                   display: block;
+                   filter: drop-shadow(0 6px 18px rgba(0,0,0,.7));
+                   object-fit: contain;
+                 "
+                 crossorigin="anonymous"
+                 onerror="this.onerror=null; this.style.display='none';">
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(host);
+
+    // ✅ GARANTIR QUE O HTML2CANVAS ESTÁ CARREGADO
+    if (typeof html2canvas === 'undefined') {
+      throw new Error("html2canvas não está disponível");
+    }
+
+    // ✅ ESPERAR CARREGAMENTO COMPLETO DE TODOS OS RECURSOS
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // ✅ ESPERAR FONTES (SE APLICÁVEL)
+    if (document.fonts && document.fonts.ready) {
+      try {
+        await document.fonts.ready;
+      } catch (e) {
+        console.warn("Font loading failed:", e);
+      }
+    }
+
+    // ✅ ESPERAR IMAGENS CARREGAREM
+    const images = host.querySelectorAll('img');
+    const imagePromises = Array.from(images).map(img => {
+      return new Promise((resolve) => {
+        if (img.complete && img.naturalWidth > 0) {
+          resolve();
+          return;
+        }
+        
+        img.onload = () => {
+          console.log('Imagem carregada:', img.src);
+          resolve();
+        };
+        
+        img.onerror = () => {
+          console.warn(`Imagem falhou ao carregar: ${img.src}`);
+          // Se for a foto do imóvel, tenta usar a padrão
+          if (img.id === 'fotoImovel') {
+            img.src = window.location.origin + '/images/img_padrao_site/padrao.jpg';
+          } else if (img.id === 'logoSiteImovel') {
+            img.style.display = 'none';
+          }
+          resolve();
+        };
+        
+        // Timeout de segurança
+        setTimeout(resolve, 3000);
+      });
+    });
+
+    await Promise.all(imagePromises);
+
+    // ✅ ESPERAR UM POUCO MAIS PARA GARANTIR QUE TUDO ESTÁ RENDERIZADO
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // ✅ CAPTURAR O CARD
+    const card = host.querySelector('#imovelCard');
+    
+    if (!card) {
+      throw new Error("Elemento do card não encontrado");
+    }
+
+    // ✅ USAR CONFIGURAÇÕES OTIMIZADAS PARA HTML2CANVAS
+    const canvas = await html2canvas(card, {
+      backgroundColor: null,
+      scale: 2, // Alta resolução
+      useCORS: true, // Para imagens externas
+      allowTaint: false,
+      logging: false,
+      imageTimeout: 10000,
+      removeContainer: true,
+      foreignObjectRendering: false,
+      onclone: function(clonedDoc) {
+        // Garantir que o clone tenha os mesmos estilos
+        const clonedCard = clonedDoc.querySelector('#imovelCard');
+        if (clonedCard) {
+          clonedCard.style.fontFamily = "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+          clonedCard.style.width = "360px";
+          clonedCard.style.height = "640px";
+        }
+      }
+    });
+
+    // ✅ CRIAR E DISPARAR DOWNLOAD
+    const link = document.createElement('a');
+    const nomeArquivo = `imovel-${String(titulo)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')}-${Date.now()}.png`;
+    
+    link.download = nomeArquivo;
+    link.href = canvas.toDataURL('image/png', 1.0);
+    
+    // Disparar download automaticamente
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // ✅ LIMPEZA
+    host.remove();
+
+    // ✅ FEEDBACK PARA O USUÁRIO
+    if (typeof mostrarToast === 'function') {
+      mostrarToast('✅ Card do imóvel gerado com sucesso!');
+    }
+
+  } catch (err) {
+    console.error("Erro ao gerar imagem do card do imóvel:", err);
+    
+    // Feedback de erro
+    if (typeof mostrarToast === 'function') {
+      mostrarToast('❌ Erro ao gerar card do imóvel. Verifique o console.');
+    } else {
+      alert("Não foi possível gerar a imagem do imóvel. Veja o console (F12) para detalhes.");
+    }
+    
+    // Limpar qualquer elemento temporário
+    const host = document.getElementById('imovel-card-generator-host');
+    if (host) host.remove();
+  }
+}
 
 
 
@@ -15950,11 +16501,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
       // Atualiza swiper correto
       setTimeout(() => {
-        if (target === "turismo" && window.swiperTurismo) {
-          window.swiperTurismo.update();
-          window.swiperTurismo.slideTo(0);
-        }
-        if (target === "eventos" && window.swiperEventos) {
+if (target === "eventos" && window.swiperEventos) {
           window.swiperEventos.update();
           window.swiperEventos.slideTo(0);
         }
@@ -15966,7 +16513,225 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     });
   });
 
-  window.addEventListener("DOMContentLoaded", () => {
+  
+
+// =========================
+// Perguntas (IA local / regras)
+// =========================
+(function () {
+  const input = document.getElementById("perguntaInput");
+  const btn = document.getElementById("enviarPerguntaBtn");
+  const out = document.getElementById("perguntasResposta");
+
+  if (!input || !btn || !out) return; // página sem a seção
+
+  const stripAccents = (s) =>
+    (s || "")
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+  const timeToMin = (hhmm) => {
+    if (!hhmm) return null;
+    const [h, m] = hhmm.split(":").map((n) => parseInt(n, 10));
+    if (Number.isNaN(h) || Number.isNaN(m)) return null;
+    return h * 60 + m;
+  };
+
+  const getDayKey = (date) => {
+    const d = date.getDay(); // 0=dom
+    return ["dom", "seg", "ter", "qua", "qui", "sex", "sab"][d];
+  };
+
+  const isOpenNow = (est, now = new Date()) => {
+    const horarios = est?.horarios;
+    if (!horarios) return { open: false, reason: "Sem horários cadastrados" };
+
+    const dayKey = getDayKey(now);
+    const slots = horarios[dayKey] || [];
+    if (!Array.isArray(slots) || slots.length === 0) return { open: false, reason: "Fechado hoje" };
+
+    const cur = now.getHours() * 60 + now.getMinutes();
+    for (const s of slots) {
+      const ini = timeToMin(s.inicio);
+      const fim = timeToMin(s.fim);
+      if (ini == null || fim == null) continue;
+      if (cur >= ini && cur <= fim) return { open: true };
+    }
+    return { open: false, reason: "Fora do horário" };
+  };
+
+  const prettySlots = (est, date = new Date()) => {
+    const dayKey = getDayKey(date);
+    const slots = est?.horarios?.[dayKey] || [];
+    if (!slots.length) return "";
+    return slots.map(s => `${s.inicio}–${s.fim}`).join(" / ");
+  };
+
+  const findEstablishmentsByText = (text) => {
+    const q = stripAccents(text);
+    const results = [];
+    (window.categories || []).forEach((cat) => {
+      (cat.establishments || []).forEach((est) => {
+        const name = stripAccents(est?.name || "");
+        if (name && q && (name.includes(q) || q.includes(name))) {
+          results.push({ cat, est });
+        }
+      });
+    });
+    return results;
+  };
+
+  const findBestMatchByName = (namePart) => {
+    const q = stripAccents(namePart);
+    let best = null;
+    (window.categories || []).forEach((cat) => {
+      (cat.establishments || []).forEach((est) => {
+        const n = stripAccents(est?.name || "");
+        if (!n) return;
+        if (n === q) best = best || { cat, est, score: 100 };
+        if (n.includes(q)) best = best || { cat, est, score: 70 };
+      });
+    });
+    return best;
+  };
+
+  const answerPergunta = (questionRaw) => {
+    const now = new Date();
+    const q = stripAccents(questionRaw);
+
+    if (!q || q.length < 3) {
+      return `Digite uma pergunta (ex: <b>“Quais mercados estão abertos agora?”</b>).`;
+    }
+
+    // 1) Mercados abertos hoje/agora
+    if ((q.includes("mercad") || q.includes("supermerc")) && (q.includes("abert") || q.includes("aberto") || q.includes("abertos"))) {
+      const cat = (window.categories || []).find(c => stripAccents(c.title || "").includes("supermerc"));
+      const lista = cat?.establishments || [];
+      if (!lista.length) {
+        return `Não encontrei a categoria <b>Supermercado</b> cadastrada no site.`;
+      }
+
+      const abertos = [];
+      const fechados = [];
+
+      lista.forEach((est) => {
+        const st = isOpenNow(est, now);
+        if (st.open) abertos.push(est);
+        else fechados.push(est);
+      });
+
+      const horaAtual = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+      let html = `<div class="perguntas-title">🛒 Supermercados em Carlópolis</div>`;
+      html += `<div class="perguntas-meta">Consulta em <b>${horaAtual}</b> (${now.toLocaleDateString("pt-BR")}).</div>`;
+
+      if (abertos.length) {
+        html += `<div class="perguntas-section"><b>✅ Abertos agora:</b></div>`;
+        html += `<ul class="perguntas-list">` + abertos.map(est => {
+          const slots = prettySlots(est, now);
+          const tel = (est.contact || "").trim();
+          return `<li><b>${est.name}</b>${slots ? ` <span class="perguntas-muted">(${slots})</span>` : ""}${tel ? `<br><span class="perguntas-muted">${tel}</span>` : ""}</li>`;
+        }).join("") + `</ul>`;
+      } else {
+        html += `<div class="perguntas-section"><b>✅ Abertos agora:</b> nenhum encontrado.</div>`;
+      }
+
+      // se ninguém aberto, mostra quem abre hoje
+      const abreHoje = fechados.filter(est => (est?.horarios?.[getDayKey(now)] || []).length > 0);
+      if (abreHoje.length) {
+        html += `<div class="perguntas-section"><b>🕒 Horários de hoje:</b></div>`;
+        html += `<ul class="perguntas-list">` + abreHoje.map(est => {
+          const slots = prettySlots(est, now);
+          return `<li><b>${est.name}</b> <span class="perguntas-muted">(${slots || "—"})</span></li>`;
+        }).join("") + `</ul>`;
+      }
+
+      html += `<div class="perguntas-muted" style="margin-top:10px;">Obs: isso usa os horários cadastrados no Olá Carlópolis (campo <code>horarios</code>).</div>`;
+      return html;
+    }
+
+    // 2) Telefone de X
+    if (q.includes("telefone") || q.includes("whats") || q.includes("contato")) {
+      const alvo = questionRaw.replace(/.*(telefone|whats|contato)\s*(do|da|de)?\s*/i, "").trim();
+      const best = findBestMatchByName(alvo);
+      if (best?.est) {
+        const tel = (best.est.contact || best.est.contact2 || "").trim();
+        if (tel) {
+          return `<b>${best.est.name}</b><br><span class="perguntas-muted">Telefone:</span> ${tel}`;
+        }
+        return `Encontrei <b>${best.est.name}</b>, mas não achei telefone cadastrado.`;
+      }
+    }
+
+    // 3) Endereço / Onde fica X
+    if (q.includes("onde fica") || q.includes("endereco") || q.includes("endereço") || q.includes("localizacao") || q.includes("localização")) {
+      const alvo = questionRaw
+        .replace(/.*(onde fica|endereco|endereço|localizacao|localização)\s*(do|da|de)?\s*/i, "")
+        .trim();
+      const best = findBestMatchByName(alvo);
+      if (best?.est) {
+        const end = (best.est.address || "").trim();
+        if (end) {
+          return `<b>${best.est.name}</b><br><span class="perguntas-muted">Endereço:</span> ${end}`;
+        }
+        return `Encontrei <b>${best.est.name}</b>, mas não achei endereço cadastrado.`;
+      }
+    }
+
+    // 4) Busca simples por nome (fallback útil)
+    const hits = findEstablishmentsByText(questionRaw);
+    if (hits.length) {
+      const top = hits.slice(0, 5);
+      return `
+        <div class="perguntas-title">Resultados relacionados</div>
+        <ul class="perguntas-list">
+          ${top.map(({ cat, est }) => {
+            const tel = (est.contact || "").trim();
+            return `<li><b>${est.name}</b> <span class="perguntas-muted">(${cat.title || ""})</span>${tel ? `<br><span class="perguntas-muted">${tel}</span>` : ""}</li>`;
+          }).join("")}
+        </ul>
+        <div class="perguntas-muted">Dica: pergunte “telefone do ...” ou “onde fica ...”.</div>
+      `;
+    }
+
+    // 5) Resposta padrão (quando não tem na base)
+    return `
+      <div class="perguntas-title">Não achei isso na base do site 😕</div>
+      <div class="perguntas-muted">
+        Eu respondo com base no que está cadastrado no Olá Carlópolis.<br>
+        Tente perguntar de outro jeito, ou use o menu lateral para encontrar a categoria.<br><br>
+        Exemplos: “Quais mercados estão abertos agora?”, “Qual o telefone do Bom Preço?”, “Onde fica o Carreiro?”
+      </div>
+    `;
+  };
+
+  const render = (html) => {
+    out.innerHTML = html;
+    out.style.display = "block";
+  };
+
+  const send = () => {
+    const q = input.value.trim();
+    render(answerPergunta(q));
+  };
+
+  btn.addEventListener("click", send);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") send();
+  });
+
+  document.querySelectorAll(".perguntas-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const q = chip.getAttribute("data-q") || chip.textContent;
+      input.value = q;
+      send();
+    });
+  });
+})();
+
+window.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.carrossel-container').forEach(secao => {
       secao.style.display = 'none';
     });
