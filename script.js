@@ -485,10 +485,10 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           
           ${legendaGourmet ? `
             <div style="margin-bottom: 5px; position: relative; padding-left: 30px;">
-              <span style="position: absolute; left: 0; top: -8px; font-size: 100px; color: #0095f6; opacity: 0.2; font-family: serif;">“</span>
+              <span style="position: absolute; left: 0; top: -8px; font-size: 100px; color: #0095f6; opacity: 0.2; font-family: serif;">“ </span>
               <p style="font-size: 32px; font-weight: 600; color: #6c6c6cff; margin: 0; line-height: 1.3; font-style: italic;">
                 ${legendaGourmet}
-              </p>
+              </p><span style="position: absolute; left: 0; top: -8px; font-size: 100px; color: #0095f6; opacity: 0.2; font-family: serif;">” </span>
             </div>
           ` : ""}
 
@@ -11353,7 +11353,7 @@ function abrirPainelAdmin(user) {
               "images/servicos/podologa/vania/divulgacao/2.jpg",
             ],
             novidadesDescriptions: [
-              "Especialista no Tratamento em Diabético",
+              "Especialista no Tratamento em Diabético, Calos,  Unhas encravadas, Reflexologia podal entre outros tratamento nos pés",
             ],
 
 
