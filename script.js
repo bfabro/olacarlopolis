@@ -422,27 +422,20 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     const nome = (establishment.name || "Estabelecimento").toUpperCase();
     const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
     
-    // --- COLETA E TRATAMENTO DE DADOS ---
+    // --- COLETA DE DADOS ---
     const telefone = getPrimeiroContato(establishment.contact || establishment.whatsapp || establishment.telefone || "");
     const endereco = establishment.address || establishment.endereco || "";
-    const delivery = establishment.delivery || null;
-    
-    // Tratamento Inteligente de Horário (Quebra de linha)
-    let horarioRaw = establishment.hours || establishment.horario || "";
-    if (typeof horarioRaw === "object") horarioRaw = "Consulte no site";
-    
-    // Remove HTML e prepara as quebras
-    let horarioLimpo = horarioRaw.replace(/<[^>]+>/g, "").trim();
-    
-    // Lógica de quebra: substitui separadores por <br> e isola o Sábado
-    let horarioFormatado = horarioLimpo
-      .replace(/;/g, "<br>") // Troca ponto e vírgula por quebra
-      .replace(/Sab/gi, "<br>Sab") // Garante que o Sábado comece em nova linha
-      .replace(/Sábado/gi, "<br>Sábado")
-      .replace(/,\s/g, "<br>"); // Troca vírgula seguida de espaço por quebra
-
     const descricoes = establishment.novidadesDescriptions || [];
     const legendaGourmet = descricoes.length > 0 ? descricoes[0] : "";
+
+    // --- LÓGICA DE HORÁRIO ---
+    let horarioRaw = establishment.hours || establishment.horario || "";
+    if (typeof horarioRaw === "object") horarioRaw = "Consulte no site";
+    let horarioLimpo = horarioRaw.replace(/<[^>]+>/g, "").trim();
+    let horarioFormatado = horarioLimpo
+      .replace(/;/g, "<br>")
+      .replace(/,\s/g, "<br>")
+      .replace(/(?<![a-zA-Záàâãéèêíïóôõöúçñ]\s[aA]\s)(Sab|Sábado)/gi, "<br>$1");
 
     const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
     let fotoUrl = establishment.image || establishment.logo || (imagens.length ? imagens[0] : "");
@@ -459,15 +452,24 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         display: flex; flex-direction: column; overflow: hidden;
       ">
         
-        <div style="padding: 70px 60px 30px; display: flex; align-items: center; justify-content: space-between; height: 200px;">
-          <div style="flex: 1;">
-            <h2 style="margin: 0; font-size: 55px; font-weight: 900; color: #1a1a1a; line-height: 1.1; letter-spacing: -2px;">${nome}</h2>
-            <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
-                <span style="width: 50px; height: 6px; background: #0095f6; border-radius: 10px;"></span>
-                <span style="font-size: 28px; color: #0095f6; font-weight: 700; text-transform: uppercase;">${categoriaAtual}</span>
+        <div style="padding: 70px 60px 30px; display: flex; align-items: center; justify-content: space-between; height: 200px; box-sizing: border-box;">
+          <div style="flex: 1; overflow: hidden; padding-right: 20px;">
+            <h2 style="
+                margin: 0; 
+                font-size: 42px; /* Reduzido para garantir uma linha */
+                font-weight: 900; 
+                color: #1a1a1a; 
+                line-height: 1; 
+                letter-spacing: 0px;
+                white-space: nowrap; 
+                text-overflow: ellipsis;
+            ">${nome}</h2>
+            <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px;">
+                <span style="width: 40px; height: 5px; background: #0095f6; border-radius: 10px;"></span>
+                <span style="font-size: 22px; height: 40px;color: #0095f6; font-weight: 900; text-transform: uppercase; ">${categoriaAtual}</span>
             </div>
           </div>
-          <div style="width: 300px; height: 140px; background: url('${logoSiteUrl}') no-repeat center right; background-size: contain;"></div>
+          <div style="width: 300px; height: 150px; background: url('${logoSiteUrl}') no-repeat center right; background-size: contain; flex-shrink: 0;"></div>
         </div>
 
         <div style="width: 1080px; height: 900px; padding: 0 60px;">
@@ -479,57 +481,57 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           "></div>
         </div>
 
-        <div style="flex: 1; padding: 50px 80px; display: flex; flex-direction: column; gap: 30px;">
+        <div style="flex: 1; padding: 40px 80px; display: flex; flex-direction: column; gap: 30px;">
           
           ${legendaGourmet ? `
-            <div style="background: #fdfdfd; border-left: 10px solid #f0f0f0; padding: 20px 30px; margin-bottom: 5px;">
-              <p style="font-size: 32px; font-style: italic; color: #555; margin: 0; line-height: 1.4;">"${legendaGourmet}"</p>
+            <div style="margin-bottom: 5px; position: relative; padding-left: 30px;">
+              <span style="position: absolute; left: 0; top: -8px; font-size: 100px; color: #0095f6; opacity: 0.2; font-family: serif;">“</span>
+              <p style="font-size: 32px; font-weight: 600; color: #6c6c6cff; margin: 0; line-height: 1.3; font-style: italic;">
+                ${legendaGourmet}
+              </p>
             </div>
           ` : ""}
 
           <div style="display: flex; flex-direction: column; gap: 25px;">
             ${horarioFormatado ? `
-              <div style="display: flex; align-items: flex-start; gap: 25px;">
-                <span style="font-size: 45px; margin-top: 5px;">🕒</span>
+              <div style="display: flex; align-items: flex-start; gap: 20px;">
+                <span style="font-size: 40px; margin-top: 5px;">🕒</span>
                 <div>
-                  <small style="display: block; font-size: 20px; color: #bbb; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Horário de Funcionamento</small>
-                  <p style="font-size: 34px; margin: 5px 0 0 0; color: #333; font-weight: 600; line-height: 1.5;">
+                  <small style="display: block; font-size: 22px; color: #bbb; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Horário de Funcionamento</small>
+                  <p style="font-size: 32px; margin: 5px 0 0 0; color: #444; font-weight: 600; line-height: 1.4;">
                     ${horarioFormatado}
                   </p>
                 </div>
               </div>
             ` : ""}
 
-            ${delivery ? `
-              <div style="display: flex; align-items: center; gap: 25px;">
-                <span style="font-size: 45px;">🛵</span>
+            ${endereco ? `
+              <div style="display: flex; align-items: flex-start; gap: 20px; padding: 15px 25px; background: #f9f9f9; border-radius: 20px;">
+                <span style="font-size: 35px;">📍</span>
                 <div>
-                  <small style="display: block; font-size: 20px; color: #bbb; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Serviço</small>
-                  <p style="font-size: 32px; margin: 0; color: #0095f6; font-weight: 700;">${delivery}</p>
+                  <small style="display: block; font-size: 22px; color: #aaa; text-transform: uppercase; font-weight: 800;">Localização</small>
+                  <p style="font-size: 32px; color: #444; margin: 0; line-height: 1.3; font-weight: 500;">${endereco}</p>
                 </div>
               </div>
             ` : ""}
+
+            <div style="background: #e9f7ef; border-radius: 30px; padding: 25px 40px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #d4f0de;">
+              <div>
+                <small style="display: block; font-size: 22px; color: #2ecc71; text-transform: uppercase; font-weight: 800;">WhatsApp / Contato</small>
+                <p style="font-size: 38px; margin: 5px 0 0 0; color: #1ebea5; font-weight: 900; letter-spacing: -1px;">${telefone || 'Ver no site'}</p>
+              </div>
+             
+            </div>
           </div>
 
-          <div style="background: #e9f7ef; border-radius: 30px; padding: 35px 45px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <small style="display: block; font-size: 22px; color: #2ecc71; text-transform: uppercase; font-weight: 800;">WhatsApp / Pedidos</small>
-              <p style="font-size: 65px; margin: 5px 0 0 0; color: #1ebea5; font-weight: 900; letter-spacing: -2px;">${telefone || 'Ver no site'}</p>
-            </div>
-            <span style="font-size: 70px;">📱</span>
-          </div>
-
-          ${endereco ? `
-            <div style="display: flex; align-items: flex-start; gap: 25px; padding: 10px;">
-              <span style="font-size: 40px;">📍</span>
-              <p style="font-size: 30px; color: #666; margin: 0; line-height: 1.4; font-weight: 500;">${endereco}</p>
-            </div>
-          ` : ""}
-
-          <div style="margin-top: auto; padding-top: 20px;">
+          <div style="margin-top: auto; padding-bottom: 30px;">
             <div style="width: 100%; height: 2px; background: linear-gradient(to right, transparent, #eee, transparent); margin-bottom: 25px;"></div>
-            <p style="font-size: 26px; color: #ccc; text-align: center; font-weight: 500; margin-bottom: 5px;">Para mais informações:</p>
-            <p style="font-size: 48px; font-weight: 900; color: #1a1a1a; text-align: center; margin: 0;">olacarlopolis.com.br</p>
+            <p style="font-size: 36px; color: #1a1a1a; text-align: center; font-weight: 900; margin-bottom: 12px;  letter-spacing: 2px;">
+              Para mais informações acesse:
+            </p>
+            <p style="font-size: 28px; font-weight: 900; color: #0095f6; text-align: center; margin: 0; letter-spacing: 1px;">
+              olacarlopolis.com
+            </p>
           </div>
 
         </div>
@@ -546,12 +548,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     });
 
     const link = document.createElement('a');
-    link.download = `card-${nome.toLowerCase()}.png`;
+    link.download = `card-${nome.toLowerCase().replace(/\s+/g, '-')}.png`;
     link.href = canvas.toDataURL('image/png', 1.0);
     link.click();
     host.remove();
   } catch (err) {
-    console.error("Erro:", err);
+    console.error("Erro ao gerar card:", err);
     if (document.getElementById("insta-card-host")) document.getElementById("insta-card-host").remove();
   }
 }
