@@ -333,20 +333,20 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
     const attrs = [];
     if (imovel.quartos) attrs.push({ l: `${imovel.quartos} Quartos`, i: "🛏️" });
     if (imovel.suite) attrs.push({ l: `${imovel.suite} Suíte`, i: "🚿" });
-    if (imovel.banheiros) attrs.push({ l: `${imovel.banheiros} Banh.`, i: "🚽" });
+    if (imovel.banheiros) attrs.push({ l: `${imovel.banheiros} Banheiro`, i: "🚽" });
     if (imovel.vagas) attrs.push({ l: `${imovel.vagas} Vagas`, i: "🚗" });
     if (imovel.salas) attrs.push({ l: `${imovel.salas} Salas`, i: "🛋️" });
     if (imovel.cozinhas) attrs.push({ l: `${imovel.cozinhas} Coz.`, i: "🍳" });
     if (imovel.area) attrs.push({ l: `${imovel.area}m² Área`, i: "📐" });
-    if (imovel.construcao) attrs.push({ l: `${imovel.construcao}m² Const.`, i: "🏗️" });
+    if (imovel.construcao) attrs.push({ l: `${imovel.construcao}m² Construção`, i: "🏗️" });
     if (imovel.piscina === true || imovel.piscina === "Sim") attrs.push({ l: `Piscina`, i: "🏊" });
-    if (imovel.churrasqueira === true || imovel.churrasqueira === "Sim") attrs.push({ l: `Churrasq.`, i: "🔥" });
+    if (imovel.churrasqueira === true || imovel.churrasqueira === "Sim") attrs.push({ l: `Churrasqueira`, i: "🔥" });
     if (imovel.quintal && imovel.quintal !== "Não") attrs.push({ l: `Quintal`, i: "🌳" });
 
     const atributosHTML = attrs.map(a => `
       <div style="background: #f8f9fa; padding: 10px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; border: 1px solid #eee;">
-         <span style="font-size: 24px;">${a.i}</span>
-         <span style="font-size: 18px; font-weight: 700; color: #333;">${a.l}</span>
+         <span style="font-size: 32px;">${a.i}</span>
+         <span style="font-size: 26px; font-weight: 700; color: #333;">${a.l}</span>
       </div>
     `).join('');
 
@@ -381,7 +381,7 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
         <div style="flex: 1; padding: 30px 60px; display: flex; flex-direction: column; gap: 25px;">
           
           <div style="background: #fff; border-left: 8px solid ${corDestaque}; padding: 10px 20px;">
-            <p style="font-size: 28px; color: #444; margin: 0; line-height: 1.4; font-style: italic;">
+            <p style="font-size: 38px; color: #444; margin: 0; line-height: 1.4; font-style: italic;">
               "${descricao.length > 180 ? descricao.substring(0, 180) + '...' : descricao}"
             </p>
           </div>
