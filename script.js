@@ -345,7 +345,7 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
 
     const atributosHTML = attrs.map(a => `
       <div style="background: #f8f9fa; padding: 10px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; border: 1px solid #eee;">
-         <span style="font-size: 32px;">${a.i}</span>
+         <span style="font-size: 40px;">${a.i}</span>
          <span style="font-size: 26px; font-weight: 700; color: #333;">${a.l}</span>
       </div>
     `).join('');
@@ -390,18 +390,18 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
             ${atributosHTML}
           </div>
 
-          <div style="margin-top: auto; background: #1a1a1a; padding: 40px; border-radius: 30px; color: white; position: relative; overflow: hidden;">
-            <div style="position: absolute; right: -20px; top: -20px; font-size: 150px; opacity: 0.1; color: white;">💰</div>
-            <span style="font-size: 22px; color: ${corDestaque}; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Valor do Investimento</span>
-            <div style="font-size: 75px; font-weight: 900; margin: 5px 0;">${preco}</div>
+          <div style="margin-top: auto; background: #1a1a1aff; padding: 40px; border-radius: 30px; color: white; position: relative; overflow: hidden;">
+            <div style="position: absolute; right: -20px; top: -18px; font-size: 150px; opacity: 0.1; color: white;">💰</div>
+            <span style="font-size: 26px; color: ${corDestaque}; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Valor do Investimento</span>
+            <div style="font-size: 42px; font-weight: 900; margin: 5px 0;">${preco}</div>
             <div style="font-size: 26px; color: #ccc; display: flex; align-items: center; gap: 10px;">
                 <span>📍</span> ${endereco}
             </div>
           </div>
 
-          <div style="text-align: center; padding: 20px 0 40px;">
-            <div style="font-size: 20px; font-weight: 800; color: #999; margin-bottom: 5px;">PARA MAIS INFORMAÇÕES ACESSE:</div>
-            <div style="font-size: 50px; font-weight: 900; color: #1a1a1a; letter-spacing: 2px;">OLACARLOPOLIS.COM</div>
+          <div style="text-align: center; padding: 0px 0 0px;">
+            <div style="font-size: 40px; font-weight: 800; color: #999; margin-bottom: 5px;">PARA MAIS INFORMAÇÕES ACESSE:</div>
+            <div style="font-size: 30px; font-weight: 900; margin-top:25px;color: #1a1a1a; letter-spacing: 2px;">olacarlopolis.com</div>
           </div>
 
         </div>
