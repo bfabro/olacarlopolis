@@ -307,161 +307,129 @@ function somenteDigitos(str) {
 
 
 
-async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
+
+
+
+
+async function gerarImagemCardImovel(imovel, categoriaAtual) {
   try {
-    const nome = (establishment.name || "Estabelecimento").toUpperCase();
+    const corDestaque = "#0095f6"; 
     const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
     
-    // --- COLETA DE DADOS ---
-    const telefone = getPrimeiroContato(establishment.contact || establishment.whatsapp || establishment.telefone || "");
-    const endereco = establishment.address || establishment.endereco || "";
-    const descricoes = establishment.novidadesDescriptions || [];
-    const legendaGourmet = descricoes.length > 0 ? descricoes[0] : "";
+    const titulo = (imovel.titulo || "IMÓVEL DISPONÍVEL").toUpperCase();
+    const endereco = imovel.endereco || "Consulte localização";
+    const preco = imovel.valor ? imovel.valor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) : "Consulte";
+    const descricao = imovel.descricao || "";
 
-    // --- LÓGICA DE HORÁRIO REFEITA (SISTEMA DE ARRAY) ---
-    let horarioRaw = establishment.hours || establishment.horario || "";
-    if (typeof horarioRaw === "object") horarioRaw = "Consulte no site";
+    // 1. TRATAMENTO DE IMAGENS (Grade Inteligente)
+    const imagensRaw = imovel.imagens || [];
+    const fotos = imagensRaw.slice(0, 4).map(url => {
+       if (!url.startsWith('http')) return window.location.origin + '/' + url.replace(/^\//, '');
+       return url;
+    });
+    const totalFotos = fotos.length;
 
-    // Substitui BR, ponto e vírgula e vírgulas por um marcador único para separar
-    let horarioProcessado = horarioRaw
-      .replace(/<br\s*\/?>/gi, "|")
-      .replace(/;/g, "|")
-      .replace(/<[^>]+>/g, "") // Limpa outras tags
-      .split("|") // Transforma em lista
-      .map(item => item.trim())
-      .filter(item => item !== ""); // Remove linhas vazias
+    // 2. LISTA COMPLETA DE ATRIBUTOS (CONFORME SOLICITADO)
+    const attrs = [];
+    if (imovel.quartos) attrs.push({ l: `${imovel.quartos} Quartos`, i: "🛏️" });
+    if (imovel.suite) attrs.push({ l: `${imovel.suite} Suíte`, i: "🚿" });
+    if (imovel.banheiros) attrs.push({ l: `${imovel.banheiros} Banh.`, i: "🚽" });
+    if (imovel.vagas) attrs.push({ l: `${imovel.vagas} Vagas`, i: "🚗" });
+    if (imovel.salas) attrs.push({ l: `${imovel.salas} Salas`, i: "🛋️" });
+    if (imovel.cozinhas) attrs.push({ l: `${imovel.cozinhas} Coz.`, i: "🍳" });
+    if (imovel.area) attrs.push({ l: `${imovel.area}m² Área`, i: "📐" });
+    if (imovel.construcao) attrs.push({ l: `${imovel.construcao}m² Const.`, i: "🏗️" });
+    if (imovel.piscina === true || imovel.piscina === "Sim") attrs.push({ l: `Piscina`, i: "🏊" });
+    if (imovel.churrasqueira === true || imovel.churrasqueira === "Sim") attrs.push({ l: `Churrasq.`, i: "🔥" });
+    if (imovel.quintal && imovel.quintal !== "Não") attrs.push({ l: `Quintal`, i: "🌳" });
 
-    // Transforma a lista em blocos HTML individuais
-    let horarioHtmlFinal = horarioProcessado
-      .map(linha => `<div style="margin-bottom: 4px;">${linha}</div>`)
-      .join("");
-
-    const imagens = establishment.novidadesImages || establishment.divulgacaoImages || [];
-    let fotoUrl = establishment.image || establishment.logo || (imagens.length ? imagens[0] : "");
-    const fotoFinal = fotoUrl.trim() ? fotoUrl : logoSiteUrl;
+    const atributosHTML = attrs.map(a => `
+      <div style="background: #f8f9fa; padding: 10px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; border: 1px solid #eee;">
+         <span style="font-size: 24px;">${a.i}</span>
+         <span style="font-size: 18px; font-weight: 700; color: #333;">${a.l}</span>
+      </div>
+    `).join('');
 
     const host = document.createElement("div");
-    host.id = "insta-card-host";
-    host.style.cssText = "position: fixed; left: -9999px; top: 0; width: 1080px; height: 1920px; z-index: 99999;";
+    host.style.cssText = "position: fixed; left: -9999px; top: 0; width: 1080px; height: 1920px; background: white;";
+    document.body.appendChild(host);
 
     host.innerHTML = `
-      <div id="instaCard" style="
-        width: 1080px; height: 1920px; position: relative;
-        background: #FFFFFF; font-family: 'Poppins', sans-serif;
-        display: flex; flex-direction: column; overflow: hidden;
-      ">
+      <div id="captureArea" style="width: 1080px; height: 1920px; display: flex; flex-direction: column; background: #ffffff; font-family: 'Poppins', Arial, sans-serif;">
         
-        <div style="padding: 70px 60px 30px; display: flex; align-items: center; justify-content: space-between; height: 220px; box-sizing: border-box;">
-          <div style="flex: 1; overflow: hidden; padding-right: 20px;">
-            <h2 style="margin: 0; font-size: 42px; font-weight: 900; color: #1a1a1a; line-height: 1; letter-spacing: -1px; white-space: nowrap; text-overflow: ellipsis;">${nome}</h2>
-            <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
-                <span style="width: 45px; height: 6px; background: #0095f6; border-radius: 10px;"></span>
-                <span style="font-size: 26px; color: #0095f6; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">${categoriaAtual || "Estabelecimento"}</span>
+        <div style="padding: 50px 60px 20px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="flex: 1;">
+            <h1 style="margin: 0; font-size: 42px; color: #1a1a1a; font-weight: 900; line-height: 1.1;">${titulo}</h1>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                <div style="background: ${corDestaque}; height: 6px; width: 50px; border-radius: 3px;"></div>
+                <span style="font-size: 22px; color: ${corDestaque}; font-weight: 800; text-transform: uppercase;">${categoriaAtual || "Imóveis"}</span>
             </div>
           </div>
-          <div style="width: 280px; height: 130px; background: url('${logoSiteUrl}') no-repeat center right; background-size: contain; flex-shrink: 0;"></div>
+          <img src="${logoSiteUrl}" style="height: 110px; width: auto; object-fit: contain;">
         </div>
 
-        <div style="width: 1080px; height: 880px; padding: 0 60px; display: flex; justify-content: center;">
-          <div style="
-            width: 880px; height: 880px; 
-            border-radius: 50%; 
-            background: #fcfcfc url('${fotoFinal}') center/cover no-repeat;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            border: 8px solid #f8f8f8;
-          "></div>
+        <div style="width: 1080px; height: 780px; padding: 0 60px; box-sizing: border-box; display: grid; 
+             grid-template-columns: ${totalFotos === 1 ? '1fr' : '1fr 1fr'}; 
+             grid-template-rows: ${totalFotos <= 2 ? '1fr' : '1fr 1fr'}; gap: 15px;">
+          ${totalFotos === 3 ? `
+            <div style="grid-column: span 2; background: url('${fotos[0]}') center/cover; border-radius: 20px;"></div>
+            <div style="background: url('${fotos[1]}') center/cover; border-radius: 20px;"></div>
+            <div style="background: url('${fotos[2]}') center/cover; border-radius: 20px;"></div>
+          ` : fotos.map(f => `<div style="background: url('${f}') center/cover; border-radius: 20px;"></div>`).join('')}
         </div>
 
-        <div style="flex: 1; padding: 40px 80px; display: flex; flex-direction: column; gap: 30px;">
+        <div style="flex: 1; padding: 30px 60px; display: flex; flex-direction: column; gap: 25px;">
           
-          ${legendaGourmet ? `
-            <div style="margin-bottom: 5px; position: relative; padding-left: 40px;">
-              <span style="position: absolute; left: 0; top: -10px; font-size: 100px; color: #0095f6; opacity: 0.2; font-family: serif;">“</span>
-              <p style="font-size: 38px; font-weight: 600; color: #333; margin: 0; line-height: 1.3; font-style: italic;">${legendaGourmet}</p>
-            </div>
-          ` : ""}
+          <div style="background: #fff; border-left: 8px solid ${corDestaque}; padding: 10px 20px;">
+            <p style="font-size: 28px; color: #444; margin: 0; line-height: 1.4; font-style: italic;">
+              "${descricao.length > 180 ? descricao.substring(0, 180) + '...' : descricao}"
+            </p>
+          </div>
 
-          <div style="display: flex; flex-direction: column; gap: 20px;">
-            ${horarioHtmlFinal ? `
-              <div style="display: flex; align-items: flex-start; gap: 20px;">
-                <span style="font-size: 40px; margin-top: 5px;">🕒</span>
-                <div>
-                  <small style="display: block; font-size: 18px; color: #bbb; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 5px;">Horário de Funcionamento</small>
-                  <div style="font-size: 30px; color: #444; font-weight: 600; line-height: 1.2;">
-                    ${horarioHtmlFinal}
-                  </div>
-                </div>
-              </div>
-            ` : ""}
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+            ${atributosHTML}
+          </div>
 
-            ${endereco ? `
-              <div style="display: flex; align-items: flex-start; gap: 20px; padding: 15px 25px; background: #f9f9f9; border-radius: 20px; border: 1px solid #eee;">
-                <span style="font-size: 35px;">📍</span>
-                <div>
-                  <small style="display: block; font-size: 16px; color: #aaa; text-transform: uppercase; font-weight: 800;">Localização</small>
-                  <p style="font-size: 28px; color: #555; margin: 0; line-height: 1.3; font-weight: 500;">${endereco}</p>
-                </div>
-              </div>
-            ` : ""}
-
-            <div style="background: #e9f7ef; border-radius: 30px; padding: 25px 40px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #d4f0de;">
-              <div>
-                <small style="display: block; font-size: 18px; color: #2ecc71; text-transform: uppercase; font-weight: 800;">WhatsApp / Contato</small>
-                <p style="font-size: 58px; margin: 5px 0 0 0; color: #1ebea5; font-weight: 900; letter-spacing: -1px;">${telefone || 'Ver no site'}</p>
-              </div>
-              <span style="font-size: 55px;">📱</span>
+          <div style="margin-top: auto; background: #1a1a1a; padding: 40px; border-radius: 30px; color: white; position: relative; overflow: hidden;">
+            <div style="position: absolute; right: -20px; top: -20px; font-size: 150px; opacity: 0.1; color: white;">💰</div>
+            <span style="font-size: 22px; color: ${corDestaque}; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Valor do Investimento</span>
+            <div style="font-size: 75px; font-weight: 900; margin: 5px 0;">${preco}</div>
+            <div style="font-size: 26px; color: #ccc; display: flex; align-items: center; gap: 10px;">
+                <span>📍</span> ${endereco}
             </div>
           </div>
 
-          <div style="margin-top: auto; padding-bottom: 40px;">
-            <div style="width: 100%; height: 2px; background: linear-gradient(to right, transparent, #eee, transparent); margin-bottom: 25px;"></div>
-            <p style="font-size: 42px; color: #1a1a1a; text-align: center; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px;">PARA MAIS INFORMAÇÕES ACESSE:</p>
-            <p style="font-size: 62px; font-weight: 900; color: #0095f6; text-align: center; margin: 0; letter-spacing: -2px;">olacarlopolis.com.br</p>
+          <div style="text-align: center; padding: 20px 0 40px;">
+            <div style="font-size: 20px; font-weight: 800; color: #999; margin-bottom: 5px;">PARA MAIS INFORMAÇÕES ACESSE:</div>
+            <div style="font-size: 50px; font-weight: 900; color: #1a1a1a; letter-spacing: 2px;">OLACARLOPOLIS.COM</div>
           </div>
 
         </div>
       </div>
     `;
 
-    document.body.appendChild(host);
-    await new Promise(resolve => setTimeout(resolve, 1200)); // Tempo extra para renderizar as divs
+    // AGUARDAR CARREGAMENTO
+    const imgs = host.querySelectorAll('img');
+    await Promise.all(Array.from(imgs).map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+    }));
+    await new Promise(r => setTimeout(r, 1200)); 
 
-    const canvas = await html2canvas(document.querySelector("#instaCard"), {
-      scale: 2, // Aumentei a escala para melhor legibilidade
-      useCORS: true,
-      backgroundColor: "#FFFFFF"
+    const canvas = await html2canvas(document.querySelector("#captureArea"), {
+      scale: 2, useCORS: true, allowTaint: true, backgroundColor: "#ffffff"
     });
 
-    const link = document.createElement('a');
-    link.download = `card-${nome.toLowerCase().replace(/\s+/g, '-')}.png`;
-    link.href = canvas.toDataURL('image/png', 1.0);
+    const link = document.createElement("a");
+    link.download = `card-imovel-${Date.now()}.png`;
+    link.href = canvas.toDataURL("image/png");
     link.click();
     host.remove();
+
   } catch (err) {
-    console.error("Erro ao gerar card:", err);
-    if (document.getElementById("insta-card-host")) document.getElementById("insta-card-host").remove();
+    console.error("Erro:", err);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1765,7 +1733,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "tokfino", "oficinadocelular", "cacaushow", "farmais"
+    "tokfino", "oficinadocelular", "cacaushow","toninhoparana"
   ];
 
   function montarCarrosselDivulgacao() {
@@ -4293,9 +4261,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       status: "disponível",
       titulo: "Residencial Villa Ray (Horizonte 3)",
-      endereco: "Agende uma visita",
-      lat: -23.3953,
-      lng: -49.7232,
+      endereco: "Agende uma visita",   
       quartos: 2,
       banheiros: 2,
       vagas: 1,
@@ -4304,8 +4270,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       piscina: false,
       churrasqueira: false,
       area: 90,
-      construcao: 63,          // << NOVO: m² de construção   
+      construcao: 63,         
       valor: 230000,
+      suite: "1",
+      quintal: "Não",
       telefone: "43 99678-9652",
       imagens: [
         "images/imoveis/cesar/venda/casa1/1.png",
@@ -4322,8 +4290,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       ],
       descricao: "Ambientes bem iluminados e ventilados, prontos para receber sua família. Documentação OK",
-      suite: "1",
-      quintal: "Não",
+      
       procura: "casa", // ou "terreno", "rural", etc.   
 
       // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
