@@ -336,9 +336,9 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
     if (imovel.banheiros) attrs.push({ l: `${imovel.banheiros} Banheiro`, i: "🚽" });
     if (imovel.vagas) attrs.push({ l: `${imovel.vagas} Vagas`, i: "🚗" });
     if (imovel.salas) attrs.push({ l: `${imovel.salas} Salas`, i: "🛋️" });
-    if (imovel.cozinhas) attrs.push({ l: `${imovel.cozinhas} Coz.`, i: "🍳" });
+    if (imovel.cozinhas) attrs.push({ l: `${imovel.cozinhas} Cozinha`, i: "🍳" });
     if (imovel.area) attrs.push({ l: `${imovel.area}m² Área`, i: "📐" });
-    if (imovel.construcao) attrs.push({ l: `${imovel.construcao}m² Construção`, i: "🏗️" });
+    if (imovel.construcao) attrs.push({ l: `${imovel.construcao}m² Constr.`, i: "🏗️" });
     if (imovel.piscina === true || imovel.piscina === "Sim") attrs.push({ l: `Piscina`, i: "🏊" });
     if (imovel.churrasqueira === true || imovel.churrasqueira === "Sim") attrs.push({ l: `Churrasqueira`, i: "🔥" });
     if (imovel.quintal && imovel.quintal !== "Não") attrs.push({ l: `Quintal`, i: "🌳" });
