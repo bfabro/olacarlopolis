@@ -1588,6 +1588,8 @@ auth.onAuthStateChanged((user) => {
       }
 
 
+      
+
       // Atualiza o contador de usuários online
       onlineUsersRef.on("value", (snapshot) => {
          const userCount = snapshot.numChildren(); // Número de usuários online
@@ -1607,38 +1609,51 @@ auth.onAuthStateChanged((user) => {
       });
 
 
-      // Seleciona todos os itens de menu que começam com "menu"
-      document.querySelectorAll("[id^='menu']").forEach(item => {
-         item.addEventListener("click", () => {
-            const menuId = item.id;
-            const dataHoje = getHojeBR(); // ✅ Corrigido fuso horário
-            const horaAgora = new Date().toLocaleTimeString("pt-BR"); // hh:mm:ss
-
-            // Caminho de contagem total por data e menu
-            const contadorRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/total`);
-            contadorRef.transaction(current => (current || 0) + 1);
-
-            // Caminho de log detalhado com horário
-            const detalhesRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/detalhes`);
-            detalhesRef.push({
-               horario: horaAgora
-            });
-         });
-      });
-
-
-
-
-      // Aplica o evento a todos os submenus (clique em categorias)
-      document.querySelectorAll(".nav_link.sublink").forEach(link => {
-         link.addEventListener("click", () => {
-            const nomeMenu = link.innerText.trim();
-            registrarClique(nomeMenu);
-         });
-      });
+      
 
    </script>
 
+<script>
+  // ✅ Conta QUALQUER clique no menu lateral (pais + filhos + links)
+  function slugMenu(texto) {
+    return (texto || "")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // tira acentos
+      .replace(/[^\w\s-]/g, "")                        // tira caracteres especiais
+      .trim()
+      .replace(/\s+/g, "");                            // remove espaços
+  }
+
+  function registrarCliqueMenu(menuId, texto) {
+    try {
+      const dataHoje = getHojeBR(); // já existe no seu código
+      const horaAgora = new Date().toLocaleTimeString("pt-BR");
+
+      const contadorRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/total`);
+      contadorRef.transaction((current) => (current || 0) + 1);
+
+      const detalhesRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/detalhes`);
+      detalhesRef.push({
+        horario: horaAgora,
+        texto: texto || ""
+      });
+    } catch (e) {
+      console.error("Erro ao registrar clique no menu:", e);
+    }
+  }
+
+  // ✅ Event Delegation (pega itens criados depois e qualquer clique no menu)
+  document.addEventListener("click", (ev) => {
+    const el = ev.target.closest(".nav_link, [id^='menu']");
+    if (!el) return;
+
+    const textoMenu = (el.innerText || el.textContent || "").trim();
+    const menuId = (el.id && el.id.trim())
+      ? el.id.trim()
+      : `menu${slugMenu(textoMenu)}`;
+
+    registrarCliqueMenu(menuId, textoMenu);
+  }, true); // true = capture (pega mesmo se algum código mexer no bubble)
+</script>
 
 
    <script>
