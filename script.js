@@ -2783,6 +2783,25 @@ tardezinhadefimdeano: "s",
     }
   });
 
+  // Adicione ou atualize esta parte no seu script.js
+document.addEventListener("click", (e) => {
+    // Procura por cliques em itens que tenham um identificador de informação
+    const itemMenu = e.target.closest(".menu-item-info, #menuInformacoes, [data-tipo='informacoes']");
+    
+    if (itemMenu) {
+        const tituloInfo = itemMenu.innerText || "Informações Gerais";
+        
+        // Envia para o Firebase na categoria 'cliques_menu' ou 'acessos'
+        firebase.database().ref('estatisticas/cliques_menu').push({
+            titulo: tituloInfo,
+            categoria: "Informações",
+            dataHora: new Date().toLocaleString('pt-BR'),
+            timestamp: Date.now()
+        });
+        console.log("Clique em informação contabilizado:", tituloInfo);
+    }
+});
+
 
   // ativar PLANO ACADEMIA IA pelo menu
   document.addEventListener("click", (e) => {

@@ -1234,6 +1234,35 @@
 			}
 
 
+			async function carregarTabelaAcessosMenu() {
+    const tbody = document.querySelector('#tabelaAcessosMenu tbody');
+    if (!tbody) return;
+
+    firebase.database().ref('estatisticas/cliques_menu').once('value', (snapshot) => {
+        let html = '';
+        const dados = snapshot.val();
+        
+        if (dados) {
+            // Converte objeto em array e ordena por data (mais recente primeiro)
+            const lista = Object.values(dados).reverse();
+            
+            lista.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.dataHora}</td>
+                        <td>${item.categoria || 'Geral'}</td>
+                        <td>${item.titulo}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        } else {
+            tbody.innerHTML = '<tr><td colspan="3">Nenhum clique registado.</td></tr>';
+        }
+    });
+}
+
+
 
 			// Lê os dias do período já selecionado no filtro (diário/semanal/mensal)
 			// A página já usa listarDatasPeriodo() em outras tabelas.
