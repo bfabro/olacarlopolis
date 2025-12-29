@@ -11531,26 +11531,7 @@ function abrirPainelAdmin(user) {
 
 
 
-          {
-            image: "images/informacoes/eventos/1.jpg",
-            name: "Confra do Caravela",
-            date: "27/12/2025",
-            address: "Caravela Country Clube",
-            contact: "(43) 99800-1680",
-            contact2: "(43) 99966-9812",
-            instagram: "https://www.instagram.com/caravelaclube/",
-            infoAdicional: "​A Confra do Caravela está chegando para encerrar 2025 com chave de ouro! Teremos um super show com Júlya & Maryana, a energia contagiante de Anadark e o som do Deejay Kábelo para não deixar ninguém parado.<br><br><strong>Pontos de Venda:</strong><br>Lojas Eliane<br>Adega Cuenca<br>Farmacia Desconto Facil<br>Portaria do Clube Caravela."
-          },
-
-             {
-            image: "images/informacoes/eventos/4.jpg",
-            name: "Tardezinha de Fim de Ano",
-            date: "28/12/2025",
-            address: "Centro de Eventos Ilha do Ponciano",
-          
-            instagram: "https://www.instagram.com/p/DSe7vZjkVsZ/",
-            infoAdicional: "Tardezinha de Fim de Ano com Yasmin Santos + Gabi e Rapha, a partir ads 18hrs"
-          },
+        
 
 
           {
