@@ -2442,11 +2442,11 @@ document.addEventListener("DOMContentLoaded", function () {
     campeonatoeliteredai: "n",
 
     pedalaparana: "n",
-    confradocaravela: "s",
+   
     showdavirada2026: "s",
     cafedamanhadosamigos: "s",
 
-tardezinhadefimdeano: "s",
+
     campeonatovelocross2026: "s",
 
 

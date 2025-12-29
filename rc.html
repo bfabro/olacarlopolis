@@ -425,11 +425,11 @@
 			<table>
 				<thead>
 					<tr>
-						 <th>Imóvel</th>
-    <th>Proprietário</th>
-    <th>Corretor</th>
-    <th style="text-align:center">WhatsApp</th>
-    <th style="text-align:center">Fotos</th>
+						<th>Imóvel</th>
+						<th>Proprietário</th>
+						<th>Corretor</th>
+						<th style="text-align:center">WhatsApp</th>
+						<th style="text-align:center">Fotos</th>
 					</tr>
 				</thead>
 				<tbody id="tabelaCliquesImoveis">
@@ -820,7 +820,15 @@
 							const nomeFormatado = nome.startsWith("menu") ? nome.replace("menu", "") : nome;
 
 							// Oculta as categorias indesejadas
-							const nomesOcultos = [];
+							const nomesOcultos = [
+								"horizontal",
+								"comercio",
+								"informacoes",
+								"informações",
+								"setorpublico",
+								"setor público",
+								"eventos"
+							];
 							if (nomesOcultos.includes(nomeFormatado.toLowerCase())) return;
 
 							const row = document.createElement("tr");
@@ -1284,88 +1292,88 @@
 
 
 
-		async function carregarTabelaCliquesImoveis() {
-  const tbody = document.getElementById('tabelaCliquesImoveis');
-  if (!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+			async function carregarTabelaCliquesImoveis() {
+				const tbody = document.getElementById('tabelaCliquesImoveis');
+				if (!tbody) return;
+				tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
-  const datas = await listarDatasPeriodo();
-  const db = firebase.database();
+				const datas = await listarDatasPeriodo();
+				const db = firebase.database();
 
-  const tot = {};                 // { id: {whats, fotos} }
-  const titulos = {};             // { id: titulo }
-  const mapCorretor = {};         // { id: corretor }
-  const mapProprietario = {};     // { id: proprietario }
+				const tot = {};                 // { id: {whats, fotos} }
+				const titulos = {};             // { id: titulo }
+				const mapCorretor = {};         // { id: corretor }
+				const mapProprietario = {};     // { id: proprietario }
 
-  const norm = (raw) => {
-    if (!raw) return '';
-    if (Array.isArray(raw)) return raw.filter(Boolean).join(', ');
-    if (typeof raw === 'object') return String(raw.nome || raw.label || raw.titulo || raw.text || '').trim();
-    return String(raw).trim();
-  };
+				const norm = (raw) => {
+					if (!raw) return '';
+					if (Array.isArray(raw)) return raw.filter(Boolean).join(', ');
+					if (typeof raw === 'object') return String(raw.nome || raw.label || raw.titulo || raw.text || '').trim();
+					return String(raw).trim();
+				};
 
-  // 1) Soma cliques por dia e captura rótulos do nó diário
-  for (const d of datas) {
-    const snap = await db.ref(`imoveisCliquesPorDia/${d}`).once('value');
-    const dia = snap.val() || {};
-    Object.entries(dia).forEach(([id, info]) => {
-      const w = Number(info?.whatsapp || 0);
-      const f = Number(info?.fotos || 0);
+				// 1) Soma cliques por dia e captura rótulos do nó diário
+				for (const d of datas) {
+					const snap = await db.ref(`imoveisCliquesPorDia/${d}`).once('value');
+					const dia = snap.val() || {};
+					Object.entries(dia).forEach(([id, info]) => {
+						const w = Number(info?.whatsapp || 0);
+						const f = Number(info?.fotos || 0);
 
-      const t = (typeof info?.titulo === 'string' && info.titulo) || '';
-      const corretor = norm(info?.corretor ?? info?.corretores);
-      const proprietario = norm(info?.proprietario ?? info?.proprietaria);
+						const t = (typeof info?.titulo === 'string' && info.titulo) || '';
+						const corretor = norm(info?.corretor ?? info?.corretores);
+						const proprietario = norm(info?.proprietario ?? info?.proprietaria);
 
-      if (t && !titulos[id]) titulos[id] = t;
-      if (corretor && !mapCorretor[id]) mapCorretor[id] = corretor;
-      if (proprietario && !mapProprietario[id]) mapProprietario[id] = proprietario;
+						if (t && !titulos[id]) titulos[id] = t;
+						if (corretor && !mapCorretor[id]) mapCorretor[id] = corretor;
+						if (proprietario && !mapProprietario[id]) mapProprietario[id] = proprietario;
 
-      if (w + f > 0) {
-        if (!tot[id]) tot[id] = { whats: 0, fotos: 0 };
-        tot[id].whats += w;
-        tot[id].fotos += f;
-      }
-    });
-  }
+						if (w + f > 0) {
+							if (!tot[id]) tot[id] = { whats: 0, fotos: 0 };
+							tot[id].whats += w;
+							tot[id].fotos += f;
+						}
+					});
+				}
 
-  // 2) Completa faltantes pelo cadastro do imóvel
-  const faltantes = Object.keys(tot).filter(id => !mapCorretor[id] || !mapProprietario[id] || !titulos[id]);
-  await Promise.all(faltantes.map(async (id) => {
-    for (const path of [`imoveis/dados/${id}`, `imoveis/${id}`]) {
-      const s = await db.ref(path).once('value');
-      const v = s.val();
-      if (!v) continue;
-      if (!titulos[id] && v?.titulo) titulos[id] = String(v.titulo);
-      if (!mapCorretor[id]) {
-        const c = norm(v?.corretor ?? v?.corretores);
-        if (c) mapCorretor[id] = c;
-      }
-      if (!mapProprietario[id]) {
-        const p = norm(v?.proprietario ?? v?.proprietaria ?? v?.owner);
-        if (p) mapProprietario[id] = p;
-      }
-      if (titulos[id] && mapCorretor[id] && mapProprietario[id]) break;
-    }
-  }));
+				// 2) Completa faltantes pelo cadastro do imóvel
+				const faltantes = Object.keys(tot).filter(id => !mapCorretor[id] || !mapProprietario[id] || !titulos[id]);
+				await Promise.all(faltantes.map(async (id) => {
+					for (const path of [`imoveis/dados/${id}`, `imoveis/${id}`]) {
+						const s = await db.ref(path).once('value');
+						const v = s.val();
+						if (!v) continue;
+						if (!titulos[id] && v?.titulo) titulos[id] = String(v.titulo);
+						if (!mapCorretor[id]) {
+							const c = norm(v?.corretor ?? v?.corretores);
+							if (c) mapCorretor[id] = c;
+						}
+						if (!mapProprietario[id]) {
+							const p = norm(v?.proprietario ?? v?.proprietaria ?? v?.owner);
+							if (p) mapProprietario[id] = p;
+						}
+						if (titulos[id] && mapCorretor[id] && mapProprietario[id]) break;
+					}
+				}));
 
-  // 3) Monta linhas
-  const linhas = Object.entries(tot)
-    .map(([id, v]) => ({
-      titulo: titulos[id] || id,
-      proprietario: mapProprietario[id] || "—",
-      corretor: mapCorretor[id] || "—",
-      whats: v.whats,
-      fotos: v.fotos
-    }))
-    .filter(r => r.whats + r.fotos > 0)
-    .sort((a, b) => (b.whats + b.fotos) - (a.whats + a.fotos));
+				// 3) Monta linhas
+				const linhas = Object.entries(tot)
+					.map(([id, v]) => ({
+						titulo: titulos[id] || id,
+						proprietario: mapProprietario[id] || "—",
+						corretor: mapCorretor[id] || "—",
+						whats: v.whats,
+						fotos: v.fotos
+					}))
+					.filter(r => r.whats + r.fotos > 0)
+					.sort((a, b) => (b.whats + b.fotos) - (a.whats + a.fotos));
 
-  if (!linhas.length) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
-    return;
-  }
+				if (!linhas.length) {
+					tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
+					return;
+				}
 
-  tbody.innerHTML = linhas.map(l => `
+				tbody.innerHTML = linhas.map(l => `
     <tr>
       <td>${l.titulo}</td>
       <td>${l.proprietario}</td>
@@ -1374,7 +1382,7 @@
       <td style="text-align:center">${l.fotos}</td>
     </tr>
   `).join('');
-}
+			}
 
 
 
