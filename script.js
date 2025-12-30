@@ -7310,7 +7310,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/acougue/curitiba/curitiba.png",
             name: "Açougue Curitiba",
-            hours: "Seg a Sab: 08:00h as 20:00h </br> Dom: 08:00h as 12:00h",
+            hours: "Seg a Sab: 08:00h as 20:00h <br> Dom: 08:00h as 12:00h",
             statusAberto: "a",
             horarios: {
 
@@ -7362,7 +7362,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/adega/cuenca/adega_cuenca.jpg",
             name: "Adega Cuenca",
             hours:
-              "Seg 09:00h as 19:30h </br> Ter e Qua 09:00h as 22:00h </br> Qui a Sab 09:00h as 23:50h </br> Dom 09:00h as 22:00h",
+              "Seg 09:00h as 19:30h <br> Ter e Qua 09:00h as 22:00h <br> Qui a Sab 09:00h as 23:50h <br> Dom 09:00h as 22:00h",
             statusAberto: ".",
             horarios: {
 
@@ -7539,7 +7539,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/agropecuaria/varaschin/perfil.jpg",
             name: "AgroCasa Varaschin",
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 16:00h",
+            hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 16:00h",
             statusAberto: "a",
             horarios: {
 
@@ -7572,7 +7572,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/agropecuaria/agroVida/agrovida.png",
             name: "Agro Vida",
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 16:00h",
+            hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 16:00h",
             statusAberto: "a",
             horarios: {
 
@@ -7687,7 +7687,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/agropecuaria/saoJose/perfil.png",
             name: "Rações São Jose",
-            hours: "Seg a Sex: 08:00h as 19:00h </br> Sab: 08:00h as 19:00h",
+            hours: "Seg a Sex: 08:00h as 19:00h <br> Sab: 08:00h as 19:00h",
             statusAberto: "a",
             horarios: {
 
@@ -9318,7 +9318,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/pizzaria/fornalha/perfil.jpg",
             name: "Fornalha Pizzaria",
-            hours: "Qua a Qui: 18:00h as 23:00h </br>Sex a Sab: 18:00h as 00:00h </br> Dom: 18:00 as 23:00h",
+            hours: "Qua a Qui: 18:00h as 23:00h <br>Sex a Sab: 18:00h as 00:00h <br> Dom: 18:00 as 23:00h",
             statusAberto: ".",
             horarios: {
               seg: [],
@@ -9844,7 +9844,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/padaria/esquinadopao/perfil.png",
             name: "Esquina do Pão",
-            hours: "Seg a Sab: 06:00h as 19:00h </br> Dom: 06:00h as 12:00h",
+            hours: "Seg a Sab: 06:00h as 19:00h <br> Dom: 06:00h as 12:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "06:00", fim: "19:00" }],
@@ -9884,7 +9884,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/padaria/prelie/prelie.png",
             name: "Prelie",
-            hours: "Seg a Sab: 05:45h as 19:00h </br> Dom: 05:45h as 12:00h",
+            hours: "Seg a Sab: 05:45h as 19:00h <br> Dom: 05:45h as 12:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "05:45", fim: "19:00" }],
@@ -9924,7 +9924,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/padaria/saoFrancisco/saoFrancisco.png",
             name: "São Francisco",
-            hours: "Seg a Sab: 05:30h as 19:00h </br> Dom: 5:30h as 12:00h",
+            hours: "Seg a Sab: 05:30h as 19:00h <br> Dom: 5:30h as 12:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "05:30", fim: "19:00" }],
@@ -10063,7 +10063,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/supermercado/compreBemMais/compreBemMais.png",
             name: "Compre Bem Mais",
             address: "R. Andrino Soares, 355 - Carlopolis",
-            hours: "Seg a Sex: 07:00h as 20:00h </br> Dom: 08:00 as 12:00h",
+            hours: "Seg a Sex: 07:00h as 20:00h <br> Dom: 08:00 as 12:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "07:00", fim: "20:00" }],
@@ -10143,7 +10143,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/supermercado/obarateiro.png",
             name: "O Barateiro",
             address: "Bendito Salles, 1168 - Carlopolis",
-            hours: "Seg a Sex: 8:00h as 21:00h </br> Dom: 08:00h as 12:00h",
+            hours: "Seg a Sex: 8:00h as 21:00h <br> Dom: 08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "21:00" }],
@@ -10166,7 +10166,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/supermercado/kelve.png",
             name: "Kelve",
             address: "R. Paul Harris,104",
-            hours: "Seg a Sex: 8:00h as 19:30h </br> Dom: 08:30h as 12:30h",
+            hours: "Seg a Sex: 8:00h as 19:30h <br> Dom: 08:30h as 12:30h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "19:30" }],
@@ -10308,7 +10308,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/produtosLimpeza/jm/perfil.png",
             name: "J M Produtos de Limpeza",
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "18:00" }],
@@ -10491,7 +10491,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/bioFarma/biofarma.jpg",
             name: "Bio Farma",
             address: "R. Laurindo Franco Godoy, 464 - Carlopolis",
-            hours: "Seg a Sex:</strong> 08:00h as 18:00h </br>Sab: </strong>08:00h as 12:00h",
+            hours: "Seg a Sex:</strong> 08:00h as 18:00h <br>Sab: </strong>08:00h as 12:00h",
 
             statusAberto: ".",
             horarios: {
@@ -10535,7 +10535,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Benedito Salles, 574 - Carlopolis",
 
 
-            hours: "Seg a Sex: 08:00h as 20:00h </br> Sab: 08:00h as 15:00h",
+            hours: "Seg a Sex: 08:00h as 20:00h <br> Sab: 08:00h as 15:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -10727,7 +10727,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/elShaday/elshaday.png",
             name: "El Shaday",
             address: "R. Benedito Sales, 353 - Carlopolis",
-            hours: "Seg a Sex: 08:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            hours: "Seg a Sex: 08:00h as 18:00h <br> Sab: 08:00h as 12:00h",
 
             statusAberto: ".",
             horarios: {
@@ -10836,7 +10836,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/masterFarma/masterfarma.png",
             name: "Master Farma",
             address: "R. Laurindo Franco de Godoi, 90 - Carlopolis",
-            hours: "Seg a Sab: 08:00h as 20:00h </br>Dom: 08:00h as 13:00h",
+            hours: "Seg a Sab: 08:00h as 20:00h <br>Dom: 08:00h as 13:00h",
 
             statusAberto: ".",
             horarios: {
@@ -10921,7 +10921,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             image: "images/comercios/farmacia/santaMaria/santamaria.png",
             name: "Santa Maria",
             address: "R. Benedito Salles, nº 711 - Carlopols",
-            hours: "Seg a Sab: 08:00h as 20h </br> Dom: 08:00h as 13:00h",
+            hours: "Seg a Sab: 08:00h as 20:00h <br> Dom: 08:00h as 13:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "20:00" }],
@@ -12537,7 +12537,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         establishments: [
           {
             name: "Filho Otaviano",
-            hours: "Seg a Sex: 8h - 18h </br> Sab: 08h - 12h",
+            hours: "Seg a Sex: 8h - 18h <br> Sab: 08h - 12h",
             address: "R. Laurindo Franco de Godoi, 90",
             contact: "(43) 99951-1540",
             delivery: "Sim / Sem Taxa",
@@ -12812,7 +12812,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/depositoGas/cnCasaDoGas/perfil.jpg",
             name: "CN Casa do Gas",
-            hours: "Seg a Sab: 08:00h as 19:00h </br>Dom: 09:00h as 12:00h",
+            hours: "Seg a Sab: 08:00h as 19:00h <br>Dom: 09:00h as 12:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "08:00", fim: "19:00" }],
@@ -12979,7 +12979,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/produtosOrientais/seiza/seiza.png",
             name: "Seiza",
-            hours: "Seg a Qui: 09:00h as 18:30h <br>Sex: 09:00h as 16:30h </br> Sab: 09:00 as 12:00h",
+            hours: "Seg a Qui: 09:00h as 18:30h <br>Sex: 09:00h as 16:30h <br> Sab: 09:00 as 12:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "09:00", fim: "18:30" }],
@@ -13051,7 +13051,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/marmoraria/2irmaos/perfil.jpg",
             name: "Marmoraria 2 Irmaos",
-            hours: "Seg a Sex: 07:00h as 18:00h </br> Sab: 08:00h as 13:00h",
+            hours: "Seg a Sex: 07:00h as 18:00h <br> Sab: 08:00h as 13:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "07:00", fim: "18:00" }],
@@ -13106,7 +13106,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/materialConstrucao/ferreira/perfil.png",
             name: "Loja Ferreira",
-            hours: "Seg a Sex: 07:00h as 18:00h </br> Sab: 08:00h as 17:00h",
+            hours: "Seg a Sex: 07:00h as 18:00h <br> Sab: 08:00h as 17:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "07:00", fim: "18:00" }],
@@ -13156,7 +13156,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/materiaisEletricos/acende/perfil.jpg",
             name: "Acende Materiais Eletricos",
-            hours: "Seg a Sex: 07:00h as 18:00h </br> Sab: 08:00h as 12:00h",
+            hours: "Seg a Sex: 07:00h as 18:00h <br> Sab: 08:00h as 12:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "07:00", fim: "18:00" }],
@@ -13197,7 +13197,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         establishments: [
           {
             name: "Paraiso dos Animais",
-            hours: "seg a sex: 8h - 18h </br> sab: 08 - 12h",
+            hours: "seg a sex: 8h - 18h <br> sab: 08 - 12h",
             address: "R. Laurindo Franco de Godoi, 90",
             contact: "(43) 99951-1540",
             delivery: "Sim / Sem Taxa",
@@ -13375,7 +13375,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/restaurante/delfino/delfino.png",
             name: "Emporio São Victor",
-            hours: "Seg a Sex: 11:00h as 15:00h - 18:00h as 22:30h</br> Sab: 11:00h as 16:00h",
+            hours: "Seg a Sex: 11:00h as 15:00h - 18:00h as 22:30h<br> Sab: 11:00h as 16:00h",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "11:00", fim: "15:00" }, { inicio: "18:00", fim: "22:30" }],
