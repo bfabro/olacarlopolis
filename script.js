@@ -7885,12 +7885,11 @@ function abrirPainelAdmin(user) {
             facebook: "https://www.facebook.com/oficinadocelularclps/",
             instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
             novidadesImages: [
-              "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/1.jpg",
+              
               "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/2.jpg",
 
             ],
             novidadesDescriptions: [
-              "CURTIR O POST!<br>• SEGUIR O INSTAGRAM DA LOJA!<br>• COMPARTILHAR NO STORY E MARCAR A LOJA!<br>• MARCAR 5 AMIGOS NOS COMENTÁRIOS (quanto mais amigos marcar, maior a chance de ganhar) obs: não pode marcar a mesma pessoa 2 vezes!<br>•Ganhador ou ganhadora deve estar seguindo todas as regras do sorteio corretamente, caso contrário será sorteado novamente!!!<br>O SORTEIO OCORRERÁ NO DIA 22/12/2025 BOA SORTE A TODOS",
               "Temos Assistencia Tecnica, todos modelos de celular"
 
             ],
