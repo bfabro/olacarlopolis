@@ -5,72 +5,72 @@
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    const formLogin = document.getElementById("formLogin");
+  const formLogin = document.getElementById("formLogin");
 
-    if (formLogin) {
-        formLogin.addEventListener("submit", function(e) {
-            e.preventDefault(); // Impede a página de recarregar
+  if (formLogin) {
+    formLogin.addEventListener("submit", function (e) {
+      e.preventDefault(); // Impede a página de recarregar
 
-            const emailDigitado = document.getElementById("usuario").value.trim();
-            const senhaDigitada = document.getElementById("senha").value.trim();
+      const emailDigitado = document.getElementById("usuario").value.trim();
+      const senhaDigitada = document.getElementById("senha").value.trim();
 
-            console.log("Tentativa de login:", emailDigitado);
+      console.log("Tentativa de login:", emailDigitado);
 
-            // 1. Aceder ao Firebase
-            firebase.database().ref('usuarios').once('value')
-                .then((snapshot) => {
-                    let usuarioLogado = null;
+      // 1. Aceder ao Firebase
+      firebase.database().ref('usuarios').once('value')
+        .then((snapshot) => {
+          let usuarioLogado = null;
 
-                    if (!snapshot.exists()) {
-                        alert("Erro: Nenhum utilizador cadastrado no banco de dados.");
-                        return;
-                    }
+          if (!snapshot.exists()) {
+            alert("Erro: Nenhum utilizador cadastrado no banco de dados.");
+            return;
+          }
 
-                    snapshot.forEach((childSnapshot) => {
-                        const user = childSnapshot.val();
-                        if (user.email === emailDigitado && user.senha === senhaDigitada) {
-                            usuarioLogado = user;
-                        }
-                    });
+          snapshot.forEach((childSnapshot) => {
+            const user = childSnapshot.val();
+            if (user.email === emailDigitado && user.senha === senhaDigitada) {
+              usuarioLogado = user;
+            }
+          });
 
-                    if (usuarioLogado) {
-                        alert("Acesso concedido!");
-                        document.getElementById("modalLogin").classList.add("hidden");
-                        
-                        // Executa a função que mostra os painéis
-                        liberarPainelPorNivel(usuarioLogado);
-                    } else {
-                        alert("E-mail ou senha incorretos.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Erro Firebase:", error);
-                    alert("Erro ao conectar ao banco de dados.");
-                });
+          if (usuarioLogado) {
+            alert("Acesso concedido!");
+            document.getElementById("modalLogin").classList.add("hidden");
+
+            // Executa a função que mostra os painéis
+            liberarPainelPorNivel(usuarioLogado);
+          } else {
+            alert("E-mail ou senha incorretos.");
+          }
+        })
+        .catch(error => {
+          console.error("Erro Firebase:", error);
+          alert("Erro ao conectar ao banco de dados.");
         });
-    }
+    });
+  }
 });
 
 
 
 // 2. Função que REALMENTE mostra as opções na tela
 function mostrarOpcoesCadastro(usuario) {
-    const pageAdmin = document.getElementById("page-admin");
-    const adminSuperPanel = document.getElementById("admin-super-panel");
-    const adminContent = document.getElementById("admin-content");
+  const pageAdmin = document.getElementById("page-admin");
+  const adminSuperPanel = document.getElementById("admin-super-panel");
+  const adminContent = document.getElementById("admin-content");
 
-    // Se o cargo no Firebase for 'superadmin', liberamos a tela de cadastro
-    if (usuario.role === "superadmin") {
-        if (pageAdmin) pageAdmin.style.display = "block"; // Mostra a seção principal
-        if (adminContent) adminContent.style.display = "block"; // Mostra o conteúdo
-        if (adminSuperPanel) {
-            adminSuperPanel.style.display = "block"; // ESTA É A TELA DE OPÇÕES (CADASTRO)
-            console.log("Opções de cadastro liberadas para:", usuario.email);
-        }
-    } else {
-        // Lógica para cliente comum (se houver)
-        alert("Você não tem permissão de Super Admin.");
+  // Se o cargo no Firebase for 'superadmin', liberamos a tela de cadastro
+  if (usuario.role === "superadmin") {
+    if (pageAdmin) pageAdmin.style.display = "block"; // Mostra a seção principal
+    if (adminContent) adminContent.style.display = "block"; // Mostra o conteúdo
+    if (adminSuperPanel) {
+      adminSuperPanel.style.display = "block"; // ESTA É A TELA DE OPÇÕES (CADASTRO)
+      console.log("Opções de cadastro liberadas para:", usuario.email);
     }
+  } else {
+    // Lógica para cliente comum (se houver)
+    alert("Você não tem permissão de Super Admin.");
+  }
 }
 
 
@@ -83,163 +83,163 @@ function mostrarOpcoesCadastro(usuario) {
 
 
 // Localize o evento de submit do formLogin e substitua por este:
-document.getElementById("formLogin")?.addEventListener("submit", function(e) {
-    e.preventDefault();
+document.getElementById("formLogin")?.addEventListener("submit", function (e) {
+  e.preventDefault();
 
-    const emailDigitado = document.getElementById("usuario").value.trim();
-    const senhaDigitada = document.getElementById("senha").value.trim();
+  const emailDigitado = document.getElementById("usuario").value.trim();
+  const senhaDigitada = document.getElementById("senha").value.trim();
 
-    // Referência para o nó 'usuarios' no seu Firebase
-    const dbRef = firebase.database().ref('usuarios');
+  // Referência para o nó 'usuarios' no seu Firebase
+  const dbRef = firebase.database().ref('usuarios');
 
-    dbRef.once('value').then((snapshot) => {
-        let usuarioEncontrado = null;
+  dbRef.once('value').then((snapshot) => {
+    let usuarioEncontrado = null;
 
-        snapshot.forEach((childSnapshot) => {
-            const user = childSnapshot.val();
-            if (user.email === emailDigitado && user.senha === senhaDigitada) {
-                usuarioEncontrado = user;
-            }
-        });
-
-        if (usuarioEncontrado) {
-            alert("Acesso concedido!");
-            document.getElementById("modalLogin").classList.add("hidden");
-            
-            // Chama a função que abre os painéis
-            liberarPainelPorNivel(usuarioEncontrado);
-        } else {
-            alert("E-mail ou senha incorretos.");
-        }
-    }).catch(error => {
-        console.error("Erro ao acessar Firebase:", error);
-        alert("Erro de conexão. Verifique as chaves do Firebase.");
+    snapshot.forEach((childSnapshot) => {
+      const user = childSnapshot.val();
+      if (user.email === emailDigitado && user.senha === senhaDigitada) {
+        usuarioEncontrado = user;
+      }
     });
+
+    if (usuarioEncontrado) {
+      alert("Acesso concedido!");
+      document.getElementById("modalLogin").classList.add("hidden");
+
+      // Chama a função que abre os painéis
+      liberarPainelPorNivel(usuarioEncontrado);
+    } else {
+      alert("E-mail ou senha incorretos.");
+    }
+  }).catch(error => {
+    console.error("Erro ao acessar Firebase:", error);
+    alert("Erro de conexão. Verifique as chaves do Firebase.");
+  });
 });
 
 
 
 // Certifique-se de que esta função está solta no script.js
 function liberarPainelPorNivel(usuario) {
-    const pageAdmin = document.getElementById("page-admin");
-    const adminSuperPanel = document.getElementById("admin-super-panel");
+  const pageAdmin = document.getElementById("page-admin");
+  const adminSuperPanel = document.getElementById("admin-super-panel");
 
-    if (pageAdmin) pageAdmin.style.display = "block";
+  if (pageAdmin) pageAdmin.style.display = "block";
 
-    if (usuario.role === "superadmin") {
-        if (adminSuperPanel) adminSuperPanel.style.display = "block";
-    }
+  if (usuario.role === "superadmin") {
+    if (adminSuperPanel) adminSuperPanel.style.display = "block";
+  }
 }
 
 
 // Função para você cadastrar clientes no seu painel
 document.getElementById("form-config-cliente")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("novo-cliente-email").value;
-    const senha = document.getElementById("novo-cliente-senha").value;
-    const checkboxes = e.target.querySelectorAll('input[type="checkbox"]');
-    
-    let permissoes = {};
-    checkboxes.forEach(cb => {
-        permissoes[cb.value] = cb.checked;
-    });
+  e.preventDefault();
+  const email = document.getElementById("novo-cliente-email").value;
+  const senha = document.getElementById("novo-cliente-senha").value;
+  const checkboxes = e.target.querySelectorAll('input[type="checkbox"]');
 
-    const userPath = email.replace(/\./g, '_'); // Firebase não aceita pontos na chave
-    
-    firebase.database().ref('usuarios/' + userPath).set({
-        email: email,
-        senha: senha,
-        role: "cliente",
-        permissoes: permissoes
-    }).then(() => alert("Cliente cadastrado com sucesso!"));
+  let permissoes = {};
+  checkboxes.forEach(cb => {
+    permissoes[cb.value] = cb.checked;
+  });
+
+  const userPath = email.replace(/\./g, '_'); // Firebase não aceita pontos na chave
+
+  firebase.database().ref('usuarios/' + userPath).set({
+    email: email,
+    senha: senha,
+    role: "cliente",
+    permissoes: permissoes
+  }).then(() => alert("Cliente cadastrado com sucesso!"));
 });
 // Função para SALVAR um novo cliente e suas permissões no Firebase
-document.getElementById("form-permissoes-cliente")?.addEventListener("submit", function(e) {
-    e.preventDefault();
+document.getElementById("form-permissoes-cliente")?.addEventListener("submit", function (e) {
+  e.preventDefault();
 
-    const emailCliente = document.getElementById("cliente-id").value.trim();
-    const senhaCliente = document.getElementById("senha-provisoria").value.trim();
-    
-    // Captura quais checkboxes foram marcados
-    const permissoes = {};
-    document.querySelectorAll('input[name="func"]').forEach(checkbox => {
-        permissoes[checkbox.value] = checkbox.checked;
-    });
+  const emailCliente = document.getElementById("cliente-id").value.trim();
+  const senhaCliente = document.getElementById("senha-provisoria").value.trim();
 
-    const dadosNovoCliente = {
-        email: emailCliente,
-        senha: senhaCliente,
-        role: "cliente",
-        permissoes: permissoes
-    };
+  // Captura quais checkboxes foram marcados
+  const permissoes = {};
+  document.querySelectorAll('input[name="func"]').forEach(checkbox => {
+    permissoes[checkbox.value] = checkbox.checked;
+  });
 
-    // Gera um ID limpo para o Firebase (substituindo pontos por underscores)
-    const userId = emailCliente.replace(/\./g, '_');
+  const dadosNovoCliente = {
+    email: emailCliente,
+    senha: senhaCliente,
+    role: "cliente",
+    permissoes: permissoes
+  };
 
-    firebase.database().ref('usuarios/' + userId).set(dadosNovoCliente)
-        .then(() => {
-            alert("Cliente " + emailCliente + " configurado com sucesso no Firebase!");
-            this.reset();
-        })
-        .catch(error => alert("Erro ao salvar: " + error.message));
+  // Gera um ID limpo para o Firebase (substituindo pontos por underscores)
+  const userId = emailCliente.replace(/\./g, '_');
+
+  firebase.database().ref('usuarios/' + userId).set(dadosNovoCliente)
+    .then(() => {
+      alert("Cliente " + emailCliente + " configurado com sucesso no Firebase!");
+      this.reset();
+    })
+    .catch(error => alert("Erro ao salvar: " + error.message));
 });
 
 
 
 // Função para abrir o painel que você usará para configurar clientes
 function mostrarPainelSuperAdmin(dados) {
-    const pageAdmin = document.getElementById("page-admin");
-    const superPanel = document.getElementById("admin-super-panel");
-    
-    if (pageAdmin) pageAdmin.style.display = "block";
-    if (superPanel) superPanel.style.display = "block";
-    
-    console.log("Modo Super Admin: Você pode configurar novos clientes agora.");
+  const pageAdmin = document.getElementById("page-admin");
+  const superPanel = document.getElementById("admin-super-panel");
+
+  if (pageAdmin) pageAdmin.style.display = "block";
+  if (superPanel) superPanel.style.display = "block";
+
+  console.log("Modo Super Admin: Você pode configurar novos clientes agora.");
 }
 
 // Função para o cliente logar e ver apenas o que você liberou
 function mostrarPainelCliente(dados) {
-    const pageAdmin = document.getElementById("page-admin");
-    const adminContent = document.getElementById("admin-content");
-    
-    if (pageAdmin) pageAdmin.style.display = "block";
-    if (adminContent) adminContent.style.display = "block";
+  const pageAdmin = document.getElementById("page-admin");
+  const adminContent = document.getElementById("admin-content");
 
-    // Aqui usamos as permissões vindas do Firebase para esconder/mostrar botões
-    console.log("Permissões do cliente:", dados.permissoes);
-    // Exemplo: if (!dados.permissoes.veiculos) document.getElementById('btn-veiculos').remove();
+  if (pageAdmin) pageAdmin.style.display = "block";
+  if (adminContent) adminContent.style.display = "block";
+
+  // Aqui usamos as permissões vindas do Firebase para esconder/mostrar botões
+  console.log("Permissões do cliente:", dados.permissoes);
+  // Exemplo: if (!dados.permissoes.veiculos) document.getElementById('btn-veiculos').remove();
 }
 
 
 
 // Função para simular o salvamento das permissões
 document.getElementById("form-permissoes-cliente")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    
-    const emailCliente = document.getElementById("cliente-id").value;
-    const senhaProvisoria = document.getElementById("senha-provisoria").value;
-    
-    // Captura as permissões marcadas nos checkboxes
-    const permissoes = {};
-    document.querySelectorAll('input[name="func"]').forEach(cb => {
-        permissoes[cb.value] = cb.checked;
-    });
+  e.preventDefault();
 
-    const novoUsuario = {
-        email: emailCliente,
-        senha: senhaProvisoria,
-        role: "cliente",
-        permissoes: permissoes
-    };
+  const emailCliente = document.getElementById("cliente-id").value;
+  const senhaProvisoria = document.getElementById("senha-provisoria").value;
 
-    // Salva no Firebase (substituindo pontos por underscores no email para usar como ID)
-    const userId = emailCliente.replace(/\./g, '_');
-    firebase.database().ref('usuarios/' + userId).set(novoUsuario)
-        .then(() => {
-            alert("Cliente cadastrado e permissões salvas no Firebase!");
-            e.target.reset();
-        })
-        .catch(err => alert("Erro ao salvar: " + err));
+  // Captura as permissões marcadas nos checkboxes
+  const permissoes = {};
+  document.querySelectorAll('input[name="func"]').forEach(cb => {
+    permissoes[cb.value] = cb.checked;
+  });
+
+  const novoUsuario = {
+    email: emailCliente,
+    senha: senhaProvisoria,
+    role: "cliente",
+    permissoes: permissoes
+  };
+
+  // Salva no Firebase (substituindo pontos por underscores no email para usar como ID)
+  const userId = emailCliente.replace(/\./g, '_');
+  firebase.database().ref('usuarios/' + userId).set(novoUsuario)
+    .then(() => {
+      alert("Cliente cadastrado e permissões salvas no Firebase!");
+      e.target.reset();
+    })
+    .catch(err => alert("Erro ao salvar: " + err));
 });
 //
 //
@@ -313,19 +313,19 @@ function somenteDigitos(str) {
 
 async function gerarImagemCardImovel(imovel, categoriaAtual) {
   try {
-    const corDestaque = "#0095f6"; 
+    const corDestaque = "#0095f6";
     const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
-    
+
     const titulo = (imovel.titulo || "IMÓVEL DISPONÍVEL").toUpperCase();
     const endereco = imovel.endereco || "Consulte localização";
-    const preco = imovel.valor ? imovel.valor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) : "Consulte";
+    const preco = imovel.valor ? imovel.valor.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' }) : "Consulte";
     const descricao = imovel.descricao || "";
 
     // 1. TRATAMENTO DE IMAGENS (Grade Inteligente)
     const imagensRaw = imovel.imagens || [];
     const fotos = imagensRaw.slice(0, 4).map(url => {
-       if (!url.startsWith('http')) return window.location.origin + '/' + url.replace(/^\//, '');
-       return url;
+      if (!url.startsWith('http')) return window.location.origin + '/' + url.replace(/^\//, '');
+      return url;
     });
     const totalFotos = fotos.length;
 
@@ -414,7 +414,7 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
       if (img.complete) return Promise.resolve();
       return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
     }));
-    await new Promise(r => setTimeout(r, 1200)); 
+    await new Promise(r => setTimeout(r, 1200));
 
     const canvas = await html2canvas(document.querySelector("#captureArea"), {
       scale: 2, useCORS: true, allowTaint: true, backgroundColor: "#ffffff"
@@ -446,32 +446,41 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
 
 
 
+
+
+
+
+
 async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   try {
-    const nome = (establishment.name || "Estabelecimento").toUpperCase();
+    const nomeRaw = (establishment.name ?? establishment.nome ?? establishment.title ?? "");
+    const nomeLimpo = String(nomeRaw)
+      .replace(/<[^>]*>/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const nome = (nomeLimpo || "Estabelecimento").toUpperCase();
+
+
     const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
-    
+
     // --- COLETA DE DADOS ---
     const telefone = getPrimeiroContato(establishment.contact || establishment.whatsapp || establishment.telefone || "");
     const endereco = establishment.address || establishment.endereco || "";
     const descricoes = establishment.novidadesDescriptions || [];
     const legendaGourmet = descricoes.length > 0 ? descricoes[0] : "";
 
-    // --- LÓGICA DE HORÁRIO (FOCO NO <BR>) ---
+    // --- LÓGICA DE HORÁRIO ---
     let horarioRaw = establishment.hours || establishment.horario || "";
     if (typeof horarioRaw === "object") horarioRaw = "Consulte no site";
 
-    // 1. Convertemos todos os <br> (e variações) em um marcador único '|'
-    // 2. Também convertemos o ponto e vírgula ';' caso o cliente use como separador
     let horarioProcessado = horarioRaw
-      .replace(/<br\s*\/?>/gi, "|") 
+      .replace(/<br\s*\/?>/gi, "|")
       .replace(/;/g, "|")
-      .replace(/<[^>]+>/g, "") // Limpa outras tags HTML que sobrarem
-      .split("|") // Divide o texto onde tinha o <br>
+      .replace(/<[^>]+>/g, "")
+      .split("|")
       .map(item => item.trim())
-      .filter(item => item !== ""); // Remove linhas vazias
+      .filter(item => item !== "");
 
-    // 3. Montamos o HTML garantindo que cada parte seja uma nova linha real (div)
     let horarioHtmlFinal = horarioProcessado
       .map(linha => `<div style="margin-bottom: 5px; line-height: 1.2;">${linha}</div>`)
       .join("");
@@ -491,25 +500,29 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         display: flex; flex-direction: column; overflow: hidden;
       ">
         
-        <div style="padding: 70px 60px 30px; display: flex; align-items: center; justify-content: space-between; height: 200px; box-sizing: border-box;">
-          <div style="flex: 1; overflow: hidden; padding-right: 20px;">
-            <h2 style="
-                margin: 0; 
-                font-size: 46px; /* Reduzido para garantir uma linha */
-                font-weight: 900; 
-                color: #1a1a1a; 
-                line-height: 1; 
-                letter-spacing: 0px;
-                white-space: nowrap; 
-                text-overflow: ellipsis;
-            ">${nome}</h2>
-            <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px;">
-                <span style="width: 40px; height: 5px; background: #0095f6; border-radius: 10px;"></span>
-                <span style="font-size: 22px; height: 40px;color: #0095f6; font-weight: 900; text-transform: uppercase; ">${categoriaAtual}</span>
-            </div>
-          </div>
-          <div style="width: 300px; height: 150px; background: url('${logoSiteUrl}') no-repeat center right; background-size: contain; flex-shrink: 0;"></div>
-        </div>
+        <div style="padding: 70px 60px 30px; display: flex; align-items: center; justify-content: space-between; height: 190px; box-sizing: border-box;">
+  <div style="flex: 1; padding-right: 10px; min-width: 0;">
+    <h2 style="
+  margin: 0;
+  font-size: 48px;
+  font-weight: 900;
+  color: #1a1a1a;
+  line-height: 1;
+  letter-spacing: -1px;
+  white-space: nowrap;
+">
+  Estamos no <span style="color:#0095f6;">olacarlopolis.com</span>
+</h2>
+
+
+    <div style="margin-top: 5px;">
+      <span style="display:inline-block; width: 210px; height: 6px; background: #0095f6; border-radius: 10px;"></span>
+    </div>
+  </div>
+
+  <div style="width: 260px; height: 150px; background: url('${logoSiteUrl}') no-repeat center right; background-size: contain; flex-shrink: 0;"></div>
+</div>
+
 
         <div style="width: 1080px; height: 900px; padding: 0 60px;">
           <div style="
@@ -520,7 +533,48 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           "></div>
         </div>
 
-        <div style="flex: 1; padding: 40px 80px; display: flex; flex-direction: column; gap: 30px;">
+
+
+        <div style="padding: 30px 80px 12px; display: flex; justify-content: center;">
+  <div style="text-align: center; max-width: 900px;">
+
+   
+
+    <!-- Nome do comércio -->
+    <h1 style="
+      margin: 0;
+      font-size: 58px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      color: #1a1a1a;
+      text-align: center;
+      word-break: break-word;
+
+      /* Efeito 3D elegante */
+         text-shadow:
+                0 2px 0 #e6e6e6,
+                0 5px 0 #dcdcdc,
+                0 12px 22px rgba(0,0,0,0.18);
+    ">
+      ${nome}
+    </h1>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+     
+
+        <div style="flex: 1; padding: 30px 80px; display: flex; flex-direction: column; gap: 30px;">
           
           ${legendaGourmet ? `
             <div style="margin-bottom: 5px; position: relative; padding-left: 30px;">
@@ -531,10 +585,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
             </div>
           ` : ""}
 
-         
-
-
-            <div style="display: flex; flex-direction: column; gap: 25px;">
+          <div style="display: flex; flex-direction: column; gap: 25px;">
             ${horarioHtmlFinal ? `
               <div style="display: flex; align-items: flex-start; gap: 20px; padding: 15px 25px; background: #f9f9f9; border-radius: 20px;">
                 <span style="font-size: 40px; margin-top: 5px;">🕒</span>
@@ -562,18 +613,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
                 <small style="display: block; font-size: 22px; color: #2ecc71; text-transform: uppercase; font-weight: 800;">WhatsApp / Contato</small>
                 <p style="font-size: 38px; margin: 5px 0 0 0; color: #1ebea5; font-weight: 900; letter-spacing: -1px;">${telefone || 'Ver no site'}</p>
               </div>
-             
             </div>
           </div>
 
           <div style="margin-top: auto; padding-bottom: 30px;">
-            <div style="width: 100%; height: 2px; background: linear-gradient(to right, transparent, #eee, transparent); margin-bottom: 25px;"></div>
-            <p style="font-size: 36px; color: #1a1a1a; text-align: center; font-weight: 900; margin-bottom: 12px;  letter-spacing: 2px;">
-              Para mais informações acesse:
-            </p>
-            <p style="font-size: 28px; font-weight: 900; color: #0095f6; text-align: center; margin: 0; letter-spacing: 1px;">
-              olacarlopolis.com
-            </p>
+            <div style="margin-top: 25px;width: 100%; height: 2px; background: linear-gradient(to right, transparent, #eee, transparent); margin-bottom: 25px;"></div>
+            
           </div>
 
         </div>
@@ -584,7 +629,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const canvas = await html2canvas(document.querySelector("#instaCard"), {
-      scale: 1, 
+      scale: 1,
       useCORS: true,
       backgroundColor: "#FFFFFF"
     });
@@ -599,6 +644,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     if (document.getElementById("insta-card-host")) document.getElementById("insta-card-host").remove();
   }
 }
+
 
 
 
@@ -1733,7 +1779,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "tokfino", "oficinadocelular", "cacaushow","toninhoparana"
+    "tokfino", "oficinadocelular", "cacaushow", "toninhoparana"
   ];
 
   function montarCarrosselDivulgacao() {
@@ -2442,7 +2488,7 @@ document.addEventListener("DOMContentLoaded", function () {
     campeonatoeliteredai: "n",
 
     pedalaparana: "n",
-   
+
     showdavirada2026: "s",
     cafedamanhadosamigos: "s",
 
@@ -4261,7 +4307,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       status: "disponível",
       titulo: "Residencial Villa Ray (Horizonte 3)",
-      endereco: "Agende uma visita",   
+      endereco: "Agende uma visita",
       quartos: 2,
       banheiros: 2,
       vagas: 1,
@@ -4270,7 +4316,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       piscina: false,
       churrasqueira: false,
       area: 90,
-      construcao: 63,         
+      construcao: 63,
       valor: 230000,
       suite: "1",
       quintal: "Não",
@@ -4290,7 +4336,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       ],
       descricao: "Ambientes bem iluminados e ventilados, prontos para receber sua família. Documentação OK",
-      
+
       procura: "casa", // ou "terreno", "rural", etc.   
 
       // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
@@ -6852,16 +6898,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
   //// MODULOS
-// 1. Definição Universal de Campos (Adicione todos que precisar aqui)
-const CONFIG_MODULOS = {
+  // 1. Definição Universal de Campos (Adicione todos que precisar aqui)
+  const CONFIG_MODULOS = {
     veiculos: { nome: "Veículos", campos: ["Marca", "Modelo", "Ano", "Preço", "Link_Imagem"] },
     promocoes: { nome: "Promoções", campos: ["Título", "Descrição", "Desconto", "Link_Imagem"] },
     cardapio: { nome: "Cardápio", campos: ["Prato", "Preço", "Ingredientes", "Link_Imagem"] },
     imoveis: { nome: "Imóveis", campos: ["Tipo", "Cidade", "Valor", "Link_Imagem"] }
-};
+  };
 
-// 2. Função que constrói o Painel após o Login
-function montarPainelAdmin(dadosUsuario) {
+  // 2. Função que constrói o Painel após o Login
+  function montarPainelAdmin(dadosUsuario) {
     document.getElementById("page-admin").style.display = "block";
     document.getElementById("nome-usuario-logado").innerText = dadosUsuario.email;
 
@@ -6870,32 +6916,32 @@ function montarPainelAdmin(dadosUsuario) {
 
     // Se for você, mostra a gestão de clientes
     if (dadosUsuario.role === "superadmin") {
-        document.getElementById("super-admin-control").style.display = "block";
+      document.getElementById("super-admin-control").style.display = "block";
     }
 
     // Cria botões apenas para o que o cliente tem permissão
     Object.keys(dadosUsuario.permissoes || {}).forEach(chave => {
-        if (dadosUsuario.permissoes[chave] === true) {
-            const btn = document.createElement("button");
-            btn.className = "btn-menu-item";
-            btn.innerHTML = `<i class="fas fa-plus"></i> ${CONFIG_MODULOS[chave].nome}`;
-            btn.onclick = () => abrirFormularioCadastro(chave, dadosUsuario.email);
-            menu.appendChild(btn);
-        }
+      if (dadosUsuario.permissoes[chave] === true) {
+        const btn = document.createElement("button");
+        btn.className = "btn-menu-item";
+        btn.innerHTML = `<i class="fas fa-plus"></i> ${CONFIG_MODULOS[chave].nome}`;
+        btn.onclick = () => abrirFormularioCadastro(chave, dadosUsuario.email);
+        menu.appendChild(btn);
+      }
     });
-}
+  }
 
-// 3. Gera o formulário de cadastro dinamicamente
-function abrirFormularioCadastro(tipo, emailDono) {
+  // 3. Gera o formulário de cadastro dinamicamente
+  function abrirFormularioCadastro(tipo, emailDono) {
     const editor = document.getElementById("editor-de-conteudo");
     const container = document.getElementById("container-campos-dinamicos");
-    
+
     editor.style.display = "block";
     document.getElementById("titulo-modulo-atual").innerText = "Gerenciar " + CONFIG_MODULOS[tipo].nome;
     container.innerHTML = ""; // Limpa campos antigos
 
     CONFIG_MODULOS[tipo].campos.forEach(campo => {
-        container.innerHTML += `
+      container.innerHTML += `
             <div class="input-group">
                 <label>${campo}:</label>
                 <input type="text" name="${campo}" required placeholder="Digite o ${campo}">
@@ -6904,20 +6950,20 @@ function abrirFormularioCadastro(tipo, emailDono) {
 
     // Configura o salvamento para este formulário específico
     document.getElementById("form-cadastro-geral").onsubmit = (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const objetoParaSalvar = Object.fromEntries(formData.entries());
-        
-        objetoParaSalvar.dono = emailDono; // Vincula o item ao cliente
-        objetoParaSalvar.timestamp = Date.now();
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const objetoParaSalvar = Object.fromEntries(formData.entries());
 
-        firebase.database().ref(`conteudo/${tipo}`).push(objetoParaSalvar)
-            .then(() => {
-                alert("Sucesso! O item já está disponível no banco de dados.");
-                e.target.reset();
-            });
+      objetoParaSalvar.dono = emailDono; // Vincula o item ao cliente
+      objetoParaSalvar.timestamp = Date.now();
+
+      firebase.database().ref(`conteudo/${tipo}`).push(objetoParaSalvar)
+        .then(() => {
+          alert("Sucesso! O item já está disponível no banco de dados.");
+          e.target.reset();
+        });
     };
-}
+  }
 
 
 
@@ -6925,57 +6971,57 @@ function abrirFormularioCadastro(tipo, emailDono) {
 
 
 
-// FUNCIONALIDADES ON LINE
+  // FUNCIONALIDADES ON LINE
 
 
-// 1. Definição das funcionalidades possíveis
-const FUNCIONALIDADES = {
+  // 1. Definição das funcionalidades possíveis
+  const FUNCIONALIDADES = {
     veiculos: { nome: "Veículos", campos: ["Marca", "Modelo", "Preço", "Ano", "Imagem URL"] },
     cardapio: { nome: "Cardápio", campos: ["Prato", "Descrição", "Preço", "Imagem URL"] },
     promocoes: { nome: "Promoções", campos: ["Título", "Desconto", "Validade", "Imagem URL"] }
     // Adicione as outras conforme sua lista
-};
+  };
 
-// 2. Função de Login atualizada com Filtro
-function realizarLogin(email, senha) {
+  // 2. Função de Login atualizada com Filtro
+  function realizarLogin(email, senha) {
     firebase.database().ref('usuarios').once('value', (snapshot) => {
-        let user = null;
-        snapshot.forEach(child => {
-            if(child.val().email === email && child.val().senha === senha) user = child.val();
-        });
+      let user = null;
+      snapshot.forEach(child => {
+        if (child.val().email === email && child.val().senha === senha) user = child.val();
+      });
 
-        if(user) {
-            abrirPainelAdmin(user);
-        } else {
-            alert("Acesso negado.");
-        }
+      if (user) {
+        abrirPainelAdmin(user);
+      } else {
+        alert("Acesso negado.");
+      }
     });
-}
+  }
 
-// 3. Gerador de Menu por Permissão
-function abrirPainelAdmin(user) {
+  // 3. Gerador de Menu por Permissão
+  function abrirPainelAdmin(user) {
     document.getElementById("modalLogin").classList.add("hidden");
     document.getElementById("page-admin").style.display = "flex";
-    
+
     const menu = document.getElementById("admin-menu");
     menu.innerHTML = ""; // Limpa menu
 
     // Se for Super Admin, ele ganha todos os botões e o filtro de clientes
-    if(user.role === "superadmin") {
-        document.getElementById("super-admin-area").style.display = "block";
-        gerarMenuCompleto();
+    if (user.role === "superadmin") {
+      document.getElementById("super-admin-area").style.display = "block";
+      gerarMenuCompleto();
     } else {
-        // Se for cliente, gera apenas o que você marcou no checkbox
-        Object.keys(user.permissoes).forEach(key => {
-            if(user.permissoes[key]) {
-                const btn = document.createElement("button");
-                btn.innerText = FUNCIONALIDADES[key].nome;
-                btn.onclick = () => carregarFormulario(key, user.email);
-                menu.appendChild(btn);
-            }
-        });
+      // Se for cliente, gera apenas o que você marcou no checkbox
+      Object.keys(user.permissoes).forEach(key => {
+        if (user.permissoes[key]) {
+          const btn = document.createElement("button");
+          btn.innerText = FUNCIONALIDADES[key].nome;
+          btn.onclick = () => carregarFormulario(key, user.email);
+          menu.appendChild(btn);
+        }
+      });
     }
-}
+  }
 
 
 
@@ -6984,7 +7030,7 @@ function abrirPainelAdmin(user) {
 
 
 
- // FIM FUNCIONALIDADES ON LINE
+  // FIM FUNCIONALIDADES ON LINE
 
 
 
@@ -7081,12 +7127,12 @@ function abrirPainelAdmin(user) {
               "images/comercios/acabamentos/tokfino/divulgacao/6.jpg",
               "images/comercios/acabamentos/tokfino/divulgacao/7.jpg",
               "images/comercios/acabamentos/tokfino/divulgacao/8.jpg",
-              
+
               "images/comercios/acabamentos/tokfino/divulgacao/1.jpg",
 
             ],
             novidadesDescriptions: [
-             "Realizamos serviços completos desde a base até os acabamentos finais, garantindo qualidade em todas as etapas da obra.",
+              "Realizamos serviços completos desde a base até os acabamentos finais, garantindo qualidade em todas as etapas da obra.",
               "Grama sintética instalada.<br>A grama sintética além de super prática. Ela é extremamente linda, causa um conforto tanto visualmente quanto utilizando-a",
               "A sofisticação e praticidade que uma persiana proporciona é fora de base.",
               "Cortinas em tecido, para quem não abre mão do bom gosto e sofisticação.",
@@ -7094,9 +7140,9 @@ function abrirPainelAdmin(user) {
               "Piso laminado é perfeito para deixar o ambiente aconchegante e com um visual lindíssimo!",
               "Papel de parede<BR> ✨Ótimo para mudar o visual do seu ambiente. Deixando da forma que você quiser, prático e rápido!",
               "Persianas são um investimento excelente para o seu ambiente, deixando um espaço confortável e extremamente lindo.",
-              
 
-               "Papel de parede, mude o visual do teu ambiente de forma rapida e pratica",
+
+              "Papel de parede, mude o visual do teu ambiente de forma rapida e pratica",
 
             ],
           },
@@ -7605,7 +7651,7 @@ function abrirPainelAdmin(user) {
                 titulo: "Ração Golden Special - Frango e Carne ",
                 volume: "15kg",
                 preco: 159.90,
-                precoAntigo:  220.00,
+                precoAntigo: 220.00,
                 unidade: "A UNIDADE",
                 imagem: "images/comercios/agropecuaria/agroVida/promocao/4.jpg",
                 validadeFim: "2025-12-30",
@@ -7885,12 +7931,12 @@ function abrirPainelAdmin(user) {
             facebook: "https://www.facebook.com/oficinadocelularclps/",
             instagram: "https://www.instagram.com/oficinadocelular_carlopolis/",
             novidadesImages: [
-              
+
               "images/comercios/assistenciaCelular/oficinaCelular/divulgacao/2.jpg",
 
             ],
             novidadesDescriptions: [
-              "Temos Assistencia Tecnica, todos modelos de celular"
+              "Temos Assistencia Tecnica em todos modelos de celular"
 
             ],
 
@@ -11530,7 +11576,7 @@ function abrirPainelAdmin(user) {
 
 
 
-        
+
 
 
           {
