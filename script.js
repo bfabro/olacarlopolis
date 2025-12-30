@@ -12864,11 +12864,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram:"https://www.instagram.com/eliana.cristiano/",
             novidadesImages: [
               "images/comercios/depositoGas/liaGas/divulgacao/1.jpg",
+              "images/comercios/depositoGas/liaGas/divulgacao/2.jpg",
+              
             
 
             ],
             novidadesDescriptions: [
               "Lia Gás, entrega que não falha jamais! Temos Gás e Galão de Agua 20 Litros",
+              "Nosso estoque para nao deixar na mão quando mais precisar!",
              
             ],
           },
