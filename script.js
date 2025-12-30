@@ -500,7 +500,15 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         display: flex; flex-direction: column; overflow: hidden;
       ">
         
-        <div style="padding: 70px 60px 30px; display: flex; align-items: center; justify-content: space-between; height: 190px; box-sizing: border-box;">
+    <div style="
+  padding: 50px 60px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: auto;
+  box-sizing: border-box;
+">
+
   <div style="flex: 1; padding-right: 10px; min-width: 0;">
     <h2 style="
   margin: 0;
@@ -524,7 +532,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 </div>
 
 
-        <div style="width: 1080px; height: 900px; padding: 0 60px;">
+       <div style="
+  width: 1080px;
+  height: 900px;
+  padding: 0 60px;
+  margin-top: -20px;
+">
           <div style="
             width: 100%; height: 100%; border-radius: 40px; 
             background: #fcfcfc url('${fotoFinal}') center/contain no-repeat;
