@@ -12861,14 +12861,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact2: "(43) 99844-5345",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/liagasclps/",
+            instagram:"https://www.instagram.com/eliana.cristiano/",
             novidadesImages: [
-              "images/comercios/depositoGas/liaGas/divulgacao/1.png",
-              "images/comercios/depositoGas/liaGas/divulgacao/2.png",
+              "images/comercios/depositoGas/liaGas/divulgacao/1.jpg",
+            
 
             ],
             novidadesDescriptions: [
-              "Botijao em estoque",
-              "Temos agua Cristal",
+              "Lia Gás, entrega que não falha jamais! Temos Gás e Galão de Agua 20 Litros",
+             
             ],
           },
 
