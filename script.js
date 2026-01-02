@@ -1661,6 +1661,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   });
 
+  function detectarCanalAcesso() {
+  const isStandalone =
+    window.matchMedia?.("(display-mode: standalone)").matches ||
+    window.matchMedia?.("(display-mode: fullscreen)").matches ||
+    window.matchMedia?.("(display-mode: minimal-ui)").matches ||
+    window.navigator.standalone === true; // iOS
+
+  return isStandalone ? "App (PWA)" : "Site (Navegador)";
+}
+
+
 
   // Função para registrar o acesso diário
   function registrarAcesso() {
@@ -1685,8 +1696,9 @@ document.addEventListener("DOMContentLoaded", function () {
         idioma: navigator.language,
         plataforma: navigator.platform,
         pagina: window.location.href,
-        referrer: document.referrer || "Site ou App",
-        origem: new URLSearchParams(window.location.search).get("o") || "Site ou App",
+        referrer: document.referrer || "acesso direto",
+        origem: new URLSearchParams(window.location.search).get("o") || "acesso direto",
+         canal: detectarCanalAcesso(), // ✅ NOVO (Site vs App)
         tela: `${window.screen.width}x${window.screen.height}`,
         dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
       });
