@@ -1779,7 +1779,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "tokfino", "oficinadocelular", "cacaushow", "toninhoparana"
+    "seiza", 
+    //    "seiza", "hime"
   ];
 
   function montarCarrosselDivulgacao() {
@@ -11579,14 +11580,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/informacoes/eventos/2.jpg",
-            name: "Show da Virada 2026",
-            date: "31/12/2025",
-            address: "Ilha do Ponciano",
-            instagram: "https://www.instagram.com/turismocarlopolis/",
-            infoAdicional: "Show da Virada com Lucas Lucco, entrada Free!"
-          },
 
 
           {
