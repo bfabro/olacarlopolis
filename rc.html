@@ -267,9 +267,12 @@
 				<option value="diario">Diário</option>
 				<option value="semanal">Semanal</option>
 				<option value="mensal">Mensal</option>
+				<option value="anual">Anual</option>
 			</select>
+
 			<input type="date" id="filtroData" class="filtro">
 			<input type="month" id="filtroMes" class="filtro hidden">
+
 			<select id="filtroSemana" class="filtro hidden">
 				<option value="1">Semana 1 (1–7)</option>
 				<option value="2">Semana 2 (8–14)</option>
@@ -277,6 +280,10 @@
 				<option value="4">Semana 4 (22–28)</option>
 				<option value="5">Semana 5 (29–31)</option>
 			</select>
+
+			<!-- NOVO: filtro anual -->
+			<input type="number" id="filtroAno" class="filtro hidden" min="2020" max="2099" placeholder="2026">
+
 			<button id="btnBuscar">Buscar</button>
 
 		</div>
@@ -602,17 +609,25 @@
 
 		<script>
 			const tipoRelatorioEl = document.getElementById("tipoRelatorio");
+
 			tipoRelatorioEl.addEventListener("change", e => {
 				document.querySelectorAll(".filtro").forEach(f => f.classList.add("hidden"));
+
 				if (e.target.value === "diario") {
 					document.getElementById("filtroData").classList.remove("hidden");
+
 				} else if (e.target.value === "mensal") {
 					document.getElementById("filtroMes").classList.remove("hidden");
-				} else {
+
+				} else if (e.target.value === "semanal") {
 					document.getElementById("filtroMes").classList.remove("hidden");
 					document.getElementById("filtroSemana").classList.remove("hidden");
+
+				} else if (e.target.value === "anual") {
+					document.getElementById("filtroAno").classList.remove("hidden");
 				}
 			});
+
 
 			let valoresAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresCliques") || "{}");
 			let cidadesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresCidades") || "{}");
@@ -656,41 +671,58 @@
 
 
 					if (tipo === "diario") {
-						const dia = document.getElementById("filtroData").value;
-						diasFiltrados = [dia];
+  const dia = document.getElementById("filtroData").value;
+  diasFiltrados = [dia];
 
-					} else if (tipo === "mensal") {
-						const mes = document.getElementById("filtroMes").value;
-						const diasDoMes = new Set([
-							...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
-							...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
-						]);
-						diasFiltrados = Array.from(diasDoMes);
-					} else if (tipo === "semanal") {
-						const mesSelecionado = document.getElementById("filtroMes").value;
-						const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
+} else if (tipo === "mensal") {
+  const mes = document.getElementById("filtroMes").value;
+  const diasDoMes = new Set([
+    ...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
+    ...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
+  ]);
+  diasFiltrados = Array.from(diasDoMes);
 
-						if (!mesSelecionado || isNaN(semanaSelecionada)) {
-							alert("Selecione um mês e uma semana para o relatório semanal.");
-							return;
-						}
+} else if (tipo === "anual") {
+  const ano = document.getElementById("filtroAno").value;
 
-						const inicio = (semanaSelecionada - 1) * 7 + 1;
-						const fim = semanaSelecionada * 7;
+  if (!ano || ano.length !== 4) {
+    alert("Selecione um ano válido (ex: 2026).");
+    return;
+  }
 
-						const diasDaSemana = new Set([
-							...Object.keys(dadosCliques).filter(dia =>
-								dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-							),
-							...Object.keys(dadosBotoes).filter(dia =>
-								dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-							)
-						]);
+  const prefixoAno = ano + "-";
 
-						diasFiltrados = Array.from(diasDaSemana);
+  const diasDoAno = new Set([
+    ...Object.keys(dadosCliques).filter(dia => dia.startsWith(prefixoAno)),
+    ...Object.keys(dadosBotoes).filter(dia => dia.startsWith(prefixoAno))
+  ]);
 
+  diasFiltrados = Array.from(diasDoAno);
 
-					}
+} else if (tipo === "semanal") {
+  const mesSelecionado = document.getElementById("filtroMes").value;
+  const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
+
+  if (!mesSelecionado || isNaN(semanaSelecionada)) {
+    alert("Selecione um mês e uma semana para o relatório semanal.");
+    return;
+  }
+
+  const inicio = (semanaSelecionada - 1) * 7 + 1;
+  const fim = semanaSelecionada * 7;
+
+  const diasDaSemana = new Set([
+    ...Object.keys(dadosCliques).filter(dia =>
+      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+    ),
+    ...Object.keys(dadosBotoes).filter(dia =>
+      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+    )
+  ]);
+
+  diasFiltrados = Array.from(diasDaSemana);
+}
+
 
 
 					if (diasFiltrados.length === 0 || !diasFiltrados[0]) {
@@ -843,8 +875,8 @@
 
 							// Oculta as categorias indesejadas
 							const nomesOcultos = [
-								"Comercios", 
-								"comercios", 
+								"Comercios",
+								"comercios",
 								"Inicio",
 								"inicio",
 								"comercio",
@@ -1136,7 +1168,11 @@
 					const mes = document.getElementById("filtroMes").value;
 					const semana = document.getElementById("filtroSemana").value;
 					dataReferencia = `Semana ${semana} / ${mes}`;
+				} else if (tipo === "anual") {
+					const ano = document.getElementById("filtroAno").value;
+					dataReferencia = `Ano ${ano}`;
 				}
+
 
 				// 🔍 Acessos por cidade
 				const snapAcessos = await firebase.database().ref("acessosPorDia").once("value");
