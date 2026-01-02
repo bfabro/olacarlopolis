@@ -2800,9 +2800,9 @@ function mostrarIgreenDescontoLuz() {
 
   const html = `
   <div class="page-header" data-share-hash="#luz">
-    <h2>⚡ Desconto na Luz</h2>
+    <h2>⚡ Desconto na Conta de Luz</h2>
     <i class="fa-solid fa-share-nodes share-btn"
-      onclick="compartilharPagina('#luz','Desconto na Luz','Cadastro gratuito (menos de 10 minutos) para desconto na conta de energia.')"></i>
+      onclick="compartilharPagina('#luz','Desconto na Conta de Luz','Cadastro gratuito')"></i>
   </div>
 
   <div class="igreen-wrap">
