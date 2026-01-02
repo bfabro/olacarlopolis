@@ -2829,7 +2829,10 @@ function mostrarIgreenDescontoLuz() {
               <i class="fa-solid fa-scale-balanced"></i>
               <div>
                 <b>Amparo legal</b>
-                <small>Marco legal da geração distribuída (Lei 14.300/22)</small>
+                <small>                
+              Marco legal da micro/mini geração distribuída e o
+            Sistema de Compensação de Energia Elétrica (SCEE), (Lei 14.300/22).                
+                </small>
               </div>
             </div>
 
@@ -2844,7 +2847,7 @@ function mostrarIgreenDescontoLuz() {
             <div class="igreen-highlight-item">
               <i class="fa-solid fa-bolt"></i>
               <div>
-                <b>Rápido e simples</b>
+                <b>Rápido, simples e gratuito</b>
                 <small>Cadastro em poucos minutos</small>
               </div>
             </div>
@@ -2860,12 +2863,6 @@ function mostrarIgreenDescontoLuz() {
             </button>
           </div>
 
-          
-
-          <div class="igreen-legal">
-            <b>Base legal:</b> a Lei nº 14.300/2022 institui o marco legal da micro/mini geração distribuída e o
-            Sistema de Compensação de Energia Elétrica (SCEE). 
-          </div>
         </div>
 
         <div class="igreen-hero-right">
