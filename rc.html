@@ -505,20 +505,22 @@
 
 		<div class="card">
 			<h3 style="margin-top:18px;">⚡ iGreen – Desconto Conta de Luz</h3>
-<table style="width:100%; border-collapse:collapse;">
-  <thead>
-    <tr>
-      <th style="text-align:left;">ID</th>
-      <th>Cadastros</th>
-      <th>Whats (Dúvidas)</th>
-    </tr>
-  </thead>
-  <tbody id="tabelaIgreen">
-    <tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>
-  </tbody>
-</table>
+			<table style="width:100%; border-collapse:collapse;">
+				<thead>
+					<tr>
+						<th style="text-align:left;">ID</th>
+						<th>Cadastros</th>
+						<th>Whats (Dúvidas)</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaIgreen">
+					<tr>
+						<td colspan="3" style="text-align:center; color:#999;">Carregando...</td>
+					</tr>
+				</tbody>
+			</table>
 
-</div>
+		</div>
 
 
 		<div class="card">
@@ -841,15 +843,27 @@
 
 							// Oculta as categorias indesejadas
 							const nomesOcultos = [
-								"horizontal",
+"Comercios","Inicio",
 								"comercio",
+								"comércio",
+								"servicos",
+								"serviços",
 								"informacoes",
 								"informações",
 								"setorpublico",
-								"setor público",
-								"eventos"
+								"setor público"
 							];
-							if (nomesOcultos.includes(nomeFormatado.toLowerCase())) return;
+
+
+							// normaliza o nome (remove espaços e acentos básicos)
+							const nomeNormalizado = nomeFormatado
+								.toLowerCase()
+								.normalize("NFD")
+								.replace(/[\u0300-\u036f]/g, "") // remove acentos
+								.replace(/\s+/g, "");            // remove espaços
+
+							if (nomesOcultos.includes(nomeNormalizado)) return;
+						
 
 							const row = document.createElement("tr");
 							row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
@@ -975,32 +989,32 @@
 
 
 
-// ====== iGreen (Cadastro / Dúvidas Whats) ======
-let totalIgreenCadastro = 0;
-let totalIgreenDuvidas = 0;
+					// ====== iGreen (Cadastro / Dúvidas Whats) ======
+					let totalIgreenCadastro = 0;
+					let totalIgreenDuvidas = 0;
 
-diasFiltrados.forEach((dia) => {
-  const ig = dadosBotoes?.[dia]?.igreen || {};
-  totalIgreenCadastro += ig?.igreenCadastro || 0;
-  totalIgreenDuvidas += ig?.igreenDuvidasWhats || 0;
-});
+					diasFiltrados.forEach((dia) => {
+						const ig = dadosBotoes?.[dia]?.igreen || {};
+						totalIgreenCadastro += ig?.igreenCadastro || 0;
+						totalIgreenDuvidas += ig?.igreenDuvidasWhats || 0;
+					});
 
-const tabelaIgreen = document.getElementById("tabelaIgreen");
-if (tabelaIgreen) {
-  tabelaIgreen.innerHTML = "";
+					const tabelaIgreen = document.getElementById("tabelaIgreen");
+					if (tabelaIgreen) {
+						tabelaIgreen.innerHTML = "";
 
-  const r1 = document.createElement("tr");
-  r1.innerHTML = `<td>Quero 10% de desconto agora (Cadastro)</td><td style="text-align:center;">${totalIgreenCadastro}</td>`;
-  tabelaIgreen.appendChild(r1);
+						const r1 = document.createElement("tr");
+						r1.innerHTML = `<td>Quero 10% de desconto agora (Cadastro)</td><td style="text-align:center;">${totalIgreenCadastro}</td>`;
+						tabelaIgreen.appendChild(r1);
 
-  const r2 = document.createElement("tr");
-  r2.innerHTML = `<td>Tirar dúvidas no WhatsApp</td><td style="text-align:center;">${totalIgreenDuvidas}</td>`;
-  tabelaIgreen.appendChild(r2);
+						const r2 = document.createElement("tr");
+						r2.innerHTML = `<td>Tirar dúvidas no WhatsApp</td><td style="text-align:center;">${totalIgreenDuvidas}</td>`;
+						tabelaIgreen.appendChild(r2);
 
-  if ((totalIgreenCadastro + totalIgreenDuvidas) === 0) {
-    tabelaIgreen.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum clique registrado no período</td></tr>`;
-  }
-}
+						if ((totalIgreenCadastro + totalIgreenDuvidas) === 0) {
+							tabelaIgreen.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum clique registrado no período</td></tr>`;
+						}
+					}
 
 
 
@@ -1342,32 +1356,32 @@ if (tabelaIgreen) {
 
 
 			async function carregarTabelaIgreen() {
-  const tbody = document.getElementById('tabelaIgreen');
-  if (!tbody) return;
+				const tbody = document.getElementById('tabelaIgreen');
+				if (!tbody) return;
 
-  tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+				tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
-  const db = firebase.database();
-  const datas = await listarDatasPeriodo();
+				const db = firebase.database();
+				const datas = await listarDatasPeriodo();
 
-  let totalCadastro = 0;
-  let totalWhats = 0;
+				let totalCadastro = 0;
+				let totalWhats = 0;
 
-  for (const d of datas) {
-    const snap = await db.ref(`cliquesPorBotao/${d}/igreen`).once('value');
-    const tipos = snap.val() || {};
-    totalCadastro += Number(tipos.cadastro || 0);
-    totalWhats += Number(tipos.whats_duvidas || 0);
-  }
+				for (const d of datas) {
+					const snap = await db.ref(`cliquesPorBotao/${d}/igreen`).once('value');
+					const tipos = snap.val() || {};
+					totalCadastro += Number(tipos.cadastro || 0);
+					totalWhats += Number(tipos.whats_duvidas || 0);
+				}
 
-  tbody.innerHTML = `
+				tbody.innerHTML = `
     <tr>
       <td>Igreen</td>
       <td style="text-align:center">${totalCadastro}</td>
       <td style="text-align:center">${totalWhats}</td>
     </tr>
   `;
-}
+			}
 
 
 
