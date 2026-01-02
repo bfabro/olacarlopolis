@@ -2799,54 +2799,119 @@ function mostrarIgreenDescontoLuz() {
   if (!area) return;
 
   const html = `
-    <div class="page-header" data-share-hash="#luz">
-      <h2>⚡ Desconto na conta de luz</h2>
-      <i class="fa-solid fa-share-nodes share-btn"
-        onclick="compartilharPagina('#luz','Desconto na conta de luz','Faça o auto cadastro e veja a economia disponível.')"></i>
-    </div>
+  <div class="page-header" data-share-hash="#luz">
+    <h2>⚡ Desconto na Luz</h2>
+    <i class="fa-solid fa-share-nodes share-btn"
+      onclick="compartilharPagina('#luz','Desconto na Luz','Cadastro gratuito (menos de 10 minutos) para desconto na conta de energia.')"></i>
+  </div>
 
-    <div class="igreen-wrap">
-      <div class="igreen-card">
-        <div class="igreen-top">
-          <div class="igreen-badge">✅ Cadastro online</div>
-          <div class="igreen-badge">🌱 Energia renovável</div>
-          <div class="igreen-badge">📄 Sem obras</div>
-        </div>
+  <div class="igreen-wrap">
+    <div class="igreen-card igreen-hero">
+      <div class="igreen-hero-inner">
+        <div class="igreen-hero-left">
+          <div class="igreen-top">
+            <div class="igreen-badge">✅ 100% Online</div>
+            <div class="igreen-badge">⏱️ Leva menos de 10 min</div>
+            <div class="igreen-badge">💰 Totalmente gratuito</div>
+          </div>
 
-        <p class="igreen-text">
-          A iGreen oferece uma solução em que você pode <b>receber desconto na conta de luz</b>
-          através de um processo <b>100% digital</b>. Você faz o cadastro, informa os dados da sua conta
-          e acompanha a jornada até o desconto aparecer na fatura.
-        </p>
+          <h3 class="igreen-title">
+            Desconto na conta de luz com <span>energia limpa</span>
+          </h3>
 
-        <div class="igreen-box">
-          <div class="igreen-box-title">Como funciona</div>
-          <ul class="igreen-list">
-            <li>Você faz o <b>auto cadastro</b> com os dados do titular e da conta de luz.</li>
-            <li>A iGreen valida as informações e encaminha o processo conforme sua distribuidora.</li>
-            <li>Quando elegível e aprovado, o <b>desconto passa a aparecer</b> nas próximas faturas.</li>
-            <li>Você pode acompanhar informações pelo atendimento/app/portal da iGreen (conforme disponibilidade).</li>
-          </ul>
-          <div class="igreen-note">
-            * As condições (ex.: percentual) podem variar por distribuidora e regras do programa.
-            Confira o que aparece na simulação/cadastro.
+          <p class="igreen-sub">
+            Faça o <b>auto cadastro</b> e participe do programa de desconto 
+            Sem obra, sem instalar nada só com processo digital.
+          </p>
+
+          <div class="igreen-highlight">
+            <div class="igreen-highlight-item">
+              <i class="fa-solid fa-scale-balanced"></i>
+              <div>
+                <b>Amparo legal</b>
+                <small>Marco legal da geração distribuída (Lei 14.300/22)</small>
+              </div>
+            </div>
+
+            <div class="igreen-highlight-item">
+              <i class="fa-solid fa-file-lines"></i>
+              <div>
+                <b>Documentos necessários</b>
+                <small>Fatura atual + documentos do titular</small>
+              </div>
+            </div>
+
+            <div class="igreen-highlight-item">
+              <i class="fa-solid fa-bolt"></i>
+              <div>
+                <b>Rápido e simples</b>
+                <small>Cadastro em poucos minutos</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="igreen-actions igreen-actions-cta">
+            <a class="igreen-btn igreen-btn-big" href="${IGREEN_AUTO_CADASTRO}" target="_blank" rel="noopener">
+              👉 Fazer auto cadastro agora
+            </a>
+
+            <button class="igreen-btn-outline" id="btnCopiarLinkIgreen" type="button">
+              Copiar link
+            </button>
+          </div>
+
+          
+
+          <div class="igreen-legal">
+            <b>Base legal:</b> a Lei nº 14.300/2022 institui o marco legal da micro/mini geração distribuída e o
+            Sistema de Compensação de Energia Elétrica (SCEE). 
           </div>
         </div>
 
-        <div class="igreen-actions">
-          <a class="igreen-btn" href="${IGREEN_AUTO_CADASTRO}" target="_blank" rel="noopener">
-            👉 Fazer auto cadastro agora
-          </a>
+        <div class="igreen-hero-right">
+          <div class="igreen-sidecard">
+            <div class="igreen-side-title">✅ Checklist do cadastro</div>
+            <ul class="igreen-check">
+              <li><i class="fa-solid fa-check"></i> Fatura de energia atualizada</li>
+              <li><i class="fa-solid fa-check"></i> Documento do titular (RG/CPF)</li>
+              <li><i class="fa-solid fa-check"></i> Dados do titular e endereço</li>
+            </ul>
 
-          <button class="igreen-btn-outline" id="btnCopiarLinkIgreen" type="button">
-            Copiar link
-          </button>
+            <div class="igreen-side-divider"></div>
+
+            <div class="igreen-steps-title">🚀 Como funciona</div>
+            <ol class="igreen-steps">
+              <li>Você preenche os dados da conta de luz.</li>
+              <li>O cadastro é analisado conforme a distribuidora/região.</li>
+              <li>Quando aprovado, o desconto passa a aparecer nas faturas seguintes.</li>
+            </ol>
+
+            <div class="igreen-side-note">
+              * Condições podem variar por região/distribuidora e regras do programa.
+            </div>
+          </div>
+
+          <div class="igreen-faq">
+            <div class="igreen-faq-title">❓ Dúvidas rápidas</div>
+            <details>
+              <summary>Precisa instalar placas?</summary>
+              <p>Não. A proposta é adesão digital (sem obra/instalação na sua casa).</p>
+            </details>
+            <details>
+              <summary>Tem custo para aderir?</summary>
+              <p>O cadastro divulgado aqui é gratuito e feito online.</p>
+            </details>
+            <details>
+              <summary>Quanto tempo leva?</summary>
+              <p>O preenchimento costuma ser rápido (em torno de 10 minutos, se estiver com a fatura em mãos).</p>
+            </details>
+          </div>
         </div>
-
-       
       </div>
     </div>
-  `;
+  </div>
+`;
+
 
   area.innerHTML = html;
 
