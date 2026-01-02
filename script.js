@@ -1779,7 +1779,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "seiza", 
+    "seiza",
     //    "seiza", "hime"
   ];
 
@@ -2786,19 +2786,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-// ===============================
-// iGreen — Desconto na conta de luz (Página interna)
-// ===============================
-const IGREEN_AUTO_CADASTRO =
-  "https://digital.igreenenergy.com.br/?id=116411&sendcontract=true&desc=10";
+  // ===============================
+  // iGreen — Desconto na conta de luz (Página interna)
+  // ===============================
+  const IGREEN_AUTO_CADASTRO =
+    "https://digital.igreenenergy.com.br/?id=116411&sendcontract=true&desc=10";
 
-function mostrarIgreenDescontoLuz() {
-  if (location.hash !== "#luz") location.hash = "#luz";
+  function mostrarIgreenDescontoLuz() {
+    if (location.hash !== "#luz") location.hash = "#luz";
 
-  const area = document.querySelector(".content_area");
-  if (!area) return;
+    const area = document.querySelector(".content_area");
+    if (!area) return;
 
-  const html = `
+    const html = `
   <div class="page-header" data-share-hash="#luz">
     <h2>⚡ Desconto na Conta de Luz</h2>
     <i class="fa-solid fa-share-nodes share-btn"
@@ -2816,7 +2816,7 @@ function mostrarIgreenDescontoLuz() {
           </h3>
 
           <p class="igreen-sub">
-            Faça o <b>auto cadastro</b> e participe do programa de desconto 
+            Faça o <b>auto cadastro</b> e participe do programa de desconto.<BR> 
             Sem obra, sem instalar nada só com processo digital.
           </p>
 
@@ -2849,15 +2849,19 @@ function mostrarIgreenDescontoLuz() {
             </div>
           </div>
 
-          <div class="igreen-actions igreen-actions-cta">
-            <a class="igreen-btn igreen-btn-big" href="${IGREEN_AUTO_CADASTRO}" target="_blank" rel="noopener">
-              👉 Fazer auto cadastro agora
-            </a>
+         <div class="igreen-actions igreen-actions-cta">
+  <a class="igreen-btn igreen-btn-big" href="${IGREEN_AUTO_CADASTRO}" target="_blank" rel="noopener">
+    👉 Fazer auto cadastro agora
+  </a>
 
-            <button class="igreen-btn-outline" id="btnCopiarLinkIgreen" type="button">
-              Copiar link
-            </button>
-          </div>
+
+
+
+ 
+
+  
+</div>
+
 
         </div>
 
@@ -2895,10 +2899,20 @@ function mostrarIgreenDescontoLuz() {
               <p>O cadastro divulgado aqui é gratuito e feito online.</p>
             </details>
             <details>
-              <summary>Quanto tempo leva?</summary>
+              <summary>Quanto tempo leva para cadastrar?</summary>
               <p>O preenchimento costuma ser rápido (em torno de 10 minutos, se estiver com a fatura em mãos).</p>
             </details>
           </div>
+
+             <div class="igreen-faq">
+ <a class="igreen-btn-whats"
+     href="https://wa.me/5543991766639?text=Olá!%20Vi%20a%20página%20de%20Desconto%20na%20Conta%20de%20Luz%20no%20Olá%20Carlópolis%20e%20gostaria%20de%20tirar%20algumas%20dúvidas."
+     target="_blank"
+     rel="noopener">
+     <i class="fa-brands fa-whatsapp"></i> Tirar dúvidas no WhatsApp
+  </a></div>
+
+
         </div>
       </div>
     </div>
@@ -2906,35 +2920,35 @@ function mostrarIgreenDescontoLuz() {
 `;
 
 
-  area.innerHTML = html;
+    area.innerHTML = html;
 
-  const btn = document.getElementById("btnCopiarLinkIgreen");
-  if (btn) {
-    btn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(IGREEN_AUTO_CADASTRO);
-        btn.textContent = "✅ Copiado!";
-        setTimeout(() => (btn.textContent = "Copiar link"), 1500);
-      } catch (e) {
-        alert("Não foi possível copiar automaticamente. Copie manualmente o link exibido.");
-      }
-    });
+    const btn = document.getElementById("btnCopiarLinkIgreen");
+    if (btn) {
+      btn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(IGREEN_AUTO_CADASTRO);
+          btn.textContent = "✅ Copiado!";
+          setTimeout(() => (btn.textContent = "Copiar link"), 1500);
+        } catch (e) {
+          alert("Não foi possível copiar automaticamente. Copie manualmente o link exibido.");
+        }
+      });
+    }
   }
-}
 
-// rota via hash (pra abrir direto por link compartilhado)
-function rotaIgreenIntercept() {
-  const h = (location.hash || "").toLowerCase();
-  if (h === "#luz" || h.startsWith("#luz")) {
-    document.querySelector(".content_area")?.classList.remove("hidden");
-    mostrarIgreenDescontoLuz();
-    return true;
+  // rota via hash (pra abrir direto por link compartilhado)
+  function rotaIgreenIntercept() {
+    const h = (location.hash || "").toLowerCase();
+    if (h === "#luz" || h.startsWith("#luz")) {
+      document.querySelector(".content_area")?.classList.remove("hidden");
+      mostrarIgreenDescontoLuz();
+      return true;
+    }
+    return false;
   }
-  return false;
-}
 
-window.addEventListener("hashchange", () => rotaIgreenIntercept());
-document.addEventListener("DOMContentLoaded", () => rotaIgreenIntercept());
+  window.addEventListener("hashchange", () => rotaIgreenIntercept());
+  document.addEventListener("DOMContentLoaded", () => rotaIgreenIntercept());
 
 
 
@@ -13003,18 +13017,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             contact2: "(43) 99844-5345",
             delivery: "Sim / Sem Taxa",
             facebook: "https://www.facebook.com/liagasclps/",
-            instagram:"https://www.instagram.com/eliana.cristiano/",
+            instagram: "https://www.instagram.com/eliana.cristiano/",
             novidadesImages: [
               "images/comercios/depositoGas/liaGas/divulgacao/1.jpg",
               "images/comercios/depositoGas/liaGas/divulgacao/2.jpg",
-              
-            
+
+
 
             ],
             novidadesDescriptions: [
               "Lia Gás, entrega que não falha jamais! Temos Gás e Galão de Agua 20 Litros",
               "Nosso estoque para nao deixar na mão quando mais precisar!",
-             
+
             ],
           },
 
@@ -14842,12 +14856,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
   const menuIgreenLuz = document.getElementById("menuIgreenLuz");
-if (menuIgreenLuz) {
-  menuIgreenLuz.addEventListener("click", function (e) {
-    e.preventDefault();
-    mostrarIgreenDescontoLuz();
-  });
-}
+  if (menuIgreenLuz) {
+    menuIgreenLuz.addEventListener("click", function (e) {
+      e.preventDefault();
+      mostrarIgreenDescontoLuz();
+    });
+  }
 
 
   const menuPrevisaoTempo = document.getElementById("menuPrevisaoTempo");

@@ -9207,3 +9207,32 @@ tr[data-inativo="true"] {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Botão WhatsApp - Página Desconto Luz */
+.igreen-btn-whats{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:14px 16px;
+  border-radius:14px;
+  font-weight:900;
+  font-size:15px;
+  text-decoration:none;
+  background:#25D366;
+  color:#fff;
+  border:0;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(37,211,102,.35);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+
+.igreen-btn-whats i{
+  font-size:20px;
+}
+
+.igreen-btn-whats:hover{
+  transform:translateY(-1px);
+  box-shadow:0 12px 26px rgba(37,211,102,.45);
+}
