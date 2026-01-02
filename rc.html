@@ -684,6 +684,7 @@
 
 } else if (tipo === "anual") {
   const ano = document.getElementById("filtroAno").value;
+   dataReferencia = `Ano ${ano}`;
 
   if (!ano || ano.length !== 4) {
     alert("Selecione um ano válido (ex: 2026).");
@@ -1247,41 +1248,54 @@
 
 		<script>
 			// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
-			async function listarDatasPeriodo(tipo) {
-				const hoje = new Date();
-				const pad = n => String(n).padStart(2, '0');
+			// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
+async function listarDatasPeriodo(tipo) {
+  const hoje = new Date();
+  const pad = n => String(n).padStart(2, "0");
 
-				// lê UI já existente (rc.html tem "Tipo de Relatório" e campos de data) 
-				const tipoRel = tipo || document.getElementById('tipoRelatorio').value; // diario, semanal, mensal
-				let datas = [];
+  const tipoRel = tipo || document.getElementById("tipoRelatorio").value; // diario, semanal, mensal, anual
+  let datas = [];
 
-				if (tipoRel === 'diario') {
-					const d = document.getElementById('filtroData').value || hoje.toISOString().slice(0, 10);
-					datas = [d];
-				} else if (tipoRel === 'semanal') {
-					// usa mês atual do filtroMes se existir; e semana do filtroSemana
-					const m = (document.getElementById('filtroMes').value || hoje.toISOString().slice(0, 7)); // YYYY-MM
-					const semana = Number(document.getElementById('filtroSemana').value || 1);
-					const [ano, mes] = m.split('-').map(Number);
-					const faixas = {
-						1: [1, 7], 2: [8, 14], 3: [15, 21], 4: [22, 28], 5: [29, 31]
-					}[semana] || [1, 7];
-					for (let dia = faixas[0]; dia <= faixas[1]; dia++) {
-						const data = new Date(ano, mes - 1, dia);
-						if (data.getMonth() + 1 === mes) {
-							datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
-						}
-					}
-				} else { // mensal
-					const m = (document.getElementById('filtroMes').value || hoje.toISOString().slice(0, 7)); // YYYY-MM
-					const [ano, mes] = m.split('-').map(Number);
-					const ultimo = new Date(ano, mes, 0).getDate();
-					for (let dia = 1; dia <= ultimo; dia++) {
-						datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
-					}
-				}
-				return datas;
-			}
+  if (tipoRel === "diario") {
+    const d = document.getElementById("filtroData").value || hoje.toISOString().slice(0, 10);
+    datas = [d];
+
+  } else if (tipoRel === "semanal") {
+    const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
+    const semana = Number(document.getElementById("filtroSemana").value || 1);
+    const [ano, mes] = m.split("-").map(Number);
+
+    const faixas = { 1:[1,7], 2:[8,14], 3:[15,21], 4:[22,28], 5:[29,31] }[semana] || [1,7];
+
+    for (let dia = faixas[0]; dia <= faixas[1]; dia++) {
+      const data = new Date(ano, mes - 1, dia);
+      if (data.getMonth() + 1 === mes) datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
+    }
+
+  } else if (tipoRel === "mensal") {
+    const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
+    const [ano, mes] = m.split("-").map(Number);
+    const ultimo = new Date(ano, mes, 0).getDate();
+
+    for (let dia = 1; dia <= ultimo; dia++) {
+      datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
+    }
+
+  } else if (tipoRel === "anual") {
+    const ano = (document.getElementById("filtroAno")?.value || String(hoje.getFullYear())).trim();
+    const anoNum = Number(ano) || hoje.getFullYear();
+
+    for (let mes = 1; mes <= 12; mes++) {
+      const ultimo = new Date(anoNum, mes, 0).getDate();
+      for (let dia = 1; dia <= ultimo; dia++) {
+        datas.push(`${anoNum}-${pad(mes)}-${pad(dia)}`);
+      }
+    }
+  }
+
+  return datas;
+}
+
 
 			// Lê um nó "1 nível" (ex.: cliquesCardapiosOndeComer/2025-08-16) e acumula por estabelecimento
 			async function somarNoPorDatas(basePath, datas) {
