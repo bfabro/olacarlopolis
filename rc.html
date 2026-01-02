@@ -843,7 +843,9 @@
 
 							// Oculta as categorias indesejadas
 							const nomesOcultos = [
-"Comercios","Inicio",
+								"Comercios", 
+								"comercios", 
+								"Inicio",
 								"comercio",
 								"comércio",
 								"servicos",
@@ -863,7 +865,7 @@
 								.replace(/\s+/g, "");            // remove espaços
 
 							if (nomesOcultos.includes(nomeNormalizado)) return;
-						
+
 
 							const row = document.createElement("tr");
 							row.innerHTML = `<td>${nomeFormatado}</td><td>${total}</td>`;
