@@ -2809,14 +2809,10 @@ function mostrarIgreenDescontoLuz() {
     <div class="igreen-card igreen-hero">
       <div class="igreen-hero-inner">
         <div class="igreen-hero-left">
-          <div class="igreen-top">
-            <div class="igreen-badge">✅ 100% Online</div>
-            <div class="igreen-badge">⏱️ Leva menos de 10 min</div>
-            <div class="igreen-badge">💰 Totalmente gratuito</div>
-          </div>
+       
 
           <h3 class="igreen-title">
-            Desconto na conta de luz com <span>energia limpa</span>
+            Desconto na conta de luz com <span>energia limpa IGREEN</span>
           </h3>
 
           <p class="igreen-sub">
@@ -2880,7 +2876,7 @@ function mostrarIgreenDescontoLuz() {
             <ol class="igreen-steps">
               <li>Você preenche os dados da conta de luz.</li>
               <li>O cadastro é analisado conforme a distribuidora/região.</li>
-              <li>Quando aprovado, o desconto passa a aparecer nas faturas seguintes.</li>
+              <li>Quando aprovado, o desconto passa a aparecer nas faturas seguintes em até 90 dias.</li>
             </ol>
 
             <div class="igreen-side-note">
