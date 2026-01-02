@@ -2853,7 +2853,7 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
 
          <div class="igreen-actions igreen-actions-cta">
-  <a class="igreen-btn igreen-btn-big" href="${IGREEN_AUTO_CADASTRO}" target="_blank" rel="noopener">
+  <a class="igreen-btn igreen-btn-big"  id="btnIgreenCadastro" href="${IGREEN_AUTO_CADASTRO}" target="_blank" rel="noopener">
     👉 Fazer cadastro agora
   </a>
 
@@ -2901,7 +2901,7 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
 
              <div class="igreen-faq">
- <a class="igreen-btn-whats"
+ <a class="igreen-btn-whats" id="btnIgreenWhats"
      href="https://wa.me/5543991766639?text=Olá!%20Vi%20a%20página%20de%20Desconto%20na%20Conta%20de%20Luz%20no%20Olá%20Carlópolis%20e%20gostaria%20de%20tirar%20algumas%20dúvidas."
      target="_blank"
      rel="noopener">
@@ -2917,6 +2917,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     area.innerHTML = html;
+
+    // Registrar cliques dos botões da página iGreen
+function registrarCliqueIgreen(tipo) {
+  // Usa sua função existente (Firebase)
+  if (typeof window.registrarCliqueBotao === "function") {
+    // idEstabelecimento aqui é fixo pra iGreen (pra ficar fácil de filtrar no relatório)
+    window.registrarCliqueBotao(tipo, "igreen_luz");
+  }
+}
+
+const btnCadastro = document.getElementById("btnIgreenCadastro");
+if (btnCadastro) {
+  btnCadastro.addEventListener("click", () => {
+    registrarCliqueIgreen("cadastro");
+  });
+}
+
+const btnWhats = document.getElementById("btnIgreenWhats");
+if (btnWhats) {
+  btnWhats.addEventListener("click", () => {
+    registrarCliqueIgreen("whats_duvidas");
+  });
+}
+
 
     const btn = document.getElementById("btnCopiarLinkIgreen");
     if (btn) {
