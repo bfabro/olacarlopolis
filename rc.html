@@ -504,20 +504,20 @@
 
 
 		<div class="card">
-  <h2 class="section-title">⚡ iGreen – Desconto na Luz</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Ação</th>
-        <th style="text-align:center;">Cliques</th>
-      </tr>
-    </thead>
-    <tbody id="tabelaIgreen">
-      <tr>
-        <td colspan="2" style="text-align:center; color:#999;">Nenhum dado carregado ainda</td>
-      </tr>
-    </tbody>
-  </table>
+			<h3 style="margin-top:18px;">⚡ iGreen – Desconto Conta de Luz</h3>
+<table style="width:100%; border-collapse:collapse;">
+  <thead>
+    <tr>
+      <th style="text-align:left;">ID</th>
+      <th>Cadastros</th>
+      <th>Whats (Dúvidas)</th>
+    </tr>
+  </thead>
+  <tbody id="tabelaIgreen">
+    <tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>
+  </tbody>
+</table>
+
 </div>
 
 
@@ -1069,6 +1069,8 @@ if (tabelaIgreen) {
 
 					// ⚠️ só libere o botão depois de carregar também a tabela "Onde Comer"
 					await carregarTabelaOndeComer();
+					await carregarTabelaIgreen();
+
 				} finally {
 					stopLoading();               // 🔵 volta ao azul só depois de TUDO
 				}
@@ -1335,6 +1337,38 @@ if (tabelaIgreen) {
       </tr>
     `).join('');
 			}
+
+
+
+
+			async function carregarTabelaIgreen() {
+  const tbody = document.getElementById('tabelaIgreen');
+  if (!tbody) return;
+
+  tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+
+  const db = firebase.database();
+  const datas = await listarDatasPeriodo();
+
+  let totalCadastro = 0;
+  let totalWhats = 0;
+
+  for (const d of datas) {
+    const snap = await db.ref(`cliquesPorBotao/${d}/igreen`).once('value');
+    const tipos = snap.val() || {};
+    totalCadastro += Number(tipos.cadastro || 0);
+    totalWhats += Number(tipos.whats_duvidas || 0);
+  }
+
+  tbody.innerHTML = `
+    <tr>
+      <td>Igreen</td>
+      <td style="text-align:center">${totalCadastro}</td>
+      <td style="text-align:center">${totalWhats}</td>
+    </tr>
+  `;
+}
+
 
 
 

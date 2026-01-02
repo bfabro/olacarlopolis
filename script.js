@@ -2923,7 +2923,7 @@ function registrarCliqueIgreen(tipo) {
   // Usa sua função existente (Firebase)
   if (typeof window.registrarCliqueBotao === "function") {
     // idEstabelecimento aqui é fixo pra iGreen (pra ficar fácil de filtrar no relatório)
-    window.registrarCliqueBotao(tipo, "igreen_luz");
+    window.registrarCliqueBotao(tipo, "igreen");
   }
 }
 
