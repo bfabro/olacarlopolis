@@ -2816,8 +2816,11 @@ document.addEventListener("DOMContentLoaded", function () {
           </h3>
 
           <p class="igreen-sub">
-            Faça o <b>auto cadastro</b> e participe do programa de desconto.<BR> 
-            Sem obra, sem instalar nada só com processo digital.
+            Faça o <b>cadastro</b> e participe do programa de desconto.<BR> 
+            
+            Sem obra, sem instalar nada só com processo digital.<br>
+
+            Após concluir o cadastro e a ativação do benefício, você passa a ter ao menos<b> 10% de desconto</b> na sua conta de luz.
           </p>
 
           <div class="igreen-highlight">
@@ -2851,7 +2854,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
          <div class="igreen-actions igreen-actions-cta">
   <a class="igreen-btn igreen-btn-big" href="${IGREEN_AUTO_CADASTRO}" target="_blank" rel="noopener">
-    👉 Fazer auto cadastro agora
+    👉 Fazer cadastro agora
   </a>
 
 
@@ -2867,18 +2870,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         <div class="igreen-hero-right">
           <div class="igreen-sidecard">
-            <div class="igreen-side-title">✅ Checklist do cadastro</div>
-            <ul class="igreen-check">
-              <li><i class="fa-solid fa-check"></i> Fatura de energia atualizada</li>
-              <li><i class="fa-solid fa-check"></i> Documento do titular (RG/CPF)</li>
-              <li><i class="fa-solid fa-check"></i> Dados do titular e endereço</li>
-            </ul>
-
-            <div class="igreen-side-divider"></div>
+                  
 
             <div class="igreen-steps-title">🚀 Como funciona</div>
             <ol class="igreen-steps">
-              <li>Você preenche os dados da conta de luz.</li>
+              <li>Você preenche os teus dados e da conta de luz.</li>
               <li>O cadastro é analisado conforme a distribuidora/região.</li>
               <li>Quando aprovado, o desconto passa a aparecer nas faturas seguintes em até 90 dias.</li>
             </ol>
