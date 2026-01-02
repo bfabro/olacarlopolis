@@ -8929,3 +8929,82 @@ tr[data-inativo="true"] {
 }
 .admin-sidebar button:hover { background: #2d3748; }
 .btn-logout { margin-top: auto; background: #e53e3e !important; }
+
+
+/* ===============================
+   iGreen — Página "Desconto na Luz"
+=============================== */
+.igreen-wrap { max-width: 980px; margin: 0 auto; padding: 10px 0 20px; }
+
+.igreen-card{
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:16px;
+  box-shadow:0 8px 28px rgba(0,0,0,.08);
+  padding:16px;
+  overflow:hidden;
+}
+
+.igreen-top{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.igreen-badge{
+  border:1px solid #e7e7e7;
+  background:#fafafa;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:600;
+}
+
+.igreen-text{ color:#222; line-height:1.45; margin: 10px 0 14px; }
+
+.igreen-box{
+  border:1px solid #eef2ff;
+  background:#f8fafc;
+  border-radius:14px;
+  padding:12px;
+}
+
+.igreen-box-title{ font-weight:800; margin-bottom:8px; }
+.igreen-list{ margin: 0; padding-left: 18px; }
+.igreen-list li{ margin: 6px 0; color:#111; }
+
+.igreen-note{ margin-top:10px; font-size:12px; color:#555; }
+
+.igreen-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+.igreen-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:12px 14px;
+  border-radius:12px;
+  font-weight:800;
+  text-decoration:none;
+  border:0;
+  cursor:pointer;
+  background:#22c55e;
+  color:#fff;
+}
+
+.igreen-btn-outline{
+  padding:12px 14px;
+  border-radius:12px;
+  font-weight:800;
+  background:#fff;
+  border:1px solid #d7d7d7;
+  cursor:pointer;
+}
+
+.igreen-link{
+  margin-top:12px;
+  font-size:12px;
+  color:#444;
+  word-break:break-all;
+}
+.igreen-link a{ color:#1b60d6; text-decoration:none; }

@@ -2786,6 +2786,97 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+// ===============================
+// iGreen — Desconto na conta de luz (Página interna)
+// ===============================
+const IGREEN_AUTO_CADASTRO =
+  "https://digital.igreenenergy.com.br/?id=116411&sendcontract=true&desc=10";
+
+function mostrarIgreenDescontoLuz() {
+  if (location.hash !== "#luz") location.hash = "#luz";
+
+  const area = document.querySelector(".content_area");
+  if (!area) return;
+
+  const html = `
+    <div class="page-header" data-share-hash="#luz">
+      <h2>⚡ Desconto na conta de luz</h2>
+      <i class="fa-solid fa-share-nodes share-btn"
+        onclick="compartilharPagina('#luz','Desconto na conta de luz','Faça o auto cadastro e veja a economia disponível.')"></i>
+    </div>
+
+    <div class="igreen-wrap">
+      <div class="igreen-card">
+        <div class="igreen-top">
+          <div class="igreen-badge">✅ Cadastro online</div>
+          <div class="igreen-badge">🌱 Energia renovável</div>
+          <div class="igreen-badge">📄 Sem obras</div>
+        </div>
+
+        <p class="igreen-text">
+          A iGreen oferece uma solução em que você pode <b>receber desconto na conta de luz</b>
+          através de um processo <b>100% digital</b>. Você faz o cadastro, informa os dados da sua conta
+          e acompanha a jornada até o desconto aparecer na fatura.
+        </p>
+
+        <div class="igreen-box">
+          <div class="igreen-box-title">Como funciona</div>
+          <ul class="igreen-list">
+            <li>Você faz o <b>auto cadastro</b> com os dados do titular e da conta de luz.</li>
+            <li>A iGreen valida as informações e encaminha o processo conforme sua distribuidora.</li>
+            <li>Quando elegível e aprovado, o <b>desconto passa a aparecer</b> nas próximas faturas.</li>
+            <li>Você pode acompanhar informações pelo atendimento/app/portal da iGreen (conforme disponibilidade).</li>
+          </ul>
+          <div class="igreen-note">
+            * As condições (ex.: percentual) podem variar por distribuidora e regras do programa.
+            Confira o que aparece na simulação/cadastro.
+          </div>
+        </div>
+
+        <div class="igreen-actions">
+          <a class="igreen-btn" href="${IGREEN_AUTO_CADASTRO}" target="_blank" rel="noopener">
+            👉 Fazer auto cadastro agora
+          </a>
+
+          <button class="igreen-btn-outline" id="btnCopiarLinkIgreen" type="button">
+            Copiar link
+          </button>
+        </div>
+
+       
+      </div>
+    </div>
+  `;
+
+  area.innerHTML = html;
+
+  const btn = document.getElementById("btnCopiarLinkIgreen");
+  if (btn) {
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(IGREEN_AUTO_CADASTRO);
+        btn.textContent = "✅ Copiado!";
+        setTimeout(() => (btn.textContent = "Copiar link"), 1500);
+      } catch (e) {
+        alert("Não foi possível copiar automaticamente. Copie manualmente o link exibido.");
+      }
+    });
+  }
+}
+
+// rota via hash (pra abrir direto por link compartilhado)
+function rotaIgreenIntercept() {
+  const h = (location.hash || "").toLowerCase();
+  if (h === "#luz" || h.startsWith("#luz")) {
+    document.querySelector(".content_area")?.classList.remove("hidden");
+    mostrarIgreenDescontoLuz();
+    return true;
+  }
+  return false;
+}
+
+window.addEventListener("hashchange", () => rotaIgreenIntercept());
+document.addEventListener("DOMContentLoaded", () => rotaIgreenIntercept());
 
 
 
@@ -14690,6 +14781,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   });
 
   document.getElementById("menuConsultaCEP").addEventListener("click", mostrarConsultaCEP);
+
+
+  const menuIgreenLuz = document.getElementById("menuIgreenLuz");
+if (menuIgreenLuz) {
+  menuIgreenLuz.addEventListener("click", function (e) {
+    e.preventDefault();
+    mostrarIgreenDescontoLuz();
+  });
+}
+
 
   const menuPrevisaoTempo = document.getElementById("menuPrevisaoTempo");
 
