@@ -14875,7 +14875,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   document.getElementById("menuConsultaCEP").addEventListener("click", mostrarConsultaCEP);
 
 
-  const menuIgreenLuz = document.getElementById("menuIgreenLuz");
+  const menuIgreenLuz = document.getElementById("menuEconomiaLuz");
   if (menuIgreenLuz) {
     menuIgreenLuz.addEventListener("click", function (e) {
       e.preventDefault();
