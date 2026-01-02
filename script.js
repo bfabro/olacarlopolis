@@ -15786,6 +15786,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
 
     if (h === "#represa-chavantes") { return mostrarRepresa(); };
+    if (h === "#luz") { return mostrarIgreenDescontoLuz(); };
 
 
 
