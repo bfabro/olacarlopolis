@@ -1685,8 +1685,8 @@ document.addEventListener("DOMContentLoaded", function () {
         idioma: navigator.language,
         plataforma: navigator.platform,
         pagina: window.location.href,
-        referrer: document.referrer || "acesso direto",
-        origem: new URLSearchParams(window.location.search).get("o") || "acesso direto",
+        referrer: document.referrer || "Site ou App",
+        origem: new URLSearchParams(window.location.search).get("o") || "Site ou App",
         tela: `${window.screen.width}x${window.screen.height}`,
         dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
       });
