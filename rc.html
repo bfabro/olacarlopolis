@@ -501,6 +501,26 @@
 			</table>
 		</div>
 
+
+
+		<div class="card">
+  <h2 class="section-title">⚡ iGreen – Desconto na Luz</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Ação</th>
+        <th style="text-align:center;">Cliques</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaIgreen">
+      <tr>
+        <td colspan="2" style="text-align:center; color:#999;">Nenhum dado carregado ainda</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
 		<div class="card">
 			<h2 class="section-title">🕒 Acessos por Faixa de Horário</h2>
 			<table>
@@ -955,6 +975,32 @@
 
 
 
+// ====== iGreen (Cadastro / Dúvidas Whats) ======
+let totalIgreenCadastro = 0;
+let totalIgreenDuvidas = 0;
+
+diasFiltrados.forEach((dia) => {
+  const ig = dadosBotoes?.[dia]?.igreen || {};
+  totalIgreenCadastro += ig?.igreenCadastro || 0;
+  totalIgreenDuvidas += ig?.igreenDuvidasWhats || 0;
+});
+
+const tabelaIgreen = document.getElementById("tabelaIgreen");
+if (tabelaIgreen) {
+  tabelaIgreen.innerHTML = "";
+
+  const r1 = document.createElement("tr");
+  r1.innerHTML = `<td>Quero 10% de desconto agora (Cadastro)</td><td style="text-align:center;">${totalIgreenCadastro}</td>`;
+  tabelaIgreen.appendChild(r1);
+
+  const r2 = document.createElement("tr");
+  r2.innerHTML = `<td>Tirar dúvidas no WhatsApp</td><td style="text-align:center;">${totalIgreenDuvidas}</td>`;
+  tabelaIgreen.appendChild(r2);
+
+  if ((totalIgreenCadastro + totalIgreenDuvidas) === 0) {
+    tabelaIgreen.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Nenhum clique registrado no período</td></tr>`;
+  }
+}
 
 
 

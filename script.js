@@ -2802,7 +2802,7 @@ document.addEventListener("DOMContentLoaded", function () {
   <div class="page-header" data-share-hash="#luz">
     <h2>⚡ Desconto na Conta de Luz</h2>
     <i class="fa-solid fa-share-nodes share-btn"
-      onclick="compartilharPagina('#luz','Desconto na Conta de Luz','Cadastro gratuito')"></i>
+      onclick="compartilharPagina('#luz','Economia na Conta de Luz','Economize em sua fatura de energia através do nosso cadastro.')"></i>
   </div>
 
   <div class="igreen-wrap">
