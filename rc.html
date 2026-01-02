@@ -62,17 +62,20 @@
 			font-weight: bold;
 		}
 
-		select,
-		input[type="date"],
-		input[type="month"],
-		button {
-			padding: 10px;
-			background-color: #2a2a2a;
-			color: #fff;
-			border: 1px solid #444;
-			border-radius: 6px;
-			font-size: 14px;
-		}
+	
+	select,
+input[type="date"],
+input[type="month"],
+input[type="number"],
+button {
+  padding: 10px;
+  background-color: #2a2a2a;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
 
 		button {
 			background: linear-gradient(135deg, #00bcd4, #007b8a);
@@ -282,7 +285,7 @@
 			</select>
 
 			<!-- NOVO: filtro anual -->
-			<input type="number" id="filtroAno" class="filtro hidden" min="2020" max="2099" placeholder="2026">
+			<input type="number" id="filtroAno" class="filtro hidden" min="2025" max="2099" placeholder="2026">
 
 			<button id="btnBuscar">Buscar</button>
 
