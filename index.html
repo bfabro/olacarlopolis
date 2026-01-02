@@ -132,7 +132,7 @@
    <!--  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>-->
 
    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
 
    <!-- Use a versão compatível do Firebase -->
@@ -268,7 +268,7 @@
                         <span class="navlink">Academia de Luta</span>
                      </a>
 
-                     
+
 
 
                      <a id="menuAcai" href="#" class="nav_link sublink">
@@ -1102,7 +1102,7 @@
                         <span class="navlink">Consulta CEP</span>
                      </a>
 
-                     
+
 
 
 
@@ -1117,8 +1117,8 @@
                         <span class="navlink">Eventos</span>
                      </a>
 
-       
-                     
+
+
 
                      <a id="menuGruposWhats" href="#" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:rgb(55, 189, 17)"
@@ -1189,19 +1189,17 @@
                   </span>
                   <span class="navlink bold">Promoções</span>
                </a>
-              
+
                <a id="menuImoveis" href="#" class="nav_link">
                   <span class="navlink_icon"><i style="color:#2E8B57" class="fa-solid fa-house-chimney"></i></span>
                   <span class="navlink bold">Imóveis</span>
                </a>
 
-               <a id="menuIgreenLuz" href="#" class="nav_link sublink">
-  <span class="navlink_icon">
-    <i style="color:#22c55e" class="fa-solid fa-bolt-lightning"></i>
-  </span>
-  <span class="navlink">Desconto Luz</span>
-</a>
- <!-- 
+               <a id="menuIgreenLuz" href="#" class="nav_link">
+                  <span class="navlink_icon"><i style="color:#ffce08" class="fa-solid fa-bolt-lightning"></i></span>
+                  <span class="navlink">Desconto Luz</span>
+               </a>
+               <!-- 
                <li class="item">
   <a id="menuCarros" href="#" class="nav_link">
     <span class="navlink_icon">
@@ -1552,33 +1550,33 @@
       // Inicializa o Firebase
       const app = firebase.initializeApp(firebaseConfig);
 
-      
+
       const database = firebase.database(app);
       const db = firebase.database();
       // Firebase Realtime Database para "onlineUsers"
       const onlineUsersRef = firebase.database().ref("onlineUsers");
 
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        // Busca o documento usando o UID do usuário que acabou de logar
-        db.collection("usuarios").doc(user.uid).get().then((doc) => {
-            if (doc.exists && doc.data().admin === true) {
-                console.log("Acesso autorizado: Bem-vindo Admin!");
-                // O usuário é admin, ele permanece na página.
-            } else {
-                // Se o documento não existir ou 'admin' não for true
-                alert("Acesso negado: Você não é um administrador.");
-                window.location.href = "index.html"; 
-            }
-        }).catch((error) => {
-            console.error("Erro ao validar admin:", error);
+      auth.onAuthStateChanged((user) => {
+         if (user) {
+            // Busca o documento usando o UID do usuário que acabou de logar
+            db.collection("usuarios").doc(user.uid).get().then((doc) => {
+               if (doc.exists && doc.data().admin === true) {
+                  console.log("Acesso autorizado: Bem-vindo Admin!");
+                  // O usuário é admin, ele permanece na página.
+               } else {
+                  // Se o documento não existir ou 'admin' não for true
+                  alert("Acesso negado: Você não é um administrador.");
+                  window.location.href = "index.html";
+               }
+            }).catch((error) => {
+               console.error("Erro ao validar admin:", error);
+               window.location.href = "index.html";
+            });
+         } else {
+            // Se ninguém estiver logado, redireciona para a home/login
             window.location.href = "index.html";
-        });
-    } else {
-        // Se ninguém estiver logado, redireciona para a home/login
-        window.location.href = "index.html";
-    }
-});
+         }
+      });
 
       // Adiciona um novo usuário online
       const userRef = onlineUsersRef.push();
@@ -1595,7 +1593,7 @@ auth.onAuthStateChanged((user) => {
       }
 
 
-      
+
 
       // Atualiza o contador de usuários online
       onlineUsersRef.on("value", (snapshot) => {
@@ -1616,51 +1614,51 @@ auth.onAuthStateChanged((user) => {
       });
 
 
-      
+
 
    </script>
 
-<script>
-  // ✅ Conta QUALQUER clique no menu lateral (pais + filhos + links)
-  function slugMenu(texto) {
-    return (texto || "")
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // tira acentos
-      .replace(/[^\w\s-]/g, "")                        // tira caracteres especiais
-      .trim()
-      .replace(/\s+/g, "");                            // remove espaços
-  }
+   <script>
+      // ✅ Conta QUALQUER clique no menu lateral (pais + filhos + links)
+      function slugMenu(texto) {
+         return (texto || "")
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // tira acentos
+            .replace(/[^\w\s-]/g, "")                        // tira caracteres especiais
+            .trim()
+            .replace(/\s+/g, "");                            // remove espaços
+      }
 
-  function registrarCliqueMenu(menuId, texto) {
-    try {
-      const dataHoje = getHojeBR(); // já existe no seu código
-      const horaAgora = new Date().toLocaleTimeString("pt-BR");
+      function registrarCliqueMenu(menuId, texto) {
+         try {
+            const dataHoje = getHojeBR(); // já existe no seu código
+            const horaAgora = new Date().toLocaleTimeString("pt-BR");
 
-      const contadorRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/total`);
-      contadorRef.transaction((current) => (current || 0) + 1);
+            const contadorRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/total`);
+            contadorRef.transaction((current) => (current || 0) + 1);
 
-      const detalhesRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/detalhes`);
-      detalhesRef.push({
-        horario: horaAgora,
-        texto: texto || ""
-      });
-    } catch (e) {
-      console.error("Erro ao registrar clique no menu:", e);
-    }
-  }
+            const detalhesRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/detalhes`);
+            detalhesRef.push({
+               horario: horaAgora,
+               texto: texto || ""
+            });
+         } catch (e) {
+            console.error("Erro ao registrar clique no menu:", e);
+         }
+      }
 
-  // ✅ Event Delegation (pega itens criados depois e qualquer clique no menu)
-  document.addEventListener("click", (ev) => {
-    const el = ev.target.closest(".nav_link, [id^='menu']");
-    if (!el) return;
+      // ✅ Event Delegation (pega itens criados depois e qualquer clique no menu)
+      document.addEventListener("click", (ev) => {
+         const el = ev.target.closest(".nav_link, [id^='menu']");
+         if (!el) return;
 
-    const textoMenu = (el.innerText || el.textContent || "").trim();
-    const menuId = (el.id && el.id.trim())
-      ? el.id.trim()
-      : `menu${slugMenu(textoMenu)}`;
+         const textoMenu = (el.innerText || el.textContent || "").trim();
+         const menuId = (el.id && el.id.trim())
+            ? el.id.trim()
+            : `menu${slugMenu(textoMenu)}`;
 
-    registrarCliqueMenu(menuId, textoMenu);
-  }, true); // true = capture (pega mesmo se algum código mexer no bubble)
-</script>
+         registrarCliqueMenu(menuId, textoMenu);
+      }, true); // true = capture (pega mesmo se algum código mexer no bubble)
+   </script>
 
 
    <script>
@@ -1761,86 +1759,90 @@ HFFJYFJ
      -->
 
 
-   <!-- ===== ADMIN APP (casca) ===== --><section id="page-admin" class="page" style="display:none">
-    <div class="admin-layout">
-        <aside class="admin-sidebar">
+   <!-- ===== ADMIN APP (casca) ===== -->
+   <section id="page-admin" class="page" style="display:none">
+      <div class="admin-layout">
+         <aside class="admin-sidebar">
             <div class="admin-user-info">
-                <i class="fas fa-user-circle"></i>
-                <span id="nome-usuario-logado">Painel Administrativo</span>
+               <i class="fas fa-user-circle"></i>
+               <span id="nome-usuario-logado">Painel Administrativo</span>
             </div>
             <nav id="admin-menu-dinamico">
-                </nav>
+            </nav>
             <button onclick="window.location.reload()" class="btn-logout">Sair do Painel</button>
-        </aside>
+         </aside>
 
-        <main class="admin-content-area">
+         <main class="admin-content-area">
             <div id="super-admin-control" style="display:none;" class="admin-card">
-                <h3><i class="fas fa-users-cog"></i> Gerenciar Novo Cliente</h3>
-                <form id="form-config-cliente">
-                    <input type="email" id="novo-cliente-email" placeholder="E-mail do Cliente" required>
-                    <input type="text" id="novo-cliente-senha" placeholder="Senha Provisória" required>
-                    
-                    <div class="permissions-selector">
-                        <h4>Liberar Módulos:</h4>
-                        <label><input type="checkbox" value="veiculos"> Veículos</label>
-                        <label><input type="checkbox" value="promocoes"> Promoções</label>
-                        <label><input type="checkbox" value="cardapio"> Cardápio</label>
-                        <label><input type="checkbox" value="imoveis"> Imóveis</label>
-                        <label><input type="checkbox" value="eventos"> Eventos</label>
-                    </div>
-                    <button type="submit" class="btn-action">Criar Acesso Cliente</button>
-                </form>
+               <h3><i class="fas fa-users-cog"></i> Gerenciar Novo Cliente</h3>
+               <form id="form-config-cliente">
+                  <input type="email" id="novo-cliente-email" placeholder="E-mail do Cliente" required>
+                  <input type="text" id="novo-cliente-senha" placeholder="Senha Provisória" required>
+
+                  <div class="permissions-selector">
+                     <h4>Liberar Módulos:</h4>
+                     <label><input type="checkbox" value="veiculos"> Veículos</label>
+                     <label><input type="checkbox" value="promocoes"> Promoções</label>
+                     <label><input type="checkbox" value="cardapio"> Cardápio</label>
+                     <label><input type="checkbox" value="imoveis"> Imóveis</label>
+                     <label><input type="checkbox" value="eventos"> Eventos</label>
+                  </div>
+                  <button type="submit" class="btn-action">Criar Acesso Cliente</button>
+               </form>
             </div>
 
             <div id="editor-de-conteudo" style="display:none;" class="admin-card">
-                <h3 id="titulo-modulo-atual">Cadastrar Item</h3>
-                <form id="form-cadastro-geral">
-                    <div id="container-campos-dinamicos">
-                        </div>
-                    <button type="submit" class="btn-save-database">Publicar no Site</button>
-                </form>
+               <h3 id="titulo-modulo-atual">Cadastrar Item</h3>
+               <form id="form-cadastro-geral">
+                  <div id="container-campos-dinamicos">
+                  </div>
+                  <button type="submit" class="btn-save-database">Publicar no Site</button>
+               </form>
             </div>
-        </main>
-    </div>
-</section>
+         </main>
+      </div>
+   </section>
    <!-- ===== /ADMIN APP ===== -->
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 
 
 
-<div id="modalLogin" class="modal-login hidden">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2>Acesso Administrativo</h2>
-        <form id="formLogin"> <div class="input-group">
-                <label for="usuario">E-mail</label>
-                <input type="email" id="usuario" required> </div>
+   <div id="modalLogin" class="modal-login hidden">
+      <div class="modal-content">
+         <span class="close-modal">&times;</span>
+         <h2>Acesso Administrativo</h2>
+         <form id="formLogin">
             <div class="input-group">
-                <label for="senha">Senha</label>
-                <input type="password" id="senha" required> </div>
+               <label for="usuario">E-mail</label>
+               <input type="email" id="usuario" required>
+            </div>
+            <div class="input-group">
+               <label for="senha">Senha</label>
+               <input type="password" id="senha" required>
+            </div>
             <button type="submit" class="btn-login">Entrar</button>
-        </form>
-    </div>
-</div>
+         </form>
+      </div>
+   </div>
 
 
 
-<div id="admin-super-panel" class="admin-card" style="display:none;">
-    <h3>Configurar Novo Cliente</h3>
-    <form id="form-permissoes-cliente">
-        <div class="input-group">
+   <div id="admin-super-panel" class="admin-card" style="display:none;">
+      <h3>Configurar Novo Cliente</h3>
+      <form id="form-permissoes-cliente">
+         <div class="input-group">
             <label>E-mail do Cliente:</label>
             <input type="email" id="cliente-id" placeholder="email@cliente.com" required>
-        </div>
-        
-        <div class="input-group">
+         </div>
+
+         <div class="input-group">
             <label>Senha Provisória:</label>
             <input type="text" id="senha-provisoria" placeholder="Ex: 123456" required>
-        </div>
+         </div>
 
-        <div class="permissions-grid">
+         <div class="permissions-grid">
             <h4>Liberar Acessos:</h4>
             <label><input type="checkbox" name="func" value="veiculos"> Veículos</label>
             <label><input type="checkbox" name="func" value="promocoes"> Promoções</label>
@@ -1849,11 +1851,11 @@ HFFJYFJ
             <label><input type="checkbox" name="func" value="imagens"> Imagens</label>
             <label><input type="checkbox" name="func" value="imoveis"> Imóveis</label>
             <label><input type="checkbox" name="func" value="eventos"> Eventos</label>
-        </div>
-        
-        <button type="submit" class="btn-save">Salvar e Criar Acesso</button>
-    </form>
-</div>
+         </div>
+
+         <button type="submit" class="btn-save">Salvar e Criar Acesso</button>
+      </form>
+   </div>
 
 </body>
 
