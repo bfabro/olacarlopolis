@@ -760,7 +760,7 @@ button {
 					diasFiltrados.forEach(dia => {
 						const acessosDia = dadosAcessos[dia]?.detalhados || {};
 						Object.values(acessosDia).forEach(acesso => {
-							const origem = acesso.origem || "acesso direto";
+							const origem = acesso.origem || "Site ou App";
 							if (!origens[origem]) origens[origem] = 0;
 							origens[origem]++;
 						});
