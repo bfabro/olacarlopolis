@@ -3,53 +3,58 @@
 
 
 
-
+// ===== LOGIN ADMIN (único) =====// ===== LOGIN ADMIN (Firebase Auth + Perfil no RTDB) =====
 document.addEventListener("DOMContentLoaded", () => {
   const formLogin = document.getElementById("formLogin");
+  if (!formLogin) return;
 
-  if (formLogin) {
-    formLogin.addEventListener("submit", function (e) {
-      e.preventDefault(); // Impede a página de recarregar
+  formLogin.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const emailDigitado = document.getElementById("usuario").value.trim();
-      const senhaDigitada = document.getElementById("senha").value.trim();
+    const emailDigitado = document.getElementById("usuario").value.trim().toLowerCase();
+    const senhaDigitada = document.getElementById("senha").value.trim();
 
-      console.log("Tentativa de login:", emailDigitado);
+    try {
+      // 1) Login pelo Firebase Auth
+      const cred = await firebase.auth().signInWithEmailAndPassword(emailDigitado, senhaDigitada);
+      const user = cred.user;
 
-      // 1. Aceder ao Firebase
-      firebase.database().ref('usuarios').once('value')
-        .then((snapshot) => {
-          let usuarioLogado = null;
+      // 2) Carrega perfil/permissões do RTDB
+      // Opção preferida: usuariosByUid/{uid}
+      let perfilSnap = await firebase.database().ref(`usuariosByUid/${user.uid}`).once("value");
+      let perfil = perfilSnap.val();
 
-          if (!snapshot.exists()) {
-            alert("Erro: Nenhum utilizador cadastrado no banco de dados.");
-            return;
-          }
+      // Compat com seu formato antigo: usuarios/{email_sem_ponto}
+      if (!perfil) {
+        const userId = emailDigitado.replace(/\./g, "_");
+        perfilSnap = await firebase.database().ref(`usuarios/${userId}`).once("value");
+        perfil = perfilSnap.val();
+      }
 
-          snapshot.forEach((childSnapshot) => {
-            const user = childSnapshot.val();
-            if (user.email === emailDigitado && user.senha === senhaDigitada) {
-              usuarioLogado = user;
-            }
-          });
+      if (!perfil) {
+        alert("Seu usuário existe no Auth, mas não tem perfil/permissões no banco.");
+        return;
+      }
 
-          if (usuarioLogado) {
-            alert("Acesso concedido!");
-            document.getElementById("modalLogin").classList.add("hidden");
+      // 3) Normaliza dados do usuário logado (o painel usa role/permissoes/email)
+      const usuarioLogado = {
+        uid: user.uid,
+        email: user.email,
+        role: perfil.role || "cliente",
+        permissoes: perfil.permissoes || {}
+      };
 
-            // Executa a função que mostra os painéis
-            liberarPainelPorNivel(usuarioLogado);
-          } else {
-            alert("E-mail ou senha incorretos.");
-          }
-        })
-        .catch(error => {
-          console.error("Erro Firebase:", error);
-          alert("Erro ao conectar ao banco de dados.");
-        });
-    });
-  }
+      // 4) Fecha modal e monta painel
+      document.getElementById("modalLogin").classList.add("hidden");
+      montarPainelAdmin(usuarioLogado);
+
+    } catch (err) {
+      console.error(err);
+      alert("E-mail ou senha inválidos (Auth).");
+    }
+  });
 });
+
 
 
 
@@ -78,44 +83,6 @@ function mostrarOpcoesCadastro(usuario) {
 
 
 
-
-
-
-
-// Localize o evento de submit do formLogin e substitua por este:
-document.getElementById("formLogin")?.addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const emailDigitado = document.getElementById("usuario").value.trim();
-  const senhaDigitada = document.getElementById("senha").value.trim();
-
-  // Referência para o nó 'usuarios' no seu Firebase
-  const dbRef = firebase.database().ref('usuarios');
-
-  dbRef.once('value').then((snapshot) => {
-    let usuarioEncontrado = null;
-
-    snapshot.forEach((childSnapshot) => {
-      const user = childSnapshot.val();
-      if (user.email === emailDigitado && user.senha === senhaDigitada) {
-        usuarioEncontrado = user;
-      }
-    });
-
-    if (usuarioEncontrado) {
-      alert("Acesso concedido!");
-      document.getElementById("modalLogin").classList.add("hidden");
-
-      // Chama a função que abre os painéis
-      liberarPainelPorNivel(usuarioEncontrado);
-    } else {
-      alert("E-mail ou senha incorretos.");
-    }
-  }).catch(error => {
-    console.error("Erro ao acessar Firebase:", error);
-    alert("Erro de conexão. Verifique as chaves do Firebase.");
-  });
-});
 
 
 
@@ -7102,64 +7069,323 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     imoveis: { nome: "Imóveis", campos: ["Tipo", "Cidade", "Valor", "Link_Imagem"] }
   };
 
-  // 2. Função que constrói o Painel após o Login
-  function montarPainelAdmin(dadosUsuario) {
-    document.getElementById("page-admin").style.display = "block";
-    document.getElementById("nome-usuario-logado").innerText = dadosUsuario.email;
+  // ===== ESTADO GLOBAL DO ADMIN =====
+let ADMIN_USER = null;           // dados do usuário logado
+let ADMIN_OWNER_EMAIL = null;    // "dono" atual (cliente selecionado)
+let ADMIN_TIPO_ATUAL = null;     // módulo atual (promocoes, veiculos, etc)
+let ADMIN_EDIT_KEY = null;       // chave do item em edição (Realtime DB)
 
-    const menu = document.getElementById("admin-menu-dinamico");
-    menu.innerHTML = ""; // Limpa menu anterior
+function isSuperAdmin(u) {
+  return String(u?.role || "").toLowerCase() === "superadmin";
+}
 
-    // Se for você, mostra a gestão de clientes
-    if (dadosUsuario.role === "superadmin") {
-      document.getElementById("super-admin-control").style.display = "block";
-    }
+// 2. Função que constrói o Painel após o Login
+async function montarPainelAdmin(dadosUsuario) {
+  ADMIN_USER = dadosUsuario;
 
-    // Cria botões apenas para o que o cliente tem permissão
-    Object.keys(dadosUsuario.permissoes || {}).forEach(chave => {
-      if (dadosUsuario.permissoes[chave] === true) {
+  const pageAdmin = document.getElementById("page-admin");
+  pageAdmin.style.display = "block"; // no seu HTML está como section escondida :contentReference[oaicite:5]{index=5}
+
+  document.getElementById("nome-usuario-logado").innerText =
+    isSuperAdmin(dadosUsuario) ? "Painel Administrativo (Master)" : dadosUsuario.email;
+
+  const menu = document.getElementById("admin-menu-dinamico");
+  menu.innerHTML = "";
+
+  // superadmin: mostra gestão de clientes
+  const superControl = document.getElementById("super-admin-control");
+  if (superControl) superControl.style.display = isSuperAdmin(dadosUsuario) ? "block" : "none";
+
+  // ✅ define owner padrão
+  ADMIN_OWNER_EMAIL = isSuperAdmin(dadosUsuario) ? "__todos__" : dadosUsuario.email;
+
+  // ✅ se superadmin, cria seletor de cliente no sidebar
+  if (isSuperAdmin(dadosUsuario)) {
+    await injetarSeletorClientesSidebar();
+  } else {
+    removerSeletorClientesSidebar();
+  }
+
+  // ✅ monta botões do menu:
+  // - superadmin: todos módulos
+  // - cliente: só os permitidos
+  if (isSuperAdmin(dadosUsuario)) {
+    Object.keys(CONFIG_MODULOS).forEach((chave) => {
+      const btn = document.createElement("button");
+      btn.className = "btn-menu-item";
+      btn.innerHTML = `<i class="fas fa-plus"></i> ${CONFIG_MODULOS[chave].nome}`;
+      btn.onclick = () => abrirFormularioCadastro(chave);
+      menu.appendChild(btn);
+    });
+  } else {
+    Object.keys(dadosUsuario.permissoes || {}).forEach((chave) => {
+      if (dadosUsuario.permissoes[chave] === true && CONFIG_MODULOS[chave]) {
         const btn = document.createElement("button");
         btn.className = "btn-menu-item";
         btn.innerHTML = `<i class="fas fa-plus"></i> ${CONFIG_MODULOS[chave].nome}`;
-        btn.onclick = () => abrirFormularioCadastro(chave, dadosUsuario.email);
+        btn.onclick = () => abrirFormularioCadastro(chave);
         menu.appendChild(btn);
       }
     });
   }
+}
+
+// ===== Seletor de clientes (somente superadmin) =====
+async function injetarSeletorClientesSidebar() {
+  const host = document.querySelector(".admin-user-info");
+  if (!host) return;
+
+  // evita duplicar
+  if (document.getElementById("admin-client-select")) return;
+
+  const wrap = document.createElement("div");
+  wrap.style.marginTop = "10px";
+  wrap.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:6px;">
+      <small style="opacity:.9;">Cliente para gerenciar</small>
+      <select id="admin-client-select" style="padding:10px;border-radius:10px;border:1px solid #2d3748;background:#0f172a;color:#fff;">
+        <option value="__todos__">Todos (ver geral)</option>
+      </select>
+    </div>
+  `;
+  host.appendChild(wrap);
+
+  const sel = document.getElementById("admin-client-select");
+
+  // carrega lista de clientes
+  const snap = await firebase.database().ref("usuarios").once("value");
+  const clientes = [];
+  snap.forEach((ch) => {
+    const u = ch.val();
+    if (String(u?.role || "") === "cliente" && u?.email) clientes.push(String(u.email));
+  });
+
+  clientes.sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+  clientes.forEach((email) => {
+    const opt = document.createElement("option");
+    opt.value = email;
+    opt.textContent = email;
+    sel.appendChild(opt);
+  });
+
+  sel.value = ADMIN_OWNER_EMAIL || "__todos__";
+
+  sel.addEventListener("change", () => {
+    ADMIN_OWNER_EMAIL = sel.value;
+    // se já estiver em algum módulo aberto, recarrega lista
+    if (ADMIN_TIPO_ATUAL) {
+      listarItensDoModulo(ADMIN_TIPO_ATUAL);
+    }
+  });
+}
+
+function removerSeletorClientesSidebar() {
+  const sel = document.getElementById("admin-client-select");
+  if (sel?.parentElement?.parentElement) sel.parentElement.parentElement.remove();
+}
+
 
   // 3. Gera o formulário de cadastro dinamicamente
-  function abrirFormularioCadastro(tipo, emailDono) {
-    const editor = document.getElementById("editor-de-conteudo");
-    const container = document.getElementById("container-campos-dinamicos");
+  function abrirFormularioCadastro(tipo) {
+  ADMIN_TIPO_ATUAL = tipo;
+  ADMIN_EDIT_KEY = null;
 
-    editor.style.display = "block";
-    document.getElementById("titulo-modulo-atual").innerText = "Gerenciar " + CONFIG_MODULOS[tipo].nome;
-    container.innerHTML = ""; // Limpa campos antigos
+  const editor = document.getElementById("editor-de-conteudo");
+  const container = document.getElementById("container-campos-dinamicos");
+  const titulo = document.getElementById("titulo-modulo-atual");
+  const form = document.getElementById("form-cadastro-geral");
 
-    CONFIG_MODULOS[tipo].campos.forEach(campo => {
-      container.innerHTML += `
-            <div class="input-group">
-                <label>${campo}:</label>
-                <input type="text" name="${campo}" required placeholder="Digite o ${campo}">
-            </div>`;
-    });
+  editor.style.display = "block";
+  titulo.innerText = "Gerenciar " + CONFIG_MODULOS[tipo].nome;
 
-    // Configura o salvamento para este formulário específico
-    document.getElementById("form-cadastro-geral").onsubmit = (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const objetoParaSalvar = Object.fromEntries(formData.entries());
+  // cria campos
+  container.innerHTML = "";
+  CONFIG_MODULOS[tipo].campos.forEach((campo) => {
+    container.innerHTML += `
+      <div class="input-group">
+        <label>${campo}:</label>
+        <input type="text" name="${campo}" placeholder="Digite ${campo}">
+      </div>
+    `;
+  });
 
-      objetoParaSalvar.dono = emailDono; // Vincula o item ao cliente
-      objetoParaSalvar.timestamp = Date.now();
+  // cria/garante a área de lista abaixo do form
+  garantirAreaListaItens();
 
-      firebase.database().ref(`conteudo/${tipo}`).push(objetoParaSalvar)
-        .then(() => {
-          alert("Sucesso! O item já está disponível no banco de dados.");
-          e.target.reset();
-        });
-    };
+  // submit = criar ou editar
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+
+    // regra: cliente só mexe no próprio
+    if (!isSuperAdmin(ADMIN_USER) && ADMIN_OWNER_EMAIL !== ADMIN_USER.email) {
+      alert("Permissão negada.");
+      return;
+    }
+
+    const formData = new FormData(e.target);
+    const payload = Object.fromEntries(formData.entries());
+
+    payload.dono = isSuperAdmin(ADMIN_USER)
+      ? (ADMIN_OWNER_EMAIL === "__todos__" ? ADMIN_USER.email : ADMIN_OWNER_EMAIL)
+      : ADMIN_USER.email;
+
+    payload.updatedAt = Date.now();
+
+    const refBase = firebase.database().ref(`conteudo/${tipo}`);
+
+    try {
+      if (ADMIN_EDIT_KEY) {
+        await refBase.child(ADMIN_EDIT_KEY).update(payload);
+        alert("Item atualizado!");
+      } else {
+        payload.createdAt = Date.now();
+        await refBase.push(payload);
+        alert("Item criado!");
+      }
+
+      ADMIN_EDIT_KEY = null;
+      e.target.reset();
+      listarItensDoModulo(tipo);
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao salvar.");
+    }
+  };
+
+  // carrega lista
+  listarItensDoModulo(tipo);
+}
+
+function garantirAreaListaItens() {
+  const editor = document.getElementById("editor-de-conteudo");
+  if (!editor) return;
+
+  if (document.getElementById("admin-lista-itens")) return;
+
+  const div = document.createElement("div");
+  div.id = "admin-lista-itens";
+  div.style.marginTop = "14px";
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+      <h4 style="margin:0;">Itens cadastrados</h4>
+      <button type="button" id="btn-admin-novo" class="btn-save-database" style="width:auto;padding:10px 14px;">
+        Novo item
+      </button>
+    </div>
+    <div id="admin-lista-itens-conteudo" style="margin-top:10px; display:flex; flex-direction:column; gap:10px;"></div>
+  `;
+
+  editor.appendChild(div);
+
+  document.getElementById("btn-admin-novo").onclick = () => {
+    ADMIN_EDIT_KEY = null;
+    document.getElementById("form-cadastro-geral").reset();
+  };
+}
+
+async function listarItensDoModulo(tipo) {
+  const box = document.getElementById("admin-lista-itens-conteudo");
+  if (!box) return;
+
+  box.innerHTML = "Carregando...";
+
+  const refBase = firebase.database().ref(`conteudo/${tipo}`);
+  let snap;
+
+  // superadmin pode ver todos ou filtrar por cliente
+  if (isSuperAdmin(ADMIN_USER)) {
+    if (ADMIN_OWNER_EMAIL === "__todos__") {
+      snap = await refBase.once("value");
+    } else {
+      snap = await refBase.orderByChild("dono").equalTo(ADMIN_OWNER_EMAIL).once("value");
+    }
+  } else {
+    // cliente: sempre apenas dele
+    snap = await refBase.orderByChild("dono").equalTo(ADMIN_USER.email).once("value");
   }
+
+  const itens = [];
+  snap.forEach((ch) => itens.push({ key: ch.key, ...ch.val() }));
+  itens.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
+
+  if (!itens.length) {
+    box.innerHTML = `<div style="opacity:.8;">Nenhum item cadastrado ainda.</div>`;
+    return;
+  }
+
+  box.innerHTML = "";
+  itens.forEach((it) => {
+    const card = document.createElement("div");
+    card.style.cssText = "border:1px solid #e5e7eb;border-radius:12px;padding:12px;background:#fff;";
+    const donoInfo = it.dono ? `<div style="font-size:12px;opacity:.7;">Dono: ${it.dono}</div>` : "";
+
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="flex:1;min-width:220px;">
+          <div style="font-weight:800;">${resumoItem(tipo, it)}</div>
+          ${donoInfo}
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" data-edit="${it.key}" class="btn-save-database" style="width:auto;padding:8px 12px;">Editar</button>
+          <button type="button" data-del="${it.key}" class="btn-logout" style="width:auto;padding:8px 12px;">Excluir</button>
+        </div>
+      </div>
+    `;
+
+    box.appendChild(card);
+  });
+
+  // bind editar/excluir
+  box.querySelectorAll("[data-edit]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const key = btn.getAttribute("data-edit");
+      await carregarItemParaEdicao(tipo, key);
+    });
+  });
+
+  box.querySelectorAll("[data-del]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const key = btn.getAttribute("data-del");
+      if (!confirm("Excluir este item?")) return;
+      await firebase.database().ref(`conteudo/${tipo}/${key}`).remove();
+      listarItensDoModulo(tipo);
+    });
+  });
+}
+
+function resumoItem(tipo, item) {
+  // pega o primeiro campo do módulo como título
+  const campos = CONFIG_MODULOS[tipo]?.campos || [];
+  const c0 = campos[0];
+  if (c0 && item[c0]) return String(item[c0]);
+  // fallback
+  const keys = Object.keys(item).filter(k => !["dono","createdAt","updatedAt","timestamp"].includes(k));
+  return keys.length ? `${keys[0]}: ${String(item[keys[0]])}` : "Item";
+}
+
+async function carregarItemParaEdicao(tipo, key) {
+  const snap = await firebase.database().ref(`conteudo/${tipo}/${key}`).once("value");
+  const data = snap.val();
+  if (!data) return;
+
+  // cliente não edita item de outro dono
+  if (!isSuperAdmin(ADMIN_USER) && data.dono !== ADMIN_USER.email) {
+    alert("Permissão negada.");
+    return;
+  }
+
+  ADMIN_EDIT_KEY = key;
+
+  // preenche o form
+  const form = document.getElementById("form-cadastro-geral");
+  const campos = CONFIG_MODULOS[tipo].campos || [];
+  campos.forEach((campo) => {
+    const input = form.querySelector(`[name="${campo}"]`);
+    if (input) input.value = data[campo] ?? "";
+  });
+}
+
 
 
 
@@ -11690,7 +11916,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
             novidadesImages: [
               //"images/servicos/revendedor/tati/divulgacao/00.jpg",
-              "images/servicos/revendedor/tati/divulgacao/0.jpg",
+             // "images/servicos/revendedor/tati/divulgacao/0.jpg",
               "images/servicos/revendedor/tati/divulgacao/2.jpg",
 
               "images/servicos/revendedor/tati/divulgacao/1.jpg",
@@ -11705,7 +11931,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             ],
             novidadesDescriptions: [
               //  "Promoçao de Fim de semana!",
-              "30% De desconto em todos os produtos, entre em contato e aproveite!!!",
+             // "30% De desconto em todos os produtos, entre em contato e aproveite!!!",
               "Quer fios mais fortes, hidratados e com brilho de salão? ✨<br>Experimente o poder da linha Lizz Ante Profissional <br>Resultado que se vê, sente e apaixona! 💕",
             ],
 
