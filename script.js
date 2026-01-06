@@ -1589,13 +1589,29 @@ document.addEventListener("DOMContentLoaded", function () {
     userRef.onDisconnect().remove();
 
     // Atualiza o contador de usuários online
-    onlineUsersRef.on("value", (snapshot) => {
-      const userCount = snapshot.numChildren();
-      const contador = document.getElementById("contador");
-      if (contador) {
-        contador.textContent = userCount;
-      }
-    });
+   onlineUsersRef.on("value", (snapshot) => {
+    const userCount = snapshot.numChildren();
+
+    // Atualiza somente o número visível
+    if (contadorEl) {
+      contadorEl.textContent = userCount;
+    }
+
+    // Se aumentou, aplica efeito no ícone
+    if (iconeEl && userCount > contadorAnterior) {
+      iconeEl.style.color = "red";
+      iconeEl.classList.add("pulsando");
+
+      setTimeout(() => {
+        iconeEl.style.color = "#808080";
+        iconeEl.classList.remove("pulsando");
+      }, 5000);
+    }
+
+    contadorAnterior = userCount;
+
+
+  });
   });
 
 
@@ -5334,6 +5350,38 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/terreno3/05.jpeg",
         "images/imoveis/luiz/venda/terreno3/06.jpeg",
         "images/imoveis/luiz/venda/terreno3/07.jpeg",
+
+      ],
+
+
+    },
+
+
+
+
+
+
+    {
+      id: "ter12",
+      codRef: "T_012",
+      procura: "terreno", // ou "terreno", "rural", etc.   
+      tipo: "venda",
+      titulo: "Terreno à venda no Residencial Jardim Primavera",
+      descricao: "Terreno amplo com formato diferenciado, ideal para um projeto moderno. Excelente localização, perfeito para construção de casa térrea, sobrado ou investimento.",
+      endereco: "Residencial Jardim Primavera",
+      area: "387m²",
+      valor: 135000,
+      telefone: "43 98803-4095",
+      corretores: ["Luiz Vilas Boas - 52.194"],
+      imagens: [
+
+        "images/imoveis/luiz/venda/terreno4/01.jpeg",
+        "images/imoveis/luiz/venda/terreno4/02.jpeg",
+        "images/imoveis/luiz/venda/terreno4/03.jpeg",
+        "images/imoveis/luiz/venda/terreno4/04.jpeg",
+        "images/imoveis/luiz/venda/terreno4/05.jpeg",
+        "images/imoveis/luiz/venda/terreno4/06.jpeg",
+        "images/imoveis/luiz/venda/terreno5/07.jpeg",
 
       ],
 
