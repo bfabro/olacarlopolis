@@ -5381,7 +5381,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/terreno4/04.jpeg",
         "images/imoveis/luiz/venda/terreno4/05.jpeg",
         "images/imoveis/luiz/venda/terreno4/06.jpeg",
-        "images/imoveis/luiz/venda/terreno5/07.jpeg",
+       
 
       ],
 
