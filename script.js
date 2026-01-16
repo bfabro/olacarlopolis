@@ -1562,7 +1562,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
+// Função para identificar a origem do acesso
+function getOrigemAcesso() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const origemUrl = urlParams.get('o'); // Detecta se tem ?o=instagram na URL
+    
+    // 1. Verifica se veio do Instagram
+    if (origemUrl === 'instagram' || document.referrer.includes('instagram.com')) {
+        return 'insta';
+    }
+    // 2. Verifica se veio do App (PWA)
+    // Nota: Aqui usei a lógica da sua função detectarCanalAcesso()
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        return 'app';
+    }
+    // 3. Padrão: Site
+    return 'site';
+}
 
   // Variável global para controle do pulso
   let contadorAnterior = 0;
@@ -1587,16 +1603,19 @@ document.addEventListener("DOMContentLoaded", function () {
         // Cria uma entrada única para esta aba
         const myUserRef = onlineUsersRef.push();
 
+        myUserRef.set({
+            origem: getOrigemAcesso(), // <--- ADICIONE ESTA LINHA
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+
         // Quando desconectar, remove
         myUserRef.onDisconnect().remove();
 
-        // Salva os dados
-        myUserRef.set({
-          timestamp: firebase.database.ServerValue.TIMESTAMP,
-          dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
-        });
+     
       }
     });
+
+    
 
     // 4. Atualização em tempo real do contador
     onlineUsersRef.on("value", (snapshot) => {
@@ -1677,6 +1696,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     return isStandalone ? "App (PWA)" : "Site (Navegador)";
   }
+
+
+
+  
 
 
 
@@ -1784,6 +1807,32 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   registrarAcesso();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
   // Função para registrar clique no Firebase
   function registrarCliqueBotao(tipo, idEstabelecimento) {

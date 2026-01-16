@@ -9261,3 +9261,47 @@ tr[data-inativo="true"] {
         filter: drop-shadow(0 0 0px rgba(255, 0, 0, 0));
     }
 }
+
+
+/*  */
+
+
+/* Base para todos os pulsos */
+.pulse-base {
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* PULSO VERMELHO (SITE) */
+.pulse-site {
+    color: #ff0000 !important;
+    animation-name: pulse-red;
+}
+@keyframes pulse-red {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)); }
+}
+
+/* PULSO AZUL (APP) */
+.pulse-app {
+    color: #0095f6 !important;
+    animation-name: pulse-blue;
+}
+@keyframes pulse-blue {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); filter: drop-shadow(0 0 5px rgba(0, 149, 246, 0.6)); }
+}
+
+/* PULSO ROXO (INSTAGRAM) */
+.pulse-insta {
+    color: #833ab4 !important;
+    animation-name: pulse-purple;
+}
+@keyframes pulse-purple {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); filter: drop-shadow(0 0 5px rgba(131, 58, 180, 0.6)); }
+}
