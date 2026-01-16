@@ -13995,16 +13995,16 @@ async function carregarItemParaEdicao(tipo, key) {
           {
             image: "images/comercios/restaurante/namigo/perfil.jpg",
             name: "NamiGO Japanese",
-            hours: "Seg a Sab:16:00h as 00:00h",
+            hours: "Ter a Dom: 16:00h as 00:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "16:00", fim: "00:00" }],
+              seg: [],
               ter: [{ inicio: "16:00", fim: "00:00" }],
               qua: [{ inicio: "16:00", fim: "00:00" }],
               qui: [{ inicio: "16:00", fim: "00:00" }],
               sex: [{ inicio: "16:00", fim: "00:00" }],
               sab: [{ inicio: "16:00", fim: "00:00" }],
-              dom: []
+              dom: [{ inicio: "16:00", fim: "00:00" }]
             },
             address: "R. Padre Hugo, 460 - Carlopolis",
             contact: "(43) 99166-5381",
@@ -14285,16 +14285,16 @@ async function carregarItemParaEdicao(tipo, key) {
             image: "images/comercios/restaurante/selaht/selaht.png",
             name: "Selaht Grill",
             /* hours: "<span style='color:#FF0000;font-weight:bold;'>VOLTAMOS DIA 10/07/2025</span>",*/
-            hours: "Seg a Sab: 11:00h - 00:00h",
+            hours: "Ter a Dom: 11:00h - 00:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "11:00", fim: "00:00" }],
+              seg: [],
               ter: [{ inicio: "11:00", fim: "00:00" }],
               qua: [{ inicio: "11:00", fim: "00:00" }],
               qui: [{ inicio: "11:00", fim: "00:00" }],
               sex: [{ inicio: "11:00", fim: "00:00" }],
               sab: [{ inicio: "11:00", fim: "00:00" }],
-              dom: []
+              dom: [{ inicio: "11:00", fim: "00:00" }]
             },
             address: "R. Padre Hugo, 460 - Carlopolis",
             contact: "(43) 99160-5120",
