@@ -1564,59 +1564,67 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-// 1. Variável de controle global (fora de tudo)
+// Variável global para controle do pulso
 let contadorAnterior = 0;
 
-document.addEventListener("DOMContentLoaded", function () {
-    // 2. Captura dos elementos com os IDs REAIS do seu index.html
-    const contadorEl = document.getElementById("contadorOnline"); 
+function inicializarContadorOnline() {
+    // 1. Captura os elementos exatos do seu HTML
+    const contadorEl = document.getElementById("contadorOnline");
     const iconeEl = document.getElementById("iconeUsuarios");
 
-    // 3. Referências Firebase
+    if (!contadorEl) {
+        console.warn("Elemento 'contadorOnline' não encontrado no HTML.");
+        return;
+    }
+
+    // 2. Referência do Firebase
     const onlineUsersRef = firebase.database().ref("onlineUsers");
     const connectedRef = firebase.database().ref(".info/connected");
 
-    // Lógica de Presença: Garante que você seja contado assim que o Firebase conectar
-    connectedRef.on("value", (snapshot) => {
-        if (snapshot.val() === true) {
-            // Cria um ID único para esta sua aba aberta
+    // 3. Gerenciamento de Presença (O "pulo do gato")
+    connectedRef.on("value", (snap) => {
+        if (snap.val() === true) {
+            // Cria uma entrada única para esta aba
             const myUserRef = onlineUsersRef.push();
 
-            // Quando você fechar o site, o Firebase remove este ID automaticamente
+            // Quando desconectar, remove
             myUserRef.onDisconnect().remove();
 
-            // Salva os dados básicos
+            // Salva os dados
             myUserRef.set({
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
-                canal: typeof detectarCanalAcesso === "function" ? detectarCanalAcesso() : "web"
+                dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
             });
         }
     });
 
-    // 4. Atualização em Tempo Real do Contador
+    // 4. Atualização em tempo real do contador
     onlineUsersRef.on("value", (snapshot) => {
         const userCount = snapshot.numChildren() || 0;
         
-        // Atualiza o número no ecrã
-        if (contadorEl) {
-            contadorEl.textContent = userCount;
-        }
+        // Atualiza o texto
+        contadorEl.textContent = userCount;
 
-        // Efeito Pulse: Se o número subiu, o ícone brilha
+        // Efeito Visual Pulse
         if (iconeEl && userCount > contadorAnterior) {
-            iconeEl.style.transition = "all 0.3s ease";
-            iconeEl.style.color = "#ff0000"; // Vermelho
+            iconeEl.style.color = "red";
             iconeEl.classList.add("pulsando");
 
             setTimeout(() => {
-                iconeEl.style.color = "#808080"; // Cinza padrão
+                iconeEl.style.color = "#808080";
                 iconeEl.classList.remove("pulsando");
             }, 5000);
         }
         contadorAnterior = userCount;
     });
-});
+}
 
+// Inicialização segura
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", inicializarContadorOnline);
+} else {
+    inicializarContadorOnline();
+}
   
 
 
