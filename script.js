@@ -5491,7 +5491,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       titulo: "Terreno à venda no Residencial Vila Ray",
       descricao: "Terreno de esquina com ótima localização, por  valor abaixo de mercado, ideal para quem busca comprar bem e lucrar com a valorização.",
-      endereco: "Residencial Jardim Primavera",
+      endereco: "Residencial Vila Ray",
       area: "234m² - 13x18",
       valor: 60000,
       telefone: "43 98803-4095",
