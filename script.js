@@ -2264,7 +2264,7 @@ document.addEventListener("DOMContentLoaded", function () {
     gcyvazamentos: "s",
 
     // estudio de beleza
-    veronicakataoka: "s",
+    veronicakataoka: "n",
 
     //farmacia
     elshaday: "s",
