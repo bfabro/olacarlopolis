@@ -5431,8 +5431,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       corretores: ["Luiz Vilas Boas - 52.194"],
       imagens: [
 
-        "images/imoveis/luiz/venda/terreno6/01.jpeg",
-        "images/imoveis/luiz/venda/terreno6/02.jpeg",
+        "images/imoveis/luiz/venda/terreno6/01.jpg",
+        "images/imoveis/luiz/venda/terreno6/02.jpg",
          
 
       ],
