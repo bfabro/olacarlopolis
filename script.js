@@ -2481,11 +2481,10 @@ document.addEventListener("DOMContentLoaded", function () {
     //calendarioeventos: "s",
     feiradalua: "n",
 
-    campeonatoeliteredai: "n",
+  carnaIlha:"s",
 
-    pedalaparana: "n",
 
-    showdavirada2026: "s",
+   
     cafedamanhadosamigos: "s",
 
 
