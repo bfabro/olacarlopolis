@@ -14625,18 +14625,80 @@ async function carregarItemParaEdicao(tipo, key) {
           
                     {
                       name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/61.jpg",
-                      date: "01/12/2025",
+                      image: "images/informacoes/notaFalecimento/cristoRei/69.jpg",
+                      date: "16/01/2026",
                       descricaoFalecido: "",          
                     },
 
                      {
                       name: "Funeraria Grupo Castilho",
                       image: "images/informacoes/notaFalecimento/castilho/36.jpg",
-                      date: "21/12/2025",
+                      date: "01/01/2026",
                       descricaoFalecido: "",          
                     },
           */
+
+
+
+
+                      {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/68.jpg",
+                      date: "15/01/2026",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. ANTÔNIO JOSÉ DA SILVA, aos 83 anos, ocorrido em Jacarezinho, nosso querido Tunico da Sorveteria!<BR>O velório será realizado no Velório Municipal Lauro Soares.<BR>A cerimônia do sepultamento ocorrerá amanhã 16/01/2026 em horário a ser definido, no Cemitério Municipal de Carlópolis.<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+                      {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/67.jpg",
+                      date: "15/01/2026",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. CRISTIANE YOSHIRO KANASHIRO, aos 51 anos, ocorrido em Londrina.<BR>O velório iniciará hoje às 15:30 horas no Velório Municipal.<BR>A cerimônia do sepultamento ocorrerá amanhã às 09:00 horas, no Cemitério Municipal de Carlópolis.<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+  {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/66.jpg",
+                      date: "05/01/2026",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. JOSÉ CAMILO DE SOUZA aos 75 anos, mais conhecido como “Zé Camilo da Farmácia”, ocorrido em Londrina.<BR>O velório iniciará hoje às 15:45 horas no Municipal.<BR>A cerimônia do sepultamento será amanhã às 08:00 horas.<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+                        {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/65.jpg",
+                      date: "03/01/2026",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. JORGE DA SILVA aos 94 anos, Irmão do falecido Teleco ocorrido em Carlópolis.<BR>O velório iniciará hoje às 17:30 horas no Velório Municipal.<BR>A cerimônia do sepultamento ocorrerá amanhã às 09:00 horas no Cemitério Municipal de Carlópolis<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+{
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/64.jpg",
+                      date: "27/12/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. MARIA AUGUSTA DE OLIVEIRA LAERSON, aos 65 anos, ocorrido em Londrina.<Br>O velório iniciará hoje às 22:00 horas no Velório Municipal.<Br>A cerimônia do sepultamento ocorrerá amanhã 07:00 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+
+
+                     {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/63.jpg",
+                      date: "24/12/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. NOEMIA ROSA DA SILVA DO NASCIMENTO, aos 87 anos, mãe do Tuco e do Vardinho, ocorrido em Carlópolis.<br>O velório iniciará hoje às 18:30 horas no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá amanhã 10:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+                      {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/62.jpg",
+                      date: "24/12/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. PALMIRA FERREIRA, aos 83 anos, ocorrido em Arapongas.<br>O velório iniciará hoje às 07:00 horas no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá hoje às 15:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+
+                      {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/61.jpg",
+                      date: "23/12/2025",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. EMERSON BENEDITO BRANCO aos 49 anos, filho do Sr Hélio do Ônibus, ocorrido em Carlópolis.<br>O velório será realizado no Velório Municipal, às 20:00 horas.<br>A cerimônia do sepultamento ocorrerá amanhã às 10:00 horas no Cemitério Municipal de Carlópolis<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
 
 
           {
