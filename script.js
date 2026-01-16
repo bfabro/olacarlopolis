@@ -1557,24 +1557,24 @@ document.addEventListener("DOMContentLoaded", function () {
     return null;
   }
 
-//////
+  //////
 
 
 
 
 
 
-// Variável global para controle do pulso
-let contadorAnterior = 0;
+  // Variável global para controle do pulso
+  let contadorAnterior = 0;
 
-function inicializarContadorOnline() {
+  function inicializarContadorOnline() {
     // 1. Captura os elementos exatos do seu HTML
     const contadorEl = document.getElementById("contadorOnline");
     const iconeEl = document.getElementById("iconeUsuarios");
 
     if (!contadorEl) {
-        console.warn("Elemento 'contadorOnline' não encontrado no HTML.");
-        return;
+      console.warn("Elemento 'contadorOnline' não encontrado no HTML.");
+      return;
     }
 
     // 2. Referência do Firebase
@@ -1583,49 +1583,52 @@ function inicializarContadorOnline() {
 
     // 3. Gerenciamento de Presença (O "pulo do gato")
     connectedRef.on("value", (snap) => {
-        if (snap.val() === true) {
-            // Cria uma entrada única para esta aba
-            const myUserRef = onlineUsersRef.push();
+      if (snap.val() === true) {
+        // Cria uma entrada única para esta aba
+        const myUserRef = onlineUsersRef.push();
 
-            // Quando desconectar, remove
-            myUserRef.onDisconnect().remove();
+        // Quando desconectar, remove
+        myUserRef.onDisconnect().remove();
 
-            // Salva os dados
-            myUserRef.set({
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
-            });
-        }
+        // Salva os dados
+        myUserRef.set({
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
+        });
+      }
     });
 
     // 4. Atualização em tempo real do contador
     onlineUsersRef.on("value", (snapshot) => {
-        const userCount = snapshot.numChildren() || 0;
-        
-        // Atualiza o texto
+    const userCount = snapshot.numChildren() || 0;
+
+    if (contadorEl) {
         contadorEl.textContent = userCount;
+    }
 
-        // Efeito Visual Pulse
-        if (iconeEl && userCount > contadorAnterior) {
-            iconeEl.style.color = "red";
-            iconeEl.classList.add("pulsando");
+    // DISPARA O EFEITO EM CONJUNTO
+    if (iconeEl && userCount > contadorAnterior) {
+        // iconeEl deve ser o container que envolve <i> e <span>
+        iconeEl.classList.add("icone-notificacao");
 
-            setTimeout(() => {
-                iconeEl.style.color = "#808080";
-                iconeEl.classList.remove("pulsando");
-            }, 5000);
-        }
-        contadorAnterior = userCount;
-    });
-}
+        // Remove após 5 segundos
+        setTimeout(() => {
+            iconeEl.classList.remove("icone-notificacao");
+            // Se precisar voltar para a cor original (ex: cinza):
+            iconeEl.style.color = ""; 
+        }, 5000);
+    }
 
-// Inicialização segura
-if (document.readyState === "loading") {
+    contadorAnterior = userCount;
+});
+  }
+
+  // Inicialização segura
+  if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", inicializarContadorOnline);
-} else {
+  } else {
     inicializarContadorOnline();
-}
-  
+  }
 
 
 
@@ -1633,36 +1636,37 @@ if (document.readyState === "loading") {
 
 
 
-/////
+
+  /////
 
 
 
-  /// inicio detecta usuarios online e desconecta
-
+  /// inicio detecta usuarios online e desconecta x
 
   onlineUsersRef.on("value", (snapshot) => {
-    const userCount = snapshot.numChildren();
+    const userCount = snapshot.numChildren() || 0;
 
-    // Atualiza somente o número visível
     if (contadorEl) {
       contadorEl.textContent = userCount;
     }
 
-    // Se aumentou, aplica efeito no ícone
+    // DISPARA O EFEITO (Vermelho + Pulso)
     if (iconeEl && userCount > contadorAnterior) {
-      iconeEl.style.color = "red";
-      iconeEl.classList.add("pulsando");
+      // Adiciona a classe ao elemento pai (iconeUsuarios)
+      iconeEl.classList.add("icone-notificacao");
 
+      // Remove tudo após 5 segundos
       setTimeout(() => {
-        iconeEl.style.color = "#808080";
-        iconeEl.classList.remove("pulsando");
+        iconeEl.classList.remove("icone-notificacao");
       }, 5000);
     }
 
     contadorAnterior = userCount;
-
-
   });
+
+
+
+
 
   function detectarCanalAcesso() {
     const isStandalone =
@@ -2500,9 +2504,9 @@ if (document.readyState === "loading") {
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "n",
-    carnailha:"s",   
-    pescar:"s",
-    bloquinhodoagro:"s",
+    carnailha: "s",
+    pescar: "s",
+    bloquinhodoagro: "s",
     cafedamanhadosamigos: "s",
     campeonatovelocross2026: "s",
 

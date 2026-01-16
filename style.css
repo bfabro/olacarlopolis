@@ -9236,3 +9236,27 @@ tr[data-inativo="true"] {
   transform:translateY(-1px);
   box-shadow:0 12px 26px rgba(37,211,102,.45);
 }
+
+
+/* Animação unificada: Cor Vermelha + Pulso */
+.icone-notificacao i {
+    color: #ff0000 !important; /* Força a cor vermelha no ícone */
+    animation: pulse-red-total 1s ease-in-out infinite;
+    display: inline-block;
+}
+
+@keyframes pulse-red-total {
+    0% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 0 0px rgba(255, 0, 0, 0));
+    }
+    50% { 
+        transform: scale(1.4); 
+        /* Adiciona um brilho vermelho extra no pico do pulso */
+        filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8));
+    }
+    100% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 0 0px rgba(255, 0, 0, 0));
+    }
+}
