@@ -2481,7 +2481,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //calendarioeventos: "s",
     feiradalua: "n",
 
-  carnaIlha:"s",
+  carnailha:"s",
 
 
    
