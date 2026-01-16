@@ -2480,16 +2480,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "n",
-
-  carnailha:"s",
-
-
-   
+    carnailha:"s",   
+    pescar:"s",
+    bloquinhodoagro:"s",
     cafedamanhadosamigos: "s",
-
-
     campeonatovelocross2026: "s",
-
 
     /// FIM EVENTOS 
 
