@@ -2558,6 +2558,7 @@ document.addEventListener("DOMContentLoaded", function () {
     bloquinhodoagro: "s",
     cafedamanhadosamigos: "s",
     campeonatovelocross2026: "s",
+    ralimundodapesca:"s",
 
     /// FIM EVENTOS 
 
@@ -12157,6 +12158,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuEventos"),
         title: "Eventos em Carlópolis",
         establishments: [
+
+          {
+            image: "images/informacoes/eventos/9.jpg",
+            name: "Rali Mundo da Pesca",
+            date: "20/01/2026",            
+            instagram: "https://www.instagram.com/p/DTlCnrEAB-1/",
+            infoAdicional: "Acompanhe pelas redes sociais"
+          },
 
 
 
