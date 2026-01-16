@@ -1589,29 +1589,29 @@ document.addEventListener("DOMContentLoaded", function () {
     userRef.onDisconnect().remove();
 
     // Atualiza o contador de usuários online
-   onlineUsersRef.on("value", (snapshot) => {
-    const userCount = snapshot.numChildren();
+    onlineUsersRef.on("value", (snapshot) => {
+      const userCount = snapshot.numChildren();
 
-    // Atualiza somente o número visível
-    if (contadorEl) {
-      contadorEl.textContent = userCount;
-    }
+      // Atualiza somente o número visível
+      if (contadorEl) {
+        contadorEl.textContent = userCount;
+      }
 
-    // Se aumentou, aplica efeito no ícone
-    if (iconeEl && userCount > contadorAnterior) {
-      iconeEl.style.color = "red";
-      iconeEl.classList.add("pulsando");
+      // Se aumentou, aplica efeito no ícone
+      if (iconeEl && userCount > contadorAnterior) {
+        iconeEl.style.color = "red";
+        iconeEl.classList.add("pulsando");
 
-      setTimeout(() => {
-        iconeEl.style.color = "#808080";
-        iconeEl.classList.remove("pulsando");
-      }, 5000);
-    }
+        setTimeout(() => {
+          iconeEl.style.color = "#808080";
+          iconeEl.classList.remove("pulsando");
+        }, 5000);
+      }
 
-    contadorAnterior = userCount;
+      contadorAnterior = userCount;
 
 
-  });
+    });
   });
 
 
@@ -1645,14 +1645,14 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function detectarCanalAcesso() {
-  const isStandalone =
-    window.matchMedia?.("(display-mode: standalone)").matches ||
-    window.matchMedia?.("(display-mode: fullscreen)").matches ||
-    window.matchMedia?.("(display-mode: minimal-ui)").matches ||
-    window.navigator.standalone === true; // iOS
+    const isStandalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      window.matchMedia?.("(display-mode: fullscreen)").matches ||
+      window.matchMedia?.("(display-mode: minimal-ui)").matches ||
+      window.navigator.standalone === true; // iOS
 
-  return isStandalone ? "App (PWA)" : "Site (Navegador)";
-}
+    return isStandalone ? "App (PWA)" : "Site (Navegador)";
+  }
 
 
 
@@ -1681,7 +1681,7 @@ document.addEventListener("DOMContentLoaded", function () {
         pagina: window.location.href,
         referrer: document.referrer || "acesso direto",
         origem: new URLSearchParams(window.location.search).get("o") || "acesso direto",
-         canal: detectarCanalAcesso(), // ✅ NOVO (Site vs App)
+        canal: detectarCanalAcesso(), // ✅ NOVO (Site vs App)
         tela: `${window.screen.width}x${window.screen.height}`,
         dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
       });
@@ -2914,27 +2914,27 @@ document.addEventListener("DOMContentLoaded", function () {
     area.innerHTML = html;
 
     // Registrar cliques dos botões da página iGreen
-function registrarCliqueIgreen(tipo) {
-  // Usa sua função existente (Firebase)
-  if (typeof window.registrarCliqueBotao === "function") {
-    // idEstabelecimento aqui é fixo pra iGreen (pra ficar fácil de filtrar no relatório)
-    window.registrarCliqueBotao(tipo, "igreen");
-  }
-}
+    function registrarCliqueIgreen(tipo) {
+      // Usa sua função existente (Firebase)
+      if (typeof window.registrarCliqueBotao === "function") {
+        // idEstabelecimento aqui é fixo pra iGreen (pra ficar fácil de filtrar no relatório)
+        window.registrarCliqueBotao(tipo, "igreen");
+      }
+    }
 
-const btnCadastro = document.getElementById("btnIgreenCadastro");
-if (btnCadastro) {
-  btnCadastro.addEventListener("click", () => {
-    registrarCliqueIgreen("cadastro");
-  });
-}
+    const btnCadastro = document.getElementById("btnIgreenCadastro");
+    if (btnCadastro) {
+      btnCadastro.addEventListener("click", () => {
+        registrarCliqueIgreen("cadastro");
+      });
+    }
 
-const btnWhats = document.getElementById("btnIgreenWhats");
-if (btnWhats) {
-  btnWhats.addEventListener("click", () => {
-    registrarCliqueIgreen("whats_duvidas");
-  });
-}
+    const btnWhats = document.getElementById("btnIgreenWhats");
+    if (btnWhats) {
+      btnWhats.addEventListener("click", () => {
+        registrarCliqueIgreen("whats_duvidas");
+      });
+    }
 
 
     const btn = document.getElementById("btnCopiarLinkIgreen");
@@ -5381,7 +5381,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/terreno4/04.jpeg",
         "images/imoveis/luiz/venda/terreno4/05.jpeg",
         "images/imoveis/luiz/venda/terreno4/06.jpeg",
-       
+
 
       ],
 
@@ -5409,7 +5409,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/luiz/venda/terreno5/02.jpeg",
         "images/imoveis/luiz/venda/terreno5/03.jpeg",
         "images/imoveis/luiz/venda/terreno5/04.jpeg",
-        "images/imoveis/luiz/venda/terreno5/05.jpeg",      
+        "images/imoveis/luiz/venda/terreno5/05.jpeg",
 
       ],
     },
@@ -5433,7 +5433,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
         "images/imoveis/luiz/venda/terreno6/01.jpg",
         "images/imoveis/luiz/venda/terreno6/02.jpg",
-         
+
 
       ],
     },
@@ -7169,77 +7169,77 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   };
 
   // ===== ESTADO GLOBAL DO ADMIN =====
-let ADMIN_USER = null;           // dados do usuário logado
-let ADMIN_OWNER_EMAIL = null;    // "dono" atual (cliente selecionado)
-let ADMIN_TIPO_ATUAL = null;     // módulo atual (promocoes, veiculos, etc)
-let ADMIN_EDIT_KEY = null;       // chave do item em edição (Realtime DB)
+  let ADMIN_USER = null;           // dados do usuário logado
+  let ADMIN_OWNER_EMAIL = null;    // "dono" atual (cliente selecionado)
+  let ADMIN_TIPO_ATUAL = null;     // módulo atual (promocoes, veiculos, etc)
+  let ADMIN_EDIT_KEY = null;       // chave do item em edição (Realtime DB)
 
-function isSuperAdmin(u) {
-  return String(u?.role || "").toLowerCase() === "superadmin";
-}
-
-// 2. Função que constrói o Painel após o Login
-async function montarPainelAdmin(dadosUsuario) {
-  ADMIN_USER = dadosUsuario;
-
-  const pageAdmin = document.getElementById("page-admin");
-  pageAdmin.style.display = "block"; // no seu HTML está como section escondida :contentReference[oaicite:5]{index=5}
-
-  document.getElementById("nome-usuario-logado").innerText =
-    isSuperAdmin(dadosUsuario) ? "Painel Administrativo (Master)" : dadosUsuario.email;
-
-  const menu = document.getElementById("admin-menu-dinamico");
-  menu.innerHTML = "";
-
-  // superadmin: mostra gestão de clientes
-  const superControl = document.getElementById("super-admin-control");
-  if (superControl) superControl.style.display = isSuperAdmin(dadosUsuario) ? "block" : "none";
-
-  // ✅ define owner padrão
-  ADMIN_OWNER_EMAIL = isSuperAdmin(dadosUsuario) ? "__todos__" : dadosUsuario.email;
-
-  // ✅ se superadmin, cria seletor de cliente no sidebar
-  if (isSuperAdmin(dadosUsuario)) {
-    await injetarSeletorClientesSidebar();
-  } else {
-    removerSeletorClientesSidebar();
+  function isSuperAdmin(u) {
+    return String(u?.role || "").toLowerCase() === "superadmin";
   }
 
-  // ✅ monta botões do menu:
-  // - superadmin: todos módulos
-  // - cliente: só os permitidos
-  if (isSuperAdmin(dadosUsuario)) {
-    Object.keys(CONFIG_MODULOS).forEach((chave) => {
-      const btn = document.createElement("button");
-      btn.className = "btn-menu-item";
-      btn.innerHTML = `<i class="fas fa-plus"></i> ${CONFIG_MODULOS[chave].nome}`;
-      btn.onclick = () => abrirFormularioCadastro(chave);
-      menu.appendChild(btn);
-    });
-  } else {
-    Object.keys(dadosUsuario.permissoes || {}).forEach((chave) => {
-      if (dadosUsuario.permissoes[chave] === true && CONFIG_MODULOS[chave]) {
+  // 2. Função que constrói o Painel após o Login
+  async function montarPainelAdmin(dadosUsuario) {
+    ADMIN_USER = dadosUsuario;
+
+    const pageAdmin = document.getElementById("page-admin");
+    pageAdmin.style.display = "block"; // no seu HTML está como section escondida :contentReference[oaicite:5]{index=5}
+
+    document.getElementById("nome-usuario-logado").innerText =
+      isSuperAdmin(dadosUsuario) ? "Painel Administrativo (Master)" : dadosUsuario.email;
+
+    const menu = document.getElementById("admin-menu-dinamico");
+    menu.innerHTML = "";
+
+    // superadmin: mostra gestão de clientes
+    const superControl = document.getElementById("super-admin-control");
+    if (superControl) superControl.style.display = isSuperAdmin(dadosUsuario) ? "block" : "none";
+
+    // ✅ define owner padrão
+    ADMIN_OWNER_EMAIL = isSuperAdmin(dadosUsuario) ? "__todos__" : dadosUsuario.email;
+
+    // ✅ se superadmin, cria seletor de cliente no sidebar
+    if (isSuperAdmin(dadosUsuario)) {
+      await injetarSeletorClientesSidebar();
+    } else {
+      removerSeletorClientesSidebar();
+    }
+
+    // ✅ monta botões do menu:
+    // - superadmin: todos módulos
+    // - cliente: só os permitidos
+    if (isSuperAdmin(dadosUsuario)) {
+      Object.keys(CONFIG_MODULOS).forEach((chave) => {
         const btn = document.createElement("button");
         btn.className = "btn-menu-item";
         btn.innerHTML = `<i class="fas fa-plus"></i> ${CONFIG_MODULOS[chave].nome}`;
         btn.onclick = () => abrirFormularioCadastro(chave);
         menu.appendChild(btn);
-      }
-    });
+      });
+    } else {
+      Object.keys(dadosUsuario.permissoes || {}).forEach((chave) => {
+        if (dadosUsuario.permissoes[chave] === true && CONFIG_MODULOS[chave]) {
+          const btn = document.createElement("button");
+          btn.className = "btn-menu-item";
+          btn.innerHTML = `<i class="fas fa-plus"></i> ${CONFIG_MODULOS[chave].nome}`;
+          btn.onclick = () => abrirFormularioCadastro(chave);
+          menu.appendChild(btn);
+        }
+      });
+    }
   }
-}
 
-// ===== Seletor de clientes (somente superadmin) =====
-async function injetarSeletorClientesSidebar() {
-  const host = document.querySelector(".admin-user-info");
-  if (!host) return;
+  // ===== Seletor de clientes (somente superadmin) =====
+  async function injetarSeletorClientesSidebar() {
+    const host = document.querySelector(".admin-user-info");
+    if (!host) return;
 
-  // evita duplicar
-  if (document.getElementById("admin-client-select")) return;
+    // evita duplicar
+    if (document.getElementById("admin-client-select")) return;
 
-  const wrap = document.createElement("div");
-  wrap.style.marginTop = "10px";
-  wrap.innerHTML = `
+    const wrap = document.createElement("div");
+    wrap.style.marginTop = "10px";
+    wrap.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:6px;">
       <small style="opacity:.9;">Cliente para gerenciar</small>
       <select id="admin-client-select" style="padding:10px;border-radius:10px;border:1px solid #2d3748;background:#0f172a;color:#fff;">
@@ -7247,125 +7247,125 @@ async function injetarSeletorClientesSidebar() {
       </select>
     </div>
   `;
-  host.appendChild(wrap);
+    host.appendChild(wrap);
 
-  const sel = document.getElementById("admin-client-select");
+    const sel = document.getElementById("admin-client-select");
 
-  // carrega lista de clientes
-  const snap = await firebase.database().ref("usuarios").once("value");
-  const clientes = [];
-  snap.forEach((ch) => {
-    const u = ch.val();
-    if (String(u?.role || "") === "cliente" && u?.email) clientes.push(String(u.email));
-  });
+    // carrega lista de clientes
+    const snap = await firebase.database().ref("usuarios").once("value");
+    const clientes = [];
+    snap.forEach((ch) => {
+      const u = ch.val();
+      if (String(u?.role || "") === "cliente" && u?.email) clientes.push(String(u.email));
+    });
 
-  clientes.sort((a, b) => a.localeCompare(b, "pt-BR"));
+    clientes.sort((a, b) => a.localeCompare(b, "pt-BR"));
 
-  clientes.forEach((email) => {
-    const opt = document.createElement("option");
-    opt.value = email;
-    opt.textContent = email;
-    sel.appendChild(opt);
-  });
+    clientes.forEach((email) => {
+      const opt = document.createElement("option");
+      opt.value = email;
+      opt.textContent = email;
+      sel.appendChild(opt);
+    });
 
-  sel.value = ADMIN_OWNER_EMAIL || "__todos__";
+    sel.value = ADMIN_OWNER_EMAIL || "__todos__";
 
-  sel.addEventListener("change", () => {
-    ADMIN_OWNER_EMAIL = sel.value;
-    // se já estiver em algum módulo aberto, recarrega lista
-    if (ADMIN_TIPO_ATUAL) {
-      listarItensDoModulo(ADMIN_TIPO_ATUAL);
-    }
-  });
-}
+    sel.addEventListener("change", () => {
+      ADMIN_OWNER_EMAIL = sel.value;
+      // se já estiver em algum módulo aberto, recarrega lista
+      if (ADMIN_TIPO_ATUAL) {
+        listarItensDoModulo(ADMIN_TIPO_ATUAL);
+      }
+    });
+  }
 
-function removerSeletorClientesSidebar() {
-  const sel = document.getElementById("admin-client-select");
-  if (sel?.parentElement?.parentElement) sel.parentElement.parentElement.remove();
-}
+  function removerSeletorClientesSidebar() {
+    const sel = document.getElementById("admin-client-select");
+    if (sel?.parentElement?.parentElement) sel.parentElement.parentElement.remove();
+  }
 
 
   // 3. Gera o formulário de cadastro dinamicamente
   function abrirFormularioCadastro(tipo) {
-  ADMIN_TIPO_ATUAL = tipo;
-  ADMIN_EDIT_KEY = null;
+    ADMIN_TIPO_ATUAL = tipo;
+    ADMIN_EDIT_KEY = null;
 
-  const editor = document.getElementById("editor-de-conteudo");
-  const container = document.getElementById("container-campos-dinamicos");
-  const titulo = document.getElementById("titulo-modulo-atual");
-  const form = document.getElementById("form-cadastro-geral");
+    const editor = document.getElementById("editor-de-conteudo");
+    const container = document.getElementById("container-campos-dinamicos");
+    const titulo = document.getElementById("titulo-modulo-atual");
+    const form = document.getElementById("form-cadastro-geral");
 
-  editor.style.display = "block";
-  titulo.innerText = "Gerenciar " + CONFIG_MODULOS[tipo].nome;
+    editor.style.display = "block";
+    titulo.innerText = "Gerenciar " + CONFIG_MODULOS[tipo].nome;
 
-  // cria campos
-  container.innerHTML = "";
-  CONFIG_MODULOS[tipo].campos.forEach((campo) => {
-    container.innerHTML += `
+    // cria campos
+    container.innerHTML = "";
+    CONFIG_MODULOS[tipo].campos.forEach((campo) => {
+      container.innerHTML += `
       <div class="input-group">
         <label>${campo}:</label>
         <input type="text" name="${campo}" placeholder="Digite ${campo}">
       </div>
     `;
-  });
+    });
 
-  // cria/garante a área de lista abaixo do form
-  garantirAreaListaItens();
+    // cria/garante a área de lista abaixo do form
+    garantirAreaListaItens();
 
-  // submit = criar ou editar
-  form.onsubmit = async (e) => {
-    e.preventDefault();
+    // submit = criar ou editar
+    form.onsubmit = async (e) => {
+      e.preventDefault();
 
-    // regra: cliente só mexe no próprio
-    if (!isSuperAdmin(ADMIN_USER) && ADMIN_OWNER_EMAIL !== ADMIN_USER.email) {
-      alert("Permissão negada.");
-      return;
-    }
-
-    const formData = new FormData(e.target);
-    const payload = Object.fromEntries(formData.entries());
-
-    payload.dono = isSuperAdmin(ADMIN_USER)
-      ? (ADMIN_OWNER_EMAIL === "__todos__" ? ADMIN_USER.email : ADMIN_OWNER_EMAIL)
-      : ADMIN_USER.email;
-
-    payload.updatedAt = Date.now();
-
-    const refBase = firebase.database().ref(`conteudo/${tipo}`);
-
-    try {
-      if (ADMIN_EDIT_KEY) {
-        await refBase.child(ADMIN_EDIT_KEY).update(payload);
-        alert("Item atualizado!");
-      } else {
-        payload.createdAt = Date.now();
-        await refBase.push(payload);
-        alert("Item criado!");
+      // regra: cliente só mexe no próprio
+      if (!isSuperAdmin(ADMIN_USER) && ADMIN_OWNER_EMAIL !== ADMIN_USER.email) {
+        alert("Permissão negada.");
+        return;
       }
 
-      ADMIN_EDIT_KEY = null;
-      e.target.reset();
-      listarItensDoModulo(tipo);
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao salvar.");
-    }
-  };
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
 
-  // carrega lista
-  listarItensDoModulo(tipo);
-}
+      payload.dono = isSuperAdmin(ADMIN_USER)
+        ? (ADMIN_OWNER_EMAIL === "__todos__" ? ADMIN_USER.email : ADMIN_OWNER_EMAIL)
+        : ADMIN_USER.email;
 
-function garantirAreaListaItens() {
-  const editor = document.getElementById("editor-de-conteudo");
-  if (!editor) return;
+      payload.updatedAt = Date.now();
 
-  if (document.getElementById("admin-lista-itens")) return;
+      const refBase = firebase.database().ref(`conteudo/${tipo}`);
 
-  const div = document.createElement("div");
-  div.id = "admin-lista-itens";
-  div.style.marginTop = "14px";
-  div.innerHTML = `
+      try {
+        if (ADMIN_EDIT_KEY) {
+          await refBase.child(ADMIN_EDIT_KEY).update(payload);
+          alert("Item atualizado!");
+        } else {
+          payload.createdAt = Date.now();
+          await refBase.push(payload);
+          alert("Item criado!");
+        }
+
+        ADMIN_EDIT_KEY = null;
+        e.target.reset();
+        listarItensDoModulo(tipo);
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao salvar.");
+      }
+    };
+
+    // carrega lista
+    listarItensDoModulo(tipo);
+  }
+
+  function garantirAreaListaItens() {
+    const editor = document.getElementById("editor-de-conteudo");
+    if (!editor) return;
+
+    if (document.getElementById("admin-lista-itens")) return;
+
+    const div = document.createElement("div");
+    div.id = "admin-lista-itens";
+    div.style.marginTop = "14px";
+    div.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
       <h4 style="margin:0;">Itens cadastrados</h4>
       <button type="button" id="btn-admin-novo" class="btn-save-database" style="width:auto;padding:10px 14px;">
@@ -7375,51 +7375,51 @@ function garantirAreaListaItens() {
     <div id="admin-lista-itens-conteudo" style="margin-top:10px; display:flex; flex-direction:column; gap:10px;"></div>
   `;
 
-  editor.appendChild(div);
+    editor.appendChild(div);
 
-  document.getElementById("btn-admin-novo").onclick = () => {
-    ADMIN_EDIT_KEY = null;
-    document.getElementById("form-cadastro-geral").reset();
-  };
-}
+    document.getElementById("btn-admin-novo").onclick = () => {
+      ADMIN_EDIT_KEY = null;
+      document.getElementById("form-cadastro-geral").reset();
+    };
+  }
 
-async function listarItensDoModulo(tipo) {
-  const box = document.getElementById("admin-lista-itens-conteudo");
-  if (!box) return;
+  async function listarItensDoModulo(tipo) {
+    const box = document.getElementById("admin-lista-itens-conteudo");
+    if (!box) return;
 
-  box.innerHTML = "Carregando...";
+    box.innerHTML = "Carregando...";
 
-  const refBase = firebase.database().ref(`conteudo/${tipo}`);
-  let snap;
+    const refBase = firebase.database().ref(`conteudo/${tipo}`);
+    let snap;
 
-  // superadmin pode ver todos ou filtrar por cliente
-  if (isSuperAdmin(ADMIN_USER)) {
-    if (ADMIN_OWNER_EMAIL === "__todos__") {
-      snap = await refBase.once("value");
+    // superadmin pode ver todos ou filtrar por cliente
+    if (isSuperAdmin(ADMIN_USER)) {
+      if (ADMIN_OWNER_EMAIL === "__todos__") {
+        snap = await refBase.once("value");
+      } else {
+        snap = await refBase.orderByChild("dono").equalTo(ADMIN_OWNER_EMAIL).once("value");
+      }
     } else {
-      snap = await refBase.orderByChild("dono").equalTo(ADMIN_OWNER_EMAIL).once("value");
+      // cliente: sempre apenas dele
+      snap = await refBase.orderByChild("dono").equalTo(ADMIN_USER.email).once("value");
     }
-  } else {
-    // cliente: sempre apenas dele
-    snap = await refBase.orderByChild("dono").equalTo(ADMIN_USER.email).once("value");
-  }
 
-  const itens = [];
-  snap.forEach((ch) => itens.push({ key: ch.key, ...ch.val() }));
-  itens.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
+    const itens = [];
+    snap.forEach((ch) => itens.push({ key: ch.key, ...ch.val() }));
+    itens.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
 
-  if (!itens.length) {
-    box.innerHTML = `<div style="opacity:.8;">Nenhum item cadastrado ainda.</div>`;
-    return;
-  }
+    if (!itens.length) {
+      box.innerHTML = `<div style="opacity:.8;">Nenhum item cadastrado ainda.</div>`;
+      return;
+    }
 
-  box.innerHTML = "";
-  itens.forEach((it) => {
-    const card = document.createElement("div");
-    card.style.cssText = "border:1px solid #e5e7eb;border-radius:12px;padding:12px;background:#fff;";
-    const donoInfo = it.dono ? `<div style="font-size:12px;opacity:.7;">Dono: ${it.dono}</div>` : "";
+    box.innerHTML = "";
+    itens.forEach((it) => {
+      const card = document.createElement("div");
+      card.style.cssText = "border:1px solid #e5e7eb;border-radius:12px;padding:12px;background:#fff;";
+      const donoInfo = it.dono ? `<div style="font-size:12px;opacity:.7;">Dono: ${it.dono}</div>` : "";
 
-    card.innerHTML = `
+      card.innerHTML = `
       <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;">
         <div style="flex:1;min-width:220px;">
           <div style="font-weight:800;">${resumoItem(tipo, it)}</div>
@@ -7432,58 +7432,58 @@ async function listarItensDoModulo(tipo) {
       </div>
     `;
 
-    box.appendChild(card);
-  });
-
-  // bind editar/excluir
-  box.querySelectorAll("[data-edit]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const key = btn.getAttribute("data-edit");
-      await carregarItemParaEdicao(tipo, key);
+      box.appendChild(card);
     });
-  });
 
-  box.querySelectorAll("[data-del]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const key = btn.getAttribute("data-del");
-      if (!confirm("Excluir este item?")) return;
-      await firebase.database().ref(`conteudo/${tipo}/${key}`).remove();
-      listarItensDoModulo(tipo);
+    // bind editar/excluir
+    box.querySelectorAll("[data-edit]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const key = btn.getAttribute("data-edit");
+        await carregarItemParaEdicao(tipo, key);
+      });
     });
-  });
-}
 
-function resumoItem(tipo, item) {
-  // pega o primeiro campo do módulo como título
-  const campos = CONFIG_MODULOS[tipo]?.campos || [];
-  const c0 = campos[0];
-  if (c0 && item[c0]) return String(item[c0]);
-  // fallback
-  const keys = Object.keys(item).filter(k => !["dono","createdAt","updatedAt","timestamp"].includes(k));
-  return keys.length ? `${keys[0]}: ${String(item[keys[0]])}` : "Item";
-}
-
-async function carregarItemParaEdicao(tipo, key) {
-  const snap = await firebase.database().ref(`conteudo/${tipo}/${key}`).once("value");
-  const data = snap.val();
-  if (!data) return;
-
-  // cliente não edita item de outro dono
-  if (!isSuperAdmin(ADMIN_USER) && data.dono !== ADMIN_USER.email) {
-    alert("Permissão negada.");
-    return;
+    box.querySelectorAll("[data-del]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const key = btn.getAttribute("data-del");
+        if (!confirm("Excluir este item?")) return;
+        await firebase.database().ref(`conteudo/${tipo}/${key}`).remove();
+        listarItensDoModulo(tipo);
+      });
+    });
   }
 
-  ADMIN_EDIT_KEY = key;
+  function resumoItem(tipo, item) {
+    // pega o primeiro campo do módulo como título
+    const campos = CONFIG_MODULOS[tipo]?.campos || [];
+    const c0 = campos[0];
+    if (c0 && item[c0]) return String(item[c0]);
+    // fallback
+    const keys = Object.keys(item).filter(k => !["dono", "createdAt", "updatedAt", "timestamp"].includes(k));
+    return keys.length ? `${keys[0]}: ${String(item[keys[0]])}` : "Item";
+  }
 
-  // preenche o form
-  const form = document.getElementById("form-cadastro-geral");
-  const campos = CONFIG_MODULOS[tipo].campos || [];
-  campos.forEach((campo) => {
-    const input = form.querySelector(`[name="${campo}"]`);
-    if (input) input.value = data[campo] ?? "";
-  });
-}
+  async function carregarItemParaEdicao(tipo, key) {
+    const snap = await firebase.database().ref(`conteudo/${tipo}/${key}`).once("value");
+    const data = snap.val();
+    if (!data) return;
+
+    // cliente não edita item de outro dono
+    if (!isSuperAdmin(ADMIN_USER) && data.dono !== ADMIN_USER.email) {
+      alert("Permissão negada.");
+      return;
+    }
+
+    ADMIN_EDIT_KEY = key;
+
+    // preenche o form
+    const form = document.getElementById("form-cadastro-geral");
+    const campos = CONFIG_MODULOS[tipo].campos || [];
+    campos.forEach((campo) => {
+      const input = form.querySelector(`[name="${campo}"]`);
+      if (input) input.value = data[campo] ?? "";
+    });
+  }
 
 
 
@@ -12015,7 +12015,7 @@ async function carregarItemParaEdicao(tipo, key) {
 
             novidadesImages: [
               //"images/servicos/revendedor/tati/divulgacao/00.jpg",
-             // "images/servicos/revendedor/tati/divulgacao/0.jpg",
+              // "images/servicos/revendedor/tati/divulgacao/0.jpg",
               "images/servicos/revendedor/tati/divulgacao/2.jpg",
 
               "images/servicos/revendedor/tati/divulgacao/1.jpg",
@@ -12030,7 +12030,7 @@ async function carregarItemParaEdicao(tipo, key) {
             ],
             novidadesDescriptions: [
               //  "Promoçao de Fim de semana!",
-             // "30% De desconto em todos os produtos, entre em contato e aproveite!!!",
+              // "30% De desconto em todos os produtos, entre em contato e aproveite!!!",
               "Quer fios mais fortes, hidratados e com brilho de salão? ✨<br>Experimente o poder da linha Lizz Ante Profissional <br>Resultado que se vê, sente e apaixona! 💕",
             ],
 
@@ -12093,15 +12093,6 @@ async function carregarItemParaEdicao(tipo, key) {
 
 
 
-
-
-
-
-
-
-
-
-
           {
             image: "images/informacoes/eventos/5.jpg",
             name: "Campeonato Velocross 2026",
@@ -12112,7 +12103,33 @@ async function carregarItemParaEdicao(tipo, key) {
           },
 
 
+          {
+            image: "images/informacoes/eventos/6.jpg",
+            name: "CarnaIlha",
+            date: "13/02/2026",
+            address: "Ilha do Ponciano",
+            instagram: "https://www.instagram.com/p/DTgJCIggZlj/",
+            infoAdicional: "A programação tá simplesmente IMPERDÍVEL, a gente não vai deixar ninguém parado!"
+          },
 
+          {
+            image: "images/informacoes/eventos/8.jpg",
+            name: "Bloquinho do Agro",
+            date: "28/02/2026",
+            address: "Clube Caravela",
+            contact: "(43)99191-6037",
+            instagram: "https://www.instagram.com/p/DSa8T1WD9Z8/",
+            infoAdicional: "CountryBeat fazendo o chão tremer <br>🍺 Agro, música boa e energia lá em cima!"
+          },
+
+          {
+            image: "images/informacoes/eventos/7.jpg",
+            name: "Pescar",
+            date: "01/03/2026",
+            address: "Ilha do Ponciano",
+            instagram: "https://www.instagram.com/p/DTcy3uwAI2n/",
+            infoAdicional: " 21º PESCAR - 28 de fevereiro e 1º de março"
+          },
 
 
           {
@@ -12123,35 +12140,6 @@ async function carregarItemParaEdicao(tipo, key) {
             contact: "(43)99837-5390",
             instagram: "https://www.instagram.com/rotapr218/",
             infoAdicional: "A partir do dia 28 de março, já estaremos recebendo os irmãos de estrada!<br>Durante o fim de semana, teremos passeios mototurísticos pela região Angra Doce"
-          },
-
-            {
-            image: "images/informacoes/eventos/6.jpg",
-            name: "CarnaIlha",
-            date: "13/02/2026",
-            address: "Ilha do Ponciano",         
-            instagram: "https://www.instagram.com/p/DTgJCIggZlj/",
-            infoAdicional: "A programação tá simplesmente IMPERDÍVEL, a gente não vai deixar ninguém parado!"
-          },
-
-             {
-            image: "images/informacoes/eventos/7.jpg",
-            name: "Pescar",
-            date: "01/03/2026",
-            address: "Ilha do Ponciano",         
-            instagram: "https://www.instagram.com/p/DTcy3uwAI2n/",
-            infoAdicional: " 21º PESCAR - 28 de fevereiro e 1º de março"
-          },
-
-
-           {
-            image: "images/informacoes/eventos/8.jpg",
-            name: "Bloquinho do Agro",
-            date: "28/02/2026",
-            address: "Clube Caravela",       
-            contact:"(43)99191-6037",  
-            instagram: "https://www.instagram.com/p/DSa8T1WD9Z8/",
-            infoAdicional: "CountryBeat fazendo o chão tremer <br>🍺 Agro, música boa e energia lá em cima!"
           },
 
 
@@ -14670,64 +14658,64 @@ async function carregarItemParaEdicao(tipo, key) {
 
 
 
-                      {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/68.jpg",
-                      date: "15/01/2026",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. ANTÔNIO JOSÉ DA SILVA, aos 83 anos, ocorrido em Jacarezinho, nosso querido Tunico da Sorveteria!<BR>O velório será realizado no Velório Municipal Lauro Soares.<BR>A cerimônia do sepultamento ocorrerá amanhã 16/01/2026 em horário a ser definido, no Cemitério Municipal de Carlópolis.<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/68.jpg",
+            date: "15/01/2026",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. ANTÔNIO JOSÉ DA SILVA, aos 83 anos, ocorrido em Jacarezinho, nosso querido Tunico da Sorveteria!<BR>O velório será realizado no Velório Municipal Lauro Soares.<BR>A cerimônia do sepultamento ocorrerá amanhã 16/01/2026 em horário a ser definido, no Cemitério Municipal de Carlópolis.<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-                      {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/67.jpg",
-                      date: "15/01/2026",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. CRISTIANE YOSHIRO KANASHIRO, aos 51 anos, ocorrido em Londrina.<BR>O velório iniciará hoje às 15:30 horas no Velório Municipal.<BR>A cerimônia do sepultamento ocorrerá amanhã às 09:00 horas, no Cemitério Municipal de Carlópolis.<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/67.jpg",
+            date: "15/01/2026",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. CRISTIANE YOSHIRO KANASHIRO, aos 51 anos, ocorrido em Londrina.<BR>O velório iniciará hoje às 15:30 horas no Velório Municipal.<BR>A cerimônia do sepultamento ocorrerá amanhã às 09:00 horas, no Cemitério Municipal de Carlópolis.<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-  {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/66.jpg",
-                      date: "05/01/2026",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. JOSÉ CAMILO DE SOUZA aos 75 anos, mais conhecido como “Zé Camilo da Farmácia”, ocorrido em Londrina.<BR>O velório iniciará hoje às 15:45 horas no Municipal.<BR>A cerimônia do sepultamento será amanhã às 08:00 horas.<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/66.jpg",
+            date: "05/01/2026",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. JOSÉ CAMILO DE SOUZA aos 75 anos, mais conhecido como “Zé Camilo da Farmácia”, ocorrido em Londrina.<BR>O velório iniciará hoje às 15:45 horas no Municipal.<BR>A cerimônia do sepultamento será amanhã às 08:00 horas.<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-                        {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/65.jpg",
-                      date: "03/01/2026",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. JORGE DA SILVA aos 94 anos, Irmão do falecido Teleco ocorrido em Carlópolis.<BR>O velório iniciará hoje às 17:30 horas no Velório Municipal.<BR>A cerimônia do sepultamento ocorrerá amanhã às 09:00 horas no Cemitério Municipal de Carlópolis<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/65.jpg",
+            date: "03/01/2026",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. JORGE DA SILVA aos 94 anos, Irmão do falecido Teleco ocorrido em Carlópolis.<BR>O velório iniciará hoje às 17:30 horas no Velório Municipal.<BR>A cerimônia do sepultamento ocorrerá amanhã às 09:00 horas no Cemitério Municipal de Carlópolis<BR>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-{
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/64.jpg",
-                      date: "27/12/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. MARIA AUGUSTA DE OLIVEIRA LAERSON, aos 65 anos, ocorrido em Londrina.<Br>O velório iniciará hoje às 22:00 horas no Velório Municipal.<Br>A cerimônia do sepultamento ocorrerá amanhã 07:00 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
-
-
-
-                     {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/63.jpg",
-                      date: "24/12/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. NOEMIA ROSA DA SILVA DO NASCIMENTO, aos 87 anos, mãe do Tuco e do Vardinho, ocorrido em Carlópolis.<br>O velório iniciará hoje às 18:30 horas no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá amanhã 10:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
-
-                      {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/62.jpg",
-                      date: "24/12/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. PALMIRA FERREIRA, aos 83 anos, ocorrido em Arapongas.<br>O velório iniciará hoje às 07:00 horas no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá hoje às 15:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/64.jpg",
+            date: "27/12/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. MARIA AUGUSTA DE OLIVEIRA LAERSON, aos 65 anos, ocorrido em Londrina.<Br>O velório iniciará hoje às 22:00 horas no Velório Municipal.<Br>A cerimônia do sepultamento ocorrerá amanhã 07:00 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
 
-                      {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/61.jpg",
-                      date: "23/12/2025",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. EMERSON BENEDITO BRANCO aos 49 anos, filho do Sr Hélio do Ônibus, ocorrido em Carlópolis.<br>O velório será realizado no Velório Municipal, às 20:00 horas.<br>A cerimônia do sepultamento ocorrerá amanhã às 10:00 horas no Cemitério Municipal de Carlópolis<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/63.jpg",
+            date: "24/12/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. NOEMIA ROSA DA SILVA DO NASCIMENTO, aos 87 anos, mãe do Tuco e do Vardinho, ocorrido em Carlópolis.<br>O velório iniciará hoje às 18:30 horas no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá amanhã 10:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/62.jpg",
+            date: "24/12/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. PALMIRA FERREIRA, aos 83 anos, ocorrido em Arapongas.<br>O velório iniciará hoje às 07:00 horas no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá hoje às 15:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
+
+
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/61.jpg",
+            date: "23/12/2025",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. EMERSON BENEDITO BRANCO aos 49 anos, filho do Sr Hélio do Ônibus, ocorrido em Carlópolis.<br>O velório será realizado no Velório Municipal, às 20:00 horas.<br>A cerimônia do sepultamento ocorrerá amanhã às 10:00 horas no Cemitério Municipal de Carlópolis<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
 
           {
