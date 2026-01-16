@@ -12125,6 +12125,35 @@ async function carregarItemParaEdicao(tipo, key) {
             infoAdicional: "A partir do dia 28 de março, já estaremos recebendo os irmãos de estrada!<br>Durante o fim de semana, teremos passeios mototurísticos pela região Angra Doce"
           },
 
+            {
+            image: "images/informacoes/eventos/6.jpg",
+            name: "CarnaIlha",
+            date: "13/02/2026",
+            address: "Ilha do Ponciano",         
+            instagram: "https://www.instagram.com/p/DTgJCIggZlj/",
+            infoAdicional: "A programação tá simplesmente IMPERDÍVEL, a gente não vai deixar ninguém parado!"
+          },
+
+             {
+            image: "images/informacoes/eventos/7.jpg",
+            name: "Pescar",
+            date: "01/03/2026",
+            address: "Ilha do Ponciano",         
+            instagram: "https://www.instagram.com/p/DTcy3uwAI2n/",
+            infoAdicional: " 21º PESCAR - 28 de fevereiro e 1º de março"
+          },
+
+
+           {
+            image: "images/informacoes/eventos/8.jpg",
+            name: "Bloquinho do Agro",
+            date: "28/02/2026",
+            address: "Clube Caravela",       
+            contact:"(43)99191-6037",  
+            instagram: "https://www.instagram.com/p/DSa8T1WD9Z8/",
+            infoAdicional: "CountryBeat fazendo o chão tremer <br>🍺 Agro, música boa e energia lá em cima!"
+          },
+
 
 
         ],
