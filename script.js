@@ -5388,6 +5388,57 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
+
+
+
+    {
+      id: "ter13",
+      codRef: "T_013",
+      procura: "terreno", // ou "terreno", "rural", etc.   
+      tipo: "venda",
+      titulo: "Terreno de esquina com vista para represa – Residencial Amaral II",
+      descricao: "Terreno de esquina localizado no Residencial Amaral II, um dos bairros mais desejados de Carlópolis, com vista para a represa, ideal para projetos modernos de médio e alto padrão. Um lote que une exclusividade, qualidade de vida e potencial de valorização.",
+      endereco: "Residencial Amaral II",
+      area: "308m² - 14x22",
+      valor: 120000,
+      telefone: "43 98803-4095",
+      corretores: ["Luiz Vilas Boas - 52.194"],
+      imagens: [
+
+        "images/imoveis/luiz/venda/terreno5/01.jpeg",
+        "images/imoveis/luiz/venda/terreno5/02.jpeg",
+        "images/imoveis/luiz/venda/terreno5/03.jpeg",
+        "images/imoveis/luiz/venda/terreno5/04.jpeg",
+        "images/imoveis/luiz/venda/terreno5/05.jpeg",      
+
+      ],
+    },
+
+
+
+
+    {
+      id: "ter14",
+      codRef: "T_014",
+      procura: "terreno", // ou "terreno", "rural", etc.   
+      tipo: "venda",
+      titulo: "Terreno à venda no Residencial Vila Ray",
+      descricao: "Terreno de esquina com ótima localização, por  valor abaixo de mercado, ideal para quem busca comprar bem e lucrar com a valorização.",
+      endereco: "Residencial Jardim Primavera",
+      area: "234m² - 13x18",
+      valor: 60000,
+      telefone: "43 98803-4095",
+      corretores: ["Luiz Vilas Boas - 52.194"],
+      imagens: [
+
+        "images/imoveis/luiz/venda/terreno6/01.jpeg",
+        "images/imoveis/luiz/venda/terreno6/02.jpeg",
+         
+
+      ],
+    },
+
+
     /////////////////// GALPAO
 
     //Modelo
