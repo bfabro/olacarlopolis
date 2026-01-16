@@ -1562,23 +1562,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-// Função para identificar a origem do acesso
-function getOrigemAcesso() {
+  // Função para identificar a origem do acesso
+  function getOrigemAcesso() {
     const urlParams = new URLSearchParams(window.location.search);
     const origemUrl = urlParams.get('o'); // Detecta se tem ?o=instagram na URL
-    
+
     // 1. Verifica se veio do Instagram
     if (origemUrl === 'instagram' || document.referrer.includes('instagram.com')) {
-        return 'insta';
+      return 'insta';
     }
     // 2. Verifica se veio do App (PWA)
     // Nota: Aqui usei a lógica da sua função detectarCanalAcesso()
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-        return 'app';
+      return 'app';
     }
     // 3. Padrão: Site
     return 'site';
-}
+  }
 
   // Variável global para controle do pulso
   let contadorAnterior = 0;
@@ -1604,42 +1604,42 @@ function getOrigemAcesso() {
         const myUserRef = onlineUsersRef.push();
 
         myUserRef.set({
-            origem: getOrigemAcesso(), // <--- ADICIONE ESTA LINHA
-            timestamp: firebase.database.ServerValue.TIMESTAMP
+          origem: getOrigemAcesso(), // <--- ADICIONE ESTA LINHA
+          timestamp: firebase.database.ServerValue.TIMESTAMP
         });
 
         // Quando desconectar, remove
         myUserRef.onDisconnect().remove();
 
-     
+
       }
     });
 
-    
+
 
     // 4. Atualização em tempo real do contador
     onlineUsersRef.on("value", (snapshot) => {
-    const userCount = snapshot.numChildren() || 0;
+      const userCount = snapshot.numChildren() || 0;
 
-    if (contadorEl) {
+      if (contadorEl) {
         contadorEl.textContent = userCount;
-    }
+      }
 
-    // DISPARA O EFEITO EM CONJUNTO
-    if (iconeEl && userCount > contadorAnterior) {
+      // DISPARA O EFEITO EM CONJUNTO
+      if (iconeEl && userCount > contadorAnterior) {
         // iconeEl deve ser o container que envolve <i> e <span>
         iconeEl.classList.add("icone-notificacao");
 
         // Remove após 5 segundos
         setTimeout(() => {
-            iconeEl.classList.remove("icone-notificacao");
-            // Se precisar voltar para a cor original (ex: cinza):
-            iconeEl.style.color = ""; 
+          iconeEl.classList.remove("icone-notificacao");
+          // Se precisar voltar para a cor original (ex: cinza):
+          iconeEl.style.color = "";
         }, 5000);
-    }
+      }
 
-    contadorAnterior = userCount;
-});
+      contadorAnterior = userCount;
+    });
   }
 
   // Inicialização segura
@@ -1699,7 +1699,7 @@ function getOrigemAcesso() {
 
 
 
-  
+
 
 
 
@@ -1832,7 +1832,7 @@ function getOrigemAcesso() {
 
 
 
-  
+
 
   // Função para registrar clique no Firebase
   function registrarCliqueBotao(tipo, idEstabelecimento) {
