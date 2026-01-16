@@ -1557,63 +1557,75 @@ document.addEventListener("DOMContentLoaded", function () {
     return null;
   }
 
-
-  let contadorAnterior = 0;
-  const contadorEl = document.getElementById("contador");
-  const iconeEl = document.getElementById("iconeUsuarios");
-
-  // Cor padrão do ícone ao iniciar
-  if (iconeEl) {
-    iconeEl.style.color = "#808080";
-  }
-  /// inicio detecta usuarios online e desconecta
+//////
 
 
-  document.addEventListener("DOMContentLoaded", function () {
-    registrarAcesso();
 
+
+
+
+// 1. Variável de controle global (fora de tudo)
+let contadorAnterior = 0;
+
+document.addEventListener("DOMContentLoaded", function () {
+    // 2. Captura dos elementos com os IDs REAIS do seu index.html
+    const contadorEl = document.getElementById("contadorOnline"); 
+    const iconeEl = document.getElementById("iconeUsuarios");
+
+    // 3. Referências Firebase
     const onlineUsersRef = firebase.database().ref("onlineUsers");
+    const connectedRef = firebase.database().ref(".info/connected");
 
-    // Cria um ID único para cada usuário
-    const userId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const userRef = onlineUsersRef.child(userId);
+    // Lógica de Presença: Garante que você seja contado assim que o Firebase conectar
+    connectedRef.on("value", (snapshot) => {
+        if (snapshot.val() === true) {
+            // Cria um ID único para esta sua aba aberta
+            const myUserRef = onlineUsersRef.push();
 
-    // Salva o usuário como online
-    userRef.set({
-      hora: new Date().toLocaleTimeString(),
-      navegador: navigator.userAgent,
-      tela: `${window.screen.width}x${window.screen.height}`
+            // Quando você fechar o site, o Firebase remove este ID automaticamente
+            myUserRef.onDisconnect().remove();
+
+            // Salva os dados básicos
+            myUserRef.set({
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                canal: typeof detectarCanalAcesso === "function" ? detectarCanalAcesso() : "web"
+            });
+        }
     });
 
-    // Remove automaticamente do banco quando o usuário fecha o site
-    userRef.onDisconnect().remove();
-
-    // Atualiza o contador de usuários online
+    // 4. Atualização em Tempo Real do Contador
     onlineUsersRef.on("value", (snapshot) => {
-      const userCount = snapshot.numChildren();
+        const userCount = snapshot.numChildren() || 0;
+        
+        // Atualiza o número no ecrã
+        if (contadorEl) {
+            contadorEl.textContent = userCount;
+        }
 
-      // Atualiza somente o número visível
-      if (contadorEl) {
-        contadorEl.textContent = userCount;
-      }
+        // Efeito Pulse: Se o número subiu, o ícone brilha
+        if (iconeEl && userCount > contadorAnterior) {
+            iconeEl.style.transition = "all 0.3s ease";
+            iconeEl.style.color = "#ff0000"; // Vermelho
+            iconeEl.classList.add("pulsando");
 
-      // Se aumentou, aplica efeito no ícone
-      if (iconeEl && userCount > contadorAnterior) {
-        iconeEl.style.color = "red";
-        iconeEl.classList.add("pulsando");
-
-        setTimeout(() => {
-          iconeEl.style.color = "#808080";
-          iconeEl.classList.remove("pulsando");
-        }, 5000);
-      }
-
-      contadorAnterior = userCount;
-
-
+            setTimeout(() => {
+                iconeEl.style.color = "#808080"; // Cinza padrão
+                iconeEl.classList.remove("pulsando");
+            }, 5000);
+        }
+        contadorAnterior = userCount;
     });
-  });
+});
 
+  
+
+
+
+
+
+
+
+/////
 
 
 
