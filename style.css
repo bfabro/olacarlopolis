@@ -9243,6 +9243,7 @@ tr[data-inativo="true"] {
     color: #ff0000 !important; /* Força a cor vermelha no ícone */
     animation: pulse-red-total 1s ease-in-out infinite;
     display: inline-block;
+    gap: 10px;
 }
 
 @keyframes pulse-red-total {
