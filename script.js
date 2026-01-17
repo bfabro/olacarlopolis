@@ -1140,6 +1140,39 @@ function mostrarToast(mensagem) {
 document.addEventListener("DOMContentLoaded", function () {
 
 
+   // ================================
+  // 🔗 CAPTURA ORIGEM DO ACESSO (?o=xxx)
+  // ================================
+  (function registrarOrigemAcesso() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const origem = params.get("o");
+
+      if (!origem) return;
+
+      const origemLimpa = origem.toLowerCase().trim();
+
+      const hoje = new Date();
+      hoje.setHours(hoje.getHours() - 3); // UTC-3
+      const data = hoje.toISOString().slice(0, 10);
+
+      const ref = firebase.database().ref(`origemAcessos/${data}/${origemLimpa}`);
+      ref.transaction(atual => (atual || 0) + 1);
+
+      firebase.database().ref("acessos").push({
+        origem: origemLimpa,
+        data: data,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        userAgent: navigator.userAgent,
+        isPWA: window.matchMedia('(display-mode: standalone)').matches
+      });
+
+    } catch (e) {
+      console.warn("Erro ao registrar origem:", e);
+    }
+  })();
+
+
   /// funçao para todas as paginas
   ///
   document.addEventListener("click", (ev) => {
