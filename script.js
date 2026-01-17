@@ -1706,8 +1706,27 @@ document.addEventListener("DOMContentLoaded", function () {
   // Função para registrar o acesso diário
   function registrarAcesso() {
     const hoje = getHojeBR();
-    const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
-    const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
+
+
+    // 1. IDENTIFICAR A ORIGEM (Prioridade: Link > App > Site)
+  const urlParams = new URLSearchParams(window.location.search);
+  const origemLink = urlParams.get("o");
+  const isApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+
+
+
+    let origemFinal = "Site";
+  if (origemLink) {
+    origemFinal = origemLink; // Se tiver ?o=xxx, usa o que estiver escrito
+  } else if (isApp) {
+    origemFinal = "App"; // Se for o App instalado
+  }
+
+  const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
+  const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
+
+  refTotal.transaction((acessos) => (acessos || 0) + 1);
 
     refTotal.transaction((acessos) => (acessos || 0) + 1);
 
@@ -1728,6 +1747,8 @@ document.addEventListener("DOMContentLoaded", function () {
         pagina: window.location.href,
         referrer: document.referrer || "acesso direto",
         origem: new URLSearchParams(window.location.search).get("o") || "acesso direto",
+        // SALVANDO A ORIGEM IDENTIFICADA
+      origem: origemFinal,
         canal: detectarCanalAcesso(), // ✅ NOVO (Site vs App)
         tela: `${window.screen.width}x${window.screen.height}`,
         dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
