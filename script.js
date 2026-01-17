@@ -1779,7 +1779,7 @@ document.addEventListener("DOMContentLoaded", function () {
         plataforma: navigator.platform,
         pagina: window.location.href,
         referrer: document.referrer || "acesso direto",
-        origem: new URLSearchParams(window.location.search).get("o") || "acesso direto",
+       // origem: new URLSearchParams(window.location.search).get("o") || "acesso direto",
         // SALVANDO A ORIGEM IDENTIFICADA
       origem: origemFinal,
         canal: detectarCanalAcesso(), // ✅ NOVO (Site vs App)
