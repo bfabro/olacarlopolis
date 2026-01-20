@@ -1901,7 +1901,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-    "seiza",
+    "hime",
     //    "seiza", "hime"
   ];
 
