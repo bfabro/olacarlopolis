@@ -14105,6 +14105,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Kalil Keder, 1204 - Carlopolis",
             contact: "(43) 99686-5040",
             delivery: "Sim / Com Taxa",
+            instagram:"https://www.instagram.com/restaurantehimeclps/",
             menuImages: [
               "images/comercios/restaurante/hime/cardapio/1.jpg",
               "images/comercios/restaurante/hime/cardapio/2.jpg",
