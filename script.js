@@ -2860,15 +2860,22 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
       </div>
       <div class="grupo-actions">
+
         <a class="btn-grupo" target="_blank" rel="noopener noreferrer"
            href="${g.link}"
            data-id="${id}">
           Entrar no grupo
         </a>
+
+
+
+     
+
       </div>
     </div>
   `;
   }
+
 
 
   function montarListaGrupos(lista) {
@@ -2886,7 +2893,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const id = btn.getAttribute("data-id");
         // registra clique (não bloqueia navegação)
         if (typeof registrarCliqueBotao === "function") {
-          registrarCliqueBotao("grupoWhatsapp", id);
+          window.registrarCliqueBotao("grupoWhatsapp", id);
         }
       });
     });
@@ -16389,7 +16396,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
       );
     });
   }
-
+window.registrarCliqueBotao = registrarCliqueBotao;
 
   // === NASCER & PÔR DO SOL (Carlópolis-PR) ===
 
