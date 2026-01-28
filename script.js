@@ -2611,7 +2611,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pescar: "s",
     bloquinhodoagro: "s",
     cafedamanhadosamigos: "s",
-    campeonatovelocross2026: "s",
+    campeonatovelocross2026: "n",
    
 
     /// FIM EVENTOS 
@@ -12222,16 +12222,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
       
 
-
-
-          {
-            image: "images/informacoes/eventos/5.jpg",
-            name: "Campeonato Velocross 2026",
-            date: "24/01/2026",
-            address: "Ilha do Ponciano",
-            instagram: "https://www.instagram.com/p/DScwdE_gJOi/",
-            infoAdicional: "Dois dias de disputas eletrizantes, pilotos feras na pista e aquele clima que só o velocross tem! Chame a galera, traga a família e venha viver essa experiência de perto."
-          },
 
 
           {
