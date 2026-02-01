@@ -2607,6 +2607,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "n",
+    arenagoldenhits:"s",
     carnailha: "s",
     pescar: "s",
     bloquinhodoagro: "s",
@@ -12227,6 +12228,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
           {
+            image: "images/informacoes/eventos/12.jpg",
+            name: "Arena Golden Hits",
+            date: "07/02/2026",
+            address: "Arena seu Luiz",
+            instagram: "https://www.instagram.com/p/DTgWHeHFNos/",
+            infoAdicional: "✨ PRÉ-CARNAVAL GOLDEN HITS ✨<br>Uma noite pra curtir, cantar e viver os maiores sucessos em grande estilo! 💃🕺<br>🎤 Andrea & Lima – ao vivo<br>🕘 07/02 | 21h<br>❄️ Salão climatizado<br>🧀 Mesa de frios inclusa"
+          },
+
+
+           {
             image: "images/informacoes/eventos/6.jpg",
             name: "CarnaIlha",
             date: "13/02/2026",
