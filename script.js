@@ -2611,7 +2611,9 @@ document.addEventListener("DOMContentLoaded", function () {
     pescar: "s",
     bloquinhodoagro: "s",
     cafedamanhadosamigos: "s",
-    campeonatovelocross2026: "n",
+
+    cfccarlopolisfight:"s",
+    "7encontrodemotociclistas-lobodafronteira":"s",
    
 
     /// FIM EVENTOS 
@@ -12265,6 +12267,28 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+          {
+            image: "images/informacoes/eventos/10.jpg",
+            name: "CFC Carlopolis Fight",
+            date: "09/05/2026",
+            address: "Ginasio de esportes",
+            instagram: "https://www.instagram.com/p/DUJa9irANR3/",
+            infoAdicional: "2 - Edição<br> Entrada Franca 1 kg de alimento<br>Mesas na area VIP<br>20 Lutas <Br> 4 Modalidades em um só lugar"
+          },
+
+
+            {
+            image: "images/informacoes/eventos/11.jpg",
+            name: "7 Encontro de Motociclistas - Lobo da fronteira",
+            date: "10/10/2026",
+            address: "-",
+            instagram: "https://www.instagram.com/p/DT_RNkUjoSW/",
+            infoAdicional: "Em Breve Mais informações"
+          },
+
+
+
+
         ],
       },
 
@@ -12856,6 +12880,32 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             hours: "Seg a Sex: 07:00h as 11:00h - 13:00 as 17:00h",
             address: "-",
             contact: "(43) 3566-1328",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "07:00", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              ter: [{ inicio: "07:00", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              qua: [{ inicio: "07:00", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              qui: [{ inicio: "07:00", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              sex: [{ inicio: "07:00", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
+              sab: [],
+              dom: []
+            },
+
+          },
+        ],
+      },
+
+
+       {
+        link: document.querySelector("#menuSecretariaEducacao"),
+        title: "Secretaria da Educação",
+        establishments: [
+          {
+
+            name: "Secretaria da Saude",
+            hours: "Seg a Sex: 07:00h as 11:00h - 13:00 as 17:00h",
+            address: "-",
+            contact: "(43) 99825-1062",
             statusAberto: ".",
             horarios: {
               seg: [{ inicio: "07:00", fim: "11:00" }, { inicio: "13:00", fim: "17:00" }],
