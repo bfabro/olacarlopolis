@@ -2614,6 +2614,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cafedamanhadosamigos: "s",
 
     cfccarlopolisfight:"s",
+    lowcity043fest:"s",
     "7encontrodemotociclistas-lobodafronteira":"s",
    
 
@@ -12295,6 +12296,17 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "-",
             instagram: "https://www.instagram.com/p/DT_RNkUjoSW/",
             infoAdicional: "Em Breve Mais informações"
+          },
+
+
+
+            {
+            image: "images/informacoes/eventos/13.jpg",
+            name: "Low City 043 Fest",
+            date: "18/10/2026",
+            address: "Ilha do Ponciano",
+            instagram: "https://www.instagram.com/p/DTfq3ICka4e/",
+            infoAdicional: "🔥Essa vai pra quem esta na espera do GTA VI 🔥<br>Estao preparados para a 3ª Edição do Low City 043 Fest?<br>Carlópolis Pr mais uma vez vai ficar pequena..."
           },
 
 
