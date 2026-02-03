@@ -12264,7 +12264,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             date: "01/03/2026",
             address: "Ilha do Ponciano",
             instagram: "https://www.instagram.com/p/DTcy3uwAI2n/",
-            infoAdicional: " 21º PESCAR - 28 de fevereiro e 1º de março"
+            infoAdicional: " 21º PESCAR - 28 de fevereiro e 1º de março<br><a target='_blank' style='color:#2da6ff;' href='https://pescar2026.carlopolisdigital.com.br/?fbclid=PAb21jcAPu91hleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAaeYdq9yrDWsux-9eziXvpUi8ZMy7qhyOl4zuJ21_4Dq1ey3KAiOXvAzQUDXcA_aem_WOcr9vb6UNybZj8xfxee1w'  >Clique aqui para Inscrição</a> "
           },
 
 
@@ -12296,7 +12296,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             date: "03/09/2026",
             address: "Ilha do Ponciano",
             instagram: "https://www.instagram.com/p/DT_RNkUjoSW/",
-            infoAdicional: "FrutFest 2026, de 03 a 06 de Setembro<br> Qui 03/09: Cesar Menotti e Fabiano<br>Sext 04/09: Matheus e Kauan + US AgroBoy<br> Sab 05/09: Victor e Leo + Jyraia Uai<br>Dom 06/09 Alexandre Pires + Luan Pereira"
+            infoAdicional: "FrutFest 2026, de 03 a 06 de Setembro<br> Qui 03/09: Cesar Menotti e Fabiano<br>Sex 04/09: Matheus e Kauan + US AgroBoy<br> Sab 05/09: Victor e Leo + Jyraia Uai<br>Dom 06/09 Alexandre Pires + Luan Pereira"
           },
 
 
@@ -14848,7 +14848,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           
                     {
                       name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/69.jpg",
+                      image: "images/informacoes/notaFalecimento/cristoRei/72.jpg",
                       date: "16/01/2026",
                       descricaoFalecido: "",          
                     },
@@ -14862,6 +14862,33 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           */
 
 
+ {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/72.jpg",
+                      date: "03/02/2026",
+                      descricaoFalecido: "É com profundo pesar que comunicamos o falecimento da Sra. Adarziza María Leite de Souza, aos 90 anos de idade, ocorrido em Carlópolis.<br>O velório inicia hoje, às 10:00 horas, na residência localizada na Rua Januário Francisco, nº 29, em Carlópolis.<br>A cerimônia de sepultamento será realizada amanhã, às 10:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos sinceros pêsames aos familiares e amigos neste momento de luto.🙏🏼",          
+                    },
+
+
+ {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/71.jpg",
+                      date: "27/01/2026",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. LOURDES FURLAN MACHADO, aos 93 anos, ocorrido em Carlópolis<Br>O velório iniciará hoje às 14:30 horas no Velório Municipal Lauro Soares<Br>A cerimônia do sepultamento ocorrerá amanhã 28/01/2026 às 09:00 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
+
+                       {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/70.jpg",
+                      date: "18/01/2026",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. EDERO PEREIRA JUNIOR, aos 78 anos, ocorrido em Jacarezinho, nosso querido Tutão<br>O velório será realizado no Velório Municipal Lauro Soares em horário a ser definido.<br>A cerimônia do sepultamento ocorrerá amanhã, Também em horário a ser definido no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼"},
+
+ {
+                      name: "Funeraria Cristo Rei",
+                      image: "images/informacoes/notaFalecimento/cristoRei/69.jpg",
+                      date: "16/01/2026",
+                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. TEREZA FERNANDES DA SILVA SOUZA, aos 85 anos, ocorrido em Carlópolis<br>O velório iniciará hoje às 12:30 horas no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá amanhã às 09:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
+                    },
 
 
           {
