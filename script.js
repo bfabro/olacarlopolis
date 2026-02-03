@@ -4788,6 +4788,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       id: "casa7v",
       codRef: "C_007",
       tipo: "venda",
+      status: "vendido",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
       valor: 300000,
