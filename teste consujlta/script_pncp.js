@@ -2616,7 +2616,6 @@ document.addEventListener("DOMContentLoaded", function () {
     cfccarlopolisfight:"s",
     lowcity043fest:"s",
     "7encontrodemotociclistas-lobodafronteira":"s",
-    frutfest2026:"s",
    
 
     /// FIM EVENTOS 
@@ -12290,16 +12289,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-             {
-            image: "images/informacoes/eventos/14.jpg",
-            name: "FrutFest 2026",
-            date: "03/09/2026",
-            address: "Ilha do Ponciano",
-            instagram: "https://www.instagram.com/p/DT_RNkUjoSW/",
-            infoAdicional: "FrutFest 2026, de 03 a 06 de Setembro<br> Qui 03/09: Cesar Menotti e Fabiano<br>Sext 04/09: Matheus e Kauan + US AgroBoy<br> Sab 05/09: Victor e Leo + Jyraia Uai<br>Dom 06/09 Alexandre Pires + Luan Pereira"
-          },
-
-
             {
             image: "images/informacoes/eventos/11.jpg",
             name: "7 Encontro de Motociclistas - Lobo da fronteira",
@@ -15521,6 +15510,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     ev.preventDefault();
     mostrarSol(); // abre a página
   });
+
+
+  document.addEventListener("click", (ev) => {
+    const t = ev.target.closest("#menuPNCP");
+    if (!t) return;
+    ev.preventDefault();
+    mostrarPNCP(); // abre a página
+  });
+
 
 
   montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
@@ -19023,3 +19021,289 @@ document.addEventListener("DOMContentLoaded", () => {
 // ... (seu código de inicialização do Firebase acima)
 
 // Este observador roda automaticamente sempre que o estado do login muda
+
+
+
+
+/* =========================
+   PNCP (API de Consultas)
+   ========================= */
+
+function pncpFormatDateToYYYYMMDD(value) {
+  // value expected: 'YYYY-MM-DD'
+  if (!value) return "";
+  return String(value).replace(/-/g, "");
+}
+
+function pncpMoney(v) {
+  const n = Number(v);
+  if (Number.isFinite(n)) {
+    return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+  return v ?? "-";
+}
+
+function pncpDateBR(v) {
+  if (!v) return "-";
+  // aceita 'YYYY-MM-DD', 'YYYYMMDD', ou ISO
+  const s = String(v);
+  let d;
+  if (/^\d{8}$/.test(s)) {
+    const y = s.slice(0, 4), m = s.slice(4, 6), day = s.slice(6, 8);
+    d = new Date(`${y}-${m}-${day}T00:00:00`);
+  } else {
+    d = new Date(s);
+  }
+  if (isNaN(d.getTime())) return s;
+  return d.toLocaleDateString("pt-BR");
+}
+
+function pncpNormalizeList(payload) {
+  if (!payload) return [];
+  if (Array.isArray(payload)) return payload;
+
+  // Alguns retornos vêm com uma lista em uma propriedade
+  const candidates = ["data", "conteudo", "resultados", "results", "contratacoes", "contratos", "atas", "itens"];
+  for (const k of candidates) {
+    if (Array.isArray(payload[k])) return payload[k];
+  }
+
+  // Às vezes vem como objeto com "items"
+  if (Array.isArray(payload.items)) return payload.items;
+
+  return [];
+}
+
+function mostrarPNCP() {
+  if (location.hash !== "#pncp") location.hash = "#pncp";
+  const area = document.querySelector(".content_area");
+  if (!area) return;
+
+  // Defaults: últimos 7 dias
+  const hoje = new Date();
+  const ini = new Date();
+  ini.setDate(hoje.getDate() - 7);
+
+  const pad = (n) => String(n).padStart(2, "0");
+  const toInput = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  area.innerHTML = `
+    <div class="pncp-wrap">
+      <div class="pncp-header">
+        <div>
+          <h2>⚖️ PNCP - Licitações</h2>
+          <p class="pncp-sub">Busca pública via API de consultas do PNCP (sem login). Você pode filtrar por data e por município.</p>
+        </div>
+      </div>
+
+      <div class="pncp-toolbar">
+        <div class="pncp-field">
+          <label>Tipo de consulta</label>
+          <select id="pncpTipo">
+            <option value="contratacoesPublicacao">Contratações (por publicação)</option>
+            <option value="contratos">Contratos (por publicação)</option>
+            <option value="atas">Atas (por vigência)</option>
+          </select>
+        </div>
+
+        <div class="pncp-field">
+          <label>UF</label>
+          <select id="pncpUF">
+            <option value="PR" selected>PR</option>
+            <option value="SC">SC</option>
+            <option value="SP">SP</option>
+            <option value="MS">MS</option>
+            <option value="RS">RS</option>
+            <option value="RJ">RJ</option>
+            <option value="MG">MG</option>
+            <option value="BA">BA</option>
+            <option value="GO">GO</option>
+            <option value="DF">DF</option>
+            <option value="TO">TO</option>
+            <option value="MT">MT</option>
+            <option value="ES">ES</option>
+            <option value="PB">PB</option>
+            <option value="PE">PE</option>
+            <option value="AL">AL</option>
+            <option value="SE">SE</option>
+            <option value="RN">RN</option>
+            <option value="CE">CE</option>
+            <option value="PI">PI</option>
+            <option value="MA">MA</option>
+            <option value="PA">PA</option>
+            <option value="AM">AM</option>
+            <option value="AC">AC</option>
+            <option value="AP">AP</option>
+            <option value="RO">RO</option>
+            <option value="RR">RR</option>
+          </select>
+        </div>
+
+        <div class="pncp-field">
+          <label>Código do Município (IBGE)</label>
+          <input id="pncpIbge" inputmode="numeric" placeholder="Ex.: 4104709 (Carlópolis)" value="4104709">
+        </div>
+
+        <div class="pncp-field">
+          <label>CNPJ do órgão (opcional)</label>
+          <input id="pncpCnpj" inputmode="numeric" placeholder="Somente números (14 dígitos)">
+        </div>
+
+        <div class="pncp-field">
+          <label>Data inicial</label>
+          <input id="pncpDataIni" type="date" value="${toInput(ini)}">
+        </div>
+
+        <div class="pncp-field">
+          <label>Data final</label>
+          <input id="pncpDataFim" type="date" value="${toInput(hoje)}">
+        </div>
+
+        <div class="pncp-actions">
+          <div class="pncp-status" id="pncpStatus">Pronto para consultar.</div>
+          <button class="pncp-btn secondary" id="pncpLimpar">Limpar</button>
+          <button class="pncp-btn primary" id="pncpBuscar">Buscar</button>
+        </div>
+      </div>
+
+      <div id="pncpResultados" class="pncp-grid"></div>
+    </div>
+  `;
+
+  const elTipo = document.getElementById("pncpTipo");
+  const elUf = document.getElementById("pncpUF");
+  const elIbge = document.getElementById("pncpIbge");
+  const elCnpj = document.getElementById("pncpCnpj");
+  const elIni = document.getElementById("pncpDataIni");
+  const elFim = document.getElementById("pncpDataFim");
+  const elStatus = document.getElementById("pncpStatus");
+  const elRes = document.getElementById("pncpResultados");
+
+  const setStatus = (msg) => { if (elStatus) elStatus.textContent = msg; };
+
+  const limpar = () => {
+    elTipo.value = "contratacoesPublicacao";
+    elUf.value = "PR";
+    elIbge.value = "4104709";
+    elCnpj.value = "";
+    elIni.value = toInput(ini);
+    elFim.value = toInput(hoje);
+    elRes.innerHTML = "";
+    setStatus("Pronto para consultar.");
+  };
+
+  document.getElementById("pncpLimpar").addEventListener("click", (e) => {
+    e.preventDefault();
+    limpar();
+  });
+
+  document.getElementById("pncpBuscar").addEventListener("click", async (e) => {
+    e.preventDefault();
+    elRes.innerHTML = "";
+    setStatus("Consultando PNCP...");
+
+    const tipo = elTipo.value;
+    const uf = (elUf.value || "").trim().toUpperCase();
+    const codigoMunicipioIbge = (elIbge.value || "").trim();
+    const cnpj = (elCnpj.value || "").trim().replace(/\D/g, "");
+    const dataInicial = pncpFormatDateToYYYYMMDD(elIni.value);
+    const dataFinal = pncpFormatDateToYYYYMMDD(elFim.value);
+
+    const params = new URLSearchParams();
+    if (dataInicial) params.set("dataInicial", dataInicial);
+    if (dataFinal) params.set("dataFinal", dataFinal);
+    params.set("pagina", "1");
+    params.set("tamanhoPagina", "20");
+
+    if (uf) params.set("uf", uf);
+    if (codigoMunicipioIbge) params.set("codigoMunicipioIbge", codigoMunicipioIbge);
+    if (cnpj) params.set("cnpj", cnpj);
+
+    let endpoint = "";
+    if (tipo === "contratos") endpoint = "/v1/contratos";
+    else if (tipo === "atas") endpoint = "/v1/atas";
+    else endpoint = "/v1/contratacoes/publicacao";
+
+    const url = `https://pncp.gov.br/api/consulta${endpoint}?${params.toString()}`;
+
+    try {
+      const resp = await fetch(url, { method: "GET" });
+      if (!resp.ok) {
+        const t = await resp.text().catch(() => "");
+        throw new Error(`PNCP retornou HTTP ${resp.status}. ${t ? "Detalhe: " + t.slice(0, 200) : ""}`);
+      }
+      const payload = await resp.json();
+      const items = pncpNormalizeList(payload);
+
+      if (!items.length) {
+        setStatus("Nenhum resultado com esses filtros.");
+        elRes.innerHTML = `<div class="pncp-card"><div class="pncp-title">Nenhum resultado</div><div class="pncp-sub">Tente aumentar o período ou remover filtros (CNPJ / município).</div></div>`;
+        return;
+      }
+
+      setStatus(`Encontrado(s): ${items.length} (mostrando até 20).`);
+
+      elRes.innerHTML = items.map((it) => {
+        const numeroControle = it.numeroControlePNCP || it.numeroControlePncp || it.idPncp || it.id || "-";
+        const orgao = it.orgaoEntidade?.razaoSocial || it.orgaoEntidade?.nome || it.nomeOrgaoEntidade || it.orgaoEntidade || "-";
+        const unidade = it.unidadeOrgao?.nomeUnidade || it.unidadeOrgao?.nome || it.nomeUnidade || "-";
+        const objeto = it.objeto || it.descricao || it.objetoCompra || "-";
+        const modalidade = it.modalidadeNome || it.modalidade || it.codigoModalidadeContratacao || "-";
+        const situacao = it.situacaoNome || it.situacao || it.status || "-";
+        const dataPub = it.dataPublicacaoPncp || it.dataPublicacaoPNCP || it.dataPublicacao || it.dataPublicacaoPNCP || it.dataPublicacaoPNCPStr || it.dataPublicacaoPNCP || it.dataPublicacaoPncp || "-";
+        const valor = it.valorTotalEstimado || it.valorEstimadoTotal || it.valorGlobal || it.valorTotal || it.valor || "-";
+
+        return `
+          <div class="pncp-card">
+            <div class="pncp-card-top">
+              <div class="pncp-badges">
+                <span class="pncp-badge">${tipo === "contratos" ? "Contrato" : (tipo === "atas" ? "Ata" : "Contratação")}</span>
+                <span class="pncp-badge">${modalidade}</span>
+                <span class="pncp-badge">${situacao}</span>
+              </div>
+              <span class="pncp-badge">Publicação: ${pncpDateBR(dataPub)}</span>
+            </div>
+
+            <div class="pncp-title">${objeto}</div>
+
+            <div class="pncp-meta">
+              <div>
+                <div class="k">Órgão</div>
+                <div class="v">${orgao}</div>
+              </div>
+              <div>
+                <div class="k">Unidade</div>
+                <div class="v">${unidade}</div>
+              </div>
+              <div>
+                <div class="k">Número de Controle PNCP</div>
+                <div class="v">${numeroControle}</div>
+              </div>
+              <div>
+                <div class="k">Valor</div>
+                <div class="v">${pncpMoney(valor)}</div>
+              </div>
+            </div>
+
+            <div class="pncp-footer">
+              <a class="pncp-link" href="https://pncp.gov.br/app/contratacoes?q=${encodeURIComponent(numeroControle)}" target="_blank" rel="noopener noreferrer">Ver no PNCP</a>
+              <a class="pncp-link" href="${url}" target="_blank" rel="noopener noreferrer">Ver JSON</a>
+            </div>
+          </div>
+        `;
+      }).join("");
+    } catch (err) {
+      console.error(err);
+      // Possível CORS / rede
+      const msg = String(err?.message || err);
+      setStatus("Erro ao consultar PNCP.");
+      elRes.innerHTML = `
+        <div class="pncp-card">
+          <div class="pncp-title">Não foi possível consultar agora</div>
+          <div class="pncp-sub">${msg}</div>
+          <div class="pncp-sub">Se isso acontecer por bloqueio do navegador (CORS), a solução é criar um endpoint proxy (ex.: Firebase Cloud Function) para fazer a chamada e devolver o JSON para o site.</div>
+        </div>
+      `;
+    }
+  });
+}
