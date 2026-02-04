@@ -4617,8 +4617,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     {
       id: "casa1v",
       codRef: "C_001",
+      status: "vendido",      
       tipo: "venda",
-      status: "disponível",
+      //status: "disponível",
       titulo: "Residencial Villa Ray (Horizonte 3)",
       endereco: "Agende uma visita",
       quartos: 2,
@@ -5204,6 +5205,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa17/10.jpg",
         "images/imoveis/cesar/venda/casa17/11.jpg",
         "images/imoveis/cesar/venda/casa17/12.jpg",
+        "images/imoveis/cesar/venda/casa17/13.jpg",
 
 
 
@@ -5223,8 +5225,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       descricao: "Toda Fechada no Blindex<br>Otima oportuindade para tambem ser mais uma fonte de renda!",
       endereco: "Ilha Bella",
       valor: 950000,
-     // construcao: 306,          // << NOVO: m² de construção
-     // area: 453.33,
+      construcao: 270,          // << NOVO: m² de construção
+      area: 514,
       banheiros: 2,
       churrasqueira: "Sim",
       cozinhas: 1,
@@ -5298,12 +5300,12 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       codRef: "Ch_001",
       procura: "chacara", // ou "terreno", "rural", etc.
       tipo: "venda",
-      titulo: "Vende - se chácara em Carlópolis a 5Km da Cidade",
+      titulo: "Vende - se chácara em Carlópolis a 5 Km da Cidade",
       descricao: "- Nascente de água <br>- 03 açudes <br> - 800 de pés de goiabas IRRIGADOS <br>- Reserva de mata bem preservada<Br> - Área de lazer com fogão de lenha<Br> - Entrada fechada de muro, com portão<br> - Vista para cidade",
      // endereco: "Ilha Bella",
       valor: 850000,
      // construcao: 306,          // << NOVO: m² de construção
-      area: "30000mts",
+      area: "30.000 mts",
       banheiros: 2,
       churrasqueira: "Sim",
       cozinhas: 1,
