@@ -1140,7 +1140,7 @@ function mostrarToast(mensagem) {
 document.addEventListener("DOMContentLoaded", function () {
 
 
-   // ================================
+  // ================================
   // 🔗 CAPTURA ORIGEM DO ACESSO (?o=xxx)
   // ================================
   (function registrarOrigemAcesso() {
@@ -1742,24 +1742,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // 1. IDENTIFICAR A ORIGEM (Prioridade: Link > App > Site)
-  const urlParams = new URLSearchParams(window.location.search);
-  const origemLink = urlParams.get("o");
-  const isApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const urlParams = new URLSearchParams(window.location.search);
+    const origemLink = urlParams.get("o");
+    const isApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
 
 
 
     let origemFinal = "Site";
-  if (origemLink) {
-    origemFinal = origemLink; // Se tiver ?o=xxx, usa o que estiver escrito
-  } else if (isApp) {
-    origemFinal = "App"; // Se for o App instalado
-  }
+    if (origemLink) {
+      origemFinal = origemLink; // Se tiver ?o=xxx, usa o que estiver escrito
+    } else if (isApp) {
+      origemFinal = "App"; // Se for o App instalado
+    }
 
-  const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
-  const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
+    const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
+    const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
 
-  refTotal.transaction((acessos) => (acessos || 0) + 1);
+    refTotal.transaction((acessos) => (acessos || 0) + 1);
 
     refTotal.transaction((acessos) => (acessos || 0) + 1);
 
@@ -1779,9 +1779,9 @@ document.addEventListener("DOMContentLoaded", function () {
         plataforma: navigator.platform,
         pagina: window.location.href,
         referrer: document.referrer || "acesso direto",
-       // origem: new URLSearchParams(window.location.search).get("o") || "acesso direto",
+        // origem: new URLSearchParams(window.location.search).get("o") || "acesso direto",
         // SALVANDO A ORIGEM IDENTIFICADA
-      origem: origemFinal,
+        origem: origemFinal,
         canal: detectarCanalAcesso(), // ✅ NOVO (Site vs App)
         tela: `${window.screen.width}x${window.screen.height}`,
         dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
@@ -1901,7 +1901,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const destaquesFixos = [
-   // "hime",
+    // "hime",
     //    "seiza", "hime"
   ];
 
@@ -2607,17 +2607,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "n",
-    arenagoldenhits:"s",
+    arenagoldenhits: "s",
     carnailha: "s",
     pescar: "s",
     bloquinhodoagro: "s",
     cafedamanhadosamigos: "s",
 
-    cfccarlopolisfight:"s",
-    lowcity043fest:"s",
-    "7encontrodemotociclistas-lobodafronteira":"s",
-    frutfest2026:"s",
-   
+    cfccarlopolisfight: "s",
+    lowcity043fest: "s",
+    "7encontrodemotociclistas-lobodafronteira": "s",
+    frutfest2026: "s",
+
 
     /// FIM EVENTOS 
 
@@ -5227,15 +5227,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           codRef: "ST_001",
           tipo: "venda",
           procura: "sitio",
-          titulo: "Sítio à Beira da Represa",
-    
-          valor: 600000,
-    
-    
+          titulo: "Sítio à Beira da Represa",    
+          valor: 600000,    
           corretores: ["Luiz Vilas Boas - 52.194"],
           descricao: "Sítio com acesso exclusivo à represa, linha elétrica instalada e documentação pronta para transferência. Localizado a menos de 6 km do centro de Carlópolis, ideal para lazer, investimento ou construção",
-    
-    
+       
           area: "22.550 m²",
     
     
@@ -5256,12 +5252,52 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     
     */
 
+// CHACARA
+
+{
+      id: "chacara1",
+      codRef: "Ch_001",
+      procura: "chacara", // ou "terreno", "rural", etc.
+      tipo: "venda",
+      titulo: "Vende - se chácara em Carlópolis a 5Km da Cidade",
+      descricao: "- Nascente de água <br>- 03 açudes <br> - 800 de pés de goiabas IRRIGADOS <br>- Reserva de mata bem preservada<Br> - Área de lazer com fogão de lenha<Br> - Entrada fechada de muro, com portão<br> - Vista para cidade",
+     // endereco: "Ilha Bella",
+      valor: 850000,
+     // construcao: 306,          // << NOVO: m² de construção
+      area: "30000mts",
+      banheiros: 2,
+      churrasqueira: "Sim",
+      cozinhas: 1,
+      quartos: 2,
+      quintal: "Sim",
+      piscina: "Sim",
+      salas: 1,
+      suite: "0",
+      //vagas: 4,
+      corretores: ["Cesar Melo - 38.105 F"],
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/chacara/chacara1/1.jpg",
+        "images/imoveis/cesar/venda/chacara/chacara1/2.jpg",
+        "images/imoveis/cesar/venda/chacara/chacara1/3.jpg",
+        "images/imoveis/cesar/venda/chacara/chacara1/4.jpg",
+        "images/imoveis/cesar/venda/chacara/chacara1/5.jpg",
+        "images/imoveis/cesar/venda/chacara/chacara1/6.jpg",
+        "images/imoveis/cesar/venda/chacara/chacara1/7.jpg",
+        "images/imoveis/cesar/venda/chacara/chacara1/8.jpg",
+        "images/imoveis/cesar/venda/chacara/chacara1/9.jpg",
+        "images/imoveis/cesar/venda/chacara/chacara1/10.jpg",
+
+
+
+      ],
+
+    },
 
 
 
 
-
-    //Modelo
+    // TERRENOS 
     {
       id: "ter2",
       codRef: "T_002",
@@ -5573,12 +5609,33 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ],
     },
 
+      {
+      id: "ter15",
+      codRef: "T_015",
+      tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      titulo: "Terreno 500m2 Garden Residence",
+      descricao: "Documentação ok",
+      endereco: "Garden Residence",
+      area: "11x34",
+      valor: 230000,
+      telefone: "43 99678-9652",
+      imagens: [
+        "images/imoveis/cesar/venda/terreno/terreno3/1.jpg",
+        "images/imoveis/cesar/venda/terreno/terreno3/2.jpg",
+         "images/imoveis/cesar/venda/terreno/terreno3/3.jpg",
+
+      ],
+      corretores: ["Cesar Melo - 38.105 F"],
+
+    },
+
 
     /////////////////// GALPAO
 
     //Modelo
     {
-      id: "galpao1venda",
+      id: "galpao1",
       codRef: "G_001",
       tipo: "venda",
       procura: "galpao", // ou "terreno", "rural", etc.
@@ -5607,11 +5664,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     //Modelo
     {
-      id: "galpao1aluguel",
+      id: "galpao2",
       codRef: "G_002",
       tipo: "aluguel",
       procura: "galpao", // ou "terreno", "rural", etc.
-      titulo: "Galpão - Residencial Murador, ",
+      titulo: "Galpão - Residencial Murador",
       descricao: "Galpão amplo, ideal para indústria, depósito ou centro de distribuição",
       endereco: "Residencial Murador",
       banheiros: 1,
@@ -5632,6 +5689,38 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       corretores: ["Cesar Melo - 38.105 F"],
 
     },
+
+
+    // GALPAO
+
+    //Modelo
+    {
+      id: "galpao3",
+      codRef: "G_003",
+      tipo: "venda",
+      procura: "galpao", // ou "terreno", "rural", etc.
+      titulo: "Galpão de 180m2",
+      descricao: "Telhado com isolação térmica e acústica Estrutura de madeira tratada para mezanino ",
+      endereco: "Novo horizonte 1",
+      area: 180,
+      valor: 270000,
+      telefone: "43 99678-9652",
+      banheiros: 2,
+      imagens: [
+
+        "images/imoveis/cesar/venda/galpao/galpao2/1.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao2/2.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao2/3.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao2/4.jpg",
+        "images/imoveis/cesar/venda/galpao/galpao2/5.jpg",
+
+      ],
+      corretores: ["Cesar Melo - 38.105 F"],
+
+    },
+
+
+
     /*
         {
           id: "casa1a",
@@ -12226,7 +12315,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Eventos em Carlópolis",
         establishments: [
 
-      
+
 
 
 
@@ -12240,7 +12329,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-           {
+          {
             image: "images/informacoes/eventos/6.jpg",
             name: "CarnaIlha",
             date: "13/02/2026",
@@ -12291,7 +12380,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-             {
+          {
             image: "images/informacoes/eventos/14.jpg",
             name: "FrutFest 2026",
             date: "03/09/2026",
@@ -12301,7 +12390,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
 
-            {
+          {
             image: "images/informacoes/eventos/11.jpg",
             name: "7 Encontro de Motociclistas - Lobo da fronteira",
             date: "10/10/2026",
@@ -12312,7 +12401,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-            {
+          {
             image: "images/informacoes/eventos/13.jpg",
             name: "Low City 043 Fest",
             date: "18/10/2026",
@@ -12931,7 +13020,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       },
 
 
-       {
+      {
         link: document.querySelector("#menuSecretariaEducacao"),
         title: "Secretaria da Educação",
         establishments: [
@@ -14181,7 +14270,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R. Kalil Keder, 1204 - Carlopolis",
             contact: "(43) 99686-5040",
             delivery: "Sim / Com Taxa",
-            instagram:"https://www.instagram.com/restaurantehimeclps/",
+            instagram: "https://www.instagram.com/restaurantehimeclps/",
             menuImages: [
               "images/comercios/restaurante/hime/cardapio/1.jpg",
               "images/comercios/restaurante/hime/cardapio/2.jpg",
@@ -14863,33 +14952,34 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           */
 
 
- {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/72.jpg",
-                      date: "03/02/2026",
-                      descricaoFalecido: "É com profundo pesar que comunicamos o falecimento da Sra. Adarziza María Leite de Souza, aos 90 anos de idade, ocorrido em Carlópolis.<br>O velório inicia hoje, às 10:00 horas, na residência localizada na Rua Januário Francisco, nº 29, em Carlópolis.<br>A cerimônia de sepultamento será realizada amanhã, às 10:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos sinceros pêsames aos familiares e amigos neste momento de luto.🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/72.jpg",
+            date: "03/02/2026",
+            descricaoFalecido: "É com profundo pesar que comunicamos o falecimento da Sra. Adarziza María Leite de Souza, aos 90 anos de idade, ocorrido em Carlópolis.<br>O velório inicia hoje, às 10:00 horas, na residência localizada na Rua Januário Francisco, nº 29, em Carlópolis.<br>A cerimônia de sepultamento será realizada amanhã, às 10:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos sinceros pêsames aos familiares e amigos neste momento de luto.🙏🏼",
+          },
 
 
- {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/71.jpg",
-                      date: "27/01/2026",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. LOURDES FURLAN MACHADO, aos 93 anos, ocorrido em Carlópolis<Br>O velório iniciará hoje às 14:30 horas no Velório Municipal Lauro Soares<Br>A cerimônia do sepultamento ocorrerá amanhã 28/01/2026 às 09:00 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/71.jpg",
+            date: "27/01/2026",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. LOURDES FURLAN MACHADO, aos 93 anos, ocorrido em Carlópolis<Br>O velório iniciará hoje às 14:30 horas no Velório Municipal Lauro Soares<Br>A cerimônia do sepultamento ocorrerá amanhã 28/01/2026 às 09:00 horas, no Cemitério Municipal de Carlópolis.<Br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
-                       {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/70.jpg",
-                      date: "18/01/2026",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. EDERO PEREIRA JUNIOR, aos 78 anos, ocorrido em Jacarezinho, nosso querido Tutão<br>O velório será realizado no Velório Municipal Lauro Soares em horário a ser definido.<br>A cerimônia do sepultamento ocorrerá amanhã, Também em horário a ser definido no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼"},
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/70.jpg",
+            date: "18/01/2026",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento do Sr. EDERO PEREIRA JUNIOR, aos 78 anos, ocorrido em Jacarezinho, nosso querido Tutão<br>O velório será realizado no Velório Municipal Lauro Soares em horário a ser definido.<br>A cerimônia do sepultamento ocorrerá amanhã, Também em horário a ser definido no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼"
+          },
 
- {
-                      name: "Funeraria Cristo Rei",
-                      image: "images/informacoes/notaFalecimento/cristoRei/69.jpg",
-                      date: "16/01/2026",
-                      descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. TEREZA FERNANDES DA SILVA SOUZA, aos 85 anos, ocorrido em Carlópolis<br>O velório iniciará hoje às 12:30 horas no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá amanhã às 09:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",          
-                    },
+          {
+            name: "Funeraria Cristo Rei",
+            image: "images/informacoes/notaFalecimento/cristoRei/69.jpg",
+            date: "16/01/2026",
+            descricaoFalecido: "É com pesar que comunicamos o falecimento da Sra. TEREZA FERNANDES DA SILVA SOUZA, aos 85 anos, ocorrido em Carlópolis<br>O velório iniciará hoje às 12:30 horas no Velório Municipal.<br>A cerimônia do sepultamento ocorrerá amanhã às 09:00 horas, no Cemitério Municipal de Carlópolis.<br>Expressamos nossos mais sinceros sentimentos aos familiares e amigos neste momento de dor!🙏🏼",
+          },
 
 
           {
@@ -16492,7 +16582,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
       );
     });
   }
-window.registrarCliqueBotao = registrarCliqueBotao;
+  window.registrarCliqueBotao = registrarCliqueBotao;
 
   // === NASCER & PÔR DO SOL (Carlópolis-PR) ===
 
