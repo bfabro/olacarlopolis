@@ -5214,6 +5214,45 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+    {
+      id: "casa18v",
+      codRef: "C_018",
+      procura: "casa", // ou "terreno", "rural", etc.
+      tipo: "venda",
+      titulo: "Casa alto padrao na Ilha Bela",
+      descricao: "Toda Fechada no Blindex<br>Otima oportuindade para tambem ser mais uma fonte de renda!",
+      endereco: "Ilha Bella",
+      valor: 950000,
+     // construcao: 306,          // << NOVO: m² de construção
+     // area: 453.33,
+      banheiros: 2,
+      churrasqueira: "Sim",
+      cozinhas: 1,
+      quartos: 4,
+      quintal: "Sim",
+      piscina: "Sim",
+      salas: 1,
+      suite: "1",
+      vagas: 4,
+      corretores: ["Cesar Melo - 38.105 F"],
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa/casa18/1.jpg",
+        "images/imoveis/cesar/venda/casa/casa18/2.jpg",
+        "images/imoveis/cesar/venda/casa/casa18/3.jpg",
+        "images/imoveis/cesar/venda/casa/casa18/4.jpg",
+
+       
+
+
+
+      ],
+
+    },
+
+
+
+
 
 
 
@@ -5591,6 +5630,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     {
       id: "ter14",
       codRef: "T_014",
+      status:"vendido",
       procura: "terreno", // ou "terreno", "rural", etc.   
       tipo: "venda",
       titulo: "Terreno à venda no Residencial Vila Ray",
