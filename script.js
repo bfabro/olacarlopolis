@@ -5302,7 +5302,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       tipo: "venda",
       titulo: "Vende - se chácara em Carlópolis a 5 Km da Cidade",
       descricao: "- Nascente de água <br>- 03 açudes <br> - 800 de pés de goiabas IRRIGADOS <br>- Reserva de mata bem preservada<Br> - Área de lazer com fogão de lenha<Br> - Entrada fechada de muro, com portão<br> - Vista para cidade",
-     // endereco: "Ilha Bella",
+      endereco: "São Pedro",
       valor: 850000,
      // construcao: 306,          // << NOVO: m² de construção
       area: "30.000 mts",
@@ -5666,6 +5666,31 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/terreno/terreno3/1.jpg",
         "images/imoveis/cesar/venda/terreno/terreno3/2.jpg",
          "images/imoveis/cesar/venda/terreno/terreno3/3.jpg",
+
+      ],
+      corretores: ["Cesar Melo - 38.105 F"],
+
+    },
+
+
+     {
+      id: "ter16",
+      codRef: "T_016",
+      tipo: "venda",
+      procura: "terreno", // ou "terreno", "rural", etc.
+      titulo: "Chácara com acesso a represa",
+      descricao: " - Escriturada e registrada<BR> - Com energia enfrente <BR>- 7km da cidade",
+      endereco: "Água da Limeira",
+      area: "3000 m²",
+      valor: 350000,
+      telefone: "43 99678-9652",
+      imagens: [
+        "images/imoveis/cesar/venda/terreno/terreno4/1.jpg",
+        "images/imoveis/cesar/venda/terreno/terreno4/2.jpg",
+         "images/imoveis/cesar/venda/terreno/terreno4/3.jpg",
+           "images/imoveis/cesar/venda/terreno/terreno4/4.jpg",
+        "images/imoveis/cesar/venda/terreno/terreno4/5.jpg",
+         "images/imoveis/cesar/venda/terreno/terreno4/6.jpg",
 
       ],
       corretores: ["Cesar Melo - 38.105 F"],
