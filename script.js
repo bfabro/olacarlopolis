@@ -7316,8 +7316,13 @@ function extractInstagramUsername(input) {
 
   let s = String(input).trim();
 
-  // Se for "Instagram", "instagram:", etc, isso não é username
-  s = s.replace(/instagram/ig, "").trim();
+  // Se for só "Instagram" (ou variação), não é username
+  if (/^instagram\s*[:\-]?\s*$/i.test(s)) return "";
+
+  // Se NÃO tiver domínio, remove apenas prefixos tipo "instagram:" (sem destruir "instagram.com")
+  if (!/instagram\.com/i.test(s)) {
+    s = s.replace(/^instagram\s*[:\-]?\s*/i, "").trim();
+  }
 
   // remove protocolo
   s = s.replace(/^https?:\/\//i, "");
@@ -7325,7 +7330,7 @@ function extractInstagramUsername(input) {
   // remove www.
   s = s.replace(/^www\./i, "");
 
-  // se contiver instagram.com em qualquer lugar, corta até depois do domínio
+  // se contiver instagram.com, corta até depois do domínio
   if (/instagram\.com/i.test(s)) {
     s = s.replace(/.*instagram\.com\/?/i, "");
   }
@@ -7339,14 +7344,16 @@ function extractInstagramUsername(input) {
   const parts = s.split("/").filter(Boolean);
   if (!parts.length) return "";
 
-  // Se for link de post/reel/stories, não dá pra garantir perfil
   const first = parts[0].toLowerCase();
   if (["p", "reel", "tv", "stories", "explore"].includes(first)) return "";
 
-  // username válido
+  // Proteção: quando vira ".com" por erro de parsing
+  if (first === "com") return "";
+
   const user = parts[0].replace(/[^a-zA-Z0-9._]/g, "");
   return user || "";
 }
+
 
 function buildInstagramWebUrl(instagram) {
   const user = extractInstagramUsername(instagram);
