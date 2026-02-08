@@ -7287,150 +7287,26 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
   function fixInstagramUrl(instagram) {
-  // Mantém compatibilidade: aceita @usuario, usuario, ou link completo
   if (!instagram) return "";
 
   let ig = instagram.toString().trim();
 
-  // Remove rótulos comuns que alguns comércios digitam (ex: "Instagram", "Instagram Instagram")
-  // e qualquer espaço/emoji/ponto no final.
-  ig = ig.replace(/instagram/ig, "").trim();
-  ig = ig.replace(/\s+/g, " ").trim();
-
-  // se já for link completo, devolve ele (normalizado abaixo pelo buildInstagramWebUrl)
-  if (/^https?:\/\//i.test(ig)) return ig;
-
   // remove @
   ig = ig.replace(/^@/, "");
 
-  // se vier tipo instagram.com/usuario ou www.instagram.com/usuario
-  if (/^(www\.)?instagram\.com/i.test(ig)) return "https://" + ig.replace(/^https?:\/\//i, "");
+  // se já for link completo
+  if (ig.startsWith("http://") || ig.startsWith("https://")) {
+    return ig;
+  }
 
-  // se vier só o nome do usuário (sem espaços)
+  // se vier tipo instagram.com/usuario
+  if (ig.startsWith("instagram.com")) {
+    return "https://" + ig;
+  }
+
+  // se vier só o nome do usuário
   return "https://www.instagram.com/" + ig;
 }
-
-// Extrai o username de QUALQUER coisa (link, @, texto)
-function extractInstagramUsername(input) {
-  if (!input) return "";
-
-  let s = String(input).trim();
-
-  // Se for "Instagram", "instagram:", etc, isso não é username
-  s = s.replace(/instagram/ig, "").trim();
-
-  // remove protocolo
-  s = s.replace(/^https?:\/\//i, "");
-
-  // remove www.
-  s = s.replace(/^www\./i, "");
-
-  // se contiver instagram.com em qualquer lugar, corta até depois do domínio
-  if (/instagram\.com/i.test(s)) {
-    s = s.replace(/.*instagram\.com\/?/i, "");
-  }
-
-  // remove query/hash
-  s = s.split("?")[0].split("#")[0];
-
-  // remove @ e barras
-  s = s.replace(/^@/, "").replace(/^\/+/, "").replace(/\/+$/, "");
-
-  const parts = s.split("/").filter(Boolean);
-  if (!parts.length) return "";
-
-  // Se for link de post/reel/stories, não dá pra garantir perfil
-  const first = parts[0].toLowerCase();
-  if (["p", "reel", "tv", "stories", "explore"].includes(first)) return "";
-
-  // username válido
-  const user = parts[0].replace(/[^a-zA-Z0-9._]/g, "");
-  return user || "";
-}
-
-function buildInstagramWebUrl(instagram) {
-  const user = extractInstagramUsername(instagram);
-  if (user) return `https://www.instagram.com/${user}/`;
-
-  // fallback (mantém o que você já tinha)
-  const u = fixInstagramUrl(instagram);
-  // garante https
-  return /^https?:\/\//i.test(u) ? u : ("https://" + u.replace(/^\/+/, ""));
-}
-
-// Abre Instagram no APP quando possível (Android/iOS) e cai pro web se não abrir.
-function abrirInstagramDefinitivo(instagram) {
-  const user = extractInstagramUsername(instagram);
-  const webUrl = user ? `https://www.instagram.com/${user}/` : buildInstagramWebUrl(instagram);
-
-  const ua = navigator.userAgent || "";
-  const isAndroid = /Android/i.test(ua);
-  const isIOS = /iPhone|iPad|iPod/i.test(ua);
-  const isMobile = isAndroid || isIOS;
-
-  // Desktop: abre direto no web (nova aba)
-  if (!isMobile) {
-    window.open(webUrl, "_blank", "noopener");
-    return;
-  }
-
-  // Helper com fallback (evita "ir pra sua home" ou travar em branco)
-  const abrirComFallback = (appUrl) => {
-    let fallbackFired = false;
-
-    const timer = setTimeout(() => {
-      fallbackFired = true;
-      window.location.href = webUrl;
-    }, 900);
-
-    const cancel = () => {
-      // Se o app abriu, a página perde foco/é escondida
-      if (!fallbackFired) {
-        clearTimeout(timer);
-      }
-      document.removeEventListener("visibilitychange", cancel);
-      window.removeEventListener("pagehide", cancel);
-    };
-
-    document.addEventListener("visibilitychange", cancel);
-    window.addEventListener("pagehide", cancel);
-
-    // tentativa de abrir app
-    window.location.href = appUrl;
-  };
-
-  if (user) {
-    if (isAndroid) {
-      // Android: intent abre o app direto no perfil
-      const intent = `intent://instagram.com/_u/${user}/#Intent;package=com.instagram.android;scheme=https;end`;
-      abrirComFallback(intent);
-      return;
-    }
-
-    if (isIOS) {
-      // iOS: scheme do Instagram
-      const scheme = `instagram://user?username=${user}`;
-      abrirComFallback(scheme);
-      return;
-    }
-  }
-
-  // Se não conseguir extrair username, abre web normal
-  window.location.href = webUrl;
-}
-
-// Intercepta cliques em links do Instagram criados no card (funciona no celular e no modo APP/PWA)
-document.addEventListener("click", (e) => {
-  const a = e.target.closest && e.target.closest("a.ig-link, a[href*=\"instagram.com\"], a[href^=\"instagram://\"]");
-  if (!a) return;
-
-  // evita que o target/_blank do mobile te jogue pra "home" do Instagram
-  e.preventDefault();
-
-  const raw = a.getAttribute("data-ig-raw") || a.getAttribute("href") || "";
-  abrirInstagramDefinitivo(raw);
-}, { passive: false });
-
 
 
   function sendPaymentReminder(establishment) {
@@ -16324,7 +16200,9 @@ ${establishment.infoVagaTrabalho
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
                           ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
-                          ${establishment.instagram ? `<a href="${buildInstagramWebUrl(establishment.instagram)}" data-ig-raw="${(establishment.instagram || '').toString().replace(/"/g,'&quot;')}" class="ig-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram" style="color:#C13584;"></i> Instagram</a>` : ""}          
+                          ${establishment.instagram ? `<a href="${fixInstagramUrl(establishment.instagram)}"  target="_blank"  rel="noopener noreferrer">  <i class="fab fa-instagram" style="color:#C13584;"></i> Instagram.
+</a>
+` : ""}          
                           ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
                        
 
