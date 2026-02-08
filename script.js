@@ -7282,6 +7282,33 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     return u;
   }
 
+
+
+
+
+  function fixInstagramUrl(instagram) {
+  if (!instagram) return "";
+
+  let ig = instagram.toString().trim();
+
+  // remove @
+  ig = ig.replace(/^@/, "");
+
+  // se já for link completo
+  if (ig.startsWith("http://") || ig.startsWith("https://")) {
+    return ig;
+  }
+
+  // se vier tipo instagram.com/usuario
+  if (ig.startsWith("instagram.com")) {
+    return "https://" + ig;
+  }
+
+  // se vier só o nome do usuário
+  return "https://www.instagram.com/" + ig;
+}
+
+
   function sendPaymentReminder(establishment) {
     alert(
       `Atenção! O pagamento do site para ${establishment.name} vence hoje.`
@@ -16173,7 +16200,12 @@ ${establishment.infoVagaTrabalho
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
                           ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
-                          ${establishment.instagram ? `<a href="${fixUrl(establishment.instagram)}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram</a>` : ""}          
+                          ${establishment.instagram ? `<a href="${fixInstagramUrl(establishment.instagram)}"
+   target="_blank"
+   rel="noopener noreferrer">
+  <i class="fab fa-instagram" style="color:#C13584;"></i> Instagram.
+</a>
+` : ""}          
                           ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
                        
 
