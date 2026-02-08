@@ -7372,73 +7372,37 @@ function abrirInstagramDefinitivo(instagram) {
   const user = extractInstagramUsername(instagram);
   const webUrl = user ? `https://www.instagram.com/${user}/` : buildInstagramWebUrl(instagram);
 
-  const ua = navigator.userAgent || "";
-  const isAndroid = /Android/i.test(ua);
-  const isIOS = /iPhone|iPad|iPod/i.test(ua);
-  const isMobile = isAndroid || isIOS;
-
-  // Desktop: abre direto no web (nova aba)
-  if (!isMobile) {
-    window.open(webUrl, "_blank", "noopener");
+  // ✅ No celular: abre direto a URL do perfil
+  // (evita cair na HOME do app por causa de deep-link)
+  if (/android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
+    window.location.href = webUrl;
     return;
   }
 
-  // Helper com fallback (evita "ir pra sua home" ou travar em branco)
-  const abrirComFallback = (appUrl) => {
-    let fallbackFired = false;
-
-    const timer = setTimeout(() => {
-      fallbackFired = true;
-      window.location.href = webUrl;
-    }, 900);
-
-    const cancel = () => {
-      // Se o app abriu, a página perde foco/é escondida
-      if (!fallbackFired) {
-        clearTimeout(timer);
-      }
-      document.removeEventListener("visibilitychange", cancel);
-      window.removeEventListener("pagehide", cancel);
-    };
-
-    document.addEventListener("visibilitychange", cancel);
-    window.addEventListener("pagehide", cancel);
-
-    // tentativa de abrir app
-    window.location.href = appUrl;
-  };
-
-  if (user) {
-    if (isAndroid) {
-      // Android: intent abre o app direto no perfil
-      const intent = `intent://instagram.com/_u/${user}/#Intent;package=com.instagram.android;scheme=https;end`;
-      abrirComFallback(intent);
-      return;
-    }
-
-    if (isIOS) {
-      // iOS: scheme do Instagram
-      const scheme = `instagram://user?username=${user}`;
-      abrirComFallback(scheme);
-      return;
-    }
-  }
-
-  // Se não conseguir extrair username, abre web normal
-  window.location.href = webUrl;
+  // Desktop
+  window.open(webUrl, "_blank", "noopener");
 }
+
 
 // Intercepta cliques em links do Instagram criados no card (funciona no celular e no modo APP/PWA)
 document.addEventListener("click", (e) => {
-  const a = e.target.closest && e.target.closest("a.ig-link, a[href*=\"instagram.com\"], a[href^=\"instagram://\"]");
+  const a = e.target.closest && e.target.closest(
+    "a.js-ig-link, a.ig-link, a[href*='instagram.com']"
+  );
   if (!a) return;
 
-  // evita que o target/_blank do mobile te jogue pra "home" do Instagram
   e.preventDefault();
 
-  const raw = a.getAttribute("data-ig-raw") || a.getAttribute("href") || "";
+  const raw =
+    a.getAttribute("data-ig") ||
+    a.dataset.ig ||
+    a.getAttribute("data-ig-raw") ||
+    a.getAttribute("href") ||
+    "";
+
   abrirInstagramDefinitivo(raw);
 }, { passive: false });
+
 
 
 
@@ -19398,7 +19362,17 @@ function abrirPerfilInstagramSeguro(usernameOrUrl) {
 }
 
 // ✅ Intercepta cliques nos links marcados com .js-ig-link
-document.addEventListener("click", (e) => {
+document.addEventListener("click", (e) => {document.addEventListener("click", (e) => {
+  const a = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com'], a[href^='instagram://']");
+  if (!a) return;
+
+  e.preventDefault();
+
+  // ✅ PRIORIDADE: data-ig (se existir) > href
+  const ig = a.getAttribute("data-ig") || a.dataset.ig || a.getAttribute("href") || "";
+  abrirInstagramDefinitivo(ig);
+});
+
   const a = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com'], a[href^='instagram://']");
   if (!a) return;
 
