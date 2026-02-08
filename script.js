@@ -7371,29 +7371,34 @@ function buildInstagramWebUrl(instagram) {
 function abrirInstagramDefinitivo(usuarioOuUrl) {
   if (!usuarioOuUrl) return;
 
-  // Limpa a URL para pegar apenas o nome de usuário (ex: olacarlopolis)
-  let u = usuarioOuUrl.replace(/https?:\/\/(www\.)?instagram\.com\//, "").split('/')[0].split('?')[0];
-  
+  // 1. Extrai apenas o nome de utilizador, removendo a URL, barras e parâmetros de pesquisa
+  let u = usuarioOuUrl
+    .replace(/https?:\/\/(www\.)?instagram\.com\//, "") // Remove o domínio
+    .split('/')[0]                                     // Pega o que vem antes da primeira barra
+    .split('?')[0];                                    // Remove parâmetros tipo ?igsh=...
+
   const isAndroid = /Android/i.test(navigator.userAgent);
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
   const webUrl = `https://www.instagram.com/${u}/`;
 
+  // Fallback: se o app não abrir em 800ms, vai para o navegador
   const fallback = setTimeout(() => {
     window.location.href = webUrl;
-  }, 1000);
+  }, 800);
 
   try {
     if (isAndroid) {
-      // Tenta abrir via Intent no Android
+      // Abre o perfil direto no App Android
       window.location.href = `intent://instagram.com/_u/${u}#Intent;package=com.instagram.android;scheme=https;end`;
     } else if (isIOS) {
-      // Tenta abrir via Deep Link no iOS
+      // Abre o perfil direto no App iOS
       window.location.href = `instagram://user?username=${u}`;
     } else {
       clearTimeout(fallback);
-      window.open(webUrl, "_blank");
+      window.open(webUrl, "_blank", "noopener");
     }
   } catch (e) {
+    clearTimeout(fallback);
     window.location.href = webUrl;
   }
 }
