@@ -19358,6 +19358,56 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+// ✅ Instagram no celular: abre no perfil certo (App) + fallback web
+function abrirPerfilInstagramSeguro(usernameOrUrl) {
+  let u = String(usernameOrUrl || "").trim();
+
+  // aceita @user, user, instagram.com/user, https://instagram.com/user
+  u = u.replace(/^@/, "");
+  u = u.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "");
+  u = u.replace(/^instagram\.com\//i, "");
+  u = u.split("?")[0].replace(/\/+$/, ""); // remove query e barras finais
+
+  if (!u) return;
+
+  const webUrl = `https://www.instagram.com/${u}/`;
+  const isAndroid = /android/i.test(navigator.userAgent);
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  // fallback rápido pro web caso o app não abra
+  const fallback = setTimeout(() => { window.location.href = webUrl; }, 800);
+
+  try {
+    if (isAndroid) {
+      // Android: intent é o mais confiável
+      const intentUrl = `intent://instagram.com/_u/${u}#Intent;package=com.instagram.android;scheme=https;end`;
+      window.location.href = intentUrl;
+    } else if (isIOS) {
+      // iOS: deep link do app
+      window.location.href = `instagram://user?username=${u}`;
+    } else {
+      // desktop / outros
+      clearTimeout(fallback);
+      window.open(webUrl, "_blank", "noopener");
+    }
+  } catch (e) {
+    clearTimeout(fallback);
+    window.location.href = webUrl;
+  }
+}
+
+// ✅ Intercepta cliques nos links marcados com .js-ig-link
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a.js-ig-link");
+  if (!a) return;
+
+  const ig = a.getAttribute("data-ig") || a.getAttribute("href") || "";
+  // no celular, evita o comportamento “ir pra home”
+  if (/android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
+    e.preventDefault();
+    abrirPerfilInstagramSeguro(ig);
+  }
+});
 
 
 
