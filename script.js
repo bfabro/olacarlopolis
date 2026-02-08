@@ -19417,10 +19417,33 @@ document.addEventListener("click", (e) => {document.addEventListener("click", (e
 
 
 
+// Adicione este código no final do arquivo, antes do fechamento
+document.addEventListener("click", function(e) {
+    // Verifica se o clique foi no menu do Instagram
+    const instagramMenu = e.target.closest('#menuInstagram');
+    
+    if (instagramMenu) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Abre o Instagram em uma nova aba
+        window.open('https://www.instagram.com/olacarlopolis', '_blank');
+        
+        // Fecha o menu se estiver aberto
+        if (sidebar) {
+            sidebar.classList.remove("open");
+            overlay.classList.remove("active");
+        }
+    }
+});
 
 
-
-
+// Altere de algo como:
+document.getElementById("menuInstagram")?.addEventListener("click", function(e) {
+    e.preventDefault();
+    // Se tiver algo como location.hash = "#instagram" ou loadContent(), substitua por:
+    window.open('https://www.instagram.com/olacarlopolis', '_blank');
+});
 // ... (seu código de inicialização do Firebase acima)
 
 // Este observador roda automaticamente sempre que o estado do login muda
