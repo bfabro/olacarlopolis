@@ -7368,21 +7368,47 @@ function buildInstagramWebUrl(instagram) {
 }
 
 // Abre Instagram no APP quando possível (Android/iOS) e cai pro web se não abrir.
-function abrirInstagramDefinitivo(instagram) {
+function abrirInstagramDefinitivo(usuarioOuUrl) {
+  if (!usuarioOuUrl) return;
+
+  // Limpa a URL para pegar apenas o nome de usuário (ex: olacarlopolis)
+  let u = usuarioOuUrl.replace(/https?:\/\/(www\.)?instagram\.com\//, "").split('/')[0].split('?')[0];
   
-  const user = extractInstagramUsername(instagram);
-  const webUrl = user ? `https://www.instagram.com/${user}/` : buildInstagramWebUrl(instagram);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const webUrl = `https://www.instagram.com/${u}/`;
 
-  // ✅ No celular: abre direto a URL do perfil
-  // (evita cair na HOME do app por causa de deep-link)
-  if (/android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
+  const fallback = setTimeout(() => {
     window.location.href = webUrl;
-    return;
-  }
+  }, 1000);
 
-  // Desktop
-  window.open(webUrl, "_blank", "noopener");
+  try {
+    if (isAndroid) {
+      // Tenta abrir via Intent no Android
+      window.location.href = `intent://instagram.com/_u/${u}#Intent;package=com.instagram.android;scheme=https;end`;
+    } else if (isIOS) {
+      // Tenta abrir via Deep Link no iOS
+      window.location.href = `instagram://user?username=${u}`;
+    } else {
+      clearTimeout(fallback);
+      window.open(webUrl, "_blank");
+    }
+  } catch (e) {
+    window.location.href = webUrl;
+  }
 }
+
+// Interceptor de cliques corrigido
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a.js-ig-link, a[href*='instagram.com']");
+  if (!a) return;
+
+  const ig = a.getAttribute("data-ig") || a.getAttribute("href");
+  if (ig) {
+    e.preventDefault();
+    abrirInstagramDefinitivo(ig);
+  }
+});
 
 
 // Intercepta cliques em links do Instagram criados no card (funciona no celular e no modo APP/PWA)
