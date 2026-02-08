@@ -7287,28 +7287,29 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
   function fixInstagramUrl(instagram) {
-  // Mantém compatibilidade: aceita @usuario, usuario, ou link completo
   if (!instagram) return "";
 
-  let ig = instagram.toString().trim();
+  let ig = String(instagram).trim();
 
-  // Remove rótulos comuns que alguns comércios digitam (ex: "Instagram", "Instagram Instagram")
-  // e qualquer espaço/emoji/ponto no final.
-  ig = ig.replace(/instagram/ig, "").trim();
-  ig = ig.replace(/\s+/g, " ").trim();
+  // remove apenas rótulo no início (ex: "Instagram:", "Instagram -", "Instagram Instagram")
+  ig = ig.replace(/^\s*instagram\s*[:\-]?\s*/i, "").trim();
+  ig = ig.replace(/^\s*instagram\s+/i, "").trim(); // se repetiu
 
-  // se já for link completo, devolve ele (normalizado abaixo pelo buildInstagramWebUrl)
+  // se já é link completo, não mexe
   if (/^https?:\/\//i.test(ig)) return ig;
 
   // remove @
   ig = ig.replace(/^@/, "");
 
-  // se vier tipo instagram.com/usuario ou www.instagram.com/usuario
-  if (/^(www\.)?instagram\.com/i.test(ig)) return "https://" + ig.replace(/^https?:\/\//i, "");
+  // se vier "instagram.com/usuario" ou "www.instagram.com/usuario"
+  if (/^(www\.)?instagram\.com/i.test(ig)) {
+    return "https://" + ig.replace(/^https?:\/\//i, "");
+  }
 
-  // se vier só o nome do usuário (sem espaços) 
+  // se vier só "usuario"
   return "https://www.instagram.com/" + ig;
 }
+
 
 // Extrai o username de QUALQUER coisa (link, @, texto)
 function extractInstagramUsername(input) {
@@ -19398,16 +19399,16 @@ function abrirPerfilInstagramSeguro(usernameOrUrl) {
 
 // ✅ Intercepta cliques nos links marcados com .js-ig-link
 document.addEventListener("click", (e) => {
-  const a = e.target.closest("a.js-ig-link");
+  const a = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com'], a[href^='instagram://']");
   if (!a) return;
 
-  const ig = a.getAttribute("data-ig") || a.getAttribute("href") || "";
-  // no celular, evita o comportamento “ir pra home”
-  if (/android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
-    e.preventDefault();
-    abrirPerfilInstagramSeguro(ig);
-  }
+  e.preventDefault();
+
+  // ✅ PRIORIDADE: data-ig (se existir) > href
+  const ig = a.getAttribute("data-ig") || a.dataset.ig || a.getAttribute("href") || "";
+  abrirInstagramDefinitivo(ig);
 });
+
 
 
 
