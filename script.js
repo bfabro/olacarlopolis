@@ -7369,9 +7369,6 @@ function buildInstagramWebUrl(instagram) {
 
 // Abre Instagram no APP quando possível (Android/iOS) e cai pro web se não abrir.
 function abrirInstagramDefinitivo(instagram) {
-if (usuarioOuUrl && !usuarioOuUrl.includes("olacarlopolis")) {
-      u = usuarioOuUrl.replace(/.*instagram\.com\/([^/?]+).*/, "$1");
-  }
   
   const user = extractInstagramUsername(instagram);
   const webUrl = user ? `https://www.instagram.com/${user}/` : buildInstagramWebUrl(instagram);
