@@ -7306,7 +7306,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   // se vier tipo instagram.com/usuario ou www.instagram.com/usuario
   if (/^(www\.)?instagram\.com/i.test(ig)) return "https://" + ig.replace(/^https?:\/\//i, "");
 
-  // se vier só o nome do usuário (sem espaços) 
+  // se vier só o nome do usuário (sem espaços)
   return "https://www.instagram.com/" + ig;
 }
 
@@ -7330,7 +7330,7 @@ function extractInstagramUsername(input) {
   // remove www.
   s = s.replace(/^www\./i, "");
 
-  // se contiver instagram.com em qualquer lugar, corta até depois do domínio
+  // se contiver instagram.com, corta até depois do domínio
   if (/instagram\.com/i.test(s)) {
     s = s.replace(/.*instagram\.com\/?/i, "");
   }
@@ -7344,17 +7344,16 @@ function extractInstagramUsername(input) {
   const parts = s.split("/").filter(Boolean);
   if (!parts.length) return "";
 
-  // Se for link de post/reel/stories, não dá pra garantir perfil
   const first = parts[0].toLowerCase();
   if (["p", "reel", "tv", "stories", "explore"].includes(first)) return "";
 
   // Proteção: quando vira ".com" por erro de parsing
   if (first === "com") return "";
 
-  // username válido
   const user = parts[0].replace(/[^a-zA-Z0-9._]/g, "");
   return user || "";
 }
+
 
 function buildInstagramWebUrl(instagram) {
   const user = extractInstagramUsername(instagram);
