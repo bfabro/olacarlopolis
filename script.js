@@ -7374,7 +7374,7 @@ if (usuarioOuUrl && !usuarioOuUrl.includes("olacarlopolis")) {
   }
   
   const user = extractInstagramUsername(instagram);
- const webUrl = `https://www.instagram.com/${u}/`;
+  const webUrl = user ? `https://www.instagram.com/${user}/` : buildInstagramWebUrl(instagram);
 
   // ✅ No celular: abre direto a URL do perfil
   // (evita cair na HOME do app por causa de deep-link)
