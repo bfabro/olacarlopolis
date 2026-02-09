@@ -19328,66 +19328,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+// FUNÇÃO ÚNICA DE REDIRECIONAMENTO
+function abrirInstagram(elemento) {
+    // 1. Pega o link do atributo data-ig ou do href
+    let rawLink = elemento.getAttribute("data-ig") || elemento.getAttribute("href");
+    
+    if (!rawLink || rawLink === "#") return;
 
-// ==========================================
-// SISTEMA DE REDIRECIONAMENTO INSTAGRAM (APP/WEB)
-// ==========================================
+    // 2. Extrai o nome de usuário (ex: transforma o link do Tokfino em apenas 'tokfino')
+    let user = rawLink.replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
+                      .replace(/@/g, "")
+                      .split('/')[0]
+                      .split('?')[0]
+                      .trim();
 
-function abrirInstagramDefinitivo(igData) {
-    if (!igData || igData === "#") return;
-
-    // 1. Limpeza rigorosa do username
-    // Remove links completos, o símbolo @ e barras extras
-    let username = igData.trim()
-        .replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
-        .replace(/@/g, "")
-        .split('/')[0]
-        .split('?')[0];
-
-    if (!username) return;
-
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isAndroid = /Android/i.test(navigator.userAgent);
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // URLs de Destino
-    const appAndroid = `intent://instagram.com/_u/${username}/#Intent;package=com.instagram.android;scheme=https;end`;
-    const appIOS = `instagram://user?username=${username}`;
-    const webUrl = `https://www.instagram.com/${username}/`;
-
-    // 2. Execução do Redirecionamento
-    if (isAndroid) {
-        window.location.href = appAndroid;
-    } else if (isIOS) {
-        window.location.href = appIOS;
-        // Fallback: Se o app não abrir em 500ms, tenta a web
-        setTimeout(() => {
-            if (!document.hidden) window.location.href = webUrl;
-        }, 500);
+    if (isMobile) {
+        // Se for Android, usa o Intent (Mais forte para abrir o App)
+        if (isAndroid) {
+            window.location.href = `intent://instagram.com/_u/${user}/#Intent;package=com.instagram.android;scheme=https;end`;
+        } else {
+            // Se for iOS, tenta o esquema de app
+            window.location.href = `instagram://user?username=${user}`;
+            setTimeout(() => { window.location.href = `https://www.instagram.com/${user}/`; }, 500);
+        }
     } else {
-        // Desktop
-        window.open(webUrl, '_blank');
+        // Se for computador, abre em nova aba normal
+        window.open(`https://www.instagram.com/${user}/`, '_blank');
     }
 }
 
-// 3. Ouvinte de Cliques Global (Captura cliques em links de clientes e no menu)
+// OUVINTE DE CLIQUE QUE VAI MANDAR NO SITE TODO
 document.addEventListener("click", function(e) {
-    // Procura por links de Instagram (clientes usam as classes js-ig-link ou ig-link)
+    // Procura se o que foi clicado é um link de Instagram
     const linkIg = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com']");
     
     if (linkIg) {
-        // Bloqueia o comportamento padrão do navegador
         e.preventDefault();
         e.stopPropagation();
 
-        // SE o clique foi no seu MENU lateral (Olá Carlópolis)
-        if (linkIg.id === 'menuInstagram' || linkIg.closest('#menuInstagram')) {
-            abrirInstagramDefinitivo('olacarlopolis');
-            return;
+        // SE o link tiver o ID menuInstagram, é o SEU perfil.
+        if (linkIg.id === 'menuInstagram') {
+            abrirInstagram(Object.assign(document.createElement('a'), {href: 'olacarlopolis'}));
+        } else {
+            // SENÃO, é o perfil do cliente (Tokfino, etc)
+            abrirInstagram(linkIg);
         }
-
-        // SE o clique foi em um CLIENTE (Ex: Tokfino)
-        // Pega primeiro o data-ig (mais seguro) ou o href
-        const destino = linkIg.getAttribute("data-ig") || linkIg.getAttribute("href");
-        abrirInstagramDefinitivo(destino);
     }
-}, true); // O 'true' garante que seu código rode antes de outros scripts
+}, true); // O 'true' aqui é o segredo: ele faz esse código rodar antes de qualquer outro
