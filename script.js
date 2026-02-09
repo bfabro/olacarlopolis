@@ -16262,7 +16262,11 @@ ${establishment.infoVagaTrabalho
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
                           ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
-                          ${establishment.instagram ? `<a href="${fixInstagramUrl(establishment.instagram)}"/g,'&quot;')}"  target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram" style="color:#C13584;"></i> Instagram</a>` : ""}          
+                         
+                         
+                          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagramx</a>` : ""} 
+                         
+                         
                           ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
                        
 
