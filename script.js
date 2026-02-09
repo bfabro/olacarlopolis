@@ -7376,18 +7376,45 @@ function buildInstagramWebUrl(instagram) {
 
 
 
-function openInstagramSmart(instagramRaw) {
-  const webUrl = buildInstagramWebUrl(instagramRaw); // sempre válido
+function isStandalonePWA() {
+  return window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true; // iOS antigo
+}
 
-  // PWA/standalone: abrir via location é o mais confiável
-  if (isAppInstalado()) {
+function normalizeInstagramUrl(raw) {
+  if (!raw) return "";
+  let s = String(raw).trim();
+
+  // Se já é URL completa, só retorna
+  if (/^https?:\/\//i.test(s)) return s;
+
+  // remove @ e espaços
+  s = s.replace(/^@/, "").replace(/\s+/g, "");
+
+  // se veio tipo instagram.com/xxx
+  s = s.replace(/^www\./i, "");
+  if (/^instagram\.com\//i.test(s)) s = "https://" + s;
+
+  // se veio só o username
+  if (!/^https?:\/\//i.test(s)) s = "https://www.instagram.com/" + s + "/";
+
+  return s;
+}
+
+function openInstagramSmart(instagramRaw) {
+  const webUrl = normalizeInstagramUrl(instagramRaw);
+  if (!webUrl) return;
+
+  // ✅ PWA instalado: usar navegação direta (mais confiável)
+  if (isStandalonePWA()) {
     window.location.href = webUrl;
     return;
   }
 
-  // Browser normal: abre nova aba
+  // ✅ Browser normal: nova aba
   window.open(webUrl, "_blank", "noopener,noreferrer");
 }
+
 
 
 
@@ -19366,6 +19393,23 @@ document.addEventListener("click", (e) => {
   openInstagramSmart(raw);
 });
 
+
+
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a");
+  if (!a) return;
+
+  const href = a.getAttribute("href") || "";
+  const isIG = /instagram\.com/i.test(href) || a.classList.contains("js-ig-link") || a.dataset.ig;
+
+  if (!isIG) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const raw = a.dataset.ig || href;
+  openInstagramSmart(raw);
+});
 
 
 
