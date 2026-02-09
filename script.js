@@ -7369,6 +7369,61 @@ function buildInstagramWebUrl(instagram) {
 
 
 
+
+
+
+
+
+function openInstagramSmart(instagramRaw) {
+  const user = extractInstagramUsername(instagramRaw);
+  const webUrl = buildInstagramWebUrl(instagramRaw); // garante https + perfil quando possível
+
+  const standalone = isAppInstalado(); // você já tem essa função
+  const isAndroid = /android/i.test(navigator.userAgent);
+
+  // ✅ Regra de ouro: sem username => NUNCA tenta deep link, vai direto pro web
+  if (!user) {
+    if (standalone) {
+      window.location.href = webUrl;      // no PWA, abre fora / app via universal link
+    } else {
+      window.open(webUrl, "_blank", "noopener,noreferrer");
+    }
+    return;
+  }
+
+  // Com username, você pode tentar abrir no app (Android), com fallback pro web
+  if (standalone && isAndroid) {
+    const intentUrl = `intent://instagram.com/_u/${user}#Intent;package=com.instagram.android;scheme=https;end`;
+    window.location.href = intentUrl;
+
+    // fallback garantido
+    setTimeout(() => {
+      window.location.href = webUrl;
+    }, 800);
+
+    return;
+  }
+
+  // iOS e/ou browser normal: universal link já resolve (abre no app se tiver, senão web)
+  if (standalone) {
+    window.location.href = webUrl;
+  } else {
+    window.open(webUrl, "_blank", "noopener,noreferrer");
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Interceptor de cliques corrigido
 // Intercepta cliques em links do Instagram criados no card (funciona no celular e no modo APP/PWA)
 function sendPaymentReminder(establishment) {
@@ -19293,6 +19348,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a[data-ig], a.js-ig-link");
+  if (!a) return;
+
+  // pega o username/valor do instagram do dataset, ou do href
+  const raw = a.getAttribute("data-ig") || a.dataset.ig || a.getAttribute("href") || "";
+  if (!raw) return;
+
+  // Só intercepta links que sejam Instagram
+  if (!/instagram\.com/i.test(raw) && !/instagram/i.test(raw)) return;
+
+  e.preventDefault();
+  openInstagramSmart(raw);
+});
 
 
 
