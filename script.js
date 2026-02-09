@@ -16295,7 +16295,7 @@ ${establishment.infoVagaTrabalho
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
                           ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
-                          ${establishment.instagram ? `<a href="${buildInstagramWebUrl(establishment.instagram)}" data-ig-raw="${(establishment.instagram || '').toString().replace(/"/g,'&quot;')}" class="ig-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram" style="color:#C13584;"></i> Instagram</a>` : ""}          
+                          ${establishment.instagram ? `<a href="${buildInstagramWebUrl(establishment.instagram)}" data-ig="${(establishment.instagram || '').toString().replace(/"/g,'&quot;')}" class="ig-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram" style="color:#C13584;"></i> Instagram</a>` : ""}          
                           ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
                        
 
@@ -19321,120 +19321,73 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// ✅ Instagram no celular: abre no perfil certo (App) + fallback web
-function abrirPerfilInstagramSeguro(usernameOrUrl) {
-  let u = String(usernameOrUrl || "").trim();
-
-  // aceita @user, user, instagram.com/user, https://instagram.com/user
-  u = u.replace(/^@/, "");
-  u = u.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "");
-  u = u.replace(/^instagram\.com\//i, "");
-  u = u.split("?")[0].replace(/\/+$/, ""); // remove query e barras finais
-
-  if (!u) return;
-
-  const webUrl = `https://www.instagram.com/${u}/`;
-  const isAndroid = /android/i.test(navigator.userAgent);
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
-  // fallback rápido pro web caso o app não abra
-  const fallback = setTimeout(() => { window.location.href = webUrl; }, 800);
-
-  try {
-    if (isAndroid) {
-      // Android: intent é o mais confiável
-      const intentUrl = `intent://instagram.com/_u/${u}#Intent;package=com.instagram.android;scheme=https;end`;
-      window.location.href = intentUrl;
-    } else if (isIOS) {
-      // iOS: deep link do app
-      window.location.href = `instagram://user?username=${u}`;
-    } else {
-      // desktop / outros
-      clearTimeout(fallback);
-      window.open(webUrl, "_blank", "noopener");
-    }
-  } catch (e) {
-    clearTimeout(fallback);
-    window.location.href = webUrl;
-  }
-}
-
-// ✅ Intercepta cliques nos links marcados com .js-ig-link
-document.addEventListener("click", (e) => {
-  document.addEventListener("click", (e) => {
-  const a = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com'], a[href^='instagram://']");
-  if (!a) return;
-
-  e.preventDefault();
-
-  // ✅ PRIORIDADE: data-ig (se existir) > href
-  const ig = a.getAttribute("data-ig") || a.dataset.ig || a.getAttribute("href") || "";
-  abrirInstagramDefinitivo(ig);
-});
-
-  const a = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com'], a[href^='instagram://']");
-  if (!a) return;
-
-  e.preventDefault();
-
-  // ✅ PRIORIDADE: data-ig (se existir) > href
-  const ig = a.getAttribute("data-ig") || a.dataset.ig || a.getAttribute("href") || "";
-  abrirInstagramDefinitivo(ig);
-});
 
 
 
 
-// FUNÇÃO PARA ABRIR O APP OU WEB
-function abrirInstagramDeepLink(urlOuUser) {
-    if (!urlOuUser || urlOuUser === "#") return;
 
-    // Extrai o username puro (ex: de 'https://instagram.com/tokfino' sobra 'tokfino')
-    let user = urlOuUser.replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
-                         .replace(/@/g, "")
-                         .split('/')[0]
-                         .split('?')[0]
-                         .trim();
 
-    if (!user) return;
+
+
+// ==========================================
+// SISTEMA DE REDIRECIONAMENTO INSTAGRAM (APP/WEB)
+// ==========================================
+
+function abrirInstagramDefinitivo(igData) {
+    if (!igData || igData === "#") return;
+
+    // 1. Limpeza rigorosa do username
+    // Remove links completos, o símbolo @ e barras extras
+    let username = igData.trim()
+        .replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
+        .replace(/@/g, "")
+        .split('/')[0]
+        .split('?')[0];
+
+    if (!username) return;
 
     const isAndroid = /Android/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // Protocolos para forçar o App
-    const androidApp = `intent://instagram.com/_u/${user}/#Intent;package=com.instagram.android;scheme=https;end`;
-    const iosApp = `instagram://user?username=${user}`;
-    const webUrl = `https://www.instagram.com/${user}/`;
+    // URLs de Destino
+    const appAndroid = `intent://instagram.com/_u/${username}/#Intent;package=com.instagram.android;scheme=https;end`;
+    const appIOS = `instagram://user?username=${username}`;
+    const webUrl = `https://www.instagram.com/${username}/`;
 
+    // 2. Execução do Redirecionamento
     if (isAndroid) {
-        window.location.href = androidApp;
+        window.location.href = appAndroid;
     } else if (isIOS) {
-        window.location.href = iosApp;
-        setTimeout(() => { window.location.href = webUrl; }, 500);
+        window.location.href = appIOS;
+        // Fallback: Se o app não abrir em 500ms, tenta a web
+        setTimeout(() => {
+            if (!document.hidden) window.location.href = webUrl;
+        }, 500);
     } else {
+        // Desktop
         window.open(webUrl, '_blank');
     }
 }
 
-// OUVINTE DE CLIQUE ÚNICO
+// 3. Ouvinte de Cliques Global (Captura cliques em links de clientes e no menu)
 document.addEventListener("click", function(e) {
-    // 1. Verifica se clicou no SEU menu lateral fixo (ID único)
-    const meuPerfil = e.target.closest('#menuInstagram');
-    if (meuPerfil) {
+    // Procura por links de Instagram (clientes usam as classes js-ig-link ou ig-link)
+    const linkIg = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com']");
+    
+    if (linkIg) {
+        // Bloqueia o comportamento padrão do navegador
         e.preventDefault();
         e.stopPropagation();
-        abrirInstagramDeepLink('olacarlopolis');
-        return; // Encerra aqui
-    }
 
-    // 2. Verifica se clicou em um link de CLIENTE (Ex: Tokfino)
-    const linkCliente = e.target.closest('.js-ig-link, .ig-link');
-    if (linkCliente) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Pega o destino do data-ig ou do href
-        const destino = linkCliente.getAttribute('data-ig') || linkCliente.getAttribute('href');
-        abrirInstagramDeepLink(destino);
+        // SE o clique foi no seu MENU lateral (Olá Carlópolis)
+        if (linkIg.id === 'menuInstagram' || linkIg.closest('#menuInstagram')) {
+            abrirInstagramDefinitivo('olacarlopolis');
+            return;
+        }
+
+        // SE o clique foi em um CLIENTE (Ex: Tokfino)
+        // Pega primeiro o data-ig (mais seguro) ou o href
+        const destino = linkIg.getAttribute("data-ig") || linkIg.getAttribute("href");
+        abrirInstagramDefinitivo(destino);
     }
-}, true); // O 'true' faz o script ter prioridade total
+}, true); // O 'true' garante que seu código rode antes de outros scripts
