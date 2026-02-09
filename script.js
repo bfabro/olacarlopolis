@@ -7367,41 +7367,7 @@ function buildInstagramWebUrl(instagram) {
   return /^https?:\/\//i.test(u) ? u : ("https://" + u.replace(/^\/+/, ""));
 }
 
-// Abre Instagram no APP quando possível (Android/iOS) e cai pro web se não abrir.
-function abrirInstagramDefinitivo(usuarioOuUrl) {
-  if (!usuarioOuUrl) return;
 
-  // 1. Extrai apenas o nome de utilizador, removendo a URL, barras e parâmetros de pesquisa
-  let u = usuarioOuUrl
-    .replace(/https?:\/\/(www\.)?instagram\.com\//, "") // Remove o domínio
-    .split('/')[0]                                     // Pega o que vem antes da primeira barra
-    .split('?')[0];                                    // Remove parâmetros tipo ?igsh=...
-
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const webUrl = `https://www.instagram.com/${u}/`;
-
-  // Fallback: se o app não abrir em 800ms, vai para o navegador
-  const fallback = setTimeout(() => {
-    window.location.href = webUrl;
-  }, 800);
-
-  try {
-    if (isAndroid) {
-      // Abre o perfil direto no App Android
-      window.location.href = `intent://instagram.com/_u/${u}#Intent;package=com.instagram.android;scheme=https;end`;
-    } else if (isIOS) {
-      // Abre o perfil direto no App iOS
-      window.location.href = `instagram://user?username=${u}`;
-    } else {
-      clearTimeout(fallback);
-      window.open(webUrl, "_blank", "noopener");
-    }
-  } catch (e) {
-    clearTimeout(fallback);
-    window.location.href = webUrl;
-  }
-}
 
 // Interceptor de cliques corrigido
 document.addEventListener("click", (e) => {
@@ -19423,53 +19389,45 @@ document.addEventListener("click", (e) => {
 
 
 // ... (seu código de inicialização do Firebase acima)
-
-// Este observador roda automaticamente sempre que o estado do login muda
-// 1. Função de redirecionamento robusta
+// 1. Função simplificada e direta
 function abrirInstagramDefinitivo(ig) {
   if (!ig) return;
 
-  // Limpa o link para obter apenas o nome de usuário (ex: @usuario ou link completo)
-  let u = ig.replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
-            .replace(/@/g, "")
-            .split('/')[0]
-            .split('?')[0];
+  // Se for apenas o username (ex: "fulano"), transforma em link completo
+  let urlFinal = ig;
+  if (!ig.includes('instagram.com')) {
+      urlFinal = `https://www.instagram.com/${ig.replace('@', '')}/`;
+  }
 
-  const webUrl = `https://www.instagram.com/${u}/`;
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  // Fallback: se o app não abrir em 800ms, vai pelo navegador
-  const fallback = setTimeout(() => { 
-    window.location.href = webUrl; 
-  }, 800);
-
-  try {
-    if (isAndroid) {
-      window.location.href = `intent://instagram.com/_u/${u}#Intent;package=com.instagram.android;scheme=https;end`;
-    } else if (isIOS) {
-      window.location.href = `instagram://user?username=${u}`;
-    } else {
-      clearTimeout(fallback);
-      window.open(webUrl, "_blank", "noopener");
-    }
-  } catch (e) {
-    clearTimeout(fallback);
-    window.location.href = webUrl;
+  // Tenta abrir numa nova aba (comportamento padrão que funciona sempre)
+  const novaAba = window.open(urlFinal, '_blank', 'noopener,noreferrer');
+  
+  // Se o navegador bloqueou o popup, tenta abrir na mesma aba como plano B
+  if (!novaAba || novaAba.closed || typeof novaAba.closed === 'undefined') {
+      window.location.href = urlFinal;
   }
 }
 
-// 2. Ouvinte de clique ÚNICO e CORRETO
+// 2. Ouvinte de clique CORRIGIDO (Remova os antigos duplicados)
 document.addEventListener("click", (e) => {
-  // Captura o clique em links do instagram ou elementos com a classe específica
+  // Procura o link clicado
   const a = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com']");
   
   if (a) {
+    // IMPORTANTE: Se o link for o do seu menu fixo (#menuInstagram), 
+    // ele não deve ser processado pela lógica dinâmica dos clientes.
+    if (a.id === 'menuInstagram' || a.closest('#menuInstagram')) {
+        return; // Deixa o link normal do HTML funcionar para o seu perfil
+    }
+
     e.preventDefault();
-    // Prioridade para o data-ig, se não houver, usa o href
+    e.stopPropagation();
+
+    // Pega o link do cliente do atributo data ou do href
     const igData = a.getAttribute("data-ig") || a.dataset.ig || a.getAttribute("href");
-    if (igData) {
+    
+    if (igData && igData !== "#") {
       abrirInstagramDefinitivo(igData);
     }
   }
-});
+}, true); // O 'true' ajuda a capturar o clique antes de outros scripts
