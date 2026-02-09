@@ -15872,6 +15872,19 @@ document.addEventListener("click", (e) => {
 });
 
 
+// ✅ Nosso Instagram — abre certo no PWA e fora dele
+document.addEventListener("click", (e) => {
+  const link = e.target.closest(".js-ig-nosso");
+  if (!link) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const igUrl = link.getAttribute("data-ig");
+  openInstagramSmart(igUrl);
+});
+
+
 
 
   searchInput.addEventListener("input", function () {
