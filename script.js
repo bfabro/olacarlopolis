@@ -19394,7 +19394,8 @@ function abrirPerfilInstagramSeguro(usernameOrUrl) {
 }
 
 // ✅ Intercepta cliques nos links marcados com .js-ig-link
-document.addEventListener("click", (e) => {document.addEventListener("click", (e) => {
+document.addEventListener("click", (e) => {
+  document.addEventListener("click", (e) => {
   const a = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com'], a[href^='instagram://']");
   if (!a) return;
 
@@ -19417,33 +19418,58 @@ document.addEventListener("click", (e) => {document.addEventListener("click", (e
 
 
 
-// Adicione este código no final do arquivo, antes do fechamento
-document.addEventListener("click", function(e) {
-    // Verifica se o clique foi no menu do Instagram
-    const instagramMenu = e.target.closest('#menuInstagram');
-    
-    if (instagramMenu) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Abre o Instagram em uma nova aba
-        window.open('https://www.instagram.com/olacarlopolis', '_blank');
-        
-        // Fecha o menu se estiver aberto
-        if (sidebar) {
-            sidebar.classList.remove("open");
-            overlay.classList.remove("active");
-        }
-    }
-});
 
 
-// Altere de algo como:
-document.getElementById("menuInstagram")?.addEventListener("click", function(e) {
-    e.preventDefault();
-    // Se tiver algo como location.hash = "#instagram" ou loadContent(), substitua por:
-    window.open('https://www.instagram.com/olacarlopolis', '_blank');
-});
+
+
 // ... (seu código de inicialização do Firebase acima)
 
 // Este observador roda automaticamente sempre que o estado do login muda
+// 1. Função de redirecionamento robusta
+function abrirInstagramDefinitivo(ig) {
+  if (!ig) return;
+
+  // Limpa o link para obter apenas o nome de usuário (ex: @usuario ou link completo)
+  let u = ig.replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
+            .replace(/@/g, "")
+            .split('/')[0]
+            .split('?')[0];
+
+  const webUrl = `https://www.instagram.com/${u}/`;
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // Fallback: se o app não abrir em 800ms, vai pelo navegador
+  const fallback = setTimeout(() => { 
+    window.location.href = webUrl; 
+  }, 800);
+
+  try {
+    if (isAndroid) {
+      window.location.href = `intent://instagram.com/_u/${u}#Intent;package=com.instagram.android;scheme=https;end`;
+    } else if (isIOS) {
+      window.location.href = `instagram://user?username=${u}`;
+    } else {
+      clearTimeout(fallback);
+      window.open(webUrl, "_blank", "noopener");
+    }
+  } catch (e) {
+    clearTimeout(fallback);
+    window.location.href = webUrl;
+  }
+}
+
+// 2. Ouvinte de clique ÚNICO e CORRETO
+document.addEventListener("click", (e) => {
+  // Captura o clique em links do instagram ou elementos com a classe específica
+  const a = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com']");
+  
+  if (a) {
+    e.preventDefault();
+    // Prioridade para o data-ig, se não houver, usa o href
+    const igData = a.getAttribute("data-ig") || a.dataset.ig || a.getAttribute("href");
+    if (igData) {
+      abrirInstagramDefinitivo(igData);
+    }
+  }
+});
