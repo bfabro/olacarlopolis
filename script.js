@@ -7286,29 +7286,25 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-  function fixInstagramUrl(instagram) {
-  if (!instagram) return "";
+  function fixInstagramUrl(url) {
+  if (!url) return "";
 
-  let ig = String(instagram).trim();
+  let u = url.trim();
 
-  // remove apenas rótulo no início (ex: "Instagram:", "Instagram -", "Instagram Instagram")
-  ig = ig.replace(/^\s*instagram\s*[:\-]?\s*/i, "").trim();
-  ig = ig.replace(/^\s*instagram\s+/i, "").trim(); // se repetiu
-
-  // se já é link completo, não mexe
-  if (/^https?:\/\//i.test(ig)) return ig;
-
-  // remove @
-  ig = ig.replace(/^@/, "");
-
-  // se vier "instagram.com/usuario" ou "www.instagram.com/usuario"
-  if (/^(www\.)?instagram\.com/i.test(ig)) {
-    return "https://" + ig.replace(/^https?:\/\//i, "");
+  // Remove @
+  if (u.startsWith("@")) {
+    u = u.substring(1);
   }
 
-  // se vier só "usuario"
-  return "https://www.instagram.com/" + ig;
+  // Se já for link completo
+  if (u.startsWith("http")) {
+    return u;
+  }
+
+  // Caso seja só o username
+  return "https://www.instagram.com/" + u;
 }
+
 
 
 // Extrai o username de QUALQUER coisa (link, @, texto)
@@ -16295,7 +16291,11 @@ ${establishment.infoVagaTrabalho
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
                           ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
-                          ${establishment.instagram ? `<a href="${buildInstagramWebUrl(establishment.instagram)}" data-ig="${(establishment.instagram || '').toString().replace(/"/g,'&quot;')}" class="ig-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram" style="color:#C13584;"></i> Instagram</a>` : ""}          
+                          ${establishment.instagram ? `<a href="${fixInstagramUrl(establishment.instagram)}"
+   target="_blank"
+   rel="noopener noreferrer">
+   <i class="fab fa-instagram"></i> Instagram
+</a>` : ""}          
                           ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
                        
 
