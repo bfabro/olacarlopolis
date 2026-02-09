@@ -2607,7 +2607,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "n",
-    arenagoldenhits: "s",
+    arenagoldenhits: "n",
     carnailha: "s",
     pescar: "s",
     bloquinhodoagro: "s",
@@ -11777,14 +11777,14 @@ function sendPaymentReminder(establishment) {
             facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
             instagram: "https://www.instagram.com/farmaiscarlopolis/",
             novidadesImages: [
-              "images/comercios/farmacia/farmais/divulgacao/1.jpg",
+             
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
               "images/comercios/farmacia/farmais/divulgacao/4.jpg",
 
             ],
             novidadesDescriptions: [
-              "Venham Participar desta comemoração",
+              
               "Tome no horário certo – Respeite os intervalos indicados.",
               "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
               "Tome no horário certo – Respeite os intervalos indicados.",
