@@ -19391,22 +19391,57 @@ document.addEventListener("click", (e) => {
 // ... (seu código de inicialização do Firebase acima)
 // 1. Função simplificada e direta
 function abrirInstagramDefinitivo(ig) {
-  if (!ig) return;
+    if (!ig) return;
 
-  // Se for apenas o username (ex: "fulano"), transforma em link completo
-  let urlFinal = ig;
-  if (!ig.includes('instagram.com')) {
-      urlFinal = `https://www.instagram.com/${ig.replace('@', '')}/`;
-  }
+    // 1. Extrai apenas o nome de usuário (limpa links e @)
+    let username = ig.replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
+                     .replace(/@/g, "")
+                     .split('/')[0]
+                     .split('?')[0]
+                     .trim();
 
-  // Tenta abrir numa nova aba (comportamento padrão que funciona sempre)
-  const novaAba = window.open(urlFinal, '_blank', 'noopener,noreferrer');
-  
-  // Se o navegador bloqueou o popup, tenta abrir na mesma aba como plano B
-  if (!novaAba || novaAba.closed || typeof novaAba.closed === 'undefined') {
-      window.location.href = urlFinal;
-  }
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    // URLs de redirecionamento
+    const appUrlIOS = `instagram://user?username=${username}`;
+    const appUrlAndroid = `intent://instagram.com/_u/${username}/#Intent;package=com.instagram.android;scheme=https;end`;
+    const webUrl = `https://www.instagram.com/${username}/`;
+
+    if (isIOS) {
+        // Tenta abrir no iOS
+        window.location.href = appUrlIOS;
+        // Se em 500ms não sair da página, vai para o navegador
+        setTimeout(() => { window.location.href = webUrl; }, 500);
+    } 
+    else if (isAndroid) {
+        // No Android, o 'intent' é o método mais certeiro para abrir o App
+        window.location.href = appUrlAndroid;
+    } 
+    else {
+        // Desktop abre em nova aba normal
+        window.open(webUrl, '_blank');
+    }
 }
+
+// Ouvinte de clique único
+document.addEventListener("click", function(e) {
+    const a = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com']");
+    
+    if (a) {
+        // Se for o SEU menu fixo do site, manda para o seu
+        if (a.id === 'menuInstagram' || a.closest('#menuInstagram')) {
+            e.preventDefault();
+            abrirInstagramDefinitivo('olacarlopolis');
+            return;
+        }
+
+        // Se for link de cliente
+        e.preventDefault();
+        const igData = a.getAttribute("data-ig") || a.getAttribute("href");
+        abrirInstagramDefinitivo(igData);
+    }
+}, true);
 
 // 2. Ouvinte de clique CORRIGIDO (Remova os antigos duplicados)
 document.addEventListener("click", (e) => {
