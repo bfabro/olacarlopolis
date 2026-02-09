@@ -7374,42 +7374,19 @@ function buildInstagramWebUrl(instagram) {
 
 
 
+
+
 function openInstagramSmart(instagramRaw) {
-  const user = extractInstagramUsername(instagramRaw);
-  const webUrl = buildInstagramWebUrl(instagramRaw); // garante https + perfil quando possível
+  const webUrl = buildInstagramWebUrl(instagramRaw); // sempre válido
 
-  const standalone = isAppInstalado(); // você já tem essa função
-  const isAndroid = /android/i.test(navigator.userAgent);
-
-  // ✅ Regra de ouro: sem username => NUNCA tenta deep link, vai direto pro web
-  if (!user) {
-    if (standalone) {
-      window.location.href = webUrl;      // no PWA, abre fora / app via universal link
-    } else {
-      window.open(webUrl, "_blank", "noopener,noreferrer");
-    }
-    return;
-  }
-
-  // Com username, você pode tentar abrir no app (Android), com fallback pro web
-  if (standalone && isAndroid) {
-    const intentUrl = `intent://instagram.com/_u/${user}#Intent;package=com.instagram.android;scheme=https;end`;
-    window.location.href = intentUrl;
-
-    // fallback garantido
-    setTimeout(() => {
-      window.location.href = webUrl;
-    }, 800);
-
-    return;
-  }
-
-  // iOS e/ou browser normal: universal link já resolve (abre no app se tiver, senão web)
-  if (standalone) {
+  // PWA/standalone: abrir via location é o mais confiável
+  if (isAppInstalado()) {
     window.location.href = webUrl;
-  } else {
-    window.open(webUrl, "_blank", "noopener,noreferrer");
+    return;
   }
+
+  // Browser normal: abre nova aba
+  window.open(webUrl, "_blank", "noopener,noreferrer");
 }
 
 
