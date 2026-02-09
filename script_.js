@@ -2002,9 +2002,9 @@ document.addEventListener("DOMContentLoaded", function () {
           <div class="card-divulgacao-linha">
             <h4>${est.name}</h4>
             ${est.instagram
-            ? `<button type="button" class="card-divulgacao-ig-btn" aria-label="Abrir Instagram" data-ig="${fixUrl(est.instagram)}">
+            ? `<a href="${fixInstagramUrl(est.instagram)}" class="card-divulgacao-ig-btn" aria-label="Abrir Instagram" target="_blank" rel="noopener noreferrer">
                      <i class="fa-brands fa-instagram"></i>
-                   </button>`
+                   </a>`
             : ""
           }
           </div>
@@ -2021,7 +2021,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (igBtn && est.instagram) {
           igBtn.addEventListener("click", (ev) => {
             ev.stopPropagation();
-            window.open(fixUrl(est.instagram), "_blank");
+            
           });
         }
 
@@ -2092,11 +2092,11 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="card-divulgacao-linha">
           <h4>${nome}</h4>
           ${ev.instagram
-          ? `<button type="button" class="card-divulgacao-ig-btn"
+          ? `<a href="${fixInstagramUrl(ev.instagram)}" class="card-divulgacao-ig-btn"
                          aria-label="Abrir Instagram do evento"
-                         data-ig="${fixUrl(ev.instagram)}">
+                         target="_blank" rel="noopener noreferrer">
                    <i class="fa-brands fa-instagram"></i>
-                 </button>`
+                 </a>`
           : ""
         }
         </div>
@@ -2122,7 +2122,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (igBtn && ev.instagram) {
         igBtn.addEventListener("click", (e) => {
           e.stopPropagation();
-          window.open(fixUrl(ev.instagram), "_blank");
+          
         });
       }
 
@@ -7286,25 +7286,29 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-  function fixInstagramUrl(url) {
-  if (!url) return "";
+  function fixInstagramUrl(instagram) {
+  if (!instagram) return "";
 
-  let u = url.trim();
+  let ig = String(instagram).trim();
 
-  // Remove @
-  if (u.startsWith("@")) {
-    u = u.substring(1);
+  // remove apenas rótulo no início (ex: "Instagram:", "Instagram -", "Instagram Instagram")
+  ig = ig.replace(/^\s*instagram\s*[:\-]?\s*/i, "").trim();
+  ig = ig.replace(/^\s*instagram\s+/i, "").trim(); // se repetiu
+
+  // se já é link completo, não mexe
+  if (/^https?:\/\//i.test(ig)) return ig;
+
+  // remove @
+  ig = ig.replace(/^@/, "");
+
+  // se vier "instagram.com/usuario" ou "www.instagram.com/usuario"
+  if (/^(www\.)?instagram\.com/i.test(ig)) {
+    return "https://" + ig.replace(/^https?:\/\//i, "");
   }
 
-  // Se já for link completo
-  if (u.startsWith("http")) {
-    return u;
-  }
-
-  // Caso seja só o username
-  return "https://www.instagram.com/" + u;
+  // se vier só "usuario"
+  return "https://www.instagram.com/" + ig;
 }
-
 
 
 // Extrai o username de QUALQUER coisa (link, @, texto)
@@ -7366,41 +7370,8 @@ function buildInstagramWebUrl(instagram) {
 
 
 // Interceptor de cliques corrigido
-document.addEventListener("click", (e) => {
-  const a = e.target.closest("a.js-ig-link, a[href*='instagram.com']");
-  if (!a) return;
-
-  const ig = a.getAttribute("data-ig") || a.getAttribute("href");
-  if (ig) {
-    e.preventDefault();
-    abrirInstagramDefinitivo(ig);
-  }
-});
-
-
 // Intercepta cliques em links do Instagram criados no card (funciona no celular e no modo APP/PWA)
-document.addEventListener("click", (e) => {
-  const a = e.target.closest && e.target.closest(
-    "a.js-ig-link, a.ig-link, a[href*='instagram.com']"
-  );
-  if (!a) return;
-
-  e.preventDefault();
-
-  const raw =
-    a.getAttribute("data-ig") ||
-    a.dataset.ig ||
-    a.getAttribute("data-ig-raw") ||
-    a.getAttribute("href") ||
-    "";
-
-  abrirInstagramDefinitivo(raw);
-}, { passive: false });
-
-
-
-
-  function sendPaymentReminder(establishment) {
+function sendPaymentReminder(establishment) {
     alert(
       `Atenção! O pagamento do site para ${establishment.name} vence hoje.`
     );
@@ -16291,7 +16262,11 @@ ${establishment.infoVagaTrabalho
                         <div class="info-label">Redes Sociais</div>
                         <div class="social-icons">
                           ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
-                          ${establishment.instagram ? `<a href="${fixInstagramUrl(establishment.instagram)}" data-ig="${(establishment.instagram || '').toString().replace(/"/g,'&quot;')}" class="ig-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram" style="color:#C13584;"></i> Instagram</a>` : ""}          
+                         
+                         
+                          ${establishment.instagram ? `<a href="${establishment.instagram}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram</a>` : ""} 
+                         
+                         
                           ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
                        
 
@@ -19324,53 +19299,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-// FUNÇÃO ÚNICA DE REDIRECIONAMENTO
-function abrirInstagram(elemento) {
-    // 1. Pega o link do atributo data-ig ou do href
-    let rawLink = elemento.getAttribute("data-ig") || elemento.getAttribute("href");
-    
-    if (!rawLink || rawLink === "#") return;
 
-    // 2. Extrai o nome de usuário (ex: transforma o link do Tokfino em apenas 'tokfino')
-    let user = rawLink.replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
-                      .replace(/@/g, "")
-                      .split('/')[0]
-                      .split('?')[0]
-                      .trim();
-
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const isAndroid = /Android/i.test(navigator.userAgent);
-
-    if (isMobile) {
-        // Se for Android, usa o Intent (Mais forte para abrir o App)
-        if (isAndroid) {
-            window.location.href = `intent://instagram.com/_u/${user}/#Intent;package=com.instagram.android;scheme=https;end`;
-        } else {
-            // Se for iOS, tenta o esquema de app
-            window.location.href = `instagram://user?username=${user}`;
-            setTimeout(() => { window.location.href = `https://www.instagram.com/${user}/`; }, 500);
-        }
-    } else {
-        // Se for computador, abre em nova aba normal
-        window.open(`https://www.instagram.com/${user}/`, '_blank');
-    }
-}
-
-// OUVINTE DE CLIQUE QUE VAI MANDAR NO SITE TODO
-document.addEventListener("click", function(e) {
-    // Procura se o que foi clicado é um link de Instagram
-    const linkIg = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com']");
-    
-    if (linkIg) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // SE o link tiver o ID menuInstagram, é o SEU perfil.
-        if (linkIg.id === 'menuInstagram') {
-            abrirInstagram(Object.assign(document.createElement('a'), {href: 'olacarlopolis'}));
-        } else {
-            // SENÃO, é o perfil do cliente (Tokfino, etc)
-            abrirInstagram(linkIg);
-        }
-    }
-}, true); // O 'true' aqui é o segredo: ele faz esse código rodar antes de qualquer outro
