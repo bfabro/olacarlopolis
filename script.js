@@ -19385,59 +19385,56 @@ document.addEventListener("click", (e) => {
 
 
 
+// FUNÇÃO PARA ABRIR O APP OU WEB
+function abrirInstagramDeepLink(urlOuUser) {
+    if (!urlOuUser || urlOuUser === "#") return;
 
-// 1. Função que decide como abrir o Instagram (App ou Web)
-function abrirInstagramDireto(igData) {
-    if (!igData || igData === "#") return;
-
-    // Extrai o username (ex: tira 'https://instagram.com/' e deixa só 'tokfino')
-    let username = igData.replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
+    // Extrai o username puro (ex: de 'https://instagram.com/tokfino' sobra 'tokfino')
+    let user = urlOuUser.replace(/https?:\/\/(www\.)?instagram\.com\//g, "")
                          .replace(/@/g, "")
                          .split('/')[0]
                          .split('?')[0]
                          .trim();
 
-    // Se por algum motivo o username vier vazio, não faz nada
-    if (!username) return;
+    if (!user) return;
 
     const isAndroid = /Android/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    const appUrlAndroid = `intent://instagram.com/_u/${username}/#Intent;package=com.instagram.android;scheme=https;end`;
-    const appUrlIOS = `instagram://user?username=${username}`;
-    const webUrl = `https://www.instagram.com/${username}/`;
+    // Protocolos para forçar o App
+    const androidApp = `intent://instagram.com/_u/${user}/#Intent;package=com.instagram.android;scheme=https;end`;
+    const iosApp = `instagram://user?username=${user}`;
+    const webUrl = `https://www.instagram.com/${user}/`;
 
     if (isAndroid) {
-        window.location.href = appUrlAndroid;
+        window.location.href = androidApp;
     } else if (isIOS) {
-        window.location.href = appUrlIOS;
-        // Fallback para iOS caso o app não abra
+        window.location.href = iosApp;
         setTimeout(() => { window.location.href = webUrl; }, 500);
     } else {
         window.open(webUrl, '_blank');
     }
 }
 
-// 2. ÚNICO Ouvinte de clique para o site inteiro
+// OUVINTE DE CLIQUE ÚNICO
 document.addEventListener("click", function(e) {
-    // Identifica se o clique foi em um link do Instagram
-    const linkIg = e.target.closest("a.js-ig-link, a.ig-link, a[href*='instagram.com']");
-    
-    if (linkIg) {
-        // Se for o link fixo do SEU menu lateral (Olá Carlópolis), abre o seu
-        if (linkIg.id === 'menuInstagram' || linkIg.closest('#menuInstagram')) {
-            e.preventDefault();
-            abrirInstagramDireto('olacarlopolis');
-            return;
-        }
-
-        // Para links de CLIENTES (como Tokfino)
+    // 1. Verifica se clicou no SEU menu lateral fixo (ID único)
+    const meuPerfil = e.target.closest('#menuInstagram');
+    if (meuPerfil) {
         e.preventDefault();
         e.stopPropagation();
-
-        // Pega o valor do atributo data-ig (preferencial) ou o href
-        const destino = linkIg.getAttribute("data-ig") || linkIg.getAttribute("href");
-        
-        abrirInstagramDireto(destino);
+        abrirInstagramDeepLink('olacarlopolis');
+        return; // Encerra aqui
     }
-}, true);
+
+    // 2. Verifica se clicou em um link de CLIENTE (Ex: Tokfino)
+    const linkCliente = e.target.closest('.js-ig-link, .ig-link');
+    if (linkCliente) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Pega o destino do data-ig ou do href
+        const destino = linkCliente.getAttribute('data-ig') || linkCliente.getAttribute('href');
+        abrirInstagramDeepLink(destino);
+    }
+}, true); // O 'true' faz o script ter prioridade total
