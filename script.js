@@ -15859,6 +15859,17 @@ function sendPaymentReminder(establishment) {
 
 
 
+// ✅ Instagram: abre certo no PWA (standalone) e no navegador normal
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a.js-ig-link");
+  if (!a) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const ig = a.getAttribute("data-ig") || "";
+  openInstagramSmart(ig);
+});
 
 
 
@@ -16319,8 +16330,10 @@ ${establishment.infoVagaTrabalho
                           ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
                          
                          
-                          ${establishment.instagram ? `<a href="${fixUrl(establishment.instagram)}" target="_blank"><i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram</a>` : ""} 
-                         
+                          ${establishment.instagram ? `<a href="#" class="js-ig-link" data-ig="${fixInstagramUrl(establishment.instagram)}" rel="noopener">
+  <i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram
+</a>` : ""} 
+
                          
                           ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
                        
