@@ -2589,6 +2589,7 @@ document.addEventListener("DOMContentLoaded", function () {
     samuzinho: "s",
     rodoviaria: "s",
     secretariadasaude: "s",
+    "secretariadaeducação":"s",
     sindicatorural: "s",
     vigilanciasanitaria: "s",
 
