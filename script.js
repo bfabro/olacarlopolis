@@ -13232,7 +13232,7 @@ function sendPaymentReminder(establishment) {
         establishments: [
           {
 
-            name: "Secretaria da Saude",
+            name: "Secretaria da Educação",
             hours: "Seg a Sex: 07:00h as 11:00h - 13:00 as 17:00h",
             address: "-",
             contact: "(43) 99825-1062",
