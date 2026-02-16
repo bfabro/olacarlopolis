@@ -2365,7 +2365,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //lojaderoupas
 
-    "t&mcollection": "s",
+    "t&mcollection": "n",
 
     // mercearia
     seiza: "s",
