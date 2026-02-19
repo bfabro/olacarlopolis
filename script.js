@@ -2621,7 +2621,7 @@ document.addEventListener("DOMContentLoaded", function () {
     sunsetcaravela:"s",
     lowcity043fest: "s",
     "7encontrodemotociclistas-lobodafronteira": "s",
-    "2ºcafecoloniallarsaovicente":"s",
+    "2cafecoloniallarsaovicente":"s",
     frutfest2026: "s",
 
 
@@ -12613,7 +12613,7 @@ function sendPaymentReminder(establishment) {
 
              {
             image: "images/informacoes/eventos/20.jpg",
-            name: "2º Café Colonial Lar Sao Vicente",
+            name: "2 Café Colonial Lar Sao Vicente",
             date: "07/03/2026",
             contact:"(43) 3566-1196",
             address: "Lar Sao Vicente de Paulo - Rua Andrino Soares, 26, Centro",
