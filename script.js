@@ -2613,6 +2613,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pescar: "s",
     bloquinhodoagro: "s",
     cafedamanhadosamigos: "s",
+    "FestadeSãoJosé":"s",
 
     cfccarlopolisfight: "s",
     festadaapae:"s",
@@ -12538,14 +12539,7 @@ function sendPaymentReminder(establishment) {
 
 
 
-          {
-            image: "images/informacoes/eventos/6.jpg",
-            name: "CarnaIlha",
-            date: "13/02/2026",
-            address: "Ilha do Ponciano",
-            instagram: "https://www.instagram.com/p/DTgJCIggZlj/",
-            infoAdicional: "A programação tá simplesmente IMPERDÍVEL, a gente não vai deixar ninguém parado!"
-          },
+         
 
           {
             image: "images/informacoes/eventos/8.jpg",
@@ -12565,6 +12559,15 @@ function sendPaymentReminder(establishment) {
             instagram: "https://www.instagram.com/p/DTcy3uwAI2n/",
             infoAdicional: " 21º PESCAR - 28 de fevereiro e 1º de março<br><a target='_blank' style='color:#2da6ff;' href='https://pescar2026.carlopolisdigital.com.br/?fbclid=PAb21jcAPu91hleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAaeYdq9yrDWsux-9eziXvpUi8ZMy7qhyOl4zuJ21_4Dq1ey3KAiOXvAzQUDXcA_aem_WOcr9vb6UNybZj8xfxee1w'  >Clique aqui para Inscrição</a> "
           },
+
+           {
+            image: "images/informacoes/eventos/19.jpg",
+            name: "Festa de São José",
+            date: "15/02/2026",
+            contact:"(43)99960-9608",
+            address: "Paroquia São José Pantaleão",
+            instagram: "https://www.instagram.com/p/DUdDSD4FmUP/",
+            infoAdicional: "🙏 Festa de São José 🙏🎉<br>Haverá vendas de pastéis, mini pizza, refrigerante e bolo 🍰🥤🍕<br>🎁 Binguinho e Intens Show de Prêmios 🎁<br>1️⃣ Bicicleta aro 29<br>2️⃣ Celular<br>3️⃣ TV 32 polegadas<br>4️⃣ 💰 3 mil reais<br><br>👉 Venha participar, traga sua família e viva esse momento de fé, alegria e confraternização!<br>Pontos de vendas das cartelas do show de prêmios<br>@paroquiasaojosesaopantelea<br>@paroquiacarlopolis<br>@elizconceicao<br>@drogamaisjorginho<br>@starmaistech<br>@baggiocarlopolis<br>@funerariagrupocastilho" },
 
 
            {
