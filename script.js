@@ -10053,7 +10053,12 @@ function sendPaymentReminder(establishment) {
 
               "images/comercios/lanchonete/noponto/divulgacao/1.jpg",
               "images/comercios/lanchonete/noponto/divulgacao/2.jpg",
-            ]
+            ],
+
+             menuImages: [
+              "images/comercios/lanchonete/noponto/cardapio/1.jpg",
+              "images/comercios/lanchonete/noponto/cardapio/2.jpg",
+            ],
           },
 
 
