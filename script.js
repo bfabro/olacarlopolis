@@ -12563,7 +12563,7 @@ function sendPaymentReminder(establishment) {
            {
             image: "images/informacoes/eventos/19.jpg",
             name: "Festa de São José",
-            date: "15/02/2026",
+            date: "13/03/2026",
             contact:"(43)99960-9608",
             address: "Paroquia São José Pantaleão",
             instagram: "https://www.instagram.com/p/DUdDSD4FmUP/",
