@@ -2425,6 +2425,7 @@ document.addEventListener("DOMContentLoaded", function () {
     xisbauinea: "s",
     mycoffee: "s",
     mrpotato: "s",
+    noponto:"s",
 
     // material de construcao
     lojaferreira: "s",
@@ -10023,6 +10024,49 @@ function sendPaymentReminder(establishment) {
 
             ],
           },
+
+
+
+
+///////////////////
+///////////////
+
+{
+            image: "images/comercios/lanchonete/noponto/perfil.jpg",
+            name: "No Ponto",
+            hours: "Qua a Seg: 19:00h as 23:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "19:00", fim: "23:00" }],
+              ter: [],
+              qua: [{ inicio: "19:00", fim: "23:00" }],
+              qui: [{ inicio: "19:00", fim: "23:00" }],
+              sex: [{ inicio: "19:00", fim: "23:00" }],
+              sab: [{ inicio: "19:00", fim: "23:00" }],
+              dom: [{ inicio: "19:00", fim: "23:00" }]
+            },
+            address: " Av Elson Soares, 1342 - Carlopolis",
+            contact: "(43) 99661-9032",
+            delivery: "Sim / Com Taxa",          
+            instagram: "https://www.instagram.com/no_ponto_carlopolis/",
+            novidadesImages: [
+
+              "images/comercios/lanchonete/noponto/divulgacao/1.jpg",
+              "images/comercios/lanchonete/noponto/divulgacao/2.jpg",
+            ]
+          },
+
+
+
+
+///////////////
+//////////////////////
+
+
+
+
+
+
 
 
 
