@@ -2620,7 +2620,7 @@ document.addEventListener("DOMContentLoaded", function () {
     sunsetcaravela:"s",
     lowcity043fest: "s",
     "7encontrodemotociclistas-lobodafronteira": "s",
-    "2ºCafecoloniallarsaovicente":"s",
+    "2ºcafecoloniallarsaovicente":"s",
     frutfest2026: "s",
 
 
