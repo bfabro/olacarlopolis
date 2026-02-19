@@ -2620,6 +2620,7 @@ document.addEventListener("DOMContentLoaded", function () {
     sunsetcaravela:"s",
     lowcity043fest: "s",
     "7encontrodemotociclistas-lobodafronteira": "s",
+    "2ºCafecoloniallarsaovicente":"s",
     frutfest2026: "s",
 
 
@@ -12560,6 +12561,17 @@ function sendPaymentReminder(establishment) {
             infoAdicional: " 21º PESCAR - 28 de fevereiro e 1º de março<br><a target='_blank' style='color:#2da6ff;' href='https://pescar2026.carlopolisdigital.com.br/?fbclid=PAb21jcAPu91hleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAaeYdq9yrDWsux-9eziXvpUi8ZMy7qhyOl4zuJ21_4Dq1ey3KAiOXvAzQUDXcA_aem_WOcr9vb6UNybZj8xfxee1w'  >Clique aqui para Inscrição</a> "
           },
 
+
+             {
+            image: "images/informacoes/eventos/20.jpg",
+            name: "2º Café Colonial Lar Sao Vicente",
+            date: "07/03/2026",
+            contact:"(43) 3566-1196",
+            address: "Lar Sao Vicente de Paulo",
+            instagram: "https://www.instagram.com/p/DUibKB9EfQF/",
+            infoAdicional: "CAFÉ COLONIAL ☕<br>Queridos amigos e comunidade, com muita alegria, anunciamos nosso 2° Café Colonial com Bingo! Dessa vez, está ainda mais especial pois o café acontecerá em nosso lar.<br>Anote aí:<br>📆 7 de março de 2026 | A partir das 15h<br>📍 Lar São Vicente de Paulo de Carlópolis<br>💲 R$35,00 (na compra do convite, ganhe 1 cartela para o bingo)<br>Teremos muitos prêmios imperdíveis e mais de 20 variedades no café. Venha participar e colaborar com nosso lar!"
+          },
+
            {
             image: "images/informacoes/eventos/19.jpg",
             name: "Festa de São José",
@@ -12567,7 +12579,8 @@ function sendPaymentReminder(establishment) {
             contact:"(43)99960-9608",
             address: "Paroquia São José Pantaleão",
             instagram: "https://www.instagram.com/p/DUdDSD4FmUP/",
-            infoAdicional: "🙏 Festa de São José 🙏🎉<br>Haverá vendas de pastéis, mini pizza, refrigerante e bolo 🍰🥤🍕<br>🎁 Binguinho e Intens Show de Prêmios 🎁<br>1️⃣ Bicicleta aro 29<br>2️⃣ Celular<br>3️⃣ TV 32 polegadas<br>4️⃣ 💰 3 mil reais<br><br>👉 Venha participar, traga sua família e viva esse momento de fé, alegria e confraternização!<br>Pontos de vendas das cartelas do show de prêmios<br>@paroquiasaojosesaopantelea<br>@paroquiacarlopolis<br>@elizconceicao<br>@drogamaisjorginho<br>@starmaistech<br>@baggiocarlopolis<br>@funerariagrupocastilho" },
+            infoAdicional: "🙏 Festa de São José 🙏🎉<br>Haverá vendas de pastéis, mini pizza, refrigerante e bolo 🍰🥤🍕<br>🎁 Binguinho e Intens Show de Prêmios 🎁<br>1️⃣ Bicicleta aro 29<br>2️⃣ Celular<br>3️⃣ TV 32 polegadas<br>4️⃣ 💰 3 mil reais<br><br>👉 Venha participar, traga sua família e viva esse momento de fé, alegria e confraternização!<br>Pontos de vendas das cartelas do show de prêmios<br>@paroquiasaojosesaopantelea<br>@paroquiacarlopolis<br>@elizconceicao<br>@drogamaisjorginho<br>@starmaistech<br>@baggiocarlopolis<br>@funerariagrupocastilho" 
+          },
 
 
            {
