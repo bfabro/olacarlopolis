@@ -12567,7 +12567,7 @@ function sendPaymentReminder(establishment) {
             name: "2º Café Colonial Lar Sao Vicente",
             date: "07/03/2026",
             contact:"(43) 3566-1196",
-            address: "Lar Sao Vicente de Paulo",
+            address: "Lar Sao Vicente de Paulo - Rua Andrino Soares, 26, Centro",
             instagram: "https://www.instagram.com/p/DUibKB9EfQF/",
             infoAdicional: "CAFÉ COLONIAL ☕<br>Queridos amigos e comunidade, com muita alegria, anunciamos nosso 2° Café Colonial com Bingo! Dessa vez, está ainda mais especial pois o café acontecerá em nosso lar.<br>Anote aí:<br>📆 7 de março de 2026 | A partir das 15h<br>📍 Lar São Vicente de Paulo de Carlópolis<br>💲 R$35,00 (na compra do convite, ganhe 1 cartela para o bingo)<br>Teremos muitos prêmios imperdíveis e mais de 20 variedades no café. Venha participar e colaborar com nosso lar!"
           },
