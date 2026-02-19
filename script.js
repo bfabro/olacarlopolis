@@ -2609,11 +2609,11 @@ document.addEventListener("DOMContentLoaded", function () {
     //calendarioeventos: "s",
     feiradalua: "n",
     arenagoldenhits: "n",
-    carnailha: "s",
+  
     pescar: "s",
     bloquinhodoagro: "s",
     cafedamanhadosamigos: "s",
-    "FestadeSãoJosé":"s",
+    "festadesaojose":"s",
 
     cfccarlopolisfight: "s",
     festadaapae:"s",
