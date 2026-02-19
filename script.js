@@ -10032,7 +10032,7 @@ function sendPaymentReminder(establishment) {
 ///////////////
 
 {
-            image: "images/comercios/lanchonete/noponto/perfil.jpg",
+            image: "images/comercios/lanchonete/noponto/perfil.png",
             name: "No Ponto",
             hours: "Qua a Seg: 19:00h as 23:00h",
             statusAberto: ".",
