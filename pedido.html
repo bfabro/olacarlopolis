@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1" name="viewport" />
-  <title>No Ponto – Pedido On Line</title>
+  <title>No Ponto – Pedido On Line!</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 
   <style>
@@ -1308,67 +1308,149 @@
       taxaEntrega = Number(mapa[keyB]) || 0;
       labelTaxa = `Taxa (${dados.bairroEntrega})`;
     } else {
-      taxaEntrega = (dados.zonaEntrega === 'cidade') ? (Number(pad.cidade) || 0)
-        : (dados.zonaEntrega === 'fora') ? (Number(pad.fora) || 0) : 0;
+      taxaEntrega =
+        (dados.zonaEntrega === 'cidade') ? (Number(pad.cidade) || 0) :
+        (dados.zonaEntrega === 'fora') ? (Number(pad.fora) || 0) : 0;
+
       labelTaxa = `Taxa (${dados.zonaEntrega === 'cidade' ? 'Dentro da cidade' : 'Fora da cidade'})`;
     }
   }
 
   const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
 
-  const linhas = [];
-  linhas.push('*🛒 Novo pedido*');
-  linhas.push(`🏪 Loja: ${est.nome}`);
-  linhas.push('');
+  // Hora do pedido
+  const agora = new Date();
+  const horaPedido = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-  linhas.push('*📌 Itens:*');
+  // Número do pedido (simples e legível)
+  // Ex.: PED-2102-1942-483
+  const dd = String(agora.getDate()).padStart(2, '0');
+  const mm = String(agora.getMonth() + 1).padStart(2, '0');
+  const hh = String(agora.getHours()).padStart(2, '0');
+  const mi = String(agora.getMinutes()).padStart(2, '0');
+  const rand = Math.floor(Math.random() * 900) + 100;
+  const numeroPedido = `PED-${dd}${mm}-${hh}${mi}-${rand}`;
 
-  carrinho.forEach((it, idx) => {
-    const qtd = Number(it.qtd) || 1;
+  // Nome bonito das categorias
+  const nomeCategoria = (tipo) => {
+    const t = String(tipo || '').toLowerCase();
+    if (t === 'lanche') return '🍔 Lanches';
+    if (t === 'bebida') return '🥤 Bebidas';
+    if (t === 'doce') return '🍰 Doces';
+    return '📦 Outros Itens';
+  };
 
-    const somaAdds = (it.adicionais || []).reduce((a, x) => a + (Number(x.preco) || 0), 0);
-    const unit = (Number(it.preco) || 0) + somaAdds;
-    const lineTotal = unit * qtd;
+  // Ordenação das categorias
+  const ordemCategoria = { lanche: 1, bebida: 2, doce: 3, outros: 99 };
 
-    linhas.push(`${idx + 1}. ${qtd}x ${it.nome}`);
-    linhas.push(`   • Unitário: ${money(unit)}  |  Total: *${money(lineTotal)}*`);
+  // Agrupar por categoria
+  const grupos = {};
+  carrinho.forEach(it => {
+    const cat = ['lanche', 'bebida', 'doce'].includes((it.tipo || '').toLowerCase())
+      ? (it.tipo || '').toLowerCase()
+      : 'outros';
 
-    if (it.adicionais && it.adicionais.length) {
-      linhas.push(`   • Adicionais:`);
-      it.adicionais.forEach(a => {
-        linhas.push(`      + ${a.nome} (${money(a.preco)})`);
-      });
-    }
-
-    if (it.obs) linhas.push(`   • Obs: _${it.obs}_`);
-    linhas.push('');
+    if (!grupos[cat]) grupos[cat] = [];
+    grupos[cat].push(it);
   });
 
-  linhas.push('*💰 Valores do Pedido:*');
-  linhas.push(`Subtotal: ${money(subtotal)}`);
-  if (taxaEntrega) linhas.push(`${labelTaxa}: ${money(taxaEntrega)}`);
-  linhas.push(`*TOTAL: ${money(total)}*`);
+  const categoriasOrdenadas = Object.keys(grupos).sort((a, b) => {
+    return (ordemCategoria[a] || 99) - (ordemCategoria[b] || 99);
+  });
+
+  const linhas = [];
+
+  // Cabeçalho
+  linhas.push('🛒 *NOVO PEDIDO*');
+  linhas.push(`🏪 *${est.nome}*`);
+  linhas.push(`🧾 Pedido: *${numeroPedido}*`);
+  linhas.push(`🕒 Horário: ${horaPedido}`);
+  linhas.push('━━━━━━━━━━━━━━━━━━');
   linhas.push('');
 
-  linhas.push('*👤 Dados do Cliente:*');
-  linhas.push(`Tipo: ${dados.tipo}`);
+  // Itens por categoria
+  linhas.push('📦 *ITENS DO PEDIDO*');
+  linhas.push('');
+
+  let contadorGlobal = 1;
+
+  categoriasOrdenadas.forEach(cat => {
+    linhas.push(`${nomeCategoria(cat)}`);
+    linhas.push('');
+
+    grupos[cat].forEach((it) => {
+      const qtd = Number(it.qtd) || 1;
+      const adicionais = Array.isArray(it.adicionais) ? it.adicionais : [];
+      const somaAdds = adicionais.reduce((a, x) => a + (Number(x.preco) || 0), 0);
+
+      const precoBase = Number(it.preco) || 0;
+      const unit = precoBase + somaAdds;
+      const lineTotal = unit * qtd;
+
+      linhas.push(`*${contadorGlobal}) ${qtd}x ${it.nome}*`);
+      linhas.push(`   💵 Unitário: ${money(unit)}`);
+      linhas.push(`   ✅ Total item: *${money(lineTotal)}*`);
+
+      if (adicionais.length) {
+        linhas.push('   ➕ Adicionais:');
+        adicionais.forEach(a => {
+          linhas.push(`      • ${a.nome} (+${money(a.preco)})`);
+        });
+      }
+
+      if (it.obs) {
+        linhas.push(`   📝 Obs: _${it.obs}_`);
+      }
+
+      linhas.push('');
+      contadorGlobal++;
+    });
+
+    linhas.push(''); // espaço extra entre categorias
+  });
+
+  // Totais
+  linhas.push('━━━━━━━━━━━━━━━━━━');
+  linhas.push('💰 *RESUMO DO PAGAMENTO*');
+  linhas.push(`Subtotal: ${money(subtotal)}`);
+  if (taxaEntrega) linhas.push(`${labelTaxa}: ${money(taxaEntrega)}`);
+  linhas.push(`💵 *TOTAL GERAL: ${money(total)}*`);
+  linhas.push('');
+
+  // Entrega / retirada
+  linhas.push('🚚 *ENTREGA / RETIRADA*');
+  linhas.push(`Tipo: *${dados.tipo}*`);
 
   if (dados.tipo === 'Entrega') {
-    if (dados.zonaEntrega) linhas.push(`Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
+    if (dados.zonaEntrega) {
+      linhas.push(`Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
+    }
     if (dados.bairroEntrega) linhas.push(`Bairro: ${dados.bairroEntrega}`);
-    if (dados.endereco) linhas.push(`Endereço: ${dados.endereco}`);
-    if (dados.numero) linhas.push(`Número: ${dados.numero}`);
-    if (dados.complemento) linhas.push(`Compl.: ${dados.complemento}`);
-    if (dados.referencia) linhas.push(`Ref.: ${dados.referencia}`);
+
+    const enderecoCompleto = [
+      dados.endereco,
+      dados.numero ? `nº ${dados.numero}` : '',
+      dados.complemento ? `(${dados.complemento})` : ''
+    ].filter(Boolean).join(', ');
+
+    if (enderecoCompleto) linhas.push(`Endereço: ${enderecoCompleto}`);
+    if (dados.referencia) linhas.push(`Referência: ${dados.referencia}`);
   } else {
-    if (dados.retiradaNome) linhas.push(`Retirada para: ${dados.retiradaNome}`);
+    if (dados.retiradaNome) linhas.push(`Retirada por: ${dados.retiradaNome}`);
   }
 
+  linhas.push('');
+
+  // Cliente
+  linhas.push('👤 *DADOS DO CLIENTE*');
   if (dados.nome) linhas.push(`Nome: ${dados.nome}`);
   if (dados.tel) linhas.push(`Telefone: ${dados.tel}`);
-
   if (dados.pagamento) linhas.push(`Pagamento: ${dados.pagamento}`);
   if (dados.obsGeral) linhas.push(`Obs. geral: _${dados.obsGeral}_`);
+  linhas.push('');
+
+  // Rodapé
+  linhas.push('🙏 Obrigado! Aguardo confirmação do pedido.');
 
   return linhas.join('\n');
 }
@@ -1717,10 +1799,11 @@ btn.textContent = 'Enviar pedido pelo WhatsApp';
       const qtd = Number(document.getElementById('mQtd').textContent) || 1;
       const obs = document.getElementById('mObs').value.trim();
       const adds = (modalItem.adicionais || []).filter(a => modalItem._addsSel.has(a.id));
-     state.carrinho.push({
+  state.carrinho.push({
   id: modalItem.id,
   nome: modalItem.nome,
   desc: modalItem.desc || '',
+  tipo: modalItem.tipo || 'outros',
   preco: modalItem.preco,
   qtd,
   adicionais: adds,
