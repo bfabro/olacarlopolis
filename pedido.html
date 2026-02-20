@@ -1291,76 +1291,87 @@
 
 
     function montarTextoPedido(carrinho, est, dados) {
-      // 1) calcula taxa: prioriza bairro; se não achar, usa dentro/fora
-      const normBairro = s => (s || '')
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase().replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
+  const normBairro = s => (s || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
 
-      const mapa = est.taxaPorBairro || {};
-      const keyB = normBairro(dados.bairroEntrega || '');
-      const pad = est.taxaEntregaPadrao || {};
+  const mapa = est.taxaPorBairro || {};
+  const keyB = normBairro(dados.bairroEntrega || '');
+  const pad = est.taxaEntregaPadrao || {};
 
-      let taxaEntrega = 0;
-      let labelTaxa = '';
+  let taxaEntrega = 0;
+  let labelTaxa = '';
 
-      if (dados.tipo === 'Entrega') {
-        if (keyB && Object.prototype.hasOwnProperty.call(mapa, keyB)) {
-          taxaEntrega = Number(mapa[keyB]) || 0;
-          labelTaxa = `Taxa (${dados.bairroEntrega})`;
-        } else {
-          taxaEntrega = (dados.zonaEntrega === 'cidade') ? (Number(pad.cidade) || 0)
-            : (dados.zonaEntrega === 'fora') ? (Number(pad.fora) || 0) : 0;
-          labelTaxa = `Taxa (${dados.zonaEntrega === 'cidade' ? 'Dentro da cidade' : 'Fora da cidade'})`;
-        }
-      }
-
-      const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
-
-      // 2) cabeçalho
-      const linhas = [];
-      linhas.push('*Novo pedido*');
-      linhas.push(`Loja: ${est.nome}`);
-
-      linhas.push('');
-
-      // 3) itens
-      carrinho.forEach((it, idx) => {
-        const obs = it.obs ? `\n  _Obs:_ ${it.obs}` : '';
-        const ad = (it.adicionais && it.adicionais.length)
-          ? ('\n  + ' + it.adicionais.map(a => `${a.nome} (${money(a.preco)})`).join('\n  + '))
-          : '';
-        linhas.push(`${idx + 1}. ${it.qtd}x ${it.nome} — ${money(it.preco)}${ad}${obs}`);
-      });
-      linhas.push('');
-
-      // 4) valores
-      const linhasValores = ['*Valores do Pedido:*', `Subtotal: ${money(subtotal)}`];
-      if (taxaEntrega) linhasValores.push(`${labelTaxa}: ${money(taxaEntrega)}`);
-      linhasValores.push(`*Total: ${money(total)}*`);
-      linhas.push(...linhasValores, '');
-
-      // 5) dados do cliente
-      const linhasCliente = ['*Dados do Cliente:*', `Tipo: ${dados.tipo}`];
-      if (dados.tipo === 'Entrega') {
-        if (dados.zonaEntrega) {
-          linhasCliente.push(`Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
-        }
-        if (dados.bairroEntrega) linhasCliente.push(`Bairro: ${dados.bairroEntrega}`);
-        if (dados.endereco) linhasCliente.push(`Endereço: ${dados.endereco}`);
-        if (dados.numero) linhasCliente.push(`Número: ${dados.numero}`);
-        if (dados.complemento) linhasCliente.push(`Compl.: ${dados.complemento}`);
-        if (dados.referencia) linhasCliente.push(`Ref.: ${dados.referencia}`);
-      } else {
-        if (dados.retiradaNome) linhasCliente.push(`Para: ${dados.retiradaNome}`);
-      }
-      if (dados.nome) linhasCliente.push(`Nome: ${dados.nome}`);
-      if (dados.tel) linhasCliente.push(`Telefone: ${dados.tel}`);
-
-      linhas.push(...linhasCliente);
-
-      return linhas.join('\n');
+  if (dados.tipo === 'Entrega') {
+    if (keyB && Object.prototype.hasOwnProperty.call(mapa, keyB)) {
+      taxaEntrega = Number(mapa[keyB]) || 0;
+      labelTaxa = `Taxa (${dados.bairroEntrega})`;
+    } else {
+      taxaEntrega = (dados.zonaEntrega === 'cidade') ? (Number(pad.cidade) || 0)
+        : (dados.zonaEntrega === 'fora') ? (Number(pad.fora) || 0) : 0;
+      labelTaxa = `Taxa (${dados.zonaEntrega === 'cidade' ? 'Dentro da cidade' : 'Fora da cidade'})`;
     }
+  }
+
+  const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
+
+  const linhas = [];
+  linhas.push('*🛒 Novo pedido*');
+  linhas.push(`🏪 Loja: ${est.nome}`);
+  linhas.push('');
+
+  linhas.push('*📌 Itens:*');
+
+  carrinho.forEach((it, idx) => {
+    const qtd = Number(it.qtd) || 1;
+
+    const somaAdds = (it.adicionais || []).reduce((a, x) => a + (Number(x.preco) || 0), 0);
+    const unit = (Number(it.preco) || 0) + somaAdds;
+    const lineTotal = unit * qtd;
+
+    linhas.push(`${idx + 1}. ${qtd}x ${it.nome}`);
+    linhas.push(`   • Unitário: ${money(unit)}  |  Total: *${money(lineTotal)}*`);
+
+    if (it.adicionais && it.adicionais.length) {
+      linhas.push(`   • Adicionais:`);
+      it.adicionais.forEach(a => {
+        linhas.push(`      + ${a.nome} (${money(a.preco)})`);
+      });
+    }
+
+    if (it.obs) linhas.push(`   • Obs: _${it.obs}_`);
+    linhas.push('');
+  });
+
+  linhas.push('*💰 Valores do Pedido:*');
+  linhas.push(`Subtotal: ${money(subtotal)}`);
+  if (taxaEntrega) linhas.push(`${labelTaxa}: ${money(taxaEntrega)}`);
+  linhas.push(`*TOTAL: ${money(total)}*`);
+  linhas.push('');
+
+  linhas.push('*👤 Dados do Cliente:*');
+  linhas.push(`Tipo: ${dados.tipo}`);
+
+  if (dados.tipo === 'Entrega') {
+    if (dados.zonaEntrega) linhas.push(`Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
+    if (dados.bairroEntrega) linhas.push(`Bairro: ${dados.bairroEntrega}`);
+    if (dados.endereco) linhas.push(`Endereço: ${dados.endereco}`);
+    if (dados.numero) linhas.push(`Número: ${dados.numero}`);
+    if (dados.complemento) linhas.push(`Compl.: ${dados.complemento}`);
+    if (dados.referencia) linhas.push(`Ref.: ${dados.referencia}`);
+  } else {
+    if (dados.retiradaNome) linhas.push(`Retirada para: ${dados.retiradaNome}`);
+  }
+
+  if (dados.nome) linhas.push(`Nome: ${dados.nome}`);
+  if (dados.tel) linhas.push(`Telefone: ${dados.tel}`);
+
+  if (dados.pagamento) linhas.push(`Pagamento: ${dados.pagamento}`);
+  if (dados.obsGeral) linhas.push(`Obs. geral: _${dados.obsGeral}_`);
+
+  return linhas.join('\n');
+}
 
 
 
@@ -1370,16 +1381,19 @@
 
   const texto = montarTextoPedido(carrinho, est, dados);
 
-  // usa o whatsapp do EST ou cai no fixo; normaliza p/ DDI 55
   const alvo = normalizePhone(est.whatsapp || WHATS_ESTAB_FIXO);
 
-  // se o número ficar curto (ex.: sem o '9'), avisa
   if (alvo.length < 13) {
     alert('Número de WhatsApp do estabelecimento parece incompleto. Verifique o DDD e o 9º dígito.');
   }
 
-  const urlEst = `https://wa.me/${alvo}?text=${encodeURIComponent(texto)}`;
-  window.open(urlEst, '_blank');
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const url = isMobile
+    ? `https://wa.me/${alvo}?text=${encodeURIComponent(texto)}`
+    : `https://web.whatsapp.com/send?phone=${alvo}&text=${encodeURIComponent(texto)}`;
+
+  // Mais compatível do que window.open (principalmente em PWA/iOS)
+  window.location.href = url;
 }
 
 
@@ -1602,8 +1616,12 @@
       const st = isOpenNow(state.est.horarios);
       const btn = document.getElementById('btnEnviar');
       const entregaOk = (tipo !== 'Entrega') || (bairro && zona);
-      btn.disabled = !state.carrinho.length || !st.open || !entregaOk;
-      btn.textContent = st.open ? 'Enviar pedido pelo WhatsApp' : 'Fechado agora';
+      // para desabilitar o botao do whats quando o estabelecimento tiver fechado
+     // btn.disabled = !state.carrinho.length || !st.open || !entregaOk;
+     // btn.textContent = st.open ? 'Enviar pedido pelo WhatsApp' : 'Fechado agora';
+
+     btn.disabled = !state.carrinho.length || !entregaOk;
+btn.textContent = 'Enviar pedido pelo WhatsApp';
     }
 
 
@@ -1699,7 +1717,15 @@
       const qtd = Number(document.getElementById('mQtd').textContent) || 1;
       const obs = document.getElementById('mObs').value.trim();
       const adds = (modalItem.adicionais || []).filter(a => modalItem._addsSel.has(a.id));
-      state.carrinho.push({ id: modalItem.id, nome: modalItem.nome, preco: modalItem.preco, qtd, adicionais: adds, obs });
+     state.carrinho.push({
+  id: modalItem.id,
+  nome: modalItem.nome,
+  desc: modalItem.desc || '',
+  preco: modalItem.preco,
+  qtd,
+  adicionais: adds,
+  obs
+});
       document.getElementById('itemModal').close();
       renderCart();            // re-render do carrinho
       updateTotals();          // ⬅️ força o total agora
