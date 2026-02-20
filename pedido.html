@@ -1121,7 +1121,7 @@
       descricao: "O Hamburguer mais gostoso de Carlopolis",
       horarios: { // use 24h HH:MM-HH:MM. Dias: dom, seg, ter, qua, qui, sex, sab
         seg: "19:00-23:00",
-       
+
         qua: "19:00-23:00",
         qui: "19:00-23:00",
         sex: "19:00-23:00",
@@ -1169,7 +1169,7 @@
           ]
         },
 
- {
+        {
           id: "006", nome: "X-Salada Especial", preco: 20.00, desc: "Pao de Hamburguer, tomate, presunto, mussarela, alface, maionese, catchup e hamburguer e catupiry.", tipo: "lanche", adicionais: [
 
           ]
@@ -1190,7 +1190,7 @@
           ]
         },
         // BEBIDAS
-        
+
         { id: "b001", nome: "Coca cola Lata 350ml", preco: 6.0, tipo: "bebida" },
         { id: "b002", nome: "Fanta Lata 350ml", preco: 6.0, tipo: "bebida" },
         { id: "b003", nome: "Guarana Lata 350ml", preco: 6.0, tipo: "bebida" },
@@ -1289,6 +1289,13 @@
       return { subtotal, total };
     }
 
+    function gerarNumeroPedido() {
+  const KEY = 'oc_numero_pedido_seq';
+  let seq = Number(localStorage.getItem(KEY) || '0') + 1;
+  localStorage.setItem(KEY, String(seq));
+  return `NP${String(seq).padStart(6, '0')}`;
+}
+
 
     function montarTextoPedido(carrinho, est, dados) {
   const normBairro = s => (s || '')
@@ -1318,18 +1325,16 @@
 
   const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
 
-  // Hora do pedido
+  // Data / Hora / Número do pedido
   const agora = new Date();
-  const horaPedido = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const numeroPedido = gerarNumeroPedido();
 
-  // Número do pedido (simples e legível)
-  // Ex.: PED-2102-1942-483
-  const dd = String(agora.getDate()).padStart(2, '0');
-  const mm = String(agora.getMonth() + 1).padStart(2, '0');
-  const hh = String(agora.getHours()).padStart(2, '0');
-  const mi = String(agora.getMinutes()).padStart(2, '0');
-  const rand = Math.floor(Math.random() * 900) + 100;
-  const numeroPedido = `PED-${dd}${mm}-${hh}${mi}-${rand}`;
+  const dataPedido = agora.toLocaleDateString('pt-BR'); // DD/MM/AAAA
+  const horarioPedido = agora.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }); // HH:MM:SS
 
   // Nome bonito das categorias
   const nomeCategoria = (tipo) => {
@@ -1340,7 +1345,7 @@
     return '📦 Outros Itens';
   };
 
-  // Ordenação das categorias
+  // Ordem das categorias
   const ordemCategoria = { lanche: 1, bebida: 2, doce: 3, outros: 99 };
 
   // Agrupar por categoria
@@ -1363,12 +1368,13 @@
   // Cabeçalho
   linhas.push('🛒 *NOVO PEDIDO*');
   linhas.push(`🏪 *${est.nome}*`);
-  linhas.push(`🧾 Pedido: *${numeroPedido}*`);
-  linhas.push(`🕒 Horário: ${horaPedido}`);
+  linhas.push(`🔢 Pedido: *${numeroPedido}*`);
+  linhas.push(`📅 Data: *${dataPedido}*`);
+  linhas.push(`⏰ Horário: *${horarioPedido}*`);
   linhas.push('━━━━━━━━━━━━━━━━━━');
   linhas.push('');
 
-  // Itens por categoria
+  // Itens
   linhas.push('📦 *ITENS DO PEDIDO*');
   linhas.push('');
 
@@ -1388,8 +1394,8 @@
       const lineTotal = unit * qtd;
 
       linhas.push(`*${contadorGlobal}) ${qtd}x ${it.nome}*`);
-      linhas.push(`   💵 Unitário: ${money(unit)}`);
-      linhas.push(`   ✅ Total item: *${money(lineTotal)}*`);
+      linhas.push(`   • Unitário: ${money(unit)}`);
+      linhas.push(`   • Total item: *${money(lineTotal)}*`);
 
       if (adicionais.length) {
         linhas.push('   ➕ Adicionais:');
@@ -1406,26 +1412,26 @@
       contadorGlobal++;
     });
 
-    linhas.push(''); // espaço extra entre categorias
+    linhas.push('');
   });
 
   // Totais
   linhas.push('━━━━━━━━━━━━━━━━━━');
   linhas.push('💰 *RESUMO DO PAGAMENTO*');
-  linhas.push(`Subtotal: ${money(subtotal)}`);
-  if (taxaEntrega) linhas.push(`${labelTaxa}: ${money(taxaEntrega)}`);
+  linhas.push(`• Subtotal: ${money(subtotal)}`);
+  if (taxaEntrega) linhas.push(`• ${labelTaxa}: ${money(taxaEntrega)}`);
   linhas.push(`💵 *TOTAL GERAL: ${money(total)}*`);
   linhas.push('');
 
-  // Entrega / retirada
+  // Entrega / Retirada
   linhas.push('🚚 *ENTREGA / RETIRADA*');
-  linhas.push(`Tipo: *${dados.tipo}*`);
+  linhas.push(`• Tipo: *${dados.tipo}*`);
 
   if (dados.tipo === 'Entrega') {
     if (dados.zonaEntrega) {
-      linhas.push(`Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
+      linhas.push(`• Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
     }
-    if (dados.bairroEntrega) linhas.push(`Bairro: ${dados.bairroEntrega}`);
+    if (dados.bairroEntrega) linhas.push(`• Bairro: ${dados.bairroEntrega}`);
 
     const enderecoCompleto = [
       dados.endereco,
@@ -1433,24 +1439,25 @@
       dados.complemento ? `(${dados.complemento})` : ''
     ].filter(Boolean).join(', ');
 
-    if (enderecoCompleto) linhas.push(`Endereço: ${enderecoCompleto}`);
-    if (dados.referencia) linhas.push(`Referência: ${dados.referencia}`);
+    if (enderecoCompleto) linhas.push(`• Endereço: ${enderecoCompleto}`);
+    if (dados.referencia) linhas.push(`• Referência: ${dados.referencia}`);
   } else {
-    if (dados.retiradaNome) linhas.push(`Retirada por: ${dados.retiradaNome}`);
+    if (dados.retiradaNome) linhas.push(`• Retirada por: ${dados.retiradaNome}`);
   }
 
   linhas.push('');
 
   // Cliente
   linhas.push('👤 *DADOS DO CLIENTE*');
-  if (dados.nome) linhas.push(`Nome: ${dados.nome}`);
-  if (dados.tel) linhas.push(`Telefone: ${dados.tel}`);
-  if (dados.pagamento) linhas.push(`Pagamento: ${dados.pagamento}`);
-  if (dados.obsGeral) linhas.push(`Obs. geral: _${dados.obsGeral}_`);
+  if (dados.nome) linhas.push(`• Nome: ${dados.nome}`);
+  if (dados.tel) linhas.push(`• Telefone: ${dados.tel}`);
+  if (dados.pagamento) linhas.push(`• Pagamento: ${dados.pagamento}`);
+  if (dados.obsGeral) linhas.push(`• Obs. geral: _${dados.obsGeral}_`);
   linhas.push('');
 
   // Rodapé
-  linhas.push('🙏 Obrigado! Aguardo confirmação do pedido.');
+  linhas.push('✅ Pedido pronto para confirmação!');
+  linhas.push('🙏 Obrigado!');
 
   return linhas.join('\n');
 }
@@ -1458,25 +1465,25 @@
 
 
 
-   function enviarPedido(est, carrinho, dados) {
-  if (!carrinho?.length) { alert('Seu carrinho está vazio.'); return; }
+    function enviarPedido(est, carrinho, dados) {
+      if (!carrinho?.length) { alert('Seu carrinho está vazio.'); return; }
 
-  const texto = montarTextoPedido(carrinho, est, dados);
+      const texto = montarTextoPedido(carrinho, est, dados);
 
-  const alvo = normalizePhone(est.whatsapp || WHATS_ESTAB_FIXO);
+      const alvo = normalizePhone(est.whatsapp || WHATS_ESTAB_FIXO);
 
-  if (alvo.length < 13) {
-    alert('Número de WhatsApp do estabelecimento parece incompleto. Verifique o DDD e o 9º dígito.');
-  }
+      if (alvo.length < 13) {
+        alert('Número de WhatsApp do estabelecimento parece incompleto. Verifique o DDD e o 9º dígito.');
+      }
 
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const url = isMobile
-    ? `https://wa.me/${alvo}?text=${encodeURIComponent(texto)}`
-    : `https://web.whatsapp.com/send?phone=${alvo}&text=${encodeURIComponent(texto)}`;
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const url = isMobile
+        ? `https://wa.me/${alvo}?text=${encodeURIComponent(texto)}`
+        : `https://web.whatsapp.com/send?phone=${alvo}&text=${encodeURIComponent(texto)}`;
 
-  // Mais compatível do que window.open (principalmente em PWA/iOS)
-  window.location.href = url;
-}
+      // Mais compatível do que window.open (principalmente em PWA/iOS)
+      window.location.href = url;
+    }
 
 
     /*******************
@@ -1699,11 +1706,11 @@
       const btn = document.getElementById('btnEnviar');
       const entregaOk = (tipo !== 'Entrega') || (bairro && zona);
       // para desabilitar o botao do whats quando o estabelecimento tiver fechado
-     // btn.disabled = !state.carrinho.length || !st.open || !entregaOk;
-     // btn.textContent = st.open ? 'Enviar pedido pelo WhatsApp' : 'Fechado agora';
+      // btn.disabled = !state.carrinho.length || !st.open || !entregaOk;
+      // btn.textContent = st.open ? 'Enviar pedido pelo WhatsApp' : 'Fechado agora';
 
-     btn.disabled = !state.carrinho.length;
-btn.textContent = 'Enviar pedido pelo WhatsApp';
+      btn.disabled = !state.carrinho.length;
+      btn.textContent = 'Enviar pedido pelo WhatsApp';
     }
 
 
@@ -1799,16 +1806,16 @@ btn.textContent = 'Enviar pedido pelo WhatsApp';
       const qtd = Number(document.getElementById('mQtd').textContent) || 1;
       const obs = document.getElementById('mObs').value.trim();
       const adds = (modalItem.adicionais || []).filter(a => modalItem._addsSel.has(a.id));
-  state.carrinho.push({
-  id: modalItem.id,
-  nome: modalItem.nome,
-  desc: modalItem.desc || '',
-  tipo: modalItem.tipo || 'outros',
-  preco: modalItem.preco,
-  qtd,
-  adicionais: adds,
-  obs
-});
+      state.carrinho.push({
+        id: modalItem.id,
+        nome: modalItem.nome,
+        desc: modalItem.desc || '',
+        tipo: modalItem.tipo || 'outros',
+        preco: modalItem.preco,
+        qtd,
+        adicionais: adds,
+        obs
+      });
       document.getElementById('itemModal').close();
       renderCart();            // re-render do carrinho
       updateTotals();          // ⬅️ força o total agora
