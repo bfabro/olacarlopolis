@@ -1293,7 +1293,7 @@
   const KEY = 'oc_numero_pedido_seq';
   let seq = Number(localStorage.getItem(KEY) || '0') + 1;
   localStorage.setItem(KEY, String(seq));
-  return `NP${String(seq).padStart(6, '0')}`;
+  return `NP_${String(seq).padStart(6, '0')}`;
 }
 
 
@@ -1325,7 +1325,7 @@
 
   const { subtotal, total } = calcularTotais(carrinho, taxaEntrega);
 
-  // Data / Hora / Número do pedido
+  // Número do pedido + Data + Hora
   const agora = new Date();
   const numeroPedido = gerarNumeroPedido();
 
@@ -1336,7 +1336,9 @@
     second: '2-digit'
   }); // HH:MM:SS
 
-  // Nome bonito das categorias
+  const linha = '━━━━━━━━━━━━━━━━━━';
+
+  // Categorias
   const nomeCategoria = (tipo) => {
     const t = String(tipo || '').toLowerCase();
     if (t === 'lanche') return '🍔 Lanches';
@@ -1345,10 +1347,8 @@
     return '📦 Outros Itens';
   };
 
-  // Ordem das categorias
   const ordemCategoria = { lanche: 1, bebida: 2, doce: 3, outros: 99 };
 
-  // Agrupar por categoria
   const grupos = {};
   carrinho.forEach(it => {
     const cat = ['lanche', 'bebida', 'doce'].includes((it.tipo || '').toLowerCase())
@@ -1365,16 +1365,50 @@
 
   const linhas = [];
 
-  // Cabeçalho
+  // 1) NOVO PEDIDO
   linhas.push('🛒 *NOVO PEDIDO*');
   linhas.push(`🏪 *${est.nome}*`);
   linhas.push(`🔢 Pedido: *${numeroPedido}*`);
   linhas.push(`📅 Data: *${dataPedido}*`);
   linhas.push(`⏰ Horário: *${horarioPedido}*`);
-  linhas.push('━━━━━━━━━━━━━━━━━━');
+  linhas.push(linha);
   linhas.push('');
 
-  // Itens
+  // 2) DADOS DO CLIENTE
+  linhas.push('👤 *DADOS DO CLIENTE*');
+  if (dados.nome) linhas.push(`• Nome: ${dados.nome}`);
+  if (dados.tel) linhas.push(`• Telefone: ${dados.tel}`);
+  if (dados.pagamento) linhas.push(`• Pagamento: ${dados.pagamento}`);
+  if (dados.obsGeral) linhas.push(`• Obs. geral: _${dados.obsGeral}_`);
+  linhas.push(linha);
+  linhas.push('');
+
+  // 3) TIPO DE ENTREGA
+  linhas.push('🚚 *TIPO DE ENTREGA*');
+  linhas.push(`• Tipo: *${dados.tipo}*`);
+
+  if (dados.tipo === 'Entrega') {
+    if (dados.zonaEntrega) {
+      linhas.push(`• Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
+    }
+    if (dados.bairroEntrega) linhas.push(`• Bairro: ${dados.bairroEntrega}`);
+
+    const enderecoCompleto = [
+      dados.endereco,
+      dados.numero ? `nº ${dados.numero}` : '',
+      dados.complemento ? `(${dados.complemento})` : ''
+    ].filter(Boolean).join(', ');
+
+    if (enderecoCompleto) linhas.push(`• Endereço: ${enderecoCompleto}`);
+    if (dados.referencia) linhas.push(`• Referência: ${dados.referencia}`);
+  } else {
+    if (dados.retiradaNome) linhas.push(`• Retirada por: ${dados.retiradaNome}`);
+  }
+
+  linhas.push(linha);
+  linhas.push('');
+
+  // 4) ITENS DO PEDIDO
   linhas.push('📦 *ITENS DO PEDIDO*');
   linhas.push('');
 
@@ -1411,51 +1445,20 @@
       linhas.push('');
       contadorGlobal++;
     });
-
-    linhas.push('');
   });
 
-  // Totais
-  linhas.push('━━━━━━━━━━━━━━━━━━');
+  linhas.push(linha);
+  linhas.push('');
+
+  // 5) RESUMO DO PAGAMENTO
   linhas.push('💰 *RESUMO DO PAGAMENTO*');
   linhas.push(`• Subtotal: ${money(subtotal)}`);
   if (taxaEntrega) linhas.push(`• ${labelTaxa}: ${money(taxaEntrega)}`);
   linhas.push(`💵 *TOTAL GERAL: ${money(total)}*`);
+  linhas.push(linha);
   linhas.push('');
 
-  // Entrega / Retirada
-  linhas.push('🚚 *ENTREGA / RETIRADA*');
-  linhas.push(`• Tipo: *${dados.tipo}*`);
-
-  if (dados.tipo === 'Entrega') {
-    if (dados.zonaEntrega) {
-      linhas.push(`• Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
-    }
-    if (dados.bairroEntrega) linhas.push(`• Bairro: ${dados.bairroEntrega}`);
-
-    const enderecoCompleto = [
-      dados.endereco,
-      dados.numero ? `nº ${dados.numero}` : '',
-      dados.complemento ? `(${dados.complemento})` : ''
-    ].filter(Boolean).join(', ');
-
-    if (enderecoCompleto) linhas.push(`• Endereço: ${enderecoCompleto}`);
-    if (dados.referencia) linhas.push(`• Referência: ${dados.referencia}`);
-  } else {
-    if (dados.retiradaNome) linhas.push(`• Retirada por: ${dados.retiradaNome}`);
-  }
-
-  linhas.push('');
-
-  // Cliente
-  linhas.push('👤 *DADOS DO CLIENTE*');
-  if (dados.nome) linhas.push(`• Nome: ${dados.nome}`);
-  if (dados.tel) linhas.push(`• Telefone: ${dados.tel}`);
-  if (dados.pagamento) linhas.push(`• Pagamento: ${dados.pagamento}`);
-  if (dados.obsGeral) linhas.push(`• Obs. geral: _${dados.obsGeral}_`);
-  linhas.push('');
-
-  // Rodapé
+  // 6) MENSAGEM FINAL
   linhas.push('✅ Pedido pronto para confirmação!');
   linhas.push('🙏 Obrigado!');
 
