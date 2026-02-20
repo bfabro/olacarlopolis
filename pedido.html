@@ -1335,15 +1335,14 @@
     second: '2-digit'
   });
 
-  // Separador seguro (ASCII)
   const linha = '------------------------------';
 
   const nomeCategoria = (tipo) => {
     const t = String(tipo || '').toLowerCase();
-    if (t === 'lanche') return '[Lanches]';
-    if (t === 'bebida') return '[Bebidas]';
-    if (t === 'doce') return '[Doces]';
-    return '[Outros Itens]';
+    if (t === 'lanche') return '✅ Lanches';
+    if (t === 'bebida') return '✅ Bebidas';
+    if (t === 'doce') return '✅ Doces';
+    return '✅ Outros Itens';
   };
 
   const ordemCategoria = { lanche: 1, bebida: 2, doce: 3, outros: 99 };
@@ -1365,32 +1364,31 @@
 
   // 1) NOVO PEDIDO
   linhas.push('*NOVO PEDIDO*');
-  linhas.push(' ');
-  //linhas.push(`Loja: *${est.nome}*`);
-  linhas.push(`Pedido: *${numeroPedido.replace('_', '')}*`); // NP000001
-  linhas.push(`Data: *${dataPedido}*`);
-  linhas.push(`Horario: *${horarioPedido}*`);
+  linhas.push(`Loja: *${est.nome}*`);
+  linhas.push(`Pedido: *${numeroPedido}*`);
+  linhas.push(`📅 Data: *${dataPedido}*`);
+  linhas.push(`⏰ Horario: *${horarioPedido}*`);
   linhas.push(linha);
   linhas.push('');
 
   // 2) DADOS DO CLIENTE
   linhas.push('*DADOS DO CLIENTE*');
-  if (dados.nome) linhas.push(`- Nome: ${dados.nome}`);
-  if (dados.tel) linhas.push(`- Telefone: ${dados.tel}`);
-  if (dados.pagamento) linhas.push(`- Pagamento: ${dados.pagamento}`);
-  if (dados.obsGeral) linhas.push(`- Obs. geral: _${dados.obsGeral}_`);
+  if (dados.nome) linhas.push(`📌 Nome: ${dados.nome}`);
+  if (dados.tel) linhas.push(`📞 Telefone: ${dados.tel}`);
+  if (dados.pagamento) linhas.push(`💰 Pagamento: ${dados.pagamento}`);
+  if (dados.obsGeral) linhas.push(`⚠️ Obs. geral: _${dados.obsGeral}_`);
   linhas.push(linha);
   linhas.push('');
 
   // 3) TIPO DE ENTREGA
   linhas.push('*TIPO DE ENTREGA*');
-  linhas.push(`- Tipo: *${dados.tipo}*`);
+  linhas.push(`🚚 Tipo: *${dados.tipo}*`);
 
   if (dados.tipo === 'Entrega') {
     if (dados.zonaEntrega) {
-      linhas.push(`- Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
+      linhas.push(`📌 Zona: ${dados.zonaEntrega === 'fora' ? 'Fora da cidade' : 'Dentro da cidade'}`);
     }
-    if (dados.bairroEntrega) linhas.push(`- Bairro: ${dados.bairroEntrega}`);
+    if (dados.bairroEntrega) linhas.push(`📌 Bairro: ${dados.bairroEntrega}`);
 
     const enderecoCompleto = [
       dados.endereco,
@@ -1398,10 +1396,10 @@
       dados.complemento ? `(${dados.complemento})` : ''
     ].filter(Boolean).join(', ');
 
-    if (enderecoCompleto) linhas.push(`- Endereco: ${enderecoCompleto}`);
-    if (dados.referencia) linhas.push(`- Referencia: ${dados.referencia}`);
+    if (enderecoCompleto) linhas.push(`📌 Endereco: ${enderecoCompleto}`);
+    if (dados.referencia) linhas.push(`📌 Referencia: ${dados.referencia}`);
   } else {
-    if (dados.retiradaNome) linhas.push(`- Retirada por: ${dados.retiradaNome}`);
+    if (dados.retiradaNome) linhas.push(`📌 Retirada por: ${dados.retiradaNome}`);
   }
 
   linhas.push(linha);
@@ -1431,14 +1429,14 @@
       linhas.push(`   - Total item: *${money(lineTotal)}*`);
 
       if (adicionais.length) {
-        linhas.push('   - Adicionais:');
+        linhas.push('   + Adicionais:');
         adicionais.forEach(a => {
-          linhas.push(`     * ${a.nome} (+${money(a.preco)})`);
+          linhas.push(`     • ${a.nome} (+${money(a.preco)})`);
         });
       }
 
       if (it.obs) {
-        linhas.push(`   - Obs: _${it.obs}_`);
+        linhas.push(`   ⚠️ Obs: _${it.obs}_`);
       }
 
       linhas.push('');
@@ -1451,14 +1449,14 @@
 
   // 5) RESUMO DO PAGAMENTO
   linhas.push('*RESUMO DO PAGAMENTO*');
-  linhas.push(`- Subtotal: ${money(subtotal)}`);
-  if (taxaEntrega) linhas.push(`- ${labelTaxa}: ${money(taxaEntrega)}`);
-  linhas.push(`- *TOTAL GERAL: ${money(total)}*`);
+  linhas.push(`💰 Subtotal: ${money(subtotal)}`);
+  if (taxaEntrega) linhas.push(`💰 ${labelTaxa}: ${money(taxaEntrega)}`);
+  linhas.push(`✅ *TOTAL GERAL: ${money(total)}*`);
   linhas.push(linha);
   linhas.push('');
 
   // 6) MENSAGEM FINAL
-  linhas.push('Pedido pronto para confirmacao!');
+  linhas.push('✅ Pedido pronto para confirmacao!');
   linhas.push('Obrigado!');
 
   return linhas.join('\n');
