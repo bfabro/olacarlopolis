@@ -287,6 +287,9 @@ button {
 			<!-- NOVO: filtro anual -->
 			<input type="number" id="filtroAno" class="filtro hidden" min="2025" max="2099" placeholder="2026">
 
+			<label for="filtroCliente">Filtro por Cliente / Estabelecimento:</label>
+<input type="text" id="filtroCliente" placeholder="Ex: Mr Potato">
+
 			<button id="btnBuscar">Buscar</button>
 
 		</div>
@@ -1127,6 +1130,7 @@ button {
 					// ⚠️ só libere o botão depois de carregar também a tabela "Onde Comer"
 					await carregarTabelaOndeComer();
 					await carregarTabelaIgreen();
+					aplicarFiltroClienteNosCards();
 
 				} finally {
 					stopLoading();               // 🔵 volta ao azul só depois de TUDO
@@ -1629,6 +1633,94 @@ async function listarDatasPeriodo(tipo) {
 				if (btn) btn.addEventListener('click', carregarTabelaOndeComer);
 			});
 		</script>
+
+		<script>
+  function normalizarTexto(txt) {
+    return (txt || "")
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, ""); // remove acentos
+  }
+
+  function aplicarFiltroClienteNosCards() {
+    const input = document.getElementById("filtroCliente");
+    if (!input) return;
+
+    const termo = normalizarTexto(input.value.trim());
+    const cards = document.querySelectorAll(".container > .card");
+
+    cards.forEach(card => {
+      // não mexe no card de filtros
+      if (card.classList.contains("filtros")) return;
+
+      const tabela = card.querySelector("table");
+      const tbody = card.querySelector("tbody");
+
+      // se não tem tabela/tbody, mantém visível
+      if (!tabela || !tbody) {
+        card.style.display = "";
+        return;
+      }
+
+      const linhas = Array.from(tbody.querySelectorAll("tr"));
+
+      // sem filtro => mostra tudo
+      if (!termo) {
+        linhas.forEach(l => l.style.display = "");
+        card.style.display = "";
+        return;
+      }
+
+      let visiveis = 0;
+
+      linhas.forEach(linha => {
+        const textoLinha = normalizarTexto(linha.innerText);
+
+        // ignora linhas "vazias" / placeholders
+        const placeholder = textoLinha.includes("carregando") ||
+                            textoLinha.includes("nenhum dado") ||
+                            textoLinha.includes("nenhum clique") ||
+                            textoLinha.includes("nenhum contato") ||
+                            textoLinha.includes("nenhuma instalação") ||
+                            textoLinha.includes("nenhum uso");
+
+        if (placeholder) {
+          linha.style.display = "none";
+          return;
+        }
+
+        // se o termo estiver em qualquer coluna da linha, mantém
+        const match = textoLinha.includes(termo);
+        linha.style.display = match ? "" : "none";
+        if (match) visiveis++;
+      });
+
+      // mostra só os cards que possuem ao menos 1 linha com o cliente
+      card.style.display = visiveis > 0 ? "" : "none";
+    });
+
+    // mantém sempre visíveis o título/data e o card de filtros
+    const filtrosCard = document.querySelector(".filtros.card");
+    if (filtrosCard) filtrosCard.style.display = "";
+
+    const dataRelatorio = document.getElementById("dataRelatorio");
+    if (dataRelatorio) dataRelatorio.style.display = "";
+  }
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const filtroCliente = document.getElementById("filtroCliente");
+    if (filtroCliente) {
+      filtroCliente.addEventListener("input", aplicarFiltroClienteNosCards);
+      filtroCliente.addEventListener("change", aplicarFiltroClienteNosCards);
+    }
+
+    // aplica uma vez ao abrir
+    setTimeout(aplicarFiltroClienteNosCards, 500);
+  });
+</script>
 
 
 		<div id="loadingOverlay" class="loader-overlay" aria-live="polite" aria-busy="true">
