@@ -1889,7 +1889,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   // Função para registrar clique no Firebase
- function registrarCliqueBotao(tipo, idEstabelecimento) {
+function registrarCliqueBotao(tipo, idEstabelecimento) {
   const hoje = getHojeBR();
   const db = firebase.database();
 
@@ -12608,7 +12608,7 @@ function sendPaymentReminder(establishment) {
 ///
 ///
 
-// teste de salvar o horario dos cliques tambem
+// teste de salvar o horario dos cliques a
 ///
 
 ///
@@ -16929,7 +16929,19 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   ////
 
   // Função para registrar clique no Firebase
-  
+  function registrarCliqueBotao(tipo, idEstabelecimento) {
+    const hoje = getHojeBR();
+    const ref = firebase.database().ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
+    // retorna uma Promise e resolve quando a transação completa
+    return new Promise((resolve) => {
+      ref.transaction(
+        (atual) => (atual || 0) + 1,
+        (_erro, _committed, _snap) => resolve({ ok: !_erro })
+      );
+    });
+  }
+  window.registrarCliqueBotao = registrarCliqueBotao;
+
   // === NASCER & PÔR DO SOL (Carlópolis-PR) ===
 
   // Coordenadas fixas de Carlópolis-PR
@@ -18020,21 +18032,51 @@ document.addEventListener('click', function (e) {
 
 
 // Função para registrar clique no Firebase
+function registrarCliqueBotao(tipo, idEstabelecimento) {
+  try {
+    const db = firebase.database();
+    const hoje = (typeof getHojeBR === "function")
+      ? getHojeBR()
+      : (() => {
+          const d = new Date();
+          return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+        })();
 
+    const estId = String(idEstabelecimento || "sem-id").trim().replace(/[.#$\[\]]/g, "-");
+    const tipoSeguro = String(tipo || "outro").trim();
 
+    const refContador = db.ref(`cliquesPorBotao/${hoje}/${estId}/${tipoSeguro}`);
+    const refLog = db.ref(`cliquesPorBotaoDetalhado/${hoje}/${estId}`).push();
 
+    const agora = new Date();
+    const horarioBR = agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
-
-
-
-
-
-
-
-
-
-
-
+    return new Promise((resolve) => {
+      refContador.transaction(
+        (atual) => (Number(atual) || 0) + 1,
+        async (erro) => {
+          if (erro) return resolve({ ok: false, erro: true });
+          try {
+            await refLog.set({
+              tipo: tipoSeguro,
+              horario: horarioBR,
+              dataHoraISO: agora.toISOString(),
+              ts: firebase.database.ServerValue.TIMESTAMP,
+              pagina: window.location.href || "",
+              estabelecimento: estId
+            });
+            resolve({ ok: true });
+          } catch (e) {
+            resolve({ ok: true, logFalhou: true });
+          }
+        }
+      );
+    });
+  } catch (e) {
+    return Promise.resolve({ ok: false, erro: true });
+  }
+}
+window.registrarCliqueBotao = registrarCliqueBotao;
 ////////////// inicio salvar imoveis
 // gera a chave do imóvel: usa id; se não tiver, usa titulo higienizado
 function keyImovel(im) {
