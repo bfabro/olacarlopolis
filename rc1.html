@@ -264,7 +264,7 @@
 
 
 		</div>
-		<div class="filtros card" data-fixo="1">
+		<div class="filtros card">
 			<label for="tipoRelatorio">Tipo de Relatório:</label>
 			<select id="tipoRelatorio">
 				<option value="diario">Diário</option>
@@ -304,7 +304,7 @@
 
 		<p id="dataRelatorio">📅 Data do Relatório: -</p>
 
-		<div class="card" data-fixo="1">
+		<div class="card">
 			<h2 class="section-title">📈 Resumo de Acessos</h2>
 			<table>
 				<thead>
@@ -328,7 +328,7 @@
 		</div>
 
 		<!-- NOVO CARD - Origem dos Acessos -->
-		<div class="card" data-fixo="1">
+		<div class="card">
 			<h2 class="section-title">🔗 Origem dos Acessos</h2>
 			<table>
 				<thead>
@@ -341,7 +341,7 @@
 			</table>
 		</div>
 
-		<div class="card" data-fixo="1">
+		<div class="card">
 			<h2 class="section-title">📂 Cliques por Categoria</h2>
 			<table>
 				<thead>
@@ -541,7 +541,7 @@
 		</div>
 
 
-		<div class="card" data-fixo="1">
+		<div class="card">
 			<h2 class="section-title">🕒 Acessos por Faixa de Horário</h2>
 			<table>
 				<thead>
@@ -554,7 +554,7 @@
 			</table>
 		</div>
 
-		<div class="card" data-fixo="1">
+		<div class="card">
 			<h2 class="section-title">🌍 Resumo por Cidade</h2>
 			<table>
 				<thead>
@@ -1134,8 +1134,12 @@
 
 
 					// ⚠️ só libere o botão depois de carregar também a tabela "Onde Comer"
-					await carregarTabelaOndeComer();
-					await carregarTabelaIgreen();
+					await Promise.all([
+						carregarTabelaOndeComer(),
+						carregarTabelaGruposWhats(),
+						carregarTabelaCliquesImoveis(),
+						carregarTabelaContatosImoveis()
+					]);
 					popularFiltroClientes();
 					aplicarFiltroClienteNosCards();
 
@@ -1264,6 +1268,18 @@
 
 
 
+
+<script>
+	const __cacheNosFirebase = {};
+	async function lerNoComCache(path) {
+		if (__cacheNosFirebase[path]) return __cacheNosFirebase[path];
+		const snap = await firebase.database().ref(path).once('value');
+		const val = snap.val() || {};
+		__cacheNosFirebase[path] = val;
+		return val;
+	}
+</script>
+
 		<script>
 			// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
 			// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
@@ -1317,18 +1333,17 @@
 
 			// Lê um nó "1 nível" (ex.: cliquesCardapiosOndeComer/2025-08-16) e acumula por estabelecimento
 			async function somarNoPorDatas(basePath, datas) {
-				const db = firebase.database();
-				const total = {}; // { estabId: numero }
+	const total = {};
+	const tudo = await lerNoComCache(basePath);
 
-				for (const d of datas) {
-					const snap = await db.ref(`${basePath}/${d}`).once('value');
-					const val = snap.val() || {};
-					Object.keys(val).forEach(id => {
-						total[id] = (total[id] || 0) + (typeof val[id] === 'number' ? val[id] : 0);
-					});
-				}
-				return total;
-			}
+	for (const d of datas) {
+		const val = tudo[d] || {};
+		Object.keys(val).forEach(id => {
+			total[id] = (total[id] || 0) + (typeof val[id] === 'number' ? val[id] : 0);
+		});
+	}
+	return total;
+}
 
 
 			// Popula a tabela 📋 Cardápios (Onde Comer) somando Cardápio + WhatsApp (+ Fotos opcional)
@@ -1379,33 +1394,26 @@
 			// Lê os dias do período já selecionado no filtro (diário/semanal/mensal)
 			// A página já usa listarDatasPeriodo() em outras tabelas.
 			// Vamos reaproveitar exatamente o mesmo helper.
-			async function carregarTabelaGruposWhats() {
+						async function carregarTabelaGruposWhats() {
 				const tbody = document.getElementById('tabelaGruposWhats');
 				if (!tbody) return;
 
-				// feedback visual
 				tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
-				const db = firebase.database();
-				const datas = await listarDatasPeriodo(); // já existe e é usada na tabela "Onde Comer" :contentReference[oaicite:1]{index=1}
+				const datas = await listarDatasPeriodo();
+				const datasSet = new Set(datas);
+				const totais = {};
 
-				// totalizador por ID de grupo (id = slug/nó usado quando registra o clique do botão)
-				const totais = {}; // { grupoId: total }
+				const tudo = await lerNoComCache('cliquesPorBotao');
 
-				// Para cada dia, lemos cliquesPorBotao/<data> e somamos apenas o tipo 'grupoWhatsapp'
-				for (const d of datas) {
-					const snap = await db.ref(`cliquesPorBotao/${d}`).once('value');
-					const val = snap.val() || {};
-					// val = { [id]: { grupoWhatsapp: number, ...outros tipos } }
-					Object.entries(val).forEach(([id, tipos]) => {
+				Object.entries(tudo).forEach(([d, val]) => {
+					if (!datasSet.has(d)) return;
+					Object.entries(val || {}).forEach(([id, tipos]) => {
 						const qtd = Number(tipos?.grupoWhatsapp || 0);
-						if (qtd > 0) {
-							totais[id] = (totais[id] || 0) + qtd;
-						}
+						if (qtd > 0) totais[id] = (totais[id] || 0) + qtd;
 					});
-				}
+				});
 
-				// monta linhas ordenadas por total desc
 				const linhas = Object.entries(totais)
 					.map(([id, total]) => ({ id, total }))
 					.sort((a, b) => b.total - a.total);
@@ -1425,25 +1433,26 @@
 
 
 
-
 			async function carregarTabelaIgreen() {
 				const tbody = document.getElementById('tabelaIgreen');
 				if (!tbody) return;
 
 				tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
-				const db = firebase.database();
 				const datas = await listarDatasPeriodo();
+				const datasSet = new Set(datas);
 
 				let totalCadastro = 0;
 				let totalWhats = 0;
 
-				for (const d of datas) {
-					const snap = await db.ref(`cliquesPorBotao/${d}/igreen`).once('value');
-					const tipos = snap.val() || {};
-					totalCadastro += Number(tipos.cadastro || 0);
-					totalWhats += Number(tipos.whats_duvidas || 0);
-				}
+				const tudo = await lerNoComCache('cliquesPorBotao');
+
+				Object.entries(tudo).forEach(([d, porDia]) => {
+					if (!datasSet.has(d)) return;
+					const tipos = porDia?.igreen || {};
+					totalCadastro += Number(tipos.igreenCadastro || tipos.cadastro || 0);
+					totalWhats += Number(tipos.igreenDuvidasWhats || tipos.whats_duvidas || 0);
+				});
 
 				tbody.innerHTML = `
     <tr>
@@ -1456,7 +1465,6 @@
 
 
 
-
 			async function carregarTabelaCliquesImoveis() {
 				const tbody = document.getElementById('tabelaCliquesImoveis');
 				if (!tbody) return;
@@ -1464,11 +1472,12 @@
 
 				const datas = await listarDatasPeriodo();
 				const db = firebase.database();
+				const datasSet = new Set(datas);
 
-				const tot = {};                 // { id: {whats, fotos} }
-				const titulos = {};             // { id: titulo }
-				const mapCorretor = {};         // { id: corretor }
-				const mapProprietario = {};     // { id: proprietario }
+				const tot = {};
+				const titulos = {};
+				const mapCorretor = {};
+				const mapProprietario = {};
 
 				const norm = (raw) => {
 					if (!raw) return '';
@@ -1477,11 +1486,10 @@
 					return String(raw).trim();
 				};
 
-				// 1) Soma cliques por dia e captura rótulos do nó diário
-				for (const d of datas) {
-					const snap = await db.ref(`imoveisCliquesPorDia/${d}`).once('value');
-					const dia = snap.val() || {};
-					Object.entries(dia).forEach(([id, info]) => {
+				const tudoDias = await lerNoComCache('imoveisCliquesPorDia');
+				Object.entries(tudoDias).forEach(([d, dia]) => {
+					if (!datasSet.has(d)) return;
+					Object.entries(dia || {}).forEach(([id, info]) => {
 						const w = Number(info?.whatsapp || 0);
 						const f = Number(info?.fotos || 0);
 
@@ -1499,14 +1507,19 @@
 							tot[id].fotos += f;
 						}
 					});
-				}
+				});
 
-				// 2) Completa faltantes pelo cadastro do imóvel
 				const faltantes = Object.keys(tot).filter(id => !mapCorretor[id] || !mapProprietario[id] || !titulos[id]);
-				await Promise.all(faltantes.map(async (id) => {
-					for (const path of [`imoveis/dados/${id}`, `imoveis/${id}`]) {
-						const s = await db.ref(path).once('value');
-						const v = s.val();
+				const [snapDados, snapRaiz] = await Promise.all([
+					db.ref('imoveis/dados').once('value'),
+					db.ref('imoveis').once('value')
+				]);
+				const dadosImoveis = snapDados.val() || {};
+				const raizImoveis = snapRaiz.val() || {};
+
+				faltantes.forEach((id) => {
+					const candidatos = [dadosImoveis[id], raizImoveis[id]];
+					for (const v of candidatos) {
 						if (!v) continue;
 						if (!titulos[id] && v?.titulo) titulos[id] = String(v.titulo);
 						if (!mapCorretor[id]) {
@@ -1519,9 +1532,8 @@
 						}
 						if (titulos[id] && mapCorretor[id] && mapProprietario[id]) break;
 					}
-				}));
+				});
 
-				// 3) Monta linhas
 				const linhas = Object.entries(tot)
 					.map(([id, v]) => ({
 						titulo: titulos[id] || id,
@@ -1550,50 +1562,47 @@
 			}
 
 
-
-			// mantém as chamadas já existentes
-			document.addEventListener('DOMContentLoaded', carregarTabelaCliquesImoveis);
-			document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaCliquesImoveis);
-
-
-
 			async function carregarTabelaContatosImoveis() {
 				const tbody = document.getElementById('tabelaContatosImoveis');
 				if (!tbody) return;
-				tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+				tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
 				const datas = await listarDatasPeriodo();
-				const db = firebase.database();
-				const linhas = []; // { ts, dataHora, titulo, nome, fone }
+				const datasSet = new Set(datas);
+				const porData = await lerNoComCache('imoveis/contatos');
+				const linhas = [];
 
-				for (const d of datas) {
-					const snapDia = await db.ref(`imoveis/contatos/${d}`).once('value');
-					const porImovel = snapDia.val() || {};
-					Object.entries(porImovel).forEach(([imovelId, contatos]) => {
+				Object.entries(porData || {}).forEach(([d, porImovel]) => {
+					if (!datasSet.has(d)) return;
+					Object.entries(porImovel || {}).forEach(([imovelId, contatos]) => {
 						Object.values(contatos || {}).forEach(c => {
-							const ts = Number(c.ts || 0);
+							const ts = Number(c?.ts || 0);
 							const dt = ts ? new Date(ts) : null;
 							const dataHora = dt
-								? `${dt.toLocaleDateString()} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`
+								? `${dt.toLocaleDateString('pt-BR')} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`
 								: d;
+
+							const destino = String(c?.destinoFone || "");
+							const foneFmt = destino && destino.length >= 3
+								? `(${destino.slice(0, 2)}) ${destino.slice(2)}`
+								: "—";
+
 							linhas.push({
 								ts,
 								dataHora,
-								titulo: c.imovelTitulo || imovelId,
-								nome: c.nome || "—",
-								fone: c.destinoFone ? `(${c.destinoFone.slice(0, 2)}) ${c.destinoFone.slice(2)}` : "—",
-								corretor: (c.corretor || c.responsavel || "—")
-
+								titulo: c?.imovelTitulo || imovelId,
+								nome: c?.nome || "—",
+								fone: foneFmt,
+								corretor: c?.corretor || c?.responsavel || "—"
 							});
 						});
 					});
-				}
+				});
 
-				// ordena do mais recente pro mais antigo
 				linhas.sort((a, b) => (b.ts || 0) - (a.ts || 0));
 
 				if (!linhas.length) {
-					tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum contato encontrado</td></tr>`;
+					tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Nenhum contato encontrado</td></tr>`;
 					return;
 				}
 
@@ -1603,47 +1612,36 @@
       <td>${l.titulo}</td>
       <td>${l.nome}</td>
       <td style="white-space:nowrap">${l.fone}</td>
-	 <td>${l.corretor}</td>
+      <td>${l.corretor}</td>
     </tr>
   `).join('');
 			}
 
-			// dispara junto com os outros carregamentos do relatório
-			document.addEventListener('DOMContentLoaded', carregarTabelaContatosImoveis);
-			document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaContatosImoveis);
-
-
-
-
-
-			// Chamar junto com as outras tabelas:
-			document.addEventListener('DOMContentLoaded', () => {
-				carregarTabelaGruposWhats(); // inicial, como já é feito para Onde Comer :contentReference[oaicite:2]{index=2}
-			});
-
-			// E também no botão "Buscar", junto com as demais atualizações:
-			const _btn = document.getElementById('btnBuscar');
-			if (_btn) _btn.addEventListener('click', carregarTabelaGruposWhats);
 
 
 
 
 
 
+document.addEventListener('DOMContentLoaded', async () => {
+		startLoading();
+		try {
+			await Promise.all([
+				carregarTabelaOndeComer(),
+				carregarTabelaGruposWhats(),
+				carregarTabelaCliquesImoveis(),
+				carregarTabelaContatosImoveis()
+			]);
+			popularFiltroClientes();
+			aplicarFiltroClienteNosCards();
+		} finally {
+			stopLoading();
+		}
+	});
+</script>
 
-
-
-			// Chame ao abrir a página e também no botão "Buscar"
-			document.addEventListener('DOMContentLoaded', () => {
-				carregarTabelaOndeComer();        // inicial
-				const btn = document.getElementById('btnBuscar');
-				if (btn) btn.addEventListener('click', carregarTabelaOndeComer);
-			});
-		</script>
-
-
-		<script>
-			function normalizarTexto(txt) {
+<script>
+function normalizarTexto(txt) {
 				return (txt || "")
 					.toString()
 					.toLowerCase()
