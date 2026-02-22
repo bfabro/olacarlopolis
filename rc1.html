@@ -645,6 +645,63 @@
 			let cidadesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresCidades") || "{}");
 
 
+
+function formatarPeriodoSelecionado() {
+  const tipo = document.getElementById("tipoRelatorio").value;
+
+  if (tipo === "diario") {
+    const d = document.getElementById("filtroData").value;
+    if (!d) return "Período não definido";
+    const [ano, mes, dia] = d.split("-");
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  if (tipo === "mensal") {
+    const m = document.getElementById("filtroMes").value; // YYYY-MM
+    if (!m) return "Período não definido";
+    const [ano, mes] = m.split("-");
+    const nomesMeses = [
+      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+    return `${nomesMeses[Number(mes) - 1]} de ${ano}`;
+  }
+
+  if (tipo === "anual") {
+    const ano = document.getElementById("filtroAno").value;
+    return ano ? `Ano ${ano}` : "Período não definido";
+  }
+
+  if (tipo === "semanal") {
+    const m = document.getElementById("filtroMes").value;   // YYYY-MM
+    const semana = Number(document.getElementById("filtroSemana").value || 1);
+    if (!m) return "Período não definido";
+
+    const [ano, mes] = m.split("-").map(Number);
+    const nomesMeses = [
+      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+
+    const faixas = { 1: [1, 7], 2: [8, 14], 3: [15, 21], 4: [22, 28], 5: [29, 31] };
+    let [ini, fim] = faixas[semana] || [1, 7];
+
+    // ajusta o último dia real do mês
+    const ultimoDiaMes = new Date(ano, mes, 0).getDate();
+    if (fim > ultimoDiaMes) fim = ultimoDiaMes;
+
+    const iniTxt = String(ini).padStart(2, "0");
+    const fimTxt = String(fim).padStart(2, "0");
+    const mesTxt = String(mes).padStart(2, "0");
+
+    return `Semana ${semana} de ${nomesMeses[mes - 1]}/${ano} (${iniTxt}/${mesTxt}/${ano} a ${fimTxt}/${mesTxt}/${ano})`;
+  }
+
+  return "Período não definido";
+}
+
+
+
 			document.getElementById("btnBuscar").addEventListener("click", async () => {
 				startLoading();                // 🔴 fica vermelho + overlay
 				try {
@@ -936,7 +993,8 @@
 
 
 					// Mostrar data do relatório
-					document.getElementById("dataRelatorio").textContent = `Data do Relatório: ${diasFiltrados.join(", ")}`;
+					const periodoFormatado = formatarPeriodoSelecionado();
+document.getElementById("dataRelatorio").textContent = `📅 Data do Relatório: ${periodoFormatado}`;
 
 					// Criar tabela de cidades
 					const cidadesContagem = {};
@@ -1141,7 +1199,10 @@
 						carregarTabelaContatosImoveis()
 					]);
 					popularFiltroClientes();
-					aplicarFiltroClienteNosCards();
+					const dataRelatorio = document.getElementById("dataRelatorio");
+if (dataRelatorio) dataRelatorio.style.display = "";
+
+atualizarPeriodoNosCardsVisiveis();
 
 				} finally {
 					stopLoading();               // 🔵 volta ao azul só depois de TUDO
@@ -1781,6 +1842,43 @@ function normalizarTexto(txt) {
 				const dataRelatorio = document.getElementById("dataRelatorio");
 				if (dataRelatorio) dataRelatorio.style.display = "";
 			}
+
+			function atualizarPeriodoNosCardsVisiveis() {
+  const periodo = formatarPeriodoSelecionado();
+  const cards = document.querySelectorAll(".container > .card");
+
+  cards.forEach(card => {
+    // remove etiqueta antiga, se existir
+    const antiga = card.querySelector(".periodo-card-cliente");
+    if (antiga) antiga.remove();
+
+    // não adiciona no card de filtros
+    if (card.classList.contains("filtros")) return;
+
+    // só adiciona se o card estiver visível
+    const style = window.getComputedStyle(card);
+    if (style.display === "none") return;
+
+    // cria etiqueta
+    const etiqueta = document.createElement("div");
+    etiqueta.className = "periodo-card-cliente";
+    etiqueta.style.cssText = `
+      margin: 0 0 8px 0;
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: rgba(0,188,212,0.12);
+      border: 1px solid rgba(0,188,212,0.35);
+      color: #7ee7f2;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    `;
+    etiqueta.textContent = `Período: ${periodo}`;
+
+    // inserir no topo do card (antes do título/tabela)
+    card.insertBefore(etiqueta, card.firstChild);
+  });
+}
 
 			function limparFiltroClienteTextoAoTrocarSelect() {
 				const txt = document.getElementById("filtroClienteTexto");

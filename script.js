@@ -12577,7 +12577,15 @@ function sendPaymentReminder(establishment) {
       },
 
 
+///
+///
+///
 
+// teste de salvar o horario dos cliques tambem
+///
+
+///
+///
       // inicio Eventos
       {
         link: document.querySelector("#menuEventos"),
