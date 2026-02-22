@@ -1893,39 +1893,46 @@ document.addEventListener("DOMContentLoaded", function () {
   const hoje = getHojeBR();
   const db = firebase.database();
 
-  // 1) contador (continua igual, para relatórios rápidos)
+  // 1) contador agregado (rápido para relatório)
   const refContador = db.ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
 
-  // 2) log detalhado (novo, com horário)
-  const refLog = db.ref(`cliquesPorBotaoDetalhado/${hoje}/${idEstabelecimento}`).push();
+  // 2) log detalhado (com horário do clique)
+  const refDetalhado = db.ref(`cliquesPorBotaoDetalhado/${hoje}/${idEstabelecimento}`).push();
 
   const agora = new Date();
+  const payload = {
+    tipo: tipo, // "telefone", "fotos", "cardapio", etc.
+    horario: agora.toLocaleTimeString("pt-BR"),
+    dataHoraISO: agora.toISOString(),
+    ts: firebase.database.ServerValue.TIMESTAMP,
+    pagina: window.location.href
+  };
 
   return new Promise((resolve) => {
     refContador.transaction(
       (atual) => (atual || 0) + 1,
       async (erro) => {
         if (erro) {
-          resolve({ ok: false });
+          console.error("[CliqueBotao] Erro no contador:", erro);
+          resolve({ ok: false, erroContador: true });
           return;
         }
 
         try {
-          await refLog.set({
-            tipo, // ex: "telefone", "fotos", "cardapio"
-            horario: agora.toLocaleTimeString("pt-BR"),
-            dataHoraISO: agora.toISOString(),
-            ts: firebase.database.ServerValue.TIMESTAMP,
-            pagina: window.location.href
-          });
+          await refDetalhado.set(payload);
+          console.log("[CliqueBotao] Detalhado salvo com sucesso:", payload);
           resolve({ ok: true });
         } catch (e) {
+          console.error("[CliqueBotao] Erro ao salvar detalhado:", e);
           resolve({ ok: true, logFalhou: true });
         }
       }
     );
   });
 }
+
+// garante que fique acessível globalmente
+window.registrarCliqueBotao = registrarCliqueBotao;
 
   const destaquesFixos = [
     // "hime",
