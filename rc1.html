@@ -62,19 +62,19 @@
 			font-weight: bold;
 		}
 
-	
-	select,
-input[type="date"],
-input[type="month"],
-input[type="number"],
-button {
-  padding: 10px;
-  background-color: #2a2a2a;
-  color: #fff;
-  border: 1px solid #444;
-  border-radius: 6px;
-  font-size: 14px;
-}
+
+		select,
+		input[type="date"],
+		input[type="month"],
+		input[type="number"],
+		button {
+			padding: 10px;
+			background-color: #2a2a2a;
+			color: #fff;
+			border: 1px solid #444;
+			border-radius: 6px;
+			font-size: 14px;
+		}
 
 
 		button {
@@ -264,7 +264,7 @@ button {
 
 
 		</div>
-		<div class="filtros card">
+		<div class="filtros card" data-fixo="1">
 			<label for="tipoRelatorio">Tipo de Relatório:</label>
 			<select id="tipoRelatorio">
 				<option value="diario">Diário</option>
@@ -287,6 +287,14 @@ button {
 			<!-- NOVO: filtro anual -->
 			<input type="number" id="filtroAno" class="filtro hidden" min="2025" max="2099" placeholder="2026">
 
+			<label for="filtroClienteSelect">Cliente / Estabelecimento:</label>
+			<select id="filtroClienteSelect">
+				<option value="">Todos os clientes</option>
+			</select>
+
+			<label for="filtroClienteTexto">Busca rápida (opcional):</label>
+			<input type="text" id="filtroClienteTexto" placeholder="Ex: Mr Potato">
+
 			<button id="btnBuscar">Buscar</button>
 
 		</div>
@@ -296,7 +304,7 @@ button {
 
 		<p id="dataRelatorio">📅 Data do Relatório: -</p>
 
-		<div class="card">
+		<div class="card" data-fixo="1">
 			<h2 class="section-title">📈 Resumo de Acessos</h2>
 			<table>
 				<thead>
@@ -320,7 +328,7 @@ button {
 		</div>
 
 		<!-- NOVO CARD - Origem dos Acessos -->
-		<div class="card">
+		<div class="card" data-fixo="1">
 			<h2 class="section-title">🔗 Origem dos Acessos</h2>
 			<table>
 				<thead>
@@ -333,7 +341,7 @@ button {
 			</table>
 		</div>
 
-		<div class="card">
+		<div class="card" data-fixo="1">
 			<h2 class="section-title">📂 Cliques por Categoria</h2>
 			<table>
 				<thead>
@@ -533,7 +541,7 @@ button {
 		</div>
 
 
-		<div class="card">
+		<div class="card" data-fixo="1">
 			<h2 class="section-title">🕒 Acessos por Faixa de Horário</h2>
 			<table>
 				<thead>
@@ -546,7 +554,7 @@ button {
 			</table>
 		</div>
 
-		<div class="card">
+		<div class="card" data-fixo="1">
 			<h2 class="section-title">🌍 Resumo por Cidade</h2>
 			<table>
 				<thead>
@@ -579,11 +587,11 @@ button {
 		</script>
 
 		<script>
-			const overlayEl = document.getElementById('loadingOverlay');
 			let loadCount = 0;
 
 			function startLoading() {
 				loadCount++;
+				const overlayEl = document.getElementById('loadingOverlay');
 				if (overlayEl) overlayEl.style.display = 'grid';
 				const btn = document.getElementById('btnBuscar');
 				if (btn) {
@@ -597,6 +605,7 @@ button {
 			function stopLoading() {
 				loadCount = Math.max(0, loadCount - 1);
 				if (loadCount === 0) {
+					const overlayEl = document.getElementById('loadingOverlay');
 					if (overlayEl) overlayEl.style.display = 'none';
 					const btn = document.getElementById('btnBuscar');
 					if (btn) {
@@ -674,58 +683,58 @@ button {
 
 
 					if (tipo === "diario") {
-  const dia = document.getElementById("filtroData").value;
-  diasFiltrados = [dia];
+						const dia = document.getElementById("filtroData").value;
+						diasFiltrados = [dia];
 
-} else if (tipo === "mensal") {
-  const mes = document.getElementById("filtroMes").value;
-  const diasDoMes = new Set([
-    ...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
-    ...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
-  ]);
-  diasFiltrados = Array.from(diasDoMes);
+					} else if (tipo === "mensal") {
+						const mes = document.getElementById("filtroMes").value;
+						const diasDoMes = new Set([
+							...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
+							...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
+						]);
+						diasFiltrados = Array.from(diasDoMes);
 
-} else if (tipo === "anual") {
-  const ano = document.getElementById("filtroAno").value;
-   dataReferencia = `Ano ${ano}`;
+					} else if (tipo === "anual") {
+						const ano = document.getElementById("filtroAno").value;
+						dataReferencia = `Ano ${ano}`;
 
-  if (!ano || ano.length !== 4) {
-    alert("Selecione um ano válido (ex: 2026).");
-    return;
-  }
+						if (!ano || ano.length !== 4) {
+							alert("Selecione um ano válido (ex: 2026).");
+							return;
+						}
 
-  const prefixoAno = ano + "-";
+						const prefixoAno = ano + "-";
 
-  const diasDoAno = new Set([
-    ...Object.keys(dadosCliques).filter(dia => dia.startsWith(prefixoAno)),
-    ...Object.keys(dadosBotoes).filter(dia => dia.startsWith(prefixoAno))
-  ]);
+						const diasDoAno = new Set([
+							...Object.keys(dadosCliques).filter(dia => dia.startsWith(prefixoAno)),
+							...Object.keys(dadosBotoes).filter(dia => dia.startsWith(prefixoAno))
+						]);
 
-  diasFiltrados = Array.from(diasDoAno);
+						diasFiltrados = Array.from(diasDoAno);
 
-} else if (tipo === "semanal") {
-  const mesSelecionado = document.getElementById("filtroMes").value;
-  const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
+					} else if (tipo === "semanal") {
+						const mesSelecionado = document.getElementById("filtroMes").value;
+						const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
 
-  if (!mesSelecionado || isNaN(semanaSelecionada)) {
-    alert("Selecione um mês e uma semana para o relatório semanal.");
-    return;
-  }
+						if (!mesSelecionado || isNaN(semanaSelecionada)) {
+							alert("Selecione um mês e uma semana para o relatório semanal.");
+							return;
+						}
 
-  const inicio = (semanaSelecionada - 1) * 7 + 1;
-  const fim = semanaSelecionada * 7;
+						const inicio = (semanaSelecionada - 1) * 7 + 1;
+						const fim = semanaSelecionada * 7;
 
-  const diasDaSemana = new Set([
-    ...Object.keys(dadosCliques).filter(dia =>
-      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-    ),
-    ...Object.keys(dadosBotoes).filter(dia =>
-      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-    )
-  ]);
+						const diasDaSemana = new Set([
+							...Object.keys(dadosCliques).filter(dia =>
+								dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+							),
+							...Object.keys(dadosBotoes).filter(dia =>
+								dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+							)
+						]);
 
-  diasFiltrados = Array.from(diasDaSemana);
-}
+						diasFiltrados = Array.from(diasDaSemana);
+					}
 
 
 
@@ -761,9 +770,9 @@ button {
 						const acessosDia = dadosAcessos[dia]?.detalhados || {};
 						Object.values(acessosDia).forEach(acesso => {
 							const origem =
-  (acesso.origem && acesso.origem !== "Site" && acesso.origem !== "App" && acesso.origem !== "acesso direto")
-    ? acesso.origem
-    : (acesso.canal || acesso.origem || "Site ou App");
+								(acesso.origem && acesso.origem !== "Site" && acesso.origem !== "App" && acesso.origem !== "acesso direto")
+									? acesso.origem
+									: (acesso.canal || acesso.origem || "Site ou App");
 
 							if (!origens[origem]) origens[origem] = 0;
 							origens[origem]++;
@@ -1127,6 +1136,8 @@ button {
 					// ⚠️ só libere o botão depois de carregar também a tabela "Onde Comer"
 					await carregarTabelaOndeComer();
 					await carregarTabelaIgreen();
+					popularFiltroClientes();
+					aplicarFiltroClienteNosCards();
 
 				} finally {
 					stopLoading();               // 🔵 volta ao azul só depois de TUDO
@@ -1256,52 +1267,52 @@ button {
 		<script>
 			// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
 			// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
-async function listarDatasPeriodo(tipo) {
-  const hoje = new Date();
-  const pad = n => String(n).padStart(2, "0");
+			async function listarDatasPeriodo(tipo) {
+				const hoje = new Date();
+				const pad = n => String(n).padStart(2, "0");
 
-  const tipoRel = tipo || document.getElementById("tipoRelatorio").value; // diario, semanal, mensal, anual
-  let datas = [];
+				const tipoRel = tipo || document.getElementById("tipoRelatorio").value; // diario, semanal, mensal, anual
+				let datas = [];
 
-  if (tipoRel === "diario") {
-    const d = document.getElementById("filtroData").value || hoje.toISOString().slice(0, 10);
-    datas = [d];
+				if (tipoRel === "diario") {
+					const d = document.getElementById("filtroData").value || hoje.toISOString().slice(0, 10);
+					datas = [d];
 
-  } else if (tipoRel === "semanal") {
-    const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
-    const semana = Number(document.getElementById("filtroSemana").value || 1);
-    const [ano, mes] = m.split("-").map(Number);
+				} else if (tipoRel === "semanal") {
+					const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
+					const semana = Number(document.getElementById("filtroSemana").value || 1);
+					const [ano, mes] = m.split("-").map(Number);
 
-    const faixas = { 1:[1,7], 2:[8,14], 3:[15,21], 4:[22,28], 5:[29,31] }[semana] || [1,7];
+					const faixas = { 1: [1, 7], 2: [8, 14], 3: [15, 21], 4: [22, 28], 5: [29, 31] }[semana] || [1, 7];
 
-    for (let dia = faixas[0]; dia <= faixas[1]; dia++) {
-      const data = new Date(ano, mes - 1, dia);
-      if (data.getMonth() + 1 === mes) datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
-    }
+					for (let dia = faixas[0]; dia <= faixas[1]; dia++) {
+						const data = new Date(ano, mes - 1, dia);
+						if (data.getMonth() + 1 === mes) datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
+					}
 
-  } else if (tipoRel === "mensal") {
-    const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
-    const [ano, mes] = m.split("-").map(Number);
-    const ultimo = new Date(ano, mes, 0).getDate();
+				} else if (tipoRel === "mensal") {
+					const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
+					const [ano, mes] = m.split("-").map(Number);
+					const ultimo = new Date(ano, mes, 0).getDate();
 
-    for (let dia = 1; dia <= ultimo; dia++) {
-      datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
-    }
+					for (let dia = 1; dia <= ultimo; dia++) {
+						datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
+					}
 
-  } else if (tipoRel === "anual") {
-    const ano = (document.getElementById("filtroAno")?.value || String(hoje.getFullYear())).trim();
-    const anoNum = Number(ano) || hoje.getFullYear();
+				} else if (tipoRel === "anual") {
+					const ano = (document.getElementById("filtroAno")?.value || String(hoje.getFullYear())).trim();
+					const anoNum = Number(ano) || hoje.getFullYear();
 
-    for (let mes = 1; mes <= 12; mes++) {
-      const ultimo = new Date(anoNum, mes, 0).getDate();
-      for (let dia = 1; dia <= ultimo; dia++) {
-        datas.push(`${anoNum}-${pad(mes)}-${pad(dia)}`);
-      }
-    }
-  }
+					for (let mes = 1; mes <= 12; mes++) {
+						const ultimo = new Date(anoNum, mes, 0).getDate();
+						for (let dia = 1; dia <= ultimo; dia++) {
+							datas.push(`${anoNum}-${pad(mes)}-${pad(dia)}`);
+						}
+					}
+				}
 
-  return datas;
-}
+				return datas;
+			}
 
 
 			// Lê um nó "1 nível" (ex.: cliquesCardapiosOndeComer/2025-08-16) e acumula por estabelecimento
@@ -1630,6 +1641,177 @@ async function listarDatasPeriodo(tipo) {
 			});
 		</script>
 
+
+		<script>
+			function normalizarTexto(txt) {
+				return (txt || "")
+					.toString()
+					.toLowerCase()
+					.normalize("NFD")
+					.replace(/[\u0300-\u036f]/g, "")
+					.trim();
+			}
+
+			function ehLinhaPlaceholder(texto) {
+				const t = normalizarTexto(texto);
+				return (
+					!t ||
+					t.includes("carregando") ||
+					t.includes("nenhum dado") ||
+					t.includes("nenhum clique") ||
+					t.includes("nenhuma instalação") ||
+					t.includes("nenhum uso") ||
+					t.includes("nenhum clique encontrado") ||
+					t.includes("nenhum dado carregado")
+				);
+			}
+
+			// Monta o dropdown de clientes a partir das tabelas com cliente/estabelecimento
+			function popularFiltroClientes() {
+				const select = document.getElementById("filtroClienteSelect");
+				if (!select) return;
+
+				const clientes = new Set();
+				const tabelasAlvo = [
+					"tabelaBotoes",
+					"tabelaOndeComerCardapio",
+					"tabelaPromocoes",
+					"tabelaGruposWhats",
+					"tabelaCliquesImoveis",
+					"tabelaContatosImoveis"
+				];
+
+				tabelasAlvo.forEach(idTabela => {
+					const tbody = document.getElementById(idTabela);
+					if (!tbody) return;
+
+					const linhas = Array.from(tbody.querySelectorAll("tr"));
+					linhas.forEach(linha => {
+						if (linha.style.display === "none") return;
+						const tds = linha.querySelectorAll("td");
+						if (!tds.length) return;
+						if (ehLinhaPlaceholder(linha.innerText)) return;
+
+						let nome = "";
+						if (idTabela === "tabelaContatosImoveis") {
+							nome = (tds[1]?.innerText || "").trim();
+						} else {
+							nome = (tds[0]?.innerText || "").trim();
+						}
+
+						if (!nome || nome.length < 2) return;
+						clientes.add(nome);
+					});
+				});
+
+				const valorAtual = select.value;
+				const ordenados = Array.from(clientes).sort((a, b) =>
+					a.localeCompare(b, "pt-BR", { sensitivity: "base" })
+				);
+
+				select.innerHTML = `<option value="">Todos os clientes</option>`;
+				ordenados.forEach(nome => {
+					const opt = document.createElement("option");
+					opt.value = nome;
+					opt.textContent = nome;
+					select.appendChild(opt);
+				});
+
+				if (valorAtual && ordenados.includes(valorAtual)) {
+					select.value = valorAtual;
+				}
+			}
+
+			function obterTermoFiltroCliente() {
+				const select = document.getElementById("filtroClienteSelect");
+				const texto = document.getElementById("filtroClienteTexto");
+
+				const termoSelect = normalizarTexto(select?.value || "");
+				const termoTexto = normalizarTexto(texto?.value || "");
+
+				// Se digitou algo no campo texto, ele tem prioridade
+				return termoTexto || termoSelect || "";
+			}
+
+			function aplicarFiltroClienteNosCards() {
+				const termo = obterTermoFiltroCliente();
+				const cards = document.querySelectorAll(".container > .card");
+
+				cards.forEach(card => {
+					// Card fixo sempre aparece
+					if (card.dataset.fixo === "1" || card.classList.contains("filtros")) {
+						card.style.display = "";
+						return;
+					}
+
+					const tbody = card.querySelector("tbody");
+					if (!tbody) {
+						card.style.display = "";
+						return;
+					}
+
+					const linhas = Array.from(tbody.querySelectorAll("tr"));
+
+					// Sem filtro -> mostra tudo
+					if (!termo) {
+						linhas.forEach(l => l.style.display = "");
+						card.style.display = "";
+						return;
+					}
+
+					let visiveis = 0;
+
+					linhas.forEach(linha => {
+						const textoLinha = linha.innerText || "";
+
+						// placeholders permanecem escondidos quando filtro está ativo
+						if (ehLinhaPlaceholder(textoLinha)) {
+							linha.style.display = "none";
+							return;
+						}
+
+						const match = normalizarTexto(textoLinha).includes(termo);
+						linha.style.display = match ? "" : "none";
+						if (match) visiveis++;
+					});
+
+					// Esconde card se nenhuma linha bateu
+					card.style.display = visiveis > 0 ? "" : "none";
+				});
+
+				// Garante que título/data continuem visíveis
+				const dataRelatorio = document.getElementById("dataRelatorio");
+				if (dataRelatorio) dataRelatorio.style.display = "";
+			}
+
+			function limparFiltroClienteTextoAoTrocarSelect() {
+				const txt = document.getElementById("filtroClienteTexto");
+				if (txt) txt.value = "";
+			}
+
+			document.addEventListener("DOMContentLoaded", () => {
+				const sel = document.getElementById("filtroClienteSelect");
+				const txt = document.getElementById("filtroClienteTexto");
+
+				if (sel) {
+					sel.addEventListener("change", () => {
+						limparFiltroClienteTextoAoTrocarSelect();
+						aplicarFiltroClienteNosCards();
+					});
+				}
+
+				if (txt) {
+					txt.addEventListener("input", aplicarFiltroClienteNosCards);
+					txt.addEventListener("change", aplicarFiltroClienteNosCards);
+				}
+
+				// primeira carga (caso já tenha tabela preenchida)
+				setTimeout(() => {
+					popularFiltroClientes();
+					aplicarFiltroClienteNosCards();
+				}, 500);
+			});
+		</script>
 
 		<div id="loadingOverlay" class="loader-overlay" aria-live="polite" aria-busy="true">
 			<div class="loader-box">
