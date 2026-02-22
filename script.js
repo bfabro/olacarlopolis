@@ -684,6 +684,47 @@ function getHojeBR() {
   return agora.toISOString().slice(0, 10);
 }
 
+// Função para registrar clique no Firebase (contador + detalhado)
+function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes") {
+  const hoje = getHojeBR();
+  const db = firebase.database();
+
+  const refContador = db.ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
+  const refLog = db.ref(`cliquesPorBotaoDetalhado/${hoje}/${idEstabelecimento}`).push();
+
+  const agora = new Date();
+  const payload = {
+    area,
+    tipo,
+    horario: agora.toLocaleTimeString("pt-BR"),
+    dataHoraISO: agora.toISOString(),
+    ts: firebase.database.ServerValue.TIMESTAMP,
+    pagina: window.location.href
+  };
+
+  return new Promise((resolve) => {
+    refContador.transaction(
+      (atual) => (atual || 0) + 1,
+      async (erro) => {
+        if (erro) {
+          console.error("[CliqueBotao] Erro no contador:", erro);
+          resolve({ ok: false, erroContador: true });
+          return;
+        }
+        try {
+          await refLog.set(payload);
+          resolve({ ok: true });
+        } catch (e) {
+          console.error("[CliqueBotao] Erro ao salvar detalhado:", e);
+          resolve({ ok: true, logFalhou: true });
+        }
+      }
+    );
+  });
+}
+window.registrarCliqueBotao = registrarCliqueBotao;
+
+
 
 // === VALIDADE: helpers (expira só DEPOIS da data final) ===
 function isDepoisDeHojeStr(dataISO) {
@@ -1861,78 +1902,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   registrarAcesso();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Função para registrar clique no Firebase
- function registrarCliqueBotao(tipo, idEstabelecimento) {
-  const hoje = getHojeBR();
-  const db = firebase.database();
-
-  // 1) contador agregado (rápido para relatório)
-  const refContador = db.ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
-
-  // 2) log detalhado (com horário do clique)
-  const refDetalhado = db.ref(`cliquesPorBotaoDetalhado/${hoje}/${idEstabelecimento}`).push();
-
-  const agora = new Date();
-  const payload = {
-    tipo: tipo, // "telefone", "fotos", "cardapio", etc.
-    horario: agora.toLocaleTimeString("pt-BR"),
-    dataHoraISO: agora.toISOString(),
-    ts: firebase.database.ServerValue.TIMESTAMP,
-    pagina: window.location.href
-  };
-
-  return new Promise((resolve) => {
-    refContador.transaction(
-      (atual) => (atual || 0) + 1,
-      async (erro) => {
-        if (erro) {
-          console.error("[CliqueBotao] Erro no contador:", erro);
-          resolve({ ok: false, erroContador: true });
-          return;
-        }
-
-        try {
-          await refDetalhado.set(payload);
-          console.log("[CliqueBotao] Detalhado salvo com sucesso:", payload);
-          resolve({ ok: true });
-        } catch (e) {
-          console.error("[CliqueBotao] Erro ao salvar detalhado:", e);
-          resolve({ ok: true, logFalhou: true });
-        }
-      }
-    );
-  });
-}
-
-// garante que fique acessível globalmente
-window.registrarCliqueBotao = registrarCliqueBotao;
 
   const destaquesFixos = [
     // "hime",
@@ -17722,16 +17691,33 @@ document.body.addEventListener('click', function (e) {
 
 
 
+function registrarCliqueOndeComerDetalhado(nomeEstabelecimento, tipo) {
+  const hoje = getHojeBR();
+  const db = firebase.database();
+  const ref = db.ref(`cliquesOndeComerDetalhado/${hoje}/${nomeEstabelecimento}`).push();
+  const agora = new Date();
+  return ref.set({
+    area: "onde-comer",
+    tipo,
+    horario: agora.toLocaleTimeString("pt-BR"),
+    dataHoraISO: agora.toISOString(),
+    ts: firebase.database.ServerValue.TIMESTAMP,
+    pagina: window.location.href
+  }).catch((e) => console.error("[OndeComerDetalhado] Erro:", e));
+}
+
 function registrarCliqueCardapioOndeComer(nomeEstabelecimento) {
   const hoje = getHojeBR();
   const ref = firebase.database().ref(`cliquesCardapiosOndeComer/${hoje}/${nomeEstabelecimento}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
+  registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "cardapio");
 }
 
 function registrarCliqueWhatsOndeComer(nomeEstabelecimento) {
   const hoje = getHojeBR();
   const ref = firebase.database().ref(`cliquesWhatsOndeComer/${hoje}/${nomeEstabelecimento}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
+  registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "whatsapp");
 }
 
 function registrarCliqueNaPromocao(nomeComercio) {
