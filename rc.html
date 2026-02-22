@@ -62,19 +62,19 @@
 			font-weight: bold;
 		}
 
-	
-	select,
-input[type="date"],
-input[type="month"],
-input[type="number"],
-button {
-  padding: 10px;
-  background-color: #2a2a2a;
-  color: #fff;
-  border: 1px solid #444;
-  border-radius: 6px;
-  font-size: 14px;
-}
+
+		select,
+		input[type="date"],
+		input[type="month"],
+		input[type="number"],
+		button {
+			padding: 10px;
+			background-color: #2a2a2a;
+			color: #fff;
+			border: 1px solid #444;
+			border-radius: 6px;
+			font-size: 14px;
+		}
 
 
 		button {
@@ -287,6 +287,14 @@ button {
 			<!-- NOVO: filtro anual -->
 			<input type="number" id="filtroAno" class="filtro hidden" min="2025" max="2099" placeholder="2026">
 
+			<label for="filtroClienteSelect">Cliente / Estabelecimento:</label>
+			<select id="filtroClienteSelect">
+				<option value="">Todos os clientes</option>
+			</select>
+
+			<label for="filtroClienteTexto">Busca rápida (opcional):</label>
+			<input type="text" id="filtroClienteTexto" placeholder="Ex: Mr Potato">
+
 			<button id="btnBuscar">Buscar</button>
 
 		</div>
@@ -368,7 +376,45 @@ button {
 		</div>
 
 
+		<div class="card">
+			<h2 class="section-title">Onde Comer</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Estabelecimento</th>
+						<th>Fotos</th>
+						<th>Cardápio</th>
+						<th>WhatsApp</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaOndeComerCardapio">
+					<tr>
+						<td colspan="4" style="text-align:center; color: #999;">Carregando...</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
+
+		<div class="card">
+			<h2 class="section-title">🕒 Detalhamento de Cliques por Horário</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Data</th>
+						<th>Hora</th>
+						<th>Estabelecimento</th>
+						<th>Área</th>
+						<th>Tipo</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaCliquesPorHorario">
+					<tr>
+						<td colspan="4" style="text-align:center; color: #999;">Nenhum dado carregado ainda</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
 		<!-- Adicione aqui os outros cards de relatório existentes -->
 
@@ -380,23 +426,6 @@ button {
 
 
 
-		<div class="card">
-			<h2 class="section-title">Onde Comer</h2>
-			<table>
-				<thead>
-					<tr>
-						<th>Estabelecimento</th>
-						<th>Cardápio</th>
-						<th>WhatsApp</th>
-					</tr>
-				</thead>
-				<tbody id="tabelaOndeComerCardapio">
-					<tr>
-						<td colspan="3" style="text-align:center; color: #999;">Carregando...</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
 
 
 		<div class="card" id="cardPromocoesClicadas" style="display: none;">
@@ -444,7 +473,7 @@ button {
 				</thead>
 				<tbody id="tabelaCliquesImoveis">
 					<tr>
-						<td colspan="3" style="text-align:center; color:#999;">Carregando...</td>
+						<td colspan="4" style="text-align:center; color:#999;">Carregando...</td>
 					</tr>
 				</tbody>
 			</table>
@@ -471,7 +500,24 @@ button {
 			</table>
 		</div>
 
+		<div class="card">
+			<h3 style="margin-top:18px;">⚡ iGreen – Desconto Conta de Luz</h3>
+			<table style="width:100%; border-collapse:collapse;">
+				<thead>
+					<tr>
+						<th style="text-align:left;">ID</th>
+						<th>Cadastros</th>
+						<th>Whats (Dúvidas)</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaIgreen">
+					<tr>
+						<td colspan="3" style="text-align:center; color:#999;">Carregando...</td>
+					</tr>
+				</tbody>
+			</table>
 
+		</div>
 
 
 
@@ -513,24 +559,7 @@ button {
 
 
 
-		<div class="card">
-			<h3 style="margin-top:18px;">⚡ iGreen – Desconto Conta de Luz</h3>
-			<table style="width:100%; border-collapse:collapse;">
-				<thead>
-					<tr>
-						<th style="text-align:left;">ID</th>
-						<th>Cadastros</th>
-						<th>Whats (Dúvidas)</th>
-					</tr>
-				</thead>
-				<tbody id="tabelaIgreen">
-					<tr>
-						<td colspan="3" style="text-align:center; color:#999;">Carregando...</td>
-					</tr>
-				</tbody>
-			</table>
 
-		</div>
 
 
 		<div class="card">
@@ -579,11 +608,11 @@ button {
 		</script>
 
 		<script>
-			const overlayEl = document.getElementById('loadingOverlay');
 			let loadCount = 0;
 
 			function startLoading() {
 				loadCount++;
+				const overlayEl = document.getElementById('loadingOverlay');
 				if (overlayEl) overlayEl.style.display = 'grid';
 				const btn = document.getElementById('btnBuscar');
 				if (btn) {
@@ -597,6 +626,7 @@ button {
 			function stopLoading() {
 				loadCount = Math.max(0, loadCount - 1);
 				if (loadCount === 0) {
+					const overlayEl = document.getElementById('loadingOverlay');
 					if (overlayEl) overlayEl.style.display = 'none';
 					const btn = document.getElementById('btnBuscar');
 					if (btn) {
@@ -636,6 +666,63 @@ button {
 			let cidadesAnteriores = JSON.parse(localStorage.getItem("valoresAnterioresCidades") || "{}");
 
 
+
+			function formatarPeriodoSelecionado() {
+				const tipo = document.getElementById("tipoRelatorio").value;
+
+				if (tipo === "diario") {
+					const d = document.getElementById("filtroData").value;
+					if (!d) return "Período não definido";
+					const [ano, mes, dia] = d.split("-");
+					return `${dia}/${mes}/${ano}`;
+				}
+
+				if (tipo === "mensal") {
+					const m = document.getElementById("filtroMes").value; // YYYY-MM
+					if (!m) return "Período não definido";
+					const [ano, mes] = m.split("-");
+					const nomesMeses = [
+						"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+						"Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+					];
+					return `${nomesMeses[Number(mes) - 1]} de ${ano}`;
+				}
+
+				if (tipo === "anual") {
+					const ano = document.getElementById("filtroAno").value;
+					return ano ? `Ano ${ano}` : "Período não definido";
+				}
+
+				if (tipo === "semanal") {
+					const m = document.getElementById("filtroMes").value;   // YYYY-MM
+					const semana = Number(document.getElementById("filtroSemana").value || 1);
+					if (!m) return "Período não definido";
+
+					const [ano, mes] = m.split("-").map(Number);
+					const nomesMeses = [
+						"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+						"Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+					];
+
+					const faixas = { 1: [1, 7], 2: [8, 14], 3: [15, 21], 4: [22, 28], 5: [29, 31] };
+					let [ini, fim] = faixas[semana] || [1, 7];
+
+					// ajusta o último dia real do mês
+					const ultimoDiaMes = new Date(ano, mes, 0).getDate();
+					if (fim > ultimoDiaMes) fim = ultimoDiaMes;
+
+					const iniTxt = String(ini).padStart(2, "0");
+					const fimTxt = String(fim).padStart(2, "0");
+					const mesTxt = String(mes).padStart(2, "0");
+
+					return `Semana ${semana} de ${nomesMeses[mes - 1]}/${ano} (${iniTxt}/${mesTxt}/${ano} a ${fimTxt}/${mesTxt}/${ano})`;
+				}
+
+				return "Período não definido";
+			}
+
+
+
 			document.getElementById("btnBuscar").addEventListener("click", async () => {
 				startLoading();                // 🔴 fica vermelho + overlay
 				try {
@@ -651,6 +738,10 @@ button {
 					const snapAcessos = await db.ref("acessosPorDia").once("value");
 
 					const snapBotoes = await db.ref("cliquesPorBotao").once("value");
+					const snapCliquesDetalhados = await db.ref("cliquesPorBotaoDetalhado").once("value");
+					const dadosCliquesDetalhados = snapCliquesDetalhados.val() || {};
+					const snapOndeComerDetalhado = await db.ref("cliquesOndeComerDetalhado").once("value");
+					const dadosOndeComerDetalhado = snapOndeComerDetalhado.val() || {};
 
 					const snapPWA = await db.ref("instalacoesPWA").once("value");
 					const dadosPWA = snapPWA.val() || {};
@@ -674,58 +765,58 @@ button {
 
 
 					if (tipo === "diario") {
-  const dia = document.getElementById("filtroData").value;
-  diasFiltrados = [dia];
+						const dia = document.getElementById("filtroData").value;
+						diasFiltrados = [dia];
 
-} else if (tipo === "mensal") {
-  const mes = document.getElementById("filtroMes").value;
-  const diasDoMes = new Set([
-    ...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
-    ...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
-  ]);
-  diasFiltrados = Array.from(diasDoMes);
+					} else if (tipo === "mensal") {
+						const mes = document.getElementById("filtroMes").value;
+						const diasDoMes = new Set([
+							...Object.keys(dadosCliques).filter(dia => dia.startsWith(mes)),
+							...Object.keys(dadosBotoes).filter(dia => dia.startsWith(mes))
+						]);
+						diasFiltrados = Array.from(diasDoMes);
 
-} else if (tipo === "anual") {
-  const ano = document.getElementById("filtroAno").value;
-   dataReferencia = `Ano ${ano}`;
+					} else if (tipo === "anual") {
+						const ano = document.getElementById("filtroAno").value;
+						dataReferencia = `Ano ${ano}`;
 
-  if (!ano || ano.length !== 4) {
-    alert("Selecione um ano válido (ex: 2026).");
-    return;
-  }
+						if (!ano || ano.length !== 4) {
+							alert("Selecione um ano válido (ex: 2026).");
+							return;
+						}
 
-  const prefixoAno = ano + "-";
+						const prefixoAno = ano + "-";
 
-  const diasDoAno = new Set([
-    ...Object.keys(dadosCliques).filter(dia => dia.startsWith(prefixoAno)),
-    ...Object.keys(dadosBotoes).filter(dia => dia.startsWith(prefixoAno))
-  ]);
+						const diasDoAno = new Set([
+							...Object.keys(dadosCliques).filter(dia => dia.startsWith(prefixoAno)),
+							...Object.keys(dadosBotoes).filter(dia => dia.startsWith(prefixoAno))
+						]);
 
-  diasFiltrados = Array.from(diasDoAno);
+						diasFiltrados = Array.from(diasDoAno);
 
-} else if (tipo === "semanal") {
-  const mesSelecionado = document.getElementById("filtroMes").value;
-  const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
+					} else if (tipo === "semanal") {
+						const mesSelecionado = document.getElementById("filtroMes").value;
+						const semanaSelecionada = parseInt(document.getElementById("filtroSemana").value);
 
-  if (!mesSelecionado || isNaN(semanaSelecionada)) {
-    alert("Selecione um mês e uma semana para o relatório semanal.");
-    return;
-  }
+						if (!mesSelecionado || isNaN(semanaSelecionada)) {
+							alert("Selecione um mês e uma semana para o relatório semanal.");
+							return;
+						}
 
-  const inicio = (semanaSelecionada - 1) * 7 + 1;
-  const fim = semanaSelecionada * 7;
+						const inicio = (semanaSelecionada - 1) * 7 + 1;
+						const fim = semanaSelecionada * 7;
 
-  const diasDaSemana = new Set([
-    ...Object.keys(dadosCliques).filter(dia =>
-      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-    ),
-    ...Object.keys(dadosBotoes).filter(dia =>
-      dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
-    )
-  ]);
+						const diasDaSemana = new Set([
+							...Object.keys(dadosCliques).filter(dia =>
+								dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+							),
+							...Object.keys(dadosBotoes).filter(dia =>
+								dia.startsWith(mesSelecionado) && getDiaNum(dia) >= inicio && getDiaNum(dia) <= fim
+							)
+						]);
 
-  diasFiltrados = Array.from(diasDaSemana);
-}
+						diasFiltrados = Array.from(diasDaSemana);
+					}
 
 
 
@@ -761,9 +852,9 @@ button {
 						const acessosDia = dadosAcessos[dia]?.detalhados || {};
 						Object.values(acessosDia).forEach(acesso => {
 							const origem =
-  (acesso.origem && acesso.origem !== "Site" && acesso.origem !== "App" && acesso.origem !== "acesso direto")
-    ? acesso.origem
-    : (acesso.canal || acesso.origem || "Site ou App");
+								(acesso.origem && acesso.origem !== "Site" && acesso.origem !== "App" && acesso.origem !== "acesso direto")
+									? acesso.origem
+									: (acesso.canal || acesso.origem || "Site ou App");
 
 							if (!origens[origem]) origens[origem] = 0;
 							origens[origem]++;
@@ -927,7 +1018,8 @@ button {
 
 
 					// Mostrar data do relatório
-					document.getElementById("dataRelatorio").textContent = `Data do Relatório: ${diasFiltrados.join(", ")}`;
+					const periodoFormatado = formatarPeriodoSelecionado();
+					document.getElementById("dataRelatorio").textContent = `📅 Data do Relatório: ${periodoFormatado}`;
 
 					// Criar tabela de cidades
 					const cidadesContagem = {};
@@ -1065,23 +1157,41 @@ button {
 					const tabelaBotoes = document.getElementById("tabelaBotoes");
 					tabelaBotoes.innerHTML = "";
 
-					// Agrega por estabelecimento: fotos, cardapio, telefone
-					const agregBotoes = {}; // { estId: { fotos:0, cardapio:0, telefone:0 } }
+					// Agrega por estabelecimento: fotos, cardapio, telefone + último horário (cliquesPorBotaoDetalhado)
+					const agregBotoes = {}; // { estId: { fotos:0, cardapio:0, telefone:0, ultimoHorario:'-', ultimoTs:0 } }
 
 					for (const dia of diasFiltrados) {
 						const porDia = dadosBotoes[dia] || {};
 						for (const estId of Object.keys(porDia)) {
 							const tipos = porDia[estId] || {};
-							// depois:
 							const f = Number(tipos.fotos || 0);
 							const c = Number(tipos.cardapio || 0);
 							const t = Number(tipos.telefone || 0);
 							if (f || c || t) {
-								if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0 };
+								if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0, ultimoHorario: '-', ultimoTs: 0 };
 								agregBotoes[estId].fotos += f;
 								agregBotoes[estId].cardapio += c;
 								agregBotoes[estId].telefone += t;
 							}
+						}
+					}
+
+					// Complementa com horários do log detalhado
+					for (const dia of diasFiltrados) {
+						const porDiaDet = dadosCliquesDetalhados[dia] || {};
+						for (const estId of Object.keys(porDiaDet)) {
+							const logs = porDiaDet[estId] || {};
+							if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0, ultimoHorario: '-', ultimoTs: 0 };
+							Object.values(logs).forEach((log) => {
+								const tsNum = Number(log?.ts || 0);
+								const iso = log?.dataHoraISO || '';
+								const horario = log?.horario || (iso ? new Date(iso).toLocaleTimeString('pt-BR') : '-');
+								const valorComparacao = tsNum || (iso ? new Date(iso).getTime() : 0);
+								if (valorComparacao > (agregBotoes[estId].ultimoTs || 0)) {
+									agregBotoes[estId].ultimoTs = valorComparacao;
+									agregBotoes[estId].ultimoHorario = `${dia} ${horario}`;
+								}
+							});
 						}
 					}
 
@@ -1092,7 +1202,7 @@ button {
 
 					const itensOrdenados = Object.entries(agregBotoes)
 						.map(([estId, v]) => ({ estId, ...v }))
-						.filter(it => (it.fotos + it.cardapio + it.telefone) > 0) // <-- filtra “fantasmas”
+						.filter(it => (it.fotos + it.cardapio + it.telefone) > 0 || it.ultimoTs > 0) // <-- filtra “fantasmas”
 						.sort((a, b) => (b.fotos + b.cardapio + b.telefone) - (a.fotos + a.cardapio + a.telefone));
 
 					if (!itensOrdenados.length) {
@@ -1102,7 +1212,8 @@ button {
 							const anterior = botoesAnterioresTemp[it.estId] || {};
 							const alterou = (anterior.fotos !== it.fotos) ||
 								(anterior.cardapio !== it.cardapio) ||
-								(anterior.telefone !== it.telefone);
+								(anterior.telefone !== it.telefone) ||
+								(anterior.ultimoHorario !== it.ultimoHorario);
 
 							return `
       <tr style="${alterou ? 'color:yellow; font-weight:bold;' : ''}">
@@ -1116,17 +1227,95 @@ button {
 
 						// salvar os atuais para comparação futura
 						itensOrdenados.forEach(it => {
-							botoesAnteriores[it.estId] = { fotos: it.fotos, cardapio: it.cardapio, telefone: it.telefone };
+							botoesAnteriores[it.estId] = { fotos: it.fotos, cardapio: it.cardapio, telefone: it.telefone, ultimoHorario: it.ultimoHorario };
 						});
 					}
 
 					localStorage.setItem("valoresAnterioresBotoes", JSON.stringify(botoesAnteriores));
 
 
+					// 🕒 Tabela detalhada de horários de clique (todos os cliques)
+					const tabelaCliquesPorHorario = document.getElementById("tabelaCliquesPorHorario");
+					if (tabelaCliquesPorHorario) {
+						const linhasDetalhadas = [];
+
+						// Botões gerais (Serviços/Comércios/etc.)
+						for (const dia of diasFiltrados) {
+							const porDiaDet = dadosCliquesDetalhados[dia] || {};
+							for (const estId of Object.keys(porDiaDet)) {
+								const logs = porDiaDet[estId] || {};
+								Object.values(logs).forEach((log) => {
+									const iso = log?.dataHoraISO || "";
+									const hora = log?.horario || (iso ? new Date(iso).toLocaleTimeString("pt-BR") : "-");
+									const ts = Number(log?.ts || (iso ? new Date(iso).getTime() : 0));
+									linhasDetalhadas.push({
+										data: dia,
+										hora,
+										estabelecimento: estId,
+										area: (log?.area || "servicos-comercios"),
+										tipo: log?.tipo || "-",
+										ts
+									});
+								});
+							}
+						}
+
+						// Onde Comer (cardápio / whatsapp)
+						for (const dia of diasFiltrados) {
+							const porDiaDet = dadosOndeComerDetalhado[dia] || {};
+							for (const estId of Object.keys(porDiaDet)) {
+								const logs = porDiaDet[estId] || {};
+								Object.values(logs).forEach((log) => {
+									const iso = log?.dataHoraISO || "";
+									const hora = log?.horario || (iso ? new Date(iso).toLocaleTimeString("pt-BR") : "-");
+									const ts = Number(log?.ts || (iso ? new Date(iso).getTime() : 0));
+									linhasDetalhadas.push({
+										data: dia,
+										hora,
+										estabelecimento: estId,
+										area: "onde-comer",
+										tipo: log?.tipo || "-",
+										ts
+									});
+								});
+							}
+						}
+
+						const termoClienteDetalhado = (typeof obterTermoFiltroCliente === "function") ? obterTermoFiltroCliente() : "";
+						const linhasDetalhadasFiltradas = !termoClienteDetalhado ? linhasDetalhadas : linhasDetalhadas.filter(item =>
+							String(item.estabelecimento || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes(termoClienteDetalhado)
+						);
+
+						linhasDetalhadasFiltradas.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+						if (!linhasDetalhadasFiltradas.length) {
+							tabelaCliquesPorHorario.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Nenhum clique detalhado encontrado no período</td></tr>`;
+						} else {
+							tabelaCliquesPorHorario.innerHTML = linhasDetalhadasFiltradas.map(item => `
+            <tr>
+                <td>${item.data}</td>
+                <td style="text-align:center;">${item.hora}</td>
+                <td>${item.estabelecimento}</td>
+                <td style="text-transform:capitalize;">${String(item.area || "-").replace("servicos-comercios", "serviços/comércios").replace("onde-comer", "onde comer")}</td>
+                <td style="text-transform:capitalize;">${item.tipo}</td>
+            </tr>
+        `).join("");
+						}
+					}
+
 
 					// ⚠️ só libere o botão depois de carregar também a tabela "Onde Comer"
-					await carregarTabelaOndeComer();
-					await carregarTabelaIgreen();
+					await Promise.all([
+						carregarTabelaOndeComer(),
+						carregarTabelaGruposWhats(),
+						carregarTabelaCliquesImoveis(),
+						carregarTabelaContatosImoveis()
+					]);
+					popularFiltroClientes();
+					const dataRelatorio = document.getElementById("dataRelatorio");
+					if (dataRelatorio) dataRelatorio.style.display = "";
+
+					atualizarPeriodoNosCardsVisiveis();
 
 				} finally {
 					stopLoading();               // 🔵 volta ao azul só depois de TUDO
@@ -1253,65 +1442,76 @@ button {
 
 
 
+
+		<script>
+			const __cacheNosFirebase = {};
+			async function lerNoComCache(path) {
+				if (__cacheNosFirebase[path]) return __cacheNosFirebase[path];
+				const snap = await firebase.database().ref(path).once('value');
+				const val = snap.val() || {};
+				__cacheNosFirebase[path] = val;
+				return val;
+			}
+		</script>
+
 		<script>
 			// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
 			// Utilitário: gera lista de datas (YYYY-MM-DD) do período escolhido
-async function listarDatasPeriodo(tipo) {
-  const hoje = new Date();
-  const pad = n => String(n).padStart(2, "0");
+			async function listarDatasPeriodo(tipo) {
+				const hoje = new Date();
+				const pad = n => String(n).padStart(2, "0");
 
-  const tipoRel = tipo || document.getElementById("tipoRelatorio").value; // diario, semanal, mensal, anual
-  let datas = [];
+				const tipoRel = tipo || document.getElementById("tipoRelatorio").value; // diario, semanal, mensal, anual
+				let datas = [];
 
-  if (tipoRel === "diario") {
-    const d = document.getElementById("filtroData").value || hoje.toISOString().slice(0, 10);
-    datas = [d];
+				if (tipoRel === "diario") {
+					const d = document.getElementById("filtroData").value || hoje.toISOString().slice(0, 10);
+					datas = [d];
 
-  } else if (tipoRel === "semanal") {
-    const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
-    const semana = Number(document.getElementById("filtroSemana").value || 1);
-    const [ano, mes] = m.split("-").map(Number);
+				} else if (tipoRel === "semanal") {
+					const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
+					const semana = Number(document.getElementById("filtroSemana").value || 1);
+					const [ano, mes] = m.split("-").map(Number);
 
-    const faixas = { 1:[1,7], 2:[8,14], 3:[15,21], 4:[22,28], 5:[29,31] }[semana] || [1,7];
+					const faixas = { 1: [1, 7], 2: [8, 14], 3: [15, 21], 4: [22, 28], 5: [29, 31] }[semana] || [1, 7];
 
-    for (let dia = faixas[0]; dia <= faixas[1]; dia++) {
-      const data = new Date(ano, mes - 1, dia);
-      if (data.getMonth() + 1 === mes) datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
-    }
+					for (let dia = faixas[0]; dia <= faixas[1]; dia++) {
+						const data = new Date(ano, mes - 1, dia);
+						if (data.getMonth() + 1 === mes) datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
+					}
 
-  } else if (tipoRel === "mensal") {
-    const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
-    const [ano, mes] = m.split("-").map(Number);
-    const ultimo = new Date(ano, mes, 0).getDate();
+				} else if (tipoRel === "mensal") {
+					const m = (document.getElementById("filtroMes").value || hoje.toISOString().slice(0, 7)); // YYYY-MM
+					const [ano, mes] = m.split("-").map(Number);
+					const ultimo = new Date(ano, mes, 0).getDate();
 
-    for (let dia = 1; dia <= ultimo; dia++) {
-      datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
-    }
+					for (let dia = 1; dia <= ultimo; dia++) {
+						datas.push(`${ano}-${pad(mes)}-${pad(dia)}`);
+					}
 
-  } else if (tipoRel === "anual") {
-    const ano = (document.getElementById("filtroAno")?.value || String(hoje.getFullYear())).trim();
-    const anoNum = Number(ano) || hoje.getFullYear();
+				} else if (tipoRel === "anual") {
+					const ano = (document.getElementById("filtroAno")?.value || String(hoje.getFullYear())).trim();
+					const anoNum = Number(ano) || hoje.getFullYear();
 
-    for (let mes = 1; mes <= 12; mes++) {
-      const ultimo = new Date(anoNum, mes, 0).getDate();
-      for (let dia = 1; dia <= ultimo; dia++) {
-        datas.push(`${anoNum}-${pad(mes)}-${pad(dia)}`);
-      }
-    }
-  }
+					for (let mes = 1; mes <= 12; mes++) {
+						const ultimo = new Date(anoNum, mes, 0).getDate();
+						for (let dia = 1; dia <= ultimo; dia++) {
+							datas.push(`${anoNum}-${pad(mes)}-${pad(dia)}`);
+						}
+					}
+				}
 
-  return datas;
-}
+				return datas;
+			}
 
 
 			// Lê um nó "1 nível" (ex.: cliquesCardapiosOndeComer/2025-08-16) e acumula por estabelecimento
 			async function somarNoPorDatas(basePath, datas) {
-				const db = firebase.database();
-				const total = {}; // { estabId: numero }
+				const total = {};
+				const tudo = await lerNoComCache(basePath);
 
 				for (const d of datas) {
-					const snap = await db.ref(`${basePath}/${d}`).once('value');
-					const val = snap.val() || {};
+					const val = tudo[d] || {};
 					Object.keys(val).forEach(id => {
 						total[id] = (total[id] || 0) + (typeof val[id] === 'number' ? val[id] : 0);
 					});
@@ -1326,44 +1526,48 @@ async function listarDatasPeriodo(tipo) {
 				const tbody = document.getElementById('tabelaOndeComerCardapio');
 				if (!tbody) return;
 
-				// feedback visual local da própria tabela
 				tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Carregando...</td></tr>`;
 
-				// usa os filtros já existentes do rc.html
 				const datas = await listarDatasPeriodo();
 
-				// lê e soma cada fonte em paralelo
-				const [totCardapio, totWhats] = await Promise.all([
+				const [totCardapio, totWhats, totFotos] = await Promise.all([
 					somarNoPorDatas('cliquesCardapiosOndeComer', datas),
-					somarNoPorDatas('cliquesWhatsOndeComer', datas)
+					somarNoPorDatas('cliquesWhatsOndeComer', datas),
+					somarNoPorDatas('cliquesFotosOndeComer', datas)
 				]);
 
-				// consolida por estabelecimento
-				const estabSet = new Set([...Object.keys(totCardapio), ...Object.keys(totWhats)]);
+				const estabSet = new Set([
+					...Object.keys(totCardapio),
+					...Object.keys(totWhats),
+					...Object.keys(totFotos)
+				]);
+
 				const linhas = [];
 				estabSet.forEach(id => {
-					linhas.push({ id, cardapio: totCardapio[id] || 0, whatsapp: totWhats[id] || 0 });
+					linhas.push({
+						id,
+						fotos: Number(totFotos[id] || 0),
+						cardapio: Number(totCardapio[id] || 0),
+						whatsapp: Number(totWhats[id] || 0)
+					});
 				});
 
-				// ordena por total desc
-				linhas.sort((a, b) => (b.cardapio + b.whatsapp) - (a.cardapio + a.whatsapp));
+				linhas.sort((a, b) => (b.fotos + b.cardapio + b.whatsapp) - (a.fotos + a.cardapio + a.whatsapp));
 
-				// render
 				if (!linhas.length) {
 					tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999">Nenhum clique encontrado</td></tr>`;
 					return;
 				}
 
-				tbody.innerHTML = linhas.map(({ id, cardapio, whatsapp }) => `
+				tbody.innerHTML = linhas.map(({ id, fotos, cardapio, whatsapp }) => `
     <tr>
       <td>${id}</td>
+      <td style="text-align:center">${fotos}</td>
       <td style="text-align:center">${cardapio}</td>
       <td style="text-align:center">${whatsapp}</td>
     </tr>
   `).join('');
 			}
-
-
 
 			// Lê os dias do período já selecionado no filtro (diário/semanal/mensal)
 			// A página já usa listarDatasPeriodo() em outras tabelas.
@@ -1372,29 +1576,22 @@ async function listarDatasPeriodo(tipo) {
 				const tbody = document.getElementById('tabelaGruposWhats');
 				if (!tbody) return;
 
-				// feedback visual
 				tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
-				const db = firebase.database();
-				const datas = await listarDatasPeriodo(); // já existe e é usada na tabela "Onde Comer" :contentReference[oaicite:1]{index=1}
+				const datas = await listarDatasPeriodo();
+				const datasSet = new Set(datas);
+				const totais = {};
 
-				// totalizador por ID de grupo (id = slug/nó usado quando registra o clique do botão)
-				const totais = {}; // { grupoId: total }
+				const tudo = await lerNoComCache('cliquesPorBotao');
 
-				// Para cada dia, lemos cliquesPorBotao/<data> e somamos apenas o tipo 'grupoWhatsapp'
-				for (const d of datas) {
-					const snap = await db.ref(`cliquesPorBotao/${d}`).once('value');
-					const val = snap.val() || {};
-					// val = { [id]: { grupoWhatsapp: number, ...outros tipos } }
-					Object.entries(val).forEach(([id, tipos]) => {
+				Object.entries(tudo).forEach(([d, val]) => {
+					if (!datasSet.has(d)) return;
+					Object.entries(val || {}).forEach(([id, tipos]) => {
 						const qtd = Number(tipos?.grupoWhatsapp || 0);
-						if (qtd > 0) {
-							totais[id] = (totais[id] || 0) + qtd;
-						}
+						if (qtd > 0) totais[id] = (totais[id] || 0) + qtd;
 					});
-				}
+				});
 
-				// monta linhas ordenadas por total desc
 				const linhas = Object.entries(totais)
 					.map(([id, total]) => ({ id, total }))
 					.sort((a, b) => b.total - a.total);
@@ -1414,25 +1611,26 @@ async function listarDatasPeriodo(tipo) {
 
 
 
-
 			async function carregarTabelaIgreen() {
 				const tbody = document.getElementById('tabelaIgreen');
 				if (!tbody) return;
 
 				tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
-				const db = firebase.database();
 				const datas = await listarDatasPeriodo();
+				const datasSet = new Set(datas);
 
 				let totalCadastro = 0;
 				let totalWhats = 0;
 
-				for (const d of datas) {
-					const snap = await db.ref(`cliquesPorBotao/${d}/igreen`).once('value');
-					const tipos = snap.val() || {};
-					totalCadastro += Number(tipos.cadastro || 0);
-					totalWhats += Number(tipos.whats_duvidas || 0);
-				}
+				const tudo = await lerNoComCache('cliquesPorBotao');
+
+				Object.entries(tudo).forEach(([d, porDia]) => {
+					if (!datasSet.has(d)) return;
+					const tipos = porDia?.igreen || {};
+					totalCadastro += Number(tipos.igreenCadastro || tipos.cadastro || 0);
+					totalWhats += Number(tipos.igreenDuvidasWhats || tipos.whats_duvidas || 0);
+				});
 
 				tbody.innerHTML = `
     <tr>
@@ -1445,7 +1643,6 @@ async function listarDatasPeriodo(tipo) {
 
 
 
-
 			async function carregarTabelaCliquesImoveis() {
 				const tbody = document.getElementById('tabelaCliquesImoveis');
 				if (!tbody) return;
@@ -1453,11 +1650,12 @@ async function listarDatasPeriodo(tipo) {
 
 				const datas = await listarDatasPeriodo();
 				const db = firebase.database();
+				const datasSet = new Set(datas);
 
-				const tot = {};                 // { id: {whats, fotos} }
-				const titulos = {};             // { id: titulo }
-				const mapCorretor = {};         // { id: corretor }
-				const mapProprietario = {};     // { id: proprietario }
+				const tot = {};
+				const titulos = {};
+				const mapCorretor = {};
+				const mapProprietario = {};
 
 				const norm = (raw) => {
 					if (!raw) return '';
@@ -1466,11 +1664,10 @@ async function listarDatasPeriodo(tipo) {
 					return String(raw).trim();
 				};
 
-				// 1) Soma cliques por dia e captura rótulos do nó diário
-				for (const d of datas) {
-					const snap = await db.ref(`imoveisCliquesPorDia/${d}`).once('value');
-					const dia = snap.val() || {};
-					Object.entries(dia).forEach(([id, info]) => {
+				const tudoDias = await lerNoComCache('imoveisCliquesPorDia');
+				Object.entries(tudoDias).forEach(([d, dia]) => {
+					if (!datasSet.has(d)) return;
+					Object.entries(dia || {}).forEach(([id, info]) => {
 						const w = Number(info?.whatsapp || 0);
 						const f = Number(info?.fotos || 0);
 
@@ -1488,14 +1685,19 @@ async function listarDatasPeriodo(tipo) {
 							tot[id].fotos += f;
 						}
 					});
-				}
+				});
 
-				// 2) Completa faltantes pelo cadastro do imóvel
 				const faltantes = Object.keys(tot).filter(id => !mapCorretor[id] || !mapProprietario[id] || !titulos[id]);
-				await Promise.all(faltantes.map(async (id) => {
-					for (const path of [`imoveis/dados/${id}`, `imoveis/${id}`]) {
-						const s = await db.ref(path).once('value');
-						const v = s.val();
+				const [snapDados, snapRaiz] = await Promise.all([
+					db.ref('imoveis/dados').once('value'),
+					db.ref('imoveis').once('value')
+				]);
+				const dadosImoveis = snapDados.val() || {};
+				const raizImoveis = snapRaiz.val() || {};
+
+				faltantes.forEach((id) => {
+					const candidatos = [dadosImoveis[id], raizImoveis[id]];
+					for (const v of candidatos) {
 						if (!v) continue;
 						if (!titulos[id] && v?.titulo) titulos[id] = String(v.titulo);
 						if (!mapCorretor[id]) {
@@ -1508,9 +1710,8 @@ async function listarDatasPeriodo(tipo) {
 						}
 						if (titulos[id] && mapCorretor[id] && mapProprietario[id]) break;
 					}
-				}));
+				});
 
-				// 3) Monta linhas
 				const linhas = Object.entries(tot)
 					.map(([id, v]) => ({
 						titulo: titulos[id] || id,
@@ -1523,7 +1724,7 @@ async function listarDatasPeriodo(tipo) {
 					.sort((a, b) => (b.whats + b.fotos) - (a.whats + a.fotos));
 
 				if (!linhas.length) {
-					tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
+					tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
 					return;
 				}
 
@@ -1539,50 +1740,47 @@ async function listarDatasPeriodo(tipo) {
 			}
 
 
-
-			// mantém as chamadas já existentes
-			document.addEventListener('DOMContentLoaded', carregarTabelaCliquesImoveis);
-			document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaCliquesImoveis);
-
-
-
 			async function carregarTabelaContatosImoveis() {
 				const tbody = document.getElementById('tabelaContatosImoveis');
 				if (!tbody) return;
-				tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Carregando...</td></tr>`;
+				tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Carregando...</td></tr>`;
 
 				const datas = await listarDatasPeriodo();
-				const db = firebase.database();
-				const linhas = []; // { ts, dataHora, titulo, nome, fone }
+				const datasSet = new Set(datas);
+				const porData = await lerNoComCache('imoveis/contatos');
+				const linhas = [];
 
-				for (const d of datas) {
-					const snapDia = await db.ref(`imoveis/contatos/${d}`).once('value');
-					const porImovel = snapDia.val() || {};
-					Object.entries(porImovel).forEach(([imovelId, contatos]) => {
+				Object.entries(porData || {}).forEach(([d, porImovel]) => {
+					if (!datasSet.has(d)) return;
+					Object.entries(porImovel || {}).forEach(([imovelId, contatos]) => {
 						Object.values(contatos || {}).forEach(c => {
-							const ts = Number(c.ts || 0);
+							const ts = Number(c?.ts || 0);
 							const dt = ts ? new Date(ts) : null;
 							const dataHora = dt
-								? `${dt.toLocaleDateString()} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`
+								? `${dt.toLocaleDateString('pt-BR')} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`
 								: d;
+
+							const destino = String(c?.destinoFone || "");
+							const foneFmt = destino && destino.length >= 3
+								? `(${destino.slice(0, 2)}) ${destino.slice(2)}`
+								: "—";
+
 							linhas.push({
 								ts,
 								dataHora,
-								titulo: c.imovelTitulo || imovelId,
-								nome: c.nome || "—",
-								fone: c.destinoFone ? `(${c.destinoFone.slice(0, 2)}) ${c.destinoFone.slice(2)}` : "—",
-								corretor: (c.corretor || c.responsavel || "—")
-
+								titulo: c?.imovelTitulo || imovelId,
+								nome: c?.nome || "—",
+								fone: foneFmt,
+								corretor: c?.corretor || c?.responsavel || "—"
 							});
 						});
 					});
-				}
+				});
 
-				// ordena do mais recente pro mais antigo
 				linhas.sort((a, b) => (b.ts || 0) - (a.ts || 0));
 
 				if (!linhas.length) {
-					tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum contato encontrado</td></tr>`;
+					tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Nenhum contato encontrado</td></tr>`;
 					return;
 				}
 
@@ -1592,44 +1790,244 @@ async function listarDatasPeriodo(tipo) {
       <td>${l.titulo}</td>
       <td>${l.nome}</td>
       <td style="white-space:nowrap">${l.fone}</td>
-	 <td>${l.corretor}</td>
+      <td>${l.corretor}</td>
     </tr>
   `).join('');
 			}
 
-			// dispara junto com os outros carregamentos do relatório
-			document.addEventListener('DOMContentLoaded', carregarTabelaContatosImoveis);
-			document.getElementById('btnBuscar')?.addEventListener('click', carregarTabelaContatosImoveis);
-
-
-
-
-
-			// Chamar junto com as outras tabelas:
-			document.addEventListener('DOMContentLoaded', () => {
-				carregarTabelaGruposWhats(); // inicial, como já é feito para Onde Comer :contentReference[oaicite:2]{index=2}
-			});
-
-			// E também no botão "Buscar", junto com as demais atualizações:
-			const _btn = document.getElementById('btnBuscar');
-			if (_btn) _btn.addEventListener('click', carregarTabelaGruposWhats);
 
 
 
 
 
 
-
-
-
-			// Chame ao abrir a página e também no botão "Buscar"
-			document.addEventListener('DOMContentLoaded', () => {
-				carregarTabelaOndeComer();        // inicial
-				const btn = document.getElementById('btnBuscar');
-				if (btn) btn.addEventListener('click', carregarTabelaOndeComer);
+			document.addEventListener('DOMContentLoaded', async () => {
+				startLoading();
+				try {
+					await Promise.all([
+						carregarTabelaOndeComer(),
+						carregarTabelaGruposWhats(),
+						carregarTabelaCliquesImoveis(),
+						carregarTabelaContatosImoveis()
+					]);
+					popularFiltroClientes();
+					aplicarFiltroClienteNosCards();
+				} finally {
+					stopLoading();
+				}
 			});
 		</script>
 
+		<script>
+			function normalizarTexto(txt) {
+				return (txt || "")
+					.toString()
+					.toLowerCase()
+					.normalize("NFD")
+					.replace(/[\u0300-\u036f]/g, "")
+					.trim();
+			}
+
+			function ehLinhaPlaceholder(texto) {
+				const t = normalizarTexto(texto);
+				return (
+					!t ||
+					t.includes("carregando") ||
+					t.includes("nenhum dado") ||
+					t.includes("nenhum clique") ||
+					t.includes("nenhuma instalação") ||
+					t.includes("nenhum uso") ||
+					t.includes("nenhum clique encontrado") ||
+					t.includes("nenhum dado carregado")
+				);
+			}
+
+			// Monta o dropdown de clientes a partir das tabelas com cliente/estabelecimento
+			function popularFiltroClientes() {
+				const select = document.getElementById("filtroClienteSelect");
+				if (!select) return;
+
+				const clientes = new Set();
+				const tabelasAlvo = [
+					"tabelaBotoes",
+					"tabelaOndeComerCardapio",
+					"tabelaPromocoes",
+					"tabelaGruposWhats",
+					"tabelaCliquesImoveis",
+					"tabelaContatosImoveis",
+					"tabelaCliquesPorHorario"
+				];
+
+				tabelasAlvo.forEach(idTabela => {
+					const tbody = document.getElementById(idTabela);
+					if (!tbody) return;
+
+					const linhas = Array.from(tbody.querySelectorAll("tr"));
+					linhas.forEach(linha => {
+						// NÃO ignorar linhas hidden, senão a lista encolhe após aplicar filtro
+						const tds = linha.querySelectorAll("td");
+						if (!tds.length) return;
+						if (ehLinhaPlaceholder(linha.innerText)) return;
+
+						let nome = "";
+						if (idTabela === "tabelaContatosImoveis") {
+							nome = (tds[1]?.innerText || "").trim(); // imóvel
+						} else if (idTabela === "tabelaCliquesPorHorario") {
+							nome = (tds[2]?.innerText || "").trim(); // estabelecimento
+						} else {
+							nome = (tds[0]?.innerText || "").trim();
+						}
+
+						if (!nome || nome.length < 2) return;
+						clientes.add(nome);
+					});
+				});
+
+				const valorAtual = select.value;
+				const ordenados = Array.from(clientes).sort((a, b) =>
+					a.localeCompare(b, "pt-BR", { sensitivity: "base" })
+				);
+
+				select.innerHTML = `<option value="">Todos os clientes</option>`;
+				ordenados.forEach(nome => {
+					const opt = document.createElement("option");
+					opt.value = nome;
+					opt.textContent = nome;
+					select.appendChild(opt);
+				});
+
+				if (valorAtual && ordenados.includes(valorAtual)) {
+					select.value = valorAtual;
+				}
+			}
+
+			function obterTermoFiltroCliente() {
+				const select = document.getElementById("filtroClienteSelect");
+				const texto = document.getElementById("filtroClienteTexto");
+
+				const termoSelect = normalizarTexto(select?.value || "");
+				const termoTexto = normalizarTexto(texto?.value || "");
+
+				// Se digitou algo no campo texto, ele tem prioridade
+				return termoTexto || termoSelect || "";
+			}
+
+			function aplicarFiltroClienteNosCards() {
+				const termo = obterTermoFiltroCliente();
+				const cards = document.querySelectorAll(".container > .card");
+
+				cards.forEach(card => {
+					// Card fixo sempre aparece
+					if (card.dataset.fixo === "1" || card.classList.contains("filtros")) {
+						card.style.display = "";
+						return;
+					}
+
+					const tbody = card.querySelector("tbody");
+					if (!tbody) {
+						card.style.display = "";
+						return;
+					}
+
+					const linhas = Array.from(tbody.querySelectorAll("tr"));
+
+					// Sem filtro -> mostra tudo
+					if (!termo) {
+						linhas.forEach(l => l.style.display = "");
+						card.style.display = "";
+						return;
+					}
+
+					let visiveis = 0;
+
+					linhas.forEach(linha => {
+						const textoLinha = linha.innerText || "";
+
+						// placeholders permanecem escondidos quando filtro está ativo
+						if (ehLinhaPlaceholder(textoLinha)) {
+							linha.style.display = "none";
+							return;
+						}
+
+						const match = normalizarTexto(textoLinha).includes(termo);
+						linha.style.display = match ? "" : "none";
+						if (match) visiveis++;
+					});
+
+					// Esconde card se nenhuma linha bateu
+					card.style.display = visiveis > 0 ? "" : "none";
+				});
+
+				// Garante que título/data continuem visíveis
+				const dataRelatorio = document.getElementById("dataRelatorio");
+				if (dataRelatorio) dataRelatorio.style.display = "";
+			}
+
+			function atualizarPeriodoNosCardsVisiveis() {
+				const periodo = formatarPeriodoSelecionado();
+				const cards = document.querySelectorAll(".container > .card");
+
+				cards.forEach(card => {
+					// remove etiqueta antiga, se existir
+					const antiga = card.querySelector(".periodo-card-cliente");
+					if (antiga) antiga.remove();
+
+					// não adiciona no card de filtros
+					if (card.classList.contains("filtros")) return;
+
+					// só adiciona se o card estiver visível
+					const style = window.getComputedStyle(card);
+					if (style.display === "none") return;
+
+					// cria etiqueta
+					const etiqueta = document.createElement("div");
+					etiqueta.className = "periodo-card-cliente";
+					etiqueta.style.cssText = `
+      margin: 0 0 8px 0;
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: rgba(0,188,212,0.12);
+      border: 1px solid rgba(0,188,212,0.35);
+      color: #7ee7f2;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    `;
+					etiqueta.textContent = `Período: ${periodo}`;
+
+					// inserir no topo do card (antes do título/tabela)
+					card.insertBefore(etiqueta, card.firstChild);
+				});
+			}
+
+			function limparFiltroClienteTextoAoTrocarSelect() {
+				const txt = document.getElementById("filtroClienteTexto");
+				if (txt) txt.value = "";
+			}
+
+			document.addEventListener("DOMContentLoaded", () => {
+				const sel = document.getElementById("filtroClienteSelect");
+				const txt = document.getElementById("filtroClienteTexto");
+
+				if (sel) {
+					sel.addEventListener("change", () => {
+						limparFiltroClienteTextoAoTrocarSelect();
+						aplicarFiltroClienteNosCards();
+					});
+				}
+
+				if (txt) {
+					txt.addEventListener("input", aplicarFiltroClienteNosCards);
+					txt.addEventListener("change", aplicarFiltroClienteNosCards);
+				}
+
+				// primeira carga (caso já tenha tabela preenchida)
+				setTimeout(() => {
+					popularFiltroClientes();
+					aplicarFiltroClienteNosCards();
+				}, 500);
+			});
+		</script>
 
 		<div id="loadingOverlay" class="loader-overlay" aria-live="polite" aria-busy="true">
 			<div class="loader-box">
