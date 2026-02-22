@@ -4468,7 +4468,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel">
   ${est.novidadesImages && est.novidadesImages.length ? `
-   <button class="btn-fotos_onde" onclick="registrarCliqueFotosOndeComer('${normalizeName(est.name)}'); mostrarFotos('${normalizeName(est.name)}')">
+   <button class="btn-fotos_onde" onclick="mostrarFotos('${normalizeName(est.name)}')"">
   📷 Fotos
 </button>
   ` : ''}
@@ -16553,7 +16553,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
         const tipo = button.classList.contains('novidades-btn') ? "divulgacao" : "cardapio";
         const id = button.getAttribute("data-id");
-        registrarCliqueBotao(tipo, id, "servicos-comercios");
+        registrarCliqueBotao(tipo, id);
 
         // NOVO scroll até o separador dentro do item clicado
         setTimeout(() => {
@@ -17195,7 +17195,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
     let navegou = false;
-    registrarCliqueBotao('telefone', estId || '', 'servicos-comercios')
+    registrarCliqueBotao('telefone', estId || '')
       .finally(() => { navegou = true; navegar(); });
 
     // fallback caso a rede esteja lenta: garante navegação mesmo sem callback
@@ -17719,17 +17719,6 @@ function registrarCliqueWhatsOndeComer(nomeEstabelecimento) {
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
   registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "whatsapp");
 }
-
-function registrarCliqueFotosOndeComer(nomeEstabelecimento) {
-  const hoje = getHojeBR();
-  const ref = firebase.database().ref(`cliquesFotosOndeComer/${hoje}/${nomeEstabelecimento}`);
-  ref.transaction(valorAtual => (valorAtual || 0) + 1);
-  registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "fotos");
-}
-
-window.registrarCliqueCardapioOndeComer = registrarCliqueCardapioOndeComer;
-window.registrarCliqueWhatsOndeComer = registrarCliqueWhatsOndeComer;
-window.registrarCliqueFotosOndeComer = registrarCliqueFotosOndeComer;
 
 function registrarCliqueNaPromocao(nomeComercio) {
   const hoje = getHojeBR();
