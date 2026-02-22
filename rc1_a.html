@@ -364,12 +364,13 @@
 						<th>Fotos</th>
 						<th>Cardápio</th>
 						<th>Telefone</th> <!-- NOVO -->
+						<th>Último clique</th>
 
 					</tr>
 				</thead>
 				<tbody id="tabelaBotoes">
 					<tr>
-						<td colspan="4" style="text-align:center; color: #999;">Nenhum dado carregado ainda</td>
+						<td colspan="5" style="text-align:center; color: #999;">Nenhum dado carregado ainda</td>
 					</tr>
 				</tbody>
 			</table>
@@ -1134,23 +1135,41 @@
 					const tabelaBotoes = document.getElementById("tabelaBotoes");
 					tabelaBotoes.innerHTML = "";
 
-					// Agrega por estabelecimento: fotos, cardapio, telefone
-					const agregBotoes = {}; // { estId: { fotos:0, cardapio:0, telefone:0 } }
+					// Agrega por estabelecimento: fotos, cardapio, telefone + último horário (cliquesPorBotaoDetalhado)
+					const agregBotoes = {}; // { estId: { fotos:0, cardapio:0, telefone:0, ultimoHorario:'-', ultimoTs:0 } }
 
 					for (const dia of diasFiltrados) {
 						const porDia = dadosBotoes[dia] || {};
 						for (const estId of Object.keys(porDia)) {
 							const tipos = porDia[estId] || {};
-							// depois:
 							const f = Number(tipos.fotos || 0);
 							const c = Number(tipos.cardapio || 0);
 							const t = Number(tipos.telefone || 0);
 							if (f || c || t) {
-								if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0 };
+								if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0, ultimoHorario: '-', ultimoTs: 0 };
 								agregBotoes[estId].fotos += f;
 								agregBotoes[estId].cardapio += c;
 								agregBotoes[estId].telefone += t;
 							}
+						}
+					}
+
+					// Complementa com horários do log detalhado
+					for (const dia of diasFiltrados) {
+						const porDiaDet = dadosCliquesDetalhados[dia] || {};
+						for (const estId of Object.keys(porDiaDet)) {
+							const logs = porDiaDet[estId] || {};
+							if (!agregBotoes[estId]) agregBotoes[estId] = { fotos: 0, cardapio: 0, telefone: 0, ultimoHorario: '-', ultimoTs: 0 };
+							Object.values(logs).forEach((log) => {
+								const tsNum = Number(log?.ts || 0);
+								const iso = log?.dataHoraISO || '';
+								const horario = log?.horario || (iso ? new Date(iso).toLocaleTimeString('pt-BR') : '-');
+								const valorComparacao = tsNum || (iso ? new Date(iso).getTime() : 0);
+								if (valorComparacao > (agregBotoes[estId].ultimoTs || 0)) {
+									agregBotoes[estId].ultimoTs = valorComparacao;
+									agregBotoes[estId].ultimoHorario = `${dia} ${horario}`;
+								}
+							});
 						}
 					}
 
@@ -1161,17 +1180,18 @@
 
 					const itensOrdenados = Object.entries(agregBotoes)
 						.map(([estId, v]) => ({ estId, ...v }))
-						.filter(it => (it.fotos + it.cardapio + it.telefone) > 0) // <-- filtra “fantasmas”
+						.filter(it => (it.fotos + it.cardapio + it.telefone) > 0 || it.ultimoTs > 0) // <-- filtra “fantasmas”
 						.sort((a, b) => (b.fotos + b.cardapio + b.telefone) - (a.fotos + a.cardapio + a.telefone));
 
 					if (!itensOrdenados.length) {
-						tabelaBotoes.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
+						tabelaBotoes.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Nenhum clique encontrado</td></tr>`;
 					} else {
 						tabelaBotoes.innerHTML = itensOrdenados.map(it => {
 							const anterior = botoesAnterioresTemp[it.estId] || {};
 							const alterou = (anterior.fotos !== it.fotos) ||
 								(anterior.cardapio !== it.cardapio) ||
-								(anterior.telefone !== it.telefone);
+								(anterior.telefone !== it.telefone) ||
+								(anterior.ultimoHorario !== it.ultimoHorario);
 
 							return `
       <tr style="${alterou ? 'color:yellow; font-weight:bold;' : ''}">
@@ -1179,13 +1199,14 @@
         <td style="text-align:center">${it.fotos}</td>
         <td style="text-align:center">${it.cardapio}</td>
         <td style="text-align:center">${it.telefone}</td>
+        <td style="font-size:12px">${it.ultimoHorario || '-'}</td>
       </tr>
     `;
 						}).join("");
 
 						// salvar os atuais para comparação futura
 						itensOrdenados.forEach(it => {
-							botoesAnteriores[it.estId] = { fotos: it.fotos, cardapio: it.cardapio, telefone: it.telefone };
+							botoesAnteriores[it.estId] = { fotos: it.fotos, cardapio: it.cardapio, telefone: it.telefone, ultimoHorario: it.ultimoHorario };
 						});
 					}
 

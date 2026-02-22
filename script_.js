@@ -18033,50 +18033,60 @@ document.addEventListener('click', function (e) {
 
 // Função para registrar clique no Firebase
 function registrarCliqueBotao(tipo, idEstabelecimento) {
-  try {
-    const db = firebase.database();
-    const hoje = (typeof getHojeBR === "function")
-      ? getHojeBR()
-      : (() => {
-          const d = new Date();
-          return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-        })();
+  const hoje = getHojeBR();
+  const db = firebase.database();
 
-    const estId = String(idEstabelecimento || "sem-id").trim().replace(/[.#$\[\]]/g, "-");
-    const tipoSeguro = String(tipo || "outro").trim();
+  // 1) contador (continua igual, para relatórios rápidos)
+  const refContador = db.ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
 
-    const refContador = db.ref(`cliquesPorBotao/${hoje}/${estId}/${tipoSeguro}`);
-    const refLog = db.ref(`cliquesPorBotaoDetalhado/${hoje}/${estId}`).push();
+  // 2) log detalhado (novo, com horário)
+  const refLog = db.ref(`cliquesPorBotaoDetalhado/${hoje}/${idEstabelecimento}`).push();
 
-    const agora = new Date();
-    const horarioBR = agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const agora = new Date();
 
-    return new Promise((resolve) => {
-      refContador.transaction(
-        (atual) => (Number(atual) || 0) + 1,
-        async (erro) => {
-          if (erro) return resolve({ ok: false, erro: true });
-          try {
-            await refLog.set({
-              tipo: tipoSeguro,
-              horario: horarioBR,
-              dataHoraISO: agora.toISOString(),
-              ts: firebase.database.ServerValue.TIMESTAMP,
-              pagina: window.location.href || "",
-              estabelecimento: estId
-            });
-            resolve({ ok: true });
-          } catch (e) {
-            resolve({ ok: true, logFalhou: true });
-          }
+  return new Promise((resolve) => {
+    refContador.transaction(
+      (atual) => (atual || 0) + 1,
+      async (erro) => {
+        if (erro) {
+          resolve({ ok: false });
+          return;
         }
-      );
-    });
-  } catch (e) {
-    return Promise.resolve({ ok: false, erro: true });
-  }
+
+        try {
+          await refLog.set({
+            tipo, // ex: "telefone", "fotos", "cardapio"
+            horario: agora.toLocaleTimeString("pt-BR"),
+            dataHoraISO: agora.toISOString(),
+            ts: firebase.database.ServerValue.TIMESTAMP,
+            pagina: window.location.href
+          });
+          resolve({ ok: true });
+        } catch (e) {
+          resolve({ ok: true, logFalhou: true });
+        }
+      }
+    );
+  });
 }
+
+// 👇 adicione esta linha logo após a função:
 window.registrarCliqueBotao = registrarCliqueBotao;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ////////////// inicio salvar imoveis
 // gera a chave do imóvel: usa id; se não tiver, usa titulo higienizado
 function keyImovel(im) {
