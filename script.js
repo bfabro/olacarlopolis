@@ -2419,7 +2419,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ocasarao: "s",
     ione: "s",
     cantinhodapraca: "s",
-    caldodecanaamaral: "s",
+    caldodecanaamaral: "n",
     levisalgados: "n",
     espacogourmet: "s",
     kidoglanches: "s",
