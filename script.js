@@ -2072,9 +2072,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Só pega os eventos "reais" (com imagem, nome e instagram)
-    const listaEventos = eventosCat.establishments.filter(
-      (ev) => ev && ev.image && ev.name && ev.instagram
-    );
+   const listaEventos = eventosCat.establishments.filter(
+  (ev) => ev && ev.image && ev.name
+);
 
     grade.innerHTML = "";
 
@@ -2618,14 +2618,16 @@ document.addEventListener("DOMContentLoaded", function () {
     bloquinhodoagro: "s",
     cafedamanhadosamigos: "s",
     "festadesaojose":"s",
-
+ undokai2026:"s",
     cfccarlopolisfight: "s",
     festadaapae:"s",
     sunsetcaravela:"s",
     lowcity043fest: "s",
     "7encontrodemotociclistas-lobodafronteira": "s",
     "2cafecoloniallarsaovicente":"s",
-    frutfest2026: "s",
+    frutfest2026:"s",
+    tooronagashi:"s",
+   
 
 
     /// FIM EVENTOS 
@@ -12597,11 +12599,6 @@ function sendPaymentReminder(establishment) {
 
 
 
-
-
-
-         
-
           {
             image: "images/informacoes/eventos/8.jpg",
             name: "Bloquinho do Agro",
@@ -12683,6 +12680,15 @@ function sendPaymentReminder(establishment) {
             infoAdicional: "A tradicional festa da apae"
           },
 
+           {
+            image: "images/informacoes/eventos/1.jpg",
+            name: "Undokai 2026",
+            date: "12/07/2026",
+            address: "Campo da Acecar",
+            
+            
+          },
+
 
           {
             image: "images/informacoes/eventos/14.jpg",
@@ -12712,6 +12718,15 @@ function sendPaymentReminder(establishment) {
             address: "Ilha do Ponciano",
             instagram: "https://www.instagram.com/p/DTfq3ICka4e/",
             infoAdicional: "🔥Essa vai pra quem esta na espera do GTA VI 🔥<br>Estao preparados para a 3ª Edição do Low City 043 Fest?<br>Carlópolis Pr mais uma vez vai ficar pequena..."
+          },
+
+           {
+            image: "images/informacoes/eventos/2.jpg",
+            name: "Tooronagashi",
+            date: "24/10/2026",
+            address: "Ilha do Ponciano",
+            
+            
           },
 
 
