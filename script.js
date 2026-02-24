@@ -12214,6 +12214,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Eliane",
             hours: "Seg a Sab: 07:00h as 15:00h",
             contact: "(43) 99611-2211",
+            instagram:"https://www.instagram.com/043_elianelemes",
        infoAdicional: "✨ - Limpeza pós obra<br>🏢 - Limpeza de escritório<br>🛍️ - Limpeza de comércio<br>🏠 - Limpeza de residência<br>👕 - Passo roupa<br>💦 - Limpeza de vidros<br>📚 - Curso de limpeza e conservação "},
 
         ],
