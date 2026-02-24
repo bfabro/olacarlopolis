@@ -2521,7 +2521,7 @@ document.addEventListener("DOMContentLoaded", function () {
     gustavinho: "s",
 
     //diarista
-    rose: "n",
+    eliane: "s",
 
     //frete
 
@@ -12209,7 +12209,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuDiarista"),
         title: "Diarista",
         establishments: [
-
+    {
+            image: "images/servicos/diarista/eliane/perfil.jpg",
+            name: "Eliane",
+            contact: "(43) 99611-2211",
+       infoAdicional: "✨ - Limpeza pós obra<br>🏢 - Limpeza de escritório<br>🛍️ - Limpeza de comércio<br>🏠 - Limpeza de residência<br>👕 - Passo roupa<br>💦 - Limpeza de vidros<br>📚 - Curso de limpeza e conservação<br>📅 - Atendimento de segunda a sábado" },
 
         ],
       },
