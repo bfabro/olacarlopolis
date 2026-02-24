@@ -15190,7 +15190,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             hours: "Dom a Dom: <span style='color:red'>24horas</span>",
             address: "R Benedito Salles, 1546 - Centro / Carlopolis",
             contact: "(43) 99631-3421 ",
-            instagram: "https://www.instagram.com/eder.luis_pacheco/",
+            instagram: "https://www.instagram.com/via43.app.oficial?igsh=dzYzNXRoNDFqeHNo",
+           
             infoAdicional: "Baixe o App e comece a usar!<br><a target='_blank' style='color:#2e7d32;' href='https://play.google.com/store/apps/details?id=br.com.via43.passenger.drivermachine&pcampaignid=web_share'><i class='fab fa-android'></i> Instalar no Android</a>  <br>  <a target='_blank' style='color:#db0d0d;' href='https://apps.apple.com/br/app/via43-pe%C3%A7a-sua-viagem-entrega/id6744256463'><i class='fab fa-apple'></i> Instalar no Iphone </a><Br><BR> Pagamentos em:<br>💵 Dinheiro <br>💳 Cartão de Crédito ou Débito <br>📲 Pix",
             novidadesImages: [
               // "images/comercios/otica/oticaVisual/divulgacao/0.jpg",
@@ -16463,28 +16464,35 @@ ${establishment.infoVagaTrabalho
                    
                 
 
-                  ${(establishment.instagram || establishment.facebook || establishment.site) ? `
-                    <div class="info-box">
-                    
-                      <i class="fas fa-share-alt info-icon"></i>
-                      <div>
-                        <div class="info-label">Redes Sociais</div>
-                        <div class="social-icons">
-                          ${establishment.facebook ? `<a href="${fixUrl(establishment.facebook)}" target="_blank"><i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook</a>` : ""}
-                         
-                         
-                          ${establishment.instagram ? `<a href="#" class="js-ig-link" data-ig="${fixInstagramUrl(establishment.instagram)}" rel="noopener">
-  <i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram
-</a>` : ""} 
+                  ${(establishment.instagram || establishment.instagram2 || establishment.facebook || establishment.site) ? `
+  <div class="info-box">
+    <i class="fas fa-share-alt info-icon"></i>
+    <div>
+      <div class="info-label">Redes Sociais</div>
+      <div class="social-icons">
+        ${establishment.facebook ? `
+          <a href="${fixUrl(establishment.facebook)}" target="_blank">
+            <i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook
+          </a>` : ""}
 
-                         
-                          ${establishment.site ? `<a href="${fixUrl(establishment.site)}" target="_blank"><i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site</a>` : ""}
-                       
+        ${establishment.instagram ? `
+          <a href="#" class="js-ig-link" data-ig="${fixInstagramUrl(establishment.instagram)}" rel="noopener">
+            <i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram
+          </a>` : ""}
 
-                        </div>
-                      </div>
-                    </div>` : ""
-        }
+        ${establishment.instagram2 ? `
+          <a href="#" class="js-ig-link" data-ig="${fixInstagramUrl(establishment.instagram2)}" rel="noopener">
+            <i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram 2
+          </a>` : ""}
+
+        ${establishment.site ? `
+          <a href="${fixUrl(establishment.site)}" target="_blank">
+            <i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site
+          </a>` : ""}
+      </div>
+    </div>
+  </div>` : ""
+}
 
        
 
