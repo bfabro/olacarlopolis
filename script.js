@@ -2024,7 +2024,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (igBtn && est.instagram) {
           igBtn.addEventListener("click", (ev) => {
             ev.stopPropagation();
-            
+
           });
         }
 
@@ -2072,9 +2072,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Só pega os eventos "reais" (com imagem, nome e instagram)
-   const listaEventos = eventosCat.establishments.filter(
-  (ev) => ev && ev.image && ev.name
-);
+    const listaEventos = eventosCat.establishments.filter(
+      (ev) => ev && ev.image && ev.name
+    );
 
     grade.innerHTML = "";
 
@@ -2125,7 +2125,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (igBtn && ev.instagram) {
         igBtn.addEventListener("click", (e) => {
           e.stopPropagation();
-          
+
         });
       }
 
@@ -2428,7 +2428,7 @@ document.addEventListener("DOMContentLoaded", function () {
     xisbauinea: "s",
     mycoffee: "s",
     mrpotato: "s",
-    noponto:"s",
+    noponto: "s",
 
     // material de construcao
     lojaferreira: "s",
@@ -2544,6 +2544,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // taxista
     sereia: "s",
     dorivalmattos: "s",
+    ederluis: "s",
 
     // VETERINARIO
 
@@ -2593,7 +2594,7 @@ document.addEventListener("DOMContentLoaded", function () {
     samuzinho: "s",
     rodoviaria: "s",
     secretariadasaude: "s",
-    "secretariadaeducacao":"s",
+    "secretariadaeducacao": "s",
     sindicatorural: "s",
     vigilanciasanitaria: "s",
 
@@ -2613,21 +2614,21 @@ document.addEventListener("DOMContentLoaded", function () {
     //calendarioeventos: "s",
     feiradalua: "n",
     arenagoldenhits: "n",
-  
+
     pescar: "s",
     bloquinhodoagro: "s",
     cafedamanhadosamigos: "s",
-    "festadesaojose":"s",
- undokai2026:"s",
+    "festadesaojose": "s",
+    undokai2026: "s",
     cfccarlopolisfight: "s",
-    festadaapae:"s",
-    sunsetcaravela:"s",
+    festadaapae: "s",
+    sunsetcaravela: "s",
     lowcity043fest: "s",
     "7encontrodemotociclistas-lobodafronteira": "s",
-    "2cafecoloniallarsaovicente":"s",
-    frutfest2026:"s",
-    tooronagashi:"s",
-   
+    "2cafecoloniallarsaovicente": "s",
+    frutfest2026: "s",
+    tooronagashi: "s",
+
 
 
     /// FIM EVENTOS 
@@ -4628,7 +4629,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     {
       id: "casa1v",
       codRef: "C_001",
-      status: "vendido",      
+      status: "vendido",
       tipo: "venda",
       //status: "disponível",
       titulo: "Residencial Villa Ray (Horizonte 3)",
@@ -5255,7 +5256,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         "images/imoveis/cesar/venda/casa/casa18/3.jpg",
         "images/imoveis/cesar/venda/casa/casa18/4.jpg",
 
-       
+
 
 
 
@@ -5304,9 +5305,9 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     
     */
 
-// CHACARA
+    // CHACARA
 
-{
+    {
       id: "chacara1",
       codRef: "Ch_001",
       procura: "chacara", // ou "terreno", "rural", etc.
@@ -5315,7 +5316,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       descricao: "- Nascente de água <br>- 03 açudes <br> - 800 de pés de goiabas IRRIGADOS <br>- Reserva de mata bem preservada<Br> - Área de lazer com fogão de lenha<Br> - Entrada fechada de muro, com portão<br> - Vista para cidade",
       endereco: "São Pedro",
       valor: 850000,
-     // construcao: 306,          // << NOVO: m² de construção
+      // construcao: 306,          // << NOVO: m² de construção
       area: "30.000 mts",
       banheiros: 2,
       churrasqueira: "Sim",
@@ -5643,7 +5644,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     {
       id: "ter14",
       codRef: "T_014",
-      status:"vendido",
+      status: "vendido",
       procura: "terreno", // ou "terreno", "rural", etc.   
       tipo: "venda",
       titulo: "Terreno à venda no Residencial Vila Ray",
@@ -5662,7 +5663,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       ],
     },
 
-      {
+    {
       id: "ter15",
       codRef: "T_015",
       tipo: "venda",
@@ -5676,7 +5677,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       imagens: [
         "images/imoveis/cesar/venda/terreno/terreno3/1.jpg",
         "images/imoveis/cesar/venda/terreno/terreno3/2.jpg",
-         "images/imoveis/cesar/venda/terreno/terreno3/3.jpg",
+        "images/imoveis/cesar/venda/terreno/terreno3/3.jpg",
 
       ],
       corretores: ["Cesar Melo - 38.105 F"],
@@ -5684,7 +5685,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     },
 
 
-     {
+    {
       id: "ter16",
       codRef: "T_016",
       tipo: "venda",
@@ -5698,10 +5699,10 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       imagens: [
         "images/imoveis/cesar/venda/terreno/terreno4/1.jpg",
         "images/imoveis/cesar/venda/terreno/terreno4/2.jpg",
-         "images/imoveis/cesar/venda/terreno/terreno4/3.jpg",
-           "images/imoveis/cesar/venda/terreno/terreno4/4.jpg",
+        "images/imoveis/cesar/venda/terreno/terreno4/3.jpg",
+        "images/imoveis/cesar/venda/terreno/terreno4/4.jpg",
         "images/imoveis/cesar/venda/terreno/terreno4/5.jpg",
-         "images/imoveis/cesar/venda/terreno/terreno4/6.jpg",
+        "images/imoveis/cesar/venda/terreno/terreno4/6.jpg",
 
       ],
       corretores: ["Cesar Melo - 38.105 F"],
@@ -7298,85 +7299,86 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
   function fixInstagramUrl(instagram) {
-  if (!instagram) return "";
+    if (!instagram) return "";
 
-  let ig = String(instagram).trim();
+    let ig = String(instagram).trim();
 
-  // remove apenas rótulo no início (ex: "Instagram:", "Instagram -", "Instagram Instagram")
-  ig = ig.replace(/^\s*instagram\s*[:\-]?\s*/i, "").trim();
-  ig = ig.replace(/^\s*instagram\s+/i, "").trim(); // se repetiu
+    // remove apenas rótulo no início (ex: "Instagram:", "Instagram -", "Instagram Instagram")
+    ig = ig.replace(/^\s*instagram\s*[:\-]?\s*/i, "").trim();
+    ig = ig.replace(/^\s*instagram\s+/i, "").trim(); // se repetiu
 
-  // se já é link completo, não mexe
-  if (/^https?:\/\//i.test(ig)) return ig;
+    // se já é link completo, não mexe
+    if (/^https?:\/\//i.test(ig)) return ig;
 
-  // remove @
-  ig = ig.replace(/^@/, "");
+    // remove @
+    ig = ig.replace(/^@/, "");
 
-  // se vier "instagram.com/usuario" ou "www.instagram.com/usuario"
-  if (/^(www\.)?instagram\.com/i.test(ig)) {
-    return "https://" + ig.replace(/^https?:\/\//i, "");
+    // se vier "instagram.com/usuario" ou "www.instagram.com/usuario"
+    if (/^(www\.)?instagram\.com/i.test(ig)) {
+      return "https://" + ig.replace(/^https?:\/\//i, "");
+    }
+
+    // se vier só "usuario"
+    return "https://www.instagram.com/" + ig;
   }
 
-  // se vier só "usuario"
-  return "https://www.instagram.com/" + ig;
-}
 
+  // Extrai o username de QUALQUER coisa (link, @, texto)
+  function extractInstagramUsername(input) {
+    if (!input) return "";
 
-// Extrai o username de QUALQUER coisa (link, @, texto)
-function extractInstagramUsername(input) {
-  if (!input) return "";
+    let s = String(input).trim();
 
-  let s = String(input).trim();
+    // Se for só "Instagram" (ou variação), não é username
+    if (/^instagram\s*[:\-]?\s*$/i.test(s)) return "";
 
-  // Se for só "Instagram" (ou variação), não é username
-  if (/^instagram\s*[:\-]?\s*$/i.test(s)) return "";
+    // Se NÃO tiver domínio, remove apenas prefixos tipo "instagram:" (sem destruir "instagram.com")
+    if (!/instagram\.com/i.test(s)) {
+      s = s.replace(/^instagram\s*[:\-]?\s*/i, "").trim();
+    }
 
-  // Se NÃO tiver domínio, remove apenas prefixos tipo "instagram:" (sem destruir "instagram.com")
-  if (!/instagram\.com/i.test(s)) {
-    s = s.replace(/^instagram\s*[:\-]?\s*/i, "").trim();
+    // remove protocolo
+    s = s.replace(/^https?:\/\//i, "");
+
+    // remove www.
+    s = s.replace(/^www\./i, "");
+
+    // se contiver instagram.com em qualquer lugar, corta até depois do domínio
+    if (/instagram\.com/i.test(s)) {
+      s = s.replace(/.*instagram\.com\/?/i, "");
+    }
+
+    // remove query/hash
+    s = s.split("?")[0].split("#")[0];
+
+    // remove @ e barras
+    s = s.replace(/^@/, "").replace(/^\/+/, "").replace(/\/+$/, "");
+
+    const parts = s.split("/").filter(Boolean);
+    if (!parts.length) return "";
+
+    // Se for link de post/reel/stories, não dá pra garantir perfil
+    const first = parts[0].toLowerCase();
+    if (["p", "reel", "tv", "stories", "explore"].includes(first)) return "";
+
+    // Proteção: quando vira ".com" por erro de parsing
+    if (first === "com") return "";
+
+    // username válido
+    const user = parts[0].replace(/[^a-zA-Z0-9._]/g, "");
+    return user || "";
   }
 
-  // remove protocolo
-  s = s.replace(/^https?:\/\//i, "");
+  function buildInstagramWebUrl(instagram) {
+    const user = extractInstagramUsername(instagram);
+    if (user) return `https://www.instagram.com/${user}/`;
 
-  // remove www.
-  s = s.replace(/^www\./i, "");
-
-  // se contiver instagram.com em qualquer lugar, corta até depois do domínio
-  if (/instagram\.com/i.test(s)) {
-    s = s.replace(/.*instagram\.com\/?/i, "");
+    // fallback (mantém o que você já tinha)
+    const u = fixInstagramUrl(instagram);
+    // garante https
+    return /^https?:\/\//i.test(u) ? u : ("https://" + u.replace(/^\/+/, ""));
   }
 
-  // remove query/hash
-  s = s.split("?")[0].split("#")[0];
-
-  // remove @ e barras
-  s = s.replace(/^@/, "").replace(/^\/+/, "").replace(/\/+$/, "");
-
-  const parts = s.split("/").filter(Boolean);
-  if (!parts.length) return "";
-
-  // Se for link de post/reel/stories, não dá pra garantir perfil
-  const first = parts[0].toLowerCase();
-  if (["p", "reel", "tv", "stories", "explore"].includes(first)) return "";
-
-  // Proteção: quando vira ".com" por erro de parsing
-  if (first === "com") return "";
-
-  // username válido
-  const user = parts[0].replace(/[^a-zA-Z0-9._]/g, "");
-  return user || "";
-}
-
-function buildInstagramWebUrl(instagram) {
-  const user = extractInstagramUsername(instagram);
-  if (user) return `https://www.instagram.com/${user}/`;
-
-  // fallback (mantém o que você já tinha)
-  const u = fixInstagramUrl(instagram);
-  // garante https
-  return /^https?:\/\//i.test(u) ? u : ("https://" + u.replace(/^\/+/, ""));
-}
 
 
 
@@ -7386,45 +7388,44 @@ function buildInstagramWebUrl(instagram) {
 
 
 
-
-function isStandalonePWA() {
-  return window.matchMedia('(display-mode: standalone)').matches
-    || window.navigator.standalone === true; // iOS antigo
-}
-
-function normalizeInstagramUrl(raw) {
-  if (!raw) return "";
-  let s = String(raw).trim();
-
-  // Se já é URL completa, só retorna
-  if (/^https?:\/\//i.test(s)) return s;
-
-  // remove @ e espaços
-  s = s.replace(/^@/, "").replace(/\s+/g, "");
-
-  // se veio tipo instagram.com/xxx
-  s = s.replace(/^www\./i, "");
-  if (/^instagram\.com\//i.test(s)) s = "https://" + s;
-
-  // se veio só o username
-  if (!/^https?:\/\//i.test(s)) s = "https://www.instagram.com/" + s + "/";
-
-  return s;
-}
-
-function openInstagramSmart(instagramRaw) {
-  const webUrl = normalizeInstagramUrl(instagramRaw);
-  if (!webUrl) return;
-
-  // ✅ PWA instalado: usar navegação direta (mais confiável)
-  if (isStandalonePWA()) {
-    window.location.href = webUrl;
-    return;
+  function isStandalonePWA() {
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true; // iOS antigo
   }
 
-  // ✅ Browser normal: nova aba
-  window.open(webUrl, "_blank", "noopener,noreferrer");
-}
+  function normalizeInstagramUrl(raw) {
+    if (!raw) return "";
+    let s = String(raw).trim();
+
+    // Se já é URL completa, só retorna
+    if (/^https?:\/\//i.test(s)) return s;
+
+    // remove @ e espaços
+    s = s.replace(/^@/, "").replace(/\s+/g, "");
+
+    // se veio tipo instagram.com/xxx
+    s = s.replace(/^www\./i, "");
+    if (/^instagram\.com\//i.test(s)) s = "https://" + s;
+
+    // se veio só o username
+    if (!/^https?:\/\//i.test(s)) s = "https://www.instagram.com/" + s + "/";
+
+    return s;
+  }
+
+  function openInstagramSmart(instagramRaw) {
+    const webUrl = normalizeInstagramUrl(instagramRaw);
+    if (!webUrl) return;
+
+    // ✅ PWA instalado: usar navegação direta (mais confiável)
+    if (isStandalonePWA()) {
+      window.location.href = webUrl;
+      return;
+    }
+
+    // ✅ Browser normal: nova aba
+    window.open(webUrl, "_blank", "noopener,noreferrer");
+  }
 
 
 
@@ -7439,9 +7440,9 @@ function openInstagramSmart(instagramRaw) {
 
 
 
-// Interceptor de cliques corrigido
-// Intercepta cliques em links do Instagram criados no card (funciona no celular e no modo APP/PWA)
-function sendPaymentReminder(establishment) {
+  // Interceptor de cliques corrigido
+  // Intercepta cliques em links do Instagram criados no card (funciona no celular e no modo APP/PWA)
+  function sendPaymentReminder(establishment) {
     alert(
       `Atenção! O pagamento do site para ${establishment.name} vence hoje.`
     );
@@ -10033,10 +10034,10 @@ function sendPaymentReminder(establishment) {
 
 
 
-///////////////////
-///////////////
+          ///////////////////
+          ///////////////
 
-{
+          {
             image: "images/comercios/lanchonete/noponto/perfil.jpg",
             name: "No Ponto",
             hours: "Qua a Seg: 19:00h as 23:00h",
@@ -10052,7 +10053,7 @@ function sendPaymentReminder(establishment) {
             },
             address: " Av Elson Soares, 1342 - Carlopolis",
             contact: "(43) 99661-9032",
-            delivery: "Sim / Com Taxa",          
+            delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/no_ponto_carlopolis/",
             novidadesImages: [
 
@@ -10060,7 +10061,7 @@ function sendPaymentReminder(establishment) {
               "images/comercios/lanchonete/noponto/divulgacao/2.jpg",
             ],
 
-             menuImages: [
+            menuImages: [
               "images/comercios/lanchonete/noponto/cardapio/1.jpg",
               "images/comercios/lanchonete/noponto/cardapio/2.jpg",
             ],
@@ -10069,8 +10070,8 @@ function sendPaymentReminder(establishment) {
 
 
 
-///////////////
-//////////////////////
+          ///////////////
+          //////////////////////
 
 
 
@@ -11836,14 +11837,14 @@ function sendPaymentReminder(establishment) {
             facebook: "https://www.facebook.com/farmaiscarlopolis1/?locale=pt_BR",
             instagram: "https://www.instagram.com/farmaiscarlopolis/",
             novidadesImages: [
-             
+
               "images/comercios/farmacia/farmais/divulgacao/2.jpg",
               "images/comercios/farmacia/farmais/divulgacao/3.jpg",
               "images/comercios/farmacia/farmais/divulgacao/4.jpg",
 
             ],
             novidadesDescriptions: [
-              
+
               "Tome no horário certo – Respeite os intervalos indicados.",
               "Como fortalecer a imunidade? Comece pelo prato! Invista em alimentos ricos",
               "Tome no horário certo – Respeite os intervalos indicados.",
@@ -12582,15 +12583,15 @@ function sendPaymentReminder(establishment) {
       },
 
 
-///
-///
-///
+      ///
+      ///
+      ///
 
-// teste de salvar o horario dos cliques tambem
-///
+      // teste de salvar o horario dos cliques tambem
+      ///
 
-///
-///
+      ///
+      ///
       // inicio Eventos
       {
         link: document.querySelector("#menuEventos"),
@@ -12619,28 +12620,28 @@ function sendPaymentReminder(establishment) {
           },
 
 
-             {
+          {
             image: "images/informacoes/eventos/20.jpg",
             name: "2 Café Colonial Lar Sao Vicente",
             date: "07/03/2026",
-            contact:"(43) 3566-1196",
+            contact: "(43) 3566-1196",
             address: "Lar Sao Vicente de Paulo - Rua Andrino Soares, 26, Centro",
             instagram: "https://www.instagram.com/p/DUibKB9EfQF/",
             infoAdicional: "CAFÉ COLONIAL ☕<br>Queridos amigos e comunidade, com muita alegria, anunciamos nosso 2° Café Colonial com Bingo! Dessa vez, está ainda mais especial pois o café acontecerá em nosso lar.<br>Anote aí:<br>📆 7 de março de 2026 | A partir das 15h<br>📍 Lar São Vicente de Paulo de Carlópolis<br>💲 R$35,00 (na compra do convite, ganhe 1 cartela para o bingo)<br>Teremos muitos prêmios imperdíveis e mais de 20 variedades no café. Venha participar e colaborar com nosso lar!"
           },
 
-           {
+          {
             image: "images/informacoes/eventos/19.jpg",
             name: "Festa de São José",
             date: "13/03/2026",
-            contact:"(43)99960-9608",
+            contact: "(43)99960-9608",
             address: "Paroquia São José Pantaleão",
             instagram: "https://www.instagram.com/p/DUdDSD4FmUP/",
-            infoAdicional: "🙏 Festa de São José 🙏🎉<br>Haverá vendas de pastéis, mini pizza, refrigerante e bolo 🍰🥤🍕<br>🎁 Binguinho e Intens Show de Prêmios 🎁<br>1️⃣ Bicicleta aro 29<br>2️⃣ Celular<br>3️⃣ TV 32 polegadas<br>4️⃣ 💰 3 mil reais<br><br>👉 Venha participar, traga sua família e viva esse momento de fé, alegria e confraternização!<br>Pontos de vendas das cartelas do show de prêmios<br>@paroquiasaojosesaopantelea<br>@paroquiacarlopolis<br>@elizconceicao<br>@drogamaisjorginho<br>@starmaistech<br>@baggiocarlopolis<br>@funerariagrupocastilho" 
+            infoAdicional: "🙏 Festa de São José 🙏🎉<br>Haverá vendas de pastéis, mini pizza, refrigerante e bolo 🍰🥤🍕<br>🎁 Binguinho e Intens Show de Prêmios 🎁<br>1️⃣ Bicicleta aro 29<br>2️⃣ Celular<br>3️⃣ TV 32 polegadas<br>4️⃣ 💰 3 mil reais<br><br>👉 Venha participar, traga sua família e viva esse momento de fé, alegria e confraternização!<br>Pontos de vendas das cartelas do show de prêmios<br>@paroquiasaojosesaopantelea<br>@paroquiacarlopolis<br>@elizconceicao<br>@drogamaisjorginho<br>@starmaistech<br>@baggiocarlopolis<br>@funerariagrupocastilho"
           },
 
 
-           {
+          {
             image: "images/informacoes/eventos/17.jpg",
             name: "Sunset Caravela",
             date: "21/03/2026",
@@ -12671,7 +12672,7 @@ function sendPaymentReminder(establishment) {
             infoAdicional: "2 - Edição<br> Entrada Franca 1 kg de alimento<br>Mesas na area VIP<br>20 Lutas <Br> 4 Modalidades em um só lugar"
           },
 
-           {
+          {
             image: "images/informacoes/eventos/18.jpg",
             name: "Festa da APAE",
             date: "13/06/2026",
@@ -12680,13 +12681,13 @@ function sendPaymentReminder(establishment) {
             infoAdicional: "A tradicional festa da apae"
           },
 
-           {
+          {
             image: "images/informacoes/eventos/1.jpg",
             name: "Undokai 2026",
             date: "12/07/2026",
             address: "Campo da Acecar",
-            
-            
+
+
           },
 
 
@@ -12720,13 +12721,13 @@ function sendPaymentReminder(establishment) {
             infoAdicional: "🔥Essa vai pra quem esta na espera do GTA VI 🔥<br>Estao preparados para a 3ª Edição do Low City 043 Fest?<br>Carlópolis Pr mais uma vez vai ficar pequena..."
           },
 
-           {
+          {
             image: "images/informacoes/eventos/2.jpg",
             name: "Tooronagashi",
             date: "24/10/2026",
             address: "Ilha do Ponciano",
-            
-            
+
+
           },
 
 
@@ -15177,10 +15178,31 @@ function sendPaymentReminder(establishment) {
 
 
       {
-        link: document.querySelector("#menuTaxista"),
-        title: "Taxista",
+        link: document.querySelector("#menuTaxiApp"),
+        title: "Taxi e Apps",
         establishments: [
 
+
+
+          {
+            image: "images/servicos/taxi/via43/perfil.jpg",
+            name: "Eder Luis",
+            hours: "Dom a Dom: <span style='color:red'>24horas</span>",
+            address: "R Benedito Salles, 1546 - Centro / Carlopolis",
+            contact: "(43) 99631-3421 ",
+            instagram: "https://www.instagram.com/eder.luis_pacheco/",
+            infoAdicional: "Baixe o App e comece a usar!<br><a target='_blank' style='color:#2e7d32;' href='https://play.google.com/store/apps/details?id=br.com.via43.passenger.drivermachine&pcampaignid=web_share'><i class='fab fa-android'></i> Instalar no Android</a>  <br>  <a target='_blank' style='color:#db0d0d;' href='https://apps.apple.com/br/app/via43-pe%C3%A7a-sua-viagem-entrega/id6744256463'><i class='fab fa-apple'></i> Instalar no Iphone </a><Br><BR> Pagamentos em:<br>Dinheiro <br>Cartão de crédito ou débito <br> Pix",
+            novidadesImages: [
+              // "images/comercios/otica/oticaVisual/divulgacao/0.jpg",
+              "images/servicos/taxi/via43/divulgacao/1.jpg",
+              
+
+
+            ],
+            novidadesDescriptions: [
+              "",
+           ],
+          },
 
           {
             image: "images/servicos/taxi/dorival/perfil.jpg",
@@ -15967,30 +15989,30 @@ function sendPaymentReminder(establishment) {
 
 
 
-// ✅ Instagram: abre certo no PWA (standalone) e no navegador normal
-document.addEventListener("click", (e) => {
-  const a = e.target.closest("a.js-ig-link");
-  if (!a) return;
+  // ✅ Instagram: abre certo no PWA (standalone) e no navegador normal
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a.js-ig-link");
+    if (!a) return;
 
-  e.preventDefault();
-  e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
 
-  const ig = a.getAttribute("data-ig") || "";
-  openInstagramSmart(ig);
-});
+    const ig = a.getAttribute("data-ig") || "";
+    openInstagramSmart(ig);
+  });
 
 
-// ✅ Nosso Instagram — abre certo no PWA e fora dele
-document.addEventListener("click", (e) => {
-  const link = e.target.closest(".js-ig-nosso");
-  if (!link) return;
+  // ✅ Nosso Instagram — abre certo no PWA e fora dele
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest(".js-ig-nosso");
+    if (!link) return;
 
-  e.preventDefault();
-  e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
 
-  const igUrl = link.getAttribute("data-ig");
-  openInstagramSmart(igUrl);
-});
+    const igUrl = link.getAttribute("data-ig");
+    openInstagramSmart(igUrl);
+  });
 
 
 
@@ -16920,7 +16942,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   ////
 
   // Função para registrar clique no Firebase
-  
+
   // === NASCER & PÔR DO SOL (Carlópolis-PR) ===
 
   // Coordenadas fixas de Carlópolis-PR
