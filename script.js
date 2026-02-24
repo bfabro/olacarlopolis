@@ -15191,7 +15191,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R Benedito Salles, 1546 - Centro / Carlopolis",
             contact: "(43) 99631-3421 ",
             instagram: "https://www.instagram.com/eder.luis_pacheco/",
-            infoAdicional: "Baixe o App e comece a usar!<br><a target='_blank' style='color:#2e7d32;' href='https://play.google.com/store/apps/details?id=br.com.via43.passenger.drivermachine&pcampaignid=web_share'><i class='fab fa-android'></i> Instalar no Android</a>  <br>  <a target='_blank' style='color:#db0d0d;' href='https://apps.apple.com/br/app/via43-pe%C3%A7a-sua-viagem-entrega/id6744256463'><i class='fab fa-apple'></i> Instalar no Iphone </a><Br><BR> Pagamentos em:<br>Dinheiro <br>Cartão de crédito ou débito <br> Pix",
+            infoAdicional: "Baixe o App e comece a usar!<br><a target='_blank' style='color:#2e7d32;' href='https://play.google.com/store/apps/details?id=br.com.via43.passenger.drivermachine&pcampaignid=web_share'><i class='fab fa-android'></i> Instalar no Android</a>  <br>  <a target='_blank' style='color:#db0d0d;' href='https://apps.apple.com/br/app/via43-pe%C3%A7a-sua-viagem-entrega/id6744256463'><i class='fab fa-apple'></i> Instalar no Iphone </a><Br><BR> Pagamentos em:<br>💵 Dinheiro <br>💳 Cartão de Crédito ou Débito <br>📲 Pix",
             novidadesImages: [
               // "images/comercios/otica/oticaVisual/divulgacao/0.jpg",
               "images/servicos/taxi/via43/divulgacao/1.jpg",
