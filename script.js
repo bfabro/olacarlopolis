@@ -15185,7 +15185,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
           {
-            image: "images/servicos/taxi/via43/perfil2.jpg",
+            image: "images/servicos/taxi/via43/perfil4.jpg",
             name: "Eder Luis",
             hours: "Dom a Dom: <span style='color:red'>24horas</span>",
             address: "R Benedito Salles, 1546 - Centro / Carlopolis",
