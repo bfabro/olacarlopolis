@@ -15189,7 +15189,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             name: "Eder Luis",
             hours: "Dom a Dom: <span style='color:red'>24horas</span>",
             address: "R Benedito Salles, 1546 - Centro / Carlopolis",
-            contact: "(43) 99631-3421 ",
+            contact: "(43) 99981-9760",
             instagram: "https://www.instagram.com/via43.app.oficial?igsh=dzYzNXRoNDFqeHNo",
            
             infoAdicional: "Baixe o App e comece a usar!<br><a target='_blank' style='color:#2e7d32;' href='https://play.google.com/store/apps/details?id=br.com.via43.passenger.drivermachine&pcampaignid=web_share'><i class='fab fa-android'></i> Instalar no Android</a>  <br>  <a target='_blank' style='color:#db0d0d;' href='https://apps.apple.com/br/app/via43-pe%C3%A7a-sua-viagem-entrega/id6744256463'><i class='fab fa-apple'></i> Instalar no Iphone </a><Br><BR> Pagamentos em:<br>💵 Dinheiro <br>💳 Cartão de Crédito ou Débito <br>📲 Pix",
