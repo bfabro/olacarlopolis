@@ -4849,6 +4849,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       id: "casa8v",
       codRef: "C_008",
       tipo: "venda",
+      status: "vendido",
       procura: "casa", // ou "terreno", "rural", etc.
       quartos: 3,
       valor: 500000,
@@ -5106,6 +5107,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       id: "casa15v",
       codRef: "C_015",
       tipo: "venda",
+      status: "vendido",
       procura: "casa",
       titulo: "Casa no Residencial Novo Horizonte III",
       quartos: 2,
