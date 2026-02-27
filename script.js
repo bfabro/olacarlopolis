@@ -14071,6 +14071,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
               "images/comercios/docesChocolates/saborArte/cardapio/1.jpg",
               "images/comercios/docesChocolates/saborArte/cardapio/2.jpg",
+
+              "images/comercios/docesChocolates/saborArte/cardapio/3.jpg",
+              "images/comercios/docesChocolates/saborArte/cardapio/4.jpg",
+
+              "images/comercios/docesChocolates/saborArte/cardapio/5.jpg",
+              "images/comercios/docesChocolates/saborArte/cardapio/6.jpg",
+
+              "images/comercios/docesChocolates/saborArte/cardapio/7.jpg",
+              "images/comercios/docesChocolates/saborArte/cardapio/8.jpg",
+
+              "images/comercios/docesChocolates/saborArte/cardapio/9.jpg",
+              "images/comercios/docesChocolates/saborArte/cardapio/10.jpg",
             ],
             novidadesImages: [
               "images/comercios/docesChocolates/saborArte/divulgacao/1.jpg",
