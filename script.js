@@ -2308,6 +2308,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //doces e chocolates
     cacaushow: "s",
+    saborarte:"s",
 
     // clinica veterinaria
 
@@ -2420,7 +2421,6 @@ document.addEventListener("DOMContentLoaded", function () {
     ione: "s",
     cantinhodapraca: "s",
     caldodecanaamaral: "n",
-    levisalgados: "n",
     espacogourmet: "s",
     kidoglanches: "s",
     pracalanches: "s",
@@ -12211,13 +12211,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuDiarista"),
         title: "Diarista",
         establishments: [
-    {
+          {
             image: "images/servicos/diarista/eliane/perfil.jpg",
             name: "Eliane",
             hours: "Seg a Sab: 07:00h as 15:00h",
             contact: "(43) 99611-2211",
-            instagram:"https://www.instagram.com/043_elianelemes",
-       infoAdicional: "✨ - Limpeza pós obra<br>🏢 - Limpeza de escritório<br>🛍️ - Limpeza de comércio<br>🏠 - Limpeza de residência<br>👕 - Passo roupa<br>💦 - Limpeza de vidros<br>📚 - Curso de limpeza e conservação "},
+            instagram: "https://www.instagram.com/043_elianelemes",
+            infoAdicional: "✨ - Limpeza pós obra<br>🏢 - Limpeza de escritório<br>🛍️ - Limpeza de comércio<br>🏠 - Limpeza de residência<br>👕 - Passo roupa<br>💦 - Limpeza de vidros<br>📚 - Curso de limpeza e conservação "
+          },
 
         ],
       },
@@ -14042,6 +14043,77 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Doces e Chocolates",
         establishments: [
 
+
+
+
+
+          {
+            image: "images/comercios/docesChocolates/saborArte/perfil.jpg",
+            name: "Sabor Arte",
+            hours: "Seg a Sab: 12:00h as 18:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "12:00", fim: "18:00" }],
+              ter: [{ inicio: "12:00", fim: "18:00" }],
+              qua: [{ inicio: "12:00", fim: "18:00" }],
+              qui: [{ inicio: "12:00", fim: "18:00" }],
+              sex: [{ inicio: "12:00", fim: "18:00" }],
+              sab: [{ inicio: "12:00", fim: "17:00" }],
+              dom: []
+            },
+            address: "Somente Delivery",
+            contact: "(43) 99697-2091",
+            contact2: "(43) 99625-7502",
+            delivery: "Sim / Sem Taxa",
+            instagram: "https://www.instagram.com/saborearteclps/",
+            instagram2: "https://www.instagram.com/suh_salgadoos/",
+            menuImages: [
+
+              "images/comercios/docesChocolates/saborArte/cardapio/1.jpg",
+              "images/comercios/docesChocolates/saborArte/cardapio/2.jpg",
+            ],
+            novidadesImages: [
+              "images/comercios/docesChocolates/saborArte/divulgacao/1.jpg",
+              "images/comercios/docesChocolates/saborArte/divulgacao/2.jpg",
+
+              "images/comercios/docesChocolates/saborArte/divulgacao/3.jpg",
+              "images/comercios/docesChocolates/saborArte/divulgacao/4.jpg",
+
+              "images/comercios/docesChocolates/saborArte/divulgacao/5.jpg",
+              "images/comercios/docesChocolates/saborArte/divulgacao/6.jpg",
+
+              "images/comercios/docesChocolates/saborArte/divulgacao/7.jpg",
+              "images/comercios/docesChocolates/saborArte/divulgacao/8.jpg",
+
+            ],
+            novidadesDescriptions: [
+
+              "",
+
+
+
+
+            ],
+
+          },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           {
             image: "images/comercios/docesChocolates/cacauShow/perfil.jpg",
             name: "Cacau Show",
@@ -15199,18 +15271,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "R Benedito Salles, 1546 - Centro / Carlopolis",
             contact: "(43) 99981-9760",
             instagram: "https://www.instagram.com/via43.app.oficial?igsh=dzYzNXRoNDFqeHNo",
-           
+
             infoAdicional: "Baixe o App e comece a usar!<br><a target='_blank' style='color:#2e7d32;' href='https://play.google.com/store/apps/details?id=br.com.via43.passenger.drivermachine&pcampaignid=web_share'><i class='fab fa-android'></i> Instalar no Android</a>  <br>  <a target='_blank' style='color:#db0d0d;' href='https://apps.apple.com/br/app/via43-pe%C3%A7a-sua-viagem-entrega/id6744256463'><i class='fab fa-apple'></i> Instalar no Iphone </a><Br><BR> Pagamentos em:<br>💵 Dinheiro <br>💳 Cartão de Crédito ou Débito <br>📲 Pix",
             novidadesImages: [
               // "images/comercios/otica/oticaVisual/divulgacao/0.jpg",
               "images/servicos/taxi/via43/divulgacao/1.jpg",
-              
+
 
 
             ],
             novidadesDescriptions: [
               "",
-           ],
+            ],
           },
 
           {
@@ -16500,7 +16572,7 @@ ${establishment.infoVagaTrabalho
       </div>
     </div>
   </div>` : ""
-}
+        }
 
        
 
