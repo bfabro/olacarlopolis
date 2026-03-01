@@ -2437,7 +2437,7 @@ document.addEventListener("DOMContentLoaded", function () {
     marmoraria2irmaos: "s",
 
     //salgados
-    suhsalgados:"s",
+    suhsalgados: "s",
 
     //supermercado
     bompreco: "s",
@@ -2620,8 +2620,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     pescar: "s",
     bloquinhodoagro: "s",
+    paranafishingcaiaquetopteam: "s",
     cafedamanhadosamigos: "s",
     "festadesaojose": "s",
+    circuitoparanafishingsaint: "s",
     undokai2026: "s",
     cfccarlopolisfight: "s",
     festadaapae: "s",
@@ -11045,7 +11047,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/salgados/sueli/cardapio/1.jpg",
               "images/comercios/salgados/sueli/cardapio/2.jpg",
               "images/comercios/salgados/sueli/cardapio/3.jpg",
-               "images/comercios/salgados/sueli/cardapio/4.jpg",
+              "images/comercios/salgados/sueli/cardapio/4.jpg",
               "images/comercios/salgados/sueli/cardapio/5.jpg",
               "images/comercios/salgados/sueli/cardapio/6.jpg",
 
@@ -11055,7 +11057,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "images/comercios/salgados/sueli/divulgacao/2.jpg",
               "images/comercios/salgados/sueli/divulgacao/3.jpg",
               "images/comercios/salgados/sueli/divulgacao/4.jpg",
-          
+
 
             ],
             novidadesDescriptions: [
@@ -12701,6 +12703,19 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           },
 
           {
+            image: "images/informacoes/eventos/5.jpg",
+            name: "Circuito Parana Fishing Saint",
+            date: "07/03/2026",
+            address: "Rua Benedito Salles, 637, sala 7 - Carlopolis",
+            contact: "(43) 99177-5226",
+            instagram: "https://www.instagram.com/p/DT_IdBZDxlS/?img_index=6",
+            infoAdicional: "O Circuito Paraná Fishing 2026 será realizado em 5 etapas, sendo a primeira no dia 31/01/2026 com apoio da SAINT, na Represa de Chavantes, em Carlópolis/PR.<br>Neste circuito, poderão competir até 3 pescadores por embarcação, que disputarão não apenas a vitória em cada etapa, mas também a melhor pontuação geral, visando o título de campeão do circuito.<br>Transmissão ao vivo pelo YouTube do Paraná Fishing."
+          },
+
+
+
+
+          {
             image: "images/informacoes/eventos/19.jpg",
             name: "Festa de São José",
             date: "13/03/2026",
@@ -12718,6 +12733,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Caravela Clube",
             instagram: "https://www.instagram.com/p/DUihXMYjQiL/",
             infoAdicional: "🔥 DJ & Produtor Musical<br>🎧 +1 Milhão de streams nas plataformas<br>📻 Tocando em mais de 500 rádios pelo mundo<br>🌍 Suporte de DJs nacionais e internacionais<br>🚀 Um sucesso por onde passa — e sempre volta!"
+          },
+
+          {
+            image: "images/informacoes/eventos/4.jpg",
+            name: "Parana Fishing Caiaque Top Team",
+            date: "28/03/2026",
+            address: "Rua Benedito Salles, 637, sala 7 - Carlopolis",
+            contact: "(43) 99177-5226",
+            instagram: "https://www.instagram.com/p/DT_IdBZDxlS/?img_index=4",
+            infoAdicional: "1ª Etapa do Caiaque Top Team 2026 Série Prata/Bronze<br>O Caiaque Top Team 2026 será realizado em 3 etapas, sendo a primeira no dia 28/03/2026, na Represa de Chavantes, em Carlópolis/PR.<br>Neste circuito, os caiaqueiros disputarão não apenas a vitória em cada etapa, mas também a melhor pontuação geral, visando o título de campeão do circuito.<br>Transmissão ao vivo pelo YouTube do Paraná Fishing."
           },
 
 
@@ -14123,11 +14148,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: []
             },
             address: "Somente Delivery",
-           
+
             contact: "(43) 99625-7502",
             delivery: "Sim / Sem Taxa",
             instagram: "https://www.instagram.com/saborearteclps/",
-          
+
             menuImages: [
 
               "images/comercios/docesChocolates/saborArte/cardapio/1.jpg",
