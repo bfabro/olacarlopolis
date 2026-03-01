@@ -11023,7 +11023,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         title: "Salgados para Festas",
         establishments: [
           {
-            image: "images/comercios/salgados/sueli/perfil.jpg",
+            image: "images/comercios/salgados/sueli/perfil2.jpg",
             name: "Suh Salgados",
             hours: "Seg a Sab: 12:00h as 18:00h",
             statusAberto: ".",
