@@ -2308,7 +2308,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //doces e chocolates
     cacaushow: "s",
-    saborarte:"s",
+    saborarte: "s",
 
     // clinica veterinaria
 
@@ -2435,6 +2435,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //marmoraria
     marmoraria2irmaos: "s",
+
+    //salgados
+    suhsalgados:"s",
 
     //supermercado
     bompreco: "s",
@@ -11010,6 +11013,64 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+      ////////
+
+
+
+
+      {
+        link: document.querySelector("#menuSalgadosFestas"),
+        title: "Salgados para Festas",
+        establishments: [
+          {
+            image: "images/comercios/salgados/sueli/perfil.jpg",
+            name: "Suh Salgados",
+            hours: "Seg a Sab: 12:00h as 18:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "12:00", fim: "18:00" }],
+              ter: [{ inicio: "12:00", fim: "18:00" }],
+              qua: [{ inicio: "12:00", fim: "18:00" }],
+              qui: [{ inicio: "12:00", fim: "18:00" }],
+              sex: [{ inicio: "12:00", fim: "18:00" }],
+              sab: [{ inicio: "12:00", fim: "17:00" }],
+              dom: []
+            },
+            address: "Somente Delivery",
+            contact: "(43) 99697-2091",
+            infoAdicional: "📦 Sob encomenda <BR>🔢 Salgados por cento <BR>🎉 Encomendas para festas <BR>📅 Entregue sob agendamento",
+            instagram: "https://www.instagram.com/suh_salgadoos/",
+            menuImages: [
+
+              "images/comercios/salgados/sueli/cardapio/1.jpg",
+              "images/comercios/salgados/sueli/cardapio/2.jpg",
+              "images/comercios/salgados/sueli/cardapio/3.jpg",
+               "images/comercios/salgados/sueli/cardapio/4.jpg",
+              "images/comercios/salgados/sueli/cardapio/5.jpg",
+              "images/comercios/salgados/sueli/cardapio/6.jpg",
+
+            ],
+            novidadesImages: [
+              "images/comercios/salgados/sueli/divulgacao/1.jpg",
+              "images/comercios/salgados/sueli/divulgacao/2.jpg",
+              "images/comercios/salgados/sueli/divulgacao/3.jpg",
+              "images/comercios/salgados/sueli/divulgacao/4.jpg",
+          
+
+            ],
+            novidadesDescriptions: [
+              "",
+
+            ],
+          }
+        ]
+      },
+
+      ///////
+
+
+
+
 
       {
         link: document.querySelector("#menuMercado"),
@@ -14062,11 +14123,11 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               dom: []
             },
             address: "Somente Delivery",
-            contact: "(43) 99697-2091",
-            contact2: "(43) 99625-7502",
+           
+            contact: "(43) 99625-7502",
             delivery: "Sim / Sem Taxa",
             instagram: "https://www.instagram.com/saborearteclps/",
-            instagram2: "https://www.instagram.com/suh_salgadoos/",
+          
             menuImages: [
 
               "images/comercios/docesChocolates/saborArte/cardapio/1.jpg",
