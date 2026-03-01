@@ -12709,7 +12709,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Rua Benedito Salles, 637, sala 7 - Carlopolis",
             contact: "(43) 99177-5226",
             instagram: "https://www.instagram.com/p/DT_IdBZDxlS/?img_index=6",
-            infoAdicional: "O Circuito Paraná Fishing 2026 será realizado em 5 etapas, sendo a primeira no dia 31/01/2026 com apoio da SAINT, na Represa de Chavantes, em Carlópolis/PR.<br>Neste circuito, poderão competir até 3 pescadores por embarcação, que disputarão não apenas a vitória em cada etapa, mas também a melhor pontuação geral, visando o título de campeão do circuito.<br>Transmissão ao vivo pelo YouTube do Paraná Fishing."
+            infoAdicional: "O Circuito Paraná Fishing 2026 será realizado em 5 etapas, sendo a primeira no dia 31/01/2026 com apoio da SAINT, na Represa de Chavantes, em Carlópolis/PR.<br>Neste circuito, poderão competir até 3 pescadores por embarcação, que disputarão não apenas a vitória em cada etapa, mas também a melhor pontuação geral, visando o título de campeão do circuito.<br>Transmissão ao vivo pelo YouTube do Paraná Fishing.<br><a target='_blank' style='color:#ff0000;' href='https://www.youtube.com/@paranafishing_'>  <i class='fab fa-youtube'></i> Canal Paraná Fishing</a>"
           },
 
 
@@ -12742,7 +12742,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             address: "Rua Benedito Salles, 637, sala 7 - Carlopolis",
             contact: "(43) 99177-5226",
             instagram: "https://www.instagram.com/p/DT_IdBZDxlS/?img_index=4",
-            infoAdicional: "1ª Etapa do Caiaque Top Team 2026 Série Prata/Bronze<br>O Caiaque Top Team 2026 será realizado em 3 etapas, sendo a primeira no dia 28/03/2026, na Represa de Chavantes, em Carlópolis/PR.<br>Neste circuito, os caiaqueiros disputarão não apenas a vitória em cada etapa, mas também a melhor pontuação geral, visando o título de campeão do circuito.<br>Transmissão ao vivo pelo YouTube do Paraná Fishing."
+            infoAdicional: "1ª Etapa do Caiaque Top Team 2026 Série Prata/Bronze<br>O Caiaque Top Team 2026 será realizado em 3 etapas, sendo a primeira no dia 28/03/2026, na Represa de Chavantes, em Carlópolis/PR.<br>Neste circuito, os caiaqueiros disputarão não apenas a vitória em cada etapa, mas também a melhor pontuação geral, visando o título de campeão do circuito.<br>Transmissão ao vivo pelo YouTube do Paraná Fishing.<br><a target='_blank' style='color:#ff0000;' href='https://www.youtube.com/@paranafishing_'>  <i class='fab fa-youtube'></i> Canal Paraná Fishing</a>"
           },
 
 
@@ -13870,7 +13870,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             instagram: "https://www.instagram.com/lojathiagoaguera/",
             facebook: "https://www.facebook.com/thiagoagueraparanafishingteam",
             site: "https://thiagoaguera.com.br/",
-            infoAdicional: "Participe dos nossos grupos, acesse: <a target='_blank' style='color:#2da6ff;' href='https://linktr.ee/thiagoaguera?fbclid=PAZXh0bgNhZW0CMTEAAac0ZKqOBGEodhRS0HLfsGrN_c8ezIX72_c4icn9ZXQvUkI8_YfxE02fT-AJeQ_aem_GjbNm-TtqQr33uPA79l21Q'  >LinkTree</a>",
+            infoAdicional: "Participe dos nossos grupos, acesse: <a target='_blank' style='color:#2da6ff;' href='https://linktr.ee/thiagoaguera?fbclid=PAZXh0bgNhZW0CMTEAAac0ZKqOBGEodhRS0HLfsGrN_c8ezIX72_c4icn9ZXQvUkI8_YfxE02fT-AJeQ_aem_GjbNm-TtqQr33uPA79l21Q'  >LinkTree</a><br>Nosso Canal no YouTube:<br><a target='_blank' style='color:#ff0000;' href='https://www.youtube.com/@paranafishing_'>  <i class='fab fa-youtube'></i> Canal Paraná Fishing</a> ",
 
             novidadesImages: [
               "images/comercios/lojadepesca/thiago/divulgacao/1.jpg",
