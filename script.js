@@ -2618,8 +2618,8 @@ document.addEventListener("DOMContentLoaded", function () {
     feiradalua: "n",
     arenagoldenhits: "n",
 
-    pescar: "s",
-    bloquinhodoagro: "s",
+    pescar: "n",
+    bloquinhodoagro: "n",
     paranafishingcaiaquetopteam: "s",
     cafedamanhadosamigos: "s",
     "festadesaojose": "s",
@@ -12672,24 +12672,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/informacoes/eventos/8.jpg",
-            name: "Bloquinho do Agro",
-            date: "28/02/2026",
-            address: "Clube Caravela",
-            contact: "(43)99191-6037",
-            instagram: "https://www.instagram.com/p/DSa8T1WD9Z8/",
-            infoAdicional: "CountryBeat fazendo o chão tremer <br>🍺 Agro, música boa e energia lá em cima!"
-          },
-
-          {
-            image: "images/informacoes/eventos/7.jpg",
-            name: "Pescar",
-            date: "01/03/2026",
-            address: "Ilha do Ponciano",
-            instagram: "https://www.instagram.com/p/DTcy3uwAI2n/",
-            infoAdicional: " 21º PESCAR - 28 de fevereiro e 1º de março<br><a target='_blank' style='color:#2da6ff;' href='https://pescar2026.carlopolisdigital.com.br/?fbclid=PAb21jcAPu91hleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAaeYdq9yrDWsux-9eziXvpUi8ZMy7qhyOl4zuJ21_4Dq1ey3KAiOXvAzQUDXcA_aem_WOcr9vb6UNybZj8xfxee1w'  >Clique aqui para Inscrição</a> "
-          },
 
 
           {
