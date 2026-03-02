@@ -11027,15 +11027,15 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           {
             image: "images/comercios/salgados/sueli/perfil2.jpg",
             name: "Suh Salgados",
-            hours: "Seg a Sab: 12:00h as 18:00h",
+            hours: "Seg a Sab: 08:00h as 18:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "12:00", fim: "18:00" }],
-              ter: [{ inicio: "12:00", fim: "18:00" }],
-              qua: [{ inicio: "12:00", fim: "18:00" }],
-              qui: [{ inicio: "12:00", fim: "18:00" }],
-              sex: [{ inicio: "12:00", fim: "18:00" }],
-              sab: [{ inicio: "12:00", fim: "17:00" }],
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [{ inicio: "08:00", fim: "12:00" }],
               dom: []
             },
             address: "Somente Delivery",
