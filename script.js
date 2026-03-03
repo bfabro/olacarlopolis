@@ -2299,8 +2299,8 @@ document.addEventListener("DOMContentLoaded", function () {
     panacea: "s",
 
     // borracharia
-    vidanova: "n",
-    borrachariajr: "s",
+ 
+    borrachariajr: "n",
     // deposito de gas
     liagas: "s",
     cncasadogas: "s",
@@ -2446,7 +2446,7 @@ document.addEventListener("DOMContentLoaded", function () {
     obarateiro: "s",
     mercadodoze: "s",
     rocha: "s",
-    zerojapan: "s",
+    zerojapan: "n",
 
     // peixaria
     coopanorpi: "s",
@@ -9144,48 +9144,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
         establishments: [
 
 
-          {
-            image: "images/comercios/clinicaVeterinaria/sued/perfil.jpg",
-            name: "Sued Veterinária e Petshop",
-            hours: "Seg a Sex: 08:30h as 18:00h <br>Sab: 08:30h a 12:00h",
-            statusAberto: "a",
-            horarios: {
-
-              seg: [{ inicio: "08:30", fim: "18:00" }],
-              ter: [{ inicio: "08:30", fim: "18:00" }],
-              qua: [{ inicio: "08:30", fim: "18:00" }],
-              qui: [{ inicio: "08:30", fim: "18:00" }],
-              sex: [{ inicio: "08:30", fim: "18:00" }],
-              sab: [{ inicio: "08:30", fim: "12:00" }],
-              dom: [],
-            },
-            address: "Av. Elson Soares, 649 - Carlópolis",
-            contact: "(43) 98851-3310 ",
-
-            facebook: "https://www.facebook.com/clinicavetsued",
-            instagram: "https://www.instagram.com/clinicasued.vet/",
-            infoAdicional: "Agende o horario para banho e tosa!",
-            novidadesImages: [
-
-              "images/comercios/clinicaVeterinaria/sued/divulgacao/1.jpg",
-              "images/comercios/clinicaVeterinaria/sued/divulgacao/2.jpg",
-              "images/comercios/clinicaVeterinaria/sued/divulgacao/3.jpg",
-              "images/comercios/clinicaVeterinaria/sued/divulgacao/4.jpg",
-              "images/comercios/clinicaVeterinaria/sued/divulgacao/5.jpg",
-            ],
-
-            novidadesDescriptions: [
-              "Os gatos são animais independentes, mas isso não significa que não precisam de cuidados especiais! Se liga nessas 3 dicas para garantir o bem-estar do seu bichano:",
-              "Você sabia que manter a vacinação em dia é a forma mais eficaz de proteger seu pet contra doenças graves como raiva, leptospirose, cinomose e parvovirose?",
-              "🛁 Seu pet merece um banho cheio de carinho! 🐶💛 Nada como um banho relaxante pra deixar seu amigo de quatro patas limpinho, cheiroso e feliz! Além de remover sujeiras e odores, o banho também ajuda a manter a pele e os pelos saudáveis.",
-              "🐾 Castração é um ato de cuidado, amor e responsabilidade! Ao optar pela castração, você está garantindo mais saúde e bem-estar para o seu pet. Confira os principais benefícios",
-              "💚 Amor pelos pets e dedicação para cuidar de quem você mais ama! Aqui, cada consulta, banho ou procedimento é feito com o máximo de carinho e profissionalismo. Nosso compromisso é garantir o bem-estar e a saúde do seu melhor amigo.",
-
-
-            ],
-
-
-          },
+         
 
 
           {
@@ -10856,34 +10815,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
             ],
           },
 
-          {
-            image: "images/comercios/padaria/saoFrancisco/saoFrancisco.png",
-            name: "São Francisco",
-            hours: "Seg a Sab: 05:30h as 19:00h <br> Dom: 5:30h as 12:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "05:30", fim: "19:00" }],
-              ter: [{ inicio: "05:30", fim: "19:00" }],
-              qua: [{ inicio: "05:30", fim: "19:00" }],
-              qui: [{ inicio: "05:30", fim: "19:00" }],
-              sex: [{ inicio: "05:30", fim: "19:00" }],
-              sab: [{ inicio: "05:30", fim: "19:00" }],
-              dom: [{ inicio: "05:30", fim: "12:00" }],
-            },
-            address: "R. Benedito Salles, 881",
-            contact: "(43) 98873-1488",
-            delivery: "Sim / Com Taxa",
-            facebook: "#",
-            instagram: "#",
-            novidadesImages: [
-              "images/comercios/padaria/saoFrancisco/novidades/4.png",
-              "images/comercios/padaria/saoFrancisco/novidades/3.png",
-              "images/comercios/padaria/saoFrancisco/novidades/5.png",
-              "images/comercios/padaria/saoFrancisco/novidades/2.png",
-              "images/comercios/padaria/saoFrancisco/novidades/1.png",
-
-            ],
-          },
+          
 
 
 
@@ -14691,50 +14623,6 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
               "🍣 Joy (jyo ou Jow): o sushi que virou paixão nacional!<BR>Inspirado no gunkan maki, o Joy é um sushi envolto em salmão fresco, recheado com combinações cremosas e irresistíveis — como shimeji, camarão ou o clássico salmão com cream cheese.<Br>✨ No NamiGO, cada Joy é montado na hora, com cortes delicados e sabor que derrete na boca. Uma explosão de textura e frescor em cada mordida!",
               "🔥 Você já provou um verdadeiro Teppan-yaki?<Br>Tradicional e cheio de técnica, o teppan-yaki nasceu no Japão pós-guerra e conquistou o mundo com sua combinação de sabor, performance e frescor.<BR>Na chapa quente (teppan), carnes, legumes e frutos do mar ganham vida em uma explosão de aromas e texturas!<BR>🍱 No NamiGO, o teppan é preparado na hora, com ingredientes selecionados e aquele toque que transforma cada refeição em experiência.",
 
-
-            ],
-
-          },
-
-
-
-
-          {
-            image: "images/comercios/restaurante/oficinaSabor/perfil.png",
-            name: "Oficina do Sabor",
-            hours: "Dom a Dom: 10:30h as 14:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "10:30", fim: "14:00" }],
-              ter: [{ inicio: "10:30", fim: "14:00" }],
-              qua: [{ inicio: "10:30", fim: "14:00" }],
-              qui: [{ inicio: "10:30", fim: "14:00" }],
-              sex: [{ inicio: "10:30", fim: "14:00" }],
-              sab: [{ inicio: "10:30", fim: "14:00" }],
-              dom: [{ inicio: "10:30", fim: "14:00" }]
-            },
-
-            address: "Rua Capitão Estácio 604, Carlópolis",
-            contact: "(43) 99601-5543",
-            delivery: "Sim / Com Taxa",
-            instagram: "https://www.instagram.com/oficinadosabor_clps/",
-            facebook: "https://www.facebook.com/people/Oficina-do-Sabor/100051036652126/",
-
-
-            novidadesImages: [
-              "images/comercios/restaurante/oficinaSabor/divulgacao/1.png",
-              "images/comercios/restaurante/oficinaSabor/divulgacao/2.png",
-              "images/comercios/restaurante/oficinaSabor/divulgacao/3.png",
-              "images/comercios/restaurante/oficinaSabor/divulgacao/4.png",
-              "images/comercios/restaurante/oficinaSabor/divulgacao/5.png",
-
-            ],
-            novidadesDescriptions: [
-              "A COMIDA CASEIRA PASSANDO DE GERAÇÃO PARA GERAÇÃO!!",
-              "Espetinho de Quarta a Sexta",
-              "Você que procura aquele assado, aquela costela de qualidade para o seu almoço de domingo, encontrou o lugar certo!!!",
-              "Temos Marmitas! Confira os preços",
-              "Nossa famosa Maionese!",
 
             ],
 
