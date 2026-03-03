@@ -7163,6 +7163,24 @@ html {
   background: linear-gradient(45deg, #005fcc, #0099cc);
 }
 
+.cep-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+.cep-copy.inline{
+  padding:8px 10px;
+  border-radius:10px;
+  min-width:auto;
+}
+
+.cep-addr .cep-street{ margin-bottom:4px; }
+.cep-addr .cep-bairro{ opacity:.9; margin-bottom:4px; }
+.cep-addr .cep-city{ opacity:.9; }
+
 
 .corretor-banner {
  display: flex;
