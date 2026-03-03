@@ -6722,24 +6722,25 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         <div class="cep-bairro"><b>Bairro:</b> ${it.bairro || "—"}</div>
         <div class="cep-city">${it.localidade || ""}/${it.uf || ""}</div>
       </div>
-      <div class="cep-top">
-        <span class="cep-badge">CEP: <b>${cep}</b></span>
 
-       
 
-        <button class="cep-copy inline" data-cep="${cep}" type="button" title="Copiar CEP">
-           <i class="bx bx-copy"></i> Copiar CEP
-        </button>
-      </div>
 
-      
+     <div class="cep-top">
+  <div class="cep-left">
+    <span class="cep-badge">CEP: <b>${cep}</b></span>
 
-      <div class="cep-actions">
-        <a class="cep-map" target="_blank" rel="noopener"
-           href="https://www.google.com/maps/search/?api=1&query=${mapQ}">
-          <i class="bx bx-map"></i> Ver no mapa
-        </a>
-      </div>
+    <a class="cep-map-link" target="_blank" rel="noopener"
+       href="https://www.google.com/maps/search/?api=1&query=${mapQ}">
+      <i class="bx bx-map"></i> Ver no mapa
+    </a>
+  </div>
+
+  <button class="cep-copy inline" data-cep="${cep}" type="button" title="Copiar CEP">
+    <i class="bx bx-copy"></i> Copiar CEP
+  </button>
+</div>
+
+
     </div>
   `;
       }).join("");
@@ -6835,16 +6836,18 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
    <div class="cep-top">
-  <span class="cep-badge">CEP: <b>${cep}</b></span>
+  <div class="cep-left">
+    <span class="cep-badge">CEP: <b>${cep}</b></span>
+
+    <a class="cep-map-link" target="_blank" rel="noopener"
+       href="https://www.google.com/maps/search/?api=1&query=${mapQ}">
+      <i class="bx bx-map"></i> Ver no mapa
+    </a>
+  </div>
 
   <button class="cep-copy inline" data-cep="${cep}" type="button" title="Copiar CEP">
-     Copiar CEP
+    <i class="bx bx-copy"></i> Copiar CEP
   </button>
-
-  <a class="cep-map inline" target="_blank" rel="noopener"
-     href="https://www.google.com/maps/search/?api=1&query=${mapQ}">
-   Ver no mapa
-  </a>
 </div>
 
 

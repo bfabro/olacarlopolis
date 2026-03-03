@@ -7164,12 +7164,20 @@ html {
 }
 .cep-top{
   display:flex;
-  align-items:center;
-  justify-content:flex-start; /* agora são 3 itens na mesma linha */
-  gap:16px;
-  margin-bottom:8px;
-  flex-wrap: nowrap; /* força ficar na mesma linha */
-  margin-top: 5px;
+  align-items:flex-start;   /* 👈 alinha pelo topo (CEP e botão ficam na mesma linha) */
+  justify-content:space-between;
+  gap:12px;
+  margin: 5px 0 8px;
+}
+
+.cep-left{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.cep-copy.inline{
+  align-self:flex-start;    /* 👈 garante que o botão fique alinhado com o CEP */
 }
 
 .cep-badge{ 
@@ -7213,6 +7221,59 @@ html {
 
 .cep-badge b {
   color: #1f6feb;      /* azul: número do CEP */
+}
+
+/* ===== CEP - modo compacto em celulares pequenos ===== */
+@media (max-width: 380px){
+  .cep-top{
+    gap: 6px;
+  }
+
+  .cep-badge{
+    font-size: 12px;
+    padding: 6px 8px;
+    white-space: nowrap;
+  }
+
+  .cep-copy.inline,
+  .cep-map.inline{
+    padding: 6px 8px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* Some o texto e fica só o ícone */
+  .cep-copy.inline .btn-label,
+  .cep-map.inline .btn-label{
+    display: none;
+  }
+
+  /* ícones centralizados e com “cara de botão” */
+  .cep-copy.inline i,
+  .cep-map.inline i{
+    margin: 0;
+    font-size: 16px;
+  }
+}
+
+/* CEP: esquerda (numero + link) + direita (copiar) */
+.cep-left{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+/* Link "Ver no mapa" como link mesmo */
+.cep-map-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.cep-map-link:hover{
+  opacity: .85;
 }
 
 
