@@ -763,29 +763,35 @@
 
   <script>
     async function loadAllowedKeysFromScript() {
-      const res = await fetch('/script.js', { cache: 'no-store' });
-      const code = await res.text();
+      try {
+        const res = await fetch('/script.js', { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' ao buscar /script.js');
+        const code = await res.text();
 
-      // 1) BLOCO COMÉRCIOS: do começo até "// FIM COMERCIOS"
-      const ateFimComercios = code.split('// FIM COMERCIOS')[0] || '';
+        // 1) BLOCO COMÉRCIOS: do começo até "// FIM COMERCIOS"
+        const ateFimComercios = code.split('// FIM COMERCIOS')[0] || '';
 
-      // 2) BLOCO SERVIÇOS: entre "// INICIO SERVIÇOS" e "/// INICIO SETOR PUBLICO"
-      let blocoServ = '';
-      const iniServ = code.indexOf('// INICIO SERVIÇOS');
-      const iniSetorPublico = code.indexOf('/// INICIO SETOR PUBLICO');
-      if (iniServ !== -1 && iniSetorPublico !== -1 && iniSetorPublico > iniServ) {
-        blocoServ = code.slice(iniServ, iniSetorPublico);
+        // 2) BLOCO SERVIÇOS: entre "// INICIO SERVIÇOS" e "/// INICIO SETOR PUBLICO"
+        let blocoServ = '';
+        const iniServ = code.indexOf('// INICIO SERVIÇOS');
+        const iniSetorPublico = code.indexOf('/// INICIO SETOR PUBLICO');
+        if (iniServ !== -1 && iniSetorPublico !== -1 && iniSetorPublico > iniServ) {
+          blocoServ = code.slice(iniServ, iniSetorPublico);
+        }
+
+        // 3) extrai chaves no formato:  nome: "s"  |  nome: "n"
+        const rx = /(?:["']([^"']+)["']|([a-z0-9_]+))\s*:\s*"(?:s|n)"/gi;
+
+        const allow = new Set();
+        for (const m of ateFimComercios.matchAll(rx)) allow.add(m[1] || m[2]);
+        for (const m of blocoServ.matchAll(rx)) allow.add(m[1] || m[2]);
+
+        if (!allow.size) console.warn('[SYNC] allowedSet veio vazio. Vou deixar carregar sem filtro.');
+        return allow;
+      } catch (e) {
+        console.warn('[SYNC] Falha ao montar allowedSet a partir do /script.js. Vou deixar carregar sem filtro.', e);
+        return null;
       }
-
-      // 3) extrai chaves no formato:  nome: "s"  |  nome: "n"
-      const rx = /(?:["']([^"']+)["']|([a-z0-9_]+))\s*:\s*"(?:s|n)"/gi;
-
-      const allow = new Set();
-      for (const m of ateFimComercios.matchAll(rx)) allow.add(m[1] || m[2]);
-      for (const m of blocoServ.matchAll(rx)) allow.add(m[1] || m[2]);
-
-
-      return allow;
     }
   </script>
 
@@ -1032,6 +1038,7 @@
 
   <!-- Firebase + App -->
   <script type="module">
+
     // ==== SUA CONFIG DO FIREBASE (já colada por você) ====
     const firebaseConfig = {
       apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -1151,41 +1158,126 @@
         btnToggleInativos.textContent = window.__SHOW_INATIVOS__ ? 'Ver ativos ' : 'Ver inativos';
         applyViewAndFilter(); // só alterna a visualização (sem recarregar)
       };
+      // Sync agora é baseado em categories (mais confiável) e usa statusEstabelecimentos apenas para Pago/Em aberto
+      btnSync.onclick = () => doSyncFromScript();
 
-
-
-      // <-- NOVO: guarda globalmente
-      window.__ALLOWED__ = await loadAllowedKeysFromScript();
-
-      btnSync.onclick = () => doSyncFromScript(window.__ALLOWED__);
-
-      await doSyncFromScript(window.__ALLOWED__); // auto-sync ao abrir
+      try { await doSyncFromScript(); } catch (e) { console.error(e); }
       await loadTabela();
     }
 
 
-    function getComerciosFromStatus(map, allowedSet) {
-      const out = []; let i = 0;
-      for (const [id, val] of Object.entries(map || {})) {
-        if (allowedSet && !allowedSet.has(id)) continue;  // <-- filtro
-        i++;
-        out.push({
-          id,
-          name: id,
-          category: (val === "s" ? "Pago" : "Em aberto"),
-          sort: i
-        });
+    
+    // ===== SYNC baseado em categories =====
+    window.__CATEGORIES__ = null;
+
+    async function loadCategoriesFromMainScript() {
+      if (window.__CATEGORIES__) return window.__CATEGORIES__;
+      try {
+        const res = await fetch('/script.js', { cache: 'no-store' });
+        const code = await res.text();
+
+        const m = code.match(/const\s+categories\s*=\s*(\[[\s\S]*?\]);/m);
+        if (!m || !m[1]) {
+          console.warn('categories não encontrado em script.js');
+          return null;
+        }
+
+        let arrCode = m[1];
+        arrCode = arrCode.replace(/,(\s*[}\]])/g, '$1'); // remove vírgulas sobrando
+
+        const categories = (new Function('return (' + arrCode + ')'))();
+        window.__CATEGORIES__ = categories;
+        return categories;
+      } catch (e) {
+        console.error('Falha ao ler categories do script.js', e);
+        return null;
       }
+    }
+
+    function statusValForId(statusMap, id) {
+      if (!statusMap || !id) return "n";
+      if (statusMap[id] === "s" || statusMap[id] === "n") return statusMap[id];
+
+      // fallback comum: ids antigos sem hífen
+      const noHyphen = String(id).replace(/-/g, '');
+      if (statusMap[noHyphen] === "s" || statusMap[noHyphen] === "n") return statusMap[noHyphen];
+
+      return "n";
+    }
+
+    function canonicalIdFromAllowed(allowedSet, id) {
+      if (!allowedSet || !id) return null;
+
+      const raw = String(id).toLowerCase();
+      const rawDash = raw.replace(/_/g, '-');
+      const rawNoHyphen = raw.replace(/[^a-z0-9]/g, '');
+
+      const norm = normalizeNameLocal(raw);
+      const normDash = normalizeNameLocal(rawDash);
+      const normNoHyphen = norm.replace(/[^a-z0-9]/g, '');
+
+      const tries = [raw, rawDash, norm, normDash, rawNoHyphen, normNoHyphen];
+
+      for (const k of tries) {
+        if (allowedSet.has(k)) return k;
+      }
+      return null;
+    }
+
+    function getComerciosFromCategories(categories, statusMap, allowedSet) {
+      const out = [];
+      const seen = new Set();
+      let sort = 0;
+
+      (categories || []).forEach(cat => {
+        (cat.establishments || []).forEach(est => {
+          const idGuess =
+            est.nomeNormalizado ||
+            normalizeNameLocal(est.name || '');
+
+          if (!idGuess) return;
+
+          // ✅ Só entra se estiver na lista permitida (COMÉRCIOS + SERVIÇOS).
+          // Isso automaticamente exclui SETOR PÚBLICO.
+          const id = canonicalIdFromAllowed(allowedSet, idGuess);
+          if (!id) return;
+
+          if (seen.has(id)) return;
+          seen.add(id);
+
+          sort++;
+          const sVal = statusValForId(statusMap, id);
+
+          out.push({
+            id,
+            name: est.name || id,
+            category: (sVal === "s" ? "Pago" : "Em aberto"),
+            sort
+          });
+        });
+      });
+
       return out;
     }
 
 
-    async function doSyncFromScript(allowed) {
+    async function doSyncFromScript() {
+      try {
       const status = window.__STATUS__ || await loadStatusFromMainScript();
       if (!status) { alert('statusEstabelecimentos não encontrado (veja Console).'); return; }
 
-      const allowedSet = allowed || window.__ALLOWED__ || await loadAllowedKeysFromScript();
-      const locals = getComerciosFromStatus(status, allowedSet);
+      const categories = window.__CATEGORIES__ || await loadCategoriesFromMainScript();
+      if (!categories) { alert('categories não encontrado (veja Console).'); return; }
+
+      // ✅ permitido = só COMÉRCIOS + SERVIÇOS (exclui setor público)
+      const allowedSet = window.__ALLOWED__ || await loadAllowedKeysFromScript();
+      window.__ALLOWED__ = allowedSet;
+
+      const locals = getComerciosFromCategories(categories, status, allowedSet);
+      if (!locals.length) {
+        console.warn('Sync: nenhum estabelecimento elegível. Verifique IDs vs statusEstabelecimentos/allowedSet.');
+        alert('Sync não encontrou estabelecimentos para sincronizar. (Veja o Console)');
+      }
 
       const qMer = query(collection(db, 'merchants'), orderBy('sort'));
       const snap = await getDocs(qMer);
@@ -1195,29 +1287,44 @@
       for (const m of locals) {
         const ref = doc(db, 'merchants', m.id);
         const has = remote.get(m.id);
-        if (!has) {
-          await setDoc(ref, {
-            ...m,
-            entradaEm: serverTimestamp() // 👈 salva quando o cliente entrou
-          });
-          created++;
-        }
 
-        else {
+        if (!has) {
+          await setDoc(ref, { ...m, entradaEm: serverTimestamp() });
+          created++;
+        } else {
           const need = (has.name !== m.name) || (has.category !== m.category) || (has.sort !== m.sort);
-          if (need) { await updateDoc(ref, m); updated++; }
+          if (need) {
+            await updateDoc(ref, { name: m.name, category: m.category, sort: m.sort });
+            updated++;
+          }
         }
       }
+
       alert(`Sync concluído. Criados: ${created}, Atualizados: ${updated}.`);
+      } catch (e) {
+        console.error('Erro no Sync', e);
+        alert('Erro ao sincronizar: ' + (e && e.message ? e.message : e));
+      }
     }
 
-
-
     // ===== FIRESTORE HELPERS =====
+
     async function loadMerchants() {
+      const allowed = window.__ALLOWED__ ?? await loadAllowedKeysFromScript();
+      window.__ALLOWED__ = allowed;
+
+      // Se não conseguiu montar a lista permitida, NÃO mostramos Setor Público "por acidente".
+      if (!allowed || !allowed.size) {
+        console.warn('allowedSet vazio/indisponível — bloqueando exibição para evitar Setor Público.');
+        return [];
+      }
+
       const q = query(collection(db, 'merchants'), orderBy('sort'));
       const snap = await getDocs(q);
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // ✅ mostra só COMÉRCIOS + SERVIÇOS (exclui Setor Público mesmo que já esteja no Firestore)
+      return all.filter(m => !!canonicalIdFromAllowed(allowed, m.id));
     }
     // caminho: recebimentos/{ANO}/itens/{merchantId}
     function recebCol(year) {
@@ -1314,16 +1421,16 @@
 
       const year = selAno.value;
       const mySeq = ++window.__LOADSEQ__; // ✅ esta chamada é a "mais nova"
-
-      const allowed = window.__ALLOWED__ || await loadAllowedKeysFromScript();
-      if (mySeq !== window.__LOADSEQ__) return; // ✅ cancelou? sai
-
-
-
-
-      const merchantsAll = await loadMerchants();
+      const merchants = await loadMerchants();
       if (mySeq !== window.__LOADSEQ__) return; // ✅
-      const merchants = allowed ? merchantsAll.filter(m => allowed.has(m.id)) : merchantsAll;
+
+      if (!merchants.length) {
+        loaderBox.style.display = 'none';
+        tbody.innerHTML = '';
+        sumario.textContent = 'Nenhum cliente para exibir (somente Comércios + Serviços). Se isso não for esperado, verifique se /script.js está acessível e se os marcadores // FIM COMERCIOS e // INICIO SERVIÇOS / /// INICIO SETOR PUBLICO existem.';
+        return;
+      }
+
       const total = merchants.length;
       let carregados = 0;
 
@@ -2593,7 +2700,8 @@ ${linha}`;
 
 
 
-  </script>
+  
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>

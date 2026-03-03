@@ -2391,7 +2391,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // padaria
     bomjesus: "n",
-    esquinadopao: "s",
+    esquinadopao: "n",
     //saofrancisco:"s",
     prelie: "s",
 
@@ -2416,7 +2416,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pimentadoce: "s",
 
     //lanchonete
-    ocasarao: "s",
+    ocasarao: "n",
     ione: "s",
     cantinhodapraca: "s",
     caldodecanaamaral: "n",
@@ -2426,7 +2426,7 @@ document.addEventListener("DOMContentLoaded", function () {
     didog: "s",
     xisbauinea: "s",
     mycoffee: "s",
-    mrpotato: "s",
+    mrpotato: "n",
     noponto: "s",
 
     // material de construcao
@@ -2545,7 +2545,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // taxista
     sereia: "s",
-    dorivalmattos: "s",
+    dorivalmattos: "n",
     ederluis: "s",
 
     // VETERINARIO
