@@ -2382,7 +2382,7 @@ document.addEventListener("DOMContentLoaded", function () {
     mototaximodesto: "s",
 
     //motocenter
-    binhomotocenter: "s",
+    binhomotocenter: "n",
 
 
     //otica
