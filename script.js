@@ -2294,8 +2294,8 @@ document.addEventListener("DOMContentLoaded", function () {
     chaveirocentral: "s",
 
     //corretor de imoveis
-    cesar_imoveis:"s",
-    luis_imoveis:"s",
+    cesar_imoveis: "s",
+    luis_imoveis: "s",
 
 
     //confecção
@@ -2303,7 +2303,7 @@ document.addEventListener("DOMContentLoaded", function () {
     panacea: "s",
 
     // borracharia
- 
+
     borrachariajr: "n",
     // deposito de gas
     liagas: "s",
@@ -2377,7 +2377,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // mercearia
     seiza: "s",
 
-   
+
 
     //moveis
     movepar: "s",
@@ -2414,7 +2414,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //pizzaria
     fornalhapizzaria: "s",
     tonnypizzaria: "n",
-   
+
 
     // quitanda
     pimentadoce: "s",
@@ -2465,7 +2465,7 @@ document.addEventListener("DOMContentLoaded", function () {
     carlopolitana: "n",
 
     // relojoaria
-  
+
 
     // restaurantes
     assadaodorussao: "s",
@@ -2514,7 +2514,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO SERVIÇOS 
 
     //anuncio
-  
+
 
     //barbeiro
     luisbarbeiro: "s",
@@ -2611,7 +2611,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     funerariasaovicentedepaulo: "s",
     funerariabomjesus: "s",
- radarmeteorologico: "s",
+    radarmeteorologico: "s",
     // FIM NOTA DE FALECIMENTO
     // GRUPO WHATS
     carlopolis24hrs: "s",
@@ -6710,28 +6710,29 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
       stt.textContent = `Encontrados ${data.length} resultado(s).`;
+      out.innerHTML = data.map((it) => {
+        const cep = it.cep || "—";
+        const mapQ = encodeURIComponent(`${it.logradouro || ""}, ${it.localidade || ""} - ${it.uf || ""}`);
 
-out.innerHTML = data.map((it) => {
-  const cep = it.cep || "—";
-  const mapQ = encodeURIComponent(`${it.logradouro || ""}, ${it.localidade || ""} - ${it.uf || ""}`);
-
-  return `
+        return `
     <div class="cep-card-item">
+
+    <div class="cep-addr">
+        <div class="cep-street"><b>${it.logradouro || "—"}</b></div>
+        <div class="cep-bairro"><b>Bairro:</b> ${it.bairro || "—"}</div>
+        <div class="cep-city">${it.localidade || ""}/${it.uf || ""}</div>
+      </div>
       <div class="cep-top">
         <span class="cep-badge">CEP: <b>${cep}</b></span>
 
        
 
         <button class="cep-copy inline" data-cep="${cep}" type="button" title="Copiar CEP">
-  <i class="bx bx-copy"></i> Copiar CEP
-</button>
+           <i class="bx bx-copy"></i> Copiar CEP
+        </button>
       </div>
 
-      <div class="cep-addr">
-        <div class="cep-street"><b>${it.logradouro || "—"}</b></div>
-        <div class="cep-bairro">${it.bairro || "—"}</div>
-        <div class="cep-city">${it.localidade || ""}/${it.uf || ""}</div>
-      </div>
+      
 
       <div class="cep-actions">
         <a class="cep-map" target="_blank" rel="noopener"
@@ -6741,22 +6742,22 @@ out.innerHTML = data.map((it) => {
       </div>
     </div>
   `;
-}).join("");
+      }).join("");
 
-// copiar CEP (botão ao lado do número)
-out.querySelectorAll(".cep-copy").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const val = btn.getAttribute("data-cep") || "";
-    navigator.clipboard.writeText(val).then(() => {
-      stt.textContent = `CEP ${val} copiado.`;
-      if (typeof mostrarToast === "function") mostrarToast("✅ CEP copiado!");
-     btn.innerHTML = '<i class="bx bx-check"></i> Copiado!';
-setTimeout(() => (btn.innerHTML = '<i class="bx bx-copy"></i> Copiar CEP'), 1200);
-    }).catch(() => {
-      stt.textContent = "Não consegui copiar o CEP.";
-    });
-  });
-});
+      // copiar CEP (botão ao lado do número)
+      out.querySelectorAll(".cep-copy").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const val = btn.getAttribute("data-cep") || "";
+          navigator.clipboard.writeText(val).then(() => {
+            stt.textContent = `CEP ${val} copiado.`;
+            if (typeof mostrarToast === "function") mostrarToast("✅ CEP copiado!");
+            btn.innerHTML = '<i class="bx bx-check"></i> Copiado!';
+            setTimeout(() => (btn.innerHTML = '<i class="bx bx-copy"></i> Copiar CEP'), 1200);
+          }).catch(() => {
+            stt.textContent = "Não consegui copiar o CEP.";
+          });
+        });
+      });
 
     } catch (e) {
       console.error("ViaCEP erro:", e);
@@ -6818,53 +6819,55 @@ setTimeout(() => (btn.innerHTML = '<i class="bx bx-copy"></i> Copiar CEP'), 1200
       }
 
       stt.textContent = `Encontrados ${data.length} resultado(s).`;
-     out.innerHTML = data.map((it) => {
-  const cep = it.cep || "—";
-  const addr = `${it.logradouro || "—"}${it.bairro ? ", " + it.bairro : ""} — ${it.localidade || ""}/${it.uf || ""}`;
-  const mapQ = encodeURIComponent(`${it.logradouro || ""}, ${it.localidade || ""} - ${it.uf || ""}`);
+      out.innerHTML = data.map((it) => {
+        const cep = it.cep || "—";
+        const addr = `${it.logradouro || "—"}${it.bairro ? ", " + it.bairro : ""} — ${it.localidade || ""}/${it.uf || ""}`;
+        const mapQ = encodeURIComponent(`${it.logradouro || ""}, ${it.localidade || ""} - ${it.uf || ""}`);
 
-  return `
+        return `
   <div class="cep-card-item">
-    <div class="cep-top">
-      <span class="cep-badge">CEP: <b>${cep}</b></span>
 
-     
-      <button class="cep-copy inline" data-cep="${cep}" type="button" title="Copiar CEP">
-  <i class="bx bx-copy"></i> Copiar CEP
-</button>
-    </div>
-
-    <div class="cep-addr">
+  <div class="cep-addr">
       <div class="cep-street"><b>${it.logradouro || "—"}</b></div>
-      <div class="cep-bairro">${it.bairro || "—"}</div>
+      <div class="cep-bairro"><b>Bairro:</b> ${it.bairro || "—"}</div>
       <div class="cep-city">${it.localidade || ""}/${it.uf || ""}</div>
     </div>
 
-    <div class="cep-actions">
-      <a class="cep-map" target="_blank" rel="noopener"
-         href="https://www.google.com/maps/search/?api=1&query=${mapQ}">
-        <i class="bx bx-map"></i> Ver no mapa
-      </a>
-    </div>
+
+   <div class="cep-top">
+  <span class="cep-badge">CEP: <b>${cep}</b></span>
+
+  <button class="cep-copy inline" data-cep="${cep}" type="button" title="Copiar CEP">
+     Copiar CEP
+  </button>
+
+  <a class="cep-map inline" target="_blank" rel="noopener"
+     href="https://www.google.com/maps/search/?api=1&query=${mapQ}">
+   Ver no mapa
+  </a>
+</div>
+
+
+
   </div>
 `;
-}).join("");
+      }).join("");
 
-// copiar CEP
-out.querySelectorAll(".cep-copy").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const val = btn.getAttribute("data-cep") || "";
-    navigator.clipboard.writeText(val).then(() => {
-      stt.textContent = `CEP ${val} copiado.`;
-      // se você tiver toast no projeto:
-      if (typeof mostrarToast === "function") mostrarToast("✅ CEP copiado!");
-      btn.innerHTML = '<i class="bx bx-check"></i> Copiado!';
-      setTimeout(() => (btn.innerHTML = '<i class="bx bx-copy"></i> Copiar CEP'), 1200);
-    }).catch(() => {
-      stt.textContent = "Não consegui copiar o CEP.";
-    });
-  });
-});
+      // copiar CEP
+      out.querySelectorAll(".cep-copy").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const val = btn.getAttribute("data-cep") || "";
+          navigator.clipboard.writeText(val).then(() => {
+            stt.textContent = `CEP ${val} copiado.`;
+            // se você tiver toast no projeto:
+            if (typeof mostrarToast === "function") mostrarToast("✅ CEP copiado!");
+            btn.innerHTML = '<i class="bx bx-check"></i> Copiado!';
+            setTimeout(() => (btn.innerHTML = '<i class="bx bx-copy"></i> Copiar CEP'), 1200);
+          }).catch(() => {
+            stt.textContent = "Não consegui copiar o CEP.";
+          });
+        });
+      });
 
     } catch (err) {
       btn.disabled = false;
@@ -8476,7 +8479,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
 
 
 
-         
+
 
 
 
@@ -9148,7 +9151,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
         establishments: [
 
 
-         
+
 
 
           {
@@ -9641,7 +9644,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
             ],
           },
 
-          
+
 
 
 
@@ -10310,7 +10313,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
 
 
 
-          
+
 
 
 
@@ -10819,7 +10822,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
             ],
           },
 
-          
+
 
 
 
@@ -11275,7 +11278,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
         link: document.querySelector("#menuRelojoaria"),
         title: "Relojoaria",
         establishments: [
-          
+
         ],
       },
 
@@ -12439,7 +12442,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
         link: document.querySelector("#menuVeterinario"),
         title: "Veterinario",
         establishments: [
-        
+
           {
             name: "Jurandir Machado",
             contact: "(43) 99642-1494",
@@ -14714,7 +14717,7 @@ out.querySelectorAll(".cep-copy").forEach((btn) => {
 
 
 
-         
+
           {
             image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.jpg",
             name: "Restaurante da Di",

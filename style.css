@@ -7156,30 +7156,64 @@ html {
   font-weight: bold;
   cursor: pointer;
   width: 100%;
-  transition: 0.3s;
+  transition: 0.3s;font-size: 18px;
 }
 
 .cep-btn:hover {
   background: linear-gradient(45deg, #005fcc, #0099cc);
 }
-
 .cep-top{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:10px;
+  justify-content:flex-start; /* agora são 3 itens na mesma linha */
+  gap:16px;
   margin-bottom:8px;
+  flex-wrap: nowrap; /* força ficar na mesma linha */
+  margin-top: 5px;
+}
+
+.cep-badge{ 
+  white-space: nowrap; 
+  margin-right: auto; /* empurra os botões pra direita */
+}
+
+.cep-map.inline{
+  padding:8px 10px;
+  border-radius:10px;
+  text-decoration:none;
+  border: 1px solid #cfe0ff;
+  background:#eef3ff;
 }
 
 .cep-copy.inline{
   padding:8px 10px;
   border-radius:10px;
   min-width:auto;
+  border-block-color: deepskyblue;
 }
 
 .cep-addr .cep-street{ margin-bottom:4px; }
 .cep-addr .cep-bairro{ opacity:.9; margin-bottom:4px; }
 .cep-addr .cep-city{ opacity:.9; }
+
+/* CEP - cores para leitura rápida */
+.cep-addr .cep-bairro b { 
+  color: #ff0000;      /* laranja: "Bairro:" */
+}
+
+.cep-addr .cep-city { 
+  color: #0b7a2a;      /* verde: cidade/UF */
+  font-weight: 700;
+}
+
+.cep-badge { 
+  background: #eef3ff; 
+  border: 1px solid #cfe0ff;
+}
+
+.cep-badge b {
+  color: #1f6feb;      /* azul: número do CEP */
+}
 
 
 .corretor-banner {
