@@ -11014,12 +11014,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-
-      ////////
-
-
-
-
       {
         link: document.querySelector("#menuSalgadosFestas"),
         title: "Salgados para Festas",
@@ -11067,10 +11061,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
           }
         ]
       },
-
-      ///////
-
-
 
 
 
