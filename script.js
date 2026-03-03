@@ -2293,6 +2293,10 @@ document.addEventListener("DOMContentLoaded", function () {
     //chaveiro
     chaveirocentral: "s",
 
+    //corretor de imoveis
+    cesar_imoveis:"s",
+    luis_imoveis:"s",
+
 
     //confecção
 
