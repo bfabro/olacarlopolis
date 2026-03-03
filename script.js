@@ -2281,8 +2281,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // artesanato
-    judite: "n",
-    patymaosdeouro: "n",
+
 
     //calhas
     nelsoncalhas: "s",
@@ -2348,7 +2347,7 @@ document.addEventListener("DOMContentLoaded", function () {
     imobiliariacarlopolis: "s",
 
     // foodtruck
-    celeiro: "n",
+
 
     //funeraria
     cristorei: "s",
@@ -2374,7 +2373,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // mercearia
     seiza: "s",
 
-    radarmeteorologico: "s",
+   
 
     //moveis
     movepar: "s",
@@ -2411,7 +2410,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //pizzaria
     fornalhapizzaria: "s",
     tonnypizzaria: "n",
-    happyhour: "n",
+   
 
     // quitanda
     pimentadoce: "s",
@@ -2462,7 +2461,7 @@ document.addEventListener("DOMContentLoaded", function () {
     carlopolitana: "n",
 
     // relojoaria
-    relojoariamartini: "n",
+  
 
     // restaurantes
     assadaodorussao: "s",
@@ -2471,7 +2470,7 @@ document.addEventListener("DOMContentLoaded", function () {
     emporiosaovictor: "s",
     hime: "s",
     pesqueirodogalego: "s",
-    restauranteportal: "n",
+
     neia: "n",
     namigojapanese: "s",
     //oficinadosabor:"s",
@@ -2483,7 +2482,7 @@ document.addEventListener("DOMContentLoaded", function () {
     yingyang: "n",
 
     // produtos de limpeza
-    jmprodutosdelimpeza: "s",
+    jmprodutosdelimpeza: "n",
 
     funerariacristorei: "s",
     funerariagrupocastilho: "s",
@@ -2511,7 +2510,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INICIO SERVIÇOS 
 
     //anuncio
-    piodoanuncio: "n",
+  
 
     //barbeiro
     luisbarbeiro: "s",
@@ -2551,7 +2550,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // VETERINARIO
 
-    celsogolcalves: "s",
+
     jurandirmachado: "s",
 
 
@@ -2608,7 +2607,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     funerariasaovicentedepaulo: "s",
     funerariabomjesus: "s",
-
+ radarmeteorologico: "s",
     // FIM NOTA DE FALECIMENTO
     // GRUPO WHATS
     carlopolis24hrs: "s",
@@ -8415,78 +8414,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/comercios/artesanato/patricia/perfil.jpg",
-            name: "Paty Mãos De Ouro",
-            contact: "(43) 99954-0753",
-            hours: "Somente encomendas!",
-            infoAdicional: "<br>🧵 Serviços oferecidos:<br>👗 Bordados personalizados<br>🎨 Artesanato criativo<br>🎁 Lembrancinhas para datas especiais<br>🛍️ Presentes únicos feitos à mão<br>🏡 Itens decorativos<br>📦 Produtos sob encomenda<Br><br>📬 Entregas e Encomendas<br>Trabalho por encomenda e envio tudo com muito cuidado! Combinamos tudo certinho pelo WhatsApp<br><br>Cada peça é feita com amor e atenção aos detalhes — ideal para presentear, decorar ou guardar como lembrança! Se você procura algo único, artesanal e cheio de afeto, fale comigo. Vai ser um prazer criar algo para você!",
-            instagram: "https://www.instagram.com/patymaosdeouro/",
-            novidadesImages: [
-              "images/comercios/artesanato/patricia/divulgacao/1.jpg",
-              "images/comercios/artesanato/patricia/divulgacao/2.jpg",
-              "images/comercios/artesanato/patricia/divulgacao/3.jpg",
-              "images/comercios/artesanato/patricia/divulgacao/4.jpg",
-              "images/comercios/artesanato/patricia/divulgacao/5.jpg",
-              "images/comercios/artesanato/patricia/divulgacao/6.jpg",
-              "images/comercios/artesanato/patricia/divulgacao/7.jpg",
-              "images/comercios/artesanato/patricia/divulgacao/8.jpg",
-
-            ],
-            novidadesDescriptions: [
-              "Capas exclusivas para almofadas, produzidas artesanalmente e sob medida para o seu espaço. Perfeitas para presentear ou dar um toque especial à decoração.",
-              "Panos de prato bordados à mão, perfeitos para dar charme e personalidade à sua cozinha!",
-              "Aconchego e beleza em cada detalhe: capas de travesseiro feitas para você!",
-              "Dê um toque especial aos seus livros com marca páginas únicos, criados artesanalmente para encantar leitores de todas as idades.",
-              "Fraldinhas de ombro feitas à mão, um mimo indispensável para enxoval ou para presentear com carinho!",
-              "Fraldinhas de boca exclusivas, perfeitas para completar o enxoval ou presentear com afeto.",
-              "Sobre lençóis personalizados, confeccionados com atenção aos detalhes para proporcionar noites de sono ainda mais agradáveis.",
-              "Deixe seu banho ainda mais especial com toalhas personalizadas, únicas como você! Ideais para dar um toque pessoal ao seu dia a dia ou surpreender alguém querido.",
-
-
-            ],
-            promocoes: [
-              {
-                imagem: "images/comercios/artesanato/patricia/promocoes/1.jpg",
-                titulo: "Pano de prato - Flores ",
-                precoAntigo: 40.00,
-                preco: 35.00,
-                unidade: "A UNIDADE",
-                validadeFim: "2025-09-30",
-                obs: "Oferta válida até durar o estoque"
-              },
-
-              {
-                imagem: "images/comercios/artesanato/patricia/promocoes/2.jpg",
-                titulo: "Pano de prato - Frutas ",
-                precoAntigo: 40.00,
-                preco: 35.00,
-                unidade: "A UNIDADE",
-                validadeFim: "2025-09-28",
-                obs: "Oferta válida até durar o estoque"
-              },
-
-              {
-                imagem: "images/comercios/artesanato/patricia/promocoes/3.jpg",
-                titulo: "Pano de prato - Plantas ",
-                precoAntigo: 40.00,
-                preco: 35.00,
-                unidade: "A UNIDADE",
-                validadeFim: "2025-09-28",
-                obs: "Oferta válida até durar o estoque"
-              },
-
-              {
-                imagem: "images/comercios/artesanato/patricia/promocoes/4.jpg",
-                titulo: "Pano de prato - Melancia ",
-                precoAntigo: 40.00,
-                preco: 35.00,
-                unidade: "A UNIDADE",
-                validadeFim: "2025-09-28",
-                obs: "Oferta válida até durar o estoque"
-              }
-            ]
-          },
+         
 
 
 
@@ -9692,34 +9620,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             ],
           },
 
-          {
-            image: "images/comercios/lanchonete/celeiro/perfil.png",
-            name: "Celeiro",
-            hours: "Sex: 19:00h as 23:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [],
-              ter: [],
-              qua: [],
-              qui: [],
-              sex: [{ inicio: "19:00", fim: "23:00" }],
-              sab: [],
-              dom: []
-            },
-            infoAdicional: "Realizamos Eventos Particulares, Festas, servindo muitas variedades de espetinhos e temos tambem Chop!",
-            address: "Feira da Lua",
-            contact: "(43) 99965-2084",
-
-            novidadesImages: [
-              "images/comercios/lanchonete/celeiro/divulgacao/1.png",
-
-
-            ],
-            novidadesDescriptions: [
-              "Eventos Publicos",
-
-            ],
-          },
+          
 
 
 
@@ -10388,58 +10289,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/comercios/pizzaria/happyhour/perfil.jpg",
-            name: "Happy Hour",
-            hours: "Seg a Ter: 07:00h as 18:00h<br>Qua a Sex: 07:00 as 23:00<br>Sab: 07:00h as 14:00h - 18:00 as 23:00<br>Dom: 18:00h as 23:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "07:00", fim: "18:00" }],
-              ter: [{ inicio: "07:00", fim: "18:00" }],
-              qua: [{ inicio: "07:00", fim: "23:00" }],
-              qui: [{ inicio: "07:00", fim: "23:00" }],
-              sex: [{ inicio: "07:00", fim: "23:00" }],
-              sab: [{ inicio: "07:00", fim: "14:00" }, { inicio: "18:00", fim: "23:00" }],
-              dom: [{ inicio: "18:00", fim: "23:00" }],
-            },
-            address: "R. Kalil Keder, 753 - Carlopolis",
-            contact: "(43) 99636-3463",
-            delivery: "Sim / Com Taxa",
-
-            menuImages: [
-              "images/comercios/pizzaria/happyhour/cardapio/1.jpg",
-
-              "images/comercios/pizzaria/happyhour/cardapio/2.jpg",
-              "images/comercios/pizzaria/happyhour/cardapio/3.jpg",
-              "images/comercios/pizzaria/happyhour/cardapio/4.jpg",
-              "images/comercios/pizzaria/happyhour/cardapio/5.jpg",
-              "images/comercios/pizzaria/happyhour/cardapio/6.jpg",
-
-
-
-            ],
-
-
-            novidadesImages: [
-
-              "images/comercios/pizzaria/happyhour/divulgacao/1.jpg",
-              "images/comercios/pizzaria/happyhour/divulgacao/2.jpg",
-              "images/comercios/pizzaria/happyhour/divulgacao/3.jpg",
-              "images/comercios/pizzaria/happyhour/divulgacao/4.jpg",
-
-            ],
-            novidadesDescriptions: [
-
-              "",
-              "",
-              "",
-              "",
-              "",
-
-
-            ]
-          },
-
+          
 
 
 
@@ -11431,45 +11281,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuRelojoaria"),
         title: "Relojoaria",
         establishments: [
-          {
-            image: "images/comercios/relojoaria/martini/perfil.jpg",
-            name: "Relojoaria Martini",
-            hours: "Seg a Sex: 09:00h as 18:00h<br> Sab: 09:00h as 14:00h ",
-            statusAberto: " ",
-            horarios: {
-
-              seg: [{ inicio: "09:00", fim: "18:00" }],
-              ter: [{ inicio: "09:00", fim: "18:00" }],
-              qua: [{ inicio: "09:00", fim: "18:00" }],
-              qui: [{ inicio: "09:00", fim: "18:00" }],
-              sex: [{ inicio: "09:00", fim: "18:00" }],
-              sab: [{ inicio: "09:00", fim: "14:00" }],
-              dom: [], // fechado
-            },
-            address: "R. Benedito Salles, 1031 - Carlópolis",
-            contact: "(43) 99917-8632",
-            facebook: "https://www.facebook.com/vidracariamartini/",
-            instagram: "https://www.instagram.com/vidracariamartini/",
-            novidadesImages: [
-              "images/comercios/relojoaria/martini/divulgacao/1.jpg",
-              "images/comercios/relojoaria/martini/divulgacao/2.jpg",
-              "images/comercios/relojoaria/martini/divulgacao/3.jpg",
-              "images/comercios/relojoaria/martini/divulgacao/4.jpg",
-              "images/comercios/relojoaria/martini/divulgacao/5.jpg",
-              "images/comercios/relojoaria/martini/divulgacao/6.jpg",
-              //"images/comercios/relojoaria/martini/divulgacao/7.jpg",
-            ],
-            novidadesDescriptions: [
-              "A Relojoaria Martini oferece serviços completos para o seu relógio, como troca de baterias, ajuste de pulseiras, substituição de vidros, além de alianças de moeda, acessórios em prata 925 e venda de relógios. Com entrega rápida, qualidade garantida e atendimento em Carlópolis, solicite seu orçamento sem compromisso pelo WhatsApp!",
-              "Alianças a partir de R$ 139,00 o par, venha escolher o modelo e fazer aquela pessoa feliz",
-              "Trabalhamos com os Relogios Champion!",
-              "Consertamos o teu relogio, fazemos limpeza e entregamos como se fosse novo! faça um orçamento sem compromisso! ",
-              "Muitas peças em prata",
-              "Montamos o teu box do tamanho e jeito que quiser! nos chame para um orçamento!",
-
-
-            ],
-          },
+          
         ],
       },
 
@@ -12633,10 +12445,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         link: document.querySelector("#menuVeterinario"),
         title: "Veterinario",
         establishments: [
-          {
-            name: "Celso Golçalves",
-            contact: "(43) 98851-3310",
-          },
+        
           {
             name: "Jurandir Machado",
             contact: "(43) 99642-1494",
@@ -14955,34 +14764,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/comercios/restaurante/portal/portal.png",
-            name: "Resraurante Portal",
-            hours: "Seg a Sex: 11:30h as 14:00h - 19:00h as 21:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "11:30", fim: "14:00" }, { inicio: "19:00", fim: "21:00" }],
-              ter: [{ inicio: "11:30", fim: "14:00" }, { inicio: "19:00", fim: "21:00" }],
-              qua: [{ inicio: "11:30", fim: "14:00" }, { inicio: "19:00", fim: "21:00" }],
-              qui: [{ inicio: "11:30", fim: "14:00" }, { inicio: "19:00", fim: "21:00" }],
-              sex: [{ inicio: "11:30", fim: "14:00" }, { inicio: "19:00", fim: "21:00" }],
-              sab: [],
-              dom: []
-            },
-            address: "R. Benedito Salles, 2023 - Carlopolis",
-            contact: "(43) 3566-2174",
-            delivery: "Sim / Com Taxa",
-            infoAdicional: "Fica dentro do Hotel Portal",
-            site: "http://www.hotelportalpr.com.br/restaurante",
-            novidadesImages: [
-              "images/comercios/restaurante/portal/divulgacao/1.png",
-              "images/comercios/restaurante/portal/divulgacao/2.png",
-              "images/comercios/restaurante/portal/divulgacao/3.png",
-              "images/comercios/restaurante/portal/divulgacao/4.png",
-              "images/comercios/restaurante/portal/divulgacao/5.png",
-            ],
-
-          },
+         
           {
             image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.jpg",
             name: "Restaurante da Di",
