@@ -2526,6 +2526,9 @@ document.addEventListener("DOMContentLoaded", function () {
     flaviogiovani: "s",
     gustavinho: "s",
 
+    //corretor de imoveis
+    cesarmelo:"s",
+
     //diarista
     eliane: "s",
 
@@ -12054,6 +12057,26 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
               "Fogo, brasa e paixão: aqui o churrasco é tratado como arte!",
             ],
           },
+        ],
+      },
+
+      {
+        link: document.querySelector("#menuCorretorImoveis"),
+        title: "Corretor de Imoveis",
+        establishments: [
+
+
+          {
+            image: "images/servicos/corretorImoveis/cesar/perfil.jpg",
+            name: "Cesar Melo",
+            contact: "(43) 99678-9652",
+            instagram: "https://www.instagram.com/cesarmelo.corretor/",
+            infoAdicional:"Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
+            
+
+          },
+
+          
         ],
       },
 
