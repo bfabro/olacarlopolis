@@ -4494,7 +4494,7 @@ document.addEventListener("DOMContentLoaded", function () {
     <div class="onde-comer-info">
     
  <span class="onde-comer-categoria">
-  ${est.instagram ? `
+  ${est.categoria}${est.instagram ? `
     <a href="${fixInstagramUrl(est.instagram)}"
        class="card-divulgacao-ig-btn onde-comer-categoria-ig"
        data-ig="${fixInstagramUrl(est.instagram)}"
@@ -4504,7 +4504,7 @@ document.addEventListener("DOMContentLoaded", function () {
        onclick="registrarCliqueBotao('instagram_onde_comer', '${normalizeName(est.name)}', 'onde-comer')">
       <i class="fa-brands fa-instagram"></i>
     </a>
-  ` : ''}${est.categoria}
+  ` : ''}
 </span>${est.horarios ? `
    <span class="status-tag_comer ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
   ${estaAbertoAgora(est.horarios)
