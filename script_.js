@@ -4493,19 +4493,7 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
     <div class="onde-comer-info">
     
- <span class="onde-comer-categoria">
-  ${est.instagram ? `
-    <a href="${fixInstagramUrl(est.instagram)}"
-       class="card-divulgacao-ig-btn onde-comer-categoria-ig"
-       data-ig="${fixInstagramUrl(est.instagram)}"
-       aria-label="Abrir Instagram de ${est.name}"
-       target="_blank"
-       rel="noopener noreferrer"
-       onclick="registrarCliqueBotao('instagram_onde_comer', '${normalizeName(est.name)}', 'onde-comer')">
-      <i class="fa-brands fa-instagram"></i>
-    </a>
-  ` : ''}${est.categoria}
-</span>${est.horarios ? `
+      <span class="onde-comer-categoria">${est.categoria}</span> ${est.horarios ? `
    <span class="status-tag_comer ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
   ${estaAbertoAgora(est.horarios)
             ? `ABERTO <div class="ate-hora">até ${horarioFechamentoAtual(est.horarios) || '--:--'}</div>`
@@ -7504,7 +7492,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
     return s;
   }
 
- window.openInstagramSmart = function(instagramRaw) {
+  function openInstagramSmart(instagramRaw) {
     const webUrl = normalizeInstagramUrl(instagramRaw);
     if (!webUrl) return;
 

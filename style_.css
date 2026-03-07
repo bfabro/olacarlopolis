@@ -2924,34 +2924,11 @@ a:focus {
 }
 
 .onde-comer-categoria {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   color: #ff8800;
   font-weight: bold;
   font-size: 0.97em;
-}
-
-.onde-comer-categoria-ig {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #C13584;
-  text-decoration: none;
-  font-size:0.82em;
-  line-height: 1;
-}
-
-.onde-comer-categoria-texto {
-  display: inline-block;
-}
-
-.onde-comer-categoria-ig:hover {
-  transform: scale(1.08);
-}
-
-.onde-comer-categoria-ig:hover {
-  transform: scale(1.08);
+  margin-bottom: px;
+  display: block;
 }
 
 .btn-cardapio {
