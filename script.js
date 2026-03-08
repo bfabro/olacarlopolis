@@ -10059,6 +10059,8 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
             menuImages: [
                   "images/comercios/lanchonete/pontocerto/cardapio/1.jpg",
               "images/comercios/lanchonete/pontocerto/cardapio/2.jpg",
+                 "images/comercios/lanchonete/pontocerto/cardapio/3.jpg",
+              "images/comercios/lanchonete/pontocerto/cardapio/4.jpg",
             ],
           },
 
