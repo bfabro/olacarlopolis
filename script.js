@@ -12578,26 +12578,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-          {
-            image: "images/informacoes/eventos/20.jpg",
-            name: "2 Café Colonial Lar Sao Vicente",
-            date: "07/03/2026",
-            contact: "(43) 3566-1196",
-            address: "Lar Sao Vicente de Paulo - Rua Andrino Soares, 26, Centro",
-            instagram: "https://www.instagram.com/p/DUibKB9EfQF/",
-            infoAdicional: "CAFÉ COLONIAL ☕<br>Queridos amigos e comunidade, com muita alegria, anunciamos nosso 2° Café Colonial com Bingo! Dessa vez, está ainda mais especial pois o café acontecerá em nosso lar.<br>Anote aí:<br>📆 7 de março de 2026 | A partir das 15h<br>📍 Lar São Vicente de Paulo de Carlópolis<br>💲 R$35,00 (na compra do convite, ganhe 1 cartela para o bingo)<br>Teremos muitos prêmios imperdíveis e mais de 20 variedades no café. Venha participar e colaborar com nosso lar!"
-          },
-
-          {
-            image: "images/informacoes/eventos/5.jpg",
-            name: "Circuito Parana Fishing Saint",
-            date: "07/03/2026",
-            address: "Rua Benedito Salles, 637, sala 7 - Carlopolis",
-            contact: "(43) 99177-5226",
-            instagram: "https://www.instagram.com/p/DT_IdBZDxlS/?img_index=6",
-            infoAdicional: "O Circuito Paraná Fishing 2026 será realizado em 5 etapas, sendo a primeira no dia 31/01/2026 com apoio da SAINT, na Represa de Chavantes, em Carlópolis/PR.<br>Neste circuito, poderão competir até 3 pescadores por embarcação, que disputarão não apenas a vitória em cada etapa, mas também a melhor pontuação geral, visando o título de campeão do circuito.<br>Transmissão ao vivo pelo YouTube do Paraná Fishing.<br><a target='_blank' style='color:#ff0000;' href='https://www.youtube.com/@paranafishing_'>  <i class='fab fa-youtube'></i> Canal Paraná Fishing</a>"
-          },
-
 
 
 
