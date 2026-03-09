@@ -2631,14 +2631,14 @@ document.addEventListener("DOMContentLoaded", function () {
     paranafishingcaiaquetopteam: "s",
     cafedamanhadosamigos: "s",
     "festadesaojose": "s",
-    circuitoparanafishingsaint: "s",
+
     undokai2026: "s",
     cfccarlopolisfight: "s",
     festadaapae: "s",
     sunsetcaravela: "s",
     lowcity043fest: "s",
     "7encontrodemotociclistas-lobodafronteira": "s",
-    "2cafecoloniallarsaovicente": "s",
+    
     frutfest2026: "s",
     tooronagashi: "s",
 
