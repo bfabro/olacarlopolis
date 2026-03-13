@@ -2305,6 +2305,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // borracharia
 
     borrachariajr: "n",
+
+//bomba diesel
+carlopdiesel:"s",
+
+
     // deposito de gas
     liagas: "s",
     cncasadogas: "s",
@@ -13491,7 +13496,46 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
+{
+        link: document.querySelector("#menuBombaDiesel"),
+        title: "Bomba Diesel",
+        establishments: [
 
+
+
+          {
+            image: "images/comercios/bombaDiesel/carlopDiesel/perfil.jpg",
+            name: "Carlop Diesel",
+            hours: "Seg a Sex: 08:00h as 18:00h",
+            statusAberto: ".",
+            horarios: {
+              seg: [{ inicio: "08:00", fim: "18:00" }],
+              ter: [{ inicio: "08:00", fim: "18:00" }],
+              qua: [{ inicio: "08:00", fim: "18:00" }],
+              qui: [{ inicio: "08:00", fim: "18:00" }],
+              sex: [{ inicio: "08:00", fim: "18:00" }],
+              sab: [],
+              dom: [],
+            },
+            address: "Rua Gênova, 30 - Carlopolis",
+            contact: "(43) 99132-7434",
+            infoAdicional: "🏭 - Bomba e bicos injetora<br>⚡ - Injeção eletrônica<br>💻 - Serviço de Raster<br>🚛 - Caminhão<br>🚙 - Caminhonete<br>🚜 - Trator<br>🔋 - Gerador<br>📍 - Damos assistência no local que estiver",
+            instagram: "https://www.instagram.com/carlopdiesel/",
+            novidadesImages: [
+              "images/comercios/bombaDiesel/carlopDiesel/divulgacao/1.jpg",
+
+
+            ],
+            novidadesDescriptions: [
+              "",
+
+
+
+            ],
+
+          },
+        ],
+      },
 
 
 
