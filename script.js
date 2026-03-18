@@ -5888,13 +5888,16 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     // inicia grid + mapa
     stateImoveis.all = IM_DADOS.slice();
-    stateImoveis.filtered = stateImoveis.all.slice();
-    popularFiltroCorretor();
-    document.getElementById("filtroCorretor")
-      ?.addEventListener("change", aplicarFiltrosImoveis);
-    desenharGridImoveis(stateImoveis.filtered);
-    iniciarMapaImoveis();
-    plotarPinsImoveis(stateImoveis.filtered);
+stateImoveis.filtered = stateImoveis.all.slice();
+popularFiltroCorretor();
+atualizarContagemFiltroProcura();
+
+document.getElementById("filtroCorretor")
+  ?.addEventListener("change", aplicarFiltrosImoveis);
+
+desenharGridImoveis(stateImoveis.filtered);
+iniciarMapaImoveis();
+plotarPinsImoveis(stateImoveis.filtered);
   }
 
   const stateImoveis = { all: [], filtered: [], map: null, markers: [] };
@@ -5946,7 +5949,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       stateImoveis.filtered.sort((a, b) => {
         const A = isFechado(a.status) ? 1 : 0;
         const B = isFechado(b.status) ? 1 : 0;
-        if (A !== B) return A - B; // disponíveis (0) antes de vendidos (1)
+        if (A !== B) return A - B;
         return 0;
       });
     } else if (ordenacao === "preco_asc") {
@@ -5955,9 +5958,87 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
       stateImoveis.filtered.sort((a, b) => (b.valor || 0) - (a.valor || 0));
     }
 
-    desenharGridImoveis(stateImoveis.filtered);
-    plotarPinsImoveis(stateImoveis.filtered);
+    // 3) ATUALIZA CONTAGEM DOS FILTROS
+atualizarContagemFiltroProcura();
+popularFiltroCorretor();
+
+desenharGridImoveis(stateImoveis.filtered);
+plotarPinsImoveis(stateImoveis.filtered);
   }
+
+  function atualizarContagemFiltroProcura() {
+  const select = document.getElementById("filtroProcura");
+  if (!select) return;
+
+  const selecionadoAtual = select.value;
+
+  const tipo = document.getElementById("imTipo")?.value || "";
+  const q = parseInt(document.getElementById("imQuartos")?.value || 0, 10);
+  const p = parseInt(document.getElementById("imPreco")?.value || 0, 10);
+  const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
+  const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
+  const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
+
+  const isFechado = (st) => {
+    if (!st) return false;
+    const s = String(st).toLowerCase();
+    return s.includes("vendido") || s.includes("alugado") || s.includes("negociado");
+  };
+
+  const tipos = [
+    { value: "casa", label: "Casa" },
+    { value: "chacara", label: "Chacara" },
+    { value: "comercial", label: "Comercial" },
+    { value: "condominio", label: "Condomínio" },
+    { value: "galpao", label: "Galpão" },
+    { value: "represa", label: "Represa" },
+    { value: "sitio", label: "Sitio" },
+    { value: "terreno", label: "Terreno" }
+  ];
+
+  const contagem = {};
+  tipos.forEach(t => contagem[t.value] = 0);
+
+  // Conta usando TODOS os imóveis filtrados pelos outros filtros,
+  // mas IGNORANDO o filtroProcura atual
+  const baseParaContagem = stateImoveis.all.filter(im => {
+    const tipoOk = !tipo || im.tipo === tipo;
+    const qOk = !q || (im.quartos >= q);
+    const pOk = !p || (im.valor <= p);
+
+    const corretorOk =
+      !corretorSelecionado ||
+      (Array.isArray(im.corretores)
+        ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
+        : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
+
+    let amenOk = true;
+    if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
+    if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
+    if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
+
+    const disponivelOk = !somenteDisp || !isFechado(im.status);
+
+    return tipoOk && qOk && pOk && corretorOk && amenOk && disponivelOk;
+  });
+
+  baseParaContagem.forEach(im => {
+    const tipoProcura = String(im.procura || "").toLowerCase();
+    if (contagem.hasOwnProperty(tipoProcura)) {
+      contagem[tipoProcura]++;
+    }
+  });
+
+  select.innerHTML = `<option value="">Todos (${baseParaContagem.length})</option>`;
+
+  tipos.forEach(t => {
+    const option = document.createElement("option");
+    option.value = t.value;
+    option.textContent = `${t.label} (${contagem[t.value] || 0})`;
+    if (selecionadoAtual === t.value) option.selected = true;
+    select.appendChild(option);
+  });
+}
 
 
 
@@ -6396,24 +6477,79 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   }
 
   function popularFiltroCorretor() {
-    const sel = document.getElementById("filtroCorretor");
-    if (!sel) return;
+  const sel = document.getElementById("filtroCorretor");
+  if (!sel) return;
 
-    // Coleta TODOS os corretores (string ou array) e cria um conjunto único
-    const set = new Set();
-    stateImoveis.all.forEach(im => {
-      if (Array.isArray(im.corretores)) {
-        im.corretores.filter(Boolean).forEach(nome => set.add(String(nome).trim()));
-      } else if (im.corretor) {
-        set.add(String(im.corretor).trim());
-      }
+  const selecionadoAtual = sel.value || "";
+
+  const tipo = document.getElementById("imTipo")?.value || "";
+  const q = parseInt(document.getElementById("imQuartos")?.value || 0, 10);
+  const p = parseInt(document.getElementById("imPreco")?.value || 0, 10);
+  const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
+  const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
+  const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
+
+  const isFechado = (st) => {
+    if (!st) return false;
+    const s = String(st).toLowerCase();
+    return s.includes("vendido") || s.includes("alugado") || s.includes("negociado");
+  };
+
+  // base de contagem: aplica todos os filtros, MENOS o filtroCorretor
+  const baseParaContagem = stateImoveis.all.filter(im => {
+    const tipoOk = !tipo || im.tipo === tipo;
+    const qOk = !q || (im.quartos >= q);
+    const pOk = !p || (im.valor <= p);
+
+    const procuraOk =
+      !procuraSelecionado ||
+      (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
+
+    let amenOk = true;
+    if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
+    if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
+    if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
+
+    const disponivelOk = !somenteDisp || !isFechado(im.status);
+
+    return tipoOk && qOk && pOk && procuraOk && amenOk && disponivelOk;
+  });
+
+  const contagem = {};
+  const nomesOriginais = {};
+
+  baseParaContagem.forEach(im => {
+    let lista = [];
+
+    if (Array.isArray(im.corretores) && im.corretores.length) {
+      lista = im.corretores;
+    } else if (im.corretor) {
+      lista = [im.corretor];
+    }
+
+    lista.forEach(nome => {
+      const nomeLimpo = String(nome || "").trim();
+      if (!nomeLimpo) return;
+
+      const chave = nomeLimpo.toLowerCase();
+      contagem[chave] = (contagem[chave] || 0) + 1;
+      if (!nomesOriginais[chave]) nomesOriginais[chave] = nomeLimpo;
     });
+  });
 
-    // Limpa e recria opções (mantém "Todos")
-    sel.innerHTML = `<option value="">Todos</option>` +
-      Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"))
-        .map(nome => `<option value="${nome}">${nome}</option>`).join("");
-  }
+  const corretoresOrdenados = Object.keys(contagem)
+    .sort((a, b) => nomesOriginais[a].localeCompare(nomesOriginais[b], "pt-BR"));
+
+  sel.innerHTML = `<option value="">Todos (${baseParaContagem.length})</option>`;
+
+  corretoresOrdenados.forEach(chave => {
+    const option = document.createElement("option");
+    option.value = chave;
+    option.textContent = `${nomesOriginais[chave]} (${contagem[chave]})`;
+    if (selecionadoAtual === chave) option.selected = true;
+    sel.appendChild(option);
+  });
+}
 
   // Exemplo: após carregar os imóveis
   // stateImoveis.all = ... (carregou)
