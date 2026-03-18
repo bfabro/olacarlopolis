@@ -2534,6 +2534,7 @@ carlopdiesel:"s",
 
     //corretor de imoveis
     cesarmelo:"s",
+    luizvilasboas:"s",
 
     //diarista
     eliane: "s",
@@ -12056,6 +12057,17 @@ plotarPinsImoveis(stateImoveis.filtered);
             contact: "(43) 99678-9652",
             instagram: "https://www.instagram.com/cesarmelo.corretor/",
             infoAdicional:"<b>Creci:</b> 38.105 F <br>Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
+            
+
+          },
+
+
+              {
+            image: "images/servicos/corretorImoveis/luiz/perfil.jpg",
+            name: "Luiz Vilas Boas",
+            contact: "(43) 98803-4095",
+            instagram: "https://www.instagram.com/luizvbimoveis/",
+            infoAdicional:"<b>Creci:</b> 52.194 F <br>Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
             
 
           },
