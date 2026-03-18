@@ -1903,7 +1903,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   registrarAcesso();
 
-  const destaquesFixos = ["ederluis"
+  const destaquesFixos = [//"ederluis"
     // "hime",
     //    "seiza", "hime"
   ];
