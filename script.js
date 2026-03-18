@@ -4656,50 +4656,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   // ---------- IMÓVEIS 2.0 ---------- CADASTRO IMOVEIS
   const IM_DADOS = [
     // Substitua depois por dados do Firebase
-    {
-      id: "casa1v",
-      codRef: "C_001",
-      status: "vendido",
-      tipo: "venda",
-      //status: "disponível",
-      titulo: "Residencial Villa Ray (Horizonte 3)",
-      endereco: "Agende uma visita",
-      quartos: 2,
-      banheiros: 2,
-      vagas: 1,
-      salas: 1,
-      cozinhas: 1,
-      piscina: false,
-      churrasqueira: false,
-      area: 90,
-      construcao: 63,
-      valor: 230000,
-      suite: "1",
-      quintal: "Não",
-      telefone: "43 99678-9652",
-      imagens: [
-        "images/imoveis/cesar/venda/casa1/1.png",
-        "images/imoveis/cesar/venda/casa1/10.jpg",
-        "images/imoveis/cesar/venda/casa1/2.jpg",
-        "images/imoveis/cesar/venda/casa1/3.JPG",
-        "images/imoveis/cesar/venda/casa1/4.jpg",
-        "images/imoveis/cesar/venda/casa1/5.jpg",
-        "images/imoveis/cesar/venda/casa1/6.jpg",
-        "images/imoveis/cesar/venda/casa1/7.jpg",
-        "images/imoveis/cesar/venda/casa1/8.jpg",
-        "images/imoveis/cesar/venda/casa1/9.jpg",
-
-
-      ],
-      descricao: "Ambientes bem iluminados e ventilados, prontos para receber sua família. Documentação OK",
-
-      procura: "casa", // ou "terreno", "rural", etc.   
-
-      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-      corretores: ["Cesar Melo - 38.105 F"]
-
-    },
-
+    
 
     {
       id: "casa3v",
@@ -4783,139 +4740,14 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-    {
-      id: "casa6v",
-      codRef: "C_006",
-      status: "vendido",
-      tipo: "venda",
-      procura: "casa", // ou "terreno", "rural", etc.
-      quartos: 2,
-      valor: 320000,
-      piscina: false,
-      churrasqueira: "Sim",
-      vagas: 2,
-      corretores: ["Cesar Melo - 38.105 F"],
-      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-      ////////////////////////////////////////////////////////////
-      titulo: "Casa a venda com área gourmet",
-      descricao: "Documentação Ok.",
-      endereco: "Residencial Murador ",
-      suite: "Não",
-      banheiros: 2,
-      salas: 1,
-      cozinhas: 1,
-      area: 180,
-      construcao: 97,          // << NOVO: m² de construção
-      quintal: "Sim",
-      telefone: "43 99678-9652",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/cesar/venda/casa6/1.jpg",
-        "images/imoveis/cesar/venda/casa6/2.jpg",
-        "images/imoveis/cesar/venda/casa6/3.JPG",
-        "images/imoveis/cesar/venda/casa6/4.jpg",
-        "images/imoveis/cesar/venda/casa6/5.jpg",
-        "images/imoveis/cesar/venda/casa6/6.jpg",
-        "images/imoveis/cesar/venda/casa6/7.jpg",
-        "images/imoveis/cesar/venda/casa6/8.jpg",
-        "images/imoveis/cesar/venda/casa6/9.jpg",
-        "images/imoveis/cesar/venda/casa6/10.jpg",
-
-      ],
-      //lat: -23.3953,
-      //lng: -49.7232,
-
-    },
+    
 
 
-    {
-      id: "casa7v",
-      codRef: "C_007",
-      tipo: "venda",
-      status: "vendido",
-      procura: "casa", // ou "terreno", "rural", etc.
-      quartos: 3,
-      valor: 300000,
-      piscina: "Sim",
-      churrasqueira: false,
-      vagas: 2,
-      corretores: ["Cesar Melo - 38.105 F"],
-      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-      ////////////////////////////////////////////////////////////
-      titulo: "Casa com Piscina",
-      descricao: "Documentação Ok.",
-      endereco: "Residencial Murador ",
-      suite: "1",
-      banheiros: 3,
-      salas: 1,
-      cozinhas: 1,
-      area: 180,
-      construcao: 120,          // << NOVO: m² de construção
-      quintal: "Sim",
-      telefone: "43 99678-9652",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/cesar/venda/casa7/1.jpg",
-        "images/imoveis/cesar/venda/casa7/2.jpg",
-        "images/imoveis/cesar/venda/casa7/3.JPG",
-        "images/imoveis/cesar/venda/casa7/4.jpg",
-        "images/imoveis/cesar/venda/casa7/5.jpg",
-        "images/imoveis/cesar/venda/casa7/6.jpg",
-        "images/imoveis/cesar/venda/casa7/7.jpg",
-        "images/imoveis/cesar/venda/casa7/8.jpg",
-        "images/imoveis/cesar/venda/casa7/9.jpg",
-        "images/imoveis/cesar/venda/casa7/10.jpg",
-        "images/imoveis/cesar/venda/casa7/11.jpg",
-        "images/imoveis/cesar/venda/casa7/12.jpg",
-
-
-      ],
-      //lat: -23.3953,
-      //lng: -49.7232,
-
-    },
+    
 
 
 
-    {
-      id: "casa8v",
-      codRef: "C_008",
-      tipo: "venda",
-      status: "vendido",
-      procura: "casa", // ou "terreno", "rural", etc.
-      quartos: 3,
-      valor: 500000,
-      piscina: "Sim",
-      churrasqueira: "Sim",
-      vagas: 3,
-      corretores: ["Cesar Melo - 38.105 F"],
-      titulo: "Casa a venda mobiliada (chave na porta)",
-      descricao: "Conta com uma área de churrasqueira. Documentação Ok.",
-      endereco: "Novo Horizonte l",
-      suite: "Não",
-      banheiros: 2,
-      salas: 1,
-      cozinhas: 1,
-      area: 180,
-      construcao: 165,          // << NOVO: m² de construção
-      quintal: "Sim",
-      telefone: "43 99678-9652",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/cesar/venda/casa8/1.jpg",
-        "images/imoveis/cesar/venda/casa8/2.jpg",
-        "images/imoveis/cesar/venda/casa8/3.jpg",
-        "images/imoveis/cesar/venda/casa8/4.jpg",
-        "images/imoveis/cesar/venda/casa8/5.jpg",
-        "images/imoveis/cesar/venda/casa8/6.jpg",
-        "images/imoveis/cesar/venda/casa8/7.jpg",
-        "images/imoveis/cesar/venda/casa8/8.jpg",
-        "images/imoveis/cesar/venda/casa8/9.jpg",
-        "images/imoveis/cesar/venda/casa8/10.jpg",
-        "images/imoveis/cesar/venda/casa8/11.jpg",
-
-      ],
-      //lat: -23.3953,
-      //lng: -49.7232,
-
-    },
+    
 
 
 
@@ -5133,46 +4965,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
-    {
-      id: "casa15v",
-      codRef: "C_015",
-      tipo: "venda",
-      status: "vendido",
-      procura: "casa",
-      titulo: "Casa no Residencial Novo Horizonte III",
-      quartos: 2,
-      valor: 215000,
-      piscina: false,
-      churrasqueira: false,
-      vagas: 1,
-      corretores: ["Luiz Vilas Boas - 52.194"],
-      descricao: "Imóvel pronto para morar, bem planejado, terreno de esquina. Fica em um bairro tranquilo e valorizado, ideal para sair do aluguel. Aceita financiamento e negociações com carro ou terreno como parte do pagamento.",
-      endereco: "Novo Horizonte III",
-      suite: "Não",
-      banheiros: 1,
-      salas: 1,
-      cozinhas: 1,
-      area: 117,
-      construcao: 49,          // << NOVO: m² de construção
-      quintal: "Sim",
-      telefone: "43 98803-4095", // Corretor ou propretario
-      imagens: [
-        "images/imoveis/luiz/venda/casa2/01.jpeg",
-        "images/imoveis/luiz/venda/casa2/02.jpeg",
-        "images/imoveis/luiz/venda/casa2/03.jpeg",
-        "images/imoveis/luiz/venda/casa2/04.jpeg",
-        "images/imoveis/luiz/venda/casa2/05.jpeg",
-        "images/imoveis/luiz/venda/casa2/04.jpeg",
-        "images/imoveis/luiz/venda/casa2/07.jpeg",
-        "images/imoveis/luiz/venda/casa2/08.jpeg",
-        "images/imoveis/luiz/venda/casa2/09.jpeg",
-        "images/imoveis/luiz/venda/casa2/10.jpeg",
-        "images/imoveis/luiz/venda/casa2/11.jpeg",
-
-      ],
-
-
-    },
+   
 
     {
       id: "casa16v",
