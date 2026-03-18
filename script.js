@@ -2402,7 +2402,7 @@ carlopdiesel:"s",
     bomjesus: "n",
     esquinadopao: "n",
     //saofrancisco:"s",
-    prelie: "s",
+    prelie: "n",
 
     //produtosNaturais
     cantinhosaudavel: "s",
