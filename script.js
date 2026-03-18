@@ -12055,7 +12055,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             name: "Cesar Melo",
             contact: "(43) 99678-9652",
             instagram: "https://www.instagram.com/cesarmelo.corretor/",
-            infoAdicional:"Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
+            infoAdicional:"<b>Creci:</b> 38.105 F <br>Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
             
 
           },
