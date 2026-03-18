@@ -14786,6 +14786,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/marmitasdadiih/",
             novidadesImages: [
+                "images/comercios/restaurante/restauranteDaDi/divulgacao/0.jpg",
               "images/comercios/restaurante/restauranteDaDi/divulgacao/1.png",
               "images/comercios/restaurante/restauranteDaDi/divulgacao/2.png",
               "images/comercios/restaurante/restauranteDaDi/divulgacao/3.png",
@@ -14793,6 +14794,7 @@ plotarPinsImoveis(stateImoveis.filtered);
               "images/comercios/restaurante/restauranteDaDi/divulgacao/5.png",
             ],
             novidadesDescriptions: [
+              "",
               "Toda Quinta-feira temos Panqueca",
               "Toda Sexta-feira temos Parmegiana",
               "Todo Sabado temos Feijoada",
@@ -15890,6 +15892,16 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   document.getElementById("menuConsultaCEP").addEventListener("click", mostrarConsultaCEP);
 
+  //
+  //
+  //
+  //
+document.getElementById("menuCombustivel")?.addEventListener("click", function (e) {
+  e.preventDefault();
+  mostrarCombustivel();
+});
+  //
+  //
 
   const menuIgreenLuz = document.getElementById("menuEconomiaLuz");
   if (menuIgreenLuz) {
@@ -19483,7 +19495,164 @@ document.addEventListener("click", (e) => {
 });
 
 
+const COMBUSTIVEL_DADOS = {
+  atualizadoEm: "18/03/2026",
+  fonte: "ANP",
+  cidade: "Carlópolis / região",
+  cards: [
+    {
+      id: "gasolina-comum",
+      grupo: "Gasolina",
+      nome: "Gasolina Comum",
+      valor: "R$ 6,19",
+      detalhe: "Preço médio de referência",
+      icone: "fa-gas-pump",
+      destaque: "Mais buscado"
+    },
+    {
+      id: "gasolina-aditivada",
+      grupo: "Gasolina",
+      nome: "Gasolina Aditivada",
+      valor: "R$ 6,37",
+      detalhe: "Preço médio de referência",
+      icone: "fa-bolt",
+      destaque: "Aditivada"
+    },
+    {
+      id: "etanol",
+      grupo: "Etanol",
+      nome: "Etanol Hidratado",
+      valor: "R$ 4,28",
+      detalhe: "Preço médio de referência",
+      icone: "fa-leaf",
+      destaque: "Flex"
+    },
+    {
+      id: "diesel-s10",
+      grupo: "Diesel",
+      nome: "Diesel S10",
+      valor: "R$ 6,03",
+      detalhe: "Preço médio de referência",
+      icone: "fa-truck-front",
+      destaque: "S10"
+    },
+    {
+      id: "diesel-comum",
+      grupo: "Diesel",
+      nome: "Diesel Comum",
+      valor: "R$ 5,91",
+      detalhe: "Preço médio de referência",
+      icone: "fa-truck",
+      destaque: "Comum"
+    },
+    {
+      id: "glp",
+      grupo: "GLP / Gás",
+      nome: "Botijão 13kg",
+      valor: "R$ 102,90",
+      detalhe: "Preço médio de referência",
+      icone: "fa-fire-flame-curved",
+      destaque: "13kg"
+    }
+  ]
+};
 
+function renderizarValoresCombustivel() {
+  const box = document.getElementById("fuelResultados");
+  const status = document.getElementById("fuelStatus");
+  if (!box || !status) return;
 
+  const dados = COMBUSTIVEL_DADOS;
 
+  status.innerHTML = `
+    <div class="fuel-status-row">
+      <div class="fuel-status-pill">
+        <i class="fa-regular fa-calendar-check"></i>
+        Atualizado em <strong>${dados.atualizadoEm}</strong>
+      </div>
+      <div class="fuel-status-pill">
+        <i class="fa-solid fa-location-dot"></i>
+        ${dados.cidade}
+      </div>
+      <div class="fuel-status-pill">
+        <i class="fa-solid fa-shield-halved"></i>
+        Fonte: <strong>${dados.fonte}</strong>
+      </div>
+    </div>
+  `;
 
+  box.innerHTML = `
+    <div class="fuel-section-head">
+      <div>
+        <h3>Preços dos combustíveis</h3>
+        <p>Veja todos os principais valores em uma única tela.</p>
+      </div>
+      <div class="fuel-mini-badge">
+        6 itens
+      </div>
+    </div>
+
+    <div class="fuel-cards-grid">
+      ${dados.cards.map(item => `
+        <div class="fuel-card fuel-card--${item.id}">
+          <div class="fuel-card-top">
+            <div class="fuel-card-icon">
+              <i class="fa-solid ${item.icone}"></i>
+            </div>
+            <span class="fuel-card-tag">${item.destaque}</span>
+          </div>
+
+          <div class="fuel-card-group">${item.grupo}</div>
+          <h4 class="fuel-card-title">${item.nome}</h4>
+          <div class="fuel-card-price">${item.valor}</div>
+          <div class="fuel-card-detail">${item.detalhe}</div>
+        </div>
+      `).join("")}
+    </div>
+
+    <div class="fuel-bottom-note">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Os valores exibidos são médias de referência e podem variar entre postos e datas de coleta.</span>
+    </div>
+  `;
+}
+
+function mostrarCombustivel() {
+  const area = document.querySelector(".content_area");
+  if (!area) return;
+  if (location.hash !== "#combustivel") location.hash = "#combustivel";
+
+  area.innerHTML = `
+    <div class="fuel-wrap">
+      <div class="fuel-hero fuel-hero--premium">
+        <div class="fuel-hero-left">
+          <div class="fuel-hero-kicker">
+            <i class="fa-solid fa-gas-pump"></i>
+            Painel de Combustível
+          </div>
+
+          <h2 class="fuel-main-title">Combustíveis em destaque</h2>
+          <p class="fuel-subtitle">
+            Acompanhe de forma rápida os principais preços de gasolina, etanol, diesel e gás em uma única tela.
+          </p>
+        </div>
+
+        <div class="fuel-hero-right">
+          <div class="fuel-hero-stat">
+            <span class="fuel-hero-stat-label">Referência</span>
+            <strong>${COMBUSTIVEL_DADOS.fonte}</strong>
+          </div>
+          <div class="fuel-hero-stat">
+            <span class="fuel-hero-stat-label">Atualização</span>
+            <strong>${COMBUSTIVEL_DADOS.atualizadoEm}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div id="fuelStatus" class="fuel-status"></div>
+      <div id="fuelResultados" class="fuel-results"></div>
+    </div>
+  `;
+
+  renderizarValoresCombustivel();
+}
