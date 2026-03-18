@@ -2635,7 +2635,7 @@ carlopdiesel:"s",
     bloquinhodoagro: "n",
     paranafishingcaiaquetopteam: "s",
     cafedamanhadosamigos: "s",
-    "festadesaojose": "s",
+    "festadesaojose": "n",
 
     undokai2026: "s",
     cfccarlopolisfight: "s",
@@ -12583,18 +12583,6 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-
-
-
-          {
-            image: "images/informacoes/eventos/19.jpg",
-            name: "Festa de São José",
-            date: "13/03/2026",
-            contact: "(43)99960-9608",
-            address: "Paroquia São José Pantaleão",
-            instagram: "https://www.instagram.com/p/DUdDSD4FmUP/",
-            infoAdicional: "🙏 Festa de São José 🙏🎉<br>Haverá vendas de pastéis, mini pizza, refrigerante e bolo 🍰🥤🍕<br>🎁 Binguinho e Intens Show de Prêmios 🎁<br>1️⃣ Bicicleta aro 29<br>2️⃣ Celular<br>3️⃣ TV 32 polegadas<br>4️⃣ 💰 3 mil reais<br><br>👉 Venha participar, traga sua família e viva esse momento de fé, alegria e confraternização!<br>Pontos de vendas das cartelas do show de prêmios<br>@paroquiasaojosesaopantelea<br>@paroquiacarlopolis<br>@elizconceicao<br>@drogamaisjorginho<br>@starmaistech<br>@baggiocarlopolis<br>@funerariagrupocastilho"
-          },
 
 
           {
