@@ -13455,10 +13455,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
             ],
-            novidadesDescriptions: [
-              "",
-
-
+            novidadesDescriptions: [     "",
 
             ],
 
