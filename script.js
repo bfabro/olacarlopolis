@@ -9964,16 +9964,16 @@ plotarPinsImoveis(stateImoveis.filtered);
 {
             image: "images/comercios/lanchonete/pontocerto/perfil.jpg",
             name: "Ponto Certo",
-            hours: "Seg a Sex: 07:00h as 22:00h<br>Sab: 19:00h as 22:00h",
+            hours: "Seg a Sex: 07:30h as 22:00h<br>Sab:08:00 as 13:00 e 19:00h as 22:00h<br>Dom: 09:00h as 13:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "07:00", fim: "22:00" }],
-              ter: [{ inicio: "07:00", fim: "22:00" }],
-              qua: [{ inicio: "07:00", fim: "22:00" }],
-              qui: [{ inicio: "07:00", fim: "22:00" }],
-              sex: [{ inicio: "07:00", fim: "22:00" }],
-              sab: [{ inicio: "19:00", fim: "22:00" }],
-              dom: []
+              seg: [{ inicio: "07:30", fim: "22:00" }],
+              ter: [{ inicio: "07:30", fim: "22:00" }],
+              qua: [{ inicio: "07:30", fim: "22:00" }],
+              qui: [{ inicio: "07:30", fim: "22:00" }],
+              sex: [{ inicio: "07:30", fim: "22:00" }],
+              sab: [{ inicio: "08:00", fim: "13:00" }, { inicio: "19:00", fim: "22:00" },],
+              dom: [{ inicio: "09:00", fim: "13:00" }]
             },
             address: "Januario Francisco Falarz, 92 - Carlopolis",
             contact: "(43) 98849-8949",
