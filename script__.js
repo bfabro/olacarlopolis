@@ -2641,7 +2641,7 @@ carlopdiesel:"s",
     undokai2026: "s",
     cfccarlopolisfight: "s",
     festadaapae: "s",
-    sunsetcaravela: "s",
+ 
     lowcity043fest: "s",
     "7encontrodemotociclistas-lobodafronteira": "s",
     
@@ -11955,17 +11955,11 @@ plotarPinsImoveis(stateImoveis.filtered);
             image: "images/servicos/barbeiro/luis/luis.png",
             name: "Luis Barbeiro",
             contact: "(43) 99663-3256",
-
-             novidadesImages: [
-              "images/servicos/barbeiro/luis/luis.png",
-            
-
-            ],
-            novidadesDescriptions: [
-               ""
-            ],
           },
-         
+          {
+            name: "Antonia",
+            contact: "(43) 8901-2345",
+          },
         ],
       },
 
@@ -12063,14 +12057,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             contact: "(43) 99678-9652",
             instagram: "https://www.instagram.com/cesarmelo.corretor/",
             infoAdicional:"<b>Creci:</b> 38.105 F <br>Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
-            novidadesImages: [
-              "images/servicos/corretorImoveis/cesar/perfil.jpg",
             
-
-
-            ], novidadesDescriptions: [
-              " ",
-            ],
 
           },
 
@@ -12081,14 +12068,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             contact: "(43) 98803-4095",
             instagram: "https://www.instagram.com/luizvbimoveis/",
             infoAdicional:"<b>Creci:</b> 52.194 F <br>Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
-             novidadesImages: [
-              "images/servicos/corretorImoveis/luiz/perfil.jpg",
             
-
-
-            ], novidadesDescriptions: [
-              " ",
-            ],
 
           },
 
@@ -12121,17 +12101,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             hours: "Seg a Sab: 07:00h as 15:00h",
             contact: "(43) 99611-2211",
             instagram: "https://www.instagram.com/043_elianelemes",
-            infoAdicional: "✨ - Limpeza pós obra<br>🏢 - Limpeza de escritório<br>🛍️ - Limpeza de comércio<br>🏠 - Limpeza de residência<br>👕 - Passo roupa<br>💦 - Limpeza de vidros<br>📚 - Curso de limpeza e conservação ",
-         
-          novidadesImages: [
-              "images/servicos/diarista/eliane/perfil.jpg",
-            
-
-            ],
-            novidadesDescriptions: [
-               ""
-            ],
-         
+            infoAdicional: "✨ - Limpeza pós obra<br>🏢 - Limpeza de escritório<br>🛍️ - Limpeza de comércio<br>🏠 - Limpeza de residência<br>👕 - Passo roupa<br>💦 - Limpeza de vidros<br>📚 - Curso de limpeza e conservação "
           },
 
         ],
@@ -12262,21 +12232,6 @@ plotarPinsImoveis(stateImoveis.filtered);
             image: "images/servicos/fretes/erickson/erickson.png",
             name: "Erickson",
             contact: "(43) 99611-5261",
-                novidadesImages: [
-              "images/servicos/fretes/erickson/erickson.png",
-       
-
-
-
-
-            ],
-            novidadesDescriptions: [
-
-              "",
-
-
-            ],
-            
           },
         ],
       },
@@ -12544,22 +12499,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
           {
             name: "Jurandir Machado",
-            image: "images/servicos/veterinario/jurandir/perfil.jpg",
             contact: "(43) 99642-1494",
-                novidadesImages: [
-              "images/servicos/veterinario/jurandir/perfil.jpg",
-       
-
-
-
-
-            ],
-            novidadesDescriptions: [
-
-              "",
-
-
-            ],
           },
         ],
       },
@@ -12585,15 +12525,6 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
-
-          {
-            image: "images/informacoes/eventos/17.jpg",
-            name: "Sunset Caravela",
-            date: "21/03/2026",
-            address: "Caravela Clube",
-            instagram: "https://www.instagram.com/p/DUihXMYjQiL/",
-            infoAdicional: "🔥 DJ & Produtor Musical<br>🎧 +1 Milhão de streams nas plataformas<br>📻 Tocando em mais de 500 rádios pelo mundo<br>🌍 Suporte de DJs nacionais e internacionais<br>🚀 Um sucesso por onde passa — e sempre volta!"
-          },
 
           {
             image: "images/informacoes/eventos/4.jpg",
