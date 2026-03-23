@@ -2641,7 +2641,7 @@ carlopdiesel:"s",
     undokai2026: "s",
     cfccarlopolisfight: "s",
     festadaapae: "s",
-    sunsetcaravela: "s",
+  
     lowcity043fest: "s",
     "7encontrodemotociclistas-lobodafronteira": "s",
     
@@ -12586,14 +12586,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
-          {
-            image: "images/informacoes/eventos/17.jpg",
-            name: "Sunset Caravela",
-            date: "21/03/2026",
-            address: "Caravela Clube",
-            instagram: "https://www.instagram.com/p/DUihXMYjQiL/",
-            infoAdicional: "🔥 DJ & Produtor Musical<br>🎧 +1 Milhão de streams nas plataformas<br>📻 Tocando em mais de 500 rádios pelo mundo<br>🌍 Suporte de DJs nacionais e internacionais<br>🚀 Um sucesso por onde passa — e sempre volta!"
-          },
+     
 
           {
             image: "images/informacoes/eventos/4.jpg",
