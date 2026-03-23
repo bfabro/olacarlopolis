@@ -1903,7 +1903,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   registrarAcesso();
 
-  const destaquesFixos = [//"ederluis"
+  const destaquesFixos = ["ederluis"
     // "hime",
     //    "seiza", "hime"
   ];
@@ -2305,11 +2305,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // borracharia
 
     borrachariajr: "n",
-
-//bomba diesel
-carlopdiesel:"s",
-
-
     // deposito de gas
     liagas: "s",
     cncasadogas: "s",
@@ -2402,7 +2397,7 @@ carlopdiesel:"s",
     bomjesus: "n",
     esquinadopao: "n",
     //saofrancisco:"s",
-    prelie: "n",
+    prelie: "s",
 
     //produtosNaturais
     cantinhosaudavel: "s",
@@ -2534,7 +2529,6 @@ carlopdiesel:"s",
 
     //corretor de imoveis
     cesarmelo:"s",
-    luizvilasboas:"s",
 
     //diarista
     eliane: "s",
@@ -2636,15 +2630,15 @@ carlopdiesel:"s",
     bloquinhodoagro: "n",
     paranafishingcaiaquetopteam: "s",
     cafedamanhadosamigos: "s",
-    "festadesaojose": "n",
-
+    "festadesaojose": "s",
+    circuitoparanafishingsaint: "s",
     undokai2026: "s",
     cfccarlopolisfight: "s",
     festadaapae: "s",
     sunsetcaravela: "s",
     lowcity043fest: "s",
     "7encontrodemotociclistas-lobodafronteira": "s",
-    
+    "2cafecoloniallarsaovicente": "s",
     frutfest2026: "s",
     tooronagashi: "s",
 
@@ -2666,10 +2660,10 @@ carlopdiesel:"s",
   const novidades = document.getElementById("novidades");
   const subMenuLinks = document.querySelectorAll(".nav_link.sublink"); // Apenas subitens do menu
   const homeLink = document.querySelector(".nav_link[href='index.html']"); // Link "Início"
-  const searchInput = document.getElementById("searchTopbar") || document.getElementById("searchSidebar");
+  const searchInput = document.getElementById("searchSidebar");
   const overlay = document.querySelector("#overlay");
   const menuLinks = document.querySelectorAll(".sidebar .nav_link"); // Seleciona os itens do menu
-  const clearSearch = document.getElementById("clearTopbarSearch") || document.getElementById("clearSearch");
+  const clearSearch = document.getElementById("clearSearch");
 
 
 
@@ -2851,9 +2845,9 @@ carlopdiesel:"s",
   const gruposWhatsapp = [
     // Edite/adicione aqui:
     { id: "adegacuenca", nome: "Adega Cuenca Carlopolis", descricao: "Acesse e acompanhe nossas novidades e promoções", link: "https://chat.whatsapp.com/GeYROS9KhCOESMJ4n4jm9p", imagem: "images/informacoes/gruposWhats/7.jpg" },
-    { id: "amigosdopet", nome: "Amigos do Pet", descricao: "Aqui você encontra apoio para resgates, doações, adoções responsáveis e orientações gerais sobre animais. <br>🚫 Não é um grupo de vendas.", link: "https://chat.whatsapp.com/CEun2OPjZVpAuZ626DHA7U?mode=hq2tswi", imagem: "images/informacoes/gruposWhats/5.jpg" },
+    { id: "amigosdopet", nome: "Amigos do Pet", descricao: "Aqui você encontra apoio para resgates, doações, adoções responsáveis e orientações gerais sobre animais. <br>🚫 Não é um grupo de vendas.", link: " https://chat.whatsapp.com/FtIOQRQzHgw0gFYPnxoodS?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/5.jpg" },
     { id: "brechoAmigosPet", nome: "Brecho Amigos do Pet", descricao: "Vendas em prol de animais em risco", link: "https://chat.whatsapp.com/DW7AdwoVHIg8WfLaIqhGHa", imagem: "images/informacoes/gruposWhats/9.jpg" },
-    { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/BjTkHcyCgsh7atBAIFpq2T?mode=gi_t", imagem: "images/informacoes/gruposWhats/2.jpg" },
+    { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/JuvQ7V58aOXBP85fvxXtjl?mode=ems_wa_t", imagem: "images/informacoes/gruposWhats/2.jpg" },
     { id: "descontofacil", nome: "Farmacia Desconto Facil", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
     { id: "farmaciaVila", nome: "Farmacia da Vila", descricao: "Para vocês ficarem por dentro de todas as PROMOÇÕES e NOVIDADES aqui da Farmácia da Vila ❤️", link: "https://chat.whatsapp.com/DD4Q5CZVsXLGeraeSNjyhK?mode=wwt", imagem: "images/informacoes/gruposWhats/13.jpg" },
 
@@ -2863,13 +2857,13 @@ carlopdiesel:"s",
     { id: "oficinadeXadrez", nome: "Oficina Xadrez Carlopolis", descricao: "A Oficina de Xadrez tem como objetivo ensinar fundamentos, estimular o raciocínio lógico e desenvolver habilidades estratégicas por meio da prática do jogo", link: "https://chat.whatsapp.com/HAJ1N5n0BlK2IM3J8CUbpz?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/4.jpg" },
     { id: "soberanoLanches", nome: "Soberano Lanches", descricao: "Acompanhe nossas novidades e promoçoes", link: "https://chat.whatsapp.com/F2B9b5YGBvA0sEoqfe1ovW?mode=wwt", imagem: "images/informacoes/gruposWhats/12.jpg" },
 
-    { id: "lojaThiagoAgueraRifa", nome: "Loja Thiago Aguera - Rifa", descricao: "Grupo exclusivo para as rifas do Thiago Aguera.<br>Venda de materiais de pesca em até 12x no cartão.", link: "https://chat.whatsapp.com/FigQA9dAFTL0FT4Y0TCqyr?mode=hq2tcli", imagem: "images/informacoes/gruposWhats/11.jpg" },
+    { id: "lojaThiagoAgueraRifa", nome: "Loja Thiago Aguera - Rifa", descricao: "Grupo exclusivo para as rifas do Thiago Aguera.<br>Venda de materiais de pesca em até 12x no cartão.", link: "https://chat.whatsapp.com/EOXDZReaRDYLY3OOXmUYIt", imagem: "images/informacoes/gruposWhats/11.jpg" },
     // { id: "lojaThiagoAgueraOfertas", nome: "Loja Thiago Aguera - Ofertas", descricao: "Grupo exclusivo para as rifas do Thiago Aguera.<br>Venda de materiais de pesca em até 12x no cartão.", link: "https://tr.ee/EylHAMYMbS", imagem: "images/informacoes/gruposWhats/11.jpg"},
 
 
 
     { id: "seiza", nome: "Seiza Produtos Orientais", descricao: "Receba Novidades, Promoções e tambem informativos da loja.", link: "https://chat.whatsapp.com/CFr4ebifZzgE6fFu4CXb6F?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/6.jpg" },
-    { id: "vagasEmprego1", nome: "Vagas de Empregos e Cursos", descricao: "Acompanhe as vagas de empregos e Cusros pelo grupo.", link: "https://chat.whatsapp.com/Ir2mWV398uU4OLDRNfE4Vo", imagem: "images/informacoes/gruposWhats/10.jpg" },
+    { id: "vagasEmprego1", nome: "Vagas de Empregos 1", descricao: "Acompanhe as vagas de empregos pelo grupo.", link: "https://chat.whatsapp.com/EKbKwH3hnbHF85tUC2Nb8Q?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/10.jpg" },
 
 
   ];
@@ -4499,19 +4493,7 @@ carlopdiesel:"s",
     </div>
     <div class="onde-comer-info">
     
- <span class="onde-comer-categoria">
-  ${est.categoria}${est.instagram ? `
-    <a href="${fixInstagramUrl(est.instagram)}"
-       class="card-divulgacao-ig-btn onde-comer-categoria-ig"
-       data-ig="${fixInstagramUrl(est.instagram)}"
-       aria-label="Abrir Instagram de ${est.name}"
-       target="_blank"
-       rel="noopener noreferrer"
-       onclick="registrarCliqueBotao('instagram_onde_comer', '${normalizeName(est.name)}', 'onde-comer')">
-      <i class="fa-brands fa-instagram"></i>
-    </a>
-  ` : ''}
-</span>${est.horarios ? `
+      <span class="onde-comer-categoria">${est.categoria}</span> ${est.horarios ? `
    <span class="status-tag_comer ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
   ${estaAbertoAgora(est.horarios)
             ? `ABERTO <div class="ate-hora">até ${horarioFechamentoAtual(est.horarios) || '--:--'}</div>`
@@ -4657,7 +4639,50 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
   // ---------- IMÓVEIS 2.0 ---------- CADASTRO IMOVEIS
   const IM_DADOS = [
     // Substitua depois por dados do Firebase
-    
+    {
+      id: "casa1v",
+      codRef: "C_001",
+      status: "vendido",
+      tipo: "venda",
+      //status: "disponível",
+      titulo: "Residencial Villa Ray (Horizonte 3)",
+      endereco: "Agende uma visita",
+      quartos: 2,
+      banheiros: 2,
+      vagas: 1,
+      salas: 1,
+      cozinhas: 1,
+      piscina: false,
+      churrasqueira: false,
+      area: 90,
+      construcao: 63,
+      valor: 230000,
+      suite: "1",
+      quintal: "Não",
+      telefone: "43 99678-9652",
+      imagens: [
+        "images/imoveis/cesar/venda/casa1/1.png",
+        "images/imoveis/cesar/venda/casa1/10.jpg",
+        "images/imoveis/cesar/venda/casa1/2.jpg",
+        "images/imoveis/cesar/venda/casa1/3.JPG",
+        "images/imoveis/cesar/venda/casa1/4.jpg",
+        "images/imoveis/cesar/venda/casa1/5.jpg",
+        "images/imoveis/cesar/venda/casa1/6.jpg",
+        "images/imoveis/cesar/venda/casa1/7.jpg",
+        "images/imoveis/cesar/venda/casa1/8.jpg",
+        "images/imoveis/cesar/venda/casa1/9.jpg",
+
+
+      ],
+      descricao: "Ambientes bem iluminados e ventilados, prontos para receber sua família. Documentação OK",
+
+      procura: "casa", // ou "terreno", "rural", etc.   
+
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      corretores: ["Cesar Melo - 38.105 F"]
+
+    },
+
 
     {
       id: "casa3v",
@@ -4741,14 +4766,139 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
 
 
-    
+    {
+      id: "casa6v",
+      codRef: "C_006",
+      status: "vendido",
+      tipo: "venda",
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 2,
+      valor: 320000,
+      piscina: false,
+      churrasqueira: "Sim",
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"],
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      ////////////////////////////////////////////////////////////
+      titulo: "Casa a venda com área gourmet",
+      descricao: "Documentação Ok.",
+      endereco: "Residencial Murador ",
+      suite: "Não",
+      banheiros: 2,
+      salas: 1,
+      cozinhas: 1,
+      area: 180,
+      construcao: 97,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa6/1.jpg",
+        "images/imoveis/cesar/venda/casa6/2.jpg",
+        "images/imoveis/cesar/venda/casa6/3.JPG",
+        "images/imoveis/cesar/venda/casa6/4.jpg",
+        "images/imoveis/cesar/venda/casa6/5.jpg",
+        "images/imoveis/cesar/venda/casa6/6.jpg",
+        "images/imoveis/cesar/venda/casa6/7.jpg",
+        "images/imoveis/cesar/venda/casa6/8.jpg",
+        "images/imoveis/cesar/venda/casa6/9.jpg",
+        "images/imoveis/cesar/venda/casa6/10.jpg",
+
+      ],
+      //lat: -23.3953,
+      //lng: -49.7232,
+
+    },
 
 
-    
+    {
+      id: "casa7v",
+      codRef: "C_007",
+      tipo: "venda",
+      status: "vendido",
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 3,
+      valor: 300000,
+      piscina: "Sim",
+      churrasqueira: false,
+      vagas: 2,
+      corretores: ["Cesar Melo - 38.105 F"],
+      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
+      ////////////////////////////////////////////////////////////
+      titulo: "Casa com Piscina",
+      descricao: "Documentação Ok.",
+      endereco: "Residencial Murador ",
+      suite: "1",
+      banheiros: 3,
+      salas: 1,
+      cozinhas: 1,
+      area: 180,
+      construcao: 120,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa7/1.jpg",
+        "images/imoveis/cesar/venda/casa7/2.jpg",
+        "images/imoveis/cesar/venda/casa7/3.JPG",
+        "images/imoveis/cesar/venda/casa7/4.jpg",
+        "images/imoveis/cesar/venda/casa7/5.jpg",
+        "images/imoveis/cesar/venda/casa7/6.jpg",
+        "images/imoveis/cesar/venda/casa7/7.jpg",
+        "images/imoveis/cesar/venda/casa7/8.jpg",
+        "images/imoveis/cesar/venda/casa7/9.jpg",
+        "images/imoveis/cesar/venda/casa7/10.jpg",
+        "images/imoveis/cesar/venda/casa7/11.jpg",
+        "images/imoveis/cesar/venda/casa7/12.jpg",
+
+
+      ],
+      //lat: -23.3953,
+      //lng: -49.7232,
+
+    },
 
 
 
-    
+    {
+      id: "casa8v",
+      codRef: "C_008",
+      tipo: "venda",
+      status: "vendido",
+      procura: "casa", // ou "terreno", "rural", etc.
+      quartos: 3,
+      valor: 500000,
+      piscina: "Sim",
+      churrasqueira: "Sim",
+      vagas: 3,
+      corretores: ["Cesar Melo - 38.105 F"],
+      titulo: "Casa a venda mobiliada (chave na porta)",
+      descricao: "Conta com uma área de churrasqueira. Documentação Ok.",
+      endereco: "Novo Horizonte l",
+      suite: "Não",
+      banheiros: 2,
+      salas: 1,
+      cozinhas: 1,
+      area: 180,
+      construcao: 165,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 99678-9652",  // Corretor ou propretario
+      imagens: [
+        "images/imoveis/cesar/venda/casa8/1.jpg",
+        "images/imoveis/cesar/venda/casa8/2.jpg",
+        "images/imoveis/cesar/venda/casa8/3.jpg",
+        "images/imoveis/cesar/venda/casa8/4.jpg",
+        "images/imoveis/cesar/venda/casa8/5.jpg",
+        "images/imoveis/cesar/venda/casa8/6.jpg",
+        "images/imoveis/cesar/venda/casa8/7.jpg",
+        "images/imoveis/cesar/venda/casa8/8.jpg",
+        "images/imoveis/cesar/venda/casa8/9.jpg",
+        "images/imoveis/cesar/venda/casa8/10.jpg",
+        "images/imoveis/cesar/venda/casa8/11.jpg",
+
+      ],
+      //lat: -23.3953,
+      //lng: -49.7232,
+
+    },
 
 
 
@@ -4966,7 +5116,46 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     },
 
-   
+    {
+      id: "casa15v",
+      codRef: "C_015",
+      tipo: "venda",
+      status: "vendido",
+      procura: "casa",
+      titulo: "Casa no Residencial Novo Horizonte III",
+      quartos: 2,
+      valor: 215000,
+      piscina: false,
+      churrasqueira: false,
+      vagas: 1,
+      corretores: ["Luiz Vilas Boas - 52.194"],
+      descricao: "Imóvel pronto para morar, bem planejado, terreno de esquina. Fica em um bairro tranquilo e valorizado, ideal para sair do aluguel. Aceita financiamento e negociações com carro ou terreno como parte do pagamento.",
+      endereco: "Novo Horizonte III",
+      suite: "Não",
+      banheiros: 1,
+      salas: 1,
+      cozinhas: 1,
+      area: 117,
+      construcao: 49,          // << NOVO: m² de construção
+      quintal: "Sim",
+      telefone: "43 98803-4095", // Corretor ou propretario
+      imagens: [
+        "images/imoveis/luiz/venda/casa2/01.jpeg",
+        "images/imoveis/luiz/venda/casa2/02.jpeg",
+        "images/imoveis/luiz/venda/casa2/03.jpeg",
+        "images/imoveis/luiz/venda/casa2/04.jpeg",
+        "images/imoveis/luiz/venda/casa2/05.jpeg",
+        "images/imoveis/luiz/venda/casa2/04.jpeg",
+        "images/imoveis/luiz/venda/casa2/07.jpeg",
+        "images/imoveis/luiz/venda/casa2/08.jpeg",
+        "images/imoveis/luiz/venda/casa2/09.jpeg",
+        "images/imoveis/luiz/venda/casa2/10.jpeg",
+        "images/imoveis/luiz/venda/casa2/11.jpeg",
+
+      ],
+
+
+    },
 
     {
       id: "casa16v",
@@ -5889,16 +6078,13 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
 
     // inicia grid + mapa
     stateImoveis.all = IM_DADOS.slice();
-stateImoveis.filtered = stateImoveis.all.slice();
-popularFiltroCorretor();
-atualizarContagemFiltroProcura();
-
-document.getElementById("filtroCorretor")
-  ?.addEventListener("change", aplicarFiltrosImoveis);
-
-desenharGridImoveis(stateImoveis.filtered);
-iniciarMapaImoveis();
-plotarPinsImoveis(stateImoveis.filtered);
+    stateImoveis.filtered = stateImoveis.all.slice();
+    popularFiltroCorretor();
+    document.getElementById("filtroCorretor")
+      ?.addEventListener("change", aplicarFiltrosImoveis);
+    desenharGridImoveis(stateImoveis.filtered);
+    iniciarMapaImoveis();
+    plotarPinsImoveis(stateImoveis.filtered);
   }
 
   const stateImoveis = { all: [], filtered: [], map: null, markers: [] };
@@ -5950,7 +6136,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       stateImoveis.filtered.sort((a, b) => {
         const A = isFechado(a.status) ? 1 : 0;
         const B = isFechado(b.status) ? 1 : 0;
-        if (A !== B) return A - B;
+        if (A !== B) return A - B; // disponíveis (0) antes de vendidos (1)
         return 0;
       });
     } else if (ordenacao === "preco_asc") {
@@ -5959,87 +6145,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       stateImoveis.filtered.sort((a, b) => (b.valor || 0) - (a.valor || 0));
     }
 
-    // 3) ATUALIZA CONTAGEM DOS FILTROS
-atualizarContagemFiltroProcura();
-popularFiltroCorretor();
-
-desenharGridImoveis(stateImoveis.filtered);
-plotarPinsImoveis(stateImoveis.filtered);
+    desenharGridImoveis(stateImoveis.filtered);
+    plotarPinsImoveis(stateImoveis.filtered);
   }
-
-  function atualizarContagemFiltroProcura() {
-  const select = document.getElementById("filtroProcura");
-  if (!select) return;
-
-  const selecionadoAtual = select.value;
-
-  const tipo = document.getElementById("imTipo")?.value || "";
-  const q = parseInt(document.getElementById("imQuartos")?.value || 0, 10);
-  const p = parseInt(document.getElementById("imPreco")?.value || 0, 10);
-  const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
-  const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
-  const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
-
-  const isFechado = (st) => {
-    if (!st) return false;
-    const s = String(st).toLowerCase();
-    return s.includes("vendido") || s.includes("alugado") || s.includes("negociado");
-  };
-
-  const tipos = [
-    { value: "casa", label: "Casa" },
-    { value: "chacara", label: "Chacara" },
-    { value: "comercial", label: "Comercial" },
-    { value: "condominio", label: "Condomínio" },
-    { value: "galpao", label: "Galpão" },
-    { value: "represa", label: "Represa" },
-    { value: "sitio", label: "Sitio" },
-    { value: "terreno", label: "Terreno" }
-  ];
-
-  const contagem = {};
-  tipos.forEach(t => contagem[t.value] = 0);
-
-  // Conta usando TODOS os imóveis filtrados pelos outros filtros,
-  // mas IGNORANDO o filtroProcura atual
-  const baseParaContagem = stateImoveis.all.filter(im => {
-    const tipoOk = !tipo || im.tipo === tipo;
-    const qOk = !q || (im.quartos >= q);
-    const pOk = !p || (im.valor <= p);
-
-    const corretorOk =
-      !corretorSelecionado ||
-      (Array.isArray(im.corretores)
-        ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
-        : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
-
-    let amenOk = true;
-    if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
-    if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
-    if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
-
-    const disponivelOk = !somenteDisp || !isFechado(im.status);
-
-    return tipoOk && qOk && pOk && corretorOk && amenOk && disponivelOk;
-  });
-
-  baseParaContagem.forEach(im => {
-    const tipoProcura = String(im.procura || "").toLowerCase();
-    if (contagem.hasOwnProperty(tipoProcura)) {
-      contagem[tipoProcura]++;
-    }
-  });
-
-  select.innerHTML = `<option value="">Todos (${baseParaContagem.length})</option>`;
-
-  tipos.forEach(t => {
-    const option = document.createElement("option");
-    option.value = t.value;
-    option.textContent = `${t.label} (${contagem[t.value] || 0})`;
-    if (selecionadoAtual === t.value) option.selected = true;
-    select.appendChild(option);
-  });
-}
 
 
 
@@ -6478,79 +6586,24 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function popularFiltroCorretor() {
-  const sel = document.getElementById("filtroCorretor");
-  if (!sel) return;
+    const sel = document.getElementById("filtroCorretor");
+    if (!sel) return;
 
-  const selecionadoAtual = sel.value || "";
-
-  const tipo = document.getElementById("imTipo")?.value || "";
-  const q = parseInt(document.getElementById("imQuartos")?.value || 0, 10);
-  const p = parseInt(document.getElementById("imPreco")?.value || 0, 10);
-  const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
-  const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
-  const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
-
-  const isFechado = (st) => {
-    if (!st) return false;
-    const s = String(st).toLowerCase();
-    return s.includes("vendido") || s.includes("alugado") || s.includes("negociado");
-  };
-
-  // base de contagem: aplica todos os filtros, MENOS o filtroCorretor
-  const baseParaContagem = stateImoveis.all.filter(im => {
-    const tipoOk = !tipo || im.tipo === tipo;
-    const qOk = !q || (im.quartos >= q);
-    const pOk = !p || (im.valor <= p);
-
-    const procuraOk =
-      !procuraSelecionado ||
-      (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
-
-    let amenOk = true;
-    if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
-    if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
-    if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
-
-    const disponivelOk = !somenteDisp || !isFechado(im.status);
-
-    return tipoOk && qOk && pOk && procuraOk && amenOk && disponivelOk;
-  });
-
-  const contagem = {};
-  const nomesOriginais = {};
-
-  baseParaContagem.forEach(im => {
-    let lista = [];
-
-    if (Array.isArray(im.corretores) && im.corretores.length) {
-      lista = im.corretores;
-    } else if (im.corretor) {
-      lista = [im.corretor];
-    }
-
-    lista.forEach(nome => {
-      const nomeLimpo = String(nome || "").trim();
-      if (!nomeLimpo) return;
-
-      const chave = nomeLimpo.toLowerCase();
-      contagem[chave] = (contagem[chave] || 0) + 1;
-      if (!nomesOriginais[chave]) nomesOriginais[chave] = nomeLimpo;
+    // Coleta TODOS os corretores (string ou array) e cria um conjunto único
+    const set = new Set();
+    stateImoveis.all.forEach(im => {
+      if (Array.isArray(im.corretores)) {
+        im.corretores.filter(Boolean).forEach(nome => set.add(String(nome).trim()));
+      } else if (im.corretor) {
+        set.add(String(im.corretor).trim());
+      }
     });
-  });
 
-  const corretoresOrdenados = Object.keys(contagem)
-    .sort((a, b) => nomesOriginais[a].localeCompare(nomesOriginais[b], "pt-BR"));
-
-  sel.innerHTML = `<option value="">Todos (${baseParaContagem.length})</option>`;
-
-  corretoresOrdenados.forEach(chave => {
-    const option = document.createElement("option");
-    option.value = chave;
-    option.textContent = `${nomesOriginais[chave]} (${contagem[chave]})`;
-    if (selecionadoAtual === chave) option.selected = true;
-    sel.appendChild(option);
-  });
-}
+    // Limpa e recria opções (mantém "Todos")
+    sel.innerHTML = `<option value="">Todos</option>` +
+      Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"))
+        .map(nome => `<option value="${nome}">${nome}</option>`).join("");
+  }
 
   // Exemplo: após carregar os imóveis
   // stateImoveis.all = ... (carregou)
@@ -7439,7 +7492,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     return s;
   }
 
- window.openInstagramSmart = function(instagramRaw) {
+  function openInstagramSmart(instagramRaw) {
     const webUrl = normalizeInstagramUrl(instagramRaw);
     if (!webUrl) return;
 
@@ -9964,16 +10017,16 @@ plotarPinsImoveis(stateImoveis.filtered);
 {
             image: "images/comercios/lanchonete/pontocerto/perfil.jpg",
             name: "Ponto Certo",
-            hours: "Seg a Sex: 07:30h as 22:00h<br>Sab:08:00 as 13:00 e 19:00h as 22:00h<br>Dom: 09:00h as 13:00h",
+            hours: "Seg a Sex: 07:00h as 22:00h<br>Sab: 19:00h as 22:00h",
             statusAberto: ".",
             horarios: {
-              seg: [{ inicio: "07:30", fim: "22:00" }],
-              ter: [{ inicio: "07:30", fim: "22:00" }],
-              qua: [{ inicio: "07:30", fim: "22:00" }],
-              qui: [{ inicio: "07:30", fim: "22:00" }],
-              sex: [{ inicio: "07:30", fim: "22:00" }],
-              sab: [{ inicio: "08:00", fim: "13:00" }, { inicio: "19:00", fim: "22:00" },],
-              dom: [{ inicio: "09:00", fim: "13:00" }]
+              seg: [{ inicio: "07:00", fim: "22:00" }],
+              ter: [{ inicio: "07:00", fim: "22:00" }],
+              qua: [{ inicio: "07:00", fim: "22:00" }],
+              qui: [{ inicio: "07:00", fim: "22:00" }],
+              sex: [{ inicio: "07:00", fim: "22:00" }],
+              sab: [{ inicio: "19:00", fim: "22:00" }],
+              dom: []
             },
             address: "Januario Francisco Falarz, 92 - Carlopolis",
             contact: "(43) 98849-8949",
@@ -9994,8 +10047,6 @@ plotarPinsImoveis(stateImoveis.filtered);
             menuImages: [
                   "images/comercios/lanchonete/pontocerto/cardapio/1.jpg",
               "images/comercios/lanchonete/pontocerto/cardapio/2.jpg",
-                 "images/comercios/lanchonete/pontocerto/cardapio/3.jpg",
-              "images/comercios/lanchonete/pontocerto/cardapio/4.jpg",
             ],
           },
 
@@ -12056,18 +12107,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             name: "Cesar Melo",
             contact: "(43) 99678-9652",
             instagram: "https://www.instagram.com/cesarmelo.corretor/",
-            infoAdicional:"<b>Creci:</b> 38.105 F <br>Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
-            
-
-          },
-
-
-              {
-            image: "images/servicos/corretorImoveis/luiz/perfil.jpg",
-            name: "Luiz Vilas Boas",
-            contact: "(43) 98803-4095",
-            instagram: "https://www.instagram.com/luizvbimoveis/",
-            infoAdicional:"<b>Creci:</b> 52.194 F <br>Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
+            infoAdicional:"Veja meus imoveis disponiveis: <a target='_blank' style='color:#2e7d32;' href='https://www.olacarlopolis.com/#imoveis'> Acessar Link</a> ",
             
 
           },
@@ -12524,6 +12564,38 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
+          {
+            image: "images/informacoes/eventos/20.jpg",
+            name: "2 Café Colonial Lar Sao Vicente",
+            date: "07/03/2026",
+            contact: "(43) 3566-1196",
+            address: "Lar Sao Vicente de Paulo - Rua Andrino Soares, 26, Centro",
+            instagram: "https://www.instagram.com/p/DUibKB9EfQF/",
+            infoAdicional: "CAFÉ COLONIAL ☕<br>Queridos amigos e comunidade, com muita alegria, anunciamos nosso 2° Café Colonial com Bingo! Dessa vez, está ainda mais especial pois o café acontecerá em nosso lar.<br>Anote aí:<br>📆 7 de março de 2026 | A partir das 15h<br>📍 Lar São Vicente de Paulo de Carlópolis<br>💲 R$35,00 (na compra do convite, ganhe 1 cartela para o bingo)<br>Teremos muitos prêmios imperdíveis e mais de 20 variedades no café. Venha participar e colaborar com nosso lar!"
+          },
+
+          {
+            image: "images/informacoes/eventos/5.jpg",
+            name: "Circuito Parana Fishing Saint",
+            date: "07/03/2026",
+            address: "Rua Benedito Salles, 637, sala 7 - Carlopolis",
+            contact: "(43) 99177-5226",
+            instagram: "https://www.instagram.com/p/DT_IdBZDxlS/?img_index=6",
+            infoAdicional: "O Circuito Paraná Fishing 2026 será realizado em 5 etapas, sendo a primeira no dia 31/01/2026 com apoio da SAINT, na Represa de Chavantes, em Carlópolis/PR.<br>Neste circuito, poderão competir até 3 pescadores por embarcação, que disputarão não apenas a vitória em cada etapa, mas também a melhor pontuação geral, visando o título de campeão do circuito.<br>Transmissão ao vivo pelo YouTube do Paraná Fishing.<br><a target='_blank' style='color:#ff0000;' href='https://www.youtube.com/@paranafishing_'>  <i class='fab fa-youtube'></i> Canal Paraná Fishing</a>"
+          },
+
+
+
+
+          {
+            image: "images/informacoes/eventos/19.jpg",
+            name: "Festa de São José",
+            date: "13/03/2026",
+            contact: "(43)99960-9608",
+            address: "Paroquia São José Pantaleão",
+            instagram: "https://www.instagram.com/p/DUdDSD4FmUP/",
+            infoAdicional: "🙏 Festa de São José 🙏🎉<br>Haverá vendas de pastéis, mini pizza, refrigerante e bolo 🍰🥤🍕<br>🎁 Binguinho e Intens Show de Prêmios 🎁<br>1️⃣ Bicicleta aro 29<br>2️⃣ Celular<br>3️⃣ TV 32 polegadas<br>4️⃣ 💰 3 mil reais<br><br>👉 Venha participar, traga sua família e viva esse momento de fé, alegria e confraternização!<br>Pontos de vendas das cartelas do show de prêmios<br>@paroquiasaojosesaopantelea<br>@paroquiacarlopolis<br>@elizconceicao<br>@drogamaisjorginho<br>@starmaistech<br>@baggiocarlopolis<br>@funerariagrupocastilho"
+          },
 
 
           {
@@ -12639,7 +12711,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
-/*
+
 
       {
         link: document.querySelector("#menuFarmaciaPlantao"),
@@ -12647,8 +12719,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         establishments: [
 
 
-          /* [ 1 ] 
-          
+          /* [ 1 ] */
+          /*
               {
                 image: "images/comercios/farmacia/farmaciaDaVila/farmaciaDaVila.png",
                   name: "Farmacia da Vila",
@@ -12687,7 +12759,7 @@ plotarPinsImoveis(stateImoveis.filtered);
                   "Sabia que aqui na Farmacia da vila, voce pode estar pagando suas contas?",
                 ],
               },
-            
+            */
 
 
 
@@ -12695,7 +12767,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         ],
 
       },
-*/
+
 
       // INICIO SETOR PUBLICO
 
@@ -13425,43 +13497,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
-{
-        link: document.querySelector("#menuBombaDiesel"),
-        title: "Bomba Diesel",
-        establishments: [
 
-
-
-          {
-            image: "images/comercios/bombaDiesel/carlopDiesel/perfil.jpg",
-            name: "Carlop Diesel",
-            hours: "Seg a Sex: 08:00h as 18:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "08:00", fim: "18:00" }],
-              ter: [{ inicio: "08:00", fim: "18:00" }],
-              qua: [{ inicio: "08:00", fim: "18:00" }],
-              qui: [{ inicio: "08:00", fim: "18:00" }],
-              sex: [{ inicio: "08:00", fim: "18:00" }],
-              sab: [],
-              dom: [],
-            },
-            address: "Rua Gênova, 30 - Carlopolis",
-            contact: "(43) 99132-7434",
-            infoAdicional: "🏭 - Bomba e bicos injetora<br>⚡ - Injeção eletrônica<br>💻 - Serviço de Raster<br>🚛 - Caminhão<br>🚙 - Caminhonete<br>🚜 - Trator<br>🔋 - Gerador<br>📍 - Damos assistência no local que estiver",
-            instagram: "https://www.instagram.com/carlopdiesel/",
-            novidadesImages: [
-              "images/comercios/bombaDiesel/carlopDiesel/divulgacao/1.jpg",
-
-
-            ],
-            novidadesDescriptions: [     "",
-
-            ],
-
-          },
-        ],
-      },
 
 
 
@@ -14795,7 +14831,6 @@ plotarPinsImoveis(stateImoveis.filtered);
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/marmitasdadiih/",
             novidadesImages: [
-                "images/comercios/restaurante/restauranteDaDi/divulgacao/0.jpg",
               "images/comercios/restaurante/restauranteDaDi/divulgacao/1.png",
               "images/comercios/restaurante/restauranteDaDi/divulgacao/2.png",
               "images/comercios/restaurante/restauranteDaDi/divulgacao/3.png",
@@ -14803,7 +14838,6 @@ plotarPinsImoveis(stateImoveis.filtered);
               "images/comercios/restaurante/restauranteDaDi/divulgacao/5.png",
             ],
             novidadesDescriptions: [
-              "",
               "Toda Quinta-feira temos Panqueca",
               "Toda Sexta-feira temos Parmegiana",
               "Todo Sabado temos Feijoada",
@@ -15901,16 +15935,6 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   document.getElementById("menuConsultaCEP").addEventListener("click", mostrarConsultaCEP);
 
-  //
-  //
-  //
-  //
-document.getElementById("menuCombustivel")?.addEventListener("click", function (e) {
-  e.preventDefault();
-  mostrarCombustivel();
-});
-  //
-  //
 
   const menuIgreenLuz = document.getElementById("menuEconomiaLuz");
   if (menuIgreenLuz) {
@@ -15973,52 +15997,52 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
 
 
-  if (searchInput && clearSearch) {
-    searchInput.addEventListener("input", function () {
-      const termo = searchInput.value.toLowerCase().trim();
-      clearSearch.style.display = termo ? "flex" : "none";
+  searchInput.addEventListener("input", function () {
+    const termo = searchInput.value.toLowerCase().trim();
+    clearSearch.style.display = termo ? "inline-block" : "none";
 
-      // Esconde todos os separadores enquanto pesquisa
-      document.querySelectorAll(".separador-letra, .separadorr").forEach(sep => {
-        sep.style.display = termo ? "none" : "block";
-      });
+    // Esconde todos os separadores enquanto pesquisa
+    document.querySelectorAll(".separador-letra, .separadorr").forEach(sep => {
+      sep.style.display = termo ? "none" : "block";
+    });
 
-      // Para cada grupo/item do menu (inclui submenus e categorias principais)
-      document.querySelectorAll(".menu_items .item").forEach(item => {
-        let showItem = false;
+    // Para cada grupo/item do menu (inclui submenus e categorias principais)
+    document.querySelectorAll(".menu_items .item").forEach(item => {
+      let showItem = false;
 
-        // Procura todos os links dentro deste item
-        item.querySelectorAll(".nav_link").forEach(link => {
-          const texto = link.textContent.toLowerCase();
-          if (!termo || texto.includes(termo)) {
-            link.style.display = "flex";
-            showItem = true;
-          } else {
-            link.style.display = "none";
-          }
-        });
-
-        // Trata submenus
-        const submenu = item.querySelector(".submenu");
-        const submenuItem = item.querySelector(".submenu_item");
-
-        if (submenu) {
-          const visibleSublinks = item.querySelectorAll(".sublink");
-          const hasVisible = Array.from(visibleSublinks).some(
-            (sublink) => sublink.style.display !== "none"
-          );
-
-          submenu.style.display = hasVisible ? "block" : "none";
-          if (submenuItem) {
-            submenuItem.classList.toggle("show_submenu", hasVisible);
-          }
-          item.style.display = hasVisible ? "block" : "none";
+      // Procura todos os links dentro deste item
+      item.querySelectorAll(".nav_link").forEach(link => {
+        const texto = link.textContent.toLowerCase();
+        if (!termo || texto.includes(termo)) {
+          link.style.display = "flex";
+          showItem = true;
         } else {
-          item.style.display = showItem ? "block" : "none";
+          link.style.display = "none";
         }
       });
+
+      // Trata submenus
+      const submenu = item.querySelector(".submenu");
+      const submenuItem = item.querySelector(".submenu_item");
+
+      if (submenu) {
+        // Mostra submenu apenas se algum filho for visível
+        const visibleSublinks = item.querySelectorAll(".sublink");
+        const hasVisible = Array.from(visibleSublinks).some(
+          (sublink) => sublink.style.display !== "none"
+        );
+
+        submenu.style.display = hasVisible ? "block" : "none";
+        if (submenuItem) {
+          submenuItem.classList.toggle("show_submenu", hasVisible);
+        }
+        item.style.display = hasVisible ? "block" : "none";
+      } else {
+        // Se não é grupo, mostra apenas se o próprio item bate
+        item.style.display = showItem ? "block" : "none";
+      }
     });
-  }
+  });
 
 
 
@@ -16142,7 +16166,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     }
 
 
-    contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><ul>
+    contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><br><ul>
 
       
           
@@ -16786,165 +16810,8 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   });
 
 
-  function removerAcentosBusca(txt) {
-    return String(txt || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "")
-      .trim();
-  }
-
-  function abrirResultadoBusca(item) {
-    if (!item || !item.category) return;
-
-    const category = item.category;
-    location.hash = "#comercios-" + normalizeName(category.title);
-    if (category.link) category.link.click();
-
-    if (item.tipo === "local" && item.establishment) {
-      const idEst = item.establishment.nomeNormalizado || normalizeName(item.establishment.name || "");
-      setTimeout(() => {
-        const alvo = document.getElementById(idEst) || document.querySelector(`[data-id="${idEst}"]`);
-        if (alvo) {
-          alvo.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 450);
-    }
-  }
-
-  const buscaResultadosGlobais = document.getElementById("buscaResultadosGlobais");
-
-  function limparResultadosBuscaTopo() {
-    if (buscaResultadosGlobais) buscaResultadosGlobais.innerHTML = "";
-  }
-
-  function renderizarResultadosBuscaTopo(termoOriginal) {
-    if (!buscaResultadosGlobais) return;
-
-    const termo = removerAcentosBusca(termoOriginal);
-    if (!termo || termo.length < 2) {
-      limparResultadosBuscaTopo();
-      return;
-    }
-
-    const resultados = [];
-
-    categories.forEach((category) => {
-      const tituloCategoria = removerAcentosBusca(category.title);
-      if (tituloCategoria.includes(termo)) {
-        resultados.push({
-          tipo: "categoria",
-          titulo: category.title,
-          subtitulo: "Categoria",
-          category
-        });
-      }
-
-      if (Array.isArray(category.establishments)) {
-        category.establishments.forEach((est) => {
-          const nomeEst = removerAcentosBusca(est.name || est.nome || "");
-          if (nomeEst.includes(termo)) {
-            resultados.push({
-              tipo: "local",
-              titulo: est.name || est.nome || "Local",
-              subtitulo: `Em: ${category.title}`,
-              category,
-              establishment: est
-            });
-          }
-        });
-      }
-    });
-
-    if (!resultados.length) {
-      buscaResultadosGlobais.innerHTML = `
-        <div class="busca-resultado-box">
-          <div class="busca-resultado-titulo">Resultado da busca</div>
-          <p>Nenhum resultado encontrado para <strong>"${termoOriginal}"</strong>.</p>
-        </div>
-      `;
-      return;
-    }
-
-    buscaResultadosGlobais.innerHTML = `
-      <div class="busca-resultado-box">
-        <div class="busca-resultado-titulo">Resultado da busca</div>
-        <ul class="busca-lista">
-          ${resultados.map((item, index) => `
-            <li class="busca-item" data-index="${index}">
-              <strong>${item.titulo}</strong>
-              <span>${item.subtitulo}</span>
-            </li>
-          `).join("")}
-        </ul>
-      </div>
-    `;
-
-    buscaResultadosGlobais.querySelectorAll(".busca-item").forEach((itemEl) => {
-      itemEl.addEventListener("click", () => {
-        const item = resultados[Number(itemEl.dataset.index)];
-        abrirResultadoBusca(item);
-        limparResultadosBuscaTopo();
-      });
-    });
-  }
-
-  if (searchInput && clearSearch) {
-    searchInput.addEventListener("input", function () {
-      const valor = this.value.trim();
-      clearSearch.style.display = valor ? "flex" : "none";
-      renderizarResultadosBuscaTopo(valor);
-    });
-
-    clearSearch.addEventListener("click", function () {
-      searchInput.value = "";
-      clearSearch.style.display = "none";
-      limparResultadosBuscaTopo();
-    });
-  }
 
 
-
-
-
-
-
-(function () {
-  const barraBuscaGlobal = document.getElementById("buscaGlobalFixa");
-  const sidebar = document.querySelector(".sidebar");
-  const contentArea = document.querySelector(".content_area");
-  if (!barraBuscaGlobal || !sidebar || !contentArea) return;
-
-  function ajustarLarguraBuscaGlobal() {
-    if (window.innerWidth <= 1200) {
-      barraBuscaGlobal.classList.remove("sidebar-fechada");
-      barraBuscaGlobal.style.left = "";
-      barraBuscaGlobal.style.width = "";
-      return;
-    }
-
-    const sidebarFechada = sidebar.classList.contains("close");
-    barraBuscaGlobal.classList.toggle("sidebar-fechada", sidebarFechada);
-
-    const rect = contentArea.getBoundingClientRect();
-    barraBuscaGlobal.style.left = Math.max(0, rect.left) + "px";
-    barraBuscaGlobal.style.width = Math.max(0, rect.width) + "px";
-  }
-
-  let rafId = null;
-  function agendarAjuste() {
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(ajustarLarguraBuscaGlobal);
-  }
-
-  window.addEventListener("resize", agendarAjuste);
-  window.addEventListener("load", agendarAjuste);
-  agendarAjuste();
-
-  const observer = new MutationObserver(agendarAjuste);
-  observer.observe(sidebar, { attributes: true, attributeFilter: ["class"] });
-  observer.observe(contentArea, { attributes: true, attributeFilter: ["class", "style"] });
-})();
 
   ///// FIM AREA DE PAGAMENTO
 
@@ -19661,164 +19528,7 @@ document.addEventListener("click", (e) => {
 });
 
 
-const COMBUSTIVEL_DADOS = {
-  atualizadoEm: "18/03/2026",
-  fonte: "ANP",
-  cidade: "Carlópolis / região",
-  cards: [
-    {
-      id: "gasolina-comum",
-      grupo: "Gasolina",
-      nome: "Gasolina Comum",
-      valor: "R$ 6,19",
-      detalhe: "Preço médio de referência",
-      icone: "fa-gas-pump",
-      destaque: "Mais buscado"
-    },
-    {
-      id: "gasolina-aditivada",
-      grupo: "Gasolina",
-      nome: "Gasolina Aditivada",
-      valor: "R$ 6,37",
-      detalhe: "Preço médio de referência",
-      icone: "fa-bolt",
-      destaque: "Aditivada"
-    },
-    {
-      id: "etanol",
-      grupo: "Etanol",
-      nome: "Etanol Hidratado",
-      valor: "R$ 4,28",
-      detalhe: "Preço médio de referência",
-      icone: "fa-leaf",
-      destaque: "Flex"
-    },
-    {
-      id: "diesel-s10",
-      grupo: "Diesel",
-      nome: "Diesel S10",
-      valor: "R$ 6,03",
-      detalhe: "Preço médio de referência",
-      icone: "fa-truck-front",
-      destaque: "S10"
-    },
-    {
-      id: "diesel-comum",
-      grupo: "Diesel",
-      nome: "Diesel Comum",
-      valor: "R$ 5,91",
-      detalhe: "Preço médio de referência",
-      icone: "fa-truck",
-      destaque: "Comum"
-    },
-    {
-      id: "glp",
-      grupo: "GLP / Gás",
-      nome: "Botijão 13kg",
-      valor: "R$ 102,90",
-      detalhe: "Preço médio de referência",
-      icone: "fa-fire-flame-curved",
-      destaque: "13kg"
-    }
-  ]
-};
 
-function renderizarValoresCombustivel() {
-  const box = document.getElementById("fuelResultados");
-  const status = document.getElementById("fuelStatus");
-  if (!box || !status) return;
 
-  const dados = COMBUSTIVEL_DADOS;
 
-  status.innerHTML = `
-    <div class="fuel-status-row">
-      <div class="fuel-status-pill">
-        <i class="fa-regular fa-calendar-check"></i>
-        Atualizado em <strong>${dados.atualizadoEm}</strong>
-      </div>
-      <div class="fuel-status-pill">
-        <i class="fa-solid fa-location-dot"></i>
-        ${dados.cidade}
-      </div>
-      <div class="fuel-status-pill">
-        <i class="fa-solid fa-shield-halved"></i>
-        Fonte: <strong>${dados.fonte}</strong>
-      </div>
-    </div>
-  `;
 
-  box.innerHTML = `
-    <div class="fuel-section-head">
-      <div>
-        <h3>Preços dos combustíveis</h3>
-        <p>Veja todos os principais valores em uma única tela.</p>
-      </div>
-      <div class="fuel-mini-badge">
-        6 itens
-      </div>
-    </div>
-
-    <div class="fuel-cards-grid">
-      ${dados.cards.map(item => `
-        <div class="fuel-card fuel-card--${item.id}">
-          <div class="fuel-card-top">
-            <div class="fuel-card-icon">
-              <i class="fa-solid ${item.icone}"></i>
-            </div>
-            <span class="fuel-card-tag">${item.destaque}</span>
-          </div>
-
-          <div class="fuel-card-group">${item.grupo}</div>
-          <h4 class="fuel-card-title">${item.nome}</h4>
-          <div class="fuel-card-price">${item.valor}</div>
-          <div class="fuel-card-detail">${item.detalhe}</div>
-        </div>
-      `).join("")}
-    </div>
-
-    <div class="fuel-bottom-note">
-      <i class="fa-solid fa-circle-info"></i>
-      <span>Os valores exibidos são médias de referência e podem variar entre postos e datas de coleta.</span>
-    </div>
-  `;
-}
-
-function mostrarCombustivel() {
-  const area = document.querySelector(".content_area");
-  if (!area) return;
-  if (location.hash !== "#combustivel") location.hash = "#combustivel";
-
-  area.innerHTML = `
-    <div class="fuel-wrap">
-      <div class="fuel-hero fuel-hero--premium">
-        <div class="fuel-hero-left">
-          <div class="fuel-hero-kicker">
-            <i class="fa-solid fa-gas-pump"></i>
-            Painel de Combustível
-          </div>
-
-          <h2 class="fuel-main-title">Combustíveis em destaque</h2>
-          <p class="fuel-subtitle">
-            Acompanhe de forma rápida os principais preços de gasolina, etanol, diesel e gás em uma única tela.
-          </p>
-        </div>
-
-        <div class="fuel-hero-right">
-          <div class="fuel-hero-stat">
-            <span class="fuel-hero-stat-label">Referência</span>
-            <strong>${COMBUSTIVEL_DADOS.fonte}</strong>
-          </div>
-          <div class="fuel-hero-stat">
-            <span class="fuel-hero-stat-label">Atualização</span>
-            <strong>${COMBUSTIVEL_DADOS.atualizadoEm}</strong>
-          </div>
-        </div>
-      </div>
-
-      <div id="fuelStatus" class="fuel-status"></div>
-      <div id="fuelResultados" class="fuel-results"></div>
-    </div>
-  `;
-
-  renderizarValoresCombustivel();
-}
