@@ -514,6 +514,13 @@ body {
 
 
 
+/* VOLTAR AQUI */
+@media screen and (max-width: 768px) { 
+.menu_content {
+  position: relative;
+    height: 100%;
+    top:-64px;
+}}
 
 .content_area {
   margin-left: 268px;
