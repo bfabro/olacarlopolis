@@ -36,8 +36,8 @@ body {
   color: var(--blue-color);
   text-align: center;
   white-space: nowrap;
-  /* Impede que o texto quebre */
-  overflow: hidden;
+  /* Impede que o texto quebre 
+  overflow: hidden;*/
   /* Garante que o texto não vá para a linha de baixo */
   text-overflow: ellipsis;
   /* Exibe "..." caso o texto seja muito longo */
