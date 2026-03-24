@@ -19875,3 +19875,743 @@ function mostrarCombustivel() {
 
   renderizarValoresCombustivel();
 }
+
+/* =========================
+   FEIRA DA LUA — PEDIDOS
+   ========================= */
+(() => {
+  const FEIRA_STORAGE_KEY = "olacarlopolis_feira_lua_cliente";
+
+  const FEIRA_DA_LUA_DATA = {
+    titulo: "Feira da Lua",
+    slogan: "Peça direto das barracas e fale com cada responsável pelo WhatsApp.",
+    dia: "Sexta-feira",
+    horario: "19h às 23h30",
+    local: "Praça da Igreja Matriz",
+    retirada: "Retire na feira ou combine entrega com a barraca.",
+    banner: "images/comercios/feiraLua/divulgacao/1.jpg",
+    barracas: [
+      {
+        id: "barraca-pastel-da-praca",
+        nome: "Pastel da Praça",
+        categoria: "Lanches",
+        descricao: "Pastéis fritos na hora, porções e opções doces para levar ou retirar na feira.",
+        imagem: "images/comercios/feiraLua/divulgacao/2.png",
+        whatsapp: "5543999652084",
+        taxaEntrega: "Consultar",
+        entrega: true,
+        aberta: true,
+        pos: { row: 1, col: 1 },
+        produtos: [
+          { id: "pastel-carne", nome: "Pastel de Carne", preco: 12.0, unidade: "un", descricao: "Tradicional" },
+          { id: "pastel-queijo", nome: "Pastel de Queijo", preco: 11.0, unidade: "un", descricao: "Mussarela" },
+          { id: "pastel-pizza", nome: "Pastel de Pizza", preco: 13.0, unidade: "un", descricao: "Mussarela, tomate e orégano" },
+          { id: "porcao-batata", nome: "Porção de Batata", preco: 18.0, unidade: "porção", descricao: "Crocante" }
+        ]
+      },
+      {
+        id: "barraca-doces-da-lua",
+        nome: "Doces da Lua",
+        categoria: "Doces",
+        descricao: "Bolos no pote, churros e sobremesas para adoçar a noite da feira.",
+        imagem: "images/comercios/feiraLua/divulgacao/3.png",
+        whatsapp: "5543999652084",
+        taxaEntrega: "Não informado",
+        entrega: false,
+        aberta: true,
+        pos: { row: 1, col: 2 },
+        produtos: [
+          { id: "bolo-pote-ninho", nome: "Bolo no Pote Ninho", preco: 10.0, unidade: "un", descricao: "200 ml" },
+          { id: "bolo-pote-chocolate", nome: "Bolo no Pote Chocolate", preco: 10.0, unidade: "un", descricao: "200 ml" },
+          { id: "churros", nome: "Churros Recheado", preco: 9.0, unidade: "un", descricao: "Doce de leite ou chocolate" },
+          { id: "morango-copo", nome: "Morango no Copo", preco: 15.0, unidade: "un", descricao: "Com chocolate" }
+        ]
+      },
+      {
+        id: "barraca-verde-sabor",
+        nome: "Verde & Sabor",
+        categoria: "Hortifruti",
+        descricao: "Verduras, frutas e cestas frescas para pedido e retirada na feira.",
+        imagem: "images/comercios/feiraLua/divulgacao/4.png",
+        whatsapp: "5543999652084",
+        taxaEntrega: "Consultar",
+        entrega: true,
+        aberta: true,
+        pos: { row: 1, col: 4 },
+        produtos: [
+          { id: "alface", nome: "Alface Crespa", preco: 4.0, unidade: "pé", descricao: "Colhido no dia" },
+          { id: "couve", nome: "Couve Manteiga", preco: 5.0, unidade: "maço", descricao: "Macia e fresca" },
+          { id: "tomate", nome: "Tomate", preco: 8.5, unidade: "kg", descricao: "Selecionado" },
+          { id: "cesta-semana", nome: "Cesta da Semana", preco: 35.0, unidade: "cesta", descricao: "Itens variados" }
+        ]
+      },
+      {
+        id: "barraca-artes-da-praca",
+        nome: "Artes da Praça",
+        categoria: "Artesanato",
+        descricao: "Peças artesanais, lembranças e presentes feitos à mão.",
+        imagem: "images/comercios/feiraLua/divulgacao/5.png",
+        whatsapp: "5543999652084",
+        taxaEntrega: "Não informado",
+        entrega: false,
+        aberta: true,
+        pos: { row: 2, col: 1 },
+        produtos: [
+          { id: "vela-artesanal", nome: "Vela Artesanal", preco: 18.0, unidade: "un", descricao: "Aromática" },
+          { id: "eco-bag", nome: "Eco Bag Personalizada", preco: 28.0, unidade: "un", descricao: "Estampas locais" },
+          { id: "souvenir-ponte", nome: "Lembrança da Ponte", preco: 22.0, unidade: "un", descricao: "Peça decorativa" }
+        ]
+      },
+      {
+        id: "barraca-bebidas-geladas",
+        nome: "Bebidas Geladas",
+        categoria: "Bebidas",
+        descricao: "Sucos, refrigerantes e bebidas prontas para acompanhar seu pedido.",
+        imagem: "images/comercios/feiraLua/divulgacao/6.png",
+        whatsapp: "5543999652084",
+        taxaEntrega: "Consultar",
+        entrega: true,
+        aberta: true,
+        pos: { row: 2, col: 4 },
+        produtos: [
+          { id: "suco-laranja", nome: "Suco de Laranja", preco: 8.0, unidade: "copo", descricao: "Natural" },
+          { id: "refrigerante-lata", nome: "Refrigerante Lata", preco: 6.0, unidade: "un", descricao: "350ml" },
+          { id: "agua", nome: "Água Mineral", preco: 3.5, unidade: "un", descricao: "500ml" }
+        ]
+      },
+      {
+        id: "barraca-lanche-caseiro",
+        nome: "Lanche Caseiro",
+        categoria: "Lanches",
+        descricao: "Sanduíches, cachorro-quente e combos rápidos para toda a família.",
+        imagem: "images/comercios/feiraLua/divulgacao/7.png",
+        whatsapp: "5543999652084",
+        taxaEntrega: "Consultar",
+        entrega: true,
+        aberta: true,
+        pos: { row: 3, col: 2 },
+        produtos: [
+          { id: "dog-simples", nome: "Cachorro-quente", preco: 12.0, unidade: "un", descricao: "Tradicional" },
+          { id: "x-salada", nome: "X-Salada", preco: 18.0, unidade: "un", descricao: "Pão, carne, queijo e salada" },
+          { id: "combo-casal", nome: "Combo Casal", preco: 39.0, unidade: "combo", descricao: "2 lanches + 2 bebidas" }
+        ]
+      }
+    ]
+  };
+
+  const feiraState = {
+    view: "cards",
+    filtro: "Todos",
+    busca: "",
+    carrinho: {},
+    barracaAtiva: null
+  };
+
+  function moeda(v) {
+    return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
+  function obterInfoCliente() {
+    try {
+      return JSON.parse(localStorage.getItem(FEIRA_STORAGE_KEY) || "{}");
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function salvarInfoCliente(data) {
+    localStorage.setItem(FEIRA_STORAGE_KEY, JSON.stringify(data || {}));
+  }
+
+  function barracaPorId(id) {
+    return FEIRA_DA_LUA_DATA.barracas.find(b => b.id === id);
+  }
+
+  function produtoPorId(barraca, produtoId) {
+    return barraca?.produtos?.find(p => p.id === produtoId);
+  }
+
+  function cartKey(barracaId, produtoId) {
+    return `${barracaId}__${produtoId}`;
+  }
+
+  function quantidadeItem(barracaId, produtoId) {
+    return Number(feiraState.carrinho[cartKey(barracaId, produtoId)] || 0);
+  }
+
+  function setQuantidade(barracaId, produtoId, qtd) {
+    const key = cartKey(barracaId, produtoId);
+    if (qtd <= 0) {
+      delete feiraState.carrinho[key];
+    } else {
+      feiraState.carrinho[key] = qtd;
+    }
+    atualizarBadgeCarrinho();
+    atualizarQtyVisivel(barracaId, produtoId);
+  }
+
+  function totalItensCarrinho() {
+    return Object.values(feiraState.carrinho).reduce((s, q) => s + Number(q || 0), 0);
+  }
+
+  function itensAgrupadosCarrinho() {
+    const grupos = {};
+    Object.entries(feiraState.carrinho).forEach(([key, qtd]) => {
+      if (!qtd) return;
+      const [barracaId, produtoId] = key.split("__");
+      const barraca = barracaPorId(barracaId);
+      const produto = produtoPorId(barraca, produtoId);
+      if (!barraca || !produto) return;
+      if (!grupos[barracaId]) {
+        grupos[barracaId] = { barraca, itens: [], subtotal: 0 };
+      }
+      const total = Number(produto.preco || 0) * Number(qtd || 0);
+      grupos[barracaId].itens.push({ produto, qtd: Number(qtd || 0), total });
+      grupos[barracaId].subtotal += total;
+    });
+    return Object.values(grupos);
+  }
+
+  function totalCarrinho() {
+    return itensAgrupadosCarrinho().reduce((s, g) => s + g.subtotal, 0);
+  }
+
+  function atualizarBadgeCarrinho() {
+    document.querySelectorAll("[data-feira-cart-count]").forEach(el => {
+      el.textContent = totalItensCarrinho();
+    });
+    document.querySelectorAll("[data-feira-cart-total]").forEach(el => {
+      el.textContent = moeda(totalCarrinho());
+    });
+  }
+
+  function atualizarQtyVisivel(barracaId, produtoId) {
+    const qtd = quantidadeItem(barracaId, produtoId);
+    document.querySelectorAll(`[data-feira-qtd="${cartKey(barracaId, produtoId)}"]`).forEach(el => {
+      el.textContent = qtd;
+    });
+  }
+
+  function categoriasDisponiveis() {
+    return ["Todos", ...Array.from(new Set(FEIRA_DA_LUA_DATA.barracas.map(b => b.categoria))).sort()];
+  }
+
+  function barracasFiltradas() {
+    const termo = String(feiraState.busca || "").trim().toLowerCase();
+    return FEIRA_DA_LUA_DATA.barracas.filter(b => {
+      const filtroOk = feiraState.filtro === "Todos" || b.categoria === feiraState.filtro;
+      const buscaOk = !termo || [
+        b.nome,
+        b.categoria,
+        b.descricao,
+        ...(b.produtos || []).map(p => `${p.nome} ${p.descricao || ""}`)
+      ].join(" ").toLowerCase().includes(termo);
+      return filtroOk && buscaOk;
+    });
+  }
+
+  function htmlBarracaCard(b) {
+    const destaques = (b.produtos || []).slice(0, 3).map(p => `
+      <div class="feira-mini-product">
+        <span>${p.nome}</span>
+        <strong>${moeda(p.preco)}</strong>
+      </div>
+    `).join("");
+
+    return `
+      <article class="feira-barraca-card">
+        <div class="feira-card-cover">
+          <img src="${b.imagem || FEIRA_DA_LUA_DATA.banner}" alt="${b.nome}">
+          <span class="feira-badge">${b.categoria}</span>
+          <span class="feira-open-badge ${b.aberta ? "" : "off"}">${b.aberta ? "Aceitando pedidos" : "Fechada"}</span>
+        </div>
+        <div class="feira-card-body">
+          <div class="feira-card-title">${b.nome}</div>
+          <div class="feira-card-desc">${b.descricao}</div>
+          <div class="feira-card-meta">
+            <span><i class="fa-solid fa-basket-shopping"></i> ${(b.produtos || []).length} itens</span>
+            <span><i class="fa-solid fa-truck"></i> ${b.entrega ? "Entrega/combinar" : "Retirada na feira"}</span>
+          </div>
+          <div class="feira-mini-products">${destaques}</div>
+          <div class="feira-card-actions">
+            <button class="feira-btn feira-btn-primary" data-feira-open="${b.id}">
+              <i class="fa-solid fa-store"></i> Ver produtos
+            </button>
+            <button class="feira-btn feira-btn-secondary" data-feira-whatsapp="${b.id}" title="Falar no WhatsApp">
+              <i class="fa-brands fa-whatsapp"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function htmlMapa(barracas) {
+    const mapa = [];
+    for (let row = 1; row <= 4; row += 1) {
+      for (let col = 1; col <= 4; col += 1) {
+        if (row === 2 && (col === 2 || col === 3)) {
+          mapa.push(`
+            <div class="feira-map-stage" style="grid-column:${col};grid-row:${row};">
+              Palco / Área Central
+            </div>
+          `);
+          continue;
+        }
+        const barraca = barracas.find(b => Number(b.pos?.row) === row && Number(b.pos?.col) === col);
+        if (barraca) {
+          mapa.push(`
+            <button class="feira-map-slot" data-feira-open="${barraca.id}" style="grid-column:${col};grid-row:${row};">
+              <small>${barraca.categoria}</small>
+              <strong>${barraca.nome}</strong>
+              <span>${(barraca.produtos || []).length} itens</span>
+            </button>
+          `);
+        } else {
+          mapa.push(`<div class="feira-map-slot" style="grid-column:${col};grid-row:${row};opacity:.35;"></div>`);
+        }
+      }
+    }
+    return `
+      <section class="feira-map-wrap">
+        <div class="feira-map-header">
+          <div>
+            <h3 style="margin:0 0 4px;font-size:24px;color:#111827;">Mapa da feira</h3>
+            <div class="feira-map-note">Visualize as barracas como se estivessem na praça e toque para abrir o cardápio.</div>
+          </div>
+        </div>
+        <div class="feira-map-grid">${mapa.join("")}</div>
+      </section>
+    `;
+  }
+
+  function htmlPaginaFeira() {
+    const barracas = barracasFiltradas();
+    const chips = categoriasDisponiveis().map(cat => `
+      <button class="feira-chip ${feiraState.filtro === cat ? "active" : ""}" data-feira-chip="${cat}">
+        ${cat}
+      </button>
+    `).join("");
+
+    const viewCards = feiraState.view === "cards";
+    const viewHtml = viewCards
+      ? (barracas.length ? `<section class="feira-grid">${barracas.map(htmlBarracaCard).join("")}</section>` : `<div class="feira-empty">Nenhuma barraca encontrada com esse filtro.</div>`)
+      : htmlMapa(barracas);
+
+    return `
+      <div class="feira-lua-wrap">
+        <section class="feira-hero">
+          <div class="feira-kicker"><i class="fa-solid fa-moon"></i> Pedido digital da feira</div>
+          <h2 class="feira-title">${FEIRA_DA_LUA_DATA.titulo}</h2>
+          <p class="feira-subtitle">${FEIRA_DA_LUA_DATA.slogan}</p>
+          <div class="feira-hero-stats">
+            <div class="feira-stat"><span class="feira-stat-label">Dia</span><strong class="feira-stat-value">${FEIRA_DA_LUA_DATA.dia}</strong></div>
+            <div class="feira-stat"><span class="feira-stat-label">Horário</span><strong class="feira-stat-value">${FEIRA_DA_LUA_DATA.horario}</strong></div>
+            <div class="feira-stat"><span class="feira-stat-label">Local</span><strong class="feira-stat-value">${FEIRA_DA_LUA_DATA.local}</strong></div>
+            <div class="feira-stat"><span class="feira-stat-label">Retirada</span><strong class="feira-stat-value">${FEIRA_DA_LUA_DATA.retirada}</strong></div>
+          </div>
+        </section>
+
+        <div class="feira-toolbar">
+          <div class="feira-search">
+            <input type="text" id="feiraSearchInput" placeholder="Buscar barraca ou produto" value="${(feiraState.busca || "").replace(/"/g, '&quot;')}">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <div class="feira-view-toggle">
+            <button class="feira-toggle-btn ${viewCards ? "active" : ""}" data-feira-view="cards"><i class="fa-solid fa-grip"></i> Barracas</button>
+            <button class="feira-toggle-btn ${!viewCards ? "active" : ""}" data-feira-view="mapa"><i class="fa-solid fa-map"></i> Mapa</button>
+          </div>
+          <a href="index.html" class="feira-btn feira-btn-secondary" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">
+            <i class="fa-solid fa-house"></i>
+          </a>
+        </div>
+
+        <div class="feira-chips">${chips}</div>
+
+        <div class="feira-results-bar">
+          <div class="feira-count"><strong>${barracas.length}</strong> barracas visíveis</div>
+          <div>Pedido por barraca • envio direto no WhatsApp do responsável</div>
+        </div>
+
+        ${viewHtml}
+
+        <div class="feira-floating-cart">
+          <button class="feira-cart-btn" id="feiraAbrirCarrinho">
+            <i class="fa-solid fa-basket-shopping"></i>
+            <span><span data-feira-cart-count>0</span> itens • <span data-feira-cart-total>${moeda(0)}</span></span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderFeiraPage() {
+    const area = document.querySelector(".content_area");
+    if (!area) return;
+    area.innerHTML = htmlPaginaFeira();
+    bindFeiraPageEvents();
+    atualizarBadgeCarrinho();
+  }
+
+  function bindFeiraPageEvents() {
+    document.getElementById("feiraSearchInput")?.addEventListener("input", (e) => {
+      feiraState.busca = e.target.value || "";
+      renderFeiraPage();
+    });
+
+    document.querySelectorAll("[data-feira-chip]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        feiraState.filtro = btn.getAttribute("data-feira-chip") || "Todos";
+        renderFeiraPage();
+      });
+    });
+
+    document.querySelectorAll("[data-feira-view]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        feiraState.view = btn.getAttribute("data-feira-view") === "mapa" ? "mapa" : "cards";
+        renderFeiraPage();
+      });
+    });
+
+    document.querySelectorAll("[data-feira-open]").forEach(btn => {
+      btn.addEventListener("click", () => abrirBarraca(btn.getAttribute("data-feira-open")));
+    });
+
+    document.querySelectorAll("[data-feira-whatsapp]").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const barraca = barracaPorId(btn.getAttribute("data-feira-whatsapp"));
+        if (!barraca) return;
+        const texto = encodeURIComponent("Olá! Vi sua barraca na Feira da Lua do Olá Carlópolis e gostaria de uma informação.");
+        window.open(`https://wa.me/${String(barraca.whatsapp || "").replace(/\D/g, "")}?text=${texto}`, "_blank");
+      });
+    });
+
+    document.getElementById("feiraAbrirCarrinho")?.addEventListener("click", abrirCarrinho);
+  }
+
+  function abrirBarraca(barracaId) {
+    const barraca = barracaPorId(barracaId);
+    if (!barraca) return;
+    feiraState.barracaAtiva = barracaId;
+
+    const body = `
+      <div class="feira-lua-modal-backdrop" id="feiraModalBackdrop">
+        <div class="feira-lua-modal" role="dialog" aria-modal="true">
+          <div class="feira-modal-header">
+            <div>
+              <div style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:700;">${barraca.categoria}</div>
+              <h3 style="margin:4px 0 0;font-size:28px;color:#111827;">${barraca.nome}</h3>
+            </div>
+            <button class="feira-close" id="feiraFecharModal">&times;</button>
+          </div>
+          <div class="feira-modal-body">
+            <div class="feira-modal-image">
+              <img src="${barraca.imagem || FEIRA_DA_LUA_DATA.banner}" alt="${barraca.nome}">
+            </div>
+            <div class="feira-modal-content">
+              <p class="feira-modal-desc">${barraca.descricao}</p>
+              <div class="feira-product-list">
+                ${(barraca.produtos || []).map(prod => `
+                  <div class="feira-product-item">
+                    <div>
+                      <div class="feira-product-name">${prod.nome}</div>
+                      <div class="feira-product-meta">${prod.descricao || ""}${prod.unidade ? ` • ${prod.unidade}` : ""}</div>
+                      <div class="feira-product-price">${moeda(prod.preco)}</div>
+                    </div>
+                    <div class="feira-qty-box">
+                      <button class="feira-qty-btn" data-feira-minus="${barraca.id}|${prod.id}">−</button>
+                      <span class="feira-qty-value" data-feira-qtd="${cartKey(barraca.id, prod.id)}">${quantidadeItem(barraca.id, prod.id)}</span>
+                      <button class="feira-qty-btn" data-feira-plus="${barraca.id}|${prod.id}">+</button>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+              <div class="feira-modal-footer">
+                <div class="feira-modal-total">No carrinho desta barraca: <strong>${moeda((itensAgrupadosCarrinho().find(g => g.barraca.id === barraca.id)?.subtotal) || 0)}</strong></div>
+                <button class="feira-btn feira-btn-primary" id="feiraIrCarrinho">
+                  <i class="fa-solid fa-basket-shopping"></i> Ir para o pedido
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", body);
+
+    const close = () => document.getElementById("feiraModalBackdrop")?.remove();
+    document.getElementById("feiraFecharModal")?.addEventListener("click", close);
+    document.getElementById("feiraModalBackdrop")?.addEventListener("click", (e) => {
+      if (e.target.id === "feiraModalBackdrop") close();
+    });
+    document.getElementById("feiraIrCarrinho")?.addEventListener("click", () => {
+      close();
+      abrirCarrinho();
+    });
+
+    document.querySelectorAll("[data-feira-plus]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const [barracaId, produtoId] = (btn.getAttribute("data-feira-plus") || "").split("|");
+        setQuantidade(barracaId, produtoId, quantidadeItem(barracaId, produtoId) + 1);
+        document.querySelector(".feira-modal-total strong").textContent = moeda((itensAgrupadosCarrinho().find(g => g.barraca.id === barracaId)?.subtotal) || 0);
+      });
+    });
+
+    document.querySelectorAll("[data-feira-minus]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const [barracaId, produtoId] = (btn.getAttribute("data-feira-minus") || "").split("|");
+        setQuantidade(barracaId, produtoId, quantidadeItem(barracaId, produtoId) - 1);
+        document.querySelector(".feira-modal-total strong").textContent = moeda((itensAgrupadosCarrinho().find(g => g.barraca.id === barracaId)?.subtotal) || 0);
+      });
+    });
+  }
+
+  function abrirCarrinho() {
+    const grupos = itensAgrupadosCarrinho();
+    const cliente = obterInfoCliente();
+
+    const body = `
+      <div class="feira-lua-cart-backdrop" id="feiraCartBackdrop">
+        <div class="feira-lua-cart-modal">
+          <div class="feira-cart-header">
+            <div>
+              <div style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:700;">Seu pedido</div>
+              <h3 style="margin:4px 0 0;font-size:28px;color:#111827;">Carrinho da Feira da Lua</h3>
+            </div>
+            <button class="feira-close" id="feiraFecharCarrinho">&times;</button>
+          </div>
+          <div class="feira-cart-body">
+            <div class="feira-form-grid">
+              <div class="feira-form-group">
+                <label for="feiraClienteNome">Nome</label>
+                <input id="feiraClienteNome" value="${(cliente.nome || "").replace(/"/g, '&quot;')}" placeholder="Seu nome">
+              </div>
+              <div class="feira-form-group">
+                <label for="feiraClienteTelefone">Telefone</label>
+                <input id="feiraClienteTelefone" value="${(cliente.telefone || "").replace(/"/g, '&quot;')}" placeholder="(43) 99999-9999">
+              </div>
+              <div class="feira-form-group full">
+                <label for="feiraClienteEndereco">Endereço</label>
+                <input id="feiraClienteEndereco" value="${(cliente.endereco || "").replace(/"/g, '&quot;')}" placeholder="Rua, número e bairro">
+              </div>
+              <div class="feira-form-group">
+                <label for="feiraTipoEntrega">Como receber</label>
+                <select id="feiraTipoEntrega">
+                  <option value="Retirada na feira" ${(cliente.entrega || "") === "Retirada na feira" ? "selected" : ""}>Retirada na feira</option>
+                  <option value="Combinar entrega" ${(cliente.entrega || "") === "Combinar entrega" ? "selected" : ""}>Combinar entrega</option>
+                </select>
+              </div>
+              <div class="feira-form-group">
+                <label for="feiraObservacaoGeral">Observação geral</label>
+                <input id="feiraObservacaoGeral" value="${(cliente.observacao || "").replace(/"/g, '&quot;')}" placeholder="Ex.: sem cebola">
+              </div>
+            </div>
+
+            ${grupos.length ? grupos.map(g => `
+              <div class="feira-cart-group">
+                <div class="feira-cart-group-header">
+                  <div class="feira-cart-group-title">${g.barraca.nome}</div>
+                  <strong>${moeda(g.subtotal)}</strong>
+                </div>
+                ${g.itens.map(item => `
+                  <div class="feira-cart-line">
+                    <div>
+                      <strong>${item.produto.nome}</strong><br>
+                      <small>${item.qtd} x ${moeda(item.produto.preco)}</small>
+                    </div>
+                    <div class="feira-qty-box">
+                      <button class="feira-qty-btn" data-feira-cart-minus="${g.barraca.id}|${item.produto.id}">−</button>
+                      <span class="feira-qty-value" data-feira-qtd="${cartKey(g.barraca.id, item.produto.id)}">${item.qtd}</span>
+                      <button class="feira-qty-btn" data-feira-cart-plus="${g.barraca.id}|${item.produto.id}">+</button>
+                    </div>
+                    <strong>${moeda(item.total)}</strong>
+                    <button class="feira-remove-btn" data-feira-remove="${g.barraca.id}|${item.produto.id}">Remover</button>
+                  </div>
+                `).join("")}
+              </div>
+            `).join("") : `<div class="feira-empty">Seu carrinho ainda está vazio.</div>`}
+
+            <div class="feira-cart-summary">
+              <div class="feira-cart-summary-row"><span>Total de itens</span><strong>${totalItensCarrinho()}</strong></div>
+              <div class="feira-cart-summary-row"><span>Total do pedido</span><strong>${moeda(totalCarrinho())}</strong></div>
+              <div class="feira-cart-summary-row" style="margin-bottom:0;"><span>Envio</span><strong>Separado por barraca</strong></div>
+            </div>
+          </div>
+          <div class="feira-cart-footer">
+            <button class="feira-btn feira-btn-secondary" id="feiraContinuarComprando"><i class="fa-solid fa-store"></i> Continuar escolhendo</button>
+            <button class="feira-btn feira-btn-primary" id="feiraFinalizarPedido" ${grupos.length ? "" : "disabled"}><i class="fa-brands fa-whatsapp"></i> Gerar pedidos</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", body);
+
+    const close = () => document.getElementById("feiraCartBackdrop")?.remove();
+    document.getElementById("feiraFecharCarrinho")?.addEventListener("click", close);
+    document.getElementById("feiraContinuarComprando")?.addEventListener("click", close);
+    document.getElementById("feiraCartBackdrop")?.addEventListener("click", (e) => {
+      if (e.target.id === "feiraCartBackdrop") close();
+    });
+
+    const saveCliente = () => {
+      salvarInfoCliente({
+        nome: document.getElementById("feiraClienteNome")?.value || "",
+        telefone: document.getElementById("feiraClienteTelefone")?.value || "",
+        endereco: document.getElementById("feiraClienteEndereco")?.value || "",
+        entrega: document.getElementById("feiraTipoEntrega")?.value || "",
+        observacao: document.getElementById("feiraObservacaoGeral")?.value || ""
+      });
+    };
+
+    ["feiraClienteNome","feiraClienteTelefone","feiraClienteEndereco","feiraTipoEntrega","feiraObservacaoGeral"].forEach(id => {
+      document.getElementById(id)?.addEventListener("input", saveCliente);
+      document.getElementById(id)?.addEventListener("change", saveCliente);
+    });
+
+    document.querySelectorAll("[data-feira-cart-plus]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const [barracaId, produtoId] = (btn.getAttribute("data-feira-cart-plus") || "").split("|");
+        setQuantidade(barracaId, produtoId, quantidadeItem(barracaId, produtoId) + 1);
+        close();
+        abrirCarrinho();
+      });
+    });
+
+    document.querySelectorAll("[data-feira-cart-minus]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const [barracaId, produtoId] = (btn.getAttribute("data-feira-cart-minus") || "").split("|");
+        setQuantidade(barracaId, produtoId, quantidadeItem(barracaId, produtoId) - 1);
+        close();
+        abrirCarrinho();
+      });
+    });
+
+    document.querySelectorAll("[data-feira-remove]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const [barracaId, produtoId] = (btn.getAttribute("data-feira-remove") || "").split("|");
+        setQuantidade(barracaId, produtoId, 0);
+        close();
+        abrirCarrinho();
+      });
+    });
+
+    document.getElementById("feiraFinalizarPedido")?.addEventListener("click", () => {
+      saveCliente();
+      close();
+      abrirEnvioPedidos();
+    });
+  }
+
+  function montarMensagemWhatsApp(grupo, cliente) {
+    const linhas = [];
+    linhas.push("Olá! Segue um novo pedido da Feira da Lua pelo Olá Carlópolis.");
+    linhas.push("");
+    linhas.push(`Barraca: ${grupo.barraca.nome}`);
+    linhas.push("");
+    linhas.push("Itens do pedido:");
+    grupo.itens.forEach(item => {
+      linhas.push(`- ${item.qtd}x ${item.produto.nome} (${moeda(item.produto.preco)}) = ${moeda(item.total)}`);
+    });
+    linhas.push("");
+    linhas.push(`Subtotal: ${moeda(grupo.subtotal)}`);
+    linhas.push("");
+    linhas.push("Dados do cliente:");
+    linhas.push(`Nome: ${cliente.nome || "Não informado"}`);
+    linhas.push(`Telefone: ${cliente.telefone || "Não informado"}`);
+    linhas.push(`Recebimento: ${cliente.entrega || "Retirada na feira"}`);
+    linhas.push(`Endereço: ${cliente.endereco || "Não informado"}`);
+    if (cliente.observacao) {
+      linhas.push(`Observação: ${cliente.observacao}`);
+    }
+    linhas.push("");
+    linhas.push("Pedido enviado pelo sistema da Feira da Lua no Olá Carlópolis.");
+    return linhas.join("\n");
+  }
+
+  function abrirEnvioPedidos() {
+    const grupos = itensAgrupadosCarrinho();
+    const cliente = obterInfoCliente();
+
+    if (!grupos.length) {
+      alert("Seu carrinho está vazio.");
+      return;
+    }
+
+    const body = `
+      <div class="feira-lua-send-backdrop" id="feiraSendBackdrop">
+        <div class="feira-lua-send-modal">
+          <div class="feira-send-header">
+            <div>
+              <div style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:700;">Pronto para enviar</div>
+              <h3 style="margin:4px 0 0;font-size:28px;color:#111827;">Pedidos separados por barraca</h3>
+            </div>
+            <button class="feira-close" id="feiraFecharEnvio">&times;</button>
+          </div>
+          <div class="feira-send-body">
+            <div class="feira-send-list">
+              ${grupos.map((g, idx) => {
+                const texto = encodeURIComponent(montarMensagemWhatsApp(g, cliente));
+                const url = `https://wa.me/${String(g.barraca.whatsapp || "").replace(/\D/g, "")}?text=${texto}`;
+                return `
+                  <div class="feira-send-item">
+                    <h4>${g.barraca.nome}</h4>
+                    <p>${g.itens.length} item(ns) • subtotal ${moeda(g.subtotal)} • ${g.barraca.entrega ? "Pode combinar entrega" : "Retirada na feira"}</p>
+                    <a class="feira-send-btn" href="${url}" target="_blank" rel="noopener" data-feira-send-link="${idx}">
+                      <i class="fa-brands fa-whatsapp"></i> Enviar pedido
+                    </a>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", body);
+    const close = () => document.getElementById("feiraSendBackdrop")?.remove();
+    document.getElementById("feiraFecharEnvio")?.addEventListener("click", close);
+    document.getElementById("feiraSendBackdrop")?.addEventListener("click", (e) => {
+      if (e.target.id === "feiraSendBackdrop") close();
+    });
+  }
+
+  function mostrarFeiraDaLuaPedidos() {
+    if (location.hash !== "#feira-da-lua") {
+      history.pushState({}, "", "#feira-da-lua");
+    }
+    renderFeiraPage();
+  }
+
+  function interceptarMenuFeira() {
+    const link = document.getElementById("menuFeiraLua");
+    if (!link) return;
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      mostrarFeiraDaLuaPedidos();
+      const sidebar = document.querySelector(".sidebar");
+      const overlay = document.getElementById("overlay");
+      if (sidebar?.classList.contains("open")) sidebar.classList.remove("open");
+      overlay?.classList.remove("active");
+    }, true);
+  }
+
+  function tratarHashFeiraDaLua() {
+    const hash = String(location.hash || "").toLowerCase();
+    if (hash === "#feira-da-lua") {
+      renderFeiraPage();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    interceptarMenuFeira();
+    tratarHashFeiraDaLua();
+  });
+
+  window.addEventListener("hashchange", tratarHashFeiraDaLua);
+
+  window.mostrarFeiraDaLuaPedidos = mostrarFeiraDaLuaPedidos;
+})();
