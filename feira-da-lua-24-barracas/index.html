@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feira da Lua | Olá Carlópolis</title>
+  <meta name="description" content="Peça direto das barracas da Feira da Lua em Carlópolis." />
+  <meta name="theme-color" content="#4070f4" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <header class="hero">
+    <div class="hero__top">
+      <a class="brand" href="#" aria-label="Feira da Lua">
+        <span class="brand__badge"><i class="fa-solid fa-moon"></i></span>
+        <div>
+          <strong>Feira da Lua • 24 barracas</strong>
+          <span>Olá Carlópolis</span>
+        </div>
+      </a>
+
+      <div class="hero__actions">
+        <a class="ghost-btn" href="https://www.olacarlopolis.com" target="_blank" rel="noopener">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Olá Carlópolis
+        </a>
+        <button id="openCartBtn" class="primary-btn">
+          <i class="fa-solid fa-basket-shopping"></i>
+          <span>Carrinho</span>
+          <b id="cartCount">0</b>
+        </button>
+      </div>
+    </div>
+
+    <div class="hero__content">
+      <div class="hero__text">
+        <span class="eyebrow">Pedidos online • Feira da Lua</span>
+        <h1>Peça direto das barracas da Feira da Lua</h1>
+        <p>
+          Escolha seus produtos, monte o pedido e envie automaticamente para cada responsável no WhatsApp.
+          Esta versão já vem com 24 barracas pré-configuradas para você ajustar comércio por comércio de forma rápida.
+        </p>
+
+        <div class="hero__meta">
+          <div class="hero__meta-item"><i class="fa-regular fa-clock"></i> Quintas • 18h às 22h</div>
+          <div class="hero__meta-item"><i class="fa-solid fa-location-dot"></i> Praça central de Carlópolis</div>
+          <div class="hero__meta-item"><i class="fa-solid fa-mobile-screen-button"></i> Feita para celular</div>
+        </div>
+      </div>
+
+      <div class="hero__panel">
+        <div class="stats">
+          <div class="stat-card">
+            <span>Barracas</span>
+            <strong id="stallTotal">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Produtos</span>
+            <strong id="productTotal">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Categorias</span>
+            <strong id="categoryTotal">0</strong>
+          </div>
+        </div>
+
+        <div class="customer-card">
+          <div class="section-title">
+            <i class="fa-solid fa-user"></i>
+            <span>Seus dados</span>
+          </div>
+
+          <div class="customer-grid">
+            <label>
+              <span>Nome</span>
+              <input id="customerName" type="text" placeholder="Seu nome" />
+            </label>
+            <label>
+              <span>Telefone</span>
+              <input id="customerPhone" type="tel" placeholder="(43) 99999-9999" />
+            </label>
+            <label class="full">
+              <span>Endereço / referência</span>
+              <input id="customerAddress" type="text" placeholder="Rua, número, bairro ou ponto de referência" />
+            </label>
+            <label class="full">
+              <span>Observação geral</span>
+              <textarea id="customerNotes" rows="3" placeholder="Ex.: retirar às 19h / sem cebola / entregar se possível"></textarea>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="toolbar">
+      <div class="toolbar__left">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="searchInput" type="text" placeholder="Buscar barraca ou produto" />
+        </label>
+
+        <label class="filter-box">
+          <i class="fa-solid fa-filter"></i>
+          <select id="categoryFilter">
+            <option value="">Todas as categorias</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="toolbar__right">
+        <button id="viewCardsBtn" class="toggle-btn active">
+          <i class="fa-solid fa-grip"></i> Barracas
+        </button>
+        <button id="viewMapBtn" class="toggle-btn">
+          <i class="fa-solid fa-map"></i> Mapa da feira
+        </button>
+      </div>
+    </section>
+
+    <section class="view-section help-panel">
+      <div class="help-card">
+        <div>
+          <span class="eyebrow">Ajuste rápido</span>
+          <h2>Onde você vai editar cada comércio</h2>
+          <p>No arquivo <strong>script.js</strong>, procure por <strong>FEIRA_DA_LUA_DATA</strong>. As 24 barracas já estão prontas e separadas em blocos com comentários, cada uma com nome, responsável, WhatsApp, categoria, posição no mapa e produtos.</p>
+        </div>
+        <div class="help-tags">
+          <span class="chip chip--soft">24 barracas prontas</span>
+          <span class="chip chip--outline">1 bloco por comércio</span>
+          <span class="chip chip--outline">Edite sem mexer no layout</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="cardsView" class="view-section"></section>
+
+    <section id="mapView" class="view-section hidden">
+      <div class="map-card">
+        <div class="map-header">
+          <div>
+            <h2>Mapa da Feira</h2>
+            <p>Visualize as barracas como se estivessem posicionadas na feira.</p>
+          </div>
+          <div class="map-legend">
+            <span><i class="fa-solid fa-store"></i> Barracas clicáveis</span>
+          </div>
+        </div>
+
+        <div class="fair-map">
+          <div class="fair-map__aisle">Corredor da Feira</div>
+          <div id="mapCanvas" class="fair-map__canvas"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button id="floatingCartBtn" class="floating-cart hidden">
+    <i class="fa-solid fa-basket-shopping"></i>
+    <span id="floatingCartLabel">0 itens no carrinho</span>
+  </button>
+
+  <div id="stallModal" class="modal hidden" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog modal__dialog--wide">
+      <button class="modal__close" data-close-modal aria-label="Fechar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div id="stallModalContent"></div>
+    </div>
+  </div>
+
+  <div id="cartDrawer" class="drawer hidden" aria-hidden="true">
+    <div class="drawer__backdrop" data-close-cart></div>
+    <aside class="drawer__panel">
+      <div class="drawer__header">
+        <div>
+          <span class="eyebrow">Resumo do pedido</span>
+          <h2>Seu carrinho</h2>
+        </div>
+        <button class="modal__close" data-close-cart aria-label="Fechar carrinho">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="cartContent" class="drawer__content"></div>
+
+      <div class="drawer__footer">
+        <div class="drawer__total">
+          <span>Total estimado</span>
+          <strong id="cartTotalValue">R$ 0,00</strong>
+        </div>
+        <button id="clearCartBtn" class="ghost-btn full-btn">
+          <i class="fa-regular fa-trash-can"></i> Limpar carrinho
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <template id="stallCardTemplate">
+    <article class="stall-card">
+      <div class="stall-card__image"></div>
+      <div class="stall-card__body">
+        <div class="stall-card__top">
+          <div>
+            <span class="chip chip--soft category-chip"></span>
+            <h3 class="stall-name"></h3>
+          </div>
+          <span class="chip chip--outline product-count"></span>
+        </div>
+
+        <p class="stall-description"></p>
+
+        <div class="stall-highlights"></div>
+
+        <div class="stall-card__actions">
+          <button class="primary-btn btn-open-products">
+            <i class="fa-solid fa-bag-shopping"></i> Ver produtos
+          </button>
+          <a class="ghost-btn btn-whatsapp" target="_blank" rel="noopener">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+          </a>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
