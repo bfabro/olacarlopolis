@@ -1068,17 +1068,20 @@
         margin-bottom: 10px !important;
       }
       .oc-miniindex {
-        flex-wrap: nowrap !important;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        overflow: visible;
+        padding-bottom: 0;
       }
       .oc-miniindex a {
-        flex: 0 0 auto;
-        white-space: nowrap;
+        width: 100%;
+        min-width: 0;
+        text-align: center;
+        white-space: normal;
         font-size: 12px !important;
-        padding: 9px 12px !important;
+        line-height: 1.25;
+        padding: 10px 10px !important;
       }
       .oc-prod-list {
         grid-template-columns: 1fr !important;
@@ -1484,27 +1487,27 @@
       }
 
       .oc-miniindex {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
         margin: 0 0 12px;
-        padding: 0 2px 6px;
-        scroll-snap-type: x proximity;
-        -webkit-overflow-scrolling: touch;
+        padding: 0;
+        overflow: visible;
       }
 
       .oc-miniindex::-webkit-scrollbar {
-        height: 4px;
+        display: none;
       }
 
       .oc-miniindex a {
-        flex: 0 0 auto;
-        scroll-snap-align: start;
-        white-space: nowrap;
+        width: 100%;
+        min-width: 0;
+        text-align: center;
+        white-space: normal;
         font-size: 11px !important;
-        padding: 8px 11px !important;
-        border-radius: 999px;
+        line-height: 1.25;
+        padding: 9px 10px !important;
+        border-radius: 16px;
       }
 
       .oc-cat-card {
@@ -1847,6 +1850,92 @@
     }
   </style>
 
+
+  <style>
+    /* Destaque maior para a imagem do estabelecimento */
+    .oc-store .oc-row {
+      align-items: center !important;
+      gap: 18px !important;
+    }
+    .oc-store-media {
+      position: relative;
+      flex: 0 0 230px;
+      width: 230px;
+      max-width: 42vw;
+    }
+    .oc-store-media::before {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,.34), rgba(255,255,255,.08));
+      box-shadow: 0 18px 36px rgba(0,0,0,.18);
+      z-index: 0;
+    }
+    .oc-store-photo.oc-logo {
+      position: relative;
+      z-index: 1;
+      width: 100% !important;
+      height: 160px !important;
+      max-width: none !important;
+      border-radius: 20px !important;
+      object-fit: cover !important;
+      object-position: center;
+      border: 4px solid rgba(255,255,255,.92) !important;
+      padding: 0 !important;
+      background: #fff !important;
+      box-shadow: 0 16px 30px rgba(0,0,0,.20);
+      display: block;
+    }
+    .oc-store .oc-title {
+      font-size: clamp(1.35rem, 2.2vw, 2rem) !important;
+      margin-bottom: 8px;
+    }
+    .oc-store .oc-sub {
+      max-width: 720px;
+      font-size: 15px !important;
+      line-height: 1.45;
+    }
+    @media (max-width: 768px) {
+      .oc-store .oc-row {
+        gap: 14px !important;
+      }
+      .oc-store-media {
+        width: 100%;
+        max-width: 100%;
+        flex-basis: auto;
+      }
+      .oc-store-photo.oc-logo {
+        width: 100% !important;
+        height: 190px !important;
+        border-radius: 18px !important;
+      }
+      .oc-store .oc-title {
+        font-size: 1.35rem !important;
+      }
+      .oc-store .oc-sub {
+        font-size: 13px !important;
+      }
+    }
+    @media (max-width: 420px) {
+      .oc-store-photo.oc-logo {
+        height: 170px !important;
+      }
+    }
+  </style>
+
+
+  <style>
+    /* Destaque mais forte para status aberto */
+    .oc-badge.ok {
+      background: #dcfce7 !important;
+      color: #15803d !important;
+      border-color: #86efac !important;
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, .08), 0 6px 16px rgba(34, 197, 94, .14);
+      font-weight: 800 !important;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -1868,7 +1957,7 @@
       <div class="oc-grid">
         <section class="oc-card oc-store">
           <div class="oc-row" style="align-items:center; gap:14px;">
-            <img alt="Logo do estabelecimento" class="oc-logo" id="est-logo" />
+            <div class="oc-store-media"><img alt="Imagem do estabelecimento" class="oc-logo oc-store-photo" id="est-logo" /></div>
             <div>
               <h2 class="oc-title" id="est-name">Loja</h2>
               <span class="oc-badge warn" id="openBadge">Verificando horário…</span>
