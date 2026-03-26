@@ -1,0 +1,59 @@
+PAINEL CNPJ + PROCESSOS
+
+Arquivos:
+- painel-cnpj-processos.html
+- functions.index.exemplo.js
+- firebase.exemplo.json
+
+COMO USAR
+1. Abra o HTML no navegador.
+2. Para a parte de CNPJ, pode usar direto a API pública.
+3. Para a parte de processos, configure um endpoint seu no campo:
+   /api/processos-cnpj?cnpj={cnpj}
+
+SE FOR USAR FIREBASE
+1. Copie o conteúdo de functions.index.exemplo.js para functions/index.js
+2. Copie o conteúdo de firebase.exemplo.json para firebase.json
+3. Faça deploy:
+   firebase deploy --only functions,hosting
+
+CONTRATO ESPERADO PELO HTML PARA PROCESSOS
+{
+  "ok": true,
+  "total": 2,
+  "tribunaisConsultados": ["TJPR", "TRT9"],
+  "processos": [
+    {
+      "id": "abc123",
+      "tribunal": "TJPR",
+      "numeroProcesso": "00000000000000000000",
+      "classe": "Execução Fiscal",
+      "orgaoJulgador": "Vara X",
+      "grau": "G1",
+      "dataAjuizamento": "2024-02-10T00:00:00.000Z",
+      "atualizadoEm": "2026-03-26T00:00:00.000Z"
+    }
+  ]
+}
+
+OBSERVAÇÃO
+A tela também sabe ler uma resposta raw no estilo DataJud:
+{
+  "hits": {
+    "total": { "value": 1 },
+    "hits": [
+      {
+        "_id": "ID",
+        "_source": {
+          "tribunal": "TRF1",
+          "numeroProcesso": "00008323520184013202",
+          "classe": { "nome": "Procedimento do Juizado Especial Cível" },
+          "orgaoJulgador": { "nome": "JEF Adj - Tefé" },
+          "grau": "JE",
+          "dataAjuizamento": "2018-10-29T00:00:00.000Z",
+          "dataHoraUltimaAtualizacao": "2023-07-21T19:10:08.483Z"
+        }
+      }
+    ]
+  }
+}

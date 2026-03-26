@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel CNPJ + Processos</title>
+  <style>
+    :root{
+      --bg:#07111f;
+      --bg2:#0b1628;
+      --card:#102038;
+      --card2:#132846;
+      --line:rgba(255,255,255,.10);
+      --line2:rgba(255,255,255,.06);
+      --text:#eef5ff;
+      --muted:#9fb5d1;
+      --accent:#30abff;
+      --accent2:#66d9ff;
+      --ok:#27c383;
+      --warn:#ffca55;
+      --err:#ff7272;
+      --shadow:0 24px 70px rgba(0,0,0,.28);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      min-height:100vh;
+      font-family:Inter,Arial,Helvetica,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top, rgba(48,171,255,.18), transparent 30%),
+        linear-gradient(180deg, var(--bg), #050c16 100%);
+      padding:18px;
+    }
+    .app{
+      max-width:1400px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:380px 1fr;
+      gap:18px;
+    }
+    .panel,.box{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
+    .panel{
+      padding:20px;
+      align-self:start;
+      position:sticky;
+      top:18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .logo{
+      width:46px;height:46px;border-radius:15px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#03213d;font-weight:900;font-size:20px;
+      box-shadow:0 10px 28px rgba(48,171,255,.35);
+    }
+    h1{margin:0;font-size:24px;line-height:1.05}
+    .sub{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+      margin-top:6px;
+    }
+    .field{margin-top:14px}
+    .label{
+      display:block;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      color:var(--muted);
+      font-weight:800;
+      margin-bottom:7px;
+    }
+    input,select,textarea{
+      width:100%;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      outline:none;
+      background:var(--card);
+      color:var(--text);
+      font-size:14px;
+    }
+    textarea{
+      min-height:170px;
+      resize:vertical;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:12px;
+      line-height:1.5;
+    }
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:14px;
+    }
+    .actions3{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    button{
+      appearance:none;border:none;cursor:pointer;
+      padding:14px 12px;border-radius:14px;font-weight:800;font-size:14px;
+      transition:.18s ease;
+    }
+    button:hover{transform:translateY(-1px)}
+    .btn-primary{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#06213c;
+      box-shadow:0 10px 28px rgba(48,171,255,.30);
+    }
+    .btn-secondary{
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .btn-good{
+      background:linear-gradient(135deg,#1dbc74,#47e9a4);
+      color:#042816;
+      box-shadow:0 10px 28px rgba(39,195,131,.24);
+    }
+    .status{
+      margin-top:14px;
+      border-radius:14px;
+      padding:12px 14px;
+      line-height:1.45;
+      font-size:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      white-space:pre-wrap;
+      min-height:78px;
+    }
+    .tip{
+      margin-top:14px;
+      background:rgba(255,255,255,.04);
+      border:1px dashed rgba(255,255,255,.12);
+      border-radius:14px;
+      padding:12px 14px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+    }
+    .content{display:flex;flex-direction:column;gap:18px}
+    .hero{
+      padding:20px;
+    }
+    .hero-title{font-size:28px;margin:0}
+    .hero-sub{margin:8px 0 0;color:var(--muted);line-height:1.5;font-size:14px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .chip{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;
+      padding:9px 11px;
+      font-size:12px;
+      font-weight:800;
+    }
+    .chip.ok{background:rgba(39,195,131,.14);color:#aef1d0;border-color:rgba(39,195,131,.26)}
+    .chip.warn{background:rgba(255,202,85,.14);color:#ffe7a3;border-color:rgba(255,202,85,.26)}
+    .chip.err{background:rgba(255,114,114,.14);color:#ffc4c4;border-color:rgba(255,114,114,.26)}
+    .section{padding:20px}
+    .section h2{margin:0;font-size:19px}
+    .sec-sub{margin:6px 0 0;color:var(--muted);font-size:14px;line-height:1.5}
+    .cards{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:12px;
+    }
+    .card{
+      grid-column:span 3;
+      background:linear-gradient(180deg,var(--card2),rgba(19,40,70,.78));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:15px;
+      min-height:110px;
+    }
+    .card.wide{grid-column:span 6}
+    .card.full{grid-column:1/-1}
+    .card h3{
+      margin:0 0 8px;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      color:var(--muted);
+    }
+    .card p{
+      margin:0;
+      font-size:18px;
+      line-height:1.35;
+      font-weight:800;
+      word-break:break-word;
+    }
+    .empty{color:var(--muted);font-style:italic}
+    .table-wrap{
+      margin-top:16px;
+      overflow:auto;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.02);
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:920px;
+    }
+    th,td{
+      padding:12px 14px;
+      text-align:left;
+      border-bottom:1px solid var(--line2);
+      vertical-align:top;
+      font-size:14px;
+    }
+    th{
+      color:#b8cce5;
+      background:rgba(255,255,255,.04);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    td small{display:block;color:var(--muted);margin-top:5px}
+    .details{
+      margin-top:16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    details.node{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      overflow:hidden;
+      background:rgba(255,255,255,.03);
+    }
+    details.node>summary{
+      cursor:pointer;
+      list-style:none;
+      padding:13px 15px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:800;
+    }
+    details.node>summary::-webkit-details-marker{display:none}
+    .node-body{padding:0 15px 15px;border-top:1px solid var(--line2)}
+    .kv{
+      display:grid;
+      grid-template-columns:260px 1fr;
+      gap:12px;
+      padding:10px 0;
+      border-bottom:1px solid var(--line2);
+    }
+    .kv:last-child{border-bottom:none}
+    .kv-key{color:#b7cbe4;font-weight:800;word-break:break-word}
+    .kv-val{word-break:break-word;line-height:1.5}
+    .helper{
+      margin-top:14px;
+      font-size:12px;
+      line-height:1.55;
+      color:var(--muted);
+    }
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      padding:2px 6px;
+      border-radius:8px;
+      font-size:12px;
+    }
+    @media (max-width:1100px){
+      .app{grid-template-columns:1fr}
+      .panel{position:relative;top:0}
+      .card{grid-column:span 6}
+    }
+    @media (max-width:720px){
+      body{padding:12px}
+      .hero-title{font-size:22px}
+      .cards{grid-template-columns:repeat(6,1fr)}
+      .card,.card.wide,.card.full{grid-column:1/-1}
+      .grid2,.actions,.actions3{grid-template-columns:1fr}
+      .kv{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="panel">
+      <div class="brand">
+        <div class="logo">PJ</div>
+        <div>
+          <h1>CNPJ + Processos</h1>
+          <div class="sub">Tela pronta para consultar os dados cadastrais do CNPJ e também consumir um endpoint separado para processos judiciais.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="cnpj">CNPJ</label>
+        <input id="cnpj" type="text" placeholder="00.000.000/0000-00" maxlength="18" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="empresaEndpoint">API de CNPJ</label>
+        <select id="empresaEndpoint">
+          <option value="publica">publica.cnpj.ws</option>
+          <option value="custom">Endpoint personalizado</option>
+        </select>
+      </div>
+
+      <div class="field" id="empresaCustomWrap" style="display:none">
+        <label class="label" for="empresaCustom">Endpoint do CNPJ</label>
+        <input id="empresaCustom" type="text" placeholder="https://seu-backend.com/api/cnpj?cnpj={cnpj}" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="processosEndpoint">Endpoint de Processos</label>
+        <input id="processosEndpoint" type="text" value="/api/processos-cnpj?cnpj={cnpj}" />
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label class="label" for="expandAll">Abrir detalhes</label>
+          <select id="expandAll">
+            <option value="false">Fechar por padrão</option>
+            <option value="true">Abrir por padrão</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label" for="processosMode">Modo processos</label>
+          <select id="processosMode">
+            <option value="normalizado">Resposta normalizada</option>
+            <option value="auto">Auto detectar</option>
+            <option value="raw-datajud">Raw estilo DataJud</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions3">
+        <button class="btn-primary" id="btnEmpresa">Consultar CNPJ</button>
+        <button class="btn-good" id="btnProcessos">Consultar processos</button>
+        <button class="btn-secondary" id="btnAmbos">Consultar ambos</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn-secondary" id="btnLimpar">Limpar</button>
+        <button class="btn-secondary" id="btnExemplo">Usar exemplo</button>
+      </div>
+
+      <div class="status" id="statusBox">Aguardando consulta.</div>
+
+      <div class="tip">
+        Esta tela já está pronta para o bloco de processos, mas ele depende de um endpoint próprio. O campo de processos foi deixado configurável para você ligar no seu backend quando quiser.
+      </div>
+
+      <div class="helper">
+        Formato esperado do endpoint de processos:
+        <span class="mono">/api/processos-cnpj?cnpj={cnpj}</span>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="box hero">
+        <h2 class="hero-title" id="heroName">Nenhuma empresa consultada</h2>
+        <p class="hero-sub" id="heroSubtitle">Digite um CNPJ e faça a consulta.</p>
+        <div class="chips" id="heroChips"></div>
+      </section>
+
+      <section class="box section">
+        <h2>Resumo do CNPJ</h2>
+        <p class="sec-sub">Campos principais identificados automaticamente.</p>
+        <div class="cards" id="empresaResumo">
+          <div class="card full"><p class="empty">Sem dados ainda.</p></div>
+        </div>
+      </section>
+
+      <section class="box section">
+        <h2>Processos judiciais</h2>
+        <p class="sec-sub">O bloco abaixo aceita resposta normalizada do seu backend ou resposta em JSON no estilo raw do DataJud.</p>
+        <div class="cards" id="processosResumo">
+          <div class="card"><h3>Status</h3><p class="empty">Ainda não consultado</p></div>
+          <div class="card"><h3>Total</h3><p class="empty">—</p></div>
+          <div class="card wide"><h3>Tribunais</h3><p class="empty">—</p></div>
+        </div>
+
+        <div class="table-wrap" id="processosTableWrap" style="display:none">
+          <table>
+            <thead>
+              <tr>
+                <th>Tribunal</th>
+                <th>Número</th>
+                <th>Classe</th>
+                <th>Órgão julgador</th>
+                <th>Grau</th>
+                <th>Ajuizamento</th>
+                <th>Última atualização</th>
+              </tr>
+            </thead>
+            <tbody id="processosTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="helper" id="processosHint">
+          Dica: se o seu backend devolver um array em <span class="mono">processos</span> ou <span class="mono">encontrados</span>, a tabela será preenchida automaticamente.
+        </div>
+      </section>
+
+      <section class="box section">
+        <h2>Detalhes completos do CNPJ</h2>
+        <p class="sec-sub">Todos os campos retornados pela API.</p>
+        <div class="details" id="empresaDetalhes">
+          <div class="empty">Sem dados ainda.</div>
+        </div>
+      </section>
+
+      <section class="box section">
+        <h2>JSON da empresa</h2>
+        <p class="sec-sub">Resposta bruta da consulta de CNPJ.</p>
+        <textarea id="empresaJson" placeholder='O JSON da empresa aparecerá aqui...'></textarea>
+      </section>
+
+      <section class="box section">
+        <h2>JSON de processos</h2>
+        <p class="sec-sub">Resposta bruta do endpoint de processos.</p>
+        <textarea id="processosJson" placeholder='O JSON de processos aparecerá aqui...'></textarea>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const cnpjInput = $("cnpj");
+    const empresaEndpoint = $("empresaEndpoint");
+    const empresaCustomWrap = $("empresaCustomWrap");
+    const empresaCustom = $("empresaCustom");
+    const processosEndpoint = $("processosEndpoint");
+    const processosMode = $("processosMode");
+    const expandAll = $("expandAll");
+    const statusBox = $("statusBox");
+    const heroName = $("heroName");
+    const heroSubtitle = $("heroSubtitle");
+    const heroChips = $("heroChips");
+    const empresaResumo = $("empresaResumo");
+    const empresaDetalhes = $("empresaDetalhes");
+    const empresaJson = $("empresaJson");
+    const processosJson = $("processosJson");
+    const processosResumo = $("processosResumo");
+    const processosTableWrap = $("processosTableWrap");
+    const processosTbody = $("processosTbody");
+
+    let ultimoCnpj = null;
+    let ultimaEmpresa = null;
+    let ultimosProcessos = null;
+
+    empresaEndpoint.addEventListener("change", () => {
+      empresaCustomWrap.style.display = empresaEndpoint.value === "custom" ? "block" : "none";
+    });
+
+    cnpjInput.addEventListener("input", (e) => {
+      e.target.value = formatCNPJ(e.target.value);
+    });
+
+    cnpjInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") consultarAmbos();
+    });
+
+    $("btnExemplo").addEventListener("click", () => {
+      cnpjInput.value = "27.865.757/0001-02";
+    });
+
+    $("btnLimpar").addEventListener("click", limparTudo);
+    $("btnEmpresa").addEventListener("click", consultarEmpresa);
+    $("btnProcessos").addEventListener("click", consultarProcessos);
+    $("btnAmbos").addEventListener("click", consultarAmbos);
+
+    function status(msg, kind = "normal"){
+      statusBox.textContent = msg;
+      statusBox.style.color =
+        kind === "ok" ? "#b2f3d4" :
+        kind === "err" ? "#ffc8c8" :
+        "#9fb5d1";
+      statusBox.style.background =
+        kind === "ok" ? "rgba(39,195,131,.12)" :
+        kind === "err" ? "rgba(255,114,114,.12)" :
+        "rgba(255,255,255,.04)";
+      statusBox.style.borderColor =
+        kind === "ok" ? "rgba(39,195,131,.24)" :
+        kind === "err" ? "rgba(255,114,114,.24)" :
+        "rgba(255,255,255,.10)";
+    }
+
+    function formatCNPJ(value){
+      const digits = String(value || "").replace(/\D/g, "").slice(0,14);
+      return digits
+        .replace(/^(\d{2})(\d)/, "$1.$2")
+        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/\.(\d{3})(\d)/, ".$1/$2")
+        .replace(/(\d{4})(\d)/, "$1-$2");
+    }
+
+    function getCnpjLimpo(){
+      const cnpj = String(cnpjInput.value || "").replace(/\D/g, "");
+      if (cnpj.length !== 14) throw new Error("Digite um CNPJ com 14 números.");
+      ultimoCnpj = cnpj;
+      return cnpj;
+    }
+
+    function getEmpresaUrl(cnpj){
+      if (empresaEndpoint.value === "custom") {
+        const custom = String(empresaCustom.value || "").trim();
+        if (!custom) throw new Error("Informe o endpoint personalizado do CNPJ.");
+        return custom.replace("{cnpj}", cnpj);
+      }
+      return `https://publica.cnpj.ws/cnpj/${cnpj}`;
+    }
+
+    function getProcessosUrl(cnpj){
+      const url = String(processosEndpoint.value || "").trim();
+      if (!url) throw new Error("Informe o endpoint de processos.");
+      return url.replace("{cnpj}", cnpj);
+    }
+
+    async function consultarAmbos(){
+      try{
+        await consultarEmpresa();
+      } catch {}
+      try{
+        await consultarProcessos();
+      } catch {}
+    }
+
+    async function consultarEmpresa(){
+      const cnpj = getCnpjLimpo();
+      const url = getEmpresaUrl(cnpj);
+      status("Consultando dados do CNPJ...", "normal");
+
+      try{
+        const response = await fetch(url, {
+          method: "GET",
+          headers: { "Accept": "application/json" }
+        });
+        const text = await response.text();
+        const data = parseJsonSafe(text);
+
+        if (!response.ok) {
+          throw new Error(data?.message || data?.mensagem || `Erro HTTP ${response.status}`);
+        }
+
+        ultimaEmpresa = data;
+        empresaJson.value = JSON.stringify(data, null, 2);
+        renderEmpresa(data, url);
+        status("Consulta do CNPJ concluída com sucesso.", "ok");
+        return data;
+      }catch(err){
+        status("Falha na consulta do CNPJ: " + err.message, "err");
+        throw err;
+      }
+    }
+
+    async function consultarProcessos(){
+      const cnpj = getCnpjLimpo();
+      const url = getProcessosUrl(cnpj);
+      status("Consultando processos...", "normal");
+
+      try{
+        const response = await fetch(url, {
+          method: "GET",
+          headers: { "Accept": "application/json" }
+        });
+        const text = await response.text();
+        const data = parseJsonSafe(text);
+
+        if (!response.ok) {
+          throw new Error(data?.message || data?.mensagem || `Erro HTTP ${response.status}`);
+        }
+
+        ultimosProcessos = data;
+        processosJson.value = JSON.stringify(data, null, 2);
+        renderProcessos(data);
+        status("Consulta de processos concluída com sucesso.", "ok");
+        return data;
+      }catch(err){
+        status("Falha na consulta de processos: " + err.message, "err");
+        throw err;
+      }
+    }
+
+    function limparTudo(){
+      ultimoCnpj = null;
+      ultimaEmpresa = null;
+      ultimosProcessos = null;
+      cnpjInput.value = "";
+      heroName.textContent = "Nenhuma empresa consultada";
+      heroSubtitle.textContent = "Digite um CNPJ e faça a consulta.";
+      heroChips.innerHTML = "";
+      empresaResumo.innerHTML = '<div class="card full"><p class="empty">Sem dados ainda.</p></div>';
+      empresaDetalhes.innerHTML = '<div class="empty">Sem dados ainda.</div>';
+      empresaJson.value = "";
+      processosJson.value = "";
+      resetProcessosView();
+      status("Tela limpa.", "ok");
+    }
+
+    function renderEmpresa(data, url){
+      const razao = pick(data, ["razao_social", "nome"]) || "Empresa localizada";
+      const fantasia = pick(data, ["estabelecimento.nome_fantasia", "nome_fantasia", "fantasia"]);
+      const situacao = pick(data, ["estabelecimento.situacao_cadastral", "status", "situacao"]);
+      const cnpj = pick(data, ["estabelecimento.cnpj", "cnpj"]) || ultimoCnpj;
+      const municipio = pick(data, ["estabelecimento.cidade.nome", "municipio", "cidade"]);
+      const uf = pick(data, ["estabelecimento.estado.sigla", "uf", "estado"]);
+      const abertura = pick(data, ["estabelecimento.data_inicio_atividade", "abertura"]);
+      const atualizacao = pick(data, ["atualizado_em", "ultima_atualizacao", "estabelecimento.atualizado_em"]);
+      const email = pick(data, ["estabelecimento.email", "email"]);
+      const telefone = joinPhones(data);
+      const endereco = joinAddress(data);
+
+      heroName.textContent = razao;
+      heroSubtitle.textContent = [
+        fantasia ? `Fantasia: ${fantasia}` : null,
+        cnpj ? `CNPJ: ${formatCNPJ(cnpj)}` : null,
+        url ? `Fonte: ${url}` : null
+      ].filter(Boolean).join(" • ");
+
+      const chips = [];
+      if (situacao){
+        const klass = /ativa|active/i.test(String(situacao)) ? "ok" :
+                      /baixada|inapta|suspensa|nula/i.test(String(situacao)) ? "err" : "warn";
+        chips.push(`<span class="chip ${klass}">Situação: ${escapeHtml(situacao)}</span>`);
+      }
+      if (municipio || uf) chips.push(`<span class="chip">${escapeHtml([municipio, uf].filter(Boolean).join(" / "))}</span>`);
+      if (abertura) chips.push(`<span class="chip">Abertura: ${escapeHtml(normalizeDate(abertura))}</span>`);
+      if (atualizacao) chips.push(`<span class="chip">Atualizado: ${escapeHtml(normalizeDate(atualizacao))}</span>`);
+      heroChips.innerHTML = chips.join("");
+
+      const cards = [
+        ["Razão social", razao],
+        ["Fantasia", fantasia],
+        ["CNPJ", cnpj ? formatCNPJ(cnpj) : null],
+        ["Situação", situacao],
+        ["Abertura", abertura ? normalizeDate(abertura) : null],
+        ["Município / UF", [municipio, uf].filter(Boolean).join(" / ") || null],
+        ["Telefone", telefone],
+        ["Email", email],
+        ["Endereço", endereco],
+        ["Natureza jurídica", pick(data, ["natureza_juridica.descricao", "natureza_juridica"])],
+        ["Porte", pick(data, ["porte.descricao", "porte"])],
+        ["Capital social", pick(data, ["capital_social"])]
+      ].filter(([,v]) => v != null && String(v) !== "");
+
+      empresaResumo.innerHTML = cards.map(([title, value], i) => {
+        const wide = String(value).length > 36 || /endereço|razão social/i.test(title);
+        return `
+          <div class="card ${wide ? "wide" : ""}">
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(String(value))}</p>
+          </div>
+        `;
+      }).join("");
+
+      empresaDetalhes.innerHTML = "";
+      empresaDetalhes.appendChild(renderNode("Resposta da API", data, true));
+    }
+
+    function resetProcessosView(){
+      processosResumo.innerHTML = `
+        <div class="card"><h3>Status</h3><p class="empty">Ainda não consultado</p></div>
+        <div class="card"><h3>Total</h3><p class="empty">—</p></div>
+        <div class="card wide"><h3>Tribunais</h3><p class="empty">—</p></div>
+      `;
+      processosTableWrap.style.display = "none";
+      processosTbody.innerHTML = "";
+    }
+
+    function renderProcessos(raw){
+      const processos = normalizeProcessResponse(raw);
+      const total = Number(processos.total ?? processos.items.length ?? 0);
+      const tribunais = Array.from(new Set(processos.items.map(p => p.tribunal).filter(Boolean)));
+      const statusText = total > 0 ? "Com indícios de processos" : "Sem processos retornados";
+
+      processosResumo.innerHTML = `
+        <div class="card">
+          <h3>Status</h3>
+          <p>${escapeHtml(statusText)}</p>
+        </div>
+        <div class="card">
+          <h3>Total</h3>
+          <p>${escapeHtml(String(total))}</p>
+        </div>
+        <div class="card wide">
+          <h3>Tribunais</h3>
+          <p>${tribunais.length ? escapeHtml(tribunais.join(", ")) : "Não informado"}</p>
+        </div>
+        <div class="card">
+          <h3>Consultado em</h3>
+          <p>${escapeHtml(new Date().toLocaleString("pt-BR"))}</p>
+        </div>
+      `;
+
+      if (!processos.items.length){
+        processosTableWrap.style.display = "none";
+        processosTbody.innerHTML = "";
+        return;
+      }
+
+      processosTbody.innerHTML = processos.items.map(proc => `
+        <tr>
+          <td>${escapeHtml(proc.tribunal || "-")}</td>
+          <td>${escapeHtml(proc.numeroProcesso || "-")}
+              ${proc.id ? `<small>ID: ${escapeHtml(proc.id)}</small>` : ""}
+          </td>
+          <td>${escapeHtml(proc.classe || "-")}</td>
+          <td>${escapeHtml(proc.orgaoJulgador || "-")}</td>
+          <td>${escapeHtml(proc.grau || "-")}</td>
+          <td>${escapeHtml(proc.dataAjuizamento ? normalizeDate(proc.dataAjuizamento) : "-")}</td>
+          <td>${escapeHtml(proc.atualizadoEm ? normalizeDate(proc.atualizadoEm) : "-")}</td>
+        </tr>
+      `).join("");
+
+      processosTableWrap.style.display = "block";
+    }
+
+    function normalizeProcessResponse(raw){
+      const mode = processosMode.value;
+      if (mode === "raw-datajud") return fromDataJudRaw(raw);
+      if (mode === "normalizado") return fromNormalized(raw);
+
+      if (raw?.hits?.hits) return fromDataJudRaw(raw);
+      if (Array.isArray(raw?.processos) || Array.isArray(raw?.encontrados) || Array.isArray(raw)) return fromNormalized(raw);
+      return fromNormalized(raw);
+    }
+
+    function fromNormalized(raw){
+      const list = Array.isArray(raw) ? raw
+        : Array.isArray(raw?.processos) ? raw.processos
+        : Array.isArray(raw?.encontrados) ? raw.encontrados
+        : Array.isArray(raw?.items) ? raw.items
+        : [];
+
+      return {
+        total: raw?.total ?? list.length,
+        items: list.map(item => ({
+          id: item.id || item._id || null,
+          tribunal: item.tribunal || item.tribunalSigla || item.corte || null,
+          numeroProcesso: item.numeroProcesso || item.numero || item.processo || null,
+          classe: item.classe?.nome || item.classe || null,
+          orgaoJulgador: item.orgaoJulgador?.nome || item.orgaoJulgador || item.vara || null,
+          grau: item.grau || null,
+          dataAjuizamento: item.dataAjuizamento || item.dataDistribuicao || null,
+          atualizadoEm: item.dataHoraUltimaAtualizacao || item.atualizadoEm || item.ultimaAtualizacao || null
+        }))
+      };
+    }
+
+    function fromDataJudRaw(raw){
+      const hits = raw?.hits?.hits || [];
+      return {
+        total: raw?.hits?.total?.value ?? hits.length,
+        items: hits.map(hit => {
+          const s = hit?._source || {};
+          return {
+            id: hit?._id || s.id || null,
+            tribunal: s.tribunal || null,
+            numeroProcesso: s.numeroProcesso || null,
+            classe: s.classe?.nome || null,
+            orgaoJulgador: s.orgaoJulgador?.nome || null,
+            grau: s.grau || null,
+            dataAjuizamento: s.dataAjuizamento || null,
+            atualizadoEm: s.dataHoraUltimaAtualizacao || s["@timestamp"] || null
+          };
+        })
+      };
+    }
+
+    function renderNode(key, value, isRoot = false){
+      if (value === null || value === undefined){
+        const div = document.createElement("div");
+        div.className = "kv";
+        div.innerHTML = `<div class="kv-key">${escapeHtml(String(key))}</div><div class="kv-val empty">null</div>`;
+        return div;
+      }
+
+      if (Array.isArray(value)){
+        const details = document.createElement("details");
+        details.className = "node";
+        details.open = expandAll.value === "true" || isRoot;
+        details.innerHTML = `
+          <summary><span>${escapeHtml(String(key))}</span><span>${value.length} itens</span></summary>
+          <div class="node-body"></div>
+        `;
+        const body = details.querySelector(".node-body");
+        if (!value.length){
+          const div = document.createElement("div");
+          div.className = "empty";
+          div.textContent = "Lista vazia.";
+          body.appendChild(div);
+          return details;
+        }
+        value.forEach((item, index) => body.appendChild(renderNode(`[${index}]`, item)));
+        return details;
+      }
+
+      if (typeof value === "object"){
+        const keys = Object.keys(value);
+        const details = document.createElement("details");
+        details.className = "node";
+        details.open = expandAll.value === "true" || isRoot;
+        details.innerHTML = `
+          <summary><span>${escapeHtml(String(key))}</span><span>${keys.length} campos</span></summary>
+          <div class="node-body"></div>
+        `;
+        const body = details.querySelector(".node-body");
+        if (!keys.length){
+          const div = document.createElement("div");
+          div.className = "empty";
+          div.textContent = "Objeto vazio.";
+          body.appendChild(div);
+          return details;
+        }
+        keys.forEach(k => body.appendChild(renderNode(k, value[k])));
+        return details;
+      }
+
+      const div = document.createElement("div");
+      div.className = "kv";
+      div.innerHTML = `
+        <div class="kv-key">${escapeHtml(String(key))}</div>
+        <div class="kv-val">${escapeHtml(normalizePrimitive(value))}</div>
+      `;
+      return div;
+    }
+
+    function normalizePrimitive(value){
+      if (typeof value === "boolean") return value ? "true" : "false";
+      if (typeof value === "number") return String(value);
+      return normalizeDate(String(value));
+    }
+
+    function normalizeDate(value){
+      if (!value) return value;
+      if (!/^\d{4}-\d{2}-\d{2}/.test(String(value))) return String(value);
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return new Intl.DateTimeFormat("pt-BR", {
+        dateStyle: "short",
+        timeStyle: String(value).includes("T") ? "short" : undefined
+      }).format(date);
+    }
+
+    function parseJsonSafe(text){
+      try { return JSON.parse(text); }
+      catch { throw new Error("A resposta não veio em JSON válido."); }
+    }
+
+    function pick(obj, paths){
+      for (const path of paths){
+        const val = getByPath(obj, path);
+        if (val !== undefined && val !== null && val !== "") return val;
+      }
+      return null;
+    }
+
+    function getByPath(obj, path){
+      return String(path).split(".").reduce((acc, key) => acc == null ? undefined : acc[key], obj);
+    }
+
+    function joinPhones(data){
+      const ddd1 = pick(data, ["estabelecimento.ddd1"]);
+      const f1 = pick(data, ["estabelecimento.telefone1"]);
+      const ddd2 = pick(data, ["estabelecimento.ddd2"]);
+      const f2 = pick(data, ["estabelecimento.telefone2"]);
+      const tel = pick(data, ["telefone"]);
+      const list = [
+        tel,
+        [ddd1, f1].filter(Boolean).join(" "),
+        [ddd2, f2].filter(Boolean).join(" ")
+      ].filter(Boolean);
+      return Array.from(new Set(list)).join(" / ");
+    }
+
+    function joinAddress(data){
+      const partes = [
+        pick(data, ["estabelecimento.tipo_logradouro"]),
+        pick(data, ["estabelecimento.logradouro", "logradouro"]),
+        pick(data, ["estabelecimento.numero", "numero"]),
+        pick(data, ["estabelecimento.complemento", "complemento"]),
+        pick(data, ["estabelecimento.bairro", "bairro"]),
+        pick(data, ["estabelecimento.cep", "cep"])
+      ].filter(Boolean);
+      return partes.join(", ");
+    }
+
+    function escapeHtml(value){
+      return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+  </script>
+</body>
+</html>
