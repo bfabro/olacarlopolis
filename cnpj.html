@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consulta CNPJ - Tela Completa</title>
+  <style>
+    :root{
+      --bg:#07111f;
+      --bg2:#0c1a2d;
+      --card:#0f2138;
+      --card2:#132945;
+      --line:rgba(255,255,255,.10);
+      --text:#eaf3ff;
+      --muted:#9bb2d1;
+      --accent:#2aa8ff;
+      --accent2:#63d4ff;
+      --ok:#26c281;
+      --warn:#f4c542;
+      --err:#ff6b6b;
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:
+      radial-gradient(circle at top, rgba(42,168,255,.16), transparent 30%),
+      linear-gradient(180deg, var(--bg), #050d18 100%);
+      color:var(--text);
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      min-height:100%;
+    }
+    body{padding:24px}
+    .app{
+      max-width:1280px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 380px 1fr;
+      gap:20px;
+    }
+    .panel, .content-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .panel{
+      padding:20px;
+      position:sticky;
+      top:20px;
+      align-self:start;
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .logo-badge{
+      width:44px;height:44px;border-radius:14px;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      display:grid;place-items:center;
+      color:#03213d;
+      font-weight:900;font-size:22px;
+      box-shadow:0 8px 24px rgba(42,168,255,.35);
+    }
+    h1{
+      margin:0;
+      font-size:24px;
+      line-height:1.1;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+      margin:8px 0 18px;
+    }
+    .hint{
+      font-size:12px;
+      line-height:1.45;
+      color:var(--muted);
+      background:rgba(255,255,255,.04);
+      border:1px dashed rgba(255,255,255,.12);
+      padding:12px 14px;
+      border-radius:14px;
+      margin-top:14px;
+    }
+
+    .field{margin-bottom:14px}
+    .label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:7px;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+      font-weight:700;
+    }
+    input, select, textarea{
+      width:100%;
+      border:none;
+      outline:none;
+      border-radius:14px;
+      padding:14px 14px;
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--text);
+      font-size:15px;
+    }
+    textarea{
+      min-height:180px;
+      resize:vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    button{
+      border:none;
+      outline:none;
+      cursor:pointer;
+      border-radius:14px;
+      padding:14px 16px;
+      font-weight:800;
+      font-size:14px;
+      transition:.18s ease;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#06213c;
+      box-shadow:0 10px 28px rgba(42,168,255,.30);
+    }
+    .btn-primary:hover{transform:translateY(-1px)}
+    .btn-secondary{
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.09);
+    }
+    .btn-secondary:hover{background:rgba(255,255,255,.1)}
+    .status{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:14px;
+      line-height:1.45;
+      color:var(--muted);
+      min-height:50px;
+      white-space:pre-wrap;
+    }
+    .content{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+    .hero{
+      padding:20px;
+    }
+    .hero-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .hero-title{
+      font-size:28px;
+      margin:0 0 6px;
+      line-height:1.15;
+    }
+    .hero-sub{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+      margin:0;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:16px;
+    }
+    .chip{
+      padding:10px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--text);
+      font-size:12px;
+      font-weight:700;
+    }
+    .chip.ok{background:rgba(38,194,129,.14); color:#abf2d0; border-color:rgba(38,194,129,.26)}
+    .chip.warn{background:rgba(244,197,66,.13); color:#ffe399; border-color:rgba(244,197,66,.26)}
+    .chip.err{background:rgba(255,107,107,.14); color:#ffc0c0; border-color:rgba(255,107,107,.26)}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:14px;
+    }
+    .card{
+      grid-column:span 4;
+      background:linear-gradient(180deg, var(--card2), rgba(19,41,69,.75));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:16px;
+      min-height:110px;
+    }
+    .card h3{
+      margin:0 0 8px;
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .card p{
+      margin:0;
+      font-size:18px;
+      line-height:1.35;
+      font-weight:800;
+      word-break:break-word;
+    }
+    .wide{grid-column:span 6}
+    .full{grid-column:1/-1}
+    .section{
+      padding:20px;
+    }
+    .section h2{
+      margin:0 0 14px;
+      font-size:18px;
+    }
+    .section p.sec-sub{
+      margin:-4px 0 16px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .details-wrap{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    details.node{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      overflow:hidden;
+    }
+    details.node > summary{
+      list-style:none;
+      cursor:pointer;
+      padding:14px 16px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    details.node > summary::-webkit-details-marker{display:none}
+    .summary-meta{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+    .node-body{
+      padding:0 16px 16px;
+      border-top:1px solid rgba(255,255,255,.06);
+    }
+    .kv{
+      display:grid;
+      grid-template-columns:260px 1fr;
+      gap:10px;
+      padding:10px 0;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      align-items:start;
+    }
+    .kv:last-child{border-bottom:none}
+    .kv-key{
+      color:#b5cae4;
+      font-weight:700;
+      word-break:break-word;
+    }
+    .kv-val{
+      color:var(--text);
+      word-break:break-word;
+      line-height:1.5;
+    }
+    .empty{
+      color:var(--muted);
+      font-style:italic;
+    }
+    .raw-actions{
+      display:flex;
+      justify-content:flex-end;
+      margin-bottom:10px;
+    }
+    .footer-note{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+      margin-top:12px;
+    }
+    .inline-code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      padding:2px 6px;
+      font-size:12px;
+    }
+
+    @media (max-width: 980px){
+      .app{grid-template-columns:1fr}
+      .panel{position:relative;top:0}
+      .card, .wide{grid-column:span 6}
+    }
+    @media (max-width: 720px){
+      body{padding:14px}
+      .hero-title{font-size:22px}
+      .grid{grid-template-columns:repeat(6,1fr)}
+      .card, .wide, .full{grid-column:1/-1}
+      .kv{grid-template-columns:1fr}
+      .row, .actions{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="panel">
+      <div class="logo">
+        <div class="logo-badge">C</div>
+        <div>
+          <h1>Consulta CNPJ</h1>
+          <div class="sub">Tela pronta para consultar e exibir automaticamente todos os campos retornados pela API.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="cnpj">CNPJ</label>
+        <input id="cnpj" type="text" placeholder="00.000.000/0000-00" maxlength="18" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="endpointPreset">Fonte da consulta</label>
+        <select id="endpointPreset">
+          <option value="legacy">ReceitaWS antiga — https://www.receitaws.com.br/v1/cnpj/{cnpj}</option>
+          <option value="publica">CNPJ.ws pública — https://publica.cnpj.ws/cnpj/{cnpj}</option>
+          <option value="custom">Endpoint personalizado</option>
+        </select>
+      </div>
+
+      <div class="field" id="customEndpointWrap" style="display:none">
+        <label class="label" for="customEndpoint">Endpoint personalizado</label>
+        <input id="customEndpoint" type="text" placeholder="https://seu-backend.com/api/cnpj/{cnpj}" />
+      </div>
+
+      <div class="row">
+        <div class="field" style="margin-bottom:0">
+          <label class="label" for="expandAll">Detalhes</label>
+          <select id="expandAll">
+            <option value="false">Fechar por padrão</option>
+            <option value="true">Abrir por padrão</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label class="label" for="autoSummary">Resumo superior</label>
+          <select id="autoSummary">
+            <option value="true">Mostrar</option>
+            <option value="false">Ocultar</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" id="btnConsultar">Consultar</button>
+        <button class="btn-secondary" id="btnLimpar">Limpar</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn-secondary" id="btnCopiarJson">Copiar JSON</button>
+        <button class="btn-secondary" id="btnExemplo">Usar exemplo</button>
+      </div>
+
+      <div class="status" id="statusBox">Aguardando consulta.</div>
+
+      <div class="hint">
+        Dica: se a consulta direta no navegador falhar, normalmente isso acontece por bloqueio de CORS ou limite da API. Nesse caso, troque para um endpoint próprio de backend/proxy e mantenha esta tela apenas como front-end.
+      </div>
+
+      <div class="footer-note">
+        Esta tela aceita qualquer JSON. Se a API adicionar novos campos, eles também serão exibidos automaticamente.
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="content-card hero">
+        <div class="hero-top">
+          <div>
+            <h2 class="hero-title" id="heroName">Nenhuma empresa consultada</h2>
+            <p class="hero-sub" id="heroSubtitle">Informe um CNPJ e clique em consultar.</p>
+          </div>
+          <div class="chips" id="heroChips"></div>
+        </div>
+      </section>
+
+      <section class="content-card section" id="summarySection">
+        <h2>Resumo rápido</h2>
+        <p class="sec-sub">Campos principais identificados automaticamente no retorno.</p>
+        <div class="grid" id="summaryGrid">
+          <div class="card full"><p class="empty">Sem dados para exibir ainda.</p></div>
+        </div>
+      </section>
+
+      <section class="content-card section">
+        <h2>Detalhes completos</h2>
+        <p class="sec-sub">Todos os campos retornados pela API, inclusive objetos e listas.</p>
+        <div class="details-wrap" id="detailsWrap">
+          <div class="empty">Sem dados para exibir ainda.</div>
+        </div>
+      </section>
+
+      <section class="content-card section">
+        <div class="raw-actions">
+          <button class="btn-secondary" id="btnFormatarJson">Formatar JSON</button>
+        </div>
+        <h2>JSON bruto</h2>
+        <p class="sec-sub">Útil para debug, integração e conferência de campos.</p>
+        <textarea id="rawJson" placeholder='O JSON completo aparecerá aqui...'></textarea>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const cnpjInput = $("cnpj");
+    const endpointPreset = $("endpointPreset");
+    const customEndpointWrap = $("customEndpointWrap");
+    const customEndpoint = $("customEndpoint");
+    const expandAll = $("expandAll");
+    const autoSummary = $("autoSummary");
+    const statusBox = $("statusBox");
+    const rawJson = $("rawJson");
+    const heroName = $("heroName");
+    const heroSubtitle = $("heroSubtitle");
+    const heroChips = $("heroChips");
+    const summaryGrid = $("summaryGrid");
+    const summarySection = $("summarySection");
+    const detailsWrap = $("detailsWrap");
+
+    let ultimoJson = null;
+
+    function formatCNPJ(value) {
+      const digits = (value || "").replace(/\D/g, "").slice(0, 14);
+      return digits
+        .replace(/^(\d{2})(\d)/, "$1.$2")
+        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/\.(\d{3})(\d)/, ".$1/$2")
+        .replace(/(\d{4})(\d)/, "$1-$2");
+    }
+
+    cnpjInput.addEventListener("input", (e) => {
+      e.target.value = formatCNPJ(e.target.value);
+    });
+
+    endpointPreset.addEventListener("change", () => {
+      customEndpointWrap.style.display = endpointPreset.value === "custom" ? "block" : "none";
+    });
+
+    $("btnExemplo").addEventListener("click", () => {
+      cnpjInput.value = "27.865.757/0001-02";
+    });
+
+    $("btnLimpar").addEventListener("click", limparTela);
+    $("btnCopiarJson").addEventListener("click", copiarJson);
+    $("btnFormatarJson").addEventListener("click", () => {
+      try {
+        if (!rawJson.value.trim()) return;
+        const obj = JSON.parse(rawJson.value);
+        rawJson.value = JSON.stringify(obj, null, 2);
+        status("JSON formatado com sucesso.", "ok");
+      } catch (err) {
+        status("Não foi possível formatar o JSON: " + err.message, "err");
+      }
+    });
+
+    $("btnConsultar").addEventListener("click", consultar);
+
+    cnpjInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") consultar();
+    });
+
+    function status(message, type = "normal") {
+      statusBox.textContent = message;
+      statusBox.style.color = type === "ok" ? "#abf2d0" : type === "err" ? "#ffc0c0" : "#9bb2d1";
+      statusBox.style.borderColor = type === "ok"
+        ? "rgba(38,194,129,.26)"
+        : type === "err"
+        ? "rgba(255,107,107,.26)"
+        : "rgba(255,255,255,.08)";
+      statusBox.style.background = type === "ok"
+        ? "rgba(38,194,129,.12)"
+        : type === "err"
+        ? "rgba(255,107,107,.12)"
+        : "rgba(255,255,255,.04)";
+    }
+
+    function limparTela() {
+      ultimoJson = null;
+      rawJson.value = "";
+      heroName.textContent = "Nenhuma empresa consultada";
+      heroSubtitle.textContent = "Informe um CNPJ e clique em consultar.";
+      heroChips.innerHTML = "";
+      summaryGrid.innerHTML = '<div class="card full"><p class="empty">Sem dados para exibir ainda.</p></div>';
+      detailsWrap.innerHTML = '<div class="empty">Sem dados para exibir ainda.</div>';
+      status("Tela limpa.", "ok");
+    }
+
+    function getEndpoint(cnpj) {
+      const map = {
+        legacy: `https://www.receitaws.com.br/v1/cnpj/${cnpj}`,
+        publica: `https://publica.cnpj.ws/cnpj/${cnpj}`
+      };
+      if (endpointPreset.value === "custom") {
+        const tpl = (customEndpoint.value || "").trim();
+        if (!tpl) throw new Error("Informe um endpoint personalizado.");
+        return tpl.replace("{cnpj}", cnpj);
+      }
+      return map[endpointPreset.value];
+    }
+
+    async function consultar() {
+      const cnpj = (cnpjInput.value || "").replace(/\D/g, "");
+      if (cnpj.length !== 14) {
+        status("Digite um CNPJ com 14 números.", "err");
+        cnpjInput.focus();
+        return;
+      }
+
+      let url = "";
+      try {
+        url = getEndpoint(cnpj);
+      } catch (err) {
+        status(err.message, "err");
+        return;
+      }
+
+      status("Consultando API...", "normal");
+
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: { "Accept": "application/json" }
+        });
+
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error("A resposta não veio em JSON válido.");
+        }
+
+        if (!response.ok) {
+          const message = data?.message || data?.status || `Erro HTTP ${response.status}`;
+          throw new Error(message);
+        }
+
+        ultimoJson = data;
+        rawJson.value = JSON.stringify(data, null, 2);
+        renderAll(data, url);
+        status("Consulta concluída com sucesso.", "ok");
+      } catch (err) {
+        const msg = String(err?.message || err);
+        const help = msg.toLowerCase().includes("failed to fetch")
+          ? "\n\nPossível causa: bloqueio de CORS ou endpoint indisponível para chamada direta do navegador."
+          : "";
+        status("Falha na consulta: " + msg + help, "err");
+      }
+    }
+
+    function renderAll(data, url) {
+      renderHero(data, url);
+      renderSummary(data);
+      renderDetails(data);
+    }
+
+    function renderHero(data, url) {
+      const razao = pick(data, [
+        "razao_social",
+        "nome",
+        "company.name"
+      ]) || "Empresa localizada";
+
+      const fantasia = pick(data, [
+        "nome_fantasia",
+        "fantasia",
+        "estabelecimento.nome_fantasia"
+      ]);
+
+      const cnpj = pick(data, [
+        "cnpj",
+        "estabelecimento.cnpj"
+      ]) || formatCNPJ(cnpjInput.value);
+
+      heroName.textContent = razao;
+      heroSubtitle.textContent = [
+        fantasia ? `Fantasia: ${fantasia}` : null,
+        cnpj ? `CNPJ: ${formatCNPJ(cnpj)}` : null,
+        url ? `Fonte: ${url}` : null
+      ].filter(Boolean).join(" • ");
+
+      const situacao = pick(data, [
+        "status",
+        "situacao",
+        "estabelecimento.situacao_cadastral",
+        "situacao"
+      ]);
+
+      const abertura = pick(data, [
+        "abertura",
+        "estabelecimento.data_inicio_atividade"
+      ]);
+
+      const cidade = pick(data, [
+        "municipio",
+        "estabelecimento.cidade.nome",
+        "cidade",
+        "estabelecimento.cidade"
+      ]);
+
+      const uf = pick(data, [
+        "uf",
+        "estabelecimento.estado.sigla",
+        "estado"
+      ]);
+
+      const atualizado = pick(data, [
+        "ultima_atualizacao",
+        "atualizado_em",
+        "estabelecimento.atualizado_em"
+      ]);
+
+      const chips = [];
+      if (situacao) {
+        const klass = /ativa|active|ok/i.test(String(situacao))
+          ? "ok"
+          : /baixada|inapta|suspensa|nula/i.test(String(situacao))
+          ? "err"
+          : "warn";
+        chips.push(`<span class="chip ${klass}">Situação: ${escapeHtml(situacao)}</span>`);
+      }
+      if (abertura) chips.push(`<span class="chip">Abertura: ${escapeHtml(normalizeDate(abertura))}</span>`);
+      if (cidade || uf) chips.push(`<span class="chip">${escapeHtml([cidade, uf].filter(Boolean).join(" / "))}</span>`);
+      if (atualizado) chips.push(`<span class="chip">Atualizado: ${escapeHtml(normalizeDate(atualizado))}</span>`);
+      heroChips.innerHTML = chips.join("");
+    }
+
+    function renderSummary(data) {
+      const show = autoSummary.value === "true";
+      summarySection.style.display = show ? "block" : "none";
+      if (!show) return;
+
+      const entries = [
+        ["Razão social", pick(data, ["razao_social", "nome"])],
+        ["Nome fantasia", pick(data, ["fantasia", "nome_fantasia", "estabelecimento.nome_fantasia"])],
+        ["CNPJ", pick(data, ["cnpj", "estabelecimento.cnpj"])],
+        ["Situação", pick(data, ["status", "situacao", "estabelecimento.situacao_cadastral"])],
+        ["Abertura", pick(data, ["abertura", "estabelecimento.data_inicio_atividade"])],
+        ["Natureza jurídica", pick(data, ["natureza_juridica", "natureza_juridica.descricao", "natureza_juridica.descricao"])],
+        ["Porte", pick(data, ["porte", "porte.descricao"])],
+        ["Capital social", pick(data, ["capital_social"])],
+        ["Email", pick(data, ["email", "estabelecimento.email"])],
+        ["Telefone", joinPhone(data)],
+        ["Endereço", joinAddress(data)],
+        ["Município/UF", joinCityState(data)]
+      ].filter(([, value]) => value != null && value !== "");
+
+      if (!entries.length) {
+        summaryGrid.innerHTML = '<div class="card full"><p class="empty">Nenhum campo resumido identificado automaticamente.</p></div>';
+        return;
+      }
+
+      summaryGrid.innerHTML = entries.map(([title, value], index) => {
+        const cls = index === entries.length - 1 || String(title).length > 18 || String(value).length > 44 ? "card wide" : "card";
+        return `
+          <div class="${cls}">
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(formatSummaryValue(title, value))}</p>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderDetails(data) {
+      detailsWrap.innerHTML = "";
+      const root = renderNode("root", data, 0, true);
+      detailsWrap.appendChild(root);
+    }
+
+    function renderNode(key, value, depth = 0, isRoot = false) {
+      if (value === null || value === undefined) {
+        const div = document.createElement("div");
+        div.className = "kv";
+        div.innerHTML = `
+          <div class="kv-key">${escapeHtml(String(key))}</div>
+          <div class="kv-val empty">null</div>
+        `;
+        return div;
+      }
+
+      if (Array.isArray(value)) {
+        const details = document.createElement("details");
+        details.className = "node";
+        details.open = expandAll.value === "true" || isRoot;
+        details.innerHTML = `
+          <summary>
+            <span>${escapeHtml(labelForKey(key))}</span>
+            <span class="summary-meta">array (${value.length})</span>
+          </summary>
+          <div class="node-body"></div>
+        `;
+        const body = details.querySelector(".node-body");
+
+        if (!value.length) {
+          const div = document.createElement("div");
+          div.className = "empty";
+          div.textContent = "Lista vazia.";
+          body.appendChild(div);
+          return details;
+        }
+
+        value.forEach((item, index) => {
+          body.appendChild(renderNode(`[${index}]`, item, depth + 1));
+        });
+        return details;
+      }
+
+      if (typeof value === "object") {
+        const keys = Object.keys(value);
+        const details = document.createElement("details");
+        details.className = "node";
+        details.open = expandAll.value === "true" || isRoot;
+        details.innerHTML = `
+          <summary>
+            <span>${escapeHtml(labelForKey(key))}</span>
+            <span class="summary-meta">objeto (${keys.length} ${keys.length === 1 ? "campo" : "campos"})</span>
+          </summary>
+          <div class="node-body"></div>
+        `;
+        const body = details.querySelector(".node-body");
+
+        if (!keys.length) {
+          const div = document.createElement("div");
+          div.className = "empty";
+          div.textContent = "Objeto vazio.";
+          body.appendChild(div);
+          return details;
+        }
+
+        keys.forEach((childKey) => {
+          body.appendChild(renderNode(childKey, value[childKey], depth + 1));
+        });
+        return details;
+      }
+
+      const div = document.createElement("div");
+      div.className = "kv";
+      div.innerHTML = `
+        <div class="kv-key">${escapeHtml(labelForKey(key))}</div>
+        <div class="kv-val">${escapeHtml(normalizePrimitive(value))}</div>
+      `;
+      return div;
+    }
+
+    function labelForKey(key) {
+      if (key === "root") return "Resposta da API";
+      return String(key)
+        .replace(/_/g, " ")
+        .replace(/\./g, " › ")
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function normalizePrimitive(value) {
+      if (typeof value === "boolean") return value ? "true" : "false";
+      if (typeof value === "number") return String(value);
+      return normalizeDate(String(value));
+    }
+
+    function normalizeDate(value) {
+      if (!value) return value;
+      const isoDate = /^\d{4}-\d{2}-\d{2}/.test(value);
+      if (!isoDate) return value;
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat("pt-BR", {
+        dateStyle: "short",
+        timeStyle: value.includes("T") ? "short" : undefined
+      }).format(date);
+    }
+
+    function joinAddress(data) {
+      const logradouro = pick(data, ["logradouro", "estabelecimento.logradouro"]);
+      const numero = pick(data, ["numero", "estabelecimento.numero"]);
+      const complemento = pick(data, ["complemento", "estabelecimento.complemento"]);
+      const bairro = pick(data, ["bairro", "estabelecimento.bairro"]);
+      const cep = pick(data, ["cep", "estabelecimento.cep"]);
+      return [logradouro, numero, complemento, bairro, cep].filter(Boolean).join(", ");
+    }
+
+    function joinPhone(data) {
+      const ddd = pick(data, ["telefone", "ddd", "estabelecimento.ddd1"]);
+      const tel1 = pick(data, ["telefone", "estabelecimento.telefone1"]);
+      const tel2 = pick(data, ["estabelecimento.telefone2"]);
+      return [[ddd, tel1].filter(Boolean).join(" "), tel2].filter(Boolean).join(" / ");
+    }
+
+    function joinCityState(data) {
+      const cidade = pick(data, ["municipio", "estabelecimento.cidade.nome", "cidade"]);
+      const uf = pick(data, ["uf", "estabelecimento.estado.sigla", "estado"]);
+      return [cidade, uf].filter(Boolean).join(" / ");
+    }
+
+    function formatSummaryValue(title, value) {
+      if (/cnpj/i.test(title)) return formatCNPJ(String(value));
+      if (/abertura/i.test(title)) return normalizeDate(String(value));
+      if (typeof value === "object") return JSON.stringify(value);
+      return String(value);
+    }
+
+    function pick(obj, paths) {
+      for (const path of paths) {
+        const val = getByPath(obj, path);
+        if (val != null && val !== "") {
+          if (typeof val === "object" && !Array.isArray(val)) {
+            if ("descricao" in val) return val.descricao;
+            if ("nome" in val) return val.nome;
+          }
+          return val;
+        }
+      }
+      return null;
+    }
+
+    function getByPath(obj, path) {
+      return path.split(".").reduce((acc, key) => {
+        if (acc == null) return undefined;
+        return acc[key];
+      }, obj);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function copiarJson() {
+      try {
+        if (rawJson.value.trim()) {
+          await navigator.clipboard.writeText(rawJson.value);
+          status("JSON copiado para a área de transferência.", "ok");
+          return;
+        }
+        status("Não há JSON para copiar.", "err");
+      } catch (err) {
+        status("Não foi possível copiar o JSON.", "err");
+      }
+    }
+  </script>
+</body>
+</html>
