@@ -29,7 +29,7 @@ const FEIRA_DA_LUA_DATA = [
   pos: { x: 26, y: 8 },
   produtos: [
     { nome: "Hambúrguer Artesanal Salada", preco: 10, descricao: "Nosso Hamburguer artesanal com uma salada diferenciada", imagem: "images/indie/produtos/1.jpg" },
-    { nome: "Hambúrguer Artesanal Bacon", preco: 12, descricao: "Nosso Hambuguer artesanal com muito bacon" },
+    { nome: "Hambúrguer Artesanal Bacon", preco: 12, descricao: "Nosso Hambuguer artesanal com muito bacon" , imagem: "images/indie/produtos/2.jpg" },
   
   ]
 },
