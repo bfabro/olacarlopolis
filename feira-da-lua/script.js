@@ -1853,7 +1853,7 @@ function buildOrderMessage(stall, group, form) {
   const now = new Date();
 
   const lines = [
-  "🛒 *NOVO PEDIDO - FEIRA NA LUA*",
+  "🛒 *NOVO PEDIDO - FEIRA DA LUA*",
   "━━━━━━━━━━━━━━",
   "",
   `Pedido: ${orderNumber}`,
