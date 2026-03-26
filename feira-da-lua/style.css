@@ -348,7 +348,10 @@ img{max-width:100%}
   background:var(--blue-soft);
   border-color:rgba(64,112,244,.22);
 }
-.full-btn{width:100%}
+.full-btn{width:100%;
+background:#eb1e1e;
+        color: white;
+}
 
 #cardsView{
   margin-top:16px;
@@ -639,7 +642,7 @@ img{max-width:100%}
   border-radius:22px;
   padding:18px;
 }
-.cart-stall + .cart-stall{margin-top:14px}
+.cart-stall + .cart-stall{margin-top:10px}
 .cart-stall__header,
 .cart-stall__footer,
 .cart-item{

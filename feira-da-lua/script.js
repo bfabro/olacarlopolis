@@ -28,10 +28,9 @@ const FEIRA_DA_LUA_DATA = [
   cover: "linear-gradient(135deg,#4070f4,#5b87f7)",
   pos: { x: 26, y: 8 },
   produtos: [
-    { nome: "X-Salada", preco: 10, descricao: "Item principal da barraca 01.", imagem: "images/indie/produtos/1.jpg" },
-    { nome: "Hambúrguer Artesanal", preco: 12, descricao: "Outro produto para você ajustar." },
-    { nome: "Hambúrguer Artesanal 2", preco: 12, descricao: "Outro produto para você ajustar." },
-    { nome: "Batata Frita", preco: 8, descricao: "Descrição curta do produto." }
+    { nome: "Hambúrguer Artesanal Salada", preco: 10, descricao: "Nosso Hamburguer artesanal com uma salada diferenciada", imagem: "images/indie/produtos/1.jpg" },
+    { nome: "Hambúrguer Artesanal Bacon", preco: 12, descricao: "Nosso Hambuguer artesanal com muito bacon" },
+  
   ]
 },
 
@@ -134,8 +133,8 @@ const FEIRA_DA_LUA_DATA = [
   pos: { x: 26, y: 32 },
   produtos: [
     { nome: "Macarrao Instantaneo", preco: 16, descricao: "Macarrao instantaneo, tipo miojo",imagem: "images/seiza/produtos/1.jpg"  },
-    { nome: "Temperos", preco: 18, descricao: "Muitas variedades de temperos",imagem: "images/seiza/produtos/2.jpg" },
-    { nome: "Bebidas", preco: 14, descricao: "Temos Sakes, Pingas japonesas",imagem: "images/seiza/produtos/3.jpg" }
+    { nome: "Temperos", preco: 18, descricao: "Muitas variedades de temperos",imagem: "images/seiza/produtos/2.png" },
+    { nome: "Bebidas", preco: 14, descricao: "Temos Sakes, Pingas japonesas",imagem: "images/seiza/produtos/3.png" }
   ]
 },
 
