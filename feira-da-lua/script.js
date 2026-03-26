@@ -1853,32 +1853,43 @@ function buildOrderMessage(stall, group, form) {
   const now = new Date();
 
   const lines = [
-    "Olá! Gostaria de fazer este pedido na Feira da Lua:",
-    "",
-    `Pedido: ${orderNumber}`,
-    `Barraca: ${stall.nome}`,
-    `Responsável: ${stall.responsavel || "-"}`,
-    `Data: ${now.toLocaleDateString("pt-BR")}`,
-    `Horário: ${now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`,
-    "",
-    ...group.items.map(item => `• ${item.quantity}x ${item.productName} — ${formatCurrency(item.unitPrice * item.quantity)}`),
-    "",
-    `Subtotal: ${formatCurrency(totals.subtotal)}`,
-    `${delivery.label}: ${formatCurrency(delivery.fee)}`,
-    `Total: ${formatCurrency(totals.total)}`,
-    "",
-    `Tipo do pedido: ${form.tipoPedido}`,
-    `Pagamento: ${form.pagamento}`,
-    form.tipoPedido === "Entrega"
-      ? `Entrega em: ${[form.endereco, "Nº " + form.numeroEndereco, form.bairro].filter(Boolean).join(" • ")}`
-      : "Retirada: Cliente vai retirar na barraca",
-    form.tipoPedido === "Entrega" && form.referencia ? `Referência: ${form.referencia}` : null,
-    `Nome: ${form.nome || "-"}`,
-    `Telefone: ${form.telefone || "-"}`,
-    form.obs ? `Observações: ${form.obs}` : null,
-    "",
-    "Pedido enviado pela página da Feira da Lua."
-  ].filter(Boolean);
+  "🛒 *NOVO PEDIDO - FEIRA NA LUA*",
+  "━━━━━━━━━━━━━━",
+  "",
+  `Pedido: ${orderNumber}`,
+  `Barraca: ${stall.nome}`,
+  `Responsável: ${stall.responsavel || "-"}`,
+  `Data: ${now.toLocaleDateString("pt-BR")}`,
+  `Horário: ${now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`,
+  "",
+  "━━━━━━━━━━━━━━",
+  "*ITENS DO PEDIDO*",
+  "━━━━━━━━━━━━━━",
+  ...group.items.map(item => `• ${item.quantity}x ${item.productName} — ${formatCurrency(item.unitPrice * item.quantity)}`),
+  "",
+  "━━━━━━━━━━━━━━",
+  "*VALORES*",
+  "━━━━━━━━━━━━━━",
+  `Subtotal: ${formatCurrency(totals.subtotal)}`,
+  `${delivery.label}: ${formatCurrency(delivery.fee)}`,
+  `Total: ${formatCurrency(totals.total)}`,
+  "",
+  "━━━━━━━━━━━━━━",
+  "*DADOS DO CLIENTE*",
+  "━━━━━━━━━━━━━━",
+  `Tipo do pedido: ${form.tipoPedido}`,
+  `Pagamento: ${form.pagamento}`,
+  form.tipoPedido === "Entrega"
+    ? `Entrega em: ${[form.endereco, "Nº " + form.numeroEndereco, form.bairro].filter(Boolean).join(" • ")}`
+    : "Retirada: Cliente vai retirar na barraca",
+  form.tipoPedido === "Entrega" && form.referencia ? `Referência: ${form.referencia}` : null,
+  `Nome: ${form.nome || "-"}`,
+  `Telefone: ${form.telefone || "-"}`,
+  form.obs ? `Observações: ${form.obs}` : null,
+  "",
+  "━━━━━━━━━━━━━━",
+  "Pedido enviado pela página da Feira da Lua."
+].filter(Boolean);
 
   return lines.join("\n");
 }
