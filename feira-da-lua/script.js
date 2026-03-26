@@ -65,8 +65,8 @@ const FEIRA_DA_LUA_DATA = [
   pos: { x: 26, y: 16 },
   produtos: [
     { nome: "Espetinho de boi", preco: 12, descricao: "Saboroso e artesanal",imagem: "images/celeiro/produtos/1.jpg" },
-    {nome: "Cafita", preco: 10, descricao: "Cafita artesanal",imagem: "images/celeiro/produtos/1.jpg" },
-    { nome: "Espetinho de Frango", preco: 12, descricao: "Feito com frango caipira",imagem: "images/celeiro/produtos/1.jpg" }
+    {nome: "Kafita", preco: 10, descricao: "Kafita artesanal",imagem: "images/celeiro/produtos/2.jpg" },
+    { nome: "Espetinho de Frango", preco: 12, descricao: "Feito com frango caipira",imagem: "images/celeiro/produtos/3.jpg" }
   ]
 },
 
@@ -99,8 +99,8 @@ const FEIRA_DA_LUA_DATA = [
   cover: "linear-gradient(135deg,#22c55e,#84cc16)",
   pos: { x: 26, y: 24 },
   produtos: [
-    { nome: "Alface Crespa", preco: 14, descricao: "Item principal da barraca 03." },
-    { nome: "Tomate", preco: 16, descricao: "Outro produto para você ajustar." }
+    { nome: "Yakisoba", preco: 20, descricao: "Yakisoba tipico japones" ,imagem: "images/iwal/produtos/1.jpg" },
+    { nome: "Costelinha com Arroz", preco: 20, descricao: "Costelinha com Arroz", imagem: "images/iwal/produtos/2.jpg"}
  
   ]
 },
@@ -133,9 +133,9 @@ const FEIRA_DA_LUA_DATA = [
   cover: "linear-gradient(135deg,#f59e0b,#ef4444)",
   pos: { x: 26, y: 32 },
   produtos: [
-    { nome: "X", preco: 16, descricao: "Item principal da barraca 04." },
-    { nome: "P", preco: 18, descricao: "Outro produto para você ajustar." },
-    { nome: "T", preco: 14, descricao: "Descrição curta do produto." }
+    { nome: "Macarrao Instantaneo", preco: 16, descricao: "Macarrao instantaneo, tipo miojo",imagem: "images/seiza/produtos/1.jpg"  },
+    { nome: "Temperos", preco: 18, descricao: "Muitas variedades de temperos",imagem: "images/seiza/produtos/2.jpg" },
+    { nome: "Bebidas", preco: 14, descricao: "Temos Sakes, Pingas japonesas",imagem: "images/seiza/produtos/3.jpg" }
   ]
 },
 
