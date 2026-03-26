@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Feira da Lua | Olá Carlópolis</title>
   <meta name="description" content="Peça direto das barracas da Feira da Lua em Carlópolis." />
+  <meta name="theme-color" content="#4070f4" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -20,14 +22,14 @@
       <a class="brand" href="#" aria-label="Feira da Lua">
         <span class="brand__badge"><i class="fa-solid fa-moon"></i></span>
         <div>
-          <strong>Feira da Lua</strong>
-          <span>por Olá Carlópolis</span>
+          <strong>Feira da Lua • 24 barracas</strong>
+          <span>Olá Carlópolis</span>
         </div>
       </a>
 
       <div class="hero__actions">
         <a class="ghost-btn" href="https://www.olacarlopolis.com" target="_blank" rel="noopener">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Olá Carlópolis
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Ir Para Olá Carlópolis
         </a>
         <button id="openCartBtn" class="primary-btn">
           <i class="fa-solid fa-basket-shopping"></i>
@@ -39,17 +41,17 @@
 
     <div class="hero__content">
       <div class="hero__text">
-        <span class="eyebrow">Página independente • ajuste fácil</span>
+        <span class="eyebrow">Pedidos online • Feira da Lua</span>
         <h1>Peça direto das barracas da Feira da Lua</h1>
         <p>
           Escolha seus produtos, monte o pedido e envie automaticamente para cada responsável no WhatsApp.
-          A página abaixo é separada do site principal, em pasta própria, para você editar com facilidade.
+ 
         </p>
 
         <div class="hero__meta">
-          <div class="hero__meta-item"><i class="fa-regular fa-clock"></i> Quintas • 18h às 22h</div>
+          <div class="hero__meta-item"><i class="fa-regular fa-clock"></i> Seextas • 18:00h às 23:00h</div>
           <div class="hero__meta-item"><i class="fa-solid fa-location-dot"></i> Praça central de Carlópolis</div>
-          <div class="hero__meta-item"><i class="fa-solid fa-mobile-screen-button"></i> Feita para celular</div>
+          
         </div>
       </div>
 
@@ -69,29 +71,26 @@
           </div>
         </div>
 
-        <div class="customer-card">
+        
+        <div class="customer-card process-card">
           <div class="section-title">
-            <i class="fa-solid fa-user"></i>
-            <span>Seus dados</span>
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Como vai funcionar</span>
           </div>
 
-          <div class="customer-grid">
-            <label>
-              <span>Nome</span>
-              <input id="customerName" type="text" placeholder="Seu nome" />
-            </label>
-            <label>
-              <span>Telefone</span>
-              <input id="customerPhone" type="tel" placeholder="(43) 99999-9999" />
-            </label>
-            <label class="full">
-              <span>Endereço / referência</span>
-              <input id="customerAddress" type="text" placeholder="Rua, número, bairro ou ponto de referência" />
-            </label>
-            <label class="full">
-              <span>Observação geral</span>
-              <textarea id="customerNotes" rows="3" placeholder="Ex.: retirar às 19h / sem cebola / entregar se possível"></textarea>
-            </label>
+          <div class="process-list">
+            <div class="process-item">
+              <strong>1. Escolha a barraca</strong>
+              <p>Abra a barraca, selecione os produtos e adicione ao carrinho.</p>
+            </div>
+            <div class="process-item">
+              <strong>2. Preencha entrega ou retirada</strong>
+              <p>Cada barraca terá seu próprio bloco de endereço, pagamento, observações e taxa.</p>
+            </div>
+            <div class="process-item">
+              <strong>3. Envie ou gere o PIX</strong>
+              <p>Você pode mandar o pedido pelo WhatsApp ou gerar o PIX copia e cola da barraca.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -123,7 +122,22 @@
         </button>
       </div>
     </section>
-
+<!-- 
+    <section class="view-section help-panel">
+      <div class="help-card">
+        <div>
+          <span class="eyebrow">Ajuste rápido</span>
+          <h2>Onde você vai editar cada comércio</h2>
+          <p>No arquivo <strong>script.js</strong>, procure por <strong>FEIRA_DA_LUA_DATA</strong>. Agora cada barraca também pode ter imagem de perfil, imagem específica do mapa, taxa de entrega, bairros personalizados e chave PIX própria, além do nome, responsável, WhatsApp, categoria, posição no mapa e produtos.</p>
+        </div>
+        <div class="help-tags">
+          <span class="chip chip--soft">24 barracas prontas</span>
+          <span class="chip chip--outline">1 bloco por comércio</span>
+          <span class="chip chip--outline">WhatsApp + PIX por barraca</span>
+        </div>
+      </div>
+    </section>
+-->
     <section id="cardsView" class="view-section"></section>
 
     <section id="mapView" class="view-section hidden">
@@ -188,6 +202,55 @@
       </div>
     </aside>
   </div>
+
+  <dialog id="pixModal" class="pix-modal">
+    <div class="pix-modal__box">
+      <div class="pix-modal__header">
+        <div>
+          <span class="eyebrow">Pagamento via PIX</span>
+          <h3 id="pixModalTitle">PIX da barraca</h3>
+        </div>
+        <button type="button" class="modal__close modal__close--plain" data-close-pix aria-label="Fechar PIX">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="pix-modal__content">
+        <label class="pix-field">
+          <span>Chave PIX</span>
+          <div class="pix-inline">
+            <input id="pixChaveShow" type="text" readonly />
+            <button type="button" class="ghost-btn" id="btnCopyPixKey">Copiar</button>
+          </div>
+        </label>
+
+        <div id="pixQr" class="pix-qr"></div>
+
+        <label class="pix-field">
+          <span>Código PIX copia e cola</span>
+          <textarea id="pixCopiaCola" rows="4" readonly></textarea>
+        </label>
+
+        <div class="pix-actions">
+          <button type="button" class="primary-btn full-btn" id="btnCopyPixCode">
+            <i class="fa-regular fa-copy"></i> Copiar código
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+
+
+  <dialog id="imageViewerModal" class="image-viewer-modal">
+    <div class="image-viewer-modal__box">
+      <button type="button" class="modal__close modal__close--plain image-viewer-modal__close" data-close-image-viewer aria-label="Fechar imagem">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <img id="imageViewerImg" src="" alt="Imagem ampliada" />
+      <p id="imageViewerCaption" class="image-viewer-modal__caption"></p>
+    </div>
+  </dialog>
 
   <template id="stallCardTemplate">
     <article class="stall-card">
