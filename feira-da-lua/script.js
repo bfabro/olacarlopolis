@@ -128,6 +128,7 @@ const FEIRA_DA_LUA_DATA = [
   whatsapp: "5511998985930",
   imagemPerfil: "images/seiza/perfil.png", // coloque aqui a foto ou logo da barraca
   imagemMapa: "", // opcional: se vazio, o mapa usa a imagemPerfil
+    chavePix: "39075442858",
   destaque: [],
   cover: "linear-gradient(135deg,#f59e0b,#ef4444)",
   pos: { x: 26, y: 32 },
