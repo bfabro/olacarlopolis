@@ -2449,7 +2449,7 @@ carlopdiesel:"s",
     suhsalgados: "s",
 
     //supermercado
-    bompreco: "s",
+    bompreco: "n",
     carreiro: "n",
     comprebemmais: "s",
     kelve: "n",
