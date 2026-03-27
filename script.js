@@ -2247,7 +2247,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ADEGAS
     adegacuenca: "s",
-    assao: "s",
+    
 
     //ADVOCACIA  
 
@@ -2456,7 +2456,7 @@ carlopdiesel:"s",
     obarateiro: "s",
     mercadodoze: "s",
     rocha: "s",
-    zerojapan: "n",
+  
 
     // peixaria
     coopanorpi: "s",
@@ -2481,7 +2481,7 @@ carlopdiesel:"s",
     hime: "s",
     pesqueirodogalego: "s",
 
-    neia: "n",
+   
     namigojapanese: "s",
     //oficinadosabor:"s",
     paiol: "n",
@@ -2544,7 +2544,7 @@ carlopdiesel:"s",
     erickson: "s",
 
     // guia de pesca
-    fabiosushimoto: "n",
+   
 
     //eletrecista
     cyberneticosinstalacoes: "s",
@@ -2560,7 +2560,7 @@ carlopdiesel:"s",
 
     // taxista
     sereia: "s",
-    dorivalmattos: "n",
+ 
     ederluis: "s",
 
     // VETERINARIO
@@ -8399,28 +8399,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
           },
 
-          {
-            image: "images/comercios/adega/assao/assao.png",
-            name: "Assao",
-            hours: "Dom a Dom - 09:00h as 22:00h ",
-            statusAberto: "a",
-            horarios: {
-
-              seg: [{ inicio: "09:00", fim: "22:00" }],
-              ter: [{ inicio: "09:00", fim: "22:00" }],
-              qua: [{ inicio: "09:00", fim: "22:00" }],
-              qui: [{ inicio: "09:00", fim: "22:00" }],
-              sex: [{ inicio: "09:00", fim: "22:00" }],
-              sab: [{ inicio: "09:00", fim: "22:00" }],
-              dom: [{ inicio: "09:00", fim: "22:00" }]
-            },
-            address: "R. Benedito Sales, 1551",
-            contact: "-",
-            instagram: "https://www.instagram.com/casadecarneassao/",
-
-
-
-          },
+          
         ],
       },
 
@@ -10907,33 +10886,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         title: "Supermercado",
         establishments: [
 
-          {
-            image: "images/comercios/supermercado/bomPreco/perfil.png",
-            name: "Bom Preço",
-            address: "R. Chuva de Ouro, 397 - Vista Alegre, Carlópolis",
-            hours: "Dom a Dom: 8:00h as 19:30h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "08:00", fim: "19:30" }],
-              ter: [{ inicio: "08:00", fim: "19:30" }],
-              qua: [{ inicio: "08:00", fim: "19:30" }],
-              qui: [{ inicio: "08:00", fim: "19:30" }],
-              sex: [{ inicio: "08:00", fim: "19:30" }],
-              sab: [{ inicio: "08:00", fim: "19:30" }],
-              dom: [{ inicio: "08:00", fim: "19:30" }],
-            },
-            contact: "(43) 98821-4701",
-            delivery: "Sim / Sem Taxa",
-            instagram: "https://www.instagram.com/bomprecocarlopolis/?locale=ne_NP&hl=ar",
-            novidadesImages: [
-              "images/comercios/supermercado/bomPreco/divulgacao/1.png",
-
-            ],
-            novidadesDescriptions: [
-              "Nosso Horti Fruti",
-
-            ],
-          },
+          
 
 
           {
@@ -11120,43 +11073,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
-          {
-            image: "images/comercios/supermercado/zerojapan/zerojapan.png",
-            name: "Zero Japan",
-            address: "R. Doutora Paula e Silva, 445 - Carlopolis",
-            hours: "Dom a Dom: 08:00h as 20:00h",
-            statusAberto: ".",
-            horarios: {
-              seg: [{ inicio: "08:00", fim: "20:00" }],
-              ter: [{ inicio: "08:00", fim: "20:00" }],
-              qua: [{ inicio: "08:00", fim: "20:00" }],
-              qui: [{ inicio: "08:00", fim: "20:00" }],
-              sex: [{ inicio: "08:00", fim: "20:00" }],
-              sab: [{ inicio: "08:00", fim: "20:00" }],
-              dom: [{ inicio: "08:00", fim: "20:00" }],
-            },
-            contact: "(43) 3142-2005",
-            whatsapp: "4331422005",
-            facebook: "https://www.facebook.com/zerojapangroup/",
-            instagram: "https://www.instagram.com/mercadozerojapan/",
-            delivery: "Sim / Sem Taxa",
-            novidadesImages: [
-              "images/comercios/supermercado/zerojapan/divulgacao/1.png",
-              "images/comercios/supermercado/zerojapan/divulgacao/2.png",
-              "images/comercios/supermercado/zerojapan/divulgacao/3.png",
-              "images/comercios/supermercado/zerojapan/divulgacao/4.png",
-              "images/comercios/supermercado/zerojapan/divulgacao/5.png",
-
-
-            ],
-            novidadesDescriptions: [
-              "Temos a Famosa La fufu",
-              "Tilapia disponível aqui no Zero Japan",
-              "Hidratante beijavel mais famoso, chegou no Zero Japan",
-              "Venha fazer seu cartão na ZeroJapan",
-              "Cerveja Geladinha, aqui no Zero Japan",
-            ],
-          },
+          
         ],
       },
 
@@ -15203,18 +15120,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             ],
           },
 
-          {
-            image: "images/servicos/taxi/dorival/perfil.jpg",
-            name: "Dorival Mattos",
-            hours: "Dom a Dom: <span style='color:red'>24horas</span>",
-            address: "Ponto N2 - Em Frente a Igreja Matriz",
-            contact: "(43) 99620-9900",
-            contact2: "(43) 98830-2110",
-
-            facebook: "https://www.facebook.com/dorival.mattos.1",
-            instagram: "https://www.instagram.com/mattostaxi/",
-            infoAdicional: "Viagens e Serviços <span style='color:red'>24horas</span><br> Area Rural, Urbana e Aeroporto",
-          },
+          
 
 
           {
