@@ -2630,12 +2630,10 @@ carlopdiesel:"s",
     // INICIO EVENTOS 
     //calendarioeventos: "s",
     feiradalua: "n",
-    arenagoldenhits: "n",
+   
 
-    pescar: "n",
-    bloquinhodoagro: "n",
-    paranafishingcaiaquetopteam: "s",
-    cafedamanhadosamigos: "s",
+   
+  
     "festadesaojose": "n",
 
     undokai2026: "s",
@@ -12505,27 +12503,9 @@ plotarPinsImoveis(stateImoveis.filtered);
 
      
 
-          {
-            image: "images/informacoes/eventos/4.jpg",
-            name: "Parana Fishing Caiaque Top Team",
-            date: "28/03/2026",
-            address: "Rua Benedito Salles, 637, sala 7 - Carlopolis",
-            contact: "(43) 99177-5226",
-            instagram: "https://www.instagram.com/p/DT_IdBZDxlS/?img_index=4",
-            infoAdicional: "1ª Etapa do Caiaque Top Team 2026 Série Prata/Bronze<br>O Caiaque Top Team 2026 será realizado em 3 etapas, sendo a primeira no dia 28/03/2026, na Represa de Chavantes, em Carlópolis/PR.<br>Neste circuito, os caiaqueiros disputarão não apenas a vitória em cada etapa, mas também a melhor pontuação geral, visando o título de campeão do circuito.<br>Transmissão ao vivo pelo YouTube do Paraná Fishing.<br><a target='_blank' style='color:#ff0000;' href='https://www.youtube.com/@paranafishing_'>  <i class='fab fa-youtube'></i> Canal Paraná Fishing</a>"
-          },
+        
 
-
-          {
-            image: "images/informacoes/eventos/3.jpg",
-            name: "Cafe da manha dos amigos",
-            date: "29/03/2026",
-            address: "R. Benedito Salles, 2671 - Carlópolis",
-            contact: "(43)99837-5390",
-            instagram: "https://www.instagram.com/rotapr218/",
-            infoAdicional: "A partir do dia 28 de março, já estaremos recebendo os irmãos de estrada!<br>Durante o fim de semana, teremos passeios mototurísticos pela região Angra Doce"
-          },
-
+         
 
 
           {
