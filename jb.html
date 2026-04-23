@@ -3,297 +3,825 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Análise - Distância entre Animais Selecionados</title>
+  <title>Análise Interativa de Grupos de Animais</title>
   <style>
-    :root{
+    :root {
       --bg:#031f14;
       --bg2:#062a1c;
       --card:#083625;
+      --card-2:#0a3a29;
       --line:#00e676;
       --line-soft:rgba(0,230,118,.22);
       --text:#f5fff8;
       --muted:#9fd7b6;
       --accent:#00ff99;
-      --accent2:#19c37d;
+      --accent-2:#19c37d;
       --warn:#ffd54f;
+      --danger:#ff7676;
+      --shadow:0 14px 34px rgba(0,0,0,.22);
     }
-    *{box-sizing:border-box}
-    body{
+    * { box-sizing:border-box; }
+    body {
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
-      background:linear-gradient(90deg,var(--bg),#052916 40%,var(--bg));
       color:var(--text);
+      background:
+        radial-gradient(circle at top, rgba(0,255,153,.09), transparent 24%),
+        linear-gradient(90deg, var(--bg), #052916 42%, var(--bg));
     }
-    .wrap{
-      max-width:1280px;
+    .wrap {
+      max-width:1380px;
       margin:0 auto;
-      padding:32px 20px 48px;
+      padding:28px 18px 56px;
     }
-    .hero{
+    .hero {
       text-align:center;
       margin-bottom:22px;
     }
-    h1{
+    h1 {
       margin:0 0 8px;
       font-size:40px;
-      color:var(--text);
+      line-height:1.1;
     }
-    .subtitle{
-      color:var(--muted);
-      font-size:18px;
-      line-height:1.5;
+    .subtitle {
       max-width:980px;
       margin:0 auto;
+      color:var(--muted);
+      font-size:18px;
+      line-height:1.55;
     }
-    .selected{
-      margin:20px auto 0;
-      max-width:1000px;
+    .toolbar {
+      display:grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap:16px;
+      margin:24px 0 22px;
+    }
+    .box {
+      background:linear-gradient(180deg, rgba(10,53,36,.96), rgba(6,42,28,.96));
+      border:1px solid var(--line-soft);
+      border-radius:20px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .box h2 {
+      margin:0 0 14px;
+      font-size:18px;
+      color:var(--accent);
+    }
+    .controls {
       display:flex;
       flex-wrap:wrap;
       gap:10px;
-      justify-content:center;
+      align-items:center;
     }
-    .chip{
+    select {
+      background:#0a3927;
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      min-width:240px;
+      font-size:15px;
+      outline:none;
+    }
+    button {
+      border:1px solid var(--line-soft);
+      background:#0a3927;
+      color:var(--text);
+      padding:11px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+      transition:.15s ease;
+    }
+    button:hover {
+      transform:translateY(-1px);
+      border-color:var(--line);
+      background:#0c452f;
+    }
+    .helper {
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+      margin-top:10px;
+    }
+    .checklist {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(145px, 1fr));
+      gap:10px;
+    }
+    .check {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(0,255,153,.05);
+      border:1px solid rgba(0,255,153,.10);
+      border-radius:12px;
+      padding:10px 12px;
+      color:var(--text);
+      font-size:14px;
+    }
+    .check input {
+      accent-color:#00ff99;
+      transform:scale(1.12);
+    }
+    .chips {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:8px;
+    }
+    .chip {
+      display:inline-block;
       padding:8px 12px;
       border-radius:999px;
       background:rgba(0,255,153,.08);
-      border:1px solid rgba(0,255,153,.25);
+      border:1px solid rgba(0,255,153,.22);
       color:var(--accent);
       font-weight:700;
-      font-size:14px;
+      font-size:13px;
     }
-    .grid{
+    .grid {
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
       gap:16px;
-      margin:28px 0 32px;
+      margin:14px 0 26px;
     }
-    .card{
+    .card {
       background:linear-gradient(180deg, rgba(10,53,36,.96), rgba(6,42,28,.96));
       border:1px solid var(--line);
       border-radius:18px;
       padding:18px;
-      box-shadow:0 0 0 1px rgba(0,255,153,.05), 0 12px 35px rgba(0,0,0,.25);
+      box-shadow:0 0 0 1px rgba(0,255,153,.04), var(--shadow);
     }
-    .card h2{
+    .card h3 {
       margin:0 0 10px;
       font-size:18px;
       color:var(--accent);
     }
-    .big{
-      font-size:30px;
+    .big {
+      font-size:32px;
       font-weight:700;
-      color:var(--text);
-      margin:6px 0 4px;
+      line-height:1.1;
+      margin:6px 0 6px;
     }
-    .small{
+    .small {
       color:var(--muted);
       font-size:14px;
       line-height:1.55;
     }
-    .pill{
+    .pill {
       display:inline-block;
       padding:6px 10px;
       border-radius:999px;
       background:rgba(255,213,79,.12);
-      border:1px solid rgba(255,213,79,.25);
+      border:1px solid rgba(255,213,79,.24);
       color:var(--warn);
       font-weight:700;
       font-size:13px;
       margin-top:10px;
     }
-    .section{
-      margin-top:28px;
+    .section {
+      margin-top:24px;
     }
-    .section h3{
+    .section h3 {
+      margin:0 0 12px;
       font-size:28px;
-      margin:0 0 14px;
-      color:var(--text);
     }
-    .note{
+    .note {
       color:var(--muted);
-      margin-bottom:14px;
+      font-size:14px;
       line-height:1.6;
+      margin-bottom:12px;
     }
-    .table-wrap{
+    .table-wrap {
       background:rgba(5,34,23,.72);
       border:1px solid var(--line-soft);
       border-radius:18px;
       overflow:auto;
-      margin-bottom:20px;
+      margin-bottom:18px;
     }
-    table{
+    table {
       width:100%;
       border-collapse:collapse;
       min-width:760px;
     }
-    th, td{
-      padding:14px 12px;
+    th, td {
+      padding:13px 12px;
       border-bottom:1px solid rgba(255,255,255,.06);
       text-align:left;
+      vertical-align:top;
+      font-size:14px;
     }
-    th{
+    th {
       position:sticky;
       top:0;
       background:#0a3927;
       color:var(--accent);
-      font-size:14px;
+      z-index:1;
+      font-size:13px;
       letter-spacing:.3px;
     }
-    td{
-      color:var(--text);
-      font-size:15px;
-    }
-    tr:hover td{
+    tr:hover td {
       background:rgba(0,255,153,.04);
     }
-    .num{
+    .num {
       text-align:right;
       font-variant-numeric:tabular-nums;
     }
-    .footer{
-      margin-top:24px;
+    .charts {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+    .chart-box {
+      background:linear-gradient(180deg, rgba(10,53,36,.96), rgba(6,42,28,.96));
+      border:1px solid var(--line-soft);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+    .chart-box h4 {
+      margin:0 0 14px;
+      font-size:18px;
+      color:var(--accent);
+    }
+    .bars {
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .bar-row {
+      display:grid;
+      grid-template-columns: 120px 1fr 54px;
+      gap:10px;
+      align-items:center;
+      font-size:14px;
+    }
+    .bar-label {
+      color:var(--text);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .bar-track {
+      height:14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+      position:relative;
+    }
+    .bar-fill {
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--accent-2), var(--accent));
+    }
+    .bar-value {
+      text-align:right;
+      color:var(--muted);
+      font-variant-numeric:tabular-nums;
+    }
+    .summary {
+      background:rgba(0,255,153,.05);
+      border:1px solid rgba(0,255,153,.12);
+      border-radius:16px;
+      padding:14px 16px;
+      color:var(--muted);
+      line-height:1.65;
+    }
+    .summary strong {
+      color:var(--accent);
+    }
+    .empty {
+      padding:18px;
+      color:var(--warn);
+      background:rgba(255,213,79,.08);
+      border:1px solid rgba(255,213,79,.2);
+      border-radius:16px;
+    }
+    .footer {
+      text-align:center;
       color:var(--muted);
       font-size:14px;
-      line-height:1.6;
+      line-height:1.65;
+      margin-top:28px;
     }
-    ul{
-      margin:10px 0 0 18px;
-      color:var(--muted);
-      line-height:1.7;
+    @media (max-width: 980px) {
+      .toolbar, .charts {
+        grid-template-columns:1fr;
+      }
     }
-    strong.accent{color:var(--accent)}
-    @media (max-width:700px){
-      h1{font-size:30px}
-      .subtitle{font-size:16px}
-      .big{font-size:24px}
-      .section h3{font-size:22px}
+    @media (max-width: 700px) {
+      h1 { font-size:30px; }
+      .subtitle { font-size:16px; }
+      .big { font-size:25px; }
+      .section h3 { font-size:22px; }
+      .bar-row { grid-template-columns: 100px 1fr 40px; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="hero">
-      <h1>Análise de Distância entre Animais Selecionados</h1>
+      <h1>Análise Interativa de Grupos de Animais</h1>
       <p class="subtitle">
-        Levantamento em ordem cronológica usando apenas os seguintes animais. A análise mostra a maior distância entre aparições
-        de qualquer um deles, os maiores intervalos encontrados e a maior demora individual de reaparição por animal.
+        Arquivo interativo com os resultados extraídos das imagens enviadas, em ordem cronológica, de 03/04/2026 até 22/04/2026.
+        Você pode alternar entre os grupos prontos ou montar sua própria combinação de animais para ver as métricas.
       </p>
-      <div class="selected">
-        <span class="chip">Burro</span>
-        <span class="chip">Carneiro</span>
-        <span class="chip">Cobra</span>
-        <span class="chip">Jacaré</span>
-        <span class="chip">Pavão</span>
-        <span class="chip">Macaco</span>
-        <span class="chip">Peru</span>
-        <span class="chip">Veado</span>
-      </div>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <h2>Maior distância entre eles</h2>
-        <div class="big">7 rodadas no meio</div>
-        <div class="small">
-          <strong class="accent">Cobra (05/04 14:20) → Burro (07/04 09:20)</strong>
+    <div class="toolbar">
+      <div class="box">
+        <h2>Seleção rápida</h2>
+        <div class="controls">
+          <select id="presetSelect">
+            <option value="grupo-c">Grupo dos animais com C</option>
+            <option value="grupo-8">Grupo Burro / Carneiro / Cobra / Jacaré / Pavão / Macaco / Peru / Veado</option>
+            <option value="personalizado">Personalizado</option>
+          </select>
+          <button id="applyPresetBtn">Aplicar preset</button>
+          <button id="selectAllBtn">Selecionar todos</button>
+          <button id="clearBtn">Limpar</button>
+        </div>
+        <div class="helper">
+          Presets disponíveis:<br>
+          <strong>Grupo C:</strong> Cabra, Cachorro, Camelo, Carneiro, Cavalo, Cobra e Coelho.<br>
+          <strong>Grupo 8:</strong> Burro, Carneiro, Cobra, Jacaré, Pavão, Macaco, Peru e Veado.
         </div>
       </div>
 
-      <div class="card">
-        <h2>Resultados que saíram no meio</h2>
-        <div class="small">
-          Cavalo, Tigre, Elefante, Gato, Galo, Porco e Porco.
-        </div>
-        <div class="pill">Maior intervalo do conjunto</div>
-      </div>
-
-      <div class="card">
-        <h2>Maior demora individual</h2>
-        <div class="big">Cobra</div>
-        <div class="small">
-          A maior demora para reaparecer foi de <strong class="accent">38 rodadas</strong>.
+      <div class="box">
+        <h2>Animais do filtro atual</h2>
+        <div id="selectedChips" class="chips"></div>
+        <div class="helper">
+          Você pode usar o preset e depois ajustar manualmente os animais abaixo. As tabelas e os gráficos são recalculados automaticamente.
         </div>
       </div>
     </div>
 
-    <section class="section">
-      <h3>Resumo rápido</h3>
-      <div class="card">
-        <div class="small">
-          <ul>
-            <li><strong class="accent">Maior distância entre qualquer um dos 8 animais:</strong> 7 rodadas no meio.</li>
-            <li><strong class="accent">Sequência dessa maior distância:</strong> Cobra → Burro.</li>
-            <li><strong class="accent">Animal com maior demora para reaparecer:</strong> Cobra, com 38 rodadas.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
+    <div class="box" style="margin-bottom:22px;">
+      <h2>Escolha manual dos animais</h2>
+      <div id="checklist" class="checklist"></div>
+    </div>
 
-    <section class="section">
-      <h3>Top maiores distâncias entre os animais selecionados</h3>
-      <p class="note">
-        A coluna <strong>rodadas no meio</strong> mostra quantos resultados ocorreram entre uma aparição de um dos 8 animais
-        e a próxima aparição de qualquer outro animal desse mesmo grupo.
-      </p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Top</th>
-              <th>De</th>
-              <th>Para</th>
-              <th class="num">Rodadas no meio</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>1</td><td>Cobra (05/04 14:20)</td><td>Burro (07/04 09:20)</td><td class="num">7</td></tr>
-            <tr><td>2</td><td>Peru (08/04 09:20)</td><td>Pavão (08/04 21:30)</td><td class="num">4</td></tr>
-            <tr><td>3</td><td>Veado (20/04 14:20)</td><td>Cobra (21/04 11:20)</td><td class="num">4</td></tr>
-            <tr><td>4</td><td>Macaco (13/04 11:20)</td><td>Pavão (13/04 18:20)</td><td class="num">2</td></tr>
-            <tr><td>5</td><td>Jacaré (15/04 11:20)</td><td>Carneiro (15/04 20:00)</td><td class="num">2</td></tr>
-            <tr><td>6</td><td>Cobra (15/04 21:30)</td><td>Peru (16/04 14:20)</td><td class="num">2</td></tr>
-            <tr><td>7</td><td>Peru (16/04 14:20)</td><td>Carneiro (16/04 21:30)</td><td class="num">2</td></tr>
-            <tr><td>8</td><td>Jacaré (17/04 21:30)</td><td>Carneiro (18/04 14:20)</td><td class="num">2</td></tr>
-            <tr><td>9</td><td>Veado (19/04 14:20)</td><td>Peru (20/04 11:20)</td><td class="num">2</td></tr>
-            <tr><td>10</td><td>Veado (21/04 18:20)</td><td>Carneiro (22/04 11:20)</td><td class="num">2</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="section">
-      <h3>Maior demora para reaparecer por animal</h3>
-      <p class="note">
-        Aqui a lógica é outra: em vez de comparar o grupo todo, a tabela mostra quantas rodadas cada animal demorou,
-        na sua pior sequência, para aparecer de novo.
-      </p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Top</th>
-              <th>Animal</th>
-              <th class="num">Maior demora para reaparecer</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>1</td><td>Cobra</td><td class="num">38</td></tr>
-            <tr><td>2</td><td>Jacaré</td><td class="num">37</td></tr>
-            <tr><td>3</td><td>Carneiro</td><td class="num">34</td></tr>
-            <tr><td>4</td><td>Peru</td><td class="num">31</td></tr>
-            <tr><td>5</td><td>Macaco</td><td class="num">30</td></tr>
-            <tr><td>6</td><td>Veado</td><td class="num">25</td></tr>
-            <tr><td>7</td><td>Burro</td><td class="num">18</td></tr>
-            <tr><td>8</td><td>Pavão</td><td class="num">10</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <div id="content"></div>
 
     <div class="footer">
-      Arquivo HTML criado com base nos resultados lidos das imagens enviadas na conversa.
+      Arquivo HTML gerado automaticamente com seletor de grupos, filtro manual e gráficos.  
+      Resultado de 22/04 às 21:30 não foi incluído porque estava “aguardando”.
     </div>
   </div>
+
+  <script>
+    const DATA = [{"timestamp": "03/04 09:20", "animal": "Leão"}, {"timestamp": "03/04 11:20", "animal": "Vaca"}, {"timestamp": "03/04 14:20", "animal": "Cavalo"}, {"timestamp": "03/04 16:20", "animal": "Coelho"}, {"timestamp": "03/04 18:20", "animal": "Jacaré"}, {"timestamp": "03/04 21:30", "animal": "Burro"}, {"timestamp": "04/04 09:20", "animal": "Águia"}, {"timestamp": "04/04 11:20", "animal": "Águia"}, {"timestamp": "04/04 14:20", "animal": "Cobra"}, {"timestamp": "04/04 16:20", "animal": "Cobra"}, {"timestamp": "04/04 20:00", "animal": "Cabra"}, {"timestamp": "04/04 21:30", "animal": "Macaco"}, {"timestamp": "05/04 09:20", "animal": "Peru"}, {"timestamp": "05/04 11:20", "animal": "Elefante"}, {"timestamp": "05/04 14:20", "animal": "Cobra"}, {"timestamp": "05/04 16:20", "animal": "Cavalo"}, {"timestamp": "06/04 09:20", "animal": "Tigre"}, {"timestamp": "06/04 11:20", "animal": "Elefante"}, {"timestamp": "06/04 14:20", "animal": "Gato"}, {"timestamp": "06/04 16:20", "animal": "Galo"}, {"timestamp": "06/04 18:20", "animal": "Porco"}, {"timestamp": "06/04 21:30", "animal": "Porco"}, {"timestamp": "07/04 09:20", "animal": "Burro"}, {"timestamp": "07/04 11:20", "animal": "Coelho"}, {"timestamp": "07/04 14:20", "animal": "Borboleta"}, {"timestamp": "07/04 16:20", "animal": "Carneiro"}, {"timestamp": "07/04 18:20", "animal": "Macaco"}, {"timestamp": "07/04 21:30", "animal": "Burro"}, {"timestamp": "08/04 09:20", "animal": "Peru"}, {"timestamp": "08/04 11:20", "animal": "Coelho"}, {"timestamp": "08/04 14:20", "animal": "Urso"}, {"timestamp": "08/04 16:20", "animal": "Leão"}, {"timestamp": "08/04 20:00", "animal": "Touro"}, {"timestamp": "08/04 21:30", "animal": "Pavão"}, {"timestamp": "09/04 09:20", "animal": "Burro"}, {"timestamp": "09/04 11:20", "animal": "Urso"}, {"timestamp": "09/04 14:20", "animal": "Porco"}, {"timestamp": "09/04 16:20", "animal": "Carneiro"}, {"timestamp": "09/04 18:20", "animal": "Avestruz"}, {"timestamp": "09/04 21:30", "animal": "Elefante"}, {"timestamp": "10/04 09:20", "animal": "Pavão"}, {"timestamp": "10/04 11:20", "animal": "Borboleta"}, {"timestamp": "10/04 14:20", "animal": "Jacaré"}, {"timestamp": "10/04 16:20", "animal": "Peru"}, {"timestamp": "10/04 18:20", "animal": "Peru"}, {"timestamp": "10/04 21:30", "animal": "Tigre"}, {"timestamp": "11/04 09:20", "animal": "Borboleta"}, {"timestamp": "11/04 11:20", "animal": "Pavão"}, {"timestamp": "11/04 14:20", "animal": "Veado"}, {"timestamp": "11/04 16:20", "animal": "Pavão"}, {"timestamp": "11/04 20:00", "animal": "Avestruz"}, {"timestamp": "11/04 21:30", "animal": "Porco"}, {"timestamp": "12/04 09:20", "animal": "Burro"}, {"timestamp": "12/04 11:20", "animal": "Cobra"}, {"timestamp": "12/04 14:20", "animal": "Cavalo"}, {"timestamp": "12/04 16:20", "animal": "Águia"}, {"timestamp": "13/04 09:20", "animal": "Veado"}, {"timestamp": "13/04 11:20", "animal": "Macaco"}, {"timestamp": "13/04 14:20", "animal": "Cachorro"}, {"timestamp": "13/04 16:20", "animal": "Vaca"}, {"timestamp": "13/04 18:20", "animal": "Pavão"}, {"timestamp": "13/04 21:30", "animal": "Cobra"}, {"timestamp": "14/04 09:20", "animal": "Burro"}, {"timestamp": "14/04 11:20", "animal": "Cachorro"}, {"timestamp": "14/04 14:20", "animal": "Macaco"}, {"timestamp": "14/04 16:20", "animal": "Camelo"}, {"timestamp": "14/04 18:20", "animal": "Pavão"}, {"timestamp": "14/04 21:30", "animal": "Gato"}, {"timestamp": "15/04 09:20", "animal": "Veado"}, {"timestamp": "15/04 11:20", "animal": "Jacaré"}, {"timestamp": "15/04 14:20", "animal": "Cachorro"}, {"timestamp": "15/04 16:20", "animal": "Galo"}, {"timestamp": "15/04 20:00", "animal": "Carneiro"}, {"timestamp": "15/04 21:30", "animal": "Cobra"}, {"timestamp": "16/04 09:20", "animal": "Tigre"}, {"timestamp": "16/04 11:20", "animal": "Cabra"}, {"timestamp": "16/04 14:20", "animal": "Peru"}, {"timestamp": "16/04 16:20", "animal": "Vaca"}, {"timestamp": "16/04 18:20", "animal": "Borboleta"}, {"timestamp": "16/04 21:30", "animal": "Carneiro"}, {"timestamp": "17/04 09:20", "animal": "Avestruz"}, {"timestamp": "17/04 11:20", "animal": "Burro"}, {"timestamp": "17/04 14:20", "animal": "Peru"}, {"timestamp": "17/04 16:20", "animal": "Cachorro"}, {"timestamp": "17/04 18:20", "animal": "Macaco"}, {"timestamp": "17/04 21:30", "animal": "Jacaré"}, {"timestamp": "18/04 09:20", "animal": "Avestruz"}, {"timestamp": "18/04 11:20", "animal": "Gato"}, {"timestamp": "18/04 14:20", "animal": "Carneiro"}, {"timestamp": "18/04 16:20", "animal": "Macaco"}, {"timestamp": "18/04 20:00", "animal": "Jacaré"}, {"timestamp": "18/04 21:30", "animal": "Cachorro"}, {"timestamp": "19/04 09:20", "animal": "Jacaré"}, {"timestamp": "19/04 11:20", "animal": "Gato"}, {"timestamp": "19/04 14:20", "animal": "Veado"}, {"timestamp": "19/04 16:20", "animal": "Cachorro"}, {"timestamp": "20/04 09:20", "animal": "Cabra"}, {"timestamp": "20/04 11:20", "animal": "Peru"}, {"timestamp": "20/04 14:20", "animal": "Veado"}, {"timestamp": "20/04 16:20", "animal": "Avestruz"}, {"timestamp": "20/04 18:20", "animal": "Coelho"}, {"timestamp": "20/04 21:30", "animal": "Leão"}, {"timestamp": "21/04 09:20", "animal": "Vaca"}, {"timestamp": "21/04 11:20", "animal": "Cobra"}, {"timestamp": "21/04 14:20", "animal": "Vaca"}, {"timestamp": "21/04 16:20", "animal": "Macaco"}, {"timestamp": "21/04 18:20", "animal": "Veado"}, {"timestamp": "21/04 21:30", "animal": "Coelho"}, {"timestamp": "22/04 09:20", "animal": "Urso"}, {"timestamp": "22/04 11:20", "animal": "Carneiro"}, {"timestamp": "22/04 14:20", "animal": "Peru"}, {"timestamp": "22/04 16:20", "animal": "Peru"}, {"timestamp": "22/04 20:00", "animal": "Cachorro"}];
+    const ALL_ANIMALS = ["Avestruz", "Borboleta", "Burro", "Cabra", "Cachorro", "Camelo", "Carneiro", "Cavalo", "Cobra", "Coelho", "Elefante", "Galo", "Gato", "Jacaré", "Leão", "Macaco", "Pavão", "Peru", "Porco", "Tigre", "Touro", "Urso", "Vaca", "Veado", "Águia"];
+    const OVERALL_COUNTS = [{"animal": "Peru", "count": 9}, {"animal": "Burro", "count": 7}, {"animal": "Cachorro", "count": 7}, {"animal": "Cobra", "count": 7}, {"animal": "Macaco", "count": 7}, {"animal": "Carneiro", "count": 6}, {"animal": "Jacaré", "count": 6}, {"animal": "Pavão", "count": 6}, {"animal": "Veado", "count": 6}, {"animal": "Avestruz", "count": 5}, {"animal": "Coelho", "count": 5}, {"animal": "Vaca", "count": 5}, {"animal": "Borboleta", "count": 4}, {"animal": "Gato", "count": 4}, {"animal": "Porco", "count": 4}, {"animal": "Cabra", "count": 3}, {"animal": "Cavalo", "count": 3}, {"animal": "Elefante", "count": 3}, {"animal": "Leão", "count": 3}, {"animal": "Tigre", "count": 3}, {"animal": "Urso", "count": 3}, {"animal": "Águia", "count": 3}, {"animal": "Galo", "count": 2}, {"animal": "Camelo", "count": 1}, {"animal": "Touro", "count": 1}];
+
+    const PRESETS = {
+      "grupo-c": ["Cabra", "Cachorro", "Camelo", "Carneiro", "Cavalo", "Cobra", "Coelho"],
+      "grupo-8": ["Burro", "Carneiro", "Cobra", "Jacaré", "Pavão", "Macaco", "Peru", "Veado"],
+      "personalizado": []
+    };
+
+    const checklist = document.getElementById("checklist");
+    const selectedChips = document.getElementById("selectedChips");
+    const content = document.getElementById("content");
+    const presetSelect = document.getElementById("presetSelect");
+    const applyPresetBtn = document.getElementById("applyPresetBtn");
+    const selectAllBtn = document.getElementById("selectAllBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    function normalizeSet(arr) {
+      return new Set(arr);
+    }
+
+    function getCheckedAnimals() {
+      return [...document.querySelectorAll('input[data-animal]:checked')]
+        .map(el => el.getAttribute('data-animal'))
+        .sort((a,b) => a.localeCompare(b, 'pt-BR'));
+    }
+
+    function setCheckedAnimals(animals) {
+      const wanted = new Set(animals);
+      document.querySelectorAll('input[data-animal]').forEach(input => {
+        input.checked = wanted.has(input.getAttribute('data-animal'));
+      });
+      render();
+    }
+
+    function buildChecklist() {
+      checklist.innerHTML = "";
+      ALL_ANIMALS.forEach(animal => {
+        const label = document.createElement("label");
+        label.className = "check";
+        label.innerHTML = `<input type="checkbox" data-animal="${animal}"> <span>${animal}</span>`;
+        checklist.appendChild(label);
+      });
+
+      document.querySelectorAll('input[data-animal]').forEach(input => {
+        input.addEventListener('change', () => {
+          presetSelect.value = "personalizado";
+          render();
+        });
+      });
+    }
+
+    function formatList(list) {
+      if (!list || !list.length) return "—";
+      return list.join(", ");
+    }
+
+    function calculateMetrics(selected) {
+      const selectedSet = new Set(selected);
+      const hits = DATA
+        .map((item, index) => ({ ...item, index }))
+        .filter(item => selectedSet.has(item.animal));
+
+      const countsMap = new Map();
+      selected.forEach(animal => countsMap.set(animal, 0));
+      DATA.forEach(item => {
+        if (selectedSet.has(item.animal)) {
+          countsMap.set(item.animal, (countsMap.get(item.animal) || 0) + 1);
+        }
+      });
+
+      const selectedCounts = [...countsMap.entries()]
+        .map(([animal, count]) => ({ animal, count }))
+        .sort((a,b) => b.count - a.count || a.animal.localeCompare(b.animal, 'pt-BR'));
+
+      const transitionsChrono = [];
+      for (let i = 0; i < hits.length - 1; i++) {
+        const current = hits[i];
+        const next = hits[i + 1];
+        const gap = next.index - current.index - 1;
+        const middleAnimals = DATA.slice(current.index + 1, next.index).map(x => x.animal);
+        transitionsChrono.push({
+          order: i + 1,
+          fromAnimal: current.animal,
+          fromTime: current.timestamp,
+          toAnimal: next.animal,
+          toTime: next.timestamp,
+          gap,
+          middleAnimals
+        });
+      }
+
+      const topTransitions = [...transitionsChrono]
+        .sort((a,b) => b.gap - a.gap || a.order - b.order);
+
+      const reappearances = selected.map(animal => {
+        const indexes = DATA
+          .map((item, index) => item.animal === animal ? index : -1)
+          .filter(index => index >= 0);
+
+        let maxGap = null;
+        let fromTime = "—";
+        let toTime = "—";
+
+        for (let i = 0; i < indexes.length - 1; i++) {
+          const gap = indexes[i+1] - indexes[i] - 1;
+          if (maxGap === null || gap > maxGap) {
+            maxGap = gap;
+            fromTime = DATA[indexes[i]].timestamp;
+            toTime = DATA[indexes[i+1]].timestamp;
+          }
+        }
+
+        return {
+          animal,
+          count: indexes.length,
+          maxGap,
+          fromTime,
+          toTime
+        };
+      }).sort((a,b) => {
+        const av = a.maxGap === null ? -1 : a.maxGap;
+        const bv = b.maxGap === null ? -1 : b.maxGap;
+        return bv - av || b.count - a.count || a.animal.localeCompare(b.animal, 'pt-BR');
+      });
+
+      const largestTransition = topTransitions.length ? topTransitions[0] : null;
+      const largestReappearance = reappearances.length ? reappearances[0] : null;
+      const totalOccurrences = hits.length;
+
+      return {
+        hits,
+        selectedCounts,
+        transitionsChrono,
+        topTransitions,
+        reappearances,
+        largestTransition,
+        largestReappearance,
+        totalOccurrences
+      };
+    }
+
+    function barsHTML(items, valueKey, emptyText) {
+      if (!items.length) {
+        return `<div class="empty">${emptyText}</div>`;
+      }
+      const validValues = items.map(item => item[valueKey] ?? 0);
+      const maxValue = Math.max(...validValues, 1);
+
+      return `
+        <div class="bars">
+          ${items.map(item => {
+            const value = item[valueKey] ?? 0;
+            const width = (value / maxValue) * 100;
+            const label = item.animal;
+            return `
+              <div class="bar-row">
+                <div class="bar-label" title="${label}">${label}</div>
+                <div class="bar-track"><div class="bar-fill" style="width:${width}%"></div></div>
+                <div class="bar-value">${value}</div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function tableRowsTransitions(rows) {
+      if (!rows.length) {
+        return `<tr><td colspan="5">Nenhuma transição disponível para a seleção atual.</td></tr>`;
+      }
+      return rows.map(row => `
+        <tr>
+          <td>${row.order}</td>
+          <td>${row.fromAnimal} (${row.fromTime})</td>
+          <td>${row.toAnimal} (${row.toTime})</td>
+          <td class="num">${row.gap}</td>
+          <td>${formatList(row.middleAnimals)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function tableRowsTopTransitions(rows) {
+      if (!rows.length) {
+        return `<tr><td colspan="5">Nenhuma transição disponível para a seleção atual.</td></tr>`;
+      }
+      return rows.map((row, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${row.fromAnimal} (${row.fromTime})</td>
+          <td>${row.toAnimal} (${row.toTime})</td>
+          <td class="num">${row.gap}</td>
+          <td>${formatList(row.middleAnimals)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function tableRowsReappearances(rows) {
+      if (!rows.length) {
+        return `<tr><td colspan="5">Nenhum animal selecionado.</td></tr>`;
+      }
+      return rows.map((row, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${row.animal}</td>
+          <td class="num">${row.count}</td>
+          <td class="num">${row.maxGap === null ? "—" : row.maxGap}</td>
+          <td>${row.maxGap === null ? "Apareceu apenas uma vez." : `${row.fromTime} → ${row.toTime}`}</td>
+        </tr>
+      `).join("");
+    }
+
+    function tableRowsCounts(rows) {
+      if (!rows.length) {
+        return `<tr><td colspan="3">Nenhum animal selecionado.</td></tr>`;
+      }
+      return rows.map((row, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${row.animal}</td>
+          <td class="num">${row.count}</td>
+        </tr>
+      `).join("");
+    }
+
+    function tableRowsOverall(rows) {
+      return rows.map((row, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${row.animal}</td>
+          <td class="num">${row.count}</td>
+        </tr>
+      `).join("");
+    }
+
+    function render() {
+      const selected = getCheckedAnimals();
+      selectedChips.innerHTML = selected.length
+        ? selected.map(animal => `<span class="chip">${animal}</span>`).join("")
+        : `<span class="chip" style="border-color:rgba(255,213,79,.22); color:var(--warn); background:rgba(255,213,79,.08);">Nenhum animal selecionado</span>`;
+
+      if (!selected.length) {
+        content.innerHTML = `
+          <div class="empty">
+            Selecione pelo menos um animal para gerar as métricas.
+          </div>
+        `;
+        return;
+      }
+
+      const metrics = calculateMetrics(selected);
+      const largestTransition = metrics.largestTransition;
+      const largestReappearance = metrics.largestReappearance;
+
+      const summaryHTML = `
+        <div class="summary">
+          <strong>Resumo automático:</strong><br>
+          Foram selecionados <strong>${selected.length}</strong> animais, com <strong>${metrics.totalOccurrences}</strong> aparições no período.
+          ${largestTransition
+            ? `A maior distância entre resultados do grupo foi de <strong>${largestTransition.gap}</strong> rodadas no meio, em <strong>${largestTransition.fromAnimal}</strong> (${largestTransition.fromTime}) → <strong>${largestTransition.toAnimal}</strong> (${largestTransition.toTime}).`
+            : `Não há transições suficientes para calcular a maior distância do grupo.`
+          }
+          ${largestReappearance
+            ? ` A maior demora individual para reaparecer foi de <strong>${largestReappearance.maxGap === null ? "—" : largestReappearance.maxGap}</strong> rodadas para <strong>${largestReappearance.animal}</strong>.`
+            : ""
+          }
+        </div>
+      `;
+
+      content.innerHTML = `
+        <div class="grid">
+          <div class="card">
+            <h3>Animais selecionados</h3>
+            <div class="big">${selected.length}</div>
+            <div class="small">${selected.join(", ")}</div>
+          </div>
+
+          <div class="card">
+            <h3>Total de ocorrências do grupo</h3>
+            <div class="big">${metrics.totalOccurrences}</div>
+            <div class="small">Quantidade de vezes em que qualquer animal selecionado apareceu nas 113 rodadas analisadas.</div>
+          </div>
+
+          <div class="card">
+            <h3>Maior distância entre resultados do grupo</h3>
+            <div class="big">${largestTransition ? largestTransition.gap : "—"}</div>
+            <div class="small">
+              ${largestTransition
+                ? `${largestTransition.fromAnimal} (${largestTransition.fromTime}) → ${largestTransition.toAnimal} (${largestTransition.toTime})`
+                : "Não há transições suficientes para calcular."
+              }
+            </div>
+            ${largestTransition ? `<div class="pill">No meio: ${formatList(largestTransition.middleAnimals)}</div>` : ""}
+          </div>
+
+          <div class="card">
+            <h3>Maior demora individual</h3>
+            <div class="big">${largestReappearance && largestReappearance.maxGap !== null ? largestReappearance.maxGap : "—"}</div>
+            <div class="small">
+              ${largestReappearance
+                ? `${largestReappearance.animal}${largestReappearance.maxGap === null ? " apareceu apenas uma vez." : ` (${largestReappearance.fromTime} → ${largestReappearance.toTime})`}`
+                : "Sem dados suficientes."
+              }
+            </div>
+          </div>
+        </div>
+
+        ${summaryHTML}
+
+        <div class="section">
+          <h3>Gráficos</h3>
+          <div class="charts">
+            <div class="chart-box">
+              <h4>Quantidade de aparições por animal selecionado</h4>
+              ${barsHTML(metrics.selectedCounts, "count", "Sem dados para o gráfico.")}
+            </div>
+            <div class="chart-box">
+              <h4>Maior demora individual para reaparecer</h4>
+              ${barsHTML(
+                metrics.reappearances.map(item => ({ ...item, maxGap: item.maxGap === null ? 0 : item.maxGap })),
+                "maxGap",
+                "Sem dados para o gráfico."
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Ranking dos animais selecionados</h3>
+          <p class="note">Ordenado do que mais saiu para o que menos saiu dentro do filtro atual.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Top</th>
+                  <th>Animal</th>
+                  <th class="num">Vezes</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRowsCounts(metrics.selectedCounts)}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Transições cronológicas do grupo</h3>
+          <p class="note">Cada linha mostra um animal selecionado e o próximo resultado também pertencente ao grupo atual. A coluna “rodadas no meio” conta quantos resultados saíram entre um e outro.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>De</th>
+                  <th>Para</th>
+                  <th class="num">Rodadas no meio</th>
+                  <th>Resultados no meio</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRowsTransitions(metrics.transitionsChrono)}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Top maiores intervalos do grupo</h3>
+          <p class="note">Mesmo cálculo acima, mas ordenado pelos maiores intervalos.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Top</th>
+                  <th>De</th>
+                  <th>Para</th>
+                  <th class="num">Rodadas no meio</th>
+                  <th>Resultados no meio</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRowsTopTransitions(metrics.topTransitions.slice(0, 20))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Maior demora individual para reaparecer</h3>
+          <p class="note">Nesta tabela, a medida é individual: quantas rodadas cada animal demorou, na sua pior sequência, para aparecer de novo.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Top</th>
+                  <th>Animal</th>
+                  <th class="num">Aparições</th>
+                  <th class="num">Maior demora</th>
+                  <th>Trecho da maior demora</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRowsReappearances(metrics.reappearances)}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Ranking geral de todos os animais</h3>
+          <p class="note">Tabela fixa com o total de aparições de todos os animais do período analisado.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Top</th>
+                  <th>Animal</th>
+                  <th class="num">Vezes</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRowsOverall(OVERALL_COUNTS)}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    applyPresetBtn.addEventListener('click', () => {
+      const preset = PRESETS[presetSelect.value] || [];
+      setCheckedAnimals(preset);
+    });
+
+    selectAllBtn.addEventListener('click', () => {
+      presetSelect.value = "personalizado";
+      setCheckedAnimals(ALL_ANIMALS);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      presetSelect.value = "personalizado";
+      setCheckedAnimals([]);
+    });
+
+    buildChecklist();
+    setCheckedAnimals(PRESETS["grupo-c"]);
+  </script>
 </body>
 </html>
