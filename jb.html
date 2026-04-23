@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Análise - Distância entre Animais Selecionados</title>
+  <style>
+    :root{
+      --bg:#031f14;
+      --bg2:#062a1c;
+      --card:#083625;
+      --line:#00e676;
+      --line-soft:rgba(0,230,118,.22);
+      --text:#f5fff8;
+      --muted:#9fd7b6;
+      --accent:#00ff99;
+      --accent2:#19c37d;
+      --warn:#ffd54f;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(90deg,var(--bg),#052916 40%,var(--bg));
+      color:var(--text);
+    }
+    .wrap{
+      max-width:1280px;
+      margin:0 auto;
+      padding:32px 20px 48px;
+    }
+    .hero{
+      text-align:center;
+      margin-bottom:22px;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:40px;
+      color:var(--text);
+    }
+    .subtitle{
+      color:var(--muted);
+      font-size:18px;
+      line-height:1.5;
+      max-width:980px;
+      margin:0 auto;
+    }
+    .selected{
+      margin:20px auto 0;
+      max-width:1000px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+    }
+    .chip{
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(0,255,153,.08);
+      border:1px solid rgba(0,255,153,.25);
+      color:var(--accent);
+      font-weight:700;
+      font-size:14px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:16px;
+      margin:28px 0 32px;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(10,53,36,.96), rgba(6,42,28,.96));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 0 0 1px rgba(0,255,153,.05), 0 12px 35px rgba(0,0,0,.25);
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size:18px;
+      color:var(--accent);
+    }
+    .big{
+      font-size:30px;
+      font-weight:700;
+      color:var(--text);
+      margin:6px 0 4px;
+    }
+    .small{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+    }
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,213,79,.12);
+      border:1px solid rgba(255,213,79,.25);
+      color:var(--warn);
+      font-weight:700;
+      font-size:13px;
+      margin-top:10px;
+    }
+    .section{
+      margin-top:28px;
+    }
+    .section h3{
+      font-size:28px;
+      margin:0 0 14px;
+      color:var(--text);
+    }
+    .note{
+      color:var(--muted);
+      margin-bottom:14px;
+      line-height:1.6;
+    }
+    .table-wrap{
+      background:rgba(5,34,23,.72);
+      border:1px solid var(--line-soft);
+      border-radius:18px;
+      overflow:auto;
+      margin-bottom:20px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+    }
+    th, td{
+      padding:14px 12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      text-align:left;
+    }
+    th{
+      position:sticky;
+      top:0;
+      background:#0a3927;
+      color:var(--accent);
+      font-size:14px;
+      letter-spacing:.3px;
+    }
+    td{
+      color:var(--text);
+      font-size:15px;
+    }
+    tr:hover td{
+      background:rgba(0,255,153,.04);
+    }
+    .num{
+      text-align:right;
+      font-variant-numeric:tabular-nums;
+    }
+    .footer{
+      margin-top:24px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+    ul{
+      margin:10px 0 0 18px;
+      color:var(--muted);
+      line-height:1.7;
+    }
+    strong.accent{color:var(--accent)}
+    @media (max-width:700px){
+      h1{font-size:30px}
+      .subtitle{font-size:16px}
+      .big{font-size:24px}
+      .section h3{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Análise de Distância entre Animais Selecionados</h1>
+      <p class="subtitle">
+        Levantamento em ordem cronológica usando apenas os seguintes animais. A análise mostra a maior distância entre aparições
+        de qualquer um deles, os maiores intervalos encontrados e a maior demora individual de reaparição por animal.
+      </p>
+      <div class="selected">
+        <span class="chip">Burro</span>
+        <span class="chip">Carneiro</span>
+        <span class="chip">Cobra</span>
+        <span class="chip">Jacaré</span>
+        <span class="chip">Pavão</span>
+        <span class="chip">Macaco</span>
+        <span class="chip">Peru</span>
+        <span class="chip">Veado</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Maior distância entre eles</h2>
+        <div class="big">7 rodadas no meio</div>
+        <div class="small">
+          <strong class="accent">Cobra (05/04 14:20) → Burro (07/04 09:20)</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Resultados que saíram no meio</h2>
+        <div class="small">
+          Cavalo, Tigre, Elefante, Gato, Galo, Porco e Porco.
+        </div>
+        <div class="pill">Maior intervalo do conjunto</div>
+      </div>
+
+      <div class="card">
+        <h2>Maior demora individual</h2>
+        <div class="big">Cobra</div>
+        <div class="small">
+          A maior demora para reaparecer foi de <strong class="accent">38 rodadas</strong>.
+        </div>
+      </div>
+    </div>
+
+    <section class="section">
+      <h3>Resumo rápido</h3>
+      <div class="card">
+        <div class="small">
+          <ul>
+            <li><strong class="accent">Maior distância entre qualquer um dos 8 animais:</strong> 7 rodadas no meio.</li>
+            <li><strong class="accent">Sequência dessa maior distância:</strong> Cobra → Burro.</li>
+            <li><strong class="accent">Animal com maior demora para reaparecer:</strong> Cobra, com 38 rodadas.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h3>Top maiores distâncias entre os animais selecionados</h3>
+      <p class="note">
+        A coluna <strong>rodadas no meio</strong> mostra quantos resultados ocorreram entre uma aparição de um dos 8 animais
+        e a próxima aparição de qualquer outro animal desse mesmo grupo.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Top</th>
+              <th>De</th>
+              <th>Para</th>
+              <th class="num">Rodadas no meio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Cobra (05/04 14:20)</td><td>Burro (07/04 09:20)</td><td class="num">7</td></tr>
+            <tr><td>2</td><td>Peru (08/04 09:20)</td><td>Pavão (08/04 21:30)</td><td class="num">4</td></tr>
+            <tr><td>3</td><td>Veado (20/04 14:20)</td><td>Cobra (21/04 11:20)</td><td class="num">4</td></tr>
+            <tr><td>4</td><td>Macaco (13/04 11:20)</td><td>Pavão (13/04 18:20)</td><td class="num">2</td></tr>
+            <tr><td>5</td><td>Jacaré (15/04 11:20)</td><td>Carneiro (15/04 20:00)</td><td class="num">2</td></tr>
+            <tr><td>6</td><td>Cobra (15/04 21:30)</td><td>Peru (16/04 14:20)</td><td class="num">2</td></tr>
+            <tr><td>7</td><td>Peru (16/04 14:20)</td><td>Carneiro (16/04 21:30)</td><td class="num">2</td></tr>
+            <tr><td>8</td><td>Jacaré (17/04 21:30)</td><td>Carneiro (18/04 14:20)</td><td class="num">2</td></tr>
+            <tr><td>9</td><td>Veado (19/04 14:20)</td><td>Peru (20/04 11:20)</td><td class="num">2</td></tr>
+            <tr><td>10</td><td>Veado (21/04 18:20)</td><td>Carneiro (22/04 11:20)</td><td class="num">2</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h3>Maior demora para reaparecer por animal</h3>
+      <p class="note">
+        Aqui a lógica é outra: em vez de comparar o grupo todo, a tabela mostra quantas rodadas cada animal demorou,
+        na sua pior sequência, para aparecer de novo.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Top</th>
+              <th>Animal</th>
+              <th class="num">Maior demora para reaparecer</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Cobra</td><td class="num">38</td></tr>
+            <tr><td>2</td><td>Jacaré</td><td class="num">37</td></tr>
+            <tr><td>3</td><td>Carneiro</td><td class="num">34</td></tr>
+            <tr><td>4</td><td>Peru</td><td class="num">31</td></tr>
+            <tr><td>5</td><td>Macaco</td><td class="num">30</td></tr>
+            <tr><td>6</td><td>Veado</td><td class="num">25</td></tr>
+            <tr><td>7</td><td>Burro</td><td class="num">18</td></tr>
+            <tr><td>8</td><td>Pavão</td><td class="num">10</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="footer">
+      Arquivo HTML criado com base nos resultados lidos das imagens enviadas na conversa.
+    </div>
+  </div>
+</body>
+</html>
