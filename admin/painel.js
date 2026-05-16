@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 8,
-  label: "v8",
+  numero: 9,
+  label: "v9",
   data: "2026-05-16",
-  nota: "Importacao em lotes com contagem de clientes/categorias."
+  nota: "Cache atualizado e importacao completa por categoria."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -135,6 +135,41 @@ function normalizeImageItems(images) {
     })
     .filter((item) => item.url)
     .slice(0, 10);
+}
+
+function cleanForFirebase(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map(cleanForFirebase)
+      .filter((item) => item !== undefined);
+  }
+
+  if (value && typeof value === "object") {
+    const cleaned = {};
+    Object.entries(value).forEach(([key, val]) => {
+      if (val === undefined || typeof val === "function") return;
+      cleaned[key] = cleanForFirebase(val);
+    });
+    return cleaned;
+  }
+
+  return value === undefined ? null : value;
+}
+
+function getImportClientId(categoryName, clientName) {
+  const categoryId = slugify(categoryName || "outros");
+  const clientId = slugify(clientName || "cliente");
+  return `${categoryId}-${clientId}`.slice(0, 120);
+}
+
+function findExistingClientForImport(categoryName, clientName) {
+  const categoryId = slugify(categoryName || "outros");
+  const clientNameNorm = normalizeName(clientName);
+  return state.clientes.find((client) => {
+    const sameCategory = slugify(client.categoria || client.categoriaId || "outros") === categoryId;
+    const sameName = normalizeName(client.nome || client.name || "") === clientNameNorm;
+    return sameCategory && sameName;
+  }) || {};
 }
 
 function imageUrl(item) {
@@ -870,8 +905,8 @@ async function syncClientsFromScript() {
         const name = est.name || est.nome;
         if (!name) return;
         importStats.clientes += 1;
-        const id = slugify(name);
-        const existing = state.clientes.find((client) => client.id === id) || {};
+        const id = getImportClientId(categoryName, name);
+        const existing = findExistingClientForImport(categoryName, name);
         const paidInScript = statusMap[normalizeName(name)] === "s";
         const importedImages = [
           ...(est.novidadesImages || []),
@@ -881,7 +916,7 @@ async function syncClientsFromScript() {
           url,
           texto: (est.novidadesDescriptions || [])[index] || ""
         }));
-        updates[`clientes/${id}`] = {
+        updates[`clientes/${id}`] = cleanForFirebase({
           ...existing,
           nome: existing.nome || name,
           nomeNormalizado: existing.nomeNormalizado || normalizeName(name),
@@ -902,7 +937,7 @@ async function syncClientsFromScript() {
           origem: existing.origem || "script.js",
           updatedAt: serverTimestamp(),
           updatedBy: state.user.uid
-        };
+        });
       });
     });
 

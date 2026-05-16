@@ -15962,12 +15962,15 @@ plotarPinsImoveis(stateImoveis.filtered);
         Object.entries(clientes).forEach(([clienteId, cliente]) => {
           const alvoId = normalizeName(clienteId);
           const alvoNome = normalizeName(cliente.nomeNormalizado || cliente.nome || "");
+          const alvoCategoria = normalizeName(cliente.categoria || "");
           let encontrado = false;
 
           categories.forEach((cat) => {
+            const catSlug = normalizeName(cat.title || "");
             (cat.establishments || []).forEach((est) => {
               const estId = normalizeName(est.nomeNormalizado || est.name || "");
-              if (estId === alvoId || (alvoNome && estId === alvoNome)) {
+              const mesmaCategoria = !alvoCategoria || alvoCategoria === catSlug;
+              if (mesmaCategoria && (estId === alvoId || (alvoNome && estId === alvoNome))) {
                 encontrado = true;
                 aplicarClienteAdminNoEstabelecimento(est, cliente);
                 definirStatusClienteAdmin(cliente, clienteId);
