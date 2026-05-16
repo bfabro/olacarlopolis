@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=11">
+  <link rel="stylesheet" href="painel.css?v=12">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -175,6 +175,7 @@
                 <p>Resumo rapido com status, financeiro e quantidade de imagens.</p>
               </div>
               <button id="syncClientsButton" class="ghost-button" type="button"><i class="fa-solid fa-download"></i> Importar clientes/categorias</button>
+              <button id="migrateImagesButton" class="ghost-button" type="button"><i class="fa-solid fa-cloud-arrow-up"></i> Subir imagens</button>
             </div>
             <div id="importReport" class="import-report hidden"></div>
             <input id="clientSearch" class="search-input" placeholder="Buscar cliente...">
@@ -313,6 +314,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=11"></script>
+  <script type="module" src="painel.js?v=12"></script>
 </body>
 </html>

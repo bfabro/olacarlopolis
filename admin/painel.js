@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 11,
-  label: "v11",
+  numero: 12,
+  label: "v12",
   data: "2026-05-16",
-  nota: "Importacao sem cache e imagem manual com texto por cliente."
+  nota: "Lista usa dados importados e migracao de imagens para Storage."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -172,6 +172,20 @@ function findExistingClientForImport(categoryName, clientName) {
   }) || {};
 }
 
+function sortClientsInState() {
+  state.clientes.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+}
+
+function upsertClientInState(id, data) {
+  const index = state.clientes.findIndex((client) => client.id === id);
+  const item = { id, ...data };
+  if (index >= 0) {
+    state.clientes[index] = item;
+  } else {
+    state.clientes.push(item);
+  }
+}
+
 function imageUrl(item) {
   return typeof item === "string" ? item : (item?.url || "");
 }
@@ -248,7 +262,7 @@ async function loadAllData() {
   if (clientesSnap.exists()) {
     clientesSnap.forEach((child) => state.clientes.push({ id: child.key, ...child.val() }));
   }
-  state.clientes.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+  sortClientsInState();
 
   state.usuarios = [];
   if (usersSnap.exists()) {
@@ -494,6 +508,101 @@ async function uploadImagesForClient(clientId, files) {
     urls.push(await getDownloadURL(fileRef));
   }
   return urls;
+}
+
+function isFirebaseStorageUrl(url) {
+  return /firebasestorage\.googleapis\.com|storage\.googleapis\.com/i.test(String(url || ""));
+}
+
+async function uploadUrlToClientStorage(clientId, imageItem, index) {
+  const url = imageUrl(imageItem);
+  if (!url || isFirebaseStorageUrl(url)) return imageItem;
+
+  const absoluteUrl = new URL(url, window.location.origin).toString();
+  const response = await fetch(absoluteUrl, { cache: "reload" });
+  if (!response.ok) throw new Error(`HTTP ${response.status} em ${url}`);
+
+  const blob = await response.blob();
+  const extFromType = (blob.type && blob.type.split("/")[1]) || "jpg";
+  const fileName = `${Date.now()}-${index}.${extFromType.replace("jpeg", "jpg")}`;
+  const fileRef = storageRef(storage, `clientes/${clientId}/imagens/${fileName}`);
+  await uploadBytes(fileRef, blob);
+  const storageUrl = await getDownloadURL(fileRef);
+
+  return {
+    url: storageUrl,
+    texto: imageItem?.texto || ""
+  };
+}
+
+async function migrateClientImagesToStorage() {
+  const button = $("migrateImagesButton");
+  setBusy(button, true, "Subindo...");
+  const stats = { clientes: 0, imagens: 0, erros: [] };
+
+  try {
+    const clients = state.clientes.filter((client) => normalizeImageItems(client.imagens).length);
+    showImportReport([
+      `Migrando imagens de ${clients.length} clientes para o Firebase Storage.`,
+      "Isso pode demorar alguns minutos."
+    ]);
+
+    for (const client of clients) {
+      const imagens = normalizeImageItems(client.imagens);
+      let changed = false;
+      const migrated = [];
+
+      for (let i = 0; i < imagens.length; i += 1) {
+        const item = imagens[i];
+        try {
+          const next = await uploadUrlToClientStorage(client.id, item, i + 1);
+          migrated.push(next);
+          if (imageUrl(next) !== imageUrl(item)) {
+            changed = true;
+            stats.imagens += 1;
+          }
+        } catch (err) {
+          migrated.push(item);
+          stats.erros.push(`${client.nome || client.id} / imagem ${i + 1}: ${err.message}`);
+        }
+      }
+
+      if (changed) {
+        await update(ref(db, `clientes/${client.id}`), {
+          imagens: migrated,
+          imagem: migrated[0]?.url || client.imagem || "",
+          updatedAt: serverTimestamp(),
+          updatedBy: state.user?.uid || ""
+        });
+        client.imagens = migrated;
+        client.imagem = migrated[0]?.url || client.imagem || "";
+        stats.clientes += 1;
+      }
+
+      if ((stats.clientes + stats.erros.length) % 5 === 0) {
+        showImportReport([
+          `Clientes atualizados: ${stats.clientes}`,
+          `Imagens enviadas: ${stats.imagens}`,
+          `Erros: ${stats.erros.length}`
+        ], stats.erros.length ? "error" : "info");
+      }
+    }
+
+    showImportReport([
+      "Migracao de imagens concluida.",
+      `Clientes atualizados: ${stats.clientes}`,
+      `Imagens enviadas ao Storage: ${stats.imagens}`,
+      `Erros: ${stats.erros.length}`,
+      ...stats.erros.slice(0, 5)
+    ], stats.erros.length ? "error" : "ok");
+    renderClientsList();
+    showToast("Migracao de imagens concluida.");
+  } catch (err) {
+    showImportReport(["Falha na migracao de imagens.", err.message || String(err)], "error");
+    showToast("Falha na migracao de imagens.");
+  } finally {
+    setBusy(button, false);
+  }
 }
 
 function renderClientsList() {
@@ -1030,6 +1139,7 @@ async function syncClientsFromScript() {
       try {
         await set(ref(db, `clientes/${item.id}`), item.data);
         importStats.clientesSalvos += 1;
+        upsertClientInState(item.id, item.data);
       } catch (err) {
         importStats.erros.push(`Cliente ${item.data.nome || item.id}: ${err.code || err.message}`);
       }
@@ -1064,7 +1174,8 @@ async function syncClientsFromScript() {
     const report = [
       `Importacao concluida.`,
       `Clientes salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
-      `Categorias salvas: ${importStats.categoriasSalvas}/${importStats.categorias}`
+      `Categorias salvas: ${importStats.categoriasSalvas}/${importStats.categorias}`,
+      `Clientes na tela: ${state.clientes.length}`
     ];
     if (importStats.erros.length) {
       report.push(`Erros: ${importStats.erros.length}`);
@@ -1072,7 +1183,13 @@ async function syncClientsFromScript() {
     }
     showImportReport(report, importStats.erros.length ? "error" : "ok");
     showToast(`Importacao concluida: ${importStats.clientesSalvos} clientes salvos.`);
-    await loadAllData();
+    sortClientsInState();
+    renderStats();
+    renderClientsList();
+    renderFinanceiro();
+    fillClientCategorySelect();
+    fillUserClientSelect();
+    fillEventClientSelect();
   } catch (error) {
     console.error(error);
     showImportReport([
@@ -1187,6 +1304,7 @@ function bindEvents() {
   $("refreshButton").addEventListener("click", loadAllData);
   $("newClientButton").addEventListener("click", resetClientForm);
   $("syncClientsButton").addEventListener("click", syncClientsFromScript);
+  $("migrateImagesButton").addEventListener("click", migrateClientImagesToStorage);
   $("clientSearch").addEventListener("input", renderClientsList);
   $("clientImagesUpload").addEventListener("change", async (event) => {
     await uploadClientImages(event.target.files);
