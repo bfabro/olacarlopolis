@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 9,
-  label: "v9",
+  numero: 10,
+  label: "v10",
   data: "2026-05-16",
-  nota: "Cache atualizado e importacao completa por categoria."
+  nota: "Importacao cliente-a-cliente com relatorio e textos visiveis nas imagens."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -181,6 +181,15 @@ function showToast(message) {
   toast.textContent = message;
   toast.classList.remove("hidden");
   setTimeout(() => toast.classList.add("hidden"), 3200);
+}
+
+function showImportReport(lines, type = "info") {
+  const box = $("importReport");
+  if (!box) return;
+  box.className = `import-report ${type}`;
+  box.innerHTML = (Array.isArray(lines) ? lines : [lines])
+    .map((line) => `<div>${escapeHtml(line)}</div>`)
+    .join("");
 }
 
 function setBusy(button, busy, text) {
@@ -399,7 +408,9 @@ function renderClientImagesPreview() {
   box.innerHTML = state.clientImages.map((item, index) => `
     <article class="image-tile">
       <img src="${escapeAttr(imageUrl(item))}" alt="Imagem ${index + 1}">
-      <textarea data-image-text="${index}" rows="2" placeholder="Texto opcional abaixo da imagem">${escapeHtml(item.texto || "")}</textarea>
+      <label class="image-caption-label">Texto desta imagem
+        <textarea data-image-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
+      </label>
       <div>
         <button type="button" data-main-image="${index}">Destaque</button>
         <button type="button" data-remove-image="${index}" class="danger-mini">Remover</button>
@@ -859,7 +870,9 @@ function renderImagesMarkup(images, prefix) {
   return images.map((item, index) => `
     <article class="image-tile">
       <img src="${escapeAttr(imageUrl(item))}" alt="Imagem ${index + 1}">
-      <textarea data-${prefix}-text="${index}" rows="2" placeholder="Texto opcional abaixo da imagem">${escapeHtml(item.texto || "")}</textarea>
+      <label class="image-caption-label">Texto desta imagem
+        <textarea data-${prefix}-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
+      </label>
       <div>
         <button type="button" data-${prefix}-main="${index}">Destaque</button>
         <button type="button" data-${prefix}-remove="${index}" class="danger-mini">Remover</button>
@@ -884,22 +897,29 @@ async function syncClientsFromScript() {
 
     const safeCode = match[1].replace(/document\.querySelector\([^)]+\)/g, "null");
     const categories = new Function(`return (${safeCode});`)();
-    const updates = {};
+    const categoryPayloads = [];
+    const clientPayloads = [];
     const importStats = {
       categorias: 0,
-      clientes: 0
+      clientes: 0,
+      clientesSalvos: 0,
+      categoriasSalvas: 0,
+      erros: []
     };
 
     categories.forEach((category) => {
       const categoryName = category.title || "Outros";
       const categoryId = slugify(categoryName);
       importStats.categorias += 1;
-      updates[`categorias/${categoryId}`] = {
+      categoryPayloads.push({
+        id: categoryId,
+        data: cleanForFirebase({
         nome: categoryName,
         origem: "script.js",
         updatedAt: serverTimestamp(),
         updatedBy: state.user.uid
-      };
+        })
+      });
 
       (category.establishments || []).forEach((est) => {
         const name = est.name || est.nome;
@@ -916,7 +936,9 @@ async function syncClientsFromScript() {
           url,
           texto: (est.novidadesDescriptions || [])[index] || ""
         }));
-        updates[`clientes/${id}`] = cleanForFirebase({
+        clientPayloads.push({
+          id,
+          data: cleanForFirebase({
           ...existing,
           nome: existing.nome || name,
           nomeNormalizado: existing.nomeNormalizado || normalizeName(name),
@@ -937,30 +959,70 @@ async function syncClientsFromScript() {
           origem: existing.origem || "script.js",
           updatedAt: serverTimestamp(),
           updatedBy: state.user.uid
+          })
         });
       });
     });
 
-    const entries = Object.entries(updates);
-    const chunkSize = 40;
-    for (let i = 0; i < entries.length; i += chunkSize) {
-      const chunk = Object.fromEntries(entries.slice(i, i + chunkSize));
-      await update(ref(db), chunk);
-      showToast(`Importando ${Math.min(i + chunkSize, entries.length)} de ${entries.length} registros...`);
+    showImportReport([
+      `Encontrados: ${importStats.clientes} clientes e ${importStats.categorias} categorias.`,
+      "Gravando clientes no Firebase..."
+    ]);
+
+    for (let i = 0; i < clientPayloads.length; i += 1) {
+      const item = clientPayloads[i];
+      try {
+        await set(ref(db, `clientes/${item.id}`), item.data);
+        importStats.clientesSalvos += 1;
+      } catch (err) {
+        importStats.erros.push(`Cliente ${item.data.nome || item.id}: ${err.code || err.message}`);
+      }
+      if ((i + 1) % 20 === 0 || i + 1 === clientPayloads.length) {
+        showImportReport([
+          `Clientes salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
+          `Erros: ${importStats.erros.length}`
+        ], importStats.erros.length ? "error" : "info");
+      }
     }
 
-    await set(ref(db, "importacoes/ultimaImportacaoClientes"), {
-      ...importStats,
-      registros: entries.length,
-      origem: "script.js",
-      updatedAt: serverTimestamp(),
-      updatedBy: state.user.uid
-    });
+    for (const item of categoryPayloads) {
+      try {
+        await set(ref(db, `categorias/${item.id}`), item.data);
+        importStats.categoriasSalvas += 1;
+      } catch (err) {
+        importStats.erros.push(`Categoria ${item.data.nome || item.id}: ${err.code || err.message}`);
+      }
+    }
 
-    showToast(`Importacao concluida: ${importStats.clientes} clientes e ${importStats.categorias} categorias.`);
+    try {
+      await set(ref(db, "importacoes/ultimaImportacaoClientes"), {
+        ...importStats,
+        origem: "script.js",
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user.uid
+      });
+    } catch (err) {
+      importStats.erros.push(`Resumo da importacao: ${err.code || err.message}`);
+    }
+
+    const report = [
+      `Importacao concluida.`,
+      `Clientes salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
+      `Categorias salvas: ${importStats.categoriasSalvas}/${importStats.categorias}`
+    ];
+    if (importStats.erros.length) {
+      report.push(`Erros: ${importStats.erros.length}`);
+      report.push(...importStats.erros.slice(0, 5));
+    }
+    showImportReport(report, importStats.erros.length ? "error" : "ok");
+    showToast(`Importacao concluida: ${importStats.clientesSalvos} clientes salvos.`);
     await loadAllData();
   } catch (error) {
     console.error(error);
+    showImportReport([
+      "Falha geral na importacao.",
+      error.code || error.message || String(error)
+    ], "error");
     showToast(error.message || "Falha ao importar clientes. Abra o console para detalhes.");
   } finally {
     setBusy(button, false);

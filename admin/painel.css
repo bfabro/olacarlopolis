@@ -486,6 +486,19 @@ button[type="submit"]:hover,
   box-shadow: none;
 }
 
+.image-caption-label {
+  gap: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  background: #f8fafc;
+}
+
+.image-caption-label textarea {
+  margin-top: 6px;
+  background: #fff;
+}
+
 .image-tile div {
   display: grid;
   gap: 6px;
@@ -571,6 +584,30 @@ button[type="submit"]:hover,
   max-height: 150px;
   object-fit: cover;
   border-radius: 10px;
+}
+
+.import-report {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: #f8fafc;
+  color: var(--ink);
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.import-report.ok {
+  background: #ecfdf3;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.import-report.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
 }
 
 .list-title {
