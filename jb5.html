@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparação dos Melhores Grupos - 8, 9, 10 e 11</title>
+<style>
+:root {
+  --bg:#031f14; --card:#083625; --line:#00e676; --line-soft:rgba(0,230,118,.22);
+  --text:#f5fff8; --muted:#9fd7b6; --accent:#00ff99; --gold:#ffd54f;
+  --red:#ff7b7b; --orange:#ffb74d; --blue:#64b5f6; --green:#66bb6a;
+  --shadow:0 14px 34px rgba(0,0,0,.22);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:radial-gradient(circle at top, rgba(0,255,153,.10), transparent 24%), linear-gradient(90deg,#031f14,#052916 42%,#031f14);}
+.wrap{max-width:1360px;margin:0 auto;padding:28px 18px 56px;}
+.hero{text-align:center;margin-bottom:22px;}
+h1{margin:0 0 8px;font-size:40px;line-height:1.1}
+.subtitle{max-width:1000px;margin:0 auto;color:var(--muted);font-size:18px;line-height:1.55}
+.banner{margin:24px 0;background:linear-gradient(180deg, rgba(10,53,36,.98), rgba(6,42,28,.98));border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+.banner h2{margin:0 0 10px;color:var(--accent)}
+.banner p{margin:8px 0;color:var(--muted);line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:22px 0}
+.card{background:linear-gradient(180deg, rgba(10,53,36,.96), rgba(6,42,28,.96));border:1px solid var(--line-soft);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 10px;color:var(--accent);font-size:18px}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:10px}
+.badge.best{background:rgba(255,213,79,.12);color:var(--gold);border:1px solid rgba(255,213,79,.26)}
+.badge.regular{background:rgba(102,187,106,.12);color:#9be7a8;border:1px solid rgba(102,187,106,.26)}
+.big{font-size:30px;font-weight:700;line-height:1.1;margin:6px 0}
+.small{color:var(--muted);font-size:14px;line-height:1.6}
+.section{margin-top:26px}
+.section h2{margin:0 0 12px;font-size:28px}
+.note{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:12px}
+.table-wrap{background:rgba(5,34,23,.72);border:1px solid var(--line-soft);border-radius:18px;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:13px 12px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;font-size:14px;vertical-align:top}
+th{position:sticky;top:0;background:#0a3927;color:var(--accent);z-index:1;font-size:13px;letter-spacing:.3px}
+tr:hover td{background:rgba(0,255,153,.04)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.cell-max.good{background:rgba(102,187,106,.12)}
+.cell-max.mid{background:rgba(255,183,77,.12)}
+.cell-max.bad{background:rgba(255,123,123,.12)}
+.cell-open.good{background:rgba(102,187,106,.12)}
+.cell-open.mid{background:rgba(255,183,77,.12)}
+.cell-open.bad{background:rgba(255,123,123,.12)}
+.cell-avg.good{background:rgba(102,187,106,.12)}
+.cell-avg.mid{background:rgba(255,183,77,.12)}
+.cell-avg.bad{background:rgba(255,123,123,.12)}
+.footer{text-align:center;color:var(--muted);font-size:14px;line-height:1.6;margin-top:24px}
+@media (max-width:700px){h1{font-size:30px} .section h2{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>Comparação dos melhores grupos</h1>
+    <p class="subtitle">Base usada: resultados de <strong>03/04/2026 09:20</strong> até <strong>24/04/2026 21:30</strong>. Aqui estão os melhores grupos de tamanho 8, 9, 10 e 11, comparados lado a lado.</p>
+  </div>
+
+  <div class="banner">
+    <h2>Leitura rápida</h2>
+    <p><strong>Mais enxuto:</strong> o melhor grupo de <strong>8</strong> ainda é o menor conjunto com boa estabilidade.</p>
+    <p><strong>Mais equilibrado:</strong> o melhor grupo de <strong>10</strong> ficou bem forte porque manteve <strong>maior distância = 3</strong> e <strong>em aberto = 0</strong>.</p>
+    <p><strong>Mais estável no histórico:</strong> o melhor grupo de <strong>11</strong> teve a menor média, mas usa mais animais.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <span class="badge best">Melhor custo x estabilidade</span>
+      <h3>Grupo de 10</h3>
+      <div class="big">3 / 0</div>
+      <div class="small">Maior distância / Em aberto</div>
+      <div class="small" style="margin-top:10px;"><strong>03 - Burro, 05 - Cachorro, 07 - Carneiro, 08 - Camelo, 09 - Cobra, 10 - Coelho, 14 - Gato, 17 - Macaco, 19 - Pavão, 20 - Peru</strong></div>
+    </div>
+    <div class="card">
+      <span class="badge regular">Mais enxuto</span>
+      <h3>Grupo de 8</h3>
+      <div class="big">4 / 0</div>
+      <div class="small">Maior distância / Em aberto</div>
+      <div class="small" style="margin-top:10px;"><strong>03 - Burro, 07 - Carneiro, 09 - Cobra, 11 - Cavalo, 14 - Gato, 19 - Pavão, 20 - Peru, 24 - Veado</strong></div>
+    </div>
+    <div class="card">
+      <span class="badge regular">Menor média</span>
+      <h3>Grupo de 11</h3>
+      <div class="big">0,74</div>
+      <div class="small">Média de intervalo</div>
+      <div class="small" style="margin-top:10px;"><strong>03 - Burro, 04 - Borboleta, 05 - Cachorro, 06 - Cabra, 07 - Carneiro, 09 - Cobra, 10 - Coelho, 14 - Gato, 17 - Macaco, 19 - Pavão, 20 - Peru</strong></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Tabela comparativa</h2>
+    <p class="note">Quanto menor a <strong>maior distância</strong>, a <strong>média</strong> e o <strong>em aberto</strong>, melhor. As cores ajudam a destacar isso.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tamanho</th>
+            <th>Grupo</th>
+            <th class="num">Maior distância</th>
+            <th class="num">Em aberto</th>
+            <th class="num">Aparições</th>
+            <th class="num">Média</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>8</strong></td>
+            <td>03 - Burro, 07 - Carneiro, 09 - Cobra, 11 - Cavalo, 14 - Gato, 19 - Pavão, 20 - Peru, 24 - Veado</td>
+            <td class="num cell-max bad">4</td>
+            <td class="num cell-open good">0</td>
+            <td class="num">52</td>
+            <td class="num cell-avg bad">1,41</td>
+          </tr>
+          <tr>
+            <td><strong>9</strong></td>
+            <td>01 - Avestruz, 03 - Burro, 04 - Borboleta, 05 - Cachorro, 09 - Cobra, 14 - Gato, 20 - Peru, 21 - Touro, 24 - Veado</td>
+            <td class="num cell-max good">3</td>
+            <td class="num cell-open bad">5</td>
+            <td class="num">53</td>
+            <td class="num cell-avg mid">1,21</td>
+          </tr>
+          <tr>
+            <td><strong>10</strong></td>
+            <td>03 - Burro, 05 - Cachorro, 07 - Carneiro, 08 - Camelo, 09 - Cobra, 10 - Coelho, 14 - Gato, 17 - Macaco, 19 - Pavão, 20 - Peru</td>
+            <td class="num cell-max good">3</td>
+            <td class="num cell-open good">0</td>
+            <td class="num">63</td>
+            <td class="num cell-avg good">0,97</td>
+          </tr>
+          <tr>
+            <td><strong>11</strong></td>
+            <td>03 - Burro, 04 - Borboleta, 05 - Cachorro, 06 - Cabra, 07 - Carneiro, 09 - Cobra, 10 - Coelho, 14 - Gato, 17 - Macaco, 19 - Pavão, 20 - Peru</td>
+            <td class="num cell-max good">3</td>
+            <td class="num cell-open good">0</td>
+            <td class="num">71</td>
+            <td class="num cell-avg good">0,74</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Resumo direto</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Se quiser algo mais enxuto</h3>
+        <div class="small">O grupo de <strong>8</strong> continua sendo o menor conjunto forte, mas sua maior distância sobe para <strong>4</strong>.</div>
+      </div>
+      <div class="card">
+        <h3>Se quiser equilíbrio</h3>
+        <div class="small">O grupo de <strong>10</strong> ficou bem interessante porque já cai a maior distância para <strong>3</strong> e mantém <strong>em aberto = 0</strong>.</div>
+      </div>
+      <div class="card">
+        <h3>Se quiser máxima cobertura</h3>
+        <div class="small">O grupo de <strong>11</strong> tem a melhor média, mas isso vem junto com um conjunto mais amplo.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Arquivo gerado automaticamente com base na análise histórica até 24/04/2026 às 21:30.</div>
+</div>
+</body>
+</html>

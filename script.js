@@ -12497,26 +12497,6 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
-
-
-
-
-     
-
-        
-
-         
-
-
-          {
-            image: "images/informacoes/eventos/10.jpg",
-            name: "CFC Carlopolis Fight",
-            date: "09/05/2026",
-            address: "Ginasio de esportes",
-            instagram: "https://www.instagram.com/p/DUJa9irANR3/",
-            infoAdicional: "2 - Edição<br> Entrada Franca 1 kg de alimento<br>Mesas na area VIP<br>20 Lutas <Br> 4 Modalidades em um só lugar"
-          },
-
           {
             image: "images/informacoes/eventos/18.jpg",
             name: "Festa da APAE",
