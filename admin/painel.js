@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 7,
-  label: "v7",
+  numero: 8,
+  label: "v8",
   data: "2026-05-16",
-  nota: "Categorias Firebase, financeiro Firebase-first e imagens com texto."
+  nota: "Importacao em lotes com contagem de clientes/categorias."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -850,10 +850,15 @@ async function syncClientsFromScript() {
     const safeCode = match[1].replace(/document\.querySelector\([^)]+\)/g, "null");
     const categories = new Function(`return (${safeCode});`)();
     const updates = {};
+    const importStats = {
+      categorias: 0,
+      clientes: 0
+    };
 
     categories.forEach((category) => {
       const categoryName = category.title || "Outros";
       const categoryId = slugify(categoryName);
+      importStats.categorias += 1;
       updates[`categorias/${categoryId}`] = {
         nome: categoryName,
         origem: "script.js",
@@ -864,6 +869,7 @@ async function syncClientsFromScript() {
       (category.establishments || []).forEach((est) => {
         const name = est.name || est.nome;
         if (!name) return;
+        importStats.clientes += 1;
         const id = slugify(name);
         const existing = state.clientes.find((client) => client.id === id) || {};
         const paidInScript = statusMap[normalizeName(name)] === "s";
@@ -900,12 +906,27 @@ async function syncClientsFromScript() {
       });
     });
 
-    await update(ref(db), updates);
-    showToast("Clientes importados do script.js.");
+    const entries = Object.entries(updates);
+    const chunkSize = 40;
+    for (let i = 0; i < entries.length; i += chunkSize) {
+      const chunk = Object.fromEntries(entries.slice(i, i + chunkSize));
+      await update(ref(db), chunk);
+      showToast(`Importando ${Math.min(i + chunkSize, entries.length)} de ${entries.length} registros...`);
+    }
+
+    await set(ref(db, "importacoes/ultimaImportacaoClientes"), {
+      ...importStats,
+      registros: entries.length,
+      origem: "script.js",
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid
+    });
+
+    showToast(`Importacao concluida: ${importStats.clientes} clientes e ${importStats.categorias} categorias.`);
     await loadAllData();
   } catch (error) {
     console.error(error);
-    showToast(error.message || "Falha ao importar clientes.");
+    showToast(error.message || "Falha ao importar clientes. Abra o console para detalhes.");
   } finally {
     setBusy(button, false);
   }
