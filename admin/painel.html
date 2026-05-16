@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=10">
+  <link rel="stylesheet" href="painel.css?v=11">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -148,6 +148,15 @@
                   <span id="clientImagesCount" class="badge">0/10</span>
                 </div>
                 <input id="clientImagesUpload" type="file" accept="image/*" multiple>
+                <div class="manual-image-form">
+                  <label>URL da imagem
+                    <input id="clientImageUrl" placeholder="https://... ou images/...">
+                  </label>
+                  <label>Texto desta imagem
+                    <textarea id="clientImageText" rows="3" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
+                  </label>
+                  <button id="addClientImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem com texto</button>
+                </div>
                 <div id="clientImagesPreview" class="image-grid"></div>
               </section>
               <label class="wide">Informacoes adicionais<textarea id="clientInfo" rows="4"></textarea></label>
@@ -304,6 +313,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=10"></script>
+  <script type="module" src="painel.js?v=11"></script>
 </body>
 </html>

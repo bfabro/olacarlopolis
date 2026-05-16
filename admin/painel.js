@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 10,
-  label: "v10",
+  numero: 11,
+  label: "v11",
   data: "2026-05-16",
-  nota: "Importacao cliente-a-cliente com relatorio e textos visiveis nas imagens."
+  nota: "Importacao sem cache e imagem manual com texto por cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -464,6 +464,27 @@ async function uploadClientImages(files) {
   showToast("Imagens enviadas.");
 }
 
+function addClientImageFromUrl() {
+  const url = $("clientImageUrl").value.trim();
+  const texto = $("clientImageText").value.trim();
+
+  if (!url) {
+    showToast("Informe a URL da imagem.");
+    return;
+  }
+  if (state.clientImages.length >= 10) {
+    showToast("Limite de 10 imagens atingido.");
+    return;
+  }
+
+  state.clientImages.push({ url, texto });
+  if (!$("clientImage").value) $("clientImage").value = url;
+  $("clientImageUrl").value = "";
+  $("clientImageText").value = "";
+  renderClientImagesPreview();
+  showToast("Imagem com texto adicionada. Clique em salvar cliente para gravar.");
+}
+
 async function uploadImagesForClient(clientId, files) {
   const urls = [];
   for (const file of Array.from(files || [])) {
@@ -781,6 +802,15 @@ function renderClientOnlyEditor() {
           <span id="coImagesCount" class="badge">${imagens.length}/10</span>
         </div>
         <input id="coImagesUpload" type="file" accept="image/*" multiple>
+        <div class="manual-image-form">
+          <label>URL da imagem
+            <input id="coImageUrl" placeholder="https://... ou images/...">
+          </label>
+          <label>Texto desta imagem
+            <textarea id="coImageText" rows="3" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
+          </label>
+          <button id="coAddImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem com texto</button>
+        </div>
         <div id="coImagesPreview" class="image-grid">
           ${renderImagesMarkup(imagens, "co")}
         </div>
@@ -807,6 +837,29 @@ function renderClientOnlyEditor() {
       updatedBy: state.user.uid
     });
     showToast("Imagens enviadas.");
+    await loadAllData();
+    renderClientOnlyEditor();
+  });
+
+  mount.querySelector("#coAddImageUrlButton").addEventListener("click", async () => {
+    const url = mount.querySelector("#coImageUrl").value.trim();
+    const texto = mount.querySelector("#coImageText").value.trim();
+    if (!url) {
+      showToast("Informe a URL da imagem.");
+      return;
+    }
+    if (imagens.length >= 10) {
+      showToast("Limite de 10 imagens atingido.");
+      return;
+    }
+    imagens.push({ url, texto });
+    await update(ref(db, `clientes/${client.id}`), {
+      imagens,
+      imagem: $("coImage").value || url,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid
+    });
+    showToast("Imagem com texto adicionada.");
     await loadAllData();
     renderClientOnlyEditor();
   });
@@ -885,7 +938,10 @@ async function syncClientsFromScript() {
   const button = $("syncClientsButton");
   setBusy(button, true, "Importando...");
   try {
-    const res = await fetch("../script.js", { cache: "no-store" });
+    const scriptUrl = new URL("../script.js", window.location.href);
+    scriptUrl.searchParams.set("importVersion", String(Date.now()));
+    const res = await fetch(scriptUrl.toString(), { cache: "reload" });
+    if (!res.ok) throw new Error(`Falha ao buscar script.js: HTTP ${res.status}`);
     const code = await res.text();
     const match = code.match(/const\s+categories\s*=\s*(\[[\s\S]*?\]);/m);
     if (!match) throw new Error("Nao encontrei a lista categories no script.js.");
@@ -1136,6 +1192,7 @@ function bindEvents() {
     await uploadClientImages(event.target.files);
     event.target.value = "";
   });
+  $("addClientImageUrlButton").addEventListener("click", addClientImageFromUrl);
   $("newEventButton").addEventListener("click", resetEventForm);
   $("eventSearch").addEventListener("input", renderEventsList);
   $("eventImageUpload").addEventListener("change", async (event) => {
