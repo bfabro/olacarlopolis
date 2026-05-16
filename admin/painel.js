@@ -45,6 +45,7 @@ let state = {
   clientes: [],
   usuarios: [],
   eventos: [],
+  categorias: [],
   selectedClientId: null,
   selectedEventId: null,
   clientImages: []
@@ -176,10 +177,11 @@ async function saveUserProfile(profile) {
 }
 
 async function loadAllData() {
-  const [clientesSnap, usersSnap, eventosSnap] = await Promise.all([
+  const [clientesSnap, usersSnap, eventosSnap, categoriasSnap] = await Promise.all([
     get(ref(db, "clientes")),
     get(ref(db, "usuariosByUid")),
-    get(ref(db, "eventos"))
+    get(ref(db, "eventos")),
+    get(ref(db, "categorias"))
   ]);
 
   state.clientes = [];
@@ -200,9 +202,26 @@ async function loadAllData() {
   }
   state.eventos.sort((a, b) => String(b.data || "").localeCompare(String(a.data || "")));
 
+  state.categorias = [];
+  if (categoriasSnap.exists()) {
+    categoriasSnap.forEach((child) => state.categorias.push({ id: child.key, ...child.val() }));
+  }
+  const fromClients = new Map();
+  state.clientes.forEach((client) => {
+    const title = String(client.categoria || "").trim();
+    if (title) fromClients.set(slugify(title), { id: slugify(title), nome: title, origem: "clientes" });
+  });
+  state.categorias.forEach((cat) => fromClients.set(cat.id, cat));
+  state.categorias = Array.from(fromClients.values())
+    .sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+  if (!state.categorias.some((cat) => slugify(cat.nome || cat.id) === "outros")) {
+    state.categorias.push({ id: "outros", nome: "Outros", origem: "padrao" });
+  }
+
   renderStats();
   renderClientsList();
   renderUsersList();
+  fillClientCategorySelect();
   fillUserClientSelect();
   fillEventClientSelect();
   renderEventsList();
@@ -258,6 +277,7 @@ function resetClientForm() {
   state.clientImages = [];
   $("clientForm").reset();
   $("clientId").value = "";
+  fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
   renderClientImagesPreview();
 }
@@ -265,11 +285,14 @@ function resetClientForm() {
 function getClientFormData() {
   const name = $("clientName").value.trim();
   const id = $("clientId").value || slugify(name);
+  const newCategory = $("clientNewCategory").value.trim();
+  const category = newCategory || $("clientCategory").value.trim() || "Outros";
   return {
     id,
     nome: name,
     nomeNormalizado: normalizeName(name),
-    categoria: $("clientCategory").value.trim(),
+    categoria: category,
+    categoriaId: slugify(category),
     status: $("clientStatus").value,
     pagamentoStatus: $("clientPaymentStatus").value,
     contato: $("clientContact").value.trim(),
@@ -292,7 +315,8 @@ function fillClientForm(client) {
   state.selectedClientId = client.id;
   $("clientId").value = client.id || "";
   $("clientName").value = client.nome || client.name || "";
-  $("clientCategory").value = client.categoria || client.category || "";
+  fillClientCategorySelect(client.categoria || client.category || "");
+  $("clientNewCategory").value = "";
   $("clientStatus").value = client.status || "ativo";
   $("clientPaymentStatus").value = client.pagamentoStatus || "em_aberto";
   $("clientContact").value = client.contato || client.contact || "";
@@ -430,6 +454,18 @@ function renderClientsList() {
       if (client) fillClientForm(client);
     });
   });
+}
+
+function fillClientCategorySelect(selectedName = "") {
+  const select = $("clientCategory");
+  if (!select) return;
+  const selectedSlug = slugify(selectedName);
+  const options = state.categorias.map((cat) => {
+    const value = cat.nome || cat.title || cat.id;
+    const isSelected = slugify(value) === selectedSlug;
+    return `<option value="${escapeAttr(value)}" ${isSelected ? "selected" : ""}>${escapeHtml(value)}</option>`;
+  });
+  select.innerHTML = `<option value="">Selecione uma categoria</option>` + options.join("");
 }
 
 function renderUsersList() {
@@ -800,6 +836,15 @@ async function syncClientsFromScript() {
     const updates = {};
 
     categories.forEach((category) => {
+      const categoryName = category.title || "Outros";
+      const categoryId = slugify(categoryName);
+      updates[`categorias/${categoryId}`] = {
+        nome: categoryName,
+        origem: "script.js",
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user.uid
+      };
+
       (category.establishments || []).forEach((est) => {
         const name = est.name || est.nome;
         if (!name) return;
@@ -818,7 +863,8 @@ async function syncClientsFromScript() {
           ...existing,
           nome: existing.nome || name,
           nomeNormalizado: existing.nomeNormalizado || normalizeName(name),
-          categoria: existing.categoria || category.title || "",
+          categoria: existing.categoria || categoryName,
+          categoriaId: existing.categoriaId || categoryId,
           status: existing.status || "ativo",
           pagamentoStatus: existing.pagamentoStatus || (paidInScript ? "pago" : "em_aberto"),
           contato: existing.contato || est.contact || "",
@@ -977,7 +1023,16 @@ function bindEvents() {
     const id = payload.id;
     delete payload.id;
     if (!state.selectedClientId) payload.createdAt = serverTimestamp();
-    await update(ref(db, `clientes/${id}`), payload);
+    const updates = { [`clientes/${id}`]: payload };
+    if (payload.categoria) {
+      updates[`categorias/${payload.categoriaId || slugify(payload.categoria)}`] = {
+        nome: payload.categoria,
+        origem: "painel",
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user?.uid || ""
+      };
+    }
+    await update(ref(db), updates);
     showToast("Cliente salvo.");
     resetClientForm();
     await loadAllData();

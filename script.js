@@ -15867,6 +15867,87 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (cliente.infoAdicional) est.infoAdicional = cliente.infoAdicional;
   }
 
+  function montarEstabelecimentoDoClienteAdmin(cliente, clienteId) {
+    const imagensAdmin = Array.isArray(cliente.imagens)
+      ? cliente.imagens.map((item) => typeof item === "string" ? { url: item, texto: "" } : item).filter((item) => item && item.url)
+      : [];
+
+    return {
+      nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
+      image: cliente.imagem || (imagensAdmin[0]?.url || ""),
+      name: cliente.nome || clienteId,
+      hours: cliente.horario || "",
+      address: cliente.endereco || "",
+      contact: cliente.contato || "",
+      whatsapp: cliente.whatsapp || "",
+      instagram: cliente.instagram || "",
+      facebook: cliente.facebook || "",
+      cardapioLink: cliente.cardapioLink || "",
+      infoAdicional: cliente.infoAdicional || "",
+      novidadesImages: imagensAdmin.map((item) => item.url).slice(0, 10),
+      novidadesDescriptions: imagensAdmin.map((item) => item.texto || "").slice(0, 10),
+      origemAdmin: true
+    };
+  }
+
+  function definirStatusClienteAdmin(cliente, clienteId) {
+    const key = normalizeName(cliente.nome || cliente.nomeNormalizado || clienteId);
+    if (cliente.status === "inativo") {
+      statusEstabelecimentos[key] = "n";
+    } else if (cliente.pagamentoStatus === "pago" || cliente.pagamentoStatus === "isento") {
+      statusEstabelecimentos[key] = "s";
+    } else if (cliente.pagamentoStatus === "em_aberto") {
+      statusEstabelecimentos[key] = "n";
+    }
+  }
+
+  function clienteAdminPodeAparecer(cliente) {
+    if (!cliente || cliente.status === "inativo") return false;
+    return cliente.pagamentoStatus === "pago" || cliente.pagamentoStatus === "isento";
+  }
+
+  function garantirCategoriaAdmin(tituloCategoria) {
+    const title = String(tituloCategoria || "Outros").trim() || "Outros";
+    const slug = normalizeName(title);
+    let categoria = categories.find((cat) => normalizeName(cat.title) === slug);
+    if (categoria) return categoria;
+
+    const link = criarLinkCategoriaAdmin(title);
+    categoria = { link, title, establishments: [] };
+    categories.push(categoria);
+    return categoria;
+  }
+
+  function criarLinkCategoriaAdmin(title) {
+    const slug = normalizeName(title);
+    const existing = document.querySelector(`[data-admin-category="${slug}"]`);
+    if (existing) return existing;
+
+    const menuComercio = document.getElementById("menuComercio");
+    const submenu = menuComercio?.closest(".submenu_item")?.nextElementSibling
+      || menuComercio?.closest(".nav_link")?.nextElementSibling
+      || menuComercio?.parentElement?.nextElementSibling;
+
+    if (!submenu) return null;
+
+    const link = document.createElement("a");
+    link.href = "#";
+    link.className = "nav_link sublink";
+    link.dataset.adminCategory = slug;
+    link.innerHTML = `
+      <span class="navlink_icon"><i style="color:#2563eb" class="fa-solid fa-store"></i></span>
+      <span class="navlink">${title}</span>
+    `;
+    submenu.appendChild(link);
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      location.hash = "#comercios-" + slug;
+      const cat = categories.find((item) => normalizeName(item.title) === slug);
+      if (cat) loadContent(cat.title, cat.establishments);
+    });
+    return link;
+  }
+
   async function aplicarDadosAdminClientes() {
     if (ADMIN_CLIENTES_PROMISE) return ADMIN_CLIENTES_PROMISE;
 
@@ -15881,23 +15962,31 @@ plotarPinsImoveis(stateImoveis.filtered);
         Object.entries(clientes).forEach(([clienteId, cliente]) => {
           const alvoId = normalizeName(clienteId);
           const alvoNome = normalizeName(cliente.nomeNormalizado || cliente.nome || "");
+          let encontrado = false;
 
           categories.forEach((cat) => {
             (cat.establishments || []).forEach((est) => {
               const estId = normalizeName(est.nomeNormalizado || est.name || "");
               if (estId === alvoId || (alvoNome && estId === alvoNome)) {
+                encontrado = true;
                 aplicarClienteAdminNoEstabelecimento(est, cliente);
-                const key = normalizeName(est.name || cliente.nome || clienteId);
-                if (cliente.status === "inativo") {
-                  statusEstabelecimentos[key] = "n";
-                } else if (cliente.pagamentoStatus === "pago" || cliente.pagamentoStatus === "isento") {
-                  statusEstabelecimentos[key] = "s";
-                } else if (cliente.pagamentoStatus === "em_aberto") {
-                  statusEstabelecimentos[key] = "n";
-                }
+                definirStatusClienteAdmin(cliente, clienteId);
               }
             });
           });
+
+          if (!encontrado && clienteAdminPodeAparecer(cliente)) {
+            const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros");
+            const jaExisteNaCategoria = (categoria.establishments || []).some((est) => {
+              const estId = normalizeName(est.nomeNormalizado || est.name || "");
+              return estId === alvoId || (alvoNome && estId === alvoNome);
+            });
+            if (!jaExisteNaCategoria) {
+              categoria.establishments = categoria.establishments || [];
+              categoria.establishments.push(montarEstabelecimentoDoClienteAdmin(cliente, clienteId));
+            }
+            definirStatusClienteAdmin(cliente, clienteId);
+          }
         });
 
         try { window.categories = categories; } catch (e) { }

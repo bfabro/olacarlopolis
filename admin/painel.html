@@ -105,7 +105,12 @@
             <form id="clientForm" class="grid-form">
               <input type="hidden" id="clientId">
               <label>Nome do cliente/comercio<input id="clientName" required></label>
-              <label>Categoria<input id="clientCategory" placeholder="Ex.: Restaurante"></label>
+              <label>Categoria
+                <select id="clientCategory"></select>
+              </label>
+              <label>Nova categoria
+                <input id="clientNewCategory" placeholder="Preencha se a categoria nao existir">
+              </label>
               <label>Status
                 <select id="clientStatus">
                   <option value="ativo">Ativo</option>
@@ -154,7 +159,7 @@
                 <h2>Visao dos clientes</h2>
                 <p>Resumo rapido com status, financeiro e quantidade de imagens.</p>
               </div>
-              <button id="syncClientsButton" class="ghost-button" type="button"><i class="fa-solid fa-download"></i> Importar do site</button>
+              <button id="syncClientsButton" class="ghost-button" type="button"><i class="fa-solid fa-download"></i> Importar clientes/categorias</button>
             </div>
             <input id="clientSearch" class="search-input" placeholder="Buscar cliente...">
             <div id="clientsList" class="clients-board"></div>
