@@ -42,9 +42,10 @@
       <nav class="nav-admin">
         <button data-view="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
         <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
+        <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
+        <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
         <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
         <button data-view="minhaEmpresa" data-role="cliente"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
-        <a href="pag.html" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</a>
       </nav>
 
       <div class="sidebar-footer">
@@ -79,6 +80,10 @@
           <article class="stat-card">
             <span>Pendentes</span>
             <strong id="statPendentes">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Eventos</span>
+            <strong id="statEventos">0</strong>
           </article>
         </div>
         <section class="panel-card">
@@ -123,6 +128,17 @@
               <label>Facebook<input id="clientFacebook"></label>
               <label>Imagem principal<input id="clientImage" placeholder="images/..."></label>
               <label>Link do cardapio<input id="clientMenuLink"></label>
+              <section class="wide upload-panel">
+                <div class="section-head compact">
+                  <div>
+                    <h3>Imagens do cliente</h3>
+                    <p>Envie ate 10 imagens. A primeira pode ser usada como destaque.</p>
+                  </div>
+                  <span id="clientImagesCount" class="badge">0/10</span>
+                </div>
+                <input id="clientImagesUpload" type="file" accept="image/*" multiple>
+                <div id="clientImagesPreview" class="image-grid"></div>
+              </section>
               <label class="wide">Informacoes adicionais<textarea id="clientInfo" rows="4"></textarea></label>
               <label class="wide">Observacao interna<textarea id="clientAdminNote" rows="3"></textarea></label>
               <div class="form-actions wide">
@@ -135,15 +151,95 @@
           <section class="panel-card">
             <div class="section-head">
               <div>
-                <h2>Clientes cadastrados</h2>
-                <p>Selecione um item para editar.</p>
+                <h2>Visao dos clientes</h2>
+                <p>Resumo rapido com status, financeiro e quantidade de imagens.</p>
               </div>
               <button id="syncClientsButton" class="ghost-button" type="button"><i class="fa-solid fa-download"></i> Importar do site</button>
             </div>
             <input id="clientSearch" class="search-input" placeholder="Buscar cliente...">
-            <div id="clientsList" class="list-area"></div>
+            <div id="clientsList" class="clients-board"></div>
           </section>
         </div>
+      </section>
+
+      <section id="eventosView" class="panel-view hidden">
+        <div class="split-layout">
+          <section class="panel-card">
+            <div class="section-head">
+              <div>
+                <h2>Configurar evento</h2>
+                <p>Cadastre eventos para divulgar ou organizar no painel.</p>
+              </div>
+              <button id="newEventButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Novo</button>
+            </div>
+            <form id="eventForm" class="grid-form">
+              <input type="hidden" id="eventId">
+              <label>Titulo<input id="eventTitle" required></label>
+              <label>Cliente vinculado<select id="eventClient"></select></label>
+              <label>Data<input id="eventDate" type="date"></label>
+              <label>Horario<input id="eventTime" type="time"></label>
+              <label>Local<input id="eventPlace"></label>
+              <label>Status
+                <select id="eventStatus">
+                  <option value="ativo">Ativo</option>
+                  <option value="rascunho">Rascunho</option>
+                  <option value="encerrado">Encerrado</option>
+                </select>
+              </label>
+              <label>Imagem do evento<input id="eventImage" placeholder="URL ou images/..."></label>
+              <label>Upload da imagem<input id="eventImageUpload" type="file" accept="image/*"></label>
+              <label class="wide">Descricao<textarea id="eventDescription" rows="4"></textarea></label>
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar evento</button>
+                <button id="deleteEventButton" type="button" class="danger-button hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card">
+            <h2>Eventos cadastrados</h2>
+            <input id="eventSearch" class="search-input" placeholder="Buscar evento...">
+            <div id="eventsList" class="list-area"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="financeiroView" class="panel-view hidden">
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span>Pagos</span>
+            <strong id="financePaid">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Em aberto</span>
+            <strong id="financeOpen">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Isentos</span>
+            <strong id="financeFree">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Receita mensal</span>
+            <strong id="financeTotal">R$ 0</strong>
+          </article>
+        </div>
+
+        <section class="panel-card">
+          <div class="section-head">
+            <div>
+              <h2>Financeiro dos clientes</h2>
+              <p>Controle plano, valor, vencimento e status de cada cliente.</p>
+            </div>
+            <select id="financeFilter" class="compact-select">
+              <option value="todos">Todos</option>
+              <option value="pago">Pago</option>
+              <option value="em_aberto">Em aberto</option>
+              <option value="isento">Isento</option>
+            </select>
+          </div>
+          <input id="financeSearch" class="search-input" placeholder="Buscar cliente no financeiro...">
+          <div id="financeList" class="finance-list"></div>
+        </section>
       </section>
 
       <section id="usuariosView" class="panel-view hidden">
@@ -169,6 +265,7 @@
                 <label><input type="checkbox" value="imagens" checked> Imagens</label>
                 <label><input type="checkbox" value="cardapio" checked> Cardapio</label>
                 <label><input type="checkbox" value="promocoes" checked> Promocoes</label>
+                <label><input type="checkbox" value="eventos"> Eventos</label>
                 <label><input type="checkbox" value="financeiro"> Financeiro</label>
               </fieldset>
               <div class="form-actions wide">

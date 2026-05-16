@@ -15849,6 +15849,8 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     if (cliente.nome) est.name = cliente.nome;
     if (cliente.imagem) est.image = cliente.imagem;
+    if (!cliente.imagem && Array.isArray(cliente.imagens) && cliente.imagens[0]) est.image = cliente.imagens[0];
+    if (Array.isArray(cliente.imagens) && cliente.imagens.length) est.novidadesImages = cliente.imagens.slice(0, 10);
     if (cliente.contato) est.contact = cliente.contato;
     if (cliente.whatsapp) est.whatsapp = cliente.whatsapp;
     if (cliente.endereco) est.address = cliente.endereco;
