@@ -2436,7 +2436,7 @@ carlopdiesel:"s",
     xisbauinea: "s",
     mycoffee: "s",
     mrpotato: "n",
-    noponto: "s",
+    noponto: "n",
     pontocerto:"s",
 
     // material de construcao
@@ -8252,7 +8252,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
           {
-            image: "images/comercios/acai/turminhaAcai/turminhaAcai.png",
+            image: "images/comercios/acai/turminhaAcai/perfil.jpg",
             name: "Turminha do Açai",
             hours: "Qua a Seg: 14:00h as 23:00h <br> Ter: Fechado",
             statusAberto: ".",
@@ -14464,7 +14464,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
           },
 
-
+/*
           {
             image: "images/comercios/restaurante/delfino/delfino.png",
             name: "Emporio São Victor",
@@ -14509,7 +14509,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
           },
 
-
+*/
 
 
 
@@ -14705,7 +14705,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
-
+/*
           {
             image: "images/comercios/restaurante/restauranteDaDi/restauranteDaDi.jpg",
             name: "Restaurante da Di",
@@ -14742,7 +14742,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             ],
 
           },
-
+*/
 
 
 
