@@ -15812,6 +15812,96 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
     ];
+
+  try { window.categories = categories; } catch (e) { }
+
+  let ADMIN_CLIENTES_PROMISE = null;
+
+  function adminSlug(text) {
+    return String(text || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function esperarFirebaseDatabase() {
+    if (window.firebase && firebase.database) return Promise.resolve(firebase.database());
+
+    return new Promise((resolve) => {
+      let tentativas = 0;
+      const timer = setInterval(() => {
+        tentativas += 1;
+        if (window.firebase && firebase.database) {
+          clearInterval(timer);
+          resolve(firebase.database());
+        } else if (tentativas >= 30) {
+          clearInterval(timer);
+          resolve(null);
+        }
+      }, 100);
+    });
+  }
+
+  function aplicarClienteAdminNoEstabelecimento(est, cliente) {
+    if (!est || !cliente) return;
+
+    if (cliente.nome) est.name = cliente.nome;
+    if (cliente.imagem) est.image = cliente.imagem;
+    if (cliente.contato) est.contact = cliente.contato;
+    if (cliente.whatsapp) est.whatsapp = cliente.whatsapp;
+    if (cliente.endereco) est.address = cliente.endereco;
+    if (cliente.horario) est.hours = cliente.horario;
+    if (cliente.instagram) est.instagram = cliente.instagram;
+    if (cliente.facebook) est.facebook = cliente.facebook;
+    if (cliente.cardapioLink) est.cardapioLink = cliente.cardapioLink;
+    if (cliente.infoAdicional) est.infoAdicional = cliente.infoAdicional;
+  }
+
+  async function aplicarDadosAdminClientes() {
+    if (ADMIN_CLIENTES_PROMISE) return ADMIN_CLIENTES_PROMISE;
+
+    ADMIN_CLIENTES_PROMISE = (async () => {
+      const dbAdmin = await esperarFirebaseDatabase();
+      if (!dbAdmin) return;
+
+      try {
+        const snap = await dbAdmin.ref("clientes").once("value");
+        const clientes = snap.val() || {};
+
+        Object.entries(clientes).forEach(([clienteId, cliente]) => {
+          const alvoId = normalizeName(clienteId);
+          const alvoNome = normalizeName(cliente.nomeNormalizado || cliente.nome || "");
+
+          categories.forEach((cat) => {
+            (cat.establishments || []).forEach((est) => {
+              const estId = normalizeName(est.nomeNormalizado || est.name || "");
+              if (estId === alvoId || (alvoNome && estId === alvoNome)) {
+                aplicarClienteAdminNoEstabelecimento(est, cliente);
+                const key = normalizeName(est.name || cliente.nome || clienteId);
+                if (cliente.status === "inativo") {
+                  statusEstabelecimentos[key] = "n";
+                } else if (cliente.pagamentoStatus === "pago" || cliente.pagamentoStatus === "isento") {
+                  statusEstabelecimentos[key] = "s";
+                } else if (cliente.pagamentoStatus === "em_aberto") {
+                  statusEstabelecimentos[key] = "n";
+                }
+              }
+            });
+          });
+        });
+
+        try { window.categories = categories; } catch (e) { }
+        try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
+      } catch (err) {
+        console.warn("Nao foi possivel aplicar dados do painel admin.", err);
+      }
+    })();
+
+    return ADMIN_CLIENTES_PROMISE;
+  }
+
   document.getElementById("menuPromocoes").addEventListener("click", function (e) {
     e.preventDefault();
     location.hash = "promocoes";
@@ -16597,7 +16687,8 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
   }
 
-  function loadPaidEstablishments() {
+  async function loadPaidEstablishments() {
+    await aplicarDadosAdminClientes();
     const categories = window.categories || [];
     categories.forEach((category) => {
       loadContent(category.title, category.establishments);
@@ -16910,7 +17001,8 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
 
-  function handleHashRoute() {
+  async function handleHashRoute() {
+    await aplicarDadosAdminClientes();
     const h = (location.hash || "").toLowerCase();
 
     if (h === "#ondecomer") { return mostrarOndeComer(); }

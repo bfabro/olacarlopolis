@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin - Ola Carlopolis</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="painel.css">
+</head>
+<body>
+  <main id="loginView" class="login-view">
+    <section class="login-card">
+      <a class="back-link" href="../index.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao site</a>
+      <img src="../images/img_padrao_site/logo_1.png" alt="Ola Carlopolis" class="login-logo">
+      <h1>Acesso administrativo</h1>
+      <p>Entre para gerenciar clientes, dados comerciais e financeiro.</p>
+      <form id="loginForm">
+        <label>
+          E-mail
+          <input id="loginEmail" type="email" autocomplete="username" required>
+        </label>
+        <label>
+          Senha
+          <input id="loginPassword" type="password" autocomplete="current-password" required>
+        </label>
+        <button id="loginButton" type="submit">Entrar</button>
+        <div id="loginMessage" class="form-message"></div>
+      </form>
+    </section>
+  </main>
+
+  <main id="appView" class="app-view hidden">
+    <aside class="sidebar-admin">
+      <div class="brand-block">
+        <img src="../images/img_padrao_site/logo_1.png" alt="Ola Carlopolis">
+        <div>
+          <strong>Painel Admin</strong>
+          <span id="profileRole">-</span>
+        </div>
+      </div>
+
+      <nav class="nav-admin">
+        <button data-view="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
+        <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
+        <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
+        <button data-view="minhaEmpresa" data-role="cliente"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
+        <a href="pag.html" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span id="profileEmail">-</span>
+        <button id="logoutButton"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+      </div>
+    </aside>
+
+    <section class="main-admin">
+      <header class="topbar-admin">
+        <div>
+          <h1 id="viewTitle">Visao geral</h1>
+          <p id="viewSubtitle">Resumo do ambiente administrativo.</p>
+        </div>
+        <button id="refreshButton" class="ghost-button"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+      </header>
+
+      <section id="dashboardView" class="panel-view">
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span>Clientes</span>
+            <strong id="statClientes">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Usuarios</span>
+            <strong id="statUsuarios">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Ativos</span>
+            <strong id="statAtivos">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Pendentes</span>
+            <strong id="statPendentes">0</strong>
+          </article>
+        </div>
+        <section class="panel-card">
+          <h2>Proximos passos</h2>
+          <p>Este painel salva clientes e usuarios no Firebase. A proxima etapa e ligar o site publico para consumir estes dados editaveis.</p>
+        </section>
+      </section>
+
+      <section id="clientesView" class="panel-view hidden">
+        <div class="split-layout">
+          <section class="panel-card">
+            <div class="section-head">
+              <div>
+                <h2>Cadastrar ou editar cliente</h2>
+                <p>Dados comerciais que podem ser usados pelo site publico.</p>
+              </div>
+              <button id="newClientButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Novo</button>
+            </div>
+            <form id="clientForm" class="grid-form">
+              <input type="hidden" id="clientId">
+              <label>Nome do cliente/comercio<input id="clientName" required></label>
+              <label>Categoria<input id="clientCategory" placeholder="Ex.: Restaurante"></label>
+              <label>Status
+                <select id="clientStatus">
+                  <option value="ativo">Ativo</option>
+                  <option value="pendente">Pendente</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+              </label>
+              <label>Plano/pagamento
+                <select id="clientPaymentStatus">
+                  <option value="em_aberto">Em aberto</option>
+                  <option value="pago">Pago</option>
+                  <option value="isento">Isento</option>
+                </select>
+              </label>
+              <label>Telefone principal<input id="clientContact"></label>
+              <label>WhatsApp<input id="clientWhatsapp"></label>
+              <label>Endereco<input id="clientAddress"></label>
+              <label>Horario de funcionamento<input id="clientHours"></label>
+              <label>Instagram<input id="clientInstagram"></label>
+              <label>Facebook<input id="clientFacebook"></label>
+              <label>Imagem principal<input id="clientImage" placeholder="images/..."></label>
+              <label>Link do cardapio<input id="clientMenuLink"></label>
+              <label class="wide">Informacoes adicionais<textarea id="clientInfo" rows="4"></textarea></label>
+              <label class="wide">Observacao interna<textarea id="clientAdminNote" rows="3"></textarea></label>
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar cliente</button>
+                <button id="deleteClientButton" type="button" class="danger-button hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card">
+            <div class="section-head">
+              <div>
+                <h2>Clientes cadastrados</h2>
+                <p>Selecione um item para editar.</p>
+              </div>
+              <button id="syncClientsButton" class="ghost-button" type="button"><i class="fa-solid fa-download"></i> Importar do site</button>
+            </div>
+            <input id="clientSearch" class="search-input" placeholder="Buscar cliente...">
+            <div id="clientsList" class="list-area"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="usuariosView" class="panel-view hidden">
+        <div class="split-layout">
+          <section class="panel-card">
+            <h2>Cadastrar usuario</h2>
+            <form id="userForm" class="grid-form">
+              <label>E-mail<input id="newUserEmail" type="email" required></label>
+              <label>Senha provisoria<input id="newUserPassword" type="text" required minlength="6"></label>
+              <label>Perfil
+                <select id="newUserRole">
+                  <option value="cliente">Admin do cliente</option>
+                  <option value="admin">Admin geral</option>
+                  <option value="master">Master</option>
+                </select>
+              </label>
+              <label>Cliente vinculado
+                <select id="newUserClient"></select>
+              </label>
+              <fieldset class="permissions-box wide">
+                <legend>Permissoes</legend>
+                <label><input type="checkbox" value="dados" checked> Dados do cliente</label>
+                <label><input type="checkbox" value="imagens" checked> Imagens</label>
+                <label><input type="checkbox" value="cardapio" checked> Cardapio</label>
+                <label><input type="checkbox" value="promocoes" checked> Promocoes</label>
+                <label><input type="checkbox" value="financeiro"> Financeiro</label>
+              </fieldset>
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-user-plus"></i> Criar usuario</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card">
+            <h2>Usuarios</h2>
+            <div id="usersList" class="list-area"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="minhaEmpresaView" class="panel-view hidden">
+        <section class="panel-card">
+          <h2>Minha empresa</h2>
+          <p>Edite os dados liberados para o seu cadastro.</p>
+          <div id="clientOnlyMount"></div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script type="module" src="painel.js"></script>
+</body>
+</html>
