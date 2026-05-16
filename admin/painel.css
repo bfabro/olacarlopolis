@@ -442,6 +442,15 @@ button[type="submit"]:hover,
   display: block;
 }
 
+.image-tile textarea {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  min-height: 58px;
+  resize: vertical;
+  box-shadow: none;
+}
+
 .image-tile div {
   display: grid;
   gap: 6px;

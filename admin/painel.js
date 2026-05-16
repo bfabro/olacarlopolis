@@ -110,6 +110,20 @@ function numberFromMoney(value) {
   return Number.isFinite(n) ? n : 0;
 }
 
+function normalizeImageItems(images) {
+  return (Array.isArray(images) ? images : [])
+    .map((item) => {
+      if (typeof item === "string") return { url: item, texto: "" };
+      return { url: item?.url || "", texto: item?.texto || "" };
+    })
+    .filter((item) => item.url)
+    .slice(0, 10);
+}
+
+function imageUrl(item) {
+  return typeof item === "string" ? item : (item?.url || "");
+}
+
 function showToast(message) {
   const toast = $("toast");
   toast.textContent = message;
@@ -265,7 +279,7 @@ function getClientFormData() {
     instagram: $("clientInstagram").value.trim(),
     facebook: $("clientFacebook").value.trim(),
     imagem: $("clientImage").value.trim(),
-    imagens: state.clientImages.slice(0, 10),
+    imagens: normalizeImageItems(state.clientImages),
     cardapioLink: $("clientMenuLink").value.trim(),
     infoAdicional: $("clientInfo").value.trim(),
     observacaoAdmin: $("clientAdminNote").value.trim(),
@@ -288,7 +302,7 @@ function fillClientForm(client) {
   $("clientInstagram").value = client.instagram || "";
   $("clientFacebook").value = client.facebook || "";
   $("clientImage").value = client.imagem || client.image || "";
-  state.clientImages = Array.isArray(client.imagens) ? client.imagens.slice(0, 10) : [];
+  state.clientImages = normalizeImageItems(client.imagens);
   $("clientMenuLink").value = client.cardapioLink || "";
   $("clientInfo").value = client.infoAdicional || "";
   $("clientAdminNote").value = client.observacaoAdmin || "";
@@ -307,9 +321,10 @@ function renderClientImagesPreview() {
     return;
   }
 
-  box.innerHTML = state.clientImages.map((url, index) => `
+  box.innerHTML = state.clientImages.map((item, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(url)}" alt="Imagem ${index + 1}">
+      <img src="${escapeAttr(imageUrl(item))}" alt="Imagem ${index + 1}">
+      <textarea data-image-text="${index}" rows="2" placeholder="Texto opcional abaixo da imagem">${escapeHtml(item.texto || "")}</textarea>
       <div>
         <button type="button" data-main-image="${index}">Destaque</button>
         <button type="button" data-remove-image="${index}" class="danger-mini">Remover</button>
@@ -320,8 +335,15 @@ function renderClientImagesPreview() {
   box.querySelectorAll("[data-main-image]").forEach((button) => {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.mainImage);
-      $("clientImage").value = state.clientImages[index] || "";
+      $("clientImage").value = imageUrl(state.clientImages[index]);
       showToast("Imagem principal selecionada.");
+    });
+  });
+
+  box.querySelectorAll("[data-image-text]").forEach((field) => {
+    field.addEventListener("input", () => {
+      const index = Number(field.dataset.imageText);
+      if (state.clientImages[index]) state.clientImages[index].texto = field.value;
     });
   });
 
@@ -329,8 +351,8 @@ function renderClientImagesPreview() {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.removeImage);
       state.clientImages.splice(index, 1);
-      if (!state.clientImages.includes($("clientImage").value)) {
-        $("clientImage").value = state.clientImages[0] || "";
+      if (!state.clientImages.some((item) => imageUrl(item) === $("clientImage").value)) {
+        $("clientImage").value = imageUrl(state.clientImages[0]);
       }
       renderClientImagesPreview();
     });
@@ -349,9 +371,9 @@ async function uploadClientImages(files) {
 
   showToast("Enviando imagens...");
   const urls = await uploadImagesForClient(currentId, selected);
-  state.clientImages.push(...urls);
+  state.clientImages.push(...urls.map((url) => ({ url, texto: "" })));
 
-  if (!$("clientImage").value && state.clientImages[0]) $("clientImage").value = state.clientImages[0];
+  if (!$("clientImage").value && state.clientImages[0]) $("clientImage").value = imageUrl(state.clientImages[0]);
   renderClientImagesPreview();
   showToast("Imagens enviadas.");
 }
@@ -384,7 +406,7 @@ function renderClientsList() {
 
   box.innerHTML = list.map((client) => `
     <article class="client-row">
-      <img src="${escapeAttr(client.imagem || (client.imagens && client.imagens[0]) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}">
+      <img src="${escapeAttr(client.imagem || imageUrl(client.imagens && client.imagens[0]) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}">
       <div class="client-main">
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
@@ -395,7 +417,7 @@ function renderClientsList() {
         </div>
       </div>
       <div class="client-money">
-        <strong>${moneyBR(client.valorMensal || 0)}</strong>
+        <strong>${moneyBR(valorFinalPlano(client))}</strong>
         <span>Venc. ${client.vencimentoDia || "-"}</span>
       </div>
       <button type="button" data-edit-client="${escapeAttr(client.id)}">Editar</button>
@@ -445,6 +467,29 @@ function fillEventClientSelect() {
   select.innerHTML = `<option value="">Sem cliente vinculado</option>` + state.clientes.map((client) => (
     `<option value="${escapeAttr(client.id)}">${escapeHtml(client.nome || client.id)}</option>`
   )).join("");
+}
+
+function defaultPlanValue(tipoPlano) {
+  const defaults = {
+    mensal: 0,
+    semestral: 0,
+    anual: 0
+  };
+  return defaults[tipoPlano || "mensal"] || 0;
+}
+
+function valorFinalPlano(client) {
+  const bruto = Number(client.valorPlano ?? client.valorMensal ?? defaultPlanValue(client.tipoPlano));
+  const desconto = Number(client.descontoValor || 0);
+  return Math.max(0, bruto - desconto);
+}
+
+function planLabel(tipoPlano) {
+  return {
+    mensal: "Mensal",
+    semestral: "Semestral",
+    anual: "Anual"
+  }[tipoPlano] || "Mensal";
 }
 
 function resetEventForm() {
@@ -548,7 +593,7 @@ function renderFinanceiro() {
   const paid = state.clientes.filter((c) => c.pagamentoStatus === "pago");
   const open = state.clientes.filter((c) => !c.pagamentoStatus || c.pagamentoStatus === "em_aberto");
   const free = state.clientes.filter((c) => c.pagamentoStatus === "isento");
-  const total = paid.reduce((sum, c) => sum + Number(c.valorMensal || 0), 0);
+  const total = paid.reduce((sum, c) => sum + valorFinalPlano(c), 0);
 
   $("financePaid").textContent = String(paid.length);
   $("financeOpen").textContent = String(open.length);
@@ -565,6 +610,7 @@ function renderFinanceiro() {
       <div>
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
+        <div class="list-meta">Plano: ${planLabel(client.tipoPlano)} - Valor final: ${moneyBR(valorFinalPlano(client))}</div>
       </div>
       <label>Status
         <select data-finance-field="pagamentoStatus">
@@ -573,8 +619,15 @@ function renderFinanceiro() {
           <option value="isento" ${client.pagamentoStatus === "isento" ? "selected" : ""}>Isento</option>
         </select>
       </label>
-      <label>Plano<input data-finance-field="plano" value="${escapeAttr(client.plano || "")}" placeholder="Ex.: Mensal"></label>
-      <label>Valor<input data-finance-field="valorMensal" value="${escapeAttr(client.valorMensal || "")}" placeholder="R$"></label>
+      <label>Plano
+        <select data-finance-field="tipoPlano">
+          <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
+          <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
+          <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
+        </select>
+      </label>
+      <label>Valor<input data-finance-field="valorPlano" value="${escapeAttr(client.valorPlano ?? defaultPlanValue(client.tipoPlano))}" placeholder="R$" ${isMaster() ? "" : "readonly"}></label>
+      <label>Desconto<input data-finance-field="descontoValor" value="${escapeAttr(client.descontoValor || "")}" placeholder="R$"></label>
       <label>Venc.<input data-finance-field="vencimentoDia" value="${escapeAttr(client.vencimentoDia || "")}" placeholder="Dia"></label>
       <label class="finance-note">Obs.<input data-finance-field="financeiroObs" value="${escapeAttr(client.financeiroObs || "")}"></label>
       <button type="button" data-save-finance="${escapeAttr(client.id)}">Salvar</button>
@@ -587,10 +640,11 @@ function renderFinanceiro() {
       const id = button.dataset.saveFinance;
       const payload = {};
       row.querySelectorAll("[data-finance-field]").forEach((field) => {
-        payload[field.dataset.financeField] = field.dataset.financeField === "valorMensal"
+        payload[field.dataset.financeField] = ["valorPlano", "descontoValor"].includes(field.dataset.financeField)
           ? numberFromMoney(field.value)
           : field.value.trim();
       });
+      if (!isMaster()) delete payload.valorPlano;
       payload.updatedAt = serverTimestamp();
       payload.updatedBy = state.user?.uid || "";
       await update(ref(db, `clientes/${id}`), payload);
@@ -608,7 +662,7 @@ function renderClientOnlyEditor() {
     return;
   }
 
-  const imagens = Array.isArray(client.imagens) ? client.imagens.slice(0, 10) : [];
+  const imagens = normalizeImageItems(client.imagens);
 
   mount.innerHTML = `
     <form id="clientOnlyForm" class="grid-form">
@@ -647,10 +701,10 @@ function renderClientOnlyEditor() {
     }
     showToast("Enviando imagens...");
     const urls = await uploadImagesForClient(client.id, selected);
-    imagens.push(...urls);
+    imagens.push(...urls.map((url) => ({ url, texto: "" })));
     await update(ref(db, `clientes/${client.id}`), {
       imagens,
-      imagem: $("coImage").value || imagens[0] || "",
+      imagem: $("coImage").value || imageUrl(imagens[0]) || "",
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     });
@@ -662,7 +716,14 @@ function renderClientOnlyEditor() {
   mount.querySelectorAll("[data-co-main]").forEach((button) => {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.coMain);
-      $("coImage").value = imagens[index] || "";
+      $("coImage").value = imageUrl(imagens[index]);
+    });
+  });
+
+  mount.querySelectorAll("[data-co-text]").forEach((field) => {
+    field.addEventListener("input", () => {
+      const index = Number(field.dataset.coText);
+      if (imagens[index]) imagens[index].texto = field.value;
     });
   });
 
@@ -672,7 +733,7 @@ function renderClientOnlyEditor() {
       imagens.splice(index, 1);
       await update(ref(db, `clientes/${client.id}`), {
         imagens,
-        imagem: imagens.includes($("coImage").value) ? $("coImage").value : (imagens[0] || ""),
+        imagem: imagens.some((item) => imageUrl(item) === $("coImage").value) ? $("coImage").value : imageUrl(imagens[0]),
         updatedAt: serverTimestamp(),
         updatedBy: state.user.uid
       });
@@ -708,9 +769,10 @@ function renderClientOnlyEditor() {
 
 function renderImagesMarkup(images, prefix) {
   if (!images.length) return `<div class="list-meta">Nenhuma imagem enviada ainda.</div>`;
-  return images.map((url, index) => `
+  return images.map((item, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(url)}" alt="Imagem ${index + 1}">
+      <img src="${escapeAttr(imageUrl(item))}" alt="Imagem ${index + 1}">
+      <textarea data-${prefix}-text="${index}" rows="2" placeholder="Texto opcional abaixo da imagem">${escapeHtml(item.texto || "")}</textarea>
       <div>
         <button type="button" data-${prefix}-main="${index}">Destaque</button>
         <button type="button" data-${prefix}-remove="${index}" class="danger-mini">Remover</button>
@@ -748,7 +810,10 @@ async function syncClientsFromScript() {
           ...(est.novidadesImages || []),
           ...(est.divulgacaoImages || []),
           ...(est.menuImages || [])
-        ].slice(0, 10);
+        ].slice(0, 10).map((url, index) => ({
+          url,
+          texto: (est.novidadesDescriptions || [])[index] || ""
+        }));
         updates[`clientes/${id}`] = {
           ...existing,
           nome: existing.nome || name,
