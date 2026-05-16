@@ -84,6 +84,27 @@ button {
   line-height: 1.45;
 }
 
+.version-pill,
+.sidebar-version {
+  display: inline-flex;
+  width: fit-content;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: #eef4ff;
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.sidebar-version {
+  border-color: rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .08);
+  color: #dbeafe;
+  margin: 6px 0 0;
+}
+
 .login-card form,
 .grid-form {
   display: grid;
@@ -302,6 +323,20 @@ button[type="submit"]:hover,
   margin: 0 0 14px;
   color: var(--muted);
   line-height: 1.45;
+}
+
+.version-box {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.version-box span {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .split-layout {

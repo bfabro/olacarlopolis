@@ -34,6 +34,12 @@ const firebaseConfig = {
 };
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
+const PANEL_VERSION = {
+  numero: 7,
+  label: "v7",
+  data: "2026-05-16",
+  nota: "Categorias Firebase, financeiro Firebase-first e imagens com texto."
+};
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
@@ -52,6 +58,16 @@ let state = {
 };
 
 const $ = (id) => document.getElementById(id);
+
+function renderPanelVersion() {
+  const text = `Versao ${PANEL_VERSION.label}`;
+  if ($("loginVersion")) $("loginVersion").textContent = text;
+  if ($("sidebarVersion")) $("sidebarVersion").textContent = text;
+  if ($("dashboardVersion")) $("dashboardVersion").textContent = `${text} - atualizacao ${PANEL_VERSION.numero}`;
+  if ($("dashboardVersionDate")) {
+    $("dashboardVersionDate").textContent = `${PANEL_VERSION.data}: ${PANEL_VERSION.nota}`;
+  }
+}
 
 const views = {
   dashboard: $("dashboardView"),
@@ -1068,6 +1084,7 @@ function bindEvents() {
   });
 }
 
+renderPanelVersion();
 bindEvents();
 
 onAuthStateChanged(auth, async (user) => {
