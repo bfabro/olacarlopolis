@@ -15844,6 +15844,24 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
   }
 
+  function formatarHorariosAdmin(horarios) {
+    const dias = [
+      ["seg", "Segunda"],
+      ["ter", "Terca"],
+      ["qua", "Quarta"],
+      ["qui", "Quinta"],
+      ["sex", "Sexta"],
+      ["sab", "Sabado"],
+      ["dom", "Domingo"]
+    ];
+    if (!horarios || typeof horarios !== "object") return "";
+    return dias.map(([key, label]) => {
+      const slots = Array.isArray(horarios[key]) ? horarios[key].filter((slot) => slot && slot.inicio && slot.fim) : [];
+      if (!slots.length) return `${label}: Fechado`;
+      return `${label}: ${slots.map((slot) => `${slot.inicio} as ${slot.fim}`).join(" / ")}`;
+    }).join("<br>");
+  }
+
   function aplicarClienteAdminNoEstabelecimento(est, cliente) {
     if (!est || !cliente) return;
 
@@ -15860,7 +15878,12 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (cliente.contato) est.contact = cliente.contato;
     if (cliente.whatsapp) est.whatsapp = cliente.whatsapp;
     if (cliente.endereco) est.address = cliente.endereco;
-    if (cliente.horario) est.hours = cliente.horario;
+    if (cliente.horarios && typeof cliente.horarios === "object") {
+      est.horarios = cliente.horarios;
+      est.hours = cliente.horario || formatarHorariosAdmin(cliente.horarios);
+    } else if (cliente.horario) {
+      est.hours = cliente.horario;
+    }
     if (cliente.instagram) est.instagram = cliente.instagram;
     if (cliente.facebook) est.facebook = cliente.facebook;
     if (cliente.cardapioLink) est.cardapioLink = cliente.cardapioLink;
@@ -15876,7 +15899,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
       image: cliente.imagem || (imagensAdmin[0]?.url || ""),
       name: cliente.nome || clienteId,
-      hours: cliente.horario || "",
+      hours: cliente.horario || formatarHorariosAdmin(cliente.horarios) || "",
+      horarios: cliente.horarios || null,
       address: cliente.endereco || "",
       contact: cliente.contato || "",
       whatsapp: cliente.whatsapp || "",

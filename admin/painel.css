@@ -456,6 +456,53 @@ button[type="submit"]:hover,
   background: #f8fafc;
 }
 
+.schedule-panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  background: #fff;
+}
+
+.schedule-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.schedule-day {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.schedule-open {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--text);
+}
+
+.schedule-open input {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+}
+
+.schedule-slots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.schedule-slots input {
+  min-height: 38px;
+}
+
 .manual-image-form {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.2fr) auto;
@@ -692,6 +739,14 @@ button[type="submit"]:hover,
   .client-row,
   .finance-row {
     grid-template-columns: 1fr;
+  }
+
+  .schedule-day {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-slots {
+    grid-template-columns: repeat(2, minmax(110px, 1fr));
   }
 
   .client-money {

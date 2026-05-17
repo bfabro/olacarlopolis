@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 13,
-  label: "v13",
-  data: "2026-05-16",
-  nota: "Corrige caminhos de imagens locais e evita CORS na migracao."
+  numero: 14,
+  label: "v14",
+  data: "2026-05-17",
+  nota: "Foto de perfil, horarios por dia e financeiro sem perder lista."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -58,6 +58,15 @@ let state = {
 };
 
 const $ = (id) => document.getElementById(id);
+const WEEK_DAYS = [
+  ["seg", "Segunda"],
+  ["ter", "Terca"],
+  ["qua", "Quarta"],
+  ["qui", "Quinta"],
+  ["sex", "Sexta"],
+  ["sab", "Sabado"],
+  ["dom", "Domingo"]
+];
 
 function renderPanelVersion() {
   const text = `Versao ${PANEL_VERSION.label}`;
@@ -188,6 +197,91 @@ function upsertClientInState(id, data) {
 
 function imageUrl(item) {
   return typeof item === "string" ? item : (item?.url || "");
+}
+
+function emptySchedule() {
+  return WEEK_DAYS.reduce((acc, [key]) => {
+    acc[key] = [];
+    return acc;
+  }, {});
+}
+
+function normalizeSchedule(schedule) {
+  const base = emptySchedule();
+  if (!schedule || typeof schedule !== "object") return base;
+  WEEK_DAYS.forEach(([key]) => {
+    base[key] = Array.isArray(schedule[key])
+      ? schedule[key]
+        .filter((slot) => slot && slot.inicio && slot.fim)
+        .map((slot) => ({ inicio: slot.inicio, fim: slot.fim }))
+        .slice(0, 2)
+      : [];
+  });
+  return base;
+}
+
+function renderScheduleEditor(containerId, schedule = {}) {
+  const box = $(containerId);
+  if (!box) return;
+  const data = normalizeSchedule(schedule);
+  box.dataset.initialSchedule = scheduleHasAnyOpen(data) ? "true" : "false";
+  box.innerHTML = WEEK_DAYS.map(([key, label]) => {
+    const slots = data[key] || [];
+    const open = slots.length > 0;
+    return `
+      <article class="schedule-day" data-day="${key}">
+        <label class="schedule-open">
+          <input type="checkbox" data-schedule-open ${open ? "checked" : ""}>
+          ${label}
+        </label>
+        <div class="schedule-slots">
+          <input type="time" data-slot="0" data-field="inicio" value="${escapeAttr(slots[0]?.inicio || "")}">
+          <input type="time" data-slot="0" data-field="fim" value="${escapeAttr(slots[0]?.fim || "")}">
+          <input type="time" data-slot="1" data-field="inicio" value="${escapeAttr(slots[1]?.inicio || "")}">
+          <input type="time" data-slot="1" data-field="fim" value="${escapeAttr(slots[1]?.fim || "")}">
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function readScheduleEditor(containerId) {
+  const box = $(containerId);
+  const horarios = emptySchedule();
+  if (!box) return horarios;
+
+  box.querySelectorAll(".schedule-day").forEach((row) => {
+    const day = row.dataset.day;
+    const isOpen = row.querySelector("[data-schedule-open]")?.checked;
+    if (!isOpen) {
+      horarios[day] = [];
+      return;
+    }
+
+    const slots = [];
+    [0, 1].forEach((index) => {
+      const inicio = row.querySelector(`[data-slot="${index}"][data-field="inicio"]`)?.value || "";
+      const fim = row.querySelector(`[data-slot="${index}"][data-field="fim"]`)?.value || "";
+      if (inicio && fim) slots.push({ inicio, fim });
+    });
+    horarios[day] = slots;
+  });
+
+  return horarios;
+}
+
+function scheduleToText(schedule) {
+  const data = normalizeSchedule(schedule);
+  return WEEK_DAYS.map(([key, label]) => {
+    const slots = data[key] || [];
+    if (!slots.length) return `${label}: Fechado`;
+    return `${label}: ${slots.map((s) => `${s.inicio} as ${s.fim}`).join(" / ")}`;
+  }).join("<br>");
+}
+
+function scheduleHasAnyOpen(schedule) {
+  const data = normalizeSchedule(schedule);
+  return WEEK_DAYS.some(([key]) => (data[key] || []).length > 0);
 }
 
 function displayImageUrl(url) {
@@ -372,6 +466,7 @@ function resetClientForm() {
   $("clientId").value = "";
   fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
+  renderScheduleEditor("clientScheduleEditor", emptySchedule());
   renderClientImagesPreview();
 }
 
@@ -380,6 +475,9 @@ function getClientFormData() {
   const id = $("clientId").value || slugify(name);
   const newCategory = $("clientNewCategory").value.trim();
   const category = newCategory || $("clientCategory").value.trim() || "Outros";
+  const horarios = readScheduleEditor("clientScheduleEditor");
+  const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || $("clientScheduleEditor")?.dataset.initialSchedule === "true";
+  const horarioTexto = $("clientHours").value.trim() || (shouldSaveSchedule ? scheduleToText(horarios) : "");
   return {
     id,
     nome: name,
@@ -391,7 +489,8 @@ function getClientFormData() {
     contato: $("clientContact").value.trim(),
     whatsapp: $("clientWhatsapp").value.trim(),
     endereco: $("clientAddress").value.trim(),
-    horario: $("clientHours").value.trim(),
+    horario: horarioTexto,
+    ...(shouldSaveSchedule ? { horarios } : {}),
     instagram: $("clientInstagram").value.trim(),
     facebook: $("clientFacebook").value.trim(),
     imagem: $("clientImage").value.trim(),
@@ -420,6 +519,7 @@ function fillClientForm(client) {
   $("clientFacebook").value = client.facebook || "";
   $("clientImage").value = client.imagem || client.image || "";
   state.clientImages = normalizeImageItems(client.imagens);
+  renderScheduleEditor("clientScheduleEditor", client.horarios || {});
   $("clientMenuLink").value = client.cardapioLink || "";
   $("clientInfo").value = client.infoAdicional || "";
   $("clientAdminNote").value = client.observacaoAdmin || "";
@@ -445,7 +545,7 @@ function renderClientImagesPreview() {
         <textarea data-image-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
       </label>
       <div>
-        <button type="button" data-main-image="${index}">Destaque</button>
+        <button type="button" data-main-image="${index}">Usar como foto de perfil</button>
         <button type="button" data-remove-image="${index}" class="danger-mini">Remover</button>
       </div>
     </article>
@@ -455,7 +555,7 @@ function renderClientImagesPreview() {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.mainImage);
       $("clientImage").value = imageUrl(state.clientImages[index]);
-      showToast("Imagem principal selecionada.");
+      showToast("Foto de perfil selecionada.");
     });
   });
 
@@ -897,8 +997,14 @@ function renderFinanceiro() {
       payload.updatedAt = serverTimestamp();
       payload.updatedBy = state.user?.uid || "";
       await update(ref(db, `clientes/${id}`), payload);
+      const index = state.clientes.findIndex((client) => client.id === id);
+      if (index >= 0) state.clientes[index] = { ...state.clientes[index], ...payload };
+      renderStats();
+      renderClientsList();
+      fillUserClientSelect();
+      fillEventClientSelect();
       showToast("Financeiro atualizado.");
-      await loadAllData();
+      renderFinanceiro();
     });
   });
 }
@@ -920,8 +1026,17 @@ function renderClientOnlyEditor() {
       <label>WhatsApp<input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></label>
       <label>Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
       <label>Horario<input id="coHours" value="${escapeAttr(client.horario || "")}"></label>
+      <section class="wide schedule-panel">
+        <div class="section-head compact">
+          <div>
+            <h3>Dias e horarios de funcionamento</h3>
+            <p>Marque os dias abertos. Dias desmarcados aparecem como fechado.</p>
+          </div>
+        </div>
+        <div id="coScheduleEditor" class="schedule-editor"></div>
+      </section>
       <label>Instagram<input id="coInstagram" value="${escapeAttr(client.instagram || "")}"></label>
-      <label>Imagem principal<input id="coImage" value="${escapeAttr(client.imagem || "")}"></label>
+      <label>Foto de perfil<input id="coImage" value="${escapeAttr(client.imagem || "")}"></label>
       <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}"></label>
       <section class="wide upload-panel">
         <div class="section-head compact">
@@ -949,6 +1064,7 @@ function renderClientOnlyEditor() {
       <div class="form-actions wide"><button type="submit">Salvar meus dados</button></div>
     </form>
   `;
+  renderScheduleEditor("coScheduleEditor", client.horarios || {});
 
   mount.querySelector("#coImagesUpload").addEventListener("change", async (event) => {
     const remaining = Math.max(0, 10 - imagens.length);
@@ -1026,13 +1142,17 @@ function renderClientOnlyEditor() {
 
   $("clientOnlyForm").addEventListener("submit", async (event) => {
     event.preventDefault();
+    const horarios = readScheduleEditor("coScheduleEditor");
+    const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || $("coScheduleEditor")?.dataset.initialSchedule === "true";
+    const horarioTexto = $("coHours").value.trim() || (shouldSaveSchedule ? scheduleToText(horarios) : "");
     const payload = {
       nome: $("coName").value.trim(),
       nomeNormalizado: normalizeName($("coName").value.trim()),
       contato: $("coContact").value.trim(),
       whatsapp: $("coWhatsapp").value.trim(),
       endereco: $("coAddress").value.trim(),
-      horario: $("coHours").value.trim(),
+      horario: horarioTexto,
+      ...(shouldSaveSchedule ? { horarios } : {}),
       instagram: $("coInstagram").value.trim(),
       imagem: $("coImage").value.trim(),
       imagens,
@@ -1057,7 +1177,7 @@ function renderImagesMarkup(images, prefix) {
         <textarea data-${prefix}-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
       </label>
       <div>
-        <button type="button" data-${prefix}-main="${index}">Destaque</button>
+        <button type="button" data-${prefix}-main="${index}">Usar como foto de perfil</button>
         <button type="button" data-${prefix}-remove="${index}" class="danger-mini">Remover</button>
       </div>
     </article>
