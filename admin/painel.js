@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 12,
-  label: "v12",
+  numero: 13,
+  label: "v13",
   data: "2026-05-16",
-  nota: "Lista usa dados importados e migracao de imagens para Storage."
+  nota: "Corrige caminhos de imagens locais e evita CORS na migracao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -188,6 +188,25 @@ function upsertClientInState(id, data) {
 
 function imageUrl(item) {
   return typeof item === "string" ? item : (item?.url || "");
+}
+
+function displayImageUrl(url) {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  if (/^(https?:|data:|blob:|\/)/i.test(raw)) return raw;
+  return `../${raw.replace(/^\.?\//, "")}`;
+}
+
+function sameOriginImageUrl(url) {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  if (/^(data:|blob:)/i.test(raw)) return "";
+  if (/^https?:\/\//i.test(raw)) {
+    const parsed = new URL(raw);
+    return parsed.origin === window.location.origin ? parsed.toString() : "";
+  }
+  if (raw.startsWith("/")) return new URL(raw, window.location.origin).toString();
+  return new URL(`../${raw.replace(/^\.?\//, "")}`, window.location.href).toString();
 }
 
 function showToast(message) {
@@ -421,7 +440,7 @@ function renderClientImagesPreview() {
 
   box.innerHTML = state.clientImages.map((item, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(imageUrl(item))}" alt="Imagem ${index + 1}">
+      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}">
       <label class="image-caption-label">Texto desta imagem
         <textarea data-image-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
       </label>
@@ -518,7 +537,9 @@ async function uploadUrlToClientStorage(clientId, imageItem, index) {
   const url = imageUrl(imageItem);
   if (!url || isFirebaseStorageUrl(url)) return imageItem;
 
-  const absoluteUrl = new URL(url, window.location.origin).toString();
+  const absoluteUrl = sameOriginImageUrl(url);
+  if (!absoluteUrl) return imageItem;
+
   const response = await fetch(absoluteUrl, { cache: "reload" });
   if (!response.ok) throw new Error(`HTTP ${response.status} em ${url}`);
 
@@ -622,7 +643,7 @@ function renderClientsList() {
 
   box.innerHTML = list.map((client) => `
     <article class="client-row">
-      <img src="${escapeAttr(client.imagem || imageUrl(client.imagens && client.imagens[0]) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}">
+      <img src="${escapeAttr(displayImageUrl(client.imagem || imageUrl(client.imagens && client.imagens[0])) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}">
       <div class="client-main">
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
@@ -778,7 +799,7 @@ function renderEventsList() {
 
   box.innerHTML = list.map((evento) => `
     <article class="list-card event-card">
-      ${evento.imagem ? `<img src="${escapeAttr(evento.imagem)}" alt="${escapeAttr(evento.titulo || "Evento")}">` : ""}
+      ${evento.imagem ? `<img src="${escapeAttr(displayImageUrl(evento.imagem))}" alt="${escapeAttr(evento.titulo || "Evento")}">` : ""}
       <div class="list-title">${escapeHtml(evento.titulo || evento.id)}</div>
       <div class="list-meta">${escapeHtml(evento.clienteNome || "Sem cliente")} - ${escapeHtml(evento.data || "Sem data")} ${escapeHtml(evento.horario || "")}</div>
       <div class="list-meta">${escapeHtml(evento.local || "Sem local")}</div>
@@ -1031,7 +1052,7 @@ function renderImagesMarkup(images, prefix) {
   if (!images.length) return `<div class="list-meta">Nenhuma imagem enviada ainda.</div>`;
   return images.map((item, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(imageUrl(item))}" alt="Imagem ${index + 1}">
+      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}">
       <label class="image-caption-label">Texto desta imagem
         <textarea data-${prefix}-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
       </label>
