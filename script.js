@@ -16019,7 +16019,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (campoExiste(cliente, "endereco")) est.address = cliente.endereco || "";
     if (campoExiste(cliente, "horarios") && cliente.horarios && typeof cliente.horarios === "object") {
       est.horarios = cliente.horarios;
-      est.hours = cliente.horario || formatarHorariosAdmin(cliente.horarios);
+      est.hours = formatarHorariosAdmin(cliente.horarios) || cliente.horario || "";
+      est.statusAberto = "a";
     } else if (campoExiste(cliente, "horario")) {
       est.hours = cliente.horario || "";
     }
@@ -16038,8 +16039,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
       image: cliente.imagem || (imagensAdmin[0]?.url || ""),
       name: cliente.nome || clienteId,
-      hours: cliente.horario || formatarHorariosAdmin(cliente.horarios) || "",
+      hours: cliente.horarios ? (formatarHorariosAdmin(cliente.horarios) || cliente.horario || "") : (cliente.horario || ""),
       horarios: cliente.horarios || null,
+      statusAberto: cliente.horarios ? "a" : "",
       address: cliente.endereco || "",
       contact: cliente.contato || "",
       whatsapp: cliente.whatsapp || "",

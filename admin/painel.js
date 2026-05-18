@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 40,
-  label: "v40",
+  numero: 42,
+  label: "v42",
   data: "2026-05-18",
-  nota: "Dados editados no painel vencem qualquer importacao antiga."
+  nota: "Horarios estruturados do painel refletem no site publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -354,6 +354,35 @@ function sortCategoriesInState() {
     });
 }
 
+function mergeCategoryIntoMap(map, category) {
+  const normalized = normalizeCategory(category);
+  const existing = map.get(normalized.id);
+  if (existing) {
+    map.set(normalized.id, normalizeCategory({
+      ...normalized,
+      ...existing,
+      origem: existing.origem || normalized.origem
+    }));
+  } else {
+    map.set(normalized.id, normalized);
+  }
+}
+
+async function loadScriptCategoriesForPanel() {
+  try {
+    const source = await getScriptImportSource();
+    return (source.categories || []).map((category, index) => normalizeCategory({
+      id: slugify(category.title || `categoria-${index + 1}`),
+      nome: category.title || `Categoria ${index + 1}`,
+      origem: "script.js",
+      ordem: index + 1
+    }));
+  } catch (error) {
+    console.warn("Nao foi possivel carregar categorias base do script.js.", error);
+    return [];
+  }
+}
+
 function imageUrl(item) {
   return typeof item === "string" ? item : (item?.url || "");
 }
@@ -567,11 +596,13 @@ async function loadAllData() {
     categoriasSnap.forEach((child) => state.categorias.push({ id: child.key, ...child.val() }));
   }
   const fromClients = new Map();
+  const scriptCategories = canManageClients() ? await loadScriptCategoriesForPanel() : [];
+  scriptCategories.forEach((cat) => mergeCategoryIntoMap(fromClients, cat));
   state.clientes.forEach((client) => {
     const title = String(client.categoria || "").trim();
-    if (title) fromClients.set(slugify(title), normalizeCategory({ id: slugify(title), nome: title, origem: "clientes" }));
+    if (title) mergeCategoryIntoMap(fromClients, { id: slugify(title), nome: title, origem: "clientes" });
   });
-  state.categorias.forEach((cat) => fromClients.set(cat.id, normalizeCategory(cat)));
+  state.categorias.forEach((cat) => mergeCategoryIntoMap(fromClients, cat));
   state.categorias = Array.from(fromClients.values());
   sortCategoriesInState();
   if (!state.categorias.some((cat) => slugify(cat.nome || cat.id) === "outros")) {
@@ -695,7 +726,7 @@ function getClientFormData() {
   const category = newCategory || $("clientCategory").value.trim() || currentClient?.categoria || currentClient?.category || $("clientForm").dataset.originalCategory || "Outros";
   const horarios = readScheduleEditor("clientScheduleEditor");
   const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || $("clientScheduleEditor")?.dataset.initialSchedule === "true";
-  const horarioTexto = $("clientHours").value.trim() || (shouldSaveSchedule ? scheduleToText(horarios) : "");
+  const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("clientHours").value.trim();
   return {
     id,
     nome: name,
@@ -1684,7 +1715,7 @@ function renderClientOnlyEditor() {
     event.preventDefault();
     const horarios = readScheduleEditor("coScheduleEditor");
     const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || $("coScheduleEditor")?.dataset.initialSchedule === "true";
-    const horarioTexto = $("coHours").value.trim() || (shouldSaveSchedule ? scheduleToText(horarios) : "");
+    const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("coHours").value.trim();
     const payload = {
       nome: $("coName").value.trim(),
       nomeNormalizado: normalizeName($("coName").value.trim()),
