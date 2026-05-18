@@ -436,6 +436,22 @@ button[type="submit"]:hover,
   font-weight: 800;
 }
 
+.category-row {
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.category-icon-preview {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #eff6ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
 .compact {
   margin-bottom: 10px;
 }

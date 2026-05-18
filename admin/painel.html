@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=29">
+  <link rel="stylesheet" href="painel.css?v=30">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -44,6 +44,7 @@
       <nav class="nav-admin">
         <button data-view="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
         <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
+        <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
         <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
         <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
         <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
@@ -205,6 +206,54 @@
         </div>
       </section>
 
+      <section id="categoriasView" class="panel-view hidden">
+        <div class="split-layout">
+          <section class="panel-card">
+            <div class="section-head">
+              <div>
+                <h2>Categorias e subcategorias</h2>
+                <p>Configure os itens novos do menu lateral publico.</p>
+              </div>
+              <button id="newCategoryButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Nova</button>
+            </div>
+            <form id="categoryForm" class="grid-form">
+              <input type="hidden" id="categoryId">
+              <label>Nome da categoria<input id="categoryName" required placeholder="Ex.: Pet Shop"></label>
+              <label>Categoria principal
+                <select id="categoryParent"></select>
+              </label>
+              <label>Icone Font Awesome
+                <input id="categoryIcon" placeholder="fa-solid fa-paw">
+              </label>
+              <label>Cor do icone
+                <input id="categoryIconColor" type="color" value="#2563eb">
+              </label>
+              <label>Status
+                <select id="categoryStatus">
+                  <option value="ativo">Ativo no menu</option>
+                  <option value="rascunho">Rascunho</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+              </label>
+              <label>Ordem
+                <input id="categoryOrder" type="number" min="0" step="1" placeholder="0">
+              </label>
+              <label class="wide">Observacao interna<textarea id="categoryNote" rows="3"></textarea></label>
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar categoria</button>
+                <button id="deleteCategoryButton" type="button" class="danger-button hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card">
+            <h2>Lista de categorias</h2>
+            <input id="categorySearch" class="search-input" placeholder="Buscar categoria...">
+            <div id="categoriesList" class="list-area"></div>
+          </section>
+        </div>
+      </section>
+
       <section id="eventosView" class="panel-view hidden">
         <div class="split-layout">
           <section class="panel-card">
@@ -335,6 +384,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=29"></script>
+  <script type="module" src="painel.js?v=30"></script>
 </body>
 </html>

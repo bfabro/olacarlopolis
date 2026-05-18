@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 29,
-  label: "v29",
+  numero: 30,
+  label: "v30",
   data: "2026-05-18",
-  nota: "Site publico escolhe o registro forte mais recente quando ha duplicidade."
+  nota: "Painel gerencia categorias, subcategorias e icones do menu publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -54,6 +54,7 @@ let state = {
   categorias: [],
   selectedClientId: null,
   selectedEventId: null,
+  selectedCategoryId: null,
   clientImages: []
 };
 
@@ -81,6 +82,7 @@ function renderPanelVersion() {
 const views = {
   dashboard: $("dashboardView"),
   clientes: $("clientesView"),
+  categorias: $("categoriasView"),
   eventos: $("eventosView"),
   financeiro: $("financeiroView"),
   usuarios: $("usuariosView"),
@@ -90,6 +92,7 @@ const views = {
 const viewCopy = {
   dashboard: ["Visao geral", "Resumo do ambiente administrativo."],
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
+  categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
@@ -193,6 +196,32 @@ function upsertClientInState(id, data) {
   } else {
     state.clientes.push(item);
   }
+}
+
+function normalizeCategory(cat) {
+  const name = cat.nome || cat.title || cat.id || "Sem nome";
+  const id = cat.id || slugify(name);
+  return {
+    status: "ativo",
+    origem: "painel",
+    ...cat,
+    id,
+    nome: name,
+    parentId: cat.parentId || "",
+    icon: cat.icon || "fa-solid fa-store",
+    iconColor: cat.iconColor || "#2563eb",
+    ordem: Number(cat.ordem || 0)
+  };
+}
+
+function sortCategoriesInState() {
+  state.categorias = state.categorias
+    .map(normalizeCategory)
+    .sort((a, b) => {
+      const order = Number(a.ordem || 0) - Number(b.ordem || 0);
+      if (order) return order;
+      return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+    });
 }
 
 function imageUrl(item) {
@@ -409,19 +438,22 @@ async function loadAllData() {
   const fromClients = new Map();
   state.clientes.forEach((client) => {
     const title = String(client.categoria || "").trim();
-    if (title) fromClients.set(slugify(title), { id: slugify(title), nome: title, origem: "clientes" });
+    if (title) fromClients.set(slugify(title), normalizeCategory({ id: slugify(title), nome: title, origem: "clientes" }));
   });
-  state.categorias.forEach((cat) => fromClients.set(cat.id, cat));
-  state.categorias = Array.from(fromClients.values())
-    .sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+  state.categorias.forEach((cat) => fromClients.set(cat.id, normalizeCategory(cat)));
+  state.categorias = Array.from(fromClients.values());
+  sortCategoriesInState();
   if (!state.categorias.some((cat) => slugify(cat.nome || cat.id) === "outros")) {
-    state.categorias.push({ id: "outros", nome: "Outros", origem: "padrao" });
+    state.categorias.push(normalizeCategory({ id: "outros", nome: "Outros", origem: "padrao" }));
+    sortCategoriesInState();
   }
 
   renderStats();
   renderClientsList();
   renderUsersList();
+  renderCategoriesList();
   fillClientCategorySelect();
+  fillCategoryParentSelect();
   fillUserClientSelect();
   fillEventClientSelect();
   renderEventsList();
@@ -881,12 +913,104 @@ function fillClientCategorySelect(selectedName = "") {
   const select = $("clientCategory");
   if (!select) return;
   const selectedSlug = slugify(selectedName);
-  const options = state.categorias.map((cat) => {
+  const parents = new Map(state.categorias.map((cat) => [cat.id, cat.nome || cat.id]));
+  const options = state.categorias
+    .filter((cat) => cat.status !== "inativo")
+    .map((cat) => {
     const value = cat.nome || cat.title || cat.id;
     const isSelected = slugify(value) === selectedSlug;
-    return `<option value="${escapeAttr(value)}" ${isSelected ? "selected" : ""}>${escapeHtml(value)}</option>`;
+    const prefix = cat.parentId ? `${parents.get(cat.parentId) || "Principal"} / ` : "";
+    return `<option value="${escapeAttr(value)}" ${isSelected ? "selected" : ""}>${escapeHtml(prefix + value)}</option>`;
   });
   select.innerHTML = `<option value="">Selecione uma categoria</option>` + options.join("");
+}
+
+function fillCategoryParentSelect(selectedId = "") {
+  const select = $("categoryParent");
+  if (!select) return;
+  const currentId = $("categoryId")?.value || "";
+  const options = state.categorias
+    .filter((cat) => cat.id !== currentId && !cat.parentId && cat.status !== "inativo")
+    .map((cat) => `<option value="${escapeAttr(cat.id)}" ${cat.id === selectedId ? "selected" : ""}>${escapeHtml(cat.nome || cat.id)}</option>`);
+  select.innerHTML = `<option value="">Categoria principal</option>` + options.join("");
+}
+
+function resetCategoryForm() {
+  state.selectedCategoryId = null;
+  $("categoryForm").reset();
+  $("categoryId").value = "";
+  $("categoryIcon").value = "fa-solid fa-store";
+  $("categoryIconColor").value = "#2563eb";
+  $("categoryStatus").value = "ativo";
+  $("deleteCategoryButton").classList.add("hidden");
+  fillCategoryParentSelect();
+}
+
+function getCategoryFormData() {
+  const name = $("categoryName").value.trim();
+  const id = $("categoryId").value || slugify(name);
+  return normalizeCategory({
+    id,
+    nome: name,
+    nomeNormalizado: normalizeName(name),
+    parentId: $("categoryParent").value,
+    icon: $("categoryIcon").value.trim() || "fa-solid fa-store",
+    iconColor: $("categoryIconColor").value || "#2563eb",
+    status: $("categoryStatus").value,
+    ordem: Number($("categoryOrder").value || 0),
+    observacaoAdmin: $("categoryNote").value.trim(),
+    origem: "painel",
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  });
+}
+
+function fillCategoryForm(category) {
+  state.selectedCategoryId = category.id;
+  $("categoryId").value = category.id || "";
+  $("categoryName").value = category.nome || category.title || "";
+  $("categoryIcon").value = category.icon || "fa-solid fa-store";
+  $("categoryIconColor").value = category.iconColor || "#2563eb";
+  $("categoryStatus").value = category.status || "ativo";
+  $("categoryOrder").value = category.ordem || "";
+  $("categoryNote").value = category.observacaoAdmin || "";
+  fillCategoryParentSelect(category.parentId || "");
+  $("deleteCategoryButton").classList.remove("hidden");
+}
+
+function renderCategoriesList() {
+  const box = $("categoriesList");
+  if (!box) return;
+  const q = String($("categorySearch")?.value || "").toLowerCase().trim();
+  const parents = new Map(state.categorias.map((cat) => [cat.id, cat.nome || cat.id]));
+  const list = state.categorias.filter((cat) => {
+    const hay = `${cat.nome || ""} ${cat.parentId ? parents.get(cat.parentId) : ""} ${cat.icon || ""}`.toLowerCase();
+    return !q || hay.includes(q);
+  });
+
+  if (!list.length) {
+    box.innerHTML = `<div class="list-meta">Nenhuma categoria cadastrada.</div>`;
+    return;
+  }
+
+  box.innerHTML = list.map((cat) => `
+    <article class="list-card category-row">
+      <span class="category-icon-preview" style="color:${escapeAttr(cat.iconColor || "#2563eb")}"><i class="${escapeAttr(cat.icon || "fa-solid fa-store")}"></i></span>
+      <div>
+        <div class="list-title">${escapeHtml(cat.nome || cat.id)}</div>
+        <div class="list-meta">${cat.parentId ? `Subcategoria de ${escapeHtml(parents.get(cat.parentId) || cat.parentId)}` : "Categoria principal"} - ${statusLabel(cat.status)}</div>
+        <div class="list-meta">${escapeHtml(cat.icon || "fa-solid fa-store")}</div>
+      </div>
+      <button type="button" data-edit-category="${escapeAttr(cat.id)}">Editar</button>
+    </article>
+  `).join("");
+
+  box.querySelectorAll("[data-edit-category]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const category = state.categorias.find((cat) => cat.id === button.dataset.editCategory);
+      if (category) fillCategoryForm(category);
+    });
+  });
 }
 
 function renderUsersList() {
@@ -1342,12 +1466,20 @@ async function syncClientsFromScript(options = {}) {
     categories.forEach((category) => {
       const categoryName = category.title || "Outros";
       const categoryId = slugify(categoryName);
+      const existingCategory = state.categorias.find((cat) => cat.id === categoryId) || {};
       importStats.categorias += 1;
       categoryPayloads.push({
         id: categoryId,
         data: cleanForFirebase({
+        ...existingCategory,
         nome: categoryName,
-        origem: "script.js",
+        nomeNormalizado: normalizeName(categoryName),
+        parentId: existingCategory.parentId || "",
+        icon: existingCategory.icon || "fa-solid fa-store",
+        iconColor: existingCategory.iconColor || "#2563eb",
+        status: existingCategory.status || "ativo",
+        ordem: existingCategory.ordem ?? importStats.categorias,
+        origem: existingCategory.origem || "script.js",
         updatedAt: serverTimestamp(),
         updatedBy: state.user.uid
         })
@@ -1589,6 +1721,7 @@ function bindEvents() {
   $("logoutButton").addEventListener("click", () => signOut(auth));
   $("refreshButton").addEventListener("click", loadAllData);
   $("newClientButton").addEventListener("click", resetClientForm);
+  $("newCategoryButton").addEventListener("click", resetCategoryForm);
   $("syncClientsButton").addEventListener("click", syncClientsFromScript);
   $("migrateImagesButton").addEventListener("click", migrateClientImagesToStorage);
   $("clientSearch").addEventListener("input", renderClientsList);
@@ -1609,6 +1742,7 @@ function bindEvents() {
   });
   $("financeSearch").addEventListener("input", renderFinanceiro);
   $("financeFilter").addEventListener("change", renderFinanceiro);
+  $("categorySearch").addEventListener("input", renderCategoriesList);
   $("userForm").addEventListener("submit", createPanelUser);
 
   document.querySelectorAll(".nav-admin button").forEach((button) => {
@@ -1624,9 +1758,18 @@ function bindEvents() {
     if (!state.selectedClientId) payload.createdAt = serverTimestamp();
     const updates = { [`clientes/${id}`]: payload };
     if (payload.categoria) {
-      updates[`categorias/${payload.categoriaId || slugify(payload.categoria)}`] = {
+      const categoryId = payload.categoriaId || slugify(payload.categoria);
+      const existingCategory = state.categorias.find((cat) => cat.id === categoryId) || {};
+      updates[`categorias/${categoryId}`] = {
+        ...existingCategory,
         nome: payload.categoria,
-        origem: "painel",
+        nomeNormalizado: normalizeName(payload.categoria),
+        parentId: existingCategory.parentId || "",
+        icon: existingCategory.icon || "fa-solid fa-store",
+        iconColor: existingCategory.iconColor || "#2563eb",
+        status: existingCategory.status || "ativo",
+        ordem: existingCategory.ordem || 0,
+        origem: existingCategory.origem || "painel",
         updatedAt: serverTimestamp(),
         updatedBy: state.user?.uid || ""
       };
@@ -1638,21 +1781,59 @@ function bindEvents() {
       const existingCategory = state.categorias.find((cat) => cat.id === categoryId);
       if (existingCategory) {
         existingCategory.nome = payload.categoria;
+        existingCategory.nomeNormalizado = normalizeName(payload.categoria);
         existingCategory.origem = "painel";
       } else {
-        state.categorias.push({ id: categoryId, nome: payload.categoria, origem: "painel" });
+        state.categorias.push(normalizeCategory({ id: categoryId, nome: payload.categoria, origem: "painel" }));
       }
       state.categorias.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
     }
     sortClientsInState();
     renderStats();
     renderClientsList();
+    renderCategoriesList();
     renderFinanceiro();
     fillClientCategorySelect();
     fillUserClientSelect();
     fillEventClientSelect();
     showToast("Cliente salvo.");
     resetClientForm();
+  });
+
+  $("categoryForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!canManageClients()) return;
+    const payload = getCategoryFormData();
+    const id = payload.id;
+    delete payload.id;
+    await update(ref(db), { [`categorias/${id}`]: payload });
+    const existing = state.categorias.findIndex((cat) => cat.id === id);
+    const next = { id, ...payload };
+    if (existing >= 0) state.categorias[existing] = next;
+    else state.categorias.push(next);
+    sortCategoriesInState();
+    renderCategoriesList();
+    fillClientCategorySelect();
+    fillCategoryParentSelect();
+    showToast("Categoria salva.");
+    resetCategoryForm();
+  });
+
+  $("deleteCategoryButton").addEventListener("click", async () => {
+    if (!state.selectedCategoryId || !confirm("Excluir esta categoria?")) return;
+    const id = state.selectedCategoryId;
+    const hasChildren = state.categorias.some((cat) => cat.parentId === id);
+    if (hasChildren) {
+      showToast("Remova ou altere as subcategorias antes de excluir.");
+      return;
+    }
+    await remove(ref(db, `categorias/${id}`));
+    state.categorias = state.categorias.filter((cat) => cat.id !== id);
+    renderCategoriesList();
+    fillClientCategorySelect();
+    fillCategoryParentSelect();
+    resetCategoryForm();
+    showToast("Categoria excluida.");
   });
 
   $("deleteClientButton").addEventListener("click", async () => {

@@ -16047,19 +16047,35 @@ plotarPinsImoveis(stateImoveis.filtered);
     return cliente.pagamentoStatus === "pago" || cliente.pagamentoStatus === "isento";
   }
 
-  function garantirCategoriaAdmin(tituloCategoria) {
+  function categoriaAdminAtiva(meta) {
+    return !meta || !meta.status || meta.status === "ativo";
+  }
+
+  function iconClassCategoriaAdmin(meta) {
+    return String(meta?.icon || "fa-solid fa-store").replace(/[^a-zA-Z0-9\-\s]/g, "").trim() || "fa-solid fa-store";
+  }
+
+  function iconColorCategoriaAdmin(meta) {
+    const color = String(meta?.iconColor || "#2563eb").trim();
+    return /^#[0-9a-f]{3,8}$/i.test(color) ? color : "#2563eb";
+  }
+
+  function garantirCategoriaAdmin(tituloCategoria, meta = {}) {
     const title = String(tituloCategoria || "Outros").trim() || "Outros";
     const slug = normalizeName(title);
     let categoria = categories.find((cat) => normalizeName(cat.title) === slug);
-    if (categoria) return categoria;
+    if (categoria) {
+      categoria.metaAdmin = { ...(categoria.metaAdmin || {}), ...meta };
+      return categoria;
+    }
 
-    const link = criarLinkCategoriaAdmin(title);
-    categoria = { link, title, establishments: [] };
+    const link = criarLinkCategoriaAdmin(title, meta);
+    categoria = { link, title, establishments: [], metaAdmin: meta };
     categories.push(categoria);
     return categoria;
   }
 
-  function criarLinkCategoriaAdmin(title) {
+  function criarLinkCategoriaAdmin(title, meta = {}) {
     const slug = normalizeName(title);
     const existing = document.querySelector(`[data-admin-category="${slug}"]`);
     if (existing) return existing;
@@ -16075,9 +16091,10 @@ plotarPinsImoveis(stateImoveis.filtered);
     link.href = "#";
     link.className = "nav_link sublink";
     link.dataset.adminCategory = slug;
+    if (meta.parentId) link.dataset.adminParent = meta.parentId;
     link.innerHTML = `
-      <span class="navlink_icon"><i style="color:#2563eb" class="fa-solid fa-store"></i></span>
-      <span class="navlink">${title}</span>
+      <span class="navlink_icon"><i style="color:${iconColorCategoriaAdmin(meta)}" class="${iconClassCategoriaAdmin(meta)}"></i></span>
+      <span class="navlink">${meta.parentId ? "&nbsp;&nbsp;↳ " : ""}${title}</span>
     `;
     submenu.appendChild(link);
     link.addEventListener("click", function (event) {
@@ -16089,6 +16106,23 @@ plotarPinsImoveis(stateImoveis.filtered);
     return link;
   }
 
+  function aplicarCategoriasAdminNoMenu(categoriasAdmin) {
+    const lista = Object.entries(categoriasAdmin || {})
+      .map(([id, cat]) => ({ id, ...(cat || {}) }))
+      .filter(categoriaAdminAtiva)
+      .sort((a, b) => {
+        const order = Number(a.ordem || 0) - Number(b.ordem || 0);
+        if (order) return order;
+        return String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR");
+      });
+
+    lista.forEach((cat) => {
+      const nome = cat.nome || cat.title || cat.id;
+      if (!nome) return;
+      garantirCategoriaAdmin(nome, cat);
+    });
+  }
+
   async function aplicarDadosAdminClientes() {
     if (ADMIN_CLIENTES_PROMISE) return ADMIN_CLIENTES_PROMISE;
 
@@ -16097,8 +16131,13 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!dbAdmin) return;
 
       try {
-        const snap = await dbAdmin.ref("clientes").once("value");
-        const clientes = snap.val() || {};
+        const [clientesSnap, categoriasSnap] = await Promise.all([
+          dbAdmin.ref("clientes").once("value"),
+          dbAdmin.ref("categorias").once("value")
+        ]);
+        const clientes = clientesSnap.val() || {};
+        const categoriasAdmin = categoriasSnap.val() || {};
+        aplicarCategoriasAdminNoMenu(categoriasAdmin);
 
         categories.forEach((cat) => {
           const catSlug = normalizeName(cat.title || "");
