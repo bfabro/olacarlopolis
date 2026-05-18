@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 15,
-  label: "v15",
+  numero: 16,
+  label: "v16",
   data: "2026-05-18",
-  nota: "Upload da foto de perfil e importacao sem sobrescrever clientes existentes."
+  nota: "Dados alterados no painel passam a sobrescrever o site publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

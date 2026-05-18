@@ -15862,32 +15862,56 @@ plotarPinsImoveis(stateImoveis.filtered);
     }).join("<br>");
   }
 
+  function campoExiste(obj, campo) {
+    return Object.prototype.hasOwnProperty.call(obj || {}, campo);
+  }
+
+  function clienteAdminCombinaComEstabelecimento(clienteId, cliente, est) {
+    const alvoId = normalizeName(clienteId);
+    const alvoNome = normalizeName(cliente?.nomeNormalizado || cliente?.nome || "");
+    const estId = normalizeName(est?.nomeNormalizado || est?.name || "");
+    if (!estId) return false;
+
+    return estId === alvoId
+      || (alvoNome && estId === alvoNome)
+      || (alvoId && alvoId.endsWith(estId))
+      || (estId && alvoId.includes(estId));
+  }
+
   function aplicarClienteAdminNoEstabelecimento(est, cliente) {
     if (!est || !cliente) return;
 
-    if (cliente.nome) est.name = cliente.nome;
-    if (cliente.imagem) est.image = cliente.imagem;
+    if (campoExiste(cliente, "nome")) est.name = cliente.nome || est.name;
     const imagensAdmin = Array.isArray(cliente.imagens)
       ? cliente.imagens.map((item) => typeof item === "string" ? { url: item, texto: "" } : item).filter((item) => item && item.url)
       : [];
-    if (!cliente.imagem && imagensAdmin[0]) est.image = imagensAdmin[0].url;
+
+    if (campoExiste(cliente, "imagem")) {
+      est.image = cliente.imagem || (imagensAdmin[0]?.url || "");
+    } else if (imagensAdmin[0]) {
+      est.image = imagensAdmin[0].url;
+    }
+
     if (imagensAdmin.length) {
       est.novidadesImages = imagensAdmin.map((item) => item.url).slice(0, 10);
       est.novidadesDescriptions = imagensAdmin.map((item) => item.texto || "").slice(0, 10);
     }
-    if (cliente.contato) est.contact = cliente.contato;
-    if (cliente.whatsapp) est.whatsapp = cliente.whatsapp;
-    if (cliente.endereco) est.address = cliente.endereco;
-    if (cliente.horarios && typeof cliente.horarios === "object") {
+
+    if (campoExiste(cliente, "contato") || campoExiste(cliente, "whatsapp")) {
+      est.contact = cliente.contato || cliente.whatsapp || "";
+      est.whatsapp = cliente.whatsapp || cliente.contato || "";
+    }
+    if (campoExiste(cliente, "endereco")) est.address = cliente.endereco || "";
+    if (campoExiste(cliente, "horarios") && cliente.horarios && typeof cliente.horarios === "object") {
       est.horarios = cliente.horarios;
       est.hours = cliente.horario || formatarHorariosAdmin(cliente.horarios);
-    } else if (cliente.horario) {
-      est.hours = cliente.horario;
+    } else if (campoExiste(cliente, "horario")) {
+      est.hours = cliente.horario || "";
     }
-    if (cliente.instagram) est.instagram = cliente.instagram;
-    if (cliente.facebook) est.facebook = cliente.facebook;
-    if (cliente.cardapioLink) est.cardapioLink = cliente.cardapioLink;
-    if (cliente.infoAdicional) est.infoAdicional = cliente.infoAdicional;
+    if (campoExiste(cliente, "instagram")) est.instagram = cliente.instagram || "";
+    if (campoExiste(cliente, "facebook")) est.facebook = cliente.facebook || "";
+    if (campoExiste(cliente, "cardapioLink")) est.cardapioLink = cliente.cardapioLink || "";
+    if (campoExiste(cliente, "infoAdicional")) est.infoAdicional = cliente.infoAdicional || "";
   }
 
   function montarEstabelecimentoDoClienteAdmin(cliente, clienteId) {
@@ -15992,9 +16016,8 @@ plotarPinsImoveis(stateImoveis.filtered);
           categories.forEach((cat) => {
             const catSlug = normalizeName(cat.title || "");
             (cat.establishments || []).forEach((est) => {
-              const estId = normalizeName(est.nomeNormalizado || est.name || "");
               const mesmaCategoria = !alvoCategoria || alvoCategoria === catSlug;
-              if (mesmaCategoria && (estId === alvoId || (alvoNome && estId === alvoNome))) {
+              if (mesmaCategoria && clienteAdminCombinaComEstabelecimento(clienteId, cliente, est)) {
                 encontrado = true;
                 aplicarClienteAdminNoEstabelecimento(est, cliente);
                 definirStatusClienteAdmin(cliente, clienteId);
@@ -16005,8 +16028,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           if (!encontrado && clienteAdminPodeAparecer(cliente)) {
             const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros");
             const jaExisteNaCategoria = (categoria.establishments || []).some((est) => {
-              const estId = normalizeName(est.nomeNormalizado || est.name || "");
-              return estId === alvoId || (alvoNome && estId === alvoNome);
+              return clienteAdminCombinaComEstabelecimento(clienteId, cliente, est);
             });
             if (!jaExisteNaCategoria) {
               categoria.establishments = categoria.establishments || [];
