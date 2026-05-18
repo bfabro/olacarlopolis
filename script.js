@@ -15816,6 +15816,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   try { window.categories = categories; } catch (e) { }
 
   let ADMIN_CLIENTES_PROMISE = null;
+  let ADMIN_CLIENTES_LAST_APPLIED = 0;
 
   function adminSlug(text) {
     return String(text || "")
@@ -16013,17 +16014,22 @@ plotarPinsImoveis(stateImoveis.filtered);
           const alvoCategoria = normalizeName(cliente.categoria || "");
           let encontrado = false;
 
-          categories.forEach((cat) => {
-            const catSlug = normalizeName(cat.title || "");
-            (cat.establishments || []).forEach((est) => {
-              const mesmaCategoria = !alvoCategoria || alvoCategoria === catSlug;
-              if (mesmaCategoria && clienteAdminCombinaComEstabelecimento(clienteId, cliente, est)) {
-                encontrado = true;
-                aplicarClienteAdminNoEstabelecimento(est, cliente);
-                definirStatusClienteAdmin(cliente, clienteId);
-              }
+          const aplicarEmCategorias = (exigirCategoria) => {
+            categories.forEach((cat) => {
+              const catSlug = normalizeName(cat.title || "");
+              (cat.establishments || []).forEach((est) => {
+                const mesmaCategoria = !alvoCategoria || alvoCategoria === catSlug;
+                if ((!exigirCategoria || mesmaCategoria) && clienteAdminCombinaComEstabelecimento(clienteId, cliente, est)) {
+                  encontrado = true;
+                  aplicarClienteAdminNoEstabelecimento(est, cliente);
+                  definirStatusClienteAdmin(cliente, clienteId);
+                }
+              });
             });
-          });
+          };
+
+          aplicarEmCategorias(true);
+          if (!encontrado) aplicarEmCategorias(false);
 
           if (!encontrado && clienteAdminPodeAparecer(cliente)) {
             const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros");
@@ -16040,12 +16046,17 @@ plotarPinsImoveis(stateImoveis.filtered);
 
         try { window.categories = categories; } catch (e) { }
         try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
+        ADMIN_CLIENTES_LAST_APPLIED = Date.now();
       } catch (err) {
         console.warn("Nao foi possivel aplicar dados do painel admin.", err);
       }
     })();
 
-    return ADMIN_CLIENTES_PROMISE;
+    try {
+      return await ADMIN_CLIENTES_PROMISE;
+    } finally {
+      ADMIN_CLIENTES_PROMISE = null;
+    }
   }
 
   document.getElementById("menuPromocoes").addEventListener("click", function (e) {
