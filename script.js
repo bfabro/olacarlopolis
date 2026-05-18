@@ -15879,6 +15879,29 @@ plotarPinsImoveis(stateImoveis.filtered);
       || (estId && alvoId.includes(estId));
   }
 
+  function valorAtualizacaoClienteAdmin(cliente) {
+    const value = cliente?.updatedAt;
+    if (typeof value === "number") return value;
+    if (typeof value === "string") {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+    return 0;
+  }
+
+  function escolherClienteAdminParaEstabelecimento(candidatos, categoriaSlug) {
+    return candidatos
+      .map((item) => ({
+        ...item,
+        categoriaCorreta: !categoriaSlug || normalizeName(item.cliente?.categoria || "") === categoriaSlug,
+        atualizadoEm: valorAtualizacaoClienteAdmin(item.cliente)
+      }))
+      .sort((a, b) => {
+        if (a.categoriaCorreta !== b.categoriaCorreta) return a.categoriaCorreta ? -1 : 1;
+        return b.atualizadoEm - a.atualizadoEm;
+      })[0];
+  }
+
   function aplicarClienteAdminNoEstabelecimento(est, cliente) {
     if (!est || !cliente) return;
 
@@ -16008,28 +16031,29 @@ plotarPinsImoveis(stateImoveis.filtered);
         const snap = await dbAdmin.ref("clientes").once("value");
         const clientes = snap.val() || {};
 
+        categories.forEach((cat) => {
+          const catSlug = normalizeName(cat.title || "");
+          (cat.establishments || []).forEach((est) => {
+            const candidatos = Object.entries(clientes)
+              .filter(([clienteId, cliente]) => clienteAdminCombinaComEstabelecimento(clienteId, cliente, est))
+              .map(([clienteId, cliente]) => ({ clienteId, cliente }));
+            const escolhido = escolherClienteAdminParaEstabelecimento(candidatos, catSlug);
+            if (escolhido) {
+              aplicarClienteAdminNoEstabelecimento(est, escolhido.cliente);
+              definirStatusClienteAdmin(escolhido.cliente, escolhido.clienteId);
+            }
+          });
+        });
+
         Object.entries(clientes).forEach(([clienteId, cliente]) => {
-          const alvoId = normalizeName(clienteId);
-          const alvoNome = normalizeName(cliente.nomeNormalizado || cliente.nome || "");
-          const alvoCategoria = normalizeName(cliente.categoria || "");
           let encontrado = false;
-
-          const aplicarEmCategorias = (exigirCategoria) => {
-            categories.forEach((cat) => {
-              const catSlug = normalizeName(cat.title || "");
-              (cat.establishments || []).forEach((est) => {
-                const mesmaCategoria = !alvoCategoria || alvoCategoria === catSlug;
-                if ((!exigirCategoria || mesmaCategoria) && clienteAdminCombinaComEstabelecimento(clienteId, cliente, est)) {
-                  encontrado = true;
-                  aplicarClienteAdminNoEstabelecimento(est, cliente);
-                  definirStatusClienteAdmin(cliente, clienteId);
-                }
-              });
+          categories.forEach((cat) => {
+            const catSlug = normalizeName(cat.title || "");
+            (cat.establishments || []).forEach((est) => {
+              const mesmaCategoria = !normalizeName(cliente.categoria || "") || normalizeName(cliente.categoria || "") === catSlug;
+              if (mesmaCategoria && clienteAdminCombinaComEstabelecimento(clienteId, cliente, est)) encontrado = true;
             });
-          };
-
-          aplicarEmCategorias(true);
-          if (!encontrado) aplicarEmCategorias(false);
+          });
 
           if (!encontrado && clienteAdminPodeAparecer(cliente)) {
             const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros");
