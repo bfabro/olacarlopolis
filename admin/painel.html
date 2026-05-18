@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=30">
+  <link rel="stylesheet" href="painel.css?v=31">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -198,8 +198,11 @@
               </div>
               <button id="syncClientsButton" class="ghost-button" type="button"><i class="fa-solid fa-download"></i> Importar clientes/categorias</button>
               <button id="migrateImagesButton" class="ghost-button" type="button"><i class="fa-solid fa-cloud-arrow-up"></i> Subir imagens</button>
+              <button id="analyzeDuplicatesButton" class="ghost-button" type="button"><i class="fa-solid fa-copy"></i> Ver duplicados</button>
+              <button id="cleanupDuplicatesButton" class="danger-button hidden" type="button"><i class="fa-solid fa-broom"></i> Limpar duplicados seguros</button>
             </div>
             <div id="importReport" class="import-report hidden"></div>
+            <div id="duplicatesReport" class="duplicates-report hidden"></div>
             <input id="clientSearch" class="search-input" placeholder="Buscar cliente...">
             <div id="clientsList" class="clients-board"></div>
           </section>
@@ -384,6 +387,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=30"></script>
+  <script type="module" src="painel.js?v=31"></script>
 </body>
 </html>

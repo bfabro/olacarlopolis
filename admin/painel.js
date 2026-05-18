@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 30,
-  label: "v30",
+  numero: 31,
+  label: "v31",
   data: "2026-05-18",
-  nota: "Painel gerencia categorias, subcategorias e icones do menu publico."
+  nota: "Painel analisa e limpa clientes duplicados com confirmacao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -55,6 +55,7 @@ let state = {
   selectedClientId: null,
   selectedEventId: null,
   selectedCategoryId: null,
+  duplicateCleanupPlan: null,
   clientImages: []
 };
 
@@ -631,6 +632,19 @@ function fillClientForm(client) {
   renderClientImagesPreview();
 }
 
+async function deleteClientById(clientId) {
+  if (!clientId) return;
+  await remove(ref(db, `clientes/${clientId}`));
+  state.clientes = state.clientes.filter((client) => client.id !== clientId);
+  if (state.selectedClientId === clientId) resetClientForm();
+  sortClientsInState();
+  renderStats();
+  renderClientsList();
+  renderFinanceiro();
+  fillUserClientSelect();
+  fillEventClientSelect();
+}
+
 function renderClientImagesPreview() {
   const box = $("clientImagesPreview");
   const count = $("clientImagesCount");
@@ -897,7 +911,10 @@ function renderClientsList() {
         <strong>${moneyBR(valorFinalPlano(client))}</strong>
         <span>Venc. ${client.vencimentoDia || "-"}</span>
       </div>
-      <button type="button" data-edit-client="${escapeAttr(client.id)}">Editar</button>
+      <div class="client-actions">
+        <button type="button" data-edit-client="${escapeAttr(client.id)}">Editar</button>
+        <button type="button" class="danger-mini" data-delete-client-list="${escapeAttr(client.id)}">Excluir</button>
+      </div>
     </article>
   `).join("");
 
@@ -907,6 +924,122 @@ function renderClientsList() {
       if (client) fillClientForm(client);
     });
   });
+  box.querySelectorAll("[data-delete-client-list]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const client = state.clientes.find((item) => item.id === btn.dataset.deleteClientList);
+      if (!client || !confirm(`Excluir o cliente "${client.nome || client.id}"?`)) return;
+      await deleteClientById(client.id);
+      showToast("Cliente excluido.");
+    });
+  });
+}
+
+function clientDuplicateKey(client, includeCategory = true) {
+  const nameKey = normalizeName(client.nome || client.name || client.id || "");
+  const categoryKey = slugify(client.categoria || client.categoriaId || "sem-categoria");
+  return includeCategory ? `${nameKey}__${categoryKey}` : nameKey;
+}
+
+function clientUpdatedAt(client) {
+  const value = client.updatedAt;
+  if (typeof value === "number") return value;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function clientCompletenessScore(client) {
+  let score = 0;
+  if (client.origem && client.origem !== "script.js") score += 30;
+  if (client.imagem) score += 10;
+  if (Array.isArray(client.imagens) && client.imagens.length) score += client.imagens.length;
+  if (client.contato || client.whatsapp) score += 5;
+  if (client.status === "ativo") score += 3;
+  if (client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") score += 3;
+  return score;
+}
+
+function chooseClientToKeep(group) {
+  return [...group].sort((a, b) => {
+    const updated = clientUpdatedAt(b) - clientUpdatedAt(a);
+    if (updated) return updated;
+    const completeness = clientCompletenessScore(b) - clientCompletenessScore(a);
+    if (completeness) return completeness;
+    return String(a.id || "").localeCompare(String(b.id || ""));
+  })[0];
+}
+
+function buildDuplicateCleanupPlan() {
+  const exactGroups = new Map();
+  const nameGroups = new Map();
+  state.clientes.forEach((client) => {
+    const exactKey = clientDuplicateKey(client, true);
+    const nameKey = clientDuplicateKey(client, false);
+    if (!exactKey || exactKey.startsWith("__")) return;
+    if (!exactGroups.has(exactKey)) exactGroups.set(exactKey, []);
+    exactGroups.get(exactKey).push(client);
+    if (!nameGroups.has(nameKey)) nameGroups.set(nameKey, []);
+    nameGroups.get(nameKey).push(client);
+  });
+
+  const safeGroups = [];
+  exactGroups.forEach((group) => {
+    if (group.length < 2) return;
+    const keep = chooseClientToKeep(group);
+    safeGroups.push({
+      key: clientDuplicateKey(keep, true),
+      keep,
+      remove: group.filter((client) => client.id !== keep.id)
+    });
+  });
+
+  const reviewGroups = [];
+  nameGroups.forEach((group) => {
+    const categories = new Set(group.map((client) => slugify(client.categoria || client.categoriaId || "sem-categoria")));
+    if (group.length > 1 && categories.size > 1) reviewGroups.push(group);
+  });
+
+  return {
+    safeGroups,
+    reviewGroups,
+    removeIds: safeGroups.flatMap((group) => group.remove.map((client) => client.id))
+  };
+}
+
+function renderDuplicatesReport() {
+  const box = $("duplicatesReport");
+  const cleanupButton = $("cleanupDuplicatesButton");
+  if (!box || !cleanupButton) return;
+
+  const plan = buildDuplicateCleanupPlan();
+  state.duplicateCleanupPlan = plan;
+  cleanupButton.classList.toggle("hidden", !plan.removeIds.length);
+  box.classList.remove("hidden");
+
+  const safePreview = plan.safeGroups.slice(0, 12).map((group) => `
+    <article class="duplicate-group">
+      <div>
+        <strong>${escapeHtml(group.keep.nome || group.keep.id)}</strong>
+        <span>${escapeHtml(group.keep.categoria || "Sem categoria")}</span>
+      </div>
+      <div class="list-meta">Manter: ${escapeHtml(group.keep.id)} | Remover: ${group.remove.map((client) => escapeHtml(client.id)).join(", ")}</div>
+    </article>
+  `).join("");
+
+  const reviewPreview = plan.reviewGroups.slice(0, 8).map((group) => `
+    <article class="duplicate-group review">
+      <strong>${escapeHtml(group[0].nome || group[0].id)}</strong>
+      <div class="list-meta">${group.map((client) => `${escapeHtml(client.id)} (${escapeHtml(client.categoria || "Sem categoria")})`).join(" | ")}</div>
+    </article>
+  `).join("");
+
+  box.innerHTML = `
+    <div class="duplicate-summary">
+      <strong>${plan.removeIds.length}</strong> duplicados seguros para remover
+      <span>${plan.reviewGroups.length} grupos com mesmo nome em categorias diferentes para revisar manualmente</span>
+    </div>
+    ${safePreview || `<div class="list-meta">Nenhum duplicado seguro encontrado.</div>`}
+    ${reviewPreview ? `<h3>Revisar manualmente</h3>${reviewPreview}` : ""}
+  `;
 }
 
 function fillClientCategorySelect(selectedName = "") {
@@ -1724,6 +1857,30 @@ function bindEvents() {
   $("newCategoryButton").addEventListener("click", resetCategoryForm);
   $("syncClientsButton").addEventListener("click", syncClientsFromScript);
   $("migrateImagesButton").addEventListener("click", migrateClientImagesToStorage);
+  $("analyzeDuplicatesButton").addEventListener("click", renderDuplicatesReport);
+  $("cleanupDuplicatesButton").addEventListener("click", async () => {
+    const plan = state.duplicateCleanupPlan || buildDuplicateCleanupPlan();
+    if (!plan.removeIds.length) {
+      showToast("Nenhum duplicado seguro para remover.");
+      return;
+    }
+    if (!confirm(`Remover ${plan.removeIds.length} clientes duplicados seguros?`)) return;
+    const updates = {};
+    plan.removeIds.forEach((id) => {
+      updates[`clientes/${id}`] = null;
+    });
+    await update(ref(db), updates);
+    state.clientes = state.clientes.filter((client) => !plan.removeIds.includes(client.id));
+    state.duplicateCleanupPlan = null;
+    sortClientsInState();
+    renderStats();
+    renderClientsList();
+    renderFinanceiro();
+    fillUserClientSelect();
+    fillEventClientSelect();
+    renderDuplicatesReport();
+    showToast("Duplicados seguros removidos.");
+  });
   $("clientSearch").addEventListener("input", renderClientsList);
   $("clientImagesUpload").addEventListener("change", async (event) => {
     await uploadClientImages(event.target.files);
@@ -1838,10 +1995,8 @@ function bindEvents() {
 
   $("deleteClientButton").addEventListener("click", async () => {
     if (!state.selectedClientId || !confirm("Excluir este cliente?")) return;
-    await remove(ref(db, `clientes/${state.selectedClientId}`));
+    await deleteClientById(state.selectedClientId);
     showToast("Cliente excluido.");
-    resetClientForm();
-    await loadAllData();
   });
 
   $("eventForm").addEventListener("submit", async (event) => {

@@ -673,6 +673,11 @@ button[type="submit"]:hover,
   font-weight: 800;
 }
 
+.client-actions {
+  display: grid;
+  gap: 8px;
+}
+
 .finance-row {
   grid-template-columns: minmax(220px, 1fr) 150px 130px 110px 80px minmax(160px, .8fr) auto;
   align-items: end;
@@ -699,6 +704,39 @@ button[type="submit"]:hover,
   display: grid;
   gap: 4px;
   font-size: 13px;
+}
+
+.duplicates-report {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: #f8fafc;
+  display: grid;
+  gap: 10px;
+}
+
+.duplicate-summary {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.duplicate-summary strong {
+  color: var(--brand);
+  font-size: 20px;
+}
+
+.duplicate-group {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+}
+
+.duplicate-group.review {
+  background: #fffbeb;
 }
 
 .import-report.ok {
