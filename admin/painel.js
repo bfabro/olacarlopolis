@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 43,
-  label: "v43",
+  numero: 44,
+  label: "v44",
   data: "2026-05-18",
-  nota: "Site publico mostra dias e horarios em grade compacta."
+  nota: "Onde comer tambem mostra horarios estruturados do painel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

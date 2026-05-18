@@ -1795,6 +1795,45 @@ screen and (width: 820px) {
   color: #888;
 }
 
+.onde-comer-horarios {
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.onde-comer-horarios summary {
+  cursor: pointer;
+  color: #26435f;
+  font-weight: 700;
+  list-style: none;
+}
+
+.onde-comer-horarios summary::-webkit-details-marker {
+  display: none;
+}
+
+.onde-comer-horarios summary i {
+  margin-right: 4px;
+}
+
+.onde-comer-horarios .horarios-publicos {
+  margin-top: 5px;
+  max-width: 100%;
+  gap: 3px;
+}
+
+.onde-comer-horarios .horario-publico-dia {
+  grid-template-columns: 68px minmax(0, 1fr);
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+.onde-comer-horario-texto {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #40536b;
+  line-height: 1.3;
+}
+
 .icon-link {
   display: flex;
   align-items: center;

@@ -4519,14 +4519,23 @@ carlopdiesel:"s",
     
       <h3>${est.name}</h3>
       
-    <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
+      <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
   ${est.address && est.address.trim().toLowerCase() !== "somente delivery"
           ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank">${est.address}</a>`
           : `<span style="color:#ff0000; font-weight:bold">${est.address}</span>`
         }
 </span>
 
-   
+${est.horarios ? `
+  <details class="onde-comer-horarios">
+    <summary><i class="fas fa-clock"></i> Dias e horarios</summary>
+    ${renderHorariosFuncionamento(est.horarios)}
+  </details>
+` : (est.hours ? `
+  <div class="onde-comer-horario-texto"><i class="fas fa-clock"></i> ${est.hours}</div>
+` : "")}
+
+ 
 
 
 ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact) ? `
