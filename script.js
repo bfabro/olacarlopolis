@@ -17690,11 +17690,11 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
   // Quando clicar no botão do menu APP
-  document.getElementById("menuApp").addEventListener("click", () => {
+  document.getElementById("menuApp")?.addEventListener("click", () => {
     document.getElementById("instalarAppBox").classList.remove("hidden");
   });
 
-  document.getElementById("btnInstalarPWA").addEventListener("click", () => {
+  document.getElementById("btnInstalarPWA")?.addEventListener("click", () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choiceResult) => {
@@ -17713,11 +17713,11 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
   // Quando clicar no botão DO RODAPE
-  document.getElementById("barraInstalacao").addEventListener("click", () => {
+  document.getElementById("barraInstalacao")?.addEventListener("click", () => {
     document.getElementById("instalarAppBox").classList.remove("hidden");
   });
 
-  document.getElementById("btnInstalarPWA").addEventListener("click", () => {
+  document.getElementById("btnInstalarPWA")?.addEventListener("click", () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choiceResult) => {

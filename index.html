@@ -130,15 +130,14 @@
 
    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
    <!--  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>-->
-   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
-   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
 
    <!-- Use a versão compatível do Firebase -->
    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -1600,7 +1599,7 @@
    </script>
 
    <!--  JavaScript -->
-   <script src="script.js?v=18"></script>
+   <script src="script.js?v=20"></script>
 
 
 
@@ -1628,7 +1627,7 @@
       // Firebase Realtime Database para "onlineUsers"
       const onlineUsersRef = firebase.database().ref("onlineUsers");
 
-      auth.onAuthStateChanged((user) => {
+      if (false && window.auth) auth.onAuthStateChanged((user) => {
          if (user) {
             // Busca o documento usando o UID do usuário que acabou de logar
             db.collection("usuarios").doc(user.uid).get().then((doc) => {
@@ -1673,15 +1672,15 @@
          const contador = document.getElementById("contador");
          const icone = document.getElementById("iconeUsuarios");
 
-         contador.innerText = userCount;
+         if (contador) contador.innerText = userCount;
 
          // Lógica para mudar a cor
          if (userCount > 1) {
             // contador.style.color = "blue";
-            icone.style.color = "red";
+            if (icone) icone.style.color = "red";
          } else {
-            contador.style.color = "";
-            icone.style.color = "";
+            if (contador) contador.style.color = "";
+            if (icone) icone.style.color = "";
          }
       });
 
