@@ -16077,7 +16077,9 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function pontuarFonteClienteAdmin(cliente) {
-    return cliente?.origem === "script.js" ? 0 : 1;
+    if (cliente?.editadoNoPainel || cliente?.origem === "painel") return 2;
+    if (cliente?.origem === "script.js") return 0;
+    return 1;
   }
 
   function chavesFortesClienteAdmin(clienteId, cliente) {
@@ -16097,10 +16099,10 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function melhorClienteAdmin(atual, candidato) {
     if (!atual) return candidato;
-    const atualizado = valorAtualizacaoClienteAdmin(candidato.cliente) - valorAtualizacaoClienteAdmin(atual.cliente);
-    if (atualizado) return atualizado > 0 ? candidato : atual;
     const fonte = pontuarFonteClienteAdmin(candidato.cliente) - pontuarFonteClienteAdmin(atual.cliente);
     if (fonte) return fonte > 0 ? candidato : atual;
+    const atualizado = valorAtualizacaoClienteAdmin(candidato.cliente) - valorAtualizacaoClienteAdmin(atual.cliente);
+    if (atualizado) return atualizado > 0 ? candidato : atual;
     return candidato;
   }
 

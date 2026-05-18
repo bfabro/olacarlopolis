@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 39,
-  label: "v39",
+  numero: 40,
+  label: "v40",
   data: "2026-05-18",
-  nota: "Importacao apenas cria ausentes e nunca substitui dados do Firebase."
+  nota: "Dados editados no painel vencem qualquer importacao antiga."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -270,7 +270,9 @@ function clientUpdatedValue(client) {
 }
 
 function clientSourceRank(client) {
-  return client?.origem === "script.js" ? 0 : 1;
+  if (client?.editadoNoPainel || client?.origem === "painel") return 2;
+  if (client?.origem === "script.js") return 0;
+  return 1;
 }
 
 function clientStrongKeys(client) {
@@ -293,10 +295,10 @@ function clientStrongKeys(client) {
 
 function chooseNewestClient(current, candidate) {
   if (!current) return candidate;
-  const updatedDiff = clientUpdatedValue(candidate) - clientUpdatedValue(current);
-  if (updatedDiff) return updatedDiff > 0 ? candidate : current;
   const sourceDiff = clientSourceRank(candidate) - clientSourceRank(current);
   if (sourceDiff) return sourceDiff > 0 ? candidate : current;
+  const updatedDiff = clientUpdatedValue(candidate) - clientUpdatedValue(current);
+  if (updatedDiff) return updatedDiff > 0 ? candidate : current;
   const completenessDiff = clientCompletenessScore(candidate) - clientCompletenessScore(current);
   return completenessDiff > 0 ? candidate : current;
 }
