@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 37,
-  label: "v37",
+  numero: 38,
+  label: "v38",
   data: "2026-05-18",
-  nota: "Clientes usam ID canonico e duplicados por categoria repetida sao removidos."
+  nota: "Foto de perfil salva no cliente canonico usado pelo site publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -857,28 +857,55 @@ async function uploadProfileImageForClient(clientId, file) {
   return getDownloadURL(fileRef);
 }
 
+async function saveProfileImageForCanonicalClient(client, targetId, url) {
+  const oldId = client?.id || "";
+  const { id: _ignored, ...clientData } = client || {};
+  const payload = cleanForFirebase({
+    ...clientData,
+    imagem: url,
+    origem: "painel",
+    editadoNoPainel: true,
+    imagemAtualizadaEm: Date.now(),
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  });
+  const updates = { [`clientes/${targetId}`]: payload };
+  if (oldId && oldId !== targetId) updates[`clientes/${oldId}`] = null;
+  state.usuarios.filter((user) => user.clienteId === oldId && oldId !== targetId).forEach((user) => {
+    updates[`usuariosByUid/${user.uid}/clienteId`] = targetId;
+  });
+  if (state.profile?.clienteId === oldId && oldId !== targetId) {
+    updates[`usuariosByUid/${state.user.uid}/clienteId`] = targetId;
+  }
+  await update(ref(db), updates);
+  state.clientes = state.clientes.filter((item) => item.id !== oldId || oldId === targetId);
+  upsertClientInState(targetId, payload);
+  if (state.selectedClientId === oldId) state.selectedClientId = targetId;
+  if (state.profile?.clienteId === oldId) state.profile.clienteId = targetId;
+  state.usuarios.filter((user) => user.clienteId === oldId).forEach((user) => { user.clienteId = targetId; });
+  return payload;
+}
+
 async function uploadClientProfileImage(file) {
   if (!file) return;
-  const currentId = $("clientId").value || slugify($("clientName").value.trim());
-  if (!currentId) {
+  const name = $("clientName").value.trim();
+  const category = $("clientNewCategory").value.trim() || $("clientCategory").value.trim() || $("clientForm").dataset.originalCategory || "Outros";
+  const targetId = getCanonicalClientId(category, name);
+  if (!targetId) {
     showToast("Informe o nome do cliente antes de enviar a foto.");
     $("clientProfileUpload").value = "";
     return;
   }
 
   showToast("Enviando foto de perfil...");
-  const url = await uploadProfileImageForClient(currentId, file);
+  const url = await uploadProfileImageForClient(targetId, file);
+  $("clientId").value = targetId;
   $("clientImage").value = url;
   renderProfilePreview("clientImage", "clientProfilePreview");
 
   if (state.selectedClientId) {
-    await update(ref(db, `clientes/${currentId}`), {
-      imagem: url,
-      updatedAt: serverTimestamp(),
-      updatedBy: state.user?.uid || ""
-    });
-    const index = state.clientes.findIndex((client) => client.id === currentId);
-    if (index >= 0) state.clientes[index] = { ...state.clientes[index], imagem: url };
+    const sourceClient = state.clientes.find((client) => client.id === state.selectedClientId || client.id === targetId) || {};
+    await saveProfileImageForCanonicalClient(sourceClient, targetId, url);
     renderClientsList();
   }
 
@@ -1583,14 +1610,11 @@ function renderClientOnlyEditor() {
     const file = event.target.files?.[0];
     if (!file) return;
     showToast("Enviando foto de perfil...");
-    const url = await uploadProfileImageForClient(client.id, file);
+    const targetId = clientCanonicalId(client);
+    const url = await uploadProfileImageForClient(targetId, file);
     $("coImage").value = url;
     renderProfilePreview("coImage", "coProfilePreview");
-    await update(ref(db, `clientes/${client.id}`), {
-      imagem: url,
-      updatedAt: serverTimestamp(),
-      updatedBy: state.user.uid
-    });
+    await saveProfileImageForCanonicalClient(client, targetId, url);
     showToast("Foto de perfil salva.");
     await loadAllData();
     renderClientOnlyEditor();
