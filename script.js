@@ -15817,6 +15817,16 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   let ADMIN_CLIENTES_PROMISE = null;
   let ADMIN_CLIENTES_LAST_APPLIED = 0;
+  const ADMIN_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+    authDomain: "contadoracessos.firebaseapp.com",
+    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+    projectId: "contadoracessos",
+    storageBucket: "contadoracessos.firebasestorage.app",
+    messagingSenderId: "521517291315",
+    appId: "1:521517291315:web:74f8d878d2d8769460d046",
+    measurementId: "G-BXPWYWK61F"
+  };
 
   function adminSlug(text) {
     return String(text || "")
@@ -15828,15 +15838,28 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function esperarFirebaseDatabase() {
-    if (window.firebase && firebase.database) return Promise.resolve(firebase.database());
+    function getDatabaseIfReady() {
+      if (!window.firebase || !firebase.database) return null;
+      try {
+        if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(ADMIN_FIREBASE_CONFIG);
+        return firebase.database();
+      } catch (error) {
+        console.warn("Firebase ainda nao inicializado para clientes admin.", error);
+        return null;
+      }
+    }
+
+    const ready = getDatabaseIfReady();
+    if (ready) return Promise.resolve(ready);
 
     return new Promise((resolve) => {
       let tentativas = 0;
       const timer = setInterval(() => {
         tentativas += 1;
-        if (window.firebase && firebase.database) {
+        const db = getDatabaseIfReady();
+        if (db) {
           clearInterval(timer);
-          resolve(firebase.database());
+          resolve(db);
         } else if (tentativas >= 30) {
           clearInterval(timer);
           resolve(null);
@@ -15867,16 +15890,22 @@ plotarPinsImoveis(stateImoveis.filtered);
     return Object.prototype.hasOwnProperty.call(obj || {}, campo);
   }
 
-  function clienteAdminCombinaComEstabelecimento(clienteId, cliente, est) {
+  function pontuarClienteAdminParaEstabelecimento(clienteId, cliente, est, categoriaSlug = "") {
     const alvoId = normalizeName(clienteId);
     const alvoNome = normalizeName(cliente?.nomeNormalizado || cliente?.nome || "");
     const estId = normalizeName(est?.nomeNormalizado || est?.name || "");
-    if (!estId) return false;
+    if (!estId) return 0;
 
-    return estId === alvoId
-      || (alvoNome && estId === alvoNome)
-      || (alvoId && alvoId.endsWith(estId))
-      || (estId && alvoId.includes(estId));
+    if (alvoNome && estId === alvoNome) return 100;
+    if (estId === alvoId) return 95;
+    if (categoriaSlug && alvoId === `${categoriaSlug}-${estId}`) return 92;
+    if (categoriaSlug && alvoId.startsWith(`${categoriaSlug}-`) && alvoId.slice(categoriaSlug.length + 1) === estId) return 90;
+    if (alvoId.endsWith(`-${estId}`)) return 45;
+    return 0;
+  }
+
+  function clienteAdminCombinaComEstabelecimento(clienteId, cliente, est, categoriaSlug = "") {
+    return pontuarClienteAdminParaEstabelecimento(clienteId, cliente, est, categoriaSlug) > 0;
   }
 
   function valorAtualizacaoClienteAdmin(cliente) {
@@ -15889,15 +15918,24 @@ plotarPinsImoveis(stateImoveis.filtered);
     return 0;
   }
 
+  function clienteAdminTemCategoria(cliente, categoriaSlug) {
+    if (!categoriaSlug) return true;
+    const categoriaCliente = normalizeName(cliente?.categoria || cliente?.categoriaId || "");
+    return !categoriaCliente || categoriaCliente === categoriaSlug;
+  }
+
   function escolherClienteAdminParaEstabelecimento(candidatos, categoriaSlug) {
     return candidatos
       .map((item) => ({
         ...item,
-        categoriaCorreta: !categoriaSlug || normalizeName(item.cliente?.categoria || "") === categoriaSlug,
+        score: pontuarClienteAdminParaEstabelecimento(item.clienteId, item.cliente, item.est, categoriaSlug),
+        categoriaCorreta: clienteAdminTemCategoria(item.cliente, categoriaSlug),
         atualizadoEm: valorAtualizacaoClienteAdmin(item.cliente)
       }))
+      .filter((item) => item.score > 0)
       .sort((a, b) => {
         if (a.categoriaCorreta !== b.categoriaCorreta) return a.categoriaCorreta ? -1 : 1;
+        if (a.score !== b.score) return b.score - a.score;
         return b.atualizadoEm - a.atualizadoEm;
       })[0];
   }
@@ -16035,8 +16073,8 @@ plotarPinsImoveis(stateImoveis.filtered);
           const catSlug = normalizeName(cat.title || "");
           (cat.establishments || []).forEach((est) => {
             const candidatos = Object.entries(clientes)
-              .filter(([clienteId, cliente]) => clienteAdminCombinaComEstabelecimento(clienteId, cliente, est))
-              .map(([clienteId, cliente]) => ({ clienteId, cliente }));
+              .map(([clienteId, cliente]) => ({ clienteId, cliente, est }))
+              .filter((item) => clienteAdminCombinaComEstabelecimento(item.clienteId, item.cliente, item.est, catSlug));
             const escolhido = escolherClienteAdminParaEstabelecimento(candidatos, catSlug);
             if (escolhido) {
               aplicarClienteAdminNoEstabelecimento(est, escolhido.cliente);
@@ -16050,15 +16088,14 @@ plotarPinsImoveis(stateImoveis.filtered);
           categories.forEach((cat) => {
             const catSlug = normalizeName(cat.title || "");
             (cat.establishments || []).forEach((est) => {
-              const mesmaCategoria = !normalizeName(cliente.categoria || "") || normalizeName(cliente.categoria || "") === catSlug;
-              if (mesmaCategoria && clienteAdminCombinaComEstabelecimento(clienteId, cliente, est)) encontrado = true;
+              if (clienteAdminTemCategoria(cliente, catSlug) && clienteAdminCombinaComEstabelecimento(clienteId, cliente, est, catSlug)) encontrado = true;
             });
           });
 
           if (!encontrado && clienteAdminPodeAparecer(cliente)) {
             const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros");
             const jaExisteNaCategoria = (categoria.establishments || []).some((est) => {
-              return clienteAdminCombinaComEstabelecimento(clienteId, cliente, est);
+              return clienteAdminCombinaComEstabelecimento(clienteId, cliente, est, normalizeName(categoria.title || ""));
             });
             if (!jaExisteNaCategoria) {
               categoria.establishments = categoria.establishments || [];
