@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 16,
-  label: "v16",
+  numero: 17,
+  label: "v17",
   data: "2026-05-18",
-  nota: "Dados alterados no painel passam a sobrescrever o site publico."
+  nota: "Carrega do Firebase e completa clientes importados automaticamente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -422,6 +422,60 @@ async function loadAllData() {
   fillEventClientSelect();
   renderEventsList();
   renderFinanceiro();
+
+  await autoEnsureImportedClients();
+}
+
+async function getScriptImportSource() {
+  const scriptUrl = new URL("../script.js", window.location.href);
+  scriptUrl.searchParams.set("importVersion", String(Date.now()));
+  const res = await fetch(scriptUrl.toString(), { cache: "reload" });
+  if (!res.ok) throw new Error(`Falha ao buscar script.js: HTTP ${res.status}`);
+  const code = await res.text();
+  const match = code.match(/const\s+categories\s*=\s*(\[[\s\S]*?\]);/m);
+  if (!match) throw new Error("Nao encontrei a lista categories no script.js.");
+
+  const statusMatch = code.match(/const\s+statusEstabelecimentos\s*=\s*(\{[\s\S]*?\});?/m);
+  const statusMap = statusMatch
+    ? new Function(`return (${statusMatch[1].replace(/,(\s*[}\]])/g, "$1")});`)()
+    : {};
+
+  const safeCode = match[1].replace(/document\.querySelector\([^)]+\)/g, "null");
+  const categories = new Function(`return (${safeCode});`)();
+  const expectedClientIds = new Set();
+  categories.forEach((category) => {
+    const categoryName = category.title || "Outros";
+    (category.establishments || []).forEach((est) => {
+      const name = est.name || est.nome;
+      if (name) expectedClientIds.add(getImportClientId(categoryName, name));
+    });
+  });
+  const totalClients = expectedClientIds.size;
+
+  return { categories, statusMap, totalClients };
+}
+
+let autoImportRunning = false;
+
+async function autoEnsureImportedClients() {
+  if (autoImportRunning || !canManageClients()) return;
+
+  try {
+    autoImportRunning = true;
+    const source = await getScriptImportSource();
+    const { totalClients } = source;
+    if (!totalClients || state.clientes.length >= totalClients) return;
+
+    showImportReport([
+      `Firebase carregou ${state.clientes.length}/${totalClients} clientes.`,
+      "Completando importacao automaticamente..."
+    ], "info");
+    await syncClientsFromScript({ silent: true, source });
+  } catch (error) {
+    console.warn("Nao foi possivel completar clientes automaticamente.", error);
+  } finally {
+    autoImportRunning = false;
+  }
 }
 
 function renderStats() {
@@ -1261,25 +1315,12 @@ function renderImagesMarkup(images, prefix) {
   `).join("");
 }
 
-async function syncClientsFromScript() {
+async function syncClientsFromScript(options = {}) {
+  const { silent = false, source = null } = options;
   const button = $("syncClientsButton");
-  setBusy(button, true, "Importando...");
+  if (!silent) setBusy(button, true, "Importando...");
   try {
-    const scriptUrl = new URL("../script.js", window.location.href);
-    scriptUrl.searchParams.set("importVersion", String(Date.now()));
-    const res = await fetch(scriptUrl.toString(), { cache: "reload" });
-    if (!res.ok) throw new Error(`Falha ao buscar script.js: HTTP ${res.status}`);
-    const code = await res.text();
-    const match = code.match(/const\s+categories\s*=\s*(\[[\s\S]*?\]);/m);
-    if (!match) throw new Error("Nao encontrei a lista categories no script.js.");
-
-    const statusMatch = code.match(/const\s+statusEstabelecimentos\s*=\s*(\{[\s\S]*?\});?/m);
-    const statusMap = statusMatch
-      ? new Function(`return (${statusMatch[1].replace(/,(\s*[}\]])/g, "$1")});`)()
-      : {};
-
-    const safeCode = match[1].replace(/document\.querySelector\([^)]+\)/g, "null");
-    const categories = new Function(`return (${safeCode});`)();
+    const { categories, statusMap } = source || await getScriptImportSource();
     const categoryPayloads = [];
     const clientPayloads = [];
     const importStats = {
@@ -1356,29 +1397,44 @@ async function syncClientsFromScript() {
       "Gravando clientes no Firebase..."
     ]);
 
-    for (let i = 0; i < clientPayloads.length; i += 1) {
-      const item = clientPayloads[i];
+    const chunkSize = 25;
+    for (let i = 0; i < clientPayloads.length; i += chunkSize) {
+      const chunk = clientPayloads.slice(i, i + chunkSize);
+      const updates = {};
+      chunk.forEach((item) => {
+        updates[`clientes/${item.id}`] = item.data;
+      });
       try {
-        await set(ref(db, `clientes/${item.id}`), item.data);
-        importStats.clientesSalvos += 1;
-        upsertClientInState(item.id, item.data);
+        await update(ref(db), updates);
+        chunk.forEach((item) => upsertClientInState(item.id, item.data));
+        importStats.clientesSalvos += chunk.length;
       } catch (err) {
-        importStats.erros.push(`Cliente ${item.data.nome || item.id}: ${err.code || err.message}`);
+        chunk.forEach((item) => {
+          importStats.erros.push(`Cliente ${item.data.nome || item.id}: ${err.code || err.message}`);
+        });
       }
-      if ((i + 1) % 20 === 0 || i + 1 === clientPayloads.length) {
+      if ((i + chunk.length) % 25 === 0 || i + chunk.length === clientPayloads.length) {
         showImportReport([
           `Clientes salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
+          `Ja existiam no Firebase: ${importStats.clientesExistentes}`,
           `Erros: ${importStats.erros.length}`
         ], importStats.erros.length ? "error" : "info");
       }
     }
 
-    for (const item of categoryPayloads) {
+    for (let i = 0; i < categoryPayloads.length; i += chunkSize) {
+      const chunk = categoryPayloads.slice(i, i + chunkSize);
+      const updates = {};
+      chunk.forEach((item) => {
+        updates[`categorias/${item.id}`] = item.data;
+      });
       try {
-        await set(ref(db, `categorias/${item.id}`), item.data);
-        importStats.categoriasSalvas += 1;
+        await update(ref(db), updates);
+        importStats.categoriasSalvas += chunk.length;
       } catch (err) {
-        importStats.erros.push(`Categoria ${item.data.nome || item.id}: ${err.code || err.message}`);
+        chunk.forEach((item) => {
+          importStats.erros.push(`Categoria ${item.data.nome || item.id}: ${err.code || err.message}`);
+        });
       }
     }
 
@@ -1421,7 +1477,7 @@ async function syncClientsFromScript() {
     ], "error");
     showToast(error.message || "Falha ao importar clientes. Abra o console para detalhes.");
   } finally {
-    setBusy(button, false);
+    if (!silent) setBusy(button, false);
   }
 }
 
