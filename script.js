@@ -16088,6 +16088,42 @@ plotarPinsImoveis(stateImoveis.filtered);
     };
   }
 
+  function encontrarEstabelecimentoBaseAdmin(clienteId, cliente, categoriaTitulo = "") {
+    let melhor = null;
+    let melhorScore = 0;
+    (categories || []).forEach((cat) => {
+      const catSlug = normalizeName(cat.title || "");
+      if (categoriaTitulo && catSlug !== normalizeName(categoriaTitulo)) return;
+      (cat.establishments || []).forEach((est) => {
+        const score = pontuarClienteAdminParaEstabelecimento(clienteId, cliente, est, catSlug);
+        if (score > melhorScore) {
+          melhor = est;
+          melhorScore = score;
+        }
+      });
+    });
+    return melhor;
+  }
+
+  function enriquecerClienteComBaseAdmin(clienteId, cliente) {
+    const base = encontrarEstabelecimentoBaseAdmin(clienteId, cliente, cliente?.categoria || "");
+    if (!base) return cliente;
+    return {
+      ...cliente,
+      horarios: cliente.horarios || base.horarios || null,
+      horario: cliente.horario || base.hours || "",
+      imagem: cliente.imagem || base.image || "",
+      imagens: Array.isArray(cliente.imagens) && cliente.imagens.length
+        ? cliente.imagens
+        : (Array.isArray(base.novidadesImages)
+          ? base.novidadesImages.slice(0, 10).map((url, index) => ({
+            url,
+            texto: (base.novidadesDescriptions || [])[index] || ""
+          }))
+          : cliente.imagens)
+    };
+  }
+
   function definirStatusClienteAdmin(cliente, clienteId) {
     const keys = [
       normalizeName(clienteId),
@@ -16144,9 +16180,10 @@ plotarPinsImoveis(stateImoveis.filtered);
   function consolidarClientesAdmin(clientes) {
     const grupos = [];
     Object.entries(clientes || {}).forEach(([clienteId, cliente]) => {
-      const keys = chavesFortesClienteAdmin(clienteId, cliente);
+      const clienteCompleto = enriquecerClienteComBaseAdmin(clienteId, cliente);
+      const keys = chavesFortesClienteAdmin(clienteId, clienteCompleto);
       const grupo = grupos.find((item) => keys.some((key) => item.keys.has(key)));
-      const item = { clienteId, cliente };
+      const item = { clienteId, cliente: clienteCompleto };
       if (grupo) {
         keys.forEach((key) => grupo.keys.add(key));
         grupo.item = melhorClienteAdmin(grupo.item, item);

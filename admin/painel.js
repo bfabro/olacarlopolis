@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 45,
-  label: "v45",
+  numero: 46,
+  label: "v46",
   data: "2026-05-18",
-  nota: "Onde comer mantem filtro abertos e destaca status por horario."
+  nota: "Onde comer usa horarios base quando Firebase ainda nao tem tabela."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1809,6 +1809,18 @@ async function syncClientsFromScript(options = {}) {
         const id = getImportClientId(categoryName, name);
         const existing = findExistingClientForImport(categoryName, name);
         if (existing.id) {
+          if (!existing.editadoNoPainel && !existing.horarios && est.horarios) {
+            clientPayloads.push({
+              id: existing.id,
+              data: cleanForFirebase({
+                ...existing,
+                horarios: est.horarios,
+                horario: existing.horario || est.hours || "",
+                updatedAt: existing.updatedAt || serverTimestamp(),
+                updatedBy: existing.updatedBy || state.user.uid
+              })
+            });
+          }
           importStats.clientesExistentes += 1;
           return;
         }
@@ -1834,6 +1846,7 @@ async function syncClientsFromScript(options = {}) {
           whatsapp: est.whatsapp || "",
           endereco: est.address || "",
           horario: est.hours || "",
+          ...(est.horarios ? { horarios: est.horarios } : {}),
           instagram: est.instagram || "",
           facebook: est.facebook || "",
           imagem: est.image || "",
