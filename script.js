@@ -16087,10 +16087,10 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function melhorClienteAdmin(atual, candidato) {
     if (!atual) return candidato;
-    const fonte = pontuarFonteClienteAdmin(candidato.cliente) - pontuarFonteClienteAdmin(atual.cliente);
-    if (fonte) return fonte > 0 ? candidato : atual;
     const atualizado = valorAtualizacaoClienteAdmin(candidato.cliente) - valorAtualizacaoClienteAdmin(atual.cliente);
     if (atualizado) return atualizado > 0 ? candidato : atual;
+    const fonte = pontuarFonteClienteAdmin(candidato.cliente) - pontuarFonteClienteAdmin(atual.cliente);
+    if (fonte) return fonte > 0 ? candidato : atual;
     return candidato;
   }
 

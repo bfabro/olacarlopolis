@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 34,
-  label: "v34",
+  numero: 36,
+  label: "v36",
   data: "2026-05-18",
-  nota: "Firebase passa a ser a fonte principal de clientes no painel e no site."
+  nota: "Painel lista clientes pelo ultimo dado atualizado no Firebase."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -235,7 +235,11 @@ function findExistingClientForImport(categoryName, clientName) {
 }
 
 function sortClientsInState() {
-  state.clientes.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+  state.clientes.sort((a, b) => {
+    const updated = clientUpdatedValue(b) - clientUpdatedValue(a);
+    if (updated) return updated;
+    return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+  });
 }
 
 function clientUpdatedValue(client) {
@@ -267,10 +271,10 @@ function clientStrongKeys(client) {
 
 function chooseNewestClient(current, candidate) {
   if (!current) return candidate;
-  const sourceDiff = clientSourceRank(candidate) - clientSourceRank(current);
-  if (sourceDiff) return sourceDiff > 0 ? candidate : current;
   const updatedDiff = clientUpdatedValue(candidate) - clientUpdatedValue(current);
   if (updatedDiff) return updatedDiff > 0 ? candidate : current;
+  const sourceDiff = clientSourceRank(candidate) - clientSourceRank(current);
+  if (sourceDiff) return sourceDiff > 0 ? candidate : current;
   const completenessDiff = clientCompletenessScore(candidate) - clientCompletenessScore(current);
   return completenessDiff > 0 ? candidate : current;
 }
@@ -705,6 +709,8 @@ function getClientFormData() {
     cardapioLink: $("clientMenuLink").value.trim(),
     infoAdicional: $("clientInfo").value.trim(),
     observacaoAdmin: $("clientAdminNote").value.trim(),
+    origem: "painel",
+    editadoNoPainel: true,
     updatedAt: serverTimestamp(),
     updatedBy: state.user?.uid || ""
   };
@@ -1467,6 +1473,8 @@ function renderFinanceiro() {
       if (!isMaster()) delete payload.valorPlano;
       payload.updatedAt = serverTimestamp();
       payload.updatedBy = state.user?.uid || "";
+      payload.origem = "painel";
+      payload.editadoNoPainel = true;
       await update(ref(db, `clientes/${id}`), payload);
       const index = state.clientes.findIndex((client) => client.id === id);
       if (index >= 0) state.clientes[index] = { ...state.clientes[index], ...payload };
@@ -1659,6 +1667,8 @@ function renderClientOnlyEditor() {
       imagens,
       cardapioLink: $("coMenuLink").value.trim(),
       infoAdicional: $("coInfo").value.trim(),
+      origem: "painel",
+      editadoNoPainel: true,
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     };
