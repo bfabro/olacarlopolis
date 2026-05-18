@@ -15890,18 +15890,38 @@ plotarPinsImoveis(stateImoveis.filtered);
     return Object.prototype.hasOwnProperty.call(obj || {}, campo);
   }
 
+  function preservarIdentidadeAdminEstabelecimento(est) {
+    if (!est || est.__adminIdentityReady) return;
+    est.__adminOriginalName = est.name || "";
+    est.__adminOriginalSlug = normalizeName(est.nomeNormalizado || est.name || "");
+    est.__adminIdentityReady = true;
+  }
+
+  function slugsEstabelecimentoAdmin(est) {
+    preservarIdentidadeAdminEstabelecimento(est);
+    return [
+      normalizeName(est?.nomeNormalizado || ""),
+      normalizeName(est?.__adminOriginalSlug || ""),
+      normalizeName(est?.__adminOriginalName || ""),
+      normalizeName(est?.name || "")
+    ].filter(Boolean);
+  }
+
   function pontuarClienteAdminParaEstabelecimento(clienteId, cliente, est, categoriaSlug = "") {
     const alvoId = normalizeName(clienteId);
     const alvoNome = normalizeName(cliente?.nomeNormalizado || cliente?.nome || "");
-    const estId = normalizeName(est?.nomeNormalizado || est?.name || "");
-    if (!estId) return 0;
+    const estSlugs = slugsEstabelecimentoAdmin(est);
+    if (!estSlugs.length) return 0;
 
-    if (alvoNome && estId === alvoNome) return 100;
-    if (estId === alvoId) return 95;
-    if (categoriaSlug && alvoId === `${categoriaSlug}-${estId}`) return 92;
-    if (categoriaSlug && alvoId.startsWith(`${categoriaSlug}-`) && alvoId.slice(categoriaSlug.length + 1) === estId) return 90;
-    if (alvoId.endsWith(`-${estId}`)) return 45;
-    return 0;
+    let melhor = 0;
+    estSlugs.forEach((estId) => {
+      if (alvoNome && estId === alvoNome) melhor = Math.max(melhor, 100);
+      if (estId === alvoId) melhor = Math.max(melhor, 95);
+      if (categoriaSlug && alvoId === `${categoriaSlug}-${estId}`) melhor = Math.max(melhor, 92);
+      if (categoriaSlug && alvoId.startsWith(`${categoriaSlug}-`) && alvoId.slice(categoriaSlug.length + 1) === estId) melhor = Math.max(melhor, 90);
+      if (alvoId.endsWith(`-${estId}`)) melhor = Math.max(melhor, 45);
+    });
+    return melhor;
   }
 
   function clienteAdminCombinaComEstabelecimento(clienteId, cliente, est, categoriaSlug = "") {
@@ -15942,8 +15962,10 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function aplicarClienteAdminNoEstabelecimento(est, cliente) {
     if (!est || !cliente) return;
+    preservarIdentidadeAdminEstabelecimento(est);
 
     if (campoExiste(cliente, "nome")) est.name = cliente.nome || est.name;
+    est.nomeNormalizado = est.__adminOriginalSlug || normalizeName(est.name);
     const imagensAdmin = Array.isArray(cliente.imagens)
       ? cliente.imagens.map((item) => typeof item === "string" ? { url: item, texto: "" } : item).filter((item) => item && item.url)
       : [];
@@ -16120,6 +16142,27 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
   }
 
+  function renderizarTelaAtualComDadosAdmin() {
+    try {
+      montarCarrosselDivulgacao();
+      montarGradeEventos();
+    } catch (e) { }
+
+    const h = (location.hash || "").toLowerCase();
+    if (!h) return;
+
+    try {
+      if (h === "#ondecomer") return mostrarOndeComer();
+      if (h === "#promocoes" || h.startsWith("#promocoes-")) return mostrarPromocoes(getPromoFiltroFromHash());
+      const categoriaMatch = h.match(/^#comercios-(.+)$/);
+      if (categoriaMatch) {
+        const slug = categoriaMatch[1];
+        const cat = categories.find((item) => normalizeName(item.title) === slug);
+        if (cat) return loadContent(cat.title, cat.establishments);
+      }
+    } catch (e) { }
+  }
+
   document.getElementById("menuPromocoes").addEventListener("click", function (e) {
     e.preventDefault();
     location.hash = "promocoes";
@@ -16165,9 +16208,9 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
   });
 
 
-  montarCarrosselDivulgacao(); // Agora sim, já com categories carregado
+  aplicarDadosAdminClientes().then(renderizarTelaAtualComDadosAdmin);
   window.addEventListener("DOMContentLoaded", () => {
-    montarGradeEventos();
+    aplicarDadosAdminClientes().then(renderizarTelaAtualComDadosAdmin);
   });
 
 
