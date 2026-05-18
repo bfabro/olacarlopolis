@@ -4474,10 +4474,10 @@ carlopdiesel:"s",
         const aberto = estaAbertoAgora(est.horarios);
         if (aberto) {
           const fechamento = horarioFechamentoAtual(est.horarios);
-          statusAberto = `<span class='status-tag aberto'>ABERTO${fechamento ? ' ATÉ ' + fechamento : ''}</span>`;
+          statusAberto = `<div class="onde-comer-status-row"><span class="onde-comer-status aberto"><i class="fas fa-circle"></i> ABERTO</span>${fechamento ? `<span class="onde-comer-status-hora">ate ${fechamento}</span>` : ""}</div>`;
         } else {
           const proximo = proximoHorarioDeAbertura(est.horarios);
-          statusAberto = `<span class='status-tag fechado'>FECHADO</span> <span class='status-tag proximo'>Abre: ${proximo}</span>`;
+          statusAberto = `<div class="onde-comer-status-row"><span class="onde-comer-status fechado"><i class="fas fa-circle"></i> FECHADO</span>${proximo ? `<span class="onde-comer-status-hora">abre ${proximo}</span>` : ""}</div>`;
         }
       }
       html += `
@@ -4509,15 +4509,11 @@ carlopdiesel:"s",
       <i class="fa-brands fa-instagram"></i>
     </a>
   ` : ''}
-</span>${est.horarios ? `
-   <span class="status-tag_comer ${estaAbertoAgora(est.horarios) ? 'aberto' : 'fechado'}">
-  ${estaAbertoAgora(est.horarios)
-            ? `ABERTO <div class="ate-hora">até ${horarioFechamentoAtual(est.horarios) || '--:--'}</div>`
-            : 'FECHADO'}
-</span>` : ""}
+</span>
 
-    
+     
       <h3>${est.name}</h3>
+      ${statusAberto}
       
       <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
   ${est.address && est.address.trim().toLowerCase() !== "somente delivery"
