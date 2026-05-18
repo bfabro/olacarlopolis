@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 38,
-  label: "v38",
+  numero: 39,
+  label: "v39",
   data: "2026-05-18",
-  nota: "Foto de perfil salva no cliente canonico usado pelo site publico."
+  nota: "Importacao apenas cria ausentes e nunca substitui dados do Firebase."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -623,24 +623,7 @@ async function getScriptImportSource() {
 let autoImportRunning = false;
 
 async function autoEnsureImportedClients() {
-  if (autoImportRunning || !canManageClients()) return;
-
-  try {
-    autoImportRunning = true;
-    const source = await getScriptImportSource();
-    const { totalClients } = source;
-    if (!totalClients || state.clientes.length >= totalClients) return;
-
-    showImportReport([
-      `Firebase carregou ${state.clientes.length}/${totalClients} clientes.`,
-      "Completando importacao automaticamente..."
-    ], "info");
-    await syncClientsFromScript({ silent: true, source });
-  } catch (error) {
-    console.warn("Nao foi possivel completar clientes automaticamente.", error);
-  } finally {
-    autoImportRunning = false;
-  }
+  return;
 }
 
 function renderStats() {
@@ -1745,8 +1728,9 @@ function renderImagesMarkup(images, prefix) {
 async function syncClientsFromScript(options = {}) {
   const { silent = false, source = null } = options;
   const button = $("syncClientsButton");
-  if (!silent) setBusy(button, true, "Importando...");
+  if (!silent) setBusy(button, true, "Importando ausentes...");
   try {
+    await loadAllData();
     const { categories, statusMap } = source || await getScriptImportSource();
     const categoryPayloads = [];
     const clientPayloads = [];
@@ -1755,6 +1739,7 @@ async function syncClientsFromScript(options = {}) {
       clientes: 0,
       clientesSalvos: 0,
       clientesExistentes: 0,
+      categoriasExistentes: 0,
       categoriasSalvas: 0,
       erros: []
     };
@@ -1764,22 +1749,25 @@ async function syncClientsFromScript(options = {}) {
       const categoryId = slugify(categoryName);
       const existingCategory = state.categorias.find((cat) => cat.id === categoryId) || {};
       importStats.categorias += 1;
+      if (existingCategory.id) {
+        importStats.categoriasExistentes += 1;
+      } else {
       categoryPayloads.push({
         id: categoryId,
         data: cleanForFirebase({
-        ...existingCategory,
         nome: categoryName,
         nomeNormalizado: normalizeName(categoryName),
-        parentId: existingCategory.parentId || "",
-        icon: existingCategory.icon || "fa-solid fa-store",
-        iconColor: existingCategory.iconColor || "#2563eb",
-        status: existingCategory.status || "ativo",
-        ordem: existingCategory.ordem ?? importStats.categorias,
-        origem: existingCategory.origem || "script.js",
+        parentId: "",
+        icon: "fa-solid fa-store",
+        iconColor: "#2563eb",
+        status: "ativo",
+        ordem: importStats.categorias,
+        origem: "script.js",
         updatedAt: serverTimestamp(),
         updatedBy: state.user.uid
         })
       });
+      }
 
       (category.establishments || []).forEach((est) => {
         const name = est.name || est.nome;
@@ -1856,8 +1844,8 @@ async function syncClientsFromScript(options = {}) {
       }
       if ((i + chunk.length) % 25 === 0 || i + chunk.length === clientPayloads.length) {
         showImportReport([
-          `Clientes salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
-          `Ja existiam no Firebase: ${importStats.clientesExistentes}`,
+          `Clientes novos salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
+          `Existentes preservados: ${importStats.clientesExistentes}`,
           `Erros: ${importStats.erros.length}`
         ], importStats.erros.length ? "error" : "info");
       }
@@ -1891,10 +1879,11 @@ async function syncClientsFromScript(options = {}) {
     }
 
     const report = [
-      `Importacao concluida.`,
-      `Clientes salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
-      `Clientes ja existentes mantidos: ${importStats.clientesExistentes}`,
-      `Categorias salvas: ${importStats.categoriasSalvas}/${importStats.categorias}`,
+      `Importacao segura concluida.`,
+      `Clientes novos salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
+      `Clientes existentes preservados: ${importStats.clientesExistentes}`,
+      `Categorias novas salvas: ${importStats.categoriasSalvas}/${importStats.categorias}`,
+      `Categorias existentes preservadas: ${importStats.categoriasExistentes}`,
       `Clientes na tela: ${state.clientes.length}`
     ];
     if (importStats.erros.length) {
@@ -1902,7 +1891,7 @@ async function syncClientsFromScript(options = {}) {
       report.push(...importStats.erros.slice(0, 5));
     }
     showImportReport(report, importStats.erros.length ? "error" : "ok");
-    showToast(`Importacao concluida: ${importStats.clientesSalvos} clientes salvos.`);
+    showToast(`Importacao segura: ${importStats.clientesSalvos} clientes novos.`);
     sortClientsInState();
     renderStats();
     renderClientsList();
