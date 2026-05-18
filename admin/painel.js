@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 31,
-  label: "v31",
+  numero: 32,
+  label: "v32",
   data: "2026-05-18",
-  nota: "Painel analisa e limpa clientes duplicados com confirmacao."
+  nota: "Clientes salvam vinculos publicos para refletir edicoes no site."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -120,6 +120,45 @@ function normalizeName(text) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
+}
+
+function addAliasKey(target, value) {
+  const slug = slugify(value);
+  const normalized = normalizeName(value);
+  if (slug) target[slug] = true;
+  if (normalized) target[normalized] = true;
+}
+
+function buildClientPublicAliases(clientId, payload, sourceClient = null, useFormContext = true) {
+  const form = useFormContext ? $("clientForm") : null;
+  const aliases = { ...(sourceClient?.aliases || {}) };
+  const add = (value) => addAliasKey(aliases, value);
+  const names = [
+    clientId,
+    payload?.nome,
+    payload?.nomeNormalizado,
+    sourceClient?.id,
+    sourceClient?.nome,
+    sourceClient?.name,
+    sourceClient?.nomeNormalizado,
+    form?.dataset.originalClientId,
+    form?.dataset.originalName
+  ].filter(Boolean);
+  const categories = [
+    payload?.categoria,
+    payload?.categoriaId,
+    sourceClient?.categoria,
+    sourceClient?.categoriaId,
+    sourceClient?.category,
+    form?.dataset.originalCategory
+  ].filter(Boolean);
+
+  names.forEach(add);
+  categories.forEach((category) => {
+    names.forEach((name) => add(`${category}-${name}`));
+  });
+
+  return aliases;
 }
 
 function canManageClients() {
@@ -564,6 +603,8 @@ function resetClientForm() {
   state.clientImages = [];
   $("clientForm").reset();
   delete $("clientForm").dataset.originalCategory;
+  delete $("clientForm").dataset.originalClientId;
+  delete $("clientForm").dataset.originalName;
   $("clientId").value = "";
   fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
@@ -609,6 +650,8 @@ function getClientFormData() {
 function fillClientForm(client) {
   state.selectedClientId = client.id;
   $("clientForm").dataset.originalCategory = client.categoria || client.category || "";
+  $("clientForm").dataset.originalClientId = client.id || "";
+  $("clientForm").dataset.originalName = client.nome || client.name || "";
   $("clientId").value = client.id || "";
   $("clientName").value = client.nome || client.name || "";
   fillClientCategorySelect(client.categoria || client.category || "");
@@ -1556,6 +1599,7 @@ function renderClientOnlyEditor() {
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     };
+    payload.aliases = buildClientPublicAliases(client.id, payload, client, false);
     await update(ref(db, `clientes/${client.id}`), payload);
     showToast("Dados salvos.");
     await loadAllData();
@@ -1656,6 +1700,12 @@ async function syncClientsFromScript(options = {}) {
           imagens: importedImages,
           cardapioLink: est.cardapioLink || "",
           infoAdicional: est.infoAdicional || "",
+          aliases: buildClientPublicAliases(id, {
+            nome: name,
+            nomeNormalizado: normalizeName(name),
+            categoria: categoryName,
+            categoriaId: categoryId
+          }, null, false),
           origem: "script.js",
           updatedAt: serverTimestamp(),
           updatedBy: state.user.uid
@@ -1911,6 +1961,8 @@ function bindEvents() {
     if (!canManageClients()) return;
     const payload = getClientFormData();
     const id = payload.id;
+    const sourceClient = state.clientes.find((client) => client.id === state.selectedClientId || client.id === id) || null;
+    payload.aliases = buildClientPublicAliases(id, payload, sourceClient);
     delete payload.id;
     if (!state.selectedClientId) payload.createdAt = serverTimestamp();
     const updates = { [`clientes/${id}`]: payload };

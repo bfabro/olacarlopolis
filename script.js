@@ -15907,6 +15907,19 @@ plotarPinsImoveis(stateImoveis.filtered);
     ].filter(Boolean);
   }
 
+  function aliasesClienteAdmin(cliente) {
+    const raw = cliente?.aliases || {};
+    const values = Array.isArray(raw) ? raw : Object.keys(raw);
+    const set = new Set();
+    values.forEach((value) => {
+      const normalized = normalizeName(value);
+      const slug = normalizeName(adminSlug(value));
+      if (normalized) set.add(normalized);
+      if (slug) set.add(slug);
+    });
+    return Array.from(set);
+  }
+
   function pontuarClienteAdminParaEstabelecimento(clienteId, cliente, est, categoriaSlug = "") {
     const alvoId = normalizeName(clienteId);
     const alvoNome = normalizeName(cliente?.nomeNormalizado || cliente?.nome || "");
@@ -15915,11 +15928,17 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     let melhor = 0;
     estSlugs.forEach((estId) => {
+      const categoriaMaisEst = categoriaSlug ? `${categoriaSlug}${estId}` : "";
       if (alvoNome && estId === alvoNome) melhor = Math.max(melhor, 100);
       if (estId === alvoId) melhor = Math.max(melhor, 95);
-      if (categoriaSlug && alvoId === `${categoriaSlug}-${estId}`) melhor = Math.max(melhor, 92);
-      if (categoriaSlug && alvoId.startsWith(`${categoriaSlug}-`) && alvoId.slice(categoriaSlug.length + 1) === estId) melhor = Math.max(melhor, 90);
-      if (alvoId.endsWith(`-${estId}`)) melhor = Math.max(melhor, 45);
+      if (categoriaSlug && alvoId === categoriaMaisEst) melhor = Math.max(melhor, 92);
+      if (categoriaSlug && alvoId.startsWith(categoriaSlug) && alvoId.slice(categoriaSlug.length) === estId) melhor = Math.max(melhor, 90);
+      if (alvoId.endsWith(estId)) melhor = Math.max(melhor, 45);
+      aliasesClienteAdmin(cliente).forEach((alias) => {
+        if (alias === estId) melhor = Math.max(melhor, 130);
+        if (categoriaSlug && alias === categoriaMaisEst) melhor = Math.max(melhor, 128);
+        if (alias.endsWith(estId)) melhor = Math.max(melhor, 75);
+      });
     });
     return melhor;
   }
@@ -16029,7 +16048,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     const keys = [
       normalizeName(clienteId),
       normalizeName(cliente.nome || ""),
-      normalizeName(cliente.nomeNormalizado || "")
+      normalizeName(cliente.nomeNormalizado || ""),
+      ...aliasesClienteAdmin(cliente)
     ].filter(Boolean);
     const setStatus = (value) => keys.forEach((key) => { statusEstabelecimentos[key] = value; });
 
