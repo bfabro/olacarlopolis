@@ -16067,6 +16067,49 @@ plotarPinsImoveis(stateImoveis.filtered);
     return cliente.pagamentoStatus === "pago" || cliente.pagamentoStatus === "isento";
   }
 
+  function pontuarFonteClienteAdmin(cliente) {
+    return cliente?.origem === "script.js" ? 0 : 1;
+  }
+
+  function chavesFortesClienteAdmin(clienteId, cliente) {
+    const keys = new Set();
+    const add = (value) => {
+      const normalized = normalizeName(value);
+      const slug = normalizeName(adminSlug(value));
+      if (normalized) keys.add(normalized);
+      if (slug) keys.add(slug);
+    };
+    add(clienteId);
+    aliasesClienteAdmin(cliente).forEach(add);
+    add(`${cliente?.categoria || cliente?.categoriaId || "outros"}-${cliente?.nome || clienteId}`);
+    return Array.from(keys);
+  }
+
+  function melhorClienteAdmin(atual, candidato) {
+    if (!atual) return candidato;
+    const fonte = pontuarFonteClienteAdmin(candidato.cliente) - pontuarFonteClienteAdmin(atual.cliente);
+    if (fonte) return fonte > 0 ? candidato : atual;
+    const atualizado = valorAtualizacaoClienteAdmin(candidato.cliente) - valorAtualizacaoClienteAdmin(atual.cliente);
+    if (atualizado) return atualizado > 0 ? candidato : atual;
+    return candidato;
+  }
+
+  function consolidarClientesAdmin(clientes) {
+    const grupos = [];
+    Object.entries(clientes || {}).forEach(([clienteId, cliente]) => {
+      const keys = chavesFortesClienteAdmin(clienteId, cliente);
+      const grupo = grupos.find((item) => keys.some((key) => item.keys.has(key)));
+      const item = { clienteId, cliente };
+      if (grupo) {
+        keys.forEach((key) => grupo.keys.add(key));
+        grupo.item = melhorClienteAdmin(grupo.item, item);
+      } else {
+        grupos.push({ keys: new Set(keys), item });
+      }
+    });
+    return grupos.map((grupo) => grupo.item);
+  }
+
   function categoriaAdminAtiva(meta) {
     return !meta || !meta.status || meta.status === "ativo";
   }
@@ -16157,7 +16200,37 @@ plotarPinsImoveis(stateImoveis.filtered);
         ]);
         const clientes = clientesSnap.val() || {};
         const categoriasAdmin = categoriasSnap.val() || {};
+        const clientesConsolidados = consolidarClientesAdmin(clientes);
         aplicarCategoriasAdminNoMenu(categoriasAdmin);
+
+        if (clientesConsolidados.length) {
+          categories.length = 0;
+          Object.entries(categoriasAdmin || {})
+            .map(([id, cat]) => ({ id, ...(cat || {}) }))
+            .filter(categoriaAdminAtiva)
+            .sort((a, b) => {
+              const order = Number(a.ordem || 0) - Number(b.ordem || 0);
+              if (order) return order;
+              return String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR");
+            })
+            .forEach((cat) => garantirCategoriaAdmin(cat.nome || cat.title || cat.id || "Outros", cat));
+
+          clientesConsolidados.forEach(({ clienteId, cliente }) => {
+            if (!clienteAdminPodeAparecer(cliente)) {
+              definirStatusClienteAdmin(cliente, clienteId);
+              return;
+            }
+            const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros");
+            categoria.establishments = categoria.establishments || [];
+            categoria.establishments.push(montarEstabelecimentoDoClienteAdmin(cliente, clienteId));
+            definirStatusClienteAdmin(cliente, clienteId);
+          });
+
+          try { window.categories = categories; } catch (e) { }
+          try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
+          ADMIN_CLIENTES_LAST_APPLIED = Date.now();
+          return;
+        }
 
         categories.forEach((cat) => {
           const catSlug = normalizeName(cat.title || "");

@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 33,
-  label: "v33",
+  numero: 34,
+  label: "v34",
   data: "2026-05-18",
-  nota: "Painel prioriza dados salvos no Firebase e bloqueia reimportacao antiga."
+  nota: "Firebase passa a ser a fonte principal de clientes no painel e no site."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -236,6 +236,58 @@ function findExistingClientForImport(categoryName, clientName) {
 
 function sortClientsInState() {
   state.clientes.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+}
+
+function clientUpdatedValue(client) {
+  const value = client?.updatedAt;
+  if (typeof value === "number") return value;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function clientSourceRank(client) {
+  return client?.origem === "script.js" ? 0 : 1;
+}
+
+function clientStrongKeys(client) {
+  const keys = new Set();
+  const add = (value) => {
+    const slug = slugify(value);
+    const normalized = normalizeName(value);
+    if (slug) keys.add(slug);
+    if (normalized) keys.add(normalized);
+  };
+  add(client?.id);
+  Object.keys(client?.aliases || {}).forEach(add);
+  if (client?.categoria || client?.categoriaId || client?.nome || client?.name) {
+    add(`${client.categoria || client.categoriaId || "outros"}-${client.nome || client.name || client.id}`);
+  }
+  return Array.from(keys);
+}
+
+function chooseNewestClient(current, candidate) {
+  if (!current) return candidate;
+  const sourceDiff = clientSourceRank(candidate) - clientSourceRank(current);
+  if (sourceDiff) return sourceDiff > 0 ? candidate : current;
+  const updatedDiff = clientUpdatedValue(candidate) - clientUpdatedValue(current);
+  if (updatedDiff) return updatedDiff > 0 ? candidate : current;
+  const completenessDiff = clientCompletenessScore(candidate) - clientCompletenessScore(current);
+  return completenessDiff > 0 ? candidate : current;
+}
+
+function consolidateClientsForAdmin(clients) {
+  const groups = [];
+  clients.forEach((client) => {
+    const keys = clientStrongKeys(client);
+    const group = groups.find((item) => keys.some((key) => item.keys.has(key)));
+    if (group) {
+      keys.forEach((key) => group.keys.add(key));
+      group.client = chooseNewestClient(group.client, client);
+    } else {
+      groups.push({ keys: new Set(keys), client });
+    }
+  });
+  return groups.map((group) => group.client);
 }
 
 function upsertClientInState(id, data) {
@@ -467,6 +519,7 @@ async function loadAllData() {
   if (clientesSnap.exists()) {
     clientesSnap.forEach((child) => state.clientes.push({ id: child.key, ...child.val() }));
   }
+  state.clientes = consolidateClientsForAdmin(state.clientes);
   sortClientsInState();
 
   state.usuarios = [];
