@@ -15895,6 +15895,34 @@ plotarPinsImoveis(stateImoveis.filtered);
     }).join("<br>");
   }
 
+  function renderHorariosFuncionamento(horarios) {
+    const dias = [
+      ["seg", "Segunda"],
+      ["ter", "Terca"],
+      ["qua", "Quarta"],
+      ["qui", "Quinta"],
+      ["sex", "Sexta"],
+      ["sab", "Sabado"],
+      ["dom", "Domingo"]
+    ];
+    if (!horarios || typeof horarios !== "object") return "";
+    const rows = dias.map(([key, label]) => {
+      const slots = Array.isArray(horarios[key])
+        ? horarios[key].filter((slot) => slot && slot.inicio && slot.fim)
+        : [];
+      const aberto = slots.length > 0;
+      const texto = aberto
+        ? slots.map((slot) => `${slot.inicio} as ${slot.fim}`).join(" / ")
+        : "Fechado";
+      return `
+        <div class="horario-publico-dia ${aberto ? "aberto" : "fechado"}">
+          <span class="horario-publico-label">${label}</span>
+          <span class="horario-publico-valor">${texto}</span>
+        </div>`;
+    }).join("");
+    return `<div class="horarios-publicos">${rows}</div>`;
+  }
+
   function campoExiste(obj, campo) {
     return Object.prototype.hasOwnProperty.call(obj || {}, campo);
   }
@@ -16697,12 +16725,12 @@ ${establishment.infoVagaTrabalho
 
 
 
-        ${establishment.hours ? `
+        ${(establishment.horarios || establishment.hours) ? `
           <div class="info-box">
             <i class="fas fa-clock info-icon"></i>
             <div>
               <div class="info-label">Funcionamento: </div>
-              <div class="info-value">${establishment.hours}</div>
+              <div class="info-value">${establishment.horarios ? renderHorariosFuncionamento(establishment.horarios) : establishment.hours}</div>
             </div>
           </div>` : ""
         }

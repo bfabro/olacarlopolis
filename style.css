@@ -1759,6 +1759,42 @@ screen and (width: 820px) {
   margin-right: 6px;
 }
 
+.horarios-publicos {
+  display: grid;
+  gap: 4px;
+  max-width: 430px;
+}
+
+.horario-publico-dia {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border: 1px solid #e4ebf5;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.horario-publico-dia.fechado {
+  background: #f7f7f7;
+  color: #777;
+}
+
+.horario-publico-label {
+  font-weight: 700;
+  color: #263a53;
+}
+
+.horario-publico-valor {
+  color: #40536b;
+  line-height: 1.25;
+}
+
+.horario-publico-dia.fechado .horario-publico-valor {
+  color: #888;
+}
+
 .icon-link {
   display: flex;
   align-items: center;
