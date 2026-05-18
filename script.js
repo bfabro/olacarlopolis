@@ -15837,6 +15837,15 @@ plotarPinsImoveis(stateImoveis.filtered);
       .replace(/^-+|-+$/g, "");
   }
 
+  function adminClientCanonicalId(categoryName, clientName) {
+    const categoryId = adminSlug(categoryName || "outros");
+    const clientId = adminSlug(clientName || "cliente");
+    if (!categoryId) return clientId;
+    if (!clientId) return categoryId;
+    if (clientId === categoryId || clientId.startsWith(`${categoryId}-`)) return clientId;
+    return `${categoryId}-${clientId}`;
+  }
+
   function esperarFirebaseDatabase() {
     function getDatabaseIfReady() {
       if (!window.firebase || !firebase.database) return null;
@@ -16080,6 +16089,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (slug) keys.add(slug);
     };
     add(clienteId);
+    add(adminClientCanonicalId(cliente?.categoria || cliente?.categoriaId || "outros", cliente?.nome || clienteId));
     aliasesClienteAdmin(cliente).forEach(add);
     add(`${cliente?.categoria || cliente?.categoriaId || "outros"}-${cliente?.nome || clienteId}`);
     return Array.from(keys);

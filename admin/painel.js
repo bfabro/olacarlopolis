@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 36,
-  label: "v36",
+  numero: 37,
+  label: "v37",
   data: "2026-05-18",
-  nota: "Painel lista clientes pelo ultimo dado atualizado no Firebase."
+  nota: "Clientes usam ID canonico e duplicados por categoria repetida sao removidos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -161,6 +161,10 @@ function buildClientPublicAliases(clientId, payload, sourceClient = null, useFor
   return aliases;
 }
 
+function clientCanonicalId(client) {
+  return getCanonicalClientId(client?.categoria || client?.categoriaId || "outros", client?.nome || client?.name || client?.id || "cliente");
+}
+
 function canManageClients() {
   return ["master", "admin"].includes(state.profile?.role);
 }
@@ -209,13 +213,28 @@ function cleanForFirebase(value) {
 }
 
 function getImportClientId(categoryName, clientName) {
+  return getCanonicalClientId(categoryName, clientName);
+}
+
+function getCanonicalClientId(categoryName, clientName) {
   const categoryId = slugify(categoryName || "outros");
   const clientId = slugify(clientName || "cliente");
+  if (!categoryId) return clientId.slice(0, 120);
+  if (!clientId) return categoryId.slice(0, 120);
+  if (clientId === categoryId || clientId.startsWith(`${categoryId}-`)) return clientId.slice(0, 120);
+  return `${categoryId}-${clientId}`.slice(0, 120);
+}
+
+function getLegacyRepeatedClientId(categoryName, clientName) {
+  const categoryId = slugify(categoryName || "outros");
+  const clientId = slugify(clientName || "cliente");
+  if (!categoryId || !clientId) return "";
   return `${categoryId}-${clientId}`.slice(0, 120);
 }
 
 function findExistingClientForImport(categoryName, clientName) {
   const expectedId = getImportClientId(categoryName, clientName);
+  const legacyId = getLegacyRepeatedClientId(categoryName, clientName);
   const categoryId = slugify(categoryName || "outros");
   const clientNameNorm = normalizeName(clientName);
   const expectedKeys = buildClientPublicAliases(expectedId, {
@@ -226,6 +245,7 @@ function findExistingClientForImport(categoryName, clientName) {
   }, null, false);
   return state.clientes.find((client) => {
     if (client.id === expectedId) return true;
+    if (legacyId && client.id === legacyId) return true;
     const aliases = client.aliases || {};
     if (Object.keys(expectedKeys).some((key) => aliases[key])) return true;
     const sameCategory = slugify(client.categoria || client.categoriaId || "outros") === categoryId;
@@ -262,6 +282,8 @@ function clientStrongKeys(client) {
     if (normalized) keys.add(normalized);
   };
   add(client?.id);
+  add(clientCanonicalId(client));
+  add(getLegacyRepeatedClientId(client?.categoria || client?.categoriaId || "outros", client?.nome || client?.name || client?.id || "cliente"));
   Object.keys(client?.aliases || {}).forEach(add);
   if (client?.categoria || client?.categoriaId || client?.nome || client?.name) {
     add(`${client.categoria || client.categoriaId || "outros"}-${client.nome || client.name || client.id}`);
@@ -2033,12 +2055,21 @@ function bindEvents() {
     event.preventDefault();
     if (!canManageClients()) return;
     const payload = getClientFormData();
-    const id = payload.id;
-    const sourceClient = state.clientes.find((client) => client.id === state.selectedClientId || client.id === id) || null;
+    const formId = payload.id;
+    const id = getCanonicalClientId(payload.categoria, payload.nome);
+    const sourceClient = state.clientes.find((client) => client.id === state.selectedClientId || client.id === formId || client.id === id) || null;
     payload.aliases = buildClientPublicAliases(id, payload, sourceClient);
+    addAliasKey(payload.aliases, formId);
+    addAliasKey(payload.aliases, state.selectedClientId);
     delete payload.id;
     if (!state.selectedClientId) payload.createdAt = serverTimestamp();
     const updates = { [`clientes/${id}`]: payload };
+    [formId, state.selectedClientId].filter((oldId) => oldId && oldId !== id).forEach((oldId) => {
+      updates[`clientes/${oldId}`] = null;
+      state.usuarios.filter((user) => user.clienteId === oldId).forEach((user) => {
+        updates[`usuariosByUid/${user.uid}/clienteId`] = id;
+      });
+    });
     if (payload.categoria) {
       const categoryId = payload.categoriaId || slugify(payload.categoria);
       const existingCategory = state.categorias.find((cat) => cat.id === categoryId) || {};
@@ -2057,6 +2088,10 @@ function bindEvents() {
       };
     }
     await update(ref(db), updates);
+    [formId, state.selectedClientId].filter((oldId) => oldId && oldId !== id).forEach((oldId) => {
+      state.clientes = state.clientes.filter((client) => client.id !== oldId);
+      state.usuarios.filter((user) => user.clienteId === oldId).forEach((user) => { user.clienteId = id; });
+    });
     upsertClientInState(id, payload);
     if (payload.categoria) {
       const categoryId = payload.categoriaId || slugify(payload.categoria);
