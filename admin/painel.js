@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 18,
-  label: "v18",
+  numero: 19,
+  label: "v19",
   data: "2026-05-18",
-  nota: "Forca o site publico a carregar script.js atualizado."
+  nota: "Salvamento do cliente atualiza a lista sem recarregar importacao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -298,6 +298,10 @@ function displayImageUrl(url) {
   if (!raw) return "";
   if (/^(https?:|data:|blob:|\/)/i.test(raw)) return raw;
   return `../${raw.replace(/^\.?\//, "")}`;
+}
+
+function imageFallbackAttr() {
+  return `onerror="this.onerror=null;this.src='../images/img_padrao_site/logo_1.png';"`;
 }
 
 function sameOriginImageUrl(url) {
@@ -605,7 +609,7 @@ function renderClientImagesPreview() {
 
   box.innerHTML = state.clientImages.map((item, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}">
+      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}" ${imageFallbackAttr()}>
       <label class="image-caption-label">Texto desta imagem
         <textarea data-image-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
       </label>
@@ -844,7 +848,7 @@ function renderClientsList() {
 
   box.innerHTML = list.map((client) => `
     <article class="client-row">
-      <img src="${escapeAttr(displayImageUrl(client.imagem || imageUrl(client.imagens && client.imagens[0])) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}">
+      <img src="${escapeAttr(displayImageUrl(client.imagem || imageUrl(client.imagens && client.imagens[0])) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}" ${imageFallbackAttr()}>
       <div class="client-main">
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
@@ -1000,7 +1004,7 @@ function renderEventsList() {
 
   box.innerHTML = list.map((evento) => `
     <article class="list-card event-card">
-      ${evento.imagem ? `<img src="${escapeAttr(displayImageUrl(evento.imagem))}" alt="${escapeAttr(evento.titulo || "Evento")}">` : ""}
+      ${evento.imagem ? `<img src="${escapeAttr(displayImageUrl(evento.imagem))}" alt="${escapeAttr(evento.titulo || "Evento")}" ${imageFallbackAttr()}>` : ""}
       <div class="list-title">${escapeHtml(evento.titulo || evento.id)}</div>
       <div class="list-meta">${escapeHtml(evento.clienteNome || "Sem cliente")} - ${escapeHtml(evento.data || "Sem data")} ${escapeHtml(evento.horario || "")}</div>
       <div class="list-meta">${escapeHtml(evento.local || "Sem local")}</div>
@@ -1145,7 +1149,7 @@ function renderClientOnlyEditor() {
           </div>
         </div>
         <div class="profile-upload-row">
-          <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}">
+          <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}" ${imageFallbackAttr()}>
           <label>Enviar foto de perfil<input id="coProfileUpload" type="file" accept="image/*"></label>
         </div>
         <input id="coImage" type="hidden" value="${escapeAttr(client.imagem || "")}">
@@ -1303,7 +1307,7 @@ function renderImagesMarkup(images, prefix) {
   if (!images.length) return `<div class="list-meta">Nenhuma imagem enviada ainda.</div>`;
   return images.map((item, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}">
+      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}" ${imageFallbackAttr()}>
       <label class="image-caption-label">Texto desta imagem
         <textarea data-${prefix}-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
       </label>
@@ -1625,9 +1629,27 @@ function bindEvents() {
       };
     }
     await update(ref(db), updates);
+    upsertClientInState(id, payload);
+    if (payload.categoria) {
+      const categoryId = payload.categoriaId || slugify(payload.categoria);
+      const existingCategory = state.categorias.find((cat) => cat.id === categoryId);
+      if (existingCategory) {
+        existingCategory.nome = payload.categoria;
+        existingCategory.origem = "painel";
+      } else {
+        state.categorias.push({ id: categoryId, nome: payload.categoria, origem: "painel" });
+      }
+      state.categorias.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+    }
+    sortClientsInState();
+    renderStats();
+    renderClientsList();
+    renderFinanceiro();
+    fillClientCategorySelect();
+    fillUserClientSelect();
+    fillEventClientSelect();
     showToast("Cliente salvo.");
     resetClientForm();
-    await loadAllData();
   });
 
   $("deleteClientButton").addEventListener("click", async () => {
