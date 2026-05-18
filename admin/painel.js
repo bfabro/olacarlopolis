@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 32,
-  label: "v32",
+  numero: 33,
+  label: "v33",
   data: "2026-05-18",
-  nota: "Clientes salvam vinculos publicos para refletir edicoes no site."
+  nota: "Painel prioriza dados salvos no Firebase e bloqueia reimportacao antiga."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -215,9 +215,19 @@ function getImportClientId(categoryName, clientName) {
 }
 
 function findExistingClientForImport(categoryName, clientName) {
+  const expectedId = getImportClientId(categoryName, clientName);
   const categoryId = slugify(categoryName || "outros");
   const clientNameNorm = normalizeName(clientName);
+  const expectedKeys = buildClientPublicAliases(expectedId, {
+    nome: clientName,
+    nomeNormalizado: clientNameNorm,
+    categoria: categoryName,
+    categoriaId: categoryId
+  }, null, false);
   return state.clientes.find((client) => {
+    if (client.id === expectedId) return true;
+    const aliases = client.aliases || {};
+    if (Object.keys(expectedKeys).some((key) => aliases[key])) return true;
     const sameCategory = slugify(client.categoria || client.categoriaId || "outros") === categoryId;
     const sameName = normalizeName(client.nome || client.name || "") === clientNameNorm;
     return sameCategory && sameName;
@@ -499,7 +509,7 @@ async function loadAllData() {
   renderEventsList();
   renderFinanceiro();
 
-  await autoEnsureImportedClients();
+  // A importacao agora fica manual para nao sobrescrever edicoes feitas no Firebase.
 }
 
 async function getScriptImportSource() {
