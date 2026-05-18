@@ -15954,8 +15954,11 @@ plotarPinsImoveis(stateImoveis.filtered);
       }))
       .filter((item) => item.score > 0)
       .sort((a, b) => {
-        if (a.categoriaCorreta !== b.categoriaCorreta) return a.categoriaCorreta ? -1 : 1;
+        const aForte = a.score >= 90;
+        const bForte = b.score >= 90;
+        if (aForte && bForte && a.atualizadoEm !== b.atualizadoEm) return b.atualizadoEm - a.atualizadoEm;
         if (a.score !== b.score) return b.score - a.score;
+        if (a.categoriaCorreta !== b.categoriaCorreta) return a.categoriaCorreta ? -1 : 1;
         return b.atualizadoEm - a.atualizadoEm;
       })[0];
   }
@@ -16023,13 +16026,19 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function definirStatusClienteAdmin(cliente, clienteId) {
-    const key = normalizeName(cliente.nome || cliente.nomeNormalizado || clienteId);
+    const keys = [
+      normalizeName(clienteId),
+      normalizeName(cliente.nome || ""),
+      normalizeName(cliente.nomeNormalizado || "")
+    ].filter(Boolean);
+    const setStatus = (value) => keys.forEach((key) => { statusEstabelecimentos[key] = value; });
+
     if (cliente.status === "inativo") {
-      statusEstabelecimentos[key] = "n";
+      setStatus("n");
     } else if (cliente.pagamentoStatus === "pago" || cliente.pagamentoStatus === "isento") {
-      statusEstabelecimentos[key] = "s";
+      setStatus("s");
     } else if (cliente.pagamentoStatus === "em_aberto") {
-      statusEstabelecimentos[key] = "n";
+      setStatus("n");
     }
   }
 

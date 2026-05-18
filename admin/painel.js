@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 27,
-  label: "v27",
+  numero: 29,
+  label: "v29",
   data: "2026-05-18",
-  nota: "Site publico reaplica dados do Firebase antes de renderizar as telas."
+  nota: "Site publico escolhe o registro forte mais recente quando ha duplicidade."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -530,6 +530,7 @@ function resetClientForm() {
   state.selectedClientId = null;
   state.clientImages = [];
   $("clientForm").reset();
+  delete $("clientForm").dataset.originalCategory;
   $("clientId").value = "";
   fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
@@ -542,7 +543,8 @@ function getClientFormData() {
   const name = $("clientName").value.trim();
   const id = $("clientId").value || slugify(name);
   const newCategory = $("clientNewCategory").value.trim();
-  const category = newCategory || $("clientCategory").value.trim() || "Outros";
+  const currentClient = state.clientes.find((client) => client.id === state.selectedClientId);
+  const category = newCategory || $("clientCategory").value.trim() || currentClient?.categoria || currentClient?.category || $("clientForm").dataset.originalCategory || "Outros";
   const horarios = readScheduleEditor("clientScheduleEditor");
   const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || $("clientScheduleEditor")?.dataset.initialSchedule === "true";
   const horarioTexto = $("clientHours").value.trim() || (shouldSaveSchedule ? scheduleToText(horarios) : "");
@@ -573,6 +575,7 @@ function getClientFormData() {
 
 function fillClientForm(client) {
   state.selectedClientId = client.id;
+  $("clientForm").dataset.originalCategory = client.categoria || client.category || "";
   $("clientId").value = client.id || "";
   $("clientName").value = client.nome || client.name || "";
   fillClientCategorySelect(client.categoria || client.category || "");
