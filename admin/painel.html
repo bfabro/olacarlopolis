@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=14">
+  <link rel="stylesheet" href="painel.css?v=15">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -146,7 +146,19 @@
               </section>
               <label>Instagram<input id="clientInstagram"></label>
               <label>Facebook<input id="clientFacebook"></label>
-              <label>Foto de perfil<input id="clientImage" placeholder="images/..."></label>
+              <section class="wide profile-upload-panel">
+                <div class="section-head compact">
+                  <div>
+                    <h3>Foto de perfil</h3>
+                    <p>Envie a imagem principal do cliente. Ela fica salva no Firebase Storage.</p>
+                  </div>
+                </div>
+                <div class="profile-upload-row">
+                  <img id="clientProfilePreview" src="" alt="Foto de perfil">
+                  <label>Enviar foto de perfil<input id="clientProfileUpload" type="file" accept="image/*"></label>
+                </div>
+                <input id="clientImage" type="hidden">
+              </section>
               <label>Link do cardapio<input id="clientMenuLink"></label>
               <section class="wide upload-panel">
                 <div class="section-head compact">
@@ -323,6 +335,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=14"></script>
+  <script type="module" src="painel.js?v=15"></script>
 </body>
 </html>

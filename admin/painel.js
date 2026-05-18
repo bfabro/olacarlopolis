@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 14,
-  label: "v14",
-  data: "2026-05-17",
-  nota: "Foto de perfil, horarios por dia e financeiro sem perder lista."
+  numero: 15,
+  label: "v15",
+  data: "2026-05-18",
+  nota: "Upload da foto de perfil e importacao sem sobrescrever clientes existentes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -197,6 +197,15 @@ function upsertClientInState(id, data) {
 
 function imageUrl(item) {
   return typeof item === "string" ? item : (item?.url || "");
+}
+
+function renderProfilePreview(imageFieldId, previewId) {
+  const preview = $(previewId);
+  const field = $(imageFieldId);
+  if (!preview || !field) return;
+  const url = displayImageUrl(field.value);
+  preview.src = url || "";
+  preview.classList.toggle("empty", !url);
 }
 
 function emptySchedule() {
@@ -466,6 +475,7 @@ function resetClientForm() {
   $("clientId").value = "";
   fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
+  renderProfilePreview("clientImage", "clientProfilePreview");
   renderScheduleEditor("clientScheduleEditor", emptySchedule());
   renderClientImagesPreview();
 }
@@ -518,6 +528,7 @@ function fillClientForm(client) {
   $("clientInstagram").value = client.instagram || "";
   $("clientFacebook").value = client.facebook || "";
   $("clientImage").value = client.imagem || client.image || "";
+  renderProfilePreview("clientImage", "clientProfilePreview");
   state.clientImages = normalizeImageItems(client.imagens);
   renderScheduleEditor("clientScheduleEditor", client.horarios || {});
   $("clientMenuLink").value = client.cardapioLink || "";
@@ -555,6 +566,7 @@ function renderClientImagesPreview() {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.mainImage);
       $("clientImage").value = imageUrl(state.clientImages[index]);
+      renderProfilePreview("clientImage", "clientProfilePreview");
       showToast("Foto de perfil selecionada.");
     });
   });
@@ -595,6 +607,41 @@ async function uploadClientImages(files) {
   if (!$("clientImage").value && state.clientImages[0]) $("clientImage").value = imageUrl(state.clientImages[0]);
   renderClientImagesPreview();
   showToast("Imagens enviadas.");
+}
+
+async function uploadProfileImageForClient(clientId, file) {
+  const path = `clientes/${clientId}/perfil/${Date.now()}-${slugify(file.name || "foto")}`;
+  const fileRef = storageRef(storage, path);
+  await uploadBytes(fileRef, file);
+  return getDownloadURL(fileRef);
+}
+
+async function uploadClientProfileImage(file) {
+  if (!file) return;
+  const currentId = $("clientId").value || slugify($("clientName").value.trim());
+  if (!currentId) {
+    showToast("Informe o nome do cliente antes de enviar a foto.");
+    $("clientProfileUpload").value = "";
+    return;
+  }
+
+  showToast("Enviando foto de perfil...");
+  const url = await uploadProfileImageForClient(currentId, file);
+  $("clientImage").value = url;
+  renderProfilePreview("clientImage", "clientProfilePreview");
+
+  if (state.selectedClientId) {
+    await update(ref(db, `clientes/${currentId}`), {
+      imagem: url,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user?.uid || ""
+    });
+    const index = state.clientes.findIndex((client) => client.id === currentId);
+    if (index >= 0) state.clientes[index] = { ...state.clientes[index], imagem: url };
+    renderClientsList();
+  }
+
+  showToast(state.selectedClientId ? "Foto de perfil salva." : "Foto enviada. Salve o cliente para concluir.");
 }
 
 function addClientImageFromUrl() {
@@ -1036,7 +1083,19 @@ function renderClientOnlyEditor() {
         <div id="coScheduleEditor" class="schedule-editor"></div>
       </section>
       <label>Instagram<input id="coInstagram" value="${escapeAttr(client.instagram || "")}"></label>
-      <label>Foto de perfil<input id="coImage" value="${escapeAttr(client.imagem || "")}"></label>
+      <section class="wide profile-upload-panel">
+        <div class="section-head compact">
+          <div>
+            <h3>Foto de perfil</h3>
+            <p>Envie a imagem principal da sua empresa. Ela fica salva no Firebase Storage.</p>
+          </div>
+        </div>
+        <div class="profile-upload-row">
+          <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}">
+          <label>Enviar foto de perfil<input id="coProfileUpload" type="file" accept="image/*"></label>
+        </div>
+        <input id="coImage" type="hidden" value="${escapeAttr(client.imagem || "")}">
+      </section>
       <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}"></label>
       <section class="wide upload-panel">
         <div class="section-head compact">
@@ -1065,6 +1124,23 @@ function renderClientOnlyEditor() {
     </form>
   `;
   renderScheduleEditor("coScheduleEditor", client.horarios || {});
+
+  mount.querySelector("#coProfileUpload").addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    showToast("Enviando foto de perfil...");
+    const url = await uploadProfileImageForClient(client.id, file);
+    $("coImage").value = url;
+    renderProfilePreview("coImage", "coProfilePreview");
+    await update(ref(db, `clientes/${client.id}`), {
+      imagem: url,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid
+    });
+    showToast("Foto de perfil salva.");
+    await loadAllData();
+    renderClientOnlyEditor();
+  });
 
   mount.querySelector("#coImagesUpload").addEventListener("change", async (event) => {
     const remaining = Math.max(0, 10 - imagens.length);
@@ -1114,6 +1190,7 @@ function renderClientOnlyEditor() {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.coMain);
       $("coImage").value = imageUrl(imagens[index]);
+      renderProfilePreview("coImage", "coProfilePreview");
     });
   });
 
@@ -1209,6 +1286,7 @@ async function syncClientsFromScript() {
       categorias: 0,
       clientes: 0,
       clientesSalvos: 0,
+      clientesExistentes: 0,
       categoriasSalvas: 0,
       erros: []
     };
@@ -1233,6 +1311,10 @@ async function syncClientsFromScript() {
         importStats.clientes += 1;
         const id = getImportClientId(categoryName, name);
         const existing = findExistingClientForImport(categoryName, name);
+        if (existing.id) {
+          importStats.clientesExistentes += 1;
+          return;
+        }
         const paidInScript = statusMap[normalizeName(name)] === "s";
         const importedImages = [
           ...(est.novidadesImages || []),
@@ -1245,24 +1327,23 @@ async function syncClientsFromScript() {
         clientPayloads.push({
           id,
           data: cleanForFirebase({
-          ...existing,
-          nome: existing.nome || name,
-          nomeNormalizado: existing.nomeNormalizado || normalizeName(name),
-          categoria: existing.categoria || categoryName,
-          categoriaId: existing.categoriaId || categoryId,
-          status: existing.status || "ativo",
-          pagamentoStatus: existing.pagamentoStatus || (paidInScript ? "pago" : "em_aberto"),
-          contato: existing.contato || est.contact || "",
-          whatsapp: existing.whatsapp || est.whatsapp || "",
-          endereco: existing.endereco || est.address || "",
-          horario: existing.horario || est.hours || "",
-          instagram: existing.instagram || est.instagram || "",
-          facebook: existing.facebook || est.facebook || "",
-          imagem: existing.imagem || est.image || "",
-          imagens: Array.isArray(existing.imagens) && existing.imagens.length ? existing.imagens : importedImages,
-          cardapioLink: existing.cardapioLink || est.cardapioLink || "",
-          infoAdicional: existing.infoAdicional || est.infoAdicional || "",
-          origem: existing.origem || "script.js",
+          nome: name,
+          nomeNormalizado: normalizeName(name),
+          categoria: categoryName,
+          categoriaId: categoryId,
+          status: "ativo",
+          pagamentoStatus: paidInScript ? "pago" : "em_aberto",
+          contato: est.contact || "",
+          whatsapp: est.whatsapp || "",
+          endereco: est.address || "",
+          horario: est.hours || "",
+          instagram: est.instagram || "",
+          facebook: est.facebook || "",
+          imagem: est.image || "",
+          imagens: importedImages,
+          cardapioLink: est.cardapioLink || "",
+          infoAdicional: est.infoAdicional || "",
+          origem: "script.js",
           updatedAt: serverTimestamp(),
           updatedBy: state.user.uid
           })
@@ -1315,6 +1396,7 @@ async function syncClientsFromScript() {
     const report = [
       `Importacao concluida.`,
       `Clientes salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
+      `Clientes ja existentes mantidos: ${importStats.clientesExistentes}`,
       `Categorias salvas: ${importStats.categoriasSalvas}/${importStats.categorias}`,
       `Clientes na tela: ${state.clientes.length}`
     ];
@@ -1449,6 +1531,10 @@ function bindEvents() {
   $("clientSearch").addEventListener("input", renderClientsList);
   $("clientImagesUpload").addEventListener("change", async (event) => {
     await uploadClientImages(event.target.files);
+    event.target.value = "";
+  });
+  $("clientProfileUpload").addEventListener("change", async (event) => {
+    await uploadClientProfileImage(event.target.files?.[0]);
     event.target.value = "";
   });
   $("addClientImageUrlButton").addEventListener("click", addClientImageFromUrl);

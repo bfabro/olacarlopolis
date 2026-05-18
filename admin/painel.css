@@ -456,6 +456,33 @@ button[type="submit"]:hover,
   background: #f8fafc;
 }
 
+.profile-upload-panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  background: #fff;
+}
+
+.profile-upload-row {
+  display: grid;
+  grid-template-columns: 92px minmax(180px, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.profile-upload-row img {
+  width: 92px;
+  height: 92px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: #eef2f7;
+  border: 1px solid var(--line);
+}
+
+.profile-upload-row img.empty {
+  opacity: .55;
+}
+
 .schedule-panel {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -766,7 +793,8 @@ button[type="submit"]:hover,
 
   .grid-form,
   .permissions-box,
-  .manual-image-form {
+  .manual-image-form,
+  .profile-upload-row {
     grid-template-columns: 1fr;
   }
 }
