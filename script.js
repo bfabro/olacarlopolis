@@ -16280,6 +16280,50 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
   }
 
+  function normalizarNotaFalecimentoAdmin(item, id) {
+    const data = item?.date || item?.data || "";
+    return {
+      id,
+      name: item?.name || item?.nome || "Nota de Falecimento",
+      image: item?.image || item?.imagem || "",
+      date: data,
+      descricaoFalecido: item?.descricaoFalecido || item?.descricao || "",
+      origemAdmin: true
+    };
+  }
+
+  function aplicarNotasFalecimentoAdmin(notasAdmin) {
+    const notas = Object.entries(notasAdmin || {})
+      .map(([id, item]) => ({ id, ...(item || {}) }))
+      .filter((item) => !item.status || item.status === "ativo")
+      .map((item) => normalizarNotaFalecimentoAdmin(item, item.id))
+      .filter((item) => item.descricaoFalecido || item.image)
+      .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+
+    if (!notas.length) return;
+
+    let categoria = categories.find((cat) => normalizeName(cat.title || "") === "notadefalecimento");
+    if (!categoria) {
+      categoria = {
+        link: document.querySelector("#menuNotaFalecimento"),
+        title: "Nota de Falecimento",
+        establishments: []
+      };
+      categories.push(categoria);
+    }
+
+    categoria.link = categoria.link || document.querySelector("#menuNotaFalecimento");
+    categoria.establishments = notas;
+    if (categoria.link && !categoria.link.dataset.adminInfoBound) {
+      categoria.link.dataset.adminInfoBound = "true";
+      categoria.link.addEventListener("click", function (event) {
+        event.preventDefault();
+        location.hash = "#comercios-" + normalizeName(categoria.title);
+        loadContent(categoria.title, categoria.establishments || []);
+      });
+    }
+  }
+
   async function aplicarDadosAdminClientes() {
     if (ADMIN_CLIENTES_PROMISE) return ADMIN_CLIENTES_PROMISE;
 
@@ -16288,12 +16332,14 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!dbAdmin) return;
 
       try {
-        const [clientesSnap, categoriasSnap] = await Promise.all([
+        const [clientesSnap, categoriasSnap, notasFalecimentoSnap] = await Promise.all([
           dbAdmin.ref("clientes").once("value"),
-          dbAdmin.ref("categorias").once("value")
+          dbAdmin.ref("categorias").once("value"),
+          dbAdmin.ref("conteudosInformativos/notaFalecimento").once("value")
         ]);
         const clientes = clientesSnap.val() || {};
         const categoriasAdmin = categoriasSnap.val() || {};
+        const notasFalecimentoAdmin = notasFalecimentoSnap.val() || {};
         const clientesConsolidados = consolidarClientesAdmin(clientes);
         aplicarCategoriasAdminNoMenu(categoriasAdmin);
 
@@ -16319,6 +16365,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             categoria.establishments.push(montarEstabelecimentoDoClienteAdmin(cliente, clienteId));
             definirStatusClienteAdmin(cliente, clienteId);
           });
+          aplicarNotasFalecimentoAdmin(notasFalecimentoAdmin);
 
           try { window.categories = categories; } catch (e) { }
           try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
@@ -16361,6 +16408,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             definirStatusClienteAdmin(cliente, clienteId);
           }
         });
+        aplicarNotasFalecimentoAdmin(notasFalecimentoAdmin);
 
         try { window.categories = categories; } catch (e) { }
         try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }

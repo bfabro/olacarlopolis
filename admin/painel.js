@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 60,
-  label: "v60",
+  numero: 61,
+  label: "v61",
   data: "2026-05-18",
-  nota: "Corrige leitura completa dos snapshots do Firebase para carregar todos os clientes."
+  nota: "Adiciona gestao de Nota de Falecimento no menu Informacoes com permissao por usuario."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -51,9 +51,11 @@ let state = {
   clientes: [],
   usuarios: [],
   eventos: [],
+  notasFalecimento: [],
   categorias: [],
   selectedClientId: null,
   selectedEventId: null,
+  selectedDeathNoticeId: null,
   selectedCategoryId: null,
   duplicateCleanupPlan: null,
   clientImages: [],
@@ -88,6 +90,7 @@ const views = {
   clientes: $("clientesView"),
   categorias: $("categoriasView"),
   eventos: $("eventosView"),
+  informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
   usuarios: $("usuariosView"),
   minhaEmpresa: $("minhaEmpresaView")
@@ -98,6 +101,7 @@ const viewCopy = {
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
   categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
+  informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
   minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."]
@@ -178,6 +182,15 @@ function canManageClients() {
 
 function isMaster() {
   return currentRole() === "master";
+}
+
+function hasPermission(permission) {
+  if (canManageClients()) return true;
+  return Boolean(state.profile?.permissoes?.[permission]);
+}
+
+function canManageInformacoes() {
+  return hasPermission("informacoes") || hasPermission("informacoes_nota_falecimento");
 }
 
 function moneyBR(value) {
@@ -592,7 +605,7 @@ async function loadProfile(user) {
       email: user.email,
       role: "master",
       status: "ativo",
-      permissoes: { dados: true, imagens: true, cardapio: true, promocoes: true, financeiro: true }
+      permissoes: { dados: true, imagens: true, cardapio: true, promocoes: true, financeiro: true, informacoes: true, informacoes_nota_falecimento: true }
     };
     await saveUserProfile(profile);
     return profile;
@@ -616,11 +629,12 @@ async function saveUserProfile(profile) {
 }
 
 async function loadAllData() {
-  const [clientesSnap, usersSnap, eventosSnap, categoriasSnap] = await Promise.all([
+  const [clientesSnap, usersSnap, eventosSnap, categoriasSnap, notasFalecimentoSnap] = await Promise.all([
     get(ref(db, "clientes")),
     get(ref(db, "usuariosByUid")),
     get(ref(db, "eventos")),
-    get(ref(db, "categorias"))
+    get(ref(db, "categorias")),
+    get(ref(db, "conteudosInformativos/notaFalecimento"))
   ]);
 
   applyClientsSnapshot(clientesSnap);
@@ -651,6 +665,15 @@ async function loadAllData() {
     });
   }
 
+  state.notasFalecimento = [];
+  if (notasFalecimentoSnap.exists()) {
+    notasFalecimentoSnap.forEach((child) => {
+      state.notasFalecimento.push({ id: child.key, ...child.val() });
+      return false;
+    });
+  }
+  state.notasFalecimento.sort((a, b) => String(b.data || "").localeCompare(String(a.data || "")));
+
   renderStats();
   renderClientsList();
   renderFinanceiro();
@@ -679,6 +702,7 @@ async function loadAllData() {
   fillUserClientSelect();
   fillEventClientSelect();
   renderEventsList();
+  renderInfoDeathNoticeList();
   renderFinanceiro();
 
   // A importacao agora fica manual para nao sobrescrever edicoes feitas no Firebase.
@@ -737,6 +761,9 @@ function updateChrome() {
   document.querySelectorAll("[data-role='cliente']").forEach((el) => {
     el.classList.toggle("hidden", canManageClients());
   });
+  document.querySelectorAll("[data-permission='informacoes']").forEach((el) => {
+    el.classList.toggle("hidden", !canManageInformacoes());
+  });
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");
   if (masterOption) masterOption.disabled = !isMaster();
@@ -762,6 +789,10 @@ function switchView(name) {
   $("viewSubtitle").textContent = subtitle;
 
   if (target === "minhaEmpresa") renderClientOnlyEditor();
+  if (target === "informacoes" && !canManageInformacoes()) {
+    switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
+    return;
+  }
   if (target !== "clientes") setClientFocusMode(false);
 }
 
@@ -1660,6 +1691,89 @@ async function uploadEventImage(file) {
   showToast("Imagem do evento enviada.");
 }
 
+function resetInfoDeathNoticeForm() {
+  state.selectedDeathNoticeId = null;
+  $("infoDeathNoticeForm")?.reset();
+  if ($("infoDeathNoticeId")) $("infoDeathNoticeId").value = "";
+  $("deleteInfoDeathNoticeButton")?.classList.add("hidden");
+}
+
+function fillInfoDeathNoticeForm(item) {
+  state.selectedDeathNoticeId = item.id;
+  $("infoDeathNoticeId").value = item.id || "";
+  $("infoDeathNoticeName").value = item.name || item.nome || "";
+  $("infoDeathNoticeDate").value = item.date || item.data || "";
+  $("infoDeathNoticeStatus").value = item.status || "ativo";
+  $("infoDeathNoticeImage").value = item.image || item.imagem || "";
+  $("infoDeathNoticeDescription").value = item.descricaoFalecido || item.descricao || "";
+  $("deleteInfoDeathNoticeButton").classList.remove("hidden");
+}
+
+function getInfoDeathNoticeFormData() {
+  const name = $("infoDeathNoticeName").value.trim();
+  const date = $("infoDeathNoticeDate").value;
+  const baseId = $("infoDeathNoticeId").value || `${slugify(name || "nota")}-${date || Date.now()}`;
+  return cleanForFirebase({
+    id: baseId,
+    name,
+    nome: name,
+    date,
+    data: date,
+    status: $("infoDeathNoticeStatus").value,
+    image: $("infoDeathNoticeImage").value.trim(),
+    imagem: $("infoDeathNoticeImage").value.trim(),
+    descricaoFalecido: $("infoDeathNoticeDescription").value.trim(),
+    origem: "painel",
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  });
+}
+
+function renderInfoDeathNoticeList() {
+  const box = $("infoDeathNoticeList");
+  if (!box) return;
+
+  const q = String($("infoDeathNoticeSearch")?.value || "").toLowerCase().trim();
+  const list = state.notasFalecimento.filter((item) => {
+    const hay = `${item.name || item.nome || ""} ${item.date || item.data || ""} ${item.descricaoFalecido || ""}`.toLowerCase();
+    return !q || hay.includes(q);
+  });
+
+  if (!list.length) {
+    box.innerHTML = `<div class="list-meta">Nenhuma nota cadastrada no Firebase.</div>`;
+    return;
+  }
+
+  box.innerHTML = list.map((item) => `
+    <article class="list-card event-card">
+      ${item.image || item.imagem ? `<img src="${escapeAttr(displayImageUrl(item.image || item.imagem))}" alt="${escapeAttr(item.name || "Nota")}" ${imageFallbackAttr()}>` : ""}
+      <div class="list-title">${escapeHtml(item.name || item.nome || item.id)}</div>
+      <div class="list-meta">${escapeHtml(item.date || item.data || "Sem data")}</div>
+      <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status)}</span>
+      <button type="button" data-edit-death-notice="${escapeAttr(item.id)}">Editar</button>
+    </article>
+  `).join("");
+
+  box.querySelectorAll("[data-edit-death-notice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const item = state.notasFalecimento.find((notice) => notice.id === button.dataset.editDeathNotice);
+      if (item) fillInfoDeathNoticeForm(item);
+    });
+  });
+}
+
+async function uploadInfoDeathNoticeImage(file) {
+  if (!file) return;
+  if (!canManageInformacoes()) return;
+  const id = $("infoDeathNoticeId").value || `${slugify($("infoDeathNoticeName").value.trim() || "nota")}-${Date.now()}`;
+  const path = `conteudosInformativos/notaFalecimento/${id}/${Date.now()}-${slugify(file.name || "imagem")}`;
+  const fileRef = storageRef(storage, path);
+  showToast("Enviando imagem da nota...");
+  await uploadBytes(fileRef, file);
+  $("infoDeathNoticeImage").value = await getDownloadURL(fileRef);
+  showToast("Imagem da nota enviada.");
+}
+
 function renderFinanceiro() {
   const box = $("financeList");
   if (!box) return;
@@ -2458,6 +2572,12 @@ function bindEvents() {
     await uploadEventImage(event.target.files?.[0]);
     event.target.value = "";
   });
+  $("newInfoDeathNoticeButton")?.addEventListener("click", resetInfoDeathNoticeForm);
+  $("infoDeathNoticeSearch")?.addEventListener("input", renderInfoDeathNoticeList);
+  $("infoDeathNoticeImageUpload")?.addEventListener("change", async (event) => {
+    await uploadInfoDeathNoticeImage(event.target.files?.[0]);
+    event.target.value = "";
+  });
   $("financeSearch").addEventListener("input", renderFinanceiro);
   $("financeFilter").addEventListener("change", renderFinanceiro);
   $("categorySearch").addEventListener("input", renderCategoriesList);
@@ -2595,6 +2715,27 @@ function bindEvents() {
     resetEventForm();
     await loadAllData();
   });
+
+  $("infoDeathNoticeForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!canManageInformacoes()) return;
+    const payload = getInfoDeathNoticeFormData();
+    const id = payload.id;
+    delete payload.id;
+    if (!state.selectedDeathNoticeId) payload.createdAt = serverTimestamp();
+    await update(ref(db, `conteudosInformativos/notaFalecimento/${id}`), payload);
+    showToast("Nota de falecimento salva.");
+    resetInfoDeathNoticeForm();
+    await loadAllData();
+  });
+
+  $("deleteInfoDeathNoticeButton")?.addEventListener("click", async () => {
+    if (!state.selectedDeathNoticeId || !confirm("Excluir esta nota de falecimento?")) return;
+    await remove(ref(db, `conteudosInformativos/notaFalecimento/${state.selectedDeathNoticeId}`));
+    showToast("Nota de falecimento excluida.");
+    resetInfoDeathNoticeForm();
+    await loadAllData();
+  });
 }
 
 renderPanelVersion();
@@ -2621,5 +2762,5 @@ onAuthStateChanged(auth, async (user) => {
   $("appView").classList.remove("hidden");
   updateChrome();
   await loadAllData();
-  switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
+  switchView(canManageClients() ? "dashboard" : (canManageInformacoes() ? "informacoes" : "minhaEmpresa"));
 });
