@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 56,
-  label: "v56",
+  numero: 57,
+  label: "v57",
   data: "2026-05-18",
-  nota: "Importacao persiste clientes ausentes direto no Firebase e recarrega a base gravada."
+  nota: "Importacao ignora aliases antigos para nao confundir clientes ausentes com existentes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -266,17 +266,9 @@ function findExistingClientForImport(categoryName, clientName) {
   const legacyId = getLegacyRepeatedClientId(categoryName, clientName);
   const categoryId = slugify(categoryName || "outros");
   const clientNameNorm = normalizeName(clientName);
-  const expectedKeys = buildClientPublicAliases(expectedId, {
-    nome: clientName,
-    nomeNormalizado: clientNameNorm,
-    categoria: categoryName,
-    categoriaId: categoryId
-  }, null, false);
   return state.clientes.find((client) => {
     if (client.id === expectedId) return true;
     if (legacyId && client.id === legacyId) return true;
-    const aliases = client.aliases || {};
-    if (Object.keys(expectedKeys).some((key) => aliases[key])) return true;
     const sameCategory = slugify(client.categoria || client.categoriaId || "outros") === categoryId;
     const sameName = normalizeName(client.nome || client.name || "") === clientNameNorm;
     return sameCategory && sameName;
@@ -315,7 +307,6 @@ function clientStrongKeys(client) {
   add(client?.id);
   add(clientCanonicalId(client));
   add(getLegacyRepeatedClientId(client?.categoria || client?.categoriaId || "outros", client?.nome || client?.name || client?.id || "cliente"));
-  Object.keys(client?.aliases || {}).forEach(add);
   if (client?.categoria || client?.categoriaId || client?.nome || client?.name) {
     add(`${client.categoria || client.categoriaId || "outros"}-${client.nome || client.name || client.id}`);
   }
