@@ -6566,6 +6566,95 @@ plotarPinsImoveis(stateImoveis.filtered);
   const elMenuImoveis = document.getElementById("menuImoveis");
   if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
 
+  function textoSeguroAutomoveis(valor) {
+    return String(valor || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function automovelDeRegistro(item, key) {
+    return {
+      id: key || item.id || "",
+      marca: item.Marca || item.marca || "",
+      modelo: item.Modelo || item.modelo || item.titulo || item.Titulo || "",
+      ano: item.Ano || item.ano || "",
+      preco: item.Preco || item.Preço || item.preco || item.valor || "",
+      imagem: item.Link_Imagem || item["Imagem URL"] || item.imagem || item.image || "",
+      descricao: item.Descricao || item.Descrição || item.descricao || "",
+      contato: item.Contato || item.contato || item.whatsapp || "",
+      status: item.status || "ativo"
+    };
+  }
+
+  async function carregarAutomoveisFirebase() {
+    const dbAdmin = await esperarFirebaseDatabase();
+    if (!dbAdmin) return [];
+    const [legacySnap, novoSnap] = await Promise.all([
+      dbAdmin.ref("conteudo/veiculos").once("value"),
+      dbAdmin.ref("conteudosInformativos/automoveis").once("value")
+    ]);
+    const lista = [];
+    legacySnap.forEach((child) => {
+      lista.push(automovelDeRegistro(child.val() || {}, child.key));
+      return false;
+    });
+    novoSnap.forEach((child) => {
+      lista.push(automovelDeRegistro(child.val() || {}, child.key));
+      return false;
+    });
+    return lista.filter((item) => item.status !== "inativo");
+  }
+
+  async function mostrarAutomoveis() {
+    if (location.hash !== "#automoveis") location.hash = "#automoveis";
+    const area = document.querySelector(".content_area");
+    if (!area) return;
+
+    area.innerHTML = `
+      <section class="imoveis-wrap">
+        <div class="imoveis-head">
+          <h2><i class="fa-solid fa-car"></i> Automoveis</h2>
+        </div>
+        <div id="automoveisLista" class="im-grid">
+          <div class="list-meta">Carregando automoveis...</div>
+        </div>
+      </section>
+    `;
+
+    const box = document.getElementById("automoveisLista");
+    const lista = await carregarAutomoveisFirebase();
+    if (!lista.length) {
+      box.innerHTML = `<div class="list-meta">Nenhum automovel anunciado no momento.</div>`;
+      return;
+    }
+
+    box.innerHTML = lista.map((item) => {
+      const titulo = [item.marca, item.modelo].filter(Boolean).join(" ") || "Automovel";
+      const contato = String(item.contato || "").replace(/\D/g, "");
+      return `
+        <article class="im-card">
+          ${item.imagem ? `<img src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy">` : ""}
+          <div class="im-card-body">
+            <h3>${textoSeguroAutomoveis(titulo)}</h3>
+            <p>${textoSeguroAutomoveis([item.ano, item.preco].filter(Boolean).join(" - "))}</p>
+            ${item.descricao ? `<p>${textoSeguroAutomoveis(item.descricao)}</p>` : ""}
+            ${contato ? `<a class="zap-link telefone-link" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent("Olá! Vi o automóvel no Olá Carlópolis e gostaria de mais informações.")}"><i class="bx bxl-whatsapp"></i> Tenho interesse</a>` : ""}
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  const elMenuAutomoveis = document.getElementById("menuAutomoveis");
+  if (elMenuAutomoveis) {
+    elMenuAutomoveis.addEventListener("click", function (event) {
+      event.preventDefault();
+      mostrarAutomoveis();
+    });
+  }
+
 
 
 
@@ -17557,6 +17646,7 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
+    if (h === "#automoveis" || h === "#veiculos") { return mostrarAutomoveis(); }
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
 
     if (h === "#represa-chavantes") { return mostrarRepresa(); };

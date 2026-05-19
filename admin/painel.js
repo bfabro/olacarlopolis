@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 61,
-  label: "v61",
+  numero: 62,
+  label: "v62",
   data: "2026-05-18",
-  nota: "Adiciona gestao de Nota de Falecimento no menu Informacoes com permissao por usuario."
+  nota: "Adiciona permissoes de Imoveis e Automoveis para usuarios administrativos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -605,7 +605,7 @@ async function loadProfile(user) {
       email: user.email,
       role: "master",
       status: "ativo",
-      permissoes: { dados: true, imagens: true, cardapio: true, promocoes: true, financeiro: true, informacoes: true, informacoes_nota_falecimento: true }
+      permissoes: { dados: true, imagens: true, cardapio: true, promocoes: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true }
     };
     await saveUserProfile(profile);
     return profile;
