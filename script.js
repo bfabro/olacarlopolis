@@ -4486,7 +4486,7 @@ carlopdiesel:"s",
   
     <div class="onde-comer-card-esq">
 
-      <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel">
+      <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel" loading="lazy" decoding="async">
   ${est.novidadesImages && est.novidadesImages.length ? `
    <button class="btn-fotos_onde" onclick="registrarCliqueFotosOndeComer('${normalizeName(est.name)}'); mostrarFotos('${normalizeName(est.name)}')">
   📷 Fotos
@@ -6313,7 +6313,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     <div class="card-top">
       <div class="swiper swiper-imovel-mini">
         <div class="swiper-wrapper">
-          ${im.imagens.map(src => `<div class="swiper-slide"><img src="${src}" alt="${im.titulo}"></div>`).join("")}
+          ${im.imagens.map(src => `<div class="swiper-slide"><img src="${src}" alt="${im.titulo}" loading="lazy" decoding="async"></div>`).join("")}
         </div>
       </div>
 
@@ -6400,7 +6400,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       <div class="swiper swiper-imovel-full">
         <div class="swiper-wrapper">
           ${im.imagens.map(src => `
-            <div class="swiper-slide"><img src="${src}" alt="${im.titulo || ''}"></div>
+            <div class="swiper-slide"><img src="${src}" alt="${im.titulo || ''}" loading="lazy" decoding="async"></div>
           `).join("")}
         </div>
         <div class="swiper-pagination"></div>
@@ -6635,7 +6635,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       const contato = String(item.contato || "").replace(/\D/g, "");
       return `
         <article class="im-card">
-          ${item.imagem ? `<img src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy">` : ""}
+          ${item.imagem ? `<img src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">` : ""}
           <div class="im-card-body">
             <h3>${textoSeguroAutomoveis(titulo)}</h3>
             <p>${textoSeguroAutomoveis([item.ano, item.preco].filter(Boolean).join(" - "))}</p>
@@ -15915,6 +15915,8 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   let ADMIN_CLIENTES_PROMISE = null;
   let ADMIN_CLIENTES_LAST_APPLIED = 0;
+  let ADMIN_CLIENTES_LOADED = false;
+  let ADMIN_CLIENTES_BACKGROUND_STARTED = false;
   const ADMIN_FIREBASE_CONFIG = {
     apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
     authDomain: "contadoracessos.firebaseapp.com",
@@ -16514,6 +16516,21 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
   }
 
+  function aplicarDadosAdminClientesEmSegundoPlano(callback) {
+    if (ADMIN_CLIENTES_BACKGROUND_STARTED || ADMIN_CLIENTES_LOADED) return Promise.resolve(false);
+    ADMIN_CLIENTES_BACKGROUND_STARTED = true;
+    return aplicarDadosAdminClientes()
+      .then(() => {
+        ADMIN_CLIENTES_LOADED = true;
+        if (typeof callback === "function") callback();
+        return true;
+      })
+      .catch((err) => {
+        console.warn("Nao foi possivel atualizar dados do painel admin em segundo plano.", err);
+        return false;
+      });
+  }
+
   function renderizarTelaAtualComDadosAdmin() {
     try {
       montarCarrosselDivulgacao();
@@ -16580,9 +16597,9 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
   });
 
 
-  aplicarDadosAdminClientes().then(renderizarTelaAtualComDadosAdmin);
+  aplicarDadosAdminClientesEmSegundoPlano(renderizarTelaAtualComDadosAdmin);
   window.addEventListener("DOMContentLoaded", () => {
-    aplicarDadosAdminClientes().then(renderizarTelaAtualComDadosAdmin);
+    aplicarDadosAdminClientesEmSegundoPlano(renderizarTelaAtualComDadosAdmin);
   });
 
 
@@ -16812,7 +16829,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     
       ${establishment.image
           ? `
-           <img  id="imagem-${normalizeName(establishment.name)}" src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}">
+           <img  id="imagem-${normalizeName(establishment.name)}" src="${establishment.image}" title="${establishment.name}"  alt="Imagem de ${establishment.name}" loading="lazy" decoding="async">
 
 
           `
@@ -17321,10 +17338,15 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
   }
 
   async function loadPaidEstablishments() {
-    await aplicarDadosAdminClientes();
     const categories = window.categories || [];
     categories.forEach((category) => {
       loadContent(category.title, category.establishments);
+    });
+    aplicarDadosAdminClientesEmSegundoPlano(() => {
+      const updatedCategories = window.categories || [];
+      updatedCategories.forEach((category) => {
+        loadContent(category.title, category.establishments);
+      });
     });
   }
 
@@ -17635,8 +17657,10 @@ ${(establishment.menuImages && establishment.menuImages.length > 0) ? `
 
 
   async function handleHashRoute() {
-    await aplicarDadosAdminClientes();
     const h = (location.hash || "").toLowerCase();
+    if (!ADMIN_CLIENTES_LOADED) {
+      aplicarDadosAdminClientesEmSegundoPlano(() => handleHashRoute());
+    }
 
     if (h === "#ondecomer") { return mostrarOndeComer(); }
     if (h === "#promocoes") { return mostrarPromocoes(); }
