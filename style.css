@@ -1798,6 +1798,7 @@ screen and (width: 820px) {
 .onde-comer-horarios {
   margin-top: 6px;
   font-size: 12px;
+  width: 100%;
 }
 
 .onde-comer-horarios summary {
@@ -1822,8 +1823,8 @@ screen and (width: 820px) {
 }
 
 .onde-comer-horarios .horario-publico-dia {
-  grid-template-columns: 68px minmax(0, 1fr);
-  padding: 3px 6px;
+  grid-template-columns: 62px minmax(0, 1fr);
+  padding: 3px 5px;
   border-radius: 6px;
 }
 
@@ -1843,7 +1844,7 @@ screen and (width: 820px) {
   justify-content: flex-end;
   gap: 4px;
   flex-wrap: wrap;
-  max-width: 106px;
+  max-width: 98px;
   margin: 0;
   text-align: right;
 }
@@ -1852,9 +1853,9 @@ screen and (width: 820px) {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 7px;
+  padding: 4px 6px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0;
 }
@@ -1876,7 +1877,7 @@ screen and (width: 820px) {
 }
 
 .onde-comer-status-hora {
-  font-size: 12px;
+  font-size: 11px;
   color: #40536b;
   font-weight: 700;
   width: 100%;
@@ -3031,10 +3032,12 @@ a:focus {
 
 
 .onde-comer-lista {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
   margin-top: 14px;
+  width: 100%;
+  overflow: visible;
 }
 
 .onde-comer-card {
@@ -3042,17 +3045,19 @@ a:focus {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
-  padding: 6px;
-  width: 99%;
+  width: 100%;
+  max-width: 100%;
   min-height: 95px;
-  align-items: center;
+  align-items: flex-start;
   transition: box-shadow 0.2s;
   position: relative;
   background-color: #fff;
   border-radius: 10px;
   padding: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow: visible;
+  box-sizing: border-box;
 }
 
 .onde-comer-card:hover {
@@ -3065,15 +3070,21 @@ a:focus {
   object-fit: cover;
   border-radius: 8px;
   margin-right: 10px;
+  flex: 0 0 auto;
 }
 
 .onde-comer-info h3 {
   margin: 0 0 3px 0;
   font-size: 1.1em;
+  line-height: 1.2;
+  padding-right: 102px;
 }
 
 .onde-comer-info {
-  padding-right: 112px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-right: 0;
+  overflow: visible;
 }
 
 .onde-comer-categoria {
@@ -3597,13 +3608,14 @@ a:focus {
 
 .endereco-uma-linha {
   display: block;
-  max-width: 260px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 100%;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
   line-height: 1.4;
   margin-bottom: 2px;
-  padding: 0px 0px 20px 0px;
+  padding: 0;
+  overflow-wrap: anywhere;
 }
 
 .endereco-uma-linha a {
@@ -3678,7 +3690,10 @@ a:focus {
   display: flex;
   gap: 8px;
   margin-top: 8px;
-  width: 272px;
+  width: 100%;
+  max-width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 
@@ -3695,6 +3710,9 @@ a:focus {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
   gap: 5px;
   margin: 0px 4px;
   cursor: pointer;
