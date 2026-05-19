@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 59,
-  label: "v59",
+  numero: 60,
+  label: "v60",
   data: "2026-05-18",
-  nota: "Painel carrega clientes pelo snapshot mais recente do Firebase e normaliza permissoes."
+  nota: "Corrige leitura completa dos snapshots do Firebase para carregar todos os clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -336,7 +336,10 @@ function consolidateClientsForAdmin(clients) {
 function snapshotToClientList(snapshot) {
   const clients = [];
   if (snapshot?.exists()) {
-    snapshot.forEach((child) => clients.push({ id: child.key, ...child.val() }));
+    snapshot.forEach((child) => {
+      clients.push({ id: child.key, ...child.val() });
+      return false;
+    });
   }
   return clients;
 }
@@ -624,19 +627,28 @@ async function loadAllData() {
 
   state.usuarios = [];
   if (usersSnap.exists()) {
-    usersSnap.forEach((child) => state.usuarios.push({ uid: child.key, ...child.val() }));
+    usersSnap.forEach((child) => {
+      state.usuarios.push({ uid: child.key, ...child.val() });
+      return false;
+    });
   }
   state.usuarios.sort((a, b) => String(a.email || "").localeCompare(String(b.email || "")));
 
   state.eventos = [];
   if (eventosSnap.exists()) {
-    eventosSnap.forEach((child) => state.eventos.push({ id: child.key, ...child.val() }));
+    eventosSnap.forEach((child) => {
+      state.eventos.push({ id: child.key, ...child.val() });
+      return false;
+    });
   }
   state.eventos.sort((a, b) => String(b.data || "").localeCompare(String(a.data || "")));
 
   state.categorias = [];
   if (categoriasSnap.exists()) {
-    categoriasSnap.forEach((child) => state.categorias.push({ id: child.key, ...child.val() }));
+    categoriasSnap.forEach((child) => {
+      state.categorias.push({ id: child.key, ...child.val() });
+      return false;
+    });
   }
 
   renderStats();
@@ -2219,7 +2231,7 @@ async function syncClientsFromScript(options = {}) {
         }
       }));
       const persistedSnap = await get(ref(db, "clientes"));
-      const persistedCount = persistedSnap.exists() ? persistedSnap.size : 0;
+      const persistedCount = persistedSnap.exists() ? persistedSnap.numChildren() : 0;
       if ((i + chunk.length) % 25 === 0 || i + chunk.length === clientPayloads.length) {
         showImportReport([
           `Clientes novos salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,

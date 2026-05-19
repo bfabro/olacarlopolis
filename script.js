@@ -7886,7 +7886,10 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
 
     const itens = [];
-    snap.forEach((ch) => itens.push({ key: ch.key, ...ch.val() }));
+    snap.forEach((ch) => {
+      itens.push({ key: ch.key, ...ch.val() });
+      return false;
+    });
     itens.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
 
     if (!itens.length) {
