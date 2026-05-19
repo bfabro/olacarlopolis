@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 58,
-  label: "v58",
+  numero: 59,
+  label: "v59",
   data: "2026-05-18",
-  nota: "Painel mostra todos os clientes salvos no Firebase sem consolidar a lista automaticamente."
+  nota: "Painel carrega clientes pelo snapshot mais recente do Firebase e normaliza permissoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -57,7 +57,9 @@ let state = {
   selectedCategoryId: null,
   duplicateCleanupPlan: null,
   clientImages: [],
-  clientMenuImages: []
+  clientMenuImages: [],
+  lastFirebaseClientCount: 0,
+  lastVisibleClientCount: 0
 };
 
 const $ = (id) => document.getElementById(id);
@@ -166,12 +168,16 @@ function clientCanonicalId(client) {
   return getCanonicalClientId(client?.categoria || client?.categoriaId || "outros", client?.nome || client?.name || client?.id || "cliente");
 }
 
+function currentRole() {
+  return String(state.profile?.role || "").trim().toLowerCase();
+}
+
 function canManageClients() {
-  return ["master", "admin"].includes(state.profile?.role);
+  return ["master", "admin"].includes(currentRole());
 }
 
 function isMaster() {
-  return state.profile?.role === "master";
+  return currentRole() === "master";
 }
 
 function moneyBR(value) {
@@ -325,6 +331,28 @@ function chooseNewestClient(current, candidate) {
 
 function consolidateClientsForAdmin(clients) {
   return Array.isArray(clients) ? clients : [];
+}
+
+function snapshotToClientList(snapshot) {
+  const clients = [];
+  if (snapshot?.exists()) {
+    snapshot.forEach((child) => clients.push({ id: child.key, ...child.val() }));
+  }
+  return clients;
+}
+
+function applyClientsSnapshot(snapshot) {
+  const allClients = consolidateClientsForAdmin(snapshotToClientList(snapshot));
+  state.lastFirebaseClientCount = allClients.length;
+
+  if (!canManageClients() && state.profile?.clienteId) {
+    state.clientes = allClients.filter((client) => client.id === state.profile.clienteId);
+  } else {
+    state.clientes = allClients;
+  }
+
+  state.lastVisibleClientCount = state.clientes.length;
+  sortClientsInState();
 }
 
 function upsertClientInState(id, data) {
@@ -592,15 +620,7 @@ async function loadAllData() {
     get(ref(db, "categorias"))
   ]);
 
-  state.clientes = [];
-  if (clientesSnap.exists()) {
-    clientesSnap.forEach((child) => state.clientes.push({ id: child.key, ...child.val() }));
-  }
-  state.clientes = consolidateClientsForAdmin(state.clientes);
-  if (!canManageClients() && state.profile?.clienteId) {
-    state.clientes = state.clientes.filter((client) => client.id === state.profile.clienteId);
-  }
-  sortClientsInState();
+  applyClientsSnapshot(clientesSnap);
 
   state.usuarios = [];
   if (usersSnap.exists()) {
@@ -711,11 +731,12 @@ function updateChrome() {
 }
 
 function roleLabel(role) {
+  const key = String(role || "").trim().toLowerCase();
   return {
     master: "Usuario master",
     admin: "Admin geral",
     cliente: "Admin do cliente"
-  }[role] || "Sem perfil";
+  }[key] || "Sem perfil";
 }
 
 function switchView(name) {
@@ -2236,9 +2257,15 @@ async function syncClientsFromScript(options = {}) {
       importStats.erros.push(`Resumo da importacao: ${err.code || err.message}`);
     }
 
-    await loadAllData();
     const persistedFinalSnap = await get(ref(db, "clientes"));
-    const persistedFinalCount = persistedFinalSnap.exists() ? persistedFinalSnap.size : 0;
+    applyClientsSnapshot(persistedFinalSnap);
+    renderStats();
+    renderClientsList();
+    renderFinanceiro();
+    fillClientCategorySelect();
+    fillUserClientSelect();
+    fillEventClientSelect();
+    const persistedFinalCount = state.lastFirebaseClientCount;
 
     const report = [
       `Importacao segura concluida.`,
@@ -2247,7 +2274,7 @@ async function syncClientsFromScript(options = {}) {
       `Clientes confirmados no Firebase: ${persistedFinalCount}`,
       `Categorias novas salvas: ${importStats.categoriasSalvas}/${importStats.categorias}`,
       `Categorias existentes preservadas: ${importStats.categoriasExistentes}`,
-      `Clientes na tela: ${state.clientes.length}`
+      `Clientes visiveis no painel: ${state.lastVisibleClientCount}`
     ];
     if (importStats.erros.length) {
       report.push(`Erros: ${importStats.erros.length}`);
