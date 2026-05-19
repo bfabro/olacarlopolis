@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 54,
-  label: "v54",
+  numero: 55,
+  label: "v55",
   data: "2026-05-18",
-  nota: "Painel carrega clientes do Firebase e bloqueia reimportacao sobre dados existentes."
+  nota: "Importacao grava apenas clientes ausentes e preserva todos os ja existentes no Firebase."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -617,6 +617,9 @@ async function loadAllData() {
     clientesSnap.forEach((child) => state.clientes.push({ id: child.key, ...child.val() }));
   }
   state.clientes = consolidateClientsForAdmin(state.clientes);
+  if (!canManageClients() && state.profile?.clienteId) {
+    state.clientes = state.clientes.filter((client) => client.id === state.profile.clienteId);
+  }
   sortClientsInState();
 
   state.usuarios = [];
@@ -2104,19 +2107,17 @@ function renderPromocoesMarkup(promocoes) {
 async function syncClientsFromScript(options = {}) {
   const { silent = false, source = null } = options;
   const button = $("syncClientsButton");
-  if (!silent) setBusy(button, true, "Verificando base...");
+  if (!silent) setBusy(button, true, "Importando ausentes...");
   try {
     await loadAllData();
     const { categories, statusMap } = source || await getScriptImportSource();
     const categoryPayloads = [];
     const clientPayloads = [];
-    const allowClientImport = state.clientes.length === 0;
     const importStats = {
       categorias: 0,
       clientes: 0,
       clientesSalvos: 0,
       clientesExistentes: 0,
-      clientesBloqueados: 0,
       categoriasExistentes: 0,
       categoriasSalvas: 0,
       erros: []
@@ -2151,10 +2152,6 @@ async function syncClientsFromScript(options = {}) {
         const name = est.name || est.nome;
         if (!name) return;
         importStats.clientes += 1;
-        if (!allowClientImport) {
-          importStats.clientesBloqueados += 1;
-          return;
-        }
         const id = getImportClientId(categoryName, name);
         const existing = findExistingClientForImport(categoryName, name);
         if (existing.id) {
@@ -2206,9 +2203,7 @@ async function syncClientsFromScript(options = {}) {
 
     showImportReport([
       `Encontrados: ${importStats.clientes} clientes e ${importStats.categorias} categorias.`,
-      allowClientImport
-        ? "Firebase sem clientes: gravando base inicial."
-        : "Clientes ja existem no Firebase: nao vou importar nem sobrescrever clientes do script.js."
+      "Gravando no Firebase apenas clientes que ainda nao existem. Existentes serao preservados."
     ]);
 
     const chunkSize = 25;
@@ -2231,7 +2226,6 @@ async function syncClientsFromScript(options = {}) {
         showImportReport([
           `Clientes novos salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
           `Existentes preservados: ${importStats.clientesExistentes}`,
-          `Bloqueados por seguranca: ${importStats.clientesBloqueados}`,
           `Erros: ${importStats.erros.length}`
         ], importStats.erros.length ? "error" : "info");
       }
@@ -2268,7 +2262,6 @@ async function syncClientsFromScript(options = {}) {
       `Importacao segura concluida.`,
       `Clientes novos salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
       `Clientes existentes preservados: ${importStats.clientesExistentes}`,
-      `Clientes bloqueados por seguranca: ${importStats.clientesBloqueados}`,
       `Categorias novas salvas: ${importStats.categoriasSalvas}/${importStats.categorias}`,
       `Categorias existentes preservadas: ${importStats.categoriasExistentes}`,
       `Clientes na tela: ${state.clientes.length}`
@@ -2278,9 +2271,7 @@ async function syncClientsFromScript(options = {}) {
       report.push(...importStats.erros.slice(0, 5));
     }
     showImportReport(report, importStats.erros.length ? "error" : "ok");
-    showToast(allowClientImport
-      ? `Importacao segura: ${importStats.clientesSalvos} clientes novos.`
-      : "Clientes preservados: nada foi importado do script.js por cima do Firebase.");
+    showToast(`Importacao segura: ${importStats.clientesSalvos} clientes ausentes salvos.`);
     sortClientsInState();
     renderStats();
     renderClientsList();
