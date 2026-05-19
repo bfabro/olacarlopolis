@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 57,
-  label: "v57",
+  numero: 58,
+  label: "v58",
   data: "2026-05-18",
-  nota: "Importacao ignora aliases antigos para nao confundir clientes ausentes com existentes."
+  nota: "Painel mostra todos os clientes salvos no Firebase sem consolidar a lista automaticamente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -324,18 +324,7 @@ function chooseNewestClient(current, candidate) {
 }
 
 function consolidateClientsForAdmin(clients) {
-  const groups = [];
-  clients.forEach((client) => {
-    const keys = clientStrongKeys(client);
-    const group = groups.find((item) => keys.some((key) => item.keys.has(key)));
-    if (group) {
-      keys.forEach((key) => group.keys.add(key));
-      group.client = chooseNewestClient(group.client, client);
-    } else {
-      groups.push({ keys: new Set(keys), client });
-    }
-  });
-  return groups.map((group) => group.client);
+  return Array.isArray(clients) ? clients : [];
 }
 
 function upsertClientInState(id, data) {
