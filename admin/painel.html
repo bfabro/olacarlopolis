@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=49">
+  <link rel="stylesheet" href="painel.css?v=50">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -101,13 +101,16 @@
 
       <section id="clientesView" class="panel-view hidden">
         <div class="split-layout">
-          <section class="panel-card">
+          <section class="panel-card client-form-card">
             <div class="section-head">
               <div>
                 <h2>Cadastrar ou editar cliente</h2>
                 <p>Dados comerciais que podem ser usados pelo site publico.</p>
               </div>
-              <button id="newClientButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Novo</button>
+              <div class="section-actions">
+                <button id="closeClientFormButton" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                <button id="newClientButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Novo</button>
+              </div>
             </div>
             <form id="clientForm" class="grid-form">
               <input type="hidden" id="clientId">
@@ -160,7 +163,18 @@
                 </div>
                 <input id="clientImage" type="hidden">
               </section>
-              <label>Link do cardapio<input id="clientMenuLink"></label>
+              <label>Link do cardapio<input id="clientMenuLink" placeholder="Link externo ou PDF enviado"></label>
+              <section class="wide upload-panel">
+                <div class="section-head compact">
+                  <div>
+                    <h3>Cardapio em PDF ou imagens</h3>
+                    <p>Envie um PDF para abrir no botao Cardapio, ou imagens para aparecerem em modal.</p>
+                  </div>
+                  <span id="clientMenuImagesCount" class="badge">0 imagens</span>
+                </div>
+                <input id="clientMenuUpload" type="file" accept="image/*,application/pdf" multiple>
+                <div id="clientMenuPreview" class="image-grid"></div>
+              </section>
               <section class="wide upload-panel">
                 <div class="section-head compact">
                   <div>
@@ -190,7 +204,7 @@
             </form>
           </section>
 
-          <section class="panel-card">
+          <section class="panel-card clients-list-card">
             <div class="section-head">
               <div>
                 <h2>Visao dos clientes</h2>
@@ -387,6 +401,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=49"></script>
+  <script type="module" src="painel.js?v=50"></script>
 </body>
 </html>

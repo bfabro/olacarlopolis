@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 49,
-  label: "v49",
+  numero: 50,
+  label: "v50",
   data: "2026-05-18",
-  nota: "Cardapio antigo continua aparecendo ao usar dados do Firebase."
+  nota: "Upload de cardapio em PDF ou imagens e edicao de cliente em tela focada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -56,7 +56,8 @@ let state = {
   selectedEventId: null,
   selectedCategoryId: null,
   duplicateCleanupPlan: null,
-  clientImages: []
+  clientImages: [],
+  clientMenuImages: []
 };
 
 const $ = (id) => document.getElementById(id);
@@ -191,6 +192,14 @@ function normalizeImageItems(images) {
     })
     .filter((item) => item.url)
     .slice(0, 10);
+}
+
+function normalizeUrlList(items) {
+  return (Array.isArray(items) ? items : [])
+    .map((item) => typeof item === "string" ? item : (item?.url || ""))
+    .map((url) => String(url || "").trim())
+    .filter(Boolean)
+    .slice(0, 30);
 }
 
 function cleanForFirebase(value) {
@@ -712,11 +721,26 @@ function switchView(name) {
   $("viewSubtitle").textContent = subtitle;
 
   if (target === "minhaEmpresa") renderClientOnlyEditor();
+  if (target !== "clientes") setClientFocusMode(false);
+}
+
+function setClientFocusMode(enabled) {
+  const view = $("clientesView");
+  const closeButton = $("closeClientFormButton");
+  if (!view) return;
+  view.classList.toggle("client-focus-mode", Boolean(enabled));
+  closeButton?.classList.toggle("hidden", !enabled);
+}
+
+function closeClientFormToDashboard() {
+  resetClientForm();
+  switchView("dashboard");
 }
 
 function resetClientForm() {
   state.selectedClientId = null;
   state.clientImages = [];
+  state.clientMenuImages = [];
   $("clientForm").reset();
   delete $("clientForm").dataset.originalCategory;
   delete $("clientForm").dataset.originalClientId;
@@ -727,6 +751,8 @@ function resetClientForm() {
   renderProfilePreview("clientImage", "clientProfilePreview");
   renderScheduleEditor("clientScheduleEditor", emptySchedule());
   renderClientImagesPreview();
+  renderClientMenuPreview();
+  setClientFocusMode(false);
 }
 
 function getClientFormData() {
@@ -757,6 +783,7 @@ function getClientFormData() {
     imagem: $("clientImage").value.trim(),
     imagens: normalizeImageItems(state.clientImages),
     cardapioLink: $("clientMenuLink").value.trim(),
+    menuImages: normalizeUrlList(state.clientMenuImages),
     infoAdicional: $("clientInfo").value.trim(),
     observacaoAdmin: $("clientAdminNote").value.trim(),
     origem: "painel",
@@ -788,10 +815,13 @@ function fillClientForm(client) {
   state.clientImages = normalizeImageItems(client.imagens);
   renderScheduleEditor("clientScheduleEditor", client.horarios || {});
   $("clientMenuLink").value = client.cardapioLink || "";
+  state.clientMenuImages = normalizeUrlList(client.menuImages);
   $("clientInfo").value = client.infoAdicional || "";
   $("clientAdminNote").value = client.observacaoAdmin || "";
   $("deleteClientButton").classList.remove("hidden");
   renderClientImagesPreview();
+  renderClientMenuPreview();
+  setClientFocusMode(true);
 }
 
 async function deleteClientById(clientId) {
@@ -859,6 +889,39 @@ function renderClientImagesPreview() {
   });
 }
 
+function renderClientMenuPreview() {
+  const box = $("clientMenuPreview");
+  const count = $("clientMenuImagesCount");
+  if (!box || !count) return;
+
+  const images = normalizeUrlList(state.clientMenuImages);
+  state.clientMenuImages = images;
+  count.textContent = `${images.length} imagem${images.length === 1 ? "" : "s"}`;
+
+  if (!images.length) {
+    box.innerHTML = `<div class="list-meta">Nenhuma imagem de cardapio enviada ainda.</div>`;
+    return;
+  }
+
+  box.innerHTML = images.map((url, index) => `
+    <article class="image-tile">
+      <img src="${escapeAttr(displayImageUrl(url))}" alt="Cardapio ${index + 1}" ${imageFallbackAttr()}>
+      <div>
+        <button type="button" data-remove-menu-image="${index}" class="danger-mini">Remover</button>
+      </div>
+    </article>
+  `).join("");
+
+  box.querySelectorAll("[data-remove-menu-image]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.removeMenuImage);
+      state.clientMenuImages.splice(index, 1);
+      renderClientMenuPreview();
+      showToast("Imagem do cardapio removida. Clique em salvar cliente para gravar.");
+    });
+  });
+}
+
 async function uploadClientImages(files) {
   const currentId = $("clientId").value || slugify($("clientName").value.trim()) || `cliente-${Date.now()}`;
   const remaining = Math.max(0, 10 - state.clientImages.length);
@@ -876,6 +939,74 @@ async function uploadClientImages(files) {
   if (!$("clientImage").value && state.clientImages[0]) $("clientImage").value = imageUrl(state.clientImages[0]);
   renderClientImagesPreview();
   showToast("Imagens enviadas.");
+}
+
+function isPdfFile(file) {
+  return file?.type === "application/pdf" || /\.pdf$/i.test(file?.name || "");
+}
+
+async function uploadMenuFilesForClient(clientId, files) {
+  const result = { images: [], pdf: "" };
+  for (const file of Array.from(files || [])) {
+    const kind = isPdfFile(file) ? "pdf" : "imagens";
+    const path = `clientes/${clientId}/cardapio/${kind}/${Date.now()}-${slugify(file.name || "cardapio")}`;
+    const fileRef = storageRef(storage, path);
+    await uploadBytes(fileRef, file);
+    const url = await getDownloadURL(fileRef);
+    if (kind === "pdf" && !result.pdf) {
+      result.pdf = url;
+    } else if (kind === "imagens") {
+      result.images.push(url);
+    }
+  }
+  return result;
+}
+
+async function saveClientMenuForCanonicalClient(sourceClient, targetId) {
+  const oldId = sourceClient?.id || "";
+  const { id: _ignored, ...clientData } = sourceClient || {};
+  const payload = cleanForFirebase({
+    ...clientData,
+    cardapioLink: $("clientMenuLink").value.trim(),
+    menuImages: normalizeUrlList(state.clientMenuImages),
+    origem: "painel",
+    editadoNoPainel: true,
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  });
+  const updates = { [`clientes/${targetId}`]: payload };
+  if (oldId && oldId !== targetId) updates[`clientes/${oldId}`] = null;
+  await update(ref(db), updates);
+  if (oldId && oldId !== targetId) state.clientes = state.clientes.filter((item) => item.id !== oldId);
+  upsertClientInState(targetId, payload);
+  state.selectedClientId = targetId;
+}
+
+async function uploadClientMenuFiles(files) {
+  const selected = Array.from(files || []);
+  if (!selected.length) return;
+
+  const name = $("clientName").value.trim();
+  const category = $("clientNewCategory").value.trim() || $("clientCategory").value.trim() || $("clientForm").dataset.originalCategory || "Outros";
+  const targetId = getCanonicalClientId(category, name);
+  if (!targetId) {
+    showToast("Informe o nome do cliente antes de enviar o cardapio.");
+    return;
+  }
+
+  showToast("Enviando cardapio...");
+  const result = await uploadMenuFilesForClient(targetId, selected);
+  if (result.pdf) $("clientMenuLink").value = result.pdf;
+  state.clientMenuImages.push(...result.images);
+  renderClientMenuPreview();
+
+  if (state.selectedClientId) {
+    const sourceClient = state.clientes.find((client) => client.id === state.selectedClientId || client.id === targetId) || {};
+    await saveClientMenuForCanonicalClient(sourceClient, targetId);
+    renderClientsList();
+  }
+
+  showToast(state.selectedClientId ? "Cardapio salvo." : "Cardapio enviado. Salve o cliente para concluir.");
 }
 
 async function uploadProfileImageForClient(clientId, file) {
@@ -1574,6 +1705,7 @@ function renderClientOnlyEditor() {
   }
 
   const imagens = normalizeImageItems(client.imagens);
+  const menuImages = normalizeUrlList(client.menuImages);
 
   mount.innerHTML = `
     <form id="clientOnlyForm" class="grid-form">
@@ -1605,7 +1737,20 @@ function renderClientOnlyEditor() {
         </div>
         <input id="coImage" type="hidden" value="${escapeAttr(client.imagem || "")}">
       </section>
-      <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}"></label>
+      <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}" placeholder="Link externo ou PDF enviado"></label>
+      <section class="wide upload-panel">
+        <div class="section-head compact">
+          <div>
+            <h3>Meu cardapio</h3>
+            <p>Envie um PDF para abrir no botao Cardapio, ou imagens para aparecerem em modal.</p>
+          </div>
+          <span id="coMenuImagesCount" class="badge">${menuImages.length} imagem${menuImages.length === 1 ? "" : "s"}</span>
+        </div>
+        <input id="coMenuUpload" type="file" accept="image/*,application/pdf" multiple>
+        <div id="coMenuPreview" class="image-grid">
+          ${renderMenuImagesMarkup(menuImages, "comenu")}
+        </div>
+      </section>
       <section class="wide upload-panel">
         <div class="section-head compact">
           <div>
@@ -1669,6 +1814,26 @@ function renderClientOnlyEditor() {
     renderClientOnlyEditor();
   });
 
+  mount.querySelector("#coMenuUpload").addEventListener("change", async (event) => {
+    const selected = Array.from(event.target.files || []);
+    if (!selected.length) return;
+    showToast("Enviando cardapio...");
+    const result = await uploadMenuFilesForClient(client.id, selected);
+    if (result.pdf) $("coMenuLink").value = result.pdf;
+    menuImages.push(...result.images);
+    await update(ref(db, `clientes/${client.id}`), {
+      menuImages,
+      cardapioLink: $("coMenuLink").value.trim(),
+      origem: "painel",
+      editadoNoPainel: true,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid
+    });
+    showToast("Cardapio enviado.");
+    await loadAllData();
+    renderClientOnlyEditor();
+  });
+
   mount.querySelector("#coAddImageUrlButton").addEventListener("click", async () => {
     const url = mount.querySelector("#coImageUrl").value.trim();
     const texto = mount.querySelector("#coImageText").value.trim();
@@ -1723,6 +1888,23 @@ function renderClientOnlyEditor() {
     });
   });
 
+  mount.querySelectorAll("[data-comenu-remove]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const index = Number(button.dataset.comenuRemove);
+      menuImages.splice(index, 1);
+      await update(ref(db, `clientes/${client.id}`), {
+        menuImages,
+        origem: "painel",
+        editadoNoPainel: true,
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user.uid
+      });
+      showToast("Imagem do cardapio removida.");
+      await loadAllData();
+      renderClientOnlyEditor();
+    });
+  });
+
   $("clientOnlyForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const horarios = readScheduleEditor("coScheduleEditor");
@@ -1741,6 +1923,7 @@ function renderClientOnlyEditor() {
       imagem: $("coImage").value.trim(),
       imagens,
       cardapioLink: $("coMenuLink").value.trim(),
+      menuImages,
       infoAdicional: $("coInfo").value.trim(),
       origem: "painel",
       editadoNoPainel: true,
@@ -1765,6 +1948,19 @@ function renderImagesMarkup(images, prefix) {
       </label>
       <div>
         <button type="button" data-${prefix}-main="${index}">Usar como foto de perfil</button>
+        <button type="button" data-${prefix}-remove="${index}" class="danger-mini">Remover</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderMenuImagesMarkup(images, prefix) {
+  const list = normalizeUrlList(images);
+  if (!list.length) return `<div class="list-meta">Nenhuma imagem de cardapio enviada ainda.</div>`;
+  return list.map((url, index) => `
+    <article class="image-tile">
+      <img src="${escapeAttr(displayImageUrl(url))}" alt="Cardapio ${index + 1}" ${imageFallbackAttr()}>
+      <div>
         <button type="button" data-${prefix}-remove="${index}" class="danger-mini">Remover</button>
       </div>
     </article>
@@ -2070,7 +2266,11 @@ function bindEvents() {
 
   $("logoutButton").addEventListener("click", () => signOut(auth));
   $("refreshButton").addEventListener("click", loadAllData);
-  $("newClientButton").addEventListener("click", resetClientForm);
+  $("newClientButton").addEventListener("click", () => {
+    resetClientForm();
+    setClientFocusMode(true);
+  });
+  $("closeClientFormButton").addEventListener("click", closeClientFormToDashboard);
   $("newCategoryButton").addEventListener("click", resetCategoryForm);
   $("syncClientsButton").addEventListener("click", syncClientsFromScript);
   $("migrateImagesButton").addEventListener("click", migrateClientImagesToStorage);
@@ -2101,6 +2301,10 @@ function bindEvents() {
   $("clientSearch").addEventListener("input", renderClientsList);
   $("clientImagesUpload").addEventListener("change", async (event) => {
     await uploadClientImages(event.target.files);
+    event.target.value = "";
+  });
+  $("clientMenuUpload").addEventListener("change", async (event) => {
+    await uploadClientMenuFiles(event.target.files);
     event.target.value = "";
   });
   $("clientProfileUpload").addEventListener("change", async (event) => {
