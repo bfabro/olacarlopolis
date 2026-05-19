@@ -3749,6 +3749,29 @@ a:focus {
   outline: none;
 }
 
+@media (max-width: 600px) {
+  .botoes-abaixo-nome {
+    flex-wrap: nowrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .btn-cardapio,
+  .btn-whatsapp_onde {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+
+  .btn-whatsapp_onde {
+    margin: 0;
+    gap: 4px;
+  }
+}
+
 
 
 
