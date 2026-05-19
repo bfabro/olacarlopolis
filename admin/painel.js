@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 46,
-  label: "v46",
+  numero: 49,
+  label: "v49",
   data: "2026-05-18",
-  nota: "Onde comer usa horarios base quando Firebase ainda nao tem tabela."
+  nota: "Cardapio antigo continua aparecendo ao usar dados do Firebase."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -440,6 +440,22 @@ function renderScheduleEditor(containerId, schedule = {}) {
       </article>
     `;
   }).join("");
+  box.dataset.touchedSchedule = "false";
+  box.querySelectorAll('input[type="time"]').forEach((input) => {
+    input.addEventListener("input", () => {
+      box.dataset.touchedSchedule = "true";
+      const row = input.closest(".schedule-day");
+      if (input.value) {
+        const open = row?.querySelector("[data-schedule-open]");
+        if (open) open.checked = true;
+      }
+    });
+  });
+  box.querySelectorAll("[data-schedule-open]").forEach((input) => {
+    input.addEventListener("change", () => {
+      box.dataset.touchedSchedule = "true";
+    });
+  });
 }
 
 function readScheduleEditor(containerId) {
@@ -450,18 +466,13 @@ function readScheduleEditor(containerId) {
   box.querySelectorAll(".schedule-day").forEach((row) => {
     const day = row.dataset.day;
     const isOpen = row.querySelector("[data-schedule-open]")?.checked;
-    if (!isOpen) {
-      horarios[day] = [];
-      return;
-    }
-
     const slots = [];
     [0, 1].forEach((index) => {
       const inicio = row.querySelector(`[data-slot="${index}"][data-field="inicio"]`)?.value || "";
       const fim = row.querySelector(`[data-slot="${index}"][data-field="fim"]`)?.value || "";
       if (inicio && fim) slots.push({ inicio, fim });
     });
-    horarios[day] = slots;
+    horarios[day] = isOpen || slots.length ? slots : [];
   });
 
   return horarios;
@@ -725,7 +736,8 @@ function getClientFormData() {
   const currentClient = state.clientes.find((client) => client.id === state.selectedClientId);
   const category = newCategory || $("clientCategory").value.trim() || currentClient?.categoria || currentClient?.category || $("clientForm").dataset.originalCategory || "Outros";
   const horarios = readScheduleEditor("clientScheduleEditor");
-  const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || $("clientScheduleEditor")?.dataset.initialSchedule === "true";
+  const scheduleBox = $("clientScheduleEditor");
+  const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
   const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("clientHours").value.trim();
   return {
     id,
@@ -739,7 +751,7 @@ function getClientFormData() {
     whatsapp: $("clientWhatsapp").value.trim(),
     endereco: $("clientAddress").value.trim(),
     horario: horarioTexto,
-    ...(shouldSaveSchedule ? { horarios } : {}),
+    ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
     instagram: $("clientInstagram").value.trim(),
     facebook: $("clientFacebook").value.trim(),
     imagem: $("clientImage").value.trim(),
@@ -1714,7 +1726,8 @@ function renderClientOnlyEditor() {
   $("clientOnlyForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const horarios = readScheduleEditor("coScheduleEditor");
-    const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || $("coScheduleEditor")?.dataset.initialSchedule === "true";
+    const scheduleBox = $("coScheduleEditor");
+    const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
     const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("coHours").value.trim();
     const payload = {
       nome: $("coName").value.trim(),
@@ -1723,7 +1736,7 @@ function renderClientOnlyEditor() {
       whatsapp: $("coWhatsapp").value.trim(),
       endereco: $("coAddress").value.trim(),
       horario: horarioTexto,
-      ...(shouldSaveSchedule ? { horarios } : {}),
+      ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
       instagram: $("coInstagram").value.trim(),
       imagem: $("coImage").value.trim(),
       imagens,

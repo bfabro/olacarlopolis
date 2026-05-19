@@ -4509,11 +4509,11 @@ carlopdiesel:"s",
       <i class="fa-brands fa-instagram"></i>
     </a>
   ` : ''}
-</span>
+ </span>
+ ${statusAberto}
 
      
       <h3>${est.name}</h3>
-      ${statusAberto}
       
       <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
   ${est.address && est.address.trim().toLowerCase() !== "somente delivery"
@@ -16060,6 +16060,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (campoExiste(cliente, "instagram")) est.instagram = cliente.instagram || "";
     if (campoExiste(cliente, "facebook")) est.facebook = cliente.facebook || "";
     if (campoExiste(cliente, "cardapioLink")) est.cardapioLink = cliente.cardapioLink || "";
+    if (Array.isArray(cliente.menuImages) && cliente.menuImages.length) est.menuImages = cliente.menuImages;
     if (campoExiste(cliente, "infoAdicional")) est.infoAdicional = cliente.infoAdicional || "";
   }
 
@@ -16081,6 +16082,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       instagram: cliente.instagram || "",
       facebook: cliente.facebook || "",
       cardapioLink: cliente.cardapioLink || "",
+      menuImages: cliente.menuImages || [],
       infoAdicional: cliente.infoAdicional || "",
       novidadesImages: imagensAdmin.map((item) => item.url).slice(0, 10),
       novidadesDescriptions: imagensAdmin.map((item) => item.texto || "").slice(0, 10),
@@ -16113,6 +16115,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       horarios: cliente.horarios || base.horarios || null,
       horario: cliente.horario || base.hours || "",
       imagem: cliente.imagem || base.image || "",
+      menuImages: Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || []),
       imagens: Array.isArray(cliente.imagens) && cliente.imagens.length
         ? cliente.imagens
         : (Array.isArray(base.novidadesImages)
