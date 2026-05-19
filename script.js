@@ -4625,6 +4625,7 @@ ${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact)
         const idEst = normalizeName(nomeEst);
         const lista = est.promocoes || est.promotions || [];
         lista.forEach(p => {
+          if (p && p.ativo === false) return;
           itens.push({
             estabelecimento: nomeEst,
             estabelecimentoId: idEst,
@@ -16061,6 +16062,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (campoExiste(cliente, "facebook")) est.facebook = cliente.facebook || "";
     if (campoExiste(cliente, "cardapioLink")) est.cardapioLink = cliente.cardapioLink || "";
     if (Array.isArray(cliente.menuImages) && cliente.menuImages.length) est.menuImages = cliente.menuImages;
+    if (Array.isArray(cliente.promocoes)) est.promocoes = cliente.promocoes;
     if (campoExiste(cliente, "infoAdicional")) est.infoAdicional = cliente.infoAdicional || "";
   }
 
@@ -16083,6 +16085,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       facebook: cliente.facebook || "",
       cardapioLink: cliente.cardapioLink || "",
       menuImages: cliente.menuImages || [],
+      promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : [],
       infoAdicional: cliente.infoAdicional || "",
       novidadesImages: imagensAdmin.map((item) => item.url).slice(0, 10),
       novidadesDescriptions: imagensAdmin.map((item) => item.texto || "").slice(0, 10),
@@ -16116,6 +16119,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       horario: cliente.horario || base.hours || "",
       imagem: cliente.imagem || base.image || "",
       menuImages: Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || []),
+      promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : (base.promocoes || base.promotions || []),
       imagens: Array.isArray(cliente.imagens) && cliente.imagens.length
         ? cliente.imagens
         : (Array.isArray(base.novidadesImages)

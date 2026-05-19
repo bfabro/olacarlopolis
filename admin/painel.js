@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 52,
-  label: "v52",
+  numero: 53,
+  label: "v53",
   data: "2026-05-18",
-  nota: "Botoes de Onde Comer alinhados na mesma linha no mobile."
+  nota: "Admin do cliente pode cadastrar promocoes para o menu publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -199,6 +199,26 @@ function normalizeUrlList(items) {
     .map((item) => typeof item === "string" ? item : (item?.url || ""))
     .map((url) => String(url || "").trim())
     .filter(Boolean)
+    .slice(0, 30);
+}
+
+function normalizePromocoes(items) {
+  return (Array.isArray(items) ? items : [])
+    .map((item, index) => ({
+      id: item?.id || `promo-${Date.now()}-${index}`,
+      titulo: String(item?.titulo || item?.nome || "").trim(),
+      volume: String(item?.volume || "").trim(),
+      embalagem: String(item?.embalagem || "").trim(),
+      preco: String(item?.preco || "").trim(),
+      precoAntigo: String(item?.precoAntigo || "").trim(),
+      unidade: String(item?.unidade || "").trim(),
+      imagem: String(item?.imagem || item?.image || "").trim(),
+      validadeInicio: String(item?.validadeInicio || "").trim(),
+      validadeFim: String(item?.validadeFim || item?.validade || "").trim(),
+      obs: String(item?.obs || item?.descricao || "").trim(),
+      ativo: item?.ativo === false ? false : true
+    }))
+    .filter((item) => item.titulo)
     .slice(0, 30);
 }
 
@@ -1103,6 +1123,13 @@ async function uploadImagesForClient(clientId, files) {
   return urls;
 }
 
+async function uploadPromoImageForClient(clientId, file) {
+  const path = `clientes/${clientId}/promocoes/${Date.now()}-${slugify(file.name || "promocao")}`;
+  const fileRef = storageRef(storage, path);
+  await uploadBytes(fileRef, file);
+  return getDownloadURL(fileRef);
+}
+
 function isFirebaseStorageUrl(url) {
   return /firebasestorage\.googleapis\.com|storage\.googleapis\.com/i.test(String(url || ""));
 }
@@ -1706,6 +1733,7 @@ function renderClientOnlyEditor() {
 
   const imagens = normalizeImageItems(client.imagens);
   const menuImages = normalizeUrlList(client.menuImages);
+  const promocoes = normalizePromocoes(client.promocoes);
 
   mount.innerHTML = `
     <form id="clientOnlyForm" class="grid-form">
@@ -1771,6 +1799,32 @@ function renderClientOnlyEditor() {
         </div>
         <div id="coImagesPreview" class="image-grid">
           ${renderImagesMarkup(imagens, "co")}
+        </div>
+      </section>
+      <section class="wide upload-panel">
+        <div class="section-head compact">
+          <div>
+            <h3>Promocoes</h3>
+            <p>Cadastre ofertas que aparecem no menu Promocoes do site publico.</p>
+          </div>
+          <span id="coPromosCount" class="badge">${promocoes.length} ativa${promocoes.length === 1 ? "" : "s"}</span>
+        </div>
+        <div class="promo-admin-form">
+          <label>Titulo da promocao<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
+          <label>Preco atual<input id="coPromoPrice" placeholder="Ex.: 49,90"></label>
+          <label>Preco antigo<input id="coPromoOldPrice" placeholder="Opcional"></label>
+          <label>Unidade<input id="coPromoUnit" placeholder="Ex.: A unidade"></label>
+          <label>Volume<input id="coPromoVolume" placeholder="Opcional"></label>
+          <label>Embalagem<input id="coPromoPack" placeholder="Opcional"></label>
+          <label>Validade inicio<input id="coPromoStart" type="date"></label>
+          <label>Validade fim<input id="coPromoEnd" type="date"></label>
+          <label class="wide">Observacao<textarea id="coPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
+          <label>Imagem da promocao<input id="coPromoImageUpload" type="file" accept="image/*"></label>
+          <label>Ou URL da imagem<input id="coPromoImageUrl" placeholder="https://..."></label>
+          <button id="coAddPromoButton" type="button" class="ghost-button wide"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
+        </div>
+        <div id="coPromosPreview" class="promo-admin-list">
+          ${renderPromocoesMarkup(promocoes)}
         </div>
       </section>
       <label class="wide">Informacoes adicionais<textarea id="coInfo" rows="4">${escapeHtml(client.infoAdicional || "")}</textarea></label>
@@ -1857,6 +1911,47 @@ function renderClientOnlyEditor() {
     renderClientOnlyEditor();
   });
 
+  mount.querySelector("#coAddPromoButton").addEventListener("click", async () => {
+    const title = $("coPromoTitle").value.trim();
+    if (!title) {
+      showToast("Informe o titulo da promocao.");
+      return;
+    }
+
+    let image = $("coPromoImageUrl").value.trim();
+    const imageFile = $("coPromoImageUpload").files?.[0];
+    if (imageFile) {
+      showToast("Enviando imagem da promocao...");
+      image = await uploadPromoImageForClient(client.id, imageFile);
+    }
+
+    promocoes.unshift({
+      id: `promo-${Date.now()}`,
+      titulo: title,
+      preco: $("coPromoPrice").value.trim(),
+      precoAntigo: $("coPromoOldPrice").value.trim(),
+      unidade: $("coPromoUnit").value.trim(),
+      volume: $("coPromoVolume").value.trim(),
+      embalagem: $("coPromoPack").value.trim(),
+      validadeInicio: $("coPromoStart").value,
+      validadeFim: $("coPromoEnd").value,
+      obs: $("coPromoObs").value.trim(),
+      imagem: image,
+      ativo: true
+    });
+
+    await update(ref(db, `clientes/${client.id}`), {
+      promocoes: normalizePromocoes(promocoes),
+      origem: "painel",
+      editadoNoPainel: true,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid
+    });
+    showToast("Promocao adicionada.");
+    await loadAllData();
+    renderClientOnlyEditor();
+  });
+
   mount.querySelectorAll("[data-co-main]").forEach((button) => {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.coMain);
@@ -1905,6 +2000,23 @@ function renderClientOnlyEditor() {
     });
   });
 
+  mount.querySelectorAll("[data-promo-remove]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const index = Number(button.dataset.promoRemove);
+      promocoes.splice(index, 1);
+      await update(ref(db, `clientes/${client.id}`), {
+        promocoes: normalizePromocoes(promocoes),
+        origem: "painel",
+        editadoNoPainel: true,
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user.uid
+      });
+      showToast("Promocao removida.");
+      await loadAllData();
+      renderClientOnlyEditor();
+    });
+  });
+
   $("clientOnlyForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const horarios = readScheduleEditor("coScheduleEditor");
@@ -1924,6 +2036,7 @@ function renderClientOnlyEditor() {
       imagens,
       cardapioLink: $("coMenuLink").value.trim(),
       menuImages,
+      promocoes: normalizePromocoes(promocoes),
       infoAdicional: $("coInfo").value.trim(),
       origem: "painel",
       editadoNoPainel: true,
@@ -1963,6 +2076,22 @@ function renderMenuImagesMarkup(images, prefix) {
       <div>
         <button type="button" data-${prefix}-remove="${index}" class="danger-mini">Remover</button>
       </div>
+    </article>
+  `).join("");
+}
+
+function renderPromocoesMarkup(promocoes) {
+  const list = normalizePromocoes(promocoes);
+  if (!list.length) return `<div class="list-meta">Nenhuma promocao cadastrada ainda.</div>`;
+  return list.map((promo, index) => `
+    <article class="promo-admin-item">
+      ${promo.imagem ? `<img src="${escapeAttr(displayImageUrl(promo.imagem))}" alt="${escapeAttr(promo.titulo)}" ${imageFallbackAttr()}>` : `<div class="promo-admin-empty">sem imagem</div>`}
+      <div>
+        <strong>${escapeHtml(promo.titulo)}</strong>
+        <span>${escapeHtml([promo.preco ? `R$ ${promo.preco}` : "", promo.validadeFim ? `ate ${promo.validadeFim}` : ""].filter(Boolean).join(" - ") || "Sem preco/validade")}</span>
+        ${promo.obs ? `<small>${escapeHtml(promo.obs)}</small>` : ""}
+      </div>
+      <button type="button" data-promo-remove="${index}" class="danger-mini">Remover</button>
     </article>
   `).join("");
 }
