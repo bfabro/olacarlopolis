@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 55,
-  label: "v55",
+  numero: 56,
+  label: "v56",
   data: "2026-05-18",
-  nota: "Importacao grava apenas clientes ausentes e preserva todos os ja existentes no Firebase."
+  nota: "Importacao persiste clientes ausentes direto no Firebase e recarrega a base gravada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2209,23 +2209,21 @@ async function syncClientsFromScript(options = {}) {
     const chunkSize = 25;
     for (let i = 0; i < clientPayloads.length; i += chunkSize) {
       const chunk = clientPayloads.slice(i, i + chunkSize);
-      const updates = {};
-      chunk.forEach((item) => {
-        updates[`clientes/${item.id}`] = item.data;
-      });
-      try {
-        await update(ref(db), updates);
-        chunk.forEach((item) => upsertClientInState(item.id, item.data));
-        importStats.clientesSalvos += chunk.length;
-      } catch (err) {
-        chunk.forEach((item) => {
+      await Promise.all(chunk.map(async (item) => {
+        try {
+          await set(ref(db, `clientes/${item.id}`), item.data);
+          importStats.clientesSalvos += 1;
+        } catch (err) {
           importStats.erros.push(`Cliente ${item.data.nome || item.id}: ${err.code || err.message}`);
-        });
-      }
+        }
+      }));
+      const persistedSnap = await get(ref(db, "clientes"));
+      const persistedCount = persistedSnap.exists() ? persistedSnap.size : 0;
       if ((i + chunk.length) % 25 === 0 || i + chunk.length === clientPayloads.length) {
         showImportReport([
           `Clientes novos salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
           `Existentes preservados: ${importStats.clientesExistentes}`,
+          `Clientes confirmados no Firebase: ${persistedCount}`,
           `Erros: ${importStats.erros.length}`
         ], importStats.erros.length ? "error" : "info");
       }
@@ -2258,10 +2256,15 @@ async function syncClientsFromScript(options = {}) {
       importStats.erros.push(`Resumo da importacao: ${err.code || err.message}`);
     }
 
+    await loadAllData();
+    const persistedFinalSnap = await get(ref(db, "clientes"));
+    const persistedFinalCount = persistedFinalSnap.exists() ? persistedFinalSnap.size : 0;
+
     const report = [
       `Importacao segura concluida.`,
       `Clientes novos salvos: ${importStats.clientesSalvos}/${importStats.clientes}`,
       `Clientes existentes preservados: ${importStats.clientesExistentes}`,
+      `Clientes confirmados no Firebase: ${persistedFinalCount}`,
       `Categorias novas salvas: ${importStats.categoriasSalvas}/${importStats.categorias}`,
       `Categorias existentes preservadas: ${importStats.categoriasExistentes}`,
       `Clientes na tela: ${state.clientes.length}`
@@ -2272,13 +2275,6 @@ async function syncClientsFromScript(options = {}) {
     }
     showImportReport(report, importStats.erros.length ? "error" : "ok");
     showToast(`Importacao segura: ${importStats.clientesSalvos} clientes ausentes salvos.`);
-    sortClientsInState();
-    renderStats();
-    renderClientsList();
-    renderFinanceiro();
-    fillClientCategorySelect();
-    fillUserClientSelect();
-    fillEventClientSelect();
   } catch (error) {
     console.error(error);
     showImportReport([
