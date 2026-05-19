@@ -8367,7 +8367,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             image: "images/comercios/adega/cuenca/adega_cuenca.jpg",
             name: "Adega Cuenca",
             hours:
-              "Seg 09:00h as 19:30h <br> Ter e Qua 09:00h as 22:00h <br> Qui a Sab 09:00h as 23:50h <br> Dom 09:00h as 22:00h",
+              "Seg 09:00h as 19:30h <br> Ter e Qua 09:00h as  22:00h <br> Qui a Sab 09:00h as 23:50h <br> Dom 09:00h as 22:00h",
             statusAberto: ".",
             horarios: {
 
