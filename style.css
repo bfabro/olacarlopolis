@@ -7348,17 +7348,19 @@ html {
 }
 
 .auto-ref-code {
-  display: block;
-  width: 100%;
-  margin-top: 7px;
-  border: 1px dashed #cbd5e1;
-  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  border: 0;
+  border-radius: 0;
   background: #f8fafc;
   color: #334155;
   font-size: .76rem;
   font-weight: 900;
   text-align: center;
-  padding: 5px 6px;
+  padding: 6px 10px;
+  min-width: 126px;
 }
 
 .auto-card .im-card-body {
@@ -7370,20 +7372,21 @@ html {
 }
 
 .auto-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  display: block;
+  border: 1px dashed #cbd5e1;
+  border-radius: 9px;
+  background: #fbfdff;
+  padding: 5px 8px;
+  text-align: center;
 }
 
 .auto-card-top h3 {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  justify-content: center;
   margin: 0;
   color: #111827;
-  font-size: 1.18rem;
+  font-size: 1.05rem;
   line-height: 1.18;
 }
 
@@ -7411,24 +7414,24 @@ html {
 
 .auto-card .auto-price {
   position: absolute;
-  right: 10px;
-  bottom: 38px;
+  right: 0;
+  bottom: 0;
   z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 118px;
+  min-width: 104px;
   margin: 0;
-  color: #fff;
-  background: #078b3e;
-  border: 1px solid rgba(255,255,255,.6);
-  border-radius: 999px;
-  padding: 8px 11px;
-  font-size: 1.1rem;
+  color: #078b3e;
+  background: rgba(255,255,255,.96);
+  border: 0;
+  border-radius: 0;
+  padding: 6px 8px;
+  font-size: .98rem;
   line-height: 1;
   text-align: right;
   white-space: nowrap;
-  box-shadow: 0 8px 18px rgba(7, 139, 62, .34);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, .12);
 }
 
 .auto-status {
@@ -7451,7 +7454,8 @@ html {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  align-self: flex-start;
+  align-self: stretch;
+  justify-content: flex-start;
   border: 1px solid #dbeafe;
   border-radius: 10px;
   background: #eff6ff;
@@ -7459,6 +7463,11 @@ html {
   font-weight: 800;
   margin: 0;
   padding: 7px 10px;
+}
+
+.auto-seller .auto-instagram-icon {
+  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .auto-seller span {
@@ -7550,6 +7559,7 @@ html {
 .auto-actions {
   margin-top: 10px;
   align-items: center;
+  justify-content: space-between;
 }
 
 .auto-actions .telefone-link:not(.auto-whatsapp-button) {
@@ -7612,7 +7622,7 @@ html {
   }
 
   .auto-ref-code {
-    width: 100%;
+    width: auto;
   }
 
   .auto-card-top {
@@ -7624,12 +7634,12 @@ html {
   }
 
   .auto-card .auto-price {
-    right: 8px;
-    bottom: 38px;
+    right: 0;
+    bottom: 0;
     justify-content: center;
     margin-top: 0;
     text-align: left;
-    font-size: 1rem;
+    font-size: .9rem;
   }
 
   .auto-seller {

@@ -6710,25 +6710,23 @@ plotarPinsImoveis(stateImoveis.filtered);
               <img class="auto-card-img imagem-expandivel" src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">
             ` : `<div class="auto-card-img auto-card-img-empty"><i class="fa-solid fa-car-side"></i></div>`}
             ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(formatarPrecoAutomoveis(item.preco))}</strong>` : ""}
-            <span class="auto-ref-code">Ref. ${textoSeguroAutomoveis(codigoReferencia)}</span>
             ${item.status === "vendido" ? `<span class="auto-status auto-status-media">Vendido</span>` : ""}
           </div>
           <div class="im-card-body">
             <div class="auto-card-top">
               <div>
-                <div class="auto-kicker">${textoSeguroAutomoveis(item.tipo || "Automovel")}</div>
                 <h3>
                   <span>${textoSeguroAutomoveis(titulo)}</span>
-                  ${instagramUrl ? `<a class="auto-instagram-icon" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}" aria-label="Instagram de ${textoSeguroAutomoveis(titulo)}"><i class="fa-brands fa-instagram"></i></a>` : ""}
                 </h3>
               </div>
             </div>
-            <p class="auto-seller"><i class="fa-solid fa-store"></i><span>Loja/Vendedor</span><strong>${sellerSlug ? `<a class="auto-seller-link" href="#${textoSeguroAutomoveis(sellerSlug)}">${textoSeguroAutomoveis(vendedor || item.clienteNome || "Nao informado")}</a>` : textoSeguroAutomoveis(vendedor || "Nao informado")}</strong></p>
+            <p class="auto-seller"><i class="fa-solid fa-store"></i><span>Loja/Vendedor</span><strong>${sellerSlug ? `<a class="auto-seller-link" href="#${textoSeguroAutomoveis(sellerSlug)}">${textoSeguroAutomoveis(vendedor || item.clienteNome || "Nao informado")}</a>` : textoSeguroAutomoveis(vendedor || "Nao informado")}</strong>${instagramUrl ? `<a class="auto-instagram-icon" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}" aria-label="Instagram de ${textoSeguroAutomoveis(vendedor || titulo)}"><i class="fa-brands fa-instagram"></i></a>` : ""}</p>
             ${detalhesTabela.length ? `<div class="auto-spec-table">${detalhesTabela.map(([label, valor]) => `<div><span>${textoSeguroAutomoveis(label)}</span><strong>${textoSeguroAutomoveis(valor)}</strong></div>`).join("")}</div>` : ""}
             ${item.opcionais ? `<p class="auto-info-line"><span>Opcionais</span><strong>${textoSeguroAutomoveis(item.opcionais)}</strong></p>` : ""}
             ${item.descricao ? `<p class="auto-info-line auto-description"><span>Descricao</span><strong>${textoSeguroAutomoveis(item.descricao)}</strong></p>` : ""}
             <div class="auto-actions">
               ${contato ? `<a class="zap-link telefone-link auto-whatsapp-button" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent(whatsappTexto)}"><i class="bx bxl-whatsapp"></i> Chamar no WhatsApp</a>` : ""}
+              <span class="auto-ref-code">Ref. ${textoSeguroAutomoveis(codigoReferencia)}</span>
             </div>
           </div>
         </article>
