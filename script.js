@@ -16468,6 +16468,44 @@ plotarPinsImoveis(stateImoveis.filtered);
     return !meta || !meta.status || meta.status === "ativo";
   }
 
+  const categoriasSetorPublicoAdmin = new Set([
+    "agendamento",
+    "ambulatorio",
+    "ambulatoriodohospital",
+    "agenciatrabalhador",
+    "asilo",
+    "clubedexadrez",
+    "copel",
+    "correio",
+    "correios",
+    "cras",
+    "creche",
+    "creches",
+    "delegacia",
+    "escolapublica",
+    "farmaciamunicipal",
+    "hospital",
+    "postodesaude",
+    "prefeitura",
+    "rodoviaria",
+    "samuzinho",
+    "sanepar",
+    "secretariaeducacao",
+    "secretariasaude",
+    "sindicatorural",
+    "vigilanciasanitaria"
+  ]);
+
+  function categoriaAdminEhSetorPublico(metaOuTitulo) {
+    const meta = typeof metaOuTitulo === "object" && metaOuTitulo ? metaOuTitulo : {};
+    const titulo = typeof metaOuTitulo === "string"
+      ? metaOuTitulo
+      : (meta.nome || meta.title || meta.id || meta.categoria || "");
+    const slug = normalizeName(titulo);
+    const grupo = normalizeName(meta.menuGroup || meta.menuPrincipal || meta.bloco || meta.tipoMenu || "");
+    return categoriasSetorPublicoAdmin.has(slug) || grupo === "setorpublico" || grupo === "publico";
+  }
+
   function iconClassCategoriaAdmin(meta) {
     return String(meta?.icon || "fa-solid fa-store").replace(/[^a-zA-Z0-9\-\s]/g, "").trim() || "fa-solid fa-store";
   }
@@ -16483,11 +16521,11 @@ plotarPinsImoveis(stateImoveis.filtered);
     let categoria = categories.find((cat) => normalizeName(cat.title) === slug);
     if (categoria) {
       categoria.metaAdmin = { ...(categoria.metaAdmin || {}), ...meta };
-      if (!categoria.link) categoria.link = criarLinkCategoriaAdmin(title, meta);
+      if (!categoria.link && !categoriaAdminEhSetorPublico({ ...meta, nome: title })) categoria.link = criarLinkCategoriaAdmin(title, meta);
       return categoria;
     }
 
-    const link = criarLinkCategoriaAdmin(title, meta);
+    const link = categoriaAdminEhSetorPublico({ ...meta, nome: title }) ? null : criarLinkCategoriaAdmin(title, meta);
     categoria = { link, title, establishments: [], metaAdmin: meta };
     categories.push(categoria);
     return categoria;
@@ -16647,7 +16685,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     lista.forEach((cat) => {
       const nome = cat.nome || cat.title || cat.id;
-      if (!nome) return;
+      if (!nome || categoriaAdminEhSetorPublico({ ...cat, nome })) return;
       garantirCategoriaAdmin(nome, cat);
     });
     deduplicarCategoriasAdminNoMenu();
@@ -16717,10 +16755,13 @@ plotarPinsImoveis(stateImoveis.filtered);
         aplicarCategoriasAdminNoMenu(categoriasAdmin);
 
         if (clientesConsolidados.length) {
+          const categoriasPublicasBase = categories.filter((cat) => categoriaAdminEhSetorPublico(cat.title || ""));
           categories.length = 0;
+          categoriasPublicasBase.forEach((cat) => categories.push(cat));
           Object.entries(categoriasAdmin || {})
             .map(([id, cat]) => ({ id, ...(cat || {}) }))
             .filter(categoriaAdminAtiva)
+            .filter((cat) => !categoriaAdminEhSetorPublico(cat))
             .sort((a, b) => {
               const order = Number(a.ordem || 0) - Number(b.ordem || 0);
               if (order) return order;
@@ -16730,6 +16771,10 @@ plotarPinsImoveis(stateImoveis.filtered);
 
           clientesConsolidados.forEach(({ clienteId, cliente }) => {
             if (!clienteAdminPodeAparecer(cliente)) {
+              definirStatusClienteAdmin(cliente, clienteId);
+              return;
+            }
+            if (categoriaAdminEhSetorPublico(cliente.categoria || cliente.categoriaId || "")) {
               definirStatusClienteAdmin(cliente, clienteId);
               return;
             }
@@ -16770,6 +16815,10 @@ plotarPinsImoveis(stateImoveis.filtered);
           });
 
           if (!encontrado && clienteAdminPodeAparecer(cliente)) {
+            if (categoriaAdminEhSetorPublico(cliente.categoria || cliente.categoriaId || "")) {
+              definirStatusClienteAdmin(cliente, clienteId);
+              return;
+            }
             const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros");
             const jaExisteNaCategoria = (categoria.establishments || []).some((est) => {
               return clienteAdminCombinaComEstabelecimento(clienteId, cliente, est, normalizeName(categoria.title || ""));
