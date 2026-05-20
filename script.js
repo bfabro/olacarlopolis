@@ -7095,7 +7095,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
         html += `
-    <article class="promo-card">
+    <article class="promo-card" data-promo-est="${i.estabelecimentoId}">
     <div class="promo-card-body">
       <div class="promo-produto">
         ${i.imagem
@@ -7235,6 +7235,13 @@ plotarPinsImoveis(stateImoveis.filtered);
         mostrarPromocoes(id);
       });
     }
+
+    document.querySelectorAll(".promo-card .promo-img-zoom, .promo-card .icon-link").forEach((el) => {
+      el.addEventListener("click", () => {
+        const estId = el.closest(".promo-card")?.dataset?.promoEst || "";
+        if (estId) registrarCliqueNaPromocao(estId);
+      });
+    });
 
 
   }
@@ -18611,7 +18618,28 @@ function registrarCliqueNaPromocao(nomeComercio) {
   const hoje = getHojeBR();
   const ref = firebase.database().ref(`cliquesPromocoesPorComercio/${hoje}/${nomeComercio}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
+  firebase.database().ref(`cliquesPromocoesDetalhado/${hoje}/${nomeComercio}`).push({
+    area: "promocoes",
+    tipo: "promocao",
+    horario: new Date().toLocaleTimeString("pt-BR"),
+    ts: firebase.database.ServerValue.TIMESTAMP,
+    pagina: window.location.href
+  }).catch(() => {});
 }
+
+function registrarCliqueMenuLateral(labelMenu) {
+  const hoje = getHojeBR();
+  const idMenu = normalizeName(labelMenu || "menu");
+  if (!idMenu) return;
+  firebase.database().ref(`cliquesMenuLateral/${hoje}/${idMenu}`).transaction(valorAtual => (valorAtual || 0) + 1);
+}
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest?.(".sidebar .nav_link");
+  if (!link) return;
+  const label = link.dataset.reportLabel || link.textContent || link.getAttribute("aria-label") || link.id || "menu";
+  registrarCliqueMenuLateral(label);
+});
 
 
 

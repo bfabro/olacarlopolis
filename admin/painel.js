@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 71,
-  label: "v71",
+  numero: 72,
+  label: "v72",
   data: "2026-05-20",
-  nota: "Adiciona area de relatorios com indicadores financeiros e operacionais."
+  nota: "Aprimora relatorios com receita por plano, acessos, cidades e cliques por area."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -54,6 +54,7 @@ let state = {
   notasFalecimento: [],
   categorias: [],
   pagamentoSistema: {},
+  metricas: {},
   selectedClientId: null,
   selectedEventId: null,
   selectedDeathNoticeId: null,
@@ -760,13 +761,34 @@ async function saveUserProfile(profile) {
 }
 
 async function loadAllData() {
-  const [clientesSnap, usersSnap, eventosSnap, categoriasSnap, notasFalecimentoSnap, pagamentoSnap] = await Promise.all([
+  const [
+    clientesSnap,
+    usersSnap,
+    eventosSnap,
+    categoriasSnap,
+    notasFalecimentoSnap,
+    pagamentoSnap,
+    cliquesBotoesSnap,
+    cliquesMenuSnap,
+    acessosSnap,
+    ondeComerCardapiosSnap,
+    ondeComerWhatsSnap,
+    ondeComerFotosSnap,
+    promocoesSnap
+  ] = await Promise.all([
     get(ref(db, "clientes")),
     get(ref(db, "usuariosByUid")),
     get(ref(db, "eventos")),
     get(ref(db, "categorias")),
     get(ref(db, "conteudosInformativos/notaFalecimento")),
-    get(ref(db, "configuracoes/pagamento"))
+    get(ref(db, "configuracoes/pagamento")),
+    get(ref(db, "cliquesPorBotao")),
+    get(ref(db, "cliquesMenuLateral")),
+    get(ref(db, "acessosPorDia")),
+    get(ref(db, "cliquesCardapiosOndeComer")),
+    get(ref(db, "cliquesWhatsOndeComer")),
+    get(ref(db, "cliquesFotosOndeComer")),
+    get(ref(db, "cliquesPromocoesPorComercio"))
   ]);
 
   applyClientsSnapshot(clientesSnap);
@@ -780,6 +802,15 @@ async function loadAllData() {
   }
   state.usuarios.sort((a, b) => String(a.email || "").localeCompare(String(b.email || "")));
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
+  state.metricas = {
+    cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
+    cliquesMenu: cliquesMenuSnap.exists() ? cliquesMenuSnap.val() : {},
+    acessos: acessosSnap.exists() ? acessosSnap.val() : {},
+    ondeComerCardapios: ondeComerCardapiosSnap.exists() ? ondeComerCardapiosSnap.val() : {},
+    ondeComerWhats: ondeComerWhatsSnap.exists() ? ondeComerWhatsSnap.val() : {},
+    ondeComerFotos: ondeComerFotosSnap.exists() ? ondeComerFotosSnap.val() : {},
+    promocoes: promocoesSnap.exists() ? promocoesSnap.val() : {}
+  };
 
   state.eventos = [];
   if (eventosSnap.exists()) {
@@ -2008,6 +2039,7 @@ function renderFinanceiro() {
       fillEventClientSelect();
       showToast("Financeiro atualizado.");
       renderFinanceiro();
+      renderReports();
     });
   });
 }
@@ -2035,28 +2067,132 @@ function renderReportList(items, emptyText = "Nenhum item encontrado.") {
   `).join("");
 }
 
+const REPORT_BLOCKED_CATEGORY_SLUGS = new Set([
+  "eventosemcarlopolis",
+  "agendamento",
+  "ambulatoriodohospital",
+  "asilo",
+  "agenciatrabalhador",
+  "cras",
+  "clubedexadrez",
+  "correio",
+  "creches",
+  "hospital",
+  "rodoviaria",
+  "prefeitura",
+  "copel",
+  "delegacia",
+  "escolapublica",
+  "farmaciamunicipal",
+  "postodesaude",
+  "sanepar",
+  "samuzinho",
+  "secretariadasaude",
+  "secretariadaeducacao",
+  "sindicatorural",
+  "vigilanciasanitaria",
+  "coletadelixo",
+  "notadefalecimento",
+  "vagasdetrabalho",
+  "farmaciadeplantao"
+]);
+
+function isReportClient(client) {
+  const slug = slugify(client?.categoria || client?.category || "").replace(/-/g, "");
+  if (!slug || REPORT_BLOCKED_CATEGORY_SLUGS.has(slug)) return false;
+  return !/evento|publico|publica|informacao|informacoes|falecimento|plantao|coletadelixo|vagasdetrabalho/.test(slug);
+}
+
+function receitaPlanoValor(client) {
+  const valor = valorTotalFaturaCliente(client);
+  const plano = client?.tipoPlano || "mensal";
+  if (plano === "semestral") return { mensal: valor / 6, semestral: valor, anual: valor * 2 };
+  if (plano === "anual") return { mensal: valor / 12, semestral: valor / 2, anual: valor };
+  return { mensal: valor, semestral: valor * 6, anual: valor * 12 };
+}
+
+function incrementMetric(map, key, amount = 1) {
+  const safeKey = key || "sem-identificacao";
+  map.set(safeKey, (map.get(safeKey) || 0) + Number(amount || 0));
+}
+
+function topFromMap(map, limit = 10, singular = "clique", plural = "cliques") {
+  return [...map.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([title, count]) => ({ title, meta: `${count} ${count === 1 ? singular : plural}` }));
+}
+
+function aggregateCliquesPorBotao(data = {}) {
+  const porCliente = new Map();
+  const porTipo = new Map();
+  Object.values(data || {}).forEach((dia) => {
+    Object.entries(dia || {}).forEach(([clienteId, tipos]) => {
+      Object.entries(tipos || {}).forEach(([tipo, count]) => {
+        incrementMetric(porCliente, clienteId, count);
+        incrementMetric(porTipo, tipo, count);
+      });
+    });
+  });
+  return { porCliente, porTipo };
+}
+
+function aggregateSimpleDaily(data = {}) {
+  const map = new Map();
+  Object.values(data || {}).forEach((dia) => {
+    Object.entries(dia || {}).forEach(([key, count]) => incrementMetric(map, key, count));
+  });
+  return map;
+}
+
+function aggregateCidadesAcesso(data = {}) {
+  const map = new Map();
+  Object.values(data || {}).forEach((dia) => {
+    Object.values(dia?.detalhados || {}).forEach((item) => {
+      const cidade = [item?.cidade || "Desconhecida", item?.estado || ""].filter(Boolean).join(" - ");
+      incrementMetric(map, cidade, 1);
+    });
+  });
+  return map;
+}
+
 function renderReports() {
   const mount = $("reportsMount");
   if (!mount) return;
 
-  const totalClientes = state.clientes.length;
-  const ativos = state.clientes.filter((c) => c.status === "ativo");
-  const inativos = state.clientes.filter((c) => c.status === "inativo");
-  const pendentes = state.clientes.filter((c) => c.status === "pendente");
-  const pagos = state.clientes.filter((c) => c.pagamentoStatus === "pago");
-  const abertos = state.clientes.filter((c) => !c.pagamentoStatus || c.pagamentoStatus === "em_aberto");
-  const isentos = state.clientes.filter((c) => c.pagamentoStatus === "isento");
-  const destaques = state.clientes.filter((c) => c.destaqueSemanal);
-  const comImagem = state.clientes.filter((c) => c.imagem || normalizeImageItems(c.imagens).length);
-  const comHorarios = state.clientes.filter((c) => scheduleHasAnyOpen(c.horarios || {}));
-  const valorReceber = state.clientes
+  const reportClients = state.clientes.filter(isReportClient);
+  const totalClientes = reportClients.length;
+  const ativos = reportClients.filter((c) => c.status === "ativo");
+  const inativos = reportClients.filter((c) => c.status === "inativo");
+  const pendentes = reportClients.filter((c) => c.status === "pendente");
+  const pagos = reportClients.filter((c) => c.pagamentoStatus === "pago");
+  const abertos = reportClients.filter((c) => !c.pagamentoStatus || c.pagamentoStatus === "em_aberto");
+  const isentos = reportClients.filter((c) => c.pagamentoStatus === "isento");
+  const destaques = reportClients.filter((c) => c.destaqueSemanal);
+  const comImagem = reportClients.filter((c) => c.imagem || normalizeImageItems(c.imagens).length);
+  const comHorarios = reportClients.filter((c) => scheduleHasAnyOpen(c.horarios || {}));
+  const valorReceber = reportClients
     .filter((c) => c.status !== "inativo" && c.pagamentoStatus !== "isento")
     .reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
   const valorPago = pagos.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
   const valorAberto = abertos.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
+  const receitas = reportClients
+    .filter((c) => c.status !== "inativo" && c.pagamentoStatus !== "isento")
+    .reduce((acc, client) => {
+      const valores = receitaPlanoValor(client);
+      acc.mensal += valores.mensal;
+      acc.semestral += valores.semestral;
+      acc.anual += valores.anual;
+      return acc;
+    }, { mensal: 0, semestral: 0, anual: 0 });
+  const porPlano = reportClients.reduce((acc, client) => {
+    const plano = client.tipoPlano || "mensal";
+    acc[plano] = (acc[plano] || 0) + 1;
+    return acc;
+  }, {});
 
   const categoriasMap = new Map();
-  state.clientes.forEach((client) => {
+  reportClients.forEach((client) => {
     const key = client.categoria || "Sem categoria";
     categoriasMap.set(key, (categoriasMap.get(key) || 0) + 1);
   });
@@ -2065,7 +2201,15 @@ function renderReports() {
     .slice(0, 8)
     .map(([title, count]) => ({ title, meta: `${count} cliente${count === 1 ? "" : "s"}` }));
 
-  const clientesAtencao = state.clientes
+  const cliquesBotoes = aggregateCliquesPorBotao(state.metricas.cliquesBotoes);
+  const cliquesMenu = aggregateSimpleDaily(state.metricas.cliquesMenu);
+  const cliquesOndeComerCardapios = aggregateSimpleDaily(state.metricas.ondeComerCardapios);
+  const cliquesOndeComerWhats = aggregateSimpleDaily(state.metricas.ondeComerWhats);
+  const cliquesOndeComerFotos = aggregateSimpleDaily(state.metricas.ondeComerFotos);
+  const cliquesPromocoes = aggregateSimpleDaily(state.metricas.promocoes);
+  const cidadesAcesso = aggregateCidadesAcesso(state.metricas.acessos);
+
+  const clientesAtencao = reportClients
     .filter((client) => client.status !== "inativo")
     .map((client) => {
       const faltas = [];
@@ -2080,7 +2224,7 @@ function renderReports() {
     .slice(0, 10)
     .map((item) => ({ title: item.client.nome || item.client.id, meta: item.faltas.join(", ") }));
 
-  const faturasComComprovante = state.clientes
+  const faturasComComprovante = reportClients
     .map((client) => ({ client, invoice: latestClientInvoice(client) }))
     .filter(({ invoice }) => invoice?.comprovanteUrl)
     .slice(0, 10)
@@ -2111,6 +2255,9 @@ function renderReports() {
       <article class="stat-card"><span>Clientes ativos</span><strong>${ativos.length}</strong><small>${reportPercent(ativos.length, totalClientes)} da base</small></article>
       <article class="stat-card"><span>Financeiro em aberto</span><strong>${abertos.length}</strong><small>${moneyBR(valorAberto)}</small></article>
       <article class="stat-card"><span>Receita prevista</span><strong>${moneyBR(valorReceber)}</strong><small>Clientes nao isentos</small></article>
+      <article class="stat-card"><span>Receita mensal</span><strong>${moneyBR(receitas.mensal)}</strong><small>Projecao por planos</small></article>
+      <article class="stat-card"><span>Receita semestral</span><strong>${moneyBR(receitas.semestral)}</strong><small>Projecao por planos</small></article>
+      <article class="stat-card"><span>Receita anual</span><strong>${moneyBR(receitas.anual)}</strong><small>Projecao por planos</small></article>
       <article class="stat-card"><span>Receita paga</span><strong>${moneyBR(valorPago)}</strong><small>${pagos.length} cliente${pagos.length === 1 ? "" : "s"}</small></article>
       <article class="stat-card"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + Number(c.destaqueValor || 0), 0))}</small></article>
       <article class="stat-card"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
@@ -2126,7 +2273,45 @@ function renderReports() {
           <span>Isentos: <strong>${isentos.length}</strong></span>
           <span>Com horarios: <strong>${comHorarios.length}</strong></span>
           <span>Categorias usadas: <strong>${categoriasMap.size}</strong></span>
+          <span>Plano mensal: <strong>${porPlano.mensal || 0}</strong></span>
+          <span>Plano semestral: <strong>${porPlano.semestral || 0}</strong></span>
+          <span>Plano anual: <strong>${porPlano.anual || 0}</strong></span>
         </div>
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Mais acessados por comercio</h2>
+        ${renderReportList(topFromMap(cliquesBotoes.porCliente, 12), "Ainda nao ha cliques de comercio registrados.")}
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Cliques por botao</h2>
+        ${renderReportList(topFromMap(cliquesBotoes.porTipo, 12), "Ainda nao ha cliques por botao registrados.")}
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Cidades dos acessos</h2>
+        ${renderReportList(topFromMap(cidadesAcesso, 12, "acesso", "acessos"), "Ainda nao ha dados de cidade nos acessos.")}
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Menu lateral</h2>
+        ${renderReportList(topFromMap(cliquesMenu, 12), "Ainda nao ha cliques de menu registrados.")}
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Onde Comer</h2>
+        <div class="report-kpis">
+          <span>Cardapios: <strong>${[...cliquesOndeComerCardapios.values()].reduce((s, v) => s + v, 0)}</strong></span>
+          <span>WhatsApp: <strong>${[...cliquesOndeComerWhats.values()].reduce((s, v) => s + v, 0)}</strong></span>
+          <span>Fotos: <strong>${[...cliquesOndeComerFotos.values()].reduce((s, v) => s + v, 0)}</strong></span>
+        </div>
+        ${renderReportList(topFromMap(cliquesOndeComerWhats, 8), "Ainda nao ha cliques no Onde Comer.")}
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Promocoes</h2>
+        ${renderReportList(topFromMap(cliquesPromocoes, 12), "Ainda nao ha cliques em promocoes registrados.")}
       </section>
 
       <section class="panel-card report-card">
@@ -2708,6 +2893,7 @@ async function syncClientsFromScript(options = {}) {
     renderStats();
     renderClientsList();
     renderFinanceiro();
+    renderReports();
     fillClientCategorySelect();
     fillUserClientSelect();
     fillEventClientSelect();
@@ -3080,6 +3266,7 @@ function bindEvents() {
     renderClientsList();
     renderCategoriesList();
     renderFinanceiro();
+    renderReports();
     fillClientCategorySelect();
     fillUserClientSelect();
     fillEventClientSelect();
