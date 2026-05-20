@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 63,
-  label: "v63",
+  numero: 64,
+  label: "v64",
   data: "2026-05-18",
-  nota: "Melhora carregamento publico com dados admin em segundo plano e imagens lazy."
+  nota: "Otimiza carregamento do painel admin e imagens com lazy loading."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -556,6 +556,10 @@ function imageFallbackAttr() {
   return `onerror="this.onerror=null;this.src='../images/img_padrao_site/logo_1.png';"`;
 }
 
+function lazyImageAttrs() {
+  return `loading="lazy" decoding="async"`;
+}
+
 function sameOriginImageUrl(url) {
   const raw = String(url || "").trim();
   if (!raw) return "";
@@ -674,13 +678,7 @@ async function loadAllData() {
   }
   state.notasFalecimento.sort((a, b) => String(b.data || "").localeCompare(String(a.data || "")));
 
-  renderStats();
-  renderClientsList();
-  renderFinanceiro();
-
   const fromClients = new Map();
-  const scriptCategories = canManageClients() ? await loadScriptCategoriesForPanel() : [];
-  scriptCategories.forEach((cat) => mergeCategoryIntoMap(fromClients, cat));
   state.clientes.forEach((client) => {
     const title = String(client.categoria || "").trim();
     if (title) mergeCategoryIntoMap(fromClients, { id: slugify(title), nome: title, origem: "clientes" });
@@ -922,7 +920,7 @@ function renderClientImagesPreview() {
 
   box.innerHTML = state.clientImages.map((item, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}" ${imageFallbackAttr()}>
+      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
       <label class="image-caption-label">Texto desta imagem
         <textarea data-image-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
       </label>
@@ -977,7 +975,7 @@ function renderClientMenuPreview() {
 
   box.innerHTML = images.map((url, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(displayImageUrl(url))}" alt="Cardapio ${index + 1}" ${imageFallbackAttr()}>
+      <img src="${escapeAttr(displayImageUrl(url))}" alt="Cardapio ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
       <div>
         <button type="button" data-remove-menu-image="${index}" class="danger-mini">Remover</button>
       </div>
@@ -1296,7 +1294,7 @@ function renderClientsList() {
 
   box.innerHTML = list.map((client) => `
     <article class="client-row">
-      <img src="${escapeAttr(displayImageUrl(client.imagem || imageUrl(client.imagens && client.imagens[0])) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}" ${imageFallbackAttr()}>
+      <img src="${escapeAttr(displayImageUrl(client.imagem || imageUrl(client.imagens && client.imagens[0])) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
       <div class="client-main">
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
@@ -1663,7 +1661,7 @@ function renderEventsList() {
 
   box.innerHTML = list.map((evento) => `
     <article class="list-card event-card">
-      ${evento.imagem ? `<img src="${escapeAttr(displayImageUrl(evento.imagem))}" alt="${escapeAttr(evento.titulo || "Evento")}" ${imageFallbackAttr()}>` : ""}
+      ${evento.imagem ? `<img src="${escapeAttr(displayImageUrl(evento.imagem))}" alt="${escapeAttr(evento.titulo || "Evento")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
       <div class="list-title">${escapeHtml(evento.titulo || evento.id)}</div>
       <div class="list-meta">${escapeHtml(evento.clienteNome || "Sem cliente")} - ${escapeHtml(evento.data || "Sem data")} ${escapeHtml(evento.horario || "")}</div>
       <div class="list-meta">${escapeHtml(evento.local || "Sem local")}</div>
@@ -1746,7 +1744,7 @@ function renderInfoDeathNoticeList() {
 
   box.innerHTML = list.map((item) => `
     <article class="list-card event-card">
-      ${item.image || item.imagem ? `<img src="${escapeAttr(displayImageUrl(item.image || item.imagem))}" alt="${escapeAttr(item.name || "Nota")}" ${imageFallbackAttr()}>` : ""}
+      ${item.image || item.imagem ? `<img src="${escapeAttr(displayImageUrl(item.image || item.imagem))}" alt="${escapeAttr(item.name || "Nota")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
       <div class="list-title">${escapeHtml(item.name || item.nome || item.id)}</div>
       <div class="list-meta">${escapeHtml(item.date || item.data || "Sem data")}</div>
       <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status)}</span>
@@ -1895,7 +1893,7 @@ function renderClientOnlyEditor() {
           </div>
         </div>
         <div class="profile-upload-row">
-          <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}" ${imageFallbackAttr()}>
+          <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
           <label>Enviar foto de perfil<input id="coProfileUpload" type="file" accept="image/*"></label>
         </div>
         <input id="coImage" type="hidden" value="${escapeAttr(client.imagem || "")}">
@@ -2190,7 +2188,7 @@ function renderImagesMarkup(images, prefix) {
   if (!images.length) return `<div class="list-meta">Nenhuma imagem enviada ainda.</div>`;
   return images.map((item, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}" ${imageFallbackAttr()}>
+      <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
       <label class="image-caption-label">Texto desta imagem
         <textarea data-${prefix}-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
       </label>
@@ -2207,7 +2205,7 @@ function renderMenuImagesMarkup(images, prefix) {
   if (!list.length) return `<div class="list-meta">Nenhuma imagem de cardapio enviada ainda.</div>`;
   return list.map((url, index) => `
     <article class="image-tile">
-      <img src="${escapeAttr(displayImageUrl(url))}" alt="Cardapio ${index + 1}" ${imageFallbackAttr()}>
+      <img src="${escapeAttr(displayImageUrl(url))}" alt="Cardapio ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
       <div>
         <button type="button" data-${prefix}-remove="${index}" class="danger-mini">Remover</button>
       </div>
@@ -2220,7 +2218,7 @@ function renderPromocoesMarkup(promocoes) {
   if (!list.length) return `<div class="list-meta">Nenhuma promocao cadastrada ainda.</div>`;
   return list.map((promo, index) => `
     <article class="promo-admin-item">
-      ${promo.imagem ? `<img src="${escapeAttr(displayImageUrl(promo.imagem))}" alt="${escapeAttr(promo.titulo)}" ${imageFallbackAttr()}>` : `<div class="promo-admin-empty">sem imagem</div>`}
+      ${promo.imagem ? `<img src="${escapeAttr(displayImageUrl(promo.imagem))}" alt="${escapeAttr(promo.titulo)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : `<div class="promo-admin-empty">sem imagem</div>`}
       <div>
         <strong>${escapeHtml(promo.titulo)}</strong>
         <span>${escapeHtml([promo.preco ? `R$ ${promo.preco}` : "", promo.validadeFim ? `ate ${promo.validadeFim}` : ""].filter(Boolean).join(" - ") || "Sem preco/validade")}</span>

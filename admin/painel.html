@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=63">
+  <link rel="stylesheet" href="painel.css?v=64">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -159,7 +159,7 @@
                   </div>
                 </div>
                 <div class="profile-upload-row">
-                  <img id="clientProfilePreview" src="" alt="Foto de perfil">
+                  <img id="clientProfilePreview" src="" alt="Foto de perfil" loading="lazy" decoding="async">
                   <label>Enviar foto de perfil<input id="clientProfileUpload" type="file" accept="image/*"></label>
                 </div>
                 <input id="clientImage" type="hidden">
@@ -445,6 +445,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=63"></script>
+  <script type="module" src="painel.js?v=64"></script>
 </body>
 </html>
