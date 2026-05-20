@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=90">
+  <link rel="stylesheet" href="painel.css?v=91">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -135,6 +135,12 @@
               <label>Nome do cliente/comercio<input id="clientName" required></label>
               <label>Categoria
                 <select id="clientCategory"></select>
+              </label>
+              <label>Tipo do cliente
+                <select id="clientType">
+                  <option value="comercio">Comercio</option>
+                  <option value="servico">Servico</option>
+                </select>
               </label>
               <label>Nova categoria
                 <input id="clientNewCategory" placeholder="Preencha se a categoria nao existir">
@@ -628,6 +634,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=90"></script>
+  <script type="module" src="painel.js?v=91"></script>
 </body>
 </html>

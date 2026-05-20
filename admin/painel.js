@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 90,
-  label: "v90",
+  numero: 91,
+  label: "v91",
   data: "2026-05-20",
-  nota: "Amplia equivalencias de categorias no menu publico."
+  nota: "Permite classificar cliente como comercio ou servico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1042,6 +1042,7 @@ function resetClientForm() {
   delete $("clientForm").dataset.originalClientId;
   delete $("clientForm").dataset.originalName;
   $("clientId").value = "";
+  if ($("clientType")) $("clientType").value = "comercio";
   fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
   renderProfilePreview("clientImage", "clientProfilePreview");
@@ -1057,6 +1058,7 @@ function getClientFormData() {
   const newCategory = $("clientNewCategory").value.trim();
   const currentClient = state.clientes.find((client) => client.id === state.selectedClientId);
   const category = newCategory || $("clientCategory").value.trim() || currentClient?.categoria || currentClient?.category || $("clientForm").dataset.originalCategory || "Outros";
+  const tipoCliente = $("clientType")?.value || currentClient?.tipoCliente || currentClient?.tipo || "comercio";
   const horarios = readScheduleEditor("clientScheduleEditor");
   const scheduleBox = $("clientScheduleEditor");
   const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
@@ -1067,6 +1069,8 @@ function getClientFormData() {
     nomeNormalizado: normalizeName(name),
     categoria: category,
     categoriaId: slugify(category),
+    tipoCliente,
+    tipo: tipoCliente,
     status: $("clientStatus").value,
     pagamentoStatus: $("clientPaymentStatus").value,
     contato: $("clientContact").value.trim(),
@@ -1101,6 +1105,7 @@ function fillClientForm(client) {
   $("clientId").value = client.id || "";
   $("clientName").value = client.nome || client.name || "";
   fillClientCategorySelect(client.categoria || client.category || "");
+  if ($("clientType")) $("clientType").value = client.tipoCliente || client.tipo || "comercio";
   $("clientNewCategory").value = "";
   $("clientStatus").value = client.status || "ativo";
   $("clientPaymentStatus").value = client.pagamentoStatus || "em_aberto";
@@ -3403,6 +3408,8 @@ async function syncClientsFromScript(options = {}) {
           nomeNormalizado: normalizeName(name),
           categoria: categoryName,
           categoriaId: categoryId,
+          tipoCliente: "comercio",
+          tipo: "comercio",
           status: "ativo",
           pagamentoStatus: paidInScript ? "pago" : "em_aberto",
           contato: est.contact || "",
@@ -3993,11 +4000,14 @@ function bindEvents() {
     if (payload.categoria) {
       const categoryId = payload.categoriaId || slugify(payload.categoria);
       const existingCategory = state.categorias.find((cat) => cat.id === categoryId) || {};
+      const categoryMenuGroup = payload.tipoCliente === "servico" ? "servicos" : (existingCategory.menuGroup || "comercios");
       updates[`categorias/${categoryId}`] = {
         ...existingCategory,
         nome: payload.categoria,
         nomeNormalizado: normalizeName(payload.categoria),
         parentId: existingCategory.parentId || "",
+        menuGroup: categoryMenuGroup,
+        tipoCliente: payload.tipoCliente,
         menuLetter: existingCategory.menuLetter || "",
         icon: existingCategory.icon || "fa-solid fa-store",
         iconColor: existingCategory.iconColor || "#2563eb",
@@ -4020,9 +4030,11 @@ function bindEvents() {
       if (existingCategory) {
         existingCategory.nome = payload.categoria;
         existingCategory.nomeNormalizado = normalizeName(payload.categoria);
+        existingCategory.menuGroup = payload.tipoCliente === "servico" ? "servicos" : (existingCategory.menuGroup || "comercios");
+        existingCategory.tipoCliente = payload.tipoCliente;
         existingCategory.origem = "painel";
       } else {
-        state.categorias.push(normalizeCategory({ id: categoryId, nome: payload.categoria, origem: "painel" }));
+        state.categorias.push(normalizeCategory({ id: categoryId, nome: payload.categoria, menuGroup: payload.tipoCliente === "servico" ? "servicos" : "comercios", tipoCliente: payload.tipoCliente, origem: "painel" }));
       }
       state.categorias.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
     }

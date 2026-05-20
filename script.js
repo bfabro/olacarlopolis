@@ -16574,6 +16574,22 @@ plotarPinsImoveis(stateImoveis.filtered);
       || null;
   }
 
+  function submenuServicoAdmin() {
+    return document.getElementById("menuFretes")?.closest("ul.submenu")
+      || document.getElementById("menuDiarista")?.closest("ul.submenu")
+      || null;
+  }
+
+  function menuGroupCategoriaAdmin(meta = {}) {
+    const raw = normalizeName(meta.menuGroup || meta.menuPrincipal || meta.bloco || meta.tipoCliente || meta.tipo || "");
+    if (["servico", "servicos", "service", "services"].includes(raw)) return "servicos";
+    return "comercios";
+  }
+
+  function submenuCategoriaAdmin(meta = {}) {
+    return menuGroupCategoriaAdmin(meta) === "servicos" ? (submenuServicoAdmin() || submenuComercioAdmin()) : submenuComercioAdmin();
+  }
+
   function textoLinkCategoriaAdmin(link) {
     const label = link?.querySelector?.(".navlink:last-child") || link;
     return String(label?.textContent || "")
@@ -16605,7 +16621,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function criarLinkCategoriaAdmin(title, meta = {}) {
     const slug = normalizeName(title);
-    const submenu = submenuComercioAdmin();
+    const submenu = submenuCategoriaAdmin(meta);
 
     if (!submenu) return null;
 
@@ -16613,6 +16629,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (existing) {
       existing.dataset.adminCategory = slug;
       if (meta.parentId) existing.dataset.adminParent = meta.parentId;
+      existing.dataset.adminMenuGroup = menuGroupCategoriaAdmin(meta);
       ligarLinkCategoriaAdmin(existing, title);
       return existing;
     }
@@ -16621,6 +16638,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     link.href = "#";
     link.className = "nav_link sublink";
     link.dataset.adminCategory = slug;
+    link.dataset.adminMenuGroup = menuGroupCategoriaAdmin(meta);
     if (meta.parentId) link.dataset.adminParent = meta.parentId;
     link.innerHTML = `
       <span class="navlink_icon"><i style="color:${iconColorCategoriaAdmin(meta)}" class="${iconClassCategoriaAdmin(meta)}"></i></span>
@@ -16791,9 +16809,18 @@ plotarPinsImoveis(stateImoveis.filtered);
         aplicarCategoriasAdminNoMenu(categoriasAdmin);
 
         if (clientesConsolidados.length) {
-          const categoriasPublicasBase = categories.filter((cat) => categoriaAdminEhSetorPublico(cat.title || ""));
+          const categoriasFixasBase = categories
+            .filter((cat) => cat?.link?.id)
+            .map((cat) => ({
+              ...cat,
+              establishments: [],
+              metaAdmin: {
+                ...(cat.metaAdmin || {}),
+                menuGroup: cat.link.closest?.("ul.submenu") === submenuServicoAdmin() ? "servicos" : "comercios"
+              }
+            }));
           categories.length = 0;
-          categoriasPublicasBase.forEach((cat) => categories.push(cat));
+          categoriasFixasBase.forEach((cat) => categories.push(cat));
           Object.entries(categoriasAdmin || {})
             .map(([id, cat]) => ({ id, ...(cat || {}) }))
             .filter(categoriaAdminAtiva)
@@ -16814,7 +16841,8 @@ plotarPinsImoveis(stateImoveis.filtered);
               definirStatusClienteAdmin(cliente, clienteId);
               return;
             }
-            const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros");
+            const tipoCliente = normalizeName(cliente.tipoCliente || cliente.tipo || "");
+            const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros", { menuGroup: tipoCliente === "servico" || tipoCliente === "servicos" ? "servicos" : "comercios" });
             categoria.establishments = categoria.establishments || [];
             categoria.establishments.push(montarEstabelecimentoDoClienteAdmin(cliente, clienteId));
             definirStatusClienteAdmin(cliente, clienteId);
@@ -16855,7 +16883,8 @@ plotarPinsImoveis(stateImoveis.filtered);
               definirStatusClienteAdmin(cliente, clienteId);
               return;
             }
-            const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros");
+            const tipoCliente = normalizeName(cliente.tipoCliente || cliente.tipo || "");
+            const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros", { menuGroup: tipoCliente === "servico" || tipoCliente === "servicos" ? "servicos" : "comercios" });
             const jaExisteNaCategoria = (categoria.establishments || []).some((est) => {
               return clienteAdminCombinaComEstabelecimento(clienteId, cliente, est, normalizeName(categoria.title || ""));
             });
