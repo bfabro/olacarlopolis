@@ -6630,8 +6630,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       imagem: item.Link_Imagem || item["Imagem URL"] || item.imagem || item.image || "",
       descricao: item.Descricao || item.Descrição || item.descricao || "",
       contato: item.Contato || item.contato || item.whatsapp || "",
-      vendedor: item.Vendedor || item.vendedor || item.loja || item.nomeLoja || "",
-      loja: item.Loja || item.loja || item.vendedor || "",
+      vendedor: item.Vendedor || item.vendedor || item.loja || item.nomeLoja || item.lojaNome || item.empresa || item.clienteNome || item.cliente || item.anunciante || item.nomeVendedor || "",
+      loja: item.Loja || item.loja || item.nomeLoja || item.lojaNome || item.empresa || item.clienteNome || item.cliente || item.anunciante || item.vendedor || "",
       instagram: item.Instagram || item.instagram || item.linkInstagram || "",
       combustivel: item.Combustivel || item.combustivel || "",
       cambio: item.Cambio || item.cambio || "",
@@ -6679,6 +6679,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       const contato = String(item.contato || "").replace(/\D/g, "");
       const instagram = String(item.instagram || "").trim();
       const instagramUrl = instagram && instagram.startsWith("http") ? instagram : (instagram ? `https://instagram.com/${instagram.replace(/^@/, "")}` : "");
+      const codigoReferencia = String(item.id || `${item.marca}-${item.modelo}-${item.ano}`).replace(/[^a-z0-9-]/gi, "").slice(0, 12).toUpperCase();
       const detalhesTabela = [
         ["Tipo", item.tipo],
         ["Condicao", item.condicao],
@@ -6690,13 +6691,21 @@ plotarPinsImoveis(stateImoveis.filtered);
       ].filter(([, valor]) => valor);
       const vendedor = item.vendedor || item.loja || "";
       const localizacao = [item.cidade].filter(Boolean).join(" - ");
+      const whatsappTexto = [
+        "Ola! Vi este automovel no Ola Carlopolis e quero mais informacoes.",
+        `Referencia: ${codigoReferencia}`,
+        `Produto: ${titulo}`,
+        item.preco ? `Valor: ${formatarPrecoAutomoveis(item.preco)}` : "",
+        vendedor ? `Loja/Vendedor: ${vendedor}` : "",
+        item.imagem ? `Imagem: ${item.imagem}` : ""
+      ].filter(Boolean).join("\n");
       return `
         <article class="auto-card ${item.status === "vendido" ? "is-sold" : ""}">
           <div class="auto-card-media">
             ${item.imagem ? `
               <img class="auto-card-img imagem-expandivel" src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">
-              <span class="auto-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
             ` : `<div class="auto-card-img auto-card-img-empty"><i class="fa-solid fa-car-side"></i></div>`}
+            <span class="auto-ref-code">Ref. ${textoSeguroAutomoveis(codigoReferencia)}</span>
             ${item.status === "vendido" ? `<span class="auto-status auto-status-media">Vendido</span>` : ""}
           </div>
           <div class="im-card-body">
@@ -6710,13 +6719,13 @@ plotarPinsImoveis(stateImoveis.filtered);
               </div>
               ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(formatarPrecoAutomoveis(item.preco))}</strong>` : ""}
             </div>
-            ${vendedor ? `<p class="auto-seller"><i class="fa-solid fa-store"></i><span>Vendedor</span><strong>${textoSeguroAutomoveis(vendedor)}</strong></p>` : ""}
+            <p class="auto-seller"><i class="fa-solid fa-store"></i><span>Loja/Vendedor</span><strong>${textoSeguroAutomoveis(vendedor || "Nao informado")}</strong></p>
             ${detalhesTabela.length ? `<div class="auto-spec-table">${detalhesTabela.map(([label, valor]) => `<div><span>${textoSeguroAutomoveis(label)}</span><strong>${textoSeguroAutomoveis(valor)}</strong></div>`).join("")}</div>` : ""}
             ${localizacao ? `<p class="auto-location"><i class="fa-solid fa-location-dot"></i> ${textoSeguroAutomoveis(localizacao)}</p>` : ""}
-            ${item.opcionais ? `<p class="auto-info-line"><strong>Opcionais:</strong> ${textoSeguroAutomoveis(item.opcionais)}</p>` : ""}
-            ${item.descricao ? `<p class="auto-description">${textoSeguroAutomoveis(item.descricao)}</p>` : ""}
+            ${item.opcionais ? `<p class="auto-info-line"><span>Opcionais</span><strong>${textoSeguroAutomoveis(item.opcionais)}</strong></p>` : ""}
+            ${item.descricao ? `<p class="auto-info-line auto-description"><span>Descricao</span><strong>${textoSeguroAutomoveis(item.descricao)}</strong></p>` : ""}
             <div class="auto-actions">
-              ${contato ? `<a class="zap-link telefone-link" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent("Olá! Vi o automóvel no Olá Carlópolis e gostaria de mais informações.")}"><i class="bx bxl-whatsapp"></i> Tenho interesse</a>` : ""}
+              ${contato ? `<a class="zap-link telefone-link auto-whatsapp-button" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent(whatsappTexto)}"><i class="bx bxl-whatsapp"></i> Chamar no WhatsApp</a>` : ""}
             </div>
           </div>
         </article>
