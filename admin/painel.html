@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=82">
+  <link rel="stylesheet" href="painel.css?v=84">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -262,6 +262,31 @@
               <label>Cor do icone
                 <input id="categoryIconColor" type="color" value="#2563eb">
               </label>
+              <label>Letra no menu lateral
+                <select id="categoryMenuLetter">
+                  <option value="">Automatico pelo nome</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="E">E</option>
+                  <option value="F">F</option>
+                  <option value="G">G</option>
+                  <option value="H">H</option>
+                  <option value="I">I</option>
+                  <option value="J">J</option>
+                  <option value="L">L</option>
+                  <option value="M">M</option>
+                  <option value="N">N</option>
+                  <option value="O">O</option>
+                  <option value="P">P</option>
+                  <option value="Q">Q</option>
+                  <option value="R">R</option>
+                  <option value="S">S</option>
+                  <option value="T">T</option>
+                  <option value="V">V</option>
+                </select>
+              </label>
               <label>Status
                 <select id="categoryStatus">
                   <option value="ativo">Ativo no menu</option>
@@ -497,10 +522,17 @@
       <section id="usuariosView" class="panel-view hidden">
         <div class="split-layout">
           <section class="panel-card">
-            <h2>Cadastrar usuario</h2>
+            <div class="section-head">
+              <div>
+                <h2>Cadastrar ou editar usuario</h2>
+                <p>Altere perfil, cliente vinculado e permissoes do acesso.</p>
+              </div>
+              <button id="newUserButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo</button>
+            </div>
             <form id="userForm" class="grid-form">
+              <input id="editUserUid" type="hidden">
               <label>E-mail<input id="newUserEmail" type="email" required></label>
-              <label>Senha provisoria<input id="newUserPassword" type="text" required minlength="6"></label>
+              <label>Senha provisoria<input id="newUserPassword" type="text" minlength="6" placeholder="Obrigatoria apenas para novo usuario"></label>
               <label>Perfil
                 <select id="newUserRole">
                   <option value="cliente">Admin do cliente</option>
@@ -510,6 +542,12 @@
               </label>
               <label>Cliente vinculado
                 <select id="newUserClient"></select>
+              </label>
+              <label>Status
+                <select id="editUserStatus">
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                </select>
               </label>
               <fieldset class="permissions-box wide">
                 <legend>Permissoes</legend>
@@ -526,7 +564,7 @@
                 <label><input type="checkbox" value="informacoes_nota_falecimento"> Nota de falecimento</label>
               </fieldset>
               <div class="form-actions wide">
-                <button type="submit"><i class="fa-solid fa-user-plus"></i> Criar usuario</button>
+                <button id="saveUserButton" type="submit"><i class="fa-solid fa-user-plus"></i> Criar usuario</button>
               </div>
             </form>
           </section>
@@ -561,6 +599,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=82"></script>
+  <script type="module" src="painel.js?v=84"></script>
 </body>
 </html>

@@ -16396,7 +16396,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       <span class="navlink_icon"><i style="color:${iconColorCategoriaAdmin(meta)}" class="${iconClassCategoriaAdmin(meta)}"></i></span>
       <span class="navlink">${meta.parentId ? "&nbsp;&nbsp;↳ " : ""}${title}</span>
     `;
-    submenu.appendChild(link);
+    inserirCategoriaAdminNoMenu(submenu, link, title, meta);
     link.addEventListener("click", function (event) {
       event.preventDefault();
       location.hash = "#comercios-" + slug;
@@ -16404,6 +16404,43 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (cat) loadContent(cat.title, cat.establishments);
     });
     return link;
+  }
+
+  function letraMenuCategoriaAdmin(title, meta = {}) {
+    const explicit = String(meta.menuLetter || meta.letraMenu || "").trim().toUpperCase();
+    if (/^[A-Z]$/.test(explicit)) return explicit;
+    const normalized = String(title || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .charAt(0)
+      .toUpperCase();
+    return /^[A-Z]$/.test(normalized) ? normalized : "A";
+  }
+
+  function inserirCategoriaAdminNoMenu(submenu, link, title, meta = {}) {
+    const letter = letraMenuCategoriaAdmin(title, meta);
+    const separators = Array.from(submenu.querySelectorAll(".separador-letra"));
+    let targetSeparator = separators.find((sep) => String(sep.textContent || "").trim().toUpperCase() === letter);
+
+    if (!targetSeparator) {
+      targetSeparator = document.createElement("li");
+      targetSeparator.className = "separador-letra";
+      targetSeparator.textContent = letter;
+      const nextSeparator = separators.find((sep) => String(sep.textContent || "").trim().toUpperCase() > letter);
+      if (nextSeparator) submenu.insertBefore(targetSeparator, nextSeparator);
+      else submenu.appendChild(targetSeparator);
+    }
+
+    const sameLetterLinks = [];
+    let cursor = targetSeparator.nextElementSibling;
+    while (cursor && !cursor.classList?.contains("separador-letra")) {
+      if (cursor.matches?.("a.nav_link")) sameLetterLinks.push(cursor);
+      cursor = cursor.nextElementSibling;
+    }
+
+    const nextByName = sameLetterLinks.find((item) => String(item.textContent || "").trim().localeCompare(title, "pt-BR") > 0);
+    submenu.insertBefore(link, nextByName || cursor || null);
   }
 
   function aplicarCategoriasAdminNoMenu(categoriasAdmin) {

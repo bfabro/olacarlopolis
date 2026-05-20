@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 82,
-  label: "v82",
+  numero: 84,
+  label: "v84",
   data: "2026-05-20",
-  nota: "Adiciona cadastro de automoveis no painel admin."
+  nota: "Permite editar usuario, vinculo e permissoes no painel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -493,6 +493,7 @@ function normalizeCategory(cat) {
     id,
     nome: name,
     parentId: cat.parentId || "",
+    menuLetter: String(cat.menuLetter || cat.letraMenu || "").toUpperCase().slice(0, 1),
     icon: cat.icon || "fa-solid fa-store",
     iconColor: cat.iconColor || "#2563eb",
     ordem: Number(cat.ordem || 0)
@@ -1715,6 +1716,7 @@ function resetCategoryForm() {
   $("categoryId").value = "";
   $("categoryIcon").value = "fa-solid fa-store";
   $("categoryIconColor").value = "#2563eb";
+  $("categoryMenuLetter").value = "";
   $("categoryStatus").value = "ativo";
   $("deleteCategoryButton").classList.add("hidden");
   fillCategoryParentSelect();
@@ -1728,6 +1730,7 @@ function getCategoryFormData() {
     nome: name,
     nomeNormalizado: normalizeName(name),
     parentId: $("categoryParent").value,
+    menuLetter: $("categoryMenuLetter").value,
     icon: $("categoryIcon").value.trim() || "fa-solid fa-store",
     iconColor: $("categoryIconColor").value || "#2563eb",
     status: $("categoryStatus").value,
@@ -1745,6 +1748,7 @@ function fillCategoryForm(category) {
   $("categoryName").value = category.nome || category.title || "";
   $("categoryIcon").value = category.icon || "fa-solid fa-store";
   $("categoryIconColor").value = category.iconColor || "#2563eb";
+  $("categoryMenuLetter").value = category.menuLetter || "";
   $("categoryStatus").value = category.status || "ativo";
   $("categoryOrder").value = category.ordem || "";
   $("categoryNote").value = category.observacaoAdmin || "";
@@ -1773,7 +1777,7 @@ function renderCategoriesList() {
       <div>
         <div class="list-title">${escapeHtml(cat.nome || cat.id)}</div>
         <div class="list-meta">${cat.parentId ? `Subcategoria de ${escapeHtml(parents.get(cat.parentId) || cat.parentId)}` : "Categoria principal"} - ${statusLabel(cat.status)}</div>
-        <div class="list-meta">${escapeHtml(cat.icon || "fa-solid fa-store")}</div>
+        <div class="list-meta">${escapeHtml(cat.icon || "fa-solid fa-store")} - Letra ${escapeHtml(cat.menuLetter || "automatica")}</div>
       </div>
       <button type="button" data-edit-category="${escapeAttr(cat.id)}">Editar</button>
     </article>
@@ -1802,17 +1806,52 @@ function renderUsersList() {
       <article class="list-card">
         <div class="list-title">${escapeHtml(user.email || user.uid)}</div>
         <div class="list-meta">${roleLabel(user.role)}${client ? ` - ${escapeHtml(client.nome)}` : ""}</div>
+        <div class="list-meta">Permissoes: ${Object.entries(user.permissoes || {}).filter(([, value]) => value).map(([key]) => escapeHtml(key)).join(", ") || "nenhuma"}</div>
         <span class="badge ${escapeAttr(user.status || "ativo")}">${statusLabel(user.status)}</span>
+        <button type="button" data-edit-user="${escapeAttr(user.uid)}">Editar</button>
       </article>
     `;
   }).join("");
+  box.querySelectorAll("[data-edit-user]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const user = state.usuarios.find((item) => item.uid === button.dataset.editUser);
+      if (user) fillUserForm(user);
+    });
+  });
 }
 
-function fillUserClientSelect() {
+function resetUserForm() {
+  $("userForm")?.reset();
+  $("editUserUid").value = "";
+  $("newUserEmail").readOnly = false;
+  $("newUserPassword").required = true;
+  $("editUserStatus").value = "ativo";
+  $("saveUserButton").innerHTML = `<i class="fa-solid fa-user-plus"></i> Criar usuario`;
+  document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
+    input.checked = ["dados", "imagens", "cardapio", "promocoes", "faturas"].includes(input.value);
+  });
+}
+
+function fillUserForm(user) {
+  $("editUserUid").value = user.uid || "";
+  $("newUserEmail").value = user.email || "";
+  $("newUserEmail").readOnly = true;
+  $("newUserPassword").value = "";
+  $("newUserPassword").required = false;
+  $("newUserRole").value = user.role || "cliente";
+  $("newUserClient").value = user.clienteId || "";
+  $("editUserStatus").value = user.status || "ativo";
+  document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
+    input.checked = Boolean(user.permissoes?.[input.value]);
+  });
+  $("saveUserButton").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar usuario`;
+}
+
+function fillUserClientSelect(selectedId = "") {
   const select = $("newUserClient");
   if (!select) return;
   select.innerHTML = `<option value="">Sem vinculo</option>` + state.clientes.map((client) => (
-    `<option value="${escapeAttr(client.id)}">${escapeHtml(client.nome || client.id)}</option>`
+    `<option value="${escapeAttr(client.id)}" ${client.id === selectedId ? "selected" : ""}>${escapeHtml(client.nome || client.id)}</option>`
   )).join("");
 }
 
@@ -3687,6 +3726,7 @@ async function createPanelUser(event) {
   event.preventDefault();
   if (!canManageClients()) return;
 
+  const editingUid = $("editUserUid")?.value || "";
   const role = $("newUserRole").value;
   if (role === "master" && !isMaster()) {
     showToast("Somente master pode criar outro master.");
@@ -3702,8 +3742,28 @@ async function createPanelUser(event) {
   });
 
   const button = event.submitter;
-  setBusy(button, true, "Criando...");
+  setBusy(button, true, editingUid ? "Salvando..." : "Criando...");
   try {
+    if (editingUid) {
+      await saveUserProfile({
+        uid: editingUid,
+        email,
+        role,
+        clienteId: role === "cliente" ? clienteId : "",
+        status: $("editUserStatus").value || "ativo",
+        permissoes
+      });
+      resetUserForm();
+      showToast("Usuario atualizado.");
+      await loadAllData();
+      return;
+    }
+
+    if (!password) {
+      showToast("Informe uma senha provisoria para criar novo usuario.");
+      return;
+    }
+
     const secondaryName = `creator-${Date.now()}`;
     const secondary = initializeApp(firebaseConfig, secondaryName);
     const secondaryAuth = getAuth(secondary);
@@ -3719,7 +3779,7 @@ async function createPanelUser(event) {
       permissoes
     });
 
-    event.target.reset();
+    resetUserForm();
     showToast("Usuario criado com sucesso.");
     await loadAllData();
   } catch (error) {
@@ -3883,6 +3943,7 @@ function bindEvents() {
     renderReports();
     renderClientInvoices();
   });
+  $("newUserButton")?.addEventListener("click", resetUserForm);
   $("userForm").addEventListener("submit", createPanelUser);
 
   document.querySelectorAll(".nav-admin button").forEach((button) => {
@@ -3916,6 +3977,7 @@ function bindEvents() {
         nome: payload.categoria,
         nomeNormalizado: normalizeName(payload.categoria),
         parentId: existingCategory.parentId || "",
+        menuLetter: existingCategory.menuLetter || "",
         icon: existingCategory.icon || "fa-solid fa-store",
         iconColor: existingCategory.iconColor || "#2563eb",
         status: existingCategory.status || "ativo",
