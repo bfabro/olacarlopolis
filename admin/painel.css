@@ -492,6 +492,45 @@ button[type="submit"]:hover,
   background: #f8fafc;
 }
 
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+
+.check-row input {
+  width: 18px;
+  height: 18px;
+}
+
+.invoice-card,
+.pix-box {
+  display: grid;
+  gap: 16px;
+}
+
+.pix-box {
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: start;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.pix-box img {
+  width: 220px;
+  height: 220px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.pix-box textarea {
+  min-height: 132px;
+  resize: vertical;
+}
+
 .profile-upload-panel {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -888,8 +927,14 @@ button[type="submit"]:hover,
   .split-layout,
   .stats-grid,
   .client-row,
-  .finance-row {
+  .finance-row,
+  .pix-box {
     grid-template-columns: 1fr;
+  }
+
+  .pix-box img {
+    width: 180px;
+    height: 180px;
   }
 
   .schedule-day {

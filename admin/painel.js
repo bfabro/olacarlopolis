@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 66,
-  label: "v66",
+  numero: 67,
+  label: "v67",
   data: "2026-05-18",
-  nota: "Reativa clientes no site publico quando o status volta para ativo."
+  nota: "Adiciona TikTok, site, destaque semanal e faturas Pix por cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -93,7 +93,8 @@ const views = {
   informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
   usuarios: $("usuariosView"),
-  minhaEmpresa: $("minhaEmpresaView")
+  minhaEmpresa: $("minhaEmpresaView"),
+  faturas: $("faturasView")
 };
 
 const viewCopy = {
@@ -104,7 +105,8 @@ const viewCopy = {
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
-  minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."]
+  minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."],
+  faturas: ["Faturas", "Pix mensal, QR Code e comprovantes."]
 };
 
 function emailKey(email) {
@@ -197,10 +199,59 @@ function moneyBR(value) {
   return Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function textPix(value, maxLength = 25) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Za-z0-9 $%*+\-./:]/g, "")
+    .trim()
+    .slice(0, maxLength);
+}
+
 function numberFromMoney(value) {
   const cleaned = String(value || "").replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
   const n = Number(cleaned);
   return Number.isFinite(n) ? n : 0;
+}
+
+function pixField(id, value) {
+  const text = String(value || "");
+  return `${id}${String(text.length).padStart(2, "0")}${text}`;
+}
+
+function pixCrc16(payload) {
+  let crc = 0xffff;
+  for (let i = 0; i < payload.length; i += 1) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+      crc &= 0xffff;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+function gerarPixCopiaCola({ chave, nome, cidade, valor, txid }) {
+  const pixKey = String(chave || "").trim();
+  if (!pixKey) return "";
+  const merchantName = textPix(nome || "OLA CARLOPOLIS", 25) || "OLA CARLOPOLIS";
+  const merchantCity = textPix(cidade || "CARLOPOLIS", 15) || "CARLOPOLIS";
+  const amount = Number(valor || 0).toFixed(2);
+  const merchantAccount = pixField("00", "br.gov.bcb.pix") + pixField("01", pixKey);
+  const additionalData = pixField("05", textPix(txid || "FATURA", 25) || "FATURA");
+  const payloadSemCrc = [
+    pixField("00", "01"),
+    pixField("26", merchantAccount),
+    pixField("52", "0000"),
+    pixField("53", "986"),
+    valor > 0 ? pixField("54", amount) : "",
+    pixField("58", "BR"),
+    pixField("59", merchantName),
+    pixField("60", merchantCity),
+    pixField("62", additionalData),
+    "6304"
+  ].join("");
+  return `${payloadSemCrc}${pixCrc16(payloadSemCrc)}`;
 }
 
 function normalizeImageItems(images) {
@@ -702,6 +753,7 @@ async function loadAllData() {
   renderEventsList();
   renderInfoDeathNoticeList();
   renderFinanceiro();
+  renderClientInvoices();
 
   // A importacao agora fica manual para nao sobrescrever edicoes feitas no Firebase.
 }
@@ -787,6 +839,7 @@ function switchView(name) {
   $("viewSubtitle").textContent = subtitle;
 
   if (target === "minhaEmpresa") renderClientOnlyEditor();
+  if (target === "faturas") renderClientInvoices();
   if (target === "informacoes" && !canManageInformacoes()) {
     switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
     return;
@@ -816,6 +869,7 @@ function resetClientForm() {
   delete $("clientForm").dataset.originalClientId;
   delete $("clientForm").dataset.originalName;
   $("clientId").value = "";
+  $("clientPixCity").value = "CARLOPOLIS";
   fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
   renderProfilePreview("clientImage", "clientProfilePreview");
@@ -850,6 +904,13 @@ function getClientFormData() {
     ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
     instagram: $("clientInstagram").value.trim(),
     facebook: $("clientFacebook").value.trim(),
+    tiktok: $("clientTiktok").value.trim(),
+    site: $("clientSite").value.trim(),
+    destaqueSemanal: $("clientFeaturedWeek").checked,
+    destaqueValor: numberFromMoney($("clientFeaturedValue").value),
+    pixChave: $("clientPixKey").value.trim(),
+    pixNome: $("clientPixName").value.trim(),
+    pixCidade: $("clientPixCity").value.trim(),
     imagem: $("clientImage").value.trim(),
     imagens: normalizeImageItems(state.clientImages),
     cardapioLink: $("clientMenuLink").value.trim(),
@@ -880,6 +941,13 @@ function fillClientForm(client) {
   $("clientHours").value = client.horario || client.hours || "";
   $("clientInstagram").value = client.instagram || "";
   $("clientFacebook").value = client.facebook || "";
+  $("clientTiktok").value = client.tiktok || "";
+  $("clientSite").value = client.site || "";
+  $("clientFeaturedWeek").checked = Boolean(client.destaqueSemanal);
+  $("clientFeaturedValue").value = client.destaqueValor ? moneyBR(client.destaqueValor) : "";
+  $("clientPixKey").value = client.pixChave || "";
+  $("clientPixName").value = client.pixNome || client.nome || "";
+  $("clientPixCity").value = client.pixCidade || "CARLOPOLIS";
   $("clientImage").value = client.imagem || client.image || "";
   renderProfilePreview("clientImage", "clientProfilePreview");
   state.clientImages = normalizeImageItems(client.imagens);
@@ -1175,6 +1243,13 @@ async function uploadImagesForClient(clientId, files) {
 
 async function uploadPromoImageForClient(clientId, file) {
   const path = `clientes/${clientId}/promocoes/${Date.now()}-${slugify(file.name || "promocao")}`;
+  const fileRef = storageRef(storage, path);
+  await uploadBytes(fileRef, file);
+  return getDownloadURL(fileRef);
+}
+
+async function uploadInvoiceReceiptForClient(clientId, file) {
+  const path = `clientes/${clientId}/faturas/${Date.now()}-${slugify(file.name || "comprovante")}`;
   const fileRef = storageRef(storage, path);
   await uploadBytes(fileRef, file);
   return getDownloadURL(fileRef);
@@ -1595,6 +1670,10 @@ function valorFinalPlano(client) {
   return Math.max(0, bruto - desconto);
 }
 
+function valorTotalFaturaCliente(client) {
+  return valorFinalPlano(client) + (client?.destaqueSemanal ? Number(client.destaqueValor || 0) : 0);
+}
+
 function planLabel(tipoPlano) {
   return {
     mensal: "Mensal",
@@ -1787,7 +1866,7 @@ function renderFinanceiro() {
   const paid = state.clientes.filter((c) => c.pagamentoStatus === "pago");
   const open = state.clientes.filter((c) => !c.pagamentoStatus || c.pagamentoStatus === "em_aberto");
   const free = state.clientes.filter((c) => c.pagamentoStatus === "isento");
-  const total = paid.reduce((sum, c) => sum + valorFinalPlano(c), 0);
+  const total = paid.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
 
   $("financePaid").textContent = String(paid.length);
   $("financeOpen").textContent = String(open.length);
@@ -1804,7 +1883,7 @@ function renderFinanceiro() {
       <div>
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
-        <div class="list-meta">Plano: ${planLabel(client.tipoPlano)} - Valor final: ${moneyBR(valorFinalPlano(client))}</div>
+        <div class="list-meta">Plano: ${planLabel(client.tipoPlano)} - Valor final: ${moneyBR(valorTotalFaturaCliente(client))}${client.destaqueSemanal ? ` - destaque ${moneyBR(client.destaqueValor || 0)}` : ""}</div>
       </div>
       <label>Status
         <select data-finance-field="pagamentoStatus">
@@ -1885,6 +1964,20 @@ function renderClientOnlyEditor() {
         <div id="coScheduleEditor" class="schedule-editor"></div>
       </section>
       <label>Instagram<input id="coInstagram" value="${escapeAttr(client.instagram || "")}"></label>
+      <label>Facebook<input id="coFacebook" value="${escapeAttr(client.facebook || "")}"></label>
+      <label>TikTok<input id="coTiktok" value="${escapeAttr(client.tiktok || "")}"></label>
+      <label>Site<input id="coSite" value="${escapeAttr(client.site || "")}"></label>
+      <section class="wide upload-panel">
+        <div class="section-head compact">
+          <div>
+            <h3>Pix para pagamento</h3>
+            <p>Informe a chave Pix para gerar QR Code nas faturas.</p>
+          </div>
+        </div>
+        <label>Chave Pix<input id="coPixKey" value="${escapeAttr(client.pixChave || "")}" placeholder="CPF, CNPJ, email, telefone ou chave aleatoria"></label>
+        <label>Nome do recebedor<input id="coPixName" value="${escapeAttr(client.pixNome || client.nome || "")}"></label>
+        <label>Cidade do recebedor<input id="coPixCity" value="${escapeAttr(client.pixCidade || "CARLOPOLIS")}"></label>
+      </section>
       <section class="wide profile-upload-panel">
         <div class="section-head compact">
           <div>
@@ -2165,6 +2258,12 @@ function renderClientOnlyEditor() {
       horario: horarioTexto,
       ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
       instagram: $("coInstagram").value.trim(),
+      facebook: $("coFacebook").value.trim(),
+      tiktok: $("coTiktok").value.trim(),
+      site: $("coSite").value.trim(),
+      pixChave: $("coPixKey").value.trim(),
+      pixNome: $("coPixName").value.trim(),
+      pixCidade: $("coPixCity").value.trim(),
       imagem: $("coImage").value.trim(),
       imagens,
       cardapioLink: $("coMenuLink").value.trim(),
@@ -2418,6 +2517,98 @@ async function syncClientsFromScript(options = {}) {
   }
 }
 
+function renderClientInvoices() {
+  const mount = $("clientInvoicesMount");
+  if (!mount) return;
+  const client = state.clientes.find((item) => item.id === state.profile?.clienteId);
+  if (!client) {
+    mount.innerHTML = `<p>Nenhum cliente vinculado a este usuario. Fale com o administrador.</p>`;
+    return;
+  }
+
+  const now = new Date();
+  const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const valorPlano = valorFinalPlano(client);
+  const valorDestaque = client.destaqueSemanal ? Number(client.destaqueValor || 0) : 0;
+  const valorTotal = valorPlano + valorDestaque;
+  const txid = `OC${normalizeName(client.nome || client.id).slice(0, 10).toUpperCase()}${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const pixCode = gerarPixCopiaCola({
+    chave: client.pixChave,
+    nome: client.pixNome || client.nome,
+    cidade: client.pixCidade || "CARLOPOLIS",
+    valor: valorTotal,
+    txid
+  });
+  const qrUrl = pixCode ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pixCode)}` : "";
+  const fatura = client.faturas?.[mes] || {};
+
+  mount.innerHTML = `
+    <article class="invoice-card">
+      <div class="section-head compact">
+        <div>
+          <h3>Fatura ${escapeHtml(mes)}</h3>
+          <p>${escapeHtml(client.nome || "")}</p>
+        </div>
+        <span class="badge ${escapeAttr(fatura.status || client.pagamentoStatus || "em_aberto")}">${paymentLabel(fatura.status || client.pagamentoStatus || "em_aberto")}</span>
+      </div>
+      <div class="stats-grid">
+        <article class="stat-card"><span>Plano</span><strong>${moneyBR(valorPlano)}</strong></article>
+        <article class="stat-card"><span>Destaque</span><strong>${moneyBR(valorDestaque)}</strong></article>
+        <article class="stat-card"><span>Total</span><strong>${moneyBR(valorTotal)}</strong></article>
+      </div>
+      ${pixCode ? `
+        <div class="pix-box">
+          <img src="${escapeAttr(qrUrl)}" alt="QR Code Pix" loading="lazy" decoding="async">
+          <label class="wide">Codigo Pix copia e cola<textarea id="invoicePixCode" rows="5" readonly>${escapeHtml(pixCode)}</textarea></label>
+          <div class="form-actions">
+            <button id="copyPixButton" type="button" class="ghost-button"><i class="fa-solid fa-copy"></i> Copiar codigo Pix</button>
+            <button id="copyPixKeyButton" type="button" class="ghost-button"><i class="fa-solid fa-key"></i> Copiar chave Pix</button>
+          </div>
+        </div>
+      ` : `<div class="list-meta">Cadastre a chave Pix em Minha empresa para gerar o QR Code.</div>`}
+      <div class="upload-panel">
+        <h3>Comprovante</h3>
+        <input id="invoiceReceiptUpload" type="file" accept="image/*,application/pdf">
+        ${fatura.comprovanteUrl ? `<a class="ghost-button" href="${escapeAttr(fatura.comprovanteUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-paperclip"></i> Ver comprovante enviado</a>` : `<div class="list-meta">Nenhum comprovante anexado.</div>`}
+      </div>
+    </article>
+  `;
+
+  mount.querySelector("#copyPixButton")?.addEventListener("click", async () => {
+    await navigator.clipboard?.writeText(pixCode);
+    showToast("Codigo Pix copiado.");
+  });
+  mount.querySelector("#copyPixKeyButton")?.addEventListener("click", async () => {
+    await navigator.clipboard?.writeText(client.pixChave || "");
+    showToast("Chave Pix copiada.");
+  });
+  mount.querySelector("#invoiceReceiptUpload")?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    showToast("Enviando comprovante...");
+    const comprovanteUrl = await uploadInvoiceReceiptForClient(client.id, file);
+    const payload = {
+      [`faturas/${mes}`]: {
+        mes,
+        valorPlano,
+        valorDestaque,
+        valorTotal,
+        pixChave: client.pixChave || "",
+        pixCodigo: pixCode,
+        comprovanteUrl,
+        status: "em_analise",
+        updatedAt: Date.now()
+      },
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid
+    };
+    await update(ref(db, `clientes/${client.id}`), payload);
+    showToast("Comprovante anexado.");
+    await loadAllData();
+    renderClientInvoices();
+  });
+}
+
 async function createPanelUser(event) {
   event.preventDefault();
   if (!canManageClients()) return;
@@ -2477,7 +2668,8 @@ function paymentLabel(status) {
   return {
     pago: "Pago",
     em_aberto: "Em aberto",
-    isento: "Isento"
+    isento: "Isento",
+    em_analise: "Em analise"
   }[status] || "Em aberto";
 }
 

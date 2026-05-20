@@ -1916,18 +1916,24 @@ document.addEventListener("DOMContentLoaded", function () {
       cat.establishments?.forEach(est => {
         const nomeNormalizado = normalizeName(est.name);
         const imagens = est.novidadesImages || [];
+        const temImagemHome = imagens.length > 0 || Boolean(est.image || est.logo);
 
-        if (statusEstabelecimentos[nomeNormalizado] === "s" && imagens.length > 0) {
+        if (statusEstabelecimentos[nomeNormalizado] === "s" && temImagemHome) {
           listaTodos.push({ ...est, nomeNormalizado });
         }
       });
     });
 
-    const fixos = destaquesFixos
+    const destaquesAdmin = listaTodos
+      .filter(e => e.destaqueSemanal)
+      .map(e => e.nomeNormalizado);
+    const nomesFixos = [...new Set([...destaquesAdmin, ...destaquesFixos])];
+
+    const fixos = nomesFixos
       .map(nome => listaTodos.find(e => e.nomeNormalizado === nome))
       .filter(Boolean);
 
-    const restantes = listaTodos.filter(e => !destaquesFixos.includes(e.nomeNormalizado));
+    const restantes = listaTodos.filter(e => !nomesFixos.includes(e.nomeNormalizado));
     const sorteados = restantes
       .sort(() => Math.random() - 0.5)
       .slice(0, Math.max(0, 20 - fixos.length));
@@ -16154,6 +16160,9 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
     if (campoExiste(cliente, "instagram")) est.instagram = cliente.instagram || "";
     if (campoExiste(cliente, "facebook")) est.facebook = cliente.facebook || "";
+    if (campoExiste(cliente, "tiktok")) est.tiktok = cliente.tiktok || "";
+    if (campoExiste(cliente, "site")) est.site = cliente.site || "";
+    if (campoExiste(cliente, "destaqueSemanal")) est.destaqueSemanal = Boolean(cliente.destaqueSemanal);
     if (campoExiste(cliente, "cardapioLink")) est.cardapioLink = cliente.cardapioLink || "";
     if (Array.isArray(cliente.menuImages) && cliente.menuImages.length) est.menuImages = cliente.menuImages;
     if (Array.isArray(cliente.promocoes)) est.promocoes = cliente.promocoes;
@@ -16177,6 +16186,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       whatsapp: cliente.whatsapp || "",
       instagram: cliente.instagram || "",
       facebook: cliente.facebook || "",
+      tiktok: cliente.tiktok || "",
+      site: cliente.site || "",
+      destaqueSemanal: Boolean(cliente.destaqueSemanal),
       cardapioLink: cliente.cardapioLink || "",
       menuImages: cliente.menuImages || [],
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : [],
@@ -17074,7 +17086,7 @@ ${establishment.infoVagaTrabalho
                    
                 
 
-                  ${(establishment.instagram || establishment.instagram2 || establishment.facebook || establishment.site) ? `
+                  ${(establishment.instagram || establishment.instagram2 || establishment.facebook || establishment.tiktok || establishment.site) ? `
   <div class="info-box">
     <i class="fas fa-share-alt info-icon"></i>
     <div>
@@ -17093,6 +17105,11 @@ ${establishment.infoVagaTrabalho
         ${establishment.instagram2 ? `
           <a href="#" class="js-ig-link" data-ig="${fixInstagramUrl(establishment.instagram2)}" rel="noopener">
             <i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram 2
+          </a>` : ""}
+
+        ${establishment.tiktok ? `
+          <a href="${fixUrl(establishment.tiktok)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-tiktok" style="color: #111; font-size: 16px;"></i> TikTok
           </a>` : ""}
 
         ${establishment.site ? `

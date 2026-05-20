@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=66">
+  <link rel="stylesheet" href="painel.css?v=67">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -50,6 +50,7 @@
         <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
         <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
         <button data-view="minhaEmpresa" data-role="cliente"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
+        <button data-view="faturas" data-role="cliente"><i class="fa-solid fa-qrcode"></i> Faturas</button>
       </nav>
 
       <div class="sidebar-footer">
@@ -151,6 +152,29 @@
               </section>
               <label>Instagram<input id="clientInstagram"></label>
               <label>Facebook<input id="clientFacebook"></label>
+              <label>TikTok<input id="clientTiktok" placeholder="https://www.tiktok.com/@usuario"></label>
+              <label>Site<input id="clientSite" placeholder="https://site.com.br"></label>
+              <section class="wide upload-panel">
+                <div class="section-head compact">
+                  <div>
+                    <h3>Destaque da semana</h3>
+                    <p>Cliente fixo na tela inicial enquanto estiver marcado.</p>
+                  </div>
+                </div>
+                <label class="check-row"><input id="clientFeaturedWeek" type="checkbox"> Manter este cliente em destaque na tela inicial</label>
+                <label>Valor do destaque<input id="clientFeaturedValue" placeholder="R$"></label>
+              </section>
+              <section class="wide upload-panel">
+                <div class="section-head compact">
+                  <div>
+                    <h3>Pix do cliente</h3>
+                    <p>Dados usados para gerar QR Code e codigo copia e cola nas faturas.</p>
+                  </div>
+                </div>
+                <label>Chave Pix<input id="clientPixKey" placeholder="CPF, CNPJ, email, telefone ou chave aleatoria"></label>
+                <label>Nome do recebedor<input id="clientPixName" placeholder="Nome que aparece no Pix"></label>
+                <label>Cidade do recebedor<input id="clientPixCity" placeholder="CARLOPOLIS"></label>
+              </section>
               <section class="wide profile-upload-panel">
                 <div class="section-head compact">
                   <div>
@@ -441,10 +465,22 @@
           <div id="clientOnlyMount"></div>
         </section>
       </section>
+
+      <section id="faturasView" class="panel-view hidden">
+        <section class="panel-card">
+          <div class="section-head">
+            <div>
+              <h2>Faturas</h2>
+              <p>Gere o Pix mensal e anexe o comprovante do pagamento.</p>
+            </div>
+          </div>
+          <div id="clientInvoicesMount"></div>
+        </section>
+      </section>
     </section>
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=66"></script>
+  <script type="module" src="painel.js?v=67"></script>
 </body>
 </html>
