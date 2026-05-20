@@ -2141,6 +2141,23 @@ screen and (width: 820px) {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity .22s ease, visibility .22s ease;
+}
+
+.loader-overlay.loader-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  color: #fff;
+  font-weight: 700;
+  font-size: .95rem;
 }
 
 .loader-spinner {

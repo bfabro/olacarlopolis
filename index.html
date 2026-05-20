@@ -114,19 +114,14 @@
 
    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-   <link rel="stylesheet" href="https://blade-ui-kit.com/build/assets/app-4a434763.css" />
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-   <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 
    <!-- FIM  CSS -->
 
-   <script src=" https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
    <!-- FIM  JAVA -->
-   <link rel="stylesheet" href="style.css?v=64" />
+   <link rel="stylesheet" href="style.css?v=65" />
 
    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
    <!--  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>-->
@@ -139,9 +134,7 @@
    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
-   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 
 
@@ -165,8 +158,21 @@
 
    <h1 style="display:none;">Olá Carlópolis</h1>
    <div id="loader" class="loader-overlay">
-      <div class="loader-spinner"></div>
+      <div class="loader-content">
+         <div class="loader-spinner"></div>
+         <span>Carregando Olá Carlópolis...</span>
+      </div>
    </div>
+   <script>
+      window.__hideInitialLoader = function () {
+         var loader = document.getElementById('loader');
+         if (loader) loader.classList.add('loader-hidden');
+      };
+      setTimeout(window.__hideInitialLoader, 1400);
+      window.addEventListener('load', function () {
+         setTimeout(window.__hideInitialLoader, 250);
+      });
+   </script>
    <div class="container">
       <!-- navbar -->
       <nav class="navbar">
@@ -1328,7 +1334,7 @@
 
             </ul>
 
-            <div class="sidebar-version">Olá Carlópolis v64</div>
+            <div class="sidebar-version">Olá Carlópolis v65</div>
 
             <!-- Sidebar Open / Close -->
             <div class="bottom_content">
@@ -1606,7 +1612,7 @@
    </script>
 
    <!--  JavaScript -->
-   <script src="script.js?v=64"></script>
+   <script defer src="script.js?v=65"></script>
 
 
 
@@ -1881,11 +1887,6 @@
       </div>
    </section>
    <!-- ===== /ADMIN APP ===== -->
-
-   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
-
-
 
    <div id="modalLogin" class="modal-login hidden">
       <div class="modal-content">

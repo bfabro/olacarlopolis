@@ -1,12 +1,10 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-05-18-admin-v64'; // <-- TROQUE quando publicar atualização
+const CACHE_VERSION = '2026-05-18-admin-v65'; // <-- TROQUE quando publicar atualização
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
-  '/style.css',
-  '/script.js',
   '/images/img_padrao_site/icon-192_2.png',
   '/images/img_padrao_site/icon-512_2.png',
 ];
