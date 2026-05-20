@@ -6670,20 +6670,29 @@ plotarPinsImoveis(stateImoveis.filtered);
       const instagramUrl = instagram && instagram.startsWith("http") ? instagram : (instagram ? `https://instagram.com/${instagram.replace(/^@/, "")}` : "");
       const detalhes = [item.tipo, item.condicao, item.ano, item.km, item.cambio, item.combustivel, item.cor].filter(Boolean);
       const vendedor = item.vendedor || item.loja || "";
+      const localizacao = [item.cidade].filter(Boolean).join(" - ");
       return `
-        <article class="im-card auto-card ${item.status === "vendido" ? "is-sold" : ""}">
-          ${item.imagem ? `<img src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">` : ""}
+        <article class="auto-card ${item.status === "vendido" ? "is-sold" : ""}">
+          <div class="auto-card-media">
+            ${item.imagem ? `
+              <img class="auto-card-img imagem-expandivel" src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">
+              <span class="auto-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+            ` : `<div class="auto-card-img auto-card-img-empty"><i class="fa-solid fa-car-side"></i></div>`}
+            ${item.status === "vendido" ? `<span class="auto-status auto-status-media">Vendido</span>` : ""}
+          </div>
           <div class="im-card-body">
-            <div class="auto-title-line">
-              <h3>${textoSeguroAutomoveis(titulo)}</h3>
-              ${item.status === "vendido" ? `<span class="auto-status">Vendido</span>` : ""}
+            <div class="auto-card-top">
+              <div>
+                <div class="auto-kicker">${textoSeguroAutomoveis(item.tipo || "Automovel")}</div>
+                <h3>${textoSeguroAutomoveis(titulo)}</h3>
+              </div>
+              ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(item.preco)}</strong>` : ""}
             </div>
-            ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(item.preco)}</strong>` : ""}
-            ${vendedor ? `<p class="auto-seller"><i class="fa-solid fa-store"></i> ${textoSeguroAutomoveis(vendedor)}</p>` : ""}
-            ${detalhes.length ? `<div class="auto-tags">${detalhes.map((tag) => `<span>${textoSeguroAutomoveis(tag)}</span>`).join("")}</div>` : ""}
-            ${item.cidade ? `<p>${textoSeguroAutomoveis(item.cidade)}</p>` : ""}
-            ${item.opcionais ? `<p><strong>Opcionais:</strong> ${textoSeguroAutomoveis(item.opcionais)}</p>` : ""}
-            ${item.descricao ? `<p>${textoSeguroAutomoveis(item.descricao)}</p>` : ""}
+            ${vendedor ? `<p class="auto-seller"><i class="fa-solid fa-store"></i><span>Vendedor</span><strong>${textoSeguroAutomoveis(vendedor)}</strong></p>` : ""}
+            ${detalhes.length ? `<div class="auto-tags">${detalhes.slice(0, 7).map((tag) => `<span>${textoSeguroAutomoveis(tag)}</span>`).join("")}</div>` : ""}
+            ${localizacao ? `<p class="auto-location"><i class="fa-solid fa-location-dot"></i> ${textoSeguroAutomoveis(localizacao)}</p>` : ""}
+            ${item.opcionais ? `<p class="auto-info-line"><strong>Opcionais:</strong> ${textoSeguroAutomoveis(item.opcionais)}</p>` : ""}
+            ${item.descricao ? `<p class="auto-description">${textoSeguroAutomoveis(item.descricao)}</p>` : ""}
             <div class="auto-actions">
               ${contato ? `<a class="zap-link telefone-link" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent("Olá! Vi o automóvel no Olá Carlópolis e gostaria de mais informações.")}"><i class="bx bxl-whatsapp"></i> Tenho interesse</a>` : ""}
               ${instagramUrl ? `<a class="auto-instagram" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}"><i class="fa-brands fa-instagram"></i> Instagram</a>` : ""}
