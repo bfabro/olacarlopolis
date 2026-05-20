@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=70">
+  <link rel="stylesheet" href="painel.css?v=71">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -48,6 +48,7 @@
         <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
         <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
         <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
+        <button data-view="relatorios" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorios</button>
         <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
         <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
         <button data-view="minhaEmpresa" data-role="cliente"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
@@ -366,6 +367,10 @@
         </section>
       </section>
 
+      <section id="relatoriosView" class="panel-view hidden">
+        <div id="reportsMount" class="reports-layout"></div>
+      </section>
+
       <section id="pagamentoSistemaView" class="panel-view hidden">
         <section class="panel-card">
           <div class="section-head">
@@ -492,6 +497,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=70"></script>
+  <script type="module" src="painel.js?v=71"></script>
 </body>
 </html>

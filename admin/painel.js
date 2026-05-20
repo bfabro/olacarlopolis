@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 70,
-  label: "v70",
+  numero: 71,
+  label: "v71",
   data: "2026-05-20",
-  nota: "Mostra barra de progresso nos uploads de imagens, cardapios e comprovantes."
+  nota: "Adiciona area de relatorios com indicadores financeiros e operacionais."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -93,6 +93,7 @@ const views = {
   eventos: $("eventosView"),
   informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
+  relatorios: $("relatoriosView"),
   pagamentoSistema: $("pagamentoSistemaView"),
   usuarios: $("usuariosView"),
   minhaEmpresa: $("minhaEmpresaView"),
@@ -106,6 +107,7 @@ const viewCopy = {
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
+  relatorios: ["Relatorios", "Indicadores e pontos de atencao do painel."],
   pagamentoSistema: ["Pagamento", "Configure a chave Pix usada nas faturas."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
   minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."],
@@ -829,6 +831,7 @@ async function loadAllData() {
   renderEventsList();
   renderInfoDeathNoticeList();
   renderFinanceiro();
+  renderReports();
   renderPaymentSettings();
   renderClientInvoices();
 
@@ -928,6 +931,7 @@ function switchView(name) {
   if (target === "minhaEmpresa") renderClientOnlyEditor();
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
+  if (target === "relatorios") renderReports();
   if (target === "informacoes" && !canManageInformacoes()) {
     switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
     return;
@@ -2006,6 +2010,157 @@ function renderFinanceiro() {
       renderFinanceiro();
     });
   });
+}
+
+function latestClientInvoice(client) {
+  const entries = Object.entries(client?.faturas || {});
+  if (!entries.length) return null;
+  entries.sort(([a], [b]) => String(b).localeCompare(String(a)));
+  const [mes, data] = entries[0];
+  return { mes, ...(data || {}) };
+}
+
+function reportPercent(value, total) {
+  if (!total) return "0%";
+  return `${Math.round((value / total) * 100)}%`;
+}
+
+function renderReportList(items, emptyText = "Nenhum item encontrado.") {
+  if (!items.length) return `<div class="list-meta">${escapeHtml(emptyText)}</div>`;
+  return items.map((item) => `
+    <article class="report-item">
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.meta || "")}</span>
+    </article>
+  `).join("");
+}
+
+function renderReports() {
+  const mount = $("reportsMount");
+  if (!mount) return;
+
+  const totalClientes = state.clientes.length;
+  const ativos = state.clientes.filter((c) => c.status === "ativo");
+  const inativos = state.clientes.filter((c) => c.status === "inativo");
+  const pendentes = state.clientes.filter((c) => c.status === "pendente");
+  const pagos = state.clientes.filter((c) => c.pagamentoStatus === "pago");
+  const abertos = state.clientes.filter((c) => !c.pagamentoStatus || c.pagamentoStatus === "em_aberto");
+  const isentos = state.clientes.filter((c) => c.pagamentoStatus === "isento");
+  const destaques = state.clientes.filter((c) => c.destaqueSemanal);
+  const comImagem = state.clientes.filter((c) => c.imagem || normalizeImageItems(c.imagens).length);
+  const comHorarios = state.clientes.filter((c) => scheduleHasAnyOpen(c.horarios || {}));
+  const valorReceber = state.clientes
+    .filter((c) => c.status !== "inativo" && c.pagamentoStatus !== "isento")
+    .reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
+  const valorPago = pagos.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
+  const valorAberto = abertos.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
+
+  const categoriasMap = new Map();
+  state.clientes.forEach((client) => {
+    const key = client.categoria || "Sem categoria";
+    categoriasMap.set(key, (categoriasMap.get(key) || 0) + 1);
+  });
+  const topCategorias = [...categoriasMap.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([title, count]) => ({ title, meta: `${count} cliente${count === 1 ? "" : "s"}` }));
+
+  const clientesAtencao = state.clientes
+    .filter((client) => client.status !== "inativo")
+    .map((client) => {
+      const faltas = [];
+      if (!client.imagem && !normalizeImageItems(client.imagens).length) faltas.push("sem foto");
+      if (!client.contato && !client.whatsapp) faltas.push("sem telefone");
+      if (!client.categoria) faltas.push("sem categoria");
+      if (!scheduleHasAnyOpen(client.horarios || {})) faltas.push("sem horarios");
+      if (!client.pagamentoStatus || client.pagamentoStatus === "em_aberto") faltas.push("financeiro em aberto");
+      return { client, faltas };
+    })
+    .filter((item) => item.faltas.length)
+    .slice(0, 10)
+    .map((item) => ({ title: item.client.nome || item.client.id, meta: item.faltas.join(", ") }));
+
+  const faturasComComprovante = state.clientes
+    .map((client) => ({ client, invoice: latestClientInvoice(client) }))
+    .filter(({ invoice }) => invoice?.comprovanteUrl)
+    .slice(0, 10)
+    .map(({ client, invoice }) => ({
+      title: client.nome || client.id,
+      meta: `${invoice.mes || "Fatura"} - ${paymentLabel(invoice.status || "em_analise")} - ${moneyBR(invoice.valorTotal || valorTotalFaturaCliente(client))}`
+    }));
+
+  const roles = state.usuarios.reduce((acc, user) => {
+    const role = user.role || "cliente";
+    acc[role] = (acc[role] || 0) + 1;
+    return acc;
+  }, {});
+  const usuariosSemCliente = state.usuarios
+    .filter((user) => user.role === "cliente" && !user.clienteId)
+    .map((user) => ({ title: user.email || user.uid, meta: "Usuario cliente sem cliente vinculado" }));
+
+  const hoje = new Date().toISOString().slice(0, 10);
+  const eventosAtivos = state.eventos.filter((event) => (event.status || "ativo") === "ativo");
+  const proximosEventos = eventosAtivos
+    .filter((event) => !event.data || event.data >= hoje)
+    .sort((a, b) => String(a.data || "").localeCompare(String(b.data || "")))
+    .slice(0, 6)
+    .map((event) => ({ title: event.titulo || event.nome || event.id, meta: `${event.data || "Sem data"} - ${event.local || "Sem local"}` }));
+
+  mount.innerHTML = `
+    <div class="stats-grid">
+      <article class="stat-card"><span>Clientes ativos</span><strong>${ativos.length}</strong><small>${reportPercent(ativos.length, totalClientes)} da base</small></article>
+      <article class="stat-card"><span>Financeiro em aberto</span><strong>${abertos.length}</strong><small>${moneyBR(valorAberto)}</small></article>
+      <article class="stat-card"><span>Receita prevista</span><strong>${moneyBR(valorReceber)}</strong><small>Clientes nao isentos</small></article>
+      <article class="stat-card"><span>Receita paga</span><strong>${moneyBR(valorPago)}</strong><small>${pagos.length} cliente${pagos.length === 1 ? "" : "s"}</small></article>
+      <article class="stat-card"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + Number(c.destaqueValor || 0), 0))}</small></article>
+      <article class="stat-card"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
+    </div>
+
+    <div class="reports-grid">
+      <section class="panel-card report-card">
+        <h2>Resumo operacional</h2>
+        <div class="report-kpis">
+          <span>Ativos: <strong>${ativos.length}</strong></span>
+          <span>Pendentes: <strong>${pendentes.length}</strong></span>
+          <span>Inativos: <strong>${inativos.length}</strong></span>
+          <span>Isentos: <strong>${isentos.length}</strong></span>
+          <span>Com horarios: <strong>${comHorarios.length}</strong></span>
+          <span>Categorias usadas: <strong>${categoriasMap.size}</strong></span>
+        </div>
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Clientes que precisam de atencao</h2>
+        ${renderReportList(clientesAtencao, "Nenhuma pendencia importante encontrada.")}
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Top categorias</h2>
+        ${renderReportList(topCategorias, "Nenhuma categoria com cliente.")}
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Comprovantes recentes</h2>
+        ${renderReportList(faturasComComprovante, "Nenhum comprovante anexado ainda.")}
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Usuarios</h2>
+        <div class="report-kpis">
+          <span>Master: <strong>${roles.master || 0}</strong></span>
+          <span>Admin: <strong>${roles.admin || 0}</strong></span>
+          <span>Clientes: <strong>${roles.cliente || 0}</strong></span>
+          <span>Sem vinculo: <strong>${usuariosSemCliente.length}</strong></span>
+        </div>
+        ${renderReportList(usuariosSemCliente.slice(0, 6), "Todos os usuarios cliente estao vinculados.")}
+      </section>
+
+      <section class="panel-card report-card">
+        <h2>Proximos eventos</h2>
+        ${renderReportList(proximosEventos, "Nenhum evento ativo futuro encontrado.")}
+      </section>
+    </div>
+  `;
 }
 
 function renderPaymentSettings() {
