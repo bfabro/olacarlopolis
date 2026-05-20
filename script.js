@@ -16234,18 +16234,14 @@ plotarPinsImoveis(stateImoveis.filtered);
     ].filter(Boolean);
     const setStatus = (value) => keys.forEach((key) => { statusEstabelecimentos[key] = value; });
 
-    if (cliente.status === "inativo") {
-      setStatus("n");
-    } else if (cliente.pagamentoStatus === "pago" || cliente.pagamentoStatus === "isento") {
-      setStatus("s");
-    } else if (cliente.pagamentoStatus === "em_aberto") {
-      setStatus("n");
-    }
+    const statusCliente = String(cliente.status || "ativo").toLowerCase();
+    setStatus(statusCliente === "inativo" ? "n" : "s");
   }
 
   function clienteAdminPodeAparecer(cliente) {
-    if (!cliente || cliente.status === "inativo") return false;
-    return cliente.pagamentoStatus === "pago" || cliente.pagamentoStatus === "isento";
+    if (!cliente) return false;
+    const statusCliente = String(cliente.status || "ativo").toLowerCase();
+    return statusCliente !== "inativo";
   }
 
   function pontuarFonteClienteAdmin(cliente) {
