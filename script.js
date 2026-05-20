@@ -6725,7 +6725,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             ${item.opcionais ? `<p class="auto-info-line"><span>Opcionais</span><strong>${textoSeguroAutomoveis(item.opcionais)}</strong></p>` : ""}
             ${item.descricao ? `<p class="auto-info-line auto-description"><span>Descricao</span><strong>${textoSeguroAutomoveis(item.descricao)}</strong></p>` : ""}
             <div class="auto-actions">
-              ${contato ? `<a class="zap-link telefone-link auto-whatsapp-button" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent(whatsappTexto)}"><i class="bx bxl-whatsapp"></i> Chamar no WhatsApp</a>` : ""}
+              ${contato ? `<a class="zap-link telefone-link auto-whatsapp-button" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent(whatsappTexto)}"><i class="bx bxl-whatsapp"></i> Chamar no Whats</a>` : ""}
               <span class="auto-ref-code">Ref. ${textoSeguroAutomoveis(codigoReferencia)}</span>
             </div>
           </div>

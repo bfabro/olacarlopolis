@@ -7414,8 +7414,8 @@ html {
 
 .auto-card .auto-price {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  right: 8px;
+  bottom: 8px;
   z-index: 2;
   display: inline-flex;
   align-items: center;
@@ -7425,7 +7425,7 @@ html {
   color: #078b3e;
   background: rgba(255,255,255,.96);
   border: 0;
-  border-radius: 0;
+  border-radius: 9px;
   padding: 6px 8px;
   font-size: .98rem;
   line-height: 1;
@@ -7560,6 +7560,7 @@ html {
   margin-top: 10px;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: nowrap;
 }
 
 .auto-actions .telefone-link:not(.auto-whatsapp-button) {
@@ -7634,12 +7635,32 @@ html {
   }
 
   .auto-card .auto-price {
-    right: 0;
-    bottom: 0;
+    right: 8px;
+    bottom: 8px;
     justify-content: center;
     margin-top: 0;
     text-align: left;
     font-size: .9rem;
+  }
+
+  .auto-actions {
+    gap: 8px;
+  }
+
+  .auto-whatsapp-button {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 9px 10px;
+    font-size: .92rem;
+    white-space: nowrap;
+  }
+
+  .auto-actions .auto-ref-code {
+    flex: 0 0 auto;
+    min-width: 112px;
+    padding: 6px 7px;
+    font-size: .72rem;
+    white-space: nowrap;
   }
 
   .auto-seller {
