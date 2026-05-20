@@ -16483,6 +16483,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     let categoria = categories.find((cat) => normalizeName(cat.title) === slug);
     if (categoria) {
       categoria.metaAdmin = { ...(categoria.metaAdmin || {}), ...meta };
+      if (!categoria.link) categoria.link = criarLinkCategoriaAdmin(title, meta);
       return categoria;
     }
 
@@ -16492,17 +16493,55 @@ plotarPinsImoveis(stateImoveis.filtered);
     return categoria;
   }
 
+  function submenuComercioAdmin() {
+    const menuComercio = document.getElementById("menuComercio");
+    return menuComercio?.closest(".submenu_item")?.nextElementSibling
+      || menuComercio?.closest(".nav_link")?.nextElementSibling
+      || menuComercio?.parentElement?.nextElementSibling
+      || null;
+  }
+
+  function textoLinkCategoriaAdmin(link) {
+    const label = link?.querySelector?.(".navlink:last-child") || link;
+    return String(label?.textContent || "")
+      .replace(/↳/g, "")
+      .replace(/\u00a0/g, " ")
+      .trim();
+  }
+
+  function encontrarLinkCategoriaAdmin(submenu, title) {
+    const slug = normalizeName(title);
+    const existing = submenu.querySelector(`[data-admin-category="${slug}"]`);
+    if (existing) return existing;
+    return Array.from(submenu.querySelectorAll("a.nav_link.sublink"))
+      .find((link) => normalizeName(textoLinkCategoriaAdmin(link)) === slug) || null;
+  }
+
+  function ligarLinkCategoriaAdmin(link, title) {
+    if (!link || link.dataset.adminCategoryBound === "true") return;
+    const slug = normalizeName(title);
+    link.dataset.adminCategoryBound = "true";
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      location.hash = "#comercios-" + slug;
+      const cat = categories.find((item) => normalizeName(item.title) === slug);
+      if (cat) loadContent(cat.title, cat.establishments);
+    });
+  }
+
   function criarLinkCategoriaAdmin(title, meta = {}) {
     const slug = normalizeName(title);
-    const existing = document.querySelector(`[data-admin-category="${slug}"]`);
-    if (existing) return existing;
-
-    const menuComercio = document.getElementById("menuComercio");
-    const submenu = menuComercio?.closest(".submenu_item")?.nextElementSibling
-      || menuComercio?.closest(".nav_link")?.nextElementSibling
-      || menuComercio?.parentElement?.nextElementSibling;
+    const submenu = submenuComercioAdmin();
 
     if (!submenu) return null;
+
+    const existing = encontrarLinkCategoriaAdmin(submenu, title);
+    if (existing) {
+      existing.dataset.adminCategory = slug;
+      if (meta.parentId) existing.dataset.adminParent = meta.parentId;
+      ligarLinkCategoriaAdmin(existing, title);
+      return existing;
+    }
 
     const link = document.createElement("a");
     link.href = "#";
@@ -16514,12 +16553,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       <span class="navlink">${meta.parentId ? "&nbsp;&nbsp;↳ " : ""}${title}</span>
     `;
     inserirCategoriaAdminNoMenu(submenu, link, title, meta);
-    link.addEventListener("click", function (event) {
-      event.preventDefault();
-      location.hash = "#comercios-" + slug;
-      const cat = categories.find((item) => normalizeName(item.title) === slug);
-      if (cat) loadContent(cat.title, cat.establishments);
-    });
+    ligarLinkCategoriaAdmin(link, title);
     return link;
   }
 
@@ -16560,6 +16594,47 @@ plotarPinsImoveis(stateImoveis.filtered);
     submenu.insertBefore(link, nextByName || cursor || null);
   }
 
+  function deduplicarCategoriasAdminNoMenu() {
+    const submenu = submenuComercioAdmin();
+    if (!submenu) return;
+
+    const vistos = new Map();
+    Array.from(submenu.querySelectorAll("a.nav_link.sublink")).forEach((link) => {
+      const slug = normalizeName(textoLinkCategoriaAdmin(link));
+      if (!slug) return;
+
+      const atual = vistos.get(slug);
+      if (!atual) {
+        link.dataset.adminCategory = link.dataset.adminCategory || slug;
+        vistos.set(slug, link);
+        return;
+      }
+
+      const atualEhFixo = Boolean(atual.id) && !atual.dataset.adminParent;
+      const linkEhFixo = Boolean(link.id) && !link.dataset.adminParent;
+      const manterNovo = !atualEhFixo && linkEhFixo;
+      const manter = manterNovo ? link : atual;
+      const remover = manterNovo ? atual : link;
+
+      manter.dataset.adminCategory = slug;
+      vistos.set(slug, manter);
+      remover.remove();
+    });
+
+    Array.from(submenu.querySelectorAll(".separador-letra")).forEach((sep) => {
+      let cursor = sep.nextElementSibling;
+      let temLink = false;
+      while (cursor && !cursor.classList?.contains("separador-letra")) {
+        if (cursor.matches?.("a.nav_link")) {
+          temLink = true;
+          break;
+        }
+        cursor = cursor.nextElementSibling;
+      }
+      if (!temLink) sep.remove();
+    });
+  }
+
   function aplicarCategoriasAdminNoMenu(categoriasAdmin) {
     const lista = Object.entries(categoriasAdmin || {})
       .map(([id, cat]) => ({ id, ...(cat || {}) }))
@@ -16575,6 +16650,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!nome) return;
       garantirCategoriaAdmin(nome, cat);
     });
+    deduplicarCategoriasAdminNoMenu();
   }
 
   function normalizarNotaFalecimentoAdmin(item, id) {
