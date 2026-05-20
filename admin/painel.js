@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 67,
-  label: "v67",
-  data: "2026-05-18",
-  nota: "Adiciona TikTok, site, destaque semanal e faturas Pix por cliente."
+  numero: 68,
+  label: "v68",
+  data: "2026-05-20",
+  nota: "Separa Pix do sistema, move foto ao topo e controla Faturas por permissao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -53,6 +53,7 @@ let state = {
   eventos: [],
   notasFalecimento: [],
   categorias: [],
+  pagamentoSistema: {},
   selectedClientId: null,
   selectedEventId: null,
   selectedDeathNoticeId: null,
@@ -92,6 +93,7 @@ const views = {
   eventos: $("eventosView"),
   informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
+  pagamentoSistema: $("pagamentoSistemaView"),
   usuarios: $("usuariosView"),
   minhaEmpresa: $("minhaEmpresaView"),
   faturas: $("faturasView")
@@ -104,6 +106,7 @@ const viewCopy = {
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
+  pagamentoSistema: ["Pagamento", "Configure a chave Pix usada nas faturas."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
   minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."],
   faturas: ["Faturas", "Pix mensal, QR Code e comprovantes."]
@@ -193,6 +196,17 @@ function hasPermission(permission) {
 
 function canManageInformacoes() {
   return hasPermission("informacoes") || hasPermission("informacoes_nota_falecimento");
+}
+
+function canAccessView(viewName) {
+  if (canManageClients()) {
+    if (viewName === "pagamentoSistema") return isMaster();
+    return true;
+  }
+  if (viewName === "faturas") return hasPermission("faturas");
+  if (viewName === "informacoes") return canManageInformacoes();
+  if (viewName === "minhaEmpresa") return true;
+  return false;
 }
 
 function moneyBR(value) {
@@ -660,7 +674,7 @@ async function loadProfile(user) {
       email: user.email,
       role: "master",
       status: "ativo",
-      permissoes: { dados: true, imagens: true, cardapio: true, promocoes: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true }
+      permissoes: { dados: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true }
     };
     await saveUserProfile(profile);
     return profile;
@@ -684,12 +698,13 @@ async function saveUserProfile(profile) {
 }
 
 async function loadAllData() {
-  const [clientesSnap, usersSnap, eventosSnap, categoriasSnap, notasFalecimentoSnap] = await Promise.all([
+  const [clientesSnap, usersSnap, eventosSnap, categoriasSnap, notasFalecimentoSnap, pagamentoSnap] = await Promise.all([
     get(ref(db, "clientes")),
     get(ref(db, "usuariosByUid")),
     get(ref(db, "eventos")),
     get(ref(db, "categorias")),
-    get(ref(db, "conteudosInformativos/notaFalecimento"))
+    get(ref(db, "conteudosInformativos/notaFalecimento")),
+    get(ref(db, "configuracoes/pagamento"))
   ]);
 
   applyClientsSnapshot(clientesSnap);
@@ -702,6 +717,7 @@ async function loadAllData() {
     });
   }
   state.usuarios.sort((a, b) => String(a.email || "").localeCompare(String(b.email || "")));
+  state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
 
   state.eventos = [];
   if (eventosSnap.exists()) {
@@ -753,6 +769,7 @@ async function loadAllData() {
   renderEventsList();
   renderInfoDeathNoticeList();
   renderFinanceiro();
+  renderPaymentSettings();
   renderClientInvoices();
 
   // A importacao agora fica manual para nao sobrescrever edicoes feitas no Firebase.
@@ -811,8 +828,14 @@ function updateChrome() {
   document.querySelectorAll("[data-role='cliente']").forEach((el) => {
     el.classList.toggle("hidden", canManageClients());
   });
+  document.querySelectorAll("[data-master='true']").forEach((el) => {
+    el.classList.toggle("hidden", !isMaster());
+  });
   document.querySelectorAll("[data-permission='informacoes']").forEach((el) => {
     el.classList.toggle("hidden", !canManageInformacoes());
+  });
+  document.querySelectorAll("[data-permission='faturas']").forEach((el) => {
+    el.classList.toggle("hidden", !hasPermission("faturas") || canManageClients());
   });
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");
@@ -830,6 +853,10 @@ function roleLabel(role) {
 
 function switchView(name) {
   const target = views[name] ? name : "dashboard";
+  if (!canAccessView(target)) {
+    switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
+    return;
+  }
   Object.entries(views).forEach(([key, el]) => el.classList.toggle("hidden", key !== target));
   document.querySelectorAll(".nav-admin button").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.view === target);
@@ -840,6 +867,7 @@ function switchView(name) {
 
   if (target === "minhaEmpresa") renderClientOnlyEditor();
   if (target === "faturas") renderClientInvoices();
+  if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "informacoes" && !canManageInformacoes()) {
     switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
     return;
@@ -869,7 +897,6 @@ function resetClientForm() {
   delete $("clientForm").dataset.originalClientId;
   delete $("clientForm").dataset.originalName;
   $("clientId").value = "";
-  $("clientPixCity").value = "CARLOPOLIS";
   fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
   renderProfilePreview("clientImage", "clientProfilePreview");
@@ -908,9 +935,6 @@ function getClientFormData() {
     site: $("clientSite").value.trim(),
     destaqueSemanal: $("clientFeaturedWeek").checked,
     destaqueValor: numberFromMoney($("clientFeaturedValue").value),
-    pixChave: $("clientPixKey").value.trim(),
-    pixNome: $("clientPixName").value.trim(),
-    pixCidade: $("clientPixCity").value.trim(),
     imagem: $("clientImage").value.trim(),
     imagens: normalizeImageItems(state.clientImages),
     cardapioLink: $("clientMenuLink").value.trim(),
@@ -945,9 +969,6 @@ function fillClientForm(client) {
   $("clientSite").value = client.site || "";
   $("clientFeaturedWeek").checked = Boolean(client.destaqueSemanal);
   $("clientFeaturedValue").value = client.destaqueValor ? moneyBR(client.destaqueValor) : "";
-  $("clientPixKey").value = client.pixChave || "";
-  $("clientPixName").value = client.pixNome || client.nome || "";
-  $("clientPixCity").value = client.pixCidade || "CARLOPOLIS";
   $("clientImage").value = client.imagem || client.image || "";
   renderProfilePreview("clientImage", "clientProfilePreview");
   state.clientImages = normalizeImageItems(client.imagens);
@@ -1935,6 +1956,15 @@ function renderFinanceiro() {
   });
 }
 
+function renderPaymentSettings() {
+  if (!$("paymentSettingsForm")) return;
+  const config = state.pagamentoSistema || {};
+  $("paymentPixKey").value = config.pixChave || "";
+  $("paymentPixName").value = config.pixNome || "Ola Carlopolis";
+  $("paymentPixCity").value = config.pixCidade || "CARLOPOLIS";
+  $("paymentInvoiceNote").value = config.observacaoFatura || "";
+}
+
 function renderClientOnlyEditor() {
   const mount = $("clientOnlyMount");
   const client = state.clientes.find((item) => item.id === state.profile?.clienteId);
@@ -1949,6 +1979,19 @@ function renderClientOnlyEditor() {
 
   mount.innerHTML = `
     <form id="clientOnlyForm" class="grid-form">
+      <section class="wide profile-upload-panel profile-upload-top">
+        <div class="section-head compact">
+          <div>
+            <h3>Foto de perfil</h3>
+            <p>Imagem principal da sua empresa. Ela fica salva no Firebase Storage.</p>
+          </div>
+        </div>
+        <div class="profile-upload-row">
+          <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
+          <label>Enviar foto de perfil<input id="coProfileUpload" type="file" accept="image/*"></label>
+        </div>
+        <input id="coImage" type="hidden" value="${escapeAttr(client.imagem || "")}">
+      </section>
       <label>Nome<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
       <label>Telefone<input id="coContact" value="${escapeAttr(client.contato || "")}"></label>
       <label>WhatsApp<input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></label>
@@ -1967,30 +2010,6 @@ function renderClientOnlyEditor() {
       <label>Facebook<input id="coFacebook" value="${escapeAttr(client.facebook || "")}"></label>
       <label>TikTok<input id="coTiktok" value="${escapeAttr(client.tiktok || "")}"></label>
       <label>Site<input id="coSite" value="${escapeAttr(client.site || "")}"></label>
-      <section class="wide upload-panel">
-        <div class="section-head compact">
-          <div>
-            <h3>Pix para pagamento</h3>
-            <p>Informe a chave Pix para gerar QR Code nas faturas.</p>
-          </div>
-        </div>
-        <label>Chave Pix<input id="coPixKey" value="${escapeAttr(client.pixChave || "")}" placeholder="CPF, CNPJ, email, telefone ou chave aleatoria"></label>
-        <label>Nome do recebedor<input id="coPixName" value="${escapeAttr(client.pixNome || client.nome || "")}"></label>
-        <label>Cidade do recebedor<input id="coPixCity" value="${escapeAttr(client.pixCidade || "CARLOPOLIS")}"></label>
-      </section>
-      <section class="wide profile-upload-panel">
-        <div class="section-head compact">
-          <div>
-            <h3>Foto de perfil</h3>
-            <p>Envie a imagem principal da sua empresa. Ela fica salva no Firebase Storage.</p>
-          </div>
-        </div>
-        <div class="profile-upload-row">
-          <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
-          <label>Enviar foto de perfil<input id="coProfileUpload" type="file" accept="image/*"></label>
-        </div>
-        <input id="coImage" type="hidden" value="${escapeAttr(client.imagem || "")}">
-      </section>
       <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}" placeholder="Link externo ou PDF enviado"></label>
       <section class="wide upload-panel">
         <div class="section-head compact">
@@ -2261,9 +2280,6 @@ function renderClientOnlyEditor() {
       facebook: $("coFacebook").value.trim(),
       tiktok: $("coTiktok").value.trim(),
       site: $("coSite").value.trim(),
-      pixChave: $("coPixKey").value.trim(),
-      pixNome: $("coPixName").value.trim(),
-      pixCidade: $("coPixCity").value.trim(),
       imagem: $("coImage").value.trim(),
       imagens,
       cardapioLink: $("coMenuLink").value.trim(),
@@ -2531,11 +2547,12 @@ function renderClientInvoices() {
   const valorPlano = valorFinalPlano(client);
   const valorDestaque = client.destaqueSemanal ? Number(client.destaqueValor || 0) : 0;
   const valorTotal = valorPlano + valorDestaque;
+  const paymentConfig = state.pagamentoSistema || {};
   const txid = `OC${normalizeName(client.nome || client.id).slice(0, 10).toUpperCase()}${String(now.getMonth() + 1).padStart(2, "0")}`;
   const pixCode = gerarPixCopiaCola({
-    chave: client.pixChave,
-    nome: client.pixNome || client.nome,
-    cidade: client.pixCidade || "CARLOPOLIS",
+    chave: paymentConfig.pixChave,
+    nome: paymentConfig.pixNome || "Ola Carlopolis",
+    cidade: paymentConfig.pixCidade || "CARLOPOLIS",
     valor: valorTotal,
     txid
   });
@@ -2564,8 +2581,9 @@ function renderClientInvoices() {
             <button id="copyPixButton" type="button" class="ghost-button"><i class="fa-solid fa-copy"></i> Copiar codigo Pix</button>
             <button id="copyPixKeyButton" type="button" class="ghost-button"><i class="fa-solid fa-key"></i> Copiar chave Pix</button>
           </div>
+          ${paymentConfig.observacaoFatura ? `<div class="list-meta wide">${escapeHtml(paymentConfig.observacaoFatura)}</div>` : ""}
         </div>
-      ` : `<div class="list-meta">Cadastre a chave Pix em Minha empresa para gerar o QR Code.</div>`}
+      ` : `<div class="list-meta">A chave Pix ainda nao foi configurada pelo admin master.</div>`}
       <div class="upload-panel">
         <h3>Comprovante</h3>
         <input id="invoiceReceiptUpload" type="file" accept="image/*,application/pdf">
@@ -2579,7 +2597,7 @@ function renderClientInvoices() {
     showToast("Codigo Pix copiado.");
   });
   mount.querySelector("#copyPixKeyButton")?.addEventListener("click", async () => {
-    await navigator.clipboard?.writeText(client.pixChave || "");
+    await navigator.clipboard?.writeText(paymentConfig.pixChave || "");
     showToast("Chave Pix copiada.");
   });
   mount.querySelector("#invoiceReceiptUpload")?.addEventListener("change", async (event) => {
@@ -2593,7 +2611,7 @@ function renderClientInvoices() {
         valorPlano,
         valorDestaque,
         valorTotal,
-        pixChave: client.pixChave || "",
+        pixChave: paymentConfig.pixChave || "",
         pixCodigo: pixCode,
         comprovanteUrl,
         status: "em_analise",
@@ -2771,6 +2789,25 @@ function bindEvents() {
   $("financeSearch").addEventListener("input", renderFinanceiro);
   $("financeFilter").addEventListener("change", renderFinanceiro);
   $("categorySearch").addEventListener("input", renderCategoriesList);
+  $("paymentSettingsForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!isMaster()) {
+      showToast("Somente master pode alterar os dados de pagamento.");
+      return;
+    }
+    const payload = {
+      pixChave: $("paymentPixKey").value.trim(),
+      pixNome: $("paymentPixName").value.trim(),
+      pixCidade: $("paymentPixCity").value.trim(),
+      observacaoFatura: $("paymentInvoiceNote").value.trim(),
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user?.uid || ""
+    };
+    await update(ref(db, "configuracoes/pagamento"), payload);
+    state.pagamentoSistema = payload;
+    showToast("Dados de pagamento salvos.");
+    renderClientInvoices();
+  });
   $("userForm").addEventListener("submit", createPanelUser);
 
   document.querySelectorAll(".nav-admin button").forEach((button) => {
