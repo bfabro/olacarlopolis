@@ -18,7 +18,7 @@ import {
 import {
   getStorage,
   ref as storageRef,
-  uploadBytes,
+  uploadBytesResumable,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 69,
-  label: "v69",
+  numero: 70,
+  label: "v70",
   data: "2026-05-20",
-  nota: "Limita a divulgacao publica a clientes, sem eventos ou setor publico."
+  nota: "Mostra barra de progresso nos uploads de imagens, cardapios e comprovantes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -644,6 +644,66 @@ function showToast(message) {
   setTimeout(() => toast.classList.add("hidden"), 3200);
 }
 
+function ensureUploadProgressBox() {
+  let box = $("uploadProgressBox");
+  if (box) return box;
+  box = document.createElement("div");
+  box.id = "uploadProgressBox";
+  box.className = "upload-progress-box hidden";
+  box.innerHTML = `
+    <div class="upload-progress-head">
+      <strong id="uploadProgressTitle">Enviando arquivo</strong>
+      <span id="uploadProgressPercent">0%</span>
+    </div>
+    <div class="upload-progress-bar"><span id="uploadProgressFill"></span></div>
+    <div id="uploadProgressDetail" class="upload-progress-detail">Preparando envio...</div>
+  `;
+  document.body.appendChild(box);
+  return box;
+}
+
+function setUploadProgress(percent, title = "Enviando arquivo", detail = "") {
+  const box = ensureUploadProgressBox();
+  const safePercent = Math.max(0, Math.min(100, Math.round(percent || 0)));
+  box.classList.remove("hidden");
+  $("uploadProgressTitle").textContent = title;
+  $("uploadProgressPercent").textContent = `${safePercent}%`;
+  $("uploadProgressFill").style.width = `${safePercent}%`;
+  $("uploadProgressDetail").textContent = detail || "Aguarde enquanto o arquivo e salvo.";
+}
+
+function hideUploadProgress(delay = 800) {
+  setTimeout(() => {
+    const box = $("uploadProgressBox");
+    if (box) box.classList.add("hidden");
+  }, delay);
+}
+
+function uploadFileWithProgress(fileRef, file, title = "Enviando arquivo", detail = "") {
+  return new Promise((resolve, reject) => {
+    setUploadProgress(0, title, detail || file?.name || "");
+    const task = uploadBytesResumable(fileRef, file);
+    task.on("state_changed", (snapshot) => {
+      const percent = snapshot.totalBytes
+        ? (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        : 0;
+      setUploadProgress(percent, title, detail || file?.name || "");
+    }, (error) => {
+      hideUploadProgress(0);
+      reject(error);
+    }, async () => {
+      setUploadProgress(100, title, "Envio concluido. Finalizando...");
+      try {
+        resolve(await getDownloadURL(task.snapshot.ref));
+      } catch (error) {
+        reject(error);
+      } finally {
+        hideUploadProgress();
+      }
+    });
+  });
+}
+
 function showImportReport(lines, type = "info") {
   const box = $("importReport");
   if (!box) return;
@@ -1110,8 +1170,7 @@ async function uploadMenuFilesForClient(clientId, files) {
     const kind = isPdfFile(file) ? "pdf" : "imagens";
     const path = `clientes/${clientId}/cardapio/${kind}/${Date.now()}-${slugify(file.name || "cardapio")}`;
     const fileRef = storageRef(storage, path);
-    await uploadBytes(fileRef, file);
-    const url = await getDownloadURL(fileRef);
+    const url = await uploadFileWithProgress(fileRef, file, "Enviando cardapio", `${file.name || "arquivo"} (${result.images.length + (result.pdf ? 1 : 0) + 1}/${Array.from(files || []).length})`);
     if (kind === "pdf" && !result.pdf) {
       result.pdf = url;
     } else if (kind === "imagens") {
@@ -1171,8 +1230,7 @@ async function uploadClientMenuFiles(files) {
 async function uploadProfileImageForClient(clientId, file) {
   const path = `clientes/${clientId}/perfil/${Date.now()}-${slugify(file.name || "foto")}`;
   const fileRef = storageRef(storage, path);
-  await uploadBytes(fileRef, file);
-  return getDownloadURL(fileRef);
+  return uploadFileWithProgress(fileRef, file, "Enviando foto de perfil", file.name || "foto");
 }
 
 async function saveProfileImageForCanonicalClient(client, targetId, url) {
@@ -1256,8 +1314,7 @@ async function uploadImagesForClient(clientId, files) {
   for (const file of Array.from(files || [])) {
     const path = `clientes/${clientId}/imagens/${Date.now()}-${slugify(file.name)}`;
     const fileRef = storageRef(storage, path);
-    await uploadBytes(fileRef, file);
-    urls.push(await getDownloadURL(fileRef));
+    urls.push(await uploadFileWithProgress(fileRef, file, "Enviando imagens", `${file.name || "imagem"} (${urls.length + 1}/${Array.from(files || []).length})`));
   }
   return urls;
 }
@@ -1265,15 +1322,13 @@ async function uploadImagesForClient(clientId, files) {
 async function uploadPromoImageForClient(clientId, file) {
   const path = `clientes/${clientId}/promocoes/${Date.now()}-${slugify(file.name || "promocao")}`;
   const fileRef = storageRef(storage, path);
-  await uploadBytes(fileRef, file);
-  return getDownloadURL(fileRef);
+  return uploadFileWithProgress(fileRef, file, "Enviando imagem da promocao", file.name || "promocao");
 }
 
 async function uploadInvoiceReceiptForClient(clientId, file) {
   const path = `clientes/${clientId}/faturas/${Date.now()}-${slugify(file.name || "comprovante")}`;
   const fileRef = storageRef(storage, path);
-  await uploadBytes(fileRef, file);
-  return getDownloadURL(fileRef);
+  return uploadFileWithProgress(fileRef, file, "Enviando comprovante", file.name || "comprovante");
 }
 
 function isFirebaseStorageUrl(url) {
@@ -1294,8 +1349,7 @@ async function uploadUrlToClientStorage(clientId, imageItem, index) {
   const extFromType = (blob.type && blob.type.split("/")[1]) || "jpg";
   const fileName = `${Date.now()}-${index}.${extFromType.replace("jpeg", "jpg")}`;
   const fileRef = storageRef(storage, `clientes/${clientId}/imagens/${fileName}`);
-  await uploadBytes(fileRef, blob);
-  const storageUrl = await getDownloadURL(fileRef);
+  const storageUrl = await uploadFileWithProgress(fileRef, blob, "Migrando imagens", `Imagem ${index}`);
 
   return {
     url: storageUrl,
@@ -1784,8 +1838,7 @@ async function uploadEventImage(file) {
   const path = `eventos/${id}/${Date.now()}-${slugify(file.name)}`;
   const fileRef = storageRef(storage, path);
   showToast("Enviando imagem do evento...");
-  await uploadBytes(fileRef, file);
-  $("eventImage").value = await getDownloadURL(fileRef);
+  $("eventImage").value = await uploadFileWithProgress(fileRef, file, "Enviando imagem do evento", file.name || "evento");
   showToast("Imagem do evento enviada.");
 }
 
@@ -1867,8 +1920,7 @@ async function uploadInfoDeathNoticeImage(file) {
   const path = `conteudosInformativos/notaFalecimento/${id}/${Date.now()}-${slugify(file.name || "imagem")}`;
   const fileRef = storageRef(storage, path);
   showToast("Enviando imagem da nota...");
-  await uploadBytes(fileRef, file);
-  $("infoDeathNoticeImage").value = await getDownloadURL(fileRef);
+  $("infoDeathNoticeImage").value = await uploadFileWithProgress(fileRef, file, "Enviando imagem da nota", file.name || "imagem");
   showToast("Imagem da nota enviada.");
 }
 
