@@ -1028,7 +1028,7 @@ button[type="submit"]:hover,
 }
 
 .finance-row {
-  grid-template-columns: minmax(220px, 1fr) 135px 125px 125px 105px 80px minmax(150px, .7fr) minmax(240px, 1.2fr) auto;
+  grid-template-columns: minmax(220px, 1fr) 135px 125px 125px 105px 80px 80px minmax(150px, .7fr) minmax(240px, 1.2fr) minmax(150px, .7fr) auto;
   align-items: end;
 }
 
@@ -1070,6 +1070,17 @@ button[type="submit"]:hover,
 .finance-month-check input {
   width: 14px;
   height: 14px;
+}
+
+.finance-receipt {
+  display: grid;
+  gap: 6px;
+}
+
+.finance-receipt a {
+  color: var(--brand);
+  font-weight: 800;
+  font-size: 12px;
 }
 
 .event-card img {
