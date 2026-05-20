@@ -4577,11 +4577,11 @@ ${est.horarios ? `
  
 
 
-${(est.cardapioLink || (est.menuImages && est.menuImages.length) || est.contact) ? `
+${(cardapioVisivel(est) || est.contact) ? `
   <div class="botoes-abaixo-nome">
-    ${est.cardapioLink ? `
+    ${cardapioVisivel(est) && est.cardapioLink ? `
         <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
-      ` : (est.menuImages && est.menuImages.length ? `
+      ` : (cardapioVisivel(est) && est.menuImages && est.menuImages.length ? `
         <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
       ` : '')
           }
@@ -7440,12 +7440,21 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
+  function cardapioVisivel(est) {
+    if (!est) return false;
+    const temFlag = Object.prototype.hasOwnProperty.call(est, "cardapioAtivo")
+      || Object.prototype.hasOwnProperty.call(est, "menuAtivo")
+      || Object.prototype.hasOwnProperty.call(est, "exibirCardapio");
+    const habilitado = temFlag ? Boolean(est.cardapioAtivo || est.menuAtivo || est.exibirCardapio) : true;
+    return habilitado && Boolean(est.cardapioLink || (Array.isArray(est.menuImages) && est.menuImages.length));
+  }
+
   function mostrarCardapio(nomeNormalizado) {
     // Procura sempre o PRIMEIRO que tem menuImages
     let est = null;
     categories.forEach(cat => {
       cat.establishments.forEach(e => {
-        if (normalizeName(e.name) === nomeNormalizado && e.menuImages && e.menuImages.length) {
+        if (normalizeName(e.name) === nomeNormalizado && cardapioVisivel(e) && e.menuImages && e.menuImages.length) {
           est = e;
         }
       });
@@ -16324,8 +16333,16 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (campoExiste(cliente, "tiktok")) est.tiktok = cliente.tiktok || "";
     if (campoExiste(cliente, "site")) est.site = cliente.site || "";
     if (campoExiste(cliente, "destaqueSemanal")) est.destaqueSemanal = Boolean(cliente.destaqueSemanal);
-    if (campoExiste(cliente, "cardapioLink")) est.cardapioLink = cliente.cardapioLink || "";
-    if (Array.isArray(cliente.menuImages) && cliente.menuImages.length) est.menuImages = cliente.menuImages;
+    if (campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio")) {
+      est.cardapioAtivo = Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio);
+    }
+    if (!est.cardapioAtivo) {
+      est.cardapioLink = "";
+      est.menuImages = [];
+    } else {
+      if (campoExiste(cliente, "cardapioLink")) est.cardapioLink = cliente.cardapioLink || "";
+      if (Array.isArray(cliente.menuImages)) est.menuImages = cliente.menuImages;
+    }
     if (Array.isArray(cliente.promocoes)) est.promocoes = cliente.promocoes;
     if (campoExiste(cliente, "infoAdicional")) est.infoAdicional = cliente.infoAdicional || "";
   }
@@ -16335,6 +16352,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       ? cliente.imagens.map((item) => typeof item === "string" ? { url: item, texto: "" } : item).filter((item) => item && item.url)
       : [];
 
+    const cardapioAtivo = Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio);
     return {
       nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
       image: cliente.imagem || (imagensAdmin[0]?.url || ""),
@@ -16350,8 +16368,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       tiktok: cliente.tiktok || "",
       site: cliente.site || "",
       destaqueSemanal: Boolean(cliente.destaqueSemanal),
-      cardapioLink: cliente.cardapioLink || "",
-      menuImages: cliente.menuImages || [],
+      cardapioAtivo,
+      cardapioLink: cardapioAtivo ? (cliente.cardapioLink || "") : "",
+      menuImages: cardapioAtivo ? (cliente.menuImages || []) : [],
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : [],
       infoAdicional: cliente.infoAdicional || "",
       novidadesImages: imagensAdmin.map((item) => item.url).slice(0, 10),
@@ -16385,7 +16404,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       horarios: cliente.horarios || base.horarios || null,
       horario: cliente.horario || base.hours || "",
       imagem: cliente.imagem || base.image || "",
-      menuImages: Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || []),
+      menuImages: Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
+        ? (Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || []))
+        : [],
+      cardapioLink: Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio) ? (cliente.cardapioLink || base.cardapioLink || "") : "",
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : (base.promocoes || base.promotions || []),
       imagens: Array.isArray(cliente.imagens) && cliente.imagens.length
         ? cliente.imagens
@@ -17290,7 +17312,7 @@ ${establishment.infoVagaTrabalho
     <button class="aba-tab"   data-target="fotos-${normalizeName(establishment.name)}">📷 Fotos (${establishment.novidadesImages.length})</button>
   ` : ''}
 
-  ${((establishment.menuImages && establishment.menuImages.length) || establishment.cardapioLink) ? `
+  ${cardapioVisivel(establishment) ? `
     <button class="aba-tab"       data-target="cardapio-${normalizeName(establishment.name)}"
             ${establishment.cardapioLink ? `data-link="${establishment.cardapioLink}"` : ''}>
       🍽️ Cardápio${(establishment.menuImages && establishment.menuImages.length) ? ` (${establishment.menuImages.length})` : ``}
@@ -17546,7 +17568,7 @@ ${(establishment.novidadesImages && establishment.novidadesImages.length > 0) ? 
 ` : ``}
 
 <!-- CARDÁPIO -->
-${(establishment.menuImages && establishment.menuImages.length > 0) ? `
+${(cardapioVisivel(establishment) && establishment.menuImages && establishment.menuImages.length > 0) ? `
   <div class="aba" id="cardapio-${normalizeName(establishment.name)}" style="display:none">
     <div class="swiper" id="menu-${encodeURIComponent(establishment.name)}">
       <div class="swiper-wrapper">

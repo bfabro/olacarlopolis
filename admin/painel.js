@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 92,
-  label: "v92",
+  numero: 93,
+  label: "v93",
   data: "2026-05-20",
-  nota: "Adiciona exclusao de usuarios pelo painel."
+  nota: "Controla exibicao publica do cardapio por cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1043,6 +1043,7 @@ function resetClientForm() {
   delete $("clientForm").dataset.originalName;
   $("clientId").value = "";
   if ($("clientType")) $("clientType").value = "comercio";
+  if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = false;
   fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
   renderProfilePreview("clientImage", "clientProfilePreview");
@@ -1086,6 +1087,7 @@ function getClientFormData() {
     destaqueValor: numberFromMoney($("clientFeaturedValue").value),
     imagem: $("clientImage").value.trim(),
     imagens: normalizeImageItems(state.clientImages),
+    cardapioAtivo: Boolean($("clientMenuEnabled")?.checked),
     cardapioLink: $("clientMenuLink").value.trim(),
     menuImages: normalizeUrlList(state.clientMenuImages),
     infoAdicional: $("clientInfo").value.trim(),
@@ -1123,6 +1125,7 @@ function fillClientForm(client) {
   renderProfilePreview("clientImage", "clientProfilePreview");
   state.clientImages = normalizeImageItems(client.imagens);
   renderScheduleEditor("clientScheduleEditor", client.horarios || {});
+  if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = Boolean(client.cardapioAtivo || client.menuAtivo || client.exibirCardapio);
   $("clientMenuLink").value = client.cardapioLink || "";
   state.clientMenuImages = normalizeUrlList(client.menuImages);
   $("clientInfo").value = client.infoAdicional || "";
@@ -1275,6 +1278,7 @@ async function saveClientMenuForCanonicalClient(sourceClient, targetId) {
   const { id: _ignored, ...clientData } = sourceClient || {};
   const payload = cleanForFirebase({
     ...clientData,
+    cardapioAtivo: Boolean($("clientMenuEnabled")?.checked || clientData.cardapioAtivo),
     cardapioLink: $("clientMenuLink").value.trim(),
     menuImages: normalizeUrlList(state.clientMenuImages),
     origem: "painel",
@@ -3463,7 +3467,9 @@ async function syncClientsFromScript(options = {}) {
           facebook: est.facebook || "",
           imagem: est.image || "",
           imagens: importedImages,
+          cardapioAtivo: Boolean(est.cardapioLink || (Array.isArray(est.menuImages) && est.menuImages.length)),
           cardapioLink: est.cardapioLink || "",
+          menuImages: normalizeUrlList(est.menuImages || []),
           infoAdicional: est.infoAdicional || "",
           aliases: buildClientPublicAliases(id, {
             nome: name,
