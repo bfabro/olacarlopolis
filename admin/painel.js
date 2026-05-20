@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 77,
-  label: "v77",
+  numero: 78,
+  label: "v78",
   data: "2026-05-20",
-  nota: "Permite ativar ou desativar cliente na tela de financeiro."
+  nota: "Troca meses devendo do financeiro por selecao mensal com checkbox."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1828,6 +1828,24 @@ function pendingMonthsForClient(client) {
   return [...months].filter(Boolean).sort();
 }
 
+function monthKeyFromParts(year, monthIndex) {
+  return `${year}-${String(monthIndex + 1).padStart(2, "0")}`;
+}
+
+function financeMonthOptionsForClient(client) {
+  const now = new Date();
+  const startYear = now.getFullYear();
+  const months = new Set();
+  for (let month = 0; month <= now.getMonth(); month += 1) {
+    months.add(monthKeyFromParts(startYear, month));
+  }
+  pendingMonthsForClient(client).forEach((month) => months.add(month));
+  Object.keys(client?.faturas || {}).forEach((month) => {
+    if (/^\d{4}-\d{2}$/.test(month)) months.add(month);
+  });
+  return [...months].sort();
+}
+
 function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = null) {
   const saved = client.faturas?.[mes] || {};
   const savedPlano = Number(saved.valorPlano || 0);
@@ -2056,7 +2074,10 @@ function renderFinanceiro() {
     return;
   }
 
-  box.innerHTML = list.map((client) => `
+  box.innerHTML = list.map((client) => {
+    const pendingMonths = new Set(pendingMonthsForClient(client));
+    const monthOptions = financeMonthOptionsForClient(client);
+    return `
     <article class="finance-row" data-client-id="${escapeAttr(client.id)}">
       <div>
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
@@ -2089,10 +2110,20 @@ function renderFinanceiro() {
       <label>Desconto<input data-finance-field="descontoValor" value="${escapeAttr(client.descontoValor || "")}" placeholder="R$"></label>
       <label>Venc.<input data-finance-field="vencimentoDia" value="${escapeAttr(client.vencimentoDia || "")}" placeholder="Dia"></label>
       <label class="finance-note">Obs.<input data-finance-field="financeiroObs" value="${escapeAttr(client.financeiroObs || "")}"></label>
-      <label class="finance-months">Meses devendo<input data-finance-months value="${escapeAttr(pendingMonthsForClient(client).join(", "))}" placeholder="2026-05, 2026-06"></label>
+      <div class="finance-months">
+        <span>Meses devendo</span>
+        <div class="finance-month-checks">
+          ${monthOptions.map((mes) => `
+            <label class="finance-month-check">
+              <input type="checkbox" data-finance-month value="${escapeAttr(mes)}" ${pendingMonths.has(mes) ? "checked" : ""}>
+              ${escapeHtml(monthLabel(mes))}
+            </label>
+          `).join("")}
+        </div>
+      </div>
       <button type="button" data-save-finance="${escapeAttr(client.id)}">Salvar</button>
     </article>
-  `).join("");
+  `; }).join("");
 
   box.querySelectorAll("[data-save-finance]").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -2104,7 +2135,7 @@ function renderFinanceiro() {
           ? numberFromMoney(field.value)
           : field.value.trim();
       });
-      const mesesEmAberto = splitMonthsInput(row.querySelector("[data-finance-months]")?.value || "");
+      const mesesEmAberto = [...row.querySelectorAll("[data-finance-month]:checked")].map((input) => input.value).sort();
       const currentClient = state.clientes.find((client) => client.id === id) || {};
       const nextClient = { ...currentClient, ...payload };
       const valorPlanoFatura = valorFinalPlano(nextClient);

@@ -1028,12 +1028,48 @@ button[type="submit"]:hover,
 }
 
 .finance-row {
-  grid-template-columns: minmax(220px, 1fr) 135px 125px 125px 105px 80px minmax(150px, .7fr) minmax(180px, .9fr) auto;
+  grid-template-columns: minmax(220px, 1fr) 135px 125px 125px 105px 80px minmax(150px, .7fr) minmax(240px, 1.2fr) auto;
   align-items: end;
 }
 
 .finance-row label {
   font-size: 12px;
+}
+
+.finance-months {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.finance-month-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 96px;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.finance-month-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.finance-month-check input {
+  width: 14px;
+  height: 14px;
 }
 
 .event-card img {
