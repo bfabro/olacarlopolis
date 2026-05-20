@@ -1908,11 +1908,48 @@ document.addEventListener("DOMContentLoaded", function () {
     //    "seiza", "hime"
   ];
 
+  const categoriasBloqueadasDivulgacao = new Set([
+    "eventosemcarlopolis",
+    "agendamento",
+    "ambulatoriodohospital",
+    "asilo",
+    "agenciatrabalhador",
+    "cras",
+    "clubedexadrez",
+    "correio",
+    "creches",
+    "hospital",
+    "rodoviaria",
+    "prefeitura",
+    "copel",
+    "delegacia",
+    "escolapublica",
+    "farmaciamunicipal",
+    "postodesaude",
+    "sanepar",
+    "samuzinho",
+    "secretariadasaude",
+    "secretariadaeducacao",
+    "sindicatorural",
+    "vigilanciasanitaria",
+    "coletadelixo",
+    "notadefalecimento",
+    "vagasdetrabalho",
+    "farmaciadeplantao"
+  ]);
+
+  function categoriaPodeAparecerNaDivulgacao(cat) {
+    const slug = normalizeName(cat?.title || "");
+    if (!slug || categoriasBloqueadasDivulgacao.has(slug)) return false;
+    return !/evento|publico|publica|informacao|informacoes|falecimento|plantao|coletadelixo|vagasdetrabalho/.test(slug);
+  }
+
   function montarCarrosselDivulgacao() {
     const listaTodos = [];
 
     // monta lista com todos os estabelecimentos que têm novidades ativas
     categories.forEach(cat => {
+      if (!categoriaPodeAparecerNaDivulgacao(cat)) return;
       cat.establishments?.forEach(est => {
         const nomeNormalizado = normalizeName(est.name);
         const imagens = est.novidadesImages || [];
