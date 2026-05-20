@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 84,
-  label: "v84",
+  numero: 85,
+  label: "v85",
   data: "2026-05-20",
-  nota: "Permite editar usuario, vinculo e permissoes no painel."
+  nota: "Amplia cadastro e filtros de automoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2084,8 +2084,18 @@ function fillAutomovelForm(item) {
   $("automovelModelo").value = item.modelo || "";
   $("automovelAno").value = item.ano || "";
   $("automovelPreco").value = item.preco || "";
+  $("automovelTipo").value = item.tipo || "";
+  $("automovelCondicao").value = item.condicao || "";
+  $("automovelKm").value = item.km || "";
   $("automovelStatus").value = item.status || "ativo";
   $("automovelContato").value = item.contato || "";
+  $("automovelVendedor").value = item.vendedor || item.loja || "";
+  $("automovelInstagram").value = item.instagram || "";
+  $("automovelCombustivel").value = item.combustivel || "";
+  $("automovelCambio").value = item.cambio || "";
+  $("automovelCor").value = item.cor || "";
+  $("automovelCidade").value = item.cidade || "";
+  $("automovelOpcionais").value = item.opcionais || "";
   $("automovelDescricao").value = item.descricao || "";
   $("automovelImagem").value = item.imagem || state.automovelImages[0] || "";
   $("deleteAutomovelButton")?.classList.remove("hidden");
@@ -2104,8 +2114,19 @@ function getAutomovelFormData() {
     modelo,
     ano: $("automovelAno").value.trim(),
     preco: $("automovelPreco").value.trim(),
+    tipo: $("automovelTipo").value,
+    condicao: $("automovelCondicao").value,
+    km: $("automovelKm").value.trim(),
     status: $("automovelStatus").value,
     contato: $("automovelContato").value.trim(),
+    vendedor: $("automovelVendedor").value.trim(),
+    loja: $("automovelVendedor").value.trim(),
+    instagram: $("automovelInstagram").value.trim(),
+    combustivel: $("automovelCombustivel").value.trim(),
+    cambio: $("automovelCambio").value.trim(),
+    cor: $("automovelCor").value.trim(),
+    cidade: $("automovelCidade").value.trim(),
+    opcionais: $("automovelOpcionais").value.trim(),
     descricao: $("automovelDescricao").value.trim(),
     imagem,
     imagens,
@@ -2138,7 +2159,7 @@ function renderAutomoveisList() {
   if (!box) return;
   const q = String($("automovelSearch")?.value || "").toLowerCase().trim();
   const list = state.automoveis.filter((item) => {
-    const hay = `${item.marca || ""} ${item.modelo || ""} ${item.ano || ""} ${item.preco || ""}`.toLowerCase();
+    const hay = `${item.tipo || ""} ${item.marca || ""} ${item.modelo || ""} ${item.ano || ""} ${item.preco || ""} ${item.vendedor || ""} ${item.loja || ""}`.toLowerCase();
     return !q || hay.includes(q);
   });
   if (!list.length) {
@@ -2151,8 +2172,8 @@ function renderAutomoveisList() {
       <article class="list-card event-card">
         ${item.imagem ? `<img src="${escapeAttr(displayImageUrl(item.imagem))}" alt="${escapeAttr(titulo)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
         <div class="list-title">${escapeHtml(titulo)}</div>
-        <div class="list-meta">${escapeHtml([item.ano, item.preco].filter(Boolean).join(" - ") || "Sem valor")}</div>
-        <div class="list-meta">${escapeHtml(item.contato || "Sem contato")}</div>
+        <div class="list-meta">${escapeHtml([item.tipo, item.condicao, item.ano, item.preco].filter(Boolean).join(" - ") || "Sem valor")}</div>
+        <div class="list-meta">${escapeHtml([item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ") || "Sem contato")}</div>
         <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
         <button type="button" data-edit-automovel="${escapeAttr(item.id)}">Editar</button>
       </article>

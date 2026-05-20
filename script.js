@@ -6620,15 +6620,78 @@ plotarPinsImoveis(stateImoveis.filtered);
   function automovelDeRegistro(item, key) {
     return {
       id: key || item.id || "",
+      tipo: item.Tipo || item.tipo || item.categoria || "",
       marca: item.Marca || item.marca || "",
       modelo: item.Modelo || item.modelo || item.titulo || item.Titulo || "",
       ano: item.Ano || item.ano || "",
       preco: item.Preco || item.Preço || item.preco || item.valor || "",
+      condicao: item.Condicao || item.condicao || item.estado || "",
+      km: item.Km || item.km || item.quilometragem || "",
       imagem: item.Link_Imagem || item["Imagem URL"] || item.imagem || item.image || "",
       descricao: item.Descricao || item.Descrição || item.descricao || "",
       contato: item.Contato || item.contato || item.whatsapp || "",
+      vendedor: item.Vendedor || item.vendedor || item.loja || item.nomeLoja || "",
+      loja: item.Loja || item.loja || item.vendedor || "",
+      instagram: item.Instagram || item.instagram || item.linkInstagram || "",
+      combustivel: item.Combustivel || item.combustivel || "",
+      cambio: item.Cambio || item.cambio || "",
+      cor: item.Cor || item.cor || "",
+      cidade: item.Cidade || item.cidade || item.local || "",
+      opcionais: item.Opcionais || item.opcionais || "",
       status: item.status || "ativo"
     };
+  }
+
+  function normalizarTextoAutomoveis(valor) {
+    return String(valor || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  }
+
+  function numeroAutomoveis(valor) {
+    const texto = String(valor || "").replace(/\./g, "").replace(",", ".");
+    const match = texto.match(/\d+(\.\d+)?/);
+    return match ? Number(match[0]) : 0;
+  }
+
+  function opcoesAutomoveis(lista, campo) {
+    const valores = [...new Set(lista.map((item) => String(item[campo] || "").trim()).filter(Boolean))];
+    return valores.sort((a, b) => a.localeCompare(b, "pt-BR")).map((valor) => `<option value="${textoSeguroAutomoveis(valor)}">${textoSeguroAutomoveis(valor)}</option>`).join("");
+  }
+
+  function renderAutomoveisCards(lista, box) {
+    if (!lista.length) {
+      box.innerHTML = `<div class="list-meta">Nenhum automovel encontrado com esses filtros.</div>`;
+      return;
+    }
+
+    box.innerHTML = lista.map((item) => {
+      const titulo = [item.marca, item.modelo].filter(Boolean).join(" ") || "Automovel";
+      const contato = String(item.contato || "").replace(/\D/g, "");
+      const instagram = String(item.instagram || "").trim();
+      const instagramUrl = instagram && instagram.startsWith("http") ? instagram : (instagram ? `https://instagram.com/${instagram.replace(/^@/, "")}` : "");
+      const detalhes = [item.tipo, item.condicao, item.ano, item.km, item.cambio, item.combustivel, item.cor].filter(Boolean);
+      const vendedor = item.vendedor || item.loja || "";
+      return `
+        <article class="im-card auto-card ${item.status === "vendido" ? "is-sold" : ""}">
+          ${item.imagem ? `<img src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">` : ""}
+          <div class="im-card-body">
+            <div class="auto-title-line">
+              <h3>${textoSeguroAutomoveis(titulo)}</h3>
+              ${item.status === "vendido" ? `<span class="auto-status">Vendido</span>` : ""}
+            </div>
+            ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(item.preco)}</strong>` : ""}
+            ${vendedor ? `<p class="auto-seller"><i class="fa-solid fa-store"></i> ${textoSeguroAutomoveis(vendedor)}</p>` : ""}
+            ${detalhes.length ? `<div class="auto-tags">${detalhes.map((tag) => `<span>${textoSeguroAutomoveis(tag)}</span>`).join("")}</div>` : ""}
+            ${item.cidade ? `<p>${textoSeguroAutomoveis(item.cidade)}</p>` : ""}
+            ${item.opcionais ? `<p><strong>Opcionais:</strong> ${textoSeguroAutomoveis(item.opcionais)}</p>` : ""}
+            ${item.descricao ? `<p>${textoSeguroAutomoveis(item.descricao)}</p>` : ""}
+            <div class="auto-actions">
+              ${contato ? `<a class="zap-link telefone-link" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent("Olá! Vi o automóvel no Olá Carlópolis e gostaria de mais informações.")}"><i class="bx bxl-whatsapp"></i> Tenho interesse</a>` : ""}
+              ${instagramUrl ? `<a class="auto-instagram" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}"><i class="fa-brands fa-instagram"></i> Instagram</a>` : ""}
+            </div>
+          </div>
+        </article>
+      `;
+    }).join("");
   }
 
   async function carregarAutomoveisFirebase() {
@@ -6656,10 +6719,27 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (!area) return;
 
     area.innerHTML = `
-      <section class="imoveis-wrap">
+      <section class="imoveis-wrap automoveis-page">
         <div class="imoveis-head">
           <h2><i class="fa-solid fa-car"></i> Automoveis</h2>
         </div>
+        <aside id="filtrosAutomoveis" class="im-filtros painel-filtros">
+          <h4 class="filtro-titulo">Filtrar</h4>
+          <div class="grid-filtros">
+            <div class="campo"><label>Tipo</label><select id="autoFiltroTipo"><option value="">Todos</option></select></div>
+            <div class="campo"><label>Marca</label><select id="autoFiltroMarca"><option value="">Todas</option></select></div>
+            <div class="campo"><label>Modelo</label><input id="autoFiltroModelo" placeholder="Modelo"></div>
+            <div class="campo"><label>Ano</label><input id="autoFiltroAno" placeholder="Ex: 2020"></div>
+            <div class="campo"><label>Valor ate</label><input id="autoFiltroValor" placeholder="Ex: 50000"></div>
+            <div class="campo"><label>Vendedor</label><input id="autoFiltroVendedor" placeholder="Loja ou vendedor"></div>
+            <div class="campo"><label>Novo/usado</label><select id="autoFiltroCondicao"><option value="">Todos</option></select></div>
+            <div class="campo"><label>KM ate</label><input id="autoFiltroKm" placeholder="Ex: 80000"></div>
+            <div class="campo"><label>Combustivel</label><select id="autoFiltroCombustivel"><option value="">Todos</option></select></div>
+            <div class="campo"><label>Cambio</label><select id="autoFiltroCambio"><option value="">Todos</option></select></div>
+            <div class="campo"><label>Status</label><select id="autoFiltroStatus"><option value="">Todos</option><option value="ativo">Disponiveis</option><option value="vendido">Vendidos</option></select></div>
+            <div class="campo"><label>Busca geral</label><input id="autoFiltroBusca" placeholder="Marca, modelo, opcionais..."></div>
+          </div>
+        </aside>
         <div id="automoveisLista" class="im-grid">
           <div class="list-meta">Carregando automoveis...</div>
         </div>
@@ -6673,21 +6753,54 @@ plotarPinsImoveis(stateImoveis.filtered);
       return;
     }
 
-    box.innerHTML = lista.map((item) => {
-      const titulo = [item.marca, item.modelo].filter(Boolean).join(" ") || "Automovel";
-      const contato = String(item.contato || "").replace(/\D/g, "");
-      return `
-        <article class="im-card">
-          ${item.imagem ? `<img src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">` : ""}
-          <div class="im-card-body">
-            <h3>${textoSeguroAutomoveis(titulo)}</h3>
-            <p>${textoSeguroAutomoveis([item.ano, item.preco].filter(Boolean).join(" - "))}</p>
-            ${item.descricao ? `<p>${textoSeguroAutomoveis(item.descricao)}</p>` : ""}
-            ${contato ? `<a class="zap-link telefone-link" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent("Olá! Vi o automóvel no Olá Carlópolis e gostaria de mais informações.")}"><i class="bx bxl-whatsapp"></i> Tenho interesse</a>` : ""}
-          </div>
-        </article>
-      `;
-    }).join("");
+    const preencherSelect = (id, campo) => {
+      const el = document.getElementById(id);
+      if (el) el.insertAdjacentHTML("beforeend", opcoesAutomoveis(lista, campo));
+    };
+    preencherSelect("autoFiltroTipo", "tipo");
+    preencherSelect("autoFiltroMarca", "marca");
+    preencherSelect("autoFiltroCondicao", "condicao");
+    preencherSelect("autoFiltroCombustivel", "combustivel");
+    preencherSelect("autoFiltroCambio", "cambio");
+
+    const aplicar = () => {
+      const filtros = {
+        tipo: document.getElementById("autoFiltroTipo")?.value || "",
+        marca: document.getElementById("autoFiltroMarca")?.value || "",
+        modelo: normalizarTextoAutomoveis(document.getElementById("autoFiltroModelo")?.value || ""),
+        ano: normalizarTextoAutomoveis(document.getElementById("autoFiltroAno")?.value || ""),
+        valor: numeroAutomoveis(document.getElementById("autoFiltroValor")?.value || ""),
+        vendedor: normalizarTextoAutomoveis(document.getElementById("autoFiltroVendedor")?.value || ""),
+        condicao: document.getElementById("autoFiltroCondicao")?.value || "",
+        km: numeroAutomoveis(document.getElementById("autoFiltroKm")?.value || ""),
+        combustivel: document.getElementById("autoFiltroCombustivel")?.value || "",
+        cambio: document.getElementById("autoFiltroCambio")?.value || "",
+        status: document.getElementById("autoFiltroStatus")?.value || "",
+        busca: normalizarTextoAutomoveis(document.getElementById("autoFiltroBusca")?.value || "")
+      };
+      const filtrados = lista.filter((item) => {
+        const hay = normalizarTextoAutomoveis(`${item.tipo} ${item.marca} ${item.modelo} ${item.ano} ${item.preco} ${item.vendedor || item.loja} ${item.condicao} ${item.km} ${item.combustivel} ${item.cambio} ${item.cor} ${item.cidade} ${item.opcionais} ${item.descricao}`);
+        if (filtros.tipo && item.tipo !== filtros.tipo) return false;
+        if (filtros.marca && item.marca !== filtros.marca) return false;
+        if (filtros.modelo && !normalizarTextoAutomoveis(item.modelo).includes(filtros.modelo)) return false;
+        if (filtros.ano && !normalizarTextoAutomoveis(item.ano).includes(filtros.ano)) return false;
+        if (filtros.valor && numeroAutomoveis(item.preco) > filtros.valor) return false;
+        if (filtros.vendedor && !normalizarTextoAutomoveis(item.vendedor || item.loja).includes(filtros.vendedor)) return false;
+        if (filtros.condicao && item.condicao !== filtros.condicao) return false;
+        if (filtros.km && numeroAutomoveis(item.km) > filtros.km) return false;
+        if (filtros.combustivel && item.combustivel !== filtros.combustivel) return false;
+        if (filtros.cambio && item.cambio !== filtros.cambio) return false;
+        if (filtros.status && (item.status || "ativo") !== filtros.status) return false;
+        if (filtros.busca && !hay.includes(filtros.busca)) return false;
+        return true;
+      });
+      renderAutomoveisCards(filtrados, box);
+    };
+    document.querySelectorAll("#filtrosAutomoveis input, #filtrosAutomoveis select").forEach((el) => {
+      el.addEventListener("input", aplicar);
+      el.addEventListener("change", aplicar);
+    });
+    aplicar();
   }
 
   const elMenuAutomoveis = document.getElementById("menuAutomoveis");

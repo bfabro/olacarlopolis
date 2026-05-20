@@ -7127,6 +7127,75 @@ html {
   margin-bottom: 16px;
 }
 
+.automoveis-page {
+  grid-template-columns: 320px 1fr;
+}
+
+.automoveis-page .imoveis-head {
+  grid-column: 1 / -1;
+}
+
+.auto-card .auto-title-line {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.auto-card .auto-price {
+  display: inline-flex;
+  margin: 4px 0 8px;
+  color: #0f7a3a;
+  font-size: 1.05rem;
+}
+
+.auto-status {
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: .78rem;
+  font-weight: 800;
+  padding: 5px 8px;
+  white-space: nowrap;
+}
+
+.auto-seller {
+  color: #374151;
+  font-weight: 700;
+}
+
+.auto-tags,
+.auto-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.auto-tags span {
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #1f2937;
+  font-size: .82rem;
+  font-weight: 700;
+  padding: 5px 8px;
+}
+
+.auto-actions {
+  margin-top: 10px;
+}
+
+.auto-instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 10px;
+  background: #e1306c;
+  color: #fff;
+  font-weight: 800;
+  padding: 9px 12px;
+  text-decoration: none;
+}
+
 .im-header {
   display: flex;
   align-items: flex-start;

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=84">
+  <link rel="stylesheet" href="painel.css?v=85">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -474,10 +474,32 @@
             </div>
             <form id="automovelForm" class="grid-form">
               <input id="automovelId" type="hidden">
+              <label>Tipo
+                <select id="automovelTipo">
+                  <option value="">Selecione o tipo</option>
+                  <option value="Carro">Carro</option>
+                  <option value="Moto">Moto</option>
+                  <option value="Caminhonete">Caminhonete</option>
+                  <option value="SUV">SUV</option>
+                  <option value="Utilitario">Utilitario</option>
+                  <option value="Van">Van</option>
+                  <option value="Caminhao">Caminhao</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </label>
               <label>Marca<input id="automovelMarca" required placeholder="Ex: Volkswagen"></label>
               <label>Modelo<input id="automovelModelo" required placeholder="Ex: Gol 1.0"></label>
               <label>Ano<input id="automovelAno" placeholder="Ex: 2018"></label>
               <label>Valor<input id="automovelPreco" placeholder="R$"></label>
+              <label>Novo/usado
+                <select id="automovelCondicao">
+                  <option value="">Selecione</option>
+                  <option value="Novo">Novo</option>
+                  <option value="Usado">Usado</option>
+                  <option value="Seminovo">Seminovo</option>
+                </select>
+              </label>
+              <label>KM<input id="automovelKm" placeholder="Ex: 45.000 km"></label>
               <label>Status
                 <select id="automovelStatus">
                   <option value="ativo">Ativo</option>
@@ -486,6 +508,13 @@
                 </select>
               </label>
               <label>Contato/WhatsApp<input id="automovelContato" placeholder="(43) 99999-9999"></label>
+              <label>Loja/vendedor<input id="automovelVendedor" placeholder="Nome da loja ou vendedor"></label>
+              <label>Instagram da loja<input id="automovelInstagram" placeholder="https://instagram.com/loja"></label>
+              <label>Combustivel<input id="automovelCombustivel" placeholder="Ex: Flex, Gasolina, Diesel"></label>
+              <label>Cambio<input id="automovelCambio" placeholder="Ex: Manual, Automatico"></label>
+              <label>Cor<input id="automovelCor" placeholder="Ex: Prata"></label>
+              <label>Cidade/local<input id="automovelCidade" placeholder="Ex: Carlopolis"></label>
+              <label class="wide">Opcionais<textarea id="automovelOpcionais" rows="3" placeholder="Ex: ar condicionado, direcao, vidro eletrico, camera de re..."></textarea></label>
               <label class="wide">Descricao<textarea id="automovelDescricao" rows="4" placeholder="Detalhes do veiculo, estado, opcionais..."></textarea></label>
               <label class="wide">Imagem principal<input id="automovelImagem" placeholder="URL da imagem principal"></label>
               <section class="wide upload-panel">
@@ -599,6 +628,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=84"></script>
+  <script type="module" src="painel.js?v=85"></script>
 </body>
 </html>
