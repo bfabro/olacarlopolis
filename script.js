@@ -6780,7 +6780,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             <div class="campo"><label>Modelo</label><input id="autoFiltroModelo" placeholder="Modelo"></div>
             <div class="campo"><label>Ano</label><input id="autoFiltroAno" placeholder="Ex: 2020"></div>
             <div class="campo"><label>Valor ate</label><input id="autoFiltroValor" placeholder="Ex: 50000"></div>
-            <div class="campo"><label>Vendedor</label><input id="autoFiltroVendedor" placeholder="Loja ou vendedor"></div>
+            <div class="campo"><label>Vendedor</label><select id="autoFiltroVendedor"><option value="">Todos</option></select></div>
             <div class="campo"><label>Novo/usado</label><select id="autoFiltroCondicao"><option value="">Todos</option></select></div>
             <div class="campo"><label>KM ate</label><input id="autoFiltroKm" placeholder="Ex: 80000"></div>
             <div class="campo"><label>Combustivel</label><select id="autoFiltroCombustivel"><option value="">Todos</option></select></div>
@@ -6810,6 +6810,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     preencherSelect("autoFiltroCondicao", "condicao");
     preencherSelect("autoFiltroCombustivel", "combustivel");
     preencherSelect("autoFiltroCambio", "cambio");
+    preencherSelect("autoFiltroVendedor", "vendedor");
 
     const filtroBox = document.getElementById("filtrosAutomoveis");
     const toggleFiltros = document.getElementById("autoToggleFiltros");
@@ -6825,7 +6826,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         modelo: normalizarTextoAutomoveis(document.getElementById("autoFiltroModelo")?.value || ""),
         ano: normalizarTextoAutomoveis(document.getElementById("autoFiltroAno")?.value || ""),
         valor: numeroAutomoveis(document.getElementById("autoFiltroValor")?.value || ""),
-        vendedor: normalizarTextoAutomoveis(document.getElementById("autoFiltroVendedor")?.value || ""),
+        vendedor: document.getElementById("autoFiltroVendedor")?.value || "",
         condicao: document.getElementById("autoFiltroCondicao")?.value || "",
         km: numeroAutomoveis(document.getElementById("autoFiltroKm")?.value || ""),
         combustivel: document.getElementById("autoFiltroCombustivel")?.value || "",
@@ -6840,7 +6841,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (filtros.modelo && !normalizarTextoAutomoveis(item.modelo).includes(filtros.modelo)) return false;
         if (filtros.ano && !normalizarTextoAutomoveis(item.ano).includes(filtros.ano)) return false;
         if (filtros.valor && numeroAutomoveis(item.preco) > filtros.valor) return false;
-        if (filtros.vendedor && !normalizarTextoAutomoveis(item.vendedor || item.loja).includes(filtros.vendedor)) return false;
+        if (filtros.vendedor && (item.vendedor || item.loja) !== filtros.vendedor) return false;
         if (filtros.condicao && item.condicao !== filtros.condicao) return false;
         if (filtros.km && numeroAutomoveis(item.km) > filtros.km) return false;
         if (filtros.combustivel && item.combustivel !== filtros.combustivel) return false;
