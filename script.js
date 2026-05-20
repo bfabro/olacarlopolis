@@ -16506,6 +16506,23 @@ plotarPinsImoveis(stateImoveis.filtered);
     return categoriasSetorPublicoAdmin.has(slug) || grupo === "setorpublico" || grupo === "publico";
   }
 
+  function chaveMenuCategoriaAdmin(valor) {
+    const palavras = String(valor || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ç/g, "c")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((palavra) => {
+        if (palavra.length > 3 && palavra.endsWith("s")) return palavra.slice(0, -1);
+        return palavra;
+      });
+    return palavras.join("");
+  }
+
   function iconClassCategoriaAdmin(meta) {
     return String(meta?.icon || "fa-solid fa-store").replace(/[^a-zA-Z0-9\-\s]/g, "").trim() || "fa-solid fa-store";
   }
@@ -16518,7 +16535,8 @@ plotarPinsImoveis(stateImoveis.filtered);
   function garantirCategoriaAdmin(tituloCategoria, meta = {}) {
     const title = String(tituloCategoria || "Outros").trim() || "Outros";
     const slug = normalizeName(title);
-    let categoria = categories.find((cat) => normalizeName(cat.title) === slug);
+    const chaveMenu = chaveMenuCategoriaAdmin(title);
+    let categoria = categories.find((cat) => normalizeName(cat.title) === slug || chaveMenuCategoriaAdmin(cat.title) === chaveMenu);
     if (categoria) {
       categoria.metaAdmin = { ...(categoria.metaAdmin || {}), ...meta };
       if (!categoria.link && !categoriaAdminEhSetorPublico({ ...meta, nome: title })) categoria.link = criarLinkCategoriaAdmin(title, meta);
@@ -16549,10 +16567,11 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function encontrarLinkCategoriaAdmin(submenu, title) {
     const slug = normalizeName(title);
+    const chaveMenu = chaveMenuCategoriaAdmin(title);
     const existing = submenu.querySelector(`[data-admin-category="${slug}"]`);
     if (existing) return existing;
     return Array.from(submenu.querySelectorAll("a.nav_link.sublink"))
-      .find((link) => normalizeName(textoLinkCategoriaAdmin(link)) === slug) || null;
+      .find((link) => normalizeName(textoLinkCategoriaAdmin(link)) === slug || chaveMenuCategoriaAdmin(textoLinkCategoriaAdmin(link)) === chaveMenu) || null;
   }
 
   function ligarLinkCategoriaAdmin(link, title) {
@@ -16638,7 +16657,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     const vistos = new Map();
     Array.from(submenu.querySelectorAll("a.nav_link.sublink")).forEach((link) => {
-      const slug = normalizeName(textoLinkCategoriaAdmin(link));
+      const slug = chaveMenuCategoriaAdmin(textoLinkCategoriaAdmin(link));
       if (!slug) return;
 
       const atual = vistos.get(slug);
