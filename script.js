@@ -6720,11 +6720,16 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     area.innerHTML = `
       <section class="imoveis-wrap automoveis-page">
-        <div class="imoveis-head">
-          <h2><i class="fa-solid fa-car"></i> Automoveis</h2>
-        </div>
+        <h2 class="highlighted"><span><i class="fa-solid fa-car"></i> AUTOMOVEIS</span></h2>
         <aside id="filtrosAutomoveis" class="im-filtros painel-filtros">
-          <h4 class="filtro-titulo">Filtrar</h4>
+          <div class="topbar">
+            <h4 class="filtro-titulo">Filtrar</h4>
+            <label class="switch">
+              <input type="checkbox" id="autoFiltroDisponiveis" checked>
+              <span class="track"><span class="thumb"></span></span>
+              <span>Disponiveis</span>
+            </label>
+          </div>
           <div class="grid-filtros">
             <div class="campo"><label>Tipo</label><select id="autoFiltroTipo"><option value="">Todos</option></select></div>
             <div class="campo"><label>Marca</label><select id="autoFiltroMarca"><option value="">Todas</option></select></div>
@@ -6736,7 +6741,6 @@ plotarPinsImoveis(stateImoveis.filtered);
             <div class="campo"><label>KM ate</label><input id="autoFiltroKm" placeholder="Ex: 80000"></div>
             <div class="campo"><label>Combustivel</label><select id="autoFiltroCombustivel"><option value="">Todos</option></select></div>
             <div class="campo"><label>Cambio</label><select id="autoFiltroCambio"><option value="">Todos</option></select></div>
-            <div class="campo"><label>Status</label><select id="autoFiltroStatus"><option value="">Todos</option><option value="ativo">Disponiveis</option><option value="vendido">Vendidos</option></select></div>
             <div class="campo"><label>Busca geral</label><input id="autoFiltroBusca" placeholder="Marca, modelo, opcionais..."></div>
           </div>
         </aside>
@@ -6775,7 +6779,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         km: numeroAutomoveis(document.getElementById("autoFiltroKm")?.value || ""),
         combustivel: document.getElementById("autoFiltroCombustivel")?.value || "",
         cambio: document.getElementById("autoFiltroCambio")?.value || "",
-        status: document.getElementById("autoFiltroStatus")?.value || "",
+        disponiveis: document.getElementById("autoFiltroDisponiveis")?.checked || false,
         busca: normalizarTextoAutomoveis(document.getElementById("autoFiltroBusca")?.value || "")
       };
       const filtrados = lista.filter((item) => {
@@ -6790,7 +6794,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (filtros.km && numeroAutomoveis(item.km) > filtros.km) return false;
         if (filtros.combustivel && item.combustivel !== filtros.combustivel) return false;
         if (filtros.cambio && item.cambio !== filtros.cambio) return false;
-        if (filtros.status && (item.status || "ativo") !== filtros.status) return false;
+        if (filtros.disponiveis && (item.status || "ativo") !== "ativo") return false;
         if (filtros.busca && !hay.includes(filtros.busca)) return false;
         return true;
       });

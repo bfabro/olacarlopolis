@@ -7135,6 +7135,124 @@ html {
   grid-column: 1 / -1;
 }
 
+.automoveis-page > .highlighted {
+  grid-column: 1 / -1;
+  margin: 0 0 0;
+}
+
+#filtrosAutomoveis.painel-filtros {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(10, 20, 40, .18);
+  padding: 16px 18px 18px;
+}
+
+#filtrosAutomoveis .topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+#filtrosAutomoveis .filtro-titulo {
+  color: #16a34a;
+  font-weight: 800;
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+#filtrosAutomoveis .grid-filtros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 10px 12px;
+  align-items: end;
+}
+
+#filtrosAutomoveis .campo label {
+  display: block;
+  font-size: .85rem;
+  color: #1f2937;
+  margin: 2px 0 6px;
+  font-weight: 700;
+}
+
+#filtrosAutomoveis select,
+#filtrosAutomoveis input[type="text"],
+#filtrosAutomoveis input:not([type]) {
+  width: 100%;
+  height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #a3a3a3;
+  border-radius: 10px;
+  background: #fff;
+  color: #111827;
+  font-size: .9rem;
+}
+
+#filtrosAutomoveis select:focus,
+#filtrosAutomoveis input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+
+#filtrosAutomoveis .switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #374151;
+  user-select: none;
+}
+
+#filtrosAutomoveis .switch input {
+  appearance: none;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+#filtrosAutomoveis .switch .track {
+  width: 46px;
+  height: 26px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  position: relative;
+  transition: background .2s;
+}
+
+#filtrosAutomoveis .switch .thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+  transition: left .2s;
+}
+
+#filtrosAutomoveis .switch input:checked + .track {
+  background: #16a34a;
+}
+
+#filtrosAutomoveis .switch input:checked + .track .thumb {
+  left: 23px;
+}
+
+@media (max-width: 640px) {
+  #filtrosAutomoveis .topbar {
+    flex-wrap: wrap;
+  }
+
+  #filtrosAutomoveis .grid-filtros {
+    grid-template-columns: 1fr;
+  }
+}
+
 .auto-card .auto-title-line {
   display: flex;
   align-items: flex-start;
