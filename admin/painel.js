@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 74,
-  label: "v74",
+  numero: 75,
+  label: "v75",
   data: "2026-05-20",
-  nota: "Adiciona filtros por periodo nos relatorios."
+  nota: "Melhora faturas do cliente com selecao de meses, total unificado e troca de plano."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1819,6 +1819,30 @@ function pendingMonthsForClient(client) {
   return [...months].filter(Boolean).sort();
 }
 
+function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = null) {
+  const saved = client.faturas?.[mes] || {};
+  const valorPlano = Number(saved.valorPlano ?? valorFinalPlano(client));
+  const valorDestaque = Number(saved.valorDestaque ?? (client.destaqueSemanal ? Number(client.destaqueValor || 0) : 0));
+  const valorTotal = Number(totalOverride ?? saved.valorTotal ?? (valorPlano + valorDestaque));
+  const txid = `OC${normalizeName(client.nome || client.id).slice(0, 8).toUpperCase()}${String(mes).replace(/\W/g, "").slice(0, 12)}`;
+  const pixCode = gerarPixCopiaCola({
+    chave: paymentConfig.pixChave,
+    nome: paymentConfig.pixNome || "Ola Carlopolis",
+    cidade: paymentConfig.pixCidade || "CARLOPOLIS",
+    valor: valorTotal,
+    txid
+  });
+  return {
+    mes,
+    saved,
+    valorPlano,
+    valorDestaque,
+    valorTotal,
+    pixCode,
+    qrUrl: pixCode ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pixCode)}` : ""
+  };
+}
+
 function splitMonthsInput(value) {
   return String(value || "")
     .split(/[,\s;]+/)
@@ -3066,37 +3090,100 @@ function renderClientInvoices() {
 
   const paymentConfig = state.pagamentoSistema || {};
   const meses = pendingMonthsForClient(client);
-  const faturas = meses.map((mes) => {
-    const saved = client.faturas?.[mes] || {};
-    const valorPlano = Number(saved.valorPlano ?? valorFinalPlano(client));
-    const valorDestaque = Number(saved.valorDestaque ?? (client.destaqueSemanal ? Number(client.destaqueValor || 0) : 0));
-    const valorTotal = Number(saved.valorTotal ?? (valorPlano + valorDestaque));
-    const txid = `OC${normalizeName(client.nome || client.id).slice(0, 8).toUpperCase()}${mes.replace("-", "")}`;
-    const pixCode = gerarPixCopiaCola({
-      chave: paymentConfig.pixChave,
-      nome: paymentConfig.pixNome || "Ola Carlopolis",
-      cidade: paymentConfig.pixCidade || "CARLOPOLIS",
-      valor: valorTotal,
-      txid
-    });
-    return {
-      mes,
-      saved,
-      valorPlano,
-      valorDestaque,
-      valorTotal,
-      pixCode,
-      qrUrl: pixCode ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pixCode)}` : ""
-    };
-  });
+  const faturas = meses.map((mes) => buildClientInvoice(client, mes, paymentConfig));
 
   if (!faturas.length) {
-    mount.innerHTML = `<div class="list-meta">Nenhuma fatura em aberto para este cliente.</div>`;
+    mount.innerHTML = `
+      <article class="invoice-card invoice-summary-card">
+        <div class="section-head compact">
+          <div>
+            <h3>Faturas</h3>
+            <p>Nenhuma fatura em aberto para este cliente.</p>
+          </div>
+          <span class="badge pago">Em dia</span>
+        </div>
+        <div class="invoice-plan-row">
+          <label>Plano atual
+            <select id="clientInvoicePlan">
+              <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
+              <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
+              <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
+            </select>
+          </label>
+          <button id="saveClientInvoicePlan" type="button" class="ghost-button"><i class="fa-solid fa-arrows-rotate"></i> Atualizar plano</button>
+        </div>
+      </article>
+    `;
+    $("saveClientInvoicePlan")?.addEventListener("click", async () => {
+      const tipoPlano = $("clientInvoicePlan")?.value || "mensal";
+      await update(ref(db, `clientes/${client.id}`), {
+        tipoPlano,
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user.uid,
+        origem: "painel"
+      });
+      showToast("Plano atualizado.");
+      await loadAllData();
+      renderClientInvoices();
+    });
     return;
   }
 
+  const totalAberto = faturas.reduce((sum, fatura) => sum + fatura.valorTotal, 0);
+
   mount.innerHTML = `
     <div class="invoice-list">
+      <article class="invoice-card invoice-summary-card">
+        <div class="section-head compact">
+          <div>
+            <h3>Resumo do pagamento</h3>
+            <p>Selecione os meses que deseja pagar agora. O Pix abaixo soma somente os meses marcados.</p>
+          </div>
+          <span class="badge em_aberto">${moneyBR(totalAberto)} em aberto</span>
+        </div>
+        <div class="invoice-plan-row">
+          <label>Plano atual
+            <select id="clientInvoicePlan">
+              <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
+              <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
+              <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
+            </select>
+          </label>
+          <button id="saveClientInvoicePlan" type="button" class="ghost-button"><i class="fa-solid fa-arrows-rotate"></i> Atualizar plano</button>
+        </div>
+        <div class="invoice-month-selector">
+          ${faturas.map((fatura) => `
+            <label class="invoice-month-option">
+              <input type="checkbox" data-invoice-select value="${escapeAttr(fatura.mes)}" checked>
+              <span>
+                <strong>${escapeHtml(monthLabel(fatura.mes))}</strong>
+                <small>Plano ${moneyBR(fatura.valorPlano)}${fatura.valorDestaque ? ` + destaque ${moneyBR(fatura.valorDestaque)}` : ""}</small>
+              </span>
+              <b>${moneyBR(fatura.valorTotal)}</b>
+            </label>
+          `).join("")}
+        </div>
+        <div class="invoice-selected-total">
+          <span>Total selecionado</span>
+          <strong id="selectedInvoiceTotal">${moneyBR(totalAberto)}</strong>
+        </div>
+        ${paymentConfig.pixChave ? `
+          <div class="pix-box invoice-selected-pix">
+            <img id="selectedInvoiceQr" src="" alt="QR Code Pix" loading="lazy" decoding="async">
+            <label class="wide">Codigo Pix dos meses selecionados<textarea id="selectedInvoicePixCode" rows="5" readonly></textarea></label>
+            <div class="form-actions">
+              <button id="copySelectedInvoicePix" type="button" class="ghost-button"><i class="fa-solid fa-copy"></i> Copiar codigo Pix</button>
+              <button data-copy-invoice-key type="button" class="ghost-button"><i class="fa-solid fa-key"></i> Copiar chave Pix</button>
+            </div>
+            ${paymentConfig.observacaoFatura ? `<div class="list-meta wide">${escapeHtml(paymentConfig.observacaoFatura)}</div>` : ""}
+          </div>
+          <div class="upload-panel">
+            <h3>Comprovante dos meses selecionados</h3>
+            <input id="selectedInvoiceReceipt" type="file" accept="image/*,application/pdf">
+            <div class="list-meta">Ao anexar aqui, o mesmo comprovante sera vinculado aos meses marcados.</div>
+          </div>
+        ` : `<div class="list-meta">A chave Pix ainda nao foi configurada pelo admin master.</div>`}
+      </article>
     ${faturas.map((fatura) => `
       <article class="invoice-card" data-invoice-month="${escapeAttr(fatura.mes)}">
         <div class="section-head compact">
@@ -3130,6 +3217,42 @@ function renderClientInvoices() {
     </article>`).join("")}
     </div>
   `;
+
+  const selectedPixCode = $("selectedInvoicePixCode");
+  const selectedQr = $("selectedInvoiceQr");
+  const refreshSelectedInvoicePayment = () => {
+    const selected = [...mount.querySelectorAll("[data-invoice-select]:checked")].map((input) => input.value);
+    const selectedInvoices = faturas.filter((fatura) => selected.includes(fatura.mes));
+    const selectedTotal = selectedInvoices.reduce((sum, fatura) => sum + fatura.valorTotal, 0);
+    const selectedLabel = selected.length === 1 ? selected[0] : `${selected[0] || currentMonthKey()}-${selected.length}M`;
+    const unified = buildClientInvoice(client, selectedLabel, paymentConfig, selectedTotal);
+    $("selectedInvoiceTotal").textContent = moneyBR(selectedTotal);
+    if (selectedPixCode) selectedPixCode.value = selectedTotal > 0 ? unified.pixCode : "";
+    if (selectedQr) selectedQr.src = selectedTotal > 0 && unified.pixCode ? unified.qrUrl : "";
+  };
+
+  mount.querySelectorAll("[data-invoice-select]").forEach((input) => {
+    input.addEventListener("change", refreshSelectedInvoicePayment);
+  });
+  refreshSelectedInvoicePayment();
+
+  $("saveClientInvoicePlan")?.addEventListener("click", async () => {
+    const tipoPlano = $("clientInvoicePlan")?.value || "mensal";
+    await update(ref(db, `clientes/${client.id}`), {
+      tipoPlano,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid,
+      origem: "painel"
+    });
+    showToast("Plano atualizado.");
+    await loadAllData();
+    renderClientInvoices();
+  });
+
+  $("copySelectedInvoicePix")?.addEventListener("click", async () => {
+    await navigator.clipboard?.writeText($("selectedInvoicePixCode")?.value || "");
+    showToast("Codigo Pix dos meses selecionados copiado.");
+  });
 
   mount.querySelectorAll("[data-copy-invoice-pix]").forEach((button) => button.addEventListener("click", async () => {
     const card = button.closest("[data-invoice-month]");
@@ -3168,6 +3291,43 @@ function renderClientInvoices() {
     await loadAllData();
     renderClientInvoices();
   }));
+
+  $("selectedInvoiceReceipt")?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const selectedMonths = [...mount.querySelectorAll("[data-invoice-select]:checked")].map((input) => input.value);
+    if (!selectedMonths.length) {
+      showToast("Selecione pelo menos um mes para anexar o comprovante.");
+      event.target.value = "";
+      return;
+    }
+    showToast("Enviando comprovante dos meses selecionados...");
+    const comprovanteUrl = await uploadInvoiceReceiptForClient(client.id, file);
+    const pixCodigo = $("selectedInvoicePixCode")?.value || "";
+    const payload = {
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid
+    };
+    selectedMonths.forEach((mes) => {
+      const fatura = faturas.find((item) => item.mes === mes);
+      if (!fatura) return;
+      payload[`faturas/${mes}`] = {
+        mes,
+        valorPlano: fatura.valorPlano,
+        valorDestaque: fatura.valorDestaque,
+        valorTotal: fatura.valorTotal,
+        pixChave: paymentConfig.pixChave || "",
+        pixCodigo,
+        comprovanteUrl,
+        status: "em_analise",
+        updatedAt: Date.now()
+      };
+    });
+    await update(ref(db, `clientes/${client.id}`), payload);
+    showToast("Comprovante anexado aos meses selecionados.");
+    await loadAllData();
+    renderClientInvoices();
+  });
 }
 
 async function createPanelUser(event) {

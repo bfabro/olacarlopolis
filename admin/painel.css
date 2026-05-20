@@ -645,6 +645,68 @@ button[type="submit"]:hover,
   background: #fff;
 }
 
+.invoice-summary-card {
+  border-color: rgba(37, 99, 235, .22);
+  background: #f8fbff;
+}
+
+.invoice-plan-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.invoice-month-selector {
+  display: grid;
+  gap: 10px;
+}
+
+.invoice-month-option {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.invoice-month-option input {
+  width: 18px;
+  height: 18px;
+}
+
+.invoice-month-option span {
+  display: grid;
+  gap: 3px;
+}
+
+.invoice-month-option small {
+  color: var(--muted);
+}
+
+.invoice-month-option b,
+.invoice-selected-total strong {
+  color: var(--brand);
+}
+
+.invoice-selected-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 12px;
+  background: #eff6ff;
+  font-weight: 800;
+}
+
+.invoice-selected-pix {
+  background: #fff;
+}
+
 .pix-box {
   grid-template-columns: 220px minmax(0, 1fr);
   align-items: start;
@@ -1116,6 +1178,7 @@ button[type="submit"]:hover,
   .stats-grid,
   .reports-grid,
   .report-custom-range,
+  .invoice-plan-row,
   .client-row,
   .finance-row,
   .pix-box {
