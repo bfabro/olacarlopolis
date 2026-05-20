@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 73,
-  label: "v73",
+  numero: 74,
+  label: "v74",
   data: "2026-05-20",
-  nota: "Permite marcar meses em aberto e listar faturas acumuladas por cliente."
+  nota: "Adiciona filtros por periodo nos relatorios."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -55,6 +55,11 @@ let state = {
   categorias: [],
   pagamentoSistema: {},
   metricas: {},
+  reportPeriod: {
+    type: "mensal",
+    start: "",
+    end: ""
+  },
   selectedClientId: null,
   selectedEventId: null,
   selectedDeathNoticeId: null,
@@ -2169,6 +2174,39 @@ function topFromMap(map, limit = 10, singular = "clique", plural = "cliques") {
     .map(([title, count]) => ({ title, meta: `${count} ${count === 1 ? singular : plural}` }));
 }
 
+function dateKeyFromDate(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function addDays(date, amount) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + amount);
+  return next;
+}
+
+function getReportDateRange() {
+  const today = new Date();
+  const type = state.reportPeriod?.type || "mensal";
+  if (type === "dia") return { start: dateKeyFromDate(today), end: dateKeyFromDate(today), label: "Hoje" };
+  if (type === "semanal") {
+    const start = addDays(today, -6);
+    return { start: dateKeyFromDate(start), end: dateKeyFromDate(today), label: "Ultimos 7 dias" };
+  }
+  if (type === "anual") {
+    return { start: `${today.getFullYear()}-01-01`, end: dateKeyFromDate(today), label: String(today.getFullYear()) };
+  }
+  if (type === "personalizado") {
+    const start = state.reportPeriod.start || dateKeyFromDate(today);
+    const end = state.reportPeriod.end || start;
+    return { start, end, label: `${start} ate ${end}` };
+  }
+  return { start: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-01`, end: dateKeyFromDate(today), label: "Mes atual" };
+}
+
+function filterDailyMetrics(data = {}, range = getReportDateRange()) {
+  return Object.fromEntries(Object.entries(data || {}).filter(([date]) => date >= range.start && date <= range.end));
+}
+
 function aggregateCliquesPorBotao(data = {}) {
   const porCliente = new Map();
   const porTipo = new Map();
@@ -2205,6 +2243,16 @@ function aggregateCidadesAcesso(data = {}) {
 function renderReports() {
   const mount = $("reportsMount");
   if (!mount) return;
+  const periodRange = getReportDateRange();
+  const filteredMetrics = {
+    cliquesBotoes: filterDailyMetrics(state.metricas.cliquesBotoes, periodRange),
+    cliquesMenu: filterDailyMetrics(state.metricas.cliquesMenu, periodRange),
+    acessos: filterDailyMetrics(state.metricas.acessos, periodRange),
+    ondeComerCardapios: filterDailyMetrics(state.metricas.ondeComerCardapios, periodRange),
+    ondeComerWhats: filterDailyMetrics(state.metricas.ondeComerWhats, periodRange),
+    ondeComerFotos: filterDailyMetrics(state.metricas.ondeComerFotos, periodRange),
+    promocoes: filterDailyMetrics(state.metricas.promocoes, periodRange)
+  };
 
   const reportClients = state.clientes.filter(isReportClient);
   const totalClientes = reportClients.length;
@@ -2247,13 +2295,13 @@ function renderReports() {
     .slice(0, 8)
     .map(([title, count]) => ({ title, meta: `${count} cliente${count === 1 ? "" : "s"}` }));
 
-  const cliquesBotoes = aggregateCliquesPorBotao(state.metricas.cliquesBotoes);
-  const cliquesMenu = aggregateSimpleDaily(state.metricas.cliquesMenu);
-  const cliquesOndeComerCardapios = aggregateSimpleDaily(state.metricas.ondeComerCardapios);
-  const cliquesOndeComerWhats = aggregateSimpleDaily(state.metricas.ondeComerWhats);
-  const cliquesOndeComerFotos = aggregateSimpleDaily(state.metricas.ondeComerFotos);
-  const cliquesPromocoes = aggregateSimpleDaily(state.metricas.promocoes);
-  const cidadesAcesso = aggregateCidadesAcesso(state.metricas.acessos);
+  const cliquesBotoes = aggregateCliquesPorBotao(filteredMetrics.cliquesBotoes);
+  const cliquesMenu = aggregateSimpleDaily(filteredMetrics.cliquesMenu);
+  const cliquesOndeComerCardapios = aggregateSimpleDaily(filteredMetrics.ondeComerCardapios);
+  const cliquesOndeComerWhats = aggregateSimpleDaily(filteredMetrics.ondeComerWhats);
+  const cliquesOndeComerFotos = aggregateSimpleDaily(filteredMetrics.ondeComerFotos);
+  const cliquesPromocoes = aggregateSimpleDaily(filteredMetrics.promocoes);
+  const cidadesAcesso = aggregateCidadesAcesso(filteredMetrics.acessos);
 
   const clientesAtencao = reportClients
     .filter((client) => client.status !== "inativo")
@@ -2288,7 +2336,7 @@ function renderReports() {
     .filter((user) => user.role === "cliente" && !user.clienteId)
     .map((user) => ({ title: user.email || user.uid, meta: "Usuario cliente sem cliente vinculado" }));
 
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = dateKeyFromDate(new Date());
   const eventosAtivos = state.eventos.filter((event) => (event.status || "ativo") === "ativo");
   const proximosEventos = eventosAtivos
     .filter((event) => !event.data || event.data >= hoje)
@@ -2297,6 +2345,28 @@ function renderReports() {
     .map((event) => ({ title: event.titulo || event.nome || event.id, meta: `${event.data || "Sem data"} - ${event.local || "Sem local"}` }));
 
   mount.innerHTML = `
+    <section class="panel-card report-period-card">
+      <div class="section-head compact">
+        <div>
+          <h2>Periodo dos relatorios</h2>
+          <p>Filtra acessos, cliques, menu lateral, Onde Comer e Promocoes. Base financeira usa os clientes atuais.</p>
+        </div>
+        <span class="badge ativo">${escapeHtml(periodRange.label)}</span>
+      </div>
+      <div class="report-period-tabs">
+        <button type="button" data-report-period="dia" class="period-day ${state.reportPeriod.type === "dia" ? "active" : ""}"><i class="fa-solid fa-sun"></i> Dia</button>
+        <button type="button" data-report-period="semanal" class="period-week ${state.reportPeriod.type === "semanal" ? "active" : ""}"><i class="fa-solid fa-calendar-week"></i> Semanal</button>
+        <button type="button" data-report-period="mensal" class="period-month ${state.reportPeriod.type === "mensal" ? "active" : ""}"><i class="fa-solid fa-calendar-days"></i> Mensal</button>
+        <button type="button" data-report-period="anual" class="period-year ${state.reportPeriod.type === "anual" ? "active" : ""}"><i class="fa-solid fa-chart-line"></i> Anual</button>
+        <button type="button" data-report-period="personalizado" class="period-custom ${state.reportPeriod.type === "personalizado" ? "active" : ""}"><i class="fa-solid fa-sliders"></i> Personalizado</button>
+      </div>
+      <div class="report-custom-range ${state.reportPeriod.type === "personalizado" ? "" : "hidden"}">
+        <label>Inicio<input id="reportStartDate" type="date" value="${escapeAttr(state.reportPeriod.start || periodRange.start)}"></label>
+        <label>Fim<input id="reportEndDate" type="date" value="${escapeAttr(state.reportPeriod.end || periodRange.end)}"></label>
+        <button id="applyReportRangeButton" type="button" class="ghost-button"><i class="fa-solid fa-check"></i> Aplicar</button>
+      </div>
+    </section>
+
     <div class="stats-grid">
       <article class="stat-card"><span>Clientes ativos</span><strong>${ativos.length}</strong><small>${reportPercent(ativos.length, totalClientes)} da base</small></article>
       <article class="stat-card"><span>Financeiro em aberto</span><strong>${abertos.length}</strong><small>${moneyBR(valorAberto)}</small></article>
@@ -2392,6 +2462,19 @@ function renderReports() {
       </section>
     </div>
   `;
+
+  mount.querySelectorAll("[data-report-period]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.reportPeriod.type = button.dataset.reportPeriod;
+      renderReports();
+    });
+  });
+  mount.querySelector("#applyReportRangeButton")?.addEventListener("click", () => {
+    state.reportPeriod.type = "personalizado";
+    state.reportPeriod.start = $("reportStartDate")?.value || "";
+    state.reportPeriod.end = $("reportEndDate")?.value || state.reportPeriod.start;
+    renderReports();
+  });
 }
 
 function renderPaymentSettings() {

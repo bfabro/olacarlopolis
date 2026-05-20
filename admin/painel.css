@@ -337,6 +337,63 @@ button[type="submit"]:hover,
   gap: 18px;
 }
 
+.report-period-card {
+  gap: 14px;
+}
+
+.report-period-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.report-period-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, .12);
+  opacity: .74;
+}
+
+.report-period-tabs button.active {
+  opacity: 1;
+  transform: translateY(-1px);
+  outline: 3px solid rgba(37, 99, 235, .16);
+}
+
+.period-day {
+  background: #f97316;
+}
+
+.period-week {
+  background: #16a34a;
+}
+
+.period-month {
+  background: #2563eb;
+}
+
+.period-year {
+  background: #7c3aed;
+}
+
+.period-custom {
+  background: #0f766e;
+}
+
+.report-custom-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 220px)) auto;
+  gap: 12px;
+  align-items: end;
+}
+
 .reports-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1058,6 +1115,7 @@ button[type="submit"]:hover,
   .split-layout,
   .stats-grid,
   .reports-grid,
+  .report-custom-range,
   .client-row,
   .finance-row,
   .pix-box {
