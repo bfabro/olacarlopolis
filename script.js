@@ -6652,6 +6652,17 @@ plotarPinsImoveis(stateImoveis.filtered);
     return match ? Number(match[0]) : 0;
   }
 
+  function formatarPrecoAutomoveis(valor) {
+    const numero = numeroAutomoveis(valor);
+    if (!numero) return String(valor || "").trim();
+    return numero.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
   function opcoesAutomoveis(lista, campo) {
     const valores = [...new Set(lista.map((item) => String(item[campo] || "").trim()).filter(Boolean))];
     return valores.sort((a, b) => a.localeCompare(b, "pt-BR")).map((valor) => `<option value="${textoSeguroAutomoveis(valor)}">${textoSeguroAutomoveis(valor)}</option>`).join("");
@@ -6668,7 +6679,15 @@ plotarPinsImoveis(stateImoveis.filtered);
       const contato = String(item.contato || "").replace(/\D/g, "");
       const instagram = String(item.instagram || "").trim();
       const instagramUrl = instagram && instagram.startsWith("http") ? instagram : (instagram ? `https://instagram.com/${instagram.replace(/^@/, "")}` : "");
-      const detalhes = [item.tipo, item.condicao, item.ano, item.km, item.cambio, item.combustivel, item.cor].filter(Boolean);
+      const detalhesTabela = [
+        ["Tipo", item.tipo],
+        ["Condicao", item.condicao],
+        ["Ano", item.ano],
+        ["KM", item.km],
+        ["Cambio", item.cambio],
+        ["Combustivel", item.combustivel],
+        ["Cor", item.cor]
+      ].filter(([, valor]) => valor);
       const vendedor = item.vendedor || item.loja || "";
       const localizacao = [item.cidade].filter(Boolean).join(" - ");
       return `
@@ -6684,18 +6703,20 @@ plotarPinsImoveis(stateImoveis.filtered);
             <div class="auto-card-top">
               <div>
                 <div class="auto-kicker">${textoSeguroAutomoveis(item.tipo || "Automovel")}</div>
-                <h3>${textoSeguroAutomoveis(titulo)}</h3>
+                <h3>
+                  <span>${textoSeguroAutomoveis(titulo)}</span>
+                  ${instagramUrl ? `<a class="auto-instagram-icon" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}" aria-label="Instagram de ${textoSeguroAutomoveis(titulo)}"><i class="fa-brands fa-instagram"></i></a>` : ""}
+                </h3>
               </div>
-              ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(item.preco)}</strong>` : ""}
+              ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(formatarPrecoAutomoveis(item.preco))}</strong>` : ""}
             </div>
             ${vendedor ? `<p class="auto-seller"><i class="fa-solid fa-store"></i><span>Vendedor</span><strong>${textoSeguroAutomoveis(vendedor)}</strong></p>` : ""}
-            ${detalhes.length ? `<div class="auto-tags">${detalhes.slice(0, 7).map((tag) => `<span>${textoSeguroAutomoveis(tag)}</span>`).join("")}</div>` : ""}
+            ${detalhesTabela.length ? `<div class="auto-spec-table">${detalhesTabela.map(([label, valor]) => `<div><span>${textoSeguroAutomoveis(label)}</span><strong>${textoSeguroAutomoveis(valor)}</strong></div>`).join("")}</div>` : ""}
             ${localizacao ? `<p class="auto-location"><i class="fa-solid fa-location-dot"></i> ${textoSeguroAutomoveis(localizacao)}</p>` : ""}
             ${item.opcionais ? `<p class="auto-info-line"><strong>Opcionais:</strong> ${textoSeguroAutomoveis(item.opcionais)}</p>` : ""}
             ${item.descricao ? `<p class="auto-description">${textoSeguroAutomoveis(item.descricao)}</p>` : ""}
             <div class="auto-actions">
               ${contato ? `<a class="zap-link telefone-link" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent("Olá! Vi o automóvel no Olá Carlópolis e gostaria de mais informações.")}"><i class="bx bxl-whatsapp"></i> Tenho interesse</a>` : ""}
-              ${instagramUrl ? `<a class="auto-instagram" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}"><i class="fa-brands fa-instagram"></i> Instagram</a>` : ""}
             </div>
           </div>
         </article>
@@ -6730,9 +6751,13 @@ plotarPinsImoveis(stateImoveis.filtered);
     area.innerHTML = `
       <section class="imoveis-wrap automoveis-page">
         <h2 class="highlighted"><span><i class="fa-solid fa-car"></i> AUTOMOVEIS</span></h2>
-        <aside id="filtrosAutomoveis" class="im-filtros painel-filtros">
+        <aside id="filtrosAutomoveis" class="im-filtros painel-filtros auto-filter-collapsed">
           <div class="topbar">
-            <h4 class="filtro-titulo">Filtrar</h4>
+            <button id="autoToggleFiltros" class="auto-filter-toggle" type="button" aria-expanded="false">
+              <i class="fa-solid fa-sliders"></i>
+              <span>Filtro</span>
+              <i class="fa-solid fa-chevron-down auto-filter-chevron"></i>
+            </button>
             <label class="switch">
               <input type="checkbox" id="autoFiltroDisponiveis" checked>
               <span class="track"><span class="thumb"></span></span>
@@ -6775,6 +6800,13 @@ plotarPinsImoveis(stateImoveis.filtered);
     preencherSelect("autoFiltroCondicao", "condicao");
     preencherSelect("autoFiltroCombustivel", "combustivel");
     preencherSelect("autoFiltroCambio", "cambio");
+
+    const filtroBox = document.getElementById("filtrosAutomoveis");
+    const toggleFiltros = document.getElementById("autoToggleFiltros");
+    toggleFiltros?.addEventListener("click", () => {
+      const expanded = filtroBox?.classList.toggle("auto-filter-collapsed") === false;
+      toggleFiltros.setAttribute("aria-expanded", expanded ? "true" : "false");
+    });
 
     const aplicar = () => {
       const filtros = {
