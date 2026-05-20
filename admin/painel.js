@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 91,
-  label: "v91",
+  numero: 92,
+  label: "v92",
   data: "2026-05-20",
-  nota: "Permite classificar cliente como comercio ou servico."
+  nota: "Adiciona exclusao de usuarios pelo painel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1832,6 +1832,7 @@ function resetUserForm() {
   $("newUserPassword").required = true;
   $("editUserStatus").value = "ativo";
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-user-plus"></i> Criar usuario`;
+  $("deleteUserButton")?.classList.add("hidden");
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
     input.checked = ["dados", "imagens", "cardapio", "promocoes", "faturas"].includes(input.value);
   });
@@ -1850,6 +1851,47 @@ function fillUserForm(user) {
     input.checked = Boolean(user.permissoes?.[input.value]);
   });
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar usuario`;
+  $("deleteUserButton")?.classList.remove("hidden");
+}
+
+async function deletePanelUser() {
+  const uid = $("editUserUid")?.value || "";
+  const user = state.usuarios.find((item) => item.uid === uid);
+  if (!uid || !user) {
+    showToast("Selecione um usuario para excluir.");
+    return;
+  }
+  if (uid === state.user?.uid) {
+    showToast("Nao e possivel excluir o usuario logado.");
+    return;
+  }
+  if (user.role === "master" && !isMaster()) {
+    showToast("Somente master pode excluir outro master.");
+    return;
+  }
+  const email = String(user.email || $("newUserEmail")?.value || "").toLowerCase();
+  const ok = confirm(`Excluir o usuario ${email || uid}? Esta acao remove o acesso do painel.`);
+  if (!ok) return;
+
+  const button = $("deleteUserButton");
+  setBusy(button, true, "Excluindo...");
+  try {
+    const updates = {
+      [`usuariosByUid/${uid}`]: null
+    };
+    if (email) updates[`usuarios/${emailKey(email)}`] = null;
+    await update(ref(db), updates);
+    state.usuarios = state.usuarios.filter((item) => item.uid !== uid);
+    resetUserForm();
+    renderUsersList();
+    renderStats();
+    showToast("Usuario excluido.");
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Nao foi possivel excluir o usuario.");
+  } finally {
+    setBusy(button, false);
+  }
 }
 
 function fillUserClientSelect(selectedId = "") {
@@ -3973,6 +4015,7 @@ function bindEvents() {
   });
   $("newUserButton")?.addEventListener("click", resetUserForm);
   $("userForm").addEventListener("submit", createPanelUser);
+  $("deleteUserButton")?.addEventListener("click", deletePanelUser);
 
   document.querySelectorAll(".nav-admin button").forEach((button) => {
     button.addEventListener("click", () => switchView(button.dataset.view));
