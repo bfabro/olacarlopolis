@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 79,
-  label: "v79",
+  numero: 80,
+  label: "v80",
   data: "2026-05-20",
-  nota: "Gera Pix sob demanda nas faturas e permite comprovante pelo financeiro."
+  nota: "Simplifica faturas do cliente para resumo unico de pagamento."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3418,37 +3418,6 @@ function renderClientInvoices() {
           </div>
         ` : `<div class="list-meta">A chave Pix ainda nao foi configurada pelo admin master.</div>`}
       </article>
-    ${faturas.map((fatura) => `
-      <article class="invoice-card" data-invoice-month="${escapeAttr(fatura.mes)}">
-        <div class="section-head compact">
-          <div>
-            <h3>Fatura ${escapeHtml(monthLabel(fatura.mes))}</h3>
-            <p>${escapeHtml(client.nome || "")}</p>
-          </div>
-          <span class="badge ${escapeAttr(fatura.saved.status || client.pagamentoStatus || "em_aberto")}">${paymentLabel(fatura.saved.status || client.pagamentoStatus || "em_aberto")}</span>
-        </div>
-        <div class="stats-grid">
-          <article class="stat-card"><span>Plano</span><strong>${moneyBR(fatura.valorPlano)}</strong></article>
-          <article class="stat-card"><span>Destaque</span><strong>${moneyBR(fatura.valorDestaque)}</strong></article>
-          <article class="stat-card"><span>Total</span><strong>${moneyBR(fatura.valorTotal)}</strong></article>
-        </div>
-        ${fatura.pixCode ? `
-        <div class="pix-box">
-          <img src="${escapeAttr(fatura.qrUrl)}" alt="QR Code Pix" loading="lazy" decoding="async">
-          <label class="wide">Codigo Pix copia e cola<textarea data-invoice-pix-code rows="5" readonly>${escapeHtml(fatura.pixCode)}</textarea></label>
-          <div class="form-actions">
-            <button data-copy-invoice-pix="${escapeAttr(fatura.mes)}" type="button" class="ghost-button"><i class="fa-solid fa-copy"></i> Copiar codigo Pix</button>
-            <button data-copy-invoice-key type="button" class="ghost-button"><i class="fa-solid fa-key"></i> Copiar chave Pix</button>
-          </div>
-          ${paymentConfig.observacaoFatura ? `<div class="list-meta wide">${escapeHtml(paymentConfig.observacaoFatura)}</div>` : ""}
-        </div>
-      ` : `<div class="list-meta">A chave Pix ainda nao foi configurada pelo admin master.</div>`}
-      <div class="upload-panel">
-        <h3>Comprovante</h3>
-        <input data-invoice-receipt="${escapeAttr(fatura.mes)}" type="file" accept="image/*,application/pdf">
-        ${fatura.saved.comprovanteUrl ? `<a class="ghost-button" href="${escapeAttr(fatura.saved.comprovanteUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-paperclip"></i> Ver comprovante enviado</a>` : `<div class="list-meta">Nenhum comprovante anexado.</div>`}
-      </div>
-    </article>`).join("")}
     </div>
   `;
 
@@ -3509,42 +3478,9 @@ function renderClientInvoices() {
     showToast("Codigo Pix dos meses selecionados copiado.");
   });
 
-  mount.querySelectorAll("[data-copy-invoice-pix]").forEach((button) => button.addEventListener("click", async () => {
-    const card = button.closest("[data-invoice-month]");
-    await navigator.clipboard?.writeText(card?.querySelector("[data-invoice-pix-code]")?.value || "");
-    showToast("Codigo Pix copiado.");
-  }));
   mount.querySelectorAll("[data-copy-invoice-key]").forEach((button) => button.addEventListener("click", async () => {
     await navigator.clipboard?.writeText(paymentConfig.pixChave || "");
     showToast("Chave Pix copiada.");
-  }));
-  mount.querySelectorAll("[data-invoice-receipt]").forEach((input) => input.addEventListener("change", async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const mes = input.dataset.invoiceReceipt;
-    const fatura = faturas.find((item) => item.mes === mes);
-    if (!fatura) return;
-    showToast("Enviando comprovante...");
-    const comprovanteUrl = await uploadInvoiceReceiptForClient(client.id, file);
-    const payload = {
-      [`faturas/${mes}`]: {
-        mes,
-        valorPlano: fatura.valorPlano,
-        valorDestaque: fatura.valorDestaque,
-        valorTotal: fatura.valorTotal,
-        pixChave: paymentConfig.pixChave || "",
-        pixCodigo: fatura.pixCode,
-        comprovanteUrl,
-        status: "em_analise",
-        updatedAt: Date.now()
-      },
-      updatedAt: serverTimestamp(),
-      updatedBy: state.user.uid
-    };
-    await update(ref(db, `clientes/${client.id}`), payload);
-    showToast("Comprovante anexado.");
-    await loadAllData();
-    renderClientInvoices();
   }));
 
   $("selectedInvoiceReceipt")?.addEventListener("change", async (event) => {
