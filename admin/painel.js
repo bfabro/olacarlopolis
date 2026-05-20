@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 93,
-  label: "v93",
+  numero: 94,
+  label: "v94",
   data: "2026-05-20",
-  nota: "Controla exibicao publica do cardapio por cliente."
+  nota: "Aplica permissoes na area do cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3016,109 +3016,126 @@ function renderClientOnlyEditor() {
   const imagens = normalizeImageItems(client.imagens);
   const menuImages = normalizeUrlList(client.menuImages);
   const promocoes = normalizePromocoes(client.promocoes);
+  const canEditDados = hasPermission("dados");
+  const canEditImages = hasPermission("imagens");
+  const canEditCardapio = hasPermission("cardapio");
+  const canEditPromocoes = hasPermission("promocoes");
+  const hasAnyClientEditPermission = canEditDados || canEditImages || canEditCardapio || canEditPromocoes;
 
   mount.innerHTML = `
     <form id="clientOnlyForm" class="grid-form">
-      <section class="wide profile-upload-panel profile-upload-top">
-        <div class="section-head compact">
-          <div>
-            <h3>Foto de perfil</h3>
-            <p>Imagem principal da sua empresa. Ela fica salva no Firebase Storage.</p>
+      ${canEditImages ? `
+        <section class="wide profile-upload-panel profile-upload-top">
+          <div class="section-head compact">
+            <div>
+              <h3>Foto de perfil</h3>
+              <p>Imagem principal da sua empresa. Ela fica salva no Firebase Storage.</p>
+            </div>
           </div>
-        </div>
-        <div class="profile-upload-row">
-          <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
-          <label>Enviar foto de perfil<input id="coProfileUpload" type="file" accept="image/*"></label>
-        </div>
-        <input id="coImage" type="hidden" value="${escapeAttr(client.imagem || "")}">
-      </section>
-      <label>Nome<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
-      <label>Telefone<input id="coContact" value="${escapeAttr(client.contato || "")}"></label>
-      <label>WhatsApp<input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></label>
-      <label>Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
-      <label>Horario<input id="coHours" value="${escapeAttr(client.horario || "")}"></label>
-      <section class="wide schedule-panel">
-        <div class="section-head compact">
-          <div>
-            <h3>Dias e horarios de funcionamento</h3>
-            <p>Marque os dias abertos. Dias desmarcados aparecem como fechado.</p>
+          <div class="profile-upload-row">
+            <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
+            <label>Enviar foto de perfil<input id="coProfileUpload" type="file" accept="image/*"></label>
           </div>
-        </div>
-        <div id="coScheduleEditor" class="schedule-editor"></div>
-      </section>
-      <label>Instagram<input id="coInstagram" value="${escapeAttr(client.instagram || "")}"></label>
-      <label>Facebook<input id="coFacebook" value="${escapeAttr(client.facebook || "")}"></label>
-      <label>TikTok<input id="coTiktok" value="${escapeAttr(client.tiktok || "")}"></label>
-      <label>Site<input id="coSite" value="${escapeAttr(client.site || "")}"></label>
-      <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}" placeholder="Link externo ou PDF enviado"></label>
-      <section class="wide upload-panel">
-        <div class="section-head compact">
-          <div>
-            <h3>Meu cardapio</h3>
-            <p>Envie um PDF para abrir no botao Cardapio, ou imagens para aparecerem em modal.</p>
+          <input id="coImage" type="hidden" value="${escapeAttr(client.imagem || "")}">
+        </section>
+      ` : ""}
+      ${canEditDados ? `
+        <label>Nome<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
+        <label>Telefone<input id="coContact" value="${escapeAttr(client.contato || "")}"></label>
+        <label>WhatsApp<input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></label>
+        <label>Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
+        <label>Horario<input id="coHours" value="${escapeAttr(client.horario || "")}"></label>
+        <section class="wide schedule-panel">
+          <div class="section-head compact">
+            <div>
+              <h3>Dias e horarios de funcionamento</h3>
+              <p>Marque os dias abertos. Dias desmarcados aparecem como fechado.</p>
+            </div>
           </div>
-          <span id="coMenuImagesCount" class="badge">${menuImages.length} imagem${menuImages.length === 1 ? "" : "s"}</span>
-        </div>
-        <input id="coMenuUpload" type="file" accept="image/*,application/pdf" multiple>
-        <div id="coMenuPreview" class="image-grid">
-          ${renderMenuImagesMarkup(menuImages, "comenu")}
-        </div>
-      </section>
-      <section class="wide upload-panel">
-        <div class="section-head compact">
-          <div>
-            <h3>Minhas imagens</h3>
-            <p>Envie ate 10 imagens para sua empresa.</p>
+          <div id="coScheduleEditor" class="schedule-editor"></div>
+        </section>
+        <label>Instagram<input id="coInstagram" value="${escapeAttr(client.instagram || "")}"></label>
+        <label>Facebook<input id="coFacebook" value="${escapeAttr(client.facebook || "")}"></label>
+        <label>TikTok<input id="coTiktok" value="${escapeAttr(client.tiktok || "")}"></label>
+        <label>Site<input id="coSite" value="${escapeAttr(client.site || "")}"></label>
+        <label class="wide">Informacoes adicionais<textarea id="coInfo" rows="4">${escapeHtml(client.infoAdicional || "")}</textarea></label>
+      ` : ""}
+      ${canEditCardapio ? `
+        <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}" placeholder="Link externo ou PDF enviado"></label>
+        <section class="wide upload-panel">
+          <div class="section-head compact">
+            <div>
+              <h3>Meu cardapio</h3>
+              <p>Envie um PDF para abrir no botao Cardapio, ou imagens para aparecerem em modal.</p>
+            </div>
+            <span id="coMenuImagesCount" class="badge">${menuImages.length} imagem${menuImages.length === 1 ? "" : "s"}</span>
           </div>
-          <span id="coImagesCount" class="badge">${imagens.length}/10</span>
-        </div>
-        <input id="coImagesUpload" type="file" accept="image/*" multiple>
-        <div class="manual-image-form">
-          <label>URL da imagem
-            <input id="coImageUrl" placeholder="https://... ou images/...">
-          </label>
-          <label>Texto desta imagem
-            <textarea id="coImageText" rows="3" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
-          </label>
-          <button id="coAddImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem com texto</button>
-        </div>
-        <div id="coImagesPreview" class="image-grid">
-          ${renderImagesMarkup(imagens, "co")}
-        </div>
-      </section>
-      <section class="wide upload-panel">
-        <div class="section-head compact">
-          <div>
-            <h3>Promocoes</h3>
-            <p>Cadastre ofertas que aparecem no menu Promocoes do site publico.</p>
+          <input id="coMenuUpload" type="file" accept="image/*,application/pdf" multiple>
+          <div id="coMenuPreview" class="image-grid">
+            ${renderMenuImagesMarkup(menuImages, "comenu")}
           </div>
-          <span id="coPromosCount" class="badge">${promocoes.length} ativa${promocoes.length === 1 ? "" : "s"}</span>
-        </div>
-        <div class="promo-admin-form">
-          <label>Titulo da promocao<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
-          <label>Preco atual<input id="coPromoPrice" placeholder="Ex.: 49,90"></label>
-          <label>Preco antigo<input id="coPromoOldPrice" placeholder="Opcional"></label>
-          <label>Unidade<input id="coPromoUnit" placeholder="Ex.: A unidade"></label>
-          <label>Volume<input id="coPromoVolume" placeholder="Opcional"></label>
-          <label>Embalagem<input id="coPromoPack" placeholder="Opcional"></label>
-          <label>Validade inicio<input id="coPromoStart" type="date"></label>
-          <label>Validade fim<input id="coPromoEnd" type="date"></label>
-          <label class="wide">Observacao<textarea id="coPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
-          <label>Imagem da promocao<input id="coPromoImageUpload" type="file" accept="image/*"></label>
-          <label>Ou URL da imagem<input id="coPromoImageUrl" placeholder="https://..."></label>
-          <button id="coAddPromoButton" type="button" class="ghost-button wide"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
-        </div>
-        <div id="coPromosPreview" class="promo-admin-list">
-          ${renderPromocoesMarkup(promocoes)}
-        </div>
-      </section>
-      <label class="wide">Informacoes adicionais<textarea id="coInfo" rows="4">${escapeHtml(client.infoAdicional || "")}</textarea></label>
-      <div class="form-actions wide"><button type="submit">Salvar meus dados</button></div>
+        </section>
+      ` : ""}
+      ${canEditImages ? `
+        <section class="wide upload-panel">
+          <div class="section-head compact">
+            <div>
+              <h3>Minhas imagens</h3>
+              <p>Envie ate 10 imagens para sua empresa.</p>
+            </div>
+            <span id="coImagesCount" class="badge">${imagens.length}/10</span>
+          </div>
+          <input id="coImagesUpload" type="file" accept="image/*" multiple>
+          <div class="manual-image-form">
+            <label>URL da imagem
+              <input id="coImageUrl" placeholder="https://... ou images/...">
+            </label>
+            <label>Texto desta imagem
+              <textarea id="coImageText" rows="3" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
+            </label>
+            <button id="coAddImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem com texto</button>
+          </div>
+          <div id="coImagesPreview" class="image-grid">
+            ${renderImagesMarkup(imagens, "co")}
+          </div>
+        </section>
+      ` : ""}
+      ${canEditPromocoes ? `
+        <section class="wide upload-panel">
+          <div class="section-head compact">
+            <div>
+              <h3>Promocoes</h3>
+              <p>Cadastre ofertas que aparecem no menu Promocoes do site publico.</p>
+            </div>
+            <span id="coPromosCount" class="badge">${promocoes.length} ativa${promocoes.length === 1 ? "" : "s"}</span>
+          </div>
+          <div class="promo-admin-form">
+            <label>Titulo da promocao<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
+            <label>Preco atual<input id="coPromoPrice" placeholder="Ex.: 49,90"></label>
+            <label>Preco antigo<input id="coPromoOldPrice" placeholder="Opcional"></label>
+            <label>Unidade<input id="coPromoUnit" placeholder="Ex.: A unidade"></label>
+            <label>Volume<input id="coPromoVolume" placeholder="Opcional"></label>
+            <label>Embalagem<input id="coPromoPack" placeholder="Opcional"></label>
+            <label>Validade inicio<input id="coPromoStart" type="date"></label>
+            <label>Validade fim<input id="coPromoEnd" type="date"></label>
+            <label class="wide">Observacao<textarea id="coPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
+            <label>Imagem da promocao<input id="coPromoImageUpload" type="file" accept="image/*"></label>
+            <label>Ou URL da imagem<input id="coPromoImageUrl" placeholder="https://..."></label>
+            <button id="coAddPromoButton" type="button" class="ghost-button wide"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
+          </div>
+          <div id="coPromosPreview" class="promo-admin-list">
+            ${renderPromocoesMarkup(promocoes)}
+          </div>
+        </section>
+      ` : ""}
+      ${hasAnyClientEditPermission ? `
+        <div class="form-actions wide"><button type="submit">Salvar meus dados</button></div>
+      ` : `<section class="wide panel-card"><p>Nenhuma permissao de edicao foi liberada para este usuario.</p></section>`}
     </form>
   `;
-  renderScheduleEditor("coScheduleEditor", client.horarios || {});
+  if (canEditDados) renderScheduleEditor("coScheduleEditor", client.horarios || {});
 
-  mount.querySelector("#coProfileUpload").addEventListener("change", async (event) => {
+  mount.querySelector("#coProfileUpload")?.addEventListener("change", async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
     showToast("Enviando foto de perfil...");
@@ -3132,7 +3149,7 @@ function renderClientOnlyEditor() {
     renderClientOnlyEditor();
   });
 
-  mount.querySelector("#coImagesUpload").addEventListener("change", async (event) => {
+  mount.querySelector("#coImagesUpload")?.addEventListener("change", async (event) => {
     const remaining = Math.max(0, 10 - imagens.length);
     const selected = Array.from(event.target.files || []).slice(0, remaining);
     if (!selected.length) {
@@ -3153,7 +3170,7 @@ function renderClientOnlyEditor() {
     renderClientOnlyEditor();
   });
 
-  mount.querySelector("#coMenuUpload").addEventListener("change", async (event) => {
+  mount.querySelector("#coMenuUpload")?.addEventListener("change", async (event) => {
     const selected = Array.from(event.target.files || []);
     if (!selected.length) return;
     showToast("Enviando cardapio...");
@@ -3173,7 +3190,7 @@ function renderClientOnlyEditor() {
     renderClientOnlyEditor();
   });
 
-  mount.querySelector("#coAddImageUrlButton").addEventListener("click", async () => {
+  mount.querySelector("#coAddImageUrlButton")?.addEventListener("click", async () => {
     const url = mount.querySelector("#coImageUrl").value.trim();
     const texto = mount.querySelector("#coImageText").value.trim();
     if (!url) {
@@ -3196,7 +3213,7 @@ function renderClientOnlyEditor() {
     renderClientOnlyEditor();
   });
 
-  mount.querySelector("#coAddPromoButton").addEventListener("click", async () => {
+  mount.querySelector("#coAddPromoButton")?.addEventListener("click", async () => {
     const title = $("coPromoTitle").value.trim();
     if (!title) {
       showToast("Informe o titulo da promocao.");
@@ -3240,6 +3257,7 @@ function renderClientOnlyEditor() {
   mount.querySelectorAll("[data-co-main]").forEach((button) => {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.coMain);
+      if (!$("coImage")) return;
       $("coImage").value = imageUrl(imagens[index]);
       renderProfilePreview("coImage", "coProfilePreview");
     });
@@ -3258,7 +3276,7 @@ function renderClientOnlyEditor() {
       imagens.splice(index, 1);
       await update(ref(db, `clientes/${client.id}`), {
         imagens,
-        imagem: imagens.some((item) => imageUrl(item) === $("coImage").value) ? $("coImage").value : imageUrl(imagens[0]),
+        imagem: imagens.some((item) => imageUrl(item) === $("coImage")?.value) ? $("coImage").value : imageUrl(imagens[0]),
         updatedAt: serverTimestamp(),
         updatedBy: state.user.uid
       });
@@ -3304,34 +3322,49 @@ function renderClientOnlyEditor() {
 
   $("clientOnlyForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const horarios = readScheduleEditor("coScheduleEditor");
-    const scheduleBox = $("coScheduleEditor");
-    const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
-    const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("coHours").value.trim();
     const payload = {
-      nome: $("coName").value.trim(),
-      nomeNormalizado: normalizeName($("coName").value.trim()),
-      contato: $("coContact").value.trim(),
-      whatsapp: $("coWhatsapp").value.trim(),
-      endereco: $("coAddress").value.trim(),
-      horario: horarioTexto,
-      ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
-      instagram: $("coInstagram").value.trim(),
-      facebook: $("coFacebook").value.trim(),
-      tiktok: $("coTiktok").value.trim(),
-      site: $("coSite").value.trim(),
-      imagem: $("coImage").value.trim(),
-      imagens,
-      cardapioLink: $("coMenuLink").value.trim(),
-      menuImages,
-      promocoes: normalizePromocoes(promocoes),
-      infoAdicional: $("coInfo").value.trim(),
       origem: "painel",
       editadoNoPainel: true,
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     };
-    payload.aliases = buildClientPublicAliases(client.id, payload, client, false);
+    if (canEditDados) {
+      const horarios = readScheduleEditor("coScheduleEditor");
+      const scheduleBox = $("coScheduleEditor");
+      const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
+      const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("coHours").value.trim();
+      const nome = $("coName").value.trim();
+      Object.assign(payload, {
+        nome,
+        nomeNormalizado: normalizeName(nome),
+        contato: $("coContact").value.trim(),
+        whatsapp: $("coWhatsapp").value.trim(),
+        endereco: $("coAddress").value.trim(),
+        horario: horarioTexto,
+        ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
+        instagram: $("coInstagram").value.trim(),
+        facebook: $("coFacebook").value.trim(),
+        tiktok: $("coTiktok").value.trim(),
+        site: $("coSite").value.trim(),
+        infoAdicional: $("coInfo").value.trim()
+      });
+    }
+    if (canEditImages) {
+      Object.assign(payload, {
+        imagem: $("coImage")?.value.trim() || "",
+        imagens
+      });
+    }
+    if (canEditCardapio) {
+      Object.assign(payload, {
+        cardapioLink: $("coMenuLink")?.value.trim() || "",
+        menuImages
+      });
+    }
+    if (canEditPromocoes) {
+      payload.promocoes = normalizePromocoes(promocoes);
+    }
+    payload.aliases = buildClientPublicAliases(client.id, { ...client, ...payload }, client, false);
     await update(ref(db, `clientes/${client.id}`), payload);
     showToast("Dados salvos.");
     await loadAllData();
