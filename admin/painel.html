@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=81">
+  <link rel="stylesheet" href="painel.css?v=82">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -47,6 +47,7 @@
         <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
         <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
         <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
+        <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
         <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
         <button data-view="relatorios" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorios</button>
         <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
@@ -436,6 +437,63 @@
         </div>
       </section>
 
+      <section id="automoveisView" class="panel-view hidden">
+        <div class="split-layout">
+          <section class="panel-card">
+            <div class="section-head">
+              <div>
+                <h2>Cadastrar ou editar automovel</h2>
+                <p>Anuncios salvos aparecem no menu Automoveis do site publico.</p>
+              </div>
+              <button id="newAutomovelButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo</button>
+            </div>
+            <form id="automovelForm" class="grid-form">
+              <input id="automovelId" type="hidden">
+              <label>Marca<input id="automovelMarca" required placeholder="Ex: Volkswagen"></label>
+              <label>Modelo<input id="automovelModelo" required placeholder="Ex: Gol 1.0"></label>
+              <label>Ano<input id="automovelAno" placeholder="Ex: 2018"></label>
+              <label>Valor<input id="automovelPreco" placeholder="R$"></label>
+              <label>Status
+                <select id="automovelStatus">
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                  <option value="vendido">Vendido</option>
+                </select>
+              </label>
+              <label>Contato/WhatsApp<input id="automovelContato" placeholder="(43) 99999-9999"></label>
+              <label class="wide">Descricao<textarea id="automovelDescricao" rows="4" placeholder="Detalhes do veiculo, estado, opcionais..."></textarea></label>
+              <label class="wide">Imagem principal<input id="automovelImagem" placeholder="URL da imagem principal"></label>
+              <section class="wide upload-panel">
+                <div class="section-head compact">
+                  <div>
+                    <h3>Fotos do automovel</h3>
+                    <p>Envie imagens do veiculo. A primeira sera usada como imagem principal.</p>
+                  </div>
+                  <span id="automovelImagesCount" class="badge">0 imagens</span>
+                </div>
+                <input id="automovelImagesUpload" type="file" accept="image/*" multiple>
+                <div id="automovelImagesPreview" class="image-grid"></div>
+              </section>
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar automovel</button>
+                <button id="deleteAutomovelButton" type="button" class="danger hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card">
+            <div class="section-head">
+              <div>
+                <h2>Automoveis cadastrados</h2>
+                <p>Edite, inative ou remova anuncios.</p>
+              </div>
+            </div>
+            <input id="automovelSearch" class="search-input" placeholder="Buscar automovel...">
+            <div id="automoveisList" class="entity-list"></div>
+          </section>
+        </div>
+      </section>
+
       <section id="usuariosView" class="panel-view hidden">
         <div class="split-layout">
           <section class="panel-card">
@@ -503,6 +561,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=81"></script>
+  <script type="module" src="painel.js?v=82"></script>
 </body>
 </html>

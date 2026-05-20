@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 81,
-  label: "v81",
+  numero: 82,
+  label: "v82",
   data: "2026-05-20",
-  nota: "Corrige geracao do QR Code Pix das faturas."
+  nota: "Adiciona cadastro de automoveis no painel admin."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -51,6 +51,7 @@ let state = {
   clientes: [],
   usuarios: [],
   eventos: [],
+  automoveis: [],
   notasFalecimento: [],
   categorias: [],
   pagamentoSistema: {},
@@ -62,11 +63,13 @@ let state = {
   },
   selectedClientId: null,
   selectedEventId: null,
+  selectedAutomovelId: null,
   selectedDeathNoticeId: null,
   selectedCategoryId: null,
   duplicateCleanupPlan: null,
   clientImages: [],
   clientMenuImages: [],
+  automovelImages: [],
   lastFirebaseClientCount: 0,
   lastVisibleClientCount: 0
 };
@@ -97,6 +100,7 @@ const views = {
   clientes: $("clientesView"),
   categorias: $("categoriasView"),
   eventos: $("eventosView"),
+  automoveis: $("automoveisView"),
   informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
   relatorios: $("relatoriosView"),
@@ -111,6 +115,7 @@ const viewCopy = {
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
   categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
+  automoveis: ["Automoveis", "Cadastre veiculos para venda no site publico."],
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
   relatorios: ["Relatorios", "Indicadores e pontos de atencao do painel."],
@@ -212,6 +217,7 @@ function canAccessView(viewName) {
     return true;
   }
   if (viewName === "faturas") return hasPermission("faturas");
+  if (viewName === "automoveis") return hasPermission("veiculos");
   if (viewName === "informacoes") return canManageInformacoes();
   if (viewName === "minhaEmpresa") return true;
   return false;
@@ -793,6 +799,7 @@ async function loadAllData() {
     clientesSnap,
     usersSnap,
     eventosSnap,
+    automoveisSnap,
     categoriasSnap,
     notasFalecimentoSnap,
     pagamentoSnap,
@@ -807,6 +814,7 @@ async function loadAllData() {
     get(ref(db, "clientes")),
     get(ref(db, "usuariosByUid")),
     get(ref(db, "eventos")),
+    get(ref(db, "conteudosInformativos/automoveis")),
     get(ref(db, "categorias")),
     get(ref(db, "conteudosInformativos/notaFalecimento")),
     get(ref(db, "configuracoes/pagamento")),
@@ -829,6 +837,14 @@ async function loadAllData() {
     });
   }
   state.usuarios.sort((a, b) => String(a.email || "").localeCompare(String(b.email || "")));
+  state.automoveis = [];
+  if (automoveisSnap.exists()) {
+    automoveisSnap.forEach((child) => {
+      state.automoveis.push({ id: child.key, ...child.val() });
+      return false;
+    });
+  }
+  state.automoveis.sort((a, b) => String(a.marca || "").localeCompare(String(b.marca || ""), "pt-BR"));
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
   state.metricas = {
     cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
@@ -888,6 +904,7 @@ async function loadAllData() {
   fillUserClientSelect();
   fillEventClientSelect();
   renderEventsList();
+  renderAutomoveisList();
   renderInfoDeathNoticeList();
   renderFinanceiro();
   renderReports();
@@ -959,6 +976,9 @@ function updateChrome() {
   document.querySelectorAll("[data-permission='faturas']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("faturas") || canManageClients());
   });
+  document.querySelectorAll("[data-permission='veiculos']").forEach((el) => {
+    el.classList.toggle("hidden", !hasPermission("veiculos"));
+  });
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");
   if (masterOption) masterOption.disabled = !isMaster();
@@ -991,6 +1011,7 @@ function switchView(name) {
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "relatorios") renderReports();
+  if (target === "automoveis") renderAutomoveisList();
   if (target === "informacoes" && !canManageInformacoes()) {
     switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
     return;
@@ -1386,6 +1407,16 @@ async function uploadPromoImageForClient(clientId, file) {
   const path = `clientes/${clientId}/promocoes/${Date.now()}-${slugify(file.name || "promocao")}`;
   const fileRef = storageRef(storage, path);
   return uploadFileWithProgress(fileRef, file, "Enviando imagem da promocao", file.name || "promocao");
+}
+
+async function uploadAutomovelImages(id, files) {
+  const urls = [];
+  for (const file of Array.from(files || [])) {
+    const path = `conteudosInformativos/automoveis/${id}/${Date.now()}-${slugify(file.name || "automovel")}`;
+    const fileRef = storageRef(storage, path);
+    urls.push(await uploadFileWithProgress(fileRef, file, "Enviando fotos do automovel", `${file.name || "imagem"} (${urls.length + 1}/${Array.from(files || []).length})`));
+  }
+  return urls;
 }
 
 async function uploadInvoiceReceiptForClient(clientId, file) {
@@ -1994,6 +2025,106 @@ async function uploadEventImage(file) {
   showToast("Enviando imagem do evento...");
   $("eventImage").value = await uploadFileWithProgress(fileRef, file, "Enviando imagem do evento", file.name || "evento");
   showToast("Imagem do evento enviada.");
+}
+
+function resetAutomovelForm() {
+  state.selectedAutomovelId = null;
+  state.automovelImages = [];
+  $("automovelForm")?.reset();
+  if ($("automovelId")) $("automovelId").value = "";
+  if ($("automovelStatus")) $("automovelStatus").value = "ativo";
+  $("deleteAutomovelButton")?.classList.add("hidden");
+  renderAutomovelImagesPreview();
+}
+
+function fillAutomovelForm(item) {
+  state.selectedAutomovelId = item.id;
+  state.automovelImages = Array.isArray(item.imagens) ? item.imagens : (item.imagem ? [item.imagem] : []);
+  $("automovelId").value = item.id || "";
+  $("automovelMarca").value = item.marca || "";
+  $("automovelModelo").value = item.modelo || "";
+  $("automovelAno").value = item.ano || "";
+  $("automovelPreco").value = item.preco || "";
+  $("automovelStatus").value = item.status || "ativo";
+  $("automovelContato").value = item.contato || "";
+  $("automovelDescricao").value = item.descricao || "";
+  $("automovelImagem").value = item.imagem || state.automovelImages[0] || "";
+  $("deleteAutomovelButton")?.classList.remove("hidden");
+  renderAutomovelImagesPreview();
+}
+
+function getAutomovelFormData() {
+  const marca = $("automovelMarca").value.trim();
+  const modelo = $("automovelModelo").value.trim();
+  const id = $("automovelId").value || `${slugify(`${marca}-${modelo}`)}-${Date.now()}`;
+  const imagens = [...state.automovelImages].filter(Boolean);
+  const imagem = $("automovelImagem").value.trim() || imagens[0] || "";
+  return {
+    id,
+    marca,
+    modelo,
+    ano: $("automovelAno").value.trim(),
+    preco: $("automovelPreco").value.trim(),
+    status: $("automovelStatus").value,
+    contato: $("automovelContato").value.trim(),
+    descricao: $("automovelDescricao").value.trim(),
+    imagem,
+    imagens,
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  };
+}
+
+function renderAutomovelImagesPreview() {
+  const box = $("automovelImagesPreview");
+  if (!box) return;
+  $("automovelImagesCount").textContent = `${state.automovelImages.length} imagen${state.automovelImages.length === 1 ? "" : "s"}`;
+  box.innerHTML = state.automovelImages.map((url, index) => `
+    <article>
+      <img src="${escapeAttr(displayImageUrl(url))}" alt="Foto ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
+      <button type="button" data-remove-auto-image="${index}">Remover</button>
+    </article>
+  `).join("") || `<div class="list-meta">Nenhuma foto adicionada.</div>`;
+  box.querySelectorAll("[data-remove-auto-image]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.automovelImages.splice(Number(button.dataset.removeAutoImage), 1);
+      if (!state.automovelImages.includes($("automovelImagem").value)) $("automovelImagem").value = state.automovelImages[0] || "";
+      renderAutomovelImagesPreview();
+    });
+  });
+}
+
+function renderAutomoveisList() {
+  const box = $("automoveisList");
+  if (!box) return;
+  const q = String($("automovelSearch")?.value || "").toLowerCase().trim();
+  const list = state.automoveis.filter((item) => {
+    const hay = `${item.marca || ""} ${item.modelo || ""} ${item.ano || ""} ${item.preco || ""}`.toLowerCase();
+    return !q || hay.includes(q);
+  });
+  if (!list.length) {
+    box.innerHTML = `<div class="list-meta">Nenhum automovel cadastrado.</div>`;
+    return;
+  }
+  box.innerHTML = list.map((item) => {
+    const titulo = [item.marca, item.modelo].filter(Boolean).join(" ") || item.id;
+    return `
+      <article class="list-card event-card">
+        ${item.imagem ? `<img src="${escapeAttr(displayImageUrl(item.imagem))}" alt="${escapeAttr(titulo)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
+        <div class="list-title">${escapeHtml(titulo)}</div>
+        <div class="list-meta">${escapeHtml([item.ano, item.preco].filter(Boolean).join(" - ") || "Sem valor")}</div>
+        <div class="list-meta">${escapeHtml(item.contato || "Sem contato")}</div>
+        <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
+        <button type="button" data-edit-automovel="${escapeAttr(item.id)}">Editar</button>
+      </article>
+    `;
+  }).join("");
+  box.querySelectorAll("[data-edit-automovel]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const item = state.automoveis.find((auto) => auto.id === button.dataset.editAutomovel);
+      if (item) fillAutomovelForm(item);
+    });
+  });
 }
 
 function resetInfoDeathNoticeForm() {
@@ -3603,7 +3734,8 @@ function statusLabel(status) {
   return {
     ativo: "Ativo",
     pendente: "Pendente",
-    inativo: "Inativo"
+    inativo: "Inativo",
+    vendido: "Vendido"
   }[status] || "Pendente";
 }
 
@@ -3703,6 +3835,16 @@ function bindEvents() {
   $("eventSearch").addEventListener("input", renderEventsList);
   $("eventImageUpload").addEventListener("change", async (event) => {
     await uploadEventImage(event.target.files?.[0]);
+    event.target.value = "";
+  });
+  $("newAutomovelButton")?.addEventListener("click", resetAutomovelForm);
+  $("automovelSearch")?.addEventListener("input", renderAutomoveisList);
+  $("automovelImagesUpload")?.addEventListener("change", async (event) => {
+    const id = $("automovelId").value || slugify(`${$("automovelMarca").value}-${$("automovelModelo").value}`) || `automovel-${Date.now()}`;
+    const urls = await uploadAutomovelImages(id, event.target.files);
+    state.automovelImages.push(...urls);
+    if (!$("automovelImagem").value && state.automovelImages[0]) $("automovelImagem").value = state.automovelImages[0];
+    renderAutomovelImagesPreview();
     event.target.value = "";
   });
   $("newInfoDeathNoticeButton")?.addEventListener("click", resetInfoDeathNoticeForm);
@@ -3874,6 +4016,31 @@ function bindEvents() {
     await remove(ref(db, `eventos/${state.selectedEventId}`));
     showToast("Evento excluido.");
     resetEventForm();
+    await loadAllData();
+  });
+
+  $("automovelForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!hasPermission("veiculos")) return;
+    const payload = getAutomovelFormData();
+    const id = payload.id;
+    delete payload.id;
+    if (!state.selectedAutomovelId) payload.createdAt = serverTimestamp();
+    const updates = { [`conteudosInformativos/automoveis/${id}`]: payload };
+    if (state.selectedAutomovelId && state.selectedAutomovelId !== id) {
+      updates[`conteudosInformativos/automoveis/${state.selectedAutomovelId}`] = null;
+    }
+    await update(ref(db), updates);
+    showToast("Automovel salvo.");
+    resetAutomovelForm();
+    await loadAllData();
+  });
+
+  $("deleteAutomovelButton")?.addEventListener("click", async () => {
+    if (!state.selectedAutomovelId || !confirm("Excluir este automovel?")) return;
+    await remove(ref(db, `conteudosInformativos/automoveis/${state.selectedAutomovelId}`));
+    showToast("Automovel excluido.");
+    resetAutomovelForm();
     await loadAllData();
   });
 
