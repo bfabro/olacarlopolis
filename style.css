@@ -7297,8 +7297,8 @@ html {
 
 .auto-card {
   display: grid;
-  grid-template-columns: 170px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 10px;
   align-items: stretch;
   border: 1px solid #dbe5f2;
   border-radius: 14px;
@@ -7319,12 +7319,14 @@ html {
 
 .auto-card-media {
   position: relative;
-  min-height: 132px;
+  min-height: 0;
 }
 
 .auto-card-img {
-  width: 170px;
-  height: 132px;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
   border-radius: 12px;
   border: 1px solid rgba(15, 23, 42, .08);
@@ -7347,7 +7349,7 @@ html {
 
 .auto-ref-code {
   display: block;
-  width: 170px;
+  width: 100%;
   margin-top: 7px;
   border: 1px dashed #cbd5e1;
   border-radius: 9px;
@@ -7408,16 +7410,25 @@ html {
 }
 
 .auto-card .auto-price {
+  position: absolute;
+  right: 10px;
+  bottom: 38px;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 110px;
+  min-width: 118px;
   margin: 0;
-  color: #0f7a3a;
+  color: #fff;
+  background: #078b3e;
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: 999px;
+  padding: 8px 11px;
   font-size: 1.1rem;
   line-height: 1;
   text-align: right;
   white-space: nowrap;
+  box-shadow: 0 8px 18px rgba(7, 139, 62, .34);
 }
 
 .auto-status {
@@ -7613,9 +7624,12 @@ html {
   }
 
   .auto-card .auto-price {
-    justify-content: flex-start;
-    margin-top: 4px;
+    right: 8px;
+    bottom: 38px;
+    justify-content: center;
+    margin-top: 0;
     text-align: left;
+    font-size: 1rem;
   }
 
   .auto-seller {

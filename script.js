@@ -6709,6 +6709,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             ${item.imagem ? `
               <img class="auto-card-img imagem-expandivel" src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">
             ` : `<div class="auto-card-img auto-card-img-empty"><i class="fa-solid fa-car-side"></i></div>`}
+            ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(formatarPrecoAutomoveis(item.preco))}</strong>` : ""}
             <span class="auto-ref-code">Ref. ${textoSeguroAutomoveis(codigoReferencia)}</span>
             ${item.status === "vendido" ? `<span class="auto-status auto-status-media">Vendido</span>` : ""}
           </div>
@@ -6721,7 +6722,6 @@ plotarPinsImoveis(stateImoveis.filtered);
                   ${instagramUrl ? `<a class="auto-instagram-icon" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}" aria-label="Instagram de ${textoSeguroAutomoveis(titulo)}"><i class="fa-brands fa-instagram"></i></a>` : ""}
                 </h3>
               </div>
-              ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(formatarPrecoAutomoveis(item.preco))}</strong>` : ""}
             </div>
             <p class="auto-seller"><i class="fa-solid fa-store"></i><span>Loja/Vendedor</span><strong>${sellerSlug ? `<a class="auto-seller-link" href="#${textoSeguroAutomoveis(sellerSlug)}">${textoSeguroAutomoveis(vendedor || item.clienteNome || "Nao informado")}</a>` : textoSeguroAutomoveis(vendedor || "Nao informado")}</strong></p>
             ${detalhesTabela.length ? `<div class="auto-spec-table">${detalhesTabela.map(([label, valor]) => `<div><span>${textoSeguroAutomoveis(label)}</span><strong>${textoSeguroAutomoveis(valor)}</strong></div>`).join("")}</div>` : ""}
