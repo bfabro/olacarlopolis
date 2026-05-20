@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 76,
-  label: "v76",
+  numero: 77,
+  label: "v77",
   data: "2026-05-20",
-  nota: "Adiciona tabelas de cliques nos relatorios e valores centrais de planos e destaques."
+  nota: "Permite ativar ou desativar cliente na tela de financeiro."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2069,6 +2069,13 @@ function renderFinanceiro() {
           <option value="em_aberto" ${client.pagamentoStatus === "em_aberto" || !client.pagamentoStatus ? "selected" : ""}>Em aberto</option>
           <option value="pago" ${client.pagamentoStatus === "pago" ? "selected" : ""}>Pago</option>
           <option value="isento" ${client.pagamentoStatus === "isento" ? "selected" : ""}>Isento</option>
+        </select>
+      </label>
+      <label>Cliente
+        <select data-finance-field="status">
+          <option value="ativo" ${client.status === "ativo" || !client.status ? "selected" : ""}>Ativo</option>
+          <option value="pendente" ${client.status === "pendente" ? "selected" : ""}>Pendente</option>
+          <option value="inativo" ${client.status === "inativo" ? "selected" : ""}>Inativo</option>
         </select>
       </label>
       <label>Plano
