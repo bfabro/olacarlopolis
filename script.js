@@ -2126,7 +2126,7 @@ document.addEventListener("DOMContentLoaded", function () {
       card.className = "card-divulgacao-pequeno";
 
       const nome = ev.name || "Evento";
-      const data = ev.date || "";
+      const data = dataEventoPublico(ev);
       const endereco = ev.address || "";
 
       card.innerHTML = `
@@ -2174,6 +2174,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       grade.appendChild(card);
     });
+  }
+
+  function dataEventoPublico(evento) {
+    return evento?.date || evento?.data || evento?.dataEvento || evento?.eventDate || "";
   }
 
 
@@ -16139,6 +16143,18 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     ];
 
+  function ocultarColetaDeLixoDoMenuPublico() {
+    const slugColeta = "coletadelixo";
+    for (let index = categories.length - 1; index >= 0; index -= 1) {
+      if (normalizeName(categories[index]?.title || "") === slugColeta) categories.splice(index, 1);
+    }
+    document.querySelectorAll("#menuColetaLixo, a[href='#coletalixo'], a[href='#menucoletralixo']").forEach((el) => {
+      el.style.display = "none";
+      el.setAttribute("aria-hidden", "true");
+    });
+  }
+
+  ocultarColetaDeLixoDoMenuPublico();
   try { window.categories = categories; } catch (e) { }
 
   let ADMIN_CLIENTES_PROMISE = null;
@@ -17387,12 +17403,12 @@ ${establishment.infoVagaTrabalho
         }
 
 
-        ${establishment.date ? `
+        ${dataEventoPublico(establishment) ? `
             <div class="info-box">
               <i class="fas fa-calendar-alt info-icon" style="color: #000000ff;font-size:20px;"></i>
               <div>
                 <div class="info-label">Data</div>
-                <div class="info-value">${establishment.date}</div>
+                <div class="info-value">${dataEventoPublico(establishment)}</div>
               </div>
             </div>` : ""
         }
