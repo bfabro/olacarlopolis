@@ -6632,6 +6632,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       contato: item.Contato || item.contato || item.whatsapp || "",
       vendedor: item.Vendedor || item.vendedor || item.loja || item.nomeLoja || item.lojaNome || item.empresa || item.clienteNome || item.cliente || item.anunciante || item.nomeVendedor || "",
       loja: item.Loja || item.loja || item.nomeLoja || item.lojaNome || item.empresa || item.clienteNome || item.cliente || item.anunciante || item.vendedor || "",
+      clienteId: item.clienteId || item.ClienteId || item.cliente || "",
+      clienteNome: item.clienteNome || item.ClienteNome || "",
+      estabelecimentoId: item.estabelecimentoId || item.estabelecimento || "",
       instagram: item.Instagram || item.instagram || item.linkInstagram || "",
       combustivel: item.Combustivel || item.combustivel || "",
       cambio: item.Cambio || item.cambio || "",
@@ -6687,10 +6690,11 @@ plotarPinsImoveis(stateImoveis.filtered);
         ["KM", item.km],
         ["Cambio", item.cambio],
         ["Combustivel", item.combustivel],
-        ["Cor", item.cor]
+        ["Cor", item.cor],
+        ["Cidade", item.cidade]
       ].filter(([, valor]) => valor);
       const vendedor = item.vendedor || item.loja || "";
-      const localizacao = [item.cidade].filter(Boolean).join(" - ");
+      const sellerSlug = normalizeName(item.estabelecimentoId || item.clienteNome || item.clienteId || vendedor || "");
       const whatsappTexto = [
         "Ola! Vi este automovel no Ola Carlopolis e quero mais informacoes.",
         `Referencia: ${codigoReferencia}`,
@@ -6719,9 +6723,8 @@ plotarPinsImoveis(stateImoveis.filtered);
               </div>
               ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(formatarPrecoAutomoveis(item.preco))}</strong>` : ""}
             </div>
-            <p class="auto-seller"><i class="fa-solid fa-store"></i><span>Loja/Vendedor</span><strong>${textoSeguroAutomoveis(vendedor || "Nao informado")}</strong></p>
+            <p class="auto-seller"><i class="fa-solid fa-store"></i><span>Loja/Vendedor</span><strong>${sellerSlug ? `<a class="auto-seller-link" href="#${textoSeguroAutomoveis(sellerSlug)}">${textoSeguroAutomoveis(vendedor || item.clienteNome || "Nao informado")}</a>` : textoSeguroAutomoveis(vendedor || "Nao informado")}</strong></p>
             ${detalhesTabela.length ? `<div class="auto-spec-table">${detalhesTabela.map(([label, valor]) => `<div><span>${textoSeguroAutomoveis(label)}</span><strong>${textoSeguroAutomoveis(valor)}</strong></div>`).join("")}</div>` : ""}
-            ${localizacao ? `<p class="auto-location"><i class="fa-solid fa-location-dot"></i> ${textoSeguroAutomoveis(localizacao)}</p>` : ""}
             ${item.opcionais ? `<p class="auto-info-line"><span>Opcionais</span><strong>${textoSeguroAutomoveis(item.opcionais)}</strong></p>` : ""}
             ${item.descricao ? `<p class="auto-info-line auto-description"><span>Descricao</span><strong>${textoSeguroAutomoveis(item.descricao)}</strong></p>` : ""}
             <div class="auto-actions">

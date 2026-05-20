@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 97,
-  label: "v97",
+  numero: 98,
+  label: "v98",
   data: "2026-05-20",
-  nota: "Ajusta automoveis para celular e referencia."
+  nota: "Vincula automoveis ao estabelecimento vendedor."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2159,6 +2159,10 @@ function getAutomovelFormData() {
   const id = $("automovelId").value || `${slugify(`${marca}-${modelo}`)}-${Date.now()}`;
   const imagens = [...state.automovelImages].filter(Boolean);
   const imagem = $("automovelImagem").value.trim() || imagens[0] || "";
+  const linkedClient = state.profile?.clienteId
+    ? state.clientes.find((client) => client.id === state.profile.clienteId)
+    : null;
+  const vendedor = $("automovelVendedor").value.trim() || linkedClient?.nome || "";
   return {
     id,
     marca,
@@ -2169,14 +2173,17 @@ function getAutomovelFormData() {
     condicao: $("automovelCondicao").value,
     km: $("automovelKm").value.trim(),
     status: $("automovelStatus").value,
-    contato: $("automovelContato").value.trim(),
-    vendedor: $("automovelVendedor").value.trim(),
-    loja: $("automovelVendedor").value.trim(),
-    instagram: $("automovelInstagram").value.trim(),
+    contato: $("automovelContato").value.trim() || linkedClient?.whatsapp || linkedClient?.contato || "",
+    vendedor,
+    loja: vendedor,
+    clienteId: linkedClient?.id || state.profile?.clienteId || "",
+    clienteNome: linkedClient?.nome || vendedor,
+    estabelecimentoId: linkedClient?.nomeNormalizado || slugify(linkedClient?.nome || vendedor),
+    instagram: $("automovelInstagram").value.trim() || linkedClient?.instagram || "",
     combustivel: $("automovelCombustivel").value.trim(),
     cambio: $("automovelCambio").value.trim(),
     cor: $("automovelCor").value.trim(),
-    cidade: $("automovelCidade").value.trim(),
+    cidade: $("automovelCidade").value.trim() || linkedClient?.cidade || "",
     opcionais: $("automovelOpcionais").value.trim(),
     descricao: $("automovelDescricao").value.trim(),
     imagem,

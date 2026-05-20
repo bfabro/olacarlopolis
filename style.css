@@ -7461,6 +7461,12 @@ html {
   color: #1e293b;
 }
 
+.auto-seller-link {
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .auto-actions {
   display: flex;
   flex-wrap: wrap;
