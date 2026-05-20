@@ -406,6 +406,49 @@ button[type="submit"]:hover,
   align-content: start;
 }
 
+.report-wide {
+  grid-column: 1 / -1;
+}
+
+.report-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.report-click-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.report-click-table th,
+.report-click-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.report-click-table th {
+  background: #f8fafc;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.report-click-table td:not(:first-child):not(:nth-child(2)),
+.report-click-table th:not(:first-child):not(:nth-child(2)) {
+  text-align: right;
+}
+
+.report-click-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 .report-kpis {
   display: flex;
   flex-wrap: wrap;

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=75">
+  <link rel="stylesheet" href="painel.css?v=76">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -383,6 +383,12 @@
             <label>Chave Pix<input id="paymentPixKey" placeholder="CPF, CNPJ, email, telefone ou chave aleatoria"></label>
             <label>Nome do recebedor<input id="paymentPixName" placeholder="Ola Carlopolis"></label>
             <label>Cidade<input id="paymentPixCity" placeholder="CARLOPOLIS"></label>
+            <label>Mensalidade mensal<input id="paymentPlanMonthly" placeholder="R$"></label>
+            <label>Mensalidade semestral<input id="paymentPlanSemiannual" placeholder="R$"></label>
+            <label>Mensalidade anual<input id="paymentPlanAnnual" placeholder="R$"></label>
+            <label>Destaque semanal<input id="paymentFeaturedWeekly" placeholder="R$"></label>
+            <label>Destaque fim de semana<input id="paymentFeaturedWeekend" placeholder="R$"></label>
+            <label>Destaque mensal<input id="paymentFeaturedMonthly" placeholder="R$"></label>
             <label class="wide">Observacao para a fatura<textarea id="paymentInvoiceNote" rows="3" placeholder="Texto opcional que aparece para o cliente"></textarea></label>
             <div class="form-actions wide">
               <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar pagamento</button>
@@ -497,6 +503,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=75"></script>
+  <script type="module" src="painel.js?v=76"></script>
 </body>
 </html>

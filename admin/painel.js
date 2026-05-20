@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 75,
-  label: "v75",
+  numero: 76,
+  label: "v76",
   data: "2026-05-20",
-  nota: "Melhora faturas do cliente com selecao de meses, total unificado e troca de plano."
+  nota: "Adiciona tabelas de cliques nos relatorios e valores centrais de planos e destaques."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1771,22 +1771,31 @@ function fillEventClientSelect() {
 }
 
 function defaultPlanValue(tipoPlano) {
+  const config = state.pagamentoSistema || {};
   const defaults = {
-    mensal: 0,
-    semestral: 0,
-    anual: 0
+    mensal: Number(config.valorPlanoMensal || config.planoMensalValor || 0),
+    semestral: Number(config.valorPlanoSemestral || config.planoSemestralValor || 0),
+    anual: Number(config.valorPlanoAnual || config.planoAnualValor || 0)
   };
   return defaults[tipoPlano || "mensal"] || 0;
 }
 
 function valorFinalPlano(client) {
-  const bruto = Number(client.valorPlano ?? client.valorMensal ?? defaultPlanValue(client.tipoPlano));
+  const valorCliente = Number(client.valorPlano ?? client.valorMensal ?? 0);
+  const bruto = valorCliente > 0 ? valorCliente : defaultPlanValue(client.tipoPlano);
   const desconto = Number(client.descontoValor || 0);
   return Math.max(0, bruto - desconto);
 }
 
+function destaqueValueForClient(client) {
+  const config = state.pagamentoSistema || {};
+  const valorCliente = Number(client?.destaqueValor || 0);
+  if (valorCliente > 0) return valorCliente;
+  return Number(config.valorDestaqueSemanal || config.destaqueSemanalValor || 0);
+}
+
 function valorTotalFaturaCliente(client) {
-  return valorFinalPlano(client) + (client?.destaqueSemanal ? Number(client.destaqueValor || 0) : 0);
+  return valorFinalPlano(client) + (client?.destaqueSemanal ? destaqueValueForClient(client) : 0);
 }
 
 function planLabel(tipoPlano) {
@@ -1821,9 +1830,12 @@ function pendingMonthsForClient(client) {
 
 function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = null) {
   const saved = client.faturas?.[mes] || {};
-  const valorPlano = Number(saved.valorPlano ?? valorFinalPlano(client));
-  const valorDestaque = Number(saved.valorDestaque ?? (client.destaqueSemanal ? Number(client.destaqueValor || 0) : 0));
-  const valorTotal = Number(totalOverride ?? saved.valorTotal ?? (valorPlano + valorDestaque));
+  const savedPlano = Number(saved.valorPlano || 0);
+  const savedDestaque = Number(saved.valorDestaque || 0);
+  const savedTotal = Number(saved.valorTotal || 0);
+  const valorPlano = savedPlano > 0 ? savedPlano : valorFinalPlano(client);
+  const valorDestaque = savedDestaque > 0 ? savedDestaque : (client.destaqueSemanal ? destaqueValueForClient(client) : 0);
+  const valorTotal = Number(totalOverride ?? (savedTotal > 0 ? savedTotal : valorPlano + valorDestaque));
   const txid = `OC${normalizeName(client.nome || client.id).slice(0, 8).toUpperCase()}${String(mes).replace(/\W/g, "").slice(0, 12)}`;
   const pixCode = gerarPixCopiaCola({
     chave: paymentConfig.pixChave,
@@ -2049,7 +2061,7 @@ function renderFinanceiro() {
       <div>
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
-        <div class="list-meta">Plano: ${planLabel(client.tipoPlano)} - Valor final: ${moneyBR(valorTotalFaturaCliente(client))}${client.destaqueSemanal ? ` - destaque ${moneyBR(client.destaqueValor || 0)}` : ""}</div>
+        <div class="list-meta">Plano: ${planLabel(client.tipoPlano)} - Valor final: ${moneyBR(valorTotalFaturaCliente(client))}${client.destaqueSemanal ? ` - destaque ${moneyBR(destaqueValueForClient(client))}` : ""}</div>
         <div class="list-meta">Meses em aberto: ${pendingMonthsForClient(client).map(monthLabel).join(", ") || "Nenhum"}</div>
       </div>
       <label>Status
@@ -2089,7 +2101,7 @@ function renderFinanceiro() {
       const currentClient = state.clientes.find((client) => client.id === id) || {};
       const nextClient = { ...currentClient, ...payload };
       const valorPlanoFatura = valorFinalPlano(nextClient);
-      const valorDestaqueFatura = nextClient.destaqueSemanal ? Number(nextClient.destaqueValor || 0) : 0;
+      const valorDestaqueFatura = nextClient.destaqueSemanal ? destaqueValueForClient(nextClient) : 0;
       const valorTotalFatura = valorPlanoFatura + valorDestaqueFatura;
       payload.mesesEmAberto = mesesEmAberto;
       mesesEmAberto.forEach((mes) => {
@@ -2234,15 +2246,18 @@ function filterDailyMetrics(data = {}, range = getReportDateRange()) {
 function aggregateCliquesPorBotao(data = {}) {
   const porCliente = new Map();
   const porTipo = new Map();
+  const detalhes = new Map();
   Object.values(data || {}).forEach((dia) => {
     Object.entries(dia || {}).forEach(([clienteId, tipos]) => {
       Object.entries(tipos || {}).forEach(([tipo, count]) => {
         incrementMetric(porCliente, clienteId, count);
         incrementMetric(porTipo, tipo, count);
+        if (!detalhes.has(clienteId)) detalhes.set(clienteId, new Map());
+        incrementMetric(detalhes.get(clienteId), tipo, count);
       });
     });
   });
-  return { porCliente, porTipo };
+  return { porCliente, porTipo, detalhes };
 }
 
 function aggregateSimpleDaily(data = {}) {
@@ -2251,6 +2266,101 @@ function aggregateSimpleDaily(data = {}) {
     Object.entries(dia || {}).forEach(([key, count]) => incrementMetric(map, key, count));
   });
   return map;
+}
+
+function clientLabelFromMetricKey(key) {
+  const normalized = normalizeName(key);
+  const client = state.clientes.find((item) => {
+    const candidates = [
+      item.id,
+      item.nome,
+      item.name,
+      normalizeName(item.nome || item.name || ""),
+      clientCanonicalId(item)
+    ].filter(Boolean).map((value) => normalizeName(value));
+    return candidates.includes(normalized);
+  });
+  return client?.nome || client?.name || String(key || "Cliente");
+}
+
+function metricButtonLabel(tipo) {
+  return {
+    telefone: "Telefone",
+    whatsapp: "WhatsApp",
+    grupoWhatsapp: "Grupo WhatsApp",
+    cardapio: "Cardapio",
+    "gerar-card": "Gerar card",
+    fotos: "Fotos",
+    divulgacao: "Divulgacao",
+    instagram_onde_comer: "Instagram"
+  }[tipo] || String(tipo || "Clique").replace(/[_-]/g, " ");
+}
+
+function buildGeneralClickRows(details = new Map()) {
+  const types = new Set();
+  const rows = [...details.entries()].map(([clientId, map]) => {
+    const clicks = {};
+    let total = 0;
+    map.forEach((count, type) => {
+      types.add(type);
+      clicks[type] = count;
+      total += count;
+    });
+    return {
+      id: clientId,
+      nome: clientLabelFromMetricKey(clientId),
+      categoria: state.clientes.find((client) => normalizeName(client.id) === normalizeName(clientId) || normalizeName(client.nome) === normalizeName(clientId))?.categoria || "Estabelecimento/servico",
+      clicks,
+      total
+    };
+  }).filter((row) => row.total > 0).sort((a, b) => b.total - a.total);
+  return { rows, types: [...types].sort((a, b) => metricButtonLabel(a).localeCompare(metricButtonLabel(b), "pt-BR")) };
+}
+
+function buildOndeComerClickRows(cardapios = new Map(), whats = new Map(), fotos = new Map()) {
+  const keys = new Set([...cardapios.keys(), ...whats.keys(), ...fotos.keys()]);
+  return [...keys].map((key) => {
+    const clicks = {
+      cardapio: Number(cardapios.get(key) || 0),
+      whatsapp: Number(whats.get(key) || 0),
+      fotos: Number(fotos.get(key) || 0)
+    };
+    return {
+      id: key,
+      nome: clientLabelFromMetricKey(key),
+      categoria: "Onde Comer",
+      clicks,
+      total: clicks.cardapio + clicks.whatsapp + clicks.fotos
+    };
+  }).filter((row) => row.total > 0).sort((a, b) => b.total - a.total);
+}
+
+function renderClickReportTable(rows, types, emptyMessage) {
+  if (!rows.length) return `<div class="list-meta">${emptyMessage}</div>`;
+  return `
+    <div class="report-table-wrap">
+      <table class="report-click-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Area</th>
+            ${types.map((type) => `<th>${escapeHtml(metricButtonLabel(type))}</th>`).join("")}
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.slice(0, 30).map((row) => `
+            <tr>
+              <td><strong>${escapeHtml(row.nome)}</strong></td>
+              <td>${escapeHtml(row.categoria || "-")}</td>
+              ${types.map((type) => `<td>${Number(row.clicks[type] || 0)}</td>`).join("")}
+              <td><strong>${row.total}</strong></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
 function aggregateCidadesAcesso(data = {}) {
@@ -2326,6 +2436,8 @@ function renderReports() {
   const cliquesOndeComerFotos = aggregateSimpleDaily(filteredMetrics.ondeComerFotos);
   const cliquesPromocoes = aggregateSimpleDaily(filteredMetrics.promocoes);
   const cidadesAcesso = aggregateCidadesAcesso(filteredMetrics.acessos);
+  const generalClickReport = buildGeneralClickRows(cliquesBotoes.detalhes);
+  const ondeComerClickRows = buildOndeComerClickRows(cliquesOndeComerCardapios, cliquesOndeComerWhats, cliquesOndeComerFotos);
 
   const clientesAtencao = reportClients
     .filter((client) => client.status !== "inativo")
@@ -2424,6 +2536,11 @@ function renderReports() {
         ${renderReportList(topFromMap(cliquesBotoes.porCliente, 12), "Ainda nao ha cliques de comercio registrados.")}
       </section>
 
+      <section class="panel-card report-card report-wide">
+        <h2>Cliques por estabelecimento/servico</h2>
+        ${renderClickReportTable(generalClickReport.rows, generalClickReport.types, "Ainda nao ha cliques por estabelecimento ou servico.")}
+      </section>
+
       <section class="panel-card report-card">
         <h2>Cliques por botao</h2>
         ${renderReportList(topFromMap(cliquesBotoes.porTipo, 12), "Ainda nao ha cliques por botao registrados.")}
@@ -2447,6 +2564,11 @@ function renderReports() {
           <span>Fotos: <strong>${[...cliquesOndeComerFotos.values()].reduce((s, v) => s + v, 0)}</strong></span>
         </div>
         ${renderReportList(topFromMap(cliquesOndeComerWhats, 8), "Ainda nao ha cliques no Onde Comer.")}
+      </section>
+
+      <section class="panel-card report-card report-wide">
+        <h2>Cliques por estabelecimento - Onde Comer</h2>
+        ${renderClickReportTable(ondeComerClickRows, ["whatsapp", "cardapio", "fotos"], "Ainda nao ha cliques no Onde Comer.")}
       </section>
 
       <section class="panel-card report-card">
@@ -2507,6 +2629,12 @@ function renderPaymentSettings() {
   $("paymentPixKey").value = config.pixChave || "";
   $("paymentPixName").value = config.pixNome || "Ola Carlopolis";
   $("paymentPixCity").value = config.pixCidade || "CARLOPOLIS";
+  $("paymentPlanMonthly").value = config.valorPlanoMensal ? moneyBR(config.valorPlanoMensal) : "";
+  $("paymentPlanSemiannual").value = config.valorPlanoSemestral ? moneyBR(config.valorPlanoSemestral) : "";
+  $("paymentPlanAnnual").value = config.valorPlanoAnual ? moneyBR(config.valorPlanoAnual) : "";
+  $("paymentFeaturedWeekly").value = config.valorDestaqueSemanal ? moneyBR(config.valorDestaqueSemanal) : "";
+  $("paymentFeaturedWeekend").value = config.valorDestaqueFimSemana ? moneyBR(config.valorDestaqueFimSemana) : "";
+  $("paymentFeaturedMonthly").value = config.valorDestaqueMensal ? moneyBR(config.valorDestaqueMensal) : "";
   $("paymentInvoiceNote").value = config.observacaoFatura || "";
 }
 
@@ -3502,6 +3630,12 @@ function bindEvents() {
       pixChave: $("paymentPixKey").value.trim(),
       pixNome: $("paymentPixName").value.trim(),
       pixCidade: $("paymentPixCity").value.trim(),
+      valorPlanoMensal: numberFromMoney($("paymentPlanMonthly").value),
+      valorPlanoSemestral: numberFromMoney($("paymentPlanSemiannual").value),
+      valorPlanoAnual: numberFromMoney($("paymentPlanAnnual").value),
+      valorDestaqueSemanal: numberFromMoney($("paymentFeaturedWeekly").value),
+      valorDestaqueFimSemana: numberFromMoney($("paymentFeaturedWeekend").value),
+      valorDestaqueMensal: numberFromMoney($("paymentFeaturedMonthly").value),
       observacaoFatura: $("paymentInvoiceNote").value.trim(),
       updatedAt: serverTimestamp(),
       updatedBy: state.user?.uid || ""
@@ -3509,6 +3643,8 @@ function bindEvents() {
     await update(ref(db, "configuracoes/pagamento"), payload);
     state.pagamentoSistema = payload;
     showToast("Dados de pagamento salvos.");
+    renderFinanceiro();
+    renderReports();
     renderClientInvoices();
   });
   $("userForm").addEventListener("submit", createPanelUser);
