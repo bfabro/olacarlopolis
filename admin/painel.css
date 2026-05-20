@@ -576,6 +576,18 @@ button[type="submit"]:hover,
   gap: 16px;
 }
 
+.invoice-list {
+  display: grid;
+  gap: 18px;
+}
+
+.invoice-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  background: #fff;
+}
+
 .pix-box {
   grid-template-columns: 220px minmax(0, 1fr);
   align-items: start;
@@ -854,7 +866,7 @@ button[type="submit"]:hover,
 }
 
 .finance-row {
-  grid-template-columns: minmax(220px, 1fr) 150px 130px 110px 80px minmax(160px, .8fr) auto;
+  grid-template-columns: minmax(220px, 1fr) 140px 125px 105px 80px minmax(150px, .7fr) minmax(180px, .9fr) auto;
   align-items: end;
 }
 

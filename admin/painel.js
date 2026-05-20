@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 72,
-  label: "v72",
+  numero: 73,
+  label: "v73",
   data: "2026-05-20",
-  nota: "Aprimora relatorios com receita por plano, acessos, cidades e cliques por area."
+  nota: "Permite marcar meses em aberto e listar faturas acumuladas por cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1792,6 +1792,35 @@ function planLabel(tipoPlano) {
   }[tipoPlano] || "Mensal";
 }
 
+function currentMonthKey() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function monthLabel(monthKey) {
+  if (!/^\d{4}-\d{2}$/.test(String(monthKey || ""))) return String(monthKey || "");
+  const [year, month] = monthKey.split("-").map(Number);
+  return new Date(year, month - 1, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+}
+
+function pendingMonthsForClient(client) {
+  const months = new Set(Array.isArray(client?.mesesEmAberto) ? client.mesesEmAberto : []);
+  Object.entries(client?.faturas || {}).forEach(([mes, fatura]) => {
+    if (!fatura?.status || ["em_aberto", "em_analise"].includes(fatura.status)) months.add(mes);
+  });
+  if (!months.size && (!client?.pagamentoStatus || client.pagamentoStatus === "em_aberto")) {
+    months.add(currentMonthKey());
+  }
+  return [...months].filter(Boolean).sort();
+}
+
+function splitMonthsInput(value) {
+  return String(value || "")
+    .split(/[,\s;]+/)
+    .map((item) => item.trim())
+    .filter((item) => /^\d{4}-\d{2}$/.test(item));
+}
+
 function resetEventForm() {
   state.selectedEventId = null;
   $("eventForm").reset();
@@ -1992,6 +2021,7 @@ function renderFinanceiro() {
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
         <div class="list-meta">Plano: ${planLabel(client.tipoPlano)} - Valor final: ${moneyBR(valorTotalFaturaCliente(client))}${client.destaqueSemanal ? ` - destaque ${moneyBR(client.destaqueValor || 0)}` : ""}</div>
+        <div class="list-meta">Meses em aberto: ${pendingMonthsForClient(client).map(monthLabel).join(", ") || "Nenhum"}</div>
       </div>
       <label>Status
         <select data-finance-field="pagamentoStatus">
@@ -2011,6 +2041,7 @@ function renderFinanceiro() {
       <label>Desconto<input data-finance-field="descontoValor" value="${escapeAttr(client.descontoValor || "")}" placeholder="R$"></label>
       <label>Venc.<input data-finance-field="vencimentoDia" value="${escapeAttr(client.vencimentoDia || "")}" placeholder="Dia"></label>
       <label class="finance-note">Obs.<input data-finance-field="financeiroObs" value="${escapeAttr(client.financeiroObs || "")}"></label>
+      <label class="finance-months">Meses devendo<input data-finance-months value="${escapeAttr(pendingMonthsForClient(client).join(", "))}" placeholder="2026-05, 2026-06"></label>
       <button type="button" data-save-finance="${escapeAttr(client.id)}">Salvar</button>
     </article>
   `).join("");
@@ -2024,6 +2055,21 @@ function renderFinanceiro() {
         payload[field.dataset.financeField] = ["valorPlano", "descontoValor"].includes(field.dataset.financeField)
           ? numberFromMoney(field.value)
           : field.value.trim();
+      });
+      const mesesEmAberto = splitMonthsInput(row.querySelector("[data-finance-months]")?.value || "");
+      const currentClient = state.clientes.find((client) => client.id === id) || {};
+      const nextClient = { ...currentClient, ...payload };
+      const valorPlanoFatura = valorFinalPlano(nextClient);
+      const valorDestaqueFatura = nextClient.destaqueSemanal ? Number(nextClient.destaqueValor || 0) : 0;
+      const valorTotalFatura = valorPlanoFatura + valorDestaqueFatura;
+      payload.mesesEmAberto = mesesEmAberto;
+      mesesEmAberto.forEach((mes) => {
+        payload[`faturas/${mes}/mes`] = mes;
+        payload[`faturas/${mes}/status`] = "em_aberto";
+        payload[`faturas/${mes}/valorPlano`] = valorPlanoFatura;
+        payload[`faturas/${mes}/valorDestaque`] = valorDestaqueFatura;
+        payload[`faturas/${mes}/valorTotal`] = valorTotalFatura;
+        payload[`faturas/${mes}/updatedAt`] = Date.now();
       });
       if (!isMaster()) delete payload.valorPlano;
       payload.updatedAt = serverTimestamp();
@@ -2935,77 +2981,98 @@ function renderClientInvoices() {
     return;
   }
 
-  const now = new Date();
-  const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const valorPlano = valorFinalPlano(client);
-  const valorDestaque = client.destaqueSemanal ? Number(client.destaqueValor || 0) : 0;
-  const valorTotal = valorPlano + valorDestaque;
   const paymentConfig = state.pagamentoSistema || {};
-  const txid = `OC${normalizeName(client.nome || client.id).slice(0, 10).toUpperCase()}${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const pixCode = gerarPixCopiaCola({
-    chave: paymentConfig.pixChave,
-    nome: paymentConfig.pixNome || "Ola Carlopolis",
-    cidade: paymentConfig.pixCidade || "CARLOPOLIS",
-    valor: valorTotal,
-    txid
+  const meses = pendingMonthsForClient(client);
+  const faturas = meses.map((mes) => {
+    const saved = client.faturas?.[mes] || {};
+    const valorPlano = Number(saved.valorPlano ?? valorFinalPlano(client));
+    const valorDestaque = Number(saved.valorDestaque ?? (client.destaqueSemanal ? Number(client.destaqueValor || 0) : 0));
+    const valorTotal = Number(saved.valorTotal ?? (valorPlano + valorDestaque));
+    const txid = `OC${normalizeName(client.nome || client.id).slice(0, 8).toUpperCase()}${mes.replace("-", "")}`;
+    const pixCode = gerarPixCopiaCola({
+      chave: paymentConfig.pixChave,
+      nome: paymentConfig.pixNome || "Ola Carlopolis",
+      cidade: paymentConfig.pixCidade || "CARLOPOLIS",
+      valor: valorTotal,
+      txid
+    });
+    return {
+      mes,
+      saved,
+      valorPlano,
+      valorDestaque,
+      valorTotal,
+      pixCode,
+      qrUrl: pixCode ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pixCode)}` : ""
+    };
   });
-  const qrUrl = pixCode ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pixCode)}` : "";
-  const fatura = client.faturas?.[mes] || {};
+
+  if (!faturas.length) {
+    mount.innerHTML = `<div class="list-meta">Nenhuma fatura em aberto para este cliente.</div>`;
+    return;
+  }
 
   mount.innerHTML = `
-    <article class="invoice-card">
-      <div class="section-head compact">
-        <div>
-          <h3>Fatura ${escapeHtml(mes)}</h3>
-          <p>${escapeHtml(client.nome || "")}</p>
+    <div class="invoice-list">
+    ${faturas.map((fatura) => `
+      <article class="invoice-card" data-invoice-month="${escapeAttr(fatura.mes)}">
+        <div class="section-head compact">
+          <div>
+            <h3>Fatura ${escapeHtml(monthLabel(fatura.mes))}</h3>
+            <p>${escapeHtml(client.nome || "")}</p>
+          </div>
+          <span class="badge ${escapeAttr(fatura.saved.status || client.pagamentoStatus || "em_aberto")}">${paymentLabel(fatura.saved.status || client.pagamentoStatus || "em_aberto")}</span>
         </div>
-        <span class="badge ${escapeAttr(fatura.status || client.pagamentoStatus || "em_aberto")}">${paymentLabel(fatura.status || client.pagamentoStatus || "em_aberto")}</span>
-      </div>
-      <div class="stats-grid">
-        <article class="stat-card"><span>Plano</span><strong>${moneyBR(valorPlano)}</strong></article>
-        <article class="stat-card"><span>Destaque</span><strong>${moneyBR(valorDestaque)}</strong></article>
-        <article class="stat-card"><span>Total</span><strong>${moneyBR(valorTotal)}</strong></article>
-      </div>
-      ${pixCode ? `
+        <div class="stats-grid">
+          <article class="stat-card"><span>Plano</span><strong>${moneyBR(fatura.valorPlano)}</strong></article>
+          <article class="stat-card"><span>Destaque</span><strong>${moneyBR(fatura.valorDestaque)}</strong></article>
+          <article class="stat-card"><span>Total</span><strong>${moneyBR(fatura.valorTotal)}</strong></article>
+        </div>
+        ${fatura.pixCode ? `
         <div class="pix-box">
-          <img src="${escapeAttr(qrUrl)}" alt="QR Code Pix" loading="lazy" decoding="async">
-          <label class="wide">Codigo Pix copia e cola<textarea id="invoicePixCode" rows="5" readonly>${escapeHtml(pixCode)}</textarea></label>
+          <img src="${escapeAttr(fatura.qrUrl)}" alt="QR Code Pix" loading="lazy" decoding="async">
+          <label class="wide">Codigo Pix copia e cola<textarea data-invoice-pix-code rows="5" readonly>${escapeHtml(fatura.pixCode)}</textarea></label>
           <div class="form-actions">
-            <button id="copyPixButton" type="button" class="ghost-button"><i class="fa-solid fa-copy"></i> Copiar codigo Pix</button>
-            <button id="copyPixKeyButton" type="button" class="ghost-button"><i class="fa-solid fa-key"></i> Copiar chave Pix</button>
+            <button data-copy-invoice-pix="${escapeAttr(fatura.mes)}" type="button" class="ghost-button"><i class="fa-solid fa-copy"></i> Copiar codigo Pix</button>
+            <button data-copy-invoice-key type="button" class="ghost-button"><i class="fa-solid fa-key"></i> Copiar chave Pix</button>
           </div>
           ${paymentConfig.observacaoFatura ? `<div class="list-meta wide">${escapeHtml(paymentConfig.observacaoFatura)}</div>` : ""}
         </div>
       ` : `<div class="list-meta">A chave Pix ainda nao foi configurada pelo admin master.</div>`}
       <div class="upload-panel">
         <h3>Comprovante</h3>
-        <input id="invoiceReceiptUpload" type="file" accept="image/*,application/pdf">
-        ${fatura.comprovanteUrl ? `<a class="ghost-button" href="${escapeAttr(fatura.comprovanteUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-paperclip"></i> Ver comprovante enviado</a>` : `<div class="list-meta">Nenhum comprovante anexado.</div>`}
+        <input data-invoice-receipt="${escapeAttr(fatura.mes)}" type="file" accept="image/*,application/pdf">
+        ${fatura.saved.comprovanteUrl ? `<a class="ghost-button" href="${escapeAttr(fatura.saved.comprovanteUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-paperclip"></i> Ver comprovante enviado</a>` : `<div class="list-meta">Nenhum comprovante anexado.</div>`}
       </div>
-    </article>
+    </article>`).join("")}
+    </div>
   `;
 
-  mount.querySelector("#copyPixButton")?.addEventListener("click", async () => {
-    await navigator.clipboard?.writeText(pixCode);
+  mount.querySelectorAll("[data-copy-invoice-pix]").forEach((button) => button.addEventListener("click", async () => {
+    const card = button.closest("[data-invoice-month]");
+    await navigator.clipboard?.writeText(card?.querySelector("[data-invoice-pix-code]")?.value || "");
     showToast("Codigo Pix copiado.");
-  });
-  mount.querySelector("#copyPixKeyButton")?.addEventListener("click", async () => {
+  }));
+  mount.querySelectorAll("[data-copy-invoice-key]").forEach((button) => button.addEventListener("click", async () => {
     await navigator.clipboard?.writeText(paymentConfig.pixChave || "");
     showToast("Chave Pix copiada.");
-  });
-  mount.querySelector("#invoiceReceiptUpload")?.addEventListener("change", async (event) => {
+  }));
+  mount.querySelectorAll("[data-invoice-receipt]").forEach((input) => input.addEventListener("change", async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    const mes = input.dataset.invoiceReceipt;
+    const fatura = faturas.find((item) => item.mes === mes);
+    if (!fatura) return;
     showToast("Enviando comprovante...");
     const comprovanteUrl = await uploadInvoiceReceiptForClient(client.id, file);
     const payload = {
       [`faturas/${mes}`]: {
         mes,
-        valorPlano,
-        valorDestaque,
-        valorTotal,
+        valorPlano: fatura.valorPlano,
+        valorDestaque: fatura.valorDestaque,
+        valorTotal: fatura.valorTotal,
         pixChave: paymentConfig.pixChave || "",
-        pixCodigo: pixCode,
+        pixCodigo: fatura.pixCode,
         comprovanteUrl,
         status: "em_analise",
         updatedAt: Date.now()
@@ -3017,7 +3084,7 @@ function renderClientInvoices() {
     showToast("Comprovante anexado.");
     await loadAllData();
     renderClientInvoices();
-  });
+  }));
 }
 
 async function createPanelUser(event) {
