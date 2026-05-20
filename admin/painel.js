@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 98,
-  label: "v98",
+  numero: 100,
+  label: "v100",
   data: "2026-05-20",
-  nota: "Vincula automoveis ao estabelecimento vendedor."
+  nota: "Oculta campo tecnico de imagem em automoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2158,7 +2158,7 @@ function getAutomovelFormData() {
   const modelo = $("automovelModelo").value.trim();
   const id = $("automovelId").value || `${slugify(`${marca}-${modelo}`)}-${Date.now()}`;
   const imagens = [...state.automovelImages].filter(Boolean);
-  const imagem = $("automovelImagem").value.trim() || imagens[0] || "";
+  const imagem = $("automovelImagem")?.value.trim() || imagens[0] || "";
   const linkedClient = state.profile?.clienteId
     ? state.clientes.find((client) => client.id === state.profile.clienteId)
     : null;
