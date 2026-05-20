@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 80,
-  label: "v80",
+  numero: 81,
+  label: "v81",
   data: "2026-05-20",
-  nota: "Simplifica faturas do cliente para resumo unico de pagamento."
+  nota: "Corrige geracao do QR Code Pix das faturas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -227,7 +227,21 @@ function textPix(value, maxLength = 25) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^A-Za-z0-9 $%*+\-./:]/g, "")
     .trim()
+    .toUpperCase()
     .slice(0, maxLength);
+}
+
+function normalizePixKey(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const digits = text.replace(/\D/g, "");
+  if (/^\d{11}$/.test(digits) || /^\d{14}$/.test(digits)) return digits;
+  const compact = text.replace(/\s/g, "");
+  if (/^\+?\d{10,15}$/.test(compact)) {
+    const phone = compact.replace(/[^\d+]/g, "");
+    return phone.startsWith("+") ? phone : `+55${digits}`;
+  }
+  return text;
 }
 
 function numberFromMoney(value) {
@@ -253,20 +267,29 @@ function pixCrc16(payload) {
   return crc.toString(16).toUpperCase().padStart(4, "0");
 }
 
+function qrCodeUrl(text, provider = "qrserver") {
+  const encoded = encodeURIComponent(text || "");
+  if (!encoded) return "";
+  if (provider === "quickchart") return `https://quickchart.io/qr?size=220&text=${encoded}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encoded}`;
+}
+
 function gerarPixCopiaCola({ chave, nome, cidade, valor, txid }) {
-  const pixKey = String(chave || "").trim();
+  const pixKey = normalizePixKey(chave);
   if (!pixKey) return "";
   const merchantName = textPix(nome || "OLA CARLOPOLIS", 25) || "OLA CARLOPOLIS";
   const merchantCity = textPix(cidade || "CARLOPOLIS", 15) || "CARLOPOLIS";
-  const amount = Number(valor || 0).toFixed(2);
+  const amountValue = Number(valor || 0);
+  const amount = amountValue.toFixed(2);
   const merchantAccount = pixField("00", "br.gov.bcb.pix") + pixField("01", pixKey);
   const additionalData = pixField("05", textPix(txid || "FATURA", 25) || "FATURA");
   const payloadSemCrc = [
     pixField("00", "01"),
+    pixField("01", "12"),
     pixField("26", merchantAccount),
     pixField("52", "0000"),
     pixField("53", "986"),
-    valor > 0 ? pixField("54", amount) : "",
+    amountValue > 0 ? pixField("54", amount) : "",
     pixField("58", "BR"),
     pixField("59", merchantName),
     pixField("60", merchantCity),
@@ -1877,7 +1900,7 @@ function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = nul
     valorDestaque,
     valorTotal,
     pixCode,
-    qrUrl: pixCode ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pixCode)}` : ""
+    qrUrl: qrCodeUrl(pixCode)
   };
 }
 
@@ -3455,7 +3478,13 @@ function renderClientInvoices() {
       return;
     }
     if (selectedPixCode) selectedPixCode.value = unified.pixCode;
-    if (selectedQr) selectedQr.src = unified.qrUrl;
+    if (selectedQr) {
+      selectedQr.onerror = () => {
+        selectedQr.onerror = null;
+        selectedQr.src = qrCodeUrl(unified.pixCode, "quickchart");
+      };
+      selectedQr.src = unified.qrUrl;
+    }
     selectedPixBox?.classList.remove("hidden");
     showToast("QR Code/Pix gerado.");
   });
