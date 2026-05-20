@@ -16507,20 +16507,37 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function chaveMenuCategoriaAdmin(valor) {
-    const palavras = String(valor || "")
+    const bruto = String(valor || "");
+    const base = bruto
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/ç/g, "c")
       .replace(/[^a-z0-9]+/g, " ")
-      .trim()
+      .trim();
+    const aliases = {
+      acabamentoedecoracao: "acabamento",
+      acabamentoedecoracoes: "acabamento",
+      acabamentodecoracao: "acabamento",
+      acabamentodecoracoes: "acabamento",
+      hotelpousada: "hotelpousada",
+      hotelpousadas: "hotelpousada",
+      hotelepousada: "hotelpousada",
+      hotelepousadas: "hotelpousada",
+      guiasdepesca: "guiadepesca"
+    };
+    const compacto = base.replace(/\s+/g, "");
+    if (aliases[compacto]) return aliases[compacto];
+    const palavras = base
       .split(/\s+/)
       .filter(Boolean)
+      .filter((palavra) => !["e", "de", "da", "do", "das", "dos"].includes(palavra))
       .map((palavra) => {
         if (palavra.length > 3 && palavra.endsWith("s")) return palavra.slice(0, -1);
         return palavra;
       });
-    return palavras.join("");
+    const chave = palavras.join("");
+    return aliases[chave] || chave;
   }
 
   function iconClassCategoriaAdmin(meta) {
