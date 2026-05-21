@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 109,
-  label: "v109",
+  numero: 110,
+  label: "v110",
   data: "2026-05-20",
-  nota: "Preserva estabelecimentos do Setor Publico no site."
+  nota: "Eventos do Firebase aparecem no site e podem ser editados."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -563,11 +563,16 @@ function displayEventDate(value) {
 }
 
 function eventSortDate(evento = {}) {
-  return normalizeEventDate(eventRawDate(evento)) || "";
+  return normalizeEventDate(eventRawDate(evento)) || "9999-12-31";
 }
 
 function eventIdentity(evento = {}) {
   return slugify(evento.titulo || evento.nome || evento.name || evento.id || "");
+}
+
+function eventVisible(evento = {}) {
+  const status = String(evento.status || "ativo").toLowerCase();
+  return !["excluido", "excluida", "removido", "removida"].includes(status);
 }
 
 function normalizeScriptEvent(est, index = 0) {
@@ -936,7 +941,7 @@ async function loadAllData() {
     state.eventos.push(evento);
     eventKeys.add(key);
   });
-  state.eventos.sort((a, b) => eventSortDate(b).localeCompare(eventSortDate(a)));
+  state.eventos.sort((a, b) => eventSortDate(a).localeCompare(eventSortDate(b)));
 
   state.categorias = [];
   if (categoriasSnap.exists()) {
@@ -1027,7 +1032,7 @@ function renderStats() {
   $("statUsuarios").textContent = String(state.usuarios.length);
   $("statAtivos").textContent = String(state.clientes.filter((c) => c.status === "ativo").length);
   $("statPendentes").textContent = String(state.clientes.filter((c) => c.status === "pendente").length);
-  $("statEventos").textContent = String(state.eventos.length);
+  $("statEventos").textContent = String(state.eventos.filter(eventVisible).length);
 }
 
 function updateChrome() {
@@ -2150,7 +2155,7 @@ function renderEventsList() {
   if (!box) return;
 
   const q = String($("eventSearch")?.value || "").toLowerCase().trim();
-  const list = state.eventos.filter((evento) => {
+  const list = state.eventos.filter(eventVisible).filter((evento) => {
     const hay = `${evento.titulo || ""} ${evento.clienteNome || ""} ${evento.local || ""} ${displayEventDate(eventRawDate(evento))}`.toLowerCase();
     return !q || hay.includes(q);
   });
@@ -4279,7 +4284,11 @@ function bindEvents() {
 
   $("deleteEventButton").addEventListener("click", async () => {
     if (!state.selectedEventId || !confirm("Excluir este evento?")) return;
-    await remove(ref(db, `eventos/${state.selectedEventId}`));
+    await update(ref(db, `eventos/${state.selectedEventId}`), {
+      status: "excluido",
+      deletedAt: serverTimestamp(),
+      deletedBy: state.user?.uid || ""
+    });
     showToast("Evento excluido.");
     resetEventForm();
     await loadAllData();

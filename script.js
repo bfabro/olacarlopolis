@@ -2116,7 +2116,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Só pega os eventos "reais" (com imagem, nome e instagram)
     const listaEventos = eventosCat.establishments.filter(
-      (ev) => ev && ev.image && ev.name
+      (ev) => ev && ev.name && eventoPublicoAtivo(ev)
     ).sort((a, b) => dataEventoPublicoValor(a) - dataEventoPublicoValor(b));
 
     grade.innerHTML = "";
@@ -2131,7 +2131,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       card.innerHTML = `
       <div class="card-divulgacao-img-wrap">
-        <img src="${ev.image}" alt="${nome}" loading="lazy">
+        ${ev.image
+          ? `<img src="${ev.image}" alt="${nome}" loading="lazy">`
+          : `<div class="card-divulgacao-img-placeholder"><i class="fa-solid fa-calendar-days"></i></div>`
+        }
       </div>
       <div class="card-divulgacao-info">
         <span class="card-divulgacao-categoria">Evento</span>
@@ -2178,6 +2181,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function dataEventoPublico(evento) {
     return evento?.date || evento?.data || evento?.dataEvento || evento?.eventDate || "";
+  }
+
+  function eventoPublicoIdentidade(evento) {
+    return normalizeName(evento?.name || evento?.nome || evento?.titulo || evento?.id || "");
+  }
+
+  function eventoPublicoAtivo(evento) {
+    const status = String(evento?.status || "ativo").toLowerCase();
+    return status === "ativo";
+  }
+
+  function normalizarEventoFirebasePublico(evento, id) {
+    const data = dataEventoPublico(evento);
+    return {
+      id,
+      image: evento.imagem || evento.image || "",
+      name: evento.titulo || evento.nome || evento.name || "Evento",
+      date: data,
+      address: evento.local || evento.address || "",
+      instagram: evento.instagram || "",
+      infoAdicional: evento.descricao || evento.infoAdicional || evento.description || "",
+      status: evento.status || "ativo",
+      origem: "firebase"
+    };
   }
 
   function dataEventoPublicoValor(evento) {
@@ -16617,6 +16644,43 @@ plotarPinsImoveis(stateImoveis.filtered);
     return categoriasSetorPublicoAdmin.has(slug) || grupo === "setorpublico" || grupo === "publico";
   }
 
+  function categoriaAdminPreservaEstabelecimentosFixos(metaOuTitulo) {
+    const meta = typeof metaOuTitulo === "object" && metaOuTitulo ? metaOuTitulo : {};
+    const titulo = typeof metaOuTitulo === "string"
+      ? metaOuTitulo
+      : (meta.nome || meta.title || meta.id || meta.categoria || "");
+    const slug = normalizeName(titulo);
+    return categoriaAdminEhSetorPublico(metaOuTitulo) || slug === "eventosemcarlopolis";
+  }
+
+  function aplicarEventosFirebasePublicos(eventosAdmin = {}) {
+    const categoria = categories.find((cat) => normalizeName(cat.title || "") === "eventosemcarlopolis");
+    if (!categoria) return;
+
+    const eventosFirebase = Object.entries(eventosAdmin || {})
+      .map(([id, evento]) => normalizarEventoFirebasePublico(evento || {}, id))
+      .filter((evento) => evento.name);
+    const removidos = new Set(eventosFirebase.filter((evento) => !eventoPublicoAtivo(evento)).map(eventoPublicoIdentidade));
+    const porIdentidade = new Map();
+
+    (categoria.establishments || []).forEach((evento) => {
+      const id = eventoPublicoIdentidade(evento);
+      if (!id || removidos.has(id)) return;
+      porIdentidade.set(id, evento);
+    });
+
+    eventosFirebase.filter(eventoPublicoAtivo).forEach((evento) => {
+      const id = eventoPublicoIdentidade(evento);
+      if (!id) return;
+      porIdentidade.set(id, evento);
+      statusEstabelecimentos[id] = "s";
+    });
+
+    categoria.establishments = [...porIdentidade.values()]
+      .filter((evento) => evento.image && evento.name)
+      .sort((a, b) => dataEventoPublicoValor(a) - dataEventoPublicoValor(b));
+  }
+
   function chaveMenuCategoriaAdmin(valor) {
     const bruto = String(valor || "");
     const base = bruto
@@ -16908,14 +16972,16 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!dbAdmin) return;
 
       try {
-        const [clientesSnap, categoriasSnap, notasFalecimentoSnap] = await Promise.all([
+        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap] = await Promise.all([
           dbAdmin.ref("clientes").once("value"),
           dbAdmin.ref("categorias").once("value"),
-          dbAdmin.ref("conteudosInformativos/notaFalecimento").once("value")
+          dbAdmin.ref("conteudosInformativos/notaFalecimento").once("value"),
+          dbAdmin.ref("eventos").once("value")
         ]);
         const clientes = clientesSnap.val() || {};
         const categoriasAdmin = categoriasSnap.val() || {};
         const notasFalecimentoAdmin = notasFalecimentoSnap.val() || {};
+        const eventosAdmin = eventosSnap.val() || {};
         const clientesConsolidados = consolidarClientesAdmin(clientes);
         aplicarCategoriasAdminNoMenu(categoriasAdmin);
 
@@ -16924,7 +16990,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             .filter((cat) => cat?.link?.id)
             .map((cat) => ({
               ...cat,
-              establishments: categoriaAdminEhSetorPublico(cat.title || "")
+              establishments: categoriaAdminPreservaEstabelecimentosFixos(cat.title || "")
                 ? (cat.establishments || [])
                 : [],
               metaAdmin: {
@@ -16962,6 +17028,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             categoria.establishments.push(montarEstabelecimentoDoClienteAdmin(cliente, clienteId));
             definirStatusClienteAdmin(cliente, clienteId);
           });
+          aplicarEventosFirebasePublicos(eventosAdmin);
           aplicarNotasFalecimentoAdmin(notasFalecimentoAdmin);
 
           try { window.categories = categories; } catch (e) { }
@@ -17010,6 +17077,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             definirStatusClienteAdmin(cliente, clienteId);
           }
         });
+        aplicarEventosFirebasePublicos(eventosAdmin);
         aplicarNotasFalecimentoAdmin(notasFalecimentoAdmin);
 
         try { window.categories = categories; } catch (e) { }
