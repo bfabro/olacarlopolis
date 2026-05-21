@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 125,
-  label: "v125",
+  numero: 126,
+  label: "v126",
   data: "2026-05-20",
-  nota: "Reduz miniaturas das fotos no cadastro de Imoveis."
+  nota: "Reduz miniaturas das fotos no cadastro de Automoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
