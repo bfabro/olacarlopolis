@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 121,
-  label: "v121",
+  numero: 122,
+  label: "v122",
   data: "2026-05-20",
-  nota: "Mostra usuario logado e melhora separacao das secoes do painel."
+  nota: "Reforca subtitulos e separacao visual das areas de ajuste."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3271,6 +3271,13 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditDados ? `
+        <div class="form-section-title wide">
+          <i class="fa-solid fa-id-card"></i>
+          <div>
+            <strong>Dados da empresa</strong>
+            <span>Nome, contatos, endereco e canais publicos.</span>
+          </div>
+        </div>
         <label>Nome<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
         <label>Telefone<input id="coContact" value="${escapeAttr(client.contato || "")}"></label>
         <label>WhatsApp<input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></label>
@@ -3289,9 +3296,23 @@ function renderClientOnlyEditor() {
         <label>Facebook<input id="coFacebook" value="${escapeAttr(client.facebook || "")}"></label>
         <label>TikTok<input id="coTiktok" value="${escapeAttr(client.tiktok || "")}"></label>
         <label>Site<input id="coSite" value="${escapeAttr(client.site || "")}"></label>
+        <div class="form-section-title wide">
+          <i class="fa-solid fa-note-sticky"></i>
+          <div>
+            <strong>Informacoes complementares</strong>
+            <span>Texto extra exibido junto aos dados da empresa.</span>
+          </div>
+        </div>
         <label class="wide">Informacoes adicionais<textarea id="coInfo" rows="4">${escapeHtml(client.infoAdicional || "")}</textarea></label>
       ` : ""}
       ${canEditCardapio ? `
+        <div class="form-section-title wide">
+          <i class="fa-solid fa-utensils"></i>
+          <div>
+            <strong>Cardapio</strong>
+            <span>PDF, link ou imagens do cardapio do estabelecimento.</span>
+          </div>
+        </div>
         <section class="wide upload-panel">
           <div class="section-head compact">
             <div>
@@ -3310,6 +3331,13 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditImages ? `
+        <div class="form-section-title wide">
+          <i class="fa-solid fa-images"></i>
+          <div>
+            <strong>Galeria de imagens</strong>
+            <span>Fotos e textos usados na apresentacao da empresa.</span>
+          </div>
+        </div>
         <section class="wide upload-panel">
           <div class="section-head compact">
             <div>
@@ -3334,6 +3362,13 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditPromocoes ? `
+        <div class="form-section-title wide">
+          <i class="fa-solid fa-tags"></i>
+          <div>
+            <strong>Promocoes</strong>
+            <span>Ofertas que aparecem no menu Promocoes do site publico.</span>
+          </div>
+        </div>
         <section class="wide upload-panel">
           <div class="section-head compact">
             <div>

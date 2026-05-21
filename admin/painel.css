@@ -132,6 +132,47 @@ label {
   color: #344054;
 }
 
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 -2px;
+  padding: 12px 14px;
+  border: 1px solid #cfe0f4;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eff6ff 0%, #ffffff 72%);
+  box-shadow: inset 4px 0 0 var(--brand);
+}
+
+.form-section-title i {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #dbeafe;
+  color: var(--brand-strong);
+  flex: 0 0 auto;
+}
+
+.form-section-title strong,
+.form-section-title span {
+  display: block;
+}
+
+.form-section-title strong {
+  color: #0f172a;
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.form-section-title span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 3px;
+}
+
 input,
 select,
 textarea {
@@ -739,6 +780,18 @@ button[type="submit"]:hover,
   padding-bottom: 10px;
   margin-bottom: 12px;
   border-bottom: 1px solid #e5edf7;
+}
+
+.section-head.compact h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 17px;
+  letter-spacing: .01em;
+}
+
+.section-head.compact p {
+  margin: 4px 0 0;
+  color: var(--muted);
 }
 
 .check-row {

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=121">
+  <link rel="stylesheet" href="painel.css?v=122">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -133,6 +133,13 @@
                 </div>
                 <input id="clientImage" type="hidden">
               </section>
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-id-card"></i>
+                <div>
+                  <strong>Dados principais</strong>
+                  <span>Identificacao, categoria, status e plano do cliente.</span>
+                </div>
+              </div>
               <label>Nome do cliente/comercio<input id="clientName" required></label>
               <label>Categoria
                 <select id="clientCategory"></select>
@@ -160,6 +167,13 @@
                   <option value="isento">Isento</option>
                 </select>
               </label>
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-phone"></i>
+                <div>
+                  <strong>Contato e localizacao</strong>
+                  <span>Telefones, endereco e informacoes publicas de atendimento.</span>
+                </div>
+              </div>
               <label>Telefone principal<input id="clientContact"></label>
               <label>WhatsApp<input id="clientWhatsapp"></label>
               <label>Endereco<input id="clientAddress"></label>
@@ -173,6 +187,13 @@
                 </div>
                 <div id="clientScheduleEditor" class="schedule-editor"></div>
               </section>
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-share-nodes"></i>
+                <div>
+                  <strong>Redes e presenca online</strong>
+                  <span>Links sociais e site oficial do cliente.</span>
+                </div>
+              </div>
               <label>Instagram<input id="clientInstagram"></label>
               <label>Facebook<input id="clientFacebook"></label>
               <label>TikTok<input id="clientTiktok" placeholder="https://www.tiktok.com/@usuario"></label>
@@ -222,6 +243,13 @@
                 </div>
                 <div id="clientImagesPreview" class="image-grid"></div>
               </section>
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-note-sticky"></i>
+                <div>
+                  <strong>Informacoes complementares</strong>
+                  <span>Textos extras e observacoes internas do painel.</span>
+                </div>
+              </div>
               <label class="wide">Informacoes adicionais<textarea id="clientInfo" rows="4"></textarea></label>
               <label class="wide">Observacao interna<textarea id="clientAdminNote" rows="3"></textarea></label>
               <div class="form-actions wide">
@@ -639,6 +667,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=121"></script>
+  <script type="module" src="painel.js?v=122"></script>
 </body>
 </html>
