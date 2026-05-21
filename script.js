@@ -6662,9 +6662,10 @@ plotarPinsImoveis(stateImoveis.filtered);
   const elMenuImoveis = document.getElementById("menuImoveis");
   if (elMenuImoveis) {
     elMenuImoveis.addEventListener("click", function (event) {
+      event.preventDefault();
       event.__menuClickTracked = true;
       registrarCliqueMenuLateral("Imoveis");
-      mostrarImoveisV2(event);
+      mostrarImoveisV2();
     });
   }
 
@@ -19169,7 +19170,12 @@ function registrarCliqueMenuLateral(labelMenu) {
   const hoje = getHojeBR();
   const idMenu = normalizeName(labelMenu || "menu");
   if (!idMenu) return;
-  firebase.database().ref(`cliquesMenuLateral/${hoje}/${idMenu}`).transaction(valorAtual => (valorAtual || 0) + 1);
+  try {
+    if (!window.firebase || !firebase.database) return;
+    firebase.database().ref(`cliquesMenuLateral/${hoje}/${idMenu}`).transaction(valorAtual => (valorAtual || 0) + 1);
+  } catch (error) {
+    console.warn("Nao foi possivel registrar clique no menu lateral.", error);
+  }
 }
 
 document.addEventListener("click", (event) => {
