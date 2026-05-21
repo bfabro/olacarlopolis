@@ -19194,7 +19194,11 @@ function registrarCliqueNaPromocao(nomeComercio) {
 
 function registrarCliqueMenuLateral(labelMenu) {
   const hoje = getHojeBR();
-  const idMenu = normalizeName(labelMenu || "menu");
+  const idMenu = String(labelMenu || "menu")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
   if (!idMenu) return;
   try {
     if (!window.firebase || !firebase.database) return;
