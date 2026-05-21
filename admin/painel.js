@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 128,
-  label: "v128",
+  numero: 129,
+  label: "v129",
   data: "2026-05-20",
-  nota: "Abre formularios de cadastro somente ao clicar em Novo ou Editar."
+  nota: "Corrige cadastro e exibicao de promocoes dos clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -71,6 +71,7 @@ let state = {
   duplicateCleanupPlan: null,
   clientImages: [],
   clientMenuImages: [],
+  clientPromocoes: [],
   imovelImages: [],
   automovelImages: [],
   lastFirebaseClientCount: 0,
@@ -1390,6 +1391,7 @@ function resetClientForm() {
   state.selectedClientId = null;
   state.clientImages = [];
   state.clientMenuImages = [];
+  state.clientPromocoes = [];
   $("clientForm").reset();
   delete $("clientForm").dataset.originalCategory;
   delete $("clientForm").dataset.originalClientId;
@@ -1403,6 +1405,7 @@ function resetClientForm() {
   renderScheduleEditor("clientScheduleEditor", emptySchedule());
   renderClientImagesPreview();
   renderClientMenuPreview();
+  renderClientPromocoesPreview();
   setClientFocusMode(false);
 }
 
@@ -1443,6 +1446,7 @@ function getClientFormData() {
     cardapioAtivo: Boolean($("clientMenuEnabled")?.checked),
     cardapioLink: $("clientMenuLink").value.trim(),
     menuImages: normalizeUrlList(state.clientMenuImages),
+    promocoes: normalizePromocoes(state.clientPromocoes),
     infoAdicional: $("clientInfo").value.trim(),
     observacaoAdmin: $("clientAdminNote").value.trim(),
     origem: "painel",
@@ -1481,11 +1485,13 @@ function fillClientForm(client) {
   if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = Boolean(client.cardapioAtivo || client.menuAtivo || client.exibirCardapio);
   $("clientMenuLink").value = client.cardapioLink || "";
   state.clientMenuImages = normalizeUrlList(client.menuImages);
+  state.clientPromocoes = normalizePromocoes(client.promocoes);
   $("clientInfo").value = client.infoAdicional || "";
   $("clientAdminNote").value = client.observacaoAdmin || "";
   $("deleteClientButton").classList.remove("hidden");
   renderClientImagesPreview();
   renderClientMenuPreview();
+  renderClientPromocoesPreview();
   setClientFocusMode(true);
 }
 
@@ -1585,6 +1591,68 @@ function renderClientMenuPreview() {
       showToast("Imagem do cardapio removida. Clique em salvar cliente para gravar.");
     });
   });
+}
+
+function clearClientPromoFields() {
+  ["clientPromoTitle", "clientPromoPrice", "clientPromoOldPrice", "clientPromoUnit", "clientPromoVolume", "clientPromoPack", "clientPromoStart", "clientPromoEnd", "clientPromoObs", "clientPromoImageUrl"].forEach((id) => {
+    if ($(id)) $(id).value = "";
+  });
+  if ($("clientPromoImageUpload")) $("clientPromoImageUpload").value = "";
+  document.querySelectorAll("input[name='clientPromoWeekday']").forEach((input) => { input.checked = false; });
+}
+
+function renderClientPromocoesPreview() {
+  const box = $("clientPromosPreview");
+  const count = $("clientPromosCount");
+  const weekBox = $("clientPromoWeekdays");
+  if (weekBox && !weekBox.dataset.rendered) {
+    weekBox.innerHTML = PROMO_WEEK_DAYS.map((day) => `<label><input type="checkbox" name="clientPromoWeekday" value="${day.value}"> ${day.label}</label>`).join("");
+    weekBox.dataset.rendered = "true";
+  }
+  if (!box || !count) return;
+  state.clientPromocoes = normalizePromocoes(state.clientPromocoes);
+  count.textContent = `${state.clientPromocoes.length} ativa${state.clientPromocoes.length === 1 ? "" : "s"}`;
+  box.innerHTML = renderPromocoesMarkup(state.clientPromocoes, "client-promo-remove");
+  box.querySelectorAll("[data-client-promo-remove]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.clientPromocoes.splice(Number(button.dataset.clientPromoRemove), 1);
+      renderClientPromocoesPreview();
+      showToast("Promocao removida. Clique em salvar cliente para gravar.");
+    });
+  });
+}
+
+async function addClientPromocao() {
+  const title = $("clientPromoTitle")?.value.trim();
+  if (!title) {
+    showToast("Informe o titulo da promocao.");
+    return;
+  }
+  const currentId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
+  let image = $("clientPromoImageUrl")?.value.trim() || "";
+  const file = $("clientPromoImageUpload")?.files?.[0];
+  if (file) {
+    showToast("Enviando imagem da promocao...");
+    image = await uploadPromoImageForClient(currentId, file);
+  }
+  state.clientPromocoes.unshift({
+    id: `promo-${Date.now()}`,
+    titulo: title,
+    preco: $("clientPromoPrice")?.value.trim() || "",
+    precoAntigo: $("clientPromoOldPrice")?.value.trim() || "",
+    unidade: $("clientPromoUnit")?.value.trim() || "",
+    volume: $("clientPromoVolume")?.value.trim() || "",
+    embalagem: $("clientPromoPack")?.value.trim() || "",
+    validadeInicio: $("clientPromoStart")?.value || "",
+    validadeFim: $("clientPromoEnd")?.value || "",
+    diasSemana: Array.from(document.querySelectorAll("input[name='clientPromoWeekday']:checked")).map((input) => Number(input.value)),
+    obs: $("clientPromoObs")?.value.trim() || "",
+    imagem: image,
+    ativo: true
+  });
+  clearClientPromoFields();
+  renderClientPromocoesPreview();
+  showToast("Promocao adicionada. Clique em salvar cliente para gravar.");
 }
 
 async function uploadClientImages(files) {
@@ -3998,7 +4066,7 @@ function renderMenuImagesMarkup(images, prefix) {
   `).join("");
 }
 
-function renderPromocoesMarkup(promocoes) {
+function renderPromocoesMarkup(promocoes, removeAttr = "promo-remove") {
   const list = normalizePromocoes(promocoes);
   if (!list.length) return `<div class="list-meta">Nenhuma promocao cadastrada ainda.</div>`;
   return list.map((promo, index) => `
@@ -4010,7 +4078,7 @@ function renderPromocoesMarkup(promocoes) {
         <small>Disponivel: ${escapeHtml(promoWeekDaysLabel(promo.diasSemana))}</small>
         ${promo.obs ? `<small>${escapeHtml(promo.obs)}</small>` : ""}
       </div>
-      <button type="button" data-promo-remove="${index}" class="danger-mini">Remover</button>
+      <button type="button" data-${removeAttr}="${index}" class="danger-mini">Remover</button>
     </article>
   `).join("");
 }
@@ -4616,6 +4684,7 @@ function bindEvents() {
     event.target.value = "";
   });
   $("addClientImageUrlButton").addEventListener("click", addClientImageFromUrl);
+  $("addClientPromoButton")?.addEventListener("click", addClientPromocao);
   $("newEventButton").addEventListener("click", () => {
     resetEventForm();
     openFormForEdit("eventForm");

@@ -7536,7 +7536,18 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
   // Renderiza a página Promoções
-  function mostrarPromocoes(filtroEstabId = "todos") {
+  function mostrarPromocoes(filtroEstabId = "todos", opcoes = {}) {
+    const deveAtualizarAdmin = !opcoes.skipAdminRefresh
+      && typeof aplicarDadosAdminClientes === "function"
+      && (!ADMIN_CLIENTES_LOADED || (Date.now() - Number(ADMIN_CLIENTES_LAST_APPLIED || 0)) > 10000);
+    if (deveAtualizarAdmin) {
+      aplicarDadosAdminClientes()
+        .then(() => {
+          ADMIN_CLIENTES_LOADED = true;
+          mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true });
+        })
+        .catch((err) => console.warn("Nao foi possivel atualizar promocoes do Firebase.", err));
+    }
     const todos = coletarTodasPromocoes();
 
     // prepara lista de estabelecimentos que têm promo

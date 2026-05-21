@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=128">
+  <link rel="stylesheet" href="painel.css?v=129">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -249,6 +249,35 @@
                   <button id="addClientImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem com texto</button>
                 </div>
                 <div id="clientImagesPreview" class="image-grid"></div>
+              </section>
+              <section class="wide upload-panel">
+                <div class="section-head compact">
+                  <div>
+                    <h3>Promocoes</h3>
+                    <p>Ofertas que aparecem no menu Promocoes do site publico.</p>
+                  </div>
+                  <span id="clientPromosCount" class="badge">0 ativas</span>
+                </div>
+                <div class="promo-admin-form">
+                  <label>Titulo da promocao<input id="clientPromoTitle" placeholder="Ex.: Pizza grande"></label>
+                  <label>Preco atual<input id="clientPromoPrice" placeholder="Ex.: 49,90"></label>
+                  <label>Preco antigo<input id="clientPromoOldPrice" placeholder="Opcional"></label>
+                  <label>Unidade<input id="clientPromoUnit" placeholder="Ex.: A unidade"></label>
+                  <label>Volume<input id="clientPromoVolume" placeholder="Opcional"></label>
+                  <label>Embalagem<input id="clientPromoPack" placeholder="Opcional"></label>
+                  <label>Validade inicio<input id="clientPromoStart" type="date"></label>
+                  <label>Validade fim<input id="clientPromoEnd" type="date"></label>
+                  <fieldset class="promo-weekdays wide">
+                    <legend>Dias que fica disponivel</legend>
+                    <p>Se nao marcar nenhum dia, aparece todos os dias dentro da validade.</p>
+                    <div id="clientPromoWeekdays"></div>
+                  </fieldset>
+                  <label class="wide">Observacao<textarea id="clientPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
+                  <label>Imagem da promocao<input id="clientPromoImageUpload" type="file" accept="image/*"></label>
+                  <label>Ou URL da imagem<input id="clientPromoImageUrl" placeholder="https://..."></label>
+                  <button id="addClientPromoButton" type="button" class="ghost-button wide"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
+                </div>
+                <div id="clientPromosPreview" class="promo-admin-list"></div>
               </section>
               <div class="form-section-title wide">
                 <i class="fa-solid fa-note-sticky"></i>
@@ -791,6 +820,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=128"></script>
+  <script type="module" src="painel.js?v=129"></script>
 </body>
 </html>
