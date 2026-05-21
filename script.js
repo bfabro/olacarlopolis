@@ -17365,10 +17365,12 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
+    const isEventos = normalizeName(title || "") === "eventosemcarlopolis";
     const paidEstablishments = establishments.filter((establishment) => {
+      if (isEventos) return eventoPublicoAtivo(establishment);
       const key = normalizeName(establishment.name);
       return statusEstabelecimentos[key] === "s";
-    });
+    }).sort((a, b) => isEventos ? dataEventoPublicoValor(a) - dataEventoPublicoValor(b) : 0);
 
     /*  contentArea.classList.remove("hidden");*/
     const contentArea = document.querySelector(".content_area");

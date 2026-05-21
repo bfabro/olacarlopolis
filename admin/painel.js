@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 110,
-  label: "v110",
+  numero: 111,
+  label: "v111",
   data: "2026-05-20",
-  nota: "Eventos do Firebase aparecem no site e podem ser editados."
+  nota: "Importa eventos base para o Firebase e exibe na tela publica."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -935,12 +935,25 @@ async function loadAllData() {
   }
   const eventosBase = await loadScriptEventsForPanel();
   const eventKeys = new Set(state.eventos.map((evento) => eventIdentity(evento)));
+  const eventosBaseAusentes = {};
   eventosBase.forEach((evento) => {
     const key = eventIdentity(evento);
     if (!key || eventKeys.has(key)) return;
     state.eventos.push(evento);
     eventKeys.add(key);
+    eventosBaseAusentes[`eventos/${evento.id}`] = {
+      ...evento,
+      importedAt: serverTimestamp(),
+      importedBy: state.user?.uid || ""
+    };
   });
+  if (Object.keys(eventosBaseAusentes).length) {
+    try {
+      await update(ref(db), eventosBaseAusentes);
+    } catch (error) {
+      console.warn("Nao foi possivel salvar eventos base no Firebase.", error);
+    }
+  }
   state.eventos.sort((a, b) => eventSortDate(a).localeCompare(eventSortDate(b)));
 
   state.categorias = [];
