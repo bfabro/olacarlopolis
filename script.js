@@ -736,6 +736,29 @@ function promoExpirada(p) {
   return Boolean(p?.validadeFim) && isDepoisDeHojeStr(p.validadeFim);
 }
 
+function normalizarDiasSemanaPromocao(valor) {
+  const valores = Array.isArray(valor) ? valor : (valor === undefined || valor === null || valor === "" ? [] : [valor]);
+  return [...new Set(valores
+    .map((item) => Number(item))
+    .filter((item) => Number.isInteger(item) && item >= 0 && item <= 6))];
+}
+
+function diaSemanaAtualCarlopolis() {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getDay();
+}
+
+function promoDisponivelHoje(p) {
+  const dias = normalizarDiasSemanaPromocao(p?.diasSemana || p?.dias || p?.recorrenciaDias || p?.diaSemana);
+  return !dias.length || dias.includes(diaSemanaAtualCarlopolis());
+}
+
+function textoDiasPromocao(p) {
+  const dias = normalizarDiasSemanaPromocao(p?.diasSemana || p?.dias || p?.recorrenciaDias || p?.diaSemana);
+  if (!dias.length) return "";
+  const labels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
+  return `Disponivel: ${dias.map((dia) => labels[dia]).filter(Boolean).join(", ")}`;
+}
+
 // === Identidade local do jogador (permite atualizar recorde sem repedir nome) ===
 function getOrCreatePlayerId() {
   let id = localStorage.getItem("capivarinha_player_id");
@@ -4734,6 +4757,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
             imagem: p.imagem || p.image || "",  // url opcional
             validadeInicio: p.validadeInicio || p.validade || null,
             validadeFim: p.validadeFim || null,
+            diasSemana: normalizarDiasSemanaPromocao(p.diasSemana || p.dias || p.recorrenciaDias || p.diaSemana),
             obs: p.obs || "",                    // qualquer extra
             contact: getPrimeiroContato(est.contact) || ""
           });
@@ -7453,7 +7477,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       : todos.filter(i => String(i.estabelecimentoId).trim() === filtro);
 
     // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
-    const itensFiltrados = itens.filter(i => !promoExpirada(i));
+    const itensFiltrados = itens.filter(i => !promoExpirada(i) && promoDisponivelHoje(i));
 
 
 
@@ -7520,6 +7544,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           ${(i.volume || i.embalagem)
             ? `<div class="promo-det">${[i.volume, i.embalagem].filter(Boolean).join(" · ")}</div>` : ""}
           <div class="promo-estab">${i.estabelecimento}</div>
+          ${textoDiasPromocao(i) ? `<div class="promo-days">${textoDiasPromocao(i)}</div>` : ""}
           ${i.obs ? `<div class="promo-obs">${i.obs}</div>` : ""}
           
         </div>

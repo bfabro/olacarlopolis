@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 119,
-  label: "v119",
+  numero: 120,
+  label: "v120",
   data: "2026-05-20",
-  nota: "Ajusta setas da galeria de Automoveis no site publico."
+  nota: "Adiciona recorrencia por dia da semana nas Promocoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -368,11 +368,39 @@ function normalizePromocoes(items) {
       imagem: String(item?.imagem || item?.image || "").trim(),
       validadeInicio: String(item?.validadeInicio || "").trim(),
       validadeFim: String(item?.validadeFim || item?.validade || "").trim(),
+      diasSemana: normalizePromoWeekDays(item?.diasSemana || item?.dias || item?.recorrenciaDias || item?.diaSemana),
       obs: String(item?.obs || item?.descricao || "").trim(),
       ativo: item?.ativo === false ? false : true
     }))
     .filter((item) => item.titulo)
     .slice(0, 30);
+}
+
+const PROMO_WEEK_DAYS = [
+  { value: 0, label: "Domingo", short: "Dom" },
+  { value: 1, label: "Segunda", short: "Seg" },
+  { value: 2, label: "Terca", short: "Ter" },
+  { value: 3, label: "Quarta", short: "Qua" },
+  { value: 4, label: "Quinta", short: "Qui" },
+  { value: 5, label: "Sexta", short: "Sex" },
+  { value: 6, label: "Sabado", short: "Sab" }
+];
+
+function normalizePromoWeekDays(value) {
+  const values = Array.isArray(value) ? value : (value === undefined || value === null || value === "" ? [] : [value]);
+  return [...new Set(values
+    .map((item) => Number(item))
+    .filter((item) => Number.isInteger(item) && item >= 0 && item <= 6))]
+    .sort((a, b) => a - b);
+}
+
+function promoWeekDaysLabel(days) {
+  const normalized = normalizePromoWeekDays(days);
+  if (!normalized.length) return "Todos os dias";
+  return normalized
+    .map((day) => PROMO_WEEK_DAYS.find((item) => item.value === day)?.short || "")
+    .filter(Boolean)
+    .join(", ");
 }
 
 function cleanForFirebase(value) {
@@ -3317,6 +3345,13 @@ function renderClientOnlyEditor() {
             <label>Embalagem<input id="coPromoPack" placeholder="Opcional"></label>
             <label>Validade inicio<input id="coPromoStart" type="date"></label>
             <label>Validade fim<input id="coPromoEnd" type="date"></label>
+            <fieldset class="promo-weekdays wide">
+              <legend>Dias que fica disponivel</legend>
+              <p>Para promocoes recorrentes, marque os dias. Se nao marcar nenhum, aparece todos os dias dentro da validade.</p>
+              <div>
+                ${PROMO_WEEK_DAYS.map((day) => `<label><input type="checkbox" name="coPromoWeekday" value="${day.value}"> ${day.label}</label>`).join("")}
+              </div>
+            </fieldset>
             <label class="wide">Observacao<textarea id="coPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
             <label>Imagem da promocao<input id="coPromoImageUpload" type="file" accept="image/*"></label>
             <label>Ou URL da imagem<input id="coPromoImageUrl" placeholder="https://..."></label>
@@ -3436,6 +3471,7 @@ function renderClientOnlyEditor() {
       embalagem: $("coPromoPack").value.trim(),
       validadeInicio: $("coPromoStart").value,
       validadeFim: $("coPromoEnd").value,
+      diasSemana: Array.from(mount.querySelectorAll("input[name='coPromoWeekday']:checked")).map((input) => Number(input.value)),
       obs: $("coPromoObs").value.trim(),
       imagem: image,
       ativo: true
@@ -3609,6 +3645,7 @@ function renderPromocoesMarkup(promocoes) {
       <div>
         <strong>${escapeHtml(promo.titulo)}</strong>
         <span>${escapeHtml([promo.preco ? `R$ ${promo.preco}` : "", promo.validadeFim ? `ate ${promo.validadeFim}` : ""].filter(Boolean).join(" - ") || "Sem preco/validade")}</span>
+        <small>Disponivel: ${escapeHtml(promoWeekDaysLabel(promo.diasSemana))}</small>
         ${promo.obs ? `<small>${escapeHtml(promo.obs)}</small>` : ""}
       </div>
       <button type="button" data-promo-remove="${index}" class="danger-mini">Remover</button>

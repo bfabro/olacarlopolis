@@ -4668,6 +4668,18 @@ html {
   color: #111827;
 }
 
+.promo-days {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  border-radius: 999px;
+  background: #eef6ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+}
+
 .promo-obs {
   font-size: 11px;
   color: #747a83;
