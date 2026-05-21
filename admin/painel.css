@@ -453,6 +453,18 @@ button[type="submit"]:hover,
   padding: 18px;
 }
 
+.panel-card.form-collapsed {
+  align-self: start;
+}
+
+.panel-card.form-collapsed > form {
+  display: none;
+}
+
+.panel-card.form-collapsed .section-head {
+  margin-bottom: 0;
+}
+
 .panel-card h2 {
   margin: 0 0 6px;
   font-size: 20px;

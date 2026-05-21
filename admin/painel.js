@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 127,
-  label: "v127",
+  numero: 128,
+  label: "v128",
   data: "2026-05-20",
-  nota: "Melhora menu mobile e separacao visual do painel."
+  nota: "Abre formularios de cadastro somente ao clicar em Novo ou Editar."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1327,6 +1327,7 @@ function switchView(name) {
   const [title, subtitle] = viewCopy[target];
   $("viewTitle").textContent = title;
   $("viewSubtitle").textContent = subtitle;
+  collapseEntryFormsForView(target);
 
   if (target === "minhaEmpresa") renderClientOnlyEditor();
   if (target === "faturas") renderClientInvoices();
@@ -1341,17 +1342,48 @@ function switchView(name) {
   if (target !== "clientes") setClientFocusMode(false);
 }
 
+function collapseEntryFormsForView(target) {
+  const formsByView = {
+    clientes: ["clientForm"],
+    categorias: ["categoryForm"],
+    eventos: ["eventForm"],
+    informacoes: ["infoDeathNoticeForm"],
+    imoveis: ["imovelForm"],
+    automoveis: ["automovelForm"],
+    usuarios: ["userForm"]
+  };
+  (formsByView[target] || []).forEach((formId) => {
+    if (formId === "clientForm") setClientFocusMode(false);
+    else setFormCardOpen(formId, false);
+  });
+}
+
 function setClientFocusMode(enabled) {
   const view = $("clientesView");
   const closeButton = $("closeClientFormButton");
   if (!view) return;
   view.classList.toggle("client-focus-mode", Boolean(enabled));
   closeButton?.classList.toggle("hidden", !enabled);
+  setFormCardOpen("clientForm", enabled);
 }
 
 function closeClientFormToDashboard() {
   resetClientForm();
-  switchView("dashboard");
+  setClientFocusMode(false);
+}
+
+function setFormCardOpen(formId, isOpen) {
+  const form = $(formId);
+  const card = form?.closest(".panel-card");
+  card?.classList.toggle("form-collapsed", !isOpen);
+}
+
+function openFormForEdit(formId) {
+  setFormCardOpen(formId, true);
+  const form = $(formId);
+  if (form && window.matchMedia("(max-width: 980px)").matches) {
+    form.closest(".panel-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 function resetClientForm() {
@@ -2060,6 +2092,7 @@ function resetCategoryForm() {
   $("categoryStatus").value = "ativo";
   $("deleteCategoryButton").classList.add("hidden");
   fillCategoryParentSelect();
+  setFormCardOpen("categoryForm", false);
 }
 
 function getCategoryFormData() {
@@ -2094,6 +2127,7 @@ function fillCategoryForm(category) {
   $("categoryNote").value = category.observacaoAdmin || "";
   fillCategoryParentSelect(category.parentId || "");
   $("deleteCategoryButton").classList.remove("hidden");
+  openFormForEdit("categoryForm");
 }
 
 function renderCategoriesList() {
@@ -2171,6 +2205,7 @@ function resetUserForm() {
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
     input.checked = ["dados", "imagens", "cardapio", "promocoes", "faturas"].includes(input.value);
   });
+  setFormCardOpen("userForm", false);
 }
 
 function fillUserForm(user) {
@@ -2187,6 +2222,7 @@ function fillUserForm(user) {
   });
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar usuario`;
   $("deleteUserButton")?.classList.remove("hidden");
+  openFormForEdit("userForm");
 }
 
 async function deletePanelUser() {
@@ -2368,6 +2404,7 @@ function resetEventForm() {
   $("eventForm").reset();
   $("eventId").value = "";
   $("deleteEventButton").classList.add("hidden");
+  setFormCardOpen("eventForm", false);
 }
 
 function fillEventForm(evento) {
@@ -2382,6 +2419,7 @@ function fillEventForm(evento) {
   $("eventImage").value = evento.imagem || "";
   $("eventDescription").value = evento.descricao || "";
   $("deleteEventButton").classList.remove("hidden");
+  openFormForEdit("eventForm");
 }
 
 function getEventFormData() {
@@ -2457,6 +2495,7 @@ function resetAutomovelForm() {
   if ($("automovelStatus")) $("automovelStatus").value = "ativo";
   $("deleteAutomovelButton")?.classList.add("hidden");
   renderAutomovelImagesPreview();
+  setFormCardOpen("automovelForm", false);
 }
 
 function fillAutomovelForm(item) {
@@ -2487,6 +2526,7 @@ function fillAutomovelForm(item) {
   $("automovelImagem").value = item.imagem || state.automovelImages[0] || "";
   $("deleteAutomovelButton")?.classList.remove("hidden");
   renderAutomovelImagesPreview();
+  openFormForEdit("automovelForm");
 }
 
 function getAutomovelFormData() {
@@ -2589,6 +2629,7 @@ function resetImovelForm() {
   if ($("imovelStatus")) $("imovelStatus").value = "ativo";
   $("deleteImovelButton")?.classList.add("hidden");
   renderImovelImagesPreview();
+  setFormCardOpen("imovelForm", false);
 }
 
 function fillImovelForm(item) {
@@ -2627,6 +2668,7 @@ function fillImovelForm(item) {
   $("imovelImagem").value = item.imagem || state.imovelImages[0] || "";
   $("deleteImovelButton")?.classList.remove("hidden");
   renderImovelImagesPreview();
+  openFormForEdit("imovelForm");
 }
 
 function numberOrText(value) {
@@ -2742,6 +2784,7 @@ function resetInfoDeathNoticeForm() {
   $("infoDeathNoticeForm")?.reset();
   if ($("infoDeathNoticeId")) $("infoDeathNoticeId").value = "";
   $("deleteInfoDeathNoticeButton")?.classList.add("hidden");
+  setFormCardOpen("infoDeathNoticeForm", false);
 }
 
 function fillInfoDeathNoticeForm(item) {
@@ -2753,6 +2796,7 @@ function fillInfoDeathNoticeForm(item) {
   $("infoDeathNoticeImage").value = item.image || item.imagem || "";
   $("infoDeathNoticeDescription").value = item.descricaoFalecido || item.descricao || "";
   $("deleteInfoDeathNoticeButton").classList.remove("hidden");
+  openFormForEdit("infoDeathNoticeForm");
 }
 
 function getInfoDeathNoticeFormData() {
@@ -4528,7 +4572,10 @@ function bindEvents() {
     setClientFocusMode(true);
   });
   $("closeClientFormButton").addEventListener("click", closeClientFormToDashboard);
-  $("newCategoryButton").addEventListener("click", resetCategoryForm);
+  $("newCategoryButton").addEventListener("click", () => {
+    resetCategoryForm();
+    openFormForEdit("categoryForm");
+  });
   $("syncClientsButton").addEventListener("click", syncClientsFromScript);
   $("migrateImagesButton").addEventListener("click", migrateClientImagesToStorage);
   $("analyzeDuplicatesButton").addEventListener("click", renderDuplicatesReport);
@@ -4569,13 +4616,19 @@ function bindEvents() {
     event.target.value = "";
   });
   $("addClientImageUrlButton").addEventListener("click", addClientImageFromUrl);
-  $("newEventButton").addEventListener("click", resetEventForm);
+  $("newEventButton").addEventListener("click", () => {
+    resetEventForm();
+    openFormForEdit("eventForm");
+  });
   $("eventSearch").addEventListener("input", renderEventsList);
   $("eventImageUpload").addEventListener("change", async (event) => {
     await uploadEventImage(event.target.files?.[0]);
     event.target.value = "";
   });
-  $("newImovelButton")?.addEventListener("click", resetImovelForm);
+  $("newImovelButton")?.addEventListener("click", () => {
+    resetImovelForm();
+    openFormForEdit("imovelForm");
+  });
   $("imovelSearch")?.addEventListener("input", renderImoveisList);
   $("imovelImagesUpload")?.addEventListener("change", async (event) => {
     const id = $("imovelId").value || slugify($("imovelTitulo").value) || `imovel-${Date.now()}`;
@@ -4585,7 +4638,10 @@ function bindEvents() {
     renderImovelImagesPreview();
     event.target.value = "";
   });
-  $("newAutomovelButton")?.addEventListener("click", resetAutomovelForm);
+  $("newAutomovelButton")?.addEventListener("click", () => {
+    resetAutomovelForm();
+    openFormForEdit("automovelForm");
+  });
   $("automovelSearch")?.addEventListener("input", renderAutomoveisList);
   $("automovelImagesUpload")?.addEventListener("change", async (event) => {
     const id = $("automovelId").value || slugify(`${$("automovelMarca").value}-${$("automovelModelo").value}`) || `automovel-${Date.now()}`;
@@ -4595,7 +4651,10 @@ function bindEvents() {
     renderAutomovelImagesPreview();
     event.target.value = "";
   });
-  $("newInfoDeathNoticeButton")?.addEventListener("click", resetInfoDeathNoticeForm);
+  $("newInfoDeathNoticeButton")?.addEventListener("click", () => {
+    resetInfoDeathNoticeForm();
+    openFormForEdit("infoDeathNoticeForm");
+  });
   $("infoDeathNoticeSearch")?.addEventListener("input", renderInfoDeathNoticeList);
   $("infoDeathNoticeImageUpload")?.addEventListener("change", async (event) => {
     await uploadInfoDeathNoticeImage(event.target.files?.[0]);
@@ -4631,7 +4690,10 @@ function bindEvents() {
     renderReports();
     renderClientInvoices();
   });
-  $("newUserButton")?.addEventListener("click", resetUserForm);
+  $("newUserButton")?.addEventListener("click", () => {
+    resetUserForm();
+    openFormForEdit("userForm");
+  });
   $("userForm").addEventListener("submit", createPanelUser);
   $("deleteUserButton")?.addEventListener("click", deletePanelUser);
 
