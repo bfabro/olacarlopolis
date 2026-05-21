@@ -6667,6 +6667,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       event.preventDefault();
       event.__menuClickTracked = true;
       registrarCliqueMenuLateral("Imoveis");
+      prepararNavegacaoMenuEspecial();
       mostrarImoveisV2();
     });
   }
@@ -6690,6 +6691,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       condicao: item.Condicao || item.condicao || item.estado || "",
       km: item.Km || item.km || item.quilometragem || "",
       imagem: item.Link_Imagem || item["Imagem URL"] || item.imagem || item.image || "",
+      imagens: imagensAutomovelPublico(item),
       descricao: item.Descricao || item.Descrição || item.descricao || "",
       contato: item.Contato || item.contato || item.whatsapp || "",
       vendedor: item.Vendedor || item.vendedor || item.loja || item.nomeLoja || item.lojaNome || item.empresa || item.clienteNome || item.cliente || item.anunciante || item.nomeVendedor || "",
@@ -6728,6 +6730,27 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
   }
 
+  function imagensAutomovelPublico(item) {
+    const valores = [];
+    const adicionar = (valor) => {
+      if (!valor) return;
+      if (Array.isArray(valor)) {
+        valor.forEach(adicionar);
+        return;
+      }
+      if (typeof valor === "object") {
+        adicionar(valor.url || valor.src || valor.imagem || valor.image || valor.link);
+        return;
+      }
+      const texto = String(valor || "").trim();
+      if (texto) valores.push(texto);
+    };
+
+    adicionar(item.Link_Imagem || item["Imagem URL"] || item.imagem || item.image);
+    adicionar(item.imagens || item.Imagens || item.images || item.fotos || item.Fotos);
+    return [...new Set(valores)];
+  }
+
   function opcoesAutomoveis(lista, campo) {
     const valores = [...new Set(lista.map((item) => String(item[campo] || "").trim()).filter(Boolean))];
     return valores.sort((a, b) => a.localeCompare(b, "pt-BR")).map((valor) => `<option value="${textoSeguroAutomoveis(valor)}">${textoSeguroAutomoveis(valor)}</option>`).join("");
@@ -6741,6 +6764,9 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     box.innerHTML = lista.map((item) => {
       const titulo = [item.marca, item.modelo].filter(Boolean).join(" ") || "Automovel";
+      const imagens = imagensAutomovelPublico(item);
+      const imagemPrincipal = imagens[0] || item.imagem || "";
+      const imagensJson = textoSeguroAutomoveis(encodeURIComponent(JSON.stringify(imagens)));
       const contato = String(item.contato || "").replace(/\D/g, "");
       const instagram = String(item.instagram || "").trim();
       const instagramUrl = instagram && instagram.startsWith("http") ? instagram : (instagram ? `https://instagram.com/${instagram.replace(/^@/, "")}` : "");
@@ -6763,13 +6789,20 @@ plotarPinsImoveis(stateImoveis.filtered);
         `Produto: ${titulo}`,
         item.preco ? `Valor: ${formatarPrecoAutomoveis(item.preco)}` : "",
         vendedor ? `Loja/Vendedor: ${vendedor}` : "",
-        item.imagem ? `Imagem: ${item.imagem}` : ""
+        imagemPrincipal ? `Imagem: ${imagemPrincipal}` : ""
       ].filter(Boolean).join("\n");
       return `
         <article class="auto-card ${item.status === "vendido" ? "is-sold" : ""}">
-          <div class="auto-card-media">
-            ${item.imagem ? `
-              <img class="auto-card-img imagem-expandivel" src="${textoSeguroAutomoveis(item.imagem)}" alt="${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">
+          <div class="auto-card-media" data-auto-gallery="${imagensJson}" data-auto-title="${textoSeguroAutomoveis(titulo)}">
+            ${imagens.length ? `
+              <div class="auto-gallery-track">
+                ${imagens.map((url, index) => `<img class="auto-card-img auto-gallery-img" src="${textoSeguroAutomoveis(url)}" alt="${textoSeguroAutomoveis(titulo)}" data-auto-gallery-index="${index}" loading="lazy" decoding="async">`).join("")}
+              </div>
+              ${imagens.length > 1 ? `
+                <button class="auto-gallery-nav auto-gallery-prev" type="button" aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="auto-gallery-nav auto-gallery-next" type="button" aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
+                <span class="auto-gallery-count">1/${imagens.length}</span>
+              ` : ""}
             ` : `<div class="auto-card-img auto-card-img-empty"><i class="fa-solid fa-car-side"></i></div>`}
             ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(formatarPrecoAutomoveis(item.preco))}</strong>` : ""}
             ${item.status === "vendido" ? `<span class="auto-status auto-status-media">Vendido</span>` : ""}
@@ -6794,6 +6827,126 @@ plotarPinsImoveis(stateImoveis.filtered);
         </article>
       `;
     }).join("");
+    configurarGaleriasAutomoveis(box);
+  }
+
+  function configurarGaleriasAutomoveis(box) {
+    box.querySelectorAll(".auto-card-media").forEach((media) => {
+      const track = media.querySelector(".auto-gallery-track");
+      const count = media.querySelector(".auto-gallery-count");
+      const imagens = lerImagensGaleriaAutomovel(media);
+      const atualizarContador = () => {
+        if (!track || !count || !imagens.length) return;
+        const indice = Math.round(track.scrollLeft / Math.max(track.clientWidth, 1));
+        count.textContent = `${Math.min(indice + 1, imagens.length)}/${imagens.length}`;
+      };
+
+      media.querySelector(".auto-gallery-prev")?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        track?.scrollBy({ left: -track.clientWidth, behavior: "smooth" });
+        setTimeout(atualizarContador, 260);
+      });
+      media.querySelector(".auto-gallery-next")?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        track?.scrollBy({ left: track.clientWidth, behavior: "smooth" });
+        setTimeout(atualizarContador, 260);
+      });
+      track?.addEventListener("scroll", atualizarContador, { passive: true });
+      media.querySelectorAll(".auto-gallery-img").forEach((img) => {
+        img.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          abrirGaleriaAutomovel(imagens, Number(img.dataset.autoGalleryIndex || 0), media.dataset.autoTitle || "Automovel");
+        });
+      });
+    });
+  }
+
+  function lerImagensGaleriaAutomovel(media) {
+    try {
+      return JSON.parse(decodeURIComponent(media.dataset.autoGallery || "[]")).filter(Boolean);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function abrirGaleriaAutomovel(imagens, inicio = 0, titulo = "Automovel") {
+    if (!imagens.length) return;
+    let indice = Math.max(0, Math.min(inicio, imagens.length - 1));
+    document.querySelector(".auto-gallery-modal")?.remove();
+    const modal = document.createElement("div");
+    modal.className = "auto-gallery-modal";
+    modal.innerHTML = `
+      <div class="auto-gallery-modal-box" role="dialog" aria-label="${textoSeguroAutomoveis(titulo)}">
+        <button class="auto-gallery-modal-close" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+        <button class="auto-gallery-modal-nav auto-gallery-modal-prev" type="button" aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
+        <img src="" alt="${textoSeguroAutomoveis(titulo)}">
+        <button class="auto-gallery-modal-nav auto-gallery-modal-next" type="button" aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
+        <span class="auto-gallery-modal-count"></span>
+      </div>
+    `;
+    const img = modal.querySelector("img");
+    const count = modal.querySelector(".auto-gallery-modal-count");
+    const render = () => {
+      img.src = imagens[indice];
+      count.textContent = `${indice + 1}/${imagens.length}`;
+    };
+    const mover = (passo) => {
+      indice = (indice + passo + imagens.length) % imagens.length;
+      render();
+    };
+    modal.querySelector(".auto-gallery-modal-close")?.addEventListener("click", () => modal.remove());
+    modal.querySelector(".auto-gallery-modal-prev")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      mover(-1);
+    });
+    modal.querySelector(".auto-gallery-modal-next")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      mover(1);
+    });
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) modal.remove();
+    });
+    let toqueInicialX = 0;
+    modal.addEventListener("touchstart", (event) => {
+      toqueInicialX = event.changedTouches?.[0]?.clientX || 0;
+    }, { passive: true });
+    modal.addEventListener("touchend", (event) => {
+      const toqueFinalX = event.changedTouches?.[0]?.clientX || 0;
+      const delta = toqueFinalX - toqueInicialX;
+      if (Math.abs(delta) > 45) mover(delta > 0 ? -1 : 1);
+    }, { passive: true });
+    document.addEventListener("keydown", function fecharOuMover(event) {
+      if (!document.body.contains(modal)) {
+        document.removeEventListener("keydown", fecharOuMover);
+        return;
+      }
+      if (event.key === "Escape") modal.remove();
+      if (event.key === "ArrowLeft") mover(-1);
+      if (event.key === "ArrowRight") mover(1);
+    });
+    render();
+    document.body.appendChild(modal);
+  }
+
+  function prepararNavegacaoMenuEspecial() {
+    document.getElementById("novidades")?.classList.add("hidden");
+    document.querySelector(".content_area")?.classList.remove("hidden");
+    const sidebarEl = document.querySelector(".sidebar");
+    const overlayEl = document.getElementById("overlay");
+    sidebarEl?.classList.remove("open");
+    if (window.innerWidth < 768) sidebarEl?.classList.add("close");
+    overlayEl?.classList.remove("active");
+    document.querySelectorAll(".submenu_item").forEach((item) => item.classList.remove("show_submenu"));
+    document.querySelectorAll(".submenu").forEach((sub) => {
+      sub.style.display = "none";
+    });
+    const busca = document.getElementById("searchTopbar") || document.getElementById("searchSidebar");
+    const clear = document.getElementById("clearTopbarSearch") || document.getElementById("clearSearch");
+    if (busca) busca.value = "";
+    if (clear) clear.style.display = "none";
   }
 
   async function carregarAutomoveisFirebase() {
@@ -6934,6 +7087,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       event.preventDefault();
       event.__menuClickTracked = true;
       registrarCliqueMenuLateral("Automoveis");
+      prepararNavegacaoMenuEspecial();
       mostrarAutomoveis();
     });
   }
@@ -6948,10 +7102,12 @@ plotarPinsImoveis(stateImoveis.filtered);
     event.__menuClickTracked = true;
     if (linkImoveis) {
       registrarCliqueMenuLateral("Imoveis");
+      prepararNavegacaoMenuEspecial();
       mostrarImoveisV2();
       return;
     }
     registrarCliqueMenuLateral("Automoveis");
+    prepararNavegacaoMenuEspecial();
     mostrarAutomoveis();
   }, true);
 
