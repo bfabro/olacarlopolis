@@ -16924,10 +16924,14 @@ plotarPinsImoveis(stateImoveis.filtered);
             .filter((cat) => cat?.link?.id)
             .map((cat) => ({
               ...cat,
-              establishments: [],
+              establishments: categoriaAdminEhSetorPublico(cat.title || "")
+                ? (cat.establishments || [])
+                : [],
               metaAdmin: {
                 ...(cat.metaAdmin || {}),
-                menuGroup: cat.link.closest?.("ul.submenu") === submenuServicoAdmin() ? "servicos" : "comercios"
+                menuGroup: categoriaAdminEhSetorPublico(cat.title || "")
+                  ? "setorpublico"
+                  : (cat.link.closest?.("ul.submenu") === submenuServicoAdmin() ? "servicos" : "comercios")
               }
             }));
           categories.length = 0;
