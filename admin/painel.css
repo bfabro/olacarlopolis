@@ -105,6 +105,19 @@ button {
   margin: 6px 0 0;
 }
 
+.sidebar-logged-user {
+  display: block;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  color: #e5e7eb;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  max-width: 170px;
+  overflow-wrap: anywhere;
+}
+
 .login-card form,
 .grid-form {
   display: grid;
@@ -699,10 +712,33 @@ button[type="submit"]:hover,
 }
 
 .upload-panel {
-  border: 1px dashed var(--line);
+  border: 1px solid #cbd7e8;
   border-radius: 14px;
-  padding: 14px;
-  background: #f8fafc;
+  padding: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: inset 4px 0 0 #dbeafe, 0 8px 20px rgba(15, 23, 42, .04);
+}
+
+.schedule-panel,
+.profile-upload-panel {
+  box-shadow: inset 4px 0 0 #e0ecff, 0 8px 20px rgba(15, 23, 42, .035);
+}
+
+.section-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.section-head.compact {
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e5edf7;
 }
 
 .check-row {
@@ -1412,6 +1448,7 @@ button[type="submit"]:hover,
   .grid-form,
   .permissions-box,
   .manual-image-form,
+  .section-fields,
   .profile-upload-row {
     grid-template-columns: 1fr;
   }

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=120">
+  <link rel="stylesheet" href="painel.css?v=121">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -38,6 +38,7 @@
           <strong>Painel Admin</strong>
           <span id="profileRole">-</span>
           <span id="sidebarVersion" class="sidebar-version">Versao -</span>
+          <span id="sidebarLoggedUser" class="sidebar-logged-user">Usuario -</span>
         </div>
       </div>
 
@@ -186,15 +187,17 @@
                 <label class="check-row"><input id="clientFeaturedWeek" type="checkbox"> Manter este cliente em destaque na tela inicial</label>
                 <label>Valor do destaque<input id="clientFeaturedValue" placeholder="R$"></label>
               </section>
-              <label>Link do cardapio<input id="clientMenuLink" placeholder="Link externo ou PDF enviado"></label>
-              <label class="check-row wide"><input id="clientMenuEnabled" type="checkbox"> Exibir botao Cardapio no site publico</label>
               <section class="wide upload-panel">
                 <div class="section-head compact">
                   <div>
                     <h3>Cardapio em PDF ou imagens</h3>
-                    <p>Envie um PDF para abrir no botao Cardapio, ou imagens para aparecerem em modal.</p>
+                    <p>Controle se o botao aparece no site e envie PDF ou imagens do cardapio.</p>
                   </div>
                   <span id="clientMenuImagesCount" class="badge">0 imagens</span>
+                </div>
+                <div class="section-fields">
+                  <label>Link do cardapio<input id="clientMenuLink" placeholder="Link externo ou PDF enviado"></label>
+                  <label class="check-row"><input id="clientMenuEnabled" type="checkbox"> Exibir botao Cardapio no site publico</label>
                 </div>
                 <input id="clientMenuUpload" type="file" accept="image/*,application/pdf" multiple>
                 <div id="clientMenuPreview" class="image-grid"></div>
@@ -636,6 +639,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=120"></script>
+  <script type="module" src="painel.js?v=121"></script>
 </body>
 </html>

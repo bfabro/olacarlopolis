@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 120,
-  label: "v120",
+  numero: 121,
+  label: "v121",
   data: "2026-05-20",
-  nota: "Adiciona recorrencia por dia da semana nas Promocoes."
+  nota: "Mostra usuario logado e melhora separacao das secoes do painel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1169,6 +1169,10 @@ function renderStats() {
 function updateChrome() {
   $("profileEmail").textContent = state.user?.email || "-";
   $("profileRole").textContent = roleLabel(state.profile?.role);
+  if ($("sidebarLoggedUser")) {
+    const email = state.user?.email || state.profile?.email || "-";
+    $("sidebarLoggedUser").textContent = `Logado: ${email}`;
+  }
 
   document.querySelectorAll("[data-role='staff']").forEach((el) => {
     el.classList.toggle("hidden", !canManageClients());
@@ -3288,14 +3292,16 @@ function renderClientOnlyEditor() {
         <label class="wide">Informacoes adicionais<textarea id="coInfo" rows="4">${escapeHtml(client.infoAdicional || "")}</textarea></label>
       ` : ""}
       ${canEditCardapio ? `
-        <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}" placeholder="Link externo ou PDF enviado"></label>
         <section class="wide upload-panel">
           <div class="section-head compact">
             <div>
               <h3>Meu cardapio</h3>
-              <p>Envie um PDF para abrir no botao Cardapio, ou imagens para aparecerem em modal.</p>
+              <p>Configure o link/PDF e as imagens que aparecem no botao Cardapio.</p>
             </div>
             <span id="coMenuImagesCount" class="badge">${menuImages.length} imagem${menuImages.length === 1 ? "" : "s"}</span>
+          </div>
+          <div class="section-fields">
+            <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}" placeholder="Link externo ou PDF enviado"></label>
           </div>
           <input id="coMenuUpload" type="file" accept="image/*,application/pdf" multiple>
           <div id="coMenuPreview" class="image-grid">
