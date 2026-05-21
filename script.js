@@ -2126,7 +2126,7 @@ document.addEventListener("DOMContentLoaded", function () {
       card.className = "card-divulgacao-pequeno";
 
       const nome = ev.name || "Evento";
-      const data = dataEventoPublico(ev);
+      const data = dataEventoPublicoFormatada(ev);
       const endereco = ev.address || "";
 
       card.innerHTML = `
@@ -2181,6 +2181,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function dataEventoPublico(evento) {
     return evento?.date || evento?.data || evento?.dataEvento || evento?.eventDate || "";
+  }
+
+  function dataEventoPublicoFormatada(evento) {
+    const texto = String(dataEventoPublico(evento) || "").trim();
+    const iso = texto.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) return `${iso[3]}/${iso[2]}/${iso[1]}`;
+    const br = texto.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (br) return `${String(br[1]).padStart(2, "0")}/${String(br[2]).padStart(2, "0")}/${br[3]}`;
+    return texto;
   }
 
   function eventoPublicoIdentidade(evento) {
@@ -17503,7 +17512,7 @@ ${establishment.infoVagaTrabalho
               <i class="fas fa-calendar-alt info-icon" style="color: #000000ff;font-size:20px;"></i>
               <div>
                 <div class="info-label">Data</div>
-                <div class="info-value">${dataEventoPublico(establishment)}</div>
+                <div class="info-value">${dataEventoPublicoFormatada(establishment)}</div>
               </div>
             </div>` : ""
         }
