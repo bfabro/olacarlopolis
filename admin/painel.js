@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 124,
-  label: "v124",
+  numero: 125,
+  label: "v125",
   data: "2026-05-20",
-  nota: "Importa imoveis base no painel e permite sobrescrever ou remover via Firebase."
+  nota: "Reduz miniaturas das fotos no cadastro de Imoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
