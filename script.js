@@ -6611,7 +6611,13 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   // conectar no menu
   const elMenuImoveis = document.getElementById("menuImoveis");
-  if (elMenuImoveis) elMenuImoveis.addEventListener("click", mostrarImoveisV2);
+  if (elMenuImoveis) {
+    elMenuImoveis.addEventListener("click", function (event) {
+      event.__menuClickTracked = true;
+      registrarCliqueMenuLateral("Imoveis");
+      mostrarImoveisV2(event);
+    });
+  }
 
   function textoSeguroAutomoveis(valor) {
     return String(valor || "")
@@ -6867,6 +6873,8 @@ plotarPinsImoveis(stateImoveis.filtered);
   if (elMenuAutomoveis) {
     elMenuAutomoveis.addEventListener("click", function (event) {
       event.preventDefault();
+      event.__menuClickTracked = true;
+      registrarCliqueMenuLateral("Automoveis");
       mostrarAutomoveis();
     });
   }
@@ -19069,6 +19077,7 @@ function registrarCliqueMenuLateral(labelMenu) {
 }
 
 document.addEventListener("click", (event) => {
+  if (event.__menuClickTracked) return;
   const link = event.target.closest?.(".sidebar .nav_link");
   if (!link) return;
   const label = link.dataset.reportLabel || link.textContent || link.getAttribute("aria-label") || link.id || "menu";

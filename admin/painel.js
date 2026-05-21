@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 105,
-  label: "v105",
+  numero: 106,
+  label: "v106",
   data: "2026-05-20",
-  nota: "Mostra data de eventos e oculta coleta do menu."
+  nota: "Mostra periodo nos cards de relatorios e corrige cliques do menu."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2528,6 +2528,15 @@ function renderReportList(items, emptyText = "Nenhum item encontrado.") {
   `).join("");
 }
 
+function renderReportCardHeader(title, periodRange) {
+  return `
+    <div class="report-card-head">
+      <h2>${escapeHtml(title)}</h2>
+      <span class="report-card-date"><i class="fa-solid fa-calendar-days"></i> ${escapeHtml(periodRange.label)}</span>
+    </div>
+  `;
+}
+
 const REPORT_BLOCKED_CATEGORY_SLUGS = new Set([
   "eventosemcarlopolis",
   "agendamento",
@@ -2878,20 +2887,20 @@ function renderReports() {
     </section>
 
     <div class="stats-grid">
-      <article class="stat-card"><span>Clientes ativos</span><strong>${ativos.length}</strong><small>${reportPercent(ativos.length, totalClientes)} da base</small></article>
-      <article class="stat-card"><span>Financeiro em aberto</span><strong>${abertos.length}</strong><small>${moneyBR(valorAberto)}</small></article>
-      <article class="stat-card"><span>Receita prevista</span><strong>${moneyBR(valorReceber)}</strong><small>Clientes nao isentos</small></article>
-      <article class="stat-card"><span>Receita mensal</span><strong>${moneyBR(receitas.mensal)}</strong><small>Projecao por planos</small></article>
-      <article class="stat-card"><span>Receita semestral</span><strong>${moneyBR(receitas.semestral)}</strong><small>Projecao por planos</small></article>
-      <article class="stat-card"><span>Receita anual</span><strong>${moneyBR(receitas.anual)}</strong><small>Projecao por planos</small></article>
-      <article class="stat-card"><span>Receita paga</span><strong>${moneyBR(valorPago)}</strong><small>${pagos.length} cliente${pagos.length === 1 ? "" : "s"}</small></article>
-      <article class="stat-card"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + Number(c.destaqueValor || 0), 0))}</small></article>
-      <article class="stat-card"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Clientes ativos</span><strong>${ativos.length}</strong><small>${reportPercent(ativos.length, totalClientes)} da base</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Financeiro em aberto</span><strong>${abertos.length}</strong><small>${moneyBR(valorAberto)}</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita prevista</span><strong>${moneyBR(valorReceber)}</strong><small>Clientes nao isentos</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita mensal</span><strong>${moneyBR(receitas.mensal)}</strong><small>Projecao por planos</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita semestral</span><strong>${moneyBR(receitas.semestral)}</strong><small>Projecao por planos</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita anual</span><strong>${moneyBR(receitas.anual)}</strong><small>Projecao por planos</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita paga</span><strong>${moneyBR(valorPago)}</strong><small>${pagos.length} cliente${pagos.length === 1 ? "" : "s"}</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + Number(c.destaqueValor || 0), 0))}</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
     </div>
 
     <div class="reports-grid">
       <section class="panel-card report-card">
-        <h2>Resumo operacional</h2>
+        ${renderReportCardHeader("Resumo operacional", periodRange)}
         <div class="report-kpis">
           <span>Ativos: <strong>${ativos.length}</strong></span>
           <span>Pendentes: <strong>${pendentes.length}</strong></span>
@@ -2906,32 +2915,32 @@ function renderReports() {
       </section>
 
       <section class="panel-card report-card">
-        <h2>Mais acessados por comercio</h2>
+        ${renderReportCardHeader("Mais acessados por comercio", periodRange)}
         ${renderReportList(topFromMap(cliquesBotoes.porCliente, 12), "Ainda nao ha cliques de comercio registrados.")}
       </section>
 
       <section class="panel-card report-card report-wide">
-        <h2>Cliques por estabelecimento/servico</h2>
+        ${renderReportCardHeader("Cliques por estabelecimento/servico", periodRange)}
         ${renderClickReportTable(generalClickReport.rows, generalClickReport.types, "Ainda nao ha cliques por estabelecimento ou servico.")}
       </section>
 
       <section class="panel-card report-card">
-        <h2>Cliques por botao</h2>
+        ${renderReportCardHeader("Cliques por botao", periodRange)}
         ${renderReportList(topFromMap(cliquesBotoes.porTipo, 12), "Ainda nao ha cliques por botao registrados.")}
       </section>
 
       <section class="panel-card report-card">
-        <h2>Cidades dos acessos</h2>
+        ${renderReportCardHeader("Cidades dos acessos", periodRange)}
         ${renderReportList(topFromMap(cidadesAcesso, 12, "acesso", "acessos"), "Ainda nao ha dados de cidade nos acessos.")}
       </section>
 
       <section class="panel-card report-card">
-        <h2>Menu lateral</h2>
+        ${renderReportCardHeader("Menu lateral", periodRange)}
         ${renderReportList(topFromMap(cliquesMenu, 12), "Ainda nao ha cliques de menu registrados.")}
       </section>
 
       <section class="panel-card report-card">
-        <h2>Onde Comer</h2>
+        ${renderReportCardHeader("Onde Comer", periodRange)}
         <div class="report-kpis">
           <span>Cardapios: <strong>${[...cliquesOndeComerCardapios.values()].reduce((s, v) => s + v, 0)}</strong></span>
           <span>WhatsApp: <strong>${[...cliquesOndeComerWhats.values()].reduce((s, v) => s + v, 0)}</strong></span>
@@ -2941,32 +2950,32 @@ function renderReports() {
       </section>
 
       <section class="panel-card report-card report-wide">
-        <h2>Cliques por estabelecimento - Onde Comer</h2>
+        ${renderReportCardHeader("Cliques por estabelecimento - Onde Comer", periodRange)}
         ${renderClickReportTable(ondeComerClickRows, ["whatsapp", "cardapio", "fotos"], "Ainda nao ha cliques no Onde Comer.")}
       </section>
 
       <section class="panel-card report-card">
-        <h2>Promocoes</h2>
+        ${renderReportCardHeader("Promocoes", periodRange)}
         ${renderReportList(topFromMap(cliquesPromocoes, 12), "Ainda nao ha cliques em promocoes registrados.")}
       </section>
 
       <section class="panel-card report-card">
-        <h2>Clientes que precisam de atencao</h2>
+        ${renderReportCardHeader("Clientes que precisam de atencao", periodRange)}
         ${renderReportList(clientesAtencao, "Nenhuma pendencia importante encontrada.")}
       </section>
 
       <section class="panel-card report-card">
-        <h2>Top categorias</h2>
+        ${renderReportCardHeader("Top categorias", periodRange)}
         ${renderReportList(topCategorias, "Nenhuma categoria com cliente.")}
       </section>
 
       <section class="panel-card report-card">
-        <h2>Comprovantes recentes</h2>
+        ${renderReportCardHeader("Comprovantes recentes", periodRange)}
         ${renderReportList(faturasComComprovante, "Nenhum comprovante anexado ainda.")}
       </section>
 
       <section class="panel-card report-card">
-        <h2>Usuarios</h2>
+        ${renderReportCardHeader("Usuarios", periodRange)}
         <div class="report-kpis">
           <span>Master: <strong>${roles.master || 0}</strong></span>
           <span>Admin: <strong>${roles.admin || 0}</strong></span>
@@ -2977,7 +2986,7 @@ function renderReports() {
       </section>
 
       <section class="panel-card report-card">
-        <h2>Proximos eventos</h2>
+        ${renderReportCardHeader("Proximos eventos", periodRange)}
         ${renderReportList(proximosEventos, "Nenhum evento ativo futuro encontrado.")}
       </section>
     </div>
