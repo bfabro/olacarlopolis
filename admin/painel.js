@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 122,
-  label: "v122",
+  numero: 123,
+  label: "v123",
   data: "2026-05-20",
-  nota: "Reforca subtitulos e separacao visual das areas de ajuste."
+  nota: "Cria cadastro de Imoveis no painel e publica dados via Firebase."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -51,6 +51,7 @@ let state = {
   clientes: [],
   usuarios: [],
   eventos: [],
+  imoveis: [],
   automoveis: [],
   notasFalecimento: [],
   categorias: [],
@@ -63,12 +64,14 @@ let state = {
   },
   selectedClientId: null,
   selectedEventId: null,
+  selectedImovelId: null,
   selectedAutomovelId: null,
   selectedDeathNoticeId: null,
   selectedCategoryId: null,
   duplicateCleanupPlan: null,
   clientImages: [],
   clientMenuImages: [],
+  imovelImages: [],
   automovelImages: [],
   lastFirebaseClientCount: 0,
   lastVisibleClientCount: 0
@@ -100,6 +103,7 @@ const views = {
   clientes: $("clientesView"),
   categorias: $("categoriasView"),
   eventos: $("eventosView"),
+  imoveis: $("imoveisView"),
   automoveis: $("automoveisView"),
   informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
@@ -115,6 +119,7 @@ const viewCopy = {
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
   categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
+  imoveis: ["Imoveis", "Cadastre imoveis para venda ou aluguel no site publico."],
   automoveis: ["Automoveis", "Cadastre veiculos para venda no site publico."],
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
@@ -249,6 +254,7 @@ function canAccessView(viewName) {
     return true;
   }
   if (viewName === "faturas") return hasPermission("faturas");
+  if (viewName === "imoveis") return hasPermission("imoveis");
   if (viewName === "automoveis") return hasPermission("veiculos");
   if (viewName === "informacoes") return canManageInformacoes();
   if (viewName === "minhaEmpresa") return true;
@@ -984,6 +990,7 @@ async function loadAllData() {
     clientesSnap,
     usersSnap,
     eventosSnap,
+    imoveisSnap,
     automoveisSnap,
     categoriasSnap,
     notasFalecimentoSnap,
@@ -999,6 +1006,7 @@ async function loadAllData() {
     get(ref(db, "clientes")),
     get(ref(db, "usuariosByUid")),
     get(ref(db, "eventos")),
+    get(ref(db, "conteudosInformativos/imoveis")),
     get(ref(db, "conteudosInformativos/automoveis")),
     get(ref(db, "categorias")),
     get(ref(db, "conteudosInformativos/notaFalecimento")),
@@ -1022,6 +1030,17 @@ async function loadAllData() {
     });
   }
   state.usuarios.sort((a, b) => String(a.email || "").localeCompare(String(b.email || "")));
+  state.imoveis = [];
+  if (imoveisSnap.exists()) {
+    imoveisSnap.forEach((child) => {
+      state.imoveis.push({ id: child.key, ...child.val() });
+      return false;
+    });
+  }
+  if (!canManageClients()) {
+    state.imoveis = state.imoveis.filter(itemBelongsToCurrentClient);
+  }
+  state.imoveis.sort((a, b) => String(a.titulo || "").localeCompare(String(b.titulo || ""), "pt-BR"));
   state.automoveis = [];
   if (automoveisSnap.exists()) {
     automoveisSnap.forEach((child) => {
@@ -1113,6 +1132,7 @@ async function loadAllData() {
   fillUserClientSelect();
   fillEventClientSelect();
   renderEventsList();
+  renderImoveisList();
   renderAutomoveisList();
   renderInfoDeathNoticeList();
   renderFinanceiro();
@@ -1189,6 +1209,9 @@ function updateChrome() {
   document.querySelectorAll("[data-permission='faturas']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("faturas") || canManageClients());
   });
+  document.querySelectorAll("[data-permission='imoveis']").forEach((el) => {
+    el.classList.toggle("hidden", !hasPermission("imoveis"));
+  });
   document.querySelectorAll("[data-permission='veiculos']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("veiculos"));
   });
@@ -1224,6 +1247,7 @@ function switchView(name) {
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "relatorios") renderReports();
+  if (target === "imoveis") renderImoveisList();
   if (target === "automoveis") renderAutomoveisList();
   if (target === "informacoes" && !canManageInformacoes()) {
     switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
@@ -1637,6 +1661,16 @@ async function uploadAutomovelImages(id, files) {
     const path = `conteudosInformativos/automoveis/${id}/${Date.now()}-${slugify(file.name || "automovel")}`;
     const fileRef = storageRef(storage, path);
     urls.push(await uploadFileWithProgress(fileRef, file, "Enviando fotos do automovel", `${file.name || "imagem"} (${urls.length + 1}/${Array.from(files || []).length})`));
+  }
+  return urls;
+}
+
+async function uploadImovelImages(id, files) {
+  const urls = [];
+  for (const file of Array.from(files || [])) {
+    const path = `conteudosInformativos/imoveis/${id}/${Date.now()}-${slugify(file.name || "imovel")}`;
+    const fileRef = storageRef(storage, path);
+    urls.push(await uploadFileWithProgress(fileRef, file, "Enviando fotos do imovel", `${file.name || "imagem"} (${urls.length + 1}/${Array.from(files || []).length})`));
   }
   return urls;
 }
@@ -2456,6 +2490,159 @@ function renderAutomoveisList() {
     button.addEventListener("click", () => {
       const item = state.automoveis.find((auto) => auto.id === button.dataset.editAutomovel && itemBelongsToCurrentClient(auto));
       if (item) fillAutomovelForm(item);
+    });
+  });
+}
+
+function resetImovelForm() {
+  state.selectedImovelId = null;
+  state.imovelImages = [];
+  $("imovelForm")?.reset();
+  if ($("imovelId")) $("imovelId").value = "";
+  if ($("imovelTipo")) $("imovelTipo").value = "venda";
+  if ($("imovelProcura")) $("imovelProcura").value = "casa";
+  if ($("imovelStatus")) $("imovelStatus").value = "ativo";
+  $("deleteImovelButton")?.classList.add("hidden");
+  renderImovelImagesPreview();
+}
+
+function fillImovelForm(item) {
+  if (!itemBelongsToCurrentClient(item)) {
+    showToast("Voce nao tem permissao para editar este imovel.");
+    return;
+  }
+  state.selectedImovelId = item.id;
+  state.imovelImages = Array.isArray(item.imagens) ? item.imagens : (item.imagem ? [item.imagem] : []);
+  $("imovelId").value = item.id || "";
+  $("imovelTitulo").value = item.titulo || "";
+  $("imovelTipo").value = item.tipo || "venda";
+  $("imovelProcura").value = item.procura || "casa";
+  $("imovelStatus").value = item.status || "ativo";
+  $("imovelValor").value = item.valor || "";
+  $("imovelCodRef").value = item.codRef || "";
+  $("imovelEndereco").value = item.endereco || "";
+  $("imovelLat").value = item.lat || "";
+  $("imovelLng").value = item.lng || "";
+  $("imovelQuartos").value = item.quartos || "";
+  $("imovelSuite").value = item.suite || "";
+  $("imovelBanheiros").value = item.banheiros || "";
+  $("imovelVagas").value = item.vagas || "";
+  $("imovelSalas").value = item.salas || "";
+  $("imovelCozinhas").value = item.cozinhas || "";
+  $("imovelArea").value = item.area || "";
+  $("imovelConstrucao").value = item.construcao || "";
+  $("imovelPiscina").value = item.piscina || "";
+  $("imovelChurrasqueira").value = item.churrasqueira || "";
+  $("imovelQuintal").value = item.quintal || "";
+  $("imovelOutros").value = item.outros || "";
+  $("imovelCorretor").value = item.corretor || (Array.isArray(item.corretores) ? item.corretores[0] : "") || item.vendedor || "";
+  $("imovelTelefone").value = item.telefone || item.contato || "";
+  $("imovelProprietario").value = item.proprietario || "";
+  $("imovelDescricao").value = item.descricao || "";
+  $("imovelImagem").value = item.imagem || state.imovelImages[0] || "";
+  $("deleteImovelButton")?.classList.remove("hidden");
+  renderImovelImagesPreview();
+}
+
+function numberOrText(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const number = Number(text.replace(/\./g, "").replace(",", ".").replace(/[^\d.]/g, ""));
+  return Number.isFinite(number) && /\d/.test(text) && !/[a-zA-Z]/.test(text) ? number : text;
+}
+
+function getImovelFormData() {
+  const titulo = $("imovelTitulo").value.trim();
+  const id = $("imovelId").value || `${slugify(titulo || "imovel")}-${Date.now()}`;
+  const imagens = [...state.imovelImages].filter(Boolean);
+  const imagem = $("imovelImagem")?.value.trim() || imagens[0] || "";
+  const linkedClient = currentClientRecord();
+  const corretor = $("imovelCorretor").value.trim() || linkedClient?.nome || "";
+  const telefone = $("imovelTelefone").value.trim() || linkedClient?.whatsapp || linkedClient?.contato || "";
+  return {
+    id,
+    titulo,
+    tipo: $("imovelTipo").value,
+    procura: $("imovelProcura").value,
+    status: $("imovelStatus").value,
+    valor: numberOrText($("imovelValor").value),
+    codRef: $("imovelCodRef").value.trim() || id.slice(0, 10).toUpperCase(),
+    endereco: $("imovelEndereco").value.trim(),
+    lat: Number($("imovelLat").value) || "",
+    lng: Number($("imovelLng").value) || "",
+    quartos: Number($("imovelQuartos").value) || "",
+    suite: Number($("imovelSuite").value) || "",
+    banheiros: Number($("imovelBanheiros").value) || "",
+    vagas: Number($("imovelVagas").value) || "",
+    salas: Number($("imovelSalas").value) || "",
+    cozinhas: Number($("imovelCozinhas").value) || "",
+    area: numberOrText($("imovelArea").value),
+    construcao: numberOrText($("imovelConstrucao").value),
+    piscina: $("imovelPiscina").value.trim(),
+    churrasqueira: $("imovelChurrasqueira").value.trim(),
+    quintal: $("imovelQuintal").value.trim(),
+    outros: $("imovelOutros").value.trim(),
+    corretor,
+    corretores: corretor ? [corretor] : [],
+    telefone,
+    contato: telefone,
+    proprietario: $("imovelProprietario").value.trim(),
+    descricao: $("imovelDescricao").value.trim(),
+    imagem,
+    imagens,
+    clienteId: linkedClient?.id || state.profile?.clienteId || "",
+    clienteNome: linkedClient?.nome || corretor,
+    estabelecimentoId: linkedClient?.nomeNormalizado || slugify(linkedClient?.nome || corretor),
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  };
+}
+
+function renderImovelImagesPreview() {
+  const box = $("imovelImagesPreview");
+  if (!box) return;
+  $("imovelImagesCount").textContent = `${state.imovelImages.length} imagen${state.imovelImages.length === 1 ? "" : "s"}`;
+  box.innerHTML = state.imovelImages.map((url, index) => `
+    <article>
+      <img src="${escapeAttr(displayImageUrl(url))}" alt="Foto ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
+      <button type="button" data-remove-imovel-image="${index}">Remover</button>
+    </article>
+  `).join("") || `<div class="list-meta">Nenhuma foto adicionada.</div>`;
+  box.querySelectorAll("[data-remove-imovel-image]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.imovelImages.splice(Number(button.dataset.removeImovelImage), 1);
+      if (!state.imovelImages.includes($("imovelImagem").value)) $("imovelImagem").value = state.imovelImages[0] || "";
+      renderImovelImagesPreview();
+    });
+  });
+}
+
+function renderImoveisList() {
+  const box = $("imoveisList");
+  if (!box) return;
+  const q = String($("imovelSearch")?.value || "").toLowerCase().trim();
+  const list = state.imoveis.filter(itemBelongsToCurrentClient).filter((item) => {
+    const hay = `${item.titulo || ""} ${item.tipo || ""} ${item.procura || ""} ${item.valor || ""} ${item.corretor || ""} ${item.endereco || ""}`.toLowerCase();
+    return !q || hay.includes(q);
+  });
+  if (!list.length) {
+    box.innerHTML = `<div class="list-meta">Nenhum imovel cadastrado.</div>`;
+    return;
+  }
+  box.innerHTML = list.map((item) => `
+    <article class="list-card event-card">
+      ${item.imagem ? `<img src="${escapeAttr(displayImageUrl(item.imagem))}" alt="${escapeAttr(item.titulo || "Imovel")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
+      <div class="list-title">${escapeHtml(item.titulo || item.id)}</div>
+      <div class="list-meta">${escapeHtml([item.tipo, item.procura, item.valor ? moneyBR(item.valor) : ""].filter(Boolean).join(" - ") || "Sem valor")}</div>
+      <div class="list-meta">${escapeHtml([item.corretor || item.clienteNome, item.telefone].filter(Boolean).join(" - ") || "Sem contato")}</div>
+      <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
+      <button type="button" data-edit-imovel="${escapeAttr(item.id)}">Editar</button>
+    </article>
+  `).join("");
+  box.querySelectorAll("[data-edit-imovel]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const item = state.imoveis.find((imovel) => imovel.id === button.dataset.editImovel && itemBelongsToCurrentClient(imovel));
+      if (item) fillImovelForm(item);
     });
   });
 }
@@ -4283,6 +4470,16 @@ function bindEvents() {
     await uploadEventImage(event.target.files?.[0]);
     event.target.value = "";
   });
+  $("newImovelButton")?.addEventListener("click", resetImovelForm);
+  $("imovelSearch")?.addEventListener("input", renderImoveisList);
+  $("imovelImagesUpload")?.addEventListener("change", async (event) => {
+    const id = $("imovelId").value || slugify($("imovelTitulo").value) || `imovel-${Date.now()}`;
+    const urls = await uploadImovelImages(id, event.target.files);
+    state.imovelImages.push(...urls);
+    if (!$("imovelImagem").value && state.imovelImages[0]) $("imovelImagem").value = state.imovelImages[0];
+    renderImovelImagesPreview();
+    event.target.value = "";
+  });
   $("newAutomovelButton")?.addEventListener("click", resetAutomovelForm);
   $("automovelSearch")?.addEventListener("input", renderAutomoveisList);
   $("automovelImagesUpload")?.addEventListener("change", async (event) => {
@@ -4474,6 +4671,47 @@ function bindEvents() {
     });
     showToast("Evento excluido.");
     resetEventForm();
+    await loadAllData();
+  });
+
+  $("imovelForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!hasPermission("imoveis")) return;
+    if (!canManageClients() && !currentClientId()) {
+      showToast("Usuario sem cliente vinculado. Nao e possivel salvar imovel.");
+      return;
+    }
+    if (state.selectedImovelId) {
+      const original = state.imoveis.find((item) => item.id === state.selectedImovelId);
+      if (!original || !itemBelongsToCurrentClient(original)) {
+        showToast("Voce nao tem permissao para alterar este imovel.");
+        return;
+      }
+    }
+    const payload = getImovelFormData();
+    const id = payload.id;
+    delete payload.id;
+    if (!state.selectedImovelId) payload.createdAt = serverTimestamp();
+    const updates = { [`conteudosInformativos/imoveis/${id}`]: payload };
+    if (state.selectedImovelId && state.selectedImovelId !== id) {
+      updates[`conteudosInformativos/imoveis/${state.selectedImovelId}`] = null;
+    }
+    await update(ref(db), updates);
+    showToast("Imovel salvo.");
+    resetImovelForm();
+    await loadAllData();
+  });
+
+  $("deleteImovelButton")?.addEventListener("click", async () => {
+    if (!state.selectedImovelId || !confirm("Excluir este imovel?")) return;
+    const original = state.imoveis.find((item) => item.id === state.selectedImovelId);
+    if (!original || !itemBelongsToCurrentClient(original)) {
+      showToast("Voce nao tem permissao para excluir este imovel.");
+      return;
+    }
+    await remove(ref(db, `conteudosInformativos/imoveis/${state.selectedImovelId}`));
+    showToast("Imovel excluido.");
+    resetImovelForm();
     await loadAllData();
   });
 

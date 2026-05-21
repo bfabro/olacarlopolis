@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=122">
+  <link rel="stylesheet" href="painel.css?v=123">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -48,6 +48,7 @@
         <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
         <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
         <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
+        <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
         <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
         <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
         <button data-view="relatorios" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorios</button>
@@ -500,6 +501,123 @@
         </div>
       </section>
 
+      <section id="imoveisView" class="panel-view hidden">
+        <div class="split-layout">
+          <section class="panel-card">
+            <div class="section-head">
+              <div>
+                <h2>Cadastrar ou editar imovel</h2>
+                <p>Anuncios salvos aparecem no menu Imoveis do site publico.</p>
+              </div>
+              <button id="newImovelButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo</button>
+            </div>
+            <form id="imovelForm" class="grid-form">
+              <input id="imovelId" type="hidden">
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-house"></i>
+                <div>
+                  <strong>Dados do imovel</strong>
+                  <span>Tipo, finalidade, valor e situacao do anuncio.</span>
+                </div>
+              </div>
+              <label>Titulo<input id="imovelTitulo" required placeholder="Ex: Casa a venda no Centro"></label>
+              <label>Tipo de negociacao
+                <select id="imovelTipo">
+                  <option value="venda">Venda</option>
+                  <option value="aluguel">Aluguel</option>
+                </select>
+              </label>
+              <label>Procuro por
+                <select id="imovelProcura">
+                  <option value="casa">Casa</option>
+                  <option value="apartamento">Apartamento</option>
+                  <option value="terreno">Terreno</option>
+                  <option value="chacara">Chacara</option>
+                  <option value="sitio">Sitio</option>
+                  <option value="comercial">Comercial</option>
+                  <option value="rural">Rural</option>
+                </select>
+              </label>
+              <label>Status
+                <select id="imovelStatus">
+                  <option value="ativo">Ativo</option>
+                  <option value="vendido">Vendido</option>
+                  <option value="alugado">Alugado</option>
+                  <option value="negociado">Negociado</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+              </label>
+              <label>Valor<input id="imovelValor" placeholder="R$"></label>
+              <label>Codigo de referencia<input id="imovelCodRef" placeholder="Ex: C_001"></label>
+              <label class="wide">Endereco / bairro<input id="imovelEndereco" placeholder="Ex: Centro - Carlopolis"></label>
+              <label>Latitude<input id="imovelLat" placeholder="-23.3958"></label>
+              <label>Longitude<input id="imovelLng" placeholder="-49.7240"></label>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-ruler-combined"></i>
+                <div>
+                  <strong>Caracteristicas</strong>
+                  <span>Preencha somente o que fizer sentido para o tipo de imovel.</span>
+                </div>
+              </div>
+              <label>Quartos<input id="imovelQuartos" type="number" min="0"></label>
+              <label>Suites<input id="imovelSuite" type="number" min="0"></label>
+              <label>Banheiros<input id="imovelBanheiros" type="number" min="0"></label>
+              <label>Vagas<input id="imovelVagas" type="number" min="0"></label>
+              <label>Salas<input id="imovelSalas" type="number" min="0"></label>
+              <label>Cozinhas<input id="imovelCozinhas" type="number" min="0"></label>
+              <label>Area total<input id="imovelArea" placeholder="Ex: 300 ou 12 alqueires"></label>
+              <label>Area construida<input id="imovelConstrucao" placeholder="Ex: 120"></label>
+              <label>Piscina<input id="imovelPiscina" placeholder="Sim/Nao"></label>
+              <label>Churrasqueira<input id="imovelChurrasqueira" placeholder="Sim/Nao"></label>
+              <label>Quintal<input id="imovelQuintal" placeholder="Sim/Nao"></label>
+              <label>Outros<input id="imovelOutros" placeholder="Ex: edicula, lavanderia"></label>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-user-tie"></i>
+                <div>
+                  <strong>Responsavel e contato</strong>
+                  <span>Corretor, proprietario, telefone e descricao para o publico.</span>
+                </div>
+              </div>
+              <label>Corretor / imobiliaria<input id="imovelCorretor" placeholder="Nome do responsavel"></label>
+              <label>Telefone / WhatsApp<input id="imovelTelefone" placeholder="(43) 99999-9999"></label>
+              <label>Proprietario<input id="imovelProprietario" placeholder="Opcional"></label>
+              <label class="wide">Descricao<textarea id="imovelDescricao" rows="4" placeholder="Detalhes do imovel..."></textarea></label>
+              <input id="imovelImagem" type="hidden">
+
+              <section class="wide upload-panel">
+                <div class="section-head compact">
+                  <div>
+                    <h3>Fotos do imovel</h3>
+                    <p>Envie imagens do imovel. A primeira sera usada como imagem principal.</p>
+                  </div>
+                  <span id="imovelImagesCount" class="badge">0 imagens</span>
+                </div>
+                <input id="imovelImagesUpload" type="file" accept="image/*" multiple>
+                <div id="imovelImagesPreview" class="image-grid"></div>
+              </section>
+
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar imovel</button>
+                <button id="deleteImovelButton" type="button" class="danger hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card">
+            <div class="section-head">
+              <div>
+                <h2>Imoveis cadastrados</h2>
+                <p>Edite, inative ou remova anuncios.</p>
+              </div>
+            </div>
+            <input id="imovelSearch" class="search-input" placeholder="Buscar imovel...">
+            <div id="imoveisList" class="entity-list"></div>
+          </section>
+        </div>
+      </section>
+
       <section id="automoveisView" class="panel-view hidden">
         <div class="split-layout">
           <section class="panel-card">
@@ -667,6 +785,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=122"></script>
+  <script type="module" src="painel.js?v=123"></script>
 </body>
 </html>

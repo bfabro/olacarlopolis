@@ -5792,7 +5792,74 @@ ${(cardapioVisivel(est) || est.contact) ? `
 
 
   // monta página
-  function mostrarImoveisV2() {
+  function normalizarImovelFirebase(item, key) {
+    const imagens = Array.isArray(item.imagens) ? item.imagens : (item.imagem ? [item.imagem] : []);
+    const valorRaw = item.valor ?? item.preco ?? "";
+    const valorNum = typeof valorRaw === "number"
+      ? valorRaw
+      : Number(String(valorRaw || "").replace(/\./g, "").replace(",", ".").replace(/[^\d.]/g, ""));
+    return {
+      id: key || item.id || `imovel-${Date.now()}`,
+      titulo: item.titulo || item.nome || "Imovel disponivel",
+      tipo: item.tipo || "venda",
+      procura: item.procura || item.tipoImovel || item.categoria || "casa",
+      status: item.status || "ativo",
+      valor: Number.isFinite(valorNum) && valorNum > 0 ? valorNum : valorRaw,
+      codRef: item.codRef || item.codigo || key || "",
+      endereco: item.endereco || item.bairro || item.local || "",
+      lat: Number(item.lat) || "",
+      lng: Number(item.lng) || "",
+      quartos: Number(item.quartos) || "",
+      suite: Number(item.suite) || "",
+      banheiros: Number(item.banheiros) || "",
+      vagas: Number(item.vagas) || "",
+      salas: Number(item.salas) || "",
+      cozinhas: Number(item.cozinhas) || "",
+      area: item.area || "",
+      construcao: item.construcao || item.areaConstruida || "",
+      piscina: item.piscina || "",
+      churrasqueira: item.churrasqueira || "",
+      quintal: item.quintal || "",
+      outros: item.outros || "",
+      corretor: item.corretor || item.vendedor || item.clienteNome || "",
+      corretores: Array.isArray(item.corretores) ? item.corretores : (item.corretor ? [item.corretor] : []),
+      telefone: item.telefone || item.contato || item.whatsapp || "",
+      proprietario: item.proprietario || "",
+      descricao: item.descricao || "",
+      imagem: item.imagem || imagens[0] || "",
+      imagens: imagens.length ? imagens : (item.imagem ? [item.imagem] : []),
+      clienteId: item.clienteId || "",
+      clienteNome: item.clienteNome || "",
+      origemFirebase: true
+    };
+  }
+
+  async function carregarImoveisFirebase() {
+    const dbAdmin = await esperarFirebaseDatabase();
+    if (!dbAdmin) return [];
+    const snap = await dbAdmin.ref("conteudosInformativos/imoveis").once("value");
+    const lista = [];
+    snap.forEach((child) => {
+      lista.push(normalizarImovelFirebase(child.val() || {}, child.key));
+      return false;
+    });
+    return lista.filter((item) => item.status !== "inativo");
+  }
+
+  async function montarListaImoveisPublica() {
+    try {
+      const firebaseItems = await carregarImoveisFirebase();
+      const map = new Map();
+      IM_DADOS.forEach((item) => map.set(String(item.id), item));
+      firebaseItems.forEach((item) => map.set(String(item.id), item));
+      return [...map.values()];
+    } catch (error) {
+      console.warn("Nao foi possivel carregar imoveis do Firebase.", error);
+      return IM_DADOS.slice();
+    }
+  }
+
+  async function mostrarImoveisV2() {
     if (location.hash !== "#imoveis") location.hash = "#imoveis";
 
     const area = document.querySelector(".content_area");
@@ -6012,7 +6079,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
     });
 
     // inicia grid + mapa
-    stateImoveis.all = IM_DADOS.slice();
+    stateImoveis.all = await montarListaImoveisPublica();
 stateImoveis.filtered = stateImoveis.all.slice();
 popularFiltroCorretor();
 atualizarContagemFiltroProcura();
@@ -6576,11 +6643,13 @@ plotarPinsImoveis(stateImoveis.filtered);
     }).addTo(stateImoveis.map);
   }
   function plotarPinsImoveis(lista) {
+    if (!stateImoveis.map || !window.L) return;
     // limpa marcadores antigos
     stateImoveis.markers.forEach(m => stateImoveis.map.removeLayer(m));
     stateImoveis.markers = [];
 
     lista.forEach(im => {
+      if (!Number.isFinite(Number(im.lat)) || !Number.isFinite(Number(im.lng))) return;
       const marker = L.marker([im.lat, im.lng]).addTo(stateImoveis.map);
       marker.on("click", () => {
         // centraliza e abre galeria mini
