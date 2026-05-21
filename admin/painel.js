@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 115,
-  label: "v115",
+  numero: 116,
+  label: "v116",
   data: "2026-05-20",
-  nota: "Reforca abertura dos menus Imoveis e Automoveis."
+  nota: "Restringe automoveis ao cliente vinculado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -205,6 +205,38 @@ function isMaster() {
 function hasPermission(permission) {
   if (canManageClients()) return true;
   return Boolean(state.profile?.permissoes?.[permission]);
+}
+
+function currentClientId() {
+  return state.profile?.clienteId || "";
+}
+
+function currentClientRecord() {
+  const id = currentClientId();
+  if (!id) return null;
+  return state.clientes.find((client) => client.id === id) || null;
+}
+
+function itemBelongsToCurrentClient(item = {}) {
+  if (canManageClients()) return true;
+  const clientId = currentClientId();
+  if (!clientId) return false;
+  const client = currentClientRecord();
+  const candidates = [
+    item.clienteId,
+    item.clientId,
+    item.estabelecimentoId,
+    item.clienteNome,
+    item.vendedor,
+    item.loja
+  ].filter(Boolean).map((value) => normalizeName(value));
+  const ownKeys = [
+    clientId,
+    client?.id,
+    client?.nome,
+    client?.nomeNormalizado
+  ].filter(Boolean).map((value) => normalizeName(value));
+  return ownKeys.some((key) => candidates.includes(key));
 }
 
 function canManageInformacoes() {
@@ -968,6 +1000,9 @@ async function loadAllData() {
       state.automoveis.push({ id: child.key, ...child.val() });
       return false;
     });
+  }
+  if (!canManageClients()) {
+    state.automoveis = state.automoveis.filter(itemBelongsToCurrentClient);
   }
   state.automoveis.sort((a, b) => String(a.marca || "").localeCompare(String(b.marca || ""), "pt-BR"));
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
@@ -2274,6 +2309,10 @@ function resetAutomovelForm() {
 }
 
 function fillAutomovelForm(item) {
+  if (!itemBelongsToCurrentClient(item)) {
+    showToast("Voce nao tem permissao para editar este automovel.");
+    return;
+  }
   state.selectedAutomovelId = item.id;
   state.automovelImages = Array.isArray(item.imagens) ? item.imagens : (item.imagem ? [item.imagem] : []);
   $("automovelId").value = item.id || "";
@@ -2305,9 +2344,7 @@ function getAutomovelFormData() {
   const id = $("automovelId").value || `${slugify(`${marca}-${modelo}`)}-${Date.now()}`;
   const imagens = [...state.automovelImages].filter(Boolean);
   const imagem = $("automovelImagem")?.value.trim() || imagens[0] || "";
-  const linkedClient = state.profile?.clienteId
-    ? state.clientes.find((client) => client.id === state.profile.clienteId)
-    : null;
+  const linkedClient = currentClientRecord();
   const vendedor = $("automovelVendedor").value.trim() || linkedClient?.nome || "";
   return {
     id,
@@ -2362,7 +2399,7 @@ function renderAutomoveisList() {
   const box = $("automoveisList");
   if (!box) return;
   const q = String($("automovelSearch")?.value || "").toLowerCase().trim();
-  const list = state.automoveis.filter((item) => {
+  const list = state.automoveis.filter(itemBelongsToCurrentClient).filter((item) => {
     const hay = `${item.tipo || ""} ${item.marca || ""} ${item.modelo || ""} ${item.ano || ""} ${item.preco || ""} ${item.vendedor || ""} ${item.loja || ""}`.toLowerCase();
     return !q || hay.includes(q);
   });
@@ -2385,7 +2422,7 @@ function renderAutomoveisList() {
   }).join("");
   box.querySelectorAll("[data-edit-automovel]").forEach((button) => {
     button.addEventListener("click", () => {
-      const item = state.automoveis.find((auto) => auto.id === button.dataset.editAutomovel);
+      const item = state.automoveis.find((auto) => auto.id === button.dataset.editAutomovel && itemBelongsToCurrentClient(auto));
       if (item) fillAutomovelForm(item);
     });
   });
@@ -4365,6 +4402,17 @@ function bindEvents() {
   $("automovelForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!hasPermission("veiculos")) return;
+    if (!canManageClients() && !currentClientId()) {
+      showToast("Usuario sem cliente vinculado. Nao e possivel salvar automovel.");
+      return;
+    }
+    if (state.selectedAutomovelId) {
+      const original = state.automoveis.find((item) => item.id === state.selectedAutomovelId);
+      if (!original || !itemBelongsToCurrentClient(original)) {
+        showToast("Voce nao tem permissao para alterar este automovel.");
+        return;
+      }
+    }
     const payload = getAutomovelFormData();
     const id = payload.id;
     delete payload.id;
@@ -4381,6 +4429,11 @@ function bindEvents() {
 
   $("deleteAutomovelButton")?.addEventListener("click", async () => {
     if (!state.selectedAutomovelId || !confirm("Excluir este automovel?")) return;
+    const original = state.automoveis.find((item) => item.id === state.selectedAutomovelId);
+    if (!original || !itemBelongsToCurrentClient(original)) {
+      showToast("Voce nao tem permissao para excluir este automovel.");
+      return;
+    }
     await remove(ref(db, `conteudosInformativos/automoveis/${state.selectedAutomovelId}`));
     showToast("Automovel excluido.");
     resetAutomovelForm();
