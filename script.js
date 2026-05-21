@@ -7564,17 +7564,21 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
     const itensFiltrados = itens.filter(i => !promoExpirada(i) && promoDisponivelHoje(i));
-
-
+    const totalDisponiveis = itensFiltrados.length;
+    const totalEstabelecimentos = estabelecimentos.length;
 
 
     // título + filtro
     let html = `
-    <section class="promo-hero">
+    <section class="promo-hero promo-hero-new">
        <h2 class="highlighted"><span>🔥 Promoções</span>
     </h2>
-     <div class="filtro-comidas-card">
-    <label for="filtroEstab">Filtrar por:</label>
+       <div class="promo-hero-stats">
+        <span><strong>${totalDisponiveis}</strong> ofertas hoje</span>
+        <span><strong>${totalEstabelecimentos}</strong> estabelecimentos</span>
+       </div>
+     <div class="filtro-comidas-card promo-filter-card">
+    <label for="filtroEstab"><i class="fa-solid fa-filter"></i> Filtrar por</label>
     <select id="filtroEstab">
   <option value="todos">🔥 Todos</option>
  ${estabelecimentos.map(e => `
@@ -7618,18 +7622,21 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
         html += `
-    <article class="promo-card" data-promo-est="${i.estabelecimentoId}">
+    <article class="promo-card promo-card-new" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+    <div class="promo-top-ribbon">${precoAntFmt ? "Oferta especial" : "Promoção"}</div>
     <div class="promo-card-body">
       <div class="promo-produto">
-        ${i.imagem
+        <div class="promo-image-wrap">
+          ${i.imagem
             ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
             : `<div class="promo-sem-imagem">sem imagem</div>`}
+        </div>
         
         <div class="promo-info">
+          <div class="promo-estab"><i class="fa-solid fa-store"></i> ${i.estabelecimento}</div>
           <div class="promo-nome">${i.titulo}</div>
           ${(i.volume || i.embalagem)
             ? `<div class="promo-det">${[i.volume, i.embalagem].filter(Boolean).join(" · ")}</div>` : ""}
-          <div class="promo-estab">${i.estabelecimento}</div>
           ${textoDiasPromocao(i) ? `<div class="promo-days">${textoDiasPromocao(i)}</div>` : ""}
           ${i.obs ? `<div class="promo-obs">${i.obs}</div>` : ""}
           
@@ -7655,8 +7662,8 @@ plotarPinsImoveis(stateImoveis.filtered);
             ? `<a href="https://wa.me/55${somenteDigitos(getPrimeiroContato(i.contact))}?text=${encodeURIComponent(`Olá, encontrei o produto ${i.titulo} no Olá Carlópolis. Está disponível ainda?`)
             }" 
           target="_blank" 
-          class="icon-link">
-          <i class="fab fa-whatsapp" style="color:#25D366"></i>${i.contact}
+          class="icon-link promo-whats-link">
+          <i class="fab fa-whatsapp"></i> Chamar no Whats
         </a>`
             : ""}
 
@@ -7666,8 +7673,8 @@ plotarPinsImoveis(stateImoveis.filtered);
             ? `<a href="${fixUrl(categories.flatMap(c => c.establishments || [])
               .find(e => normalizeName(e.name) === i.estabelecimentoId).instagram)}"
         target="_blank"
-        class="icon-link">
-        <i class="fab fa-instagram" style="color:#C13584"></i> Instagram
+        class="icon-link promo-instagram-link">
+        <i class="fab fa-instagram"></i>
       </a>`
             : ""}
 

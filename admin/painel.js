@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 129,
-  label: "v129",
+  numero: 131,
+  label: "v131",
   data: "2026-05-20",
-  nota: "Corrige cadastro e exibicao de promocoes dos clientes."
+  nota: "Melhora a vitrine publica de promocoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1631,7 +1631,7 @@ async function addClientPromocao() {
   const currentId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
   let image = $("clientPromoImageUrl")?.value.trim() || "";
   const file = $("clientPromoImageUpload")?.files?.[0];
-  if (file) {
+  if (file && !image) {
     showToast("Enviando imagem da promocao...");
     image = await uploadPromoImageForClient(currentId, file);
   }
@@ -1838,6 +1838,28 @@ async function uploadPromoImageForClient(clientId, file) {
   const path = `clientes/${clientId}/promocoes/${Date.now()}-${slugify(file.name || "promocao")}`;
   const fileRef = storageRef(storage, path);
   return uploadFileWithProgress(fileRef, file, "Enviando imagem da promocao", file.name || "promocao");
+}
+
+async function uploadSelectedPromoImage(inputId, targetInputId, clientId) {
+  const input = $(inputId);
+  const target = $(targetInputId);
+  const file = input?.files?.[0];
+  if (!file || !target) return "";
+  const id = clientId || slugify($("clientName")?.value.trim()) || $("clientId")?.value || `cliente-${Date.now()}`;
+  try {
+    setBusy(input, true);
+    showToast("Enviando imagem da promocao...");
+    const url = await uploadPromoImageForClient(id, file);
+    target.value = url;
+    showToast("Imagem da promocao enviada.");
+    return url;
+  } catch (error) {
+    console.error(error);
+    showToast("Nao foi possivel enviar a imagem da promocao.");
+    return "";
+  } finally {
+    setBusy(input, false);
+  }
 }
 
 async function uploadAutomovelImages(id, files) {
@@ -3886,7 +3908,7 @@ function renderClientOnlyEditor() {
 
     let image = $("coPromoImageUrl").value.trim();
     const imageFile = $("coPromoImageUpload").files?.[0];
-    if (imageFile) {
+    if (imageFile && !image) {
       showToast("Enviando imagem da promocao...");
       image = await uploadPromoImageForClient(client.id, imageFile);
     }
@@ -3917,6 +3939,11 @@ function renderClientOnlyEditor() {
     showToast("Promocao adicionada.");
     await loadAllData();
     renderClientOnlyEditor();
+  });
+
+  mount.querySelector("#coPromoImageUpload")?.addEventListener("change", async (event) => {
+    await uploadSelectedPromoImage("coPromoImageUpload", "coPromoImageUrl", client.id);
+    event.target.value = "";
   });
 
   mount.querySelectorAll("[data-co-main]").forEach((button) => {
@@ -4685,6 +4712,11 @@ function bindEvents() {
   });
   $("addClientImageUrlButton").addEventListener("click", addClientImageFromUrl);
   $("addClientPromoButton")?.addEventListener("click", addClientPromocao);
+  $("clientPromoImageUpload")?.addEventListener("change", async (event) => {
+    const targetId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
+    await uploadSelectedPromoImage("clientPromoImageUpload", "clientPromoImageUrl", targetId);
+    event.target.value = "";
+  });
   $("newEventButton").addEventListener("click", () => {
     resetEventForm();
     openFormForEdit("eventForm");
