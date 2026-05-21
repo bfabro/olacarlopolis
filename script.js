@@ -5843,7 +5843,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
       lista.push(normalizarImovelFirebase(child.val() || {}, child.key));
       return false;
     });
-    return lista.filter((item) => item.status !== "inativo");
+    return lista;
   }
 
   async function montarListaImoveisPublica() {
@@ -5851,7 +5851,13 @@ ${(cardapioVisivel(est) || est.contact) ? `
       const firebaseItems = await carregarImoveisFirebase();
       const map = new Map();
       IM_DADOS.forEach((item) => map.set(String(item.id), item));
-      firebaseItems.forEach((item) => map.set(String(item.id), item));
+      firebaseItems.forEach((item) => {
+        if (item.status === "inativo" || item.ocultarBaseInicial) {
+          map.delete(String(item.id));
+          return;
+        }
+        map.set(String(item.id), item);
+      });
       return [...map.values()];
     } catch (error) {
       console.warn("Nao foi possivel carregar imoveis do Firebase.", error);

@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 123,
-  label: "v123",
+  numero: 124,
+  label: "v124",
   data: "2026-05-20",
-  nota: "Cria cadastro de Imoveis no painel e publica dados via Firebase."
+  nota: "Importa imoveis base no painel e permite sobrescrever ou remover via Firebase."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -233,7 +233,10 @@ function itemBelongsToCurrentClient(item = {}) {
     item.estabelecimentoId,
     item.clienteNome,
     item.vendedor,
-    item.loja
+    item.loja,
+    item.corretor,
+    ...(Array.isArray(item.corretores) ? item.corretores : []),
+    item.proprietario
   ].filter(Boolean).map((value) => normalizeName(value));
   const ownKeys = [
     clientId,
@@ -241,7 +244,7 @@ function itemBelongsToCurrentClient(item = {}) {
     client?.nome,
     client?.nomeNormalizado
   ].filter(Boolean).map((value) => normalizeName(value));
-  return ownKeys.some((key) => candidates.includes(key));
+  return ownKeys.some((key) => candidates.some((candidate) => candidate === key || candidate.includes(key) || key.includes(candidate)));
 }
 
 function canManageInformacoes() {
@@ -708,6 +711,60 @@ function normalizeScriptEvent(est, index = 0) {
   });
 }
 
+function normalizeScriptImovel(item = {}, index = 0) {
+  const imagens = Array.isArray(item.imagens) ? item.imagens.filter(Boolean) : (item.imagem ? [item.imagem] : []);
+  const corretor = item.corretor || (Array.isArray(item.corretores) ? item.corretores[0] : "") || "";
+  return {
+    ...item,
+    id: item.id || `imovel-script-${index + 1}`,
+    titulo: item.titulo || item.nome || `Imovel ${index + 1}`,
+    tipo: item.tipo || "venda",
+    procura: item.procura || item.tipoImovel || "casa",
+    status: item.status || "ativo",
+    codRef: item.codRef || item.codigo || item.id || `IM_${index + 1}`,
+    imagem: item.imagem || imagens[0] || "",
+    imagens,
+    corretor,
+    telefone: item.telefone || item.contato || item.whatsapp || "",
+    clienteNome: item.clienteNome || corretor,
+    estabelecimentoId: item.estabelecimentoId || normalizeName(corretor),
+    origem: "script.js",
+    origemBase: "script.js"
+  };
+}
+
+function extractConstArrayFromCode(code, constName) {
+  const marker = new RegExp(`const\\s+${constName}\\s*=\\s*\\[`, "m").exec(code);
+  if (!marker) return "[]";
+  const start = marker.index + marker[0].lastIndexOf("[");
+  let depth = 0;
+  let quote = "";
+  let escaped = false;
+  for (let i = start; i < code.length; i += 1) {
+    const ch = code[i];
+    if (quote) {
+      if (escaped) {
+        escaped = false;
+      } else if (ch === "\\") {
+        escaped = true;
+      } else if (ch === quote) {
+        quote = "";
+      }
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") {
+      quote = ch;
+      continue;
+    }
+    if (ch === "[") depth += 1;
+    if (ch === "]") {
+      depth -= 1;
+      if (depth === 0) return code.slice(start, i + 1);
+    }
+  }
+  return "[]";
+}
+
 async function loadScriptEventsForPanel() {
   try {
     const source = await getScriptImportSource();
@@ -1030,13 +1087,15 @@ async function loadAllData() {
     });
   }
   state.usuarios.sort((a, b) => String(a.email || "").localeCompare(String(b.email || "")));
-  state.imoveis = [];
+  const scriptImoveis = await loadScriptImoveisForPanel();
+  const firebaseImoveis = [];
   if (imoveisSnap.exists()) {
     imoveisSnap.forEach((child) => {
-      state.imoveis.push({ id: child.key, ...child.val() });
+      firebaseImoveis.push({ id: child.key, ...child.val(), origem: child.val()?.origem || "firebase" });
       return false;
     });
   }
+  state.imoveis = mergeImoveisBaseComFirebase(scriptImoveis, firebaseImoveis);
   if (!canManageClients()) {
     state.imoveis = state.imoveis.filter(itemBelongsToCurrentClient);
   }
@@ -1159,6 +1218,7 @@ async function getScriptImportSource() {
 
   const safeCode = match[1].replace(/document\.querySelector\([^)]+\)/g, "null");
   const categories = new Function(`return (${safeCode});`)();
+  const imoveisBase = new Function(`return (${extractConstArrayFromCode(code, "IM_DADOS")});`)();
   const expectedClientIds = new Set();
   categories.forEach((category) => {
     const categoryName = category.title || "Outros";
@@ -1169,13 +1229,38 @@ async function getScriptImportSource() {
   });
   const totalClients = expectedClientIds.size;
 
-  return { categories, statusMap, totalClients };
+  return { categories, statusMap, totalClients, imoveisBase };
 }
 
 let autoImportRunning = false;
 
 async function autoEnsureImportedClients() {
   return;
+}
+
+async function loadScriptImoveisForPanel() {
+  try {
+    const source = await getScriptImportSource();
+    return (source.imoveisBase || []).map(normalizeScriptImovel);
+  } catch (error) {
+    console.warn("Nao foi possivel carregar imoveis base do script.js.", error);
+    return [];
+  }
+}
+
+function mergeImoveisBaseComFirebase(scriptImoveis, firebaseImoveis) {
+  const map = new Map();
+  (scriptImoveis || []).forEach((item) => {
+    map.set(String(item.id), item);
+  });
+  (firebaseImoveis || []).forEach((item) => {
+    map.set(String(item.id), {
+      ...(map.get(String(item.id)) || {}),
+      ...item,
+      origemBase: map.has(String(item.id)) ? "script.js" : (item.origemBase || item.origem || "firebase")
+    });
+  });
+  return [...map.values()];
 }
 
 function renderStats() {
@@ -2593,6 +2678,10 @@ function getImovelFormData() {
     clienteId: linkedClient?.id || state.profile?.clienteId || "",
     clienteNome: linkedClient?.nome || corretor,
     estabelecimentoId: linkedClient?.nomeNormalizado || slugify(linkedClient?.nome || corretor),
+    origem: "painel",
+    origemBase: state.selectedImovelId
+      ? (state.imoveis.find((item) => item.id === state.selectedImovelId)?.origemBase || "firebase")
+      : "painel",
     updatedAt: serverTimestamp(),
     updatedBy: state.user?.uid || ""
   };
@@ -2635,6 +2724,7 @@ function renderImoveisList() {
       <div class="list-title">${escapeHtml(item.titulo || item.id)}</div>
       <div class="list-meta">${escapeHtml([item.tipo, item.procura, item.valor ? moneyBR(item.valor) : ""].filter(Boolean).join(" - ") || "Sem valor")}</div>
       <div class="list-meta">${escapeHtml([item.corretor || item.clienteNome, item.telefone].filter(Boolean).join(" - ") || "Sem contato")}</div>
+      <div class="list-meta">${escapeHtml(item.origemBase === "script.js" && item.origem !== "painel" ? "Base inicial do site" : "Firebase / Painel")}</div>
       <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
       <button type="button" data-edit-imovel="${escapeAttr(item.id)}">Editar</button>
     </article>
@@ -4709,7 +4799,20 @@ function bindEvents() {
       showToast("Voce nao tem permissao para excluir este imovel.");
       return;
     }
-    await remove(ref(db, `conteudosInformativos/imoveis/${state.selectedImovelId}`));
+    if (original.origemBase === "script.js") {
+      const tombstone = cleanForFirebase({
+        ...original,
+        status: "inativo",
+        ocultarBaseInicial: true,
+        origem: "painel",
+        origemBase: "script.js",
+        deletedAt: serverTimestamp(),
+        deletedBy: state.user?.uid || ""
+      });
+      await update(ref(db, `conteudosInformativos/imoveis/${state.selectedImovelId}`), tombstone);
+    } else {
+      await remove(ref(db, `conteudosInformativos/imoveis/${state.selectedImovelId}`));
+    }
     showToast("Imovel excluido.");
     resetImovelForm();
     await loadAllData();
