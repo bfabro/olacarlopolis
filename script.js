@@ -5997,8 +5997,10 @@ document.getElementById("filtroCorretor")
   ?.addEventListener("change", aplicarFiltrosImoveis);
 
 desenharGridImoveis(stateImoveis.filtered);
-iniciarMapaImoveis();
-plotarPinsImoveis(stateImoveis.filtered);
+if (document.getElementById("imMap") && window.L) {
+  iniciarMapaImoveis();
+  plotarPinsImoveis(stateImoveis.filtered);
+}
   }
 
   const stateImoveis = { all: [], filtered: [], map: null, markers: [] };
@@ -6855,7 +6857,14 @@ plotarPinsImoveis(stateImoveis.filtered);
     `;
 
     const box = document.getElementById("automoveisLista");
-    const lista = await carregarAutomoveisFirebase();
+    let lista = [];
+    try {
+      lista = await carregarAutomoveisFirebase();
+    } catch (error) {
+      console.warn("Nao foi possivel carregar automoveis.", error);
+      box.innerHTML = `<div class="list-meta">Nao foi possivel carregar os automoveis agora.</div>`;
+      return;
+    }
     if (!lista.length) {
       box.innerHTML = `<div class="list-meta">Nenhum automovel anunciado no momento.</div>`;
       return;
@@ -6928,6 +6937,23 @@ plotarPinsImoveis(stateImoveis.filtered);
       mostrarAutomoveis();
     });
   }
+
+  document.addEventListener("click", function (event) {
+    const linkImoveis = event.target.closest?.("#menuImoveis");
+    const linkAutomoveis = event.target.closest?.("#menuAutomoveis");
+    if (!linkImoveis && !linkAutomoveis) return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    event.__menuClickTracked = true;
+    if (linkImoveis) {
+      registrarCliqueMenuLateral("Imoveis");
+      mostrarImoveisV2();
+      return;
+    }
+    registrarCliqueMenuLateral("Automoveis");
+    mostrarAutomoveis();
+  }, true);
 
 
 

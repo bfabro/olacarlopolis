@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 114,
-  label: "v114",
+  numero: 115,
+  label: "v115",
   data: "2026-05-20",
-  nota: "Corrige abertura dos menus Imoveis e Automoveis."
+  nota: "Reforca abertura dos menus Imoveis e Automoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
