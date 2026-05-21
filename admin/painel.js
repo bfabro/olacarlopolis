@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 111,
-  label: "v111",
+  numero: 112,
+  label: "v112",
   data: "2026-05-20",
-  nota: "Importa eventos base para o Firebase e exibe na tela publica."
+  nota: "Garante importacao dos eventos publicos para o Firebase."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -575,6 +575,53 @@ function eventVisible(evento = {}) {
   return !["excluido", "excluida", "removido", "removida"].includes(status);
 }
 
+const PUBLIC_EVENTS_FALLBACK = [
+  {
+    image: "images/informacoes/eventos/18.jpg",
+    name: "Festa da APAE",
+    date: "13/06/2026",
+    address: "Festa da APAE",
+    instagram: "https://www.instagram.com/p/DUbTl7rkbEG/",
+    infoAdicional: "A tradicional festa da apae"
+  },
+  {
+    image: "images/informacoes/eventos/1.jpg",
+    name: "Undokai 2026",
+    date: "12/07/2026",
+    address: "Campo da Acecar"
+  },
+  {
+    image: "images/informacoes/eventos/14.jpg",
+    name: "FrutFest 2026",
+    date: "03/09/2026",
+    address: "Ilha do Ponciano",
+    instagram: "https://www.instagram.com/p/DT_RNkUjoSW/",
+    infoAdicional: "FrutFest 2026, de 03 a 06 de Setembro<br> Qui 03/09: Cesar Menotti e Fabiano<br>Sex 04/09: Matheus e Kauan + US AgroBoy<br> Sab 05/09: Victor e Leo + Jyraia Uai<br>Dom 06/09 Alexandre Pires + Luan Pereira"
+  },
+  {
+    image: "images/informacoes/eventos/11.jpg",
+    name: "7 Encontro de Motociclistas - Lobo da fronteira",
+    date: "10/10/2026",
+    address: "-",
+    instagram: "https://www.instagram.com/p/DT_RNkUjoSW/",
+    infoAdicional: "Em Breve Mais informacoes"
+  },
+  {
+    image: "images/informacoes/eventos/13.jpg",
+    name: "Low City 043 Fest",
+    date: "18/10/2026",
+    address: "Ilha do Ponciano",
+    instagram: "https://www.instagram.com/p/DTfq3ICka4e/",
+    infoAdicional: "3a Edicao do Low City 043 Fest"
+  },
+  {
+    image: "images/informacoes/eventos/2.jpg",
+    name: "Tooronagashi",
+    date: "24/10/2026",
+    address: "Ilha do Ponciano"
+  }
+];
+
 function normalizeScriptEvent(est, index = 0) {
   const title = est.name || est.nome || est.titulo || `Evento ${index + 1}`;
   const rawDate = eventRawDate(est);
@@ -598,13 +645,21 @@ function normalizeScriptEvent(est, index = 0) {
 async function loadScriptEventsForPanel() {
   try {
     const source = await getScriptImportSource();
-    const eventsCategory = (source.categories || []).find((category) => slugify(category.title || "") === "eventosemcarlopolis");
-    return (eventsCategory?.establishments || [])
+    const eventsCategory = (source.categories || []).find((category) => {
+      const title = category.title || "";
+      return slugify(title) === "eventosemcarlopolis" || normalizeName(title).includes("eventos");
+    });
+    const fromScript = (eventsCategory?.establishments || [])
       .filter((item) => item?.name || item?.nome || item?.titulo)
       .map((item, index) => normalizeScriptEvent(item, index));
+    const byKey = new Map();
+    [...fromScript, ...PUBLIC_EVENTS_FALLBACK.map((item, index) => normalizeScriptEvent(item, index + 100))].forEach((event) => {
+      byKey.set(eventIdentity(event), event);
+    });
+    return [...byKey.values()];
   } catch (error) {
     console.warn("Nao foi possivel carregar eventos base do script.js.", error);
-    return [];
+    return PUBLIC_EVENTS_FALLBACK.map((item, index) => normalizeScriptEvent(item, index + 100));
   }
 }
 
