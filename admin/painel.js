@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 106,
-  label: "v106",
+  numero: 107,
+  label: "v107",
   data: "2026-05-20",
-  nota: "Mostra periodo nos cards de relatorios e corrige cliques do menu."
+  nota: "Carrega eventos base no painel e mostra datas na lista."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -539,6 +539,70 @@ async function loadScriptCategoriesForPanel() {
   }
 }
 
+function eventRawDate(evento = {}) {
+  return evento.data || evento.date || evento.dataEvento || evento.eventDate || "";
+}
+
+function normalizeEventDate(value) {
+  const text = String(value || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+  const br = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (br) return `${br[3]}-${String(br[2]).padStart(2, "0")}-${String(br[1]).padStart(2, "0")}`;
+  return "";
+}
+
+function displayEventDate(value) {
+  const text = String(value || "").trim();
+  if (!text) return "Sem data";
+  const iso = normalizeEventDate(text);
+  if (iso) {
+    const [year, month, day] = iso.split("-");
+    return `${day}/${month}/${year}`;
+  }
+  return text;
+}
+
+function eventSortDate(evento = {}) {
+  return normalizeEventDate(eventRawDate(evento)) || "";
+}
+
+function eventIdentity(evento = {}) {
+  return slugify(evento.titulo || evento.nome || evento.name || evento.id || "");
+}
+
+function normalizeScriptEvent(est, index = 0) {
+  const title = est.name || est.nome || est.titulo || `Evento ${index + 1}`;
+  const rawDate = eventRawDate(est);
+  return cleanForFirebase({
+    id: `evento-${slugify(title)}-${index + 1}`,
+    titulo: title,
+    clienteId: "",
+    clienteNome: "",
+    data: normalizeEventDate(rawDate),
+    dataOriginal: rawDate,
+    horario: est.horario || est.time || "",
+    local: est.address || est.local || "",
+    status: est.status || "ativo",
+    imagem: est.image || est.imagem || "",
+    descricao: est.infoAdicional || est.descricao || est.description || "",
+    instagram: est.instagram || "",
+    origem: "script.js"
+  });
+}
+
+async function loadScriptEventsForPanel() {
+  try {
+    const source = await getScriptImportSource();
+    const eventsCategory = (source.categories || []).find((category) => slugify(category.title || "") === "eventosemcarlopolis");
+    return (eventsCategory?.establishments || [])
+      .filter((item) => item?.name || item?.nome || item?.titulo)
+      .map((item, index) => normalizeScriptEvent(item, index));
+  } catch (error) {
+    console.warn("Nao foi possivel carregar eventos base do script.js.", error);
+    return [];
+  }
+}
+
 function imageUrl(item) {
   return typeof item === "string" ? item : (item?.url || "");
 }
@@ -864,7 +928,15 @@ async function loadAllData() {
       return false;
     });
   }
-  state.eventos.sort((a, b) => String(b.data || "").localeCompare(String(a.data || "")));
+  const eventosBase = await loadScriptEventsForPanel();
+  const eventKeys = new Set(state.eventos.map((evento) => eventIdentity(evento)));
+  eventosBase.forEach((evento) => {
+    const key = eventIdentity(evento);
+    if (!key || eventKeys.has(key)) return;
+    state.eventos.push(evento);
+    eventKeys.add(key);
+  });
+  state.eventos.sort((a, b) => eventSortDate(b).localeCompare(eventSortDate(a)));
 
   state.categorias = [];
   if (categoriasSnap.exists()) {
@@ -2044,7 +2116,7 @@ function fillEventForm(evento) {
   $("eventId").value = evento.id || "";
   $("eventTitle").value = evento.titulo || "";
   $("eventClient").value = evento.clienteId || "";
-  $("eventDate").value = evento.data || "";
+  $("eventDate").value = normalizeEventDate(eventRawDate(evento));
   $("eventTime").value = evento.horario || "";
   $("eventPlace").value = evento.local || "";
   $("eventStatus").value = evento.status || "ativo";
@@ -2079,7 +2151,7 @@ function renderEventsList() {
 
   const q = String($("eventSearch")?.value || "").toLowerCase().trim();
   const list = state.eventos.filter((evento) => {
-    const hay = `${evento.titulo || ""} ${evento.clienteNome || ""} ${evento.local || ""}`.toLowerCase();
+    const hay = `${evento.titulo || ""} ${evento.clienteNome || ""} ${evento.local || ""} ${displayEventDate(eventRawDate(evento))}`.toLowerCase();
     return !q || hay.includes(q);
   });
 
@@ -2092,7 +2164,8 @@ function renderEventsList() {
     <article class="list-card event-card">
       ${evento.imagem ? `<img src="${escapeAttr(displayImageUrl(evento.imagem))}" alt="${escapeAttr(evento.titulo || "Evento")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
       <div class="list-title">${escapeHtml(evento.titulo || evento.id)}</div>
-      <div class="list-meta">${escapeHtml(evento.clienteNome || "Sem cliente")} - ${escapeHtml(evento.data || "Sem data")} ${escapeHtml(evento.horario || "")}</div>
+      <div class="event-date-row"><i class="fa-solid fa-calendar-days"></i><strong>${escapeHtml(displayEventDate(eventRawDate(evento)))}</strong>${evento.horario ? `<span>${escapeHtml(evento.horario)}</span>` : ""}</div>
+      <div class="list-meta">${escapeHtml(evento.clienteNome || "Sem cliente")} - ${escapeHtml(evento.origem === "script.js" ? "Base inicial" : "Firebase")}</div>
       <div class="list-meta">${escapeHtml(evento.local || "Sem local")}</div>
       <span class="badge ${escapeAttr(evento.status || "ativo")}">${eventStatusLabel(evento.status)}</span>
       <button type="button" data-edit-event="${escapeAttr(evento.id)}">Editar</button>
