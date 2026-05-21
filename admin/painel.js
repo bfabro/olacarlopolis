@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 126,
-  label: "v126",
+  numero: 127,
+  label: "v127",
   data: "2026-05-20",
-  nota: "Reduz miniaturas das fotos no cadastro de Automoveis."
+  nota: "Melhora menu mobile e separacao visual do painel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4492,6 +4492,21 @@ function escapeAttr(value) {
   return escapeHtml(value).replace(/`/g, "&#096;");
 }
 
+function setAdminMenuOpen(isOpen) {
+  const sidebar = $("adminSidebar");
+  const overlay = $("adminSidebarOverlay");
+  const toggle = $("adminMenuToggle");
+  sidebar?.classList.toggle("mobile-open", isOpen);
+  overlay?.classList.toggle("hidden", !isOpen);
+  document.body.classList.toggle("admin-menu-open", isOpen);
+  toggle?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  toggle?.setAttribute("aria-label", isOpen ? "Fechar menu" : "Abrir menu");
+}
+
+function closeAdminMenuOnMobile() {
+  if (window.matchMedia("(max-width: 980px)").matches) setAdminMenuOpen(false);
+}
+
 function bindEvents() {
   $("loginForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -4620,8 +4635,25 @@ function bindEvents() {
   $("userForm").addEventListener("submit", createPanelUser);
   $("deleteUserButton")?.addEventListener("click", deletePanelUser);
 
+  $("adminMenuToggle")?.addEventListener("click", () => {
+    const isOpen = $("adminSidebar")?.classList.contains("mobile-open");
+    setAdminMenuOpen(!isOpen);
+  });
+  $("adminSidebarOverlay")?.addEventListener("click", () => setAdminMenuOpen(false));
+  const desktopMenuQuery = window.matchMedia("(min-width: 981px)");
+  const handleDesktopMenuChange = (event) => {
+    if (event.matches) setAdminMenuOpen(false);
+  };
+  if (desktopMenuQuery.addEventListener) {
+    desktopMenuQuery.addEventListener("change", handleDesktopMenuChange);
+  } else {
+    desktopMenuQuery.addListener(handleDesktopMenuChange);
+  }
   document.querySelectorAll(".nav-admin button").forEach((button) => {
-    button.addEventListener("click", () => switchView(button.dataset.view));
+    button.addEventListener("click", () => {
+      switchView(button.dataset.view);
+      closeAdminMenuOnMobile();
+    });
   });
 
   $("clientForm").addEventListener("submit", async (event) => {

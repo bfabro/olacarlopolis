@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=126">
+  <link rel="stylesheet" href="painel.css?v=127">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -31,7 +31,7 @@
   </main>
 
   <main id="appView" class="app-view hidden">
-    <aside class="sidebar-admin">
+    <aside id="adminSidebar" class="sidebar-admin">
       <div class="brand-block">
         <img src="../images/img_padrao_site/logo_1.png" alt="Ola Carlopolis">
         <div>
@@ -63,12 +63,18 @@
         <button id="logoutButton"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
       </div>
     </aside>
+    <div id="adminSidebarOverlay" class="admin-sidebar-overlay hidden"></div>
 
     <section class="main-admin">
       <header class="topbar-admin">
-        <div>
-          <h1 id="viewTitle">Visao geral</h1>
-          <p id="viewSubtitle">Resumo do ambiente administrativo.</p>
+        <div class="topbar-title-row">
+          <button id="adminMenuToggle" class="admin-menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div>
+            <h1 id="viewTitle">Visao geral</h1>
+            <p id="viewSubtitle">Resumo do ambiente administrativo.</p>
+          </div>
         </div>
         <button id="refreshButton" class="ghost-button"><i class="fa-solid fa-rotate"></i> Atualizar</button>
       </header>
@@ -785,6 +791,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=126"></script>
+  <script type="module" src="painel.js?v=127"></script>
 </body>
 </html>
