@@ -2117,7 +2117,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Só pega os eventos "reais" (com imagem, nome e instagram)
     const listaEventos = eventosCat.establishments.filter(
       (ev) => ev && ev.image && ev.name
-    );
+    ).sort((a, b) => dataEventoPublicoValor(a) - dataEventoPublicoValor(b));
 
     grade.innerHTML = "";
 
@@ -2178,6 +2178,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function dataEventoPublico(evento) {
     return evento?.date || evento?.data || evento?.dataEvento || evento?.eventDate || "";
+  }
+
+  function dataEventoPublicoValor(evento) {
+    const texto = String(dataEventoPublico(evento) || "").trim();
+    if (!texto) return Number.MAX_SAFE_INTEGER;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(texto)) return new Date(`${texto}T00:00:00`).getTime();
+    const br = texto.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (br) {
+      const [, dia, mes, ano] = br;
+      return new Date(`${ano}-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}T00:00:00`).getTime();
+    }
+    const livre = Date.parse(texto);
+    return Number.isNaN(livre) ? Number.MAX_SAFE_INTEGER : livre;
   }
 
 

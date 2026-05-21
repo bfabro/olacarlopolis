@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 107,
-  label: "v107",
+  numero: 108,
+  label: "v108",
   data: "2026-05-20",
-  nota: "Carrega eventos base no painel e mostra datas na lista."
+  nota: "Ordena eventos publicos pela data mais proxima."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
