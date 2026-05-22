@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 132,
-  label: "v132",
+  numero: 133,
+  label: "v133",
   data: "2026-05-22",
-  nota: "Padroniza abertura e fechamento dos formularios do painel."
+  nota: "Corrige salvamento dos dias fechados nos horarios de funcionamento."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -830,7 +830,7 @@ function renderScheduleEditor(containerId, schedule = {}) {
     const slots = data[key] || [];
     const open = slots.length > 0;
     return `
-      <article class="schedule-day" data-day="${key}">
+      <article class="schedule-day ${open ? "" : "closed"}" data-day="${key}">
         <label class="schedule-open">
           <input type="checkbox" data-schedule-open ${open ? "checked" : ""}>
           ${label}
@@ -858,6 +858,7 @@ function renderScheduleEditor(containerId, schedule = {}) {
   box.querySelectorAll("[data-schedule-open]").forEach((input) => {
     input.addEventListener("change", () => {
       box.dataset.touchedSchedule = "true";
+      input.closest(".schedule-day")?.classList.toggle("closed", !input.checked);
     });
   });
 }
@@ -876,7 +877,7 @@ function readScheduleEditor(containerId) {
       const fim = row.querySelector(`[data-slot="${index}"][data-field="fim"]`)?.value || "";
       if (inicio && fim) slots.push({ inicio, fim });
     });
-    horarios[day] = isOpen || slots.length ? slots : [];
+    horarios[day] = isOpen ? slots : [];
   });
 
   return horarios;
