@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 146,
-  label: "v146",
+  numero: 147,
+  label: "v147",
   data: "2026-05-22",
-  nota: "Corrige imagem e filtros das promocoes."
+  nota: "Usa somente imagem cadastrada na promocao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

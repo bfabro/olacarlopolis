@@ -4763,7 +4763,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
             valorTexto: p.valorTexto || p.valor || "",
             precoAntigo: p.precoAntigo || null, // opcional
             unidade: p.unidade || "",           // ex: "A UNIDADE", "NO FARDO"
-            imagem: p.imagem || p.image || p.imagemUrl || p.imageUrl || est.promoImage || est.image || est.logo || "",  // url opcional
+            imagem: p.imagem || p.image || p.imagemUrl || p.imageUrl || p.foto || p.fotoUrl || p.banner || "",  // url da promocao
             logo: p.logo || est.logo || est.image || "",
             validadeInicio: p.validadeInicio || p.validade || null,
             validadeFim: p.validadeFim || null,
@@ -7786,7 +7786,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         <div class="promo-image-wrap">
           ${i.imagem
             ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
-            : `<div class="promo-sem-imagem">sem imagem</div>`}
+            : `<div class="promo-sem-imagem">Imagem da promo&ccedil;&atilde;o</div>`}
           ${(descontoTxt || descontoPct) ? `<span class="promo-discount-badge">${descontoTxt || `${descontoPct}%`}<small>off</small></span>` : ""}
           ${(i.validadeInicio && i.validadeFim)
             ? `<div class="promo-validade-media"><i class="fa-regular fa-calendar"></i> Ofertas validas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
