@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 133,
-  label: "v133",
+  numero: 134,
+  label: "v134",
   data: "2026-05-22",
-  nota: "Corrige salvamento dos dias fechados nos horarios de funcionamento."
+  nota: "Permite editar promocoes do cliente e reorganiza os cards de funcoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -72,6 +72,7 @@ let state = {
   clientImages: [],
   clientMenuImages: [],
   clientPromocoes: [],
+  clientPromoEditIndex: null,
   imovelImages: [],
   automovelImages: [],
   lastFirebaseClientCount: 0,
@@ -1404,6 +1405,7 @@ function resetClientForm() {
   state.clientImages = [];
   state.clientMenuImages = [];
   state.clientPromocoes = [];
+  state.clientPromoEditIndex = null;
   $("clientForm").reset();
   delete $("clientForm").dataset.originalCategory;
   delete $("clientForm").dataset.originalClientId;
@@ -1611,6 +1613,58 @@ function clearClientPromoFields() {
   });
   if ($("clientPromoImageUpload")) $("clientPromoImageUpload").value = "";
   document.querySelectorAll("input[name='clientPromoWeekday']").forEach((input) => { input.checked = false; });
+  if ($("addClientPromoButton")) $("addClientPromoButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar promocao`;
+  $("cancelClientPromoEditButton")?.classList.add("hidden");
+}
+
+function clearPromoFields(prefix, scope = document) {
+  ["Title", "Price", "OldPrice", "Unit", "Volume", "Pack", "Start", "End", "Obs", "ImageUrl"].forEach((suffix) => {
+    const field = scope.querySelector(`#${prefix}Promo${suffix}`);
+    if (field) field.value = "";
+  });
+  const upload = scope.querySelector(`#${prefix}PromoImageUpload`);
+  if (upload) upload.value = "";
+  scope.querySelectorAll(`input[name='${prefix}PromoWeekday']`).forEach((input) => { input.checked = false; });
+}
+
+function fillPromoFields(prefix, promo, scope = document) {
+  const set = (suffix, value) => {
+    const field = scope.querySelector(`#${prefix}Promo${suffix}`);
+    if (field) field.value = value || "";
+  };
+  set("Title", promo.titulo);
+  set("Price", promo.preco);
+  set("OldPrice", promo.precoAntigo);
+  set("Unit", promo.unidade);
+  set("Volume", promo.volume);
+  set("Pack", promo.embalagem);
+  set("Start", promo.validadeInicio);
+  set("End", promo.validadeFim);
+  set("Obs", promo.obs);
+  set("ImageUrl", promo.imagem);
+  const days = new Set(normalizePromoWeekDays(promo.diasSemana).map(String));
+  scope.querySelectorAll(`input[name='${prefix}PromoWeekday']`).forEach((input) => {
+    input.checked = days.has(String(input.value));
+  });
+}
+
+function readPromoFields(prefix, scope = document, fallbackId = "") {
+  const get = (suffix) => scope.querySelector(`#${prefix}Promo${suffix}`)?.value.trim() || "";
+  return {
+    id: fallbackId || `promo-${Date.now()}`,
+    titulo: get("Title"),
+    preco: get("Price"),
+    precoAntigo: get("OldPrice"),
+    unidade: get("Unit"),
+    volume: get("Volume"),
+    embalagem: get("Pack"),
+    validadeInicio: scope.querySelector(`#${prefix}PromoStart`)?.value || "",
+    validadeFim: scope.querySelector(`#${prefix}PromoEnd`)?.value || "",
+    diasSemana: Array.from(scope.querySelectorAll(`input[name='${prefix}PromoWeekday']:checked`)).map((input) => Number(input.value)),
+    obs: get("Obs"),
+    imagem: get("ImageUrl"),
+    ativo: true
+  };
 }
 
 function renderClientPromocoesPreview() {
@@ -1624,10 +1678,24 @@ function renderClientPromocoesPreview() {
   if (!box || !count) return;
   state.clientPromocoes = normalizePromocoes(state.clientPromocoes);
   count.textContent = `${state.clientPromocoes.length} ativa${state.clientPromocoes.length === 1 ? "" : "s"}`;
-  box.innerHTML = renderPromocoesMarkup(state.clientPromocoes, "client-promo-remove");
+  box.innerHTML = renderPromocoesMarkup(state.clientPromocoes, "client-promo-remove", "client-promo-edit");
+  box.querySelectorAll("[data-client-promo-edit]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.clientPromoEdit);
+      const promo = state.clientPromocoes[index];
+      if (!promo) return;
+      state.clientPromoEditIndex = index;
+      fillPromoFields("client", promo);
+      $("addClientPromoButton").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar alteracoes`;
+      $("cancelClientPromoEditButton")?.classList.remove("hidden");
+      $("clientPromoTitle")?.focus();
+    });
+  });
   box.querySelectorAll("[data-client-promo-remove]").forEach((button) => {
     button.addEventListener("click", () => {
       state.clientPromocoes.splice(Number(button.dataset.clientPromoRemove), 1);
+      state.clientPromoEditIndex = null;
+      clearClientPromoFields();
       renderClientPromocoesPreview();
       showToast("Promocao removida. Clique em salvar cliente para gravar.");
     });
@@ -1647,24 +1715,18 @@ async function addClientPromocao() {
     showToast("Enviando imagem da promocao...");
     image = await uploadPromoImageForClient(currentId, file);
   }
-  state.clientPromocoes.unshift({
-    id: `promo-${Date.now()}`,
-    titulo: title,
-    preco: $("clientPromoPrice")?.value.trim() || "",
-    precoAntigo: $("clientPromoOldPrice")?.value.trim() || "",
-    unidade: $("clientPromoUnit")?.value.trim() || "",
-    volume: $("clientPromoVolume")?.value.trim() || "",
-    embalagem: $("clientPromoPack")?.value.trim() || "",
-    validadeInicio: $("clientPromoStart")?.value || "",
-    validadeFim: $("clientPromoEnd")?.value || "",
-    diasSemana: Array.from(document.querySelectorAll("input[name='clientPromoWeekday']:checked")).map((input) => Number(input.value)),
-    obs: $("clientPromoObs")?.value.trim() || "",
-    imagem: image,
-    ativo: true
-  });
+  const editingIndex = Number.isInteger(state.clientPromoEditIndex) ? state.clientPromoEditIndex : -1;
+  const current = editingIndex >= 0 ? state.clientPromocoes[editingIndex] : null;
+  const payload = readPromoFields("client", document, current?.id || `promo-${Date.now()}`);
+  payload.imagem = image;
+  if (editingIndex >= 0 && current) state.clientPromocoes[editingIndex] = payload;
+  else state.clientPromocoes.unshift(payload);
+  state.clientPromoEditIndex = null;
   clearClientPromoFields();
+  $("addClientPromoButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar promocao`;
+  $("cancelClientPromoEditButton")?.classList.add("hidden");
   renderClientPromocoesPreview();
-  showToast("Promocao adicionada. Clique em salvar cliente para gravar.");
+  showToast(`${editingIndex >= 0 ? "Promocao atualizada" : "Promocao adicionada"}. Clique em salvar cliente para gravar.`);
 }
 
 async function uploadClientImages(files) {
@@ -3675,13 +3737,26 @@ function renderClientOnlyEditor() {
   const canEditCardapio = hasPermission("cardapio");
   const canEditPromocoes = hasPermission("promocoes");
   const hasAnyClientEditPermission = canEditDados || canEditImages || canEditCardapio || canEditPromocoes;
+  let coPromoEditIndex = -1;
+  const setCoPromoEditMode = (index = -1) => {
+    coPromoEditIndex = index;
+    const editing = index >= 0;
+    const addButton = $("coAddPromoButton");
+    if (addButton) {
+      addButton.innerHTML = editing
+        ? `<i class="fa-solid fa-floppy-disk"></i> Salvar alteracoes`
+        : `<i class="fa-solid fa-plus"></i> Adicionar promocao`;
+    }
+    $("coCancelPromoEditButton")?.classList.toggle("hidden", !editing);
+  };
 
   mount.innerHTML = `
     <form id="clientOnlyForm" class="grid-form">
       ${canEditImages ? `
-        <section class="wide profile-upload-panel profile-upload-top">
-          <div class="section-head compact">
+        <section class="wide profile-upload-panel profile-upload-top client-feature-card feature-foto">
+          <div class="section-head compact feature-card-head">
             <div>
+              <span class="feature-kicker">Imagem principal</span>
               <h3>Foto de perfil</h3>
               <p>Imagem principal da sua empresa. Ela fica salva no Firebase Storage.</p>
             </div>
@@ -3694,7 +3769,8 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditDados ? `
-        <div class="form-section-title wide">
+        <section class="wide client-feature-card feature-dados">
+        <div class="form-section-title">
           <i class="fa-solid fa-id-card"></i>
           <div>
             <strong>Dados da empresa</strong>
@@ -3727,18 +3803,13 @@ function renderClientOnlyEditor() {
           </div>
         </div>
         <label class="wide">Informacoes adicionais<textarea id="coInfo" rows="4">${escapeHtml(client.infoAdicional || "")}</textarea></label>
+        </section>
       ` : ""}
       ${canEditCardapio ? `
-        <div class="form-section-title wide">
-          <i class="fa-solid fa-utensils"></i>
-          <div>
-            <strong>Cardapio</strong>
-            <span>PDF, link ou imagens do cardapio do estabelecimento.</span>
-          </div>
-        </div>
-        <section class="wide upload-panel">
-          <div class="section-head compact">
+        <section class="wide upload-panel client-feature-card feature-cardapio">
+          <div class="section-head compact feature-card-head">
             <div>
+              <span class="feature-kicker">Menu e PDF</span>
               <h3>Meu cardapio</h3>
               <p>Configure o link/PDF e as imagens que aparecem no botao Cardapio.</p>
             </div>
@@ -3754,16 +3825,10 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditImages ? `
-        <div class="form-section-title wide">
-          <i class="fa-solid fa-images"></i>
-          <div>
-            <strong>Galeria de imagens</strong>
-            <span>Fotos e textos usados na apresentacao da empresa.</span>
-          </div>
-        </div>
-        <section class="wide upload-panel">
-          <div class="section-head compact">
+        <section class="wide upload-panel client-feature-card feature-galeria">
+          <div class="section-head compact feature-card-head">
             <div>
+              <span class="feature-kicker">Vitrine visual</span>
               <h3>Minhas imagens</h3>
               <p>Envie ate 10 imagens para sua empresa.</p>
             </div>
@@ -3785,18 +3850,12 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditPromocoes ? `
-        <div class="form-section-title wide">
-          <i class="fa-solid fa-tags"></i>
-          <div>
-            <strong>Promocoes</strong>
-            <span>Ofertas que aparecem no menu Promocoes do site publico.</span>
-          </div>
-        </div>
-        <section class="wide upload-panel">
-          <div class="section-head compact">
+        <section class="wide upload-panel client-feature-card feature-promocoes">
+          <div class="section-head compact feature-card-head">
             <div>
+              <span class="feature-kicker">Ofertas publicas</span>
               <h3>Promocoes</h3>
-              <p>Cadastre ofertas que aparecem no menu Promocoes do site publico.</p>
+              <p>Cadastre e edite ofertas que aparecem no menu Promocoes do site publico.</p>
             </div>
             <span id="coPromosCount" class="badge">${promocoes.length} ativa${promocoes.length === 1 ? "" : "s"}</span>
           </div>
@@ -3819,7 +3878,10 @@ function renderClientOnlyEditor() {
             <label class="wide">Observacao<textarea id="coPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
             <label>Imagem da promocao<input id="coPromoImageUpload" type="file" accept="image/*"></label>
             <label>Ou URL da imagem<input id="coPromoImageUrl" placeholder="https://..."></label>
-            <button id="coAddPromoButton" type="button" class="ghost-button wide"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
+            <div class="promo-form-actions wide">
+              <button id="coAddPromoButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
+              <button id="coCancelPromoEditButton" type="button" class="ghost-button hidden"><i class="fa-solid fa-xmark"></i> Cancelar edicao</button>
+            </div>
           </div>
           <div id="coPromosPreview" class="promo-admin-list">
             ${renderPromocoesMarkup(promocoes)}
@@ -3925,21 +3987,11 @@ function renderClientOnlyEditor() {
       image = await uploadPromoImageForClient(client.id, imageFile);
     }
 
-    promocoes.unshift({
-      id: `promo-${Date.now()}`,
-      titulo: title,
-      preco: $("coPromoPrice").value.trim(),
-      precoAntigo: $("coPromoOldPrice").value.trim(),
-      unidade: $("coPromoUnit").value.trim(),
-      volume: $("coPromoVolume").value.trim(),
-      embalagem: $("coPromoPack").value.trim(),
-      validadeInicio: $("coPromoStart").value,
-      validadeFim: $("coPromoEnd").value,
-      diasSemana: Array.from(mount.querySelectorAll("input[name='coPromoWeekday']:checked")).map((input) => Number(input.value)),
-      obs: $("coPromoObs").value.trim(),
-      imagem: image,
-      ativo: true
-    });
+    const current = coPromoEditIndex >= 0 ? promocoes[coPromoEditIndex] : null;
+    const payload = readPromoFields("co", mount, current?.id || `promo-${Date.now()}`);
+    payload.imagem = image;
+    if (coPromoEditIndex >= 0 && current) promocoes[coPromoEditIndex] = payload;
+    else promocoes.unshift(payload);
 
     await update(ref(db, `clientes/${client.id}`), {
       promocoes: normalizePromocoes(promocoes),
@@ -3948,9 +4000,16 @@ function renderClientOnlyEditor() {
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     });
-    showToast("Promocao adicionada.");
+    showToast(coPromoEditIndex >= 0 ? "Promocao atualizada." : "Promocao adicionada.");
+    clearPromoFields("co", mount);
+    setCoPromoEditMode(-1);
     await loadAllData();
     renderClientOnlyEditor();
+  });
+
+  mount.querySelector("#coCancelPromoEditButton")?.addEventListener("click", () => {
+    clearPromoFields("co", mount);
+    setCoPromoEditMode(-1);
   });
 
   mount.querySelector("#coPromoImageUpload")?.addEventListener("change", async (event) => {
@@ -4004,6 +4063,18 @@ function renderClientOnlyEditor() {
       showToast("Imagem do cardapio removida.");
       await loadAllData();
       renderClientOnlyEditor();
+    });
+  });
+
+  mount.querySelectorAll("[data-promo-edit]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.promoEdit);
+      const promo = promocoes[index];
+      if (!promo) return;
+      fillPromoFields("co", promo, mount);
+      setCoPromoEditMode(index);
+      $("coPromoTitle")?.focus();
+      $("coPromoTitle")?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   });
 
@@ -4105,7 +4176,7 @@ function renderMenuImagesMarkup(images, prefix) {
   `).join("");
 }
 
-function renderPromocoesMarkup(promocoes, removeAttr = "promo-remove") {
+function renderPromocoesMarkup(promocoes, removeAttr = "promo-remove", editAttr = "promo-edit") {
   const list = normalizePromocoes(promocoes);
   if (!list.length) return `<div class="list-meta">Nenhuma promocao cadastrada ainda.</div>`;
   return list.map((promo, index) => `
@@ -4117,7 +4188,10 @@ function renderPromocoesMarkup(promocoes, removeAttr = "promo-remove") {
         <small>Disponivel: ${escapeHtml(promoWeekDaysLabel(promo.diasSemana))}</small>
         ${promo.obs ? `<small>${escapeHtml(promo.obs)}</small>` : ""}
       </div>
-      <button type="button" data-${removeAttr}="${index}" class="danger-mini">Remover</button>
+      <div class="promo-admin-actions">
+        <button type="button" data-${editAttr}="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button>
+        <button type="button" data-${removeAttr}="${index}" class="danger-mini"><i class="fa-solid fa-trash"></i> Remover</button>
+      </div>
     </article>
   `).join("");
 }
@@ -4725,6 +4799,12 @@ function bindEvents() {
   });
   $("addClientImageUrlButton").addEventListener("click", addClientImageFromUrl);
   $("addClientPromoButton")?.addEventListener("click", addClientPromocao);
+  $("cancelClientPromoEditButton")?.addEventListener("click", () => {
+    state.clientPromoEditIndex = null;
+    clearClientPromoFields();
+    $("addClientPromoButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar promocao`;
+    $("cancelClientPromoEditButton")?.classList.add("hidden");
+  });
   $("clientPromoImageUpload")?.addEventListener("change", async (event) => {
     const targetId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
     await uploadSelectedPromoImage("clientPromoImageUpload", "clientPromoImageUrl", targetId);

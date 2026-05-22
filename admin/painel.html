@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=133">
+  <link rel="stylesheet" href="painel.css?v=134">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -275,7 +275,10 @@
                   <label class="wide">Observacao<textarea id="clientPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
                   <label>Imagem da promocao<input id="clientPromoImageUpload" type="file" accept="image/*"></label>
                   <label>Ou URL da imagem<input id="clientPromoImageUrl" placeholder="https://..."></label>
-                  <button id="addClientPromoButton" type="button" class="ghost-button wide"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
+                  <div class="promo-form-actions wide">
+                    <button id="addClientPromoButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
+                    <button id="cancelClientPromoEditButton" type="button" class="ghost-button hidden"><i class="fa-solid fa-xmark"></i> Cancelar edicao</button>
+                  </div>
                 </div>
                 <div id="clientPromosPreview" class="promo-admin-list"></div>
               </section>
@@ -838,6 +841,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=133"></script>
+  <script type="module" src="painel.js?v=134"></script>
 </body>
 </html>
