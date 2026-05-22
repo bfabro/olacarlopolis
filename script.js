@@ -7711,7 +7711,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           <span><i class="fa-solid fa-store"></i><strong>${totalEstabelecimentos}</strong> estabelecimentos</span>
         </div>
       <div class="filtro-comidas-card promo-filter-card">
-        <label for="filtroEstab"><i class="fa-solid fa-store"></i> Filtrar por estabelecimento</label>
+        <label for="filtroEstab"><i class="fa-solid fa-sliders"></i> Filtro</label>
         <select id="filtroEstab">
           <option value="todos">Todos os estabelecimentos</option>
           ${estabelecimentos.map(e => `
@@ -7815,7 +7815,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             }" 
           target="_blank" 
           class="icon-link promo-whats-link" data-promo-action="whatsapp">
-          <i class="fab fa-whatsapp"></i>
+          <i class="fab fa-whatsapp"></i><span>Quero essa promo&ccedil;&atilde;o</span>
         </a>`
             : ""}
 
@@ -7826,6 +7826,9 @@ plotarPinsImoveis(stateImoveis.filtered);
         <i class="fab fa-instagram"></i>
       </a>`
             : ""}
+    <button type="button" class="icon-link promo-share-card" data-promo-share="page" aria-label="Compartilhar promocao">
+      <i class="fa-solid fa-share-nodes"></i><span>Compartilhar</span>
+    </button>
 
     
     </div>
