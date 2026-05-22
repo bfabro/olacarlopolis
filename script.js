@@ -7795,7 +7795,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         </div>
         
         <div class="promo-info">
-          <a class="promo-estab promo-estab-link" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.logo ? `<img src="${i.logo}" alt="${i.estabelecimento}" loading="lazy">` : `<i class="fa-solid fa-store"></i>`} ${i.estabelecimento}</a>
+          <a class="promo-estab promo-estab-link" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.estabelecimento}</a>
           ${i.instagram ? `<a href="${fixUrl(i.instagram)}" target="_blank" class="promo-store-instagram" data-promo-action="instagram" aria-label="Abrir Instagram"><i class="fab fa-instagram"></i></a>` : ""}
           <div class="promo-nome">${i.titulo}</div>
           ${economiaFmt ? `<div class="promo-economia"><i class="fa-solid fa-tag"></i> Economize ${economiaFmt} nesta oferta</div>` : ""}
