@@ -7752,6 +7752,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         const badgeClass = promoBadgeClass(i);
         const badgeLabel = i.destaque || (badgeClass === "super" ? "Super oferta" : "");
         const descricaoPromo = i.descricao || [i.volume, i.embalagem].filter(Boolean).join(" + ");
+        const temPreco = Boolean(precoFmt && String(precoFmt).trim());
+        const valorCard = temPreco ? destaqueOferta : "PROMO";
 
         // validade
         let validadeTxt = "";
@@ -7775,6 +7777,10 @@ plotarPinsImoveis(stateImoveis.filtered);
             ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
             : `<div class="promo-sem-imagem">sem imagem</div>`}
           ${(descontoTxt || descontoPct) ? `<span class="promo-discount-badge">${descontoTxt || `${descontoPct}%`}<small>off</small></span>` : ""}
+          ${(i.validadeInicio && i.validadeFim)
+            ? `<div class="promo-validade-media"><i class="fa-regular fa-calendar"></i> Ofertas validas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
+            : (i.validadeFim ? `<div class="promo-validade-media"><i class="fa-regular fa-calendar"></i> Valido ate ${formatarDataBR(i.validadeFim)}</div>`
+              : (i.validadeInicio ? `<div class="promo-validade-media"><i class="fa-regular fa-calendar"></i> Valido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
         </div>
         
         <div class="promo-info">
@@ -7788,9 +7794,9 @@ plotarPinsImoveis(stateImoveis.filtered);
         </div>
       </div>
 
-     <div class="promo-preco promo-price-badge promo-price-${badgeClass}">
+     <div class="promo-preco promo-price-badge promo-price-${temPreco ? badgeClass : "promo"}">
       ${badgeLabel ? `<div class="promo-preco-label"><i class="fa-solid fa-fire"></i> ${badgeLabel}</div>` : ""}
-      <div class="promo-preco-atual">${destaqueOferta}</div>
+      <div class="promo-preco-atual">${valorCard}</div>
       ${precoAntFmt ? `<div class="promo-preco-antigo">${precoAntFmt}</div>` : ""}
       ${i.unidade && !descontoTxt ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
       ${(i.validadeInicio && i.validadeFim)
@@ -7809,7 +7815,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             }" 
           target="_blank" 
           class="icon-link promo-whats-link" data-promo-action="whatsapp">
-          <i class="fab fa-whatsapp"></i> Chamar no Whats
+          <i class="fab fa-whatsapp"></i>
         </a>`
             : ""}
 

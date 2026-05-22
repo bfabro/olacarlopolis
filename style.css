@@ -13731,3 +13731,267 @@ tr[data-inativo="true"] {
     grid-template-columns: 38px 38px !important;
   }
 }
+
+/* ===== Promo card final conforme referencia v142 ===== */
+.promo-city-screen .promo-grid {
+  width: min(920px, 100%) !important;
+  max-width: 920px !important;
+  gap: 10px !important;
+}
+
+.promo-city-screen .promo-card-new,
+.promo-city-screen .promo-grid > .promo-card {
+  min-height: 142px !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  border: 1px solid #edf0f6 !important;
+  box-shadow: 0 7px 18px rgba(15, 23, 42, .10) !important;
+}
+
+.promo-city-screen .promo-card-body {
+  display: grid !important;
+  grid-template-columns: 285px minmax(0, 1fr) 202px !important;
+  gap: 22px !important;
+  min-height: 142px !important;
+  align-items: start !important;
+  padding: 10px 22px 10px 10px !important;
+}
+
+.promo-city-screen .promo-produto {
+  display: contents !important;
+}
+
+.promo-city-screen .promo-image-wrap {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  display: grid !important;
+  align-content: start !important;
+  gap: 7px !important;
+  min-width: 0 !important;
+}
+
+.promo-city-screen .promo-img-zoom,
+.promo-city-screen .promo-produto img,
+.promo-city-screen .promo-sem-imagem {
+  width: 285px !important;
+  height: 105px !important;
+  border-radius: 14px !important;
+  object-fit: cover !important;
+}
+
+.promo-city-screen .promo-validade-media {
+  display: block !important;
+  color: #66738d !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.promo-city-screen .promo-validade-media i {
+  margin-right: 5px;
+  color: #64748b;
+}
+
+.promo-city-screen .promo-info {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+  padding: 5px 0 0 !important;
+  align-self: start !important;
+}
+
+.promo-city-screen .promo-estab,
+.promo-city-screen .promo-estab-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  max-width: 100% !important;
+  width: fit-content !important;
+  color: #0b73ff !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+  line-height: 1.1 !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+}
+
+.promo-city-screen .promo-estab-link:hover {
+  color: #ff8800 !important;
+}
+
+.promo-city-screen .promo-estab i,
+.promo-city-screen .promo-estab img {
+  width: 27px !important;
+  height: 27px !important;
+  flex: 0 0 27px !important;
+  border-radius: 50% !important;
+}
+
+.promo-city-screen .promo-nome {
+  margin-top: 5px !important;
+  color: #101a3a !important;
+  font-size: 23px !important;
+  font-weight: 950 !important;
+  line-height: 1.05 !important;
+}
+
+.promo-city-screen .promo-det,
+.promo-city-screen .promo-obs {
+  margin-top: 4px !important;
+  color: #53617c !important;
+  font-size: 16px !important;
+  line-height: 1.13 !important;
+}
+
+.promo-city-screen .promo-days,
+.promo-city-screen .promo-preco .promo-validade,
+.promo-city-screen .promo-preco-label,
+.promo-city-screen .promo-preco-antigo,
+.promo-city-screen .promo-unidade,
+.promo-city-screen .promo-discount-badge {
+  display: none !important;
+}
+
+.promo-city-screen .promo-preco {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  position: static !important;
+  width: 190px !important;
+  min-width: 190px !important;
+  height: 64px !important;
+  margin: 0 !important;
+  padding: 8px !important;
+  border: 0 !important;
+  border-radius: 11px !important;
+  align-self: start !important;
+  justify-self: end !important;
+}
+
+.promo-city-screen .promo-price-promo,
+.promo-city-screen .promo-price-darkblue,
+.promo-city-screen .promo-price-blue {
+  background: linear-gradient(135deg, #1277ed 0%, #0758cf 100%) !important;
+}
+
+.promo-city-screen .promo-preco-atual {
+  color: #fff !important;
+  font-size: 29px !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.promo-city-screen .promo-rodape {
+  position: absolute !important;
+  right: 22px !important;
+  bottom: 14px !important;
+  display: grid !important;
+  grid-template-columns: 82px 70px !important;
+  gap: 14px !important;
+  width: auto !important;
+  padding: 0 !important;
+}
+
+.promo-city-screen .promo-rodape .icon-link {
+  display: grid !important;
+  place-items: center !important;
+  width: 100% !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  border-radius: 13px !important;
+  padding: 0 !important;
+  font-size: 0 !important;
+}
+
+.promo-city-screen .promo-rodape .icon-link i {
+  margin: 0 !important;
+  font-size: 25px !important;
+}
+
+@media (max-width: 760px) {
+  .promo-city-screen .promo-card-new,
+  .promo-city-screen .promo-grid > .promo-card {
+    min-height: 128px !important;
+    border-radius: 15px !important;
+  }
+
+  .promo-city-screen .promo-card-body {
+    grid-template-columns: 34% minmax(0, 1fr) 78px !important;
+    gap: 8px !important;
+    min-height: 128px !important;
+    padding: 8px !important;
+  }
+
+  .promo-city-screen .promo-img-zoom,
+  .promo-city-screen .promo-produto img,
+  .promo-city-screen .promo-sem-imagem {
+    width: 100% !important;
+    height: 86px !important;
+    border-radius: 12px !important;
+  }
+
+  .promo-city-screen .promo-validade-media {
+    font-size: 9px !important;
+  }
+
+  .promo-city-screen .promo-info {
+    padding-top: 2px !important;
+  }
+
+  .promo-city-screen .promo-estab,
+  .promo-city-screen .promo-estab-link {
+    gap: 5px !important;
+    font-size: 9px !important;
+  }
+
+  .promo-city-screen .promo-estab i,
+  .promo-city-screen .promo-estab img {
+    width: 19px !important;
+    height: 19px !important;
+    flex-basis: 19px !important;
+  }
+
+  .promo-city-screen .promo-nome {
+    margin-top: 4px !important;
+    font-size: 15px !important;
+  }
+
+  .promo-city-screen .promo-det,
+  .promo-city-screen .promo-obs {
+    font-size: 11px !important;
+    line-height: 1.1 !important;
+  }
+
+  .promo-city-screen .promo-preco {
+    width: 78px !important;
+    min-width: 78px !important;
+    height: 45px !important;
+    padding: 5px !important;
+    border-radius: 10px !important;
+  }
+
+  .promo-city-screen .promo-preco-atual {
+    font-size: 17px !important;
+  }
+
+  .promo-city-screen .promo-rodape {
+    right: 8px !important;
+    bottom: 8px !important;
+    grid-template-columns: 38px 38px !important;
+    gap: 7px !important;
+  }
+
+  .promo-city-screen .promo-rodape .icon-link {
+    height: 31px !important;
+    min-height: 31px !important;
+    border-radius: 9px !important;
+  }
+
+  .promo-city-screen .promo-rodape .icon-link i {
+    font-size: 18px !important;
+  }
+}
