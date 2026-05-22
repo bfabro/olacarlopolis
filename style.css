@@ -12681,3 +12681,272 @@ tr[data-inativo="true"] {
     flex: 1 1 80px;
   }
 }
+
+/* ===== Promoções da cidade: ajustes finais v140 ===== */
+.promo-city-screen .promo-discount-badge {
+  display: none !important;
+}
+
+.promo-city-screen .promo-hero-stats span {
+  gap: 7px !important;
+}
+
+.promo-city-screen .promo-hero-stats span i {
+  font-size: 22px;
+}
+
+.promo-city-screen .promo-price-badge {
+  display: grid !important;
+  place-items: center !important;
+  gap: 3px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  box-shadow: 0 9px 18px rgba(255, 49, 85, .16) !important;
+}
+
+.promo-city-screen .promo-price-super,
+.promo-city-screen .promo-price-pink {
+  background: linear-gradient(135deg, #ff6aa2 0%, #ff2734 100%) !important;
+}
+
+.promo-city-screen .promo-price-purple {
+  background: linear-gradient(135deg, #b066ff 0%, #8a32e6 100%) !important;
+}
+
+.promo-city-screen .promo-price-blue {
+  background: linear-gradient(135deg, #5aa2ff 0%, #286cff 100%) !important;
+}
+
+.promo-city-screen .promo-price-darkblue {
+  background: linear-gradient(135deg, #1277ed 0%, #0758cf 100%) !important;
+}
+
+.promo-city-screen .promo-preco-label:empty {
+  display: none !important;
+}
+
+.promo-city-screen .promo-preco-atual {
+  white-space: nowrap !important;
+}
+
+.promo-city-screen .promo-validade::before {
+  content: "\f133";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 400;
+  margin-right: 7px;
+}
+
+@media (max-width: 760px) {
+  .promo-city-screen {
+    max-width: 100% !important;
+    padding-inline: 7px !important;
+  }
+
+  .promo-city-top {
+    grid-template-columns: 36px 1fr auto;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .promo-city-top strong {
+    font-size: clamp(25px, 8vw, 34px);
+  }
+
+  .promo-top-actions {
+    gap: 8px;
+  }
+
+  .promo-top-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 23px;
+  }
+
+  .promo-bell span {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+  }
+
+  .promo-city-search {
+    min-height: 62px;
+    grid-template-columns: 26px minmax(0, 1fr) 46px;
+    padding-left: 18px;
+    border-radius: 31px;
+  }
+
+  .promo-city-search input {
+    font-size: 15px;
+  }
+
+  .promo-city-search button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .promo-city-screen .promo-city-head {
+    min-height: 94px;
+    padding: 16px 14px !important;
+  }
+
+  .promo-city-screen .promo-city-title {
+    gap: 13px;
+  }
+
+  .promo-city-screen .promo-city-title h2 {
+    font-size: clamp(25px, 7.3vw, 34px) !important;
+    line-height: .98 !important;
+  }
+
+  .promo-city-screen .promo-city-title p {
+    font-size: clamp(13px, 4vw, 17px) !important;
+  }
+
+  .promo-city-screen .promo-fire-badge {
+    width: 58px !important;
+    height: 58px !important;
+    flex: 0 0 58px !important;
+  }
+
+  .promo-banner-share {
+    width: 36px;
+    height: 30px;
+  }
+
+  .promo-city-screen .promo-hero-stats {
+    padding: 16px 8px 0 !important;
+    gap: 8px !important;
+  }
+
+  .promo-city-screen .promo-hero-stats span {
+    min-height: 50px !important;
+    font-size: 14px !important;
+  }
+
+  .promo-city-screen .promo-hero-stats strong {
+    font-size: 18px !important;
+  }
+
+  .promo-city-screen .promo-filter-card {
+    width: calc(100% - 40px) !important;
+    padding: 10px 12px 14px !important;
+  }
+
+  .promo-city-screen .promo-sort-row {
+    margin: 16px auto 12px !important;
+    gap: 7px !important;
+    font-size: 12px !important;
+  }
+
+  .promo-city-screen .promo-sort-row button {
+    min-height: 29px !important;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+  }
+
+  .promo-city-screen .promo-grid {
+    gap: 8px !important;
+  }
+
+  .promo-city-screen .promo-card-new,
+  .promo-city-screen .promo-grid > .promo-card {
+    min-height: 118px !important;
+    border-radius: 15px !important;
+  }
+
+  .promo-city-screen .promo-card-body {
+    grid-template-columns: 34% minmax(0, 1fr) 78px !important;
+    gap: 8px !important;
+    align-items: start !important;
+    min-height: 118px !important;
+    padding: 9px 9px 9px 9px !important;
+  }
+
+  .promo-city-screen .promo-img-zoom,
+  .promo-city-screen .promo-produto img,
+  .promo-city-screen .promo-sem-imagem {
+    width: 100% !important;
+    height: 92px !important;
+    border-radius: 13px !important;
+  }
+
+  .promo-city-screen .promo-estab {
+    min-height: 18px;
+    gap: 5px;
+    font-size: 9px !important;
+    line-height: 1.05 !important;
+  }
+
+  .promo-city-screen .promo-estab i,
+  .promo-city-screen .promo-estab img {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    font-size: 9px;
+  }
+
+  .promo-city-screen .promo-nome {
+    margin-top: 3px;
+    font-size: 15px !important;
+    line-height: 1.05 !important;
+  }
+
+  .promo-city-screen .promo-det,
+  .promo-city-screen .promo-obs {
+    margin-top: 2px;
+    font-size: 11px !important;
+    line-height: 1.1 !important;
+  }
+
+  .promo-city-screen .promo-preco {
+    grid-column: auto !important;
+    width: 78px !important;
+    min-width: 78px !important;
+    height: 47px !important;
+    align-self: start !important;
+    border-radius: 10px !important;
+    padding: 5px !important;
+  }
+
+  .promo-city-screen .promo-preco-label {
+    font-size: 8px !important;
+  }
+
+  .promo-city-screen .promo-preco-atual {
+    font-size: 17px !important;
+  }
+
+  .promo-city-screen .promo-validade {
+    position: absolute !important;
+    left: calc(34% + 25px) !important;
+    right: 92px !important;
+    bottom: 10px !important;
+    margin: 0 !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .promo-city-screen .promo-rodape {
+    position: absolute !important;
+    right: 9px !important;
+    bottom: 9px !important;
+    display: grid !important;
+    grid-template-columns: 38px 38px !important;
+    gap: 7px !important;
+    padding: 0 !important;
+  }
+
+  .promo-city-screen .promo-rodape .icon-link {
+    width: 38px !important;
+    height: 31px !important;
+    min-height: 31px !important;
+    border-radius: 9px !important;
+  }
+
+  .promo-city-screen .promo-rodape .icon-link i {
+    font-size: 18px !important;
+  }
+}

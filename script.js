@@ -4758,6 +4758,9 @@ ${(cardapioVisivel(est) || est.contact) ? `
             embalagem: p.embalagem || "",
             preco: p.preco,                     // número ou string
             desconto: p.desconto || p.discount || "",
+            destaque: p.destaque || p.badge || "",
+            tipoDesconto: p.tipoDesconto || p.tipo || "",
+            valorTexto: p.valorTexto || p.valor || "",
             precoAntigo: p.precoAntigo || null, // opcional
             unidade: p.unidade || "",           // ex: "A UNIDADE", "NO FARDO"
             imagem: p.imagem || p.image || "",  // url opcional
@@ -4799,6 +4802,8 @@ ${(cardapioVisivel(est) || est.contact) ? `
   }
 
   function promoValorTexto(item, precoFmt = "") {
+    const valorTexto = String(item?.valorTexto || "").trim();
+    if (valorTexto) return valorTexto.toUpperCase();
     const desconto = String(item?.desconto || "").trim();
     if (desconto) return desconto.toUpperCase();
     if (precoFmt) return `R$ ${String(precoFmt).replace(/^R\$\s*/i, "")}`;
@@ -4820,6 +4825,16 @@ ${(cardapioVisivel(est) || est.contact) ? `
       text: `Vi a promocao ${item.titulo || ""} no Ola Carlopolis.`,
       url: `${baseUrl}-${item.estabelecimentoId || "todos"}`
     };
+  }
+
+  function escapePromoHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[char]));
   }
 
   function boolStr(v) { return v ? "Sim" : "Não"; }
@@ -7668,7 +7683,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     <div class="promo-city-screen">
       <header class="promo-city-top">
         <button type="button" class="promo-top-icon" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
-        <strong>Ola Carlopolis</strong>
+        <strong>Ol&aacute; Carl&oacute;polis</strong>
         <div class="promo-top-actions">
           <button type="button" class="promo-top-icon promo-bell" aria-label="Notificacoes"><i class="fa-regular fa-bell"></i><span>2</span></button>
           <button type="button" class="promo-top-icon" data-promo-share="page" aria-label="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
@@ -7676,7 +7691,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       </header>
       <div class="promo-city-search">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input id="promoSearchInput" value="${escapeHtml(buscaAtual)}" placeholder="Busque por categoria ou nome do local">
+        <input id="promoSearchInput" value="${escapePromoHtml(buscaAtual)}" placeholder="Busque por categoria ou nome do local">
         <button type="button" aria-label="Filtros"><i class="fa-solid fa-sliders"></i></button>
       </div>
     <section class="promo-hero promo-hero-new">
@@ -7684,15 +7699,15 @@ plotarPinsImoveis(stateImoveis.filtered);
         <div class="promo-city-title">
           <span class="promo-fire-badge"><i class="fa-solid fa-fire"></i></span>
           <div>
-            <h2>Promocoes da cidade</h2>
-            <p>As melhores ofertas perto de voce</p>
+            <h2>Promo&ccedil;&otilde;es da cidade</h2>
+            <p>As melhores ofertas perto de voc&ecirc;</p>
           </div>
         </div>
         <button type="button" class="promo-banner-share" data-promo-share="page" aria-label="Compartilhar promocoes"><i class="fa-solid fa-share-nodes"></i></button>
       </div>
         <div class="promo-hero-stats">
-          <span><strong>${totalDisponiveis}</strong> ofertas hoje</span>
-          <span><strong>${totalEstabelecimentos}</strong> estabelecimentos</span>
+          <span><i class="fa-solid fa-fire"></i><strong>${totalDisponiveis}</strong> ofertas hoje</span>
+          <span><i class="fa-solid fa-store"></i><strong>${totalEstabelecimentos}</strong> estabelecimentos</span>
         </div>
       <div class="filtro-comidas-card promo-filter-card">
         <label for="filtroEstab"><i class="fa-solid fa-store"></i> Filtrar por estabelecimento</label>
@@ -7731,7 +7746,9 @@ plotarPinsImoveis(stateImoveis.filtered);
 
         const descontoTxt = String(i.desconto || "").trim();
         const descontoPct = descontoTxt ? 0 : descontoPromocao(i);
-        const destaqueOferta = descontoTxt || (precoFmt ? `R$ ${String(precoFmt).replace(/^R\$\s*/i, "")}` : (descontoPct ? `${descontoPct}% OFF` : "Oferta"));
+        const destaqueOferta = promoValorTexto(i, precoFmt);
+        const badgeClass = promoBadgeClass(i);
+        const badgeLabel = i.destaque || (badgeClass === "super" ? "Super oferta" : "");
         const descricaoPromo = i.descricao || [i.volume, i.embalagem].filter(Boolean).join(" + ");
 
         // validade
@@ -7769,8 +7786,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         </div>
       </div>
 
-     <div class="promo-preco">
-      <div class="promo-preco-label"><i class="fa-solid fa-fire"></i> Super oferta</div>
+     <div class="promo-preco promo-price-badge promo-price-${badgeClass}">
+      ${badgeLabel ? `<div class="promo-preco-label"><i class="fa-solid fa-fire"></i> ${badgeLabel}</div>` : ""}
       <div class="promo-preco-atual">${destaqueOferta}</div>
       ${precoAntFmt ? `<div class="promo-preco-antigo">${precoAntFmt}</div>` : ""}
       ${i.unidade && !descontoTxt ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
@@ -7786,7 +7803,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     <div class="promo-rodape">
     ${i.contact
-            ? `<a href="https://wa.me/55${somenteDigitos(getPrimeiroContato(i.contact))}?text=${encodeURIComponent(`Olá, encontrei o produto ${i.titulo} no Olá Carlópolis. Está disponível ainda?`)
+            ? `<a href="https://wa.me/55${somenteDigitos(i.contact)}?text=${encodeURIComponent("Ola, vi sua promocao no Ola Carlopolis e tenho interesse.")
             }" 
           target="_blank" 
           class="icon-link promo-whats-link" data-promo-action="whatsapp">
@@ -7794,11 +7811,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         </a>`
             : ""}
 
-    ${i.estabelecimentoId && categories
-            .flatMap(c => c.establishments || [])
-            .find(e => normalizeName(e.name) === i.estabelecimentoId)?.instagram
-            ? `<a href="${fixUrl(categories.flatMap(c => c.establishments || [])
-              .find(e => normalizeName(e.name) === i.estabelecimentoId).instagram)}"
+    ${i.instagram
+            ? `<a href="${fixUrl(i.instagram)}"
         target="_blank"
         class="icon-link promo-instagram-link" data-promo-action="instagram">
         <i class="fab fa-instagram"></i>
@@ -7822,8 +7836,6 @@ plotarPinsImoveis(stateImoveis.filtered);
     html += `</section></div>`;
 
     document.querySelector(".content_area").innerHTML = html;
-
-
 
     // Converte "2025-09-15" em "15-09-2025"
     function formatarDataBR(dataISO) {
@@ -7876,8 +7888,6 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
     // listeners do filtro
-
-    document.querySelector(".content_area").innerHTML = html;
 
     const select = document.getElementById("filtroEstab");
     if (select) {
