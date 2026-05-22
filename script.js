@@ -7789,9 +7789,9 @@ plotarPinsImoveis(stateImoveis.filtered);
             : `<div class="promo-sem-imagem">Imagem da promo&ccedil;&atilde;o</div>`}
           ${(descontoTxt || descontoPct) ? `<span class="promo-discount-badge">${descontoTxt || `${descontoPct}%`}<small>off</small></span>` : ""}
           ${(i.validadeInicio && i.validadeFim)
-            ? `<div class="promo-validade-media"><i class="fa-regular fa-calendar"></i> Ofertas validas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
-            : (i.validadeFim ? `<div class="promo-validade-media"><i class="fa-regular fa-calendar"></i> Valido ate ${formatarDataBR(i.validadeFim)}</div>`
-              : (i.validadeInicio ? `<div class="promo-validade-media"><i class="fa-regular fa-calendar"></i> Valido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
+            ? `<div class="promo-validade-media"><i class="fa-regular fa-circle-check"></i> Ate ${formatarDataBR(i.validadeFim)}</div>`
+            : (i.validadeFim ? `<div class="promo-validade-media"><i class="fa-regular fa-circle-check"></i> Ate ${formatarDataBR(i.validadeFim)}</div>`
+              : (i.validadeInicio ? `<div class="promo-validade-media"><i class="fa-regular fa-circle-check"></i> A partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
         </div>
         
         <div class="promo-info">
