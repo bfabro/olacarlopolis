@@ -8218,6 +8218,356 @@ html {
   }
 }
 
+/* ===== Promoções: replica visual do modelo v138 ===== */
+.promo-page-model {
+  width: min(930px, calc(100vw - 28px));
+  margin: 0 auto 28px;
+  padding: 0 0 28px;
+  background: #fff;
+}
+
+.promo-page-model .promo-hero-new,
+.promo-page-model .promo-sort-row,
+.promo-page-model .promo-grid {
+  width: min(890px, 100%);
+  max-width: 890px !important;
+}
+
+.promo-page-model .promo-hero-new {
+  margin: 0 auto !important;
+}
+
+.promo-page-model .promo-city-head {
+  min-height: 126px;
+  border-radius: 0 !important;
+  padding: 26px 30px !important;
+  background: linear-gradient(100deg, #ff7b00 0%, #ff3155 54%, #9333ea 100%) !important;
+}
+
+.promo-page-model .promo-city-title {
+  gap: 22px;
+}
+
+.promo-page-model .promo-fire-badge {
+  width: 86px !important;
+  height: 86px !important;
+  flex-basis: 86px !important;
+  font-size: 43px !important;
+}
+
+.promo-page-model .promo-city-title h2 {
+  font-size: 43px !important;
+  font-weight: 950 !important;
+  letter-spacing: 0;
+}
+
+.promo-page-model .promo-city-title p {
+  margin-top: 8px;
+  font-size: 23px !important;
+  font-weight: 850 !important;
+}
+
+.promo-page-model .promo-hero-stats {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  padding: 24px 16px 0 !important;
+  gap: 12px !important;
+}
+
+.promo-page-model .promo-hero-stats span {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 62px !important;
+  border: 1px solid #e7eaf3 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #fff7ed 0%, #fff 100%) !important;
+  color: #ff4f13 !important;
+  font-size: 19px !important;
+  font-weight: 900 !important;
+}
+
+.promo-page-model .promo-hero-stats span:last-child {
+  background: linear-gradient(90deg, #fff 0%, #f7f5ff 100%) !important;
+  color: #6d5dfc !important;
+}
+
+.promo-page-model .promo-hero-stats strong {
+  display: inline;
+  margin-right: 7px;
+  color: inherit !important;
+  font-size: 22px !important;
+}
+
+.promo-page-model .promo-filter-card {
+  width: min(760px, calc(100% - 110px));
+  margin: 0 auto 0 !important;
+  padding: 13px 18px 18px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, .20) !important;
+  transform: translateY(-1px);
+}
+
+.promo-page-model .promo-filter-card label {
+  justify-content: center;
+  margin: 0;
+  color: #6b7280 !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+}
+
+.promo-page-model .promo-filter-card select {
+  width: 274px !important;
+  height: 43px !important;
+  border: 1px solid #d9deea !important;
+  border-radius: 13px !important;
+  background: #fff !important;
+  color: #4b5563 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-align: center;
+}
+
+.promo-page-model .promo-sort-row {
+  margin: 24px auto 30px !important;
+  padding-left: 56px;
+  gap: 10px;
+  color: #62708a;
+  font-size: 14px;
+}
+
+.promo-page-model .promo-sort-row button {
+  min-height: 34px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  color: #556176;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .06);
+}
+
+.promo-page-model .promo-sort-row button.active {
+  border-color: #ffd9c4;
+  background: #fff0e8;
+  color: #ff6b20;
+}
+
+.promo-page-model .promo-grid {
+  gap: 14px !important;
+}
+
+.promo-page-model .promo-card-new,
+.promo-page-model .promo-grid > .promo-card {
+  position: relative;
+  min-height: 174px;
+  overflow: hidden !important;
+  border: 1px solid #edf0f6 !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 18px rgba(22, 34, 51, .10) !important;
+}
+
+.promo-page-model .promo-card-body {
+  display: grid !important;
+  grid-template-columns: 268px minmax(0, 1fr) 206px !important;
+  gap: 24px !important;
+  min-height: 174px;
+  align-items: center !important;
+  padding: 12px 22px 12px 12px !important;
+}
+
+.promo-page-model .promo-produto {
+  display: contents !important;
+}
+
+.promo-page-model .promo-image-wrap {
+  align-self: stretch;
+}
+
+.promo-page-model .promo-img-zoom,
+.promo-page-model .promo-produto img,
+.promo-page-model .promo-sem-imagem {
+  width: 268px !important;
+  height: 150px !important;
+  border-radius: 16px !important;
+  object-fit: cover !important;
+}
+
+.promo-page-model .promo-info {
+  align-self: center;
+  padding-bottom: 22px;
+  gap: 4px !important;
+}
+
+.promo-page-model .promo-estab {
+  position: relative;
+  padding-left: 42px;
+  min-height: 28px;
+  display: flex !important;
+  align-items: center;
+  color: #ff5b00 !important;
+  font-size: 15px !important;
+  font-weight: 950 !important;
+  text-transform: uppercase;
+}
+
+.promo-page-model .promo-estab i {
+  position: absolute;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #101827;
+  color: #ffd166;
+  font-size: 13px;
+}
+
+.promo-page-model .promo-nome {
+  color: #101a3a !important;
+  font-size: 23px !important;
+  font-weight: 950 !important;
+  line-height: 1.05 !important;
+}
+
+.promo-page-model .promo-det,
+.promo-page-model .promo-obs {
+  color: #53617c !important;
+  font-size: 17px !important;
+  line-height: 1.12 !important;
+}
+
+.promo-page-model .promo-preco {
+  align-self: start;
+  width: 190px !important;
+  min-width: 190px !important;
+  height: 74px !important;
+  border: 0 !important;
+  border-radius: 13px !important;
+  background: linear-gradient(135deg, #ff5e97 0%, #ff202f 100%) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.promo-page-model .promo-preco-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.promo-page-model .promo-preco-atual {
+  color: #fff !important;
+  font-size: 31px !important;
+  font-weight: 950 !important;
+}
+
+.promo-page-model .promo-validade {
+  position: absolute;
+  left: 304px;
+  bottom: 18px;
+  margin: 0 !important;
+  color: #66738d !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+.promo-page-model .promo-rodape {
+  position: absolute;
+  right: 22px;
+  bottom: 18px;
+  display: grid !important;
+  grid-template-columns: 82px 82px;
+  gap: 18px !important;
+  width: auto;
+  padding: 0 !important;
+}
+
+.promo-page-model .promo-rodape .icon-link {
+  width: 82px;
+  height: 50px;
+  min-height: 50px !important;
+  border-radius: 13px !important;
+  font-size: 0 !important;
+  padding: 0 !important;
+}
+
+.promo-page-model .promo-rodape .icon-link i {
+  font-size: 27px !important;
+}
+
+.promo-page-model .promo-whats-link {
+  background: #05bd59 !important;
+  border-color: #05bd59 !important;
+}
+
+.promo-page-model .promo-instagram-link {
+  background: #fff !important;
+  border: 1px solid #d9deea !important;
+  color: #ff3476 !important;
+}
+
+@media (max-width: 760px) {
+  .promo-page-model {
+    width: min(100%, calc(100vw - 16px));
+  }
+  .promo-page-model .promo-city-head {
+    padding: 18px !important;
+  }
+  .promo-page-model .promo-city-title h2 {
+    font-size: 28px !important;
+  }
+  .promo-page-model .promo-city-title p {
+    font-size: 15px !important;
+  }
+  .promo-page-model .promo-fire-badge {
+    width: 58px !important;
+    height: 58px !important;
+    flex-basis: 58px !important;
+    font-size: 28px !important;
+  }
+  .promo-page-model .promo-filter-card {
+    width: calc(100% - 24px);
+  }
+  .promo-page-model .promo-sort-row {
+    padding-left: 0;
+  }
+  .promo-page-model .promo-card-body {
+    grid-template-columns: 118px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    min-height: 0;
+    padding: 10px !important;
+  }
+  .promo-page-model .promo-img-zoom,
+  .promo-page-model .promo-produto img,
+  .promo-page-model .promo-sem-imagem {
+    width: 118px !important;
+    height: 96px !important;
+  }
+  .promo-page-model .promo-info {
+    padding-bottom: 0;
+  }
+  .promo-page-model .promo-preco {
+    grid-column: 1 / -1;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .promo-page-model .promo-validade,
+  .promo-page-model .promo-rodape {
+    position: static;
+  }
+  .promo-page-model .promo-rodape {
+    display: flex !important;
+    padding: 0 10px 10px !important;
+  }
+}
+
 .im-header {
   display: flex;
   align-items: flex-start;

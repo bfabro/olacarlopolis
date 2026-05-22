@@ -7621,6 +7621,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     `;
 
     html = `
+    <div class="promo-page-model">
     <section class="promo-hero promo-hero-new">
       <div class="promo-city-head">
         <div class="promo-city-title">
@@ -7759,7 +7760,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
-    html += `</section>`;
+    html += `</section></div>`;
 
     document.querySelector(".content_area").innerHTML = html;
 
