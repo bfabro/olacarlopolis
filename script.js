@@ -4754,6 +4754,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
             volume: p.volume || "",             // ex: "350 ml", "600 ml"
             embalagem: p.embalagem || "",       // ex: "caixa c/18", "fardo c/6"
             preco: p.preco,                     // número ou string
+            desconto: p.desconto || p.discount || "",
             precoAntigo: p.precoAntigo || null, // opcional
             unidade: p.unidade || "",           // ex: "A UNIDADE", "NO FARDO"
             imagem: p.imagem || p.image || "",  // url opcional
@@ -7669,7 +7670,9 @@ plotarPinsImoveis(stateImoveis.filtered);
           ? i.precoAntigo.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
           : (i.precoAntigo || "");
 
-        const descontoPct = descontoPromocao(i);
+        const descontoTxt = String(i.desconto || "").trim();
+        const descontoPct = descontoTxt ? 0 : descontoPromocao(i);
+        const destaqueOferta = descontoTxt || (precoFmt ? `R$ ${String(precoFmt).replace(/^R\$\s*/i, "")}` : (descontoPct ? `${descontoPct}% OFF` : "Oferta"));
 
         // validade
         let validadeTxt = "";
@@ -7685,15 +7688,14 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
         html += `
-    <article class="promo-card promo-card-new ${index === 0 ? "promo-card-featured" : ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
-    <div class="promo-top-ribbon">${precoAntFmt ? "Oferta especial" : "Promoção"}</div>
+    <article class="promo-card promo-card-new" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
     <div class="promo-card-body">
       <div class="promo-produto">
         <div class="promo-image-wrap">
           ${i.imagem
             ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
             : `<div class="promo-sem-imagem">sem imagem</div>`}
-          ${descontoPct ? `<span class="promo-discount-badge">${descontoPct}%<small>off</small></span>` : ""}
+          ${(descontoTxt || descontoPct) ? `<span class="promo-discount-badge">${descontoTxt || `${descontoPct}%`}<small>off</small></span>` : ""}
         </div>
         
         <div class="promo-info">
@@ -7708,9 +7710,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       </div>
 
      <div class="promo-preco">
+      <div class="promo-preco-label"><i class="fa-solid fa-fire"></i> Super oferta</div>
+      <div class="promo-preco-atual">${destaqueOferta}</div>
       ${precoAntFmt ? `<div class="promo-preco-antigo">${precoAntFmt}</div>` : ""}
-      <div class="promo-preco-atual">${precoFmt}</div>
-      ${i.unidade ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
+      ${i.unidade && !descontoTxt ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
       ${(i.validadeInicio && i.validadeFim)
             ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
             : (i.validadeFim ? `<div class="promo-validade">Até ${formatarDataBR(i.validadeFim)}</div>`

@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 136,
-  label: "v136",
+  numero: 137,
+  label: "v137",
   data: "2026-05-22",
-  nota: "Reformula a vitrine publica de promocoes."
+  nota: "Ajusta vitrine publica de promocoes e campo de desconto."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -374,6 +374,7 @@ function normalizePromocoes(items) {
       volume: String(item?.volume || "").trim(),
       embalagem: String(item?.embalagem || "").trim(),
       preco: String(item?.preco || "").trim(),
+      desconto: String(item?.desconto || item?.discount || "").trim(),
       precoAntigo: String(item?.precoAntigo || "").trim(),
       unidade: String(item?.unidade || "").trim(),
       imagem: String(item?.imagem || item?.image || "").trim(),
@@ -1608,7 +1609,7 @@ function renderClientMenuPreview() {
 }
 
 function clearClientPromoFields() {
-  ["clientPromoTitle", "clientPromoPrice", "clientPromoOldPrice", "clientPromoUnit", "clientPromoVolume", "clientPromoPack", "clientPromoStart", "clientPromoEnd", "clientPromoObs", "clientPromoImageUrl"].forEach((id) => {
+  ["clientPromoTitle", "clientPromoPrice", "clientPromoDiscount", "clientPromoOldPrice", "clientPromoUnit", "clientPromoVolume", "clientPromoPack", "clientPromoStart", "clientPromoEnd", "clientPromoObs", "clientPromoImageUrl"].forEach((id) => {
     if ($(id)) $(id).value = "";
   });
   if ($("clientPromoImageUpload")) $("clientPromoImageUpload").value = "";
@@ -1618,7 +1619,7 @@ function clearClientPromoFields() {
 }
 
 function clearPromoFields(prefix, scope = document) {
-  ["Title", "Price", "OldPrice", "Unit", "Volume", "Pack", "Start", "End", "Obs", "ImageUrl"].forEach((suffix) => {
+  ["Title", "Price", "Discount", "OldPrice", "Unit", "Volume", "Pack", "Start", "End", "Obs", "ImageUrl"].forEach((suffix) => {
     const field = scope.querySelector(`#${prefix}Promo${suffix}`);
     if (field) field.value = "";
   });
@@ -1634,6 +1635,7 @@ function fillPromoFields(prefix, promo, scope = document) {
   };
   set("Title", promo.titulo);
   set("Price", promo.preco);
+  set("Discount", promo.desconto);
   set("OldPrice", promo.precoAntigo);
   set("Unit", promo.unidade);
   set("Volume", promo.volume);
@@ -1654,6 +1656,7 @@ function readPromoFields(prefix, scope = document, fallbackId = "") {
     id: fallbackId || `promo-${Date.now()}`,
     titulo: get("Title"),
     preco: get("Price"),
+    desconto: get("Discount"),
     precoAntigo: get("OldPrice"),
     unidade: get("Unit"),
     volume: get("Volume"),
@@ -3862,6 +3865,7 @@ function renderClientOnlyEditor() {
           <div class="promo-admin-form">
             <label>Titulo da promocao<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
             <label>Preco atual<input id="coPromoPrice" placeholder="Ex.: 49,90"></label>
+            <label>Desconto / chamada<input id="coPromoDiscount" placeholder="Ex.: 20% OFF ou ATE 30% OFF"></label>
             <label>Preco antigo<input id="coPromoOldPrice" placeholder="Opcional"></label>
             <label>Unidade<input id="coPromoUnit" placeholder="Ex.: A unidade"></label>
             <label>Volume<input id="coPromoVolume" placeholder="Opcional"></label>
@@ -4185,6 +4189,7 @@ function renderPromocoesMarkup(promocoes, removeAttr = "promo-remove", editAttr 
       <div>
         <strong>${escapeHtml(promo.titulo)}</strong>
         <span>${escapeHtml([promo.preco ? `R$ ${promo.preco}` : "", promo.validadeFim ? `ate ${promo.validadeFim}` : ""].filter(Boolean).join(" - ") || "Sem preco/validade")}</span>
+        ${promo.desconto ? `<small>Destaque: ${escapeHtml(promo.desconto)}</small>` : ""}
         <small>Disponivel: ${escapeHtml(promoWeekDaysLabel(promo.diasSemana))}</small>
         ${promo.obs ? `<small>${escapeHtml(promo.obs)}</small>` : ""}
       </div>
