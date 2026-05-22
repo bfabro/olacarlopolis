@@ -7681,6 +7681,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     html = `
     <div class="promo-city-screen">
+      <h2 class="highlighted promo-onde-title"><span><i class="fa-solid fa-fire"></i> Promo&ccedil;&otilde;es</span></h2>
       <header class="promo-city-top">
         <button type="button" class="promo-top-icon" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <strong>Ol&aacute; Carl&oacute;polis</strong>
@@ -7719,6 +7720,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             </option>
           `).join("")}
         </select>
+        <span class="promo-count-pill"><strong>${totalDisponiveis}</strong> oferta${totalDisponiveis === 1 ? "" : "s"}</span>
       </div>
     </section>
     <section class="promo-sort-row">
@@ -7776,7 +7778,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         </div>
         
         <div class="promo-info">
-          <div class="promo-estab">${i.logo ? `<img src="${i.logo}" alt="${i.estabelecimento}" loading="lazy">` : `<i class="fa-solid fa-store"></i>`} ${i.estabelecimento}</div>
+          <a class="promo-estab promo-estab-link" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.logo ? `<img src="${i.logo}" alt="${i.estabelecimento}" loading="lazy">` : `<i class="fa-solid fa-store"></i>`} ${i.estabelecimento}</a>
           <div class="promo-nome">${i.titulo}</div>
           ${(i.volume || i.embalagem)
             ? `<div class="promo-det">${[i.volume, i.embalagem].filter(Boolean).join(" · ")}</div>` : ""}
@@ -7920,6 +7922,14 @@ plotarPinsImoveis(stateImoveis.filtered);
         const ordem = button.dataset.promoSort || "recentes";
         window.__promoOrdemAtual = ordem;
         mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem, busca: window.__promoBuscaAtual || "" });
+      });
+    });
+
+    document.querySelectorAll("[data-promo-est-link]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        const estId = link.dataset.promoEstLink || "";
+        if (estId && typeof abrirEstabelecimentoDaHome === "function") abrirEstabelecimentoDaHome(estId);
       });
     });
 

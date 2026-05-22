@@ -8677,6 +8677,655 @@ html {
   }
 }
 
+/* ===== Promoções Onde Comer: camada final v141 ===== */
+.promo-city-screen {
+  width: 100% !important;
+  max-width: 980px !important;
+  margin: 0 auto 32px !important;
+  padding: 0 10px 34px !important;
+  background: transparent !important;
+}
+
+.promo-city-top,
+.promo-city-search,
+.promo-city-screen .promo-city-head,
+.promo-city-screen .promo-hero-stats {
+  display: none !important;
+}
+
+.promo-onde-title {
+  margin-top: 0 !important;
+}
+
+.promo-city-screen .promo-filter-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  width: min(760px, calc(100% - 20px)) !important;
+  max-width: 760px !important;
+  margin: 10px auto 12px !important;
+  padding: 14px 18px !important;
+  border: 1.5px solid #ffe2be !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 6px 24px rgba(255, 140, 0, 0.10), 0 1.5px 8px rgba(64, 112, 244, 0.06) !important;
+}
+
+.promo-city-screen .promo-filter-card label {
+  color: #ff8800 !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+}
+
+.promo-city-screen .promo-filter-card select {
+  flex: 1 1 260px !important;
+  width: auto !important;
+  max-width: 330px !important;
+  height: 42px !important;
+  border: 1.5px solid #ff8800 !important;
+  border-radius: 9px !important;
+  background: linear-gradient(90deg, #ffe2be 60%, #e2e6ff 100%) !important;
+}
+
+.promo-city-screen .promo-sort-row {
+  width: min(760px, calc(100% - 20px)) !important;
+  max-width: 760px !important;
+  margin: 0 auto 14px !important;
+  padding: 0 !important;
+  justify-content: center !important;
+}
+
+.promo-city-screen .promo-sort-row [data-promo-sort="desconto"] {
+  display: none !important;
+}
+
+.promo-city-screen .promo-card-body {
+  grid-template-columns: 285px minmax(0, 1fr) 204px !important;
+  min-height: 134px !important;
+  padding: 8px 22px 8px 8px !important;
+}
+
+.promo-city-screen .promo-img-zoom,
+.promo-city-screen .promo-produto img,
+.promo-city-screen .promo-sem-imagem {
+  width: 285px !important;
+  height: 116px !important;
+}
+
+.promo-city-screen .promo-estab-link {
+  color: #0b73ff !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+.promo-city-screen .promo-validade {
+  left: 315px !important;
+  right: 240px !important;
+  bottom: 13px !important;
+}
+
+.promo-city-screen .promo-rodape {
+  right: 22px !important;
+  bottom: 13px !important;
+  grid-template-columns: 82px 70px !important;
+}
+
+@media (max-width: 760px) {
+  .promo-city-screen .promo-filter-card {
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    width: calc(100% - 20px) !important;
+  }
+
+  .promo-city-screen .promo-filter-card label {
+    width: 100% !important;
+  }
+
+  .promo-city-screen .promo-card-body {
+    grid-template-columns: 34% minmax(0, 1fr) 78px !important;
+    min-height: 118px !important;
+    padding: 8px !important;
+  }
+
+  .promo-city-screen .promo-img-zoom,
+  .promo-city-screen .promo-produto img,
+  .promo-city-screen .promo-sem-imagem {
+    width: 100% !important;
+    height: 100px !important;
+  }
+
+  .promo-city-screen .promo-validade {
+    left: calc(34% + 24px) !important;
+    right: 91px !important;
+    bottom: 9px !important;
+  }
+
+  .promo-city-screen .promo-rodape {
+    right: 8px !important;
+    bottom: 8px !important;
+    grid-template-columns: 38px 38px !important;
+  }
+}
+
+/* ===== Promoções no padrão Onde Comer v141 ===== */
+.promo-city-screen {
+  width: 100% !important;
+  max-width: 980px !important;
+  margin: 0 auto 32px !important;
+  padding: 0 10px 34px !important;
+  background: transparent !important;
+}
+
+.promo-city-top,
+.promo-city-search,
+.promo-city-screen .promo-city-head,
+.promo-city-screen .promo-hero-stats {
+  display: none !important;
+}
+
+.promo-city-screen .promo-hero-new {
+  width: 100% !important;
+  max-width: 980px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.promo-city-screen .promo-filter-card {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  width: min(760px, calc(100% - 20px)) !important;
+  max-width: 760px !important;
+  margin: 10px auto 12px !important;
+  padding: 14px 18px !important;
+  border: 1.5px solid #ffe2be !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 6px 24px rgba(255, 140, 0, 0.10), 0 1.5px 8px rgba(64, 112, 244, 0.06) !important;
+}
+
+.promo-city-screen .promo-filter-card label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  color: #ff8800 !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+
+.promo-city-screen .promo-filter-card select {
+  flex: 1 1 260px !important;
+  width: auto !important;
+  max-width: 330px !important;
+  height: 42px !important;
+  border: 1.5px solid #ff8800 !important;
+  border-radius: 9px !important;
+  padding: 8px 38px 8px 12px !important;
+  background: linear-gradient(90deg, #ffe2be 60%, #e2e6ff 100%) !important;
+  color: #444 !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+}
+
+.promo-count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #f97316;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.promo-count-pill strong {
+  margin-right: 5px;
+  color: inherit;
+}
+
+.promo-city-screen .promo-sort-row {
+  width: min(760px, calc(100% - 20px)) !important;
+  max-width: 760px !important;
+  margin: 0 auto 14px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  color: #6b7280 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+.promo-city-screen .promo-sort-row [data-promo-sort="desconto"] {
+  display: none !important;
+}
+
+.promo-city-screen .promo-sort-row button {
+  min-height: 31px !important;
+  padding: 6px 11px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #4b5563 !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .06) !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+.promo-city-screen .promo-sort-row button.active {
+  border-color: #fed7aa !important;
+  background: #fff7ed !important;
+  color: #f97316 !important;
+}
+
+.promo-city-screen .promo-grid {
+  width: min(920px, 100%) !important;
+  max-width: 920px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  margin: 0 auto !important;
+}
+
+.promo-city-screen .promo-card-new,
+.promo-city-screen .promo-grid > .promo-card {
+  min-height: 134px !important;
+  overflow: hidden !important;
+  border: 1px solid #edf0f6 !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 7px 18px rgba(15, 23, 42, .10) !important;
+}
+
+.promo-city-screen .promo-card-body {
+  display: grid !important;
+  grid-template-columns: 285px minmax(0, 1fr) 204px !important;
+  gap: 22px !important;
+  min-height: 134px !important;
+  align-items: center !important;
+  padding: 8px 22px 8px 8px !important;
+}
+
+.promo-city-screen .promo-produto {
+  display: contents !important;
+}
+
+.promo-city-screen .promo-img-zoom,
+.promo-city-screen .promo-produto img,
+.promo-city-screen .promo-sem-imagem {
+  width: 285px !important;
+  height: 116px !important;
+  border-radius: 14px !important;
+  object-fit: cover !important;
+}
+
+.promo-city-screen .promo-info {
+  min-width: 0 !important;
+  align-self: center !important;
+  padding: 0 0 24px !important;
+}
+
+.promo-city-screen .promo-estab,
+.promo-city-screen .promo-estab-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  color: #0b73ff !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+  line-height: 1.1 !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+}
+
+.promo-city-screen .promo-estab-link:hover {
+  color: #ff8800 !important;
+}
+
+.promo-city-screen .promo-estab i,
+.promo-city-screen .promo-estab img {
+  width: 28px !important;
+  height: 28px !important;
+  flex: 0 0 28px !important;
+  border-radius: 50% !important;
+}
+
+.promo-city-screen .promo-nome {
+  margin-top: 4px !important;
+  color: #101a3a !important;
+  font-size: 24px !important;
+  font-weight: 950 !important;
+  line-height: 1.05 !important;
+}
+
+.promo-city-screen .promo-det,
+.promo-city-screen .promo-obs {
+  margin-top: 3px !important;
+  color: #53617c !important;
+  font-size: 17px !important;
+  line-height: 1.12 !important;
+}
+
+.promo-city-screen .promo-preco {
+  width: 190px !important;
+  min-width: 190px !important;
+  height: 64px !important;
+  align-self: start !important;
+  border: 0 !important;
+  border-radius: 11px !important;
+  padding: 8px !important;
+}
+
+.promo-city-screen .promo-preco-label {
+  font-size: 12px !important;
+}
+
+.promo-city-screen .promo-preco-atual {
+  font-size: 29px !important;
+}
+
+.promo-city-screen .promo-validade {
+  position: absolute !important;
+  left: 315px !important;
+  bottom: 13px !important;
+  right: 240px !important;
+  color: #66738d !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.promo-city-screen .promo-rodape {
+  position: absolute !important;
+  right: 22px !important;
+  bottom: 13px !important;
+  display: grid !important;
+  grid-template-columns: 82px 70px !important;
+  gap: 14px !important;
+  padding: 0 !important;
+}
+
+.promo-city-screen .promo-rodape .icon-link {
+  width: 100% !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  border-radius: 13px !important;
+  padding: 0 !important;
+  font-size: 0 !important;
+}
+
+.promo-city-screen .promo-rodape .icon-link i {
+  font-size: 25px !important;
+}
+
+@media (max-width: 760px) {
+  .promo-city-screen {
+    padding-inline: 8px !important;
+  }
+
+  .promo-city-screen .promo-filter-card {
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    width: calc(100% - 20px) !important;
+    padding: 13px 14px !important;
+  }
+
+  .promo-city-screen .promo-filter-card label {
+    width: 100% !important;
+    font-size: 1rem !important;
+  }
+
+  .promo-city-screen .promo-filter-card select {
+    flex: 1 1 170px !important;
+    min-width: 0 !important;
+  }
+
+  .promo-count-pill {
+    min-height: 36px;
+    padding-inline: 10px;
+  }
+
+  .promo-city-screen .promo-sort-row {
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    width: calc(100% - 20px) !important;
+  }
+
+  .promo-city-screen .promo-card-new,
+  .promo-city-screen .promo-grid > .promo-card {
+    min-height: 118px !important;
+    border-radius: 15px !important;
+  }
+
+  .promo-city-screen .promo-card-body {
+    grid-template-columns: 34% minmax(0, 1fr) 78px !important;
+    gap: 8px !important;
+    min-height: 118px !important;
+    padding: 8px !important;
+  }
+
+  .promo-city-screen .promo-img-zoom,
+  .promo-city-screen .promo-produto img,
+  .promo-city-screen .promo-sem-imagem {
+    width: 100% !important;
+    height: 100px !important;
+    border-radius: 12px !important;
+  }
+
+  .promo-city-screen .promo-info {
+    padding-bottom: 20px !important;
+  }
+
+  .promo-city-screen .promo-estab,
+  .promo-city-screen .promo-estab-link {
+    gap: 5px !important;
+    font-size: 9px !important;
+  }
+
+  .promo-city-screen .promo-estab i,
+  .promo-city-screen .promo-estab img {
+    width: 19px !important;
+    height: 19px !important;
+    flex-basis: 19px !important;
+  }
+
+  .promo-city-screen .promo-nome {
+    font-size: 15px !important;
+  }
+
+  .promo-city-screen .promo-det,
+  .promo-city-screen .promo-obs {
+    font-size: 11px !important;
+  }
+
+  .promo-city-screen .promo-preco {
+    width: 78px !important;
+    min-width: 78px !important;
+    height: 45px !important;
+    padding: 5px !important;
+    border-radius: 10px !important;
+  }
+
+  .promo-city-screen .promo-preco-label {
+    font-size: 7px !important;
+  }
+
+  .promo-city-screen .promo-preco-atual {
+    font-size: 17px !important;
+  }
+
+  .promo-city-screen .promo-validade {
+    left: calc(34% + 24px) !important;
+    right: 91px !important;
+    bottom: 9px !important;
+    font-size: 10px !important;
+  }
+
+  .promo-city-screen .promo-rodape {
+    right: 8px !important;
+    bottom: 8px !important;
+    grid-template-columns: 38px 38px !important;
+    gap: 7px !important;
+  }
+
+  .promo-city-screen .promo-rodape .icon-link {
+    height: 31px !important;
+    min-height: 31px !important;
+    border-radius: 9px !important;
+  }
+
+  .promo-city-screen .promo-rodape .icon-link i {
+    font-size: 18px !important;
+  }
+}
+
+/* ===== Promoções Onde Comer: camada final v141 ===== */
+.promo-city-screen {
+  width: 100% !important;
+  max-width: 980px !important;
+  margin: 0 auto 32px !important;
+  padding: 0 10px 34px !important;
+  background: transparent !important;
+}
+
+.promo-city-top,
+.promo-city-search,
+.promo-city-screen .promo-city-head,
+.promo-city-screen .promo-hero-stats {
+  display: none !important;
+}
+
+.promo-onde-title {
+  margin-top: 0 !important;
+}
+
+.promo-city-screen .promo-filter-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  width: min(760px, calc(100% - 20px)) !important;
+  max-width: 760px !important;
+  margin: 10px auto 12px !important;
+  padding: 14px 18px !important;
+  border: 1.5px solid #ffe2be !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 6px 24px rgba(255, 140, 0, 0.10), 0 1.5px 8px rgba(64, 112, 244, 0.06) !important;
+}
+
+.promo-city-screen .promo-filter-card label {
+  color: #ff8800 !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+}
+
+.promo-city-screen .promo-filter-card select {
+  flex: 1 1 260px !important;
+  width: auto !important;
+  max-width: 330px !important;
+  height: 42px !important;
+  border: 1.5px solid #ff8800 !important;
+  border-radius: 9px !important;
+  background: linear-gradient(90deg, #ffe2be 60%, #e2e6ff 100%) !important;
+}
+
+.promo-city-screen .promo-sort-row {
+  width: min(760px, calc(100% - 20px)) !important;
+  max-width: 760px !important;
+  margin: 0 auto 14px !important;
+  padding: 0 !important;
+  justify-content: center !important;
+}
+
+.promo-city-screen .promo-sort-row [data-promo-sort="desconto"] {
+  display: none !important;
+}
+
+.promo-city-screen .promo-card-body {
+  grid-template-columns: 285px minmax(0, 1fr) 204px !important;
+  min-height: 134px !important;
+  padding: 8px 22px 8px 8px !important;
+}
+
+.promo-city-screen .promo-img-zoom,
+.promo-city-screen .promo-produto img,
+.promo-city-screen .promo-sem-imagem {
+  width: 285px !important;
+  height: 116px !important;
+}
+
+.promo-city-screen .promo-estab-link {
+  color: #0b73ff !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+.promo-city-screen .promo-validade {
+  left: 315px !important;
+  right: 240px !important;
+  bottom: 13px !important;
+}
+
+.promo-city-screen .promo-rodape {
+  right: 22px !important;
+  bottom: 13px !important;
+  grid-template-columns: 82px 70px !important;
+}
+
+@media (max-width: 760px) {
+  .promo-city-screen .promo-filter-card {
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    width: calc(100% - 20px) !important;
+  }
+
+  .promo-city-screen .promo-filter-card label {
+    width: 100% !important;
+  }
+
+  .promo-city-screen .promo-card-body {
+    grid-template-columns: 34% minmax(0, 1fr) 78px !important;
+    min-height: 118px !important;
+    padding: 8px !important;
+  }
+
+  .promo-city-screen .promo-img-zoom,
+  .promo-city-screen .promo-produto img,
+  .promo-city-screen .promo-sem-imagem {
+    width: 100% !important;
+    height: 100px !important;
+  }
+
+  .promo-city-screen .promo-validade {
+    left: calc(34% + 24px) !important;
+    right: 91px !important;
+    bottom: 9px !important;
+  }
+
+  .promo-city-screen .promo-rodape {
+    right: 8px !important;
+    bottom: 8px !important;
+    grid-template-columns: 38px 38px !important;
+  }
+}
+
 /* ===== Promoções: replica visual do modelo v138 ===== */
 .promo-page-model {
   width: min(930px, calc(100vw - 28px));
@@ -12948,5 +13597,137 @@ tr[data-inativo="true"] {
 
   .promo-city-screen .promo-rodape .icon-link i {
     font-size: 18px !important;
+  }
+}
+
+/* ===== Promo��es Onde Comer: camada final v141 ===== */
+.promo-city-screen {
+  width: 100% !important;
+  max-width: 980px !important;
+  margin: 0 auto 32px !important;
+  padding: 0 10px 34px !important;
+  background: transparent !important;
+}
+
+.promo-city-top,
+.promo-city-search,
+.promo-city-screen .promo-city-head,
+.promo-city-screen .promo-hero-stats {
+  display: none !important;
+}
+
+.promo-onde-title {
+  margin-top: 0 !important;
+}
+
+.promo-city-screen .promo-filter-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  width: min(760px, calc(100% - 20px)) !important;
+  max-width: 760px !important;
+  margin: 10px auto 12px !important;
+  padding: 14px 18px !important;
+  border: 1.5px solid #ffe2be !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 6px 24px rgba(255, 140, 0, 0.10), 0 1.5px 8px rgba(64, 112, 244, 0.06) !important;
+}
+
+.promo-city-screen .promo-filter-card label {
+  color: #ff8800 !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+}
+
+.promo-city-screen .promo-filter-card select {
+  flex: 1 1 260px !important;
+  width: auto !important;
+  max-width: 330px !important;
+  height: 42px !important;
+  border: 1.5px solid #ff8800 !important;
+  border-radius: 9px !important;
+  background: linear-gradient(90deg, #ffe2be 60%, #e2e6ff 100%) !important;
+}
+
+.promo-city-screen .promo-sort-row {
+  width: min(760px, calc(100% - 20px)) !important;
+  max-width: 760px !important;
+  margin: 0 auto 14px !important;
+  padding: 0 !important;
+  justify-content: center !important;
+}
+
+.promo-city-screen .promo-sort-row [data-promo-sort="desconto"] {
+  display: none !important;
+}
+
+.promo-city-screen .promo-card-body {
+  grid-template-columns: 285px minmax(0, 1fr) 204px !important;
+  min-height: 134px !important;
+  padding: 8px 22px 8px 8px !important;
+}
+
+.promo-city-screen .promo-img-zoom,
+.promo-city-screen .promo-produto img,
+.promo-city-screen .promo-sem-imagem {
+  width: 285px !important;
+  height: 116px !important;
+}
+
+.promo-city-screen .promo-estab-link {
+  color: #0b73ff !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+.promo-city-screen .promo-validade {
+  left: 315px !important;
+  right: 240px !important;
+  bottom: 13px !important;
+}
+
+.promo-city-screen .promo-rodape {
+  right: 22px !important;
+  bottom: 13px !important;
+  grid-template-columns: 82px 70px !important;
+}
+
+@media (max-width: 760px) {
+  .promo-city-screen .promo-filter-card {
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    width: calc(100% - 20px) !important;
+  }
+
+  .promo-city-screen .promo-filter-card label {
+    width: 100% !important;
+  }
+
+  .promo-city-screen .promo-card-body {
+    grid-template-columns: 34% minmax(0, 1fr) 78px !important;
+    min-height: 118px !important;
+    padding: 8px !important;
+  }
+
+  .promo-city-screen .promo-img-zoom,
+  .promo-city-screen .promo-produto img,
+  .promo-city-screen .promo-sem-imagem {
+    width: 100% !important;
+    height: 100px !important;
+  }
+
+  .promo-city-screen .promo-validade {
+    left: calc(34% + 24px) !important;
+    right: 91px !important;
+    bottom: 9px !important;
+  }
+
+  .promo-city-screen .promo-rodape {
+    right: 8px !important;
+    bottom: 8px !important;
+    grid-template-columns: 38px 38px !important;
   }
 }
