@@ -7726,6 +7726,12 @@ plotarPinsImoveis(stateImoveis.filtered);
             </option>
           `).join("")}
         </select>
+        <div class="promo-filter-menu">
+          <button type="button" data-promo-filter-value="todos">Todas as promo&ccedil;&otilde;es</button>
+          <button type="button" data-promo-filter-value="menor-valor">Menor valor</button>
+          <button type="button" data-promo-filter-value="data">Data</button>
+          ${categoriasPromo.map(cat => `<button type="button" data-promo-filter-value="categoria::${cat}">${cat}</button>`).join("")}
+        </div>
         <span class="promo-count-pill"><strong>${totalDisponiveis}</strong> oferta${totalDisponiveis === 1 ? "" : "s"}</span>
       </div>
     </section>
@@ -7937,6 +7943,24 @@ plotarPinsImoveis(stateImoveis.filtered);
         mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "" });
       });
     }
+
+    document.querySelectorAll("[data-promo-filter-value]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const id = String(button.dataset.promoFilterValue || "todos").trim();
+        if (id === "menor-valor") {
+          window.__promoOrdemAtual = "menorValor";
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "menorValor", busca: window.__promoBuscaAtual || "" });
+          return;
+        }
+        if (id === "data") {
+          window.__promoOrdemAtual = "termina";
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "termina", busca: window.__promoBuscaAtual || "" });
+          return;
+        }
+        location.hash = id === "todos" ? "#promocoes" : `#promocoes-${id}`;
+        mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "" });
+      });
+    });
 
     const promoSearch = document.getElementById("promoSearchInput");
     if (promoSearch) {
