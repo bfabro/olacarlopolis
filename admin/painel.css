@@ -1332,6 +1332,26 @@ button[type="submit"]:hover,
   flex: 1 1 180px;
 }
 
+.promo-form-actions .ghost-button:first-child {
+  background: #16a34a;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(22, 163, 74, .18);
+}
+
+.promo-form-actions .ghost-button:first-child:hover {
+  background: #15803d;
+}
+
+.promo-form-actions .ghost-button:last-child:not(.hidden) {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fed7aa;
+}
+
+.promo-form-actions .ghost-button:last-child:not(.hidden):hover {
+  background: #ffedd5;
+}
+
 .promo-admin-item {
   display: grid;
   grid-template-columns: 72px minmax(0, 1fr) minmax(120px, auto);
