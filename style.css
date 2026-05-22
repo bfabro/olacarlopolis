@@ -9,6 +9,389 @@
   font-family: "Poppins", sans-serif;
 }
 
+/* ===== Promoções: lista compacta inspirada no app v136 ===== */
+.promo-hero-new {
+  max-width: 760px;
+  margin: 0 auto 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.promo-city-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 14px;
+  padding: 12px;
+  color: #fff;
+  background: linear-gradient(100deg, #ff850b 0%, #ff3d57 55%, #7c3aed 100%);
+  box-shadow: 0 12px 28px rgba(255, 93, 24, .24);
+}
+
+.promo-city-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.promo-fire-badge {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fff;
+  color: #ff6a00;
+  font-size: 22px;
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .5);
+}
+
+.promo-city-title h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.promo-city-title p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  font-weight: 800;
+  opacity: .94;
+}
+
+.promo-hero-new .promo-hero-stats {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.promo-hero-new .promo-hero-stats span {
+  display: grid;
+  place-items: center;
+  min-width: 94px;
+  min-height: 48px;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff;
+  color: #4b5563;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.promo-hero-new .promo-hero-stats strong {
+  display: block;
+  color: #f97316;
+  font-size: 20px;
+}
+
+.promo-filter-card {
+  display: grid !important;
+  justify-items: center;
+  gap: 8px;
+  max-width: 760px;
+  margin: 10px auto 0 !important;
+  padding: 16px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, .12) !important;
+}
+
+.promo-filter-card label {
+  color: #374151 !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+.promo-filter-card select {
+  width: min(360px, 100%);
+  min-height: 40px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 10px !important;
+  color: #374151 !important;
+  background: #f9fafb !important;
+  font-weight: 800 !important;
+}
+
+.promo-sort-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 760px;
+  margin: 8px auto 10px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.promo-sort-row button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #fff;
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.promo-sort-row button.active {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.promo-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  max-width: 760px !important;
+  gap: 8px !important;
+  margin: 0 auto !important;
+}
+
+.promo-card-new,
+.promo-grid > .promo-card {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, .09) !important;
+}
+
+.promo-card-new::before,
+.promo-grid > .promo-card::before {
+  display: none !important;
+}
+
+.promo-top-ribbon {
+  top: 8px !important;
+  left: 8px !important;
+  z-index: 4 !important;
+  border-radius: 999px !important;
+  padding: 5px 9px !important;
+  background: #ff143d !important;
+  font-size: 10px !important;
+}
+
+.promo-grid .promo-card-body {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+}
+
+.promo-grid .promo-produto {
+  display: grid !important;
+  grid-template-columns: 140px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  padding: 8px !important;
+}
+
+.promo-image-wrap {
+  position: relative;
+}
+
+.promo-grid .promo-img-zoom,
+.promo-grid .promo-produto img,
+.promo-grid .promo-sem-imagem {
+  width: 140px !important;
+  height: 86px !important;
+  border-radius: 9px !important;
+  object-fit: cover !important;
+}
+
+.promo-discount-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff3d57, #a855f7);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 950;
+  line-height: .9;
+  text-transform: uppercase;
+  box-shadow: 0 6px 14px rgba(168, 85, 247, .25);
+}
+
+.promo-discount-badge small {
+  display: block;
+  font-size: 9px;
+}
+
+.promo-grid .promo-info {
+  justify-content: center !important;
+  gap: 3px !important;
+}
+
+.promo-grid .promo-estab {
+  color: #2563eb !important;
+  font-size: 11px !important;
+  font-weight: 950 !important;
+}
+
+.promo-grid .promo-nome {
+  font-size: 15px !important;
+  line-height: 1.12 !important;
+  color: #111827 !important;
+}
+
+.promo-grid .promo-det,
+.promo-grid .promo-obs,
+.promo-grid .promo-days {
+  font-size: 11px !important;
+}
+
+.promo-grid .promo-preco {
+  min-width: 88px !important;
+  border: 0 !important;
+  border-left: 1px solid #f3f4f6 !important;
+  border-top: 0 !important;
+  background: #fff !important;
+  padding: 8px !important;
+  justify-items: end !important;
+}
+
+.promo-grid .promo-preco-atual {
+  color: #111827 !important;
+  font-size: 18px !important;
+}
+
+.promo-grid .promo-preco-antigo,
+.promo-grid .promo-unidade,
+.promo-grid .promo-validade {
+  font-size: 10px !important;
+  color: #6b7280 !important;
+}
+
+.promo-grid .promo-rodape {
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  padding: 0 8px 8px !important;
+  background: transparent !important;
+}
+
+.promo-grid .promo-rodape .icon-link {
+  min-height: 38px !important;
+  border-radius: 11px !important;
+  padding: 8px 11px !important;
+}
+
+.promo-card-featured {
+  min-height: 190px;
+  color: #fff;
+  background: #130806 !important;
+}
+
+.promo-card-featured .promo-card-body {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.promo-card-featured .promo-produto {
+  grid-template-columns: minmax(0, 1fr) 52% !important;
+  min-height: 150px;
+  background: radial-gradient(circle at 80% 50%, rgba(249, 115, 22, .28), transparent 36%), #140805;
+}
+
+.promo-card-featured .promo-image-wrap {
+  order: 2;
+}
+
+.promo-card-featured .promo-info {
+  order: 1;
+  padding: 32px 4px 12px 4px;
+}
+
+.promo-card-featured .promo-img-zoom,
+.promo-card-featured .promo-produto img,
+.promo-card-featured .promo-sem-imagem {
+  width: 100% !important;
+  height: 150px !important;
+  border-radius: 12px !important;
+}
+
+.promo-card-featured .promo-estab,
+.promo-card-featured .promo-nome,
+.promo-card-featured .promo-det,
+.promo-card-featured .promo-obs,
+.promo-card-featured .promo-days {
+  color: #fff !important;
+}
+
+.promo-card-featured .promo-nome {
+  font-size: 25px !important;
+}
+
+.promo-card-featured .promo-preco {
+  display: none !important;
+}
+
+.promo-card-featured .promo-rodape {
+  margin-top: -54px !important;
+  position: relative;
+  z-index: 5;
+}
+
+@media (max-width: 640px) {
+  .promo-city-head,
+  .promo-hero-new .promo-hero-stats {
+    display: grid;
+  }
+
+  .promo-hero-new .promo-hero-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .promo-grid .promo-card-body {
+    grid-template-columns: 1fr !important;
+  }
+
+  .promo-grid .promo-produto {
+    grid-template-columns: 96px minmax(0, 1fr) !important;
+  }
+
+  .promo-grid .promo-img-zoom,
+  .promo-grid .promo-produto img,
+  .promo-grid .promo-sem-imagem {
+    width: 96px !important;
+    height: 76px !important;
+  }
+
+  .promo-card-featured .promo-produto {
+    grid-template-columns: 1fr !important;
+  }
+
+  .promo-card-featured .promo-image-wrap {
+    order: 1;
+  }
+
+  .promo-card-featured .promo-info {
+    order: 2;
+    padding-top: 4px;
+  }
+
+  .promo-card-featured .promo-rodape {
+    margin-top: 0 !important;
+  }
+}
+
 :root {
   --white-color: #fff;
   --blue-color: #4070f4;
@@ -11219,3 +11602,19 @@ tr[data-inativo="true"] {
     text-align: center;
   }
 }
+
+/* ===== Promoções: lista compacta inspirada no app v136 ===== */
+.promo-hero-new{max-width:760px;margin:0 auto 10px!important;padding:0!important;border:0!important;border-radius:14px!important;background:transparent!important;box-shadow:none!important}
+.promo-city-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:14px;padding:12px;color:#fff;background:linear-gradient(100deg,#ff850b 0%,#ff3d57 55%,#7c3aed 100%);box-shadow:0 12px 28px rgba(255,93,24,.24)}
+.promo-city-title{display:flex;align-items:center;gap:10px;min-width:0}.promo-fire-badge{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:50%;background:#fff;color:#ff6a00;font-size:22px}.promo-city-title h2{margin:0;font-size:22px;line-height:1;font-weight:950}.promo-city-title p{margin:3px 0 0;font-size:12px;font-weight:800;opacity:.94}
+.promo-hero-new .promo-hero-stats{display:flex;gap:8px;flex:0 0 auto}.promo-hero-new .promo-hero-stats span{display:grid;place-items:center;min-width:94px;min-height:48px;padding:6px 9px;border:0;border-radius:10px;background:#fff;color:#4b5563;font-size:10px;font-weight:900;text-align:center;line-height:1.1}.promo-hero-new .promo-hero-stats strong{display:block;color:#f97316;font-size:20px}
+.promo-filter-card{display:grid!important;justify-items:center;gap:8px;max-width:760px;margin:10px auto 0!important;padding:16px!important;border:1px solid #e5e7eb!important;border-radius:12px!important;background:#fff!important;box-shadow:0 8px 22px rgba(15,23,42,.12)!important}.promo-filter-card label{color:#374151!important;font-size:12px!important;font-weight:900!important}.promo-filter-card select{width:min(360px,100%);min-height:40px!important;border:1px solid #d1d5db!important;border-radius:10px!important;color:#374151!important;background:#f9fafb!important;font-weight:800!important}
+.promo-sort-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;max-width:760px;margin:8px auto 10px;color:#6b7280;font-size:12px;font-weight:800}.promo-sort-row button{display:inline-flex;align-items:center;gap:6px;min-height:30px;border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px;background:#fff;color:#4b5563;font-size:12px;font-weight:900}.promo-sort-row button.active{border-color:#fed7aa;background:#fff7ed;color:#f97316}
+.promo-grid{display:grid!important;grid-template-columns:1fr!important;max-width:760px!important;gap:8px!important;margin:0 auto!important}.promo-card-new,.promo-grid>.promo-card{border:1px solid #e5e7eb!important;border-radius:12px!important;background:#fff!important;box-shadow:0 6px 16px rgba(15,23,42,.09)!important}.promo-card-new::before,.promo-grid>.promo-card::before{display:none!important}
+.promo-top-ribbon{top:8px!important;left:8px!important;z-index:4!important;border-radius:999px!important;padding:5px 9px!important;background:#ff143d!important;font-size:10px!important}.promo-grid .promo-card-body{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:stretch!important;gap:0!important}.promo-grid .promo-produto{display:grid!important;grid-template-columns:140px minmax(0,1fr)!important;gap:10px!important;padding:8px!important}.promo-image-wrap{position:relative}.promo-grid .promo-img-zoom,.promo-grid .promo-produto img,.promo-grid .promo-sem-imagem{width:140px!important;height:86px!important;border-radius:9px!important;object-fit:cover!important}
+.promo-discount-badge{position:absolute;top:6px;left:6px;display:grid;place-items:center;min-width:38px;min-height:38px;border-radius:50%;background:linear-gradient(135deg,#ff3d57,#a855f7);color:#fff;font-size:13px;font-weight:950;line-height:.9;text-transform:uppercase;box-shadow:0 6px 14px rgba(168,85,247,.25)}.promo-discount-badge small{display:block;font-size:9px}
+.promo-grid .promo-info{justify-content:center!important;gap:3px!important}.promo-grid .promo-estab{color:#2563eb!important;font-size:11px!important;font-weight:950!important}.promo-grid .promo-nome{font-size:15px!important;line-height:1.12!important;color:#111827!important}.promo-grid .promo-det,.promo-grid .promo-obs,.promo-grid .promo-days{font-size:11px!important}
+.promo-grid .promo-preco{min-width:88px!important;border:0!important;border-left:1px solid #f3f4f6!important;border-top:0!important;background:#fff!important;padding:8px!important;justify-items:end!important}.promo-grid .promo-preco-atual{color:#111827!important;font-size:18px!important}.promo-grid .promo-preco-antigo,.promo-grid .promo-unidade,.promo-grid .promo-validade{font-size:10px!important;color:#6b7280!important}
+.promo-grid .promo-rodape{justify-content:flex-end!important;gap:8px!important;padding:0 8px 8px!important;background:transparent!important}.promo-grid .promo-rodape .icon-link{min-height:38px!important;border-radius:11px!important;padding:8px 11px!important}
+.promo-card-featured{min-height:190px;color:#fff;background:#130806!important}.promo-card-featured .promo-card-body{grid-template-columns:minmax(0,1fr)!important}.promo-card-featured .promo-produto{grid-template-columns:minmax(0,1fr) 52%!important;min-height:150px;background:radial-gradient(circle at 80% 50%,rgba(249,115,22,.28),transparent 36%),#140805}.promo-card-featured .promo-image-wrap{order:2}.promo-card-featured .promo-info{order:1;padding:32px 4px 12px 4px}.promo-card-featured .promo-img-zoom,.promo-card-featured .promo-produto img,.promo-card-featured .promo-sem-imagem{width:100%!important;height:150px!important;border-radius:12px!important}.promo-card-featured .promo-estab,.promo-card-featured .promo-nome,.promo-card-featured .promo-det,.promo-card-featured .promo-obs,.promo-card-featured .promo-days{color:#fff!important}.promo-card-featured .promo-nome{font-size:25px!important}.promo-card-featured .promo-preco{display:none!important}.promo-card-featured .promo-rodape{margin-top:-54px!important;position:relative;z-index:5}
+@media(max-width:640px){.promo-city-head,.promo-hero-new .promo-hero-stats{display:grid}.promo-hero-new .promo-hero-stats{grid-template-columns:1fr 1fr}.promo-grid .promo-card-body{grid-template-columns:1fr!important}.promo-grid .promo-produto{grid-template-columns:96px minmax(0,1fr)!important}.promo-grid .promo-img-zoom,.promo-grid .promo-produto img,.promo-grid .promo-sem-imagem{width:96px!important;height:76px!important}.promo-card-featured .promo-produto{grid-template-columns:1fr!important}.promo-card-featured .promo-image-wrap{order:1}.promo-card-featured .promo-info{order:2;padding-top:4px}.promo-card-featured .promo-rodape{margin-top:0!important}}

@@ -4738,6 +4738,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
   // Coleta TODAS as promoções percorrendo categories/establishments
   function coletarTodasPromocoes() {
     const itens = [];
+    let ordem = 0;
     (categories || []).forEach(cat => {
       (cat.establishments || []).forEach(est => {
         const nomeEst = est.name;
@@ -4746,6 +4747,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
         lista.forEach(p => {
           if (p && p.ativo === false) return;
           itens.push({
+            ordem: ordem++,
             estabelecimento: nomeEst,
             estabelecimentoId: idEst,
             titulo: p.titulo || p.nome || "",
@@ -4765,6 +4767,20 @@ ${(cardapioVisivel(est) || est.contact) ? `
       });
     });
     return itens;
+  }
+
+  function numeroPrecoPromocao(valor) {
+    if (typeof valor === "number") return valor;
+    const texto = String(valor || "").replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
+    const numero = Number(texto);
+    return Number.isFinite(numero) ? numero : 0;
+  }
+
+  function descontoPromocao(item) {
+    const atual = numeroPrecoPromocao(item?.preco);
+    const antigo = numeroPrecoPromocao(item?.precoAntigo);
+    if (!atual || !antigo || antigo <= atual) return 0;
+    return Math.round(((antigo - atual) / antigo) * 100);
   }
 
   function boolStr(v) { return v ? "Sim" : "Não"; }
@@ -7563,7 +7579,17 @@ plotarPinsImoveis(stateImoveis.filtered);
       : todos.filter(i => String(i.estabelecimentoId).trim() === filtro);
 
     // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
-    const itensFiltrados = itens.filter(i => !promoExpirada(i) && promoDisponivelHoje(i));
+    const ordemAtual = opcoes.ordem || window.__promoOrdemAtual || "recentes";
+    window.__promoOrdemAtual = ordemAtual;
+    const itensFiltrados = itens
+      .filter(i => !promoExpirada(i) && promoDisponivelHoje(i))
+      .sort((a, b) => {
+        if (ordemAtual === "termina") {
+          return String(a.validadeFim || "9999-12-31").localeCompare(String(b.validadeFim || "9999-12-31"));
+        }
+        if (ordemAtual === "desconto") return descontoPromocao(b) - descontoPromocao(a);
+        return Number(a.ordem || 0) - Number(b.ordem || 0);
+      });
     const totalDisponiveis = itensFiltrados.length;
     const totalEstabelecimentos = estabelecimentos.length;
 
@@ -7593,13 +7619,48 @@ plotarPinsImoveis(stateImoveis.filtered);
     </section>
     `;
 
+    html = `
+    <section class="promo-hero promo-hero-new">
+      <div class="promo-city-head">
+        <div class="promo-city-title">
+          <span class="promo-fire-badge"><i class="fa-solid fa-fire"></i></span>
+          <div>
+            <h2>Promocoes da cidade</h2>
+            <p>As melhores ofertas perto de voce</p>
+          </div>
+        </div>
+        <div class="promo-hero-stats">
+          <span><strong>${totalDisponiveis}</strong> ofertas hoje</span>
+          <span><strong>${totalEstabelecimentos}</strong> estabelecimentos</span>
+        </div>
+      </div>
+      <div class="filtro-comidas-card promo-filter-card">
+        <label for="filtroEstab"><i class="fa-solid fa-store"></i> Filtrar por estabelecimento</label>
+        <select id="filtroEstab">
+          <option value="todos">Todos os estabelecimentos</option>
+          ${estabelecimentos.map(e => `
+            <option value="${String(e.id).trim()}" ${String(filtroEstabId || "todos").trim() === String(e.id).trim() ? "selected" : ""}>
+              ${e.nome}
+            </option>
+          `).join("")}
+        </select>
+      </div>
+    </section>
+    <section class="promo-sort-row">
+      <span><i class="fa-solid fa-arrow-down-wide-short"></i> Ordenar por</span>
+      <button type="button" data-promo-sort="recentes" class="${ordemAtual === "recentes" ? "active" : ""}"><i class="fa-solid fa-bolt"></i> Mais recentes</button>
+      <button type="button" data-promo-sort="termina" class="${ordemAtual === "termina" ? "active" : ""}"><i class="fa-regular fa-clock"></i> Termina hoje</button>
+      <button type="button" data-promo-sort="desconto" class="${ordemAtual === "desconto" ? "active" : ""}"><i class="fa-solid fa-tag"></i> Maior desconto</button>
+    </section>
+    `;
+
     // grid de cards
     html += `<section class="promo-grid">`;
 
     if (itensFiltrados.length === 0) {
       html += `<div class="promo-vazio">Nenhuma promoção cadastrada.</div>`;
     } else {
-      itensFiltrados.forEach(i => {
+      itensFiltrados.forEach((i, index) => {
         const precoFmt = (typeof i.preco === "number")
           ? i.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
           : i.preco;
@@ -7607,6 +7668,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         const precoAntFmt = (i.precoAntigo && typeof i.precoAntigo === "number")
           ? i.precoAntigo.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
           : (i.precoAntigo || "");
+
+        const descontoPct = descontoPromocao(i);
 
         // validade
         let validadeTxt = "";
@@ -7622,7 +7685,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
         html += `
-    <article class="promo-card promo-card-new" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+    <article class="promo-card promo-card-new ${index === 0 ? "promo-card-featured" : ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
     <div class="promo-top-ribbon">${precoAntFmt ? "Oferta especial" : "Promoção"}</div>
     <div class="promo-card-body">
       <div class="promo-produto">
@@ -7630,6 +7693,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           ${i.imagem
             ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
             : `<div class="promo-sem-imagem">sem imagem</div>`}
+          ${descontoPct ? `<span class="promo-discount-badge">${descontoPct}%<small>off</small></span>` : ""}
         </div>
         
         <div class="promo-info">
@@ -7766,6 +7830,14 @@ plotarPinsImoveis(stateImoveis.filtered);
         mostrarPromocoes(id);
       });
     }
+
+    document.querySelectorAll("[data-promo-sort]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const ordem = button.dataset.promoSort || "recentes";
+        window.__promoOrdemAtual = ordem;
+        mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem });
+      });
+    });
 
     document.querySelectorAll(".promo-card .promo-img-zoom, .promo-card .icon-link").forEach((el) => {
       el.addEventListener("click", () => {
