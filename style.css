@@ -8218,6 +8218,465 @@ html {
   }
 }
 
+/* ===== Promoções da cidade: tela final mobile-first v138 ===== */
+.promo-city-screen {
+  width: min(960px, 100%);
+  margin: 0 auto 32px;
+  padding: 20px 14px 40px;
+  background: #f6f9ff;
+  color: #14213d;
+}
+
+.promo-city-top {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  width: min(850px, 100%);
+  margin: 0 auto 22px;
+}
+
+.promo-city-top strong {
+  justify-self: center;
+  color: #fff;
+  font-size: clamp(30px, 5vw, 42px);
+  font-weight: 950;
+  text-shadow: 0 0 6px #2d6cff, 0 4px 12px rgba(45,108,255,.55);
+}
+
+.promo-top-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.promo-top-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: transparent;
+  color: #1f2d48;
+  font-size: 28px;
+}
+
+.promo-bell span {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.promo-city-search {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 54px;
+  align-items: center;
+  gap: 12px;
+  width: min(850px, 100%);
+  min-height: 76px;
+  margin: 0 auto 12px;
+  padding: 0 12px 0 26px;
+  border-radius: 38px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(47, 78, 122, .16);
+}
+
+.promo-city-search > i {
+  color: #607399;
+  font-size: 24px;
+}
+
+.promo-city-search input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #607399;
+  font-size: clamp(16px, 3.2vw, 22px);
+  font-weight: 500;
+  background: transparent;
+}
+
+.promo-city-search button {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 0;
+  border-radius: 50%;
+  background: #eef4ff;
+  color: #246bff;
+  font-size: 22px;
+}
+
+.promo-city-screen .promo-hero-new,
+.promo-city-screen .promo-sort-row,
+.promo-city-screen .promo-grid {
+  width: min(890px, 100%);
+  max-width: 890px !important;
+}
+
+.promo-city-screen .promo-hero-new {
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.promo-city-screen .promo-city-head {
+  min-height: 126px;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 0 !important;
+  padding: 26px 30px !important;
+  background: linear-gradient(100deg, #ff7b00 0%, #ff3155 54%, #9333ea 100%) !important;
+  color: #fff;
+}
+
+.promo-city-screen .promo-city-title {
+  gap: 22px;
+}
+
+.promo-city-screen .promo-fire-badge {
+  width: 86px !important;
+  height: 86px !important;
+  flex: 0 0 86px !important;
+  font-size: 43px !important;
+}
+
+.promo-city-screen .promo-city-title h2 {
+  color: #fff;
+  font-size: clamp(34px, 5.2vw, 43px) !important;
+  font-weight: 950 !important;
+}
+
+.promo-city-screen .promo-city-title p {
+  margin-top: 8px;
+  color: #fff;
+  font-size: clamp(18px, 3vw, 23px) !important;
+  font-weight: 850 !important;
+}
+
+.promo-banner-share {
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 34px;
+  border: 0;
+  background: #4da3ff;
+  color: #fff;
+  font-size: 18px;
+}
+
+.promo-city-screen .promo-hero-stats {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  padding: 24px 16px 0 !important;
+  gap: 12px !important;
+}
+
+.promo-city-screen .promo-hero-stats span {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 62px !important;
+  border: 1px solid #e7eaf3 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #fff7ed 0%, #fff 100%) !important;
+  color: #ff4f13 !important;
+  font-size: clamp(16px, 2.8vw, 19px) !important;
+  font-weight: 900 !important;
+}
+
+.promo-city-screen .promo-hero-stats span:last-child {
+  background: linear-gradient(90deg, #fff 0%, #f7f5ff 100%) !important;
+  color: #6d5dfc !important;
+}
+
+.promo-city-screen .promo-hero-stats strong {
+  display: inline;
+  margin-right: 7px;
+  color: inherit !important;
+  font-size: 22px !important;
+}
+
+.promo-city-screen .promo-filter-card {
+  width: min(760px, calc(100% - 110px));
+  margin: 0 auto !important;
+  padding: 13px 18px 18px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, .20) !important;
+}
+
+.promo-city-screen .promo-filter-card label {
+  justify-content: center;
+  color: #6b7280 !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+}
+
+.promo-city-screen .promo-filter-card select {
+  width: min(274px, 100%) !important;
+  height: 43px !important;
+  border: 1px solid #d9deea !important;
+  border-radius: 13px !important;
+  background: #fff !important;
+  color: #4b5563 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.promo-city-screen .promo-sort-row {
+  margin: 24px auto 30px !important;
+  padding-left: 56px;
+  gap: 10px;
+  color: #62708a;
+  font-size: 14px;
+}
+
+.promo-city-screen .promo-sort-row button {
+  min-height: 34px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  color: #556176;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .06);
+}
+
+.promo-city-screen .promo-sort-row button.active {
+  border-color: #ffd9c4;
+  background: #fff0e8;
+  color: #ff6b20;
+}
+
+.promo-city-screen .promo-grid {
+  grid-template-columns: 1fr !important;
+  gap: 14px !important;
+  margin: 0 auto !important;
+}
+
+.promo-city-screen .promo-card-new,
+.promo-city-screen .promo-grid > .promo-card {
+  position: relative;
+  min-height: 174px;
+  overflow: hidden !important;
+  border: 1px solid #edf0f6 !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 18px rgba(22, 34, 51, .10) !important;
+}
+
+.promo-city-screen .promo-card-body {
+  display: grid !important;
+  grid-template-columns: 268px minmax(0, 1fr) 206px !important;
+  gap: 24px !important;
+  min-height: 174px;
+  align-items: center !important;
+  padding: 12px 22px 12px 12px !important;
+}
+
+.promo-city-screen .promo-produto {
+  display: contents !important;
+}
+
+.promo-city-screen .promo-img-zoom,
+.promo-city-screen .promo-produto img,
+.promo-city-screen .promo-sem-imagem {
+  width: 268px !important;
+  height: 150px !important;
+  border-radius: 16px !important;
+  object-fit: cover !important;
+}
+
+.promo-city-screen .promo-info {
+  align-self: center;
+  padding-bottom: 22px;
+}
+
+.promo-city-screen .promo-estab {
+  position: relative;
+  min-height: 30px;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  color: #ff5b00 !important;
+  font-size: 15px !important;
+  font-weight: 950 !important;
+  text-transform: uppercase;
+}
+
+.promo-city-screen .promo-estab i,
+.promo-city-screen .promo-estab img {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #101827;
+  color: #ffd166;
+  object-fit: cover;
+  font-size: 13px;
+}
+
+.promo-city-screen .promo-nome {
+  color: #101a3a !important;
+  font-size: 23px !important;
+  font-weight: 950 !important;
+  line-height: 1.05 !important;
+}
+
+.promo-city-screen .promo-det,
+.promo-city-screen .promo-obs {
+  color: #53617c !important;
+  font-size: 17px !important;
+  line-height: 1.12 !important;
+}
+
+.promo-city-screen .promo-days {
+  display: none !important;
+}
+
+.promo-city-screen .promo-preco {
+  align-self: start;
+  width: 190px !important;
+  min-width: 190px !important;
+  height: 74px !important;
+  border: 0 !important;
+  border-radius: 13px !important;
+  background: linear-gradient(135deg, #ff5e97 0%, #ff202f 100%) !important;
+  color: #fff !important;
+}
+
+.promo-city-screen .promo-preco-label {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.promo-city-screen .promo-preco-atual {
+  color: #fff !important;
+  font-size: 31px !important;
+  font-weight: 950 !important;
+}
+
+.promo-city-screen .promo-preco-antigo,
+.promo-city-screen .promo-unidade {
+  display: none !important;
+}
+
+.promo-city-screen .promo-validade {
+  position: absolute;
+  left: 304px;
+  bottom: 18px;
+  color: #66738d !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+.promo-city-screen .promo-rodape {
+  position: absolute;
+  right: 22px;
+  bottom: 18px;
+  display: grid !important;
+  grid-template-columns: 82px 82px;
+  gap: 18px !important;
+  width: auto;
+  padding: 0 !important;
+}
+
+.promo-city-screen .promo-rodape .icon-link {
+  width: 82px;
+  height: 50px;
+  min-height: 50px !important;
+  border-radius: 13px !important;
+  font-size: 0 !important;
+  padding: 0 !important;
+}
+
+.promo-city-screen .promo-rodape .icon-link i {
+  font-size: 27px !important;
+}
+
+.promo-city-screen .promo-whats-link {
+  background: #05bd59 !important;
+  border-color: #05bd59 !important;
+}
+
+.promo-city-screen .promo-instagram-link {
+  background: #fff !important;
+  border: 1px solid #d9deea !important;
+  color: #ff3476 !important;
+}
+
+@media (max-width: 760px) {
+  .promo-city-screen {
+    padding: 14px 8px 34px;
+  }
+  .promo-city-screen .promo-city-head {
+    padding: 18px !important;
+  }
+  .promo-city-screen .promo-city-title h2 {
+    font-size: 28px !important;
+  }
+  .promo-city-screen .promo-city-title p {
+    font-size: 15px !important;
+  }
+  .promo-city-screen .promo-fire-badge {
+    width: 58px !important;
+    height: 58px !important;
+    flex-basis: 58px !important;
+    font-size: 28px !important;
+  }
+  .promo-city-screen .promo-filter-card {
+    width: calc(100% - 24px);
+  }
+  .promo-city-screen .promo-sort-row {
+    padding-left: 0;
+  }
+  .promo-city-screen .promo-card-body {
+    grid-template-columns: 34% minmax(0, 1fr) !important;
+    gap: 10px !important;
+    min-height: 0;
+    padding: 10px !important;
+  }
+  .promo-city-screen .promo-img-zoom,
+  .promo-city-screen .promo-produto img,
+  .promo-city-screen .promo-sem-imagem {
+    width: 100% !important;
+    height: 96px !important;
+  }
+  .promo-city-screen .promo-info {
+    padding-bottom: 0;
+  }
+  .promo-city-screen .promo-preco {
+    grid-column: 1 / -1;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .promo-city-screen .promo-validade,
+  .promo-city-screen .promo-rodape {
+    position: static;
+  }
+  .promo-city-screen .promo-rodape {
+    display: flex !important;
+    padding: 0 10px 10px !important;
+  }
+}
+
 /* ===== Promoções: replica visual do modelo v138 ===== */
 .promo-page-model {
   width: min(930px, calc(100vw - 28px));

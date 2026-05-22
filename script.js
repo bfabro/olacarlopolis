@@ -4748,21 +4748,27 @@ ${(cardapioVisivel(est) || est.contact) ? `
           if (p && p.ativo === false) return;
           itens.push({
             ordem: ordem++,
+            id: p.id || `promo_${idEst}_${ordem}`,
             estabelecimento: nomeEst,
             estabelecimentoId: idEst,
+            categoria: cat.title || "",
             titulo: p.titulo || p.nome || "",
-            volume: p.volume || "",             // ex: "350 ml", "600 ml"
-            embalagem: p.embalagem || "",       // ex: "caixa c/18", "fardo c/6"
+            descricao: p.descricao || p.obs || [p.volume, p.embalagem].filter(Boolean).join(" + "),
+            volume: p.volume || "",
+            embalagem: p.embalagem || "",
             preco: p.preco,                     // número ou string
             desconto: p.desconto || p.discount || "",
             precoAntigo: p.precoAntigo || null, // opcional
             unidade: p.unidade || "",           // ex: "A UNIDADE", "NO FARDO"
             imagem: p.imagem || p.image || "",  // url opcional
+            logo: p.logo || est.logo || est.image || "",
             validadeInicio: p.validadeInicio || p.validade || null,
             validadeFim: p.validadeFim || null,
             diasSemana: normalizarDiasSemanaPromocao(p.diasSemana || p.dias || p.recorrenciaDias || p.diaSemana),
             obs: p.obs || "",                    // qualquer extra
-            contact: getPrimeiroContato(est.contact) || ""
+            contact: getPrimeiroContato(est.contact) || "",
+            instagram: est.instagram || "",
+            criadoEm: p.criadoEm || p.createdAt || ""
           });
         });
       });
@@ -4782,6 +4788,38 @@ ${(cardapioVisivel(est) || est.contact) ? `
     const antigo = numeroPrecoPromocao(item?.precoAntigo);
     if (!atual || !antigo || antigo <= atual) return 0;
     return Math.round(((antigo - atual) / antigo) * 100);
+  }
+
+  function promoBadgeClass(item) {
+    const texto = String(item?.desconto || item?.valorTexto || item?.preco || "").toLowerCase();
+    if (String(item?.destaque || "").toLowerCase().includes("super")) return "super";
+    if (texto.includes("%")) return texto.includes("até") || texto.includes("ate") ? "blue" : "purple";
+    if (texto.includes("off")) return "pink";
+    return "darkblue";
+  }
+
+  function promoValorTexto(item, precoFmt = "") {
+    const desconto = String(item?.desconto || "").trim();
+    if (desconto) return desconto.toUpperCase();
+    if (precoFmt) return `R$ ${String(precoFmt).replace(/^R\$\s*/i, "")}`;
+    const pct = descontoPromocao(item);
+    return pct ? `${pct}% OFF` : "OFERTA";
+  }
+
+  function promoShareData(item = null) {
+    const baseUrl = `${location.origin}${location.pathname}#promocoes`;
+    if (!item) {
+      return {
+        title: "Promocoes da cidade",
+        text: "Veja as promocoes da cidade no Ola Carlopolis.",
+        url: baseUrl
+      };
+    }
+    return {
+      title: item.titulo || "Promocao",
+      text: `Vi a promocao ${item.titulo || ""} no Ola Carlopolis.`,
+      url: `${baseUrl}-${item.estabelecimentoId || "todos"}`
+    };
   }
 
   function boolStr(v) { return v ? "Sim" : "Não"; }
@@ -7578,11 +7616,17 @@ plotarPinsImoveis(stateImoveis.filtered);
     const itens = (filtro === "todos")
       ? todos
       : todos.filter(i => String(i.estabelecimentoId).trim() === filtro);
+    const buscaAtual = opcoes.busca !== undefined ? String(opcoes.busca || "") : String(window.__promoBuscaAtual || "");
+    window.__promoBuscaAtual = buscaAtual;
+    const buscaNorm = normalizeName(buscaAtual);
+    const itensBuscados = buscaNorm
+      ? itens.filter((i) => normalizeName(`${i.titulo || ""} ${i.estabelecimento || ""} ${i.categoria || ""} ${i.descricao || ""}`).includes(buscaNorm))
+      : itens;
 
     // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
     const ordemAtual = opcoes.ordem || window.__promoOrdemAtual || "recentes";
     window.__promoOrdemAtual = ordemAtual;
-    const itensFiltrados = itens
+    const itensFiltrados = itensBuscados
       .filter(i => !promoExpirada(i) && promoDisponivelHoje(i))
       .sort((a, b) => {
         if (ordemAtual === "termina") {
@@ -7621,7 +7665,20 @@ plotarPinsImoveis(stateImoveis.filtered);
     `;
 
     html = `
-    <div class="promo-page-model">
+    <div class="promo-city-screen">
+      <header class="promo-city-top">
+        <button type="button" class="promo-top-icon" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+        <strong>Ola Carlopolis</strong>
+        <div class="promo-top-actions">
+          <button type="button" class="promo-top-icon promo-bell" aria-label="Notificacoes"><i class="fa-regular fa-bell"></i><span>2</span></button>
+          <button type="button" class="promo-top-icon" data-promo-share="page" aria-label="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
+        </div>
+      </header>
+      <div class="promo-city-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="promoSearchInput" value="${escapeHtml(buscaAtual)}" placeholder="Busque por categoria ou nome do local">
+        <button type="button" aria-label="Filtros"><i class="fa-solid fa-sliders"></i></button>
+      </div>
     <section class="promo-hero promo-hero-new">
       <div class="promo-city-head">
         <div class="promo-city-title">
@@ -7631,11 +7688,12 @@ plotarPinsImoveis(stateImoveis.filtered);
             <p>As melhores ofertas perto de voce</p>
           </div>
         </div>
+        <button type="button" class="promo-banner-share" data-promo-share="page" aria-label="Compartilhar promocoes"><i class="fa-solid fa-share-nodes"></i></button>
+      </div>
         <div class="promo-hero-stats">
           <span><strong>${totalDisponiveis}</strong> ofertas hoje</span>
           <span><strong>${totalEstabelecimentos}</strong> estabelecimentos</span>
         </div>
-      </div>
       <div class="filtro-comidas-card promo-filter-card">
         <label for="filtroEstab"><i class="fa-solid fa-store"></i> Filtrar por estabelecimento</label>
         <select id="filtroEstab">
@@ -7674,6 +7732,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         const descontoTxt = String(i.desconto || "").trim();
         const descontoPct = descontoTxt ? 0 : descontoPromocao(i);
         const destaqueOferta = descontoTxt || (precoFmt ? `R$ ${String(precoFmt).replace(/^R\$\s*/i, "")}` : (descontoPct ? `${descontoPct}% OFF` : "Oferta"));
+        const descricaoPromo = i.descricao || [i.volume, i.embalagem].filter(Boolean).join(" + ");
 
         // validade
         let validadeTxt = "";
@@ -7689,7 +7748,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
         html += `
-    <article class="promo-card promo-card-new" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+    <article class="promo-card promo-card-new" data-promo-id="${i.id || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
     <div class="promo-card-body">
       <div class="promo-produto">
         <div class="promo-image-wrap">
@@ -7700,12 +7759,12 @@ plotarPinsImoveis(stateImoveis.filtered);
         </div>
         
         <div class="promo-info">
-          <div class="promo-estab"><i class="fa-solid fa-store"></i> ${i.estabelecimento}</div>
+          <div class="promo-estab">${i.logo ? `<img src="${i.logo}" alt="${i.estabelecimento}" loading="lazy">` : `<i class="fa-solid fa-store"></i>`} ${i.estabelecimento}</div>
           <div class="promo-nome">${i.titulo}</div>
           ${(i.volume || i.embalagem)
             ? `<div class="promo-det">${[i.volume, i.embalagem].filter(Boolean).join(" · ")}</div>` : ""}
           ${textoDiasPromocao(i) ? `<div class="promo-days">${textoDiasPromocao(i)}</div>` : ""}
-          ${i.obs ? `<div class="promo-obs">${i.obs}</div>` : ""}
+          ${i.obs ? `<div class="promo-obs">${i.obs}</div>` : (!i.volume && !i.embalagem && descricaoPromo ? `<div class="promo-obs">${descricaoPromo}</div>` : "")}
           
         </div>
       </div>
@@ -7730,7 +7789,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             ? `<a href="https://wa.me/55${somenteDigitos(getPrimeiroContato(i.contact))}?text=${encodeURIComponent(`Olá, encontrei o produto ${i.titulo} no Olá Carlópolis. Está disponível ainda?`)
             }" 
           target="_blank" 
-          class="icon-link promo-whats-link">
+          class="icon-link promo-whats-link" data-promo-action="whatsapp">
           <i class="fab fa-whatsapp"></i> Chamar no Whats
         </a>`
             : ""}
@@ -7741,7 +7800,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             ? `<a href="${fixUrl(categories.flatMap(c => c.establishments || [])
               .find(e => normalizeName(e.name) === i.estabelecimentoId).instagram)}"
         target="_blank"
-        class="icon-link promo-instagram-link">
+        class="icon-link promo-instagram-link" data-promo-action="instagram">
         <i class="fab fa-instagram"></i>
       </a>`
             : ""}
@@ -7831,7 +7890,18 @@ plotarPinsImoveis(stateImoveis.filtered);
         // Atualiza a URL para permitir voltar/compartilhar já filtrado
         const id = String(e.target.value || "todos").trim();
         location.hash = id === "todos" ? "#promocoes" : `#promocoes-${id}`;
-        mostrarPromocoes(id);
+        mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "" });
+      });
+    }
+
+    const promoSearch = document.getElementById("promoSearchInput");
+    if (promoSearch) {
+      promoSearch.addEventListener("input", (event) => {
+        clearTimeout(window.__promoBuscaTimer);
+        const busca = event.target.value || "";
+        window.__promoBuscaTimer = setTimeout(() => {
+          mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca });
+        }, 180);
       });
     }
 
@@ -7839,7 +7909,22 @@ plotarPinsImoveis(stateImoveis.filtered);
       button.addEventListener("click", () => {
         const ordem = button.dataset.promoSort || "recentes";
         window.__promoOrdemAtual = ordem;
-        mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem });
+        mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem, busca: window.__promoBuscaAtual || "" });
+      });
+    });
+
+    document.querySelectorAll("[data-promo-share]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const data = promoShareData();
+        try {
+          if (navigator.share) await navigator.share(data);
+          else {
+            await navigator.clipboard?.writeText(data.url);
+            alert("Link copiado.");
+          }
+        } catch (error) {
+          console.warn("Compartilhamento cancelado ou indisponivel.", error);
+        }
       });
     });
 
