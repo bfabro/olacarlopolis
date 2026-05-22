@@ -7754,6 +7754,11 @@ plotarPinsImoveis(stateImoveis.filtered);
         const descricaoPromo = i.descricao || [i.volume, i.embalagem].filter(Boolean).join(" + ");
         const temPreco = Boolean(precoFmt && String(precoFmt).trim());
         const valorCard = temPreco ? destaqueOferta : "PROMO";
+        const precoAtualNum = numeroPrecoPromocao(i.preco);
+        const precoAntigoNum = numeroPrecoPromocao(i.precoAntigo);
+        const economiaFmt = (precoAtualNum && precoAntigoNum && precoAntigoNum > precoAtualNum)
+          ? (precoAntigoNum - precoAtualNum).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+          : "";
 
         // validade
         let validadeTxt = "";
@@ -7785,7 +7790,9 @@ plotarPinsImoveis(stateImoveis.filtered);
         
         <div class="promo-info">
           <a class="promo-estab promo-estab-link" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.logo ? `<img src="${i.logo}" alt="${i.estabelecimento}" loading="lazy">` : `<i class="fa-solid fa-store"></i>`} ${i.estabelecimento}</a>
+          ${i.instagram ? `<a href="${fixUrl(i.instagram)}" target="_blank" class="promo-store-instagram" data-promo-action="instagram" aria-label="Abrir Instagram"><i class="fab fa-instagram"></i></a>` : ""}
           <div class="promo-nome">${i.titulo}</div>
+          ${economiaFmt ? `<div class="promo-economia"><i class="fa-solid fa-tag"></i> Economize ${economiaFmt} nesta oferta</div>` : ""}
           ${(i.volume || i.embalagem)
             ? `<div class="promo-det">${[i.volume, i.embalagem].filter(Boolean).join(" · ")}</div>` : ""}
           ${textoDiasPromocao(i) ? `<div class="promo-days">${textoDiasPromocao(i)}</div>` : ""}
