@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 131,
-  label: "v131",
-  data: "2026-05-20",
-  nota: "Melhora a vitrine publica de promocoes."
+  numero: 132,
+  label: "v132",
+  data: "2026-05-22",
+  nota: "Padroniza abertura e fechamento dos formularios do painel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1376,7 +1376,18 @@ function closeClientFormToDashboard() {
 function setFormCardOpen(formId, isOpen) {
   const form = $(formId);
   const card = form?.closest(".panel-card");
+  const closeButtonMap = {
+    categoryForm: "closeCategoryFormButton",
+    eventForm: "closeEventFormButton",
+    infoDeathNoticeForm: "closeInfoDeathNoticeFormButton",
+    imovelForm: "closeImovelFormButton",
+    automovelForm: "closeAutomovelFormButton",
+    userForm: "closeUserFormButton"
+  };
   card?.classList.toggle("form-collapsed", !isOpen);
+  if (closeButtonMap[formId]) {
+    $(closeButtonMap[formId])?.classList.toggle("hidden", !isOpen);
+  }
 }
 
 function openFormForEdit(formId) {
@@ -4671,6 +4682,7 @@ function bindEvents() {
     resetCategoryForm();
     openFormForEdit("categoryForm");
   });
+  $("closeCategoryFormButton")?.addEventListener("click", resetCategoryForm);
   $("syncClientsButton").addEventListener("click", syncClientsFromScript);
   $("migrateImagesButton").addEventListener("click", migrateClientImagesToStorage);
   $("analyzeDuplicatesButton").addEventListener("click", renderDuplicatesReport);
@@ -4721,6 +4733,7 @@ function bindEvents() {
     resetEventForm();
     openFormForEdit("eventForm");
   });
+  $("closeEventFormButton")?.addEventListener("click", resetEventForm);
   $("eventSearch").addEventListener("input", renderEventsList);
   $("eventImageUpload").addEventListener("change", async (event) => {
     await uploadEventImage(event.target.files?.[0]);
@@ -4730,6 +4743,7 @@ function bindEvents() {
     resetImovelForm();
     openFormForEdit("imovelForm");
   });
+  $("closeImovelFormButton")?.addEventListener("click", resetImovelForm);
   $("imovelSearch")?.addEventListener("input", renderImoveisList);
   $("imovelImagesUpload")?.addEventListener("change", async (event) => {
     const id = $("imovelId").value || slugify($("imovelTitulo").value) || `imovel-${Date.now()}`;
@@ -4743,6 +4757,7 @@ function bindEvents() {
     resetAutomovelForm();
     openFormForEdit("automovelForm");
   });
+  $("closeAutomovelFormButton")?.addEventListener("click", resetAutomovelForm);
   $("automovelSearch")?.addEventListener("input", renderAutomoveisList);
   $("automovelImagesUpload")?.addEventListener("change", async (event) => {
     const id = $("automovelId").value || slugify(`${$("automovelMarca").value}-${$("automovelModelo").value}`) || `automovel-${Date.now()}`;
@@ -4756,6 +4771,7 @@ function bindEvents() {
     resetInfoDeathNoticeForm();
     openFormForEdit("infoDeathNoticeForm");
   });
+  $("closeInfoDeathNoticeFormButton")?.addEventListener("click", resetInfoDeathNoticeForm);
   $("infoDeathNoticeSearch")?.addEventListener("input", renderInfoDeathNoticeList);
   $("infoDeathNoticeImageUpload")?.addEventListener("change", async (event) => {
     await uploadInfoDeathNoticeImage(event.target.files?.[0]);
@@ -4795,6 +4811,7 @@ function bindEvents() {
     resetUserForm();
     openFormForEdit("userForm");
   });
+  $("closeUserFormButton")?.addEventListener("click", resetUserForm);
   $("userForm").addEventListener("submit", createPanelUser);
   $("deleteUserButton")?.addEventListener("click", deletePanelUser);
 

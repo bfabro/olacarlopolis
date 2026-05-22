@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=131">
+  <link rel="stylesheet" href="painel.css?v=132">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -322,7 +322,10 @@
                 <h2>Categorias e subcategorias</h2>
                 <p>Configure os itens novos do menu lateral publico.</p>
               </div>
-              <button id="newCategoryButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Nova</button>
+              <div class="section-actions">
+                <button id="closeCategoryFormButton" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                <button id="newCategoryButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Nova</button>
+              </div>
             </div>
             <form id="categoryForm" class="grid-form">
               <input type="hidden" id="categoryId">
@@ -395,7 +398,10 @@
                 <h2>Configurar evento</h2>
                 <p>Cadastre eventos para divulgar ou organizar no painel.</p>
               </div>
-              <button id="newEventButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Novo</button>
+              <div class="section-actions">
+                <button id="closeEventFormButton" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                <button id="newEventButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Novo</button>
+              </div>
             </div>
             <form id="eventForm" class="grid-form">
               <input type="hidden" id="eventId">
@@ -505,7 +511,10 @@
                 <h2>Nota de falecimento</h2>
                 <p>Cadastre, edite e remova notas do menu publico Informacoes.</p>
               </div>
-              <button id="newInfoDeathNoticeButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Nova</button>
+              <div class="section-actions">
+                <button id="closeInfoDeathNoticeFormButton" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                <button id="newInfoDeathNoticeButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Nova</button>
+              </div>
             </div>
             <form id="infoDeathNoticeForm" class="grid-form">
               <input type="hidden" id="infoDeathNoticeId">
@@ -544,7 +553,10 @@
                 <h2>Cadastrar ou editar imovel</h2>
                 <p>Anuncios salvos aparecem no menu Imoveis do site publico.</p>
               </div>
-              <button id="newImovelButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo</button>
+              <div class="section-actions">
+                <button id="closeImovelFormButton" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                <button id="newImovelButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo</button>
+              </div>
             </div>
             <form id="imovelForm" class="grid-form">
               <input id="imovelId" type="hidden">
@@ -661,7 +673,10 @@
                 <h2>Cadastrar ou editar automovel</h2>
                 <p>Anuncios salvos aparecem no menu Automoveis do site publico.</p>
               </div>
-              <button id="newAutomovelButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo</button>
+              <div class="section-actions">
+                <button id="closeAutomovelFormButton" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                <button id="newAutomovelButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo</button>
+              </div>
             </div>
             <form id="automovelForm" class="grid-form">
               <input id="automovelId" type="hidden">
@@ -747,7 +762,10 @@
                 <h2>Cadastrar ou editar usuario</h2>
                 <p>Altere perfil, cliente vinculado e permissoes do acesso.</p>
               </div>
-              <button id="newUserButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo</button>
+              <div class="section-actions">
+                <button id="closeUserFormButton" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                <button id="newUserButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo</button>
+              </div>
             </div>
             <form id="userForm" class="grid-form">
               <input id="editUserUid" type="hidden">
@@ -820,6 +838,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=131"></script>
+  <script type="module" src="painel.js?v=132"></script>
 </body>
 </html>
