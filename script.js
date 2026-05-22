@@ -4763,7 +4763,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
             valorTexto: p.valorTexto || p.valor || "",
             precoAntigo: p.precoAntigo || null, // opcional
             unidade: p.unidade || "",           // ex: "A UNIDADE", "NO FARDO"
-            imagem: p.imagem || p.image || "",  // url opcional
+            imagem: p.imagem || p.image || p.imagemUrl || p.imageUrl || est.promoImage || est.image || est.logo || "",  // url opcional
             logo: p.logo || est.logo || est.image || "",
             validadeInicio: p.validadeInicio || p.validade || null,
             validadeFim: p.validadeFim || null,
@@ -7625,12 +7625,15 @@ plotarPinsImoveis(stateImoveis.filtered);
       new Set(todos.map(i => JSON.stringify({ id: i.estabelecimentoId, nome: i.estabelecimento })))
     ).map(s => JSON.parse(s))
       .sort((a, b) => a.nome.localeCompare(b.nome));
+    const categoriasPromo = Array.from(new Set(todos.map(i => i.categoria).filter(Boolean)))
+      .sort((a, b) => a.localeCompare(b));
 
     // aplica filtro (força comparação por string para evitar mismatch)
     const filtro = String(filtroEstabId || "todos").trim();
-    const itens = (filtro === "todos")
-      ? todos
-      : todos.filter(i => String(i.estabelecimentoId).trim() === filtro);
+    const filtroCategoria = filtro.startsWith("categoria::") ? filtro.replace("categoria::", "") : "";
+    const itens = filtroCategoria
+      ? todos.filter(i => String(i.categoria || "").trim() === filtroCategoria)
+      : todos;
     const buscaAtual = opcoes.busca !== undefined ? String(opcoes.busca || "") : String(window.__promoBuscaAtual || "");
     window.__promoBuscaAtual = buscaAtual;
     const buscaNorm = normalizeName(buscaAtual);
@@ -7647,6 +7650,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (ordemAtual === "termina") {
           return String(a.validadeFim || "9999-12-31").localeCompare(String(b.validadeFim || "9999-12-31"));
         }
+        if (ordemAtual === "menorValor") return numeroPrecoPromocao(a.preco) - numeroPrecoPromocao(b.preco);
         if (ordemAtual === "desconto") return descontoPromocao(b) - descontoPromocao(a);
         return Number(a.ordem || 0) - Number(b.ordem || 0);
       });
@@ -7713,10 +7717,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       <div class="filtro-comidas-card promo-filter-card">
         <label for="filtroEstab"><i class="fa-solid fa-sliders"></i> Filtro</label>
         <select id="filtroEstab">
-          <option value="todos">Todos os estabelecimentos</option>
-          ${estabelecimentos.map(e => `
-            <option value="${String(e.id).trim()}" ${String(filtroEstabId || "todos").trim() === String(e.id).trim() ? "selected" : ""}>
-              ${e.nome}
+          <option value="todos">Todas as promoções</option>
+          <option value="menor-valor">Menor valor</option>
+          <option value="data">Data</option>
+          ${categoriasPromo.map(cat => `
+            <option value="categoria::${cat}" ${String(filtroEstabId || "todos").trim() === `categoria::${cat}` ? "selected" : ""}>
+              ${cat}
             </option>
           `).join("")}
         </select>
@@ -7913,10 +7919,20 @@ plotarPinsImoveis(stateImoveis.filtered);
       const clone = select.cloneNode(true);
       select.parentNode.replaceChild(clone, select);
 
-      clone.value = String(filtroEstabId || "todos").trim();
+      clone.value = ordemAtual === "menorValor" ? "menor-valor" : (ordemAtual === "termina" ? "data" : String(filtroEstabId || "todos").trim());
       clone.addEventListener("change", (e) => {
         // Atualiza a URL para permitir voltar/compartilhar já filtrado
         const id = String(e.target.value || "todos").trim();
+        if (id === "menor-valor") {
+          window.__promoOrdemAtual = "menorValor";
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "menorValor", busca: window.__promoBuscaAtual || "" });
+          return;
+        }
+        if (id === "data") {
+          window.__promoOrdemAtual = "termina";
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "termina", busca: window.__promoBuscaAtual || "" });
+          return;
+        }
         location.hash = id === "todos" ? "#promocoes" : `#promocoes-${id}`;
         mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "" });
       });
