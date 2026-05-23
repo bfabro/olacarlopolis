@@ -4811,6 +4811,12 @@ ${(cardapioVisivel(est) || est.contact) ? `
     return pct ? `${pct}% OFF` : "OFERTA";
   }
 
+  function formatarMoedaPromo(valor) {
+    const numero = numeroPrecoPromocao(valor);
+    if (!numero) return "";
+    return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
   function promoShareData(item = null) {
     const baseUrl = `${location.origin}${location.pathname}#promocoes`;
     if (!item) {
@@ -7750,13 +7756,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       html += `<div class="promo-vazio">Nenhuma promoção cadastrada.</div>`;
     } else {
       itensFiltrados.forEach((i, index) => {
-        const precoFmt = (typeof i.preco === "number")
-          ? i.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-          : i.preco;
+        const precoFmt = formatarMoedaPromo(i.preco);
 
-        const precoAntFmt = (i.precoAntigo && typeof i.precoAntigo === "number")
-          ? i.precoAntigo.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-          : (i.precoAntigo || "");
+        const precoAntFmt = formatarMoedaPromo(i.precoAntigo);
 
         const descontoTxt = String(i.desconto || "").trim();
         const descontoPct = descontoTxt ? 0 : descontoPromocao(i);

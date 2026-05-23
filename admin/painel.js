@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 152,
-  label: "v152",
+  numero: 153,
+  label: "v153",
   data: "2026-05-23",
-  nota: "Ajusta tipografia e icones das promocoes."
+  nota: "Adiciona filtros e campos extras das promocoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1609,7 +1609,7 @@ function renderClientMenuPreview() {
 }
 
 function clearClientPromoFields() {
-  ["clientPromoTitle", "clientPromoPrice", "clientPromoDiscount", "clientPromoOldPrice", "clientPromoUnit", "clientPromoVolume", "clientPromoPack", "clientPromoStart", "clientPromoEnd", "clientPromoObs", "clientPromoImageUrl"].forEach((id) => {
+  ["clientPromoTitle", "clientPromoPrice", "clientPromoDiscount", "clientPromoOldPrice", "clientPromoUnit", "clientPromoVolume", "clientPromoPack", "clientPromoStart", "clientPromoEnd", "clientPromoOfferType", "clientPromoFulfillment", "clientPromoPriceRange", "clientPromoPriceMode", "clientPromoObs", "clientPromoImageUrl"].forEach((id) => {
     if ($(id)) $(id).value = "";
   });
   if ($("clientPromoImageUpload")) $("clientPromoImageUpload").value = "";
@@ -1619,7 +1619,7 @@ function clearClientPromoFields() {
 }
 
 function clearPromoFields(prefix, scope = document) {
-  ["Title", "Price", "Discount", "OldPrice", "Unit", "Volume", "Pack", "Start", "End", "Obs", "ImageUrl"].forEach((suffix) => {
+  ["Title", "Price", "Discount", "OldPrice", "Unit", "Volume", "Pack", "Start", "End", "OfferType", "Fulfillment", "PriceRange", "PriceMode", "Obs", "ImageUrl"].forEach((suffix) => {
     const field = scope.querySelector(`#${prefix}Promo${suffix}`);
     if (field) field.value = "";
   });
@@ -1642,6 +1642,10 @@ function fillPromoFields(prefix, promo, scope = document) {
   set("Pack", promo.embalagem);
   set("Start", promo.validadeInicio);
   set("End", promo.validadeFim);
+  set("OfferType", promo.tipoOferta);
+  set("Fulfillment", promo.entregaRetirada);
+  set("PriceRange", promo.faixaPreco);
+  set("PriceMode", promo.modoPreco);
   set("Obs", promo.obs);
   set("ImageUrl", promo.imagem);
   const days = new Set(normalizePromoWeekDays(promo.diasSemana).map(String));
@@ -1663,6 +1667,10 @@ function readPromoFields(prefix, scope = document, fallbackId = "") {
     embalagem: get("Pack"),
     validadeInicio: scope.querySelector(`#${prefix}PromoStart`)?.value || "",
     validadeFim: scope.querySelector(`#${prefix}PromoEnd`)?.value || "",
+    tipoOferta: get("OfferType"),
+    entregaRetirada: get("Fulfillment"),
+    faixaPreco: get("PriceRange"),
+    modoPreco: get("PriceMode"),
     diasSemana: Array.from(scope.querySelectorAll(`input[name='${prefix}PromoWeekday']:checked`)).map((input) => Number(input.value)),
     obs: get("Obs"),
     imagem: get("ImageUrl"),
@@ -3872,6 +3880,10 @@ function renderClientOnlyEditor() {
             <label>Embalagem<input id="coPromoPack" placeholder="Opcional"></label>
             <label>Validade inicio<input id="coPromoStart" type="date"></label>
             <label>Validade fim<input id="coPromoEnd" type="date"></label>
+            <label>Tipo de oferta<select id="coPromoOfferType"><option value="">Selecione</option><option value="produto">Produto</option><option value="servico">Servico</option><option value="combo">Combo</option><option value="cupom">Cupom</option></select></label>
+            <label>Entrega / retirada<select id="coPromoFulfillment"><option value="">Nao informar</option><option value="entrega">Entrega</option><option value="retirada">Retirada</option><option value="ambos">Entrega e retirada</option></select></label>
+            <label>Faixa de preco<select id="coPromoPriceRange"><option value="">Automatico</option><option value="ate-50">Ate R$ 50</option><option value="50-100">R$ 50 a R$ 100</option><option value="100-200">R$ 100 a R$ 200</option><option value="acima-200">Acima de R$ 200</option></select></label>
+            <label>Com preco?<select id="coPromoPriceMode"><option value="">Automatico</option><option value="com-preco">Com preco</option><option value="sem-preco">Sem preco</option></select></label>
             <fieldset class="promo-weekdays wide">
               <legend>Dias que fica disponivel</legend>
               <p>Para promocoes recorrentes, marque os dias. Se nao marcar nenhum, aparece todos os dias dentro da validade.</p>
