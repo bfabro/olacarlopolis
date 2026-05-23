@@ -17153,10 +17153,13 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (campoExiste(cliente, "tiktok")) est.tiktok = cliente.tiktok || "";
     if (campoExiste(cliente, "site")) est.site = cliente.site || "";
     if (campoExiste(cliente, "destaqueSemanal")) est.destaqueSemanal = Boolean(cliente.destaqueSemanal);
-    if (campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio")) {
+    const temControleCardapio = campoExiste(cliente, "cardapioAtivo")
+      || campoExiste(cliente, "menuAtivo")
+      || campoExiste(cliente, "exibirCardapio");
+    if (temControleCardapio) {
       est.cardapioAtivo = Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio);
     }
-    if (!est.cardapioAtivo) {
+    if (temControleCardapio && !est.cardapioAtivo) {
       est.cardapioLink = "";
       est.menuImages = [];
     } else {
@@ -17224,10 +17227,14 @@ plotarPinsImoveis(stateImoveis.filtered);
       horarios: cliente.horarios || base.horarios || null,
       horario: cliente.horario || base.hours || "",
       imagem: cliente.imagem || base.image || "",
-      menuImages: Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
-        ? (Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || []))
-        : [],
-      cardapioLink: Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio) ? (cliente.cardapioLink || base.cardapioLink || "") : "",
+      menuImages: (campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio"))
+        ? (Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
+          ? (Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || []))
+          : [])
+        : (Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || [])),
+      cardapioLink: (campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio"))
+        ? (Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio) ? (cliente.cardapioLink || base.cardapioLink || "") : "")
+        : (cliente.cardapioLink || base.cardapioLink || ""),
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : (base.promocoes || base.promotions || []),
       imagens: Array.isArray(cliente.imagens) && cliente.imagens.length
         ? cliente.imagens

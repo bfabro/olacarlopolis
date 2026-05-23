@@ -14287,3 +14287,9 @@ tr[data-inativo="true"] {
 .promo-filter-menu label::after{content:none!important;display:none!important}
 .promo-filter-menu select{display:block!important;position:static!important;inset:auto!important;width:100%!important;min-width:0!important;max-width:none!important;height:39px!important;opacity:1!important;pointer-events:auto!important;border:1px solid #bfc7d2!important;border-radius:9px!important;background:#fff!important;color:#071334!important;padding:0 12px!important;font-size:14px!important;font-weight:600!important;cursor:pointer!important}
 @media(max-width:640px){.promo-filter-menu{border-radius:0 0 14px 14px!important;padding:12px!important}.promo-filter-menu label{font-size:13px!important;margin-bottom:11px!important}.promo-filter-menu select{height:38px!important;font-size:13px!important}}
+
+/* ===== Onde comer restaurar botoes de cardapio v157 ===== */
+.onde-comer-card .botoes-abaixo-nome{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:8px!important;margin-top:10px!important}
+.onde-comer-card .btn-cardapio{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:34px!important;padding:7px 14px!important;border-radius:9px!important;background:#4070f4!important;color:#fff!important;font-size:14px!important;font-weight:800!important;line-height:1!important;white-space:nowrap!important;visibility:visible!important;opacity:1!important}
+.onde-comer-card .btn-cardapio:hover{background:#ff8800!important}
+@media(max-width:600px){.onde-comer-card .botoes-abaixo-nome{flex-wrap:wrap!important;gap:7px!important}.onde-comer-card .btn-cardapio{min-height:32px!important;padding:7px 12px!important;font-size:13px!important}}
