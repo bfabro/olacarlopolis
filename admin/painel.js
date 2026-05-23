@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 154,
-  label: "v154",
+  numero: 155,
+  label: "v155",
   data: "2026-05-23",
-  nota: "Compacta filtro e ajusta nome do cliente nas promocoes."
+  nota: "Ajusta filtros expandidos e preserva campos das promocoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -375,6 +375,10 @@ function normalizePromocoes(items) {
       embalagem: String(item?.embalagem || "").trim(),
       preco: String(item?.preco || "").trim(),
       desconto: String(item?.desconto || item?.discount || "").trim(),
+      tipoOferta: String(item?.tipoOferta || "").trim(),
+      entregaRetirada: String(item?.entregaRetirada || "").trim(),
+      faixaPreco: String(item?.faixaPreco || "").trim(),
+      modoPreco: String(item?.modoPreco || "").trim(),
       precoAntigo: String(item?.precoAntigo || "").trim(),
       unidade: String(item?.unidade || "").trim(),
       imagem: String(item?.imagem || item?.image || "").trim(),

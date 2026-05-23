@@ -4758,6 +4758,10 @@ ${(cardapioVisivel(est) || est.contact) ? `
             embalagem: p.embalagem || "",
             preco: p.preco,                     // número ou string
             desconto: p.desconto || p.discount || "",
+            tipoOferta: p.tipoOferta || "",
+            entregaRetirada: p.entregaRetirada || "",
+            faixaPreco: p.faixaPreco || "",
+            modoPreco: p.modoPreco || "",
             destaque: p.destaque || p.badge || "",
             tipoDesconto: p.tipoDesconto || p.tipo || "",
             valorTexto: p.valorTexto || p.valor || "",
@@ -7625,14 +7629,25 @@ plotarPinsImoveis(stateImoveis.filtered);
         .catch((err) => console.warn("Nao foi possivel atualizar promocoes do Firebase.", err));
     }
     const todos = coletarTodasPromocoes();
+    const promoAtivasDisponiveis = todos.filter(i => !promoExpirada(i) && promoDisponivelHoje(i));
 
     // prepara lista de estabelecimentos que têm promo
     const estabelecimentos = Array.from(
-      new Set(todos.map(i => JSON.stringify({ id: i.estabelecimentoId, nome: i.estabelecimento })))
+      new Set(promoAtivasDisponiveis.map(i => JSON.stringify({ id: i.estabelecimentoId, nome: i.estabelecimento })))
     ).map(s => JSON.parse(s))
       .sort((a, b) => a.nome.localeCompare(b.nome));
-    const categoriasPromo = Array.from(new Set(todos.map(i => i.categoria).filter(Boolean)))
+    const categoriasPromo = Array.from(new Set(promoAtivasDisponiveis.map(i => i.categoria).filter(Boolean)))
       .sort((a, b) => a.localeCompare(b));
+    const tiposOfertaPromo = Array.from(new Set(promoAtivasDisponiveis.map(i => i.tipoOferta).filter(Boolean)))
+      .sort((a, b) => a.localeCompare(b));
+    const entregasPromo = Array.from(new Set(promoAtivasDisponiveis.map(i => i.entregaRetirada).filter(Boolean)))
+      .sort((a, b) => a.localeCompare(b));
+
+    const filtrosExtras = {
+      ...(window.__promoFiltrosExtras || {}),
+      ...(opcoes.filtrosExtras || {})
+    };
+    window.__promoFiltrosExtras = filtrosExtras;
 
     // aplica filtro (força comparação por string para evitar mismatch)
     const filtro = String(filtroEstabId || "todos").trim();
@@ -7646,11 +7661,19 @@ plotarPinsImoveis(stateImoveis.filtered);
     const itensBuscados = buscaNorm
       ? itens.filter((i) => normalizeName(`${i.titulo || ""} ${i.estabelecimento || ""} ${i.categoria || ""} ${i.descricao || ""}`).includes(buscaNorm))
       : itens;
+    const itensComFiltrosExtras = itensBuscados
+      .filter((i) => !filtrosExtras.tipoOferta || String(i.tipoOferta || "") === String(filtrosExtras.tipoOferta))
+      .filter((i) => !filtrosExtras.entregaRetirada || String(i.entregaRetirada || "") === String(filtrosExtras.entregaRetirada))
+      .filter((i) => {
+        if (filtrosExtras.modoPreco === "com") return numeroPrecoPromocao(i.preco) > 0;
+        if (filtrosExtras.modoPreco === "sem") return numeroPrecoPromocao(i.preco) <= 0;
+        return true;
+      });
 
     // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
     const ordemAtual = opcoes.ordem || window.__promoOrdemAtual || "recentes";
     window.__promoOrdemAtual = ordemAtual;
-    const itensFiltrados = itensBuscados
+    const itensFiltrados = itensComFiltrosExtras
       .filter(i => !promoExpirada(i) && promoDisponivelHoje(i))
       .sort((a, b) => {
         if (ordemAtual === "termina") {
@@ -7733,10 +7756,51 @@ plotarPinsImoveis(stateImoveis.filtered);
           `).join("")}
         </select>
         <div class="promo-filter-menu">
-          <button type="button" data-promo-filter-value="todos">Todas as promo&ccedil;&otilde;es</button>
-          <button type="button" data-promo-filter-value="menor-valor">Menor valor</button>
-          <button type="button" data-promo-filter-value="data">Data</button>
-          ${categoriasPromo.map(cat => `<button type="button" data-promo-filter-value="categoria::${cat}">${cat}</button>`).join("")}
+          <label>Ordenar
+            <select data-promo-filter-select>
+              <option value="recentes">Mais recentes</option>
+              <option value="data">Termina hoje</option>
+            </select>
+          </label>
+          <label>Categoria
+            <select data-promo-filter-select>
+              <option value="todos">Todas</option>
+              ${categoriasPromo.map(cat => `<option value="categoria::${cat}">${cat}</option>`).join("")}
+            </select>
+          </label>
+          <label>Tipo de oferta
+            <select data-promo-filter-select>
+              <option value="tipo::todos">Todos</option>
+              ${tiposOfertaPromo.map(tipo => `<option value="tipo::${tipo}" ${filtrosExtras.tipoOferta === tipo ? "selected" : ""}>${tipo}</option>`).join("")}
+            </select>
+          </label>
+          <label>Faixa de pre&ccedil;o
+            <select data-promo-filter-select>
+              <option value="preco::todos" ${!filtrosExtras.modoPreco ? "selected" : ""}>Todas</option>
+              <option value="menor-valor">Menor valor</option>
+              <option value="preco::com" ${filtrosExtras.modoPreco === "com" ? "selected" : ""}>Com pre&ccedil;o</option>
+              <option value="preco::sem" ${filtrosExtras.modoPreco === "sem" ? "selected" : ""}>Sem pre&ccedil;o</option>
+            </select>
+          </label>
+          <label>Entrega / retirada
+            <select data-promo-filter-select>
+              <option value="entrega::todos">Todos</option>
+              ${entregasPromo.map(tipo => `<option value="entrega::${tipo}" ${filtrosExtras.entregaRetirada === tipo ? "selected" : ""}>${tipo}</option>`).join("")}
+            </select>
+          </label>
+          <label>Validade
+            <select data-promo-filter-select>
+              <option value="validade::todos">Todas</option>
+              <option value="data">Termina hoje</option>
+            </select>
+          </label>
+          <label>Com pre&ccedil;o / sem pre&ccedil;o
+            <select data-promo-filter-select>
+              <option value="preco::todos" ${!filtrosExtras.modoPreco ? "selected" : ""}>Todos</option>
+              <option value="preco::com" ${filtrosExtras.modoPreco === "com" ? "selected" : ""}>Com pre&ccedil;o</option>
+              <option value="preco::sem" ${filtrosExtras.modoPreco === "sem" ? "selected" : ""}>Sem pre&ccedil;o</option>
+            </select>
+          </label>
         </div>
         <span class="promo-count-pill"><strong>${totalDisponiveis}</strong> oferta${totalDisponiveis === 1 ? "" : "s"}</span>
       </div>
@@ -7926,16 +7990,16 @@ plotarPinsImoveis(stateImoveis.filtered);
         const id = String(e.target.value || "todos").trim();
         if (id === "menor-valor") {
           window.__promoOrdemAtual = "menorValor";
-          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "menorValor", busca: window.__promoBuscaAtual || "" });
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "menorValor", busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
           return;
         }
         if (id === "data") {
           window.__promoOrdemAtual = "termina";
-          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "termina", busca: window.__promoBuscaAtual || "" });
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "termina", busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
           return;
         }
         location.hash = id === "todos" ? "#promocoes" : `#promocoes-${id}`;
-        mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "" });
+        mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
       });
     }
 
@@ -7944,26 +8008,93 @@ plotarPinsImoveis(stateImoveis.filtered);
         const id = String(button.dataset.promoFilterValue || "todos").trim();
         if (id === "menor-valor") {
           window.__promoOrdemAtual = "menorValor";
-          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "menorValor", busca: window.__promoBuscaAtual || "" });
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "menorValor", busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
           return;
         }
         if (id === "data") {
           window.__promoOrdemAtual = "termina";
-          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "termina", busca: window.__promoBuscaAtual || "" });
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "termina", busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
           return;
         }
         location.hash = id === "todos" ? "#promocoes" : `#promocoes-${id}`;
-        mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "" });
+        mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
       });
     });
 
+    document.querySelectorAll("[data-promo-filter-select]").forEach((field) => {
+      field.addEventListener("change", () => {
+        const id = String(field.value || "todos").trim();
+        if (id === "menor-valor") {
+          window.__promoOrdemAtual = "menorValor";
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "menorValor", busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
+          return;
+        }
+        if (id === "data") {
+          window.__promoOrdemAtual = "termina";
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "termina", busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
+          return;
+        }
+        if (id === "recentes") {
+          window.__promoOrdemAtual = "recentes";
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "recentes", busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
+          return;
+        }
+        if (id === "todos") {
+          location.hash = "#promocoes";
+          mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
+          return;
+        }
+        if (id.startsWith("tipo::")) {
+          const tipo = id.replace("tipo::", "");
+          window.__promoFiltrosExtras = { ...(window.__promoFiltrosExtras || {}), tipoOferta: tipo === "todos" ? "" : tipo };
+          mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras });
+          return;
+        }
+        if (id.startsWith("entrega::")) {
+          const entrega = id.replace("entrega::", "");
+          window.__promoFiltrosExtras = { ...(window.__promoFiltrosExtras || {}), entregaRetirada: entrega === "todos" ? "" : entrega };
+          mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras });
+          return;
+        }
+        if (id.startsWith("preco::")) {
+          const modo = id.replace("preco::", "");
+          window.__promoFiltrosExtras = { ...(window.__promoFiltrosExtras || {}), modoPreco: modo === "todos" ? "" : modo };
+          mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras });
+          return;
+        }
+        if (id.startsWith("categoria::")) {
+          location.hash = `#promocoes-${id}`;
+          mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
+        }
+      });
+    });
+
+    const promoFilterCard = document.querySelector(".promo-filter-card");
+    const promoFilterLabel = promoFilterCard?.querySelector("label");
+    if (promoFilterLabel && promoFilterCard) {
+      promoFilterLabel.setAttribute("role", "button");
+      promoFilterLabel.setAttribute("tabindex", "0");
+      promoFilterLabel.addEventListener("click", (event) => {
+        event.preventDefault();
+        promoFilterCard.classList.toggle("is-open");
+      });
+      promoFilterLabel.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          promoFilterCard.classList.toggle("is-open");
+        }
+      });
+      document.addEventListener("click", (event) => {
+        if (!promoFilterCard.contains(event.target)) promoFilterCard.classList.remove("is-open");
+      });
+    }
     const promoSearch = document.getElementById("promoSearchInput");
     if (promoSearch) {
       promoSearch.addEventListener("input", (event) => {
         clearTimeout(window.__promoBuscaTimer);
         const busca = event.target.value || "";
         window.__promoBuscaTimer = setTimeout(() => {
-          mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca });
+          mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca, filtrosExtras: window.__promoFiltrosExtras || {} });
         }, 180);
       });
     }
@@ -7972,7 +8103,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       button.addEventListener("click", () => {
         const ordem = button.dataset.promoSort || "recentes";
         window.__promoOrdemAtual = ordem;
-        mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem, busca: window.__promoBuscaAtual || "" });
+        mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
       });
     });
 
