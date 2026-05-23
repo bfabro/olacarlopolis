@@ -8072,20 +8072,51 @@ plotarPinsImoveis(stateImoveis.filtered);
     const promoFilterCard = document.querySelector(".promo-filter-card");
     const promoFilterLabel = promoFilterCard?.querySelector("label");
     if (promoFilterLabel && promoFilterCard) {
+      const promoFilterMenu = promoFilterCard.querySelector(".promo-filter-menu");
+      const positionPromoFilterMenu = () => {
+        const hero = promoFilterCard.closest(".promo-hero-new") || promoFilterCard;
+        const rect = hero.getBoundingClientRect();
+        const left = Math.max(10, rect.left);
+        const width = Math.min(rect.width, window.innerWidth - 20);
+        promoFilterCard.style.setProperty("--promo-filter-menu-left", `${left}px`);
+        promoFilterCard.style.setProperty("--promo-filter-menu-top", `${rect.bottom + 8}px`);
+        promoFilterCard.style.setProperty("--promo-filter-menu-width", `${width}px`);
+      };
+      const closePromoFilterMenu = () => promoFilterCard.classList.remove("is-open");
+      const togglePromoFilterMenu = () => {
+        positionPromoFilterMenu();
+        promoFilterCard.classList.toggle("is-open");
+      };
       promoFilterLabel.setAttribute("role", "button");
       promoFilterLabel.setAttribute("tabindex", "0");
       promoFilterLabel.addEventListener("click", (event) => {
         event.preventDefault();
-        promoFilterCard.classList.toggle("is-open");
+        event.stopPropagation();
+        togglePromoFilterMenu();
       });
       promoFilterLabel.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          promoFilterCard.classList.toggle("is-open");
+          event.stopPropagation();
+          togglePromoFilterMenu();
+        }
+        if (event.key === "Escape") {
+          closePromoFilterMenu();
         }
       });
+      promoFilterMenu?.addEventListener("click", (event) => event.stopPropagation());
+      promoFilterMenu?.addEventListener("change", () => closePromoFilterMenu());
+      window.addEventListener("resize", () => {
+        if (promoFilterCard.classList.contains("is-open")) positionPromoFilterMenu();
+      });
+      window.addEventListener("scroll", () => {
+        if (promoFilterCard.classList.contains("is-open")) positionPromoFilterMenu();
+      }, { passive: true });
       document.addEventListener("click", (event) => {
-        if (!promoFilterCard.contains(event.target)) promoFilterCard.classList.remove("is-open");
+        if (!promoFilterCard.contains(event.target)) closePromoFilterMenu();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closePromoFilterMenu();
       });
     }
     const promoSearch = document.getElementById("promoSearchInput");
