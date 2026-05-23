@@ -7838,13 +7838,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         </a>`
             : ""}
 
-    ${i.instagram
-            ? `<a href="${fixUrl(i.instagram)}"
-        target="_blank"
-        class="icon-link promo-instagram-link" data-promo-action="instagram">
-        <i class="fab fa-instagram"></i>
-      </a>`
-            : ""}
     <button type="button" class="icon-link promo-share-card" data-promo-share="page" aria-label="Compartilhar promocao">
       <i class="fa-solid fa-share-nodes"></i><span>Compartilhar</span>
     </button>
