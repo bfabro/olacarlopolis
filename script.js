@@ -8250,11 +8250,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function cardapioVisivel(est) {
     if (!est) return false;
-    const temFlag = Object.prototype.hasOwnProperty.call(est, "cardapioAtivo")
-      || Object.prototype.hasOwnProperty.call(est, "menuAtivo")
-      || Object.prototype.hasOwnProperty.call(est, "exibirCardapio");
-    const habilitado = temFlag ? Boolean(est.cardapioAtivo || est.menuAtivo || est.exibirCardapio) : true;
-    return habilitado && Boolean(est.cardapioLink || (Array.isArray(est.menuImages) && est.menuImages.length));
+    return Boolean(est.cardapioLink || (Array.isArray(est.menuImages) && est.menuImages.length));
   }
 
   function mostrarCardapio(nomeNormalizado) {
@@ -17027,6 +17023,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (!est || est.__adminIdentityReady) return;
     est.__adminOriginalName = est.name || "";
     est.__adminOriginalSlug = normalizeName(est.nomeNormalizado || est.name || "");
+    est.__adminOriginalCardapioLink = est.cardapioLink || "";
+    est.__adminOriginalMenuImages = Array.isArray(est.menuImages) ? [...est.menuImages] : [];
     est.__adminIdentityReady = true;
   }
 
@@ -17160,11 +17158,15 @@ plotarPinsImoveis(stateImoveis.filtered);
       est.cardapioAtivo = Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio);
     }
     if (temControleCardapio && !est.cardapioAtivo) {
-      est.cardapioLink = "";
-      est.menuImages = [];
+      est.cardapioLink = cliente.cardapioLink || est.__adminOriginalCardapioLink || "";
+      est.menuImages = Array.isArray(cliente.menuImages) && cliente.menuImages.length
+        ? cliente.menuImages
+        : (est.__adminOriginalMenuImages || []);
     } else {
-      if (campoExiste(cliente, "cardapioLink")) est.cardapioLink = cliente.cardapioLink || "";
-      if (Array.isArray(cliente.menuImages)) est.menuImages = cliente.menuImages;
+      if (campoExiste(cliente, "cardapioLink")) est.cardapioLink = cliente.cardapioLink || est.__adminOriginalCardapioLink || "";
+      if (Array.isArray(cliente.menuImages)) {
+        est.menuImages = cliente.menuImages.length ? cliente.menuImages : (est.__adminOriginalMenuImages || []);
+      }
     }
     if (Array.isArray(cliente.promocoes)) est.promocoes = cliente.promocoes;
     if (campoExiste(cliente, "infoAdicional")) est.infoAdicional = cliente.infoAdicional || "";
@@ -17227,14 +17229,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       horarios: cliente.horarios || base.horarios || null,
       horario: cliente.horario || base.hours || "",
       imagem: cliente.imagem || base.image || "",
-      menuImages: (campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio"))
-        ? (Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
-          ? (Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || []))
-          : [])
-        : (Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || [])),
-      cardapioLink: (campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio"))
-        ? (Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio) ? (cliente.cardapioLink || base.cardapioLink || "") : "")
-        : (cliente.cardapioLink || base.cardapioLink || ""),
+      menuImages: Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || []),
+      cardapioLink: cliente.cardapioLink || base.cardapioLink || "",
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : (base.promocoes || base.promotions || []),
       imagens: Array.isArray(cliente.imagens) && cliente.imagens.length
         ? cliente.imagens
