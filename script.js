@@ -7884,6 +7884,31 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
+        if (window.__promoModoCompacto) {
+          const dataCompacta = i.validadeFim ? formatarDataBR(i.validadeFim) : (i.validadeInicio ? formatarDataBR(i.validadeInicio) : "");
+          const detalheCompacto = [dataCompacta, i.estabelecimento].filter(Boolean).join(" • ");
+          html += `
+    <article class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+      <div class="card-divulgacao-img-wrap">
+        ${i.imagem
+              ? `<img src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
+              : `<div class="card-divulgacao-img-placeholder"><i class="fa-solid fa-tag"></i></div>`}
+      </div>
+      <div class="card-divulgacao-info">
+        <span class="card-divulgacao-categoria">Promo&ccedil;&atilde;o</span>
+        <div class="card-divulgacao-linha">
+          <h4>${i.titulo}</h4>
+          ${i.instagram
+              ? `<a href="${fixUrl(i.instagram)}" class="card-divulgacao-ig-btn" data-promo-action="instagram" aria-label="Abrir Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>`
+              : ""}
+        </div>
+        ${detalheCompacto ? `<small>${detalheCompacto}</small>` : ""}
+      </div>
+    </article>
+    `;
+          return;
+        }
+
         html += `
     <article class="promo-card promo-card-new" data-promo-id="${i.id || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
     <div class="promo-card-body">
@@ -8181,7 +8206,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (promoCompactToggle) {
       promoCompactToggle.addEventListener("change", () => {
         window.__promoModoCompacto = promoCompactToggle.checked;
-        document.querySelector(".promo-city-screen")?.classList.toggle("promo-compact-mode", promoCompactToggle.checked);
+        mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
       });
     }
 
@@ -8191,6 +8216,14 @@ plotarPinsImoveis(stateImoveis.filtered);
         const estId = link.dataset.promoEstLink || "";
         if (estId && typeof abrirEstabelecimentoDaHome === "function") abrirEstabelecimentoDaHome(estId);
       });
+    });
+
+    document.querySelectorAll(".promo-event-style-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const estId = card.dataset?.promoEst || "";
+        if (estId && typeof abrirEstabelecimentoDaHome === "function") abrirEstabelecimentoDaHome(estId);
+      });
+      card.querySelectorAll("a").forEach((link) => link.addEventListener("click", (event) => event.stopPropagation()));
     });
 
     document.querySelectorAll("[data-promo-share]").forEach((button) => {
