@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 159,
-  label: "v159",
-  data: "2026-05-23",
-  nota: "Melhora carregamento do filtro de automoveis."
+  numero: 160,
+  label: "v160",
+  data: "2026-05-24",
+  nota: "Garante permissoes master e salvamento imediato de promocoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -201,12 +201,16 @@ function currentRole() {
   return String(state.profile?.role || "").trim().toLowerCase();
 }
 
+function isMasterEmail(email = state.user?.email || state.profile?.email || "") {
+  return MASTER_EMAILS.includes(String(email || "").trim().toLowerCase());
+}
+
 function canManageClients() {
-  return ["master", "admin"].includes(currentRole());
+  return isMasterEmail() || ["master", "admin"].includes(currentRole());
 }
 
 function isMaster() {
-  return currentRole() === "master";
+  return isMasterEmail() || currentRole() === "master";
 }
 
 function hasPermission(permission) {
@@ -1015,19 +1019,51 @@ function setBusy(button, busy, text) {
 }
 
 async function loadProfile(user) {
+  const masterEmail = isMasterEmail(user.email);
+  const masterPermissions = { dados: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
-  if (uidSnap.exists()) return { uid: user.uid, ...uidSnap.val() };
+  if (uidSnap.exists()) {
+    const profile = { uid: user.uid, ...uidSnap.val() };
+    if (masterEmail && (profile.role !== "master" || profile.status !== "ativo")) {
+      const upgraded = {
+        ...profile,
+        email: user.email,
+        role: "master",
+        status: "ativo",
+        clienteId: "",
+        permissoes: { ...masterPermissions, ...(profile.permissoes || {}) }
+      };
+      await saveUserProfile(upgraded);
+      return upgraded;
+    }
+    return profile;
+  }
 
   const legacySnap = await get(ref(db, `usuarios/${emailKey(user.email)}`));
-  if (legacySnap.exists()) return { uid: user.uid, ...legacySnap.val() };
+  if (legacySnap.exists()) {
+    const profile = { uid: user.uid, ...legacySnap.val() };
+    if (masterEmail) {
+      const upgraded = {
+        ...profile,
+        email: user.email,
+        role: "master",
+        status: "ativo",
+        clienteId: "",
+        permissoes: { ...masterPermissions, ...(profile.permissoes || {}) }
+      };
+      await saveUserProfile(upgraded);
+      return upgraded;
+    }
+    return profile;
+  }
 
-  if (MASTER_EMAILS.includes(String(user.email || "").toLowerCase())) {
+  if (masterEmail) {
     const profile = {
       uid: user.uid,
       email: user.email,
       role: "master",
       status: "ativo",
-      permissoes: { dados: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true }
+      permissoes: masterPermissions
     };
     await saveUserProfile(profile);
     return profile;
@@ -1037,13 +1073,15 @@ async function loadProfile(user) {
 }
 
 async function saveUserProfile(profile) {
+  const masterEmail = isMasterEmail(profile.email);
+  const masterPermissions = { dados: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
-    role: profile.role || "cliente",
-    clienteId: profile.clienteId || "",
-    status: profile.status || "ativo",
-    permissoes: profile.permissoes || {},
+    role: masterEmail ? "master" : (profile.role || "cliente"),
+    clienteId: masterEmail ? "" : (profile.clienteId || ""),
+    status: masterEmail ? "ativo" : (profile.status || "ativo"),
+    permissoes: masterEmail ? { ...masterPermissions, ...(profile.permissoes || {}) } : (profile.permissoes || {}),
     updatedAt: serverTimestamp()
   };
   await set(ref(db, `usuariosByUid/${profile.uid}`), payload);
@@ -1707,14 +1745,36 @@ function renderClientPromocoesPreview() {
     });
   });
   box.querySelectorAll("[data-client-promo-remove]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       state.clientPromocoes.splice(Number(button.dataset.clientPromoRemove), 1);
       state.clientPromoEditIndex = null;
       clearClientPromoFields();
       renderClientPromocoesPreview();
-      showToast("Promocao removida. Clique em salvar cliente para gravar.");
+      const saved = await persistClientPromocoesIfEditing("Promocao removida e salva.");
+      if (!saved) showToast("Promocao removida. Clique em salvar cliente para gravar.");
     });
   });
+}
+
+async function persistClientPromocoesIfEditing(message = "Promocoes salvas.") {
+  if (!canManageClients() || !state.selectedClientId) return false;
+  const client = state.clientes.find((item) => item.id === state.selectedClientId) || null;
+  const targetId = client?.id || state.selectedClientId;
+  await update(ref(db, `clientes/${targetId}`), {
+    promocoes: normalizePromocoes(state.clientPromocoes),
+    origem: "painel",
+    editadoNoPainel: true,
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  });
+  upsertClientInState(targetId, {
+    ...(client || {}),
+    promocoes: normalizePromocoes(state.clientPromocoes),
+    origem: "painel",
+    editadoNoPainel: true
+  });
+  showToast(message);
+  return true;
 }
 
 async function addClientPromocao() {
@@ -1741,7 +1801,8 @@ async function addClientPromocao() {
   $("addClientPromoButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar promocao`;
   $("cancelClientPromoEditButton")?.classList.add("hidden");
   renderClientPromocoesPreview();
-  showToast(`${editingIndex >= 0 ? "Promocao atualizada" : "Promocao adicionada"}. Clique em salvar cliente para gravar.`);
+  const saved = await persistClientPromocoesIfEditing(editingIndex >= 0 ? "Promocao atualizada e salva." : "Promocao adicionada e salva.");
+  if (!saved) showToast(`${editingIndex >= 0 ? "Promocao atualizada" : "Promocao adicionada"}. Clique em salvar cliente para gravar.`);
 }
 
 async function uploadClientImages(files) {
