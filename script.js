@@ -7130,10 +7130,16 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   async function carregarAutomoveisFirebase() {
     const dbAdmin = await esperarFirebaseDatabase();
-    if (!dbAdmin) return [];
-    const [legacySnap, novoSnap] = await Promise.all([
-      dbAdmin.ref("conteudo/veiculos").once("value"),
-      dbAdmin.ref("conteudosInformativos/automoveis").once("value")
+    if (!dbAdmin) return window.__automoveisCache || [];
+    const timeout = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Tempo limite ao carregar automoveis.")), 6000);
+    });
+    const [legacySnap, novoSnap] = await Promise.race([
+      Promise.all([
+        dbAdmin.ref("conteudo/veiculos").once("value"),
+        dbAdmin.ref("conteudosInformativos/automoveis").once("value")
+      ]),
+      timeout
     ]);
     const lista = [];
     legacySnap.forEach((child) => {
@@ -7144,7 +7150,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       lista.push(automovelDeRegistro(child.val() || {}, child.key));
       return false;
     });
-    return lista.filter((item) => item.status !== "inativo");
+    const ativos = lista.filter((item) => item.status !== "inativo");
+    window.__automoveisCache = ativos;
+    return ativos;
   }
 
   async function mostrarAutomoveis() {
@@ -7189,38 +7197,32 @@ plotarPinsImoveis(stateImoveis.filtered);
     `;
 
     const box = document.getElementById("automoveisLista");
-    let lista = [];
-    try {
-      lista = await carregarAutomoveisFirebase();
-    } catch (error) {
-      console.warn("Nao foi possivel carregar automoveis.", error);
-      box.innerHTML = `<div class="list-meta">Nao foi possivel carregar os automoveis agora.</div>`;
-      return;
-    }
-    if (!lista.length) {
-      box.innerHTML = `<div class="list-meta">Nenhum automovel anunciado no momento.</div>`;
-      return;
-    }
+    const filtroBox = document.getElementById("filtrosAutomoveis");
+    const toggleFiltros = document.getElementById("autoToggleFiltros");
+    let lista = Array.isArray(window.__automoveisCache) ? window.__automoveisCache : [];
 
     const preencherSelect = (id, campo) => {
       const el = document.getElementById(id);
-      if (el) el.insertAdjacentHTML("beforeend", opcoesAutomoveis(lista, campo));
+      if (!el) return;
+      const primeiraOpcao = el.querySelector("option")?.outerHTML || `<option value="">Todos</option>`;
+      el.innerHTML = primeiraOpcao + opcoesAutomoveis(lista, campo);
     };
-    preencherSelect("autoFiltroTipo", "tipo");
-    preencherSelect("autoFiltroMarca", "marca");
-    preencherSelect("autoFiltroCondicao", "condicao");
-    preencherSelect("autoFiltroCombustivel", "combustivel");
-    preencherSelect("autoFiltroCambio", "cambio");
-    preencherSelect("autoFiltroVendedor", "vendedor");
 
-    const filtroBox = document.getElementById("filtrosAutomoveis");
-    const toggleFiltros = document.getElementById("autoToggleFiltros");
-    toggleFiltros?.addEventListener("click", () => {
-      const expanded = filtroBox?.classList.toggle("auto-filter-collapsed") === false;
-      toggleFiltros.setAttribute("aria-expanded", expanded ? "true" : "false");
-    });
+    const preencherFiltros = () => {
+      preencherSelect("autoFiltroTipo", "tipo");
+      preencherSelect("autoFiltroMarca", "marca");
+      preencherSelect("autoFiltroCondicao", "condicao");
+      preencherSelect("autoFiltroCombustivel", "combustivel");
+      preencherSelect("autoFiltroCambio", "cambio");
+      preencherSelect("autoFiltroVendedor", "vendedor");
+    };
 
     const aplicar = () => {
+      if (!box) return;
+      if (!lista.length) {
+        box.innerHTML = `<div class="list-meta">Carregando automoveis...</div>`;
+        return;
+      }
       const filtros = {
         tipo: document.getElementById("autoFiltroTipo")?.value || "",
         marca: document.getElementById("autoFiltroMarca")?.value || "",
@@ -7253,10 +7255,37 @@ plotarPinsImoveis(stateImoveis.filtered);
       });
       renderAutomoveisCards(filtrados, box);
     };
+
+    toggleFiltros?.addEventListener("click", () => {
+      const expanded = filtroBox?.classList.toggle("auto-filter-collapsed") === false;
+      toggleFiltros.setAttribute("aria-expanded", expanded ? "true" : "false");
+    });
     document.querySelectorAll("#filtrosAutomoveis input, #filtrosAutomoveis select").forEach((el) => {
       el.addEventListener("input", aplicar);
       el.addEventListener("change", aplicar);
     });
+
+    if (lista.length) {
+      preencherFiltros();
+      aplicar();
+    }
+
+    try {
+      filtroBox?.classList.add("auto-filter-loading");
+      lista = await carregarAutomoveisFirebase();
+    } catch (error) {
+      console.warn("Nao foi possivel carregar automoveis.", error);
+      if (!lista.length) box.innerHTML = `<div class="list-meta">Nao foi possivel carregar os automoveis agora.</div>`;
+      return;
+    } finally {
+      filtroBox?.classList.remove("auto-filter-loading");
+    }
+    if (!lista.length) {
+      box.innerHTML = `<div class="list-meta">Nenhum automovel anunciado no momento.</div>`;
+      return;
+    }
+
+    preencherFiltros();
     aplicar();
   }
 
