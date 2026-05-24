@@ -15357,3 +15357,126 @@ tr[data-inativo="true"] {
     font-size:13px!important;
   }
 }
+
+/* ===== Promocoes alinhamento promo/instagram e preco inferior v171 ===== */
+.promo-city-screen .promo-info{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 40px!important;
+  gap:6px!important;
+  align-items:center!important;
+}
+.promo-city-screen .promo-estab-link{
+  display:flex!important;
+  align-items:center!important;
+  min-height:40px!important;
+  height:40px!important;
+  padding:0 9px!important;
+  font-size:12px!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.promo-city-screen .promo-estab-link::before{
+  content:"Promoção:"!important;
+  display:inline!important;
+  flex:0 0 auto!important;
+  margin:0 5px 0 0!important;
+  font-family:inherit!important;
+  font-size:11px!important;
+  line-height:1!important;
+  color:#64748b!important;
+  text-decoration:none!important;
+  text-transform:none!important;
+  white-space:nowrap!important;
+}
+.promo-store-instagram{
+  display:grid!important;
+  grid-column:2 / 3!important;
+  place-items:center!important;
+  align-self:center!important;
+  justify-self:stretch!important;
+  width:40px!important;
+  min-width:40px!important;
+  max-width:40px!important;
+  height:40px!important;
+  min-height:40px!important;
+  border-radius:10px!important;
+  line-height:1!important;
+}
+.promo-store-instagram i{
+  line-height:1!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card{
+  position:relative!important;
+  padding-bottom:0!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .promo-event-meta-row{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:6px!important;
+  margin:0 0 4px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .promo-event-actions{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:5px!important;
+  flex:0 0 auto!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-price{
+  position:absolute!important;
+  right:7px!important;
+  bottom:7px!important;
+  z-index:4!important;
+  max-width:78px!important;
+  min-height:24px!important;
+  padding:4px 8px!important;
+  border-radius:8px!important;
+  background:#ef3336!important;
+  color:#fff!important;
+  font-size:12px!important;
+  font-weight:950!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  box-shadow:0 5px 12px rgba(15,23,42,.18)!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-info{
+  position:relative!important;
+  padding-bottom:38px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card small{
+  padding-right:78px!important;
+}
+@media(max-width:520px){
+  .promo-city-screen .promo-info{
+    grid-template-columns:minmax(0,1fr) 38px!important;
+  }
+  .promo-city-screen .promo-estab-link{
+    height:38px!important;
+    min-height:38px!important;
+    font-size:11px!important;
+    padding:0 8px!important;
+  }
+  .promo-city-screen .promo-estab-link::before{
+    font-size:10px!important;
+  }
+  .promo-store-instagram{
+    width:38px!important;
+    min-width:38px!important;
+    max-width:38px!important;
+    height:38px!important;
+    min-height:38px!important;
+  }
+  .promo-city-screen.promo-compact-mode .promo-event-price{
+    right:6px!important;
+    bottom:6px!important;
+    max-width:70px!important;
+    font-size:11px!important;
+    padding-inline:6px!important;
+  }
+  .promo-city-screen.promo-compact-mode .promo-event-style-card small{
+    padding-right:70px!important;
+  }
+}

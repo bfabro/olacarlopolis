@@ -7898,10 +7898,6 @@ plotarPinsImoveis(stateImoveis.filtered);
       <div class="card-divulgacao-info">
         <div class="promo-event-meta-row">
           <span class="card-divulgacao-categoria">Promo&ccedil;&atilde;o</span>
-          <span class="promo-event-price">${valorCard}</span>
-        </div>
-        <div class="card-divulgacao-linha">
-          <h4>${i.titulo}</h4>
           <span class="promo-event-actions">
           ${i.contact
               ? `<a href="https://wa.me/55${somenteDigitos(i.contact)}?text=${encodeURIComponent("Ola, vi sua promocao no Ola Carlopolis e tenho interesse.")}" class="card-divulgacao-wa-btn" data-promo-action="whatsapp" aria-label="Abrir WhatsApp" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i></a>`
@@ -7911,8 +7907,12 @@ plotarPinsImoveis(stateImoveis.filtered);
               : ""}
           </span>
         </div>
+        <div class="card-divulgacao-linha">
+          <h4>${i.titulo}</h4>
+        </div>
         <a class="promo-event-store" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.estabelecimento}</a>
         ${detalheCompacto ? `<small>${detalheCompacto}</small>` : ""}
+        <span class="promo-event-price">${valorCard}</span>
       </div>
     </article>
     `;
