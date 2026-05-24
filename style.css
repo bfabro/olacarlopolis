@@ -15023,3 +15023,68 @@ tr[data-inativo="true"] {
     height:176px!important;
   }
 }
+
+/* ===== Promocoes limpar filtros e info compacta v168 ===== */
+.promo-clear-filters{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  min-height:36px!important;
+  padding:0 10px!important;
+  border:1px solid #dbe5f2!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  color:#174ea6!important;
+  box-shadow:0 5px 14px rgba(15,23,42,.08)!important;
+  font-size:11px!important;
+  font-weight:950!important;
+  white-space:nowrap!important;
+  cursor:pointer!important;
+}
+.promo-clear-filters:hover{border-color:#174ea6!important;background:#eff6ff!important;}
+.promo-city-screen.promo-compact-mode .promo-event-store{
+  display:block!important;
+  margin-top:4px!important;
+  color:#155bd5!important;
+  font-size:11px!important;
+  font-weight:850!important;
+  line-height:1.15!important;
+  text-decoration:underline!important;
+  text-underline-offset:2px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-desc{
+  display:-webkit-box!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+  overflow:hidden!important;
+  margin:3px 0 0!important;
+  color:#374151!important;
+  font-size:11px!important;
+  font-weight:500!important;
+  line-height:1.2!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-info{
+  min-height:108px!important;
+}
+@media(max-width:520px){
+  .promo-clear-filters{
+    grid-column:1 / -1!important;
+    width:100%!important;
+    min-height:34px!important;
+    font-size:12px!important;
+  }
+  .promo-city-screen .promo-compact-switch{
+    grid-column:1 / -1!important;
+  }
+}
+@media(max-width:380px){
+  .promo-city-screen.promo-compact-mode .promo-event-store,
+  .promo-city-screen.promo-compact-mode .promo-event-desc,
+  .promo-city-screen.promo-compact-mode .promo-event-style-card small{
+    font-size:10px!important;
+  }
+}

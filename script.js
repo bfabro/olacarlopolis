@@ -7795,6 +7795,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           <span class="promo-compact-track"><span></span></span>
           <strong>Cards menores</strong>
         </label>
+        <button type="button" class="promo-clear-filters" id="promoClearFilters"><i class="fa-solid fa-rotate-left"></i> Limpar filtros</button>
       </section>
       <div class="promo-filter-menu">
         <label>Ordenar
@@ -7907,6 +7908,8 @@ plotarPinsImoveis(stateImoveis.filtered);
               : ""}
           </span>
         </div>
+        <a class="promo-event-store" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.estabelecimento}</a>
+        ${descricaoPromo ? `<p class="promo-event-desc">${descricaoPromo}</p>` : ""}
         ${detalheCompacto ? `<small>${detalheCompacto}</small>` : ""}
       </div>
     </article>
@@ -8216,6 +8219,17 @@ plotarPinsImoveis(stateImoveis.filtered);
       promoCompactToggle.addEventListener("change", () => {
         window.__promoModoCompacto = promoCompactToggle.checked;
         mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
+      });
+    }
+
+    const promoClearFilters = document.getElementById("promoClearFilters");
+    if (promoClearFilters) {
+      promoClearFilters.addEventListener("click", () => {
+        window.__promoFiltrosExtras = {};
+        window.__promoBuscaAtual = "";
+        window.__promoOrdemAtual = "recentes";
+        location.hash = "#promocoes";
+        mostrarPromocoes("todos", { skipAdminRefresh: true, ordem: "recentes", busca: "", filtrosExtras: {} });
       });
     }
 
