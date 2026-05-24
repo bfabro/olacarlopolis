@@ -7896,7 +7896,10 @@ plotarPinsImoveis(stateImoveis.filtered);
               : `<div class="card-divulgacao-img-placeholder"><i class="fa-solid fa-tag"></i></div>`}
       </div>
       <div class="card-divulgacao-info">
-        <span class="card-divulgacao-categoria">Promo&ccedil;&atilde;o</span>
+        <div class="promo-event-meta-row">
+          <span class="card-divulgacao-categoria">Promo&ccedil;&atilde;o</span>
+          <span class="promo-event-price">${valorCard}</span>
+        </div>
         <div class="card-divulgacao-linha">
           <h4>${i.titulo}</h4>
           <span class="promo-event-actions">
@@ -7909,7 +7912,6 @@ plotarPinsImoveis(stateImoveis.filtered);
           </span>
         </div>
         <a class="promo-event-store" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.estabelecimento}</a>
-        ${descricaoPromo ? `<p class="promo-event-desc">${descricaoPromo}</p>` : ""}
         ${detalheCompacto ? `<small>${detalheCompacto}</small>` : ""}
       </div>
     </article>
