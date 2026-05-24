@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 165,
-  label: "v165",
+  numero: 166,
+  label: "v166",
   data: "2026-05-24",
-  nota: "Deixa a flag de cards pequenos visivel no mobile e adiciona WhatsApp nos cards de promocoes."
+  nota: "Forca promocoes em cards pequenos a renderizar em duas colunas no mobile."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

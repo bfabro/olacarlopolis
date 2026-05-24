@@ -14976,3 +14976,50 @@ tr[data-inativo="true"] {
     grid-row:3!important;
   }
 }
+
+/* ===== Promocoes compactas duas colunas v166 ===== */
+.promo-city-screen.promo-compact-mode .promo-grid,
+.promo-city-screen.promo-compact-mode section.promo-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-auto-flow:row!important;
+  align-items:start!important;
+  justify-content:center!important;
+  gap:10px!important;
+  width:min(430px,calc(100vw - 10px))!important;
+  max-width:430px!important;
+  padding:0!important;
+  margin:0 auto!important;
+}
+.promo-city-screen.promo-compact-mode .promo-grid > .promo-card,
+.promo-city-screen.promo-compact-mode .promo-grid > .promo-event-style-card,
+.promo-city-screen.promo-compact-mode .promo-grid > .card-divulgacao-pequeno{
+  grid-column:auto!important;
+  grid-row:auto!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+  float:none!important;
+  align-self:start!important;
+  justify-self:stretch!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card.card-divulgacao-pequeno{
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:0!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-img-wrap{
+  height:200px!important;
+}
+@media(max-width:380px){
+  .promo-city-screen.promo-compact-mode .promo-grid,
+  .promo-city-screen.promo-compact-mode section.promo-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+    width:calc(100vw - 8px)!important;
+  }
+  .promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-img-wrap{
+    height:176px!important;
+  }
+}
