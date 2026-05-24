@@ -7784,53 +7784,6 @@ plotarPinsImoveis(stateImoveis.filtered);
             </option>
           `).join("")}
         </select>
-        <div class="promo-filter-menu">
-          <label>Ordenar
-            <select data-promo-filter-select>
-              <option value="recentes">Mais recentes</option>
-              <option value="data">Termina hoje</option>
-            </select>
-          </label>
-          <label>Categoria
-            <select data-promo-filter-select>
-              <option value="todos">Todas</option>
-              ${categoriasPromo.map(cat => `<option value="categoria::${cat}">${cat}</option>`).join("")}
-            </select>
-          </label>
-          <label>Tipo de oferta
-            <select data-promo-filter-select>
-              <option value="tipo::todos">Todos</option>
-              ${tiposOfertaPromo.map(tipo => `<option value="tipo::${tipo}" ${filtrosExtras.tipoOferta === tipo ? "selected" : ""}>${tipo}</option>`).join("")}
-            </select>
-          </label>
-          <label>Faixa de pre&ccedil;o
-            <select data-promo-filter-select>
-              <option value="preco::todos" ${!filtrosExtras.modoPreco ? "selected" : ""}>Todas</option>
-              <option value="menor-valor">Menor valor</option>
-              <option value="preco::com" ${filtrosExtras.modoPreco === "com" ? "selected" : ""}>Com pre&ccedil;o</option>
-              <option value="preco::sem" ${filtrosExtras.modoPreco === "sem" ? "selected" : ""}>Sem pre&ccedil;o</option>
-            </select>
-          </label>
-          <label>Entrega / retirada
-            <select data-promo-filter-select>
-              <option value="entrega::todos">Todos</option>
-              ${entregasPromo.map(tipo => `<option value="entrega::${tipo}" ${filtrosExtras.entregaRetirada === tipo ? "selected" : ""}>${tipo}</option>`).join("")}
-            </select>
-          </label>
-          <label>Validade
-            <select data-promo-filter-select>
-              <option value="validade::todos">Todas</option>
-              <option value="data">Termina hoje</option>
-            </select>
-          </label>
-          <label>Com pre&ccedil;o / sem pre&ccedil;o
-            <select data-promo-filter-select>
-              <option value="preco::todos" ${!filtrosExtras.modoPreco ? "selected" : ""}>Todos</option>
-              <option value="preco::com" ${filtrosExtras.modoPreco === "com" ? "selected" : ""}>Com pre&ccedil;o</option>
-              <option value="preco::sem" ${filtrosExtras.modoPreco === "sem" ? "selected" : ""}>Sem pre&ccedil;o</option>
-            </select>
-          </label>
-        </div>
         <span class="promo-count-pill"><strong>${totalDisponiveis}</strong> oferta${totalDisponiveis === 1 ? "" : "s"}</span>
       </div>
       <section class="promo-sort-row">
@@ -7843,6 +7796,53 @@ plotarPinsImoveis(stateImoveis.filtered);
           <strong>Cards menores</strong>
         </label>
       </section>
+      <div class="promo-filter-menu">
+        <label>Ordenar
+          <select data-promo-filter-select>
+            <option value="recentes">Mais recentes</option>
+            <option value="data">Termina hoje</option>
+          </select>
+        </label>
+        <label>Categoria
+          <select data-promo-filter-select>
+            <option value="todos">Todas</option>
+            ${categoriasPromo.map(cat => `<option value="categoria::${cat}">${cat}</option>`).join("")}
+          </select>
+        </label>
+        <label>Tipo de oferta
+          <select data-promo-filter-select>
+            <option value="tipo::todos">Todos</option>
+            ${tiposOfertaPromo.map(tipo => `<option value="tipo::${tipo}" ${filtrosExtras.tipoOferta === tipo ? "selected" : ""}>${tipo}</option>`).join("")}
+          </select>
+        </label>
+        <label>Faixa de pre&ccedil;o
+          <select data-promo-filter-select>
+            <option value="preco::todos" ${!filtrosExtras.modoPreco ? "selected" : ""}>Todas</option>
+            <option value="menor-valor">Menor valor</option>
+            <option value="preco::com" ${filtrosExtras.modoPreco === "com" ? "selected" : ""}>Com pre&ccedil;o</option>
+            <option value="preco::sem" ${filtrosExtras.modoPreco === "sem" ? "selected" : ""}>Sem pre&ccedil;o</option>
+          </select>
+        </label>
+        <label>Entrega / retirada
+          <select data-promo-filter-select>
+            <option value="entrega::todos">Todos</option>
+            ${entregasPromo.map(tipo => `<option value="entrega::${tipo}" ${filtrosExtras.entregaRetirada === tipo ? "selected" : ""}>${tipo}</option>`).join("")}
+          </select>
+        </label>
+        <label>Validade
+          <select data-promo-filter-select>
+            <option value="validade::todos">Todas</option>
+            <option value="data">Termina hoje</option>
+          </select>
+        </label>
+        <label>Com pre&ccedil;o / sem pre&ccedil;o
+          <select data-promo-filter-select>
+            <option value="preco::todos" ${!filtrosExtras.modoPreco ? "selected" : ""}>Todos</option>
+            <option value="preco::com" ${filtrosExtras.modoPreco === "com" ? "selected" : ""}>Com pre&ccedil;o</option>
+            <option value="preco::sem" ${filtrosExtras.modoPreco === "sem" ? "selected" : ""}>Sem pre&ccedil;o</option>
+          </select>
+        </label>
+      </div>
     </section>
     `;
 
@@ -8109,23 +8109,25 @@ plotarPinsImoveis(stateImoveis.filtered);
     const promoFilterCard = document.querySelector(".promo-filter-card");
     const promoFilterLabel = promoFilterCard?.querySelector("label");
     if (promoFilterLabel && promoFilterCard) {
-      const promoFilterMenu = promoFilterCard.querySelector(".promo-filter-menu");
+      const promoHeroFilter = promoFilterCard.closest(".promo-hero-new");
+      const promoFilterMenu = promoHeroFilter?.querySelector(".promo-filter-menu");
       const positionPromoFilterMenu = () => {
-        const hero = promoFilterCard.closest(".promo-hero-new") || promoFilterCard;
-        const rect = hero.getBoundingClientRect();
-        const left = Math.max(10, rect.left);
-        const width = Math.min(rect.width, window.innerWidth - 20);
-        promoFilterCard.style.setProperty("--promo-filter-menu-left", `${left}px`);
-        promoFilterCard.style.setProperty("--promo-filter-menu-top", `${rect.bottom + 8}px`);
-        promoFilterCard.style.setProperty("--promo-filter-menu-width", `${width}px`);
+        return true;
       };
-      const closePromoFilterMenu = () => promoFilterCard.classList.remove("is-open");
+      const closePromoFilterMenu = () => {
+        promoFilterCard.classList.remove("is-open");
+        promoHeroFilter?.classList.remove("promo-filter-open");
+        promoFilterLabel.setAttribute("aria-expanded", "false");
+      };
       const togglePromoFilterMenu = () => {
         positionPromoFilterMenu();
-        promoFilterCard.classList.toggle("is-open");
+        const opened = promoFilterCard.classList.toggle("is-open");
+        promoHeroFilter?.classList.toggle("promo-filter-open", opened);
+        promoFilterLabel.setAttribute("aria-expanded", opened ? "true" : "false");
       };
       promoFilterLabel.setAttribute("role", "button");
       promoFilterLabel.setAttribute("tabindex", "0");
+      promoFilterLabel.setAttribute("aria-expanded", "false");
       promoFilterLabel.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -8150,7 +8152,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (promoFilterCard.classList.contains("is-open")) positionPromoFilterMenu();
       }, { passive: true });
       document.addEventListener("click", (event) => {
-        if (!promoFilterCard.contains(event.target)) closePromoFilterMenu();
+        if (!promoHeroFilter?.contains(event.target)) closePromoFilterMenu();
       });
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") closePromoFilterMenu();

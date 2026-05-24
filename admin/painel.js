@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 162,
-  label: "v162",
+  numero: 163,
+  label: "v163",
   data: "2026-05-24",
-  nota: "Ajusta filtro, espacamento e modo compacto da tela de promocoes."
+  nota: "Faz o filtro de promocoes expandir no padrao da tela de veiculos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

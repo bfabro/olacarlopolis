@@ -14607,3 +14607,156 @@ tr[data-inativo="true"] {
     font-size:16px!important;
   }
 }
+
+/* ===== Promocoes filtro expandido estilo veiculos v163 ===== */
+.promo-city-screen .promo-hero-new{
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr)!important;
+  align-items:center!important;
+  justify-content:stretch!important;
+  width:min(430px,calc(100% - 14px))!important;
+  gap:10px 12px!important;
+  padding:14px!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  box-shadow:6px 0 0 #e6edf5,0 8px 22px rgba(15,23,42,.08)!important;
+  overflow:visible!important;
+}
+.promo-city-screen .promo-filter-card{
+  grid-column:1 / 2!important;
+  grid-row:1!important;
+  display:block!important;
+  z-index:2!important;
+}
+.promo-city-screen .promo-sort-row{
+  grid-column:2 / 3!important;
+  grid-row:1!important;
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:7px!important;
+  overflow:hidden!important;
+}
+.promo-city-screen .promo-filter-card label{
+  min-height:42px!important;
+  padding:0 13px!important;
+  border-radius:12px!important;
+  font-size:13px!important;
+}
+.promo-city-screen .promo-filter-card.is-open label::after{
+  content:"\f077"!important;
+}
+.promo-city-screen .promo-sort-row button{
+  min-height:36px!important;
+  padding:0 10px!important;
+  font-size:11px!important;
+}
+.promo-city-screen .promo-sort-row button[data-promo-sort="termina"]{
+  margin-left:0!important;
+}
+.promo-city-screen .promo-compact-switch{
+  flex:0 0 auto!important;
+}
+.promo-city-screen .promo-filter-menu{
+  grid-column:1 / -1!important;
+  grid-row:2!important;
+  position:static!important;
+  left:auto!important;
+  top:auto!important;
+  right:auto!important;
+  transform:none!important;
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  width:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  overflow:visible!important;
+  margin:2px 0 0!important;
+  padding:2px 0 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  text-align:left!important;
+  z-index:1!important;
+}
+.promo-city-screen .promo-filter-card.is-open ~ .promo-filter-menu,
+.promo-city-screen .promo-hero-new.promo-filter-open .promo-filter-menu{
+  display:grid!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+  gap:12px!important;
+}
+.promo-city-screen .promo-filter-menu label{
+  display:grid!important;
+  gap:7px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#071334!important;
+  font-size:14px!important;
+  font-weight:950!important;
+  line-height:1.15!important;
+}
+.promo-city-screen .promo-filter-menu label::after{
+  content:none!important;
+  display:none!important;
+}
+.promo-city-screen .promo-filter-menu select{
+  display:block!important;
+  position:static!important;
+  inset:auto!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:38px!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  padding:7px 12px!important;
+  border:1px solid #a3a3a3!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  color:#071334!important;
+  font-size:15px!important;
+  font-weight:500!important;
+  cursor:pointer!important;
+  appearance:auto!important;
+}
+.promo-city-screen .promo-filter-menu select:focus{
+  outline:none!important;
+  border-color:#3b82f6!important;
+  box-shadow:0 0 0 3px rgba(59,130,246,.15)!important;
+}
+@media(max-width:420px){
+  .promo-city-screen .promo-hero-new{
+    width:min(398px,calc(100% - 8px))!important;
+    grid-template-columns:auto minmax(0,1fr)!important;
+    gap:10px 7px!important;
+    padding:12px!important;
+  }
+  .promo-city-screen .promo-filter-card label{
+    min-height:38px!important;
+    padding:0 10px!important;
+    font-size:12px!important;
+  }
+  .promo-city-screen .promo-sort-row{
+    gap:5px!important;
+  }
+  .promo-city-screen .promo-sort-row button{
+    min-height:32px!important;
+    padding:0 7px!important;
+    font-size:10px!important;
+  }
+  .promo-city-screen .promo-filter-menu label{
+    font-size:13px!important;
+  }
+  .promo-city-screen .promo-filter-menu select{
+    height:38px!important;
+    font-size:14px!important;
+  }
+}
