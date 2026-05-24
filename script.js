@@ -7742,7 +7742,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     `;
 
     html = `
-    <div class="promo-city-screen">
+    <div class="promo-city-screen ${window.__promoModoCompacto ? "promo-compact-mode" : ""}">
       <h2 class="highlighted promo-onde-title"><span><i class="fa-solid fa-fire"></i> Promo&ccedil;&otilde;es</span></h2>
       <header class="promo-city-top">
         <button type="button" class="promo-top-icon" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
@@ -7833,12 +7833,16 @@ plotarPinsImoveis(stateImoveis.filtered);
         </div>
         <span class="promo-count-pill"><strong>${totalDisponiveis}</strong> oferta${totalDisponiveis === 1 ? "" : "s"}</span>
       </div>
-    </section>
-    <section class="promo-sort-row">
-      <span><i class="fa-solid fa-arrow-down-wide-short"></i> Ordenar por</span>
-      <button type="button" data-promo-sort="recentes" class="${ordemAtual === "recentes" ? "active" : ""}"><i class="fa-solid fa-bolt"></i> Mais recentes</button>
-      <button type="button" data-promo-sort="termina" class="${ordemAtual === "termina" ? "active" : ""}"><i class="fa-regular fa-clock"></i> Termina hoje</button>
-      <button type="button" data-promo-sort="desconto" class="${ordemAtual === "desconto" ? "active" : ""}"><i class="fa-solid fa-tag"></i> Maior desconto</button>
+      <section class="promo-sort-row">
+        <span><i class="fa-solid fa-arrow-down-wide-short"></i> Ordenar por</span>
+        <button type="button" data-promo-sort="recentes" class="${ordemAtual === "recentes" ? "active" : ""}"><i class="fa-solid fa-bolt"></i> Mais recentes</button>
+        <button type="button" data-promo-sort="termina" class="${ordemAtual === "termina" ? "active" : ""}"><i class="fa-regular fa-clock"></i> Termina hoje</button>
+        <label class="promo-compact-switch" title="Mostrar promocoes em cards menores">
+          <input type="checkbox" id="promoCompactToggle" ${window.__promoModoCompacto ? "checked" : ""}>
+          <span class="promo-compact-track"><span></span></span>
+          <strong>Cards menores</strong>
+        </label>
+      </section>
     </section>
     `;
 
@@ -8091,6 +8095,10 @@ plotarPinsImoveis(stateImoveis.filtered);
           mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras });
           return;
         }
+        if (id.startsWith("validade::")) {
+          mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
+          return;
+        }
         if (id.startsWith("categoria::")) {
           location.hash = `#promocoes-${id}`;
           mostrarPromocoes(id, { skipAdminRefresh: true, ordem: ordemAtual, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
@@ -8166,6 +8174,14 @@ plotarPinsImoveis(stateImoveis.filtered);
         mostrarPromocoes(filtroEstabId, { skipAdminRefresh: true, ordem, busca: window.__promoBuscaAtual || "", filtrosExtras: window.__promoFiltrosExtras || {} });
       });
     });
+
+    const promoCompactToggle = document.getElementById("promoCompactToggle");
+    if (promoCompactToggle) {
+      promoCompactToggle.addEventListener("change", () => {
+        window.__promoModoCompacto = promoCompactToggle.checked;
+        document.querySelector(".promo-city-screen")?.classList.toggle("promo-compact-mode", promoCompactToggle.checked);
+      });
+    }
 
     document.querySelectorAll("[data-promo-est-link]").forEach((link) => {
       link.addEventListener("click", (event) => {

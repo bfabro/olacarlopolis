@@ -14299,3 +14299,311 @@ tr[data-inativo="true"] {
 #filtrosAutomoveis.auto-filter-loading select{background-image:linear-gradient(90deg,rgba(249,250,251,.8),rgba(255,247,237,.9),rgba(249,250,251,.8));background-size:180% 100%;animation:autoFilterPulse 1.1s ease-in-out infinite}
 @keyframes autoFilterSpin{to{transform:rotate(360deg)}}
 @keyframes autoFilterPulse{0%{background-position:0 0}100%{background-position:180% 0}}
+
+/* ===== Promocoes ajustes finais filtro/cards v162 ===== */
+.promo-city-screen{
+  --promo-blue:#174ea6;
+  --promo-orange:#ff6417;
+  --promo-border:#dbe5f2;
+}
+.promo-city-screen .promo-city-top,
+.promo-city-screen .promo-city-search,
+.promo-city-screen .promo-city-head,
+.promo-city-screen .promo-hero-stats{
+  display:none!important;
+}
+.promo-city-screen .promo-onde-title{
+  margin:0 auto 12px!important;
+}
+.promo-city-screen .promo-hero-new{
+  width:min(430px,calc(100% - 14px))!important;
+  min-height:0!important;
+  margin:0 auto 16px!important;
+  padding:10px 12px!important;
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  box-shadow:6px 0 0 #e6edf5,0 8px 22px rgba(15,23,42,.08)!important;
+  overflow:visible!important;
+}
+.promo-city-screen .promo-filter-card{
+  flex:0 0 auto!important;
+  position:relative!important;
+  z-index:120!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.promo-city-screen .promo-filter-card label{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  min-height:42px!important;
+  padding:0 12px!important;
+  border:1.5px solid var(--promo-orange)!important;
+  border-radius:13px!important;
+  background:#fff7ed!important;
+  color:#eb5c10!important;
+  font-size:13px!important;
+  font-weight:950!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+.promo-city-screen .promo-filter-card label::after{
+  content:"\f078"!important;
+  font-family:"Font Awesome 6 Free"!important;
+  font-weight:900!important;
+  color:#071334!important;
+  margin-left:2px!important;
+}
+.promo-city-screen .promo-filter-card.is-open label::after{content:"\f077"!important;}
+.promo-city-screen .promo-filter-card>select{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:42px!important;
+  min-width:0!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+.promo-city-screen .promo-sort-row{
+  flex:0 1 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  flex-wrap:nowrap!important;
+  gap:7px!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  width:auto!important;
+  max-width:none!important;
+}
+.promo-city-screen .promo-sort-row>span{display:none!important;}
+.promo-city-screen .promo-sort-row button{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+  min-height:36px!important;
+  padding:0 9px!important;
+  border-radius:999px!important;
+  border:1px solid #e5e7eb!important;
+  background:#fff!important;
+  color:#12213d!important;
+  box-shadow:0 5px 14px rgba(15,23,42,.09)!important;
+  font-size:11px!important;
+  font-weight:950!important;
+  white-space:nowrap!important;
+}
+.promo-city-screen .promo-sort-row button.active{
+  border-color:#ffd2b5!important;
+  background:#fff7ed!important;
+  color:var(--promo-orange)!important;
+}
+.promo-city-screen .promo-sort-row button i{font-size:10px!important;}
+.promo-compact-switch{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  min-height:36px!important;
+  padding:0 8px!important;
+  border:1px solid #dbe5f2!important;
+  border-radius:999px!important;
+  background:#f8fbff!important;
+  color:#174ea6!important;
+  font-size:10px!important;
+  font-weight:950!important;
+  white-space:nowrap!important;
+  cursor:pointer!important;
+  user-select:none!important;
+}
+.promo-compact-switch input{position:absolute!important;opacity:0!important;pointer-events:none!important;}
+.promo-compact-track{position:relative!important;width:28px!important;height:16px!important;border-radius:999px!important;background:#d8e2f0!important;transition:.18s ease!important;}
+.promo-compact-track span{position:absolute!important;top:3px!important;left:3px!important;width:10px!important;height:10px!important;border-radius:999px!important;background:#fff!important;box-shadow:0 1px 3px rgba(15,23,42,.25)!important;transition:.18s ease!important;}
+.promo-compact-switch input:checked+.promo-compact-track{background:#174ea6!important;}
+.promo-compact-switch input:checked+.promo-compact-track span{left:15px!important;}
+.promo-filter-menu{
+  border-radius:0 0 16px 16px!important;
+  padding:14px!important;
+}
+.promo-filter-menu select{
+  appearance:auto!important;
+}
+.promo-city-screen .promo-grid{
+  gap:16px!important;
+}
+.promo-city-screen .promo-card-new,
+.promo-city-screen .promo-grid>.promo-card{
+  border-radius:20px!important;
+}
+.promo-city-screen .promo-card-body{
+  padding:12px!important;
+  gap:10px!important;
+}
+.promo-city-screen .promo-info{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 48px!important;
+  gap:10px!important;
+  align-items:stretch!important;
+}
+.promo-city-screen .promo-nome,
+.promo-city-screen .promo-economia,
+.promo-city-screen .promo-obs{
+  grid-column:1 / -1!important;
+}
+.promo-city-screen .promo-estab-link{
+  grid-column:1 / 2!important;
+  grid-row:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  min-height:48px!important;
+  width:100%!important;
+  padding:9px 12px!important;
+  border:1px solid var(--promo-border)!important;
+  border-radius:14px!important;
+  background:linear-gradient(180deg,#fbfdff,#f4f8ff)!important;
+  color:#155bd5!important;
+  font-size:17px!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+  text-decoration:underline!important;
+  text-underline-offset:3px!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+}
+.promo-city-screen .promo-estab-link::before{
+  content:"\f54e  LOJA/PROMOCAO"!important;
+  font-family:"Font Awesome 6 Free",Arial,sans-serif!important;
+  font-weight:900!important;
+  flex:0 0 auto!important;
+  margin-right:8px!important;
+  color:#174ea6!important;
+  font-size:12px!important;
+  text-decoration:none!important;
+  opacity:.9!important;
+}
+.promo-store-instagram{
+  grid-column:2 / 3!important;
+  display:grid!important;
+  place-items:center!important;
+  position:static!important;
+  align-self:stretch!important;
+  justify-self:stretch!important;
+  min-height:48px!important;
+  width:auto!important;
+  height:auto!important;
+  border:1px solid #ffc4d8!important;
+  border-radius:14px!important;
+  background:#fff0f5!important;
+  font-size:24px!important;
+  text-decoration:none!important;
+}
+.promo-city-screen .promo-rodape{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:10px!important;
+  padding:0 12px 14px!important;
+}
+.promo-city-screen .promo-rodape .icon-link{
+  min-height:56px!important;
+  height:56px!important;
+  border-radius:15px!important;
+}
+.promo-city-screen .promo-whats-link i{color:#fff!important;}
+.promo-city-screen .promo-whats-link span{font-size:16px!important;line-height:1.05!important;}
+.promo-city-screen .promo-share-card{
+  grid-column:auto!important;
+  border:1.5px solid #ffb7d4!important;
+  background:#fff5fa!important;
+  color:#e62f83!important;
+}
+.promo-city-screen.promo-compact-mode .promo-grid{
+  gap:10px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-card-new,
+.promo-city-screen.promo-compact-mode .promo-grid>.promo-card{
+  border-radius:16px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-card-body{
+  padding:8px!important;
+  gap:7px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-img-zoom,
+.promo-city-screen.promo-compact-mode .promo-produto img,
+.promo-city-screen.promo-compact-mode .promo-sem-imagem{
+  height:150px!important;
+  border-radius:14px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-image-wrap::after{
+  top:8px!important;
+  right:8px!important;
+  padding:6px 9px!important;
+  font-size:11px!important;
+  border-radius:10px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-preco{
+  top:106px!important;
+  right:14px!important;
+  width:112px!important;
+  min-height:48px!important;
+  padding:5px 7px!important;
+  border-width:3px!important;
+  border-radius:12px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-preco-atual{font-size:20px!important;}
+.promo-city-screen.promo-compact-mode .promo-preco-antigo{font-size:12px!important;margin:4px -7px -5px!important;padding:2px!important;width:calc(100% + 14px)!important;}
+.promo-city-screen.promo-compact-mode .promo-nome{font-size:21px!important;padding:9px 10px!important;border-radius:13px!important;}
+.promo-city-screen.promo-compact-mode .promo-economia,
+.promo-city-screen.promo-compact-mode .promo-days,
+.promo-city-screen.promo-compact-mode .promo-det{display:none!important;}
+.promo-city-screen.promo-compact-mode .promo-estab-link{min-height:42px!important;font-size:15px!important;padding:8px 10px!important;}
+.promo-city-screen.promo-compact-mode .promo-estab-link::before{font-size:10px!important;}
+.promo-city-screen.promo-compact-mode .promo-store-instagram{min-height:42px!important;font-size:21px!important;}
+.promo-city-screen.promo-compact-mode .promo-obs{font-size:15px!important;line-height:1.16!important;padding:10px 11px!important;border-radius:13px!important;max-height:82px!important;overflow:hidden!important;}
+.promo-city-screen.promo-compact-mode .promo-obs::before{font-size:11px!important;margin-bottom:5px!important;}
+.promo-city-screen.promo-compact-mode .promo-rodape .icon-link{height:48px!important;min-height:48px!important;}
+.promo-city-screen.promo-compact-mode .promo-rodape .icon-link i{font-size:21px!important;}
+.promo-city-screen.promo-compact-mode .promo-whats-link span,
+.promo-city-screen.promo-compact-mode .promo-share-card span{font-size:12px!important;}
+@media(max-width:420px){
+  .promo-city-screen .promo-hero-new{width:min(398px,calc(100% - 8px))!important;padding:8px 7px!important;gap:5px!important;}
+  .promo-city-screen .promo-filter-card label{min-height:38px!important;padding:0 9px!important;font-size:12px!important;}
+  .promo-city-screen .promo-sort-row{gap:5px!important;}
+  .promo-city-screen .promo-sort-row button{min-height:32px!important;padding:0 7px!important;font-size:10px!important;}
+  .promo-compact-switch{min-height:32px!important;padding:0 6px!important;font-size:0!important;}
+  .promo-compact-track{width:25px!important;height:15px!important;}
+  .promo-compact-switch input:checked+.promo-compact-track span{left:12px!important;}
+  .promo-city-screen .promo-estab-link{font-size:16px!important;}
+  .promo-city-screen .promo-estab-link::before{font-size:10px!important;margin-right:6px!important;}
+}
+
+/* ===== Promocoes ajuste fino loja v162.1 ===== */
+.promo-city-screen .promo-estab-link{
+  font-size:clamp(17px,3.2vw,21px)!important;
+}
+@media(max-width:640px){
+  .promo-city-screen .promo-estab-link{
+    font-size:17px!important;
+  }
+  .promo-city-screen .promo-obs{
+    font-size:17px!important;
+  }
+}
+@media(max-width:420px){
+  .promo-city-screen .promo-estab-link{
+    font-size:16px!important;
+  }
+}
