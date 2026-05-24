@@ -7891,7 +7891,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     <article class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
       <div class="card-divulgacao-img-wrap">
         ${i.imagem
-              ? `<img src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
+              ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
               : `<div class="card-divulgacao-img-placeholder"><i class="fa-solid fa-tag"></i></div>`}
       </div>
       <div class="card-divulgacao-info">
@@ -8022,7 +8022,9 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     // Ampliar imagem do produto
     document.querySelectorAll('.promo-img-zoom').forEach(img => {
-      img.addEventListener('click', () => {
+      img.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         const overlay = document.createElement('div');
         overlay.className = 'fullscreen-img-bg';
         overlay.innerHTML = `
@@ -8031,6 +8033,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     `;
         overlay.addEventListener('click', (e) => {
           if (e.target === overlay || e.target.classList.contains('fullscreen-close')) {
+            e.preventDefault();
+            e.stopPropagation();
             overlay.remove();
           }
         });
