@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 171,
-  label: "v171",
+  numero: 172,
+  label: "v172",
   data: "2026-05-24",
-  nota: "Alinha Promocao com Instagram e move preco dos cards compactos para o canto inferior."
+  nota: "Coloca preco/PROMO sobre a imagem e mostra apenas Valido ate nos cards compactos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

@@ -7887,13 +7887,14 @@ plotarPinsImoveis(stateImoveis.filtered);
 
         if (window.__promoModoCompacto) {
           const dataCompacta = i.validadeFim ? formatarDataBR(i.validadeFim) : (i.validadeInicio ? formatarDataBR(i.validadeInicio) : "");
-          const detalheCompacto = [dataCompacta, i.estabelecimento].filter(Boolean).join(" • ");
+          const detalheCompacto = dataCompacta ? `V&aacute;lido at&eacute;: ${dataCompacta}` : "";
           html += `
     <article class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
       <div class="card-divulgacao-img-wrap">
         ${i.imagem
               ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
               : `<div class="card-divulgacao-img-placeholder"><i class="fa-solid fa-tag"></i></div>`}
+        <span class="promo-event-price">${valorCard}</span>
       </div>
       <div class="card-divulgacao-info">
         <div class="promo-event-meta-row">
@@ -7912,7 +7913,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         </div>
         <a class="promo-event-store" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.estabelecimento}</a>
         ${detalheCompacto ? `<small>${detalheCompacto}</small>` : ""}
-        <span class="promo-event-price">${valorCard}</span>
       </div>
     </article>
     `;

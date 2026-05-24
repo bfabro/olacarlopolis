@@ -15480,3 +15480,43 @@ tr[data-inativo="true"] {
     padding-right:70px!important;
   }
 }
+
+/* ===== Promocoes preco sobre imagem e validade v172 ===== */
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-img-wrap{
+  position:relative!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-price{
+  position:absolute!important;
+  right:7px!important;
+  bottom:7px!important;
+  z-index:5!important;
+  max-width:min(86px,calc(100% - 14px))!important;
+  min-height:26px!important;
+  padding:5px 9px!important;
+  border-radius:9px!important;
+  background:#ef3336!important;
+  color:#fff!important;
+  font-size:12px!important;
+  font-weight:950!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  box-shadow:0 6px 14px rgba(15,23,42,.25)!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-info{
+  padding-bottom:9px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card small{
+  padding-right:0!important;
+  color:#111827!important;
+  font-weight:500!important;
+}
+@media(max-width:520px){
+  .promo-city-screen.promo-compact-mode .promo-event-price{
+    right:6px!important;
+    bottom:6px!important;
+    max-width:min(78px,calc(100% - 12px))!important;
+    min-height:24px!important;
+    padding:4px 7px!important;
+    font-size:11px!important;
+  }
+}
