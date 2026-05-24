@@ -14890,3 +14890,89 @@ tr[data-inativo="true"] {
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
   }
 }
+
+/* ===== Promocoes mobile flag visivel e acoes v165 ===== */
+.promo-city-screen .promo-sort-row{
+  overflow:visible!important;
+  flex-wrap:wrap!important;
+}
+.promo-city-screen .promo-compact-switch{
+  flex:0 0 auto!important;
+  min-width:max-content!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .promo-event-actions{
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:6px!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-wa-btn,
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-ig-btn{
+  flex:0 0 auto!important;
+  display:grid!important;
+  place-items:center!important;
+  width:24px!important;
+  height:24px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  text-decoration:none!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-wa-btn i{
+  font-size:18px!important;
+  color:#16a34a!important;
+}
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-ig-btn i{
+  font-size:18px!important;
+  color:#e1306c!important;
+  background:none!important;
+  -webkit-background-clip:initial!important;
+  background-clip:initial!important;
+}
+@media(max-width:520px){
+  .promo-city-screen .promo-hero-new{
+    grid-template-columns:auto minmax(0,1fr)!important;
+    align-items:start!important;
+    gap:8px!important;
+    padding:12px!important;
+  }
+  .promo-city-screen .promo-filter-card{
+    align-self:start!important;
+  }
+  .promo-city-screen .promo-sort-row{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:7px!important;
+    width:100%!important;
+    overflow:visible!important;
+  }
+  .promo-city-screen .promo-sort-row button{
+    width:100%!important;
+    min-width:0!important;
+    padding:0 6px!important;
+  }
+  .promo-city-screen .promo-compact-switch{
+    grid-column:1 / -1!important;
+    width:100%!important;
+    min-height:34px!important;
+    padding:0 10px!important;
+    justify-content:center!important;
+    font-size:12px!important;
+  }
+  .promo-city-screen .promo-compact-switch strong{
+    display:inline!important;
+  }
+}
+@media(max-width:380px){
+  .promo-city-screen .promo-filter-card{
+    grid-column:1 / -1!important;
+  }
+  .promo-city-screen .promo-sort-row{
+    grid-column:1 / -1!important;
+    grid-row:2!important;
+  }
+  .promo-city-screen .promo-filter-menu{
+    grid-row:3!important;
+  }
+}

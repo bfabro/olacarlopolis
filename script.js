@@ -7898,9 +7898,14 @@ plotarPinsImoveis(stateImoveis.filtered);
         <span class="card-divulgacao-categoria">Promo&ccedil;&atilde;o</span>
         <div class="card-divulgacao-linha">
           <h4>${i.titulo}</h4>
+          <span class="promo-event-actions">
+          ${i.contact
+              ? `<a href="https://wa.me/55${somenteDigitos(i.contact)}?text=${encodeURIComponent("Ola, vi sua promocao no Ola Carlopolis e tenho interesse.")}" class="card-divulgacao-wa-btn" data-promo-action="whatsapp" aria-label="Abrir WhatsApp" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i></a>`
+              : ""}
           ${i.instagram
               ? `<a href="${fixUrl(i.instagram)}" class="card-divulgacao-ig-btn" data-promo-action="instagram" aria-label="Abrir Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>`
               : ""}
+          </span>
         </div>
         ${detalheCompacto ? `<small>${detalheCompacto}</small>` : ""}
       </div>
