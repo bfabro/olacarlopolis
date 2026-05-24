@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 160,
-  label: "v160",
+  numero: 161,
+  label: "v161",
   data: "2026-05-24",
-  nota: "Garante permissoes master e salvamento imediato de promocoes."
+  nota: "Adiciona horarios de cliques, PWA e origens aos relatorios."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1104,7 +1104,14 @@ async function loadAllData() {
     ondeComerCardapiosSnap,
     ondeComerWhatsSnap,
     ondeComerFotosSnap,
-    promocoesSnap
+    promocoesSnap,
+    cliquesBotoesDetalhadoSnap,
+    cliquesOndeComerDetalhadoSnap,
+    cliquesPromocoesDetalhadoSnap,
+    cliquesPorMenuSnap,
+    origemAcessosSnap,
+    instalacoesPWASnap,
+    usoPWASnap
   ] = await Promise.all([
     get(ref(db, "clientes")),
     get(ref(db, "usuariosByUid")),
@@ -1120,7 +1127,14 @@ async function loadAllData() {
     get(ref(db, "cliquesCardapiosOndeComer")),
     get(ref(db, "cliquesWhatsOndeComer")),
     get(ref(db, "cliquesFotosOndeComer")),
-    get(ref(db, "cliquesPromocoesPorComercio"))
+    get(ref(db, "cliquesPromocoesPorComercio")),
+    get(ref(db, "cliquesPorBotaoDetalhado")),
+    get(ref(db, "cliquesOndeComerDetalhado")),
+    get(ref(db, "cliquesPromocoesDetalhado")),
+    get(ref(db, "cliquesPorMenu")),
+    get(ref(db, "origemAcessos")),
+    get(ref(db, "instalacoesPWA")),
+    get(ref(db, "usoPWA"))
   ]);
 
   applyClientsSnapshot(clientesSnap);
@@ -1165,7 +1179,14 @@ async function loadAllData() {
     ondeComerCardapios: ondeComerCardapiosSnap.exists() ? ondeComerCardapiosSnap.val() : {},
     ondeComerWhats: ondeComerWhatsSnap.exists() ? ondeComerWhatsSnap.val() : {},
     ondeComerFotos: ondeComerFotosSnap.exists() ? ondeComerFotosSnap.val() : {},
-    promocoes: promocoesSnap.exists() ? promocoesSnap.val() : {}
+    promocoes: promocoesSnap.exists() ? promocoesSnap.val() : {},
+    cliquesBotoesDetalhado: cliquesBotoesDetalhadoSnap.exists() ? cliquesBotoesDetalhadoSnap.val() : {},
+    cliquesOndeComerDetalhado: cliquesOndeComerDetalhadoSnap.exists() ? cliquesOndeComerDetalhadoSnap.val() : {},
+    cliquesPromocoesDetalhado: cliquesPromocoesDetalhadoSnap.exists() ? cliquesPromocoesDetalhadoSnap.val() : {},
+    cliquesPorMenuDetalhado: cliquesPorMenuSnap.exists() ? cliquesPorMenuSnap.val() : {},
+    origemAcessos: origemAcessosSnap.exists() ? origemAcessosSnap.val() : {},
+    instalacoesPWA: instalacoesPWASnap.exists() ? instalacoesPWASnap.val() : {},
+    usoPWA: usoPWASnap.exists() ? usoPWASnap.val() : {}
   };
 
   state.eventos = [];
@@ -3533,6 +3554,151 @@ function aggregateCidadesAcesso(data = {}) {
   return map;
 }
 
+function origemLabel(value) {
+  const raw = String(value || "").trim();
+  const normalized = normalizeName(raw);
+  if (!raw) return "Acesso direto";
+  if (/instagram|insta/.test(normalized)) return "Instagram";
+  if (/facebook|face/.test(normalized)) return "Facebook";
+  if (/whatsapp|zap/.test(normalized)) return "WhatsApp";
+  if (/pwa|app/.test(normalized)) return "App / PWA";
+  if (/site|navegador/.test(normalized)) return "Site";
+  if (/google/.test(normalized)) return "Google";
+  return raw;
+}
+
+function aggregateOrigemAcessos(acessos = {}, origemAcessos = {}) {
+  const map = new Map();
+  Object.values(acessos || {}).forEach((dia) => {
+    Object.values(dia?.detalhados || {}).forEach((item) => {
+      incrementMetric(map, origemLabel(item?.origem || item?.canal || item?.referrer), 1);
+    });
+  });
+  Object.values(origemAcessos || {}).forEach((dia) => {
+    Object.entries(dia || {}).forEach(([origem, count]) => incrementMetric(map, origemLabel(origem), count));
+  });
+  return map;
+}
+
+function aggregatePWAInstalls(data = {}) {
+  let total = 0;
+  Object.values(data || {}).forEach((dia) => {
+    if (typeof dia === "number") total += dia;
+    else total += Object.keys(dia || {}).length;
+  });
+  return total;
+}
+
+function aggregateUsoPWA(data = {}) {
+  let total = 0;
+  Object.values(data || {}).forEach((dia) => {
+    if (typeof dia === "number") total += dia;
+    else if (dia && typeof dia === "object") {
+      total += Number(dia.total || 0);
+      if (!dia.total) total += Object.keys(dia).length;
+    }
+  });
+  return total;
+}
+
+function formatReportTime(item = {}, fallbackDate = "") {
+  if (item.horario) return String(item.horario);
+  if (item.dataHoraISO || item.timestamp) {
+    const date = new Date(item.dataHoraISO || item.timestamp);
+    if (!Number.isNaN(date.getTime())) return date.toLocaleTimeString("pt-BR");
+  }
+  return fallbackDate || "-";
+}
+
+function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
+  const rows = [];
+  const pushRow = (date, area, cliente, tipo, item = {}) => {
+    rows.push({
+      date,
+      hora: formatReportTime(item, date),
+      area,
+      cliente: clientLabelFromMetricKey(cliente),
+      tipo: metricButtonLabel(tipo || item.tipo || area),
+      pagina: item.pagina || ""
+    });
+  };
+
+  Object.entries(metrics.cliquesBotoesDetalhado || {}).forEach(([date, dia]) => {
+    if (date < range.start || date > range.end) return;
+    Object.entries(dia || {}).forEach(([cliente, logs]) => {
+      Object.values(logs || {}).forEach((item) => pushRow(date, item?.area || "Botoes", cliente, item?.tipo, item));
+    });
+  });
+  Object.entries(metrics.cliquesOndeComerDetalhado || {}).forEach(([date, dia]) => {
+    if (date < range.start || date > range.end) return;
+    Object.entries(dia || {}).forEach(([cliente, logs]) => {
+      Object.values(logs || {}).forEach((item) => pushRow(date, "Onde Comer", cliente, item?.tipo, item));
+    });
+  });
+  Object.entries(metrics.cliquesPromocoesDetalhado || {}).forEach(([date, dia]) => {
+    if (date < range.start || date > range.end) return;
+    Object.entries(dia || {}).forEach(([cliente, logs]) => {
+      Object.values(logs || {}).forEach((item) => pushRow(date, "Promocoes", cliente, item?.tipo || "promocao", item));
+    });
+  });
+  Object.entries(metrics.cliquesPorMenuDetalhado || {}).forEach(([date, dia]) => {
+    if (date < range.start || date > range.end) return;
+    Object.entries(dia || {}).forEach(([menuId, value]) => {
+      Object.values(value?.detalhes || {}).forEach((item) => pushRow(date, "Menu", item?.texto || menuId, "menu", item));
+    });
+  });
+
+  return rows.sort((a, b) => `${b.date} ${b.hora}`.localeCompare(`${a.date} ${a.hora}`));
+}
+
+function buildAccessTimeline(acessos = {}, range = getReportDateRange()) {
+  const rows = [];
+  Object.entries(acessos || {}).forEach(([date, dia]) => {
+    if (date < range.start || date > range.end) return;
+    Object.values(dia?.detalhados || {}).forEach((item) => {
+      rows.push({
+        date,
+        hora: formatReportTime(item, date),
+        origem: origemLabel(item?.origem || item?.canal || item?.referrer),
+        canal: item?.canal || "-",
+        cidade: [item?.cidade || "Desconhecida", item?.estado || ""].filter(Boolean).join(" - "),
+        dispositivo: item?.dispositivo || "-",
+        pagina: item?.pagina || ""
+      });
+    });
+  });
+  return rows.sort((a, b) => `${b.date} ${b.hora}`.localeCompare(`${a.date} ${a.hora}`));
+}
+
+function renderTimelineTable(rows, emptyMessage, type = "clicks") {
+  if (!rows.length) return `<div class="list-meta">${escapeHtml(emptyMessage)}</div>`;
+  const isAccess = type === "access";
+  return `
+    <div class="report-table-wrap">
+      <table class="report-click-table report-timeline-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Hora</th>
+            ${isAccess ? `<th>Origem</th><th>Canal</th><th>Cidade</th><th>Dispositivo</th>` : `<th>Area</th><th>Cliente/card</th><th>Tipo</th>`}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.slice(0, 80).map((row) => `
+            <tr title="${escapeAttr(row.pagina || "")}">
+              <td>${escapeHtml(row.date)}</td>
+              <td><strong>${escapeHtml(row.hora)}</strong></td>
+              ${isAccess
+                ? `<td>${escapeHtml(row.origem)}</td><td>${escapeHtml(row.canal)}</td><td>${escapeHtml(row.cidade)}</td><td>${escapeHtml(row.dispositivo)}</td>`
+                : `<td>${escapeHtml(row.area)}</td><td>${escapeHtml(row.cliente)}</td><td>${escapeHtml(row.tipo)}</td>`}
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 function renderReports() {
   const mount = $("reportsMount");
   if (!mount) return;
@@ -3544,7 +3710,10 @@ function renderReports() {
     ondeComerCardapios: filterDailyMetrics(state.metricas.ondeComerCardapios, periodRange),
     ondeComerWhats: filterDailyMetrics(state.metricas.ondeComerWhats, periodRange),
     ondeComerFotos: filterDailyMetrics(state.metricas.ondeComerFotos, periodRange),
-    promocoes: filterDailyMetrics(state.metricas.promocoes, periodRange)
+    promocoes: filterDailyMetrics(state.metricas.promocoes, periodRange),
+    origemAcessos: filterDailyMetrics(state.metricas.origemAcessos, periodRange),
+    instalacoesPWA: filterDailyMetrics(state.metricas.instalacoesPWA, periodRange),
+    usoPWA: filterDailyMetrics(state.metricas.usoPWA, periodRange)
   };
 
   const reportClients = state.clientes.filter(isReportClient);
@@ -3595,6 +3764,12 @@ function renderReports() {
   const cliquesOndeComerFotos = aggregateSimpleDaily(filteredMetrics.ondeComerFotos);
   const cliquesPromocoes = aggregateSimpleDaily(filteredMetrics.promocoes);
   const cidadesAcesso = aggregateCidadesAcesso(filteredMetrics.acessos);
+  const origensAcesso = aggregateOrigemAcessos(filteredMetrics.acessos, filteredMetrics.origemAcessos);
+  const instalacoesPWA = aggregatePWAInstalls(filteredMetrics.instalacoesPWA);
+  const usoPWA = aggregateUsoPWA(filteredMetrics.usoPWA);
+  const totalAcessos = Object.values(filteredMetrics.acessos || {}).reduce((sum, dia) => sum + Number(dia?.total || 0), 0);
+  const clickTimeline = buildClickTimeline(state.metricas, periodRange);
+  const accessTimeline = buildAccessTimeline(filteredMetrics.acessos, periodRange);
   const generalClickReport = buildGeneralClickRows(cliquesBotoes.detalhes);
   const ondeComerClickRows = buildOndeComerClickRows(cliquesOndeComerCardapios, cliquesOndeComerWhats, cliquesOndeComerFotos);
 
@@ -3672,6 +3847,9 @@ function renderReports() {
       <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita paga</span><strong>${moneyBR(valorPago)}</strong><small>${pagos.length} cliente${pagos.length === 1 ? "" : "s"}</small></article>
       <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + Number(c.destaqueValor || 0), 0))}</small></article>
       <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Acessos no site</span><strong>${totalAcessos}</strong><small>Registros do periodo</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Instalacoes PWA</span><strong>${instalacoesPWA}</strong><small>App instalado</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Uso via PWA</span><strong>${usoPWA}</strong><small>Acessos pelo app</small></article>
     </div>
 
     <div class="reports-grid">
@@ -3711,6 +3889,11 @@ function renderReports() {
       </section>
 
       <section class="panel-card report-card">
+        ${renderReportCardHeader("Meios de acesso", periodRange)}
+        ${renderReportList(topFromMap(origensAcesso, 12, "acesso", "acessos"), "Ainda nao ha origem de acesso registrada.")}
+      </section>
+
+      <section class="panel-card report-card">
         ${renderReportCardHeader("Menu lateral", periodRange)}
         ${renderReportList(topFromMap(cliquesMenu, 12), "Ainda nao ha cliques de menu registrados.")}
       </section>
@@ -3733,6 +3916,16 @@ function renderReports() {
       <section class="panel-card report-card">
         ${renderReportCardHeader("Promocoes", periodRange)}
         ${renderReportList(topFromMap(cliquesPromocoes, 12), "Ainda nao ha cliques em promocoes registrados.")}
+      </section>
+
+      <section class="panel-card report-card report-wide">
+        ${renderReportCardHeader("Horarios dos cliques dos cards", periodRange)}
+        ${renderTimelineTable(clickTimeline, "Ainda nao ha horarios detalhados de cliques neste periodo.")}
+      </section>
+
+      <section class="panel-card report-card report-wide">
+        ${renderReportCardHeader("Horarios e origem dos acessos", periodRange)}
+        ${renderTimelineTable(accessTimeline, "Ainda nao ha acessos detalhados neste periodo.", "access")}
       </section>
 
       <section class="panel-card report-card">
