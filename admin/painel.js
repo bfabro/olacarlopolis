@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 179,
-  label: "v179",
-  data: "2026-05-24",
-  nota: "Garante botoes de ordenacao visiveis no filtro de promocoes no mobile."
+  numero: 180,
+  label: "v180",
+  data: "2026-05-25",
+  nota: "Oculta eventos realizados no site publico e sinaliza no admin."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -645,6 +645,18 @@ function displayEventDate(value) {
 
 function eventSortDate(evento = {}) {
   return normalizeEventDate(eventRawDate(evento)) || "9999-12-31";
+}
+
+function eventEndOfDayMs(evento = {}) {
+  const iso = normalizeEventDate(evento.dataFim || evento.fim || evento.endDate || evento.dateEnd || eventRawDate(evento));
+  if (!iso) return null;
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(year, month - 1, day, 23, 59, 59, 999).getTime();
+}
+
+function eventAlreadyDone(evento = {}) {
+  const endMs = eventEndOfDayMs(evento);
+  return typeof endMs === "number" && endMs < Date.now();
 }
 
 function eventIdentity(evento = {}) {
@@ -2721,17 +2733,21 @@ function renderEventsList() {
     return;
   }
 
-  box.innerHTML = list.map((evento) => `
-    <article class="list-card event-card">
+  box.innerHTML = list.map((evento) => {
+    const realizado = eventAlreadyDone(evento);
+    return `
+    <article class="list-card event-card${realizado ? " event-card-done" : ""}">
       ${evento.imagem ? `<img src="${escapeAttr(displayImageUrl(evento.imagem))}" alt="${escapeAttr(evento.titulo || "Evento")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
       <div class="list-title">${escapeHtml(evento.titulo || evento.id)}</div>
       <div class="event-date-row"><i class="fa-solid fa-calendar-days"></i><strong>${escapeHtml(displayEventDate(eventRawDate(evento)))}</strong>${evento.horario ? `<span>${escapeHtml(evento.horario)}</span>` : ""}</div>
+      ${realizado ? `<div class="event-done-note"><i class="fa-solid fa-circle-check"></i> Evento ja realizado</div>` : ""}
       <div class="list-meta">${escapeHtml(evento.clienteNome || "Sem cliente")} - ${escapeHtml(evento.origem === "script.js" ? "Base inicial" : "Firebase")}</div>
       <div class="list-meta">${escapeHtml(evento.local || "Sem local")}</div>
       <span class="badge ${escapeAttr(evento.status || "ativo")}">${eventStatusLabel(evento.status)}</span>
       <button type="button" data-edit-event="${escapeAttr(evento.id)}">Editar</button>
     </article>
-  `).join("");
+  `;
+  }).join("");
 
   box.querySelectorAll("[data-edit-event]").forEach((button) => {
     button.addEventListener("click", () => {

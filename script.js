@@ -2215,13 +2215,41 @@ document.addEventListener("DOMContentLoaded", function () {
     return texto;
   }
 
+  function eventoPublicoFimDiaMs(evento) {
+    const texto = String(
+      evento?.dataFim || evento?.fim || evento?.endDate || evento?.dateEnd || dataEventoPublico(evento) || ""
+    ).trim();
+    if (!texto) return null;
+
+    const iso = texto.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) {
+      return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]), 23, 59, 59, 999).getTime();
+    }
+
+    const br = texto.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (br) {
+      return new Date(Number(br[3]), Number(br[2]) - 1, Number(br[1]), 23, 59, 59, 999).getTime();
+    }
+
+    const livre = Date.parse(texto);
+    if (Number.isNaN(livre)) return null;
+    const data = new Date(livre);
+    data.setHours(23, 59, 59, 999);
+    return data.getTime();
+  }
+
+  function eventoPublicoRealizado(evento) {
+    const fimDia = eventoPublicoFimDiaMs(evento);
+    return typeof fimDia === "number" && fimDia < Date.now();
+  }
+
   function eventoPublicoIdentidade(evento) {
     return normalizeName(evento?.name || evento?.nome || evento?.titulo || evento?.id || "");
   }
 
   function eventoPublicoAtivo(evento) {
     const status = String(evento?.status || "ativo").toLowerCase();
-    return status === "ativo";
+    return status === "ativo" && !eventoPublicoRealizado(evento);
   }
 
   function normalizarEventoFirebasePublico(evento, id) {
@@ -17494,7 +17522,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
 
     categoria.establishments = [...porIdentidade.values()]
-      .filter((evento) => evento.image && evento.name)
+      .filter((evento) => evento.image && evento.name && eventoPublicoAtivo(evento))
       .sort((a, b) => dataEventoPublicoValor(a) - dataEventoPublicoValor(b));
   }
 
