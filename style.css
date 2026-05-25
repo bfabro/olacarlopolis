@@ -16357,3 +16357,177 @@ tr[data-inativo="true"] {
   .promo-city-screen:not(.promo-compact-mode) .promo-store-strip{margin:5px 7px 0!important;}
   .promo-city-screen:not(.promo-compact-mode) .promo-rodape{margin:7px 7px 9px!important;}
 }
+/* ===== Promocoes preco/economia e desktop v178 ===== */
+.promo-city-screen:not(.promo-compact-mode) .promo-preco{
+  overflow:visible!important;
+  border-radius:14px!important;
+  padding:10px 10px 0!important;
+  background:linear-gradient(180deg,#ef202f 0%,#b90917 100%)!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-preco-atual{
+  font-size:clamp(24px,4vw,42px)!important;
+  line-height:1!important;
+  color:#fff!important;
+  white-space:nowrap!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-preco-antigo{
+  margin:6px 0 6px!important;
+  padding:0!important;
+  color:#fff!important;
+  background:transparent!important;
+  font-size:clamp(12px,1.8vw,18px)!important;
+  font-weight:700!important;
+  opacity:1!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-preco-antigo::after{
+  left:42%!important;
+  right:18%!important;
+  height:2px!important;
+  background:#fff!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-preco-economia{
+  width:calc(100% + 20px)!important;
+  min-height:30px!important;
+  margin:0 -10px 0!important;
+  padding:7px 8px!important;
+  border-radius:10px 10px 14px 14px!important;
+  background:#07984a!important;
+  color:#fff!important;
+  font-size:clamp(10px,1.45vw,14px)!important;
+  font-weight:950!important;
+  line-height:1!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  white-space:nowrap!important;
+  box-shadow:0 -1px 0 rgba(255,255,255,.18) inset!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-preco-economia i{
+  width:18px!important;
+  height:18px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:50%!important;
+  color:#dfffea!important;
+  font-size:13px!important;
+}
+@media(min-width:761px){
+  .promo-city-screen:not(.promo-compact-mode){
+    max-width:1120px!important;
+    padding-left:18px!important;
+    padding-right:18px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-grid{
+    max-width:1040px!important;
+    margin:0 auto!important;
+    gap:18px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-card-new,
+  .promo-city-screen:not(.promo-compact-mode) .promo-grid>.promo-card{
+    max-width:820px!important;
+    margin:0 auto!important;
+    border-radius:18px!important;
+    box-shadow:0 10px 26px rgba(15,23,42,.10)!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-img-zoom,
+  .promo-city-screen:not(.promo-compact-mode) .promo-produto img,
+  .promo-city-screen:not(.promo-compact-mode) .promo-sem-imagem{
+    height:340px!important;
+    border-radius:18px 18px 0 0!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-validade-media{
+    top:16px!important;
+    right:16px!important;
+    padding:10px 14px!important;
+    border-radius:14px!important;
+    font-size:15px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-preco{
+    top:226px!important;
+    right:18px!important;
+    width:210px!important;
+    min-width:210px!important;
+    min-height:104px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-preco-atual{
+    font-size:34px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-preco-antigo{
+    font-size:16px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-preco-economia{
+    min-height:34px!important;
+    font-size:13px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-nome{
+    font-size:24px!important;
+    margin:12px 18px 0!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-obs{
+    font-size:17px!important;
+    margin:2px 18px 0!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-store-strip{
+    margin:12px 18px 0!important;
+    padding:10px 12px!important;
+    min-height:76px!important;
+    grid-template-columns:minmax(0,1fr) 52px!important;
+    border-radius:16px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-estab-link{
+    grid-template-columns:54px minmax(0,1fr)!important;
+    min-height:56px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-store-logo{
+    width:54px!important;
+    height:54px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-store-copy strong{
+    font-size:20px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-store-copy small{
+    font-size:14px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-store-instagram{
+    width:48px!important;
+    min-width:48px!important;
+    max-width:48px!important;
+    height:48px!important;
+    min-height:48px!important;
+    font-size:38px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-rodape{
+    margin:14px 18px 18px!important;
+    gap:14px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-rodape .icon-link{
+    min-height:62px!important;
+    border-radius:14px!important;
+    padding:8px 14px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-whats-link span{
+    font-size:18px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-whats-link span::after{
+    font-size:13px!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-share-card span{
+    font-size:18px!important;
+  }
+}
+@media(max-width:640px){
+  .promo-city-screen:not(.promo-compact-mode) .promo-preco{
+    border-radius:12px!important;
+    padding:8px 6px 0!important;
+  }
+  .promo-city-screen:not(.promo-compact-mode) .promo-preco-economia{
+    width:calc(100% + 12px)!important;
+    min-height:26px!important;
+    margin:0 -6px 0!important;
+    padding:5px 5px!important;
+    border-radius:8px 8px 12px 12px!important;
+    font-size:9px!important;
+    gap:4px!important;
+  }
+}
