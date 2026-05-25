@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 182,
-  label: "v182",
+  numero: 183,
+  label: "v183",
   data: "2026-05-25",
-  nota: "Adiciona area de vagas de trabalho para clientes."
+  nota: "Organiza o painel do cliente em menu lateral por funcoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1033,7 +1033,7 @@ function setBusy(button, busy, text) {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -1087,7 +1087,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -1404,6 +1404,9 @@ function switchView(name) {
   document.querySelectorAll(".nav-admin button").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.view === target);
   });
+  if ($("clientModuleSidebar") && target !== "minhaEmpresa") {
+    $("clientModuleSidebar").classList.add("hidden");
+  }
   const [title, subtitle] = viewCopy[target];
   $("viewTitle").textContent = title;
   $("viewSubtitle").textContent = subtitle;
@@ -2506,7 +2509,7 @@ function resetUserForm() {
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-user-plus"></i> Criar usuario`;
   $("deleteUserButton")?.classList.add("hidden");
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
-    input.checked = ["dados", "imagens", "cardapio", "promocoes", "faturas"].includes(input.value);
+    input.checked = ["dados", "vagas", "imagens", "cardapio", "promocoes", "faturas"].includes(input.value);
   });
   setFormCardOpen("userForm", false);
 }
@@ -4041,6 +4044,10 @@ function renderClientOnlyEditor() {
   const client = state.clientes.find((item) => item.id === state.profile?.clienteId);
   if (!client) {
     mount.innerHTML = `<p>Nenhum cliente vinculado a este usuario. Fale com o administrador.</p>`;
+    if ($("clientModuleSidebar")) {
+      $("clientModuleSidebar").innerHTML = "";
+      $("clientModuleSidebar").classList.add("hidden");
+    }
     return;
   }
 
@@ -4049,9 +4056,10 @@ function renderClientOnlyEditor() {
   const promocoes = normalizePromocoes(client.promocoes);
   const canEditDados = hasPermission("dados");
   const canEditImages = hasPermission("imagens");
+  const canEditVagas = hasPermission("vagas");
   const canEditCardapio = hasPermission("cardapio");
   const canEditPromocoes = hasPermission("promocoes");
-  const hasAnyClientEditPermission = canEditDados || canEditImages || canEditCardapio || canEditPromocoes;
+  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditPromocoes;
   let coPromoEditIndex = -1;
   const setCoPromoEditMode = (index = -1) => {
     coPromoEditIndex = index;
@@ -4064,11 +4072,38 @@ function renderClientOnlyEditor() {
     }
     $("coCancelPromoEditButton")?.classList.toggle("hidden", !editing);
   };
+  const clientModules = [
+    { id: "client-module-dados", icon: "fa-solid fa-building", label: "Dados da empresa", show: canEditDados },
+    { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas },
+    { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardapio", show: canEditCardapio },
+    { id: "client-module-foto", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
+    { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes }
+  ].filter((item) => item.show);
+  const clientModuleNav = clientModules.map((item, index) => `
+    <button type="button" class="client-module-nav-item${index === 0 ? " active" : ""}" data-client-module-target="${item.id}">
+      <i class="${item.icon}"></i><span>${item.label}</span>
+    </button>
+  `).join("");
+  const clientSidebarNav = clientModules.map((item, index) => `
+    <button type="button" class="sidebar-client-module-item${index === 0 ? " active" : ""}" data-client-module-target="${item.id}">
+      <i class="${item.icon}"></i><span>${item.label}</span>
+    </button>
+  `).join("");
+  if ($("clientModuleSidebar")) {
+    $("clientModuleSidebar").innerHTML = clientSidebarNav;
+    $("clientModuleSidebar").classList.toggle("hidden", !clientModules.length);
+  }
 
   mount.innerHTML = `
     <form id="clientOnlyForm" class="grid-form">
+      <div class="client-module-shell wide">
+        <aside class="client-module-menu" aria-label="Menu Minha empresa">
+          <div class="client-module-menu-title">Minha empresa</div>
+          ${clientModuleNav || `<div class="list-meta">Nenhuma funcao liberada.</div>`}
+        </aside>
+        <div class="client-module-content">
       ${canEditImages ? `
-        <section class="wide profile-upload-panel profile-upload-top client-feature-card feature-foto">
+        <section id="client-module-foto" class="wide profile-upload-panel profile-upload-top client-feature-card feature-foto">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Imagem principal</span>
@@ -4084,7 +4119,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditDados ? `
-        <section class="wide client-feature-card feature-dados">
+        <section id="client-module-dados" class="wide client-feature-card feature-dados">
         <div class="form-section-title">
           <i class="fa-solid fa-id-card"></i>
           <div>
@@ -4119,7 +4154,9 @@ function renderClientOnlyEditor() {
         </div>
         <label class="wide">Informacoes adicionais<textarea id="coInfo" rows="4">${escapeHtml(client.infoAdicional || "")}</textarea></label>
         </section>
-        <section class="wide upload-panel client-feature-card feature-vagas client-jobs-panel">
+      ` : ""}
+      ${canEditVagas ? `
+        <section id="client-module-vagas" class="wide upload-panel client-feature-card feature-vagas client-jobs-panel">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Contratacao</span>
@@ -4142,7 +4179,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditCardapio ? `
-        <section class="wide upload-panel client-feature-card feature-cardapio">
+        <section id="client-module-cardapio" class="wide upload-panel client-feature-card feature-cardapio">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Menu e PDF</span>
@@ -4162,7 +4199,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditImages ? `
-        <section class="wide upload-panel client-feature-card feature-galeria">
+        <section id="client-module-galeria" class="wide upload-panel client-feature-card feature-galeria">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Vitrine visual</span>
@@ -4187,7 +4224,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditPromocoes ? `
-        <section class="wide upload-panel client-feature-card feature-promocoes">
+        <section id="client-module-promocoes" class="wide upload-panel client-feature-card feature-promocoes">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Ofertas publicas</span>
@@ -4231,12 +4268,27 @@ function renderClientOnlyEditor() {
           </div>
         </section>
       ` : ""}
+        </div>
+      </div>
       ${hasAnyClientEditPermission ? `
         <div class="form-actions wide"><button type="submit">Salvar meus dados</button></div>
       ` : `<section class="wide panel-card"><p>Nenhuma permissao de edicao foi liberada para este usuario.</p></section>`}
     </form>
   `;
   if (canEditDados) renderScheduleEditor("coScheduleEditor", client.horarios || {});
+  const moduleNavButtons = [
+    ...mount.querySelectorAll("[data-client-module-target]"),
+    ...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")
+  ];
+  moduleNavButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.dataset.clientModuleTarget;
+      const target = mount.querySelector(`#${targetId}`);
+      if (!target) return;
+      moduleNavButtons.forEach((item) => item.classList.toggle("active", item.dataset.clientModuleTarget === targetId));
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
 
   mount.querySelector("#coProfileUpload")?.addEventListener("change", async (event) => {
     const file = event.target.files?.[0];
@@ -4465,7 +4517,11 @@ function renderClientOnlyEditor() {
         facebook: $("coFacebook").value.trim(),
         tiktok: $("coTiktok").value.trim(),
         site: $("coSite").value.trim(),
-        infoAdicional: $("coInfo").value.trim(),
+        infoAdicional: $("coInfo").value.trim()
+      });
+    }
+    if (canEditVagas) {
+      Object.assign(payload, {
         vagaAtiva: Boolean($("coJobActive")?.checked),
         vagaTitulo: $("coJobTitle")?.value.trim() || "",
         vagaCargo: $("coJobTitle")?.value.trim() || "",
@@ -4756,6 +4812,10 @@ function renderClientInvoices() {
   const client = state.clientes.find((item) => item.id === state.profile?.clienteId);
   if (!client) {
     mount.innerHTML = `<p>Nenhum cliente vinculado a este usuario. Fale com o administrador.</p>`;
+    if ($("clientModuleSidebar")) {
+      $("clientModuleSidebar").innerHTML = "";
+      $("clientModuleSidebar").classList.add("hidden");
+    }
     return;
   }
 

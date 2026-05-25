@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=182">
+  <link rel="stylesheet" href="painel.css?v=183">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -55,6 +55,7 @@
         <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
         <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
         <button data-view="minhaEmpresa" data-role="cliente"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
+        <div id="clientModuleSidebar" class="client-module-sidebar hidden" data-role="cliente"></div>
         <button data-view="faturas" data-role="cliente" data-permission="faturas"><i class="fa-solid fa-qrcode"></i> Faturas</button>
       </nav>
 
@@ -819,6 +820,7 @@
               <fieldset class="permissions-box wide">
                 <legend>Permissoes</legend>
                 <label><input type="checkbox" value="dados" checked> Dados do cliente</label>
+                <label><input type="checkbox" value="vagas" checked> Vagas de trabalho</label>
                 <label><input type="checkbox" value="imagens" checked> Imagens</label>
                 <label><input type="checkbox" value="cardapio" checked> Cardapio</label>
                 <label><input type="checkbox" value="promocoes" checked> Promocoes</label>
@@ -867,6 +869,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=182"></script>
+  <script type="module" src="painel.js?v=183"></script>
 </body>
 </html>
