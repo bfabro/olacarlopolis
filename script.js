@@ -2291,6 +2291,10 @@ document.addEventListener("DOMContentLoaded", function () {
     return possuiConteudo && establishment.vagaAtiva !== false;
   }
 
+  function montarLinhaDetalheVaga(icone, rotulo, valor) {
+    return valor ? `<div class="vaga-detail-row"><span class="vaga-detail-icon"><i class="${icone}"></i></span><strong>${rotulo}</strong><span>${valor}</span></div>` : "";
+  }
+
   function montarHtmlVagaTrabalho(establishment = {}) {
     const titulo = establishment.vagaTitulo || establishment.vagaCargo || "Vaga de Trabalho";
     const descricao = establishment.infoVagaTrabalho || establishment.vagaDescricao || "";
@@ -2303,27 +2307,25 @@ document.addEventListener("DOMContentLoaded", function () {
     const validade = establishment.vagaValidade ? formatarDataBR(establishment.vagaValidade) : "";
 
     return `
-    <div class="card-plantao detalhe-esquerda card-vaga-trabalho">
-      <div class="conteudo-plantao">
-        <div class="titulo-plantao">
-          <i class="fas fa-briefcase"></i> ${titulo}
-        </div>
-        ${descricao ? `<p class="vaga-descricao">${descricao}</p>` : ""}
-        ${requisitos ? `<p><strong><i class="fas fa-list-check"></i> Pré-requisito:</strong> ${requisitos}</p>` : ""}
-        ${salario ? `<p><strong><i class="fa-solid fa-money-bill-wave"></i> Salário:</strong> ${salario}</p>` : ""}
-        ${jornada ? `<p><strong><i class="fa-solid fa-clock"></i> Jornada:</strong> ${jornada}</p>` : ""}
-        ${local ? `<p><strong><i class="fa-solid fa-location-dot"></i> Local:</strong> ${local}</p>` : ""}
-        ${validade ? `<p><strong><i class="fa-solid fa-calendar-days"></i> Validade:</strong> ${validade}</p>` : ""}
-        ${contato ? `<p><strong><i class="fa-brands fa-whatsapp"></i> Contato:</strong> ${contato}</p>` : ""}
-        ${candidatura ? `<p><strong><i class="fa-solid fa-paper-plane"></i> Como se candidatar:</strong> ${candidatura}</p>` : ""}
+      <div class="vaga-detail-box">
+        ${montarLinhaDetalheVaga("fa-solid fa-dollar-sign", "Salário", salario)}
+        ${montarLinhaDetalheVaga("fa-regular fa-clock", "Jornada", jornada)}
+        ${montarLinhaDetalheVaga("fa-solid fa-location-dot", "Local", local)}
+        ${montarLinhaDetalheVaga("fa-regular fa-calendar-days", "Validade", validade)}
+        ${montarLinhaDetalheVaga("fa-brands fa-whatsapp", "Contato", contato)}
       </div>
-    </div>
+      ${requisitos ? `<div class="vaga-info-box"><span class="vaga-detail-icon"><i class="fa-regular fa-clipboard"></i></span><div><strong>Pré-requisito</strong><p>${requisitos}</p></div></div>` : ""}
+      ${candidatura ? `<div class="vaga-info-box candidatura"><span class="vaga-detail-icon"><i class="fa-solid fa-users"></i></span><div><strong>Como se candidatar</strong><p>${candidatura}</p></div></div>` : ""}
+      ${contato ? `<a class="vaga-whats-btn" href="https://wa.me/55${somenteDigitos(contato)}?text=${encodeURIComponent("Ola, vi sua vaga no Ola Carlopolis e tenho interesse.")}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp</a>` : ""}
+      <button type="button" class="vaga-share-btn"><i class="fa-solid fa-share-nodes"></i> Compartilhar</button>
   `;
   }
 
   function montarCardVagaTrabalhoPublico(establishment = {}) {
     const nome = establishment.name || establishment.nome || "Empresa";
     const imagem = establishment.image || establishment.imagem || "";
+    const titulo = establishment.vagaTitulo || establishment.vagaCargo || "Vaga de Trabalho";
+    const descricao = establishment.infoVagaTrabalho || establishment.vagaDescricao || "";
     return `
       <article class="vaga-public-card" id="${normalizeName(nome)}" data-id="${normalizeName(nome)}">
         <div class="vaga-public-media">
@@ -2331,7 +2333,15 @@ document.addEventListener("DOMContentLoaded", function () {
             ? `<img src="${imagem}" alt="${nome}" loading="lazy" decoding="async">`
             : `<div class="vaga-public-img-empty"><i class="fa-solid fa-briefcase"></i></div>`}
         </div>
-        ${montarHtmlVagaTrabalho(establishment)}
+        <div class="vaga-public-summary">
+          <h3>${titulo}</h3>
+          ${descricao ? `<p>${descricao}</p>` : ""}
+          <span>${nome}</span>
+          <button type="button" class="vaga-more-btn"><i class="fa-solid fa-circle-info"></i> Mais informações</button>
+        </div>
+        <div class="vaga-public-details">
+          ${montarHtmlVagaTrabalho(establishment)}
+        </div>
       </article>
     `;
   }
@@ -18366,6 +18376,27 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
       contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><section class="vagas-public-list">
         ${paidEstablishments.map(montarCardVagaTrabalhoPublico).join("")}
       </section>`;
+      contentArea.querySelectorAll(".vaga-more-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const card = button.closest(".vaga-public-card");
+          const expanded = card?.classList.toggle("expanded");
+          button.innerHTML = expanded
+            ? `<i class="fa-solid fa-chevron-up"></i> Menos informações`
+            : `<i class="fa-solid fa-circle-info"></i> Mais informações`;
+        });
+      });
+      contentArea.querySelectorAll(".vaga-share-btn").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const card = button.closest(".vaga-public-card");
+          const nome = card?.querySelector(".vaga-public-summary h3")?.textContent || "Vaga de trabalho";
+          const url = location.href;
+          if (navigator.share) await navigator.share({ title: nome, text: `Confira esta vaga no Olá Carlópolis: ${nome}`, url });
+          else {
+            await navigator.clipboard?.writeText(url);
+            alert("Link copiado!");
+          }
+        });
+      });
       return;
     }
 
