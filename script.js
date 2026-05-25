@@ -7265,10 +7265,10 @@ plotarPinsImoveis(stateImoveis.filtered);
               <span>Filtro</span>
               <i class="fa-solid fa-chevron-down auto-filter-chevron"></i>
             </button>
-            <label class="switch">
-              <input type="checkbox" id="autoFiltroDisponiveis" checked>
+            <label class="switch auto-cards-switch" title="Mostrar automoveis em cards menores">
+              <input type="checkbox" id="autoModoCards" ${window.__automoveisModoCards ? "checked" : ""}>
               <span class="track"><span class="thumb"></span></span>
-              <span>Disponiveis</span>
+              <span>Cards</span>
             </label>
           </div>
           <div class="grid-filtros">
@@ -7312,8 +7312,16 @@ plotarPinsImoveis(stateImoveis.filtered);
       preencherSelect("autoFiltroVendedor", "vendedor");
     };
 
+    const aplicarModoCards = () => {
+      const ativo = Boolean(document.getElementById("autoModoCards")?.checked);
+      window.__automoveisModoCards = ativo;
+      document.querySelector(".automoveis-page")?.classList.toggle("auto-cards-mode", ativo);
+      box?.classList.toggle("auto-cards-grid", ativo);
+    };
+
     const aplicar = () => {
       if (!box) return;
+      aplicarModoCards();
       if (!lista.length) {
         box.innerHTML = `<div class="list-meta">Carregando automoveis...</div>`;
         return;
@@ -7329,7 +7337,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         km: numeroAutomoveis(document.getElementById("autoFiltroKm")?.value || ""),
         combustivel: document.getElementById("autoFiltroCombustivel")?.value || "",
         cambio: document.getElementById("autoFiltroCambio")?.value || "",
-        disponiveis: document.getElementById("autoFiltroDisponiveis")?.checked || false,
         busca: normalizarTextoAutomoveis(document.getElementById("autoFiltroBusca")?.value || "")
       };
       const filtrados = lista.filter((item) => {
@@ -7344,7 +7351,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (filtros.km && numeroAutomoveis(item.km) > filtros.km) return false;
         if (filtros.combustivel && item.combustivel !== filtros.combustivel) return false;
         if (filtros.cambio && item.cambio !== filtros.cambio) return false;
-        if (filtros.disponiveis && (item.status || "ativo") !== "ativo") return false;
         if (filtros.busca && !hay.includes(filtros.busca)) return false;
         return true;
       });
@@ -7355,10 +7361,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       const expanded = filtroBox?.classList.toggle("auto-filter-collapsed") === false;
       toggleFiltros.setAttribute("aria-expanded", expanded ? "true" : "false");
     });
-    document.querySelectorAll("#filtrosAutomoveis input, #filtrosAutomoveis select").forEach((el) => {
+    document.getElementById("autoModoCards")?.addEventListener("change", aplicarModoCards);
+    document.querySelectorAll("#filtrosAutomoveis input:not(#autoModoCards), #filtrosAutomoveis select").forEach((el) => {
       el.addEventListener("input", aplicar);
       el.addEventListener("change", aplicar);
     });
+    aplicarModoCards();
 
     if (lista.length) {
       preencherFiltros();
