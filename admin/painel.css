@@ -2006,3 +2006,13 @@ button[type="submit"]:hover,
 .profile-upload-panel.client-module-panel.active {
   display: grid !important;
 }
+/* ===== Minha empresa somente menu lateral v185 ===== */
+.client-module-shell {
+  display: block !important;
+}
+
+.client-module-menu,
+.client-module-menu-title,
+.client-module-nav-item {
+  display: none !important;
+}

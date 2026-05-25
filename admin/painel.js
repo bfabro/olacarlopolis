@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 184,
-  label: "v184",
+  numero: 185,
+  label: "v185",
   data: "2026-05-25",
-  nota: "Mostra um modulo por vez no painel Minha empresa."
+  nota: "Remove menu interno e usa somente sidebar para modulos do cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4080,11 +4080,6 @@ function renderClientOnlyEditor() {
     { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes }
   ].filter((item) => item.show);
   const initialClientModule = (clientModules.find((item) => item.id === "client-module-dados") || clientModules[0] || {}).id || "";
-  const clientModuleNav = clientModules.map((item) => `
-    <button type="button" class="client-module-nav-item${item.id === initialClientModule ? " active" : ""}" data-client-module-target="${item.id}">
-      <i class="${item.icon}"></i><span>${item.label}</span>
-    </button>
-  `).join("");
   const clientSidebarNav = clientModules.map((item) => `
     <button type="button" class="sidebar-client-module-item${item.id === initialClientModule ? " active" : ""}" data-client-module-target="${item.id}">
       <i class="${item.icon}"></i><span>${item.label}</span>
@@ -4098,10 +4093,6 @@ function renderClientOnlyEditor() {
   mount.innerHTML = `
     <form id="clientOnlyForm" class="grid-form">
       <div class="client-module-shell wide">
-        <aside class="client-module-menu" aria-label="Menu Minha empresa">
-          <div class="client-module-menu-title">Minha empresa</div>
-          ${clientModuleNav || `<div class="list-meta">Nenhuma funcao liberada.</div>`}
-        </aside>
         <div class="client-module-content">
       ${canEditImages ? `
         <section id="client-module-foto" class="wide profile-upload-panel profile-upload-top client-feature-card feature-foto client-module-panel">
@@ -4277,10 +4268,7 @@ function renderClientOnlyEditor() {
     </form>
   `;
   if (canEditDados) renderScheduleEditor("coScheduleEditor", client.horarios || {});
-  const moduleNavButtons = [
-    ...mount.querySelectorAll("[data-client-module-target]"),
-    ...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")
-  ];
+  const moduleNavButtons = [...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")];
   const activateClientModule = (targetId) => {
     const target = mount.querySelector(`#${targetId}`);
     if (!target) return;
@@ -4291,7 +4279,10 @@ function renderClientOnlyEditor() {
   };
   if (initialClientModule) activateClientModule(initialClientModule);
   moduleNavButtons.forEach((button) => {
-    button.addEventListener("click", () => activateClientModule(button.dataset.clientModuleTarget));
+    button.addEventListener("click", () => {
+      activateClientModule(button.dataset.clientModuleTarget);
+      closeAdminMenuOnMobile();
+    });
   });
 
   mount.querySelector("#coProfileUpload")?.addEventListener("change", async (event) => {
