@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 183,
-  label: "v183",
+  numero: 184,
+  label: "v184",
   data: "2026-05-25",
-  nota: "Organiza o painel do cliente em menu lateral por funcoes."
+  nota: "Mostra um modulo por vez no painel Minha empresa."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4079,13 +4079,14 @@ function renderClientOnlyEditor() {
     { id: "client-module-foto", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
     { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes }
   ].filter((item) => item.show);
-  const clientModuleNav = clientModules.map((item, index) => `
-    <button type="button" class="client-module-nav-item${index === 0 ? " active" : ""}" data-client-module-target="${item.id}">
+  const initialClientModule = (clientModules.find((item) => item.id === "client-module-dados") || clientModules[0] || {}).id || "";
+  const clientModuleNav = clientModules.map((item) => `
+    <button type="button" class="client-module-nav-item${item.id === initialClientModule ? " active" : ""}" data-client-module-target="${item.id}">
       <i class="${item.icon}"></i><span>${item.label}</span>
     </button>
   `).join("");
-  const clientSidebarNav = clientModules.map((item, index) => `
-    <button type="button" class="sidebar-client-module-item${index === 0 ? " active" : ""}" data-client-module-target="${item.id}">
+  const clientSidebarNav = clientModules.map((item) => `
+    <button type="button" class="sidebar-client-module-item${item.id === initialClientModule ? " active" : ""}" data-client-module-target="${item.id}">
       <i class="${item.icon}"></i><span>${item.label}</span>
     </button>
   `).join("");
@@ -4103,7 +4104,7 @@ function renderClientOnlyEditor() {
         </aside>
         <div class="client-module-content">
       ${canEditImages ? `
-        <section id="client-module-foto" class="wide profile-upload-panel profile-upload-top client-feature-card feature-foto">
+        <section id="client-module-foto" class="wide profile-upload-panel profile-upload-top client-feature-card feature-foto client-module-panel">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Imagem principal</span>
@@ -4119,7 +4120,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditDados ? `
-        <section id="client-module-dados" class="wide client-feature-card feature-dados">
+        <section id="client-module-dados" class="wide client-feature-card feature-dados client-module-panel">
         <div class="form-section-title">
           <i class="fa-solid fa-id-card"></i>
           <div>
@@ -4156,7 +4157,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditVagas ? `
-        <section id="client-module-vagas" class="wide upload-panel client-feature-card feature-vagas client-jobs-panel">
+        <section id="client-module-vagas" class="wide upload-panel client-feature-card feature-vagas client-jobs-panel client-module-panel">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Contratacao</span>
@@ -4179,7 +4180,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditCardapio ? `
-        <section id="client-module-cardapio" class="wide upload-panel client-feature-card feature-cardapio">
+        <section id="client-module-cardapio" class="wide upload-panel client-feature-card feature-cardapio client-module-panel">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Menu e PDF</span>
@@ -4199,7 +4200,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditImages ? `
-        <section id="client-module-galeria" class="wide upload-panel client-feature-card feature-galeria">
+        <section id="client-module-galeria" class="wide upload-panel client-feature-card feature-galeria client-module-panel">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Vitrine visual</span>
@@ -4224,7 +4225,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditPromocoes ? `
-        <section id="client-module-promocoes" class="wide upload-panel client-feature-card feature-promocoes">
+        <section id="client-module-promocoes" class="wide upload-panel client-feature-card feature-promocoes client-module-panel">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Ofertas publicas</span>
@@ -4280,14 +4281,17 @@ function renderClientOnlyEditor() {
     ...mount.querySelectorAll("[data-client-module-target]"),
     ...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")
   ];
-  moduleNavButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const targetId = button.dataset.clientModuleTarget;
-      const target = mount.querySelector(`#${targetId}`);
-      if (!target) return;
-      moduleNavButtons.forEach((item) => item.classList.toggle("active", item.dataset.clientModuleTarget === targetId));
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+  const activateClientModule = (targetId) => {
+    const target = mount.querySelector(`#${targetId}`);
+    if (!target) return;
+    mount.querySelectorAll(".client-module-panel").forEach((panel) => {
+      panel.classList.toggle("active", panel.id === targetId);
     });
+    moduleNavButtons.forEach((item) => item.classList.toggle("active", item.dataset.clientModuleTarget === targetId));
+  };
+  if (initialClientModule) activateClientModule(initialClientModule);
+  moduleNavButtons.forEach((button) => {
+    button.addEventListener("click", () => activateClientModule(button.dataset.clientModuleTarget));
   });
 
   mount.querySelector("#coProfileUpload")?.addEventListener("change", async (event) => {
