@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 173,
-  label: "v173",
+  numero: 174,
+  label: "v174",
   data: "2026-05-24",
-  nota: "Estabiliza a linha Promocao/Instagram e reduz o titulo das promocoes."
+  nota: "Atualiza o card publico de promocoes e adiciona mensagem de Instagram no admin."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -390,6 +390,7 @@ function normalizePromocoes(items) {
       validadeFim: String(item?.validadeFim || item?.validade || "").trim(),
       diasSemana: normalizePromoWeekDays(item?.diasSemana || item?.dias || item?.recorrenciaDias || item?.diaSemana),
       obs: String(item?.obs || item?.descricao || "").trim(),
+      instagramMensagem: String(item?.instagramMensagem || item?.mensagemInstagram || item?.chamadaInstagram || "").trim(),
       ativo: item?.ativo === false ? false : true
     }))
     .filter((item) => item.titulo)
@@ -1672,7 +1673,7 @@ function renderClientMenuPreview() {
 }
 
 function clearClientPromoFields() {
-  ["clientPromoTitle", "clientPromoPrice", "clientPromoDiscount", "clientPromoOldPrice", "clientPromoUnit", "clientPromoVolume", "clientPromoPack", "clientPromoStart", "clientPromoEnd", "clientPromoOfferType", "clientPromoFulfillment", "clientPromoPriceRange", "clientPromoPriceMode", "clientPromoObs", "clientPromoImageUrl"].forEach((id) => {
+  ["clientPromoTitle", "clientPromoPrice", "clientPromoDiscount", "clientPromoOldPrice", "clientPromoUnit", "clientPromoVolume", "clientPromoPack", "clientPromoStart", "clientPromoEnd", "clientPromoOfferType", "clientPromoFulfillment", "clientPromoPriceRange", "clientPromoPriceMode", "clientPromoObs", "clientPromoInstagramMsg", "clientPromoImageUrl"].forEach((id) => {
     if ($(id)) $(id).value = "";
   });
   if ($("clientPromoImageUpload")) $("clientPromoImageUpload").value = "";
@@ -1682,7 +1683,7 @@ function clearClientPromoFields() {
 }
 
 function clearPromoFields(prefix, scope = document) {
-  ["Title", "Price", "Discount", "OldPrice", "Unit", "Volume", "Pack", "Start", "End", "OfferType", "Fulfillment", "PriceRange", "PriceMode", "Obs", "ImageUrl"].forEach((suffix) => {
+  ["Title", "Price", "Discount", "OldPrice", "Unit", "Volume", "Pack", "Start", "End", "OfferType", "Fulfillment", "PriceRange", "PriceMode", "Obs", "InstagramMsg", "ImageUrl"].forEach((suffix) => {
     const field = scope.querySelector(`#${prefix}Promo${suffix}`);
     if (field) field.value = "";
   });
@@ -1710,6 +1711,7 @@ function fillPromoFields(prefix, promo, scope = document) {
   set("PriceRange", promo.faixaPreco);
   set("PriceMode", promo.modoPreco);
   set("Obs", promo.obs);
+  set("InstagramMsg", promo.instagramMensagem);
   set("ImageUrl", promo.imagem);
   const days = new Set(normalizePromoWeekDays(promo.diasSemana).map(String));
   scope.querySelectorAll(`input[name='${prefix}PromoWeekday']`).forEach((input) => {
@@ -1736,6 +1738,7 @@ function readPromoFields(prefix, scope = document, fallbackId = "") {
     modoPreco: get("PriceMode"),
     diasSemana: Array.from(scope.querySelectorAll(`input[name='${prefix}PromoWeekday']:checked`)).map((input) => Number(input.value)),
     obs: get("Obs"),
+    instagramMensagem: get("InstagramMsg"),
     imagem: get("ImageUrl"),
     ativo: true
   };
@@ -4150,6 +4153,7 @@ function renderClientOnlyEditor() {
               </div>
             </fieldset>
             <label class="wide">Observacao<textarea id="coPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
+            <label class="wide">Mensagem abaixo do cliente / Instagram<textarea id="coPromoInstagramMsg" rows="2" placeholder="Ex.: Siga no Instagram e fique por dentro das novidades!"></textarea></label>
             <label>Imagem da promocao<input id="coPromoImageUpload" type="file" accept="image/*"></label>
             <label>Ou URL da imagem<input id="coPromoImageUrl" placeholder="https://..."></label>
             <div class="promo-form-actions wide">
@@ -4462,6 +4466,7 @@ function renderPromocoesMarkup(promocoes, removeAttr = "promo-remove", editAttr 
         ${promo.desconto ? `<small>Destaque: ${escapeHtml(promo.desconto)}</small>` : ""}
         <small>Disponivel: ${escapeHtml(promoWeekDaysLabel(promo.diasSemana))}</small>
         ${promo.obs ? `<small>${escapeHtml(promo.obs)}</small>` : ""}
+        ${promo.instagramMensagem ? `<small>Instagram: ${escapeHtml(promo.instagramMensagem)}</small>` : ""}
       </div>
       <div class="promo-admin-actions">
         <button type="button" data-${editAttr}="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button>

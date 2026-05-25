@@ -4773,6 +4773,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
             validadeFim: p.validadeFim || null,
             diasSemana: normalizarDiasSemanaPromocao(p.diasSemana || p.dias || p.recorrenciaDias || p.diaSemana),
             obs: p.obs || "",                    // qualquer extra
+            instagramMensagem: p.instagramMensagem || p.mensagemInstagram || p.chamadaInstagram || est.instagramMensagem || "Siga no Instagram e fique por dentro das novidades!",
             contact: getPrimeiroContato(est.contact) || "",
             instagram: est.instagram || "",
             criadoEm: p.criadoEm || p.createdAt || ""
@@ -7935,15 +7936,18 @@ plotarPinsImoveis(stateImoveis.filtered);
         </div>
         
         <div class="promo-info">
-          <a class="promo-estab promo-estab-link" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.estabelecimento}</a>
-          ${i.instagram ? `<a href="${fixUrl(i.instagram)}" target="_blank" class="promo-store-instagram" data-promo-action="instagram" aria-label="Abrir Instagram"><i class="fab fa-instagram"></i></a>` : ""}
           <div class="promo-nome">${i.titulo}</div>
-          ${economiaFmt ? `<div class="promo-economia"><i class="fa-solid fa-tag"></i> Economize ${economiaFmt} nesta oferta</div>` : ""}
+          ${i.obs ? `<div class="promo-obs">${i.obs}</div>` : (!i.volume && !i.embalagem && descricaoPromo ? `<div class="promo-obs">${descricaoPromo}</div>` : "")}
+          <div class="promo-store-strip">
+            <a class="promo-estab promo-estab-link" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">
+              <span class="promo-store-logo">${i.logo ? `<img src="${i.logo}" alt="${i.estabelecimento}" loading="lazy">` : `<i class="fa-solid fa-store"></i>`}</span>
+              <span class="promo-store-copy"><strong>${i.estabelecimento}</strong><small>${i.instagramMensagem || "Siga no Instagram e fique por dentro das novidades!"}</small></span>
+            </a>
+            ${i.instagram ? `<a href="${fixUrl(i.instagram)}" target="_blank" class="promo-store-instagram" data-promo-action="instagram" aria-label="Abrir Instagram"><i class="fab fa-instagram"></i></a>` : ""}
+          </div>
           ${(i.volume || i.embalagem)
             ? `<div class="promo-det">${[i.volume, i.embalagem].filter(Boolean).join(" · ")}</div>` : ""}
           ${textoDiasPromocao(i) ? `<div class="promo-days">${textoDiasPromocao(i)}</div>` : ""}
-          ${i.obs ? `<div class="promo-obs">${i.obs}</div>` : (!i.volume && !i.embalagem && descricaoPromo ? `<div class="promo-obs">${descricaoPromo}</div>` : "")}
-          
         </div>
       </div>
 
@@ -7951,6 +7955,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       ${badgeLabel ? `<div class="promo-preco-label"><i class="fa-solid fa-fire"></i> ${badgeLabel}</div>` : ""}
       <div class="promo-preco-atual">${valorCard}</div>
       ${precoAntFmt ? `<div class="promo-preco-antigo">${precoAntFmt}</div>` : ""}
+      ${economiaFmt ? `<div class="promo-preco-economia"><i class="fa-solid fa-tag"></i> Economize ${economiaFmt}</div>` : ""}
       ${i.unidade && !descontoTxt ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
       ${(i.validadeInicio && i.validadeFim)
             ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
