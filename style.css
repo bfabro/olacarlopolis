@@ -16643,3 +16643,20 @@ tr[data-inativo="true"] {
     font-size:10px!important;
   }
 }
+
+/* ===== Vagas de trabalho por cliente v182 ===== */
+.card-vaga-trabalho {
+  border-left-color: #2563eb;
+  background: #f5f9ff;
+  box-shadow: 0 5px 14px rgba(37, 99, 235, .14);
+}
+
+.card-vaga-trabalho .titulo-plantao,
+.card-vaga-trabalho i {
+  color: #1d4ed8;
+}
+
+.card-vaga-trabalho .vaga-descricao {
+  color: #172033;
+  font-weight: 700;
+}

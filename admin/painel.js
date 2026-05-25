@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 181,
-  label: "v181",
+  numero: 182,
+  label: "v182",
   data: "2026-05-25",
-  nota: "Adiciona flag de cardapio no painel do cliente e respeita no site publico."
+  nota: "Adiciona area de vagas de trabalho para clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1490,6 +1490,10 @@ function resetClientForm() {
   $("clientId").value = "";
   if ($("clientType")) $("clientType").value = "comercio";
   if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = false;
+  if ($("clientJobActive")) $("clientJobActive").checked = false;
+  ["clientJobTitle", "clientJobDescription", "clientJobRequirements", "clientJobSalary", "clientJobSchedule", "clientJobPlace", "clientJobContact", "clientJobApply", "clientJobValidUntil"].forEach((id) => {
+    if ($(id)) $(id).value = "";
+  });
   fillClientCategorySelect();
   $("deleteClientButton").classList.add("hidden");
   renderProfilePreview("clientImage", "clientProfilePreview");
@@ -1538,6 +1542,19 @@ function getClientFormData() {
     cardapioLink: $("clientMenuLink").value.trim(),
     menuImages: normalizeUrlList(state.clientMenuImages),
     promocoes: normalizePromocoes(state.clientPromocoes),
+    vagaAtiva: Boolean($("clientJobActive")?.checked),
+    vagaTitulo: $("clientJobTitle")?.value.trim() || "",
+    vagaCargo: $("clientJobTitle")?.value.trim() || "",
+    infoVagaTrabalho: $("clientJobDescription")?.value.trim() || "",
+    vagaDescricao: $("clientJobDescription")?.value.trim() || "",
+    vagaPreRequisito: $("clientJobRequirements")?.value.trim() || "",
+    vagaRequisitos: $("clientJobRequirements")?.value.trim() || "",
+    vagaSalario: $("clientJobSalary")?.value.trim() || "",
+    vagaJornada: $("clientJobSchedule")?.value.trim() || "",
+    vagaLocal: $("clientJobPlace")?.value.trim() || "",
+    vagaContato: $("clientJobContact")?.value.trim() || "",
+    vagaComoCandidatar: $("clientJobApply")?.value.trim() || "",
+    vagaValidade: $("clientJobValidUntil")?.value || "",
     infoAdicional: $("clientInfo").value.trim(),
     observacaoAdmin: $("clientAdminNote").value.trim(),
     origem: "painel",
@@ -1577,6 +1594,16 @@ function fillClientForm(client) {
   $("clientMenuLink").value = client.cardapioLink || "";
   state.clientMenuImages = normalizeUrlList(client.menuImages);
   state.clientPromocoes = normalizePromocoes(client.promocoes);
+  if ($("clientJobActive")) $("clientJobActive").checked = client.vagaAtiva !== false && Boolean(client.infoVagaTrabalho || client.vagaTitulo || client.vagaCargo || client.vagaDescricao);
+  if ($("clientJobTitle")) $("clientJobTitle").value = client.vagaTitulo || client.vagaCargo || "";
+  if ($("clientJobDescription")) $("clientJobDescription").value = client.infoVagaTrabalho || client.vagaDescricao || "";
+  if ($("clientJobRequirements")) $("clientJobRequirements").value = client.vagaPreRequisito || client.vagaRequisitos || "";
+  if ($("clientJobSalary")) $("clientJobSalary").value = client.vagaSalario || "";
+  if ($("clientJobSchedule")) $("clientJobSchedule").value = client.vagaJornada || "";
+  if ($("clientJobPlace")) $("clientJobPlace").value = client.vagaLocal || "";
+  if ($("clientJobContact")) $("clientJobContact").value = client.vagaContato || "";
+  if ($("clientJobApply")) $("clientJobApply").value = client.vagaComoCandidatar || "";
+  if ($("clientJobValidUntil")) $("clientJobValidUntil").value = client.vagaValidade || "";
   $("clientInfo").value = client.infoAdicional || "";
   $("clientAdminNote").value = client.observacaoAdmin || "";
   $("deleteClientButton").classList.remove("hidden");
@@ -4092,6 +4119,27 @@ function renderClientOnlyEditor() {
         </div>
         <label class="wide">Informacoes adicionais<textarea id="coInfo" rows="4">${escapeHtml(client.infoAdicional || "")}</textarea></label>
         </section>
+        <section class="wide upload-panel client-feature-card feature-vagas client-jobs-panel">
+          <div class="section-head compact feature-card-head">
+            <div>
+              <span class="feature-kicker">Contratacao</span>
+              <h3>Vagas de trabalho</h3>
+              <p>Cadastre uma oportunidade para aparecer no site publico.</p>
+            </div>
+          </div>
+          <label class="check-row"><input id="coJobActive" type="checkbox" ${client.vagaAtiva !== false && (client.infoVagaTrabalho || client.vagaTitulo || client.vagaCargo || client.vagaDescricao) ? "checked" : ""}> Exibir vaga no site publico</label>
+          <div class="section-fields">
+            <label>Cargo / titulo da vaga<input id="coJobTitle" value="${escapeAttr(client.vagaTitulo || client.vagaCargo || "")}" placeholder="Ex.: Atendente"></label>
+            <label>Salario / beneficio<input id="coJobSalary" value="${escapeAttr(client.vagaSalario || "")}" placeholder="Ex.: A combinar"></label>
+            <label>Jornada / horario<input id="coJobSchedule" value="${escapeAttr(client.vagaJornada || "")}" placeholder="Ex.: Segunda a sabado"></label>
+            <label>Validade da vaga<input id="coJobValidUntil" type="date" value="${escapeAttr(client.vagaValidade || "")}"></label>
+            <label>Local da vaga<input id="coJobPlace" value="${escapeAttr(client.vagaLocal || "")}" placeholder="Opcional"></label>
+            <label>Contato da vaga<input id="coJobContact" value="${escapeAttr(client.vagaContato || "")}" placeholder="WhatsApp, telefone ou e-mail"></label>
+          </div>
+          <label class="wide">Descricao da vaga<textarea id="coJobDescription" rows="3" placeholder="Conte o que a pessoa vai fazer">${escapeHtml(client.infoVagaTrabalho || client.vagaDescricao || "")}</textarea></label>
+          <label class="wide">Pre-requisitos<textarea id="coJobRequirements" rows="3" placeholder="Ex.: Maior de 18 anos, experiencia">${escapeHtml(client.vagaPreRequisito || client.vagaRequisitos || "")}</textarea></label>
+          <label class="wide">Como se candidatar<textarea id="coJobApply" rows="2" placeholder="Ex.: Enviar curriculo pelo WhatsApp">${escapeHtml(client.vagaComoCandidatar || "")}</textarea></label>
+        </section>
       ` : ""}
       ${canEditCardapio ? `
         <section class="wide upload-panel client-feature-card feature-cardapio">
@@ -4417,7 +4465,20 @@ function renderClientOnlyEditor() {
         facebook: $("coFacebook").value.trim(),
         tiktok: $("coTiktok").value.trim(),
         site: $("coSite").value.trim(),
-        infoAdicional: $("coInfo").value.trim()
+        infoAdicional: $("coInfo").value.trim(),
+        vagaAtiva: Boolean($("coJobActive")?.checked),
+        vagaTitulo: $("coJobTitle")?.value.trim() || "",
+        vagaCargo: $("coJobTitle")?.value.trim() || "",
+        infoVagaTrabalho: $("coJobDescription")?.value.trim() || "",
+        vagaDescricao: $("coJobDescription")?.value.trim() || "",
+        vagaPreRequisito: $("coJobRequirements")?.value.trim() || "",
+        vagaRequisitos: $("coJobRequirements")?.value.trim() || "",
+        vagaSalario: $("coJobSalary")?.value.trim() || "",
+        vagaJornada: $("coJobSchedule")?.value.trim() || "",
+        vagaLocal: $("coJobPlace")?.value.trim() || "",
+        vagaContato: $("coJobContact")?.value.trim() || "",
+        vagaComoCandidatar: $("coJobApply")?.value.trim() || "",
+        vagaValidade: $("coJobValidUntil")?.value || ""
       });
     }
     if (canEditImages) {

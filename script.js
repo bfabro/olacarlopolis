@@ -2280,6 +2280,47 @@ document.addEventListener("DOMContentLoaded", function () {
     return Number.isNaN(livre) ? Number.MAX_SAFE_INTEGER : livre;
   }
 
+  function vagaTrabalhoVisivel(establishment = {}) {
+    const possuiConteudo = Boolean(
+      establishment.infoVagaTrabalho ||
+      establishment.vagaTitulo ||
+      establishment.vagaCargo ||
+      establishment.vagaDescricao ||
+      establishment.vagaPreRequisito
+    );
+    return possuiConteudo && establishment.vagaAtiva !== false;
+  }
+
+  function montarHtmlVagaTrabalho(establishment = {}) {
+    const titulo = establishment.vagaTitulo || establishment.vagaCargo || "Vaga de Trabalho";
+    const descricao = establishment.infoVagaTrabalho || establishment.vagaDescricao || "";
+    const requisitos = establishment.vagaPreRequisito || establishment.vagaRequisitos || "";
+    const salario = establishment.vagaSalario || "";
+    const jornada = establishment.vagaJornada || "";
+    const local = establishment.vagaLocal || establishment.address || "";
+    const contato = establishment.vagaContato || establishment.whatsapp || establishment.contact || "";
+    const candidatura = establishment.vagaComoCandidatar || "";
+    const validade = establishment.vagaValidade ? formatarDataBR(establishment.vagaValidade) : "";
+
+    return `
+    <div class="card-plantao detalhe-esquerda card-vaga-trabalho">
+      <div class="conteudo-plantao">
+        <div class="titulo-plantao">
+          <i class="fas fa-briefcase"></i> ${titulo}
+        </div>
+        ${descricao ? `<p class="vaga-descricao">${descricao}</p>` : ""}
+        ${requisitos ? `<p><strong><i class="fas fa-list-check"></i> Pré-requisito:</strong> ${requisitos}</p>` : ""}
+        ${salario ? `<p><strong><i class="fa-solid fa-money-bill-wave"></i> Salário:</strong> ${salario}</p>` : ""}
+        ${jornada ? `<p><strong><i class="fa-solid fa-clock"></i> Jornada:</strong> ${jornada}</p>` : ""}
+        ${local ? `<p><strong><i class="fa-solid fa-location-dot"></i> Local:</strong> ${local}</p>` : ""}
+        ${validade ? `<p><strong><i class="fa-solid fa-calendar-days"></i> Validade:</strong> ${validade}</p>` : ""}
+        ${contato ? `<p><strong><i class="fa-brands fa-whatsapp"></i> Contato:</strong> ${contato}</p>` : ""}
+        ${candidatura ? `<p><strong><i class="fa-solid fa-paper-plane"></i> Como se candidatar:</strong> ${candidatura}</p>` : ""}
+      </div>
+    </div>
+  `;
+  }
+
 
 
 
@@ -17322,6 +17363,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       }
     }
     if (Array.isArray(cliente.promocoes)) est.promocoes = cliente.promocoes;
+    ["vagaAtiva", "vagaTitulo", "vagaCargo", "infoVagaTrabalho", "vagaDescricao", "vagaPreRequisito", "vagaRequisitos", "vagaSalario", "vagaJornada", "vagaLocal", "vagaContato", "vagaComoCandidatar", "vagaValidade"].forEach((campo) => {
+      if (campoExiste(cliente, campo)) est[campo] = cliente[campo] || (campo === "vagaAtiva" ? false : "");
+    });
     if (campoExiste(cliente, "infoAdicional")) est.infoAdicional = cliente.infoAdicional || "";
   }
 
@@ -17353,6 +17397,19 @@ plotarPinsImoveis(stateImoveis.filtered);
       cardapioLink: cardapioAtivo ? (cliente.cardapioLink || "") : "",
       menuImages: cardapioAtivo ? (cliente.menuImages || []) : [],
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : [],
+      vagaAtiva: cliente.vagaAtiva !== false && Boolean(cliente.infoVagaTrabalho || cliente.vagaTitulo || cliente.vagaCargo || cliente.vagaDescricao),
+      vagaTitulo: cliente.vagaTitulo || cliente.vagaCargo || "",
+      vagaCargo: cliente.vagaCargo || cliente.vagaTitulo || "",
+      infoVagaTrabalho: cliente.infoVagaTrabalho || cliente.vagaDescricao || "",
+      vagaDescricao: cliente.vagaDescricao || cliente.infoVagaTrabalho || "",
+      vagaPreRequisito: cliente.vagaPreRequisito || cliente.vagaRequisitos || "",
+      vagaRequisitos: cliente.vagaRequisitos || cliente.vagaPreRequisito || "",
+      vagaSalario: cliente.vagaSalario || "",
+      vagaJornada: cliente.vagaJornada || "",
+      vagaLocal: cliente.vagaLocal || "",
+      vagaContato: cliente.vagaContato || "",
+      vagaComoCandidatar: cliente.vagaComoCandidatar || "",
+      vagaValidade: cliente.vagaValidade || "",
       infoAdicional: cliente.infoAdicional || "",
       novidadesImages: imagensAdmin.map((item) => item.url).slice(0, 10),
       novidadesDescriptions: imagensAdmin.map((item) => item.texto || "").slice(0, 10),
@@ -17391,6 +17448,19 @@ plotarPinsImoveis(stateImoveis.filtered);
         ? Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
         : Boolean(cliente.cardapioLink || (Array.isArray(cliente.menuImages) && cliente.menuImages.length) || base.cardapioLink || (Array.isArray(base.menuImages) && base.menuImages.length)),
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : (base.promocoes || base.promotions || []),
+      vagaAtiva: cliente.vagaAtiva !== false && Boolean(cliente.infoVagaTrabalho || cliente.vagaTitulo || cliente.vagaCargo || cliente.vagaDescricao || base.infoVagaTrabalho),
+      vagaTitulo: cliente.vagaTitulo || cliente.vagaCargo || base.vagaTitulo || base.vagaCargo || "",
+      vagaCargo: cliente.vagaCargo || cliente.vagaTitulo || base.vagaCargo || base.vagaTitulo || "",
+      infoVagaTrabalho: cliente.infoVagaTrabalho || cliente.vagaDescricao || base.infoVagaTrabalho || "",
+      vagaDescricao: cliente.vagaDescricao || cliente.infoVagaTrabalho || base.vagaDescricao || base.infoVagaTrabalho || "",
+      vagaPreRequisito: cliente.vagaPreRequisito || cliente.vagaRequisitos || base.vagaPreRequisito || "",
+      vagaRequisitos: cliente.vagaRequisitos || cliente.vagaPreRequisito || base.vagaRequisitos || base.vagaPreRequisito || "",
+      vagaSalario: cliente.vagaSalario || base.vagaSalario || "",
+      vagaJornada: cliente.vagaJornada || base.vagaJornada || "",
+      vagaLocal: cliente.vagaLocal || base.vagaLocal || "",
+      vagaContato: cliente.vagaContato || base.vagaContato || "",
+      vagaComoCandidatar: cliente.vagaComoCandidatar || base.vagaComoCandidatar || "",
+      vagaValidade: cliente.vagaValidade || base.vagaValidade || "",
       imagens: Array.isArray(cliente.imagens) && cliente.imagens.length
         ? cliente.imagens
         : (Array.isArray(base.novidadesImages)
@@ -17508,6 +17578,30 @@ plotarPinsImoveis(stateImoveis.filtered);
     const slug = normalizeName(titulo);
     const grupo = normalizeName(meta.menuGroup || meta.menuPrincipal || meta.bloco || meta.tipoMenu || "");
     return categoriasSetorPublicoAdmin.has(slug) || grupo === "setorpublico" || grupo === "publico";
+  }
+
+  function aplicarVagasTrabalhoClientesAdmin(clientesConsolidados = []) {
+    const categoria = categories.find((cat) => normalizeName(cat.title || "") === "vagasdetrabalho");
+    if (!categoria) return;
+
+    const porIdentidade = new Map();
+    (categoria.establishments || []).forEach((vaga) => {
+      const id = eventoPublicoIdentidade(vaga);
+      if (id) porIdentidade.set(id, vaga);
+    });
+
+    clientesConsolidados.forEach(({ clienteId, cliente }) => {
+      if (!clienteAdminPodeAparecer(cliente)) return;
+      const vaga = montarEstabelecimentoDoClienteAdmin(cliente, clienteId);
+      if (!vagaTrabalhoVisivel(vaga)) return;
+      const id = eventoPublicoIdentidade(vaga);
+      if (!id) return;
+      vaga.origemVagaCliente = true;
+      porIdentidade.set(id, vaga);
+      statusEstabelecimentos[id] = "s";
+    });
+
+    categoria.establishments = Array.from(porIdentidade.values()).filter(vagaTrabalhoVisivel);
   }
 
   function categoriaAdminPreservaEstabelecimentosFixos(metaOuTitulo) {
@@ -17894,6 +17988,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             categoria.establishments.push(montarEstabelecimentoDoClienteAdmin(cliente, clienteId));
             definirStatusClienteAdmin(cliente, clienteId);
           });
+          aplicarVagasTrabalhoClientesAdmin(clientesConsolidados);
           aplicarEventosFirebasePublicos(eventosAdmin);
           aplicarNotasFalecimentoAdmin(notasFalecimentoAdmin);
 
@@ -17943,6 +18038,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             definirStatusClienteAdmin(cliente, clienteId);
           }
         });
+        aplicarVagasTrabalhoClientesAdmin(clientesConsolidados);
         aplicarEventosFirebasePublicos(eventosAdmin);
         aplicarNotasFalecimentoAdmin(notasFalecimentoAdmin);
 
@@ -18300,20 +18396,7 @@ ${!establishment.descricaoFalecido ? `
   
 
 
-${establishment.infoVagaTrabalho
-          ? `
-    <div class="card-plantao detalhe-esquerda">
-      <div class="conteudo-plantao">
-        <div class="titulo-plantao">
-          <i class="fas fa-briefcase"></i> Vaga de Trabalho
-        </div>
-        <p>${establishment.infoVagaTrabalho}</p>
-        ${establishment.vagaPreRequisito ? `<p><strong><i class="fas fa-list-check"></i> Pré-requisito:</strong> ${establishment.vagaPreRequisito}</p>` : ""}
-      </div>
-    </div>
-  `
-          : ""
-        }
+${vagaTrabalhoVisivel(establishment) ? montarHtmlVagaTrabalho(establishment) : ""}
       
         ${establishment.plantaoHorario
           ? `

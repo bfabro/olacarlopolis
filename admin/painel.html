@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=181">
+  <link rel="stylesheet" href="painel.css?v=182">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -214,6 +214,26 @@
                 </div>
                 <label class="check-row"><input id="clientFeaturedWeek" type="checkbox"> Manter este cliente em destaque na tela inicial</label>
                 <label>Valor do destaque<input id="clientFeaturedValue" placeholder="R$"></label>
+              </section>
+              <section class="wide upload-panel client-jobs-panel">
+                <div class="section-head compact">
+                  <div>
+                    <h3>Vagas de trabalho</h3>
+                    <p>Cadastre uma oportunidade para aparecer no site publico junto aos dados do cliente.</p>
+                  </div>
+                </div>
+                <label class="check-row"><input id="clientJobActive" type="checkbox"> Exibir vaga no site publico</label>
+                <div class="section-fields">
+                  <label>Cargo / titulo da vaga<input id="clientJobTitle" placeholder="Ex.: Atendente"></label>
+                  <label>Salario / beneficio<input id="clientJobSalary" placeholder="Ex.: A combinar, R$ 1.800,00"></label>
+                  <label>Jornada / horario<input id="clientJobSchedule" placeholder="Ex.: Segunda a sabado"></label>
+                  <label>Validade da vaga<input id="clientJobValidUntil" type="date"></label>
+                  <label>Local da vaga<input id="clientJobPlace" placeholder="Opcional, usa o endereco do cliente se vazio"></label>
+                  <label>Contato da vaga<input id="clientJobContact" placeholder="WhatsApp, telefone ou e-mail"></label>
+                </div>
+                <label class="wide">Descricao da vaga<textarea id="clientJobDescription" rows="3" placeholder="Conte o que a pessoa vai fazer"></textarea></label>
+                <label class="wide">Pre-requisitos<textarea id="clientJobRequirements" rows="3" placeholder="Ex.: Maior de 18 anos, experiencia, disponibilidade"></textarea></label>
+                <label class="wide">Como se candidatar<textarea id="clientJobApply" rows="2" placeholder="Ex.: Enviar curriculo pelo WhatsApp"></textarea></label>
               </section>
               <section class="wide upload-panel">
                 <div class="section-head compact">
@@ -847,6 +867,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=181"></script>
+  <script type="module" src="painel.js?v=182"></script>
 </body>
 </html>

@@ -1847,3 +1847,17 @@ button[type="submit"]:hover,
   font-size: 13px;
   font-weight: 900;
 }
+
+/* ===== Area de vagas de trabalho v182 ===== */
+.client-jobs-panel {
+  border-color: #bfdbfe;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.client-jobs-panel .section-head h3::before {
+  content: "\f0b1";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: var(--brand);
+  margin-right: 8px;
+}
