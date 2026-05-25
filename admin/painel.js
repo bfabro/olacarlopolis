@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 176,
-  label: "v176",
+  numero: 177,
+  label: "v177",
   data: "2026-05-24",
-  nota: "Aproveita melhor a largura do card de promocoes e reduz fontes no mobile."
+  nota: "Zera padding dos elementos do card de promocoes para ganhar largura no mobile."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
