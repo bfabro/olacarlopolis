@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 180,
-  label: "v180",
+  numero: 181,
+  label: "v181",
   data: "2026-05-25",
-  nota: "Oculta eventos realizados no site publico e sinaliza no admin."
+  nota: "Adiciona flag de cardapio no painel do cliente e respeita no site publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1573,7 +1573,7 @@ function fillClientForm(client) {
   renderProfilePreview("clientImage", "clientProfilePreview");
   state.clientImages = normalizeImageItems(client.imagens);
   renderScheduleEditor("clientScheduleEditor", client.horarios || {});
-  if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = Boolean(client.cardapioAtivo || client.menuAtivo || client.exibirCardapio);
+  if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = Boolean(client.cardapioAtivo || client.menuAtivo || client.exibirCardapio || client.cardapioLink || (Array.isArray(client.menuImages) && client.menuImages.length));
   $("clientMenuLink").value = client.cardapioLink || "";
   state.clientMenuImages = normalizeUrlList(client.menuImages);
   state.clientPromocoes = normalizePromocoes(client.promocoes);
@@ -4105,6 +4105,7 @@ function renderClientOnlyEditor() {
           </div>
           <div class="section-fields">
             <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}" placeholder="Link externo ou PDF enviado"></label>
+            <label class="check-row"><input id="coMenuEnabled" type="checkbox" ${client.cardapioAtivo || client.menuAtivo || client.exibirCardapio || client.cardapioLink || menuImages.length ? "checked" : ""}> Exibir botao Cardapio no site publico</label>
           </div>
           <input id="coMenuUpload" type="file" accept="image/*,application/pdf" multiple>
           <div id="coMenuPreview" class="image-grid">
@@ -4234,6 +4235,7 @@ function renderClientOnlyEditor() {
     await update(ref(db, `clientes/${client.id}`), {
       menuImages,
       cardapioLink: $("coMenuLink").value.trim(),
+      cardapioAtivo: true,
       origem: "painel",
       editadoNoPainel: true,
       updatedAt: serverTimestamp(),
@@ -4426,6 +4428,7 @@ function renderClientOnlyEditor() {
     }
     if (canEditCardapio) {
       Object.assign(payload, {
+        cardapioAtivo: Boolean($("coMenuEnabled")?.checked),
         cardapioLink: $("coMenuLink")?.value.trim() || "",
         menuImages
       });

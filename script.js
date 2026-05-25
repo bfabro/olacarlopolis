@@ -8386,9 +8386,26 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
 
+  function cardapioTemConteudo(est) {
+    return Boolean(est?.cardapioLink || (Array.isArray(est?.menuImages) && est.menuImages.length));
+  }
+
+  function cardapioControleExiste(est) {
+    return Boolean(est && (
+      Object.prototype.hasOwnProperty.call(est, "cardapioAtivo") ||
+      Object.prototype.hasOwnProperty.call(est, "menuAtivo") ||
+      Object.prototype.hasOwnProperty.call(est, "exibirCardapio")
+    ));
+  }
+
+  function cardapioFlagAtiva(est) {
+    if (!cardapioControleExiste(est)) return true;
+    return Boolean(est.cardapioAtivo || est.menuAtivo || est.exibirCardapio);
+  }
+
   function cardapioVisivel(est) {
     if (!est) return false;
-    return Boolean(est.cardapioLink || (Array.isArray(est.menuImages) && est.menuImages.length));
+    return cardapioFlagAtiva(est) && cardapioTemConteudo(est);
   }
 
   function mostrarCardapio(nomeNormalizado) {
@@ -17296,10 +17313,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       est.cardapioAtivo = Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio);
     }
     if (temControleCardapio && !est.cardapioAtivo) {
-      est.cardapioLink = cliente.cardapioLink || est.__adminOriginalCardapioLink || "";
-      est.menuImages = Array.isArray(cliente.menuImages) && cliente.menuImages.length
-        ? cliente.menuImages
-        : (est.__adminOriginalMenuImages || []);
+      est.cardapioLink = "";
+      est.menuImages = [];
     } else {
       if (campoExiste(cliente, "cardapioLink")) est.cardapioLink = cliente.cardapioLink || est.__adminOriginalCardapioLink || "";
       if (Array.isArray(cliente.menuImages)) {
@@ -17315,7 +17330,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       ? cliente.imagens.map((item) => typeof item === "string" ? { url: item, texto: "" } : item).filter((item) => item && item.url)
       : [];
 
-    const cardapioAtivo = Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio);
+    const temControleCardapio = campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio");
+    const cardapioAtivo = temControleCardapio
+      ? Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
+      : Boolean(cliente.cardapioLink || (Array.isArray(cliente.menuImages) && cliente.menuImages.length));
     return {
       nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
       image: cliente.imagem || (imagensAdmin[0]?.url || ""),
@@ -17369,6 +17387,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       imagem: cliente.imagem || base.image || "",
       menuImages: Array.isArray(cliente.menuImages) && cliente.menuImages.length ? cliente.menuImages : (base.menuImages || []),
       cardapioLink: cliente.cardapioLink || base.cardapioLink || "",
+      cardapioAtivo: campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio")
+        ? Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
+        : Boolean(cliente.cardapioLink || (Array.isArray(cliente.menuImages) && cliente.menuImages.length) || base.cardapioLink || (Array.isArray(base.menuImages) && base.menuImages.length)),
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : (base.promocoes || base.promotions || []),
       imagens: Array.isArray(cliente.imagens) && cliente.imagens.length
         ? cliente.imagens
