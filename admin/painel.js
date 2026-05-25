@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 174,
-  label: "v174",
+  numero: 175,
+  label: "v175",
   data: "2026-05-24",
-  nota: "Atualiza o card publico de promocoes e adiciona mensagem de Instagram no admin."
+  nota: "Compacta o layout mobile das promocoes e melhora a foto de perfil do cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

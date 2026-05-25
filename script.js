@@ -4768,7 +4768,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
             precoAntigo: p.precoAntigo || null, // opcional
             unidade: p.unidade || "",           // ex: "A UNIDADE", "NO FARDO"
             imagem: p.imagem || p.image || p.imagemUrl || p.imageUrl || p.foto || p.fotoUrl || p.banner || "",  // url da promocao
-            logo: p.logo || est.logo || est.image || "",
+            logo: p.logo || p.logoUrl || p.perfil || p.perfilUrl || est.logo || est.logoUrl || est.profileImage || est.perfil || est.imagemPerfil || est.image || "",
             validadeInicio: p.validadeInicio || p.validade || null,
             validadeFim: p.validadeFim || null,
             diasSemana: normalizarDiasSemanaPromocao(p.diasSemana || p.dias || p.recorrenciaDias || p.diaSemana),
