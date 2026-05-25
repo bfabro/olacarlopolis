@@ -16354,7 +16354,7 @@ tr[data-inativo="true"] {
   }
   .promo-city-screen:not(.promo-compact-mode) .promo-nome{margin:7px 7px 0!important;}
   .promo-city-screen:not(.promo-compact-mode) .promo-obs{margin:0 7px!important;}
-  .promo-city-screen:not(.promo-compact-mode) .promo-store-strip{margin:5px 7px 0!important;}
+  .promo-city-screen:not(.promo-compact-mode) .promo-store-strip{margin:5px 0px 0!important;}
   .promo-city-screen:not(.promo-compact-mode) .promo-rodape{margin:7px 7px 9px!important;}
 }
 /* ===== Promocoes preco/economia e desktop v178 ===== */
@@ -16469,7 +16469,7 @@ tr[data-inativo="true"] {
     margin:2px 18px 0!important;
   }
   .promo-city-screen:not(.promo-compact-mode) .promo-store-strip{
-    margin:12px 18px 0!important;
+    margin:12px 0px 0!important;
     padding:10px 12px!important;
     min-height:76px!important;
     grid-template-columns:minmax(0,1fr) 52px!important;
