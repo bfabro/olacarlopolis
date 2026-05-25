@@ -16531,3 +16531,115 @@ tr[data-inativo="true"] {
     gap:4px!important;
   }
 }
+/* ===== Promocoes filtro botoes visiveis v179 ===== */
+.promo-city-screen .promo-hero-new{
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr)!important;
+  align-items:center!important;
+  overflow:visible!important;
+}
+.promo-city-screen .promo-filter-card{
+  grid-column:1 / 2!important;
+  grid-row:1!important;
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+.promo-city-screen .promo-sort-row{
+  grid-column:2 / 3!important;
+  grid-row:1!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:center!important;
+  justify-content:stretch!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:visible!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+.promo-city-screen .promo-sort-row>span,
+.promo-city-screen .promo-sort-row [data-promo-sort="desconto"]{
+  display:none!important;
+}
+.promo-city-screen .promo-sort-row button[data-promo-sort="recentes"],
+.promo-city-screen .promo-sort-row button[data-promo-sort="termina"]{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:36px!important;
+  height:36px!important;
+  margin:0!important;
+  padding:0 9px!important;
+  border:1px solid #e5e7eb!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  color:#1f2d48!important;
+  box-shadow:0 6px 14px rgba(15,23,42,.10)!important;
+  font-size:12px!important;
+  font-weight:950!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  pointer-events:auto!important;
+}
+.promo-city-screen .promo-sort-row button[data-promo-sort="recentes"].active,
+.promo-city-screen .promo-sort-row button[data-promo-sort="termina"].active{
+  border-color:#ffd2b5!important;
+  background:#fff7ed!important;
+  color:#ff6417!important;
+}
+.promo-city-screen .promo-sort-row button[data-promo-sort="recentes"] i,
+.promo-city-screen .promo-sort-row button[data-promo-sort="termina"] i{
+  display:inline-block!important;
+  font-size:11px!important;
+  margin-right:4px!important;
+}
+.promo-city-screen .promo-compact-switch,
+.promo-city-screen .promo-clear-filters{
+  grid-column:auto!important;
+}
+@media(max-width:640px){
+  .promo-city-screen .promo-hero-new{
+    grid-template-columns:auto minmax(0,1fr)!important;
+    gap:7px!important;
+    width:calc(100% - 8px)!important;
+    padding:8px 7px!important;
+  }
+  .promo-city-screen .promo-filter-card label{
+    min-height:36px!important;
+    padding:0 9px!important;
+    font-size:12px!important;
+  }
+  .promo-city-screen .promo-sort-row{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:6px!important;
+  }
+  .promo-city-screen .promo-sort-row button[data-promo-sort="recentes"],
+  .promo-city-screen .promo-sort-row button[data-promo-sort="termina"]{
+    min-height:34px!important;
+    height:34px!important;
+    padding:0 6px!important;
+    font-size:10.5px!important;
+  }
+}
+@media(max-width:360px){
+  .promo-city-screen .promo-hero-new{
+    grid-template-columns:1fr!important;
+  }
+  .promo-city-screen .promo-filter-card,
+  .promo-city-screen .promo-sort-row{
+    grid-column:1 / -1!important;
+  }
+  .promo-city-screen .promo-sort-row button[data-promo-sort="recentes"],
+  .promo-city-screen .promo-sort-row button[data-promo-sort="termina"]{
+    font-size:10px!important;
+  }
+}
