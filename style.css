@@ -16177,3 +16177,129 @@ tr[data-inativo="true"] {
   .promo-city-screen:not(.promo-compact-mode) .promo-whats-link span::after{font-size:8.5px!important;}
   .promo-city-screen:not(.promo-compact-mode) .promo-share-card span{font-size:11.5px!important;}
 }
+/* ===== Promocoes largura maxima do card e fontes v176 ===== */
+.promo-city-screen:not(.promo-compact-mode){
+  width:100%!important;
+  max-width:930px!important;
+  padding-left:2px!important;
+  padding-right:2px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-grid{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  gap:10px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-card-new,
+.promo-city-screen:not(.promo-compact-mode) .promo-grid>.promo-card{
+  width:100%!important;
+  border-radius:14px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-card-body{
+  width:100%!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-image-wrap{
+  padding:4px 4px 0!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-img-zoom,
+.promo-city-screen:not(.promo-compact-mode) .promo-produto img,
+.promo-city-screen:not(.promo-compact-mode) .promo-sem-imagem{
+  border-radius:12px 12px 0 0!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-info{
+  padding:10px 8px 0!important;
+  gap:5px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-nome{
+  /* FONTE DO TITULO DA PROMOCAO: ajuste aqui */
+  font-size:18px!important;
+  line-height:1.12!important;
+  font-weight:900!important;
+  overflow:visible!important;
+  overflow-wrap:anywhere!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-obs{
+  /* FONTE DA DESCRICAO DA PROMOCAO: ajuste aqui */
+  font-size:14px!important;
+  line-height:1.2!important;
+  overflow:visible!important;
+  overflow-wrap:anywhere!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-store-strip{
+  margin-top:3px!important;
+  min-height:58px!important;
+  padding:5px 6px!important;
+  grid-template-columns:minmax(0,1fr) 36px!important;
+  gap:5px!important;
+  border-radius:11px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-estab-link{
+  grid-template-columns:38px minmax(0,1fr)!important;
+  min-height:46px!important;
+  gap:7px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-store-logo{
+  width:38px!important;
+  height:38px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-store-copy strong{
+  font-size:14px!important;
+  line-height:1.05!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-store-copy small{
+  font-size:9px!important;
+  line-height:1.05!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-store-instagram{
+  width:34px!important;
+  min-width:34px!important;
+  max-width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  font-size:27px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-rodape{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:6px!important;
+  padding:10px 8px 12px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-rodape .icon-link{
+  min-height:48px!important;
+  padding:5px 6px!important;
+  border-radius:11px!important;
+  gap:5px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-whats-link i{
+  font-size:21px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-share-card i{
+  font-size:19px!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-whats-link span{
+  font-size:11px!important;
+  line-height:1!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-whats-link span::after{
+  font-size:8px!important;
+  line-height:1!important;
+}
+.promo-city-screen:not(.promo-compact-mode) .promo-share-card span{
+  font-size:12px!important;
+  line-height:1!important;
+}
+@media(max-width:640px){
+  .promo-city-screen:not(.promo-compact-mode){padding-left:0!important;padding-right:0!important;}
+  .promo-city-screen:not(.promo-compact-mode) .promo-grid{gap:8px!important;}
+  .promo-city-screen:not(.promo-compact-mode) .promo-card-new,
+  .promo-city-screen:not(.promo-compact-mode) .promo-grid>.promo-card{border-radius:13px!important;}
+  .promo-city-screen:not(.promo-compact-mode) .promo-image-wrap{padding:4px 4px 0!important;}
+  .promo-city-screen:not(.promo-compact-mode) .promo-info{padding:9px 8px 0!important;gap:5px!important;}
+  .promo-city-screen:not(.promo-compact-mode) .promo-rodape{padding:9px 8px 11px!important;}
+}
+@media(max-width:380px){
+  .promo-city-screen:not(.promo-compact-mode) .promo-info{padding-left:7px!important;padding-right:7px!important;}
+  .promo-city-screen:not(.promo-compact-mode) .promo-rodape{padding-left:7px!important;padding-right:7px!important;gap:5px!important;}
+  .promo-city-screen:not(.promo-compact-mode) .promo-whats-link span{font-size:10px!important;}
+  .promo-city-screen:not(.promo-compact-mode) .promo-share-card span{font-size:11px!important;}
+}
