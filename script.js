@@ -2321,6 +2321,21 @@ document.addEventListener("DOMContentLoaded", function () {
   `;
   }
 
+  function montarCardVagaTrabalhoPublico(establishment = {}) {
+    const nome = establishment.name || establishment.nome || "Empresa";
+    const imagem = establishment.image || establishment.imagem || "";
+    return `
+      <article class="vaga-public-card" id="${normalizeName(nome)}" data-id="${normalizeName(nome)}">
+        <div class="vaga-public-media">
+          ${imagem
+            ? `<img src="${imagem}" alt="${nome}" loading="lazy" decoding="async">`
+            : `<div class="vaga-public-img-empty"><i class="fa-solid fa-briefcase"></i></div>`}
+        </div>
+        ${montarHtmlVagaTrabalho(establishment)}
+      </article>
+    `;
+  }
+
 
 
 
@@ -18327,9 +18342,12 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
   // Função para carregar conteúdo
   function loadContent(title, establishments) {
-    const isEventos = normalizeName(title || "") === "eventosemcarlopolis";
+    const titleSlug = normalizeName(title || "");
+    const isEventos = titleSlug === "eventosemcarlopolis";
+    const isVagasTrabalho = titleSlug === "vagasdetrabalho";
     const paidEstablishments = establishments.filter((establishment) => {
       if (isEventos) return eventoPublicoAtivo(establishment);
+      if (isVagasTrabalho) return vagaTrabalhoVisivel(establishment);
       const key = normalizeName(establishment.name);
       return statusEstabelecimentos[key] === "s";
     }).sort((a, b) => isEventos ? dataEventoPublicoValor(a) - dataEventoPublicoValor(b) : 0);
@@ -18339,7 +18357,15 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     if (!contentArea) return;
 
     if (paidEstablishments.length === 0) {
-      contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><p>Nenhum estabelecimento se cadastrou ainda.</p>`;
+      const vazio = isVagasTrabalho ? "Nenhuma vaga de trabalho cadastrada no momento." : "Nenhum estabelecimento se cadastrou ainda.";
+      contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><p>${vazio}</p>`;
+      return;
+    }
+
+    if (isVagasTrabalho) {
+      contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><section class="vagas-public-list">
+        ${paidEstablishments.map(montarCardVagaTrabalhoPublico).join("")}
+      </section>`;
       return;
     }
 

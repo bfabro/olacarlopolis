@@ -16660,3 +16660,86 @@ tr[data-inativo="true"] {
   color: #172033;
   font-weight: 700;
 }
+/* ===== Tela publica de vagas de trabalho v187 ===== */
+.vagas-public-list {
+  display: grid;
+  gap: 18px;
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 0 10px 28px;
+}
+
+.vaga-public-card {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid #dbe4ef;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, .10);
+}
+
+.vaga-public-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 360px;
+  overflow: hidden;
+  background: #eef2f7;
+}
+
+.vaga-public-media img,
+.vaga-public-img-empty {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.vaga-public-media img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.vaga-public-img-empty {
+  display: grid;
+  place-items: center;
+  color: #1d4ed8;
+  font-size: 52px;
+}
+
+.vaga-public-card .card-vaga-trabalho {
+  margin: 0;
+  border-radius: 0;
+  border-left-width: 0;
+  box-shadow: none;
+  background: #fff;
+}
+
+.vaga-public-card .titulo-plantao {
+  font-size: clamp(20px, 4.8vw, 30px);
+  line-height: 1.1;
+}
+
+.vaga-public-card .card-plantao p {
+  font-size: clamp(15px, 3.7vw, 18px);
+  line-height: 1.35;
+}
+
+@media (max-width: 640px) {
+  .vagas-public-list {
+    gap: 14px;
+    padding: 0 6px 24px;
+  }
+
+  .vaga-public-card {
+    border-radius: 14px;
+  }
+
+  .vaga-public-media {
+    aspect-ratio: 4 / 3;
+    max-height: 260px;
+  }
+
+  .vaga-public-card .card-plantao.detalhe-esquerda {
+    padding: 14px;
+  }
+}
