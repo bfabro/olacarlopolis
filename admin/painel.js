@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 185,
-  label: "v185",
+  numero: 186,
+  label: "v186",
   data: "2026-05-25",
-  nota: "Remove menu interno e usa somente sidebar para modulos do cliente."
+  nota: "Agrupa foto de perfil e upload em Fotos e imagens."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4076,7 +4076,7 @@ function renderClientOnlyEditor() {
     { id: "client-module-dados", icon: "fa-solid fa-building", label: "Dados da empresa", show: canEditDados },
     { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas },
     { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardapio", show: canEditCardapio },
-    { id: "client-module-foto", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
+    { id: "client-module-imagens", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
     { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes }
   ].filter((item) => item.show);
   const initialClientModule = (clientModules.find((item) => item.id === "client-module-dados") || clientModules[0] || {}).id || "";
@@ -4095,7 +4095,7 @@ function renderClientOnlyEditor() {
       <div class="client-module-shell wide">
         <div class="client-module-content">
       ${canEditImages ? `
-        <section id="client-module-foto" class="wide profile-upload-panel profile-upload-top client-feature-card feature-foto client-module-panel">
+        <section id="client-module-foto" data-client-module-group="client-module-imagens" class="wide profile-upload-panel profile-upload-top client-feature-card feature-foto client-module-panel">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Imagem principal</span>
@@ -4191,7 +4191,7 @@ function renderClientOnlyEditor() {
         </section>
       ` : ""}
       ${canEditImages ? `
-        <section id="client-module-galeria" class="wide upload-panel client-feature-card feature-galeria client-module-panel">
+        <section id="client-module-galeria" data-client-module-group="client-module-imagens" class="wide upload-panel client-feature-card feature-galeria client-module-panel">
           <div class="section-head compact feature-card-head">
             <div>
               <span class="feature-kicker">Vitrine visual</span>
@@ -4270,10 +4270,10 @@ function renderClientOnlyEditor() {
   if (canEditDados) renderScheduleEditor("coScheduleEditor", client.horarios || {});
   const moduleNavButtons = [...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")];
   const activateClientModule = (targetId) => {
-    const target = mount.querySelector(`#${targetId}`);
+    const target = mount.querySelector(`#${targetId}`) || mount.querySelector(`[data-client-module-group="${targetId}"]`);
     if (!target) return;
     mount.querySelectorAll(".client-module-panel").forEach((panel) => {
-      panel.classList.toggle("active", panel.id === targetId);
+      panel.classList.toggle("active", panel.id === targetId || panel.dataset.clientModuleGroup === targetId);
     });
     moduleNavButtons.forEach((item) => item.classList.toggle("active", item.dataset.clientModuleTarget === targetId));
   };
