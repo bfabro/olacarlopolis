@@ -4,7 +4,8 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getDatabase,
@@ -35,10 +36,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 197,
-  label: "v197",
+  numero: 198,
+  label: "v198",
   data: "2026-05-26",
-  nota: "Adiciona multiplas vagas de trabalho e filtro publico de vagas."
+  nota: "Adiciona recuperacao segura de senha no login administrativo."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5561,6 +5562,26 @@ function bindEvents() {
       $("loginMessage").textContent = "Falha ao entrar. Confira e-mail e senha.";
     } finally {
       setBusy($("loginButton"), false);
+    }
+  });
+
+  $("resetPasswordButton")?.addEventListener("click", async () => {
+    const email = $("loginEmail")?.value.trim().toLowerCase() || "";
+    $("loginMessage").textContent = "";
+    if (!email) {
+      $("loginMessage").textContent = "Informe seu e-mail para receber o link de redefinicao.";
+      $("loginEmail")?.focus();
+      return;
+    }
+    setBusy($("resetPasswordButton"), true, "Enviando...");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      $("loginMessage").textContent = "Enviamos um link de redefinicao para este e-mail. Abra o e-mail e crie sua nova senha.";
+    } catch (error) {
+      console.warn("Falha ao enviar redefinicao de senha.", error);
+      $("loginMessage").textContent = "Nao foi possivel enviar o link agora. Confira o e-mail informado ou tente novamente.";
+    } finally {
+      setBusy($("resetPasswordButton"), false);
     }
   });
 
