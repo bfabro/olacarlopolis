@@ -6105,9 +6105,21 @@ ${(cardapioVisivel(est) || est.contact) ? `
 
 
 
-    <div class="imoveis-wrap">
+    <div class="imoveis-wrap ${window.__imoveisModoCards ? "im-cards-mode" : ""}">
+  <section class="imoveis-filter-toolbar">
+    <button id="imToggleFiltros" class="im-filter-toggle" type="button" aria-expanded="false">
+      <i class="fa-solid fa-sliders"></i>
+      <span>Filtro</span>
+      <i class="fa-solid fa-chevron-down"></i>
+    </button>
+    <label class="im-cards-switch" title="Mostrar imoveis em cards menores">
+      <input type="checkbox" id="imModoCards" ${window.__imoveisModoCards ? "checked" : ""}>
+      <span class="promo-compact-track"><span></span></span>
+      <strong>Cards</strong>
+    </label>
+  </section>
   <!-- Painel de filtros -->
-  <aside id="filtrosImoveis" class="im-filtros painel-filtros">
+  <aside id="filtrosImoveis" class="im-filtros painel-filtros im-filter-collapsed">
 
     <div class="topbar">
       <h4 class="filtro-titulo">Filtrar</h4>
@@ -6223,6 +6235,23 @@ ${(cardapioVisivel(est) || est.contact) ? `
 
 
     // === Controle visual dos botões de comodidades ===
+    const imoveisWrap = document.querySelector(".imoveis-wrap");
+    const toggleFiltrosImoveis = document.getElementById("imToggleFiltros");
+    const filtrosImoveisBox = document.getElementById("filtrosImoveis");
+    const aplicarModoCardsImoveis = () => {
+      const ativo = Boolean(document.getElementById("imModoCards")?.checked);
+      window.__imoveisModoCards = ativo;
+      imoveisWrap?.classList.toggle("im-cards-mode", ativo);
+    };
+    toggleFiltrosImoveis?.addEventListener("click", () => {
+      const aberto = filtrosImoveisBox?.classList.toggle("im-filter-collapsed") === false;
+      toggleFiltrosImoveis.setAttribute("aria-expanded", aberto ? "true" : "false");
+      const icon = toggleFiltrosImoveis.querySelector(".fa-chevron-down, .fa-chevron-up");
+      icon?.classList.toggle("fa-chevron-up", aberto);
+      icon?.classList.toggle("fa-chevron-down", !aberto);
+    });
+    document.getElementById("imModoCards")?.addEventListener("change", aplicarModoCardsImoveis);
+    aplicarModoCardsImoveis();
     document.querySelectorAll('.amenity-chip').forEach(btn => {
       btn.addEventListener('click', () => {
         // Alterna a classe de seleção

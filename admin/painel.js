@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 200,
-  label: "v200",
+  numero: 201,
+  label: "v201",
   data: "2026-05-26",
-  nota: "Adiciona mascara de valor em imoveis e automoveis."
+  nota: "Ajusta filtro publico de imoveis recolhido e modo cards."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
