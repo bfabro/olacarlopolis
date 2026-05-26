@@ -17089,7 +17089,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       ? metaOuTitulo
       : (meta.nome || meta.title || meta.id || meta.categoria || "");
     const slug = normalizeName(titulo);
-    return categoriaAdminEhSetorPublico(metaOuTitulo) || slug === "eventosemcarlopolis";
+    return categoriaAdminEhSetorPublico(metaOuTitulo) || slug === "eventosemcarlopolis" || slug === "funeraria";
   }
 
   function aplicarEventosFirebasePublicos(eventosAdmin = {}) {
@@ -17801,6 +17801,13 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     return escapePromoHtml(raw);
   }
 
+  function slugFunerariaNotaPublica(nome) {
+    const slug = normalizeName(nome || "");
+    if (slug === "funerariacristorei") return "cristorei";
+    if (slug === "funerariagrupocastilho") return "grupocastilho";
+    return slug.replace(/^funeraria/, "") || slug;
+  }
+
   function montarCardNotaFalecimentoPublica(establishment) {
     const id = normalizeName(establishment.nomeFalecido || establishment.falecidoNome || establishment.name || "nota-falecimento");
     const nome = escapePromoHtml(establishment.nomeFalecido || establishment.falecidoNome || establishment.name || "Nota de Falecimento");
@@ -17810,7 +17817,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     const descricao = establishment.mensagem || establishment.descricaoFalecido || establishment.descricao || "";
     const imagem = establishment.image || "";
     const idadeLimpa = String(idade || "").replace(/\s*anos?$/i, "");
-    const funerariaSlug = normalizeName(funeraria);
+    const funerariaSlug = slugFunerariaNotaPublica(funeraria);
     const funerariaHtml = funeraria
       ? `<a class="nota-falecimento-funeraria" href="#${escapePromoHtml(funerariaSlug)}">${escapePromoHtml(funeraria)}</a>`
       : "";
