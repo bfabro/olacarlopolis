@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=193">
+  <link rel="stylesheet" href="painel.css?v=194">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -564,7 +564,7 @@
                   <option value="inativo">Inativo</option>
                 </select>
               </label>
-              <label>Imagem<input id="infoDeathNoticeImage" placeholder="URL ou images/..."></label>
+              <input id="infoDeathNoticeImage" type="hidden">
               <label>Upload da imagem<input id="infoDeathNoticeImageUpload" type="file" accept="image/*"></label>
               <label class="wide">Mensagem livre<textarea id="infoDeathNoticeDescription" rows="8" required placeholder="Mensagem informada pela funeraria ou admin"></textarea></label>
               <div class="form-actions wide">
@@ -876,6 +876,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=193"></script>
+  <script type="module" src="painel.js?v=194"></script>
 </body>
 </html>

@@ -17357,6 +17357,12 @@ tr[data-inativo="true"] {
   text-align: right;
   text-transform: uppercase;
   letter-spacing: .03em;
+  text-decoration: none;
+}
+
+.nota-falecimento-funeraria:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
 }
 
 .nota-falecimento-texto {
@@ -17407,5 +17413,138 @@ tr[data-inativo="true"] {
     padding: 14px 14px !important;
     font-size: 15px !important;
     min-height: 74px;
+  }
+}
+
+/* ===== Nota de falecimento: imagem expansivel e modo cards v194 ===== */
+.nota-falecimento-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 12px;
+}
+
+.nota-falecimento-cards-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border: 1px solid #d8dee8;
+  border-radius: 999px;
+  background: #fff;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 6px 12px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .08);
+  cursor: pointer;
+}
+
+.nota-falecimento-cards-switch input {
+  accent-color: #1d4ed8;
+}
+
+.nota-falecimento-media img {
+  cursor: zoom-in;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-card {
+  border-radius: 14px !important;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-main {
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  min-height: 132px;
+  padding: 10px;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-main::after,
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-line {
+  display: none;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-media {
+  border-radius: 12px !important;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-body {
+  padding: 2px 0 !important;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-body h3 {
+  font-size: 18px !important;
+  line-height: 1.08 !important;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-idade {
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-bottom {
+  justify-items: start;
+  gap: 4px;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-date,
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-funeraria {
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.nota-falecimento-page.nota-cards-mode .nota-falecimento-texto {
+  min-height: 0;
+  padding: 10px 11px !important;
+  font-size: 13px !important;
+  line-height: 1.32 !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .nota-falecimento-toolbar {
+    padding: 0 4px;
+  }
+
+  .nota-falecimento-page.nota-cards-mode .nota-falecimento-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .nota-falecimento-page.nota-cards-mode .nota-falecimento-main {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    gap: 7px;
+    padding: 7px;
+  }
+
+  .nota-falecimento-page.nota-cards-mode .nota-falecimento-media {
+    aspect-ratio: 1 / 1;
+  }
+
+  .nota-falecimento-page.nota-cards-mode .nota-falecimento-body h3 {
+    font-size: 15px !important;
+  }
+
+  .nota-falecimento-page.nota-cards-mode .nota-falecimento-idade {
+    font-size: 12px;
+  }
+
+  .nota-falecimento-page.nota-cards-mode .nota-falecimento-date,
+  .nota-falecimento-page.nota-cards-mode .nota-falecimento-funeraria {
+    font-size: 10px;
+  }
+
+  .nota-falecimento-page.nota-cards-mode .nota-falecimento-texto {
+    font-size: 11px !important;
+    -webkit-line-clamp: 3;
   }
 }
