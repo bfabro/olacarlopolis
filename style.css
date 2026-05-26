@@ -6776,7 +6776,8 @@ html {
 
 .imoveis-wrap.im-cards-mode .descricaoImovel,
 .imoveis-wrap.im-cards-mode .specs-chips,
-.imoveis-wrap.im-cards-mode .price-line {
+.imoveis-wrap.im-cards-mode .price-line,
+.imoveis-wrap.im-cards-mode .corretor-banner {
   display: none !important;
 }
 
@@ -6813,8 +6814,7 @@ html {
     height: 130px !important;
   }
 
-  .imoveis-wrap.im-cards-mode .card-addr2,
-  .imoveis-wrap.im-cards-mode .corretor-banner {
+  .imoveis-wrap.im-cards-mode .card-addr2 {
     font-size: 10px !important;
   }
 }
