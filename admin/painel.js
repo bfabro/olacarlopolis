@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 196,
-  label: "v196",
+  numero: 197,
+  label: "v197",
   data: "2026-05-26",
-  nota: "Preserva funerarias fixas e ajusta link das notas de falecimento."
+  nota: "Adiciona multiplas vagas de trabalho e filtro publico de vagas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -398,6 +398,42 @@ function normalizePromocoes(items) {
       ativo: item?.ativo === false ? false : true
     }))
     .filter((item) => item.titulo)
+    .slice(0, 30);
+}
+
+function normalizeVagasTrabalho(items, legacy = null) {
+  const source = Array.isArray(items) ? items : [];
+  const legacyItem = !source.length && legacy && (legacy.infoVagaTrabalho || legacy.vagaTitulo || legacy.vagaCargo || legacy.vagaDescricao || legacy.vagaPreRequisito)
+    ? [{
+      id: "vaga-principal",
+      ativo: legacy.vagaAtiva !== false,
+      titulo: legacy.vagaTitulo || legacy.vagaCargo || "",
+      descricao: legacy.infoVagaTrabalho || legacy.vagaDescricao || "",
+      requisitos: legacy.vagaPreRequisito || legacy.vagaRequisitos || "",
+      salario: legacy.vagaSalario || "",
+      jornada: legacy.vagaJornada || "",
+      local: legacy.vagaLocal || "",
+      contato: legacy.vagaContato || "",
+      comoCandidatar: legacy.vagaComoCandidatar || "",
+      validade: legacy.vagaValidade || ""
+    }]
+    : [];
+  return [...source, ...legacyItem]
+    .map((item, index) => ({
+      id: item?.id || `vaga-${Date.now()}-${index}`,
+      ativo: item?.ativo === false ? false : true,
+      titulo: String(item?.titulo || item?.vagaTitulo || item?.vagaCargo || "").trim(),
+      descricao: String(item?.descricao || item?.infoVagaTrabalho || item?.vagaDescricao || "").trim(),
+      requisitos: String(item?.requisitos || item?.vagaPreRequisito || item?.vagaRequisitos || "").trim(),
+      salario: String(item?.salario || item?.vagaSalario || "").trim(),
+      jornada: String(item?.jornada || item?.vagaJornada || "").trim(),
+      local: String(item?.local || item?.vagaLocal || "").trim(),
+      contato: String(item?.contato || item?.vagaContato || "").trim(),
+      comoCandidatar: String(item?.comoCandidatar || item?.vagaComoCandidatar || "").trim(),
+      validade: String(item?.validade || item?.vagaValidade || "").trim()
+    }))
+    .filter((item, index, arr) => item.titulo || item.descricao || item.requisitos)
+    .filter((item, index, arr) => arr.findIndex((other) => other.id === item.id) === index)
     .slice(0, 30);
 }
 
@@ -1789,6 +1825,70 @@ function readPromoFields(prefix, scope = document, fallbackId = "") {
     imagem: get("ImageUrl"),
     ativo: true
   };
+}
+
+function clearJobFields(prefix, scope = document) {
+  ["Title", "Salary", "Schedule", "ValidUntil", "Place", "Contact", "Description", "Requirements", "Apply"].forEach((suffix) => {
+    const field = scope.querySelector(`#${prefix}Job${suffix}`);
+    if (field) field.value = "";
+  });
+  const active = scope.querySelector(`#${prefix}JobActive`);
+  if (active) active.checked = true;
+}
+
+function fillJobFields(prefix, vaga, scope = document) {
+  const set = (suffix, value) => {
+    const field = scope.querySelector(`#${prefix}Job${suffix}`);
+    if (field) field.value = value || "";
+  };
+  const active = scope.querySelector(`#${prefix}JobActive`);
+  if (active) active.checked = vaga?.ativo !== false;
+  set("Title", vaga?.titulo);
+  set("Salary", vaga?.salario);
+  set("Schedule", vaga?.jornada);
+  set("ValidUntil", vaga?.validade);
+  set("Place", vaga?.local);
+  set("Contact", vaga?.contato);
+  set("Description", vaga?.descricao);
+  set("Requirements", vaga?.requisitos);
+  set("Apply", vaga?.comoCandidatar);
+}
+
+function readJobFields(prefix, scope = document, fallbackId = "") {
+  const get = (suffix) => scope.querySelector(`#${prefix}Job${suffix}`)?.value.trim() || "";
+  return {
+    id: fallbackId || `vaga-${Date.now()}`,
+    ativo: scope.querySelector(`#${prefix}JobActive`)?.checked !== false,
+    titulo: get("Title"),
+    salario: get("Salary"),
+    jornada: get("Schedule"),
+    validade: scope.querySelector(`#${prefix}JobValidUntil`)?.value || "",
+    local: get("Place"),
+    contato: get("Contact"),
+    descricao: get("Description"),
+    requisitos: get("Requirements"),
+    comoCandidatar: get("Apply")
+  };
+}
+
+function renderVagasTrabalhoMarkup(vagas, removeAttr = "job-remove", editAttr = "job-edit") {
+  const list = normalizeVagasTrabalho(vagas);
+  if (!list.length) return `<div class="list-meta">Nenhuma vaga cadastrada ainda.</div>`;
+  return list.map((vaga, index) => `
+    <article class="promo-admin-item job-admin-item">
+      <div class="promo-admin-empty"><i class="fa-solid fa-briefcase"></i></div>
+      <div>
+        <strong>${escapeHtml(vaga.titulo || "Vaga de trabalho")}</strong>
+        <span>${escapeHtml([vaga.salario, vaga.validade ? `ate ${vaga.validade}` : ""].filter(Boolean).join(" - ") || "Sem salario/validade")}</span>
+        ${vaga.descricao ? `<small>${escapeHtml(vaga.descricao)}</small>` : ""}
+        ${vaga.ativo === false ? `<small>Inativa no site publico</small>` : ""}
+      </div>
+      <div class="promo-admin-actions">
+        <button type="button" data-${editAttr}="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button>
+        <button type="button" data-${removeAttr}="${index}" class="danger-mini"><i class="fa-solid fa-trash"></i> Remover</button>
+      </div>
+    </article>
+  `).join("");
 }
 
 function renderClientPromocoesPreview() {
@@ -4244,6 +4344,7 @@ function renderClientOnlyEditor() {
   const imagens = normalizeImageItems(client.imagens);
   const menuImages = normalizeUrlList(client.menuImages);
   const promocoes = normalizePromocoes(client.promocoes);
+  const vagasTrabalho = normalizeVagasTrabalho(client.vagasTrabalho, client);
   const canEditDados = hasPermission("dados");
   const canEditImages = hasPermission("imagens");
   const canEditVagas = hasPermission("vagas");
@@ -4251,6 +4352,7 @@ function renderClientOnlyEditor() {
   const canEditPromocoes = hasPermission("promocoes");
   const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditPromocoes;
   let coPromoEditIndex = -1;
+  let coJobEditIndex = -1;
   const setCoPromoEditMode = (index = -1) => {
     coPromoEditIndex = index;
     const editing = index >= 0;
@@ -4261,6 +4363,17 @@ function renderClientOnlyEditor() {
         : `<i class="fa-solid fa-plus"></i> Adicionar promocao`;
     }
     $("coCancelPromoEditButton")?.classList.toggle("hidden", !editing);
+  };
+  const setCoJobEditMode = (index = -1) => {
+    coJobEditIndex = index;
+    const editing = index >= 0;
+    const addButton = $("coAddJobButton");
+    if (addButton) {
+      addButton.innerHTML = editing
+        ? `<i class="fa-solid fa-floppy-disk"></i> Salvar alteracoes`
+        : `<i class="fa-solid fa-plus"></i> Adicionar vaga`;
+    }
+    $("coCancelJobEditButton")?.classList.toggle("hidden", !editing);
   };
   const clientModules = [
     { id: "client-module-dados", icon: "fa-solid fa-building", label: "Dados da empresa", show: canEditDados },
@@ -4343,21 +4456,29 @@ function renderClientOnlyEditor() {
             <div>
               <span class="feature-kicker">Contratacao</span>
               <h3>Vagas de trabalho</h3>
-              <p>Cadastre uma oportunidade para aparecer no site publico.</p>
+              <p>Cadastre quantas oportunidades precisar para aparecer no site publico.</p>
             </div>
+            <span id="coJobsCount" class="badge">${vagasTrabalho.length} vaga${vagasTrabalho.length === 1 ? "" : "s"}</span>
           </div>
-          <label class="check-row"><input id="coJobActive" type="checkbox" ${client.vagaAtiva !== false && (client.infoVagaTrabalho || client.vagaTitulo || client.vagaCargo || client.vagaDescricao) ? "checked" : ""}> Exibir vaga no site publico</label>
+          <label class="check-row"><input id="coJobActive" type="checkbox" checked> Exibir esta vaga no site publico</label>
           <div class="section-fields">
-            <label>Cargo / titulo da vaga<input id="coJobTitle" value="${escapeAttr(client.vagaTitulo || client.vagaCargo || "")}" placeholder="Ex.: Atendente"></label>
-            <label>Salario / beneficio<input id="coJobSalary" value="${escapeAttr(client.vagaSalario || "")}" placeholder="Ex.: A combinar"></label>
-            <label>Jornada / horario<input id="coJobSchedule" value="${escapeAttr(client.vagaJornada || "")}" placeholder="Ex.: Segunda a sabado"></label>
-            <label>Validade da vaga<input id="coJobValidUntil" type="date" value="${escapeAttr(client.vagaValidade || "")}"></label>
-            <label>Local da vaga<input id="coJobPlace" value="${escapeAttr(client.vagaLocal || "")}" placeholder="Opcional"></label>
-            <label>Contato da vaga<input id="coJobContact" value="${escapeAttr(client.vagaContato || "")}" placeholder="WhatsApp, telefone ou e-mail"></label>
+            <label>Cargo / titulo da vaga<input id="coJobTitle" placeholder="Ex.: Atendente"></label>
+            <label>Salario / beneficio<input id="coJobSalary" placeholder="Ex.: A combinar"></label>
+            <label>Jornada / horario<input id="coJobSchedule" placeholder="Ex.: Segunda a sabado"></label>
+            <label>Validade da vaga<input id="coJobValidUntil" type="date"></label>
+            <label>Local da vaga<input id="coJobPlace" placeholder="Opcional"></label>
+            <label>Contato da vaga<input id="coJobContact" placeholder="WhatsApp, telefone ou e-mail"></label>
           </div>
-          <label class="wide">Descricao da vaga<textarea id="coJobDescription" rows="3" placeholder="Conte o que a pessoa vai fazer">${escapeHtml(client.infoVagaTrabalho || client.vagaDescricao || "")}</textarea></label>
-          <label class="wide">Pre-requisitos<textarea id="coJobRequirements" rows="3" placeholder="Ex.: Maior de 18 anos, experiencia">${escapeHtml(client.vagaPreRequisito || client.vagaRequisitos || "")}</textarea></label>
-          <label class="wide">Como se candidatar<textarea id="coJobApply" rows="2" placeholder="Ex.: Enviar curriculo pelo WhatsApp">${escapeHtml(client.vagaComoCandidatar || "")}</textarea></label>
+          <label class="wide">Descricao da vaga<textarea id="coJobDescription" rows="3" placeholder="Conte o que a pessoa vai fazer"></textarea></label>
+          <label class="wide">Pre-requisitos<textarea id="coJobRequirements" rows="3" placeholder="Ex.: Maior de 18 anos, experiencia"></textarea></label>
+          <label class="wide">Como se candidatar<textarea id="coJobApply" rows="2" placeholder="Ex.: Enviar curriculo pelo WhatsApp"></textarea></label>
+          <div class="form-actions wide promo-edit-actions">
+            <button id="coAddJobButton" type="button"><i class="fa-solid fa-plus"></i> Adicionar vaga</button>
+            <button id="coCancelJobEditButton" type="button" class="ghost-button hidden"><i class="fa-solid fa-xmark"></i> Cancelar edicao</button>
+          </div>
+          <div id="coJobsPreview" class="promo-admin-list">
+            ${renderVagasTrabalhoMarkup(vagasTrabalho)}
+          </div>
         </section>
       ` : ""}
       ${canEditCardapio ? `
@@ -4588,6 +4709,51 @@ function renderClientOnlyEditor() {
     renderClientOnlyEditor();
   });
 
+  mount.querySelector("#coAddJobButton")?.addEventListener("click", async () => {
+    const title = $("coJobTitle").value.trim();
+    const description = $("coJobDescription").value.trim();
+    if (!title && !description) {
+      showToast("Informe o titulo ou a descricao da vaga.");
+      return;
+    }
+    const current = coJobEditIndex >= 0 ? vagasTrabalho[coJobEditIndex] : null;
+    const payload = readJobFields("co", mount, current?.id || `vaga-${Date.now()}`);
+    if (coJobEditIndex >= 0 && current) vagasTrabalho[coJobEditIndex] = payload;
+    else vagasTrabalho.unshift(payload);
+    const normalizedJobs = normalizeVagasTrabalho(vagasTrabalho);
+    const mainJob = normalizedJobs.find((item) => item.ativo !== false) || normalizedJobs[0] || {};
+    await update(ref(db, `clientes/${client.id}`), {
+      vagasTrabalho: normalizedJobs,
+      vagaAtiva: Boolean(mainJob.titulo || mainJob.descricao || mainJob.requisitos),
+      vagaTitulo: mainJob.titulo || "",
+      vagaCargo: mainJob.titulo || "",
+      infoVagaTrabalho: mainJob.descricao || "",
+      vagaDescricao: mainJob.descricao || "",
+      vagaPreRequisito: mainJob.requisitos || "",
+      vagaRequisitos: mainJob.requisitos || "",
+      vagaSalario: mainJob.salario || "",
+      vagaJornada: mainJob.jornada || "",
+      vagaLocal: mainJob.local || "",
+      vagaContato: mainJob.contato || "",
+      vagaComoCandidatar: mainJob.comoCandidatar || "",
+      vagaValidade: mainJob.validade || "",
+      origem: "painel",
+      editadoNoPainel: true,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid
+    });
+    showToast(coJobEditIndex >= 0 ? "Vaga atualizada." : "Vaga adicionada.");
+    clearJobFields("co", mount);
+    setCoJobEditMode(-1);
+    await loadAllData();
+    renderClientOnlyEditor();
+  });
+
+  mount.querySelector("#coCancelJobEditButton")?.addEventListener("click", () => {
+    clearJobFields("co", mount);
+    setCoJobEditMode(-1);
+  });
+
   mount.querySelector("#coCancelPromoEditButton")?.addEventListener("click", () => {
     clearPromoFields("co", mount);
     setCoPromoEditMode(-1);
@@ -4676,6 +4842,50 @@ function renderClientOnlyEditor() {
     });
   });
 
+  mount.querySelectorAll("[data-job-edit]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.jobEdit);
+      const vaga = vagasTrabalho[index];
+      if (!vaga) return;
+      fillJobFields("co", vaga, mount);
+      setCoJobEditMode(index);
+      $("coJobTitle")?.focus();
+      $("coJobTitle")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  });
+
+  mount.querySelectorAll("[data-job-remove]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const index = Number(button.dataset.jobRemove);
+      vagasTrabalho.splice(index, 1);
+      const normalizedJobs = normalizeVagasTrabalho(vagasTrabalho);
+      const mainJob = normalizedJobs.find((item) => item.ativo !== false) || normalizedJobs[0] || {};
+      await update(ref(db, `clientes/${client.id}`), {
+        vagasTrabalho: normalizedJobs,
+        vagaAtiva: Boolean(mainJob.titulo || mainJob.descricao || mainJob.requisitos),
+        vagaTitulo: mainJob.titulo || "",
+        vagaCargo: mainJob.titulo || "",
+        infoVagaTrabalho: mainJob.descricao || "",
+        vagaDescricao: mainJob.descricao || "",
+        vagaPreRequisito: mainJob.requisitos || "",
+        vagaRequisitos: mainJob.requisitos || "",
+        vagaSalario: mainJob.salario || "",
+        vagaJornada: mainJob.jornada || "",
+        vagaLocal: mainJob.local || "",
+        vagaContato: mainJob.contato || "",
+        vagaComoCandidatar: mainJob.comoCandidatar || "",
+        vagaValidade: mainJob.validade || "",
+        origem: "painel",
+        editadoNoPainel: true,
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user.uid
+      });
+      showToast("Vaga removida.");
+      await loadAllData();
+      renderClientOnlyEditor();
+    });
+  });
+
   $("clientOnlyForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const payload = {
@@ -4706,20 +4916,23 @@ function renderClientOnlyEditor() {
       });
     }
     if (canEditVagas) {
+      const normalizedJobs = normalizeVagasTrabalho(vagasTrabalho);
+      const mainJob = normalizedJobs.find((item) => item.ativo !== false) || normalizedJobs[0] || {};
       Object.assign(payload, {
-        vagaAtiva: Boolean($("coJobActive")?.checked),
-        vagaTitulo: $("coJobTitle")?.value.trim() || "",
-        vagaCargo: $("coJobTitle")?.value.trim() || "",
-        infoVagaTrabalho: $("coJobDescription")?.value.trim() || "",
-        vagaDescricao: $("coJobDescription")?.value.trim() || "",
-        vagaPreRequisito: $("coJobRequirements")?.value.trim() || "",
-        vagaRequisitos: $("coJobRequirements")?.value.trim() || "",
-        vagaSalario: $("coJobSalary")?.value.trim() || "",
-        vagaJornada: $("coJobSchedule")?.value.trim() || "",
-        vagaLocal: $("coJobPlace")?.value.trim() || "",
-        vagaContato: $("coJobContact")?.value.trim() || "",
-        vagaComoCandidatar: $("coJobApply")?.value.trim() || "",
-        vagaValidade: $("coJobValidUntil")?.value || ""
+        vagasTrabalho: normalizedJobs,
+        vagaAtiva: Boolean(mainJob.titulo || mainJob.descricao || mainJob.requisitos),
+        vagaTitulo: mainJob.titulo || "",
+        vagaCargo: mainJob.titulo || "",
+        infoVagaTrabalho: mainJob.descricao || "",
+        vagaDescricao: mainJob.descricao || "",
+        vagaPreRequisito: mainJob.requisitos || "",
+        vagaRequisitos: mainJob.requisitos || "",
+        vagaSalario: mainJob.salario || "",
+        vagaJornada: mainJob.jornada || "",
+        vagaLocal: mainJob.local || "",
+        vagaContato: mainJob.contato || "",
+        vagaComoCandidatar: mainJob.comoCandidatar || "",
+        vagaValidade: mainJob.validade || ""
       });
     }
     if (canEditImages) {

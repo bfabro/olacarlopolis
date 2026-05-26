@@ -2291,6 +2291,45 @@ document.addEventListener("DOMContentLoaded", function () {
     return possuiConteudo && establishment.vagaAtiva !== false;
   }
 
+  function normalizarVagasTrabalhoPublicas(establishment = {}) {
+    const vagas = Array.isArray(establishment.vagasTrabalho) ? establishment.vagasTrabalho : [];
+    const legado = !vagas.length && vagaTrabalhoVisivel(establishment)
+      ? [{
+        id: "vaga-principal",
+        ativo: establishment.vagaAtiva !== false,
+        titulo: establishment.vagaTitulo || establishment.vagaCargo || "",
+        descricao: establishment.infoVagaTrabalho || establishment.vagaDescricao || "",
+        requisitos: establishment.vagaPreRequisito || establishment.vagaRequisitos || "",
+        salario: establishment.vagaSalario || "",
+        jornada: establishment.vagaJornada || "",
+        local: establishment.vagaLocal || "",
+        contato: establishment.vagaContato || "",
+        comoCandidatar: establishment.vagaComoCandidatar || "",
+        validade: establishment.vagaValidade || ""
+      }]
+      : [];
+    return [...vagas, ...legado]
+      .map((vaga, index) => ({
+        ...establishment,
+        vagasTrabalho: [],
+        vagaId: vaga?.id || `vaga-${index}`,
+        vagaAtiva: vaga?.ativo === false ? false : true,
+        vagaTitulo: vaga?.titulo || vaga?.vagaTitulo || vaga?.vagaCargo || "",
+        vagaCargo: vaga?.titulo || vaga?.vagaCargo || vaga?.vagaTitulo || "",
+        infoVagaTrabalho: vaga?.descricao || vaga?.infoVagaTrabalho || vaga?.vagaDescricao || "",
+        vagaDescricao: vaga?.descricao || vaga?.vagaDescricao || vaga?.infoVagaTrabalho || "",
+        vagaPreRequisito: vaga?.requisitos || vaga?.vagaPreRequisito || vaga?.vagaRequisitos || "",
+        vagaRequisitos: vaga?.requisitos || vaga?.vagaRequisitos || vaga?.vagaPreRequisito || "",
+        vagaSalario: vaga?.salario || vaga?.vagaSalario || "",
+        vagaJornada: vaga?.jornada || vaga?.vagaJornada || "",
+        vagaLocal: vaga?.local || vaga?.vagaLocal || "",
+        vagaContato: vaga?.contato || vaga?.vagaContato || "",
+        vagaComoCandidatar: vaga?.comoCandidatar || vaga?.vagaComoCandidatar || "",
+        vagaValidade: vaga?.validade || vaga?.vagaValidade || ""
+      }))
+      .filter((vaga, index, arr) => vagaTrabalhoVisivel(vaga) && arr.findIndex((item) => item.vagaId === vaga.vagaId && normalizeName(item.name || item.nome || "") === normalizeName(vaga.name || vaga.nome || "")) === index);
+  }
+
   function montarLinhaDetalheVaga(icone, rotulo, valor) {
     return valor ? `<div class="vaga-detail-row"><span class="vaga-detail-icon"><i class="${icone}"></i></span><strong>${rotulo}</strong><span>${valor}</span></div>` : "";
   }
@@ -16842,6 +16881,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       }
     }
     if (Array.isArray(cliente.promocoes)) est.promocoes = cliente.promocoes;
+    if (Array.isArray(cliente.vagasTrabalho)) est.vagasTrabalho = cliente.vagasTrabalho;
     ["vagaAtiva", "vagaTitulo", "vagaCargo", "infoVagaTrabalho", "vagaDescricao", "vagaPreRequisito", "vagaRequisitos", "vagaSalario", "vagaJornada", "vagaLocal", "vagaContato", "vagaComoCandidatar", "vagaValidade"].forEach((campo) => {
       if (campoExiste(cliente, campo)) est[campo] = cliente[campo] || (campo === "vagaAtiva" ? false : "");
     });
@@ -16876,6 +16916,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       cardapioLink: cardapioAtivo ? (cliente.cardapioLink || "") : "",
       menuImages: cardapioAtivo ? (cliente.menuImages || []) : [],
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : [],
+      vagasTrabalho: Array.isArray(cliente.vagasTrabalho) ? cliente.vagasTrabalho : [],
       vagaAtiva: cliente.vagaAtiva !== false && Boolean(cliente.infoVagaTrabalho || cliente.vagaTitulo || cliente.vagaCargo || cliente.vagaDescricao),
       vagaTitulo: cliente.vagaTitulo || cliente.vagaCargo || "",
       vagaCargo: cliente.vagaCargo || cliente.vagaTitulo || "",
@@ -17071,13 +17112,14 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     clientesConsolidados.forEach(({ clienteId, cliente }) => {
       if (!clienteAdminPodeAparecer(cliente)) return;
-      const vaga = montarEstabelecimentoDoClienteAdmin(cliente, clienteId);
-      if (!vagaTrabalhoVisivel(vaga)) return;
-      const id = eventoPublicoIdentidade(vaga);
-      if (!id) return;
-      vaga.origemVagaCliente = true;
-      porIdentidade.set(id, vaga);
-      statusEstabelecimentos[id] = "s";
+      const vagaBase = montarEstabelecimentoDoClienteAdmin(cliente, clienteId);
+      normalizarVagasTrabalhoPublicas(vagaBase).forEach((vaga, index) => {
+        const id = `${eventoPublicoIdentidade(vaga)}-${normalizeName(vaga.vagaId || index)}`;
+        if (!id) return;
+        vaga.origemVagaCliente = true;
+        porIdentidade.set(id, vaga);
+        statusEstabelecimentos[id] = "s";
+      });
     });
 
     categoria.establishments = Array.from(porIdentidade.values()).filter(vagaTrabalhoVisivel);
@@ -17887,7 +17929,10 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     const isEventos = titleSlug === "eventosemcarlopolis";
     const isVagasTrabalho = titleSlug === "vagasdetrabalho";
     const isNotaFalecimento = titleSlug === "notadefalecimento";
-    const paidEstablishments = establishments.filter((establishment) => {
+    const sourceEstablishments = isVagasTrabalho
+      ? establishments.flatMap((establishment) => normalizarVagasTrabalhoPublicas(establishment))
+      : establishments;
+    const paidEstablishments = sourceEstablishments.filter((establishment) => {
       if (isEventos) return eventoPublicoAtivo(establishment);
       if (isVagasTrabalho) return vagaTrabalhoVisivel(establishment);
       if (isNotaFalecimento) return Boolean(establishment.descricaoFalecido || establishment.mensagem || establishment.image);
@@ -17906,30 +17951,65 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     }
 
     if (isVagasTrabalho) {
-      contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><section class="vagas-public-list">
-        ${paidEstablishments.map(montarCardVagaTrabalhoPublico).join("")}
+      const buscaInicial = window.__vagasBuscaAtual || "";
+      const bindVagasPublicas = () => {
+        contentArea.querySelectorAll(".vaga-more-btn").forEach((button) => {
+          button.addEventListener("click", () => {
+            const card = button.closest(".vaga-public-card");
+            const expanded = card?.classList.toggle("expanded");
+            button.innerHTML = expanded
+              ? `<i class="fa-solid fa-chevron-up"></i> Menos informações`
+              : `<i class="fa-solid fa-circle-info"></i> Mais informações`;
+          });
+        });
+        contentArea.querySelectorAll(".vaga-share-btn").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const card = button.closest(".vaga-public-card");
+            const nome = card?.querySelector(".vaga-public-summary h3")?.textContent || "Vaga de trabalho";
+            const url = location.href;
+            if (navigator.share) await navigator.share({ title: nome, text: `Confira esta vaga no Olá Carlópolis: ${nome}`, url });
+            else {
+              await navigator.clipboard?.writeText(url);
+              alert("Link copiado!");
+            }
+          });
+        });
+      };
+      const renderVagasPublicas = () => {
+        const field = document.getElementById("vagasSearchInput");
+        const busca = normalizeName(field?.value || "");
+        window.__vagasBuscaAtual = field?.value || "";
+        const filtradas = busca
+          ? paidEstablishments.filter((vaga) => normalizeName(`${vaga.vagaTitulo || ""} ${vaga.vagaCargo || ""} ${vaga.infoVagaTrabalho || ""} ${vaga.vagaDescricao || ""} ${vaga.name || vaga.nome || ""}`).includes(busca))
+          : paidEstablishments;
+        const list = contentArea.querySelector(".vagas-public-list");
+        if (!list) return;
+        list.innerHTML = filtradas.length
+          ? filtradas.map(montarCardVagaTrabalhoPublico).join("")
+          : `<div class="list-meta">Nenhuma vaga encontrada com esse filtro.</div>`;
+        bindVagasPublicas();
+      };
+      const aplicarModoCardsVagas = () => {
+        const ativo = Boolean(document.getElementById("vagasModoCards")?.checked);
+        window.__vagasModoCards = ativo;
+        contentArea.querySelector(".vagas-public-page")?.classList.toggle("vagas-cards-mode", ativo);
+      };
+      contentArea.innerHTML = `<section class="vagas-public-page">
+        <h2 class="highlighted">${title}</h2>
+        <div class="vagas-filter-card">
+          <label class="vagas-search-label"><i class="fa-solid fa-magnifying-glass"></i><input id="vagasSearchInput" value="${escapePromoHtml(buscaInicial)}" placeholder="Pesquisar por vaga ou empresa"></label>
+          <label class="switch vagas-cards-switch" title="Mostrar vagas em cards menores">
+            <input type="checkbox" id="vagasModoCards" ${window.__vagasModoCards ? "checked" : ""}>
+            <span class="slider"></span>
+            <strong>Cards</strong>
+          </label>
+        </div>
+        <section class="vagas-public-list"></section>
       </section>`;
-      contentArea.querySelectorAll(".vaga-more-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-          const card = button.closest(".vaga-public-card");
-          const expanded = card?.classList.toggle("expanded");
-          button.innerHTML = expanded
-            ? `<i class="fa-solid fa-chevron-up"></i> Menos informações`
-            : `<i class="fa-solid fa-circle-info"></i> Mais informações`;
-        });
-      });
-      contentArea.querySelectorAll(".vaga-share-btn").forEach((button) => {
-        button.addEventListener("click", async () => {
-          const card = button.closest(".vaga-public-card");
-          const nome = card?.querySelector(".vaga-public-summary h3")?.textContent || "Vaga de trabalho";
-          const url = location.href;
-          if (navigator.share) await navigator.share({ title: nome, text: `Confira esta vaga no Olá Carlópolis: ${nome}`, url });
-          else {
-            await navigator.clipboard?.writeText(url);
-            alert("Link copiado!");
-          }
-        });
-      });
+      document.getElementById("vagasSearchInput")?.addEventListener("input", renderVagasPublicas);
+      document.getElementById("vagasModoCards")?.addEventListener("change", aplicarModoCardsVagas);
+      renderVagasPublicas();
+      aplicarModoCardsVagas();
       return;
     }
 
