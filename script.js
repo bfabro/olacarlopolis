@@ -2406,10 +2406,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     document.querySelectorAll(".submenu").forEach((submenu) => {
-      submenu.style.display = submenu === submenuAtual ? "block" : "none";
+      submenu.style.display = "none";
     });
     document.querySelectorAll(".submenu_item").forEach((item) => {
-      item.classList.toggle("show_submenu", item.nextElementSibling === submenuAtual);
+      item.classList.remove("show_submenu");
     });
 
     if (submenuAtual) {
