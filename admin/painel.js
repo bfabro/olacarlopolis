@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 199,
-  label: "v199",
+  numero: 200,
+  label: "v200",
   data: "2026-05-26",
-  nota: "Gera codigos incrementais automaticos para imoveis e automoveis."
+  nota: "Adiciona mascara de valor em imoveis e automoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -278,6 +278,37 @@ function canAccessView(viewName) {
 
 function moneyBR(value) {
   return Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function formatCurrencyInput(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "";
+  const cents = Number(digits) / 100;
+  return moneyBR(cents);
+}
+
+function formatExistingCurrency(value) {
+  if (value === null || value === undefined || value === "") return "";
+  if (typeof value === "number") return moneyBR(value);
+  const text = String(value).trim();
+  if (!text) return "";
+  if (/R\$/i.test(text)) return moneyBR(numberFromMoney(text));
+  const digits = text.replace(/\D/g, "");
+  if (!digits) return text;
+  if (/[,.]/.test(text)) return moneyBR(numberFromMoney(text));
+  return moneyBR(Number(digits));
+}
+
+function bindCurrencyMask(input) {
+  if (!input || input.dataset.currencyMaskBound) return;
+  input.dataset.currencyMaskBound = "true";
+  input.setAttribute("inputmode", "numeric");
+  input.addEventListener("input", () => {
+    input.value = formatCurrencyInput(input.value);
+  });
+  input.addEventListener("blur", () => {
+    input.value = formatExistingCurrency(input.value);
+  });
 }
 
 function textPix(value, maxLength = 25) {
@@ -2926,7 +2957,7 @@ function fillAutomovelForm(item) {
   $("automovelMarca").value = item.marca || "";
   $("automovelModelo").value = item.modelo || "";
   $("automovelAno").value = item.ano || "";
-  $("automovelPreco").value = item.preco || "";
+  $("automovelPreco").value = formatExistingCurrency(item.preco || "");
   $("automovelTipo").value = item.tipo || "";
   $("automovelCondicao").value = item.condicao || "";
   $("automovelKm").value = item.km || "";
@@ -3061,7 +3092,7 @@ function fillImovelForm(item) {
   $("imovelTipo").value = item.tipo || "venda";
   $("imovelProcura").value = item.procura || "casa";
   $("imovelStatus").value = item.status || "ativo";
-  $("imovelValor").value = item.valor || "";
+  $("imovelValor").value = formatExistingCurrency(item.valor || "");
   $("imovelEndereco").value = item.endereco || "";
   $("imovelLat").value = item.lat || "";
   $("imovelLng").value = item.lng || "";
@@ -3120,7 +3151,7 @@ function getImovelFormData() {
     tipo: $("imovelTipo").value,
     procura: $("imovelProcura").value,
     status: $("imovelStatus").value,
-    valor: numberOrText($("imovelValor").value),
+    valor: numberFromMoney($("imovelValor").value),
     endereco: $("imovelEndereco").value.trim(),
     lat: Number($("imovelLat").value) || "",
     lng: Number($("imovelLng").value) || "",
@@ -5563,6 +5594,9 @@ function closeAdminMenuOnMobile() {
 }
 
 function bindEvents() {
+  bindCurrencyMask($("imovelValor"));
+  bindCurrencyMask($("automovelPreco"));
+
   $("loginForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     $("loginMessage").textContent = "";

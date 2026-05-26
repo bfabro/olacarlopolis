@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=199">
+  <link rel="stylesheet" href="painel.css?v=200">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -632,7 +632,7 @@
                   <option value="inativo">Inativo</option>
                 </select>
               </label>
-              <label>Valor<input id="imovelValor" placeholder="R$"></label>
+              <label>Valor<input id="imovelValor" inputmode="numeric" placeholder="R$ 260.000,00"></label>
               <label class="wide">Endereco / bairro<input id="imovelEndereco" placeholder="Ex: Centro - Carlopolis"></label>
               <label>Latitude<input id="imovelLat" placeholder="-23.3958"></label>
               <label>Longitude<input id="imovelLng" placeholder="-49.7240"></label>
@@ -733,7 +733,7 @@
               <label>Marca<input id="automovelMarca" required placeholder="Ex: Volkswagen"></label>
               <label>Modelo<input id="automovelModelo" required placeholder="Ex: Gol 1.0"></label>
               <label>Ano<input id="automovelAno" placeholder="Ex: 2018"></label>
-              <label>Valor<input id="automovelPreco" placeholder="R$"></label>
+              <label>Valor<input id="automovelPreco" inputmode="numeric" placeholder="R$ 260.000,00"></label>
               <label>Novo/usado
                 <select id="automovelCondicao">
                   <option value="">Selecione</option>
@@ -876,6 +876,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=199"></script>
+  <script type="module" src="painel.js?v=200"></script>
 </body>
 </html>
