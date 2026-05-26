@@ -4832,21 +4832,34 @@ ${(cardapioVisivel(est) || est.contact) ? `
   // Coleta TODAS as promoções percorrendo categories/establishments
   function coletarTodasPromocoes() {
     const itens = [];
+    const vistos = new Set();
     let ordem = 0;
     (categories || []).forEach(cat => {
       (cat.establishments || []).forEach(est => {
         const nomeEst = est.name;
-        const idEst = normalizeName(nomeEst);
+        const idEst = normalizeName(est.nomeNormalizado || nomeEst);
         const lista = est.promocoes || est.promotions || [];
         lista.forEach(p => {
           if (p && p.ativo === false) return;
+          const promoId = p.id || "";
+          const tituloPromo = p.titulo || p.nome || "";
+          const chavePromo = normalizeName([
+            idEst,
+            promoId,
+            tituloPromo,
+            p.validadeFim || "",
+            p.preco || "",
+            p.desconto || p.discount || ""
+          ].join("|"));
+          if (chavePromo && vistos.has(chavePromo)) return;
+          if (chavePromo) vistos.add(chavePromo);
           itens.push({
             ordem: ordem++,
-            id: p.id || `promo_${idEst}_${ordem}`,
+            id: promoId || `promo_${idEst}_${ordem}`,
             estabelecimento: nomeEst,
             estabelecimentoId: idEst,
             categoria: cat.title || "",
-            titulo: p.titulo || p.nome || "",
+            titulo: tituloPromo,
             descricao: p.descricao || p.obs || [p.volume, p.embalagem].filter(Boolean).join(" + "),
             volume: p.volume || "",
             embalagem: p.embalagem || "",
