@@ -7096,7 +7096,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       const contato = String(item.contato || "").replace(/\D/g, "");
       const instagram = String(item.instagram || "").trim();
       const instagramUrl = instagram && instagram.startsWith("http") ? instagram : (instagram ? `https://instagram.com/${instagram.replace(/^@/, "")}` : "");
-      const codigoReferencia = String(item.id || `${item.marca}-${item.modelo}-${item.ano}`).replace(/[^a-z0-9-]/gi, "").slice(0, 12).toUpperCase();
+      const codigoReferencia = String(item.codRef || item.codigo || item.id || `${item.marca}-${item.modelo}-${item.ano}`).replace(/[^a-z0-9_-]/gi, "").slice(0, 18).toUpperCase();
       const detalhesTabela = [
         ["Tipo", item.tipo],
         ["Condicao", item.condicao],

@@ -14,7 +14,8 @@ import {
   set,
   update,
   remove,
-  serverTimestamp
+  serverTimestamp,
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import {
   getStorage,
@@ -36,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 198,
-  label: "v198",
+  numero: 199,
+  label: "v199",
   data: "2026-05-26",
-  nota: "Adiciona recuperacao segura de senha no login administrativo."
+  nota: "Gera codigos incrementais automaticos para imoveis e automoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3061,7 +3062,6 @@ function fillImovelForm(item) {
   $("imovelProcura").value = item.procura || "casa";
   $("imovelStatus").value = item.status || "ativo";
   $("imovelValor").value = item.valor || "";
-  $("imovelCodRef").value = item.codRef || "";
   $("imovelEndereco").value = item.endereco || "";
   $("imovelLat").value = item.lat || "";
   $("imovelLng").value = item.lng || "";
@@ -3094,6 +3094,18 @@ function numberOrText(value) {
   return Number.isFinite(number) && /\d/.test(text) && !/[a-zA-Z]/.test(text) ? number : text;
 }
 
+async function gerarCodigoReferenciaIncremental(tipo) {
+  const config = {
+    imovel: { path: "contadores/codigosReferencia/imoveis", prefix: "Imv_" },
+    automovel: { path: "contadores/codigosReferencia/automoveis", prefix: "car_" }
+  }[tipo];
+  if (!config) throw new Error("Tipo de codigo de referencia invalido.");
+  const counterRef = ref(db, config.path);
+  const result = await runTransaction(counterRef, (current) => (Number(current) || 0) + 1);
+  const next = Number(result.snapshot.val()) || 1;
+  return `${config.prefix}${next}`;
+}
+
 function getImovelFormData() {
   const titulo = $("imovelTitulo").value.trim();
   const id = $("imovelId").value || `${slugify(titulo || "imovel")}-${Date.now()}`;
@@ -3109,7 +3121,6 @@ function getImovelFormData() {
     procura: $("imovelProcura").value,
     status: $("imovelStatus").value,
     valor: numberOrText($("imovelValor").value),
-    codRef: $("imovelCodRef").value.trim() || id.slice(0, 10).toUpperCase(),
     endereco: $("imovelEndereco").value.trim(),
     lat: Number($("imovelLat").value) || "",
     lng: Number($("imovelLng").value) || "",
@@ -5913,7 +5924,13 @@ function bindEvents() {
     const payload = getImovelFormData();
     const id = payload.id;
     delete payload.id;
-    if (!state.selectedImovelId) payload.createdAt = serverTimestamp();
+    if (!state.selectedImovelId) {
+      payload.createdAt = serverTimestamp();
+      payload.codRef = await gerarCodigoReferenciaIncremental("imovel");
+    } else {
+      const original = state.imoveis.find((item) => item.id === state.selectedImovelId) || {};
+      payload.codRef = original.codRef || original.codigo || await gerarCodigoReferenciaIncremental("imovel");
+    }
     const updates = { [`conteudosInformativos/imoveis/${id}`]: payload };
     if (state.selectedImovelId && state.selectedImovelId !== id) {
       updates[`conteudosInformativos/imoveis/${state.selectedImovelId}`] = null;
@@ -5967,7 +5984,13 @@ function bindEvents() {
     const payload = getAutomovelFormData();
     const id = payload.id;
     delete payload.id;
-    if (!state.selectedAutomovelId) payload.createdAt = serverTimestamp();
+    if (!state.selectedAutomovelId) {
+      payload.createdAt = serverTimestamp();
+      payload.codRef = await gerarCodigoReferenciaIncremental("automovel");
+    } else {
+      const original = state.automoveis.find((item) => item.id === state.selectedAutomovelId) || {};
+      payload.codRef = original.codRef || original.codigo || await gerarCodigoReferenciaIncremental("automovel");
+    }
     const updates = { [`conteudosInformativos/automoveis/${id}`]: payload };
     if (state.selectedAutomovelId && state.selectedAutomovelId !== id) {
       updates[`conteudosInformativos/automoveis/${state.selectedAutomovelId}`] = null;
