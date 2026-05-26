@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 194,
-  label: "v194",
+  numero: 195,
+  label: "v195",
   data: "2026-05-26",
-  nota: "Ajusta notas de falecimento com imagem expansivel, modo cards e upload simplificado."
+  nota: "Remove cinza das imagens e simplifica cards de nota de falecimento."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

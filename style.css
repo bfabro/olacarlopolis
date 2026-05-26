@@ -17303,7 +17303,7 @@ tr[data-inativo="true"] {
   height: 100% !important;
   max-height: none !important;
   object-fit: cover !important;
-  filter: grayscale(100%);
+  filter: none !important;
 }
 
 .nota-falecimento-body {
@@ -17499,14 +17499,7 @@ tr[data-inativo="true"] {
 }
 
 .nota-falecimento-page.nota-cards-mode .nota-falecimento-texto {
-  min-height: 0;
-  padding: 10px 11px !important;
-  font-size: 13px !important;
-  line-height: 1.32 !important;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: none !important;
 }
 
 @media (max-width: 560px) {
@@ -17544,7 +17537,6 @@ tr[data-inativo="true"] {
   }
 
   .nota-falecimento-page.nota-cards-mode .nota-falecimento-texto {
-    font-size: 11px !important;
-    -webkit-line-clamp: 3;
+    display: none !important;
   }
 }
