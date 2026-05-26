@@ -18352,6 +18352,55 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
 
 
+  function montarCardNotaFalecimentoPublica(establishment) {
+    const id = normalizeName(establishment.name || "nota-falecimento");
+    const nome = escapePromoHtml(establishment.name || "Nota de Falecimento");
+    const data = establishment.date || establishment.data || "";
+    const funeraria = establishment.funeraria || "";
+    const descricao = establishment.descricaoFalecido || establishment.descricao || "";
+    const imagem = establishment.image || "";
+    return `
+      <article id="${id}" class="nota-falecimento-card" data-id="${id}">
+        <div class="nota-falecimento-media">
+          ${imagem
+            ? `<img src="${escapePromoHtml(imagem)}" alt="${nome}" loading="lazy" decoding="async">`
+            : `<div class="nota-falecimento-placeholder"><i class="fa-solid fa-ribbon"></i></div>`}
+        </div>
+        <div class="nota-falecimento-body">
+          <div class="nota-falecimento-kicker"><i class="fa-solid fa-ribbon"></i> Comunicado</div>
+          <h3>${nome}</h3>
+          <div class="nota-falecimento-meta">
+            ${data ? `<span><i class="fa-regular fa-calendar"></i> ${escapePromoHtml(data)}</span>` : ""}
+            ${funeraria ? `<span><i class="fa-solid fa-hands-praying"></i> ${escapePromoHtml(funeraria)}</span>` : ""}
+          </div>
+          ${descricao ? `<div class="nota-falecimento-texto">${descricao}</div>` : ""}
+          <div class="nota-falecimento-actions">
+            <button type="button" class="nota-falecimento-share" data-share-id="${id}" data-share-nome="${nome}">
+              <i class="fa-solid fa-share-nodes"></i> Compartilhar
+            </button>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function configurarCompartilhamentoNotasFalecimento(scope = document) {
+    scope.querySelectorAll(".nota-falecimento-share").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const nome = button.dataset.shareNome || "Nota de Falecimento";
+        const url = `${location.origin}${location.pathname}#${button.dataset.shareId || "notadefalecimento"}`;
+        try {
+          if (navigator.share) await navigator.share({ title: nome, text: `Confira este comunicado no Ola Carlopolis: ${nome}`, url });
+          else {
+            await navigator.clipboard?.writeText(url);
+            alert("Link copiado!");
+          }
+        } catch (error) {
+          console.warn("Nao foi possivel compartilhar a nota.", error);
+        }
+      });
+    });
+  }
   // teste de trocar abas
 
 
@@ -18376,6 +18425,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     const titleSlug = normalizeName(title || "");
     const isEventos = titleSlug === "eventosemcarlopolis";
     const isVagasTrabalho = titleSlug === "vagasdetrabalho";
+    const isNotaFalecimento = titleSlug === "notadefalecimento";
     const paidEstablishments = establishments.filter((establishment) => {
       if (isEventos) return eventoPublicoAtivo(establishment);
       if (isVagasTrabalho) return vagaTrabalhoVisivel(establishment);
@@ -18418,6 +18468,17 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
           }
         });
       });
+      return;
+    }
+
+    if (isNotaFalecimento) {
+      contentArea.innerHTML = `<section class="nota-falecimento-page">
+        <h2 class="highlighted nota-falecimento-title"><span><i class="fa-solid fa-ribbon"></i> ${title}</span></h2>
+        <div class="nota-falecimento-list">
+          ${paidEstablishments.map(montarCardNotaFalecimentoPublica).join("")}
+        </div>
+      </section>`;
+      configurarCompartilhamentoNotasFalecimento(contentArea);
       return;
     }
 

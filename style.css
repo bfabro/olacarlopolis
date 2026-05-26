@@ -17074,3 +17074,186 @@ tr[data-inativo="true"] {
     white-space: normal !important;
   }
 }
+/* ===== Nota de falecimento publica v192 ===== */
+.nota-falecimento-page {
+  width: min(940px, 100%);
+  margin: 0 auto 34px;
+  padding: 0 8px 28px;
+}
+
+.nota-falecimento-title {
+  margin: 0 0 14px;
+  background: linear-gradient(135deg, #1f2937, #475569) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, .16) !important;
+}
+
+.nota-falecimento-list {
+  display: grid;
+  gap: 14px;
+}
+
+.nota-falecimento-card {
+  display: grid;
+  grid-template-columns: minmax(180px, 270px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  border: 1px solid #d8dee8;
+  border-radius: 18px;
+  padding: 12px;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, .10);
+}
+
+.nota-falecimento-media {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  border-radius: 15px;
+  overflow: hidden;
+  background: #eef2f7;
+  border: 1px solid #e2e8f0;
+}
+
+.nota-falecimento-media img {
+  width: 100%;
+  height: 100%;
+  max-height: 330px;
+  object-fit: contain;
+  background: #f8fafc;
+}
+
+.nota-falecimento-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #64748b;
+  font-size: 42px;
+}
+
+.nota-falecimento-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 4px 2px;
+}
+
+.nota-falecimento-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 6px 10px;
+}
+
+.nota-falecimento-body h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(22px, 3.8vw, 34px);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.nota-falecimento-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nota-falecimento-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #fff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.nota-falecimento-texto {
+  border-left: 4px solid #64748b;
+  border-radius: 12px;
+  background: #fff;
+  color: #1f2937;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 12px 13px;
+  box-shadow: inset 0 0 0 1px #e5e7eb;
+  overflow-wrap: anywhere;
+}
+
+.nota-falecimento-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.nota-falecimento-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  color: #1e40af;
+  font-weight: 900;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .nota-falecimento-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .nota-falecimento-card {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    border-radius: 16px;
+    padding: 8px;
+  }
+
+  .nota-falecimento-media {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    border-radius: 14px;
+  }
+
+  .nota-falecimento-media img {
+    max-height: none;
+  }
+
+  .nota-falecimento-body {
+    padding: 4px 4px 6px;
+  }
+
+  .nota-falecimento-body h3 {
+    font-size: 24px;
+  }
+
+  .nota-falecimento-texto {
+    font-size: 14px;
+    line-height: 1.42;
+    padding: 10px;
+  }
+
+  .nota-falecimento-actions,
+  .nota-falecimento-share {
+    width: 100%;
+  }
+}
