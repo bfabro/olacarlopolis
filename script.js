@@ -2385,10 +2385,47 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
   }
 
+  // Abre a categoria certa e rola ate o comercio correspondente
+  function prepararMenuParaCategoria(categoria) {
+    const linkCategoria = categoria?.link;
+    if (!linkCategoria) return;
 
+    const submenuAtual = linkCategoria.closest("ul.submenu");
 
+    document.querySelectorAll(".sidebar .nav_link").forEach((link) => {
+      if (link !== linkCategoria) link.classList.remove("active");
+      link.style.display = "flex";
+    });
+    linkCategoria.classList.add("active");
 
-  // Abre a categoria certa e rola até o comércio correspondente
+    document.querySelectorAll(".menu_items > li").forEach((item) => {
+      item.style.display = "block";
+    });
+    document.querySelectorAll(".menu_title").forEach((title) => {
+      title.style.display = "block";
+    });
+
+    document.querySelectorAll(".submenu").forEach((submenu) => {
+      submenu.style.display = submenu === submenuAtual ? "block" : "none";
+    });
+    document.querySelectorAll(".submenu_item").forEach((item) => {
+      item.classList.toggle("show_submenu", item.nextElementSibling === submenuAtual);
+    });
+
+    if (submenuAtual) {
+      submenuAtual.querySelectorAll(".nav_link, .separador-letra").forEach((item) => {
+        item.style.display = "";
+        item.style.visibility = "";
+        item.style.height = "";
+        item.style.padding = "";
+        item.style.margin = "";
+      });
+    }
+
+    document.querySelector(".sidebar")?.classList.remove("open");
+    document.querySelector("#overlay")?.classList.remove("active");
+  }
+
   function abrirEstabelecimentoDaHome(idEst) {
     if (!idEst) return;
 
@@ -2409,12 +2446,9 @@ document.addEventListener("DOMContentLoaded", function () {
       console.warn("Estabelecimento não encontrado para id:", idEst);
       return;
     }
-
-    // 2) Se existir link no menu lateral para essa categoria, clica nele
-    if (categoriaEncontrada.link && typeof categoriaEncontrada.link.click === "function") {
-      categoriaEncontrada.link.click();
-    } else if (typeof loadContent === "function") {
-      // fallback: monta a categoria manualmente
+    // 2) Abre a categoria sem disparar click programatico no menu lateral
+    prepararMenuParaCategoria(categoriaEncontrada);
+    if (typeof loadContent === "function") {
       loadContent(categoriaEncontrada.title, categoriaEncontrada.establishments);
     }
 
@@ -17644,7 +17678,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (categoriaMatch) {
         const slug = categoriaMatch[1];
         const cat = categories.find((item) => normalizeName(item.title) === slug);
-        if (cat) return loadContent(cat.title, cat.establishments);
+        if (cat) {
+          prepararMenuParaCategoria(cat);
+          return loadContent(cat.title, cat.establishments);
+        }
       }
     } catch (e) { }
   }
@@ -18945,7 +18982,10 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
     if (m) {
       const slug = m[1]; // ex.: "adega"
       const cat = categories.find(c => normalizeName(c.title) === slug);
-      if (cat) return loadContent(cat.title, cat.establishments);
+      if (cat) {
+        prepararMenuParaCategoria(cat);
+        return loadContent(cat.title, cat.establishments);
+      }
     }
   }
   window.addEventListener("hashchange", handleHashRoute);
