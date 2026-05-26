@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=192">
+  <link rel="stylesheet" href="painel.css?v=193">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -553,8 +553,10 @@
             </div>
             <form id="infoDeathNoticeForm" class="grid-form">
               <input type="hidden" id="infoDeathNoticeId">
-              <label>Funeraria ou origem<input id="infoDeathNoticeName" required placeholder="Ex.: Funeraria Cristo Rei"></label>
-              <label>Data<input id="infoDeathNoticeDate" type="date"></label>
+              <label>Nome do falecido<input id="infoDeathNoticeName" required placeholder="Ex.: Jose da Silva"></label>
+              <label>Idade<input id="infoDeathNoticeAge" placeholder="Ex.: 82"></label>
+              <label>Data de falecimento<input id="infoDeathNoticeDate" type="date"></label>
+              <label>Funeraria<input id="infoDeathNoticeFuneralHome" placeholder="Ex.: Funeraria Cristo Rei"></label>
               <label>Status
                 <select id="infoDeathNoticeStatus">
                   <option value="ativo">Ativo no site</option>
@@ -564,7 +566,7 @@
               </label>
               <label>Imagem<input id="infoDeathNoticeImage" placeholder="URL ou images/..."></label>
               <label>Upload da imagem<input id="infoDeathNoticeImageUpload" type="file" accept="image/*"></label>
-              <label class="wide">Texto da nota<textarea id="infoDeathNoticeDescription" rows="8" required></textarea></label>
+              <label class="wide">Mensagem livre<textarea id="infoDeathNoticeDescription" rows="8" required placeholder="Mensagem informada pela funeraria ou admin"></textarea></label>
               <div class="form-actions wide">
                 <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar nota</button>
                 <button id="deleteInfoDeathNoticeButton" type="button" class="danger-button hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
@@ -874,6 +876,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=192"></script>
+  <script type="module" src="painel.js?v=193"></script>
 </body>
 </html>

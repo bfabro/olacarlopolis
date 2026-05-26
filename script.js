@@ -17927,17 +17927,23 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function normalizarNotaFalecimentoAdmin(item, id) {
-    const data = item?.date || item?.data || "";
+    const data = item?.dataFalecimento || item?.date || item?.data || "";
+    const nome = item?.nomeFalecido || item?.falecidoNome || item?.name || item?.nome || "Nota de Falecimento";
+    const mensagem = item?.mensagem || item?.descricaoFalecido || item?.descricao || "";
     return {
       id,
-      name: item?.name || item?.nome || "Nota de Falecimento",
+      name: nome,
+      nomeFalecido: nome,
       image: item?.image || item?.imagem || "",
       date: data,
-      descricaoFalecido: item?.descricaoFalecido || item?.descricao || "",
+      dataFalecimento: data,
+      idade: item?.idade || item?.age || "",
+      funeraria: item?.funeraria || item?.funerariaNome || "",
+      mensagem,
+      descricaoFalecido: mensagem,
       origemAdmin: true
     };
   }
-
   function aplicarNotasFalecimentoAdmin(notasAdmin) {
     const notas = Object.entries(notasAdmin || {})
       .map(([id, item]) => ({ id, ...(item || {}) }))
@@ -18352,38 +18358,49 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
 
 
+  function formatarDataFalecimentoPublica(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      const [ano, mes, dia] = raw.split("-");
+      return `${dia}/${mes}/${ano}`;
+    }
+    return escapePromoHtml(raw);
+  }
+
   function montarCardNotaFalecimentoPublica(establishment) {
-    const id = normalizeName(establishment.name || "nota-falecimento");
-    const nome = escapePromoHtml(establishment.name || "Nota de Falecimento");
-    const data = establishment.date || establishment.data || "";
-    const funeraria = establishment.funeraria || "";
-    const descricao = establishment.descricaoFalecido || establishment.descricao || "";
+    const id = normalizeName(establishment.nomeFalecido || establishment.falecidoNome || establishment.name || "nota-falecimento");
+    const nome = escapePromoHtml(establishment.nomeFalecido || establishment.falecidoNome || establishment.name || "Nota de Falecimento");
+    const data = establishment.dataFalecimento || establishment.date || establishment.data || "";
+    const idade = establishment.idade || establishment.age || "";
+    const funeraria = establishment.funeraria || establishment.funerariaNome || "";
+    const descricao = establishment.mensagem || establishment.descricaoFalecido || establishment.descricao || "";
     const imagem = establishment.image || "";
+    const idadeLimpa = String(idade || "").replace(/\s*anos?$/i, "");
     return `
       <article id="${id}" class="nota-falecimento-card" data-id="${id}">
-        <div class="nota-falecimento-media">
-          ${imagem
-            ? `<img src="${escapePromoHtml(imagem)}" alt="${nome}" loading="lazy" decoding="async">`
-            : `<div class="nota-falecimento-placeholder"><i class="fa-solid fa-ribbon"></i></div>`}
-        </div>
-        <div class="nota-falecimento-body">
-          <div class="nota-falecimento-kicker"><i class="fa-solid fa-ribbon"></i> Comunicado</div>
-          <h3>${nome}</h3>
-          <div class="nota-falecimento-meta">
-            ${data ? `<span><i class="fa-regular fa-calendar"></i> ${escapePromoHtml(data)}</span>` : ""}
-            ${funeraria ? `<span><i class="fa-solid fa-hands-praying"></i> ${escapePromoHtml(funeraria)}</span>` : ""}
+        <div class="nota-falecimento-main">
+          <div class="nota-falecimento-media">
+            ${imagem
+              ? `<img src="${escapePromoHtml(imagem)}" alt="${nome}" loading="lazy" decoding="async">`
+              : `<div class="nota-falecimento-placeholder"><i class="fa-solid fa-ribbon"></i></div>`}
           </div>
-          ${descricao ? `<div class="nota-falecimento-texto">${descricao}</div>` : ""}
-          <div class="nota-falecimento-actions">
-            <button type="button" class="nota-falecimento-share" data-share-id="${id}" data-share-nome="${nome}">
-              <i class="fa-solid fa-share-nodes"></i> Compartilhar
-            </button>
+          <div class="nota-falecimento-body">
+            <div>
+              <h3>${nome}</h3>
+              ${idadeLimpa ? `<strong class="nota-falecimento-idade">${escapePromoHtml(idadeLimpa)} anos</strong>` : ""}
+            </div>
+            <div class="nota-falecimento-bottom">
+              <span class="nota-falecimento-line"></span>
+              ${data ? `<span class="nota-falecimento-date"><i class="fa-regular fa-calendar"></i> Faleceu em ${formatarDataFalecimentoPublica(data)}</span>` : ""}
+              ${funeraria ? `<span class="nota-falecimento-funeraria">${escapePromoHtml(funeraria)}</span>` : ""}
+            </div>
           </div>
         </div>
+        ${descricao ? `<div class="nota-falecimento-texto">${descricao}</div>` : ""}
       </article>
     `;
   }
-
   function configurarCompartilhamentoNotasFalecimento(scope = document) {
     scope.querySelectorAll(".nota-falecimento-share").forEach((button) => {
       button.addEventListener("click", async () => {
@@ -18429,6 +18446,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     const paidEstablishments = establishments.filter((establishment) => {
       if (isEventos) return eventoPublicoAtivo(establishment);
       if (isVagasTrabalho) return vagaTrabalhoVisivel(establishment);
+      if (isNotaFalecimento) return Boolean(establishment.descricaoFalecido || establishment.mensagem || establishment.image);
       const key = normalizeName(establishment.name);
       return statusEstabelecimentos[key] === "s";
     }).sort((a, b) => isEventos ? dataEventoPublicoValor(a) - dataEventoPublicoValor(b) : 0);

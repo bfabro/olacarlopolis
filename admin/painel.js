@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 192,
-  label: "v192",
+  numero: 193,
+  label: "v193",
   data: "2026-05-26",
-  nota: "Ajusta layout publico de Nota de Falecimento."
+  nota: "Adiciona campos estruturados e novo card publico para Nota de Falecimento."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3105,11 +3105,13 @@ function resetInfoDeathNoticeForm() {
 function fillInfoDeathNoticeForm(item) {
   state.selectedDeathNoticeId = item.id;
   $("infoDeathNoticeId").value = item.id || "";
-  $("infoDeathNoticeName").value = item.name || item.nome || "";
-  $("infoDeathNoticeDate").value = item.date || item.data || "";
+  $("infoDeathNoticeName").value = item.nomeFalecido || item.falecidoNome || item.name || item.nome || "";
+  if ($("infoDeathNoticeAge")) $("infoDeathNoticeAge").value = item.idade || item.age || "";
+  $("infoDeathNoticeDate").value = item.dataFalecimento || item.date || item.data || "";
+  if ($("infoDeathNoticeFuneralHome")) $("infoDeathNoticeFuneralHome").value = item.funeraria || item.funerariaNome || "";
   $("infoDeathNoticeStatus").value = item.status || "ativo";
   $("infoDeathNoticeImage").value = item.image || item.imagem || "";
-  $("infoDeathNoticeDescription").value = item.descricaoFalecido || item.descricao || "";
+  $("infoDeathNoticeDescription").value = item.mensagem || item.descricaoFalecido || item.descricao || "";
   $("deleteInfoDeathNoticeButton").classList.remove("hidden");
   openFormForEdit("infoDeathNoticeForm");
 }
@@ -3117,30 +3119,40 @@ function fillInfoDeathNoticeForm(item) {
 function getInfoDeathNoticeFormData() {
   const name = $("infoDeathNoticeName").value.trim();
   const date = $("infoDeathNoticeDate").value;
+  const idade = $("infoDeathNoticeAge")?.value.trim() || "";
+  const funeraria = $("infoDeathNoticeFuneralHome")?.value.trim() || "";
+  const mensagem = $("infoDeathNoticeDescription").value.trim();
   const baseId = $("infoDeathNoticeId").value || `${slugify(name || "nota")}-${date || Date.now()}`;
   return cleanForFirebase({
     id: baseId,
     name,
     nome: name,
+    nomeFalecido: name,
+    falecidoNome: name,
     date,
     data: date,
+    dataFalecimento: date,
+    idade,
+    age: idade,
+    funeraria,
+    funerariaNome: funeraria,
     status: $("infoDeathNoticeStatus").value,
     image: $("infoDeathNoticeImage").value.trim(),
     imagem: $("infoDeathNoticeImage").value.trim(),
-    descricaoFalecido: $("infoDeathNoticeDescription").value.trim(),
+    descricaoFalecido: mensagem,
+    mensagem,
     origem: "painel",
     updatedAt: serverTimestamp(),
     updatedBy: state.user?.uid || ""
   });
 }
-
 function renderInfoDeathNoticeList() {
   const box = $("infoDeathNoticeList");
   if (!box) return;
 
   const q = String($("infoDeathNoticeSearch")?.value || "").toLowerCase().trim();
   const list = state.notasFalecimento.filter((item) => {
-    const hay = `${item.name || item.nome || ""} ${item.date || item.data || ""} ${item.descricaoFalecido || ""}`.toLowerCase();
+    const hay = `${item.nomeFalecido || item.falecidoNome || item.name || item.nome || ""} ${item.funeraria || ""} ${item.date || item.data || ""} ${item.descricaoFalecido || ""}`.toLowerCase();
     return !q || hay.includes(q);
   });
 
