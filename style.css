@@ -6781,6 +6781,39 @@ html {
   display: none !important;
 }
 
+/* Imoveis: modal da foto sempre mostra a imagem inteira, inclusive no modo Cards. */
+body > .im-modal .im-modal-content {
+  width: min(96vw, 1120px) !important;
+  height: min(92vh, 820px) !important;
+  max-width: 96vw !important;
+  max-height: 92vh !important;
+  background: #05070d;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+body > .im-modal .swiper-imovel-full,
+body > .im-modal .swiper-wrapper,
+body > .im-modal .swiper-slide {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body > .im-modal .swiper-slide {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body > .im-modal .swiper-slide img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  background: #05070d;
+}
+
 .imoveis-wrap.im-cards-mode .card-actions .btn-whats {
   min-height: 38px;
   padding: 8px;
@@ -7103,7 +7136,8 @@ html {
 .im-modal img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #05070d;
 }
 
 /* Leaflet já está no projeto (CSS incluído no index) */

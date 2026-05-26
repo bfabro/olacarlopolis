@@ -6560,7 +6560,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         const im = stateImoveis.all.find(x => x.id === id);
         if (im) {
           registrarCliqueImovel('fotos', im);   // <<< ADICIONE ESTA LINHA
-          abrirModalImoveis(im);
+          abrirModalImoveis(im, ev.currentTarget.currentSrc || ev.currentTarget.src);
         }
       });
     });
@@ -6731,7 +6731,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         const id = card?.getAttribute("data-id") || ev.currentTarget.getAttribute("data-id");
         if (!id) return;
         const im = stateImoveis.all.find(x => x.id === id);
-        if (im) abrirModalImoveis(im);
+        if (im) abrirModalImoveis(im, ev.currentTarget.currentSrc || ev.currentTarget.src);
       });
     });
 
@@ -6871,7 +6871,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
   // ---------- Modal (galeria full) ----------
-  function abrirModalImoveis(im) {
+  function abrirModalImoveis(im, imagemInicial = "") {
     // Remove qualquer modal aberto antes
     const existente = document.querySelector(".im-modal");
     if (existente) existente.remove();
@@ -6892,10 +6892,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       </div>
     </div>`;
     document.body.appendChild(modal);
+    const initialSlide = Math.max(0, (im.imagens || []).findIndex(src => src === imagemInicial));
 
     // Swiper
     new Swiper(".swiper-imovel-full", {
       loop: true,
+      initialSlide,
       pagination: { el: ".swiper-pagination" },
       autoplay: { delay: 3000 },
     });
@@ -6914,7 +6916,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     // fechar quando clicar FORA do conteúdo
     modal.addEventListener("click", (e) => {
-      const content = modal.querySelector(".im-modal");
+      const content = modal.querySelector(".im-modal-content");
       if (!content || !content.contains(e.target)) {
         cleanup();
       }

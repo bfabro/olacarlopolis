@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 203,
-  label: "v203",
+  numero: 205,
+  label: "v205",
   data: "2026-05-26",
-  nota: "Ajusta abertura do menu ao acessar funeraria pela nota de falecimento."
+  nota: "Corrige modal de imagens dos imoveis no modo cards."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
