@@ -35,10 +35,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 186,
-  label: "v186",
-  data: "2026-05-25",
-  nota: "Agrupa foto de perfil e upload em Fotos e imagens."
+  numero: 190,
+  label: "v190",
+  data: "2026-05-26",
+  nota: "Libera cadastro e ajuste de promocoes dos clientes para master/admin geral."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -73,6 +73,8 @@ let state = {
   clientMenuImages: [],
   clientPromocoes: [],
   clientPromoEditIndex: null,
+  staffPromoEditIndex: null,
+  selectedPromoClientId: "",
   imovelImages: [],
   automovelImages: [],
   lastFirebaseClientCount: 0,
@@ -103,6 +105,7 @@ function renderPanelVersion() {
 const views = {
   dashboard: $("dashboardView"),
   clientes: $("clientesView"),
+  promocoesClientes: $("promocoesClientesView"),
   categorias: $("categoriasView"),
   eventos: $("eventosView"),
   imoveis: $("imoveisView"),
@@ -119,6 +122,7 @@ const views = {
 const viewCopy = {
   dashboard: ["Visao geral", "Resumo do ambiente administrativo."],
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
+  promocoesClientes: ["Promocoes", "Cadastre e ajuste promocoes em nome dos clientes."],
   categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
   imoveis: ["Imoveis", "Cadastre imoveis para venda ou aluguel no site publico."],
@@ -1416,6 +1420,7 @@ function switchView(name) {
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "relatorios") renderReports();
+  if (target === "promocoesClientes") renderStaffPromocoesView();
   if (target === "imoveis") renderImoveisList();
   if (target === "automoveis") renderAutomoveisList();
   if (target === "informacoes" && !canManageInformacoes()) {
@@ -4039,6 +4044,179 @@ function renderPaymentSettings() {
   $("paymentInvoiceNote").value = config.observacaoFatura || "";
 }
 
+function renderStaffPromocoesView() {
+  const mount = $("staffPromocoesMount");
+  if (!mount) return;
+  if (!canManageClients()) {
+    mount.innerHTML = `<section class="panel-card"><p>Somente master ou admin geral pode acessar as promocoes dos clientes.</p></section>`;
+    return;
+  }
+
+  const clientes = [...state.clientes].sort((a, b) => String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR"));
+  if (!clientes.length) {
+    mount.innerHTML = `<section class="panel-card"><p>Nenhum cliente cadastrado ainda.</p></section>`;
+    return;
+  }
+
+  if (!state.selectedPromoClientId || !clientes.some((client) => client.id === state.selectedPromoClientId)) {
+    state.selectedPromoClientId = clientes[0].id;
+  }
+
+  const client = clientes.find((item) => item.id === state.selectedPromoClientId) || clientes[0];
+  const promocoes = normalizePromocoes(client.promocoes);
+  const selectedId = client.id;
+  const editing = Number.isInteger(state.staffPromoEditIndex) && state.staffPromoEditIndex >= 0;
+
+  mount.innerHTML = `
+    <section class="panel-card staff-promos-panel">
+      <div class="section-head">
+        <div>
+          <h2>Promocoes dos clientes</h2>
+          <p>Selecione um cliente para inserir, editar ou remover ofertas exibidas no site publico.</p>
+        </div>
+        <span class="badge">${promocoes.length} ativa${promocoes.length === 1 ? "" : "s"}</span>
+      </div>
+      <label class="wide">Cliente
+        <select id="staffPromoClientSelect">
+          ${clientes.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === selectedId ? "selected" : ""}>${escapeHtml(item.nome || item.id)}${item.status && item.status !== "ativo" ? ` (${escapeHtml(statusLabel(item.status))})` : ""}</option>`).join("")}
+        </select>
+      </label>
+      <div class="staff-promo-client-card">
+        <img src="${escapeAttr(displayImageUrl(client.imagem || imageUrl(client.imagens && client.imagens[0])) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
+        <div>
+          <strong>${escapeHtml(client.nome || client.id)}</strong>
+          <span>${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || client.whatsapp || "Sem contato")}</span>
+        </div>
+      </div>
+    </section>
+    <section class="panel-card staff-promos-panel">
+      <div class="section-head compact">
+        <div>
+          <h3>${editing ? "Editar promocao" : "Nova promocao"}</h3>
+          <p>As alteracoes sao salvas diretamente no cadastro do cliente selecionado.</p>
+        </div>
+      </div>
+      <div class="promo-admin-form">
+        <label>Titulo da promocao<input id="staffPromoTitle" placeholder="Ex.: Pizza grande"></label>
+        <label>Preco atual<input id="staffPromoPrice" placeholder="Ex.: 49,90"></label>
+        <label>Desconto / chamada<input id="staffPromoDiscount" placeholder="Ex.: 20% OFF ou ATE 30% OFF"></label>
+        <label>Preco antigo<input id="staffPromoOldPrice" placeholder="Opcional"></label>
+        <label>Unidade<input id="staffPromoUnit" placeholder="Ex.: A unidade"></label>
+        <label>Volume<input id="staffPromoVolume" placeholder="Opcional"></label>
+        <label>Embalagem<input id="staffPromoPack" placeholder="Opcional"></label>
+        <label>Validade inicio<input id="staffPromoStart" type="date"></label>
+        <label>Validade fim<input id="staffPromoEnd" type="date"></label>
+        <label>Tipo de oferta<select id="staffPromoOfferType"><option value="">Selecione</option><option value="produto">Produto</option><option value="servico">Servico</option><option value="combo">Combo</option><option value="cupom">Cupom</option></select></label>
+        <label>Entrega / retirada<select id="staffPromoFulfillment"><option value="">Nao informar</option><option value="entrega">Entrega</option><option value="retirada">Retirada</option><option value="ambos">Entrega e retirada</option></select></label>
+        <label>Faixa de preco<select id="staffPromoPriceRange"><option value="">Automatico</option><option value="ate-50">Ate R$ 50</option><option value="50-100">R$ 50 a R$ 100</option><option value="100-200">R$ 100 a R$ 200</option><option value="acima-200">Acima de R$ 200</option></select></label>
+        <label>Com preco?<select id="staffPromoPriceMode"><option value="">Automatico</option><option value="com-preco">Com preco</option><option value="sem-preco">Sem preco</option></select></label>
+        <fieldset class="promo-weekdays wide">
+          <legend>Dias que fica disponivel</legend>
+          <p>Se nao marcar nenhum dia, aparece todos os dias dentro da validade.</p>
+          <div>${PROMO_WEEK_DAYS.map((day) => `<label><input type="checkbox" name="staffPromoWeekday" value="${day.value}"> ${day.label}</label>`).join("")}</div>
+        </fieldset>
+        <label class="wide">Observacao<textarea id="staffPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
+        <label class="wide">Mensagem abaixo do cliente / Instagram<textarea id="staffPromoInstagramMsg" rows="2" placeholder="Ex.: Siga no Instagram e fique por dentro das novidades!"></textarea></label>
+        <label>Imagem da promocao<input id="staffPromoImageUpload" type="file" accept="image/*"></label>
+        <label>Ou URL da imagem<input id="staffPromoImageUrl" placeholder="https://..."></label>
+        <div class="promo-form-actions wide">
+          <button id="staffAddPromoButton" type="button" class="ghost-button"><i class="fa-solid ${editing ? "fa-floppy-disk" : "fa-plus"}"></i> ${editing ? "Salvar alteracoes" : "Adicionar promocao"}</button>
+          <button id="staffCancelPromoEditButton" type="button" class="ghost-button ${editing ? "" : "hidden"}"><i class="fa-solid fa-xmark"></i> Cancelar edicao</button>
+        </div>
+      </div>
+    </section>
+    <section class="panel-card staff-promos-panel">
+      <div class="section-head compact">
+        <div>
+          <h3>Promocoes cadastradas</h3>
+          <p>Lista atual do cliente selecionado.</p>
+        </div>
+      </div>
+      <div id="staffPromosPreview" class="promo-admin-list">${renderPromocoesMarkup(promocoes, "staff-promo-remove", "staff-promo-edit")}</div>
+    </section>
+  `;
+
+  if (editing && promocoes[state.staffPromoEditIndex]) {
+    fillPromoFields("staff", promocoes[state.staffPromoEditIndex], mount);
+  }
+
+  mount.querySelector("#staffPromoClientSelect")?.addEventListener("change", (event) => {
+    state.selectedPromoClientId = event.target.value;
+    state.staffPromoEditIndex = null;
+    renderStaffPromocoesView();
+  });
+
+  mount.querySelector("#staffPromoImageUpload")?.addEventListener("change", async (event) => {
+    await uploadSelectedPromoImage("staffPromoImageUpload", "staffPromoImageUrl", selectedId);
+    event.target.value = "";
+  });
+
+  mount.querySelector("#staffAddPromoButton")?.addEventListener("click", async () => {
+    const title = mount.querySelector("#staffPromoTitle")?.value.trim();
+    if (!title) {
+      showToast("Informe o titulo da promocao.");
+      return;
+    }
+    let image = mount.querySelector("#staffPromoImageUrl")?.value.trim() || "";
+    const imageFile = mount.querySelector("#staffPromoImageUpload")?.files?.[0];
+    if (imageFile && !image) {
+      showToast("Enviando imagem da promocao...");
+      image = await uploadPromoImageForClient(selectedId, imageFile);
+    }
+    const editIndex = Number.isInteger(state.staffPromoEditIndex) ? state.staffPromoEditIndex : -1;
+    const current = editIndex >= 0 ? promocoes[editIndex] : null;
+    const payload = readPromoFields("staff", mount, current?.id || `promo-${Date.now()}`);
+    payload.imagem = image;
+    if (editIndex >= 0 && current) promocoes[editIndex] = payload;
+    else promocoes.unshift(payload);
+    await update(ref(db, `clientes/${selectedId}`), {
+      promocoes: normalizePromocoes(promocoes),
+      origem: "painel-admin",
+      editadoNoPainel: true,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user?.uid || ""
+    });
+    showToast(editIndex >= 0 ? "Promocao atualizada." : "Promocao adicionada.");
+    state.staffPromoEditIndex = null;
+    await loadAllData();
+    state.selectedPromoClientId = selectedId;
+    renderStaffPromocoesView();
+  });
+
+  mount.querySelector("#staffCancelPromoEditButton")?.addEventListener("click", () => {
+    state.staffPromoEditIndex = null;
+    renderStaffPromocoesView();
+  });
+
+  mount.querySelectorAll("[data-staff-promo-edit]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.staffPromoEditIndex = Number(button.dataset.staffPromoEdit);
+      renderStaffPromocoesView();
+      $("staffPromoTitle")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  });
+
+  mount.querySelectorAll("[data-staff-promo-remove]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const index = Number(button.dataset.staffPromoRemove);
+      const promo = promocoes[index];
+      if (!promo || !confirm(`Remover a promocao "${promo.titulo || "sem titulo"}" de ${client.nome || client.id}?`)) return;
+      promocoes.splice(index, 1);
+      await update(ref(db, `clientes/${selectedId}`), {
+        promocoes: normalizePromocoes(promocoes),
+        origem: "painel-admin",
+        editadoNoPainel: true,
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user?.uid || ""
+      });
+      showToast("Promocao removida.");
+      state.staffPromoEditIndex = null;
+      await loadAllData();
+      state.selectedPromoClientId = selectedId;
+      renderStaffPromocoesView();
+    });
+  });
+}
 function renderClientOnlyEditor() {
   const mount = $("clientOnlyMount");
   const client = state.clientes.find((item) => item.id === state.profile?.clienteId);

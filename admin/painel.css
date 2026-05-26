@@ -2016,3 +2016,54 @@ button[type="submit"]:hover,
 .client-module-nav-item {
   display: none !important;
 }
+/* ===== Admin promocoes por cliente v190 ===== */
+.staff-promos-view {
+  display: grid;
+  gap: 16px;
+}
+
+.staff-promos-panel > label.wide {
+  display: grid;
+  gap: 6px;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.staff-promo-client-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: #eff6ff;
+}
+
+.staff-promo-client-card img {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: #fff;
+}
+
+.staff-promo-client-card strong,
+.staff-promo-client-card span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.staff-promo-client-card strong {
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.staff-promo-client-card span {
+  color: #64748b;
+  font-size: 13px;
+}

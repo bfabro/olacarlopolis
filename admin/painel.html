@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=186">
+  <link rel="stylesheet" href="painel.css?v=190">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -45,6 +45,7 @@
       <nav class="nav-admin">
         <button data-view="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
         <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
+        <button data-view="promocoesClientes" data-role="staff"><i class="fa-solid fa-tags"></i> Promocoes</button>
         <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
         <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
         <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
@@ -342,6 +343,10 @@
             <div id="clientsList" class="clients-board"></div>
           </section>
         </div>
+      </section>
+
+      <section id="promocoesClientesView" class="panel-view hidden">
+        <div id="staffPromocoesMount" class="staff-promos-view"></div>
       </section>
 
       <section id="categoriasView" class="panel-view hidden">
@@ -869,6 +874,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=186"></script>
+  <script type="module" src="painel.js?v=190"></script>
 </body>
 </html>
