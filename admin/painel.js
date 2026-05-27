@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 209,
-  label: "v209",
+  numero: 211,
+  label: "v211",
   data: "2026-05-26",
-  nota: "Mostra codigo de referencia nas listas de imoveis e veiculos."
+  nota: "Permite excluir imoveis diretamente pela lista."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3232,6 +3232,7 @@ function renderImoveisList() {
       <div class="list-meta">${escapeHtml(item.origemBase === "script.js" && item.origem !== "painel" ? "Base inicial do site" : "Firebase / Painel")}</div>
       <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
       <button type="button" data-edit-imovel="${escapeAttr(item.id)}">Editar</button>
+      <button type="button" class="danger" data-delete-imovel="${escapeAttr(item.id)}">Excluir</button>
     </article>
   `; }).join("");
   box.querySelectorAll("[data-edit-imovel]").forEach((button) => {
@@ -3240,6 +3241,36 @@ function renderImoveisList() {
       if (item) fillImovelForm(item);
     });
   });
+  box.querySelectorAll("[data-delete-imovel]").forEach((button) => {
+    button.addEventListener("click", () => excluirImovelPorId(button.dataset.deleteImovel));
+  });
+}
+
+async function excluirImovelPorId(imovelId) {
+  if (!imovelId || !confirm("Excluir este imovel?")) return;
+  if (!hasPermission("imoveis")) return;
+  const original = state.imoveis.find((item) => item.id === imovelId);
+  if (!original || !itemBelongsToCurrentClient(original)) {
+    showToast("Voce nao tem permissao para excluir este imovel.");
+    return;
+  }
+  if (original.origemBase === "script.js") {
+    const tombstone = cleanForFirebase({
+      ...original,
+      status: "inativo",
+      ocultarBaseInicial: true,
+      origem: "painel",
+      origemBase: "script.js",
+      deletedAt: serverTimestamp(),
+      deletedBy: state.user?.uid || ""
+    });
+    await update(ref(db, `conteudosInformativos/imoveis/${imovelId}`), tombstone);
+  } else {
+    await remove(ref(db, `conteudosInformativos/imoveis/${imovelId}`));
+  }
+  showToast("Imovel excluido.");
+  resetImovelForm();
+  await loadAllData();
 }
 
 function resetInfoDeathNoticeForm() {
@@ -5981,29 +6012,7 @@ function bindEvents() {
   });
 
   $("deleteImovelButton")?.addEventListener("click", async () => {
-    if (!state.selectedImovelId || !confirm("Excluir este imovel?")) return;
-    const original = state.imoveis.find((item) => item.id === state.selectedImovelId);
-    if (!original || !itemBelongsToCurrentClient(original)) {
-      showToast("Voce nao tem permissao para excluir este imovel.");
-      return;
-    }
-    if (original.origemBase === "script.js") {
-      const tombstone = cleanForFirebase({
-        ...original,
-        status: "inativo",
-        ocultarBaseInicial: true,
-        origem: "painel",
-        origemBase: "script.js",
-        deletedAt: serverTimestamp(),
-        deletedBy: state.user?.uid || ""
-      });
-      await update(ref(db, `conteudosInformativos/imoveis/${state.selectedImovelId}`), tombstone);
-    } else {
-      await remove(ref(db, `conteudosInformativos/imoveis/${state.selectedImovelId}`));
-    }
-    showToast("Imovel excluido.");
-    resetImovelForm();
-    await loadAllData();
+    await excluirImovelPorId(state.selectedImovelId);
   });
 
   $("automovelForm")?.addEventListener("submit", async (event) => {

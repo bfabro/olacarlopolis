@@ -18026,10 +18026,60 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
     if (isVagasTrabalho) {
       const buscaInicial = window.__vagasBuscaAtual || "";
+      const abrirModalVagaPublica = (card) => {
+        if (!card) return;
+        document.querySelector(".vaga-modal-overlay")?.remove();
+        const titulo = card.querySelector(".vaga-public-summary h3")?.textContent || "Vaga de trabalho";
+        const media = card.querySelector(".vaga-public-media")?.cloneNode(true);
+        const summary = card.querySelector(".vaga-public-summary")?.cloneNode(true);
+        const details = card.querySelector(".vaga-public-details")?.cloneNode(true);
+        summary?.querySelector(".vaga-more-btn")?.remove();
+        const modal = document.createElement("div");
+        modal.className = "vaga-modal-overlay";
+        modal.innerHTML = `
+          <div class="vaga-modal-card" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(titulo)}">
+            <button type="button" class="vaga-modal-close" aria-label="Fechar">&times;</button>
+            <div class="vaga-modal-content"></div>
+          </div>
+        `;
+        const content = modal.querySelector(".vaga-modal-content");
+        if (media) content.appendChild(media);
+        if (summary) content.appendChild(summary);
+        if (details) content.appendChild(details);
+        document.body.appendChild(modal);
+        document.body.classList.add("vaga-modal-open");
+        const fechar = () => {
+          document.body.classList.remove("vaga-modal-open");
+          modal.remove();
+          document.removeEventListener("keydown", escHandler);
+        };
+        const escHandler = (event) => {
+          if (event.key === "Escape") fechar();
+        };
+        modal.querySelector(".vaga-modal-close")?.addEventListener("click", fechar);
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) fechar();
+        });
+        modal.querySelectorAll(".vaga-share-btn").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const url = location.href;
+            if (navigator.share) await navigator.share({ title: titulo, text: `Confira esta vaga no Olá Carlópolis: ${titulo}`, url });
+            else {
+              await navigator.clipboard?.writeText(url);
+              alert("Link copiado!");
+            }
+          });
+        });
+        document.addEventListener("keydown", escHandler);
+      };
       const bindVagasPublicas = () => {
         contentArea.querySelectorAll(".vaga-more-btn").forEach((button) => {
           button.addEventListener("click", () => {
             const card = button.closest(".vaga-public-card");
+            if (contentArea.querySelector(".vagas-public-page")?.classList.contains("vagas-cards-mode")) {
+              abrirModalVagaPublica(card);
+              return;
+            }
             const expanded = card?.classList.toggle("expanded");
             button.innerHTML = expanded
               ? `<i class="fa-solid fa-chevron-up"></i> Menos informações`
