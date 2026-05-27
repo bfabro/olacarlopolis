@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=220">
+  <link rel="stylesheet" href="painel.css?v=221">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -564,7 +564,11 @@
       </section>
 
       <section id="informacoesView" class="panel-view hidden">
-        <div class="split-layout">
+        <div class="info-module-tabs">
+          <button type="button" class="active" data-info-module-target="infoDeathNoticeModule"><i class="fa-solid fa-dove"></i> Nota de falecimento</button>
+          <button type="button" data-info-module-target="infoWhatsappGroupsModule"><i class="fa-brands fa-whatsapp"></i> Grupos WhatsApp</button>
+        </div>
+        <div id="infoDeathNoticeModule" class="split-layout info-module-panel active">
           <section class="panel-card form-collapsed">
             <div class="section-head">
               <div>
@@ -606,7 +610,7 @@
           </section>
         </div>
 
-        <div class="split-layout info-admin-block">
+        <div id="infoWhatsappGroupsModule" class="split-layout info-admin-block info-module-panel">
           <section class="panel-card form-collapsed">
             <div class="section-head">
               <div>
@@ -951,6 +955,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=220"></script>
+  <script type="module" src="painel.js?v=221"></script>
 </body>
 </html>

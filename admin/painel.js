@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 220,
-  label: "v220",
+  numero: 221,
+  label: "v221",
   data: "2026-05-26",
-  nota: "Adiciona filtro por bairro na tela publica de imoveis."
+  nota: "Destaca Grupos WhatsApp na tela de Informacoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6172,6 +6172,15 @@ function bindEvents() {
   $("infoWhatsappGroupImageUpload")?.addEventListener("change", async (event) => {
     await uploadInfoWhatsappGroupImage(event.target.files?.[0]);
     event.target.value = "";
+  });
+  document.querySelectorAll("[data-info-module-target]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.dataset.infoModuleTarget;
+      document.querySelectorAll("[data-info-module-target]").forEach((item) => item.classList.toggle("active", item === button));
+      document.querySelectorAll("#informacoesView .info-module-panel").forEach((panel) => {
+        panel.classList.toggle("active", panel.id === targetId);
+      });
+    });
   });
   $("financeSearch").addEventListener("input", renderFinanceiro);
   $("financeFilter").addEventListener("change", renderFinanceiro);

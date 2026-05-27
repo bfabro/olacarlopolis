@@ -716,6 +716,41 @@ button[type="submit"]:hover,
   margin-top: 18px;
 }
 
+.info-module-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.info-module-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: #fff;
+  color: var(--text);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.info-module-tabs button.active {
+  border-color: var(--brand);
+  background: #eff6ff;
+  color: var(--brand);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, .12);
+}
+
+.info-module-panel {
+  display: none;
+}
+
+.info-module-panel.active {
+  display: grid;
+}
+
 #clientesView.client-focus-mode .split-layout {
   grid-template-columns: minmax(0, 980px);
   justify-content: center;
