@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 207,
-  label: "v207",
+  numero: 208,
+  label: "v208",
   data: "2026-05-26",
-  nota: "Ajusta contador online para ignorar admin e expirar abas inativas."
+  nota: "Faz o contador online abrir o painel administrativo atual."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

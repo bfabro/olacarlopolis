@@ -21607,31 +21607,30 @@ try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  const iconeContador = document.getElementById("iconeUsuarios"); // Altere para o ID real do ícone
+  const iconeContador = document.getElementById("iconeUsuarios");
   const modal = document.getElementById("modalLogin");
   const btnFechar = document.querySelector(".close-modal");
 
-  if (iconeContador && modal) {
+  if (iconeContador) {
+    iconeContador.setAttribute("title", "Area administrativa");
     iconeContador.addEventListener("click", (e) => {
       e.preventDefault();
-      modal.classList.remove("hidden");
+      window.location.href = "admin/painel.html";
     });
   }
 
-  if (btnFechar) {
+  if (btnFechar && modal) {
     btnFechar.addEventListener("click", () => {
       modal.classList.add("hidden");
     });
   }
 
-  // Fechar ao clicar fora da modal
   window.addEventListener("click", (event) => {
-    if (event.target == modal) {
+    if (modal && event.target == modal) {
       modal.classList.add("hidden");
     }
   });
 });
-
 
 
 document.addEventListener("click", (e) => {
