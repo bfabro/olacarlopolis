@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 208,
-  label: "v208",
+  numero: 209,
+  label: "v209",
   data: "2026-05-26",
-  nota: "Faz o contador online abrir o painel administrativo atual."
+  nota: "Mostra codigo de referencia nas listas de imoveis e veiculos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3039,7 +3039,7 @@ function renderAutomoveisList() {
   if (!box) return;
   const q = String($("automovelSearch")?.value || "").toLowerCase().trim();
   const list = state.automoveis.filter(itemBelongsToCurrentClient).filter((item) => {
-    const hay = `${item.tipo || ""} ${item.marca || ""} ${item.modelo || ""} ${item.ano || ""} ${item.preco || ""} ${item.vendedor || ""} ${item.loja || ""}`.toLowerCase();
+    const hay = `${item.codRef || ""} ${item.codigo || ""} ${item.tipo || ""} ${item.marca || ""} ${item.modelo || ""} ${item.ano || ""} ${item.preco || ""} ${item.vendedor || ""} ${item.loja || ""}`.toLowerCase();
     return !q || hay.includes(q);
   });
   if (!list.length) {
@@ -3048,10 +3048,12 @@ function renderAutomoveisList() {
   }
   box.innerHTML = list.map((item) => {
     const titulo = [item.marca, item.modelo].filter(Boolean).join(" ") || item.id;
+    const codigoRef = item.codRef || item.codigo || item.id || "";
     return `
       <article class="list-card event-card">
         ${item.imagem ? `<img src="${escapeAttr(displayImageUrl(item.imagem))}" alt="${escapeAttr(titulo)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
         <div class="list-title">${escapeHtml(titulo)}</div>
+        <div class="list-meta"><strong>Codigo de referencia:</strong> ${escapeHtml(codigoRef || "Sem codigo")}</div>
         <div class="list-meta">${escapeHtml([item.tipo, item.condicao, item.ano, item.preco].filter(Boolean).join(" - ") || "Sem valor")}</div>
         <div class="list-meta">${escapeHtml([item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ") || "Sem contato")}</div>
         <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
@@ -3211,24 +3213,27 @@ function renderImoveisList() {
   if (!box) return;
   const q = String($("imovelSearch")?.value || "").toLowerCase().trim();
   const list = state.imoveis.filter(itemBelongsToCurrentClient).filter((item) => {
-    const hay = `${item.titulo || ""} ${item.tipo || ""} ${item.procura || ""} ${item.valor || ""} ${item.corretor || ""} ${item.endereco || ""}`.toLowerCase();
+    const hay = `${item.codRef || ""} ${item.codigo || ""} ${item.titulo || ""} ${item.tipo || ""} ${item.procura || ""} ${item.valor || ""} ${item.corretor || ""} ${item.endereco || ""}`.toLowerCase();
     return !q || hay.includes(q);
   });
   if (!list.length) {
     box.innerHTML = `<div class="list-meta">Nenhum imovel cadastrado.</div>`;
     return;
   }
-  box.innerHTML = list.map((item) => `
+  box.innerHTML = list.map((item) => {
+    const codigoRef = item.codRef || item.codigo || item.id || "";
+    return `
     <article class="list-card event-card">
       ${item.imagem ? `<img src="${escapeAttr(displayImageUrl(item.imagem))}" alt="${escapeAttr(item.titulo || "Imovel")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
       <div class="list-title">${escapeHtml(item.titulo || item.id)}</div>
+      <div class="list-meta"><strong>Codigo de referencia:</strong> ${escapeHtml(codigoRef || "Sem codigo")}</div>
       <div class="list-meta">${escapeHtml([item.tipo, item.procura, item.valor ? moneyBR(item.valor) : ""].filter(Boolean).join(" - ") || "Sem valor")}</div>
       <div class="list-meta">${escapeHtml([item.corretor || item.clienteNome, item.telefone].filter(Boolean).join(" - ") || "Sem contato")}</div>
       <div class="list-meta">${escapeHtml(item.origemBase === "script.js" && item.origem !== "painel" ? "Base inicial do site" : "Firebase / Painel")}</div>
       <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
       <button type="button" data-edit-imovel="${escapeAttr(item.id)}">Editar</button>
     </article>
-  `).join("");
+  `; }).join("");
   box.querySelectorAll("[data-edit-imovel]").forEach((button) => {
     button.addEventListener("click", () => {
       const item = state.imoveis.find((imovel) => imovel.id === button.dataset.editImovel && itemBelongsToCurrentClient(imovel));
