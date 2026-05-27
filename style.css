@@ -9,6 +9,39 @@
   font-family: "Poppins", sans-serif;
 }
 
+/* Imóveis: quando o modo Cards estiver ativo no desktop, mantém o mesmo formato vertical do mobile. */
+@media (min-width: 768px) {
+  .content_area .imoveis-wrap.im-cards-mode .card-imovel {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+  }
+
+  .content_area .imoveis-wrap.im-cards-mode .card-top,
+  .content_area .imoveis-wrap.im-cards-mode .card-body {
+    width: 100% !important;
+  }
+
+  .content_area .imoveis-wrap.im-cards-mode .card-body {
+    padding: 9px !important;
+  }
+
+  .content_area .imoveis-wrap.im-cards-mode .card-title {
+    font-size: 14px !important;
+    line-height: 1.15 !important;
+    margin-bottom: 5px !important;
+  }
+
+  .content_area .imoveis-wrap.im-cards-mode .card-addr2 {
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+  }
+}
+
 /* ===== Promoções: lista compacta inspirada no app v136 ===== */
 .promo-hero-new {
   max-width: 760px;
