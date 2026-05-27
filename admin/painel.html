@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=227">
+  <link rel="stylesheet" href="painel.css?v=228">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -806,6 +806,13 @@
             </div>
             <form id="automovelForm" class="grid-form">
               <input id="automovelId" type="hidden">
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-car-side"></i>
+                <div>
+                  <strong>Dados do veiculo</strong>
+                  <span>Tipo, marca, modelo, ano, valor e situacao do anuncio.</span>
+                </div>
+              </div>
               <label>Tipo
                 <select id="automovelTipo">
                   <option value="">Selecione o tipo</option>
@@ -839,13 +846,27 @@
                   <option value="vendido">Vendido</option>
                 </select>
               </label>
-              <label>Contato/WhatsApp<input id="automovelContato" placeholder="(43) 99999-9999"></label>
-              <label>Loja/vendedor<input id="automovelVendedor" placeholder="Nome da loja ou vendedor"></label>
-              <label>Instagram da loja<input id="automovelInstagram" placeholder="https://instagram.com/loja"></label>
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-gears"></i>
+                <div>
+                  <strong>Caracteristicas</strong>
+                  <span>Detalhes rapidos para facilitar o filtro e a leitura no site publico.</span>
+                </div>
+              </div>
               <label>Combustivel<input id="automovelCombustivel" placeholder="Ex: Flex, Gasolina, Diesel"></label>
               <label>Cambio<input id="automovelCambio" placeholder="Ex: Manual, Automatico"></label>
               <label>Cor<input id="automovelCor" placeholder="Ex: Prata"></label>
               <label>Cidade/local<input id="automovelCidade" placeholder="Ex: Carlopolis"></label>
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-store"></i>
+                <div>
+                  <strong>Vendedor e contato</strong>
+                  <span>Dados usados nos botoes e na identificacao do anunciante.</span>
+                </div>
+              </div>
+              <label>Contato/WhatsApp<input id="automovelContato" placeholder="(43) 99999-9999"></label>
+              <label>Loja/vendedor<input id="automovelVendedor" placeholder="Nome da loja ou vendedor"></label>
+              <label class="wide">Instagram da loja<input id="automovelInstagram" placeholder="https://instagram.com/loja"></label>
               <label class="wide">Opcionais<textarea id="automovelOpcionais" rows="3" placeholder="Ex: ar condicionado, direcao, vidro eletrico, camera de re..."></textarea></label>
               <label class="wide">Descricao<textarea id="automovelDescricao" rows="4" placeholder="Detalhes do veiculo, estado, opcionais..."></textarea></label>
               <input id="automovelImagem" type="hidden">
@@ -976,6 +997,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=227"></script>
+  <script type="module" src="painel.js?v=228"></script>
 </body>
 </html>

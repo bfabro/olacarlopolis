@@ -1995,6 +1995,117 @@ button[type="submit"]:hover,
   }
 }
 
+@media (max-width: 640px) {
+  #imovelForm,
+  #automovelForm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  #imovelForm label,
+  #automovelForm label {
+    gap: 4px;
+    font-size: 11.5px;
+    line-height: 1.15;
+  }
+
+  #imovelForm input,
+  #imovelForm select,
+  #automovelForm input,
+  #automovelForm select {
+    min-height: 38px;
+    border-radius: 9px;
+    padding: 8px 9px;
+    font-size: 13px;
+  }
+
+  #imovelForm textarea,
+  #automovelForm textarea {
+    min-height: 86px;
+    border-radius: 10px;
+    padding: 9px;
+    font-size: 13px;
+  }
+
+  #imovelForm .form-section-title,
+  #automovelForm .form-section-title {
+    margin: 8px 0 0;
+    padding: 9px 10px;
+    border-radius: 11px;
+    gap: 8px;
+  }
+
+  #imovelForm .form-section-title i,
+  #automovelForm .form-section-title i {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  #imovelForm .form-section-title strong,
+  #automovelForm .form-section-title strong {
+    font-size: 14px;
+    line-height: 1.1;
+  }
+
+  #imovelForm .form-section-title span,
+  #automovelForm .form-section-title span {
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+
+  #imovelForm .upload-panel,
+  #automovelForm .upload-panel {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  #imovelForm .upload-panel .section-head,
+  #automovelForm .upload-panel .section-head {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  #imovelForm .upload-panel h3,
+  #automovelForm .upload-panel h3 {
+    font-size: 15px;
+  }
+
+  #imovelForm .upload-panel p,
+  #automovelForm .upload-panel p {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  #imovelForm .image-grid,
+  #automovelForm .image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  #imovelForm .form-actions,
+  #automovelForm .form-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  #imovelForm .form-actions button,
+  #automovelForm .form-actions button {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  #deleteImovelButton.hidden,
+  #deleteAutomovelButton.hidden {
+    display: none !important;
+  }
+}
+
 /* ===== Eventos realizados v180 ===== */
 .event-card-done {
   border-color: #fed7aa;
