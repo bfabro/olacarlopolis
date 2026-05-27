@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 224,
-  label: "v224",
+  numero: 225,
+  label: "v225",
   data: "2026-05-26",
-  nota: "Adiciona controle de destaque da semana para clientes."
+  nota: "Adiciona rodizio semanal dos destaques da home."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1759,8 +1759,8 @@ function refreshClientFeaturedSummary() {
   if ($("clientFeaturedValue")) $("clientFeaturedValue").value = value ? moneyBR(value) : "";
   if ($("clientFeaturedSummary")) {
     $("clientFeaturedSummary").textContent = active
-      ? `${weeks} semana${weeks === 1 ? "" : "s"} (${days} dias) - ${moneyBR(value)} - valido ate ${formatDateBR(end)}.`
-      : `Valor definido pelo admin master: ${moneyBR(destaqueWeeklyValue())} por semana.`;
+      ? `${weeks} semana${weeks === 1 ? "" : "s"} (${days} dias) - ${moneyBR(value)} - valido ate ${formatDateBR(end)}. Se houver mais de 20 destaques ativos, a exibicao alterna por semana pela ordem de contratacao.`
+      : `Valor definido pelo admin master: ${moneyBR(destaqueWeeklyValue())} por semana. Limite de 20 destaques exibidos por semana.`;
   }
 }
 
@@ -5126,7 +5126,7 @@ function renderClientOnlyEditor() {
             <div>
               <span class="feature-kicker">Pagina inicial</span>
               <h3>Destaque da semana</h3>
-              <p>Fixe sua empresa entre os destaques da tela inicial pelo periodo escolhido.</p>
+              <p>Sua empresa entra na fila semanal da tela inicial. O site mostra ate 20 destaques por semana.</p>
             </div>
             <span class="badge">${destaqueIsActive(client) ? "Ativo" : "Inativo"}</span>
           </div>
@@ -5203,8 +5203,8 @@ function renderClientOnlyEditor() {
     if (valueInput) valueInput.value = value ? moneyBR(value) : "";
     if (summary) {
       summary.textContent = active
-        ? `${weeks} semana${weeks === 1 ? "" : "s"} (${days} dias), ${moneyBR(value)}, valido ate ${formatDateBR(end)}. Cobranca: ${billing === "pix_separado" ? "Pix separado" : "junto da mensalidade"}.`
-        : `Valor do destaque definido pelo admin master: ${moneyBR(destaqueWeeklyValue())} por semana.`;
+        ? `${weeks} semana${weeks === 1 ? "" : "s"} (${days} dias), ${moneyBR(value)}, valido ate ${formatDateBR(end)}. Cobranca: ${billing === "pix_separado" ? "Pix separado" : "junto da mensalidade"}. Se houver mais de 20 ativos, os destaques alternam semanalmente por ordem de contratacao.`
+        : `Valor do destaque definido pelo admin master: ${moneyBR(destaqueWeeklyValue())} por semana. O site exibe no maximo 20 destaques por semana.`;
     }
   };
   ["coFeaturedWeek", "coFeaturedWeeks", "coFeaturedBilling"].forEach((id) => {

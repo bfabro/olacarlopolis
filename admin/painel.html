@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=224">
+  <link rel="stylesheet" href="painel.css?v=225">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -212,7 +212,7 @@
                 <div class="section-head compact">
                   <div>
                     <h3>Destaque da semana</h3>
-                    <p>Cliente fixo na tela inicial enquanto estiver marcado.</p>
+                    <p>Cliente entra na fila semanal da tela inicial. O site mostra ate 20 destaques por semana.</p>
                   </div>
                 </div>
                 <label class="check-row"><input id="clientFeaturedWeek" type="checkbox"> Manter este cliente em destaque na tela inicial</label>
@@ -224,7 +224,7 @@
                   </select>
                 </label>
                 <label>Valor do destaque<input id="clientFeaturedValue" placeholder="R$" readonly></label>
-                <div id="clientFeaturedSummary" class="list-meta wide">Valor definido pelo admin master.</div>
+                <div id="clientFeaturedSummary" class="list-meta wide">Valor definido pelo admin master. Quando houver mais de 20 destaques ativos, a exibicao alterna por semana conforme a ordem de contratacao.</div>
               </section>
               <section class="wide upload-panel client-jobs-panel">
                 <div class="section-head compact">
@@ -964,6 +964,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=224"></script>
+  <script type="module" src="painel.js?v=225"></script>
 </body>
 </html>

@@ -1987,6 +1987,21 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
+    const LIMITE_DESTAQUES_HOME = 20;
+    const inicioSemana = (date = new Date()) => {
+      const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const dia = d.getDay() || 7;
+      d.setDate(d.getDate() - dia + 1);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    };
+    const numeroSemana = (date = new Date()) => Math.floor(inicioSemana(date).getTime() / 604800000);
+    const valorOrdemDestaque = (est) => {
+      const raw = est?.destaqueInicio || est?.createdAt || est?.updatedAt || "";
+      if (typeof raw === "number") return raw;
+      const time = raw ? new Date(`${String(raw).slice(0, 10)}T12:00:00`).getTime() : 0;
+      return Number.isFinite(time) ? time : 0;
+    };
     const destaqueEstaAtivo = (est) => {
       if (!est?.destaqueSemanal) return false;
       const fim = est.destaqueFim || "";
@@ -1994,22 +2009,32 @@ document.addEventListener("DOMContentLoaded", function () {
       const hoje = new Date().toISOString().slice(0, 10);
       return String(fim) >= hoje;
     };
+    const selecionarDestaquesDaSemana = (itens) => {
+      const unicos = [...new Map(itens.map(item => [item.nomeNormalizado, item])).values()]
+        .sort((a, b) => valorOrdemDestaque(a) - valorOrdemDestaque(b) || String(a.name || "").localeCompare(String(b.name || "")));
+      if (unicos.length <= LIMITE_DESTAQUES_HOME) return unicos;
+      const semana = numeroSemana();
+      const grupo = semana % Math.ceil(unicos.length / LIMITE_DESTAQUES_HOME);
+      const inicio = grupo * LIMITE_DESTAQUES_HOME;
+      const selecionados = unicos.slice(inicio, inicio + LIMITE_DESTAQUES_HOME);
+      return selecionados.length === LIMITE_DESTAQUES_HOME
+        ? selecionados
+        : [...selecionados, ...unicos.slice(0, LIMITE_DESTAQUES_HOME - selecionados.length)];
+    };
 
-    const destaquesAdmin = listaTodos
-      .filter(e => destaqueEstaAtivo(e))
-      .map(e => e.nomeNormalizado);
-    const nomesFixos = [...new Set([...destaquesAdmin, ...destaquesFixos])];
-
-    const fixos = nomesFixos
+    const destaquesContratados = listaTodos.filter(e => destaqueEstaAtivo(e));
+    const destaquesManuais = destaquesFixos
       .map(nome => listaTodos.find(e => e.nomeNormalizado === nome))
       .filter(Boolean);
+    const fixos = selecionarDestaquesDaSemana([...destaquesManuais, ...destaquesContratados]);
+    const nomesFixos = fixos.map(e => e.nomeNormalizado);
 
     const restantes = listaTodos.filter(e => !nomesFixos.includes(e.nomeNormalizado));
     const sorteados = restantes
       .sort(() => Math.random() - 0.5)
-      .slice(0, Math.max(0, 20 - fixos.length));
+      .slice(0, Math.max(0, LIMITE_DESTAQUES_HOME - fixos.length));
 
-    const totalExibir = [...fixos, ...sorteados].slice(0, 22);
+    const totalExibir = [...fixos, ...sorteados].slice(0, LIMITE_DESTAQUES_HOME);
 
     const swiperWrapper = document.querySelector(".swiper-novidades .swiper-wrapper");
     const gradeDivulgacao = document.getElementById("grade-divulgacao");
