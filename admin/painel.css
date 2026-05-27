@@ -2104,6 +2104,117 @@ button[type="submit"]:hover,
   #deleteAutomovelButton.hidden {
     display: none !important;
   }
+
+  #clientOnlyForm {
+    gap: 10px;
+  }
+
+  #clientOnlyForm .client-module-content {
+    gap: 10px;
+  }
+
+  #clientOnlyForm #client-module-dados.client-module-panel.active,
+  #clientOnlyForm #client-module-vagas.client-module-panel.active {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  #clientOnlyForm #client-module-dados .wide,
+  #clientOnlyForm #client-module-vagas .wide,
+  #clientOnlyForm #client-module-dados .form-section-title,
+  #clientOnlyForm #client-module-vagas .section-head,
+  #clientOnlyForm #client-module-dados .schedule-panel,
+  #clientOnlyForm #client-module-vagas .check-row,
+  #clientOnlyForm #client-module-vagas .promo-admin-list {
+    grid-column: 1 / -1;
+  }
+
+  #clientOnlyForm #client-module-dados label,
+  #clientOnlyForm #client-module-vagas label {
+    gap: 4px;
+    font-size: 11.5px;
+    line-height: 1.15;
+  }
+
+  #clientOnlyForm #client-module-dados input,
+  #clientOnlyForm #client-module-dados select,
+  #clientOnlyForm #client-module-vagas input,
+  #clientOnlyForm #client-module-vagas select {
+    min-height: 38px;
+    border-radius: 9px;
+    padding: 8px 9px;
+    font-size: 13px;
+  }
+
+  #clientOnlyForm #client-module-dados textarea,
+  #clientOnlyForm #client-module-vagas textarea {
+    min-height: 78px;
+    border-radius: 10px;
+    padding: 9px;
+    font-size: 13px;
+  }
+
+  #clientOnlyForm #client-module-dados .form-section-title,
+  #clientOnlyForm #client-module-vagas .section-head {
+    margin: 4px 0 0;
+    padding: 9px 10px;
+    border-radius: 11px;
+    gap: 8px;
+  }
+
+  #clientOnlyForm #client-module-dados .form-section-title i {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  #clientOnlyForm #client-module-dados .form-section-title strong,
+  #clientOnlyForm #client-module-vagas .section-head h3 {
+    font-size: 14px;
+    line-height: 1.1;
+  }
+
+  #clientOnlyForm #client-module-dados .form-section-title span,
+  #clientOnlyForm #client-module-vagas .section-head p {
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+
+  #clientOnlyForm #client-module-vagas .section-head {
+    display: flex;
+    align-items: center;
+  }
+
+  #clientOnlyForm #client-module-vagas .section-fields {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  #clientOnlyForm #client-module-vagas .form-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  #clientOnlyForm #client-module-vagas .form-actions button,
+  #clientOnlyForm > .form-actions button {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  #clientOnlyForm #client-module-vagas .badge {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
 }
 
 /* ===== Eventos realizados v180 ===== */
@@ -2237,13 +2348,34 @@ button[type="submit"]:hover,
     white-space: nowrap;
   }
 }
-/* ===== Submenu Minha empresa no sidebar v183 ===== */
+/* ===== Itens diretos do cliente no sidebar v229 ===== */
 .client-module-sidebar {
   display: grid;
+  gap: 10px;
+  margin: 2px 0 8px;
+  padding: 2px 0 8px;
+  border-left: 0;
+}
+
+.client-module-sidebar-group {
+  display: grid;
   gap: 6px;
-  margin: -4px 0 6px 14px;
-  padding-left: 10px;
-  border-left: 1px solid rgba(255,255,255,.16);
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.12);
+}
+
+.client-module-sidebar-group:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.client-module-sidebar-title {
+  padding: 0 9px;
+  color: #93c5fd;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
 .sidebar-client-module-item {
@@ -2251,18 +2383,19 @@ button[type="submit"]:hover,
   align-items: center;
   gap: 8px;
   width: 100%;
-  min-height: 34px;
-  padding: 7px 9px;
-  border-radius: 9px;
-  background: rgba(255,255,255,.05);
-  color: #dbeafe;
-  font-size: 12px;
+  min-height: 41px;
+  padding: 9px 11px;
+  border-radius: 11px;
+  background: rgba(255,255,255,.04);
+  color: #e5edff;
+  font-size: 13px;
   font-weight: 800;
   text-align: left;
+  border: 1px solid rgba(255,255,255,.08);
 }
 
 .sidebar-client-module-item i {
-  width: 15px;
+  width: 17px;
   text-align: center;
   color: #93c5fd;
 }
@@ -2270,6 +2403,12 @@ button[type="submit"]:hover,
 .sidebar-client-module-item.active,
 .sidebar-client-module-item:hover {
   background: rgba(37,99,235,.22);
+  color: #ffffff;
+  border-color: rgba(147,197,253,.35);
+}
+
+.sidebar-client-module-item.active i,
+.sidebar-client-module-item:hover i {
   color: #ffffff;
 }
 /* ===== Minha empresa um modulo por vez v184 ===== */

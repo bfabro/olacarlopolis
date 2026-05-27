@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 228,
-  label: "v228",
+  numero: 229,
+  label: "v229",
   data: "2026-05-26",
-  nota: "Melhora formularios mobile de imoveis e automoveis."
+  nota: "Organiza menu do cliente e melhora dados e vagas no mobile."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -78,6 +78,7 @@ let state = {
   clientPromocoes: [],
   clientPromoEditIndex: null,
   staffPromoEditIndex: null,
+  pendingClientModuleTarget: "",
   selectedPromoClientId: "",
   imovelImages: [],
   automovelImages: [],
@@ -1506,6 +1507,9 @@ function updateChrome() {
   document.querySelectorAll("[data-role='cliente']").forEach((el) => {
     el.classList.toggle("hidden", canManageClients());
   });
+  document.querySelectorAll("[data-client-root-nav='true']").forEach((el) => {
+    el.classList.add("hidden");
+  });
   document.querySelectorAll("[data-master='true']").forEach((el) => {
     el.classList.toggle("hidden", !isMaster());
   });
@@ -1545,9 +1549,6 @@ function switchView(name) {
   document.querySelectorAll(".nav-admin button").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.view === target);
   });
-  if ($("clientModuleSidebar") && target !== "minhaEmpresa") {
-    $("clientModuleSidebar").classList.add("hidden");
-  }
   const [title, subtitle] = viewCopy[target];
   $("viewTitle").textContent = title;
   $("viewSubtitle").textContent = subtitle;
@@ -4940,20 +4941,47 @@ function renderClientOnlyEditor() {
     }
     $("coCancelJobEditButton")?.classList.toggle("hidden", !editing);
   };
-  const clientModules = [
-    { id: "client-module-dados", icon: "fa-solid fa-building", label: "Dados da empresa", show: canEditDados },
-    { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas },
-    { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardapio", show: canEditCardapio },
-    { id: "client-module-imagens", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
-    { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes },
-    { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque },
-    { id: "client-module-relatorios", icon: "fa-solid fa-chart-line", label: "Relatorios", show: canViewRelatorios }
-  ].filter((item) => item.show);
-  const initialClientModule = (clientModules.find((item) => item.id === "client-module-dados") || clientModules[0] || {}).id || "";
-  const clientSidebarNav = clientModules.map((item) => `
-    <button type="button" class="sidebar-client-module-item${item.id === initialClientModule ? " active" : ""}" data-client-module-target="${item.id}">
-      <i class="${item.icon}"></i><span>${item.label}</span>
-    </button>
+  const clientModuleGroups = [
+    {
+      label: "Cadastro",
+      items: [
+        { id: "client-module-dados", icon: "fa-solid fa-building", label: "Dados da empresa", show: canEditDados },
+        { id: "client-module-imagens", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
+        { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardapio", show: canEditCardapio }
+      ]
+    },
+    {
+      label: "Negocio",
+      items: [
+        { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas },
+        { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes },
+        { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque }
+      ]
+    },
+    {
+      label: "Gestao",
+      items: [
+        { id: "client-module-relatorios", icon: "fa-solid fa-chart-line", label: "Relatorios", show: canViewRelatorios }
+      ]
+    }
+  ].map((group) => ({
+    ...group,
+    items: group.items.filter((item) => item.show)
+  })).filter((group) => group.items.length);
+  const clientModules = clientModuleGroups.flatMap((group) => group.items);
+  const requestedClientModule = clientModules.some((item) => item.id === state.pendingClientModuleTarget)
+    ? state.pendingClientModuleTarget
+    : "";
+  const initialClientModule = requestedClientModule || (clientModules.find((item) => item.id === "client-module-dados") || clientModules[0] || {}).id || "";
+  const clientSidebarNav = clientModuleGroups.map((group) => `
+    <div class="client-module-sidebar-group">
+      <span class="client-module-sidebar-title">${group.label}</span>
+      ${group.items.map((item) => `
+        <button type="button" class="sidebar-client-module-item${item.id === initialClientModule ? " active" : ""}" data-client-module-target="${item.id}">
+          <i class="${item.icon}"></i><span>${item.label}</span>
+        </button>
+      `).join("")}
+    </div>
   `).join("");
   if ($("clientModuleSidebar")) {
     $("clientModuleSidebar").innerHTML = clientSidebarNav;
@@ -5202,10 +5230,20 @@ function renderClientOnlyEditor() {
     });
     moduleNavButtons.forEach((item) => item.classList.toggle("active", item.dataset.clientModuleTarget === targetId));
   };
-  if (initialClientModule) activateClientModule(initialClientModule);
+  if (initialClientModule) {
+    activateClientModule(initialClientModule);
+    state.pendingClientModuleTarget = "";
+  }
   moduleNavButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      activateClientModule(button.dataset.clientModuleTarget);
+      const targetModule = button.dataset.clientModuleTarget;
+      state.pendingClientModuleTarget = targetModule;
+      if (views.minhaEmpresa?.classList.contains("hidden")) {
+        switchView("minhaEmpresa");
+      } else {
+        activateClientModule(targetModule);
+        state.pendingClientModuleTarget = "";
+      }
       closeAdminMenuOnMobile();
     });
   });
