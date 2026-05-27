@@ -4911,6 +4911,8 @@ ${(cardapioVisivel(est) || est.contact) ? `
       (cat.establishments || []).forEach(est => {
         const nomeEst = est.name;
         const idEst = normalizeName(est.nomeNormalizado || nomeEst);
+        const statusEst = statusEstabelecimentos[idEst] || statusEstabelecimentos[normalizeName(nomeEst)];
+        if (statusEst && statusEst !== "s") return;
         const lista = est.promocoes || est.promotions || [];
         lista.forEach(p => {
           if (p && p.ativo === false) return;
@@ -17066,14 +17068,15 @@ plotarPinsImoveis(stateImoveis.filtered);
     ].filter(Boolean);
     const setStatus = (value) => keys.forEach((key) => { statusEstabelecimentos[key] = value; });
 
-    const statusCliente = String(cliente.status || "ativo").toLowerCase();
-    setStatus(statusCliente === "inativo" ? "n" : "s");
+    setStatus(clienteAdminPodeAparecer(cliente) ? "s" : "n");
   }
 
   function clienteAdminPodeAparecer(cliente) {
     if (!cliente) return false;
     const statusCliente = String(cliente.status || "ativo").toLowerCase();
-    return statusCliente !== "inativo";
+    const financeiroStatus = String(cliente.financeiroStatus || cliente.statusFinanceiro || cliente.financeiro?.status || "").toLowerCase();
+    const pagamentoStatus = String(cliente.pagamentoStatus || "").toLowerCase();
+    return ![statusCliente, financeiroStatus, pagamentoStatus].some((status) => ["inativo", "inativa", "inactive"].includes(status));
   }
 
   function pontuarFonteClienteAdmin(cliente) {
