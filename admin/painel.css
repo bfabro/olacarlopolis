@@ -752,6 +752,68 @@ button[type="submit"]:hover,
   font-weight: 800;
 }
 
+.delete-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(15, 23, 42, .58);
+  backdrop-filter: blur(3px);
+}
+
+.delete-confirm-modal {
+  width: min(420px, 100%);
+  border: 1px solid #fecaca;
+  border-radius: 18px;
+  padding: 22px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, .28);
+  text-align: center;
+}
+
+.delete-confirm-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: var(--danger);
+  font-size: 24px;
+}
+
+.delete-confirm-modal h3 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 22px;
+}
+
+.delete-confirm-modal p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.delete-confirm-name {
+  margin: 14px 0 18px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: var(--ink);
+  font-weight: 900;
+  word-break: break-word;
+}
+
+.delete-confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .permissions-box {
   border: 1px solid var(--line);
   border-radius: 12px;

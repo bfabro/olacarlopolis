@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 212,
-  label: "v212",
+  numero: 213,
+  label: "v213",
   data: "2026-05-26",
-  nota: "Adiciona relatorio de cliques no painel do cliente por permissao."
+  nota: "Adiciona modal de confirmacao ao excluir itens."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1027,6 +1027,43 @@ function showToast(message) {
   setTimeout(() => toast.classList.add("hidden"), 3200);
 }
 
+function confirmarExclusao(nomeItem, tipoItem = "item") {
+  return new Promise((resolve) => {
+    document.querySelector(".delete-confirm-overlay")?.remove();
+    const nome = String(nomeItem || "este item").trim() || "este item";
+    const overlay = document.createElement("div");
+    overlay.className = "delete-confirm-overlay";
+    overlay.innerHTML = `
+      <section class="delete-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+        <div class="delete-confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3 id="deleteConfirmTitle">Confirmar exclusao</h3>
+        <p>Tem certeza que deseja excluir o <strong>${escapeHtml(tipoItem)}</strong>:</p>
+        <div class="delete-confirm-name">${escapeHtml(nome)}</div>
+        <div class="delete-confirm-actions">
+          <button type="button" class="ghost-button" data-delete-cancel>Cancelar</button>
+          <button type="button" class="danger-button" data-delete-confirm><i class="fa-solid fa-trash"></i> Excluir</button>
+        </div>
+      </section>
+    `;
+    document.body.appendChild(overlay);
+    const close = (ok) => {
+      overlay.remove();
+      document.removeEventListener("keydown", onKey);
+      resolve(Boolean(ok));
+    };
+    const onKey = (event) => {
+      if (event.key === "Escape") close(false);
+      if (event.key === "Enter") close(true);
+    };
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay || event.target.closest("[data-delete-cancel]")) close(false);
+      if (event.target.closest("[data-delete-confirm]")) close(true);
+    });
+    document.addEventListener("keydown", onKey);
+    overlay.querySelector("[data-delete-confirm]")?.focus();
+  });
+}
+
 function ensureUploadProgressBox() {
   let box = $("uploadProgressBox");
   if (box) return box;
@@ -1950,7 +1987,10 @@ function renderClientPromocoesPreview() {
   });
   box.querySelectorAll("[data-client-promo-remove]").forEach((button) => {
     button.addEventListener("click", async () => {
-      state.clientPromocoes.splice(Number(button.dataset.clientPromoRemove), 1);
+      const index = Number(button.dataset.clientPromoRemove);
+      const promo = state.clientPromocoes[index];
+      if (!promo || !(await confirmarExclusao(promo.titulo || "sem titulo", "promocao"))) return;
+      state.clientPromocoes.splice(index, 1);
       state.clientPromoEditIndex = null;
       clearClientPromoFields();
       renderClientPromocoesPreview();
@@ -3247,13 +3287,14 @@ function renderImoveisList() {
 }
 
 async function excluirImovelPorId(imovelId) {
-  if (!imovelId || !confirm("Excluir este imovel?")) return;
+  if (!imovelId) return;
   if (!hasPermission("imoveis")) return;
   const original = state.imoveis.find((item) => item.id === imovelId);
   if (!original || !itemBelongsToCurrentClient(original)) {
     showToast("Voce nao tem permissao para excluir este imovel.");
     return;
   }
+  if (!(await confirmarExclusao(original.titulo || original.codRef || original.id, "imovel"))) return;
   if (original.origemBase === "script.js") {
     const tombstone = cleanForFirebase({
       ...original,
@@ -4487,7 +4528,7 @@ function renderStaffPromocoesView() {
     button.addEventListener("click", async () => {
       const index = Number(button.dataset.staffPromoRemove);
       const promo = promocoes[index];
-      if (!promo || !confirm(`Remover a promocao "${promo.titulo || "sem titulo"}" de ${client.nome || client.id}?`)) return;
+      if (!promo || !(await confirmarExclusao(`${promo.titulo || "sem titulo"} - ${client.nome || client.id}`, "promocao"))) return;
       promocoes.splice(index, 1);
       await update(ref(db, `clientes/${selectedId}`), {
         promocoes: normalizePromocoes(promocoes),
@@ -5018,6 +5059,8 @@ function renderClientOnlyEditor() {
   mount.querySelectorAll("[data-promo-remove]").forEach((button) => {
     button.addEventListener("click", async () => {
       const index = Number(button.dataset.promoRemove);
+      const promo = promocoes[index];
+      if (!promo || !(await confirmarExclusao(promo.titulo || "sem titulo", "promocao"))) return;
       promocoes.splice(index, 1);
       await update(ref(db, `clientes/${client.id}`), {
         promocoes: normalizePromocoes(promocoes),
@@ -6077,7 +6120,9 @@ function bindEvents() {
   });
 
   $("deleteEventButton").addEventListener("click", async () => {
-    if (!state.selectedEventId || !confirm("Excluir este evento?")) return;
+    if (!state.selectedEventId) return;
+    const evento = state.eventos.find((item) => item.id === state.selectedEventId);
+    if (!(await confirmarExclusao(evento?.titulo || evento?.nome || state.selectedEventId, "evento"))) return;
     await update(ref(db, `eventos/${state.selectedEventId}`), {
       status: "excluido",
       deletedAt: serverTimestamp(),
@@ -6161,12 +6206,14 @@ function bindEvents() {
   });
 
   $("deleteAutomovelButton")?.addEventListener("click", async () => {
-    if (!state.selectedAutomovelId || !confirm("Excluir este automovel?")) return;
+    if (!state.selectedAutomovelId) return;
     const original = state.automoveis.find((item) => item.id === state.selectedAutomovelId);
     if (!original || !itemBelongsToCurrentClient(original)) {
       showToast("Voce nao tem permissao para excluir este automovel.");
       return;
     }
+    const titulo = [original.marca, original.modelo, original.ano].filter(Boolean).join(" ") || original.codRef || original.id;
+    if (!(await confirmarExclusao(titulo, "automovel"))) return;
     await remove(ref(db, `conteudosInformativos/automoveis/${state.selectedAutomovelId}`));
     showToast("Automovel excluido.");
     resetAutomovelForm();
