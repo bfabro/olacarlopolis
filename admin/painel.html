@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=214">
+  <link rel="stylesheet" href="painel.css?v=215">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -341,6 +341,30 @@
             <div id="importReport" class="import-report hidden"></div>
             <div id="duplicatesReport" class="duplicates-report hidden"></div>
             <input id="clientSearch" class="search-input" placeholder="Buscar cliente...">
+            <div class="client-list-filters">
+              <label>Status
+                <select id="clientStatusFilter">
+                  <option value="todos">Todos</option>
+                  <option value="ativo">Ativo</option>
+                  <option value="pendente">Pendente</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+              </label>
+              <label>Vencimento
+                <select id="clientDueFilter">
+                  <option value="todos">Todos</option>
+                  <option value="vencidos">Vencidos</option>
+                  <option value="em_dia">Em dia</option>
+                </select>
+              </label>
+              <label>Tipo de cliente
+                <select id="clientTypeFilter">
+                  <option value="todos">Todos</option>
+                  <option value="comercio">Comercio</option>
+                  <option value="servico">Servico</option>
+                </select>
+              </label>
+            </div>
             <div id="clientsList" class="clients-board"></div>
           </section>
         </div>
@@ -883,6 +907,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=214"></script>
+  <script type="module" src="painel.js?v=215"></script>
 </body>
 </html>

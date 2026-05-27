@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 214,
-  label: "v214",
+  numero: 215,
+  label: "v215",
   data: "2026-05-26",
-  nota: "Organiza permissoes de usuario por area."
+  nota: "Adiciona filtros na lista de clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2378,14 +2378,32 @@ async function migrateClientImagesToStorage() {
   }
 }
 
+function isClientOverdue(client) {
+  if (!client || client.status === "inativo" || client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") return false;
+  const today = new Date();
+  const currentMonth = currentMonthKey();
+  const hasPreviousPendingInvoice = pendingMonthsForClient(client).some((month) => month && month < currentMonth);
+  const dueDay = Number(client.vencimentoDia);
+  const hasExpiredDueDay = Number.isFinite(dueDay) && dueDay > 0 && dueDay < today.getDate();
+  return hasPreviousPendingInvoice || hasExpiredDueDay;
+}
+
 function renderClientsList() {
   const box = $("clientsList");
   if (!box) return;
 
   const q = String($("clientSearch")?.value || "").toLowerCase().trim();
+  const statusFilter = $("clientStatusFilter")?.value || "todos";
+  const dueFilter = $("clientDueFilter")?.value || "todos";
+  const typeFilter = $("clientTypeFilter")?.value || "todos";
   const list = state.clientes.filter((client) => {
     const hay = `${client.nome || ""} ${client.categoria || ""} ${client.contato || ""}`.toLowerCase();
-    return !q || hay.includes(q);
+    const matchesSearch = !q || hay.includes(q);
+    const matchesStatus = statusFilter === "todos" || (client.status || "pendente") === statusFilter;
+    const overdue = isClientOverdue(client);
+    const matchesDue = dueFilter === "todos" || (dueFilter === "vencidos" ? overdue : !overdue);
+    const matchesType = typeFilter === "todos" || (client.tipo || "comercio") === typeFilter;
+    return matchesSearch && matchesStatus && matchesDue && matchesType;
   });
 
   if (!list.length) {
@@ -5859,6 +5877,9 @@ function bindEvents() {
     showToast("Duplicados seguros removidos.");
   });
   $("clientSearch").addEventListener("input", renderClientsList);
+  $("clientStatusFilter")?.addEventListener("change", renderClientsList);
+  $("clientDueFilter")?.addEventListener("change", renderClientsList);
+  $("clientTypeFilter")?.addEventListener("change", renderClientsList);
   $("clientImagesUpload").addEventListener("change", async (event) => {
     await uploadClientImages(event.target.files);
     event.target.value = "";

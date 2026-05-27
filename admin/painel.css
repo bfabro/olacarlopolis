@@ -861,6 +861,25 @@ button[type="submit"]:hover,
   margin-bottom: 12px;
 }
 
+.client-list-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.client-list-filters label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.client-list-filters select {
+  min-height: 42px;
+}
+
 .list-area,
 .clients-board,
 .finance-list {
@@ -1902,6 +1921,7 @@ button[type="submit"]:hover,
 
   .grid-form,
   .permissions-box,
+  .client-list-filters,
   .client-feature-card,
   .manual-image-form,
   .section-fields,
