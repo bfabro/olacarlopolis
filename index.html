@@ -121,7 +121,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
    <!-- FIM  JAVA -->
-   <link rel="stylesheet" href="style.css?v=206" />
+   <link rel="stylesheet" href="style.css?v=207" />
 
    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
    <!--  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>-->
@@ -201,9 +201,6 @@
                <i class="fas fa-users"></i>
                <span id="contadorOnline" style="margin-left: 12px;"> 0 </span>
             </div>
-            <a href="admin/painel.html" id="linkAdmin" title="Ãrea administrativa" style="text-decoration:none; color:inherit; margin-left: 14px;">
-               <i class="fas fa-user-shield"></i>
-            </a>
 
             <!-- <i class='bx bx-bell' ></i>-->
          </div>
@@ -1334,7 +1331,7 @@
 
             </ul>
 
-            <div class="sidebar-version">Olá Carlópolis v206</div>
+            <div class="sidebar-version">Olá Carlópolis v207</div>
 
             <!-- Sidebar Open / Close -->
             <div class="bottom_content">
@@ -1612,7 +1609,7 @@
    </script>
 
    <!--  JavaScript -->
-   <script defer src="script.js?v=206"></script>
+   <script defer src="script.js?v=207"></script>
 
 
 
@@ -1661,41 +1658,13 @@
             window.location.href = "index.html";
          }
       });
-
-      // Adiciona um novo usuÃ¡rio online
-      const userRef = onlineUsersRef.push();
-      userRef.set(true);
-
-      // Remove o usuÃ¡rio ao sair
-      userRef.onDisconnect().remove();
-
+      // A presenca online agora e controlada pelo script.js para evitar contagem duplicada.
 
       function getHojeBR() {
          const agora = new Date();
          agora.setHours(agora.getHours() - 3); // UTC-3
          return agora.toISOString().slice(0, 10); // yyyy-mm-dd
       }
-
-
-
-
-      // Atualiza o contador de usuÃ¡rios online
-      onlineUsersRef.on("value", (snapshot) => {
-         const userCount = snapshot.numChildren(); // NÃºmero de usuÃ¡rios online
-         const contador = document.getElementById("contador");
-         const icone = document.getElementById("iconeUsuarios");
-
-         if (contador) contador.innerText = userCount;
-
-         // LÃ³gica para mudar a cor
-         if (userCount > 1) {
-            // contador.style.color = "blue";
-            if (icone) icone.style.color = "red";
-         } else {
-            if (contador) contador.style.color = "";
-            if (icone) icone.style.color = "";
-         }
-      });
 
 
 

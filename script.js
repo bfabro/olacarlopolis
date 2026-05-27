@@ -1677,112 +1677,115 @@ document.addEventListener("DOMContentLoaded", function () {
     return 'site';
   }
 
-  // Variável global para controle do pulso
+  // Variavel global para controle do pulso
   let contadorAnterior = 0;
 
   function inicializarContadorOnline() {
-    // 1. Captura os elementos exatos do seu HTML
     const contadorEl = document.getElementById("contadorOnline");
     const iconeEl = document.getElementById("iconeUsuarios");
 
-    if (!contadorEl) {
-      console.warn("Elemento 'contadorOnline' não encontrado no HTML.");
-      return;
-    }
+    if (!contadorEl || !window.firebase?.database) return;
+    if (location.pathname.toLowerCase().includes("/admin/")) return;
 
-    // 2. Referência do Firebase
     const onlineUsersRef = firebase.database().ref("onlineUsers");
     const connectedRef = firebase.database().ref(".info/connected");
+    const INACTIVE_LIMIT_MS = 5 * 60 * 1000;
+    let myUserRef = null;
+    let inactiveTimer = null;
+    let presenceStarted = false;
 
-    // 3. Gerenciamento de Presença (O "pulo do gato")
-    connectedRef.on("value", (snap) => {
-      if (snap.val() === true) {
-        // Cria uma entrada única para esta aba
-        const myUserRef = onlineUsersRef.push();
+    const clearInactiveTimer = () => {
+      if (inactiveTimer) clearTimeout(inactiveTimer);
+      inactiveTimer = null;
+    };
 
-        myUserRef.set({
-          origem: getOrigemAcesso(), // <--- ADICIONE ESTA LINHA
-          timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
+    const stopPresence = () => {
+      clearInactiveTimer();
+      if (!myUserRef) return;
+      myUserRef.remove().catch(() => {});
+      try { myUserRef.onDisconnect().cancel(); } catch (e) {}
+      myUserRef = null;
+      presenceStarted = false;
+    };
 
-        // Quando desconectar, remove
-        myUserRef.onDisconnect().remove();
+    const startPresence = () => {
+      if (presenceStarted || document.hidden) return;
+      presenceStarted = true;
+      myUserRef = onlineUsersRef.push();
+      myUserRef.set({
+        origem: getOrigemAcesso(),
+        pagina: location.pathname + location.hash,
+        userAgent: navigator.userAgent,
+        active: true,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+      });
+      myUserRef.onDisconnect().remove();
+    };
 
+    const scheduleInactiveRemoval = () => {
+      clearInactiveTimer();
+      if (!myUserRef) return;
+      myUserRef.update({
+        active: true,
+        inactivePending: true,
+        hiddenAt: firebase.database.ServerValue.TIMESTAMP,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+      }).catch(() => {});
+      inactiveTimer = setTimeout(stopPresence, INACTIVE_LIMIT_MS);
+    };
 
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) scheduleInactiveRemoval();
+      else {
+        clearInactiveTimer();
+        if (myUserRef) {
+          myUserRef.update({
+            active: true,
+            inactivePending: false,
+            hiddenAt: null,
+            lastSeen: firebase.database.ServerValue.TIMESTAMP
+          }).catch(() => {});
+        } else {
+          startPresence();
+        }
       }
     });
+    window.addEventListener("pagehide", stopPresence);
+    window.addEventListener("beforeunload", stopPresence);
 
+    connectedRef.on("value", (snap) => {
+      if (snap.val() === true) startPresence();
+    });
 
-
-    // 4. Atualização em tempo real do contador
     onlineUsersRef.on("value", (snapshot) => {
-      const userCount = snapshot.numChildren() || 0;
+      const agora = Date.now();
+      let userCount = 0;
+      snapshot.forEach((child) => {
+        const user = child.val() || {};
+        const lastSeen = Number(user.lastSeen || user.timestamp || 0);
+        const recente = !Number.isFinite(lastSeen) || !lastSeen || (agora - lastSeen) <= INACTIVE_LIMIT_MS;
+        const ativo = user.active !== false && recente;
+        if (ativo) userCount += 1;
+      });
 
-      if (contadorEl) {
-        contadorEl.textContent = userCount;
-      }
-
-      // DISPARA O EFEITO EM CONJUNTO
+      contadorEl.textContent = userCount;
       if (iconeEl && userCount > contadorAnterior) {
-        // iconeEl deve ser o container que envolve <i> e <span>
         iconeEl.classList.add("icone-notificacao");
-
-        // Remove após 5 segundos
         setTimeout(() => {
           iconeEl.classList.remove("icone-notificacao");
-          // Se precisar voltar para a cor original (ex: cinza):
           iconeEl.style.color = "";
         }, 5000);
       }
-
       contadorAnterior = userCount;
     });
   }
 
-  // Inicialização segura
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", inicializarContadorOnline);
   } else {
     inicializarContadorOnline();
   }
-
-
-
-
-
-
-
-
-  /////
-
-
-
-  /// inicio detecta usuarios online e desconecta x
-
-  onlineUsersRef.on("value", (snapshot) => {
-    const userCount = snapshot.numChildren() || 0;
-
-    if (contadorEl) {
-      contadorEl.textContent = userCount;
-    }
-
-    // DISPARA O EFEITO (Vermelho + Pulso)
-    if (iconeEl && userCount > contadorAnterior) {
-      // Adiciona a classe ao elemento pai (iconeUsuarios)
-      iconeEl.classList.add("icone-notificacao");
-
-      // Remove tudo após 5 segundos
-      setTimeout(() => {
-        iconeEl.classList.remove("icone-notificacao");
-      }, 5000);
-    }
-
-    contadorAnterior = userCount;
-  });
-
-
-
-
 
   function detectarCanalAcesso() {
     const isStandalone =

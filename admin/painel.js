@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 206,
-  label: "v206",
+  numero: 207,
+  label: "v207",
   data: "2026-05-26",
-  nota: "Oculta do site publico clientes com financeiro inativo."
+  nota: "Ajusta contador online para ignorar admin e expirar abas inativas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
