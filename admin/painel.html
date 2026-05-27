@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=216">
+  <link rel="stylesheet" href="painel.css?v=218">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -605,6 +605,47 @@
             <div id="infoDeathNoticeList" class="list-area"></div>
           </section>
         </div>
+
+        <div class="split-layout info-admin-block">
+          <section class="panel-card form-collapsed">
+            <div class="section-head">
+              <div>
+                <h2>Grupos WhatsApp</h2>
+                <p>Cadastre grupos para aparecerem no menu publico Informacoes.</p>
+              </div>
+              <div class="section-actions">
+                <button id="closeInfoWhatsappGroupFormButton" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                <button id="newInfoWhatsappGroupButton" class="ghost-button" type="button"><i class="fa-solid fa-plus"></i> Novo grupo</button>
+              </div>
+            </div>
+            <form id="infoWhatsappGroupForm" class="grid-form">
+              <input type="hidden" id="infoWhatsappGroupId">
+              <label>Nome do grupo<input id="infoWhatsappGroupName" required placeholder="Ex.: Noticias Carlópolis"></label>
+              <label>Link do grupo<input id="infoWhatsappGroupLink" required placeholder="https://chat.whatsapp.com/..."></label>
+              <label>Status
+                <select id="infoWhatsappGroupStatus">
+                  <option value="ativo">Ativo no site</option>
+                  <option value="rascunho">Rascunho</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+              </label>
+              <input id="infoWhatsappGroupImage" type="hidden">
+              <label>Upload da imagem<input id="infoWhatsappGroupImageUpload" type="file" accept="image/*"></label>
+              <label>Ou URL da imagem<input id="infoWhatsappGroupImageUrl" placeholder="images/... ou https://..."></label>
+              <label class="wide">Descricao<textarea id="infoWhatsappGroupDescription" rows="4" placeholder="Explique rapidamente o objetivo do grupo"></textarea></label>
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar grupo</button>
+                <button id="deleteInfoWhatsappGroupButton" type="button" class="danger-button hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card">
+            <h2>Grupos cadastrados</h2>
+            <input id="infoWhatsappGroupSearch" class="search-input" placeholder="Buscar grupo...">
+            <div id="infoWhatsappGroupList" class="list-area"></div>
+          </section>
+        </div>
       </section>
 
       <section id="imoveisView" class="panel-view hidden">
@@ -910,6 +951,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=216"></script>
+  <script type="module" src="painel.js?v=218"></script>
 </body>
 </html>

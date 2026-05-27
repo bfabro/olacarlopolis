@@ -3161,6 +3161,45 @@ carlopdiesel:"s",
 
   ];
 
+  let gruposWhatsappFirebaseCarregados = false;
+
+  function normalizarGrupoWhatsappFirebase(item = {}, id = "") {
+    return {
+      id: item.id || id,
+      nome: item.nome || item.name || "",
+      descricao: item.descricao || item.description || "",
+      link: item.link || "",
+      imagem: item.imagem || item.image || "",
+      status: item.status || "ativo",
+      origemFirebase: true
+    };
+  }
+
+  async function carregarGruposWhatsappFirebase() {
+    if (gruposWhatsappFirebaseCarregados) return gruposWhatsapp;
+    gruposWhatsappFirebaseCarregados = true;
+    try {
+      const dbAdmin = await esperarFirebaseDatabase();
+      if (!dbAdmin) return gruposWhatsapp;
+      const snap = await dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value");
+      const cadastrados = [];
+      snap.forEach((child) => {
+        const grupo = normalizarGrupoWhatsappFirebase(child.val() || {}, child.key);
+        if (grupo.nome && grupo.link && grupo.status === "ativo") cadastrados.push(grupo);
+        return false;
+      });
+      cadastrados.forEach((grupo) => {
+        const key = slug(grupo.id || grupo.nome);
+        const exists = gruposWhatsapp.some((item) => slug(item.id || item.nome) === key);
+        if (!exists) gruposWhatsapp.push(grupo);
+      });
+      gruposWhatsapp.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+    } catch (error) {
+      console.warn("Nao foi possivel carregar grupos WhatsApp do painel.", error);
+    }
+    return gruposWhatsapp;
+  }
+
   function slug(s) {
     return String(s || "")
       .toLowerCase()
@@ -3168,24 +3207,37 @@ carlopdiesel:"s",
       .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   }
 
+  function escapeGrupoHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function cardGrupoHTML(g) {
     const id = g.id || slug(g.nome);
     const foto = g.imagem || "img/grupos/default.jpg"; // fallback opcional
+    const nome = g.origemFirebase ? escapeGrupoHtml(g.nome) : g.nome;
+    const descricao = g.origemFirebase ? escapeGrupoHtml(g.descricao).replace(/\n/g, "<br>") : g.descricao;
+    const link = g.origemFirebase ? escapeGrupoHtml(g.link) : g.link;
+    const imagem = g.origemFirebase ? escapeGrupoHtml(foto) : foto;
     return `
     <div class="grupo-card" data-id="${id}">
       <div class="grupo-head">
         <div class="grupo-icon">
-          <img src="${foto}" alt="Imagem do grupo ${g.nome}" class="grupo-img" loading="lazy">
+          <img src="${imagem}" alt="Imagem do grupo ${nome}" class="grupo-img" loading="lazy">
         </div>
         <div class="grupo-txt">
-          <div class="grupo-title">${g.nome}</div>
-          ${g.descricao ? `<div class="grupo-desc">${g.descricao}</div>` : ""}
+          <div class="grupo-title">${nome}</div>
+          ${descricao ? `<div class="grupo-desc">${descricao}</div>` : ""}
         </div>
       </div>
       <div class="grupo-actions">
 
         <a class="btn-grupo" target="_blank" rel="noopener noreferrer"
-           href="${g.link}"
+           href="${link}"
            data-id="${id}">
           Entrar no grupo
         </a>
@@ -3419,7 +3471,7 @@ carlopdiesel:"s",
 
 
 
-  function mostrarGruposWhatsApp() {
+  async function mostrarGruposWhatsApp() {
     if (location.hash !== "#grupos") location.hash = "#grupos";
 
     const html = `
@@ -3444,7 +3496,7 @@ carlopdiesel:"s",
     area.innerHTML = html;
 
     const input = document.getElementById("buscaGrupos");
-    montarListaGrupos(gruposWhatsapp);
+    montarListaGrupos(await carregarGruposWhatsappFirebase());
 
     input.addEventListener("input", () => {
       montarListaGrupos(filtrarGrupos(input.value));

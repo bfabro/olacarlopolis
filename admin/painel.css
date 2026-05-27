@@ -636,6 +636,19 @@ button[type="submit"]:hover,
   border-bottom: 0;
 }
 
+.client-report-click-table {
+  min-width: 680px;
+}
+
+.client-report-click-table td,
+.client-report-click-table th {
+  text-align: left !important;
+}
+
+.client-report-period-card {
+  margin-bottom: 14px;
+}
+
 .report-kpis {
   display: flex;
   flex-wrap: wrap;
@@ -697,6 +710,10 @@ button[type="submit"]:hover,
   grid-template-columns: minmax(340px, 1.15fr) minmax(320px, .85fr);
   gap: 18px;
   align-items: start;
+}
+
+.info-admin-block {
+  margin-top: 18px;
 }
 
 #clientesView.client-focus-mode .split-layout {

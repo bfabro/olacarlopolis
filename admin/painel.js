@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 216,
-  label: "v216",
+  numero: 218,
+  label: "v218",
   data: "2026-05-26",
-  nota: "Reorganiza permissoes de usuarios por escopo."
+  nota: "Melhora relatorio do cliente com filtros e horarios de cliques."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -56,6 +56,7 @@ let state = {
   imoveis: [],
   automoveis: [],
   notasFalecimento: [],
+  gruposWhatsapp: [],
   categorias: [],
   pagamentoSistema: {},
   metricas: {},
@@ -69,6 +70,7 @@ let state = {
   selectedImovelId: null,
   selectedAutomovelId: null,
   selectedDeathNoticeId: null,
+  selectedWhatsappGroupId: null,
   selectedCategoryId: null,
   duplicateCleanupPlan: null,
   clientImages: [],
@@ -1220,6 +1222,7 @@ async function loadAllData() {
     automoveisSnap,
     categoriasSnap,
     notasFalecimentoSnap,
+    gruposWhatsappSnap,
     pagamentoSnap,
     cliquesBotoesSnap,
     cliquesMenuSnap,
@@ -1243,6 +1246,7 @@ async function loadAllData() {
     get(ref(db, "conteudosInformativos/automoveis")),
     get(ref(db, "categorias")),
     get(ref(db, "conteudosInformativos/notaFalecimento")),
+    get(ref(db, "conteudosInformativos/gruposWhatsapp")),
     get(ref(db, "configuracoes/pagamento")),
     get(ref(db, "cliquesPorBotao")),
     get(ref(db, "cliquesMenuLateral")),
@@ -1294,6 +1298,14 @@ async function loadAllData() {
     state.automoveis = state.automoveis.filter(itemBelongsToCurrentClient);
   }
   state.automoveis.sort((a, b) => String(a.marca || "").localeCompare(String(b.marca || ""), "pt-BR"));
+  state.gruposWhatsapp = [];
+  if (gruposWhatsappSnap.exists()) {
+    gruposWhatsappSnap.forEach((child) => {
+      state.gruposWhatsapp.push({ id: child.key, ...child.val() });
+      return false;
+    });
+  }
+  state.gruposWhatsapp.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
   state.metricas = {
     cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
@@ -1384,6 +1396,7 @@ async function loadAllData() {
   renderImoveisList();
   renderAutomoveisList();
   renderInfoDeathNoticeList();
+  renderInfoWhatsappGroupsList();
   renderFinanceiro();
   renderReports();
   renderPaymentSettings();
@@ -3428,6 +3441,96 @@ async function uploadInfoDeathNoticeImage(file) {
   showToast("Imagem da nota enviada.");
 }
 
+function resetInfoWhatsappGroupForm() {
+  state.selectedWhatsappGroupId = null;
+  $("infoWhatsappGroupForm")?.reset();
+  if ($("infoWhatsappGroupId")) $("infoWhatsappGroupId").value = "";
+  if ($("infoWhatsappGroupImage")) $("infoWhatsappGroupImage").value = "";
+  $("deleteInfoWhatsappGroupButton")?.classList.add("hidden");
+  setFormCardOpen("infoWhatsappGroupForm", false);
+}
+
+function fillInfoWhatsappGroupForm(item) {
+  state.selectedWhatsappGroupId = item.id;
+  $("infoWhatsappGroupId").value = item.id || "";
+  $("infoWhatsappGroupName").value = item.nome || item.name || "";
+  $("infoWhatsappGroupLink").value = item.link || "";
+  $("infoWhatsappGroupStatus").value = item.status || "ativo";
+  $("infoWhatsappGroupImage").value = item.imagem || item.image || "";
+  $("infoWhatsappGroupImageUrl").value = item.imagem || item.image || "";
+  $("infoWhatsappGroupDescription").value = item.descricao || item.description || "";
+  $("deleteInfoWhatsappGroupButton")?.classList.remove("hidden");
+  openFormForEdit("infoWhatsappGroupForm");
+}
+
+function getInfoWhatsappGroupFormData() {
+  const nome = $("infoWhatsappGroupName").value.trim();
+  const link = $("infoWhatsappGroupLink").value.trim();
+  const image = $("infoWhatsappGroupImage").value.trim() || $("infoWhatsappGroupImageUrl").value.trim();
+  const baseId = $("infoWhatsappGroupId").value || slugify(nome || `grupo-${Date.now()}`);
+  return cleanForFirebase({
+    id: baseId,
+    nome,
+    name: nome,
+    descricao: $("infoWhatsappGroupDescription").value.trim(),
+    description: $("infoWhatsappGroupDescription").value.trim(),
+    link,
+    imagem: image,
+    image,
+    status: $("infoWhatsappGroupStatus").value || "ativo",
+    origem: "painel",
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  });
+}
+
+function renderInfoWhatsappGroupsList() {
+  const box = $("infoWhatsappGroupList");
+  if (!box) return;
+
+  const q = String($("infoWhatsappGroupSearch")?.value || "").toLowerCase().trim();
+  const list = state.gruposWhatsapp.filter((item) => {
+    const hay = `${item.nome || item.name || ""} ${item.descricao || item.description || ""} ${item.link || ""}`.toLowerCase();
+    return !q || hay.includes(q);
+  });
+
+  if (!list.length) {
+    box.innerHTML = `<div class="list-meta">Nenhum grupo cadastrado no Firebase.</div>`;
+    return;
+  }
+
+  box.innerHTML = list.map((item) => `
+    <article class="list-card event-card">
+      ${item.imagem || item.image ? `<img src="${escapeAttr(displayImageUrl(item.imagem || item.image))}" alt="${escapeAttr(item.nome || "Grupo")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
+      <div class="list-title">${escapeHtml(item.nome || item.name || item.id)}</div>
+      <div class="list-meta">${escapeHtml(item.descricao || item.description || "Sem descricao")}</div>
+      <div class="list-meta">${escapeHtml(item.link || "Sem link")}</div>
+      <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status)}</span>
+      <button type="button" data-edit-whatsapp-group="${escapeAttr(item.id)}">Editar</button>
+    </article>
+  `).join("");
+
+  box.querySelectorAll("[data-edit-whatsapp-group]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const item = state.gruposWhatsapp.find((group) => group.id === button.dataset.editWhatsappGroup);
+      if (item) fillInfoWhatsappGroupForm(item);
+    });
+  });
+}
+
+async function uploadInfoWhatsappGroupImage(file) {
+  if (!file) return;
+  if (!canManageInformacoes()) return;
+  const id = $("infoWhatsappGroupId").value || `${slugify($("infoWhatsappGroupName").value.trim() || "grupo")}-${Date.now()}`;
+  const path = `conteudosInformativos/gruposWhatsapp/${id}/${Date.now()}-${slugify(file.name || "imagem")}`;
+  const fileRef = storageRef(storage, path);
+  showToast("Enviando imagem do grupo...");
+  const url = await uploadFileWithProgress(fileRef, file, "Enviando imagem do grupo", file.name || "imagem");
+  $("infoWhatsappGroupImage").value = url;
+  $("infoWhatsappGroupImageUrl").value = url;
+  showToast("Imagem do grupo enviada.");
+}
+
 function renderFinanceiro() {
   const box = $("financeList");
   if (!box) return;
@@ -3696,6 +3799,12 @@ function topFromMap(map, limit = 10, singular = "clique", plural = "cliques") {
 
 function dateKeyFromDate(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function formatDateBR(dateKey = "") {
+  const match = String(dateKey || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return String(dateKey || "-");
+  return `${match[3]}/${match[2]}/${match[1]}`;
 }
 
 function addDays(date, amount) {
@@ -4014,7 +4123,73 @@ function aggregateButtonTypesForClient(details = new Map(), keys = []) {
   return tipos;
 }
 
-function renderClientMetricReport(client = {}) {
+function clientReportCategory(row = {}) {
+  const text = normalizeName(`${row.area || ""} ${row.tipo || ""}`);
+  if (/whatsapp|telefone|contato|zap/.test(text)) return "WhatsApp / telefone";
+  if (/cardapio|menu/.test(text)) return "Cardapio";
+  if (/foto|fotos|imagem|divulgacao/.test(text)) return "Fotos / divulgacao";
+  if (/promocao|promocoes|oferta/.test(text)) return "Promocoes";
+  if (/instagram|facebook|tiktok|site|rede|social|link/.test(text)) return "Redes sociais / links";
+  return row.tipo || row.area || "Clique";
+}
+
+function renderClientReportPeriodControls(range = getReportDateRange()) {
+  return `
+    <section class="panel-card report-period-card client-report-period-card">
+      <div class="section-head compact">
+        <div>
+          <h3>Periodo do relatorio</h3>
+          <p>Filtre os cliques por dia, semana, mes, ano ou intervalo personalizado.</p>
+        </div>
+        <span class="report-card-date"><i class="fa-solid fa-calendar-days"></i> ${escapeHtml(range.label)}</span>
+      </div>
+      <div class="report-period-tabs">
+        <button type="button" data-client-report-period="dia" class="period-day ${state.reportPeriod.type === "dia" ? "active" : ""}"><i class="fa-solid fa-sun"></i> Dia</button>
+        <button type="button" data-client-report-period="semanal" class="period-week ${state.reportPeriod.type === "semanal" ? "active" : ""}"><i class="fa-solid fa-calendar-week"></i> Semana</button>
+        <button type="button" data-client-report-period="mensal" class="period-month ${state.reportPeriod.type === "mensal" ? "active" : ""}"><i class="fa-solid fa-calendar-days"></i> Mes</button>
+        <button type="button" data-client-report-period="anual" class="period-year ${state.reportPeriod.type === "anual" ? "active" : ""}"><i class="fa-solid fa-chart-line"></i> Ano</button>
+        <button type="button" data-client-report-period="personalizado" class="period-custom ${state.reportPeriod.type === "personalizado" ? "active" : ""}"><i class="fa-solid fa-sliders"></i> Data personalizada</button>
+      </div>
+      <div class="report-custom-range ${state.reportPeriod.type === "personalizado" ? "" : "hidden"}">
+        <label>Inicio<input id="clientReportStartDate" type="date" value="${escapeAttr(state.reportPeriod.start || range.start)}"></label>
+        <label>Fim<input id="clientReportEndDate" type="date" value="${escapeAttr(state.reportPeriod.end || range.end)}"></label>
+        <button id="applyClientReportRangeButton" type="button" class="ghost-button"><i class="fa-solid fa-filter"></i> Aplicar</button>
+      </div>
+    </section>
+  `;
+}
+
+function renderClientTimelineTable(rows, emptyMessage) {
+  if (!rows.length) return `<div class="list-meta">${escapeHtml(emptyMessage)}</div>`;
+  return `
+    <div class="report-table-wrap">
+      <table class="report-click-table client-report-click-table">
+        <thead>
+          <tr>
+            <th>Recurso</th>
+            <th>Data</th>
+            <th>Horario</th>
+            <th>Origem / card</th>
+            <th>Detalhe</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.slice(0, 200).map((row) => `
+            <tr title="${escapeAttr(row.pagina || "")}">
+              <td><strong>${escapeHtml(clientReportCategory(row))}</strong></td>
+              <td>${escapeHtml(formatDateBR(row.date))}</td>
+              <td><strong>${escapeHtml(row.hora)}</strong></td>
+              <td>${escapeHtml(row.area || "-")}</td>
+              <td>${escapeHtml(row.tipo || "-")}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderClientMetricReportContent(client = {}) {
   const range = getReportDateRange();
   const keys = clientMetricKeys(client);
   const filtered = {
@@ -4038,7 +4213,7 @@ function renderClientMetricReport(client = {}) {
   const outros = Math.max(0, totalBotoes - (cardapios + whats + fotos + redes));
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
-    .slice(0, 12);
+    .map((row) => ({ ...row, categoria: clientReportCategory(row) }));
   const rows = [
     ["WhatsApp / telefone", whats],
     ["Cardapio", cardapios],
@@ -4049,6 +4224,7 @@ function renderClientMetricReport(client = {}) {
   ];
 
   return `
+    ${renderClientReportPeriodControls(range)}
     <div class="client-report-summary">
       <div class="stats-grid client-report-stats">
         <article class="stat-card"><span>Total de interacoes</span><strong>${total + outros}</strong><small>${escapeHtml(range.label)}</small></article>
@@ -4061,13 +4237,39 @@ function renderClientMetricReport(client = {}) {
           <h3>Resumo por tipo</h3>
           ${renderReportList(rows.filter(([, count]) => count > 0).map(([title, count]) => ({ title, meta: `${count} clique${count === 1 ? "" : "s"}` })), "Ainda nao ha cliques registrados para este cliente no periodo.")}
         </section>
-        <section class="panel-card report-card">
-          <h3>Ultimos cliques</h3>
-          ${renderTimelineTable(timeline, "Ainda nao ha horarios detalhados para este cliente.")}
+        <section class="panel-card report-card report-wide">
+          <h3>Cliques detalhados por data e horario</h3>
+          <p class="list-meta">Use essa tabela para conferir interacoes reais no telefone, cardapio, fotos, promocoes, redes sociais e demais botoes.</p>
+          ${renderClientTimelineTable(timeline, "Ainda nao ha horarios detalhados para este cliente neste periodo.")}
         </section>
       </div>
     </div>
   `;
+}
+
+function renderClientMetricReport(client = {}) {
+  return `<div id="clientMetricReportMount">${renderClientMetricReportContent(client)}</div>`;
+}
+
+function bindClientMetricReportControls(client = {}) {
+  const root = $("clientMetricReportMount");
+  if (!root) return;
+  const refresh = () => {
+    root.innerHTML = renderClientMetricReportContent(client);
+    bindClientMetricReportControls(client);
+  };
+  root.querySelectorAll("[data-client-report-period]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.reportPeriod.type = button.dataset.clientReportPeriod;
+      refresh();
+    });
+  });
+  root.querySelector("#applyClientReportRangeButton")?.addEventListener("click", () => {
+    state.reportPeriod.type = "personalizado";
+    state.reportPeriod.start = root.querySelector("#clientReportStartDate")?.value || "";
+    state.reportPeriod.end = root.querySelector("#clientReportEndDate")?.value || state.reportPeriod.start;
+    refresh();
+  });
 }
 
 function renderTimelineTable(rows, emptyMessage, type = "clicks") {
@@ -4828,6 +5030,7 @@ function renderClientOnlyEditor() {
     </form>
   `;
   if (canEditDados) renderScheduleEditor("coScheduleEditor", client.horarios || {});
+  if (canViewRelatorios) bindClientMetricReportControls(client);
   const moduleNavButtons = [...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")];
   const activateClientModule = (targetId) => {
     const target = mount.querySelector(`#${targetId}`) || mount.querySelector(`[data-client-module-group="${targetId}"]`);
@@ -5953,6 +6156,16 @@ function bindEvents() {
     await uploadInfoDeathNoticeImage(event.target.files?.[0]);
     event.target.value = "";
   });
+  $("newInfoWhatsappGroupButton")?.addEventListener("click", () => {
+    resetInfoWhatsappGroupForm();
+    openFormForEdit("infoWhatsappGroupForm");
+  });
+  $("closeInfoWhatsappGroupFormButton")?.addEventListener("click", resetInfoWhatsappGroupForm);
+  $("infoWhatsappGroupSearch")?.addEventListener("input", renderInfoWhatsappGroupsList);
+  $("infoWhatsappGroupImageUpload")?.addEventListener("change", async (event) => {
+    await uploadInfoWhatsappGroupImage(event.target.files?.[0]);
+    event.target.value = "";
+  });
   $("financeSearch").addEventListener("input", renderFinanceiro);
   $("financeFilter").addEventListener("change", renderFinanceiro);
   $("categorySearch").addEventListener("input", renderCategoriesList);
@@ -6255,10 +6468,42 @@ function bindEvents() {
   });
 
   $("deleteInfoDeathNoticeButton")?.addEventListener("click", async () => {
-    if (!state.selectedDeathNoticeId || !confirm("Excluir esta nota de falecimento?")) return;
+    const nota = state.notasFalecimento.find((item) => item.id === state.selectedDeathNoticeId);
+    if (!state.selectedDeathNoticeId || !(await confirmarExclusao(nota?.nomeFalecido || nota?.name || state.selectedDeathNoticeId, "nota de falecimento"))) return;
     await remove(ref(db, `conteudosInformativos/notaFalecimento/${state.selectedDeathNoticeId}`));
     showToast("Nota de falecimento excluida.");
     resetInfoDeathNoticeForm();
+    await loadAllData();
+  });
+
+  $("infoWhatsappGroupForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!canManageInformacoes()) return;
+    const payload = getInfoWhatsappGroupFormData();
+    if (!payload.nome || !payload.link) {
+      showToast("Informe nome e link do grupo.");
+      return;
+    }
+    const id = payload.id;
+    delete payload.id;
+    if (!state.selectedWhatsappGroupId) payload.createdAt = serverTimestamp();
+    const updates = { [`conteudosInformativos/gruposWhatsapp/${id}`]: payload };
+    if (state.selectedWhatsappGroupId && state.selectedWhatsappGroupId !== id) {
+      updates[`conteudosInformativos/gruposWhatsapp/${state.selectedWhatsappGroupId}`] = null;
+    }
+    await update(ref(db), updates);
+    showToast("Grupo WhatsApp salvo.");
+    resetInfoWhatsappGroupForm();
+    await loadAllData();
+  });
+
+  $("deleteInfoWhatsappGroupButton")?.addEventListener("click", async () => {
+    if (!state.selectedWhatsappGroupId) return;
+    const grupo = state.gruposWhatsapp.find((item) => item.id === state.selectedWhatsappGroupId);
+    if (!(await confirmarExclusao(grupo?.nome || grupo?.name || state.selectedWhatsappGroupId, "grupo WhatsApp"))) return;
+    await remove(ref(db, `conteudosInformativos/gruposWhatsapp/${state.selectedWhatsappGroupId}`));
+    showToast("Grupo WhatsApp excluido.");
+    resetInfoWhatsappGroupForm();
     await loadAllData();
   });
 }
