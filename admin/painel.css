@@ -820,7 +820,7 @@ button[type="submit"]:hover,
   padding: 12px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 14px;
 }
 
 .permissions-box legend {
@@ -838,6 +838,23 @@ button[type="submit"]:hover,
 
 .permissions-box input {
   width: auto;
+}
+
+.permission-group {
+  display: grid;
+  gap: 9px;
+  align-content: start;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.permission-group > strong {
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .search-input {

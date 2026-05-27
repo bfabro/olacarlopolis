@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=213">
+  <link rel="stylesheet" href="painel.css?v=214">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -826,19 +826,25 @@
               </label>
               <fieldset class="permissions-box wide">
                 <legend>Permissoes</legend>
-                <label><input type="checkbox" value="dados" checked> Dados do cliente</label>
-                <label><input type="checkbox" value="vagas" checked> Vagas de trabalho</label>
-                <label><input type="checkbox" value="imagens" checked> Imagens</label>
-                <label><input type="checkbox" value="cardapio" checked> Cardapio</label>
-                <label><input type="checkbox" value="promocoes" checked> Promocoes</label>
-                <label><input type="checkbox" value="relatorios"> Relatorios do cliente</label>
-                <label><input type="checkbox" value="faturas" checked> Faturas</label>
-                <label><input type="checkbox" value="eventos"> Eventos</label>
-                <label><input type="checkbox" value="financeiro"> Financeiro</label>
-                <label><input type="checkbox" value="imoveis"> Imoveis</label>
-                <label><input type="checkbox" value="veiculos"> Automoveis</label>
-                <label><input type="checkbox" value="informacoes"> Menu Informacoes</label>
-                <label><input type="checkbox" value="informacoes_nota_falecimento"> Nota de falecimento</label>
+                <div class="permission-group">
+                  <strong>Parte admin</strong>
+                  <label><input type="checkbox" value="veiculos"> Automoveis</label>
+                  <label><input type="checkbox" value="eventos"> Eventos</label>
+                  <label><input type="checkbox" value="financeiro"> Financeiro</label>
+                  <label><input type="checkbox" value="imoveis"> Imoveis</label>
+                  <label><input type="checkbox" value="informacoes"> Menu Informacoes</label>
+                  <label><input type="checkbox" value="informacoes_nota_falecimento"> Nota de falecimento</label>
+                </div>
+                <div class="permission-group">
+                  <strong>Liberacao para cliente</strong>
+                  <label><input type="checkbox" value="cardapio" checked> Cardapio</label>
+                  <label><input type="checkbox" value="dados" checked> Dados do cliente</label>
+                  <label><input type="checkbox" value="faturas" checked> Faturas</label>
+                  <label><input type="checkbox" value="imagens" checked> Imagens</label>
+                  <label><input type="checkbox" value="promocoes" checked> Promocoes</label>
+                  <label><input type="checkbox" value="relatorios"> Relatorios do cliente</label>
+                  <label><input type="checkbox" value="vagas" checked> Vagas de trabalho</label>
+                </div>
               </fieldset>
               <div class="form-actions wide">
                 <button id="saveUserButton" type="submit"><i class="fa-solid fa-user-plus"></i> Criar usuario</button>
@@ -877,6 +883,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=213"></script>
+  <script type="module" src="painel.js?v=214"></script>
 </body>
 </html>

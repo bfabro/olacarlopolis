@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 213,
-  label: "v213",
+  numero: 214,
+  label: "v214",
   data: "2026-05-26",
-  nota: "Adiciona modal de confirmacao ao excluir itens."
+  nota: "Organiza permissoes de usuario por area."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
