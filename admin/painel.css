@@ -1265,77 +1265,40 @@ button[type="submit"]:hover,
 
 #client-module-dados,
 #client-module-vagas {
-  gap: 16px;
+  gap: 12px;
 }
 
-.admin-field-card {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
-  min-height: 78px;
-  padding: 9px 12px;
-  border: 1px solid #d6e1f0;
-  border-radius: 14px;
-  background: #ffffff;
-  color: #0f172a;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, .04);
-}
-
-.admin-field-card > i {
-  display: inline-grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: #eef4ff;
-  color: var(--brand);
-  font-size: 20px;
-}
-
-.admin-field-card > span {
-  display: grid;
-  min-width: 0;
-  gap: 2px;
-}
-
-.admin-field-card small {
+.admin-field-line {
+  gap: 6px;
   color: var(--brand);
   font-size: 13px;
   font-weight: 850;
 }
 
-.admin-field-card input,
-.admin-field-card select {
+.admin-field-line input,
+.admin-field-line select {
   width: 100%;
-  min-height: 28px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  min-height: 44px;
+  border: 1px solid #d6e1f0;
+  border-radius: 11px;
+  background: #fff;
   color: #0f172a;
-  font-size: 16px;
-  font-weight: 850;
-  box-shadow: none;
+  font-size: 15px;
+  font-weight: 750;
 }
 
-.admin-field-card input:focus,
-.admin-field-card select:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-.admin-field-card:focus-within {
+.admin-field-line input:focus,
+.admin-field-line select:focus {
   border-color: #93c5fd;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, .12), 0 10px 24px rgba(15, 23, 42, .06);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
 }
 
 .schedule-panel {
   border: 1px solid #dbe5f2;
-  border-radius: 18px;
-  padding: 18px;
+  border-radius: 14px;
+  padding: 14px;
   background: #fff;
-  box-shadow: 0 18px 42px rgba(15, 23, 42, .06);
+  box-shadow: none;
 }
 
 .schedule-editor {
@@ -2228,9 +2191,12 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-dados.client-module-panel.active,
   #clientOnlyForm #client-module-vagas.client-module-panel.active {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
-    padding: 10px;
-    border-radius: 14px;
+    gap: 8px;
+    padding: 8px 6px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   #clientOnlyForm #client-module-dados .wide,
@@ -2260,40 +2226,23 @@ button[type="submit"]:hover,
     font-size: 13px;
   }
 
-  #clientOnlyForm #client-module-dados .admin-field-card,
-  #clientOnlyForm #client-module-vagas .admin-field-card {
-    grid-template-columns: 42px minmax(0, 1fr);
-    gap: 8px;
-    min-height: 66px;
-    padding: 8px 9px;
-    border-radius: 13px;
-  }
-
-  #clientOnlyForm #client-module-dados .admin-field-card > i,
-  #clientOnlyForm #client-module-vagas .admin-field-card > i {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    font-size: 17px;
-  }
-
-  #clientOnlyForm #client-module-dados .admin-field-card small,
-  #clientOnlyForm #client-module-vagas .admin-field-card small {
+  #clientOnlyForm #client-module-dados .admin-field-line,
+  #clientOnlyForm #client-module-vagas .admin-field-line {
+    gap: 4px;
     font-size: 12px;
   }
 
-  #clientOnlyForm #client-module-dados .admin-field-card input,
-  #clientOnlyForm #client-module-dados .admin-field-card select,
-  #clientOnlyForm #client-module-vagas .admin-field-card input,
-  #clientOnlyForm #client-module-vagas .admin-field-card select {
-    min-height: 24px;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    font-size: 14px;
-    font-weight: 850;
-    box-shadow: none;
+  #clientOnlyForm #client-module-dados .admin-field-line input,
+  #clientOnlyForm #client-module-dados .admin-field-line select,
+  #clientOnlyForm #client-module-vagas .admin-field-line input,
+  #clientOnlyForm #client-module-vagas .admin-field-line select {
+    min-height: 38px;
+    padding: 8px 9px;
+    border: 1px solid #d6e1f0;
+    border-radius: 9px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 750;
   }
 
   #clientOnlyForm #client-module-dados textarea,
@@ -2365,8 +2314,8 @@ button[type="submit"]:hover,
   }
 
   #clientOnlyForm #client-module-dados .schedule-panel {
-    padding: 12px;
-    border-radius: 14px;
+    padding: 10px;
+    border-radius: 12px;
   }
 
   #clientOnlyForm #client-module-dados .schedule-day {

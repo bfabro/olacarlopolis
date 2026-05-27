@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 230,
-  label: "v230",
+  numero: 231,
+  label: "v231",
   data: "2026-05-26",
-  nota: "Melhora layout de dados da empresa e vagas no painel do cliente."
+  nota: "Simplifica layout de dados e vagas usando mais largura no mobile."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5021,11 +5021,11 @@ function renderClientOnlyEditor() {
             <span>Nome, contatos, endereco e canais publicos.</span>
           </div>
         </div>
-        <label class="admin-field-card field-company"><i class="fa-solid fa-id-card"></i><span><small>Nome da empresa</small><input id="coName" value="${escapeAttr(client.nome || "")}"></span></label>
-        <label class="admin-field-card field-phone"><i class="fa-solid fa-phone"></i><span><small>Telefone</small><input id="coContact" value="${escapeAttr(client.contato || "")}"></span></label>
-        <label class="admin-field-card field-whatsapp"><i class="fa-brands fa-whatsapp"></i><span><small>WhatsApp</small><input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></span></label>
-        <label class="admin-field-card field-address wide"><i class="fa-solid fa-location-dot"></i><span><small>Endereco</small><input id="coAddress" value="${escapeAttr(client.endereco || "")}"></span></label>
-        <label class="admin-field-card field-hours wide"><i class="fa-solid fa-clock"></i><span><small>Horario resumido</small><input id="coHours" value="${escapeAttr(client.horario || "")}"></span></label>
+        <label class="admin-field-line field-company">Nome da empresa<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
+        <label class="admin-field-line field-phone">Telefone<input id="coContact" value="${escapeAttr(client.contato || "")}"></label>
+        <label class="admin-field-line field-whatsapp">WhatsApp<input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></label>
+        <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
+        <label class="admin-field-line field-hours wide">Horario resumido<input id="coHours" value="${escapeAttr(client.horario || "")}"></label>
         <section class="wide schedule-panel">
           <div class="section-head compact">
             <div>
@@ -5035,10 +5035,10 @@ function renderClientOnlyEditor() {
           </div>
           <div id="coScheduleEditor" class="schedule-editor"></div>
         </section>
-        <label class="admin-field-card field-instagram"><i class="fa-brands fa-instagram"></i><span><small>Instagram</small><input id="coInstagram" value="${escapeAttr(client.instagram || "")}"></span></label>
-        <label class="admin-field-card field-facebook"><i class="fa-brands fa-facebook-f"></i><span><small>Facebook</small><input id="coFacebook" value="${escapeAttr(client.facebook || "")}"></span></label>
-        <label class="admin-field-card field-tiktok"><i class="fa-brands fa-tiktok"></i><span><small>TikTok</small><input id="coTiktok" value="${escapeAttr(client.tiktok || "")}"></span></label>
-        <label class="admin-field-card field-site"><i class="fa-solid fa-globe"></i><span><small>Site</small><input id="coSite" value="${escapeAttr(client.site || "")}"></span></label>
+        <label class="admin-field-line field-instagram">Instagram<input id="coInstagram" value="${escapeAttr(client.instagram || "")}"></label>
+        <label class="admin-field-line field-facebook">Facebook<input id="coFacebook" value="${escapeAttr(client.facebook || "")}"></label>
+        <label class="admin-field-line field-tiktok">TikTok<input id="coTiktok" value="${escapeAttr(client.tiktok || "")}"></label>
+        <label class="admin-field-line field-site">Site<input id="coSite" value="${escapeAttr(client.site || "")}"></label>
         <div class="form-section-title wide">
           <i class="fa-solid fa-note-sticky"></i>
           <div>
@@ -5061,12 +5061,12 @@ function renderClientOnlyEditor() {
           </div>
           <label class="check-row"><input id="coJobActive" type="checkbox" checked> Exibir esta vaga no site publico</label>
           <div class="section-fields">
-            <label class="admin-field-card field-job"><i class="fa-solid fa-briefcase"></i><span><small>Cargo / titulo da vaga</small><input id="coJobTitle" placeholder="Ex.: Atendente"></span></label>
-            <label class="admin-field-card field-salary"><i class="fa-solid fa-dollar-sign"></i><span><small>Salario / beneficio</small><input id="coJobSalary" placeholder="Ex.: A combinar"></span></label>
-            <label class="admin-field-card field-schedule"><i class="fa-solid fa-clock"></i><span><small>Jornada / horario</small><input id="coJobSchedule" placeholder="Ex.: Segunda a sabado"></span></label>
-            <label class="admin-field-card field-date"><i class="fa-solid fa-calendar-days"></i><span><small>Validade da vaga</small><input id="coJobValidUntil" type="date"></span></label>
-            <label class="admin-field-card field-place"><i class="fa-solid fa-location-dot"></i><span><small>Local da vaga</small><input id="coJobPlace" placeholder="Opcional"></span></label>
-            <label class="admin-field-card field-contact"><i class="fa-brands fa-whatsapp"></i><span><small>Contato da vaga</small><input id="coJobContact" placeholder="WhatsApp, telefone ou e-mail"></span></label>
+            <label class="admin-field-line field-job">Cargo / titulo da vaga<input id="coJobTitle" placeholder="Ex.: Atendente"></label>
+            <label class="admin-field-line field-salary">Salario / beneficio<input id="coJobSalary" placeholder="Ex.: A combinar"></label>
+            <label class="admin-field-line field-schedule">Jornada / horario<input id="coJobSchedule" placeholder="Ex.: Segunda a sabado"></label>
+            <label class="admin-field-line field-date">Validade da vaga<input id="coJobValidUntil" type="date"></label>
+            <label class="admin-field-line field-place">Local da vaga<input id="coJobPlace" placeholder="Opcional"></label>
+            <label class="admin-field-line field-contact">Contato da vaga<input id="coJobContact" placeholder="WhatsApp, telefone ou e-mail"></label>
           </div>
           <label class="wide">Descricao da vaga<textarea id="coJobDescription" rows="3" placeholder="Conte o que a pessoa vai fazer"></textarea></label>
           <label class="wide">Pre-requisitos<textarea id="coJobRequirements" rows="3" placeholder="Ex.: Maior de 18 anos, experiencia"></textarea></label>
