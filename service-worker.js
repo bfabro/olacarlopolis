@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-05-26-admin-v215'; // <-- TROQUE quando publicar atualização
+const CACHE_VERSION = '2026-05-26-admin-v216'; // <-- TROQUE quando publicar atualização
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
