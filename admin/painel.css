@@ -1265,7 +1265,44 @@ button[type="submit"]:hover,
 
 #client-module-dados,
 #client-module-vagas {
+  gap: 14px;
+  align-items: end;
+}
+
+#client-module-dados.client-module-panel.active,
+#client-module-vagas.client-module-panel.active {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+#client-module-dados .field-company {
+  grid-column: span 6;
+}
+
+#client-module-dados .field-phone,
+#client-module-dados .field-whatsapp {
+  grid-column: span 3;
+}
+
+#client-module-dados .field-instagram,
+#client-module-dados .field-facebook,
+#client-module-dados .field-tiktok,
+#client-module-dados .field-site {
+  grid-column: span 3;
+}
+
+#client-module-vagas .section-fields {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 12px;
+}
+
+#client-module-vagas .field-job,
+#client-module-vagas .field-salary,
+#client-module-vagas .field-schedule,
+#client-module-vagas .field-date,
+#client-module-vagas .field-place,
+#client-module-vagas .field-contact {
+  grid-column: span 4;
 }
 
 .admin-field-line {
@@ -1278,13 +1315,13 @@ button[type="submit"]:hover,
 .admin-field-line input,
 .admin-field-line select {
   width: 100%;
-  min-height: 44px;
+  min-height: 42px;
   border: 1px solid #d6e1f0;
-  border-radius: 11px;
+  border-radius: 10px;
   background: #fff;
   color: #0f172a;
-  font-size: 15px;
-  font-weight: 750;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .admin-field-line input:focus,
@@ -2025,12 +2062,13 @@ button[type="submit"]:hover,
 
 @media (max-width: 640px) {
   .main-admin {
-    padding: 16px;
+    padding: 10px 7px;
   }
 
   .topbar-admin {
     display: grid;
-    margin: -16px -16px 16px;
+    margin: -10px -7px 10px;
+    padding: 10px 8px;
     grid-template-columns: 1fr;
   }
 
@@ -2181,18 +2219,19 @@ button[type="submit"]:hover,
   }
 
   #clientOnlyForm {
-    gap: 10px;
+    gap: 8px;
+    margin-inline: -2px;
   }
 
   #clientOnlyForm .client-module-content {
-    gap: 10px;
+    gap: 8px;
   }
 
   #clientOnlyForm #client-module-dados.client-module-panel.active,
   #clientOnlyForm #client-module-vagas.client-module-panel.active {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    padding: 8px 6px;
+    gap: 8px 7px;
+    padding: 4px 2px 8px;
     border: 0;
     border-radius: 0;
     background: transparent;
@@ -2212,8 +2251,10 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-dados label,
   #clientOnlyForm #client-module-vagas label {
     gap: 4px;
-    font-size: 11.5px;
+    font-size: 11px;
     line-height: 1.15;
+    text-align: left;
+    align-items: stretch;
   }
 
   #clientOnlyForm #client-module-dados input,
@@ -2229,7 +2270,7 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-dados .admin-field-line,
   #clientOnlyForm #client-module-vagas .admin-field-line {
     gap: 4px;
-    font-size: 12px;
+    font-size: 11.5px;
   }
 
   #clientOnlyForm #client-module-dados .admin-field-line input,
@@ -2237,12 +2278,12 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-vagas .admin-field-line input,
   #clientOnlyForm #client-module-vagas .admin-field-line select {
     min-height: 38px;
-    padding: 8px 9px;
+    padding: 8px 8px;
     border: 1px solid #d6e1f0;
     border-radius: 9px;
     background: #fff;
     font-size: 13px;
-    font-weight: 750;
+    font-weight: 700;
   }
 
   #clientOnlyForm #client-module-dados textarea,
@@ -2255,17 +2296,18 @@ button[type="submit"]:hover,
 
   #clientOnlyForm #client-module-dados .form-section-title,
   #clientOnlyForm #client-module-vagas .section-head {
-    margin: 4px 0 0;
-    padding: 9px 10px;
-    border-radius: 11px;
-    gap: 8px;
+    margin: 2px 0 0;
+    padding: 8px 0 6px;
+    border: 0;
+    border-bottom: 1px solid #dbeafe;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    gap: 6px;
   }
 
   #clientOnlyForm #client-module-dados .form-section-title i {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    font-size: 13px;
+    display: none;
   }
 
   #clientOnlyForm #client-module-dados .form-section-title strong,
@@ -2288,7 +2330,7 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-vagas .section-fields {
     grid-column: 1 / -1;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
+    gap: 8px 7px;
     padding: 0;
     border: 0;
     background: transparent;
@@ -2314,8 +2356,11 @@ button[type="submit"]:hover,
   }
 
   #clientOnlyForm #client-module-dados .schedule-panel {
-    padding: 10px;
-    border-radius: 12px;
+    padding: 8px 0 2px;
+    border: 0;
+    border-top: 1px solid #dbeafe;
+    border-radius: 0;
+    background: transparent;
   }
 
   #clientOnlyForm #client-module-dados .schedule-day {
@@ -2352,7 +2397,7 @@ button[type="submit"]:hover,
 
   #clientOnlyForm #client-module-dados .schedule-slots {
     grid-column: 1 / -1;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
   }
 
