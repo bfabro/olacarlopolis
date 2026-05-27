@@ -19197,7 +19197,7 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
     if (h === "#automoveis" || h === "#veiculos") { return mostrarAutomoveis(); }
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
 
-    if (h === "#represa-chavantes") { return mostrarRepresa(); };
+    if (h === "#represa-chavantes") { return mostrarRepresaChavantes(); };
     if (h === "#luz") { return mostrarIgreenDescontoLuz(); };
 
 
