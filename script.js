@@ -983,6 +983,20 @@ function classificarComparacao(atual, referencia) {
 }
 
 // Ajuste aqui se seus campos tiverem outros nomes/origem:
+function valorNumeroRepresa(valor) {
+  const n = Number(String(valor ?? '').replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''));
+  return Number.isFinite(n) ? n : null;
+}
+
+function dadosRepresaParecemInvalidos(data) {
+  const cota = valorNumeroRepresa(data?.cotaAtual ?? data?.cota ?? data?.nivel);
+  const volume = data?.volumeUtil ?? data?.volume ?? data?.volumeUtilPct;
+  const defluencia = data?.vazaoDefluente ?? data?.defluente;
+  // A CTG mostra "Maximo = 474,00 mts" no bloco de Chavantes; se vier 474 sem volume/defluencia,
+  // o scraper pegou o maximo do reservatorio, nao a medicao atual.
+  return cota === 474 && volume == null && defluencia == null;
+}
+
 async function carregarDadosRepresa() {
   // TODO: substitua por seu fetch real (ONS/Vercel/etc.)
   // Estrutura sugerida:
@@ -21676,11 +21690,12 @@ async function carregarDadosRepresa() {
     const data = await r.json();
 
     if (!data?.success) throw new Error('API retornou sem sucesso');
+    if (dadosRepresaParecemInvalidos(data)) throw new Error('API retornou o nivel maximo da CTG em vez da medicao atual');
 
-    const cotaAtual = data.cotaAtual ?? data.cota ?? data.nivel ?? '—';
-    const volumeUtil = data.volumeUtil ?? data.volume ?? data.volumeUtilPct ?? '—';
+    const cotaAtual = data.cotaAtual ?? data.cota ?? data.nivel ?? data.nivel_m ?? '—';
+    const volumeUtil = data.volumeUtil ?? data.volume ?? data.volumeUtilPct ?? data.volume_util_pct ?? '—';
     const vazaoAfluente = data.vazaoAfluente ?? data.afluente ?? '—';
-    const vazaoDefluente = data.vazaoDefluente ?? data.defluente ?? '—';
+    const vazaoDefluente = data.vazaoDefluente ?? data.defluente ?? data.defluencia_m3s ?? '—';
     const atualizadoEm = data.atualizadoEm || data.ultimaAtualizacao || Date.now();
 
     // Preenche UI principal
@@ -21693,7 +21708,9 @@ async function carregarDadosRepresa() {
 
     // Exibe fonte e, se existir UI “NR” (carrossel da home), também preenche
     setTexto('#fonteDados', `Fonte: ${data.fonte || 'CTG Brasil'}`);
-    setTexto('#statusDadosRepresa', 'Dados carregados da fonte oficial.');
+    setTexto('#statusDadosRepresa', data.horarioReferencia
+      ? `Dados carregados da fonte oficial - medicao das ${data.horarioReferencia}.`
+      : 'Dados carregados da fonte oficial.');
     setTexto('#nr-cota', cotaAtual);
     setTexto('#nr-volume', volumeUtil);
     setTexto('#nr-data', new Date(atualizadoEm).toLocaleDateString('pt-BR'));

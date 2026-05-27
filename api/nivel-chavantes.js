@@ -4,28 +4,31 @@ export const config = { runtime: "edge" };
 const CTG_URL = "https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/";
 
 async function parseCTG(html) {
-  // Isola o bloco da UHE Chavantes
-  const sect = html.split("UHE Chavantes")[1] || "";
-  // Pega o primeiro triplo Nível/Defluência/Volume que aparece após o título
-  // Ex.: ... Nível ... 469,75 ... Defluência ... 126,80 ... Volume ... 47,75 ...
-  const num = sect.match(/N[ií]vel[\s\S]*?([\d.,]+)[\s\S]*?Deflu[êe]ncia[\s\S]*?([\d.,]+)[\s\S]*?Volume[\s\S]*?([\d.,]+)/i);
-  if (!num) throw new Error("Não consegui extrair números da CTG.");
+  const chavantesIndex = html.toLowerCase().indexOf("uhe chavantes");
+  if (chavantesIndex === -1) throw new Error("Nao encontrei UHE Chavantes na pagina da CTG.");
 
-  const nivel_m = num[1].replace(/\./g, "").replace(",", ".");      // metros
-  const deflu_m3s = num[2].replace(/\./g, "").replace(",", ".");    // m³/s
-  const volume_pct = num[3].replace(/\./g, "").replace(",", ".");   // %
+  const nextAccordion = html.indexOf('<div class="accordion-item">', chavantesIndex + 20);
+  const sect = html.slice(chavantesIndex, nextAccordion > chavantesIndex ? nextAccordion : chavantesIndex + 6000);
+  const dataLinha = sect.match(/<div class="col-12 data[^"]*">\s*([^<]+?)\s*<\/div>/i);
+  const rows = [];
+  const rowRegex = /<div class="col-2 bold">\s*(\d{2}:\d{2})\s*<\/div>[\s\S]*?<div class="row text-end bold">([\s\S]*?)<\/div>\s*<\/div>\s*<div class="col-2">/gi;
+  let rowMatch;
+  while ((rowMatch = rowRegex.exec(sect)) !== null) {
+    const values = [...rowMatch[2].matchAll(/<div class="col-12">\s*([\d.,]+)\s*<\/div>/gi)].map((m) => m[1]);
+    if (values.length >= 2) rows.push({ horario: rowMatch[1], nivel: values[0], defluencia: values[1], volume: values[2] || null });
+  }
+  const latest = rows[rows.length - 1];
+  if (!latest) throw new Error("Nao consegui extrair a ultima medicao da CTG.");
 
-  // Data (linha “domingo, 26 de outubro de 2025” ou similar)
-  const dataLinha = sect.match(/(\w+,\s+\d{1,2}\s+de\s+\w+\s+de\s+\d{4})/i);
-  const data = dataLinha ? dataLinha[1] : null;
-
+  const toNumber = (value) => Number(String(value || "").replace(/\./g, "").replace(",", "."));
   return {
     fonte: "CTG Brasil",
     usina: "UHE Chavantes",
-    nivel_m: Number(nivel_m),
-    volume_util_pct: Number(volume_pct),
-    defluencia_m3s: Number(deflu_m3s),
-    data_humana: data,
+    nivel_m: toNumber(latest.nivel),
+    volume_util_pct: latest.volume ? toNumber(latest.volume) : null,
+    defluencia_m3s: toNumber(latest.defluencia),
+    horario: latest.horario,
+    data_humana: dataLinha ? dataLinha[1].trim() : null,
     updated_from: CTG_URL,
   };
 }

@@ -139,62 +139,46 @@ async function tentarCTGDireto() {
     const html = await r.text();
     console.log('Tamanho HTML CTG:', html.length);
     
-    // Estratégia mais robusta de parsing
-    const normalizedHtml = html.toLowerCase().replace(/\s+/g, ' ');
-    
-    // Busca por Chavantes com contexto maior
-    const chavantesIndex = normalizedHtml.indexOf('chavantes');
+    // Isola o bloco da UHE Chavantes para nao confundir "Maximo" com nivel atual.
+    const chavantesIndex = html.toLowerCase().indexOf('uhe chavantes');
     if (chavantesIndex === -1) {
-      return { ok: false, motivo: 'Reservatório Chavantes não encontrado' };
+      return { ok: false, motivo: 'Reservatorio Chavantes nao encontrado' };
     }
 
-    // Pega contexto maior para análise
-    const start = Math.max(0, chavantesIndex - 200);
-    const end = chavantesIndex + 1000;
-    const context = normalizedHtml.slice(start, end);
-    
-    console.log('Contexto Chavantes:', context.slice(0, 500));
-
-    // Padrões mais flexíveis para números
-    const numberPatterns = [
-      /(\d{1,3}[,.]\d{2})/g,        // 123.45 ou 123,45
-      /(\d{3,4})/g,                 // 1234 ou 567
-      /cota[\s:]*([\d,.-]+)/i,      // cota: 123.45
-      /nível[\s:]*([\d,.-]+)/i,     // nível: 123.45
-      /(\d{2,4}[,.]\d)/g           // 123.4 ou 12.34
-    ];
-
-    let cota = null;
-    
-    for (const pattern of numberPatterns) {
-      const matches = context.match(pattern);
-      if (matches) {
-        // Converte e filtra números plausíveis para cota de reservatório
-        const numeros = matches
-          .map(m => parseFloat(m.replace(',', '.').replace(/[^\d.-]/g, '')))
-          .filter(n => !isNaN(n) && n > 100 && n < 800); // Faixa plausível
-        
-        if (numeros.length > 0) {
-          cota = numeros[0];
-          console.log('Cota encontrada com padrão:', pattern, cota);
-          break;
-        }
+    const nextAccordion = html.indexOf('<div class="accordion-item">', chavantesIndex + 20);
+    const context = html.slice(chavantesIndex, nextAccordion > chavantesIndex ? nextAccordion : chavantesIndex + 6000);
+    const dataMatch = context.match(/<div class="col-12 data[^"]*">\s*([^<]+?)\s*<\/div>/i);
+    const rows = [];
+    const rowRegex = /<div class="col-2 bold">\s*(\d{2}:\d{2})\s*<\/div>[\s\S]*?<div class="row text-end bold">([\s\S]*?)<\/div>\s*<\/div>\s*<div class="col-2">/gi;
+    let rowMatch;
+    while ((rowMatch = rowRegex.exec(context)) !== null) {
+      const values = [...rowMatch[2].matchAll(/<div class="col-12">\s*([\d.,]+)\s*<\/div>/gi)].map((m) => m[1]);
+      if (values.length >= 2) {
+        rows.push({
+          horario: rowMatch[1],
+          nivel: values[0],
+          defluencia: values[1],
+          volume: values[2] || null
+        });
       }
     }
 
-    if (!cota) {
-      return { ok: false, motivo: 'Não encontrou cota válida no contexto' };
-    }
+    const latest = rows[rows.length - 1];
+    if (!latest?.nivel) return { ok: false, motivo: 'Nao encontrou linha de medicao da CTG' };
 
     return {
       ok: true,
       fonte: 'CTG Brasil',
-      cotaAtual: cota.toFixed(2),
-      volumeUtil: null,
+      cotaAtual: latest.nivel,
+      volumeUtil: latest.volume,
       vazaoAfluente: null,
-      vazaoDefluente: null,
+      vazaoDefluente: latest.defluencia,
       atualizadoEm: new Date().toISOString(),
-      observacao: 'Dados via scraping direto - pode necessitar ajuste'
+      dataReferencia: dataMatch ? dataMatch[1].trim() : null,
+      horarioReferencia: latest.horario,
+      maximo: (context.match(/M[aá]ximo\s*=\s*<strong>\s*([\d.,]+)/i) || [])[1] || null,
+      minimo: (context.match(/M[ií]nimo\s*=\s*<strong>\s*([\d.,]+)/i) || [])[1] || null,
+      observacao: 'Dados extraidos da ultima linha de medicao da CTG'
     };
   } catch (e) {
     console.error('Erro CTG:', e);
