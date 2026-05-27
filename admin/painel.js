@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 211,
-  label: "v211",
+  numero: 212,
+  label: "v212",
   data: "2026-05-26",
-  nota: "Permite excluir imoveis diretamente pela lista."
+  nota: "Adiciona relatorio de cliques no painel do cliente por permissao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1106,7 +1106,7 @@ function setBusy(button, busy, text) {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -1160,7 +1160,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, promocoes: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -3915,6 +3915,102 @@ function buildAccessTimeline(acessos = {}, range = getReportDateRange()) {
   return rows.sort((a, b) => `${b.date} ${b.hora}`.localeCompare(`${a.date} ${a.hora}`));
 }
 
+function clientMetricKeys(client = {}) {
+  const values = [
+    client.id,
+    client.nome,
+    client.name,
+    client.nomeNormalizado,
+    client.estabelecimentoId,
+    clientCanonicalId(client),
+    ...(client.aliases ? Object.keys(client.aliases) : [])
+  ];
+  return [...new Set(values.map((value) => normalizeName(value)).filter(Boolean))];
+}
+
+function metricKeyBelongsToClient(metricKey, keys = []) {
+  const key = normalizeName(metricKey);
+  if (!key) return false;
+  return keys.some((candidate) => {
+    if (!candidate) return false;
+    if (key === candidate) return true;
+    return candidate.length > 4 && (key.includes(candidate) || candidate.includes(key));
+  });
+}
+
+function sumMetricMapForClient(map = new Map(), keys = []) {
+  let total = 0;
+  map.forEach((count, key) => {
+    if (metricKeyBelongsToClient(key, keys)) total += Number(count || 0);
+  });
+  return total;
+}
+
+function aggregateButtonTypesForClient(details = new Map(), keys = []) {
+  const tipos = new Map();
+  details.forEach((typeMap, clientKey) => {
+    if (!metricKeyBelongsToClient(clientKey, keys)) return;
+    typeMap.forEach((count, type) => incrementMetric(tipos, type, count));
+  });
+  return tipos;
+}
+
+function renderClientMetricReport(client = {}) {
+  const range = getReportDateRange();
+  const keys = clientMetricKeys(client);
+  const filtered = {
+    cliquesBotoes: filterDailyMetrics(state.metricas.cliquesBotoes, range),
+    ondeComerCardapios: filterDailyMetrics(state.metricas.ondeComerCardapios, range),
+    ondeComerWhats: filterDailyMetrics(state.metricas.ondeComerWhats, range),
+    ondeComerFotos: filterDailyMetrics(state.metricas.ondeComerFotos, range),
+    promocoes: filterDailyMetrics(state.metricas.promocoes, range)
+  };
+  const botoes = aggregateCliquesPorBotao(filtered.cliquesBotoes);
+  const tipos = aggregateButtonTypesForClient(botoes.detalhes, keys);
+  const cardapios = sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerCardapios), keys) + Number(tipos.get("cardapio") || 0);
+  const whats = sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerWhats), keys) + Number(tipos.get("whatsapp") || 0) + Number(tipos.get("telefone") || 0);
+  const fotos = sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerFotos), keys) + Number(tipos.get("fotos") || 0) + Number(tipos.get("divulgacao") || 0);
+  const promocoes = sumMetricMapForClient(aggregateSimpleDaily(filtered.promocoes), keys);
+  const redes = [...tipos.entries()]
+    .filter(([tipo]) => /instagram|facebook|tiktok|site|rede|social/i.test(String(tipo)))
+    .reduce((sum, [, count]) => sum + Number(count || 0), 0);
+  const totalBotoes = [...tipos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
+  const total = cardapios + whats + fotos + promocoes + redes;
+  const outros = Math.max(0, totalBotoes - (cardapios + whats + fotos + redes));
+  const timeline = buildClickTimeline(state.metricas, range)
+    .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
+    .slice(0, 12);
+  const rows = [
+    ["WhatsApp / telefone", whats],
+    ["Cardapio", cardapios],
+    ["Fotos / divulgacao", fotos],
+    ["Promocoes", promocoes],
+    ["Redes sociais / links", redes],
+    ["Outros botoes", outros]
+  ];
+
+  return `
+    <div class="client-report-summary">
+      <div class="stats-grid client-report-stats">
+        <article class="stat-card"><span>Total de interacoes</span><strong>${total + outros}</strong><small>${escapeHtml(range.label)}</small></article>
+        <article class="stat-card"><span>WhatsApp</span><strong>${whats}</strong><small>Telefone e contato</small></article>
+        <article class="stat-card"><span>Cardapio</span><strong>${cardapios}</strong><small>Cliques no cardapio</small></article>
+        <article class="stat-card"><span>Promocoes</span><strong>${promocoes}</strong><small>Cliques em ofertas</small></article>
+      </div>
+      <div class="reports-grid client-report-grid">
+        <section class="panel-card report-card">
+          <h3>Resumo por tipo</h3>
+          ${renderReportList(rows.filter(([, count]) => count > 0).map(([title, count]) => ({ title, meta: `${count} clique${count === 1 ? "" : "s"}` })), "Ainda nao ha cliques registrados para este cliente no periodo.")}
+        </section>
+        <section class="panel-card report-card">
+          <h3>Ultimos cliques</h3>
+          ${renderTimelineTable(timeline, "Ainda nao ha horarios detalhados para este cliente.")}
+        </section>
+      </div>
+    </div>
+  `;
+}
+
 function renderTimelineTable(rows, emptyMessage, type = "clicks") {
   if (!rows.length) return `<div class="list-meta">${escapeHtml(emptyMessage)}</div>`;
   const isAccess = type === "access";
@@ -4429,7 +4525,9 @@ function renderClientOnlyEditor() {
   const canEditVagas = hasPermission("vagas");
   const canEditCardapio = hasPermission("cardapio");
   const canEditPromocoes = hasPermission("promocoes");
+  const canViewRelatorios = hasPermission("relatorios");
   const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditPromocoes;
+  const hasAnyClientModule = hasAnyClientEditPermission || canViewRelatorios;
   let coPromoEditIndex = -1;
   let coJobEditIndex = -1;
   const setCoPromoEditMode = (index = -1) => {
@@ -4459,7 +4557,8 @@ function renderClientOnlyEditor() {
     { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas },
     { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardapio", show: canEditCardapio },
     { id: "client-module-imagens", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
-    { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes }
+    { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes },
+    { id: "client-module-relatorios", icon: "fa-solid fa-chart-line", label: "Relatorios", show: canViewRelatorios }
   ].filter((item) => item.show);
   const initialClientModule = (clientModules.find((item) => item.id === "client-module-dados") || clientModules[0] || {}).id || "";
   const clientSidebarNav = clientModules.map((item) => `
@@ -4650,11 +4749,23 @@ function renderClientOnlyEditor() {
           </div>
         </section>
       ` : ""}
+      ${canViewRelatorios ? `
+        <section id="client-module-relatorios" class="wide client-feature-card feature-relatorios client-module-panel">
+          <div class="section-head compact feature-card-head">
+            <div>
+              <span class="feature-kicker">Metricas</span>
+              <h3>Relatorio do meu cadastro</h3>
+              <p>Resumo dos cliques relacionados a ${escapeHtml(client.nome || "sua empresa")} no periodo atual.</p>
+            </div>
+          </div>
+          ${renderClientMetricReport(client)}
+        </section>
+      ` : ""}
         </div>
       </div>
       ${hasAnyClientEditPermission ? `
         <div class="form-actions wide"><button type="submit">Salvar meus dados</button></div>
-      ` : `<section class="wide panel-card"><p>Nenhuma permissao de edicao foi liberada para este usuario.</p></section>`}
+      ` : (!hasAnyClientModule ? `<section class="wide panel-card"><p>Nenhuma permissao foi liberada para este usuario.</p></section>` : "")}
     </form>
   `;
   if (canEditDados) renderScheduleEditor("coScheduleEditor", client.horarios || {});
