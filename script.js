@@ -6440,9 +6440,12 @@ ${(cardapioVisivel(est) || est.contact) ? `
     stateImoveis.all = await montarListaImoveisPublica();
 stateImoveis.filtered = stateImoveis.all.slice();
 popularFiltroCorretor();
+popularFiltroBairroImovel();
 atualizarContagemFiltroProcura();
 
 document.getElementById("filtroCorretor")
+  ?.addEventListener("change", aplicarFiltrosImoveis);
+document.getElementById("filtroBairroImovel")
   ?.addEventListener("change", aplicarFiltrosImoveis);
 
 desenharGridImoveis(stateImoveis.filtered);
@@ -6454,6 +6457,30 @@ if (document.getElementById("imMap") && window.L) {
 
   const stateImoveis = { all: [], filtered: [], map: null, markers: [] };
 
+  function normalizarBairroImovelTexto(value = "") {
+    return String(value || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .replace(/^bairro\s+/i, "");
+  }
+
+  function extrairBairroImovel(im = {}) {
+    const direto = normalizarBairroImovelTexto(im.bairro || im.bairroNome || im.neighborhood || "");
+    if (direto) return direto;
+    const endereco = normalizarBairroImovelTexto(im.endereco || im.localizacao || im.address || "");
+    if (!endereco) return "";
+    const partes = endereco.split(/\s[-–—]\s|,|\/|\|/).map(normalizarBairroImovelTexto).filter(Boolean);
+    const candidatos = partes.filter((parte) => !/carlopolis|parana|\bpr\b|\d/.test(parte.toLowerCase()));
+    return candidatos[0] || partes[0] || "";
+  }
+
+  function chaveBairroImovel(value = "") {
+    return normalizarBairroImovelTexto(value)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
   function aplicarFiltrosImoveis() {
     const tipo = document.getElementById("imTipo").value;
     const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
@@ -6461,6 +6488,7 @@ if (document.getElementById("imMap") && window.L) {
     const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
     const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
     const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
+    const bairroSelecionado = document.getElementById("filtroBairroImovel")?.value || "";
     const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
     const ordenacao = document.getElementById("ordenacaoImoveis")?.value || "";
 
@@ -6486,6 +6514,10 @@ if (document.getElementById("imMap") && window.L) {
         !procuraSelecionado ||
         (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
 
+      const bairroOk =
+        !bairroSelecionado ||
+        chaveBairroImovel(extrairBairroImovel(im)) === bairroSelecionado;
+
       let amenOk = true;
       if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
       if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
@@ -6493,7 +6525,7 @@ if (document.getElementById("imMap") && window.L) {
 
       const disponivelOk = !somenteDisp || !isFechado(im.status);
 
-      return tipoOk && qOk && pOk && corretorOk && procuraOk && amenOk && disponivelOk;
+      return tipoOk && qOk && pOk && corretorOk && procuraOk && bairroOk && amenOk && disponivelOk;
     });
 
     // 2) ORDENAR
@@ -6513,6 +6545,7 @@ if (document.getElementById("imMap") && window.L) {
     // 3) ATUALIZA CONTAGEM DOS FILTROS
 atualizarContagemFiltroProcura();
 popularFiltroCorretor();
+popularFiltroBairroImovel();
 
 desenharGridImoveis(stateImoveis.filtered);
 plotarPinsImoveis(stateImoveis.filtered);
@@ -6529,6 +6562,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   const p = parseInt(document.getElementById("imPreco")?.value || 0, 10);
   const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
   const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
+  const bairroSelecionado = document.getElementById("filtroBairroImovel")?.value || "";
   const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
 
   const isFechado = (st) => {
@@ -6564,6 +6598,10 @@ plotarPinsImoveis(stateImoveis.filtered);
         ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
         : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
 
+    const bairroOk =
+      !bairroSelecionado ||
+      chaveBairroImovel(extrairBairroImovel(im)) === bairroSelecionado;
+
     let amenOk = true;
     if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
     if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
@@ -6571,7 +6609,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     const disponivelOk = !somenteDisp || !isFechado(im.status);
 
-    return tipoOk && qOk && pOk && corretorOk && amenOk && disponivelOk;
+    return tipoOk && qOk && pOk && corretorOk && bairroOk && amenOk && disponivelOk;
   });
 
   baseParaContagem.forEach(im => {
@@ -7032,6 +7070,70 @@ plotarPinsImoveis(stateImoveis.filtered);
     stateImoveis.map.setView([im.lat, im.lng], 16);
   }
 
+  function popularFiltroBairroImovel() {
+  const sel = document.getElementById("filtroBairroImovel");
+  if (!sel) return;
+
+  const selecionadoAtual = sel.value || "";
+  const tipo = document.getElementById("imTipo")?.value || "";
+  const q = parseInt(document.getElementById("imQuartos")?.value || 0, 10);
+  const p = parseInt(document.getElementById("imPreco")?.value || 0, 10);
+  const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
+  const corretorSelecionado = document.getElementById("filtroCorretor")?.value || "";
+  const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
+  const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
+
+  const isFechado = (st) => {
+    if (!st) return false;
+    const s = String(st).toLowerCase();
+    return s.includes("vendido") || s.includes("alugado") || s.includes("negociado");
+  };
+
+  const baseParaContagem = stateImoveis.all.filter(im => {
+    const tipoOk = !tipo || im.tipo === tipo;
+    const qOk = !q || (im.quartos >= q);
+    const pOk = !p || (im.valor <= p);
+    const corretorOk =
+      !corretorSelecionado ||
+      (Array.isArray(im.corretores)
+        ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
+        : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
+    const procuraOk =
+      !procuraSelecionado ||
+      (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
+
+    let amenOk = true;
+    if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
+    if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
+    if (amen.includes("vagas")) amenOk = amenOk && (im.vagas >= 2);
+    const disponivelOk = !somenteDisp || !isFechado(im.status);
+
+    return tipoOk && qOk && pOk && corretorOk && procuraOk && amenOk && disponivelOk;
+  });
+
+  const contagem = {};
+  const nomesOriginais = {};
+  baseParaContagem.forEach(im => {
+    const bairro = extrairBairroImovel(im);
+    const chave = chaveBairroImovel(bairro);
+    if (!chave) return;
+    contagem[chave] = (contagem[chave] || 0) + 1;
+    if (!nomesOriginais[chave]) nomesOriginais[chave] = bairro;
+  });
+
+  const bairrosOrdenados = Object.keys(contagem)
+    .sort((a, b) => nomesOriginais[a].localeCompare(nomesOriginais[b], "pt-BR"));
+
+  sel.innerHTML = `<option value="">Todos (${baseParaContagem.length})</option>`;
+  bairrosOrdenados.forEach(chave => {
+    const option = document.createElement("option");
+    option.value = chave;
+    option.textContent = `${nomesOriginais[chave]} (${contagem[chave]})`;
+    if (selecionadoAtual === chave) option.selected = true;
+    sel.appendChild(option);
+  });
+}
+
   function popularFiltroCorretor() {
   const sel = document.getElementById("filtroCorretor");
   if (!sel) return;
@@ -7043,6 +7145,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   const p = parseInt(document.getElementById("imPreco")?.value || 0, 10);
   const amen = Array.from(document.querySelectorAll(".amenity-chip.active")).map(c => c.dataset.key);
   const procuraSelecionado = document.getElementById("filtroProcura")?.value || "";
+  const bairroSelecionado = document.getElementById("filtroBairroImovel")?.value || "";
   const somenteDisp = document.getElementById("somenteDisponiveis")?.checked || false;
 
   const isFechado = (st) => {
@@ -7061,6 +7164,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       !procuraSelecionado ||
       (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
 
+    const bairroOk =
+      !bairroSelecionado ||
+      chaveBairroImovel(extrairBairroImovel(im)) === bairroSelecionado;
+
     let amenOk = true;
     if (amen.includes("piscina")) amenOk = amenOk && !!im.piscina;
     if (amen.includes("churrasqueira")) amenOk = amenOk && !!im.churrasqueira;
@@ -7068,7 +7175,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     const disponivelOk = !somenteDisp || !isFechado(im.status);
 
-    return tipoOk && qOk && pOk && procuraOk && amenOk && disponivelOk;
+    return tipoOk && qOk && pOk && procuraOk && bairroOk && amenOk && disponivelOk;
   });
 
   const contagem = {};
