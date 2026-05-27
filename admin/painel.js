@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 226,
-  label: "v226",
+  numero: 227,
+  label: "v227",
   data: "2026-05-26",
-  nota: "Corrige leitura oficial do nivel da Represa de Chavantes."
+  nota: "Amplia indicadores da visao geral do admin."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1467,11 +1467,29 @@ function mergeImoveisBaseComFirebase(scriptImoveis, firebaseImoveis) {
 }
 
 function renderStats() {
+  const today = dateKeyFromDate(new Date());
+  const clienteAtivo = (client) => String(client?.status || "ativo").toLowerCase() === "ativo";
+  const itemCadastrado = (item) => {
+    const status = String(item?.status || "ativo").toLowerCase();
+    return !item?.deletedAt && !["excluido", "excluida", "removido", "removida"].includes(status);
+  };
+  const promocaoAtiva = (promo, client) => {
+    const status = String(promo?.status || "ativo").toLowerCase();
+    const fim = promo?.validadeFim || promo?.validade || promo?.fim || promo?.dataFim || "";
+    return clienteAtivo(client) && !["inativo", "inativa", "expirado", "expirada", "excluido", "excluida"].includes(status) && (!fim || String(fim).slice(0, 10) >= today);
+  };
+  const promocoesAtivas = state.clientes.reduce((total, client) => (
+    total + normalizePromocoes(client.promocoes).filter((promo) => promocaoAtiva(promo, client)).length
+  ), 0);
   $("statClientes").textContent = String(state.clientes.length);
   $("statUsuarios").textContent = String(state.usuarios.length);
   $("statAtivos").textContent = String(state.clientes.filter((c) => c.status === "ativo").length);
   $("statPendentes").textContent = String(state.clientes.filter((c) => c.status === "pendente").length);
+  if ($("statInativos")) $("statInativos").textContent = String(state.clientes.filter((c) => c.status === "inativo").length);
   $("statEventos").textContent = String(state.eventos.filter(eventVisible).length);
+  if ($("statPromocoesAtivas")) $("statPromocoesAtivas").textContent = String(promocoesAtivas);
+  if ($("statImoveis")) $("statImoveis").textContent = String(state.imoveis.filter(itemCadastrado).length);
+  if ($("statAutomoveis")) $("statAutomoveis").textContent = String(state.automoveis.filter(itemCadastrado).length);
 }
 
 function updateChrome() {

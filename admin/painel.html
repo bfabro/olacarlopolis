@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=226">
+  <link rel="stylesheet" href="painel.css?v=227">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -104,15 +104,27 @@
             <span>Eventos</span>
             <strong id="statEventos">0</strong>
           </article>
+          <article class="stat-card">
+            <span>Promocoes ativas</span>
+            <strong id="statPromocoesAtivas">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Imoveis cadastrados</span>
+            <strong id="statImoveis">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Veiculos cadastrados</span>
+            <strong id="statAutomoveis">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Clientes inativos</span>
+            <strong id="statInativos">0</strong>
+          </article>
         </div>
-        <section class="panel-card">
-          <h2>Proximos passos</h2>
-          <p>Este painel salva clientes e usuarios no Firebase. A proxima etapa e ligar o site publico para consumir estes dados editaveis.</p>
-          <div class="version-box">
-            <strong id="dashboardVersion">Versao -</strong>
-            <span id="dashboardVersionDate">Atualizacao registrada no codigo do painel.</span>
-          </div>
-        </section>
+        <div class="version-box">
+          <strong id="dashboardVersion">Versao -</strong>
+          <span id="dashboardVersionDate">Atualizacao registrada no codigo do painel.</span>
+        </div>
       </section>
 
       <section id="clientesView" class="panel-view hidden">
@@ -964,6 +976,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=226"></script>
+  <script type="module" src="painel.js?v=227"></script>
 </body>
 </html>
