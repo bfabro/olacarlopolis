@@ -21635,18 +21635,26 @@ async function carregarDadosRepresa() {
 
     if (!data?.success) throw new Error('API retornou sem sucesso');
 
+    const cotaAtual = data.cotaAtual ?? data.cota ?? data.nivel ?? '—';
+    const volumeUtil = data.volumeUtil ?? data.volume ?? data.volumeUtilPct ?? '—';
+    const vazaoAfluente = data.vazaoAfluente ?? data.afluente ?? '—';
+    const vazaoDefluente = data.vazaoDefluente ?? data.defluente ?? '—';
+    const atualizadoEm = data.atualizadoEm || data.ultimaAtualizacao || Date.now();
+
     // Preenche UI principal
-    setTexto('#cotaAtual', data.cotaAtual);
-    setTexto('#vazaoAfluente', data.vazaoAfluente ?? '—');
-    setTexto('#vazaoDefluente', data.vazaoDefluente ?? '—');
+    setTexto('#cotaAtual', cotaAtual);
+    setTexto('#volumeUtil', volumeUtil);
+    setTexto('#vazaoAfluente', vazaoAfluente);
+    setTexto('#vazaoDefluente', vazaoDefluente);
     setTexto('#ultimaAtualizacao',
-      new Date(data.atualizadoEm || Date.now()).toLocaleString('pt-BR'));
+      new Date(atualizadoEm).toLocaleString('pt-BR'));
 
     // Exibe fonte e, se existir UI “NR” (carrossel da home), também preenche
-    setTexto('#fonteDados', `Fonte: ${data.fonte}`);
-    setTexto('#nr-cota', data.cotaAtual);
-    setTexto('#nr-volume', data.volumeUtil);
-    setTexto('#nr-data', new Date(data.atualizadoEm || Date.now()).toLocaleDateString('pt-BR'));
+    setTexto('#fonteDados', `Fonte: ${data.fonte || 'CTG Brasil'}`);
+    setTexto('#statusDadosRepresa', 'Dados carregados da fonte oficial.');
+    setTexto('#nr-cota', cotaAtual);
+    setTexto('#nr-volume', volumeUtil);
+    setTexto('#nr-data', new Date(atualizadoEm).toLocaleDateString('pt-BR'));
 
     // Destaque visual
     if (typeof destacarMudancas === 'function') destacarMudancas();
@@ -21658,27 +21666,15 @@ async function carregarDadosRepresa() {
       if (typeof buscarCTGviaJina === 'function') {
         const dados = await buscarCTGviaJina(); // mantém seu leitor como 2ª opção
         setTexto('#cotaAtual', dados.cota);
+        setTexto('#volumeUtil', dados.volume);
         setTexto('#vazaoAfluente', dados.vazaoAfluente ?? '—');
         setTexto('#vazaoDefluente', dados.vazaoDefluente ?? '—');
         setTexto('#ultimaAtualizacao', dados.atualizacao);
         setTexto('#fonteDados', `Fonte: ${dados.fonte}`);
+        setTexto('#statusDadosRepresa', 'Dados carregados da página oficial da CTG.');
         setTexto('#nr-cota', dados.cota);
         setTexto('#nr-volume', dados.volume);
         setTexto('#nr-data', dados.atualizacao);
-        if (typeof destacarMudancas === 'function') destacarMudancas();
-        return;
-      }
-      // 3) Último fallback (estimado/local) se o leitor também falhar
-      if (typeof obterDadosHistoricos === 'function') {
-        const alt = await obterDadosHistoricos();
-        setTexto('#cotaAtual', alt.cotaAtual);
-        setTexto('#vazaoAfluente', alt.vazaoAfluente);
-        setTexto('#vazaoDefluente', alt.vazaoDefluente);
-        setTexto('#ultimaAtualizacao', alt.ultimaAtualizacao);
-        setTexto('#fonteDados', `Fonte: ${alt.fonte}`);
-        setTexto('#nr-cota', alt.cotaAtual);
-        setTexto('#nr-volume', alt.volumeUtil || alt.volume || '—');
-        setTexto('#nr-data', alt.ultimaAtualizacao);
         if (typeof destacarMudancas === 'function') destacarMudancas();
         return;
       }
@@ -21699,16 +21695,18 @@ async function carregarDadosRepresa() {
 
 // Função para mostrar erro de carregamento
 function mostrarErroCarregamento() {
-  document.getElementById('cotaAtual').textContent = 'Erro';
-  document.getElementById('vazaoAfluente').textContent = 'Erro';
-  document.getElementById('vazaoDefluente').textContent = 'Erro';
-  document.getElementById('ultimaAtualizacao').textContent = 'Falha ao carregar';
+  setTexto('#cotaAtual', 'Erro');
+  setTexto('#volumeUtil', 'Erro');
+  setTexto('#vazaoAfluente', 'Erro');
+  setTexto('#vazaoDefluente', 'Erro');
+  setTexto('#ultimaAtualizacao', 'Falha ao carregar');
+  setTexto('#statusDadosRepresa', 'Não foi possível conectar às fontes oficiais agora.');
 
   const erroElement = document.getElementById('erroCarregamento') || (() => {
     const el = document.createElement('div');
     el.id = 'erroCarregamento';
     el.style.cssText = 'background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 6px; margin: 1rem 0;';
-    document.querySelector('.represa-card').insertBefore(el, document.querySelector('.represa-note'));
+    document.querySelector('.represa-card')?.appendChild(el);
     return el;
   })();
 
@@ -21739,17 +21737,39 @@ function mostrarRepresaChavantes() {
         <div class="represa-header">
           <i class="fas fa-water" style="font-size: 3rem; color: #1e90ff; margin-bottom: 1rem;"></i>
           <h3>Nível da Água - Tempo Real</h3>
-          <p>Monitoramento da Represa de Chavantes</p>
+          <p>Monitoramento oficial da Represa de Chavantes</p>
           <div id="fonteDados" style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;"></div>
         </div>
 
-       
+        <div class="represa-dados">
+          <div class="dado-item">
+            <div class="dado-label">Cota atual</div>
+            <div class="dado-valor" id="cotaAtual">—</div>
+            <div class="dado-unidade">metros</div>
+          </div>
+          <div class="dado-item">
+            <div class="dado-label">Volume útil</div>
+            <div class="dado-valor" id="volumeUtil">—</div>
+            <div class="dado-unidade">%</div>
+          </div>
+          <div class="dado-item">
+            <div class="dado-label">Vazão afluente</div>
+            <div class="dado-valor" id="vazaoAfluente">—</div>
+            <div class="dado-unidade">m³/s</div>
+          </div>
+          <div class="dado-item">
+            <div class="dado-label">Vazão defluente</div>
+            <div class="dado-valor" id="vazaoDefluente">—</div>
+            <div class="dado-unidade">m³/s</div>
+          </div>
+        </div>
 
-        <!-- Espaço para análise dinâmica do nível -->
+        <div class="represa-note">
+          <p><strong>Última atualização:</strong> <span id="ultimaAtualizacao">Carregando...</span></p>
+          <p id="statusDadosRepresa">Buscando dados oficiais...</p>
+        </div>
 
         <div class="represa-info">
-         
-
           <div class="info-box">
             <h4>ℹ️ Represa:</h4>
             <p><strong>Capacidade:</strong> 9.410 hm³<br>
@@ -21759,17 +21779,13 @@ function mostrarRepresaChavantes() {
         </div>
 
         <div class="represa-actions">
-          
+          <button type="button" class="btn-refresh"><i class="fas fa-rotate"></i> Atualizar dados</button>
           <a href="https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/" 
              target="_blank" 
              class="btn-external">
             <i class="fas fa-external-link-alt"></i> Site Oficial
           </a>
         </div>
-
-      
-
-     
       </div>
     </div>
   `;

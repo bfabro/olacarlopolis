@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 221,
-  label: "v221",
+  numero: 222,
+  label: "v222",
   data: "2026-05-26",
-  nota: "Destaca Grupos WhatsApp na tela de Informacoes."
+  nota: "Melhora tela publica do nivel da Represa de Chavantes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
