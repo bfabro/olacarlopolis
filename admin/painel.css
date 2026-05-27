@@ -1263,12 +1263,79 @@ button[type="submit"]:hover,
   opacity: .55;
 }
 
+#client-module-dados,
+#client-module-vagas {
+  gap: 16px;
+}
+
+.admin-field-card {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 78px;
+  padding: 9px 12px;
+  border: 1px solid #d6e1f0;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, .04);
+}
+
+.admin-field-card > i {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #eef4ff;
+  color: var(--brand);
+  font-size: 20px;
+}
+
+.admin-field-card > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.admin-field-card small {
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.admin-field-card input,
+.admin-field-card select {
+  width: 100%;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 850;
+  box-shadow: none;
+}
+
+.admin-field-card input:focus,
+.admin-field-card select:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.admin-field-card:focus-within {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .12), 0 10px 24px rgba(15, 23, 42, .06);
+}
+
 .schedule-panel {
-  border: 1px solid var(--line);
-  border-left: 5px solid var(--section-accent, #16a34a);
-  border-radius: 12px;
-  padding: 14px;
+  border: 1px solid #dbe5f2;
+  border-radius: 18px;
+  padding: 18px;
   background: #fff;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, .06);
 }
 
 .schedule-editor {
@@ -1278,41 +1345,86 @@ button[type="submit"]:hover,
 
 .schedule-day {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 12px;
+  grid-template-columns: minmax(140px, 1fr) 92px minmax(260px, 1.5fr);
+  gap: 14px;
   align-items: center;
-  padding: 10px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #f8fafc;
+  padding: 11px 0;
+  border: 0;
+  border-bottom: 1px solid #e5edf6;
+  border-radius: 0;
+  background: transparent;
+}
+
+.schedule-day:last-child {
+  border-bottom: 0;
 }
 
 .schedule-day.closed {
-  background: #fff7ed;
-  border-color: #fed7aa;
+  background: transparent;
+  border-color: #e5edf6;
 }
 
 .schedule-day.closed .schedule-slots {
-  opacity: .5;
+  opacity: .62;
 }
 
 .schedule-open {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin: 0;
-  color: var(--text);
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 850;
 }
 
 .schedule-open input {
+  appearance: none;
+  width: 42px;
+  height: 24px;
+  min-height: 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #c8cdd4;
+  box-shadow: inset 0 2px 5px rgba(15, 23, 42, .18);
+  position: relative;
+  cursor: pointer;
+}
+
+.schedule-open input::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
   width: 18px;
   height: 18px;
-  min-height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, .18);
+  transition: transform .18s ease;
+}
+
+.schedule-open input:checked {
+  background: #16a34a;
+}
+
+.schedule-open input:checked::after {
+  transform: translateX(18px);
+}
+
+.schedule-status {
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.schedule-day.closed .schedule-status {
+  color: #667085;
 }
 
 .schedule-slots {
   display: grid;
-  grid-template-columns: repeat(4, minmax(90px, 1fr));
+  grid-template-columns: repeat(4, minmax(72px, 1fr));
   gap: 8px;
 }
 
@@ -2148,6 +2260,42 @@ button[type="submit"]:hover,
     font-size: 13px;
   }
 
+  #clientOnlyForm #client-module-dados .admin-field-card,
+  #clientOnlyForm #client-module-vagas .admin-field-card {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 8px;
+    min-height: 66px;
+    padding: 8px 9px;
+    border-radius: 13px;
+  }
+
+  #clientOnlyForm #client-module-dados .admin-field-card > i,
+  #clientOnlyForm #client-module-vagas .admin-field-card > i {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 17px;
+  }
+
+  #clientOnlyForm #client-module-dados .admin-field-card small,
+  #clientOnlyForm #client-module-vagas .admin-field-card small {
+    font-size: 12px;
+  }
+
+  #clientOnlyForm #client-module-dados .admin-field-card input,
+  #clientOnlyForm #client-module-dados .admin-field-card select,
+  #clientOnlyForm #client-module-vagas .admin-field-card input,
+  #clientOnlyForm #client-module-vagas .admin-field-card select {
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 850;
+    box-shadow: none;
+  }
+
   #clientOnlyForm #client-module-dados textarea,
   #clientOnlyForm #client-module-vagas textarea {
     min-height: 78px;
@@ -2214,6 +2362,55 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-vagas .badge {
     padding: 6px 8px;
     font-size: 11px;
+  }
+
+  #clientOnlyForm #client-module-dados .schedule-panel {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  #clientOnlyForm #client-module-dados .schedule-day {
+    grid-template-columns: minmax(112px, 1fr) 68px;
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  #clientOnlyForm #client-module-dados .schedule-open {
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  #clientOnlyForm #client-module-dados .schedule-open input {
+    width: 38px;
+    height: 22px;
+    min-height: 22px;
+    padding: 0;
+  }
+
+  #clientOnlyForm #client-module-dados .schedule-open input::after {
+    width: 16px;
+    height: 16px;
+  }
+
+  #clientOnlyForm #client-module-dados .schedule-open input:checked::after {
+    transform: translateX(16px);
+  }
+
+  #clientOnlyForm #client-module-dados .schedule-status {
+    font-size: 12px;
+    text-align: right;
+  }
+
+  #clientOnlyForm #client-module-dados .schedule-slots {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  #clientOnlyForm #client-module-dados .schedule-slots input {
+    min-height: 34px;
+    padding: 6px 4px;
+    font-size: 12px;
   }
 }
 
