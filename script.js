@@ -6258,7 +6258,12 @@ ${(cardapioVisivel(est) || est.contact) ? `
         </select>
       </div>
 
-     
+      <div class="campo">
+        <label for="filtroBairroImovel">Bairro</label>
+        <select id="filtroBairroImovel">
+          <option value="">Todos</option>
+        </select>
+      </div>
 
       <div class="campo">
         <label for="imPreco">Preço até</label>
