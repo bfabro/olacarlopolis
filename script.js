@@ -8166,7 +8166,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           const dataCompacta = i.validadeFim ? formatarDataBR(i.validadeFim) : (i.validadeInicio ? formatarDataBR(i.validadeInicio) : "");
           const detalheCompacto = dataCompacta ? `V&aacute;lido at&eacute;: ${dataCompacta}` : "";
           html += `
-    <article class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+    <article class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
       <div class="card-divulgacao-img-wrap">
         ${i.imagem
               ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
@@ -8197,7 +8197,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         }
 
         html += `
-    <article class="promo-card promo-card-new" data-promo-id="${i.id || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+    <article class="promo-card promo-card-new" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
     <div class="promo-card-body">
       <div class="promo-produto">
         <div class="promo-image-wrap">
@@ -8547,10 +8547,16 @@ plotarPinsImoveis(stateImoveis.filtered);
       });
     });
 
-    document.querySelectorAll(".promo-card .promo-img-zoom, .promo-card .icon-link").forEach((el) => {
+    document.querySelectorAll(".promo-card .promo-img-zoom, .promo-card .icon-link, .promo-card [data-promo-action]").forEach((el) => {
       el.addEventListener("click", () => {
-        const estId = el.closest(".promo-card")?.dataset?.promoEst || "";
-        if (estId) registrarCliqueNaPromocao(estId);
+        const card = el.closest(".promo-card");
+        const estId = card?.dataset?.promoEst || "";
+        const action = el.dataset?.promoAction || (el.classList.contains("promo-img-zoom") ? "imagem" : "promocao");
+        if (estId) registrarCliqueNaPromocao(estId, {
+          promoId: card?.dataset?.promoId || "",
+          promoTitulo: card?.dataset?.promoTitle || "",
+          acao: action
+        });
       });
     });
 
@@ -19966,13 +19972,20 @@ window.registrarCliqueCardapioOndeComer = registrarCliqueCardapioOndeComer;
 window.registrarCliqueWhatsOndeComer = registrarCliqueWhatsOndeComer;
 window.registrarCliqueFotosOndeComer = registrarCliqueFotosOndeComer;
 
-function registrarCliqueNaPromocao(nomeComercio) {
+function registrarCliqueNaPromocao(nomeComercio, detalhes = {}) {
   const hoje = getHojeBR();
   const ref = firebase.database().ref(`cliquesPromocoesPorComercio/${hoje}/${nomeComercio}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
+  const acao = detalhes.acao || "promocao";
   firebase.database().ref(`cliquesPromocoesDetalhado/${hoje}/${nomeComercio}`).push({
     area: "promocoes",
-    tipo: "promocao",
+    tipo: acao === "whatsapp" ? "whatsapp_promocao" : "promocao",
+    acao,
+    promoId: detalhes.promoId || "",
+    promocaoId: detalhes.promoId || "",
+    promoTitulo: detalhes.promoTitulo || detalhes.titulo || "",
+    promocaoTitulo: detalhes.promoTitulo || detalhes.titulo || "",
+    clicouWhatsAppPromocao: acao === "whatsapp",
     horario: new Date().toLocaleTimeString("pt-BR"),
     ts: firebase.database.ServerValue.TIMESTAMP,
     pagina: window.location.href

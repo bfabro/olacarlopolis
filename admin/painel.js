@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 218,
-  label: "v218",
+  numero: 219,
+  label: "v219",
   data: "2026-05-26",
-  nota: "Melhora relatorio do cliente com filtros e horarios de cliques."
+  nota: "Detalha promocao e WhatsApp no relatorio do cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4032,7 +4032,10 @@ function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
       area,
       cliente: clientLabelFromMetricKey(cliente),
       tipo: metricButtonLabel(tipo || item.tipo || area),
-      pagina: item.pagina || ""
+      pagina: item.pagina || "",
+      promocao: item.promocaoTitulo || item.promoTitulo || item.tituloPromocao || item.titulo || "",
+      promocaoId: item.promocaoId || item.promoId || "",
+      clicouWhatsAppPromocao: Boolean(item.clicouWhatsAppPromocao || item.acao === "whatsapp" || item.tipo === "whatsapp_promocao")
     });
   };
 
@@ -4169,6 +4172,8 @@ function renderClientTimelineTable(rows, emptyMessage) {
             <th>Recurso</th>
             <th>Data</th>
             <th>Horario</th>
+            <th>Promocao</th>
+            <th>WhatsApp promocao</th>
             <th>Origem / card</th>
             <th>Detalhe</th>
           </tr>
@@ -4179,6 +4184,8 @@ function renderClientTimelineTable(rows, emptyMessage) {
               <td><strong>${escapeHtml(clientReportCategory(row))}</strong></td>
               <td>${escapeHtml(formatDateBR(row.date))}</td>
               <td><strong>${escapeHtml(row.hora)}</strong></td>
+              <td>${escapeHtml(row.promocao || "-")}</td>
+              <td>${row.promocao || row.promocaoId || /promoc/i.test(String(row.area || row.tipo || "")) ? (row.clicouWhatsAppPromocao ? "Sim" : "Nao") : "-"}</td>
               <td>${escapeHtml(row.area || "-")}</td>
               <td>${escapeHtml(row.tipo || "-")}</td>
             </tr>
