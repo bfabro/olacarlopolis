@@ -1987,8 +1987,16 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
+    const destaqueEstaAtivo = (est) => {
+      if (!est?.destaqueSemanal) return false;
+      const fim = est.destaqueFim || "";
+      if (!fim) return true;
+      const hoje = new Date().toISOString().slice(0, 10);
+      return String(fim) >= hoje;
+    };
+
     const destaquesAdmin = listaTodos
-      .filter(e => e.destaqueSemanal)
+      .filter(e => destaqueEstaAtivo(e))
       .map(e => e.nomeNormalizado);
     const nomesFixos = [...new Set([...destaquesAdmin, ...destaquesFixos])];
 
@@ -17105,6 +17113,9 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (campoExiste(cliente, "tiktok")) est.tiktok = cliente.tiktok || "";
     if (campoExiste(cliente, "site")) est.site = cliente.site || "";
     if (campoExiste(cliente, "destaqueSemanal")) est.destaqueSemanal = Boolean(cliente.destaqueSemanal);
+    ["destaqueSemanas", "destaqueDias", "destaqueInicio", "destaqueFim", "destaqueCobranca", "destaqueValor"].forEach((campo) => {
+      if (campoExiste(cliente, campo)) est[campo] = cliente[campo] || "";
+    });
     const temControleCardapio = campoExiste(cliente, "cardapioAtivo")
       || campoExiste(cliente, "menuAtivo")
       || campoExiste(cliente, "exibirCardapio");
@@ -17152,6 +17163,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       tiktok: cliente.tiktok || "",
       site: cliente.site || "",
       destaqueSemanal: Boolean(cliente.destaqueSemanal),
+      destaqueSemanas: cliente.destaqueSemanas || 1,
+      destaqueDias: cliente.destaqueDias || 7,
+      destaqueInicio: cliente.destaqueInicio || "",
+      destaqueFim: cliente.destaqueFim || "",
+      destaqueCobranca: cliente.destaqueCobranca || "mensalidade",
+      destaqueValor: cliente.destaqueValor || 0,
       cardapioAtivo,
       cardapioLink: cardapioAtivo ? (cliente.cardapioLink || "") : "",
       menuImages: cardapioAtivo ? (cliente.menuImages || []) : [],

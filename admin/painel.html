@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=223">
+  <link rel="stylesheet" href="painel.css?v=224">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -216,7 +216,15 @@
                   </div>
                 </div>
                 <label class="check-row"><input id="clientFeaturedWeek" type="checkbox"> Manter este cliente em destaque na tela inicial</label>
-                <label>Valor do destaque<input id="clientFeaturedValue" placeholder="R$"></label>
+                <label>Quantidade de semanas<input id="clientFeaturedWeeks" type="number" min="1" max="52" value="1"></label>
+                <label>Cobranca do destaque
+                  <select id="clientFeaturedBilling">
+                    <option value="mensalidade">Junto da mensalidade</option>
+                    <option value="pix_separado">Pix separado</option>
+                  </select>
+                </label>
+                <label>Valor do destaque<input id="clientFeaturedValue" placeholder="R$" readonly></label>
+                <div id="clientFeaturedSummary" class="list-meta wide">Valor definido pelo admin master.</div>
               </section>
               <section class="wide upload-panel client-jobs-panel">
                 <div class="section-head compact">
@@ -911,6 +919,7 @@
                 <div class="permission-group">
                   <strong>Liberacao comum</strong>
                   <label><input type="checkbox" value="dados" checked> Dados do cliente</label>
+                  <label><input type="checkbox" value="destaque" checked> Destaque da semana</label>
                   <label><input type="checkbox" value="faturas" checked> Faturas</label>
                   <label><input type="checkbox" value="imagens" checked> Imagens</label>
                   <label><input type="checkbox" value="promocoes" checked> Promocoes</label>
@@ -955,6 +964,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=223"></script>
+  <script type="module" src="painel.js?v=224"></script>
 </body>
 </html>

@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 223,
-  label: "v223",
+  numero: 224,
+  label: "v224",
   data: "2026-05-26",
-  nota: "Corrige cards de imoveis no desktop."
+  nota: "Adiciona controle de destaque da semana para clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1145,7 +1145,7 @@ function setBusy(button, busy, text) {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -1199,7 +1199,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -1618,6 +1618,9 @@ function resetClientForm() {
   if ($("clientType")) $("clientType").value = "comercio";
   if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = false;
   if ($("clientJobActive")) $("clientJobActive").checked = false;
+  if ($("clientFeaturedWeeks")) $("clientFeaturedWeeks").value = "1";
+  if ($("clientFeaturedBilling")) $("clientFeaturedBilling").value = "mensalidade";
+  refreshClientFeaturedSummary();
   ["clientJobTitle", "clientJobDescription", "clientJobRequirements", "clientJobSalary", "clientJobSchedule", "clientJobPlace", "clientJobContact", "clientJobApply", "clientJobValidUntil"].forEach((id) => {
     if ($(id)) $(id).value = "";
   });
@@ -1662,7 +1665,12 @@ function getClientFormData() {
     tiktok: $("clientTiktok").value.trim(),
     site: $("clientSite").value.trim(),
     destaqueSemanal: $("clientFeaturedWeek").checked,
-    destaqueValor: numberFromMoney($("clientFeaturedValue").value),
+    destaqueSemanas: destaqueWeeksForClient({ destaqueSemanas: $("clientFeaturedWeeks")?.value || 1 }),
+    destaqueDias: destaqueDaysForClient({ destaqueSemanas: $("clientFeaturedWeeks")?.value || 1 }),
+    destaqueInicio: $("clientFeaturedWeek").checked ? (currentClient?.destaqueInicio || dateKeyFromDate(new Date())) : "",
+    destaqueFim: $("clientFeaturedWeek").checked ? dateKeyFromDate(addDays(new Date(`${currentClient?.destaqueInicio || dateKeyFromDate(new Date())}T12:00:00`), destaqueDaysForClient({ destaqueSemanas: $("clientFeaturedWeeks")?.value || 1 }) - 1)) : "",
+    destaqueCobranca: $("clientFeaturedBilling")?.value || "mensalidade",
+    destaqueValor: $("clientFeaturedWeek").checked ? destaqueValueForClient({ destaqueSemanas: $("clientFeaturedWeeks")?.value || 1 }) : 0,
     imagem: $("clientImage").value.trim(),
     imagens: normalizeImageItems(state.clientImages),
     cardapioAtivo: Boolean($("clientMenuEnabled")?.checked),
@@ -1712,7 +1720,9 @@ function fillClientForm(client) {
   $("clientTiktok").value = client.tiktok || "";
   $("clientSite").value = client.site || "";
   $("clientFeaturedWeek").checked = Boolean(client.destaqueSemanal);
-  $("clientFeaturedValue").value = client.destaqueValor ? moneyBR(client.destaqueValor) : "";
+  if ($("clientFeaturedWeeks")) $("clientFeaturedWeeks").value = destaqueWeeksForClient(client);
+  if ($("clientFeaturedBilling")) $("clientFeaturedBilling").value = destaqueBillingForClient(client);
+  refreshClientFeaturedSummary();
   $("clientImage").value = client.imagem || client.image || "";
   renderProfilePreview("clientImage", "clientProfilePreview");
   state.clientImages = normalizeImageItems(client.imagens);
@@ -1738,6 +1748,20 @@ function fillClientForm(client) {
   renderClientMenuPreview();
   renderClientPromocoesPreview();
   setClientFocusMode(true);
+}
+
+function refreshClientFeaturedSummary() {
+  const active = Boolean($("clientFeaturedWeek")?.checked);
+  const weeks = destaqueWeeksForClient({ destaqueSemanas: $("clientFeaturedWeeks")?.value || 1 });
+  const days = weeks * 7;
+  const value = active ? destaqueValueForClient({ destaqueSemanas: weeks }) : 0;
+  const end = active ? dateKeyFromDate(addDays(new Date(), days - 1)) : "";
+  if ($("clientFeaturedValue")) $("clientFeaturedValue").value = value ? moneyBR(value) : "";
+  if ($("clientFeaturedSummary")) {
+    $("clientFeaturedSummary").textContent = active
+      ? `${weeks} semana${weeks === 1 ? "" : "s"} (${days} dias) - ${moneyBR(value)} - valido ate ${formatDateBR(end)}.`
+      : `Valor definido pelo admin master: ${moneyBR(destaqueWeeklyValue())} por semana.`;
+  }
 }
 
 async function deleteClientById(clientId) {
@@ -2718,7 +2742,7 @@ function resetUserForm() {
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-user-plus"></i> Criar usuario`;
   $("deleteUserButton")?.classList.add("hidden");
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
-    input.checked = ["dados", "vagas", "imagens", "cardapio", "promocoes", "faturas"].includes(input.value);
+    input.checked = ["dados", "destaque", "vagas", "imagens", "cardapio", "promocoes", "faturas"].includes(input.value);
   });
   setFormCardOpen("userForm", false);
 }
@@ -2821,15 +2845,54 @@ function valorFinalPlano(client) {
   return Math.max(0, bruto - desconto);
 }
 
-function destaqueValueForClient(client) {
+function destaqueWeeklyValue() {
   const config = state.pagamentoSistema || {};
-  const valorCliente = Number(client?.destaqueValor || 0);
-  if (valorCliente > 0) return valorCliente;
   return Number(config.valorDestaqueSemanal || config.destaqueSemanalValor || 0);
 }
 
+function destaqueWeeksForClient(client) {
+  const weeks = Number(client?.destaqueSemanas || client?.destaqueQtdSemanas || 1);
+  return Math.max(1, Math.min(52, Number.isFinite(weeks) ? Math.round(weeks) : 1));
+}
+
+function destaqueDaysForClient(client) {
+  return destaqueWeeksForClient(client) * 7;
+}
+
+function destaqueValueForClient(client) {
+  const valorCliente = Number(client?.destaqueValor || 0);
+  if (valorCliente > 0) return valorCliente;
+  return destaqueWeeklyValue() * destaqueWeeksForClient(client);
+}
+
+function destaqueBillingForClient(client) {
+  return client?.destaqueCobranca || client?.destaqueFormaPagamento || "mensalidade";
+}
+
+function destaqueIncludedInInvoice(client) {
+  return destaqueIsActive(client) && destaqueBillingForClient(client) === "mensalidade";
+}
+
+function destaqueEndDateForClient(client) {
+  if (client?.destaqueFim) return client.destaqueFim;
+  if (!client?.destaqueInicio) return "";
+  const start = new Date(`${client.destaqueInicio}T12:00:00`);
+  if (Number.isNaN(start.getTime())) return "";
+  return dateKeyFromDate(addDays(start, destaqueDaysForClient(client) - 1));
+}
+
+function destaqueIsActive(client) {
+  if (!client?.destaqueSemanal) return false;
+  const end = destaqueEndDateForClient(client);
+  return !end || end >= dateKeyFromDate(new Date());
+}
+
+function destaqueTxidForClient(client) {
+  return `DST${normalizeName(client?.nome || client?.id || "CLIENTE").slice(0, 10).toUpperCase()}${Date.now().toString().slice(-6)}`;
+}
+
 function valorTotalFaturaCliente(client) {
-  return valorFinalPlano(client) + (client?.destaqueSemanal ? destaqueValueForClient(client) : 0);
+  return valorFinalPlano(client) + (destaqueIncludedInInvoice(client) ? destaqueValueForClient(client) : 0);
 }
 
 function planLabel(tipoPlano) {
@@ -2886,7 +2949,7 @@ function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = nul
   const savedDestaque = options.ignoreSaved ? 0 : Number(saved.valorDestaque || 0);
   const savedTotal = options.ignoreSaved ? 0 : Number(saved.valorTotal || 0);
   const valorPlano = savedPlano > 0 ? savedPlano : valorFinalPlano(client);
-  const valorDestaque = savedDestaque > 0 ? savedDestaque : (client.destaqueSemanal ? destaqueValueForClient(client) : 0);
+  const valorDestaque = savedDestaque > 0 ? savedDestaque : (destaqueIncludedInInvoice(client) ? destaqueValueForClient(client) : 0);
   const valorTotal = Number(totalOverride ?? (savedTotal > 0 ? savedTotal : valorPlano + valorDestaque));
   const txid = `OC${normalizeName(client.nome || client.id).slice(0, 8).toUpperCase()}${String(mes).replace(/\W/g, "").slice(0, 12)}`;
   const pixCode = gerarPixCopiaCola({
@@ -2905,6 +2968,44 @@ function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = nul
     pixCode,
     qrUrl: qrCodeUrl(pixCode)
   };
+}
+
+function buildDestaquePix(client, paymentConfig = {}) {
+  const valorDestaque = destaqueValueForClient(client);
+  const pixCode = gerarPixCopiaCola({
+    chave: paymentConfig.pixChave,
+    nome: paymentConfig.pixNome || "Ola Carlopolis",
+    cidade: paymentConfig.pixCidade || "CARLOPOLIS",
+    valor: valorDestaque,
+    txid: destaqueTxidForClient(client)
+  });
+  return {
+    valorDestaque,
+    pixCode,
+    qrUrl: qrCodeUrl(pixCode),
+    semanas: destaqueWeeksForClient(client),
+    dias: destaqueDaysForClient(client),
+    inicio: client?.destaqueInicio || dateKeyFromDate(new Date()),
+    fim: destaqueEndDateForClient(client)
+  };
+}
+
+function bindFeaturedInvoicePix(featuredPix) {
+  if (!featuredPix) return;
+  $("generateFeaturedInvoicePix")?.addEventListener("click", () => {
+    if (!featuredPix.pixCode) {
+      showToast("Nao foi possivel gerar o Pix do destaque.");
+      return;
+    }
+    if ($("featuredInvoicePixCode")) $("featuredInvoicePixCode").value = featuredPix.pixCode;
+    if ($("featuredInvoiceQr")) $("featuredInvoiceQr").src = featuredPix.qrUrl;
+    $("featuredInvoicePixBox")?.classList.remove("hidden");
+    showToast("Pix do destaque gerado.");
+  });
+  $("copyFeaturedInvoicePix")?.addEventListener("click", async () => {
+    await navigator.clipboard?.writeText($("featuredInvoicePixCode")?.value || featuredPix.pixCode || "");
+    showToast("Codigo Pix do destaque copiado.");
+  });
 }
 
 function splitMonthsInput(value) {
@@ -3567,7 +3668,7 @@ function renderFinanceiro() {
       <div>
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
-        <div class="list-meta">Plano: ${planLabel(client.tipoPlano)} - Valor final: ${moneyBR(valorTotalFaturaCliente(client))}${client.destaqueSemanal ? ` - destaque ${moneyBR(destaqueValueForClient(client))}` : ""}</div>
+        <div class="list-meta">Plano: ${planLabel(client.tipoPlano)} - Valor final: ${moneyBR(valorTotalFaturaCliente(client))}${client.destaqueSemanal ? ` - destaque ${moneyBR(destaqueValueForClient(client))} (${destaqueBillingForClient(client) === "pix_separado" ? "Pix separado" : "mensalidade"})` : ""}</div>
         <div class="list-meta">Meses em aberto: ${pendingMonthsForClient(client).map(monthLabel).join(", ") || "Nenhum"}</div>
       </div>
       <label>Status
@@ -3628,7 +3729,7 @@ function renderFinanceiro() {
       const currentClient = state.clientes.find((client) => client.id === id) || {};
       const nextClient = { ...currentClient, ...payload };
       const valorPlanoFatura = valorFinalPlano(nextClient);
-      const valorDestaqueFatura = nextClient.destaqueSemanal ? destaqueValueForClient(nextClient) : 0;
+      const valorDestaqueFatura = destaqueIncludedInInvoice(nextClient) ? destaqueValueForClient(nextClient) : 0;
       const valorTotalFatura = valorPlanoFatura + valorDestaqueFatura;
       payload.mesesEmAberto = mesesEmAberto;
       mesesEmAberto.forEach((mes) => {
@@ -3678,7 +3779,7 @@ function renderFinanceiro() {
       });
       const nextClient = { ...currentClient, ...payloadBase };
       const valorPlanoFatura = valorFinalPlano(nextClient);
-      const valorDestaqueFatura = nextClient.destaqueSemanal ? destaqueValueForClient(nextClient) : 0;
+      const valorDestaqueFatura = destaqueIncludedInInvoice(nextClient) ? destaqueValueForClient(nextClient) : 0;
       const valorTotalFatura = valorPlanoFatura + valorDestaqueFatura;
       showToast("Enviando comprovante do financeiro...");
       const comprovanteUrl = await uploadInvoiceReceiptForClient(id, file);
@@ -4333,7 +4434,7 @@ function renderReports() {
   const pagos = reportClients.filter((c) => c.pagamentoStatus === "pago");
   const abertos = reportClients.filter((c) => !c.pagamentoStatus || c.pagamentoStatus === "em_aberto");
   const isentos = reportClients.filter((c) => c.pagamentoStatus === "isento");
-  const destaques = reportClients.filter((c) => c.destaqueSemanal);
+  const destaques = reportClients.filter((c) => destaqueIsActive(c));
   const comImagem = reportClients.filter((c) => c.imagem || normalizeImageItems(c.imagens).length);
   const comHorarios = reportClients.filter((c) => scheduleHasAnyOpen(c.horarios || {}));
   const valorReceber = reportClients
@@ -4454,7 +4555,7 @@ function renderReports() {
       <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita semestral</span><strong>${moneyBR(receitas.semestral)}</strong><small>Projecao por planos</small></article>
       <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita anual</span><strong>${moneyBR(receitas.anual)}</strong><small>Projecao por planos</small></article>
       <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita paga</span><strong>${moneyBR(valorPago)}</strong><small>${pagos.length} cliente${pagos.length === 1 ? "" : "s"}</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + Number(c.destaqueValor || 0), 0))}</small></article>
+      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + destaqueValueForClient(c), 0))}</small></article>
       <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
       <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Acessos no site</span><strong>${totalAcessos}</strong><small>Registros do periodo</small></article>
       <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Instalacoes PWA</span><strong>${instalacoesPWA}</strong><small>App instalado</small></article>
@@ -4793,8 +4894,9 @@ function renderClientOnlyEditor() {
   const canEditVagas = hasPermission("vagas");
   const canEditCardapio = hasPermission("cardapio");
   const canEditPromocoes = hasPermission("promocoes");
+  const canEditDestaque = hasPermission("destaque") || hasPermission("dados");
   const canViewRelatorios = hasPermission("relatorios");
-  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditPromocoes;
+  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditPromocoes || canEditDestaque;
   const hasAnyClientModule = hasAnyClientEditPermission || canViewRelatorios;
   let coPromoEditIndex = -1;
   let coJobEditIndex = -1;
@@ -4826,6 +4928,7 @@ function renderClientOnlyEditor() {
     { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardapio", show: canEditCardapio },
     { id: "client-module-imagens", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
     { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes },
+    { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque },
     { id: "client-module-relatorios", icon: "fa-solid fa-chart-line", label: "Relatorios", show: canViewRelatorios }
   ].filter((item) => item.show);
   const initialClientModule = (clientModules.find((item) => item.id === "client-module-dados") || clientModules[0] || {}).id || "";
@@ -5017,6 +5120,40 @@ function renderClientOnlyEditor() {
           </div>
         </section>
       ` : ""}
+      ${canEditDestaque ? `
+        <section id="client-module-destaque" class="wide upload-panel client-feature-card feature-destaque client-module-panel">
+          <div class="section-head compact feature-card-head">
+            <div>
+              <span class="feature-kicker">Pagina inicial</span>
+              <h3>Destaque da semana</h3>
+              <p>Fixe sua empresa entre os destaques da tela inicial pelo periodo escolhido.</p>
+            </div>
+            <span class="badge">${destaqueIsActive(client) ? "Ativo" : "Inativo"}</span>
+          </div>
+          <label class="check-row"><input id="coFeaturedWeek" type="checkbox" ${client.destaqueSemanal ? "checked" : ""}> Ativar destaque na pagina inicial</label>
+          <div class="section-fields">
+            <label>Quantidade de semanas<input id="coFeaturedWeeks" type="number" min="1" max="52" value="${escapeAttr(destaqueWeeksForClient(client))}"></label>
+            <label>Cobranca
+              <select id="coFeaturedBilling">
+                <option value="mensalidade" ${destaqueBillingForClient(client) === "mensalidade" ? "selected" : ""}>Junto da mensalidade</option>
+                <option value="pix_separado" ${destaqueBillingForClient(client) === "pix_separado" ? "selected" : ""}>Pix separado</option>
+              </select>
+            </label>
+            <label>Valor calculado<input id="coFeaturedValue" value="${escapeAttr(client.destaqueSemanal ? moneyBR(destaqueValueForClient(client)) : "")}" readonly></label>
+          </div>
+          <div id="coFeaturedSummary" class="list-meta wide"></div>
+          <div class="form-actions wide">
+            <button id="coGenerateFeaturedPix" type="button" class="ghost-button"><i class="fa-solid fa-qrcode"></i> Gerar Pix do destaque</button>
+          </div>
+          <div id="coFeaturedPixBox" class="pix-box hidden">
+            <img id="coFeaturedQr" alt="QR Code Pix destaque" loading="lazy" decoding="async">
+            <label class="wide">Codigo Pix do destaque<textarea id="coFeaturedPixCode" rows="5" readonly></textarea></label>
+            <div class="form-actions wide">
+              <button id="coCopyFeaturedPix" type="button" class="ghost-button"><i class="fa-solid fa-copy"></i> Copiar codigo Pix</button>
+            </div>
+          </div>
+        </section>
+      ` : ""}
       ${canViewRelatorios ? `
         <section id="client-module-relatorios" class="wide client-feature-card feature-relatorios client-module-panel">
           <div class="section-head compact feature-card-head">
@@ -5053,6 +5190,56 @@ function renderClientOnlyEditor() {
       activateClientModule(button.dataset.clientModuleTarget);
       closeAdminMenuOnMobile();
     });
+  });
+  const refreshCoFeaturedSummary = () => {
+    const active = Boolean(mount.querySelector("#coFeaturedWeek")?.checked);
+    const weeks = destaqueWeeksForClient({ destaqueSemanas: mount.querySelector("#coFeaturedWeeks")?.value || 1 });
+    const days = weeks * 7;
+    const value = active ? destaqueValueForClient({ destaqueSemanas: weeks }) : 0;
+    const end = active ? dateKeyFromDate(addDays(new Date(), days - 1)) : "";
+    const billing = mount.querySelector("#coFeaturedBilling")?.value || "mensalidade";
+    const valueInput = mount.querySelector("#coFeaturedValue");
+    const summary = mount.querySelector("#coFeaturedSummary");
+    if (valueInput) valueInput.value = value ? moneyBR(value) : "";
+    if (summary) {
+      summary.textContent = active
+        ? `${weeks} semana${weeks === 1 ? "" : "s"} (${days} dias), ${moneyBR(value)}, valido ate ${formatDateBR(end)}. Cobranca: ${billing === "pix_separado" ? "Pix separado" : "junto da mensalidade"}.`
+        : `Valor do destaque definido pelo admin master: ${moneyBR(destaqueWeeklyValue())} por semana.`;
+    }
+  };
+  ["coFeaturedWeek", "coFeaturedWeeks", "coFeaturedBilling"].forEach((id) => {
+    mount.querySelector(`#${id}`)?.addEventListener("input", refreshCoFeaturedSummary);
+    mount.querySelector(`#${id}`)?.addEventListener("change", refreshCoFeaturedSummary);
+  });
+  refreshCoFeaturedSummary();
+
+  mount.querySelector("#coGenerateFeaturedPix")?.addEventListener("click", () => {
+    if (!state.pagamentoSistema?.pixChave) {
+      showToast("A chave Pix ainda nao foi configurada pelo admin master.");
+      return;
+    }
+    const active = Boolean(mount.querySelector("#coFeaturedWeek")?.checked);
+    if (!active) {
+      showToast("Ative o destaque para gerar o Pix.");
+      return;
+    }
+    const plannedClient = {
+      ...client,
+      destaqueSemanal: true,
+      destaqueSemanas: mount.querySelector("#coFeaturedWeeks")?.value || 1,
+      destaqueCobranca: "pix_separado"
+    };
+    const pix = buildDestaquePix(plannedClient, state.pagamentoSistema);
+    const code = mount.querySelector("#coFeaturedPixCode");
+    const qr = mount.querySelector("#coFeaturedQr");
+    if (code) code.value = pix.pixCode;
+    if (qr) qr.src = pix.qrUrl;
+    mount.querySelector("#coFeaturedPixBox")?.classList.remove("hidden");
+    showToast("Pix do destaque gerado.");
+  });
+  mount.querySelector("#coCopyFeaturedPix")?.addEventListener("click", async () => {
+    await navigator.clipboard?.writeText(mount.querySelector("#coFeaturedPixCode")?.value || "");
+    showToast("Codigo Pix do destaque copiado.");
   });
 
   mount.querySelector("#coProfileUpload")?.addEventListener("change", async (event) => {
@@ -5412,6 +5599,21 @@ function renderClientOnlyEditor() {
     if (canEditPromocoes) {
       payload.promocoes = normalizePromocoes(promocoes);
     }
+    if (canEditDestaque) {
+      const destaqueAtivo = Boolean($("coFeaturedWeek")?.checked);
+      const weeks = destaqueWeeksForClient({ destaqueSemanas: $("coFeaturedWeeks")?.value || 1 });
+      const days = weeks * 7;
+      const start = destaqueAtivo ? (client.destaqueInicio || dateKeyFromDate(new Date())) : "";
+      Object.assign(payload, {
+        destaqueSemanal: destaqueAtivo,
+        destaqueSemanas: weeks,
+        destaqueDias: days,
+        destaqueInicio: start,
+        destaqueFim: destaqueAtivo ? dateKeyFromDate(addDays(new Date(`${start}T12:00:00`), days - 1)) : "",
+        destaqueCobranca: $("coFeaturedBilling")?.value || "mensalidade",
+        destaqueValor: destaqueAtivo ? destaqueValueForClient({ destaqueSemanas: weeks }) : 0
+      });
+    }
     payload.aliases = buildClientPublicAliases(client.id, { ...client, ...payload }, client, false);
     await update(ref(db, `clientes/${client.id}`), payload);
     showToast("Dados salvos.");
@@ -5681,9 +5883,36 @@ function renderClientInvoices() {
   const paymentConfig = state.pagamentoSistema || {};
   const meses = pendingMonthsForClient(client);
   const faturas = meses.map((mes) => buildClientInvoice(client, mes, paymentConfig));
+  const showFeaturedPix = destaqueIsActive(client) && (destaqueBillingForClient(client) === "pix_separado" || client.tipoPlano === "anual");
+  const featuredPix = showFeaturedPix ? buildDestaquePix(client, paymentConfig) : null;
+  const featuredPixCard = showFeaturedPix ? `
+    <article class="invoice-card invoice-summary-card">
+      <div class="section-head compact">
+        <div>
+          <h3>Destaque da semana</h3>
+          <p>${featuredPix.semanas} semana${featuredPix.semanas === 1 ? "" : "s"} (${featuredPix.dias} dias)${featuredPix.fim ? ` - valido ate ${formatDateBR(featuredPix.fim)}` : ""}.</p>
+        </div>
+        <span class="badge em_aberto">${moneyBR(featuredPix.valorDestaque)}</span>
+      </div>
+      ${paymentConfig.pixChave ? `
+        <div class="form-actions">
+          <button id="generateFeaturedInvoicePix" type="button"><i class="fa-solid fa-qrcode"></i> Gerar Pix do destaque</button>
+        </div>
+        <div id="featuredInvoicePixBox" class="pix-box invoice-selected-pix hidden">
+          <img id="featuredInvoiceQr" alt="QR Code Pix destaque" loading="lazy" decoding="async">
+          <label class="wide">Codigo Pix do destaque<textarea id="featuredInvoicePixCode" rows="5" readonly></textarea></label>
+          <div class="list-meta wide">Chave Pix: <strong>${escapeHtml(paymentConfig.pixChave || "")}</strong></div>
+          <div class="form-actions">
+            <button id="copyFeaturedInvoicePix" type="button" class="ghost-button"><i class="fa-solid fa-copy"></i> Copiar codigo Pix</button>
+          </div>
+        </div>
+      ` : `<div class="list-meta">A chave Pix ainda nao foi configurada pelo admin master.</div>`}
+    </article>
+  ` : "";
 
   if (!faturas.length) {
     mount.innerHTML = `
+      ${featuredPixCard}
       <article class="invoice-card invoice-summary-card">
         <div class="section-head compact">
           <div>
@@ -5704,6 +5933,7 @@ function renderClientInvoices() {
         </div>
       </article>
     `;
+    bindFeaturedInvoicePix(featuredPix);
     $("saveClientInvoicePlan")?.addEventListener("click", async () => {
       const tipoPlano = $("clientInvoicePlan")?.value || "mensal";
       await update(ref(db, `clientes/${client.id}`), {
@@ -5723,6 +5953,7 @@ function renderClientInvoices() {
 
   mount.innerHTML = `
     <div class="invoice-list">
+      ${featuredPixCard}
       <article class="invoice-card invoice-summary-card">
         <div class="section-head compact">
           <div>
@@ -5780,6 +6011,7 @@ function renderClientInvoices() {
       </article>
     </div>
   `;
+  bindFeaturedInvoicePix(featuredPix);
 
   const selectedPixCode = $("selectedInvoicePixCode");
   const selectedQr = $("selectedInvoiceQr");
@@ -6110,6 +6342,11 @@ function bindEvents() {
     $("addClientPromoButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar promocao`;
     $("cancelClientPromoEditButton")?.classList.add("hidden");
   });
+  ["clientFeaturedWeek", "clientFeaturedWeeks", "clientFeaturedBilling"].forEach((id) => {
+    $(id)?.addEventListener("input", refreshClientFeaturedSummary);
+    $(id)?.addEventListener("change", refreshClientFeaturedSummary);
+  });
+  refreshClientFeaturedSummary();
   $("clientPromoImageUpload")?.addEventListener("change", async (event) => {
     const targetId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
     await uploadSelectedPromoImage("clientPromoImageUpload", "clientPromoImageUrl", targetId);
