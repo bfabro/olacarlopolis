@@ -1010,6 +1010,48 @@ function dadosRepresaParecemInvalidos(data) {
   return cota === 474 && volume == null && defluencia == null;
 }
 
+const REPRESA_HISTORICO_INICIAL = [
+  {
+    id: '2026-05-28-00-00',
+    dataISO: '2026-05-28T00:00:00-03:00',
+    dataLabel: '28/05/2026',
+    horario: '00:00',
+    cota: 469.89,
+    volume: 49.36,
+    defluencia: 187.90,
+    afluencia: null,
+    fonte: 'CTG Brasil'
+  },
+  {
+    id: '2026-05-28-06-00',
+    dataISO: '2026-05-28T06:00:00-03:00',
+    dataLabel: '28/05/2026',
+    horario: '06:00',
+    cota: 469.87,
+    volume: 49.13,
+    defluencia: 286.40,
+    afluencia: null,
+    fonte: 'CTG Brasil'
+  },
+  {
+    id: '2026-05-28-12-00',
+    dataISO: '2026-05-28T12:00:00-03:00',
+    dataLabel: '28/05/2026',
+    horario: '12:00',
+    cota: 469.87,
+    volume: 49.13,
+    defluencia: 123.90,
+    afluencia: null,
+    fonte: 'CTG Brasil'
+  }
+];
+
+function represaRegistroId(date, horario = '') {
+  const dateKey = date.toISOString().slice(0, 10);
+  const timeKey = String(horario || '').trim().replace(/\D/g, '').slice(0, 4);
+  return `${dateKey}-${timeKey ? `${timeKey.slice(0, 2)}-${timeKey.slice(2, 4)}` : 'diario'}`;
+}
+
 function normalizarRegistroRepresa(data = {}) {
   const atualizadoEm = data.atualizadoEm || data.ultimaAtualizacao || data.data || Date.now();
   const parsedDate = new Date(atualizadoEm);
@@ -1019,11 +1061,12 @@ function normalizarRegistroRepresa(data = {}) {
   const defluencia = valorNumeroRepresa(data.vazaoDefluente ?? data.defluente ?? data.defluencia_m3s);
   const afluencia = valorNumeroRepresa(data.vazaoAfluente ?? data.afluente);
   if (!Number.isFinite(cota) && !Number.isFinite(volume)) return null;
+  const horario = data.horarioReferencia || data.horario || '';
   return {
-    id: date.toISOString().slice(0, 10),
+    id: represaRegistroId(date, horario),
     dataISO: date.toISOString(),
     dataLabel: date.toLocaleDateString('pt-BR'),
-    horario: data.horarioReferencia || date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    horario: horario || date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
     cota,
     volume,
     defluencia,
@@ -1033,12 +1076,19 @@ function normalizarRegistroRepresa(data = {}) {
 }
 
 function lerHistoricoRepresa() {
+  const base = REPRESA_HISTORICO_INICIAL.map((item) => ({ ...item }));
   try {
     const raw = localStorage.getItem(REPRESA_HISTORICO_KEY);
     const list = raw ? JSON.parse(raw) : [];
-    return Array.isArray(list) ? list.filter(Boolean) : [];
+    const mapa = new Map(base.map((item) => [item.id, item]));
+    if (Array.isArray(list)) {
+      list.filter(Boolean).forEach((item) => {
+        if (item?.id) mapa.set(item.id, item);
+      });
+    }
+    return Array.from(mapa.values()).sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
   } catch (_) {
-    return [];
+    return base;
   }
 }
 
