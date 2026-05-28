@@ -10894,7 +10894,7 @@ body > .im-modal .swiper-slide img {
 }
 
 .represa-header {
-  margin-bottom: 2rem;
+  margin-bottom: 0rem;
 }
 
 .represa-dados {
@@ -10985,7 +10985,7 @@ body > .im-modal .swiper-slide img {
 }
 
 .represa-note {
-  margin-top: 2rem;
+  margin-top: 0rem;
   padding: 1rem;
   background: #fff3cd;
   border-radius: 6px;
