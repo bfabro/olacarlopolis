@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 233,
-  label: "v233",
+  numero: 234,
+  label: "v234",
   data: "2026-05-26",
-  nota: "Renderiza dados da empresa em blocos amplos e campos mais legiveis."
+  nota: "Ajusta telefone e WhatsApp na mesma linha com mascara."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -281,6 +281,29 @@ function canAccessView(viewName) {
 
 function moneyBR(value) {
   return Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function formatPhoneMask(value) {
+  const digitsOnly = String(value || "").replace(/\D/g, "");
+  const digits = digitsOnly.length > 11 && digitsOnly.startsWith("55")
+    ? digitsOnly.slice(2, 13)
+    : digitsOnly.slice(0, 11);
+  if (digits.length <= 2) return digits ? `(${digits}` : "";
+  const ddd = digits.slice(0, 2);
+  const rest = digits.slice(2);
+  if (rest.length <= 4) return `(${ddd}) ${rest}`;
+  if (rest.length <= 8) return `(${ddd}) ${rest.slice(0, 4)}-${rest.slice(4)}`;
+  return `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5, 9)}`;
+}
+
+function bindPhoneMask(inputId) {
+  const input = $(inputId);
+  if (!input) return;
+  const applyMask = () => {
+    input.value = formatPhoneMask(input.value);
+  };
+  applyMask();
+  input.addEventListener("input", applyMask);
 }
 
 function formatCurrencyInput(value) {
@@ -5223,7 +5246,11 @@ function renderClientOnlyEditor() {
       ` : (!hasAnyClientModule ? `<section class="wide panel-card"><p>Nenhuma permissao foi liberada para este usuario.</p></section>` : "")}
     </form>
   `;
-  if (canEditDados) renderScheduleEditor("coScheduleEditor", client.horarios || {});
+  if (canEditDados) {
+    renderScheduleEditor("coScheduleEditor", client.horarios || {});
+    bindPhoneMask("coContact");
+    bindPhoneMask("coWhatsapp");
+  }
   if (canViewRelatorios) bindClientMetricReportControls(client);
   const moduleNavButtons = [...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")];
   const activateClientModule = (targetId) => {

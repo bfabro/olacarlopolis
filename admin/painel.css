@@ -2254,6 +2254,10 @@ button[type="submit"]:hover,
     box-shadow: 0 12px 30px rgba(15, 23, 42, .04);
   }
 
+  #clientOnlyForm #client-module-dados.client-module-panel.active {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   #clientOnlyForm #client-module-dados .wide,
   #clientOnlyForm #client-module-vagas .wide,
   #clientOnlyForm #client-module-dados .form-section-title,
@@ -2262,6 +2266,11 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-vagas .check-row,
   #clientOnlyForm #client-module-vagas .promo-admin-list {
     grid-column: 1 / -1;
+  }
+
+  #clientOnlyForm #client-module-dados .field-phone,
+  #clientOnlyForm #client-module-dados .field-whatsapp {
+    grid-column: span 1;
   }
 
   #clientOnlyForm #client-module-dados label,
