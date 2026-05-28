@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 239,
-  label: "v239",
+  numero: 240,
+  label: "v240",
   data: "2026-05-26",
-  nota: "Atualiza versao junto ao ajuste do historico da represa."
+  nota: "Carrega menu completo do admin cliente na primeira entrada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6898,5 +6898,6 @@ onAuthStateChanged(auth, async (user) => {
   $("appView").classList.remove("hidden");
   updateChrome();
   await loadAllData();
+  if (!canManageClients()) renderClientOnlyEditor();
   switchView(initialView);
 });
