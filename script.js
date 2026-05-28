@@ -997,6 +997,125 @@ function dadosRepresaParecemInvalidos(data) {
   return cota === 474 && volume == null && defluencia == null;
 }
 
+function normalizarRegistroRepresa(data = {}) {
+  const atualizadoEm = data.atualizadoEm || data.ultimaAtualizacao || data.data || Date.now();
+  const parsedDate = new Date(atualizadoEm);
+  const date = Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+  const cota = valorNumeroRepresa(data.cotaAtual ?? data.cota ?? data.nivel ?? data.nivel_m);
+  const volume = valorNumeroRepresa(data.volumeUtil ?? data.volume ?? data.volumeUtilPct ?? data.volume_util_pct);
+  const defluencia = valorNumeroRepresa(data.vazaoDefluente ?? data.defluente ?? data.defluencia_m3s);
+  const afluencia = valorNumeroRepresa(data.vazaoAfluente ?? data.afluente);
+  if (!Number.isFinite(cota) && !Number.isFinite(volume)) return null;
+  return {
+    id: date.toISOString().slice(0, 10),
+    dataISO: date.toISOString(),
+    dataLabel: date.toLocaleDateString('pt-BR'),
+    horario: data.horarioReferencia || date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    cota,
+    volume,
+    defluencia,
+    afluencia,
+    fonte: data.fonte || 'CTG Brasil'
+  };
+}
+
+function lerHistoricoRepresa() {
+  try {
+    const raw = localStorage.getItem(REPRESA_HISTORICO_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list.filter(Boolean) : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function salvarHistoricoRepresa(data = {}) {
+  const registro = normalizarRegistroRepresa(data);
+  if (!registro) return;
+  const historico = lerHistoricoRepresa().filter((item) => item.id !== registro.id);
+  historico.push(registro);
+  historico.sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
+  try {
+    localStorage.setItem(REPRESA_HISTORICO_KEY, JSON.stringify(historico.slice(-730)));
+  } catch (_) {
+    // Historico local e opcional; se o navegador bloquear, a tela principal continua funcionando.
+  }
+}
+
+function filtrarHistoricoRepresa(periodo = '30') {
+  const historico = lerHistoricoRepresa();
+  if (periodo === 'todos') return historico;
+  const dias = Number(periodo || 30);
+  const limite = new Date();
+  limite.setDate(limite.getDate() - Math.max(dias - 1, 0));
+  limite.setHours(0, 0, 0, 0);
+  return historico.filter((item) => new Date(item.dataISO) >= limite);
+}
+
+function renderHistoricoRepresa(periodo = '30') {
+  const box = document.getElementById('represaHistoricoBox');
+  if (!box) return;
+  const dados = filtrarHistoricoRepresa(periodo);
+  if (!dados.length) {
+    box.innerHTML = `
+      <div class="represa-history-empty">
+        Ainda nao ha historico suficiente. O dado atual sera salvo e os proximos acessos vao preencher este grafico.
+      </div>
+    `;
+    return;
+  }
+
+  const cotaValores = dados.map((item) => item.cota).filter(Number.isFinite);
+  const volumeValores = dados.map((item) => item.volume).filter(Number.isFinite);
+  const cotaMin = Math.min(...cotaValores);
+  const cotaMax = Math.max(...cotaValores);
+  const span = cotaMax - cotaMin || 1;
+  const pontos = dados.map((item, index) => {
+    const x = dados.length === 1 ? 50 : (index / (dados.length - 1)) * 100;
+    const y = Number.isFinite(item.cota) ? 88 - (((item.cota - cotaMin) / span) * 66) : 88;
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(' ');
+  const volumeMedio = volumeValores.length ? volumeValores.reduce((sum, value) => sum + value, 0) / volumeValores.length : null;
+  const cotaAtual = cotaValores.length ? cotaValores[cotaValores.length - 1] : null;
+
+  box.innerHTML = `
+    <div class="represa-history-summary">
+      <div><span>Registros</span><strong>${dados.length}</strong></div>
+      <div><span>Cota atual</span><strong>${Number.isFinite(cotaAtual) ? cotaAtual.toFixed(2) + ' m' : '-'}</strong></div>
+      <div><span>Volume medio</span><strong>${Number.isFinite(volumeMedio) ? volumeMedio.toFixed(2) + '%' : '-'}</strong></div>
+    </div>
+    <div class="represa-history-chart" aria-label="Grafico do nivel da represa">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+        <line x1="0" y1="88" x2="100" y2="88"></line>
+        <line x1="0" y1="22" x2="100" y2="22"></line>
+        <polyline points="${pontos}"></polyline>
+      </svg>
+    </div>
+    <div class="represa-history-table-wrap">
+      <table class="represa-history-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Nivel</th>
+            <th>Volume</th>
+            <th>Defluencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${dados.slice().reverse().map((item) => `
+            <tr>
+              <td>${item.dataLabel}${item.horario ? `<small>${item.horario}</small>` : ''}</td>
+              <td>${Number.isFinite(item.cota) ? item.cota.toFixed(2) + ' m' : '-'}</td>
+              <td>${Number.isFinite(item.volume) ? item.volume.toFixed(2) + '%' : '-'}</td>
+              <td>${Number.isFinite(item.defluencia) ? item.defluencia.toFixed(2) + ' m3/s' : '-'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 async function carregarDadosRepresa() {
   // TODO: substitua por seu fetch real (ONS/Vercel/etc.)
   // Estrutura sugerida:
@@ -21668,6 +21787,7 @@ async function obterDadosHistoricos() {
 // Função para carregar dados REAIS da represa (CTG via proxy sem CORS)
 // === NOVO: URL do seu endpoint (troque pelo seu domínio do Vercel) ===
 const API_REPRESA = 'https://olacarlopolis.vercel.app/api/represa/chavantes';
+const REPRESA_HISTORICO_KEY = 'ola_carlopolis_represa_chavantes_historico_v1';
 
 // === util: setar texto seguro no DOM ===
 function setTexto(sel, val) {
@@ -21714,6 +21834,8 @@ async function carregarDadosRepresa() {
     setTexto('#nr-cota', cotaAtual);
     setTexto('#nr-volume', volumeUtil);
     setTexto('#nr-data', new Date(atualizadoEm).toLocaleDateString('pt-BR'));
+    salvarHistoricoRepresa(data);
+    renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30');
 
     // Destaque visual
     if (typeof destacarMudancas === 'function') destacarMudancas();
@@ -21734,6 +21856,15 @@ async function carregarDadosRepresa() {
         setTexto('#nr-cota', dados.cota);
         setTexto('#nr-volume', dados.volume);
         setTexto('#nr-data', dados.atualizacao);
+        salvarHistoricoRepresa({
+          cotaAtual: dados.cota,
+          volumeUtil: dados.volume,
+          vazaoAfluente: dados.vazaoAfluente,
+          vazaoDefluente: dados.vazaoDefluente,
+          atualizadoEm: Date.now(),
+          fonte: dados.fonte
+        });
+        renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30');
         if (typeof destacarMudancas === 'function') destacarMudancas();
         return;
       }
@@ -21837,6 +21968,28 @@ function mostrarRepresaChavantes() {
           </div>
         </div>
 
+        <section class="represa-history-panel">
+          <div class="represa-history-head">
+            <div>
+              <h4>Historico do nivel</h4>
+              <p>Grafico e tabela preparados para acompanhar a evolucao diaria.</p>
+            </div>
+            <label>
+              Periodo
+              <select id="represaHistoricoPeriodo">
+                <option value="7">7 dias</option>
+                <option value="30" selected>30 dias</option>
+                <option value="90">90 dias</option>
+                <option value="365">1 ano</option>
+                <option value="todos">Todos</option>
+              </select>
+            </label>
+          </div>
+          <div id="represaHistoricoBox" class="represa-history-box">
+            <div class="represa-history-empty">Carregando historico...</div>
+          </div>
+        </section>
+
         <div class="represa-actions">
           <button type="button" class="btn-refresh"><i class="fas fa-rotate"></i> Atualizar dados</button>
           <a href="https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/" 
@@ -21850,7 +22003,12 @@ function mostrarRepresaChavantes() {
   `;
 
   // Carrega os dados ao abrir a página
+  renderHistoricoRepresa('30');
   carregarDadosRepresa();
+
+  document.getElementById('represaHistoricoPeriodo')?.addEventListener('change', (event) => {
+    renderHistoricoRepresa(event.target.value);
+  });
 
   // e, no botão "Atualizar Dados", mantenha:
   document.addEventListener('click', (ev) => {

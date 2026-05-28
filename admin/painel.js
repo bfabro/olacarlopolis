@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 234,
-  label: "v234",
+  numero: 235,
+  label: "v235",
   data: "2026-05-26",
-  nota: "Ajusta telefone e WhatsApp na mesma linha com mascara."
+  nota: "Atualiza versao junto ao historico da represa."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
