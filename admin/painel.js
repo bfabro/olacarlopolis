@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 236,
-  label: "v236",
+  numero: 237,
+  label: "v237",
   data: "2026-05-26",
-  nota: "Adiciona botao para tirar foto no cadastro de automoveis."
+  nota: "Evita exibir visao geral para admin cliente no carregamento."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -277,6 +277,10 @@ function canAccessView(viewName) {
   if (viewName === "informacoes") return canManageInformacoes();
   if (viewName === "minhaEmpresa") return true;
   return false;
+}
+
+function initialViewForProfile() {
+  return canManageClients() ? "dashboard" : "minhaEmpresa";
 }
 
 function moneyBR(value) {
@@ -1593,6 +1597,17 @@ function switchView(name) {
     return;
   }
   if (target !== "clientes") setClientFocusMode(false);
+}
+
+function prepareInitialView(name) {
+  const target = views[name] ? name : initialViewForProfile();
+  Object.entries(views).forEach(([key, el]) => el?.classList.toggle("hidden", key !== target));
+  document.querySelectorAll(".nav-admin button").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.view === target);
+  });
+  const [title, subtitle] = viewCopy[target] || viewCopy.dashboard;
+  $("viewTitle").textContent = title;
+  $("viewSubtitle").textContent = subtitle;
 }
 
 function collapseEntryFormsForView(target) {
@@ -6874,9 +6889,11 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   state.profile = profile;
+  const initialView = initialViewForProfile();
+  prepareInitialView(initialView);
   $("loginView").classList.add("hidden");
   $("appView").classList.remove("hidden");
   updateChrome();
   await loadAllData();
-  switchView(canManageClients() ? "dashboard" : (canManageInformacoes() ? "informacoes" : "minhaEmpresa"));
+  switchView(initialView);
 });
