@@ -1501,6 +1501,40 @@ button[type="submit"]:hover,
   font-weight: 800;
 }
 
+.vehicle-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.vehicle-photo-upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.vehicle-photo-upload input,
+.hidden-file-input {
+  display: none !important;
+}
+
+.vehicle-photo-actions .ghost-button {
+  min-height: 42px;
+}
+
 .image-tile {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -2226,6 +2260,20 @@ button[type="submit"]:hover,
     min-height: 42px;
     padding: 10px 8px;
     font-size: 13px;
+  }
+
+  .vehicle-photo-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .vehicle-photo-upload,
+  .vehicle-photo-actions .ghost-button {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 8px;
+    font-size: 12.5px;
   }
 
   #deleteImovelButton.hidden,

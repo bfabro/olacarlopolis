@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=235">
+  <link rel="stylesheet" href="painel.css?v=236">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -878,7 +878,16 @@
                   </div>
                   <span id="automovelImagesCount" class="badge">0 imagens</span>
                 </div>
-                <input id="automovelImagesUpload" type="file" accept="image/*" multiple>
+                <div class="vehicle-photo-actions">
+                  <label class="vehicle-photo-upload">
+                    <i class="fa-solid fa-images"></i> Selecionar fotos
+                    <input id="automovelImagesUpload" type="file" accept="image/*" multiple>
+                  </label>
+                  <button id="automovelCameraButton" type="button" class="ghost-button">
+                    <i class="fa-solid fa-camera"></i> Tirar foto
+                  </button>
+                </div>
+                <input id="automovelCameraUpload" class="hidden-file-input" type="file" accept="image/*" capture="environment">
                 <div id="automovelImagesPreview" class="image-grid"></div>
               </section>
               <div class="form-actions wide">
@@ -997,6 +1006,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=235"></script>
+  <script type="module" src="painel.js?v=236"></script>
 </body>
 </html>

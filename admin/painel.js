@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 235,
-  label: "v235",
+  numero: 236,
+  label: "v236",
   data: "2026-05-26",
-  nota: "Atualiza versao junto ao historico da represa."
+  nota: "Adiciona botao para tirar foto no cadastro de automoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6470,13 +6470,18 @@ function bindEvents() {
   });
   $("closeAutomovelFormButton")?.addEventListener("click", resetAutomovelForm);
   $("automovelSearch")?.addEventListener("input", renderAutomoveisList);
-  $("automovelImagesUpload")?.addEventListener("change", async (event) => {
+  const handleAutomovelImagesUpload = async (event) => {
     const id = $("automovelId").value || slugify(`${$("automovelMarca").value}-${$("automovelModelo").value}`) || `automovel-${Date.now()}`;
     const urls = await uploadAutomovelImages(id, event.target.files);
     state.automovelImages.push(...urls);
     if (!$("automovelImagem").value && state.automovelImages[0]) $("automovelImagem").value = state.automovelImages[0];
     renderAutomovelImagesPreview();
     event.target.value = "";
+  };
+  $("automovelImagesUpload")?.addEventListener("change", handleAutomovelImagesUpload);
+  $("automovelCameraUpload")?.addEventListener("change", handleAutomovelImagesUpload);
+  $("automovelCameraButton")?.addEventListener("click", () => {
+    $("automovelCameraUpload")?.click();
   });
   $("newInfoDeathNoticeButton")?.addEventListener("click", () => {
     resetInfoDeathNoticeForm();
