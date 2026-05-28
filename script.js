@@ -19388,7 +19388,7 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
     if (h === "#automoveis" || h === "#veiculos") { return mostrarAutomoveis(); }
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
 
-    if (h === "#represa-chavantes") { return mostrarRepresaChavantes(); };
+    if (h === "#represa" || h === "#represa-chavantes") { return mostrarRepresaChavantes(); };
     if (h === "#luz") { return mostrarIgreenDescontoLuz(); };
 
 
@@ -21935,7 +21935,7 @@ function mostrarRepresaChavantes() {
     <div class="page-header">
       <h2>💧 Represa de Chavantes</h2>
       <i class="fa-solid fa-share-nodes share-btn" 
-         onclick="compartilharPagina('#represa','Represa de Chavantes','Acompanhe o nível da água da Represa de Chavantes')"></i>
+         onclick="compartilharPagina('#represa-chavantes','Represa de Chavantes','Acompanhe o nível da água da Represa de Chavantes')"></i>
     </div>
 
     <div class="represa-wrap">
