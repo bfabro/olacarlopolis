@@ -1121,7 +1121,15 @@ function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
   if (!box) return;
   const mapa = new Map(filtrarHistoricoRepresa(periodo).map((item) => [item.id, item]));
   if (registroAtual?.id) mapa.set(registroAtual.id, registroAtual);
-  const dados = Array.from(mapa.values()).sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
+  const dedupePorHorario = new Map();
+  Array.from(mapa.values())
+    .sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO))
+    .forEach((item) => {
+      const dia = item.dataLabel || new Date(item.dataISO).toLocaleDateString('pt-BR');
+      const hora = String(item.horario || '').trim() || new Date(item.dataISO).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      dedupePorHorario.set(`${dia}-${hora}`, { ...item, dataLabel: dia, horario: hora });
+    });
+  const dados = Array.from(dedupePorHorario.values()).sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
   if (!dados.length) {
     box.innerHTML = `
       <div class="represa-history-empty">
@@ -1144,6 +1152,7 @@ function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
   const pontos = dados.length === 1 ? `8,${pontosBase[0].split(',')[1]} 92,${pontosBase[0].split(',')[1]}` : pontosBase.join(' ');
   const volumeMedio = volumeValores.length ? volumeValores.reduce((sum, value) => sum + value, 0) / volumeValores.length : null;
   const cotaAtual = cotaValores.length ? cotaValores[cotaValores.length - 1] : null;
+  const cotaMeio = (cotaMax + cotaMin) / 2;
 
   box.innerHTML = `
     <div class="represa-history-summary">
@@ -1151,12 +1160,20 @@ function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
       <div><span>Cota atual</span><strong>${Number.isFinite(cotaAtual) ? cotaAtual.toFixed(2) + ' m' : '-'}</strong></div>
       <div><span>Volume medio</span><strong>${Number.isFinite(volumeMedio) ? volumeMedio.toFixed(2) + '%' : '-'}</strong></div>
     </div>
-    <div class="represa-history-chart" aria-label="Grafico do nivel da represa">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-        <line x1="0" y1="88" x2="100" y2="88"></line>
-        <line x1="0" y1="22" x2="100" y2="22"></line>
-        <polyline points="${pontos}"></polyline>
-      </svg>
+    <div class="represa-history-chart-shell">
+      <div class="represa-history-axis" aria-hidden="true">
+        <span>${cotaMax.toFixed(2)} m</span>
+        <span>${cotaMeio.toFixed(2)} m</span>
+        <span>${cotaMin.toFixed(2)} m</span>
+      </div>
+      <div class="represa-history-chart" aria-label="Grafico do nivel da represa">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <line x1="0" y1="22" x2="100" y2="22"></line>
+          <line x1="0" y1="55" x2="100" y2="55"></line>
+          <line x1="0" y1="88" x2="100" y2="88"></line>
+          <polyline points="${pontos}"></polyline>
+        </svg>
+      </div>
     </div>
     <div class="represa-history-table-wrap">
       <table class="represa-history-table">

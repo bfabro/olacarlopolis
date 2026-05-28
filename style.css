@@ -11101,6 +11101,34 @@ body > .im-modal .swiper-slide img {
   font-size: .96rem;
 }
 
+.represa-history-chart-shell {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.represa-history-axis {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  align-items: center;
+  color: #475569;
+  font-size: .68rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: right;
+}
+
+.represa-history-axis span:first-child {
+  align-self: start;
+  padding-top: 2px;
+}
+
+.represa-history-axis span:last-child {
+  align-self: end;
+  padding-bottom: 2px;
+}
+
 .represa-history-chart {
   height: 150px;
   border: 1px solid #dbeafe;
@@ -11191,6 +11219,15 @@ body > .im-modal .swiper-slide img {
 
   .represa-history-summary strong {
     font-size: .78rem;
+  }
+
+  .represa-history-chart-shell {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .represa-history-axis {
+    font-size: .6rem;
   }
 
   .represa-history-table {
