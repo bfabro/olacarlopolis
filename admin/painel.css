@@ -466,7 +466,7 @@ button[type="submit"]:hover,
 }
 
 .panel-card {
-  padding: 18px;
+  padding: 8px;
 }
 
 .panel-card.form-collapsed {
@@ -2246,7 +2246,7 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-vagas.client-module-panel.active {
     grid-template-columns: 1fr;
     gap: 10px;
-    padding: 12px 10px;
+    padding: 10px 0px;
     border: 1px solid #e1e8f2;
     border-left: 0;
     border-radius: 14px;
