@@ -984,7 +984,20 @@ function classificarComparacao(atual, referencia) {
 
 // Ajuste aqui se seus campos tiverem outros nomes/origem:
 function valorNumeroRepresa(valor) {
-  const n = Number(String(valor ?? '').replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''));
+  const raw = String(valor ?? '').trim();
+  const match = raw.match(/-?\d{1,3}(?:\.\d{3})*,\d+|-?\d+(?:[.,]\d+)?/);
+  let text = match ? match[0] : '';
+  if (!text) return null;
+  if (text.includes(',')) {
+    text = text.replace(/\./g, '').replace(',', '.');
+  } else {
+    const parts = text.split('.');
+    if (parts.length > 2) {
+      const decimal = parts.pop();
+      text = `${parts.join('')}.${decimal}`;
+    }
+  }
+  const n = Number(text);
   return Number.isFinite(n) ? n : null;
 }
 
@@ -1031,7 +1044,7 @@ function lerHistoricoRepresa() {
 
 function salvarHistoricoRepresa(data = {}) {
   const registro = normalizarRegistroRepresa(data);
-  if (!registro) return;
+  if (!registro) return null;
   const historico = lerHistoricoRepresa().filter((item) => item.id !== registro.id);
   historico.push(registro);
   historico.sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
@@ -1040,6 +1053,7 @@ function salvarHistoricoRepresa(data = {}) {
   } catch (_) {
     // Historico local e opcional; se o navegador bloquear, a tela principal continua funcionando.
   }
+  return registro;
 }
 
 function filtrarHistoricoRepresa(periodo = '30') {
@@ -1052,10 +1066,12 @@ function filtrarHistoricoRepresa(periodo = '30') {
   return historico.filter((item) => new Date(item.dataISO) >= limite);
 }
 
-function renderHistoricoRepresa(periodo = '30') {
+function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
   const box = document.getElementById('represaHistoricoBox');
   if (!box) return;
-  const dados = filtrarHistoricoRepresa(periodo);
+  const mapa = new Map(filtrarHistoricoRepresa(periodo).map((item) => [item.id, item]));
+  if (registroAtual?.id) mapa.set(registroAtual.id, registroAtual);
+  const dados = Array.from(mapa.values()).sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
   if (!dados.length) {
     box.innerHTML = `
       <div class="represa-history-empty">
@@ -1070,11 +1086,12 @@ function renderHistoricoRepresa(periodo = '30') {
   const cotaMin = Math.min(...cotaValores);
   const cotaMax = Math.max(...cotaValores);
   const span = cotaMax - cotaMin || 1;
-  const pontos = dados.map((item, index) => {
+  const pontosBase = dados.map((item, index) => {
     const x = dados.length === 1 ? 50 : (index / (dados.length - 1)) * 100;
     const y = Number.isFinite(item.cota) ? 88 - (((item.cota - cotaMin) / span) * 66) : 88;
     return `${x.toFixed(2)},${y.toFixed(2)}`;
-  }).join(' ');
+  });
+  const pontos = dados.length === 1 ? `8,${pontosBase[0].split(',')[1]} 92,${pontosBase[0].split(',')[1]}` : pontosBase.join(' ');
   const volumeMedio = volumeValores.length ? volumeValores.reduce((sum, value) => sum + value, 0) / volumeValores.length : null;
   const cotaAtual = cotaValores.length ? cotaValores[cotaValores.length - 1] : null;
 
@@ -21834,8 +21851,8 @@ async function carregarDadosRepresa() {
     setTexto('#nr-cota', cotaAtual);
     setTexto('#nr-volume', volumeUtil);
     setTexto('#nr-data', new Date(atualizadoEm).toLocaleDateString('pt-BR'));
-    salvarHistoricoRepresa(data);
-    renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30');
+    const registroAtual = salvarHistoricoRepresa(data);
+    renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual);
 
     // Destaque visual
     if (typeof destacarMudancas === 'function') destacarMudancas();
@@ -21856,7 +21873,7 @@ async function carregarDadosRepresa() {
         setTexto('#nr-cota', dados.cota);
         setTexto('#nr-volume', dados.volume);
         setTexto('#nr-data', dados.atualizacao);
-        salvarHistoricoRepresa({
+        const registroAtual = salvarHistoricoRepresa({
           cotaAtual: dados.cota,
           volumeUtil: dados.volume,
           vazaoAfluente: dados.vazaoAfluente,
@@ -21864,7 +21881,7 @@ async function carregarDadosRepresa() {
           atualizadoEm: Date.now(),
           fonte: dados.fonte
         });
-        renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30');
+        renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual);
         if (typeof destacarMudancas === 'function') destacarMudancas();
         return;
       }
