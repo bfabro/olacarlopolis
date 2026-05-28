@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 237,
-  label: "v237",
+  numero: 238,
+  label: "v238",
   data: "2026-05-26",
-  nota: "Evita exibir visao geral para admin cliente no carregamento."
+  nota: "Abre automoveis ou imoveis como tela inicial do admin cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -280,7 +280,10 @@ function canAccessView(viewName) {
 }
 
 function initialViewForProfile() {
-  return canManageClients() ? "dashboard" : "minhaEmpresa";
+  if (canManageClients()) return "dashboard";
+  if (hasPermission("veiculos")) return "automoveis";
+  if (hasPermission("imoveis")) return "imoveis";
+  return "minhaEmpresa";
 }
 
 function moneyBR(value) {
