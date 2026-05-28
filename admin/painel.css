@@ -2300,7 +2300,7 @@ button[type="submit"]:hover,
     border: 1px solid #d8e2ef;
     border-radius: 13px;
     background: #fff;
-    font-size: 12px;
+    font-size: 14px;
   }
 
   #clientOnlyForm #client-module-dados .admin-field-line input,
