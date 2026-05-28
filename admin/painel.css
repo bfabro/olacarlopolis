@@ -2267,7 +2267,7 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-dados label,
   #clientOnlyForm #client-module-vagas label {
     gap: 4px;
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.15;
     text-align: left;
     align-items: stretch;
@@ -2286,8 +2286,8 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-dados .admin-field-line,
   #clientOnlyForm #client-module-vagas .admin-field-line {
     min-height: 68px;
-    gap: 5px;
-    padding: 10px 12px;
+    gap: 0px;
+    padding: 8px 6px;
     border: 1px solid #d8e2ef;
     border-radius: 13px;
     background: #fff;
@@ -2319,7 +2319,7 @@ button[type="submit"]:hover,
   #clientOnlyForm #client-module-dados .form-section-title,
   #clientOnlyForm #client-module-vagas .section-head {
     margin: 0;
-    padding: 0 0 8px;
+    padding: 0 10px 6px;
     border: 0;
     border-bottom: 1px solid #dbeafe;
     border-radius: 0;

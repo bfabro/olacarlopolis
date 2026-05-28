@@ -5025,7 +5025,7 @@ function renderClientOnlyEditor() {
         <label class="admin-field-line field-phone">Telefone<input id="coContact" value="${escapeAttr(client.contato || "")}"></label>
         <label class="admin-field-line field-whatsapp">WhatsApp<input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></label>
         <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
-        <label class="admin-field-line field-hours wide">Horario resumido<input id="coHours" value="${escapeAttr(client.horario || "")}"></label>
+        
         <section class="wide schedule-panel">
           <div class="section-head compact">
             <div>
