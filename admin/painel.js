@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 232,
-  label: "v232",
+  numero: 233,
+  label: "v233",
   data: "2026-05-26",
-  nota: "Reorganiza dados e vagas para aproveitar melhor a largura da tela."
+  nota: "Renderiza dados da empresa em blocos amplos e campos mais legiveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5017,8 +5017,8 @@ function renderClientOnlyEditor() {
         <div class="form-section-title">
           <i class="fa-solid fa-id-card"></i>
           <div>
-            <strong>Dados da empresa</strong>
-            <span>Nome, contatos, endereco e canais publicos.</span>
+            <strong>Dados principais</strong>
+            <span>Informacoes basicas da sua empresa.</span>
           </div>
         </div>
         <label class="admin-field-line field-company">Nome da empresa<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
