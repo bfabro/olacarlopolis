@@ -1,4 +1,4 @@
-
+﻿
 //
 
 
@@ -21930,7 +21930,7 @@ function mostrarRepresaChavantes() {
           <p>Monitoramento oficial da Represa de Chavantes</p>
           <div id="fonteDados" style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;"></div>
         </div>
-
+ <!-- 
         <div class="represa-dados">
           <div class="dado-item">
             <div class="dado-label">Cota atual</div>
@@ -21953,13 +21953,9 @@ function mostrarRepresaChavantes() {
             <div class="dado-unidade">m³/s</div>
           </div>
         </div>
+-->
 
-        <div class="represa-note">
-          <p><strong>Última atualização:</strong> <span id="ultimaAtualizacao">Carregando...</span></p>
-          <p id="statusDadosRepresa">Buscando dados oficiais...</p>
-        </div>
-
-        <div class="represa-info">
+ <div class="represa-info">
           <div class="info-box">
             <h4>ℹ️ Represa:</h4>
             <p><strong>Capacidade:</strong> 9.410 hm³<br>
@@ -21967,6 +21963,14 @@ function mostrarRepresaChavantes() {
                <strong>Operadora:</strong> Duke Energy</p>
           </div>
         </div>
+
+        
+        <div class="represa-note">
+          <p><strong>Última atualização:</strong> <span id="ultimaAtualizacao">Carregando...</span></p>
+          <p id="statusDadosRepresa">Buscando dados oficiais...</p>
+        </div>
+
+       
 
         <section class="represa-history-panel">
           <div class="represa-history-head">
