@@ -10938,7 +10938,7 @@ body > .im-modal .swiper-slide img {
 .represa-info {
   display: grid;
   gap: 1rem;
-  margin: 1rem 0;
+  margin: 0rem 0;
 
 }
 
@@ -11177,7 +11177,20 @@ body > .im-modal .swiper-slide img {
   }
 
   .represa-history-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .represa-history-summary div {
+    padding: 7px 5px;
+  }
+
+  .represa-history-summary span {
+    font-size: .62rem;
+  }
+
+  .represa-history-summary strong {
+    font-size: .78rem;
   }
 
   .represa-history-table {
