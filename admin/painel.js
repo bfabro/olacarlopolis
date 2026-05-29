@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 247,
-  label: "v247",
+  numero: 248,
+  label: "v248",
   data: "2026-05-29",
-  nota: "Corrige vagas e remove novidades de itens excluidos."
+  nota: "Filtra novidades invalidas e separa vagas da pagina dos comercios."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6738,17 +6738,19 @@ function bindEvents() {
       };
     }
     await update(ref(db), updates);
-    await registrarNovidadeAdmin({
+    if (isNewClient || newImagesCount > oldImagesCount) {
+      await registrarNovidadeAdmin({
       tipo: "estabelecimento",
-      titulo: isNewClient ? "Novo estabelecimento cadastrado" : (newImagesCount > oldImagesCount ? "Novas fotos adicionadas" : "Informações atualizadas"),
-      descricao: isNewClient ? "Novo estabelecimento disponível no Olá Carlópolis." : (newImagesCount > oldImagesCount ? "Confira os novos trabalhos realizados." : "Informações do estabelecimento atualizadas."),
+      titulo: isNewClient ? "Novo estabelecimento cadastrado" : "Novas fotos adicionadas",
+      descricao: isNewClient ? "Novo estabelecimento disponível no Olá Carlópolis." : "Confira os novos trabalhos realizados.",
       estabelecimento: payload.nome,
       imagem: imagemPrincipalNovidade(payload),
       imagens: normalizeImageItems(payload.imagens).map((item) => item.url || item).filter(Boolean),
       categoria: payload.categoria,
       destinoTipo: "estabelecimento",
       destinoId: payload.nomeNormalizado || id
-    });
+      });
+    }
     [formId, state.selectedClientId].filter((oldId) => oldId && oldId !== id).forEach((oldId) => {
       state.clientes = state.clientes.filter((client) => client.id !== oldId);
       state.usuarios.filter((user) => user.clienteId === oldId).forEach((user) => { user.clienteId = id; });
@@ -6856,6 +6858,7 @@ function bindEvents() {
       deletedAt: serverTimestamp(),
       deletedBy: state.user?.uid || ""
     });
+    await removerNovidadesPorDestino("evento", state.selectedEventId, state.selectedEventId);
     showToast("Evento excluido.");
     resetEventForm();
     await loadAllData();

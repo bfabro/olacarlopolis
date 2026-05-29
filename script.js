@@ -2605,13 +2605,25 @@ document.addEventListener("DOMContentLoaded", function () {
       const geradas = [];
       const livePromoCards = new Set();
       const livePromoClients = new Set();
+      const livePromoTitles = new Set();
       const liveAutomoveis = new Set();
       const liveImoveis = new Set();
+      const liveEventos = new Set();
+      const clienteEstaPublico = (...ids) => {
+        for (const id of ids) {
+          const key = normalizeName(id || "");
+          if (!key) continue;
+          const status = statusEstabelecimentos[key];
+          if (status && status !== "s") return false;
+        }
+        return true;
+      };
 
       try {
         const promocoesAtuais = coletarTodasPromocoes();
         promocoesAtuais.forEach((promo) => {
           livePromoClients.add(String(promo.estabelecimentoId || ""));
+          livePromoTitles.add(`${String(promo.estabelecimentoId || "")}|${normalizeName(promo.titulo || "")}`);
           livePromoCards.add(novidadeDomId("promocao", `${promo.id || "promo"}-${promo.estabelecimentoId || "todos"}`));
           if (promo.id) livePromoCards.add(String(promo.id));
         });
@@ -2637,10 +2649,26 @@ document.addEventListener("DOMContentLoaded", function () {
       } catch (e) { }
 
       try {
+        const eventosCat = (categories || []).find((cat) => normalizeName(cat.title || "") === "eventosemcarlopolis");
+        (eventosCat?.establishments || [])
+          .filter(eventoPublicoAtivo)
+          .forEach((evento) => {
+            if (evento.id) liveEventos.add(String(evento.id));
+            if (evento.name) liveEventos.add(normalizeName(evento.name));
+          });
+      } catch (e) { }
+
+      try {
         const [autos, imoveis] = await Promise.all([carregarAutomoveisFirebase(), carregarImoveisFirebase()]);
-        (autos || []).forEach((auto) => liveAutomoveis.add(String(auto.id || "")));
-        (imoveis || []).forEach((imovel) => liveImoveis.add(String(imovel.id || "")));
-        (autos || []).slice(0, 12).forEach((auto) => {
+        const autosPublicos = (autos || []).filter((auto) => clienteEstaPublico(auto.estabelecimentoId, auto.clienteId, auto.clienteNome, auto.vendedor, auto.loja));
+        const imoveisPublicos = (imoveis || []).filter((imovel) => {
+          if (normalizeName(imovel.status || "") === "inativo") return false;
+          if (imovel.ocultarBaseInicial) return false;
+          return clienteEstaPublico(imovel.estabelecimentoId, imovel.clienteId, imovel.clienteNome, imovel.corretor);
+        });
+        autosPublicos.forEach((auto) => liveAutomoveis.add(String(auto.id || "")));
+        imoveisPublicos.forEach((imovel) => liveImoveis.add(String(imovel.id || "")));
+        autosPublicos.slice(0, 12).forEach((auto) => {
           geradas.push(montarNovidadeRecord({
             id: `auto-${auto.id}`,
             tipo: "veiculo",
@@ -2655,7 +2683,7 @@ document.addEventListener("DOMContentLoaded", function () {
             valor: auto.preco || ""
           }));
         });
-        (imoveis || []).slice(0, 12).forEach((imovel) => {
+        imoveisPublicos.slice(0, 12).forEach((imovel) => {
           geradas.push(montarNovidadeRecord({
             id: `imovel-${imovel.id}`,
             tipo: "imovel",
@@ -2674,14 +2702,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const novidadeDestinoExiste = (item) => {
         const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+        const textoNovidade = normalizeName(`${item.tipo || ""} ${item.titulo || ""} ${item.descricao || ""}`);
+        if (/(informacoesatualizadas|financeiro|pagamento|mensalidade|fatura|inadimplente|clienteativo|clienteinativo|ativado|desativado)/.test(textoNovidade)) return false;
+        if (!clienteEstaPublico(item.destinoId, item.estabelecimento, item.raw?.clienteId, item.raw?.clienteNome)) return false;
+        if (tipo.includes("estabelecimento")) {
+          const titulo = normalizeName(item.titulo || "");
+          return titulo.includes("novoestabelecimentocadastrado") || titulo.includes("novasfotosadicionadas");
+        }
         if (tipo.includes("promoc")) {
           const cardId = item.destinoCardId || "";
           const itemId = item.raw?.itemId || item.raw?.promoOriginalId || "";
           if (cardId || itemId) return livePromoCards.has(cardId) || livePromoCards.has(String(itemId));
+          const tituloPromo = normalizeName(item.descricao || item.raw?.descricao || item.raw?.tituloConteudo || item.titulo || "");
+          if (tituloPromo) return livePromoTitles.has(`${String(item.destinoId || "")}|${tituloPromo}`);
           return livePromoClients.has(String(item.destinoId || ""));
         }
         if (tipo.includes("veiculo") || tipo.includes("automovel")) return liveAutomoveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("imovel")) return liveImoveis.has(String(item.destinoId || item.raw?.itemId || ""));
+        if (tipo.includes("evento")) return liveEventos.has(String(item.destinoId || item.raw?.itemId || "")) || liveEventos.has(normalizeName(item.descricao || item.estabelecimento || item.titulo || ""));
         return true;
       };
 
@@ -18999,7 +19037,7 @@ ${!establishment.descricaoFalecido ? `
   
 
 
-${vagaTrabalhoVisivel(establishment) ? montarHtmlVagaTrabalho(establishment) : ""}
+<!-- Vagas de trabalho aparecem somente na tela dedicada. -->
       
         ${establishment.plantaoHorario
           ? `
