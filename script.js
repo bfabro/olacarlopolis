@@ -14316,14 +14316,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         link: document.querySelector("#menuBabas"),
         title: "Baba",
         establishments: [
-          {
-            name: "Maria",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Antonia",
-            contact: "(43) 8901-2345",
-          },
+        
         ],
       },
 
@@ -14521,14 +14514,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         link: document.querySelector("#menuJardineiro"),
         title: "Jardineiro",
         establishments: [
-          {
-            name: "Antonio Gil",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Ruan",
-            contact: "(43) 8901-2345",
-          },
+        
         ],
       },
 
@@ -14536,14 +14522,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         link: document.querySelector("#menuMarceneiro"),
         title: "Marceneiro",
         establishments: [
-          {
-            name: "Pedro alvez",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Rodrigo",
-            contact: "(43) 8901-2345",
-          },
+         
         ],
       },
 
@@ -15827,13 +15806,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         link: document.querySelector("#menuBrinquedos"),
         title: "Loja de Brinquedo",
         establishments: [
-          {
-            name: "Filho Otaviano",
-            hours: "Seg a Sex: 8h - 18h <br> Sab: 08h - 12h",
-            address: "R. Laurindo Franco de Godoi, 90",
-            contact: "(43) 99951-1540",
-            delivery: "Sim / Sem Taxa",
-          },
+         
         ],
       },
 
