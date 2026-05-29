@@ -14616,15 +14616,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         link: document.querySelector("#menuPedreiro"),
         title: "Pedreiro",
         establishments: [
-          {
-            image: "images/servicos/pedreiro/pedreiro.jpg",
-            name: "Denis centurion",
-            contact: "(43) 94587-2485",
-          },
-          {
-            name: "Kauan",
-            contact: "(43) 8901-2345",
-          },
+         
         ],
       },
 
@@ -14632,14 +14624,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         link: document.querySelector("#menuPintor"),
         title: "Pintor",
         establishments: [
-          {
-            name: "Rafael portes",
-            contact: "(43) 7890-1234",
-          },
-          {
-            name: "Yuri",
-            contact: "(43) 8901-2345",
-          },
+       
         ],
       },
 
