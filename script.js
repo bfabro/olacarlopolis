@@ -2603,9 +2603,19 @@ document.addEventListener("DOMContentLoaded", function () {
       const agora = Date.now();
       const limiteMs = diasVisiveis * 86400000;
       const geradas = [];
+      const livePromoCards = new Set();
+      const livePromoClients = new Set();
+      const liveAutomoveis = new Set();
+      const liveImoveis = new Set();
 
       try {
-        coletarTodasPromocoes().slice(0, 20).forEach((promo, idx) => {
+        const promocoesAtuais = coletarTodasPromocoes();
+        promocoesAtuais.forEach((promo) => {
+          livePromoClients.add(String(promo.estabelecimentoId || ""));
+          livePromoCards.add(novidadeDomId("promocao", `${promo.id || "promo"}-${promo.estabelecimentoId || "todos"}`));
+          if (promo.id) livePromoCards.add(String(promo.id));
+        });
+        promocoesAtuais.slice(0, 20).forEach((promo, idx) => {
           const dataMs = novidadeCidadeMs(promo.criadoEm || promo.validadeInicio || promo.validadeFim) || (agora - idx * 7200000);
           geradas.push(montarNovidadeRecord({
             id: `promo-${promo.id}-${promo.estabelecimentoId}`,
@@ -2628,6 +2638,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       try {
         const [autos, imoveis] = await Promise.all([carregarAutomoveisFirebase(), carregarImoveisFirebase()]);
+        (autos || []).forEach((auto) => liveAutomoveis.add(String(auto.id || "")));
+        (imoveis || []).forEach((imovel) => liveImoveis.add(String(imovel.id || "")));
         (autos || []).slice(0, 12).forEach((auto) => {
           geradas.push(montarNovidadeRecord({
             id: `auto-${auto.id}`,
@@ -2660,10 +2672,24 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       } catch (e) { }
 
+      const novidadeDestinoExiste = (item) => {
+        const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+        if (tipo.includes("promoc")) {
+          const cardId = item.destinoCardId || "";
+          const itemId = item.raw?.itemId || item.raw?.promoOriginalId || "";
+          if (cardId || itemId) return livePromoCards.has(cardId) || livePromoCards.has(String(itemId));
+          return livePromoClients.has(String(item.destinoId || ""));
+        }
+        if (tipo.includes("veiculo") || tipo.includes("automovel")) return liveAutomoveis.has(String(item.destinoId || item.raw?.itemId || ""));
+        if (tipo.includes("imovel")) return liveImoveis.has(String(item.destinoId || item.raw?.itemId || ""));
+        return true;
+      };
+
       const mapa = new Map();
       [...registros, ...geradas].forEach((item) => {
         const data = item.dataMs || agora;
         if (agora - data > limiteMs) return;
+        if (!novidadeDestinoExiste(item)) return;
         const key = item.id || `${item.destinoTipo}-${item.destinoId}-${item.titulo}`;
         if (!mapa.has(key)) mapa.set(key, { ...item, dataMs: data });
       });
@@ -17795,19 +17821,19 @@ plotarPinsImoveis(stateImoveis.filtered);
         ? Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
         : Boolean(cliente.cardapioLink || (Array.isArray(cliente.menuImages) && cliente.menuImages.length) || base.cardapioLink || (Array.isArray(base.menuImages) && base.menuImages.length)),
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : (base.promocoes || base.promotions || []),
-      vagaAtiva: cliente.vagaAtiva !== false && Boolean(cliente.infoVagaTrabalho || cliente.vagaTitulo || cliente.vagaCargo || cliente.vagaDescricao || base.infoVagaTrabalho),
-      vagaTitulo: cliente.vagaTitulo || cliente.vagaCargo || base.vagaTitulo || base.vagaCargo || "",
-      vagaCargo: cliente.vagaCargo || cliente.vagaTitulo || base.vagaCargo || base.vagaTitulo || "",
-      infoVagaTrabalho: cliente.infoVagaTrabalho || cliente.vagaDescricao || base.infoVagaTrabalho || "",
-      vagaDescricao: cliente.vagaDescricao || cliente.infoVagaTrabalho || base.vagaDescricao || base.infoVagaTrabalho || "",
-      vagaPreRequisito: cliente.vagaPreRequisito || cliente.vagaRequisitos || base.vagaPreRequisito || "",
-      vagaRequisitos: cliente.vagaRequisitos || cliente.vagaPreRequisito || base.vagaRequisitos || base.vagaPreRequisito || "",
-      vagaSalario: cliente.vagaSalario || base.vagaSalario || "",
-      vagaJornada: cliente.vagaJornada || base.vagaJornada || "",
-      vagaLocal: cliente.vagaLocal || base.vagaLocal || "",
-      vagaContato: cliente.vagaContato || base.vagaContato || "",
-      vagaComoCandidatar: cliente.vagaComoCandidatar || base.vagaComoCandidatar || "",
-      vagaValidade: cliente.vagaValidade || base.vagaValidade || "",
+      vagaAtiva: cliente.vagaAtiva !== false && Boolean(cliente.infoVagaTrabalho || cliente.vagaTitulo || cliente.vagaCargo || cliente.vagaDescricao || (Array.isArray(cliente.vagasTrabalho) && cliente.vagasTrabalho.length)),
+      vagaTitulo: cliente.vagaTitulo || cliente.vagaCargo || "",
+      vagaCargo: cliente.vagaCargo || cliente.vagaTitulo || "",
+      infoVagaTrabalho: cliente.infoVagaTrabalho || cliente.vagaDescricao || "",
+      vagaDescricao: cliente.vagaDescricao || cliente.infoVagaTrabalho || "",
+      vagaPreRequisito: cliente.vagaPreRequisito || cliente.vagaRequisitos || "",
+      vagaRequisitos: cliente.vagaRequisitos || cliente.vagaPreRequisito || "",
+      vagaSalario: cliente.vagaSalario || "",
+      vagaJornada: cliente.vagaJornada || "",
+      vagaLocal: cliente.vagaLocal || "",
+      vagaContato: cliente.vagaContato || "",
+      vagaComoCandidatar: cliente.vagaComoCandidatar || "",
+      vagaValidade: cliente.vagaValidade || "",
       imagens: Array.isArray(cliente.imagens) && cliente.imagens.length
         ? cliente.imagens
         : (Array.isArray(base.novidadesImages)

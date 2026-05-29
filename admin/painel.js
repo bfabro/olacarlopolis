@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 246,
-  label: "v246",
+  numero: 247,
+  label: "v247",
   data: "2026-05-29",
-  nota: "Ajusta novidades com cores por tipo, galeria e destino exato."
+  nota: "Corrige vagas e remove novidades de itens excluidos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1783,12 +1783,41 @@ async function registrarNovidadeAdmin(payload = {}) {
       categoria: payload.categoria || "",
       destinoTipo: payload.destinoTipo || tipo,
       destinoId,
+      itemId: payload.itemId || "",
+      destinoCardId: payload.destinoCardId || "",
       dataCriacao: serverTimestamp(),
       criadoPor: state.user?.uid || "",
       origem: "painel"
     });
   } catch (error) {
     console.warn("Nao foi possivel registrar novidade.", error);
+  }
+}
+
+async function removerNovidadesPorDestino(tipo, destinoId, itemId = "") {
+  try {
+    const snap = await get(ref(db, "novidades"));
+    if (!snap.exists()) return;
+    const tipoNorm = normalizeName(tipo || "");
+    const destino = String(destinoId || "");
+    const item = String(itemId || "");
+    const updates = {};
+    snap.forEach((child) => {
+      const novidade = child.val() || {};
+      const novidadeTipo = normalizeName(novidade.destinoTipo || novidade.tipo || "");
+      const mesmoTipo = !tipoNorm || novidadeTipo.includes(tipoNorm) || tipoNorm.includes(novidadeTipo);
+      const mesmoDestino = destino && String(novidade.destinoId || "") === destino;
+      const mesmoItem = item && (
+        String(novidade.itemId || "") === item ||
+        String(novidade.destinoCardId || "").includes(item) ||
+        String(novidade.id || "").includes(item)
+      );
+      if (mesmoTipo && (mesmoItem || (!item && mesmoDestino))) updates[`novidades/${child.key}`] = null;
+      return false;
+    });
+    if (Object.keys(updates).length) await update(ref(db), updates);
+  } catch (error) {
+    console.warn("Nao foi possivel remover novidades antigas.", error);
   }
 }
 
@@ -2125,6 +2154,7 @@ function renderClientPromocoesPreview() {
       clearClientPromoFields();
       renderClientPromocoesPreview();
       const saved = await persistClientPromocoesIfEditing("Promocao removida e salva.");
+      if (saved) await removerNovidadesPorDestino("promocao", normalizeName($("clientName")?.value.trim() || $("clientId")?.value || ""), promo.id || "");
       if (!saved) showToast("Promocao removida. Clique em salvar cliente para gravar.");
     });
   });
@@ -2186,7 +2216,9 @@ async function addClientPromocao() {
       valor: payload.preco || payload.desconto || payload.valorTexto || "",
       categoria: $("clientCategory")?.value || "",
       destinoTipo: "promocao",
-      destinoId: normalizeName($("clientName")?.value.trim() || currentId)
+      destinoId: normalizeName($("clientName")?.value.trim() || currentId),
+      itemId: payload.id,
+      destinoCardId: `promocao-${payload.id}-${normalizeName($("clientName")?.value.trim() || currentId)}`
     });
   }
   if (!saved) showToast(`${editingIndex >= 0 ? "Promocao atualizada" : "Promocao adicionada"}. Clique em salvar cliente para gravar.`);
@@ -3547,6 +3579,7 @@ async function excluirImovelPorId(imovelId) {
   } else {
     await remove(ref(db, `conteudosInformativos/imoveis/${imovelId}`));
   }
+  await removerNovidadesPorDestino("imovel", imovelId, imovelId);
   showToast("Imovel excluido.");
   resetImovelForm();
   await loadAllData();
@@ -4948,7 +4981,9 @@ function renderStaffPromocoesView() {
       valor: payload.preco || payload.desconto || payload.valorTexto || "",
       categoria: client.categoria || "",
       destinoTipo: "promocao",
-      destinoId: client.nomeNormalizado || normalizeName(client.nome || selectedId)
+      destinoId: client.nomeNormalizado || normalizeName(client.nome || selectedId),
+      itemId: payload.id,
+      destinoCardId: `promocao-${payload.id}-${client.nomeNormalizado || normalizeName(client.nome || selectedId)}`
     });
     showToast(editIndex >= 0 ? "Promocao atualizada." : "Promocao adicionada.");
     state.staffPromoEditIndex = null;
@@ -4983,6 +5018,7 @@ function renderStaffPromocoesView() {
         updatedAt: serverTimestamp(),
         updatedBy: state.user?.uid || ""
       });
+      await removerNovidadesPorDestino("promocao", client.nomeNormalizado || normalizeName(client.nome || selectedId), promo.id || "");
       showToast("Promocao removida.");
       state.staffPromoEditIndex = null;
       await loadAllData();
@@ -5517,7 +5553,9 @@ function renderClientOnlyEditor() {
       valor: payload.preco || payload.desconto || payload.valorTexto || "",
       categoria: client.categoria || "",
       destinoTipo: "promocao",
-      destinoId: client.nomeNormalizado || normalizeName(client.nome || client.id)
+      destinoId: client.nomeNormalizado || normalizeName(client.nome || client.id),
+      itemId: payload.id,
+      destinoCardId: `promocao-${payload.id}-${client.nomeNormalizado || normalizeName(client.nome || client.id)}`
     });
     showToast(coPromoEditIndex >= 0 ? "Promocao atualizada." : "Promocao adicionada.");
     clearPromoFields("co", mount);
@@ -5655,6 +5693,7 @@ function renderClientOnlyEditor() {
         updatedAt: serverTimestamp(),
         updatedBy: state.user.uid
       });
+      await removerNovidadesPorDestino("promocao", client.nomeNormalizado || normalizeName(client.nome || client.id), promo.id || "");
       showToast("Promocao removida.");
       await loadAllData();
       renderClientOnlyEditor();
@@ -6930,6 +6969,7 @@ function bindEvents() {
     const titulo = [original.marca, original.modelo, original.ano].filter(Boolean).join(" ") || original.codRef || original.id;
     if (!(await confirmarExclusao(titulo, "automovel"))) return;
     await remove(ref(db, `conteudosInformativos/automoveis/${state.selectedAutomovelId}`));
+    await removerNovidadesPorDestino("veiculo", state.selectedAutomovelId, state.selectedAutomovelId);
     showToast("Automovel excluido.");
     resetAutomovelForm();
     await loadAllData();
