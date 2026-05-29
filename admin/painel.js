@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 245,
-  label: "v245",
+  numero: 246,
+  label: "v246",
   data: "2026-05-29",
-  nota: "Inclui aba Novidades com feed e registros automaticos."
+  nota: "Ajusta novidades com cores por tipo, galeria e destino exato."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1778,6 +1778,7 @@ async function registrarNovidadeAdmin(payload = {}) {
       descricao: payload.descricao || payload.titulo || "",
       estabelecimento: payload.estabelecimento || payload.clienteNome || "",
       imagem: payload.imagem || "",
+      imagens: Array.isArray(payload.imagens) ? payload.imagens.filter(Boolean) : (payload.imagem ? [payload.imagem] : []),
       valor: payload.valor || "",
       categoria: payload.categoria || "",
       destinoTipo: payload.destinoTipo || tipo,
@@ -6704,6 +6705,7 @@ function bindEvents() {
       descricao: isNewClient ? "Novo estabelecimento disponível no Olá Carlópolis." : (newImagesCount > oldImagesCount ? "Confira os novos trabalhos realizados." : "Informações do estabelecimento atualizadas."),
       estabelecimento: payload.nome,
       imagem: imagemPrincipalNovidade(payload),
+      imagens: normalizeImageItems(payload.imagens).map((item) => item.url || item).filter(Boolean),
       categoria: payload.categoria,
       destinoTipo: "estabelecimento",
       destinoId: payload.nomeNormalizado || id
@@ -6856,6 +6858,7 @@ function bindEvents() {
       descricao: payload.titulo || payload.endereco || "Imóvel disponível",
       estabelecimento: payload.clienteNome || payload.corretor || "",
       imagem: imagemPrincipalNovidade(payload),
+      imagens: payload.imagens || [],
       valor: payload.valor || "",
       categoria: "Imóveis",
       destinoTipo: "imovel",
@@ -6906,6 +6909,7 @@ function bindEvents() {
       descricao: [payload.marca, payload.modelo, payload.ano].filter(Boolean).join(" ") || "Veículo disponível",
       estabelecimento: payload.clienteNome || payload.vendedor || payload.loja || "",
       imagem: imagemPrincipalNovidade(payload),
+      imagens: payload.imagens || [],
       valor: payload.preco || "",
       categoria: "Automóveis",
       destinoTipo: "veiculo",

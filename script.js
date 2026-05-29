@@ -2499,22 +2499,77 @@ document.addEventListener("DOMContentLoaded", function () {
     return item?.imagem || item?.image || item?.foto || item?.logo || item?.perfil || "";
   }
 
+  function novidadeImagens(item = {}) {
+    const valores = [];
+    const adicionar = (valor) => {
+      if (!valor) return;
+      if (Array.isArray(valor)) {
+        valor.forEach(adicionar);
+        return;
+      }
+      if (typeof valor === "object") {
+        adicionar(valor.url || valor.src || valor.imagem || valor.image || valor.link);
+        return;
+      }
+      const texto = String(valor || "").trim();
+      if (texto) valores.push(texto);
+    };
+    adicionar(item.imagens || item.images || item.fotos || item.Fotos);
+    adicionar(novidadeImagem(item));
+    return [...new Set(valores)];
+  }
+
   function novidadeTituloDestino(item) {
     return item?.destinoTitulo || item?.nomeItem || item?.subtitulo || item?.nome || item?.tituloConteudo || "";
   }
 
+  function novidadeTipoClasse(tipo) {
+    const key = normalizeName(tipo || "");
+    if (key.includes("imovel")) return "tipo-imovel";
+    if (key.includes("veiculo") || key.includes("automovel")) return "tipo-veiculo";
+    if (key.includes("promoc")) return "tipo-promocao";
+    if (key.includes("evento")) return "tipo-evento";
+    if (key.includes("foto")) return "tipo-foto";
+    return "tipo-estabelecimento";
+  }
+
+  function novidadeDomId(prefixo, id) {
+    return `${prefixo}-${String(id || "").replace(/[^a-z0-9_-]/gi, "-")}`;
+  }
+
+  function destacarDestinoNovidade(selector) {
+    if (!selector) return;
+    setTimeout(() => {
+      const alvo = document.querySelector(selector);
+      destacarElementoNovidade(alvo);
+    }, 650);
+  }
+
+  function destacarElementoNovidade(alvo) {
+    if (!alvo) return;
+    setTimeout(() => {
+      if (!alvo) return;
+      alvo.scrollIntoView({ behavior: "smooth", block: "center" });
+      alvo.classList.add("destaque-home");
+      setTimeout(() => alvo.classList.remove("destaque-home"), 1800);
+    }, 80);
+  }
+
   function montarNovidadeRecord(base) {
     const dataMs = novidadeCidadeMs(base.dataCriacao || base.createdAt || base.updatedAt || base.criadoEm || base.dataAtualizacao);
+    const imagens = novidadeImagens(base);
     return {
       id: base.id || `novidade-${normalizeName(base.estabelecimento || base.titulo || "")}-${dataMs || Date.now()}`,
       tipo: base.tipo || base.destinoTipo || "estabelecimento",
       titulo: base.titulo || "Novidade adicionada",
       estabelecimento: base.estabelecimento || base.clienteNome || base.nomeCliente || "",
       descricao: base.descricao || base.titulo || "Novo conteúdo disponível",
-      imagem: novidadeImagem(base),
+      imagem: imagens[0] || "",
+      imagens,
       dataMs,
       destinoTipo: base.destinoTipo || base.tipo || "estabelecimento",
       destinoId: base.destinoId || base.itemId || base.estabelecimentoId || base.clienteId || "",
+      destinoCardId: base.destinoCardId || "",
       categoria: base.categoria || "",
       valor: base.valor || base.preco || base.valorTexto || "",
       raw: base
@@ -2559,9 +2614,12 @@ document.addEventListener("DOMContentLoaded", function () {
             descricao: promo.titulo || "Promoção disponível",
             estabelecimento: promo.estabelecimento,
             imagem: promo.imagem || promo.logo,
+            imagens: [promo.imagem || promo.logo].filter(Boolean),
             dataCriacao: dataMs,
             destinoTipo: "promocao",
             destinoId: promo.estabelecimentoId,
+            destinoCardId: novidadeDomId("promocao", `${promo.id}-${promo.estabelecimentoId}`),
+            promoOriginalId: promo.id,
             categoria: promo.categoria,
             valor: promoValorTexto(promo, formatarMoedaPromo(promo.preco))
           }));
@@ -2578,6 +2636,7 @@ document.addEventListener("DOMContentLoaded", function () {
             descricao: [auto.marca, auto.modelo, auto.ano].filter(Boolean).join(" ") || "Veículo disponível",
             estabelecimento: auto.vendedor || auto.loja || auto.clienteNome || "",
             imagem: auto.imagem || auto.imagens?.[0] || "",
+            imagens: auto.imagens || (auto.imagem ? [auto.imagem] : []),
             dataCriacao: auto.createdAt || auto.updatedAt || agora - 10800000,
             destinoTipo: "veiculo",
             destinoId: auto.id,
@@ -2592,6 +2651,7 @@ document.addEventListener("DOMContentLoaded", function () {
             descricao: imovel.titulo || imovel.endereco || "Imóvel disponível",
             estabelecimento: imovel.corretor || imovel.clienteNome || "",
             imagem: imovel.imagem || imovel.imagens?.[0] || "",
+            imagens: imovel.imagens || (imovel.imagem ? [imovel.imagem] : []),
             dataCriacao: imovel.createdAt || imovel.updatedAt || agora - 14400000,
             destinoTipo: "imovel",
             destinoId: imovel.id,
@@ -2632,8 +2692,9 @@ document.addEventListener("DOMContentLoaded", function () {
     feed.innerHTML = lista.map((item) => {
       const img = item.imagem;
       const destino = novidadeTituloDestino(item);
+      const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo);
       return `
-        <article class="novidade-feed-card" data-novidade-id="${escapePromoHtml(item.id)}">
+        <article class="novidade-feed-card ${tipoClass}" data-novidade-id="${escapePromoHtml(item.id)}">
           <div class="novidade-feed-img">
             ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(item.estabelecimento || item.titulo)}" loading="lazy" decoding="async">` : `<i class="fa-regular fa-bell"></i>`}
           </div>
@@ -2643,7 +2704,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ${destino ? `<small>${escapePromoHtml(destino)}</small>` : ""}
             <span>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</span>
           </div>
-          <button type="button">${escapePromoHtml(novidadeActionLabel(item.destinoTipo))}</button>
+          <button type="button" class="${tipoClass}">${escapePromoHtml(novidadeActionLabel(item.destinoTipo))}</button>
         </article>
       `;
     }).join("");
@@ -2669,23 +2730,53 @@ document.addEventListener("DOMContentLoaded", function () {
     const item = novidadesCidadeCache.find((novidade) => String(novidade.id) === String(id));
     if (!item) return;
     document.querySelector(".novidade-preview-overlay")?.remove();
-    const img = item.imagem;
+    const imagens = item.imagens?.length ? item.imagens : (item.imagem ? [item.imagem] : []);
     const destino = novidadeTituloDestino(item) || item.descricao || "";
     const valor = item.valor ? `<strong class="novidade-preview-price">${escapePromoHtml(formatarMoedaPromo(item.valor) || item.valor)}</strong>` : "";
+    const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo);
     const overlay = document.createElement("div");
     overlay.className = "novidade-preview-overlay";
     overlay.innerHTML = `
-      <div class="novidade-preview-modal" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.titulo)}">
+      <div class="novidade-preview-modal ${tipoClass}" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.titulo)}">
         <button type="button" class="novidade-preview-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
         <h3>${escapePromoHtml(item.estabelecimento || "Olá Carlópolis")}</h3>
         <p>${escapePromoHtml(item.titulo || "Novidade")}</p>
-        ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(destino || item.estabelecimento || "Novidade")}" loading="lazy" decoding="async">` : ""}
+        ${imagens.length ? `
+          <div class="novidade-preview-gallery">
+            <div class="novidade-preview-track">
+              ${imagens.map((img, index) => `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(destino || item.estabelecimento || "Novidade")}" data-novidade-img="${index}" loading="lazy" decoding="async">`).join("")}
+            </div>
+            ${imagens.length > 1 ? `
+              <button type="button" class="novidade-gallery-nav prev" aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
+              <button type="button" class="novidade-gallery-nav next" aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
+              <span class="novidade-gallery-count">1/${imagens.length}</span>
+            ` : ""}
+          </div>
+        ` : ""}
         ${destino ? `<h4>${escapePromoHtml(destino)}</h4>` : ""}
         ${valor}
-        <button type="button" class="novidade-preview-open">${escapePromoHtml(novidadeActionLabel(item.destinoTipo))}</button>
+        <button type="button" class="novidade-preview-open ${tipoClass}">${escapePromoHtml(novidadeActionLabel(item.destinoTipo))}</button>
       </div>
     `;
     document.body.appendChild(overlay);
+    const track = overlay.querySelector(".novidade-preview-track");
+    const count = overlay.querySelector(".novidade-gallery-count");
+    const atualizarCount = () => {
+      if (!track || !count) return;
+      const idx = Math.round(track.scrollLeft / Math.max(track.clientWidth, 1));
+      count.textContent = `${Math.min(idx + 1, imagens.length)}/${imagens.length}`;
+    };
+    overlay.querySelector(".novidade-gallery-nav.prev")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      track?.scrollBy({ left: -track.clientWidth, behavior: "smooth" });
+      setTimeout(atualizarCount, 260);
+    });
+    overlay.querySelector(".novidade-gallery-nav.next")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      track?.scrollBy({ left: track.clientWidth, behavior: "smooth" });
+      setTimeout(atualizarCount, 260);
+    });
+    track?.addEventListener("scroll", atualizarCount, { passive: true });
     overlay.querySelector(".novidade-preview-close")?.addEventListener("click", () => overlay.remove());
     overlay.addEventListener("click", (event) => {
       if (event.target === overlay) overlay.remove();
@@ -2696,16 +2787,26 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function abrirDestinoNovidadeCidade(item) {
+  async function abrirDestinoNovidadeCidade(item) {
     const tipo = normalizeName(item.destinoTipo || item.tipo || "");
     if (tipo.includes("promoc")) {
       location.hash = item.destinoId ? `#promocoes-${item.destinoId}` : "#promocoes";
-      return mostrarPromocoes(item.destinoId || "todos");
+      await Promise.resolve(mostrarPromocoes(item.destinoId || "todos"));
+      const alvo = item.destinoCardId
+        ? document.getElementById(item.destinoCardId)
+        : [...document.querySelectorAll(".promo-card")].find((card) => card.dataset.promoEst === item.destinoId);
+      return destacarElementoNovidade(alvo);
     }
-    if (tipo.includes("imovel")) return mostrarImoveisV2();
-    if (tipo.includes("veiculo") || tipo.includes("automovel")) return mostrarAutomoveis();
+    if (tipo.includes("imovel")) {
+      await Promise.resolve(mostrarImoveisV2());
+      return destacarDestinoNovidade(`#${novidadeDomId("imovel", item.destinoId)}`);
+    }
+    if (tipo.includes("veiculo") || tipo.includes("automovel")) {
+      await Promise.resolve(mostrarAutomoveis());
+      return destacarDestinoNovidade(`#${novidadeDomId("veiculo", item.destinoId)}`);
+    }
     if (tipo.includes("evento") || tipo.includes("estabelecimento")) {
-      const id = normalizeName(item.destinoId || item.estabelecimento || "");
+      const id = normalizeName(item.destinoId || item.descricao || item.estabelecimento || "");
       if (id) {
         location.hash = `#${id}`;
         return carregarEstabelecimentoPeloHash();
@@ -2977,6 +3078,21 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => alvo.classList.remove("destaque-home"), 1500);
       }
     }, 500);
+  }
+
+  function mostrarVagasTrabalhoPublicas() {
+    const categoria = categories.find((cat) => normalizeName(cat.title || "") === "vagasdetrabalho");
+    if (!categoria) return;
+    if (!ADMIN_CLIENTES_LOADED) {
+      document.querySelector(".content_area").innerHTML = `<h2 class="highlighted">Vagas de Trabalho</h2><p>Carregando vagas...</p>`;
+      aplicarDadosAdminClientes().then(() => {
+        ADMIN_CLIENTES_LOADED = true;
+        mostrarVagasTrabalhoPublicas();
+      });
+      return;
+    }
+    prepararMenuParaCategoria(categoria);
+    loadContent(categoria.title, categoria.establishments || []);
   }
 
   // Observa o hash (#alguma-coisa) e, se for um estabelecimento válido,
@@ -7404,7 +7520,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
     return `
-  <article class="card-imovel ${tag} ${isFechado ? "is-sold" : ""}" data-id="${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
+  <article id="${novidadeDomId("imovel", im.id)}" class="card-imovel ${tag} ${isFechado ? "is-sold" : ""}" data-id="${im.id}" data-novidade-destino="imovel-${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
     <div class="card-top">
       <div class="swiper swiper-imovel-mini">
         <div class="swiper-wrapper">
@@ -7862,7 +7978,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         imagemPrincipal ? `Imagem: ${imagemPrincipal}` : ""
       ].filter(Boolean).join("\n");
       return `
-        <article class="auto-card ${item.status === "vendido" ? "is-sold" : ""}">
+        <article id="${novidadeDomId("veiculo", item.id)}" class="auto-card ${item.status === "vendido" ? "is-sold" : ""}" data-novidade-destino="veiculo-${textoSeguroAutomoveis(item.id || "")}">
           <div class="auto-card-media" data-auto-gallery="${imagensJson}" data-auto-title="${textoSeguroAutomoveis(titulo)}">
             ${imagens.length ? `
               <div class="auto-gallery-track">
@@ -8198,6 +8314,18 @@ plotarPinsImoveis(stateImoveis.filtered);
       mostrarAutomoveis();
     });
   }
+
+  function carregarEstabelecimentoPeloHash() {
+    tratarHashEstabelecimento();
+  }
+
+  document.getElementById("menuVagasTrabalho")?.addEventListener("click", function (event) {
+    event.preventDefault();
+    registrarCliqueMenuLateral("Vagas de Trabalho");
+    prepararNavegacaoMenuEspecial();
+    location.hash = "#vagas-trabalho";
+    mostrarVagasTrabalhoPublicas();
+  });
 
   document.addEventListener("click", function (event) {
     const linkImoveis = event.target.closest?.("#menuImoveis");
@@ -8788,7 +8916,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           const dataCompacta = i.validadeFim ? formatarDataBR(i.validadeFim) : (i.validadeInicio ? formatarDataBR(i.validadeInicio) : "");
           const detalheCompacto = dataCompacta ? `V&aacute;lido at&eacute;: ${dataCompacta}` : "";
           html += `
-    <article class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+    <article id="${novidadeDomId("promocao", `${i.id || "promo"}-${i.estabelecimentoId || "todos"}`)}" class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
       <div class="card-divulgacao-img-wrap">
         ${i.imagem
               ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
@@ -8819,7 +8947,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         }
 
         html += `
-    <article class="promo-card promo-card-new" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+    <article id="${novidadeDomId("promocao", `${i.id || "promo"}-${i.estabelecimentoId || "todos"}`)}" class="promo-card promo-card-new" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
     <div class="promo-card-body">
       <div class="promo-produto">
         <div class="promo-image-wrap">
@@ -17226,6 +17354,14 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
       {
+        link: document.querySelector("#menuVagasTrabalho"),
+        title: "Vagas de Trabalho",
+        establishments: [],
+      },
+
+
+
+      {
         link: document.querySelector("#menuColetaLixo"),
         title: "Coleta de Lixo",
         establishments: [
@@ -19647,6 +19783,7 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
     if (h === "#automoveis" || h === "#veiculos") { return mostrarAutomoveis(); }
+    if (h === "#vagas" || h === "#vagas-trabalho") { return mostrarVagasTrabalhoPublicas(); }
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
 
     if (h === "#represa" || h === "#represa-chavantes") { return mostrarRepresaChavantes(); };
