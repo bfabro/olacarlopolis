@@ -17197,6 +17197,7 @@ tr[data-inativo="true"] {
 .vagas-cards-switch {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   min-height: 46px;
   padding: 0 14px;
@@ -17206,10 +17207,14 @@ tr[data-inativo="true"] {
   color: #1d4ed8;
   font-weight: 900;
   cursor: pointer;
+  appearance: none;
+  font-family: inherit;
 }
 
-.vagas-cards-switch input {
-  accent-color: #1d4ed8;
+.vagas-cards-switch.is-active {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #fff;
 }
 
 .vagas-public-list {

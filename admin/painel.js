@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 248,
-  label: "v248",
+  numero: 249,
+  label: "v249",
   data: "2026-05-29",
-  nota: "Filtra novidades invalidas e separa vagas da pagina dos comercios."
+  nota: "Corrige botao Cards da tela publica de vagas de trabalho."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

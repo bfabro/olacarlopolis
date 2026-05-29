@@ -18936,24 +18936,29 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
         bindVagasPublicas();
       };
       const aplicarModoCardsVagas = () => {
-        const ativo = Boolean(document.getElementById("vagasModoCards")?.checked);
-        window.__vagasModoCards = ativo;
-        contentArea.querySelector(".vagas-public-page")?.classList.toggle("vagas-cards-mode", ativo);
+        const ativo = Boolean(window.__vagasModoCards);
+        const page = contentArea.querySelector(".vagas-public-page");
+        const button = document.getElementById("vagasModoCards");
+        page?.classList.toggle("vagas-cards-mode", ativo);
+        button?.classList.toggle("is-active", ativo);
+        button?.setAttribute("aria-pressed", ativo ? "true" : "false");
       };
       contentArea.innerHTML = `<section class="vagas-public-page">
         <h2 class="highlighted">${title}</h2>
         <div class="vagas-filter-card">
           <label class="vagas-search-label"><i class="fa-solid fa-magnifying-glass"></i><input id="vagasSearchInput" value="${escapePromoHtml(buscaInicial)}" placeholder="Pesquisar por vaga ou empresa"></label>
-          <label class="switch vagas-cards-switch" title="Mostrar vagas em cards menores">
-            <input type="checkbox" id="vagasModoCards" ${window.__vagasModoCards ? "checked" : ""}>
-            <span class="slider"></span>
+          <button type="button" id="vagasModoCards" class="vagas-cards-switch ${window.__vagasModoCards ? "is-active" : ""}" aria-pressed="${window.__vagasModoCards ? "true" : "false"}" title="Mostrar vagas em cards menores">
+            <i class="fa-solid fa-table-cells-large"></i>
             <strong>Cards</strong>
-          </label>
+          </button>
         </div>
         <section class="vagas-public-list"></section>
       </section>`;
       document.getElementById("vagasSearchInput")?.addEventListener("input", renderVagasPublicas);
-      document.getElementById("vagasModoCards")?.addEventListener("change", aplicarModoCardsVagas);
+      document.getElementById("vagasModoCards")?.addEventListener("click", () => {
+        window.__vagasModoCards = !window.__vagasModoCards;
+        aplicarModoCardsVagas();
+      });
       renderVagasPublicas();
       aplicarModoCardsVagas();
       return;
