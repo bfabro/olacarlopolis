@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 244,
-  label: "v244",
-  data: "2026-05-26",
-  nota: "Atualiza versao junto ao link compartilhavel da represa."
+  numero: 245,
+  label: "v245",
+  data: "2026-05-29",
+  nota: "Inclui aba Novidades com feed e registros automaticos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1763,6 +1763,34 @@ function getClientFormData() {
   };
 }
 
+function imagemPrincipalNovidade(payload = {}) {
+  return payload.imagem || payload.image || payload.logo || payload.imagens?.[0] || payload.menuImages?.[0] || "";
+}
+
+async function registrarNovidadeAdmin(payload = {}) {
+  try {
+    const tipo = payload.tipo || payload.destinoTipo || "estabelecimento";
+    const destinoId = payload.destinoId || payload.itemId || payload.estabelecimentoId || payload.clienteId || "";
+    const id = `${slugify(tipo)}-${slugify(destinoId || payload.estabelecimento || payload.titulo || "item")}-${Date.now()}`;
+    await update(ref(db, `novidades/${id}`), {
+      tipo,
+      titulo: payload.titulo || "Novidade adicionada",
+      descricao: payload.descricao || payload.titulo || "",
+      estabelecimento: payload.estabelecimento || payload.clienteNome || "",
+      imagem: payload.imagem || "",
+      valor: payload.valor || "",
+      categoria: payload.categoria || "",
+      destinoTipo: payload.destinoTipo || tipo,
+      destinoId,
+      dataCriacao: serverTimestamp(),
+      criadoPor: state.user?.uid || "",
+      origem: "painel"
+    });
+  } catch (error) {
+    console.warn("Nao foi possivel registrar novidade.", error);
+  }
+}
+
 function fillClientForm(client) {
   state.selectedClientId = client.id;
   $("clientForm").dataset.originalCategory = client.categoria || client.category || "";
@@ -2147,6 +2175,19 @@ async function addClientPromocao() {
   $("cancelClientPromoEditButton")?.classList.add("hidden");
   renderClientPromocoesPreview();
   const saved = await persistClientPromocoesIfEditing(editingIndex >= 0 ? "Promocao atualizada e salva." : "Promocao adicionada e salva.");
+  if (saved) {
+    await registrarNovidadeAdmin({
+      tipo: "promocao",
+      titulo: editingIndex >= 0 ? "Promoção atualizada" : "Nova promoção adicionada",
+      descricao: payload.titulo || "Promoção disponível",
+      estabelecimento: $("clientName")?.value.trim() || currentId,
+      imagem: payload.imagem,
+      valor: payload.preco || payload.desconto || payload.valorTexto || "",
+      categoria: $("clientCategory")?.value || "",
+      destinoTipo: "promocao",
+      destinoId: normalizeName($("clientName")?.value.trim() || currentId)
+    });
+  }
   if (!saved) showToast(`${editingIndex >= 0 ? "Promocao atualizada" : "Promocao adicionada"}. Clique em salvar cliente para gravar.`);
 }
 
@@ -4761,6 +4802,7 @@ function renderPaymentSettings() {
   $("paymentFeaturedWeekly").value = config.valorDestaqueSemanal ? moneyBR(config.valorDestaqueSemanal) : "";
   $("paymentFeaturedWeekend").value = config.valorDestaqueFimSemana ? moneyBR(config.valorDestaqueFimSemana) : "";
   $("paymentFeaturedMonthly").value = config.valorDestaqueMensal ? moneyBR(config.valorDestaqueMensal) : "";
+  if ($("paymentNewsVisibleDays")) $("paymentNewsVisibleDays").value = config.diasNovidadesVisiveis || 5;
   $("paymentInvoiceNote").value = config.observacaoFatura || "";
 }
 
@@ -4895,6 +4937,17 @@ function renderStaffPromocoesView() {
       editadoNoPainel: true,
       updatedAt: serverTimestamp(),
       updatedBy: state.user?.uid || ""
+    });
+    await registrarNovidadeAdmin({
+      tipo: "promocao",
+      titulo: editIndex >= 0 ? "Promoção atualizada" : "Nova promoção adicionada",
+      descricao: payload.titulo || "Promoção disponível",
+      estabelecimento: client.nome || selectedId,
+      imagem: payload.imagem,
+      valor: payload.preco || payload.desconto || payload.valorTexto || "",
+      categoria: client.categoria || "",
+      destinoTipo: "promocao",
+      destinoId: client.nomeNormalizado || normalizeName(client.nome || selectedId)
     });
     showToast(editIndex >= 0 ? "Promocao atualizada." : "Promocao adicionada.");
     state.staffPromoEditIndex = null;
@@ -5453,6 +5506,17 @@ function renderClientOnlyEditor() {
       editadoNoPainel: true,
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
+    });
+    await registrarNovidadeAdmin({
+      tipo: "promocao",
+      titulo: coPromoEditIndex >= 0 ? "Promoção atualizada" : "Nova promoção adicionada",
+      descricao: payload.titulo || "Promoção disponível",
+      estabelecimento: client.nome || client.id,
+      imagem: payload.imagem,
+      valor: payload.preco || payload.desconto || payload.valorTexto || "",
+      categoria: client.categoria || "",
+      destinoTipo: "promocao",
+      destinoId: client.nomeNormalizado || normalizeName(client.nome || client.id)
     });
     showToast(coPromoEditIndex >= 0 ? "Promocao atualizada." : "Promocao adicionada.");
     clearPromoFields("co", mount);
@@ -6549,6 +6613,7 @@ function bindEvents() {
       valorDestaqueSemanal: numberFromMoney($("paymentFeaturedWeekly").value),
       valorDestaqueFimSemana: numberFromMoney($("paymentFeaturedWeekend").value),
       valorDestaqueMensal: numberFromMoney($("paymentFeaturedMonthly").value),
+      diasNovidadesVisiveis: Math.max(1, Number($("paymentNewsVisibleDays")?.value || 5) || 5),
       observacaoFatura: $("paymentInvoiceNote").value.trim(),
       updatedAt: serverTimestamp(),
       updatedBy: state.user?.uid || ""
@@ -6596,6 +6661,9 @@ function bindEvents() {
     const formId = payload.id;
     const id = getCanonicalClientId(payload.categoria, payload.nome);
     const sourceClient = state.clientes.find((client) => client.id === state.selectedClientId || client.id === formId || client.id === id) || null;
+    const isNewClient = !state.selectedClientId;
+    const oldImagesCount = normalizeImageItems(sourceClient?.imagens).length;
+    const newImagesCount = normalizeImageItems(payload.imagens).length;
     payload.aliases = buildClientPublicAliases(id, payload, sourceClient);
     addAliasKey(payload.aliases, formId);
     addAliasKey(payload.aliases, state.selectedClientId);
@@ -6630,6 +6698,16 @@ function bindEvents() {
       };
     }
     await update(ref(db), updates);
+    await registrarNovidadeAdmin({
+      tipo: "estabelecimento",
+      titulo: isNewClient ? "Novo estabelecimento cadastrado" : (newImagesCount > oldImagesCount ? "Novas fotos adicionadas" : "Informações atualizadas"),
+      descricao: isNewClient ? "Novo estabelecimento disponível no Olá Carlópolis." : (newImagesCount > oldImagesCount ? "Confira os novos trabalhos realizados." : "Informações do estabelecimento atualizadas."),
+      estabelecimento: payload.nome,
+      imagem: imagemPrincipalNovidade(payload),
+      categoria: payload.categoria,
+      destinoTipo: "estabelecimento",
+      destinoId: payload.nomeNormalizado || id
+    });
     [formId, state.selectedClientId].filter((oldId) => oldId && oldId !== id).forEach((oldId) => {
       state.clientes = state.clientes.filter((client) => client.id !== oldId);
       state.usuarios.filter((user) => user.clienteId === oldId).forEach((user) => { user.clienteId = id; });
@@ -6710,8 +6788,19 @@ function bindEvents() {
     const payload = getEventFormData();
     const id = payload.id;
     delete payload.id;
-    if (!state.selectedEventId) payload.createdAt = serverTimestamp();
+    const isNewEvent = !state.selectedEventId;
+    if (isNewEvent) payload.createdAt = serverTimestamp();
     await update(ref(db, `eventos/${id}`), payload);
+    await registrarNovidadeAdmin({
+      tipo: "evento",
+      titulo: isNewEvent ? "Novo evento cadastrado" : "Evento atualizado",
+      descricao: payload.titulo || "Evento disponível",
+      estabelecimento: payload.clienteNome || payload.local || "Evento",
+      imagem: payload.imagem,
+      categoria: "Eventos",
+      destinoTipo: "evento",
+      destinoId: id
+    });
     showToast("Evento salvo.");
     resetEventForm();
     await loadAllData();
@@ -6748,7 +6837,8 @@ function bindEvents() {
     const payload = getImovelFormData();
     const id = payload.id;
     delete payload.id;
-    if (!state.selectedImovelId) {
+    const isNewImovel = !state.selectedImovelId;
+    if (isNewImovel) {
       payload.createdAt = serverTimestamp();
       payload.codRef = await gerarCodigoReferenciaIncremental("imovel");
     } else {
@@ -6760,6 +6850,17 @@ function bindEvents() {
       updates[`conteudosInformativos/imoveis/${state.selectedImovelId}`] = null;
     }
     await update(ref(db), updates);
+    await registrarNovidadeAdmin({
+      tipo: "imovel",
+      titulo: isNewImovel ? "Novo imóvel cadastrado" : "Imóvel atualizado",
+      descricao: payload.titulo || payload.endereco || "Imóvel disponível",
+      estabelecimento: payload.clienteNome || payload.corretor || "",
+      imagem: imagemPrincipalNovidade(payload),
+      valor: payload.valor || "",
+      categoria: "Imóveis",
+      destinoTipo: "imovel",
+      destinoId: id
+    });
     showToast("Imovel salvo.");
     resetImovelForm();
     await loadAllData();
@@ -6786,7 +6887,8 @@ function bindEvents() {
     const payload = getAutomovelFormData();
     const id = payload.id;
     delete payload.id;
-    if (!state.selectedAutomovelId) {
+    const isNewAutomovel = !state.selectedAutomovelId;
+    if (isNewAutomovel) {
       payload.createdAt = serverTimestamp();
       payload.codRef = await gerarCodigoReferenciaIncremental("automovel");
     } else {
@@ -6798,6 +6900,17 @@ function bindEvents() {
       updates[`conteudosInformativos/automoveis/${state.selectedAutomovelId}`] = null;
     }
     await update(ref(db), updates);
+    await registrarNovidadeAdmin({
+      tipo: "veiculo",
+      titulo: isNewAutomovel ? "Novo veículo cadastrado" : "Veículo atualizado",
+      descricao: [payload.marca, payload.modelo, payload.ano].filter(Boolean).join(" ") || "Veículo disponível",
+      estabelecimento: payload.clienteNome || payload.vendedor || payload.loja || "",
+      imagem: imagemPrincipalNovidade(payload),
+      valor: payload.preco || "",
+      categoria: "Automóveis",
+      destinoTipo: "veiculo",
+      destinoId: id
+    });
     showToast("Automovel salvo.");
     resetAutomovelForm();
     await loadAllData();

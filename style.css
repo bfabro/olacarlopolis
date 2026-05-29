@@ -18181,3 +18181,229 @@ body.vaga-modal-open {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
+
+/* Feed da aba Novidades da cidade */
+.novidades-cidade-wrap {
+  width: min(960px, calc(100% - 16px));
+  margin: 12px auto 28px;
+}
+
+.novidades-cidade-resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0 0 12px;
+  padding: 16px 18px;
+  border: 1px solid #dbe7ff;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #ffffff 0%, #eef5ff 100%);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.novidades-cidade-resumo strong {
+  color: var(--blue-color, #0f5eea);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.novidades-cidade-resumo span {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.novidades-cidade-feed {
+  display: grid;
+  gap: 10px;
+}
+
+.novidade-feed-card {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid #dfe7f3;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.novidade-feed-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.novidade-feed-img {
+  width: 84px;
+  height: 84px;
+  border-radius: 15px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #eef5ff;
+  color: var(--blue-color, #0f5eea);
+  font-size: 26px;
+}
+
+.novidade-feed-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.novidade-feed-info {
+  min-width: 0;
+}
+
+.novidade-feed-info strong {
+  display: block;
+  color: #0b1736;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.novidade-feed-info p {
+  margin: 3px 0 0;
+  color: #1f2d48;
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.novidade-feed-info small,
+.novidade-feed-info span {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.novidade-feed-card > button,
+.novidade-preview-open {
+  border: 0;
+  border-radius: 999px;
+  background: var(--blue-color, #0f5eea);
+  color: #fff;
+  font-weight: 900;
+  padding: 10px 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.novidades-empty {
+  padding: 18px;
+  border-radius: 16px;
+  background: #fff;
+  color: #64748b;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.novidade-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(15, 23, 42, 0.56);
+}
+
+.novidade-preview-modal {
+  position: relative;
+  width: min(430px, 100%);
+  max-height: min(88vh, 760px);
+  overflow: auto;
+  border-radius: 24px;
+  background: #fff;
+  padding: 18px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .24);
+}
+
+.novidade-preview-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: #eef5ff;
+  color: #0b1736;
+  cursor: pointer;
+}
+
+.novidade-preview-modal h3 {
+  margin: 4px 44px 2px 0;
+  color: #0b1736;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.novidade-preview-modal p {
+  margin: 0 44px 12px 0;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.novidade-preview-modal img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 18px;
+  display: block;
+  margin-bottom: 14px;
+}
+
+.novidade-preview-modal h4 {
+  margin: 0 0 8px;
+  color: #0b1736;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.novidade-preview-price {
+  display: inline-flex;
+  margin: 0 0 14px;
+  color: var(--blue-color, #0f5eea);
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.novidade-preview-open {
+  width: 100%;
+  min-height: 48px;
+}
+
+@media (max-width: 640px) {
+  .novidades-cidade-wrap {
+    width: calc(100% - 8px);
+    margin-top: 8px;
+  }
+
+  .novidade-feed-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 10px;
+    border-radius: 16px;
+  }
+
+  .novidade-feed-img {
+    width: 72px;
+    height: 72px;
+  }
+
+  .novidade-feed-card > button {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 40px;
+  }
+}

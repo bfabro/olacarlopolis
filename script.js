@@ -2455,6 +2455,266 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  let novidadesCidadeCache = [];
+  let novidadesCidadePromise = null;
+
+  function novidadeCidadeMs(value) {
+    if (!value) return 0;
+    if (typeof value === "number") return value;
+    if (typeof value === "object") {
+      if (typeof value.seconds === "number") return value.seconds * 1000;
+      if (typeof value._seconds === "number") return value._seconds * 1000;
+    }
+    const text = String(value).trim();
+    if (!text) return 0;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return new Date(`${text}T12:00:00`).getTime();
+    const br = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (br) return new Date(Number(br[3]), Number(br[2]) - 1, Number(br[1]), 12, 0, 0).getTime();
+    const parsed = Date.parse(text);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function tempoDecorridoNovidade(ms) {
+    if (!ms) return "recentemente";
+    const diff = Math.max(0, Date.now() - ms);
+    const min = Math.floor(diff / 60000);
+    if (min < 1) return "agora";
+    if (min < 60) return `há ${min} min`;
+    const horas = Math.floor(min / 60);
+    if (horas < 24) return `há ${horas} hora${horas === 1 ? "" : "s"}`;
+    const dias = Math.floor(horas / 24);
+    return `há ${dias} dia${dias === 1 ? "" : "s"}`;
+  }
+
+  function novidadeActionLabel(tipo) {
+    const key = normalizeName(tipo || "");
+    if (key.includes("promoc")) return "Abrir promoção";
+    if (key.includes("imovel")) return "Abrir imóvel";
+    if (key.includes("veiculo") || key.includes("automovel")) return "Abrir veículo";
+    if (key.includes("evento")) return "Abrir evento";
+    return "Abrir estabelecimento";
+  }
+
+  function novidadeImagem(item) {
+    return item?.imagem || item?.image || item?.foto || item?.logo || item?.perfil || "";
+  }
+
+  function novidadeTituloDestino(item) {
+    return item?.destinoTitulo || item?.nomeItem || item?.subtitulo || item?.nome || item?.tituloConteudo || "";
+  }
+
+  function montarNovidadeRecord(base) {
+    const dataMs = novidadeCidadeMs(base.dataCriacao || base.createdAt || base.updatedAt || base.criadoEm || base.dataAtualizacao);
+    return {
+      id: base.id || `novidade-${normalizeName(base.estabelecimento || base.titulo || "")}-${dataMs || Date.now()}`,
+      tipo: base.tipo || base.destinoTipo || "estabelecimento",
+      titulo: base.titulo || "Novidade adicionada",
+      estabelecimento: base.estabelecimento || base.clienteNome || base.nomeCliente || "",
+      descricao: base.descricao || base.titulo || "Novo conteúdo disponível",
+      imagem: novidadeImagem(base),
+      dataMs,
+      destinoTipo: base.destinoTipo || base.tipo || "estabelecimento",
+      destinoId: base.destinoId || base.itemId || base.estabelecimentoId || base.clienteId || "",
+      categoria: base.categoria || "",
+      valor: base.valor || base.preco || base.valorTexto || "",
+      raw: base
+    };
+  }
+
+  async function carregarNovidadesCidade() {
+    if (novidadesCidadePromise) return novidadesCidadePromise;
+    novidadesCidadePromise = (async () => {
+      const dbAdmin = await esperarFirebaseDatabase();
+      let diasVisiveis = 5;
+      const registros = [];
+
+      if (dbAdmin) {
+        try {
+          const [novidadesSnap, configSnap] = await Promise.all([
+            dbAdmin.ref("novidades").once("value"),
+            dbAdmin.ref("configuracoes/pagamento/diasNovidadesVisiveis").once("value")
+          ]);
+          const configDias = Number(configSnap.val());
+          if (Number.isFinite(configDias) && configDias > 0) diasVisiveis = configDias;
+          novidadesSnap.forEach((child) => {
+            registros.push(montarNovidadeRecord({ id: child.key, ...(child.val() || {}) }));
+            return false;
+          });
+        } catch (error) {
+          console.warn("Nao foi possivel carregar novidades do Firebase.", error);
+        }
+      }
+
+      const agora = Date.now();
+      const limiteMs = diasVisiveis * 86400000;
+      const geradas = [];
+
+      try {
+        coletarTodasPromocoes().slice(0, 20).forEach((promo, idx) => {
+          const dataMs = novidadeCidadeMs(promo.criadoEm || promo.validadeInicio || promo.validadeFim) || (agora - idx * 7200000);
+          geradas.push(montarNovidadeRecord({
+            id: `promo-${promo.id}-${promo.estabelecimentoId}`,
+            tipo: "promocao",
+            titulo: promo.criadoEm ? "Promoção atualizada" : "Promoção disponível",
+            descricao: promo.titulo || "Promoção disponível",
+            estabelecimento: promo.estabelecimento,
+            imagem: promo.imagem || promo.logo,
+            dataCriacao: dataMs,
+            destinoTipo: "promocao",
+            destinoId: promo.estabelecimentoId,
+            categoria: promo.categoria,
+            valor: promoValorTexto(promo, formatarMoedaPromo(promo.preco))
+          }));
+        });
+      } catch (e) { }
+
+      try {
+        const [autos, imoveis] = await Promise.all([carregarAutomoveisFirebase(), carregarImoveisFirebase()]);
+        (autos || []).slice(0, 12).forEach((auto) => {
+          geradas.push(montarNovidadeRecord({
+            id: `auto-${auto.id}`,
+            tipo: "veiculo",
+            titulo: "Novo veículo cadastrado",
+            descricao: [auto.marca, auto.modelo, auto.ano].filter(Boolean).join(" ") || "Veículo disponível",
+            estabelecimento: auto.vendedor || auto.loja || auto.clienteNome || "",
+            imagem: auto.imagem || auto.imagens?.[0] || "",
+            dataCriacao: auto.createdAt || auto.updatedAt || agora - 10800000,
+            destinoTipo: "veiculo",
+            destinoId: auto.id,
+            valor: auto.preco || ""
+          }));
+        });
+        (imoveis || []).slice(0, 12).forEach((imovel) => {
+          geradas.push(montarNovidadeRecord({
+            id: `imovel-${imovel.id}`,
+            tipo: "imovel",
+            titulo: "Novo imóvel cadastrado",
+            descricao: imovel.titulo || imovel.endereco || "Imóvel disponível",
+            estabelecimento: imovel.corretor || imovel.clienteNome || "",
+            imagem: imovel.imagem || imovel.imagens?.[0] || "",
+            dataCriacao: imovel.createdAt || imovel.updatedAt || agora - 14400000,
+            destinoTipo: "imovel",
+            destinoId: imovel.id,
+            valor: imovel.valor || ""
+          }));
+        });
+      } catch (e) { }
+
+      const mapa = new Map();
+      [...registros, ...geradas].forEach((item) => {
+        const data = item.dataMs || agora;
+        if (agora - data > limiteMs) return;
+        const key = item.id || `${item.destinoTipo}-${item.destinoId}-${item.titulo}`;
+        if (!mapa.has(key)) mapa.set(key, { ...item, dataMs: data });
+      });
+
+      novidadesCidadeCache = [...mapa.values()].sort((a, b) => (b.dataMs || 0) - (a.dataMs || 0));
+      return novidadesCidadeCache;
+    })();
+    try {
+      return await novidadesCidadePromise;
+    } finally {
+      novidadesCidadePromise = null;
+    }
+  }
+
+  function renderNovidadesCidade(lista) {
+    const feed = document.getElementById("novidadesCidadeFeed");
+    const resumo = document.getElementById("novidadesSemanaResumo");
+    if (!feed) return;
+    const inicioSemana = Date.now() - 7 * 86400000;
+    const semana = lista.filter((item) => (item.dataMs || 0) >= inicioSemana).length;
+    if (resumo) resumo.textContent = `🔥 ${semana} novidade${semana === 1 ? "" : "s"} esta semana`;
+    if (!lista.length) {
+      feed.innerHTML = `<div class="novidades-empty">Nenhuma novidade recente no momento.</div>`;
+      return;
+    }
+    feed.innerHTML = lista.map((item) => {
+      const img = item.imagem;
+      const destino = novidadeTituloDestino(item);
+      return `
+        <article class="novidade-feed-card" data-novidade-id="${escapePromoHtml(item.id)}">
+          <div class="novidade-feed-img">
+            ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(item.estabelecimento || item.titulo)}" loading="lazy" decoding="async">` : `<i class="fa-regular fa-bell"></i>`}
+          </div>
+          <div class="novidade-feed-info">
+            <strong>${escapePromoHtml(item.estabelecimento || "Olá Carlópolis")}</strong>
+            <p>${escapePromoHtml(item.descricao || item.titulo || "Nova atualização disponível")}</p>
+            ${destino ? `<small>${escapePromoHtml(destino)}</small>` : ""}
+            <span>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</span>
+          </div>
+          <button type="button">${escapePromoHtml(novidadeActionLabel(item.destinoTipo))}</button>
+        </article>
+      `;
+    }).join("");
+    feed.querySelectorAll(".novidade-feed-card").forEach((card) => {
+      card.addEventListener("click", () => abrirModalNovidadeCidade(card.dataset.novidadeId));
+      card.querySelector("button")?.addEventListener("click", (event) => {
+        event.stopPropagation();
+        abrirModalNovidadeCidade(card.dataset.novidadeId);
+      });
+    });
+  }
+
+  async function montarNovidadesCidade() {
+    const feed = document.getElementById("novidadesCidadeFeed");
+    if (feed) feed.innerHTML = `<div class="novidades-empty">Carregando novidades...</div>`;
+    const lista = await carregarNovidadesCidade();
+    renderNovidadesCidade(lista);
+  }
+
+  try { window.montarNovidadesCidade = montarNovidadesCidade; } catch (e) { }
+
+  function abrirModalNovidadeCidade(id) {
+    const item = novidadesCidadeCache.find((novidade) => String(novidade.id) === String(id));
+    if (!item) return;
+    document.querySelector(".novidade-preview-overlay")?.remove();
+    const img = item.imagem;
+    const destino = novidadeTituloDestino(item) || item.descricao || "";
+    const valor = item.valor ? `<strong class="novidade-preview-price">${escapePromoHtml(formatarMoedaPromo(item.valor) || item.valor)}</strong>` : "";
+    const overlay = document.createElement("div");
+    overlay.className = "novidade-preview-overlay";
+    overlay.innerHTML = `
+      <div class="novidade-preview-modal" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.titulo)}">
+        <button type="button" class="novidade-preview-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+        <h3>${escapePromoHtml(item.estabelecimento || "Olá Carlópolis")}</h3>
+        <p>${escapePromoHtml(item.titulo || "Novidade")}</p>
+        ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(destino || item.estabelecimento || "Novidade")}" loading="lazy" decoding="async">` : ""}
+        ${destino ? `<h4>${escapePromoHtml(destino)}</h4>` : ""}
+        ${valor}
+        <button type="button" class="novidade-preview-open">${escapePromoHtml(novidadeActionLabel(item.destinoTipo))}</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector(".novidade-preview-close")?.addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) overlay.remove();
+    });
+    overlay.querySelector(".novidade-preview-open")?.addEventListener("click", () => {
+      overlay.remove();
+      abrirDestinoNovidadeCidade(item);
+    });
+  }
+
+  function abrirDestinoNovidadeCidade(item) {
+    const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+    if (tipo.includes("promoc")) {
+      location.hash = item.destinoId ? `#promocoes-${item.destinoId}` : "#promocoes";
+      return mostrarPromocoes(item.destinoId || "todos");
+    }
+    if (tipo.includes("imovel")) return mostrarImoveisV2();
+    if (tipo.includes("veiculo") || tipo.includes("automovel")) return mostrarAutomoveis();
+    if (tipo.includes("evento") || tipo.includes("estabelecimento")) {
+      const id = normalizeName(item.destinoId || item.estabelecimento || "");
+      if (id) {
+        location.hash = `#${id}`;
+        return carregarEstabelecimentoPeloHash();
+      }
+    }
+    location.hash = "#ondecomer";
+    return mostrarOndeComer();
+  }
+
   function dataEventoPublico(evento) {
     return evento?.date || evento?.data || evento?.dataEvento || evento?.eventDate || "";
   }
@@ -18035,6 +18295,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     try {
       montarCarrosselDivulgacao();
       montarGradeEventos();
+      montarNovidadesCidade();
     } catch (e) { }
 
     const h = (location.hash || "").toLowerCase();
@@ -19844,6 +20105,9 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
         if (target === "divulgacao" && window.swiperNovidades) {
           window.swiperNovidades.update();
           window.swiperNovidades.slideTo(0);
+        }
+        if (target === "novidades-cidade") {
+          montarNovidadesCidade();
         }
       }, 150);
     });

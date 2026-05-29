@@ -121,7 +121,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
    <!-- FIM  JAVA -->
-   <link rel="stylesheet" href="style.css?v=244" />
+   <link rel="stylesheet" href="style.css?v=245" />
 
    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
    <!--  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>-->
@@ -1369,8 +1369,8 @@
             <button class="botao-menu-topo" data-target="eventos">
                <i class="fa-regular fa-calendar-days"></i> Eventos
             </button>
-            <button class="botao-menu-topo" data-target="turismo">
-               <i class="fa-solid fa-map-location-dot"></i> Turismo
+            <button class="botao-menu-topo" data-target="novidades-cidade">
+               <i class="fa-regular fa-bell"></i> Novidades
             </button>
          </div>
 
@@ -1455,9 +1455,18 @@
          <!-- Separador entre os carrosséis 
          <div class="separador"></div>-->
          <!-- Carrossel de Eventos -->
-         <div id="secao-turismo" class="carrossel-container">
+         <div id="secao-novidades-cidade" class="carrossel-container">
+            <section class="novidades-cidade-wrap">
+               <div class="novidades-cidade-resumo">
+                  <strong id="novidadesSemanaResumo">🔥 0 novidades esta semana</strong>
+                  <span>Tudo que foi adicionado ou atualizado recentemente.</span>
+               </div>
+               <div id="novidadesCidadeFeed" class="novidades-cidade-feed">
+                  <div class="novidades-empty">Carregando novidades...</div>
+               </div>
+            </section>
             <!--  <h2>Turismo</h2>-->
-            <div class="swiper-container swiper-turismo">
+            <div class="swiper-container swiper-turismo" style="display:none">
 
                <div class="swiper-wrapper">
                   <!-- Slides de Turismo -->
@@ -1609,7 +1618,7 @@
    </script>
 
    <!--  JavaScript -->
-   <script defer src="script.js?v=244"></script>
+   <script defer src="script.js?v=245"></script>
 
 
 
@@ -1746,6 +1755,9 @@
             if (target === "divulgacao" && window.swiperNovidades) {
                swiperNovidades.update();
                swiperNovidades.slideTo(0);
+            }
+            if (target === "novidades-cidade" && typeof montarNovidadesCidade === "function") {
+               montarNovidadesCidade();
             }
          });
       });
