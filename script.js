@@ -8884,7 +8884,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         <label class="promo-compact-switch" title="Mostrar promocoes em cards menores">
           <input type="checkbox" id="promoCompactToggle" ${window.__promoModoCompacto ? "checked" : ""}>
           <span class="promo-compact-track"><span></span></span>
-          <strong>Cardss</strong>
+          <strong>Cards</strong>
         </label>
         <button type="button" class="promo-clear-filters" id="promoClearFilters"><i class="fa-solid fa-rotate-left"></i> Limpar filtros</button>
       </section>
