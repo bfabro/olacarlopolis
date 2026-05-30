@@ -16794,18 +16794,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             contact: "(43) 99686-5040",
             delivery: "Sim / Com Taxa",
             instagram: "https://www.instagram.com/restaurantehimeclps/",
-            menuImages: [
-              "images/comercios/restaurante/hime/cardapio/1.jpg",
-              "images/comercios/restaurante/hime/cardapio/2.jpg",
-              "images/comercios/restaurante/hime/cardapio/3.jpg",
-              "images/comercios/restaurante/hime/cardapio/4.jpg",
-              "images/comercios/restaurante/hime/cardapio/5.jpg",
-              "images/comercios/restaurante/hime/cardapio/6.jpg",
-              "images/comercios/restaurante/hime/cardapio/7.jpg",
-              "images/comercios/restaurante/hime/cardapio/8.jpg",
-
-
-            ],
+           
 
 
             novidadesImages: [
