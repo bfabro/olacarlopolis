@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 256,
-  label: "v256",
+  numero: 257,
+  label: "v257",
   data: "2026-05-31",
-  nota: "Padroniza as flags Cards das telas publicas."
+  nota: "Corrige nome e navegacao de eventos no feed de novidades."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6967,7 +6967,7 @@ function bindEvents() {
       acao,
       descricao: acao,
       tituloConteudo: tituloConteudoNovidadeAdmin("evento", payload),
-      estabelecimento: payload.clienteNome || payload.local || "Evento",
+      estabelecimento: payload.titulo || payload.nome || "Evento",
       imagem: payload.imagem,
       categoria: "Eventos",
       destinoTipo: "evento",

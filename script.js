@@ -2541,6 +2541,12 @@ document.addEventListener("DOMContentLoaded", function () {
     return item?.acao || item?.raw?.acao || item?.titulo || item?.descricao || "Nova atualização disponível";
   }
 
+  function novidadeNomePrincipal(item) {
+    const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
+    if (tipo.includes("evento")) return novidadeTituloDestino(item) || item?.estabelecimento || "Evento";
+    return item?.estabelecimento || "Olá Carlópolis";
+  }
+
   function novidadeTipoClasse(tipo) {
     const key = normalizeName(tipo || "");
     if (key.includes("imovel")) return "tipo-imovel";
@@ -2761,7 +2767,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         if (tipo.includes("veiculo") || tipo.includes("automovel")) return liveAutomoveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("imovel")) return liveImoveis.has(String(item.destinoId || item.raw?.itemId || ""));
-        if (tipo.includes("evento")) return liveEventos.has(String(item.destinoId || item.raw?.itemId || "")) || liveEventos.has(normalizeName(item.descricao || item.estabelecimento || item.titulo || ""));
+        if (tipo.includes("evento")) return liveEventos.has(String(item.destinoId || item.raw?.itemId || "")) || liveEventos.has(normalizeName(item.tituloConteudo || item.raw?.tituloConteudo || item.descricao || item.estabelecimento || item.titulo || ""));
         if (tipo.includes("vaga")) {
           const itemId = String(item.raw?.itemId || item.destinoId || "");
           if (itemId && liveVagas.has(itemId)) return true;
@@ -2808,10 +2814,10 @@ document.addEventListener("DOMContentLoaded", function () {
       return `
         <article class="novidade-feed-card ${tipoClass}" data-novidade-id="${escapePromoHtml(item.id)}">
           <div class="novidade-feed-img">
-            ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(item.estabelecimento || item.titulo)}" loading="lazy" decoding="async">` : `<i class="fa-regular fa-bell"></i>`}
+            ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(novidadeNomePrincipal(item) || item.titulo)}" loading="lazy" decoding="async">` : `<i class="fa-regular fa-bell"></i>`}
           </div>
           <div class="novidade-feed-info">
-            <strong>${escapePromoHtml(item.estabelecimento || "Olá Carlópolis")}</strong>
+            <strong>${escapePromoHtml(novidadeNomePrincipal(item))}</strong>
             <p>${escapePromoHtml(novidadeTextoAcao(item))}</p>
             <span>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</span>
           </div>
@@ -2849,7 +2855,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.innerHTML = `
       <div class="novidade-preview-modal ${tipoClass}" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.titulo)}">
         <button type="button" class="novidade-preview-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
-        <h3>${escapePromoHtml(item.estabelecimento || "Olá Carlópolis")}</h3>
+        <h3>${escapePromoHtml(novidadeNomePrincipal(item))}</h3>
         <p>${escapePromoHtml(item.titulo || "Novidade")}</p>
         ${imagens.length ? `
           <div class="novidade-preview-gallery">
@@ -2923,7 +2929,14 @@ document.addEventListener("DOMContentLoaded", function () {
       location.hash = "#informacoes";
       return carregarEstabelecimentoPeloHash();
     }
-    if (tipo.includes("evento") || tipo.includes("estabelecimento")) {
+    if (tipo.includes("evento")) {
+      const id = normalizeName(item.tituloConteudo || item.raw?.tituloConteudo || item.estabelecimento || item.destinoId || "");
+      if (id) {
+        location.hash = `#${id}`;
+        return carregarEstabelecimentoPeloHash();
+      }
+    }
+    if (tipo.includes("estabelecimento")) {
       const id = normalizeName(item.destinoId || item.descricao || item.estabelecimento || "");
       if (id) {
         location.hash = `#${id}`;
