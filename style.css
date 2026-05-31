@@ -18312,9 +18312,10 @@ body.vaga-modal-open {
   font-size: 15px;
   font-weight: 900;
   line-height: 1.15;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .novidade-feed-info p {
@@ -18427,6 +18428,9 @@ body.vaga-modal-open {
   color: #0b1736;
   font-size: 22px;
   font-weight: 900;
+  line-height: 1.12;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .novidade-preview-modal p {

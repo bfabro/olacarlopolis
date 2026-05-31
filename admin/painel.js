@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 257,
-  label: "v257",
+  numero: 258,
+  label: "v258",
   data: "2026-05-31",
-  nota: "Corrige nome e navegacao de eventos no feed de novidades."
+  nota: "Evita corte de nomes no feed publico de novidades."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
