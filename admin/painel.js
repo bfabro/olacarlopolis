@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 253,
-  label: "v253",
+  numero: 254,
+  label: "v254",
   data: "2026-05-31",
-  nota: "Ajusta login, logo no painel e encerramento automatico por inatividade."
+  nota: "Padroniza a flag Cards dos imoveis com a tela de automoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

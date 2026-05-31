@@ -6949,10 +6949,10 @@ ${(cardapioVisivel(est) || est.contact) ? `
       <span>Filtro</span>
       <i class="fa-solid fa-chevron-down"></i>
     </button>
-    <label class="im-cards-switch ${window.__imoveisModoCards ? "is-active" : ""}" title="Mostrar imoveis em cards menores" aria-pressed="${window.__imoveisModoCards ? "true" : "false"}">
+    <label class="switch im-cards-switch ${window.__imoveisModoCards ? "is-active" : ""}" title="Mostrar imoveis em cards menores" aria-pressed="${window.__imoveisModoCards ? "true" : "false"}">
       <input type="checkbox" id="imModoCards" ${window.__imoveisModoCards ? "checked" : ""}>
-      <span class="promo-compact-track"><span></span></span>
-      <strong>Cards</strong>
+      <span class="track"><span class="thumb"></span></span>
+      <span>Cards</span>
     </label>
   </section>
   <!-- Painel de filtros -->

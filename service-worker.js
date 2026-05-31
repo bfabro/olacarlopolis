@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-05-31-admin-login-idle-v253'; // <-- TROQUE quando publicar atualização
+const CACHE_VERSION = '2026-05-31-imoveis-cards-switch-v254'; // <-- TROQUE quando publicar atualização
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
