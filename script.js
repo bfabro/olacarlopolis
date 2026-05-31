@@ -6949,7 +6949,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
       <span>Filtro</span>
       <i class="fa-solid fa-chevron-down"></i>
     </button>
-    <label class="im-cards-switch" title="Mostrar imoveis em cards menores">
+    <label class="im-cards-switch ${window.__imoveisModoCards ? "is-active" : ""}" title="Mostrar imoveis em cards menores" aria-pressed="${window.__imoveisModoCards ? "true" : "false"}">
       <input type="checkbox" id="imModoCards" ${window.__imoveisModoCards ? "checked" : ""}>
       <span class="promo-compact-track"><span></span></span>
       <strong>Cards</strong>
@@ -7081,9 +7081,12 @@ ${(cardapioVisivel(est) || est.contact) ? `
     const toggleFiltrosImoveis = document.getElementById("imToggleFiltros");
     const filtrosImoveisBox = document.getElementById("filtrosImoveis");
     const aplicarModoCardsImoveis = () => {
-      const ativo = Boolean(document.getElementById("imModoCards")?.checked);
+      const inputCards = document.getElementById("imModoCards");
+      const ativo = Boolean(inputCards?.checked);
       window.__imoveisModoCards = ativo;
       imoveisWrap?.classList.toggle("im-cards-mode", ativo);
+      inputCards?.closest(".im-cards-switch")?.classList.toggle("is-active", ativo);
+      inputCards?.closest(".im-cards-switch")?.setAttribute("aria-pressed", ativo ? "true" : "false");
     };
     toggleFiltrosImoveis?.addEventListener("click", () => {
       const aberto = filtrosImoveisBox?.classList.toggle("im-filter-collapsed") === false;
