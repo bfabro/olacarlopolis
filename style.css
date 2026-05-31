@@ -18263,14 +18263,17 @@ body.vaga-modal-open {
 
 .novidade-feed-card {
   display: grid;
-  grid-template-columns: 84px minmax(0, 1fr) auto;
+  grid-template-columns: 72px minmax(0, 1fr);
   align-items: center;
-  gap: 12px;
-  padding: 10px;
+  gap: 10px;
+  position: relative;
+  min-height: 92px;
+  padding: 8px 12px 8px 12px;
   border: 1px solid #dfe7f3;
-  border-radius: 18px;
+  border-left: 6px solid var(--novidade-color, var(--blue-color, #0f5eea));
+  border-radius: 16px;
   background: #fff;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
   cursor: pointer;
   transition: transform .16s ease, box-shadow .16s ease;
 }
@@ -18281,9 +18284,9 @@ body.vaga-modal-open {
 }
 
 .novidade-feed-img {
-  width: 84px;
-  height: 84px;
-  border-radius: 15px;
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
   overflow: hidden;
   display: grid;
   place-items: center;
@@ -18315,9 +18318,9 @@ body.vaga-modal-open {
 }
 
 .novidade-feed-info p {
-  margin: 3px 0 0;
-  color: #1f2d48;
-  font-size: 14px;
+  margin: 8px 0 0;
+  color: #1d4ed8;
+  font-size: 13px;
   line-height: 1.25;
   font-weight: 700;
 }
@@ -18325,13 +18328,12 @@ body.vaga-modal-open {
 .novidade-feed-info small,
 .novidade-feed-info span {
   display: block;
-  margin-top: 3px;
+  margin-top: 2px;
   color: #64748b;
   font-size: 12px;
   line-height: 1.2;
 }
 
-.novidade-feed-card > button,
 .novidade-preview-open {
   border: 0;
   border-radius: 999px;
@@ -18341,20 +18343,6 @@ body.vaga-modal-open {
   padding: 10px 14px;
   white-space: nowrap;
   cursor: pointer;
-}
-
-.novidade-feed-card > button {
-  background: color-mix(in srgb, var(--novidade-color, #0f5eea) 10%, #ffffff);
-  color: var(--novidade-color, #0f5eea);
-  border: 1px solid color-mix(in srgb, var(--novidade-color, #0f5eea) 24%, #ffffff);
-  box-shadow: none;
-  font-size: 12px;
-  padding: 7px 10px;
-  font-weight: 800;
-}
-
-.novidade-feed-card > button:hover {
-  background: color-mix(in srgb, var(--novidade-color, #0f5eea) 16%, #ffffff);
 }
 
 .novidade-feed-card.tipo-imovel,
@@ -18536,8 +18524,8 @@ body.vaga-modal-open {
 
   .novidade-feed-card {
     grid-template-columns: 72px minmax(0, 1fr);
-    gap: 10px;
-    border-radius: 16px;
+    gap: 9px;
+    padding: 8px 10px;
   }
 
   .novidade-feed-img {
@@ -18545,10 +18533,4 @@ body.vaga-modal-open {
     height: 72px;
   }
 
-  .novidade-feed-card > button {
-    grid-column: 1 / -1;
-    justify-self: start;
-    width: auto;
-    min-height: 34px;
-  }
 }

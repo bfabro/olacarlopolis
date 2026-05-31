@@ -2813,10 +2813,8 @@ document.addEventListener("DOMContentLoaded", function () {
           <div class="novidade-feed-info">
             <strong>${escapePromoHtml(item.estabelecimento || "Olá Carlópolis")}</strong>
             <p>${escapePromoHtml(novidadeTextoAcao(item))}</p>
-            ${destino ? `<small>${escapePromoHtml(destino)}</small>` : ""}
             <span>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</span>
           </div>
-          <button type="button" class="${tipoClass}">${escapePromoHtml(novidadeActionLabel(item.destinoTipo))}</button>
         </article>
       `;
     }).join("");
