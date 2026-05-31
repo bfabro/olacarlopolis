@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 258,
-  label: "v258",
+  numero: 259,
+  label: "v259",
   data: "2026-05-31",
-  nota: "Evita corte de nomes no feed publico de novidades."
+  nota: "Mantem somente a novidade mais recente por item."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1815,6 +1815,7 @@ async function registrarNovidadeAdmin(payload = {}) {
   try {
     const tipo = payload.tipo || payload.destinoTipo || "estabelecimento";
     const destinoId = payload.destinoId || payload.itemId || payload.estabelecimentoId || payload.clienteId || "";
+    await removerNovidadesPorDestino(tipo, destinoId, payload.itemId || payload.destinoCardId || "");
     const id = `${slugify(tipo)}-${slugify(destinoId || payload.estabelecimento || payload.titulo || "item")}-${Date.now()}`;
     await update(ref(db, `novidades/${id}`), {
       tipo,
@@ -1856,6 +1857,8 @@ async function removerNovidadesPorDestino(tipo, destinoId, itemId = "") {
       const mesmoItem = item && (
         String(novidade.itemId || "") === item ||
         String(novidade.destinoCardId || "").includes(item) ||
+        String(item).includes(String(novidade.itemId || "")) ||
+        String(item).includes(String(novidade.destinoCardId || "")) ||
         String(novidade.id || "").includes(item)
       );
       if (mesmoTipo && (mesmoItem || (!item && mesmoDestino))) updates[`novidades/${child.key}`] = null;

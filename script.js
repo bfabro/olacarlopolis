@@ -2604,6 +2604,16 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
+  function chaveAgrupamentoNovidade(item = {}) {
+    const tipo = normalizeName(item.destinoTipo || item.tipo || "estabelecimento");
+    const destino = normalizeName(item.destinoId || item.estabelecimento || item.raw?.destinoId || "");
+    const itemId = normalizeName(item.raw?.itemId || item.raw?.promoOriginalId || item.itemId || "");
+    if (itemId) return `${tipo}|${destino}|${itemId}`;
+    if (item.destinoCardId) return `${tipo}|${destino}|${normalizeName(item.destinoCardId)}`;
+    const titulo = normalizeName(item.tituloConteudo || item.raw?.tituloConteudo || item.descricao || item.titulo || "");
+    return `${tipo}|${destino}|${titulo || normalizeName(item.id || "")}`;
+  }
+
   async function carregarNovidadesCidade() {
     if (novidadesCidadePromise) return novidadesCidadePromise;
     novidadesCidadePromise = (async () => {
@@ -2782,8 +2792,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!data) return;
         if (agora - data > limiteMs) return;
         if (!novidadeDestinoExiste(item)) return;
-        const key = item.id || `${item.destinoTipo}-${item.destinoId}-${item.titulo}`;
-        if (!mapa.has(key)) mapa.set(key, { ...item, dataMs: data });
+        const key = chaveAgrupamentoNovidade(item);
+        const atual = mapa.get(key);
+        if (!atual || data > (atual.dataMs || 0)) mapa.set(key, { ...item, dataMs: data });
       });
 
       novidadesCidadeCache = [...mapa.values()].sort((a, b) => (b.dataMs || 0) - (a.dataMs || 0));
