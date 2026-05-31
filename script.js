@@ -2490,15 +2490,23 @@ document.addEventListener("DOMContentLoaded", function () {
     return `há ${dias} dia${dias === 1 ? "" : "s"}`;
   }
 
-  function novidadeActionLabel(tipo) {
+  function novidadeDestinoNome(tipo) {
     const key = normalizeName(tipo || "");
-    if (key.includes("promoc")) return "Abrir promoção";
-    if (key.includes("imovel")) return "Abrir imóvel";
-    if (key.includes("veiculo") || key.includes("automovel")) return "Abrir veículo";
-    if (key.includes("evento")) return "Abrir evento";
-    if (key.includes("vaga")) return "Abrir vaga";
-    if (key.includes("grupo") || key.includes("whatsapp")) return "Abrir grupo";
-    return "Abrir estabelecimento";
+    if (key.includes("promoc")) return "promoção";
+    if (key.includes("imovel")) return "imóvel";
+    if (key.includes("veiculo") || key.includes("automovel")) return "veículo";
+    if (key.includes("evento")) return "evento";
+    if (key.includes("vaga")) return "vaga";
+    if (key.includes("grupo") || key.includes("whatsapp")) return "grupo";
+    return "estabelecimento";
+  }
+
+  function novidadeActionLabel(tipo) {
+    return `Ver ${novidadeDestinoNome(tipo)}`;
+  }
+
+  function novidadeModalActionLabel(tipo) {
+    return `Ir para ${novidadeDestinoNome(tipo)}`;
   }
 
   function novidadeImagem(item) {
@@ -2859,7 +2867,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ` : ""}
         ${destino ? `<h4>${escapePromoHtml(destino)}</h4>` : ""}
         ${valor}
-        <button type="button" class="novidade-preview-open ${tipoClass}">${escapePromoHtml(novidadeActionLabel(item.destinoTipo))}</button>
+        <button type="button" class="novidade-preview-open ${tipoClass}">${escapePromoHtml(novidadeModalActionLabel(item.destinoTipo || item.tipo))}</button>
       </div>
     `;
     document.body.appendChild(overlay);

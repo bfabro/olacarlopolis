@@ -18304,6 +18304,20 @@ body.vaga-modal-open {
   cursor: pointer;
 }
 
+.novidade-feed-card > button {
+  background: color-mix(in srgb, var(--novidade-color, #0f5eea) 10%, #ffffff);
+  color: var(--novidade-color, #0f5eea);
+  border: 1px solid color-mix(in srgb, var(--novidade-color, #0f5eea) 24%, #ffffff);
+  box-shadow: none;
+  font-size: 12px;
+  padding: 7px 10px;
+  font-weight: 800;
+}
+
+.novidade-feed-card > button:hover {
+  background: color-mix(in srgb, var(--novidade-color, #0f5eea) 16%, #ffffff);
+}
+
 .novidade-feed-card.tipo-imovel,
 .novidade-preview-modal.tipo-imovel {
   --novidade-color: #2563eb;
@@ -18494,7 +18508,8 @@ body.vaga-modal-open {
 
   .novidade-feed-card > button {
     grid-column: 1 / -1;
-    width: 100%;
-    min-height: 40px;
+    justify-self: start;
+    width: auto;
+    min-height: 34px;
   }
 }
