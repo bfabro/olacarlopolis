@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=244">
+  <link rel="stylesheet" href="painel.css?v=253">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -14,7 +14,6 @@
       <img src="../images/img_padrao_site/logo_1.png" alt="Ola Carlopolis" class="login-logo">
       <h1>Acesso administrativo</h1>
       <p>Entre para gerenciar clientes, dados comerciais e financeiro.</p>
-      <span id="loginVersion" class="version-pill">Versao -</span>
       <form id="loginForm">
         <label>
           E-mail
@@ -26,6 +25,7 @@
         </label>
         <button id="loginButton" type="submit">Entrar</button>
         <button id="resetPasswordButton" class="forgot-password-button" type="button"><i class="fa-solid fa-key"></i> Esqueci minha senha</button>
+        <span id="loginVersion" class="version-pill login-version-pill">Versao -</span>
         <div id="loginMessage" class="form-message"></div>
       </form>
     </section>
@@ -74,6 +74,9 @@
           <button id="adminMenuToggle" class="admin-menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">
             <i class="fa-solid fa-bars"></i>
           </button>
+          <a class="topbar-site-logo" href="../index.html" title="Voltar ao site">
+            <img src="../images/img_padrao_site/logo_1.png" alt="Ola Carlopolis">
+          </a>
           <div>
             <h1 id="viewTitle">Visao geral</h1>
             <p id="viewSubtitle">Resumo do ambiente administrativo.</p>
@@ -1007,6 +1010,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=252"></script>
+  <script type="module" src="painel.js?v=253"></script>
 </body>
 </html>

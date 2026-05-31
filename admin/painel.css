@@ -70,7 +70,7 @@ button {
   height: 74px;
   object-fit: contain;
   display: block;
-  margin-bottom: 14px;
+  margin: 0 auto 14px;
 }
 
 .login-card h1 {
@@ -96,6 +96,11 @@ button {
   font-size: 12px;
   font-weight: 800;
   margin-bottom: 16px;
+}
+
+.login-version-pill {
+  justify-self: center;
+  margin: -6px 0 8px;
 }
 
 .sidebar-version {
@@ -356,6 +361,26 @@ button[type="submit"]:hover,
   align-items: center;
   gap: 12px;
   min-width: 0;
+}
+
+.topbar-site-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
+  flex: 0 0 auto;
+}
+
+.topbar-site-logo img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
 }
 
 .topbar-admin h1 {
@@ -2122,7 +2147,18 @@ button[type="submit"]:hover,
   }
 
   .topbar-title-row {
-    align-items: flex-start;
+    align-items: center;
+  }
+
+  .topbar-site-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .topbar-site-logo img {
+    width: 36px;
+    height: 36px;
   }
 
   .topbar-admin h1 {

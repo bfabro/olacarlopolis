@@ -37,15 +37,17 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 252,
-  label: "v252",
+  numero: 253,
+  label: "v253",
   data: "2026-05-31",
-  nota: "Ajusta estado do Cards em imoveis e nome da loja nos cards de automoveis."
+  nota: "Ajusta login, logo no painel e encerramento automatico por inatividade."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
+const ADMIN_IDLE_TIMEOUT_MS = 10 * 60 * 1000;
+let adminIdleTimer = null;
 
 let state = {
   user: null,
@@ -6548,6 +6550,32 @@ function closeAdminMenuOnMobile() {
   if (window.matchMedia("(max-width: 980px)").matches) setAdminMenuOpen(false);
 }
 
+function stopAdminIdleTimer() {
+  if (adminIdleTimer) clearTimeout(adminIdleTimer);
+  adminIdleTimer = null;
+}
+
+function resetAdminIdleTimer() {
+  stopAdminIdleTimer();
+  if (!auth.currentUser) return;
+  adminIdleTimer = setTimeout(async () => {
+    stopAdminIdleTimer();
+    try {
+      await signOut(auth);
+      if ($("loginMessage")) $("loginMessage").textContent = "Sessao encerrada por inatividade. Entre novamente.";
+    } catch (error) {
+      console.warn("Nao foi possivel encerrar a sessao por inatividade.", error);
+    }
+  }, ADMIN_IDLE_TIMEOUT_MS);
+}
+
+function bindAdminIdleTimer() {
+  const events = ["click", "keydown", "input", "mousemove", "touchstart", "scroll"];
+  events.forEach((eventName) => {
+    document.addEventListener(eventName, resetAdminIdleTimer, { passive: true });
+  });
+}
+
 function bindEvents() {
   bindCurrencyMask($("imovelValor"));
   bindCurrencyMask($("automovelPreco"));
@@ -7159,10 +7187,12 @@ function bindEvents() {
 
 renderPanelVersion();
 bindEvents();
+bindAdminIdleTimer();
 
 onAuthStateChanged(auth, async (user) => {
   state.user = user;
   if (!user) {
+    stopAdminIdleTimer();
     state.profile = null;
     $("loginView").classList.remove("hidden");
     $("appView").classList.add("hidden");
@@ -7177,6 +7207,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   state.profile = profile;
+  resetAdminIdleTimer();
   const initialView = initialViewForProfile();
   prepareInitialView(initialView);
   $("loginView").classList.add("hidden");
