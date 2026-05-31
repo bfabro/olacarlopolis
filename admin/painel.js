@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 249,
-  label: "v249",
-  data: "2026-05-29",
-  nota: "Corrige botao Cards da tela publica de vagas de trabalho."
+  numero: 250,
+  label: "v250",
+  data: "2026-05-31",
+  nota: "Detalha acoes no feed de novidades e corrige datas sem timestamp."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1767,6 +1767,48 @@ function imagemPrincipalNovidade(payload = {}) {
   return payload.imagem || payload.image || payload.logo || payload.imagens?.[0] || payload.menuImages?.[0] || "";
 }
 
+function tituloConteudoNovidadeAdmin(tipo, payload = {}) {
+  const key = normalizeName(tipo || "");
+  if (key.includes("veiculo") || key.includes("automovel")) return [payload.marca, payload.modelo, payload.ano].filter(Boolean).join(" ") || "Veiculo";
+  if (key.includes("imovel")) return payload.titulo || payload.endereco || "Imovel";
+  if (key.includes("promoc")) return payload.titulo || "Promocao";
+  if (key.includes("evento")) return payload.titulo || payload.nome || "Evento";
+  if (key.includes("vaga")) return payload.titulo || payload.vagaTitulo || payload.vagaCargo || "Vaga de trabalho";
+  if (key.includes("grupo")) return payload.nome || payload.titulo || "Grupo WhatsApp";
+  return payload.nome || payload.titulo || "";
+}
+
+function acaoNovidadeAdmin(tipo, isNew, payload = {}, original = {}) {
+  const key = normalizeName(tipo || "");
+  if (key.includes("veiculo") || key.includes("automovel")) {
+    if (isNew) return "Veiculo inserido";
+    const antes = numberFromMoney(original.preco || original.valor || "");
+    const agora = numberFromMoney(payload.preco || payload.valor || "");
+    if (antes > 0 && agora > 0 && agora < antes) return "Preco abaixou";
+    if (antes > 0 && agora > 0 && agora !== antes) return "Preco atualizado";
+    return "Veiculo atualizado";
+  }
+  if (key.includes("imovel")) {
+    if (isNew) return "Imovel inserido";
+    const antes = numberFromMoney(original.valor || original.preco || "");
+    const agora = numberFromMoney(payload.valor || payload.preco || "");
+    if (antes > 0 && agora > 0 && agora < antes) return "Preco abaixou";
+    if (antes > 0 && agora > 0 && agora !== antes) return "Preco atualizado";
+    return "Imovel atualizado";
+  }
+  if (key.includes("promoc")) {
+    if (isNew) return "Promocao inserida";
+    const antes = numberFromMoney(original.preco || "");
+    const agora = numberFromMoney(payload.preco || "");
+    if (antes > 0 && agora > 0 && agora < antes) return "Preco da promocao abaixou";
+    return "Promocao atualizada";
+  }
+  if (key.includes("vaga")) return isNew ? "Vaga de trabalho inserida" : "Vaga de trabalho atualizada";
+  if (key.includes("evento")) return isNew ? "Evento inserido" : "Evento atualizado";
+  if (key.includes("grupo")) return isNew ? "Grupo WhatsApp inserido" : "Grupo WhatsApp atualizado";
+  return isNew ? "Cadastro novo" : "Cadastro atualizado";
+}
+
 async function registrarNovidadeAdmin(payload = {}) {
   try {
     const tipo = payload.tipo || payload.destinoTipo || "estabelecimento";
@@ -1775,6 +1817,8 @@ async function registrarNovidadeAdmin(payload = {}) {
     await update(ref(db, `novidades/${id}`), {
       tipo,
       titulo: payload.titulo || "Novidade adicionada",
+      acao: payload.acao || payload.titulo || "Novidade adicionada",
+      tituloConteudo: payload.tituloConteudo || payload.destinoTitulo || payload.nomeItem || "",
       descricao: payload.descricao || payload.titulo || "",
       estabelecimento: payload.estabelecimento || payload.clienteNome || "",
       imagem: payload.imagem || "",
@@ -2207,10 +2251,13 @@ async function addClientPromocao() {
   renderClientPromocoesPreview();
   const saved = await persistClientPromocoesIfEditing(editingIndex >= 0 ? "Promocao atualizada e salva." : "Promocao adicionada e salva.");
   if (saved) {
+    const acao = acaoNovidadeAdmin("promocao", editingIndex < 0, payload, current || {});
     await registrarNovidadeAdmin({
       tipo: "promocao",
-      titulo: editingIndex >= 0 ? "Promoção atualizada" : "Nova promoção adicionada",
-      descricao: payload.titulo || "Promoção disponível",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("promocao", payload),
       estabelecimento: $("clientName")?.value.trim() || currentId,
       imagem: payload.imagem,
       valor: payload.preco || payload.desconto || payload.valorTexto || "",
@@ -4972,10 +5019,13 @@ function renderStaffPromocoesView() {
       updatedAt: serverTimestamp(),
       updatedBy: state.user?.uid || ""
     });
+    const acao = acaoNovidadeAdmin("promocao", editIndex < 0, payload, current || {});
     await registrarNovidadeAdmin({
       tipo: "promocao",
-      titulo: editIndex >= 0 ? "Promoção atualizada" : "Nova promoção adicionada",
-      descricao: payload.titulo || "Promoção disponível",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("promocao", payload),
       estabelecimento: client.nome || selectedId,
       imagem: payload.imagem,
       valor: payload.preco || payload.desconto || payload.valorTexto || "",
@@ -5468,6 +5518,19 @@ function renderClientOnlyEditor() {
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     });
+    await registrarNovidadeAdmin({
+      tipo: "estabelecimento",
+      titulo: "Novas fotos adicionadas",
+      acao: "Novas fotos adicionadas",
+      descricao: "Novas fotos adicionadas",
+      tituloConteudo: client.nome || client.id,
+      estabelecimento: client.nome || client.id,
+      imagem: urls[0] || imagemPrincipalNovidade(client),
+      imagens: urls,
+      categoria: client.categoria || "",
+      destinoTipo: "estabelecimento",
+      destinoId: client.nomeNormalizado || normalizeName(client.nome || client.id)
+    });
     showToast("Imagens enviadas.");
     await loadAllData();
     renderClientOnlyEditor();
@@ -5512,6 +5575,19 @@ function renderClientOnlyEditor() {
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     });
+    await registrarNovidadeAdmin({
+      tipo: "estabelecimento",
+      titulo: "Novas fotos adicionadas",
+      acao: "Novas fotos adicionadas",
+      descricao: "Novas fotos adicionadas",
+      tituloConteudo: client.nome || client.id,
+      estabelecimento: client.nome || client.id,
+      imagem: url,
+      imagens: [url],
+      categoria: client.categoria || "",
+      destinoTipo: "estabelecimento",
+      destinoId: client.nomeNormalizado || normalizeName(client.nome || client.id)
+    });
     showToast("Imagem com texto adicionada.");
     await loadAllData();
     renderClientOnlyEditor();
@@ -5544,10 +5620,13 @@ function renderClientOnlyEditor() {
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     });
+    const acao = acaoNovidadeAdmin("promocao", coPromoEditIndex < 0, payload, current || {});
     await registrarNovidadeAdmin({
       tipo: "promocao",
-      titulo: coPromoEditIndex >= 0 ? "Promoção atualizada" : "Nova promoção adicionada",
-      descricao: payload.titulo || "Promoção disponível",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("promocao", payload),
       estabelecimento: client.nome || client.id,
       imagem: payload.imagem,
       valor: payload.preco || payload.desconto || payload.valorTexto || "",
@@ -5596,6 +5675,20 @@ function renderClientOnlyEditor() {
       editadoNoPainel: true,
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
+    });
+    const acao = acaoNovidadeAdmin("vaga", coJobEditIndex < 0, payload, current || {});
+    await registrarNovidadeAdmin({
+      tipo: "vaga",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("vaga", payload),
+      estabelecimento: client.nome || client.id,
+      imagem: imagemPrincipalNovidade(client),
+      categoria: client.categoria || "Vagas de trabalho",
+      destinoTipo: "vaga",
+      destinoId: client.nomeNormalizado || normalizeName(client.nome || client.id),
+      itemId: payload.id
     });
     showToast(coJobEditIndex >= 0 ? "Vaga atualizada." : "Vaga adicionada.");
     clearJobFields("co", mount);
@@ -5715,6 +5808,7 @@ function renderClientOnlyEditor() {
   mount.querySelectorAll("[data-job-remove]").forEach((button) => {
     button.addEventListener("click", async () => {
       const index = Number(button.dataset.jobRemove);
+      const vagaRemovida = vagasTrabalho[index];
       vagasTrabalho.splice(index, 1);
       const normalizedJobs = normalizeVagasTrabalho(vagasTrabalho);
       const mainJob = normalizedJobs.find((item) => item.ativo !== false) || normalizedJobs[0] || {};
@@ -5738,6 +5832,7 @@ function renderClientOnlyEditor() {
         updatedAt: serverTimestamp(),
         updatedBy: state.user.uid
       });
+      await removerNovidadesPorDestino("vaga", client.nomeNormalizado || normalizeName(client.nome || client.id), vagaRemovida?.id || "");
       showToast("Vaga removida.");
       await loadAllData();
       renderClientOnlyEditor();
@@ -6739,10 +6834,13 @@ function bindEvents() {
     }
     await update(ref(db), updates);
     if (isNewClient || newImagesCount > oldImagesCount) {
+      const acao = isNewClient ? "Cadastro novo" : "Novas fotos adicionadas";
       await registrarNovidadeAdmin({
       tipo: "estabelecimento",
-      titulo: isNewClient ? "Novo estabelecimento cadastrado" : "Novas fotos adicionadas",
-      descricao: isNewClient ? "Novo estabelecimento disponível no Olá Carlópolis." : "Confira os novos trabalhos realizados.",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: payload.nome,
       estabelecimento: payload.nome,
       imagem: imagemPrincipalNovidade(payload),
       imagens: normalizeImageItems(payload.imagens).map((item) => item.url || item).filter(Boolean),
@@ -6834,10 +6932,13 @@ function bindEvents() {
     const isNewEvent = !state.selectedEventId;
     if (isNewEvent) payload.createdAt = serverTimestamp();
     await update(ref(db, `eventos/${id}`), payload);
+    const acao = acaoNovidadeAdmin("evento", isNewEvent, payload);
     await registrarNovidadeAdmin({
       tipo: "evento",
-      titulo: isNewEvent ? "Novo evento cadastrado" : "Evento atualizado",
-      descricao: payload.titulo || "Evento disponível",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("evento", payload),
       estabelecimento: payload.clienteNome || payload.local || "Evento",
       imagem: payload.imagem,
       categoria: "Eventos",
@@ -6882,6 +6983,7 @@ function bindEvents() {
     const id = payload.id;
     delete payload.id;
     const isNewImovel = !state.selectedImovelId;
+    const originalImovelNovidade = isNewImovel ? {} : (state.imoveis.find((item) => item.id === state.selectedImovelId) || {});
     if (isNewImovel) {
       payload.createdAt = serverTimestamp();
       payload.codRef = await gerarCodigoReferenciaIncremental("imovel");
@@ -6894,10 +6996,13 @@ function bindEvents() {
       updates[`conteudosInformativos/imoveis/${state.selectedImovelId}`] = null;
     }
     await update(ref(db), updates);
+    const acao = acaoNovidadeAdmin("imovel", isNewImovel, payload, originalImovelNovidade);
     await registrarNovidadeAdmin({
       tipo: "imovel",
-      titulo: isNewImovel ? "Novo imóvel cadastrado" : "Imóvel atualizado",
-      descricao: payload.titulo || payload.endereco || "Imóvel disponível",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("imovel", payload),
       estabelecimento: payload.clienteNome || payload.corretor || "",
       imagem: imagemPrincipalNovidade(payload),
       imagens: payload.imagens || [],
@@ -6933,6 +7038,7 @@ function bindEvents() {
     const id = payload.id;
     delete payload.id;
     const isNewAutomovel = !state.selectedAutomovelId;
+    const originalAutomovelNovidade = isNewAutomovel ? {} : (state.automoveis.find((item) => item.id === state.selectedAutomovelId) || {});
     if (isNewAutomovel) {
       payload.createdAt = serverTimestamp();
       payload.codRef = await gerarCodigoReferenciaIncremental("automovel");
@@ -6945,10 +7051,13 @@ function bindEvents() {
       updates[`conteudosInformativos/automoveis/${state.selectedAutomovelId}`] = null;
     }
     await update(ref(db), updates);
+    const acao = acaoNovidadeAdmin("veiculo", isNewAutomovel, payload, originalAutomovelNovidade);
     await registrarNovidadeAdmin({
       tipo: "veiculo",
-      titulo: isNewAutomovel ? "Novo veículo cadastrado" : "Veículo atualizado",
-      descricao: [payload.marca, payload.modelo, payload.ano].filter(Boolean).join(" ") || "Veículo disponível",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("veiculo", payload),
       estabelecimento: payload.clienteNome || payload.vendedor || payload.loja || "",
       imagem: imagemPrincipalNovidade(payload),
       imagens: payload.imagens || [],
@@ -7010,12 +7119,27 @@ function bindEvents() {
     }
     const id = payload.id;
     delete payload.id;
-    if (!state.selectedWhatsappGroupId) payload.createdAt = serverTimestamp();
+    const isNewGroup = !state.selectedWhatsappGroupId;
+    if (isNewGroup) payload.createdAt = serverTimestamp();
     const updates = { [`conteudosInformativos/gruposWhatsapp/${id}`]: payload };
     if (state.selectedWhatsappGroupId && state.selectedWhatsappGroupId !== id) {
       updates[`conteudosInformativos/gruposWhatsapp/${state.selectedWhatsappGroupId}`] = null;
     }
     await update(ref(db), updates);
+    const acao = acaoNovidadeAdmin("grupoWhatsapp", isNewGroup, payload);
+    await registrarNovidadeAdmin({
+      tipo: "grupoWhatsapp",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("grupoWhatsapp", payload),
+      estabelecimento: "Olá Carlópolis",
+      imagem: imagemPrincipalNovidade(payload),
+      categoria: "Grupos WhatsApp",
+      destinoTipo: "grupoWhatsapp",
+      destinoId: id,
+      itemId: id
+    });
     showToast("Grupo WhatsApp salvo.");
     resetInfoWhatsappGroupForm();
     await loadAllData();
@@ -7026,6 +7150,7 @@ function bindEvents() {
     const grupo = state.gruposWhatsapp.find((item) => item.id === state.selectedWhatsappGroupId);
     if (!(await confirmarExclusao(grupo?.nome || grupo?.name || state.selectedWhatsappGroupId, "grupo WhatsApp"))) return;
     await remove(ref(db, `conteudosInformativos/gruposWhatsapp/${state.selectedWhatsappGroupId}`));
+    await removerNovidadesPorDestino("grupoWhatsapp", state.selectedWhatsappGroupId, state.selectedWhatsappGroupId);
     showToast("Grupo WhatsApp excluido.");
     resetInfoWhatsappGroupForm();
     await loadAllData();

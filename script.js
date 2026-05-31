@@ -2460,10 +2460,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function novidadeCidadeMs(value) {
     if (!value) return 0;
-    if (typeof value === "number") return value;
+    if (value instanceof Date) return value.getTime();
+    if (typeof value === "number") return value < 1000000000000 ? value * 1000 : value;
     if (typeof value === "object") {
+      if (typeof value.toMillis === "function") return value.toMillis();
       if (typeof value.seconds === "number") return value.seconds * 1000;
       if (typeof value._seconds === "number") return value._seconds * 1000;
+      if (typeof value.timestamp === "number") return novidadeCidadeMs(value.timestamp);
+      if (typeof value.value === "number") return novidadeCidadeMs(value.value);
     }
     const text = String(value).trim();
     if (!text) return 0;
@@ -2492,6 +2496,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (key.includes("imovel")) return "Abrir imóvel";
     if (key.includes("veiculo") || key.includes("automovel")) return "Abrir veículo";
     if (key.includes("evento")) return "Abrir evento";
+    if (key.includes("vaga")) return "Abrir vaga";
+    if (key.includes("grupo") || key.includes("whatsapp")) return "Abrir grupo";
     return "Abrir estabelecimento";
   }
 
@@ -2520,7 +2526,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function novidadeTituloDestino(item) {
-    return item?.destinoTitulo || item?.nomeItem || item?.subtitulo || item?.nome || item?.tituloConteudo || "";
+    return item?.destinoTitulo || item?.nomeItem || item?.subtitulo || item?.nome || item?.tituloConteudo || item?.raw?.tituloConteudo || "";
+  }
+
+  function novidadeTextoAcao(item) {
+    return item?.acao || item?.raw?.acao || item?.titulo || item?.descricao || "Nova atualização disponível";
   }
 
   function novidadeTipoClasse(tipo) {
@@ -2529,6 +2539,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (key.includes("veiculo") || key.includes("automovel")) return "tipo-veiculo";
     if (key.includes("promoc")) return "tipo-promocao";
     if (key.includes("evento")) return "tipo-evento";
+    if (key.includes("vaga")) return "tipo-veiculo";
+    if (key.includes("grupo") || key.includes("whatsapp")) return "tipo-foto";
     if (key.includes("foto")) return "tipo-foto";
     return "tipo-estabelecimento";
   }
@@ -2562,6 +2574,8 @@ document.addEventListener("DOMContentLoaded", function () {
       id: base.id || `novidade-${normalizeName(base.estabelecimento || base.titulo || "")}-${dataMs || Date.now()}`,
       tipo: base.tipo || base.destinoTipo || "estabelecimento",
       titulo: base.titulo || "Novidade adicionada",
+      acao: base.acao || base.tipoAtualizacao || "",
+      tituloConteudo: base.tituloConteudo || base.destinoTitulo || base.nomeItem || "",
       estabelecimento: base.estabelecimento || base.clienteNome || base.nomeCliente || "",
       descricao: base.descricao || base.titulo || "Novo conteúdo disponível",
       imagem: imagens[0] || "",
@@ -2609,6 +2623,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const liveAutomoveis = new Set();
       const liveImoveis = new Set();
       const liveEventos = new Set();
+      const liveVagas = new Set();
       const clienteEstaPublico = (...ids) => {
         for (const id of ids) {
           const key = normalizeName(id || "");
@@ -2628,12 +2643,15 @@ document.addEventListener("DOMContentLoaded", function () {
           if (promo.id) livePromoCards.add(String(promo.id));
         });
         promocoesAtuais.slice(0, 20).forEach((promo, idx) => {
-          const dataMs = novidadeCidadeMs(promo.criadoEm || promo.validadeInicio || promo.validadeFim) || (agora - idx * 7200000);
+          const dataMs = novidadeCidadeMs(promo.criadoEm || promo.createdAt || promo.updatedAt);
+          if (!dataMs) return;
           geradas.push(montarNovidadeRecord({
             id: `promo-${promo.id}-${promo.estabelecimentoId}`,
             tipo: "promocao",
             titulo: promo.criadoEm ? "Promoção atualizada" : "Promoção disponível",
-            descricao: promo.titulo || "Promoção disponível",
+            acao: promo.criadoEm ? "Promoção atualizada" : "Promoção inserida",
+            descricao: promo.criadoEm ? "Promoção atualizada" : "Promoção inserida",
+            tituloConteudo: promo.titulo || "Promoção disponível",
             estabelecimento: promo.estabelecimento,
             imagem: promo.imagem || promo.logo,
             imagens: [promo.imagem || promo.logo].filter(Boolean),
@@ -2659,6 +2677,14 @@ document.addEventListener("DOMContentLoaded", function () {
       } catch (e) { }
 
       try {
+        const vagasCat = (categories || []).find((cat) => normalizeName(cat.title || "") === "vagasdetrabalho");
+        (vagasCat?.establishments || []).forEach((vaga) => {
+          if (vaga.vagaId) liveVagas.add(String(vaga.vagaId));
+          liveVagas.add(`${normalizeName(vaga.name || vaga.nome || "")}|${normalizeName(vaga.vagaTitulo || vaga.vagaCargo || "")}`);
+        });
+      } catch (e) { }
+
+      try {
         const [autos, imoveis] = await Promise.all([carregarAutomoveisFirebase(), carregarImoveisFirebase()]);
         const autosPublicos = (autos || []).filter((auto) => clienteEstaPublico(auto.estabelecimentoId, auto.clienteId, auto.clienteNome, auto.vendedor, auto.loja));
         const imoveisPublicos = (imoveis || []).filter((imovel) => {
@@ -2669,30 +2695,38 @@ document.addEventListener("DOMContentLoaded", function () {
         autosPublicos.forEach((auto) => liveAutomoveis.add(String(auto.id || "")));
         imoveisPublicos.forEach((imovel) => liveImoveis.add(String(imovel.id || "")));
         autosPublicos.slice(0, 12).forEach((auto) => {
+          const dataMs = novidadeCidadeMs(auto.createdAt || auto.updatedAt);
+          if (!dataMs) return;
           geradas.push(montarNovidadeRecord({
             id: `auto-${auto.id}`,
             tipo: "veiculo",
             titulo: "Novo veículo cadastrado",
-            descricao: [auto.marca, auto.modelo, auto.ano].filter(Boolean).join(" ") || "Veículo disponível",
+            acao: "Veículo inserido",
+            descricao: "Veículo inserido",
+            tituloConteudo: [auto.marca, auto.modelo, auto.ano].filter(Boolean).join(" ") || "Veículo disponível",
             estabelecimento: auto.vendedor || auto.loja || auto.clienteNome || "",
             imagem: auto.imagem || auto.imagens?.[0] || "",
             imagens: auto.imagens || (auto.imagem ? [auto.imagem] : []),
-            dataCriacao: auto.createdAt || auto.updatedAt || agora - 10800000,
+            dataCriacao: dataMs,
             destinoTipo: "veiculo",
             destinoId: auto.id,
             valor: auto.preco || ""
           }));
         });
         imoveisPublicos.slice(0, 12).forEach((imovel) => {
+          const dataMs = novidadeCidadeMs(imovel.createdAt || imovel.updatedAt);
+          if (!dataMs) return;
           geradas.push(montarNovidadeRecord({
             id: `imovel-${imovel.id}`,
             tipo: "imovel",
             titulo: "Novo imóvel cadastrado",
-            descricao: imovel.titulo || imovel.endereco || "Imóvel disponível",
+            acao: "Imóvel inserido",
+            descricao: "Imóvel inserido",
+            tituloConteudo: imovel.titulo || imovel.endereco || "Imóvel disponível",
             estabelecimento: imovel.corretor || imovel.clienteNome || "",
             imagem: imovel.imagem || imovel.imagens?.[0] || "",
             imagens: imovel.imagens || (imovel.imagem ? [imovel.imagem] : []),
-            dataCriacao: imovel.createdAt || imovel.updatedAt || agora - 14400000,
+            dataCriacao: dataMs,
             destinoTipo: "imovel",
             destinoId: imovel.id,
             valor: imovel.valor || ""
@@ -2706,8 +2740,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (/(informacoesatualizadas|financeiro|pagamento|mensalidade|fatura|inadimplente|clienteativo|clienteinativo|ativado|desativado)/.test(textoNovidade)) return false;
         if (!clienteEstaPublico(item.destinoId, item.estabelecimento, item.raw?.clienteId, item.raw?.clienteNome)) return false;
         if (tipo.includes("estabelecimento")) {
-          const titulo = normalizeName(item.titulo || "");
-          return titulo.includes("novoestabelecimentocadastrado") || titulo.includes("novasfotosadicionadas");
+          const titulo = normalizeName(`${item.titulo || ""} ${item.acao || ""}`);
+          return titulo.includes("novoestabelecimentocadastrado") || titulo.includes("cadastronovo") || titulo.includes("novasfotosadicionadas");
         }
         if (tipo.includes("promoc")) {
           const cardId = item.destinoCardId || "";
@@ -2720,12 +2754,18 @@ document.addEventListener("DOMContentLoaded", function () {
         if (tipo.includes("veiculo") || tipo.includes("automovel")) return liveAutomoveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("imovel")) return liveImoveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("evento")) return liveEventos.has(String(item.destinoId || item.raw?.itemId || "")) || liveEventos.has(normalizeName(item.descricao || item.estabelecimento || item.titulo || ""));
+        if (tipo.includes("vaga")) {
+          const itemId = String(item.raw?.itemId || item.destinoId || "");
+          if (itemId && liveVagas.has(itemId)) return true;
+          return liveVagas.has(`${normalizeName(item.estabelecimento || "")}|${normalizeName(item.tituloConteudo || item.raw?.tituloConteudo || item.descricao || "")}`);
+        }
         return true;
       };
 
       const mapa = new Map();
       [...registros, ...geradas].forEach((item) => {
-        const data = item.dataMs || agora;
+        const data = item.dataMs;
+        if (!data) return;
         if (agora - data > limiteMs) return;
         if (!novidadeDestinoExiste(item)) return;
         const key = item.id || `${item.destinoTipo}-${item.destinoId}-${item.titulo}`;
@@ -2764,7 +2804,7 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
           <div class="novidade-feed-info">
             <strong>${escapePromoHtml(item.estabelecimento || "Olá Carlópolis")}</strong>
-            <p>${escapePromoHtml(item.descricao || item.titulo || "Nova atualização disponível")}</p>
+            <p>${escapePromoHtml(novidadeTextoAcao(item))}</p>
             ${destino ? `<small>${escapePromoHtml(destino)}</small>` : ""}
             <span>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</span>
           </div>
@@ -2868,6 +2908,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if (tipo.includes("veiculo") || tipo.includes("automovel")) {
       await Promise.resolve(mostrarAutomoveis());
       return destacarDestinoNovidade(`#${novidadeDomId("veiculo", item.destinoId)}`);
+    }
+    if (tipo.includes("vaga")) {
+      mostrarVagasTrabalhoPublicas();
+      return destacarDestinoNovidade(`#${normalizeName(item.estabelecimento || item.raw?.estabelecimento || item.destinoId)}`);
+    }
+    if (tipo.includes("grupo") || tipo.includes("whatsapp")) {
+      location.hash = "#informacoes";
+      return carregarEstabelecimentoPeloHash();
     }
     if (tipo.includes("evento") || tipo.includes("estabelecimento")) {
       const id = normalizeName(item.destinoId || item.descricao || item.estabelecimento || "");
