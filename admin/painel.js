@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 255,
-  label: "v255",
+  numero: 256,
+  label: "v256",
   data: "2026-05-31",
-  nota: "Ajusta o feed publico de novidades para cards compactos."
+  nota: "Padroniza as flags Cards das telas publicas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

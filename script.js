@@ -8940,8 +8940,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         <button type="button" data-promo-sort="termina" class="${ordemAtual === "termina" ? "active" : ""}"><i class="fa-regular fa-clock"></i> Termina hoje</button>
         <label class="promo-compact-switch" title="Mostrar promocoes em cards menores">
           <input type="checkbox" id="promoCompactToggle" ${window.__promoModoCompacto ? "checked" : ""}>
-          <span class="promo-compact-track"><span></span></span>
-          <strong>Cards</strong>
+          <span class="track"><span class="thumb"></span></span>
+          <span>Cards</span>
         </label>
         <button type="button" class="promo-clear-filters" id="promoClearFilters"><i class="fa-solid fa-rotate-left"></i> Limpar filtros</button>
       </section>
@@ -18940,29 +18940,28 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
         bindVagasPublicas();
       };
       const aplicarModoCardsVagas = () => {
-        const ativo = Boolean(window.__vagasModoCards);
+        const inputCards = document.getElementById("vagasModoCards");
+        const ativo = Boolean(inputCards?.checked);
+        window.__vagasModoCards = ativo;
         const page = contentArea.querySelector(".vagas-public-page");
-        const button = document.getElementById("vagasModoCards");
         page?.classList.toggle("vagas-cards-mode", ativo);
-        button?.classList.toggle("is-active", ativo);
-        button?.setAttribute("aria-pressed", ativo ? "true" : "false");
+        inputCards?.closest(".vagas-cards-switch")?.classList.toggle("is-active", ativo);
+        inputCards?.closest(".vagas-cards-switch")?.setAttribute("aria-pressed", ativo ? "true" : "false");
       };
       contentArea.innerHTML = `<section class="vagas-public-page">
         <h2 class="highlighted">${title}</h2>
         <div class="vagas-filter-card">
           <label class="vagas-search-label"><i class="fa-solid fa-magnifying-glass"></i><input id="vagasSearchInput" value="${escapePromoHtml(buscaInicial)}" placeholder="Pesquisar por vaga ou empresa"></label>
-          <button type="button" id="vagasModoCards" class="vagas-cards-switch ${window.__vagasModoCards ? "is-active" : ""}" aria-pressed="${window.__vagasModoCards ? "true" : "false"}" title="Mostrar vagas em cards menores">
-            <i class="fa-solid fa-table-cells-large"></i>
-            <strong>Cards</strong>
-          </button>
+          <label class="switch vagas-cards-switch ${window.__vagasModoCards ? "is-active" : ""}" aria-pressed="${window.__vagasModoCards ? "true" : "false"}" title="Mostrar vagas em cards menores">
+            <input type="checkbox" id="vagasModoCards" ${window.__vagasModoCards ? "checked" : ""}>
+            <span class="track"><span class="thumb"></span></span>
+            <span>Cards</span>
+          </label>
         </div>
         <section class="vagas-public-list"></section>
       </section>`;
       document.getElementById("vagasSearchInput")?.addEventListener("input", renderVagasPublicas);
-      document.getElementById("vagasModoCards")?.addEventListener("click", () => {
-        window.__vagasModoCards = !window.__vagasModoCards;
-        aplicarModoCardsVagas();
-      });
+      document.getElementById("vagasModoCards")?.addEventListener("change", aplicarModoCardsVagas);
       renderVagasPublicas();
       aplicarModoCardsVagas();
       return;
@@ -18974,8 +18973,8 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
         <div class="nota-falecimento-toolbar">
           <label class="switch nota-falecimento-cards-switch" title="Mostrar notas em cards menores">
             <input type="checkbox" id="notaFalecimentoModoCards" ${window.__notaFalecimentoModoCards ? "checked" : ""}>
-            <span class="slider"></span>
-            <strong>Cards</strong>
+            <span class="track"><span class="thumb"></span></span>
+            <span>Cards</span>
           </label>
         </div>
         <div class="nota-falecimento-list">

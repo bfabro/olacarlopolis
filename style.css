@@ -18534,3 +18534,122 @@ body.vaga-modal-open {
   }
 
 }
+
+/* ===== Padrao unico das flags Cards do site publico v256 ===== */
+.promo-compact-switch,
+.vagas-cards-switch,
+.nota-falecimento-cards-switch,
+#filtrosAutomoveis .auto-cards-switch,
+.im-cards-switch {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  min-height: 46px !important;
+  padding: 0 4px !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: transparent !important;
+  color: #374151 !important;
+  box-shadow: none !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  white-space: nowrap !important;
+}
+
+.promo-compact-switch input,
+.vagas-cards-switch input,
+.nota-falecimento-cards-switch input,
+#filtrosAutomoveis .auto-cards-switch input,
+.im-cards-switch input {
+  appearance: none !important;
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.promo-compact-switch .track,
+.vagas-cards-switch .track,
+.nota-falecimento-cards-switch .track,
+#filtrosAutomoveis .auto-cards-switch .track,
+.im-cards-switch .track {
+  position: relative !important;
+  display: inline-block !important;
+  width: 46px !important;
+  height: 26px !important;
+  flex: 0 0 46px !important;
+  border-radius: 999px !important;
+  background: #e5e7eb !important;
+  transition: background .2s ease !important;
+}
+
+.promo-compact-switch .thumb,
+.vagas-cards-switch .thumb,
+.nota-falecimento-cards-switch .thumb,
+#filtrosAutomoveis .auto-cards-switch .thumb,
+.im-cards-switch .thumb {
+  position: absolute !important;
+  top: 3px !important;
+  left: 3px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15) !important;
+  transition: left .2s ease !important;
+}
+
+.promo-compact-switch input:checked + .track,
+.vagas-cards-switch input:checked + .track,
+.nota-falecimento-cards-switch input:checked + .track,
+#filtrosAutomoveis .auto-cards-switch input:checked + .track,
+.im-cards-switch input:checked + .track {
+  background: #16a34a !important;
+}
+
+.promo-compact-switch input:checked + .track .thumb,
+.vagas-cards-switch input:checked + .track .thumb,
+.nota-falecimento-cards-switch input:checked + .track .thumb,
+#filtrosAutomoveis .auto-cards-switch input:checked + .track .thumb,
+.im-cards-switch input:checked + .track .thumb {
+  left: 23px !important;
+}
+
+.promo-compact-switch input:checked ~ span:last-child,
+.vagas-cards-switch input:checked ~ span:last-child,
+.nota-falecimento-cards-switch input:checked ~ span:last-child,
+#filtrosAutomoveis .auto-cards-switch input:checked ~ span:last-child,
+.im-cards-switch input:checked ~ span:last-child {
+  color: #14532d !important;
+}
+
+.vagas-filter-card,
+.nota-falecimento-toolbar {
+  width: min(860px, calc(100% - 16px)) !important;
+  margin: 0 auto 12px !important;
+  padding: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, .08) !important;
+}
+
+.nota-falecimento-toolbar {
+  justify-content: center !important;
+}
+
+@media (max-width: 640px) {
+  .promo-compact-switch,
+  .vagas-cards-switch,
+  .nota-falecimento-cards-switch,
+  #filtrosAutomoveis .auto-cards-switch,
+  .im-cards-switch {
+    min-height: 40px !important;
+    font-size: 13px !important;
+  }
+}
