@@ -121,7 +121,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
    <!-- FIM  JAVA -->
-   <link rel="stylesheet" href="style.css?v=263" />
+   <link rel="stylesheet" href="style.css?v=265" />
 
    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
    <!--  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>-->
@@ -1379,10 +1379,6 @@
          </div>
       </section>
 
-      <div id="homeCardsIntro" class="home-cards-intro">
-         <span>Veja quem ja esta por aqui!</span>
-      </div>
-
       <div class="content_area" id="conteudo">
 
          <div id="menuHorizontal" class="menu-horizontal-custom">
@@ -1404,9 +1400,15 @@
          <div id="secao-divulgacao" class="carrossel-container">
             <!--  <h2>Divulgação </h2>-->
             <!-- NOVO: grade com cards pequenos de todos os destaques -->
-            <div id="grade-divulgacao" class="grade-divulgacao">
+            <section id="homeDestaquesCard" class="novidades-cidade-wrap home-section-wrap">
+               <div class="novidades-cidade-resumo home-section-resumo">
+                  <strong>Destaques</strong>
+                  <span>Veja quem ja esta por aqui!</span>
+               </div>
+               <div id="grade-divulgacao" class="grade-divulgacao">
                <!-- Os cards serão preenchidos via JS (montarCarrosselDivulgacao) -->
-            </div>
+               </div>
+            </section>
             
             <!-- Carrossel principal de divulgação (continua igual) -->
             <div class="swiper-container swiper-novidades">
@@ -1432,9 +1434,15 @@
          <div id="secao-eventos" class="carrossel-container">
 
             <!-- Grade com cards pequenos de eventos -->
-            <div id="grade-eventos" class="grade-divulgacao">
+            <section id="homeEventosCard" class="novidades-cidade-wrap home-section-wrap">
+               <div class="novidades-cidade-resumo home-section-resumo">
+                  <strong>Confira os proximos Eventos</strong>
+                  <span>Agenda da cidade para voce acompanhar e participar.</span>
+               </div>
+               <div id="grade-eventos" class="grade-divulgacao">
                <!-- preenchido via JS -->
-            </div>
+               </div>
+            </section>
 
             
 
@@ -1641,7 +1649,7 @@
    </script>
 
    <!--  JavaScript -->
-   <script defer src="script.js?v=263"></script>
+   <script defer src="script.js?v=265"></script>
 
 
 

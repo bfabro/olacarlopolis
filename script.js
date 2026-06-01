@@ -18635,23 +18635,34 @@ plotarPinsImoveis(stateImoveis.filtered);
     atualizarVisibilidadeHomeQuickBanner();
   }
 
+  function rolarParaCardInicial(id) {
+    const alvo = document.getElementById(id);
+    if (!alvo) return;
+    setTimeout(() => {
+      const busca = document.getElementById("buscaGlobalFixa");
+      const offset = (busca?.getBoundingClientRect().height || 0) + 12;
+      const top = window.scrollY + alvo.getBoundingClientRect().top - offset;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }, 80);
+  }
+
   function abrirHomeQuickAction(action) {
     if (action === "destaques") {
       limparRotaParaSecaoInicial();
       document.querySelector('.botao-menu-topo[data-target="divulgacao"]')?.click();
-      document.getElementById("secao-divulgacao")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      rolarParaCardInicial("homeDestaquesCard");
       return;
     }
     if (action === "eventos") {
       limparRotaParaSecaoInicial();
       document.querySelector('.botao-menu-topo[data-target="eventos"]')?.click();
-      document.getElementById("secao-eventos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      rolarParaCardInicial("homeEventosCard");
       return;
     }
     if (action === "novidades") {
       limparRotaParaSecaoInicial();
       document.querySelector('.botao-menu-topo[data-target="novidades-cidade"]')?.click();
-      document.getElementById("secao-novidades-cidade")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      rolarParaCardInicial("secao-novidades-cidade");
       return;
     }
     if (action === "cep") {
