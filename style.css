@@ -2652,7 +2652,7 @@ screen and (width: 820px) {
   .botao-menu-topo {
     flex-shrink: 0;
     font-size: 14px;
-    padding: 8px 12px;
+    padding: 8px 10px;
   }
 }
 
