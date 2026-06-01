@@ -18636,14 +18636,15 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function rolarParaCardInicial(id) {
-    const alvo = document.getElementById(id);
+    const secao = document.getElementById(id);
+    const alvo = secao?.querySelector?.(".novidades-cidade-resumo") || secao;
     if (!alvo) return;
     setTimeout(() => {
       const busca = document.getElementById("buscaGlobalFixa");
-      const offset = (busca?.getBoundingClientRect().height || 0) + 12;
-      const top = window.scrollY + alvo.getBoundingClientRect().top - offset;
+      const buscaBottom = busca?.getBoundingClientRect().bottom || 0;
+      const top = window.scrollY + alvo.getBoundingClientRect().top - buscaBottom - 10;
       window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-    }, 80);
+    }, 220);
   }
 
   function abrirHomeQuickAction(action) {
