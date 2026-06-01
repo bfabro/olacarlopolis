@@ -3282,7 +3282,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 3) Atualiza o hash amigável
-
+    const hashCliente = `#${idEst}`;
+    if (window.location.hash !== hashCliente) {
+      history.pushState(null, "", `${location.pathname}${location.search}${hashCliente}`);
+    }
+    if (typeof atualizarVisibilidadeHomeQuickBanner === "function") {
+      atualizarVisibilidadeHomeQuickBanner();
+    }
 
     // 4) Depois que a categoria carregar, rola até o li do comércio e destaca
     setTimeout(() => {
@@ -19052,6 +19058,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     /*  contentArea.classList.remove("hidden");*/
     const contentArea = document.querySelector(".content_area");
     if (!contentArea) return;
+    document.body.classList.add("home-quick-banner-route-hidden");
 
     if (paidEstablishments.length === 0) {
       const vazio = isVagasTrabalho ? "Nenhuma vaga de trabalho cadastrada no momento." : "Nenhum estabelecimento se cadastrou ainda.";
@@ -20497,6 +20504,9 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
   document.querySelectorAll('.botao-menu-topo').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.target;
+      if (["divulgacao", "eventos", "novidades-cidade"].includes(target) && typeof limparRotaParaSecaoInicial === "function") {
+        limparRotaParaSecaoInicial();
+      }
 
       // Remove classe ativo
       document.querySelectorAll('.botao-menu-topo').forEach(b => b.classList.remove('ativo'));

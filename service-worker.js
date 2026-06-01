@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-06-01-home-banner-flat-buttons-v267'; // <-- TROQUE quando publicar atualização
+const CACHE_VERSION = '2026-06-01-home-banner-client-route-v269'; // <-- TROQUE quando publicar atualização
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
