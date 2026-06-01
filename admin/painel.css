@@ -243,6 +243,45 @@ button[type="submit"]:hover,
   grid-template-columns: 280px minmax(0, 1fr);
 }
 
+.client-billing-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(220, 38, 38, .28);
+  border-left: 5px solid var(--danger);
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.client-billing-alert strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.client-billing-alert p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.client-billing-alert button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 11px 14px;
+  background: var(--danger);
+  color: #fff;
+  font-weight: 800;
+}
+
 .sidebar-admin {
   background: var(--sidebar);
   color: #fff;
@@ -1109,6 +1148,35 @@ button[type="submit"]:hover,
 .invoice-summary-card {
   border-color: rgba(37, 99, 235, .22);
   background: #f8fbff;
+}
+
+.invoice-contract-card {
+  border-color: rgba(21, 128, 61, .22);
+  background: #f7fef9;
+}
+
+.invoice-contract-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.invoice-contract-grid div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.invoice-contract-grid span,
+.invoice-contract-grid small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.invoice-contract-grid strong {
+  color: #0f172a;
+  font-size: 18px;
 }
 
 .invoice-plan-row {
@@ -2105,10 +2173,21 @@ button[type="submit"]:hover,
     backdrop-filter: blur(8px);
   }
 
+  .client-billing-alert {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .client-billing-alert button {
+    justify-content: center;
+    width: 100%;
+  }
+
   .split-layout,
   .stats-grid,
   .reports-grid,
   .report-custom-range,
+  .invoice-contract-grid,
   .invoice-plan-row,
   .client-row,
   .finance-row,

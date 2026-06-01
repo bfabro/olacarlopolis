@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 259,
-  label: "v259",
-  data: "2026-05-31",
-  nota: "Mantem somente a novidade mais recente por item."
+  numero: 260,
+  label: "v260",
+  data: "2026-06-01",
+  nota: "Aviso de fatura em aberto para clientes mensais."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -273,7 +273,7 @@ function canAccessView(viewName) {
     if (viewName === "pagamentoSistema") return isMaster();
     return true;
   }
-  if (viewName === "faturas") return hasPermission("faturas");
+  if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenMonthlyInvoice(currentClientRecord());
   if (viewName === "imoveis") return hasPermission("imoveis");
   if (viewName === "automoveis") return hasPermission("veiculos");
   if (viewName === "informacoes") return canManageInformacoes();
@@ -1438,6 +1438,7 @@ async function loadAllData() {
   renderReports();
   renderPaymentSettings();
   renderClientInvoices();
+  renderClientBillingAlert();
 
   // A importacao agora fica manual para nao sobrescrever edicoes feitas no Firebase.
 }
@@ -3201,6 +3202,7 @@ function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = nul
   return {
     mes,
     saved,
+    dueDate: saved.vencimento || saved.dataVencimento || invoiceDueDateForMonth(client, mes),
     valorPlano,
     valorDestaque,
     valorTotal,
@@ -6242,6 +6244,28 @@ function renderClientInvoices() {
   const paymentConfig = state.pagamentoSistema || {};
   const meses = pendingMonthsForClient(client);
   const faturas = meses.map((mes) => buildClientInvoice(client, mes, paymentConfig));
+  const firstInvoice = faturas[0] || buildClientInvoice(client, currentMonthKey(), paymentConfig, null, { ignoreSaved: true });
+  const planOverviewCard = `
+    <article class="invoice-card invoice-contract-card">
+      <div class="invoice-contract-grid">
+        <div>
+          <span>Plano contratado</span>
+          <strong>${escapeHtml(planLabel(client.tipoPlano))}</strong>
+          <small>${moneyBR(valorTotalFaturaCliente(client))}${destaqueIncludedInInvoice(client) ? " com destaque incluso" : ""}</small>
+        </div>
+        <div>
+          <span>Vencimento</span>
+          <strong>${escapeHtml(formatDateBR(firstInvoice.dueDate))}</strong>
+          <small>${client.vencimentoDia ? `Todo dia ${escapeHtml(client.vencimentoDia)}` : "Data definida pelo fechamento da fatura"}</small>
+        </div>
+        <div>
+          <span>Pagamento</span>
+          <strong>${escapeHtml(planLabel(client.tipoPlano || "mensal"))}</strong>
+          <small>${escapeHtml(paymentLabel(client.pagamentoStatus || "em_aberto"))}</small>
+        </div>
+      </div>
+    </article>
+  `;
   const showFeaturedPix = destaqueIsActive(client) && (destaqueBillingForClient(client) === "pix_separado" || client.tipoPlano === "anual");
   const featuredPix = showFeaturedPix ? buildDestaquePix(client, paymentConfig) : null;
   const featuredPixCard = showFeaturedPix ? `
@@ -6271,6 +6295,7 @@ function renderClientInvoices() {
 
   if (!faturas.length) {
     mount.innerHTML = `
+      ${planOverviewCard}
       ${featuredPixCard}
       <article class="invoice-card invoice-summary-card">
         <div class="section-head compact">
@@ -6312,6 +6337,7 @@ function renderClientInvoices() {
 
   mount.innerHTML = `
     <div class="invoice-list">
+      ${planOverviewCard}
       ${featuredPixCard}
       <article class="invoice-card invoice-summary-card">
         <div class="section-head compact">
@@ -6337,7 +6363,7 @@ function renderClientInvoices() {
               <input type="checkbox" data-invoice-select value="${escapeAttr(fatura.mes)}" checked>
               <span>
                 <strong>${escapeHtml(monthLabel(fatura.mes))}</strong>
-                <small>Plano ${moneyBR(fatura.valorPlano)}${fatura.valorDestaque ? ` + destaque ${moneyBR(fatura.valorDestaque)}` : ""}</small>
+                <small>Plano ${moneyBR(fatura.valorPlano)}${fatura.valorDestaque ? ` + destaque ${moneyBR(fatura.valorDestaque)}` : ""} - venc. ${escapeHtml(formatDateBR(fatura.dueDate))}</small>
               </span>
               <b>${moneyBR(fatura.valorTotal)}</b>
             </label>
@@ -7248,6 +7274,7 @@ onAuthStateChanged(auth, async (user) => {
     state.profile = null;
     $("loginView").classList.remove("hidden");
     $("appView").classList.add("hidden");
+    renderClientBillingAlert();
     return;
   }
 
@@ -7266,6 +7293,7 @@ onAuthStateChanged(auth, async (user) => {
   $("appView").classList.remove("hidden");
   updateChrome();
   await loadAllData();
+  renderClientBillingAlert();
   if (!canManageClients()) renderClientOnlyEditor();
   switchView(initialView);
 });
