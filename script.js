@@ -18623,28 +18623,46 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
   }
 
+  function atualizarVisibilidadeHomeQuickBanner() {
+    const h = (location.hash || "").toLowerCase();
+    document.body.classList.toggle("home-quick-banner-route-hidden", Boolean(h));
+  }
+
+  function limparRotaParaSecaoInicial() {
+    if (location.hash) {
+      history.replaceState(null, "", `${location.pathname}${location.search}`);
+    }
+    atualizarVisibilidadeHomeQuickBanner();
+  }
+
   function abrirHomeQuickAction(action) {
     if (action === "destaques") {
+      limparRotaParaSecaoInicial();
       document.querySelector('.botao-menu-topo[data-target="divulgacao"]')?.click();
       document.getElementById("secao-divulgacao")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     if (action === "eventos") {
+      limparRotaParaSecaoInicial();
       document.querySelector('.botao-menu-topo[data-target="eventos"]')?.click();
       document.getElementById("secao-eventos")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     if (action === "novidades") {
+      limparRotaParaSecaoInicial();
       document.querySelector('.botao-menu-topo[data-target="novidades-cidade"]')?.click();
       document.getElementById("secao-novidades-cidade")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     if (action === "cep") {
       location.hash = "#cep";
+      atualizarVisibilidadeHomeQuickBanner();
       if (typeof mostrarConsultaCEP === "function") mostrarConsultaCEP();
       return;
     }
     if (action === "onde-comer") {
+      location.hash = "#ondecomer";
+      atualizarVisibilidadeHomeQuickBanner();
       if (typeof mostrarOndeComer === "function") {
         mostrarOndeComer();
       } else {
@@ -18658,6 +18676,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
     if (action === "promocoes") {
       location.hash = "#promocoes";
+      atualizarVisibilidadeHomeQuickBanner();
       if (typeof mostrarPromocoes === "function") mostrarPromocoes();
     }
   }
@@ -18669,6 +18688,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       button.addEventListener("click", () => abrirHomeQuickAction(button.dataset.homeQuickAction));
     });
     aplicarConfiguracaoPaginaInicial(window.__paginaInicialSite || {});
+    atualizarVisibilidadeHomeQuickBanner();
+    window.addEventListener("hashchange", atualizarVisibilidadeHomeQuickBanner);
   }
 
   function renderizarTelaAtualComDadosAdmin() {
@@ -20018,6 +20039,7 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
 
   async function handleHashRoute() {
     const h = (location.hash || "").toLowerCase();
+    atualizarVisibilidadeHomeQuickBanner();
     if (!ADMIN_CLIENTES_LOADED) {
       aplicarDadosAdminClientesEmSegundoPlano(() => handleHashRoute());
     }

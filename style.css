@@ -2593,7 +2593,7 @@ screen and (width: 820px) {
 
 
 .menu-horizontal-custom {
-  display: flex;
+  display: none;
   justify-content: center;
   gap: 12px;
   background: #f2f6fc;
@@ -13259,11 +13259,13 @@ tr[data-inativo="true"] {
   margin-top: 0 !important;
 }
 
-body.home-quick-banner-hidden .home-quick-banner {
+body.home-quick-banner-hidden .home-quick-banner,
+body.home-quick-banner-route-hidden .home-quick-banner {
   display: none;
 }
 
-body.home-quick-banner-hidden .content_area {
+body.home-quick-banner-hidden .content_area,
+body.home-quick-banner-route-hidden .content_area {
   margin-top: 120px !important;
 }
 
@@ -13273,6 +13275,11 @@ body.home-quick-banner-hidden .content_area {
 
 .sidebar.close ~ .home-quick-banner + .content_area {
   margin-top: 0 !important;
+}
+
+body.home-quick-banner-hidden .sidebar.close ~ .home-quick-banner + .content_area,
+body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .content_area {
+  margin-top: 120px !important;
 }
 
 .busca-global-fixa.sidebar-fechada {
