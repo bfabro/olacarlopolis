@@ -1075,39 +1075,112 @@ function normalizarRegistroRepresa(data = {}) {
   };
 }
 
-function lerHistoricoRepresa() {
+function represaFirebaseDisponivel() {
+  return !!(window.firebase && firebase.database);
+}
+
+function represaHistoricoRef() {
+  if (!represaFirebaseDisponivel()) return null;
+  return firebase.database().ref('represas/chavantes/historico');
+}
+
+async function lerHistoricoRepresaRemoto() {
+  const ref = represaHistoricoRef();
+  if (ref) {
+    const snap = await ref.once('value');
+    return snap.val() || {};
+  }
+
+  const response = await fetch(`${REPRESA_HISTORICO_FIREBASE_REST}.json`, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`Firebase REST retornou ${response.status}`);
+  return await response.json() || {};
+}
+
+async function salvarRegistroRepresaRemoto(registro) {
+  const ref = represaHistoricoRef();
+  if (ref) {
+    await ref.child(registro.id).set({
+      ...registro,
+      salvoEm: firebase.database.ServerValue.TIMESTAMP
+    });
+    return;
+  }
+
+  const response = await fetch(`${REPRESA_HISTORICO_FIREBASE_REST}/${encodeURIComponent(registro.id)}.json`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ...registro,
+      salvoEm: Date.now()
+    })
+  });
+  if (!response.ok) throw new Error(`Firebase REST retornou ${response.status}`);
+}
+
+function normalizarListaHistoricoRepresa(list = []) {
+  const mapa = new Map(REPRESA_HISTORICO_INICIAL.map((item) => [item.id, { ...item }]));
+  if (Array.isArray(list)) {
+    list.filter(Boolean).forEach((item) => {
+      if (item?.id) mapa.set(item.id, item);
+    });
+  } else if (list && typeof list === 'object') {
+    Object.entries(list).forEach(([id, item]) => {
+      if (item && typeof item === 'object') mapa.set(item.id || id, { id: item.id || id, ...item });
+    });
+  }
+  return Array.from(mapa.values()).sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
+}
+
+function lerHistoricoRepresaLocal() {
   const base = REPRESA_HISTORICO_INICIAL.map((item) => ({ ...item }));
   try {
     const raw = localStorage.getItem(REPRESA_HISTORICO_KEY);
     const list = raw ? JSON.parse(raw) : [];
-    const mapa = new Map(base.map((item) => [item.id, item]));
-    if (Array.isArray(list)) {
-      list.filter(Boolean).forEach((item) => {
-        if (item?.id) mapa.set(item.id, item);
-      });
-    }
-    return Array.from(mapa.values()).sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
+    return normalizarListaHistoricoRepresa([...base, ...(Array.isArray(list) ? list : [])]);
   } catch (_) {
     return base;
   }
 }
 
-function salvarHistoricoRepresa(data = {}) {
-  const registro = normalizarRegistroRepresa(data);
-  if (!registro) return null;
-  const historico = lerHistoricoRepresa().filter((item) => item.id !== registro.id);
-  historico.push(registro);
-  historico.sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
+function salvarHistoricoRepresaLocal(historico = []) {
   try {
     localStorage.setItem(REPRESA_HISTORICO_KEY, JSON.stringify(historico.slice(-730)));
   } catch (_) {
     // Historico local e opcional; se o navegador bloquear, a tela principal continua funcionando.
   }
+}
+
+async function lerHistoricoRepresa() {
+  const local = lerHistoricoRepresaLocal();
+  try {
+    const remoto = await lerHistoricoRepresaRemoto();
+    const historico = normalizarListaHistoricoRepresa([...local, ...Object.values(remoto)]);
+    salvarHistoricoRepresaLocal(historico);
+    return historico;
+  } catch (error) {
+    console.warn('Historico da represa indisponivel no Firebase; usando copia local.', error);
+    return local;
+  }
+}
+
+async function salvarHistoricoRepresa(data = {}) {
+  const registro = normalizarRegistroRepresa(data);
+  if (!registro) return null;
+  const historico = (await lerHistoricoRepresa()).filter((item) => item.id !== registro.id);
+  historico.push(registro);
+  historico.sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
+  salvarHistoricoRepresaLocal(historico);
+
+  try {
+    await salvarRegistroRepresaRemoto(registro);
+  } catch (error) {
+    console.warn('Nao foi possivel salvar historico da represa no Firebase.', error);
+  }
   return registro;
 }
 
-function filtrarHistoricoRepresa(periodo = '30') {
-  const historico = lerHistoricoRepresa();
+async function filtrarHistoricoRepresa(periodo = '30') {
+  const historico = await lerHistoricoRepresa();
   if (periodo === 'todos') return historico;
   const dias = Number(periodo || 30);
   const limite = new Date();
@@ -1116,10 +1189,10 @@ function filtrarHistoricoRepresa(periodo = '30') {
   return historico.filter((item) => new Date(item.dataISO) >= limite);
 }
 
-function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
+async function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
   const box = document.getElementById('represaHistoricoBox');
   if (!box) return;
-  const mapa = new Map(filtrarHistoricoRepresa(periodo).map((item) => [item.id, item]));
+  const mapa = new Map((await filtrarHistoricoRepresa(periodo)).map((item) => [item.id, item]));
   if (registroAtual?.id) mapa.set(registroAtual.id, registroAtual);
   const dedupePorHorario = new Map();
   Array.from(mapa.values())
@@ -22301,6 +22374,7 @@ async function obterDadosHistoricos() {
 // === NOVO: URL do seu endpoint (troque pelo seu domínio do Vercel) ===
 const API_REPRESA = 'https://olacarlopolis.vercel.app/api/represa/chavantes';
 const REPRESA_HISTORICO_KEY = 'ola_carlopolis_represa_chavantes_historico_v1';
+const REPRESA_HISTORICO_FIREBASE_REST = 'https://contadoracessos-default-rtdb.firebaseio.com/represas/chavantes/historico';
 
 // === util: setar texto seguro no DOM ===
 function setTexto(sel, val) {
@@ -22347,8 +22421,8 @@ async function carregarDadosRepresa() {
     setTexto('#nr-cota', cotaAtual);
     setTexto('#nr-volume', volumeUtil);
     setTexto('#nr-data', new Date(atualizadoEm).toLocaleDateString('pt-BR'));
-    const registroAtual = salvarHistoricoRepresa(data);
-    renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual);
+    const registroAtual = await salvarHistoricoRepresa(data);
+    await renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual);
 
     // Destaque visual
     if (typeof destacarMudancas === 'function') destacarMudancas();
@@ -22369,7 +22443,7 @@ async function carregarDadosRepresa() {
         setTexto('#nr-cota', dados.cota);
         setTexto('#nr-volume', dados.volume);
         setTexto('#nr-data', dados.atualizacao);
-        const registroAtual = salvarHistoricoRepresa({
+        const registroAtual = await salvarHistoricoRepresa({
           cotaAtual: dados.cota,
           volumeUtil: dados.volume,
           vazaoAfluente: dados.vazaoAfluente,
@@ -22377,7 +22451,7 @@ async function carregarDadosRepresa() {
           atualizadoEm: Date.now(),
           fonte: dados.fonte
         });
-        renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual);
+        await renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual);
         if (typeof destacarMudancas === 'function') destacarMudancas();
         return;
       }
