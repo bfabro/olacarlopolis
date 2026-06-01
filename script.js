@@ -2530,6 +2530,69 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let novidadesCidadeCache = [];
   let novidadesCidadePromise = null;
+  const NOVIDADES_CIDADE_VISTAS_KEY = "ola_carlopolis_novidades_vistas_ate_v1";
+
+  function novidadesCidadeReferencia(lista = novidadesCidadeCache) {
+    return Math.max(0, ...lista.map((item) => Number(item?.dataMs || 0)).filter(Number.isFinite));
+  }
+
+  function novidadesCidadeVistasAte() {
+    try {
+      return Number(localStorage.getItem(NOVIDADES_CIDADE_VISTAS_KEY) || 0) || 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  function setNovidadesCidadeVistasAte(valor) {
+    try {
+      localStorage.setItem(NOVIDADES_CIDADE_VISTAS_KEY, String(Math.max(0, Number(valor) || 0)));
+    } catch (e) { }
+  }
+
+  function botoesNovidadesCidade() {
+    return [
+      ...document.querySelectorAll('[data-home-quick-action="novidades"], .botao-menu-topo[data-target="novidades-cidade"]')
+    ];
+  }
+
+  function renderAvisoNovidadesCidade(qtd) {
+    botoesNovidadesCidade().forEach((button) => {
+      let badge = button.querySelector(".novidades-alert-badge");
+      if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "novidades-alert-badge";
+        button.appendChild(badge);
+      }
+      if (qtd > 0) {
+        badge.textContent = qtd > 99 ? "99+" : String(qtd);
+        button.classList.add("tem-novidades-novas");
+      } else {
+        badge.textContent = "";
+        button.classList.remove("tem-novidades-novas");
+      }
+    });
+  }
+
+  function atualizarAvisoNovidadesCidade(lista = novidadesCidadeCache) {
+    const referencia = novidadesCidadeReferencia(lista);
+    const vistasAte = novidadesCidadeVistasAte();
+    if (!referencia) return renderAvisoNovidadesCidade(0);
+    if (!vistasAte) {
+      setNovidadesCidadeVistasAte(referencia);
+      return renderAvisoNovidadesCidade(0);
+    }
+    const novas = lista.filter((item) => Number(item?.dataMs || 0) > vistasAte).length;
+    renderAvisoNovidadesCidade(novas);
+  }
+
+  function marcarNovidadesCidadeComoVistas() {
+    const referencia = novidadesCidadeReferencia();
+    if (referencia) setNovidadesCidadeVistasAte(referencia);
+    renderAvisoNovidadesCidade(0);
+  }
+
+  try { window.marcarNovidadesCidadeComoVistas = marcarNovidadesCidadeComoVistas; } catch (e) { }
 
   function novidadeCidadeMs(value) {
     if (!value) return 0;
@@ -2871,6 +2934,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       novidadesCidadeCache = [...mapa.values()].sort((a, b) => (b.dataMs || 0) - (a.dataMs || 0));
+      atualizarAvisoNovidadesCidade(novidadesCidadeCache);
       return novidadesCidadeCache;
     })();
     try {
@@ -2922,6 +2986,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (feed) feed.innerHTML = `<div class="novidades-empty">Carregando novidades...</div>`;
     const lista = await carregarNovidadesCidade();
     renderNovidadesCidade(lista);
+    if (window.__novidadesCidadeAbrindo) {
+      marcarNovidadesCidadeComoVistas();
+      window.__novidadesCidadeAbrindo = false;
+    }
   }
 
   try { window.montarNovidadesCidade = montarNovidadesCidade; } catch (e) { }
@@ -18667,6 +18735,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       return;
     }
     if (action === "novidades") {
+      window.__novidadesCidadeAbrindo = true;
       limparRotaParaSecaoInicial();
       document.querySelector('.botao-menu-topo[data-target="novidades-cidade"]')?.click();
       rolarParaCardInicial("secao-novidades-cidade");
@@ -20506,6 +20575,9 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
       const target = btn.dataset.target;
       if (["divulgacao", "eventos", "novidades-cidade"].includes(target) && typeof limparRotaParaSecaoInicial === "function") {
         limparRotaParaSecaoInicial();
+      }
+      if (target === "novidades-cidade" && typeof marcarNovidadesCidadeComoVistas === "function") {
+        window.__novidadesCidadeAbrindo = true;
       }
 
       // Remove classe ativo

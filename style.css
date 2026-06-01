@@ -2607,6 +2607,7 @@ screen and (width: 820px) {
 }
 
 .botao-menu-topo {
+  position: relative;
   background-color: white;
   border: 1px solid #ccc;
   font-weight: 500;
@@ -2621,6 +2622,47 @@ screen and (width: 820px) {
   transition: all 0.3s ease;
   white-space: nowrap;
 
+}
+
+.novidades-alert-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  z-index: 2;
+  display: none;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ef233c;
+  color: #fff;
+  border: 2px solid #fff;
+  box-shadow: 0 6px 14px rgba(239,35,60,.28);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.tem-novidades-novas {
+  animation: novidadesPulse 1.8s ease-in-out infinite;
+}
+
+.tem-novidades-novas .novidades-alert-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes novidadesPulse {
+  0%, 100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  50% {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+  }
 }
 
 .botao-menu-topo:hover {
@@ -13249,6 +13291,7 @@ tr[data-inativo="true"] {
 }
 
 .home-quick-actions button {
+  position: relative;
   display: grid;
   place-items: center;
   gap: 7px;
