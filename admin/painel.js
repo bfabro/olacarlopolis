@@ -4234,6 +4234,7 @@ function metricButtonLabel(tipo) {
     whatsapp: "WhatsApp",
     grupoWhatsapp: "Grupo WhatsApp",
     cardapio: "Cardapio",
+    novidades: "Novidades",
     "gerar-card": "Gerar card",
     fotos: "Fotos",
     divulgacao: "Divulgacao",
@@ -4387,6 +4388,8 @@ function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
       pagina: item.pagina || "",
       promocao: item.promocaoTitulo || item.promoTitulo || item.tituloPromocao || item.titulo || "",
       promocaoId: item.promocaoId || item.promoId || "",
+      tituloConteudo: item.tituloConteudo || item.estabelecimento || "",
+      acao: item.acao || "",
       clicouWhatsAppPromocao: Boolean(item.clicouWhatsAppPromocao || item.acao === "whatsapp" || item.tipo === "whatsapp_promocao")
     });
   };
@@ -4480,6 +4483,7 @@ function aggregateButtonTypesForClient(details = new Map(), keys = []) {
 
 function clientReportCategory(row = {}) {
   const text = normalizeName(`${row.area || ""} ${row.tipo || ""}`);
+  if (/novidade|novidades/.test(text)) return "Novidades";
   if (/whatsapp|telefone|contato|zap/.test(text)) return "WhatsApp / telefone";
   if (/cardapio|menu/.test(text)) return "Cardapio";
   if (/foto|fotos|imagem|divulgacao/.test(text)) return "Fotos / divulgacao";
@@ -4491,6 +4495,7 @@ function clientReportCategory(row = {}) {
 function clientReportResourceAllowed(category = "") {
   const normalized = normalizeName(category);
   if (/cardapio/.test(normalized)) return hasPermission("cardapio");
+  if (/novidade/.test(normalized)) return true;
   if (/promoc/.test(normalized)) return hasPermission("promocoes");
   if (/foto|divulgacao|imagem/.test(normalized)) return hasPermission("imagens") || hasPermission("destaque");
   return true;
@@ -4547,7 +4552,7 @@ function renderClientTimelineTable(rows, emptyMessage) {
               <td>${escapeHtml(row.promocao || "-")}</td>
               <td>${row.promocao || row.promocaoId || /promoc/i.test(String(row.area || row.tipo || "")) ? (row.clicouWhatsAppPromocao ? "Sim" : "Nao") : "-"}</td>
               <td>${escapeHtml(row.area || "-")}</td>
-              <td>${escapeHtml(row.tipo || "-")}</td>
+              <td>${escapeHtml(row.tituloConteudo || row.acao || row.tipo || "-")}</td>
             </tr>
           `).join("")}
         </tbody>
@@ -4580,12 +4585,13 @@ function renderClientMetricReportContent(client = {}) {
   const promocoes = clientReportResourceAllowed("Promocoes")
     ? sumMetricMapForClient(aggregateSimpleDaily(filtered.promocoes), keys)
     : 0;
+  const novidades = Number(tiposPermitidos.get("novidades") || 0);
   const redes = [...tiposPermitidos.entries()]
     .filter(([tipo]) => /instagram|facebook|tiktok|site|rede|social/i.test(String(tipo)))
     .reduce((sum, [, count]) => sum + Number(count || 0), 0);
   const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
-  const total = cardapios + whats + fotos + promocoes + redes;
-  const outros = Math.max(0, totalBotoes - (cardapios + whats + fotos + redes));
+  const total = cardapios + whats + fotos + promocoes + novidades + redes;
+  const outros = Math.max(0, totalBotoes - (cardapios + whats + fotos + promocoes + novidades + redes));
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
     .map((row) => ({ ...row, categoria: clientReportCategory(row) }))
@@ -4594,6 +4600,7 @@ function renderClientMetricReportContent(client = {}) {
     ["WhatsApp / telefone", whats],
     ...(canShowCardapioReport ? [["Cardapio", cardapios]] : []),
     ["Fotos / divulgacao", fotos],
+    ["Novidades", novidades],
     ["Promocoes", promocoes],
     ["Redes sociais / links", redes],
     ["Outros botoes", outros]
@@ -4602,6 +4609,7 @@ function renderClientMetricReportContent(client = {}) {
     "telefone",
     ...(canShowCardapioReport ? ["cardapio"] : []),
     ...(clientReportResourceAllowed("Fotos / divulgacao") ? ["fotos"] : []),
+    "novidades",
     ...(clientReportResourceAllowed("Promocoes") ? ["promocoes"] : []),
     "redes sociais",
     "demais botoes"
@@ -4614,6 +4622,7 @@ function renderClientMetricReportContent(client = {}) {
         <article class="stat-card"><span>Total de interacoes</span><strong>${total + outros}</strong><small>${escapeHtml(range.label)}</small></article>
         <article class="stat-card"><span>WhatsApp</span><strong>${whats}</strong><small>Telefone e contato</small></article>
         ${canShowCardapioReport ? `<article class="stat-card"><span>Cardapio</span><strong>${cardapios}</strong><small>Cliques no cardapio</small></article>` : ""}
+        <article class="stat-card"><span>Novidades</span><strong>${novidades}</strong><small>Cliques na tela inicial</small></article>
         <article class="stat-card"><span>Promocoes</span><strong>${promocoes}</strong><small>Cliques em ofertas</small></article>
       </div>
       <div class="reports-grid client-report-grid">

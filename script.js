@@ -685,7 +685,7 @@ function getHojeBR() {
 }
 
 // Função para registrar clique no Firebase (contador + detalhado)
-function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes") {
+function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes = {}) {
   const hoje = getHojeBR();
   const db = firebase.database();
 
@@ -696,6 +696,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes") {
   const payload = {
     area,
     tipo,
+    ...detalhes,
     horario: agora.toLocaleTimeString("pt-BR"),
     dataHoraISO: agora.toISOString(),
     ts: firebase.database.ServerValue.TIMESTAMP,
@@ -2594,6 +2595,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   try { window.marcarNovidadesCidadeComoVistas = marcarNovidadesCidadeComoVistas; } catch (e) { }
 
+  function registrarCliqueNovidadeCidade(acao, item = {}) {
+    if (typeof registrarCliqueBotao !== "function") return;
+    const destinoId = normalizeName(item.estabelecimento || item.raw?.clienteNome || item.raw?.clienteId || item.destinoId || "novidades");
+    registrarCliqueBotao("novidades", destinoId || "novidades", "Novidades", {
+      acao,
+      novidadeId: item.id || "",
+      destinoTipo: item.destinoTipo || item.tipo || "",
+      destinoId: item.destinoId || "",
+      titulo: item.titulo || "",
+      tituloConteudo: novidadeNomePrincipal(item),
+      estabelecimento: item.estabelecimento || item.raw?.clienteNome || "",
+      origem: "tela-inicial"
+    }).catch(() => { });
+  }
+
   function novidadeCidadeMs(value) {
     if (!value) return 0;
     if (value instanceof Date) return value.getTime();
@@ -2973,10 +2989,10 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
     }).join("");
     feed.querySelectorAll(".novidade-feed-card").forEach((card) => {
-      card.addEventListener("click", () => abrirModalNovidadeCidade(card.dataset.novidadeId));
+      card.addEventListener("click", () => abrirModalNovidadeCidade(card.dataset.novidadeId, "item"));
       card.querySelector("button")?.addEventListener("click", (event) => {
         event.stopPropagation();
-        abrirModalNovidadeCidade(card.dataset.novidadeId);
+        abrirModalNovidadeCidade(card.dataset.novidadeId, "item");
       });
     });
   }
@@ -2994,9 +3010,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   try { window.montarNovidadesCidade = montarNovidadesCidade; } catch (e) { }
 
-  function abrirModalNovidadeCidade(id) {
+  function abrirModalNovidadeCidade(id, origemClique = "modal") {
     const item = novidadesCidadeCache.find((novidade) => String(novidade.id) === String(id));
     if (!item) return;
+    if (origemClique === "item") registrarCliqueNovidadeCidade("item", item);
     document.querySelector(".novidade-preview-overlay")?.remove();
     const imagens = item.imagens?.length ? item.imagens : (item.imagem ? [item.imagem] : []);
     const destino = novidadeTituloDestino(item) || item.descricao || "";
@@ -3050,6 +3067,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (event.target === overlay) overlay.remove();
     });
     overlay.querySelector(".novidade-preview-open")?.addEventListener("click", () => {
+      registrarCliqueNovidadeCidade("abrir-destino", item);
       overlay.remove();
       abrirDestinoNovidadeCidade(item);
     });
@@ -18735,6 +18753,13 @@ plotarPinsImoveis(stateImoveis.filtered);
       return;
     }
     if (action === "novidades") {
+      registrarCliqueNovidadeCidade("abrir-aba", {
+        id: "home-quick-novidades",
+        titulo: "Botao Novidades",
+        destinoTipo: "novidades",
+        destinoId: "novidades",
+        estabelecimento: "Novidades"
+      });
       window.__novidadesCidadeAbrindo = true;
       limparRotaParaSecaoInicial();
       document.querySelector('.botao-menu-topo[data-target="novidades-cidade"]')?.click();
@@ -20577,6 +20602,13 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
         limparRotaParaSecaoInicial();
       }
       if (target === "novidades-cidade" && typeof marcarNovidadesCidadeComoVistas === "function") {
+        registrarCliqueNovidadeCidade("abrir-aba", {
+          id: "menu-topo-novidades",
+          titulo: "Botao Novidades",
+          destinoTipo: "novidades",
+          destinoId: "novidades",
+          estabelecimento: "Novidades"
+        });
         window.__novidadesCidadeAbrindo = true;
       }
 
