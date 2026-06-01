@@ -18452,16 +18452,20 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!dbAdmin) return;
 
       try {
-        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap] = await Promise.all([
+        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap] = await Promise.all([
           dbAdmin.ref("clientes").once("value"),
           dbAdmin.ref("categorias").once("value"),
           dbAdmin.ref("conteudosInformativos/notaFalecimento").once("value"),
-          dbAdmin.ref("eventos").once("value")
+          dbAdmin.ref("eventos").once("value"),
+          dbAdmin.ref("configuracoes/paginaInicial").once("value")
         ]);
         const clientes = clientesSnap.val() || {};
         const categoriasAdmin = categoriasSnap.val() || {};
         const notasFalecimentoAdmin = notasFalecimentoSnap.val() || {};
         const eventosAdmin = eventosSnap.val() || {};
+        const paginaInicialAdmin = paginaInicialSnap.val() || {};
+        window.__paginaInicialSite = paginaInicialAdmin;
+        aplicarConfiguracaoPaginaInicial(paginaInicialAdmin);
         const clientesConsolidados = consolidarClientesAdmin(clientes);
         aplicarCategoriasAdminNoMenu(categoriasAdmin);
 
@@ -18590,6 +18594,81 @@ plotarPinsImoveis(stateImoveis.filtered);
         console.warn("Nao foi possivel atualizar dados do painel admin em segundo plano.", err);
         return false;
       });
+  }
+
+  function aplicarConfiguracaoPaginaInicial(config = {}) {
+    const banner = document.getElementById("homeQuickBanner");
+    if (!banner) return;
+    const ativo = config.ativo !== false;
+    document.body.classList.toggle("home-quick-banner-hidden", !ativo);
+    if (!ativo) return;
+
+    const titulo = String(config.titulo || "").trim() || "Carlópolis em tempo real";
+    const subtitulo = String(config.subtitulo || "").trim() || "Acesse os principais serviços, eventos, novidades e promoções da cidade.";
+    const imagens = Array.isArray(config.imagens) ? config.imagens.filter(Boolean) : [];
+    const titleEl = document.getElementById("homeQuickBannerTitle");
+    const subtitleEl = document.getElementById("homeQuickBannerSubtitle");
+    const bgEl = banner.querySelector(".home-quick-banner-bg");
+    if (titleEl) titleEl.textContent = titulo;
+    if (subtitleEl) subtitleEl.textContent = subtitulo;
+    if (bgEl && imagens.length) {
+      let index = 0;
+      const setImage = () => {
+        bgEl.style.backgroundImage = `url("${String(imagens[index] || "").replace(/"/g, "%22")}")`;
+        index = (index + 1) % imagens.length;
+      };
+      setImage();
+      if (window.homeQuickBannerInterval) clearInterval(window.homeQuickBannerInterval);
+      if (imagens.length > 1) window.homeQuickBannerInterval = setInterval(setImage, 6000);
+    }
+  }
+
+  function abrirHomeQuickAction(action) {
+    if (action === "destaques") {
+      document.querySelector('.botao-menu-topo[data-target="divulgacao"]')?.click();
+      document.getElementById("secao-divulgacao")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (action === "eventos") {
+      document.querySelector('.botao-menu-topo[data-target="eventos"]')?.click();
+      document.getElementById("secao-eventos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (action === "novidades") {
+      document.querySelector('.botao-menu-topo[data-target="novidades-cidade"]')?.click();
+      document.getElementById("secao-novidades-cidade")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (action === "cep") {
+      location.hash = "#cep";
+      if (typeof mostrarConsultaCEP === "function") mostrarConsultaCEP();
+      return;
+    }
+    if (action === "onde-comer") {
+      if (typeof mostrarOndeComer === "function") {
+        mostrarOndeComer();
+      } else {
+        const cat = categories.find((item) => normalizeName(item.title || "").includes("ondecomer"));
+        if (cat) {
+          location.hash = "#comercios-" + normalizeName(cat.title);
+          loadContent(cat.title, cat.establishments || []);
+        }
+      }
+      return;
+    }
+    if (action === "promocoes") {
+      location.hash = "#promocoes";
+      if (typeof mostrarPromocoes === "function") mostrarPromocoes();
+    }
+  }
+
+  function inicializarHomeQuickBanner() {
+    document.querySelectorAll("[data-home-quick-action]").forEach((button) => {
+      if (button.dataset.homeQuickBound) return;
+      button.dataset.homeQuickBound = "true";
+      button.addEventListener("click", () => abrirHomeQuickAction(button.dataset.homeQuickAction));
+    });
+    aplicarConfiguracaoPaginaInicial(window.__paginaInicialSite || {});
   }
 
   function renderizarTelaAtualComDadosAdmin() {
@@ -20378,6 +20457,8 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
 
 
 
+
+  inicializarHomeQuickBanner();
 
   document.querySelectorAll('.botao-menu-topo').forEach(btn => {
     btn.addEventListener('click', () => {

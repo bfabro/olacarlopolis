@@ -13107,7 +13107,7 @@ tr[data-inativo="true"] {
   position: fixed;
   top: 64px;
   left: 268px;
-  width: calc(100% - 268px);
+  width: calc(100% - 292px);
   z-index: 995;
   padding: 10px 14px 6px;
   background: rgba(231, 242, 253, 0.96);
@@ -13141,8 +13141,138 @@ tr[data-inativo="true"] {
   margin-top: 120px !important;
 }
 
+.home-quick-banner {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  width: calc(100% - 292px);
+  max-width: 980px;
+  min-height: 238px;
+  margin: 132px 24px 14px 268px;
+  border-radius: 22px;
+  box-shadow: 0 20px 42px rgba(15, 23, 42, .18);
+  color: #fff;
+  isolation: isolate;
+}
+
+.sidebar.close ~ .home-quick-banner {
+  width: calc(100% - 110px);
+  margin-left: 86px;
+}
+
+.home-quick-banner-bg,
+.home-quick-banner-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.home-quick-banner-bg {
+  background-image: url("images/img_padrao_site/og-image.jpg");
+  background-position: center;
+  background-size: cover;
+  transform: scale(1.02);
+  transition: background-image .35s ease;
+}
+
+.home-quick-banner-overlay {
+  z-index: -1;
+  background:
+    linear-gradient(110deg, rgba(8, 22, 50, .92) 0%, rgba(20, 68, 122, .78) 52%, rgba(10, 18, 34, .64) 100%),
+    radial-gradient(circle at 78% 18%, rgba(255,255,255,.16), transparent 36%);
+}
+
+.home-quick-banner-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 420px);
+  gap: 22px;
+  align-items: center;
+  min-height: inherit;
+  padding: 26px;
+}
+
+.home-quick-copy h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.65rem, 3.2vw, 2.7rem);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.home-quick-copy p {
+  max-width: 560px;
+  margin: 10px 0 0;
+  color: rgba(255,255,255,.9);
+  font-size: 1rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.home-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.home-quick-actions button {
+  display: grid;
+  place-items: center;
+  gap: 7px;
+  min-height: 76px;
+  padding: 10px 8px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 16px;
+  background: rgba(255,255,255,.14);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.home-quick-actions button i {
+  font-size: 1.18rem;
+}
+
+.home-quick-actions button span {
+  color: #fff;
+  font-size: .84rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+}
+
+@media (hover: hover) {
+  .home-quick-actions button:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,.22);
+    border-color: rgba(255,255,255,.42);
+  }
+}
+
+.content_area:has(+ *) {
+  margin-top: 0 !important;
+}
+
+.home-quick-banner + .content_area {
+  margin-top: 0 !important;
+}
+
+body.home-quick-banner-hidden .home-quick-banner {
+  display: none;
+}
+
+body.home-quick-banner-hidden .content_area {
+  margin-top: 120px !important;
+}
+
 .sidebar.close ~ .content_area {
   margin-top: 120px !important;
+}
+
+.sidebar.close ~ .home-quick-banner + .content_area {
+  margin-top: 0 !important;
 }
 
 .busca-global-fixa.sidebar-fechada {
@@ -13156,6 +13286,13 @@ tr[data-inativo="true"] {
     width: 100%;
     top: 64px;
     padding: 10px 10px 6px;
+  }
+
+  .home-quick-banner,
+  .sidebar.close ~ .home-quick-banner {
+    width: calc(100% - 20px);
+    max-width: none;
+    margin: 124px 10px 12px;
   }
 }
 
@@ -13176,7 +13313,46 @@ tr[data-inativo="true"] {
   }
 
   .content_area {
-    margin-top: 120px !important;
+    margin-top: 0 !important;
+  }
+
+  .home-quick-banner,
+  .sidebar.close ~ .home-quick-banner {
+    min-height: 0;
+    margin-top: 124px;
+    border-radius: 18px;
+  }
+
+  .home-quick-banner-content {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .home-quick-copy h2 {
+    font-size: 1.45rem;
+  }
+
+  .home-quick-copy p {
+    font-size: .86rem;
+  }
+
+  .home-quick-actions {
+    gap: 8px;
+  }
+
+  .home-quick-actions button {
+    min-height: 62px;
+    border-radius: 13px;
+    padding: 8px 4px;
+  }
+
+  .home-quick-actions button i {
+    font-size: 1rem;
+  }
+
+  .home-quick-actions button span {
+    font-size: .72rem;
   }
 }
 

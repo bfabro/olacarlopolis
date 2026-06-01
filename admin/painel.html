@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=260">
+  <link rel="stylesheet" href="painel.css?v=261">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -54,6 +54,7 @@
         <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
         <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
         <button data-view="relatorios" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorios</button>
+        <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
         <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
         <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
         <button data-view="minhaEmpresa" data-role="cliente" data-client-root-nav="true"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
@@ -1007,10 +1008,40 @@
           <div id="clientInvoicesMount"></div>
         </section>
       </section>
+
+      <section id="paginaInicialSiteView" class="panel-view hidden">
+        <section class="panel-card">
+          <div class="section-head">
+            <div>
+              <h2>Página Inicial Site</h2>
+              <p>Configure o banner de acessos rápidos exibido logo abaixo da busca principal.</p>
+            </div>
+          </div>
+          <form id="homePageForm" class="grid-form">
+            <label class="check-row wide">
+              <input id="homeBannerActive" type="checkbox">
+              Banner ativo na página inicial
+            </label>
+            <label class="wide">Título principal
+              <input id="homeBannerTitle" placeholder="Carlópolis em tempo real">
+            </label>
+            <label class="wide">Subtítulo
+              <textarea id="homeBannerSubtitle" rows="3" placeholder="Acesse os principais serviços, eventos, novidades e promoções da cidade."></textarea>
+            </label>
+            <label class="wide">Adicionar fotos do banner
+              <input id="homeBannerImagesUpload" type="file" accept="image/*" multiple>
+            </label>
+            <div class="form-actions wide">
+              <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar página inicial</button>
+            </div>
+          </form>
+          <div id="homeBannerImagesList" class="home-banner-admin-grid"></div>
+        </section>
+      </section>
     </section>
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=260"></script>
+  <script type="module" src="painel.js?v=261"></script>
 </body>
 </html>

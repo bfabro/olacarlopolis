@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 260,
-  label: "v260",
+  numero: 261,
+  label: "v261",
   data: "2026-06-01",
-  nota: "Aviso de fatura em aberto para clientes mensais."
+  nota: "Banner configuravel da pagina inicial."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -61,6 +61,7 @@ let state = {
   gruposWhatsapp: [],
   categorias: [],
   pagamentoSistema: {},
+  paginaInicialSite: {},
   metricas: {},
   reportPeriod: {
     type: "mensal",
@@ -121,6 +122,7 @@ const views = {
   financeiro: $("financeiroView"),
   relatorios: $("relatoriosView"),
   pagamentoSistema: $("pagamentoSistemaView"),
+  paginaInicialSite: $("paginaInicialSiteView"),
   usuarios: $("usuariosView"),
   minhaEmpresa: $("minhaEmpresaView"),
   faturas: $("faturasView")
@@ -138,6 +140,7 @@ const viewCopy = {
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
   relatorios: ["Relatorios", "Indicadores e pontos de atencao do painel."],
   pagamentoSistema: ["Pagamento", "Configure a chave Pix usada nas faturas."],
+  paginaInicialSite: ["Página Inicial Site", "Configure o banner principal de acessos rapidos."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
   minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."],
   faturas: ["Faturas", "Pix mensal, QR Code e comprovantes."]
@@ -271,6 +274,7 @@ function canManageInformacoes() {
 function canAccessView(viewName) {
   if (canManageClients()) {
     if (viewName === "pagamentoSistema") return isMaster();
+    if (viewName === "paginaInicialSite") return isMaster();
     return true;
   }
   if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenMonthlyInvoice(currentClientRecord());
@@ -1261,6 +1265,7 @@ async function loadAllData() {
     notasFalecimentoSnap,
     gruposWhatsappSnap,
     pagamentoSnap,
+    paginaInicialSnap,
     cliquesBotoesSnap,
     cliquesMenuSnap,
     acessosSnap,
@@ -1285,6 +1290,7 @@ async function loadAllData() {
     get(ref(db, "conteudosInformativos/notaFalecimento")),
     get(ref(db, "conteudosInformativos/gruposWhatsapp")),
     get(ref(db, "configuracoes/pagamento")),
+    get(ref(db, "configuracoes/paginaInicial")),
     get(ref(db, "cliquesPorBotao")),
     get(ref(db, "cliquesMenuLateral")),
     get(ref(db, "acessosPorDia")),
@@ -1344,6 +1350,7 @@ async function loadAllData() {
   }
   state.gruposWhatsapp.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
+  state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
   state.metricas = {
     cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
     cliquesMenu: cliquesMenuSnap.exists() ? cliquesMenuSnap.val() : {},
@@ -1437,6 +1444,7 @@ async function loadAllData() {
   renderFinanceiro();
   renderReports();
   renderPaymentSettings();
+  renderHomePageSettings();
   renderClientInvoices();
   renderClientBillingAlert();
 
@@ -1627,6 +1635,7 @@ function switchView(name) {
   if (target === "minhaEmpresa") renderClientOnlyEditor();
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
+  if (target === "paginaInicialSite") renderHomePageSettings();
   if (target === "relatorios") renderReports();
   if (target === "promocoesClientes") renderStaffPromocoesView();
   if (target === "imoveis") renderImoveisList();
@@ -4943,6 +4952,62 @@ function renderPaymentSettings() {
   $("paymentInvoiceNote").value = config.observacaoFatura || "";
 }
 
+function renderHomePageSettings() {
+  if (!$("homePageForm")) return;
+  const config = state.paginaInicialSite || {};
+  const imagens = Array.isArray(config.imagens) ? config.imagens.filter(Boolean) : [];
+  $("homeBannerActive").checked = config.ativo !== false;
+  $("homeBannerTitle").value = config.titulo || "Carlópolis em tempo real";
+  $("homeBannerSubtitle").value = config.subtitulo || "Acesse os principais serviços, eventos, novidades e promoções da cidade.";
+  const list = $("homeBannerImagesList");
+  if (!list) return;
+  list.innerHTML = imagens.length ? imagens.map((url, index) => `
+    <article class="home-banner-admin-item">
+      <img src="${escapeAttr(url)}" alt="Foto ${index + 1} do banner" loading="lazy">
+      <button type="button" class="danger-mini" data-remove-home-banner-image="${index}">
+        <i class="fa-solid fa-trash"></i> Remover
+      </button>
+    </article>
+  `).join("") : `<div class="list-meta">Nenhuma foto cadastrada. O site usara a imagem padrao ate voce adicionar fotos.</div>`;
+
+  list.querySelectorAll("[data-remove-home-banner-image]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const index = Number(button.dataset.removeHomeBannerImage);
+      const nextImages = imagens.filter((_, imgIndex) => imgIndex !== index);
+      await update(ref(db, "configuracoes/paginaInicial"), {
+        imagens: nextImages,
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user.uid
+      });
+      state.paginaInicialSite = { ...state.paginaInicialSite, imagens: nextImages };
+      renderHomePageSettings();
+      showToast("Foto removida do banner.");
+    });
+  });
+}
+
+async function uploadHomeBannerImages(files) {
+  const selected = Array.from(files || []).filter((file) => file.type?.startsWith("image/"));
+  if (!selected.length) return;
+  const currentImages = Array.isArray(state.paginaInicialSite?.imagens) ? state.paginaInicialSite.imagens.filter(Boolean) : [];
+  const uploaded = [];
+  for (const file of selected) {
+    const path = `configuracoes/paginaInicial/banner/${Date.now()}-${slugify(file.name || "banner")}`;
+    const fileRef = storageRef(storage, path);
+    const url = await uploadFileWithProgress(fileRef, file, "Enviando foto do banner", `${file.name || "imagem"} (${uploaded.length + 1}/${selected.length})`);
+    uploaded.push(url);
+  }
+  const imagens = [...currentImages, ...uploaded];
+  await update(ref(db, "configuracoes/paginaInicial"), {
+    imagens,
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user.uid
+  });
+  state.paginaInicialSite = { ...state.paginaInicialSite, imagens };
+  renderHomePageSettings();
+  showToast("Fotos do banner enviadas.");
+}
+
 function renderStaffPromocoesView() {
   const mount = $("staffPromocoesMount");
   if (!mount) return;
@@ -6865,6 +6930,34 @@ function bindEvents() {
     renderFinanceiro();
     renderReports();
     renderClientInvoices();
+  });
+  $("homePageForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!isMaster()) {
+      showToast("Somente master pode alterar a pagina inicial.");
+      return;
+    }
+    const payload = {
+      ativo: $("homeBannerActive")?.checked !== false,
+      titulo: $("homeBannerTitle")?.value.trim() || "Carlópolis em tempo real",
+      subtitulo: $("homeBannerSubtitle")?.value.trim() || "Acesse os principais serviços, eventos, novidades e promoções da cidade.",
+      imagens: Array.isArray(state.paginaInicialSite?.imagens) ? state.paginaInicialSite.imagens.filter(Boolean) : [],
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user?.uid || ""
+    };
+    await update(ref(db, "configuracoes/paginaInicial"), payload);
+    state.paginaInicialSite = payload;
+    renderHomePageSettings();
+    showToast("Pagina inicial salva.");
+  });
+  $("homeBannerImagesUpload")?.addEventListener("change", async (event) => {
+    if (!isMaster()) {
+      showToast("Somente master pode enviar fotos do banner.");
+      event.target.value = "";
+      return;
+    }
+    await uploadHomeBannerImages(event.target.files);
+    event.target.value = "";
   });
   $("newUserButton")?.addEventListener("click", () => {
     resetUserForm();
