@@ -1566,6 +1566,39 @@ function updateChrome() {
   if (masterOption) masterOption.disabled = !isMaster();
 }
 
+function renderClientBillingAlert() {
+  const box = $("clientBillingAlert");
+  if (!box) return;
+  const client = currentClientRecord();
+  if (!clientHasOpenMonthlyInvoice(client)) {
+    box.classList.add("hidden");
+    box.innerHTML = "";
+    return;
+  }
+
+  const months = pendingMonthsForClient(client);
+  const firstMonth = months[0] || currentMonthKey();
+  const dueDate = invoiceDueDateForMonth(client, firstMonth);
+  const total = months
+    .map((month) => buildClientInvoice(client, month, state.pagamentoSistema || {}))
+    .reduce((sum, invoice) => sum + invoice.valorTotal, 0);
+
+  box.classList.remove("hidden");
+  box.innerHTML = `
+    <div>
+      <strong><i class="fa-solid fa-triangle-exclamation"></i> Fatura em aberto</strong>
+      <p>Existe pagamento mensal pendente no plano ${escapeHtml(planLabel(client.tipoPlano))}, com vencimento em ${escapeHtml(formatDateBR(dueDate))}. O nao pagamento podera causar a inativacao do cadastro ate a regularizacao.</p>
+    </div>
+    <button type="button" data-open-client-invoices>
+      <i class="fa-solid fa-qrcode"></i> Ver faturas ${total > 0 ? `(${moneyBR(total)})` : ""}
+    </button>
+  `;
+  box.querySelector("[data-open-client-invoices]")?.addEventListener("click", () => {
+    switchView("faturas");
+    closeAdminMenuOnMobile();
+  });
+}
+
 function roleLabel(role) {
   const key = String(role || "").trim().toLowerCase();
   return {
@@ -3102,6 +3135,22 @@ function monthLabel(monthKey) {
   if (!/^\d{4}-\d{2}$/.test(String(monthKey || ""))) return String(monthKey || "");
   const [year, month] = monthKey.split("-").map(Number);
   return new Date(year, month - 1, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+}
+
+function invoiceDueDateForMonth(client, monthKey = currentMonthKey()) {
+  const [year, month] = String(monthKey || currentMonthKey()).split("-").map(Number);
+  if (!year || !month) return "";
+  const lastDay = new Date(year, month, 0).getDate();
+  const configuredDay = Number(client?.vencimentoDia);
+  const dueDay = Number.isFinite(configuredDay) && configuredDay > 0 ? Math.min(configuredDay, lastDay) : lastDay;
+  return dateKeyFromDate(new Date(year, month - 1, dueDay));
+}
+
+function clientHasOpenMonthlyInvoice(client) {
+  if (!client || canManageClients()) return false;
+  if ((client.tipoPlano || "mensal") !== "mensal") return false;
+  if (client.status === "inativo" || client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") return false;
+  return pendingMonthsForClient(client).length > 0;
 }
 
 function pendingMonthsForClient(client) {
