@@ -4488,6 +4488,14 @@ function clientReportCategory(row = {}) {
   return row.tipo || row.area || "Clique";
 }
 
+function clientReportResourceAllowed(category = "") {
+  const normalized = normalizeName(category);
+  if (/cardapio/.test(normalized)) return hasPermission("cardapio");
+  if (/promoc/.test(normalized)) return hasPermission("promocoes");
+  if (/foto|divulgacao|imagem/.test(normalized)) return hasPermission("imagens") || hasPermission("destaque");
+  return true;
+}
+
 function renderClientReportPeriodControls(range = getReportDateRange()) {
   return `
     <section class="panel-card report-period-card client-report-period-card">
@@ -4560,27 +4568,44 @@ function renderClientMetricReportContent(client = {}) {
   };
   const botoes = aggregateCliquesPorBotao(filtered.cliquesBotoes);
   const tipos = aggregateButtonTypesForClient(botoes.detalhes, keys);
-  const cardapios = sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerCardapios), keys) + Number(tipos.get("cardapio") || 0);
-  const whats = sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerWhats), keys) + Number(tipos.get("whatsapp") || 0) + Number(tipos.get("telefone") || 0);
-  const fotos = sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerFotos), keys) + Number(tipos.get("fotos") || 0) + Number(tipos.get("divulgacao") || 0);
-  const promocoes = sumMetricMapForClient(aggregateSimpleDaily(filtered.promocoes), keys);
-  const redes = [...tipos.entries()]
+  const tiposPermitidos = new Map([...tipos.entries()].filter(([tipo]) => clientReportResourceAllowed(clientReportCategory({ tipo }))));
+  const canShowCardapioReport = clientReportResourceAllowed("Cardapio");
+  const cardapios = canShowCardapioReport
+    ? sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerCardapios), keys) + Number(tiposPermitidos.get("cardapio") || 0)
+    : 0;
+  const whats = sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerWhats), keys) + Number(tiposPermitidos.get("whatsapp") || 0) + Number(tiposPermitidos.get("telefone") || 0);
+  const fotos = clientReportResourceAllowed("Fotos / divulgacao")
+    ? sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerFotos), keys) + Number(tiposPermitidos.get("fotos") || 0) + Number(tiposPermitidos.get("divulgacao") || 0)
+    : 0;
+  const promocoes = clientReportResourceAllowed("Promocoes")
+    ? sumMetricMapForClient(aggregateSimpleDaily(filtered.promocoes), keys)
+    : 0;
+  const redes = [...tiposPermitidos.entries()]
     .filter(([tipo]) => /instagram|facebook|tiktok|site|rede|social/i.test(String(tipo)))
     .reduce((sum, [, count]) => sum + Number(count || 0), 0);
-  const totalBotoes = [...tipos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
+  const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
   const total = cardapios + whats + fotos + promocoes + redes;
   const outros = Math.max(0, totalBotoes - (cardapios + whats + fotos + redes));
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
-    .map((row) => ({ ...row, categoria: clientReportCategory(row) }));
+    .map((row) => ({ ...row, categoria: clientReportCategory(row) }))
+    .filter((row) => clientReportResourceAllowed(row.categoria));
   const rows = [
     ["WhatsApp / telefone", whats],
-    ["Cardapio", cardapios],
+    ...(canShowCardapioReport ? [["Cardapio", cardapios]] : []),
     ["Fotos / divulgacao", fotos],
     ["Promocoes", promocoes],
     ["Redes sociais / links", redes],
     ["Outros botoes", outros]
   ];
+  const recursosTexto = [
+    "telefone",
+    ...(canShowCardapioReport ? ["cardapio"] : []),
+    ...(clientReportResourceAllowed("Fotos / divulgacao") ? ["fotos"] : []),
+    ...(clientReportResourceAllowed("Promocoes") ? ["promocoes"] : []),
+    "redes sociais",
+    "demais botoes"
+  ].join(", ");
 
   return `
     ${renderClientReportPeriodControls(range)}
@@ -4588,7 +4613,7 @@ function renderClientMetricReportContent(client = {}) {
       <div class="stats-grid client-report-stats">
         <article class="stat-card"><span>Total de interacoes</span><strong>${total + outros}</strong><small>${escapeHtml(range.label)}</small></article>
         <article class="stat-card"><span>WhatsApp</span><strong>${whats}</strong><small>Telefone e contato</small></article>
-        <article class="stat-card"><span>Cardapio</span><strong>${cardapios}</strong><small>Cliques no cardapio</small></article>
+        ${canShowCardapioReport ? `<article class="stat-card"><span>Cardapio</span><strong>${cardapios}</strong><small>Cliques no cardapio</small></article>` : ""}
         <article class="stat-card"><span>Promocoes</span><strong>${promocoes}</strong><small>Cliques em ofertas</small></article>
       </div>
       <div class="reports-grid client-report-grid">
@@ -4598,7 +4623,7 @@ function renderClientMetricReportContent(client = {}) {
         </section>
         <section class="panel-card report-card report-wide">
           <h3>Cliques detalhados por data e horario</h3>
-          <p class="list-meta">Use essa tabela para conferir interacoes reais no telefone, cardapio, fotos, promocoes, redes sociais e demais botoes.</p>
+          <p class="list-meta">Use essa tabela para conferir interacoes reais em ${escapeHtml(recursosTexto)}.</p>
           ${renderClientTimelineTable(timeline, "Ainda nao ha horarios detalhados para este cliente neste periodo.")}
         </section>
       </div>
