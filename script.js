@@ -2579,10 +2579,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const referencia = novidadesCidadeReferencia(lista);
     const vistasAte = novidadesCidadeVistasAte();
     if (!referencia) return renderAvisoNovidadesCidade(0);
-    if (!vistasAte) {
-      setNovidadesCidadeVistasAte(referencia);
-      return renderAvisoNovidadesCidade(0);
-    }
     const novas = lista.filter((item) => Number(item?.dataMs || 0) > vistasAte).length;
     renderAvisoNovidadesCidade(novas);
   }
