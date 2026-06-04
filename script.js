@@ -2663,9 +2663,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function novidadeImagens(item = {}) {
     const valores = [];
+    let temListaImagens = false;
     const adicionar = (valor) => {
       if (!valor) return;
       if (Array.isArray(valor)) {
+        if (valor.length) temListaImagens = true;
         valor.forEach(adicionar);
         return;
       }
@@ -2677,7 +2679,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (texto) valores.push(texto);
     };
     adicionar(item.imagens || item.images || item.fotos || item.Fotos);
-    adicionar(novidadeImagem(item));
+    if (!temListaImagens) adicionar(novidadeImagem(item));
     return [...new Set(valores)];
   }
 
@@ -7073,7 +7075,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
       telefone: item.telefone || item.contato || item.whatsapp || "",
       proprietario: item.proprietario || "",
       descricao: item.descricao || "",
-      imagem: item.imagem || imagens[0] || "",
+      imagem: imagens[0] || item.imagem || "",
       imagens: imagens.length ? imagens : (item.imagem ? [item.imagem] : []),
       clienteId: item.clienteId || "",
       clienteNome: item.clienteNome || "",
