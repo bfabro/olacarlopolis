@@ -2898,6 +2898,9 @@ document.addEventListener("DOMContentLoaded", function () {
             destinoCardId: novidadeDomId("promocao", `${promo.id}-${promo.estabelecimentoId}`),
             promoOriginalId: promo.id,
             categoria: promo.categoria,
+            telefone: promo.whatsapp || promo.contact || promo.contato || "",
+            logo: promo.logo || promo.estabelecimentoLogo || "",
+            validade: promo.validade || promo.dataValidade || "",
             valor: promoValorTexto(promo, formatarMoedaPromo(promo.preco))
           }));
         });
@@ -2939,6 +2942,15 @@ document.addEventListener("DOMContentLoaded", function () {
           const origem = tipo.includes("imovel") ? imoveisPorId.get(destinoId) : (tipo.includes("veiculo") || tipo.includes("automovel") ? autosPorId.get(destinoId) : null);
           if (!origem) return;
           item.codRef = item.codRef || origem.codRef || origem.codigo || origem.id || "";
+          item.telefone = item.telefone || origem.telefone || origem.contato || origem.whatsapp || "";
+          item.endereco = item.endereco || origem.endereco || origem.bairro || origem.local || origem.cidade || "";
+          item.cidade = item.cidade || origem.cidade || "Carlópolis - PR";
+          item.area = item.area || origem.area || origem.construcao || "";
+          item.caracteristica = item.caracteristica || origem.outros || origem.procura || origem.tipo || "";
+          item.ano = item.ano || origem.ano || "";
+          item.km = item.km || origem.km || "";
+          item.cambio = item.cambio || origem.cambio || "";
+          item.combustivel = item.combustivel || origem.combustivel || "";
         });
         autosPublicos.slice(0, 12).forEach((auto) => {
           const dataMs = novidadeCidadeMs(auto.createdAt || auto.updatedAt);
@@ -2957,6 +2969,12 @@ document.addEventListener("DOMContentLoaded", function () {
             destinoTipo: "veiculo",
             destinoId: auto.id,
             codRef: auto.codRef || auto.codigo || auto.id || "",
+            telefone: auto.contato || auto.telefone || auto.whatsapp || "",
+            ano: auto.ano || "",
+            km: auto.km || "",
+            cambio: auto.cambio || "",
+            combustivel: auto.combustivel || "",
+            cidade: auto.cidade || "",
             valor: auto.preco || ""
           }));
         });
@@ -2977,6 +2995,11 @@ document.addEventListener("DOMContentLoaded", function () {
             destinoTipo: "imovel",
             destinoId: imovel.id,
             codRef: imovel.codRef || imovel.codigo || imovel.id || "",
+            telefone: imovel.telefone || imovel.contato || imovel.whatsapp || "",
+            endereco: imovel.endereco || "",
+            cidade: imovel.cidade || "Carlópolis - PR",
+            area: imovel.area || imovel.construcao || "",
+            caracteristica: imovel.outros || imovel.procura || imovel.tipo || "",
             valor: imovel.valor || ""
           }));
         });
@@ -3135,33 +3158,129 @@ document.addEventListener("DOMContentLoaded", function () {
 
   try { window.montarNovidadesCidade = montarNovidadesCidade; } catch (e) { }
 
+  function novidadeValorCampo(item, nomes = []) {
+    for (const nome of nomes) {
+      const valor = item?.[nome] ?? item?.raw?.[nome];
+      if (valor !== undefined && valor !== null && String(valor).trim() !== "") return valor;
+    }
+    return "";
+  }
+
+  function novidadeTelefone(item) {
+    const valor = novidadeValorCampo(item, ["telefone", "contato", "whatsapp", "contact"]);
+    const digitos = somenteDigitos(valor || "");
+    return digitos.length >= 10 ? digitos : "";
+  }
+
+  function novidadeLogoAnunciante(item) {
+    return novidadeValorCampo(item, ["logo", "logoUrl", "perfil", "imagemPerfil", "clienteLogo"]) || "";
+  }
+
+  function novidadeDestaquePrincipal(item) {
+    const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
+    const valor = item?.valor || item?.raw?.valor || item?.raw?.preco || item?.raw?.valorTexto || "";
+    if (valor) return formatarMoedaPromo(valor) || String(valor);
+    if (tipo.includes("evento")) {
+      return novidadeValorCampo(item, ["data", "dataEvento", "date", "horario", "entrada", "valorEntrada"]);
+    }
+    if (tipo.includes("promoc")) {
+      return item?.descricao || item?.raw?.descricao || "Oferta especial";
+    }
+    if (tipo.includes("estabelecimento") || tipo.includes("vaga") || tipo.includes("grupo")) {
+      return item?.categoria || item?.raw?.categoria || "Atendimento em Carlópolis";
+    }
+    return "";
+  }
+
+  function novidadeInfoRapida(item) {
+    const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
+    const infos = [];
+    const add = (icon, principal, secundario) => {
+      const texto = principal === undefined || principal === null ? "" : String(principal).trim();
+      if (!texto || /^undefined|null|nan$/i.test(texto)) return;
+      infos.push({ icon, principal: texto, secundario: secundario || "" });
+    };
+    if (tipo.includes("imovel")) {
+      add("fa-location-dot", novidadeValorCampo(item, ["endereco", "bairro", "local"]) || "Carlópolis", novidadeValorCampo(item, ["cidade"]) || "Carlópolis - PR");
+      add("fa-star", novidadeValorCampo(item, ["caracteristica", "outros", "procura", "tipo"]), "Destaque");
+      const area = novidadeValorCampo(item, ["area", "metragem", "construcao", "areaConstruida"]);
+      add("fa-ruler-combined", area ? `${area}m²` : "", "Área total");
+    } else if (tipo.includes("veiculo") || tipo.includes("automovel")) {
+      add("fa-calendar", novidadeValorCampo(item, ["ano"]), "Ano");
+      const km = novidadeValorCampo(item, ["km", "quilometragem"]);
+      add("fa-gauge-high", km ? `${km} km` : "", "Rodado");
+      add("fa-gears", novidadeValorCampo(item, ["cambio", "combustivel"]), "Detalhe");
+    } else if (tipo.includes("promoc")) {
+      add("fa-store", item.estabelecimento || item.raw?.estabelecimento, "Comércio");
+      add("fa-tag", item.categoria || item.raw?.categoria, "Categoria");
+      add("fa-clock", novidadeValorCampo(item, ["validade", "dataValidade"]) || "Oferta recente", "Validade");
+    } else if (tipo.includes("evento")) {
+      add("fa-calendar-days", novidadeValorCampo(item, ["data", "dataEvento", "date"]) || item.tituloConteudo, "Data");
+      add("fa-location-dot", novidadeValorCampo(item, ["local", "endereco"]) || item.estabelecimento, "Local");
+      add("fa-ticket", novidadeValorCampo(item, ["entrada", "valor", "valorEntrada"]) || "Confira detalhes", "Entrada");
+    } else {
+      add("fa-store", item.estabelecimento || novidadeTituloDestino(item), "Responsável");
+      add("fa-location-dot", novidadeValorCampo(item, ["endereco", "cidade"]) || "Carlópolis - PR", "Local");
+      add("fa-bell", item.categoria || item.descricao || "Novidade recente", "Informação");
+    }
+    return infos.slice(0, 3);
+  }
+
+  function novidadeIconeAcao(tipo) {
+    const key = normalizeName(tipo || "");
+    if (key.includes("imovel")) return "fa-house";
+    if (key.includes("veiculo") || key.includes("automovel")) return "fa-car";
+    if (key.includes("promoc")) return "fa-tag";
+    if (key.includes("evento")) return "fa-calendar-days";
+    return "fa-arrow-right";
+  }
+
   function abrirModalNovidadeCidade(id, origemClique = "modal") {
     const item = novidadesCidadeCache.find((novidade) => String(novidade.id) === String(id));
     if (!item) return;
     if (origemClique === "item") registrarCliqueNovidadeCidade("item", item);
     document.querySelector(".novidade-preview-overlay")?.remove();
     const imagens = item.imagens?.length ? item.imagens : (item.imagem ? [item.imagem] : []);
-    const destino = novidadeTituloDestino(item) || item.descricao || "";
-    const valor = item.valor ? `<strong class="novidade-preview-price">${escapePromoHtml(formatarMoedaPromo(item.valor) || item.valor)}</strong>` : "";
+    const destino = novidadeTituloCard(item) || novidadeTituloDestino(item) || item.descricao || "";
     const tipoRef = normalizeName(item.destinoTipo || item.tipo || "");
     const mostrarReferencia = tipoRef.includes("imovel") || tipoRef.includes("veiculo") || tipoRef.includes("automovel");
     const codRef = mostrarReferencia ? String(item.codRef || item.codigoReferencia || item.codigo || item.raw?.codRef || item.raw?.codigoReferencia || item.raw?.codigo || "").trim() : "";
-    const metaValor = (valor || codRef) ? `
-      <div class="novidade-preview-meta-row">
-        ${valor || "<span></span>"}
-        ${codRef ? `<span class="novidade-preview-ref">Ref. ${escapePromoHtml(codRef)}</span>` : ""}
-      </div>
-    ` : "";
     const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo);
+    const categoria = novidadeCategoriaInfo(item);
+    const status = novidadeStatusInfo(item);
+    const anunciante = novidadeEstabelecimentoCard(item) || novidadeNomePrincipal(item);
+    const logo = novidadeLogoAnunciante(item);
+    const destaque = novidadeDestaquePrincipal(item);
+    const infos = novidadeInfoRapida(item);
+    const telefone = novidadeTelefone(item);
+    const whatsappTexto = [
+      "Olá! Vi esta novidade no Olá Carlópolis e quero mais informações.",
+      destino ? `Item: ${destino}` : "",
+      codRef ? `Referência: ${codRef}` : "",
+      destaque ? `Destaque: ${destaque}` : "",
+      anunciante ? `Responsável: ${anunciante}` : ""
+    ].filter(Boolean).join("\n");
     const overlay = document.createElement("div");
     overlay.className = "novidade-preview-overlay";
     overlay.innerHTML = `
       <div class="novidade-preview-modal ${tipoClass}" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.titulo)}">
-        <button type="button" class="novidade-preview-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
-        <h3>${escapePromoHtml(novidadeNomePrincipal(item))}</h3>
-        <p>${escapePromoHtml(item.titulo || "Novidade")}</p>
+        <div class="novidade-preview-badges">
+          <span class="novidade-preview-badge categoria"><i class="fa-solid ${escapePromoHtml(categoria.icon)}"></i>${escapePromoHtml(categoria.label)}</span>
+          <span class="novidade-preview-badge status ${escapePromoHtml(status.className)}"><i class="fa-solid ${status.className === "atualizado" ? "fa-rotate" : "fa-plus"}"></i>${escapePromoHtml(status.label)}</span>
+          <span class="novidade-preview-badge tempo"><i class="fa-regular fa-clock"></i>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</span>
+          ${codRef ? `<span class="novidade-preview-badge ref">Ref. ${escapePromoHtml(codRef)}</span>` : ""}
+        </div>
+        ${anunciante ? `
+          <div class="novidade-preview-owner">
+            <span class="novidade-preview-owner-logo">
+              ${logo ? `<img src="${escapePromoHtml(logo)}" alt="${escapePromoHtml(anunciante)}" loading="lazy" decoding="async">` : `<i class="fa-solid fa-store"></i>`}
+            </span>
+            <span>${escapePromoHtml(anunciante)}</span>
+          </div>
+        ` : ""}
         ${imagens.length ? `
           <div class="novidade-preview-gallery">
+            <button type="button" class="novidade-preview-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
             <div class="novidade-preview-track">
               ${imagens.map((img, index) => `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(destino || item.estabelecimento || "Novidade")}" data-novidade-img="${index}" loading="lazy" decoding="async">`).join("")}
             </div>
@@ -3171,10 +3290,33 @@ document.addEventListener("DOMContentLoaded", function () {
               <span class="novidade-gallery-count">1/${imagens.length}</span>
             ` : ""}
           </div>
+        ` : `
+          <div class="novidade-preview-gallery novidade-preview-placeholder">
+            <button type="button" class="novidade-preview-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+            <i class="fa-solid ${escapePromoHtml(categoria.icon)}"></i>
+          </div>
+        `}
+        ${destino ? `<h3>${escapePromoHtml(destino)}</h3>` : ""}
+        ${destaque ? `<strong class="novidade-preview-price">${escapePromoHtml(destaque)}</strong>` : ""}
+        ${infos.length ? `
+          <div class="novidade-preview-quick-info">
+            ${infos.map((info) => `
+              <div>
+                <i class="fa-solid ${escapePromoHtml(info.icon)}"></i>
+                <span>${escapePromoHtml(info.principal)}</span>
+                ${info.secundario ? `<small>${escapePromoHtml(info.secundario)}</small>` : ""}
+              </div>
+            `).join("")}
+          </div>
         ` : ""}
-        ${destino ? `<h4>${escapePromoHtml(destino)}</h4>` : ""}
-        ${metaValor}
-        <button type="button" class="novidade-preview-open ${tipoClass}">${escapePromoHtml(novidadeModalActionLabel(item.destinoTipo || item.tipo))}</button>
+        <div class="novidade-preview-actions">
+          ${telefone ? `<a class="novidade-preview-whatsapp telefone-link" href="https://wa.me/55${escapePromoHtml(telefone)}?text=${encodeURIComponent(whatsappTexto)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ""}
+          <button type="button" class="novidade-preview-open ${tipoClass}">
+            <i class="fa-solid ${escapePromoHtml(novidadeIconeAcao(item.destinoTipo || item.tipo))}"></i>
+            <span>${escapePromoHtml(novidadeActionLabel(item.destinoTipo || item.tipo))}</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -3196,13 +3338,24 @@ document.addEventListener("DOMContentLoaded", function () {
       setTimeout(atualizarCount, 260);
     });
     track?.addEventListener("scroll", atualizarCount, { passive: true });
-    overlay.querySelector(".novidade-preview-close")?.addEventListener("click", () => overlay.remove());
+    const fecharModalNovidade = () => {
+      document.removeEventListener("keydown", fecharComEsc);
+      overlay.remove();
+    };
+    const fecharComEsc = (event) => {
+      if (event.key === "Escape") fecharModalNovidade();
+    };
+    overlay.querySelector(".novidade-preview-close")?.addEventListener("click", fecharModalNovidade);
     overlay.addEventListener("click", (event) => {
-      if (event.target === overlay) overlay.remove();
+      if (event.target === overlay) fecharModalNovidade();
+    });
+    document.addEventListener("keydown", fecharComEsc);
+    overlay.querySelector(".novidade-preview-whatsapp")?.addEventListener("click", () => {
+      registrarCliqueNovidadeCidade("whatsapp", item);
     });
     overlay.querySelector(".novidade-preview-open")?.addEventListener("click", () => {
       registrarCliqueNovidadeCidade("abrir-destino", item);
-      overlay.remove();
+      fecharModalNovidade();
       abrirDestinoNovidadeCidade(item);
     });
   }
