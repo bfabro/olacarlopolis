@@ -18579,52 +18579,138 @@ body.vaga-modal-open {
 
 /* Feed da aba Novidades da cidade */
 .novidades-cidade-wrap {
-  width: min(960px, calc(100% - 16px));
-  margin: 12px auto 28px;
+  width: min(760px, calc(100% - 16px));
+  margin: 12px auto 30px;
 }
 
 .novidades-cidade-resumo {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 14px;
+  padding: 18px;
+  border: 1px solid #e4ecf7;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.09);
+}
+
+.novidades-cidade-resumo > span {
+  display: none;
+}
+
+#novidadesSemanaResumo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  font-weight: inherit;
+}
+
+.novidades-resumo-copy {
+  display: grid;
   gap: 5px;
-  margin: 0 0 12px;
-  padding: 16px 18px;
-  border: 1px solid #dbe7ff;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #ffffff 0%, #eef5ff 100%);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  min-width: 0;
 }
 
-.novidades-cidade-resumo strong {
-  color: var(--blue-color, #0f5eea);
-  font-size: 18px;
+.novidades-resumo-copy strong {
+  color: #0b1736;
+  font-size: 19px;
   font-weight: 900;
+  line-height: 1.1;
 }
 
-.novidades-cidade-resumo span {
+.novidades-resumo-copy small {
   color: #64748b;
   font-size: 13px;
   line-height: 1.3;
+  font-weight: 700;
+}
+
+.novidades-resumo-contador {
+  flex: 0 0 auto;
+  min-width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: #0f5eea;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 950;
+  box-shadow: 0 10px 22px rgba(15, 94, 234, .22);
 }
 
 .novidades-cidade-feed {
+  display: grid;
+  gap: 16px;
+}
+
+.novidade-filter-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 6px;
+  scrollbar-width: none;
+}
+
+.novidade-filter-row::-webkit-scrollbar {
+  display: none;
+}
+
+.novidade-filter-chip {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #dbe7f4;
+  border-radius: 999px;
+  background: #fff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, .05);
+}
+
+.novidade-filter-chip.ativo {
+  border-color: #0f5eea;
+  background: #0f5eea;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(15, 94, 234, .2);
+}
+
+.novidade-periodo-grupo {
+  display: grid;
+  gap: 9px;
+}
+
+.novidade-periodo-grupo h3 {
+  margin: 0;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.novidade-periodo-lista {
   display: grid;
   gap: 10px;
 }
 
 .novidade-feed-card {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
   position: relative;
-  min-height: 92px;
-  padding: 8px 12px 8px 12px;
-  border: 1px solid #dfe7f3;
-  border-left: 6px solid var(--novidade-color, var(--blue-color, #0f5eea));
-  border-radius: 16px;
+  min-height: 112px;
+  padding: 10px 12px 10px 14px;
+  border: 1px solid #e3e9f2;
+  border-left: 5px solid var(--novidade-color, var(--blue-color, #0f5eea));
+  border-radius: 18px;
   background: #fff;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
   cursor: pointer;
   transition: transform .16s ease, box-shadow .16s ease;
 }
@@ -18635,8 +18721,8 @@ body.vaga-modal-open {
 }
 
 .novidade-feed-img {
-  width: 72px;
-  height: 72px;
+  width: 82px;
+  height: 82px;
   border-radius: 12px;
   overflow: hidden;
   display: grid;
@@ -18654,15 +18740,70 @@ body.vaga-modal-open {
 }
 
 .novidade-feed-info {
+  display: grid;
+  gap: 6px;
   min-width: 0;
+}
+
+.novidade-feed-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.novidade-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 950;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.novidade-badge.categoria {
+  background: color-mix(in srgb, var(--novidade-color, #0f5eea) 12%, #fff);
+  color: var(--novidade-color, #0f5eea);
+}
+
+.novidade-badge.promocoes {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.novidade-badge.status.novo {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.novidade-badge.status.atualizado {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.novidade-badge.comercios {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.novidade-feed-meta time {
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .novidade-feed-info strong {
   display: block;
   color: #0b1736;
-  font-size: 15px;
-  font-weight: 900;
-  line-height: 1.15;
+  font-size: 16px;
+  font-weight: 950;
+  line-height: 1.18;
   overflow: visible;
   text-overflow: clip;
   white-space: normal;
@@ -18670,11 +18811,11 @@ body.vaga-modal-open {
 }
 
 .novidade-feed-info p {
-  margin: 8px 0 0;
-  color: #1d4ed8;
+  margin: 0;
+  color: #64748b;
   font-size: 13px;
   line-height: 1.25;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .novidade-action-tag {
@@ -18701,13 +18842,27 @@ body.vaga-modal-open {
   background: #eff6ff;
 }
 
-.novidade-feed-info small,
-.novidade-feed-info span {
+.novidade-feed-info > small,
+.novidade-feed-info > span {
   display: block;
   margin-top: 2px;
   color: #64748b;
   font-size: 12px;
   line-height: 1.2;
+}
+
+.novidade-card-detalhes {
+  justify-self: start;
+  min-height: 28px;
+  margin-top: 2px;
+  padding: 0 10px;
+  border: 1px solid #dbe7f4;
+  border-radius: 999px;
+  background: #f8fbff;
+  color: #0f5eea;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .novidade-preview-open {
@@ -18733,7 +18888,7 @@ body.vaga-modal-open {
 
 .novidade-feed-card.tipo-promocao,
 .novidade-preview-modal.tipo-promocao {
-  --novidade-color: #ef233c;
+  --novidade-color: #f97316;
 }
 
 .novidade-feed-card.tipo-evento,
@@ -18749,10 +18904,6 @@ body.vaga-modal-open {
 .novidade-feed-card.tipo-estabelecimento,
 .novidade-preview-modal.tipo-estabelecimento {
   --novidade-color: #0f5eea;
-}
-
-.novidade-feed-card {
-  border-left: 5px solid var(--novidade-color, var(--blue-color, #0f5eea));
 }
 
 .novidades-empty {
@@ -18935,14 +19086,14 @@ body.vaga-modal-open {
   }
 
   .novidade-feed-card {
-    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-columns: 82px minmax(0, 1fr);
     gap: 9px;
     padding: 8px 10px;
   }
 
   .novidade-feed-img {
-    width: 72px;
-    height: 72px;
+    width: 82px;
+    height: 82px;
   }
 
 }

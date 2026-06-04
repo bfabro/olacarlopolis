@@ -2708,6 +2708,57 @@ document.addEventListener("DOMContentLoaded", function () {
     return item?.estabelecimento || "Olá Carlópolis";
   }
 
+  let novidadesCidadeFiltroAtivo = "todos";
+
+  function novidadeCategoriaInfo(item) {
+    const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
+    const texto = normalizeName(`${item?.titulo || ""} ${item?.acao || ""} ${item?.descricao || ""}`);
+    if (tipo.includes("imovel")) return { key: "imoveis", label: "Imóvel", icon: "fa-house" };
+    if (tipo.includes("veiculo") || tipo.includes("automovel")) return { key: "veiculos", label: "Veículo", icon: "fa-car" };
+    if (tipo.includes("promoc")) return { key: "promocoes", label: "Promoção", icon: "fa-tag" };
+    if (texto.includes("destaque")) return { key: "comercios", label: "Destaque", icon: "fa-star" };
+    if (tipo.includes("estabelecimento")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
+    return { key: "servicos", label: "Serviço", icon: "fa-bell" };
+  }
+
+  function novidadeStatusInfo(item) {
+    const texto = normalizeName(novidadeTextoAcao(item));
+    if (texto.includes("atualiz") || texto.includes("preco") || texto.includes("abaixou")) return { label: "Atualizado", className: "atualizado" };
+    return { label: "Novo", className: "novo" };
+  }
+
+  function novidadePeriodoInfo(item) {
+    const data = new Date(item?.dataMs || 0);
+    const agora = new Date();
+    const inicioHoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate()).getTime();
+    const inicioOntem = inicioHoje - 86400000;
+    const dataMs = data.getTime();
+    if (dataMs >= inicioHoje) return "Hoje";
+    if (dataMs >= inicioOntem) return "Ontem";
+    return "Esta semana";
+  }
+
+  function novidadeTituloCard(item) {
+    const destino = novidadeTituloDestino(item);
+    const acao = novidadeTextoAcao(item);
+    const categoria = novidadeCategoriaInfo(item);
+    const status = novidadeStatusInfo(item);
+    if (destino) {
+      if (categoria.key === "imoveis") return status.className === "atualizado" ? `${destino} atualizado` : destino;
+      if (categoria.key === "veiculos") return status.className === "atualizado" ? `${destino} atualizado` : destino;
+      return destino;
+    }
+    if (acao) return acao;
+    return status.className === "atualizado" ? `${categoria.label} atualizado` : `Novo ${categoria.label.toLowerCase()} cadastrado`;
+  }
+
+  function novidadeEstabelecimentoCard(item) {
+    const nome = novidadeNomePrincipal(item);
+    const titulo = novidadeTituloCard(item);
+    if (normalizeName(nome) === normalizeName(titulo)) return item?.estabelecimento || item?.raw?.clienteNome || "";
+    return nome;
+  }
+
   function novidadeTipoClasse(tipo) {
     const key = normalizeName(tipo || "");
     if (key.includes("imovel")) return "tipo-imovel";
@@ -2987,28 +3038,81 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!feed) return;
     const inicioSemana = Date.now() - 7 * 86400000;
     const semana = lista.filter((item) => (item.dataMs || 0) >= inicioSemana).length;
-    if (resumo) resumo.textContent = `🔥 ${semana} novidade${semana === 1 ? "" : "s"} esta semana`;
+    if (resumo) {
+      resumo.innerHTML = `
+        <span class="novidades-resumo-copy">
+          <strong>🔥 Novidades da semana</strong>
+          <small>Tudo que foi adicionado ou atualizado recentemente.</small>
+        </span>
+        <span class="novidades-resumo-contador">${semana}</span>
+      `;
+    }
     if (!lista.length) {
       feed.innerHTML = `<div class="novidades-empty">Nenhuma novidade recente no momento.</div>`;
       return;
     }
-    feed.innerHTML = lista.map((item) => {
+    const filtros = [
+      ["todos", "Todos"],
+      ["comercios", "Comércios"],
+      ["promocoes", "Promoções"],
+      ["imoveis", "Imóveis"],
+      ["veiculos", "Veículos"],
+      ["servicos", "Serviços"]
+    ];
+    const filtrada = novidadesCidadeFiltroAtivo === "todos"
+      ? lista
+      : lista.filter((item) => novidadeCategoriaInfo(item).key === novidadesCidadeFiltroAtivo);
+    const grupos = ["Hoje", "Ontem", "Esta semana"].map((titulo) => ({
+      titulo,
+      itens: filtrada.filter((item) => novidadePeriodoInfo(item) === titulo)
+    })).filter((grupo) => grupo.itens.length);
+    const chipsHtml = filtros.map(([key, label]) => `
+      <button type="button" class="novidade-filter-chip ${novidadesCidadeFiltroAtivo === key ? "ativo" : ""}" data-novidade-filter="${key}">
+        ${escapePromoHtml(label)}
+      </button>
+    `).join("");
+    const cardsHtml = grupos.length ? grupos.map((grupo) => `
+      <section class="novidade-periodo-grupo" aria-label="${escapePromoHtml(grupo.titulo)}">
+        <h3>${escapePromoHtml(grupo.titulo)}</h3>
+        <div class="novidade-periodo-lista">
+          ${grupo.itens.map((item) => {
       const img = item.imagem;
-      const destino = novidadeTituloDestino(item);
       const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo);
+      const categoria = novidadeCategoriaInfo(item);
+      const status = novidadeStatusInfo(item);
+      const titulo = novidadeTituloCard(item);
+      const estabelecimento = novidadeEstabelecimentoCard(item);
       return `
         <article class="novidade-feed-card ${tipoClass}" data-novidade-id="${escapePromoHtml(item.id)}">
           <div class="novidade-feed-img">
-            ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(novidadeNomePrincipal(item) || item.titulo)}" loading="lazy" decoding="async">` : `<i class="fa-regular fa-bell"></i>`}
+            ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(titulo || item.titulo)}" loading="lazy" decoding="async">` : `<i class="fa-solid ${escapePromoHtml(categoria.icon)}"></i>`}
           </div>
           <div class="novidade-feed-info">
-            <strong>${escapePromoHtml(novidadeNomePrincipal(item))}</strong>
-            <p>${novidadeTextoAcaoHtml(item)}</p>
-            <span>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</span>
+            <div class="novidade-feed-meta">
+              <span class="novidade-badge categoria ${escapePromoHtml(categoria.key)}">${escapePromoHtml(categoria.label)}</span>
+              <span class="novidade-badge status ${escapePromoHtml(status.className)}">${escapePromoHtml(status.label)}</span>
+              <time>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</time>
+            </div>
+            <strong>${escapePromoHtml(titulo)}</strong>
+            ${estabelecimento ? `<p>${escapePromoHtml(estabelecimento)}</p>` : ""}
+            <button type="button" class="novidade-card-detalhes">Ver detalhes</button>
           </div>
         </article>
       `;
-    }).join("");
+          }).join("")}
+        </div>
+      </section>
+    `).join("") : `<div class="novidades-empty">Nenhuma novidade neste filtro.</div>`;
+    feed.innerHTML = `
+      <div class="novidade-filter-row" role="tablist" aria-label="Filtros de novidades">${chipsHtml}</div>
+      ${cardsHtml}
+    `;
+    feed.querySelectorAll(".novidade-filter-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        novidadesCidadeFiltroAtivo = chip.dataset.novidadeFilter || "todos";
+        renderNovidadesCidade(lista);
+      });
+    });
     feed.querySelectorAll(".novidade-feed-card").forEach((card) => {
       card.addEventListener("click", () => abrirModalNovidadeCidade(card.dataset.novidadeId, "item"));
       card.querySelector("button")?.addEventListener("click", (event) => {
