@@ -2743,12 +2743,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const acao = novidadeTextoAcao(item);
     const categoria = novidadeCategoriaInfo(item);
     const status = novidadeStatusInfo(item);
-    if (destino) {
-      if (categoria.key === "imoveis") return status.className === "atualizado" ? `${destino} atualizado` : destino;
-      if (categoria.key === "veiculos") return status.className === "atualizado" ? `${destino} atualizado` : destino;
-      return destino;
-    }
-    if (acao) return acao;
+    if (destino) return destino;
+    const acaoLimpa = String(acao || "")
+      .replace(/\b(inserido|inserida|atualizado|atualizada)\b/gi, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+    if (acaoLimpa) return acaoLimpa;
     return status.className === "atualizado" ? `${categoria.label} atualizado` : `Novo ${categoria.label.toLowerCase()} cadastrado`;
   }
 
