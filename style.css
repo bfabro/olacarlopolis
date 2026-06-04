@@ -18803,7 +18803,7 @@ body.vaga-modal-open {
 .novidade-feed-info strong {
   display: block;
   color: #0b1736;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 950;
   line-height: 1.18;
   overflow: visible;
@@ -18815,7 +18815,7 @@ body.vaga-modal-open {
 .novidade-feed-info p {
   margin: 0;
   color: #64748b;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.25;
   font-weight: 800;
   overflow: hidden;
@@ -19198,12 +19198,12 @@ body.vaga-modal-open {
   .novidade-feed-card {
     grid-template-columns: 84px minmax(0, 1fr);
     gap: 9px;
-    padding: 8px 10px;
+    padding: 8px 4x;
   }
 
   .novidade-feed-img {
-    width: 84px;
-    height: 84px;
+    width: 88px;
+    height: 88px;
   }
 
   .novidade-preview-overlay {
