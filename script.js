@@ -2761,6 +2761,7 @@ document.addEventListener("DOMContentLoaded", function () {
       destinoCardId: base.destinoCardId || "",
       categoria: base.categoria || "",
       valor: base.valor || base.preco || base.valorTexto || "",
+      codRef: base.codRef || base.codigoReferencia || base.codigo || base.referencia || "",
       raw: base
     };
   }
@@ -2877,8 +2878,17 @@ document.addEventListener("DOMContentLoaded", function () {
           if (imovel.ocultarBaseInicial) return false;
           return clienteEstaPublico(imovel.estabelecimentoId, imovel.clienteId, imovel.clienteNome, imovel.corretor);
         });
+        const autosPorId = new Map(autosPublicos.map((auto) => [String(auto.id || ""), auto]).filter(([id]) => id));
+        const imoveisPorId = new Map(imoveisPublicos.map((imovel) => [String(imovel.id || ""), imovel]).filter(([id]) => id));
         autosPublicos.forEach((auto) => liveAutomoveis.add(String(auto.id || "")));
         imoveisPublicos.forEach((imovel) => liveImoveis.add(String(imovel.id || "")));
+        registros.forEach((item) => {
+          const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+          const destinoId = String(item.destinoId || item.raw?.itemId || "");
+          const origem = tipo.includes("imovel") ? imoveisPorId.get(destinoId) : (tipo.includes("veiculo") || tipo.includes("automovel") ? autosPorId.get(destinoId) : null);
+          if (!origem) return;
+          item.codRef = item.codRef || origem.codRef || origem.codigo || origem.id || "";
+        });
         autosPublicos.slice(0, 12).forEach((auto) => {
           const dataMs = novidadeCidadeMs(auto.createdAt || auto.updatedAt);
           if (!dataMs) return;
@@ -2895,6 +2905,7 @@ document.addEventListener("DOMContentLoaded", function () {
             dataCriacao: dataMs,
             destinoTipo: "veiculo",
             destinoId: auto.id,
+            codRef: auto.codRef || auto.codigo || auto.id || "",
             valor: auto.preco || ""
           }));
         });
@@ -2914,6 +2925,7 @@ document.addEventListener("DOMContentLoaded", function () {
             dataCriacao: dataMs,
             destinoTipo: "imovel",
             destinoId: imovel.id,
+            codRef: imovel.codRef || imovel.codigo || imovel.id || "",
             valor: imovel.valor || ""
           }));
         });
@@ -3027,6 +3039,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const imagens = item.imagens?.length ? item.imagens : (item.imagem ? [item.imagem] : []);
     const destino = novidadeTituloDestino(item) || item.descricao || "";
     const valor = item.valor ? `<strong class="novidade-preview-price">${escapePromoHtml(formatarMoedaPromo(item.valor) || item.valor)}</strong>` : "";
+    const tipoRef = normalizeName(item.destinoTipo || item.tipo || "");
+    const mostrarReferencia = tipoRef.includes("imovel") || tipoRef.includes("veiculo") || tipoRef.includes("automovel");
+    const codRef = mostrarReferencia ? String(item.codRef || item.codigoReferencia || item.codigo || item.raw?.codRef || item.raw?.codigoReferencia || item.raw?.codigo || "").trim() : "";
+    const metaValor = (valor || codRef) ? `
+      <div class="novidade-preview-meta-row">
+        ${valor || "<span></span>"}
+        ${codRef ? `<span class="novidade-preview-ref">Ref. ${escapePromoHtml(codRef)}</span>` : ""}
+      </div>
+    ` : "";
     const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo);
     const overlay = document.createElement("div");
     overlay.className = "novidade-preview-overlay";
@@ -3048,7 +3069,7 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
         ` : ""}
         ${destino ? `<h4>${escapePromoHtml(destino)}</h4>` : ""}
-        ${valor}
+        ${metaValor}
         <button type="button" class="novidade-preview-open ${tipoClass}">${escapePromoHtml(novidadeModalActionLabel(item.destinoTipo || item.tipo))}</button>
       </div>
     `;
@@ -8192,6 +8213,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       marca: item.Marca || item.marca || "",
       modelo: item.Modelo || item.modelo || item.titulo || item.Titulo || "",
       ano: item.Ano || item.ano || "",
+      codRef: item.codRef || item.codigo || item.Codigo || item["Codigo Referencia"] || item["Código Referencia"] || item["Cod Ref"] || key || "",
       preco: item.Preco || item.Preço || item.preco || item.valor || "",
       condicao: item.Condicao || item.condicao || item.estado || "",
       km: item.Km || item.km || item.quilometragem || "",

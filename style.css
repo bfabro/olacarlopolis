@@ -18845,22 +18845,30 @@ body.vaga-modal-open {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 38px;
-  height: 38px;
+  width: 26px;
+  height: 26px;
   border: 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, .92);
-  color: #0b1736;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, .18);
+  background: rgba(255, 255, 255, .68);
+  color: rgba(11, 23, 54, .72);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, .12);
   cursor: pointer;
+  font-size: 11px;
+  opacity: .74;
+  transition: opacity .18s ease, background .18s ease;
+}
+
+.novidade-gallery-nav:hover {
+  background: rgba(255, 255, 255, .88);
+  opacity: 1;
 }
 
 .novidade-gallery-nav.prev {
-  left: 10px;
+  left: 8px;
 }
 
 .novidade-gallery-nav.next {
-  right: 10px;
+  right: 8px;
 }
 
 .novidade-gallery-count {
@@ -18888,6 +18896,31 @@ body.vaga-modal-open {
   color: var(--blue-color, #0f5eea);
   font-size: 20px;
   font-weight: 950;
+}
+
+.novidade-preview-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 14px;
+}
+
+.novidade-preview-meta-row .novidade-preview-price {
+  margin: 0;
+}
+
+.novidade-preview-ref {
+  margin-left: auto;
+  padding: 5px 9px;
+  border: 1px solid #d9e6ff;
+  border-radius: 999px;
+  background: #f8fbff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .novidade-preview-open {
