@@ -3167,8 +3167,33 @@ document.addEventListener("DOMContentLoaded", function () {
     return digitos.length >= 10 ? digitos : "";
   }
 
-  function novidadeLogoAnunciante(item) {
-    return novidadeValorCampo(item, ["logo", "logoUrl", "perfil", "imagemPerfil", "clienteLogo"]) || item?.imagem || item?.imagens?.[0] || "";
+  function encontrarCadastroDonoNovidade(item, anunciante = "") {
+    const chaves = [
+      anunciante,
+      item?.estabelecimento,
+      item?.raw?.estabelecimento,
+      item?.raw?.clienteNome,
+      item?.raw?.clienteId,
+      item?.destinoId
+    ].map((valor) => normalizeName(valor || "")).filter(Boolean);
+    if (!chaves.length || !Array.isArray(categories)) return null;
+    for (const cat of categories) {
+      for (const est of (cat.establishments || [])) {
+        const nome = normalizeName(est?.name || est?.nome || est?.id || "");
+        if (!nome) continue;
+        if (chaves.some((chave) => nome === chave || nome.includes(chave) || chave.includes(nome))) return est;
+      }
+    }
+    return null;
+  }
+
+  function novidadeLogoAnunciante(item, anunciante = "") {
+    const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
+    if (tipo.includes("evento")) return "images/img_padrao_site/logo_1.png";
+    const direto = novidadeValorCampo(item, ["logo", "logoUrl", "perfil", "perfilUrl", "imagemPerfil", "clienteLogo", "profileImage"]);
+    if (direto) return direto;
+    const cadastro = encontrarCadastroDonoNovidade(item, anunciante);
+    return cadastro?.image || cadastro?.logo || cadastro?.logoUrl || cadastro?.profileImage || cadastro?.perfil || cadastro?.imagemPerfil || "";
   }
 
   function novidadeDestaquePrincipal(item) {
@@ -3243,7 +3268,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo);
     const categoria = novidadeCategoriaInfo(item);
     const anunciante = novidadeEstabelecimentoCard(item) || novidadeNomePrincipal(item);
-    const logo = novidadeLogoAnunciante(item);
+    const logo = novidadeLogoAnunciante(item, anunciante);
     const destaque = novidadeDestaquePrincipal(item);
     const infos = novidadeInfoRapida(item);
     const telefone = novidadeTelefone(item);
