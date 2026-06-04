@@ -2626,20 +2626,20 @@ screen and (width: 820px) {
 
 .novidades-alert-badge {
   position: absolute;
-  top: -7px;
-  right: -7px;
+  top: -10px;
+  right: -10px;
   z-index: 2;
   display: none;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
   border-radius: 999px;
   background: #ef233c;
   color: #fff;
-  border: 2px solid #fff;
-  box-shadow: 0 6px 14px rgba(239,35,60,.28);
-  font-size: 11px;
-  line-height: 16px;
+  border: 3px solid #fff;
+  box-shadow: 0 8px 18px rgba(239,35,60,.32);
+  font-size: 13px;
+  line-height: 22px;
   font-weight: 900;
   text-align: center;
 }
@@ -18675,6 +18675,30 @@ body.vaga-modal-open {
   font-size: 13px;
   line-height: 1.25;
   font-weight: 700;
+}
+
+.novidade-action-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  margin: 0 2px;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.novidade-action-tag.inserido {
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.novidade-action-tag.atualizado {
+  color: #1d4ed8;
+  background: #eff6ff;
 }
 
 .novidade-feed-info small,

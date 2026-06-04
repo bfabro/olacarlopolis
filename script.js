@@ -2691,6 +2691,17 @@ document.addEventListener("DOMContentLoaded", function () {
     return item?.acao || item?.raw?.acao || item?.titulo || item?.descricao || "Nova atualização disponível";
   }
 
+  function novidadeTextoAcaoHtml(item) {
+    const texto = novidadeTextoAcao(item);
+    const match = String(texto).match(/\b(inserido|inserida|atualizado|atualizada)\b/i);
+    if (!match) return escapePromoHtml(texto);
+    const antes = texto.slice(0, match.index);
+    const palavra = match[0];
+    const depois = texto.slice((match.index || 0) + palavra.length);
+    const tipo = normalizeName(palavra).startsWith("inserid") ? "inserido" : "atualizado";
+    return `${escapePromoHtml(antes)}<span class="novidade-action-tag ${tipo}">${escapePromoHtml(palavra)}</span>${escapePromoHtml(depois)}`;
+  }
+
   function novidadeNomePrincipal(item) {
     const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
     if (tipo.includes("evento")) return novidadeTituloDestino(item) || item?.estabelecimento || "Evento";
@@ -2980,7 +2991,7 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
           <div class="novidade-feed-info">
             <strong>${escapePromoHtml(novidadeNomePrincipal(item))}</strong>
-            <p>${escapePromoHtml(novidadeTextoAcao(item))}</p>
+            <p>${novidadeTextoAcaoHtml(item)}</p>
             <span>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</span>
           </div>
         </article>
