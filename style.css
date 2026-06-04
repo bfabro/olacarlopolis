@@ -18700,12 +18700,12 @@ body.vaga-modal-open {
 
 .novidade-feed-card {
   display: grid;
-  grid-template-columns: 82px minmax(0, 1fr);
-  align-items: start;
+  grid-template-columns: 84px minmax(0, 1fr);
+  align-items: center;
   gap: 12px;
   position: relative;
-  min-height: 112px;
-  padding: 10px 12px 10px 14px;
+  min-height: 106px;
+  padding: 10px 12px;
   border: 1px solid #e3e9f2;
   border-left: 5px solid var(--novidade-color, var(--blue-color, #0f5eea));
   border-radius: 18px;
@@ -18721,8 +18721,8 @@ body.vaga-modal-open {
 }
 
 .novidade-feed-img {
-  width: 82px;
-  height: 82px;
+  width: 84px;
+  height: 84px;
   border-radius: 12px;
   overflow: hidden;
   display: grid;
@@ -18741,15 +18741,16 @@ body.vaga-modal-open {
 
 .novidade-feed-info {
   display: grid;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
 }
 
 .novidade-feed-meta {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 5px;
+  min-width: 0;
 }
 
 .novidade-badge {
@@ -18763,6 +18764,7 @@ body.vaga-modal-open {
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .novidade-badge.categoria {
@@ -18793,7 +18795,7 @@ body.vaga-modal-open {
 .novidade-feed-meta time {
   margin-left: auto;
   color: #94a3b8;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -18816,6 +18818,9 @@ body.vaga-modal-open {
   font-size: 13px;
   line-height: 1.25;
   font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .novidade-action-tag {
@@ -18849,20 +18854,6 @@ body.vaga-modal-open {
   color: #64748b;
   font-size: 12px;
   line-height: 1.2;
-}
-
-.novidade-card-detalhes {
-  justify-self: start;
-  min-height: 28px;
-  margin-top: 2px;
-  padding: 0 10px;
-  border: 1px solid #dbe7f4;
-  border-radius: 999px;
-  background: #f8fbff;
-  color: #0f5eea;
-  font-size: 12px;
-  font-weight: 900;
-  cursor: pointer;
 }
 
 .novidade-feed-card.tipo-imovel,
@@ -19205,14 +19196,14 @@ body.vaga-modal-open {
   }
 
   .novidade-feed-card {
-    grid-template-columns: 82px minmax(0, 1fr);
+    grid-template-columns: 84px minmax(0, 1fr);
     gap: 9px;
     padding: 8px 10px;
   }
 
   .novidade-feed-img {
-    width: 82px;
-    height: 82px;
+    width: 84px;
+    height: 84px;
   }
 
   .novidade-preview-overlay {

@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-06-03-novidades-preview-modal-mobile-v280'; // <-- TROQUE quando publicar atualização
+const CACHE_VERSION = '2026-06-03-novidades-feed-cards-v281'; // <-- TROQUE quando publicar atualização
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

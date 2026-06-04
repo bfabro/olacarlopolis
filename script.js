@@ -3118,7 +3118,6 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <strong>${escapePromoHtml(titulo)}</strong>
             ${estabelecimento ? `<p>${escapePromoHtml(estabelecimento)}</p>` : ""}
-            <button type="button" class="novidade-card-detalhes">Ver detalhes</button>
           </div>
         </article>
       `;
@@ -3138,10 +3137,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     feed.querySelectorAll(".novidade-feed-card").forEach((card) => {
       card.addEventListener("click", () => abrirModalNovidadeCidade(card.dataset.novidadeId, "item"));
-      card.querySelector("button")?.addEventListener("click", (event) => {
-        event.stopPropagation();
-        abrirModalNovidadeCidade(card.dataset.novidadeId, "item");
-      });
     });
   }
 
