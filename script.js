@@ -3168,7 +3168,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function novidadeLogoAnunciante(item) {
-    return novidadeValorCampo(item, ["logo", "logoUrl", "perfil", "imagemPerfil", "clienteLogo"]) || "";
+    return novidadeValorCampo(item, ["logo", "logoUrl", "perfil", "imagemPerfil", "clienteLogo"]) || item?.imagem || item?.imagens?.[0] || "";
   }
 
   function novidadeDestaquePrincipal(item) {
@@ -3242,7 +3242,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const codRef = mostrarReferencia ? String(item.codRef || item.codigoReferencia || item.codigo || item.raw?.codRef || item.raw?.codigoReferencia || item.raw?.codigo || "").trim() : "";
     const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo);
     const categoria = novidadeCategoriaInfo(item);
-    const status = novidadeStatusInfo(item);
     const anunciante = novidadeEstabelecimentoCard(item) || novidadeNomePrincipal(item);
     const logo = novidadeLogoAnunciante(item);
     const destaque = novidadeDestaquePrincipal(item);
@@ -3261,8 +3260,6 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="novidade-preview-modal ${tipoClass}" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.titulo)}">
         <div class="novidade-preview-badges">
           <span class="novidade-preview-badge categoria"><i class="fa-solid ${escapePromoHtml(categoria.icon)}"></i>${escapePromoHtml(categoria.label)}</span>
-          <span class="novidade-preview-badge status ${escapePromoHtml(status.className)}"><i class="fa-solid ${status.className === "atualizado" ? "fa-rotate" : "fa-plus"}"></i>${escapePromoHtml(status.label)}</span>
-          <span class="novidade-preview-badge tempo"><i class="fa-regular fa-clock"></i>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</span>
           ${codRef ? `<span class="novidade-preview-badge ref">Ref. ${escapePromoHtml(codRef)}</span>` : ""}
         </div>
         ${anunciante ? `
