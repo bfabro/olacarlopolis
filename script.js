@@ -2710,12 +2710,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let novidadesCidadeFiltroAtivo = "todos";
 
+  function novidadeEhEvento(item = {}) {
+    const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+    const categoria = normalizeName(item.categoria || item.raw?.categoria || item.raw?.categoriaTitulo || "");
+    if (tipo.includes("evento") || categoria.includes("evento")) return true;
+    const candidatos = [
+      item.destinoId,
+      item.estabelecimento,
+      item.tituloConteudo,
+      item.raw?.tituloConteudo,
+      item.raw?.destinoTitulo,
+      item.raw?.nomeItem,
+      item.descricao,
+      item.titulo
+    ].map((valor) => normalizeName(valor || "")).filter(Boolean);
+    if (!candidatos.length || !Array.isArray(categories)) return false;
+    const eventosCat = categories.find((cat) => normalizeName(cat.title || "") === "eventosemcarlopolis");
+    return (eventosCat?.establishments || []).some((evento) => {
+      const ids = [evento.id, evento.name, evento.nome, evento.titulo]
+        .map((valor) => normalizeName(valor || ""))
+        .filter(Boolean);
+      return ids.some((id) => candidatos.some((cand) => cand === id || cand.includes(id) || id.includes(cand)));
+    });
+  }
+
   function novidadeCategoriaInfo(item) {
     const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
     const texto = normalizeName(`${item?.titulo || ""} ${item?.acao || ""} ${item?.descricao || ""}`);
     if (tipo.includes("imovel")) return { key: "imoveis", label: "Imóvel", icon: "fa-house" };
     if (tipo.includes("veiculo") || tipo.includes("automovel")) return { key: "veiculos", label: "Veículo", icon: "fa-car" };
     if (tipo.includes("promoc")) return { key: "promocoes", label: "Promoção", icon: "fa-tag" };
+    if (novidadeEhEvento(item)) return { key: "servicos", label: "Evento", icon: "fa-calendar-days" };
     if (texto.includes("destaque")) return { key: "comercios", label: "Destaque", icon: "fa-star" };
     if (tipo.includes("estabelecimento")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
     return { key: "servicos", label: "Serviço", icon: "fa-bell" };
@@ -2759,12 +2784,12 @@ document.addEventListener("DOMContentLoaded", function () {
     return nome;
   }
 
-  function novidadeTipoClasse(tipo) {
+  function novidadeTipoClasse(tipo, item = null) {
     const key = normalizeName(tipo || "");
     if (key.includes("imovel")) return "tipo-imovel";
     if (key.includes("veiculo") || key.includes("automovel")) return "tipo-veiculo";
     if (key.includes("promoc")) return "tipo-promocao";
-    if (key.includes("evento")) return "tipo-evento";
+    if (key.includes("evento") || novidadeEhEvento(item || { tipo })) return "tipo-evento";
     if (key.includes("vaga")) return "tipo-veiculo";
     if (key.includes("grupo") || key.includes("whatsapp")) return "tipo-foto";
     if (key.includes("foto")) return "tipo-foto";
@@ -3100,7 +3125,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="novidade-periodo-lista">
           ${grupo.itens.map((item) => {
       const img = item.imagem;
-      const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo);
+      const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo, item);
       const categoria = novidadeCategoriaInfo(item);
       const status = novidadeStatusInfo(item);
       const titulo = novidadeTituloCard(item);
@@ -3189,7 +3214,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function novidadeLogoAnunciante(item, anunciante = "") {
     const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
-    if (tipo.includes("evento")) return "images/img_padrao_site/logo_1.png";
+    if (tipo.includes("evento") || novidadeEhEvento(item)) return "images/img_padrao_site/logo_1.png";
     const direto = novidadeValorCampo(item, ["logo", "logoUrl", "perfil", "perfilUrl", "imagemPerfil", "clienteLogo", "profileImage"]);
     if (direto) return direto;
     const cadastro = encontrarCadastroDonoNovidade(item, anunciante);
@@ -3234,7 +3259,7 @@ document.addEventListener("DOMContentLoaded", function () {
       add("fa-store", item.estabelecimento || item.raw?.estabelecimento, "Comércio");
       add("fa-tag", item.categoria || item.raw?.categoria, "Categoria");
       add("fa-clock", novidadeValorCampo(item, ["validade", "dataValidade"]) || "Oferta recente", "Validade");
-    } else if (tipo.includes("evento")) {
+    } else if (tipo.includes("evento") || novidadeEhEvento(item)) {
       add("fa-calendar-days", novidadeValorCampo(item, ["data", "dataEvento", "date"]) || item.tituloConteudo, "Data");
       add("fa-location-dot", novidadeValorCampo(item, ["local", "endereco"]) || item.estabelecimento, "Local");
       add("fa-ticket", novidadeValorCampo(item, ["entrada", "valor", "valorEntrada"]) || "Confira detalhes", "Entrada");
@@ -3265,13 +3290,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const tipoRef = normalizeName(item.destinoTipo || item.tipo || "");
     const mostrarReferencia = tipoRef.includes("imovel") || tipoRef.includes("veiculo") || tipoRef.includes("automovel");
     const codRef = mostrarReferencia ? String(item.codRef || item.codigoReferencia || item.codigo || item.raw?.codRef || item.raw?.codigoReferencia || item.raw?.codigo || "").trim() : "";
-    const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo);
+    const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo, item);
     const categoria = novidadeCategoriaInfo(item);
     const anunciante = novidadeEstabelecimentoCard(item) || novidadeNomePrincipal(item);
     const logo = novidadeLogoAnunciante(item, anunciante);
     const destaque = novidadeDestaquePrincipal(item);
     const infos = novidadeInfoRapida(item);
     const telefone = novidadeTelefone(item);
+    const destinoTipoAcao = novidadeEhEvento(item) ? "evento" : (item.destinoTipo || item.tipo);
     const whatsappTexto = [
       "Olá! Vi esta novidade no Olá Carlópolis e quero mais informações.",
       destino ? `Item: ${destino}` : "",
@@ -3329,8 +3355,8 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="novidade-preview-actions">
           ${telefone ? `<a class="novidade-preview-whatsapp telefone-link" href="https://wa.me/55${escapePromoHtml(telefone)}?text=${encodeURIComponent(whatsappTexto)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ""}
           <button type="button" class="novidade-preview-open ${tipoClass}">
-            <i class="fa-solid ${escapePromoHtml(novidadeIconeAcao(item.destinoTipo || item.tipo))}"></i>
-            <span>${escapePromoHtml(novidadeActionLabel(item.destinoTipo || item.tipo))}</span>
+            <i class="fa-solid ${escapePromoHtml(novidadeIconeAcao(destinoTipoAcao))}"></i>
+            <span>${escapePromoHtml(novidadeActionLabel(destinoTipoAcao))}</span>
             <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
@@ -3378,7 +3404,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function abrirDestinoNovidadeCidade(item) {
-    const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+    const tipo = normalizeName(novidadeEhEvento(item) ? "evento" : (item.destinoTipo || item.tipo || ""));
     if (tipo.includes("promoc")) {
       location.hash = item.destinoId ? `#promocoes-${item.destinoId}` : "#promocoes";
       await Promise.resolve(mostrarPromocoes(item.destinoId || "todos"));
