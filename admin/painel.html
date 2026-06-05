@@ -791,6 +791,26 @@
                 <p>Edite, inative ou remova anuncios.</p>
               </div>
             </div>
+            <div class="imovel-art-panel">
+              <div>
+                <strong>Arte para Instagram</strong>
+                <span>Escolha um imovel e um dos 6 modelos de venda para baixar a imagem.</span>
+              </div>
+              <label>Imovel
+                <select id="imovelArteItem"></select>
+              </label>
+              <label>Layout
+                <select id="imovelArteLayout">
+                  <option value="impacto">Impacto azul</option>
+                  <option value="premium">Premium escuro</option>
+                  <option value="oportunidade">Oportunidade</option>
+                  <option value="solar">Solar destaque</option>
+                  <option value="minimal">Minimal clean</option>
+                  <option value="exclusivo">Exclusivo</option>
+                </select>
+              </label>
+              <button id="generateImovelArtButton" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar imagem</button>
+            </div>
             <input id="imovelSearch" class="search-input" placeholder="Buscar imovel...">
             <div id="imoveisList" class="entity-list"></div>
           </section>
@@ -1042,6 +1062,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=261"></script>
+  <script type="module" src="painel.js?v=262"></script>
 </body>
 </html>

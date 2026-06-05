@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 261,
-  label: "v261",
-  data: "2026-06-01",
-  nota: "Banner configuravel da pagina inicial."
+  numero: 262,
+  label: "v262",
+  data: "2026-06-05",
+  nota: "Gerador de artes de imoveis para Instagram."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3630,9 +3630,288 @@ function renderImovelImagesPreview() {
   });
 }
 
+const IMOVEL_ARTE_LAYOUTS = {
+  impacto: { nome: "Impacto azul", bg: "#0f172a", accent: "#38bdf8", accent2: "#2563eb", dark: true, chamada: "IMOVEL EM DESTAQUE" },
+  premium: { nome: "Premium escuro", bg: "#111827", accent: "#fbbf24", accent2: "#f59e0b", dark: true, chamada: "ALTO PADRAO DE OPORTUNIDADE" },
+  oportunidade: { nome: "Oportunidade", bg: "#f8fafc", accent: "#dc2626", accent2: "#0f172a", dark: false, chamada: "OPORTUNIDADE A VENDA" },
+  solar: { nome: "Solar destaque", bg: "#fff7ed", accent: "#f97316", accent2: "#0f5eea", dark: false, chamada: "SEU PROXIMO INVESTIMENTO" },
+  minimal: { nome: "Minimal clean", bg: "#ffffff", accent: "#2563eb", accent2: "#16a34a", dark: false, chamada: "CONHECA ESTE IMOVEL" },
+  exclusivo: { nome: "Exclusivo", bg: "#18181b", accent: "#a855f7", accent2: "#ec4899", dark: true, chamada: "EXCLUSIVO PARA VOCE" }
+};
+
+function donoImovelAdmin(item = {}) {
+  const candidatos = [
+    item.clienteId,
+    item.estabelecimentoId,
+    item.clienteNome,
+    item.corretor,
+    item.vendedor,
+    item.proprietario
+  ].map((valor) => normalizeName(valor || "")).filter(Boolean);
+  const cliente = state.clientes.find((client) => {
+    const ids = [client.id, client.nome, client.name, client.nomeNormalizado]
+      .map((valor) => normalizeName(valor || ""))
+      .filter(Boolean);
+    return ids.some((id) => candidatos.some((cand) => id === cand || id.includes(cand) || cand.includes(id)));
+  }) || currentClientRecord();
+  return cliente || {
+    nome: item.clienteNome || item.corretor || "Ola Carlopolis",
+    imagem: ""
+  };
+}
+
+function logoClienteImovelAdmin(client = {}) {
+  return displayImageUrl(client.imagem || imageUrl(client.imagens?.[0]) || client.logo || client.logoUrl || "../images/img_padrao_site/logo_1.png");
+}
+
+function imovelImagemPrincipalAdmin(item = {}) {
+  const imagens = Array.isArray(item.imagens) ? item.imagens : [];
+  return displayImageUrl(item.imagem || imagens[0] || "../images/img_padrao_site/logo_1.png");
+}
+
+function formatarValorArteImovel(valor) {
+  if (valor === undefined || valor === null || String(valor).trim() === "") return "Consulte";
+  return moneyBR(typeof valor === "number" ? valor : numberFromMoney(valor));
+}
+
+function textoCurtoArte(valor, limite = 72) {
+  const texto = String(valor || "").replace(/\s+/g, " ").trim();
+  return texto.length > limite ? `${texto.slice(0, limite - 3)}...` : texto;
+}
+
+function carregarImagemCanvas(url) {
+  return new Promise((resolve) => {
+    const src = displayImageUrl(url);
+    if (!src) return resolve(null);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+function canvasRoundRect(ctx, x, y, w, h, r) {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+  ctx.closePath();
+}
+
+function preencherRoundRect(ctx, x, y, w, h, r, fill) {
+  canvasRoundRect(ctx, x, y, w, h, r);
+  ctx.fillStyle = fill;
+  ctx.fill();
+}
+
+function desenharImagemCover(ctx, img, x, y, w, h, r = 0) {
+  if (!img) {
+    preencherRoundRect(ctx, x, y, w, h, r, "#dbeafe");
+    ctx.fillStyle = "#2563eb";
+    ctx.font = "900 54px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Ola Carlopolis", x + w / 2, y + h / 2);
+    return;
+  }
+  const scale = Math.max(w / img.width, h / img.height);
+  const sw = w / scale;
+  const sh = h / scale;
+  const sx = (img.width - sw) / 2;
+  const sy = (img.height - sh) / 2;
+  ctx.save();
+  if (r) {
+    canvasRoundRect(ctx, x, y, w, h, r);
+    ctx.clip();
+  }
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  ctx.restore();
+}
+
+function desenharImagemContain(ctx, img, x, y, w, h, r = 0) {
+  preencherRoundRect(ctx, x, y, w, h, r, "#ffffff");
+  if (!img) return;
+  const scale = Math.min(w / img.width, h / img.height);
+  const dw = img.width * scale;
+  const dh = img.height * scale;
+  ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+}
+
+function textoQuebradoCanvas(ctx, texto, x, y, maxWidth, lineHeight, maxLines = 3) {
+  const words = String(texto || "").split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+  words.forEach((word) => {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  const finalLines = lines.slice(0, maxLines);
+  if (lines.length > maxLines) finalLines[maxLines - 1] = `${finalLines[maxLines - 1].replace(/\.*$/, "")}...`;
+  finalLines.forEach((l, idx) => ctx.fillText(l, x, y + idx * lineHeight));
+  return finalLines.length * lineHeight;
+}
+
+function desenharPillCanvas(ctx, texto, x, y, fill, color = "#fff") {
+  ctx.font = "900 30px Arial";
+  const w = ctx.measureText(texto).width + 42;
+  preencherRoundRect(ctx, x, y, w, 52, 26, fill);
+  ctx.fillStyle = color;
+  ctx.textAlign = "left";
+  ctx.fillText(texto, x + 21, y + 36);
+  return w;
+}
+
+function caracteristicasArteImovel(item = {}) {
+  const dados = [];
+  if (item.quartos) dados.push(`${item.quartos} quartos`);
+  if (item.banheiros) dados.push(`${item.banheiros} banheiros`);
+  if (item.vagas) dados.push(`${item.vagas} vagas`);
+  if (item.area) dados.push(`${item.area}m2`);
+  if (item.construcao) dados.push(`${item.construcao}m2 constr.`);
+  if (item.piscina) dados.push("piscina");
+  if (item.churrasqueira) dados.push("churrasqueira");
+  if (item.outros) dados.push(String(item.outros));
+  return dados.slice(0, 4);
+}
+
+function renderImovelArteOptions() {
+  const select = $("imovelArteItem");
+  const layout = $("imovelArteLayout");
+  if (!select || !layout) return;
+  const atual = select.value;
+  const list = state.imoveis.filter(itemBelongsToCurrentClient);
+  select.innerHTML = list.map((item) => {
+    const label = [item.codRef || item.codigo || item.id, item.titulo || "Imovel"].filter(Boolean).join(" - ");
+    return `<option value="${escapeAttr(item.id)}">${escapeHtml(label)}</option>`;
+  }).join("");
+  if (atual && list.some((item) => item.id === atual)) select.value = atual;
+}
+
+async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, layoutKey = $("imovelArteLayout")?.value || "impacto") {
+  const item = state.imoveis.find((imovel) => imovel.id === imovelId && itemBelongsToCurrentClient(imovel));
+  if (!item) return showToast("Selecione um imovel para gerar a arte.");
+  const layout = IMOVEL_ARTE_LAYOUTS[layoutKey] || IMOVEL_ARTE_LAYOUTS.impacto;
+  const button = $("generateImovelArtButton");
+  if (button) button.disabled = true;
+  showToast("Gerando arte do imovel...");
+  try {
+    const client = donoImovelAdmin(item);
+    const [foto, logo] = await Promise.all([
+      carregarImagemCanvas(imovelImagemPrincipalAdmin(item)),
+      carregarImagemCanvas(logoClienteImovelAdmin(client))
+    ]);
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1350;
+    const ctx = canvas.getContext("2d");
+    const dark = layout.dark;
+    const text = dark ? "#ffffff" : "#0f172a";
+    const muted = dark ? "rgba(255,255,255,.78)" : "#64748b";
+    const grad = ctx.createLinearGradient(0, 0, 1080, 1350);
+    grad.addColorStop(0, layout.bg);
+    grad.addColorStop(1, dark ? "#020617" : "#ffffff");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1080, 1350);
+
+    if (layoutKey === "premium" || layoutKey === "exclusivo") {
+      ctx.fillStyle = layout.accent;
+      ctx.globalAlpha = .22;
+      ctx.beginPath();
+      ctx.arc(930, 120, 270, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      desenharImagemCover(ctx, foto, 62, 210, 956, 560, 34);
+    } else if (layoutKey === "minimal") {
+      desenharImagemCover(ctx, foto, 62, 260, 956, 520, 28);
+    } else if (layoutKey === "solar") {
+      preencherRoundRect(ctx, 46, 190, 990, 620, 42, "#ffffff");
+      desenharImagemCover(ctx, foto, 70, 214, 942, 572, 32);
+    } else {
+      desenharImagemCover(ctx, foto, 0, 0, 1080, 690, 0);
+      ctx.fillStyle = "rgba(2,6,23,.45)";
+      ctx.fillRect(0, 0, 1080, 690);
+    }
+
+    desenharImagemContain(ctx, logo, 62, 58, 92, 92, 20);
+    ctx.fillStyle = text;
+    ctx.font = "900 34px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText(textoCurtoArte(client?.nome || item.clienteNome || item.corretor || "Ola Carlopolis", 30), 176, 92);
+    ctx.fillStyle = muted;
+    ctx.font = "700 24px Arial";
+    ctx.fillText("Imovel anunciado no Ola Carlopolis", 176, 126);
+
+    const ref = String(item.codRef || item.codigo || item.id || "").toUpperCase();
+    if (ref) desenharPillCanvas(ctx, `REF. ${ref}`, 780, 64, dark ? "rgba(255,255,255,.16)" : "#e0edff", dark ? "#fff" : layout.accent2);
+
+    const contentY = (layoutKey === "impacto" || layoutKey === "oportunidade") ? 735 : 820;
+    desenharPillCanvas(ctx, layout.chamada, 62, contentY, layout.accent, "#fff");
+    ctx.fillStyle = text;
+    ctx.font = "900 58px Arial";
+    const tituloHeight = textoQuebradoCanvas(ctx, item.titulo || "Imovel disponivel", 62, contentY + 102, 930, 64, 3);
+
+    ctx.fillStyle = layout.accent;
+    ctx.font = "900 62px Arial";
+    ctx.fillText(formatarValorArteImovel(item.valor), 62, contentY + 130 + tituloHeight);
+
+    ctx.fillStyle = muted;
+    ctx.font = "800 28px Arial";
+    const endereco = item.endereco || "Carlopolis - PR";
+    textoQuebradoCanvas(ctx, endereco, 62, contentY + 182 + tituloHeight, 880, 34, 2);
+
+    const chips = caracteristicasArteImovel(item);
+    let chipX = 62;
+    let chipY = 1086;
+    chips.forEach((chip) => {
+      const w = desenharPillCanvas(ctx, chip.toUpperCase(), chipX, chipY, dark ? "rgba(255,255,255,.14)" : "#eef5ff", dark ? "#fff" : "#1d4ed8");
+      chipX += w + 14;
+      if (chipX > 880) {
+        chipX = 62;
+        chipY += 66;
+      }
+    });
+
+    preencherRoundRect(ctx, 62, 1230, 956, 86, 26, dark ? "rgba(255,255,255,.12)" : "#0f172a");
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 30px Arial";
+    ctx.fillText("CHAME AGORA E SAIBA MAIS", 92, 1284);
+    ctx.textAlign = "right";
+    ctx.fillText("olacarlopolis.com", 988, 1284);
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        showToast("Nao foi possivel gerar a imagem.");
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `arte-imovel-${slugify(item.codRef || item.titulo || item.id)}-${layoutKey}.png`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast("Arte gerada.");
+    }, "image/png");
+  } catch (error) {
+    console.error("Erro ao gerar arte do imovel.", error);
+    showToast("Nao foi possivel gerar a arte.");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 function renderImoveisList() {
   const box = $("imoveisList");
   if (!box) return;
+  renderImovelArteOptions();
   const q = String($("imovelSearch")?.value || "").toLowerCase().trim();
   const list = state.imoveis.filter(itemBelongsToCurrentClient).filter((item) => {
     const hay = `${item.codRef || ""} ${item.codigo || ""} ${item.titulo || ""} ${item.tipo || ""} ${item.procura || ""} ${item.valor || ""} ${item.corretor || ""} ${item.endereco || ""}`.toLowerCase();
@@ -3653,10 +3932,17 @@ function renderImoveisList() {
       <div class="list-meta">${escapeHtml([item.corretor || item.clienteNome, item.telefone].filter(Boolean).join(" - ") || "Sem contato")}</div>
       <div class="list-meta">${escapeHtml(item.origemBase === "script.js" && item.origem !== "painel" ? "Base inicial do site" : "Firebase / Painel")}</div>
       <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
+      <button type="button" data-art-imovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte Instagram</button>
       <button type="button" data-edit-imovel="${escapeAttr(item.id)}">Editar</button>
       <button type="button" class="danger" data-delete-imovel="${escapeAttr(item.id)}">Excluir</button>
     </article>
   `; }).join("");
+  box.querySelectorAll("[data-art-imovel]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if ($("imovelArteItem")) $("imovelArteItem").value = button.dataset.artImovel || "";
+      gerarArteInstagramImovel(button.dataset.artImovel, $("imovelArteLayout")?.value || "impacto");
+    });
+  });
   box.querySelectorAll("[data-edit-imovel]").forEach((button) => {
     button.addEventListener("click", () => {
       const item = state.imoveis.find((imovel) => imovel.id === button.dataset.editImovel && itemBelongsToCurrentClient(imovel));
@@ -6878,6 +7164,7 @@ function bindEvents() {
   });
   $("closeImovelFormButton")?.addEventListener("click", resetImovelForm);
   $("imovelSearch")?.addEventListener("input", renderImoveisList);
+  $("generateImovelArtButton")?.addEventListener("click", () => gerarArteInstagramImovel());
   $("imovelImagesUpload")?.addEventListener("change", async (event) => {
     const id = $("imovelId").value || slugify($("imovelTitulo").value) || `imovel-${Date.now()}`;
     const urls = await uploadImovelImages(id, event.target.files);
