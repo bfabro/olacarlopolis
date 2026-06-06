@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 265,
-  label: "v265",
+  numero: 267,
+  label: "v267",
   data: "2026-06-06",
-  nota: "Correcao do download e dos tempos de carregamento das artes."
+  nota: "Proxy Netlify para imagens do Firebase usadas nas artes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3691,6 +3691,18 @@ function imovelImagemPrincipalAdmin(item = {}) {
   return imovelImagensCandidatasAdmin(item)[0] || "../images/img_padrao_site/logo_1.png";
 }
 
+function imagemCanvasUrlAdmin(url) {
+  const resolved = /^(data:|blob:)/i.test(url)
+    ? url
+    : new URL(url, window.location.href).toString();
+  if (!isFirebaseStorageUrl(resolved)) return resolved;
+
+  const proxyOrigin = /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname)
+    ? "https://www.olacarlopolis.com"
+    : window.location.origin;
+  return `${proxyOrigin}/api/image-proxy?url=${encodeURIComponent(resolved)}`;
+}
+
 function formatarValorArteImovel(valor) {
   if (valor === undefined || valor === null || String(valor).trim() === "") return "Consulte";
   return moneyBR(typeof valor === "number" ? valor : numberFromMoney(valor));
@@ -3726,7 +3738,7 @@ function imagemDeBlobCanvas(blob) {
 async function carregarImagemCanvas(url) {
   const src = normalizarImagemArteAdmin(url);
   if (!src) return null;
-  const resolved = /^(data:|blob:)/i.test(src) ? src : new URL(src, window.location.href).toString();
+  const resolved = imagemCanvasUrlAdmin(src);
   const controller = new AbortController();
   const fetchTimeout = window.setTimeout(() => controller.abort(), 12000);
   try {
