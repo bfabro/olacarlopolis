@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 263,
-  label: "v263",
-  data: "2026-06-05",
-  nota: "Ajuste no carregamento da foto nas artes de imoveis."
+  numero: 264,
+  label: "v264",
+  data: "2026-06-06",
+  nota: "Model CS e carregamento robusto das fotos nas artes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3636,7 +3636,8 @@ const IMOVEL_ARTE_LAYOUTS = {
   oportunidade: { nome: "Oportunidade", bg: "#f8fafc", accent: "#dc2626", accent2: "#0f172a", dark: false, chamada: "OPORTUNIDADE A VENDA" },
   solar: { nome: "Solar destaque", bg: "#fff7ed", accent: "#f97316", accent2: "#0f5eea", dark: false, chamada: "SEU PROXIMO INVESTIMENTO" },
   minimal: { nome: "Minimal clean", bg: "#ffffff", accent: "#2563eb", accent2: "#16a34a", dark: false, chamada: "CONHECA ESTE IMOVEL" },
-  exclusivo: { nome: "Exclusivo", bg: "#18181b", accent: "#a855f7", accent2: "#ec4899", dark: true, chamada: "EXCLUSIVO PARA VOCE" }
+  exclusivo: { nome: "Exclusivo", bg: "#18181b", accent: "#a855f7", accent2: "#ec4899", dark: true, chamada: "EXCLUSIVO PARA VOCE" },
+  modelcs: { nome: "Model CS", bg: "#ffffff", accent: "#dc2626", accent2: "#000000", dark: false, chamada: "VENDA" }
 };
 
 function donoImovelAdmin(item = {}) {
@@ -3666,20 +3667,28 @@ function logoClienteImovelAdmin(client = {}) {
 
 function normalizarImagemArteAdmin(valor) {
   if (!valor) return "";
-  if (typeof valor === "string") return displayImageUrl(valor);
-  const url = imageUrl(valor) || valor.url || valor.src || valor.imagem || valor.image || "";
-  return displayImageUrl(url);
+  const url = typeof valor === "string"
+    ? valor
+    : (imageUrl(valor) || valor.url || valor.src || valor.imagem || valor.image || "");
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  if (/^(https?:|data:|blob:|\/|\.\.?\/)/i.test(raw)) return raw;
+  return displayImageUrl(raw);
+}
+
+function imovelImagensCandidatasAdmin(item = {}) {
+  const imagens = Array.isArray(item.imagens) ? item.imagens : [];
+  const candidatos = [
+    ...imagens,
+    item.imagem,
+    item.image,
+    item.foto
+  ];
+  return [...new Set(candidatos.map(normalizarImagemArteAdmin).filter(Boolean))];
 }
 
 function imovelImagemPrincipalAdmin(item = {}) {
-  const imagens = Array.isArray(item.imagens) ? item.imagens : [];
-  const candidatos = [
-    item.imagem,
-    item.image,
-    item.foto,
-    ...imagens
-  ];
-  return candidatos.map(normalizarImagemArteAdmin).find(Boolean) || "../images/img_padrao_site/logo_1.png";
+  return imovelImagensCandidatasAdmin(item)[0] || "../images/img_padrao_site/logo_1.png";
 }
 
 function formatarValorArteImovel(valor) {
@@ -3692,16 +3701,50 @@ function textoCurtoArte(valor, limite = 72) {
   return texto.length > limite ? `${texto.slice(0, limite - 3)}...` : texto;
 }
 
-function carregarImagemCanvas(url) {
+function imagemDeBlobCanvas(blob) {
   return new Promise((resolve) => {
-    const src = normalizarImagemArteAdmin(url);
-    if (!src) return resolve(null);
+    const objectUrl = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(img);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(null);
+    };
+    img.src = objectUrl;
+  });
+}
+
+async function carregarImagemCanvas(url) {
+  const src = normalizarImagemArteAdmin(url);
+  if (!src) return null;
+  const resolved = /^(data:|blob:)/i.test(src) ? src : new URL(src, window.location.href).toString();
+  try {
+    const response = await fetch(resolved, { mode: "cors", cache: "no-store" });
+    if (response.ok) {
+      const imagem = await imagemDeBlobCanvas(await response.blob());
+      if (imagem) return imagem;
+    }
+  } catch (error) {
+    console.warn("Falha ao buscar imagem para a arte.", resolved, error);
+  }
+  return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
     img.onerror = () => resolve(null);
-    img.src = src;
+    img.src = resolved;
   });
+}
+
+async function carregarPrimeiraImagemCanvas(urls = []) {
+  for (const url of urls) {
+    const imagem = await carregarImagemCanvas(url);
+    if (imagem) return imagem;
+  }
+  return null;
 }
 
 function canvasRoundRect(ctx, x, y, w, h, r) {
@@ -3796,6 +3839,104 @@ function caracteristicasArteImovel(item = {}) {
   return dados.slice(0, 4);
 }
 
+function dadosModelCs(item = {}) {
+  const dados = [];
+  const add = (icone, principal, secundario = "") => {
+    if (principal === undefined || principal === null || String(principal).trim() === "") return;
+    dados.push({ icone, principal: String(principal), secundario: String(secundario || "") });
+  };
+  if (item.construcao) add("AC", `${item.construcao}m2`, "construcao");
+  if (item.area) add("AT", `${item.area}m2`, "area total");
+  if (item.quartos) add("Q", `${item.quartos} quarto${Number(item.quartos) === 1 ? "" : "s"}`, item.suite ? `${item.suite} suite${Number(item.suite) === 1 ? "" : "s"}` : "");
+  if (item.salas) add("S", `${item.salas} sala${Number(item.salas) === 1 ? "" : "s"}`, item.cozinhas ? `${item.cozinhas} cozinha${Number(item.cozinhas) === 1 ? "" : "s"}` : "");
+  if (item.endereco) add("L", textoCurtoArte(item.endereco, 28), "localizacao");
+  if (item.outros) add("+", textoCurtoArte(item.outros, 24), "");
+  if (item.vagas) add("V", `${item.vagas} vaga${Number(item.vagas) === 1 ? "" : "s"}`, "");
+  if (item.banheiros) add("B", `${item.banheiros} banheiro${Number(item.banheiros) === 1 ? "" : "s"}`, "");
+  return dados.slice(0, 6);
+}
+
+function desenharInfoModelCs(ctx, info, x, y, maxWidth = 300) {
+  ctx.fillStyle = "#050505";
+  ctx.beginPath();
+  ctx.arc(x + 24, y + 24, 24, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "900 17px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(info.icone, x + 24, y + 30);
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#090909";
+  ctx.font = "900 28px Arial";
+  ctx.fillText(textoCurtoArte(info.principal, 24), x + 60, y + 22, maxWidth - 60);
+  if (info.secundario) {
+    ctx.font = "800 23px Arial";
+    ctx.fillText(textoCurtoArte(info.secundario, 27), x + 60, y + 49, maxWidth - 60);
+  }
+}
+
+function desenharModeloCs(ctx, item, client, foto, logo) {
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, 1080, 1350);
+  desenharImagemCover(ctx, foto, 0, 0, 1080, 700, 0);
+
+  preencherRoundRect(ctx, 650, 650, 300, 92, 42, "#050505");
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "900 52px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(String(item.tipo || "VENDA").toUpperCase(), 800, 713);
+
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#050505";
+  ctx.font = "900 58px Arial";
+  const titulo = textoCurtoArte(item.titulo || "IMOVEL EM DESTAQUE", 54).toUpperCase();
+  textoQuebradoCanvas(ctx, titulo, 62, 785, 470, 61, 3);
+
+  const infos = dadosModelCs(item);
+  infos.forEach((info, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    desenharInfoModelCs(ctx, info, 68 + col * 285, 990 + row * 76, 270);
+  });
+
+  desenharImagemContain(ctx, logo, 620, 790, 380, 190, 16);
+  ctx.fillStyle = "#111111";
+  ctx.textAlign = "center";
+  ctx.font = "900 38px Arial";
+  ctx.fillText(textoCurtoArte(client?.nome || item.clienteNome || item.corretor || "Ola Carlopolis", 34).toUpperCase(), 810, 1018);
+  ctx.font = "800 22px Arial";
+  ctx.fillText("IMOVEIS E OPORTUNIDADES", 810, 1052);
+
+  const telefone = String(item.telefone || client?.whatsapp || client?.contato || client?.telefone || "").trim();
+  if (telefone) {
+    preencherRoundRect(ctx, 625, 1090, 370, 74, 28, "#dc2626");
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(670, 1127, 25, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#dc2626";
+    ctx.font = "900 18px Arial";
+    ctx.fillText("WA", 670, 1133);
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "left";
+    ctx.font = "900 31px Arial";
+    ctx.fillText(telefone, 710, 1138);
+  }
+
+  const ref = String(item.codRef || item.codigo || item.id || "").toUpperCase();
+  if (ref) {
+    ctx.fillStyle = "#111111";
+    ctx.textAlign = "center";
+    ctx.font = "800 22px Arial";
+    ctx.fillText(`REF. ${ref}`, 810, 1205);
+  }
+
+  ctx.fillStyle = "#0f172a";
+  ctx.textAlign = "center";
+  ctx.font = "900 24px Arial";
+  ctx.fillText("olacarlopolis.com", 810, 1250);
+}
+
 function renderImovelArteOptions() {
   const select = $("imovelArteItem");
   const layout = $("imovelArteLayout");
@@ -3818,87 +3959,100 @@ async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, l
   showToast("Gerando arte do imovel...");
   try {
     const client = donoImovelAdmin(item);
+    const fotosCandidatas = imovelImagensCandidatasAdmin(item);
     const [foto, logo] = await Promise.all([
-      carregarImagemCanvas(imovelImagemPrincipalAdmin(item)),
+      carregarPrimeiraImagemCanvas(fotosCandidatas),
       carregarImagemCanvas(logoClienteImovelAdmin(client))
     ]);
+    if (!foto) {
+      console.error("Nenhuma foto do imovel carregou para a arte.", {
+        imovelId: item.id,
+        fotosCandidatas
+      });
+      showToast("Nao foi possivel carregar a foto deste imovel. Confira as imagens cadastradas.");
+      return;
+    }
     const canvas = document.createElement("canvas");
     canvas.width = 1080;
     canvas.height = 1350;
     const ctx = canvas.getContext("2d");
-    const dark = layout.dark;
-    const text = dark ? "#ffffff" : "#0f172a";
-    const muted = dark ? "rgba(255,255,255,.78)" : "#64748b";
-    const grad = ctx.createLinearGradient(0, 0, 1080, 1350);
-    grad.addColorStop(0, layout.bg);
-    grad.addColorStop(1, dark ? "#020617" : "#ffffff");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 1080, 1350);
-
-    if (layoutKey === "premium" || layoutKey === "exclusivo") {
-      ctx.fillStyle = layout.accent;
-      ctx.globalAlpha = .22;
-      ctx.beginPath();
-      ctx.arc(930, 120, 270, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      desenharImagemCover(ctx, foto, 62, 210, 956, 560, 34);
-    } else if (layoutKey === "minimal") {
-      desenharImagemCover(ctx, foto, 62, 260, 956, 520, 28);
-    } else if (layoutKey === "solar") {
-      preencherRoundRect(ctx, 46, 190, 990, 620, 42, "#ffffff");
-      desenharImagemCover(ctx, foto, 70, 214, 942, 572, 32);
+    if (layoutKey === "modelcs") {
+      desenharModeloCs(ctx, item, client, foto, logo);
     } else {
-      desenharImagemCover(ctx, foto, 0, 0, 1080, 690, 0);
-      ctx.fillStyle = "rgba(2,6,23,.45)";
-      ctx.fillRect(0, 0, 1080, 690);
-    }
+      const dark = layout.dark;
+      const text = dark ? "#ffffff" : "#0f172a";
+      const muted = dark ? "rgba(255,255,255,.78)" : "#64748b";
+      const grad = ctx.createLinearGradient(0, 0, 1080, 1350);
+      grad.addColorStop(0, layout.bg);
+      grad.addColorStop(1, dark ? "#020617" : "#ffffff");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1080, 1350);
 
-    desenharImagemContain(ctx, logo, 62, 58, 92, 92, 20);
-    ctx.fillStyle = text;
-    ctx.font = "900 34px Arial";
-    ctx.textAlign = "left";
-    ctx.fillText(textoCurtoArte(client?.nome || item.clienteNome || item.corretor || "Ola Carlopolis", 30), 176, 92);
-    ctx.fillStyle = muted;
-    ctx.font = "700 24px Arial";
-    ctx.fillText("Imovel anunciado no Ola Carlopolis", 176, 126);
-
-    const ref = String(item.codRef || item.codigo || item.id || "").toUpperCase();
-    if (ref) desenharPillCanvas(ctx, `REF. ${ref}`, 780, 64, dark ? "rgba(255,255,255,.16)" : "#e0edff", dark ? "#fff" : layout.accent2);
-
-    const contentY = (layoutKey === "impacto" || layoutKey === "oportunidade") ? 735 : 820;
-    desenharPillCanvas(ctx, layout.chamada, 62, contentY, layout.accent, "#fff");
-    ctx.fillStyle = text;
-    ctx.font = "900 58px Arial";
-    const tituloHeight = textoQuebradoCanvas(ctx, item.titulo || "Imovel disponivel", 62, contentY + 102, 930, 64, 3);
-
-    ctx.fillStyle = layout.accent;
-    ctx.font = "900 62px Arial";
-    ctx.fillText(formatarValorArteImovel(item.valor), 62, contentY + 130 + tituloHeight);
-
-    ctx.fillStyle = muted;
-    ctx.font = "800 28px Arial";
-    const endereco = item.endereco || "Carlopolis - PR";
-    textoQuebradoCanvas(ctx, endereco, 62, contentY + 182 + tituloHeight, 880, 34, 2);
-
-    const chips = caracteristicasArteImovel(item);
-    let chipX = 62;
-    let chipY = 1086;
-    chips.forEach((chip) => {
-      const w = desenharPillCanvas(ctx, chip.toUpperCase(), chipX, chipY, dark ? "rgba(255,255,255,.14)" : "#eef5ff", dark ? "#fff" : "#1d4ed8");
-      chipX += w + 14;
-      if (chipX > 880) {
-        chipX = 62;
-        chipY += 66;
+      if (layoutKey === "premium" || layoutKey === "exclusivo") {
+        ctx.fillStyle = layout.accent;
+        ctx.globalAlpha = .22;
+        ctx.beginPath();
+        ctx.arc(930, 120, 270, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        desenharImagemCover(ctx, foto, 62, 210, 956, 560, 34);
+      } else if (layoutKey === "minimal") {
+        desenharImagemCover(ctx, foto, 62, 260, 956, 520, 28);
+      } else if (layoutKey === "solar") {
+        preencherRoundRect(ctx, 46, 190, 990, 620, 42, "#ffffff");
+        desenharImagemCover(ctx, foto, 70, 214, 942, 572, 32);
+      } else {
+        desenharImagemCover(ctx, foto, 0, 0, 1080, 690, 0);
+        ctx.fillStyle = "rgba(2,6,23,.45)";
+        ctx.fillRect(0, 0, 1080, 690);
       }
-    });
 
-    preencherRoundRect(ctx, 62, 1230, 956, 86, 26, dark ? "rgba(255,255,255,.12)" : "#0f172a");
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "900 30px Arial";
-    ctx.fillText("CHAME AGORA E SAIBA MAIS", 92, 1284);
-    ctx.textAlign = "right";
-    ctx.fillText("olacarlopolis.com", 988, 1284);
+      desenharImagemContain(ctx, logo, 62, 58, 92, 92, 20);
+      ctx.fillStyle = text;
+      ctx.font = "900 34px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText(textoCurtoArte(client?.nome || item.clienteNome || item.corretor || "Ola Carlopolis", 30), 176, 92);
+      ctx.fillStyle = muted;
+      ctx.font = "700 24px Arial";
+      ctx.fillText("Imovel anunciado no Ola Carlopolis", 176, 126);
+
+      const ref = String(item.codRef || item.codigo || item.id || "").toUpperCase();
+      if (ref) desenharPillCanvas(ctx, `REF. ${ref}`, 780, 64, dark ? "rgba(255,255,255,.16)" : "#e0edff", dark ? "#fff" : layout.accent2);
+
+      const contentY = (layoutKey === "impacto" || layoutKey === "oportunidade") ? 735 : 820;
+      desenharPillCanvas(ctx, layout.chamada, 62, contentY, layout.accent, "#fff");
+      ctx.fillStyle = text;
+      ctx.font = "900 58px Arial";
+      const tituloHeight = textoQuebradoCanvas(ctx, item.titulo || "Imovel disponivel", 62, contentY + 102, 930, 64, 3);
+
+      ctx.fillStyle = layout.accent;
+      ctx.font = "900 62px Arial";
+      ctx.fillText(formatarValorArteImovel(item.valor), 62, contentY + 130 + tituloHeight);
+
+      ctx.fillStyle = muted;
+      ctx.font = "800 28px Arial";
+      const endereco = item.endereco || "Carlopolis - PR";
+      textoQuebradoCanvas(ctx, endereco, 62, contentY + 182 + tituloHeight, 880, 34, 2);
+
+      const chips = caracteristicasArteImovel(item);
+      let chipX = 62;
+      let chipY = 1086;
+      chips.forEach((chip) => {
+        const w = desenharPillCanvas(ctx, chip.toUpperCase(), chipX, chipY, dark ? "rgba(255,255,255,.14)" : "#eef5ff", dark ? "#fff" : "#1d4ed8");
+        chipX += w + 14;
+        if (chipX > 880) {
+          chipX = 62;
+          chipY += 66;
+        }
+      });
+
+      preencherRoundRect(ctx, 62, 1230, 956, 86, 26, dark ? "rgba(255,255,255,.12)" : "#0f172a");
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 30px Arial";
+      ctx.fillText("CHAME AGORA E SAIBA MAIS", 92, 1284);
+      ctx.textAlign = "right";
+      ctx.fillText("olacarlopolis.com", 988, 1284);
+    }
 
     canvas.toBlob((blob) => {
       if (!blob) {
