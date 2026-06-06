@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 264,
-  label: "v264",
+  numero: 265,
+  label: "v265",
   data: "2026-06-06",
-  nota: "Model CS e carregamento robusto das fotos nas artes."
+  nota: "Correcao do download e dos tempos de carregamento das artes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3705,11 +3705,17 @@ function imagemDeBlobCanvas(blob) {
   return new Promise((resolve) => {
     const objectUrl = URL.createObjectURL(blob);
     const img = new Image();
+    const timeout = window.setTimeout(() => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(null);
+    }, 12000);
     img.onload = () => {
+      window.clearTimeout(timeout);
       URL.revokeObjectURL(objectUrl);
       resolve(img);
     };
     img.onerror = () => {
+      window.clearTimeout(timeout);
       URL.revokeObjectURL(objectUrl);
       resolve(null);
     };
@@ -3721,20 +3727,35 @@ async function carregarImagemCanvas(url) {
   const src = normalizarImagemArteAdmin(url);
   if (!src) return null;
   const resolved = /^(data:|blob:)/i.test(src) ? src : new URL(src, window.location.href).toString();
+  const controller = new AbortController();
+  const fetchTimeout = window.setTimeout(() => controller.abort(), 12000);
   try {
-    const response = await fetch(resolved, { mode: "cors", cache: "no-store" });
+    const response = await fetch(resolved, {
+      mode: "cors",
+      cache: "no-store",
+      signal: controller.signal
+    });
     if (response.ok) {
       const imagem = await imagemDeBlobCanvas(await response.blob());
       if (imagem) return imagem;
     }
   } catch (error) {
     console.warn("Falha ao buscar imagem para a arte.", resolved, error);
+  } finally {
+    window.clearTimeout(fetchTimeout);
   }
   return new Promise((resolve) => {
     const img = new Image();
+    const timeout = window.setTimeout(() => resolve(null), 12000);
     img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
+    img.onload = () => {
+      window.clearTimeout(timeout);
+      resolve(img);
+    };
+    img.onerror = () => {
+      window.clearTimeout(timeout);
+      resolve(null);
+    };
     img.src = resolved;
   });
 }
@@ -3745,6 +3766,33 @@ async function carregarPrimeiraImagemCanvas(urls = []) {
     if (imagem) return imagem;
   }
   return null;
+}
+
+function canvasParaBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    try {
+      canvas.toBlob((blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error("O navegador nao retornou a imagem gerada."));
+      }, "image/png");
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+function baixarBlobCanvas(blob, nomeArquivo) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = nomeArquivo;
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  window.setTimeout(() => {
+    link.remove();
+    URL.revokeObjectURL(url);
+  }, 1500);
 }
 
 function canvasRoundRect(ctx, x, y, w, h, r) {
@@ -4054,19 +4102,12 @@ async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, l
       ctx.fillText("olacarlopolis.com", 988, 1284);
     }
 
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        showToast("Nao foi possivel gerar a imagem.");
-        return;
-      }
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `arte-imovel-${slugify(item.codRef || item.titulo || item.id)}-${layoutKey}.png`;
-      link.click();
-      URL.revokeObjectURL(url);
-      showToast("Arte gerada.");
-    }, "image/png");
+    const blob = await canvasParaBlob(canvas);
+    baixarBlobCanvas(
+      blob,
+      `arte-imovel-${slugify(item.codRef || item.titulo || item.id)}-${layoutKey}.png`
+    );
+    showToast("Arte gerada e download iniciado.");
   } catch (error) {
     console.error("Erro ao gerar arte do imovel.", error);
     showToast("Nao foi possivel gerar a arte.");
