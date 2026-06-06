@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 262,
-  label: "v262",
+  numero: 263,
+  label: "v263",
   data: "2026-06-05",
-  nota: "Gerador de artes de imoveis para Instagram."
+  nota: "Ajuste no carregamento da foto nas artes de imoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3664,9 +3664,22 @@ function logoClienteImovelAdmin(client = {}) {
   return displayImageUrl(client.imagem || imageUrl(client.imagens?.[0]) || client.logo || client.logoUrl || "../images/img_padrao_site/logo_1.png");
 }
 
+function normalizarImagemArteAdmin(valor) {
+  if (!valor) return "";
+  if (typeof valor === "string") return displayImageUrl(valor);
+  const url = imageUrl(valor) || valor.url || valor.src || valor.imagem || valor.image || "";
+  return displayImageUrl(url);
+}
+
 function imovelImagemPrincipalAdmin(item = {}) {
   const imagens = Array.isArray(item.imagens) ? item.imagens : [];
-  return displayImageUrl(item.imagem || imagens[0] || "../images/img_padrao_site/logo_1.png");
+  const candidatos = [
+    item.imagem,
+    item.image,
+    item.foto,
+    ...imagens
+  ];
+  return candidatos.map(normalizarImagemArteAdmin).find(Boolean) || "../images/img_padrao_site/logo_1.png";
 }
 
 function formatarValorArteImovel(valor) {
@@ -3681,7 +3694,7 @@ function textoCurtoArte(valor, limite = 72) {
 
 function carregarImagemCanvas(url) {
   return new Promise((resolve) => {
-    const src = displayImageUrl(url);
+    const src = normalizarImagemArteAdmin(url);
     if (!src) return resolve(null);
     const img = new Image();
     img.crossOrigin = "anonymous";
