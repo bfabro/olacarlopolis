@@ -4086,6 +4086,13 @@ function tituloPrincipalArte(item = {}) {
   return textoCurtoArte(item.titulo || "Imovel em destaque", 34).toUpperCase();
 }
 
+function tagNegociacaoArte(item = {}) {
+  const tipo = String(item.tipo || "").trim().toLowerCase();
+  if (/alug|loca/.test(tipo)) return "PARA ALUGUEL";
+  if (/vend/.test(tipo)) return "PARA VENDA";
+  return tipo ? `PARA ${tipo.toUpperCase()}` : "IMOVEL DISPONIVEL";
+}
+
 function itensDestaqueArte(item = {}) {
   const itens = [];
   const add = (sigla, valor, rotulo) => {
@@ -4151,27 +4158,25 @@ function desenharCaracteristicasPremium(ctx, item, layout) {
       ctx.fillStyle = "rgba(255,255,255,.65)";
       ctx.fillRect(x, 724, 2, 76);
     }
-    ctx.fillStyle = layout.accent;
-    ctx.beginPath();
-    ctx.arc(centerX, 738, 24, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = layout.bg;
-    ctx.textAlign = "center";
-    ctx.font = "900 20px Arial";
-    ctx.fillText(info.sigla, centerX, 745);
     ctx.fillStyle = layout.text;
+    ctx.textAlign = "center";
     if (info.valor) {
       const valor = /AREA/.test(info.rotulo) ? `${info.valor} m2` : String(info.valor);
-      fonteQueCabeCanvas(ctx, valor, 900, 22, 14, 190);
-      ctx.fillText(valor, centerX, 780);
-      fonteQueCabeCanvas(ctx, info.rotulo, 900, 18, 11, 190);
-      ctx.fillText(info.rotulo, centerX, 804);
-    } else {
-      desenharTextoInteiroCanvas(ctx, info.rotulo, centerX, 780, 190, 2, {
+      fonteQueCabeCanvas(ctx, valor, 900, 28, 16, 194);
+      ctx.fillText(valor, centerX, 758);
+      fonteQueCabeCanvas(ctx, info.rotulo, 900, 20, 12, 194);
+      desenharTextoInteiroCanvas(ctx, info.rotulo, centerX, 788, 194, 2, {
         peso: 900,
-        tamanho: 19,
-        minimo: 11,
+        tamanho: 20,
+        minimo: 12,
         lineHeight: 21
+      });
+    } else {
+      desenharTextoInteiroCanvas(ctx, info.rotulo, centerX, 760, 194, 3, {
+        peso: 900,
+        tamanho: 23,
+        minimo: 12,
+        lineHeight: 24
       });
     }
   });
@@ -4206,6 +4211,13 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillText(titulo, 540, 676);
   ctx.restore();
 
+  const tag = tagNegociacaoArte(item);
+  preencherRoundRect(ctx, 72, 558, 238, 54, 18, layout.accent);
+  ctx.fillStyle = layout.bg;
+  ctx.textAlign = "center";
+  fonteQueCabeCanvas(ctx, tag, 900, 25, 15, 196);
+  ctx.fillText(tag, 191, 594);
+
   desenharCaracteristicasPremium(ctx, item, layout);
 
   preencherRoundRect(ctx, 196, 842, 688, 150, 28, layout.panel);
@@ -4227,11 +4239,7 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
 
   preencherRoundRect(ctx, 38, 1004, 250, 270, 30, layout.panel);
   desenharBordaRoundRect(ctx, 38, 1004, 250, 270, 30, layout.accent, 4);
-  desenharImagemCover(ctx, logo, 55, 1021, 216, 190, 20);
-  ctx.fillStyle = layout.accent;
-  ctx.textAlign = "center";
-  ctx.font = "900 19px Arial";
-  ctx.fillText("ANUNCIANTE", 163, 1245);
+  desenharImagemCover(ctx, logo, 55, 1021, 216, 236, 20);
 
   const responsavel = textoCurtoArte(client?.nome || item.clienteNome || item.corretor || "Ola Carlopolis", 32).toUpperCase();
   ctx.fillStyle = layout.accent;
@@ -4279,13 +4287,13 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillStyle = layout.accent;
   ctx.fillRect(780, 1242, 2, 52);
   ctx.fillStyle = layout.text;
-  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 540, 1256, 440, 4, {
+  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 512, 1254, 382, 4, {
     peso: 800,
     tamanho: 20,
     minimo: 11,
     lineHeight: 21
   });
-  desenharImagemContain(ctx, siteLogo, 830, 1240, 174, 58, 0, "rgba(255,255,255,0)");
+  desenharImagemContain(ctx, siteLogo, 812, 1229, 220, 84, 0, "rgba(255,255,255,0)");
 }
 
 function renderImovelArteOptions() {
