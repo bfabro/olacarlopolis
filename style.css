@@ -13501,6 +13501,7 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .conte
 
   .home-quick-copy p {
     font-size: .86rem;
+    text-align: center;
   }
 
   .home-quick-actions {
