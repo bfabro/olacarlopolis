@@ -4082,6 +4082,31 @@ function desenharBordaRoundRect(ctx, x, y, w, h, r, cor, largura = 2) {
   ctx.restore();
 }
 
+function desenharIconeWhatsappCanvas(ctx, cx, cy, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 3.2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.arc(cx, cy, 12, 0.2 * Math.PI, 1.95 * Math.PI);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx - 8, cy + 9);
+  ctx.lineTo(cx - 13, cy + 14);
+  ctx.lineTo(cx - 5, cy + 12);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx - 5, cy - 6);
+  ctx.bezierCurveTo(cx - 1, cy + 4, cx + 4, cy + 8, cx + 9, cy + 5);
+  ctx.lineTo(cx + 5, cy + 1);
+  ctx.bezierCurveTo(cx + 3, cy + 3, cx, cy + 1, cx - 2, cy - 2);
+  ctx.lineTo(cx - 5, cy - 6);
+  ctx.fill();
+  ctx.restore();
+}
+
 function tituloPrincipalArte(item = {}) {
   const procura = String(item.procura || "").trim();
   const tipo = String(item.tipo || "venda").trim();
@@ -4283,8 +4308,7 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fill();
   ctx.fillStyle = layout.action;
   ctx.textAlign = "center";
-  ctx.font = "900 25px 'Font Awesome 6 Brands', Arial";
-  ctx.fillText("\uf232", 362, 1207);
+  desenharIconeWhatsappCanvas(ctx, 362, 1198, layout.action);
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "left";
   fonteQueCabeCanvas(ctx, telefone || "FALE COM O ANUNCIANTE", 900, 31, 20, 360);
