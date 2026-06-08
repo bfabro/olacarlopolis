@@ -3928,9 +3928,15 @@ function desenharTextoInteiroCanvas(ctx, texto, x, y, maxWidth, maxLines, option
 
 function telefoneArteAdmin(value) {
   const original = String(value || "").trim();
-  const digits = original.replace(/\D/g, "");
+  const rawDigits = original.replace(/\D/g, "");
+  const digits = rawDigits.length > 11 && rawDigits.startsWith("55")
+    ? rawDigits.slice(2, 13)
+    : rawDigits.slice(0, 11);
   if (digits.length < 10) return original;
-  return formatPhoneMask(original);
+  if (digits.length === 11) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 3)}.${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+  }
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6, 10)}`;
 }
 
 function desenharPillCanvas(ctx, texto, x, y, fill, color = "#fff") {
@@ -3995,7 +4001,7 @@ function desenharInfoModelCs(ctx, info, x, y, maxWidth = 300) {
 function desenharModeloCs(ctx, item, client, foto, logo) {
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, 1080, 1350);
-  desenharImagemContain(ctx, foto, 0, 0, 1080, 700, 0, "#eef2f7");
+  desenharImagemCover(ctx, foto, 0, 0, 1080, 700, 0);
 
   preencherRoundRect(ctx, 650, 650, 300, 92, 42, "#050505");
   ctx.fillStyle = "#ffffff";
@@ -4140,33 +4146,41 @@ function desenharCaracteristicasPremium(ctx, item, layout) {
   desenharBordaRoundRect(ctx, 72, 704, 936, 116, 26, layout.accent, 2);
   itens.forEach((info, index) => {
     const x = 72 + index * 234;
+    const centerX = x + 117;
     if (index) {
       ctx.fillStyle = "rgba(255,255,255,.65)";
       ctx.fillRect(x, 724, 2, 76);
     }
     ctx.fillStyle = layout.accent;
     ctx.beginPath();
-    ctx.arc(x + 52, 749, 25, 0, Math.PI * 2);
+    ctx.arc(centerX, 738, 24, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = layout.bg;
     ctx.textAlign = "center";
-    ctx.font = "900 21px Arial";
-    ctx.fillText(info.sigla, x + 52, 756);
-    const principal = info.valor ? `${info.valor} ${info.rotulo}` : info.rotulo;
+    ctx.font = "900 20px Arial";
+    ctx.fillText(info.sigla, centerX, 745);
     ctx.fillStyle = layout.text;
-    fonteQueCabeCanvas(ctx, principal, 900, 24, 15, 145);
-    ctx.fillText(principal, x + 148, 758);
-    if (info.valor && /AREA/.test(info.rotulo)) {
-      ctx.font = "700 15px Arial";
-      ctx.fillText("m2", x + 148, 782);
+    if (info.valor) {
+      const valor = /AREA/.test(info.rotulo) ? `${info.valor} m2` : String(info.valor);
+      fonteQueCabeCanvas(ctx, valor, 900, 22, 14, 190);
+      ctx.fillText(valor, centerX, 780);
+      fonteQueCabeCanvas(ctx, info.rotulo, 900, 18, 11, 190);
+      ctx.fillText(info.rotulo, centerX, 804);
+    } else {
+      desenharTextoInteiroCanvas(ctx, info.rotulo, centerX, 780, 190, 2, {
+        peso: 900,
+        tamanho: 19,
+        minimo: 11,
+        lineHeight: 21
+      });
     }
   });
 }
 
-function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout) {
+function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, siteLogo) {
   ctx.fillStyle = layout.bg;
   ctx.fillRect(0, 0, 1080, 1350);
-  desenharImagemContain(ctx, foto, 0, 92, 1080, 650, 0, layout.bg);
+  desenharImagemCover(ctx, foto, 0, 92, 1080, 650, 0);
 
   const topo = ctx.createLinearGradient(0, 92, 0, 260);
   topo.addColorStop(0, layout.bg);
@@ -4213,7 +4227,7 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout) {
 
   preencherRoundRect(ctx, 38, 1004, 250, 270, 30, layout.panel);
   desenharBordaRoundRect(ctx, 38, 1004, 250, 270, 30, layout.accent, 4);
-  desenharImagemContain(ctx, logo, 55, 1021, 216, 190, 20);
+  desenharImagemCover(ctx, logo, 55, 1021, 216, 190, 20);
   ctx.fillStyle = layout.accent;
   ctx.textAlign = "center";
   ctx.font = "900 19px Arial";
@@ -4251,30 +4265,27 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout) {
   ctx.fillText("SUA VISITA", 921, 1145);
 
   const ref = String(item.codRef || item.codigo || item.id || "").toUpperCase();
+  if (ref) {
+    ctx.font = "900 18px Arial";
+    fonteQueCabeCanvas(ctx, `REF. ${ref}`, 900, 18, 12, 190);
+    ctx.fillText(`REF. ${ref}`, 921, 1181);
+  }
+
   ctx.fillStyle = "rgba(255,255,255,.14)";
   ctx.fillRect(315, 1225, 729, 1);
   const enderecoCompleto = String(item.endereco || "CARLOPOLIS - PR").trim().toUpperCase();
-  const rodape = [
-    { texto: ref ? `REF. ${ref}` : "IMOVEL SELECIONADO", x: 395, largura: 180, linhas: 2 },
-    { texto: enderecoCompleto, x: 650, largura: 300, linhas: 4 },
-    { texto: "OLACARLOPOLIS.COM", x: 930, largura: 185, linhas: 2 }
-  ];
   ctx.fillStyle = layout.text;
   ctx.textAlign = "center";
-  rodape.forEach((info, index) => {
-    const x = info.x;
-    if (index) {
-      ctx.fillStyle = layout.accent;
-      ctx.fillRect(x - 126, 1242, 2, 52);
-      ctx.fillStyle = layout.text;
-    }
-    desenharTextoInteiroCanvas(ctx, info.texto, x, 1260, info.largura, info.linhas, {
-      peso: 800,
-      tamanho: 18,
-      minimo: 10,
-      lineHeight: 20
-    });
+  ctx.fillStyle = layout.accent;
+  ctx.fillRect(780, 1242, 2, 52);
+  ctx.fillStyle = layout.text;
+  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 540, 1256, 440, 4, {
+    peso: 800,
+    tamanho: 20,
+    minimo: 11,
+    lineHeight: 21
   });
+  desenharImagemContain(ctx, siteLogo, 830, 1240, 174, 58, 0, "rgba(255,255,255,0)");
 }
 
 function renderImovelArteOptions() {
@@ -4300,9 +4311,10 @@ async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, l
   try {
     const client = donoImovelAdmin(item);
     const fotosCandidatas = imovelImagensCandidatasAdmin(item);
-    const [foto, logo] = await Promise.all([
+    const [foto, logo, siteLogo] = await Promise.all([
       carregarPrimeiraImagemCanvas(fotosCandidatas),
-      carregarImagemCanvas(logoClienteImovelAdmin(client))
+      carregarImagemCanvas(logoClienteImovelAdmin(client)),
+      carregarImagemCanvas("../images/img_padrao_site/logo_1.png")
     ]);
     if (!foto) {
       console.error("Nenhuma foto do imovel carregou para a arte.", {
@@ -4316,7 +4328,7 @@ async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, l
     canvas.width = 1080;
     canvas.height = 1350;
     const ctx = canvas.getContext("2d");
-    desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout);
+    desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, siteLogo);
 
     const blob = await canvasParaBlob(canvas);
     baixarBlobCanvas(
