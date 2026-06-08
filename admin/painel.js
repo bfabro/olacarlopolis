@@ -4243,7 +4243,10 @@ function desenharCaracteristicasPremium(ctx, item, layout, y = 874, endereco = "
 function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, siteLogo) {
   ctx.fillStyle = layout.bg;
   ctx.fillRect(0, 0, 1080, 1350);
+  ctx.save();
+  ctx.filter = "brightness(1.12) contrast(1.04)";
   desenharImagemCover(ctx, foto, 0, 92, 1080, 650, 0);
+  ctx.restore();
 
   const topo = ctx.createLinearGradient(0, 92, 0, 260);
   topo.addColorStop(0, layout.bg);
