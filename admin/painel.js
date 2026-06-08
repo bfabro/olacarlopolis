@@ -3907,7 +3907,8 @@ function desenharTextoInteiroCanvas(ctx, texto, x, y, maxWidth, maxLines, option
     minimo = 10,
     lineHeight = 20,
     familia = "Arial",
-    align = "center"
+    align = "center",
+    blockHeight = 0
   } = options;
   let fontSize = tamanho;
   let lines = [];
@@ -3920,8 +3921,11 @@ function desenharTextoInteiroCanvas(ctx, texto, x, y, maxWidth, maxLines, option
 
   const fittedLineHeight = Math.max(minimo + 3, Math.round(lineHeight * (fontSize / tamanho)));
   ctx.textAlign = align;
+  const startY = blockHeight
+    ? y + (blockHeight - lines.length * fittedLineHeight) / 2 + fontSize * .82
+    : y;
   lines.forEach((line, index) => {
-    ctx.fillText(line, x, y + index * fittedLineHeight, maxWidth);
+    ctx.fillText(line, x, startY + index * fittedLineHeight, maxWidth);
   });
   return lines.length * fittedLineHeight;
 }
@@ -4245,11 +4249,12 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   preencherRoundRect(ctx, 112, 982, 856, 62, 22, layout.panel);
   desenharBordaRoundRect(ctx, 112, 982, 856, 62, 22, layout.accent, 3);
   ctx.fillStyle = layout.text;
-  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 540, 1008, 760, 2, {
+  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 540, 982, 760, 2, {
     peso: 900,
     tamanho: 20,
     minimo: 12,
-    lineHeight: 21
+    lineHeight: 21,
+    blockHeight: 62
   });
 
   preencherRoundRect(ctx, 38, 1062, 250, 250, 30, layout.panel);
@@ -4288,7 +4293,7 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   fonteQueCabeCanvas(ctx, agendaTexto, 900, 22, 13, 400);
   ctx.fillText(agendaTexto, 549, 1285);
 
-  desenharImagemContain(ctx, siteLogo, 840, 1148, 178, 102, 0, "rgba(255,255,255,0)");
+  desenharImagemContain(ctx, siteLogo, 806, 1138, 230, 132, 0, "rgba(255,255,255,0)");
 }
 
 function renderImovelArteOptions() {
