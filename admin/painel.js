@@ -4118,7 +4118,7 @@ function itensDestaqueArte(item = {}) {
   return itens.slice(0, 4);
 }
 
-function desenharFaixaDestaque(ctx, layout) {
+function desenharFaixaDestaque(ctx, layout, item = {}) {
   const grad = ctx.createLinearGradient(180, 0, 900, 0);
   grad.addColorStop(0, layout.accent);
   grad.addColorStop(.5, layout.accent2);
@@ -4129,10 +4129,10 @@ function desenharFaixaDestaque(ctx, layout) {
   ctx.beginPath();
   ctx.moveTo(170, 28);
   ctx.lineTo(910, 28);
-  ctx.lineTo(875, 72);
-  ctx.lineTo(910, 116);
-  ctx.lineTo(170, 116);
-  ctx.lineTo(205, 72);
+  ctx.lineTo(880, 68);
+  ctx.lineTo(910, 108);
+  ctx.lineTo(170, 108);
+  ctx.lineTo(200, 68);
   ctx.closePath();
   ctx.fillStyle = grad;
   ctx.fill();
@@ -4142,36 +4142,43 @@ function desenharFaixaDestaque(ctx, layout) {
   ctx.stroke();
   ctx.fillStyle = layout.bg;
   ctx.textAlign = "center";
-  ctx.font = "900 47px Arial";
-  ctx.fillText("*  IMOVEL EM DESTAQUE  *", 540, 88);
+  ctx.font = "900 43px Arial";
+  ctx.fillText("*  IMOVEL EM DESTAQUE  *", 540, 84);
+
+  const tag = tagNegociacaoArte(item);
+  preencherRoundRect(ctx, 420, 106, 240, 42, 16, layout.accent);
+  desenharBordaRoundRect(ctx, 420, 106, 240, 42, 16, layout.accent2, 2);
+  ctx.fillStyle = layout.bg;
+  fonteQueCabeCanvas(ctx, tag, 900, 22, 14, 194);
+  ctx.fillText(tag, 540, 134);
 }
 
-function desenharCaracteristicasPremium(ctx, item, layout) {
+function desenharCaracteristicasPremium(ctx, item, layout, y = 874) {
   const itens = itensDestaqueArte(item);
-  preencherRoundRect(ctx, 72, 704, 936, 116, 26, layout.panel);
-  desenharBordaRoundRect(ctx, 72, 704, 936, 116, 26, layout.accent, 2);
+  preencherRoundRect(ctx, 72, y, 936, 116, 26, layout.panel);
+  desenharBordaRoundRect(ctx, 72, y, 936, 116, 26, layout.accent, 2);
   itens.forEach((info, index) => {
     const x = 72 + index * 234;
     const centerX = x + 117;
     if (index) {
       ctx.fillStyle = "rgba(255,255,255,.65)";
-      ctx.fillRect(x, 724, 2, 76);
+      ctx.fillRect(x, y + 20, 2, 76);
     }
     ctx.fillStyle = layout.text;
     ctx.textAlign = "center";
     if (info.valor) {
       const valor = /AREA/.test(info.rotulo) ? `${info.valor} m2` : String(info.valor);
       fonteQueCabeCanvas(ctx, valor, 900, 28, 16, 194);
-      ctx.fillText(valor, centerX, 758);
+      ctx.fillText(valor, centerX, y + 54);
       fonteQueCabeCanvas(ctx, info.rotulo, 900, 20, 12, 194);
-      desenharTextoInteiroCanvas(ctx, info.rotulo, centerX, 788, 194, 2, {
+      desenharTextoInteiroCanvas(ctx, info.rotulo, centerX, y + 84, 194, 2, {
         peso: 900,
         tamanho: 20,
         minimo: 12,
         lineHeight: 21
       });
     } else {
-      desenharTextoInteiroCanvas(ctx, info.rotulo, centerX, 760, 194, 3, {
+      desenharTextoInteiroCanvas(ctx, info.rotulo, centerX, y + 56, 194, 3, {
         peso: 900,
         tamanho: 23,
         minimo: 12,
@@ -4198,7 +4205,7 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   baseFoto.addColorStop(1, layout.bg);
   ctx.fillStyle = baseFoto;
   ctx.fillRect(0, 490, 1080, 300);
-  desenharFaixaDestaque(ctx, layout);
+  desenharFaixaDestaque(ctx, layout, item);
 
   const titulo = tituloPrincipalArte(item);
   ctx.save();
@@ -4210,30 +4217,24 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillText(titulo, 540, 676);
   ctx.restore();
 
-  desenharCaracteristicasPremium(ctx, item, layout);
-
-  preencherRoundRect(ctx, 196, 842, 688, 150, 28, layout.panel);
-  desenharBordaRoundRect(ctx, 196, 842, 688, 150, 28, layout.accent, 3);
+  preencherRoundRect(ctx, 216, 704, 648, 132, 26, layout.panel);
+  desenharBordaRoundRect(ctx, 216, 704, 648, 132, 26, layout.accent, 3);
   ctx.fillStyle = layout.text;
   ctx.textAlign = "left";
-  ctx.font = "800 22px Arial";
-  ctx.fillText("POR APENAS", 230, 886);
-  const tag = tagNegociacaoArte(item);
-  preencherRoundRect(ctx, 698, 862, 150, 38, 16, layout.accent);
-  ctx.fillStyle = layout.bg;
-  ctx.textAlign = "center";
-  fonteQueCabeCanvas(ctx, tag.replace(/^PARA\s+/i, ""), 900, 18, 12, 116);
-  ctx.fillText(tag.replace(/^PARA\s+/i, ""), 773, 887);
+  ctx.font = "800 21px Arial";
+  ctx.fillText("POR APENAS", 250, 747);
   const valor = formatarValorArteImovel(item.valor);
   const valorTexto = valor === "Consulte" ? "CONSULTE" : valor.replace(/\s/g, "");
-  const valorGrad = ctx.createLinearGradient(270, 900, 835, 980);
+  const valorGrad = ctx.createLinearGradient(270, 760, 835, 830);
   valorGrad.addColorStop(0, layout.accent);
   valorGrad.addColorStop(.5, layout.accent2);
   valorGrad.addColorStop(1, layout.accent);
   ctx.fillStyle = valorGrad;
   ctx.textAlign = "center";
-  fonteQueCabeCanvas(ctx, valorTexto, 900, 88, 48, 610);
-  ctx.fillText(valorTexto, 540, 965);
+  fonteQueCabeCanvas(ctx, valorTexto, 900, 76, 42, 570);
+  ctx.fillText(valorTexto, 540, 815);
+
+  desenharCaracteristicasPremium(ctx, item, layout, 858);
 
   preencherRoundRect(ctx, 38, 1004, 250, 270, 30, layout.panel);
   desenharBordaRoundRect(ctx, 38, 1004, 250, 270, 30, layout.accent, 4);
