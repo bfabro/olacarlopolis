@@ -3933,10 +3933,7 @@ function telefoneArteAdmin(value) {
     ? rawDigits.slice(2, 13)
     : rawDigits.slice(0, 11);
   if (digits.length < 10) return original;
-  if (digits.length === 11) {
-    return `(${digits.slice(0, 2)}) ${digits.slice(2, 3)}.${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
-  }
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6, 10)}`;
+  return formatPhoneMask(digits);
 }
 
 function desenharPillCanvas(ctx, texto, x, y, fill, color = "#fff") {
