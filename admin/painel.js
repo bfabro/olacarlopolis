@@ -4192,6 +4192,7 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillStyle = layout.bg;
   ctx.fillRect(0, 0, 1080, 1350);
   desenharImagemCover(ctx, foto, 0, 92, 1080, 650, 0);
+  desenharImagemContain(ctx, siteLogo, 905, 22, 112, 78, 0, "rgba(255,255,255,0)");
 
   const topo = ctx.createLinearGradient(0, 92, 0, 260);
   topo.addColorStop(0, layout.bg);
@@ -4217,24 +4218,37 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillText(titulo, 540, 676);
   ctx.restore();
 
-  preencherRoundRect(ctx, 216, 704, 648, 132, 26, layout.panel);
-  desenharBordaRoundRect(ctx, 216, 704, 648, 132, 26, layout.accent, 3);
+  const enderecoCompleto = String(item.endereco || "CARLOPOLIS - PR").trim().toUpperCase();
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.85)";
+  ctx.shadowBlur = 8;
+  ctx.fillStyle = "#ffffff";
+  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 540, 708, 720, 2, {
+    peso: 900,
+    tamanho: 22,
+    minimo: 13,
+    lineHeight: 24
+  });
+  ctx.restore();
+
+  preencherRoundRect(ctx, 236, 752, 608, 118, 24, layout.panel);
+  desenharBordaRoundRect(ctx, 236, 752, 608, 118, 24, layout.accent, 3);
   ctx.fillStyle = layout.text;
   ctx.textAlign = "left";
-  ctx.font = "800 21px Arial";
-  ctx.fillText("POR APENAS", 250, 747);
+  ctx.font = "800 19px Arial";
+  ctx.fillText("POR APENAS", 270, 790);
   const valor = formatarValorArteImovel(item.valor);
   const valorTexto = valor === "Consulte" ? "CONSULTE" : valor.replace(/\s/g, "");
-  const valorGrad = ctx.createLinearGradient(270, 760, 835, 830);
+  const valorGrad = ctx.createLinearGradient(290, 802, 790, 858);
   valorGrad.addColorStop(0, layout.accent);
   valorGrad.addColorStop(.5, layout.accent2);
   valorGrad.addColorStop(1, layout.accent);
   ctx.fillStyle = valorGrad;
   ctx.textAlign = "center";
-  fonteQueCabeCanvas(ctx, valorTexto, 900, 76, 42, 570);
-  ctx.fillText(valorTexto, 540, 815);
+  fonteQueCabeCanvas(ctx, valorTexto, 900, 64, 36, 520);
+  ctx.fillText(valorTexto, 540, 850);
 
-  desenharCaracteristicasPremium(ctx, item, layout, 858);
+  desenharCaracteristicasPremium(ctx, item, layout, 878);
 
   preencherRoundRect(ctx, 38, 1004, 250, 270, 30, layout.panel);
   desenharBordaRoundRect(ctx, 38, 1004, 250, 270, 30, layout.accent, 4);
@@ -4280,19 +4294,6 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
 
   ctx.fillStyle = "rgba(255,255,255,.14)";
   ctx.fillRect(315, 1225, 729, 1);
-  const enderecoCompleto = String(item.endereco || "CARLOPOLIS - PR").trim().toUpperCase();
-  ctx.fillStyle = layout.text;
-  ctx.textAlign = "center";
-  ctx.fillStyle = layout.accent;
-  ctx.fillRect(780, 1242, 2, 52);
-  ctx.fillStyle = layout.text;
-  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 512, 1254, 382, 4, {
-    peso: 800,
-    tamanho: 20,
-    minimo: 11,
-    lineHeight: 21
-  });
-  desenharImagemContain(ctx, siteLogo, 812, 1229, 220, 84, 0, "rgba(255,255,255,0)");
 }
 
 function renderImovelArteOptions() {
