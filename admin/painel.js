@@ -4192,7 +4192,6 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillStyle = layout.bg;
   ctx.fillRect(0, 0, 1080, 1350);
   desenharImagemCover(ctx, foto, 0, 92, 1080, 650, 0);
-  desenharImagemContain(ctx, siteLogo, 905, 22, 112, 78, 0, "rgba(255,255,255,0)");
 
   const topo = ctx.createLinearGradient(0, 92, 0, 260);
   topo.addColorStop(0, layout.bg);
@@ -4218,25 +4217,17 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillText(titulo, 540, 676);
   ctx.restore();
 
-  const enderecoCompleto = String(item.endereco || "CARLOPOLIS - PR").trim().toUpperCase();
   ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,.85)";
-  ctx.shadowBlur = 8;
-  ctx.fillStyle = "#ffffff";
-  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 540, 708, 720, 2, {
-    peso: 900,
-    tamanho: 22,
-    minimo: 13,
-    lineHeight: 24
-  });
+  ctx.shadowColor = layout.accent;
+  ctx.shadowBlur = 18;
+  desenharBordaRoundRect(ctx, 236, 724, 608, 118, 24, layout.accent, 5);
   ctx.restore();
-
-  preencherRoundRect(ctx, 236, 752, 608, 118, 24, layout.panel);
-  desenharBordaRoundRect(ctx, 236, 752, 608, 118, 24, layout.accent, 3);
+  preencherRoundRect(ctx, 236, 724, 608, 118, 24, layout.panel);
+  desenharBordaRoundRect(ctx, 236, 724, 608, 118, 24, layout.accent, 3);
   ctx.fillStyle = layout.text;
   ctx.textAlign = "left";
   ctx.font = "800 19px Arial";
-  ctx.fillText("POR APENAS", 270, 790);
+  ctx.fillText("POR APENAS", 270, 762);
   const valor = formatarValorArteImovel(item.valor);
   const valorTexto = valor === "Consulte" ? "CONSULTE" : valor.replace(/\s/g, "");
   const valorGrad = ctx.createLinearGradient(290, 802, 790, 858);
@@ -4246,54 +4237,58 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillStyle = valorGrad;
   ctx.textAlign = "center";
   fonteQueCabeCanvas(ctx, valorTexto, 900, 64, 36, 520);
-  ctx.fillText(valorTexto, 540, 850);
+  ctx.fillText(valorTexto, 540, 822);
 
-  desenharCaracteristicasPremium(ctx, item, layout, 878);
+  desenharCaracteristicasPremium(ctx, item, layout, 858);
 
-  preencherRoundRect(ctx, 38, 1004, 250, 270, 30, layout.panel);
-  desenharBordaRoundRect(ctx, 38, 1004, 250, 270, 30, layout.accent, 4);
-  desenharImagemCover(ctx, logo, 55, 1021, 216, 236, 20);
+  const enderecoCompleto = String(item.endereco || "CARLOPOLIS - PR").trim().toUpperCase();
+  preencherRoundRect(ctx, 112, 982, 856, 62, 22, layout.panel);
+  desenharBordaRoundRect(ctx, 112, 982, 856, 62, 22, layout.accent, 3);
+  ctx.fillStyle = layout.text;
+  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 540, 1008, 760, 2, {
+    peso: 900,
+    tamanho: 20,
+    minimo: 12,
+    lineHeight: 21
+  });
+
+  preencherRoundRect(ctx, 38, 1062, 250, 250, 30, layout.panel);
+  desenharBordaRoundRect(ctx, 38, 1062, 250, 250, 30, layout.accent, 4);
+  desenharImagemCover(ctx, logo, 55, 1079, 216, 216, 20);
 
   const responsavel = textoCurtoArte(client?.nome || item.clienteNome || item.corretor || "Ola Carlopolis", 32).toUpperCase();
   ctx.fillStyle = layout.accent;
   ctx.textAlign = "left";
   ctx.font = "900 24px Arial";
-  ctx.fillText("IMOVEIS", 330, 1053);
+  ctx.fillText("IMOVEIS", 330, 1095);
   ctx.fillStyle = layout.text;
   fonteQueCabeCanvas(ctx, responsavel, 900, 39, 25, 690);
-  ctx.fillText(responsavel, 330, 1095);
+  ctx.fillText(responsavel, 330, 1137);
 
   const telefone = telefoneArteAdmin(item.telefone || client?.whatsapp || client?.contato || client?.telefone || "");
-  preencherRoundRect(ctx, 322, 1120, 454, 76, 22, layout.action);
+  preencherRoundRect(ctx, 322, 1162, 454, 72, 22, layout.action);
   ctx.fillStyle = "#ffffff";
   ctx.beginPath();
-  ctx.arc(362, 1158, 25, 0, Math.PI * 2);
+  ctx.arc(362, 1198, 24, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = layout.action;
   ctx.textAlign = "center";
   ctx.font = "900 25px 'Font Awesome 6 Brands', Arial";
-  ctx.fillText("\uf232", 362, 1167);
+  ctx.fillText("\uf232", 362, 1207);
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "left";
   fonteQueCabeCanvas(ctx, telefone || "FALE COM O ANUNCIANTE", 900, 31, 20, 360);
-  ctx.fillText(telefone || "FALE COM O ANUNCIANTE", 399, 1168);
-
-  preencherRoundRect(ctx, 798, 1052, 246, 144, 24, layout.accent);
-  ctx.fillStyle = layout.bg;
-  ctx.textAlign = "center";
-  ctx.font = "900 25px Arial";
-  ctx.fillText("AGENDE", 921, 1106);
-  ctx.fillText("SUA VISITA", 921, 1145);
+  ctx.fillText(telefone || "FALE COM O ANUNCIANTE", 399, 1208);
 
   const ref = String(item.codRef || item.codigo || item.id || "").toUpperCase();
-  if (ref) {
-    ctx.font = "900 18px Arial";
-    fonteQueCabeCanvas(ctx, `REF. ${ref}`, 900, 18, 12, 190);
-    ctx.fillText(`REF. ${ref}`, 921, 1181);
-  }
+  preencherRoundRect(ctx, 322, 1252, 454, 50, 18, layout.accent);
+  ctx.fillStyle = layout.bg;
+  ctx.textAlign = "center";
+  const agendaTexto = ref ? `AGENDE SUA VISITA  |  REF. ${ref}` : "AGENDE SUA VISITA";
+  fonteQueCabeCanvas(ctx, agendaTexto, 900, 22, 13, 400);
+  ctx.fillText(agendaTexto, 549, 1285);
 
-  ctx.fillStyle = "rgba(255,255,255,.14)";
-  ctx.fillRect(315, 1225, 729, 1);
+  desenharImagemContain(ctx, siteLogo, 840, 1148, 178, 102, 0, "rgba(255,255,255,0)");
 }
 
 function renderImovelArteOptions() {
