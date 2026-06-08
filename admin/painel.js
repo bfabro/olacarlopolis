@@ -4157,10 +4157,12 @@ function desenharFaixaDestaque(ctx, layout, item = {}) {
   ctx.fillText(tag, 540, 134);
 }
 
-function desenharCaracteristicasPremium(ctx, item, layout, y = 874) {
+function desenharCaracteristicasPremium(ctx, item, layout, y = 874, endereco = "") {
   const itens = itensDestaqueArte(item);
-  preencherRoundRect(ctx, 72, y, 936, 116, 26, layout.panel);
-  desenharBordaRoundRect(ctx, 72, y, 936, 116, 26, layout.accent, 2);
+  const hasEndereco = Boolean(String(endereco || "").trim());
+  const boxHeight = hasEndereco ? 178 : 116;
+  preencherRoundRect(ctx, 72, y, 936, boxHeight, 26, layout.panel);
+  desenharBordaRoundRect(ctx, 72, y, 936, boxHeight, 26, layout.accent, 2);
   itens.forEach((info, index) => {
     const x = 72 + index * 234;
     const centerX = x + 117;
@@ -4190,6 +4192,20 @@ function desenharCaracteristicasPremium(ctx, item, layout, y = 874) {
       });
     }
   });
+  if (hasEndereco) {
+    ctx.fillStyle = layout.accent;
+    ctx.globalAlpha = .72;
+    ctx.fillRect(112, y + 116, 856, 2);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = layout.text;
+    desenharTextoInteiroCanvas(ctx, String(endereco).toUpperCase(), 540, y + 120, 800, 2, {
+      peso: 900,
+      tamanho: 19,
+      minimo: 11,
+      lineHeight: 20,
+      blockHeight: 56
+    });
+  }
 }
 
 function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, siteLogo) {
@@ -4243,19 +4259,8 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   fonteQueCabeCanvas(ctx, valorTexto, 900, 64, 36, 520);
   ctx.fillText(valorTexto, 540, 822);
 
-  desenharCaracteristicasPremium(ctx, item, layout, 858);
-
   const enderecoCompleto = String(item.endereco || "CARLOPOLIS - PR").trim().toUpperCase();
-  preencherRoundRect(ctx, 112, 982, 856, 62, 22, layout.panel);
-  desenharBordaRoundRect(ctx, 112, 982, 856, 62, 22, layout.accent, 3);
-  ctx.fillStyle = layout.text;
-  desenharTextoInteiroCanvas(ctx, enderecoCompleto, 540, 982, 760, 2, {
-    peso: 900,
-    tamanho: 20,
-    minimo: 12,
-    lineHeight: 21,
-    blockHeight: 62
-  });
+  desenharCaracteristicasPremium(ctx, item, layout, 858, enderecoCompleto);
 
   preencherRoundRect(ctx, 38, 1062, 250, 250, 30, layout.panel);
   desenharBordaRoundRect(ctx, 38, 1062, 250, 250, 30, layout.accent, 4);
@@ -4293,7 +4298,7 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   fonteQueCabeCanvas(ctx, agendaTexto, 900, 22, 13, 400);
   ctx.fillText(agendaTexto, 549, 1285);
 
-  desenharImagemContain(ctx, siteLogo, 806, 1138, 230, 132, 0, "rgba(255,255,255,0)");
+  desenharImagemContain(ctx, siteLogo, 796, 1144, 250, 150, 0, "rgba(255,255,255,0)");
 }
 
 function renderImovelArteOptions() {
