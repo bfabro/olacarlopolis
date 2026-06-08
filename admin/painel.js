@@ -4298,7 +4298,11 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   fonteQueCabeCanvas(ctx, agendaTexto, 900, 22, 13, 400);
   ctx.fillText(agendaTexto, 549, 1285);
 
-  desenharImagemContain(ctx, siteLogo, 796, 1144, 250, 150, 0, "rgba(255,255,255,0)");
+  desenharImagemContain(ctx, siteLogo, 796, 1136, 250, 132, 0, "rgba(255,255,255,0)");
+  ctx.fillStyle = layout.text;
+  ctx.textAlign = "center";
+  fonteQueCabeCanvas(ctx, "www.olacarlopolis.com", 900, 18, 11, 230);
+  ctx.fillText("www.olacarlopolis.com", 921, 1292);
 }
 
 function renderImovelArteOptions() {
