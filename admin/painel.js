@@ -3083,19 +3083,33 @@ function destaqueWeeklyValue() {
   return Number(config.valorDestaqueSemanal || config.destaqueSemanalValor || 0);
 }
 
+function destaqueWeekendValue() {
+  const config = state.pagamentoSistema || {};
+  return Number(config.valorDestaqueFimSemana || config.destaqueFimSemanaValor || 0);
+}
+
+function destaqueTypeForClient(client) {
+  return client?.destaqueTipo || client?.destaquePeriodo || (client?.destaqueFimSemana ? "fim_semana" : "semanal");
+}
+
 function destaqueWeeksForClient(client) {
   const weeks = Number(client?.destaqueSemanas || client?.destaqueQtdSemanas || 1);
   return Math.max(1, Math.min(52, Number.isFinite(weeks) ? Math.round(weeks) : 1));
 }
 
 function destaqueDaysForClient(client) {
-  return destaqueWeeksForClient(client) * 7;
+  return destaqueTypeForClient(client) === "fim_semana"
+    ? destaqueWeeksForClient(client) * 2
+    : destaqueWeeksForClient(client) * 7;
 }
 
 function destaqueValueForClient(client) {
   const valorCliente = Number(client?.destaqueValor || 0);
   if (valorCliente > 0) return valorCliente;
-  return destaqueWeeklyValue() * destaqueWeeksForClient(client);
+  const unitValue = destaqueTypeForClient(client) === "fim_semana"
+    ? destaqueWeekendValue()
+    : destaqueWeeklyValue();
+  return unitValue * destaqueWeeksForClient(client);
 }
 
 function destaqueBillingForClient(client) {
@@ -4173,13 +4187,6 @@ function desenharFaixaDestaque(ctx, layout, item = {}) {
   ctx.textAlign = "center";
   ctx.font = "900 43px Arial";
   ctx.fillText("*  IMOVEL EM DESTAQUE  *", 540, 84);
-
-  const tag = tagNegociacaoArte(item);
-  preencherRoundRect(ctx, 420, 106, 240, 42, 16, layout.accent);
-  desenharBordaRoundRect(ctx, 420, 106, 240, 42, 16, layout.accent2, 2);
-  ctx.fillStyle = layout.bg;
-  fonteQueCabeCanvas(ctx, tag, 900, 22, 14, 194);
-  ctx.fillText(tag, 540, 134);
 }
 
 function desenharCaracteristicasPremium(ctx, item, layout, y = 874, endereco = "") {
@@ -6282,7 +6289,13 @@ function renderClientOnlyEditor() {
           </div>
           <label class="check-row"><input id="coFeaturedWeek" type="checkbox" ${client.destaqueSemanal ? "checked" : ""}> Ativar destaque na pagina inicial</label>
           <div class="section-fields">
-            <label>Quantidade de semanas<input id="coFeaturedWeeks" type="number" min="1" max="52" value="${escapeAttr(destaqueWeeksForClient(client))}"></label>
+            <label>Tipo de destaque
+              <select id="coFeaturedType">
+                <option value="semanal" ${destaqueTypeForClient(client) === "semanal" ? "selected" : ""}>Destaque semanal</option>
+                <option value="fim_semana" ${destaqueTypeForClient(client) === "fim_semana" ? "selected" : ""}>Destaque fim de semana</option>
+              </select>
+            </label>
+            <label>Quantidade<input id="coFeaturedWeeks" type="number" min="1" max="52" value="${escapeAttr(destaqueWeeksForClient(client))}"></label>
             <label>Cobranca
               <select id="coFeaturedBilling">
                 <option value="mensalidade" ${destaqueBillingForClient(client) === "mensalidade" ? "selected" : ""}>Junto da mensalidade</option>
@@ -6358,8 +6371,10 @@ function renderClientOnlyEditor() {
   const refreshCoFeaturedSummary = () => {
     const active = Boolean(mount.querySelector("#coFeaturedWeek")?.checked);
     const weeks = destaqueWeeksForClient({ destaqueSemanas: mount.querySelector("#coFeaturedWeeks")?.value || 1 });
-    const days = weeks * 7;
-    const value = active ? destaqueValueForClient({ destaqueSemanas: weeks }) : 0;
+    const type = mount.querySelector("#coFeaturedType")?.value || "semanal";
+    const kindLabel = type === "fim_semana" ? "fim de semana" : "semana";
+    const days = destaqueDaysForClient({ destaqueSemanas: weeks, destaqueTipo: type });
+    const value = active ? destaqueValueForClient({ destaqueSemanas: weeks, destaqueTipo: type }) : 0;
     const end = active ? dateKeyFromDate(addDays(new Date(), days - 1)) : "";
     const billing = mount.querySelector("#coFeaturedBilling")?.value || "mensalidade";
     const valueInput = mount.querySelector("#coFeaturedValue");
@@ -6367,11 +6382,11 @@ function renderClientOnlyEditor() {
     if (valueInput) valueInput.value = value ? moneyBR(value) : "";
     if (summary) {
       summary.textContent = active
-        ? `${weeks} semana${weeks === 1 ? "" : "s"} (${days} dias), ${moneyBR(value)}, valido ate ${formatDateBR(end)}. Cobranca: ${billing === "pix_separado" ? "Pix separado" : "junto da mensalidade"}. Se houver mais de 20 ativos, os destaques alternam semanalmente por ordem de contratacao.`
-        : `Valor do destaque definido pelo admin master: ${moneyBR(destaqueWeeklyValue())} por semana. O site exibe no maximo 20 destaques por semana.`;
+        ? `${weeks} ${kindLabel}${weeks === 1 ? "" : "s"} (${days} dias), ${moneyBR(value)}, valido ate ${formatDateBR(end)}. Cobranca: ${billing === "pix_separado" ? "Pix separado" : "junto da mensalidade"}. Se houver mais de 20 ativos, os destaques alternam conforme a fila de contratacao.`
+        : `Valores definidos pelo admin master: ${moneyBR(destaqueWeeklyValue())} por semana e ${moneyBR(destaqueWeekendValue())} por fim de semana.`;
     }
   };
-  ["coFeaturedWeek", "coFeaturedWeeks", "coFeaturedBilling"].forEach((id) => {
+  ["coFeaturedWeek", "coFeaturedType", "coFeaturedWeeks", "coFeaturedBilling"].forEach((id) => {
     mount.querySelector(`#${id}`)?.addEventListener("input", refreshCoFeaturedSummary);
     mount.querySelector(`#${id}`)?.addEventListener("change", refreshCoFeaturedSummary);
   });
@@ -6391,6 +6406,7 @@ function renderClientOnlyEditor() {
       ...client,
       destaqueSemanal: true,
       destaqueSemanas: mount.querySelector("#coFeaturedWeeks")?.value || 1,
+      destaqueTipo: mount.querySelector("#coFeaturedType")?.value || "semanal",
       destaqueCobranca: "pix_separado"
     };
     const pix = buildDestaquePix(plannedClient, state.pagamentoSistema);
@@ -6824,17 +6840,19 @@ function renderClientOnlyEditor() {
     }
     if (canEditDestaque) {
       const destaqueAtivo = Boolean($("coFeaturedWeek")?.checked);
+      const destaqueTipo = $("coFeaturedType")?.value || "semanal";
       const weeks = destaqueWeeksForClient({ destaqueSemanas: $("coFeaturedWeeks")?.value || 1 });
-      const days = weeks * 7;
+      const days = destaqueDaysForClient({ destaqueSemanas: weeks, destaqueTipo });
       const start = destaqueAtivo ? (client.destaqueInicio || dateKeyFromDate(new Date())) : "";
       Object.assign(payload, {
         destaqueSemanal: destaqueAtivo,
+        destaqueTipo,
         destaqueSemanas: weeks,
         destaqueDias: days,
         destaqueInicio: start,
         destaqueFim: destaqueAtivo ? dateKeyFromDate(addDays(new Date(`${start}T12:00:00`), days - 1)) : "",
         destaqueCobranca: $("coFeaturedBilling")?.value || "mensalidade",
-        destaqueValor: destaqueAtivo ? destaqueValueForClient({ destaqueSemanas: weeks }) : 0
+        destaqueValor: destaqueAtivo ? destaqueValueForClient({ destaqueSemanas: weeks, destaqueTipo }) : 0
       });
     }
     payload.aliases = buildClientPublicAliases(client.id, { ...client, ...payload }, client, false);
