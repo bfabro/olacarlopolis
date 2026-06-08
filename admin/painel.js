@@ -4176,6 +4176,192 @@ function desenharModeloCs(ctx, item, client, foto, logo, siteLogo) {
   desenharImagemContain(ctx, siteLogo, 828, 1218, 180, 86, 0, "#ffffff");
 }
 
+function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo) {
+  const red = "#e30613";
+  const black = "#101010";
+  const city = String(item.cidade || "CARLOPOLIS - PR").trim().toUpperCase();
+  const titleWord = String(item.procura || "CASA").trim().toUpperCase();
+  const broker = String(client?.nome || item.clienteNome || item.corretor || "CESAR MELO").toUpperCase();
+
+  ctx.fillStyle = black;
+  ctx.fillRect(0, 0, 1080, 1080);
+  ctx.save();
+  ctx.filter = "brightness(1.1) contrast(1.04)";
+  desenharImagemCover(ctx, foto, 250, 245, 830, 715, 0);
+  ctx.restore();
+
+  const photoShade = ctx.createLinearGradient(245, 0, 520, 0);
+  photoShade.addColorStop(0, black);
+  photoShade.addColorStop(1, "rgba(16,16,16,0)");
+  ctx.fillStyle = photoShade;
+  ctx.fillRect(245, 245, 310, 715);
+
+  ctx.fillStyle = black;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(650, 0);
+  ctx.lineTo(515, 250);
+  ctx.lineTo(0, 320);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = red;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(72, 0);
+  ctx.lineTo(0, 72);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.moveTo(700, 0);
+  ctx.lineTo(1080, 0);
+  ctx.lineTo(1080, 225);
+  ctx.lineTo(982, 250);
+  ctx.quadraticCurveTo(820, 268, 748, 202);
+  ctx.quadraticCurveTo(686, 144, 700, 0);
+  ctx.closePath();
+  ctx.fill();
+  desenharImagemContain(ctx, logo, 780, 22, 230, 100, 0, "#fff");
+  ctx.fillStyle = "#111";
+  ctx.textAlign = "center";
+  fonteQueCabeCanvas(ctx, broker, 900, 29, 17, 270);
+  ctx.fillText(broker, 895, 145);
+  ctx.font = "800 15px Arial";
+  ctx.fillText("CORRETOR DE IMOVEIS", 895, 170);
+  ctx.font = "800 12px Arial";
+  ctx.fillText("CRECI-PR", 895, 191);
+
+  ctx.textAlign = "left";
+  ctx.fillStyle = red;
+  fonteQueCabeCanvas(ctx, titleWord, 900, 84, 46, 470);
+  ctx.fillText(titleWord, 68, 104);
+  ctx.fillStyle = "#fff";
+  ctx.font = "900 92px Arial";
+  ctx.fillText("SUPER", 68, 205);
+  ctx.font = "900 42px Arial";
+  ctx.fillText("ACONCHEGANTE", 68, 254);
+  ctx.strokeStyle = red;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(68, 270);
+  ctx.lineTo(520, 270);
+  ctx.stroke();
+  ctx.fillStyle = "#d7d7d7";
+  ctx.font = "500 22px Arial";
+  ctx.fillText("CONFORTO, ESPACO E QUALIDADE", 68, 307);
+  ctx.fillText("PARA SUA FAMILIA!", 68, 336);
+
+  preencherRoundRect(ctx, 790, 286, 250, 48, 24, red);
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.font = "900 21px Arial";
+  ctx.fillText(city, 915, 318);
+
+  const infos = dadosModelCs(item).slice(0, 6);
+  preencherRoundRect(ctx, 32, 360, 302, 512, 18, "#0a0a0a");
+  desenharBordaRoundRect(ctx, 32, 360, 302, 512, 18, red, 5);
+  infos.forEach((info, index) => {
+    const y = 404 + index * 78;
+    if (index) {
+      ctx.strokeStyle = "rgba(255,255,255,.22)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(100, y - 29);
+      ctx.lineTo(310, y - 29);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.arc(77, y, 27, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = red;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = red;
+    ctx.textAlign = "center";
+    ctx.font = "900 16px Arial";
+    ctx.fillText(info.icone, 77, y + 6);
+    ctx.fillStyle = "#fff";
+    desenharTextoInteiroCanvas(ctx, `${info.principal}${info.secundario ? ` ${info.secundario}` : ""}`.toUpperCase(), 122, y - 25, 182, 3, {
+      peso: 900,
+      tamanho: 17,
+      minimo: 11,
+      lineHeight: 17,
+      align: "left"
+    });
+  });
+
+  ctx.fillStyle = "#151515";
+  ctx.fillRect(0, 875, 1080, 95);
+  ctx.fillStyle = red;
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.4)";
+  ctx.shadowBlur = 16;
+  ctx.beginPath();
+  ctx.moveTo(585, 845);
+  ctx.lineTo(1080, 845);
+  ctx.lineTo(1080, 970);
+  ctx.lineTo(520, 970);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = red;
+  ctx.beginPath();
+  ctx.arc(82, 922, 36, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.font = "900 38px Arial";
+  ctx.fillText("L", 82, 934);
+  ctx.textAlign = "left";
+  ctx.font = "500 22px Arial";
+  ctx.fillText("LOCALIZACAO", 138, 908);
+  ctx.font = "900 27px Arial";
+  ctx.fillText(city, 138, 944);
+
+  const numericValue = Number(item.valor || 0);
+  const useMil = numericValue >= 100000;
+  let mainValue = numericValue
+    ? (useMil ? String(Math.round(numericValue / 1000)) : moneyBR(numericValue).replace("R$", "").trim())
+    : "CONSULTE";
+  let suffix = useMil ? "MIL" : "";
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "left";
+  ctx.font = "900 18px Arial";
+  ctx.fillText("APENAS", 620, 884);
+  ctx.font = "900 28px Arial";
+  ctx.fillText("R$", 620, 932);
+  ctx.textAlign = "center";
+  fonteQueCabeCanvas(ctx, mainValue, 900, 96, 46, 255);
+  ctx.fillText(mainValue, 810, 947);
+  ctx.textAlign = "left";
+  ctx.font = "900 35px Arial";
+  ctx.fillText(suffix, 950, 936);
+
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 970, 1080, 110);
+  const benefits = [
+    ["OK", "DOCUMENTACAO", "REGULARIZADA"],
+    ["OK", "COMPRA SEGURA E", "TRANSPARENTE"],
+    ["OK", "PRONTO PARA", "MORAR"]
+  ];
+  benefits.forEach(([icon, line1, line2], index) => {
+    const x = 125 + index * 300;
+    ctx.fillStyle = red;
+    ctx.textAlign = "center";
+    ctx.font = "900 21px Arial";
+    ctx.fillText(icon, x, 1032);
+    ctx.fillStyle = "#111";
+    ctx.textAlign = "left";
+    ctx.font = "900 13px Arial";
+    ctx.fillText(line1, x + 34, 1025);
+    ctx.fillText(line2, x + 34, 1045);
+  });
+  desenharImagemContain(ctx, siteLogo, 895, 990, 145, 60, 0, "#fff");
+}
+
 function fonteQueCabeCanvas(ctx, texto, peso, tamanho, minimo, maxWidth, familia = "Arial") {
   let atual = tamanho;
   do {
@@ -4476,10 +4662,10 @@ async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, l
     }
     const canvas = document.createElement("canvas");
     canvas.width = 1080;
-    canvas.height = 1350;
+    canvas.height = layout.model === "cs" ? 1080 : 1350;
     const ctx = canvas.getContext("2d");
     if (layout.model === "cs") {
-      desenharModeloCs(ctx, item, client, foto, logo, siteLogo);
+      desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo);
     } else {
       desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, siteLogo);
     }
