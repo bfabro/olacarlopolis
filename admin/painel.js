@@ -3650,7 +3650,8 @@ const IMOVEL_ARTE_LAYOUTS = {
   graphiteCyan: { nome: "Grafite e azul ciano", bg: "#18212b", panel: "#263442", accent: "#22d3ee", accent2: "#cffafe", action: "#0891b2", text: "#ffffff" },
   forestGold: { nome: "Verde floresta e dourado", bg: "#092b25", panel: "#123f36", accent: "#f4c95d", accent2: "#fff1b5", action: "#16a34a", text: "#ffffff" },
   purpleGold: { nome: "Roxo profundo e dourado", bg: "#27113f", panel: "#3b1b59", accent: "#f6c85f", accent2: "#fff0b0", action: "#7c3aed", text: "#ffffff" },
-  petrolOrange: { nome: "Azul petroleo e laranja", bg: "#07333c", panel: "#0c4a56", accent: "#fb923c", accent2: "#ffedd5", action: "#ea580c", text: "#ffffff" }
+  petrolOrange: { nome: "Azul petroleo e laranja", bg: "#07333c", panel: "#0c4a56", accent: "#fb923c", accent2: "#ffedd5", action: "#ea580c", text: "#ffffff" },
+  cs: { nome: "CS", model: "cs", bg: "#101010", panel: "#111111", accent: "#e30613", accent2: "#ffffff", action: "#e30613", text: "#ffffff" }
 };
 
 function donoImovelAdmin(item = {}) {
@@ -4015,66 +4016,164 @@ function desenharInfoModelCs(ctx, info, x, y, maxWidth = 300) {
   }
 }
 
-function desenharModeloCs(ctx, item, client, foto, logo) {
+function desenharModeloCs(ctx, item, client, foto, logo, siteLogo) {
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, 1080, 1350);
-  desenharImagemCover(ctx, foto, 0, 0, 1080, 700, 0);
+  ctx.fillStyle = "#111111";
+  ctx.fillRect(0, 0, 1080, 1230);
+  ctx.fillStyle = "#e30613";
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(78, 0);
+  ctx.lineTo(0, 88);
+  ctx.closePath();
+  ctx.fill();
 
-  preencherRoundRect(ctx, 650, 650, 300, 92, 42, "#050505");
   ctx.fillStyle = "#ffffff";
-  ctx.font = "900 52px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText(String(item.tipo || "VENDA").toUpperCase(), 800, 713);
-
-  ctx.textAlign = "left";
-  ctx.fillStyle = "#050505";
-  ctx.font = "900 58px Arial";
-  const titulo = textoCurtoArte(item.titulo || "IMOVEL EM DESTAQUE", 54).toUpperCase();
-  textoQuebradoCanvas(ctx, titulo, 62, 785, 470, 61, 3);
-
-  const infos = dadosModelCs(item);
-  infos.forEach((info, index) => {
-    const col = index % 2;
-    const row = Math.floor(index / 2);
-    desenharInfoModelCs(ctx, info, 68 + col * 285, 990 + row * 76, 270);
-  });
-
-  desenharImagemContain(ctx, logo, 620, 790, 380, 190, 16);
+  ctx.beginPath();
+  ctx.moveTo(660, 0);
+  ctx.lineTo(1080, 0);
+  ctx.lineTo(1080, 252);
+  ctx.quadraticCurveTo(910, 254, 838, 214);
+  ctx.quadraticCurveTo(740, 158, 690, 58);
+  ctx.closePath();
+  ctx.fill();
+  desenharImagemContain(ctx, logo, 744, 28, 270, 136, 0, "#ffffff");
   ctx.fillStyle = "#111111";
   ctx.textAlign = "center";
-  ctx.font = "900 38px Arial";
-  ctx.fillText(textoCurtoArte(client?.nome || item.clienteNome || item.corretor || "Ola Carlopolis", 34).toUpperCase(), 810, 1018);
-  ctx.font = "800 22px Arial";
-  ctx.fillText("IMOVEIS E OPORTUNIDADES", 810, 1052);
+  const nome = String(client?.nome || item.clienteNome || item.corretor || "CESAR MELO");
+  fonteQueCabeCanvas(ctx, nome.toUpperCase(), 900, 30, 18, 300);
+  ctx.fillText(nome.toUpperCase(), 880, 178);
+  ctx.font = "800 17px Arial";
+  ctx.fillText("CORRETOR DE IMOVEIS", 880, 205);
 
-  const telefone = telefoneArteAdmin(item.telefone || client?.whatsapp || client?.contato || client?.telefone || "");
-  if (telefone) {
-    preencherRoundRect(ctx, 625, 1090, 370, 74, 28, "#dc2626");
+  const procura = String(item.procura || "CASA").toUpperCase();
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#e30613";
+  fonteQueCabeCanvas(ctx, procura, 900, 82, 48, 470);
+  ctx.fillText(procura, 72, 110);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "900 82px Arial";
+  ctx.fillText("SUPER", 72, 205);
+  ctx.font = "900 40px Arial";
+  ctx.fillText("ACONCHEGANTE", 72, 257);
+  ctx.strokeStyle = "#e30613";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(72, 272);
+  ctx.lineTo(522, 272);
+  ctx.stroke();
+  ctx.fillStyle = "#d8d8d8";
+  ctx.font = "500 24px Arial";
+  ctx.fillText("CONFORTO, ESPACO E QUALIDADE", 72, 314);
+  ctx.fillText("PARA SUA FAMILIA!", 72, 346);
+
+  desenharImagemCover(ctx, foto, 336, 350, 744, 678, 0);
+  const imgGrad = ctx.createLinearGradient(336, 350, 540, 350);
+  imgGrad.addColorStop(0, "#111111");
+  imgGrad.addColorStop(1, "rgba(17,17,17,0)");
+  ctx.fillStyle = imgGrad;
+  ctx.fillRect(336, 350, 245, 678);
+
+  const endereco = textoCurtoArte(item.endereco || "CARLOPOLIS - PR", 28).toUpperCase();
+  preencherRoundRect(ctx, 795, 292, 250, 48, 24, "#e30613");
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "center";
+  ctx.font = "900 22px Arial";
+  ctx.fillText(endereco.includes("CARLOPOLIS") ? "CARLOPOLIS - PR" : endereco, 920, 324);
+
+  const infos = dadosModelCs(item);
+  preencherRoundRect(ctx, 36, 405, 300, 626, 20, "#101010");
+  desenharBordaRoundRect(ctx, 36, 405, 300, 626, 20, "#e30613", 5);
+  infos.slice(0, 7).forEach((info, index) => {
+    const y = 438 + index * 83;
+    if (index) {
+      ctx.strokeStyle = "rgba(255,255,255,.24)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(98, y - 28);
+      ctx.lineTo(310, y - 28);
+      ctx.stroke();
+    }
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
-    ctx.arc(670, 1127, 25, 0, Math.PI * 2);
+    ctx.arc(78, y, 28, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "#dc2626";
-    ctx.font = "900 18px Arial";
-    ctx.fillText("WA", 670, 1133);
-    ctx.fillStyle = "#ffffff";
-    ctx.textAlign = "left";
-    fonteQueCabeCanvas(ctx, telefone, 900, 31, 20, 265);
-    ctx.fillText(telefone, 710, 1138);
-  }
-
-  const ref = String(item.codRef || item.codigo || item.id || "").toUpperCase();
-  if (ref) {
-    ctx.fillStyle = "#111111";
+    ctx.strokeStyle = "#e30613";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = "#e30613";
     ctx.textAlign = "center";
-    ctx.font = "800 22px Arial";
-    ctx.fillText(`REF. ${ref}`, 810, 1205);
-  }
+    ctx.font = "900 18px Arial";
+    ctx.fillText(info.icone, 78, y + 6);
+    ctx.fillStyle = "#ffffff";
+    desenharTextoInteiroCanvas(ctx, `${info.principal}${info.secundario ? ` ${info.secundario}` : ""}`.toUpperCase(), 124, y - 27, 178, 3, {
+      peso: 900,
+      tamanho: 18,
+      minimo: 12,
+      lineHeight: 18,
+      align: "left"
+    });
+  });
 
-  ctx.fillStyle = "#0f172a";
+  ctx.fillStyle = "#111111";
+  ctx.fillRect(0, 1030, 1080, 178);
+  ctx.fillStyle = "#e30613";
+  ctx.beginPath();
+  ctx.moveTo(570, 1030);
+  ctx.lineTo(1080, 1030);
+  ctx.lineTo(1080, 1208);
+  ctx.lineTo(520, 1208);
+  ctx.lineTo(590, 1030);
+  ctx.closePath();
+  ctx.fill();
+  const valor = formatarValorArteImovel(item.valor);
+  const valorLimpo = valor === "Consulte" ? "CONSULTE" : valor.replace("R$", "").trim();
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left";
+  ctx.font = "900 22px Arial";
+  ctx.fillText("APENAS", 610, 1092);
+  ctx.font = "900 30px Arial";
+  ctx.fillText("R$", 610, 1140);
   ctx.textAlign = "center";
-  ctx.font = "900 24px Arial";
-  ctx.fillText("olacarlopolis.com", 810, 1250);
+  fonteQueCabeCanvas(ctx, valorLimpo, 900, 108, 52, 340);
+  ctx.fillText(valorLimpo, 815, 1162);
+
+  ctx.fillStyle = "#e30613";
+  ctx.beginPath();
+  ctx.arc(82, 1118, 38, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "900 42px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("•", 82, 1128);
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left";
+  ctx.font = "500 25px Arial";
+  ctx.fillText("LOCALIZACAO", 140, 1102);
+  ctx.font = "900 30px Arial";
+  ctx.fillText(endereco, 140, 1144);
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 1208, 1080, 142);
+  const rodape = [
+    ["✓", "DOCUMENTACAO", "REGULARIZADA"],
+    ["OK", "COMPRA SEGURA E", "TRANSPARENTE"],
+    ["→", "PRONTO PARA", "MORAR"]
+  ];
+  rodape.forEach(([icon, a, b], index) => {
+    const x = 170 + index * 330;
+    ctx.fillStyle = "#e30613";
+    ctx.textAlign = "center";
+    ctx.font = "900 34px Arial";
+    ctx.fillText(icon, x - 64, 1285);
+    ctx.fillStyle = "#111111";
+    ctx.textAlign = "left";
+    ctx.font = "900 16px Arial";
+    ctx.fillText(a, x - 18, 1278);
+    ctx.fillText(b, x - 18, 1302);
+  });
+  desenharImagemContain(ctx, siteLogo, 828, 1218, 180, 86, 0, "#ffffff");
 }
 
 function fonteQueCabeCanvas(ctx, texto, peso, tamanho, minimo, maxWidth, familia = "Arial") {
@@ -4379,7 +4478,11 @@ async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, l
     canvas.width = 1080;
     canvas.height = 1350;
     const ctx = canvas.getContext("2d");
-    desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, siteLogo);
+    if (layout.model === "cs") {
+      desenharModeloCs(ctx, item, client, foto, logo, siteLogo);
+    } else {
+      desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, siteLogo);
+    }
 
     const blob = await canvasParaBlob(canvas);
     baixarBlobCanvas(
