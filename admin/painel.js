@@ -3533,7 +3533,7 @@ function fillImovelForm(item) {
   $("imovelQuintal").value = item.quintal || "";
   $("imovelOutros").value = item.outros || "";
   $("imovelCorretor").value = item.corretor || (Array.isArray(item.corretores) ? item.corretores[0] : "") || item.vendedor || "";
-  $("imovelTelefone").value = item.telefone || item.contato || "";
+  $("imovelTelefone").value = telefoneArteAdmin(item.telefone || item.contato || "");
   $("imovelProprietario").value = item.proprietario || "";
   $("imovelDescricao").value = item.descricao || "";
   $("imovelImagem").value = item.imagem || state.imovelImages[0] || "";
@@ -3568,7 +3568,7 @@ function getImovelFormData() {
   const imagem = $("imovelImagem")?.value.trim() || imagens[0] || "";
   const linkedClient = currentClientRecord();
   const corretor = $("imovelCorretor").value.trim() || linkedClient?.nome || "";
-  const telefone = $("imovelTelefone").value.trim() || linkedClient?.whatsapp || linkedClient?.contato || "";
+  const telefone = telefoneArteAdmin($("imovelTelefone").value.trim() || linkedClient?.whatsapp || linkedClient?.contato || "");
   return {
     id,
     titulo,
@@ -3846,13 +3846,19 @@ function desenharImagemCover(ctx, img, x, y, w, h, r = 0) {
   ctx.restore();
 }
 
-function desenharImagemContain(ctx, img, x, y, w, h, r = 0) {
-  preencherRoundRect(ctx, x, y, w, h, r, "#ffffff");
+function desenharImagemContain(ctx, img, x, y, w, h, r = 0, fill = "#ffffff") {
+  preencherRoundRect(ctx, x, y, w, h, r, fill);
   if (!img) return;
   const scale = Math.min(w / img.width, h / img.height);
   const dw = img.width * scale;
   const dh = img.height * scale;
+  ctx.save();
+  if (r) {
+    canvasRoundRect(ctx, x, y, w, h, r);
+    ctx.clip();
+  }
   ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  ctx.restore();
 }
 
 function textoQuebradoCanvas(ctx, texto, x, y, maxWidth, lineHeight, maxLines = 3) {
@@ -3873,6 +3879,58 @@ function textoQuebradoCanvas(ctx, texto, x, y, maxWidth, lineHeight, maxLines = 
   if (lines.length > maxLines) finalLines[maxLines - 1] = `${finalLines[maxLines - 1].replace(/\.*$/, "")}...`;
   finalLines.forEach((l, idx) => ctx.fillText(l, x, y + idx * lineHeight));
   return finalLines.length * lineHeight;
+}
+
+function linhasCanvas(ctx, texto, maxWidth) {
+  const words = String(texto || "").split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+  words.forEach((word) => {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+function desenharTextoInteiroCanvas(ctx, texto, x, y, maxWidth, maxLines, options = {}) {
+  const content = String(texto || "").trim();
+  if (!content) return 0;
+  const {
+    peso = 800,
+    tamanho = 18,
+    minimo = 10,
+    lineHeight = 20,
+    familia = "Arial",
+    align = "center"
+  } = options;
+  let fontSize = tamanho;
+  let lines = [];
+  do {
+    ctx.font = `${peso} ${fontSize}px ${familia}`;
+    lines = linhasCanvas(ctx, content, maxWidth);
+    if (lines.length <= maxLines) break;
+    fontSize -= 1;
+  } while (fontSize > minimo);
+
+  const fittedLineHeight = Math.max(minimo + 3, Math.round(lineHeight * (fontSize / tamanho)));
+  ctx.textAlign = align;
+  lines.forEach((line, index) => {
+    ctx.fillText(line, x, y + index * fittedLineHeight, maxWidth);
+  });
+  return lines.length * fittedLineHeight;
+}
+
+function telefoneArteAdmin(value) {
+  const original = String(value || "").trim();
+  const digits = original.replace(/\D/g, "");
+  if (digits.length < 10) return original;
+  return formatPhoneMask(original);
 }
 
 function desenharPillCanvas(ctx, texto, x, y, fill, color = "#fff") {
@@ -3937,7 +3995,7 @@ function desenharInfoModelCs(ctx, info, x, y, maxWidth = 300) {
 function desenharModeloCs(ctx, item, client, foto, logo) {
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, 1080, 1350);
-  desenharImagemCover(ctx, foto, 0, 0, 1080, 700, 0);
+  desenharImagemContain(ctx, foto, 0, 0, 1080, 700, 0, "#eef2f7");
 
   preencherRoundRect(ctx, 650, 650, 300, 92, 42, "#050505");
   ctx.fillStyle = "#ffffff";
@@ -3966,7 +4024,7 @@ function desenharModeloCs(ctx, item, client, foto, logo) {
   ctx.font = "800 22px Arial";
   ctx.fillText("IMOVEIS E OPORTUNIDADES", 810, 1052);
 
-  const telefone = String(item.telefone || client?.whatsapp || client?.contato || client?.telefone || "").trim();
+  const telefone = telefoneArteAdmin(item.telefone || client?.whatsapp || client?.contato || client?.telefone || "");
   if (telefone) {
     preencherRoundRect(ctx, 625, 1090, 370, 74, 28, "#dc2626");
     ctx.fillStyle = "#ffffff";
@@ -3978,7 +4036,7 @@ function desenharModeloCs(ctx, item, client, foto, logo) {
     ctx.fillText("WA", 670, 1133);
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "left";
-    ctx.font = "900 31px Arial";
+    fonteQueCabeCanvas(ctx, telefone, 900, 31, 20, 265);
     ctx.fillText(telefone, 710, 1138);
   }
 
@@ -4108,7 +4166,7 @@ function desenharCaracteristicasPremium(ctx, item, layout) {
 function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout) {
   ctx.fillStyle = layout.bg;
   ctx.fillRect(0, 0, 1080, 1350);
-  desenharImagemCover(ctx, foto, 0, 92, 1080, 650, 0);
+  desenharImagemContain(ctx, foto, 0, 92, 1080, 650, 0, layout.bg);
 
   const topo = ctx.createLinearGradient(0, 92, 0, 260);
   topo.addColorStop(0, layout.bg);
@@ -4170,7 +4228,7 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout) {
   fonteQueCabeCanvas(ctx, responsavel, 900, 39, 25, 690);
   ctx.fillText(responsavel, 330, 1095);
 
-  const telefone = String(item.telefone || client?.whatsapp || client?.contato || client?.telefone || "").trim();
+  const telefone = telefoneArteAdmin(item.telefone || client?.whatsapp || client?.contato || client?.telefone || "");
   preencherRoundRect(ctx, 322, 1120, 454, 76, 22, layout.action);
   ctx.fillStyle = "#ffffff";
   ctx.beginPath();
@@ -4195,22 +4253,27 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout) {
   const ref = String(item.codRef || item.codigo || item.id || "").toUpperCase();
   ctx.fillStyle = "rgba(255,255,255,.14)";
   ctx.fillRect(315, 1225, 729, 1);
+  const enderecoCompleto = String(item.endereco || "CARLOPOLIS - PR").trim().toUpperCase();
   const rodape = [
-    ref ? `REF. ${ref}` : "IMOVEL SELECIONADO",
-    textoCurtoArte(item.endereco || "CARLOPOLIS - PR", 34).toUpperCase(),
-    "OLACARLOPOLIS.COM"
+    { texto: ref ? `REF. ${ref}` : "IMOVEL SELECIONADO", x: 395, largura: 180, linhas: 2 },
+    { texto: enderecoCompleto, x: 650, largura: 300, linhas: 4 },
+    { texto: "OLACARLOPOLIS.COM", x: 930, largura: 185, linhas: 2 }
   ];
   ctx.fillStyle = layout.text;
   ctx.textAlign = "center";
-  rodape.forEach((texto, index) => {
-    const x = 410 + index * 250;
+  rodape.forEach((info, index) => {
+    const x = info.x;
     if (index) {
       ctx.fillStyle = layout.accent;
       ctx.fillRect(x - 126, 1242, 2, 52);
       ctx.fillStyle = layout.text;
     }
-    fonteQueCabeCanvas(ctx, texto, 800, 18, 12, 215);
-    textoQuebradoCanvas(ctx, texto, x, 1265, 215, 20, 2);
+    desenharTextoInteiroCanvas(ctx, info.texto, x, 1260, info.largura, info.linhas, {
+      peso: 800,
+      tamanho: 18,
+      minimo: 10,
+      lineHeight: 20
+    });
   });
 }
 
@@ -7403,6 +7466,7 @@ function bindAdminIdleTimer() {
 function bindEvents() {
   bindCurrencyMask($("imovelValor"));
   bindCurrencyMask($("automovelPreco"));
+  bindPhoneMask("imovelTelefone");
 
   $("loginForm").addEventListener("submit", async (event) => {
     event.preventDefault();
