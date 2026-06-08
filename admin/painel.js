@@ -3929,9 +3929,11 @@ function desenharTextoInteiroCanvas(ctx, texto, x, y, maxWidth, maxLines, option
 function telefoneArteAdmin(value) {
   const original = String(value || "").trim();
   const rawDigits = original.replace(/\D/g, "");
-  const digits = rawDigits.length > 11 && rawDigits.startsWith("55")
-    ? rawDigits.slice(2, 13)
-    : rawDigits.slice(0, 11);
+  let digits = rawDigits.length > 11 && rawDigits.startsWith("55")
+    ? rawDigits.slice(2)
+    : rawDigits;
+  if (digits.length > 10 && digits.startsWith("0")) digits = digits.slice(1);
+  digits = digits.slice(0, 11);
   if (digits.length < 10) return original;
   return formatPhoneMask(digits);
 }
@@ -4208,13 +4210,6 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillText(titulo, 540, 676);
   ctx.restore();
 
-  const tag = tagNegociacaoArte(item);
-  preencherRoundRect(ctx, 72, 558, 238, 54, 18, layout.accent);
-  ctx.fillStyle = layout.bg;
-  ctx.textAlign = "center";
-  fonteQueCabeCanvas(ctx, tag, 900, 25, 15, 196);
-  ctx.fillText(tag, 191, 594);
-
   desenharCaracteristicasPremium(ctx, item, layout);
 
   preencherRoundRect(ctx, 196, 842, 688, 150, 28, layout.panel);
@@ -4223,6 +4218,12 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.textAlign = "left";
   ctx.font = "800 22px Arial";
   ctx.fillText("POR APENAS", 230, 886);
+  const tag = tagNegociacaoArte(item);
+  preencherRoundRect(ctx, 698, 862, 150, 38, 16, layout.accent);
+  ctx.fillStyle = layout.bg;
+  ctx.textAlign = "center";
+  fonteQueCabeCanvas(ctx, tag.replace(/^PARA\s+/i, ""), 900, 18, 12, 116);
+  ctx.fillText(tag.replace(/^PARA\s+/i, ""), 773, 887);
   const valor = formatarValorArteImovel(item.valor);
   const valorTexto = valor === "Consulte" ? "CONSULTE" : valor.replace(/\s/g, "");
   const valorGrad = ctx.createLinearGradient(270, 900, 835, 980);
@@ -4255,8 +4256,8 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fill();
   ctx.fillStyle = layout.action;
   ctx.textAlign = "center";
-  ctx.font = "900 17px Arial";
-  ctx.fillText("WA", 362, 1164);
+  ctx.font = "900 25px 'Font Awesome 6 Brands', Arial";
+  ctx.fillText("\uf232", 362, 1167);
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "left";
   fonteQueCabeCanvas(ctx, telefone || "FALE COM O ANUNCIANTE", 900, 31, 20, 360);
