@@ -38,9 +38,9 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
   numero: 268,
-  label: "v271",
+  label: "v272",
   data: "2026-06-09",
-  nota: "Refinamento visual do modelo CS."
+  nota: "Alinhamento das caracteristicas e preco do modelo CS."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4421,12 +4421,13 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
     ctx.stroke();
     desenharIconeCaracteristicaCs(ctx, info.id, 77, y, red);
     ctx.fillStyle = "#fff";
-    desenharTextoInteiroCanvas(ctx, String(info.text || `${info.principal || ""} ${info.secundario || ""}`).trim().toUpperCase(), 122, y - 25, 182, 3, {
+    desenharTextoInteiroCanvas(ctx, String(info.text || `${info.principal || ""} ${info.secundario || ""}`).trim().toUpperCase(), 122, y - featureRowHeight / 2, 182, 3, {
       peso: 900,
       tamanho: 17,
       minimo: 11,
       lineHeight: 17,
-      align: "left"
+      align: "left",
+      blockHeight: featureRowHeight
     });
   });
 
@@ -4461,23 +4462,23 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.fillStyle = "#fff";
   ctx.textAlign = "left";
   const finalidade = /alug|loca/i.test(String(item.tipo || "")) ? "PARA LOCACAO" : "PARA VENDA";
-  preencherRoundRect(ctx, 865, 858, 185, 34, 15, "#ffffff");
+  preencherRoundRect(ctx, 842, 852, 208, 32, 14, "#ffffff");
   ctx.fillStyle = red;
   ctx.textAlign = "right";
-  fonteQueCabeCanvas(ctx, finalidade, 900, 16, 11, 155);
-  ctx.fillText(finalidade, 1034, 881);
+  fonteQueCabeCanvas(ctx, finalidade, 900, 16, 11, 176);
+  ctx.fillText(finalidade, 1034, 874);
   ctx.fillStyle = "#fff";
   ctx.textAlign = "left";
   ctx.font = "900 18px Arial";
-  ctx.fillText("APENAS", 620, 897);
+  ctx.fillText("APENAS", 620, 912);
   ctx.font = "900 28px Arial";
-  ctx.fillText("R$", 620, 940);
+  ctx.fillText("R$", 620, 954);
   ctx.textAlign = "center";
-  fonteQueCabeCanvas(ctx, mainValue, 900, 96, 46, 255);
-  ctx.fillText(mainValue, 810, 952);
+  fonteQueCabeCanvas(ctx, mainValue, 900, 72, 42, 255);
+  ctx.fillText(mainValue, 810, 958);
   ctx.textAlign = "left";
-  ctx.font = "900 35px Arial";
-  ctx.fillText(suffix, 950, 942);
+  ctx.font = "900 31px Arial";
+  ctx.fillText(suffix, 950, 954);
 
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 970, 1080, 110);
