@@ -38,9 +38,9 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
   numero: 268,
-  label: "v268",
-  data: "2026-06-06",
-  nota: "Novo modelo premium de imoveis em seis combinacoes de cores."
+  label: "v269",
+  data: "2026-06-09",
+  nota: "Editor do modelo CS para artes de imoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -84,6 +84,8 @@ let state = {
   pendingClientModuleTarget: "",
   selectedPromoClientId: "",
   imovelImages: [],
+  imovelCsEditorItemId: "",
+  imovelCsBrokerImage: "",
   automovelImages: [],
   lastFirebaseClientCount: 0,
   lastVisibleClientCount: 0
@@ -4176,11 +4178,14 @@ function desenharModeloCs(ctx, item, client, foto, logo, siteLogo) {
   desenharImagemContain(ctx, siteLogo, 828, 1218, 180, 86, 0, "#ffffff");
 }
 
-function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo) {
+function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, options = {}) {
   const red = "#e30613";
   const black = "#101010";
   const city = String(item.cidade || "CARLOPOLIS - PR").trim().toUpperCase();
-  const titleWord = String(item.procura || "CASA").trim().toUpperCase();
+  const titleParts = String(options.title || tituloAutomaticoCs(item)).trim().toUpperCase().split(/\s+/).filter(Boolean);
+  const titleWord = titleParts.shift() || "IMOVEL";
+  const titleSecond = titleParts.shift() || "SUPER";
+  const titleThird = titleParts.join(" ") || "ACONCHEGANTE";
   const broker = String(client?.nome || item.clienteNome || item.corretor || "CESAR MELO").toUpperCase();
 
   ctx.fillStyle = black;
@@ -4224,23 +4229,28 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo) {
   ctx.fill();
   desenharImagemContain(ctx, logo, 780, 22, 230, 100, 0, "#fff");
   ctx.fillStyle = "#111";
+  desenharTextoInteiroCanvas(ctx, broker, 895, 122, 270, 2, {
+    peso: 900,
+    tamanho: 28,
+    minimo: 15,
+    lineHeight: 27,
+    blockHeight: 48
+  });
   ctx.textAlign = "center";
-  fonteQueCabeCanvas(ctx, broker, 900, 29, 17, 270);
-  ctx.fillText(broker, 895, 145);
   ctx.font = "800 15px Arial";
-  ctx.fillText("CORRETOR DE IMOVEIS", 895, 170);
+  ctx.fillText("CORRETOR DE IMOVEIS", 895, 188);
   ctx.font = "800 12px Arial";
-  ctx.fillText("CRECI-PR", 895, 191);
+  ctx.fillText("CRECI-PR", 895, 208);
 
   ctx.textAlign = "left";
   ctx.fillStyle = red;
   fonteQueCabeCanvas(ctx, titleWord, 900, 84, 46, 470);
   ctx.fillText(titleWord, 68, 104);
   ctx.fillStyle = "#fff";
-  ctx.font = "900 92px Arial";
-  ctx.fillText("SUPER", 68, 205);
-  ctx.font = "900 42px Arial";
-  ctx.fillText("ACONCHEGANTE", 68, 254);
+  fonteQueCabeCanvas(ctx, titleSecond, 900, 92, 54, 500);
+  ctx.fillText(titleSecond, 68, 205);
+  fonteQueCabeCanvas(ctx, titleThird, 900, 42, 24, 500);
+  ctx.fillText(titleThird, 68, 254);
   ctx.strokeStyle = red;
   ctx.lineWidth = 3;
   ctx.beginPath();
@@ -4248,17 +4258,15 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo) {
   ctx.lineTo(520, 270);
   ctx.stroke();
   ctx.fillStyle = "#d7d7d7";
-  ctx.font = "500 22px Arial";
-  ctx.fillText("CONFORTO, ESPACO E QUALIDADE", 68, 307);
-  ctx.fillText("PARA SUA FAMILIA!", 68, 336);
+  desenharTextoInteiroCanvas(ctx, options.message || "Conforto, espaco e qualidade para sua familia!", 68, 290, 500, 2, {
+    peso: 500,
+    tamanho: 22,
+    minimo: 15,
+    lineHeight: 27,
+    align: "left"
+  });
 
-  preencherRoundRect(ctx, 790, 286, 250, 48, 24, red);
-  ctx.fillStyle = "#fff";
-  ctx.textAlign = "center";
-  ctx.font = "900 21px Arial";
-  ctx.fillText(city, 915, 318);
-
-  const infos = dadosModelCs(item).slice(0, 6);
+  const infos = Array.isArray(options.features) ? options.features.slice(0, 6) : [];
   preencherRoundRect(ctx, 32, 360, 302, 512, 18, "#0a0a0a");
   desenharBordaRoundRect(ctx, 32, 360, 302, 512, 18, red, 5);
   infos.forEach((info, index) => {
@@ -4281,9 +4289,9 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo) {
     ctx.fillStyle = red;
     ctx.textAlign = "center";
     ctx.font = "900 16px Arial";
-    ctx.fillText(info.icone, 77, y + 6);
+    ctx.fillText(info.icon || info.icone || "+", 77, y + 6);
     ctx.fillStyle = "#fff";
-    desenharTextoInteiroCanvas(ctx, `${info.principal}${info.secundario ? ` ${info.secundario}` : ""}`.toUpperCase(), 122, y - 25, 182, 3, {
+    desenharTextoInteiroCanvas(ctx, String(info.text || `${info.principal || ""} ${info.secundario || ""}`).trim().toUpperCase(), 122, y - 25, 182, 3, {
       peso: 900,
       tamanho: 17,
       minimo: 11,
@@ -4294,17 +4302,10 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo) {
 
   ctx.fillStyle = "#151515";
   ctx.fillRect(0, 875, 1080, 95);
-  ctx.fillStyle = red;
   ctx.save();
   ctx.shadowColor = "rgba(0,0,0,.4)";
   ctx.shadowBlur = 16;
-  ctx.beginPath();
-  ctx.moveTo(585, 845);
-  ctx.lineTo(1080, 845);
-  ctx.lineTo(1080, 970);
-  ctx.lineTo(520, 970);
-  ctx.closePath();
-  ctx.fill();
+  preencherRoundRect(ctx, 555, 845, 525, 125, 28, red);
   ctx.restore();
 
   ctx.fillStyle = red;
@@ -4342,24 +4343,26 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo) {
 
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 970, 1080, 110);
-  const benefits = [
-    ["OK", "DOCUMENTACAO", "REGULARIZADA"],
-    ["OK", "COMPRA SEGURA E", "TRANSPARENTE"],
-    ["OK", "PRONTO PARA", "MORAR"]
-  ];
-  benefits.forEach(([icon, line1, line2], index) => {
-    const x = 125 + index * 300;
+  const benefits = (Array.isArray(options.footer) ? options.footer : []).slice(0, 3);
+  while (benefits.length < 3) benefits.push("");
+  benefits.forEach((text, index) => {
+    const x = 72 + index * 270;
     ctx.fillStyle = red;
     ctx.textAlign = "center";
     ctx.font = "900 21px Arial";
-    ctx.fillText(icon, x, 1032);
+    ctx.fillText("OK", x, 1032);
     ctx.fillStyle = "#111";
-    ctx.textAlign = "left";
-    ctx.font = "900 13px Arial";
-    ctx.fillText(line1, x + 34, 1025);
-    ctx.fillText(line2, x + 34, 1045);
+    desenharTextoInteiroCanvas(ctx, text, x + 112, 995, 170, 2, {
+      peso: 900,
+      tamanho: 14,
+      minimo: 10,
+      lineHeight: 17,
+      blockHeight: 70
+    });
   });
-  desenharImagemContain(ctx, siteLogo, 895, 990, 145, 60, 0, "#fff");
+  if (options.showSiteLogo) {
+    desenharImagemContain(ctx, siteLogo, 895, 990, 145, 60, 0, "#fff");
+  }
 }
 
 function fonteQueCabeCanvas(ctx, texto, peso, tamanho, minimo, maxWidth, familia = "Arial") {
@@ -4624,6 +4627,91 @@ function desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, site
   ctx.fillText("www.olacarlopolis.com", 921, 1292);
 }
 
+function caracteristicasEditaveisCs(item = {}) {
+  const list = [];
+  const add = (id, label, text, icon) => {
+    if (text === undefined || text === null || String(text).trim() === "") return;
+    list.push({ id, label, text: String(text), icon });
+  };
+  add("quartos", "Dormitorios", item.quartos ? `${item.quartos} dormitorio${Number(item.quartos) === 1 ? "" : "s"}` : "", "Q");
+  add("suite", "Suites", item.suite ? `${item.suite} suite${Number(item.suite) === 1 ? "" : "s"}` : "", "S");
+  add("banheiros", "Banheiros", item.banheiros ? `${item.banheiros} banheiro${Number(item.banheiros) === 1 ? "" : "s"}` : "", "B");
+  add("vagas", "Vagas", item.vagas ? `${item.vagas} vaga${Number(item.vagas) === 1 ? "" : "s"}` : "", "V");
+  add("construcao", "Area construida", item.construcao ? `${item.construcao} m2 de area construida` : "", "AC");
+  add("area", "Area do terreno", item.area ? `${item.area} m2 de area do terreno` : "", "AT");
+  add("cozinhas", "Cozinha", item.cozinhas ? `${item.cozinhas} cozinha${Number(item.cozinhas) === 1 ? "" : "s"}` : "", "C");
+  add("salas", "Sala", item.salas ? `${item.salas} sala${Number(item.salas) === 1 ? "" : "s"}` : "", "SL");
+  add("piscina", "Piscina", item.piscina && !/^n(ao|ão)$/i.test(String(item.piscina)) ? `Piscina: ${item.piscina}` : "", "P");
+  add("churrasqueira", "Churrasqueira", item.churrasqueira && !/^n(ao|ão)$/i.test(String(item.churrasqueira)) ? `Churrasqueira: ${item.churrasqueira}` : "", "CH");
+  add("quintal", "Quintal", item.quintal && !/^n(ao|ão)$/i.test(String(item.quintal)) ? `Quintal: ${item.quintal}` : "", "QT");
+  add("outros", "Outros diferenciais", item.outros, "+");
+  return list;
+}
+
+function tituloAutomaticoCs(item = {}) {
+  return `${String(item.procura || "IMOVEL").toUpperCase()} SUPER ACONCHEGANTE`;
+}
+
+function logoCsAtivaPorPadrao() {
+  const config = state.paginaInicialSite || {};
+  return Boolean(config.exibirLogoArteCs || config.logoArteCsAtiva || false);
+}
+
+function preencherEditorCs(item, force = false) {
+  const editor = $("imovelCsEditor");
+  if (!editor || !item) return;
+  const changedItem = state.imovelCsEditorItemId !== item.id;
+  if (!force && !changedItem) return;
+  state.imovelCsEditorItemId = item.id;
+  state.imovelCsBrokerImage = "";
+  const client = donoImovelAdmin(item);
+  $("imovelCsTitle").value = tituloAutomaticoCs(item);
+  $("imovelCsMessage").value = "Conforto, espaco e qualidade para sua familia!";
+  $("imovelCsFooter1").value = "Documentacao Regularizada";
+  $("imovelCsFooter2").value = "Compra segura e transparente";
+  $("imovelCsFooter3").value = "Pronto para Morar";
+  $("imovelCsShowSiteLogo").checked = logoCsAtivaPorPadrao();
+  $("imovelCsBrokerImage").value = "";
+  $("imovelCsBrokerPreview").src = logoClienteImovelAdmin(client);
+  const features = caracteristicasEditaveisCs(item);
+  $("imovelCsFeatures").innerHTML = features.length
+    ? features.map((feature) => `
+      <label>
+        <input type="checkbox" data-cs-feature="${escapeAttr(feature.id)}" data-cs-icon="${escapeAttr(feature.icon)}" data-cs-text="${escapeAttr(feature.text)}" checked>
+        ${escapeHtml(feature.label)}: ${escapeHtml(feature.text)}
+      </label>
+    `).join("")
+    : `<span class="list-meta">Nenhuma caracteristica preenchida no cadastro.</span>`;
+}
+
+function atualizarVisibilidadeEditorCs(force = false) {
+  const isCs = $("imovelArteLayout")?.value === "cs";
+  $("imovelCsEditor")?.classList.toggle("hidden", !isCs);
+  if (!isCs) return;
+  const item = state.imoveis.find((imovel) => imovel.id === $("imovelArteItem")?.value && itemBelongsToCurrentClient(imovel));
+  if (item) preencherEditorCs(item, force);
+}
+
+function opcoesEditorCs() {
+  const features = [...document.querySelectorAll("#imovelCsFeatures [data-cs-feature]:checked")].map((input) => ({
+    id: input.dataset.csFeature || "",
+    icon: input.dataset.csIcon || "+",
+    text: input.dataset.csText || ""
+  }));
+  return {
+    title: $("imovelCsTitle")?.value.trim() || "",
+    message: $("imovelCsMessage")?.value.trim() || "",
+    features,
+    footer: [
+      $("imovelCsFooter1")?.value.trim() || "",
+      $("imovelCsFooter2")?.value.trim() || "",
+      $("imovelCsFooter3")?.value.trim() || ""
+    ],
+    showSiteLogo: Boolean($("imovelCsShowSiteLogo")?.checked),
+    brokerImage: state.imovelCsBrokerImage || ""
+  };
+}
+
 function renderImovelArteOptions() {
   const select = $("imovelArteItem");
   const layout = $("imovelArteLayout");
@@ -4635,6 +4723,7 @@ function renderImovelArteOptions() {
     return `<option value="${escapeAttr(item.id)}">${escapeHtml(label)}</option>`;
   }).join("");
   if (atual && list.some((item) => item.id === atual)) select.value = atual;
+  atualizarVisibilidadeEditorCs();
 }
 
 async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, layoutKey = $("imovelArteLayout")?.value || "navyGold") {
@@ -4646,10 +4735,11 @@ async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, l
   showToast("Gerando arte do imovel...");
   try {
     const client = donoImovelAdmin(item);
+    const csOptions = layout.model === "cs" ? opcoesEditorCs() : {};
     const fotosCandidatas = imovelImagensCandidatasAdmin(item);
     const [foto, logo, siteLogo] = await Promise.all([
       carregarPrimeiraImagemCanvas(fotosCandidatas),
-      carregarImagemCanvas(logoClienteImovelAdmin(client)),
+      carregarImagemCanvas(csOptions.brokerImage || logoClienteImovelAdmin(client)),
       carregarImagemCanvas("../images/img_padrao_site/logo_1.png")
     ]);
     if (!foto) {
@@ -4665,7 +4755,7 @@ async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, l
     canvas.height = layout.model === "cs" ? 1080 : 1350;
     const ctx = canvas.getContext("2d");
     if (layout.model === "cs") {
-      desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo);
+      desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, csOptions);
     } else {
       desenharModeloPremiumImovel(ctx, item, client, foto, logo, layout, siteLogo);
     }
@@ -7953,6 +8043,25 @@ function bindEvents() {
   $("closeImovelFormButton")?.addEventListener("click", resetImovelForm);
   $("imovelSearch")?.addEventListener("input", renderImoveisList);
   $("generateImovelArtButton")?.addEventListener("click", () => gerarArteInstagramImovel());
+  $("imovelArteLayout")?.addEventListener("change", () => atualizarVisibilidadeEditorCs());
+  $("imovelArteItem")?.addEventListener("change", () => atualizarVisibilidadeEditorCs(true));
+  $("imovelCsBrokerImage")?.addEventListener("change", (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.imovelCsBrokerImage = String(reader.result || "");
+      if ($("imovelCsBrokerPreview")) $("imovelCsBrokerPreview").src = state.imovelCsBrokerImage;
+    };
+    reader.readAsDataURL(file);
+  });
+  $("imovelCsResetBrokerImage")?.addEventListener("click", () => {
+    const item = state.imoveis.find((imovel) => imovel.id === $("imovelArteItem")?.value && itemBelongsToCurrentClient(imovel));
+    if (!item) return;
+    state.imovelCsBrokerImage = "";
+    if ($("imovelCsBrokerImage")) $("imovelCsBrokerImage").value = "";
+    if ($("imovelCsBrokerPreview")) $("imovelCsBrokerPreview").src = logoClienteImovelAdmin(donoImovelAdmin(item));
+  });
   $("imovelImagesUpload")?.addEventListener("change", async (event) => {
     const id = $("imovelId").value || slugify($("imovelTitulo").value) || `imovel-${Date.now()}`;
     const urls = await uploadImovelImages(id, event.target.files);
