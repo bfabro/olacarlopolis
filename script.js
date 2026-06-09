@@ -6364,46 +6364,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
     // Substitua depois por dados do Firebase
     
 
-    {
-      id: "casa3v",
-      codRef: "C_003",
-      tipo: "venda",
-      procura: "casa", // ou "terreno", "rural", etc.
-      quartos: 3,
-      valor: 380000,
-      piscina: false,
-      churrasqueira: "Sim",
-      vagas: 2,
-      corretores: ["Cesar Melo - 38.105 F"],
-      // corretores: ["Cesar Melo - 38.105 F", "João Souza", "Ana Lima"]
-      ////////////////////////////////////////////////////////////
-      titulo: "Casa a venda em Carlópolis",
-      descricao: "Documentação OK.",
-      endereco: "Novo Horizonte 1",
-      suite: "1",
-      banheiros: 3,
-      salas: 1,
-      cozinhas: 1,
-      area: 180,
-      construcao: 125,          // << NOVO: m² de construção
-      quintal: "Não",
-      telefone: "43 99678-9652",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/cesar/venda/casa3/1.jpg",
-        "images/imoveis/cesar/venda/casa3/2.jpg",
-        "images/imoveis/cesar/venda/casa3/3.JPG",
-        "images/imoveis/cesar/venda/casa3/4.jpg",
-        "images/imoveis/cesar/venda/casa3/5.jpg",
-        "images/imoveis/cesar/venda/casa3/6.jpg",
-        "images/imoveis/cesar/venda/casa3/7.jpg",
-        "images/imoveis/cesar/venda/casa3/8.jpg",
-        "images/imoveis/cesar/venda/casa3/9.jpg"
-
-      ],
-      //lat: -23.3953,
-      //lng: -49.7232,
-
-    },
+    
 
 
     {
@@ -6457,43 +6418,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
 
 
 
-    {
-      id: "casa9v",
-      codRef: "C_009",
-      procura: "casa", // ou "terreno", "rural", etc.
-      tipo: "venda",
-      titulo: "Casa moderna a venda",
-      descricao: "Documentação Ok.",
-      endereco: "Residencial Lê Blanc",
-      valor: 420000,
-      construcao: 110,          // << NOVO: m² de construção
-      area: 165,
-      banheiros: 2,
-      churrasqueira: "Sim",
-      cozinhas: 1,
-      quartos: 3,
-      quintal: "Sim",
-      piscina: false,
-      salas: 1,
-      suite: "1",
-      vagas: 2,
-      corretores: ["Cesar Melo - 38.105 F"],
-      telefone: "43 99678-9652",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/cesar/venda/casa9/1.jpg",
-        "images/imoveis/cesar/venda/casa9/2.jpg",
-        "images/imoveis/cesar/venda/casa9/3.jpg",
-        "images/imoveis/cesar/venda/casa9/4.jpg",
-        "images/imoveis/cesar/venda/casa9/5.jpg",
-        "images/imoveis/cesar/venda/casa9/6.jpg",
-        "images/imoveis/cesar/venda/casa9/7.jpg",
-        "images/imoveis/cesar/venda/casa9/8.jpg",
-        "images/imoveis/cesar/venda/casa9/9.jpg",
-
-
-      ],
-
-    },
+    
 
 
     {
@@ -6539,47 +6464,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
 
     },
 
-    {
-      id: "casa11v",
-      codRef: "C_011",
-      procura: "casa", // ou "terreno", "rural", etc.
-      tipo: "venda",
-      titulo: "Casa recém construída",
-      descricao: "Casa Nova com piscina, Portão Eletronico, Sala ampla com porta pivotante, Aceita Financiamento de TODOS OS BANCOS, Documentação Ok.",
-      endereco: "Residencial Murador ",
-      valor: 500000,
-      construcao: 138,          // << NOVO: m² de construção
-      area: 180,
-      banheiros: 2,
-      churrasqueira: "Sim",
-      cozinhas: 1,
-      quartos: 3,
-      quintal: "Sim",
-      piscina: "Sim",
-      salas: 1,
-      suite: "1",
-      vagas: 2,
-      corretores: ["Cesar Melo - 38.105 F"],
-      telefone: "43 99678-9652",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/cesar/venda/casa11/1.jpg",
-        "images/imoveis/cesar/venda/casa11/2.jpg",
-        "images/imoveis/cesar/venda/casa11/3.jpg",
-        "images/imoveis/cesar/venda/casa11/4.jpg",
-        "images/imoveis/cesar/venda/casa11/5.jpg",
-        "images/imoveis/cesar/venda/casa11/6.jpg",
-        "images/imoveis/cesar/venda/casa11/7.jpg",
-        "images/imoveis/cesar/venda/casa11/8.jpg",
-        "images/imoveis/cesar/venda/casa11/9.jpg",
-        "images/imoveis/cesar/venda/casa11/10.jpg",
-        "images/imoveis/cesar/venda/casa11/11.jpg",
-        "images/imoveis/cesar/venda/casa11/12.jpg",
-
-
-
-      ],
-
-    },
+    
 
 
 
@@ -6684,41 +6569,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
 
 
 
-    {
-      id: "casa18v",
-      codRef: "C_018",
-      procura: "casa", // ou "terreno", "rural", etc.
-      tipo: "venda",
-      titulo: "Casa alto padrao na Ilha Bela",
-      descricao: "Toda Fechada no Blindex<br>Otima oportuindade para tambem ser mais uma fonte de renda!",
-      endereco: "Ilha Bella",
-      valor: 950000,
-      construcao: 270,          // << NOVO: m² de construção
-      area: 514,
-      banheiros: 2,
-      churrasqueira: "Sim",
-      cozinhas: 1,
-      quartos: 4,
-      quintal: "Sim",
-      piscina: "Sim",
-      salas: 1,
-      suite: "1",
-      vagas: 4,
-      corretores: ["Cesar Melo - 38.105 F"],
-      telefone: "43 99678-9652",  // Corretor ou propretario
-      imagens: [
-        "images/imoveis/cesar/venda/casa/casa18/1.jpg",
-        "images/imoveis/cesar/venda/casa/casa18/2.jpg",
-        "images/imoveis/cesar/venda/casa/casa18/3.jpg",
-        "images/imoveis/cesar/venda/casa/casa18/4.jpg",
-
-
-
-
-
-      ],
-
-    },
+   
 
 
 
@@ -7141,60 +6992,13 @@ ${(cardapioVisivel(est) || est.contact) ? `
     },
 
 
-    {
-      id: "ter16",
-      codRef: "T_016",
-      tipo: "venda",
-      procura: "terreno", // ou "terreno", "rural", etc.
-      titulo: "Chácara com acesso a represa",
-      descricao: " - Escriturada e registrada<BR> - Com energia enfrente <BR>- 7km da cidade",
-      endereco: "Água da Limeira",
-      area: "3000 m²",
-      valor: 350000,
-      telefone: "43 99678-9652",
-      imagens: [
-        "images/imoveis/cesar/venda/terreno/terreno4/1.jpg",
-        "images/imoveis/cesar/venda/terreno/terreno4/2.jpg",
-        "images/imoveis/cesar/venda/terreno/terreno4/3.jpg",
-        "images/imoveis/cesar/venda/terreno/terreno4/4.jpg",
-        "images/imoveis/cesar/venda/terreno/terreno4/5.jpg",
-        "images/imoveis/cesar/venda/terreno/terreno4/6.jpg",
-
-      ],
-      corretores: ["Cesar Melo - 38.105 F"],
-
-    },
+    
 
 
     /////////////////// GALPAO
 
     //Modelo
-    {
-      id: "galpao1",
-      codRef: "G_001",
-      tipo: "venda",
-      procura: "galpao", // ou "terreno", "rural", etc.
-      titulo: "Galpão - Residencial Murador",
-      descricao: "Galpão amplo, ideal para indústria, depósito ou centro de distribuição",
-      endereco: "Residencial Murador",
-      banheiros: 1,
-      outros: "Mezanino",
-      escritorio: "Sim",
-      area: 300,
-      valor: 600000,
-      telefone: "43 99678-9652",
-      imagens: [
-        "images/imoveis/cesar/venda/galpao/galpao1/1.jpg",
-        "images/imoveis/cesar/venda/galpao/galpao1/2.jpg",
-        "images/imoveis/cesar/venda/galpao/galpao1/3.jpg",
-        "images/imoveis/cesar/venda/galpao/galpao1/4.jpg",
-
-        "images/imoveis/cesar/venda/galpao/galpao1/5.jpg",
-        "images/imoveis/cesar/venda/galpao/galpao1/6.jpg",
-      ],
-      corretores: ["Cesar Melo - 38.105 F"],
-
-    },
+    
 
 
     //Modelo
