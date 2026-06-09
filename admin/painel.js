@@ -38,9 +38,9 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
   numero: 268,
-  label: "v270",
+  label: "v271",
   data: "2026-06-09",
-  nota: "Ajustes visuais e editor do modelo CS."
+  nota: "Refinamento visual do modelo CS."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4254,6 +4254,58 @@ function desenharIconeCaracteristicaCs(ctx, id, cx, cy, color) {
   ctx.restore();
 }
 
+function desenharIconeRodapeCs(ctx, index, cx, cy, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 2.8;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  if (index === 0) {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 15);
+    ctx.lineTo(cx + 13, cy - 9);
+    ctx.lineTo(cx + 10, cy + 9);
+    ctx.lineTo(cx, cy + 16);
+    ctx.lineTo(cx - 10, cy + 9);
+    ctx.lineTo(cx - 13, cy - 9);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - 6, cy);
+    ctx.lineTo(cx - 1, cy + 5);
+    ctx.lineTo(cx + 7, cy - 5);
+    ctx.stroke();
+  } else if (index === 1) {
+    ctx.beginPath();
+    ctx.moveTo(cx - 16, cy - 2);
+    ctx.lineTo(cx - 7, cy - 9);
+    ctx.lineTo(cx, cy - 4);
+    ctx.lineTo(cx + 7, cy - 9);
+    ctx.lineTo(cx + 16, cy - 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - 16, cy - 2);
+    ctx.lineTo(cx - 6, cy + 11);
+    ctx.lineTo(cx, cy + 6);
+    ctx.lineTo(cx + 6, cy + 11);
+    ctx.lineTo(cx + 16, cy - 2);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.arc(cx - 6, cy - 2, 8, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx + 2, cy - 2);
+    ctx.lineTo(cx + 17, cy - 2);
+    ctx.lineTo(cx + 17, cy + 5);
+    ctx.moveTo(cx + 10, cy - 2);
+    ctx.lineTo(cx + 10, cy + 5);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, options = {}) {
   const red = "#e30613";
   const black = "#101010";
@@ -4269,14 +4321,14 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.fillRect(0, 0, 1080, 1080);
   ctx.save();
   ctx.filter = "brightness(1.1) contrast(1.04)";
-  desenharImagemCover(ctx, foto, 250, 245, 830, 715, 0);
+  desenharImagemCover(ctx, foto, 0, 245, 1080, 715, 0);
   ctx.restore();
 
-  const photoShade = ctx.createLinearGradient(245, 0, 520, 0);
-  photoShade.addColorStop(0, black);
+  const photoShade = ctx.createLinearGradient(0, 0, 430, 0);
+  photoShade.addColorStop(0, "rgba(16,16,16,.62)");
   photoShade.addColorStop(1, "rgba(16,16,16,0)");
   ctx.fillStyle = photoShade;
-  ctx.fillRect(245, 245, 310, 715);
+  ctx.fillRect(0, 245, 430, 715);
 
   ctx.fillStyle = black;
   ctx.beginPath();
@@ -4346,8 +4398,10 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   });
 
   const infos = Array.isArray(options.features) ? options.features.slice(0, 6) : [];
-  preencherRoundRect(ctx, 32, 360, 302, 512, 18, "rgba(8,8,8,.78)");
-  desenharBordaRoundRect(ctx, 32, 360, 302, 512, 18, red, 5);
+  const featureRowHeight = 78;
+  const featurePanelHeight = Math.max(104, 42 + infos.length * featureRowHeight);
+  preencherRoundRect(ctx, 32, 360, 302, featurePanelHeight, 18, "rgba(8,8,8,.52)");
+  desenharBordaRoundRect(ctx, 32, 360, 302, featurePanelHeight, 18, red, 5);
   infos.forEach((info, index) => {
     const y = 404 + index * 78;
     if (index) {
@@ -4406,8 +4460,15 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   let suffix = useMil ? "MIL" : "";
   ctx.fillStyle = "#fff";
   ctx.textAlign = "left";
+  const finalidade = /alug|loca/i.test(String(item.tipo || "")) ? "PARA LOCACAO" : "PARA VENDA";
+  preencherRoundRect(ctx, 865, 858, 185, 34, 15, "#ffffff");
+  ctx.fillStyle = red;
+  ctx.textAlign = "right";
+  fonteQueCabeCanvas(ctx, finalidade, 900, 16, 11, 155);
+  ctx.fillText(finalidade, 1034, 881);
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "left";
   ctx.font = "900 18px Arial";
-  ctx.fillText(/alug|loca/i.test(String(item.tipo || "")) ? "PARA LOCACAO" : "PARA VENDA", 620, 873);
   ctx.fillText("APENAS", 620, 897);
   ctx.font = "900 28px Arial";
   ctx.fillText("R$", 620, 940);
@@ -4424,10 +4485,7 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   while (benefits.length < 3) benefits.push("");
   benefits.forEach((text, index) => {
     const x = 72 + index * 270;
-    ctx.fillStyle = red;
-    ctx.textAlign = "center";
-    ctx.font = "900 21px Arial";
-    ctx.fillText("OK", x, 1032);
+    desenharIconeRodapeCs(ctx, index, x, 1030, red);
     ctx.fillStyle = "#111";
     desenharTextoInteiroCanvas(ctx, text, x + 112, 995, 170, 2, {
       peso: 900,
