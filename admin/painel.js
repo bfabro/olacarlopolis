@@ -38,9 +38,9 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
   numero: 268,
-  label: "v272",
+  label: "v273",
   data: "2026-06-09",
-  nota: "Alinhamento das caracteristicas e preco do modelo CS."
+  nota: "Degrade, cores e rodape do modelo CS."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4321,16 +4321,28 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.fillRect(0, 0, 1080, 1080);
   ctx.save();
   ctx.filter = "brightness(1.1) contrast(1.04)";
-  desenharImagemCover(ctx, foto, 0, 245, 1080, 715, 0);
+  desenharImagemCover(ctx, foto, 0, 0, 1080, 960, 0);
   ctx.restore();
 
-  const photoShade = ctx.createLinearGradient(0, 0, 430, 0);
-  photoShade.addColorStop(0, "rgba(16,16,16,.62)");
+  const photoShade = ctx.createLinearGradient(0, 0, 600, 0);
+  photoShade.addColorStop(0, "rgba(16,16,16,.94)");
+  photoShade.addColorStop(.62, "rgba(16,16,16,.68)");
   photoShade.addColorStop(1, "rgba(16,16,16,0)");
   ctx.fillStyle = photoShade;
-  ctx.fillRect(0, 245, 430, 715);
+  ctx.fillRect(0, 0, 620, 960);
 
-  ctx.fillStyle = black;
+  const topShade = ctx.createLinearGradient(0, 0, 0, 365);
+  topShade.addColorStop(0, "rgba(16,16,16,.76)");
+  topShade.addColorStop(.72, "rgba(16,16,16,.42)");
+  topShade.addColorStop(1, "rgba(16,16,16,0)");
+  ctx.fillStyle = topShade;
+  ctx.fillRect(0, 0, 760, 380);
+
+  const titlePanel = ctx.createLinearGradient(0, 0, 650, 250);
+  titlePanel.addColorStop(0, "rgba(16,16,16,.92)");
+  titlePanel.addColorStop(.72, "rgba(16,16,16,.55)");
+  titlePanel.addColorStop(1, "rgba(16,16,16,0)");
+  ctx.fillStyle = titlePanel;
   ctx.beginPath();
   ctx.moveTo(0, 0);
   ctx.lineTo(650, 0);
@@ -4388,7 +4400,7 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.moveTo(68, 270);
   ctx.lineTo(520, 270);
   ctx.stroke();
-  ctx.fillStyle = "#d7d7d7";
+  ctx.fillStyle = options.messageColor || "#d7d7d7";
   desenharTextoInteiroCanvas(ctx, options.message || "Conforto, espaco e qualidade para sua familia!", 68, 290, 500, 2, {
     peso: 700,
     tamanho: 28,
@@ -4490,9 +4502,9 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
     ctx.fillStyle = "#111";
     desenharTextoInteiroCanvas(ctx, text, x + 112, 995, 170, 2, {
       peso: 900,
-      tamanho: 17,
-      minimo: 12,
-      lineHeight: 20,
+      tamanho: 19,
+      minimo: 13,
+      lineHeight: 22,
       blockHeight: 70
     });
   });
@@ -4803,6 +4815,7 @@ function preencherEditorCs(item, force = false) {
   const client = donoImovelAdmin(item);
   $("imovelCsTitle").value = tituloAutomaticoCs(item);
   $("imovelCsMessage").value = "Conforto, espaco e qualidade para sua familia!";
+  $("imovelCsMessageColor").value = "#d7d7d7";
   $("imovelCsFooter1").value = "Documentacao Regularizada";
   $("imovelCsFooter2").value = "Compra segura e transparente";
   $("imovelCsFooter3").value = "Pronto para Morar";
@@ -4837,6 +4850,7 @@ function opcoesEditorCs() {
   return {
     title: $("imovelCsTitle")?.value.trim() || "",
     message: $("imovelCsMessage")?.value.trim() || "",
+    messageColor: $("imovelCsMessageColor")?.value || "#d7d7d7",
     features,
     footer: [
       $("imovelCsFooter1")?.value.trim() || "",

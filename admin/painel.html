@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=272">
+  <link rel="stylesheet" href="painel.css?v=273">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -826,6 +826,9 @@
                 <label class="wide">Mensagem abaixo do titulo
                   <textarea id="imovelCsMessage" rows="2"></textarea>
                 </label>
+                <label>Cor da mensagem
+                  <input id="imovelCsMessageColor" type="color" value="#d7d7d7">
+                </label>
                 <section class="wide imovel-cs-feature-panel">
                   <strong>Caracteristicas exibidas</strong>
                   <div id="imovelCsFeatures" class="imovel-cs-features"></div>
@@ -1103,6 +1106,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=272"></script>
+  <script type="module" src="painel.js?v=273"></script>
 </body>
 </html>
