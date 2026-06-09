@@ -38,9 +38,9 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
   numero: 268,
-  label: "v269",
+  label: "v270",
   data: "2026-06-09",
-  nota: "Editor do modelo CS para artes de imoveis."
+  nota: "Ajustes visuais e editor do modelo CS."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4178,14 +4178,91 @@ function desenharModeloCs(ctx, item, client, foto, logo, siteLogo) {
   desenharImagemContain(ctx, siteLogo, 828, 1218, 180, 86, 0, "#ffffff");
 }
 
+function desenharIconeCaracteristicaCs(ctx, id, cx, cy, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 2.8;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  const line = (...points) => {
+    ctx.beginPath();
+    points.forEach(([x, y], index) => index ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    ctx.stroke();
+  };
+  if (["quartos", "suite"].includes(id)) {
+    ctx.strokeRect(cx - 13, cy, 26, 9);
+    ctx.strokeRect(cx - 12, cy - 8, 9, 8);
+    line([cx - 13, cy + 9], [cx - 13, cy + 14], [cx - 9, cy + 14]);
+    line([cx + 13, cy + 9], [cx + 13, cy + 14], [cx + 9, cy + 14]);
+  } else if (id === "banheiros") {
+    ctx.beginPath();
+    ctx.arc(cx - 6, cy - 7, 4, 0, Math.PI * 2);
+    ctx.stroke();
+    line([cx - 13, cy + 1], [cx + 13, cy + 1], [cx + 10, cy + 11], [cx - 10, cy + 11], [cx - 13, cy + 1]);
+  } else if (id === "vagas") {
+    ctx.strokeRect(cx - 14, cy - 6, 28, 13);
+    line([cx - 10, cy - 6], [cx - 5, cy - 12], [cx + 7, cy - 12], [cx + 12, cy - 6]);
+    [cx - 8, cx + 8].forEach((x) => {
+      ctx.beginPath();
+      ctx.arc(x, cy + 9, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  } else if (["area", "construcao"].includes(id)) {
+    ctx.strokeRect(cx - 12, cy - 12, 24, 24);
+    line([cx - 17, cy - 8], [cx - 17, cy - 17], [cx - 8, cy - 17]);
+    line([cx + 17, cy + 8], [cx + 17, cy + 17], [cx + 8, cy + 17]);
+  } else if (id === "cozinhas") {
+    ctx.strokeRect(cx - 14, cy - 11, 28, 22);
+    ctx.beginPath();
+    ctx.arc(cx - 6, cy - 3, 4, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx + 6, cy - 3, 4, 0, Math.PI * 2);
+    ctx.stroke();
+    line([cx - 9, cy + 6], [cx + 9, cy + 6]);
+  } else if (id === "salas") {
+    ctx.strokeRect(cx - 14, cy - 3, 28, 13);
+    ctx.strokeRect(cx - 11, cy - 11, 22, 10);
+    line([cx - 14, cy + 10], [cx - 14, cy + 15]);
+    line([cx + 14, cy + 10], [cx + 14, cy + 15]);
+  } else if (id === "piscina") {
+    line([cx - 15, cy - 5], [cx - 7, cy - 8], [cx, cy - 5], [cx + 7, cy - 8], [cx + 15, cy - 5]);
+    line([cx - 15, cy + 4], [cx - 7, cy + 1], [cx, cy + 4], [cx + 7, cy + 1], [cx + 15, cy + 4]);
+  } else if (id === "churrasqueira") {
+    ctx.beginPath();
+    ctx.arc(cx, cy - 3, 12, 0, Math.PI);
+    ctx.stroke();
+    line([cx - 9, cy + 1], [cx - 5, cy + 14]);
+    line([cx + 9, cy + 1], [cx + 5, cy + 14]);
+    line([cx - 12, cy - 3], [cx + 12, cy - 3]);
+  } else if (id === "quintal") {
+    line([cx, cy + 14], [cx, cy - 4]);
+    ctx.beginPath();
+    ctx.arc(cx - 7, cy - 6, 8, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx + 7, cy - 8, 8, 0, Math.PI * 2);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+    ctx.stroke();
+    line([cx - 6, cy], [cx + 6, cy]);
+    line([cx, cy - 6], [cx, cy + 6]);
+  }
+  ctx.restore();
+}
+
 function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, options = {}) {
   const red = "#e30613";
   const black = "#101010";
   const city = String(item.cidade || "CARLOPOLIS - PR").trim().toUpperCase();
   const titleParts = String(options.title || tituloAutomaticoCs(item)).trim().toUpperCase().split(/\s+/).filter(Boolean);
-  const titleWord = titleParts.shift() || "IMOVEL";
+  const titleWord = String(item.procura || "IMOVEL").trim().toUpperCase();
+  if (normalizeName(titleParts[0] || "") === normalizeName(titleWord)) titleParts.shift();
   const titleSecond = titleParts.shift() || "SUPER";
-  const titleThird = titleParts.join(" ") || "ACONCHEGANTE";
+  const titleThird = titleParts.join(" ");
   const broker = String(client?.nome || item.clienteNome || item.corretor || "CESAR MELO").toUpperCase();
 
   ctx.fillStyle = black;
@@ -4249,8 +4326,10 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.fillStyle = "#fff";
   fonteQueCabeCanvas(ctx, titleSecond, 900, 92, 54, 500);
   ctx.fillText(titleSecond, 68, 205);
-  fonteQueCabeCanvas(ctx, titleThird, 900, 42, 24, 500);
-  ctx.fillText(titleThird, 68, 254);
+  if (titleThird) {
+    fonteQueCabeCanvas(ctx, titleThird, 900, 42, 24, 500);
+    ctx.fillText(titleThird, 68, 254);
+  }
   ctx.strokeStyle = red;
   ctx.lineWidth = 3;
   ctx.beginPath();
@@ -4259,15 +4338,15 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.stroke();
   ctx.fillStyle = "#d7d7d7";
   desenharTextoInteiroCanvas(ctx, options.message || "Conforto, espaco e qualidade para sua familia!", 68, 290, 500, 2, {
-    peso: 500,
-    tamanho: 22,
-    minimo: 15,
-    lineHeight: 27,
+    peso: 700,
+    tamanho: 28,
+    minimo: 18,
+    lineHeight: 31,
     align: "left"
   });
 
   const infos = Array.isArray(options.features) ? options.features.slice(0, 6) : [];
-  preencherRoundRect(ctx, 32, 360, 302, 512, 18, "#0a0a0a");
+  preencherRoundRect(ctx, 32, 360, 302, 512, 18, "rgba(8,8,8,.78)");
   desenharBordaRoundRect(ctx, 32, 360, 302, 512, 18, red, 5);
   infos.forEach((info, index) => {
     const y = 404 + index * 78;
@@ -4286,10 +4365,7 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
     ctx.strokeStyle = red;
     ctx.lineWidth = 3;
     ctx.stroke();
-    ctx.fillStyle = red;
-    ctx.textAlign = "center";
-    ctx.font = "900 16px Arial";
-    ctx.fillText(info.icon || info.icone || "+", 77, y + 6);
+    desenharIconeCaracteristicaCs(ctx, info.id, 77, y, red);
     ctx.fillStyle = "#fff";
     desenharTextoInteiroCanvas(ctx, String(info.text || `${info.principal || ""} ${info.secundario || ""}`).trim().toUpperCase(), 122, y - 25, 182, 3, {
       peso: 900,
@@ -4331,15 +4407,16 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.fillStyle = "#fff";
   ctx.textAlign = "left";
   ctx.font = "900 18px Arial";
-  ctx.fillText("APENAS", 620, 884);
+  ctx.fillText(/alug|loca/i.test(String(item.tipo || "")) ? "PARA LOCACAO" : "PARA VENDA", 620, 873);
+  ctx.fillText("APENAS", 620, 897);
   ctx.font = "900 28px Arial";
-  ctx.fillText("R$", 620, 932);
+  ctx.fillText("R$", 620, 940);
   ctx.textAlign = "center";
   fonteQueCabeCanvas(ctx, mainValue, 900, 96, 46, 255);
-  ctx.fillText(mainValue, 810, 947);
+  ctx.fillText(mainValue, 810, 952);
   ctx.textAlign = "left";
   ctx.font = "900 35px Arial";
-  ctx.fillText(suffix, 950, 936);
+  ctx.fillText(suffix, 950, 942);
 
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 970, 1080, 110);
@@ -4354,9 +4431,9 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
     ctx.fillStyle = "#111";
     desenharTextoInteiroCanvas(ctx, text, x + 112, 995, 170, 2, {
       peso: 900,
-      tamanho: 14,
-      minimo: 10,
-      lineHeight: 17,
+      tamanho: 17,
+      minimo: 12,
+      lineHeight: 20,
       blockHeight: 70
     });
   });
@@ -4649,7 +4726,7 @@ function caracteristicasEditaveisCs(item = {}) {
 }
 
 function tituloAutomaticoCs(item = {}) {
-  return `${String(item.procura || "IMOVEL").toUpperCase()} SUPER ACONCHEGANTE`;
+  return `${String(item.procura || "IMOVEL").toUpperCase()} SUPER`;
 }
 
 function logoCsAtivaPorPadrao() {
