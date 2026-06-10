@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 276,
-  label: "v282",
+  numero: 277,
+  label: "v283",
   data: "2026-06-10",
-  nota: "Refinamento de logo, imagem e rodape das artes promocionais."
+  nota: "Gerador promocional liberado para clientes e logo opcional."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6831,15 +6831,20 @@ function desenharIconeInstagramPromo(ctx, cx, cy, color) {
   ctx.restore();
 }
 
-function desenharRodapeContatosPromo(ctx, client, layout, siteLogo) {
+function desenharRodapeContatosPromo(ctx, client, layout, siteLogo, showSiteLogo = true) {
   const instagramRaw = String(client.instagram || "@seuinstagram").trim();
   const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
   const instagramLabel = instagram.startsWith("@") ? instagram : `@${instagram}`;
   const phone = telefoneArteAdmin(client.whatsapp || client.contato || "") || "(00) 00000-0000";
-  const cards = [
-    { x: 34, w: 330, label: instagramLabel, type: "instagram" },
-    { x: 375, w: 360, label: phone, type: "whatsapp" }
-  ];
+  const cards = showSiteLogo
+    ? [
+      { x: 34, w: 330, label: instagramLabel, type: "instagram" },
+      { x: 375, w: 360, label: phone, type: "whatsapp" }
+    ]
+    : [
+      { x: 34, w: 496, label: instagramLabel, type: "instagram" },
+      { x: 550, w: 496, label: phone, type: "whatsapp" }
+    ];
   cards.forEach((card) => {
     ctx.save();
     ctx.shadowColor = "rgba(17,24,39,.12)";
@@ -6860,14 +6865,16 @@ function desenharRodapeContatosPromo(ctx, client, layout, siteLogo) {
     ctx.fillText(card.label, card.x + 88, 1010);
   });
 
-  ctx.save();
-  ctx.shadowColor = "rgba(17,24,39,.12)";
-  ctx.shadowBlur = 12;
-  ctx.shadowOffsetY = 5;
-  preencherRoundRect(ctx, 746, 958, 300, 88, 20, "rgba(255,255,255,.97)");
-  ctx.restore();
-  desenharBordaRoundRect(ctx, 746, 958, 300, 88, 20, "rgba(17,24,39,.1)", 2);
-  if (siteLogo) desenharImagemContain(ctx, siteLogo, 768, 966, 256, 72, 0, "rgba(255,255,255,0)");
+  if (showSiteLogo) {
+    ctx.save();
+    ctx.shadowColor = "rgba(17,24,39,.12)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 5;
+    preencherRoundRect(ctx, 746, 958, 300, 88, 20, "rgba(255,255,255,.97)");
+    ctx.restore();
+    desenharBordaRoundRect(ctx, 746, 958, 300, 88, 20, "rgba(17,24,39,.1)", 2);
+    if (siteLogo) desenharImagemContain(ctx, siteLogo, 768, 966, 256, 72, 0, "rgba(255,255,255,0)");
+  }
 }
 
 function desenharLogoPromoDireita(ctx, logo, client, layout) {
@@ -6912,7 +6919,7 @@ function desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo,
   desenharLogoPromoDireita(ctx, logo, client, layout);
 
   ctx.fillStyle = layout.primary;
-  desenharTextoPromoCanvas(ctx, "PROMOCAO", 810, 330, 420, 2, {
+  desenharTextoPromoCanvas(ctx, "PROMO\u00c7\u00c3O", 810, 330, 420, 2, {
     tamanho: 59,
     minimo: 35,
     lineHeight: 59,
@@ -6922,9 +6929,9 @@ function desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo,
   });
   ctx.fillStyle = layout.dark;
   desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 810, 425, 330, 2, {
-    tamanho: 23,
-    minimo: 14,
-    lineHeight: 24,
+    tamanho: 29,
+    minimo: 17,
+    lineHeight: 29,
     align: "center",
     blockHeight: 62,
     peso: 800
@@ -6960,7 +6967,7 @@ function desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo,
     ctx.fillText(oldText, 817, 714);
     const oldWidth = ctx.measureText(oldText).width;
     ctx.strokeStyle = layout.primary;
-    ctx.lineWidth = reduced ? 5 : 4;
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(817 - oldWidth / 2, 705);
     ctx.lineTo(817 + oldWidth / 2, 705);
@@ -6968,7 +6975,7 @@ function desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo,
   }
 
   desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
-  desenharRodapeContatosPromo(ctx, client, layout, siteLogo);
+  desenharRodapeContatosPromo(ctx, client, layout, siteLogo, options.showSiteLogo);
 }
 
 function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layout, options = {}) {
@@ -6983,7 +6990,7 @@ function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layo
   desenharImagemPromoNova(ctx, foto, layout, options.imageFit || "cover");
 
   ctx.fillStyle = layout.primary;
-  desenharTextoPromoCanvas(ctx, "PROMOCAO", 245, 330, 420, 2, {
+  desenharTextoPromoCanvas(ctx, "PROMO\u00c7\u00c3O", 245, 330, 420, 2, {
     tamanho: 61,
     minimo: 36,
     lineHeight: 60,
@@ -7001,9 +7008,9 @@ function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layo
   ctx.stroke();
   ctx.fillStyle = layout.dark;
   desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 245, 430, 280, 2, {
-    tamanho: 21,
-    minimo: 13,
-    lineHeight: 21,
+    tamanho: 28,
+    minimo: 17,
+    lineHeight: 28,
     align: "center",
     blockHeight: 62,
     peso: 800
@@ -7044,7 +7051,7 @@ function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layo
     ctx.fillText(oldText, 245, 739);
     const oldWidth = ctx.measureText(oldText).width;
     ctx.strokeStyle = layout.primary;
-    ctx.lineWidth = reduced ? 5 : 4;
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(245 - oldWidth / 2, 730);
     ctx.lineTo(245 + oldWidth / 2, 730);
@@ -7057,28 +7064,30 @@ function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layo
   }
 
   desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
-  desenharRodapeContatosPromo(ctx, client, layout, siteLogo);
+  desenharRodapeContatosPromo(ctx, client, layout, siteLogo, options.showSiteLogo);
 }
 
-function opcoesArtePromocao() {
+function opcoesArtePromocao(prefix = "promoArt", scope = document) {
+  const field = (suffix) => scope.querySelector(`#${prefix}${suffix}`);
   const benefits = [1, 2, 3].map((index) => ({
-    enabled: Boolean($(`promoArtBenefit${index}Enabled`)?.checked),
-    title: $(`promoArtBenefit${index}Title`)?.value.trim() || "",
-    text: $(`promoArtBenefit${index}Text`)?.value.trim() || "",
+    enabled: Boolean(field(`Benefit${index}Enabled`)?.checked),
+    title: field(`Benefit${index}Title`)?.value.trim() || "",
+    text: field(`Benefit${index}Text`)?.value.trim() || "",
     icon: index - 1
   }));
   return {
-    imageFit: $("promoArtImageFit")?.value || "cover",
+    imageFit: field("ImageFit")?.value || "cover",
+    showSiteLogo: Boolean(field("ShowSiteLogo")?.checked),
     benefits
   };
 }
 
-async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "classico") {
+async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "classico", options = null) {
   const client = state.clientes.find((item) => item.id === clientId);
   const promo = normalizePromocoes(client?.promocoes).find((item) => item.id === promoId);
   if (!client || !promo) return showToast("Selecione uma promocao para gerar a arte.");
   const layout = PROMO_ARTE_LAYOUTS[layoutKey] || PROMO_ARTE_LAYOUTS.classico;
-  const button = $("generatePromoArtButton");
+  const button = $("generatePromoArtButton") || $("coGeneratePromoArtButton");
   if (button) button.disabled = true;
   showToast("Gerando arte da promocao...");
   try {
@@ -7091,7 +7100,7 @@ async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "classi
     canvas.width = 1080;
     canvas.height = 1080;
     const ctx = canvas.getContext("2d");
-    desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layout, opcoesArtePromocao());
+    desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layout, options || opcoesArtePromocao());
     const blob = await canvasParaBlob(canvas);
     baixarBlobCanvas(blob, `arte-promocao-${slugify(client.nome || client.id)}-${slugify(promo.titulo)}-${layoutKey}.png`);
     showToast("Arte da promocao gerada.");
@@ -7188,6 +7197,7 @@ function renderStaffPromocoesView() {
               <option value="contain">Mostrar imagem inteira</option>
             </select>
           </label>
+          <label class="check-row"><input id="promoArtShowSiteLogo" type="checkbox" checked> Exibir logo Ola Carlopolis</label>
           <div class="promo-art-benefit">
             <label class="check-row"><input id="promoArtBenefit1Enabled" type="checkbox" checked> Exibir beneficio 1</label>
             <input id="promoArtBenefit1Title" value="QUALIDADE" aria-label="Titulo do beneficio 1">
@@ -7619,6 +7629,58 @@ function renderClientOnlyEditor() {
             </div>
             <span id="coPromosCount" class="badge">${promocoes.length} ativa${promocoes.length === 1 ? "" : "s"}</span>
           </div>
+          <section class="promo-art-generator client-promo-art-generator">
+            <div class="section-head compact">
+              <div>
+                <h3>Arte para Instagram</h3>
+                <p>Escolha uma promocao e gere a imagem quadrada para postagem.</p>
+              </div>
+              <span class="badge">1080 x 1080</span>
+            </div>
+            ${promocoes.length ? `
+              <div class="promo-art-controls">
+                <label>Promocao
+                  <select id="coPromoArtItem">
+                    ${promocoes.map((promo) => `<option value="${escapeAttr(promo.id)}">${escapeHtml(promo.titulo)}</option>`).join("")}
+                  </select>
+                </label>
+                <label>Modelo
+                  <select id="coPromoArtLayout">
+                    ${Object.entries(PROMO_ARTE_LAYOUTS).map(([key, layout]) => `<option value="${key}">${escapeHtml(layout.nome)}</option>`).join("")}
+                  </select>
+                </label>
+                <button id="coGeneratePromoArtButton" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar imagem</button>
+              </div>
+              <div class="promo-layout-swatches">
+                ${Object.entries(PROMO_ARTE_LAYOUTS).map(([key, layout]) => `
+                  <button type="button" data-co-promo-layout="${key}">
+                    <span style="--promo-main:${layout.primary};--promo-dark:${layout.dark};--promo-light:${layout.secondary}"></span>
+                    ${escapeHtml(layout.nome)}
+                  </button>
+                `).join("")}
+              </div>
+              <div class="promo-art-editor">
+                <label>Ajuste da imagem
+                  <select id="coPromoArtImageFit">
+                    <option value="cover">Preencher a moldura</option>
+                    <option value="contain">Mostrar imagem inteira</option>
+                  </select>
+                </label>
+                <label class="check-row"><input id="coPromoArtShowSiteLogo" type="checkbox" checked> Exibir logo Ola Carlopolis</label>
+                ${[
+                  ["QUALIDADE", "Produtos de qualidade que voce confia."],
+                  ["ATENDIMENTO", "Atendimento proximo e personalizado."],
+                  ["ENTREGA RAPIDA", "Mais agilidade e seguranca para voce."]
+                ].map((benefit, index) => `
+                  <div class="promo-art-benefit">
+                    <label class="check-row"><input id="coPromoArtBenefit${index + 1}Enabled" type="checkbox" checked> Exibir beneficio ${index + 1}</label>
+                    <input id="coPromoArtBenefit${index + 1}Title" value="${benefit[0]}">
+                    <textarea id="coPromoArtBenefit${index + 1}Text" rows="2">${benefit[1]}</textarea>
+                  </div>
+                `).join("")}
+              </div>
+            ` : `<div class="list-meta">Cadastre uma promocao para liberar a geracao da arte.</div>`}
+          </section>
           <div class="promo-admin-form">
             <label>Titulo da promocao<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
             <label>Preco atual<input id="coPromoPrice" placeholder="Ex.: 49,90"></label>
@@ -7902,6 +7964,28 @@ function renderClientOnlyEditor() {
     showToast("Imagem com texto adicionada.");
     await loadAllData();
     renderClientOnlyEditor();
+  });
+
+  mount.querySelectorAll("[data-co-promo-layout]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const select = mount.querySelector("#coPromoArtLayout");
+      if (select) select.value = button.dataset.coPromoLayout;
+      mount.querySelectorAll("[data-co-promo-layout]").forEach((item) => item.classList.toggle("active", item === button));
+    });
+  });
+  mount.querySelector("[data-co-promo-layout='classico']")?.classList.add("active");
+  mount.querySelector("#coPromoArtLayout")?.addEventListener("change", (event) => {
+    mount.querySelectorAll("[data-co-promo-layout]").forEach((item) => {
+      item.classList.toggle("active", item.dataset.coPromoLayout === event.target.value);
+    });
+  });
+  mount.querySelector("#coGeneratePromoArtButton")?.addEventListener("click", () => {
+    gerarArteInstagramPromocao(
+      client.id,
+      mount.querySelector("#coPromoArtItem")?.value || "",
+      mount.querySelector("#coPromoArtLayout")?.value || "classico",
+      opcoesArtePromocao("coPromoArt", mount)
+    );
   });
 
   mount.querySelector("#coAddPromoButton")?.addEventListener("click", async () => {

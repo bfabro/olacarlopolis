@@ -3178,6 +3178,14 @@ button[type="submit"]:hover,
   min-height: 58px;
 }
 
+.client-promo-art-generator {
+  margin-top: 6px;
+  padding: 16px;
+  border: 1px solid #c7d7ee;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
 @media (max-width: 900px) {
   .promo-art-controls {
     grid-template-columns: 1fr;
