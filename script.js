@@ -6441,7 +6441,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
       salas: 1,
       suite: "Não",
       vagas: 2,
-      corretores: ["Cesar Melo - 38.105 F"],
+      corretores: ["Cesar Melo"],
       telefone: "43 99678-9652",  // Corretor ou propretario
       imagens: [
         "images/imoveis/cesar/venda/casa10/1.jpg",
@@ -6543,7 +6543,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
       salas: 1,
       suite: "4",
       vagas: 4,
-      corretores: ["Cesar Melo - 38.105 F"],
+      corretores: ["Cesar Melo"],
       telefone: "43 99678-9652",  // Corretor ou propretario
       imagens: [
         "images/imoveis/cesar/venda/casa17/1.jpg",
@@ -6634,7 +6634,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
       salas: 1,
       suite: "0",
       //vagas: 4,
-      corretores: ["Cesar Melo - 38.105 F"],
+      corretores: ["Cesar Melo"],
       telefone: "43 99678-9652",  // Corretor ou propretario
       imagens: [
         "images/imoveis/cesar/venda/chacara/chacara1/1.jpg",
@@ -6671,7 +6671,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
       telefone: "43 99678-9652",
 
       imagens: ["images/imoveis/cesar/venda/terreno/3.jpg",],
-      corretores: ["Cesar Melo - 38.105 F"],
+      corretores: ["Cesar Melo"],
 
     },
 
@@ -6712,7 +6712,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
         "images/imoveis/cesar/venda/terreno/terreno1/2.jpg",
 
       ],
-      corretores: ["Cesar Melo - 38.105 F"],
+      corretores: ["Cesar Melo"],
 
     },
 
@@ -6987,7 +6987,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
         "images/imoveis/cesar/venda/terreno/terreno3/3.jpg",
 
       ],
-      corretores: ["Cesar Melo - 38.105 F"],
+      corretores: ["Cesar Melo"],
 
     },
 
@@ -7025,7 +7025,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
         "images/imoveis/cesar/venda/galpao/galpao1/5.jpg",
         "images/imoveis/cesar/venda/galpao/galpao1/6.jpg",
       ],
-      corretores: ["Cesar Melo - 38.105 F"],
+      corretores: ["Cesar Melo"],
 
     },
 
@@ -7054,7 +7054,7 @@ ${(cardapioVisivel(est) || est.contact) ? `
         "images/imoveis/cesar/venda/galpao/galpao2/5.jpg",
 
       ],
-      corretores: ["Cesar Melo - 38.105 F"],
+      corretores: ["Cesar Melo"],
 
     },
 
