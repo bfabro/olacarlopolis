@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 269,
-  label: "v275",
+  numero: 270,
+  label: "v276",
   data: "2026-06-10",
-  nota: "Refinamentos de texto e do card do corretor no modelo CS."
+  nota: "Card de preco mais compacto e valor completo no modelo CS."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4462,11 +4462,11 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.save();
   ctx.shadowColor = "rgba(0,0,0,.4)";
   ctx.shadowBlur = 18;
-  const priceGradient = ctx.createLinearGradient(555, 845, 1080, 970);
+  const priceGradient = ctx.createLinearGradient(555, 850, 1080, 970);
   priceGradient.addColorStop(0, "#7f0009");
   priceGradient.addColorStop(.55, "#b70412");
   priceGradient.addColorStop(1, "#df1020");
-  preencherRoundRect(ctx, 555, 835, 525, 135, 30, priceGradient);
+  preencherRoundRect(ctx, 555, 850, 525, 120, 28, priceGradient);
   ctx.restore();
 
   ctx.fillStyle = red;
@@ -4483,40 +4483,36 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.font = "900 27px Arial";
   ctx.fillText(city, 138, 944);
 
-  const numericValue = Number(item.valor || 0);
+  const rawPrice = String(item.valor ?? "").trim().replace(/[^\d,.-]/g, "");
+  const normalizedPrice = rawPrice.includes(",")
+    ? rawPrice.replace(/\./g, "").replace(",", ".")
+    : (/^\d{1,3}(?:\.\d{3})+$/.test(rawPrice) ? rawPrice.replace(/\./g, "") : rawPrice);
+  const numericValue = Number(normalizedPrice) || 0;
   const isRental = /alug|loca/i.test(String(item.tipo || ""));
-  const useMil = !isRental && numericValue >= 100000;
-  let mainValue = numericValue
-    ? (useMil
-      ? String(Math.round(numericValue / 1000))
-      : numericValue.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 }))
+  const mainValue = numericValue
+    ? numericValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : "";
-  let suffix = useMil ? "MIL" : (isRental && numericValue ? "/ MES" : "");
   ctx.fillStyle = "#fff";
   ctx.textAlign = "left";
   const finalidade = isRental ? "PARA ALUGAR" : "PARA VENDA";
-  preencherRoundRect(ctx, 842, 846, 208, 32, 14, "#ffffff");
+  ctx.font = "800 15px Arial";
+  ctx.fillText("APENAS", 585, 879);
+  preencherRoundRect(ctx, 842, 858, 208, 32, 14, "#ffffff");
   ctx.fillStyle = red;
   ctx.textAlign = "right";
   fonteQueCabeCanvas(ctx, finalidade, 900, 16, 11, 176);
-  ctx.fillText(finalidade, 1034, 868);
+  ctx.fillText(finalidade, 1034, 880);
   ctx.fillStyle = "#fff";
   ctx.textAlign = "left";
   if (!numericValue) {
     ctx.textAlign = "center";
-    fonteQueCabeCanvas(ctx, "CONSULTE O VALOR", 900, 42, 24, 420);
-    ctx.fillText("CONSULTE O VALOR", 815, 934);
+    fonteQueCabeCanvas(ctx, "CONSULTE O VALOR", 900, 38, 24, 430);
+    ctx.fillText("CONSULTE O VALOR", 815, 941);
   } else {
-    ctx.font = "900 17px Arial";
-    ctx.fillText("APENAS", 600, 892);
-    ctx.font = "900 27px Arial";
-    ctx.fillText("R$", 600, 943);
     ctx.textAlign = "center";
-    fonteQueCabeCanvas(ctx, mainValue, 900, isRental ? 66 : 76, 40, 270);
-    ctx.fillText(mainValue, 792, 952);
-    ctx.textAlign = "left";
-    fonteQueCabeCanvas(ctx, suffix, 900, isRental ? 25 : 31, 18, 96);
-    ctx.fillText(suffix, 945, 946);
+    const displayPrice = `R$ ${mainValue}${isRental ? " / M\u00caS" : ""}`;
+    fonteQueCabeCanvas(ctx, displayPrice, 900, 52, 30, 465);
+    ctx.fillText(displayPrice, 815, 944);
   }
 
   ctx.fillStyle = "#fff";
