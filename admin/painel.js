@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 275,
-  label: "v281",
+  numero: 276,
+  label: "v282",
   data: "2026-06-10",
-  nota: "Modelos de promocao com cores e composicoes distintas."
+  nota: "Refinamento de logo, imagem e rodape das artes promocionais."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6623,8 +6623,9 @@ function desenharDecoracaoPromoNova(ctx, layout) {
 
 function desenharLogoPromoNova(ctx, logo, client, layout) {
   ctx.save();
-  ctx.shadowColor = "rgba(17,24,39,.14)";
-  ctx.shadowBlur = 16;
+  ctx.shadowColor = "rgba(17,24,39,.34)";
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 10;
   ctx.fillStyle = "#fff";
   ctx.beginPath();
   ctx.arc(245, 125, 84, 0, Math.PI * 2);
@@ -6656,14 +6657,12 @@ function desenharLogoPromoNova(ctx, logo, client, layout) {
   }
   ctx.fillStyle = layout.dark;
   ctx.textAlign = "center";
-  ctx.font = "700 14px Arial";
-  ctx.fillText("NOME DA SUA", 245, 225);
-  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 245, 234, 360, 2, {
-    tamanho: 29,
+  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 245, 215, 380, 2, {
+    tamanho: 31,
     minimo: 17,
-    lineHeight: 29,
+    lineHeight: 31,
     align: "center",
-    blockHeight: 60
+    blockHeight: 72
   });
   ctx.strokeStyle = layout.primary;
   ctx.lineWidth = 3;
@@ -6695,10 +6694,15 @@ function desenharImagemPromoNova(ctx, foto, layout, fit = "cover") {
   ctx.shadowOffsetY = 14;
   preencherRoundRect(ctx, x, y, w, h, 42, "#fff");
   ctx.restore();
+  desenharBordaRoundRect(ctx, x, y, w, h, 42, "rgba(255,255,255,.9)", 3);
   desenharBordaTracejadaPromo(ctx, x + 18, y + 18, w - 36, h - 36, 30, layout.primary, 3);
   if (foto) {
-    if (fit === "contain") desenharImagemContain(ctx, foto, x + 32, y + 32, w - 64, h - 64, 24, "#f5f5f5");
-    else desenharImagemCover(ctx, foto, x + 32, y + 32, w - 64, h - 64, 24);
+    const imageX = x + 34;
+    const imageY = y + 34;
+    const imageW = w - 68;
+    const imageH = h - 68;
+    if (fit === "contain") desenharImagemContain(ctx, foto, imageX, imageY, imageW, imageH, 24, "#f5f5f5");
+    else desenharImagemCover(ctx, foto, imageX, imageY, imageW, imageH, 24);
     return;
   }
   ctx.strokeStyle = layout.primary;
@@ -6811,10 +6815,66 @@ function promocaoTeveReducao(promo = {}) {
   return atual > 0 && antigo > atual;
 }
 
+function desenharIconeInstagramPromo(ctx, cx, cy, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  canvasRoundRect(ctx, cx - 15, cy - 15, 30, 30, 8);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(cx + 9, cy - 9, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function desenharRodapeContatosPromo(ctx, client, layout, siteLogo) {
+  const instagramRaw = String(client.instagram || "@seuinstagram").trim();
+  const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
+  const instagramLabel = instagram.startsWith("@") ? instagram : `@${instagram}`;
+  const phone = telefoneArteAdmin(client.whatsapp || client.contato || "") || "(00) 00000-0000";
+  const cards = [
+    { x: 34, w: 330, label: instagramLabel, type: "instagram" },
+    { x: 375, w: 360, label: phone, type: "whatsapp" }
+  ];
+  cards.forEach((card) => {
+    ctx.save();
+    ctx.shadowColor = "rgba(17,24,39,.12)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 5;
+    preencherRoundRect(ctx, card.x, 958, card.w, 88, 20, "rgba(255,255,255,.97)");
+    ctx.restore();
+    desenharBordaRoundRect(ctx, card.x, 958, card.w, 88, 20, "rgba(17,24,39,.1)", 2);
+    ctx.fillStyle = layout.secondary;
+    ctx.beginPath();
+    ctx.arc(card.x + 46, 1002, 27, 0, Math.PI * 2);
+    ctx.fill();
+    if (card.type === "instagram") desenharIconeInstagramPromo(ctx, card.x + 46, 1002, layout.primary);
+    else desenharIconeWhatsappCanvas(ctx, card.x + 46, 1002, layout.primary);
+    ctx.fillStyle = layout.dark;
+    ctx.textAlign = "left";
+    fonteQueCabeCanvas(ctx, card.label, 900, 21, 14, card.w - 100);
+    ctx.fillText(card.label, card.x + 88, 1010);
+  });
+
+  ctx.save();
+  ctx.shadowColor = "rgba(17,24,39,.12)";
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 5;
+  preencherRoundRect(ctx, 746, 958, 300, 88, 20, "rgba(255,255,255,.97)");
+  ctx.restore();
+  desenharBordaRoundRect(ctx, 746, 958, 300, 88, 20, "rgba(17,24,39,.1)", 2);
+  if (siteLogo) desenharImagemContain(ctx, siteLogo, 768, 966, 256, 72, 0, "rgba(255,255,255,0)");
+}
+
 function desenharLogoPromoDireita(ctx, logo, client, layout) {
   ctx.save();
-  ctx.shadowColor = "rgba(17,24,39,.16)";
-  ctx.shadowBlur = 18;
+  ctx.shadowColor = "rgba(17,24,39,.34)";
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 10;
   ctx.fillStyle = "#fff";
   ctx.beginPath();
   ctx.arc(815, 130, 84, 0, Math.PI * 2);
@@ -6835,14 +6895,12 @@ function desenharLogoPromoDireita(ctx, logo, client, layout) {
   }
   ctx.fillStyle = layout.dark;
   ctx.textAlign = "center";
-  ctx.font = "700 14px Arial";
-  ctx.fillText("NOME DA SUA", 815, 230);
-  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 815, 238, 390, 2, {
-    tamanho: 30,
+  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 815, 220, 400, 2, {
+    tamanho: 31,
     minimo: 17,
-    lineHeight: 30,
+    lineHeight: 31,
     align: "center",
-    blockHeight: 62
+    blockHeight: 72
   });
 }
 
@@ -6863,35 +6921,35 @@ function desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo,
     familia: '"Arial Narrow", Arial, sans-serif'
   });
   ctx.fillStyle = layout.dark;
-  desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 810, 444, 330, 2, {
+  desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 810, 425, 330, 2, {
     tamanho: 23,
     minimo: 14,
     lineHeight: 24,
     align: "center",
-    blockHeight: 52,
+    blockHeight: 62,
     peso: 800
   });
 
-  const priceGradient = ctx.createLinearGradient(625, 490, 1010, 650);
+  const priceGradient = ctx.createLinearGradient(625, 510, 1010, 670);
   priceGradient.addColorStop(0, layout.primary);
   priceGradient.addColorStop(1, layout.primaryDark);
-  preencherRoundRect(ctx, 625, 490, 385, 160, 40, priceGradient);
-  desenharBordaTracejadaPromo(ctx, 640, 505, 355, 130, 29, "rgba(255,255,255,.92)", 3);
+  preencherRoundRect(ctx, 625, 510, 385, 160, 40, priceGradient);
+  desenharBordaTracejadaPromo(ctx, 640, 525, 355, 130, 29, "rgba(255,255,255,.92)", 3);
   ctx.fillStyle = "#fff";
   if (price.consulta) {
     ctx.textAlign = "center";
     fonteQueCabeCanvas(ctx, "CONSULTE", 900, 52, 30, 310);
-    ctx.fillText("CONSULTE", 817, 592);
+    ctx.fillText("CONSULTE", 817, 612);
   } else {
     ctx.textAlign = "left";
     ctx.font = "900 32px Arial";
-    ctx.fillText("R$", 660, 590);
+    ctx.fillText("R$", 660, 610);
     ctx.textAlign = "right";
     fonteQueCabeCanvas(ctx, price.inteiro, 900, 70, 40, 230);
-    ctx.fillText(price.inteiro, 910, 603);
+    ctx.fillText(price.inteiro, 910, 623);
     ctx.textAlign = "left";
     ctx.font = "900 29px Arial";
-    ctx.fillText(price.centavos, 914, 578);
+    ctx.fillText(price.centavos, 914, 598);
   }
   if (oldPrice) {
     const reduced = promocaoTeveReducao(promo);
@@ -6899,42 +6957,18 @@ function desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo,
     ctx.textAlign = "center";
     ctx.font = `${reduced ? 900 : 700} ${reduced ? 28 : 21}px Arial`;
     const oldText = `DE R$ ${oldPrice}`;
-    ctx.fillText(oldText, 817, 688);
+    ctx.fillText(oldText, 817, 714);
     const oldWidth = ctx.measureText(oldText).width;
     ctx.strokeStyle = layout.primary;
     ctx.lineWidth = reduced ? 5 : 4;
     ctx.beginPath();
-    ctx.moveTo(817 - oldWidth / 2, 679);
-    ctx.lineTo(817 + oldWidth / 2, 679);
+    ctx.moveTo(817 - oldWidth / 2, 705);
+    ctx.lineTo(817 + oldWidth / 2, 705);
     ctx.stroke();
   }
 
-  preencherRoundRect(ctx, 605, 706, 425, 76, 24, layout.primary);
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.arc(650, 744, 25, 0, Math.PI * 2);
-  ctx.fill();
-  desenharIconeWhatsappCanvas(ctx, 650, 744, layout.primary);
-  ctx.fillStyle = "#fff";
-  desenharTextoInteiroCanvas(ctx, options.whatsappText || "FALE CONOSCO PELO WHATSAPP", 695, 716, 305, 2, {
-    peso: 900,
-    tamanho: 19,
-    minimo: 14,
-    lineHeight: 21,
-    align: "left",
-    blockHeight: 56
-  });
   desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
-  ctx.fillStyle = layout.dark;
-  ctx.font = "900 22px Arial";
-  ctx.textAlign = "right";
-  const instagramRaw = String(client.instagram || "@seuinstagram").trim();
-  const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
-  ctx.fillText(`INSTAGRAM  ${instagram.startsWith("@") ? instagram : `@${instagram}`}`, 510, 972, 430);
-  ctx.textAlign = "left";
-  const phone = telefoneArteAdmin(client.whatsapp || client.contato || "") || "(00) 00000-0000";
-  ctx.fillText(`WHATSAPP  ${phone}`, 570, 972, 430);
-  if (siteLogo && layout.variant === 5) desenharImagemContain(ctx, siteLogo, 930, 992, 105, 60, 0, "rgba(255,255,255,0)");
+  desenharRodapeContatosPromo(ctx, client, layout, siteLogo);
 }
 
 function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layout, options = {}) {
@@ -6966,40 +7000,40 @@ function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layo
   ctx.lineTo(385, 478);
   ctx.stroke();
   ctx.fillStyle = layout.dark;
-  desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 245, 452, 250, 2, {
+  desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 245, 430, 280, 2, {
     tamanho: 21,
     minimo: 13,
     lineHeight: 21,
     align: "center",
-    blockHeight: 48,
+    blockHeight: 62,
     peso: 800
   });
 
-  const priceGradient = ctx.createLinearGradient(60, 515, 430, 688);
+  const priceGradient = ctx.createLinearGradient(60, 525, 430, 698);
   priceGradient.addColorStop(0, layout.primary);
   priceGradient.addColorStop(1, layout.primaryDark);
   ctx.save();
   ctx.shadowColor = "rgba(183,13,37,.28)";
   ctx.shadowBlur = 22;
   ctx.shadowOffsetY = 10;
-  preencherRoundRect(ctx, 60, 515, 370, 170, 40, priceGradient);
+  preencherRoundRect(ctx, 60, 525, 370, 170, 40, priceGradient);
   ctx.restore();
-  desenharBordaTracejadaPromo(ctx, 75, 530, 340, 140, 29, "rgba(255,255,255,.92)", 3);
+  desenharBordaTracejadaPromo(ctx, 75, 540, 340, 140, 29, "rgba(255,255,255,.92)", 3);
   ctx.fillStyle = "#fff";
   if (price.consulta) {
     ctx.textAlign = "center";
     fonteQueCabeCanvas(ctx, "CONSULTE", 900, 52, 30, 300);
-    ctx.fillText("CONSULTE", 245, 618);
+    ctx.fillText("CONSULTE", 245, 628);
   } else {
     ctx.textAlign = "left";
     ctx.font = "900 32px Arial";
-    ctx.fillText("R$", 92, 616);
+    ctx.fillText("R$", 92, 626);
     ctx.textAlign = "right";
     fonteQueCabeCanvas(ctx, price.inteiro, 900, 70, 40, 220);
-    ctx.fillText(price.inteiro, 340, 629);
+    ctx.fillText(price.inteiro, 340, 639);
     ctx.textAlign = "left";
     ctx.font = "900 29px Arial";
-    ctx.fillText(price.centavos, 342, 604);
+    ctx.fillText(price.centavos, 342, 614);
   }
   if (oldPrice) {
     const reduced = promocaoTeveReducao(promo);
@@ -7007,59 +7041,23 @@ function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layo
     ctx.textAlign = "center";
     ctx.font = `${reduced ? 900 : 700} ${reduced ? 28 : 21}px Arial`;
     const oldText = `DE R$ ${oldPrice}`;
-    ctx.fillText(oldText, 245, 721);
+    ctx.fillText(oldText, 245, 739);
     const oldWidth = ctx.measureText(oldText).width;
     ctx.strokeStyle = layout.primary;
     ctx.lineWidth = reduced ? 5 : 4;
     ctx.beginPath();
-    ctx.moveTo(245 - oldWidth / 2, 714);
-    ctx.lineTo(245 + oldWidth / 2, 714);
+    ctx.moveTo(245 - oldWidth / 2, 730);
+    ctx.lineTo(245 + oldWidth / 2, 730);
     ctx.stroke();
   } else {
     ctx.fillStyle = "#606369";
     ctx.textAlign = "center";
     ctx.font = "700 16px Arial";
-    ctx.fillText(promoValidadeArte(promo), 245, 718, 390);
+    ctx.fillText(promoValidadeArte(promo), 245, 738, 390);
   }
 
-  ctx.save();
-  ctx.shadowColor = "rgba(183,13,37,.24)";
-  ctx.shadowBlur = 18;
-  ctx.shadowOffsetY = 7;
-  preencherRoundRect(ctx, 555, 665, 450, 92, 26, layout.primary);
-  ctx.restore();
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.arc(610, 711, 29, 0, Math.PI * 2);
-  ctx.fill();
-  desenharIconeWhatsappCanvas(ctx, 610, 711, layout.primary);
-  ctx.fillStyle = "#fff";
-  desenharTextoInteiroCanvas(ctx, options.whatsappText || "FALE CONOSCO PELO WHATSAPP", 660, 682, 315, 2, {
-    peso: 900,
-    tamanho: 21,
-    minimo: 15,
-    lineHeight: 23,
-    align: "left",
-    blockHeight: 58
-  });
-
   desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
-  ctx.strokeStyle = layout.primary;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(530, 958);
-  ctx.lineTo(550, 958);
-  ctx.stroke();
-  const instagramRaw = String(client.instagram || "@seuinstagram").trim();
-  const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
-  ctx.fillStyle = layout.dark;
-  ctx.font = "900 22px Arial";
-  ctx.textAlign = "right";
-  ctx.fillText(`INSTAGRAM  ${instagram.startsWith("@") ? instagram : `@${instagram}`}`, 510, 966, 430);
-  ctx.textAlign = "left";
-  const phone = telefoneArteAdmin(client.whatsapp || client.contato || "") || "(00) 00000-0000";
-  ctx.fillText(`WHATSAPP  ${phone}`, 570, 966, 420);
-  if (siteLogo && layout.variant === 5) desenharImagemContain(ctx, siteLogo, 930, 988, 105, 60, 0, "rgba(255,255,255,0)");
+  desenharRodapeContatosPromo(ctx, client, layout, siteLogo);
 }
 
 function opcoesArtePromocao() {
@@ -7071,7 +7069,6 @@ function opcoesArtePromocao() {
   }));
   return {
     imageFit: $("promoArtImageFit")?.value || "cover",
-    whatsappText: $("promoArtWhatsappText")?.value.trim() || "FALE CONOSCO PELO WHATSAPP",
     benefits
   };
 }
@@ -7190,9 +7187,6 @@ function renderStaffPromocoesView() {
               <option value="cover">Preencher a moldura</option>
               <option value="contain">Mostrar imagem inteira</option>
             </select>
-          </label>
-          <label class="wide">Texto do botao WhatsApp
-            <input id="promoArtWhatsappText" value="FALE CONOSCO PELO WHATSAPP">
           </label>
           <div class="promo-art-benefit">
             <label class="check-row"><input id="promoArtBenefit1Enabled" type="checkbox" checked> Exibir beneficio 1</label>
