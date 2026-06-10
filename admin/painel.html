@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=283">
+  <link rel="stylesheet" href="painel.css?v=284">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -809,7 +809,7 @@
                 <p>Edite, inative ou remova anuncios.</p>
               </div>
             </div>
-            <div class="imovel-art-panel">
+            <div class="imovel-art-panel" data-permission="gerar_imagens_imoveis">
               <div>
                 <strong>Arte para Instagram</strong>
                 <span>Escolha um imovel e uma das 6 combinacoes de cores para baixar a imagem.</span>
@@ -830,7 +830,7 @@
               </label>
               <button id="generateImovelArtButton" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar imagem</button>
             </div>
-            <section id="imovelCsEditor" class="imovel-cs-editor hidden">
+            <section id="imovelCsEditor" class="imovel-cs-editor hidden" data-permission="gerar_imagens_imoveis">
               <div class="section-head compact">
                 <div>
                   <strong>Editar arte CS</strong>
@@ -1044,6 +1044,7 @@
                   <label><input type="checkbox" value="cardapio" checked> Cardapio</label>
                   <label><input type="checkbox" value="eventos"> Eventos</label>
                   <label><input type="checkbox" value="imoveis"> Imoveis</label>
+                  <label><input type="checkbox" value="gerar_imagens_imoveis"> Gerar imagens de imoveis</label>
                   <label><input type="checkbox" value="informacoes_nota_falecimento"> Nota de falecimento</label>
                 </div>
                 <div class="permission-group">
@@ -1053,6 +1054,7 @@
                   <label><input type="checkbox" value="faturas" checked> Faturas</label>
                   <label><input type="checkbox" value="imagens" checked> Imagens</label>
                   <label><input type="checkbox" value="promocoes" checked> Promocoes</label>
+                  <label><input type="checkbox" value="gerar_imagens_promocoes"> Gerar imagens de promocoes</label>
                   <label><input type="checkbox" value="relatorios"> Relatorios do cliente</label>
                   <label><input type="checkbox" value="vagas" checked> Vagas de trabalho</label>
                 </div>
@@ -1124,6 +1126,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=283"></script>
+  <script type="module" src="painel.js?v=284"></script>
 </body>
 </html>

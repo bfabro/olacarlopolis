@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 277,
-  label: "v283",
+  numero: 278,
+  label: "v284",
   data: "2026-06-10",
-  nota: "Gerador promocional liberado para clientes e logo opcional."
+  nota: "Permissoes independentes para geradores de imagens."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1204,7 +1204,7 @@ function setBusy(button, busy, text) {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -1258,7 +1258,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -1587,6 +1587,9 @@ function updateChrome() {
   });
   document.querySelectorAll("[data-permission='veiculos']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("veiculos"));
+  });
+  document.querySelectorAll("[data-permission='gerar_imagens_imoveis']").forEach((el) => {
+    el.classList.toggle("hidden", !hasPermission("gerar_imagens_imoveis"));
   });
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");
@@ -4884,7 +4887,7 @@ function preencherEditorCs(item, force = false) {
 }
 
 function atualizarVisibilidadeEditorCs(force = false) {
-  const isCs = $("imovelArteLayout")?.value === "cs";
+  const isCs = hasPermission("gerar_imagens_imoveis") && $("imovelArteLayout")?.value === "cs";
   $("imovelCsEditor")?.classList.toggle("hidden", !isCs);
   if (!isCs) return;
   const item = state.imoveis.find((imovel) => imovel.id === $("imovelArteItem")?.value && itemBelongsToCurrentClient(imovel));
@@ -4927,6 +4930,7 @@ function renderImovelArteOptions() {
 }
 
 async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, layoutKey = $("imovelArteLayout")?.value || "navyGold") {
+  if (!hasPermission("gerar_imagens_imoveis")) return showToast("A geracao de imagens de imoveis nao esta liberada para este usuario.");
   const item = state.imoveis.find((imovel) => imovel.id === imovelId && itemBelongsToCurrentClient(imovel));
   if (!item) return showToast("Selecione um imovel para gerar a arte.");
   const layout = IMOVEL_ARTE_LAYOUTS[layoutKey] || IMOVEL_ARTE_LAYOUTS.navyGold;
@@ -4998,7 +5002,7 @@ function renderImoveisList() {
       <div class="list-meta">${escapeHtml([item.corretor || item.clienteNome, item.telefone].filter(Boolean).join(" - ") || "Sem contato")}</div>
       <div class="list-meta">${escapeHtml(item.origemBase === "script.js" && item.origem !== "painel" ? "Base inicial do site" : "Firebase / Painel")}</div>
       <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
-      <button type="button" data-art-imovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte Instagram</button>
+      ${hasPermission("gerar_imagens_imoveis") ? `<button type="button" data-art-imovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte Instagram</button>` : ""}
       <button type="button" data-edit-imovel="${escapeAttr(item.id)}">Editar</button>
       <button type="button" class="danger" data-delete-imovel="${escapeAttr(item.id)}">Excluir</button>
     </article>
@@ -7083,6 +7087,7 @@ function opcoesArtePromocao(prefix = "promoArt", scope = document) {
 }
 
 async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "classico", options = null) {
+  if (!hasPermission("gerar_imagens_promocoes")) return showToast("A geracao de imagens de promocoes nao esta liberada para este usuario.");
   const client = state.clientes.find((item) => item.id === clientId);
   const promo = normalizePromocoes(client?.promocoes).find((item) => item.id === promoId);
   if (!client || !promo) return showToast("Selecione uma promocao para gerar a arte.");
@@ -7408,10 +7413,11 @@ function renderClientOnlyEditor() {
   const canEditVagas = hasPermission("vagas");
   const canEditCardapio = hasPermission("cardapio");
   const canEditPromocoes = hasPermission("promocoes");
+  const canGeneratePromoImages = hasPermission("gerar_imagens_promocoes");
   const canEditDestaque = hasPermission("destaque") || hasPermission("dados");
   const isRealEstateClient = clienteAssociadoImoveis(client, true);
   const canViewRelatorios = hasPermission("relatorios");
-  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditPromocoes || canEditDestaque;
+  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditPromocoes || canGeneratePromoImages || canEditDestaque;
   const hasAnyClientModule = hasAnyClientEditPermission || canViewRelatorios;
   let coPromoEditIndex = -1;
   let coJobEditIndex = -1;
@@ -7450,7 +7456,7 @@ function renderClientOnlyEditor() {
       label: "Negocio",
       items: [
         { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas },
-        { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes },
+        { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes || canGeneratePromoImages },
         { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque }
       ]
     },
@@ -7619,7 +7625,7 @@ function renderClientOnlyEditor() {
           </div>
         </section>
       ` : ""}
-      ${canEditPromocoes ? `
+      ${canEditPromocoes || canGeneratePromoImages ? `
         <section id="client-module-promocoes" class="wide upload-panel client-feature-card feature-promocoes client-module-panel">
           <div class="section-head compact feature-card-head">
             <div>
@@ -7629,6 +7635,7 @@ function renderClientOnlyEditor() {
             </div>
             <span id="coPromosCount" class="badge">${promocoes.length} ativa${promocoes.length === 1 ? "" : "s"}</span>
           </div>
+          ${canGeneratePromoImages ? `
           <section class="promo-art-generator client-promo-art-generator">
             <div class="section-head compact">
               <div>
@@ -7681,6 +7688,8 @@ function renderClientOnlyEditor() {
               </div>
             ` : `<div class="list-meta">Cadastre uma promocao para liberar a geracao da arte.</div>`}
           </section>
+          ` : ""}
+          ${canEditPromocoes ? `
           <div class="promo-admin-form">
             <label>Titulo da promocao<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
             <label>Preco atual<input id="coPromoPrice" placeholder="Ex.: 49,90"></label>
@@ -7714,6 +7723,7 @@ function renderClientOnlyEditor() {
           <div id="coPromosPreview" class="promo-admin-list">
             ${renderPromocoesMarkup(promocoes)}
           </div>
+          ` : ""}
         </section>
       ` : ""}
       ${canEditDestaque ? `
