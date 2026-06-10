@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 278,
-  label: "v284",
+  numero: 279,
+  label: "v285",
   data: "2026-06-10",
-  nota: "Permissoes independentes para geradores de imagens."
+  nota: "Validade da promocao e beneficios ajustados nas artes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6420,7 +6420,8 @@ function promoPrecoArte(valor) {
     : raw.replace(/^R\$\s*/i, "");
 }
 
-function promoValidadeArte(promo = {}) {
+function promoValidadeArte(promo = {}, validadeEditada = "") {
+  if (validadeEditada) return `VALIDA ATE ${formatDateBR(validadeEditada)}`;
   if (promo.validadeFim) return `VALIDA ATE ${formatDateBR(promo.validadeFim)}`;
   if (promo.validadeInicio) return `A PARTIR DE ${formatDateBR(promo.validadeInicio)}`;
   return "OFERTA POR TEMPO LIMITADO";
@@ -6793,17 +6794,17 @@ function desenharBeneficiosPromoNova(ctx, layout, benefits = []) {
     }
     ctx.fillStyle = layout.secondary;
     ctx.beginPath();
-    ctx.arc(x + 48, 868, 34, 0, Math.PI * 2);
+    ctx.arc(x + 48, 874, 34, 0, Math.PI * 2);
     ctx.fill();
-    desenharIconeBeneficioPromo(ctx, benefit.icon ?? index, x + 48, 868, layout.primary);
+    desenharIconeBeneficioPromo(ctx, benefit.icon ?? index, x + 48, 874, layout.primary);
     ctx.fillStyle = layout.dark;
-    desenharTextoPromoCanvas(ctx, benefit.title, x + 94, 824, blockWidth - 110, 1, {
+    desenharTextoPromoCanvas(ctx, benefit.title, x + 94, 838, blockWidth - 110, 1, {
       tamanho: 23,
       minimo: 15,
       lineHeight: 24
     });
     ctx.fillStyle = "#5f6368";
-    desenharTextoInteiroCanvas(ctx, benefit.text, x + 94, 856, blockWidth - 110, 3, {
+    desenharTextoInteiroCanvas(ctx, benefit.text, x + 94, 872, blockWidth - 110, 3, {
       peso: 600,
       tamanho: 17,
       minimo: 12,
@@ -6977,6 +6978,10 @@ function desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo,
     ctx.lineTo(817 + oldWidth / 2, 705);
     ctx.stroke();
   }
+  ctx.fillStyle = "#5f6368";
+  ctx.textAlign = "center";
+  ctx.font = "800 17px Arial";
+  ctx.fillText(promoValidadeArte(promo, options.validityDate), 817, oldPrice ? 758 : 720, 350);
 
   desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
   desenharRodapeContatosPromo(ctx, client, layout, siteLogo, options.showSiteLogo);
@@ -7060,12 +7065,11 @@ function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layo
     ctx.moveTo(245 - oldWidth / 2, 730);
     ctx.lineTo(245 + oldWidth / 2, 730);
     ctx.stroke();
-  } else {
-    ctx.fillStyle = "#606369";
-    ctx.textAlign = "center";
-    ctx.font = "700 16px Arial";
-    ctx.fillText(promoValidadeArte(promo), 245, 738, 390);
   }
+  ctx.fillStyle = "#606369";
+  ctx.textAlign = "center";
+  ctx.font = "800 17px Arial";
+  ctx.fillText(promoValidadeArte(promo, options.validityDate), 245, oldPrice ? 779 : 744, 390);
 
   desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
   desenharRodapeContatosPromo(ctx, client, layout, siteLogo, options.showSiteLogo);
@@ -7081,6 +7085,7 @@ function opcoesArtePromocao(prefix = "promoArt", scope = document) {
   }));
   return {
     imageFit: field("ImageFit")?.value || "cover",
+    validityDate: field("ValidityDate")?.value || "",
     showSiteLogo: Boolean(field("ShowSiteLogo")?.checked),
     benefits
   };
@@ -7202,6 +7207,9 @@ function renderStaffPromocoesView() {
               <option value="contain">Mostrar imagem inteira</option>
             </select>
           </label>
+          <label>Validade da promocao
+            <input id="promoArtValidityDate" type="date" value="${escapeAttr(promocoes.find((promo) => promo.id === state.selectedPromoArtId)?.validadeFim || "")}">
+          </label>
           <label class="check-row"><input id="promoArtShowSiteLogo" type="checkbox" checked> Exibir logo Ola Carlopolis</label>
           <div class="promo-art-benefit">
             <label class="check-row"><input id="promoArtBenefit1Enabled" type="checkbox" checked> Exibir beneficio 1</label>
@@ -7281,6 +7289,9 @@ function renderStaffPromocoesView() {
 
   mount.querySelector("#promoArtItem")?.addEventListener("change", (event) => {
     state.selectedPromoArtId = event.target.value;
+    const promo = promocoes.find((item) => item.id === event.target.value);
+    const validityField = mount.querySelector("#promoArtValidityDate");
+    if (validityField) validityField.value = promo?.validadeFim || "";
   });
 
   mount.querySelectorAll("[data-promo-layout]").forEach((button) => {
@@ -7673,6 +7684,9 @@ function renderClientOnlyEditor() {
                     <option value="contain">Mostrar imagem inteira</option>
                   </select>
                 </label>
+                <label>Validade da promocao
+                  <input id="coPromoArtValidityDate" type="date" value="${escapeAttr(promocoes[0]?.validadeFim || "")}">
+                </label>
                 <label class="check-row"><input id="coPromoArtShowSiteLogo" type="checkbox" checked> Exibir logo Ola Carlopolis</label>
                 ${[
                   ["QUALIDADE", "Produtos de qualidade que voce confia."],
@@ -7988,6 +8002,11 @@ function renderClientOnlyEditor() {
     mount.querySelectorAll("[data-co-promo-layout]").forEach((item) => {
       item.classList.toggle("active", item.dataset.coPromoLayout === event.target.value);
     });
+  });
+  mount.querySelector("#coPromoArtItem")?.addEventListener("change", (event) => {
+    const promo = promocoes.find((item) => item.id === event.target.value);
+    const validityField = mount.querySelector("#coPromoArtValidityDate");
+    if (validityField) validityField.value = promo?.validadeFim || "";
   });
   mount.querySelector("#coGeneratePromoArtButton")?.addEventListener("click", () => {
     gerarArteInstagramPromocao(
