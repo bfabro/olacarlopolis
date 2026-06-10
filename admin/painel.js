@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 268,
-  label: "v274",
+  numero: 269,
+  label: "v275",
   data: "2026-06-10",
-  nota: "Cards do corretor, caracteristicas e preco do modelo CS."
+  nota: "Refinamentos de texto e do card do corretor no modelo CS."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4362,30 +4362,39 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.fill();
 
   ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,.22)";
-  ctx.shadowBlur = 18;
-  preencherRoundRect(ctx, 700, 28, 350, 174, 24, "rgba(245,238,222,.9)");
+  ctx.shadowColor = "rgba(0,0,0,.32)";
+  ctx.shadowBlur = 22;
+  ctx.shadowOffsetY = 8;
+  preencherRoundRect(ctx, 690, 24, 366, 186, 24, "rgba(245,238,222,.92)");
   ctx.restore();
-  desenharBordaRoundRect(ctx, 700, 28, 350, 174, 24, "rgba(255,255,255,.72)", 2);
-  desenharImagemCover(ctx, logo, 718, 46, 116, 116, 18);
+  desenharBordaRoundRect(ctx, 690, 24, 366, 186, 24, "rgba(255,255,255,.78)", 2);
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.3)";
+  ctx.shadowBlur = 13;
+  ctx.shadowOffsetY = 5;
+  preencherRoundRect(ctx, 708, 42, 136, 146, 18, "#ffffff");
+  ctx.restore();
+  desenharImagemCover(ctx, logo, 714, 48, 124, 134, 14);
+  desenharBordaRoundRect(ctx, 708, 42, 136, 146, 18, "rgba(227,6,19,.34)", 2);
   ctx.fillStyle = "#171717";
-  desenharTextoInteiroCanvas(ctx, broker, 858, 45, 170, 2, {
-    peso: 900,
-    tamanho: 25,
-    minimo: 14,
-    lineHeight: 24,
+  desenharTextoInteiroCanvas(ctx, broker, 864, 44, 172, 3, {
+    peso: 800,
+    tamanho: 23,
+    minimo: 13,
+    lineHeight: 22,
+    familia: '"Arial Narrow", Arial, sans-serif',
     align: "left",
-    blockHeight: 54
+    blockHeight: 62
   });
   ctx.fillStyle = red;
-  ctx.fillRect(858, 107, 168, 3);
+  ctx.fillRect(864, 112, 170, 3);
   ctx.fillStyle = "#353535";
   ctx.textAlign = "left";
-  ctx.font = "800 14px Arial";
-  ctx.fillText(brokerRole, 858, 133);
+  ctx.font = '700 13px "Arial Narrow", Arial, sans-serif';
+  ctx.fillText(brokerRole, 864, 138);
   if (creci) {
-    fonteQueCabeCanvas(ctx, creci, 800, 13, 10, 168);
-    ctx.fillText(creci, 858, 155);
+    fonteQueCabeCanvas(ctx, creci, 700, 13, 10, 170, '"Arial Narrow", Arial, sans-serif');
+    ctx.fillText(creci, 864, 161);
   }
 
   ctx.textAlign = "left";
@@ -4406,7 +4415,7 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.lineTo(520, 270);
   ctx.stroke();
   ctx.fillStyle = options.messageColor || "#d7d7d7";
-  desenharTextoInteiroCanvas(ctx, options.message || "Conforto, espaco e qualidade para sua familia!", 68, 290, 500, 2, {
+  desenharTextoInteiroCanvas(ctx, options.message || "Conforto, espaco e qualidade para sua familia!", 68, 306, 500, 2, {
     peso: 700,
     tamanho: 28,
     minimo: 18,
@@ -4799,8 +4808,13 @@ function caracteristicasEditaveisCs(item = {}) {
     if (text === undefined || text === null || String(text).trim() === "") return;
     list.push({ id, label, text: String(text), icon });
   };
+  const suiteValue = String(item.suite ?? "").trim();
+  const semSuite = /^(0|n[aã]o|nao|sem)$/i.test(suiteValue);
+  const suiteText = suiteValue
+    ? (semSuite ? "SEM SU\u00cdTE" : `${suiteValue} suite${Number(suiteValue) === 1 ? "" : "s"}`)
+    : "";
   add("quartos", "Dormitorios", item.quartos ? `${item.quartos} dormitorio${Number(item.quartos) === 1 ? "" : "s"}` : "", "Q");
-  add("suite", "Suites", item.suite ? `${item.suite} suite${Number(item.suite) === 1 ? "" : "s"}` : "", "S");
+  add("suite", "Suites", suiteText, "S");
   add("banheiros", "Banheiros", item.banheiros ? `${item.banheiros} banheiro${Number(item.banheiros) === 1 ? "" : "s"}` : "", "B");
   add("vagas", "Vagas", item.vagas ? `${item.vagas} vaga${Number(item.vagas) === 1 ? "" : "s"}` : "", "V");
   add("construcao", "Area construida", item.construcao ? `${item.construcao} m2 de area construida` : "", "AC");
