@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=277">
+  <link rel="stylesheet" href="painel.css?v=278">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -45,18 +45,33 @@
 
       <nav class="nav-admin">
         <button data-view="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
-        <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
-        <button data-view="promocoesClientes" data-role="staff"><i class="fa-solid fa-tags"></i> Promocoes</button>
-        <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
-        <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
-        <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
-        <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
-        <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
-        <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
-        <button data-view="relatorios" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorios</button>
+        <section class="nav-admin-group" data-role="staff">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-database"></i> Cadastros</span>
+          <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
+          <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
+          <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
+        </section>
+        <section class="nav-admin-group" data-role="staff">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-bullhorn"></i> Conteudo</span>
+          <button data-view="promocoesClientes" data-role="staff"><i class="fa-solid fa-tags"></i> Promocoes</button>
+          <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
+          <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
+        </section>
+        <section class="nav-admin-group" data-role="staff">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-rectangle-list"></i> Classificados</span>
+          <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
+          <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
+        </section>
+        <section class="nav-admin-group" data-role="staff">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestao</span>
+          <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
+          <button data-view="relatorios" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorios</button>
+        </section>
+        <section class="nav-admin-group" data-master="true">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Sistema</span>
         <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
-        <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
-        <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
+          <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
+        </section>
         <button data-view="minhaEmpresa" data-role="cliente" data-client-root-nav="true"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
         <div id="clientModuleSidebar" class="client-module-sidebar hidden" data-role="cliente"></div>
         <button data-view="faturas" data-role="cliente" data-permission="faturas"><i class="fa-solid fa-qrcode"></i> Faturas</button>
@@ -1109,6 +1124,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=277"></script>
+  <script type="module" src="painel.js?v=278"></script>
 </body>
 </html>

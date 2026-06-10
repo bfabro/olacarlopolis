@@ -434,7 +434,9 @@ button[type="submit"]:hover,
   gap: 20px;
   position: sticky;
   top: 0;
+  height: 100vh;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 .admin-sidebar-overlay {
@@ -488,8 +490,49 @@ button[type="submit"]:hover,
 }
 
 .nav-admin {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, .22) transparent;
+}
+
+.nav-admin::-webkit-scrollbar {
+  width: 5px;
+}
+
+.nav-admin::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .22);
+}
+
+.nav-admin-group {
+  display: grid;
+  gap: 4px;
+  margin-top: 5px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, .09);
+}
+
+.nav-admin-group-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px 5px;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.nav-admin-group-title i {
+  width: 13px;
+  color: #60a5fa;
+  text-align: center;
 }
 
 .nav-admin button,
@@ -511,6 +554,7 @@ button[type="submit"]:hover,
   background: transparent;
   color: #e5e7eb;
   text-align: left;
+  width: 100%;
 }
 
 .nav-admin button.active,

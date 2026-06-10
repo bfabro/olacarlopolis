@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 271,
-  label: "v277",
+  numero: 272,
+  label: "v278",
   data: "2026-06-10",
-  nota: "Campo opcional de CRECI para clientes associados a imoveis."
+  nota: "Menu lateral administrativo organizado por categorias."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
