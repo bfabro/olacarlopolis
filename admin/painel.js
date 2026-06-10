@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 274,
-  label: "v280",
+  numero: 275,
+  label: "v281",
   data: "2026-06-10",
-  nota: "Novos modelos profissionais para artes de promocoes."
+  nota: "Modelos de promocao com cores e composicoes distintas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6395,12 +6395,12 @@ async function uploadHomeBannerImages(files) {
 }
 
 const PROMO_ARTE_LAYOUTS = {
-  classico: { nome: "Classico", primary: "#e7192d", primaryDark: "#b80f20", secondary: "#fde9ec", dark: "#202124", variant: 0 },
-  elegante: { nome: "Elegante", primary: "#c8102e", primaryDark: "#85091d", secondary: "#f8e6ea", dark: "#171717", variant: 1 },
-  moderno: { nome: "Moderno", primary: "#f21d3b", primaryDark: "#b70d25", secondary: "#ffe7ec", dark: "#26262a", variant: 2 },
-  comercial: { nome: "Comercial", primary: "#df0b24", primaryDark: "#a30418", secondary: "#fbe3e7", dark: "#111318", variant: 3 },
-  suave: { nome: "Suave", primary: "#d9273e", primaryDark: "#9e1729", secondary: "#fceef0", dark: "#2c292a", variant: 4 },
-  destaque: { nome: "Destaque", primary: "#f0002f", primaryDark: "#a90021", secondary: "#ffe1e8", dark: "#141414", variant: 5 }
+  classico: { nome: "Classico", primary: "#e7192d", primaryDark: "#a90d1d", secondary: "#fde9ec", dark: "#202124", variant: 0 },
+  elegante: { nome: "Elegante", primary: "#b58a21", primaryDark: "#71520b", secondary: "#f7efd7", dark: "#171717", variant: 1 },
+  moderno: { nome: "Moderno", primary: "#2166d1", primaryDark: "#123b82", secondary: "#e4edff", dark: "#162033", variant: 2 },
+  comercial: { nome: "Comercial", primary: "#f05a18", primaryDark: "#aa3105", secondary: "#ffeadf", dark: "#201815", variant: 3 },
+  suave: { nome: "Suave", primary: "#138a72", primaryDark: "#075848", secondary: "#def5ef", dark: "#15332c", variant: 4 },
+  destaque: { nome: "Destaque", primary: "#7c3aed", primaryDark: "#4c1d95", secondary: "#eee5ff", dark: "#25143d", variant: 5 }
 };
 
 function promoImagemPrincipalAdmin(promo = {}, client = {}) {
@@ -6627,38 +6627,38 @@ function desenharLogoPromoNova(ctx, logo, client, layout) {
   ctx.shadowBlur = 16;
   ctx.fillStyle = "#fff";
   ctx.beginPath();
-  ctx.arc(245, 122, 69, 0, Math.PI * 2);
+  ctx.arc(245, 125, 84, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
   ctx.strokeStyle = layout.primary;
   ctx.lineWidth = 5;
   ctx.beginPath();
-  ctx.arc(245, 122, 69, 0, Math.PI * 2);
+  ctx.arc(245, 125, 84, 0, Math.PI * 2);
   ctx.stroke();
   if (logo) {
     ctx.save();
     ctx.beginPath();
-    ctx.arc(245, 122, 59, 0, Math.PI * 2);
+    ctx.arc(245, 125, 74, 0, Math.PI * 2);
     ctx.clip();
-    desenharImagemContain(ctx, logo, 186, 63, 118, 118, 0, "#fff");
+    desenharImagemContain(ctx, logo, 171, 51, 148, 148, 0, "#fff");
     ctx.restore();
   } else {
     ctx.strokeStyle = layout.primary;
     ctx.lineWidth = 4;
-    ctx.strokeRect(220, 108, 50, 38);
+    ctx.strokeRect(215, 108, 60, 44);
     ctx.beginPath();
-    ctx.arc(245, 108, 14, Math.PI, 0);
+    ctx.arc(245, 108, 17, Math.PI, 0);
     ctx.stroke();
     ctx.fillStyle = layout.dark;
     ctx.textAlign = "center";
     ctx.font = "800 11px Arial";
-    ctx.fillText("SUA LOGO AQUI", 245, 169);
+    ctx.fillText("SUA LOGO AQUI", 245, 184);
   }
   ctx.fillStyle = layout.dark;
   ctx.textAlign = "center";
   ctx.font = "700 14px Arial";
-  ctx.fillText("NOME DA SUA", 245, 211);
-  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 245, 219, 360, 2, {
+  ctx.fillText("NOME DA SUA", 245, 225);
+  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 245, 234, 360, 2, {
     tamanho: 29,
     minimo: 17,
     lineHeight: 29,
@@ -6668,22 +6668,27 @@ function desenharLogoPromoNova(ctx, logo, client, layout) {
   ctx.strokeStyle = layout.primary;
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(130, 291);
-  ctx.lineTo(220, 291);
-  ctx.moveTo(270, 291);
-  ctx.lineTo(360, 291);
+  ctx.moveTo(130, 305);
+  ctx.lineTo(220, 305);
+  ctx.moveTo(270, 305);
+  ctx.lineTo(360, 305);
   ctx.stroke();
   ctx.fillStyle = layout.primary;
   ctx.beginPath();
-  ctx.arc(245, 291, 6, 0, Math.PI * 2);
+  ctx.arc(245, 305, 6, 0, Math.PI * 2);
   ctx.fill();
 }
 
 function desenharImagemPromoNova(ctx, foto, layout, fit = "cover") {
-  const x = 535;
-  const y = 120;
-  const w = 500;
-  const h = 625;
+  const geometries = [
+    [535, 120, 500, 625],
+    [45, 120, 500, 625],
+    [575, 82, 450, 665],
+    [22, 165, 525, 580],
+    [515, 155, 520, 590],
+    [72, 88, 455, 660]
+  ];
+  const [x, y, w, h] = geometries[layout.variant] || geometries[0];
   ctx.save();
   ctx.shadowColor = "rgba(17,24,39,.22)";
   ctx.shadowBlur = layout.variant % 2 ? 30 : 22;
@@ -6698,21 +6703,23 @@ function desenharImagemPromoNova(ctx, foto, layout, fit = "cover") {
   }
   ctx.strokeStyle = layout.primary;
   ctx.lineWidth = 5;
-  ctx.strokeRect(710, 335, 150, 118);
+  const centerX = x + w / 2;
+  const centerY = y + h / 2;
+  ctx.strokeRect(centerX - 75, centerY - 75, 150, 118);
   ctx.beginPath();
-  ctx.arc(822, 370, 18, 0, Math.PI * 2);
+  ctx.arc(centerX + 37, centerY - 40, 18, 0, Math.PI * 2);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(722, 435);
-  ctx.lineTo(766, 390);
-  ctx.lineTo(802, 422);
-  ctx.lineTo(835, 392);
-  ctx.lineTo(850, 435);
+  ctx.moveTo(centerX - 63, centerY + 25);
+  ctx.lineTo(centerX - 19, centerY - 20);
+  ctx.lineTo(centerX + 17, centerY + 12);
+  ctx.lineTo(centerX + 50, centerY - 18);
+  ctx.lineTo(centerX + 65, centerY + 25);
   ctx.stroke();
   ctx.fillStyle = layout.dark;
   ctx.textAlign = "center";
   ctx.font = "800 21px Arial";
-  ctx.fillText("SUA IMAGEM AQUI", 785, 500);
+  ctx.fillText("SUA IMAGEM AQUI", centerX, centerY + 90);
 }
 
 function desenharIconeBeneficioPromo(ctx, type, cx, cy, color) {
@@ -6764,7 +6771,7 @@ function desenharIconeBeneficioPromo(ctx, type, cx, cy, color) {
 function desenharBeneficiosPromoNova(ctx, layout, benefits = []) {
   const visible = benefits.filter((item) => item?.enabled !== false && String(item?.title || item?.text || "").trim());
   if (!visible.length) return;
-  preencherRoundRect(ctx, 34, 785, 1012, 145, 22, "rgba(255,255,255,.94)");
+  preencherRoundRect(ctx, 34, 805, 1012, 135, 22, "rgba(255,255,255,.94)");
   const blockWidth = 980 / visible.length;
   visible.forEach((benefit, index) => {
     const x = 50 + index * blockWidth;
@@ -6772,33 +6779,169 @@ function desenharBeneficiosPromoNova(ctx, layout, benefits = []) {
       ctx.strokeStyle = "#d5d7db";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(x, 804);
-      ctx.lineTo(x, 908);
+      ctx.moveTo(x, 820);
+      ctx.lineTo(x, 922);
       ctx.stroke();
     }
     ctx.fillStyle = layout.secondary;
     ctx.beginPath();
-    ctx.arc(x + 48, 850, 34, 0, Math.PI * 2);
+    ctx.arc(x + 48, 868, 34, 0, Math.PI * 2);
     ctx.fill();
-    desenharIconeBeneficioPromo(ctx, benefit.icon ?? index, x + 48, 850, layout.primary);
+    desenharIconeBeneficioPromo(ctx, benefit.icon ?? index, x + 48, 868, layout.primary);
     ctx.fillStyle = layout.dark;
-    desenharTextoPromoCanvas(ctx, benefit.title, x + 94, 808, blockWidth - 110, 1, {
-      tamanho: 19,
-      minimo: 12,
-      lineHeight: 21
+    desenharTextoPromoCanvas(ctx, benefit.title, x + 94, 824, blockWidth - 110, 1, {
+      tamanho: 23,
+      minimo: 15,
+      lineHeight: 24
     });
     ctx.fillStyle = "#5f6368";
-    desenharTextoInteiroCanvas(ctx, benefit.text, x + 94, 840, blockWidth - 110, 3, {
+    desenharTextoInteiroCanvas(ctx, benefit.text, x + 94, 856, blockWidth - 110, 3, {
       peso: 600,
-      tamanho: 14,
-      minimo: 10,
-      lineHeight: 17,
+      tamanho: 17,
+      minimo: 12,
+      lineHeight: 19,
       align: "left"
     });
   });
 }
 
+function promocaoTeveReducao(promo = {}) {
+  const atual = numberFromMoney(promo.preco || "");
+  const antigo = numberFromMoney(promo.precoAntigo || "");
+  return atual > 0 && antigo > atual;
+}
+
+function desenharLogoPromoDireita(ctx, logo, client, layout) {
+  ctx.save();
+  ctx.shadowColor = "rgba(17,24,39,.16)";
+  ctx.shadowBlur = 18;
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(815, 130, 84, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = layout.primary;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.arc(815, 130, 84, 0, Math.PI * 2);
+  ctx.stroke();
+  if (logo) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(815, 130, 74, 0, Math.PI * 2);
+    ctx.clip();
+    desenharImagemContain(ctx, logo, 741, 56, 148, 148, 0, "#fff");
+    ctx.restore();
+  }
+  ctx.fillStyle = layout.dark;
+  ctx.textAlign = "center";
+  ctx.font = "700 14px Arial";
+  ctx.fillText("NOME DA SUA", 815, 230);
+  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 815, 238, 390, 2, {
+    tamanho: 30,
+    minimo: 17,
+    lineHeight: 30,
+    align: "center",
+    blockHeight: 62
+  });
+}
+
+function desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo, layout, options = {}) {
+  const price = promoPrecoPartes(promo.preco);
+  const oldPrice = promo.precoAntigo ? promoPrecoArte(promo.precoAntigo) : "";
+  desenharDecoracaoPromoNova(ctx, layout);
+  desenharImagemPromoNova(ctx, foto, layout, options.imageFit || "cover");
+  desenharLogoPromoDireita(ctx, logo, client, layout);
+
+  ctx.fillStyle = layout.primary;
+  desenharTextoPromoCanvas(ctx, "PROMOCAO", 810, 330, 420, 2, {
+    tamanho: 59,
+    minimo: 35,
+    lineHeight: 59,
+    align: "center",
+    blockHeight: 102,
+    familia: '"Arial Narrow", Arial, sans-serif'
+  });
+  ctx.fillStyle = layout.dark;
+  desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 810, 444, 330, 2, {
+    tamanho: 23,
+    minimo: 14,
+    lineHeight: 24,
+    align: "center",
+    blockHeight: 52,
+    peso: 800
+  });
+
+  const priceGradient = ctx.createLinearGradient(625, 490, 1010, 650);
+  priceGradient.addColorStop(0, layout.primary);
+  priceGradient.addColorStop(1, layout.primaryDark);
+  preencherRoundRect(ctx, 625, 490, 385, 160, 40, priceGradient);
+  desenharBordaTracejadaPromo(ctx, 640, 505, 355, 130, 29, "rgba(255,255,255,.92)", 3);
+  ctx.fillStyle = "#fff";
+  if (price.consulta) {
+    ctx.textAlign = "center";
+    fonteQueCabeCanvas(ctx, "CONSULTE", 900, 52, 30, 310);
+    ctx.fillText("CONSULTE", 817, 592);
+  } else {
+    ctx.textAlign = "left";
+    ctx.font = "900 32px Arial";
+    ctx.fillText("R$", 660, 590);
+    ctx.textAlign = "right";
+    fonteQueCabeCanvas(ctx, price.inteiro, 900, 70, 40, 230);
+    ctx.fillText(price.inteiro, 910, 603);
+    ctx.textAlign = "left";
+    ctx.font = "900 29px Arial";
+    ctx.fillText(price.centavos, 914, 578);
+  }
+  if (oldPrice) {
+    const reduced = promocaoTeveReducao(promo);
+    ctx.fillStyle = layout.dark;
+    ctx.textAlign = "center";
+    ctx.font = `${reduced ? 900 : 700} ${reduced ? 28 : 21}px Arial`;
+    const oldText = `DE R$ ${oldPrice}`;
+    ctx.fillText(oldText, 817, 688);
+    const oldWidth = ctx.measureText(oldText).width;
+    ctx.strokeStyle = layout.primary;
+    ctx.lineWidth = reduced ? 5 : 4;
+    ctx.beginPath();
+    ctx.moveTo(817 - oldWidth / 2, 679);
+    ctx.lineTo(817 + oldWidth / 2, 679);
+    ctx.stroke();
+  }
+
+  preencherRoundRect(ctx, 605, 706, 425, 76, 24, layout.primary);
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(650, 744, 25, 0, Math.PI * 2);
+  ctx.fill();
+  desenharIconeWhatsappCanvas(ctx, 650, 744, layout.primary);
+  ctx.fillStyle = "#fff";
+  desenharTextoInteiroCanvas(ctx, options.whatsappText || "FALE CONOSCO PELO WHATSAPP", 695, 716, 305, 2, {
+    peso: 900,
+    tamanho: 19,
+    minimo: 14,
+    lineHeight: 21,
+    align: "left",
+    blockHeight: 56
+  });
+  desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
+  ctx.fillStyle = layout.dark;
+  ctx.font = "900 22px Arial";
+  ctx.textAlign = "right";
+  const instagramRaw = String(client.instagram || "@seuinstagram").trim();
+  const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
+  ctx.fillText(`INSTAGRAM  ${instagram.startsWith("@") ? instagram : `@${instagram}`}`, 510, 972, 430);
+  ctx.textAlign = "left";
+  const phone = telefoneArteAdmin(client.whatsapp || client.contato || "") || "(00) 00000-0000";
+  ctx.fillText(`WHATSAPP  ${phone}`, 570, 972, 430);
+  if (siteLogo && layout.variant === 5) desenharImagemContain(ctx, siteLogo, 930, 992, 105, 60, 0, "rgba(255,255,255,0)");
+}
+
 function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layout, options = {}) {
+  if (layout.variant % 2 === 1) {
+    desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo, layout, options);
+    return;
+  }
   const price = promoPrecoPartes(promo.preco);
   const oldPrice = promo.precoAntigo ? promoPrecoArte(promo.precoAntigo) : "";
   desenharDecoracaoPromoNova(ctx, layout);
@@ -6859,14 +7002,15 @@ function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layo
     ctx.fillText(price.centavos, 342, 604);
   }
   if (oldPrice) {
+    const reduced = promocaoTeveReducao(promo);
     ctx.fillStyle = "#55585d";
     ctx.textAlign = "center";
-    ctx.font = "700 19px Arial";
+    ctx.font = `${reduced ? 900 : 700} ${reduced ? 28 : 21}px Arial`;
     const oldText = `DE R$ ${oldPrice}`;
     ctx.fillText(oldText, 245, 721);
     const oldWidth = ctx.measureText(oldText).width;
     ctx.strokeStyle = layout.primary;
-    ctx.lineWidth = 4;
+    ctx.lineWidth = reduced ? 5 : 4;
     ctx.beginPath();
     ctx.moveTo(245 - oldWidth / 2, 714);
     ctx.lineTo(245 + oldWidth / 2, 714);
@@ -6909,7 +7053,7 @@ function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layo
   const instagramRaw = String(client.instagram || "@seuinstagram").trim();
   const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
   ctx.fillStyle = layout.dark;
-  ctx.font = "800 18px Arial";
+  ctx.font = "900 22px Arial";
   ctx.textAlign = "right";
   ctx.fillText(`INSTAGRAM  ${instagram.startsWith("@") ? instagram : `@${instagram}`}`, 510, 966, 430);
   ctx.textAlign = "left";
