@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 270,
-  label: "v276",
+  numero: 271,
+  label: "v277",
   data: "2026-06-10",
-  nota: "Card de preco mais compacto e valor completo no modelo CS."
+  nota: "Campo opcional de CRECI para clientes associados a imoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -223,6 +223,21 @@ function isMasterEmail(email = state.user?.email || state.profile?.email || "") 
 
 function canManageClients() {
   return isMasterEmail() || ["master", "admin"].includes(currentRole());
+}
+
+function clienteAssociadoImoveis(client = {}, includeCurrentPermission = false) {
+  const category = normalizeName(client.categoria || client.category || client.categoriaId || "");
+  const categoryMatches = category.includes("imove") || category.includes("imobili");
+  const permissionMatches = includeCurrentPermission && Boolean(state.profile?.permissoes?.imoveis);
+  return categoryMatches || permissionMatches;
+}
+
+function atualizarVisibilidadeCreciCliente() {
+  const field = $("clientCreciField");
+  if (!field) return;
+  const category = $("clientNewCategory")?.value.trim() || $("clientCategory")?.value.trim() || "";
+  const currentClient = state.clientes.find((client) => client.id === state.selectedClientId) || {};
+  field.classList.toggle("hidden", !clienteAssociadoImoveis({ ...currentClient, categoria: category }));
 }
 
 function isMaster() {
@@ -1727,6 +1742,7 @@ function resetClientForm() {
   delete $("clientForm").dataset.originalName;
   $("clientId").value = "";
   if ($("clientType")) $("clientType").value = "comercio";
+  if ($("clientCreci")) $("clientCreci").value = "";
   if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = false;
   if ($("clientJobActive")) $("clientJobActive").checked = false;
   if ($("clientFeaturedWeeks")) $("clientFeaturedWeeks").value = "1";
@@ -1736,6 +1752,7 @@ function resetClientForm() {
     if ($(id)) $(id).value = "";
   });
   fillClientCategorySelect();
+  atualizarVisibilidadeCreciCliente();
   $("deleteClientButton").classList.add("hidden");
   renderProfilePreview("clientImage", "clientProfilePreview");
   renderScheduleEditor("clientScheduleEditor", emptySchedule());
@@ -1768,6 +1785,7 @@ function getClientFormData() {
     pagamentoStatus: $("clientPaymentStatus").value,
     contato: $("clientContact").value.trim(),
     whatsapp: $("clientWhatsapp").value.trim(),
+    creci: $("clientCreci")?.value.trim() || "",
     endereco: $("clientAddress").value.trim(),
     horario: horarioTexto,
     ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
@@ -1924,7 +1942,9 @@ function fillClientForm(client) {
   $("clientName").value = client.nome || client.name || "";
   fillClientCategorySelect(client.categoria || client.category || "");
   if ($("clientType")) $("clientType").value = client.tipoCliente || client.tipo || "comercio";
+  if ($("clientCreci")) $("clientCreci").value = client.creci || client.registroCreci || "";
   $("clientNewCategory").value = "";
+  atualizarVisibilidadeCreciCliente();
   $("clientStatus").value = client.status || "ativo";
   $("clientPaymentStatus").value = client.pagamentoStatus || "em_aberto";
   $("clientContact").value = client.contato || client.contact || "";
@@ -2844,6 +2864,7 @@ function fillClientCategorySelect(selectedName = "") {
     return `<option value="${escapeAttr(value)}" ${isSelected ? "selected" : ""}>${escapeHtml(prefix + value)}</option>`;
   });
   select.innerHTML = `<option value="">Selecione uma categoria</option>` + options.join("");
+  atualizarVisibilidadeCreciCliente();
 }
 
 function fillCategoryParentSelect(selectedId = "") {
@@ -6584,6 +6605,7 @@ function renderClientOnlyEditor() {
   const canEditCardapio = hasPermission("cardapio");
   const canEditPromocoes = hasPermission("promocoes");
   const canEditDestaque = hasPermission("destaque") || hasPermission("dados");
+  const isRealEstateClient = clienteAssociadoImoveis(client, true);
   const canViewRelatorios = hasPermission("relatorios");
   const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditPromocoes || canEditDestaque;
   const hasAnyClientModule = hasAnyClientEditPermission || canViewRelatorios;
@@ -6691,6 +6713,7 @@ function renderClientOnlyEditor() {
         <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
         <label class="admin-field-line field-phone">Telefone<input id="coContact" value="${escapeAttr(client.contato || "")}"></label>
         <label class="admin-field-line field-whatsapp">WhatsApp<input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></label>
+        ${isRealEstateClient ? `<label class="admin-field-line field-creci">CRECI (opcional)<input id="coCreci" value="${escapeAttr(client.creci || client.registroCreci || "")}" placeholder="Ex.: 38.105 F"></label>` : ""}
         
         
         <section class="wide schedule-panel">
@@ -7352,6 +7375,7 @@ function renderClientOnlyEditor() {
         nomeNormalizado: normalizeName(nome),
         contato: $("coContact").value.trim(),
         whatsapp: $("coWhatsapp").value.trim(),
+        ...(isRealEstateClient ? { creci: $("coCreci")?.value.trim() || "" } : {}),
         endereco: $("coAddress").value.trim(),
         horario: horarioTexto,
         ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
@@ -8475,6 +8499,8 @@ function bindEvents() {
     showToast("Cliente salvo.");
     resetClientForm();
   });
+  $("clientCategory")?.addEventListener("change", atualizarVisibilidadeCreciCliente);
+  $("clientNewCategory")?.addEventListener("input", atualizarVisibilidadeCreciCliente);
 
   $("categoryForm").addEventListener("submit", async (event) => {
     event.preventDefault();
