@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 273,
-  label: "v279",
+  numero: 274,
+  label: "v280",
   data: "2026-06-10",
-  nota: "Gerador de artes para promocoes com seis modelos."
+  nota: "Novos modelos profissionais para artes de promocoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6395,21 +6395,16 @@ async function uploadHomeBannerImages(files) {
 }
 
 const PROMO_ARTE_LAYOUTS = {
-  impacto: { nome: "Impacto", primary: "#ef233c", secondary: "#ffb703", dark: "#111318", light: "#ffffff", variant: 0 },
-  premium: { nome: "Premium", primary: "#c9a227", secondary: "#f4e7b2", dark: "#111111", light: "#ffffff", variant: 1 },
-  fresh: { nome: "Fresh", primary: "#0f9d75", secondary: "#dff7ef", dark: "#12372d", light: "#ffffff", variant: 2 },
-  pop: { nome: "Pop", primary: "#ff4d00", secondary: "#ffe600", dark: "#171717", light: "#ffffff", variant: 3 },
-  urbano: { nome: "Urbano", primary: "#2563eb", secondary: "#dbeafe", dark: "#101827", light: "#ffffff", variant: 4 },
-  local: { nome: "Local", primary: "#8b1e3f", secondary: "#f3d9a6", dark: "#26141a", light: "#ffffff", variant: 5 }
+  classico: { nome: "Classico", primary: "#e7192d", primaryDark: "#b80f20", secondary: "#fde9ec", dark: "#202124", variant: 0 },
+  elegante: { nome: "Elegante", primary: "#c8102e", primaryDark: "#85091d", secondary: "#f8e6ea", dark: "#171717", variant: 1 },
+  moderno: { nome: "Moderno", primary: "#f21d3b", primaryDark: "#b70d25", secondary: "#ffe7ec", dark: "#26262a", variant: 2 },
+  comercial: { nome: "Comercial", primary: "#df0b24", primaryDark: "#a30418", secondary: "#fbe3e7", dark: "#111318", variant: 3 },
+  suave: { nome: "Suave", primary: "#d9273e", primaryDark: "#9e1729", secondary: "#fceef0", dark: "#2c292a", variant: 4 },
+  destaque: { nome: "Destaque", primary: "#f0002f", primaryDark: "#a90021", secondary: "#ffe1e8", dark: "#141414", variant: 5 }
 };
 
 function promoImagemPrincipalAdmin(promo = {}, client = {}) {
-  return normalizarImagemArteAdmin(
-    promo.imagem ||
-    client.imagem ||
-    imageUrl(client.imagens?.[0]) ||
-    "../images/img_padrao_site/logo_1.png"
-  );
+  return normalizarImagemArteAdmin(promo.imagem || "");
 }
 
 function promoPrecoArte(valor) {
@@ -6576,11 +6571,372 @@ function desenharArtePromocao(ctx, promo, client, foto, logo, siteLogo, layout) 
   desenharRodapePromo(ctx, promo, client, layout, siteLogo);
 }
 
-async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "impacto") {
+function promoPrecoPartes(valor) {
+  const formatted = promoPrecoArte(valor);
+  if (formatted === "CONSULTE") return { inteiro: "CONSULTE", centavos: "", consulta: true };
+  const [inteiro, centavos = "00"] = formatted.split(",");
+  return { inteiro, centavos: `,${centavos}`, consulta: false };
+}
+
+function desenharBordaTracejadaPromo(ctx, x, y, w, h, radius, color, width = 3) {
+  ctx.save();
+  canvasRoundRect(ctx, x, y, w, h, radius);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.setLineDash([10, 8]);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function desenharDecoracaoPromoNova(ctx, layout) {
+  const bg = ctx.createLinearGradient(0, 0, 1080, 1080);
+  bg.addColorStop(0, "#ffffff");
+  bg.addColorStop(1, "#f1f2f4");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, 1080, 1080);
+  ctx.fillStyle = layout.primary;
+  ctx.beginPath();
+  ctx.moveTo(840, 0);
+  ctx.quadraticCurveTo(1060, 25, 1080, 250);
+  ctx.lineTo(1080, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(0, 780);
+  ctx.quadraticCurveTo(135, 920, 310, 1080);
+  ctx.lineTo(0, 1080);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = layout.dark;
+  ctx.beginPath();
+  ctx.moveTo(925, 1080);
+  ctx.lineTo(1080, 900);
+  ctx.lineTo(1080, 1080);
+  ctx.closePath();
+  ctx.fill();
+  [[48, 42], [72, 42], [96, 42], [992, 68], [1016, 68]].forEach(([x, y]) => {
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function desenharLogoPromoNova(ctx, logo, client, layout) {
+  ctx.save();
+  ctx.shadowColor = "rgba(17,24,39,.14)";
+  ctx.shadowBlur = 16;
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(245, 122, 69, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = layout.primary;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.arc(245, 122, 69, 0, Math.PI * 2);
+  ctx.stroke();
+  if (logo) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(245, 122, 59, 0, Math.PI * 2);
+    ctx.clip();
+    desenharImagemContain(ctx, logo, 186, 63, 118, 118, 0, "#fff");
+    ctx.restore();
+  } else {
+    ctx.strokeStyle = layout.primary;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(220, 108, 50, 38);
+    ctx.beginPath();
+    ctx.arc(245, 108, 14, Math.PI, 0);
+    ctx.stroke();
+    ctx.fillStyle = layout.dark;
+    ctx.textAlign = "center";
+    ctx.font = "800 11px Arial";
+    ctx.fillText("SUA LOGO AQUI", 245, 169);
+  }
+  ctx.fillStyle = layout.dark;
+  ctx.textAlign = "center";
+  ctx.font = "700 14px Arial";
+  ctx.fillText("NOME DA SUA", 245, 211);
+  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 245, 219, 360, 2, {
+    tamanho: 29,
+    minimo: 17,
+    lineHeight: 29,
+    align: "center",
+    blockHeight: 60
+  });
+  ctx.strokeStyle = layout.primary;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(130, 291);
+  ctx.lineTo(220, 291);
+  ctx.moveTo(270, 291);
+  ctx.lineTo(360, 291);
+  ctx.stroke();
+  ctx.fillStyle = layout.primary;
+  ctx.beginPath();
+  ctx.arc(245, 291, 6, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function desenharImagemPromoNova(ctx, foto, layout, fit = "cover") {
+  const x = 535;
+  const y = 120;
+  const w = 500;
+  const h = 625;
+  ctx.save();
+  ctx.shadowColor = "rgba(17,24,39,.22)";
+  ctx.shadowBlur = layout.variant % 2 ? 30 : 22;
+  ctx.shadowOffsetY = 14;
+  preencherRoundRect(ctx, x, y, w, h, 42, "#fff");
+  ctx.restore();
+  desenharBordaTracejadaPromo(ctx, x + 18, y + 18, w - 36, h - 36, 30, layout.primary, 3);
+  if (foto) {
+    if (fit === "contain") desenharImagemContain(ctx, foto, x + 32, y + 32, w - 64, h - 64, 24, "#f5f5f5");
+    else desenharImagemCover(ctx, foto, x + 32, y + 32, w - 64, h - 64, 24);
+    return;
+  }
+  ctx.strokeStyle = layout.primary;
+  ctx.lineWidth = 5;
+  ctx.strokeRect(710, 335, 150, 118);
+  ctx.beginPath();
+  ctx.arc(822, 370, 18, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(722, 435);
+  ctx.lineTo(766, 390);
+  ctx.lineTo(802, 422);
+  ctx.lineTo(835, 392);
+  ctx.lineTo(850, 435);
+  ctx.stroke();
+  ctx.fillStyle = layout.dark;
+  ctx.textAlign = "center";
+  ctx.font = "800 21px Arial";
+  ctx.fillText("SUA IMAGEM AQUI", 785, 500);
+}
+
+function desenharIconeBeneficioPromo(ctx, type, cx, cy, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  if (type === 0) {
+    ctx.beginPath();
+    ctx.arc(cx, cy - 4, 12, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - 7, cy + 7);
+    ctx.lineTo(cx - 10, cy + 21);
+    ctx.lineTo(cx, cy + 16);
+    ctx.lineTo(cx + 10, cy + 21);
+    ctx.lineTo(cx + 7, cy + 7);
+    ctx.stroke();
+  } else if (type === 1) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, 15, Math.PI, 0);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - 15, cy);
+    ctx.lineTo(cx - 15, cy + 13);
+    ctx.moveTo(cx + 15, cy);
+    ctx.lineTo(cx + 15, cy + 13);
+    ctx.lineTo(cx + 7, cy + 13);
+    ctx.stroke();
+  } else {
+    ctx.strokeRect(cx - 18, cy - 11, 25, 19);
+    ctx.beginPath();
+    ctx.moveTo(cx + 7, cy - 6);
+    ctx.lineTo(cx + 17, cy - 6);
+    ctx.lineTo(cx + 22, cy + 2);
+    ctx.lineTo(cx + 22, cy + 8);
+    ctx.lineTo(cx + 7, cy + 8);
+    ctx.stroke();
+    [cx - 10, cx + 15].forEach((wheelX) => {
+      ctx.beginPath();
+      ctx.arc(wheelX, cy + 12, 5, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+  }
+  ctx.restore();
+}
+
+function desenharBeneficiosPromoNova(ctx, layout, benefits = []) {
+  const visible = benefits.filter((item) => item?.enabled !== false && String(item?.title || item?.text || "").trim());
+  if (!visible.length) return;
+  preencherRoundRect(ctx, 34, 785, 1012, 145, 22, "rgba(255,255,255,.94)");
+  const blockWidth = 980 / visible.length;
+  visible.forEach((benefit, index) => {
+    const x = 50 + index * blockWidth;
+    if (index) {
+      ctx.strokeStyle = "#d5d7db";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, 804);
+      ctx.lineTo(x, 908);
+      ctx.stroke();
+    }
+    ctx.fillStyle = layout.secondary;
+    ctx.beginPath();
+    ctx.arc(x + 48, 850, 34, 0, Math.PI * 2);
+    ctx.fill();
+    desenharIconeBeneficioPromo(ctx, benefit.icon ?? index, x + 48, 850, layout.primary);
+    ctx.fillStyle = layout.dark;
+    desenharTextoPromoCanvas(ctx, benefit.title, x + 94, 808, blockWidth - 110, 1, {
+      tamanho: 19,
+      minimo: 12,
+      lineHeight: 21
+    });
+    ctx.fillStyle = "#5f6368";
+    desenharTextoInteiroCanvas(ctx, benefit.text, x + 94, 840, blockWidth - 110, 3, {
+      peso: 600,
+      tamanho: 14,
+      minimo: 10,
+      lineHeight: 17,
+      align: "left"
+    });
+  });
+}
+
+function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layout, options = {}) {
+  const price = promoPrecoPartes(promo.preco);
+  const oldPrice = promo.precoAntigo ? promoPrecoArte(promo.precoAntigo) : "";
+  desenharDecoracaoPromoNova(ctx, layout);
+  desenharLogoPromoNova(ctx, logo, client, layout);
+  desenharImagemPromoNova(ctx, foto, layout, options.imageFit || "cover");
+
+  ctx.fillStyle = layout.primary;
+  desenharTextoPromoCanvas(ctx, "PROMOCAO", 245, 330, 420, 2, {
+    tamanho: 61,
+    minimo: 36,
+    lineHeight: 60,
+    align: "center",
+    blockHeight: 105,
+    familia: '"Arial Narrow", Arial, sans-serif'
+  });
+  ctx.strokeStyle = layout.primary;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(105, 478);
+  ctx.lineTo(165, 478);
+  ctx.moveTo(325, 478);
+  ctx.lineTo(385, 478);
+  ctx.stroke();
+  ctx.fillStyle = layout.dark;
+  desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 245, 452, 250, 2, {
+    tamanho: 21,
+    minimo: 13,
+    lineHeight: 21,
+    align: "center",
+    blockHeight: 48,
+    peso: 800
+  });
+
+  const priceGradient = ctx.createLinearGradient(60, 515, 430, 688);
+  priceGradient.addColorStop(0, layout.primary);
+  priceGradient.addColorStop(1, layout.primaryDark);
+  ctx.save();
+  ctx.shadowColor = "rgba(183,13,37,.28)";
+  ctx.shadowBlur = 22;
+  ctx.shadowOffsetY = 10;
+  preencherRoundRect(ctx, 60, 515, 370, 170, 40, priceGradient);
+  ctx.restore();
+  desenharBordaTracejadaPromo(ctx, 75, 530, 340, 140, 29, "rgba(255,255,255,.92)", 3);
+  ctx.fillStyle = "#fff";
+  if (price.consulta) {
+    ctx.textAlign = "center";
+    fonteQueCabeCanvas(ctx, "CONSULTE", 900, 52, 30, 300);
+    ctx.fillText("CONSULTE", 245, 618);
+  } else {
+    ctx.textAlign = "left";
+    ctx.font = "900 32px Arial";
+    ctx.fillText("R$", 92, 616);
+    ctx.textAlign = "right";
+    fonteQueCabeCanvas(ctx, price.inteiro, 900, 70, 40, 220);
+    ctx.fillText(price.inteiro, 340, 629);
+    ctx.textAlign = "left";
+    ctx.font = "900 29px Arial";
+    ctx.fillText(price.centavos, 342, 604);
+  }
+  if (oldPrice) {
+    ctx.fillStyle = "#55585d";
+    ctx.textAlign = "center";
+    ctx.font = "700 19px Arial";
+    const oldText = `DE R$ ${oldPrice}`;
+    ctx.fillText(oldText, 245, 721);
+    const oldWidth = ctx.measureText(oldText).width;
+    ctx.strokeStyle = layout.primary;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(245 - oldWidth / 2, 714);
+    ctx.lineTo(245 + oldWidth / 2, 714);
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = "#606369";
+    ctx.textAlign = "center";
+    ctx.font = "700 16px Arial";
+    ctx.fillText(promoValidadeArte(promo), 245, 718, 390);
+  }
+
+  ctx.save();
+  ctx.shadowColor = "rgba(183,13,37,.24)";
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 7;
+  preencherRoundRect(ctx, 555, 665, 450, 92, 26, layout.primary);
+  ctx.restore();
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(610, 711, 29, 0, Math.PI * 2);
+  ctx.fill();
+  desenharIconeWhatsappCanvas(ctx, 610, 711, layout.primary);
+  ctx.fillStyle = "#fff";
+  desenharTextoInteiroCanvas(ctx, options.whatsappText || "FALE CONOSCO PELO WHATSAPP", 660, 682, 315, 2, {
+    peso: 900,
+    tamanho: 21,
+    minimo: 15,
+    lineHeight: 23,
+    align: "left",
+    blockHeight: 58
+  });
+
+  desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
+  ctx.strokeStyle = layout.primary;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(530, 958);
+  ctx.lineTo(550, 958);
+  ctx.stroke();
+  const instagramRaw = String(client.instagram || "@seuinstagram").trim();
+  const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
+  ctx.fillStyle = layout.dark;
+  ctx.font = "800 18px Arial";
+  ctx.textAlign = "right";
+  ctx.fillText(`INSTAGRAM  ${instagram.startsWith("@") ? instagram : `@${instagram}`}`, 510, 966, 430);
+  ctx.textAlign = "left";
+  const phone = telefoneArteAdmin(client.whatsapp || client.contato || "") || "(00) 00000-0000";
+  ctx.fillText(`WHATSAPP  ${phone}`, 570, 966, 420);
+  if (siteLogo && layout.variant === 5) desenharImagemContain(ctx, siteLogo, 930, 988, 105, 60, 0, "rgba(255,255,255,0)");
+}
+
+function opcoesArtePromocao() {
+  const benefits = [1, 2, 3].map((index) => ({
+    enabled: Boolean($(`promoArtBenefit${index}Enabled`)?.checked),
+    title: $(`promoArtBenefit${index}Title`)?.value.trim() || "",
+    text: $(`promoArtBenefit${index}Text`)?.value.trim() || "",
+    icon: index - 1
+  }));
+  return {
+    imageFit: $("promoArtImageFit")?.value || "cover",
+    whatsappText: $("promoArtWhatsappText")?.value.trim() || "FALE CONOSCO PELO WHATSAPP",
+    benefits
+  };
+}
+
+async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "classico") {
   const client = state.clientes.find((item) => item.id === clientId);
   const promo = normalizePromocoes(client?.promocoes).find((item) => item.id === promoId);
   if (!client || !promo) return showToast("Selecione uma promocao para gerar a arte.");
-  const layout = PROMO_ARTE_LAYOUTS[layoutKey] || PROMO_ARTE_LAYOUTS.impacto;
+  const layout = PROMO_ARTE_LAYOUTS[layoutKey] || PROMO_ARTE_LAYOUTS.classico;
   const button = $("generatePromoArtButton");
   if (button) button.disabled = true;
   showToast("Gerando arte da promocao...");
@@ -6590,12 +6946,11 @@ async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "impact
       carregarImagemCanvas(logoClienteImovelAdmin(client)),
       carregarImagemCanvas("../images/img_padrao_site/logo_1.png")
     ]);
-    if (!foto) return showToast("Nao foi possivel carregar a imagem da promocao.");
     const canvas = document.createElement("canvas");
     canvas.width = 1080;
     canvas.height = 1080;
     const ctx = canvas.getContext("2d");
-    desenharArtePromocao(ctx, promo, client, foto, logo, siteLogo, layout);
+    desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layout, opcoesArtePromocao());
     const blob = await canvasParaBlob(canvas);
     baixarBlobCanvas(blob, `arte-promocao-${slugify(client.nome || client.id)}-${slugify(promo.titulo)}-${layoutKey}.png`);
     showToast("Arte da promocao gerada.");
@@ -6685,6 +7040,32 @@ function renderStaffPromocoesView() {
             </button>
           `).join("")}
         </div>
+        <div class="promo-art-editor">
+          <label>Ajuste da imagem
+            <select id="promoArtImageFit">
+              <option value="cover">Preencher a moldura</option>
+              <option value="contain">Mostrar imagem inteira</option>
+            </select>
+          </label>
+          <label class="wide">Texto do botao WhatsApp
+            <input id="promoArtWhatsappText" value="FALE CONOSCO PELO WHATSAPP">
+          </label>
+          <div class="promo-art-benefit">
+            <label class="check-row"><input id="promoArtBenefit1Enabled" type="checkbox" checked> Exibir beneficio 1</label>
+            <input id="promoArtBenefit1Title" value="QUALIDADE" aria-label="Titulo do beneficio 1">
+            <textarea id="promoArtBenefit1Text" rows="2" aria-label="Texto do beneficio 1">Produtos de qualidade que voce confia.</textarea>
+          </div>
+          <div class="promo-art-benefit">
+            <label class="check-row"><input id="promoArtBenefit2Enabled" type="checkbox" checked> Exibir beneficio 2</label>
+            <input id="promoArtBenefit2Title" value="ATENDIMENTO" aria-label="Titulo do beneficio 2">
+            <textarea id="promoArtBenefit2Text" rows="2" aria-label="Texto do beneficio 2">Atendimento proximo e personalizado.</textarea>
+          </div>
+          <div class="promo-art-benefit">
+            <label class="check-row"><input id="promoArtBenefit3Enabled" type="checkbox" checked> Exibir beneficio 3</label>
+            <input id="promoArtBenefit3Title" value="ENTREGA RAPIDA" aria-label="Titulo do beneficio 3">
+            <textarea id="promoArtBenefit3Text" rows="2" aria-label="Texto do beneficio 3">Mais agilidade e seguranca para voce.</textarea>
+          </div>
+        </div>
       ` : `<div class="list-meta">Cadastre uma promocao para liberar a geracao da arte.</div>`}
     </section>
     <section class="panel-card staff-promos-panel">
@@ -6757,7 +7138,7 @@ function renderStaffPromocoesView() {
     });
   });
 
-  mount.querySelector("[data-promo-layout='impacto']")?.classList.add("active");
+  mount.querySelector("[data-promo-layout='classico']")?.classList.add("active");
   mount.querySelector("#promoArtLayout")?.addEventListener("change", (event) => {
     mount.querySelectorAll("[data-promo-layout]").forEach((item) => {
       item.classList.toggle("active", item.dataset.promoLayout === event.target.value);
@@ -6766,7 +7147,7 @@ function renderStaffPromocoesView() {
 
   mount.querySelector("#generatePromoArtButton")?.addEventListener("click", () => {
     const promoId = mount.querySelector("#promoArtItem")?.value || state.selectedPromoArtId;
-    const layoutKey = mount.querySelector("#promoArtLayout")?.value || "impacto";
+    const layoutKey = mount.querySelector("#promoArtLayout")?.value || "classico";
     gerarArteInstagramPromocao(selectedId, promoId, layoutKey);
   });
 
