@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 279,
-  label: "v285",
+  numero: 280,
+  label: "v286",
   data: "2026-06-10",
-  nota: "Validade da promocao e beneficios ajustados nas artes."
+  nota: "Acesso de clientes ao modulo e gerador de imagens de imoveis corrigido."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -250,6 +250,19 @@ function hasPermission(permission) {
   return Boolean(state.profile?.permissoes?.[permission]);
 }
 
+function canGenerateImovelImages() {
+  if (canManageClients()) return true;
+  const permissions = state.profile?.permissoes || {};
+  if (Object.prototype.hasOwnProperty.call(permissions, "gerar_imagens_imoveis")) {
+    return Boolean(permissions.gerar_imagens_imoveis);
+  }
+  return Boolean(permissions.imoveis);
+}
+
+function canAccessImoveis() {
+  return hasPermission("imoveis") || canGenerateImovelImages();
+}
+
 function currentClientId() {
   return state.profile?.clienteId || "";
 }
@@ -296,7 +309,7 @@ function canAccessView(viewName) {
     return true;
   }
   if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenMonthlyInvoice(currentClientRecord());
-  if (viewName === "imoveis") return hasPermission("imoveis");
+  if (viewName === "imoveis") return canAccessImoveis();
   if (viewName === "automoveis") return hasPermission("veiculos");
   if (viewName === "informacoes") return canManageInformacoes();
   if (viewName === "minhaEmpresa") return true;
@@ -306,7 +319,7 @@ function canAccessView(viewName) {
 function initialViewForProfile() {
   if (canManageClients()) return "dashboard";
   if (hasPermission("veiculos")) return "automoveis";
-  if (hasPermission("imoveis")) return "imoveis";
+  if (canAccessImoveis()) return "imoveis";
   return "minhaEmpresa";
 }
 
@@ -1583,13 +1596,16 @@ function updateChrome() {
     el.classList.toggle("hidden", !hasPermission("faturas") || canManageClients());
   });
   document.querySelectorAll("[data-permission='imoveis']").forEach((el) => {
-    el.classList.toggle("hidden", !hasPermission("imoveis"));
+    el.classList.toggle("hidden", !canAccessImoveis());
   });
   document.querySelectorAll("[data-permission='veiculos']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("veiculos"));
   });
   document.querySelectorAll("[data-permission='gerar_imagens_imoveis']").forEach((el) => {
-    el.classList.toggle("hidden", !hasPermission("gerar_imagens_imoveis"));
+    el.classList.toggle("hidden", !canGenerateImovelImages());
+  });
+  document.querySelectorAll("[data-classified-nav='true']").forEach((el) => {
+    el.classList.toggle("hidden", !canManageClients() && !canAccessImoveis() && !hasPermission("veiculos"));
   });
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");
@@ -4887,7 +4903,7 @@ function preencherEditorCs(item, force = false) {
 }
 
 function atualizarVisibilidadeEditorCs(force = false) {
-  const isCs = hasPermission("gerar_imagens_imoveis") && $("imovelArteLayout")?.value === "cs";
+  const isCs = canGenerateImovelImages() && $("imovelArteLayout")?.value === "cs";
   $("imovelCsEditor")?.classList.toggle("hidden", !isCs);
   if (!isCs) return;
   const item = state.imoveis.find((imovel) => imovel.id === $("imovelArteItem")?.value && itemBelongsToCurrentClient(imovel));
@@ -4930,7 +4946,7 @@ function renderImovelArteOptions() {
 }
 
 async function gerarArteInstagramImovel(imovelId = $("imovelArteItem")?.value, layoutKey = $("imovelArteLayout")?.value || "navyGold") {
-  if (!hasPermission("gerar_imagens_imoveis")) return showToast("A geracao de imagens de imoveis nao esta liberada para este usuario.");
+  if (!canGenerateImovelImages()) return showToast("A geracao de imagens de imoveis nao esta liberada para este usuario.");
   const item = state.imoveis.find((imovel) => imovel.id === imovelId && itemBelongsToCurrentClient(imovel));
   if (!item) return showToast("Selecione um imovel para gerar a arte.");
   const layout = IMOVEL_ARTE_LAYOUTS[layoutKey] || IMOVEL_ARTE_LAYOUTS.navyGold;
@@ -5002,7 +5018,7 @@ function renderImoveisList() {
       <div class="list-meta">${escapeHtml([item.corretor || item.clienteNome, item.telefone].filter(Boolean).join(" - ") || "Sem contato")}</div>
       <div class="list-meta">${escapeHtml(item.origemBase === "script.js" && item.origem !== "painel" ? "Base inicial do site" : "Firebase / Painel")}</div>
       <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
-      ${hasPermission("gerar_imagens_imoveis") ? `<button type="button" data-art-imovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte Instagram</button>` : ""}
+      ${canGenerateImovelImages() ? `<button type="button" data-art-imovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte Instagram</button>` : ""}
       <button type="button" data-edit-imovel="${escapeAttr(item.id)}">Editar</button>
       <button type="button" class="danger" data-delete-imovel="${escapeAttr(item.id)}">Excluir</button>
     </article>

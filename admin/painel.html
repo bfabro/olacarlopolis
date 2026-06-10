@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=285">
+  <link rel="stylesheet" href="painel.css?v=286">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -57,7 +57,7 @@
           <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
           <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
         </section>
-        <section class="nav-admin-group" data-role="staff">
+        <section class="nav-admin-group" data-classified-nav="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-rectangle-list"></i> Classificados</span>
           <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
           <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
@@ -1126,6 +1126,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=285"></script>
+  <script type="module" src="painel.js?v=286"></script>
 </body>
 </html>
