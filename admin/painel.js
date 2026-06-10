@@ -38,9 +38,9 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
   numero: 268,
-  label: "v273",
-  data: "2026-06-09",
-  nota: "Degrade, cores e rodape do modelo CS."
+  label: "v274",
+  data: "2026-06-10",
+  nota: "Cards do corretor, caracteristicas e preco do modelo CS."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4315,7 +4315,10 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   if (normalizeName(titleParts[0] || "") === normalizeName(titleWord)) titleParts.shift();
   const titleSecond = titleParts.shift() || "SUPER";
   const titleThird = titleParts.join(" ");
-  const broker = String(client?.nome || item.clienteNome || item.corretor || "CESAR MELO").toUpperCase();
+  const brokerName = String(item.corretor || client?.nome || item.clienteNome || item.proprietario || "").trim();
+  const broker = (brokerName || "ANUNCIANTE").toUpperCase();
+  const brokerRole = item.corretor || client?.nome ? "CORRETOR DE IMOVEIS" : "ANUNCIANTE";
+  const creci = String(item.creci || client?.creci || client?.registroCreci || "").trim().toUpperCase();
 
   ctx.fillStyle = black;
   ctx.fillRect(0, 0, 1080, 1080);
@@ -4358,30 +4361,32 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.moveTo(700, 0);
-  ctx.lineTo(1080, 0);
-  ctx.lineTo(1080, 225);
-  ctx.lineTo(982, 250);
-  ctx.quadraticCurveTo(820, 268, 748, 202);
-  ctx.quadraticCurveTo(686, 144, 700, 0);
-  ctx.closePath();
-  ctx.fill();
-  desenharImagemContain(ctx, logo, 780, 22, 230, 100, 0, "#fff");
-  ctx.fillStyle = "#111";
-  desenharTextoInteiroCanvas(ctx, broker, 895, 122, 270, 2, {
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.22)";
+  ctx.shadowBlur = 18;
+  preencherRoundRect(ctx, 700, 28, 350, 174, 24, "rgba(245,238,222,.9)");
+  ctx.restore();
+  desenharBordaRoundRect(ctx, 700, 28, 350, 174, 24, "rgba(255,255,255,.72)", 2);
+  desenharImagemCover(ctx, logo, 718, 46, 116, 116, 18);
+  ctx.fillStyle = "#171717";
+  desenharTextoInteiroCanvas(ctx, broker, 858, 45, 170, 2, {
     peso: 900,
-    tamanho: 28,
-    minimo: 15,
-    lineHeight: 27,
-    blockHeight: 48
+    tamanho: 25,
+    minimo: 14,
+    lineHeight: 24,
+    align: "left",
+    blockHeight: 54
   });
-  ctx.textAlign = "center";
-  ctx.font = "800 15px Arial";
-  ctx.fillText("CORRETOR DE IMOVEIS", 895, 188);
-  ctx.font = "800 12px Arial";
-  ctx.fillText("CRECI-PR", 895, 208);
+  ctx.fillStyle = red;
+  ctx.fillRect(858, 107, 168, 3);
+  ctx.fillStyle = "#353535";
+  ctx.textAlign = "left";
+  ctx.font = "800 14px Arial";
+  ctx.fillText(brokerRole, 858, 133);
+  if (creci) {
+    fonteQueCabeCanvas(ctx, creci, 800, 13, 10, 168);
+    ctx.fillText(creci, 858, 155);
+  }
 
   ctx.textAlign = "left";
   ctx.fillStyle = red;
@@ -4413,7 +4418,7 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   const featureRowHeight = 78;
   const featurePanelHeight = Math.max(104, 42 + infos.length * featureRowHeight);
   preencherRoundRect(ctx, 32, 360, 302, featurePanelHeight, 18, "rgba(8,8,8,.52)");
-  desenharBordaRoundRect(ctx, 32, 360, 302, featurePanelHeight, 18, red, 5);
+  desenharBordaRoundRect(ctx, 32, 360, 302, featurePanelHeight, 18, "rgba(255,255,255,.76)", 2);
   infos.forEach((info, index) => {
     const y = 404 + index * 78;
     if (index) {
@@ -4447,8 +4452,12 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.fillRect(0, 875, 1080, 95);
   ctx.save();
   ctx.shadowColor = "rgba(0,0,0,.4)";
-  ctx.shadowBlur = 16;
-  preencherRoundRect(ctx, 555, 845, 525, 125, 28, red);
+  ctx.shadowBlur = 18;
+  const priceGradient = ctx.createLinearGradient(555, 845, 1080, 970);
+  priceGradient.addColorStop(0, "#7f0009");
+  priceGradient.addColorStop(.55, "#b70412");
+  priceGradient.addColorStop(1, "#df1020");
+  preencherRoundRect(ctx, 555, 835, 525, 135, 30, priceGradient);
   ctx.restore();
 
   ctx.fillStyle = red;
@@ -4466,31 +4475,40 @@ function desenharModeloCsQuadrado(ctx, item, client, foto, logo, siteLogo, optio
   ctx.fillText(city, 138, 944);
 
   const numericValue = Number(item.valor || 0);
-  const useMil = numericValue >= 100000;
+  const isRental = /alug|loca/i.test(String(item.tipo || ""));
+  const useMil = !isRental && numericValue >= 100000;
   let mainValue = numericValue
-    ? (useMil ? String(Math.round(numericValue / 1000)) : moneyBR(numericValue).replace("R$", "").trim())
-    : "CONSULTE";
-  let suffix = useMil ? "MIL" : "";
+    ? (useMil
+      ? String(Math.round(numericValue / 1000))
+      : numericValue.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 }))
+    : "";
+  let suffix = useMil ? "MIL" : (isRental && numericValue ? "/ MES" : "");
   ctx.fillStyle = "#fff";
   ctx.textAlign = "left";
-  const finalidade = /alug|loca/i.test(String(item.tipo || "")) ? "PARA LOCACAO" : "PARA VENDA";
-  preencherRoundRect(ctx, 842, 852, 208, 32, 14, "#ffffff");
+  const finalidade = isRental ? "PARA ALUGAR" : "PARA VENDA";
+  preencherRoundRect(ctx, 842, 846, 208, 32, 14, "#ffffff");
   ctx.fillStyle = red;
   ctx.textAlign = "right";
   fonteQueCabeCanvas(ctx, finalidade, 900, 16, 11, 176);
-  ctx.fillText(finalidade, 1034, 874);
+  ctx.fillText(finalidade, 1034, 868);
   ctx.fillStyle = "#fff";
   ctx.textAlign = "left";
-  ctx.font = "900 18px Arial";
-  ctx.fillText("APENAS", 620, 912);
-  ctx.font = "900 28px Arial";
-  ctx.fillText("R$", 620, 954);
-  ctx.textAlign = "center";
-  fonteQueCabeCanvas(ctx, mainValue, 900, 72, 42, 255);
-  ctx.fillText(mainValue, 810, 958);
-  ctx.textAlign = "left";
-  ctx.font = "900 31px Arial";
-  ctx.fillText(suffix, 950, 954);
+  if (!numericValue) {
+    ctx.textAlign = "center";
+    fonteQueCabeCanvas(ctx, "CONSULTE O VALOR", 900, 42, 24, 420);
+    ctx.fillText("CONSULTE O VALOR", 815, 934);
+  } else {
+    ctx.font = "900 17px Arial";
+    ctx.fillText("APENAS", 600, 892);
+    ctx.font = "900 27px Arial";
+    ctx.fillText("R$", 600, 943);
+    ctx.textAlign = "center";
+    fonteQueCabeCanvas(ctx, mainValue, 900, isRental ? 66 : 76, 40, 270);
+    ctx.fillText(mainValue, 792, 952);
+    ctx.textAlign = "left";
+    fonteQueCabeCanvas(ctx, suffix, 900, isRental ? 25 : 31, 18, 96);
+    ctx.fillText(suffix, 945, 946);
+  }
 
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 970, 1080, 110);
