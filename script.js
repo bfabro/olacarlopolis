@@ -4252,8 +4252,8 @@ carlopdiesel:"s",
         "menuJogos"
       ]],
       ["Informações e utilidades", [
-        "menuConsultaCEP",
         "menuSol",
+        "menuConsultaCEP",        
          "menuEconomiaLuz",
         "menuEventos",       
         "menuGruposWhats",        
