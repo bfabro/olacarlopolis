@@ -4281,6 +4281,7 @@ carlopdiesel:"s",
 
   const CARD_VIEW_DEFAULTS = {
     menuAutomoveis: "__automoveisModoCards",
+    menuGruposWhats: "__gruposWhatsappModoCards",
     menuImoveis: "__imoveisModoCards",
     menuPromocoes: "__promoModoCompacto",
     menuNotaFalecimento: "__notaFalecimentoModoCards",
@@ -4293,7 +4294,7 @@ carlopdiesel:"s",
 
   document.addEventListener("click", (event) => {
     const menuLink = event.target.closest?.(
-      "#menuAutomoveis, #menuImoveis, #menuPromocoes, #menuNotaFalecimento, #menuVagasTrabalho"
+      "#menuAutomoveis, #menuGruposWhats, #menuImoveis, #menuPromocoes, #menuNotaFalecimento, #menuVagasTrabalho"
     );
     if (!menuLink) return;
     const stateKey = CARD_VIEW_DEFAULTS[menuLink.id];
@@ -4831,6 +4832,7 @@ carlopdiesel:"s",
 
   async function mostrarGruposWhatsApp() {
     if (location.hash !== "#grupos") location.hash = "#grupos";
+    if (typeof window.__gruposWhatsappModoCards === "undefined") window.__gruposWhatsappModoCards = true;
 
     const html = `
     <div class="page-header" data-share-hash="#grupos">
@@ -4840,9 +4842,14 @@ carlopdiesel:"s",
 
   </div>
 
-    <div class="grupos-wrap">
+    <div class="grupos-wrap ${window.__gruposWhatsappModoCards ? "grupos-cards-mode" : ""}">
       <div class="grupos-top">
         <input id="buscaGrupos" class="grupos-search" placeholder="Pesquisar grupos por nome..." autocomplete="off" />
+        <label class="switch grupos-cards-switch ${window.__gruposWhatsappModoCards ? "is-active" : ""}" aria-pressed="${window.__gruposWhatsappModoCards ? "true" : "false"}" title="Mostrar grupos em cards menores">
+          <input type="checkbox" id="gruposModoCards" ${window.__gruposWhatsappModoCards ? "checked" : ""}>
+          <span class="track"><span class="thumb"></span></span>
+          <span>Cards</span>
+        </label>
       </div>
       <div class="grupos-note"><b>⚠️ Respeite as regras de cada grupo.<Br>⚠️ Links são de responsabilidade dos administradores.</b></div>
       <div id="gruposLista" class="grupos-list"></div>
@@ -4859,6 +4866,16 @@ carlopdiesel:"s",
     input.addEventListener("input", () => {
       montarListaGrupos(filtrarGrupos(input.value));
     });
+    const aplicarModoCardsGrupos = () => {
+      const inputCards = document.getElementById("gruposModoCards");
+      const ativo = Boolean(inputCards?.checked);
+      window.__gruposWhatsappModoCards = ativo;
+      document.querySelector(".grupos-wrap")?.classList.toggle("grupos-cards-mode", ativo);
+      inputCards?.closest(".grupos-cards-switch")?.classList.toggle("is-active", ativo);
+      inputCards?.closest(".grupos-cards-switch")?.setAttribute("aria-pressed", ativo ? "true" : "false");
+    };
+    document.getElementById("gruposModoCards")?.addEventListener("change", aplicarModoCardsGrupos);
+    aplicarModoCardsGrupos();
   }
 
   // ativar pelo menu
