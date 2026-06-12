@@ -4241,26 +4241,29 @@ carlopdiesel:"s",
     };
 
     const sections = [
-      ["Informações e utilidades", [
-        "menuSol",
-        "menuPrevisaoTempo",
-        "menuRepresa",
-        "menuConsultaCEP",
-        "menuEventos",
-        "menuNotaFalecimento",
-        "menuGruposWhats",
-        "menuEconomiaLuz"
-      ]],
-      ["Ofertas e oportunidades", [
-        "menuVagasTrabalho",
-        "menuPromocoes",
+       ["Ofertas e oportunidades", [
+         "menuPromocoes",
+        "menuAutomoveis",
         "menuImoveis",
-        "menuAutomoveis"
+        "menuVagasTrabalho"         
       ]],
-      ["Lazer e gastronomia", [
+       ["Lazer e gastronomia", [
         "menuOndeComer",
         "menuJogos"
       ]]
+      ["Informações e utilidades", [
+        "menuConsultaCEP",
+        "menuSol",
+        "menuEventos",
+        "menuEconomiaLuz",
+        "menuGruposWhats",
+        "menuPrevisaoTempo",
+        "menuRepresa",        
+        "menuNotaFalecimento"       
+        
+      ]]
+     
+     
     ];
 
     sections.forEach(([title, ids]) => {
