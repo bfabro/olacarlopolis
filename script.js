@@ -4250,7 +4250,7 @@ carlopdiesel:"s",
        ["Lazer e gastronomia", [
         "menuOndeComer",
         "menuJogos"
-      ]]
+      ]],
       ["Informações e utilidades", [
         "menuConsultaCEP",
         "menuSol",
