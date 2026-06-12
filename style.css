@@ -6607,15 +6607,19 @@ html {
   gap: 12px;
 }
 
+.grupos-cards-mode .grupos-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 @media (min-width: 680px) {
   .grupos-cards-mode .grupos-list {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1000px) {
   .grupos-cards-mode .grupos-list {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -6643,7 +6647,73 @@ html {
   line-height: 1.45;
 }
 
+.grupos-cards-mode .grupo-card {
+  min-width: 0;
+  padding: 8px;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.grupos-cards-mode .grupo-head {
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.grupos-cards-mode .grupo-icon {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  flex: none;
+  border-radius: 8px;
+}
+
+.grupos-cards-mode .grupo-txt {
+  min-width: 0;
+}
+
+.grupos-cards-mode .grupo-title {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: center;
+}
+
+.grupos-cards-mode .grupo-desc {
+  display: none;
+}
+
+.grupos-cards-mode .grupo-actions {
+  width: 100%;
+  margin-top: auto;
+}
+
+.grupos-cards-mode .btn-grupo {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 9px 5px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 16px;
+  text-align: center;
+}
+
 @media (max-width: 679px) {
+  .grupos-wrap {
+    padding: 8px;
+  }
+
+  .grupos-cards-mode .grupos-list {
+    gap: 8px;
+  }
+
   .grupos-top {
     align-items: stretch;
     flex-direction: column;
@@ -6655,6 +6725,21 @@ html {
 
   .grupos-wrap:not(.grupos-cards-mode) .grupo-card {
     grid-template-columns: 1fr;
+  }
+
+  .grupos-cards-mode .grupo-card {
+    padding: 6px;
+  }
+
+  .grupos-cards-mode .grupo-title {
+    min-height: 36px;
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  .grupos-cards-mode .btn-grupo {
+    padding: 8px 3px;
+    font-size: 12px;
   }
 }
 
