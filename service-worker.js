@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-06-03-novidades-owner-mini-logo-size-v288'; // <-- TROQUE quando publicar atualização
+const CACHE_VERSION = '2026-06-12-cards-default-v291'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

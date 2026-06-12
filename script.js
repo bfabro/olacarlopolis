@@ -4279,6 +4279,27 @@ carlopdiesel:"s",
 
   organizarMenuLateralPublico();
 
+  const CARD_VIEW_DEFAULTS = {
+    menuAutomoveis: "__automoveisModoCards",
+    menuImoveis: "__imoveisModoCards",
+    menuPromocoes: "__promoModoCompacto",
+    menuNotaFalecimento: "__notaFalecimentoModoCards",
+    menuVagasTrabalho: "__vagasModoCards"
+  };
+
+  Object.values(CARD_VIEW_DEFAULTS).forEach((stateKey) => {
+    if (typeof window[stateKey] === "undefined") window[stateKey] = true;
+  });
+
+  document.addEventListener("click", (event) => {
+    const menuLink = event.target.closest?.(
+      "#menuAutomoveis, #menuImoveis, #menuPromocoes, #menuNotaFalecimento, #menuVagasTrabalho"
+    );
+    if (!menuLink) return;
+    const stateKey = CARD_VIEW_DEFAULTS[menuLink.id];
+    if (stateKey) window[stateKey] = true;
+  }, true);
+
   const body = document.querySelector("body");
 
   const sidebar = document.querySelector(".sidebar");
