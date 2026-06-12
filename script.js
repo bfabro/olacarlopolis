@@ -4205,6 +4205,77 @@ carlopdiesel:"s",
 
   };
 
+  function organizarMenuLateralPublico() {
+    const infoSubmenu = document.getElementById("menuSol")?.closest("ul.submenu");
+    const infoItem = infoSubmenu?.closest("li.item");
+    const directItem = document.getElementById("menuEconomiaLuz")?.closest("li.item");
+    const gameItem = document.getElementById("menuJogos")?.closest("li.item");
+    const menuRoot = infoItem?.parentElement;
+    if (!infoItem || !menuRoot || infoItem.dataset.organizado === "true") return;
+
+    const createSeparator = () => {
+      const separator = document.createElement("li");
+      separator.className = "separadorr";
+      return separator;
+    };
+    const createSection = (title, ids) => {
+      const label = document.createElement("li");
+      label.className = "menu-section-label";
+      label.textContent = title;
+      const group = document.createElement("li");
+      group.className = "item menu-direct-group";
+      ids.forEach((id) => {
+        const link = document.getElementById(id);
+        if (!link) return;
+        link.classList.remove("sublink");
+        link.querySelector(".navlink")?.classList.add("bold");
+        group.appendChild(link);
+      });
+      return [label, group];
+    };
+    const removeItemWithPreviousSeparator = (item) => {
+      if (!item || item === infoItem) return;
+      const previous = item.previousElementSibling;
+      item.remove();
+      if (previous?.classList.contains("separadorr")) previous.remove();
+    };
+
+    const sections = [
+      ["Informações e utilidades", [
+        "menuSol",
+        "menuPrevisaoTempo",
+        "menuRepresa",
+        "menuConsultaCEP",
+        "menuEventos",
+        "menuNotaFalecimento",
+        "menuGruposWhats",
+        "menuEconomiaLuz"
+      ]],
+      ["Ofertas e oportunidades", [
+        "menuVagasTrabalho",
+        "menuPromocoes",
+        "menuImoveis",
+        "menuAutomoveis"
+      ]],
+      ["Lazer e gastronomia", [
+        "menuOndeComer",
+        "menuJogos"
+      ]]
+    ];
+
+    sections.forEach(([title, ids]) => {
+      menuRoot.insertBefore(createSeparator(), infoItem);
+      createSection(title, ids).forEach((node) => menuRoot.insertBefore(node, infoItem));
+    });
+
+    removeItemWithPreviousSeparator(directItem);
+    removeItemWithPreviousSeparator(gameItem);
+    infoItem.dataset.organizado = "true";
+    infoItem.remove();
+  }
+
+  organizarMenuLateralPublico();
+
   const body = document.querySelector("body");
 
   const sidebar = document.querySelector(".sidebar");
