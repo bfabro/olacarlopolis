@@ -4242,10 +4242,10 @@ carlopdiesel:"s",
 
     const sections = [
        ["Ofertas e oportunidades", [
-         "menuPromocoes",
+         
         "menuAutomoveis",
         "menuImoveis",
-        "menuVagasTrabalho"         
+        "menuPromocoes"
       ]],
        ["Lazer e gastronomia", [
         "menuOndeComer",
@@ -4254,13 +4254,13 @@ carlopdiesel:"s",
       ["Informações e utilidades", [
         "menuConsultaCEP",
         "menuSol",
-        "menuEventos",
-        "menuEconomiaLuz",
-        "menuGruposWhats",
-        "menuPrevisaoTempo",
+         "menuEconomiaLuz",
+        "menuEventos",       
+        "menuGruposWhats",        
         "menuRepresa",        
-        "menuNotaFalecimento"       
-        
+        "menuNotaFalecimento" ,
+        "menuPrevisaoTempo"  ,    
+         "menuVagasTrabalho"  
       ]]
      
      
