@@ -618,7 +618,7 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 4px 0px;
+  padding: 2px 0px;
   border-radius: 8px;
   text-decoration: none;
   color: var(--grey-color);
