@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 282,
-  label: "v288",
+  numero: 283,
+  label: "v289",
   data: "2026-06-14",
-  nota: "Gerador master de stories comerciais com cinco modelos premium."
+  nota: "Stories comerciais com sete estilos emocionais e novo enquadramento de imagens."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -82,7 +82,7 @@ let state = {
   clientPromoEditIndex: null,
   staffPromoEditIndex: null,
   selectedPromoArtId: "",
-  selectedStoryTemplate: "editorial",
+  selectedStoryTemplate: "vitrine",
   storyCustomImage: "",
   pendingClientModuleTarget: "",
   selectedPromoClientId: "",
@@ -6422,11 +6422,13 @@ async function uploadHomeBannerImages(files) {
 }
 
 const STORY_TEMPLATE_NAMES = {
-  editorial: "Editorial",
   vitrine: "Vitrine",
-  minimal: "Essencial",
-  impacto: "Impacto",
-  local: "Conexao local"
+  humor: "Humor",
+  seriedade: "Seriedade",
+  alegria: "Alegria",
+  marketing: "Marketing Pro",
+  acolhimento: "Acolhimento",
+  exclusivo: "Exclusivo"
 };
 
 let storyPreviewRequest = 0;
@@ -6556,26 +6558,26 @@ function storyDrawContact(ctx, client, showContact, x, y, width, color, align = 
   ctx.fillText(contact, x, y, width);
 }
 
-function desenharStoryEditorial(ctx, data) {
-  const { photo, logo, client, headline, message, cta, accent, showContact, showProspect } = data;
-  ctx.fillStyle = "#0b0d12";
-  ctx.fillRect(0, 0, 1080, 1920);
-  desenharImagemCover(ctx, photo || logo, 420, 0, 660, 1210, 0);
-  const shade = ctx.createLinearGradient(250, 0, 760, 0);
-  shade.addColorStop(0, "#0b0d12");
-  shade.addColorStop(1, "rgba(11,13,18,0)");
-  ctx.fillStyle = shade;
-  ctx.fillRect(220, 0, 700, 1210);
-  ctx.fillStyle = accent;
-  ctx.fillRect(64, 92, 9, 360);
-  storyDrawLogo(ctx, logo, client, 92, 90, 148, accent);
-  storyDrawText(ctx, client.nome || "Cliente Ola Carlopolis", 92, 300, 480, 3, "#fff", 43);
-  storyDrawText(ctx, headline, 92, 540, 740, 5, "#fff", 78);
-  storyDrawText(ctx, message, 92, 1010, 840, 4, "#cbd5e1", 32, "left", 700);
-  preencherRoundRect(ctx, 92, 1345, 520, 92, 46, accent);
-  storyDrawText(ctx, cta, 352, 1380, 450, 1, "#111827", 28, "center");
-  storyDrawContact(ctx, client, showContact, 92, 1515, 820, "#fff");
-  storyDrawProspectFooter(ctx, showProspect, true);
+function storyDrawSmartPhoto(ctx, img, x, y, w, h, radius = 30, frame = "#ffffff") {
+  ctx.save();
+  canvasRoundRect(ctx, x, y, w, h, radius);
+  ctx.clip();
+  ctx.fillStyle = frame;
+  ctx.fillRect(x, y, w, h);
+  if (img) {
+    ctx.save();
+    ctx.filter = "blur(24px) saturate(.8)";
+    ctx.globalAlpha = .56;
+    desenharImagemCover(ctx, img, x - 35, y - 35, w + 70, h + 70, 0);
+    ctx.restore();
+    ctx.fillStyle = "rgba(8,15,28,.18)";
+    ctx.fillRect(x, y, w, h);
+    desenharImagemContain(ctx, img, x + 22, y + 22, w - 44, h - 44, Math.max(8, radius - 10), "rgba(255,255,255,.9)");
+  } else {
+    desenharImagemCover(ctx, null, x, y, w, h, 0);
+  }
+  ctx.restore();
+  desenharBordaRoundRect(ctx, x, y, w, h, radius, "rgba(255,255,255,.8)", 4);
 }
 
 function desenharStoryVitrine(ctx, data) {
@@ -6595,7 +6597,7 @@ function desenharStoryVitrine(ctx, data) {
   ctx.save();
   ctx.rotate(-4 * Math.PI / 180);
   preencherRoundRect(ctx, 95, 330, 890, 780, 54, "#fff");
-  if (photo || logo) desenharImagemCover(ctx, photo || logo, 120, 355, 840, 730, 36);
+  storyDrawSmartPhoto(ctx, photo || logo, 120, 355, 840, 730, 36);
   ctx.restore();
   preencherRoundRect(ctx, 62, 1100, 956, 430, 38, "rgba(255,255,255,.96)");
   storyDrawText(ctx, headline, 105, 1180, 870, 4, "#22103f", 64);
@@ -6606,84 +6608,143 @@ function desenharStoryVitrine(ctx, data) {
   storyDrawProspectFooter(ctx, showProspect, true);
 }
 
-function desenharStoryMinimal(ctx, data) {
+function desenharStoryHumor(ctx, data) {
   const { photo, logo, client, headline, message, cta, accent, showContact, showProspect } = data;
-  ctx.fillStyle = "#f5f1e8";
+  ctx.fillStyle = "#24d4c4";
   ctx.fillRect(0, 0, 1080, 1920);
-  ctx.fillStyle = "#173f5f";
-  ctx.fillRect(0, 0, 1080, 270);
-  storyDrawLogo(ctx, logo, client, 70, 64, 142, accent);
-  storyDrawText(ctx, client.nome || "Cliente", 245, 120, 700, 2, "#fff", 42);
-  storyDrawText(ctx, headline, 70, 390, 455, 5, "#173f5f", 68);
-  ctx.fillStyle = accent;
-  ctx.fillRect(70, 720, 180, 8);
-  storyDrawText(ctx, message, 70, 785, 445, 5, "#4b5563", 29, "left", 650);
-  preencherRoundRect(ctx, 565, 610, 445, 700, 28, "#fff");
-  if (photo || logo) desenharImagemCover(ctx, photo || logo, 585, 630, 405, 660, 18);
-  preencherRoundRect(ctx, 70, 1240, 430, 90, 10, "#173f5f");
-  storyDrawText(ctx, cta, 285, 1275, 380, 1, "#fff", 27, "center");
-  storyDrawContact(ctx, client, showContact, 70, 1450, 700, "#173f5f");
+  ctx.fillStyle = "#ffe04b";
+  ctx.beginPath();
+  ctx.arc(930, 150, 250, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ff6b6b";
+  ctx.beginPath();
+  ctx.arc(65, 1080, 170, 0, Math.PI * 2);
+  ctx.fill();
+  storyDrawLogo(ctx, logo, client, 64, 58, 132, "#fff");
+  storyDrawText(ctx, client.nome || "Cliente", 225, 105, 650, 2, "#123047", 38);
+  preencherRoundRect(ctx, 65, 250, 950, 205, 34, "#fff");
+  storyDrawText(ctx, headline, 540, 315, 860, 3, "#123047", 57, "center");
+  ctx.save();
+  ctx.translate(540, 850);
+  ctx.rotate(3 * Math.PI / 180);
+  storyDrawSmartPhoto(ctx, photo || logo, -430, -340, 860, 680, 45);
+  ctx.restore();
+  preencherRoundRect(ctx, 130, 1225, 820, 170, 70, "#123047");
+  storyDrawText(ctx, message, 540, 1270, 720, 3, "#fff", 28, "center", 700);
+  preencherRoundRect(ctx, 285, 1455, 510, 88, 44, accent);
+  storyDrawText(ctx, cta, 540, 1490, 450, 1, "#123047", 27, "center");
+  storyDrawContact(ctx, client, showContact, 540, 1640, 780, "#123047", "center");
   storyDrawProspectFooter(ctx, showProspect, false);
 }
 
-function desenharStoryImpacto(ctx, data) {
+function desenharStorySeriedade(ctx, data) {
   const { photo, logo, client, headline, message, cta, accent, showContact, showProspect } = data;
-  ctx.fillStyle = "#0b132b";
+  ctx.fillStyle = "#081b33";
   ctx.fillRect(0, 0, 1080, 1920);
-  if (photo || logo) desenharImagemCover(ctx, photo || logo, 0, 0, 1080, 1040, 0);
-  const shade = ctx.createLinearGradient(0, 500, 0, 1120);
-  shade.addColorStop(0, "rgba(11,19,43,0)");
-  shade.addColorStop(1, "#0b132b");
-  ctx.fillStyle = shade;
-  ctx.fillRect(0, 420, 1080, 720);
-  ctx.fillStyle = accent;
-  ctx.beginPath();
-  ctx.moveTo(0, 880);
-  ctx.lineTo(1080, 670);
-  ctx.lineTo(1080, 830);
-  ctx.lineTo(0, 1040);
-  ctx.closePath();
-  ctx.fill();
-  storyDrawLogo(ctx, logo, client, 70, 80, 135, "#fff");
-  storyDrawText(ctx, client.nome || "Cliente", 235, 126, 720, 2, "#fff", 40);
-  storyDrawText(ctx, headline, 65, 1060, 950, 4, "#fff", 74);
-  storyDrawText(ctx, message, 65, 1405, 850, 3, "#b9c2d8", 29, "left", 700);
-  preencherRoundRect(ctx, 65, 1570, 450, 86, 14, accent);
-  storyDrawText(ctx, cta, 290, 1604, 400, 1, "#0b132b", 27, "center");
-  storyDrawContact(ctx, client, showContact, 1015, 1622, 430, "#fff", "right");
+  ctx.fillStyle = "#3b82a0";
+  ctx.fillRect(0, 0, 18, 1920);
+  storyDrawLogo(ctx, logo, client, 72, 70, 128, "#9fc4d5");
+  storyDrawText(ctx, client.nome || "Cliente", 230, 112, 730, 2, "#fff", 39);
+  storyDrawSmartPhoto(ctx, photo || logo, 62, 265, 956, 720, 18);
+  ctx.fillStyle = "#d7e2ef";
+  ctx.fillRect(62, 1045, 956, 3);
+  storyDrawText(ctx, headline, 62, 1135, 920, 4, "#fff", 68);
+  storyDrawText(ctx, message, 62, 1430, 850, 3, "#afc0d2", 29, "left", 650);
+  preencherRoundRect(ctx, 62, 1570, 430, 84, 8, accent);
+  storyDrawText(ctx, cta, 277, 1603, 380, 1, "#081b33", 26, "center");
+  storyDrawContact(ctx, client, showContact, 1015, 1622, 460, "#d7e2ef", "right");
   storyDrawProspectFooter(ctx, showProspect, true);
 }
 
-function desenharStoryLocal(ctx, data) {
+function desenharStoryAlegria(ctx, data) {
   const { photo, logo, client, headline, message, cta, accent, showContact, showProspect } = data;
-  ctx.fillStyle = "#153f3a";
+  const bg = ctx.createLinearGradient(0, 0, 1080, 1920);
+  bg.addColorStop(0, "#ff963f");
+  bg.addColorStop(.55, "#ffcf4a");
+  bg.addColorStop(1, "#ef4e7b");
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 1080, 1920);
-  ctx.fillStyle = "#efe6d5";
-  ctx.fillRect(0, 1220, 1080, 700);
-  ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,.3)";
-  ctx.shadowBlur = 34;
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = "rgba(255,255,255,.24)";
   ctx.beginPath();
-  ctx.arc(540, 520, 390, 0, Math.PI * 2);
+  ctx.arc(540, 610, 500, 0, Math.PI * 2);
   ctx.fill();
-  ctx.restore();
-  if (photo || logo) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(540, 520, 365, 0, Math.PI * 2);
-    ctx.clip();
-    desenharImagemCover(ctx, photo || logo, 175, 155, 730, 730, 0);
-    ctx.restore();
-  }
-  storyDrawLogo(ctx, logo, client, 70, 70, 132, accent);
-  storyDrawText(ctx, client.nome || "Cliente", 230, 116, 720, 2, "#fff", 40);
-  storyDrawText(ctx, headline, 540, 980, 900, 4, "#fff", 62, "center");
-  storyDrawText(ctx, message, 540, 1295, 850, 4, "#365c57", 30, "center", 700);
-  preencherRoundRect(ctx, 315, 1510, 450, 86, 43, accent);
-  storyDrawText(ctx, cta, 540, 1544, 400, 1, "#153f3a", 27, "center");
-  storyDrawContact(ctx, client, showContact, 540, 1675, 760, "#153f3a", "center");
+  storyDrawLogo(ctx, logo, client, 70, 65, 132, "#fff");
+  storyDrawText(ctx, client.nome || "Cliente", 230, 110, 700, 2, "#6c2745", 40);
+  storyDrawText(ctx, headline, 540, 270, 900, 3, "#6c2745", 64, "center");
+  storyDrawSmartPhoto(ctx, photo || logo, 120, 555, 840, 650, 90);
+  preencherRoundRect(ctx, 80, 1260, 920, 235, 45, "rgba(255,255,255,.92)");
+  storyDrawText(ctx, message, 540, 1325, 820, 4, "#6c2745", 30, "center", 700);
+  preencherRoundRect(ctx, 300, 1535, 480, 86, 43, accent);
+  storyDrawText(ctx, cta, 540, 1569, 430, 1, "#52203a", 27, "center");
+  storyDrawContact(ctx, client, showContact, 540, 1680, 800, "#6c2745", "center");
   storyDrawProspectFooter(ctx, showProspect, false);
+}
+
+function desenharStoryMarketing(ctx, data) {
+  const { photo, logo, client, headline, message, cta, accent, showContact, showProspect } = data;
+  ctx.fillStyle = "#101828";
+  ctx.fillRect(0, 0, 1080, 1920);
+  ctx.fillStyle = "#2f6bff";
+  ctx.fillRect(0, 0, 1080, 20);
+  storyDrawLogo(ctx, logo, client, 66, 62, 126, "#64e572");
+  storyDrawText(ctx, client.nome || "Cliente", 220, 106, 690, 2, "#fff", 38);
+  preencherRoundRect(ctx, 65, 235, 950, 265, 26, "#17233a");
+  ctx.fillStyle = "#64e572";
+  ctx.font = "900 22px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText("MARCA LOCAL EM DESTAQUE", 102, 292);
+  storyDrawText(ctx, headline, 102, 350, 860, 3, "#fff", 55);
+  storyDrawSmartPhoto(ctx, photo || logo, 65, 550, 950, 680, 26);
+  preencherRoundRect(ctx, 65, 1280, 950, 220, 26, "#eaf0ff");
+  storyDrawText(ctx, message, 105, 1340, 870, 4, "#26334d", 29, "left", 700);
+  preencherRoundRect(ctx, 65, 1545, 455, 86, 12, accent);
+  storyDrawText(ctx, cta, 292, 1578, 400, 1, "#101828", 26, "center");
+  ctx.fillStyle = "#64e572";
+  ctx.font = "900 18px Arial";
+  ctx.textAlign = "right";
+  ctx.fillText("VISIBILIDADE  •  PRESENCA  •  RESULTADO", 1015, 1598);
+  storyDrawContact(ctx, client, showContact, 65, 1690, 820, "#d6e1f3");
+  storyDrawProspectFooter(ctx, showProspect, true);
+}
+
+function desenharStoryAcolhimento(ctx, data) {
+  const { photo, logo, client, headline, message, cta, accent, showContact, showProspect } = data;
+  ctx.fillStyle = "#f4eadc";
+  ctx.fillRect(0, 0, 1080, 1920);
+  ctx.fillStyle = "#9b4f3f";
+  ctx.fillRect(0, 0, 1080, 510);
+  storyDrawLogo(ctx, logo, client, 70, 65, 132, "#f4d2ad");
+  storyDrawText(ctx, client.nome || "Cliente", 230, 110, 700, 2, "#fff", 40);
+  storyDrawText(ctx, headline, 70, 255, 920, 4, "#fff", 59);
+  storyDrawSmartPhoto(ctx, photo || logo, 105, 570, 870, 690, 100, "#f8efe4");
+  storyDrawText(ctx, message, 540, 1335, 860, 4, "#6d3c33", 31, "center", 650);
+  preencherRoundRect(ctx, 310, 1535, 460, 86, 43, accent);
+  storyDrawText(ctx, cta, 540, 1569, 410, 1, "#5a3028", 27, "center");
+  storyDrawContact(ctx, client, showContact, 540, 1680, 790, "#6d3c33", "center");
+  storyDrawProspectFooter(ctx, showProspect, false);
+}
+
+function desenharStoryExclusivo(ctx, data) {
+  const { photo, logo, client, headline, message, cta, accent, showContact, showProspect } = data;
+  ctx.fillStyle = "#090909";
+  ctx.fillRect(0, 0, 1080, 1920);
+  const gold = ctx.createLinearGradient(0, 0, 1080, 0);
+  gold.addColorStop(0, "#8a6a2c");
+  gold.addColorStop(.5, "#f0d58b");
+  gold.addColorStop(1, "#8a6a2c");
+  ctx.fillStyle = gold;
+  ctx.fillRect(60, 55, 960, 5);
+  storyDrawLogo(ctx, logo, client, 72, 95, 130, "#d7b667");
+  storyDrawText(ctx, client.nome || "Cliente", 230, 140, 720, 2, "#f4ead2", 39);
+  storyDrawSmartPhoto(ctx, photo || logo, 75, 310, 930, 780, 8, "#18140e");
+  storyDrawText(ctx, headline, 540, 1170, 920, 4, "#f4ead2", 62, "center");
+  ctx.fillStyle = "#c9a24f";
+  ctx.fillRect(430, 1430, 220, 3);
+  storyDrawText(ctx, message, 540, 1490, 820, 3, "#b8ad98", 27, "center", 650);
+  preencherRoundRect(ctx, 315, 1610, 450, 78, 4, accent);
+  storyDrawText(ctx, cta, 540, 1640, 400, 1, "#090909", 25, "center");
+  storyDrawContact(ctx, client, showContact, 540, 1718, 780, "#f4ead2", "center");
+  storyDrawProspectFooter(ctx, showProspect, true);
 }
 
 async function atualizarPreviaStory() {
@@ -6709,17 +6770,19 @@ async function atualizarPreviaStory() {
     showContact: $("storyShowContact")?.checked !== false,
     showProspect: $("storyShowProspect")?.checked !== false
   };
-  const template = state.selectedStoryTemplate || "editorial";
+  const template = state.selectedStoryTemplate || "vitrine";
   const drawers = {
-    editorial: desenharStoryEditorial,
     vitrine: desenharStoryVitrine,
-    minimal: desenharStoryMinimal,
-    impacto: desenharStoryImpacto,
-    local: desenharStoryLocal
+    humor: desenharStoryHumor,
+    seriedade: desenharStorySeriedade,
+    alegria: desenharStoryAlegria,
+    marketing: desenharStoryMarketing,
+    acolhimento: desenharStoryAcolhimento,
+    exclusivo: desenharStoryExclusivo
   };
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  (drawers[template] || drawers.editorial)(ctx, data);
-  if ($("storyPreviewModel")) $("storyPreviewModel").textContent = `Modelo ${STORY_TEMPLATE_NAMES[template] || "Editorial"}`;
+  (drawers[template] || drawers.vitrine)(ctx, data);
+  if ($("storyPreviewModel")) $("storyPreviewModel").textContent = `Modelo ${STORY_TEMPLATE_NAMES[template] || "Vitrine"}`;
 }
 
 async function baixarStoryComercial() {
@@ -9794,7 +9857,7 @@ function bindEvents() {
   });
   document.querySelectorAll("[data-story-template]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.selectedStoryTemplate = button.dataset.storyTemplate || "editorial";
+      state.selectedStoryTemplate = button.dataset.storyTemplate || "vitrine";
       document.querySelectorAll("[data-story-template]").forEach((item) => item.classList.toggle("active", item === button));
       atualizarPreviaStory();
     });

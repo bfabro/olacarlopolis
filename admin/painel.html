@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=288">
+  <link rel="stylesheet" href="painel.css?v=289">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1116,13 +1116,15 @@
               </section>
 
               <section class="story-control-card">
-                <div class="story-step"><span>2</span><div><strong>Escolha um modelo premium</strong><small>Cinco composicoes com personalidades proprias.</small></div></div>
+                <div class="story-step"><span>2</span><div><strong>Escolha um modelo premium</strong><small>Sete composicoes criadas para transmitir sentimentos diferentes.</small></div></div>
                 <div id="storyTemplateGrid" class="story-template-grid">
-                  <button type="button" class="story-template-option active" data-story-template="editorial"><span class="story-template-thumb template-editorial"></span><strong>Editorial</strong><small>Luxo escuro</small></button>
-                  <button type="button" class="story-template-option" data-story-template="vitrine"><span class="story-template-thumb template-vitrine"></span><strong>Vitrine</strong><small>Vibrante</small></button>
-                  <button type="button" class="story-template-option" data-story-template="minimal"><span class="story-template-thumb template-minimal"></span><strong>Essencial</strong><small>Claro e elegante</small></button>
-                  <button type="button" class="story-template-option" data-story-template="impacto"><span class="story-template-thumb template-impacto"></span><strong>Impacto</strong><small>Marcante</small></button>
-                  <button type="button" class="story-template-option" data-story-template="local"><span class="story-template-thumb template-local"></span><strong>Conexao local</strong><small>Humano</small></button>
+                  <button type="button" class="story-template-option active" data-story-template="vitrine"><span class="story-template-thumb template-vitrine"></span><strong>Vitrine</strong><small>Vibrante</small></button>
+                  <button type="button" class="story-template-option" data-story-template="humor"><span class="story-template-thumb template-humor"></span><strong>Humor</strong><small>Leve e divertido</small></button>
+                  <button type="button" class="story-template-option" data-story-template="seriedade"><span class="story-template-thumb template-seriedade"></span><strong>Seriedade</strong><small>Firme e confiavel</small></button>
+                  <button type="button" class="story-template-option" data-story-template="alegria"><span class="story-template-thumb template-alegria"></span><strong>Alegria</strong><small>Positivo e caloroso</small></button>
+                  <button type="button" class="story-template-option" data-story-template="marketing"><span class="story-template-thumb template-marketing"></span><strong>Marketing Pro</strong><small>Estrategico</small></button>
+                  <button type="button" class="story-template-option" data-story-template="acolhimento"><span class="story-template-thumb template-acolhimento"></span><strong>Acolhimento</strong><small>Proximo e humano</small></button>
+                  <button type="button" class="story-template-option" data-story-template="exclusivo"><span class="story-template-thumb template-exclusivo"></span><strong>Exclusivo</strong><small>Premium e sofisticado</small></button>
                 </div>
               </section>
 
@@ -1146,7 +1148,7 @@
 
             <aside class="story-preview-panel">
               <div class="story-preview-toolbar">
-                <div><strong>Previa do story</strong><span id="storyPreviewModel">Modelo Editorial</span></div>
+                <div><strong>Previa do story</strong><span id="storyPreviewModel">Modelo Vitrine</span></div>
                 <span class="story-live-dot">PREVIA</span>
               </div>
               <div class="story-phone-frame"><canvas id="storyCanvas" width="1080" height="1920" aria-label="Previa do story comercial"></canvas></div>
@@ -1189,6 +1191,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=288"></script>
+  <script type="module" src="painel.js?v=289"></script>
 </body>
 </html>
