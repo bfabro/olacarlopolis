@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=287">
+  <link rel="stylesheet" href="painel.css?v=288">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -70,6 +70,7 @@
         <section class="nav-admin-group" data-master="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Sistema</span>
         <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
+          <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
         </section>
         <button data-view="minhaEmpresa" data-role="cliente" data-client-root-nav="true"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
@@ -1093,6 +1094,68 @@
         </section>
       </section>
 
+      <section id="storiesComerciaisView" class="panel-view hidden">
+        <section class="panel-card story-generator">
+          <div class="section-head story-generator-head">
+            <div>
+              <span class="story-kicker">Estudio de criacao</span>
+              <h2>Stories comerciais premium</h2>
+              <p>Crie uma arte vertical para divulgar um cliente e mostrar a força de anunciar no Ola Carlopolis.</p>
+            </div>
+            <span class="story-size-badge"><i class="fa-brands fa-instagram"></i> 1080 x 1920</span>
+          </div>
+
+          <div class="story-generator-layout">
+            <div class="story-controls">
+              <section class="story-control-card">
+                <div class="story-step"><span>1</span><div><strong>Escolha o cliente</strong><small>Dados e imagens do cadastro serao carregados.</small></div></div>
+                <label>Cliente<select id="storyClient"></select></label>
+                <label>Imagem do cadastro<select id="storyClientImage"></select></label>
+                <label class="story-upload-button"><i class="fa-solid fa-cloud-arrow-up"></i> Usar outra imagem nesta arte<input id="storyCustomImage" type="file" accept="image/*"></label>
+                <span id="storyCustomImageName" class="story-file-name">Nenhuma imagem personalizada.</span>
+              </section>
+
+              <section class="story-control-card">
+                <div class="story-step"><span>2</span><div><strong>Escolha um modelo premium</strong><small>Cinco composicoes com personalidades proprias.</small></div></div>
+                <div id="storyTemplateGrid" class="story-template-grid">
+                  <button type="button" class="story-template-option active" data-story-template="editorial"><span class="story-template-thumb template-editorial"></span><strong>Editorial</strong><small>Luxo escuro</small></button>
+                  <button type="button" class="story-template-option" data-story-template="vitrine"><span class="story-template-thumb template-vitrine"></span><strong>Vitrine</strong><small>Vibrante</small></button>
+                  <button type="button" class="story-template-option" data-story-template="minimal"><span class="story-template-thumb template-minimal"></span><strong>Essencial</strong><small>Claro e elegante</small></button>
+                  <button type="button" class="story-template-option" data-story-template="impacto"><span class="story-template-thumb template-impacto"></span><strong>Impacto</strong><small>Marcante</small></button>
+                  <button type="button" class="story-template-option" data-story-template="local"><span class="story-template-thumb template-local"></span><strong>Conexao local</strong><small>Humano</small></button>
+                </div>
+              </section>
+
+              <section class="story-control-card">
+                <div class="story-step"><span>3</span><div><strong>Ajuste a mensagem</strong><small>Personalize o texto antes de baixar.</small></div></div>
+                <label>Chamada principal<textarea id="storyHeadline" rows="3" maxlength="90">Sua marca merece ser vista por toda Carlópolis.</textarea></label>
+                <label>Mensagem de apoio<textarea id="storyMessage" rows="3" maxlength="150">Comercio local forte e aquele que esta perto das pessoas, todos os dias.</textarea></label>
+                <div class="story-inline-fields">
+                  <label>Botao de acao<input id="storyCta" maxlength="32" value="Conheca este cliente"></label>
+                  <label>Cor de destaque<input id="storyAccent" type="color" value="#f4b942"></label>
+                </div>
+                <label class="check-row"><input id="storyShowContact" type="checkbox" checked> Exibir contato e Instagram</label>
+                <label class="check-row"><input id="storyShowProspect" type="checkbox" checked> Exibir convite para novos anunciantes</label>
+              </section>
+
+              <div class="story-actions">
+                <button id="storyRefreshPreview" type="button" class="ghost-button"><i class="fa-solid fa-rotate"></i> Atualizar previa</button>
+                <button id="storyDownload" type="button"><i class="fa-solid fa-download"></i> Baixar story em PNG</button>
+              </div>
+            </div>
+
+            <aside class="story-preview-panel">
+              <div class="story-preview-toolbar">
+                <div><strong>Previa do story</strong><span id="storyPreviewModel">Modelo Editorial</span></div>
+                <span class="story-live-dot">PREVIA</span>
+              </div>
+              <div class="story-phone-frame"><canvas id="storyCanvas" width="1080" height="1920" aria-label="Previa do story comercial"></canvas></div>
+              <p class="story-preview-note"><i class="fa-solid fa-circle-info"></i> A imagem final e exportada em alta resolucao, pronta para publicar.</p>
+            </aside>
+          </div>
+        </section>
+      </section>
+
       <section id="paginaInicialSiteView" class="panel-view hidden">
         <section class="panel-card">
           <div class="section-head">
@@ -1126,6 +1189,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=287"></script>
+  <script type="module" src="painel.js?v=288"></script>
 </body>
 </html>
