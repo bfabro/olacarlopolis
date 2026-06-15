@@ -2211,6 +2211,24 @@ screen and (width: 820px) {
   color: #888;
 }
 
+.horario-publico-dia.vinte-quatro-horas {
+  border-color: #fecaca;
+  background: #fff1f2;
+}
+
+.horario-publico-dia.vinte-quatro-horas .horario-publico-label,
+.horario-publico-dia.vinte-quatro-horas .horario-publico-valor,
+.onde-comer-status-hora.vinte-quatro-horas,
+.status-tag.vinte-quatro-horas {
+  color: #dc2626;
+  font-weight: 900;
+}
+
+.status-tag.vinte-quatro-horas {
+  border-color: #fecaca;
+  background: #fff1f2;
+}
+
 .onde-comer-horarios {
   margin-top: 6px;
   font-size: 12px;

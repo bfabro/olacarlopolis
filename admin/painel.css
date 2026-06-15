@@ -1664,7 +1664,7 @@ button[type="submit"]:hover,
 
 .schedule-day {
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) 92px minmax(260px, 1.5fr);
+  grid-template-columns: minmax(140px, 1fr) 92px 108px minmax(260px, 1.5fr);
   gap: 14px;
   align-items: center;
   padding: 11px 0;
@@ -1685,6 +1685,32 @@ button[type="submit"]:hover,
 
 .schedule-day.closed .schedule-slots {
   opacity: .62;
+}
+
+.schedule-day.all-day .schedule-status {
+  color: #dc2626;
+}
+
+.schedule-day.all-day .schedule-slots {
+  opacity: .42;
+}
+
+.schedule-all-day {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.schedule-all-day input {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  accent-color: #dc2626;
 }
 
 .schedule-open {

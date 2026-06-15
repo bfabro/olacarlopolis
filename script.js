@@ -1848,6 +1848,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
 
     const turnosHoje = horarios[hoje] || [];
+    if (turnosHoje.some((turno) => turno?.vinteQuatroHoras === true)) return true;
 
     for (const turno of turnosHoje) {
       if (!turno || !turno.inicio || !turno.fim) continue;
@@ -1894,8 +1895,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const diaIndex = (agora.getDay() + i) % 7;
       const { chave, nome } = dias[diaIndex];
       const faixas = horarios[chave] || [];
+      if (faixas.some((faixa) => faixa?.vinteQuatroHoras === true)) {
+        return i === 0 ? "agora, 24 horas" : `${nome}, 24 horas`;
+      }
 
       for (const faixa of faixas) {
+        if (!faixa?.inicio) continue;
         const [h, m] = faixa.inicio.split(":").map(Number);
         const horaInicio = h + m / 60;
         if (i > 0 || horaInicio > horaAtual) {
@@ -1916,6 +1921,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
     const hoje = dias[agora.getDay()];
     const turnosHoje = horarios[hoje] || [];
+    if (turnosHoje.some((turno) => turno?.vinteQuatroHoras === true)) return "24 HORAS";
 
     const horaAgoraMinutos = agora.getHours() * 60 + agora.getMinutes();
 
@@ -1943,6 +1949,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     return null;
+  }
+
+  function funciona24HorasHoje(horarios) {
+    if (!horarios || typeof horarios !== "object") return false;
+    const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
+    const turnosHoje = horarios[dias[new Date().getDay()]] || [];
+    return turnosHoje.some((turno) => turno?.vinteQuatroHoras === true);
   }
 
   //////
@@ -6190,7 +6203,8 @@ carlopdiesel:"s",
         const aberto = estaAbertoAgora(est.horarios);
         if (aberto) {
           const fechamento = horarioFechamentoAtual(est.horarios);
-          statusAberto = `<div class="onde-comer-status-row"><span class="onde-comer-status aberto"><i class="fas fa-circle"></i> ABERTO</span>${fechamento ? `<span class="onde-comer-status-hora">ate ${fechamento}</span>` : ""}</div>`;
+          const vinteQuatroHoras = funciona24HorasHoje(est.horarios);
+          statusAberto = `<div class="onde-comer-status-row"><span class="onde-comer-status aberto"><i class="fas fa-circle"></i> ABERTO</span>${vinteQuatroHoras ? `<span class="onde-comer-status-hora vinte-quatro-horas">24 HORAS</span>` : (fechamento ? `<span class="onde-comer-status-hora">ate ${fechamento}</span>` : "")}</div>`;
         } else {
           const proximo = proximoHorarioDeAbertura(est.horarios);
           statusAberto = `<div class="onde-comer-status-row"><span class="onde-comer-status fechado"><i class="fas fa-circle"></i> FECHADO</span>${proximo ? `<span class="onde-comer-status-hora">abre ${proximo}</span>` : ""}</div>`;
@@ -17942,7 +17956,9 @@ plotarPinsImoveis(stateImoveis.filtered);
     ];
     if (!horarios || typeof horarios !== "object") return "";
     return dias.map(([key, label]) => {
-      const slots = Array.isArray(horarios[key]) ? horarios[key].filter((slot) => slot && slot.inicio && slot.fim) : [];
+      const slotsRaw = Array.isArray(horarios[key]) ? horarios[key] : [];
+      if (slotsRaw.some((slot) => slot?.vinteQuatroHoras === true)) return `${label}: 24 horas`;
+      const slots = slotsRaw.filter((slot) => slot && slot.inicio && slot.fim);
       if (!slots.length) return `${label}: Fechado`;
       return `${label}: ${slots.map((slot) => `${slot.inicio} as ${slot.fim}`).join(" / ")}`;
     }).join("<br>");
@@ -17960,15 +17976,19 @@ plotarPinsImoveis(stateImoveis.filtered);
     ];
     if (!horarios || typeof horarios !== "object") return "";
     const rows = dias.map(([key, label]) => {
+      const slotsRaw = Array.isArray(horarios[key]) ? horarios[key] : [];
+      const vinteQuatroHoras = slotsRaw.some((slot) => slot?.vinteQuatroHoras === true);
       const slots = Array.isArray(horarios[key])
-        ? horarios[key].filter((slot) => slot && slot.inicio && slot.fim)
+        ? slotsRaw.filter((slot) => slot && slot.inicio && slot.fim)
         : [];
-      const aberto = slots.length > 0;
-      const texto = aberto
+      const aberto = vinteQuatroHoras || slots.length > 0;
+      const texto = vinteQuatroHoras
+        ? "24 HORAS"
+        : aberto
         ? slots.map((slot) => `${slot.inicio} as ${slot.fim}`).join(" / ")
         : "Fechado";
       return `
-        <div class="horario-publico-dia ${aberto ? "aberto" : "fechado"}">
+        <div class="horario-publico-dia ${vinteQuatroHoras ? "vinte-quatro-horas" : (aberto ? "aberto" : "fechado")}">
           <span class="horario-publico-label">${label}</span>
           <span class="horario-publico-valor">${texto}</span>
         </div>`;
@@ -19485,7 +19505,9 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
         const aberto = estaAbertoAgora(establishment.horarios);
         if (aberto) {
           const fechamento = horarioFechamentoAtual(establishment.horarios);
-          statusAberto = `<span class='status-tag aberto'>ABERTO ATÉ ${fechamento}</span>`;
+          statusAberto = funciona24HorasHoje(establishment.horarios)
+            ? `<span class='status-tag vinte-quatro-horas'>ABERTO 24 HORAS</span>`
+            : `<span class='status-tag aberto'>ABERTO ATÉ ${fechamento}</span>`;
         } else {
           const proximo = proximoHorarioDeAbertura(establishment.horarios);
           statusAberto = `<span class='status-tag fechado'>FECHADO</span><span class='proximo-horario'>Abre ${proximo}</span>`;

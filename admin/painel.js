@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 283,
-  label: "v289",
+  numero: 284,
+  label: "v290",
   data: "2026-06-14",
-  nota: "Stories comerciais com sete estilos emocionais e novo enquadramento de imagens."
+  nota: "Opcao de funcionamento 24 horas adicionada aos horarios dos clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -984,8 +984,10 @@ function normalizeSchedule(schedule) {
   WEEK_DAYS.forEach(([key]) => {
     base[key] = Array.isArray(schedule[key])
       ? schedule[key]
-        .filter((slot) => slot && slot.inicio && slot.fim)
-        .map((slot) => ({ inicio: slot.inicio, fim: slot.fim }))
+        .filter((slot) => slot && (slot.vinteQuatroHoras === true || (slot.inicio && slot.fim)))
+        .map((slot) => slot.vinteQuatroHoras === true
+          ? { vinteQuatroHoras: true }
+          : { inicio: slot.inicio, fim: slot.fim })
         .slice(0, 2)
       : [];
   });
@@ -1000,18 +1002,24 @@ function renderScheduleEditor(containerId, schedule = {}) {
   box.innerHTML = WEEK_DAYS.map(([key, label]) => {
     const slots = data[key] || [];
     const open = slots.length > 0;
+    const allDay = slots.some((slot) => slot.vinteQuatroHoras === true);
+    const timeSlots = slots.filter((slot) => !slot.vinteQuatroHoras);
     return `
-      <article class="schedule-day ${open ? "" : "closed"}" data-day="${key}">
+      <article class="schedule-day ${open ? "" : "closed"} ${allDay ? "all-day" : ""}" data-day="${key}">
         <label class="schedule-open">
           <input type="checkbox" data-schedule-open ${open ? "checked" : ""}>
           <span>${label}</span>
         </label>
-        <strong class="schedule-status">${open ? "Aberto" : "Fechado"}</strong>
+        <strong class="schedule-status">${allDay ? "24 horas" : (open ? "Aberto" : "Fechado")}</strong>
+        <label class="schedule-all-day">
+          <input type="checkbox" data-schedule-all-day ${allDay ? "checked" : ""}>
+          <span>24 horas</span>
+        </label>
         <div class="schedule-slots">
-          <input type="time" data-slot="0" data-field="inicio" value="${escapeAttr(slots[0]?.inicio || "")}">
-          <input type="time" data-slot="0" data-field="fim" value="${escapeAttr(slots[0]?.fim || "")}">
-          <input type="time" data-slot="1" data-field="inicio" value="${escapeAttr(slots[1]?.inicio || "")}">
-          <input type="time" data-slot="1" data-field="fim" value="${escapeAttr(slots[1]?.fim || "")}">
+          <input type="time" data-slot="0" data-field="inicio" value="${escapeAttr(timeSlots[0]?.inicio || "")}" ${allDay ? "disabled" : ""}>
+          <input type="time" data-slot="0" data-field="fim" value="${escapeAttr(timeSlots[0]?.fim || "")}" ${allDay ? "disabled" : ""}>
+          <input type="time" data-slot="1" data-field="inicio" value="${escapeAttr(timeSlots[1]?.inicio || "")}" ${allDay ? "disabled" : ""}>
+          <input type="time" data-slot="1" data-field="fim" value="${escapeAttr(timeSlots[1]?.fim || "")}" ${allDay ? "disabled" : ""}>
         </div>
       </article>
     `;
@@ -1032,8 +1040,32 @@ function renderScheduleEditor(containerId, schedule = {}) {
       box.dataset.touchedSchedule = "true";
       const row = input.closest(".schedule-day");
       row?.classList.toggle("closed", !input.checked);
+      if (!input.checked) {
+        const allDayInput = row?.querySelector("[data-schedule-all-day]");
+        if (allDayInput) allDayInput.checked = false;
+        row?.classList.remove("all-day");
+        row?.querySelectorAll('input[type="time"]').forEach((timeInput) => {
+          timeInput.disabled = false;
+        });
+      }
       const status = row?.querySelector(".schedule-status");
-      if (status) status.textContent = input.checked ? "Aberto" : "Fechado";
+      const allDay = row?.querySelector("[data-schedule-all-day]")?.checked;
+      if (status) status.textContent = input.checked ? (allDay ? "24 horas" : "Aberto") : "Fechado";
+    });
+  });
+  box.querySelectorAll("[data-schedule-all-day]").forEach((input) => {
+    input.addEventListener("change", () => {
+      box.dataset.touchedSchedule = "true";
+      const row = input.closest(".schedule-day");
+      const open = row?.querySelector("[data-schedule-open]");
+      if (input.checked && open) open.checked = true;
+      row?.classList.toggle("closed", !open?.checked);
+      row?.classList.toggle("all-day", input.checked);
+      row?.querySelectorAll('input[type="time"]').forEach((timeInput) => {
+        timeInput.disabled = input.checked;
+      });
+      const status = row?.querySelector(".schedule-status");
+      if (status) status.textContent = input.checked ? "24 horas" : (open?.checked ? "Aberto" : "Fechado");
     });
   });
 }
@@ -1046,7 +1078,12 @@ function readScheduleEditor(containerId) {
   box.querySelectorAll(".schedule-day").forEach((row) => {
     const day = row.dataset.day;
     const isOpen = row.querySelector("[data-schedule-open]")?.checked;
+    const allDay = row.querySelector("[data-schedule-all-day]")?.checked;
     const slots = [];
+    if (isOpen && allDay) {
+      horarios[day] = [{ vinteQuatroHoras: true }];
+      return;
+    }
     [0, 1].forEach((index) => {
       const inicio = row.querySelector(`[data-slot="${index}"][data-field="inicio"]`)?.value || "";
       const fim = row.querySelector(`[data-slot="${index}"][data-field="fim"]`)?.value || "";
@@ -1063,6 +1100,7 @@ function scheduleToText(schedule) {
   return WEEK_DAYS.map(([key, label]) => {
     const slots = data[key] || [];
     if (!slots.length) return `${label}: Fechado`;
+    if (slots.some((slot) => slot.vinteQuatroHoras === true)) return `${label}: 24 horas`;
     return `${label}: ${slots.map((s) => `${s.inicio} as ${s.fim}`).join(" / ")}`;
   }).join("<br>");
 }
