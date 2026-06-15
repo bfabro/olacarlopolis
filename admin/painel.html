@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="painel.css?v=291">
+  <link rel="stylesheet" href="painel.css?v=292">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -232,6 +232,10 @@
                     <p>Marque os dias abertos. Dias desmarcados aparecem como fechado.</p>
                   </div>
                 </div>
+                <label class="schedule-global-all-day">
+                  <input id="clientOpen24Hours" type="checkbox">
+                  <span><strong>Funcionamento 24 horas</strong><small>Ative quando o estabelecimento trabalha 24 horas por dia.</small></span>
+                </label>
                 <div id="clientScheduleEditor" class="schedule-editor"></div>
               </section>
               <div class="form-section-title wide">
@@ -1192,6 +1196,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=291"></script>
+  <script type="module" src="painel.js?v=292"></script>
 </body>
 </html>

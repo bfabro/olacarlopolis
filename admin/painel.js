@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 285,
-  label: "v291",
+  numero: 286,
+  label: "v292",
   data: "2026-06-14",
-  nota: "Cadastro e exibicao de ate tres telefones ou WhatsApps por cliente."
+  nota: "Flag geral de funcionamento 24 horas com exibicao publica simplificada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1008,10 +1008,8 @@ function normalizeSchedule(schedule) {
   WEEK_DAYS.forEach(([key]) => {
     base[key] = Array.isArray(schedule[key])
       ? schedule[key]
-        .filter((slot) => slot && (slot.vinteQuatroHoras === true || (slot.inicio && slot.fim)))
-        .map((slot) => slot.vinteQuatroHoras === true
-          ? { vinteQuatroHoras: true }
-          : { inicio: slot.inicio, fim: slot.fim })
+        .filter((slot) => slot && slot.inicio && slot.fim)
+        .map((slot) => ({ inicio: slot.inicio, fim: slot.fim }))
         .slice(0, 2)
       : [];
   });
@@ -1026,24 +1024,18 @@ function renderScheduleEditor(containerId, schedule = {}) {
   box.innerHTML = WEEK_DAYS.map(([key, label]) => {
     const slots = data[key] || [];
     const open = slots.length > 0;
-    const allDay = slots.some((slot) => slot.vinteQuatroHoras === true);
-    const timeSlots = slots.filter((slot) => !slot.vinteQuatroHoras);
     return `
-      <article class="schedule-day ${open ? "" : "closed"} ${allDay ? "all-day" : ""}" data-day="${key}">
+      <article class="schedule-day ${open ? "" : "closed"}" data-day="${key}">
         <label class="schedule-open">
           <input type="checkbox" data-schedule-open ${open ? "checked" : ""}>
           <span>${label}</span>
         </label>
-        <strong class="schedule-status">${allDay ? "24 horas" : (open ? "Aberto" : "Fechado")}</strong>
-        <label class="schedule-all-day">
-          <input type="checkbox" data-schedule-all-day ${allDay ? "checked" : ""}>
-          <span>24 horas</span>
-        </label>
+        <strong class="schedule-status">${open ? "Aberto" : "Fechado"}</strong>
         <div class="schedule-slots">
-          <input type="time" data-slot="0" data-field="inicio" value="${escapeAttr(timeSlots[0]?.inicio || "")}" ${allDay ? "disabled" : ""}>
-          <input type="time" data-slot="0" data-field="fim" value="${escapeAttr(timeSlots[0]?.fim || "")}" ${allDay ? "disabled" : ""}>
-          <input type="time" data-slot="1" data-field="inicio" value="${escapeAttr(timeSlots[1]?.inicio || "")}" ${allDay ? "disabled" : ""}>
-          <input type="time" data-slot="1" data-field="fim" value="${escapeAttr(timeSlots[1]?.fim || "")}" ${allDay ? "disabled" : ""}>
+          <input type="time" data-slot="0" data-field="inicio" value="${escapeAttr(slots[0]?.inicio || "")}">
+          <input type="time" data-slot="0" data-field="fim" value="${escapeAttr(slots[0]?.fim || "")}">
+          <input type="time" data-slot="1" data-field="inicio" value="${escapeAttr(slots[1]?.inicio || "")}">
+          <input type="time" data-slot="1" data-field="fim" value="${escapeAttr(slots[1]?.fim || "")}">
         </div>
       </article>
     `;
@@ -1064,33 +1056,18 @@ function renderScheduleEditor(containerId, schedule = {}) {
       box.dataset.touchedSchedule = "true";
       const row = input.closest(".schedule-day");
       row?.classList.toggle("closed", !input.checked);
-      if (!input.checked) {
-        const allDayInput = row?.querySelector("[data-schedule-all-day]");
-        if (allDayInput) allDayInput.checked = false;
-        row?.classList.remove("all-day");
-        row?.querySelectorAll('input[type="time"]').forEach((timeInput) => {
-          timeInput.disabled = false;
-        });
-      }
       const status = row?.querySelector(".schedule-status");
-      const allDay = row?.querySelector("[data-schedule-all-day]")?.checked;
-      if (status) status.textContent = input.checked ? (allDay ? "24 horas" : "Aberto") : "Fechado";
+      if (status) status.textContent = input.checked ? "Aberto" : "Fechado";
     });
   });
-  box.querySelectorAll("[data-schedule-all-day]").forEach((input) => {
-    input.addEventListener("change", () => {
-      box.dataset.touchedSchedule = "true";
-      const row = input.closest(".schedule-day");
-      const open = row?.querySelector("[data-schedule-open]");
-      if (input.checked && open) open.checked = true;
-      row?.classList.toggle("closed", !open?.checked);
-      row?.classList.toggle("all-day", input.checked);
-      row?.querySelectorAll('input[type="time"]').forEach((timeInput) => {
-        timeInput.disabled = input.checked;
-      });
-      const status = row?.querySelector(".schedule-status");
-      if (status) status.textContent = input.checked ? "24 horas" : (open?.checked ? "Aberto" : "Fechado");
-    });
+}
+
+function toggleSchedule24Hours(containerId, enabled) {
+  const box = $(containerId);
+  if (!box) return;
+  box.classList.toggle("schedule-disabled", Boolean(enabled));
+  box.querySelectorAll("input").forEach((input) => {
+    input.disabled = Boolean(enabled);
   });
 }
 
@@ -1102,12 +1079,7 @@ function readScheduleEditor(containerId) {
   box.querySelectorAll(".schedule-day").forEach((row) => {
     const day = row.dataset.day;
     const isOpen = row.querySelector("[data-schedule-open]")?.checked;
-    const allDay = row.querySelector("[data-schedule-all-day]")?.checked;
     const slots = [];
-    if (isOpen && allDay) {
-      horarios[day] = [{ vinteQuatroHoras: true }];
-      return;
-    }
     [0, 1].forEach((index) => {
       const inicio = row.querySelector(`[data-slot="${index}"][data-field="inicio"]`)?.value || "";
       const fim = row.querySelector(`[data-slot="${index}"][data-field="fim"]`)?.value || "";
@@ -1124,7 +1096,6 @@ function scheduleToText(schedule) {
   return WEEK_DAYS.map(([key, label]) => {
     const slots = data[key] || [];
     if (!slots.length) return `${label}: Fechado`;
-    if (slots.some((slot) => slot.vinteQuatroHoras === true)) return `${label}: 24 horas`;
     return `${label}: ${slots.map((s) => `${s.inicio} as ${s.fim}`).join(" / ")}`;
   }).join("<br>");
 }
@@ -1845,6 +1816,8 @@ function resetClientForm() {
   $("deleteClientButton").classList.add("hidden");
   renderProfilePreview("clientImage", "clientProfilePreview");
   renderScheduleEditor("clientScheduleEditor", emptySchedule());
+  if ($("clientOpen24Hours")) $("clientOpen24Hours").checked = false;
+  toggleSchedule24Hours("clientScheduleEditor", false);
   renderClientImagesPreview();
   renderClientMenuPreview();
   renderClientPromocoesPreview();
@@ -1861,7 +1834,8 @@ function getClientFormData() {
   const horarios = readScheduleEditor("clientScheduleEditor");
   const scheduleBox = $("clientScheduleEditor");
   const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
-  const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("clientHours").value.trim();
+  const funcionamento24Horas = Boolean($("clientOpen24Hours")?.checked);
+  const horarioTexto = funcionamento24Horas ? "24 horas" : (shouldSaveSchedule ? scheduleToText(horarios) : $("clientHours").value.trim());
   const contatos = [
     $("clientContact").value.trim(),
     $("clientWhatsapp").value.trim(),
@@ -1884,6 +1858,7 @@ function getClientFormData() {
     contato3: contatos[2] || "",
     creci: $("clientCreci")?.value.trim() || "",
     endereco: $("clientAddress").value.trim(),
+    funcionamento24Horas,
     horario: horarioTexto,
     ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
     instagram: $("clientInstagram").value.trim(),
@@ -2050,6 +2025,7 @@ function fillClientForm(client) {
   if ($("clientContact3")) $("clientContact3").value = contatos[2] || "";
   $("clientAddress").value = client.endereco || client.address || "";
   $("clientHours").value = client.horario || client.hours || "";
+  if ($("clientOpen24Hours")) $("clientOpen24Hours").checked = Boolean(client.funcionamento24Horas);
   $("clientInstagram").value = client.instagram || "";
   $("clientFacebook").value = client.facebook || "";
   $("clientTiktok").value = client.tiktok || "";
@@ -2062,6 +2038,7 @@ function fillClientForm(client) {
   renderProfilePreview("clientImage", "clientProfilePreview");
   state.clientImages = normalizeImageItems(client.imagens);
   renderScheduleEditor("clientScheduleEditor", client.horarios || {});
+  toggleSchedule24Hours("clientScheduleEditor", Boolean(client.funcionamento24Horas));
   if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = Boolean(client.cardapioAtivo || client.menuAtivo || client.exibirCardapio || client.cardapioLink || (Array.isArray(client.menuImages) && client.menuImages.length));
   $("clientMenuLink").value = client.cardapioLink || "";
   state.clientMenuImages = normalizeUrlList(client.menuImages);
@@ -8028,6 +8005,10 @@ function renderClientOnlyEditor() {
               <p>Marque os dias abertos. Dias desmarcados aparecem como fechado.</p>
             </div>
           </div>
+          <label class="schedule-global-all-day">
+            <input id="coOpen24Hours" type="checkbox" ${client.funcionamento24Horas ? "checked" : ""}>
+            <span><strong>Funcionamento 24 horas</strong><small>Ative quando o estabelecimento trabalha 24 horas por dia.</small></span>
+          </label>
           <div id="coScheduleEditor" class="schedule-editor"></div>
         </section>
         <label class="admin-field-line field-instagram">Instagram<input id="coInstagram" value="${escapeAttr(client.instagram || "")}"></label>
@@ -8323,6 +8304,10 @@ function renderClientOnlyEditor() {
   `;
   if (canEditDados) {
     renderScheduleEditor("coScheduleEditor", client.horarios || {});
+    toggleSchedule24Hours("coScheduleEditor", Boolean(client.funcionamento24Horas));
+    $("coOpen24Hours")?.addEventListener("change", (event) => {
+      toggleSchedule24Hours("coScheduleEditor", event.target.checked);
+    });
     bindPhoneMask("coContact");
     bindPhoneMask("coWhatsapp");
     bindPhoneMask("coContact3");
@@ -8894,7 +8879,8 @@ function renderClientOnlyEditor() {
       const horarios = readScheduleEditor("coScheduleEditor");
       const scheduleBox = $("coScheduleEditor");
       const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
-      const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("coHours").value.trim();
+      const funcionamento24Horas = Boolean($("coOpen24Hours")?.checked);
+      const horarioTexto = funcionamento24Horas ? "24 horas" : (shouldSaveSchedule ? scheduleToText(horarios) : $("coHours").value.trim());
       const nome = $("coName").value.trim();
       const contatos = [
         $("coContact").value.trim(),
@@ -8911,6 +8897,7 @@ function renderClientOnlyEditor() {
         contato3: contatos[2] || "",
         ...(isRealEstateClient ? { creci: $("coCreci")?.value.trim() || "" } : {}),
         endereco: $("coAddress").value.trim(),
+        funcionamento24Horas,
         horario: horarioTexto,
         ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
         instagram: $("coInstagram").value.trim(),
@@ -9748,6 +9735,9 @@ function bindEvents() {
     event.target.value = "";
   });
   $("addClientImageUrlButton").addEventListener("click", addClientImageFromUrl);
+  $("clientOpen24Hours")?.addEventListener("change", (event) => {
+    toggleSchedule24Hours("clientScheduleEditor", event.target.checked);
+  });
   $("addClientPromoButton")?.addEventListener("click", addClientPromocao);
   $("cancelClientPromoEditButton")?.addEventListener("click", () => {
     state.clientPromoEditIndex = null;

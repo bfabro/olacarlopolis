@@ -6203,7 +6203,7 @@ carlopdiesel:"s",
       if (categoriasComida.includes(cat.title)) {
         cat.establishments.forEach(est => {
           const nomeNorm = normalizeName(est.name);
-          const abertoAgora = est.horarios ? estaAbertoAgora(est.horarios) : false;
+          const abertoAgora = est.funcionamento24Horas || (est.horarios ? estaAbertoAgora(est.horarios) : false);
 
           if (
             statusEstabelecimentos[nomeNorm] === "s" &&
@@ -6229,11 +6229,11 @@ carlopdiesel:"s",
     lista.forEach(est => {
       // ...código anterior...
       let statusAberto = '';
-      if (est.horarios) {
-        const aberto = estaAbertoAgora(est.horarios);
+      if (est.funcionamento24Horas || est.horarios) {
+        const aberto = est.funcionamento24Horas || estaAbertoAgora(est.horarios);
         if (aberto) {
           const fechamento = horarioFechamentoAtual(est.horarios);
-          const vinteQuatroHoras = funciona24HorasHoje(est.horarios);
+          const vinteQuatroHoras = est.funcionamento24Horas || funciona24HorasHoje(est.horarios);
           statusAberto = `<div class="onde-comer-status-row"><span class="onde-comer-status aberto"><i class="fas fa-circle"></i> ABERTO</span>${vinteQuatroHoras ? `<span class="onde-comer-status-hora vinte-quatro-horas">24 HORAS</span>` : (fechamento ? `<span class="onde-comer-status-hora">ate ${fechamento}</span>` : "")}</div>`;
         } else {
           const proximo = proximoHorarioDeAbertura(est.horarios);
@@ -6282,14 +6282,16 @@ carlopdiesel:"s",
         }
 </span>
 
-${est.horarios ? `
+${est.funcionamento24Horas ? `
+  <div class="onde-comer-horario-texto funcionamento-24-horas"><i class="fas fa-clock"></i> Funcionamento: 24 horas</div>
+` : (est.horarios ? `
   <details class="onde-comer-horarios">
     <summary><i class="fas fa-clock"></i> Dias e horarios</summary>
     ${renderHorariosFuncionamento(est.horarios)}
   </details>
 ` : (est.hours ? `
   <div class="onde-comer-horario-texto"><i class="fas fa-clock"></i> ${est.hours}</div>
-` : "")}
+` : ""))}
 
  
 
@@ -18154,7 +18156,13 @@ plotarPinsImoveis(stateImoveis.filtered);
       est.contact3 = contatos[2] || "";
     }
     if (campoExiste(cliente, "endereco")) est.address = cliente.endereco || "";
-    if (campoExiste(cliente, "horarios") && cliente.horarios && typeof cliente.horarios === "object") {
+    if (campoExiste(cliente, "funcionamento24Horas")) {
+      est.funcionamento24Horas = Boolean(cliente.funcionamento24Horas);
+    }
+    if (cliente.funcionamento24Horas) {
+      est.hours = "24 horas";
+      est.statusAberto = "a";
+    } else if (campoExiste(cliente, "horarios") && cliente.horarios && typeof cliente.horarios === "object") {
       est.horarios = cliente.horarios;
       est.hours = formatarHorariosAdmin(cliente.horarios) || cliente.horario || "";
       est.statusAberto = "a";
@@ -18205,9 +18213,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
       image: cliente.imagem || (imagensAdmin[0]?.url || ""),
       name: cliente.nome || clienteId,
-      hours: cliente.horarios ? (formatarHorariosAdmin(cliente.horarios) || cliente.horario || "") : (cliente.horario || ""),
+      funcionamento24Horas: Boolean(cliente.funcionamento24Horas),
+      hours: cliente.funcionamento24Horas ? "24 horas" : (cliente.horarios ? (formatarHorariosAdmin(cliente.horarios) || cliente.horario || "") : (cliente.horario || "")),
       horarios: cliente.horarios || null,
-      statusAberto: cliente.horarios ? "a" : "",
+      statusAberto: cliente.funcionamento24Horas || cliente.horarios ? "a" : "",
       address: cliente.endereco || "",
       contatos: getContatosEstabelecimento(cliente),
       contact: getContatosEstabelecimento(cliente)[0] || "",
@@ -18275,6 +18284,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       : getContatosEstabelecimento(base);
     return {
       ...cliente,
+      funcionamento24Horas: Boolean(cliente.funcionamento24Horas || base.funcionamento24Horas),
       contatos,
       contato: contatos[0] || "",
       whatsapp: contatos[1] || contatos[0] || "",
@@ -19546,11 +19556,11 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
           
       ${paidEstablishments.map((establishment) => {
       let statusAberto = "";
-      if (establishment.horarios) {
-        const aberto = estaAbertoAgora(establishment.horarios);
+      if (establishment.funcionamento24Horas || establishment.horarios) {
+        const aberto = establishment.funcionamento24Horas || estaAbertoAgora(establishment.horarios);
         if (aberto) {
           const fechamento = horarioFechamentoAtual(establishment.horarios);
-          statusAberto = funciona24HorasHoje(establishment.horarios)
+          statusAberto = establishment.funcionamento24Horas || funciona24HorasHoje(establishment.horarios)
             ? `<span class='status-tag vinte-quatro-horas'>ABERTO 24 HORAS</span>`
             : `<span class='status-tag aberto'>ABERTO ATÉ ${fechamento}</span>`;
         } else {
@@ -19659,12 +19669,12 @@ ${!establishment.descricaoFalecido ? `
 
 
 
-        ${(establishment.horarios || establishment.hours) ? `
+        ${(establishment.funcionamento24Horas || establishment.horarios || establishment.hours) ? `
           <div class="info-box">
             <i class="fas fa-clock info-icon"></i>
             <div>
               <div class="info-label">Funcionamento: </div>
-              <div class="info-value">${establishment.horarios ? renderHorariosFuncionamento(establishment.horarios) : establishment.hours}</div>
+              <div class="info-value">${establishment.funcionamento24Horas ? `<span class="funcionamento-24-horas">24 horas</span>` : (establishment.horarios ? renderHorariosFuncionamento(establishment.horarios) : establishment.hours)}</div>
             </div>
           </div>` : ""
         }

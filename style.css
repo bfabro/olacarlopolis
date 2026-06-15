@@ -2268,6 +2268,11 @@ screen and (width: 820px) {
   background: #fff1f2;
 }
 
+.funcionamento-24-horas {
+  color: #dc2626 !important;
+  font-weight: 900;
+}
+
 .onde-comer-horarios {
   margin-top: 6px;
   font-size: 12px;
