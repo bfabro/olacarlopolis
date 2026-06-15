@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-06-14-whatsapp-flags-v297'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-06-14-novidades-imagem-cliente-v298'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

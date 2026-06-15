@@ -2729,7 +2729,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function novidadeImagem(item) {
-    return item?.imagem || item?.image || item?.foto || item?.logo || item?.perfil || "";
+    const imagemDireta = item?.imagem || item?.image || item?.foto || item?.logo || item?.perfil || "";
+    if (imagemDireta) return imagemDireta;
+    const cadastro = encontrarCadastroDonoNovidade(item, item?.estabelecimento || item?.clienteNome || "");
+    return cadastro?.image
+      || cadastro?.imagem
+      || cadastro?.logo
+      || cadastro?.logoUrl
+      || cadastro?.profileImage
+      || cadastro?.perfil
+      || cadastro?.imagemPerfil
+      || "";
   }
 
   function novidadeImagens(item = {}) {
