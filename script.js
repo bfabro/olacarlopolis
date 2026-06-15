@@ -19719,12 +19719,12 @@ ${!establishment.descricaoFalecido ? `
 
 
 
-        ${(establishment.funcionamento24Horas || establishment.horarios || establishment.hours) ? `
+        ${(!establishment.funcionamento24Horas && (establishment.horarios || establishment.hours)) ? `
           <div class="info-box">
             <i class="fas fa-clock info-icon"></i>
             <div>
               <div class="info-label">Funcionamento: </div>
-              <div class="info-value">${establishment.funcionamento24Horas ? `<span class="funcionamento-24-horas">24 horas</span>` : (establishment.horarios ? renderHorariosFuncionamento(establishment.horarios) : establishment.hours)}</div>
+              <div class="info-value">${establishment.horarios ? renderHorariosFuncionamento(establishment.horarios) : establishment.hours}</div>
             </div>
           </div>` : ""
         }

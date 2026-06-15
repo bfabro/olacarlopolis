@@ -2150,28 +2150,33 @@ screen and (width: 820px) {
 }
 
 .contato-publico-link {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 9px;
+  flex-wrap: nowrap;
+  gap: 6px;
   width: fit-content;
   max-width: 100%;
   border: 1px solid #bfdbfe;
   border-radius: 10px;
-  padding: 7px 10px;
+  padding: 6px 9px;
   background: #eff6ff;
   color: #1e40af;
   font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
   text-decoration: none;
 }
 
 .contato-publico-link .info-icon {
+  flex: 0 0 auto;
   margin: 0;
   color: #2563eb;
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .contato-publico-link span {
-  display: block;
+  display: inline;
+  white-space: nowrap;
 }
 
 .contato-publico-link.is-whatsapp {
