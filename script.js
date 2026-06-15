@@ -236,17 +236,47 @@ function gerarMensagemWhatsApp() {
   return `${saudacao} Encontrei seu numero no Ola Carlopolis.`;
 }
 
-// Retorna o primeiro telefone do contact (array ou string)
+function getContatosEstabelecimento(establishment = {}) {
+  const candidates = [
+    ...(Array.isArray(establishment.contatos) ? establishment.contatos : []),
+    establishment.contato,
+    establishment.contact,
+    establishment.whatsapp,
+    establishment.contact2,
+    establishment.contato2,
+    establishment.contact3,
+    establishment.contato3,
+    establishment.telefone
+  ];
+  const seen = new Set();
+  return candidates
+    .flatMap((value) => Array.isArray(value) ? value : [value])
+    .map((value) => String(value || "").trim())
+    .filter((value) => {
+      const key = somenteDigitos(value);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 3);
+}
+
+// Retorna o primeiro telefone para locais que ainda exibem somente um contato.
 function getPrimeiroContato(contact) {
-  if (!contact) return "";
-  if (Array.isArray(contact)) return String(contact.find(Boolean) || "").trim();
-  // divide por separadores comuns: / , ; " e " " ou "
-  return String(contact).split(/\s*(?:\/|,|;|\bou\b|\be\b)\s*/i)[0].trim();
+  if (contact && typeof contact === "object" && !Array.isArray(contact)) {
+    return getContatosEstabelecimento(contact)[0] || "";
+  }
+  return getContatosEstabelecimento({ contatos: Array.isArray(contact) ? contact : [contact] })[0] || "";
 }
 
 // Mantém só dígitos (para montar o link do WhatsApp)
 function somenteDigitos(str) {
   return String(str || "").replace(/\D/g, "");
+}
+
+function numeroWhatsAppBrasil(value) {
+  const digits = somenteDigitos(value);
+  return digits.startsWith("55") ? digits : `55${digits}`;
 }
 
 
@@ -6264,7 +6294,7 @@ ${est.horarios ? `
  
 
 
-${(cardapioVisivel(est) || est.contact) ? `
+${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   <div class="botoes-abaixo-nome">
     ${cardapioVisivel(est) && est.cardapioLink ? `
         <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
@@ -6272,15 +6302,15 @@ ${(cardapioVisivel(est) || est.contact) ? `
         <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
       ` : '')
           }
-    ${est.contact ? `
-      <a href="https://wa.me/55${est.contact.replace(/\D/g, '')}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
-         target="_blank"
-         class="btn-whatsapp_onde"
-         onclick="registrarCliqueWhatsOndeComer('${normalizeName(est.name)}');">
-         
-        <i class="fab fa-whatsapp"></i> ${est.contact}
+    ${getContatosEstabelecimento(est).map((contato) => `
+      <a href="https://wa.me/${numeroWhatsAppBrasil(contato)}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-whatsapp_onde"
+        onclick="registrarCliqueWhatsOndeComer('${normalizeName(est.name)}');">
+        <i class="fab fa-whatsapp"></i> ${contato}
       </a>
-    ` : ""}
+    `).join("")}
   </div>
 ` : ""}
 
@@ -18115,9 +18145,13 @@ plotarPinsImoveis(stateImoveis.filtered);
       est.novidadesDescriptions = imagensAdmin.map((item) => item.texto || "").slice(0, 10);
     }
 
-    if (campoExiste(cliente, "contato") || campoExiste(cliente, "whatsapp")) {
-      est.contact = cliente.contato || cliente.whatsapp || "";
-      est.whatsapp = cliente.whatsapp || cliente.contato || "";
+    if (campoExiste(cliente, "contatos") || campoExiste(cliente, "contato") || campoExiste(cliente, "whatsapp")) {
+      const contatos = getContatosEstabelecimento(cliente);
+      est.contatos = contatos;
+      est.contact = contatos[0] || "";
+      est.whatsapp = contatos[1] || contatos[0] || "";
+      est.contact2 = contatos[1] || "";
+      est.contact3 = contatos[2] || "";
     }
     if (campoExiste(cliente, "endereco")) est.address = cliente.endereco || "";
     if (campoExiste(cliente, "horarios") && cliente.horarios && typeof cliente.horarios === "object") {
@@ -18175,8 +18209,11 @@ plotarPinsImoveis(stateImoveis.filtered);
       horarios: cliente.horarios || null,
       statusAberto: cliente.horarios ? "a" : "",
       address: cliente.endereco || "",
-      contact: cliente.contato || "",
-      whatsapp: cliente.whatsapp || "",
+      contatos: getContatosEstabelecimento(cliente),
+      contact: getContatosEstabelecimento(cliente)[0] || "",
+      whatsapp: getContatosEstabelecimento(cliente)[1] || getContatosEstabelecimento(cliente)[0] || "",
+      contact2: getContatosEstabelecimento(cliente)[1] || "",
+      contact3: getContatosEstabelecimento(cliente)[2] || "",
       instagram: cliente.instagram || "",
       facebook: cliente.facebook || "",
       tiktok: cliente.tiktok || "",
@@ -18233,8 +18270,16 @@ plotarPinsImoveis(stateImoveis.filtered);
   function enriquecerClienteComBaseAdmin(clienteId, cliente) {
     const base = encontrarEstabelecimentoBaseAdmin(clienteId, cliente, cliente?.categoria || "");
     if (!base) return cliente;
+    const contatos = getContatosEstabelecimento(cliente).length
+      ? getContatosEstabelecimento(cliente)
+      : getContatosEstabelecimento(base);
     return {
       ...cliente,
+      contatos,
+      contato: contatos[0] || "",
+      whatsapp: contatos[1] || contatos[0] || "",
+      contato2: contatos[1] || "",
+      contato3: contatos[2] || "",
       horarios: cliente.horarios || base.horarios || null,
       horario: cliente.horario || base.hours || "",
       imagem: cliente.imagem || base.image || "",
@@ -19641,62 +19686,37 @@ ${!establishment.descricaoFalecido ? `
 
 
 
-        ${establishment.contact || establishment.contact2 || establishment.contact3 ? (() => {
+        ${getContatosEstabelecimento(establishment).length ? (() => {
           const formatPhone = (number) => {
             const rawNumber = (number || "").replace(/\D/g, "");
             const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
             return fullNumber;
           }
-
-          const firstNumber = formatPhone(establishment.whatsapp || establishment.contact || "");
-          const secondNumber = establishment.contact2 ? formatPhone(establishment.contact2) : null;
-          const thirdNumber = establishment.contact3 ? formatPhone(establishment.contact3) : null;
+          const contatos = getContatosEstabelecimento(establishment);
 
           return `
 
               <div class="info-box">
                 <i class="fas fa-phone info-icon"></i>
                 <div>
-                  <div class="info-label">Contato</div>
-                  <div class="info-value">
-                    ${establishment.contact ? `
-                      <div style="display: flex; align-items: center;  margin-bottom: 4px;">
-
-                      <a href="https://api.whatsapp.com/send?phone=${firstNumber}&text=${encodeURIComponent('Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!')}"
-   target="_blank"
-   class="zap-link telefone-link"
-   data-id="${normalizeName(establishment.name)}"
-   data-tel="${firstNumber}">
-  <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-  <span>${establishment.contact}</span>
-</a>
-
-
-                      </div>` : ""
-            }
-
-                    ${secondNumber ? `
-                        <div style="display: flex; align-items: center;  margin-bottom: 4px;">
-                          <a href="https://api.whatsapp.com/send?phone=${secondNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank" class="link-whatsapp">
-                                        <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-                                  
-                                                <span>${establishment.contact2}</span></a>
-                      </div>` : ""
-            }
-
-                  ${thirdNumber ? `
-                  <div style="display: flex; align-items: center; ">
-                    <a href="https://api.whatsapp.com/send?phone=${thirdNumber}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}" target="_blank">
-                      <i class='bx bxl-whatsapp info-icon' style="color: #25D366; font-size: 24px;"></i>
-                    
-                    <span>${establishment.contact3}</span></a>
-                  </div>` : ""
-            }
-                                </div>
-                              </div>
-                            </div>
-
-                            `;
+                  <div class="info-label">Contatos</div>
+                  <div class="info-value contatos-publicos">
+                    ${contatos.map((contato, index) => {
+                      const numero = formatPhone(contato);
+                      return `
+                        <a href="https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="zap-link telefone-link contato-publico-link"
+                          data-id="${normalizeName(establishment.name)}"
+                          data-tel="${numero}">
+                          <i class='bx bxl-whatsapp info-icon'></i>
+                          <span><small>Contato ${index + 1}</small>${contato}</span>
+                        </a>`;
+                    }).join("")}
+                  </div>
+                </div>
+              </div>`;
         })() : ""
 
         }

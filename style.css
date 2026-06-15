@@ -2144,6 +2144,45 @@ screen and (width: 820px) {
   text-decoration: none !important;
 }
 
+.contatos-publicos {
+  display: grid;
+  gap: 8px;
+}
+
+.contato-publico-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 7px 10px;
+  background: #f0fdf4;
+  color: #166534;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.contato-publico-link .info-icon {
+  margin: 0;
+  color: #25d366;
+  font-size: 24px;
+}
+
+.contato-publico-link span,
+.contato-publico-link small {
+  display: block;
+}
+
+.contato-publico-link small {
+  margin-bottom: 2px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 .info-label {
   font-weight: 600;
   font-size: 16px;

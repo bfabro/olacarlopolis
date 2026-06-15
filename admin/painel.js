@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 284,
-  label: "v290",
+  numero: 285,
+  label: "v291",
   data: "2026-06-14",
-  nota: "Opcao de funcionamento 24 horas adicionada aos horarios dos clientes."
+  nota: "Cadastro e exibicao de ate tres telefones ou WhatsApps por cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -480,6 +480,30 @@ function normalizeUrlList(items) {
     .map((url) => String(url || "").trim())
     .filter(Boolean)
     .slice(0, 30);
+}
+
+function normalizeClientContacts(client = {}) {
+  const candidates = [
+    ...(Array.isArray(client.contatos) ? client.contatos : []),
+    client.contato,
+    client.contact,
+    client.whatsapp,
+    client.contato2,
+    client.contact2,
+    client.contato3,
+    client.contact3,
+    client.telefone
+  ];
+  const seen = new Set();
+  return candidates
+    .map((value) => String(value || "").trim())
+    .filter((value) => {
+      const key = value.replace(/\D/g, "");
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 3);
 }
 
 function normalizePromocoes(items) {
@@ -1838,6 +1862,11 @@ function getClientFormData() {
   const scheduleBox = $("clientScheduleEditor");
   const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
   const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("clientHours").value.trim();
+  const contatos = [
+    $("clientContact").value.trim(),
+    $("clientWhatsapp").value.trim(),
+    $("clientContact3")?.value.trim() || ""
+  ].filter(Boolean);
   return {
     id,
     nome: name,
@@ -1848,8 +1877,11 @@ function getClientFormData() {
     tipo: tipoCliente,
     status: $("clientStatus").value,
     pagamentoStatus: $("clientPaymentStatus").value,
-    contato: $("clientContact").value.trim(),
-    whatsapp: $("clientWhatsapp").value.trim(),
+    contatos,
+    contato: contatos[0] || "",
+    whatsapp: contatos[1] || contatos[0] || "",
+    contato2: contatos[1] || "",
+    contato3: contatos[2] || "",
     creci: $("clientCreci")?.value.trim() || "",
     endereco: $("clientAddress").value.trim(),
     horario: horarioTexto,
@@ -2012,8 +2044,10 @@ function fillClientForm(client) {
   atualizarVisibilidadeCreciCliente();
   $("clientStatus").value = client.status || "ativo";
   $("clientPaymentStatus").value = client.pagamentoStatus || "em_aberto";
-  $("clientContact").value = client.contato || client.contact || "";
-  $("clientWhatsapp").value = client.whatsapp || "";
+  const contatos = normalizeClientContacts(client);
+  $("clientContact").value = contatos[0] || "";
+  $("clientWhatsapp").value = contatos[1] || "";
+  if ($("clientContact3")) $("clientContact3").value = contatos[2] || "";
   $("clientAddress").value = client.endereco || client.address || "";
   $("clientHours").value = client.horario || client.hours || "";
   $("clientInstagram").value = client.instagram || "";
@@ -7981,8 +8015,9 @@ function renderClientOnlyEditor() {
         </div>
         <label class="admin-field-line field-company">Nome da empresa<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
         <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
-        <label class="admin-field-line field-phone">Telefone<input id="coContact" value="${escapeAttr(client.contato || "")}"></label>
-        <label class="admin-field-line field-whatsapp">WhatsApp<input id="coWhatsapp" value="${escapeAttr(client.whatsapp || "")}"></label>
+        <label class="admin-field-line field-phone">Telefone / WhatsApp 1<input id="coContact" value="${escapeAttr(normalizeClientContacts(client)[0] || "")}"></label>
+        <label class="admin-field-line field-whatsapp">Telefone / WhatsApp 2<input id="coWhatsapp" value="${escapeAttr(normalizeClientContacts(client)[1] || "")}"></label>
+        <label class="admin-field-line field-phone-extra">Telefone / WhatsApp 3<input id="coContact3" value="${escapeAttr(normalizeClientContacts(client)[2] || "")}"></label>
         ${isRealEstateClient ? `<label class="admin-field-line field-creci">CRECI (opcional)<input id="coCreci" value="${escapeAttr(client.creci || client.registroCreci || "")}" placeholder="Ex.: 38.105 F"></label>` : ""}
         
         
@@ -8290,6 +8325,7 @@ function renderClientOnlyEditor() {
     renderScheduleEditor("coScheduleEditor", client.horarios || {});
     bindPhoneMask("coContact");
     bindPhoneMask("coWhatsapp");
+    bindPhoneMask("coContact3");
   }
   if (canViewRelatorios) bindClientMetricReportControls(client);
   const moduleNavButtons = [...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")];
@@ -8860,11 +8896,19 @@ function renderClientOnlyEditor() {
       const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
       const horarioTexto = shouldSaveSchedule ? scheduleToText(horarios) : $("coHours").value.trim();
       const nome = $("coName").value.trim();
+      const contatos = [
+        $("coContact").value.trim(),
+        $("coWhatsapp").value.trim(),
+        $("coContact3")?.value.trim() || ""
+      ].filter(Boolean);
       Object.assign(payload, {
         nome,
         nomeNormalizado: normalizeName(nome),
-        contato: $("coContact").value.trim(),
-        whatsapp: $("coWhatsapp").value.trim(),
+        contatos,
+        contato: contatos[0] || "",
+        whatsapp: contatos[1] || contatos[0] || "",
+        contato2: contatos[1] || "",
+        contato3: contatos[2] || "",
         ...(isRealEstateClient ? { creci: $("coCreci")?.value.trim() || "" } : {}),
         endereco: $("coAddress").value.trim(),
         horario: horarioTexto,
@@ -9612,6 +9656,9 @@ function bindEvents() {
   bindCurrencyMask($("imovelValor"));
   bindCurrencyMask($("automovelPreco"));
   bindPhoneMask("imovelTelefone");
+  bindPhoneMask("clientContact");
+  bindPhoneMask("clientWhatsapp");
+  bindPhoneMask("clientContact3");
 
   $("loginForm").addEventListener("submit", async (event) => {
     event.preventDefault();
