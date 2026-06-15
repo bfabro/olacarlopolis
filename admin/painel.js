@@ -37,10 +37,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 286,
-  label: "v292",
+  numero: 287,
+  label: "v293",
   data: "2026-06-14",
-  nota: "Flag geral de funcionamento 24 horas com exibicao publica simplificada."
+  nota: "Flags individuais de WhatsApp e mascara publica para os telefones."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -483,26 +483,41 @@ function normalizeUrlList(items) {
 }
 
 function normalizeClientContacts(client = {}) {
+  return normalizeClientContactDetails(client).map((item) => item.numero);
+}
+
+function normalizeClientContactDetails(client = {}) {
+  const detailed = Array.isArray(client.contatosDetalhados)
+    ? client.contatosDetalhados.map((item) => ({
+      numero: String(item?.numero || item?.telefone || "").trim(),
+      whatsapp: Boolean(item?.whatsapp)
+    }))
+    : [];
+  const legacyWhatsappDigits = String(client.whatsapp || "").replace(/\D/g, "");
   const candidates = [
-    ...(Array.isArray(client.contatos) ? client.contatos : []),
-    client.contato,
-    client.contact,
-    client.whatsapp,
-    client.contato2,
-    client.contact2,
-    client.contato3,
-    client.contact3,
-    client.telefone
+    ...detailed,
+    ...(Array.isArray(client.contatos) ? client.contatos.map((numero) => ({ numero, whatsapp: false })) : []),
+    { numero: client.contato, whatsapp: false },
+    { numero: client.contact, whatsapp: false },
+    { numero: client.whatsapp, whatsapp: true },
+    { numero: client.contato2, whatsapp: false },
+    { numero: client.contact2, whatsapp: false },
+    { numero: client.contato3, whatsapp: false },
+    { numero: client.contact3, whatsapp: false },
+    { numero: client.telefone, whatsapp: false }
   ];
-  const seen = new Set();
-  return candidates
-    .map((value) => String(value || "").trim())
-    .filter((value) => {
-      const key = value.replace(/\D/g, "");
-      if (!key || seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
+  const byNumber = new Map();
+  candidates.forEach((item) => {
+    const numero = String(item?.numero || "").trim();
+    const key = numero.replace(/\D/g, "");
+    if (!key) return;
+    const existing = byNumber.get(key);
+    byNumber.set(key, {
+      numero: existing?.numero || numero,
+      whatsapp: Boolean(existing?.whatsapp || item?.whatsapp || (legacyWhatsappDigits && key === legacyWhatsappDigits))
+    });
+  });
+  return [...byNumber.values()]
     .slice(0, 3);
 }
 
@@ -1836,11 +1851,13 @@ function getClientFormData() {
   const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
   const funcionamento24Horas = Boolean($("clientOpen24Hours")?.checked);
   const horarioTexto = funcionamento24Horas ? "24 horas" : (shouldSaveSchedule ? scheduleToText(horarios) : $("clientHours").value.trim());
-  const contatos = [
-    $("clientContact").value.trim(),
-    $("clientWhatsapp").value.trim(),
-    $("clientContact3")?.value.trim() || ""
-  ].filter(Boolean);
+  const contatosDetalhados = [
+    { numero: $("clientContact").value.trim(), whatsapp: Boolean($("clientContactIsWhatsapp")?.checked) },
+    { numero: $("clientWhatsapp").value.trim(), whatsapp: Boolean($("clientWhatsappIsWhatsapp")?.checked) },
+    { numero: $("clientContact3")?.value.trim() || "", whatsapp: Boolean($("clientContact3IsWhatsapp")?.checked) }
+  ].filter((item) => item.numero);
+  const contatos = contatosDetalhados.map((item) => item.numero);
+  const whatsappPrincipal = contatosDetalhados.find((item) => item.whatsapp)?.numero || "";
   return {
     id,
     nome: name,
@@ -1851,9 +1868,10 @@ function getClientFormData() {
     tipo: tipoCliente,
     status: $("clientStatus").value,
     pagamentoStatus: $("clientPaymentStatus").value,
+    contatosDetalhados,
     contatos,
     contato: contatos[0] || "",
-    whatsapp: contatos[1] || contatos[0] || "",
+    whatsapp: whatsappPrincipal,
     contato2: contatos[1] || "",
     contato3: contatos[2] || "",
     creci: $("clientCreci")?.value.trim() || "",
@@ -2019,10 +2037,13 @@ function fillClientForm(client) {
   atualizarVisibilidadeCreciCliente();
   $("clientStatus").value = client.status || "ativo";
   $("clientPaymentStatus").value = client.pagamentoStatus || "em_aberto";
-  const contatos = normalizeClientContacts(client);
-  $("clientContact").value = contatos[0] || "";
-  $("clientWhatsapp").value = contatos[1] || "";
-  if ($("clientContact3")) $("clientContact3").value = contatos[2] || "";
+  const contatos = normalizeClientContactDetails(client);
+  $("clientContact").value = contatos[0]?.numero || "";
+  $("clientWhatsapp").value = contatos[1]?.numero || "";
+  if ($("clientContact3")) $("clientContact3").value = contatos[2]?.numero || "";
+  if ($("clientContactIsWhatsapp")) $("clientContactIsWhatsapp").checked = Boolean(contatos[0]?.whatsapp);
+  if ($("clientWhatsappIsWhatsapp")) $("clientWhatsappIsWhatsapp").checked = Boolean(contatos[1]?.whatsapp);
+  if ($("clientContact3IsWhatsapp")) $("clientContact3IsWhatsapp").checked = Boolean(contatos[2]?.whatsapp);
   $("clientAddress").value = client.endereco || client.address || "";
   $("clientHours").value = client.horario || client.hours || "";
   if ($("clientOpen24Hours")) $("clientOpen24Hours").checked = Boolean(client.funcionamento24Horas);
@@ -7992,9 +8013,15 @@ function renderClientOnlyEditor() {
         </div>
         <label class="admin-field-line field-company">Nome da empresa<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
         <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
-        <label class="admin-field-line field-phone">Telefone / WhatsApp 1<input id="coContact" value="${escapeAttr(normalizeClientContacts(client)[0] || "")}"></label>
-        <label class="admin-field-line field-whatsapp">Telefone / WhatsApp 2<input id="coWhatsapp" value="${escapeAttr(normalizeClientContacts(client)[1] || "")}"></label>
-        <label class="admin-field-line field-phone-extra">Telefone / WhatsApp 3<input id="coContact3" value="${escapeAttr(normalizeClientContacts(client)[2] || "")}"></label>
+        ${(() => {
+          const contactDetails = normalizeClientContactDetails(client);
+          return [0, 1, 2].map((index) => `
+            <div class="contact-admin-field">
+              <label class="admin-field-line">Telefone ${index + 1}<input id="${index === 0 ? "coContact" : (index === 1 ? "coWhatsapp" : "coContact3")}" value="${escapeAttr(contactDetails[index]?.numero || "")}"></label>
+              <label class="contact-whatsapp-flag"><input id="coContact${index + 1}IsWhatsapp" type="checkbox" ${contactDetails[index]?.whatsapp ? "checked" : ""}> É WhatsApp</label>
+            </div>
+          `).join("");
+        })()}
         ${isRealEstateClient ? `<label class="admin-field-line field-creci">CRECI (opcional)<input id="coCreci" value="${escapeAttr(client.creci || client.registroCreci || "")}" placeholder="Ex.: 38.105 F"></label>` : ""}
         
         
@@ -8882,17 +8909,20 @@ function renderClientOnlyEditor() {
       const funcionamento24Horas = Boolean($("coOpen24Hours")?.checked);
       const horarioTexto = funcionamento24Horas ? "24 horas" : (shouldSaveSchedule ? scheduleToText(horarios) : $("coHours").value.trim());
       const nome = $("coName").value.trim();
-      const contatos = [
-        $("coContact").value.trim(),
-        $("coWhatsapp").value.trim(),
-        $("coContact3")?.value.trim() || ""
-      ].filter(Boolean);
+      const contatosDetalhados = [
+        { numero: $("coContact").value.trim(), whatsapp: Boolean($("coContact1IsWhatsapp")?.checked) },
+        { numero: $("coWhatsapp").value.trim(), whatsapp: Boolean($("coContact2IsWhatsapp")?.checked) },
+        { numero: $("coContact3")?.value.trim() || "", whatsapp: Boolean($("coContact3IsWhatsapp")?.checked) }
+      ].filter((item) => item.numero);
+      const contatos = contatosDetalhados.map((item) => item.numero);
+      const whatsappPrincipal = contatosDetalhados.find((item) => item.whatsapp)?.numero || "";
       Object.assign(payload, {
         nome,
         nomeNormalizado: normalizeName(nome),
+        contatosDetalhados,
         contatos,
         contato: contatos[0] || "",
-        whatsapp: contatos[1] || contatos[0] || "",
+        whatsapp: whatsappPrincipal,
         contato2: contatos[1] || "",
         contato3: contatos[2] || "",
         ...(isRealEstateClient ? { creci: $("coCreci")?.value.trim() || "" } : {}),

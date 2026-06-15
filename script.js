@@ -237,28 +237,43 @@ function gerarMensagemWhatsApp() {
 }
 
 function getContatosEstabelecimento(establishment = {}) {
+  return getContatosDetalhadosEstabelecimento(establishment).map((item) => item.numero);
+}
+
+function getContatosDetalhadosEstabelecimento(establishment = {}) {
+  const detailed = Array.isArray(establishment.contatosDetalhados)
+    ? establishment.contatosDetalhados.map((item) => ({
+      numero: String(item?.numero || item?.telefone || "").trim(),
+      whatsapp: Boolean(item?.whatsapp)
+    }))
+    : [];
+  const legacyWhatsappDigits = somenteDigitos(establishment.whatsapp);
   const candidates = [
-    ...(Array.isArray(establishment.contatos) ? establishment.contatos : []),
-    establishment.contato,
-    establishment.contact,
-    establishment.whatsapp,
-    establishment.contact2,
-    establishment.contato2,
-    establishment.contact3,
-    establishment.contato3,
-    establishment.telefone
+    ...detailed,
+    ...(Array.isArray(establishment.contatos)
+      ? establishment.contatos.map((numero) => ({ numero, whatsapp: false }))
+      : []),
+    { numero: establishment.contato, whatsapp: false },
+    { numero: establishment.contact, whatsapp: false },
+    { numero: establishment.whatsapp, whatsapp: true },
+    { numero: establishment.contact2, whatsapp: false },
+    { numero: establishment.contato2, whatsapp: false },
+    { numero: establishment.contact3, whatsapp: false },
+    { numero: establishment.contato3, whatsapp: false },
+    { numero: establishment.telefone, whatsapp: false }
   ];
-  const seen = new Set();
-  return candidates
-    .flatMap((value) => Array.isArray(value) ? value : [value])
-    .map((value) => String(value || "").trim())
-    .filter((value) => {
-      const key = somenteDigitos(value);
-      if (!key || seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .slice(0, 3);
+  const byNumber = new Map();
+  candidates.forEach((item) => {
+    const numero = String(item?.numero || "").trim();
+    const key = somenteDigitos(numero);
+    if (!key) return;
+    const existing = byNumber.get(key);
+    byNumber.set(key, {
+      numero: existing?.numero || numero,
+      whatsapp: Boolean(existing?.whatsapp || item?.whatsapp || (legacyWhatsappDigits && key === legacyWhatsappDigits))
+    });
+  });
+  return [...byNumber.values()].slice(0, 3);
 }
 
 // Retorna o primeiro telefone para locais que ainda exibem somente um contato.
@@ -277,6 +292,19 @@ function somenteDigitos(str) {
 function numeroWhatsAppBrasil(value) {
   const digits = somenteDigitos(value);
   return digits.startsWith("55") ? digits : `55${digits}`;
+}
+
+function formatarTelefonePublico(value) {
+  let digits = somenteDigitos(value);
+  if (digits.startsWith("55") && digits.length > 11) digits = digits.slice(2);
+  digits = digits.slice(0, 11);
+  if (digits.length === 11) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 3)}.${digits.slice(3, 7)}-${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+  return String(value || "").trim();
 }
 
 
@@ -6304,13 +6332,17 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
       ` : '')
           }
-    ${getContatosEstabelecimento(est).map((contato) => `
-      <a href="https://wa.me/${numeroWhatsAppBrasil(contato)}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
+    ${getContatosDetalhadosEstabelecimento(est).map((contato) => contato.whatsapp ? `
+      <a href="https://wa.me/${numeroWhatsAppBrasil(contato.numero)}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
         target="_blank"
         rel="noopener noreferrer"
         class="btn-whatsapp_onde"
         onclick="registrarCliqueWhatsOndeComer('${normalizeName(est.name)}');">
-        <i class="fab fa-whatsapp"></i> ${contato}
+        <i class="fab fa-whatsapp"></i> ${formatarTelefonePublico(contato.numero)}
+      </a>
+    ` : `
+      <a href="tel:${somenteDigitos(contato.numero)}" class="btn-whatsapp_onde btn-telefone-onde">
+        <i class="fas fa-phone"></i> ${formatarTelefonePublico(contato.numero)}
       </a>
     `).join("")}
   </div>
@@ -18147,11 +18179,13 @@ plotarPinsImoveis(stateImoveis.filtered);
       est.novidadesDescriptions = imagensAdmin.map((item) => item.texto || "").slice(0, 10);
     }
 
-    if (campoExiste(cliente, "contatos") || campoExiste(cliente, "contato") || campoExiste(cliente, "whatsapp")) {
-      const contatos = getContatosEstabelecimento(cliente);
+    if (campoExiste(cliente, "contatosDetalhados") || campoExiste(cliente, "contatos") || campoExiste(cliente, "contato") || campoExiste(cliente, "whatsapp")) {
+      const contatosDetalhados = getContatosDetalhadosEstabelecimento(cliente);
+      const contatos = contatosDetalhados.map((item) => item.numero);
+      est.contatosDetalhados = contatosDetalhados;
       est.contatos = contatos;
       est.contact = contatos[0] || "";
-      est.whatsapp = contatos[1] || contatos[0] || "";
+      est.whatsapp = contatosDetalhados.find((item) => item.whatsapp)?.numero || "";
       est.contact2 = contatos[1] || "";
       est.contact3 = contatos[2] || "";
     }
@@ -18209,6 +18243,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     const cardapioAtivo = temControleCardapio
       ? Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
       : Boolean(cliente.cardapioLink || (Array.isArray(cliente.menuImages) && cliente.menuImages.length));
+    const contatosDetalhados = getContatosDetalhadosEstabelecimento(cliente);
+    const contatos = contatosDetalhados.map((item) => item.numero);
     return {
       nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
       image: cliente.imagem || (imagensAdmin[0]?.url || ""),
@@ -18218,11 +18254,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       horarios: cliente.horarios || null,
       statusAberto: cliente.funcionamento24Horas || cliente.horarios ? "a" : "",
       address: cliente.endereco || "",
-      contatos: getContatosEstabelecimento(cliente),
-      contact: getContatosEstabelecimento(cliente)[0] || "",
-      whatsapp: getContatosEstabelecimento(cliente)[1] || getContatosEstabelecimento(cliente)[0] || "",
-      contact2: getContatosEstabelecimento(cliente)[1] || "",
-      contact3: getContatosEstabelecimento(cliente)[2] || "",
+      contatosDetalhados,
+      contatos,
+      contact: contatos[0] || "",
+      whatsapp: contatosDetalhados.find((item) => item.whatsapp)?.numero || "",
+      contact2: contatos[1] || "",
+      contact3: contatos[2] || "",
       instagram: cliente.instagram || "",
       facebook: cliente.facebook || "",
       tiktok: cliente.tiktok || "",
@@ -18279,15 +18316,18 @@ plotarPinsImoveis(stateImoveis.filtered);
   function enriquecerClienteComBaseAdmin(clienteId, cliente) {
     const base = encontrarEstabelecimentoBaseAdmin(clienteId, cliente, cliente?.categoria || "");
     if (!base) return cliente;
-    const contatos = getContatosEstabelecimento(cliente).length
-      ? getContatosEstabelecimento(cliente)
-      : getContatosEstabelecimento(base);
+    const contatosDetalhadosCliente = getContatosDetalhadosEstabelecimento(cliente);
+    const contatosDetalhados = contatosDetalhadosCliente.length
+      ? contatosDetalhadosCliente
+      : getContatosDetalhadosEstabelecimento(base);
+    const contatos = contatosDetalhados.map((item) => item.numero);
     return {
       ...cliente,
       funcionamento24Horas: Boolean(cliente.funcionamento24Horas || base.funcionamento24Horas),
+      contatosDetalhados,
       contatos,
       contato: contatos[0] || "",
-      whatsapp: contatos[1] || contatos[0] || "",
+      whatsapp: contatosDetalhados.find((item) => item.whatsapp)?.numero || "",
       contato2: contatos[1] || "",
       contato3: contatos[2] || "",
       horarios: cliente.horarios || base.horarios || null,
@@ -19696,13 +19736,8 @@ ${!establishment.descricaoFalecido ? `
 
 
 
-        ${getContatosEstabelecimento(establishment).length ? (() => {
-          const formatPhone = (number) => {
-            const rawNumber = (number || "").replace(/\D/g, "");
-            const fullNumber = rawNumber.startsWith("55") ? rawNumber : `55${rawNumber}`;
-            return fullNumber;
-          }
-          const contatos = getContatosEstabelecimento(establishment);
+        ${getContatosDetalhadosEstabelecimento(establishment).length ? (() => {
+          const contatos = getContatosDetalhadosEstabelecimento(establishment);
 
           return `
 
@@ -19711,17 +19746,19 @@ ${!establishment.descricaoFalecido ? `
                 <div>
                   <div class="info-label">Contatos</div>
                   <div class="info-value contatos-publicos">
-                    ${contatos.map((contato, index) => {
-                      const numero = formatPhone(contato);
+                    ${contatos.map((contato) => {
+                      const numero = somenteDigitos(contato.numero);
+                      const href = contato.whatsapp
+                        ? `https://api.whatsapp.com/send?phone=${numeroWhatsAppBrasil(contato.numero)}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}`
+                        : `tel:${numero}`;
                       return `
-                        <a href="https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent("Olá! Encontrei seu número no Site Olá Carlópolis e gostaria de uma informação!")}"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="zap-link telefone-link contato-publico-link"
+                        <a href="${href}"
+                          ${contato.whatsapp ? 'target="_blank" rel="noopener noreferrer"' : ""}
+                          class="telefone-link contato-publico-link ${contato.whatsapp ? "zap-link is-whatsapp" : "is-phone"}"
                           data-id="${normalizeName(establishment.name)}"
                           data-tel="${numero}">
-                          <i class='bx bxl-whatsapp info-icon'></i>
-                          <span><small>Contato ${index + 1}</small>${contato}</span>
+                          <i class="${contato.whatsapp ? "bx bxl-whatsapp" : "fas fa-phone"} info-icon"></i>
+                          <span>${formatarTelefonePublico(contato.numero)}</span>
                         </a>`;
                     }).join("")}
                   </div>

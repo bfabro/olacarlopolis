@@ -2155,32 +2155,37 @@ screen and (width: 820px) {
   gap: 9px;
   width: fit-content;
   max-width: 100%;
-  border: 1px solid #bbf7d0;
+  border: 1px solid #bfdbfe;
   border-radius: 10px;
   padding: 7px 10px;
-  background: #f0fdf4;
-  color: #166534;
+  background: #eff6ff;
+  color: #1e40af;
   font-weight: 800;
   text-decoration: none;
 }
 
 .contato-publico-link .info-icon {
   margin: 0;
-  color: #25d366;
+  color: #2563eb;
   font-size: 24px;
 }
 
-.contato-publico-link span,
-.contato-publico-link small {
+.contato-publico-link span {
   display: block;
 }
 
-.contato-publico-link small {
-  margin-bottom: 2px;
-  color: #64748b;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
+.contato-publico-link.is-whatsapp {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.contato-publico-link.is-whatsapp .info-icon {
+  color: #25d366;
+}
+
+.contato-publico-link.is-phone .info-icon {
+  color: #2563eb;
 }
 
 .info-label {
@@ -4298,6 +4303,15 @@ a:focus {
 
 .btn-whatsapp_onde:hover {
   background-color: #1ebe5d;
+}
+
+.btn-telefone-onde,
+.btn-telefone-onde:hover,
+.btn-telefone-onde:visited,
+.btn-telefone-onde:active,
+.btn-telefone-onde:focus {
+  background-color: #1d4ed8 !important;
+  color: white !important;
 }
 
 .btn-whatsapp_onde,

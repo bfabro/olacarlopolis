@@ -1721,6 +1721,32 @@ button[type="submit"]:hover,
 .schedule-editor.schedule-disabled {
   opacity: .45;
 }
+
+.contact-admin-field {
+  display: grid;
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid #dbe5f2;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.contact-whatsapp-flag {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.contact-whatsapp-flag input {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  accent-color: #16a34a;
+}
 .schedule-open {
   display: flex;
   align-items: center;
