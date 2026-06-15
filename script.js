@@ -8926,8 +8926,10 @@ plotarPinsImoveis(stateImoveis.filtered);
   // ===== CEP: rota #cep + busca por endereço (ViaCEP) [v2 layout] =====
   function stripDiacritics(s) { return String(s || "").normalize("NFD").replace(/\p{Diacritic}/gu, ""); }
 
-  function mostrarConsultaCEP() {
+  function mostrarConsultaCEP(event) {
+    event?.preventDefault?.();
     const area = document.querySelector(".content_area");
+    document.body.classList.add("home-quick-banner-route-hidden");
     if (location.hash !== "#cep") location.hash = "#cep";
     if (!area) return;
 
@@ -19132,7 +19134,10 @@ plotarPinsImoveis(stateImoveis.filtered);
     mostrarPromocoes();
   });
 
-  document.getElementById("menuConsultaCEP").addEventListener("click", mostrarConsultaCEP);
+  document.getElementById("menuConsultaCEP")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    mostrarConsultaCEP();
+  });
 
   //
   //
