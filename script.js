@@ -6342,17 +6342,13 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
       ` : '')
           }
-    ${getContatosDetalhadosEstabelecimento(est).map((contato) => contato.whatsapp ? `
+    ${getContatosDetalhadosEstabelecimento(est).map((contato) => `
       <a href="https://wa.me/${numeroWhatsAppBrasil(contato.numero)}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
         target="_blank"
         rel="noopener noreferrer"
         class="btn-whatsapp_onde"
         onclick="registrarCliqueWhatsOndeComer('${normalizeName(est.name)}');">
         <i class="fab fa-whatsapp"></i> ${formatarTelefonePublico(contato.numero)}
-      </a>
-    ` : `
-      <a href="tel:${somenteDigitos(contato.numero)}" class="btn-whatsapp_onde btn-telefone-onde">
-        <i class="fas fa-phone"></i> ${formatarTelefonePublico(contato.numero)}
       </a>
     `).join("")}
   </div>
