@@ -2885,6 +2885,96 @@ async function migrateClientImagesToStorage() {
   }
 }
 
+async function migrateClientFinanceToPrivate() {
+  const button = $("migrateFinanceButton");
+  if (!isMaster()) {
+    showToast("Somente master pode migrar dados financeiros.");
+    return;
+  }
+  if (!confirm("Copiar dados financeiros antigos de clientes para clientesFinanceiro? Nada sera apagado de clientes.")) return;
+
+  setBusy(button, true, "Migrando...");
+  const stats = { analisados: 0, comFinanceiro: 0, migrados: 0, preservados: 0, erros: [] };
+
+  try {
+    const [clientesSnap, financeiroSnap] = await Promise.all([
+      get(ref(db, "clientes")),
+      getPanelSnapshot("clientesFinanceiro")
+    ]);
+    const privateByClientId = clientFinanceMapFromSnapshot(financeiroSnap);
+    const updates = {};
+
+    if (clientesSnap.exists()) {
+      clientesSnap.forEach((child) => {
+        stats.analisados += 1;
+        const clientId = child.key;
+        const client = child.val() || {};
+        const legacyFinance = pickClientFinanceFields(client);
+        const legacyKeys = Object.keys(legacyFinance);
+        if (!legacyKeys.length) return false;
+
+        stats.comFinanceiro += 1;
+        const existingFinance = privateByClientId[clientId] || {};
+        const merged = cleanForFirebase({
+          ...legacyFinance,
+          ...existingFinance,
+          migratedFromClientesAt: existingFinance.migratedFromClientesAt || Date.now(),
+          migratedFromClientesBy: existingFinance.migratedFromClientesBy || state.user?.uid || "",
+          updatedAt: existingFinance.updatedAt || serverTimestamp(),
+          updatedBy: existingFinance.updatedBy || state.user?.uid || "",
+          origem: existingFinance.origem || "migracao-clientes"
+        });
+
+        const changed = legacyKeys.some((field) => !Object.prototype.hasOwnProperty.call(existingFinance, field));
+        if (changed || !Object.keys(existingFinance).length) {
+          updates[`clientesFinanceiro/${clientId}`] = merged;
+          stats.migrados += 1;
+        } else {
+          stats.preservados += 1;
+        }
+        return false;
+      });
+    }
+
+    const entries = Object.entries(updates);
+    const chunkSize = 50;
+    for (let i = 0; i < entries.length; i += chunkSize) {
+      const chunk = Object.fromEntries(entries.slice(i, i + chunkSize));
+      try {
+        await update(ref(db), chunk);
+      } catch (error) {
+        stats.erros.push(error.code || error.message || String(error));
+      }
+      showImportReport([
+        `Migracao financeira em andamento: ${Math.min(i + chunkSize, entries.length)}/${entries.length}`,
+        `Clientes analisados: ${stats.analisados}`,
+        `Clientes com financeiro antigo: ${stats.comFinanceiro}`,
+        `Erros: ${stats.erros.length}`
+      ], stats.erros.length ? "error" : "info");
+    }
+
+    showImportReport([
+      "Migracao financeira concluida.",
+      `Clientes analisados: ${stats.analisados}`,
+      `Clientes com dados financeiros antigos: ${stats.comFinanceiro}`,
+      `Copiados/atualizados em clientesFinanceiro: ${stats.migrados}`,
+      `Ja tinham dados privados preservados: ${stats.preservados}`,
+      `Erros: ${stats.erros.length}`,
+      ...stats.erros.slice(0, 5)
+    ], stats.erros.length ? "error" : "ok");
+    showToast("Migracao financeira concluida.");
+    await loadAllData();
+    renderFinanceiro();
+    renderReports();
+  } catch (error) {
+    console.error(error);
+    showImportReport(["Falha na migracao financeira.", error.code || error.message || String(error)], "error");
+    showToast("Falha na migracao financeira.");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
 function isClientOverdue(client) {
   if (!client || client.status === "inativo" || client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") return false;
   const today = new Date();
@@ -9884,6 +9974,7 @@ function bindEvents() {
   $("closeCategoryFormButton")?.addEventListener("click", resetCategoryForm);
   $("syncClientsButton").addEventListener("click", syncClientsFromScript);
   $("migrateImagesButton").addEventListener("click", migrateClientImagesToStorage);
+  $("migrateFinanceButton")?.addEventListener("click", migrateClientFinanceToPrivate);
   $("analyzeDuplicatesButton").addEventListener("click", renderDuplicatesReport);
   $("cleanupDuplicatesButton").addEventListener("click", async () => {
     const plan = state.duplicateCleanupPlan || buildDuplicateCleanupPlan();
