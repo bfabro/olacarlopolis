@@ -2975,6 +2975,86 @@ async function migrateClientFinanceToPrivate() {
   }
 }
 
+async function auditClientFinanceCleanup() {
+  const button = $("auditFinanceCleanupButton");
+  if (!isMaster()) {
+    showToast("Somente master pode auditar a limpeza financeira.");
+    return;
+  }
+
+  setBusy(button, true, "Auditando...");
+  const stats = {
+    clientes: 0,
+    comCamposPublicos: 0,
+    segurosParaLimpar: 0,
+    incompletosNoPrivado: 0,
+    semFinanceiroPrivado: 0
+  };
+  const fieldCounts = {};
+  CLIENT_FINANCE_FIELDS.forEach((field) => { fieldCounts[field] = 0; });
+  const examples = [];
+
+  try {
+    const [clientesSnap, financeiroSnap] = await Promise.all([
+      get(ref(db, "clientes")),
+      getPanelSnapshot("clientesFinanceiro")
+    ]);
+    const privateByClientId = clientFinanceMapFromSnapshot(financeiroSnap);
+
+    if (clientesSnap.exists()) {
+      clientesSnap.forEach((child) => {
+        stats.clientes += 1;
+        const clientId = child.key;
+        const client = child.val() || {};
+        const publicFinance = pickClientFinanceFields(client);
+        const publicFields = Object.keys(publicFinance);
+        if (!publicFields.length) return false;
+
+        stats.comCamposPublicos += 1;
+        publicFields.forEach((field) => { fieldCounts[field] += 1; });
+
+        const privateFinance = privateByClientId[clientId] || {};
+        if (!Object.keys(privateFinance).length) {
+          stats.semFinanceiroPrivado += 1;
+          if (examples.length < 8) examples.push(`${client.nome || clientId}: sem clientesFinanceiro`);
+          return false;
+        }
+
+        const missing = publicFields.filter((field) => !Object.prototype.hasOwnProperty.call(privateFinance, field));
+        if (missing.length) {
+          stats.incompletosNoPrivado += 1;
+          if (examples.length < 8) examples.push(`${client.nome || clientId}: faltando ${missing.join(", ")}`);
+        } else {
+          stats.segurosParaLimpar += 1;
+        }
+        return false;
+      });
+    }
+
+    const fieldLines = Object.entries(fieldCounts)
+      .filter(([, count]) => count > 0)
+      .map(([field, count]) => `${field}: ${count}`);
+
+    showImportReport([
+      "Auditoria da limpeza financeira concluida. Nenhum dado foi apagado.",
+      `Clientes analisados: ${stats.clientes}`,
+      `Clientes ainda com campos financeiros em clientes: ${stats.comCamposPublicos}`,
+      `Clientes seguros para limpar depois: ${stats.segurosParaLimpar}`,
+      `Clientes com privado incompleto: ${stats.incompletosNoPrivado}`,
+      `Clientes sem financeiro privado: ${stats.semFinanceiroPrivado}`,
+      fieldLines.length ? `Campos encontrados: ${fieldLines.join(" | ")}` : "Nenhum campo financeiro publico encontrado.",
+      ...examples
+    ], (stats.incompletosNoPrivado || stats.semFinanceiroPrivado) ? "error" : "ok");
+    showToast("Auditoria da limpeza concluida.");
+  } catch (error) {
+    console.error(error);
+    showImportReport(["Falha na auditoria da limpeza financeira.", error.code || error.message || String(error)], "error");
+    showToast("Falha na auditoria da limpeza.");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
 function isClientOverdue(client) {
   if (!client || client.status === "inativo" || client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") return false;
   const today = new Date();
@@ -9975,6 +10055,7 @@ function bindEvents() {
   $("syncClientsButton").addEventListener("click", syncClientsFromScript);
   $("migrateImagesButton").addEventListener("click", migrateClientImagesToStorage);
   $("migrateFinanceButton")?.addEventListener("click", migrateClientFinanceToPrivate);
+  $("auditFinanceCleanupButton")?.addEventListener("click", auditClientFinanceCleanup);
   $("analyzeDuplicatesButton").addEventListener("click", renderDuplicatesReport);
   $("cleanupDuplicatesButton").addEventListener("click", async () => {
     const plan = state.duplicateCleanupPlan || buildDuplicateCleanupPlan();
