@@ -3055,6 +3055,104 @@ async function auditClientFinanceCleanup() {
   }
 }
 
+async function cleanupPublicClientFinanceFields() {
+  const button = $("cleanupFinanceButton");
+  if (!isMaster()) {
+    showToast("Somente master pode limpar campos financeiros publicos.");
+    return;
+  }
+
+  const confirmation = prompt("Esta acao remove campos financeiros antigos de clientes. Digite LIMPAR FINANCEIRO para confirmar.");
+  if (confirmation !== "LIMPAR FINANCEIRO") {
+    showToast("Limpeza cancelada.");
+    return;
+  }
+
+  setBusy(button, true, "Limpando...");
+  const stats = {
+    clientes: 0,
+    comCamposPublicos: 0,
+    limpos: 0,
+    ignorados: 0,
+    camposRemovidos: 0,
+    erros: []
+  };
+
+  try {
+    const [clientesSnap, financeiroSnap] = await Promise.all([
+      get(ref(db, "clientes")),
+      getPanelSnapshot("clientesFinanceiro")
+    ]);
+    const privateByClientId = clientFinanceMapFromSnapshot(financeiroSnap);
+    const updates = {};
+
+    if (clientesSnap.exists()) {
+      clientesSnap.forEach((child) => {
+        stats.clientes += 1;
+        const clientId = child.key;
+        const client = child.val() || {};
+        const publicFinance = pickClientFinanceFields(client);
+        const publicFields = Object.keys(publicFinance);
+        if (!publicFields.length) return false;
+
+        stats.comCamposPublicos += 1;
+        const privateFinance = privateByClientId[clientId] || {};
+        const safeToClean = publicFields.every((field) => Object.prototype.hasOwnProperty.call(privateFinance, field));
+        if (!safeToClean) {
+          stats.ignorados += 1;
+          if (stats.erros.length < 8) stats.erros.push(`${client.nome || clientId}: privado incompleto`);
+          return false;
+        }
+
+        publicFields.forEach((field) => {
+          updates[`clientes/${clientId}/${field}`] = null;
+          stats.camposRemovidos += 1;
+        });
+        stats.limpos += 1;
+        return false;
+      });
+    }
+
+    const entries = Object.entries(updates);
+    const chunkSize = 100;
+    for (let i = 0; i < entries.length; i += chunkSize) {
+      const chunk = Object.fromEntries(entries.slice(i, i + chunkSize));
+      try {
+        await update(ref(db), chunk);
+      } catch (error) {
+        stats.erros.push(error.code || error.message || String(error));
+      }
+      showImportReport([
+        `Limpeza em andamento: ${Math.min(i + chunkSize, entries.length)}/${entries.length} campos`,
+        `Clientes limpos: ${stats.limpos}`,
+        `Clientes ignorados: ${stats.ignorados}`,
+        `Erros: ${stats.erros.length}`
+      ], stats.erros.length ? "error" : "info");
+    }
+
+    showImportReport([
+      "Limpeza financeira concluida.",
+      `Clientes analisados: ${stats.clientes}`,
+      `Clientes que tinham campos financeiros publicos: ${stats.comCamposPublicos}`,
+      `Clientes limpos: ${stats.limpos}`,
+      `Campos removidos de clientes: ${stats.camposRemovidos}`,
+      `Clientes ignorados por seguranca: ${stats.ignorados}`,
+      `Erros: ${stats.erros.length}`,
+      ...stats.erros.slice(0, 8)
+    ], stats.erros.length ? "error" : "ok");
+    showToast("Limpeza financeira concluida.");
+    await loadAllData();
+    renderFinanceiro();
+    renderReports();
+  } catch (error) {
+    console.error(error);
+    showImportReport(["Falha na limpeza financeira.", error.code || error.message || String(error)], "error");
+    showToast("Falha na limpeza financeira.");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
 function isClientOverdue(client) {
   if (!client || client.status === "inativo" || client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") return false;
   const today = new Date();
@@ -10056,6 +10154,7 @@ function bindEvents() {
   $("migrateImagesButton").addEventListener("click", migrateClientImagesToStorage);
   $("migrateFinanceButton")?.addEventListener("click", migrateClientFinanceToPrivate);
   $("auditFinanceCleanupButton")?.addEventListener("click", auditClientFinanceCleanup);
+  $("cleanupFinanceButton")?.addEventListener("click", cleanupPublicClientFinanceFields);
   $("analyzeDuplicatesButton").addEventListener("click", renderDuplicatesReport);
   $("cleanupDuplicatesButton").addEventListener("click", async () => {
     const plan = state.duplicateCleanupPlan || buildDuplicateCleanupPlan();
