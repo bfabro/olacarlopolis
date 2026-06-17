@@ -6,3 +6,15 @@
   from = "/api/image-proxy"
   to = "/.netlify/functions/image-proxy"
   status = 200
+
+[[redirects]]
+  from = "/old/*"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/admin/old/*"
+  to = "/admin/painel.html"
+  status = 301
+  force = true
