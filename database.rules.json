@@ -24,13 +24,21 @@
       }
     },
 
+    "clientesFinanceiro": {
+      ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
+      ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
+      "$clientId": {
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')"
+      }
+    },
+
     "configuracoes": {
       "paginaInicial": {
         ".read": true,
         ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')"
       },
       "pagamento": {
-        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
+        ".read": "auth != null",
         ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
         "diasNovidadesVisiveis": {
           ".read": true

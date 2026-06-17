@@ -53,6 +53,7 @@ let state = {
   user: null,
   profile: null,
   clientes: [],
+  clientesFinanceiro: {},
   usuarios: [],
   eventos: [],
   imoveis: [],
@@ -716,6 +717,76 @@ function consolidateClientsForAdmin(clients) {
   return Array.isArray(clients) ? clients : [];
 }
 
+const CLIENT_FINANCE_FIELDS = [
+  "pagamentoStatus",
+  "tipoPlano",
+  "valorPlano",
+  "valorMensal",
+  "descontoValor",
+  "vencimentoDia",
+  "financeiroObs",
+  "mesesEmAberto",
+  "faturas",
+  "financeiroStatus",
+  "statusFinanceiro",
+  "observacaoAdmin",
+  "observacaoFinanceira"
+];
+
+function pickClientFinanceFields(source = {}) {
+  const picked = {};
+  CLIENT_FINANCE_FIELDS.forEach((field) => {
+    if (Object.prototype.hasOwnProperty.call(source, field)) {
+      picked[field] = source[field];
+    }
+  });
+  return picked;
+}
+
+function splitClientFinancePayload(payload = {}) {
+  const publicPayload = { ...payload };
+  const financePayload = pickClientFinanceFields(publicPayload);
+  CLIENT_FINANCE_FIELDS.forEach((field) => {
+    delete publicPayload[field];
+  });
+  return { publicPayload, financePayload };
+}
+
+function clientFinanceMapFromSnapshot(snapshot, singleClientId = "") {
+  const map = {};
+  if (!snapshot?.exists()) return map;
+
+  if (singleClientId) {
+    map[singleClientId] = snapshot.val() || {};
+    return map;
+  }
+
+  snapshot.forEach((child) => {
+    map[child.key] = child.val() || {};
+    return false;
+  });
+  return map;
+}
+
+function mergeClientFinanceData(client, privateFinance = {}) {
+  const legacyFinance = pickClientFinanceFields(client);
+  const privateFields = {
+    ...pickClientFinanceFields(privateFinance?.financeiro || {}),
+    ...pickClientFinanceFields(privateFinance)
+  };
+  const mergedFinance = { ...legacyFinance, ...privateFields };
+  const hasFinance = Object.keys(mergedFinance).length > 0;
+  if (!hasFinance) return client;
+  return {
+    ...client,
+    ...mergedFinance,
+    financeiro: {
+      ...(client.financeiro || {}),
+      ...mergedFinance
+    }
+  };
+}
+
 function snapshotToClientList(snapshot) {
   const clients = [];
   if (snapshot?.exists()) {
@@ -727,8 +798,29 @@ function snapshotToClientList(snapshot) {
   return clients;
 }
 
-function applyClientsSnapshot(snapshot) {
-  const allClients = consolidateClientsForAdmin(snapshotToClientList(snapshot));
+const EMPTY_SNAPSHOT = {
+  exists: () => false,
+  forEach: () => false,
+  val: () => null,
+  numChildren: () => 0
+};
+
+async function getPanelSnapshot(path, options = {}) {
+  const { enabled = true, required = false } = options;
+  if (!enabled) return EMPTY_SNAPSHOT;
+  try {
+    return await get(ref(db, path));
+  } catch (error) {
+    if (required) throw error;
+    console.warn(`Leitura opcional bloqueada ou indisponivel: ${path}`, error);
+    return EMPTY_SNAPSHOT;
+  }
+}
+
+function applyClientsSnapshot(snapshot, financeSnapshot = null, financeClientId = "") {
+  const financeByClientId = clientFinanceMapFromSnapshot(financeSnapshot, financeClientId);
+  const allClients = consolidateClientsForAdmin(snapshotToClientList(snapshot))
+    .map((client) => mergeClientFinanceData(client, financeByClientId[client.id]));
   state.lastFirebaseClientCount = allClients.length;
 
   if (!canManageClients() && state.profile?.clienteId) {
@@ -1339,8 +1431,12 @@ async function saveUserProfile(profile) {
 }
 
 async function loadAllData() {
+  const canManage = canManageClients();
+  const financeClientId = canManage ? "" : currentClientId();
+  const financePath = financeClientId ? `clientesFinanceiro/${financeClientId}` : "clientesFinanceiro";
   const [
     clientesSnap,
+    clientesFinanceiroSnap,
     usersSnap,
     eventosSnap,
     imoveisSnap,
@@ -1365,33 +1461,35 @@ async function loadAllData() {
     instalacoesPWASnap,
     usoPWASnap
   ] = await Promise.all([
-    get(ref(db, "clientes")),
-    get(ref(db, "usuariosByUid")),
-    get(ref(db, "eventos")),
-    get(ref(db, "conteudosInformativos/imoveis")),
-    get(ref(db, "conteudosInformativos/automoveis")),
-    get(ref(db, "categorias")),
-    get(ref(db, "conteudosInformativos/notaFalecimento")),
-    get(ref(db, "conteudosInformativos/gruposWhatsapp")),
-    get(ref(db, "configuracoes/pagamento")),
-    get(ref(db, "configuracoes/paginaInicial")),
-    get(ref(db, "cliquesPorBotao")),
-    get(ref(db, "cliquesMenuLateral")),
-    get(ref(db, "acessosPorDia")),
-    get(ref(db, "cliquesCardapiosOndeComer")),
-    get(ref(db, "cliquesWhatsOndeComer")),
-    get(ref(db, "cliquesFotosOndeComer")),
-    get(ref(db, "cliquesPromocoesPorComercio")),
-    get(ref(db, "cliquesPorBotaoDetalhado")),
-    get(ref(db, "cliquesOndeComerDetalhado")),
-    get(ref(db, "cliquesPromocoesDetalhado")),
-    get(ref(db, "cliquesPorMenu")),
-    get(ref(db, "origemAcessos")),
-    get(ref(db, "instalacoesPWA")),
-    get(ref(db, "usoPWA"))
+    getPanelSnapshot("clientes", { required: true }),
+    getPanelSnapshot(financePath),
+    getPanelSnapshot("usuariosByUid", { enabled: canManage }),
+    getPanelSnapshot("eventos"),
+    getPanelSnapshot("conteudosInformativos/imoveis"),
+    getPanelSnapshot("conteudosInformativos/automoveis"),
+    getPanelSnapshot("categorias"),
+    getPanelSnapshot("conteudosInformativos/notaFalecimento"),
+    getPanelSnapshot("conteudosInformativos/gruposWhatsapp"),
+    getPanelSnapshot("configuracoes/pagamento"),
+    getPanelSnapshot("configuracoes/paginaInicial"),
+    getPanelSnapshot("cliquesPorBotao", { enabled: canManage }),
+    getPanelSnapshot("cliquesMenuLateral", { enabled: canManage }),
+    getPanelSnapshot("acessosPorDia", { enabled: canManage }),
+    getPanelSnapshot("cliquesCardapiosOndeComer", { enabled: canManage }),
+    getPanelSnapshot("cliquesWhatsOndeComer", { enabled: canManage }),
+    getPanelSnapshot("cliquesFotosOndeComer", { enabled: canManage }),
+    getPanelSnapshot("cliquesPromocoesPorComercio", { enabled: canManage }),
+    getPanelSnapshot("cliquesPorBotaoDetalhado", { enabled: canManage }),
+    getPanelSnapshot("cliquesOndeComerDetalhado", { enabled: canManage }),
+    getPanelSnapshot("cliquesPromocoesDetalhado", { enabled: canManage }),
+    getPanelSnapshot("cliquesPorMenu", { enabled: canManage }),
+    getPanelSnapshot("origemAcessos", { enabled: canManage }),
+    getPanelSnapshot("instalacoesPWA", { enabled: canManage }),
+    getPanelSnapshot("usoPWA", { enabled: canManage })
   ]);
 
-  applyClientsSnapshot(clientesSnap);
+  state.clientesFinanceiro = clientFinanceMapFromSnapshot(clientesFinanceiroSnap, financeClientId);
+  applyClientsSnapshot(clientesSnap, clientesFinanceiroSnap, financeClientId);
 
   state.usuarios = [];
   if (usersSnap.exists()) {
@@ -2480,8 +2578,9 @@ async function uploadMenuFilesForClient(clientId, files) {
 async function saveClientMenuForCanonicalClient(sourceClient, targetId) {
   const oldId = sourceClient?.id || "";
   const { id: _ignored, ...clientData } = sourceClient || {};
+  const { publicPayload: publicClientData } = splitClientFinancePayload(clientData);
   const payload = cleanForFirebase({
-    ...clientData,
+    ...publicClientData,
     cardapioAtivo: Boolean($("clientMenuEnabled")?.checked || clientData.cardapioAtivo),
     cardapioLink: $("clientMenuLink").value.trim(),
     menuImages: normalizeUrlList(state.clientMenuImages),
@@ -2491,10 +2590,20 @@ async function saveClientMenuForCanonicalClient(sourceClient, targetId) {
     updatedBy: state.user?.uid || ""
   });
   const updates = { [`clientes/${targetId}`]: payload };
-  if (oldId && oldId !== targetId) updates[`clientes/${oldId}`] = null;
+  if (oldId && oldId !== targetId) {
+    updates[`clientes/${oldId}`] = null;
+    if (state.clientesFinanceiro[oldId]) updates[`clientesFinanceiro/${targetId}`] = state.clientesFinanceiro[oldId];
+    updates[`clientesFinanceiro/${oldId}`] = null;
+  }
   await update(ref(db), updates);
-  if (oldId && oldId !== targetId) state.clientes = state.clientes.filter((item) => item.id !== oldId);
-  upsertClientInState(targetId, payload);
+  if (oldId && oldId !== targetId) {
+    state.clientes = state.clientes.filter((item) => item.id !== oldId);
+    if (state.clientesFinanceiro[oldId]) {
+      state.clientesFinanceiro[targetId] = state.clientesFinanceiro[oldId];
+      delete state.clientesFinanceiro[oldId];
+    }
+  }
+  upsertClientInState(targetId, mergeClientFinanceData({ id: targetId, ...payload }, state.clientesFinanceiro[targetId]));
   state.selectedClientId = targetId;
 }
 
@@ -2534,8 +2643,9 @@ async function uploadProfileImageForClient(clientId, file) {
 async function saveProfileImageForCanonicalClient(client, targetId, url) {
   const oldId = client?.id || "";
   const { id: _ignored, ...clientData } = client || {};
+  const { publicPayload: publicClientData } = splitClientFinancePayload(clientData);
   const payload = cleanForFirebase({
-    ...clientData,
+    ...publicClientData,
     imagem: url,
     origem: "painel",
     editadoNoPainel: true,
@@ -2544,7 +2654,11 @@ async function saveProfileImageForCanonicalClient(client, targetId, url) {
     updatedBy: state.user?.uid || ""
   });
   const updates = { [`clientes/${targetId}`]: payload };
-  if (oldId && oldId !== targetId) updates[`clientes/${oldId}`] = null;
+  if (oldId && oldId !== targetId) {
+    updates[`clientes/${oldId}`] = null;
+    if (state.clientesFinanceiro[oldId]) updates[`clientesFinanceiro/${targetId}`] = state.clientesFinanceiro[oldId];
+    updates[`clientesFinanceiro/${oldId}`] = null;
+  }
   state.usuarios.filter((user) => user.clienteId === oldId && oldId !== targetId).forEach((user) => {
     updates[`usuariosByUid/${user.uid}/clienteId`] = targetId;
   });
@@ -2553,7 +2667,11 @@ async function saveProfileImageForCanonicalClient(client, targetId, url) {
   }
   await update(ref(db), updates);
   state.clientes = state.clientes.filter((item) => item.id !== oldId || oldId === targetId);
-  upsertClientInState(targetId, payload);
+  if (oldId && oldId !== targetId && state.clientesFinanceiro[oldId]) {
+    state.clientesFinanceiro[targetId] = state.clientesFinanceiro[oldId];
+    delete state.clientesFinanceiro[oldId];
+  }
+  upsertClientInState(targetId, mergeClientFinanceData({ id: targetId, ...payload }, state.clientesFinanceiro[targetId]));
   if (state.selectedClientId === oldId) state.selectedClientId = targetId;
   if (state.profile?.clienteId === oldId) state.profile.clienteId = targetId;
   state.usuarios.filter((user) => user.clienteId === oldId).forEach((user) => { user.clienteId = targetId; });
@@ -5428,6 +5546,11 @@ function renderFinanceiro() {
       const mesesEmAberto = [...row.querySelectorAll("[data-finance-month]:checked")].map((input) => input.value).sort();
       const currentClient = state.clientes.find((client) => client.id === id) || {};
       const nextClient = { ...currentClient, ...payload };
+      const publicPayload = {};
+      if (Object.prototype.hasOwnProperty.call(payload, "status")) {
+        publicPayload.status = payload.status;
+        delete payload.status;
+      }
       const valorPlanoFatura = valorFinalPlano(nextClient);
       const valorDestaqueFatura = destaqueIncludedInInvoice(nextClient) ? destaqueValueForClient(nextClient) : 0;
       const valorTotalFatura = valorPlanoFatura + valorDestaqueFatura;
@@ -5445,9 +5568,15 @@ function renderFinanceiro() {
       payload.updatedBy = state.user?.uid || "";
       payload.origem = "painel";
       payload.editadoNoPainel = true;
-      await update(ref(db, `clientes/${id}`), payload);
-      const index = state.clientes.findIndex((client) => client.id === id);
-      if (index >= 0) state.clientes[index] = { ...state.clientes[index], ...payload };
+      if (Object.keys(publicPayload).length) {
+        publicPayload.updatedAt = serverTimestamp();
+        publicPayload.updatedBy = state.user?.uid || "";
+        publicPayload.origem = "painel";
+        publicPayload.editadoNoPainel = true;
+        await update(ref(db, `clientes/${id}`), publicPayload);
+      }
+      await update(ref(db, `clientesFinanceiro/${id}`), payload);
+      await loadAllData();
       renderStats();
       renderClientsList();
       fillUserClientSelect();
@@ -5478,6 +5607,11 @@ function renderFinanceiro() {
           : field.value.trim();
       });
       const nextClient = { ...currentClient, ...payloadBase };
+      const publicPayload = {};
+      if (Object.prototype.hasOwnProperty.call(payloadBase, "status")) {
+        publicPayload.status = payloadBase.status;
+        delete payloadBase.status;
+      }
       const valorPlanoFatura = valorFinalPlano(nextClient);
       const valorDestaqueFatura = destaqueIncludedInInvoice(nextClient) ? destaqueValueForClient(nextClient) : 0;
       const valorTotalFatura = valorPlanoFatura + valorDestaqueFatura;
@@ -5503,7 +5637,14 @@ function renderFinanceiro() {
           updatedAt: Date.now()
         };
       });
-      await update(ref(db, `clientes/${id}`), payload);
+      if (Object.keys(publicPayload).length) {
+        publicPayload.updatedAt = serverTimestamp();
+        publicPayload.updatedBy = state.user?.uid || "";
+        publicPayload.origem = "painel";
+        publicPayload.editadoNoPainel = true;
+        await update(ref(db, `clientes/${id}`), publicPayload);
+      }
+      await update(ref(db, `clientesFinanceiro/${id}`), payload);
       showToast("Comprovante anexado pelo financeiro.");
       await loadAllData();
     });
@@ -9112,9 +9253,7 @@ async function syncClientsFromScript(options = {}) {
           url,
           texto: (est.novidadesDescriptions || [])[index] || ""
         }));
-        clientPayloads.push({
-          id,
-          data: cleanForFirebase({
+        const importedPayload = cleanForFirebase({
           nome: name,
           nomeNormalizado: normalizeName(name),
           categoria: categoryName,
@@ -9145,6 +9284,16 @@ async function syncClientsFromScript(options = {}) {
           origem: "script.js",
           updatedAt: serverTimestamp(),
           updatedBy: state.user.uid
+        });
+        const { publicPayload, financePayload } = splitClientFinancePayload(importedPayload);
+        clientPayloads.push({
+          id,
+          data: publicPayload,
+          financeData: cleanForFirebase({
+            ...financePayload,
+            origem: "script.js",
+            updatedAt: serverTimestamp(),
+            updatedBy: state.user.uid
           })
         });
       });
@@ -9161,6 +9310,9 @@ async function syncClientsFromScript(options = {}) {
       await Promise.all(chunk.map(async (item) => {
         try {
           await set(ref(db, `clientes/${item.id}`), item.data);
+          if (Object.keys(item.financeData || {}).length) {
+            await set(ref(db, `clientesFinanceiro/${item.id}`), item.financeData);
+          }
           importStats.clientesSalvos += 1;
         } catch (err) {
           importStats.erros.push(`Cliente ${item.data.nome || item.id}: ${err.code || err.message}`);
@@ -9257,6 +9409,8 @@ function renderClientInvoices() {
   }
 
   const paymentConfig = state.pagamentoSistema || {};
+  const canWriteClientFinance = canManageClients();
+  const planChangeNotice = `<div class="list-meta">Alteracoes de plano e comprovantes devem ser solicitados ao administrador.</div>`;
   const meses = pendingMonthsForClient(client);
   const faturas = meses.map((mes) => buildClientInvoice(client, mes, paymentConfig));
   const firstInvoice = faturas[0] || buildClientInvoice(client, currentMonthKey(), paymentConfig, null, { ignoreSaved: true });
@@ -9320,22 +9474,24 @@ function renderClientInvoices() {
           </div>
           <span class="badge pago">Em dia</span>
         </div>
-        <div class="invoice-plan-row">
-          <label>Plano atual
-            <select id="clientInvoicePlan">
-              <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
-              <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
-              <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
-            </select>
-          </label>
-          <button id="saveClientInvoicePlan" type="button" class="ghost-button"><i class="fa-solid fa-arrows-rotate"></i> Atualizar plano</button>
-        </div>
+        ${canWriteClientFinance ? `
+          <div class="invoice-plan-row">
+            <label>Plano atual
+              <select id="clientInvoicePlan">
+                <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
+                <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
+                <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
+              </select>
+            </label>
+            <button id="saveClientInvoicePlan" type="button" class="ghost-button"><i class="fa-solid fa-arrows-rotate"></i> Atualizar plano</button>
+          </div>
+        ` : planChangeNotice}
       </article>
     `;
     bindFeaturedInvoicePix(featuredPix);
-    $("saveClientInvoicePlan")?.addEventListener("click", async () => {
+    if (canWriteClientFinance) $("saveClientInvoicePlan")?.addEventListener("click", async () => {
       const tipoPlano = $("clientInvoicePlan")?.value || "mensal";
-      await update(ref(db, `clientes/${client.id}`), {
+      await update(ref(db, `clientesFinanceiro/${client.id}`), {
         tipoPlano,
         updatedAt: serverTimestamp(),
         updatedBy: state.user.uid,
@@ -9363,14 +9519,16 @@ function renderClientInvoices() {
           <span class="badge em_aberto">${moneyBR(totalAberto)} em aberto</span>
         </div>
         <div class="invoice-plan-row">
-          <label>Plano atual
-            <select id="clientInvoicePlan">
-              <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
-              <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
-              <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
-            </select>
-          </label>
-          <button id="saveClientInvoicePlan" type="button" class="ghost-button"><i class="fa-solid fa-arrows-rotate"></i> Atualizar plano</button>
+          ${canWriteClientFinance ? `
+            <label>Plano atual
+              <select id="clientInvoicePlan">
+                <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
+                <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
+                <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
+              </select>
+            </label>
+            <button id="saveClientInvoicePlan" type="button" class="ghost-button"><i class="fa-solid fa-arrows-rotate"></i> Atualizar plano</button>
+          ` : planChangeNotice}
         </div>
         <div class="invoice-month-selector">
           ${faturas.map((fatura) => `
@@ -9402,11 +9560,13 @@ function renderClientInvoices() {
             </div>
             ${paymentConfig.observacaoFatura ? `<div class="list-meta wide">${escapeHtml(paymentConfig.observacaoFatura)}</div>` : ""}
           </div>
-          <div class="upload-panel">
-            <h3>Comprovante dos meses selecionados</h3>
-            <input id="selectedInvoiceReceipt" type="file" accept="image/*,application/pdf">
-            <div class="list-meta">Ao anexar aqui, o mesmo comprovante sera vinculado aos meses marcados.</div>
-          </div>
+          ${canWriteClientFinance ? `
+            <div class="upload-panel">
+              <h3>Comprovante dos meses selecionados</h3>
+              <input id="selectedInvoiceReceipt" type="file" accept="image/*,application/pdf">
+              <div class="list-meta">Ao anexar aqui, o mesmo comprovante sera vinculado aos meses marcados.</div>
+            </div>
+          ` : `<div class="list-meta">Depois de pagar, envie o comprovante ao administrador para baixa manual.</div>`}
         ` : `<div class="list-meta">A chave Pix ainda nao foi configurada pelo admin master.</div>`}
       </article>
     </div>
@@ -9418,7 +9578,7 @@ function renderClientInvoices() {
   const selectedPixBox = $("selectedInvoicePixBox");
   const selectedInvoiceData = () => {
     const selected = [...mount.querySelectorAll("[data-invoice-select]:checked")].map((input) => input.value);
-    const selectedPlan = $("clientInvoicePlan")?.value || client.tipoPlano || "mensal";
+    const selectedPlan = canWriteClientFinance ? ($("clientInvoicePlan")?.value || client.tipoPlano || "mensal") : (client.tipoPlano || "mensal");
     const plannedClient = clientForInvoicePlan(client, selectedPlan);
     const selectedInvoices = selected.map((mes) => buildClientInvoice(plannedClient, mes, paymentConfig, null, { ignoreSaved: true }));
     const selectedTotal = selectedInvoices.reduce((sum, fatura) => sum + fatura.valorTotal, 0);
@@ -9437,7 +9597,7 @@ function renderClientInvoices() {
   mount.querySelectorAll("[data-invoice-select]").forEach((input) => {
     input.addEventListener("change", refreshSelectedInvoicePayment);
   });
-  $("clientInvoicePlan")?.addEventListener("change", refreshSelectedInvoicePayment);
+  if (canWriteClientFinance) $("clientInvoicePlan")?.addEventListener("change", refreshSelectedInvoicePayment);
   refreshSelectedInvoicePayment();
 
   $("generateSelectedInvoicePix")?.addEventListener("click", () => {
@@ -9458,9 +9618,9 @@ function renderClientInvoices() {
     showToast("QR Code/Pix gerado.");
   });
 
-  $("saveClientInvoicePlan")?.addEventListener("click", async () => {
+  if (canWriteClientFinance) $("saveClientInvoicePlan")?.addEventListener("click", async () => {
     const tipoPlano = $("clientInvoicePlan")?.value || "mensal";
-    await update(ref(db, `clientes/${client.id}`), {
+    await update(ref(db, `clientesFinanceiro/${client.id}`), {
       tipoPlano,
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid,
@@ -9481,7 +9641,7 @@ function renderClientInvoices() {
     showToast("Chave Pix copiada.");
   }));
 
-  $("selectedInvoiceReceipt")?.addEventListener("change", async (event) => {
+  if (canWriteClientFinance) $("selectedInvoiceReceipt")?.addEventListener("change", async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
     const selectedMonths = [...mount.querySelectorAll("[data-invoice-select]:checked")].map((input) => input.value);
@@ -9514,7 +9674,7 @@ function renderClientInvoices() {
         updatedAt: Date.now()
       };
     });
-    await update(ref(db, `clientes/${client.id}`), payload);
+    await update(ref(db, `clientesFinanceiro/${client.id}`), payload);
     showToast("Comprovante anexado aos meses selecionados.");
     await loadAllData();
     renderClientInvoices();
@@ -10005,21 +10165,33 @@ function bindEvents() {
   $("clientForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!canManageClients()) return;
-    const payload = getClientFormData();
-    const formId = payload.id;
-    const id = getCanonicalClientId(payload.categoria, payload.nome);
+    const rawPayload = getClientFormData();
+    const formId = rawPayload.id;
+    const id = getCanonicalClientId(rawPayload.categoria, rawPayload.nome);
     const sourceClient = state.clientes.find((client) => client.id === state.selectedClientId || client.id === formId || client.id === id) || null;
     const isNewClient = !state.selectedClientId;
     const oldImagesCount = normalizeImageItems(sourceClient?.imagens).length;
-    const newImagesCount = normalizeImageItems(payload.imagens).length;
-    payload.aliases = buildClientPublicAliases(id, payload, sourceClient);
-    addAliasKey(payload.aliases, formId);
-    addAliasKey(payload.aliases, state.selectedClientId);
+    const newImagesCount = normalizeImageItems(rawPayload.imagens).length;
+    rawPayload.aliases = buildClientPublicAliases(id, rawPayload, sourceClient);
+    addAliasKey(rawPayload.aliases, formId);
+    addAliasKey(rawPayload.aliases, state.selectedClientId);
+    const { publicPayload: payload, financePayload } = splitClientFinancePayload(rawPayload);
     delete payload.id;
     if (!state.selectedClientId) payload.createdAt = serverTimestamp();
     const updates = { [`clientes/${id}`]: payload };
+    if (Object.keys(financePayload).length) {
+      updates[`clientesFinanceiro/${id}`] = {
+        ...pickClientFinanceFields(sourceClient),
+        ...state.clientesFinanceiro[id],
+        ...financePayload,
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user?.uid || "",
+        origem: "painel"
+      };
+    }
     [formId, state.selectedClientId].filter((oldId) => oldId && oldId !== id).forEach((oldId) => {
       updates[`clientes/${oldId}`] = null;
+      updates[`clientesFinanceiro/${oldId}`] = null;
       state.usuarios.filter((user) => user.clienteId === oldId).forEach((user) => {
         updates[`usuariosByUid/${user.uid}/clienteId`] = id;
       });
@@ -10064,9 +10236,11 @@ function bindEvents() {
     }
     [formId, state.selectedClientId].filter((oldId) => oldId && oldId !== id).forEach((oldId) => {
       state.clientes = state.clientes.filter((client) => client.id !== oldId);
+      delete state.clientesFinanceiro[oldId];
       state.usuarios.filter((user) => user.clienteId === oldId).forEach((user) => { user.clienteId = id; });
     });
-    upsertClientInState(id, payload);
+    state.clientesFinanceiro[id] = { ...(state.clientesFinanceiro[id] || {}), ...financePayload };
+    upsertClientInState(id, mergeClientFinanceData({ id, ...payload }, state.clientesFinanceiro[id]));
     if (payload.categoria) {
       const categoryId = payload.categoriaId || slugify(payload.categoria);
       const existingCategory = state.categorias.find((cat) => cat.id === categoryId);
