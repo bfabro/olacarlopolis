@@ -21,7 +21,8 @@ import {
   getStorage,
   ref as storageRef,
   uploadBytesResumable,
-  getDownloadURL
+  getDownloadURL,
+  getBlob
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
@@ -1339,6 +1340,30 @@ function uploadFileWithProgress(fileRef, file, title = "Enviando arquivo", detai
       } finally {
         hideUploadProgress();
       }
+    });
+  });
+}
+
+function uploadPrivateFileWithProgress(fileRef, file, title = "Enviando arquivo", detail = "") {
+  return new Promise((resolve, reject) => {
+    setUploadProgress(0, title, detail || file?.name || "");
+    const task = uploadBytesResumable(fileRef, file);
+    task.on("state_changed", (snapshot) => {
+      const percent = snapshot.totalBytes
+        ? (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        : 0;
+      setUploadProgress(percent, title, detail || file?.name || "");
+    }, (error) => {
+      hideUploadProgress(0);
+      reject(error);
+    }, () => {
+      setUploadProgress(100, title, "Envio concluido.");
+      resolve({
+        path: task.snapshot.ref.fullPath,
+        name: file?.name || task.snapshot.ref.name || "comprovante",
+        contentType: file?.type || task.snapshot.metadata?.contentType || ""
+      });
+      hideUploadProgress();
     });
   });
 }
@@ -2786,7 +2811,58 @@ async function uploadImovelImages(id, files) {
 async function uploadInvoiceReceiptForClient(clientId, file) {
   const path = `clientes/${clientId}/faturas/${Date.now()}-${slugify(file.name || "comprovante")}`;
   const fileRef = storageRef(storage, path);
-  return uploadFileWithProgress(fileRef, file, "Enviando comprovante", file.name || "comprovante");
+  return uploadPrivateFileWithProgress(fileRef, file, "Enviando comprovante", file.name || "comprovante");
+}
+
+function invoiceHasReceipt(invoice = {}) {
+  return Boolean(invoice.comprovantePath || invoice.comprovanteUrl);
+}
+
+function invoiceReceiptButton(invoice = {}) {
+  if (!invoiceHasReceipt(invoice)) return "";
+  return `<button type="button" class="ghost-mini" data-open-receipt-path="${escapeAttr(invoice.comprovantePath || "")}" data-open-receipt-url="${escapeAttr(invoice.comprovanteUrl || "")}" data-open-receipt-name="${escapeAttr(invoice.comprovanteNome || "comprovante")}">Ver comprovante</button>`;
+}
+
+async function openInvoiceReceipt(path, legacyUrl = "", fileName = "comprovante") {
+  if (path) {
+    try {
+      showToast("Carregando comprovante...");
+      const blob = await getBlob(storageRef(storage, path));
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.download = fileName || "comprovante";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+      return;
+    } catch (error) {
+      console.error(error);
+      if (!legacyUrl) {
+        showToast("Nao foi possivel abrir o comprovante.");
+        return;
+      }
+    }
+  }
+
+  if (legacyUrl) {
+    window.open(legacyUrl, "_blank", "noopener,noreferrer");
+  }
+}
+
+function bindInvoiceReceiptButtons(scope = document) {
+  scope.querySelectorAll("[data-open-receipt-path], [data-open-receipt-url]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openInvoiceReceipt(
+        button.dataset.openReceiptPath || "",
+        button.dataset.openReceiptUrl || "",
+        button.dataset.openReceiptName || "comprovante"
+      );
+    });
+  });
 }
 
 function isFirebaseStorageUrl(url) {
@@ -5795,11 +5871,13 @@ function renderFinanceiro() {
       </div>
       <label class="finance-receipt">Comprovante
         <input data-finance-receipt="${escapeAttr(client.id)}" type="file" accept="image/*,application/pdf">
-        ${latestInvoice?.comprovanteUrl ? `<a href="${escapeAttr(latestInvoice.comprovanteUrl)}" target="_blank" rel="noopener noreferrer">Ver comprovante</a>` : ""}
+        ${invoiceReceiptButton(latestInvoice)}
       </label>
       <button type="button" data-save-finance="${escapeAttr(client.id)}">Salvar</button>
     </article>
   `; }).join("");
+
+  bindInvoiceReceiptButtons(box);
 
   box.querySelectorAll("[data-save-finance]").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -5884,7 +5962,7 @@ function renderFinanceiro() {
       const valorDestaqueFatura = destaqueIncludedInInvoice(nextClient) ? destaqueValueForClient(nextClient) : 0;
       const valorTotalFatura = valorPlanoFatura + valorDestaqueFatura;
       showToast("Enviando comprovante do financeiro...");
-      const comprovanteUrl = await uploadInvoiceReceiptForClient(id, file);
+      const receipt = await uploadInvoiceReceiptForClient(id, file);
       if (!isMaster()) delete payloadBase.valorPlano;
       const payload = {
         ...payloadBase,
@@ -5900,7 +5978,9 @@ function renderFinanceiro() {
           valorPlano: valorPlanoFatura,
           valorDestaque: valorDestaqueFatura,
           valorTotal: valorTotalFatura,
-          comprovanteUrl,
+          comprovantePath: receipt.path,
+          comprovanteNome: receipt.name,
+          comprovanteTipo: receipt.contentType,
           status: payloadBase.pagamentoStatus === "pago" ? "pago" : "em_analise",
           updatedAt: Date.now()
         };
@@ -6643,7 +6723,7 @@ function renderReports() {
 
   const faturasComComprovante = reportClients
     .map((client) => ({ client, invoice: latestClientInvoice(client) }))
-    .filter(({ invoice }) => invoice?.comprovanteUrl)
+    .filter(({ invoice }) => invoiceHasReceipt(invoice))
     .slice(0, 10)
     .map(({ client, invoice }) => ({
       title: client.nome || client.id,
@@ -9919,7 +9999,7 @@ function renderClientInvoices() {
       return;
     }
     showToast("Enviando comprovante dos meses selecionados...");
-    const comprovanteUrl = await uploadInvoiceReceiptForClient(client.id, file);
+    const receipt = await uploadInvoiceReceiptForClient(client.id, file);
     const { selectedPlan, selectedInvoices, unified } = selectedInvoiceData();
     const pixCodigo = $("selectedInvoicePixCode")?.value || unified.pixCode || "";
     const payload = {
@@ -9937,7 +10017,9 @@ function renderClientInvoices() {
         valorTotal: fatura.valorTotal,
         pixChave: paymentConfig.pixChave || "",
         pixCodigo,
-        comprovanteUrl,
+        comprovantePath: receipt.path,
+        comprovanteNome: receipt.name,
+        comprovanteTipo: receipt.contentType,
         status: "em_analise",
         updatedAt: Date.now()
       };

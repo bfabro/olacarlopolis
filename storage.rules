@@ -6,36 +6,83 @@ service firebase.storage {
       return request.auth != null;
     }
 
-    function isImage() {
+    function isNewImage() {
       return request.resource != null
         && request.resource.contentType.matches('image/.*')
         && request.resource.size < 8 * 1024 * 1024;
     }
 
-    function isPdf() {
+    function isNewPdf() {
       return request.resource != null
         && request.resource.contentType == 'application/pdf'
         && request.resource.size < 15 * 1024 * 1024;
     }
 
-    match /clientes/{clientId}/{allPaths=**} {
+    function isNewImageOrPdf() {
+      return isNewImage() || isNewPdf();
+    }
+
+    // Comprovantes financeiros: nunca publicos.
+    // Nesta primeira etapa, qualquer usuario autenticado pode ler e gravar.
+    // O isolamento por cliente exigira custom claims ou perfis no Firestore.
+    match /clientes/{clientId}/faturas/{allPaths=**} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && isNewImageOrPdf();
+      allow delete: if signedIn();
+    }
+
+    // Arquivos usados no site publico.
+    match /clientes/{clientId}/perfil/{allPaths=**} {
       allow read: if true;
-      allow write: if signedIn() && (isImage() || isPdf());
+      allow create, update: if signedIn() && isNewImage();
+      allow delete: if signedIn();
+    }
+
+    match /clientes/{clientId}/imagens/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if signedIn() && isNewImage();
+      allow delete: if signedIn();
+    }
+
+    match /clientes/{clientId}/promocoes/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if signedIn() && isNewImage();
+      allow delete: if signedIn();
+    }
+
+    match /clientes/{clientId}/cardapio/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if signedIn() && isNewImageOrPdf();
+      allow delete: if signedIn();
+    }
+
+    match /clientes/{clientId}/grupo-whatsapp/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if signedIn() && isNewImage();
+      allow delete: if signedIn();
+    }
+
+    // Bloqueia novas pastas de clientes que nao tenham regra explicita.
+    match /clientes/{clientId}/{allPaths=**} {
+      allow read, write: if false;
     }
 
     match /conteudosInformativos/{module}/{itemId}/{allPaths=**} {
       allow read: if true;
-      allow write: if signedIn() && (isImage() || isPdf());
+      allow create, update: if signedIn() && isNewImageOrPdf();
+      allow delete: if signedIn();
     }
 
     match /eventos/{allPaths=**} {
       allow read: if true;
-      allow write: if signedIn() && isImage();
+      allow create, update: if signedIn() && isNewImage();
+      allow delete: if signedIn();
     }
 
     match /configuracoes/paginaInicial/{allPaths=**} {
       allow read: if true;
-      allow write: if signedIn() && isImage();
+      allow create, update: if signedIn() && isNewImage();
+      allow delete: if signedIn();
     }
 
     match /{allPaths=**} {
