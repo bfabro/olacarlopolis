@@ -3553,6 +3553,8 @@ function resetUserForm() {
   $("editUserUid").value = "";
   $("newUserEmail").readOnly = false;
   $("newUserPassword").required = true;
+  if ($("newUserClientSearch")) $("newUserClientSearch").value = "";
+  fillUserClientSelect();
   $("editUserStatus").value = "ativo";
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-user-plus"></i> Criar usuario`;
   $("deleteUserButton")?.classList.add("hidden");
@@ -3569,7 +3571,9 @@ function fillUserForm(user) {
   $("newUserPassword").value = "";
   $("newUserPassword").required = false;
   $("newUserRole").value = user.role || "cliente";
-  $("newUserClient").value = user.clienteId || "";
+  const linkedClient = state.clientes.find((client) => client.id === user.clienteId);
+  if ($("newUserClientSearch")) $("newUserClientSearch").value = linkedClient?.nome || "";
+  fillUserClientSelect(user.clienteId || "");
   $("editUserStatus").value = user.status || "ativo";
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
     input.checked = Boolean(user.permissoes?.[input.value]);
@@ -3622,9 +3626,20 @@ async function deletePanelUser() {
 function fillUserClientSelect(selectedId = "") {
   const select = $("newUserClient");
   if (!select) return;
-  select.innerHTML = `<option value="">Sem vinculo</option>` + state.clientes.map((client) => (
+  const currentSelectedId = selectedId || select.value || "";
+  const query = normalizeName($("newUserClientSearch")?.value || "");
+  const clients = [...state.clientes]
+    .sort((a, b) => String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR", { sensitivity: "base" }))
+    .filter((client) => {
+      if (!query || client.id === currentSelectedId) return true;
+      return normalizeName(`${client.nome || ""} ${client.id || ""} ${client.categoria || ""}`).includes(query);
+    });
+  select.innerHTML = `<option value="">Sem vinculo</option>` + clients.map((client) => (
     `<option value="${escapeAttr(client.id)}" ${client.id === selectedId ? "selected" : ""}>${escapeHtml(client.nome || client.id)}</option>`
   )).join("");
+  if (currentSelectedId && clients.some((client) => client.id === currentSelectedId)) {
+    select.value = currentSelectedId;
+  }
 }
 
 function fillEventClientSelect() {
@@ -10493,6 +10508,12 @@ function bindEvents() {
   $("closeUserFormButton")?.addEventListener("click", resetUserForm);
   $("userForm").addEventListener("submit", createPanelUser);
   $("deleteUserButton")?.addEventListener("click", deletePanelUser);
+  $("newUserClientSearch")?.addEventListener("input", () => fillUserClientSelect());
+  $("newUserClient")?.addEventListener("change", () => {
+    const client = state.clientes.find((item) => item.id === $("newUserClient").value);
+    if ($("newUserClientSearch")) $("newUserClientSearch").value = client?.nome || "";
+    fillUserClientSelect(client?.id || "");
+  });
 
   $("adminMenuToggle")?.addEventListener("click", () => {
     const isOpen = $("adminSidebar")?.classList.contains("mobile-open");
