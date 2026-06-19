@@ -3671,12 +3671,23 @@ function fillUserClientSelect(selectedId = "") {
   }
 }
 
-function fillEventClientSelect() {
+function fillEventClientSelect(selectedId = "") {
   const select = $("eventClient");
   if (!select) return;
-  select.innerHTML = `<option value="">Sem cliente vinculado</option>` + state.clientes.map((client) => (
-    `<option value="${escapeAttr(client.id)}">${escapeHtml(client.nome || client.id)}</option>`
+  const currentSelectedId = selectedId || select.value || "";
+  const query = normalizeName($("eventClientSearch")?.value || "");
+  const clients = [...state.clientes]
+    .sort((a, b) => String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR", { sensitivity: "base" }))
+    .filter((client) => {
+      if (!query || client.id === currentSelectedId) return true;
+      return normalizeName(`${client.nome || ""} ${client.id || ""} ${client.categoria || ""}`).includes(query);
+    });
+  select.innerHTML = `<option value="">Sem cliente vinculado</option>` + clients.map((client) => (
+    `<option value="${escapeAttr(client.id)}" ${client.id === selectedId ? "selected" : ""}>${escapeHtml(client.nome || client.id)}</option>`
   )).join("");
+  if (currentSelectedId && clients.some((client) => client.id === currentSelectedId)) {
+    select.value = currentSelectedId;
+  }
 }
 
 function defaultPlanValue(tipoPlano) {
@@ -3917,6 +3928,8 @@ function resetEventForm() {
   state.selectedEventId = null;
   $("eventForm").reset();
   $("eventId").value = "";
+  if ($("eventClientSearch")) $("eventClientSearch").value = "";
+  fillEventClientSelect();
   $("deleteEventButton").classList.add("hidden");
   setFormCardOpen("eventForm", false);
 }
@@ -3925,7 +3938,9 @@ function fillEventForm(evento) {
   state.selectedEventId = evento.id;
   $("eventId").value = evento.id || "";
   $("eventTitle").value = evento.titulo || "";
-  $("eventClient").value = evento.clienteId || "";
+  const linkedClient = state.clientes.find((client) => client.id === evento.clienteId);
+  if ($("eventClientSearch")) $("eventClientSearch").value = linkedClient?.nome || "";
+  fillEventClientSelect(evento.clienteId || "");
   $("eventDate").value = normalizeEventDate(eventRawDate(evento));
   $("eventTime").value = evento.horario || "";
   $("eventPlace").value = evento.local || "";
@@ -10681,6 +10696,12 @@ function bindEvents() {
   $("clientCategory")?.addEventListener("change", atualizarVisibilidadeCreciCliente);
   $("clientNewCategory")?.addEventListener("input", atualizarVisibilidadeCreciCliente);
   $("clientType")?.addEventListener("change", () => syncClientPaymentByType(true));
+  $("eventClientSearch")?.addEventListener("input", () => fillEventClientSelect());
+  $("eventClient")?.addEventListener("change", () => {
+    const client = state.clientes.find((item) => item.id === $("eventClient").value);
+    if ($("eventClientSearch")) $("eventClientSearch").value = client?.nome || "";
+    fillEventClientSelect(client?.id || "");
+  });
 
   $("categoryForm").addEventListener("submit", async (event) => {
     event.preventDefault();
