@@ -279,6 +279,27 @@ function currentClientRecord() {
   return state.clientes.find((client) => client.id === id) || null;
 }
 
+function isBillableClientType(clientOrType = "") {
+  const type = normalizeName(
+    typeof clientOrType === "string"
+      ? clientOrType
+      : (clientOrType?.tipoCliente || clientOrType?.tipo || "")
+  );
+  return type === "comercio" || type === "servico";
+}
+
+function syncClientPaymentByType(resetWhenBecomingBillable = false) {
+  const type = $("clientType")?.value || "comercio";
+  const payment = $("clientPaymentStatus");
+  if (!payment) return;
+  const billable = isBillableClientType(type);
+  const wasDisabled = payment.disabled;
+  if (!billable) payment.value = "isento";
+  if (billable && resetWhenBecomingBillable && wasDisabled) payment.value = "em_aberto";
+  payment.disabled = !billable;
+  payment.title = billable ? "" : "Clientes institucionais ou de outro tipo sao isentos de cobranca.";
+}
+
 function itemBelongsToCurrentClient(item = {}) {
   if (canManageClients()) return true;
   const clientId = currentClientId();
@@ -1940,6 +1961,8 @@ function resetClientForm() {
   delete $("clientForm").dataset.originalName;
   $("clientId").value = "";
   if ($("clientType")) $("clientType").value = "comercio";
+  if ($("clientPaymentStatus")) $("clientPaymentStatus").value = "em_aberto";
+  syncClientPaymentByType();
   if ($("clientCreci")) $("clientCreci").value = "";
   if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = false;
   if ($("clientJobActive")) $("clientJobActive").checked = false;
@@ -1981,6 +2004,9 @@ function getClientFormData() {
   ].filter((item) => item.numero);
   const contatos = contatosDetalhados.map((item) => item.numero);
   const whatsappPrincipal = contatosDetalhados.find((item) => item.whatsapp)?.numero || "";
+  const pagamentoStatus = isBillableClientType(tipoCliente)
+    ? $("clientPaymentStatus").value
+    : "isento";
   return {
     id,
     nome: name,
@@ -1990,7 +2016,7 @@ function getClientFormData() {
     tipoCliente,
     tipo: tipoCliente,
     status: $("clientStatus").value,
-    pagamentoStatus: $("clientPaymentStatus").value,
+    pagamentoStatus,
     contatosDetalhados,
     contatos,
     contato: contatos[0] || "",
@@ -2159,7 +2185,10 @@ function fillClientForm(client) {
   $("clientNewCategory").value = "";
   atualizarVisibilidadeCreciCliente();
   $("clientStatus").value = client.status || "ativo";
-  $("clientPaymentStatus").value = client.pagamentoStatus || "em_aberto";
+  $("clientPaymentStatus").value = isBillableClientType(client)
+    ? (client.pagamentoStatus || "em_aberto")
+    : "isento";
+  syncClientPaymentByType();
   const contatos = normalizeClientContactDetails(client);
   $("clientContact").value = contatos[0]?.numero || "";
   $("clientWhatsapp").value = contatos[1]?.numero || "";
@@ -3230,7 +3259,7 @@ async function cleanupPublicClientFinanceFields() {
 }
 
 function isClientOverdue(client) {
-  if (!client || client.status === "inativo" || client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") return false;
+  if (!client || !isBillableClientType(client) || client.status === "inativo" || client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") return false;
   const today = new Date();
   const currentMonth = currentMonthKey();
   const hasPreviousPendingInvoice = pendingMonthsForClient(client).some((month) => month && month < currentMonth);
@@ -3253,7 +3282,7 @@ function renderClientsList() {
     const matchesStatus = statusFilter === "todos" || (client.status || "pendente") === statusFilter;
     const overdue = isClientOverdue(client);
     const matchesDue = dueFilter === "todos" || (dueFilter === "vencidos" ? overdue : !overdue);
-    const matchesType = typeFilter === "todos" || (client.tipo || "comercio") === typeFilter;
+    const matchesType = typeFilter === "todos" || (client.tipoCliente || client.tipo || "comercio") === typeFilter;
     return matchesSearch && matchesStatus && matchesDue && matchesType;
   });
 
@@ -3270,7 +3299,7 @@ function renderClientsList() {
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
         <div class="client-tags">
           <span class="badge ${escapeAttr(client.status || "pendente")}">${statusLabel(client.status)}</span>
-          <span class="badge ${escapeAttr(client.pagamentoStatus || "em_aberto")}">${paymentLabel(client.pagamentoStatus)}</span>
+          <span class="badge ${escapeAttr(effectivePaymentStatus(client))}">${paymentLabel(effectivePaymentStatus(client))}</span>
           <span class="badge">${Array.isArray(client.imagens) ? client.imagens.length : 0} imagens</span>
         </div>
       </div>
@@ -3321,7 +3350,7 @@ function clientCompletenessScore(client) {
   if (Array.isArray(client.imagens) && client.imagens.length) score += client.imagens.length;
   if (client.contato || client.whatsapp) score += 5;
   if (client.status === "ativo") score += 3;
-  if (client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") score += 3;
+  if (["pago", "isento"].includes(effectivePaymentStatus(client))) score += 3;
   return score;
 }
 
@@ -3669,6 +3698,7 @@ function clientForInvoicePlan(client, tipoPlano) {
 }
 
 function valorFinalPlano(client) {
+  if (!isBillableClientType(client)) return 0;
   const valorCliente = Number(client.valorPlano ?? client.valorMensal ?? 0);
   const bruto = valorCliente > 0 ? valorCliente : defaultPlanValue(client.tipoPlano);
   const desconto = Number(client.descontoValor || 0);
@@ -3736,7 +3766,13 @@ function destaqueTxidForClient(client) {
 }
 
 function valorTotalFaturaCliente(client) {
+  if (!isBillableClientType(client)) return 0;
   return valorFinalPlano(client) + (destaqueIncludedInInvoice(client) ? destaqueValueForClient(client) : 0);
+}
+
+function effectivePaymentStatus(client) {
+  if (!isBillableClientType(client)) return "isento";
+  return client?.pagamentoStatus || "em_aberto";
 }
 
 function planLabel(tipoPlano) {
@@ -3768,13 +3804,14 @@ function invoiceDueDateForMonth(client, monthKey = currentMonthKey()) {
 }
 
 function clientHasOpenMonthlyInvoice(client) {
-  if (!client || canManageClients()) return false;
+  if (!client || !isBillableClientType(client) || canManageClients()) return false;
   if ((client.tipoPlano || "mensal") !== "mensal") return false;
-  if (client.status === "inativo" || client.pagamentoStatus === "pago" || client.pagamentoStatus === "isento") return false;
+  if (client.status === "inativo" || effectivePaymentStatus(client) !== "em_aberto") return false;
   return pendingMonthsForClient(client).length > 0;
 }
 
 function pendingMonthsForClient(client) {
+  if (!isBillableClientType(client)) return [];
   const months = new Set(Array.isArray(client?.mesesEmAberto) ? client.mesesEmAberto : []);
   Object.entries(client?.faturas || {}).forEach(([mes, fatura]) => {
     if (!fatura?.status || ["em_aberto", "em_analise"].includes(fatura.status)) months.add(mes);
@@ -5816,14 +5853,14 @@ function renderFinanceiro() {
   const filter = $("financeFilter")?.value || "todos";
   const q = String($("financeSearch")?.value || "").toLowerCase().trim();
   const list = state.clientes.filter((client) => {
-    const matchesFilter = filter === "todos" || (client.pagamentoStatus || "em_aberto") === filter;
+    const matchesFilter = filter === "todos" || effectivePaymentStatus(client) === filter;
     const hay = `${client.nome || ""} ${client.categoria || ""} ${client.contato || ""}`.toLowerCase();
     return matchesFilter && (!q || hay.includes(q));
   });
 
-  const paid = state.clientes.filter((c) => c.pagamentoStatus === "pago");
-  const open = state.clientes.filter((c) => !c.pagamentoStatus || c.pagamentoStatus === "em_aberto");
-  const free = state.clientes.filter((c) => c.pagamentoStatus === "isento");
+  const paid = state.clientes.filter((c) => effectivePaymentStatus(c) === "pago");
+  const open = state.clientes.filter((c) => effectivePaymentStatus(c) === "em_aberto");
+  const free = state.clientes.filter((c) => effectivePaymentStatus(c) === "isento");
   const total = paid.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
 
   $("financePaid").textContent = String(paid.length);
@@ -5849,10 +5886,10 @@ function renderFinanceiro() {
         <div class="list-meta">Meses em aberto: ${pendingMonthsForClient(client).map(monthLabel).join(", ") || "Nenhum"}</div>
       </div>
       <label>Status
-        <select data-finance-field="pagamentoStatus">
-          <option value="em_aberto" ${client.pagamentoStatus === "em_aberto" || !client.pagamentoStatus ? "selected" : ""}>Em aberto</option>
-          <option value="pago" ${client.pagamentoStatus === "pago" ? "selected" : ""}>Pago</option>
-          <option value="isento" ${client.pagamentoStatus === "isento" ? "selected" : ""}>Isento</option>
+        <select data-finance-field="pagamentoStatus" ${isBillableClientType(client) ? "" : "disabled"}>
+          <option value="em_aberto" ${effectivePaymentStatus(client) === "em_aberto" ? "selected" : ""}>Em aberto</option>
+          <option value="pago" ${effectivePaymentStatus(client) === "pago" ? "selected" : ""}>Pago</option>
+          <option value="isento" ${effectivePaymentStatus(client) === "isento" ? "selected" : ""}>Isento</option>
         </select>
       </label>
       <label>Cliente
@@ -6669,19 +6706,19 @@ function renderReports() {
   const ativos = reportClients.filter((c) => c.status === "ativo");
   const inativos = reportClients.filter((c) => c.status === "inativo");
   const pendentes = reportClients.filter((c) => c.status === "pendente");
-  const pagos = reportClients.filter((c) => c.pagamentoStatus === "pago");
-  const abertos = reportClients.filter((c) => !c.pagamentoStatus || c.pagamentoStatus === "em_aberto");
-  const isentos = reportClients.filter((c) => c.pagamentoStatus === "isento");
+  const pagos = reportClients.filter((c) => effectivePaymentStatus(c) === "pago");
+  const abertos = reportClients.filter((c) => effectivePaymentStatus(c) === "em_aberto");
+  const isentos = reportClients.filter((c) => effectivePaymentStatus(c) === "isento");
   const destaques = reportClients.filter((c) => destaqueIsActive(c));
   const comImagem = reportClients.filter((c) => c.imagem || normalizeImageItems(c.imagens).length);
   const comHorarios = reportClients.filter((c) => scheduleHasAnyOpen(c.horarios || {}));
   const valorReceber = reportClients
-    .filter((c) => c.status !== "inativo" && c.pagamentoStatus !== "isento")
+    .filter((c) => c.status !== "inativo" && isBillableClientType(c) && effectivePaymentStatus(c) !== "isento")
     .reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
   const valorPago = pagos.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
   const valorAberto = abertos.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
   const receitas = reportClients
-    .filter((c) => c.status !== "inativo" && c.pagamentoStatus !== "isento")
+    .filter((c) => c.status !== "inativo" && isBillableClientType(c) && effectivePaymentStatus(c) !== "isento")
     .reduce((acc, client) => {
       const valores = receitaPlanoValor(client);
       acc.mensal += valores.mensal;
@@ -6729,7 +6766,7 @@ function renderReports() {
       if (!client.contato && !client.whatsapp) faltas.push("sem telefone");
       if (!client.categoria) faltas.push("sem categoria");
       if (!scheduleHasAnyOpen(client.horarios || {})) faltas.push("sem horarios");
-      if (!client.pagamentoStatus || client.pagamentoStatus === "em_aberto") faltas.push("financeiro em aberto");
+      if (effectivePaymentStatus(client) === "em_aberto") faltas.push("financeiro em aberto");
       return { client, faltas };
     })
     .filter((item) => item.faltas.length)
@@ -9793,7 +9830,7 @@ function renderClientInvoices() {
         <div>
           <span>Pagamento</span>
           <strong>${escapeHtml(planLabel(client.tipoPlano || "mensal"))}</strong>
-          <small>${escapeHtml(paymentLabel(client.pagamentoStatus || "em_aberto"))}</small>
+          <small>${escapeHtml(paymentLabel(effectivePaymentStatus(client)))}</small>
         </div>
       </div>
     </article>
@@ -10643,6 +10680,7 @@ function bindEvents() {
   });
   $("clientCategory")?.addEventListener("change", atualizarVisibilidadeCreciCliente);
   $("clientNewCategory")?.addEventListener("input", atualizarVisibilidadeCreciCliente);
+  $("clientType")?.addEventListener("change", () => syncClientPaymentByType(true));
 
   $("categoryForm").addEventListener("submit", async (event) => {
     event.preventDefault();
