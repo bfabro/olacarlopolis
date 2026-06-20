@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 291,
-  label: "v297",
+  numero: 292,
+  label: "v298",
   data: "2026-06-20",
-  nota: "Destaques publicos agora respeitam exclusivamente a flag ativa do cliente."
+  nota: "Filtro da lista de clientes por data ou periodo da ultima atualizacao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3547,6 +3547,25 @@ function formatClientLastUpdate(client = {}) {
   return `Ultima atualizacao: ${formatted}${author ? ` - ${author}` : ""}`;
 }
 
+function clientMatchesUpdateRange(client = {}, startDate = "", endDate = "") {
+  if (!startDate && !endDate) return true;
+  const timestamp = clientLastUpdate(client).timestamp;
+  if (!timestamp) return false;
+
+  const updatedAt = new Date(timestamp);
+  if (Number.isNaN(updatedAt.getTime())) return false;
+
+  if (startDate) {
+    const start = new Date(`${startDate}T00:00:00`);
+    if (updatedAt < start) return false;
+  }
+  if (endDate) {
+    const end = new Date(`${endDate}T23:59:59.999`);
+    if (updatedAt > end) return false;
+  }
+  return true;
+}
+
 function renderClientsList() {
   const box = $("clientsList");
   if (!box) return;
@@ -3555,6 +3574,8 @@ function renderClientsList() {
   const statusFilter = $("clientStatusFilter")?.value || "todos";
   const dueFilter = $("clientDueFilter")?.value || "todos";
   const typeFilter = $("clientTypeFilter")?.value || "todos";
+  const updatedFromFilter = $("clientUpdatedFromFilter")?.value || "";
+  const updatedToFilter = $("clientUpdatedToFilter")?.value || "";
   const list = state.clientes.filter((client) => {
     const hay = `${client.nome || ""} ${client.categoria || ""} ${client.contato || ""}`.toLowerCase();
     const matchesSearch = !q || hay.includes(q);
@@ -3562,7 +3583,8 @@ function renderClientsList() {
     const overdue = isClientOverdue(client);
     const matchesDue = dueFilter === "todos" || (dueFilter === "vencidos" ? overdue : !overdue);
     const matchesType = typeFilter === "todos" || (client.tipoCliente || client.tipo || "comercio") === typeFilter;
-    return matchesSearch && matchesStatus && matchesDue && matchesType;
+    const matchesUpdate = clientMatchesUpdateRange(client, updatedFromFilter, updatedToFilter);
+    return matchesSearch && matchesStatus && matchesDue && matchesType && matchesUpdate;
   });
 
   if (!list.length) {
@@ -10803,6 +10825,8 @@ function bindEvents() {
   $("clientStatusFilter")?.addEventListener("change", renderClientsList);
   $("clientDueFilter")?.addEventListener("change", renderClientsList);
   $("clientTypeFilter")?.addEventListener("change", renderClientsList);
+  $("clientUpdatedFromFilter")?.addEventListener("change", renderClientsList);
+  $("clientUpdatedToFilter")?.addEventListener("change", renderClientsList);
   $("clientImagesUpload").addEventListener("change", async (event) => {
     await uploadClientImages(event.target.files);
     event.target.value = "";

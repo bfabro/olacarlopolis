@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=297">
+  <link rel="stylesheet" href="painel.css?v=298">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -436,6 +436,12 @@
                   <option value="institucional">Institucional</option>
                   <option value="outro">Outro</option>
                 </select>
+              </label>
+              <label>Atualizado de
+                <input id="clientUpdatedFromFilter" type="date">
+              </label>
+              <label>Atualizado ate
+                <input id="clientUpdatedToFilter" type="date">
               </label>
             </div>
             <div id="clientsList" class="clients-board"></div>
@@ -1224,6 +1230,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=297"></script>
+  <script type="module" src="painel.js?v=298"></script>
 </body>
 </html>
