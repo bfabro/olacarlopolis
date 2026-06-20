@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 288,
-  label: "v294",
+  numero: 289,
+  label: "v295",
   data: "2026-06-20",
-  nota: "Correcao do Financeiro e Relatorios, blocos retrateis e confirmacoes de salvamento."
+  nota: "Atualizacao automatica do valor financeiro conforme o plano selecionado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3936,6 +3936,34 @@ function defaultPlanValue(tipoPlano) {
   return defaults[tipoPlano || "mensal"] || 0;
 }
 
+function financePlanValue(client, tipoPlano) {
+  if (!isBillableClientType(client)) return 0;
+  const configuredValue = defaultPlanValue(tipoPlano);
+  if (configuredValue > 0) return configuredValue;
+  if ((client?.tipoPlano || "mensal") === (tipoPlano || "mensal")) {
+    return Number(client?.valorPlano ?? client?.valorMensal ?? 0);
+  }
+  return 0;
+}
+
+function syncFinanceRowPlanValue(row) {
+  if (!row) return;
+  const client = state.clientes.find((item) => item.id === row.dataset.clientId) || {};
+  const planSelect = row.querySelector('[data-finance-field="tipoPlano"]');
+  const valueInput = row.querySelector('[data-finance-field="valorPlano"]');
+  if (!planSelect || !valueInput) return;
+  const value = financePlanValue(client, planSelect.value);
+  valueInput.value = moneyBR(value);
+  valueInput.dataset.planValue = String(value);
+  const summary = row.querySelector("[data-finance-plan-summary]");
+  if (summary) {
+    const discountInput = row.querySelector('[data-finance-field="descontoValor"]');
+    const discount = numberFromMoney(discountInput?.value || 0);
+    const finalValue = Math.max(0, value - discount);
+    summary.textContent = `Plano: ${planLabel(planSelect.value)} - Valor final: ${moneyBR(finalValue)}`;
+  }
+}
+
 function clientForInvoicePlan(client, tipoPlano) {
   return {
     ...client,
@@ -6128,12 +6156,15 @@ function renderFinanceiro() {
     const pendingMonths = new Set(pendingMonthsForClient(client));
     const monthOptions = financeMonthOptionsForClient(client);
     const latestInvoice = latestClientInvoice(client);
+    const selectedPlan = client.tipoPlano || "mensal";
+    const selectedPlanValue = financePlanValue(client, selectedPlan);
     return `
     <article class="finance-row" data-client-id="${escapeAttr(client.id)}">
       <div>
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
-        <div class="list-meta">Plano: ${planLabel(client.tipoPlano)} - Valor final: ${moneyBR(valorTotalFaturaCliente(client))}${client.destaqueSemanal ? ` - destaque ${moneyBR(destaqueValueForClient(client))} (${destaqueBillingForClient(client) === "pix_separado" ? "Pix separado" : "mensalidade"})` : ""}</div>
+        <div class="list-meta" data-finance-plan-summary>Plano: ${planLabel(selectedPlan)} - Valor final: ${moneyBR(Math.max(0, selectedPlanValue - numberFromMoney(client.descontoValor || 0)))}</div>
+        ${client.destaqueSemanal ? `<div class="list-meta">Destaque: ${moneyBR(destaqueValueForClient(client))} (${destaqueBillingForClient(client) === "pix_separado" ? "Pix separado" : "mensalidade"})</div>` : ""}
         <div class="list-meta">Meses em aberto: ${pendingMonthsForClient(client).map(monthLabel).join(", ") || "Nenhum"}</div>
       </div>
       <label>Status
@@ -6152,12 +6183,12 @@ function renderFinanceiro() {
       </label>
       <label>Plano
         <select data-finance-field="tipoPlano">
-          <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
-          <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
-          <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
+          <option value="mensal" ${selectedPlan === "mensal" ? "selected" : ""}>Mensal</option>
+          <option value="semestral" ${selectedPlan === "semestral" ? "selected" : ""}>Semestral</option>
+          <option value="anual" ${selectedPlan === "anual" ? "selected" : ""}>Anual</option>
         </select>
       </label>
-      <label>Valor<input data-finance-field="valorPlano" value="${escapeAttr(client.valorPlano ?? defaultPlanValue(client.tipoPlano))}" placeholder="R$" ${isMaster() ? "" : "readonly"}></label>
+      <label>Valor<input data-finance-field="valorPlano" value="${escapeAttr(moneyBR(selectedPlanValue))}" data-plan-value="${escapeAttr(selectedPlanValue)}" placeholder="R$" ${isMaster() ? "" : "readonly"}></label>
       <label>Desconto<input data-finance-field="descontoValor" value="${escapeAttr(client.descontoValor || "")}" placeholder="R$"></label>
       <label>Venc.<input data-finance-field="vencimentoDia" value="${escapeAttr(client.vencimentoDia || "")}" placeholder="Dia"></label>
       <label class="finance-note">Obs.<input data-finance-field="financeiroObs" value="${escapeAttr(client.financeiroObs || "")}"></label>
@@ -6181,6 +6212,20 @@ function renderFinanceiro() {
   `; }).join("");
 
   bindInvoiceReceiptButtons(box);
+
+  box.querySelectorAll(".finance-row").forEach((row) => {
+    row.querySelector('[data-finance-field="tipoPlano"]')?.addEventListener("change", () => {
+      syncFinanceRowPlanValue(row);
+    });
+    row.querySelector('[data-finance-field="descontoValor"]')?.addEventListener("input", () => {
+      const planSelect = row.querySelector('[data-finance-field="tipoPlano"]');
+      const valueInput = row.querySelector('[data-finance-field="valorPlano"]');
+      const summary = row.querySelector("[data-finance-plan-summary]");
+      if (!planSelect || !valueInput || !summary) return;
+      const finalValue = Math.max(0, numberFromMoney(valueInput.value) - numberFromMoney(row.querySelector('[data-finance-field="descontoValor"]')?.value || 0));
+      summary.textContent = `Plano: ${planLabel(planSelect.value)} - Valor final: ${moneyBR(finalValue)}`;
+    });
+  });
 
   box.querySelectorAll("[data-save-finance]").forEach((button) => {
     button.addEventListener("click", async () => {
