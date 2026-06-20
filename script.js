@@ -35,6 +35,7 @@ function getContatosDetalhadosEstabelecimento(establishment = {}) {
   const detailed = Array.isArray(establishment.contatosDetalhados)
     ? establishment.contatosDetalhados.map((item) => ({
       numero: String(item?.numero || item?.telefone || "").trim(),
+      referencia: String(item?.referencia || item?.nome || item?.local || "").trim(),
       whatsapp: Boolean(item?.whatsapp)
     }))
     : [];
@@ -61,6 +62,7 @@ function getContatosDetalhadosEstabelecimento(establishment = {}) {
     const existing = byNumber.get(key);
     byNumber.set(key, {
       numero: existing?.numero || numero,
+      referencia: existing?.referencia || String(item?.referencia || "").trim(),
       whatsapp: Boolean(existing?.whatsapp || item?.whatsapp || (legacyWhatsappDigits && key === legacyWhatsappDigits))
     });
   });
@@ -6139,7 +6141,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         rel="noopener noreferrer"
         class="btn-whatsapp_onde"
         onclick="registrarCliqueWhatsOndeComer('${normalizeName(est.name)}');">
-        <i class="fab fa-whatsapp"></i> ${formatarTelefonePublico(contato.numero)}
+        <i class="fab fa-whatsapp"></i>
+        <span class="contato-publico-texto"><span class="contato-publico-numero">${formatarTelefonePublico(contato.numero)}</span>${contato.referencia ? `<span class="contato-publico-referencia"> - ${escapePromoHtml(contato.referencia)}</span>` : ""}</span>
       </a>
     `).join("")}
   </div>
@@ -19165,7 +19168,7 @@ ${!establishment.descricaoFalecido ? `
                           data-id="${normalizeName(establishment.name)}"
                           data-tel="${numero}">
                           <i class="${contato.whatsapp ? "bx bxl-whatsapp" : "fas fa-phone"} info-icon"></i>
-                          <span>${formatarTelefonePublico(contato.numero)}</span>
+                          <span class="contato-publico-texto"><span class="contato-publico-numero">${formatarTelefonePublico(contato.numero)}</span>${contato.referencia ? `<span class="contato-publico-referencia"> - ${escapePromoHtml(contato.referencia)}</span>` : ""}</span>
                         </a>`;
                     }).join("")}
                   </div>

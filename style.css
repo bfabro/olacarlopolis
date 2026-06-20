@@ -2174,9 +2174,29 @@ screen and (width: 820px) {
   font-size: 20px;
 }
 
-.contato-publico-link span {
+.contato-publico-texto {
+  display: inline-flex;
+  min-width: 0;
+  align-items: baseline;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contato-publico-numero,
+.contato-publico-referencia {
   display: inline;
   white-space: nowrap;
+}
+
+.contato-publico-numero {
+  flex: 0 0 auto;
+}
+
+.contato-publico-referencia {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .contato-publico-link.is-whatsapp {
@@ -4281,8 +4301,8 @@ a:focus {
   display: inline-flex;
   align-items: center;
   max-width: 100%;
-  white-space: normal;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  overflow: hidden;
   gap: 5px;
   margin: 0px 4px;
   cursor: pointer;
@@ -4300,6 +4320,10 @@ a:focus {
     transform 0.13s;
   will-change: transform, box-shadow;
 
+}
+
+.btn-whatsapp_onde .contato-publico-texto {
+  max-width: min(58vw, 300px);
 }
 
 /* background: #f48840;*/
@@ -4348,6 +4372,11 @@ a:focus {
   .btn-whatsapp_onde {
     margin: 0;
     gap: 4px;
+    font-size: clamp(10px, 2.8vw, 13px);
+  }
+
+  .btn-whatsapp_onde .contato-publico-texto {
+    max-width: 52vw;
   }
 }
 
