@@ -1385,6 +1385,46 @@ button[type="submit"]:hover,
   gap: 8px;
 }
 
+.finance-annual-summary-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.finance-annual-summary-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.finance-annual-summary-toggle p {
+  margin-bottom: 0;
+}
+
+.finance-annual-summary-toggle i {
+  transition: transform .2s ease;
+}
+
+.finance-annual-summary[open] .finance-annual-summary-toggle i {
+  transform: rotate(180deg);
+}
+
+.finance-annual-summary-content {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.finance-due-order {
+  display: grid;
+  gap: 5px;
+  max-width: 260px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .finance-due-item {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
@@ -1399,6 +1439,18 @@ button[type="submit"]:hover,
 .finance-due-item span,
 .finance-due-item small {
   color: var(--muted);
+}
+
+.finance-due-item.renewal-warning {
+  border-color: #ef4444;
+  background: #fef2f2;
+  box-shadow: inset 4px 0 0 #dc2626;
+}
+
+.finance-due-item.renewal-warning strong,
+.finance-due-item.renewal-warning span,
+.finance-due-item.renewal-warning small {
+  color: #b91c1c;
 }
 
 .upload-panel {

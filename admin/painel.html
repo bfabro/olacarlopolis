@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=302">
+  <link rel="stylesheet" href="painel.css?v=303">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -615,15 +615,25 @@
           </article>
         </div>
 
-        <section class="panel-card finance-annual-summary">
-          <div class="section-head compact">
+        <details id="financeAnnualSummary" class="panel-card finance-annual-summary hidden">
+          <summary class="finance-annual-summary-toggle">
             <div>
               <h2>Vencimentos dos planos anuais</h2>
-              <p>Somente clientes ativos de comercio ou servico.</p>
+              <p>Clique para expandir e acompanhar as renovacoes.</p>
             </div>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="finance-annual-summary-content">
+            <label class="finance-due-order">Ordenar vencimentos
+              <select id="financeAnnualDueOrder" class="compact-select">
+                <option value="proximos">Mais proximos primeiro</option>
+                <option value="distantes">Mais distantes primeiro</option>
+                <option value="nome">Nome do cliente</option>
+              </select>
+            </label>
+            <div id="financeAnnualDueList" class="finance-due-list"></div>
           </div>
-          <div id="financeAnnualDueList" class="finance-due-list"></div>
-        </section>
+        </details>
 
         <section class="panel-card">
           <div class="section-head">
@@ -1270,6 +1280,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=302"></script>
+  <script type="module" src="painel.js?v=303"></script>
 </body>
 </html>

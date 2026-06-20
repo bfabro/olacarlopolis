@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 296,
-  label: "v302",
+  numero: 297,
+  label: "v303",
   data: "2026-06-20",
-  nota: "Confirmacao destacada ao concluir o salvamento de clientes."
+  nota: "Vencimentos anuais retrateis, ordenaveis e destacados no mes da renovacao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6255,20 +6255,31 @@ function renderFinanceiro() {
   $("financeAnnualCount").textContent = `${clientsByPlan.anual.length} cliente${clientsByPlan.anual.length === 1 ? "" : "s"}`;
 
   const annualDueList = $("financeAnnualDueList");
+  $("financeAnnualSummary")?.classList.toggle("hidden", !isMaster());
   if (annualDueList) {
+    const dueOrder = $("financeAnnualDueOrder")?.value || "proximos";
     annualDueList.innerHTML = clientsByPlan.anual.length
       ? [...clientsByPlan.anual]
         .sort((a, b) => {
-          const dateCompare = String(financePlanDueDate(a) || "9999-12-31").localeCompare(String(financePlanDueDate(b) || "9999-12-31"));
-          return dateCompare || String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR");
+          if (dueOrder === "nome") {
+            return String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR");
+          }
+          const aDate = financePlanDueDate(a);
+          const bDate = financePlanDueDate(b);
+          if (!aDate && !bDate) return String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR");
+          if (!aDate) return 1;
+          if (!bDate) return -1;
+          const dateCompare = aDate.localeCompare(bDate);
+          return dueOrder === "distantes" ? -dateCompare : dateCompare;
         })
         .map((client) => {
           const dueDate = financePlanDueDate(client);
+          const renewal = financePlanRenewalStatus(dueDate);
           return `
-            <article class="finance-due-item">
+            <article class="finance-due-item ${renewal.warning ? "renewal-warning" : ""}">
               <strong>${escapeHtml(client.nome || client.id)}</strong>
               <span>${moneyBR(valorFinalPlano(client))}</span>
-              <small>${dueDate ? `Vencimento: ${escapeHtml(formatDateBR(dueDate))}` : "Vencimento anual nao definido"}</small>
+              <small>${dueDate ? `${escapeHtml(renewal.label)}: ${escapeHtml(formatDateBR(dueDate))}` : "Vencimento anual nao definido"}</small>
             </article>
           `;
         }).join("")
@@ -6492,6 +6503,18 @@ function financePlanDueDate(client = {}) {
   if (configured) return String(configured).slice(0, 10);
   const invoice = latestClientInvoice(client);
   return String(invoice?.vencimento || invoice?.dataVencimento || "").slice(0, 10);
+}
+
+function financePlanRenewalStatus(dueDate = "") {
+  if (!dueDate) return { warning: false, label: "Vencimento" };
+  const date = new Date(`${dueDate}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return { warning: false, label: "Vencimento" };
+  const now = new Date();
+  const currentMonth = now.getFullYear() * 12 + now.getMonth();
+  const dueMonth = date.getFullYear() * 12 + date.getMonth();
+  if (dueMonth < currentMonth) return { warning: true, label: "Vencido - renovar" };
+  if (dueMonth === currentMonth) return { warning: true, label: "Vence neste mes - renovar" };
+  return { warning: false, label: "Vencimento" };
 }
 
 function reportPercent(value, total) {
@@ -11029,6 +11052,7 @@ function bindEvents() {
   $("financeSearch").addEventListener("input", renderFinanceiro);
   $("financeFilter").addEventListener("change", renderFinanceiro);
   $("financePlanFilter")?.addEventListener("change", renderFinanceiro);
+  $("financeAnnualDueOrder")?.addEventListener("change", renderFinanceiro);
   $("categorySearch").addEventListener("input", renderCategoriesList);
   $("paymentSettingsForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
