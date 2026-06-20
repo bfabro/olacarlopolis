@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=298">
+  <link rel="stylesheet" href="painel.css?v=299">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -442,6 +442,13 @@
               </label>
               <label>Atualizado ate
                 <input id="clientUpdatedToFilter" type="date">
+              </label>
+              <label>Ordenar atualizacoes
+                <select id="clientUpdatedOrder">
+                  <option value="recentes">Mais recentes primeiro</option>
+                  <option value="antigas">Mais antigas primeiro</option>
+                  <option value="alfabetica">Ordem alfabetica</option>
+                </select>
               </label>
             </div>
             <div id="clientsList" class="clients-board"></div>
@@ -1230,6 +1237,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=298"></script>
+  <script type="module" src="painel.js?v=299"></script>
 </body>
 </html>

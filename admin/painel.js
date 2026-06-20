@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 292,
-  label: "v298",
+  numero: 293,
+  label: "v299",
   data: "2026-06-20",
-  nota: "Filtro da lista de clientes por data ou periodo da ultima atualizacao."
+  nota: "Ordenacao da lista de clientes pelas atualizacoes mais recentes ou mais antigas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3566,6 +3566,23 @@ function clientMatchesUpdateRange(client = {}, startDate = "", endDate = "") {
   return true;
 }
 
+function sortClientsByUpdate(clients = [], order = "recentes") {
+  return [...clients].sort((a, b) => {
+    if (order === "alfabetica") {
+      return String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR");
+    }
+
+    const aTime = clientLastUpdate(a).timestamp;
+    const bTime = clientLastUpdate(b).timestamp;
+    if (!aTime && !bTime) {
+      return String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR");
+    }
+    if (!aTime) return 1;
+    if (!bTime) return -1;
+    return order === "antigas" ? aTime - bTime : bTime - aTime;
+  });
+}
+
 function renderClientsList() {
   const box = $("clientsList");
   if (!box) return;
@@ -3576,7 +3593,8 @@ function renderClientsList() {
   const typeFilter = $("clientTypeFilter")?.value || "todos";
   const updatedFromFilter = $("clientUpdatedFromFilter")?.value || "";
   const updatedToFilter = $("clientUpdatedToFilter")?.value || "";
-  const list = state.clientes.filter((client) => {
+  const updatedOrder = $("clientUpdatedOrder")?.value || "recentes";
+  const filteredClients = state.clientes.filter((client) => {
     const hay = `${client.nome || ""} ${client.categoria || ""} ${client.contato || ""}`.toLowerCase();
     const matchesSearch = !q || hay.includes(q);
     const matchesStatus = statusFilter === "todos" || (client.status || "pendente") === statusFilter;
@@ -3586,6 +3604,7 @@ function renderClientsList() {
     const matchesUpdate = clientMatchesUpdateRange(client, updatedFromFilter, updatedToFilter);
     return matchesSearch && matchesStatus && matchesDue && matchesType && matchesUpdate;
   });
+  const list = sortClientsByUpdate(filteredClients, updatedOrder);
 
   if (!list.length) {
     box.innerHTML = `<div class="list-meta">Nenhum cliente encontrado.</div>`;
@@ -10827,6 +10846,7 @@ function bindEvents() {
   $("clientTypeFilter")?.addEventListener("change", renderClientsList);
   $("clientUpdatedFromFilter")?.addEventListener("change", renderClientsList);
   $("clientUpdatedToFilter")?.addEventListener("change", renderClientsList);
+  $("clientUpdatedOrder")?.addEventListener("change", renderClientsList);
   $("clientImagesUpload").addEventListener("change", async (event) => {
     await uploadClientImages(event.target.files);
     event.target.value = "";
