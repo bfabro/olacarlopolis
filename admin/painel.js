@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 293,
-  label: "v299",
+  numero: 294,
+  label: "v300",
   data: "2026-06-20",
-  nota: "Ordenacao da lista de clientes pelas atualizacoes mais recentes ou mais antigas."
+  nota: "Receitas mensal, semestral e anual no financeiro, com filtro por tipo de plano."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6215,22 +6215,34 @@ function renderFinanceiro() {
   if (!box) return;
 
   const filter = $("financeFilter")?.value || "todos";
+  const planFilter = $("financePlanFilter")?.value || "todos";
   const q = String($("financeSearch")?.value || "").toLowerCase().trim();
   const list = state.clientes.filter((client) => {
     const matchesFilter = filter === "todos" || effectivePaymentStatus(client) === filter;
+    const matchesPlan = planFilter === "todos" || (client.tipoPlano || "mensal") === planFilter;
     const hay = `${client.nome || ""} ${client.categoria || ""} ${client.contato || ""}`.toLowerCase();
-    return matchesFilter && (!q || hay.includes(q));
+    return matchesFilter && matchesPlan && (!q || hay.includes(q));
   });
 
   const paid = state.clientes.filter((c) => effectivePaymentStatus(c) === "pago");
   const open = state.clientes.filter((c) => effectivePaymentStatus(c) === "em_aberto");
   const free = state.clientes.filter((c) => effectivePaymentStatus(c) === "isento");
-  const total = paid.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
+  const revenues = state.clientes
+    .filter((client) => client.status !== "inativo" && isBillableClientType(client) && effectivePaymentStatus(client) !== "isento")
+    .reduce((totals, client) => {
+      const values = receitaPlanoValor(client);
+      totals.mensal += values.mensal;
+      totals.semestral += values.semestral;
+      totals.anual += values.anual;
+      return totals;
+    }, { mensal: 0, semestral: 0, anual: 0 });
 
   $("financePaid").textContent = String(paid.length);
   $("financeOpen").textContent = String(open.length);
   $("financeFree").textContent = String(free.length);
-  $("financeTotal").textContent = moneyBR(total);
+  $("financeMonthlyRevenue").textContent = moneyBR(revenues.mensal);
+  $("financeSemiannualRevenue").textContent = moneyBR(revenues.semestral);
+  $("financeAnnualRevenue").textContent = moneyBR(revenues.anual);
 
   if (!list.length) {
     box.innerHTML = `<div class="list-meta">Nenhum cliente no filtro selecionado.</div>`;
@@ -10974,6 +10986,7 @@ function bindEvents() {
   });
   $("financeSearch").addEventListener("input", renderFinanceiro);
   $("financeFilter").addEventListener("change", renderFinanceiro);
+  $("financePlanFilter")?.addEventListener("change", renderFinanceiro);
   $("categorySearch").addEventListener("input", renderCategoriesList);
   $("paymentSettingsForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();

@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=299">
+  <link rel="stylesheet" href="painel.css?v=300">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -600,7 +600,18 @@
           </article>
           <article class="stat-card">
             <span>Receita mensal</span>
-            <strong id="financeTotal">R$ 0</strong>
+            <strong id="financeMonthlyRevenue">R$ 0</strong>
+            <small>Projecao de 1 mes</small>
+          </article>
+          <article class="stat-card">
+            <span>Receita semestral</span>
+            <strong id="financeSemiannualRevenue">R$ 0</strong>
+            <small>Projecao de 6 meses</small>
+          </article>
+          <article class="stat-card">
+            <span>Receita anual</span>
+            <strong id="financeAnnualRevenue">R$ 0</strong>
+            <small>Projecao de 12 meses</small>
           </article>
         </div>
 
@@ -610,12 +621,24 @@
               <h2>Financeiro dos clientes</h2>
               <p>Controle plano, valor, desconto, vencimento e status. Valores de plano so podem ser editados pelo master.</p>
             </div>
-            <select id="financeFilter" class="compact-select">
-              <option value="todos">Todos</option>
-              <option value="pago">Pago</option>
-              <option value="em_aberto">Em aberto</option>
-              <option value="isento">Isento</option>
-            </select>
+            <div class="finance-filter-group">
+              <label>Status financeiro
+                <select id="financeFilter" class="compact-select">
+                  <option value="todos">Todos</option>
+                  <option value="pago">Pago</option>
+                  <option value="em_aberto">Em aberto</option>
+                  <option value="isento">Isento</option>
+                </select>
+              </label>
+              <label>Tipo de plano
+                <select id="financePlanFilter" class="compact-select">
+                  <option value="todos">Todos</option>
+                  <option value="mensal">Mensal</option>
+                  <option value="semestral">Semestral</option>
+                  <option value="anual">Anual</option>
+                </select>
+              </label>
+            </div>
           </div>
           <input id="financeSearch" class="search-input" placeholder="Buscar cliente no financeiro...">
           <div id="financeList" class="finance-list"></div>
@@ -1237,6 +1260,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=299"></script>
+  <script type="module" src="painel.js?v=300"></script>
 </body>
 </html>
