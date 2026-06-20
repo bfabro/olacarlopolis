@@ -194,6 +194,85 @@ label {
   margin-top: 3px;
 }
 
+.client-sections-master-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 11px 14px;
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.client-sections-master-toggle input {
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  accent-color: #2563eb;
+}
+
+.client-sections-master-toggle span,
+.client-sections-master-toggle strong,
+.client-sections-master-toggle small {
+  display: block;
+}
+
+.client-sections-master-toggle small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.client-edit-section {
+  display: grid;
+  gap: 12px;
+}
+
+.client-section-body {
+  padding-top: 2px;
+}
+
+.client-section-header {
+  position: relative;
+  cursor: pointer;
+  padding-right: 54px !important;
+}
+
+.client-section-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  background: #fff;
+  color: #1d4ed8;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.client-section-toggle:hover {
+  background: #dbeafe;
+}
+
+#clientForm > [data-client-edit-section].is-collapsed > .client-section-content {
+  display: none !important;
+}
+
+#clientForm > section[data-client-edit-section] > .section-head.client-section-header {
+  margin-bottom: 0;
+}
+
+#clientForm > section[data-client-edit-section]:not(.is-collapsed) > .section-head.client-section-header {
+  margin-bottom: 14px;
+}
+
 input,
 select,
 textarea {
@@ -2390,6 +2469,12 @@ button[type="submit"]:hover,
   box-shadow: 0 18px 40px rgba(15, 23, 42, .2);
   max-width: 360px;
   z-index: 30;
+}
+
+.toast.success {
+  border: 1px solid #86efac;
+  background: #166534;
+  font-weight: 800;
 }
 
 .upload-progress-box {

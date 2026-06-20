@@ -1390,11 +1390,17 @@ function sameOriginImageUrl(url) {
   return new URL(`../${raw.replace(/^\.?\//, "")}`, window.location.href).toString();
 }
 
+let toastTimer = null;
+
 function showToast(message) {
   const toast = $("toast");
+  if (!toast) return;
+  if (toastTimer) clearTimeout(toastTimer);
   toast.textContent = message;
+  const success = /salv|atualizad|criad[oa] com sucesso|concluid[oa]/i.test(String(message || ""));
+  toast.classList.toggle("success", success);
   toast.classList.remove("hidden");
-  setTimeout(() => toast.classList.add("hidden"), 3200);
+  toastTimer = setTimeout(() => toast.classList.add("hidden"), success ? 5200 : 3600);
 }
 
 function confirmarExclusao(nomeItem, tipoItem = "item") {
@@ -2061,6 +2067,87 @@ function setClientFocusMode(enabled) {
   setFormCardOpen("clientForm", enabled);
 }
 
+function clientSectionTitle(section) {
+  return section.querySelector(".form-section-title strong, .section-head h3")?.textContent?.trim() || "Bloco do cadastro";
+}
+
+function setClientSectionExpanded(section, expanded) {
+  if (!section) return;
+  section.classList.toggle("is-collapsed", !expanded);
+  const button = section.querySelector(":scope > .client-section-header [data-client-section-toggle]");
+  button?.setAttribute("aria-expanded", expanded ? "true" : "false");
+  const icon = button?.querySelector("i");
+  if (icon) icon.className = expanded ? "fa-solid fa-chevron-up" : "fa-solid fa-chevron-down";
+}
+
+function setAllClientSectionsExpanded(expanded) {
+  document.querySelectorAll("#clientForm > [data-client-edit-section]").forEach((section) => {
+    setClientSectionExpanded(section, expanded);
+  });
+  if ($("clientShowAllSections")) $("clientShowAllSections").checked = expanded;
+}
+
+function addClientSectionToggle(section, header) {
+  if (!section || !header || header.querySelector("[data-client-section-toggle]")) return;
+  header.classList.add("client-section-header");
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "client-section-toggle";
+  button.dataset.clientSectionToggle = "";
+  button.setAttribute("aria-label", `Expandir ou retrair ${clientSectionTitle(section)}`);
+  button.setAttribute("aria-expanded", "false");
+  button.innerHTML = `<i class="fa-solid fa-chevron-down"></i>`;
+  header.appendChild(button);
+  header.addEventListener("click", (event) => {
+    if (event.target.closest("input, select, textarea, a")) return;
+    setClientSectionExpanded(section, section.classList.contains("is-collapsed"));
+    if ($("clientShowAllSections")) {
+      const sections = [...document.querySelectorAll("#clientForm > [data-client-edit-section]")];
+      $("clientShowAllSections").checked = sections.length > 0 && sections.every((item) => !item.classList.contains("is-collapsed"));
+    }
+  });
+}
+
+function prepareClientFormSections() {
+  const form = $("clientForm");
+  if (!form || form.dataset.sectionsPrepared === "true") return;
+  form.dataset.sectionsPrepared = "true";
+  const children = [...form.children];
+  const isStandaloneSection = (element) => element.matches("section.profile-upload-panel, section.upload-panel");
+  const isStart = (element) => element.matches(".form-section-title") || isStandaloneSection(element);
+
+  children.forEach((child, index) => {
+    if (!isStart(child) || child.closest("[data-client-edit-section]")) return;
+    if (isStandaloneSection(child)) {
+      child.dataset.clientEditSection = "";
+      const header = child.querySelector(":scope > .section-head");
+      if (header) {
+        [...child.children].filter((item) => item !== header).forEach((item) => item.classList.add("client-section-content"));
+        addClientSectionToggle(child, header);
+      }
+      setClientSectionExpanded(child, false);
+      return;
+    }
+
+    const wrapper = document.createElement("section");
+    wrapper.className = "client-edit-section wide";
+    wrapper.dataset.clientEditSection = "";
+    form.insertBefore(wrapper, child);
+    wrapper.appendChild(child);
+    child.classList.add("client-section-header");
+    const content = document.createElement("div");
+    content.className = "client-section-body grid-form client-section-content";
+    wrapper.appendChild(content);
+    for (let nextIndex = index + 1; nextIndex < children.length; nextIndex += 1) {
+      const next = children[nextIndex];
+      if (isStart(next) || next.matches(".form-actions")) break;
+      content.appendChild(next);
+    }
+    addClientSectionToggle(wrapper, child);
+    setClientSectionExpanded(wrapper, false);
+  });
+}
+
 function closeClientFormToDashboard() {
   resetClientForm();
   setClientFocusMode(false);
@@ -2124,6 +2211,7 @@ function resetClientForm() {
   renderClientImagesPreview();
   renderClientMenuPreview();
   renderClientPromocoesPreview();
+  setAllClientSectionsExpanded(false);
   setClientFocusMode(false);
 }
 
@@ -2341,6 +2429,7 @@ function fillClientForm(client) {
   if ($("clientContactIsWhatsapp")) $("clientContactIsWhatsapp").checked = Boolean(contatos[0]?.whatsapp);
   if ($("clientWhatsappIsWhatsapp")) $("clientWhatsappIsWhatsapp").checked = Boolean(contatos[1]?.whatsapp);
   if ($("clientContact3IsWhatsapp")) $("clientContact3IsWhatsapp").checked = Boolean(contatos[2]?.whatsapp);
+  setAllClientSectionsExpanded(false);
   $("clientAddress").value = client.endereco || client.address || "";
   $("clientHours").value = client.horario || client.hours || "";
   if ($("clientOpen24Hours")) $("clientOpen24Hours").checked = Boolean(client.funcionamento24Horas);
@@ -10534,6 +10623,7 @@ function bindAdminIdleTimer() {
 }
 
 function bindEvents() {
+  prepareClientFormSections();
   bindCurrencyMask($("imovelValor"));
   bindCurrencyMask($("automovelPreco"));
   bindPhoneMask("imovelTelefone");
@@ -10986,6 +11076,9 @@ function bindEvents() {
   $("clientCategory")?.addEventListener("change", atualizarVisibilidadeCreciCliente);
   $("clientNewCategory")?.addEventListener("input", atualizarVisibilidadeCreciCliente);
   $("clientType")?.addEventListener("change", () => syncClientPaymentByType(true));
+  $("clientShowAllSections")?.addEventListener("change", (event) => {
+    setAllClientSectionsExpanded(Boolean(event.target.checked));
+  });
   $("eventClientSearch")?.addEventListener("input", () => fillEventClientSelect());
   $("eventClient")?.addEventListener("change", () => {
     const client = state.clientes.find((item) => item.id === $("eventClient").value);
