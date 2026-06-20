@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 289,
-  label: "v295",
+  numero: 290,
+  label: "v296",
   data: "2026-06-20",
-  nota: "Atualizacao automatica do valor financeiro conforme o plano selecionado."
+  nota: "Data, horario e responsavel pela ultima atualizacao na lista de clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -914,6 +914,8 @@ function mergeClientFinanceData(client, privateFinance = {}) {
   return {
     ...client,
     ...mergedFinance,
+    financeiroUpdatedAt: privateFinance?.updatedAt || privateFinance?.financeiro?.updatedAt || 0,
+    financeiroUpdatedBy: privateFinance?.updatedBy || privateFinance?.financeiro?.updatedBy || "",
     financeiro: {
       ...(client.financeiro || {}),
       ...mergedFinance
@@ -3504,6 +3506,47 @@ function isClientOverdue(client) {
   return hasPreviousPendingInvoice || hasExpiredDueDay;
 }
 
+function clientLastUpdate(client = {}) {
+  const publicAt = clientUpdatedValue(client);
+  const financeAt = clientUpdatedValue({ updatedAt: client.financeiroUpdatedAt });
+  const useFinance = financeAt > publicAt;
+  return {
+    timestamp: useFinance ? financeAt : publicAt,
+    uid: useFinance ? client.financeiroUpdatedBy : client.updatedBy
+  };
+}
+
+function clientUpdateAuthor(client = {}, uid = "") {
+  if (!uid) return client.origem === "painel" || client.editadoNoPainel ? "Painel administrativo" : "";
+  const user = state.usuarios.find((item) => item.uid === uid);
+  const role = String(user?.role || "").toLowerCase();
+  if (role === "master") return "Admin Master";
+  if (role === "admin") return "Admin Geral";
+  if (role === "cliente" || user?.clienteId === client.id) return "Proprio cliente";
+  if (uid === state.user?.uid) {
+    if (isMaster()) return "Admin Master";
+    if (currentRole() === "admin") return "Admin Geral";
+    return "Proprio cliente";
+  }
+  return user?.email || "Usuario do painel";
+}
+
+function formatClientLastUpdate(client = {}) {
+  const update = clientLastUpdate(client);
+  if (!update.timestamp) return "Ultima atualizacao: nao registrada";
+  const date = new Date(update.timestamp);
+  if (Number.isNaN(date.getTime())) return "Ultima atualizacao: nao registrada";
+  const author = clientUpdateAuthor(client, update.uid);
+  const formatted = date.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+  return `Ultima atualizacao: ${formatted}${author ? ` - ${author}` : ""}`;
+}
+
 function renderClientsList() {
   const box = $("clientsList");
   if (!box) return;
@@ -3542,6 +3585,7 @@ function renderClientsList() {
       <div class="client-money">
         <strong>${moneyBR(valorFinalPlano(client))}</strong>
         <span>Venc. ${client.vencimentoDia || "-"}</span>
+        <small class="client-last-update">${escapeHtml(formatClientLastUpdate(client))}</small>
       </div>
       <div class="client-actions">
         <button type="button" data-edit-client="${escapeAttr(client.id)}">Editar</button>
