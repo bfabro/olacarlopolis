@@ -2084,11 +2084,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   registrarAcesso();
 
-  const destaquesFixos = ["ederluis"
-    // "hime",
-    //    "seiza", "hime"
-  ];
-
   const categoriasBloqueadasDivulgacao = new Set([
     "eventosemcarlopolis",
     "agendamento",
@@ -2178,10 +2173,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     const destaquesContratados = listaTodos.filter(e => destaqueEstaAtivo(e));
-    const destaquesManuais = destaquesFixos
-      .map(nome => listaTodos.find(e => e.nomeNormalizado === nome))
-      .filter(Boolean);
-    const fixos = selecionarDestaquesDaSemana([...destaquesManuais, ...destaquesContratados]);
+    const fixos = selecionarDestaquesDaSemana(destaquesContratados);
     const nomesFixos = fixos.map(e => e.nomeNormalizado);
 
     const restantes = listaTodos.filter(e => !nomesFixos.includes(e.nomeNormalizado));
