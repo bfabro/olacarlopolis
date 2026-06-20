@@ -11,9 +11,9 @@ import {
   getDatabase,
   ref,
   get,
-  set,
-  update,
-  remove,
+  set as firebaseSet,
+  update as firebaseUpdate,
+  remove as firebaseRemove,
   serverTimestamp,
   runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -65,6 +65,8 @@ let state = {
   pagamentoSistema: {},
   paginaInicialSite: {},
   metricas: {},
+  auditLogs: [],
+  reportSection: "analytics",
   reportPeriod: {
     type: "mensal",
     start: "",
@@ -95,6 +97,112 @@ let state = {
   lastFirebaseClientCount: 0,
   lastVisibleClientCount: 0
 };
+
+const AUDIT_IGNORED_ROOTS = new Set(["auditLogs", "novidades"]);
+const AUDIT_CATEGORY_LABELS = {
+  clientes: "Clientes",
+  clientesFinanceiro: "Financeiro",
+  usuarios: "Usuarios",
+  usuariosByUid: "Usuarios",
+  categorias: "Categorias",
+  eventos: "Eventos",
+  conteudosInformativos: "Informacoes",
+  configuracoes: "Configuracoes",
+  importacoes: "Importacoes"
+};
+
+function auditCategoryFromPath(path = "") {
+  const parts = String(path || "").split("/").filter(Boolean);
+  const root = parts[0] || "";
+  const section = parts[1] || "";
+  if (root === "conteudosInformativos") {
+    return {
+      imoveis: "Imoveis",
+      automoveis: "Automoveis",
+      notaFalecimento: "Notas de falecimento",
+      gruposWhatsapp: "Grupos WhatsApp"
+    }[section] || "Informacoes";
+  }
+  if (root === "configuracoes") {
+    return {
+      pagamento: "Configuracoes financeiras",
+      paginaInicial: "Pagina inicial"
+    }[section] || "Configuracoes";
+  }
+  return AUDIT_CATEGORY_LABELS[root] || root;
+}
+
+function databaseReferencePath(reference) {
+  try {
+    const url = new URL(reference.toString());
+    return decodeURIComponent(url.pathname.replace(/^\/+|\/+$/g, ""));
+  } catch {
+    return "";
+  }
+}
+
+function auditTargetFromWrite(reference, value = null) {
+  const basePath = databaseReferencePath(reference);
+  const paths = basePath
+    ? [basePath]
+    : Object.keys(value && typeof value === "object" ? value : {});
+  const relevantPaths = paths.filter((path) => {
+    const root = String(path || "").split("/")[0];
+    return root && !AUDIT_IGNORED_ROOTS.has(root);
+  });
+  if (!relevantPaths.length) return null;
+  const categories = [...new Set(relevantPaths.map(auditCategoryFromPath))];
+  const category = categories.length === 1
+    ? categories[0]
+    : "Multiplas categorias";
+  return {
+    category,
+    target: relevantPaths.slice(0, 6).join(", "),
+    total: relevantPaths.length
+  };
+}
+
+async function registrarLogAuditoria(action, category, details = "", target = "") {
+  const user = auth.currentUser || state.user;
+  if (!user || !state.profile) return;
+  const id = `${Date.now()}-${user.uid}-${Math.random().toString(36).slice(2, 9)}`;
+  try {
+    await firebaseSet(ref(db, `auditLogs/${id}`), {
+      uid: user.uid,
+      email: String(user.email || state.profile.email || "").trim(),
+      role: currentRole() || state.profile.role || "",
+      action,
+      category,
+      details: String(details || "").slice(0, 500),
+      target: String(target || "").slice(0, 500),
+      createdAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Nao foi possivel registrar o log de auditoria.", error);
+  }
+}
+
+async function update(reference, value) {
+  await firebaseUpdate(reference, value);
+  const audit = auditTargetFromWrite(reference, value);
+  if (audit) {
+    const hasRemoval = Object.values(value || {}).some((item) => item === null);
+    const action = hasRemoval ? "Exclusao/atualizacao" : "Atualizacao";
+    await registrarLogAuditoria(action, audit.category, `${audit.total} registro(s) alterado(s)`, audit.target);
+  }
+}
+
+async function set(reference, value) {
+  await firebaseSet(reference, value);
+  const audit = auditTargetFromWrite(reference, value);
+  if (audit) await registrarLogAuditoria("Gravacao", audit.category, "Registro salvo", audit.target);
+}
+
+async function remove(reference) {
+  const audit = auditTargetFromWrite(reference);
+  await firebaseRemove(reference);
+  if (audit) await registrarLogAuditoria("Exclusao", audit.category, "Registro removido", audit.target);
+}
 
 const $ = (id) => document.getElementById(id);
 const WEEK_DAYS = [
@@ -1505,7 +1613,8 @@ async function loadAllData() {
     cliquesPorMenuSnap,
     origemAcessosSnap,
     instalacoesPWASnap,
-    usoPWASnap
+    usoPWASnap,
+    auditLogsSnap
   ] = await Promise.all([
     getPanelSnapshot("clientes", { required: true }),
     getPanelSnapshot(financePath),
@@ -1531,7 +1640,8 @@ async function loadAllData() {
     getPanelSnapshot("cliquesPorMenu", { enabled: canManage }),
     getPanelSnapshot("origemAcessos", { enabled: canManage }),
     getPanelSnapshot("instalacoesPWA", { enabled: canManage }),
-    getPanelSnapshot("usoPWA", { enabled: canManage })
+    getPanelSnapshot("usoPWA", { enabled: canManage }),
+    getPanelSnapshot("auditLogs", { enabled: isMaster() })
   ]);
 
   state.clientesFinanceiro = clientFinanceMapFromSnapshot(clientesFinanceiroSnap, financeClientId);
@@ -1595,6 +1705,14 @@ async function loadAllData() {
     instalacoesPWA: instalacoesPWASnap.exists() ? instalacoesPWASnap.val() : {},
     usoPWA: usoPWASnap.exists() ? usoPWASnap.val() : {}
   };
+  state.auditLogs = [];
+  if (auditLogsSnap.exists()) {
+    auditLogsSnap.forEach((child) => {
+      state.auditLogs.push({ id: child.key, ...child.val() });
+      return false;
+    });
+  }
+  state.auditLogs.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
 
   state.eventos = [];
   if (eventosSnap.exists()) {
@@ -6699,10 +6817,146 @@ function renderTimelineTable(rows, emptyMessage, type = "clicks") {
   `;
 }
 
+function renderReportSectionTabs() {
+  if (!isMaster()) return "";
+  return `
+    <section class="panel-card report-section-card">
+      <div class="section-head compact">
+        <div>
+          <h2>Relatorios do painel</h2>
+          <p>Separe os indicadores de acesso da auditoria das atividades administrativas.</p>
+        </div>
+      </div>
+      <div class="report-section-tabs">
+        <button type="button" data-report-section="analytics" class="${state.reportSection === "analytics" ? "active" : ""}">
+          <i class="fa-solid fa-chart-line"></i> Relatorio analitico de acessos
+        </button>
+        <button type="button" data-report-section="actions" class="${state.reportSection === "actions" ? "active" : ""}">
+          <i class="fa-solid fa-list-check"></i> Acoes dos usuarios
+        </button>
+      </div>
+    </section>
+  `;
+}
+
+function auditLogDateKey(log = {}) {
+  const date = new Date(Number(log.createdAt || 0));
+  return Number.isNaN(date.getTime()) ? "" : dateKeyFromDate(date);
+}
+
+function auditLogDateTime(log = {}) {
+  const date = new Date(Number(log.createdAt || 0));
+  if (Number.isNaN(date.getTime())) return { date: "-", time: "-" };
+  return {
+    date: date.toLocaleDateString("pt-BR"),
+    time: date.toLocaleTimeString("pt-BR")
+  };
+}
+
+function renderUserActionReport(mount, periodRange) {
+  const query = normalizeName($("auditLogSearch")?.value || "");
+  const categoryFilter = $("auditLogCategory")?.value || "todas";
+  const logs = state.auditLogs.filter((log) => {
+    const dateKey = auditLogDateKey(log);
+    const inPeriod = dateKey && dateKey >= periodRange.start && dateKey <= periodRange.end;
+    const categoryMatches = categoryFilter === "todas" || log.category === categoryFilter;
+    const haystack = normalizeName(`${log.email || ""} ${log.action || ""} ${log.category || ""} ${log.details || ""} ${log.target || ""}`);
+    return inPeriod && categoryMatches && (!query || haystack.includes(query));
+  });
+  const categories = [...new Set(state.auditLogs.map((log) => log.category).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const uniqueUsers = new Set(logs.map((log) => log.uid || log.email).filter(Boolean)).size;
+  const logins = logs.filter((log) => log.action === "Login").length;
+
+  mount.innerHTML = `
+    ${renderReportSectionTabs()}
+    <section class="panel-card report-period-card">
+      <div class="section-head compact">
+        <div>
+          <h2>Relatorio de acoes dos usuarios</h2>
+          <p>Historico de login e alteracoes realizadas no painel. Disponivel somente para o Admin Master.</p>
+        </div>
+        <span class="badge ativo">${escapeHtml(periodRange.label)}</span>
+      </div>
+      <div class="report-period-tabs">
+        <button type="button" data-report-period="dia" class="period-day ${state.reportPeriod.type === "dia" ? "active" : ""}">Dia</button>
+        <button type="button" data-report-period="semanal" class="period-week ${state.reportPeriod.type === "semanal" ? "active" : ""}">Semanal</button>
+        <button type="button" data-report-period="mensal" class="period-month ${state.reportPeriod.type === "mensal" ? "active" : ""}">Mensal</button>
+        <button type="button" data-report-period="anual" class="period-year ${state.reportPeriod.type === "anual" ? "active" : ""}">Anual</button>
+      </div>
+      <div class="audit-log-filters">
+        <label>Pesquisar
+          <input id="auditLogSearch" type="search" value="${escapeAttr($("auditLogSearch")?.value || "")}" placeholder="Usuario, acao ou registro...">
+        </label>
+        <label>Categoria
+          <select id="auditLogCategory">
+            <option value="todas">Todas</option>
+            ${categories.map((category) => `<option value="${escapeAttr(category)}" ${category === categoryFilter ? "selected" : ""}>${escapeHtml(category)}</option>`).join("")}
+          </select>
+        </label>
+      </div>
+    </section>
+    <div class="stats-grid">
+      <article class="stat-card"><span>Acoes registradas</span><strong>${logs.length}</strong><small>${escapeHtml(periodRange.label)}</small></article>
+      <article class="stat-card"><span>Usuarios ativos</span><strong>${uniqueUsers}</strong><small>Com atividade no periodo</small></article>
+      <article class="stat-card"><span>Logins</span><strong>${logins}</strong><small>Entradas no painel</small></article>
+    </div>
+    <section class="panel-card report-card">
+      <div class="report-card-head">
+        <h2>Historico de atividades</h2>
+        <span class="report-card-date"><i class="fa-solid fa-clock-rotate-left"></i> ${logs.length} registro(s)</span>
+      </div>
+      <div class="report-table-wrap">
+        <table class="report-click-table audit-log-table">
+          <thead><tr><th>Data</th><th>Horario</th><th>Usuario</th><th>Perfil</th><th>Categoria</th><th>Acao</th><th>Registro</th><th>Detalhes</th></tr></thead>
+          <tbody>
+            ${logs.length ? logs.slice(0, 500).map((log) => {
+              const when = auditLogDateTime(log);
+              return `<tr>
+                <td>${escapeHtml(when.date)}</td>
+                <td>${escapeHtml(when.time)}</td>
+                <td><strong>${escapeHtml(log.email || log.uid || "-")}</strong></td>
+                <td>${escapeHtml(roleLabel(log.role))}</td>
+                <td>${escapeHtml(log.category || "-")}</td>
+                <td>${escapeHtml(log.action || "-")}</td>
+                <td>${escapeHtml(log.target || "-")}</td>
+                <td>${escapeHtml(log.details || "-")}</td>
+              </tr>`;
+            }).join("") : `<tr><td colspan="8">Nenhuma atividade encontrada neste periodo.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
+function bindReportControls(mount) {
+  mount.querySelectorAll("[data-report-section]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.reportSection = button.dataset.reportSection;
+      renderReports();
+    });
+  });
+  mount.querySelectorAll("[data-report-period]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.reportPeriod.type = button.dataset.reportPeriod;
+      renderReports();
+    });
+  });
+  mount.querySelector("#auditLogSearch")?.addEventListener("change", renderReports);
+  mount.querySelector("#auditLogCategory")?.addEventListener("change", renderReports);
+}
+
 function renderReports() {
   const mount = $("reportsMount");
   if (!mount) return;
+  if (!isMaster()) state.reportSection = "analytics";
   const periodRange = getReportDateRange();
+  if (isMaster() && state.reportSection === "actions") {
+    renderUserActionReport(mount, periodRange);
+    bindReportControls(mount);
+    return;
+  }
   const filteredMetrics = {
     cliquesBotoes: filterDailyMetrics(state.metricas.cliquesBotoes, periodRange),
     cliquesMenu: filterDailyMetrics(state.metricas.cliquesMenu, periodRange),
@@ -6815,6 +7069,15 @@ function renderReports() {
     .map((event) => ({ title: event.titulo || event.nome || event.id, meta: `${event.data || "Sem data"} - ${event.local || "Sem local"}` }));
 
   mount.innerHTML = `
+    ${renderReportSectionTabs()}
+    <section class="panel-card report-title-card">
+      <div class="section-head compact">
+        <div>
+          <h2>Relatorio analitico de informacoes de acessos</h2>
+          <p>Indicadores do site, cliques, origem dos acessos, clientes e resultados financeiros.</p>
+        </div>
+      </div>
+    </section>
     <section class="panel-card report-period-card">
       <div class="section-head compact">
         <div>
@@ -6961,12 +7224,7 @@ function renderReports() {
     </div>
   `;
 
-  mount.querySelectorAll("[data-report-period]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.reportPeriod.type = button.dataset.reportPeriod;
-      renderReports();
-    });
-  });
+  bindReportControls(mount);
   mount.querySelector("#applyReportRangeButton")?.addEventListener("click", () => {
     state.reportPeriod.type = "personalizado";
     state.reportPeriod.start = $("reportStartDate")?.value || "";
@@ -10231,6 +10489,7 @@ function resetAdminIdleTimer() {
   adminIdleTimer = setTimeout(async () => {
     stopAdminIdleTimer();
     try {
+      await registrarLogAuditoria("Saida", "Acesso", "Sessao encerrada por inatividade");
       await signOut(auth);
       if ($("loginMessage")) $("loginMessage").textContent = "Sessao encerrada por inatividade. Entre novamente.";
     } catch (error) {
@@ -10287,7 +10546,10 @@ function bindEvents() {
     }
   });
 
-  $("logoutButton").addEventListener("click", () => signOut(auth));
+  $("logoutButton").addEventListener("click", async () => {
+    await registrarLogAuditoria("Saida", "Acesso", "Usuario saiu do painel");
+    await signOut(auth);
+  });
   $("refreshButton").addEventListener("click", loadAllData);
   $("newClientButton").addEventListener("click", () => {
     resetClientForm();
@@ -11002,6 +11264,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   state.profile = profile;
+  await registrarLogAuditoria("Login", "Acesso", "Login realizado no painel");
   resetAdminIdleTimer();
   const initialView = initialViewForProfile();
   prepareInitialView(initialView);
