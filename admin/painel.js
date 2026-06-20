@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 294,
-  label: "v300",
+  numero: 295,
+  label: "v301",
   data: "2026-06-20",
-  nota: "Receitas mensal, semestral e anual no financeiro, com filtro por tipo de plano."
+  nota: "Totais reais por tipo de plano ativo e vencimento completo dos planos anuais."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -858,6 +858,7 @@ const CLIENT_FINANCE_FIELDS = [
   "valorMensal",
   "descontoValor",
   "vencimentoDia",
+  "vencimentoDataPlano",
   "financeiroObs",
   "mesesEmAberto",
   "faturas",
@@ -6224,18 +6225,20 @@ function renderFinanceiro() {
     return matchesFilter && matchesPlan && (!q || hay.includes(q));
   });
 
-  const paid = state.clientes.filter((c) => effectivePaymentStatus(c) === "pago");
-  const open = state.clientes.filter((c) => effectivePaymentStatus(c) === "em_aberto");
-  const free = state.clientes.filter((c) => effectivePaymentStatus(c) === "isento");
-  const revenues = state.clientes
-    .filter((client) => client.status !== "inativo" && isBillableClientType(client) && effectivePaymentStatus(client) !== "isento")
-    .reduce((totals, client) => {
-      const values = receitaPlanoValor(client);
-      totals.mensal += values.mensal;
-      totals.semestral += values.semestral;
-      totals.anual += values.anual;
-      return totals;
-    }, { mensal: 0, semestral: 0, anual: 0 });
+  const activeBillable = state.clientes.filter((client) => client.status === "ativo" && isBillableClientType(client));
+  const paid = activeBillable.filter((client) => effectivePaymentStatus(client) === "pago");
+  const open = activeBillable.filter((client) => effectivePaymentStatus(client) === "em_aberto");
+  const free = activeBillable.filter((client) => effectivePaymentStatus(client) === "isento");
+  const revenueClients = activeBillable.filter((client) => effectivePaymentStatus(client) !== "isento");
+  const clientsByPlan = {
+    mensal: revenueClients.filter((client) => (client.tipoPlano || "mensal") === "mensal"),
+    semestral: revenueClients.filter((client) => client.tipoPlano === "semestral"),
+    anual: revenueClients.filter((client) => client.tipoPlano === "anual")
+  };
+  const revenues = Object.fromEntries(Object.entries(clientsByPlan).map(([plan, clients]) => [
+    plan,
+    clients.reduce((sum, client) => sum + valorFinalPlano(client), 0)
+  ]));
 
   $("financePaid").textContent = String(paid.length);
   $("financeOpen").textContent = String(open.length);
@@ -6243,6 +6246,30 @@ function renderFinanceiro() {
   $("financeMonthlyRevenue").textContent = moneyBR(revenues.mensal);
   $("financeSemiannualRevenue").textContent = moneyBR(revenues.semestral);
   $("financeAnnualRevenue").textContent = moneyBR(revenues.anual);
+  $("financeMonthlyCount").textContent = `${clientsByPlan.mensal.length} cliente${clientsByPlan.mensal.length === 1 ? "" : "s"}`;
+  $("financeSemiannualCount").textContent = `${clientsByPlan.semestral.length} cliente${clientsByPlan.semestral.length === 1 ? "" : "s"}`;
+  $("financeAnnualCount").textContent = `${clientsByPlan.anual.length} cliente${clientsByPlan.anual.length === 1 ? "" : "s"}`;
+
+  const annualDueList = $("financeAnnualDueList");
+  if (annualDueList) {
+    annualDueList.innerHTML = clientsByPlan.anual.length
+      ? [...clientsByPlan.anual]
+        .sort((a, b) => {
+          const dateCompare = String(financePlanDueDate(a) || "9999-12-31").localeCompare(String(financePlanDueDate(b) || "9999-12-31"));
+          return dateCompare || String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR");
+        })
+        .map((client) => {
+          const dueDate = financePlanDueDate(client);
+          return `
+            <article class="finance-due-item">
+              <strong>${escapeHtml(client.nome || client.id)}</strong>
+              <span>${moneyBR(valorFinalPlano(client))}</span>
+              <small>${dueDate ? `Vencimento: ${escapeHtml(formatDateBR(dueDate))}` : "Vencimento anual nao definido"}</small>
+            </article>
+          `;
+        }).join("")
+      : `<div class="list-meta">Nenhum plano anual ativo para contabilizar.</div>`;
+  }
 
   if (!list.length) {
     box.innerHTML = `<div class="list-meta">Nenhum cliente no filtro selecionado.</div>`;
@@ -6261,6 +6288,9 @@ function renderFinanceiro() {
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
         <div class="list-meta" data-finance-plan-summary>Plano: ${planLabel(selectedPlan)} - Valor final: ${moneyBR(Math.max(0, selectedPlanValue - numberFromMoney(client.descontoValor || 0)))}</div>
+        ${selectedPlan === "anual" || selectedPlan === "semestral"
+          ? `<div class="list-meta">Vencimento do plano: ${financePlanDueDate(client) ? escapeHtml(formatDateBR(financePlanDueDate(client))) : "nao definido"}</div>`
+          : ""}
         ${client.destaqueSemanal ? `<div class="list-meta">Destaque: ${moneyBR(destaqueValueForClient(client))} (${destaqueBillingForClient(client) === "pix_separado" ? "Pix separado" : "mensalidade"})</div>` : ""}
         <div class="list-meta">Meses em aberto: ${pendingMonthsForClient(client).map(monthLabel).join(", ") || "Nenhum"}</div>
       </div>
@@ -6288,6 +6318,7 @@ function renderFinanceiro() {
       <label>Valor<input data-finance-field="valorPlano" value="${escapeAttr(moneyBR(selectedPlanValue))}" data-plan-value="${escapeAttr(selectedPlanValue)}" placeholder="R$" ${isMaster() ? "" : "readonly"}></label>
       <label>Desconto<input data-finance-field="descontoValor" value="${escapeAttr(client.descontoValor || "")}" placeholder="R$"></label>
       <label>Venc.<input data-finance-field="vencimentoDia" value="${escapeAttr(client.vencimentoDia || "")}" placeholder="Dia"></label>
+      <label>Data venc. do plano<input data-finance-field="vencimentoDataPlano" type="date" value="${escapeAttr(selectedPlan === "anual" || selectedPlan === "semestral" ? financePlanDueDate(client) : "")}"></label>
       <label class="finance-note">Obs.<input data-finance-field="financeiroObs" value="${escapeAttr(client.financeiroObs || "")}"></label>
       <div class="finance-months">
         <span>Meses devendo</span>
@@ -6450,6 +6481,13 @@ function latestClientInvoice(client) {
   entries.sort(([a], [b]) => String(b).localeCompare(String(a)));
   const [mes, data] = entries[0];
   return { mes, ...(data || {}) };
+}
+
+function financePlanDueDate(client = {}) {
+  const configured = client.vencimentoDataPlano || client.dataVencimentoPlano || client.vencimentoAnual || "";
+  if (configured) return String(configured).slice(0, 10);
+  const invoice = latestClientInvoice(client);
+  return String(invoice?.vencimento || invoice?.dataVencimento || "").slice(0, 10);
 }
 
 function reportPercent(value, total) {

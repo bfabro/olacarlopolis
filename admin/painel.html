@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=300">
+  <link rel="stylesheet" href="painel.css?v=301">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -599,21 +599,31 @@
             <strong id="financeFree">0</strong>
           </article>
           <article class="stat-card">
-            <span>Receita mensal</span>
+            <span>Planos mensais ativos</span>
             <strong id="financeMonthlyRevenue">R$ 0</strong>
-            <small>Projecao de 1 mes</small>
+            <small id="financeMonthlyCount">0 clientes</small>
           </article>
           <article class="stat-card">
-            <span>Receita semestral</span>
+            <span>Planos semestrais ativos</span>
             <strong id="financeSemiannualRevenue">R$ 0</strong>
-            <small>Projecao de 6 meses</small>
+            <small id="financeSemiannualCount">0 clientes</small>
           </article>
           <article class="stat-card">
-            <span>Receita anual</span>
+            <span>Planos anuais ativos</span>
             <strong id="financeAnnualRevenue">R$ 0</strong>
-            <small>Projecao de 12 meses</small>
+            <small id="financeAnnualCount">0 clientes</small>
           </article>
         </div>
+
+        <section class="panel-card finance-annual-summary">
+          <div class="section-head compact">
+            <div>
+              <h2>Vencimentos dos planos anuais</h2>
+              <p>Somente clientes ativos de comercio ou servico.</p>
+            </div>
+          </div>
+          <div id="financeAnnualDueList" class="finance-due-list"></div>
+        </section>
 
         <section class="panel-card">
           <div class="section-head">
@@ -1260,6 +1270,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=300"></script>
+  <script type="module" src="painel.js?v=301"></script>
 </body>
 </html>
