@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 295,
-  label: "v301",
+  numero: 296,
+  label: "v302",
   data: "2026-06-20",
-  nota: "Totais reais por tipo de plano ativo e vencimento completo dos planos anuais."
+  nota: "Confirmacao destacada ao concluir o salvamento de clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1395,15 +1395,19 @@ function sameOriginImageUrl(url) {
 
 let toastTimer = null;
 
-function showToast(message) {
+function showToast(message, options = {}) {
   const toast = $("toast");
   if (!toast) return;
   if (toastTimer) clearTimeout(toastTimer);
   toast.textContent = message;
   const success = /salv|atualizad|criad[oa] com sucesso|concluid[oa]/i.test(String(message || ""));
   toast.classList.toggle("success", success);
+  toast.classList.toggle("prominent", Boolean(options.prominent));
   toast.classList.remove("hidden");
-  toastTimer = setTimeout(() => toast.classList.add("hidden"), success ? 5200 : 3600);
+  toastTimer = setTimeout(() => {
+    toast.classList.add("hidden");
+    toast.classList.remove("prominent");
+  }, success ? 5200 : 3600);
 }
 
 function confirmarExclusao(nomeItem, tipoItem = "item") {
@@ -11256,8 +11260,8 @@ function bindEvents() {
     fillClientCategorySelect();
     fillUserClientSelect();
     fillEventClientSelect();
-    showToast("Cliente salvo.");
     resetClientForm();
+    showToast("Cliente salvo com sucesso.", { prominent: true });
   });
   $("clientCategory")?.addEventListener("change", atualizarVisibilidadeCreciCliente);
   $("clientNewCategory")?.addEventListener("input", atualizarVisibilidadeCreciCliente);
