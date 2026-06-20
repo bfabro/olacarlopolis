@@ -11,6 +11,8 @@ import {
   getDatabase,
   ref,
   get,
+  query,
+  limitToLast,
   set as firebaseSet,
   update as firebaseUpdate,
   remove as firebaseRemove,
@@ -949,6 +951,23 @@ async function getPanelSnapshot(path, options = {}) {
   }
 }
 
+async function loadAuditLogs() {
+  state.auditLogs = [];
+  if (!isMaster()) return;
+  try {
+    const snapshot = await get(query(ref(db, "auditLogs"), limitToLast(1000)));
+    if (snapshot.exists()) {
+      snapshot.forEach((child) => {
+        state.auditLogs.push({ id: child.key, ...child.val() });
+        return false;
+      });
+    }
+    state.auditLogs.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+  } catch (error) {
+    console.warn("Leitura dos logs de auditoria bloqueada ou indisponivel.", error);
+  }
+}
+
 function applyClientsSnapshot(snapshot, financeSnapshot = null, financeClientId = "") {
   const financeByClientId = clientFinanceMapFromSnapshot(financeSnapshot, financeClientId);
   const allClients = consolidateClientsForAdmin(snapshotToClientList(snapshot))
@@ -1615,8 +1634,7 @@ async function loadAllData() {
     cliquesPorMenuSnap,
     origemAcessosSnap,
     instalacoesPWASnap,
-    usoPWASnap,
-    auditLogsSnap
+    usoPWASnap
   ] = await Promise.all([
     getPanelSnapshot("clientes", { required: true }),
     getPanelSnapshot(financePath),
@@ -1642,8 +1660,7 @@ async function loadAllData() {
     getPanelSnapshot("cliquesPorMenu", { enabled: canManage }),
     getPanelSnapshot("origemAcessos", { enabled: canManage }),
     getPanelSnapshot("instalacoesPWA", { enabled: canManage }),
-    getPanelSnapshot("usoPWA", { enabled: canManage }),
-    getPanelSnapshot("auditLogs", { enabled: isMaster() })
+    getPanelSnapshot("usoPWA", { enabled: canManage })
   ]);
 
   state.clientesFinanceiro = clientFinanceMapFromSnapshot(clientesFinanceiroSnap, financeClientId);
@@ -1707,15 +1724,6 @@ async function loadAllData() {
     instalacoesPWA: instalacoesPWASnap.exists() ? instalacoesPWASnap.val() : {},
     usoPWA: usoPWASnap.exists() ? usoPWASnap.val() : {}
   };
-  state.auditLogs = [];
-  if (auditLogsSnap.exists()) {
-    auditLogsSnap.forEach((child) => {
-      state.auditLogs.push({ id: child.key, ...child.val() });
-      return false;
-    });
-  }
-  state.auditLogs.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
-
   state.eventos = [];
   if (eventosSnap.exists()) {
     eventosSnap.forEach((child) => {
@@ -1789,13 +1797,27 @@ async function loadAllData() {
   renderAutomoveisList();
   renderInfoDeathNoticeList();
   renderInfoWhatsappGroupsList();
-  renderFinanceiro();
-  renderReports();
+  try {
+    renderFinanceiro();
+  } catch (error) {
+    console.error("Falha ao renderizar o financeiro.", error);
+    if ($("financeList")) $("financeList").innerHTML = `<div class="list-meta">Nao foi possivel montar o financeiro. Use Atualizar para tentar novamente.</div>`;
+  }
+  try {
+    renderReports();
+  } catch (error) {
+    console.error("Falha ao renderizar os relatorios.", error);
+    if ($("reportsMount")) $("reportsMount").innerHTML = `<section class="panel-card"><p>Nao foi possivel montar os relatorios. Use Atualizar para tentar novamente.</p></section>`;
+  }
   renderPaymentSettings();
   renderHomePageSettings();
   renderStoriesComerciaisView();
   renderClientInvoices();
   renderClientBillingAlert();
+  loadAuditLogs().then(() => {
+    const reportsVisible = !$("relatoriosView")?.classList.contains("hidden");
+    if (reportsVisible && state.reportSection === "actions") renderReports();
+  });
 
   // A importacao agora fica manual para nao sobrescrever edicoes feitas no Firebase.
 }
