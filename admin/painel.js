@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 287,
-  label: "v293",
-  data: "2026-06-14",
-  nota: "Flags individuais de WhatsApp e mascara publica para os telefones."
+  numero: 288,
+  label: "v294",
+  data: "2026-06-20",
+  nota: "Correcao do Financeiro e Relatorios, blocos retrateis e confirmacoes de salvamento."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3078,12 +3078,14 @@ async function uploadInvoiceReceiptForClient(clientId, file) {
 }
 
 function invoiceHasReceipt(invoice = {}) {
+  if (!invoice || typeof invoice !== "object") return false;
   return Boolean(invoice.comprovantePath || invoice.comprovanteUrl);
 }
 
 function invoiceReceiptButton(invoice = {}) {
   if (!invoiceHasReceipt(invoice)) return "";
-  return `<button type="button" class="ghost-mini" data-open-receipt-path="${escapeAttr(invoice.comprovantePath || "")}" data-open-receipt-url="${escapeAttr(invoice.comprovanteUrl || "")}" data-open-receipt-name="${escapeAttr(invoice.comprovanteNome || "comprovante")}">Ver comprovante</button>`;
+  const safeInvoice = invoice || {};
+  return `<button type="button" class="ghost-mini" data-open-receipt-path="${escapeAttr(safeInvoice.comprovantePath || "")}" data-open-receipt-url="${escapeAttr(safeInvoice.comprovanteUrl || "")}" data-open-receipt-name="${escapeAttr(safeInvoice.comprovanteNome || "comprovante")}">Ver comprovante</button>`;
 }
 
 async function openInvoiceReceipt(path, legacyUrl = "", fileName = "comprovante") {
