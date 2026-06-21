@@ -20894,13 +20894,18 @@ function registrarCliqueNaPromocao(nomeComercio, detalhes = {}) {
   const ref = firebase.database().ref(`cliquesPromocoesPorComercio/${hoje}/${nomeComercio}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
   const acao = detalhes.acao || "promocao";
-  registrarMetricaCliente(nomeComercio, "promocoes", acao === "whatsapp" ? "whatsapp_promocao" : "promocao", {
+  const tipoMetrica = acao === "whatsapp" ? "whatsapp_promocao" : (acao === "instagram" ? "instagram_promocao" : "promocao");
+  if (tipoMetrica !== "promocao") {
+    firebase.database().ref(`cliquesPorBotao/${hoje}/${nomeComercio}/${tipoMetrica}`)
+      .transaction(valorAtual => (valorAtual || 0) + 1);
+  }
+  registrarMetricaCliente(nomeComercio, "promocoes", tipoMetrica, {
     area: "promocoes",
     ...detalhes
   });
   firebase.database().ref(`cliquesPromocoesDetalhado/${hoje}/${nomeComercio}`).push({
     area: "promocoes",
-    tipo: acao === "whatsapp" ? "whatsapp_promocao" : "promocao",
+    tipo: tipoMetrica,
     acao,
     promoId: detalhes.promoId || "",
     promocaoId: detalhes.promoId || "",

@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 320,
-  label: "v326",
+  numero: 321,
+  label: "v327",
   data: "2026-06-21",
-  nota: "Relatorios passam a contabilizar cliques nos destaques da pagina inicial."
+  nota: "WhatsApp das promocoes e redes sociais aparecem separados nos relatorios."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1005,6 +1005,11 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
     const detalhes = day?.detalhes || {};
 
     if (Object.keys(botoes).length) metrics.cliquesBotoes[date] = { [clientKey]: botoes };
+    ["whatsapp_promocao", "instagram_promocao", "facebook", "tiktok", "site"].forEach((tipo) => {
+      if (!Number(promocoes[tipo] || 0)) return;
+      if (!metrics.cliquesBotoes[date]) metrics.cliquesBotoes[date] = { [clientKey]: {} };
+      metrics.cliquesBotoes[date][clientKey][tipo] = Number(promocoes[tipo]);
+    });
     if (Number(ondeComer.cardapio || 0)) metrics.ondeComerCardapios[date] = { [clientKey]: Number(ondeComer.cardapio) };
     if (Number(ondeComer.whatsapp || 0)) metrics.ondeComerWhats[date] = { [clientKey]: Number(ondeComer.whatsapp) };
     if (Number(ondeComer.fotos || 0)) metrics.ondeComerFotos[date] = { [clientKey]: Number(ondeComer.fotos) };
@@ -7201,6 +7206,7 @@ function metricButtonLabel(tipo) {
   return {
     telefone: "Telefone",
     whatsapp: "WhatsApp",
+    whatsapp_promocao: "WhatsApp da promocao",
     grupoWhatsapp: "Grupo WhatsApp",
     cardapio: "Cardapio",
     novidades: "Novidades",
@@ -7209,6 +7215,7 @@ function metricButtonLabel(tipo) {
     divulgacao: "Divulgacao",
     instagram_onde_comer: "Instagram",
     instagram: "Instagram",
+    instagram_promocao: "Instagram",
     facebook: "Facebook",
     tiktok: "TikTok",
     site: "Site",
@@ -7462,9 +7469,11 @@ function clientReportCategory(row = {}) {
   if (/destaque/.test(text)) return "Destaques";
   if (/compartilh/.test(text)) return "Compartilhamentos";
   if (/grupowhatsapp|grupowhats|grupozap/.test(text)) return "Grupo WhatsApp";
+  if (/whatsapppromocao/.test(text)) return "WhatsApp da promocao";
   if (/whatsapp|telefone|contato|zap/.test(text)) return "WhatsApp / telefone";
   if (/cardapio|menu/.test(text)) return "Cardapio";
   if (/foto|fotos|imagem|divulgacao/.test(text)) return "Fotos / divulgacao";
+  if (/instagrampromocao/.test(text)) return "Redes sociais / links";
   if (/promocao|promocoes|oferta/.test(text)) return "Promocoes";
   if (/instagram|facebook|tiktok|site|rede|social|link/.test(text)) return "Redes sociais / links";
   return row.tipo || row.area || "Clique";
@@ -7560,18 +7569,27 @@ function renderClientMetricReportContent(client = {}) {
   const fotos = clientReportResourceAllowed("Fotos / divulgacao")
     ? sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerFotos), keys) + Number(tiposPermitidos.get("fotos") || 0) + Number(tiposPermitidos.get("divulgacao") || 0)
     : 0;
-  const promocoes = clientReportResourceAllowed("Promocoes")
+  const promocoesTotal = clientReportResourceAllowed("Promocoes")
     ? sumMetricMapForClient(aggregateSimpleDaily(filtered.promocoes), keys)
     : 0;
+  const whatsappPromocao = Number(tiposPermitidos.get("whatsapp_promocao") || 0);
+  const promocoes = Math.max(0, promocoesTotal - whatsappPromocao);
   const novidades = Number(tiposPermitidos.get("novidades") || 0);
   const destaques = Number(tiposPermitidos.get("destaque") || 0);
   const gruposWhatsapp = Number(tiposPermitidos.get("grupoWhatsapp") || 0);
   const compartilhamentos = Number(tiposPermitidos.get("compartilhamento") || 0);
-  const redes = [...tiposPermitidos.entries()]
-    .filter(([tipo]) => /instagram|facebook|tiktok|youtube|linkedin|site|rede|social|link/i.test(String(tipo)))
+  const instagramPromocao = Number(tiposPermitidos.get("instagram_promocao") || 0);
+  const instagram = Number(tiposPermitidos.get("instagram") || 0) + Number(tiposPermitidos.get("instagram_onde_comer") || 0) + instagramPromocao;
+  const facebook = Number(tiposPermitidos.get("facebook") || 0);
+  const tiktok = Number(tiposPermitidos.get("tiktok") || 0);
+  const site = Number(tiposPermitidos.get("site") || 0);
+  const outrasRedes = [...tiposPermitidos.entries()]
+    .filter(([tipo]) => /youtube|linkedin|rede|social|link/i.test(String(tipo)))
     .reduce((sum, [, count]) => sum + Number(count || 0), 0);
+  const redes = instagram + facebook + tiktok + site + outrasRedes;
+  const promocoesLiquidas = Math.max(0, promocoes - instagramPromocao);
   const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
-  const total = cardapios + whats + fotos + promocoes + novidades + destaques + gruposWhatsapp + compartilhamentos + redes;
+  const total = cardapios + whats + whatsappPromocao + fotos + promocoesLiquidas + novidades + destaques + gruposWhatsapp + compartilhamentos + redes;
   const outros = Math.max(0, totalBotoes - total);
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
@@ -7579,25 +7597,31 @@ function renderClientMetricReportContent(client = {}) {
     .filter((row) => clientReportResourceAllowed(row.categoria));
   const rows = [
     ["WhatsApp / telefone", whats],
+    ["WhatsApp da promocao", whatsappPromocao],
     ...(canShowCardapioReport ? [["Cardapio", cardapios]] : []),
     ["Fotos / divulgacao", fotos],
     ["Novidades", novidades],
     ["Destaques", destaques],
-    ["Promocoes", promocoes],
+    ["Promocoes", promocoesLiquidas],
     ["Grupo WhatsApp", gruposWhatsapp],
-    ["Redes sociais / links", redes],
+    ["Instagram", instagram],
+    ["Facebook", facebook],
+    ["TikTok", tiktok],
+    ["Site", site],
+    ...(outrasRedes ? [["Outras redes / links", outrasRedes]] : []),
     ["Compartilhamentos", compartilhamentos],
     ["Outros botoes", outros]
   ];
   const recursosTexto = [
     "telefone",
+    "WhatsApp da promocao",
     ...(canShowCardapioReport ? ["cardapio"] : []),
     ...(clientReportResourceAllowed("Fotos / divulgacao") ? ["fotos"] : []),
     "novidades",
     "destaques",
     "grupo de WhatsApp",
     ...(clientReportResourceAllowed("Promocoes") ? ["promocoes"] : []),
-    "redes sociais",
+    "Instagram, Facebook, TikTok e site",
     "compartilhamentos",
     "demais botoes"
   ].join(", ");
@@ -7608,12 +7632,16 @@ function renderClientMetricReportContent(client = {}) {
       <div class="stats-grid client-report-stats">
         <article class="stat-card"><span>Total de interacoes</span><strong>${total + outros}</strong><small>${escapeHtml(range.label)}</small></article>
         <article class="stat-card"><span>WhatsApp</span><strong>${whats}</strong><small>Telefone e contato</small></article>
+        <article class="stat-card"><span>WhatsApp da promocao</span><strong>${whatsappPromocao}</strong><small>Interesse direto nas ofertas</small></article>
         ${canShowCardapioReport ? `<article class="stat-card"><span>Cardapio</span><strong>${cardapios}</strong><small>Cliques no cardapio</small></article>` : ""}
         <article class="stat-card"><span>Novidades</span><strong>${novidades}</strong><small>Cliques na tela inicial</small></article>
         <article class="stat-card"><span>Destaques</span><strong>${destaques}</strong><small>Cliques nos cards e slides em destaque</small></article>
-        <article class="stat-card"><span>Promocoes</span><strong>${promocoes}</strong><small>Cliques em ofertas</small></article>
+        <article class="stat-card"><span>Promocoes</span><strong>${promocoesLiquidas}</strong><small>Cliques em ofertas</small></article>
         <article class="stat-card"><span>Grupo WhatsApp</span><strong>${gruposWhatsapp}</strong><small>Entradas pelo link do grupo</small></article>
-        <article class="stat-card"><span>Redes sociais</span><strong>${redes}</strong><small>Instagram, Facebook, TikTok e site</small></article>
+        <article class="stat-card"><span>Instagram</span><strong>${instagram}</strong><small>Cliques no Instagram</small></article>
+        <article class="stat-card"><span>Facebook</span><strong>${facebook}</strong><small>Cliques no Facebook</small></article>
+        <article class="stat-card"><span>TikTok</span><strong>${tiktok}</strong><small>Cliques no TikTok</small></article>
+        <article class="stat-card"><span>Site</span><strong>${site}</strong><small>Cliques no site do cliente</small></article>
         <article class="stat-card"><span>Compartilhamentos</span><strong>${compartilhamentos}</strong><small>Botao de compartilhar cliente</small></article>
       </div>
       <div class="reports-grid client-report-grid">
