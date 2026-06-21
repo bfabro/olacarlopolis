@@ -2950,7 +2950,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const novidadeDestinoExiste = (item) => {
         const tipo = normalizeName(item.destinoTipo || item.tipo || "");
         const textoNovidade = normalizeName(`${item.tipo || ""} ${item.titulo || ""} ${item.descricao || ""}`);
-        if (/(informacoesatualizadas|financeiro|pagamento|mensalidade|fatura|inadimplente|clienteativo|clienteinativo|ativado|desativado)/.test(textoNovidade)) return false;
+        if (/(informacoesatualizadas|financeiro|pagamento|mensalidade|fatura|inadimplente|clienteativo|clienteinativo|ativado|desativad|removid|excluid|retirad|ocultad|cancelad|encerrad|apagado)/.test(textoNovidade)) return false;
         if (!clienteEstaPublico(item.destinoId, item.estabelecimento, item.raw?.clienteId, item.raw?.clienteNome)) return false;
         if (tipo.includes("estabelecimento")) {
           const titulo = normalizeName(`${item.titulo || ""} ${item.acao || ""}`);

@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 311,
-  label: "v317",
+  numero: 312,
+  label: "v318",
   data: "2026-06-21",
-  nota: "Texto dos valores de destaque simplificado no painel do cliente."
+  nota: "Remocoes e desativacoes nao sao exibidas como novidades no site publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2512,6 +2512,8 @@ function renderNovidadesConfig() {
 
 async function registrarNovidadeAdmin(payload = {}) {
   try {
+    const actionText = normalizeName(`${payload.acao || ""} ${payload.titulo || ""} ${payload.descricao || ""}`);
+    if (/(removid|excluid|desativad|retirad|ocultad|cancelad|encerrad|apagado)/.test(actionText)) return;
     const novidadeTema = novidadeTopicFromPayload(payload);
     if (!novidadeTopicEnabled(novidadeTema)) return;
     const tipo = payload.tipo || payload.destinoTipo || "estabelecimento";
@@ -2559,25 +2561,46 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
   }
 
   const updates = [];
+  const removals = [];
   const add = (tema, tipo, acao) => updates.push({ ...base, tipo, destinoTipo: tipo, novidadeTema: tema, itemId: tema, titulo: acao, acao, descricao: acao });
+  const remove = (tipo, tema) => removals.push(removerNovidadesPorDestino(tipo, base.destinoId, tema));
   if (String(original.nome || "") !== String(payload.nome || "")) add("nomeCliente", "cliente-nome", "Nome do cliente atualizado");
-  if (String(original.endereco || "") !== String(payload.endereco || "")) add("endereco", "cliente-endereco", "Endereço atualizado");
+  if (String(original.endereco || "") !== String(payload.endereco || "")) {
+    if (String(payload.endereco || "").trim()) add("endereco", "cliente-endereco", "Endereço atualizado");
+    else remove("cliente-endereco", "endereco");
+  }
   const oldPhones = JSON.stringify(original.contatosDetalhados || original.contatos || [original.contato, original.whatsapp, original.contato2, original.contato3].filter(Boolean));
   const newPhones = JSON.stringify(payload.contatosDetalhados || payload.contatos || []);
-  if (oldPhones !== newPhones) add("telefone", "cliente-telefone", "Telefone atualizado");
+  if (oldPhones !== newPhones) {
+    if ((payload.contatosDetalhados || payload.contatos || []).length) add("telefone", "cliente-telefone", "Telefone atualizado");
+    else remove("cliente-telefone", "telefone");
+  }
   const oldHours = JSON.stringify({ horario: original.horario || "", horarios: original.horarios || {}, funcionamento24Horas: Boolean(original.funcionamento24Horas) });
   const newHours = JSON.stringify({ horario: payload.horario || "", horarios: payload.horarios || {}, funcionamento24Horas: Boolean(payload.funcionamento24Horas) });
-  if (oldHours !== newHours) add("horario", "cliente-horario", "Horário de atendimento atualizado");
+  if (oldHours !== newHours) {
+    const hasHours = Boolean(payload.funcionamento24Horas || String(payload.horario || "").trim() || scheduleHasAnyOpen(normalizeSchedule(payload.horarios || {})));
+    if (hasHours) add("horario", "cliente-horario", "Horário de atendimento atualizado");
+    else remove("cliente-horario", "horario");
+  }
   if (normalizeImageItems(payload.imagens).length > normalizeImageItems(original.imagens).length) add("imagens", "cliente-imagens", "Novas fotos adicionadas");
   if (String(original.categoria || "") !== String(payload.categoria || "")) add("categoria", "cliente-categoria", "Categoria atualizada");
   const oldSocial = JSON.stringify([original.instagram, original.facebook, original.tiktok, original.site]);
   const newSocial = JSON.stringify([payload.instagram, payload.facebook, payload.tiktok, payload.site]);
-  if (oldSocial !== newSocial) add("redesSociais", "cliente-redes", "Redes sociais atualizadas");
+  if (oldSocial !== newSocial) {
+    if ([payload.instagram, payload.facebook, payload.tiktok, payload.site].some((value) => String(value || "").trim())) add("redesSociais", "cliente-redes", "Redes sociais atualizadas");
+    else remove("cliente-redes", "redesSociais");
+  }
   const oldMenu = JSON.stringify([original.cardapioAtivo, original.cardapioLink, original.menuImages]);
   const newMenu = JSON.stringify([payload.cardapioAtivo, payload.cardapioLink, payload.menuImages]);
-  if (oldMenu !== newMenu) add("cardapio", "cliente-cardapio", "Cardápio atualizado");
-  if (Boolean(original.destaqueSemanal) !== Boolean(payload.destaqueSemanal) || String(original.destaqueFim || "") !== String(payload.destaqueFim || "")) add("destaque", "cliente-destaque", "Destaque comercial atualizado");
-  await Promise.all(updates.map(registrarNovidadeAdmin));
+  if (oldMenu !== newMenu) {
+    if (payload.cardapioAtivo || String(payload.cardapioLink || "").trim() || normalizeUrlList(payload.menuImages).length) add("cardapio", "cliente-cardapio", "Cardápio atualizado");
+    else remove("cliente-cardapio", "cardapio");
+  }
+  if (Boolean(original.destaqueSemanal) !== Boolean(payload.destaqueSemanal) || String(original.destaqueFim || "") !== String(payload.destaqueFim || "")) {
+    if (payload.destaqueSemanal) add("destaque", "cliente-destaque", "Destaque comercial atualizado");
+    else remove("cliente-destaque", "destaque");
+  }
+  await Promise.all([...removals, ...updates.map(registrarNovidadeAdmin)]);
 }
 
 async function removerNovidadesPorDestino(tipo, destinoId, itemId = "") {
