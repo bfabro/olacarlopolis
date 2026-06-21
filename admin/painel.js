@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 313,
-  label: "v319",
+  numero: 314,
+  label: "v320",
   data: "2026-06-21",
-  nota: "Vencimento padrao configuravel, com dia individual por cliente no financeiro."
+  nota: "Planos anuais e semestrais usam a data individual do plano nos pagamentos e boletos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4488,6 +4488,7 @@ function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = nul
   const valorPlano = savedPlano > 0 ? savedPlano : valorFinalPlano(client);
   const valorDestaque = savedDestaque > 0 ? savedDestaque : (destaqueIncludedInInvoiceMonth(client, mes) ? destaqueValueForClient(client) : 0);
   const valorTotal = Number(totalOverride ?? (savedTotal > 0 ? savedTotal : valorPlano + valorDestaque));
+  const planDueDate = ["anual", "semestral"].includes(client?.tipoPlano) ? financePlanDueDate(client) : "";
   const txid = `OC${normalizeName(client.nome || client.id).slice(0, 8).toUpperCase()}${String(mes).replace(/\W/g, "").slice(0, 12)}`;
   const pixCode = gerarPixCopiaCola({
     chave: paymentConfig.pixChave,
@@ -4499,7 +4500,7 @@ function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = nul
   return {
     mes,
     saved,
-    dueDate: saved.vencimento || saved.dataVencimento || invoiceDueDateForMonth(client, mes),
+    dueDate: saved.vencimento || saved.dataVencimento || options.dueDateOverride || planDueDate || invoiceDueDateForMonth(client, mes),
     valorPlano,
     valorDestaque,
     valorTotal,
@@ -4514,12 +4515,28 @@ function monthKeyOffset(monthKey = currentMonthKey(), offset = 0) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
+function dateKeyOffsetMonths(dateKey = "", offset = 0) {
+  const match = String(dateKey || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return "";
+  const year = Number(match[1]);
+  const monthIndex = Number(match[2]) - 1 + offset;
+  const day = Number(match[3]);
+  const target = new Date(year, monthIndex, 1);
+  const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+  return dateKeyFromDate(new Date(target.getFullYear(), target.getMonth(), Math.min(day, lastDay)));
+}
+
 function buildInvoiceBatch(client, quantity = 1, startMonth = currentMonthKey(), options = {}) {
   const total = Math.max(1, Math.min(12, Number(quantity) || 1));
   const paymentConfig = state.pagamentoSistema || {};
+  const planDueDate = financePlanDueDate(client);
+  const recurrenceMonths = client?.tipoPlano === "anual" ? 12 : (client?.tipoPlano === "semestral" ? 6 : 0);
   return Array.from({ length: total }, (_, index) => {
-    const month = monthKeyOffset(startMonth, index);
-    return buildClientInvoice(client, month, paymentConfig, null, options);
+    const dueDateOverride = recurrenceMonths && planDueDate
+      ? dateKeyOffsetMonths(planDueDate, index * recurrenceMonths)
+      : "";
+    const month = dueDateOverride ? dueDateOverride.slice(0, 7) : monthKeyOffset(startMonth, index);
+    return buildClientInvoice(client, month, paymentConfig, null, { ...options, dueDateOverride });
   });
 }
 
