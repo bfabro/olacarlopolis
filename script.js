@@ -1336,6 +1336,10 @@ async function compartilharEstabelecimento(id, nome, categoria) {
   }
   if (_sharing) return;
   _sharing = true;
+  registrarCliqueBotao("compartilhamento", id, "compartilhamento-cliente", {
+    estabelecimento: nome || "",
+    categoria: categoria || ""
+  }).catch(() => { });
 
   const url = `${window.location.origin}${window.location.pathname}#${id}`;
   const texto = `Confira: ${nome} (${categoria}) no Olá Carlópolis!`;
@@ -1429,6 +1433,15 @@ document.addEventListener("DOMContentLoaded", function () {
       compartilharEstabelecimento(id, nome, categoria);
     }
   });
+
+  document.addEventListener("click", (ev) => {
+    const link = ev.target.closest("[data-social-client][data-social-type]");
+    if (!link) return;
+    const clientId = link.getAttribute("data-social-client") || "";
+    const socialType = link.getAttribute("data-social-type") || "rede_social";
+    if (!clientId || typeof registrarCliqueBotao !== "function") return;
+    registrarCliqueBotao(socialType, clientId, "redes-sociais").catch(() => { });
+  }, true);
 
 
   // 🔹 Botão "Gerar card para divulgação"
@@ -2266,7 +2279,8 @@ document.addEventListener("DOMContentLoaded", function () {
         <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
         <p>${texto}</p>
 
-        ${est.instagram ? `<a href="${fixUrl(est.instagram)}" target="_blank" rel="noopener noreferrer" class="mais-info">+ informações</a>` : ""}
+        ${est.instagram ? `<a href="${fixUrl(est.instagram)}" target="_blank" rel="noopener noreferrer" class="mais-info"
+          data-social-client="${est.nomeNormalizado || normalizeName(est.name || "")}" data-social-type="instagram">+ informações</a>` : ""}
       </div>
     `;
 
@@ -2290,7 +2304,8 @@ document.addEventListener("DOMContentLoaded", function () {
           <div class="card-divulgacao-linha">
             <h4>${est.name}</h4>
             ${est.instagram
-            ? `<a href="${fixInstagramUrl(est.instagram)}" class="card-divulgacao-ig-btn" aria-label="Abrir Instagram" target="_blank" rel="noopener noreferrer">
+            ? `<a href="${fixInstagramUrl(est.instagram)}" class="card-divulgacao-ig-btn" aria-label="Abrir Instagram" target="_blank" rel="noopener noreferrer"
+                     data-social-client="${idEst}" data-social-type="instagram">
                      <i class="fa-brands fa-instagram"></i>
                    </a>`
             : ""
@@ -4504,6 +4519,8 @@ carlopdiesel:"s",
       link: item.link || "",
       imagem: item.imagem || item.image || "",
       status: item.status || "ativo",
+      clienteId: item.clienteId || "",
+      clienteNome: item.clienteNome || "",
       origemFirebase: true
     };
   }
@@ -4551,6 +4568,7 @@ carlopdiesel:"s",
 
   function cardGrupoHTML(g) {
     const id = g.id || slug(g.nome);
+    const metricClientId = g.clienteNome || g.clienteId || id;
     const foto = g.imagem || "img/grupos/default.jpg"; // fallback opcional
     const nome = g.origemFirebase ? escapeGrupoHtml(g.nome) : g.nome;
     const descricao = g.origemFirebase ? escapeGrupoHtml(g.descricao).replace(/\n/g, "<br>") : g.descricao;
@@ -4571,7 +4589,8 @@ carlopdiesel:"s",
 
         <a class="btn-grupo" target="_blank" rel="noopener noreferrer"
            href="${link}"
-           data-id="${id}">
+           data-id="${id}"
+           data-metric-client="${escapeGrupoHtml(metricClientId)}">
           Entrar no grupo
         </a>
 
@@ -4599,9 +4618,10 @@ carlopdiesel:"s",
     wrap.querySelectorAll(".btn-grupo").forEach(btn => {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-id");
+        const metricClientId = btn.getAttribute("data-metric-client") || id;
         // registra clique (não bloqueia navegação)
         if (typeof registrarCliqueBotao === "function") {
-          window.registrarCliqueBotao("grupoWhatsapp", id);
+          window.registrarCliqueBotao("grupoWhatsapp", metricClientId, "grupo-whatsapp");
         }
       });
     });
@@ -19345,27 +19365,32 @@ ${!establishment.descricaoFalecido ? `
       <div class="info-label">Redes Sociais</div>
       <div class="social-icons">
         ${establishment.facebook ? `
-          <a href="${fixUrl(establishment.facebook)}" target="_blank">
+          <a href="${fixUrl(establishment.facebook)}" target="_blank"
+             data-social-client="${normalizeName(establishment.name)}" data-social-type="facebook">
             <i class="fab fa-facebook" style="color: #1877F2; font-size: 16px;"></i> Facebook
           </a>` : ""}
 
         ${establishment.instagram ? `
-          <a href="#" class="js-ig-link" data-ig="${fixInstagramUrl(establishment.instagram)}" rel="noopener">
+          <a href="#" class="js-ig-link" data-ig="${fixInstagramUrl(establishment.instagram)}" rel="noopener"
+             data-social-client="${normalizeName(establishment.name)}" data-social-type="instagram">
             <i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram
           </a>` : ""}
 
         ${establishment.instagram2 ? `
-          <a href="#" class="js-ig-link" data-ig="${fixInstagramUrl(establishment.instagram2)}" rel="noopener">
+          <a href="#" class="js-ig-link" data-ig="${fixInstagramUrl(establishment.instagram2)}" rel="noopener"
+             data-social-client="${normalizeName(establishment.name)}" data-social-type="instagram">
             <i class="fab fa-instagram" style="color: #C13584; font-size: 16px;"></i> Instagram 2
           </a>` : ""}
 
         ${establishment.tiktok ? `
-          <a href="${fixUrl(establishment.tiktok)}" target="_blank" rel="noopener noreferrer">
+          <a href="${fixUrl(establishment.tiktok)}" target="_blank" rel="noopener noreferrer"
+             data-social-client="${normalizeName(establishment.name)}" data-social-type="tiktok">
             <i class="fab fa-tiktok" style="color: #111; font-size: 16px;"></i> TikTok
           </a>` : ""}
 
         ${establishment.site ? `
-          <a href="${fixUrl(establishment.site)}" target="_blank">
+          <a href="${fixUrl(establishment.site)}" target="_blank"
+             data-social-client="${normalizeName(establishment.name)}" data-social-type="site">
             <i class="fas fa-globe" style="color: #4caf50; font-size: 16px;"></i> Site
           </a>` : ""}
       </div>
