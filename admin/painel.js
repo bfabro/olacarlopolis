@@ -3588,9 +3588,33 @@ function sortClientsByUpdate(clients = [], order = "recentes") {
   });
 }
 
+function updateClientStatusFilterCounts() {
+  const filter = $("clientStatusFilter");
+  if (!filter) return;
+
+  const counts = state.clientes.reduce((total, client) => {
+    const status = String(client.status || "pendente").toLowerCase();
+    if (Object.prototype.hasOwnProperty.call(total, status)) total[status] += 1;
+    return total;
+  }, { ativo: 0, pendente: 0, inativo: 0 });
+
+  const labels = {
+    ativo: "Ativo",
+    pendente: "Pendente",
+    inativo: "Inativo"
+  };
+
+  Object.entries(labels).forEach(([status, label]) => {
+    const option = filter.querySelector(`option[value="${status}"]`);
+    if (option) option.textContent = `${label} - ${counts[status]}`;
+  });
+}
+
 function renderClientsList() {
   const box = $("clientsList");
   if (!box) return;
+
+  updateClientStatusFilterCounts();
 
   const q = String($("clientSearch")?.value || "").toLowerCase().trim();
   const statusFilter = $("clientStatusFilter")?.value || "todos";
