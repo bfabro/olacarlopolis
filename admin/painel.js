@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 300,
-  label: "v306",
+  numero: 301,
+  label: "v307",
   data: "2026-06-20",
-  nota: "Lembretes automaticos de vencimento para Admin Cliente, com contato direto da cobranca pelo WhatsApp."
+  nota: "Data de cadastro automatica para novos clientes, preservada nas edicoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -11282,7 +11282,13 @@ function bindEvents() {
     addAliasKey(rawPayload.aliases, state.selectedClientId);
     const { publicPayload: payload, financePayload } = splitClientFinancePayload(rawPayload);
     delete payload.id;
-    if (!state.selectedClientId) payload.createdAt = serverTimestamp();
+    if (!sourceClient) {
+      payload.createdAt = serverTimestamp();
+      payload.dataCadastro = dateKeyFromDate(new Date());
+    } else {
+      if (sourceClient.createdAt) payload.createdAt = sourceClient.createdAt;
+      if (sourceClient.dataCadastro) payload.dataCadastro = sourceClient.dataCadastro;
+    }
     const updates = { [`clientes/${id}`]: payload };
     if (Object.keys(financePayload).length) {
       updates[`clientesFinanceiro/${id}`] = {
