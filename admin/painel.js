@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 319,
-  label: "v325",
+  numero: 320,
+  label: "v326",
   data: "2026-06-21",
-  nota: "Relatorios contabilizam grupo WhatsApp, redes sociais e compartilhamentos."
+  nota: "Relatorios passam a contabilizar cliques nos destaques da pagina inicial."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -7212,6 +7212,7 @@ function metricButtonLabel(tipo) {
     facebook: "Facebook",
     tiktok: "TikTok",
     site: "Site",
+    destaque: "Destaque",
     compartilhamento: "Compartilhamento"
   }[tipo] || String(tipo || "Clique").replace(/[_-]/g, " ");
 }
@@ -7458,6 +7459,7 @@ function aggregateButtonTypesForClient(details = new Map(), keys = []) {
 function clientReportCategory(row = {}) {
   const text = normalizeName(`${row.area || ""} ${row.tipo || ""}`);
   if (/novidade|novidades/.test(text)) return "Novidades";
+  if (/destaque/.test(text)) return "Destaques";
   if (/compartilh/.test(text)) return "Compartilhamentos";
   if (/grupowhatsapp|grupowhats|grupozap/.test(text)) return "Grupo WhatsApp";
   if (/whatsapp|telefone|contato|zap/.test(text)) return "WhatsApp / telefone";
@@ -7562,13 +7564,14 @@ function renderClientMetricReportContent(client = {}) {
     ? sumMetricMapForClient(aggregateSimpleDaily(filtered.promocoes), keys)
     : 0;
   const novidades = Number(tiposPermitidos.get("novidades") || 0);
+  const destaques = Number(tiposPermitidos.get("destaque") || 0);
   const gruposWhatsapp = Number(tiposPermitidos.get("grupoWhatsapp") || 0);
   const compartilhamentos = Number(tiposPermitidos.get("compartilhamento") || 0);
   const redes = [...tiposPermitidos.entries()]
     .filter(([tipo]) => /instagram|facebook|tiktok|youtube|linkedin|site|rede|social|link/i.test(String(tipo)))
     .reduce((sum, [, count]) => sum + Number(count || 0), 0);
   const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
-  const total = cardapios + whats + fotos + promocoes + novidades + gruposWhatsapp + compartilhamentos + redes;
+  const total = cardapios + whats + fotos + promocoes + novidades + destaques + gruposWhatsapp + compartilhamentos + redes;
   const outros = Math.max(0, totalBotoes - total);
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
@@ -7579,6 +7582,7 @@ function renderClientMetricReportContent(client = {}) {
     ...(canShowCardapioReport ? [["Cardapio", cardapios]] : []),
     ["Fotos / divulgacao", fotos],
     ["Novidades", novidades],
+    ["Destaques", destaques],
     ["Promocoes", promocoes],
     ["Grupo WhatsApp", gruposWhatsapp],
     ["Redes sociais / links", redes],
@@ -7590,6 +7594,7 @@ function renderClientMetricReportContent(client = {}) {
     ...(canShowCardapioReport ? ["cardapio"] : []),
     ...(clientReportResourceAllowed("Fotos / divulgacao") ? ["fotos"] : []),
     "novidades",
+    "destaques",
     "grupo de WhatsApp",
     ...(clientReportResourceAllowed("Promocoes") ? ["promocoes"] : []),
     "redes sociais",
@@ -7605,6 +7610,7 @@ function renderClientMetricReportContent(client = {}) {
         <article class="stat-card"><span>WhatsApp</span><strong>${whats}</strong><small>Telefone e contato</small></article>
         ${canShowCardapioReport ? `<article class="stat-card"><span>Cardapio</span><strong>${cardapios}</strong><small>Cliques no cardapio</small></article>` : ""}
         <article class="stat-card"><span>Novidades</span><strong>${novidades}</strong><small>Cliques na tela inicial</small></article>
+        <article class="stat-card"><span>Destaques</span><strong>${destaques}</strong><small>Cliques nos cards e slides em destaque</small></article>
         <article class="stat-card"><span>Promocoes</span><strong>${promocoes}</strong><small>Cliques em ofertas</small></article>
         <article class="stat-card"><span>Grupo WhatsApp</span><strong>${gruposWhatsapp}</strong><small>Entradas pelo link do grupo</small></article>
         <article class="stat-card"><span>Redes sociais</span><strong>${redes}</strong><small>Instagram, Facebook, TikTok e site</small></article>

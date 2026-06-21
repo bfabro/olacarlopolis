@@ -2272,6 +2272,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // ====== SLIDE GRANDE DO CARROSSEL (mantém como era) ======
       const slide = document.createElement("div");
       slide.classList.add("swiper-slide");
+      const idEst = est.nomeNormalizado || normalizeName(est.name || "");
 
       slide.innerHTML = `
       <img class="content_image" src="${imagemInicial}" alt="${est.name}" loading="lazy">
@@ -2282,7 +2283,17 @@ document.addEventListener("DOMContentLoaded", function () {
         ${est.instagram ? `<a href="${fixUrl(est.instagram)}" target="_blank" rel="noopener noreferrer" class="mais-info"
           data-social-client="${est.nomeNormalizado || normalizeName(est.name || "")}" data-social-type="instagram">+ informações</a>` : ""}
       </div>
-    `;
+      `;
+      slide.addEventListener("click", (ev) => {
+        if (ev.target.closest("a")) return;
+        registrarCliqueBotao("destaque", idEst, "destaques-home", {
+          estabelecimento: est.name || "",
+          categoria,
+          destaqueContratado: destaqueEstaAtivo(est),
+          formato: "slide"
+        }).catch(() => { });
+        abrirEstabelecimentoDaHome(idEst);
+      });
 
       swiperWrapper.appendChild(slide);
 
@@ -2290,7 +2301,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (gradeDivulgacao) {
         const card = document.createElement("div");
         card.className = "card-divulgacao-pequeno";
-        const idEst = est.nomeNormalizado || normalizeName(est.name || "");
         card.dataset.id = idEst;
 
         card.innerHTML = `
@@ -2316,6 +2326,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // 👉 Clique no CARD leva para o comércio dentro do site
         card.addEventListener("click", () => {
+          registrarCliqueBotao("destaque", idEst, "destaques-home", {
+            estabelecimento: est.name || "",
+            categoria,
+            destaqueContratado: destaqueEstaAtivo(est),
+            formato: "card"
+          }).catch(() => { });
           abrirEstabelecimentoDaHome(idEst);
         });
 
