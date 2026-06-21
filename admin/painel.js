@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 321,
-  label: "v327",
+  numero: 322,
+  label: "v328",
   data: "2026-06-21",
-  nota: "WhatsApp das promocoes e redes sociais aparecem separados nos relatorios."
+  nota: "Novidades de grupos WhatsApp exibem criacao e convite direto para participar."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2525,7 +2525,7 @@ function acaoNovidadeAdmin(tipo, isNew, payload = {}, original = {}) {
   }
   if (key.includes("vaga")) return isNew ? "Vaga de trabalho inserida" : "Vaga de trabalho atualizada";
   if (key.includes("evento")) return isNew ? "Evento inserido" : "Evento atualizado";
-  if (key.includes("grupo")) return isNew ? "Grupo WhatsApp inserido" : "Grupo WhatsApp atualizado";
+  if (key.includes("grupo")) return isNew ? "Novo grupo de WhatsApp criado" : "Grupo de WhatsApp atualizado";
   return isNew ? "Cadastro novo" : "Cadastro atualizado";
 }
 
@@ -2593,6 +2593,7 @@ async function registrarNovidadeAdmin(payload = {}) {
       destinoId,
       itemId: payload.itemId || "",
       destinoCardId: payload.destinoCardId || "",
+      link: payload.link || payload.url || "",
       novidadeTema,
       dataCriacao: serverTimestamp(),
       criadoPor: state.user?.uid || "",
@@ -10468,7 +10469,8 @@ function renderClientOnlyEditor() {
         categoria: "Grupos WhatsApp",
         destinoTipo: "grupoWhatsapp",
         destinoId: clientWhatsappGroupId,
-        itemId: clientWhatsappGroupId
+        itemId: clientWhatsappGroupId,
+        link
       });
     }
     showToast(enabled ? "Grupo WhatsApp publicado." : "Grupo WhatsApp salvo como oculto.");
@@ -12197,7 +12199,8 @@ function bindEvents() {
       categoria: "Grupos WhatsApp",
       destinoTipo: "grupoWhatsapp",
       destinoId: id,
-      itemId: id
+      itemId: id,
+      link: payload.link || ""
     });
     showToast("Grupo WhatsApp salvo.");
     resetInfoWhatsappGroupForm();

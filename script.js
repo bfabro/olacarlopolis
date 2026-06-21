@@ -2632,7 +2632,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function novidadeTextoAcao(item) {
-    return item?.acao || item?.raw?.acao || item?.titulo || item?.descricao || "Nova atualização disponível";
+    const texto = item?.acao || item?.raw?.acao || item?.titulo || item?.descricao || "Nova atualização disponível";
+    const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
+    if ((tipo.includes("grupo") || tipo.includes("whatsapp")) && /inserid|criad|novo/.test(normalizeName(texto))) {
+      return "Novo grupo de WhatsApp criado";
+    }
+    return texto;
   }
 
   function novidadeTextoAcaoHtml(item) {
@@ -2685,6 +2690,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (tipo.includes("veiculo") || tipo.includes("automovel")) return { key: "veiculos", label: "Veículo", icon: "fa-car" };
     if (tipo.includes("promoc")) return { key: "promocoes", label: "Promoção", icon: "fa-tag" };
     if (novidadeEhEvento(item)) return { key: "servicos", label: "Evento", icon: "fa-calendar-days" };
+    if (tipo.includes("grupo") || tipo.includes("whatsapp")) return { key: "servicos", label: "Grupo WhatsApp", icon: "fa-user-group" };
     if (texto.includes("destaque")) return { key: "comercios", label: "Destaque", icon: "fa-star" };
     if (tipo.includes("cliente") || tipo.includes("endereco") || tipo.includes("telefone") || tipo.includes("horario") || tipo.includes("cardapio") || tipo.includes("rede")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
     if (tipo.includes("estabelecimento")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
@@ -2803,6 +2809,7 @@ document.addEventListener("DOMContentLoaded", function () {
       categoria: base.categoria || "",
       valor: base.valor || base.preco || base.valorTexto || "",
       codRef: base.codRef || base.codigoReferencia || base.codigo || base.referencia || "",
+      link: base.link || base.url || "",
       raw: base
     };
   }
@@ -2827,15 +2834,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (dbAdmin) {
         try {
-          const [novidadesSnap, configSnap] = await Promise.all([
+          const [novidadesSnap, configSnap, gruposSnap] = await Promise.all([
             dbAdmin.ref("novidades").once("value"),
-            dbAdmin.ref("configuracoes/pagamento/diasNovidadesVisiveis").once("value")
+            dbAdmin.ref("configuracoes/pagamento/diasNovidadesVisiveis").once("value"),
+            dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value")
           ]);
           const configDias = Number(configSnap.val());
           if (Number.isFinite(configDias) && configDias > 0) diasVisiveis = configDias;
           novidadesSnap.forEach((child) => {
             registros.push(montarNovidadeRecord({ id: child.key, ...(child.val() || {}) }));
             return false;
+          });
+          const gruposPorId = gruposSnap.val() || {};
+          registros.forEach((registro) => {
+            const tipo = normalizeName(registro.destinoTipo || registro.tipo || "");
+            if (!tipo.includes("grupo") && !tipo.includes("whatsapp")) return;
+            const grupo = gruposPorId[registro.destinoId] || {};
+            if (!registro.link) registro.link = grupo.link || grupo.url || "";
+            if (!registro.raw.link && registro.link) registro.raw.link = registro.link;
           });
         } catch (error) {
           console.warn("Nao foi possivel carregar novidades do Firebase.", error);
@@ -3128,7 +3144,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const estabelecimento = novidadeEstabelecimentoCard(item);
       const atualizacaoCliente = novidadeEhAtualizacaoCliente(item);
       const alteracao = novidadeResumoAlteracao(item);
-      const tituloVisivel = atualizacaoCliente ? (item.estabelecimento || titulo) : titulo;
+      const isGrupoWhatsapp = normalizeName(item.destinoTipo || item.tipo || "").includes("grupo")
+        || normalizeName(item.destinoTipo || item.tipo || "").includes("whatsapp");
+      const tituloVisivel = isGrupoWhatsapp
+        ? novidadeTextoAcao(item)
+        : (atualizacaoCliente ? (item.estabelecimento || titulo) : titulo);
       return `
         <article class="novidade-feed-card ${tipoClass}" data-novidade-id="${escapePromoHtml(item.id)}">
           <div class="novidade-feed-img">
@@ -3143,7 +3163,9 @@ document.addEventListener("DOMContentLoaded", function () {
             <strong>${escapePromoHtml(tituloVisivel)}</strong>
             ${atualizacaoCliente && alteracao
               ? `<p class="novidade-change-detail"><i class="fa-solid fa-pen-to-square"></i> Alteração: ${escapePromoHtml(alteracao)}</p>`
-              : (estabelecimento ? `<p>${escapePromoHtml(estabelecimento)}</p>` : "")}
+              : (isGrupoWhatsapp
+                ? `<p>${escapePromoHtml(novidadeTituloDestino(item) || estabelecimento || "Toque para participar")}</p>`
+                : (estabelecimento ? `<p>${escapePromoHtml(estabelecimento)}</p>` : ""))}
           </div>
         </article>
       `;
@@ -3301,6 +3323,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const infos = novidadeInfoRapida(item);
     const telefone = novidadeTelefone(item);
     const destinoTipoAcao = novidadeEhEvento(item) ? "evento" : (item.destinoTipo || item.tipo);
+    const isGrupoWhatsapp = tipoRef.includes("grupo") || tipoRef.includes("whatsapp");
+    const grupoLink = isGrupoWhatsapp ? String(item.link || item.raw?.link || item.raw?.url || "").trim() : "";
     const whatsappTexto = [
       "Olá! Vi esta novidade no Olá Carlópolis e quero mais informações.",
       destino ? `Item: ${destino}` : "",
@@ -3345,6 +3369,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ${atualizacaoCliente
           ? `<h3>${escapePromoHtml(item.estabelecimento || destino)}</h3>${alteracao ? `<p class="novidade-preview-change"><i class="fa-solid fa-pen-to-square"></i> Alteração realizada: <strong>${escapePromoHtml(alteracao)}</strong></p>` : ""}`
           : (destino ? `<h3>${escapePromoHtml(destino)}</h3>` : "")}
+        ${isGrupoWhatsapp ? `<p class="novidade-preview-change"><i class="fa-brands fa-whatsapp"></i> ${escapePromoHtml(novidadeTextoAcao(item))}. Clique em <strong>Ver grupo</strong> para participar.</p>` : ""}
         ${destaque ? `<strong class="novidade-preview-price">${escapePromoHtml(destaque)}</strong>` : ""}
         ${infos.length ? `
           <div class="novidade-preview-quick-info">
@@ -3359,11 +3384,17 @@ document.addEventListener("DOMContentLoaded", function () {
         ` : ""}
         <div class="novidade-preview-actions">
           ${telefone ? `<a class="novidade-preview-whatsapp telefone-link" href="https://wa.me/55${escapePromoHtml(telefone)}?text=${encodeURIComponent(whatsappTexto)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ""}
-          <button type="button" class="novidade-preview-open ${tipoClass}">
-            <i class="fa-solid ${escapePromoHtml(novidadeIconeAcao(destinoTipoAcao))}"></i>
-            <span>${escapePromoHtml(novidadeActionLabel(destinoTipoAcao))}</span>
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
+          ${grupoLink
+            ? `<a class="novidade-preview-open novidade-preview-group-link ${tipoClass}" href="${escapePromoHtml(grupoLink)}" target="_blank" rel="noopener noreferrer">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>Ver grupo</span>
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>`
+            : `<button type="button" class="novidade-preview-open ${tipoClass}">
+                <i class="fa-solid ${escapePromoHtml(novidadeIconeAcao(destinoTipoAcao))}"></i>
+                <span>${escapePromoHtml(novidadeActionLabel(destinoTipoAcao))}</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>`}
         </div>
       </div>
     `;
@@ -3401,7 +3432,10 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.querySelector(".novidade-preview-whatsapp")?.addEventListener("click", () => {
       registrarCliqueNovidadeCidade("whatsapp", item);
     });
-    overlay.querySelector(".novidade-preview-open")?.addEventListener("click", () => {
+    overlay.querySelector(".novidade-preview-group-link")?.addEventListener("click", () => {
+      registrarCliqueNovidadeCidade("ver-grupo", item);
+    });
+    overlay.querySelector(".novidade-preview-open:not(.novidade-preview-group-link)")?.addEventListener("click", () => {
       registrarCliqueNovidadeCidade("abrir-destino", item);
       fecharModalNovidade();
       abrirDestinoNovidadeCidade(item);
