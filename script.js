@@ -4553,7 +4553,7 @@ carlopdiesel:"s",
 
 
 
-    { id: "seiza", nome: "Seiza Produtos Orientais", descricao: "Receba Novidades, Promoções e tambem informativos da loja.", link: "https://chat.whatsapp.com/CFr4ebifZzgE6fFu4CXb6F?mode=ems_copy_t", imagem: "images/informacoes/gruposWhats/6.jpg" },
+    
     { id: "vagasEmprego1", nome: "Vagas de Empregos e Cursos", descricao: "Acompanhe as vagas de empregos e Cusros pelo grupo.", link: "https://chat.whatsapp.com/Ir2mWV398uU4OLDRNfE4Vo", imagem: "images/informacoes/gruposWhats/10.jpg" },
 
 
