@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 297,
-  label: "v303",
+  numero: 298,
+  label: "v304",
   data: "2026-06-20",
-  nota: "Vencimentos anuais retrateis, ordenaveis e destacados no mes da renovacao."
+  nota: "Contadores nos filtros de status e tipo de cliente, com simplificacao dos filtros de atualizacao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3552,25 +3552,6 @@ function formatClientLastUpdate(client = {}) {
   return `Ultima atualizacao: ${formatted}${author ? ` - ${author}` : ""}`;
 }
 
-function clientMatchesUpdateRange(client = {}, startDate = "", endDate = "") {
-  if (!startDate && !endDate) return true;
-  const timestamp = clientLastUpdate(client).timestamp;
-  if (!timestamp) return false;
-
-  const updatedAt = new Date(timestamp);
-  if (Number.isNaN(updatedAt.getTime())) return false;
-
-  if (startDate) {
-    const start = new Date(`${startDate}T00:00:00`);
-    if (updatedAt < start) return false;
-  }
-  if (endDate) {
-    const end = new Date(`${endDate}T23:59:59.999`);
-    if (updatedAt > end) return false;
-  }
-  return true;
-}
-
 function sortClientsByUpdate(clients = [], order = "recentes") {
   return [...clients].sort((a, b) => {
     if (order === "alfabetica") {
@@ -3588,25 +3569,46 @@ function sortClientsByUpdate(clients = [], order = "recentes") {
   });
 }
 
-function updateClientStatusFilterCounts() {
-  const filter = $("clientStatusFilter");
-  if (!filter) return;
-
-  const counts = state.clientes.reduce((total, client) => {
+function updateClientFilterCounts() {
+  const statusCounts = state.clientes.reduce((total, client) => {
     const status = String(client.status || "pendente").toLowerCase();
     if (Object.prototype.hasOwnProperty.call(total, status)) total[status] += 1;
     return total;
   }, { ativo: 0, pendente: 0, inativo: 0 });
 
-  const labels = {
+  const statusLabels = {
+    todos: "Todos",
     ativo: "Ativo",
     pendente: "Pendente",
     inativo: "Inativo"
   };
 
-  Object.entries(labels).forEach(([status, label]) => {
-    const option = filter.querySelector(`option[value="${status}"]`);
-    if (option) option.textContent = `${label} - ${counts[status]}`;
+  const statusFilter = $("clientStatusFilter");
+  Object.entries(statusLabels).forEach(([status, label]) => {
+    const option = statusFilter?.querySelector(`option[value="${status}"]`);
+    const count = status === "todos" ? state.clientes.length : statusCounts[status];
+    if (option) option.textContent = `${label} - ${count}`;
+  });
+
+  const typeCounts = state.clientes.reduce((total, client) => {
+    const type = String(client.tipoCliente || client.tipo || "comercio").toLowerCase();
+    if (Object.prototype.hasOwnProperty.call(total, type)) total[type] += 1;
+    return total;
+  }, { comercio: 0, servico: 0, institucional: 0, outro: 0 });
+
+  const typeLabels = {
+    todos: "Todos",
+    comercio: "Comercio",
+    servico: "Servico",
+    institucional: "Institucional",
+    outro: "Outro"
+  };
+
+  const typeFilter = $("clientTypeFilter");
+  Object.entries(typeLabels).forEach(([type, label]) => {
+    const option = typeFilter?.querySelector(`option[value="${type}"]`);
+    const count = type === "todos" ? state.clientes.length : typeCounts[type];
+    if (option) option.textContent = `${label} - ${count}`;
   });
 }
 
@@ -3614,14 +3616,12 @@ function renderClientsList() {
   const box = $("clientsList");
   if (!box) return;
 
-  updateClientStatusFilterCounts();
+  updateClientFilterCounts();
 
   const q = String($("clientSearch")?.value || "").toLowerCase().trim();
   const statusFilter = $("clientStatusFilter")?.value || "todos";
   const dueFilter = $("clientDueFilter")?.value || "todos";
   const typeFilter = $("clientTypeFilter")?.value || "todos";
-  const updatedFromFilter = $("clientUpdatedFromFilter")?.value || "";
-  const updatedToFilter = $("clientUpdatedToFilter")?.value || "";
   const updatedOrder = $("clientUpdatedOrder")?.value || "recentes";
   const filteredClients = state.clientes.filter((client) => {
     const hay = `${client.nome || ""} ${client.categoria || ""} ${client.contato || ""}`.toLowerCase();
@@ -3630,8 +3630,7 @@ function renderClientsList() {
     const overdue = isClientOverdue(client);
     const matchesDue = dueFilter === "todos" || (dueFilter === "vencidos" ? overdue : !overdue);
     const matchesType = typeFilter === "todos" || (client.tipoCliente || client.tipo || "comercio") === typeFilter;
-    const matchesUpdate = clientMatchesUpdateRange(client, updatedFromFilter, updatedToFilter);
-    return matchesSearch && matchesStatus && matchesDue && matchesType && matchesUpdate;
+    return matchesSearch && matchesStatus && matchesDue && matchesType;
   });
   const list = sortClientsByUpdate(filteredClients, updatedOrder);
 
@@ -10945,8 +10944,6 @@ function bindEvents() {
   $("clientStatusFilter")?.addEventListener("change", renderClientsList);
   $("clientDueFilter")?.addEventListener("change", renderClientsList);
   $("clientTypeFilter")?.addEventListener("change", renderClientsList);
-  $("clientUpdatedFromFilter")?.addEventListener("change", renderClientsList);
-  $("clientUpdatedToFilter")?.addEventListener("change", renderClientsList);
   $("clientUpdatedOrder")?.addEventListener("change", renderClientsList);
   $("clientImagesUpload").addEventListener("change", async (event) => {
     await uploadClientImages(event.target.files);
