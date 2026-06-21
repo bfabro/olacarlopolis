@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 306,
-  label: "v312",
+  numero: 307,
+  label: "v313",
   data: "2026-06-20",
-  nota: "Boletos com fontes ampliadas, margem para grampear, telefone e detalhamento do destaque mensal."
+  nota: "Carne com margem ampliada, linhas pontilhadas de corte e mensagem opcional no rodape."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4527,8 +4527,8 @@ function printableBoletoHtml(client, invoice, paymentConfig = {}) {
         </section>
       </div>
       <footer>
-        <span>Documento gerado em ${escapeHtml(new Date().toLocaleDateString("pt-BR"))}</span>
-        <span>${escapeHtml(paymentConfig.pixCidade || "CARLOPOLIS")}</span>
+        ${paymentConfig.mensagemRodapeBoleto ? `<strong>${escapeHtml(paymentConfig.mensagemRodapeBoleto)}</strong>` : ""}
+        <div><span>Documento gerado em ${escapeHtml(new Date().toLocaleDateString("pt-BR"))}</span><span>${escapeHtml(paymentConfig.pixCidade || "CARLOPOLIS")}</span></div>
       </footer>
     </article>
   `;
@@ -4568,16 +4568,19 @@ function openPrintableBoletos(client, invoices = []) {
       *{box-sizing:border-box} body{margin:0;background:#e5e7eb;color:#172033;font-family:Arial,sans-serif}
       .print-actions{position:sticky;top:0;z-index:5;display:flex;justify-content:center;gap:10px;padding:10px;background:#172033}
       .print-actions button{border:0;border-radius:8px;padding:10px 18px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer}
-      .sheet{position:relative;width:210mm;min-height:297mm;margin:12px auto;padding:7mm 7mm 7mm 18mm;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:5mm;background:#fff;box-shadow:0 8px 25px #0002;page-break-after:always}
-      .sheet:before{content:"";position:absolute;left:11mm;top:7mm;bottom:7mm;border-left:1px dashed #cbd5e1}
+      .sheet{position:relative;width:210mm;min-height:297mm;margin:12px auto;padding:7mm 7mm 7mm 24mm;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:0;background:#fff;box-shadow:0 8px 25px #0002;page-break-after:always}
+      .sheet:before{content:"ÁREA PARA GRAMPEAR";position:absolute;left:5mm;top:50%;width:14mm;color:#94a3b8;font-size:8px;font-weight:700;letter-spacing:.5px;text-align:center;transform:translateY(-50%) rotate(-90deg);white-space:nowrap}
+      .sheet:after{content:"";position:absolute;left:18mm;top:7mm;bottom:7mm;border-left:1.5px dashed #94a3b8}
       .sheet:last-child{page-break-after:auto}
-      .boleto{min-height:0;overflow:hidden;border:1.5px solid #334155;border-radius:10px;display:grid;grid-template-rows:auto 1fr auto;background:#fff}
+      .boleto{position:relative;min-height:0;overflow:visible;border:1.5px solid #334155;border-radius:8px;display:grid;grid-template-rows:auto 1fr auto;background:#fff}
+      .boleto:not(:last-child){margin-bottom:5mm}
+      .boleto:not(:last-child):after{content:"✂  CORTE AQUI";position:absolute;left:-6mm;right:-1mm;bottom:-3mm;border-bottom:1.5px dashed #64748b;color:#64748b;font-size:8px;font-weight:700;line-height:1;text-align:center}
       .boleto header{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:9px 12px;border-bottom:1px solid #cbd5e1;background:#f8fafc}
       .boleto header img{width:64px;height:48px;object-fit:contain}.boleto header strong{display:block;font-size:18px}.boleto header span{font-size:13px;color:#64748b}.boleto header b{font-size:22px;color:#0f766e}
       .boleto-body{display:grid;grid-template-columns:1fr 112px;gap:10px;padding:9px 12px}
       .boleto-details{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;align-content:start}.boleto-details div{min-width:0}.boleto-details .wide{grid-column:1/-1}.boleto-details span{display:block;font-size:10px;text-transform:uppercase;color:#64748b;font-weight:700}.boleto-details strong{display:block;font-size:13px;line-height:1.2;overflow-wrap:anywhere}.boleto-details .note strong,.boleto-details .destaque-description strong{font-size:11px;font-weight:600}.boleto-details .destaque-value strong{color:#b45309}
       .boleto-qr{display:grid;justify-items:center;align-content:center;border-left:1px dashed #94a3b8;padding-left:10px}.boleto-qr img{width:104px;height:104px}.boleto-qr span{font-size:11px;font-weight:700;margin-top:3px}
-      .boleto footer{display:flex;justify-content:space-between;padding:6px 12px;border-top:1px solid #e2e8f0;color:#64748b;font-size:10px}
+      .boleto footer{display:grid;gap:3px;padding:6px 12px;border-top:1px solid #e2e8f0;color:#64748b;font-size:10px}.boleto footer>strong{color:#334155;font-size:11px;text-align:center}.boleto footer>div{display:flex;justify-content:space-between}
       @page{size:A4 portrait;margin:0}
       @media print{body{background:#fff}.print-actions{display:none}.sheet{margin:0;box-shadow:none;width:210mm;height:297mm;min-height:297mm}}
     </style>
@@ -7959,6 +7962,7 @@ function renderPaymentSettings() {
   $("paymentFeaturedMonthly").value = config.valorDestaqueMensal ? moneyBR(config.valorDestaqueMensal) : "";
   if ($("paymentNewsVisibleDays")) $("paymentNewsVisibleDays").value = config.diasNovidadesVisiveis || 5;
   $("paymentInvoiceNote").value = config.observacaoFatura || "";
+  $("paymentInvoiceFooterMessage").value = config.mensagemRodapeBoleto || "";
 }
 
 async function uploadPaymentInvoiceLogo(file) {
@@ -11500,6 +11504,7 @@ function bindEvents() {
       valorDestaqueMensal: numberFromMoney($("paymentFeaturedMonthly").value),
       diasNovidadesVisiveis: Math.max(1, Number($("paymentNewsVisibleDays")?.value || 5) || 5),
       observacaoFatura: $("paymentInvoiceNote").value.trim(),
+      mensagemRodapeBoleto: $("paymentInvoiceFooterMessage").value.trim(),
       updatedAt: serverTimestamp(),
       updatedBy: state.user?.uid || ""
     };
