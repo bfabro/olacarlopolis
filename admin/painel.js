@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 310,
-  label: "v316",
+  numero: 311,
+  label: "v317",
   data: "2026-06-21",
-  nota: "Descricoes das atualizacoes nas novidades quebram linha sem cortar palavras."
+  nota: "Texto dos valores de destaque simplificado no painel do cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -9923,7 +9923,7 @@ function renderClientOnlyEditor() {
     if (summary) {
       summary.textContent = active
         ? `${weeks} ${kindLabel}${weeks === 1 ? "" : "s"} (${days} dias), ${moneyBR(value)}, valido ate ${formatDateBR(end)}. Cobranca: ${billing === "pix_separado" ? "Pix separado" : "junto da mensalidade"}. Se houver mais de 20 ativos, os destaques alternam conforme a fila de contratacao.`
-        : `Valores definidos pelo admin master: ${moneyBR(destaqueWeeklyValue())} por semana e ${moneyBR(destaqueWeekendValue())} por fim de semana.`;
+        : `Valores definidos: ${moneyBR(destaqueWeeklyValue())} por semana e ${moneyBR(destaqueWeekendValue())} por fim de semana.`;
     }
   };
   ["coFeaturedWeek", "coFeaturedType", "coFeaturedWeeks", "coFeaturedBilling"].forEach((id) => {
