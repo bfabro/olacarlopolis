@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 312,
-  label: "v318",
+  numero: 313,
+  label: "v319",
   data: "2026-06-21",
-  nota: "Remocoes e desativacoes nao sao exibidas como novidades no site publico."
+  nota: "Vencimento padrao configuravel, com dia individual por cliente no financeiro."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3882,7 +3882,7 @@ function renderClientsList() {
       </div>
       <div class="client-money">
         <strong>${moneyBR(valorFinalPlano(client))}</strong>
-        <span>Venc. ${client.vencimentoDia || "-"}</span>
+        <span>Venc. dia ${client.vencimentoDia || state.pagamentoSistema?.vencimentoDiaPadrao || "último"}</span>
         <small class="client-last-update">${escapeHtml(formatClientLastUpdate(client))}</small>
       </div>
       <div class="client-actions">
@@ -4427,9 +4427,21 @@ function invoiceDueDateForMonth(client, monthKey = currentMonthKey()) {
   const [year, month] = String(monthKey || currentMonthKey()).split("-").map(Number);
   if (!year || !month) return "";
   const lastDay = new Date(year, month, 0).getDate();
-  const configuredDay = Number(client?.vencimentoDia);
-  const dueDay = Number.isFinite(configuredDay) && configuredDay > 0 ? Math.min(configuredDay, lastDay) : lastDay;
+  const clientDay = Number(client?.vencimentoDia);
+  const defaultDay = Number(state.pagamentoSistema?.vencimentoDiaPadrao);
+  const configuredDay = Number.isFinite(clientDay) && clientDay >= 1 && clientDay <= 31
+    ? clientDay
+    : defaultDay;
+  const dueDay = Number.isFinite(configuredDay) && configuredDay >= 1
+    ? Math.min(configuredDay, lastDay)
+    : lastDay;
   return dateKeyFromDate(new Date(year, month - 1, dueDay));
+}
+
+function normalizeDueDay(value) {
+  if (String(value || "").trim() === "") return "";
+  const day = Number(value);
+  return Number.isFinite(day) ? String(Math.max(1, Math.min(31, Math.round(day)))) : "";
 }
 
 function clientHasOpenInvoice(client) {
@@ -6716,7 +6728,9 @@ function renderFinanceiro() {
       </label>
       <label>Valor<input data-finance-field="valorPlano" value="${escapeAttr(moneyBR(selectedPlanValue))}" data-plan-value="${escapeAttr(selectedPlanValue)}" placeholder="R$" ${isMaster() ? "" : "readonly"}></label>
       <label>Desconto<input data-finance-field="descontoValor" value="${escapeAttr(client.descontoValor || "")}" placeholder="R$"></label>
-      <label>Venc.<input data-finance-field="vencimentoDia" value="${escapeAttr(client.vencimentoDia || "")}" placeholder="Dia"></label>
+      <label>Dia de vencimento
+        <input data-finance-field="vencimentoDia" type="number" min="1" max="31" step="1" inputmode="numeric" value="${escapeAttr(client.vencimentoDia || "")}" placeholder="Padrão: ${escapeAttr(state.pagamentoSistema?.vencimentoDiaPadrao || "último dia")}">
+      </label>
       <label>Data venc. do plano<input data-finance-field="vencimentoDataPlano" type="date" value="${escapeAttr(selectedPlan === "anual" || selectedPlan === "semestral" ? financePlanDueDate(client) : "")}"></label>
       <label class="finance-note">Obs.<input data-finance-field="financeiroObs" value="${escapeAttr(client.financeiroObs || "")}"></label>
       <div class="finance-months">
@@ -6770,7 +6784,7 @@ function renderFinanceiro() {
       row.querySelectorAll("[data-finance-field]").forEach((field) => {
         payload[field.dataset.financeField] = ["valorPlano", "descontoValor"].includes(field.dataset.financeField)
           ? numberFromMoney(field.value)
-          : field.value.trim();
+          : (field.dataset.financeField === "vencimentoDia" ? normalizeDueDay(field.value) : field.value.trim());
       });
       const mesesEmAberto = [...row.querySelectorAll("[data-finance-month]:checked")].map((input) => input.value).sort();
       const currentClient = state.clientes.find((client) => client.id === id) || {};
@@ -6827,7 +6841,7 @@ function renderFinanceiro() {
       row.querySelectorAll("[data-finance-field]").forEach((field) => {
         payload[field.dataset.financeField] = ["valorPlano", "descontoValor"].includes(field.dataset.financeField)
           ? numberFromMoney(field.value)
-          : field.value.trim();
+          : (field.dataset.financeField === "vencimentoDia" ? normalizeDueDay(field.value) : field.value.trim());
       });
       const plannedClient = { ...client, ...payload };
       const invoices = buildInvoiceBatch(plannedClient, quantity, startMonth, { ignoreSaved: true });
@@ -6852,7 +6866,7 @@ function renderFinanceiro() {
       row.querySelectorAll("[data-finance-field]").forEach((field) => {
         payloadBase[field.dataset.financeField] = ["valorPlano", "descontoValor"].includes(field.dataset.financeField)
           ? numberFromMoney(field.value)
-          : field.value.trim();
+          : (field.dataset.financeField === "vencimentoDia" ? normalizeDueDay(field.value) : field.value.trim());
       });
       const nextClient = { ...currentClient, ...payloadBase };
       const publicPayload = {};
@@ -7975,6 +7989,7 @@ function renderPaymentSettings() {
   $("paymentPixName").value = config.pixNome || "Ola Carlopolis";
   $("paymentPixCity").value = config.pixCidade || "CARLOPOLIS";
   $("paymentBillingWhatsapp").value = formatPhoneMask(config.whatsappCobranca || "43991766639");
+  $("paymentDefaultDueDay").value = config.vencimentoDiaPadrao || "";
   $("paymentInvoiceLogo").value = config.logoBoleto || "";
   $("paymentInvoiceLogoPreview").src = boletoLogoUrl(config);
   $("paymentPlanMonthly").value = config.valorPlanoMensal ? moneyBR(config.valorPlanoMensal) : "";
@@ -10850,7 +10865,9 @@ function renderClientInvoices() {
         <div>
           <span>Vencimento</span>
           <strong>${escapeHtml(formatDateBR(firstInvoice.dueDate))}</strong>
-          <small>${client.vencimentoDia ? `Todo dia ${escapeHtml(client.vencimentoDia)}` : "Data definida pelo fechamento da fatura"}</small>
+          <small>${client.vencimentoDia
+            ? `Dia individual: ${escapeHtml(client.vencimentoDia)}`
+            : `Dia padrão: ${escapeHtml(state.pagamentoSistema?.vencimentoDiaPadrao || "último dia do mês")}`}</small>
         </div>
         <div>
           <span>Pagamento</span>
@@ -11518,6 +11535,7 @@ function bindEvents() {
       pixNome: $("paymentPixName").value.trim(),
       pixCidade: $("paymentPixCity").value.trim(),
       whatsappCobranca: $("paymentBillingWhatsapp").value.trim(),
+      vencimentoDiaPadrao: Math.max(1, Math.min(31, Number($("paymentDefaultDueDay").value || 31) || 31)),
       logoBoleto: $("paymentInvoiceLogo").value.trim(),
       valorPlanoMensal: numberFromMoney($("paymentPlanMonthly").value),
       valorPlanoSemestral: numberFromMoney($("paymentPlanSemiannual").value),

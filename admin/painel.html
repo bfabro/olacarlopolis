@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=318">
+  <link rel="stylesheet" href="painel.css?v=319">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -703,6 +703,10 @@
             <label>Nome do recebedor<input id="paymentPixName" placeholder="Ola Carlopolis"></label>
             <label>Cidade<input id="paymentPixCity" placeholder="CARLOPOLIS"></label>
             <label>WhatsApp da cobrança<input id="paymentBillingWhatsapp" inputmode="tel" placeholder="(43) 99176-6639"></label>
+            <label>Dia padrão de vencimento
+              <input id="paymentDefaultDueDay" type="number" min="1" max="31" step="1" inputmode="numeric" placeholder="Ex.: 10">
+              <small>Usado nos boletos quando o cliente não possui um dia individual.</small>
+            </label>
             <div class="wide payment-invoice-logo">
               <div>
                 <strong>Logo dos boletos</strong>
@@ -1333,6 +1337,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=318"></script>
+  <script type="module" src="painel.js?v=319"></script>
 </body>
 </html>
