@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 314,
-  label: "v320",
+  numero: 315,
+  label: "v321",
   data: "2026-06-21",
-  nota: "Planos anuais e semestrais usam a data individual do plano nos pagamentos e boletos."
+  nota: "Deteccao precisa das alteracoes do cliente e foto de perfil fixa nas novidades."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2546,14 +2546,23 @@ async function registrarNovidadeAdmin(payload = {}) {
 }
 
 async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, original = null) {
+  const effective = { ...(original || {}), ...payload };
+  const profileImage = String(
+    effective.imagem
+    || effective.profileImage
+    || effective.imagemPerfil
+    || effective.perfil
+    || effective.logo
+    || ""
+  ).trim();
   const base = {
-    estabelecimento: payload.nome || original?.nome || clientId,
-    tituloConteudo: payload.nome || original?.nome || clientId,
-    imagem: imagemPrincipalNovidade(payload) || imagemPrincipalNovidade(original || {}),
-    imagens: normalizeImageItems(payload.imagens).map((item) => item.url || item).filter(Boolean),
-    categoria: payload.categoria || original?.categoria || "",
+    estabelecimento: effective.nome || clientId,
+    tituloConteudo: effective.nome || clientId,
+    imagem: profileImage,
+    imagens: profileImage ? [profileImage] : [],
+    categoria: effective.categoria || "",
     destinoTipo: "estabelecimento",
-    destinoId: payload.nomeNormalizado || normalizeName(payload.nome || original?.nome || clientId)
+    destinoId: effective.nomeNormalizado || normalizeName(effective.nome || clientId)
   };
   if (!original) {
     await registrarNovidadeAdmin({ ...base, tipo: "estabelecimento", novidadeTema: "novoCliente", itemId: "novoCliente", titulo: "Cadastro novo", acao: "Cadastro novo", descricao: "Cadastro novo" });
@@ -2564,40 +2573,54 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
   const removals = [];
   const add = (tema, tipo, acao) => updates.push({ ...base, tipo, destinoTipo: tipo, novidadeTema: tema, itemId: tema, titulo: acao, acao, descricao: acao });
   const remove = (tipo, tema) => removals.push(removerNovidadesPorDestino(tipo, base.destinoId, tema));
-  if (String(original.nome || "") !== String(payload.nome || "")) add("nomeCliente", "cliente-nome", "Nome do cliente atualizado");
-  if (String(original.endereco || "") !== String(payload.endereco || "")) {
-    if (String(payload.endereco || "").trim()) add("endereco", "cliente-endereco", "Endereço atualizado");
+  if (String(original.nome || "") !== String(effective.nome || "")) add("nomeCliente", "cliente-nome", "Nome do cliente atualizado");
+  if (String(original.endereco || "") !== String(effective.endereco || "")) {
+    if (String(effective.endereco || "").trim()) add("endereco", "cliente-endereco", "Endereço atualizado");
     else remove("cliente-endereco", "endereco");
   }
-  const oldPhones = JSON.stringify(original.contatosDetalhados || original.contatos || [original.contato, original.whatsapp, original.contato2, original.contato3].filter(Boolean));
-  const newPhones = JSON.stringify(payload.contatosDetalhados || payload.contatos || []);
+  const contactFingerprint = (client) => JSON.stringify(normalizeClientContactDetails(client).map((item) => ({
+    numero: String(item.numero || "").replace(/\D/g, ""),
+    referencia: String(item.referencia || "").trim(),
+    whatsapp: Boolean(item.whatsapp)
+  })));
+  const oldPhones = contactFingerprint(original);
+  const newPhones = contactFingerprint(effective);
   if (oldPhones !== newPhones) {
-    if ((payload.contatosDetalhados || payload.contatos || []).length) add("telefone", "cliente-telefone", "Telefone atualizado");
+    if (normalizeClientContactDetails(effective).length) add("telefone", "cliente-telefone", "Telefone atualizado");
     else remove("cliente-telefone", "telefone");
   }
-  const oldHours = JSON.stringify({ horario: original.horario || "", horarios: original.horarios || {}, funcionamento24Horas: Boolean(original.funcionamento24Horas) });
-  const newHours = JSON.stringify({ horario: payload.horario || "", horarios: payload.horarios || {}, funcionamento24Horas: Boolean(payload.funcionamento24Horas) });
+  const scheduleFingerprint = (client) => {
+    const horarios = normalizeSchedule(client.horarios || {});
+    const hasStructuredSchedule = scheduleHasAnyOpen(horarios);
+    return JSON.stringify({
+      funcionamento24Horas: Boolean(client.funcionamento24Horas),
+      horarios: hasStructuredSchedule ? horarios : null,
+      horario: hasStructuredSchedule ? "" : String(client.horario || "").replace(/\s+/g, " ").trim()
+    });
+  };
+  const oldHours = scheduleFingerprint(original);
+  const newHours = scheduleFingerprint(effective);
   if (oldHours !== newHours) {
-    const hasHours = Boolean(payload.funcionamento24Horas || String(payload.horario || "").trim() || scheduleHasAnyOpen(normalizeSchedule(payload.horarios || {})));
+    const hasHours = Boolean(effective.funcionamento24Horas || String(effective.horario || "").trim() || scheduleHasAnyOpen(normalizeSchedule(effective.horarios || {})));
     if (hasHours) add("horario", "cliente-horario", "Horário de atendimento atualizado");
     else remove("cliente-horario", "horario");
   }
-  if (normalizeImageItems(payload.imagens).length > normalizeImageItems(original.imagens).length) add("imagens", "cliente-imagens", "Novas fotos adicionadas");
-  if (String(original.categoria || "") !== String(payload.categoria || "")) add("categoria", "cliente-categoria", "Categoria atualizada");
+  if (normalizeImageItems(effective.imagens).length > normalizeImageItems(original.imagens).length) add("imagens", "cliente-imagens", "Novas fotos adicionadas");
+  if (String(original.categoria || "") !== String(effective.categoria || "")) add("categoria", "cliente-categoria", "Categoria atualizada");
   const oldSocial = JSON.stringify([original.instagram, original.facebook, original.tiktok, original.site]);
-  const newSocial = JSON.stringify([payload.instagram, payload.facebook, payload.tiktok, payload.site]);
+  const newSocial = JSON.stringify([effective.instagram, effective.facebook, effective.tiktok, effective.site]);
   if (oldSocial !== newSocial) {
-    if ([payload.instagram, payload.facebook, payload.tiktok, payload.site].some((value) => String(value || "").trim())) add("redesSociais", "cliente-redes", "Redes sociais atualizadas");
+    if ([effective.instagram, effective.facebook, effective.tiktok, effective.site].some((value) => String(value || "").trim())) add("redesSociais", "cliente-redes", "Redes sociais atualizadas");
     else remove("cliente-redes", "redesSociais");
   }
   const oldMenu = JSON.stringify([original.cardapioAtivo, original.cardapioLink, original.menuImages]);
-  const newMenu = JSON.stringify([payload.cardapioAtivo, payload.cardapioLink, payload.menuImages]);
+  const newMenu = JSON.stringify([effective.cardapioAtivo, effective.cardapioLink, effective.menuImages]);
   if (oldMenu !== newMenu) {
-    if (payload.cardapioAtivo || String(payload.cardapioLink || "").trim() || normalizeUrlList(payload.menuImages).length) add("cardapio", "cliente-cardapio", "Cardápio atualizado");
+    if (effective.cardapioAtivo || String(effective.cardapioLink || "").trim() || normalizeUrlList(effective.menuImages).length) add("cardapio", "cliente-cardapio", "Cardápio atualizado");
     else remove("cliente-cardapio", "cardapio");
   }
-  if (Boolean(original.destaqueSemanal) !== Boolean(payload.destaqueSemanal) || String(original.destaqueFim || "") !== String(payload.destaqueFim || "")) {
-    if (payload.destaqueSemanal) add("destaque", "cliente-destaque", "Destaque comercial atualizado");
+  if (Boolean(original.destaqueSemanal) !== Boolean(effective.destaqueSemanal) || String(original.destaqueFim || "") !== String(effective.destaqueFim || "")) {
+    if (effective.destaqueSemanal) add("destaque", "cliente-destaque", "Destaque comercial atualizado");
     else remove("cliente-destaque", "destaque");
   }
   await Promise.all([...removals, ...updates.map(registrarNovidadeAdmin)]);
