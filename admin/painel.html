@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=309">
+  <link rel="stylesheet" href="painel.css?v=310">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -702,6 +702,17 @@
             <label>Nome do recebedor<input id="paymentPixName" placeholder="Ola Carlopolis"></label>
             <label>Cidade<input id="paymentPixCity" placeholder="CARLOPOLIS"></label>
             <label>WhatsApp da cobrança<input id="paymentBillingWhatsapp" inputmode="tel" placeholder="(43) 99176-6639"></label>
+            <div class="wide payment-invoice-logo">
+              <div>
+                <strong>Logo dos boletos</strong>
+                <p>Imagem exibida nos boletos de pagamento impressos.</p>
+              </div>
+              <img id="paymentInvoiceLogoPreview" src="../images/img_padrao_site/logo_1.png" alt="Logo dos boletos">
+              <label class="upload-button"><i class="fa-solid fa-cloud-arrow-up"></i> Enviar logo
+                <input id="paymentInvoiceLogoUpload" type="file" accept="image/*">
+              </label>
+              <input id="paymentInvoiceLogo" type="hidden">
+            </div>
             <label>Mensalidade mensal<input id="paymentPlanMonthly" placeholder="R$"></label>
             <label>Mensalidade semestral<input id="paymentPlanSemiannual" placeholder="R$"></label>
             <label>Mensalidade anual<input id="paymentPlanAnnual" placeholder="R$"></label>
@@ -1301,6 +1312,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=309"></script>
+  <script type="module" src="painel.js?v=310"></script>
 </body>
 </html>

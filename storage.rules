@@ -85,6 +85,12 @@ service firebase.storage {
       allow delete: if signedIn();
     }
 
+    match /configuracoes/pagamento/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if signedIn() && isNewImage();
+      allow delete: if signedIn();
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

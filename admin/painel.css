@@ -229,6 +229,67 @@ button {
   text-decoration: underline;
 }
 
+.payment-invoice-logo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 86px auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.payment-invoice-logo strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.payment-invoice-logo p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.payment-invoice-logo img {
+  width: 86px;
+  height: 62px;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+}
+
+.payment-invoice-logo .upload-button {
+  margin: 0;
+}
+
+.finance-boleto-actions {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+
+.finance-boleto-actions label {
+  min-width: 92px;
+}
+
+.finance-boleto-actions button {
+  white-space: nowrap;
+  background: #0f766e;
+}
+
+.invoice-boleto-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+}
+
+.invoice-boleto-actions label {
+  min-width: 150px;
+}
+
 label {
   display: grid;
   gap: 6px;
@@ -2824,6 +2885,17 @@ button[type="submit"]:hover,
   .client-billing-alert button {
     justify-content: center;
     width: 100%;
+  }
+
+  .payment-invoice-logo {
+    grid-template-columns: 1fr;
+  }
+
+  .finance-boleto-actions,
+  .invoice-boleto-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
   }
 
   .split-layout,

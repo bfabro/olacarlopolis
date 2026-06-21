@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 303,
-  label: "v309",
+  numero: 304,
+  label: "v310",
   data: "2026-06-20",
-  nota: "Tela de carregamento com progresso apos o login, liberando a navegacao somente quando os dados estiverem prontos."
+  nota: "Boletos Pix em A4 com ate tres por pagina, geracao por meses e logo configuravel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4353,6 +4353,118 @@ function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = nul
   };
 }
 
+function monthKeyOffset(monthKey = currentMonthKey(), offset = 0) {
+  const [year, month] = String(monthKey || currentMonthKey()).split("-").map(Number);
+  const date = new Date(year || new Date().getFullYear(), (month || 1) - 1 + offset, 1);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function buildInvoiceBatch(client, quantity = 1, startMonth = currentMonthKey(), options = {}) {
+  const total = Math.max(1, Math.min(12, Number(quantity) || 1));
+  const paymentConfig = state.pagamentoSistema || {};
+  return Array.from({ length: total }, (_, index) => {
+    const month = monthKeyOffset(startMonth, index);
+    return buildClientInvoice(client, month, paymentConfig, null, options);
+  });
+}
+
+function boletoLogoUrl(paymentConfig = {}) {
+  return displayImageUrl(paymentConfig.logoBoleto || paymentConfig.boletoLogo || "")
+    || new URL("../images/img_padrao_site/logo_1.png", window.location.href).href;
+}
+
+function printableBoletoHtml(client, invoice, paymentConfig = {}) {
+  const contact = client.whatsapp || client.contato || client.telefone || "Não informado";
+  return `
+    <article class="boleto">
+      <header>
+        <img src="${escapeAttr(boletoLogoUrl(paymentConfig))}" alt="Logo">
+        <div>
+          <strong>Olá Carlópolis</strong>
+          <span>Boleto de pagamento via Pix</span>
+        </div>
+        <b>${escapeHtml(moneyBR(invoice.valorTotal))}</b>
+      </header>
+      <div class="boleto-body">
+        <section class="boleto-details">
+          <div><span>Cliente</span><strong>${escapeHtml(client.nome || client.id || "Cliente")}</strong></div>
+          <div><span>Contato</span><strong>${escapeHtml(contact)}</strong></div>
+          <div><span>Competência</span><strong>${escapeHtml(monthLabel(invoice.mes))}</strong></div>
+          <div><span>Vencimento</span><strong>${escapeHtml(formatDateBR(invoice.dueDate))}</strong></div>
+          <div><span>Plano</span><strong>${escapeHtml(planLabel(client.tipoPlano || "mensal"))}</strong></div>
+          <div><span>Recebedor</span><strong>${escapeHtml(paymentConfig.pixNome || "Ola Carlopolis")}</strong></div>
+          <div class="wide"><span>Chave Pix</span><strong>${escapeHtml(paymentConfig.pixChave || "Não configurada")}</strong></div>
+          ${paymentConfig.observacaoFatura ? `<div class="wide note"><span>Observação</span><strong>${escapeHtml(paymentConfig.observacaoFatura)}</strong></div>` : ""}
+        </section>
+        <section class="boleto-qr">
+          <img src="${escapeAttr(qrCodeUrl(invoice.pixCode))}" alt="QR Code Pix">
+          <span>Escaneie para pagar</span>
+        </section>
+      </div>
+      <footer>
+        <span>Documento gerado em ${escapeHtml(new Date().toLocaleDateString("pt-BR"))}</span>
+        <span>${escapeHtml(paymentConfig.pixCidade || "CARLOPOLIS")}</span>
+      </footer>
+    </article>
+  `;
+}
+
+function openPrintableBoletos(client, invoices = []) {
+  const paymentConfig = state.pagamentoSistema || {};
+  if (!paymentConfig.pixChave) {
+    showToast("Configure a chave Pix na tela de Pagamento antes de gerar boletos.");
+    return;
+  }
+  const validInvoices = invoices.filter((invoice) => invoice?.pixCode && invoice.valorTotal > 0);
+  if (!validInvoices.length) {
+    showToast("Nenhum boleto válido para gerar.");
+    return;
+  }
+
+  const printWindow = window.open("", "_blank", "width=1000,height=850");
+  if (!printWindow) {
+    showToast("O navegador bloqueou a janela do boleto. Libere pop-ups e tente novamente.");
+    return;
+  }
+
+  const sheets = [];
+  for (let index = 0; index < validInvoices.length; index += 3) {
+    sheets.push(`<main class="sheet">${validInvoices.slice(index, index + 3).map((invoice) => printableBoletoHtml(client, invoice, paymentConfig)).join("")}</main>`);
+  }
+
+  printWindow.document.open();
+  printWindow.document.write(`<!DOCTYPE html>
+  <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Boletos - ${escapeHtml(client.nome || client.id || "Cliente")}</title>
+    <style>
+      *{box-sizing:border-box} body{margin:0;background:#e5e7eb;color:#172033;font-family:Arial,sans-serif}
+      .print-actions{position:sticky;top:0;z-index:5;display:flex;justify-content:center;gap:10px;padding:10px;background:#172033}
+      .print-actions button{border:0;border-radius:8px;padding:10px 18px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer}
+      .sheet{width:210mm;min-height:297mm;margin:12px auto;padding:8mm;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:5mm;background:#fff;box-shadow:0 8px 25px #0002;page-break-after:always}
+      .sheet:last-child{page-break-after:auto}
+      .boleto{min-height:0;overflow:hidden;border:1.5px solid #334155;border-radius:10px;display:grid;grid-template-rows:auto 1fr auto;background:#fff}
+      .boleto header{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;padding:9px 12px;border-bottom:1px solid #cbd5e1;background:#f8fafc}
+      .boleto header img{width:58px;height:44px;object-fit:contain}.boleto header strong{display:block;font-size:16px}.boleto header span{font-size:11px;color:#64748b}.boleto header b{font-size:19px;color:#0f766e}
+      .boleto-body{display:grid;grid-template-columns:1fr 104px;gap:10px;padding:9px 12px}
+      .boleto-details{display:grid;grid-template-columns:repeat(3,1fr);gap:7px 10px;align-content:start}.boleto-details div{min-width:0}.boleto-details .wide{grid-column:1/-1}.boleto-details span{display:block;font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700}.boleto-details strong{display:block;font-size:11px;overflow-wrap:anywhere}.boleto-details .note strong{font-weight:500}
+      .boleto-qr{display:grid;justify-items:center;align-content:center;border-left:1px dashed #94a3b8;padding-left:10px}.boleto-qr img{width:92px;height:92px}.boleto-qr span{font-size:9px;font-weight:700;margin-top:3px}
+      .boleto footer{display:flex;justify-content:space-between;padding:5px 12px;border-top:1px solid #e2e8f0;color:#64748b;font-size:8px}
+      @page{size:A4 portrait;margin:0}
+      @media print{body{background:#fff}.print-actions{display:none}.sheet{margin:0;box-shadow:none;width:210mm;height:297mm;min-height:297mm}}
+    </style>
+  </head>
+  <body>
+    <div class="print-actions"><button onclick="window.print()">Imprimir / Salvar em PDF</button><button onclick="window.close()">Fechar</button></div>
+    ${sheets.join("")}
+  </body>
+  </html>`);
+  printWindow.document.close();
+  printWindow.focus();
+}
+
 function buildDestaquePix(client, paymentConfig = {}) {
   const valorDestaque = destaqueValueForClient(client);
   const pixCode = gerarPixCopiaCola({
@@ -6470,6 +6582,14 @@ function renderFinanceiro() {
         <input data-finance-receipt="${escapeAttr(client.id)}" type="file" accept="image/*,application/pdf">
         ${invoiceReceiptButton(latestInvoice)}
       </label>
+      <div class="finance-boleto-actions">
+        <label>Qtd. boletos
+          <select data-finance-boleto-quantity>
+            ${Array.from({ length: 12 }, (_, index) => `<option value="${index + 1}">${index + 1}</option>`).join("")}
+          </select>
+        </label>
+        <button type="button" data-generate-finance-boletos="${escapeAttr(client.id)}"><i class="fa-solid fa-print"></i> Gerar boleto</button>
+      </div>
       <button type="button" data-save-finance="${escapeAttr(client.id)}">Salvar</button>
     </article>
   `; }).join("");
@@ -6541,6 +6661,26 @@ function renderFinanceiro() {
       showToast("Financeiro atualizado.");
       renderFinanceiro();
       renderReports();
+    });
+  });
+
+  box.querySelectorAll("[data-generate-finance-boletos]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const row = button.closest(".finance-row");
+      const client = state.clientes.find((item) => item.id === button.dataset.generateFinanceBoletos);
+      if (!row || !client) return;
+      const quantity = Number(row.querySelector("[data-finance-boleto-quantity]")?.value || 1);
+      const selectedMonths = [...row.querySelectorAll("[data-finance-month]:checked")].map((input) => input.value).sort();
+      const startMonth = selectedMonths[0] || currentMonthKey();
+      const payload = {};
+      row.querySelectorAll("[data-finance-field]").forEach((field) => {
+        payload[field.dataset.financeField] = ["valorPlano", "descontoValor"].includes(field.dataset.financeField)
+          ? numberFromMoney(field.value)
+          : field.value.trim();
+      });
+      const plannedClient = { ...client, ...payload };
+      const invoices = buildInvoiceBatch(plannedClient, quantity, startMonth, { ignoreSaved: true });
+      openPrintableBoletos(plannedClient, invoices);
     });
   });
 
@@ -7685,6 +7825,8 @@ function renderPaymentSettings() {
   $("paymentPixName").value = config.pixNome || "Ola Carlopolis";
   $("paymentPixCity").value = config.pixCidade || "CARLOPOLIS";
   $("paymentBillingWhatsapp").value = formatPhoneMask(config.whatsappCobranca || "43991766639");
+  $("paymentInvoiceLogo").value = config.logoBoleto || "";
+  $("paymentInvoiceLogoPreview").src = boletoLogoUrl(config);
   $("paymentPlanMonthly").value = config.valorPlanoMensal ? moneyBR(config.valorPlanoMensal) : "";
   $("paymentPlanSemiannual").value = config.valorPlanoSemestral ? moneyBR(config.valorPlanoSemestral) : "";
   $("paymentPlanAnnual").value = config.valorPlanoAnual ? moneyBR(config.valorPlanoAnual) : "";
@@ -7693,6 +7835,17 @@ function renderPaymentSettings() {
   $("paymentFeaturedMonthly").value = config.valorDestaqueMensal ? moneyBR(config.valorDestaqueMensal) : "";
   if ($("paymentNewsVisibleDays")) $("paymentNewsVisibleDays").value = config.diasNovidadesVisiveis || 5;
   $("paymentInvoiceNote").value = config.observacaoFatura || "";
+}
+
+async function uploadPaymentInvoiceLogo(file) {
+  if (!file || !isMaster()) return;
+  const extension = String(file.name || "logo.png").split(".").pop() || "png";
+  const path = `configuracoes/pagamento/logo-boleto-${Date.now()}.${slugify(extension)}`;
+  const fileRef = storageRef(storage, path);
+  const url = await uploadFileWithProgress(fileRef, file, "Enviando logo dos boletos", file.name || "logo");
+  $("paymentInvoiceLogo").value = url;
+  $("paymentInvoiceLogoPreview").src = displayImageUrl(url);
+  showToast("Logo enviada. Clique em Salvar pagamento para confirmar.");
 }
 
 function renderHomePageSettings() {
@@ -10606,9 +10759,23 @@ function renderClientInvoices() {
             <button id="saveClientInvoicePlan" type="button" class="ghost-button"><i class="fa-solid fa-arrows-rotate"></i> Atualizar plano</button>
           </div>
         ` : planChangeNotice}
+        ${paymentConfig.pixChave ? `
+          <div class="invoice-boleto-actions">
+            <label>Quantidade de meses
+              <select id="clientBoletoQuantity">
+                ${Array.from({ length: 12 }, (_, index) => `<option value="${index + 1}">${index + 1}</option>`).join("")}
+              </select>
+            </label>
+            <button id="generateClientBoletos" type="button"><i class="fa-solid fa-print"></i> Gerar boletos A4</button>
+          </div>
+        ` : ""}
       </article>
     `;
     bindFeaturedInvoicePix(featuredPix);
+    $("generateClientBoletos")?.addEventListener("click", () => {
+      const quantity = Number($("clientBoletoQuantity")?.value || 1);
+      openPrintableBoletos(client, buildInvoiceBatch(client, quantity, currentMonthKey()));
+    });
     if (canWriteClientFinance) $("saveClientInvoicePlan")?.addEventListener("click", async () => {
       const tipoPlano = $("clientInvoicePlan")?.value || "mensal";
       await update(ref(db, `clientesFinanceiro/${client.id}`), {
@@ -10667,8 +10834,14 @@ function renderClientInvoices() {
           <strong id="selectedInvoiceTotal">${moneyBR(totalAberto)}</strong>
         </div>
         ${paymentConfig.pixChave ? `
-          <div class="form-actions">
+          <div class="invoice-boleto-actions">
+            <label>Quantidade de meses
+              <select id="clientBoletoQuantity">
+                ${Array.from({ length: 12 }, (_, index) => `<option value="${index + 1}" ${index + 1 === Math.min(12, faturas.length) ? "selected" : ""}>${index + 1}</option>`).join("")}
+              </select>
+            </label>
             <button id="generateSelectedInvoicePix" type="button"><i class="fa-solid fa-qrcode"></i> Gerar QR Code/Pix</button>
+            <button id="generateClientBoletos" type="button" class="ghost-button"><i class="fa-solid fa-print"></i> Gerar boletos A4</button>
           </div>
           <div id="selectedInvoicePixBox" class="pix-box invoice-selected-pix hidden">
             <img id="selectedInvoiceQr" alt="QR Code Pix" loading="lazy" decoding="async">
@@ -10736,6 +10909,14 @@ function renderClientInvoices() {
     }
     selectedPixBox?.classList.remove("hidden");
     showToast("QR Code/Pix gerado.");
+  });
+
+  $("generateClientBoletos")?.addEventListener("click", () => {
+    const { selected } = selectedInvoiceData();
+    const quantity = Number($("clientBoletoQuantity")?.value || 1);
+    const startMonth = selected.sort()[0] || currentMonthKey();
+    const invoices = buildInvoiceBatch(client, quantity, startMonth);
+    openPrintableBoletos(client, invoices);
   });
 
   if (canWriteClientFinance) $("saveClientInvoicePlan")?.addEventListener("click", async () => {
@@ -11185,6 +11366,7 @@ function bindEvents() {
       pixNome: $("paymentPixName").value.trim(),
       pixCidade: $("paymentPixCity").value.trim(),
       whatsappCobranca: $("paymentBillingWhatsapp").value.trim(),
+      logoBoleto: $("paymentInvoiceLogo").value.trim(),
       valorPlanoMensal: numberFromMoney($("paymentPlanMonthly").value),
       valorPlanoSemestral: numberFromMoney($("paymentPlanSemiannual").value),
       valorPlanoAnual: numberFromMoney($("paymentPlanAnnual").value),
@@ -11203,6 +11385,15 @@ function bindEvents() {
     renderReports();
     renderClientInvoices();
     renderClientBillingAlert();
+  });
+  $("paymentInvoiceLogoUpload")?.addEventListener("change", async (event) => {
+    if (!isMaster()) {
+      showToast("Somente master pode alterar a logo dos boletos.");
+      event.target.value = "";
+      return;
+    }
+    await uploadPaymentInvoiceLogo(event.target.files?.[0]);
+    event.target.value = "";
   });
   $("homePageForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
