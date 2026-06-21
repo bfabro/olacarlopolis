@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 299,
-  label: "v305",
+  numero: 300,
+  label: "v306",
   data: "2026-06-20",
-  nota: "Totais de comercios, servicos e institucionais separados na tela inicial do Admin Master."
+  nota: "Lembretes automaticos de vencimento para Admin Cliente, com contato direto da cobranca pelo WhatsApp."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -446,7 +446,7 @@ function canAccessView(viewName) {
     if (viewName === "storiesComerciais") return isMaster();
     return true;
   }
-  if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenMonthlyInvoice(currentClientRecord());
+  if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenInvoice(currentClientRecord());
   if (viewName === "imoveis") return canAccessImoveis();
   if (viewName === "automoveis") return hasPermission("veiculos");
   if (viewName === "informacoes") return canManageInformacoes();
@@ -1977,7 +1977,7 @@ function renderClientBillingAlert() {
   const box = $("clientBillingAlert");
   if (!box) return;
   const client = currentClientRecord();
-  if (!clientHasOpenMonthlyInvoice(client)) {
+  if (!clientHasOpenInvoice(client)) {
     box.classList.add("hidden");
     box.innerHTML = "";
     return;
@@ -1985,25 +1985,78 @@ function renderClientBillingAlert() {
 
   const months = pendingMonthsForClient(client);
   const firstMonth = months[0] || currentMonthKey();
-  const dueDate = invoiceDueDateForMonth(client, firstMonth);
-  const total = months
-    .map((month) => buildClientInvoice(client, month, state.pagamentoSistema || {}))
-    .reduce((sum, invoice) => sum + invoice.valorTotal, 0);
+  const invoices = months.map((month) => buildClientInvoice(client, month, state.pagamentoSistema || {}));
+  const firstInvoice = invoices[0] || buildClientInvoice(client, firstMonth, state.pagamentoSistema || {});
+  const dueDate = (client.tipoPlano !== "mensal" ? financePlanDueDate(client) : "") || firstInvoice.dueDate;
+  const daysUntilDue = calendarDaysBetween(dateKeyFromDate(new Date()), dueDate);
+  const reminderMessages = {
+    5: `Sua mensalidade vence em 5 dias, no dia ${formatDateBR(dueDate)}.`,
+    3: `Sua mensalidade vence em 3 dias, no dia ${formatDateBR(dueDate)}.`,
+    1: `Sua mensalidade vence amanhã, dia ${formatDateBR(dueDate)}.`
+  };
+  const isOverdue = Number.isFinite(daysUntilDue) && daysUntilDue < 0;
+  const message = isOverdue
+    ? `Sua mensalidade está vencida desde ${formatDateBR(dueDate)}. Caso o pagamento não seja regularizado, o cadastro poderá ser inativado em até 5 dias.`
+    : reminderMessages[daysUntilDue];
 
+  if (!message) {
+    box.classList.add("hidden");
+    box.innerHTML = "";
+    return;
+  }
+
+  const total = invoices.reduce((sum, invoice) => sum + invoice.valorTotal, 0);
+  const billingWhatsapp = billingWhatsappNumber();
+  const clientName = client.nome || client.id || "cliente";
+  const paidWhatsappUrl = billingWhatsapp
+    ? whatsappUrl(billingWhatsapp, `Olá! Sou do estabelecimento ${clientName}. Já realizei o pagamento da mensalidade com vencimento em ${formatDateBR(dueDate)} e gostaria de confirmar a baixa.`)
+    : "";
+  const supportWhatsappUrl = billingWhatsapp
+    ? whatsappUrl(billingWhatsapp, `Olá! Sou do estabelecimento ${clientName}. Preciso de ajuda com a mensalidade com vencimento em ${formatDateBR(dueDate)}.`)
+    : "";
+
+  box.classList.toggle("is-overdue", isOverdue);
+  box.classList.toggle("is-upcoming", !isOverdue);
   box.classList.remove("hidden");
   box.innerHTML = `
-    <div>
-      <strong><i class="fa-solid fa-triangle-exclamation"></i> Fatura em aberto</strong>
-      <p>Existe pagamento mensal pendente no plano ${escapeHtml(planLabel(client.tipoPlano))}, com vencimento em ${escapeHtml(formatDateBR(dueDate))}. O nao pagamento podera causar a inativacao do cadastro ate a regularizacao.</p>
+    <div class="client-billing-alert-copy">
+      <strong><i class="fa-solid ${isOverdue ? "fa-triangle-exclamation" : "fa-calendar-day"}"></i> ${isOverdue ? "Mensalidade vencida" : "Lembrete de vencimento"}</strong>
+      <p>${escapeHtml(message)}</p>
+      <small>Plano ${escapeHtml(planLabel(client.tipoPlano))}${total > 0 ? ` - ${escapeHtml(moneyBR(total))}` : ""}</small>
     </div>
-    <button type="button" data-open-client-invoices>
-      <i class="fa-solid fa-qrcode"></i> Ver faturas ${total > 0 ? `(${moneyBR(total)})` : ""}
-    </button>
+    <div class="client-billing-alert-actions">
+      ${paidWhatsappUrl ? `<a href="${escapeAttr(paidWhatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Já realizei o pagamento</a>` : ""}
+      ${supportWhatsappUrl ? `<a class="billing-support-button" href="${escapeAttr(supportWhatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-headset"></i> Falar com o suporte</a>` : ""}
+      <button type="button" data-open-client-invoices><i class="fa-solid fa-qrcode"></i> Ver faturas</button>
+    </div>
   `;
   box.querySelector("[data-open-client-invoices]")?.addEventListener("click", () => {
     switchView("faturas");
     closeAdminMenuOnMobile();
   });
+}
+
+function calendarDaysBetween(fromDateKey = "", toDateKey = "") {
+  const parseDateKey = (value) => {
+    const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return NaN;
+    return Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  };
+  const from = parseDateKey(fromDateKey);
+  const to = parseDateKey(toDateKey);
+  if (!Number.isFinite(from) || !Number.isFinite(to)) return NaN;
+  return Math.round((to - from) / 86400000);
+}
+
+function billingWhatsappNumber() {
+  const configured = state.pagamentoSistema?.whatsappCobranca || "";
+  const digits = String(configured || "5543991766639").replace(/\D/g, "");
+  if (!digits) return "";
+  return digits.startsWith("55") ? digits : `55${digits}`;
+}
+
+function whatsappUrl(number, message) {
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
 function roleLabel(role) {
@@ -4199,9 +4252,8 @@ function invoiceDueDateForMonth(client, monthKey = currentMonthKey()) {
   return dateKeyFromDate(new Date(year, month - 1, dueDay));
 }
 
-function clientHasOpenMonthlyInvoice(client) {
+function clientHasOpenInvoice(client) {
   if (!client || !isBillableClientType(client) || canManageClients()) return false;
-  if ((client.tipoPlano || "mensal") !== "mensal") return false;
   if (client.status === "inativo" || effectivePaymentStatus(client) !== "em_aberto") return false;
   return pendingMonthsForClient(client).length > 0;
 }
@@ -7595,6 +7647,7 @@ function renderPaymentSettings() {
   $("paymentPixKey").value = config.pixChave || "";
   $("paymentPixName").value = config.pixNome || "Ola Carlopolis";
   $("paymentPixCity").value = config.pixCidade || "CARLOPOLIS";
+  $("paymentBillingWhatsapp").value = formatPhoneMask(config.whatsappCobranca || "43991766639");
   $("paymentPlanMonthly").value = config.valorPlanoMensal ? moneyBR(config.valorPlanoMensal) : "";
   $("paymentPlanSemiannual").value = config.valorPlanoSemestral ? moneyBR(config.valorPlanoSemestral) : "";
   $("paymentPlanAnnual").value = config.valorPlanoAnual ? moneyBR(config.valorPlanoAnual) : "";
@@ -10870,6 +10923,7 @@ function bindEvents() {
   bindPhoneMask("clientContact");
   bindPhoneMask("clientWhatsapp");
   bindPhoneMask("clientContact3");
+  bindPhoneMask("paymentBillingWhatsapp");
 
   $("loginForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -11093,6 +11147,7 @@ function bindEvents() {
       pixChave: $("paymentPixKey").value.trim(),
       pixNome: $("paymentPixName").value.trim(),
       pixCidade: $("paymentPixCity").value.trim(),
+      whatsappCobranca: $("paymentBillingWhatsapp").value.trim(),
       valorPlanoMensal: numberFromMoney($("paymentPlanMonthly").value),
       valorPlanoSemestral: numberFromMoney($("paymentPlanSemiannual").value),
       valorPlanoAnual: numberFromMoney($("paymentPlanAnnual").value),
@@ -11110,6 +11165,7 @@ function bindEvents() {
     renderFinanceiro();
     renderReports();
     renderClientInvoices();
+    renderClientBillingAlert();
   });
   $("homePageForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();

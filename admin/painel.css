@@ -479,6 +479,13 @@ button[type="submit"]:hover,
   color: #991b1b;
 }
 
+.client-billing-alert.is-upcoming {
+  border-color: rgba(217, 119, 6, .3);
+  border-left-color: #d97706;
+  background: #fffbeb;
+  color: #92400e;
+}
+
 .client-billing-alert strong {
   display: inline-flex;
   align-items: center;
@@ -492,6 +499,21 @@ button[type="submit"]:hover,
   line-height: 1.45;
 }
 
+.client-billing-alert small {
+  display: block;
+  margin-top: 5px;
+  font-weight: 700;
+}
+
+.client-billing-alert-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.client-billing-alert a,
 .client-billing-alert button {
   flex: 0 0 auto;
   display: inline-flex;
@@ -502,6 +524,19 @@ button[type="submit"]:hover,
   background: var(--danger);
   color: #fff;
   font-weight: 800;
+  text-decoration: none;
+}
+
+.client-billing-alert a {
+  background: #16a34a;
+}
+
+.client-billing-alert .billing-support-button {
+  background: #0f766e;
+}
+
+.client-billing-alert.is-upcoming button {
+  background: #d97706;
 }
 
 .sidebar-admin {
@@ -2696,6 +2731,12 @@ button[type="submit"]:hover,
     flex-direction: column;
   }
 
+  .client-billing-alert-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .client-billing-alert a,
   .client-billing-alert button {
     justify-content: center;
     width: 100%;
