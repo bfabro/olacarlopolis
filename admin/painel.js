@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 298,
-  label: "v304",
+  numero: 299,
+  label: "v305",
   data: "2026-06-20",
-  nota: "Contadores nos filtros de status e tipo de cliente, com simplificacao dos filtros de atualizacao."
+  nota: "Totais de comercios, servicos e institucionais separados na tela inicial do Admin Master."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1912,6 +1912,14 @@ function renderStats() {
     total + normalizePromocoes(client.promocoes).filter((promo) => promocaoAtiva(promo, client)).length
   ), 0);
   $("statClientes").textContent = String(state.clientes.length);
+  const clientTypeCounts = state.clientes.reduce((counts, client) => {
+    const type = String(client.tipoCliente || client.tipo || "comercio").toLowerCase();
+    if (Object.prototype.hasOwnProperty.call(counts, type)) counts[type] += 1;
+    return counts;
+  }, { comercio: 0, servico: 0, institucional: 0 });
+  if ($("statComercios")) $("statComercios").textContent = String(clientTypeCounts.comercio);
+  if ($("statServicos")) $("statServicos").textContent = String(clientTypeCounts.servico);
+  if ($("statInstitucionais")) $("statInstitucionais").textContent = String(clientTypeCounts.institucional);
   $("statUsuarios").textContent = String(state.usuarios.length);
   $("statAtivos").textContent = String(state.clientes.filter((c) => c.status === "ativo").length);
   $("statPendentes").textContent = String(state.clientes.filter((c) => c.status === "pendente").length);
