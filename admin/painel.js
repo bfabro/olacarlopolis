@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 322,
-  label: "v328",
+  numero: 323,
+  label: "v329",
   data: "2026-06-21",
-  nota: "Novidades de grupos WhatsApp exibem criacao e convite direto para participar."
+  nota: "Acesso ao grupo pela novidade contabilizado e cards de WhatsApp destacados em verde."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

@@ -2690,7 +2690,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (tipo.includes("veiculo") || tipo.includes("automovel")) return { key: "veiculos", label: "Veículo", icon: "fa-car" };
     if (tipo.includes("promoc")) return { key: "promocoes", label: "Promoção", icon: "fa-tag" };
     if (novidadeEhEvento(item)) return { key: "servicos", label: "Evento", icon: "fa-calendar-days" };
-    if (tipo.includes("grupo") || tipo.includes("whatsapp")) return { key: "servicos", label: "Grupo WhatsApp", icon: "fa-user-group" };
+    if (tipo.includes("grupo") || tipo.includes("whatsapp")) return { key: "grupo-whatsapp", label: "Grupo WhatsApp", icon: "fa-user-group" };
     if (texto.includes("destaque")) return { key: "comercios", label: "Destaque", icon: "fa-star" };
     if (tipo.includes("cliente") || tipo.includes("endereco") || tipo.includes("telefone") || tipo.includes("horario") || tipo.includes("cardapio") || tipo.includes("rede")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
     if (tipo.includes("estabelecimento")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
@@ -2762,7 +2762,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (key.includes("promoc")) return "tipo-promocao";
     if (key.includes("evento") || novidadeEhEvento(item || { tipo })) return "tipo-evento";
     if (key.includes("vaga")) return "tipo-veiculo";
-    if (key.includes("grupo") || key.includes("whatsapp")) return "tipo-foto";
+    if (key.includes("grupo") || key.includes("whatsapp")) return "tipo-grupo-whatsapp";
     if (key.includes("foto")) return "tipo-foto";
     return "tipo-estabelecimento";
   }
@@ -3434,6 +3434,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     overlay.querySelector(".novidade-preview-group-link")?.addEventListener("click", () => {
       registrarCliqueNovidadeCidade("ver-grupo", item);
+      const metricClientId = item.estabelecimento
+        || item.raw?.clienteNome
+        || item.raw?.clienteId
+        || item.destinoId
+        || "grupoWhatsapp";
+      registrarCliqueBotao("grupoWhatsapp", metricClientId, "novidades-grupo-whatsapp", {
+        grupoId: item.destinoId || "",
+        grupoNome: novidadeTituloDestino(item) || "",
+        origem: "modal-novidades"
+      }).catch(() => { });
     });
     overlay.querySelector(".novidade-preview-open:not(.novidade-preview-group-link)")?.addEventListener("click", () => {
       registrarCliqueNovidadeCidade("abrir-destino", item);

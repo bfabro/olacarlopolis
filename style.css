@@ -19161,6 +19161,21 @@ body.vaga-modal-open {
   --novidade-color: #f97316;
 }
 
+.novidade-feed-card.tipo-grupo-whatsapp,
+.novidade-preview-modal.tipo-grupo-whatsapp {
+  --novidade-color: #16a34a;
+}
+
+.novidade-badge.grupo-whatsapp {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.novidade-feed-card.tipo-grupo-whatsapp .novidade-feed-img {
+  background: #ecfdf3;
+  color: #16a34a;
+}
+
 .novidade-feed-card.tipo-estabelecimento,
 .novidade-preview-modal.tipo-estabelecimento {
   --novidade-color: #0f5eea;
