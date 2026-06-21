@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=310">
+  <link rel="stylesheet" href="painel.css?v=311">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -84,7 +84,8 @@
         </section>
         <section class="nav-admin-group" data-master="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Sistema</span>
-        <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
+          <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
+          <button data-view="novidadesConfig" data-master="true"><i class="fa-solid fa-bell"></i> Novidades do site</button>
           <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
         </section>
@@ -1308,10 +1309,27 @@
           <div id="homeBannerImagesList" class="home-banner-admin-grid"></div>
         </section>
       </section>
+
+      <section id="novidadesConfigView" class="panel-view hidden">
+        <section class="panel-card">
+          <div class="section-head">
+            <div>
+              <h2>Novidades da tela principal</h2>
+              <p>Escolha quais cadastros e atualizações podem aparecer como novidade no site público.</p>
+            </div>
+          </div>
+          <form id="novidadesConfigForm">
+            <div id="novidadesConfigOptions" class="novidades-config-grid"></div>
+            <div class="form-actions">
+              <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar configuração</button>
+            </div>
+          </form>
+        </section>
+      </section>
     </section>
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=310"></script>
+  <script type="module" src="painel.js?v=311"></script>
 </body>
 </html>

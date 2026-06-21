@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 304,
-  label: "v310",
+  numero: 305,
+  label: "v311",
   data: "2026-06-20",
-  nota: "Boletos Pix em A4 com ate tres por pagina, geracao por meses e logo configuravel."
+  nota: "Controle do Admin Master sobre os temas exibidos como novidades no site publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -66,6 +66,7 @@ let state = {
   categorias: [],
   pagamentoSistema: {},
   paginaInicialSite: {},
+  novidadesConfig: {},
   metricas: {},
   auditLogs: [],
   reportSection: "analytics",
@@ -101,6 +102,27 @@ let state = {
 };
 
 const AUDIT_IGNORED_ROOTS = new Set(["auditLogs", "novidades"]);
+const NOVIDADES_TOPICS = {
+  novoCliente: ["Novo cliente", "Cadastro de um novo comércio, serviço ou instituição."],
+  nomeCliente: ["Nome do cliente", "Alteração do nome comercial."],
+  endereco: ["Endereço", "Alteração do endereço do cliente."],
+  telefone: ["Telefone / WhatsApp", "Alteração dos contatos do cliente."],
+  horario: ["Horário de atendimento", "Alteração de horários ou atendimento 24 horas."],
+  imagens: ["Imagens", "Novas fotos adicionadas ao cadastro."],
+  promocao: ["Promoções", "Nova promoção ou atualização de oferta."],
+  imovel: ["Imóveis", "Novo imóvel ou atualização do cadastro."],
+  nomeImovel: ["Nome do imóvel", "Alteração do título ou identificação do imóvel."],
+  automovel: ["Automóveis", "Novo veículo ou atualização do cadastro."],
+  preco: ["Preços", "Redução ou atualização de preço em promoções, imóveis e veículos."],
+  vaga: ["Vagas de trabalho", "Nova vaga ou atualização de oportunidade."],
+  evento: ["Eventos", "Novo evento ou atualização dos dados."],
+  grupoWhatsapp: ["Grupos de WhatsApp", "Novo grupo ou atualização do grupo."],
+  noticia: ["Notícias", "Notícias cadastradas ou integradas futuramente."],
+  cardapio: ["Cardápio", "Alteração ou inclusão de cardápio."],
+  redesSociais: ["Redes sociais e site", "Alteração de Instagram, Facebook, TikTok ou site."],
+  destaque: ["Destaque comercial", "Cliente incluído ou atualizado nos destaques."],
+  categoria: ["Categoria", "Mudança de categoria do cliente."]
+};
 const AUDIT_CATEGORY_LABELS = {
   clientes: "Clientes",
   clientesFinanceiro: "Financeiro",
@@ -240,6 +262,7 @@ const views = {
   relatorios: $("relatoriosView"),
   pagamentoSistema: $("pagamentoSistemaView"),
   paginaInicialSite: $("paginaInicialSiteView"),
+  novidadesConfig: $("novidadesConfigView"),
   storiesComerciais: $("storiesComerciaisView"),
   usuarios: $("usuariosView"),
   minhaEmpresa: $("minhaEmpresaView"),
@@ -260,6 +283,7 @@ const viewCopy = {
   pagamentoSistema: ["Pagamento", "Configure a chave Pix usada nas faturas."],
   storiesComerciais: ["Stories comerciais", "Crie artes premium para clientes e conquiste novos anunciantes."],
   paginaInicialSite: ["Página Inicial Site", "Configure o banner principal de acessos rapidos."],
+  novidadesConfig: ["Novidades do site", "Defina quais atualizações aparecem na tela principal pública."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
   minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."],
   faturas: ["Faturas", "Pix mensal, QR Code e comprovantes."]
@@ -443,6 +467,7 @@ function canAccessView(viewName) {
   if (canManageClients()) {
     if (viewName === "pagamentoSistema") return isMaster();
     if (viewName === "paginaInicialSite") return isMaster();
+    if (viewName === "novidadesConfig") return isMaster();
     if (viewName === "storiesComerciais") return isMaster();
     return true;
   }
@@ -1660,6 +1685,7 @@ async function loadAllData(onProgress = null) {
     gruposWhatsappSnap,
     pagamentoSnap,
     paginaInicialSnap,
+    novidadesConfigSnap,
     cliquesBotoesSnap,
     cliquesMenuSnap,
     acessosSnap,
@@ -1686,6 +1712,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("conteudosInformativos/gruposWhatsapp"),
     getPanelSnapshot("configuracoes/pagamento"),
     getPanelSnapshot("configuracoes/paginaInicial"),
+    getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("cliquesPorBotao", { enabled: canManage }),
     getPanelSnapshot("cliquesMenuLateral", { enabled: canManage }),
     getPanelSnapshot("acessosPorDia", { enabled: canManage }),
@@ -1748,6 +1775,7 @@ async function loadAllData(onProgress = null) {
   state.gruposWhatsapp.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
   state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
+  state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   progress(72, "Preparando informações do painel...");
   state.metricas = {
     cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
@@ -1853,6 +1881,7 @@ async function loadAllData(onProgress = null) {
   }
   renderPaymentSettings();
   renderHomePageSettings();
+  renderNovidadesConfig();
   renderStoriesComerciaisView();
   renderClientInvoices();
   renderClientBillingAlert();
@@ -2117,6 +2146,7 @@ function switchView(name) {
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "paginaInicialSite") renderHomePageSettings();
+  if (target === "novidadesConfig") renderNovidadesConfig();
   if (target === "storiesComerciais") renderStoriesComerciaisView();
   if (target === "relatorios") renderReports();
   if (target === "promocoesClientes") renderStaffPromocoesView();
@@ -2441,8 +2471,49 @@ function acaoNovidadeAdmin(tipo, isNew, payload = {}, original = {}) {
   return isNew ? "Cadastro novo" : "Cadastro atualizado";
 }
 
+function novidadeTopicFromPayload(payload = {}) {
+  if (payload.novidadeTema && NOVIDADES_TOPICS[payload.novidadeTema]) return payload.novidadeTema;
+  const tipo = normalizeName(payload.destinoTipo || payload.tipo || "");
+  const acao = normalizeName(`${payload.acao || ""} ${payload.titulo || ""}`);
+  if (acao.includes("preco")) return "preco";
+  if (tipo.includes("promoc")) return "promocao";
+  if (tipo.includes("imovel")) return "imovel";
+  if (tipo.includes("veiculo") || tipo.includes("automovel")) return "automovel";
+  if (tipo.includes("vaga")) return "vaga";
+  if (tipo.includes("evento")) return "evento";
+  if (tipo.includes("grupo") || tipo.includes("whatsapp")) return "grupoWhatsapp";
+  if (tipo.includes("noticia")) return "noticia";
+  if (tipo.includes("endereco")) return "endereco";
+  if (tipo.includes("telefone") || tipo.includes("contato")) return "telefone";
+  if (tipo.includes("horario")) return "horario";
+  if (tipo.includes("imagem") || acao.includes("foto")) return "imagens";
+  if (tipo.includes("cardapio")) return "cardapio";
+  if (tipo.includes("rede")) return "redesSociais";
+  if (tipo.includes("destaque")) return "destaque";
+  if (tipo.includes("categoria")) return "categoria";
+  return "novoCliente";
+}
+
+function novidadeTopicEnabled(topic) {
+  const value = state.novidadesConfig?.temas?.[topic];
+  return value !== false;
+}
+
+function renderNovidadesConfig() {
+  const box = $("novidadesConfigOptions");
+  if (!box) return;
+  box.innerHTML = Object.entries(NOVIDADES_TOPICS).map(([key, [label, description]]) => `
+    <label class="novidades-config-option">
+      <input type="checkbox" value="${escapeAttr(key)}" ${novidadeTopicEnabled(key) ? "checked" : ""}>
+      <span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(description)}</small></span>
+    </label>
+  `).join("");
+}
+
 async function registrarNovidadeAdmin(payload = {}) {
   try {
+    const novidadeTema = novidadeTopicFromPayload(payload);
+    if (!novidadeTopicEnabled(novidadeTema)) return;
     const tipo = payload.tipo || payload.destinoTipo || "estabelecimento";
     const destinoId = payload.destinoId || payload.itemId || payload.estabelecimentoId || payload.clienteId || "";
     await removerNovidadesPorDestino(tipo, destinoId, payload.itemId || payload.destinoCardId || "");
@@ -2462,6 +2533,7 @@ async function registrarNovidadeAdmin(payload = {}) {
       destinoId,
       itemId: payload.itemId || "",
       destinoCardId: payload.destinoCardId || "",
+      novidadeTema,
       dataCriacao: serverTimestamp(),
       criadoPor: state.user?.uid || "",
       origem: "painel"
@@ -2469,6 +2541,43 @@ async function registrarNovidadeAdmin(payload = {}) {
   } catch (error) {
     console.warn("Nao foi possivel registrar novidade.", error);
   }
+}
+
+async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, original = null) {
+  const base = {
+    estabelecimento: payload.nome || original?.nome || clientId,
+    tituloConteudo: payload.nome || original?.nome || clientId,
+    imagem: imagemPrincipalNovidade(payload) || imagemPrincipalNovidade(original || {}),
+    imagens: normalizeImageItems(payload.imagens).map((item) => item.url || item).filter(Boolean),
+    categoria: payload.categoria || original?.categoria || "",
+    destinoTipo: "estabelecimento",
+    destinoId: payload.nomeNormalizado || normalizeName(payload.nome || original?.nome || clientId)
+  };
+  if (!original) {
+    await registrarNovidadeAdmin({ ...base, tipo: "estabelecimento", novidadeTema: "novoCliente", itemId: "novoCliente", titulo: "Cadastro novo", acao: "Cadastro novo", descricao: "Cadastro novo" });
+    return;
+  }
+
+  const updates = [];
+  const add = (tema, tipo, acao) => updates.push({ ...base, tipo, destinoTipo: tipo, novidadeTema: tema, itemId: tema, titulo: acao, acao, descricao: acao });
+  if (String(original.nome || "") !== String(payload.nome || "")) add("nomeCliente", "cliente-nome", "Nome do cliente atualizado");
+  if (String(original.endereco || "") !== String(payload.endereco || "")) add("endereco", "cliente-endereco", "Endereço atualizado");
+  const oldPhones = JSON.stringify(original.contatosDetalhados || original.contatos || [original.contato, original.whatsapp, original.contato2, original.contato3].filter(Boolean));
+  const newPhones = JSON.stringify(payload.contatosDetalhados || payload.contatos || []);
+  if (oldPhones !== newPhones) add("telefone", "cliente-telefone", "Telefone atualizado");
+  const oldHours = JSON.stringify({ horario: original.horario || "", horarios: original.horarios || {}, funcionamento24Horas: Boolean(original.funcionamento24Horas) });
+  const newHours = JSON.stringify({ horario: payload.horario || "", horarios: payload.horarios || {}, funcionamento24Horas: Boolean(payload.funcionamento24Horas) });
+  if (oldHours !== newHours) add("horario", "cliente-horario", "Horário de atendimento atualizado");
+  if (normalizeImageItems(payload.imagens).length > normalizeImageItems(original.imagens).length) add("imagens", "cliente-imagens", "Novas fotos adicionadas");
+  if (String(original.categoria || "") !== String(payload.categoria || "")) add("categoria", "cliente-categoria", "Categoria atualizada");
+  const oldSocial = JSON.stringify([original.instagram, original.facebook, original.tiktok, original.site]);
+  const newSocial = JSON.stringify([payload.instagram, payload.facebook, payload.tiktok, payload.site]);
+  if (oldSocial !== newSocial) add("redesSociais", "cliente-redes", "Redes sociais atualizadas");
+  const oldMenu = JSON.stringify([original.cardapioAtivo, original.cardapioLink, original.menuImages]);
+  const newMenu = JSON.stringify([payload.cardapioAtivo, payload.cardapioLink, payload.menuImages]);
+  if (oldMenu !== newMenu) add("cardapio", "cliente-cardapio", "Cardápio atualizado");
+  if (Boolean(original.destaqueSemanal) !== Boolean(payload.destaqueSemanal) || String(original.destaqueFim || "") !== String(payload.destaqueFim || "")) add("destaque", "cliente-destaque", "Destaque comercial atualizado");
+  await Promise.all(updates.map(registrarNovidadeAdmin));
 }
 
 async function removerNovidadesPorDestino(tipo, destinoId, itemId = "") {
@@ -10406,6 +10515,7 @@ function renderClientOnlyEditor() {
     }
     payload.aliases = buildClientPublicAliases(client.id, { ...client, ...payload }, client, false);
     await update(ref(db, `clientes/${client.id}`), payload);
+    await registrarAtualizacoesClienteNovidade(client.id, { ...client, ...payload }, client);
     showToast("Dados salvos.");
     await loadAllData();
     renderClientOnlyEditor();
@@ -11414,6 +11524,22 @@ function bindEvents() {
     renderHomePageSettings();
     showToast("Pagina inicial salva.");
   });
+  $("novidadesConfigForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!isMaster()) return;
+    const temas = {};
+    $("novidadesConfigOptions")?.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+      temas[input.value] = input.checked;
+    });
+    const payload = {
+      temas,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user?.uid || ""
+    };
+    await update(ref(db, "configuracoes/novidades"), payload);
+    state.novidadesConfig = payload;
+    showToast("Configuração de novidades salva.");
+  });
   $("homeBannerImagesUpload")?.addEventListener("change", async (event) => {
     if (!isMaster()) {
       showToast("Somente master pode enviar fotos do banner.");
@@ -11502,9 +11628,6 @@ function bindEvents() {
     const formId = rawPayload.id;
     const id = getCanonicalClientId(rawPayload.categoria, rawPayload.nome);
     const sourceClient = state.clientes.find((client) => client.id === state.selectedClientId || client.id === formId || client.id === id) || null;
-    const isNewClient = !state.selectedClientId;
-    const oldImagesCount = normalizeImageItems(sourceClient?.imagens).length;
-    const newImagesCount = normalizeImageItems(rawPayload.imagens).length;
     rawPayload.aliases = buildClientPublicAliases(id, rawPayload, sourceClient);
     addAliasKey(rawPayload.aliases, formId);
     addAliasKey(rawPayload.aliases, state.selectedClientId);
@@ -11557,22 +11680,7 @@ function bindEvents() {
       };
     }
     await update(ref(db), updates);
-    if (isNewClient || newImagesCount > oldImagesCount) {
-      const acao = isNewClient ? "Cadastro novo" : "Novas fotos adicionadas";
-      await registrarNovidadeAdmin({
-      tipo: "estabelecimento",
-      titulo: acao,
-      acao,
-      descricao: acao,
-      tituloConteudo: payload.nome,
-      estabelecimento: payload.nome,
-      imagem: imagemPrincipalNovidade(payload),
-      imagens: normalizeImageItems(payload.imagens).map((item) => item.url || item).filter(Boolean),
-      categoria: payload.categoria,
-      destinoTipo: "estabelecimento",
-      destinoId: payload.nomeNormalizado || id
-      });
-    }
+    await registrarAtualizacoesClienteNovidade(id, payload, sourceClient);
     [formId, state.selectedClientId].filter((oldId) => oldId && oldId !== id).forEach((oldId) => {
       state.clientes = state.clientes.filter((client) => client.id !== oldId);
       delete state.clientesFinanceiro[oldId];
@@ -11735,8 +11843,12 @@ function bindEvents() {
     }
     await update(ref(db), updates);
     const acao = acaoNovidadeAdmin("imovel", isNewImovel, payload, originalImovelNovidade);
+    const imovelTema = !isNewImovel && String(originalImovelNovidade.titulo || "") !== String(payload.titulo || "")
+      ? "nomeImovel"
+      : (normalizeName(acao).includes("preco") ? "preco" : "imovel");
     await registrarNovidadeAdmin({
       tipo: "imovel",
+      novidadeTema: imovelTema,
       titulo: acao,
       acao,
       descricao: acao,
@@ -11792,6 +11904,7 @@ function bindEvents() {
     const acao = acaoNovidadeAdmin("veiculo", isNewAutomovel, payload, originalAutomovelNovidade);
     await registrarNovidadeAdmin({
       tipo: "veiculo",
+      novidadeTema: normalizeName(acao).includes("preco") ? "preco" : "automovel",
       titulo: acao,
       acao,
       descricao: acao,

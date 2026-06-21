@@ -290,6 +290,41 @@ button {
   min-width: 150px;
 }
 
+.novidades-config-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.novidades-config-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.novidades-config-option input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.novidades-config-option strong,
+.novidades-config-option small {
+  display: block;
+}
+
+.novidades-config-option small {
+  margin-top: 4px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
 label {
   display: grid;
   gap: 6px;
@@ -2888,6 +2923,10 @@ button[type="submit"]:hover,
   }
 
   .payment-invoice-logo {
+    grid-template-columns: 1fr;
+  }
+
+  .novidades-config-grid {
     grid-template-columns: 1fr;
   }
 

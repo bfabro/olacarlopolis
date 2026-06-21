@@ -2608,6 +2608,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (tipo.includes("promoc")) return { key: "promocoes", label: "Promoção", icon: "fa-tag" };
     if (novidadeEhEvento(item)) return { key: "servicos", label: "Evento", icon: "fa-calendar-days" };
     if (texto.includes("destaque")) return { key: "comercios", label: "Destaque", icon: "fa-star" };
+    if (tipo.includes("cliente") || tipo.includes("endereco") || tipo.includes("telefone") || tipo.includes("horario") || tipo.includes("cardapio") || tipo.includes("rede")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
     if (tipo.includes("estabelecimento")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
     return { key: "servicos", label: "Serviço", icon: "fa-bell" };
   }
@@ -2723,16 +2724,19 @@ document.addEventListener("DOMContentLoaded", function () {
     novidadesCidadePromise = (async () => {
       const dbAdmin = await esperarFirebaseDatabase();
       let diasVisiveis = 5;
+      let temasNovidades = {};
       const registros = [];
 
       if (dbAdmin) {
         try {
-          const [novidadesSnap, configSnap] = await Promise.all([
+          const [novidadesSnap, configSnap, temasSnap] = await Promise.all([
             dbAdmin.ref("novidades").once("value"),
-            dbAdmin.ref("configuracoes/pagamento/diasNovidadesVisiveis").once("value")
+            dbAdmin.ref("configuracoes/pagamento/diasNovidadesVisiveis").once("value"),
+            dbAdmin.ref("configuracoes/novidades/temas").once("value")
           ]);
           const configDias = Number(configSnap.val());
           if (Number.isFinite(configDias) && configDias > 0) diasVisiveis = configDias;
+          temasNovidades = temasSnap.val() || {};
           novidadesSnap.forEach((child) => {
             registros.push(montarNovidadeRecord({ id: child.key, ...(child.val() || {}) }));
             return false;
@@ -2744,6 +2748,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const agora = Date.now();
       const limiteMs = diasVisiveis * 86400000;
+      const temaNovidade = (item = {}) => {
+        if (item.novidadeTema || item.raw?.novidadeTema) return item.novidadeTema || item.raw.novidadeTema;
+        const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+        const acao = normalizeName(`${item.acao || ""} ${item.titulo || ""}`);
+        if (acao.includes("preco")) return "preco";
+        if (tipo.includes("promoc")) return "promocao";
+        if (tipo.includes("imovel")) return "imovel";
+        if (tipo.includes("veiculo") || tipo.includes("automovel")) return "automovel";
+        if (tipo.includes("vaga")) return "vaga";
+        if (tipo.includes("evento")) return "evento";
+        if (tipo.includes("grupo") || tipo.includes("whatsapp")) return "grupoWhatsapp";
+        if (tipo.includes("noticia")) return "noticia";
+        if (tipo.includes("endereco")) return "endereco";
+        if (tipo.includes("telefone") || tipo.includes("contato")) return "telefone";
+        if (tipo.includes("horario")) return "horario";
+        if (tipo.includes("imagem") || acao.includes("foto")) return "imagens";
+        if (tipo.includes("cardapio")) return "cardapio";
+        if (tipo.includes("rede")) return "redesSociais";
+        if (tipo.includes("destaque")) return "destaque";
+        if (tipo.includes("categoria")) return "categoria";
+        return "novoCliente";
+      };
+      const temaAtivo = (item) => temasNovidades[temaNovidade(item)] !== false;
       const geradas = [];
       const livePromoCards = new Set();
       const livePromoClients = new Set();
@@ -2929,6 +2956,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = item.dataMs;
         if (!data) return;
         if (agora - data > limiteMs) return;
+        if (!temaAtivo(item)) return;
         if (!novidadeDestinoExiste(item)) return;
         const key = chaveAgrupamentoNovidade(item);
         const atual = mapa.get(key);
@@ -3302,7 +3330,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return carregarEstabelecimentoPeloHash();
       }
     }
-    if (tipo.includes("estabelecimento")) {
+    if (tipo.includes("estabelecimento") || tipo.includes("cliente") || tipo.includes("endereco") || tipo.includes("telefone") || tipo.includes("horario") || tipo.includes("cardapio") || tipo.includes("rede") || tipo.includes("destaque") || tipo.includes("categoria") || tipo.includes("imagem")) {
       const id = normalizeName(item.destinoId || item.descricao || item.estabelecimento || "");
       if (id) {
         location.hash = `#${id}`;
