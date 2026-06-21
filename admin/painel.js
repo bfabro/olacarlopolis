@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 302,
-  label: "v308",
+  numero: 303,
+  label: "v309",
   data: "2026-06-20",
-  nota: "Usuario de sistema vinculado exibido na lista de clientes dos administradores."
+  nota: "Tela de carregamento com progresso apos o login, liberando a navegacao somente quando os dados estiverem prontos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1548,6 +1548,28 @@ function setBusy(button, busy, text) {
   if (!busy && button.dataset.originalText) button.innerHTML = button.dataset.originalText;
 }
 
+function setPanelLoadingProgress(percent = 0, message = "") {
+  const value = Math.max(0, Math.min(100, Math.round(Number(percent) || 0)));
+  const bar = $("panelLoadingBar");
+  const label = $("panelLoadingPercent");
+  const track = document.querySelector(".panel-loading-track");
+  if (bar) bar.style.width = `${value}%`;
+  if (label) label.textContent = `${value}%`;
+  if (track) track.setAttribute("aria-valuenow", String(value));
+  if (message && $("panelLoadingMessage")) $("panelLoadingMessage").textContent = message;
+}
+
+function showPanelLoading(message = "Validando seu acesso...") {
+  $("loginView")?.classList.add("hidden");
+  $("appView")?.classList.add("hidden");
+  $("panelLoadingView")?.classList.remove("hidden");
+  setPanelLoadingProgress(5, message);
+}
+
+function hidePanelLoading() {
+  $("panelLoadingView")?.classList.add("hidden");
+}
+
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
   const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
@@ -1618,7 +1640,11 @@ async function saveUserProfile(profile) {
   await set(ref(db, `usuarios/${emailKey(payload.email)}`), payload);
 }
 
-async function loadAllData() {
+async function loadAllData(onProgress = null) {
+  const progress = (percent, message) => {
+    if (typeof onProgress === "function") onProgress(percent, message);
+  };
+  progress(35, "Buscando dados do sistema...");
   const canManage = canManageClients();
   const financeClientId = canManage ? "" : currentClientId();
   const financePath = financeClientId ? `clientesFinanceiro/${financeClientId}` : "clientesFinanceiro";
@@ -1676,6 +1702,7 @@ async function loadAllData() {
     getPanelSnapshot("usoPWA", { enabled: canManage })
   ]);
 
+  progress(58, "Organizando clientes e acessos...");
   state.clientesFinanceiro = clientFinanceMapFromSnapshot(clientesFinanceiroSnap, financeClientId);
   applyClientsSnapshot(clientesSnap, clientesFinanceiroSnap, financeClientId);
 
@@ -1721,6 +1748,7 @@ async function loadAllData() {
   state.gruposWhatsapp.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
   state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
+  progress(72, "Preparando informações do painel...");
   state.metricas = {
     cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
     cliquesMenu: cliquesMenuSnap.exists() ? cliquesMenuSnap.val() : {},
@@ -1797,6 +1825,7 @@ async function loadAllData() {
     sortCategoriesInState();
   }
 
+  progress(86, "Montando telas e indicadores...");
   renderStats();
   renderClientsList();
   renderUsersList();
@@ -1827,6 +1856,7 @@ async function loadAllData() {
   renderStoriesComerciaisView();
   renderClientInvoices();
   renderClientBillingAlert();
+  progress(96, "Finalizando a navegação...");
   loadAuditLogs().then(() => {
     const reportsVisible = !$("relatoriosView")?.classList.contains("hidden");
     if (reportsVisible && state.reportSection === "actions") renderReports();
@@ -11683,29 +11713,44 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) {
     stopAdminIdleTimer();
     state.profile = null;
+    hidePanelLoading();
     $("loginView").classList.remove("hidden");
     $("appView").classList.add("hidden");
     renderClientBillingAlert();
     return;
   }
 
-  const profile = await loadProfile(user);
-  if (!profile || profile.status === "inativo") {
-    await signOut(auth);
-    $("loginMessage").textContent = "Usuario sem perfil administrativo ativo.";
-    return;
-  }
+  showPanelLoading("Validando seu perfil de acesso...");
+  try {
+    setPanelLoadingProgress(15, "Validando seu perfil de acesso...");
+    const profile = await loadProfile(user);
+    if (!profile || profile.status === "inativo") {
+      await signOut(auth);
+      $("loginMessage").textContent = "Usuario sem perfil administrativo ativo.";
+      return;
+    }
 
-  state.profile = profile;
-  await registrarLogAuditoria("Login", "Acesso", "Login realizado no painel");
-  resetAdminIdleTimer();
-  const initialView = initialViewForProfile();
-  prepareInitialView(initialView);
-  $("loginView").classList.add("hidden");
-  $("appView").classList.remove("hidden");
-  updateChrome();
-  await loadAllData();
-  renderClientBillingAlert();
-  if (!canManageClients()) renderClientOnlyEditor();
-  switchView(initialView);
+    state.profile = profile;
+    setPanelLoadingProgress(25, "Acesso confirmado. Iniciando o painel...");
+    await registrarLogAuditoria("Login", "Acesso", "Login realizado no painel");
+    resetAdminIdleTimer();
+    const initialView = initialViewForProfile();
+    prepareInitialView(initialView);
+    updateChrome();
+    await loadAllData(setPanelLoadingProgress);
+    renderClientBillingAlert();
+    if (!canManageClients()) renderClientOnlyEditor();
+    switchView(initialView);
+    setPanelLoadingProgress(100, "Tudo pronto!");
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    $("appView").classList.remove("hidden");
+    hidePanelLoading();
+  } catch (error) {
+    console.error("Falha ao carregar o painel.", error);
+    hidePanelLoading();
+    $("appView").classList.add("hidden");
+    $("loginView").classList.remove("hidden");
+    $("loginMessage").textContent = "Nao foi possivel carregar os dados do painel. Tente entrar novamente.";
+    await signOut(auth).catch(() => {});
+  }
 });

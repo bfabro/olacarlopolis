@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=308">
+  <link rel="stylesheet" href="painel.css?v=309">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -29,6 +29,20 @@
         <span id="loginVersion" class="version-pill login-version-pill">Versao -</span>
         <div id="loginMessage" class="form-message"></div>
       </form>
+    </section>
+  </main>
+
+  <main id="panelLoadingView" class="panel-loading-view hidden" aria-live="polite">
+    <section class="panel-loading-card">
+      <img src="../images/img_padrao_site/logo_1.png" alt="Ola Carlopolis">
+      <div class="panel-loading-spinner" aria-hidden="true"></div>
+      <h1>Preparando seu painel</h1>
+      <p id="panelLoadingMessage">Validando seu acesso...</p>
+      <div class="panel-loading-track" role="progressbar" aria-label="Carregamento do painel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="panelLoadingBar"></span>
+      </div>
+      <strong id="panelLoadingPercent">0%</strong>
+      <small>Aguarde até que os dados estejam prontos para navegação.</small>
     </section>
   </main>
 
@@ -1287,6 +1301,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=308"></script>
+  <script type="module" src="painel.js?v=309"></script>
 </body>
 </html>
