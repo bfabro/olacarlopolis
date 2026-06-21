@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 301,
-  label: "v307",
+  numero: 302,
+  label: "v308",
   data: "2026-06-20",
-  nota: "Data de cadastro automatica para novos clientes, preservada nas edicoes."
+  nota: "Usuario de sistema vinculado exibido na lista de clientes dos administradores."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3700,12 +3700,18 @@ function renderClientsList() {
     return;
   }
 
-  box.innerHTML = list.map((client) => `
+  box.innerHTML = list.map((client) => {
+    const systemUsers = state.usuarios
+      .filter((user) => user.clienteId === client.id)
+      .map((user) => user.email || user.uid)
+      .filter(Boolean);
+    return `
     <article class="client-row">
       <img src="${escapeAttr(displayImageUrl(client.imagem || imageUrl(client.imagens && client.imagens[0])) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
       <div class="client-main">
         <div class="list-title">${escapeHtml(client.nome || client.id)}</div>
         <div class="list-meta">${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || "Sem telefone")}</div>
+        ${systemUsers.length ? `<div class="list-meta"><i class="fa-solid fa-user"></i> Usuário do sistema: ${systemUsers.map(escapeHtml).join(", ")}</div>` : ""}
         <div class="client-tags">
           <span class="badge ${escapeAttr(client.status || "pendente")}">${statusLabel(client.status)}</span>
           <span class="badge ${escapeAttr(effectivePaymentStatus(client))}">${paymentLabel(effectivePaymentStatus(client))}</span>
@@ -3722,7 +3728,8 @@ function renderClientsList() {
         <button type="button" class="danger-mini" data-delete-client-list="${escapeAttr(client.id)}">Excluir</button>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 
   box.querySelectorAll("[data-edit-client]").forEach((btn) => {
     btn.addEventListener("click", () => {
