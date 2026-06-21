@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 305,
-  label: "v311",
+  numero: 306,
+  label: "v312",
   data: "2026-06-20",
-  nota: "Controle do Admin Master sobre os temas exibidos como novidades no site publico."
+  nota: "Boletos com fontes ampliadas, margem para grampear, telefone e detalhamento do destaque mensal."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4342,6 +4342,17 @@ function destaqueIncludedInInvoice(client) {
   return destaqueIsActive(client) && destaqueBillingForClient(client) === "mensalidade";
 }
 
+function destaqueIncludedInInvoiceMonth(client, monthKey = currentMonthKey()) {
+  if (!client?.destaqueSemanal || destaqueBillingForClient(client) !== "mensalidade") return false;
+  const [year, month] = String(monthKey || currentMonthKey()).split("-").map(Number);
+  if (!year || !month) return destaqueIncludedInInvoice(client);
+  const monthStart = dateKeyFromDate(new Date(year, month - 1, 1));
+  const monthEnd = dateKeyFromDate(new Date(year, month, 0));
+  const start = client.destaqueInicio || currentMonthKey() + "-01";
+  const end = destaqueEndDateForClient(client) || start;
+  return start <= monthEnd && end >= monthStart;
+}
+
 function destaqueEndDateForClient(client) {
   if (client?.destaqueFim) return client.destaqueFim;
   if (!client?.destaqueInicio) return "";
@@ -4440,7 +4451,7 @@ function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = nul
   const savedDestaque = options.ignoreSaved ? 0 : Number(saved.valorDestaque || 0);
   const savedTotal = options.ignoreSaved ? 0 : Number(saved.valorTotal || 0);
   const valorPlano = savedPlano > 0 ? savedPlano : valorFinalPlano(client);
-  const valorDestaque = savedDestaque > 0 ? savedDestaque : (destaqueIncludedInInvoice(client) ? destaqueValueForClient(client) : 0);
+  const valorDestaque = savedDestaque > 0 ? savedDestaque : (destaqueIncludedInInvoiceMonth(client, mes) ? destaqueValueForClient(client) : 0);
   const valorTotal = Number(totalOverride ?? (savedTotal > 0 ? savedTotal : valorPlano + valorDestaque));
   const txid = `OC${normalizeName(client.nome || client.id).slice(0, 8).toUpperCase()}${String(mes).replace(/\W/g, "").slice(0, 12)}`;
   const pixCode = gerarPixCopiaCola({
@@ -4484,6 +4495,7 @@ function boletoLogoUrl(paymentConfig = {}) {
 
 function printableBoletoHtml(client, invoice, paymentConfig = {}) {
   const contact = client.whatsapp || client.contato || client.telefone || "Não informado";
+  const olaPhone = formatPhoneMask(paymentConfig.whatsappCobranca || "43991766639") || "Não informado";
   return `
     <article class="boleto">
       <header>
@@ -4502,7 +4514,11 @@ function printableBoletoHtml(client, invoice, paymentConfig = {}) {
           <div><span>Vencimento</span><strong>${escapeHtml(formatDateBR(invoice.dueDate))}</strong></div>
           <div><span>Plano</span><strong>${escapeHtml(planLabel(client.tipoPlano || "mensal"))}</strong></div>
           <div><span>Recebedor</span><strong>${escapeHtml(paymentConfig.pixNome || "Ola Carlopolis")}</strong></div>
+          <div><span>Telefone Olá Carlópolis</span><strong>${escapeHtml(olaPhone)}</strong></div>
+          <div><span>Mensalidade</span><strong>${escapeHtml(moneyBR(invoice.valorPlano))}</strong></div>
+          ${invoice.valorDestaque > 0 ? `<div class="destaque-value"><span>Adicional de destaque</span><strong>${escapeHtml(moneyBR(invoice.valorDestaque))}</strong></div>` : ""}
           <div class="wide"><span>Chave Pix</span><strong>${escapeHtml(paymentConfig.pixChave || "Não configurada")}</strong></div>
+          ${invoice.valorDestaque > 0 ? `<div class="wide destaque-description"><span>Descrição do adicional</span><strong>Destaque comercial contratado durante ${escapeHtml(monthLabel(invoice.mes))}, somado ao valor da mensalidade.</strong></div>` : ""}
           ${paymentConfig.observacaoFatura ? `<div class="wide note"><span>Observação</span><strong>${escapeHtml(paymentConfig.observacaoFatura)}</strong></div>` : ""}
         </section>
         <section class="boleto-qr">
@@ -4552,15 +4568,16 @@ function openPrintableBoletos(client, invoices = []) {
       *{box-sizing:border-box} body{margin:0;background:#e5e7eb;color:#172033;font-family:Arial,sans-serif}
       .print-actions{position:sticky;top:0;z-index:5;display:flex;justify-content:center;gap:10px;padding:10px;background:#172033}
       .print-actions button{border:0;border-radius:8px;padding:10px 18px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer}
-      .sheet{width:210mm;min-height:297mm;margin:12px auto;padding:8mm;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:5mm;background:#fff;box-shadow:0 8px 25px #0002;page-break-after:always}
+      .sheet{position:relative;width:210mm;min-height:297mm;margin:12px auto;padding:7mm 7mm 7mm 18mm;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:5mm;background:#fff;box-shadow:0 8px 25px #0002;page-break-after:always}
+      .sheet:before{content:"";position:absolute;left:11mm;top:7mm;bottom:7mm;border-left:1px dashed #cbd5e1}
       .sheet:last-child{page-break-after:auto}
       .boleto{min-height:0;overflow:hidden;border:1.5px solid #334155;border-radius:10px;display:grid;grid-template-rows:auto 1fr auto;background:#fff}
-      .boleto header{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;padding:9px 12px;border-bottom:1px solid #cbd5e1;background:#f8fafc}
-      .boleto header img{width:58px;height:44px;object-fit:contain}.boleto header strong{display:block;font-size:16px}.boleto header span{font-size:11px;color:#64748b}.boleto header b{font-size:19px;color:#0f766e}
-      .boleto-body{display:grid;grid-template-columns:1fr 104px;gap:10px;padding:9px 12px}
-      .boleto-details{display:grid;grid-template-columns:repeat(3,1fr);gap:7px 10px;align-content:start}.boleto-details div{min-width:0}.boleto-details .wide{grid-column:1/-1}.boleto-details span{display:block;font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700}.boleto-details strong{display:block;font-size:11px;overflow-wrap:anywhere}.boleto-details .note strong{font-weight:500}
-      .boleto-qr{display:grid;justify-items:center;align-content:center;border-left:1px dashed #94a3b8;padding-left:10px}.boleto-qr img{width:92px;height:92px}.boleto-qr span{font-size:9px;font-weight:700;margin-top:3px}
-      .boleto footer{display:flex;justify-content:space-between;padding:5px 12px;border-top:1px solid #e2e8f0;color:#64748b;font-size:8px}
+      .boleto header{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:9px 12px;border-bottom:1px solid #cbd5e1;background:#f8fafc}
+      .boleto header img{width:64px;height:48px;object-fit:contain}.boleto header strong{display:block;font-size:18px}.boleto header span{font-size:13px;color:#64748b}.boleto header b{font-size:22px;color:#0f766e}
+      .boleto-body{display:grid;grid-template-columns:1fr 112px;gap:10px;padding:9px 12px}
+      .boleto-details{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;align-content:start}.boleto-details div{min-width:0}.boleto-details .wide{grid-column:1/-1}.boleto-details span{display:block;font-size:10px;text-transform:uppercase;color:#64748b;font-weight:700}.boleto-details strong{display:block;font-size:13px;line-height:1.2;overflow-wrap:anywhere}.boleto-details .note strong,.boleto-details .destaque-description strong{font-size:11px;font-weight:600}.boleto-details .destaque-value strong{color:#b45309}
+      .boleto-qr{display:grid;justify-items:center;align-content:center;border-left:1px dashed #94a3b8;padding-left:10px}.boleto-qr img{width:104px;height:104px}.boleto-qr span{font-size:11px;font-weight:700;margin-top:3px}
+      .boleto footer{display:flex;justify-content:space-between;padding:6px 12px;border-top:1px solid #e2e8f0;color:#64748b;font-size:10px}
       @page{size:A4 portrait;margin:0}
       @media print{body{background:#fff}.print-actions{display:none}.sheet{margin:0;box-shadow:none;width:210mm;height:297mm;min-height:297mm}}
     </style>
@@ -6738,15 +6755,14 @@ function renderFinanceiro() {
         delete payload.status;
       }
       const valorPlanoFatura = valorFinalPlano(nextClient);
-      const valorDestaqueFatura = destaqueIncludedInInvoice(nextClient) ? destaqueValueForClient(nextClient) : 0;
-      const valorTotalFatura = valorPlanoFatura + valorDestaqueFatura;
       payload.mesesEmAberto = mesesEmAberto;
       mesesEmAberto.forEach((mes) => {
+        const valorDestaqueFatura = destaqueIncludedInInvoiceMonth(nextClient, mes) ? destaqueValueForClient(nextClient) : 0;
         payload[`faturas/${mes}/mes`] = mes;
         payload[`faturas/${mes}/status`] = "em_aberto";
         payload[`faturas/${mes}/valorPlano`] = valorPlanoFatura;
         payload[`faturas/${mes}/valorDestaque`] = valorDestaqueFatura;
-        payload[`faturas/${mes}/valorTotal`] = valorTotalFatura;
+        payload[`faturas/${mes}/valorTotal`] = valorPlanoFatura + valorDestaqueFatura;
         payload[`faturas/${mes}/updatedAt`] = Date.now();
       });
       if (!isMaster()) delete payload.valorPlano;
@@ -6819,8 +6835,6 @@ function renderFinanceiro() {
         delete payloadBase.status;
       }
       const valorPlanoFatura = valorFinalPlano(nextClient);
-      const valorDestaqueFatura = destaqueIncludedInInvoice(nextClient) ? destaqueValueForClient(nextClient) : 0;
-      const valorTotalFatura = valorPlanoFatura + valorDestaqueFatura;
       showToast("Enviando comprovante do financeiro...");
       const receipt = await uploadInvoiceReceiptForClient(id, file);
       if (!isMaster()) delete payloadBase.valorPlano;
@@ -6833,11 +6847,12 @@ function renderFinanceiro() {
         editadoNoPainel: true
       };
       mesesEmAberto.forEach((mes) => {
+        const valorDestaqueFatura = destaqueIncludedInInvoiceMonth(nextClient, mes) ? destaqueValueForClient(nextClient) : 0;
         payload[`faturas/${mes}`] = {
           mes,
           valorPlano: valorPlanoFatura,
           valorDestaque: valorDestaqueFatura,
-          valorTotal: valorTotalFatura,
+          valorTotal: valorPlanoFatura + valorDestaqueFatura,
           comprovantePath: receipt.path,
           comprovanteNome: receipt.name,
           comprovanteTipo: receipt.contentType,
