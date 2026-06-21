@@ -19082,6 +19082,19 @@ body.vaga-modal-open {
   white-space: nowrap;
 }
 
+.novidade-feed-info .novidade-change-detail {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.novidade-change-detail i {
+  flex: 0 0 auto;
+}
+
 .novidade-action-tag {
   display: inline-flex;
   align-items: center;
@@ -19287,6 +19300,18 @@ body.vaga-modal-open {
   margin: 0 44px 12px 0;
   color: #64748b;
   font-weight: 700;
+}
+
+.novidade-preview-modal .novidade-preview-change {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 2px 12px;
+  padding: 10px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 .novidade-preview-gallery {

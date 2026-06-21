@@ -2644,6 +2644,26 @@ document.addEventListener("DOMContentLoaded", function () {
     return status.className === "atualizado" ? `${categoria.label} atualizado` : `Novo ${categoria.label.toLowerCase()} cadastrado`;
   }
 
+  function novidadeEhAtualizacaoCliente(item = {}) {
+    const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+    return tipo.includes("cliente") || [
+      "nomeCliente",
+      "endereco",
+      "telefone",
+      "horario",
+      "imagens",
+      "cardapio",
+      "redesSociais",
+      "destaque",
+      "categoria"
+    ].includes(item.raw?.novidadeTema || item.novidadeTema || "");
+  }
+
+  function novidadeResumoAlteracao(item = {}) {
+    const texto = novidadeTextoAcao(item);
+    return texto && normalizeName(texto) !== normalizeName(item.estabelecimento || "") ? texto : "";
+  }
+
   function novidadeEstabelecimentoCard(item) {
     const nome = novidadeNomePrincipal(item);
     const titulo = novidadeTituloCard(item);
@@ -3028,10 +3048,13 @@ document.addEventListener("DOMContentLoaded", function () {
       const status = novidadeStatusInfo(item);
       const titulo = novidadeTituloCard(item);
       const estabelecimento = novidadeEstabelecimentoCard(item);
+      const atualizacaoCliente = novidadeEhAtualizacaoCliente(item);
+      const alteracao = novidadeResumoAlteracao(item);
+      const tituloVisivel = atualizacaoCliente ? (item.estabelecimento || titulo) : titulo;
       return `
         <article class="novidade-feed-card ${tipoClass}" data-novidade-id="${escapePromoHtml(item.id)}">
           <div class="novidade-feed-img">
-            ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(titulo || item.titulo)}" loading="lazy" decoding="async">` : `<i class="fa-solid ${escapePromoHtml(categoria.icon)}"></i>`}
+            ${img ? `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(tituloVisivel || item.titulo)}" loading="lazy" decoding="async">` : `<i class="fa-solid ${escapePromoHtml(categoria.icon)}"></i>`}
           </div>
           <div class="novidade-feed-info">
             <div class="novidade-feed-meta">
@@ -3039,8 +3062,10 @@ document.addEventListener("DOMContentLoaded", function () {
               <span class="novidade-badge status ${escapePromoHtml(status.className)}">${escapePromoHtml(status.label)}</span>
               <time>${escapePromoHtml(tempoDecorridoNovidade(item.dataMs))}</time>
             </div>
-            <strong>${escapePromoHtml(titulo)}</strong>
-            ${estabelecimento ? `<p>${escapePromoHtml(estabelecimento)}</p>` : ""}
+            <strong>${escapePromoHtml(tituloVisivel)}</strong>
+            ${atualizacaoCliente && alteracao
+              ? `<p class="novidade-change-detail"><i class="fa-solid fa-pen-to-square"></i> Alteração: ${escapePromoHtml(alteracao)}</p>`
+              : (estabelecimento ? `<p>${escapePromoHtml(estabelecimento)}</p>` : "")}
           </div>
         </article>
       `;
@@ -3185,6 +3210,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelector(".novidade-preview-overlay")?.remove();
     const imagens = item.imagens?.length ? item.imagens : (item.imagem ? [item.imagem] : []);
     const destino = novidadeTituloCard(item) || novidadeTituloDestino(item) || item.descricao || "";
+    const atualizacaoCliente = novidadeEhAtualizacaoCliente(item);
+    const alteracao = novidadeResumoAlteracao(item);
     const tipoRef = normalizeName(item.destinoTipo || item.tipo || "");
     const mostrarReferencia = tipoRef.includes("imovel") || tipoRef.includes("veiculo") || tipoRef.includes("automovel");
     const codRef = mostrarReferencia ? String(item.codRef || item.codigoReferencia || item.codigo || item.raw?.codRef || item.raw?.codigoReferencia || item.raw?.codigo || "").trim() : "";
@@ -3237,7 +3264,9 @@ document.addEventListener("DOMContentLoaded", function () {
             <i class="fa-solid ${escapePromoHtml(categoria.icon)}"></i>
           </div>
         `}
-        ${destino ? `<h3>${escapePromoHtml(destino)}</h3>` : ""}
+        ${atualizacaoCliente
+          ? `<h3>${escapePromoHtml(item.estabelecimento || destino)}</h3>${alteracao ? `<p class="novidade-preview-change"><i class="fa-solid fa-pen-to-square"></i> Alteração realizada: <strong>${escapePromoHtml(alteracao)}</strong></p>` : ""}`
+          : (destino ? `<h3>${escapePromoHtml(destino)}</h3>` : "")}
         ${destaque ? `<strong class="novidade-preview-price">${escapePromoHtml(destaque)}</strong>` : ""}
         ${infos.length ? `
           <div class="novidade-preview-quick-info">
