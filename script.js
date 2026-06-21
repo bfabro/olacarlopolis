@@ -541,7 +541,11 @@ function getHojeBR() {
 }
 
 function registrarMetricaCliente(idEstabelecimento, grupo, tipo, detalhes = {}) {
-  const clienteKey = normalizeName(idEstabelecimento);
+  const clienteKey = String(idEstabelecimento || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
   if (!clienteKey) return Promise.resolve();
 
   const hoje = getHojeBR();
