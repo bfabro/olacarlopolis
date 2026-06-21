@@ -2544,8 +2544,19 @@ document.addEventListener("DOMContentLoaded", function () {
       const texto = String(valor || "").trim();
       if (texto) valores.push(texto);
     };
-    adicionar(item.imagens || item.images || item.fotos || item.Fotos);
-    if (!temListaImagens) adicionar(novidadeImagem(item));
+    const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+    const isClientUpdate = tipo.includes("cliente")
+      || ["nomeCliente", "endereco", "telefone", "horario", "imagens", "cardapio", "redesSociais", "destaque", "categoria"]
+        .includes(item.novidadeTema || item.raw?.novidadeTema || "");
+    if (isClientUpdate) {
+      const cadastro = encontrarCadastroDonoNovidade(item, item.estabelecimento || item.raw?.estabelecimento || "");
+      adicionar(novidadeImagem(item));
+      adicionar(item.imagens || item.images || item.fotos || item.Fotos);
+      adicionar(cadastro?.novidadesImages || cadastro?.divulgacaoImages || cadastro?.imagens || cadastro?.images);
+    } else {
+      adicionar(item.imagens || item.images || item.fotos || item.Fotos);
+      if (!temListaImagens) adicionar(novidadeImagem(item));
+    }
     return [...new Set(valores)];
   }
 

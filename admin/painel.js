@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 315,
-  label: "v321",
+  numero: 316,
+  label: "v322",
   data: "2026-06-21",
-  nota: "Deteccao precisa das alteracoes do cliente e foto de perfil fixa nas novidades."
+  nota: "Galeria das atualizacoes inicia no perfil e continua com as imagens da vitrine."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2555,11 +2555,15 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
     || effective.logo
     || ""
   ).trim();
+  const showcaseImages = normalizeImageItems(effective.imagens)
+    .map((item) => item.url)
+    .filter(Boolean);
+  const noveltyImages = [...new Set([profileImage, ...showcaseImages].filter(Boolean))];
   const base = {
     estabelecimento: effective.nome || clientId,
     tituloConteudo: effective.nome || clientId,
     imagem: profileImage,
-    imagens: profileImage ? [profileImage] : [],
+    imagens: noveltyImages,
     categoria: effective.categoria || "",
     destinoTipo: "estabelecimento",
     destinoId: effective.nomeNormalizado || normalizeName(effective.nome || clientId)
