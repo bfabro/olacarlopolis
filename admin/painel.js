@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 316,
-  label: "v322",
+  numero: 317,
+  label: "v323",
   data: "2026-06-21",
-  nota: "Galeria das atualizacoes inicia no perfil e continua com as imagens da vitrine."
+  nota: "Contabilizacao de cliques corrigida nos relatorios geral e do cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -979,6 +979,52 @@ async function getPanelSnapshot(path, options = {}) {
   }
 }
 
+function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
+  const metrics = {
+    cliquesBotoes: {},
+    cliquesMenu: {},
+    acessos: {},
+    ondeComerCardapios: {},
+    ondeComerWhats: {},
+    ondeComerFotos: {},
+    promocoes: {},
+    cliquesBotoesDetalhado: {},
+    cliquesOndeComerDetalhado: {},
+    cliquesPromocoesDetalhado: {},
+    cliquesPorMenuDetalhado: {},
+    origemAcessos: {},
+    instalacoesPWA: {},
+    usoPWA: {}
+  };
+  const data = snapshot?.exists() ? snapshot.val() : {};
+
+  Object.entries(data || {}).forEach(([date, day]) => {
+    const botoes = day?.botoes || {};
+    const ondeComer = day?.ondeComer || {};
+    const promocoes = day?.promocoes || {};
+    const detalhes = day?.detalhes || {};
+
+    if (Object.keys(botoes).length) metrics.cliquesBotoes[date] = { [clientKey]: botoes };
+    if (Number(ondeComer.cardapio || 0)) metrics.ondeComerCardapios[date] = { [clientKey]: Number(ondeComer.cardapio) };
+    if (Number(ondeComer.whatsapp || 0)) metrics.ondeComerWhats[date] = { [clientKey]: Number(ondeComer.whatsapp) };
+    if (Number(ondeComer.fotos || 0)) metrics.ondeComerFotos[date] = { [clientKey]: Number(ondeComer.fotos) };
+
+    const totalPromocoes = Object.values(promocoes).reduce((sum, count) => sum + Number(count || 0), 0);
+    if (totalPromocoes) metrics.promocoes[date] = { [clientKey]: totalPromocoes };
+
+    Object.entries(detalhes).forEach(([logId, item]) => {
+      const group = item?.grupo || "botoes";
+      const target = group === "ondeComer"
+        ? "cliquesOndeComerDetalhado"
+        : (group === "promocoes" ? "cliquesPromocoesDetalhado" : "cliquesBotoesDetalhado");
+      if (!metrics[target][date]) metrics[target][date] = { [clientKey]: {} };
+      metrics[target][date][clientKey][logId] = item;
+    });
+  });
+
+  return metrics;
+}
+
 async function loadAuditLogs() {
   state.auditLogs = [];
   if (!isMaster()) return;
@@ -1732,6 +1778,13 @@ async function loadAllData(onProgress = null) {
   progress(58, "Organizando clientes e acessos...");
   state.clientesFinanceiro = clientFinanceMapFromSnapshot(clientesFinanceiroSnap, financeClientId);
   applyClientsSnapshot(clientesSnap, clientesFinanceiroSnap, financeClientId);
+  let scopedClientMetrics = null;
+  if (!canManage) {
+    const client = currentClientRecord();
+    const clientMetricKey = normalizeName(client?.nomeNormalizado || client?.nome || client?.name || client?.id || financeClientId);
+    const scopedMetricsSnap = await getPanelSnapshot(`metricasClientes/${clientMetricKey}`);
+    scopedClientMetrics = scopedClientMetricsFromSnapshot(scopedMetricsSnap, clientMetricKey);
+  }
 
   state.usuarios = [];
   if (usersSnap.exists()) {
@@ -1777,7 +1830,7 @@ async function loadAllData(onProgress = null) {
   state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   progress(72, "Preparando informações do painel...");
-  state.metricas = {
+  state.metricas = scopedClientMetrics || {
     cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
     cliquesMenu: cliquesMenuSnap.exists() ? cliquesMenuSnap.val() : {},
     acessos: acessosSnap.exists() ? acessosSnap.val() : {},

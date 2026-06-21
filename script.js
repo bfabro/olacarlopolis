@@ -530,9 +530,37 @@ function getResponsavelImovel(im) {
 
 
 function getHojeBR() {
-  const agora = new Date();
-  agora.setHours(agora.getHours() - 3); // UTC-3 (Brasília)
-  return agora.toISOString().slice(0, 10);
+  const parts = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function registrarMetricaCliente(idEstabelecimento, grupo, tipo, detalhes = {}) {
+  const clienteKey = normalizeName(idEstabelecimento);
+  if (!clienteKey) return Promise.resolve();
+
+  const hoje = getHojeBR();
+  const db = firebase.database();
+  const contadorPath = tipo
+    ? `metricasClientes/${clienteKey}/${hoje}/${grupo}/${tipo}`
+    : `metricasClientes/${clienteKey}/${hoje}/${grupo}`;
+  const contador = db.ref(contadorPath).transaction((atual) => (atual || 0) + 1);
+  const log = db.ref(`metricasClientes/${clienteKey}/${hoje}/detalhes`).push().set({
+    grupo,
+    tipo: tipo || grupo,
+    ...detalhes,
+    horario: new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" }),
+    dataHoraISO: new Date().toISOString(),
+    ts: firebase.database.ServerValue.TIMESTAMP,
+    pagina: window.location.href
+  });
+
+  return Promise.allSettled([contador, log]);
 }
 
 // Função para registrar clique no Firebase (contador + detalhado)
@@ -553,6 +581,10 @@ function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes
     ts: firebase.database.ServerValue.TIMESTAMP,
     pagina: window.location.href
   };
+  const metricaCliente = registrarMetricaCliente(idEstabelecimento, "botoes", tipo, {
+    area,
+    ...detalhes
+  });
 
   return new Promise((resolve) => {
     refContador.transaction(
@@ -564,7 +596,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes
           return;
         }
         try {
-          await refLog.set(payload);
+          await Promise.all([refLog.set(payload), metricaCliente]);
           resolve({ ok: true });
         } catch (e) {
           console.error("[CliqueBotao] Erro ao salvar detalhado:", e);
@@ -20789,6 +20821,7 @@ function registrarCliqueCardapioOndeComer(nomeEstabelecimento) {
   const ref = firebase.database().ref(`cliquesCardapiosOndeComer/${hoje}/${nomeEstabelecimento}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
   registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "cardapio");
+  registrarMetricaCliente(nomeEstabelecimento, "ondeComer", "cardapio", { area: "onde-comer" });
 }
 
 function registrarCliqueWhatsOndeComer(nomeEstabelecimento) {
@@ -20796,6 +20829,7 @@ function registrarCliqueWhatsOndeComer(nomeEstabelecimento) {
   const ref = firebase.database().ref(`cliquesWhatsOndeComer/${hoje}/${nomeEstabelecimento}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
   registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "whatsapp");
+  registrarMetricaCliente(nomeEstabelecimento, "ondeComer", "whatsapp", { area: "onde-comer" });
 }
 
 function registrarCliqueFotosOndeComer(nomeEstabelecimento) {
@@ -20803,6 +20837,7 @@ function registrarCliqueFotosOndeComer(nomeEstabelecimento) {
   const ref = firebase.database().ref(`cliquesFotosOndeComer/${hoje}/${nomeEstabelecimento}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
   registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "fotos");
+  registrarMetricaCliente(nomeEstabelecimento, "ondeComer", "fotos", { area: "onde-comer" });
 }
 
 window.registrarCliqueCardapioOndeComer = registrarCliqueCardapioOndeComer;
@@ -20814,6 +20849,10 @@ function registrarCliqueNaPromocao(nomeComercio, detalhes = {}) {
   const ref = firebase.database().ref(`cliquesPromocoesPorComercio/${hoje}/${nomeComercio}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
   const acao = detalhes.acao || "promocao";
+  registrarMetricaCliente(nomeComercio, "promocoes", acao === "whatsapp" ? "whatsapp_promocao" : "promocao", {
+    area: "promocoes",
+    ...detalhes
+  });
   firebase.database().ref(`cliquesPromocoesDetalhado/${hoje}/${nomeComercio}`).push({
     area: "promocoes",
     tipo: acao === "whatsapp" ? "whatsapp_promocao" : "promocao",
