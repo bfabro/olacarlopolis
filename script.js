@@ -2729,20 +2729,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (dbAdmin) {
         try {
-          const [novidadesSnap, configSnap, temasSnap] = await Promise.all([
+          const [novidadesSnap, configSnap] = await Promise.all([
             dbAdmin.ref("novidades").once("value"),
-            dbAdmin.ref("configuracoes/pagamento/diasNovidadesVisiveis").once("value"),
-            dbAdmin.ref("configuracoes/novidades/temas").once("value")
+            dbAdmin.ref("configuracoes/pagamento/diasNovidadesVisiveis").once("value")
           ]);
           const configDias = Number(configSnap.val());
           if (Number.isFinite(configDias) && configDias > 0) diasVisiveis = configDias;
-          temasNovidades = temasSnap.val() || {};
           novidadesSnap.forEach((child) => {
             registros.push(montarNovidadeRecord({ id: child.key, ...(child.val() || {}) }));
             return false;
           });
         } catch (error) {
           console.warn("Nao foi possivel carregar novidades do Firebase.", error);
+        }
+        try {
+          const temasSnap = await dbAdmin.ref("configuracoes/novidades/temas").once("value");
+          temasNovidades = temasSnap.val() || {};
+        } catch (error) {
+          console.warn("Nao foi possivel carregar a configuracao de temas das novidades. Usando todos os temas.", error);
         }
       }
 
