@@ -19084,15 +19084,23 @@ body.vaga-modal-open {
 
 .novidade-feed-info .novidade-change-detail {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 5px;
   color: #1d4ed8;
   font-size: 12px;
   font-weight: 900;
+  line-height: 1.35;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 .novidade-change-detail i {
   flex: 0 0 auto;
+  margin-top: 2px;
 }
 
 .novidade-action-tag {
