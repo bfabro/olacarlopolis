@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 332,
-  label: "v338",
+  numero: 333,
+  label: "v339",
   data: "2026-06-22",
-  nota: "Relatorios detalham imoveis e veiculos por referencia, visualizacao, WhatsApp e fotos."
+  nota: "Relatorio do cliente exibe somente recursos disponiveis e separa os detalhes dos modulos especiais ativos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -7475,6 +7475,17 @@ function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
       promocaoId: item.promocaoId || item.promoId || "",
       tituloConteudo: item.tituloConteudo || item.estabelecimento || "",
       acao: item.acao || "",
+      codigoReferencia: item.codRef || item.codigoReferencia || "",
+      itemId: item.imovelId || item.veiculoId || "",
+      origemDescricao: {
+        "perfil-cliente": "Pagina do cliente",
+        "atalho-home": "Destaques da pagina inicial",
+        imoveis: "Tela de imoveis",
+        veiculos: "Tela de veiculos",
+        promocoes: "Tela de promocoes",
+        "onde-comer": "Tela Onde Comer",
+        "redes-sociais": "Redes sociais do cliente"
+      }[item.area || area] || item.origem || area || "Site publico",
       clicouWhatsAppPromocao: Boolean(item.clicouWhatsAppPromocao || item.acao === "whatsapp" || item.tipo === "whatsapp_promocao")
     });
   };
@@ -7636,6 +7647,7 @@ function clientReportCategory(row = {}) {
   const text = normalizeName(`${row.area || ""} ${row.tipo || ""}`);
   if (/novidade|novidades/.test(text)) return "Novidades";
   if (/imovel/.test(text)) return "Imoveis";
+  if (/veiculo|automovel/.test(text)) return "Veiculos";
   if (/perfil/.test(text)) return "Visualizacao do perfil";
   if (/destaque/.test(text)) return "Destaques";
   if (/compartilh/.test(text)) return "Compartilhamentos";
@@ -7695,28 +7707,89 @@ function renderClientTimelineTable(rows, emptyMessage) {
             <th>Recurso</th>
             <th>Data</th>
             <th>Horario</th>
-            <th>Promocao</th>
-            <th>WhatsApp promocao</th>
-            <th>Origem / card</th>
-            <th>Detalhe</th>
+            <th>Origem do clique</th>
+            <th>Descricao</th>
           </tr>
         </thead>
         <tbody>
+          ${rows.slice(0, 200).map((row) => {
+            const details = [
+              row.promocao ? `Promocao: ${row.promocao}` : "",
+              row.tituloConteudo || "",
+              row.codigoReferencia ? `Referencia: ${row.codigoReferencia}` : "",
+              row.acao || row.tipo || "",
+              row.clicouWhatsAppPromocao ? "Clique no WhatsApp da promocao" : ""
+            ].filter(Boolean);
+            return `
+              <tr title="${escapeAttr(row.pagina || "")}">
+                <td><strong>${escapeHtml(clientReportCategory(row))}</strong></td>
+                <td>${escapeHtml(formatDateBR(row.date))}</td>
+                <td><strong>${escapeHtml(row.hora)}</strong></td>
+                <td>${escapeHtml(row.origemDescricao || row.area || "Site publico")}</td>
+                <td>${escapeHtml(details.join(" - ") || "-")}</td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderClientModuleTimelineTable(rows, moduleLabel, emptyMessage) {
+  if (!rows.length) return `<div class="list-meta">${escapeHtml(emptyMessage)}</div>`;
+  return `
+    <div class="report-table-wrap">
+      <table class="report-click-table client-report-click-table">
+        <thead><tr><th>Data</th><th>Horario</th><th>Acao</th><th>Codigo de referencia</th><th>Anuncio</th><th>Origem do clique</th></tr></thead>
+        <tbody>
           ${rows.slice(0, 200).map((row) => `
             <tr title="${escapeAttr(row.pagina || "")}">
-              <td><strong>${escapeHtml(clientReportCategory(row))}</strong></td>
               <td>${escapeHtml(formatDateBR(row.date))}</td>
               <td><strong>${escapeHtml(row.hora)}</strong></td>
-              <td>${escapeHtml(row.promocao || "-")}</td>
-              <td>${row.promocao || row.promocaoId || /promoc/i.test(String(row.area || row.tipo || "")) ? (row.clicouWhatsAppPromocao ? "Sim" : "Nao") : "-"}</td>
-              <td>${escapeHtml(row.area || "-")}</td>
-              <td>${escapeHtml(row.tituloConteudo || row.acao || row.tipo || "-")}</td>
+              <td>${escapeHtml(row.tipo || moduleLabel)}</td>
+              <td>${escapeHtml(row.codigoReferencia || row.itemId || "-")}</td>
+              <td>${escapeHtml(row.tituloConteudo || "-")}</td>
+              <td>${escapeHtml(row.origemDescricao || row.area || "Site publico")}</td>
             </tr>
           `).join("")}
         </tbody>
       </table>
     </div>
   `;
+}
+
+function clientReportAvailability(client = {}, counts = {}) {
+  const hasContacts = normalizeClientContactDetails(client).length > 0;
+  const hasImages = Boolean(client.imagem || client.image || normalizeImageItems(client.imagens).length);
+  const hasMenu = Boolean(client.cardapioAtivo || client.menuAtivo || client.exibirCardapio || client.cardapioLink || normalizeUrlList(client.menuImages).length);
+  const hasPromotions = normalizePromocoes(client.promocoes).length > 0
+    || Boolean(counts.historicoPromocoes)
+    || Number(counts.promocoes || 0) > 0
+    || Number(counts.whatsappPromocao || 0) > 0;
+  const hasWhatsappGroup = Boolean(client.grupoWhatsappAtivo !== false && client.grupoWhatsappLink);
+  const hasImoveis = canAccessImoveis();
+  const hasVeiculos = hasPermission("veiculos");
+  return {
+    whats: hasContacts,
+    whatsappPromocao: hasPromotions,
+    cardapios: hasPermission("cardapio") && hasMenu,
+    fotos: (hasPermission("imagens") || hasPermission("destaque")) && hasImages,
+    novidades: Number(counts.novidades || 0) > 0,
+    perfil: true,
+    imoveis: hasImoveis,
+    veiculos: hasVeiculos,
+    destaques: Boolean(client.destaqueSemanal),
+    promocoes: hasPermission("promocoes") && hasPromotions,
+    gruposWhatsapp: hasWhatsappGroup,
+    instagram: Boolean(String(client.instagram || "").trim()),
+    facebook: Boolean(String(client.facebook || "").trim()),
+    tiktok: Boolean(String(client.tiktok || "").trim()),
+    site: Boolean(String(client.site || "").trim()),
+    outrasRedes: Number(counts.outrasRedes || 0) > 0,
+    compartilhamentos: true,
+    outros: Number(counts.outros || 0) > 0
+  };
 }
 
 function renderClientMetricReportContent(client = {}) {
@@ -7767,85 +7840,108 @@ function renderClientMetricReportContent(client = {}) {
   const redes = instagram + facebook + tiktok + site + outrasRedes;
   const promocoesLiquidas = Math.max(0, promocoes - instagramPromocao);
   const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
-  const total = cardapios + whats + whatsappPromocao + fotos + promocoesLiquidas + novidades + perfil + imoveis + veiculos + destaques + gruposWhatsapp + compartilhamentos + redes;
-  const outros = Math.max(0, totalBotoes - total);
+  const categorizedTotal = cardapios + whats + whatsappPromocao + fotos + promocoesLiquidas + novidades + perfil + imoveis + veiculos + destaques + gruposWhatsapp + compartilhamentos + redes;
+  const outros = Math.max(0, totalBotoes - categorizedTotal);
+  const historicoPromocoes = sumMetricMapForClient(aggregateSimpleDaily(state.metricas.promocoes), keys) > 0;
+  const availability = clientReportAvailability(client, {
+    promocoes: promocoesLiquidas,
+    whatsappPromocao,
+    historicoPromocoes,
+    novidades,
+    outrasRedes,
+    outros
+  });
+  const resourceEntries = [
+    { key: "whats", label: "WhatsApp / telefone", count: whats, note: "Telefone e contato" },
+    { key: "whatsappPromocao", label: "WhatsApp da promocao", count: whatsappPromocao, note: "Interesse direto nas ofertas" },
+    { key: "cardapios", label: "Cardapio", count: cardapios, note: "Cliques no cardapio" },
+    { key: "fotos", label: "Fotos / divulgacao", count: fotos, note: "Fotos e divulgacoes" },
+    { key: "novidades", label: "Novidades", count: novidades, note: "Cliques na tela inicial" },
+    { key: "perfil", label: "Visualizacao do perfil", count: perfil, note: "Aberturas da area do cliente" },
+    { key: "imoveis", label: "Imoveis", count: imoveis, note: "Visualizacoes, fotos e WhatsApp" },
+    { key: "veiculos", label: "Veiculos", count: veiculos, note: "Visualizacoes, fotos e WhatsApp" },
+    { key: "destaques", label: "Destaques", count: destaques, note: "Cards e slides em destaque" },
+    { key: "promocoes", label: "Promocoes", count: promocoesLiquidas, note: "Cliques em ofertas" },
+    { key: "gruposWhatsapp", label: "Grupo WhatsApp", count: gruposWhatsapp, note: "Entradas pelo link do grupo" },
+    { key: "instagram", label: "Instagram", count: instagram, note: "Cliques no Instagram" },
+    { key: "facebook", label: "Facebook", count: facebook, note: "Cliques no Facebook" },
+    { key: "tiktok", label: "TikTok", count: tiktok, note: "Cliques no TikTok" },
+    { key: "site", label: "Site", count: site, note: "Cliques no site do cliente" },
+    { key: "outrasRedes", label: "Outras redes / links", count: outrasRedes, note: "Outros links cadastrados" },
+    { key: "compartilhamentos", label: "Compartilhamentos", count: compartilhamentos, note: "Botao de compartilhar cliente" },
+    { key: "outros", label: "Outros botoes", count: outros, note: "Demais interacoes" }
+  ].filter((entry) => availability[entry.key]);
+  const total = resourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
     .map((row) => ({ ...row, categoria: clientReportCategory(row) }))
     .filter((row) => clientReportResourceAllowed(row.categoria));
-  const rows = [
-    ["WhatsApp / telefone", whats],
-    ["WhatsApp da promocao", whatsappPromocao],
-    ...(canShowCardapioReport ? [["Cardapio", cardapios]] : []),
-    ["Fotos / divulgacao", fotos],
-    ["Novidades", novidades],
-    ["Visualizacao do perfil", perfil],
-    ["Imoveis", imoveis],
-    ["Veiculos", veiculos],
-    ["Destaques", destaques],
-    ["Promocoes", promocoesLiquidas],
-    ["Grupo WhatsApp", gruposWhatsapp],
-    ["Instagram", instagram],
-    ["Facebook", facebook],
-    ["TikTok", tiktok],
-    ["Site", site],
-    ...(outrasRedes ? [["Outras redes / links", outrasRedes]] : []),
-    ["Compartilhamentos", compartilhamentos],
-    ["Outros botoes", outros]
-  ];
-  const recursosTexto = [
-    "telefone",
-    "WhatsApp da promocao",
-    ...(canShowCardapioReport ? ["cardapio"] : []),
-    ...(clientReportResourceAllowed("Fotos / divulgacao") ? ["fotos"] : []),
-    "novidades",
-    "visualizacao do perfil",
-    "imoveis",
-    "veiculos",
-    "destaques",
-    "grupo de WhatsApp",
-    ...(clientReportResourceAllowed("Promocoes") ? ["promocoes"] : []),
-    "Instagram, Facebook, TikTok e site",
-    "compartilhamentos",
-    "demais botoes"
-  ].join(", ");
+  const moduleTypes = {
+    imoveis: (row) => row.categoria === "Imoveis",
+    veiculos: (row) => row.categoria === "Veiculos"
+  };
+  const imoveisTimeline = timeline.filter(moduleTypes.imoveis);
+  const veiculosTimeline = timeline.filter(moduleTypes.veiculos);
+  const categoryIsAvailable = (row = {}) => {
+    const normalized = normalizeName(row.categoria);
+    const type = normalizeName(row.tipo);
+    if (/instagram/.test(type)) return availability.instagram;
+    if (/facebook/.test(type)) return availability.facebook;
+    if (/tiktok/.test(type)) return availability.tiktok;
+    if (/^site$|sitecliente/.test(type)) return availability.site;
+    if (/whatsapppromocao/.test(normalized)) return availability.whatsappPromocao;
+    if (/whatsapptelefone/.test(normalized)) return availability.whats;
+    if (/cardapio/.test(normalized)) return availability.cardapios;
+    if (/fotosdivulgacao/.test(normalized)) return availability.fotos;
+    if (/novidade/.test(normalized)) return availability.novidades;
+    if (/visualizacaodoperfil/.test(normalized)) return availability.perfil;
+    if (/destaque/.test(normalized)) return availability.destaques;
+    if (/promoc/.test(normalized)) return availability.promocoes;
+    if (/grupowhatsapp/.test(normalized)) return availability.gruposWhatsapp;
+    if (/redessociaislinks/.test(normalized)) return availability.instagram || availability.facebook || availability.tiktok || availability.site || availability.outrasRedes;
+    if (/compartilh/.test(normalized)) return availability.compartilhamentos;
+    return availability.outros;
+  };
+  const commonTimeline = timeline.filter((row) => (
+    !moduleTypes.imoveis(row)
+    && !moduleTypes.veiculos(row)
+    && categoryIsAvailable(row)
+  ));
+  const recursosTexto = resourceEntries.map((entry) => entry.label).join(", ");
   const itemAccessRows = buildItemAccessRows(state.metricas, range, keys);
+  const imovelAccessRows = itemAccessRows.filter((row) => row.kind === "imovel");
+  const veiculoAccessRows = itemAccessRows.filter((row) => row.kind === "veiculo");
 
   return `
     ${renderClientReportPeriodControls(range)}
     <div class="client-report-summary">
       <div class="stats-grid client-report-stats">
-        <article class="stat-card"><span>Total de interacoes</span><strong>${total + outros}</strong><small>${escapeHtml(range.label)}</small></article>
-        <article class="stat-card"><span>WhatsApp</span><strong>${whats}</strong><small>Telefone e contato</small></article>
-        <article class="stat-card"><span>WhatsApp da promocao</span><strong>${whatsappPromocao}</strong><small>Interesse direto nas ofertas</small></article>
-        ${canShowCardapioReport ? `<article class="stat-card"><span>Cardapio</span><strong>${cardapios}</strong><small>Cliques no cardapio</small></article>` : ""}
-        <article class="stat-card"><span>Novidades</span><strong>${novidades}</strong><small>Cliques na tela inicial</small></article>
-        <article class="stat-card"><span>Visualizacao do perfil</span><strong>${perfil}</strong><small>Aberturas da area do cliente</small></article>
-        <article class="stat-card"><span>Imoveis</span><strong>${imoveis}</strong><small>Visualizacoes, fotos e WhatsApp dos anuncios</small></article>
-        <article class="stat-card"><span>Veiculos</span><strong>${veiculos}</strong><small>Visualizacoes, fotos e WhatsApp dos anuncios</small></article>
-        <article class="stat-card"><span>Destaques</span><strong>${destaques}</strong><small>Cliques nos cards e slides em destaque</small></article>
-        <article class="stat-card"><span>Promocoes</span><strong>${promocoesLiquidas}</strong><small>Cliques em ofertas</small></article>
-        <article class="stat-card"><span>Grupo WhatsApp</span><strong>${gruposWhatsapp}</strong><small>Entradas pelo link do grupo</small></article>
-        <article class="stat-card"><span>Instagram</span><strong>${instagram}</strong><small>Cliques no Instagram</small></article>
-        <article class="stat-card"><span>Facebook</span><strong>${facebook}</strong><small>Cliques no Facebook</small></article>
-        <article class="stat-card"><span>TikTok</span><strong>${tiktok}</strong><small>Cliques no TikTok</small></article>
-        <article class="stat-card"><span>Site</span><strong>${site}</strong><small>Cliques no site do cliente</small></article>
-        <article class="stat-card"><span>Compartilhamentos</span><strong>${compartilhamentos}</strong><small>Botao de compartilhar cliente</small></article>
+        <article class="stat-card"><span>Total de interacoes</span><strong>${total}</strong><small>${escapeHtml(range.label)}</small></article>
+        ${resourceEntries.map((entry) => `<article class="stat-card"><span>${escapeHtml(entry.label)}</span><strong>${entry.count}</strong><small>${escapeHtml(entry.note)}</small></article>`).join("")}
       </div>
       <div class="reports-grid client-report-grid">
         <section class="panel-card report-card">
           <h3>Resumo por tipo</h3>
-          ${renderReportList(rows.filter(([, count]) => count > 0).map(([title, count]) => ({ title, meta: `${count} clique${count === 1 ? "" : "s"}` })), "Ainda nao ha cliques registrados para este cliente no periodo.")}
+          ${renderReportList(resourceEntries.filter((entry) => entry.count > 0).map((entry) => ({ title: entry.label, meta: `${entry.count} clique${entry.count === 1 ? "" : "s"}` })), "Ainda nao ha cliques registrados para este cliente no periodo.")}
         </section>
+        ${availability.imoveis ? `<section class="panel-card report-card report-wide">
+          <h3>Modulo especial: Imoveis</h3>
+          <p class="list-meta">Acessos dos imoveis vinculados ao cliente, separados por referencia.</p>
+          ${renderItemAccessTable(imovelAccessRows, "Ainda nao ha acessos nos imoveis neste periodo.")}
+          <h3>Cliques detalhados dos imoveis por data e horario</h3>
+          ${renderClientModuleTimelineTable(imoveisTimeline, "Imoveis", "Ainda nao ha horarios de cliques nos imoveis neste periodo.")}
+        </section>` : ""}
+        ${availability.veiculos ? `<section class="panel-card report-card report-wide">
+          <h3>Modulo especial: Veiculos</h3>
+          <p class="list-meta">Acessos dos veiculos vinculados ao cliente, separados por referencia.</p>
+          ${renderItemAccessTable(veiculoAccessRows, "Ainda nao ha acessos nos veiculos neste periodo.")}
+          <h3>Cliques detalhados dos veiculos por data e horario</h3>
+          ${renderClientModuleTimelineTable(veiculosTimeline, "Veiculos", "Ainda nao ha horarios de cliques nos veiculos neste periodo.")}
+        </section>` : ""}
         <section class="panel-card report-card report-wide">
-          <h3>Acessos por imovel e veiculo</h3>
-          <p class="list-meta">Contabilizacao separada pelo codigo de referencia de cada anuncio.</p>
-          ${renderItemAccessTable(itemAccessRows, "Ainda nao ha acessos em imoveis ou veiculos neste periodo.")}
-        </section>
-        <section class="panel-card report-card report-wide">
-          <h3>Cliques detalhados por data e horario</h3>
+          <h3>Cliques detalhados da pagina do cliente</h3>
           <p class="list-meta">Use essa tabela para conferir interacoes reais em ${escapeHtml(recursosTexto)}.</p>
-          ${renderClientTimelineTable(timeline, "Ainda nao ha horarios detalhados para este cliente neste periodo.")}
+          ${renderClientTimelineTable(commonTimeline, "Ainda nao ha horarios detalhados para a pagina do cliente neste periodo.")}
         </section>
       </div>
     </div>
