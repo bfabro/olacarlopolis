@@ -3756,6 +3756,11 @@ document.addEventListener("DOMContentLoaded", function () {
       console.warn("Estabelecimento não encontrado para id:", idEst);
       return;
     }
+    const estabelecimento = categoriaEncontrada.establishments?.find((est) => normalizeName(est.name || "") === idEst);
+    registrarCliqueBotao("perfil", idEst, "perfil-cliente", {
+      estabelecimento: estabelecimento?.name || "",
+      origem: "atalho-home"
+    }).catch(() => { });
     // 2) Abre a categoria sem disparar click programatico no menu lateral
     prepararMenuParaCategoria(categoriaEncontrada);
     if (typeof loadContent === "function") {
@@ -7830,6 +7835,14 @@ plotarPinsImoveis(stateImoveis.filtered);
     }, 0);
 
     // conecta botões
+    el.querySelectorAll(".card-imovel").forEach((card) => {
+      card.addEventListener("click", (ev) => {
+        if (ev.target.closest("button, a, input, select, textarea")) return;
+        const im = stateImoveis.all.find((item) => item.id === card.dataset.id);
+        if (im) registrarCliqueImovel("visualizacao", im);
+      });
+    });
+
     // [FOTOS] – abre a galeria E registra clique "fotos"
     // permitir abrir a galeria clicando na imagem ou no botão de lupa
     el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb").forEach(node => {
@@ -19637,6 +19650,20 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
 
 
     let lastClickedButton = null;
+    contentArea.querySelectorAll("li[data-id]").forEach((clientCard) => {
+      clientCard.addEventListener("click", (ev) => {
+        if (ev.target.closest("button, a, input, select, textarea, .swiper-button-prev, .swiper-button-next")) return;
+        if (clientCard.dataset.profileMetricRegistered === "true") return;
+        clientCard.dataset.profileMetricRegistered = "true";
+        const clientId = clientCard.dataset.id || clientCard.id || "";
+        const clientName = clientCard.querySelector(".locais_nomes")?.textContent?.trim() || "";
+        registrarCliqueBotao("perfil", clientId || clientName, "perfil-cliente", {
+          estabelecimento: clientName,
+          origem: "pagina-cliente"
+        }).catch(() => { });
+      });
+    });
+
     // Função para alternar entre cardápio e novidades
     function toggleContent(button, contentId, otherButtons) {
       const content = document.getElementById(contentId);
@@ -21423,12 +21450,13 @@ function registrarCliqueImovelResumo(tipo, im) {
   const ref = firebase.database().ref(`imoveisCliquesResumo/${hoje}/${chave}`);
 
   return ref.transaction(curr => {
-    const base = curr || { totalFotos: 0, totalWhats: 0 };
+    const base = curr || { totalFotos: 0, totalWhats: 0, totalVisualizacoes: 0 };
     base.titulo = im?.titulo || base.titulo || "";
     base.corretor = getCorretorPrincipal(im) || base.corretor || "";
     base.proprietario = im?.proprietario || im?.proprietaria || base.proprietario || ""; // ← NOVO
     if (tipo === "fotos") base.totalFotos = (base.totalFotos || 0) + 1;
     if (tipo === "whatsapp") base.totalWhats = (base.totalWhats || 0) + 1;
+    if (tipo === "visualizacao") base.totalVisualizacoes = (base.totalVisualizacoes || 0) + 1;
     base.ultimoClique = firebase.database.ServerValue.TIMESTAMP;
     return base;
   });
@@ -21443,11 +21471,12 @@ function registrarCliqueImovelResumo(tipo, im) {
   const ref = firebase.database().ref(`imoveisCliquesResumo/${hoje}/${chave}`);
 
   return ref.transaction(curr => {
-    const base = curr || { totalFotos: 0, totalWhats: 0 };
+    const base = curr || { totalFotos: 0, totalWhats: 0, totalVisualizacoes: 0 };
     base.titulo = im?.titulo || base.titulo || "";
     base.corretor = getCorretorPrincipal(im) || base.corretor || "";
     if (tipo === "fotos") base.totalFotos = (base.totalFotos || 0) + 1;
     if (tipo === "whatsapp") base.totalWhats = (base.totalWhats || 0) + 1;
+    if (tipo === "visualizacao") base.totalVisualizacoes = (base.totalVisualizacoes || 0) + 1;
     base.ultimoClique = firebase.database.ServerValue.TIMESTAMP;
     return base;
   });
@@ -21457,9 +21486,20 @@ function registrarCliqueImovelResumo(tipo, im) {
 
 // atalho: registra nos dois nós (dia + resumo)
 function registrarCliqueImovel(tipo, im) {
+  const responsavel = im?.clienteId || im?.estabelecimentoId || im?.clienteNome || getCorretorPrincipal(im);
+  const metricaCliente = responsavel
+    ? registrarCliqueBotao(`imovel_${tipo}`, responsavel, "imoveis", {
+        imovelId: keyImovel(im),
+        tituloConteudo: im?.titulo || "",
+        corretor: getCorretorPrincipal(im),
+        clienteId: im?.clienteId || "",
+        codRef: im?.codRef || ""
+      })
+    : Promise.resolve();
   return Promise.allSettled([
     registrarCliqueImovelDia(tipo, im),
-    registrarCliqueImovelResumo(tipo, im)
+    registrarCliqueImovelResumo(tipo, im),
+    metricaCliente
   ]);
 }
 
