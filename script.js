@@ -18437,18 +18437,47 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!dbAdmin) return;
 
       try {
-        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap] = await Promise.all([
+        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, gruposWhatsappSnap] = await Promise.all([
           dbAdmin.ref("clientes").once("value"),
           dbAdmin.ref("categorias").once("value"),
           dbAdmin.ref("conteudosInformativos/notaFalecimento").once("value"),
           dbAdmin.ref("eventos").once("value"),
-          dbAdmin.ref("configuracoes/paginaInicial").once("value")
+          dbAdmin.ref("configuracoes/paginaInicial").once("value"),
+          dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value")
         ]);
         const clientes = clientesSnap.val() || {};
         const categoriasAdmin = categoriasSnap.val() || {};
         const notasFalecimentoAdmin = notasFalecimentoSnap.val() || {};
         const eventosAdmin = eventosSnap.val() || {};
         const paginaInicialAdmin = paginaInicialSnap.val() || {};
+        const gruposWhatsappAdmin = gruposWhatsappSnap.val() || {};
+        Object.entries(gruposWhatsappAdmin).forEach(([grupoId, grupo]) => {
+          const clienteId = grupo?.clienteId || "";
+          if (!clienteId || !clientes[clienteId]) return;
+          const ativo = (grupo.status || "ativo") === "ativo";
+          clientes[clienteId] = {
+            ...clientes[clienteId],
+            grupoWhatsappId: grupoId,
+            grupoWhatsappNome: grupo.nome || grupo.name || "",
+            grupoWhatsappLink: grupo.link || "",
+            grupoWhatsappDescricao: grupo.descricao || grupo.description || "",
+            grupoWhatsappImagem: grupo.imagem || grupo.image || "",
+            grupoWhatsappAtivo: ativo
+          };
+        });
+        Object.entries(clientes).forEach(([clienteId, cliente]) => {
+          const grupoId = cliente?.grupoWhatsappId || "";
+          const grupo = gruposWhatsappAdmin[grupoId];
+          if (!grupo) return;
+          clientes[clienteId] = {
+            ...cliente,
+            grupoWhatsappNome: grupo.nome || grupo.name || cliente.grupoWhatsappNome || "",
+            grupoWhatsappLink: grupo.link || cliente.grupoWhatsappLink || "",
+            grupoWhatsappDescricao: grupo.descricao || grupo.description || cliente.grupoWhatsappDescricao || "",
+            grupoWhatsappImagem: grupo.imagem || grupo.image || cliente.grupoWhatsappImagem || "",
+            grupoWhatsappAtivo: (grupo.status || "ativo") === "ativo"
+          };
+        });
         window.__paginaInicialSite = paginaInicialAdmin;
         aplicarConfiguracaoPaginaInicial(paginaInicialAdmin);
         const clientesConsolidados = consolidarClientesAdmin(clientes);
