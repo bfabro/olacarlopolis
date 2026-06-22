@@ -7325,6 +7325,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       corretor: item.corretor || item.vendedor || item.clienteNome || "",
       corretores: Array.isArray(item.corretores) ? item.corretores : (item.corretor ? [item.corretor] : []),
       telefone: item.telefone || item.contato || item.whatsapp || "",
+      instagram: item.instagram || item.Instagram || item.linkInstagram || "",
       proprietario: item.proprietario || "",
       descricao: item.descricao || "",
       imagem: imagens[0] || item.imagem || "",
@@ -7989,6 +7990,13 @@ plotarPinsImoveis(stateImoveis.filtered);
       });
     });
 
+    el.querySelectorAll("[data-action='instagram']").forEach((link) => {
+      link.addEventListener("click", () => {
+        const im = stateImoveis.all.find((item) => item.id === link.getAttribute("data-id"));
+        if (im) registrarCliqueImovel("instagram", im).catch(() => { });
+      });
+    });
+
 
 
 
@@ -8051,6 +8059,35 @@ plotarPinsImoveis(stateImoveis.filtered);
     return chips.join("");
   }
 
+  function instagramResponsavelImovel(im = {}) {
+    const direto = String(im.instagram || im.Instagram || im.linkInstagram || "").trim();
+    if (direto) return direto;
+
+    const chaves = [
+      im.clienteId,
+      im.clienteNome,
+      im.corretor,
+      ...(Array.isArray(im.corretores) ? im.corretores : [])
+    ].map((value) => normalizeName(value || "")).filter(Boolean);
+
+    for (const categoria of categories || []) {
+      const estabelecimento = (categoria.establishments || []).find((item) => {
+        const aliases = [
+          item.nomeNormalizado,
+          item.name,
+          item.nome,
+          item.id
+        ].map((value) => normalizeName(value || "")).filter(Boolean);
+        return chaves.some((chave) => aliases.some((alias) => (
+          chave === alias
+          || (chave.length > 4 && alias.length > 4 && (chave.includes(alias) || alias.includes(chave)))
+        )));
+      });
+      if (estabelecimento?.instagram) return estabelecimento.instagram;
+    }
+    return "";
+  }
+
 
   function cardImovelHTML(im) {
     const tag = im.tipo; // "venda" | "aluguel"
@@ -8063,6 +8100,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       : `R$ ${Number(im.valor).toLocaleString()}`;
 
     const responsavel = nomeResponsavel(im);
+    const instagram = instagramResponsavelImovel(im);
+    const instagramUrl = instagram ? fixInstagramUrl(instagram) : "";
 
 
 
@@ -8120,6 +8159,9 @@ plotarPinsImoveis(stateImoveis.filtered);
         <button class="btn-whats" data-action="whats" data-id="${im.id}" ${isFechado ? 'disabled aria-disabled="true"' : ""}>
           <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
         </button>
+        ${instagramUrl ? `<a class="btn-instagram-imovel" data-action="instagram" data-id="${im.id}" href="${instagramUrl}" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-instagram"></i> Instagram
+        </a>` : ""}
       </div>
 
    
@@ -8577,6 +8619,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       });
       card.querySelector(".auto-whatsapp-button")?.addEventListener("click", () => {
         registrarCliqueAutomovel("whatsapp", item);
+      });
+      card.querySelector(".auto-instagram-icon")?.addEventListener("click", () => {
+        registrarCliqueAutomovel("instagram", item);
       });
     });
   }

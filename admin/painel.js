@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 335,
-  label: "v341",
+  numero: 336,
+  label: "v342",
   data: "2026-06-22",
-  nota: "Cliques no WhatsApp dos imoveis corrigidos e indicadores de visualizacoes, fotos e WhatsApp separados."
+  nota: "Imoveis e automoveis contabilizam visualizacoes, fotos, WhatsApp e Instagram separadamente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -7382,9 +7382,11 @@ function metricButtonLabel(tipo) {
     imovel_visualizacao: "Visualizacao do imovel",
     imovel_fotos: "Fotos do imovel",
     imovel_whatsapp: "WhatsApp do imovel",
+    imovel_instagram: "Instagram do imovel",
     veiculo_visualizacao: "Visualizacao do veiculo",
     veiculo_fotos: "Fotos do veiculo",
-    veiculo_whatsapp: "WhatsApp do veiculo"
+    veiculo_whatsapp: "WhatsApp do veiculo",
+    veiculo_instagram: "Instagram do veiculo"
   }[tipo] || String(tipo || "Clique").replace(/[_-]/g, " ");
 }
 
@@ -7593,7 +7595,7 @@ function buildItemAccessRows(metrics = {}, range = getReportDateRange(), clientK
         if (clientKeys && !metricKeyBelongsToClient(clientKey, clientKeys)) return;
         Object.values(logs || {}).forEach((item) => {
           const type = String(item?.tipo || "");
-          const match = type.match(/^(imovel|veiculo)_(visualizacao|fotos|whatsapp)$/);
+          const match = type.match(/^(imovel|veiculo)_(visualizacao|fotos|whatsapp|instagram)$/);
           if (!match) return;
           const kind = match[1];
           const action = match[2];
@@ -7608,6 +7610,7 @@ function buildItemAccessRows(metrics = {}, range = getReportDateRange(), clientK
               visualizacao: 0,
               fotos: 0,
               whatsapp: 0,
+              instagram: 0,
               total: 0
             });
           }
@@ -7626,7 +7629,7 @@ function renderItemAccessTable(rows = [], emptyMessage = "Nenhum acesso registra
   return `
     <div class="report-table-wrap">
       <table class="report-click-table">
-        <thead><tr><th>Tipo</th><th>Codigo de referencia</th><th>Anuncio</th><th>Visualizacoes</th><th>WhatsApp</th><th>Fotos</th><th>Total</th></tr></thead>
+        <thead><tr><th>Tipo</th><th>Codigo de referencia</th><th>Anuncio</th><th>Visualizacoes</th><th>WhatsApp</th><th>Fotos</th><th>Instagram</th><th>Total</th></tr></thead>
         <tbody>
           ${rows.map((row) => `
             <tr>
@@ -7636,6 +7639,7 @@ function renderItemAccessTable(rows = [], emptyMessage = "Nenhum acesso registra
               <td>${row.visualizacao}</td>
               <td>${row.whatsapp}</td>
               <td>${row.fotos}</td>
+              <td>${row.instagram}</td>
               <td><strong>${row.total}</strong></td>
             </tr>
           `).join("")}
@@ -7884,10 +7888,13 @@ function renderClientMetricReportContent(client = {}) {
   const imoveisVisualizacoes = Number(tiposPermitidos.get("imovel_visualizacao") || 0);
   const imoveisFotos = Number(tiposPermitidos.get("imovel_fotos") || 0);
   const imoveisWhatsapp = Number(tiposPermitidos.get("imovel_whatsapp") || 0);
-  const imoveis = imoveisVisualizacoes + imoveisFotos + imoveisWhatsapp;
-  const veiculos = [...tiposPermitidos.entries()]
-    .filter(([tipo]) => /^veiculo_/.test(String(tipo)))
-    .reduce((sum, [, count]) => sum + Number(count || 0), 0);
+  const imoveisInstagram = Number(tiposPermitidos.get("imovel_instagram") || 0);
+  const imoveis = imoveisVisualizacoes + imoveisFotos + imoveisWhatsapp + imoveisInstagram;
+  const veiculosVisualizacoes = Number(tiposPermitidos.get("veiculo_visualizacao") || 0);
+  const veiculosFotos = Number(tiposPermitidos.get("veiculo_fotos") || 0);
+  const veiculosWhatsapp = Number(tiposPermitidos.get("veiculo_whatsapp") || 0);
+  const veiculosInstagram = Number(tiposPermitidos.get("veiculo_instagram") || 0);
+  const veiculos = veiculosVisualizacoes + veiculosFotos + veiculosWhatsapp + veiculosInstagram;
   const destaques = Number(tiposPermitidos.get("destaque") || 0);
   const gruposWhatsapp = Number(tiposPermitidos.get("grupoWhatsapp") || 0);
   const compartilhamentos = Number(tiposPermitidos.get("compartilhamento") || 0);
@@ -7923,7 +7930,11 @@ function renderClientMetricReportContent(client = {}) {
     { key: "imoveis", label: "Imoveis - visualizacoes", count: imoveisVisualizacoes, note: "Aberturas dos anuncios" },
     { key: "imoveis", label: "Imoveis - fotos", count: imoveisFotos, note: "Cliques para ampliar as fotos" },
     { key: "imoveis", label: "Imoveis - WhatsApp", count: imoveisWhatsapp, note: "Cliques no botao Falar no WhatsApp" },
-    { key: "veiculos", label: "Veiculos", count: veiculos, note: "Visualizacoes, fotos e WhatsApp" },
+    { key: "imoveis", label: "Imoveis - Instagram", count: imoveisInstagram, note: "Cliques no Instagram do anunciante" },
+    { key: "veiculos", label: "Automoveis - visualizacoes", count: veiculosVisualizacoes, note: "Aberturas dos anuncios" },
+    { key: "veiculos", label: "Automoveis - fotos", count: veiculosFotos, note: "Cliques para ampliar as fotos" },
+    { key: "veiculos", label: "Automoveis - WhatsApp", count: veiculosWhatsapp, note: "Cliques no botao Chamar no Whats" },
+    { key: "veiculos", label: "Automoveis - Instagram", count: veiculosInstagram, note: "Cliques no Instagram do anunciante" },
     { key: "destaques", label: "Destaques", count: destaques, note: "Cards e slides em destaque" },
     { key: "promocoes", label: "Promocoes", count: promocoesLiquidas, note: "Cliques em ofertas" },
     { key: "gruposWhatsapp", label: "Grupo WhatsApp", count: gruposWhatsapp, note: "Entradas pelo link do grupo" },

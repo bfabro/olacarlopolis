@@ -7499,6 +7499,20 @@ body > .im-modal .swiper-slide img {
   color: #fff;
 }
 
+.btn-instagram-imovel {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 10px;
+  padding: 10px;
+  color: #fff;
+  background: linear-gradient(135deg, #833ab4, #e1306c, #f77737);
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .btn-fotos {
   background: #f1f5f9;
 }
