@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 334,
-  label: "v340",
+  numero: 335,
+  label: "v341",
   data: "2026-06-22",
-  nota: "Relatorio do Admin Cliente atualiza cliques e acessos dos modulos especiais em tempo real."
+  nota: "Cliques no WhatsApp dos imoveis corrigidos e indicadores de visualizacoes, fotos e WhatsApp separados."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -7881,9 +7881,10 @@ function renderClientMetricReportContent(client = {}) {
   const promocoes = Math.max(0, promocoesTotal - whatsappPromocao);
   const novidades = Number(tiposPermitidos.get("novidades") || 0);
   const perfil = Number(tiposPermitidos.get("perfil") || 0);
-  const imoveis = [...tiposPermitidos.entries()]
-    .filter(([tipo]) => /^imovel_/.test(String(tipo)))
-    .reduce((sum, [, count]) => sum + Number(count || 0), 0);
+  const imoveisVisualizacoes = Number(tiposPermitidos.get("imovel_visualizacao") || 0);
+  const imoveisFotos = Number(tiposPermitidos.get("imovel_fotos") || 0);
+  const imoveisWhatsapp = Number(tiposPermitidos.get("imovel_whatsapp") || 0);
+  const imoveis = imoveisVisualizacoes + imoveisFotos + imoveisWhatsapp;
   const veiculos = [...tiposPermitidos.entries()]
     .filter(([tipo]) => /^veiculo_/.test(String(tipo)))
     .reduce((sum, [, count]) => sum + Number(count || 0), 0);
@@ -7919,7 +7920,9 @@ function renderClientMetricReportContent(client = {}) {
     { key: "fotos", label: "Fotos / divulgacao", count: fotos, note: "Fotos e divulgacoes" },
     { key: "novidades", label: "Novidades", count: novidades, note: "Cliques na tela inicial" },
     { key: "perfil", label: "Visualizacao do perfil", count: perfil, note: "Aberturas da area do cliente" },
-    { key: "imoveis", label: "Imoveis", count: imoveis, note: "Visualizacoes, fotos e WhatsApp" },
+    { key: "imoveis", label: "Imoveis - visualizacoes", count: imoveisVisualizacoes, note: "Aberturas dos anuncios" },
+    { key: "imoveis", label: "Imoveis - fotos", count: imoveisFotos, note: "Cliques para ampliar as fotos" },
+    { key: "imoveis", label: "Imoveis - WhatsApp", count: imoveisWhatsapp, note: "Cliques no botao Falar no WhatsApp" },
     { key: "veiculos", label: "Veiculos", count: veiculos, note: "Visualizacoes, fotos e WhatsApp" },
     { key: "destaques", label: "Destaques", count: destaques, note: "Cards e slides em destaque" },
     { key: "promocoes", label: "Promocoes", count: promocoesLiquidas, note: "Cliques em ofertas" },

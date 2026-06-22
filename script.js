@@ -7935,30 +7935,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       const msg = `${saudacao ? saudacao + " " : ""}Meu nome é ${nome}. Vi o imóvel "${im.titulo}", cod de ref: ( ${codigo} ) no Olá Carlópolis e gostaria de mais informações.`;
       const url = `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`;
 
-      // 1) sempre registra o clique do botão (contador)
       try {
-        // se você já tem essa função, mantém:
-        if (typeof registrarCliqueImovel === "function") {
-          registrarCliqueImovel("whatsapp", im).catch(() => { });
-        } else if (window.firebase && firebase.database) {
-          // fallback simples: soma em imoveisCliquesPorDia/YYYY-MM-DD/<imovelId>/whatsapp
-          const hoje = new Date().toISOString().slice(0, 10);
-          const ref = firebase.database().ref(`imoveisCliquesPorDia/${hoje}/${im.id}`);
-          ref.transaction(cur => {
-            const v = cur || {};
-            v.whatsapp = (Number(v.whatsapp || 0) + 1);
-            if (!v.titulo && im.titulo) v.titulo = im.titulo;
-
-
-            if (!v.corretor) v.corretor = (typeof getCorretorPrincipal === "function" ? getCorretorPrincipal(im) : (im.corretor || ""));
-            if (!v.responsavel) v.responsavel = getResponsavelImovel(im); // <-- NOVO
-
-
-            return v;
-          }).catch(() => { });
-        }
-
-        // 2) salva a confirmação com o NOME (para aparecer no relatório)
+        // O clique do botao ja foi contabilizado antes desta etapa.
+        // Aqui e salva somente a confirmacao com o nome informado.
         salvarContatoImovel(im, nome);
 
         if (typeof logEventoCliqueImovel === "function") {
@@ -8005,7 +7984,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         const id = ev.currentTarget.getAttribute("data-id");
         const im = stateImoveis.all.find(x => x.id === id);
         if (!im) return;
-        abrirModalContatoImovel(im); // aqui NÃO registra clique
+        registrarCliqueImovel("whatsapp", im).catch(() => { });
+        abrirModalContatoImovel(im);
       });
     });
 
