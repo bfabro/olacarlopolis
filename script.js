@@ -7867,6 +7867,23 @@ plotarPinsImoveis(stateImoveis.filtered);
       });
     });
 
+    el.querySelectorAll("[data-imovel-detalhes]").forEach((titulo) => {
+      const abrirDetalhes = (ev) => {
+        const cardsAtivos = titulo.closest(".imoveis-wrap")?.classList.contains("im-cards-mode");
+        if (!cardsAtivos) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        const im = stateImoveis.all.find((item) => item.id === titulo.getAttribute("data-imovel-detalhes"));
+        if (!im) return;
+        registrarCliqueImovel("visualizacao", im).catch(() => { });
+        abrirModalDetalhesImovel(im);
+      };
+      titulo.addEventListener("click", abrirDetalhes);
+      titulo.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") abrirDetalhes(ev);
+      });
+    });
+
     // [FOTOS] – abre a galeria E registra clique "fotos"
     // permitir abrir a galeria clicando na imagem ou no botão de lupa
     el.querySelectorAll(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb").forEach(node => {
@@ -8111,6 +8128,96 @@ plotarPinsImoveis(stateImoveis.filtered);
     return "";
   }
 
+  function abrirModalDetalhesImovel(im = {}) {
+    document.querySelector(".imovel-detalhes-modal")?.remove();
+    const responsavel = nomeResponsavel(im);
+    const valor = Number(im.valor || 0);
+    const valorFormatado = valor
+      ? valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) + (im.tipo === "aluguel" ? " / mes" : "")
+      : "Consulte";
+    const detalhes = [
+      ["Finalidade", im.tipo],
+      ["Tipo do imovel", im.procura || im.tipoImovel || im.categoria],
+      ["Status", im.status],
+      ["Endereco", im.endereco],
+      ["Quartos", im.quartos],
+      ["Suites", im.suite],
+      ["Banheiros", im.banheiros],
+      ["Vagas", im.vagas],
+      ["Salas", im.salas],
+      ["Cozinhas", im.cozinhas],
+      ["Area", im.area ? `${im.area}${String(im.area).includes("m") ? "" : " m²"}` : ""],
+      ["Construcao", im.construcao ? `${im.construcao}${String(im.construcao).includes("m") ? "" : " m²"}` : ""],
+      ["Piscina", im.piscina],
+      ["Churrasqueira", im.churrasqueira],
+      ["Quintal", im.quintal],
+      ["Escritorio", im.escritorio],
+      ["Outros", im.outros]
+    ].filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== "" && String(value) !== "0");
+    const imagens = Array.isArray(im.imagens) ? im.imagens.filter(Boolean) : (im.imagem ? [im.imagem] : []);
+
+    const modal = document.createElement("div");
+    modal.className = "imovel-detalhes-modal";
+    modal.innerHTML = `
+      <section class="imovel-detalhes-dialog" role="dialog" aria-modal="true" aria-label="Detalhes de ${escapePromoHtml(im.titulo || "imovel")}">
+        <button type="button" class="imovel-detalhes-fechar" aria-label="Fechar detalhes" title="Fechar">&times;</button>
+        <div class="imovel-detalhes-media">
+          ${imagens[0] ? `<img src="${escapePromoHtml(imagens[0])}" alt="${escapePromoHtml(im.titulo || "Imovel")}" loading="lazy" decoding="async">` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-house"></i></div>`}
+        </div>
+        <div class="imovel-detalhes-conteudo">
+          <div class="imovel-detalhes-topo">
+            <div>
+              <span class="imovel-detalhes-tipo">${escapePromoHtml(String(im.tipo || "Imovel").toUpperCase())}</span>
+              <h2>${escapePromoHtml(im.titulo || "Imovel")}</h2>
+            </div>
+            <strong class="imovel-detalhes-valor">${escapePromoHtml(valorFormatado)}</strong>
+          </div>
+          <div class="imovel-detalhes-referencia"><i class="fa-solid fa-hashtag"></i> Ref.: ${escapePromoHtml(String(im.codRef || im.id || "").toUpperCase())}</div>
+          ${im.descricao ? `<p class="imovel-detalhes-descricao">${escapePromoHtml(im.descricao)}</p>` : ""}
+          <div class="imovel-detalhes-grade">
+            ${detalhes.map(([label, value]) => `
+              <div><span>${escapePromoHtml(label)}</span><strong>${escapePromoHtml(value)}</strong></div>
+            `).join("")}
+          </div>
+          ${responsavel ? `<div class="imovel-detalhes-corretor"><span>Corretor responsável</span><strong>${escapePromoHtml(responsavel)}</strong></div>` : ""}
+          ${imagens.length > 1 ? `
+            <div class="imovel-detalhes-miniaturas">
+              ${imagens.map((src, index) => `<button type="button" data-imovel-foto="${index}" aria-label="Ver foto ${index + 1}"><img src="${escapePromoHtml(src)}" alt="Foto ${index + 1} de ${escapePromoHtml(im.titulo || "imovel")}" loading="lazy"></button>`).join("")}
+            </div>
+          ` : ""}
+        </div>
+      </section>
+    `;
+    document.body.appendChild(modal);
+
+    const fechar = () => {
+      document.removeEventListener("keydown", fecharComEsc);
+      modal.remove();
+    };
+    const fecharComEsc = (event) => {
+      if (event.key === "Escape") fechar();
+    };
+    modal.querySelector(".imovel-detalhes-fechar")?.addEventListener("click", fechar);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) fechar();
+    });
+    modal.querySelector(".imovel-detalhes-media img")?.addEventListener("click", () => {
+      registrarCliqueImovel("fotos", im).catch(() => { });
+      fechar();
+      abrirModalImoveis(im, imagens[0] || "");
+    });
+    modal.querySelectorAll("[data-imovel-foto]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const index = Number(button.dataset.imovelFoto || 0);
+        registrarCliqueImovel("fotos", im).catch(() => { });
+        fechar();
+        abrirModalImoveis(im, imagens[index] || imagens[0] || "");
+      });
+    });
+    document.addEventListener("keydown", fecharComEsc);
+    modal.querySelector(".imovel-detalhes-fechar")?.focus();
+  }
+
 
   function cardImovelHTML(im) {
     const tag = im.tipo; // "venda" | "aluguel"
@@ -8156,7 +8263,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     </div>
 
    <div class="card-body">
-  <div class="card-title">${im.titulo}</div>
+  <div class="card-title" data-imovel-detalhes="${im.id}" role="button" tabindex="0" title="Ver detalhes do imovel">${im.titulo}</div>
   ${im.descricao ? `<div class="descricaoImovel" style="margin-top:8px"><p>${im.descricao}</p></div>` : ""}
   
   <!-- Bairro -->

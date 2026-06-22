@@ -7542,8 +7542,9 @@ body > .im-modal .swiper-slide img {
 }
 
 .corretor-instagram-link {
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 28px;
   width: 28px;
   height: 28px;
@@ -7556,10 +7557,237 @@ body > .im-modal .swiper-slide img {
   box-shadow: inset 0 0 0 1px rgba(214, 41, 118, .18);
 }
 
+.corretor-instagram-link i {
+  display: block;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+}
+
 .corretor-instagram-link:hover,
 .corretor-instagram-link:focus-visible {
   background: #ffe4e9;
   color: #c2185b;
+}
+
+.imoveis-wrap.im-cards-mode .card-title[data-imovel-detalhes] {
+  cursor: pointer;
+}
+
+.imoveis-wrap.im-cards-mode .card-title[data-imovel-detalhes]:hover,
+.imoveis-wrap.im-cards-mode .card-title[data-imovel-detalhes]:focus-visible {
+  color: #075985;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  outline: none;
+}
+
+.imovel-detalhes-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(2, 6, 23, .78);
+  backdrop-filter: blur(4px);
+}
+
+.imovel-detalhes-dialog {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(260px, .85fr) minmax(320px, 1.15fr);
+  width: min(960px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
+}
+
+.imovel-detalhes-fechar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(15, 23, 42, .88);
+  font-size: 1.65rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.imovel-detalhes-media {
+  min-height: 360px;
+  background: #0f172a;
+}
+
+.imovel-detalhes-media img,
+.imovel-detalhes-sem-foto {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+  cursor: zoom-in;
+}
+
+.imovel-detalhes-sem-foto {
+  display: grid;
+  place-items: center;
+  color: #94a3b8;
+  font-size: 4rem;
+}
+
+.imovel-detalhes-conteudo {
+  padding: 28px 24px 24px;
+}
+
+.imovel-detalhes-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.imovel-detalhes-topo h2 {
+  margin: 5px 0 0;
+  color: #0f172a;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.imovel-detalhes-tipo {
+  color: #0284c7;
+  font-size: .75rem;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+
+.imovel-detalhes-valor {
+  flex: 0 0 auto;
+  color: #15803d;
+  font-size: 1.15rem;
+  white-space: nowrap;
+}
+
+.imovel-detalhes-referencia {
+  display: inline-flex;
+  gap: 5px;
+  margin: 14px 0;
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #075985;
+  background: #e0f2fe;
+  font-size: .82rem;
+  font-weight: 800;
+}
+
+.imovel-detalhes-descricao {
+  margin: 0 0 16px;
+  color: #475569;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.imovel-detalhes-grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.imovel-detalhes-grade > div,
+.imovel-detalhes-corretor {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: #f8fafc;
+}
+
+.imovel-detalhes-grade span,
+.imovel-detalhes-corretor span {
+  display: block;
+  color: #64748b;
+  font-size: .7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.imovel-detalhes-grade strong,
+.imovel-detalhes-corretor strong {
+  display: block;
+  margin-top: 3px;
+  color: #1e293b;
+  font-size: .9rem;
+}
+
+.imovel-detalhes-corretor {
+  margin-top: 10px;
+  border-color: #fed7aa;
+  background: #fff7ed;
+}
+
+.imovel-detalhes-miniaturas {
+  display: flex;
+  gap: 7px;
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.imovel-detalhes-miniaturas button {
+  flex: 0 0 68px;
+  width: 68px;
+  height: 54px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 0;
+  overflow: hidden;
+  background: #e2e8f0;
+  cursor: pointer;
+}
+
+.imovel-detalhes-miniaturas button:hover {
+  border-color: #0284c7;
+}
+
+.imovel-detalhes-miniaturas img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 720px) {
+  .imovel-detalhes-dialog {
+    grid-template-columns: 1fr;
+    width: min(560px, 96vw);
+  }
+
+  .imovel-detalhes-media,
+  .imovel-detalhes-media img,
+  .imovel-detalhes-sem-foto {
+    min-height: 230px;
+    max-height: 310px;
+  }
+
+  .imovel-detalhes-conteudo {
+    padding: 20px 16px;
+  }
+
+  .imovel-detalhes-topo {
+    display: block;
+  }
+
+  .imovel-detalhes-valor {
+    display: block;
+    margin-top: 9px;
+  }
 }
 
 .btn-fotos {
