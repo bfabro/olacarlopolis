@@ -7501,41 +7501,51 @@ body > .im-modal .swiper-slide img {
 .corretor-banner.corretor-imovel-identificacao {
   display: flex;
   align-items: center;
-  gap: 6px;
+  flex-wrap: nowrap;
+  gap: 5px;
+  min-width: 0;
   margin: 10px 0 4px;
+  padding: 6px 7px;
 }
 
 .corretor-banner.corretor-imovel-identificacao .k {
+  flex: 0 0 auto;
   color: #78511f;
-  font-size: .76rem;
+  font-size: .68rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .corretor-banner.corretor-imovel-identificacao .v {
+  flex: 1 1 auto;
   min-width: 0;
   color: #3b2b17;
-  font-size: .88rem;
+  font-size: .74rem;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .corretor-instagram-link {
   display: inline-grid;
   place-items: center;
-  flex: 0 0 29px;
-  width: 29px;
-  height: 29px;
-  margin-left: 2px;
-  border-radius: 50%;
-  color: #fff;
-  background: linear-gradient(135deg, #833ab4, #e1306c, #f77737);
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  border-radius: 999px;
+  color: #d62976;
+  background: #fff1f2;
   text-decoration: none;
-  font-size: 1rem;
-  box-shadow: 0 2px 6px rgba(225, 48, 108, .25);
+  font-size: 1.05rem;
+  box-shadow: inset 0 0 0 1px rgba(214, 41, 118, .18);
 }
 
 .corretor-instagram-link:hover,
 .corretor-instagram-link:focus-visible {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
+  background: #ffe4e9;
+  color: #c2185b;
 }
 
 .btn-fotos {

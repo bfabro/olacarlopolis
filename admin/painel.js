@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 338,
-  label: "v344",
+  numero: 339,
+  label: "v345",
   data: "2026-06-22",
-  nota: "Cards de imoveis exibem o corretor e o link do Instagram antes do botao de WhatsApp."
+  nota: "Nome do corretor foi compactado em uma linha e o Instagram segue o visual dos automoveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

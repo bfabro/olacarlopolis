@@ -8181,7 +8181,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       ${responsavel ? `
         <div class="corretor-banner corretor-imovel-identificacao">
           <span class="k">Corretor</span>
-          <strong class="v">${escapePromoHtml(responsavel)}</strong>
+          <strong class="v" title="${escapePromoHtml(responsavel)}">${escapePromoHtml(responsavel)}</strong>
           ${instagramUrl ? `<a class="corretor-instagram-link" data-action="instagram" data-id="${im.id}" href="${instagramUrl}" target="_blank" rel="noopener noreferrer" aria-label="Abrir Instagram de ${escapePromoHtml(responsavel)}" title="Instagram de ${escapePromoHtml(responsavel)}">
             <i class="fa-brands fa-instagram"></i>
           </a>` : ""}
