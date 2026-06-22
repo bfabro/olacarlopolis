@@ -8178,18 +8178,21 @@ plotarPinsImoveis(stateImoveis.filtered);
   
 
 
+      ${responsavel ? `
+        <div class="corretor-banner corretor-imovel-identificacao">
+          <span class="k">Corretor</span>
+          <strong class="v">${escapePromoHtml(responsavel)}</strong>
+          ${instagramUrl ? `<a class="corretor-instagram-link" data-action="instagram" data-id="${im.id}" href="${instagramUrl}" target="_blank" rel="noopener noreferrer" aria-label="Abrir Instagram de ${escapePromoHtml(responsavel)}" title="Instagram de ${escapePromoHtml(responsavel)}">
+            <i class="fa-brands fa-instagram"></i>
+          </a>` : ""}
+        </div>
+      ` : ""}
+
       <div class="card-actions">
         <button class="btn-whats" data-action="whats" data-id="${im.id}" ${isFechado ? 'disabled aria-disabled="true"' : ""}>
           <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
         </button>
-        ${instagramUrl ? `<a class="btn-instagram-imovel" data-action="instagram" data-id="${im.id}" href="${instagramUrl}" target="_blank" rel="noopener noreferrer">
-          <i class="fa-brands fa-instagram"></i> Instagram
-        </a>` : ""}
       </div>
-
-   
-
-      ${responsavel ? `<div class="spec-chip chip-mini corretor-banner"><span class="k">Corretor</span><span class="v">${responsavel}</span></div>` : ``}
 
      <!-- Código de referência -->
   <div class="card-addr2 card-ref"

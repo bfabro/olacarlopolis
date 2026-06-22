@@ -7209,8 +7209,7 @@ html {
 
 .imoveis-wrap.im-cards-mode .descricaoImovel,
 .imoveis-wrap.im-cards-mode .specs-chips,
-.imoveis-wrap.im-cards-mode .price-line,
-.imoveis-wrap.im-cards-mode .corretor-banner {
+.imoveis-wrap.im-cards-mode .price-line {
   display: none !important;
 }
 
@@ -7499,18 +7498,44 @@ body > .im-modal .swiper-slide img {
   color: #fff;
 }
 
-.btn-instagram-imovel {
-  flex: 1;
-  display: inline-flex;
+.corretor-banner.corretor-imovel-identificacao {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 7px;
-  border-radius: 10px;
-  padding: 10px;
+  gap: 6px;
+  margin: 10px 0 4px;
+}
+
+.corretor-banner.corretor-imovel-identificacao .k {
+  color: #78511f;
+  font-size: .76rem;
+  font-weight: 700;
+}
+
+.corretor-banner.corretor-imovel-identificacao .v {
+  min-width: 0;
+  color: #3b2b17;
+  font-size: .88rem;
+}
+
+.corretor-instagram-link {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 29px;
+  width: 29px;
+  height: 29px;
+  margin-left: 2px;
+  border-radius: 50%;
   color: #fff;
   background: linear-gradient(135deg, #833ab4, #e1306c, #f77737);
-  font-weight: 700;
   text-decoration: none;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px rgba(225, 48, 108, .25);
+}
+
+.corretor-instagram-link:hover,
+.corretor-instagram-link:focus-visible {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
 .btn-fotos {
