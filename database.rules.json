@@ -70,7 +70,7 @@
       ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
       ".write": true,
       "$clientKey": {
-        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin' || root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientKey || root.child('clientes').child(root.child('usuariosByUid').child(auth.uid).child('clienteId').val()).child('nomeNormalizado').val() === $clientKey)"
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin' || root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientKey || root.child('clientes').child(root.child('usuariosByUid').child(auth.uid).child('clienteId').val()).child('nomeNormalizado').val() === $clientKey || root.child('clientes').child(root.child('usuariosByUid').child(auth.uid).child('clienteId').val()).child('aliases').child($clientKey).val() === true)"
       }
     },
 

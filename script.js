@@ -540,12 +540,18 @@ function getHojeBR() {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
-function registrarMetricaCliente(idEstabelecimento, grupo, tipo, detalhes = {}) {
-  const clienteKey = String(idEstabelecimento || "")
+function resolverChaveMetricaCliente(idEstabelecimento) {
+  const original = String(idEstabelecimento || "").trim();
+  const normalized = original
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
+  return window.__metricClientIds?.[normalized] || normalized;
+}
+
+function registrarMetricaCliente(idEstabelecimento, grupo, tipo, detalhes = {}) {
+  const clienteKey = resolverChaveMetricaCliente(idEstabelecimento);
   if (!clienteKey) return Promise.resolve();
 
   const hoje = getHojeBR();
@@ -18481,6 +18487,20 @@ plotarPinsImoveis(stateImoveis.filtered);
         window.__paginaInicialSite = paginaInicialAdmin;
         aplicarConfiguracaoPaginaInicial(paginaInicialAdmin);
         const clientesConsolidados = consolidarClientesAdmin(clientes);
+        window.__metricClientIds = {};
+        clientesConsolidados.forEach(({ clienteId, cliente }) => {
+          const aliases = [
+            clienteId,
+            cliente?.nome,
+            cliente?.name,
+            cliente?.nomeNormalizado,
+            ...Object.keys(cliente?.aliases || {})
+          ];
+          aliases.forEach((alias) => {
+            const key = normalizeName(alias || "");
+            if (key) window.__metricClientIds[key] = clienteId;
+          });
+        });
         aplicarCategoriasAdminNoMenu(categoriasAdmin);
 
         if (clientesConsolidados.length) {

@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 329,
-  label: "v335",
+  numero: 330,
+  label: "v336",
   data: "2026-06-22",
-  nota: "Financeiro separa mensal pago e aberto do mes e planos anuais pagos."
+  nota: "Relatorios de clientes unificam metricas pelo ID, nome e aliases do cadastro."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1030,6 +1030,22 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
   return metrics;
 }
 
+function mergeMetricTrees(target = {}, source = {}) {
+  Object.entries(source || {}).forEach(([key, value]) => {
+    if (typeof value === "number") {
+      target[key] = Number(target[key] || 0) + value;
+      return;
+    }
+    if (value && typeof value === "object") {
+      if (!target[key] || typeof target[key] !== "object") target[key] = {};
+      mergeMetricTrees(target[key], value);
+      return;
+    }
+    target[key] = value;
+  });
+  return target;
+}
+
 async function loadAuditLogs() {
   state.auditLogs = [];
   if (!isMaster()) return;
@@ -1786,9 +1802,17 @@ async function loadAllData(onProgress = null) {
   let scopedClientMetrics = null;
   if (!canManage) {
     const client = currentClientRecord();
-    const clientMetricKey = normalizeName(client?.nomeNormalizado || client?.nome || client?.name || client?.id || financeClientId);
-    const scopedMetricsSnap = await getPanelSnapshot(`metricasClientes/${clientMetricKey}`);
-    scopedClientMetrics = scopedClientMetricsFromSnapshot(scopedMetricsSnap, clientMetricKey);
+    const clientMetricKeys = [...new Set([
+      financeClientId,
+      client?.id,
+      client?.nomeNormalizado,
+      normalizeName(client?.nome || client?.name || "")
+    ].filter(Boolean))];
+    scopedClientMetrics = {};
+    for (const clientMetricKey of clientMetricKeys) {
+      const scopedMetricsSnap = await getPanelSnapshot(`metricasClientes/${clientMetricKey}`);
+      mergeMetricTrees(scopedClientMetrics, scopedClientMetricsFromSnapshot(scopedMetricsSnap, clientMetricKey));
+    }
   }
 
   state.usuarios = [];
