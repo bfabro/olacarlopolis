@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 328,
-  label: "v334",
+  numero: 329,
+  label: "v335",
   data: "2026-06-22",
-  nota: "Resumo financeiro mostra quantidade e valor de pagos e em aberto."
+  nota: "Financeiro separa mensal pago e aberto do mes e planos anuais pagos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4512,6 +4512,20 @@ function effectivePaymentStatus(client) {
   return client?.pagamentoStatus || "em_aberto";
 }
 
+function financePaymentStatusForMonth(client, monthKey = currentMonthKey()) {
+  if (!isBillableClientType(client)) return "isento";
+  const invoiceStatus = client?.faturas?.[monthKey]?.status;
+  if (invoiceStatus === "pago") return "pago";
+  if (["em_aberto", "em_analise"].includes(invoiceStatus)) return "em_aberto";
+  if (Array.isArray(client?.mesesEmAberto) && client.mesesEmAberto.includes(monthKey)) return "em_aberto";
+  return effectivePaymentStatus(client);
+}
+
+function financeInvoiceValueForMonth(client, monthKey = currentMonthKey()) {
+  const savedValue = Number(client?.faturas?.[monthKey]?.valorTotal || 0);
+  return savedValue > 0 ? savedValue : valorTotalFaturaCliente(client);
+}
+
 function planLabel(tipoPlano) {
   return {
     mensal: "Mensal",
@@ -6779,16 +6793,20 @@ function renderFinanceiro() {
   });
 
   const activeBillable = state.clientes.filter((client) => client.status === "ativo" && isBillableClientType(client));
-  const paid = activeBillable.filter((client) => effectivePaymentStatus(client) === "pago");
-  const open = activeBillable.filter((client) => effectivePaymentStatus(client) === "em_aberto");
+  const currentMonth = currentMonthKey();
+  const monthlyClients = activeBillable.filter((client) => (client.tipoPlano || "mensal") === "mensal");
+  const paid = monthlyClients.filter((client) => financePaymentStatusForMonth(client, currentMonth) === "pago");
+  const open = monthlyClients.filter((client) => financePaymentStatusForMonth(client, currentMonth) === "em_aberto");
   const free = activeBillable.filter((client) => effectivePaymentStatus(client) === "isento");
-  const paidValue = paid.reduce((sum, client) => sum + valorTotalFaturaCliente(client), 0);
-  const openValue = open.reduce((sum, client) => sum + valorTotalFaturaCliente(client), 0);
+  const paidValue = paid.reduce((sum, client) => sum + financeInvoiceValueForMonth(client, currentMonth), 0);
+  const openValue = open.reduce((sum, client) => sum + financeInvoiceValueForMonth(client, currentMonth), 0);
   const revenueClients = activeBillable.filter((client) => effectivePaymentStatus(client) !== "isento");
+  const annualActiveClients = revenueClients.filter((client) => client.tipoPlano === "anual");
+  const annualPaidClients = annualActiveClients.filter((client) => effectivePaymentStatus(client) === "pago");
   const clientsByPlan = {
     mensal: revenueClients.filter((client) => (client.tipoPlano || "mensal") === "mensal"),
     semestral: revenueClients.filter((client) => client.tipoPlano === "semestral"),
-    anual: revenueClients.filter((client) => client.tipoPlano === "anual")
+    anual: annualPaidClients
   };
   const revenues = Object.fromEntries(Object.entries(clientsByPlan).map(([plan, clients]) => [
     plan,
@@ -6809,8 +6827,8 @@ function renderFinanceiro() {
   $("financeAnnualSummary")?.classList.toggle("hidden", !isMaster());
   if (annualDueList) {
     const dueOrder = $("financeAnnualDueOrder")?.value || "proximos";
-    annualDueList.innerHTML = clientsByPlan.anual.length
-      ? [...clientsByPlan.anual]
+    annualDueList.innerHTML = annualActiveClients.length
+      ? [...annualActiveClients]
         .sort((a, b) => {
           if (dueOrder === "nome") {
             return String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR");
