@@ -7213,6 +7213,20 @@ html {
   display: none !important;
 }
 
+.imoveis-wrap.im-cards-mode .zoom-thumb,
+.imoveis-wrap.im-cards-mode .corretor-imovel-identificacao .k {
+  display: none !important;
+}
+
+.imoveis-wrap.im-cards-mode .corretor-banner.corretor-imovel-identificacao {
+  gap: 4px;
+  padding: 6px;
+}
+
+.imoveis-wrap.im-cards-mode .corretor-imovel-identificacao .v {
+  font-size: .68rem;
+}
+
 /* Imoveis: modal da foto sempre mostra a imagem inteira, inclusive no modo Cards. */
 body > .im-modal .im-modal-content {
   width: min(96vw, 1120px) !important;
