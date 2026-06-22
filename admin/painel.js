@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 331,
-  label: "v337",
+  numero: 332,
+  label: "v338",
   data: "2026-06-22",
-  nota: "Relatorios contabilizam visualizacoes do perfil e cliques nos imoveis do cliente."
+  nota: "Relatorios detalham imoveis e veiculos por referencia, visualizacao, WhatsApp e fotos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -7320,7 +7320,10 @@ function metricButtonLabel(tipo) {
     compartilhamento: "Compartilhamento",
     imovel_visualizacao: "Visualizacao do imovel",
     imovel_fotos: "Fotos do imovel",
-    imovel_whatsapp: "WhatsApp do imovel"
+    imovel_whatsapp: "WhatsApp do imovel",
+    veiculo_visualizacao: "Visualizacao do veiculo",
+    veiculo_fotos: "Fotos do veiculo",
+    veiculo_whatsapp: "WhatsApp do veiculo"
   }[tipo] || String(tipo || "Clique").replace(/[_-]/g, " ");
 }
 
@@ -7504,6 +7507,72 @@ function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
   return rows.sort((a, b) => `${b.date} ${b.hora}`.localeCompare(`${a.date} ${a.hora}`));
 }
 
+function buildItemAccessRows(metrics = {}, range = getReportDateRange(), clientKeys = null) {
+  const rows = new Map();
+  const sources = [
+    metrics.cliquesBotoesDetalhado || {},
+    metrics.cliquesOndeComerDetalhado || {},
+    metrics.cliquesPromocoesDetalhado || {}
+  ];
+  sources.forEach((source) => {
+    Object.entries(source).forEach(([date, day]) => {
+      if (date < range.start || date > range.end) return;
+      Object.entries(day || {}).forEach(([clientKey, logs]) => {
+        if (clientKeys && !metricKeyBelongsToClient(clientKey, clientKeys)) return;
+        Object.values(logs || {}).forEach((item) => {
+          const type = String(item?.tipo || "");
+          const match = type.match(/^(imovel|veiculo)_(visualizacao|fotos|whatsapp)$/);
+          if (!match) return;
+          const kind = match[1];
+          const action = match[2];
+          const itemId = item.imovelId || item.veiculoId || item.codRef || item.tituloConteudo || "sem-id";
+          const key = `${kind}|${itemId}`;
+          if (!rows.has(key)) {
+            rows.set(key, {
+              kind,
+              clientKey,
+              codigo: item.codRef || itemId,
+              titulo: item.tituloConteudo || itemId,
+              visualizacao: 0,
+              fotos: 0,
+              whatsapp: 0,
+              total: 0
+            });
+          }
+          const row = rows.get(key);
+          row[action] += 1;
+          row.total += 1;
+        });
+      });
+    });
+  });
+  return [...rows.values()].sort((a, b) => b.total - a.total || String(a.codigo).localeCompare(String(b.codigo), "pt-BR"));
+}
+
+function renderItemAccessTable(rows = [], emptyMessage = "Nenhum acesso registrado.") {
+  if (!rows.length) return `<div class="list-meta">${escapeHtml(emptyMessage)}</div>`;
+  return `
+    <div class="report-table-wrap">
+      <table class="report-click-table">
+        <thead><tr><th>Tipo</th><th>Codigo de referencia</th><th>Anuncio</th><th>Visualizacoes</th><th>WhatsApp</th><th>Fotos</th><th>Total</th></tr></thead>
+        <tbody>
+          ${rows.map((row) => `
+            <tr>
+              <td><strong>${row.kind === "imovel" ? "Imovel" : "Veiculo"}</strong></td>
+              <td>${escapeHtml(row.codigo || "-")}</td>
+              <td>${escapeHtml(row.titulo || "-")}</td>
+              <td>${row.visualizacao}</td>
+              <td>${row.whatsapp}</td>
+              <td>${row.fotos}</td>
+              <td><strong>${row.total}</strong></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 function buildAccessTimeline(acessos = {}, range = getReportDateRange()) {
   const rows = [];
   Object.entries(acessos || {}).forEach(([date, dia]) => {
@@ -7681,6 +7750,9 @@ function renderClientMetricReportContent(client = {}) {
   const imoveis = [...tiposPermitidos.entries()]
     .filter(([tipo]) => /^imovel_/.test(String(tipo)))
     .reduce((sum, [, count]) => sum + Number(count || 0), 0);
+  const veiculos = [...tiposPermitidos.entries()]
+    .filter(([tipo]) => /^veiculo_/.test(String(tipo)))
+    .reduce((sum, [, count]) => sum + Number(count || 0), 0);
   const destaques = Number(tiposPermitidos.get("destaque") || 0);
   const gruposWhatsapp = Number(tiposPermitidos.get("grupoWhatsapp") || 0);
   const compartilhamentos = Number(tiposPermitidos.get("compartilhamento") || 0);
@@ -7695,7 +7767,7 @@ function renderClientMetricReportContent(client = {}) {
   const redes = instagram + facebook + tiktok + site + outrasRedes;
   const promocoesLiquidas = Math.max(0, promocoes - instagramPromocao);
   const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
-  const total = cardapios + whats + whatsappPromocao + fotos + promocoesLiquidas + novidades + perfil + imoveis + destaques + gruposWhatsapp + compartilhamentos + redes;
+  const total = cardapios + whats + whatsappPromocao + fotos + promocoesLiquidas + novidades + perfil + imoveis + veiculos + destaques + gruposWhatsapp + compartilhamentos + redes;
   const outros = Math.max(0, totalBotoes - total);
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
@@ -7709,6 +7781,7 @@ function renderClientMetricReportContent(client = {}) {
     ["Novidades", novidades],
     ["Visualizacao do perfil", perfil],
     ["Imoveis", imoveis],
+    ["Veiculos", veiculos],
     ["Destaques", destaques],
     ["Promocoes", promocoesLiquidas],
     ["Grupo WhatsApp", gruposWhatsapp],
@@ -7728,6 +7801,7 @@ function renderClientMetricReportContent(client = {}) {
     "novidades",
     "visualizacao do perfil",
     "imoveis",
+    "veiculos",
     "destaques",
     "grupo de WhatsApp",
     ...(clientReportResourceAllowed("Promocoes") ? ["promocoes"] : []),
@@ -7735,6 +7809,7 @@ function renderClientMetricReportContent(client = {}) {
     "compartilhamentos",
     "demais botoes"
   ].join(", ");
+  const itemAccessRows = buildItemAccessRows(state.metricas, range, keys);
 
   return `
     ${renderClientReportPeriodControls(range)}
@@ -7747,6 +7822,7 @@ function renderClientMetricReportContent(client = {}) {
         <article class="stat-card"><span>Novidades</span><strong>${novidades}</strong><small>Cliques na tela inicial</small></article>
         <article class="stat-card"><span>Visualizacao do perfil</span><strong>${perfil}</strong><small>Aberturas da area do cliente</small></article>
         <article class="stat-card"><span>Imoveis</span><strong>${imoveis}</strong><small>Visualizacoes, fotos e WhatsApp dos anuncios</small></article>
+        <article class="stat-card"><span>Veiculos</span><strong>${veiculos}</strong><small>Visualizacoes, fotos e WhatsApp dos anuncios</small></article>
         <article class="stat-card"><span>Destaques</span><strong>${destaques}</strong><small>Cliques nos cards e slides em destaque</small></article>
         <article class="stat-card"><span>Promocoes</span><strong>${promocoesLiquidas}</strong><small>Cliques em ofertas</small></article>
         <article class="stat-card"><span>Grupo WhatsApp</span><strong>${gruposWhatsapp}</strong><small>Entradas pelo link do grupo</small></article>
@@ -7760,6 +7836,11 @@ function renderClientMetricReportContent(client = {}) {
         <section class="panel-card report-card">
           <h3>Resumo por tipo</h3>
           ${renderReportList(rows.filter(([, count]) => count > 0).map(([title, count]) => ({ title, meta: `${count} clique${count === 1 ? "" : "s"}` })), "Ainda nao ha cliques registrados para este cliente no periodo.")}
+        </section>
+        <section class="panel-card report-card report-wide">
+          <h3>Acessos por imovel e veiculo</h3>
+          <p class="list-meta">Contabilizacao separada pelo codigo de referencia de cada anuncio.</p>
+          ${renderItemAccessTable(itemAccessRows, "Ainda nao ha acessos em imoveis ou veiculos neste periodo.")}
         </section>
         <section class="panel-card report-card report-wide">
           <h3>Cliques detalhados por data e horario</h3>
@@ -8031,6 +8112,7 @@ function renderReports() {
   const usoPWA = aggregateUsoPWA(filteredMetrics.usoPWA);
   const totalAcessos = Object.values(filteredMetrics.acessos || {}).reduce((sum, dia) => sum + Number(dia?.total || 0), 0);
   const clickTimeline = buildClickTimeline(state.metricas, periodRange);
+  const itemAccessRows = buildItemAccessRows(state.metricas, periodRange);
   const accessTimeline = buildAccessTimeline(filteredMetrics.acessos, periodRange);
   const generalClickReport = buildGeneralClickRows(cliquesBotoes.detalhes);
   const ondeComerClickRows = buildOndeComerClickRows(cliquesOndeComerCardapios, cliquesOndeComerWhats, cliquesOndeComerFotos);
@@ -8192,6 +8274,12 @@ function renderReports() {
       <section class="panel-card report-card report-wide">
         ${renderReportCardHeader("Horarios dos cliques dos cards", periodRange)}
         ${renderTimelineTable(clickTimeline, "Ainda nao ha horarios detalhados de cliques neste periodo.")}
+      </section>
+
+      <section class="panel-card report-card report-wide">
+        ${renderReportCardHeader("Acessos por imovel e veiculo", periodRange)}
+        <p class="list-meta">Visualizacoes, WhatsApp e fotos separados pelo codigo de referencia do anuncio.</p>
+        ${renderItemAccessTable(itemAccessRows, "Ainda nao ha acessos em imoveis ou veiculos neste periodo.")}
       </section>
 
       <section class="panel-card report-card report-wide">

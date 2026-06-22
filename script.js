@@ -8547,7 +8547,9 @@ plotarPinsImoveis(stateImoveis.filtered);
         imagemPrincipal ? `Imagem: ${imagemPrincipal}` : ""
       ].filter(Boolean).join("\n");
       return `
-        <article id="${novidadeDomId("veiculo", item.id)}" class="auto-card ${item.status === "vendido" ? "is-sold" : ""}" data-novidade-destino="veiculo-${textoSeguroAutomoveis(item.id || "")}">
+        <article id="${novidadeDomId("veiculo", item.id)}" class="auto-card ${item.status === "vendido" ? "is-sold" : ""}"
+          data-auto-id="${textoSeguroAutomoveis(item.id || "")}"
+          data-novidade-destino="veiculo-${textoSeguroAutomoveis(item.id || "")}">
           <div class="auto-card-media" data-auto-gallery="${imagensJson}" data-auto-title="${textoSeguroAutomoveis(titulo)}">
             ${imagens.length ? `
               <div class="auto-gallery-track">
@@ -8583,6 +8585,32 @@ plotarPinsImoveis(stateImoveis.filtered);
       `;
     }).join("");
     configurarGaleriasAutomoveis(box);
+    box.querySelectorAll(".auto-card").forEach((card) => {
+      const item = lista.find((entry) => String(entry.id) === String(card.dataset.autoId));
+      if (!item) return;
+      card.addEventListener("click", (event) => {
+        if (event.target.closest("a, button")) return;
+        registrarCliqueAutomovel("visualizacao", item);
+      });
+      card.querySelectorAll(".auto-gallery-img").forEach((image) => {
+        image.addEventListener("click", () => registrarCliqueAutomovel("fotos", item));
+      });
+      card.querySelector(".auto-whatsapp-button")?.addEventListener("click", () => {
+        registrarCliqueAutomovel("whatsapp", item);
+      });
+    });
+  }
+
+  function registrarCliqueAutomovel(tipo, item = {}) {
+    const responsavel = item.clienteId || item.estabelecimentoId || item.clienteNome || item.vendedor || item.loja;
+    if (!responsavel) return Promise.resolve();
+    return registrarCliqueBotao(`veiculo_${tipo}`, responsavel, "veiculos", {
+      veiculoId: item.id || "",
+      tituloConteudo: [item.marca, item.modelo, item.ano].filter(Boolean).join(" "),
+      codRef: item.codRef || item.codigo || item.id || "",
+      clienteId: item.clienteId || "",
+      vendedor: item.vendedor || item.loja || ""
+    });
   }
 
   function configurarGaleriasAutomoveis(box) {
@@ -21435,6 +21463,7 @@ function registrarCliqueImovelDia(tipo, im) {
   return ref.transaction(curr => {
     const base = curr || {};
     base.titulo = im?.titulo || base.titulo || "";
+    base.codRef = im?.codRef || base.codRef || chave;
     base.corretor = getCorretorPrincipal(im) || base.corretor || "";
     base.proprietario = im?.proprietario || im?.proprietaria || base.proprietario || ""; // ← NOVO
     base[tipo] = (base[tipo] || 0) + 1;
@@ -21452,6 +21481,7 @@ function registrarCliqueImovelResumo(tipo, im) {
   return ref.transaction(curr => {
     const base = curr || { totalFotos: 0, totalWhats: 0, totalVisualizacoes: 0 };
     base.titulo = im?.titulo || base.titulo || "";
+    base.codRef = im?.codRef || base.codRef || chave;
     base.corretor = getCorretorPrincipal(im) || base.corretor || "";
     base.proprietario = im?.proprietario || im?.proprietaria || base.proprietario || ""; // ← NOVO
     if (tipo === "fotos") base.totalFotos = (base.totalFotos || 0) + 1;
@@ -21473,6 +21503,7 @@ function registrarCliqueImovelResumo(tipo, im) {
   return ref.transaction(curr => {
     const base = curr || { totalFotos: 0, totalWhats: 0, totalVisualizacoes: 0 };
     base.titulo = im?.titulo || base.titulo || "";
+    base.codRef = im?.codRef || base.codRef || chave;
     base.corretor = getCorretorPrincipal(im) || base.corretor || "";
     if (tipo === "fotos") base.totalFotos = (base.totalFotos || 0) + 1;
     if (tipo === "whatsapp") base.totalWhats = (base.totalWhats || 0) + 1;
