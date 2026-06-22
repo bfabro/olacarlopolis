@@ -7668,6 +7668,37 @@ if (document.getElementById("imMap") && window.L) {
       .replace(/[\u0300-\u036f]/g, "");
   }
 
+  function nomeCorretorSemRegistro(value = "") {
+    return String(value || "")
+      .trim()
+      .replace(/\bcreci\b\s*[:.-]?\s*/gi, " ")
+      .replace(/\s*[-–—]?\s*\d{1,3}(?:[.\s]\d{3})+\s*[-/]?\s*[a-z]?\b/gi, " ")
+      .replace(/\s*[-–—]?\s*\d{4,6}\s*[-/]?\s*[a-z]?\b/gi, " ")
+      .replace(/\s*[-–—]\s*$/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function chaveCorretorImovel(value = "") {
+    return nomeCorretorSemRegistro(value)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, "");
+  }
+
+  function corretoresDoImovel(im = {}) {
+    const valores = Array.isArray(im.corretores) && im.corretores.length
+      ? im.corretores
+      : [im.corretor];
+    return valores.map((value) => String(value || "").trim()).filter(Boolean);
+  }
+
+  function imovelTemCorretor(im = {}, corretorSelecionado = "") {
+    if (!corretorSelecionado) return true;
+    return corretoresDoImovel(im).some((nome) => chaveCorretorImovel(nome) === corretorSelecionado);
+  }
+
   function aplicarFiltrosImoveis() {
     const tipo = document.getElementById("imTipo").value;
     const q = parseInt(document.getElementById("imQuartos").value || 0, 10);
@@ -7691,11 +7722,7 @@ if (document.getElementById("imMap") && window.L) {
       const qOk = !q || (im.quartos >= q);
       const pOk = !p || (im.valor <= p);
 
-      const corretorOk =
-        !corretorSelecionado ||
-        (Array.isArray(im.corretores)
-          ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
-          : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
+      const corretorOk = imovelTemCorretor(im, corretorSelecionado);
 
       const procuraOk =
         !procuraSelecionado ||
@@ -7779,11 +7806,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const qOk = !q || (im.quartos >= q);
     const pOk = !p || (im.valor <= p);
 
-    const corretorOk =
-      !corretorSelecionado ||
-      (Array.isArray(im.corretores)
-        ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
-        : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
+    const corretorOk = imovelTemCorretor(im, corretorSelecionado);
 
     const bairroOk =
       !bairroSelecionado ||
@@ -8309,11 +8332,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const tipoOk = !tipo || im.tipo === tipo;
     const qOk = !q || (im.quartos >= q);
     const pOk = !p || (im.valor <= p);
-    const corretorOk =
-      !corretorSelecionado ||
-      (Array.isArray(im.corretores)
-        ? im.corretores.some(c => String(c).toLowerCase().includes(corretorSelecionado.toLowerCase()))
-        : String(im.corretor || "").toLowerCase().includes(corretorSelecionado.toLowerCase()));
+    const corretorOk = imovelTemCorretor(im, corretorSelecionado);
     const procuraOk =
       !procuraSelecionado ||
       (String(im.procura || "").toLowerCase() === procuraSelecionado.toLowerCase());
@@ -8354,7 +8373,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   const sel = document.getElementById("filtroCorretor");
   if (!sel) return;
 
-  const selecionadoAtual = sel.value || "";
+  const selecionadoAtual = chaveCorretorImovel(sel.value || "");
 
   const tipo = document.getElementById("imTipo")?.value || "";
   const q = parseInt(document.getElementById("imQuartos")?.value || 0, 10);
@@ -8398,19 +8417,14 @@ plotarPinsImoveis(stateImoveis.filtered);
   const nomesOriginais = {};
 
   baseParaContagem.forEach(im => {
-    let lista = [];
-
-    if (Array.isArray(im.corretores) && im.corretores.length) {
-      lista = im.corretores;
-    } else if (im.corretor) {
-      lista = [im.corretor];
-    }
-
-    lista.forEach(nome => {
-      const nomeLimpo = String(nome || "").trim();
+    const chavesContadas = new Set();
+    corretoresDoImovel(im).forEach(nome => {
+      const nomeLimpo = nomeCorretorSemRegistro(nome);
       if (!nomeLimpo) return;
 
-      const chave = nomeLimpo.toLowerCase();
+      const chave = chaveCorretorImovel(nomeLimpo);
+      if (!chave || chavesContadas.has(chave)) return;
+      chavesContadas.add(chave);
       contagem[chave] = (contagem[chave] || 0) + 1;
       if (!nomesOriginais[chave]) nomesOriginais[chave] = nomeLimpo;
     });
