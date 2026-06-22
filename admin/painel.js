@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 327,
-  label: "v333",
+  numero: 328,
+  label: "v334",
   data: "2026-06-22",
-  nota: "Site publico integra grupos associados diretamente ao perfil do cliente."
+  nota: "Resumo financeiro mostra quantidade e valor de pagos e em aberto."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6782,6 +6782,8 @@ function renderFinanceiro() {
   const paid = activeBillable.filter((client) => effectivePaymentStatus(client) === "pago");
   const open = activeBillable.filter((client) => effectivePaymentStatus(client) === "em_aberto");
   const free = activeBillable.filter((client) => effectivePaymentStatus(client) === "isento");
+  const paidValue = paid.reduce((sum, client) => sum + valorTotalFaturaCliente(client), 0);
+  const openValue = open.reduce((sum, client) => sum + valorTotalFaturaCliente(client), 0);
   const revenueClients = activeBillable.filter((client) => effectivePaymentStatus(client) !== "isento");
   const clientsByPlan = {
     mensal: revenueClients.filter((client) => (client.tipoPlano || "mensal") === "mensal"),
@@ -6793,8 +6795,8 @@ function renderFinanceiro() {
     clients.reduce((sum, client) => sum + valorFinalPlano(client), 0)
   ]));
 
-  $("financePaid").textContent = String(paid.length);
-  $("financeOpen").textContent = String(open.length);
+  $("financePaid").textContent = `${paid.length} - ${moneyBR(paidValue)}`;
+  $("financeOpen").textContent = `${open.length} - ${moneyBR(openValue)}`;
   $("financeFree").textContent = String(free.length);
   $("financeMonthlyRevenue").textContent = moneyBR(revenues.mensal);
   $("financeSemiannualRevenue").textContent = moneyBR(revenues.semestral);
