@@ -13,6 +13,7 @@ import {
   get,
   query,
   limitToLast,
+  onValue,
   set as firebaseSet,
   update as firebaseUpdate,
   remove as firebaseRemove,
@@ -40,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 333,
-  label: "v339",
+  numero: 334,
+  label: "v340",
   data: "2026-06-22",
-  nota: "Relatorio do cliente exibe somente recursos disponiveis e separa os detalhes dos modulos especiais ativos."
+  nota: "Relatorio do Admin Cliente atualiza cliques e acessos dos modulos especiais em tempo real."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -51,6 +52,8 @@ const db = getDatabase(app);
 const storage = getStorage(app);
 const ADMIN_IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 let adminIdleTimer = null;
+let clientMetricsRealtimeUnsubscribers = [];
+let clientMetricsRealtimeSignature = "";
 
 let state = {
   user: null,
@@ -1046,6 +1049,70 @@ function mergeMetricTrees(target = {}, source = {}) {
   return target;
 }
 
+function clientMetricScopeKeys(client = currentClientRecord()) {
+  return [...new Set([
+    currentClientId(),
+    client?.id,
+    client?.nomeNormalizado,
+    normalizeName(client?.nome || client?.name || ""),
+    ...Object.keys(client?.aliases || {})
+  ].map((value) => String(value || "").trim()).filter(Boolean))];
+}
+
+function stopClientMetricsRealtime() {
+  clientMetricsRealtimeUnsubscribers.forEach((unsubscribe) => {
+    try {
+      unsubscribe();
+    } catch (error) {
+      console.warn("Nao foi possivel encerrar uma assinatura de metricas.", error);
+    }
+  });
+  clientMetricsRealtimeUnsubscribers = [];
+  clientMetricsRealtimeSignature = "";
+}
+
+function refreshClientMetricReport(client = currentClientRecord()) {
+  const root = $("clientMetricReportMount");
+  if (!root || !client) return;
+  root.innerHTML = renderClientMetricReportContent(client);
+  bindClientMetricReportControls(client);
+}
+
+function startClientMetricsRealtime(client = currentClientRecord()) {
+  if (canManageClients() || !client) {
+    stopClientMetricsRealtime();
+    return;
+  }
+
+  const keys = clientMetricScopeKeys(client);
+  const signature = keys.slice().sort().join("|");
+  if (!signature || signature === clientMetricsRealtimeSignature) return;
+
+  stopClientMetricsRealtime();
+  clientMetricsRealtimeSignature = signature;
+  const snapshotsByKey = new Map();
+
+  const applyRealtimeMetrics = () => {
+    const metrics = {};
+    snapshotsByKey.forEach((snapshot, clientKey) => {
+      mergeMetricTrees(metrics, scopedClientMetricsFromSnapshot(snapshot, clientKey));
+    });
+    state.metricas = metrics;
+    refreshClientMetricReport(currentClientRecord() || client);
+  };
+
+  clientMetricsRealtimeUnsubscribers = keys.map((clientKey) => onValue(
+    ref(db, `metricasClientes/${clientKey}`),
+    (snapshot) => {
+      snapshotsByKey.set(clientKey, snapshot);
+      applyRealtimeMetrics();
+    },
+    (error) => {
+      console.warn(`Metricas em tempo real indisponiveis para ${clientKey}.`, error);
+    }
+  ));
+}
+
 async function loadAuditLogs() {
   state.auditLogs = [];
   if (!isMaster()) return;
@@ -1802,13 +1869,7 @@ async function loadAllData(onProgress = null) {
   let scopedClientMetrics = null;
   if (!canManage) {
     const client = currentClientRecord();
-    const clientMetricKeys = [...new Set([
-      financeClientId,
-      client?.id,
-      client?.nomeNormalizado,
-      normalizeName(client?.nome || client?.name || ""),
-      ...Object.keys(client?.aliases || {})
-    ].filter(Boolean))];
+    const clientMetricKeys = clientMetricScopeKeys(client);
     scopedClientMetrics = {};
     for (const clientMetricKey of clientMetricKeys) {
       const scopedMetricsSnap = await getPanelSnapshot(`metricasClientes/${clientMetricKey}`);
@@ -10362,7 +10423,12 @@ function renderClientOnlyEditor() {
     bindPhoneMask("coWhatsapp");
     bindPhoneMask("coContact3");
   }
-  if (canViewRelatorios) bindClientMetricReportControls(client);
+  if (canViewRelatorios) {
+    bindClientMetricReportControls(client);
+    startClientMetricsRealtime(client);
+  } else {
+    stopClientMetricsRealtime();
+  }
   const moduleNavButtons = [...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")];
   const activateClientModule = (targetId) => {
     const target = mount.querySelector(`#${targetId}`) || mount.querySelector(`[data-client-module-group="${targetId}"]`);
@@ -12568,6 +12634,7 @@ onAuthStateChanged(auth, async (user) => {
   state.user = user;
   if (!user) {
     stopAdminIdleTimer();
+    stopClientMetricsRealtime();
     state.profile = null;
     hidePanelLoading();
     $("loginView").classList.remove("hidden");
