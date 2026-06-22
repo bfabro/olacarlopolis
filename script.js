@@ -1443,6 +1443,16 @@ document.addEventListener("DOMContentLoaded", function () {
     registrarCliqueBotao(socialType, clientId, "redes-sociais").catch(() => { });
   }, true);
 
+  document.addEventListener("click", (ev) => {
+    const link = ev.target.closest(".cliente-grupo-whatsapp-link");
+    if (!link || typeof registrarCliqueBotao !== "function") return;
+    registrarCliqueBotao("grupoWhatsapp", link.dataset.groupClient || link.dataset.groupId || "grupoWhatsapp", "perfil-cliente", {
+      grupoId: link.dataset.groupId || "",
+      grupoNome: link.dataset.groupName || "",
+      origem: "pagina-cliente"
+    }).catch(() => { });
+  }, true);
+
 
   // 🔹 Botão "Gerar card para divulgação"
   document.addEventListener("click", (ev) => {
@@ -17794,6 +17804,9 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (campoExiste(cliente, "facebook")) est.facebook = cliente.facebook || "";
     if (campoExiste(cliente, "tiktok")) est.tiktok = cliente.tiktok || "";
     if (campoExiste(cliente, "site")) est.site = cliente.site || "";
+    ["grupoWhatsappId", "grupoWhatsappNome", "grupoWhatsappLink", "grupoWhatsappDescricao", "grupoWhatsappImagem", "grupoWhatsappAtivo"].forEach((campo) => {
+      if (campoExiste(cliente, campo)) est[campo] = cliente[campo];
+    });
     if (campoExiste(cliente, "destaqueSemanal")) est.destaqueSemanal = Boolean(cliente.destaqueSemanal);
     ["destaqueSemanas", "destaqueDias", "destaqueInicio", "destaqueFim", "destaqueCobranca", "destaqueValor"].forEach((campo) => {
       if (campoExiste(cliente, campo)) est[campo] = cliente[campo] || "";
@@ -17851,6 +17864,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       facebook: cliente.facebook || "",
       tiktok: cliente.tiktok || "",
       site: cliente.site || "",
+      grupoWhatsappId: cliente.grupoWhatsappId || "",
+      grupoWhatsappNome: cliente.grupoWhatsappNome || "",
+      grupoWhatsappLink: cliente.grupoWhatsappLink || "",
+      grupoWhatsappDescricao: cliente.grupoWhatsappDescricao || "",
+      grupoWhatsappImagem: cliente.grupoWhatsappImagem || "",
+      grupoWhatsappAtivo: cliente.grupoWhatsappAtivo !== false && Boolean(cliente.grupoWhatsappLink),
       destaqueSemanal: Boolean(cliente.destaqueSemanal),
       destaqueSemanas: cliente.destaqueSemanas || 1,
       destaqueDias: cliente.destaqueDias || 7,
@@ -19358,8 +19377,42 @@ ${!establishment.descricaoFalecido ? `
 
         }
 
+        ${(establishment.grupoWhatsappAtivo !== false && establishment.grupoWhatsappLink) ? `
+          <div class="info-box cliente-grupo-whatsapp-card">
+            <div class="cliente-grupo-whatsapp-imagem">
+              ${establishment.grupoWhatsappImagem
+                ? `<img src="${escapePromoHtml(establishment.grupoWhatsappImagem)}" alt="${escapePromoHtml(establishment.grupoWhatsappNome || `Grupo de ${establishment.name}`)}" loading="lazy" decoding="async">`
+                : `<i class="fa-brands fa-whatsapp"></i>`}
+            </div>
+            <div class="cliente-grupo-whatsapp-conteudo">
+              <div class="info-label">Grupo WhatsApp</div>
+              <strong>${escapePromoHtml(establishment.grupoWhatsappNome || `Grupo de ${establishment.name}`)}</strong>
+              ${establishment.grupoWhatsappDescricao ? `<p>${escapePromoHtml(establishment.grupoWhatsappDescricao)}</p>` : ""}
+              <a class="cliente-grupo-whatsapp-link"
+                 href="${escapePromoHtml(establishment.grupoWhatsappLink)}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 data-group-client="${normalizeName(establishment.name)}"
+                 data-group-id="${escapePromoHtml(establishment.grupoWhatsappId || "")}"
+                 data-group-name="${escapePromoHtml(establishment.grupoWhatsappNome || "")}">
+                <i class="fa-brands fa-whatsapp"></i>
+                Entrar no grupo
+              </a>
+            </div>
+          </div>
+        ` : ""}
+
+        ${establishment.infoAdicional ? `
+          <div class="info-box">
+            <i class="fas fa-circle-info info-icon"></i>
+            <div>
+              <div class="info-label">Informações Adicionais</div>
+              <div class="info-value">${establishment.infoAdicional}</div>
+            </div>
+          </div>` : ""}
 
     
+
 
 
 
@@ -19384,16 +19437,6 @@ ${!establishment.descricaoFalecido ? `
         }
 
                  
-
-                  ${establishment.infoAdicional ? `
-                    <div class="info-box">
-                      <i class="fas fa-circle-info info-icon"></i>
-                      <div>
-                        <div class="info-label">Informações Adicionais</div>
-                        <div class="info-value">${establishment.infoAdicional}</div>
-                      </div>
-                    </div>` : ""
-        }
 
                       ${establishment.funeraria ? `
                     <div class="info-box">

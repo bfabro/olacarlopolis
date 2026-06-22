@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 323,
-  label: "v329",
+  numero: 324,
+  label: "v330",
   data: "2026-06-21",
-  nota: "Acesso ao grupo pela novidade contabilizado e cards de WhatsApp destacados em verde."
+  nota: "Grupo WhatsApp do cliente exibido no perfil publico abaixo dos contatos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -10454,7 +10454,8 @@ function renderClientOnlyEditor() {
       [`clientes/${client.id}/grupoWhatsappNome`]: nome,
       [`clientes/${client.id}/grupoWhatsappLink`]: link,
       [`clientes/${client.id}/grupoWhatsappDescricao`]: descricao,
-      [`clientes/${client.id}/grupoWhatsappImagem`]: imagem
+      [`clientes/${client.id}/grupoWhatsappImagem`]: imagem,
+      [`clientes/${client.id}/grupoWhatsappAtivo`]: enabled
     });
     if (enabled) {
       const acao = acaoNovidadeAdmin("grupoWhatsapp", isNewGroup, payload);
@@ -10487,7 +10488,8 @@ function renderClientOnlyEditor() {
       [`clientes/${client.id}/grupoWhatsappNome`]: null,
       [`clientes/${client.id}/grupoWhatsappLink`]: null,
       [`clientes/${client.id}/grupoWhatsappDescricao`]: null,
-      [`clientes/${client.id}/grupoWhatsappImagem`]: null
+      [`clientes/${client.id}/grupoWhatsappImagem`]: null,
+      [`clientes/${client.id}/grupoWhatsappAtivo`]: null
     });
     await removerNovidadesPorDestino("grupoWhatsapp", clientWhatsappGroupId, clientWhatsappGroupId);
     showToast("Grupo WhatsApp excluido.");
