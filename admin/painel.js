@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 324,
-  label: "v330",
-  data: "2026-06-21",
-  nota: "Grupo WhatsApp do cliente exibido no perfil publico abaixo dos contatos."
+  numero: 325,
+  label: "v331",
+  data: "2026-06-22",
+  nota: "Tela de usuarios permite pesquisar pelo nome do cliente vinculado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4216,13 +4216,28 @@ function renderCategoriesList() {
 function renderUsersList() {
   const box = $("usersList");
   if (!box) return;
+  const query = normalizeName($("userSearch")?.value || "");
+  const users = state.usuarios.filter((user) => {
+    if (!query) return true;
+    const client = state.clientes.find((item) => item.id === user.clienteId);
+    return normalizeName([
+      client?.nome,
+      client?.name,
+      client?.nomeNormalizado,
+      client?.id,
+      user.email,
+      user.uid,
+      roleLabel(user.role),
+      statusLabel(user.status)
+    ].filter(Boolean).join(" ")).includes(query);
+  });
 
-  if (!state.usuarios.length) {
-    box.innerHTML = `<div class="list-meta">Nenhum usuario encontrado.</div>`;
+  if (!users.length) {
+    box.innerHTML = `<div class="list-meta">${query ? "Nenhum usuario encontrado para esta pesquisa." : "Nenhum usuario encontrado."}</div>`;
     return;
   }
 
-  box.innerHTML = state.usuarios.map((user) => {
+  box.innerHTML = users.map((user) => {
     const client = state.clientes.find((item) => item.id === user.clienteId);
     return `
       <article class="list-card">
@@ -11805,6 +11820,7 @@ function bindEvents() {
   $("closeUserFormButton")?.addEventListener("click", resetUserForm);
   $("userForm").addEventListener("submit", createPanelUser);
   $("deleteUserButton")?.addEventListener("click", deletePanelUser);
+  $("userSearch")?.addEventListener("input", renderUsersList);
   $("newUserClientSearch")?.addEventListener("input", () => fillUserClientSelect());
   $("newUserClient")?.addEventListener("change", () => {
     const client = state.clientes.find((item) => item.id === $("newUserClient").value);
