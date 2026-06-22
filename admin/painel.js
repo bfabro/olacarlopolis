@@ -40,10 +40,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 325,
-  label: "v331",
+  numero: 326,
+  label: "v332",
   data: "2026-06-22",
-  nota: "Tela de usuarios permite pesquisar pelo nome do cliente vinculado."
+  nota: "Grupos WhatsApp em Informacoes permitem consultar e associar um cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1826,7 +1826,14 @@ async function loadAllData(onProgress = null) {
   state.gruposWhatsapp = [];
   if (gruposWhatsappSnap.exists()) {
     gruposWhatsappSnap.forEach((child) => {
-      state.gruposWhatsapp.push({ id: child.key, ...child.val() });
+      const value = child.val() || {};
+      const linkedClient = state.clientes.find((client) => client.grupoWhatsappId === child.key);
+      state.gruposWhatsapp.push({
+        id: child.key,
+        ...value,
+        clienteId: value.clienteId || linkedClient?.id || "",
+        clienteNome: value.clienteNome || linkedClient?.nome || ""
+      });
       return false;
     });
   }
@@ -6644,6 +6651,8 @@ function resetInfoWhatsappGroupForm() {
   $("infoWhatsappGroupForm")?.reset();
   if ($("infoWhatsappGroupId")) $("infoWhatsappGroupId").value = "";
   if ($("infoWhatsappGroupImage")) $("infoWhatsappGroupImage").value = "";
+  if ($("infoWhatsappGroupClientSearch")) $("infoWhatsappGroupClientSearch").value = "";
+  fillInfoWhatsappGroupClientSelect();
   $("deleteInfoWhatsappGroupButton")?.classList.add("hidden");
   setFormCardOpen("infoWhatsappGroupForm", false);
 }
@@ -6657,6 +6666,9 @@ function fillInfoWhatsappGroupForm(item) {
   $("infoWhatsappGroupImage").value = item.imagem || item.image || "";
   $("infoWhatsappGroupImageUrl").value = item.imagem || item.image || "";
   $("infoWhatsappGroupDescription").value = item.descricao || item.description || "";
+  const client = state.clientes.find((entry) => entry.id === item.clienteId);
+  if ($("infoWhatsappGroupClientSearch")) $("infoWhatsappGroupClientSearch").value = client?.nome || item.clienteNome || "";
+  fillInfoWhatsappGroupClientSelect(item.clienteId || "");
   $("deleteInfoWhatsappGroupButton")?.classList.remove("hidden");
   openFormForEdit("infoWhatsappGroupForm");
 }
@@ -6666,6 +6678,8 @@ function getInfoWhatsappGroupFormData() {
   const link = $("infoWhatsappGroupLink").value.trim();
   const image = $("infoWhatsappGroupImage").value.trim() || $("infoWhatsappGroupImageUrl").value.trim();
   const baseId = $("infoWhatsappGroupId").value || slugify(nome || `grupo-${Date.now()}`);
+  const clienteId = $("infoWhatsappGroupClient")?.value || "";
+  const client = state.clientes.find((item) => item.id === clienteId);
   return cleanForFirebase({
     id: baseId,
     nome,
@@ -6676,19 +6690,39 @@ function getInfoWhatsappGroupFormData() {
     imagem: image,
     image,
     status: $("infoWhatsappGroupStatus").value || "ativo",
+    clienteId,
+    clienteNome: client?.nome || "",
     origem: "painel",
     updatedAt: serverTimestamp(),
     updatedBy: state.user?.uid || ""
   });
 }
 
+function fillInfoWhatsappGroupClientSelect(selectedId = "") {
+  const select = $("infoWhatsappGroupClient");
+  if (!select) return;
+  const currentSelectedId = selectedId || select.value || "";
+  const query = normalizeName($("infoWhatsappGroupClientSearch")?.value || "");
+  const clients = [...state.clientes]
+    .sort((a, b) => String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR", { sensitivity: "base" }))
+    .filter((client) => {
+      if (!query || client.id === currentSelectedId) return true;
+      return normalizeName(`${client.nome || ""} ${client.id || ""} ${client.categoria || ""}`).includes(query);
+    });
+  select.innerHTML = `<option value="">Sem cliente associado</option>` + clients.map((client) => (
+    `<option value="${escapeAttr(client.id)}">${escapeHtml(client.nome || client.id)}</option>`
+  )).join("");
+  if (currentSelectedId && clients.some((client) => client.id === currentSelectedId)) select.value = currentSelectedId;
+}
+
 function renderInfoWhatsappGroupsList() {
   const box = $("infoWhatsappGroupList");
   if (!box) return;
 
-  const q = String($("infoWhatsappGroupSearch")?.value || "").toLowerCase().trim();
+  const q = normalizeName($("infoWhatsappGroupSearch")?.value || "");
   const list = state.gruposWhatsapp.filter((item) => {
-    const hay = `${item.nome || item.name || ""} ${item.descricao || item.description || ""} ${item.link || ""}`.toLowerCase();
+    const client = state.clientes.find((entry) => entry.id === item.clienteId);
+    const hay = normalizeName(`${item.nome || item.name || ""} ${item.descricao || item.description || ""} ${item.link || ""} ${client?.nome || item.clienteNome || ""}`);
     return !q || hay.includes(q);
   });
 
@@ -6703,6 +6737,7 @@ function renderInfoWhatsappGroupsList() {
       <div class="list-title">${escapeHtml(item.nome || item.name || item.id)}</div>
       <div class="list-meta">${escapeHtml(item.descricao || item.description || "Sem descricao")}</div>
       <div class="list-meta">${escapeHtml(item.link || "Sem link")}</div>
+      <div class="list-meta"><strong>Cliente:</strong> ${escapeHtml(state.clientes.find((client) => client.id === item.clienteId)?.nome || item.clienteNome || "Nao associado")}</div>
       <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status)}</span>
       <button type="button" data-edit-whatsapp-group="${escapeAttr(item.id)}">Editar</button>
     </article>
@@ -11672,6 +11707,12 @@ function bindEvents() {
   });
   $("closeInfoWhatsappGroupFormButton")?.addEventListener("click", resetInfoWhatsappGroupForm);
   $("infoWhatsappGroupSearch")?.addEventListener("input", renderInfoWhatsappGroupsList);
+  $("infoWhatsappGroupClientSearch")?.addEventListener("input", () => fillInfoWhatsappGroupClientSelect());
+  $("infoWhatsappGroupClient")?.addEventListener("change", () => {
+    const client = state.clientes.find((item) => item.id === $("infoWhatsappGroupClient").value);
+    if ($("infoWhatsappGroupClientSearch")) $("infoWhatsappGroupClientSearch").value = client?.nome || "";
+    fillInfoWhatsappGroupClientSelect(client?.id || "");
+  });
   $("infoWhatsappGroupImageUpload")?.addEventListener("change", async (event) => {
     await uploadInfoWhatsappGroupImage(event.target.files?.[0]);
     event.target.value = "";
@@ -12199,10 +12240,35 @@ function bindEvents() {
     const id = payload.id;
     delete payload.id;
     const isNewGroup = !state.selectedWhatsappGroupId;
+    const originalGroup = state.gruposWhatsapp.find((item) => item.id === state.selectedWhatsappGroupId) || {};
     if (isNewGroup) payload.createdAt = serverTimestamp();
     const updates = { [`conteudosInformativos/gruposWhatsapp/${id}`]: payload };
     if (state.selectedWhatsappGroupId && state.selectedWhatsappGroupId !== id) {
       updates[`conteudosInformativos/gruposWhatsapp/${state.selectedWhatsappGroupId}`] = null;
+    }
+    if (originalGroup.clienteId && originalGroup.clienteId !== payload.clienteId) {
+      const originalClient = state.clientes.find((client) => client.id === originalGroup.clienteId);
+      if (!originalClient?.grupoWhatsappId || originalClient.grupoWhatsappId === state.selectedWhatsappGroupId) {
+        updates[`clientes/${originalGroup.clienteId}/grupoWhatsappId`] = null;
+        updates[`clientes/${originalGroup.clienteId}/grupoWhatsappNome`] = null;
+        updates[`clientes/${originalGroup.clienteId}/grupoWhatsappLink`] = null;
+        updates[`clientes/${originalGroup.clienteId}/grupoWhatsappDescricao`] = null;
+        updates[`clientes/${originalGroup.clienteId}/grupoWhatsappImagem`] = null;
+        updates[`clientes/${originalGroup.clienteId}/grupoWhatsappAtivo`] = null;
+      }
+    }
+    if (payload.clienteId) {
+      const targetClient = state.clientes.find((client) => client.id === payload.clienteId);
+      if (targetClient?.grupoWhatsappId && targetClient.grupoWhatsappId !== id) {
+        updates[`conteudosInformativos/gruposWhatsapp/${targetClient.grupoWhatsappId}/clienteId`] = null;
+        updates[`conteudosInformativos/gruposWhatsapp/${targetClient.grupoWhatsappId}/clienteNome`] = null;
+      }
+      updates[`clientes/${payload.clienteId}/grupoWhatsappId`] = id;
+      updates[`clientes/${payload.clienteId}/grupoWhatsappNome`] = payload.nome;
+      updates[`clientes/${payload.clienteId}/grupoWhatsappLink`] = payload.link;
+      updates[`clientes/${payload.clienteId}/grupoWhatsappDescricao`] = payload.descricao || "";
+      updates[`clientes/${payload.clienteId}/grupoWhatsappImagem`] = payload.imagem || "";
+      updates[`clientes/${payload.clienteId}/grupoWhatsappAtivo`] = payload.status === "ativo";
     }
     await update(ref(db), updates);
     const acao = acaoNovidadeAdmin("grupoWhatsapp", isNewGroup, payload);
@@ -12212,7 +12278,7 @@ function bindEvents() {
       acao,
       descricao: acao,
       tituloConteudo: tituloConteudoNovidadeAdmin("grupoWhatsapp", payload),
-      estabelecimento: "Olá Carlópolis",
+      estabelecimento: payload.clienteNome || "Olá Carlópolis",
       imagem: imagemPrincipalNovidade(payload),
       categoria: "Grupos WhatsApp",
       destinoTipo: "grupoWhatsapp",
@@ -12229,7 +12295,19 @@ function bindEvents() {
     if (!state.selectedWhatsappGroupId) return;
     const grupo = state.gruposWhatsapp.find((item) => item.id === state.selectedWhatsappGroupId);
     if (!(await confirmarExclusao(grupo?.nome || grupo?.name || state.selectedWhatsappGroupId, "grupo WhatsApp"))) return;
-    await remove(ref(db, `conteudosInformativos/gruposWhatsapp/${state.selectedWhatsappGroupId}`));
+    const updates = { [`conteudosInformativos/gruposWhatsapp/${state.selectedWhatsappGroupId}`]: null };
+    if (grupo?.clienteId) {
+      const client = state.clientes.find((item) => item.id === grupo.clienteId);
+      if (!client?.grupoWhatsappId || client.grupoWhatsappId === state.selectedWhatsappGroupId) {
+        updates[`clientes/${grupo.clienteId}/grupoWhatsappId`] = null;
+        updates[`clientes/${grupo.clienteId}/grupoWhatsappNome`] = null;
+        updates[`clientes/${grupo.clienteId}/grupoWhatsappLink`] = null;
+        updates[`clientes/${grupo.clienteId}/grupoWhatsappDescricao`] = null;
+        updates[`clientes/${grupo.clienteId}/grupoWhatsappImagem`] = null;
+        updates[`clientes/${grupo.clienteId}/grupoWhatsappAtivo`] = null;
+      }
+    }
+    await update(ref(db), updates);
     await removerNovidadesPorDestino("grupoWhatsapp", state.selectedWhatsappGroupId, state.selectedWhatsappGroupId);
     showToast("Grupo WhatsApp excluido.");
     resetInfoWhatsappGroupForm();

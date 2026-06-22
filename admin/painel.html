@@ -799,6 +799,10 @@
               <input type="hidden" id="infoWhatsappGroupId">
               <label>Nome do grupo<input id="infoWhatsappGroupName" required placeholder="Ex.: Noticias Carlópolis"></label>
               <label>Link do grupo<input id="infoWhatsappGroupLink" required placeholder="https://chat.whatsapp.com/..."></label>
+              <label>Cliente associado
+                <input id="infoWhatsappGroupClientSearch" type="search" placeholder="Pesquisar cliente pelo nome..." autocomplete="off">
+                <select id="infoWhatsappGroupClient"></select>
+              </label>
               <label>Status
                 <select id="infoWhatsappGroupStatus">
                   <option value="ativo">Ativo no site</option>
@@ -1338,6 +1342,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=323"></script>
+  <script type="module" src="painel.js?v=324"></script>
 </body>
 </html>
