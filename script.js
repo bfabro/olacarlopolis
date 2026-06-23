@@ -23333,3 +23333,105 @@ function mostrarCombustivel() {
 
   renderizarValoresCombustivel();
 }
+
+// ===== MODULO PUBLICO DE NOTICIAS =====
+(() => {
+  const newsState = { all: [] };
+  const escNews = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
+  const normalizeNews = (value) => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const categories = ["Todas", "Cidade", "Utilidade Pública", "Eventos", "Empregos", "Saúde", "Educação", "Esporte", "Comércio Local", "Prefeitura", "Turismo", "Represa", "Trânsito", "Aviso", "Informe Comercial"];
+  const categoryClass = (category) => `news-cat-${normalizeNews(category).replace(/[^a-z0-9]+/g, "-")}`;
+  const dateTime = (item) => [item.dataPublicacao ? item.dataPublicacao.split("-").reverse().join("/") : "", item.horaPublicacao].filter(Boolean).join(" às ") || "Data não informada";
+  const published = (item, home = false) => item.status === "publicado" && (!home || item.exibirNaHome !== false) && (!home || !item.dataExpiracao || item.dataExpiracao >= new Date().toISOString().slice(0, 10));
+  const sorted = (home = false) => newsState.all.filter((item) => published(item, home)).sort((a, b) => {
+    if (home && Boolean(a.destaquePrincipal) !== Boolean(b.destaquePrincipal)) return a.destaquePrincipal ? -1 : 1;
+    const order = Number(a.ordem || 0) - Number(b.ordem || 0);
+    return order || `${b.dataPublicacao || ""} ${b.horaPublicacao || ""}`.localeCompare(`${a.dataPublicacao || ""} ${a.horaPublicacao || ""}`);
+  });
+  const image = (item) => item.imagemPrincipalUrl || item.imagensExtrasUrls?.[0] || "";
+  const placeholder = (item) => `<div class="news-placeholder ${categoryClass(item.tipoInformacao)}"><i class="fa-solid fa-newspaper"></i></div>`;
+  const bindOpeners = (root = document) => root.querySelectorAll("[data-open-news]").forEach((el) => el.addEventListener("click", () => openDetail(el.dataset.openNews)));
+
+  function renderHome() {
+    const section = document.getElementById("homeNoticiasSection");
+    const box = document.getElementById("homeNewsContent");
+    if (!section || !box) return;
+    const list = sorted(true).slice(0, 4);
+    section.classList.toggle("hidden", !list.length);
+    if (!list.length) return;
+    const [main, ...small] = list;
+    box.innerHTML = `<article class="home-news-main" data-open-news="${escNews(main.slug || main.id)}"><div class="home-news-main-media">${image(main) ? `<img src="${escNews(image(main))}" alt="${escNews(main.titulo)}">` : placeholder(main)}</div><div class="home-news-main-copy"><span class="news-category-badge ${categoryClass(main.tipoInformacao)}">${escNews(main.tipoInformacao)}</span>${main.patrocinado ? `<small class="news-sponsored">${escNews(main.textoPatrocinado || "Conteúdo patrocinado")}</small>` : ""}<h3>${escNews(main.titulo)}</h3><p>${escNews(main.resumoCurto)}</p><div class="news-date"><i class="fa-regular fa-clock"></i>${escNews(dateTime(main))}</div><button type="button">Ler mais <i class="fa-solid fa-arrow-right"></i></button></div></article><div class="home-news-small-list">${small.map((item) => `<article class="home-news-small" data-open-news="${escNews(item.slug || item.id)}"><div class="home-news-thumb">${image(item) ? `<img src="${escNews(image(item))}" alt="${escNews(item.titulo)}">` : placeholder(item)}</div><div><span class="news-category-badge ${categoryClass(item.tipoInformacao)}">${escNews(item.tipoInformacao)}</span><h4>${escNews(item.titulo)}</h4><small>${escNews(dateTime(item))}</small></div><i class="fa-solid fa-chevron-right"></i></article>`).join("")}</div>`;
+    bindOpeners(box);
+  }
+
+  function openList(category = "Todas") {
+    document.querySelector(".news-list-modal")?.remove();
+    const modal = document.createElement("div");
+    modal.className = "news-list-modal";
+    modal.innerHTML = `<section class="news-list-dialog"><button class="news-modal-close">&times;</button><div class="news-list-head"><div><span>Olá Carlópolis</span><h2>Todas as notícias</h2></div><input class="news-list-search" placeholder="Buscar por título"></div><div class="news-filter-chips">${categories.map((cat) => `<button data-news-filter="${escNews(cat)}" class="${cat === category ? "active" : ""}">${escNews(cat)}</button>`).join("")}</div><div class="news-list-grid"></div></section>`;
+    document.body.appendChild(modal);
+    const render = () => {
+      const active = modal.querySelector("[data-news-filter].active")?.dataset.newsFilter || "Todas";
+      const q = normalizeNews(modal.querySelector(".news-list-search").value);
+      const list = sorted().filter((item) => (active === "Todas" || item.tipoInformacao === active) && (!q || normalizeNews(item.titulo).includes(q)));
+      modal.querySelector(".news-list-grid").innerHTML = list.length ? list.map((item) => `<article class="news-list-card" data-open-news="${escNews(item.slug || item.id)}"><div>${image(item) ? `<img src="${escNews(image(item))}" alt="${escNews(item.titulo)}">` : placeholder(item)}</div><span class="news-category-badge ${categoryClass(item.tipoInformacao)}">${escNews(item.tipoInformacao)}</span><h3>${escNews(item.titulo)}</h3><p>${escNews(item.resumoCurto || "")}</p><small>${escNews(dateTime(item))}</small></article>`).join("") : `<p class="news-empty">Nenhuma notícia encontrada.</p>`;
+      bindOpeners(modal.querySelector(".news-list-grid"));
+    };
+    modal.querySelector(".news-modal-close").addEventListener("click", () => modal.remove());
+    modal.addEventListener("click", (event) => { if (event.target === modal) modal.remove(); });
+    modal.querySelectorAll("[data-news-filter]").forEach((button) => button.addEventListener("click", () => { modal.querySelectorAll("[data-news-filter]").forEach((item) => item.classList.toggle("active", item === button)); render(); }));
+    modal.querySelector(".news-list-search").addEventListener("input", render);
+    render();
+  }
+
+  const shareUrl = (item) => { const url = new URL(location.href); url.searchParams.set("noticia", item.slug || item.id); url.hash = ""; return url.toString(); };
+  async function share(item) {
+    const url = shareUrl(item), text = `Confira no Olá Carlópolis: ${item.titulo}`;
+    if (navigator.share) { try { await navigator.share({ title: item.titulo, text, url }); } catch (_) {} return; }
+    await navigator.clipboard.writeText(`${text}\n${url}`);
+    alert("Link copiado");
+  }
+
+  function openDetail(slugOrId, updateUrl = true) {
+    const item = newsState.all.find((news) => news.id === slugOrId || news.slug === slugOrId);
+    if (!item || !published(item)) return;
+    document.querySelector(".news-detail-modal")?.remove();
+    const others = sorted().filter((news) => news.id !== item.id).slice(0, 4);
+    const modal = document.createElement("div");
+    modal.className = "news-detail-modal";
+    modal.innerHTML = `<article class="news-detail-dialog"><header><strong>Olá Carlópolis</strong><button class="news-modal-close">&times;</button></header><div class="news-detail-body"><span class="news-category-badge ${categoryClass(item.tipoInformacao)}">${escNews(item.tipoInformacao)}</span>${item.patrocinado ? `<span class="news-sponsored">${escNews(item.textoPatrocinado || "Conteúdo patrocinado")}</span>` : ""}<h1>${escNews(item.titulo)}</h1><div class="news-detail-meta"><span><i class="fa-regular fa-clock"></i>${escNews(dateTime(item))}</span>${item.local ? `<span><i class="fa-solid fa-location-dot"></i>${escNews(item.local)}</span>` : ""}</div>${image(item) ? `<img class="news-detail-main-image" src="${escNews(image(item))}" alt="${escNews(item.titulo)}">` : placeholder(item)}<div class="news-detail-text">${escNews(item.textoCompleto).replace(/\n/g, "<br>")}</div>${item.fonteMateria ? `<div class="news-source"><strong>Fonte:</strong> ${escNews(item.fonteMateria)}</div>` : ""}<div class="news-detail-actions">${item.linkPublicacaoOficial ? `<a href="${escNews(item.linkPublicacaoOficial)}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver publicação oficial</a>` : ""}<button data-share-news><i class="fa-solid fa-share-nodes"></i> Compartilhar</button>${item.whatsappContato ? `<a class="news-whatsapp" href="https://wa.me/55${String(item.whatsappContato).replace(/\D/g, "")}?text=${encodeURIComponent(`Olá! Vi a notícia "${item.titulo}" no Olá Carlópolis.`)}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${escNews(item.textoBotaoWhatsapp || "Falar no WhatsApp")}</a>` : ""}</div>${item.imagensExtrasUrls?.length ? `<div class="news-extra-images">${item.imagensExtrasUrls.map((url) => `<img src="${escNews(url)}" alt="${escNews(item.titulo)}">`).join("")}</div>` : ""}<section class="more-news"><h2>Mais notícias</h2><div>${others.map((news) => `<article data-open-news="${escNews(news.slug || news.id)}">${image(news) ? `<img src="${escNews(image(news))}" alt="${escNews(news.titulo)}">` : placeholder(news)}<span class="news-category-badge ${categoryClass(news.tipoInformacao)}">${escNews(news.tipoInformacao)}</span><h3>${escNews(news.titulo)}</h3><small>${escNews(dateTime(news))}</small></article>`).join("")}</div></section></div></article>`;
+    document.body.appendChild(modal);
+    if (updateUrl) history.pushState({ noticia: item.slug || item.id }, "", shareUrl(item));
+    const close = () => { modal.remove(); const url = new URL(location.href); if (url.searchParams.has("noticia")) { url.searchParams.delete("noticia"); history.replaceState({}, "", url.pathname + url.search + url.hash); } };
+    modal.querySelector(".news-modal-close").addEventListener("click", close);
+    modal.addEventListener("click", (event) => { if (event.target === modal) close(); });
+    modal.querySelector("[data-share-news]").addEventListener("click", () => share(item));
+    bindOpeners(modal);
+  }
+
+  async function init() {
+    document.getElementById("homeNewsViewAll")?.addEventListener("click", () => openList());
+    if (window.firebase?.database && (!firebase.apps || !firebase.apps.length)) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+        authDomain: "contadoracessos.firebaseapp.com",
+        databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+        projectId: "contadoracessos",
+        storageBucket: "contadoracessos.firebasestorage.app",
+        messagingSenderId: "521517291315",
+        appId: "1:521517291315:web:74f8d878d2d8769460d046"
+      });
+    }
+    const database = typeof esperarFirebaseDatabase === "function"
+      ? await esperarFirebaseDatabase()
+      : (window.firebase?.apps?.length ? firebase.database() : null);
+    if (!database) return;
+    database.ref("noticias").on("value", (snapshot) => {
+      newsState.all = []; snapshot.forEach((child) => { newsState.all.push({ id: child.key, ...(child.val() || {}) }); });
+      renderHome();
+      const requested = new URL(location.href).searchParams.get("noticia");
+      if (requested) openDetail(requested, false);
+    });
+  }
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
+})();

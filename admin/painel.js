@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 345,
-  label: "v351",
+  numero: 346,
+  label: "v352",
   data: "2026-06-22",
-  nota: "Modal dos imoveis ganhou galeria deslizante, tag inferior, referencia alinhada e status removido."
+  nota: "Modulo completo de Noticias adicionado ao painel administrativo e ao site publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -62,6 +62,8 @@ let state = {
   clientesFinanceiro: {},
   usuarios: [],
   eventos: [],
+  noticias: [],
+  noticiaExtraImages: [],
   imoveis: [],
   automoveis: [],
   notasFalecimento: [],
@@ -258,6 +260,7 @@ const views = {
   promocoesClientes: $("promocoesClientesView"),
   categorias: $("categoriasView"),
   eventos: $("eventosView"),
+  noticias: $("noticiasView"),
   imoveis: $("imoveisView"),
   automoveis: $("automoveisView"),
   informacoes: $("informacoesView"),
@@ -278,6 +281,7 @@ const viewCopy = {
   promocoesClientes: ["Promocoes", "Cadastre e ajuste promocoes em nome dos clientes."],
   categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
+  noticias: ["Noticias", "Cadastre materias para a home e para a pagina publica de noticias."],
   imoveis: ["Imoveis", "Cadastre imoveis para venda ou aluguel no site publico."],
   automoveis: ["Automoveis", "Cadastre veiculos para venda no site publico."],
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
@@ -477,6 +481,7 @@ function canAccessView(viewName) {
   if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenInvoice(currentClientRecord());
   if (viewName === "imoveis") return canAccessImoveis();
   if (viewName === "automoveis") return hasPermission("veiculos");
+  if (viewName === "noticias") return canManageClients() || hasPermission("noticias");
   if (viewName === "informacoes") return canManageInformacoes();
   if (viewName === "minhaEmpresa") return true;
   return false;
@@ -1731,7 +1736,7 @@ function hidePanelLoading() {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -1785,7 +1790,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -1862,6 +1867,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("instalacoesPWA", { enabled: canManage }),
     getPanelSnapshot("usoPWA", { enabled: canManage })
   ]);
+  const noticiasSnap = await getPanelSnapshot("noticias");
 
   progress(58, "Organizando clientes e acessos...");
   state.clientesFinanceiro = clientFinanceMapFromSnapshot(clientesFinanceiroSnap, financeClientId);
@@ -1973,6 +1979,15 @@ async function loadAllData(onProgress = null) {
     }
   }
   state.eventos.sort((a, b) => eventSortDate(a).localeCompare(eventSortDate(b)));
+  state.noticias = [];
+  if (noticiasSnap.exists()) {
+    noticiasSnap.forEach((child) => {
+      const item = { id: child.key, ...child.val() };
+      if (canManageClients() || item.createdBy === state.user?.uid) state.noticias.push(item);
+      return false;
+    });
+  }
+  state.noticias.sort((a, b) => String(b.dataPublicacao || "").localeCompare(String(a.dataPublicacao || "")) || Number(b.createdAt || 0) - Number(a.createdAt || 0));
 
   state.categorias = [];
   if (categoriasSnap.exists()) {
@@ -2014,6 +2029,7 @@ async function loadAllData(onProgress = null) {
   fillUserClientSelect();
   fillEventClientSelect();
   renderEventsList();
+  renderNewsAdminList();
   renderImoveisList();
   renderAutomoveisList();
   renderInfoDeathNoticeList();
@@ -2301,6 +2317,7 @@ function switchView(name) {
   if (target === "storiesComerciais") renderStoriesComerciaisView();
   if (target === "relatorios") renderReports();
   if (target === "promocoesClientes") renderStaffPromocoesView();
+  if (target === "noticias") renderNewsAdminList();
   if (target === "imoveis") renderImoveisList();
   if (target === "automoveis") renderAutomoveisList();
   if (target === "informacoes" && !canManageInformacoes()) {
@@ -6862,6 +6879,152 @@ async function uploadInfoWhatsappGroupImage(file) {
   $("infoWhatsappGroupImage").value = url;
   $("infoWhatsappGroupImageUrl").value = url;
   showToast("Imagem do grupo enviada.");
+}
+
+function resetNewsForm() {
+  $("newsForm")?.reset();
+  if ($("newsId")) $("newsId").value = "";
+  if ($("newsMainImageUrl")) $("newsMainImageUrl").value = "";
+  if ($("newsDate")) $("newsDate").value = new Date().toISOString().slice(0, 10);
+  if ($("newsTime")) $("newsTime").value = new Date().toTimeString().slice(0, 5);
+  if ($("newsShowHome")) $("newsShowHome").checked = true;
+  state.noticiaExtraImages = [];
+  $("deleteNewsButton")?.classList.add("hidden");
+  renderNewsImagesPreview();
+  updateNewsSummaryCount();
+}
+
+function updateNewsSummaryCount() {
+  if ($("newsSummaryCount")) $("newsSummaryCount").textContent = `${$("newsSummary")?.value.length || 0}/240`;
+}
+
+function renderNewsImagesPreview() {
+  const main = $("newsMainImagePreview");
+  const mainUrl = $("newsMainImageUrl")?.value || "";
+  if (main) main.innerHTML = mainUrl ? `<img src="${escapeAttr(mainUrl)}" alt="Imagem principal da noticia">` : `<div class="list-meta">Nenhuma imagem principal enviada.</div>`;
+  const extras = $("newsExtraImagesPreview");
+  if (!extras) return;
+  extras.innerHTML = state.noticiaExtraImages.length
+    ? state.noticiaExtraImages.map((url, index) => `<article class="image-card"><img src="${escapeAttr(url)}" alt="Imagem extra"><button type="button" data-remove-news-image="${index}" class="danger-button"><i class="fa-solid fa-trash"></i></button></article>`).join("")
+    : `<div class="list-meta">Nenhuma imagem extra.</div>`;
+  extras.querySelectorAll("[data-remove-news-image]").forEach((button) => button.addEventListener("click", () => {
+    state.noticiaExtraImages.splice(Number(button.dataset.removeNewsImage), 1);
+    renderNewsImagesPreview();
+  }));
+}
+
+async function uploadNewsImage(file, extra = false) {
+  if (!file) return "";
+  const owner = state.user?.uid || "admin";
+  const newsId = $("newsId")?.value || slugify($("newsTitle")?.value || `noticia-${Date.now()}`);
+  const path = `noticias/${owner}/${newsId}/${extra ? "extras" : "principal"}/${Date.now()}-${slugify(file.name || "imagem")}`;
+  return uploadFileWithProgress(storageRef(storage, path), file, "Enviando imagem da noticia", file.name || "imagem");
+}
+
+function newsFormPayload(forcedStatus = "") {
+  const current = state.noticias.find((item) => item.id === $("newsId")?.value) || {};
+  const title = $("newsTitle").value.trim();
+  const status = forcedStatus || $("newsStatus").value || "rascunho";
+  return cleanForFirebase({
+    id: $("newsId").value || slugify(`${title}-${Date.now()}`),
+    tipoInformacao: $("newsCategory").value,
+    categoria: $("newsCategory").value,
+    titulo: title,
+    resumoCurto: $("newsSummary").value.trim(),
+    textoCompleto: $("newsContent").value.trim(),
+    imagemPrincipalUrl: $("newsMainImageUrl").value.trim(),
+    imagensExtrasUrls: [...state.noticiaExtraImages],
+    dataPublicacao: $("newsDate").value,
+    horaPublicacao: $("newsTime").value,
+    local: $("newsLocation").value.trim(),
+    fonteMateria: $("newsSource").value.trim(),
+    linkPublicacaoOficial: $("newsOfficialLink").value.trim(),
+    whatsappContato: $("newsWhatsapp").value.trim(),
+    textoBotaoWhatsapp: $("newsWhatsappText").value.trim(),
+    status,
+    exibirNaHome: $("newsShowHome").checked,
+    destaquePrincipal: $("newsFeatured").checked,
+    patrocinado: $("newsSponsored").checked,
+    textoPatrocinado: $("newsSponsoredText").value.trim(),
+    dataExpiracao: $("newsExpiration").value || "",
+    ordem: Number($("newsOrder").value || 0),
+    slug: slugify($("newsSlug").value.trim() || title),
+    createdAt: current.createdAt || serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    createdBy: current.createdBy || state.user?.uid || "",
+    createdByName: current.createdByName || state.profile?.nome || state.user?.email || "",
+    updatedBy: state.user?.uid || "",
+    updatedByName: state.profile?.nome || state.user?.email || ""
+  });
+}
+
+async function saveNews(forcedStatus = "") {
+  const payload = newsFormPayload(forcedStatus);
+  if (!payload.titulo || !payload.tipoInformacao) return showToast("Informe titulo e categoria.");
+  if (payload.status === "publicado" && (!payload.resumoCurto || !payload.textoCompleto)) return showToast("Para publicar, informe resumo e texto completo.");
+  await firebaseSet(ref(db, `noticias/${payload.id}`), payload);
+  showToast(payload.status === "rascunho" ? "Rascunho salvo." : "Noticia salva.");
+  await loadAllData();
+  resetNewsForm();
+}
+
+function fillNewsForm(item) {
+  $("newsId").value = item.id || "";
+  $("newsCategory").value = item.tipoInformacao || item.categoria || "";
+  $("newsStatus").value = item.status || "rascunho";
+  $("newsTitle").value = item.titulo || "";
+  $("newsSlug").value = item.slug || "";
+  $("newsSummary").value = item.resumoCurto || "";
+  $("newsContent").value = item.textoCompleto || "";
+  $("newsDate").value = item.dataPublicacao || "";
+  $("newsTime").value = item.horaPublicacao || "";
+  $("newsLocation").value = item.local || "";
+  $("newsSource").value = item.fonteMateria || "";
+  $("newsOfficialLink").value = item.linkPublicacaoOficial || "";
+  $("newsWhatsapp").value = item.whatsappContato || "";
+  $("newsWhatsappText").value = item.textoBotaoWhatsapp || "";
+  $("newsExpiration").value = item.dataExpiracao || "";
+  $("newsOrder").value = Number(item.ordem || 0);
+  $("newsShowHome").checked = item.exibirNaHome !== false;
+  $("newsFeatured").checked = Boolean(item.destaquePrincipal);
+  $("newsSponsored").checked = Boolean(item.patrocinado);
+  $("newsSponsoredText").value = item.textoPatrocinado || "";
+  $("newsMainImageUrl").value = item.imagemPrincipalUrl || "";
+  state.noticiaExtraImages = Array.isArray(item.imagensExtrasUrls) ? [...item.imagensExtrasUrls] : [];
+  $("deleteNewsButton").classList.remove("hidden");
+  updateNewsSummaryCount();
+  renderNewsImagesPreview();
+}
+
+function renderNewsAdminList() {
+  const box = $("newsAdminList");
+  if (!box) return;
+  const q = normalizeName($("newsAdminSearch")?.value || "");
+  const list = state.noticias.filter((item) => !q || normalizeName(`${item.titulo} ${item.tipoInformacao} ${item.status}`).includes(q));
+  box.innerHTML = list.length ? list.map((item) => `
+    <article class="list-card news-admin-card">
+      ${item.imagemPrincipalUrl ? `<img src="${escapeAttr(item.imagemPrincipalUrl)}" alt="${escapeAttr(item.titulo)}">` : `<div class="news-admin-placeholder"><i class="fa-solid fa-newspaper"></i></div>`}
+      <div class="list-title">${escapeHtml(item.titulo || "Sem titulo")}</div>
+      <div class="list-meta">${escapeHtml(item.tipoInformacao || "Sem categoria")} · ${escapeHtml(item.dataPublicacao || "Sem data")}</div>
+      <div class="news-admin-badges"><span class="badge ${escapeAttr(item.status || "rascunho")}">${escapeHtml(item.status || "rascunho")}</span>${item.exibirNaHome ? `<span class="badge ativo">Home</span>` : ""}${item.destaquePrincipal ? `<span class="badge pendente">Destaque</span>` : ""}</div>
+      <div class="form-actions">
+        <button type="button" data-edit-news="${escapeAttr(item.id)}"><i class="fa-solid fa-pen"></i> Editar</button>
+        <button type="button" class="ghost-button" data-preview-news="${escapeAttr(item.slug || item.id)}"><i class="fa-solid fa-eye"></i> Visualizar</button>
+        <button type="button" class="ghost-button" data-toggle-news="${escapeAttr(item.id)}">${item.status === "publicado" ? "Inativar" : "Publicar"}</button>
+      </div>
+    </article>`).join("") : `<div class="list-meta">Nenhuma noticia cadastrada.</div>`;
+  box.querySelectorAll("[data-edit-news]").forEach((button) => button.addEventListener("click", () => {
+    const item = state.noticias.find((news) => news.id === button.dataset.editNews);
+    if (item) fillNewsForm(item);
+  }));
+  box.querySelectorAll("[data-preview-news]").forEach((button) => button.addEventListener("click", () => window.open(`../index.html?noticia=${encodeURIComponent(button.dataset.previewNews)}`, "_blank")));
+  box.querySelectorAll("[data-toggle-news]").forEach((button) => button.addEventListener("click", async () => {
+    const item = state.noticias.find((news) => news.id === button.dataset.toggleNews);
+    if (!item) return;
+    if (item.status !== "publicado" && (!item.resumoCurto || !item.textoCompleto)) return showToast("Complete resumo e texto antes de publicar.");
+    await firebaseUpdate(ref(db, `noticias/${item.id}`), { status: item.status === "publicado" ? "inativo" : "publicado", updatedAt: serverTimestamp(), updatedBy: state.user?.uid || "" });
+    await loadAllData();
+  }));
 }
 
 function renderFinanceiro() {
@@ -11837,6 +12000,42 @@ function bindEvents() {
   bindPhoneMask("clientWhatsapp");
   bindPhoneMask("clientContact3");
   bindPhoneMask("paymentBillingWhatsapp");
+  bindPhoneMask("newsWhatsapp");
+  resetNewsForm();
+
+  $("newNewsButton")?.addEventListener("click", resetNewsForm);
+  $("newsSummary")?.addEventListener("input", updateNewsSummaryCount);
+  $("newsTitle")?.addEventListener("input", () => {
+    if (!$("newsId")?.value || !$("newsSlug")?.value) $("newsSlug").value = slugify($("newsTitle").value);
+  });
+  $("newsAdminSearch")?.addEventListener("input", renderNewsAdminList);
+  $("newsMainImageUpload")?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    $("newsMainImageUrl").value = await uploadNewsImage(file);
+    renderNewsImagesPreview();
+    event.target.value = "";
+  });
+  $("newsExtraImagesUpload")?.addEventListener("change", async (event) => {
+    const files = [...(event.target.files || [])].slice(0, Math.max(0, 10 - state.noticiaExtraImages.length));
+    for (const file of files) state.noticiaExtraImages.push(await uploadNewsImage(file, true));
+    renderNewsImagesPreview();
+    event.target.value = "";
+  });
+  $("newsForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await saveNews();
+  });
+  $("saveNewsDraftButton")?.addEventListener("click", () => saveNews("rascunho"));
+  $("deleteNewsButton")?.addEventListener("click", async () => {
+    const id = $("newsId")?.value;
+    if (!id) return;
+    const item = state.noticias.find((news) => news.id === id);
+    if (!(await confirmarExclusao(item?.titulo || id, "noticia"))) return;
+    await firebaseRemove(ref(db, `noticias/${id}`));
+    resetNewsForm();
+    await loadAllData();
+  });
 
   $("loginForm").addEventListener("submit", async (event) => {
     event.preventDefault();

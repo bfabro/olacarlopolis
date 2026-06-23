@@ -79,6 +79,12 @@ service firebase.storage {
       allow delete: if signedIn();
     }
 
+    match /noticias/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if signedIn() && isNewImage();
+      allow delete: if signedIn();
+    }
+
     match /configuracoes/paginaInicial/{allPaths=**} {
       allow read: if true;
       allow create, update: if signedIn() && isNewImage();

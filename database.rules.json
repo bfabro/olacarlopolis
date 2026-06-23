@@ -74,6 +74,13 @@
       }
     },
 
+    "noticias": {
+      ".read": true,
+      "$newsId": {
+        ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin' || (!data.exists() && newData.child('createdBy').val() === auth.uid) || (data.child('createdBy').val() === auth.uid && (!newData.exists() || newData.child('createdBy').val() === auth.uid)))"
+      }
+    },
+
     "cliquesMenuLateral": {
       ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
       ".write": true

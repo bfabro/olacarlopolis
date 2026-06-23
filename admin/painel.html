@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=322">
+  <link rel="stylesheet" href="painel.css?v=323">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -69,6 +69,7 @@
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-bullhorn"></i> Conteudo</span>
           <button data-view="promocoesClientes" data-role="staff"><i class="fa-solid fa-tags"></i> Promocoes</button>
+          <button data-view="noticias" data-permission="noticias"><i class="fa-solid fa-newspaper"></i> Noticias</button>
           <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
           <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
         </section>
@@ -601,6 +602,49 @@
             <h2>Eventos cadastrados</h2>
             <input id="eventSearch" class="search-input" placeholder="Buscar evento...">
             <div id="eventsList" class="list-area"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="noticiasView" class="panel-view hidden">
+        <div class="split-layout noticias-admin-layout">
+          <section class="panel-card form-card">
+            <div class="section-head">
+              <div><h2>Cadastro de noticia</h2><p>Publique informacoes na area Acontece em Carlópolis.</p></div>
+              <button id="newNewsButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Nova</button>
+            </div>
+            <form id="newsForm" class="grid-form">
+              <input id="newsId" type="hidden"><input id="newsMainImageUrl" type="hidden">
+              <label>Categoria<select id="newsCategory" required><option value="">Selecione</option><option>Cidade</option><option>Utilidade Pública</option><option>Eventos</option><option>Empregos</option><option>Saúde</option><option>Educação</option><option>Esporte</option><option>Comércio Local</option><option>Prefeitura</option><option>Turismo</option><option>Represa</option><option>Trânsito</option><option>Aviso</option><option>Informe Comercial</option></select></label>
+              <label>Status<select id="newsStatus"><option value="rascunho">Rascunho</option><option value="publicado">Publicado</option><option value="inativo">Inativo</option></select></label>
+              <label class="wide">Título<input id="newsTitle" required maxlength="180"></label>
+              <label class="wide">Slug<input id="newsSlug" maxlength="180"></label>
+              <label class="wide">Resumo curto <span id="newsSummaryCount" class="field-counter">0/240</span><textarea id="newsSummary" rows="3" maxlength="240"></textarea></label>
+              <label class="wide">Texto completo<textarea id="newsContent" rows="12"></textarea></label>
+              <label>Data de publicação<input id="newsDate" type="date"></label><label>Hora<input id="newsTime" type="time"></label>
+              <label>Local<input id="newsLocation"></label><label>Fonte da matéria<input id="newsSource"></label>
+              <label class="wide">Link da publicação oficial<input id="newsOfficialLink" type="url"></label>
+              <label>WhatsApp<input id="newsWhatsapp"></label><label>Texto do botão WhatsApp<input id="newsWhatsappText" placeholder="Falar no WhatsApp"></label>
+              <label>Data de expiração<input id="newsExpiration" type="date"></label><label>Ordem<input id="newsOrder" type="number" value="0"></label>
+              <label class="check-row"><input id="newsShowHome" type="checkbox" checked> Exibir na home</label>
+              <label class="check-row"><input id="newsFeatured" type="checkbox"> Destaque principal</label>
+              <label class="check-row"><input id="newsSponsored" type="checkbox"> Patrocinado</label>
+              <label>Texto patrocinado<input id="newsSponsoredText" placeholder="Conteúdo patrocinado"></label>
+              <label class="wide">Imagem principal<input id="newsMainImageUpload" type="file" accept="image/*"></label>
+              <div id="newsMainImagePreview" class="wide news-image-preview"></div>
+              <label class="wide">Imagens extras<input id="newsExtraImagesUpload" type="file" accept="image/*" multiple></label>
+              <div id="newsExtraImagesPreview" class="wide image-grid"></div>
+              <div class="form-actions wide">
+                <button id="saveNewsDraftButton" type="button" class="ghost-button"><i class="fa-solid fa-file"></i> Salvar rascunho</button>
+                <button type="submit"><i class="fa-solid fa-paper-plane"></i> Publicar / salvar</button>
+                <button id="deleteNewsButton" type="button" class="danger-button hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
+              </div>
+            </form>
+          </section>
+          <section class="panel-card">
+            <div class="section-head"><div><h2>Noticias cadastradas</h2><p>Edite, visualize, publique ou inative.</p></div></div>
+            <input id="newsAdminSearch" class="search-input" placeholder="Buscar por título ou categoria">
+            <div id="newsAdminList" class="list-area"></div>
           </section>
         </div>
       </section>
@@ -1171,6 +1215,7 @@
                   <strong>Parte admin</strong>
                   <label><input type="checkbox" value="financeiro"> Financeiro</label>
                   <label><input type="checkbox" value="informacoes"> Menu Informacoes</label>
+                  <label><input type="checkbox" value="noticias"> Noticias</label>
                 </div>
                 <div class="permission-group">
                   <strong>Tipo de cliente especifico</strong>
@@ -1342,6 +1387,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=343"></script>
+  <script type="module" src="painel.js?v=344"></script>
 </body>
 </html>
