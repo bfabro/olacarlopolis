@@ -7632,6 +7632,7 @@ body > .im-modal .swiper-slide img {
   min-height: 360px;
   background: #0f172a;
   overflow: hidden;
+  touch-action: pan-y;
 }
 
 .imovel-detalhes-media img,
@@ -7657,6 +7658,21 @@ body > .im-modal .swiper-slide img {
   background: rgba(15, 23, 42, .78);
   cursor: pointer;
   transform: translateY(-50%);
+}
+
+.imovel-detalhes-finalidade {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #fff;
+  background: #0284c7;
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .05em;
+  box-shadow: 0 3px 10px rgba(2, 132, 199, .28);
 }
 
 .imovel-detalhes-galeria-nav.anterior {
@@ -7729,24 +7745,26 @@ body > .im-modal .swiper-slide img {
   color: #0284c7;
 }
 
-.imovel-detalhes-tipo {
-  color: #0284c7;
-  font-size: .75rem;
-  font-weight: 900;
-  letter-spacing: .06em;
+.imovel-detalhes-financeiro {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  text-align: right;
 }
 
 .imovel-detalhes-valor {
-  flex: 0 0 auto;
+  display: block;
   color: #15803d;
   font-size: 1.15rem;
   white-space: nowrap;
 }
 
 .imovel-detalhes-referencia {
-  display: inline-flex;
+  display: flex;
+  align-items: center;
   gap: 5px;
-  margin: 14px 0;
   border-radius: 999px;
   padding: 6px 10px;
   color: #075985;
@@ -7798,6 +7816,7 @@ body > .im-modal .swiper-slide img {
   border-radius: 10px;
   padding: 9px 10px;
   background: #f8fafc;
+  text-align: center;
 }
 
 .imovel-detalhes-grade span {
@@ -7854,9 +7873,12 @@ body > .im-modal .swiper-slide img {
     display: block;
   }
 
-  .imovel-detalhes-valor {
-    display: block;
+  .imovel-detalhes-financeiro {
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     margin-top: 9px;
+    text-align: left;
   }
 }
 

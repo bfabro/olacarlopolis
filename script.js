@@ -8140,7 +8140,6 @@ plotarPinsImoveis(stateImoveis.filtered);
       ? valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) + (im.tipo === "aluguel" ? " / mes" : "")
       : "Consulte";
     const detalhes = [
-      ["Finalidade", im.tipo],
       ["Tipo do imovel", im.procura || im.tipoImovel || im.categoria],
       ["Status", im.status],
       ["Quartos", im.quartos],
@@ -8166,6 +8165,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       <section class="imovel-detalhes-dialog" role="dialog" aria-modal="true" aria-label="Detalhes de ${escapePromoHtml(im.titulo || "imovel")}">
         <button type="button" class="imovel-detalhes-fechar" aria-label="Fechar detalhes" title="Fechar">&times;</button>
         <div class="imovel-detalhes-media">
+          <span class="imovel-detalhes-finalidade">${escapePromoHtml(String(im.tipo || "Imovel").toUpperCase())}</span>
           ${imagens[0] ? `
             <img data-imovel-galeria-principal src="${escapePromoHtml(imagens[0])}" alt="${escapePromoHtml(im.titulo || "Imovel")}" loading="lazy" decoding="async">
             ${imagens.length > 1 ? `
@@ -8178,13 +8178,14 @@ plotarPinsImoveis(stateImoveis.filtered);
         <div class="imovel-detalhes-conteudo">
           <div class="imovel-detalhes-topo">
             <div>
-              <span class="imovel-detalhes-tipo">${escapePromoHtml(String(im.tipo || "Imovel").toUpperCase())}</span>
               <h2>${escapePromoHtml(im.titulo || "Imovel")}</h2>
               ${im.endereco ? `<p class="imovel-detalhes-endereco"><i class="fa-solid fa-location-dot"></i><span>${escapePromoHtml(im.endereco)}</span></p>` : ""}
             </div>
-            <strong class="imovel-detalhes-valor">${escapePromoHtml(valorFormatado)}</strong>
+            <div class="imovel-detalhes-financeiro">
+              <strong class="imovel-detalhes-valor">${escapePromoHtml(valorFormatado)}</strong>
+              <span class="imovel-detalhes-referencia"><i class="fa-solid fa-hashtag"></i> Ref.: ${escapePromoHtml(String(im.codRef || im.id || "").toUpperCase())}</span>
+            </div>
           </div>
-          <div class="imovel-detalhes-referencia"><i class="fa-solid fa-hashtag"></i> Ref.: ${escapePromoHtml(String(im.codRef || im.id || "").toUpperCase())}</div>
           ${im.descricao ? `
             <section class="imovel-detalhes-descricao">
               <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-align-left"></i><span>Sobre o imóvel</span></div>
@@ -8219,6 +8220,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       registrarCliqueImovel("fotos", im).catch(() => { });
       atualizarGaleria(indiceImagem + direcao);
     };
+    let toqueInicioX = 0;
+    let toqueInicioY = 0;
+    let galeriaFoiArrastada = false;
     const fecharComEsc = (event) => {
       if (event.key === "Escape") fechar();
       if (event.key === "ArrowLeft" && imagens.length > 1) navegarGaleria(-1);
@@ -8230,7 +8234,27 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
     modal.querySelector("[data-imovel-galeria-anterior]")?.addEventListener("click", () => navegarGaleria(-1));
     modal.querySelector("[data-imovel-galeria-proxima]")?.addEventListener("click", () => navegarGaleria(1));
+    imagemPrincipal?.addEventListener("touchstart", (event) => {
+      const toque = event.changedTouches?.[0];
+      if (!toque) return;
+      toqueInicioX = toque.clientX;
+      toqueInicioY = toque.clientY;
+      galeriaFoiArrastada = false;
+    }, { passive: true });
+    imagemPrincipal?.addEventListener("touchend", (event) => {
+      const toque = event.changedTouches?.[0];
+      if (!toque || imagens.length < 2) return;
+      const diferencaX = toque.clientX - toqueInicioX;
+      const diferencaY = toque.clientY - toqueInicioY;
+      if (Math.abs(diferencaX) < 45 || Math.abs(diferencaX) <= Math.abs(diferencaY)) return;
+      galeriaFoiArrastada = true;
+      navegarGaleria(diferencaX < 0 ? 1 : -1);
+    }, { passive: true });
     imagemPrincipal?.addEventListener("click", () => {
+      if (galeriaFoiArrastada) {
+        galeriaFoiArrastada = false;
+        return;
+      }
       registrarCliqueImovel("fotos", im).catch(() => { });
       fechar();
       abrirModalImoveis(im, imagens[indiceImagem] || imagens[0] || "");
