@@ -7850,14 +7850,14 @@ body > .im-modal .swiper-slide img {
 }
 
 /* ===== Noticias da cidade ===== */
-.home-news-section{width:min(1080px,calc(100% - 24px));margin:18px auto;padding:18px;border-radius:22px;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.1)}
+.home-news-section{width:min(1080px,calc(100% - 24px));margin:10px auto;padding:10px;border-radius:22px;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.1)}
 body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 .home-news-heading,.news-list-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
 .home-news-heading h2,.news-list-head h2{margin:2px 0 0;color:#0f172a}.home-news-kicker,.news-list-head span{color:#2563eb;font-size:.76rem;font-weight:900;text-transform:uppercase}
 .home-news-heading button{border:0;background:transparent;color:#2563eb;font-weight:800;cursor:pointer}
 .home-news-main{display:grid;grid-template-columns:minmax(260px,1.1fr) minmax(280px,.9fr);overflow:hidden;border:1px solid #e2e8f0;border-radius:18px;cursor:pointer}
 .home-news-main-media{min-height:280px;background:#e2e8f0}.home-news-main-media img,.home-news-thumb img,.news-list-card img,.more-news img{width:100%;height:100%;object-fit:cover}
-.home-news-main-copy{padding:22px}.home-news-main-copy h3{margin:10px 0 8px;color:#0f172a;font-size:1.55rem}.home-news-main-copy p{color:#475569;line-height:1.5}
+.home-news-main-copy{padding:0px}.home-news-main-copy h3{margin:10px 0 8px;color:#0f172a;font-size:1.55rem}.home-news-main-copy p{color:#475569;line-height:1.5}
 .home-news-main-copy button,.news-detail-actions a,.news-detail-actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;border-radius:11px;padding:10px 14px;background:#2563eb;color:#fff;font-weight:800;text-decoration:none;cursor:pointer}
 .news-date,.news-detail-meta{display:flex;gap:12px;flex-wrap:wrap;color:#64748b;font-size:.82rem}.news-date{margin:12px 0}
 .home-news-small-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.home-news-small{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:10px;padding:10px;border:1px solid #e2e8f0;border-radius:14px;cursor:pointer}.home-news-thumb{width:72px;height:64px;overflow:hidden;border-radius:10px}.home-news-small h4{margin:5px 0;color:#1e293b;font-size:.9rem}.home-news-small small{color:#64748b;font-size:.7rem}
