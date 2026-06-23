@@ -14224,8 +14224,8 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .conte
 
   .home-quick-banner-content {
     grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 18px;
+    gap: 6px;
+    padding: 10px;
   }
 
   .home-quick-copy h2 {
