@@ -20182,3 +20182,58 @@ body.vaga-modal-open {
     font-size: 13px !important;
   }
 }
+
+/* ===== Restaurar cards de filtros publicos v354 ===== */
+.promo-city-screen .promo-hero-new {
+  width: min(860px, calc(100% - 16px)) !important;
+  flex-wrap: wrap !important;
+}
+
+.promo-city-screen .promo-filter-card {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.promo-city-screen .promo-filter-menu {
+  position: static !important;
+  order: 3 !important;
+  flex: 1 0 100% !important;
+  width: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 4px 0 0 !important;
+  transform: none !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, .08) !important;
+}
+
+.promo-city-screen .promo-hero-new:not(.promo-filter-open) .promo-filter-menu {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.promo-city-screen .promo-hero-new.promo-filter-open .promo-filter-menu {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px 12px !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.promo-city-screen .promo-filter-menu label {
+  margin: 0 !important;
+}
+
+@media (max-width: 640px) {
+  .promo-city-screen .promo-hero-new {
+    width: min(430px, calc(100% - 12px)) !important;
+  }
+
+  .promo-city-screen .promo-hero-new.promo-filter-open .promo-filter-menu {
+    grid-template-columns: 1fr !important;
+    max-height: 62vh !important;
+    overflow-y: auto !important;
+  }
+}
