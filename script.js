@@ -7861,7 +7861,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     // conecta botões
     el.querySelectorAll(".card-imovel").forEach((card) => {
       card.addEventListener("click", (ev) => {
-        if (ev.target.closest("button, a, input, select, textarea")) return;
+        if (ev.target.closest("button, a, input, select, textarea, [data-imovel-detalhes]")) return;
         const im = stateImoveis.all.find((item) => item.id === card.dataset.id);
         if (im) registrarCliqueImovel("visualizacao", im);
       });
@@ -7869,7 +7869,11 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     el.querySelectorAll("[data-imovel-detalhes]").forEach((titulo) => {
       const abrirDetalhes = (ev) => {
-        const cardsAtivos = titulo.closest(".imoveis-wrap")?.classList.contains("im-cards-mode");
+        const cardsAtivos = Boolean(
+          window.__imoveisModoCards
+          || document.getElementById("imModoCards")?.checked
+          || document.querySelector(".imoveis-wrap")?.classList.contains("im-cards-mode")
+        );
         if (!cardsAtivos) return;
         ev.preventDefault();
         ev.stopPropagation();
@@ -8139,7 +8143,6 @@ plotarPinsImoveis(stateImoveis.filtered);
       ["Finalidade", im.tipo],
       ["Tipo do imovel", im.procura || im.tipoImovel || im.categoria],
       ["Status", im.status],
-      ["Endereco", im.endereco],
       ["Quartos", im.quartos],
       ["Suites", im.suite],
       ["Banheiros", im.banheiros],
@@ -8177,11 +8180,17 @@ plotarPinsImoveis(stateImoveis.filtered);
             <div>
               <span class="imovel-detalhes-tipo">${escapePromoHtml(String(im.tipo || "Imovel").toUpperCase())}</span>
               <h2>${escapePromoHtml(im.titulo || "Imovel")}</h2>
+              ${im.endereco ? `<p class="imovel-detalhes-endereco"><i class="fa-solid fa-location-dot"></i><span>${escapePromoHtml(im.endereco)}</span></p>` : ""}
             </div>
             <strong class="imovel-detalhes-valor">${escapePromoHtml(valorFormatado)}</strong>
           </div>
           <div class="imovel-detalhes-referencia"><i class="fa-solid fa-hashtag"></i> Ref.: ${escapePromoHtml(String(im.codRef || im.id || "").toUpperCase())}</div>
-          ${im.descricao ? `<p class="imovel-detalhes-descricao">${escapePromoHtml(im.descricao)}</p>` : ""}
+          ${im.descricao ? `
+            <section class="imovel-detalhes-descricao">
+              <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-align-left"></i><span>Sobre o imóvel</span></div>
+              <p>${escapePromoHtml(im.descricao)}</p>
+            </section>
+          ` : ""}
           <div class="imovel-detalhes-grade">
             ${detalhes.map(([label, value]) => `
               <div><span>${escapePromoHtml(label)}</span><strong>${escapePromoHtml(value)}</strong></div>

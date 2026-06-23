@@ -7712,6 +7712,23 @@ body > .im-modal .swiper-slide img {
   overflow-wrap: anywhere;
 }
 
+.imovel-detalhes-endereco {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 8px 0 0;
+  color: #475569;
+  font-size: .88rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.imovel-detalhes-endereco i {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #0284c7;
+}
+
 .imovel-detalhes-tipo {
   color: #0284c7;
   font-size: .75rem;
@@ -7740,9 +7757,33 @@ body > .im-modal .swiper-slide img {
 
 .imovel-detalhes-descricao {
   margin: 0 0 16px;
-  color: #475569;
+  overflow: hidden;
+  border: 1px solid #bae6fd;
+  border-left: 4px solid #0284c7;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0f9ff, #f8fafc);
+}
+
+.imovel-detalhes-descricao-titulo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px 0;
+  color: #0369a1;
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.imovel-detalhes-descricao p {
+  margin: 0;
+  padding: 8px 12px 11px;
+  color: #334155;
+  font-size: .9rem;
   line-height: 1.55;
   white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 
 .imovel-detalhes-grade {
