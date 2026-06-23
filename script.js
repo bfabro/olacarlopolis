@@ -7382,10 +7382,10 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
 
     <div class="imoveis-wrap ${window.__imoveisModoCards ? "im-cards-mode" : ""}">
   <section class="imoveis-filter-toolbar">
-    <button id="imToggleFiltros" class="im-filter-toggle" type="button" aria-expanded="true">
+    <button id="imToggleFiltros" class="im-filter-toggle" type="button" aria-expanded="false">
       <i class="fa-solid fa-sliders"></i>
       <span>Filtro</span>
-      <i class="fa-solid fa-chevron-up"></i>
+      <i class="fa-solid fa-chevron-down"></i>
     </button>
     <label class="switch im-cards-switch ${window.__imoveisModoCards ? "is-active" : ""}" title="Mostrar imoveis em cards menores" aria-pressed="${window.__imoveisModoCards ? "true" : "false"}">
       <input type="checkbox" id="imModoCards" ${window.__imoveisModoCards ? "checked" : ""}>
@@ -7394,7 +7394,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     </label>
   </section>
   <!-- Painel de filtros -->
-  <aside id="filtrosImoveis" class="im-filtros painel-filtros">
+  <aside id="filtrosImoveis" class="im-filtros painel-filtros im-filter-collapsed">
 
     <div class="topbar">
       <h4 class="filtro-titulo">Filtrar</h4>
@@ -8961,9 +8961,9 @@ plotarPinsImoveis(stateImoveis.filtered);
     area.innerHTML = `
       <section class="imoveis-wrap automoveis-page">
         <h2 class="highlighted"><span><i class="fa-solid fa-car"></i> AUTOMOVEIS</span></h2>
-        <aside id="filtrosAutomoveis" class="im-filtros painel-filtros">
+        <aside id="filtrosAutomoveis" class="im-filtros painel-filtros auto-filter-collapsed">
           <div class="topbar">
-            <button id="autoToggleFiltros" class="auto-filter-toggle" type="button" aria-expanded="true">
+            <button id="autoToggleFiltros" class="auto-filter-toggle" type="button" aria-expanded="false">
               <i class="fa-solid fa-sliders"></i>
               <span>Filtro</span>
               <i class="fa-solid fa-chevron-down auto-filter-chevron"></i>
@@ -9577,7 +9577,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         <input id="promoSearchInput" value="${escapePromoHtml(buscaAtual)}" placeholder="Busque por categoria ou nome do local">
         <button type="button" aria-label="Filtros"><i class="fa-solid fa-sliders"></i></button>
       </div>
-    <section class="promo-hero promo-hero-new promo-filter-open">
+    <section class="promo-hero promo-hero-new">
       <div class="promo-city-head">
         <div class="promo-city-title">
           <span class="promo-fire-badge"><i class="fa-solid fa-fire"></i></span>
@@ -9592,7 +9592,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           <span><i class="fa-solid fa-fire"></i><strong>${totalDisponiveis}</strong> ofertas hoje</span>
           <span><i class="fa-solid fa-store"></i><strong>${totalEstabelecimentos}</strong> estabelecimentos</span>
         </div>
-      <div class="filtro-comidas-card promo-filter-card is-open">
+      <div class="filtro-comidas-card promo-filter-card">
         <label for="filtroEstab"><i class="fa-solid fa-sliders"></i> Filtro</label>
         <select id="filtroEstab">
           <option value="todos">Todas as promoções</option>
@@ -9990,7 +9990,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       };
       promoFilterLabel.setAttribute("role", "button");
       promoFilterLabel.setAttribute("tabindex", "0");
-      promoFilterLabel.setAttribute("aria-expanded", promoFilterCard.classList.contains("is-open") ? "true" : "false");
+      promoFilterLabel.setAttribute("aria-expanded", "false");
       promoFilterLabel.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();

@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 348,
-  label: "v354",
+  numero: 349,
+  label: "v355",
   data: "2026-06-23",
-  nota: "Cards de filtros das telas publicas de imoveis, automoveis e promocoes foram restaurados."
+  nota: "Filtros publicos voltaram ao comportamento original e seus cards nao ficam mais sob a busca fixa."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
