@@ -10743,14 +10743,14 @@ body > .im-modal .swiper-slide img {
 /* === Selo de preço no topo da imagem === */
 .price-pill {
   position: absolute;
-  right: 10px;
-  top: 10px;
-  padding: 8px 12px;
+  right: 0px;
+  top: 0px;
+  padding: 4px 8px;
   border-radius: 12px;
   background: rgba(0,0,0,0.65);
   color: #fff;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1;
   backdrop-filter: blur(2px);
   box-shadow: 0 6px 16px rgba(0,0,0,.18);
