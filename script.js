@@ -8141,7 +8141,6 @@ plotarPinsImoveis(stateImoveis.filtered);
       : "Consulte";
     const detalhes = [
       ["Tipo do imovel", im.procura || im.tipoImovel || im.categoria],
-      ["Status", im.status],
       ["Quartos", im.quartos],
       ["Suites", im.suite],
       ["Banheiros", im.banheiros],
@@ -8167,7 +8166,9 @@ plotarPinsImoveis(stateImoveis.filtered);
         <div class="imovel-detalhes-media">
           <span class="imovel-detalhes-finalidade">${escapePromoHtml(String(im.tipo || "Imovel").toUpperCase())}</span>
           ${imagens[0] ? `
-            <img data-imovel-galeria-principal src="${escapePromoHtml(imagens[0])}" alt="${escapePromoHtml(im.titulo || "Imovel")}" loading="lazy" decoding="async">
+            <div class="imovel-detalhes-galeria-track" data-imovel-galeria-track>
+              ${imagens.map((src, index) => `<img src="${escapePromoHtml(src)}" alt="Foto ${index + 1} de ${escapePromoHtml(im.titulo || "Imovel")}" loading="lazy" decoding="async">`).join("")}
+            </div>
             ${imagens.length > 1 ? `
               <button type="button" class="imovel-detalhes-galeria-nav anterior" data-imovel-galeria-anterior aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button>
               <button type="button" class="imovel-detalhes-galeria-nav proxima" data-imovel-galeria-proxima aria-label="Proxima foto"><i class="fa-solid fa-chevron-right"></i></button>
@@ -8207,13 +8208,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       modal.remove();
     };
     let indiceImagem = 0;
-    const imagemPrincipal = modal.querySelector("[data-imovel-galeria-principal]");
+    const galeriaTrack = modal.querySelector("[data-imovel-galeria-track]");
     const contadorGaleria = modal.querySelector("[data-imovel-galeria-contador]");
     const atualizarGaleria = (novoIndice) => {
-      if (!imagemPrincipal || !imagens.length) return;
+      if (!galeriaTrack || !imagens.length) return;
       indiceImagem = (novoIndice + imagens.length) % imagens.length;
-      imagemPrincipal.src = imagens[indiceImagem];
-      imagemPrincipal.alt = `Foto ${indiceImagem + 1} de ${im.titulo || "imovel"}`;
+      galeriaTrack.style.transform = `translateX(-${indiceImagem * 100}%)`;
       if (contadorGaleria) contadorGaleria.textContent = `${indiceImagem + 1} / ${imagens.length}`;
     };
     const navegarGaleria = (direcao) => {
@@ -8234,14 +8234,14 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
     modal.querySelector("[data-imovel-galeria-anterior]")?.addEventListener("click", () => navegarGaleria(-1));
     modal.querySelector("[data-imovel-galeria-proxima]")?.addEventListener("click", () => navegarGaleria(1));
-    imagemPrincipal?.addEventListener("touchstart", (event) => {
+    galeriaTrack?.addEventListener("touchstart", (event) => {
       const toque = event.changedTouches?.[0];
       if (!toque) return;
       toqueInicioX = toque.clientX;
       toqueInicioY = toque.clientY;
       galeriaFoiArrastada = false;
     }, { passive: true });
-    imagemPrincipal?.addEventListener("touchend", (event) => {
+    galeriaTrack?.addEventListener("touchend", (event) => {
       const toque = event.changedTouches?.[0];
       if (!toque || imagens.length < 2) return;
       const diferencaX = toque.clientX - toqueInicioX;
@@ -8250,7 +8250,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       galeriaFoiArrastada = true;
       navegarGaleria(diferencaX < 0 ? 1 : -1);
     }, { passive: true });
-    imagemPrincipal?.addEventListener("click", () => {
+    galeriaTrack?.addEventListener("click", () => {
       if (galeriaFoiArrastada) {
         galeriaFoiArrastada = false;
         return;

@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 344,
-  label: "v350",
+  numero: 345,
+  label: "v351",
   data: "2026-06-22",
-  nota: "Modal dos imoveis ganhou finalidade sobre a foto, referencia junto ao valor e gesto lateral na galeria."
+  nota: "Modal dos imoveis ganhou galeria deslizante, tag inferior, referencia alinhada e status removido."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
