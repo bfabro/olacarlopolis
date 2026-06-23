@@ -10804,16 +10804,16 @@ body > .im-modal .swiper-slide img {
 
 .price-pill {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 0%;
+  left: 0px;
   right: auto;            /* não deixar encostar do lado direito */
   display: inline-block;  /* ocupa só o conteúdo */
   width: auto;            /* não estica */
   white-space: nowrap;    /* tudo numa linha */
-  padding: 8px 12px;
+  padding: 4px 8px;
   border-radius: 999px;
   font-weight: 800;
-  font-size: 15px;
+  font-size: 14px;
   color: #fff;
   z-index: 3;
   pointer-events: none;   /* não atrapalha cliques na imagem/lupa */
