@@ -7601,7 +7601,8 @@ body > .im-modal .swiper-slide img {
   grid-template-columns: minmax(260px, .85fr) minmax(320px, 1.15fr);
   width: min(960px, 96vw);
   max-height: 92vh;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   border-radius: 18px;
   background: #fff;
   box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
@@ -7626,8 +7627,11 @@ body > .im-modal .swiper-slide img {
 }
 
 .imovel-detalhes-media {
+  position: relative;
+  min-width: 0;
   min-height: 360px;
   background: #0f172a;
+  overflow: hidden;
 }
 
 .imovel-detalhes-media img,
@@ -7635,8 +7639,45 @@ body > .im-modal .swiper-slide img {
   width: 100%;
   height: 100%;
   min-height: 360px;
-  object-fit: cover;
+  object-fit: contain;
   cursor: zoom-in;
+}
+
+.imovel-detalhes-galeria-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(15, 23, 42, .78);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.imovel-detalhes-galeria-nav.anterior {
+  left: 10px;
+}
+
+.imovel-detalhes-galeria-nav.proxima {
+  right: 10px;
+}
+
+.imovel-detalhes-galeria-contador {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #fff;
+  background: rgba(15, 23, 42, .78);
+  font-size: .78rem;
+  font-weight: 800;
 }
 
 .imovel-detalhes-sem-foto {
@@ -7647,7 +7688,9 @@ body > .im-modal .swiper-slide img {
 }
 
 .imovel-detalhes-conteudo {
+  min-width: 0;
   padding: 28px 24px 24px;
+  overflow-wrap: anywhere;
 }
 
 .imovel-detalhes-topo {
@@ -7657,11 +7700,16 @@ body > .im-modal .swiper-slide img {
   gap: 16px;
 }
 
+.imovel-detalhes-topo > div {
+  min-width: 0;
+}
+
 .imovel-detalhes-topo h2 {
   margin: 5px 0 0;
   color: #0f172a;
   font-size: clamp(1.25rem, 3vw, 1.75rem);
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .imovel-detalhes-tipo {
@@ -7699,20 +7747,19 @@ body > .im-modal .swiper-slide img {
 
 .imovel-detalhes-grade {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
-.imovel-detalhes-grade > div,
-.imovel-detalhes-corretor {
+.imovel-detalhes-grade > div {
+  min-width: 0;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 9px 10px;
   background: #f8fafc;
 }
 
-.imovel-detalhes-grade span,
-.imovel-detalhes-corretor span {
+.imovel-detalhes-grade span {
   display: block;
   color: #64748b;
   font-size: .7rem;
@@ -7720,47 +7767,12 @@ body > .im-modal .swiper-slide img {
   text-transform: uppercase;
 }
 
-.imovel-detalhes-grade strong,
-.imovel-detalhes-corretor strong {
+.imovel-detalhes-grade strong {
   display: block;
   margin-top: 3px;
   color: #1e293b;
   font-size: .9rem;
-}
-
-.imovel-detalhes-corretor {
-  margin-top: 10px;
-  border-color: #fed7aa;
-  background: #fff7ed;
-}
-
-.imovel-detalhes-miniaturas {
-  display: flex;
-  gap: 7px;
-  margin-top: 12px;
-  overflow-x: auto;
-}
-
-.imovel-detalhes-miniaturas button {
-  flex: 0 0 68px;
-  width: 68px;
-  height: 54px;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  padding: 0;
-  overflow: hidden;
-  background: #e2e8f0;
-  cursor: pointer;
-}
-
-.imovel-detalhes-miniaturas button:hover {
-  border-color: #0284c7;
-}
-
-.imovel-detalhes-miniaturas img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 720px) {
@@ -7780,6 +7792,23 @@ body > .im-modal .swiper-slide img {
     padding: 20px 16px;
   }
 
+  .imovel-detalhes-grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .imovel-detalhes-grade > div {
+    padding: 7px 6px;
+  }
+
+  .imovel-detalhes-grade span {
+    font-size: .61rem;
+  }
+
+  .imovel-detalhes-grade strong {
+    font-size: .76rem;
+  }
+
   .imovel-detalhes-topo {
     display: block;
   }
@@ -7787,6 +7816,17 @@ body > .im-modal .swiper-slide img {
   .imovel-detalhes-valor {
     display: block;
     margin-top: 9px;
+  }
+}
+
+@media (max-width: 430px) {
+  .imovel-detalhes-modal {
+    padding: 8px;
+  }
+
+  .imovel-detalhes-dialog {
+    width: 100%;
+    max-height: 96vh;
   }
 }
 

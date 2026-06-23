@@ -8152,7 +8152,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       ["Churrasqueira", im.churrasqueira],
       ["Quintal", im.quintal],
       ["Escritorio", im.escritorio],
-      ["Outros", im.outros]
+      ["Outros", im.outros],
+      ["Corretor", responsavel]
     ].filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== "" && String(value) !== "0");
     const imagens = Array.isArray(im.imagens) ? im.imagens.filter(Boolean) : (im.imagem ? [im.imagem] : []);
 
@@ -8162,7 +8163,14 @@ plotarPinsImoveis(stateImoveis.filtered);
       <section class="imovel-detalhes-dialog" role="dialog" aria-modal="true" aria-label="Detalhes de ${escapePromoHtml(im.titulo || "imovel")}">
         <button type="button" class="imovel-detalhes-fechar" aria-label="Fechar detalhes" title="Fechar">&times;</button>
         <div class="imovel-detalhes-media">
-          ${imagens[0] ? `<img src="${escapePromoHtml(imagens[0])}" alt="${escapePromoHtml(im.titulo || "Imovel")}" loading="lazy" decoding="async">` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-house"></i></div>`}
+          ${imagens[0] ? `
+            <img data-imovel-galeria-principal src="${escapePromoHtml(imagens[0])}" alt="${escapePromoHtml(im.titulo || "Imovel")}" loading="lazy" decoding="async">
+            ${imagens.length > 1 ? `
+              <button type="button" class="imovel-detalhes-galeria-nav anterior" data-imovel-galeria-anterior aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button>
+              <button type="button" class="imovel-detalhes-galeria-nav proxima" data-imovel-galeria-proxima aria-label="Proxima foto"><i class="fa-solid fa-chevron-right"></i></button>
+              <span class="imovel-detalhes-galeria-contador" data-imovel-galeria-contador>1 / ${imagens.length}</span>
+            ` : ""}
+          ` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-house"></i></div>`}
         </div>
         <div class="imovel-detalhes-conteudo">
           <div class="imovel-detalhes-topo">
@@ -8179,12 +8187,6 @@ plotarPinsImoveis(stateImoveis.filtered);
               <div><span>${escapePromoHtml(label)}</span><strong>${escapePromoHtml(value)}</strong></div>
             `).join("")}
           </div>
-          ${responsavel ? `<div class="imovel-detalhes-corretor"><span>Corretor responsável</span><strong>${escapePromoHtml(responsavel)}</strong></div>` : ""}
-          ${imagens.length > 1 ? `
-            <div class="imovel-detalhes-miniaturas">
-              ${imagens.map((src, index) => `<button type="button" data-imovel-foto="${index}" aria-label="Ver foto ${index + 1}"><img src="${escapePromoHtml(src)}" alt="Foto ${index + 1} de ${escapePromoHtml(im.titulo || "imovel")}" loading="lazy"></button>`).join("")}
-            </div>
-          ` : ""}
         </div>
       </section>
     `;
@@ -8194,25 +8196,35 @@ plotarPinsImoveis(stateImoveis.filtered);
       document.removeEventListener("keydown", fecharComEsc);
       modal.remove();
     };
+    let indiceImagem = 0;
+    const imagemPrincipal = modal.querySelector("[data-imovel-galeria-principal]");
+    const contadorGaleria = modal.querySelector("[data-imovel-galeria-contador]");
+    const atualizarGaleria = (novoIndice) => {
+      if (!imagemPrincipal || !imagens.length) return;
+      indiceImagem = (novoIndice + imagens.length) % imagens.length;
+      imagemPrincipal.src = imagens[indiceImagem];
+      imagemPrincipal.alt = `Foto ${indiceImagem + 1} de ${im.titulo || "imovel"}`;
+      if (contadorGaleria) contadorGaleria.textContent = `${indiceImagem + 1} / ${imagens.length}`;
+    };
+    const navegarGaleria = (direcao) => {
+      registrarCliqueImovel("fotos", im).catch(() => { });
+      atualizarGaleria(indiceImagem + direcao);
+    };
     const fecharComEsc = (event) => {
       if (event.key === "Escape") fechar();
+      if (event.key === "ArrowLeft" && imagens.length > 1) navegarGaleria(-1);
+      if (event.key === "ArrowRight" && imagens.length > 1) navegarGaleria(1);
     };
     modal.querySelector(".imovel-detalhes-fechar")?.addEventListener("click", fechar);
     modal.addEventListener("click", (event) => {
       if (event.target === modal) fechar();
     });
-    modal.querySelector(".imovel-detalhes-media img")?.addEventListener("click", () => {
+    modal.querySelector("[data-imovel-galeria-anterior]")?.addEventListener("click", () => navegarGaleria(-1));
+    modal.querySelector("[data-imovel-galeria-proxima]")?.addEventListener("click", () => navegarGaleria(1));
+    imagemPrincipal?.addEventListener("click", () => {
       registrarCliqueImovel("fotos", im).catch(() => { });
       fechar();
-      abrirModalImoveis(im, imagens[0] || "");
-    });
-    modal.querySelectorAll("[data-imovel-foto]").forEach((button) => {
-      button.addEventListener("click", () => {
-        const index = Number(button.dataset.imovelFoto || 0);
-        registrarCliqueImovel("fotos", im).catch(() => { });
-        fechar();
-        abrirModalImoveis(im, imagens[index] || imagens[0] || "");
-      });
+      abrirModalImoveis(im, imagens[indiceImagem] || imagens[0] || "");
     });
     document.addEventListener("keydown", fecharComEsc);
     modal.querySelector(".imovel-detalhes-fechar")?.focus();
