@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 353,
-  label: "v359",
+  numero: 354,
+  label: "v360",
   data: "2026-06-25",
-  nota: "Painel admin mostra barra de carregamento em acoes demoradas de botoes e formularios."
+  nota: "Clique em Relatorios mostra barra de carregamento antes de montar a tela pesada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -12572,6 +12572,23 @@ function bindEvents() {
   }
   document.querySelectorAll(".nav-admin button").forEach((button) => {
     button.addEventListener("click", () => {
+      if (button.dataset.view === "relatorios") {
+        const finish = beginAdminActionLoading("Montando relatórios...", button);
+        showAdminActionLoading("Montando relatórios...", button);
+        return new Promise((resolve) => {
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              try {
+                switchView(button.dataset.view);
+                closeAdminMenuOnMobile();
+              } finally {
+                finish();
+                resolve();
+              }
+            }, 0);
+          });
+        });
+      }
       switchView(button.dataset.view);
       closeAdminMenuOnMobile();
     });
