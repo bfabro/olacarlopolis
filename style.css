@@ -6484,6 +6484,36 @@ html {
   gap: 8px;
 }
 
+.rank-filter-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(130px, 1fr)) auto;
+  gap: 8px;
+  align-items: end;
+  margin: 10px 0 12px;
+  padding: 10px;
+  border: 1px solid #bae6fd;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .72);
+}
+
+.rank-filter-card label {
+  display: grid;
+  gap: 4px;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.rank-filter-card input {
+  min-height: 38px;
+  border: 1px solid #93c5fd;
+  border-radius: 10px;
+  padding: 0 9px;
+  background: #fff;
+  color: #111827;
+  font-weight: 800;
+}
+
 .rank-list {
   list-style: none;
   margin: 0;
@@ -6567,6 +6597,15 @@ html {
   white-space: nowrap;
 }
 
+.rank-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .rank-score {
   display: grid;
   justify-items: end;
@@ -6608,6 +6647,14 @@ html {
 
 /* responsivo */
 @media (max-width: 480px) {
+  .rank-filter-card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rank-filter-card button {
+    grid-column: 1 / -1;
+  }
+
   .score-bar {
     width: 90px;
   }

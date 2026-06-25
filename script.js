@@ -682,6 +682,36 @@ function setPlayerName(newName) {
   return true;
 }
 
+function capivarinhaDateKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function capivarinhaFormatDateBR(value) {
+  if (!value) return "Data não informada";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(String(value))) {
+    const [year, month, day] = String(value).split("-");
+    return `${day}/${month}/${year}`;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Data não informada";
+  return date.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+}
+
+function capivarinhaRecordDateKey(item = {}) {
+  if (item.bestDate) return String(item.bestDate);
+  const timestamp = Number(item.bestAt || item.updatedAt || item.ts || 0);
+  if (timestamp > 0) return capivarinhaDateKey(new Date(timestamp));
+  if (item.bestDateTime) return capivarinhaDateKey(new Date(item.bestDateTime));
+  return "";
+}
+
 function salvarScoreCapivarinha(score) {
   try {
     if (!window.firebase || !firebase.database) {
@@ -693,6 +723,10 @@ function salvarScoreCapivarinha(score) {
     const uid = getOrCreatePlayerId();
     const name = getPlayerName();
     if (!name) return;
+    const agora = new Date();
+    const agoraMs = agora.getTime();
+    const dataRecorde = capivarinhaDateKey(agora);
+    const dataHoraRecorde = agora.toISOString();
 
     const db = firebase.database();
     const userRef = db.ref(`jogos/capivarinha/users/${uid}`);
@@ -700,7 +734,9 @@ function salvarScoreCapivarinha(score) {
     // Atualiza histórico opcional (mantém cada partida, se você quiser estatística)
     db.ref("jogos/capivarinha/scores").push({
       uid, name, score: Number(score),
-      ts: firebase.database.ServerValue.TIMESTAMP
+      date: dataRecorde,
+      dateTime: dataHoraRecorde,
+      ts: agoraMs
     }).catch(() => { });
 
     // Transaction para manter o MELHOR score (best) do usuário
@@ -711,14 +747,22 @@ function salvarScoreCapivarinha(score) {
         return {
           name,
           best: Number(score),
-          updatedAt: firebase.database.ServerValue.TIMESTAMP
+          bestAt: agoraMs,
+          bestDate: dataRecorde,
+          bestDateTime: dataHoraRecorde,
+          updatedAt: agoraMs
         };
       }
       // atualiza nome (pode ter sido trocado) e recorde se for maior
+      const novoRecorde = Number(score) > Number(best);
       return {
+        ...curr,
         name,
         best: Math.max(Number(best), Number(score)),
-        updatedAt: firebase.database.ServerValue.TIMESTAMP
+        bestAt: novoRecorde ? agoraMs : (curr.bestAt || curr.updatedAt || agoraMs),
+        bestDate: novoRecorde ? dataRecorde : (curr.bestDate || capivarinhaRecordDateKey(curr)),
+        bestDateTime: novoRecorde ? dataHoraRecorde : (curr.bestDateTime || ""),
+        updatedAt: agoraMs
       };
     }).then(() => {
       console.log("Recorde verificado/atualizado:", name, score);
@@ -744,6 +788,15 @@ function mostrarRankingCapivarinha() {
       <div class="rank-title">
   🏅 Top Records <span><br>(melhor pontuação por jogador)</span>
 </div>
+      <div class="rank-filter-card">
+        <label>Data de
+          <input id="rankDataInicio" type="date">
+        </label>
+        <label>Data até
+          <input id="rankDataFim" type="date">
+        </label>
+        <button class="btn-rank" id="rankLimparDatas" type="button">Limpar datas</button>
+      </div>
       <ul id="rankList" class="rank-list"></ul>
 
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
@@ -755,6 +808,10 @@ function mostrarRankingCapivarinha() {
   `;
 
   const ul = document.getElementById("rankList");
+  const inputInicio = document.getElementById("rankDataInicio");
+  const inputFim = document.getElementById("rankDataFim");
+  const btnLimparDatas = document.getElementById("rankLimparDatas");
+  const filtrosRanking = { inicio: "", fim: "" };
 
   // segurança: sem Firebase, mostra aviso e sai
   if (!window.firebase || !firebase.database) {
@@ -771,8 +828,7 @@ function mostrarRankingCapivarinha() {
     .orderByChild("best")
     .limitToLast(50);
 
-  // listener que redesenha a lista
-  ref.on("value", (snap) => {
+  const renderRanking = (snap) => {
     const arr = [];
     snap.forEach(ch => {
       const v = ch.val();
@@ -783,20 +839,26 @@ function mostrarRankingCapivarinha() {
     });
 
     // ordena do maior para o menor
-    arr.sort((a, b) => b.best - a.best);
+    const filtrados = arr.filter((item) => {
+      const data = capivarinhaRecordDateKey(item);
+      const inicioOk = !filtrosRanking.inicio || (data && data >= filtrosRanking.inicio);
+      const fimOk = !filtrosRanking.fim || (data && data <= filtrosRanking.fim);
+      return inicioOk && fimOk;
+    }).sort((a, b) => b.best - a.best);
 
-    if (!arr.length) {
-      ul.innerHTML = `<li class="rank-empty">Ninguém no ranking ainda. Jogue e salve seu score! 🎮</li>`;
+    if (!filtrados.length) {
+      ul.innerHTML = `<li class="rank-empty">${arr.length ? "Nenhum recorde encontrado para o período selecionado." : "Ninguém no ranking ainda. Jogue e salve seu score! 🎮"}</li>`;
       return;
     }
 
-    const top = arr[0]?.best || 1;
+    const top = filtrados[0]?.best || 1;
 
-    ul.innerHTML = arr.map((it, i) => {
+    ul.innerHTML = filtrados.map((it, i) => {
       const pos = i + 1;
       const medalClass = pos === 1 ? "medal-1" : pos === 2 ? "medal-2" : pos === 3 ? "medal-3" : "";
       const fillPct = Math.max(6, Math.round((Number(it.best || 0) / top) * 100));
       const isMe = it._id === myUid;
+      const dataRecorde = capivarinhaRecordDateKey(it);
 
       return `
     <li class="rank-item rank-item--compact ${isMe ? "me" : ""}">
@@ -808,6 +870,7 @@ function mostrarRankingCapivarinha() {
           </div>
           <div class="score-number">${Number(it.best || 0)}</div>
         </div>
+        <div class="rank-date"><i class="fa-regular fa-calendar"></i> ${capivarinhaFormatDateBR(dataRecorde)}</div>
         <div class="score-bar">
           <div class="score-fill" style="width:${fillPct}%"></div>
         </div>
@@ -821,6 +884,25 @@ function mostrarRankingCapivarinha() {
     // rolar até minha posição (se eu estiver na lista)
     const myItem = ul.querySelector(".rank-item.me");
     if (myItem) myItem.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  let rankingSnapshot = null;
+  ref.on("value", (snap) => {
+    rankingSnapshot = snap;
+    renderRanking(snap);
+  });
+
+  const aplicarFiltroDataRanking = () => {
+    filtrosRanking.inicio = inputInicio?.value || "";
+    filtrosRanking.fim = inputFim?.value || "";
+    if (rankingSnapshot) renderRanking(rankingSnapshot);
+  };
+  inputInicio?.addEventListener("change", aplicarFiltroDataRanking);
+  inputFim?.addEventListener("change", aplicarFiltroDataRanking);
+  btnLimparDatas?.addEventListener("click", () => {
+    if (inputInicio) inputInicio.value = "";
+    if (inputFim) inputFim.value = "";
+    aplicarFiltroDataRanking();
   });
 
   // Botão "Trocar nome"

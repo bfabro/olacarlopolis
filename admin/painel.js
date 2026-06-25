@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 354,
-  label: "v360",
+  numero: 355,
+  label: "v361",
   data: "2026-06-25",
-  nota: "Clique em Relatorios mostra barra de carregamento antes de montar a tela pesada."
+  nota: "Ranking da Capivarinha exibe data do recorde e filtro por periodo."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
