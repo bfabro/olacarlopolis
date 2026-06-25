@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=323">
+  <link rel="stylesheet" href="painel.css?v=324">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1387,6 +1387,15 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="painel.js?v=350"></script>
+  <div id="adminActionLoading" class="admin-action-loading hidden" aria-live="polite">
+    <div class="admin-action-loading-card">
+      <div class="admin-action-loading-head">
+        <i class="fa-solid fa-circle-notch"></i>
+        <span id="adminActionLoadingText">Carregando...</span>
+      </div>
+      <div class="admin-action-loading-bar"><span></span></div>
+    </div>
+  </div>
+  <script type="module" src="painel.js?v=351"></script>
 </body>
 </html>

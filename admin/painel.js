@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 352,
-  label: "v358",
+  numero: 353,
+  label: "v359",
   data: "2026-06-25",
-  nota: "Noticias publicas com filtros e relatorio de cliques das noticias."
+  nota: "Painel admin mostra barra de carregamento em acoes demoradas de botoes e formularios."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1573,6 +1573,96 @@ function showToast(message, options = {}) {
     toast.classList.remove("prominent");
   }, success ? 5200 : 3600);
 }
+
+const ADMIN_ACTION_LOADING_DELAY = 280;
+const ADMIN_ACTION_LOADING_MIN_VISIBLE = 450;
+let adminActionLoadingCount = 0;
+let adminActionLoadingTimer = null;
+let adminActionLoadingVisibleAt = 0;
+
+function adminActionLoadingLabel(target) {
+  const text = String(target?.innerText || target?.textContent || "").replace(/\s+/g, " ").trim();
+  if (/salvar|gravar|publicar|atualizar/i.test(text)) return "Salvando alterações...";
+  if (/excluir|remover|limpar/i.test(text)) return "Processando exclusão...";
+  if (/gerar|baixar|download|boleto|pix|arte|story/i.test(text)) return "Gerando informações...";
+  if (/enviar|upload|imagem|foto|logo/i.test(text)) return "Enviando arquivo...";
+  if (/entrar|login/i.test(text)) return "Validando acesso...";
+  if (/atualizar|sincronizar|migrar|auditar/i.test(text)) return "Atualizando dados...";
+  return text ? `Carregando ${text}...` : "Carregando...";
+}
+
+function showAdminActionLoading(message = "Carregando...", sourceButton = null) {
+  const box = $("adminActionLoading");
+  if (!box) return;
+  $("adminActionLoadingText").textContent = message;
+  box.classList.remove("hidden");
+  adminActionLoadingVisibleAt = Date.now();
+  sourceButton?.classList?.add("admin-button-loading");
+}
+
+function beginAdminActionLoading(message = "Carregando...", sourceButton = null) {
+  adminActionLoadingCount += 1;
+  if (!adminActionLoadingTimer && $("adminActionLoading")?.classList.contains("hidden")) {
+    adminActionLoadingTimer = setTimeout(() => {
+      adminActionLoadingTimer = null;
+      if (adminActionLoadingCount > 0) showAdminActionLoading(message, sourceButton);
+    }, ADMIN_ACTION_LOADING_DELAY);
+  } else if (adminActionLoadingCount > 0 && !$("adminActionLoading")?.classList.contains("hidden")) {
+    $("adminActionLoadingText").textContent = message;
+    sourceButton?.classList?.add("admin-button-loading");
+  }
+  let finished = false;
+  return () => {
+    if (finished) return;
+    finished = true;
+    adminActionLoadingCount = Math.max(0, adminActionLoadingCount - 1);
+    sourceButton?.classList?.remove("admin-button-loading");
+    if (adminActionLoadingCount > 0) return;
+    if (adminActionLoadingTimer) {
+      clearTimeout(adminActionLoadingTimer);
+      adminActionLoadingTimer = null;
+      return;
+    }
+    const hide = () => $("adminActionLoading")?.classList.add("hidden");
+    const elapsed = Date.now() - adminActionLoadingVisibleAt;
+    setTimeout(hide, Math.max(0, ADMIN_ACTION_LOADING_MIN_VISIBLE - elapsed));
+  };
+}
+
+window.beginAdminActionLoading = beginAdminActionLoading;
+
+function installAdminActionLoadingInterceptor() {
+  if (window.__adminActionLoadingInterceptorInstalled) return;
+  window.__adminActionLoadingInterceptorInstalled = true;
+  const originalAddEventListener = EventTarget.prototype.addEventListener;
+  EventTarget.prototype.addEventListener = function patchedAddEventListener(type, listener, options) {
+    const shouldWrap = (type === "click" || type === "submit") && typeof listener === "function";
+    if (!shouldWrap || listener.__adminLoadingWrapped) {
+      return originalAddEventListener.call(this, type, listener, options);
+    }
+    const wrapped = function adminLoadingWrappedListener(event) {
+      const target = event?.target?.closest?.("button, [role='button'], input[type='submit'], form") || event?.target;
+      const insideAdmin = Boolean(target?.closest?.("#appView, #loginView, #panelLoadingView"));
+      const skip = target?.matches?.("[data-no-loading], .admin-no-loading") || target?.closest?.("[data-no-loading], .admin-no-loading");
+      if (!insideAdmin || skip) return listener.call(this, event);
+      const button = target?.closest?.("button, [role='button'], input[type='submit']");
+      const finish = beginAdminActionLoading(adminActionLoadingLabel(button || target), button);
+      try {
+        const result = listener.call(this, event);
+        if (result && typeof result.finally === "function") result.finally(finish);
+        else queueMicrotask(finish);
+        return result;
+      } catch (error) {
+        finish();
+        throw error;
+      }
+    };
+    wrapped.__adminLoadingWrapped = true;
+    return originalAddEventListener.call(this, type, wrapped, options);
+  };
+}
+
+installAdminActionLoadingInterceptor();
 
 function confirmarExclusao(nomeItem, tipoItem = "item") {
   return new Promise((resolve) => {
