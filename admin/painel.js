@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 351,
-  label: "v357",
+  numero: 352,
+  label: "v358",
   data: "2026-06-25",
-  nota: "Noticias da home sem lateral interna e novo menu lateral de noticias em cards."
+  nota: "Noticias publicas com filtros e relatorio de cliques das noticias."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -7509,6 +7509,7 @@ function aggregateSimpleDaily(data = {}) {
 
 function clientLabelFromMetricKey(key) {
   const normalized = normalizeName(key);
+  if (normalized === "noticiasdacidade") return "Notícias da Cidade";
   const client = state.clientes.find((item) => {
     const candidates = [
       item.id,
@@ -7549,7 +7550,11 @@ function metricButtonLabel(tipo) {
     veiculo_visualizacao: "Visualizacao do veiculo",
     veiculo_fotos: "Fotos do veiculo",
     veiculo_whatsapp: "WhatsApp do veiculo",
-    veiculo_instagram: "Instagram do veiculo"
+    veiculo_instagram: "Instagram do veiculo",
+    noticia_visualizacao: "Visualizacao da noticia",
+    noticia_compartilhar: "Compartilhamento da noticia",
+    noticia_whatsapp: "WhatsApp da noticia",
+    noticia_oficial: "Materia oficial"
   }[tipo] || String(tipo || "Clique").replace(/[_-]/g, " ");
 }
 
@@ -7590,6 +7595,66 @@ function buildOndeComerClickRows(cardapios = new Map(), whats = new Map(), fotos
       total: clicks.cardapio + clicks.whatsapp + clicks.fotos
     };
   }).filter((row) => row.total > 0).sort((a, b) => b.total - a.total);
+}
+
+function buildNewsClickRows(metrics = {}, range = getReportDateRange()) {
+  const rows = new Map();
+  Object.entries(metrics.cliquesBotoesDetalhado || {}).forEach(([date, dia]) => {
+    if (date < range.start || date > range.end) return;
+    Object.values(dia || {}).forEach((logs) => {
+      Object.values(logs || {}).forEach((item) => {
+        if ((item?.area || "") !== "noticias-cidade") return;
+        const key = item.noticiaId || item.noticiaSlug || item.tituloConteudo || "noticia-sem-id";
+        if (!rows.has(key)) {
+          rows.set(key, {
+            titulo: item.tituloConteudo || item.titulo || "Notícia",
+            tipoInformacao: item.tipoInformacao || "Notícia",
+            clicks: {},
+            total: 0,
+            ultimoAcesso: ""
+          });
+        }
+        const row = rows.get(key);
+        const tipo = item.tipo || `noticia_${item.acao || "visualizacao"}`;
+        row.clicks[tipo] = Number(row.clicks[tipo] || 0) + 1;
+        row.total += 1;
+        const ultimo = `${date} ${formatReportTime(item, "")}`;
+        if (ultimo > row.ultimoAcesso) row.ultimoAcesso = ultimo;
+      });
+    });
+  });
+  return [...rows.values()].sort((a, b) => b.total - a.total);
+}
+
+function renderNewsClickReportTable(rows, emptyMessage) {
+  if (!rows.length) return `<div class="list-meta">${emptyMessage}</div>`;
+  const types = ["noticia_visualizacao", "noticia_oficial", "noticia_whatsapp", "noticia_compartilhar"];
+  return `
+    <div class="report-table-wrap">
+      <table class="report-click-table">
+        <thead>
+          <tr>
+            <th>Notícia</th>
+            <th>Tipo</th>
+            ${types.map((type) => `<th>${escapeHtml(metricButtonLabel(type))}</th>`).join("")}
+            <th>Total</th>
+            <th>Último acesso</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.slice(0, 30).map((row) => `
+            <tr>
+              <td><strong>${escapeHtml(row.titulo)}</strong></td>
+              <td>${escapeHtml(row.tipoInformacao || "Notícia")}</td>
+              ${types.map((type) => `<td>${Number(row.clicks[type] || 0)}</td>`).join("")}
+              <td><strong>${row.total}</strong></td>
+              <td>${escapeHtml(row.ultimoAcesso ? row.ultimoAcesso.replace(/^(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") : "-")}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
 function renderClickReportTable(rows, types, emptyMessage) {
@@ -7710,7 +7775,8 @@ function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
         veiculos: "Tela de veiculos",
         promocoes: "Tela de promocoes",
         "onde-comer": "Tela Onde Comer",
-        "redes-sociais": "Redes sociais do cliente"
+        "redes-sociais": "Redes sociais do cliente",
+        "noticias-cidade": "Notícias da Cidade"
       }[item.area || area] || item.origem || area || "Site publico",
       clicouWhatsAppPromocao: Boolean(item.clicouWhatsAppPromocao || item.acao === "whatsapp" || item.tipo === "whatsapp_promocao")
     });
@@ -8450,6 +8516,7 @@ function renderReports() {
   const accessTimeline = buildAccessTimeline(filteredMetrics.acessos, periodRange);
   const generalClickReport = buildGeneralClickRows(cliquesBotoes.detalhes);
   const ondeComerClickRows = buildOndeComerClickRows(cliquesOndeComerCardapios, cliquesOndeComerWhats, cliquesOndeComerFotos);
+  const newsClickRows = buildNewsClickRows(state.metricas, periodRange);
 
   const clientesAtencao = reportClients
     .filter((client) => client.status !== "inativo")
@@ -8568,6 +8635,12 @@ function renderReports() {
       <section class="panel-card report-card">
         ${renderReportCardHeader("Cliques por botao", periodRange)}
         ${renderReportList(topFromMap(cliquesBotoes.porTipo, 12), "Ainda nao ha cliques por botao registrados.")}
+      </section>
+
+      <section class="panel-card report-card report-wide">
+        ${renderReportCardHeader("Cliques nas noticias da cidade", periodRange)}
+        <p class="list-meta">Mostra visualizacoes, compartilhamentos, WhatsApp e acessos para a materia oficial de cada noticia.</p>
+        ${renderNewsClickReportTable(newsClickRows, "Ainda nao ha cliques em noticias registrados neste periodo.")}
       </section>
 
       <section class="panel-card report-card">

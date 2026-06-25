@@ -23352,6 +23352,20 @@ function mostrarCombustivel() {
   const image = (item) => item.imagemPrincipalUrl || item.imagensExtrasUrls?.[0] || "";
   const placeholder = (item) => `<div class="news-placeholder ${categoryClass(item.tipoInformacao)}"><i class="fa-solid fa-newspaper"></i></div>`;
   const bindOpeners = (root = document) => root.querySelectorAll("[data-open-news]").forEach((el) => el.addEventListener("click", () => openDetail(el.dataset.openNews)));
+  const newsMetricKey = "noticias-da-cidade";
+
+  function registerNewsClick(action, item = {}) {
+    if (typeof registrarCliqueBotao !== "function" || !item) return;
+    registrarCliqueBotao(`noticia_${action}`, newsMetricKey, "noticias-cidade", {
+      acao: action,
+      noticiaId: item.id || "",
+      noticiaSlug: item.slug || "",
+      tituloConteudo: item.titulo || "Notícia",
+      tipoInformacao: item.tipoInformacao || "",
+      destinoUrl: action === "oficial" ? (item.linkPublicacaoOficial || "") : "",
+      origem: "Notícias da Cidade"
+    }).catch(() => {});
+  }
 
   function renderHome() {
     const section = document.getElementById("homeNoticiasSection");
@@ -23369,16 +23383,59 @@ function mostrarCombustivel() {
     const contentArea = document.querySelector(".content_area");
     if (!contentArea) return;
     document.body.classList.add("home-quick-banner-route-hidden");
-    const list = sorted();
+    const filters = window.__newsMenuFilters || { busca: "", tipo: "Todas", dataInicio: "", dataFim: "" };
+    const allNews = sorted();
+    const tipos = ["Todas", ...Array.from(new Set(allNews.map((item) => item.tipoInformacao).filter(Boolean))).sort((a, b) => a.localeCompare(b, "pt-BR"))];
+    const busca = normalizeNews(filters.busca || "");
+    const list = allNews.filter((item) => {
+      const data = item.dataPublicacao || "";
+      const tipoOk = !filters.tipo || filters.tipo === "Todas" || item.tipoInformacao === filters.tipo;
+      const buscaOk = !busca || normalizeNews(`${item.titulo || ""} ${item.resumoCurto || ""} ${item.textoCompleto || ""}`).includes(busca);
+      const dataInicioOk = !filters.dataInicio || data >= filters.dataInicio;
+      const dataFimOk = !filters.dataFim || data <= filters.dataFim;
+      return tipoOk && buscaOk && dataInicioOk && dataFimOk;
+    });
     contentArea.innerHTML = `<section class="home-news-menu-page novidades-cidade-wrap home-section-wrap">
       <div class="novidades-cidade-resumo home-section-resumo">
         <strong><i class="fa-solid fa-newspaper"></i> Notícias da Cidade</strong>
         <span>Acompanhe as principais atualizações de Carlópolis e região.</span>
       </div>
+      <div class="home-news-filter-card">
+        <label><span>Buscar</span><input id="newsMenuSearch" type="search" value="${escNews(filters.busca || "")}" placeholder="Título, resumo ou descrição"></label>
+        <label><span>Tipo</span><select id="newsMenuType">${tipos.map((tipo) => `<option value="${escNews(tipo)}" ${tipo === filters.tipo ? "selected" : ""}>${escNews(tipo)}</option>`).join("")}</select></label>
+        <label><span>Data de</span><input id="newsMenuStart" type="date" value="${escNews(filters.dataInicio || "")}"></label>
+        <label><span>Data até</span><input id="newsMenuEnd" type="date" value="${escNews(filters.dataFim || "")}"></label>
+        <button id="newsMenuClear" type="button"><i class="fa-solid fa-rotate-left"></i> Limpar</button>
+      </div>
       <div class="grade-divulgacao home-news-menu-grid">
         ${list.length ? list.map((item) => `<article class="card-divulgacao-pequeno home-news-menu-card" data-open-news="${escNews(item.slug || item.id)}"><div class="card-divulgacao-img-wrap">${image(item) ? `<img src="${escNews(image(item))}" alt="${escNews(item.titulo)}" loading="lazy">` : placeholder(item)}</div><div class="card-divulgacao-info"><span class="card-divulgacao-categoria">${escNews(item.tipoInformacao || "Notícia")}</span><div class="card-divulgacao-linha"><h4>${escNews(item.titulo)}</h4></div><small>${escNews(dateTime(item))}</small></div></article>`).join("") : `<p class="news-empty">Nenhuma notícia publicada no momento.</p>`}
       </div>
     </section>`;
+    const updateFilters = (event) => {
+      const focusId = event?.target?.id || "";
+      const cursorStart = event?.target?.selectionStart || 0;
+      const cursorEnd = event?.target?.selectionEnd || cursorStart;
+      window.__newsMenuFilters = {
+        busca: contentArea.querySelector("#newsMenuSearch")?.value || "",
+        tipo: contentArea.querySelector("#newsMenuType")?.value || "Todas",
+        dataInicio: contentArea.querySelector("#newsMenuStart")?.value || "",
+        dataFim: contentArea.querySelector("#newsMenuEnd")?.value || ""
+      };
+      renderNewsMenuPage();
+      if (focusId) {
+        const field = document.getElementById(focusId);
+        field?.focus();
+        if (field && typeof field.setSelectionRange === "function") field.setSelectionRange(cursorStart, cursorEnd);
+      }
+    };
+    contentArea.querySelector("#newsMenuSearch")?.addEventListener("input", updateFilters);
+    contentArea.querySelector("#newsMenuType")?.addEventListener("change", updateFilters);
+    contentArea.querySelector("#newsMenuStart")?.addEventListener("change", updateFilters);
+    contentArea.querySelector("#newsMenuEnd")?.addEventListener("change", updateFilters);
+    contentArea.querySelector("#newsMenuClear")?.addEventListener("click", () => {
+      window.__newsMenuFilters = { busca: "", tipo: "Todas", dataInicio: "", dataFim: "" };
+      renderNewsMenuPage();
+    });
     bindOpeners(contentArea);
   }
 
@@ -23413,17 +23470,20 @@ function mostrarCombustivel() {
   function openDetail(slugOrId, updateUrl = true) {
     const item = newsState.all.find((news) => news.id === slugOrId || news.slug === slugOrId);
     if (!item || !published(item)) return;
+    registerNewsClick("visualizacao", item);
     document.querySelector(".news-detail-modal")?.remove();
     const others = sorted().filter((news) => news.id !== item.id).slice(0, 4);
     const modal = document.createElement("div");
     modal.className = "news-detail-modal";
-    modal.innerHTML = `<article class="news-detail-dialog"><header><strong>Olá Carlópolis</strong><button class="news-modal-close">&times;</button></header><div class="news-detail-body"><span class="news-category-badge ${categoryClass(item.tipoInformacao)}">${escNews(item.tipoInformacao)}</span>${item.patrocinado ? `<span class="news-sponsored">${escNews(item.textoPatrocinado || "Conteúdo patrocinado")}</span>` : ""}<h1>${escNews(item.titulo)}</h1><div class="news-detail-meta"><span><i class="fa-regular fa-clock"></i>${escNews(dateTime(item))}</span>${item.local ? `<span><i class="fa-solid fa-location-dot"></i>${escNews(item.local)}</span>` : ""}</div>${image(item) ? `<img class="news-detail-main-image" src="${escNews(image(item))}" alt="${escNews(item.titulo)}">` : placeholder(item)}<div class="news-detail-text">${escNews(item.textoCompleto).replace(/\n/g, "<br>")}</div>${item.fonteMateria ? `<div class="news-source"><strong>Fonte:</strong> ${escNews(item.fonteMateria)}</div>` : ""}<div class="news-detail-actions">${item.linkPublicacaoOficial ? `<a href="${escNews(item.linkPublicacaoOficial)}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver publicação oficial</a>` : ""}<button data-share-news><i class="fa-solid fa-share-nodes"></i> Compartilhar</button>${item.whatsappContato ? `<a class="news-whatsapp" href="https://wa.me/55${String(item.whatsappContato).replace(/\D/g, "")}?text=${encodeURIComponent(`Olá! Vi a notícia "${item.titulo}" no Olá Carlópolis.`)}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${escNews(item.textoBotaoWhatsapp || "Falar no WhatsApp")}</a>` : ""}</div>${item.imagensExtrasUrls?.length ? `<div class="news-extra-images">${item.imagensExtrasUrls.map((url) => `<img src="${escNews(url)}" alt="${escNews(item.titulo)}">`).join("")}</div>` : ""}<section class="more-news"><h2>Mais notícias</h2><div>${others.map((news) => `<article data-open-news="${escNews(news.slug || news.id)}">${image(news) ? `<img src="${escNews(image(news))}" alt="${escNews(news.titulo)}">` : placeholder(news)}<span class="news-category-badge ${categoryClass(news.tipoInformacao)}">${escNews(news.tipoInformacao)}</span><h3>${escNews(news.titulo)}</h3><small>${escNews(dateTime(news))}</small></article>`).join("")}</div></section></div></article>`;
+    modal.innerHTML = `<article class="news-detail-dialog"><header><strong>Olá Carlópolis</strong><button class="news-modal-close">&times;</button></header><div class="news-detail-body"><span class="news-category-badge ${categoryClass(item.tipoInformacao)}">${escNews(item.tipoInformacao)}</span>${item.patrocinado ? `<span class="news-sponsored">${escNews(item.textoPatrocinado || "Conteúdo patrocinado")}</span>` : ""}<h1>${escNews(item.titulo)}</h1><div class="news-detail-meta"><span><i class="fa-regular fa-clock"></i>${escNews(dateTime(item))}</span>${item.local ? `<span><i class="fa-solid fa-location-dot"></i>${escNews(item.local)}</span>` : ""}</div>${image(item) ? `<img class="news-detail-main-image" src="${escNews(image(item))}" alt="${escNews(item.titulo)}">` : placeholder(item)}<div class="news-detail-text">${escNews(item.textoCompleto).replace(/\n/g, "<br>")}</div>${item.fonteMateria ? `<div class="news-source"><strong>Fonte:</strong> ${escNews(item.fonteMateria)}</div>` : ""}<div class="news-detail-actions">${item.linkPublicacaoOficial ? `<a data-news-official href="${escNews(item.linkPublicacaoOficial)}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver publicação oficial</a>` : ""}<button data-share-news><i class="fa-solid fa-share-nodes"></i> Compartilhar</button>${item.whatsappContato ? `<a class="news-whatsapp" href="https://wa.me/55${String(item.whatsappContato).replace(/\D/g, "")}?text=${encodeURIComponent(`Olá! Vi a notícia "${item.titulo}" no Olá Carlópolis.`)}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${escNews(item.textoBotaoWhatsapp || "Falar no WhatsApp")}</a>` : ""}</div>${item.imagensExtrasUrls?.length ? `<div class="news-extra-images">${item.imagensExtrasUrls.map((url) => `<img src="${escNews(url)}" alt="${escNews(item.titulo)}">`).join("")}</div>` : ""}<section class="more-news"><h2>Mais notícias</h2><div>${others.map((news) => `<article data-open-news="${escNews(news.slug || news.id)}">${image(news) ? `<img src="${escNews(image(news))}" alt="${escNews(news.titulo)}">` : placeholder(news)}<span class="news-category-badge ${categoryClass(news.tipoInformacao)}">${escNews(news.tipoInformacao)}</span><h3>${escNews(news.titulo)}</h3><small>${escNews(dateTime(news))}</small></article>`).join("")}</div></section></div></article>`;
     document.body.appendChild(modal);
     if (updateUrl) history.pushState({ noticia: item.slug || item.id }, "", shareUrl(item));
     const close = () => { modal.remove(); const url = new URL(location.href); if (url.searchParams.has("noticia")) { url.searchParams.delete("noticia"); history.replaceState({}, "", url.pathname + url.search + url.hash); } };
     modal.querySelector(".news-modal-close").addEventListener("click", close);
     modal.addEventListener("click", (event) => { if (event.target === modal) close(); });
-    modal.querySelector("[data-share-news]").addEventListener("click", () => share(item));
+    modal.querySelector("[data-share-news]").addEventListener("click", () => { registerNewsClick("compartilhar", item); share(item); });
+    modal.querySelector("[data-news-official]")?.addEventListener("click", () => registerNewsClick("oficial", item));
+    modal.querySelector(".news-whatsapp")?.addEventListener("click", () => registerNewsClick("whatsapp", item));
     bindOpeners(modal);
   }
 
