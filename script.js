@@ -4329,6 +4329,7 @@ carlopdiesel:"s",
         "menuGruposWhats",        
         "menuRepresa",        
         "menuNotaFalecimento" ,
+        "menuNoticiasCidade" ,
         "menuPrevisaoTempo"  ,    
          "menuVagasTrabalho"  
       ]]
@@ -23360,9 +23361,25 @@ function mostrarCombustivel() {
     section.classList.toggle("hidden", !list.length);
     if (!list.length) return;
     const [main, ...small] = list;
-    const sideNews = sorted(true).filter((item) => item.id !== main.id).slice(0, 6);
-    box.innerHTML = `<div class="home-news-layout"><div class="home-news-featured"><article class="home-news-main" data-open-news="${escNews(main.slug || main.id)}"><div class="home-news-main-media">${image(main) ? `<img src="${escNews(image(main))}" alt="${escNews(main.titulo)}">` : placeholder(main)}</div><div class="home-news-main-copy"><span class="news-category-badge ${categoryClass(main.tipoInformacao)}">${escNews(main.tipoInformacao)}</span>${main.patrocinado ? `<small class="news-sponsored">${escNews(main.textoPatrocinado || "Conteúdo patrocinado")}</small>` : ""}<h3>${escNews(main.titulo)}</h3><p>${escNews(main.resumoCurto)}</p><div class="news-date"><i class="fa-regular fa-clock"></i>${escNews(dateTime(main))}</div><button type="button">Ler mais <i class="fa-solid fa-arrow-right"></i></button></div></article><div class="home-news-small-list">${small.map((item) => `<article class="home-news-small" data-open-news="${escNews(item.slug || item.id)}"><div class="home-news-thumb">${image(item) ? `<img src="${escNews(image(item))}" alt="${escNews(item.titulo)}">` : placeholder(item)}</div><div><span class="news-category-badge ${categoryClass(item.tipoInformacao)}">${escNews(item.tipoInformacao)}</span><h4>${escNews(item.titulo)}</h4><small>${escNews(dateTime(item))}</small></div><i class="fa-solid fa-chevron-right"></i></article>`).join("")}</div></div><aside class="home-news-sidebar" aria-label="Menu lateral de notícias"><div class="home-news-sidebar-head"><strong>Mais notícias</strong><span>Atualizações recentes</span></div><div class="home-news-sidebar-grid">${sideNews.map((item) => `<article class="card-divulgacao-pequeno home-news-side-card" data-open-news="${escNews(item.slug || item.id)}"><div class="card-divulgacao-img-wrap">${image(item) ? `<img src="${escNews(image(item))}" alt="${escNews(item.titulo)}" loading="lazy">` : placeholder(item)}</div><div class="card-divulgacao-info"><span class="card-divulgacao-categoria">${escNews(item.tipoInformacao || "Notícia")}</span><div class="card-divulgacao-linha"><h4>${escNews(item.titulo)}</h4></div><small>${escNews(dateTime(item))}</small></div></article>`).join("")}</div></aside></div>`;
+    box.innerHTML = `<article class="home-news-main" data-open-news="${escNews(main.slug || main.id)}"><div class="home-news-main-media">${image(main) ? `<img src="${escNews(image(main))}" alt="${escNews(main.titulo)}">` : placeholder(main)}</div><div class="home-news-main-copy"><span class="news-category-badge ${categoryClass(main.tipoInformacao)}">${escNews(main.tipoInformacao)}</span>${main.patrocinado ? `<small class="news-sponsored">${escNews(main.textoPatrocinado || "Conteúdo patrocinado")}</small>` : ""}<h3>${escNews(main.titulo)}</h3><p>${escNews(main.resumoCurto)}</p><div class="news-date"><i class="fa-regular fa-clock"></i>${escNews(dateTime(main))}</div><button type="button">Ler mais <i class="fa-solid fa-arrow-right"></i></button></div></article><div class="home-news-small-list">${small.map((item) => `<article class="home-news-small" data-open-news="${escNews(item.slug || item.id)}"><div class="home-news-thumb">${image(item) ? `<img src="${escNews(image(item))}" alt="${escNews(item.titulo)}">` : placeholder(item)}</div><div><span class="news-category-badge ${categoryClass(item.tipoInformacao)}">${escNews(item.tipoInformacao)}</span><h4>${escNews(item.titulo)}</h4><small>${escNews(dateTime(item))}</small></div><i class="fa-solid fa-chevron-right"></i></article>`).join("")}</div>`;
     bindOpeners(box);
+  }
+
+  function renderNewsMenuPage() {
+    const contentArea = document.querySelector(".content_area");
+    if (!contentArea) return;
+    document.body.classList.add("home-quick-banner-route-hidden");
+    const list = sorted();
+    contentArea.innerHTML = `<section class="home-news-menu-page novidades-cidade-wrap home-section-wrap">
+      <div class="novidades-cidade-resumo home-section-resumo">
+        <strong><i class="fa-solid fa-newspaper"></i> Notícias da Cidade</strong>
+        <span>Acompanhe as principais atualizações de Carlópolis e região.</span>
+      </div>
+      <div class="grade-divulgacao home-news-menu-grid">
+        ${list.length ? list.map((item) => `<article class="card-divulgacao-pequeno home-news-menu-card" data-open-news="${escNews(item.slug || item.id)}"><div class="card-divulgacao-img-wrap">${image(item) ? `<img src="${escNews(image(item))}" alt="${escNews(item.titulo)}" loading="lazy">` : placeholder(item)}</div><div class="card-divulgacao-info"><span class="card-divulgacao-categoria">${escNews(item.tipoInformacao || "Notícia")}</span><div class="card-divulgacao-linha"><h4>${escNews(item.titulo)}</h4></div><small>${escNews(dateTime(item))}</small></div></article>`).join("") : `<p class="news-empty">Nenhuma notícia publicada no momento.</p>`}
+      </div>
+    </section>`;
+    bindOpeners(contentArea);
   }
 
   function openList(category = "Todas") {
@@ -23412,6 +23429,14 @@ function mostrarCombustivel() {
 
   async function init() {
     document.getElementById("homeNewsViewAll")?.addEventListener("click", () => openList());
+    const menuNoticias = document.getElementById("menuNoticiasCidade");
+    menuNoticias?.addEventListener("click", (event) => {
+      event.preventDefault();
+      document.querySelectorAll(".sidebar .nav_link").forEach((link) => link.classList.remove("active"));
+      menuNoticias.classList.add("active");
+      location.hash = "#noticias-cidade";
+      renderNewsMenuPage();
+    });
     if (window.firebase?.database && (!firebase.apps || !firebase.apps.length)) {
       firebase.initializeApp({
         apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -23430,6 +23455,7 @@ function mostrarCombustivel() {
     database.ref("noticias").on("value", (snapshot) => {
       newsState.all = []; snapshot.forEach((child) => { newsState.all.push({ id: child.key, ...(child.val() || {}) }); });
       renderHome();
+      if (location.hash === "#noticias-cidade") renderNewsMenuPage();
       const requested = new URL(location.href).searchParams.get("noticia");
       if (requested) openDetail(requested, false);
     });

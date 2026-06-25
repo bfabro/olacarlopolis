@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 350,
-  label: "v356",
+  numero: 351,
+  label: "v357",
   data: "2026-06-25",
-  nota: "Noticias da pagina inicial alinhadas no desktop com menu lateral em cards."
+  nota: "Noticias da home sem lateral interna e novo menu lateral de noticias em cards."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
