@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 355,
-  label: "v361",
+  numero: 356,
+  label: "v362",
   data: "2026-06-25",
-  nota: "Ranking da Capivarinha exibe data do recorde e filtro por periodo."
+  nota: "Menu Noticias foi movido para o bloco de tipo especifico e respeita permissao de cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2269,6 +2269,9 @@ function updateChrome() {
   document.querySelectorAll("[data-permission='informacoes']").forEach((el) => {
     el.classList.toggle("hidden", !canManageInformacoes());
   });
+  document.querySelectorAll("[data-permission='noticias']").forEach((el) => {
+    el.classList.toggle("hidden", !hasPermission("noticias"));
+  });
   document.querySelectorAll("[data-permission='faturas']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("faturas") || canManageClients());
   });
@@ -2282,7 +2285,7 @@ function updateChrome() {
     el.classList.toggle("hidden", !canGenerateImovelImages());
   });
   document.querySelectorAll("[data-classified-nav='true']").forEach((el) => {
-    el.classList.toggle("hidden", !canManageClients() && !canAccessImoveis() && !hasPermission("veiculos"));
+    el.classList.toggle("hidden", !canManageClients() && !hasPermission("noticias") && !canAccessImoveis() && !hasPermission("veiculos"));
   });
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");
