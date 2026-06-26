@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 361,
-  label: "v367",
+  numero: 362,
+  label: "v368",
   data: "2026-06-26",
-  nota: "Gerador de automoveis foi reconstruido em arte premium vertical 4:5 com controles da foto."
+  nota: "Cadastro de cliente novo corrigido para tratar financeiro sem cliente anterior."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -905,10 +905,11 @@ const CLIENT_FINANCE_FIELDS = [
 ];
 
 function pickClientFinanceFields(source = {}) {
+  const safeSource = source && typeof source === "object" ? source : {};
   const picked = {};
   CLIENT_FINANCE_FIELDS.forEach((field) => {
-    if (Object.prototype.hasOwnProperty.call(source, field)) {
-      picked[field] = source[field];
+    if (Object.prototype.hasOwnProperty.call(safeSource, field)) {
+      picked[field] = safeSource[field];
     }
   });
   return picked;
@@ -13456,7 +13457,9 @@ function bindEvents() {
     rawPayload.aliases = buildClientPublicAliases(id, rawPayload, sourceClient);
     addAliasKey(rawPayload.aliases, formId);
     addAliasKey(rawPayload.aliases, state.selectedClientId);
-    const { publicPayload: payload, financePayload } = splitClientFinancePayload(rawPayload);
+    const splitPayload = splitClientFinancePayload(rawPayload);
+    const payload = cleanForFirebase(splitPayload.publicPayload);
+    const financePayload = cleanForFirebase(splitPayload.financePayload);
     delete payload.id;
     if (!sourceClient) {
       payload.createdAt = serverTimestamp();
