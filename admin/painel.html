@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=326">
+  <link rel="stylesheet" href="painel.css?v=327">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1203,7 +1203,14 @@
                 <input id="automovelArteRodape" maxlength="95" value="Olá Carlópolis • veículos e oportunidades locais">
               </label>
               <label class="check-row auto-art-logo-check"><input id="automovelArteShowSiteLogo" type="checkbox" checked> Logo Ola Carlópolis</label>
-              <button id="generateAutomovelArtButton" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar imagem</button>
+              <div class="auto-art-preview">
+                <div><strong>Prévia da imagem</strong><span>Confira antes de baixar.</span></div>
+                <canvas id="automovelArtePreview" width="1080" height="1080" aria-label="Prévia da arte do automóvel"></canvas>
+              </div>
+              <div class="auto-art-actions">
+                <button id="previewAutomovelArtButton" type="button" class="ghost-button"><i class="fa-solid fa-eye"></i> Atualizar prévia</button>
+                <button id="generateAutomovelArtButton" type="button"><i class="fa-solid fa-download"></i> Baixar imagem</button>
+              </div>
             </div>
             <input id="automovelSearch" class="search-input" placeholder="Buscar automovel...">
             <div id="automoveisList" class="entity-list"></div>
@@ -1432,6 +1439,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=356"></script>
+  <script type="module" src="painel.js?v=357"></script>
 </body>
 </html>

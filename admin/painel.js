@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 358,
-  label: "v364",
+  numero: 359,
+  label: "v365",
   data: "2026-06-26",
-  nota: "Gerador de automoveis ganhou texto editavel, post ou stories e layout adaptado para poucas fotos."
+  nota: "Gerador de automoveis ganhou previa antes do download, imagens inteiras e stories mais legivel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -54,6 +54,7 @@ const ADMIN_IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 let adminIdleTimer = null;
 let clientMetricsRealtimeUnsubscribers = [];
 let clientMetricsRealtimeSignature = "";
+let automovelArtePreviewTimer = null;
 
 let state = {
   user: null,
@@ -5261,10 +5262,14 @@ function detalhesAutomovelArte(item = {}) {
     item.cambio ? { label: "CAMBIO", value: item.cambio } : null,
     item.combustivel ? { label: "COMBUSTIVEL", value: item.combustivel } : null,
     item.cor ? { label: "COR", value: item.cor } : null,
-    item.condicao ? { label: "CONDICAO", value: item.condicao } : null,
     item.contato ? { label: "WHATSAPP", value: telefoneArteAdmin(item.contato) || item.contato } : null
   ].filter(Boolean);
   return detalhes.slice(0, 4);
+}
+
+function desenharImagemAutoInteira(ctx, img, x, y, w, h, r = 0, fill = "#f8fafc") {
+  preencherRoundRect(ctx, x, y, w, h, r, fill);
+  desenharImagemContain(ctx, img, x, y, w, h, r, fill);
 }
 
 function desenharAutoThumbs(ctx, fotos = [], x, y, w, h, layout, vertical = true) {
@@ -5278,7 +5283,7 @@ function desenharAutoThumbs(ctx, fotos = [], x, y, w, h, layout, vertical = true
     const tw = vertical ? w : (w - gap * (count - 1)) / count;
     const th = vertical ? (h - gap * (count - 1)) / count : h;
     preencherRoundRect(ctx, tx - 5, ty - 5, tw + 10, th + 10, 24, layout.accent);
-    desenharImagemCover(ctx, foto, tx, ty, tw, th, 20);
+    desenharImagemAutoInteira(ctx, foto, tx, ty, tw, th, 20, "#ffffff");
   });
 }
 
@@ -5328,7 +5333,7 @@ function textoTituloAutomovelArte(item = {}, options = {}) {
 }
 
 function textoSubtituloAutomovelArte(item = {}, options = {}) {
-  return textoCurtoArte(options.subtitle || [item.tipo, item.condicao, item.cidade].filter(Boolean).join(" • ") || "Veículo em destaque no Olá Carlópolis", 95);
+  return textoCurtoArte(options.subtitle || [item.tipo, item.cidade].filter(Boolean).join(" • ") || "Veículo em destaque no Olá Carlópolis", 95);
 }
 
 function desenharRodapeAutomovelArte(ctx, texto, layout, w, y) {
@@ -5353,22 +5358,22 @@ function desenharArteAutomovelUmaFoto(ctx, item, client, fotos, logo, siteLogo, 
   desenharLogosAutoArte(ctx, client, logo, siteLogo, options.showSiteLogo !== false, layout, 58, isStory ? 58 : 48);
 
   if (isStory) {
-    desenharImagemCover(ctx, main, 58, 250, 964, 890, 44);
+    desenharImagemAutoInteira(ctx, main, 58, 250, 964, 890, 44, "#ffffff");
     ctx.fillStyle = layout.text;
     ctx.textAlign = "center";
-    desenharTextoInteiroCanvas(ctx, title, w / 2, 1225, 920, 3, { peso: 900, tamanho: 66, minimo: 34, lineHeight: 70, blockHeight: 210 });
+    desenharTextoInteiroCanvas(ctx, title, w / 2, 1210, 930, 3, { peso: 900, tamanho: 82, minimo: 46, lineHeight: 86, blockHeight: 238 });
     preencherRoundRect(ctx, 250, 1460, 580, 105, 30, layout.priceBg);
     ctx.fillStyle = layout.priceText;
     fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 50, 28, 520);
     ctx.fillText(precoAutomovelArte(item), w / 2, 1528);
     ctx.fillStyle = layout.accent;
-    desenharTextoInteiroCanvas(ctx, subtitle, w / 2, 1595, 850, 2, { peso: 800, tamanho: 31, minimo: 18, lineHeight: 35, blockHeight: 85 });
+    desenharTextoInteiroCanvas(ctx, subtitle, w / 2, 1585, 870, 2, { peso: 800, tamanho: 42, minimo: 24, lineHeight: 46, blockHeight: 104 });
     desenharAutoInfoCards(ctx, item, layout, 82, 1710, 916);
     desenharRodapeAutomovelArte(ctx, options.footer, layout, w, 1848);
     return;
   }
 
-  desenharImagemCover(ctx, main, 58, 175, 964, 560, 42);
+  desenharImagemAutoInteira(ctx, main, 58, 175, 964, 560, 42, "#ffffff");
   ctx.fillStyle = layout.text;
   ctx.textAlign = "left";
   desenharTextoInteiroCanvas(ctx, title, 80, 778, 670, 2, { peso: 900, tamanho: 54, minimo: 30, lineHeight: 58, blockHeight: 126 });
@@ -5392,20 +5397,20 @@ function desenharArteAutomovelStories(ctx, item, client, fotos, logo, siteLogo, 
   ctx.fillRect(0, 0, 1080, 1920);
   desenharLogosAutoArte(ctx, client, logo, siteLogo, options.showSiteLogo !== false, layout, 58, 58);
   if (hasThumbs) {
-    desenharImagemCover(ctx, main, 58, 245, 720, 835, 44);
+    desenharImagemAutoInteira(ctx, main, 58, 245, 720, 835, 44, "#ffffff");
     desenharAutoThumbs(ctx, fotos, 806, 245, 216, 835, layout, true);
   } else {
-    desenharImagemCover(ctx, main, 58, 245, 964, 835, 44);
+    desenharImagemAutoInteira(ctx, main, 58, 245, 964, 835, 44, "#ffffff");
   }
   ctx.fillStyle = layout.text;
   ctx.textAlign = "center";
-  desenharTextoInteiroCanvas(ctx, title, 540, 1168, 920, 3, { peso: 900, tamanho: 64, minimo: 32, lineHeight: 68, blockHeight: 205 });
+  desenharTextoInteiroCanvas(ctx, title, 540, 1158, 920, 3, { peso: 900, tamanho: 82, minimo: 46, lineHeight: 86, blockHeight: 245 });
   preencherRoundRect(ctx, 250, 1408, 580, 106, 30, layout.priceBg);
   ctx.fillStyle = layout.priceText;
   fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 50, 28, 520);
   ctx.fillText(precoAutomovelArte(item), 540, 1478);
   ctx.fillStyle = layout.accent;
-  desenharTextoInteiroCanvas(ctx, subtitle, 540, 1544, 850, 2, { peso: 800, tamanho: 31, minimo: 18, lineHeight: 35, blockHeight: 86 });
+  desenharTextoInteiroCanvas(ctx, subtitle, 540, 1532, 870, 2, { peso: 800, tamanho: 42, minimo: 24, lineHeight: 46, blockHeight: 110 });
   desenharAutoInfoCards(ctx, item, layout, 82, 1682, 916);
   desenharRodapeAutomovelArte(ctx, options.footer, layout, 1080, 1848);
 }
@@ -5429,7 +5434,7 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
 
   if (layoutKey === "clean") {
     preencherRoundRect(ctx, 38, 38, 1004, 1004, 38, "#ffffff");
-    desenharImagemCover(ctx, main, 70, 160, 655, 520, 30);
+    desenharImagemAutoInteira(ctx, main, 70, 160, 655, 520, 30, "#ffffff");
     desenharAutoThumbs(ctx, fotos, 750, 160, 250, 520, layout, true);
     desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout, 76, 62);
     ctx.fillStyle = layout.accent2;
@@ -5443,7 +5448,7 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     ctx.fillText(precoAutomovelArte(item), 280, 842);
     desenharAutoInfoCards(ctx, item, layout, 78, 905, 925);
   } else if (layoutKey === "dark") {
-    desenharImagemCover(ctx, main, 0, 0, 1080, 690, 0);
+    desenharImagemAutoInteira(ctx, main, 0, 0, 1080, 690, 0, "#111111");
     const grad = ctx.createLinearGradient(0, 350, 0, 780);
     grad.addColorStop(0, "rgba(0,0,0,0)");
     grad.addColorStop(.78, layout.bg);
@@ -5463,7 +5468,7 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     desenharAutoInfoCards(ctx, item, layout, 54, 915, 972);
   } else if (layoutKey === "orange") {
     preencherRoundRect(ctx, 44, 44, 992, 992, 42, layout.panel);
-    desenharImagemCover(ctx, main, 76, 120, 670, 610, 34);
+    desenharImagemAutoInteira(ctx, main, 76, 120, 670, 610, 34, "#ffffff");
     desenharAutoThumbs(ctx, fotos, 770, 120, 218, 610, layout, true);
     desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout, 80, 780);
     ctx.fillStyle = layout.text;
@@ -5479,7 +5484,7 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
   } else if (layoutKey === "blue") {
     preencherRoundRect(ctx, 50, 54, 980, 150, 30, layout.panel);
     desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout, 74, 70);
-    desenharImagemCover(ctx, main, 50, 230, 980, 520, 36);
+    desenharImagemAutoInteira(ctx, main, 50, 230, 980, 520, 36, "#ffffff");
     desenharAutoThumbs(ctx, fotos, 70, 770, 470, 135, layout, false);
     ctx.fillStyle = layout.text;
     ctx.textAlign = "left";
@@ -5494,7 +5499,7 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
   } else if (layoutKey === "magazine") {
     ctx.fillStyle = "#f9fafb";
     ctx.fillRect(40, 40, 1000, 1000);
-    desenharImagemCover(ctx, main, 70, 260, 580, 520, 0);
+    desenharImagemAutoInteira(ctx, main, 70, 260, 580, 520, 0, "#ffffff");
     desenharAutoThumbs(ctx, fotos, 680, 260, 300, 520, layout, true);
     desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout, 70, 70);
     ctx.fillStyle = layout.text;
@@ -5511,7 +5516,7 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     ctx.fillText(precoAutomovelArte(item), 282, 862);
     desenharAutoInfoCards(ctx, item, layout, 70, 930, 900);
   } else {
-    desenharImagemCover(ctx, main, 44, 155, 700, 610, 34);
+    desenharImagemAutoInteira(ctx, main, 44, 155, 700, 610, 34, "#ffffff");
     desenharAutoThumbs(ctx, fotos, 770, 155, 235, 610, layout, true);
     desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout, 54, 42);
     ctx.fillStyle = layout.text;
@@ -5534,6 +5539,7 @@ function renderAutomovelArteOptions() {
   const layout = $("automovelArteLayout");
   if (!select || !layout) return;
   const atual = select.value || state.selectedAutomovelArtId;
+  const anterior = state.selectedAutomovelArtId;
   const list = state.automoveis.filter(itemBelongsToCurrentClient);
   select.innerHTML = list.length
     ? list.map((item) => {
@@ -5543,32 +5549,72 @@ function renderAutomovelArteOptions() {
     : `<option value="">Nenhum veiculo cadastrado</option>`;
   if (atual && list.some((item) => item.id === atual)) select.value = atual;
   state.selectedAutomovelArtId = select.value || "";
+  if (state.selectedAutomovelArtId && state.selectedAutomovelArtId !== anterior && $("automovelArtePreview")) {
+    agendarPreviaArteAutomovel(150);
+  }
 }
 
-async function gerarArteInstagramAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = $("automovelArteLayout")?.value || "showroom", options = opcoesArteAutomovel()) {
+async function criarCanvasArteAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = $("automovelArteLayout")?.value || "showroom", options = opcoesArteAutomovel()) {
   if (!hasPermission("veiculos")) return showToast("A geracao de posts de automoveis nao esta liberada para este usuario.");
   const item = state.automoveis.find((auto) => auto.id === autoId && itemBelongsToCurrentClient(auto));
   if (!item) return showToast("Selecione um veiculo para gerar a imagem.");
+  const client = donoAutomovelAdmin(item);
+  const fotosCandidatas = automovelImagensCandidatasAdmin(item);
+  const [logo, siteLogo, ...loadedFotos] = await Promise.all([
+    carregarImagemCanvas(logoClienteImovelAdmin(client)),
+    carregarImagemCanvas("../images/img_padrao_site/logo_1.png"),
+    ...fotosCandidatas.slice(0, 4).map((url) => carregarImagemCanvas(url))
+  ]);
+  const fotos = loadedFotos.filter(Boolean);
+  if (!fotos.length) {
+    showToast("Nao foi possivel carregar as fotos deste veiculo.");
+    return null;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080;
+  canvas.height = options.formato === "stories" ? 1920 : 1080;
+  const ctx = canvas.getContext("2d");
+  desenharArteAutomovel(ctx, item, client, fotos, logo || siteLogo, siteLogo, layoutKey, options);
+  return { canvas, item };
+}
+
+function agendarPreviaArteAutomovel(delay = 450) {
+  clearTimeout(automovelArtePreviewTimer);
+  automovelArtePreviewTimer = setTimeout(() => atualizarPreviaArteAutomovel({ silent: true }), delay);
+}
+
+async function atualizarPreviaArteAutomovel({ silent = false } = {}) {
+  const preview = $("automovelArtePreview");
+  if (!preview) return;
+  const button = $("previewAutomovelArtButton");
+  if (button) button.disabled = true;
+  if (!silent) showToast("Atualizando previa do veiculo...");
+  try {
+    const result = await criarCanvasArteAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, $("automovelArteLayout")?.value || "showroom", opcoesArteAutomovel());
+    if (!result?.canvas) return;
+    preview.width = result.canvas.width;
+    preview.height = result.canvas.height;
+    const ctx = preview.getContext("2d");
+    ctx.clearRect(0, 0, preview.width, preview.height);
+    ctx.drawImage(result.canvas, 0, 0);
+    if (!silent) showToast("Previa atualizada.");
+  } catch (error) {
+    console.error("Erro ao atualizar previa do automovel.", error);
+    if (!silent) showToast("Nao foi possivel atualizar a previa.");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+async function gerarArteInstagramAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = $("automovelArteLayout")?.value || "showroom", options = opcoesArteAutomovel()) {
   const button = $("generateAutomovelArtButton");
   if (button) button.disabled = true;
   showToast(options.formato === "stories" ? "Gerando stories do veiculo..." : "Gerando post do veiculo...");
   try {
-    const client = donoAutomovelAdmin(item);
-    const fotosCandidatas = automovelImagensCandidatasAdmin(item);
-    const [logo, siteLogo, ...loadedFotos] = await Promise.all([
-      carregarImagemCanvas(logoClienteImovelAdmin(client)),
-      carregarImagemCanvas("../images/img_padrao_site/logo_1.png"),
-      ...fotosCandidatas.slice(0, 4).map((url) => carregarImagemCanvas(url))
-    ]);
-    const fotos = loadedFotos.filter(Boolean);
-    if (!fotos.length) return showToast("Nao foi possivel carregar as fotos deste veiculo.");
-    const canvas = document.createElement("canvas");
-    canvas.width = 1080;
-    canvas.height = options.formato === "stories" ? 1920 : 1080;
-    const ctx = canvas.getContext("2d");
-    desenharArteAutomovel(ctx, item, client, fotos, logo || siteLogo, siteLogo, layoutKey, options);
-    const blob = await canvasParaBlob(canvas);
-    baixarBlobCanvas(blob, `${options.formato === "stories" ? "stories" : "post"}-veiculo-${slugify(item.codRef || item.marca || item.id)}-${layoutKey}.png`);
+    const result = await criarCanvasArteAutomovel(autoId, layoutKey, options);
+    if (!result?.canvas) return;
+    const blob = await canvasParaBlob(result.canvas);
+    baixarBlobCanvas(blob, `${options.formato === "stories" ? "stories" : "post"}-veiculo-${slugify(result.item.codRef || result.item.marca || result.item.id)}-${layoutKey}.png`);
     showToast(options.formato === "stories" ? "Stories do veiculo gerado." : "Post do veiculo gerado.");
   } catch (error) {
     console.error("Erro ao gerar post do automovel.", error);
@@ -12753,9 +12799,19 @@ function bindEvents() {
   $("automovelSearch")?.addEventListener("input", renderAutomoveisList);
   $("automovelArteItem")?.addEventListener("change", (event) => {
     state.selectedAutomovelArtId = event.target.value || "";
+    atualizarPreviaArteAutomovel({ silent: true });
   });
   $("automovelArteLayout")?.addEventListener("change", (event) => {
     state.selectedAutomovelArtLayout = event.target.value || "showroom";
+    atualizarPreviaArteAutomovel({ silent: true });
+  });
+  $("automovelArteFormato")?.addEventListener("change", () => atualizarPreviaArteAutomovel({ silent: true }));
+  ["automovelArteTitulo", "automovelArteSubtitulo", "automovelArteRodape", "automovelArteShowSiteLogo"].forEach((id) => {
+    $(id)?.addEventListener("input", () => agendarPreviaArteAutomovel());
+    $(id)?.addEventListener("change", () => atualizarPreviaArteAutomovel({ silent: true }));
+  });
+  $("previewAutomovelArtButton")?.addEventListener("click", () => {
+    atualizarPreviaArteAutomovel();
   });
   $("generateAutomovelArtButton")?.addEventListener("click", () => {
     gerarArteInstagramAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, $("automovelArteLayout")?.value || "showroom", opcoesArteAutomovel());
