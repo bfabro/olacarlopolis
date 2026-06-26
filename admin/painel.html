@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=324">
+  <link rel="stylesheet" href="painel.css?v=325">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1169,6 +1169,27 @@
                 <p>Edite, inative ou remova anuncios.</p>
               </div>
             </div>
+            <div class="imovel-art-panel automovel-art-panel" data-permission="veiculos">
+              <div>
+                <strong>Post para Instagram</strong>
+                <span>Escolha um veiculo e um dos 6 modelos com foco nas fotos e dados principais.</span>
+              </div>
+              <label>Veiculo
+                <select id="automovelArteItem"></select>
+              </label>
+              <label>Modelo
+                <select id="automovelArteLayout">
+                  <option value="showroom">Showroom premium</option>
+                  <option value="dark">Noite esportiva</option>
+                  <option value="clean">Clean destaque</option>
+                  <option value="orange">Oferta laranja</option>
+                  <option value="blue">Azul concessionaria</option>
+                  <option value="magazine">Revista automotiva</option>
+                </select>
+              </label>
+              <label class="check-row auto-art-logo-check"><input id="automovelArteShowSiteLogo" type="checkbox" checked> Logo Ola Carlópolis</label>
+              <button id="generateAutomovelArtButton" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar imagem</button>
+            </div>
             <input id="automovelSearch" class="search-input" placeholder="Buscar automovel...">
             <div id="automoveisList" class="entity-list"></div>
           </section>
@@ -1396,6 +1417,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=354"></script>
+  <script type="module" src="painel.js?v=355"></script>
 </body>
 </html>
