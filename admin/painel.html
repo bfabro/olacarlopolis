@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=325">
+  <link rel="stylesheet" href="painel.css?v=326">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1187,6 +1187,21 @@
                   <option value="magazine">Revista automotiva</option>
                 </select>
               </label>
+              <label>Formato
+                <select id="automovelArteFormato">
+                  <option value="post">Post quadrado 1080x1080</option>
+                  <option value="stories">Stories 1080x1920</option>
+                </select>
+              </label>
+              <label class="auto-art-wide">Texto principal
+                <input id="automovelArteTitulo" maxlength="70" placeholder="Ex.: Oferta imperdível">
+              </label>
+              <label class="auto-art-wide">Texto de apoio
+                <input id="automovelArteSubtitulo" maxlength="95" placeholder="Ex.: Veículo completo, revisado e pronto para negociar">
+              </label>
+              <label class="auto-art-wide">Texto do rodapé
+                <input id="automovelArteRodape" maxlength="95" value="Olá Carlópolis • veículos e oportunidades locais">
+              </label>
               <label class="check-row auto-art-logo-check"><input id="automovelArteShowSiteLogo" type="checkbox" checked> Logo Ola Carlópolis</label>
               <button id="generateAutomovelArtButton" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar imagem</button>
             </div>
@@ -1417,6 +1432,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=355"></script>
+  <script type="module" src="painel.js?v=356"></script>
 </body>
 </html>

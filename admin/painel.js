@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 357,
-  label: "v363",
+  numero: 358,
+  label: "v364",
   data: "2026-06-26",
-  nota: "Automoveis ganharam geracao de posts para Instagram com 6 modelos e logos opcionais."
+  nota: "Gerador de automoveis ganhou texto editavel, post ou stories e layout adaptado para poucas fotos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5313,10 +5313,117 @@ function desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout
   if (showSiteLogo) desenharImagemContain(ctx, siteLogo, 860, 48, 165, 88, 0, "rgba(255,255,255,0)");
 }
 
+function opcoesArteAutomovel() {
+  return {
+    formato: $("automovelArteFormato")?.value || "post",
+    title: $("automovelArteTitulo")?.value.trim() || "",
+    subtitle: $("automovelArteSubtitulo")?.value.trim() || "",
+    footer: $("automovelArteRodape")?.value.trim() || "Olá Carlópolis • veículos e oportunidades locais",
+    showSiteLogo: $("automovelArteShowSiteLogo")?.checked !== false
+  };
+}
+
+function textoTituloAutomovelArte(item = {}, options = {}) {
+  return textoCurtoArte(options.title || tituloAutomovelArte(item), 44).toUpperCase();
+}
+
+function textoSubtituloAutomovelArte(item = {}, options = {}) {
+  return textoCurtoArte(options.subtitle || [item.tipo, item.condicao, item.cidade].filter(Boolean).join(" • ") || "Veículo em destaque no Olá Carlópolis", 95);
+}
+
+function desenharRodapeAutomovelArte(ctx, texto, layout, w, y) {
+  const safe = textoCurtoArte(texto || "Olá Carlópolis • veículos e oportunidades locais", 95);
+  preencherRoundRect(ctx, 70, y, w - 140, 44, 18, layout.panel);
+  desenharBordaRoundRect(ctx, 70, y, w - 140, 44, 18, layout.accent, 2);
+  ctx.fillStyle = layout.text;
+  ctx.textAlign = "center";
+  fonteQueCabeCanvas(ctx, safe, 900, 18, 11, w - 190);
+  ctx.fillText(safe, w / 2, y + 29);
+}
+
+function desenharArteAutomovelUmaFoto(ctx, item, client, fotos, logo, siteLogo, layout, options = {}) {
+  const main = fotos[0] || logo || siteLogo;
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+  const isStory = h > w;
+  const title = textoTituloAutomovelArte(item, options);
+  const subtitle = textoSubtituloAutomovelArte(item, options);
+  ctx.fillStyle = layout.bg;
+  ctx.fillRect(0, 0, w, h);
+  desenharLogosAutoArte(ctx, client, logo, siteLogo, options.showSiteLogo !== false, layout, 58, isStory ? 58 : 48);
+
+  if (isStory) {
+    desenharImagemCover(ctx, main, 58, 250, 964, 890, 44);
+    ctx.fillStyle = layout.text;
+    ctx.textAlign = "center";
+    desenharTextoInteiroCanvas(ctx, title, w / 2, 1225, 920, 3, { peso: 900, tamanho: 66, minimo: 34, lineHeight: 70, blockHeight: 210 });
+    preencherRoundRect(ctx, 250, 1460, 580, 105, 30, layout.priceBg);
+    ctx.fillStyle = layout.priceText;
+    fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 50, 28, 520);
+    ctx.fillText(precoAutomovelArte(item), w / 2, 1528);
+    ctx.fillStyle = layout.accent;
+    desenharTextoInteiroCanvas(ctx, subtitle, w / 2, 1595, 850, 2, { peso: 800, tamanho: 31, minimo: 18, lineHeight: 35, blockHeight: 85 });
+    desenharAutoInfoCards(ctx, item, layout, 82, 1710, 916);
+    desenharRodapeAutomovelArte(ctx, options.footer, layout, w, 1848);
+    return;
+  }
+
+  desenharImagemCover(ctx, main, 58, 175, 964, 560, 42);
+  ctx.fillStyle = layout.text;
+  ctx.textAlign = "left";
+  desenharTextoInteiroCanvas(ctx, title, 80, 778, 670, 2, { peso: 900, tamanho: 54, minimo: 30, lineHeight: 58, blockHeight: 126 });
+  preencherRoundRect(ctx, 690, 786, 315, 82, 24, layout.priceBg);
+  ctx.fillStyle = layout.priceText;
+  ctx.textAlign = "center";
+  fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 36, 22, 275);
+  ctx.fillText(precoAutomovelArte(item), 848, 838);
+  ctx.fillStyle = layout.accent;
+  desenharTextoInteiroCanvas(ctx, subtitle, 80, 902, 900, 2, { peso: 800, tamanho: 24, minimo: 15, lineHeight: 28, blockHeight: 62 });
+  desenharAutoInfoCards(ctx, item, layout, 70, 958, 940);
+  desenharRodapeAutomovelArte(ctx, options.footer, layout, w, 1022);
+}
+
+function desenharArteAutomovelStories(ctx, item, client, fotos, logo, siteLogo, layout, options = {}) {
+  const main = fotos[0] || logo || siteLogo;
+  const hasThumbs = fotos.length > 1;
+  const title = textoTituloAutomovelArte(item, options);
+  const subtitle = textoSubtituloAutomovelArte(item, options);
+  ctx.fillStyle = layout.bg;
+  ctx.fillRect(0, 0, 1080, 1920);
+  desenharLogosAutoArte(ctx, client, logo, siteLogo, options.showSiteLogo !== false, layout, 58, 58);
+  if (hasThumbs) {
+    desenharImagemCover(ctx, main, 58, 245, 720, 835, 44);
+    desenharAutoThumbs(ctx, fotos, 806, 245, 216, 835, layout, true);
+  } else {
+    desenharImagemCover(ctx, main, 58, 245, 964, 835, 44);
+  }
+  ctx.fillStyle = layout.text;
+  ctx.textAlign = "center";
+  desenharTextoInteiroCanvas(ctx, title, 540, 1168, 920, 3, { peso: 900, tamanho: 64, minimo: 32, lineHeight: 68, blockHeight: 205 });
+  preencherRoundRect(ctx, 250, 1408, 580, 106, 30, layout.priceBg);
+  ctx.fillStyle = layout.priceText;
+  fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 50, 28, 520);
+  ctx.fillText(precoAutomovelArte(item), 540, 1478);
+  ctx.fillStyle = layout.accent;
+  desenharTextoInteiroCanvas(ctx, subtitle, 540, 1544, 850, 2, { peso: 800, tamanho: 31, minimo: 18, lineHeight: 35, blockHeight: 86 });
+  desenharAutoInfoCards(ctx, item, layout, 82, 1682, 916);
+  desenharRodapeAutomovelArte(ctx, options.footer, layout, 1080, 1848);
+}
+
 function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutKey, options = {}) {
   const layout = AUTOMOVEL_ARTE_LAYOUTS[layoutKey] || AUTOMOVEL_ARTE_LAYOUTS.showroom;
   const main = fotos[0] || logo || siteLogo;
   const showSiteLogo = options.showSiteLogo !== false;
+  const titleAuto = textoTituloAutomovelArte(item, options);
+  const footerText = options.footer || "Olá Carlópolis • veículos e oportunidades locais";
+  if (options.formato === "stories") {
+    desenharArteAutomovelStories(ctx, item, client, fotos, logo, siteLogo, layout, options);
+    return;
+  }
+  if (fotos.length < 2) {
+    desenharArteAutomovelUmaFoto(ctx, item, client, fotos, logo, siteLogo, layout, options);
+    return;
+  }
   ctx.fillStyle = layout.bg;
   ctx.fillRect(0, 0, 1080, 1080);
 
@@ -5327,8 +5434,8 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout, 76, 62);
     ctx.fillStyle = layout.accent2;
     ctx.textAlign = "left";
-    fonteQueCabeCanvas(ctx, tituloAutomovelArte(item), 900, 54, 30, 900);
-    ctx.fillText(tituloAutomovelArte(item), 78, 744);
+    fonteQueCabeCanvas(ctx, titleAuto, 900, 54, 30, 900);
+    ctx.fillText(titleAuto, 78, 744);
     preencherRoundRect(ctx, 78, 790, 405, 82, 22, layout.priceBg);
     ctx.fillStyle = layout.priceText;
     ctx.textAlign = "center";
@@ -5346,8 +5453,8 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     desenharAutoThumbs(ctx, fotos, 60, 710, 350, 170, layout, false);
     ctx.fillStyle = "#fff";
     ctx.textAlign = "left";
-    fonteQueCabeCanvas(ctx, tituloAutomovelArte(item), 900, 62, 34, 870);
-    ctx.fillText(tituloAutomovelArte(item), 54, 630);
+    fonteQueCabeCanvas(ctx, titleAuto, 900, 62, 34, 870);
+    ctx.fillText(titleAuto, 54, 630);
     preencherRoundRect(ctx, 620, 704, 382, 92, 26, layout.priceBg);
     ctx.fillStyle = layout.priceText;
     ctx.textAlign = "center";
@@ -5361,8 +5468,8 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout, 80, 780);
     ctx.fillStyle = layout.text;
     ctx.textAlign = "left";
-    fonteQueCabeCanvas(ctx, tituloAutomovelArte(item), 900, 52, 30, 650);
-    ctx.fillText(tituloAutomovelArte(item), 80, 792);
+    fonteQueCabeCanvas(ctx, titleAuto, 900, 52, 30, 650);
+    ctx.fillText(titleAuto, 80, 792);
     preencherRoundRect(ctx, 612, 780, 370, 88, 24, layout.priceBg);
     ctx.fillStyle = layout.priceText;
     ctx.textAlign = "center";
@@ -5376,8 +5483,8 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     desenharAutoThumbs(ctx, fotos, 70, 770, 470, 135, layout, false);
     ctx.fillStyle = layout.text;
     ctx.textAlign = "left";
-    fonteQueCabeCanvas(ctx, tituloAutomovelArte(item), 900, 48, 28, 570);
-    ctx.fillText(tituloAutomovelArte(item), 580, 812);
+    fonteQueCabeCanvas(ctx, titleAuto, 900, 48, 28, 570);
+    ctx.fillText(titleAuto, 580, 812);
     preencherRoundRect(ctx, 580, 840, 390, 74, 22, layout.priceBg);
     ctx.fillStyle = layout.priceText;
     ctx.textAlign = "center";
@@ -5392,8 +5499,8 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout, 70, 70);
     ctx.fillStyle = layout.text;
     ctx.textAlign = "left";
-    fonteQueCabeCanvas(ctx, tituloAutomovelArte(item), 900, 58, 32, 880);
-    ctx.fillText(tituloAutomovelArte(item), 70, 180);
+    fonteQueCabeCanvas(ctx, titleAuto, 900, 58, 32, 880);
+    ctx.fillText(titleAuto, 70, 180);
     ctx.fillStyle = layout.accent;
     ctx.font = "900 23px Arial";
     ctx.fillText("OPORTUNIDADE AUTOMOTIVA", 70, 220);
@@ -5409,8 +5516,8 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout, 54, 42);
     ctx.fillStyle = layout.text;
     ctx.textAlign = "left";
-    fonteQueCabeCanvas(ctx, tituloAutomovelArte(item), 900, 55, 31, 920);
-    ctx.fillText(tituloAutomovelArte(item), 54, 835);
+    fonteQueCabeCanvas(ctx, titleAuto, 900, 55, 31, 920);
+    ctx.fillText(titleAuto, 54, 835);
     preencherRoundRect(ctx, 54, 872, 410, 80, 22, layout.priceBg);
     ctx.fillStyle = layout.priceText;
     ctx.textAlign = "center";
@@ -5419,10 +5526,7 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
     desenharAutoInfoCards(ctx, item, layout, 54, 978, 970);
   }
 
-  ctx.fillStyle = layout.accent;
-  ctx.textAlign = "center";
-  fonteQueCabeCanvas(ctx, "Ola Carlópolis • veículos e oportunidades locais", 900, 18, 11, 620);
-  ctx.fillText("Ola Carlópolis • veículos e oportunidades locais", 540, 1062);
+  desenharRodapeAutomovelArte(ctx, footerText, layout, 1080, 1022);
 }
 
 function renderAutomovelArteOptions() {
@@ -5441,13 +5545,13 @@ function renderAutomovelArteOptions() {
   state.selectedAutomovelArtId = select.value || "";
 }
 
-async function gerarArteInstagramAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = $("automovelArteLayout")?.value || "showroom") {
+async function gerarArteInstagramAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = $("automovelArteLayout")?.value || "showroom", options = opcoesArteAutomovel()) {
   if (!hasPermission("veiculos")) return showToast("A geracao de posts de automoveis nao esta liberada para este usuario.");
   const item = state.automoveis.find((auto) => auto.id === autoId && itemBelongsToCurrentClient(auto));
-  if (!item) return showToast("Selecione um veiculo para gerar o post.");
+  if (!item) return showToast("Selecione um veiculo para gerar a imagem.");
   const button = $("generateAutomovelArtButton");
   if (button) button.disabled = true;
-  showToast("Gerando post do veiculo...");
+  showToast(options.formato === "stories" ? "Gerando stories do veiculo..." : "Gerando post do veiculo...");
   try {
     const client = donoAutomovelAdmin(item);
     const fotosCandidatas = automovelImagensCandidatasAdmin(item);
@@ -5460,14 +5564,12 @@ async function gerarArteInstagramAutomovel(autoId = $("automovelArteItem")?.valu
     if (!fotos.length) return showToast("Nao foi possivel carregar as fotos deste veiculo.");
     const canvas = document.createElement("canvas");
     canvas.width = 1080;
-    canvas.height = 1080;
+    canvas.height = options.formato === "stories" ? 1920 : 1080;
     const ctx = canvas.getContext("2d");
-    desenharArteAutomovel(ctx, item, client, fotos, logo || siteLogo, siteLogo, layoutKey, {
-      showSiteLogo: $("automovelArteShowSiteLogo")?.checked !== false
-    });
+    desenharArteAutomovel(ctx, item, client, fotos, logo || siteLogo, siteLogo, layoutKey, options);
     const blob = await canvasParaBlob(canvas);
-    baixarBlobCanvas(blob, `post-veiculo-${slugify(item.codRef || item.marca || item.id)}-${layoutKey}.png`);
-    showToast("Post do veiculo gerado.");
+    baixarBlobCanvas(blob, `${options.formato === "stories" ? "stories" : "post"}-veiculo-${slugify(item.codRef || item.marca || item.id)}-${layoutKey}.png`);
+    showToast(options.formato === "stories" ? "Stories do veiculo gerado." : "Post do veiculo gerado.");
   } catch (error) {
     console.error("Erro ao gerar post do automovel.", error);
     showToast("Nao foi possivel gerar o post do veiculo.");
@@ -12656,7 +12758,7 @@ function bindEvents() {
     state.selectedAutomovelArtLayout = event.target.value || "showroom";
   });
   $("generateAutomovelArtButton")?.addEventListener("click", () => {
-    gerarArteInstagramAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, $("automovelArteLayout")?.value || "showroom");
+    gerarArteInstagramAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, $("automovelArteLayout")?.value || "showroom", opcoesArteAutomovel());
   });
   const handleAutomovelImagesUpload = async (event) => {
     const id = $("automovelId").value || slugify(`${$("automovelMarca").value}-${$("automovelModelo").value}`) || `automovel-${Date.now()}`;
