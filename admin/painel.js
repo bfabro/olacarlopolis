@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 360,
-  label: "v366",
+  numero: 361,
+  label: "v367",
   data: "2026-06-26",
-  nota: "Gerador de automoveis ganhou modelo premium bronze inspirado em anuncio automotivo."
+  nota: "Gerador de automoveis foi reconstruido em arte premium vertical 4:5 com controles da foto."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5321,11 +5321,18 @@ function desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout
 
 function opcoesArteAutomovel() {
   return {
-    formato: $("automovelArteFormato")?.value || "post",
+    formato: "premium45",
     title: $("automovelArteTitulo")?.value.trim() || "",
     subtitle: $("automovelArteSubtitulo")?.value.trim() || "",
+    subtitle2: $("automovelArteSubtitulo2")?.value.trim() || "",
     footer: $("automovelArteRodape")?.value.trim() || "Olá Carlópolis • veículos e oportunidades locais",
-    showSiteLogo: $("automovelArteShowSiteLogo")?.checked !== false
+    showSiteLogo: $("automovelArteShowSiteLogo")?.checked !== false,
+    imageSettings: {
+      scale: Number($("automovelArteImageScale")?.value || 1) || 1,
+      offsetX: Number($("automovelArteImageOffsetX")?.value || 0) || 0,
+      offsetY: Number($("automovelArteImageOffsetY")?.value || 0) || 0,
+      darkOverlay: Number($("automovelArteDarkOverlay")?.value || 0.22) || 0
+    }
   };
 }
 
@@ -5629,6 +5636,188 @@ function desenharArteAutomovelPremium(ctx, item, client, fotos, logo, siteLogo, 
   ctx.fillText(contato, 868, 1004);
 }
 
+function desenharImagemVeiculoPremium45(ctx, img, x, y, w, h, settings = {}) {
+  preencherRoundRect(ctx, x, y, w, h, 34, "#151515");
+  const scale = Math.max(.75, Math.min(1.35, Number(settings.scale || 1)));
+  const offsetX = Number(settings.offsetX || 0);
+  const offsetY = Number(settings.offsetY || 0);
+  const ratio = Math.min(w / img.width, h / img.height) * scale;
+  const iw = img.width * ratio;
+  const ih = img.height * ratio;
+  const ix = x + (w - iw) / 2 + offsetX;
+  const iy = y + (h - ih) / 2 + offsetY;
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, 34);
+  ctx.clip();
+  ctx.drawImage(img, ix, iy, iw, ih);
+  const overlay = Math.max(0, Math.min(.55, Number(settings.darkOverlay ?? .22)));
+  if (overlay) {
+    ctx.fillStyle = `rgba(0,0,0,${overlay})`;
+    ctx.fillRect(x, y, w, h);
+  }
+  const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+  grad.addColorStop(0, "rgba(0,0,0,.25)");
+  grad.addColorStop(.52, "rgba(0,0,0,0)");
+  grad.addColorStop(1, "rgba(0,0,0,.48)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(x, y, w, h);
+  ctx.restore();
+  ctx.fillStyle = "rgba(0,0,0,.42)";
+  ctx.beginPath();
+  ctx.ellipse(x + w * .55, y + h + 18, w * .34, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function specsAutomovelPremium45(item = {}) {
+  const specs = [
+    item.tracao ? { title: String(item.tracao).toUpperCase(), detail: "TRACAO" } : null,
+    item.motor ? { title: `MOTOR ${String(item.motor).toUpperCase()}`, detail: item.combustivel || "" } : null,
+    item.cambio ? { title: "CAMBIO", detail: item.cambio } : null,
+    item.cor ? { title: "COR", detail: item.cor } : null,
+    item.condicao && !/usado/i.test(String(item.condicao)) ? { title: String(item.condicao).toUpperCase(), detail: "STATUS" } : null
+  ].filter(Boolean);
+  while (specs.length < 5) {
+    const fallback = [
+      { title: "NEGOCIACAO", detail: "FACILITADA" },
+      { title: "VEICULO", detail: "EM DESTAQUE" },
+      { title: "CONTATO", detail: "WHATSAPP" }
+    ][specs.length % 3];
+    specs.push(fallback);
+  }
+  return specs.slice(0, 5);
+}
+
+function desenharMiniInfoPremium45(ctx, label, value, x, y, layout) {
+  preencherRoundRect(ctx, x, y, 172, 84, 16, "rgba(255,255,255,.035)");
+  desenharBordaRoundRect(ctx, x, y, 172, 84, 16, layout.accent, 2);
+  ctx.fillStyle = "#f8fafc";
+  ctx.textAlign = "left";
+  ctx.font = "900 18px Arial";
+  ctx.fillText(label, x + 18, y + 30);
+  ctx.fillStyle = layout.accent2;
+  fonteQueCabeCanvas(ctx, String(value || "-").toUpperCase(), 900, 25, 14, 136);
+  ctx.fillText(String(value || "-").toUpperCase(), x + 18, y + 64);
+}
+
+function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo, options = {}) {
+  const layout = AUTOMOVEL_ARTE_LAYOUTS.premium4x4;
+  const main = fotos[0] || logo || siteLogo;
+  const settings = options.imageSettings || {};
+  const contato = telefoneArteAdmin(item.contato || client?.whatsapp || client?.contato || client?.telefone || "") || "(00) 00000-0000";
+  const title = tituloAutomovelPremium(item, options);
+  const titleParts = title.split(/\s+/);
+  const titleLast = titleParts.length > 1 ? titleParts.pop() : "";
+  const titleFirst = titleParts.join(" ") || title;
+  const subtitle1 = textoCurtoArte(options.subtitle || "FORCA, CONFORTO E DESEMPENHO", 52).toUpperCase();
+  const subtitle2 = textoCurtoArte(options.subtitle2 || "PARA QUALQUER DESAFIO.", 52).toUpperCase();
+  const specs = specsAutomovelPremium45(item);
+
+  desenharFundoPremiumAutomovel(ctx, 1080, 1350, layout);
+  ctx.fillStyle = "rgba(255,255,255,.035)";
+  for (let x = 0; x < 1080; x += 28) ctx.fillRect(x, 1232, 14, 118);
+  desenharSeparadorPremium(ctx, 58, 64, 300, layout.accent);
+  desenharSeparadorPremium(ctx, 382, 64, 590, layout.accent);
+  ctx.strokeStyle = layout.accent;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(333, 48, 30, 30);
+
+  ctx.fillStyle = layout.accent2;
+  ctx.textAlign = "left";
+  ctx.font = "900 30px Arial";
+  ctx.fillText("OPORTUNIDADE PREMIUM", 58, 116);
+  ctx.fillStyle = "#f8fafc";
+  fonteQueCabeCanvas(ctx, titleFirst, 900, 78, 42, 480);
+  ctx.fillText(titleFirst, 58, 194);
+  if (titleLast && titleLast !== titleFirst) {
+    ctx.fillStyle = layout.priceText;
+    fonteQueCabeCanvas(ctx, titleLast, 900, 92, 46, 260);
+    ctx.fillText(titleLast, 58, 286);
+  }
+  desenharSeparadorPremium(ctx, 58, 318, 572, layout.accent);
+  ctx.fillStyle = "#f8fafc";
+  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 350, 410, 2, { peso: 800, tamanho: 27, minimo: 16, lineHeight: 32, blockHeight: 70 });
+  ctx.fillStyle = layout.accent2;
+  desenharTextoInteiroCanvas(ctx, subtitle2, 58, 420, 430, 2, { peso: 900, tamanho: 28, minimo: 16, lineHeight: 33, blockHeight: 70 });
+
+  desenharImagemVeiculoPremium45(ctx, main, 392, 130, 642, 560, settings);
+  ctx.strokeStyle = layout.accent;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(382, 118);
+  ctx.lineTo(352, 704);
+  ctx.stroke();
+  desenharAssinaturaPremiumAutomovel(ctx, client, logo, siteLogo, options.showSiteLogo !== false, layout, false);
+
+  desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 520, layout);
+  desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 626, layout);
+  desenharMiniInfoPremium45(ctx, "KM", item.km || item.quilometragem || "-", 58, 732, layout);
+
+  preencherRoundRect(ctx, 58, 870, 602, 154, 18, "rgba(0,0,0,.82)");
+  desenharBordaRoundRect(ctx, 58, 870, 602, 154, 18, layout.accent, 3);
+  ctx.fillStyle = "#f8fafc";
+  ctx.textAlign = "center";
+  ctx.font = "900 28px Arial";
+  ctx.fillText("POR APENAS", 359, 924);
+  ctx.fillStyle = layout.priceText;
+  fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 84, 44, 540);
+  ctx.fillText(precoAutomovelArte(item), 359, 1000);
+
+  preencherRoundRect(ctx, 706, 744, 318, 356, 24, "rgba(0,0,0,.66)");
+  desenharBordaRoundRect(ctx, 706, 744, 318, 356, 24, layout.accent, 2);
+  specs.forEach((spec, index) => {
+    const y = 785 + index * 61;
+    if (index) desenharSeparadorPremium(ctx, 736, y - 22, 994, "rgba(244,193,155,.35)");
+    ctx.fillStyle = layout.accent2;
+    ctx.textAlign = "center";
+    ctx.font = "900 20px Arial";
+    ctx.fillText(String(index + 1).padStart(2, "0"), 752, y + 10);
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#ffffff";
+    fonteQueCabeCanvas(ctx, spec.title, 900, 22, 14, 205);
+    ctx.fillText(spec.title, 790, y);
+    ctx.fillStyle = "#e5e7eb";
+    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 18, 11, 205);
+    ctx.fillText(String(spec.detail || "").toUpperCase(), 790, y + 27);
+  });
+
+  preencherRoundRect(ctx, 58, 1060, 610, 92, 18, "rgba(196,122,74,.16)");
+  desenharBordaRoundRect(ctx, 58, 1060, 610, 92, 18, layout.accent, 2);
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left";
+  ctx.font = "900 29px Arial";
+  ctx.fillText("FINANCIAMENTO", 92, 1096);
+  ctx.fillStyle = layout.priceText;
+  ctx.font = "900 34px Arial";
+  ctx.fillText("FACILITADO", 92, 1132);
+  ctx.strokeStyle = "rgba(255,255,255,.42)";
+  ctx.beginPath();
+  ctx.moveTo(344, 1075);
+  ctx.lineTo(344, 1138);
+  ctx.stroke();
+  ctx.fillStyle = "#f8fafc";
+  fonteQueCabeCanvas(ctx, options.footer || "As melhores condicoes para voce sair de carro novo.", 800, 20, 12, 285);
+  ctx.fillText(options.footer || "As melhores condicoes para voce sair de carro novo.", 370, 1112);
+
+  preencherRoundRect(ctx, 90, 1248, 380, 62, 24, layout.accent);
+  ctx.fillStyle = "#111111";
+  ctx.textAlign = "center";
+  ctx.font = "900 31px Arial";
+  ctx.fillText("SAIBA MAIS", 280, 1289);
+  ctx.strokeStyle = "rgba(255,255,255,.35)";
+  ctx.beginPath();
+  ctx.moveTo(515, 1248);
+  ctx.lineTo(515, 1310);
+  ctx.stroke();
+  ctx.fillStyle = layout.accent2;
+  ctx.textAlign = "left";
+  ctx.font = "900 20px Arial";
+  ctx.fillText("CONTATO:", 565, 1270);
+  ctx.fillStyle = "#ffffff";
+  fonteQueCabeCanvas(ctx, contato, 900, 38, 20, 390);
+  ctx.fillText(contato, 565, 1304);
+}
+
 function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutKey, options = {}) {
   const layout = AUTOMOVEL_ARTE_LAYOUTS[layoutKey] || AUTOMOVEL_ARTE_LAYOUTS.showroom;
   const main = fotos[0] || logo || siteLogo;
@@ -5754,8 +5943,7 @@ function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutK
 
 function renderAutomovelArteOptions() {
   const select = $("automovelArteItem");
-  const layout = $("automovelArteLayout");
-  if (!select || !layout) return;
+  if (!select) return;
   const atual = select.value || state.selectedAutomovelArtId;
   const anterior = state.selectedAutomovelArtId;
   const list = state.automoveis.filter(itemBelongsToCurrentClient);
@@ -5772,7 +5960,7 @@ function renderAutomovelArteOptions() {
   }
 }
 
-async function criarCanvasArteAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = $("automovelArteLayout")?.value || "showroom", options = opcoesArteAutomovel()) {
+async function criarCanvasArteAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = "premium45", options = opcoesArteAutomovel()) {
   if (!hasPermission("veiculos")) return showToast("A geracao de posts de automoveis nao esta liberada para este usuario.");
   const item = state.automoveis.find((auto) => auto.id === autoId && itemBelongsToCurrentClient(auto));
   if (!item) return showToast("Selecione um veiculo para gerar a imagem.");
@@ -5790,9 +5978,9 @@ async function criarCanvasArteAutomovel(autoId = $("automovelArteItem")?.value, 
   }
   const canvas = document.createElement("canvas");
   canvas.width = 1080;
-  canvas.height = options.formato === "stories" ? 1920 : 1080;
+  canvas.height = 1350;
   const ctx = canvas.getContext("2d");
-  desenharArteAutomovel(ctx, item, client, fotos, logo || siteLogo, siteLogo, layoutKey, options);
+  desenharArteAutomovelPremium45(ctx, item, client, fotos, logo || siteLogo, siteLogo, options);
   return { canvas, item };
 }
 
@@ -5808,7 +5996,7 @@ async function atualizarPreviaArteAutomovel({ silent = false } = {}) {
   if (button) button.disabled = true;
   if (!silent) showToast("Atualizando previa do veiculo...");
   try {
-    const result = await criarCanvasArteAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, $("automovelArteLayout")?.value || "showroom", opcoesArteAutomovel());
+    const result = await criarCanvasArteAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, "premium45", opcoesArteAutomovel());
     if (!result?.canvas) return;
     preview.width = result.canvas.width;
     preview.height = result.canvas.height;
@@ -5824,16 +6012,16 @@ async function atualizarPreviaArteAutomovel({ silent = false } = {}) {
   }
 }
 
-async function gerarArteInstagramAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = $("automovelArteLayout")?.value || "showroom", options = opcoesArteAutomovel()) {
+async function gerarArteInstagramAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = "premium45", options = opcoesArteAutomovel()) {
   const button = $("generateAutomovelArtButton");
   if (button) button.disabled = true;
-  showToast(options.formato === "stories" ? "Gerando stories do veiculo..." : "Gerando post do veiculo...");
+  showToast("Gerando arte premium do veiculo...");
   try {
     const result = await criarCanvasArteAutomovel(autoId, layoutKey, options);
     if (!result?.canvas) return;
     const blob = await canvasParaBlob(result.canvas);
-    baixarBlobCanvas(blob, `${options.formato === "stories" ? "stories" : "post"}-veiculo-${slugify(result.item.codRef || result.item.marca || result.item.id)}-${layoutKey}.png`);
-    showToast(options.formato === "stories" ? "Stories do veiculo gerado." : "Post do veiculo gerado.");
+    baixarBlobCanvas(blob, `arte-premium-veiculo-${slugify(result.item.codRef || result.item.marca || result.item.id)}.png`);
+    showToast("Arte premium do veiculo gerada.");
   } catch (error) {
     console.error("Erro ao gerar post do automovel.", error);
     showToast("Nao foi possivel gerar o post do veiculo.");
@@ -5866,7 +6054,7 @@ function renderAutomoveisList() {
         <div class="list-meta">${escapeHtml([item.tipo, item.condicao, item.ano, item.preco].filter(Boolean).join(" - ") || "Sem valor")}</div>
         <div class="list-meta">${escapeHtml([item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ") || "Sem contato")}</div>
         <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
-        ${hasPermission("veiculos") ? `<button type="button" data-art-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Post Instagram</button>` : ""}
+        ${hasPermission("veiculos") ? `<button type="button" data-art-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte premium</button>` : ""}
         <button type="button" data-edit-automovel="${escapeAttr(item.id)}">Editar</button>
       </article>
     `;
@@ -5875,7 +6063,7 @@ function renderAutomoveisList() {
     button.addEventListener("click", () => {
       if ($("automovelArteItem")) $("automovelArteItem").value = button.dataset.artAutomovel || "";
       state.selectedAutomovelArtId = button.dataset.artAutomovel || "";
-      gerarArteInstagramAutomovel(button.dataset.artAutomovel, $("automovelArteLayout")?.value || "showroom");
+      gerarArteInstagramAutomovel(button.dataset.artAutomovel, "premium45");
     });
   });
   box.querySelectorAll("[data-edit-automovel]").forEach((button) => {
@@ -13019,12 +13207,7 @@ function bindEvents() {
     state.selectedAutomovelArtId = event.target.value || "";
     atualizarPreviaArteAutomovel({ silent: true });
   });
-  $("automovelArteLayout")?.addEventListener("change", (event) => {
-    state.selectedAutomovelArtLayout = event.target.value || "showroom";
-    atualizarPreviaArteAutomovel({ silent: true });
-  });
-  $("automovelArteFormato")?.addEventListener("change", () => atualizarPreviaArteAutomovel({ silent: true }));
-  ["automovelArteTitulo", "automovelArteSubtitulo", "automovelArteRodape", "automovelArteShowSiteLogo"].forEach((id) => {
+  ["automovelArteTitulo", "automovelArteSubtitulo", "automovelArteSubtitulo2", "automovelArteRodape", "automovelArteShowSiteLogo", "automovelArteImageScale", "automovelArteImageOffsetX", "automovelArteImageOffsetY", "automovelArteDarkOverlay"].forEach((id) => {
     $(id)?.addEventListener("input", () => agendarPreviaArteAutomovel());
     $(id)?.addEventListener("change", () => atualizarPreviaArteAutomovel({ silent: true }));
   });
@@ -13032,7 +13215,7 @@ function bindEvents() {
     atualizarPreviaArteAutomovel();
   });
   $("generateAutomovelArtButton")?.addEventListener("click", () => {
-    gerarArteInstagramAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, $("automovelArteLayout")?.value || "showroom", opcoesArteAutomovel());
+    gerarArteInstagramAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, "premium45", opcoesArteAutomovel());
   });
   const handleAutomovelImagesUpload = async (event) => {
     const id = $("automovelId").value || slugify(`${$("automovelMarca").value}-${$("automovelModelo").value}`) || `automovel-${Date.now()}`;

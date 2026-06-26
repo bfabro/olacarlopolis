@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=328">
+  <link rel="stylesheet" href="painel.css?v=329">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1171,42 +1171,40 @@
             </div>
             <div class="imovel-art-panel automovel-art-panel" data-permission="veiculos">
               <div>
-                <strong>Post para Instagram</strong>
-                <span>Escolha um veiculo e um dos modelos com foco nas fotos e dados principais.</span>
+                <strong>Arte premium para Instagram</strong>
+                <span>Gere uma arte vertical 4:5 com foto real do veiculo, dados, preco e contato.</span>
               </div>
               <label>Veiculo
                 <select id="automovelArteItem"></select>
               </label>
-              <label>Modelo
-                <select id="automovelArteLayout">
-                  <option value="showroom">Showroom premium</option>
-                  <option value="premium4x4">Premium bronze</option>
-                  <option value="dark">Noite esportiva</option>
-                  <option value="clean">Clean destaque</option>
-                  <option value="orange">Oferta laranja</option>
-                  <option value="blue">Azul concessionaria</option>
-                  <option value="magazine">Revista automotiva</option>
-                </select>
+              <label class="auto-art-wide">Titulo principal
+                <input id="automovelArteTitulo" maxlength="70" placeholder="Ex.: Picape 4x4">
               </label>
-              <label>Formato
-                <select id="automovelArteFormato">
-                  <option value="post">Post quadrado 1080x1080</option>
-                  <option value="stories">Stories 1080x1920</option>
-                </select>
+              <label>Subtitulo 1
+                <input id="automovelArteSubtitulo" maxlength="95" placeholder="Ex.: Força, conforto e desempenho">
               </label>
-              <label class="auto-art-wide">Texto principal
-                <input id="automovelArteTitulo" maxlength="70" placeholder="Ex.: Oferta imperdível">
-              </label>
-              <label class="auto-art-wide">Texto de apoio
-                <input id="automovelArteSubtitulo" maxlength="95" placeholder="Ex.: Veículo completo, revisado e pronto para negociar">
-              </label>
-              <label class="auto-art-wide">Texto do rodapé
-                <input id="automovelArteRodape" maxlength="95" value="Olá Carlópolis • veículos e oportunidades locais">
+              <label class="auto-art-wide">Texto de financiamento
+                <input id="automovelArteRodape" maxlength="95" value="As melhores condições para você sair de carro novo.">
               </label>
               <label class="check-row auto-art-logo-check"><input id="automovelArteShowSiteLogo" type="checkbox" checked> Logo Ola Carlópolis</label>
+              <label>Subtitulo 2
+                <input id="automovelArteSubtitulo2" maxlength="70" placeholder="Ex.: Para qualquer desafio.">
+              </label>
+              <label>Escala da foto
+                <input id="automovelArteImageScale" type="range" min="0.75" max="1.35" step="0.01" value="1">
+              </label>
+              <label>Posicao horizontal
+                <input id="automovelArteImageOffsetX" type="range" min="-160" max="160" step="5" value="0">
+              </label>
+              <label>Posicao vertical
+                <input id="automovelArteImageOffsetY" type="range" min="-140" max="140" step="5" value="0">
+              </label>
+              <label>Escurecer fundo da foto
+                <input id="automovelArteDarkOverlay" type="range" min="0" max="0.55" step="0.01" value="0.22">
+              </label>
               <div class="auto-art-preview">
-                <div><strong>Prévia da imagem</strong><span>Confira antes de baixar.</span></div>
-                <canvas id="automovelArtePreview" width="1080" height="1080" aria-label="Prévia da arte do automóvel"></canvas>
+                <div><strong>Prévia 4:5</strong><span>Arte final em 1080x1350px, pronta para baixar em PNG.</span></div>
+                <canvas id="automovelArtePreview" width="1080" height="1350" aria-label="Prévia da arte premium do automóvel"></canvas>
               </div>
               <div class="auto-art-actions">
                 <button id="previewAutomovelArtButton" type="button" class="ghost-button"><i class="fa-solid fa-eye"></i> Atualizar prévia</button>
@@ -1440,6 +1438,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=358"></script>
+  <script type="module" src="painel.js?v=359"></script>
 </body>
 </html>
