@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 373,
-  label: "v379",
+  numero: 374,
+  label: "v380",
   data: "2026-06-27",
-  nota: "Arte premium de veiculos teve titulo centralizado corretamente dentro do card superior."
+  nota: "Arte premium de veiculos teve subtitulo 1 centralizado corretamente dentro do card superior."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5837,7 +5837,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.textAlign = "center";
   desenharTextoInteiroCanvas(ctx, title, 540, 148, 904, 2, { peso: 900, tamanho: 58, minimo: 24, lineHeight: 60, blockHeight: 114, align: "center" });
   ctx.fillStyle = "#f8fafc";
-  desenharTextoInteiroCanvas(ctx, subtitle1, 108, 270, 864, 2, { peso: 900, tamanho: 25, minimo: 13, lineHeight: 29, blockHeight: 52, align: "center" });
+  desenharTextoInteiroCanvas(ctx, subtitle1, 540, 270, 864, 2, { peso: 900, tamanho: 25, minimo: 13, lineHeight: 29, blockHeight: 52, align: "center" });
 
   desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 375, layout);
   desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 473, layout);
