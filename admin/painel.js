@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 370,
-  label: "v376",
+  numero: 371,
+  label: "v377",
   data: "2026-06-27",
-  nota: "Arte premium de veiculos ganhou paletas de cor, textos centralizados e subtitulo 2 apenas nas caracteristicas."
+  nota: "Arte premium de veiculos teve titulo contido no card e paletas mais vivas nas informacoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5277,13 +5277,13 @@ function renderAutomovelImagesPreview() {
 }
 
 const AUTOMOVEL_ARTE_LAYOUTS = {
-  showroom: { nome: "Showroom premium", bg: "#0f172a", panel: "#111827", accent: "#facc15", accent2: "#ffffff", text: "#ffffff", priceBg: "#facc15", priceText: "#111827" },
-  premium4x4: { nome: "Premium bronze", bg: "#050505", panel: "#101010", accent: "#c47a4a", accent2: "#f4c19b", text: "#f8fafc", priceBg: "#120f0d", priceText: "#f4a261" },
-  dark: { nome: "Noite esportiva", bg: "#050505", panel: "#171717", accent: "#ef4444", accent2: "#fca5a5", text: "#ffffff", priceBg: "#ef4444", priceText: "#ffffff" },
-  clean: { nome: "Clean destaque", bg: "#f8fafc", panel: "#ffffff", accent: "#2563eb", accent2: "#0f172a", text: "#0f172a", priceBg: "#0f172a", priceText: "#ffffff" },
-  orange: { nome: "Oferta laranja", bg: "#431407", panel: "#7c2d12", accent: "#fb923c", accent2: "#ffedd5", text: "#ffffff", priceBg: "#fb923c", priceText: "#431407" },
-  blue: { nome: "Azul concessionaria", bg: "#082f49", panel: "#075985", accent: "#38bdf8", accent2: "#e0f2fe", text: "#ffffff", priceBg: "#38bdf8", priceText: "#082f49" },
-  magazine: { nome: "Revista automotiva", bg: "#1f2937", panel: "#f9fafb", accent: "#22c55e", accent2: "#111827", text: "#111827", priceBg: "#22c55e", priceText: "#052e16" }
+  showroom: { nome: "Showroom premium", bg: "#0f172a", panel: "#111827", accent: "#facc15", accent2: "#fff7ad", infoText: "#fff7ad", text: "#ffffff", priceBg: "#facc15", priceText: "#ffe66d" },
+  premium4x4: { nome: "Premium bronze", bg: "#050505", panel: "#101010", accent: "#c47a4a", accent2: "#f4c19b", infoText: "#ffd1a8", text: "#f8fafc", priceBg: "#120f0d", priceText: "#ffad66" },
+  dark: { nome: "Noite esportiva", bg: "#050505", panel: "#171717", accent: "#ef4444", accent2: "#fecaca", infoText: "#ff6b6b", text: "#ffffff", priceBg: "#ef4444", priceText: "#ff6b6b" },
+  clean: { nome: "Clean destaque", bg: "#f8fafc", panel: "#ffffff", accent: "#2563eb", accent2: "#93c5fd", infoText: "#60a5fa", text: "#ffffff", priceBg: "#0f172a", priceText: "#60a5fa" },
+  orange: { nome: "Oferta laranja", bg: "#431407", panel: "#7c2d12", accent: "#fb923c", accent2: "#ffedd5", infoText: "#ffb86b", text: "#ffffff", priceBg: "#fb923c", priceText: "#ffb86b" },
+  blue: { nome: "Azul concessionaria", bg: "#082f49", panel: "#075985", accent: "#38bdf8", accent2: "#e0f2fe", infoText: "#67e8f9", text: "#ffffff", priceBg: "#38bdf8", priceText: "#67e8f9" },
+  magazine: { nome: "Revista automotiva", bg: "#122018", panel: "#183525", accent: "#22c55e", accent2: "#bbf7d0", infoText: "#86efac", text: "#ffffff", priceBg: "#22c55e", priceText: "#86efac" }
 };
 
 function hexParaRgbaArte(hex, alpha = 1) {
@@ -5780,8 +5780,9 @@ function specsAutomovelPremium45(item = {}) {
 }
 
 function desenharMiniInfoPremium45(ctx, label, value, x, y, layout) {
+  const infoColor = layout.infoText || layout.accent2 || "#f4c19b";
   ctx.save();
-  ctx.shadowColor = hexParaRgbaArte(layout.accent2 || layout.accent, .42);
+  ctx.shadowColor = hexParaRgbaArte(infoColor, .42);
   ctx.shadowBlur = 12;
   desenharBordaRoundRect(ctx, x, y, 172, 84, 16, layout.accent, 2);
   ctx.restore();
@@ -5791,7 +5792,7 @@ function desenharMiniInfoPremium45(ctx, label, value, x, y, layout) {
   ctx.textAlign = "left";
   ctx.font = "900 18px Arial";
   ctx.fillText(label, x + 18, y + 30);
-  ctx.fillStyle = layout.accent2;
+  ctx.fillStyle = infoColor;
   fonteQueCabeCanvas(ctx, String(value || "-").toUpperCase(), 900, 25, 14, 136);
   ctx.fillText(String(value || "-").toUpperCase(), x + 18, y + 64);
 }
@@ -5805,6 +5806,8 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   const subtitle1 = textoCurtoArte(options.subtitle || "FORCA, CONFORTO E DESEMPENHO", 52).toUpperCase();
   const subtitle2 = textoCurtoArte(options.subtitle2 || "CARACTERISTICAS", 52).toUpperCase();
   const specs = specsAutomovelPremium45(item);
+  const infoColor = layout.infoText || layout.accent2 || "#f4c19b";
+  const priceColor = layout.priceText || infoColor;
 
   desenharFundoPremiumAutomovel(ctx, 1080, 1350, layout);
   ctx.fillStyle = "rgba(255,255,255,.035)";
@@ -5821,15 +5824,15 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
 
   preencherRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(0,0,0,.84)");
   desenharBordaRoundRect(ctx, 42, 126, 996, 210, 24, hexParaRgbaArte(layout.accent, .52), 2);
-  ctx.fillStyle = layout.accent2;
+  ctx.fillStyle = infoColor;
   ctx.textAlign = "center";
   ctx.font = "900 38px Arial";
   ctx.fillText("OPORTUNIDADE PREMIUM", options.showSiteLogo !== false ? 470 : 540, 96);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "center";
-  desenharTextoInteiroCanvas(ctx, title, 76, 148, 928, 3, { peso: 900, tamanho: 54, minimo: 22, lineHeight: 56, blockHeight: 116, align: "center" });
+  desenharTextoInteiroCanvas(ctx, title, 92, 150, 896, 2, { peso: 900, tamanho: 50, minimo: 20, lineHeight: 53, blockHeight: 104, align: "center" });
   ctx.fillStyle = "#f8fafc";
-  desenharTextoInteiroCanvas(ctx, subtitle1, 108, 266, 864, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "center" });
+  desenharTextoInteiroCanvas(ctx, subtitle1, 108, 270, 864, 2, { peso: 900, tamanho: 24, minimo: 13, lineHeight: 28, blockHeight: 52, align: "center" });
 
   desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 375, layout);
   desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 473, layout);
@@ -5838,40 +5841,40 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   desenharMiniInfoPremium45(ctx, "CAMBIO", item.cambio || item.partida || "-", 58, 767, layout);
 
   ctx.save();
-  ctx.shadowColor = hexParaRgbaArte(layout.accent2 || layout.accent, .75);
+  ctx.shadowColor = hexParaRgbaArte(infoColor, .75);
   ctx.shadowBlur = 22;
   desenharBordaRoundRect(ctx, 58, 900, 602, 154, 18, layout.accent, 4);
   ctx.restore();
   preencherRoundRect(ctx, 58, 900, 602, 154, 18, "rgba(0,0,0,.82)");
   desenharBordaRoundRect(ctx, 58, 900, 602, 154, 18, layout.accent, 3);
   const priceGlow = ctx.createLinearGradient(58, 900, 660, 1054);
-  priceGlow.addColorStop(0, hexParaRgbaArte(layout.accent2 || layout.accent, .32));
+  priceGlow.addColorStop(0, hexParaRgbaArte(infoColor, .32));
   priceGlow.addColorStop(.35, "rgba(255,255,255,.08)");
-  priceGlow.addColorStop(.72, hexParaRgbaArte(layout.accent2 || layout.accent, .22));
+  priceGlow.addColorStop(.72, hexParaRgbaArte(infoColor, .22));
   priceGlow.addColorStop(1, hexParaRgbaArte(layout.accent, .34));
   desenharBordaRoundRect(ctx, 64, 906, 590, 142, 15, priceGlow, 2);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "center";
   ctx.font = "900 28px Arial";
   ctx.fillText("POR APENAS", 359, 954);
-  ctx.fillStyle = layout.priceText;
+  ctx.fillStyle = priceColor;
   fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 84, 44, 540);
   ctx.fillText(precoAutomovelArte(item), 359, 1030);
 
   ctx.save();
-  ctx.shadowColor = hexParaRgbaArte(layout.accent2 || layout.accent, .52);
+  ctx.shadowColor = hexParaRgbaArte(infoColor, .52);
   ctx.shadowBlur = 16;
   desenharBordaRoundRect(ctx, 690, 830, 338, 412, 24, layout.accent, 3);
   ctx.restore();
   preencherRoundRect(ctx, 690, 830, 338, 412, 24, "rgba(0,0,0,.70)");
   desenharBordaRoundRect(ctx, 690, 830, 338, 412, 24, layout.accent, 2);
-  ctx.fillStyle = layout.accent2;
+  ctx.fillStyle = infoColor;
   ctx.textAlign = "left";
   desenharTextoInteiroCanvas(ctx, subtitle2, 720, 852, 278, 1, { peso: 900, tamanho: 22, minimo: 13, lineHeight: 25, blockHeight: 34, align: "left" });
   specs.forEach((spec, index) => {
     const y = 920 + index * 50;
-    if (index) desenharSeparadorPremium(ctx, 720, y - 16, 1000, hexParaRgbaArte(layout.accent2 || layout.accent, .35));
-    ctx.fillStyle = layout.accent2;
+    if (index) desenharSeparadorPremium(ctx, 720, y - 16, 1000, hexParaRgbaArte(infoColor, .35));
+    ctx.fillStyle = infoColor;
     ctx.textAlign = "center";
     ctx.font = "900 15px Arial";
     ctx.fillText(String(index + 1).padStart(2, "0"), 736, y + 10);
@@ -5890,7 +5893,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.textAlign = "left";
   ctx.font = "900 24px Arial";
   ctx.fillText("FINANCIAMENTO", 92, 1198);
-  ctx.fillStyle = layout.priceText;
+  ctx.fillStyle = priceColor;
   ctx.font = "900 29px Arial";
   ctx.fillText("FACILITADO", 92, 1230);
   ctx.strokeStyle = "rgba(255,255,255,.42)";
@@ -5911,7 +5914,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.moveTo(515, 1248);
   ctx.lineTo(515, 1310);
   ctx.stroke();
-  ctx.fillStyle = layout.accent2;
+  ctx.fillStyle = infoColor;
   ctx.textAlign = "left";
   ctx.font = "900 20px Arial";
   ctx.fillText("CONTATO:", 565, 1270);
