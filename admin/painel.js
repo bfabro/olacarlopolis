@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 366,
-  label: "v372",
+  numero: 367,
+  label: "v373",
   data: "2026-06-27",
-  nota: "Arte premium de veiculos ganhou mais destaque para foto e espaco seguro para titulo e subtitulos."
+  nota: "Arte premium de veiculos foi reposicionada conforme referencia visual com topo amplo e foto em destaque."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5802,29 +5802,29 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.lineWidth = 2;
   ctx.strokeRect(333, 48, 30, 30);
 
-  desenharImagemVeiculoPremium45(ctx, main, 320, 455, 730, 365, settings);
+  desenharImagemVeiculoPremium45(ctx, main, 305, 375, 730, 445, settings);
   ctx.strokeStyle = layout.accent;
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(314, 438);
-  ctx.lineTo(290, 842);
+  ctx.moveTo(298, 356);
+  ctx.lineTo(276, 840);
   ctx.stroke();
   if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 850, 26, 210, 118, 0, "rgba(255,255,255,0)");
 
-  preencherRoundRect(ctx, 42, 126, 548, 318, 26, "rgba(0,0,0,.78)");
-  desenharBordaRoundRect(ctx, 42, 126, 548, 318, 26, "rgba(196,122,74,.42)", 2);
+  preencherRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(0,0,0,.84)");
+  desenharBordaRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(196,122,74,.52)", 2);
   ctx.fillStyle = layout.accent2;
-  ctx.textAlign = "left";
+  ctx.textAlign = "center";
   ctx.font = "900 30px Arial";
-  ctx.fillText("OPORTUNIDADE PREMIUM", 58, 116);
+  ctx.fillText("OPORTUNIDADE PREMIUM", 540, 112);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, title, 58, 146, 508, 4, { peso: 900, tamanho: 54, minimo: 25, lineHeight: 56, blockHeight: 170, align: "left" });
-  desenharSeparadorPremium(ctx, 58, 324, 552, layout.accent);
+  desenharTextoInteiroCanvas(ctx, title, 58, 148, 920, 2, { peso: 900, tamanho: 58, minimo: 32, lineHeight: 62, blockHeight: 106, align: "left" });
+  desenharSeparadorPremium(ctx, 58, 238, 555, layout.accent);
   ctx.fillStyle = "#f8fafc";
-  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 342, 450, 3, { peso: 800, tamanho: 24, minimo: 13, lineHeight: 28, blockHeight: 68, align: "left" });
+  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 258, 500, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "left" });
   ctx.fillStyle = layout.accent2;
-  desenharTextoInteiroCanvas(ctx, subtitle2, 58, 400, 450, 2, { peso: 900, tamanho: 23, minimo: 13, lineHeight: 27, blockHeight: 42, align: "left" });
+  desenharTextoInteiroCanvas(ctx, subtitle2, 560, 258, 420, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "left" });
 
   desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 520, layout);
   desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 626, layout);
