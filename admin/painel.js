@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 367,
-  label: "v373",
+  numero: 368,
+  label: "v374",
   data: "2026-06-27",
-  nota: "Arte premium de veiculos foi reposicionada conforme referencia visual com topo amplo e foto em destaque."
+  nota: "Arte premium de veiculos ganhou titulo sem reticencias, card lateral ampliado e logos ajustadas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5501,7 +5501,7 @@ function detalheAutomovelValorPremium(item = {}, campos = []) {
 }
 
 function tituloAutomovelPremium(item = {}, options = {}) {
-  const base = textoTituloAutomovelArte(item, options).replace(/\s+/g, " ").trim();
+  const base = String(options.title || [item.marca, item.modelo].filter(Boolean).join(" ") || item.titulo || "Veiculo premium").replace(/\s+/g, " ").trim().toUpperCase();
   return base || "VEICULO PREMIUM";
 }
 
@@ -5736,6 +5736,14 @@ function desenharImagemVeiculoPremium45(ctx, img, x, y, w, h, settings = {}) {
   ctx.fill();
 }
 
+function desenharLogoSemFundoCanvas(ctx, img, x, y, w, h) {
+  if (!img) return;
+  const scale = Math.min(w / img.width, h / img.height);
+  const dw = img.width * scale;
+  const dh = img.height * scale;
+  ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+}
+
 function specsAutomovelPremium45(item = {}) {
   const isMoto = normalizeName(item.tipo || "").includes("moto");
   const specs = (isMoto ? [
@@ -5768,7 +5776,7 @@ function specsAutomovelPremium45(item = {}) {
     ][specs.length % 3];
     specs.push(fallback);
   }
-  return specs.slice(0, 6);
+  return specs.slice(0, 8);
 }
 
 function desenharMiniInfoPremium45(ctx, label, value, x, y, layout) {
@@ -5796,11 +5804,6 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   desenharFundoPremiumAutomovel(ctx, 1080, 1350, layout);
   ctx.fillStyle = "rgba(255,255,255,.035)";
   for (let x = 0; x < 1080; x += 28) ctx.fillRect(x, 1232, 14, 118);
-  desenharSeparadorPremium(ctx, 58, 64, 300, layout.accent);
-  desenharSeparadorPremium(ctx, 382, 64, 590, layout.accent);
-  ctx.strokeStyle = layout.accent;
-  ctx.lineWidth = 2;
-  ctx.strokeRect(333, 48, 30, 30);
 
   desenharImagemVeiculoPremium45(ctx, main, 305, 375, 730, 445, settings);
   ctx.strokeStyle = layout.accent;
@@ -5809,17 +5812,17 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.moveTo(298, 356);
   ctx.lineTo(276, 840);
   ctx.stroke();
-  if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 850, 26, 210, 118, 0, "rgba(255,255,255,0)");
+  if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 842, 22, 218, 132, 0, "rgba(255,255,255,0)");
 
   preencherRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(0,0,0,.84)");
   desenharBordaRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(196,122,74,.52)", 2);
   ctx.fillStyle = layout.accent2;
   ctx.textAlign = "center";
-  ctx.font = "900 30px Arial";
+  ctx.font = "900 38px Arial";
   ctx.fillText("OPORTUNIDADE PREMIUM", 540, 112);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, title, 58, 148, 920, 2, { peso: 900, tamanho: 58, minimo: 32, lineHeight: 62, blockHeight: 106, align: "left" });
+  desenharTextoInteiroCanvas(ctx, title, 58, 146, 920, 3, { peso: 900, tamanho: 54, minimo: 22, lineHeight: 56, blockHeight: 116, align: "left" });
   desenharSeparadorPremium(ctx, 58, 238, 555, layout.accent);
   ctx.fillStyle = "#f8fafc";
   desenharTextoInteiroCanvas(ctx, subtitle1, 58, 258, 500, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "left" });
@@ -5851,25 +5854,30 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 84, 44, 540);
   ctx.fillText(precoAutomovelArte(item), 359, 1030);
 
-  preencherRoundRect(ctx, 706, 840, 318, 318, 24, "rgba(0,0,0,.66)");
-  desenharBordaRoundRect(ctx, 706, 840, 318, 318, 24, layout.accent, 2);
+  ctx.save();
+  ctx.shadowColor = "rgba(244,193,155,.52)";
+  ctx.shadowBlur = 16;
+  desenharBordaRoundRect(ctx, 682, 818, 354, 344, 24, layout.accent, 3);
+  ctx.restore();
+  preencherRoundRect(ctx, 682, 818, 354, 344, 24, "rgba(0,0,0,.70)");
+  desenharBordaRoundRect(ctx, 682, 818, 354, 344, 24, layout.accent, 2);
   ctx.fillStyle = layout.accent2;
   ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, subtitle2, 736, 858, 258, 2, { peso: 900, tamanho: 18, minimo: 11, lineHeight: 22, blockHeight: 44, align: "left" });
+  desenharTextoInteiroCanvas(ctx, subtitle2, 712, 836, 294, 2, { peso: 900, tamanho: 20, minimo: 12, lineHeight: 23, blockHeight: 44, align: "left" });
   specs.forEach((spec, index) => {
-    const y = 930 + index * 38;
-    if (index) desenharSeparadorPremium(ctx, 736, y - 14, 994, "rgba(244,193,155,.35)");
+    const y = 896 + index * 32;
+    if (index) desenharSeparadorPremium(ctx, 712, y - 12, 1006, "rgba(244,193,155,.35)");
     ctx.fillStyle = layout.accent2;
     ctx.textAlign = "center";
-    ctx.font = "900 14px Arial";
-    ctx.fillText(String(index + 1).padStart(2, "0"), 752, y + 10);
+    ctx.font = "900 13px Arial";
+    ctx.fillText(String(index + 1).padStart(2, "0"), 728, y + 8);
     ctx.textAlign = "left";
     ctx.fillStyle = "#ffffff";
-    fonteQueCabeCanvas(ctx, spec.title, 900, 16, 9, 205);
-    ctx.fillText(spec.title, 790, y);
+    fonteQueCabeCanvas(ctx, spec.title, 900, 15, 9, 238);
+    ctx.fillText(spec.title, 760, y);
     ctx.fillStyle = "#e5e7eb";
-    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 13, 8, 205);
-    ctx.fillText(String(spec.detail || "").toUpperCase(), 790, y + 21);
+    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 12, 8, 238);
+    ctx.fillText(String(spec.detail || "").toUpperCase(), 760, y + 18);
   });
 
   preencherRoundRect(ctx, 58, 1168, 610, 74, 18, "rgba(196,122,74,.16)");
@@ -5906,7 +5914,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.fillStyle = "#ffffff";
   fonteQueCabeCanvas(ctx, contato, 900, 35, 18, 330);
   ctx.fillText(contato, 565, 1304);
-  desenharImagemContain(ctx, logo, 930, 1238, 96, 80, 14, "#ffffff");
+  desenharLogoSemFundoCanvas(ctx, logo, 930, 1238, 96, 80);
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "right";
   fonteQueCabeCanvas(ctx, client?.nome || item.vendedor || item.loja || "Cliente", 900, 17, 10, 230);
