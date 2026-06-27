@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 368,
-  label: "v374",
+  numero: 369,
+  label: "v375",
   data: "2026-06-27",
-  nota: "Arte premium de veiculos ganhou titulo sem reticencias, card lateral ampliado e logos ajustadas."
+  nota: "Arte premium de veiculos teve linhas removidas, logos reposicionadas e cards laterais melhorados."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5812,7 +5812,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.moveTo(298, 356);
   ctx.lineTo(276, 840);
   ctx.stroke();
-  if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 842, 22, 218, 132, 0, "rgba(255,255,255,0)");
+  if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 884, 20, 160, 90, 0, "rgba(255,255,255,0)");
 
   preencherRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(0,0,0,.84)");
   desenharBordaRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(196,122,74,.52)", 2);
@@ -5823,15 +5823,16 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "left";
   desenharTextoInteiroCanvas(ctx, title, 58, 146, 920, 3, { peso: 900, tamanho: 54, minimo: 22, lineHeight: 56, blockHeight: 116, align: "left" });
-  desenharSeparadorPremium(ctx, 58, 238, 555, layout.accent);
   ctx.fillStyle = "#f8fafc";
   desenharTextoInteiroCanvas(ctx, subtitle1, 58, 258, 500, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "left" });
   ctx.fillStyle = layout.accent2;
   desenharTextoInteiroCanvas(ctx, subtitle2, 560, 258, 420, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "left" });
 
-  desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 520, layout);
-  desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 626, layout);
-  desenharMiniInfoPremium45(ctx, "KM", item.km || item.quilometragem || "-", 58, 732, layout);
+  desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 420, layout);
+  desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 518, layout);
+  desenharMiniInfoPremium45(ctx, "KM", item.km || item.quilometragem || "-", 58, 616, layout);
+  desenharMiniInfoPremium45(ctx, normalizeName(item.tipo || "").includes("moto") ? "CIL." : "MOTOR", normalizeName(item.tipo || "").includes("moto") ? (item.cilindrada || item.motor || "-") : (item.motor || item.cambio || "-"), 58, 714, layout);
+  desenharMiniInfoPremium45(ctx, "DOC.", item.documentacao || item.aceitaFinanciamento || "-", 58, 812, layout);
 
   ctx.save();
   ctx.shadowColor = "rgba(244,193,155,.75)";
@@ -5857,27 +5858,27 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.save();
   ctx.shadowColor = "rgba(244,193,155,.52)";
   ctx.shadowBlur = 16;
-  desenharBordaRoundRect(ctx, 682, 818, 354, 344, 24, layout.accent, 3);
+  desenharBordaRoundRect(ctx, 690, 792, 338, 450, 24, layout.accent, 3);
   ctx.restore();
-  preencherRoundRect(ctx, 682, 818, 354, 344, 24, "rgba(0,0,0,.70)");
-  desenharBordaRoundRect(ctx, 682, 818, 354, 344, 24, layout.accent, 2);
+  preencherRoundRect(ctx, 690, 792, 338, 450, 24, "rgba(0,0,0,.70)");
+  desenharBordaRoundRect(ctx, 690, 792, 338, 450, 24, layout.accent, 2);
   ctx.fillStyle = layout.accent2;
   ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, subtitle2, 712, 836, 294, 2, { peso: 900, tamanho: 20, minimo: 12, lineHeight: 23, blockHeight: 44, align: "left" });
+  desenharTextoInteiroCanvas(ctx, subtitle2, 720, 814, 278, 2, { peso: 900, tamanho: 20, minimo: 12, lineHeight: 23, blockHeight: 48, align: "left" });
   specs.forEach((spec, index) => {
-    const y = 896 + index * 32;
-    if (index) desenharSeparadorPremium(ctx, 712, y - 12, 1006, "rgba(244,193,155,.35)");
+    const y = 890 + index * 41;
+    if (index) desenharSeparadorPremium(ctx, 720, y - 15, 1000, "rgba(244,193,155,.35)");
     ctx.fillStyle = layout.accent2;
     ctx.textAlign = "center";
-    ctx.font = "900 13px Arial";
-    ctx.fillText(String(index + 1).padStart(2, "0"), 728, y + 8);
+    ctx.font = "900 14px Arial";
+    ctx.fillText(String(index + 1).padStart(2, "0"), 736, y + 9);
     ctx.textAlign = "left";
     ctx.fillStyle = "#ffffff";
-    fonteQueCabeCanvas(ctx, spec.title, 900, 15, 9, 238);
-    ctx.fillText(spec.title, 760, y);
+    fonteQueCabeCanvas(ctx, spec.title, 900, 16, 10, 230);
+    ctx.fillText(spec.title, 768, y);
     ctx.fillStyle = "#e5e7eb";
-    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 12, 8, 238);
-    ctx.fillText(String(spec.detail || "").toUpperCase(), 760, y + 18);
+    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 13, 9, 230);
+    ctx.fillText(String(spec.detail || "").toUpperCase(), 768, y + 21);
   });
 
   preencherRoundRect(ctx, 58, 1168, 610, 74, 18, "rgba(196,122,74,.16)");
