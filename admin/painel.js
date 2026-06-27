@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 362,
-  label: "v368",
-  data: "2026-06-26",
-  nota: "Cadastro de cliente novo corrigido para tratar financeiro sem cliente anterior."
+  numero: 363,
+  label: "v369",
+  data: "2026-06-27",
+  nota: "Cadastro de veiculos ganhou novos dados e arte premium recebeu ajustes de texto e logos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5115,9 +5115,27 @@ function resetAutomovelForm() {
   $("automovelForm")?.reset();
   if ($("automovelId")) $("automovelId").value = "";
   if ($("automovelStatus")) $("automovelStatus").value = "ativo";
+  atualizarCamposTipoAutomovel();
   $("deleteAutomovelButton")?.classList.add("hidden");
   renderAutomovelImagesPreview();
   setFormCardOpen("automovelForm", false);
+}
+
+function toggleAutomovelFieldGroup(ids = [], visible = true) {
+  ids.forEach((id) => {
+    const field = $(id);
+    field?.closest("label")?.classList.toggle("hidden", !visible);
+  });
+}
+
+function atualizarCamposTipoAutomovel() {
+  const tipo = normalizeName($("automovelTipo")?.value || "");
+  const isMoto = tipo.includes("moto");
+  const hasType = Boolean(tipo);
+  const motoFields = ["automovelCilindrada", "automovelPartida", "automovelFreio", "automovelInjecaoEletronica"];
+  const veiculoFields = ["automovelMotor", "automovelDirecao", "automovelVidroEletrico", "automovelTravaEletrica", "automovelPortas", "automovelFreioAbs"];
+  toggleAutomovelFieldGroup(motoFields, !hasType || isMoto);
+  toggleAutomovelFieldGroup(veiculoFields, !hasType || !isMoto);
 }
 
 function fillAutomovelForm(item) {
@@ -5142,10 +5160,26 @@ function fillAutomovelForm(item) {
   $("automovelCombustivel").value = item.combustivel || "";
   $("automovelCambio").value = item.cambio || "";
   $("automovelCor").value = item.cor || "";
+  $("automovelConsumoMedio").value = item.consumoMedio || "";
+  $("automovelAceitaTroca").value = item.aceitaTroca || "";
+  $("automovelAceitaFinanciamento").value = item.aceitaFinanciamento || "";
+  $("automovelDocumentacao").value = item.documentacao || "";
+  $("automovelMotor").value = item.motor || "";
+  $("automovelDirecao").value = item.direcao || "";
+  $("automovelVidroEletrico").value = item.vidroEletrico || "";
+  $("automovelTravaEletrica").value = item.travaEletrica || "";
+  $("automovelPortas").value = item.portas || "";
+  $("automovelFreioAbs").value = item.freioAbs || "";
+  $("automovelCilindrada").value = item.cilindrada || "";
+  $("automovelPartida").value = item.partida || "";
+  $("automovelFreio").value = item.freio || "";
+  $("automovelInjecaoEletronica").value = item.injecaoEletronica || "";
   $("automovelCidade").value = item.cidade || "";
+  $("automovelAcessorios").value = item.acessorios || "";
   $("automovelOpcionais").value = item.opcionais || "";
   $("automovelDescricao").value = item.descricao || "";
   $("automovelImagem").value = item.imagem || state.automovelImages[0] || "";
+  atualizarCamposTipoAutomovel();
   $("deleteAutomovelButton")?.classList.remove("hidden");
   renderAutomovelImagesPreview();
   openFormForEdit("automovelForm");
@@ -5179,7 +5213,22 @@ function getAutomovelFormData() {
     combustivel: $("automovelCombustivel").value.trim(),
     cambio: $("automovelCambio").value.trim(),
     cor: $("automovelCor").value.trim(),
+    consumoMedio: $("automovelConsumoMedio").value.trim(),
+    aceitaTroca: $("automovelAceitaTroca").value,
+    aceitaFinanciamento: $("automovelAceitaFinanciamento").value,
+    documentacao: $("automovelDocumentacao").value.trim(),
+    motor: $("automovelMotor").value.trim(),
+    direcao: $("automovelDirecao").value.trim(),
+    vidroEletrico: $("automovelVidroEletrico").value,
+    travaEletrica: $("automovelTravaEletrica").value,
+    portas: $("automovelPortas").value.trim(),
+    freioAbs: $("automovelFreioAbs").value,
+    cilindrada: $("automovelCilindrada").value.trim(),
+    partida: $("automovelPartida").value.trim(),
+    freio: $("automovelFreio").value.trim(),
+    injecaoEletronica: $("automovelInjecaoEletronica").value,
     cidade: $("automovelCidade").value.trim() || linkedClient?.cidade || "",
+    acessorios: $("automovelAcessorios").value.trim(),
     opcionais: $("automovelOpcionais").value.trim(),
     descricao: $("automovelDescricao").value.trim(),
     imagem,
@@ -5434,8 +5483,6 @@ function detalheAutomovelValorPremium(item = {}, campos = []) {
 
 function tituloAutomovelPremium(item = {}, options = {}) {
   const base = textoTituloAutomovelArte(item, options).replace(/\s+/g, " ").trim();
-  const tipo = String(item.tipo || "").trim().toUpperCase();
-  if (tipo && base && !base.includes(tipo)) return `${tipo} ${base}`;
   return base || "VEICULO PREMIUM";
 }
 
@@ -5671,13 +5718,25 @@ function desenharImagemVeiculoPremium45(ctx, img, x, y, w, h, settings = {}) {
 }
 
 function specsAutomovelPremium45(item = {}) {
-  const specs = [
-    item.tracao ? { title: String(item.tracao).toUpperCase(), detail: "TRACAO" } : null,
+  const isMoto = normalizeName(item.tipo || "").includes("moto");
+  const specs = (isMoto ? [
+    item.cilindrada ? { title: "CILINDRADA", detail: item.cilindrada } : null,
+    item.partida ? { title: "PARTIDA", detail: item.partida } : null,
+    item.freio ? { title: "FREIO", detail: item.freio } : null,
+    item.injecaoEletronica ? { title: "INJECAO ELETRONICA", detail: item.injecaoEletronica } : null,
+    item.consumoMedio ? { title: "CONSUMO MEDIO", detail: item.consumoMedio } : null
+  ] : [
     item.motor ? { title: `MOTOR ${String(item.motor).toUpperCase()}`, detail: item.combustivel || "" } : null,
-    item.cambio ? { title: "CAMBIO", detail: item.cambio } : null,
-    item.cor ? { title: "COR", detail: item.cor } : null,
-    item.condicao && !/usado/i.test(String(item.condicao)) ? { title: String(item.condicao).toUpperCase(), detail: "STATUS" } : null
-  ].filter(Boolean);
+    item.direcao ? { title: "DIRECAO", detail: item.direcao } : null,
+    item.portas ? { title: "PORTAS", detail: item.portas } : null,
+    item.freioAbs ? { title: "FREIO ABS", detail: item.freioAbs } : null,
+    item.vidroEletrico ? { title: "VIDRO ELETRICO", detail: item.vidroEletrico } : null,
+    item.travaEletrica ? { title: "TRAVA ELETRICA", detail: item.travaEletrica } : null,
+    item.consumoMedio ? { title: "CONSUMO MEDIO", detail: item.consumoMedio } : null
+  ]).filter(Boolean);
+  if (item.aceitaFinanciamento) specs.push({ title: "FINANCIAMENTO", detail: item.aceitaFinanciamento });
+  if (item.aceitaTroca) specs.push({ title: "ACEITA TROCA", detail: item.aceitaTroca });
+  if (item.documentacao) specs.push({ title: "DOCUMENTACAO", detail: item.documentacao });
   while (specs.length < 5) {
     const fallback = [
       { title: "NEGOCIACAO", detail: "FACILITADA" },
@@ -5707,9 +5766,6 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   const settings = options.imageSettings || {};
   const contato = telefoneArteAdmin(item.contato || client?.whatsapp || client?.contato || client?.telefone || "") || "(00) 00000-0000";
   const title = tituloAutomovelPremium(item, options);
-  const titleParts = title.split(/\s+/);
-  const titleLast = titleParts.length > 1 ? titleParts.pop() : "";
-  const titleFirst = titleParts.join(" ") || title;
   const subtitle1 = textoCurtoArte(options.subtitle || "FORCA, CONFORTO E DESEMPENHO", 52).toUpperCase();
   const subtitle2 = textoCurtoArte(options.subtitle2 || "PARA QUALQUER DESAFIO.", 52).toUpperCase();
   const specs = specsAutomovelPremium45(item);
@@ -5728,18 +5784,13 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.font = "900 30px Arial";
   ctx.fillText("OPORTUNIDADE PREMIUM", 58, 116);
   ctx.fillStyle = "#f8fafc";
-  fonteQueCabeCanvas(ctx, titleFirst, 900, 78, 42, 480);
-  ctx.fillText(titleFirst, 58, 194);
-  if (titleLast && titleLast !== titleFirst) {
-    ctx.fillStyle = layout.priceText;
-    fonteQueCabeCanvas(ctx, titleLast, 900, 92, 46, 260);
-    ctx.fillText(titleLast, 58, 286);
-  }
-  desenharSeparadorPremium(ctx, 58, 318, 572, layout.accent);
+  ctx.textAlign = "left";
+  desenharTextoInteiroCanvas(ctx, title, 58, 145, 510, 3, { peso: 900, tamanho: 72, minimo: 34, lineHeight: 74, blockHeight: 180, align: "left" });
+  desenharSeparadorPremium(ctx, 58, 330, 572, layout.accent);
   ctx.fillStyle = "#f8fafc";
-  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 350, 410, 2, { peso: 800, tamanho: 27, minimo: 16, lineHeight: 32, blockHeight: 70 });
+  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 356, 430, 3, { peso: 800, tamanho: 27, minimo: 15, lineHeight: 31, blockHeight: 96, align: "left" });
   ctx.fillStyle = layout.accent2;
-  desenharTextoInteiroCanvas(ctx, subtitle2, 58, 420, 430, 2, { peso: 900, tamanho: 28, minimo: 16, lineHeight: 33, blockHeight: 70 });
+  desenharTextoInteiroCanvas(ctx, subtitle2, 58, 442, 430, 2, { peso: 900, tamanho: 27, minimo: 15, lineHeight: 31, blockHeight: 68, align: "left" });
 
   desenharImagemVeiculoPremium45(ctx, main, 392, 130, 642, 560, settings);
   ctx.strokeStyle = layout.accent;
@@ -5748,7 +5799,11 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.moveTo(382, 118);
   ctx.lineTo(352, 704);
   ctx.stroke();
-  desenharAssinaturaPremiumAutomovel(ctx, client, logo, siteLogo, options.showSiteLogo !== false, layout, false);
+  if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 884, 34, 170, 96, 0, "rgba(255,255,255,0)");
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "right";
+  fonteQueCabeCanvas(ctx, client?.nome || item.vendedor || "Cliente", 900, 19, 12, 270);
+  ctx.fillText(String(client?.nome || item.vendedor || "Cliente").toUpperCase(), 862, 70);
 
   desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 520, layout);
   desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 626, layout);
@@ -5764,21 +5819,24 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 84, 44, 540);
   ctx.fillText(precoAutomovelArte(item), 359, 1000);
 
-  preencherRoundRect(ctx, 706, 744, 318, 356, 24, "rgba(0,0,0,.66)");
-  desenharBordaRoundRect(ctx, 706, 744, 318, 356, 24, layout.accent, 2);
+  preencherRoundRect(ctx, 706, 724, 318, 388, 24, "rgba(0,0,0,.66)");
+  desenharBordaRoundRect(ctx, 706, 724, 318, 388, 24, layout.accent, 2);
+  ctx.fillStyle = layout.accent2;
+  ctx.textAlign = "left";
+  desenharTextoInteiroCanvas(ctx, subtitle2, 736, 746, 258, 2, { peso: 900, tamanho: 20, minimo: 12, lineHeight: 24, blockHeight: 54, align: "left" });
   specs.forEach((spec, index) => {
-    const y = 785 + index * 61;
-    if (index) desenharSeparadorPremium(ctx, 736, y - 22, 994, "rgba(244,193,155,.35)");
+    const y = 830 + index * 54;
+    if (index) desenharSeparadorPremium(ctx, 736, y - 20, 994, "rgba(244,193,155,.35)");
     ctx.fillStyle = layout.accent2;
     ctx.textAlign = "center";
-    ctx.font = "900 20px Arial";
+    ctx.font = "900 18px Arial";
     ctx.fillText(String(index + 1).padStart(2, "0"), 752, y + 10);
     ctx.textAlign = "left";
     ctx.fillStyle = "#ffffff";
-    fonteQueCabeCanvas(ctx, spec.title, 900, 22, 14, 205);
+    fonteQueCabeCanvas(ctx, spec.title, 900, 20, 12, 205);
     ctx.fillText(spec.title, 790, y);
     ctx.fillStyle = "#e5e7eb";
-    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 18, 11, 205);
+    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 16, 10, 205);
     ctx.fillText(String(spec.detail || "").toUpperCase(), 790, y + 27);
   });
 
@@ -5797,8 +5855,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.lineTo(344, 1138);
   ctx.stroke();
   ctx.fillStyle = "#f8fafc";
-  fonteQueCabeCanvas(ctx, options.footer || "As melhores condicoes para voce sair de carro novo.", 800, 20, 12, 285);
-  ctx.fillText(options.footer || "As melhores condicoes para voce sair de carro novo.", 370, 1112);
+  desenharTextoInteiroCanvas(ctx, options.footer || "As melhores condicoes para voce sair de carro novo.", 370, 1074, 265, 3, { peso: 800, tamanho: 19, minimo: 11, lineHeight: 23, blockHeight: 66, align: "left" });
 
   preencherRoundRect(ctx, 90, 1248, 380, 62, 24, layout.accent);
   ctx.fillStyle = "#111111";
@@ -5815,8 +5872,9 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.font = "900 20px Arial";
   ctx.fillText("CONTATO:", 565, 1270);
   ctx.fillStyle = "#ffffff";
-  fonteQueCabeCanvas(ctx, contato, 900, 38, 20, 390);
+  fonteQueCabeCanvas(ctx, contato, 900, 35, 18, 330);
   ctx.fillText(contato, 565, 1304);
+  desenharImagemContain(ctx, logo, 940, 1246, 92, 72, 14, "#ffffff");
 }
 
 function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutKey, options = {}) {
@@ -13203,6 +13261,7 @@ function bindEvents() {
     openFormForEdit("automovelForm");
   });
   $("closeAutomovelFormButton")?.addEventListener("click", resetAutomovelForm);
+  $("automovelTipo")?.addEventListener("change", atualizarCamposTipoAutomovel);
   $("automovelSearch")?.addEventListener("input", renderAutomoveisList);
   $("automovelArteItem")?.addEventListener("change", (event) => {
     state.selectedAutomovelArtId = event.target.value || "";

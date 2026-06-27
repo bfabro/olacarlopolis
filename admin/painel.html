@@ -1121,6 +1121,56 @@
               <label>Combustivel<input id="automovelCombustivel" placeholder="Ex: Flex, Gasolina, Diesel"></label>
               <label>Cambio<input id="automovelCambio" placeholder="Ex: Manual, Automatico"></label>
               <label>Cor<input id="automovelCor" placeholder="Ex: Prata"></label>
+              <label>Consumo medio<input id="automovelConsumoMedio" placeholder="Ex: 12 km/l"></label>
+              <label>Aceita troca
+                <select id="automovelAceitaTroca">
+                  <option value="">Nao informado</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Nao">Nao</option>
+                </select>
+              </label>
+              <label>Aceita financiamento
+                <select id="automovelAceitaFinanciamento">
+                  <option value="">Nao informado</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Nao">Nao</option>
+                </select>
+              </label>
+              <label>Documentacao<input id="automovelDocumentacao" placeholder="Ex: Em dia, recibo aberto"></label>
+              <label>Motor<input id="automovelMotor" placeholder="Ex: 1.0, 2.8, 160cc"></label>
+              <label>Direcao<input id="automovelDirecao" placeholder="Ex: Hidraulica, Eletrica"></label>
+              <label>Vidro eletrico
+                <select id="automovelVidroEletrico">
+                  <option value="">Nao informado</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Nao">Nao</option>
+                </select>
+              </label>
+              <label>Trava eletrica
+                <select id="automovelTravaEletrica">
+                  <option value="">Nao informado</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Nao">Nao</option>
+                </select>
+              </label>
+              <label>Portas<input id="automovelPortas" placeholder="Ex: 4 portas"></label>
+              <label>Freio ABS
+                <select id="automovelFreioAbs">
+                  <option value="">Nao informado</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Nao">Nao</option>
+                </select>
+              </label>
+              <label>Cilindrada<input id="automovelCilindrada" placeholder="Ex: 160cc"></label>
+              <label>Partida<input id="automovelPartida" placeholder="Ex: Eletrica, pedal"></label>
+              <label>Freio<input id="automovelFreio" placeholder="Ex: Disco, tambor, CBS"></label>
+              <label>Injecao eletronica
+                <select id="automovelInjecaoEletronica">
+                  <option value="">Nao informado</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Nao">Nao</option>
+                </select>
+              </label>
               <label>Cidade/local<input id="automovelCidade" placeholder="Ex: Carlopolis"></label>
               <div class="form-section-title wide">
                 <i class="fa-solid fa-store"></i>
@@ -1132,6 +1182,7 @@
               <label>Contato/WhatsApp<input id="automovelContato" placeholder="(43) 99999-9999"></label>
               <label>Loja/vendedor<input id="automovelVendedor" placeholder="Nome da loja ou vendedor"></label>
               <label class="wide">Instagram da loja<input id="automovelInstagram" placeholder="https://instagram.com/loja"></label>
+              <label class="wide">Acessorios<textarea id="automovelAcessorios" rows="3" placeholder="Ex: ar condicionado, camera de re, multimidia..."></textarea></label>
               <label class="wide">Opcionais<textarea id="automovelOpcionais" rows="3" placeholder="Ex: ar condicionado, direcao, vidro eletrico, camera de re..."></textarea></label>
               <label class="wide">Descricao<textarea id="automovelDescricao" rows="4" placeholder="Detalhes do veiculo, estado, opcionais..."></textarea></label>
               <input id="automovelImagem" type="hidden">
@@ -1438,6 +1489,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=360"></script>
+  <script type="module" src="painel.js?v=361"></script>
 </body>
 </html>
