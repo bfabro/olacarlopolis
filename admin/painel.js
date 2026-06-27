@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 365,
-  label: "v371",
+  numero: 366,
+  label: "v372",
   data: "2026-06-27",
-  nota: "Usuarios ganharam permissao separada para gerar imagens de veiculos."
+  nota: "Arte premium de veiculos ganhou mais destaque para foto e espaco seguro para titulo e subtitulos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5802,29 +5802,29 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.lineWidth = 2;
   ctx.strokeRect(333, 48, 30, 30);
 
-  desenharImagemVeiculoPremium45(ctx, main, 392, 130, 642, 560, settings);
+  desenharImagemVeiculoPremium45(ctx, main, 320, 455, 730, 365, settings);
   ctx.strokeStyle = layout.accent;
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(382, 118);
-  ctx.lineTo(352, 704);
+  ctx.moveTo(314, 438);
+  ctx.lineTo(290, 842);
   ctx.stroke();
   if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 850, 26, 210, 118, 0, "rgba(255,255,255,0)");
 
-  preencherRoundRect(ctx, 42, 126, 548, 388, 26, "rgba(0,0,0,.72)");
-  desenharBordaRoundRect(ctx, 42, 126, 548, 388, 26, "rgba(196,122,74,.42)", 2);
+  preencherRoundRect(ctx, 42, 126, 548, 318, 26, "rgba(0,0,0,.78)");
+  desenharBordaRoundRect(ctx, 42, 126, 548, 318, 26, "rgba(196,122,74,.42)", 2);
   ctx.fillStyle = layout.accent2;
   ctx.textAlign = "left";
   ctx.font = "900 30px Arial";
   ctx.fillText("OPORTUNIDADE PREMIUM", 58, 116);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, title, 58, 150, 508, 4, { peso: 900, tamanho: 64, minimo: 28, lineHeight: 66, blockHeight: 224, align: "left" });
-  desenharSeparadorPremium(ctx, 58, 382, 552, layout.accent);
+  desenharTextoInteiroCanvas(ctx, title, 58, 146, 508, 4, { peso: 900, tamanho: 54, minimo: 25, lineHeight: 56, blockHeight: 170, align: "left" });
+  desenharSeparadorPremium(ctx, 58, 324, 552, layout.accent);
   ctx.fillStyle = "#f8fafc";
-  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 402, 430, 3, { peso: 800, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 82, align: "left" });
+  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 342, 450, 3, { peso: 800, tamanho: 24, minimo: 13, lineHeight: 28, blockHeight: 68, align: "left" });
   ctx.fillStyle = layout.accent2;
-  desenharTextoInteiroCanvas(ctx, subtitle2, 58, 474, 430, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "left" });
+  desenharTextoInteiroCanvas(ctx, subtitle2, 58, 400, 450, 2, { peso: 900, tamanho: 23, minimo: 13, lineHeight: 27, blockHeight: 42, align: "left" });
 
   desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 520, layout);
   desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 626, layout);
@@ -5833,61 +5833,61 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.save();
   ctx.shadowColor = "rgba(244,193,155,.75)";
   ctx.shadowBlur = 22;
-  desenharBordaRoundRect(ctx, 58, 870, 602, 154, 18, layout.accent, 4);
+  desenharBordaRoundRect(ctx, 58, 900, 602, 154, 18, layout.accent, 4);
   ctx.restore();
-  preencherRoundRect(ctx, 58, 870, 602, 154, 18, "rgba(0,0,0,.82)");
-  desenharBordaRoundRect(ctx, 58, 870, 602, 154, 18, layout.accent, 3);
-  const priceGlow = ctx.createLinearGradient(58, 870, 660, 1024);
+  preencherRoundRect(ctx, 58, 900, 602, 154, 18, "rgba(0,0,0,.82)");
+  desenharBordaRoundRect(ctx, 58, 900, 602, 154, 18, layout.accent, 3);
+  const priceGlow = ctx.createLinearGradient(58, 900, 660, 1054);
   priceGlow.addColorStop(0, "rgba(244,193,155,.32)");
   priceGlow.addColorStop(.35, "rgba(255,255,255,.08)");
   priceGlow.addColorStop(.72, "rgba(244,193,155,.22)");
   priceGlow.addColorStop(1, "rgba(196,122,74,.34)");
-  desenharBordaRoundRect(ctx, 64, 876, 590, 142, 15, priceGlow, 2);
+  desenharBordaRoundRect(ctx, 64, 906, 590, 142, 15, priceGlow, 2);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "center";
   ctx.font = "900 28px Arial";
-  ctx.fillText("POR APENAS", 359, 924);
+  ctx.fillText("POR APENAS", 359, 954);
   ctx.fillStyle = layout.priceText;
   fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 84, 44, 540);
-  ctx.fillText(precoAutomovelArte(item), 359, 1000);
+  ctx.fillText(precoAutomovelArte(item), 359, 1030);
 
-  preencherRoundRect(ctx, 706, 706, 318, 418, 24, "rgba(0,0,0,.66)");
-  desenharBordaRoundRect(ctx, 706, 706, 318, 418, 24, layout.accent, 2);
+  preencherRoundRect(ctx, 706, 840, 318, 318, 24, "rgba(0,0,0,.66)");
+  desenharBordaRoundRect(ctx, 706, 840, 318, 318, 24, layout.accent, 2);
   ctx.fillStyle = layout.accent2;
   ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, subtitle2, 736, 726, 258, 2, { peso: 900, tamanho: 20, minimo: 12, lineHeight: 24, blockHeight: 50, align: "left" });
+  desenharTextoInteiroCanvas(ctx, subtitle2, 736, 858, 258, 2, { peso: 900, tamanho: 18, minimo: 11, lineHeight: 22, blockHeight: 44, align: "left" });
   specs.forEach((spec, index) => {
-    const y = 804 + index * 50;
-    if (index) desenharSeparadorPremium(ctx, 736, y - 17, 994, "rgba(244,193,155,.35)");
+    const y = 930 + index * 38;
+    if (index) desenharSeparadorPremium(ctx, 736, y - 14, 994, "rgba(244,193,155,.35)");
     ctx.fillStyle = layout.accent2;
     ctx.textAlign = "center";
-    ctx.font = "900 16px Arial";
+    ctx.font = "900 14px Arial";
     ctx.fillText(String(index + 1).padStart(2, "0"), 752, y + 10);
     ctx.textAlign = "left";
     ctx.fillStyle = "#ffffff";
-    fonteQueCabeCanvas(ctx, spec.title, 900, 18, 10, 205);
+    fonteQueCabeCanvas(ctx, spec.title, 900, 16, 9, 205);
     ctx.fillText(spec.title, 790, y);
     ctx.fillStyle = "#e5e7eb";
-    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 15, 9, 205);
-    ctx.fillText(String(spec.detail || "").toUpperCase(), 790, y + 24);
+    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 13, 8, 205);
+    ctx.fillText(String(spec.detail || "").toUpperCase(), 790, y + 21);
   });
 
-  preencherRoundRect(ctx, 58, 1060, 610, 92, 18, "rgba(196,122,74,.16)");
-  desenharBordaRoundRect(ctx, 58, 1060, 610, 92, 18, layout.accent, 2);
+  preencherRoundRect(ctx, 58, 1168, 610, 74, 18, "rgba(196,122,74,.16)");
+  desenharBordaRoundRect(ctx, 58, 1168, 610, 74, 18, layout.accent, 2);
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "left";
-  ctx.font = "900 29px Arial";
-  ctx.fillText("FINANCIAMENTO", 92, 1096);
+  ctx.font = "900 24px Arial";
+  ctx.fillText("FINANCIAMENTO", 92, 1198);
   ctx.fillStyle = layout.priceText;
-  ctx.font = "900 34px Arial";
-  ctx.fillText("FACILITADO", 92, 1132);
+  ctx.font = "900 29px Arial";
+  ctx.fillText("FACILITADO", 92, 1230);
   ctx.strokeStyle = "rgba(255,255,255,.42)";
   ctx.beginPath();
-  ctx.moveTo(344, 1075);
-  ctx.lineTo(344, 1138);
+  ctx.moveTo(344, 1180);
+  ctx.lineTo(344, 1230);
   ctx.stroke();
   ctx.fillStyle = "#f8fafc";
-  desenharTextoInteiroCanvas(ctx, options.footer || "As melhores condicoes para voce sair de carro novo.", 370, 1074, 265, 3, { peso: 800, tamanho: 19, minimo: 11, lineHeight: 23, blockHeight: 66, align: "left" });
+  desenharTextoInteiroCanvas(ctx, options.footer || "As melhores condicoes para voce sair de carro novo.", 370, 1178, 265, 3, { peso: 800, tamanho: 16, minimo: 9, lineHeight: 19, blockHeight: 54, align: "left" });
 
   preencherRoundRect(ctx, 90, 1248, 380, 62, 24, layout.accent);
   ctx.fillStyle = "#111111";
