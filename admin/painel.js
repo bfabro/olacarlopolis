@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 369,
-  label: "v375",
+  numero: 370,
+  label: "v376",
   data: "2026-06-27",
-  nota: "Arte premium de veiculos teve linhas removidas, logos reposicionadas e cards laterais melhorados."
+  nota: "Arte premium de veiculos ganhou paletas de cor, textos centralizados e subtitulo 2 apenas nas caracteristicas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5286,6 +5286,15 @@ const AUTOMOVEL_ARTE_LAYOUTS = {
   magazine: { nome: "Revista automotiva", bg: "#1f2937", panel: "#f9fafb", accent: "#22c55e", accent2: "#111827", text: "#111827", priceBg: "#22c55e", priceText: "#052e16" }
 };
 
+function hexParaRgbaArte(hex, alpha = 1) {
+  const value = String(hex || "").replace("#", "").trim();
+  if (!/^[0-9a-f]{6}$/i.test(value)) return `rgba(244,193,155,${alpha})`;
+  const r = parseInt(value.slice(0, 2), 16);
+  const g = parseInt(value.slice(2, 4), 16);
+  const b = parseInt(value.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 function donoAutomovelAdmin(item = {}) {
   const candidatos = [
     item.clienteId,
@@ -5391,6 +5400,7 @@ function desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout
 function opcoesArteAutomovel() {
   return {
     formato: "premium45",
+    tema: $("automovelArteTema")?.value || "premium4x4",
     title: $("automovelArteTitulo")?.value.trim() || "",
     subtitle: $("automovelArteSubtitulo")?.value.trim() || "",
     subtitle2: $("automovelArteSubtitulo2")?.value.trim() || "",
@@ -5771,7 +5781,7 @@ function specsAutomovelPremium45(item = {}) {
 
 function desenharMiniInfoPremium45(ctx, label, value, x, y, layout) {
   ctx.save();
-  ctx.shadowColor = "rgba(244,193,155,.42)";
+  ctx.shadowColor = hexParaRgbaArte(layout.accent2 || layout.accent, .42);
   ctx.shadowBlur = 12;
   desenharBordaRoundRect(ctx, x, y, 172, 84, 16, layout.accent, 2);
   ctx.restore();
@@ -5787,7 +5797,7 @@ function desenharMiniInfoPremium45(ctx, label, value, x, y, layout) {
 }
 
 function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo, options = {}) {
-  const layout = AUTOMOVEL_ARTE_LAYOUTS.premium4x4;
+  const layout = AUTOMOVEL_ARTE_LAYOUTS[options.tema] || AUTOMOVEL_ARTE_LAYOUTS.premium4x4;
   const main = fotos[0] || logo || siteLogo;
   const settings = options.imageSettings || {};
   const contato = telefoneArteAdmin(item.contato || client?.whatsapp || client?.contato || client?.telefone || "") || "(00) 00000-0000";
@@ -5807,40 +5817,38 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.moveTo(298, 356);
   ctx.lineTo(276, 840);
   ctx.stroke();
-  if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 884, 20, 160, 90, 0, "rgba(255,255,255,0)");
+  if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 886, 34, 146, 76, 0, "rgba(255,255,255,0)");
 
   preencherRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(0,0,0,.84)");
-  desenharBordaRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(196,122,74,.52)", 2);
+  desenharBordaRoundRect(ctx, 42, 126, 996, 210, 24, hexParaRgbaArte(layout.accent, .52), 2);
   ctx.fillStyle = layout.accent2;
   ctx.textAlign = "center";
   ctx.font = "900 38px Arial";
-  ctx.fillText("OPORTUNIDADE PREMIUM", 540, 112);
+  ctx.fillText("OPORTUNIDADE PREMIUM", options.showSiteLogo !== false ? 470 : 540, 96);
   ctx.fillStyle = "#f8fafc";
-  ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, title, 58, 146, 920, 3, { peso: 900, tamanho: 54, minimo: 22, lineHeight: 56, blockHeight: 116, align: "left" });
+  ctx.textAlign = "center";
+  desenharTextoInteiroCanvas(ctx, title, 76, 148, 928, 3, { peso: 900, tamanho: 54, minimo: 22, lineHeight: 56, blockHeight: 116, align: "center" });
   ctx.fillStyle = "#f8fafc";
-  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 258, 500, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "left" });
-  ctx.fillStyle = layout.accent2;
-  desenharTextoInteiroCanvas(ctx, subtitle2, 560, 258, 420, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "left" });
+  desenharTextoInteiroCanvas(ctx, subtitle1, 108, 266, 864, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "center" });
 
-  desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 390, layout);
-  desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 488, layout);
-  desenharMiniInfoPremium45(ctx, "KM", item.km || item.quilometragem || "-", 58, 586, layout);
-  desenharMiniInfoPremium45(ctx, normalizeName(item.tipo || "").includes("moto") ? "CIL." : "MOTOR", normalizeName(item.tipo || "").includes("moto") ? (item.cilindrada || item.motor || "-") : (item.motor || "-"), 58, 684, layout);
-  desenharMiniInfoPremium45(ctx, "CAMBIO", item.cambio || item.partida || "-", 58, 782, layout);
+  desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 375, layout);
+  desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 473, layout);
+  desenharMiniInfoPremium45(ctx, "KM", item.km || item.quilometragem || "-", 58, 571, layout);
+  desenharMiniInfoPremium45(ctx, normalizeName(item.tipo || "").includes("moto") ? "CIL." : "MOTOR", normalizeName(item.tipo || "").includes("moto") ? (item.cilindrada || item.motor || "-") : (item.motor || "-"), 58, 669, layout);
+  desenharMiniInfoPremium45(ctx, "CAMBIO", item.cambio || item.partida || "-", 58, 767, layout);
 
   ctx.save();
-  ctx.shadowColor = "rgba(244,193,155,.75)";
+  ctx.shadowColor = hexParaRgbaArte(layout.accent2 || layout.accent, .75);
   ctx.shadowBlur = 22;
   desenharBordaRoundRect(ctx, 58, 900, 602, 154, 18, layout.accent, 4);
   ctx.restore();
   preencherRoundRect(ctx, 58, 900, 602, 154, 18, "rgba(0,0,0,.82)");
   desenharBordaRoundRect(ctx, 58, 900, 602, 154, 18, layout.accent, 3);
   const priceGlow = ctx.createLinearGradient(58, 900, 660, 1054);
-  priceGlow.addColorStop(0, "rgba(244,193,155,.32)");
+  priceGlow.addColorStop(0, hexParaRgbaArte(layout.accent2 || layout.accent, .32));
   priceGlow.addColorStop(.35, "rgba(255,255,255,.08)");
-  priceGlow.addColorStop(.72, "rgba(244,193,155,.22)");
-  priceGlow.addColorStop(1, "rgba(196,122,74,.34)");
+  priceGlow.addColorStop(.72, hexParaRgbaArte(layout.accent2 || layout.accent, .22));
+  priceGlow.addColorStop(1, hexParaRgbaArte(layout.accent, .34));
   desenharBordaRoundRect(ctx, 64, 906, 590, 142, 15, priceGlow, 2);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "center";
@@ -5851,7 +5859,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.fillText(precoAutomovelArte(item), 359, 1030);
 
   ctx.save();
-  ctx.shadowColor = "rgba(244,193,155,.52)";
+  ctx.shadowColor = hexParaRgbaArte(layout.accent2 || layout.accent, .52);
   ctx.shadowBlur = 16;
   desenharBordaRoundRect(ctx, 690, 830, 338, 412, 24, layout.accent, 3);
   ctx.restore();
@@ -5862,7 +5870,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   desenharTextoInteiroCanvas(ctx, subtitle2, 720, 852, 278, 1, { peso: 900, tamanho: 22, minimo: 13, lineHeight: 25, blockHeight: 34, align: "left" });
   specs.forEach((spec, index) => {
     const y = 920 + index * 50;
-    if (index) desenharSeparadorPremium(ctx, 720, y - 16, 1000, "rgba(244,193,155,.35)");
+    if (index) desenharSeparadorPremium(ctx, 720, y - 16, 1000, hexParaRgbaArte(layout.accent2 || layout.accent, .35));
     ctx.fillStyle = layout.accent2;
     ctx.textAlign = "center";
     ctx.font = "900 15px Arial";
@@ -5876,7 +5884,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
     ctx.fillText(String(spec.detail || "").toUpperCase(), 768, y + 24);
   });
 
-  preencherRoundRect(ctx, 58, 1168, 610, 74, 18, "rgba(196,122,74,.16)");
+  preencherRoundRect(ctx, 58, 1168, 610, 74, 18, hexParaRgbaArte(layout.accent, .16));
   desenharBordaRoundRect(ctx, 58, 1168, 610, 74, 18, layout.accent, 2);
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "left";
@@ -5910,10 +5918,10 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.fillStyle = "#ffffff";
   fonteQueCabeCanvas(ctx, contato, 900, 35, 18, 330);
   ctx.fillText(contato, 565, 1304);
-  desenharLogoSemFundoCanvas(ctx, logo, 930, 1238, 96, 80);
+  desenharLogoSemFundoCanvas(ctx, logo, 910, 1262, 112, 58);
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "right";
-  fonteQueCabeCanvas(ctx, client?.nome || item.vendedor || item.loja || "Cliente", 900, 17, 10, 230);
+  fonteQueCabeCanvas(ctx, client?.nome || item.vendedor || item.loja || "Cliente", 900, 15, 9, 210);
   ctx.fillText(String(client?.nome || item.vendedor || item.loja || "Cliente").toUpperCase(), 1026, 1334);
 }
 
@@ -13307,7 +13315,7 @@ function bindEvents() {
     state.selectedAutomovelArtId = event.target.value || "";
     atualizarPreviaArteAutomovel({ silent: true });
   });
-  ["automovelArteTitulo", "automovelArteSubtitulo", "automovelArteSubtitulo2", "automovelArteRodape", "automovelArteShowSiteLogo", "automovelArteImageScale", "automovelArteImageOffsetX", "automovelArteImageOffsetY", "automovelArteDarkOverlay"].forEach((id) => {
+  ["automovelArteTitulo", "automovelArteSubtitulo", "automovelArteTema", "automovelArteSubtitulo2", "automovelArteRodape", "automovelArteShowSiteLogo", "automovelArteImageScale", "automovelArteImageOffsetX", "automovelArteImageOffsetY", "automovelArteDarkOverlay"].forEach((id) => {
     $(id)?.addEventListener("input", () => agendarPreviaArteAutomovel());
     $(id)?.addEventListener("change", () => atualizarPreviaArteAutomovel({ silent: true }));
   });
