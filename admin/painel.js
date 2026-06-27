@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 364,
-  label: "v370",
+  numero: 365,
+  label: "v371",
   data: "2026-06-27",
-  nota: "Arte premium de veiculos ganhou melhor encaixe da foto, titulo protegido, brilho no valor e mais caracteristicas."
+  nota: "Usuarios ganharam permissao separada para gerar imagens de veiculos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -409,8 +409,21 @@ function canGenerateImovelImages() {
   return Boolean(permissions.imoveis);
 }
 
+function canGenerateVeiculoImages() {
+  if (canManageClients()) return true;
+  const permissions = state.profile?.permissoes || {};
+  if (Object.prototype.hasOwnProperty.call(permissions, "gerar_imagens_veiculos")) {
+    return Boolean(permissions.gerar_imagens_veiculos);
+  }
+  return Boolean(permissions.veiculos);
+}
+
 function canAccessImoveis() {
   return hasPermission("imoveis") || canGenerateImovelImages();
+}
+
+function canAccessAutomoveis() {
+  return hasPermission("veiculos") || canGenerateVeiculoImages();
 }
 
 function currentClientId() {
@@ -483,7 +496,7 @@ function canAccessView(viewName) {
   }
   if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenInvoice(currentClientRecord());
   if (viewName === "imoveis") return canAccessImoveis();
-  if (viewName === "automoveis") return hasPermission("veiculos");
+  if (viewName === "automoveis") return canAccessAutomoveis();
   if (viewName === "noticias") return canManageClients() || hasPermission("noticias");
   if (viewName === "informacoes") return canManageInformacoes();
   if (viewName === "minhaEmpresa") return true;
@@ -492,7 +505,7 @@ function canAccessView(viewName) {
 
 function initialViewForProfile() {
   if (canManageClients()) return "dashboard";
-  if (hasPermission("veiculos")) return "automoveis";
+  if (canAccessAutomoveis()) return "automoveis";
   if (canAccessImoveis()) return "imoveis";
   return "minhaEmpresa";
 }
@@ -1830,7 +1843,7 @@ function hidePanelLoading() {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -1884,7 +1897,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -2283,13 +2296,19 @@ function updateChrome() {
     el.classList.toggle("hidden", !canAccessImoveis());
   });
   document.querySelectorAll("[data-permission='veiculos']").forEach((el) => {
+    el.classList.toggle("hidden", !canAccessAutomoveis());
+  });
+  document.querySelectorAll("[data-permission='veiculos_manage']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("veiculos"));
+  });
+  document.querySelectorAll("[data-permission='gerar_imagens_veiculos']").forEach((el) => {
+    el.classList.toggle("hidden", !canGenerateVeiculoImages());
   });
   document.querySelectorAll("[data-permission='gerar_imagens_imoveis']").forEach((el) => {
     el.classList.toggle("hidden", !canGenerateImovelImages());
   });
   document.querySelectorAll("[data-classified-nav='true']").forEach((el) => {
-    el.classList.toggle("hidden", !canManageClients() && !hasPermission("noticias") && !canAccessImoveis() && !hasPermission("veiculos"));
+    el.classList.toggle("hidden", !canManageClients() && !hasPermission("noticias") && !canAccessImoveis() && !canAccessAutomoveis());
   });
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");
@@ -6037,7 +6056,7 @@ function renderAutomovelArteOptions() {
 }
 
 async function criarCanvasArteAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = "premium45", options = opcoesArteAutomovel()) {
-  if (!hasPermission("veiculos")) return showToast("A geracao de posts de automoveis nao esta liberada para este usuario.");
+  if (!canGenerateVeiculoImages()) return showToast("A geracao de imagens de veiculos nao esta liberada para este usuario.");
   const item = state.automoveis.find((auto) => auto.id === autoId && itemBelongsToCurrentClient(auto));
   if (!item) return showToast("Selecione um veiculo para gerar a imagem.");
   const client = donoAutomovelAdmin(item);
@@ -6130,8 +6149,8 @@ function renderAutomoveisList() {
         <div class="list-meta">${escapeHtml([item.tipo, item.condicao, item.ano, item.preco].filter(Boolean).join(" - ") || "Sem valor")}</div>
         <div class="list-meta">${escapeHtml([item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ") || "Sem contato")}</div>
         <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
-        ${hasPermission("veiculos") ? `<button type="button" data-art-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte premium</button>` : ""}
-        <button type="button" data-edit-automovel="${escapeAttr(item.id)}">Editar</button>
+        ${canGenerateVeiculoImages() ? `<button type="button" data-art-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte premium</button>` : ""}
+        ${hasPermission("veiculos") ? `<button type="button" data-edit-automovel="${escapeAttr(item.id)}">Editar</button>` : ""}
       </article>
     `;
   }).join("");

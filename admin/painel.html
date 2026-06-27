@@ -1058,7 +1058,7 @@
 
       <section id="automoveisView" class="panel-view hidden">
         <div class="split-layout">
-          <section class="panel-card form-collapsed">
+          <section class="panel-card form-collapsed" data-permission="veiculos_manage">
             <div class="section-head">
               <div>
                 <h2>Cadastrar ou editar automovel</h2>
@@ -1220,7 +1220,7 @@
                 <p>Edite, inative ou remova anuncios.</p>
               </div>
             </div>
-            <div class="imovel-art-panel automovel-art-panel" data-permission="veiculos">
+            <div class="imovel-art-panel automovel-art-panel" data-permission="gerar_imagens_veiculos">
               <div>
                 <strong>Arte premium para Instagram</strong>
                 <span>Gere uma arte vertical 4:5 com foto real do veiculo, dados, preco e contato.</span>
@@ -1313,6 +1313,7 @@
                 <div class="permission-group">
                   <strong>Tipo de cliente especifico</strong>
                   <label><input type="checkbox" value="veiculos"> Automoveis</label>
+                  <label><input type="checkbox" value="gerar_imagens_veiculos"> Gerar imagens de veiculos</label>
                   <label><input type="checkbox" value="cardapio" checked> Cardapio</label>
                   <label><input type="checkbox" value="eventos"> Eventos</label>
                   <label><input type="checkbox" value="imoveis"> Imoveis</label>
@@ -1489,6 +1490,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=362"></script>
+  <script type="module" src="painel.js?v=363"></script>
 </body>
 </html>
