@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 363,
-  label: "v369",
+  numero: 364,
+  label: "v370",
   data: "2026-06-27",
-  nota: "Cadastro de veiculos ganhou novos dados e arte premium recebeu ajustes de texto e logos."
+  nota: "Arte premium de veiculos ganhou melhor encaixe da foto, titulo protegido, brilho no valor e mais caracteristicas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5689,7 +5689,7 @@ function desenharImagemVeiculoPremium45(ctx, img, x, y, w, h, settings = {}) {
   const scale = Math.max(.75, Math.min(1.35, Number(settings.scale || 1)));
   const offsetX = Number(settings.offsetX || 0);
   const offsetY = Number(settings.offsetY || 0);
-  const ratio = Math.min(w / img.width, h / img.height) * scale;
+  const ratio = Math.max(w / img.width, h / img.height) * scale;
   const iw = img.width * ratio;
   const ih = img.height * ratio;
   const ix = x + (w - iw) / 2 + offsetX;
@@ -5724,19 +5724,23 @@ function specsAutomovelPremium45(item = {}) {
     item.partida ? { title: "PARTIDA", detail: item.partida } : null,
     item.freio ? { title: "FREIO", detail: item.freio } : null,
     item.injecaoEletronica ? { title: "INJECAO ELETRONICA", detail: item.injecaoEletronica } : null,
-    item.consumoMedio ? { title: "CONSUMO MEDIO", detail: item.consumoMedio } : null
+    item.consumoMedio ? { title: "CONSUMO MEDIO", detail: item.consumoMedio } : null,
+    item.documentacao ? { title: "DOCUMENTACAO", detail: item.documentacao } : null
   ] : [
     item.motor ? { title: `MOTOR ${String(item.motor).toUpperCase()}`, detail: item.combustivel || "" } : null,
+    item.cambio ? { title: "CAMBIO", detail: item.cambio } : null,
     item.direcao ? { title: "DIRECAO", detail: item.direcao } : null,
     item.portas ? { title: "PORTAS", detail: item.portas } : null,
     item.freioAbs ? { title: "FREIO ABS", detail: item.freioAbs } : null,
     item.vidroEletrico ? { title: "VIDRO ELETRICO", detail: item.vidroEletrico } : null,
     item.travaEletrica ? { title: "TRAVA ELETRICA", detail: item.travaEletrica } : null,
-    item.consumoMedio ? { title: "CONSUMO MEDIO", detail: item.consumoMedio } : null
+    item.consumoMedio ? { title: "CONSUMO MEDIO", detail: item.consumoMedio } : null,
+    item.documentacao ? { title: "DOCUMENTACAO", detail: item.documentacao } : null
   ]).filter(Boolean);
   if (item.aceitaFinanciamento) specs.push({ title: "FINANCIAMENTO", detail: item.aceitaFinanciamento });
   if (item.aceitaTroca) specs.push({ title: "ACEITA TROCA", detail: item.aceitaTroca });
-  if (item.documentacao) specs.push({ title: "DOCUMENTACAO", detail: item.documentacao });
+  if (item.acessorios) specs.push({ title: "ACESSORIOS", detail: textoCurtoArte(item.acessorios, 28) });
+  if (item.opcionais) specs.push({ title: "OPCIONAIS", detail: textoCurtoArte(item.opcionais, 28) });
   while (specs.length < 5) {
     const fallback = [
       { title: "NEGOCIACAO", detail: "FACILITADA" },
@@ -5745,7 +5749,7 @@ function specsAutomovelPremium45(item = {}) {
     ][specs.length % 3];
     specs.push(fallback);
   }
-  return specs.slice(0, 5);
+  return specs.slice(0, 6);
 }
 
 function desenharMiniInfoPremium45(ctx, label, value, x, y, layout) {
@@ -5779,19 +5783,6 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.lineWidth = 2;
   ctx.strokeRect(333, 48, 30, 30);
 
-  ctx.fillStyle = layout.accent2;
-  ctx.textAlign = "left";
-  ctx.font = "900 30px Arial";
-  ctx.fillText("OPORTUNIDADE PREMIUM", 58, 116);
-  ctx.fillStyle = "#f8fafc";
-  ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, title, 58, 145, 510, 3, { peso: 900, tamanho: 72, minimo: 34, lineHeight: 74, blockHeight: 180, align: "left" });
-  desenharSeparadorPremium(ctx, 58, 330, 572, layout.accent);
-  ctx.fillStyle = "#f8fafc";
-  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 356, 430, 3, { peso: 800, tamanho: 27, minimo: 15, lineHeight: 31, blockHeight: 96, align: "left" });
-  ctx.fillStyle = layout.accent2;
-  desenharTextoInteiroCanvas(ctx, subtitle2, 58, 442, 430, 2, { peso: 900, tamanho: 27, minimo: 15, lineHeight: 31, blockHeight: 68, align: "left" });
-
   desenharImagemVeiculoPremium45(ctx, main, 392, 130, 642, 560, settings);
   ctx.strokeStyle = layout.accent;
   ctx.lineWidth = 4;
@@ -5799,18 +5790,40 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.moveTo(382, 118);
   ctx.lineTo(352, 704);
   ctx.stroke();
-  if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 884, 34, 170, 96, 0, "rgba(255,255,255,0)");
-  ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "right";
-  fonteQueCabeCanvas(ctx, client?.nome || item.vendedor || "Cliente", 900, 19, 12, 270);
-  ctx.fillText(String(client?.nome || item.vendedor || "Cliente").toUpperCase(), 862, 70);
+  if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 850, 26, 210, 118, 0, "rgba(255,255,255,0)");
+
+  preencherRoundRect(ctx, 42, 126, 548, 388, 26, "rgba(0,0,0,.72)");
+  desenharBordaRoundRect(ctx, 42, 126, 548, 388, 26, "rgba(196,122,74,.42)", 2);
+  ctx.fillStyle = layout.accent2;
+  ctx.textAlign = "left";
+  ctx.font = "900 30px Arial";
+  ctx.fillText("OPORTUNIDADE PREMIUM", 58, 116);
+  ctx.fillStyle = "#f8fafc";
+  ctx.textAlign = "left";
+  desenharTextoInteiroCanvas(ctx, title, 58, 150, 508, 4, { peso: 900, tamanho: 64, minimo: 28, lineHeight: 66, blockHeight: 224, align: "left" });
+  desenharSeparadorPremium(ctx, 58, 382, 552, layout.accent);
+  ctx.fillStyle = "#f8fafc";
+  desenharTextoInteiroCanvas(ctx, subtitle1, 58, 402, 430, 3, { peso: 800, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 82, align: "left" });
+  ctx.fillStyle = layout.accent2;
+  desenharTextoInteiroCanvas(ctx, subtitle2, 58, 474, 430, 2, { peso: 900, tamanho: 25, minimo: 14, lineHeight: 29, blockHeight: 54, align: "left" });
 
   desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 520, layout);
   desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 626, layout);
   desenharMiniInfoPremium45(ctx, "KM", item.km || item.quilometragem || "-", 58, 732, layout);
 
+  ctx.save();
+  ctx.shadowColor = "rgba(244,193,155,.75)";
+  ctx.shadowBlur = 22;
+  desenharBordaRoundRect(ctx, 58, 870, 602, 154, 18, layout.accent, 4);
+  ctx.restore();
   preencherRoundRect(ctx, 58, 870, 602, 154, 18, "rgba(0,0,0,.82)");
   desenharBordaRoundRect(ctx, 58, 870, 602, 154, 18, layout.accent, 3);
+  const priceGlow = ctx.createLinearGradient(58, 870, 660, 1024);
+  priceGlow.addColorStop(0, "rgba(244,193,155,.32)");
+  priceGlow.addColorStop(.35, "rgba(255,255,255,.08)");
+  priceGlow.addColorStop(.72, "rgba(244,193,155,.22)");
+  priceGlow.addColorStop(1, "rgba(196,122,74,.34)");
+  desenharBordaRoundRect(ctx, 64, 876, 590, 142, 15, priceGlow, 2);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "center";
   ctx.font = "900 28px Arial";
@@ -5819,25 +5832,25 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   fonteQueCabeCanvas(ctx, precoAutomovelArte(item), 900, 84, 44, 540);
   ctx.fillText(precoAutomovelArte(item), 359, 1000);
 
-  preencherRoundRect(ctx, 706, 724, 318, 388, 24, "rgba(0,0,0,.66)");
-  desenharBordaRoundRect(ctx, 706, 724, 318, 388, 24, layout.accent, 2);
+  preencherRoundRect(ctx, 706, 706, 318, 418, 24, "rgba(0,0,0,.66)");
+  desenharBordaRoundRect(ctx, 706, 706, 318, 418, 24, layout.accent, 2);
   ctx.fillStyle = layout.accent2;
   ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, subtitle2, 736, 746, 258, 2, { peso: 900, tamanho: 20, minimo: 12, lineHeight: 24, blockHeight: 54, align: "left" });
+  desenharTextoInteiroCanvas(ctx, subtitle2, 736, 726, 258, 2, { peso: 900, tamanho: 20, minimo: 12, lineHeight: 24, blockHeight: 50, align: "left" });
   specs.forEach((spec, index) => {
-    const y = 830 + index * 54;
-    if (index) desenharSeparadorPremium(ctx, 736, y - 20, 994, "rgba(244,193,155,.35)");
+    const y = 804 + index * 50;
+    if (index) desenharSeparadorPremium(ctx, 736, y - 17, 994, "rgba(244,193,155,.35)");
     ctx.fillStyle = layout.accent2;
     ctx.textAlign = "center";
-    ctx.font = "900 18px Arial";
+    ctx.font = "900 16px Arial";
     ctx.fillText(String(index + 1).padStart(2, "0"), 752, y + 10);
     ctx.textAlign = "left";
     ctx.fillStyle = "#ffffff";
-    fonteQueCabeCanvas(ctx, spec.title, 900, 20, 12, 205);
+    fonteQueCabeCanvas(ctx, spec.title, 900, 18, 10, 205);
     ctx.fillText(spec.title, 790, y);
     ctx.fillStyle = "#e5e7eb";
-    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 16, 10, 205);
-    ctx.fillText(String(spec.detail || "").toUpperCase(), 790, y + 27);
+    fonteQueCabeCanvas(ctx, spec.detail || "", 700, 15, 9, 205);
+    ctx.fillText(String(spec.detail || "").toUpperCase(), 790, y + 24);
   });
 
   preencherRoundRect(ctx, 58, 1060, 610, 92, 18, "rgba(196,122,74,.16)");
@@ -5874,7 +5887,11 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.fillStyle = "#ffffff";
   fonteQueCabeCanvas(ctx, contato, 900, 35, 18, 330);
   ctx.fillText(contato, 565, 1304);
-  desenharImagemContain(ctx, logo, 940, 1246, 92, 72, 14, "#ffffff");
+  desenharImagemContain(ctx, logo, 930, 1238, 96, 80, 14, "#ffffff");
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "right";
+  fonteQueCabeCanvas(ctx, client?.nome || item.vendedor || item.loja || "Cliente", 900, 17, 10, 230);
+  ctx.fillText(String(client?.nome || item.vendedor || item.loja || "Cliente").toUpperCase(), 1026, 1334);
 }
 
 function desenharArteAutomovel(ctx, item, client, fotos, logo, siteLogo, layoutKey, options = {}) {
