@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 374,
-  label: "v380",
+  numero: 375,
+  label: "v381",
   data: "2026-06-27",
-  nota: "Arte premium de veiculos teve subtitulo 1 centralizado corretamente dentro do card superior."
+  nota: "Arte premium de veiculos teve texto Oportunidade Premium centralizado no topo."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5832,7 +5832,7 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.fillStyle = infoColor;
   ctx.textAlign = "center";
   ctx.font = "900 38px Arial";
-  ctx.fillText("OPORTUNIDADE PREMIUM", options.showSiteLogo !== false ? 470 : 540, 96);
+  ctx.fillText("OPORTUNIDADE PREMIUM", 540, 96);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "center";
   desenharTextoInteiroCanvas(ctx, title, 540, 148, 904, 2, { peso: 900, tamanho: 58, minimo: 24, lineHeight: 60, blockHeight: 114, align: "center" });
