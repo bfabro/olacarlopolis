@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 371,
-  label: "v377",
+  numero: 372,
+  label: "v378",
   data: "2026-06-27",
-  nota: "Arte premium de veiculos teve titulo contido no card e paletas mais vivas nas informacoes."
+  nota: "Arte premium de veiculos teve card do titulo com brilho e texto mais destacado dentro do bloco."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5822,17 +5822,22 @@ function desenharArteAutomovelPremium45(ctx, item, client, fotos, logo, siteLogo
   ctx.stroke();
   if (options.showSiteLogo !== false) desenharImagemContain(ctx, siteLogo, 886, 34, 146, 76, 0, "rgba(255,255,255,0)");
 
-  preencherRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(0,0,0,.84)");
-  desenharBordaRoundRect(ctx, 42, 126, 996, 210, 24, hexParaRgbaArte(layout.accent, .52), 2);
+  ctx.save();
+  ctx.shadowColor = hexParaRgbaArte(infoColor, .58);
+  ctx.shadowBlur = 20;
+  desenharBordaRoundRect(ctx, 42, 126, 996, 210, 24, layout.accent, 3);
+  ctx.restore();
+  preencherRoundRect(ctx, 42, 126, 996, 210, 24, "rgba(0,0,0,.86)");
+  desenharBordaRoundRect(ctx, 42, 126, 996, 210, 24, hexParaRgbaArte(layout.accent, .72), 2);
   ctx.fillStyle = infoColor;
   ctx.textAlign = "center";
   ctx.font = "900 38px Arial";
   ctx.fillText("OPORTUNIDADE PREMIUM", options.showSiteLogo !== false ? 470 : 540, 96);
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "center";
-  desenharTextoInteiroCanvas(ctx, title, 92, 150, 896, 2, { peso: 900, tamanho: 50, minimo: 20, lineHeight: 53, blockHeight: 104, align: "center" });
+  desenharTextoInteiroCanvas(ctx, title, 88, 148, 904, 2, { peso: 900, tamanho: 58, minimo: 24, lineHeight: 60, blockHeight: 114, align: "center" });
   ctx.fillStyle = "#f8fafc";
-  desenharTextoInteiroCanvas(ctx, subtitle1, 108, 270, 864, 2, { peso: 900, tamanho: 24, minimo: 13, lineHeight: 28, blockHeight: 52, align: "center" });
+  desenharTextoInteiroCanvas(ctx, subtitle1, 108, 270, 864, 2, { peso: 900, tamanho: 25, minimo: 13, lineHeight: 29, blockHeight: 52, align: "center" });
 
   desenharMiniInfoPremium45(ctx, "ANO", item.ano || "-", 58, 375, layout);
   desenharMiniInfoPremium45(ctx, "COMB.", item.combustivel || "-", 58, 473, layout);
