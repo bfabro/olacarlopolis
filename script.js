@@ -5091,7 +5091,7 @@ carlopdiesel:"s",
   function definirTelaContentArea(classe) {
     const area = document.querySelector(".content_area");
     if (!area) return null;
-    area.classList.remove("tela-promocoes-mobile", "tela-ranking-xadrez-mobile", "tela-jogos-mobile", "tela-canos-mobile", "tela-xadrez-mobile");
+    area.classList.remove("tela-promocoes-mobile", "tela-ranking-xadrez-mobile", "tela-jogos-mobile", "tela-canos-mobile", "tela-xadrez-mobile", "tela-eventos-mobile");
     if (classe) area.classList.add(classe);
     return area;
   }
@@ -5120,7 +5120,7 @@ carlopdiesel:"s",
             <div class="game-desc">Entre na represa, desvie dos objetos e acumule pontos. E confira o Ranking</div>
           </div>
           <div class="game-actions">
-            <button class="btn-play" type="button" data-game="canos">Jogar</button>
+            <button id="btnJogarCapivarinha" class="btn-play" type="button" data-game="canos">Jogar</button>
           </div>
         </div>
 
@@ -5132,7 +5132,7 @@ carlopdiesel:"s",
             <div class="game-desc">Jogue xadrez, vença partidas e dispute pontos no ranking.</div>
           </div>
           <div class="game-actions">
-            <button class="btn-play" type="button" data-game="xadrez">Jogar</button>
+            <button id="btnJogarXadrez" class="btn-play" type="button" data-game="xadrez">Jogar</button>
           </div>
         </div>
 
@@ -5172,26 +5172,20 @@ carlopdiesel:"s",
     const area = document.querySelector(".content_area");
     area.innerHTML = html;
 
-    const abrirJogo = (game) => {
-      if (game === "canos") {
-        location.hash = "#canos";
-        mostrarCanos();
-      } else if (game === "xadrez") {
-        location.hash = "#xadrez";
-        mostrarXadrez();
-      } else if (game === "tetrix") {
-        location.hash = "#tetrix";
-        mostrarTetrix();
-      }
-    };
-
-    area.querySelector(".games-list")?.addEventListener("click", (e) => {
-      const button = e.target.closest("[data-game]");
-      if (!button) return;
+    const abrirCapivarinha = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      abrirJogo(button.dataset.game);
-    });
+      location.hash = "#canos";
+      mostrarCanos();
+    };
+    const abrirXadrez = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      location.hash = "#xadrez";
+      mostrarXadrez();
+    };
+    area.querySelector("#btnJogarCapivarinha")?.addEventListener("click", abrirCapivarinha);
+    area.querySelector("#btnJogarXadrez")?.addEventListener("click", abrirXadrez);
   }
 
 
@@ -20026,6 +20020,9 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     /*  contentArea.classList.remove("hidden");*/
     const contentArea = document.querySelector(".content_area");
     if (!contentArea) return;
+    if (typeof definirTelaContentArea === "function") {
+      definirTelaContentArea(isEventos ? "tela-eventos-mobile" : null);
+    }
     document.body.classList.add("home-quick-banner-route-hidden");
 
     if (paidEstablishments.length === 0) {
