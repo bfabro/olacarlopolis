@@ -5111,7 +5111,7 @@ carlopdiesel:"s",
             <div class="game-desc">Entre na represa, desvie dos objetos e acumule pontos. E confira o Ranking</div>
           </div>
           <div class="game-actions">
-            <button class="btn-play" type="button" data-game="canos">Jogar</button>
+            <button class="btn-play" type="button" data-game="canos" onclick="event.preventDefault(); event.stopPropagation(); location.hash='#canos'; mostrarCanos();">Jogar</button>
           </div>
         </div>
 
@@ -5123,7 +5123,7 @@ carlopdiesel:"s",
             <div class="game-desc">Jogue contra uma inteligência intermediária e dispute pontos no ranking.</div>
           </div>
           <div class="game-actions">
-            <button class="btn-play" type="button" data-game="xadrez">Jogar</button>
+            <button class="btn-play" type="button" data-game="xadrez" onclick="event.preventDefault(); event.stopPropagation(); location.hash='#xadrez'; mostrarXadrez();">Jogar</button>
           </div>
         </div>
 
