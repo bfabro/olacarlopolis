@@ -6426,7 +6426,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         class="btn-whatsapp_onde"
         onclick="registrarCliqueWhatsOndeComer('${normalizeName(est.name)}');">
         <i class="fab fa-whatsapp"></i>
-        <span class="contato-publico-texto"><span class="contato-publico-numero">${formatarTelefonePublico(contato.numero)}</span>${contato.referencia ? `<span class="contato-publico-referencia"> - ${escapePromoHtml(contato.referencia)}</span>` : ""}</span>
+        <span class="contato-publico-texto"><span class="contato-publico-numero">${formatarTelefonePublico(contato.numero)}</span></span>
       </a>
     `).join("")}
   </div>
