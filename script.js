@@ -5091,10 +5091,39 @@ carlopdiesel:"s",
   function definirTelaContentArea(classe) {
     const area = document.querySelector(".content_area");
     if (!area) return null;
-    area.classList.remove("tela-promocoes-mobile", "tela-ranking-xadrez-mobile", "tela-jogos-mobile", "tela-canos-mobile", "tela-xadrez-mobile", "tela-eventos-mobile");
-    if (classe) area.classList.add(classe);
+    const telas = ["tela-promocoes-mobile", "tela-ranking-xadrez-mobile", "tela-jogos-mobile", "tela-canos-mobile", "tela-xadrez-mobile", "tela-eventos-mobile"];
+    area.classList.remove(...telas);
+    document.body.classList.remove(...telas);
+    if (classe) {
+      area.classList.add(classe);
+      document.body.classList.add(classe);
+    }
     return area;
   }
+
+  function abrirJogoOlaCarlopolis(event, jogo) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+    if (jogo === "canos") {
+      if (location.hash !== "#canos") history.pushState(null, "", "#canos");
+      mostrarCanos();
+      return false;
+    }
+    if (jogo === "xadrez") {
+      if (location.hash !== "#xadrez") history.pushState(null, "", "#xadrez");
+      mostrarXadrez();
+      return false;
+    }
+    if (jogo === "tetrix") {
+      if (location.hash !== "#tetrix") history.pushState(null, "", "#tetrix");
+      mostrarTetrix();
+      return false;
+    }
+    return false;
+  }
+
+  window.abrirJogoOlaCarlopolis = abrirJogoOlaCarlopolis;
 
   function mostrarJogos() {
     if (window.xadrezTimerId) {
@@ -5120,7 +5149,7 @@ carlopdiesel:"s",
             <div class="game-desc">Entre na represa, desvie dos objetos e acumule pontos. E confira o Ranking</div>
           </div>
           <div class="game-actions">
-            <button id="btnJogarCapivarinha" class="btn-play" type="button" data-game="canos">Jogar</button>
+            <button id="btnJogarCapivarinha" class="btn-play" type="button" data-game="canos" onclick="return window.abrirJogoOlaCarlopolis(event, 'canos')">Jogar</button>
           </div>
         </div>
 
@@ -5132,7 +5161,7 @@ carlopdiesel:"s",
             <div class="game-desc">Jogue xadrez, vença partidas e dispute pontos no ranking.</div>
           </div>
           <div class="game-actions">
-            <button id="btnJogarXadrez" class="btn-play" type="button" data-game="xadrez">Jogar</button>
+            <button id="btnJogarXadrez" class="btn-play" type="button" data-game="xadrez" onclick="return window.abrirJogoOlaCarlopolis(event, 'xadrez')">Jogar</button>
           </div>
         </div>
 
@@ -5172,20 +5201,8 @@ carlopdiesel:"s",
     const area = document.querySelector(".content_area");
     area.innerHTML = html;
 
-    const abrirCapivarinha = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      location.hash = "#canos";
-      mostrarCanos();
-    };
-    const abrirXadrez = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      location.hash = "#xadrez";
-      mostrarXadrez();
-    };
-    area.querySelector("#btnJogarCapivarinha")?.addEventListener("click", abrirCapivarinha);
-    area.querySelector("#btnJogarXadrez")?.addEventListener("click", abrirXadrez);
+    area.querySelector("#btnJogarCapivarinha")?.addEventListener("click", (e) => abrirJogoOlaCarlopolis(e, "canos"));
+    area.querySelector("#btnJogarXadrez")?.addEventListener("click", (e) => abrirJogoOlaCarlopolis(e, "xadrez"));
   }
 
 

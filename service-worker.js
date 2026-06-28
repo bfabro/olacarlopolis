@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-06-28-jogos-rank-promos-eventos-v342'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-06-28-jogos-rank-promos-eventos-v343'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
@@ -54,6 +54,11 @@ self.addEventListener('fetch', (event) => {
   }
 
   // STALE-WHILE-REVALIDATE para arquivos estáticos (css/js/img)
+  if (req.destination === 'script' || req.destination === 'style') {
+    event.respondWith(networkFirst(req));
+    return;
+  }
+
   event.respondWith(staleWhileRevalidate(req));
 });
 

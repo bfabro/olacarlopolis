@@ -20448,7 +20448,7 @@ body.vaga-modal-open {
     height: auto !important;
     margin-left: 0 !important;
     margin-top: 0 !important;
-    padding: calc(env(safe-area-inset-top, 0px) + 72px) 8px 18px !important;
+    padding: 0 8px 18px !important;
     overflow: visible !important;
     align-items: stretch !important;
     justify-content: flex-start !important;
@@ -20568,7 +20568,7 @@ body.vaga-modal-open {
   }
 }
 
-/* ===== Ajuste final mobile para telas com topo fixo v342 ===== */
+/* ===== Ajuste final mobile para telas com topo fixo v343 ===== */
 @media (max-width: 768px) {
   body.home-quick-banner-hidden .content_area:has(.promo-city-screen),
   body.home-quick-banner-route-hidden .content_area:has(.promo-city-screen),
@@ -20578,6 +20578,7 @@ body.vaga-modal-open {
   body.home-quick-banner-route-hidden .content_area.tela-promocoes-mobile,
   body.home-quick-banner-hidden .sidebar.close ~ .content_area.tela-promocoes-mobile,
   body.home-quick-banner-route-hidden .sidebar.close ~ .content_area.tela-promocoes-mobile,
+  body.tela-promocoes-mobile .content_area,
   .sidebar.close ~ .content_area.tela-promocoes-mobile,
   .content_area.tela-promocoes-mobile,
   .sidebar.close ~ .content_area:has(.promo-city-screen),
@@ -20601,6 +20602,7 @@ body.vaga-modal-open {
   body.home-quick-banner-route-hidden .content_area.tela-ranking-xadrez-mobile,
   body.home-quick-banner-hidden .sidebar.close ~ .content_area.tela-ranking-xadrez-mobile,
   body.home-quick-banner-route-hidden .sidebar.close ~ .content_area.tela-ranking-xadrez-mobile,
+  body.tela-ranking-xadrez-mobile .content_area,
   .sidebar.close ~ .content_area.tela-ranking-xadrez-mobile,
   .content_area.tela-ranking-xadrez-mobile,
   .sidebar.close ~ .content_area:has(.xadrez-rank-wrap),
@@ -20671,6 +20673,7 @@ body.vaga-modal-open {
   body.home-quick-banner-route-hidden .content_area.tela-eventos-mobile,
   body.home-quick-banner-hidden .sidebar.close ~ .content_area.tela-eventos-mobile,
   body.home-quick-banner-route-hidden .sidebar.close ~ .content_area.tela-eventos-mobile,
+  body.tela-eventos-mobile .content_area,
   .sidebar.close ~ .content_area.tela-eventos-mobile,
   .content_area.tela-eventos-mobile {
     width: 100% !important;
