@@ -6544,6 +6544,11 @@ html {
   font-size: 13px;
 }
 
+.chess-clock {
+  background: #111827 !important;
+  color: #fff !important;
+}
+
 .chess-board {
   width: min(92vw, 420px);
   aspect-ratio: 1;
@@ -6619,6 +6624,73 @@ html {
 
 .chess-square:disabled {
   cursor: wait;
+}
+
+.xadrez-rank-wrap {
+  display: grid;
+  gap: 12px;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border-color: #c7d2fe;
+}
+
+.xadrez-rank-header {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #111827;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, .16);
+}
+
+.xadrez-rank-header strong {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.xadrez-rank-header span {
+  color: #dbeafe;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.xadrez-rank-list {
+  display: grid;
+  gap: 8px;
+}
+
+.xadrez-rank-item {
+  border-color: #cbd5e1 !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .06);
+}
+
+.xadrez-rank-item .score-number {
+  min-width: 58px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  text-align: center;
+}
+
+.xadrez-rank-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.xadrez-rank-stats span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .rank-list {

@@ -5089,6 +5089,10 @@ carlopdiesel:"s",
   /// mostrar jogos
 
   function mostrarJogos() {
+    if (window.xadrezTimerId) {
+      clearInterval(window.xadrezTimerId);
+      window.xadrezTimerId = null;
+    }
     if (location.hash !== "#jogos") location.hash = "#jogos"; // garante URL compartilhável
     const html = `
 <div class="page-header">
@@ -6625,16 +6629,23 @@ carlopdiesel:"s",
   }
 
   function mostrarRankingXadrez() {
+    if (window.xadrezTimerId) {
+      clearInterval(window.xadrezTimerId);
+      window.xadrezTimerId = null;
+    }
     if (location.hash !== "#ranking-xadrez") location.hash = "#ranking-xadrez";
     const area = document.querySelector(".content_area");
     area.innerHTML = `
       <div class="page-header">
-        <h2>♟️ Ranking Xadrez</h2>
+        <h2>♟️ Ranking do Xadrez</h2>
         <i class="fa-solid fa-share-nodes share-btn" onclick="compartilharPagina('#ranking-xadrez','Ranking Xadrez','Veja o ranking do xadrez no Olá Carlópolis!')"></i>
       </div>
-      <div class="rank-wrap" style="padding:8px 12px">
-        <div class="rank-title">🏆 Pontuação <span><br>Vitórias menos derrotas. Empate só conta como partida.</span></div>
-        <ul id="xadrezRankList" class="rank-list"></ul>
+      <div class="rank-wrap xadrez-rank-wrap" style="padding:8px 12px">
+        <div class="xadrez-rank-header">
+          <strong>Ranking do Xadrez</strong>
+          <span>Vitórias menos derrotas. Empate só conta como partida.</span>
+        </div>
+        <ul id="xadrezRankList" class="rank-list xadrez-rank-list"></ul>
         <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn-rank" onclick="location.hash='xadrez'; mostrarXadrez()">Voltar ao Xadrez</button>
           <button class="btn-rank" onclick="location.hash='jogos'; mostrarJogos()">Jogos</button>
@@ -6661,14 +6672,19 @@ carlopdiesel:"s",
         const pos = index + 1;
         const medalClass = pos === 1 ? "medal-1" : pos === 2 ? "medal-2" : pos === 3 ? "medal-3" : "";
         return `
-          <li class="rank-item rank-item--compact ${it._id === myUid ? "me" : ""}">
+          <li class="rank-item rank-item--compact xadrez-rank-item ${it._id === myUid ? "me" : ""}">
             <div class="rank-pos ${medalClass}">${pos}</div>
             <div class="rank-main">
               <div class="rank-row">
                 <div class="rank-name">${escapeGameHtml(it.name || "Jogador")}</div>
                 <div class="score-number">${Number(it.wins || 0) - Number(it.losses || 0)} pts</div>
               </div>
-              <div class="rank-date">V ${Number(it.wins || 0)} • D ${Number(it.losses || 0)} • Partidas ${Number(it.games || 0) || (Number(it.wins || 0) + Number(it.losses || 0) + Number(it.draws || 0))} • ${capivarinhaFormatDateBR(it.lastDate)}</div>
+              <div class="xadrez-rank-stats">
+                <span>V ${Number(it.wins || 0)}</span>
+                <span>D ${Number(it.losses || 0)}</span>
+                <span>Partidas ${Number(it.games || 0) || (Number(it.wins || 0) + Number(it.losses || 0) + Number(it.draws || 0))}</span>
+                <span>${capivarinhaFormatDateBR(it.lastDate)}</span>
+              </div>
             </div>
           </li>`;
       }).join("");
@@ -6685,6 +6701,7 @@ carlopdiesel:"s",
           <div class="flappy-ui">
             <div class="scorebox">Você: Brancas</div>
             <div class="scorebox">IA: Intermediária</div>
+            <div class="scorebox chess-clock">Tempo: <span id="xadrezTimer">10:00</span></div>
           </div>
         </div>
         <div id="xadrezConfigInfo" class="chess-tournament-card hidden"></div>
@@ -6703,22 +6720,63 @@ carlopdiesel:"s",
     let legal = [];
     let locked = false;
     let finished = false;
+    let plyCount = 0;
+    let remainingSeconds = 10 * 60;
+    if (window.xadrezTimerId) clearInterval(window.xadrezTimerId);
     const boardEl = document.getElementById("xadrezBoard");
     const statusEl = document.getElementById("xadrezStatus");
+    const timerEl = document.getElementById("xadrezTimer");
 
     const setStatus = (text) => { statusEl.textContent = text; };
+    const formatTimer = (seconds) => {
+      const safe = Math.max(0, Number(seconds || 0));
+      const min = Math.floor(safe / 60);
+      const sec = safe % 60;
+      return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+    };
+    const renderTimer = () => {
+      if (timerEl) timerEl.textContent = formatTimer(remainingSeconds);
+    };
     const finish = (text, result) => {
+      if (finished) return;
       finished = true;
       locked = false;
+      if (window.xadrezTimerId) {
+        clearInterval(window.xadrezTimerId);
+        window.xadrezTimerId = null;
+      }
       setStatus(text);
       xadrezSalvarResultado(result);
       render();
+    };
+    const startTimer = () => {
+      renderTimer();
+      window.xadrezTimerId = setInterval(() => {
+        if (finished) return;
+        remainingSeconds -= 1;
+        renderTimer();
+        if (remainingSeconds <= 0) finish("Tempo esgotado. A IA venceu.", "loss");
+      }, 1000);
+    };
+    const describeMove = (move) => {
+      if (move?.castle === "K") return "Roque P";
+      if (move?.castle === "Q") return "Roque G";
+      if (move?.enPassant) return "Passante";
+      return "";
+    };
+    const statusDepoisDoLance = (baseText, checkColor) => {
+      const isCheck = xadrezEmXeque(board, checkColor, gameState);
+      if (baseText && isCheck) return `${baseText} - Check`;
+      if (isCheck) return "Check";
+      return baseText || (checkColor === "b" ? "A IA está pensando..." : "Sua vez.");
     };
     const checkGameEnd = (color) => {
       const moves = xadrezLegalMoves(board, color, gameState);
       if (moves.length) return false;
       if (xadrezEmXeque(board, color, gameState)) {
-        finish(color === "b" ? "Xeque-mate. Você venceu!" : "Xeque-mate. A IA venceu.", color === "b" ? "win" : "loss");
+        const jogadasCompletas = Math.ceil(plyCount / 2);
+        const quickMate = jogadasCompletas < 12 ? " Presta atenção Jovem, partida muito rapida rs" : "";
+        finish(color === "b" ? `Xeque-mate. Você venceu!${quickMate}` : `Xeque-mate. A IA venceu.${quickMate}`, color === "b" ? "win" : "loss");
       } else {
         finish("Empate por afogamento.", "draw");
       }
@@ -6734,21 +6792,23 @@ carlopdiesel:"s",
       }).join("")).join("");
       boardEl.querySelectorAll(".chess-square").forEach((btn) => btn.addEventListener("click", onSquareClick));
     };
-    const aiTurn = () => {
+    const aiTurn = (previousMessage = "") => {
       if (checkGameEnd("b")) return;
       locked = true;
-      setStatus("A IA está pensando...");
+      setStatus(previousMessage ? `${previousMessage} - IA pensando...` : "A IA está pensando...");
       render();
       setTimeout(() => {
         const move = xadrezBestMove(board, gameState, 2);
+        const moveText = describeMove(move);
         if (move) {
           const next = xadrezMovePosition(board, gameState, move);
           board = next.board;
           gameState = next.state;
+          plyCount += 1;
         }
         locked = false;
         if (!checkGameEnd("w")) {
-          setStatus(xadrezEmXeque(board, "w", gameState) ? "Você está em xeque." : "Sua vez.");
+          setStatus(statusDepoisDoLance(moveText, "w"));
           render();
         }
       }, 250);
@@ -6759,13 +6819,17 @@ carlopdiesel:"s",
       const piece = board[r][c];
       const chosenMove = selected && legal.find((m) => m.to.r === r && m.to.c === c);
       if (chosenMove) {
+        const moveText = describeMove(chosenMove);
         const next = xadrezMovePosition(board, gameState, chosenMove);
         board = next.board;
         gameState = next.state;
+        plyCount += 1;
         selected = null;
         legal = [];
         render();
-        if (!checkGameEnd("b")) aiTurn();
+        if (!checkGameEnd("b")) {
+          aiTurn(statusDepoisDoLance(moveText, "b"));
+        }
         return;
       }
       if (piece && xadrezCor(piece) === "w") {
@@ -6781,12 +6845,17 @@ carlopdiesel:"s",
     }
 
     document.getElementById("xadrezRestart")?.addEventListener("click", () => {
+      if (window.xadrezTimerId) clearInterval(window.xadrezTimerId);
       board = xadrezBoardInicial();
       gameState = xadrezEstadoInicial();
       selected = null;
       legal = [];
       locked = false;
       finished = false;
+      plyCount = 0;
+      remainingSeconds = 10 * 60;
+      renderTimer();
+      startTimer();
       setStatus("Sua vez. Toque em uma peça branca.");
       render();
     });
@@ -6802,6 +6871,7 @@ carlopdiesel:"s",
           ${cfg.premio ? `<span>Prêmio: ${escapeGameHtml(cfg.premio)}</span>` : ""}`;
       }).catch(() => { });
     }
+    startTimer();
     render();
   }
 
