@@ -5111,7 +5111,7 @@ carlopdiesel:"s",
             <div class="game-desc">Entre na represa, desvie dos objetos e acumule pontos. E confira o Ranking</div>
           </div>
           <div class="game-actions">
-            <button class="btn-play" id="playCanos">Jogar</button>
+            <button class="btn-play" type="button" data-game="canos">Jogar</button>
           </div>
         </div>
 
@@ -5123,7 +5123,7 @@ carlopdiesel:"s",
             <div class="game-desc">Jogue contra uma inteligência intermediária e dispute pontos no ranking.</div>
           </div>
           <div class="game-actions">
-            <button class="btn-play" id="playXadrez">Jogar</button>
+            <button class="btn-play" type="button" data-game="xadrez">Jogar</button>
           </div>
         </div>
 
@@ -5141,7 +5141,7 @@ carlopdiesel:"s",
 
 
           <div class="game-actions">
-            <button class="btn-play" id="playTetrix">Jogar</button>
+            <button class="btn-play" type="button" data-game="tetrix">Jogar</button>
           </div>
         </div>
 
@@ -5163,25 +5163,25 @@ carlopdiesel:"s",
     const area = document.querySelector(".content_area");
     area.innerHTML = html;
 
-    const t = document.getElementById("playTetrix");
-    if (t) t.addEventListener("click", (e) => {
-      e.preventDefault();
-      location.hash = "tetrix";
-      mostrarTetrix();
-    });
+    const abrirJogo = (game) => {
+      if (game === "canos") {
+        location.hash = "#canos";
+        mostrarCanos();
+      } else if (game === "xadrez") {
+        location.hash = "#xadrez";
+        mostrarXadrez();
+      } else if (game === "tetrix") {
+        location.hash = "#tetrix";
+        mostrarTetrix();
+      }
+    };
 
-    const c = document.getElementById("playCanos");
-    if (c) c.addEventListener("click", (e) => {
+    area.querySelector(".games-list")?.addEventListener("click", (e) => {
+      const button = e.target.closest("[data-game]");
+      if (!button) return;
       e.preventDefault();
-      location.hash = "canos";
-      mostrarCanos();
-    });
-
-    const x = document.getElementById("playXadrez");
-    if (x) x.addEventListener("click", (e) => {
-      e.preventDefault();
-      location.hash = "xadrez";
-      mostrarXadrez();
+      e.stopPropagation();
+      abrirJogo(button.dataset.game);
     });
   }
 
