@@ -73,6 +73,7 @@ let state = {
   pagamentoSistema: {},
   paginaInicialSite: {},
   novidadesConfig: {},
+  xadrezConfig: {},
   metricas: {},
   auditLogs: [],
   reportSection: "analytics",
@@ -272,6 +273,7 @@ const views = {
   pagamentoSistema: $("pagamentoSistemaView"),
   paginaInicialSite: $("paginaInicialSiteView"),
   novidadesConfig: $("novidadesConfigView"),
+  xadrezConfig: $("xadrezConfigView"),
   storiesComerciais: $("storiesComerciaisView"),
   usuarios: $("usuariosView"),
   minhaEmpresa: $("minhaEmpresaView"),
@@ -294,6 +296,7 @@ const viewCopy = {
   storiesComerciais: ["Stories comerciais", "Crie artes premium para clientes e conquiste novos anunciantes."],
   paginaInicialSite: ["Página Inicial Site", "Configure o banner principal de acessos rapidos."],
   novidadesConfig: ["Novidades do site", "Defina quais atualizações aparecem na tela principal pública."],
+  xadrezConfig: ["Xadrez", "Configure campeonato e premio do jogo de xadrez."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
   minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."],
   faturas: ["Faturas", "Pix mensal, QR Code e comprovantes."]
@@ -491,6 +494,7 @@ function canAccessView(viewName) {
     if (viewName === "pagamentoSistema") return isMaster();
     if (viewName === "paginaInicialSite") return isMaster();
     if (viewName === "novidadesConfig") return isMaster();
+    if (viewName === "xadrezConfig") return isMaster();
     if (viewName === "storiesComerciais") return isMaster();
     return true;
   }
@@ -1932,6 +1936,7 @@ async function loadAllData(onProgress = null) {
     pagamentoSnap,
     paginaInicialSnap,
     novidadesConfigSnap,
+    xadrezConfigSnap,
     cliquesBotoesSnap,
     cliquesMenuSnap,
     acessosSnap,
@@ -1959,6 +1964,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("configuracoes/pagamento"),
     getPanelSnapshot("configuracoes/paginaInicial"),
     getPanelSnapshot("configuracoes/novidades"),
+    getPanelSnapshot("jogos/xadrez/config"),
     getPanelSnapshot("cliquesPorBotao", { enabled: canManage }),
     getPanelSnapshot("cliquesMenuLateral", { enabled: canManage }),
     getPanelSnapshot("acessosPorDia", { enabled: canManage }),
@@ -2040,6 +2046,7 @@ async function loadAllData(onProgress = null) {
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
   state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
+  state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
   progress(72, "Preparando informações do painel...");
   state.metricas = scopedClientMetrics || {
     cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
@@ -2430,6 +2437,7 @@ function switchView(name) {
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "paginaInicialSite") renderHomePageSettings();
   if (target === "novidadesConfig") renderNovidadesConfig();
+  if (target === "xadrezConfig") renderXadrezConfig();
   if (target === "storiesComerciais") renderStoriesComerciaisView();
   if (target === "relatorios") renderReports();
   if (target === "promocoesClientes") renderStaffPromocoesView();
@@ -2792,6 +2800,14 @@ function renderNovidadesConfig() {
       <span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(description)}</small></span>
     </label>
   `).join("");
+}
+
+function renderXadrezConfig() {
+  if (!$("xadrezConfigForm")) return;
+  const config = state.xadrezConfig || {};
+  $("xadrezConfigActive").checked = config.ativo !== false;
+  $("xadrezConfigName").value = config.campeonatoNome || "";
+  $("xadrezConfigPrize").value = config.premio || "";
 }
 
 async function registrarNovidadeAdmin(payload = {}) {
@@ -13462,6 +13478,23 @@ function bindEvents() {
     await update(ref(db, "configuracoes/novidades"), payload);
     state.novidadesConfig = payload;
     showToast("Configuração de novidades salva.");
+  });
+  $("xadrezConfigForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!isMaster()) {
+      showToast("Somente master pode alterar o xadrez.");
+      return;
+    }
+    const payload = {
+      ativo: $("xadrezConfigActive")?.checked !== false,
+      campeonatoNome: $("xadrezConfigName")?.value.trim().slice(0, 80) || "",
+      premio: $("xadrezConfigPrize")?.value.trim().slice(0, 180) || "",
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user?.uid || ""
+    };
+    await update(ref(db, "jogos/xadrez/config"), payload);
+    state.xadrezConfig = payload;
+    showToast("Configuracao do xadrez salva.");
   });
   $("homeBannerImagesUpload")?.addEventListener("change", async (event) => {
     if (!isMaster()) {

@@ -712,6 +712,16 @@ function capivarinhaRecordDateKey(item = {}) {
   return "";
 }
 
+function escapeGameHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, (ch) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[ch]));
+}
+
 function salvarScoreCapivarinha(score) {
   try {
     if (!window.firebase || !firebase.database) {
@@ -795,6 +805,13 @@ function mostrarRankingCapivarinha() {
         <label>Data até
           <input id="rankDataFim" type="date">
         </label>
+        <label>Ordenar por
+          <select id="rankOrdenacao">
+            <option value="score">Maior pontuação</option>
+            <option value="data-recente">Data mais recente</option>
+            <option value="data-antiga">Data mais antiga</option>
+          </select>
+        </label>
         <button class="btn-rank" id="rankLimparDatas" type="button">Limpar datas</button>
       </div>
       <ul id="rankList" class="rank-list"></ul>
@@ -810,8 +827,9 @@ function mostrarRankingCapivarinha() {
   const ul = document.getElementById("rankList");
   const inputInicio = document.getElementById("rankDataInicio");
   const inputFim = document.getElementById("rankDataFim");
+  const inputOrdenacao = document.getElementById("rankOrdenacao");
   const btnLimparDatas = document.getElementById("rankLimparDatas");
-  const filtrosRanking = { inicio: "", fim: "" };
+  const filtrosRanking = { inicio: "", fim: "", ordenacao: "score" };
 
   // segurança: sem Firebase, mostra aviso e sai
   if (!window.firebase || !firebase.database) {
@@ -844,7 +862,13 @@ function mostrarRankingCapivarinha() {
       const inicioOk = !filtrosRanking.inicio || (data && data >= filtrosRanking.inicio);
       const fimOk = !filtrosRanking.fim || (data && data <= filtrosRanking.fim);
       return inicioOk && fimOk;
-    }).sort((a, b) => b.best - a.best);
+    }).sort((a, b) => {
+      const dataA = capivarinhaRecordDateKey(a);
+      const dataB = capivarinhaRecordDateKey(b);
+      if (filtrosRanking.ordenacao === "data-recente") return String(dataB).localeCompare(String(dataA)) || b.best - a.best;
+      if (filtrosRanking.ordenacao === "data-antiga") return String(dataA).localeCompare(String(dataB)) || b.best - a.best;
+      return b.best - a.best;
+    });
 
     if (!filtrados.length) {
       ul.innerHTML = `<li class="rank-empty">${arr.length ? "Nenhum recorde encontrado para o período selecionado." : "Ninguém no ranking ainda. Jogue e salve seu score! 🎮"}</li>`;
@@ -895,10 +919,12 @@ function mostrarRankingCapivarinha() {
   const aplicarFiltroDataRanking = () => {
     filtrosRanking.inicio = inputInicio?.value || "";
     filtrosRanking.fim = inputFim?.value || "";
+    filtrosRanking.ordenacao = inputOrdenacao?.value || "score";
     if (rankingSnapshot) renderRanking(rankingSnapshot);
   };
   inputInicio?.addEventListener("change", aplicarFiltroDataRanking);
   inputFim?.addEventListener("change", aplicarFiltroDataRanking);
+  inputOrdenacao?.addEventListener("change", aplicarFiltroDataRanking);
   btnLimparDatas?.addEventListener("click", () => {
     if (inputInicio) inputInicio.value = "";
     if (inputFim) inputFim.value = "";
@@ -5090,6 +5116,18 @@ carlopdiesel:"s",
         </div>
 
 
+        <div class="game-item">
+          <div class="game-icon"><i class="fa-solid fa-chess-knight" style="color:#111827"></i></div>
+          <div class="game-body">
+            <div class="game-title">Xadrez</div>
+            <div class="game-desc">Jogue contra uma inteligência intermediária e dispute pontos no ranking.</div>
+          </div>
+          <div class="game-actions">
+            <button class="btn-play" id="playXadrez">Jogar</button>
+          </div>
+        </div>
+
+
 
 
            <!-- Jogo 1: Tetrix 
@@ -5137,6 +5175,13 @@ carlopdiesel:"s",
       e.preventDefault();
       location.hash = "canos";
       mostrarCanos();
+    });
+
+    const x = document.getElementById("playXadrez");
+    if (x) x.addEventListener("click", (e) => {
+      e.preventDefault();
+      location.hash = "xadrez";
+      mostrarXadrez();
     });
   }
 
@@ -6287,6 +6332,390 @@ carlopdiesel:"s",
   }
 
 
+  function xadrezBoardInicial() {
+    return [
+      ["r", "n", "b", "q", "k", "b", "n", "r"],
+      ["p", "p", "p", "p", "p", "p", "p", "p"],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["P", "P", "P", "P", "P", "P", "P", "P"],
+      ["R", "N", "B", "Q", "K", "B", "N", "R"]
+    ];
+  }
+
+  const XADREZ_PECAS = {
+    K: "♔", Q: "♕", R: "♖", B: "♗", N: "♘", P: "♙",
+    k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟"
+  };
+  const XADREZ_VALOR = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
+
+  function xadrezCor(piece) {
+    if (!piece) return "";
+    return piece === piece.toUpperCase() ? "w" : "b";
+  }
+
+  function xadrezDentro(r, c) {
+    return r >= 0 && r < 8 && c >= 0 && c < 8;
+  }
+
+  function xadrezClone(board) {
+    return board.map((row) => row.slice());
+  }
+
+  function xadrezMoveBoard(board, move) {
+    const next = xadrezClone(board);
+    const piece = next[move.from.r][move.from.c];
+    next[move.from.r][move.from.c] = "";
+    next[move.to.r][move.to.c] = move.promotion || piece;
+    return next;
+  }
+
+  function xadrezPseudoMoves(board, color) {
+    const moves = [];
+    const add = (from, to, promotion = "") => {
+      if (!xadrezDentro(to.r, to.c)) return;
+      const target = board[to.r][to.c];
+      if (!target || xadrezCor(target) !== color) moves.push({ from, to, promotion, capture: target || "" });
+    };
+    const slide = (from, dirs) => {
+      dirs.forEach(([dr, dc]) => {
+        let r = from.r + dr;
+        let c = from.c + dc;
+        while (xadrezDentro(r, c)) {
+          const target = board[r][c];
+          if (!target) add(from, { r, c });
+          else {
+            if (xadrezCor(target) !== color) add(from, { r, c });
+            break;
+          }
+          r += dr;
+          c += dc;
+        }
+      });
+    };
+
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const piece = board[r][c];
+        if (!piece || xadrezCor(piece) !== color) continue;
+        const from = { r, c };
+        const type = piece.toLowerCase();
+        if (type === "p") {
+          const dir = color === "w" ? -1 : 1;
+          const start = color === "w" ? 6 : 1;
+          const promoteRow = color === "w" ? 0 : 7;
+          if (xadrezDentro(r + dir, c) && !board[r + dir][c]) {
+            add(from, { r: r + dir, c }, r + dir === promoteRow ? (color === "w" ? "Q" : "q") : "");
+            if (r === start && !board[r + dir * 2][c]) add(from, { r: r + dir * 2, c });
+          }
+          [-1, 1].forEach((dc) => {
+            const tr = r + dir;
+            const tc = c + dc;
+            if (xadrezDentro(tr, tc) && board[tr][tc] && xadrezCor(board[tr][tc]) !== color) {
+              add(from, { r: tr, c: tc }, tr === promoteRow ? (color === "w" ? "Q" : "q") : "");
+            }
+          });
+        } else if (type === "n") {
+          [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
+            .forEach(([dr, dc]) => add(from, { r: r + dr, c: c + dc }));
+        } else if (type === "b") {
+          slide(from, [[-1, -1], [-1, 1], [1, -1], [1, 1]]);
+        } else if (type === "r") {
+          slide(from, [[-1, 0], [1, 0], [0, -1], [0, 1]]);
+        } else if (type === "q") {
+          slide(from, [[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]]);
+        } else if (type === "k") {
+          [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+            .forEach(([dr, dc]) => add(from, { r: r + dr, c: c + dc }));
+        }
+      }
+    }
+    return moves;
+  }
+
+  function xadrezKingPos(board, color) {
+    const king = color === "w" ? "K" : "k";
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        if (board[r][c] === king) return { r, c };
+      }
+    }
+    return null;
+  }
+
+  function xadrezEmXeque(board, color) {
+    const king = xadrezKingPos(board, color);
+    if (!king) return true;
+    const enemy = color === "w" ? "b" : "w";
+    return xadrezPseudoMoves(board, enemy).some((m) => m.to.r === king.r && m.to.c === king.c);
+  }
+
+  function xadrezLegalMoves(board, color) {
+    return xadrezPseudoMoves(board, color).filter((move) => !xadrezEmXeque(xadrezMoveBoard(board, move), color));
+  }
+
+  function xadrezEval(board) {
+    let score = 0;
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const piece = board[r][c];
+        if (!piece) continue;
+        const value = XADREZ_VALOR[piece.toLowerCase()] || 0;
+        const center = 14 - (Math.abs(3.5 - r) + Math.abs(3.5 - c)) * 2;
+        score += (xadrezCor(piece) === "b" ? 1 : -1) * (value + center);
+      }
+    }
+    return score + (xadrezLegalMoves(board, "b").length - xadrezLegalMoves(board, "w").length) * 3;
+  }
+
+  function xadrezBestMove(board, depth = 2) {
+    const moves = xadrezLegalMoves(board, "b").sort((a, b) => (XADREZ_VALOR[(b.capture || "").toLowerCase()] || 0) - (XADREZ_VALOR[(a.capture || "").toLowerCase()] || 0));
+    let best = moves[0] || null;
+    let bestScore = -Infinity;
+    const minimax = (pos, d, color, alpha, beta) => {
+      const legal = xadrezLegalMoves(pos, color);
+      if (!d || !legal.length) {
+        if (!legal.length && xadrezEmXeque(pos, color)) return color === "b" ? -99999 : 99999;
+        return xadrezEval(pos);
+      }
+      if (color === "b") {
+        let value = -Infinity;
+        for (const move of legal) {
+          value = Math.max(value, minimax(xadrezMoveBoard(pos, move), d - 1, "w", alpha, beta));
+          alpha = Math.max(alpha, value);
+          if (alpha >= beta) break;
+        }
+        return value;
+      }
+      let value = Infinity;
+      for (const move of legal) {
+        value = Math.min(value, minimax(xadrezMoveBoard(pos, move), d - 1, "b", alpha, beta));
+        beta = Math.min(beta, value);
+        if (alpha >= beta) break;
+      }
+      return value;
+    };
+    moves.forEach((move) => {
+      const score = minimax(xadrezMoveBoard(board, move), depth - 1, "w", -Infinity, Infinity);
+      if (score > bestScore) {
+        bestScore = score;
+        best = move;
+      }
+    });
+    return best;
+  }
+
+  function xadrezSalvarResultado(resultado) {
+    try {
+      if (!window.firebase || !firebase.database) return;
+      const uid = getOrCreatePlayerId();
+      const name = getPlayerName();
+      if (!name) return;
+      const now = Date.now();
+      const db = firebase.database();
+      db.ref("jogos/xadrez/partidas").push({
+        uid,
+        name,
+        resultado,
+        date: capivarinhaDateKey(new Date(now)),
+        ts: now
+      }).catch(() => { });
+      db.ref(`jogos/xadrez/users/${uid}`).transaction((curr) => {
+        const base = curr || { wins: 0, losses: 0, draws: 0 };
+        const wins = Number(base.wins || 0) + (resultado === "win" ? 1 : 0);
+        const losses = Number(base.losses || 0) + (resultado === "loss" ? 1 : 0);
+        const draws = Number(base.draws || 0) + (resultado === "draw" ? 1 : 0);
+        return {
+          ...base,
+          name,
+          wins,
+          losses,
+          draws,
+          points: wins * 3 + draws - losses,
+          updatedAt: now,
+          lastDate: capivarinhaDateKey(new Date(now))
+        };
+      });
+    } catch (e) {
+      console.error("Erro ao salvar ranking do xadrez:", e);
+    }
+  }
+
+  function mostrarRankingXadrez() {
+    if (location.hash !== "#ranking-xadrez") location.hash = "#ranking-xadrez";
+    const area = document.querySelector(".content_area");
+    area.innerHTML = `
+      <div class="page-header">
+        <h2>♟️ Ranking Xadrez</h2>
+        <i class="fa-solid fa-share-nodes share-btn" onclick="compartilharPagina('#ranking-xadrez','Ranking Xadrez','Veja o ranking do xadrez no Olá Carlópolis!')"></i>
+      </div>
+      <div class="rank-wrap" style="padding:8px 12px">
+        <div class="rank-title">🏆 Pontuação <span><br>Vitória +3, empate +1, derrota -1</span></div>
+        <ul id="xadrezRankList" class="rank-list"></ul>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-rank" onclick="location.hash='xadrez'; mostrarXadrez()">Voltar ao Xadrez</button>
+          <button class="btn-rank" onclick="location.hash='jogos'; mostrarJogos()">Jogos</button>
+        </div>
+      </div>`;
+    const ul = document.getElementById("xadrezRankList");
+    if (!window.firebase || !firebase.database) {
+      ul.innerHTML = `<li class="rank-empty">Firebase indisponível.</li>`;
+      return;
+    }
+    const myUid = getOrCreatePlayerId();
+    firebase.database().ref("jogos/xadrez/users").orderByChild("points").limitToLast(50).on("value", (snap) => {
+      const arr = [];
+      snap.forEach((child) => {
+        const v = child.val() || {};
+        arr.push({ ...v, _id: child.key });
+      });
+      arr.sort((a, b) => Number(b.points || 0) - Number(a.points || 0) || Number(b.wins || 0) - Number(a.wins || 0));
+      if (!arr.length) {
+        ul.innerHTML = `<li class="rank-empty">Ninguém no ranking ainda. Vença uma partida para aparecer aqui.</li>`;
+        return;
+      }
+      ul.innerHTML = arr.map((it, index) => {
+        const pos = index + 1;
+        const medalClass = pos === 1 ? "medal-1" : pos === 2 ? "medal-2" : pos === 3 ? "medal-3" : "";
+        return `
+          <li class="rank-item rank-item--compact ${it._id === myUid ? "me" : ""}">
+            <div class="rank-pos ${medalClass}">${pos}</div>
+            <div class="rank-main">
+              <div class="rank-row">
+                <div class="rank-name">${escapeGameHtml(it.name || "Jogador")}</div>
+                <div class="score-number">${Number(it.points || 0)} pts</div>
+              </div>
+              <div class="rank-date">V ${Number(it.wins || 0)} • E ${Number(it.draws || 0)} • D ${Number(it.losses || 0)} • ${capivarinhaFormatDateBR(it.lastDate)}</div>
+            </div>
+          </li>`;
+      }).join("");
+    });
+  }
+
+  function mostrarXadrez() {
+    if (location.hash !== "#xadrez") location.hash = "#xadrez";
+    const area = document.querySelector(".content_area");
+    area.innerHTML = `
+      <div class="game-wrap chess-game">
+        <div class="game-header">
+          <h2>Xadrez</h2>
+          <div class="flappy-ui">
+            <div class="scorebox">Você: Brancas</div>
+            <div class="scorebox">IA: Intermediária</div>
+          </div>
+        </div>
+        <div id="xadrezConfigInfo" class="chess-tournament-card hidden"></div>
+        <div id="xadrezStatus" class="chess-status">Sua vez. Toque em uma peça branca.</div>
+        <div id="xadrezBoard" class="chess-board" aria-label="Tabuleiro de xadrez"></div>
+        <div class="flappy-buttons">
+          <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
+          <button id="xadrezRestart" type="button">Reiniciar</button>
+          <button id="xadrezRank" class="btn-rank" type="button">🏆 Ranking</button>
+        </div>
+      </div>`;
+
+    let board = xadrezBoardInicial();
+    let selected = null;
+    let legal = [];
+    let locked = false;
+    let finished = false;
+    const boardEl = document.getElementById("xadrezBoard");
+    const statusEl = document.getElementById("xadrezStatus");
+
+    const setStatus = (text) => { statusEl.textContent = text; };
+    const finish = (text, result) => {
+      finished = true;
+      locked = false;
+      setStatus(text);
+      xadrezSalvarResultado(result);
+      render();
+    };
+    const checkGameEnd = (color) => {
+      const moves = xadrezLegalMoves(board, color);
+      if (moves.length) return false;
+      if (xadrezEmXeque(board, color)) {
+        finish(color === "b" ? "Xeque-mate. Você venceu!" : "Xeque-mate. A IA venceu.", color === "b" ? "win" : "loss");
+      } else {
+        finish("Empate por afogamento.", "draw");
+      }
+      return true;
+    };
+    const render = () => {
+      const selectedKey = selected ? `${selected.r}-${selected.c}` : "";
+      const legalKeys = new Set(legal.map((m) => `${m.to.r}-${m.to.c}`));
+      boardEl.innerHTML = board.map((row, r) => row.map((piece, c) => {
+        const dark = (r + c) % 2 ? "dark" : "light";
+        const key = `${r}-${c}`;
+        return `<button type="button" class="chess-square ${dark} ${key === selectedKey ? "selected" : ""} ${legalKeys.has(key) ? "target" : ""}" data-r="${r}" data-c="${c}" ${locked || finished ? "disabled" : ""}>${piece ? XADREZ_PECAS[piece] : ""}</button>`;
+      }).join("")).join("");
+      boardEl.querySelectorAll(".chess-square").forEach((btn) => btn.addEventListener("click", onSquareClick));
+    };
+    const aiTurn = () => {
+      if (checkGameEnd("b")) return;
+      locked = true;
+      setStatus("A IA está pensando...");
+      render();
+      setTimeout(() => {
+        const move = xadrezBestMove(board, 2);
+        if (move) board = xadrezMoveBoard(board, move);
+        locked = false;
+        if (!checkGameEnd("w")) {
+          setStatus(xadrezEmXeque(board, "w") ? "Você está em xeque." : "Sua vez.");
+          render();
+        }
+      }, 250);
+    };
+    function onSquareClick(event) {
+      const r = Number(event.currentTarget.dataset.r);
+      const c = Number(event.currentTarget.dataset.c);
+      const piece = board[r][c];
+      const chosenMove = selected && legal.find((m) => m.to.r === r && m.to.c === c);
+      if (chosenMove) {
+        board = xadrezMoveBoard(board, chosenMove);
+        selected = null;
+        legal = [];
+        render();
+        if (!checkGameEnd("b")) aiTurn();
+        return;
+      }
+      if (piece && xadrezCor(piece) === "w") {
+        selected = { r, c };
+        legal = xadrezLegalMoves(board, "w").filter((m) => m.from.r === r && m.from.c === c);
+        setStatus(legal.length ? "Escolha a casa de destino." : "Essa peça não tem jogadas legais.");
+      } else {
+        selected = null;
+        legal = [];
+        setStatus("Toque em uma peça branca.");
+      }
+      render();
+    }
+
+    document.getElementById("xadrezRestart")?.addEventListener("click", () => {
+      board = xadrezBoardInicial();
+      selected = null;
+      legal = [];
+      locked = false;
+      finished = false;
+      setStatus("Sua vez. Toque em uma peça branca.");
+      render();
+    });
+    document.getElementById("xadrezRank")?.addEventListener("click", () => mostrarRankingXadrez());
+    if (window.firebase && firebase.database) {
+      firebase.database().ref("jogos/xadrez/config").once("value").then((snap) => {
+        const cfg = snap.val() || {};
+        const card = document.getElementById("xadrezConfigInfo");
+        if (!card || cfg.ativo === false || (!cfg.campeonatoNome && !cfg.premio)) return;
+        card.classList.remove("hidden");
+        card.innerHTML = `
+          ${cfg.campeonatoNome ? `<strong>${escapeGameHtml(cfg.campeonatoNome)}</strong>` : ""}
+          ${cfg.premio ? `<span>Prêmio: ${escapeGameHtml(cfg.premio)}</span>` : ""}`;
+      }).catch(() => { });
+    }
+    render();
+  }
+
 
 
   ///
@@ -6469,12 +6898,16 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     if (h === "jogos") mostrarJogos();
     else if (h === "tetrix") mostrarTetrix();
     else if (h === "canos") mostrarCanos();
+    else if (h === "xadrez") mostrarXadrez();
+    else if (h === "ranking-xadrez") mostrarRankingXadrez();
   });
   window.addEventListener("hashchange", () => {
     const h = (location.hash || "").replace("#", "");
     if (h === "jogos") mostrarJogos();
     else if (h === "tetrix") mostrarTetrix();
     else if (h === "canos") mostrarCanos();
+    else if (h === "xadrez") mostrarXadrez();
+    else if (h === "ranking-xadrez") mostrarRankingXadrez();
   });
 
 
@@ -20441,8 +20874,10 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
     if (h === "#promocoes") { return mostrarPromocoes(); }
     if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
+    if (h === "#xadrez") { return mostrarXadrez(); }
     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }
+    if (h === "#ranking-xadrez") { return mostrarRankingXadrez(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
     if (h === "#automoveis" || h === "#veiculos") { return mostrarAutomoveis(); }
@@ -21415,7 +21850,7 @@ document.addEventListener("click", (event) => {
 function estaNosJogos() {
   // via hash OU pela presença de um container de jogo
   const h = (location.hash || '').toLowerCase();
-  if (h.includes('jogos') || h.includes('tetrix') || h.includes('canos')) return true;
+  if (h.includes('jogos') || h.includes('tetrix') || h.includes('canos') || h.includes('xadrez')) return true;
   return !!document.querySelector('.game-wrap');
 }
 

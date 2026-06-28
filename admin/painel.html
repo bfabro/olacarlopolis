@@ -87,6 +87,7 @@
           <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Sistema</span>
           <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
           <button data-view="novidadesConfig" data-master="true"><i class="fa-solid fa-bell"></i> Novidades do site</button>
+          <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
           <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
         </section>
@@ -1484,6 +1485,32 @@
             <div id="novidadesConfigOptions" class="novidades-config-grid"></div>
             <div class="form-actions">
               <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar configuração</button>
+            </div>
+          </form>
+        </section>
+      </section>
+
+      <section id="xadrezConfigView" class="panel-view hidden">
+        <section class="panel-card">
+          <div class="section-head">
+            <div>
+              <h2>Configuracao do Xadrez</h2>
+              <p>Defina o nome do campeonato e o premio exibidos no jogo publico.</p>
+            </div>
+          </div>
+          <form id="xadrezConfigForm" class="grid-form">
+            <label class="check-row wide">
+              <input id="xadrezConfigActive" type="checkbox">
+              Exibir campeonato no jogo publico
+            </label>
+            <label class="wide">Nome do campeonato
+              <input id="xadrezConfigName" maxlength="80" placeholder="Ex.: Campeonato de Xadrez Ola Carlopolis">
+            </label>
+            <label class="wide">Premio possivel
+              <textarea id="xadrezConfigPrize" rows="3" maxlength="180" placeholder="Ex.: Trofeu, vale-compra ou premiacao a definir"></textarea>
+            </label>
+            <div class="form-actions wide">
+              <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar xadrez</button>
             </div>
           </form>
         </section>
