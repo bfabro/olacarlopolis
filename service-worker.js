@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-06-28-jogos-rank-promos-eventos-v343'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-06-28-promocoes-mobile-sem-corte-v344'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
