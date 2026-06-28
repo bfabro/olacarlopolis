@@ -20792,117 +20792,67 @@ body.vaga-modal-open {
   }
 }
 
-/* ===== Titulos highlighted responsivos v345 ===== */
+/* ===== Titulos highlighted/page-header padrao mobile v347 ===== */
 @media (max-width: 768px) {
   .content_area .highlighted,
   .content_area h2.highlighted,
   .content_area .promo-onde-title,
   .content_area .nota-falecimento-title,
-  .content_area.tela-eventos-mobile > .highlighted {
+  .content_area .page-header {
     box-sizing: border-box !important;
-    width: calc(100% - 16px) !important;
+    width: calc(100% - 20px) !important;
     max-width: 430px !important;
     min-width: 0 !important;
-    margin: 0 auto 12px !important;
-    padding: 9px 12px !important;
+    min-height: 52px !important;
+    height: auto !important;
+    margin: 0 auto 14px !important;
+    padding: 11px 14px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     flex-wrap: wrap !important;
     gap: 8px !important;
+    overflow: visible !important;
     text-align: center !important;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
     word-break: normal !important;
-    line-height: 1.16 !important;
-    font-size: clamp(18px, 5vw, 24px) !important;
+    line-height: 1.2 !important;
+    font-size: clamp(18px, 4.8vw, 23px) !important;
   }
 
   .content_area .highlighted > span,
   .content_area h2.highlighted > span,
   .content_area .promo-onde-title > span,
-  .content_area .nota-falecimento-title > span {
+  .content_area .nota-falecimento-title > span,
+  .content_area .page-header h2 {
     min-width: 0 !important;
     max-width: 100% !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-wrap: wrap !important;
-    gap: 6px !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    text-align: center !important;
-  }
-
-  .content_area .highlighted .btn-share,
-  .content_area .highlighted .share-btn {
-    flex: 0 0 auto !important;
-  }
-}
-
-/* ===== Titulos highlighted/page-header sem corte mobile v346 ===== */
-@media (max-width: 768px) {
-  body.tela-eventos-mobile .content_area,
-  .content_area.tela-eventos-mobile,
-  body.tela-ranking-xadrez-mobile .content_area,
-  .content_area.tela-ranking-xadrez-mobile {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 112px) !important;
-  }
-
-  body.tela-eventos-mobile .content_area > .highlighted,
-  .content_area.tela-eventos-mobile > .highlighted,
-  body.tela-ranking-xadrez-mobile .content_area .page-header,
-  .content_area.tela-ranking-xadrez-mobile .page-header {
-    box-sizing: border-box !important;
-    width: calc(100% - 16px) !important;
-    max-width: 430px !important;
-    min-height: 48px !important;
-    height: auto !important;
-    margin: 0 auto 12px !important;
-    padding: 10px 12px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    overflow: visible !important;
-    text-align: center !important;
-    line-height: 1.18 !important;
-  }
-
-  body.tela-ranking-xadrez-mobile .content_area .page-header {
-    justify-content: space-between !important;
-  }
-
-  body.tela-eventos-mobile .content_area > .highlighted,
-  .content_area.tela-eventos-mobile > .highlighted {
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    font-size: clamp(17px, 4.8vw, 22px) !important;
-  }
-
-  body.tela-ranking-xadrez-mobile .content_area .page-header h2,
-  .content_area.tela-ranking-xadrez-mobile .page-header h2 {
-    min-width: 0 !important;
     margin: 0 !important;
-    flex: 1 1 auto !important;
     white-space: normal !important;
     overflow: visible !important;
     overflow-wrap: anywhere !important;
     text-overflow: clip !important;
     text-align: center !important;
-    line-height: 1.18 !important;
-    font-size: clamp(17px, 4.8vw, 22px) !important;
+    line-height: 1.2 !important;
   }
 
-  body.tela-ranking-xadrez-mobile .content_area .page-header .share-btn,
-  .content_area.tela-ranking-xadrez-mobile .page-header .share-btn {
-    flex: 0 0 34px !important;
-    width: 34px !important;
-    height: 34px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+  .content_area .page-header h2 {
+    flex: 1 1 auto !important;
+    font-size: inherit !important;
+  }
+
+  .content_area .highlighted .btn-share,
+  .content_area .highlighted .share-btn,
+  .content_area .page-header .share-btn {
+    flex: 0 0 auto !important;
     margin: 0 !important;
+  }
+
+  body.tela-eventos-mobile .content_area,
+  .content_area.tela-eventos-mobile,
+  body.tela-ranking-xadrez-mobile .content_area,
+  .content_area.tela-ranking-xadrez-mobile {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 96px) !important;
   }
 }

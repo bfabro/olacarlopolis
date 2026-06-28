@@ -20837,6 +20837,7 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
     if (!category.link) return;
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
+      if (typeof definirTelaContentArea === "function") definirTelaContentArea(null);
       categories.forEach((cat) => cat.link?.classList.remove("active"));
       this.classList.add("active");
 
