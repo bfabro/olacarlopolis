@@ -6550,6 +6550,7 @@ html {
   margin: 12px auto;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
+  grid-auto-rows: 1fr;
   border: 4px solid #1f2937;
   border-radius: 10px;
   overflow: hidden;
@@ -6557,16 +6558,37 @@ html {
 }
 
 .chess-square {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
   min-width: 0;
   min-height: 0;
   display: grid;
   place-items: center;
+  padding: 0;
   border: 0;
   border-radius: 0;
-  font-size: clamp(24px, 8vw, 44px);
+  margin: 0;
+  overflow: hidden;
+  appearance: none;
+  font-size: 0;
   line-height: 1;
   cursor: pointer;
   color: #111827;
+}
+
+.chess-piece {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: clamp(24px, 8vw, 44px);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
 }
 
 .chess-square.light {
@@ -6584,15 +6606,15 @@ html {
 
 .chess-square.target::after {
   content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: 34%;
   height: 34%;
   border-radius: 50%;
   background: rgba(37, 99, 235, .42);
-  position: absolute;
-}
-
-.chess-square {
-  position: relative;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .chess-square:disabled {

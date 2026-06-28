@@ -5091,16 +5091,12 @@ carlopdiesel:"s",
   function mostrarJogos() {
     if (location.hash !== "#jogos") location.hash = "#jogos"; // garante URL compartilhável
     const html = `
-    <div class="page-header">
+<div class="page-header">
   <h2>🎮 Jogos</h2>
   <i class="fa-solid fa-share-nodes share-btn"  onclick="compartilharPagina('#jogos','Jogos','Venha jogar no Olá Carlópolis!')"></i>
 </div>
 
-<div class="games-message">🎉 Divirta-se nesta sessão!</div>
-
-      
-
-      <div class="games-list">
+      <div class="games-list" aria-label="Jogos disponíveis">
        
 
         <!-- Jogo 2: Capivarinha -->
@@ -6734,7 +6730,7 @@ carlopdiesel:"s",
       boardEl.innerHTML = board.map((row, r) => row.map((piece, c) => {
         const dark = (r + c) % 2 ? "dark" : "light";
         const key = `${r}-${c}`;
-        return `<button type="button" class="chess-square ${dark} ${key === selectedKey ? "selected" : ""} ${legalKeys.has(key) ? "target" : ""}" data-r="${r}" data-c="${c}" ${locked || finished ? "disabled" : ""}>${piece ? XADREZ_PECAS[piece] : ""}</button>`;
+        return `<button type="button" class="chess-square ${dark} ${key === selectedKey ? "selected" : ""} ${legalKeys.has(key) ? "target" : ""}" data-r="${r}" data-c="${c}" ${locked || finished ? "disabled" : ""}>${piece ? `<span class="chess-piece">${XADREZ_PECAS[piece]}</span>` : ""}</button>`;
       }).join("")).join("");
       boardEl.querySelectorAll(".chess-square").forEach((btn) => btn.addEventListener("click", onSquareClick));
     };
@@ -6980,9 +6976,9 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   }
 
   // ====== JOGOS (lista) ======
-  document.getElementById("menuJogos").addEventListener("click", function (e) {
+  document.getElementById("menuJogos")?.addEventListener("click", function (e) {
     e.preventDefault();
-    location.hash = "jogos";
+    location.hash = "#jogos";
     mostrarJogos();
   });
 
