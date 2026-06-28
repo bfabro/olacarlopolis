@@ -3944,10 +3944,16 @@ document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener("DOMContentLoaded", tratarHashEstabelecimento);
 
 
-  function abrirPromocoes() {
+  function abrirPromocoes(filtroEstabId = "todos") {
     location.hash = "#promocoes";
+    if (typeof atualizarVisibilidadeHomeQuickBanner === "function") {
+      atualizarVisibilidadeHomeQuickBanner();
+    }
+    if (typeof definirTelaContentArea === "function") {
+      definirTelaContentArea(null);
+    }
     if (typeof mostrarPromocoes === "function") {
-      mostrarPromocoes(); // chama a função já existente que monta a página de promoções
+      mostrarPromocoes(filtroEstabId); // chama a função já existente que monta a página de promoções
     } else {
       console.warn("Função mostrarPromocoes não encontrada.");
     }
@@ -10818,9 +10824,10 @@ plotarPinsImoveis(stateImoveis.filtered);
   // Atalho no menu
   const linkPromo = document.getElementById("menuPromocoes");
   if (linkPromo) {
+    linkPromo.dataset.promoMenuBound = "true";
     linkPromo.addEventListener("click", (e) => {
       e.preventDefault();
-      mostrarPromocoes("todos"); // sempre abre com todas as promoções
+      abrirPromocoes("todos"); // sempre abre com todas as promoções
     });
   }
 
@@ -19670,9 +19677,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       return;
     }
     if (action === "promocoes") {
-      location.hash = "#promocoes";
-      atualizarVisibilidadeHomeQuickBanner();
-      if (typeof mostrarPromocoes === "function") mostrarPromocoes();
+      abrirPromocoes("todos");
     }
   }
 
@@ -19713,9 +19718,9 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   document.getElementById("menuPromocoes").addEventListener("click", function (e) {
+    if (this.dataset.promoMenuBound === "true") return;
     e.preventDefault();
-    location.hash = "promocoes";
-    mostrarPromocoes();
+    abrirPromocoes("todos");
   });
 
   document.getElementById("menuConsultaCEP")?.addEventListener("click", (event) => {
