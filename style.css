@@ -20856,3 +20856,50 @@ body.vaga-modal-open {
     padding-top: calc(env(safe-area-inset-top, 0px) + 96px) !important;
   }
 }
+
+/* ===== Promocoes highlighted igual Automoveis v348 ===== */
+@media (max-width: 768px) {
+  body.tela-promocoes-mobile .content_area,
+  .content_area.tela-promocoes-mobile {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 96px) !important;
+  }
+
+  body.tela-promocoes-mobile .promo-city-screen,
+  .content_area.tela-promocoes-mobile .promo-city-screen {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    align-items: start !important;
+    justify-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  body.tela-promocoes-mobile .promo-city-screen > .promo-onde-title,
+  .content_area.tela-promocoes-mobile .promo-city-screen > .promo-onde-title {
+    grid-column: 1 / -1 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 430px !important;
+    min-height: 52px !important;
+    height: auto !important;
+    margin: 0 auto 2px !important;
+    padding: 11px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    overflow: visible !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    font-size: clamp(18px, 4.8vw, 23px) !important;
+  }
+
+  body.tela-promocoes-mobile .promo-city-screen > .promo-onde-title > span,
+  .content_area.tela-promocoes-mobile .promo-city-screen > .promo-onde-title > span {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere !important;
+    text-align: center !important;
+  }
+}
