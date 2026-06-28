@@ -20437,9 +20437,100 @@ body.vaga-modal-open {
 
 /* ===== Corrigir area dos cards de filtro sob a busca fixa v355 ===== */
 @media (max-width: 768px) {
-  .content_area:has(.imoveis-wrap),
-  .content_area:has(.promo-city-screen) {
+.content_area:has(.imoveis-wrap),
+.content_area:has(.promo-city-screen) {
     margin-top: 0 !important;
     padding-top: 120px !important;
+  }
+}
+
+/* ===== Jogos mobile: evita corte do topo por regras antigas de viewport/menu ===== */
+@media (max-width: 768px) {
+  .content_area:has(.game-wrap) {
+    width: 100% !important;
+    min-height: auto !important;
+    height: auto !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    padding: calc(env(safe-area-inset-top, 0px) + 78px) 10px 18px !important;
+    overflow: visible !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+  }
+
+  .content_area:has(.chess-game) {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 84px) !important;
+  }
+
+  .game-wrap {
+    width: min(100%, 430px) !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    gap: 8px !important;
+  }
+
+  .game-header {
+    width: 100% !important;
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .game-header h2 {
+    margin: 0 !important;
+    text-align: center !important;
+    line-height: 1.1 !important;
+  }
+
+  .chess-game .flappy-ui {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+
+  .chess-game .scorebox {
+    min-height: 34px !important;
+    padding: 6px 8px !important;
+    border-radius: 9px !important;
+    font-size: 12px !important;
+    text-align: center !important;
+  }
+
+  .chess-clock {
+    grid-column: 1 / -1 !important;
+  }
+
+  .chess-status,
+  .chess-tournament-card {
+    width: 100% !important;
+    margin: 6px auto !important;
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+  }
+
+  .chess-board {
+    width: min(92vw, 360px) !important;
+    margin: 6px auto 8px !important;
+    border-width: 3px !important;
+    border-radius: 9px !important;
+  }
+
+  .chess-piece {
+    font-size: clamp(22px, 8vw, 38px) !important;
+  }
+
+  .flappy-buttons {
+    width: 100% !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    margin-top: 4px !important;
+  }
+
+  .flappy-buttons button {
+    min-height: 36px !important;
+    padding: 8px 10px !important;
+    font-size: 12px !important;
   }
 }
