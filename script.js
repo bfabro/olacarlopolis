@@ -5094,7 +5094,8 @@ carlopdiesel:"s",
     const telas = ["tela-promocoes-mobile", "tela-ranking-xadrez-mobile", "tela-jogos-mobile", "tela-canos-mobile", "tela-xadrez-mobile", "tela-eventos-mobile"];
     area.classList.remove(...telas);
     document.body.classList.remove(...telas);
-    if (classe) {
+    const telasIsoladas = new Set(["tela-ranking-xadrez-mobile", "tela-xadrez-mobile"]);
+    if (classe && telasIsoladas.has(classe)) {
       area.classList.add(classe);
       document.body.classList.add(classe);
     }
@@ -5131,7 +5132,7 @@ carlopdiesel:"s",
       window.xadrezTimerId = null;
     }
     if (location.hash !== "#jogos") location.hash = "#jogos"; // garante URL compartilhável
-    definirTelaContentArea("tela-jogos-mobile");
+    definirTelaContentArea(null);
     const html = `
 <div class="page-header">
   <h2>🎮 Jogos</h2>
@@ -5595,7 +5596,7 @@ carlopdiesel:"s",
 
   // ======== CAPIVARINHA (rio serpenteando) — FUNÇÃO ÚNICA, LIMPA ========
   function mostrarCanos() {
-    definirTelaContentArea("tela-canos-mobile");
+    definirTelaContentArea(null);
     const html = `
     <div class="game-wrap">
       <div class="game-header">
@@ -10520,7 +10521,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     html += `</section></div>`;
 
-    const areaPromocoes = definirTelaContentArea("tela-promocoes-mobile");
+    const areaPromocoes = definirTelaContentArea(null);
     areaPromocoes.innerHTML = html;
 
     // Converte "2025-09-15" em "15-09-2025"
@@ -20038,7 +20039,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     const contentArea = document.querySelector(".content_area");
     if (!contentArea) return;
     if (typeof definirTelaContentArea === "function") {
-      definirTelaContentArea(isEventos ? "tela-eventos-mobile" : null);
+      definirTelaContentArea(null);
     }
     document.body.classList.add("home-quick-banner-route-hidden");
 
