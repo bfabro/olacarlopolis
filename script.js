@@ -5088,12 +5088,21 @@ carlopdiesel:"s",
   ///
   /// mostrar jogos
 
+  function definirTelaContentArea(classe) {
+    const area = document.querySelector(".content_area");
+    if (!area) return null;
+    area.classList.remove("tela-promocoes-mobile", "tela-ranking-xadrez-mobile", "tela-jogos-mobile", "tela-canos-mobile", "tela-xadrez-mobile");
+    if (classe) area.classList.add(classe);
+    return area;
+  }
+
   function mostrarJogos() {
     if (window.xadrezTimerId) {
       clearInterval(window.xadrezTimerId);
       window.xadrezTimerId = null;
     }
     if (location.hash !== "#jogos") location.hash = "#jogos"; // garante URL compartilhável
+    definirTelaContentArea("tela-jogos-mobile");
     const html = `
 <div class="page-header">
   <h2>🎮 Jogos</h2>
@@ -5111,7 +5120,7 @@ carlopdiesel:"s",
             <div class="game-desc">Entre na represa, desvie dos objetos e acumule pontos. E confira o Ranking</div>
           </div>
           <div class="game-actions">
-            <button class="btn-play" type="button" data-game="canos" onclick="event.preventDefault(); event.stopPropagation(); location.hash='#canos'; mostrarCanos();">Jogar</button>
+            <button class="btn-play" type="button" data-game="canos">Jogar</button>
           </div>
         </div>
 
@@ -5123,7 +5132,7 @@ carlopdiesel:"s",
             <div class="game-desc">Jogue xadrez, vença partidas e dispute pontos no ranking.</div>
           </div>
           <div class="game-actions">
-            <button class="btn-play" type="button" data-game="xadrez" onclick="event.preventDefault(); event.stopPropagation(); location.hash='#xadrez'; mostrarXadrez();">Jogar</button>
+            <button class="btn-play" type="button" data-game="xadrez">Jogar</button>
           </div>
         </div>
 
@@ -5575,6 +5584,7 @@ carlopdiesel:"s",
 
   // ======== CAPIVARINHA (rio serpenteando) — FUNÇÃO ÚNICA, LIMPA ========
   function mostrarCanos() {
+    definirTelaContentArea("tela-canos-mobile");
     const html = `
     <div class="game-wrap">
       <div class="game-header">
@@ -6634,7 +6644,7 @@ carlopdiesel:"s",
       window.xadrezTimerId = null;
     }
     if (location.hash !== "#ranking-xadrez") location.hash = "#ranking-xadrez";
-    const area = document.querySelector(".content_area");
+    const area = definirTelaContentArea("tela-ranking-xadrez-mobile");
     area.innerHTML = `
       <div class="page-header">
         <h2>♟️ Ranking do Xadrez</h2>
@@ -6693,7 +6703,7 @@ carlopdiesel:"s",
 
   function mostrarXadrez() {
     if (location.hash !== "#xadrez") location.hash = "#xadrez";
-    const area = document.querySelector(".content_area");
+    const area = definirTelaContentArea("tela-xadrez-mobile");
     area.innerHTML = `
       <div class="game-wrap chess-game">
         <div class="game-header">
@@ -7039,7 +7049,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
 
     });
     html += `</div>`;
-    document.querySelector(".content_area").innerHTML = html;
+    const areaOndeComer = definirTelaContentArea(null);
+    areaOndeComer.innerHTML = html;
 
     // 4. Evento do filtro
     document.getElementById("filtroComidas").addEventListener("change", function () {
@@ -10498,7 +10509,8 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     html += `</section></div>`;
 
-    document.querySelector(".content_area").innerHTML = html;
+    const areaPromocoes = definirTelaContentArea("tela-promocoes-mobile");
+    areaPromocoes.innerHTML = html;
 
     // Converte "2025-09-15" em "15-09-2025"
     function formatarDataBR(dataISO) {
@@ -21040,6 +21052,7 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
     if (h === "#promocoes") { return mostrarPromocoes(); }
     if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
+    if (h === "#canos") { return mostrarCanos(); }
     if (h === "#xadrez") { return mostrarXadrez(); }
     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
     if (h === "#ranking-capivarinha") { return mostrarRankingCapivarinha(); }

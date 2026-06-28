@@ -20567,3 +20567,63 @@ body.vaga-modal-open {
     font-size: 12px !important;
   }
 }
+
+/* ===== Ajuste final mobile para telas com topo fixo v341 ===== */
+@media (max-width: 768px) {
+  body.home-quick-banner-hidden .content_area:has(.promo-city-screen),
+  body.home-quick-banner-route-hidden .content_area:has(.promo-city-screen),
+  body.home-quick-banner-hidden .sidebar.close ~ .content_area:has(.promo-city-screen),
+  body.home-quick-banner-route-hidden .sidebar.close ~ .content_area:has(.promo-city-screen),
+  body.home-quick-banner-hidden .content_area.tela-promocoes-mobile,
+  body.home-quick-banner-route-hidden .content_area.tela-promocoes-mobile,
+  body.home-quick-banner-hidden .sidebar.close ~ .content_area.tela-promocoes-mobile,
+  body.home-quick-banner-route-hidden .sidebar.close ~ .content_area.tela-promocoes-mobile,
+  .sidebar.close ~ .content_area.tela-promocoes-mobile,
+  .content_area.tela-promocoes-mobile,
+  .sidebar.close ~ .content_area:has(.promo-city-screen),
+  .content_area:has(.promo-city-screen) {
+    width: 100% !important;
+    min-height: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 6px 18px !important;
+    overflow: visible !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+  }
+
+  body.home-quick-banner-hidden .content_area:has(.xadrez-rank-wrap),
+  body.home-quick-banner-route-hidden .content_area:has(.xadrez-rank-wrap),
+  body.home-quick-banner-hidden .sidebar.close ~ .content_area:has(.xadrez-rank-wrap),
+  body.home-quick-banner-route-hidden .sidebar.close ~ .content_area:has(.xadrez-rank-wrap),
+  body.home-quick-banner-hidden .content_area.tela-ranking-xadrez-mobile,
+  body.home-quick-banner-route-hidden .content_area.tela-ranking-xadrez-mobile,
+  body.home-quick-banner-hidden .sidebar.close ~ .content_area.tela-ranking-xadrez-mobile,
+  body.home-quick-banner-route-hidden .sidebar.close ~ .content_area.tela-ranking-xadrez-mobile,
+  .sidebar.close ~ .content_area.tela-ranking-xadrez-mobile,
+  .content_area.tela-ranking-xadrez-mobile,
+  .sidebar.close ~ .content_area:has(.xadrez-rank-wrap),
+  .content_area:has(.xadrez-rank-wrap) {
+    width: 100% !important;
+    min-height: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: calc(env(safe-area-inset-top, 0px) + 76px) 10px 18px !important;
+    overflow: visible !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+  }
+
+  .content_area.tela-ranking-xadrez-mobile .page-header,
+  .content_area:has(.xadrez-rank-wrap) .page-header {
+    width: min(100%, 430px) !important;
+    margin: 0 auto 10px !important;
+  }
+
+  .content_area.tela-ranking-xadrez-mobile .xadrez-rank-wrap,
+  .content_area:has(.xadrez-rank-wrap) .xadrez-rank-wrap {
+    width: min(100%, 430px) !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+}
