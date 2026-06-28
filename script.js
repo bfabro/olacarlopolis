@@ -5120,7 +5120,7 @@ carlopdiesel:"s",
           <div class="game-icon"><i class="fa-solid fa-chess-knight" style="color:#111827"></i></div>
           <div class="game-body">
             <div class="game-title">Xadrez</div>
-            <div class="game-desc">Jogue contra uma inteligência intermediária e dispute pontos no ranking.</div>
+            <div class="game-desc">Jogue xadrez, vença partidas e dispute pontos no ranking.</div>
           </div>
           <div class="game-actions">
             <button class="btn-play" type="button" data-game="xadrez" onclick="event.preventDefault(); event.stopPropagation(); location.hash='#xadrez'; mostrarXadrez();">Jogar</button>
@@ -6700,7 +6700,6 @@ carlopdiesel:"s",
           <h2>Xadrez</h2>
           <div class="flappy-ui">
             <div class="scorebox">Você: Brancas</div>
-            <div class="scorebox">IA: Intermediária</div>
             <div class="scorebox chess-clock">Tempo: <span id="xadrezTimer">10:00</span></div>
           </div>
         </div>
@@ -6720,6 +6719,7 @@ carlopdiesel:"s",
     let legal = [];
     let locked = false;
     let finished = false;
+    let timerStarted = false;
     let plyCount = 0;
     let remainingSeconds = 10 * 60;
     if (window.xadrezTimerId) clearInterval(window.xadrezTimerId);
@@ -6750,6 +6750,7 @@ carlopdiesel:"s",
       render();
     };
     const startTimer = () => {
+      if (window.xadrezTimerId) clearInterval(window.xadrezTimerId);
       renderTimer();
       window.xadrezTimerId = setInterval(() => {
         if (finished) return;
@@ -6757,6 +6758,11 @@ carlopdiesel:"s",
         renderTimer();
         if (remainingSeconds <= 0) finish("Tempo esgotado. A IA venceu.", "loss");
       }, 1000);
+    };
+    const ensureTimerStarted = () => {
+      if (timerStarted || finished) return;
+      timerStarted = true;
+      startTimer();
     };
     const describeMove = (move) => {
       if (move?.castle === "K") return "Roque P";
@@ -6819,6 +6825,7 @@ carlopdiesel:"s",
       const piece = board[r][c];
       const chosenMove = selected && legal.find((m) => m.to.r === r && m.to.c === c);
       if (chosenMove) {
+        ensureTimerStarted();
         const moveText = describeMove(chosenMove);
         const next = xadrezMovePosition(board, gameState, chosenMove);
         board = next.board;
@@ -6852,10 +6859,10 @@ carlopdiesel:"s",
       legal = [];
       locked = false;
       finished = false;
+      timerStarted = false;
       plyCount = 0;
       remainingSeconds = 10 * 60;
       renderTimer();
-      startTimer();
       setStatus("Sua vez. Toque em uma peça branca.");
       render();
     });
@@ -6871,7 +6878,7 @@ carlopdiesel:"s",
           ${cfg.premio ? `<span>Prêmio: ${escapeGameHtml(cfg.premio)}</span>` : ""}`;
       }).catch(() => { });
     }
-    startTimer();
+    renderTimer();
     render();
   }
 

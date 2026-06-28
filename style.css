@@ -20437,10 +20437,25 @@ body.vaga-modal-open {
 
 /* ===== Corrigir area dos cards de filtro sob a busca fixa v355 ===== */
 @media (max-width: 768px) {
-.content_area:has(.imoveis-wrap),
-.content_area:has(.promo-city-screen) {
+  .content_area:has(.imoveis-wrap) {
     margin-top: 0 !important;
     padding-top: 120px !important;
+  }
+
+  .content_area:has(.promo-city-screen) {
+    width: 100% !important;
+    min-height: auto !important;
+    height: auto !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    padding: calc(env(safe-area-inset-top, 0px) + 72px) 8px 18px !important;
+    overflow: visible !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+  }
+
+  .promo-city-screen {
+    margin-top: 0 !important;
   }
 }
 
@@ -20460,6 +20475,24 @@ body.vaga-modal-open {
 
   .content_area:has(.chess-game) {
     padding-top: calc(env(safe-area-inset-top, 0px) + 84px) !important;
+  }
+
+  .content_area:has(.xadrez-rank-wrap) {
+    width: 100% !important;
+    min-height: auto !important;
+    height: auto !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    padding: calc(env(safe-area-inset-top, 0px) + 84px) 10px 18px !important;
+    overflow: visible !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+  }
+
+  .xadrez-rank-wrap {
+    width: min(100%, 430px) !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
   }
 
   .game-wrap {
