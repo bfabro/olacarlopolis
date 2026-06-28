@@ -6364,20 +6364,69 @@ carlopdiesel:"s",
     return board.map((row) => row.slice());
   }
 
-  function xadrezMoveBoard(board, move) {
-    const next = xadrezClone(board);
-    const piece = next[move.from.r][move.from.c];
-    next[move.from.r][move.from.c] = "";
-    next[move.to.r][move.to.c] = move.promotion || piece;
-    return next;
+  function xadrezEstadoInicial() {
+    return {
+      castling: { wK: true, wQ: true, bK: true, bQ: true },
+      enPassant: null
+    };
   }
 
-  function xadrezPseudoMoves(board, color) {
+  function xadrezCloneState(state = xadrezEstadoInicial()) {
+    return {
+      castling: { ...xadrezEstadoInicial().castling, ...(state.castling || {}) },
+      enPassant: state.enPassant ? { ...state.enPassant } : null
+    };
+  }
+
+  function xadrezMovePosition(board, state, move) {
+    const next = xadrezClone(board);
+    const nextState = xadrezCloneState(state);
+    const piece = next[move.from.r][move.from.c];
+    const target = next[move.to.r][move.to.c];
+    next[move.from.r][move.from.c] = "";
+    if (move.enPassant) next[move.from.r][move.to.c] = "";
+    next[move.to.r][move.to.c] = move.promotion || piece;
+
+    if (move.castle) {
+      const row = move.from.r;
+      if (move.castle === "K") {
+        next[row][5] = next[row][7];
+        next[row][7] = "";
+      } else {
+        next[row][3] = next[row][0];
+        next[row][0] = "";
+      }
+    }
+
+    if (piece === "K") nextState.castling.wK = nextState.castling.wQ = false;
+    if (piece === "k") nextState.castling.bK = nextState.castling.bQ = false;
+    if (piece === "R" && move.from.r === 7 && move.from.c === 0) nextState.castling.wQ = false;
+    if (piece === "R" && move.from.r === 7 && move.from.c === 7) nextState.castling.wK = false;
+    if (piece === "r" && move.from.r === 0 && move.from.c === 0) nextState.castling.bQ = false;
+    if (piece === "r" && move.from.r === 0 && move.from.c === 7) nextState.castling.bK = false;
+    if (target === "R" && move.to.r === 7 && move.to.c === 0) nextState.castling.wQ = false;
+    if (target === "R" && move.to.r === 7 && move.to.c === 7) nextState.castling.wK = false;
+    if (target === "r" && move.to.r === 0 && move.to.c === 0) nextState.castling.bQ = false;
+    if (target === "r" && move.to.r === 0 && move.to.c === 7) nextState.castling.bK = false;
+
+    nextState.enPassant = null;
+    if (piece && piece.toLowerCase() === "p" && Math.abs(move.to.r - move.from.r) === 2) {
+      nextState.enPassant = { r: (move.to.r + move.from.r) / 2, c: move.from.c };
+    }
+
+    return { board: next, state: nextState };
+  }
+
+  function xadrezMoveBoard(board, move, state = xadrezEstadoInicial()) {
+    return xadrezMovePosition(board, state, move).board;
+  }
+
+  function xadrezPseudoMoves(board, color, state = xadrezEstadoInicial(), attacksOnly = false) {
     const moves = [];
-    const add = (from, to, promotion = "") => {
+    const add = (from, to, promotion = "", extra = {}) => {
       if (!xadrezDentro(to.r, to.c)) return;
       const target = board[to.r][to.c];
-      if (!target || xadrezCor(target) !== color) moves.push({ from, to, promotion, capture: target || "" });
+      if (!target || xadrezCor(target) !== color) moves.push({ from, to, promotion, capture: target || "", ...extra });
     };
     const slide = (from, dirs) => {
       dirs.forEach(([dr, dc]) => {
@@ -6406,15 +6455,22 @@ carlopdiesel:"s",
           const dir = color === "w" ? -1 : 1;
           const start = color === "w" ? 6 : 1;
           const promoteRow = color === "w" ? 0 : 7;
-          if (xadrezDentro(r + dir, c) && !board[r + dir][c]) {
+          if (!attacksOnly && xadrezDentro(r + dir, c) && !board[r + dir][c]) {
             add(from, { r: r + dir, c }, r + dir === promoteRow ? (color === "w" ? "Q" : "q") : "");
             if (r === start && !board[r + dir * 2][c]) add(from, { r: r + dir * 2, c });
           }
           [-1, 1].forEach((dc) => {
             const tr = r + dir;
             const tc = c + dc;
+            if (attacksOnly && xadrezDentro(tr, tc)) {
+              moves.push({ from, to: { r: tr, c: tc }, capture: board[tr][tc] || "" });
+              return;
+            }
             if (xadrezDentro(tr, tc) && board[tr][tc] && xadrezCor(board[tr][tc]) !== color) {
               add(from, { r: tr, c: tc }, tr === promoteRow ? (color === "w" ? "Q" : "q") : "");
+            }
+            if (!attacksOnly && state.enPassant && state.enPassant.r === tr && state.enPassant.c === tc) {
+              add(from, { r: tr, c: tc }, "", { enPassant: true, capture: color === "w" ? "p" : "P" });
             }
           });
         } else if (type === "n") {
@@ -6429,6 +6485,23 @@ carlopdiesel:"s",
         } else if (type === "k") {
           [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
             .forEach(([dr, dc]) => add(from, { r: r + dr, c: c + dc }));
+          if (!attacksOnly && !xadrezEmXeque(board, color, state)) {
+            const enemy = color === "w" ? "b" : "w";
+            const row = color === "w" ? 7 : 0;
+            const rights = xadrezCloneState(state).castling;
+            const canKingSide = color === "w" ? rights.wK : rights.bK;
+            const canQueenSide = color === "w" ? rights.wQ : rights.bQ;
+            if (r === row && c === 4 && canKingSide && board[row][7] === (color === "w" ? "R" : "r") && !board[row][5] && !board[row][6]
+              && !xadrezCasaAtacada(board, { r: row, c: 5 }, enemy, state)
+              && !xadrezCasaAtacada(board, { r: row, c: 6 }, enemy, state)) {
+              add(from, { r: row, c: 6 }, "", { castle: "K" });
+            }
+            if (r === row && c === 4 && canQueenSide && board[row][0] === (color === "w" ? "R" : "r") && !board[row][1] && !board[row][2] && !board[row][3]
+              && !xadrezCasaAtacada(board, { r: row, c: 3 }, enemy, state)
+              && !xadrezCasaAtacada(board, { r: row, c: 2 }, enemy, state)) {
+              add(from, { r: row, c: 2 }, "", { castle: "Q" });
+            }
+          }
         }
       }
     }
@@ -6445,18 +6518,25 @@ carlopdiesel:"s",
     return null;
   }
 
-  function xadrezEmXeque(board, color) {
+  function xadrezCasaAtacada(board, square, byColor, state = xadrezEstadoInicial()) {
+    return xadrezPseudoMoves(board, byColor, state, true).some((m) => m.to.r === square.r && m.to.c === square.c);
+  }
+
+  function xadrezEmXeque(board, color, state = xadrezEstadoInicial()) {
     const king = xadrezKingPos(board, color);
     if (!king) return true;
     const enemy = color === "w" ? "b" : "w";
-    return xadrezPseudoMoves(board, enemy).some((m) => m.to.r === king.r && m.to.c === king.c);
+    return xadrezCasaAtacada(board, king, enemy, state);
   }
 
-  function xadrezLegalMoves(board, color) {
-    return xadrezPseudoMoves(board, color).filter((move) => !xadrezEmXeque(xadrezMoveBoard(board, move), color));
+  function xadrezLegalMoves(board, color, state = xadrezEstadoInicial()) {
+    return xadrezPseudoMoves(board, color, state).filter((move) => {
+      const next = xadrezMovePosition(board, state, move);
+      return !xadrezEmXeque(next.board, color, next.state);
+    });
   }
 
-  function xadrezEval(board) {
+  function xadrezEval(board, state = xadrezEstadoInicial()) {
     let score = 0;
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
@@ -6467,23 +6547,24 @@ carlopdiesel:"s",
         score += (xadrezCor(piece) === "b" ? 1 : -1) * (value + center);
       }
     }
-    return score + (xadrezLegalMoves(board, "b").length - xadrezLegalMoves(board, "w").length) * 3;
+    return score + (xadrezLegalMoves(board, "b", state).length - xadrezLegalMoves(board, "w", state).length) * 3;
   }
 
-  function xadrezBestMove(board, depth = 2) {
-    const moves = xadrezLegalMoves(board, "b").sort((a, b) => (XADREZ_VALOR[(b.capture || "").toLowerCase()] || 0) - (XADREZ_VALOR[(a.capture || "").toLowerCase()] || 0));
+  function xadrezBestMove(board, state = xadrezEstadoInicial(), depth = 2) {
+    const moves = xadrezLegalMoves(board, "b", state).sort((a, b) => (XADREZ_VALOR[(b.capture || "").toLowerCase()] || 0) - (XADREZ_VALOR[(a.capture || "").toLowerCase()] || 0));
     let best = moves[0] || null;
     let bestScore = -Infinity;
-    const minimax = (pos, d, color, alpha, beta) => {
-      const legal = xadrezLegalMoves(pos, color);
+    const minimax = (pos, posState, d, color, alpha, beta) => {
+      const legal = xadrezLegalMoves(pos, color, posState);
       if (!d || !legal.length) {
-        if (!legal.length && xadrezEmXeque(pos, color)) return color === "b" ? -99999 : 99999;
-        return xadrezEval(pos);
+        if (!legal.length && xadrezEmXeque(pos, color, posState)) return color === "b" ? -99999 : 99999;
+        return xadrezEval(pos, posState);
       }
       if (color === "b") {
         let value = -Infinity;
         for (const move of legal) {
-          value = Math.max(value, minimax(xadrezMoveBoard(pos, move), d - 1, "w", alpha, beta));
+          const next = xadrezMovePosition(pos, posState, move);
+          value = Math.max(value, minimax(next.board, next.state, d - 1, "w", alpha, beta));
           alpha = Math.max(alpha, value);
           if (alpha >= beta) break;
         }
@@ -6491,14 +6572,16 @@ carlopdiesel:"s",
       }
       let value = Infinity;
       for (const move of legal) {
-        value = Math.min(value, minimax(xadrezMoveBoard(pos, move), d - 1, "b", alpha, beta));
+        const next = xadrezMovePosition(pos, posState, move);
+        value = Math.min(value, minimax(next.board, next.state, d - 1, "b", alpha, beta));
         beta = Math.min(beta, value);
         if (alpha >= beta) break;
       }
       return value;
     };
     moves.forEach((move) => {
-      const score = minimax(xadrezMoveBoard(board, move), depth - 1, "w", -Infinity, Infinity);
+      const next = xadrezMovePosition(board, state, move);
+      const score = minimax(next.board, next.state, depth - 1, "w", -Infinity, Infinity);
       if (score > bestScore) {
         bestScore = score;
         best = move;
@@ -6523,17 +6606,19 @@ carlopdiesel:"s",
         ts: now
       }).catch(() => { });
       db.ref(`jogos/xadrez/users/${uid}`).transaction((curr) => {
-        const base = curr || { wins: 0, losses: 0, draws: 0 };
+        const base = curr || { wins: 0, losses: 0, draws: 0, games: 0 };
         const wins = Number(base.wins || 0) + (resultado === "win" ? 1 : 0);
         const losses = Number(base.losses || 0) + (resultado === "loss" ? 1 : 0);
         const draws = Number(base.draws || 0) + (resultado === "draw" ? 1 : 0);
+        const games = Number(base.games || 0) + 1;
         return {
           ...base,
           name,
           wins,
           losses,
           draws,
-          points: wins * 3 + draws - losses,
+          games,
+          points: wins - losses,
           updatedAt: now,
           lastDate: capivarinhaDateKey(new Date(now))
         };
@@ -6552,7 +6637,7 @@ carlopdiesel:"s",
         <i class="fa-solid fa-share-nodes share-btn" onclick="compartilharPagina('#ranking-xadrez','Ranking Xadrez','Veja o ranking do xadrez no Olá Carlópolis!')"></i>
       </div>
       <div class="rank-wrap" style="padding:8px 12px">
-        <div class="rank-title">🏆 Pontuação <span><br>Vitória +3, empate +1, derrota -1</span></div>
+        <div class="rank-title">🏆 Pontuação <span><br>Vitórias menos derrotas. Empate só conta como partida.</span></div>
         <ul id="xadrezRankList" class="rank-list"></ul>
         <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn-rank" onclick="location.hash='xadrez'; mostrarXadrez()">Voltar ao Xadrez</button>
@@ -6565,13 +6650,13 @@ carlopdiesel:"s",
       return;
     }
     const myUid = getOrCreatePlayerId();
-    firebase.database().ref("jogos/xadrez/users").orderByChild("points").limitToLast(50).on("value", (snap) => {
+    firebase.database().ref("jogos/xadrez/users").on("value", (snap) => {
       const arr = [];
       snap.forEach((child) => {
         const v = child.val() || {};
         arr.push({ ...v, _id: child.key });
       });
-      arr.sort((a, b) => Number(b.points || 0) - Number(a.points || 0) || Number(b.wins || 0) - Number(a.wins || 0));
+      arr.sort((a, b) => (Number(b.wins || 0) - Number(b.losses || 0)) - (Number(a.wins || 0) - Number(a.losses || 0)) || Number(b.wins || 0) - Number(a.wins || 0) || Number(a.losses || 0) - Number(b.losses || 0));
       if (!arr.length) {
         ul.innerHTML = `<li class="rank-empty">Ninguém no ranking ainda. Vença uma partida para aparecer aqui.</li>`;
         return;
@@ -6585,9 +6670,9 @@ carlopdiesel:"s",
             <div class="rank-main">
               <div class="rank-row">
                 <div class="rank-name">${escapeGameHtml(it.name || "Jogador")}</div>
-                <div class="score-number">${Number(it.points || 0)} pts</div>
+                <div class="score-number">${Number(it.wins || 0) - Number(it.losses || 0)} pts</div>
               </div>
-              <div class="rank-date">V ${Number(it.wins || 0)} • E ${Number(it.draws || 0)} • D ${Number(it.losses || 0)} • ${capivarinhaFormatDateBR(it.lastDate)}</div>
+              <div class="rank-date">V ${Number(it.wins || 0)} • D ${Number(it.losses || 0)} • Partidas ${Number(it.games || 0) || (Number(it.wins || 0) + Number(it.losses || 0) + Number(it.draws || 0))} • ${capivarinhaFormatDateBR(it.lastDate)}</div>
             </div>
           </li>`;
       }).join("");
@@ -6617,6 +6702,7 @@ carlopdiesel:"s",
       </div>`;
 
     let board = xadrezBoardInicial();
+    let gameState = xadrezEstadoInicial();
     let selected = null;
     let legal = [];
     let locked = false;
@@ -6633,9 +6719,9 @@ carlopdiesel:"s",
       render();
     };
     const checkGameEnd = (color) => {
-      const moves = xadrezLegalMoves(board, color);
+      const moves = xadrezLegalMoves(board, color, gameState);
       if (moves.length) return false;
-      if (xadrezEmXeque(board, color)) {
+      if (xadrezEmXeque(board, color, gameState)) {
         finish(color === "b" ? "Xeque-mate. Você venceu!" : "Xeque-mate. A IA venceu.", color === "b" ? "win" : "loss");
       } else {
         finish("Empate por afogamento.", "draw");
@@ -6658,11 +6744,15 @@ carlopdiesel:"s",
       setStatus("A IA está pensando...");
       render();
       setTimeout(() => {
-        const move = xadrezBestMove(board, 2);
-        if (move) board = xadrezMoveBoard(board, move);
+        const move = xadrezBestMove(board, gameState, 2);
+        if (move) {
+          const next = xadrezMovePosition(board, gameState, move);
+          board = next.board;
+          gameState = next.state;
+        }
         locked = false;
         if (!checkGameEnd("w")) {
-          setStatus(xadrezEmXeque(board, "w") ? "Você está em xeque." : "Sua vez.");
+          setStatus(xadrezEmXeque(board, "w", gameState) ? "Você está em xeque." : "Sua vez.");
           render();
         }
       }, 250);
@@ -6673,7 +6763,9 @@ carlopdiesel:"s",
       const piece = board[r][c];
       const chosenMove = selected && legal.find((m) => m.to.r === r && m.to.c === c);
       if (chosenMove) {
-        board = xadrezMoveBoard(board, chosenMove);
+        const next = xadrezMovePosition(board, gameState, chosenMove);
+        board = next.board;
+        gameState = next.state;
         selected = null;
         legal = [];
         render();
@@ -6682,7 +6774,7 @@ carlopdiesel:"s",
       }
       if (piece && xadrezCor(piece) === "w") {
         selected = { r, c };
-        legal = xadrezLegalMoves(board, "w").filter((m) => m.from.r === r && m.from.c === c);
+        legal = xadrezLegalMoves(board, "w", gameState).filter((m) => m.from.r === r && m.from.c === c);
         setStatus(legal.length ? "Escolha a casa de destino." : "Essa peça não tem jogadas legais.");
       } else {
         selected = null;
@@ -6694,6 +6786,7 @@ carlopdiesel:"s",
 
     document.getElementById("xadrezRestart")?.addEventListener("click", () => {
       board = xadrezBoardInicial();
+      gameState = xadrezEstadoInicial();
       selected = null;
       legal = [];
       locked = false;
