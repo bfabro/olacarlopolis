@@ -9858,12 +9858,22 @@ plotarPinsImoveis(stateImoveis.filtered);
   // ===== CEP: rota #cep + busca por endereço (ViaCEP) [v2 layout] =====
   function stripDiacritics(s) { return String(s || "").normalize("NFD").replace(/\p{Diacritic}/gu, ""); }
 
-  function mostrarConsultaCEP(event) {
+  function mostrarConsultaCEP(event, options = {}) {
     event?.preventDefault?.();
     const area = document.querySelector(".content_area");
     document.body.classList.add("home-quick-banner-route-hidden");
-    if (location.hash !== "#cep") location.hash = "#cep";
     if (!area) return;
+    area.classList.remove("hidden");
+
+    const hashAtual = (location.hash || "").toLowerCase();
+    const jaEstaNaRotaCep = hashAtual.startsWith("#cep");
+    if (!jaEstaNaRotaCep) {
+      location.hash = "#cep";
+    } else if (!options.force && area.dataset.currentRoute === "cep" && area.querySelector("#cepForm")) {
+      return;
+    }
+
+    area.dataset.currentRoute = "cep";
 
     area.innerHTML = `
     <div class="cep-wrap">
@@ -19725,6 +19735,9 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   document.getElementById("menuConsultaCEP")?.addEventListener("click", (event) => {
     event.preventDefault();
+    if (window.innerWidth < 768) {
+      sidebar?.classList.add("close", "hoverable");
+    }
     mostrarConsultaCEP();
   });
 
