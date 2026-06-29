@@ -20576,3 +20576,51 @@ body.vaga-modal-open {
     white-space: nowrap !important;
   }
 }
+
+/* ===== Protecao global contra telas cortadas abaixo da navbar/busca ===== */
+:root {
+  --content-route-offset-desktop: 120px;
+  --content-route-offset-mobile: calc(env(safe-area-inset-top, 0px) + 120px);
+}
+
+body.home-quick-banner-hidden .content_area,
+body.home-quick-banner-route-hidden .content_area,
+body.home-quick-banner-hidden .sidebar.close ~ .content_area,
+body.home-quick-banner-route-hidden .sidebar.close ~ .content_area,
+body.home-quick-banner-hidden .home-quick-banner + .content_area,
+body.home-quick-banner-route-hidden .home-quick-banner + .content_area,
+body.home-quick-banner-hidden .sidebar.close ~ .home-quick-banner + .content_area,
+body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .content_area,
+body.home-quick-banner-hidden .home-quick-banner + .home-cards-intro + .content_area,
+body.home-quick-banner-route-hidden .home-quick-banner + .home-cards-intro + .content_area,
+body.home-quick-banner-hidden .sidebar.close ~ .home-quick-banner + .home-cards-intro + .content_area,
+body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-cards-intro + .content_area {
+  margin-top: var(--content-route-offset-desktop) !important;
+}
+
+@media (max-width: 768px) {
+  body.home-quick-banner-hidden .content_area,
+  body.home-quick-banner-route-hidden .content_area,
+  body.home-quick-banner-hidden .sidebar.close ~ .content_area,
+  body.home-quick-banner-route-hidden .sidebar.close ~ .content_area,
+  body.home-quick-banner-hidden .home-quick-banner + .content_area,
+  body.home-quick-banner-route-hidden .home-quick-banner + .content_area,
+  body.home-quick-banner-hidden .sidebar.close ~ .home-quick-banner + .content_area,
+  body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .content_area,
+  body.home-quick-banner-hidden .home-quick-banner + .home-cards-intro + .content_area,
+  body.home-quick-banner-route-hidden .home-quick-banner + .home-cards-intro + .content_area,
+  body.home-quick-banner-hidden .sidebar.close ~ .home-quick-banner + .home-cards-intro + .content_area,
+  body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-cards-intro + .content_area {
+    margin-top: var(--content-route-offset-mobile) !important;
+    padding-top: 1px !important;
+    overflow: visible !important;
+  }
+
+  body.home-quick-banner-hidden .content_area:has(.imoveis-wrap),
+  body.home-quick-banner-route-hidden .content_area:has(.imoveis-wrap),
+  body.home-quick-banner-hidden .content_area:has(.promo-city-screen),
+  body.home-quick-banner-route-hidden .content_area:has(.promo-city-screen) {
+    margin-top: var(--content-route-offset-mobile) !important;
+    padding-top: 1px !important;
+  }
+}
