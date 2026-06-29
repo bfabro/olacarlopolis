@@ -24125,22 +24125,40 @@ function mostrarCombustivel() {
       const dataFimOk = !filters.dataFim || data <= filters.dataFim;
       return tipoOk && buscaOk && dataInicioOk && dataFimOk;
     });
+    const filtrosAbertos = Boolean(window.__newsMenuFiltersOpen);
     contentArea.innerHTML = `<section class="home-news-menu-page novidades-cidade-wrap home-section-wrap">
       <div class="novidades-cidade-resumo home-section-resumo">
         <strong><i class="fa-solid fa-newspaper"></i> Notícias da Cidade</strong>
         <span>Acompanhe as principais atualizações de Carlópolis e região.</span>
       </div>
-      <div class="home-news-filter-card">
+      <section class="home-news-filter-toolbar imoveis-filter-toolbar">
+        <button id="newsToggleFiltros" class="im-filter-toggle news-filter-toggle" type="button" aria-expanded="${filtrosAbertos ? "true" : "false"}">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Filtro</span>
+          <i class="fa-solid ${filtrosAbertos ? "fa-chevron-up" : "fa-chevron-down"}"></i>
+        </button>
+      </section>
+      <aside id="newsMenuFilters" class="home-news-filter-card news-filter-panel ${filtrosAbertos ? "" : "news-filter-collapsed"}">
         <label><span>Buscar</span><input id="newsMenuSearch" type="search" value="${escNews(filters.busca || "")}" placeholder="Título, resumo ou descrição"></label>
         <label><span>Tipo</span><select id="newsMenuType">${tipos.map((tipo) => `<option value="${escNews(tipo)}" ${tipo === filters.tipo ? "selected" : ""}>${escNews(tipo)}</option>`).join("")}</select></label>
         <label><span>Data de</span><input id="newsMenuStart" type="date" value="${escNews(filters.dataInicio || "")}"></label>
         <label><span>Data até</span><input id="newsMenuEnd" type="date" value="${escNews(filters.dataFim || "")}"></label>
         <button id="newsMenuClear" type="button"><i class="fa-solid fa-rotate-left"></i> Limpar</button>
-      </div>
+      </aside>
       <div class="grade-divulgacao home-news-menu-grid">
         ${list.length ? list.map((item) => `<article class="card-divulgacao-pequeno home-news-menu-card" data-open-news="${escNews(item.slug || item.id)}"><div class="card-divulgacao-img-wrap">${image(item) ? `<img src="${escNews(image(item))}" alt="${escNews(item.titulo)}" loading="lazy">` : placeholder(item)}</div><div class="card-divulgacao-info"><span class="card-divulgacao-categoria">${escNews(item.tipoInformacao || "Notícia")}</span><div class="card-divulgacao-linha"><h4>${escNews(item.titulo)}</h4></div><small>${escNews(dateTime(item))}</small></div></article>`).join("") : `<p class="news-empty">Nenhuma notícia publicada no momento.</p>`}
       </div>
     </section>`;
+    const toggleFiltrosNoticias = contentArea.querySelector("#newsToggleFiltros");
+    const filtrosNoticiasBox = contentArea.querySelector("#newsMenuFilters");
+    toggleFiltrosNoticias?.addEventListener("click", () => {
+      const aberto = filtrosNoticiasBox?.classList.toggle("news-filter-collapsed") === false;
+      window.__newsMenuFiltersOpen = aberto;
+      toggleFiltrosNoticias.setAttribute("aria-expanded", aberto ? "true" : "false");
+      const icon = toggleFiltrosNoticias.querySelector(".fa-chevron-down, .fa-chevron-up");
+      icon?.classList.toggle("fa-chevron-up", aberto);
+      icon?.classList.toggle("fa-chevron-down", !aberto);
+    });
     const updateFilters = (event) => {
       const focusId = event?.target?.id || "";
       const cursorStart = event?.target?.selectionStart || 0;

@@ -20624,3 +20624,44 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
     padding-top: 1px !important;
   }
 }
+
+/* ===== Noticias da Cidade: filtros retraidos no padrao Imoveis v356 ===== */
+.home-news-menu-page {
+  width: min(980px, 100%) !important;
+  margin: 0 auto !important;
+}
+
+.home-news-filter-toolbar {
+  display: flex !important;
+  justify-content: center !important;
+  width: min(860px, calc(100% - 16px)) !important;
+  margin: 0 auto 10px !important;
+}
+
+.news-filter-toggle {
+  min-width: 132px !important;
+}
+
+#newsMenuFilters.news-filter-collapsed {
+  display: none !important;
+}
+
+#newsMenuFilters.home-news-filter-card {
+  width: min(860px, calc(100% - 16px)) !important;
+  margin: 0 auto 14px !important;
+}
+
+.home-news-menu-grid.grade-divulgacao {
+  width: min(980px, 100%) !important;
+  margin: 0 auto !important;
+}
+
+@media (max-width: 720px) {
+  #newsMenuFilters.home-news-filter-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .home-news-filter-toolbar {
+    justify-content: flex-start !important;
+  }
+}
