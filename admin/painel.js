@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 375,
-  label: "v381",
-  data: "2026-06-27",
-  nota: "Arte premium de veiculos teve texto Oportunidade Premium centralizado no topo."
+  numero: 376,
+  label: "v382",
+  data: "2026-07-01",
+  nota: "Geracao de boletos ganhou fallback para celulares quando a nova aba e bloqueada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4943,6 +4943,25 @@ function printableBoletoHtml(client, invoice, paymentConfig = {}) {
   `;
 }
 
+function showBoletoOpenFallback(url, fileName = "boletos.html") {
+  document.querySelector(".boleto-open-fallback")?.remove();
+  const box = document.createElement("div");
+  box.className = "boleto-open-fallback";
+  box.innerHTML = `
+    <div class="boleto-open-card">
+      <strong>Boleto gerado</strong>
+      <p>Se o celular bloqueou a abertura automática, toque abaixo para abrir ou baixar o boleto.</p>
+      <div>
+        <a href="${escapeAttr(url)}" target="_blank" rel="noopener">Abrir boleto</a>
+        <a href="${escapeAttr(url)}" download="${escapeAttr(fileName)}">Baixar arquivo</a>
+        <button type="button">Fechar</button>
+      </div>
+    </div>
+  `;
+  box.querySelector("button")?.addEventListener("click", () => box.remove());
+  document.body.appendChild(box);
+}
+
 function openPrintableBoletos(client, invoices = []) {
   const paymentConfig = state.pagamentoSistema || {};
   if (!paymentConfig.pixChave) {
@@ -4956,18 +4975,13 @@ function openPrintableBoletos(client, invoices = []) {
   }
 
   const printWindow = window.open("", "_blank", "width=1000,height=850");
-  if (!printWindow) {
-    showToast("O navegador bloqueou a janela do boleto. Libere pop-ups e tente novamente.");
-    return;
-  }
 
   const sheets = [];
   for (let index = 0; index < validInvoices.length; index += 3) {
     sheets.push(`<main class="sheet">${validInvoices.slice(index, index + 3).map((invoice) => printableBoletoHtml(client, invoice, paymentConfig)).join("")}</main>`);
   }
 
-  printWindow.document.open();
-  printWindow.document.write(`<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
   <html lang="pt-BR">
   <head>
     <meta charset="UTF-8">
@@ -4998,9 +5012,29 @@ function openPrintableBoletos(client, invoices = []) {
     <div class="print-actions"><button onclick="window.print()">Imprimir / Salvar em PDF</button><button onclick="window.close()">Fechar</button></div>
     ${sheets.join("")}
   </body>
-  </html>`);
-  printWindow.document.close();
-  printWindow.focus();
+  </html>`;
+
+  try {
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    return;
+  } catch (error) {
+    try { printWindow.close(); } catch (e) { }
+  }
+
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const fileName = `boletos-${slugify(client.nome || client.id || "cliente")}-${Date.now()}.html`;
+  const opened = window.open(url, "_blank", "noopener,noreferrer");
+  if (opened) {
+    try { opened.focus(); } catch (e) { }
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    return;
+  }
+  showBoletoOpenFallback(url, fileName);
+  showToast("Boleto gerado. Toque em Abrir boleto para visualizar no celular.");
 }
 
 function buildDestaquePix(client, paymentConfig = {}) {
