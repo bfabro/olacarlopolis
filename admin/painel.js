@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 376,
-  label: "v382",
+  numero: 377,
+  label: "v383",
   data: "2026-07-01",
-  nota: "Geracao de boletos ganhou fallback para celulares quando a nova aba e bloqueada."
+  nota: "Boletos no celular agora abrem por link interno e Pix mostra o valor total gerado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4974,8 +4974,6 @@ function openPrintableBoletos(client, invoices = []) {
     return;
   }
 
-  const printWindow = window.open("", "_blank", "width=1000,height=850");
-
   const sheets = [];
   for (let index = 0; index < validInvoices.length; index += 3) {
     sheets.push(`<main class="sheet">${validInvoices.slice(index, index + 3).map((invoice) => printableBoletoHtml(client, invoice, paymentConfig)).join("")}</main>`);
@@ -5014,6 +5012,19 @@ function openPrintableBoletos(client, invoices = []) {
   </body>
   </html>`;
 
+  const fileName = `boletos-${slugify(client.nome || client.id || "cliente")}-${Date.now()}.html`;
+  const isMobileBoleto = window.matchMedia?.("(max-width: 768px)")?.matches
+    || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
+  if (isMobileBoleto) {
+    const mobileBlob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const mobileUrl = URL.createObjectURL(mobileBlob);
+    showBoletoOpenFallback(mobileUrl, fileName);
+    showToast("Boleto gerado. Toque em Abrir boleto ou Baixar arquivo.");
+    return;
+  }
+
+  const printWindow = window.open("", "_blank", "width=1000,height=850");
+
   try {
     printWindow.document.open();
     printWindow.document.write(html);
@@ -5026,7 +5037,6 @@ function openPrintableBoletos(client, invoices = []) {
 
   const blob = new Blob([html], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
-  const fileName = `boletos-${slugify(client.nome || client.id || "cliente")}-${Date.now()}.html`;
   const opened = window.open(url, "_blank", "noopener,noreferrer");
   if (opened) {
     try { opened.focus(); } catch (e) { }
@@ -12748,6 +12758,7 @@ function renderClientInvoices() {
           <button id="generateFeaturedInvoicePix" type="button"><i class="fa-solid fa-qrcode"></i> Gerar Pix do destaque</button>
         </div>
         <div id="featuredInvoicePixBox" class="pix-box invoice-selected-pix hidden">
+          <div class="pix-generated-total"><span>Valor do Pix gerado</span><strong id="featuredInvoicePixTotal">${moneyBR(featuredPix.valorDestaque)}</strong></div>
           <img id="featuredInvoiceQr" alt="QR Code Pix destaque" loading="lazy" decoding="async">
           <label class="wide">Codigo Pix do destaque<textarea id="featuredInvoicePixCode" rows="5" readonly></textarea></label>
           <div class="list-meta wide">Chave Pix: <strong>${escapeHtml(paymentConfig.pixChave || "")}</strong></div>
@@ -12868,6 +12879,7 @@ function renderClientInvoices() {
             <button id="generateClientBoletos" type="button" class="ghost-button"><i class="fa-solid fa-print"></i> Gerar boletos A4</button>
           </div>
           <div id="selectedInvoicePixBox" class="pix-box invoice-selected-pix hidden">
+            <div class="pix-generated-total"><span>Valor do Pix gerado</span><strong id="selectedInvoicePixTotalGenerated">${moneyBR(totalAberto)}</strong></div>
             <img id="selectedInvoiceQr" alt="QR Code Pix" loading="lazy" decoding="async">
             <label class="wide">Codigo Pix dos meses selecionados<textarea id="selectedInvoicePixCode" rows="5" readonly></textarea></label>
             <div class="list-meta wide">Chave Pix: <strong>${escapeHtml(paymentConfig.pixChave || "")}</strong></div>
@@ -12924,6 +12936,7 @@ function renderClientInvoices() {
       return;
     }
     if (selectedPixCode) selectedPixCode.value = unified.pixCode;
+    if ($("selectedInvoicePixTotalGenerated")) $("selectedInvoicePixTotalGenerated").textContent = moneyBR(selectedTotal);
     if (selectedQr) {
       selectedQr.onerror = () => {
         selectedQr.onerror = null;

@@ -1969,6 +1969,32 @@ button[type="submit"]:hover,
   resize: vertical;
 }
 
+.pix-generated-total {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  background: #f0fdf4;
+}
+
+.pix-generated-total span {
+  color: #166534;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pix-generated-total strong {
+  color: #047857;
+  font-size: 20px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .profile-upload-panel {
   border: 1px solid var(--line);
   border-left: 5px solid var(--section-accent, #8b5cf6);
