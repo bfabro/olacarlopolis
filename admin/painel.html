@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=331">
+  <link rel="stylesheet" href="painel.css?v=332">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1295,8 +1295,8 @@
             </div>
             <form id="userForm" class="grid-form">
               <input id="editUserUid" type="hidden">
-              <label>E-mail<input id="newUserEmail" type="email" required></label>
-              <label>Senha provisoria<input id="newUserPassword" type="text" minlength="6" placeholder="Obrigatoria apenas para novo usuario"></label>
+              <label>E-mail<input id="newUserEmail" type="email" required><small>Master pode alterar. Ao trocar, sera criado um novo acesso para este e-mail.</small></label>
+              <label>Senha provisoria<input id="newUserPassword" type="text" minlength="6" placeholder="Obrigatoria para novo usuario ou troca de e-mail"></label>
               <label>Perfil
                 <select id="newUserRole">
                   <option value="cliente">Admin do cliente</option>
@@ -1528,6 +1528,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=375"></script>
+  <script type="module" src="painel.js?v=376"></script>
 </body>
 </html>

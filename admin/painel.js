@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 377,
-  label: "v383",
-  data: "2026-07-01",
-  nota: "Boletos no celular agora abrem por link interno e Pix mostra o valor total gerado."
+  numero: 378,
+  label: "v384",
+  data: "2026-07-03",
+  nota: "Master pode trocar o e-mail de acesso do cliente criando um novo login vinculado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1913,6 +1913,50 @@ async function saveUserProfile(profile) {
   };
   await set(ref(db, `usuariosByUid/${profile.uid}`), payload);
   await set(ref(db, `usuarios/${emailKey(payload.email)}`), payload);
+}
+
+async function createAuthUserWithTemporaryPassword(email, password) {
+  const secondaryName = `creator-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const secondary = initializeApp(firebaseConfig, secondaryName);
+  const secondaryAuth = getAuth(secondary);
+  const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+  await signOut(secondaryAuth);
+  return cred.user;
+}
+
+async function migratePanelUserEmail({ currentUser, email, password, role, clienteId, status, permissoes }) {
+  if (!isMaster()) {
+    showToast("Somente master pode trocar o e-mail de acesso.");
+    return false;
+  }
+  if (!currentUser?.uid || currentUser.uid === state.user?.uid) {
+    showToast("Nao e possivel trocar o e-mail do usuario logado por aqui.");
+    return false;
+  }
+  if (!password) {
+    showToast("Informe uma senha provisoria para criar o novo acesso.");
+    return false;
+  }
+  const oldEmail = String(currentUser.email || "").trim().toLowerCase();
+  const ok = confirm(`Trocar o acesso de ${oldEmail || currentUser.uid} para ${email}?\n\nUm novo login sera criado e o perfil antigo sera removido do painel.`);
+  if (!ok) return false;
+
+  const authUser = await createAuthUserWithTemporaryPassword(email, password);
+  await saveUserProfile({
+    uid: authUser.uid,
+    email,
+    role,
+    clienteId: role === "cliente" ? clienteId : "",
+    status,
+    permissoes
+  });
+
+  const updates = {
+    [`usuariosByUid/${currentUser.uid}`]: null
+  };
+  if (oldEmail) updates[`usuarios/${emailKey(oldEmail)}`] = null;
+  await update(ref(db), updates);
+  return true;
 }
 
 async function loadAllData(onProgress = null) {
@@ -4501,9 +4545,11 @@ function renderUsersList() {
 
 function resetUserForm() {
   $("userForm")?.reset();
+  delete $("userForm").dataset.originalEmail;
   $("editUserUid").value = "";
   $("newUserEmail").readOnly = false;
   $("newUserPassword").required = true;
+  $("newUserPassword").placeholder = "Obrigatoria para novo usuario ou troca de e-mail";
   if ($("newUserClientSearch")) $("newUserClientSearch").value = "";
   fillUserClientSelect();
   $("editUserStatus").value = "ativo";
@@ -4517,10 +4563,12 @@ function resetUserForm() {
 
 function fillUserForm(user) {
   $("editUserUid").value = user.uid || "";
+  $("userForm").dataset.originalEmail = String(user.email || "").trim().toLowerCase();
   $("newUserEmail").value = user.email || "";
-  $("newUserEmail").readOnly = true;
+  $("newUserEmail").readOnly = !isMaster();
   $("newUserPassword").value = "";
   $("newUserPassword").required = false;
+  $("newUserPassword").placeholder = isMaster() ? "Preencha somente se for trocar o e-mail" : "Nao necessario ao editar";
   $("newUserRole").value = user.role || "cliente";
   const linkedClient = state.clientes.find((client) => client.id === user.clienteId);
   if ($("newUserClientSearch")) $("newUserClientSearch").value = linkedClient?.nome || "";
@@ -13044,6 +13092,25 @@ async function createPanelUser(event) {
   setBusy(button, true, editingUid ? "Salvando..." : "Criando...");
   try {
     if (editingUid) {
+      const currentUser = state.usuarios.find((item) => item.uid === editingUid);
+      const originalEmail = String(currentUser?.email || "").trim().toLowerCase();
+      if (email !== originalEmail) {
+        const migrated = await migratePanelUserEmail({
+          currentUser,
+          email,
+          password,
+          role,
+          clienteId,
+          status: $("editUserStatus").value || "ativo",
+          permissoes
+        });
+        if (!migrated) return;
+        resetUserForm();
+        showToast("E-mail de acesso trocado. Passe o novo e-mail e a senha provisoria ao cliente.");
+        await loadAllData();
+        return;
+      }
+
       await saveUserProfile({
         uid: editingUid,
         email,
@@ -13063,14 +13130,10 @@ async function createPanelUser(event) {
       return;
     }
 
-    const secondaryName = `creator-${Date.now()}`;
-    const secondary = initializeApp(firebaseConfig, secondaryName);
-    const secondaryAuth = getAuth(secondary);
-    const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
-    await signOut(secondaryAuth);
+    const authUser = await createAuthUserWithTemporaryPassword(email, password);
 
     await saveUserProfile({
-      uid: cred.user.uid,
+      uid: authUser.uid,
       email,
       role,
       clienteId: role === "cliente" ? clienteId : "",
