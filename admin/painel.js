@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 384,
-  label: "v390",
+  numero: 385,
+  label: "v391",
   data: "2026-07-04",
-  nota: "Novidades preservam cards separados para cada item cadastrado."
+  nota: "Arraste da arte de veiculos ficou mais leve e preciso."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -56,6 +56,9 @@ let clientMetricsRealtimeUnsubscribers = [];
 let clientMetricsRealtimeSignature = "";
 let automovelArtePreviewTimer = null;
 let automovelArteDragState = null;
+let automovelArteDragFrame = null;
+let automovelArtePreviewRendering = false;
+let automovelArtePreviewQueued = false;
 
 let state = {
   user: null,
@@ -5613,11 +5616,19 @@ function clampNumero(valor, min, max) {
   return Math.max(min, Math.min(max, numero));
 }
 
-function setValorControleArteAutomovel(id, valor) {
+function setValorControleArteAutomovel(id, valor, dispatch = true) {
   const input = $(id);
   if (!input) return;
   input.value = String(valor);
-  input.dispatchEvent(new Event("input", { bubbles: true }));
+  if (dispatch) input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function redesenharArteAutomovelDuranteArraste() {
+  if (automovelArteDragFrame) return;
+  automovelArteDragFrame = requestAnimationFrame(() => {
+    automovelArteDragFrame = null;
+    atualizarPreviaArteAutomovel({ silent: true });
+  });
 }
 
 function pontoCanvasArteAutomovel(event, canvas = $("automovelArtePreview")) {
@@ -5647,10 +5658,10 @@ function retangulosArrastaveisArteAutomovel(options = opcoesArteAutomovel()) {
         h: 88,
         inputX: "automovelArteTarjaPrecoX",
         inputY: "automovelArteTarjaPrecoY",
-        minX: -360,
-        maxX: 360,
-        minY: -220,
-        maxY: 220
+        minX: -900,
+        maxX: 900,
+        minY: -900,
+        maxY: 900
       });
     }
     if (config.showTitle !== false) {
@@ -5662,10 +5673,10 @@ function retangulosArrastaveisArteAutomovel(options = opcoesArteAutomovel()) {
         h: 96,
         inputX: "automovelArteTarjaTituloX",
         inputY: "automovelArteTarjaTituloY",
-        minX: -360,
-        maxX: 360,
-        minY: -220,
-        maxY: 220
+        minX: -900,
+        maxX: 900,
+        minY: -900,
+        maxY: 900
       });
     }
     return rects;
@@ -5678,10 +5689,10 @@ function retangulosArrastaveisArteAutomovel(options = opcoesArteAutomovel()) {
     h: 445,
     inputX: "automovelArteImageOffsetX",
     inputY: "automovelArteImageOffsetY",
-    minX: -160,
-    maxX: 160,
-    minY: -140,
-    maxY: 140
+    minX: -420,
+    maxX: 420,
+    minY: -320,
+    maxY: 320
   }];
 }
 
@@ -5726,9 +5737,9 @@ function moverArrasteArteAutomovel(event) {
   const { alvo, startX, startY, initialX, initialY } = automovelArteDragState;
   const nextX = Math.round(clampNumero(initialX + ponto.x - startX, alvo.minX, alvo.maxX));
   const nextY = Math.round(clampNumero(initialY + ponto.y - startY, alvo.minY, alvo.maxY));
-  setValorControleArteAutomovel(alvo.inputX, nextX);
-  setValorControleArteAutomovel(alvo.inputY, nextY);
-  atualizarPreviaArteAutomovel({ silent: true });
+  setValorControleArteAutomovel(alvo.inputX, nextX, false);
+  setValorControleArteAutomovel(alvo.inputY, nextY, false);
+  redesenharArteAutomovelDuranteArraste();
 }
 
 function finalizarArrasteArteAutomovel(event) {
@@ -6531,6 +6542,11 @@ function agendarPreviaArteAutomovel(delay = 450) {
 async function atualizarPreviaArteAutomovel({ silent = false } = {}) {
   const preview = $("automovelArtePreview");
   if (!preview) return;
+  if (automovelArtePreviewRendering) {
+    automovelArtePreviewQueued = true;
+    return;
+  }
+  automovelArtePreviewRendering = true;
   const button = $("previewAutomovelArtButton");
   if (button) button.disabled = true;
   if (!silent) showToast("Atualizando previa do veiculo...");
@@ -6547,7 +6563,12 @@ async function atualizarPreviaArteAutomovel({ silent = false } = {}) {
     console.error("Erro ao atualizar previa do automovel.", error);
     if (!silent) showToast("Nao foi possivel atualizar a previa.");
   } finally {
+    automovelArtePreviewRendering = false;
     if (button) button.disabled = false;
+    if (automovelArtePreviewQueued) {
+      automovelArtePreviewQueued = false;
+      atualizarPreviaArteAutomovel({ silent: true });
+    }
   }
 }
 
