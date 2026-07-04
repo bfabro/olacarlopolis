@@ -9216,6 +9216,55 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
   line-height: 1.18;
 }
 
+.auto-title-button {
+  display: inline;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.auto-title-button:hover,
+.auto-title-button:focus-visible {
+  color: #075985;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  outline: none;
+}
+
+.auto-detalhes-media {
+  background: #111827;
+}
+
+.auto-detalhes-finalidade {
+  background: #0f766e;
+  box-shadow: 0 3px 10px rgba(15, 118, 110, .28);
+}
+
+.auto-detalhes-vendedor i {
+  color: #0f766e;
+}
+
+.auto-detalhes-sem-foto {
+  color: #99f6e4;
+}
+
+.auto-detalhes-acoes {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 12px 0 16px;
+}
+
+.auto-detalhes-acoes .auto-whatsapp-button {
+  width: auto;
+  min-height: 38px;
+  padding: 9px 13px;
+}
+
+.auto-detalhes-instagram {
+  flex: 0 0 auto;
+}
+
 .auto-instagram-icon {
   display: inline-grid;
   place-items: center;
@@ -18987,8 +19036,8 @@ body.vaga-modal-open {
 }
 
 .automoveis-page.auto-cards-mode .auto-card .auto-price {
-  right: 7px !important;
-  bottom: 7px !important;
+  right: 0px !important;
+  bottom: 0px !important;
   min-width: 92px !important;
   padding: 6px 7px !important;
   border-radius: 9px !important;

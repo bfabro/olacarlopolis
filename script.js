@@ -9395,7 +9395,22 @@ plotarPinsImoveis(stateImoveis.filtered);
       combustivel: item.Combustivel || item.combustivel || "",
       cambio: item.Cambio || item.cambio || "",
       cor: item.Cor || item.cor || "",
+      consumoMedio: item.consumoMedio || item.ConsumoMedio || item["Consumo Medio"] || item["Consumo Médio"] || "",
+      aceitaTroca: item.aceitaTroca || item.AceitaTroca || item["Aceita Troca"] || "",
+      aceitaFinanciamento: item.aceitaFinanciamento || item.AceitaFinanciamento || item["Aceita Financiamento"] || "",
+      documentacao: item.documentacao || item.Documentacao || item["Documentação"] || "",
+      motor: item.motor || item.Motor || "",
+      direcao: item.direcao || item.Direcao || item["Direção"] || "",
+      vidroEletrico: item.vidroEletrico || item.VidroEletrico || item["Vidro Eletrico"] || item["Vidro Elétrico"] || "",
+      travaEletrica: item.travaEletrica || item.TravaEletrica || item["Trava Eletrica"] || item["Trava Elétrica"] || "",
+      portas: item.portas || item.Portas || "",
+      freioAbs: item.freioAbs || item.FreioAbs || item["Freio ABS"] || "",
+      cilindrada: item.cilindrada || item.Cilindrada || "",
+      partida: item.partida || item.Partida || "",
+      freio: item.freio || item.Freio || "",
+      injecaoEletronica: item.injecaoEletronica || item.InjecaoEletronica || item["Injecao Eletronica"] || item["Injeção Eletrônica"] || "",
       cidade: item.Cidade || item.cidade || item.local || "",
+      acessorios: item.acessorios || item.Acessorios || item["Acessórios"] || "",
       opcionais: item.Opcionais || item.opcionais || "",
       status: item.status || "ativo"
     };
@@ -9505,7 +9520,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             <div class="auto-card-top">
               <div>
                 <h3>
-                  <span>${textoSeguroAutomoveis(titulo)}</span>
+                  <span class="auto-title-button" data-auto-detalhes="${textoSeguroAutomoveis(item.id || "")}" role="button" tabindex="0" title="Ver detalhes do veiculo">${textoSeguroAutomoveis(titulo)}</span>
                 </h3>
               </div>
             </div>
@@ -9526,8 +9541,21 @@ plotarPinsImoveis(stateImoveis.filtered);
       const item = lista.find((entry) => String(entry.id) === String(card.dataset.autoId));
       if (!item) return;
       card.addEventListener("click", (event) => {
-        if (event.target.closest("a, button")) return;
+        if (event.target.closest("a, button, [data-auto-detalhes]")) return;
         registrarCliqueAutomovel("visualizacao", item);
+      });
+      card.querySelector("[data-auto-detalhes]")?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        registrarCliqueAutomovel("visualizacao", item);
+        abrirModalDetalhesAutomovel(item);
+      });
+      card.querySelector("[data-auto-detalhes]")?.addEventListener("keydown", (event) => {
+        if (!["Enter", " "].includes(event.key)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        registrarCliqueAutomovel("visualizacao", item);
+        abrirModalDetalhesAutomovel(item);
       });
       card.querySelectorAll(".auto-gallery-img").forEach((image) => {
         image.addEventListener("click", () => registrarCliqueAutomovel("fotos", item));
@@ -9539,6 +9567,146 @@ plotarPinsImoveis(stateImoveis.filtered);
         registrarCliqueAutomovel("instagram", item);
       });
     });
+  }
+
+  function abrirModalDetalhesAutomovel(item = {}) {
+    document.querySelector(".auto-detalhes-modal")?.remove();
+    const titulo = [item.marca, item.modelo].filter(Boolean).join(" ") || item.titulo || "Automovel";
+    const imagens = imagensAutomovelPublico(item);
+    const codigoReferencia = String(item.codRef || item.codigo || item.id || "").toUpperCase();
+    const valorFormatado = item.preco ? formatarPrecoAutomoveis(item.preco) : "Consulte";
+    const contato = String(item.contato || "").replace(/\D/g, "");
+    const vendedor = item.vendedor || item.loja || item.clienteNome || "";
+    const instagram = String(item.instagram || "").trim();
+    const instagramUrl = instagram && instagram.startsWith("http") ? instagram : (instagram ? `https://instagram.com/${instagram.replace(/^@/, "")}` : "");
+    const whatsappTexto = [
+      "Ola! Vi este automovel no Ola Carlopolis e quero mais informacoes.",
+      codigoReferencia ? `Referencia: ${codigoReferencia}` : "",
+      `Produto: ${titulo}`,
+      item.preco ? `Valor: ${valorFormatado}` : "",
+      vendedor ? `Loja/Vendedor: ${vendedor}` : ""
+    ].filter(Boolean).join("\n");
+    const detalhes = [
+      ["Marca", item.marca],
+      ["Modelo", item.modelo],
+      ["Tipo", item.tipo],
+      ["Condicao", item.condicao],
+      ["Ano", item.ano],
+      ["KM", item.km],
+      ["Cambio", item.cambio],
+      ["Combustivel", item.combustivel],
+      ["Cor", item.cor],
+      ["Motor", item.motor],
+      ["Portas", item.portas],
+      ["Direcao", item.direcao],
+      ["Vidro eletrico", item.vidroEletrico],
+      ["Trava eletrica", item.travaEletrica],
+      ["Freio ABS", item.freioAbs],
+      ["Freio", item.freio],
+      ["Cilindrada", item.cilindrada],
+      ["Partida", item.partida],
+      ["Injecao eletronica", item.injecaoEletronica],
+      ["Consumo medio", item.consumoMedio],
+      ["Aceita troca", item.aceitaTroca],
+      ["Aceita financiamento", item.aceitaFinanciamento],
+      ["Documentacao", item.documentacao],
+      ["Cidade", item.cidade],
+      ["Loja", item.loja],
+      ["Vendedor", item.vendedor || item.clienteNome],
+      ["Contato", contato],
+      ["Instagram", instagram],
+      ["Status", item.status],
+      ["ID", item.id]
+    ].filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== "" && String(value) !== "0");
+
+    const modal = document.createElement("div");
+    modal.className = "imovel-detalhes-modal auto-detalhes-modal";
+    modal.innerHTML = `
+      <section class="imovel-detalhes-dialog auto-detalhes-dialog" role="dialog" aria-modal="true" aria-label="Detalhes de ${textoSeguroAutomoveis(titulo)}">
+        <button type="button" class="imovel-detalhes-fechar auto-detalhes-fechar" aria-label="Fechar detalhes" title="Fechar">&times;</button>
+        <div class="imovel-detalhes-media auto-detalhes-media">
+          <span class="imovel-detalhes-finalidade auto-detalhes-finalidade">${textoSeguroAutomoveis(String(item.tipo || "Veiculo").toUpperCase())}</span>
+          ${imagens[0] ? `
+            <div class="imovel-detalhes-galeria-track auto-detalhes-galeria-track" data-auto-detalhes-galeria-track>
+              ${imagens.map((src, index) => `<img src="${textoSeguroAutomoveis(src)}" alt="Foto ${index + 1} de ${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">`).join("")}
+            </div>
+            ${imagens.length > 1 ? `
+              <button type="button" class="imovel-detalhes-galeria-nav anterior" data-auto-detalhes-galeria-anterior aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button>
+              <button type="button" class="imovel-detalhes-galeria-nav proxima" data-auto-detalhes-galeria-proxima aria-label="Proxima foto"><i class="fa-solid fa-chevron-right"></i></button>
+              <span class="imovel-detalhes-galeria-contador" data-auto-detalhes-galeria-contador>1 / ${imagens.length}</span>
+            ` : ""}
+          ` : `<div class="imovel-detalhes-sem-foto auto-detalhes-sem-foto"><i class="fa-solid fa-car-side"></i></div>`}
+        </div>
+        <div class="imovel-detalhes-conteudo">
+          <div class="imovel-detalhes-topo">
+            <div>
+              <h2>${textoSeguroAutomoveis(titulo)}</h2>
+              ${vendedor ? `<p class="imovel-detalhes-endereco auto-detalhes-vendedor"><i class="fa-solid fa-store"></i><span>${textoSeguroAutomoveis(vendedor)}</span></p>` : ""}
+            </div>
+            <div class="imovel-detalhes-financeiro">
+              <strong class="imovel-detalhes-valor">${textoSeguroAutomoveis(valorFormatado)}</strong>
+              ${codigoReferencia ? `<span class="imovel-detalhes-referencia"><i class="fa-solid fa-hashtag"></i> Ref.: ${textoSeguroAutomoveis(codigoReferencia)}</span>` : ""}
+            </div>
+          </div>
+          ${item.descricao || item.opcionais || item.acessorios ? `
+            <section class="imovel-detalhes-descricao">
+              <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-align-left"></i><span>Sobre o veiculo</span></div>
+              ${item.descricao ? `<p>${textoSeguroAutomoveis(item.descricao)}</p>` : ""}
+              ${item.acessorios ? `<p><strong>Acessorios:</strong> ${textoSeguroAutomoveis(item.acessorios)}</p>` : ""}
+              ${item.opcionais ? `<p><strong>Opcionais:</strong> ${textoSeguroAutomoveis(item.opcionais)}</p>` : ""}
+            </section>
+          ` : ""}
+          <div class="auto-detalhes-acoes">
+            ${contato ? `<a class="zap-link telefone-link auto-whatsapp-button" target="_blank" href="https://api.whatsapp.com/send?phone=55${contato}&text=${encodeURIComponent(whatsappTexto)}"><i class="bx bxl-whatsapp"></i> Chamar no Whats</a>` : ""}
+            ${instagramUrl ? `<a class="auto-instagram-icon auto-detalhes-instagram" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}" aria-label="Instagram de ${textoSeguroAutomoveis(vendedor || titulo)}"><i class="fa-brands fa-instagram"></i></a>` : ""}
+          </div>
+          <div class="imovel-detalhes-grade">
+            ${detalhes.map(([label, value]) => `
+              <div><span>${textoSeguroAutomoveis(label)}</span><strong>${textoSeguroAutomoveis(value)}</strong></div>
+            `).join("")}
+          </div>
+        </div>
+      </section>
+    `;
+    document.body.appendChild(modal);
+
+    const fechar = () => {
+      document.removeEventListener("keydown", fecharComEsc);
+      modal.remove();
+    };
+    let indiceImagem = 0;
+    const galeriaTrack = modal.querySelector("[data-auto-detalhes-galeria-track]");
+    const contadorGaleria = modal.querySelector("[data-auto-detalhes-galeria-contador]");
+    const atualizarGaleria = (novoIndice) => {
+      if (!galeriaTrack || !imagens.length) return;
+      indiceImagem = (novoIndice + imagens.length) % imagens.length;
+      galeriaTrack.style.transform = `translateX(-${indiceImagem * 100}%)`;
+      if (contadorGaleria) contadorGaleria.textContent = `${indiceImagem + 1} / ${imagens.length}`;
+    };
+    const navegarGaleria = (direcao) => {
+      registrarCliqueAutomovel("fotos", item);
+      atualizarGaleria(indiceImagem + direcao);
+    };
+    const fecharComEsc = (event) => {
+      if (event.key === "Escape") fechar();
+      if (event.key === "ArrowLeft" && imagens.length > 1) navegarGaleria(-1);
+      if (event.key === "ArrowRight" && imagens.length > 1) navegarGaleria(1);
+    };
+    modal.querySelector(".auto-detalhes-fechar")?.addEventListener("click", fechar);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) fechar();
+    });
+    modal.querySelector("[data-auto-detalhes-galeria-anterior]")?.addEventListener("click", () => navegarGaleria(-1));
+    modal.querySelector("[data-auto-detalhes-galeria-proxima]")?.addEventListener("click", () => navegarGaleria(1));
+    galeriaTrack?.addEventListener("click", () => {
+      registrarCliqueAutomovel("fotos", item);
+      fechar();
+      abrirGaleriaAutomovel(imagens, indiceImagem, titulo);
+    });
+    modal.querySelector(".auto-whatsapp-button")?.addEventListener("click", () => registrarCliqueAutomovel("whatsapp", item));
+    modal.querySelector(".auto-detalhes-instagram")?.addEventListener("click", () => registrarCliqueAutomovel("instagram", item));
+    document.addEventListener("keydown", fecharComEsc);
+    modal.querySelector(".auto-detalhes-fechar")?.focus();
   }
 
   function registrarCliqueAutomovel(tipo, item = {}) {
