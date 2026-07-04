@@ -518,7 +518,7 @@ function canManageInformacoes() {
 }
 
 function canAccessView(viewName) {
-  if (viewName === "dashboard") return true;
+  if (viewName === "dashboard") return canManageClients();
   if (canManageClients()) {
     if (viewName === "pagamentoSistema") return isMaster();
     if (viewName === "paginaInicialSite") return isMaster();
@@ -537,7 +537,7 @@ function canAccessView(viewName) {
 }
 
 function initialViewForProfile() {
-  return "dashboard";
+  return canManageClients() ? "dashboard" : "minhaEmpresa";
 }
 
 function moneyBR(value) {
