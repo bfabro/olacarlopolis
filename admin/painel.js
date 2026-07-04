@@ -2503,7 +2503,10 @@ function switchView(name) {
   $("viewSubtitle").textContent = subtitle;
   collapseEntryFormsForView(target);
 
-  if (target === "minhaEmpresa") renderClientOnlyEditor();
+  if (target === "minhaEmpresa") {
+    state.pendingClientModuleTarget = "";
+    renderClientOnlyEditor();
+  }
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "paginaInicialSite") renderHomePageSettings();
