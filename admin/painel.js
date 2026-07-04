@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 383,
-  label: "v389",
+  numero: 384,
+  label: "v390",
   data: "2026-07-04",
-  nota: "Previa de arte de veiculos permite arrastar elementos conforme o layout."
+  nota: "Novidades preservam cards separados para cada item cadastrado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2888,7 +2888,8 @@ async function registrarNovidadeAdmin(payload = {}) {
     if (!novidadeTopicEnabled(novidadeTema)) return;
     const tipo = payload.tipo || payload.destinoTipo || "estabelecimento";
     const destinoId = payload.destinoId || payload.itemId || payload.estabelecimentoId || payload.clienteId || "";
-    await removerNovidadesPorDestino(tipo, destinoId, payload.itemId || payload.destinoCardId || "");
+    const itemId = payload.itemId || payload.destinoCardId || "";
+    await removerNovidadesPorDestino(tipo, destinoId, itemId);
     const id = `${slugify(tipo)}-${slugify(destinoId || payload.estabelecimento || payload.titulo || "item")}-${Date.now()}`;
     await update(ref(db, `novidades/${id}`), {
       tipo,
@@ -2903,7 +2904,7 @@ async function registrarNovidadeAdmin(payload = {}) {
       categoria: payload.categoria || "",
       destinoTipo: payload.destinoTipo || tipo,
       destinoId,
-      itemId: payload.itemId || "",
+      itemId,
       destinoCardId: payload.destinoCardId || "",
       link: payload.link || payload.url || "",
       novidadeTema,
@@ -14203,7 +14204,8 @@ function bindEvents() {
       imagem: payload.imagem,
       categoria: "Eventos",
       destinoTipo: "evento",
-      destinoId: id
+      destinoId: id,
+      itemId: id
     });
     showToast("Evento salvo.");
     resetEventForm();
@@ -14273,7 +14275,8 @@ function bindEvents() {
       valor: payload.valor || "",
       categoria: "Imóveis",
       destinoTipo: "imovel",
-      destinoId: id
+      destinoId: id,
+      itemId: id
     });
     showToast("Imovel salvo.");
     resetImovelForm();
@@ -14329,7 +14332,8 @@ function bindEvents() {
       valor: payload.preco || "",
       categoria: "Automóveis",
       destinoTipo: "veiculo",
-      destinoId: id
+      destinoId: id,
+      itemId: id
     });
     showToast("Automovel salvo.");
     resetAutomovelForm();

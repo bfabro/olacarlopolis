@@ -2964,6 +2964,7 @@ document.addEventListener("DOMContentLoaded", function () {
       dataMs,
       destinoTipo: base.destinoTipo || base.tipo || "estabelecimento",
       destinoId: base.destinoId || base.itemId || base.estabelecimentoId || base.clienteId || "",
+      itemId: base.itemId || base.promoOriginalId || "",
       destinoCardId: base.destinoCardId || "",
       categoria: base.categoria || "",
       valor: base.valor || base.preco || base.valorTexto || "",
@@ -3074,7 +3075,7 @@ document.addEventListener("DOMContentLoaded", function () {
           livePromoCards.add(novidadeDomId("promocao", `${promo.id || "promo"}-${promo.estabelecimentoId || "todos"}`));
           if (promo.id) livePromoCards.add(String(promo.id));
         });
-        promocoesAtuais.slice(0, 20).forEach((promo, idx) => {
+        promocoesAtuais.forEach((promo) => {
           const dataMs = novidadeCidadeMs(promo.criadoEm || promo.createdAt || promo.updatedAt);
           if (!dataMs) return;
           geradas.push(montarNovidadeRecord({
@@ -3090,6 +3091,7 @@ document.addEventListener("DOMContentLoaded", function () {
             dataCriacao: dataMs,
             destinoTipo: "promocao",
             destinoId: promo.estabelecimentoId,
+            itemId: promo.id,
             destinoCardId: novidadeDomId("promocao", `${promo.id}-${promo.estabelecimentoId}`),
             promoOriginalId: promo.id,
             categoria: promo.categoria,
@@ -3147,7 +3149,7 @@ document.addEventListener("DOMContentLoaded", function () {
           item.cambio = item.cambio || origem.cambio || "";
           item.combustivel = item.combustivel || origem.combustivel || "";
         });
-        autosPublicos.slice(0, 12).forEach((auto) => {
+        autosPublicos.forEach((auto) => {
           const dataMs = novidadeCidadeMs(auto.createdAt || auto.updatedAt);
           if (!dataMs) return;
           geradas.push(montarNovidadeRecord({
@@ -3163,6 +3165,7 @@ document.addEventListener("DOMContentLoaded", function () {
             dataCriacao: dataMs,
             destinoTipo: "veiculo",
             destinoId: auto.id,
+            itemId: auto.id,
             codRef: auto.codRef || auto.codigo || auto.id || "",
             telefone: auto.contato || auto.telefone || auto.whatsapp || "",
             ano: auto.ano || "",
@@ -3173,7 +3176,7 @@ document.addEventListener("DOMContentLoaded", function () {
             valor: auto.preco || ""
           }));
         });
-        imoveisPublicos.slice(0, 12).forEach((imovel) => {
+        imoveisPublicos.forEach((imovel) => {
           const dataMs = novidadeCidadeMs(imovel.createdAt || imovel.updatedAt);
           if (!dataMs) return;
           geradas.push(montarNovidadeRecord({
@@ -3189,6 +3192,7 @@ document.addEventListener("DOMContentLoaded", function () {
             dataCriacao: dataMs,
             destinoTipo: "imovel",
             destinoId: imovel.id,
+            itemId: imovel.id,
             codRef: imovel.codRef || imovel.codigo || imovel.id || "",
             telefone: imovel.telefone || imovel.contato || imovel.whatsapp || "",
             endereco: imovel.endereco || "",
