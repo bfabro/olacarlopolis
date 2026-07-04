@@ -1259,8 +1259,14 @@
               <label class="auto-art-three-field">Preco da tarja
                 <input id="automovelArteTarjaPreco" maxlength="34" placeholder="Valor do veiculo">
               </label>
-              <label class="auto-art-three-field">Cor da tarja
-                <input id="automovelArteTarjaCor" type="color" value="#050505">
+              <label class="auto-art-three-field">Cor tarja veiculo
+                <input id="automovelArteTarjaTituloCor" type="color" value="#050505">
+              </label>
+              <label class="auto-art-three-field">Cor tarja preco
+                <input id="automovelArteTarjaPrecoCor" type="color" value="#050505">
+              </label>
+              <label class="auto-art-three-field">Cor tarja cliente
+                <input id="automovelArteTarjaClienteCor" type="color" value="#050505">
               </label>
               <label class="auto-art-three-field">Fonte titulo
                 <input id="automovelArteTarjaTituloFonte" type="range" min="26" max="74" step="1" value="48">
@@ -1274,6 +1280,9 @@
               <label class="check-row auto-art-three-field"><input id="automovelArteTarjaPrecoShow" type="checkbox" checked> Mostrar tarja do preco</label>
               <input id="automovelArteTarjaPrecoX" type="hidden" value="0">
               <input id="automovelArteTarjaPrecoY" type="hidden" value="0">
+              <label class="check-row auto-art-three-field"><input id="automovelArteTarjaClienteShow" type="checkbox" checked> Mostrar tarja do cliente</label>
+              <input id="automovelArteTarjaClienteX" type="hidden" value="0">
+              <input id="automovelArteTarjaClienteY" type="hidden" value="0">
               <label class="auto-art-premium-field">Escala da foto
                 <input id="automovelArteImageScale" type="range" min="0.75" max="1.35" step="0.01" value="1">
               </label>
@@ -1554,6 +1563,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=379"></script>
+  <script type="module" src="painel.js?v=380"></script>
 </body>
 </html>

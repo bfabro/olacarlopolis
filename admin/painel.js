@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 385,
-  label: "v391",
+  numero: 386,
+  label: "v392",
   data: "2026-07-04",
-  nota: "Arraste da arte de veiculos ficou mais leve e preciso."
+  nota: "Tarjas da arte de veiculos ganharam cores separadas, cantos arredondados e tarja do cliente ajustavel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5558,7 +5558,10 @@ function opcoesArteAutomovel() {
       line1: $("automovelArteTarjaLinha1")?.value.trim() || "",
       line2: $("automovelArteTarjaLinha2")?.value.trim() || "",
       price: $("automovelArteTarjaPreco")?.value.trim() || "",
-      bandColor: $("automovelArteTarjaCor")?.value || "#050505",
+      bandColor: $("automovelArteTarjaTituloCor")?.value || $("automovelArteTarjaCor")?.value || "#050505",
+      titleBandColor: $("automovelArteTarjaTituloCor")?.value || $("automovelArteTarjaCor")?.value || "#050505",
+      priceBandColor: $("automovelArteTarjaPrecoCor")?.value || $("automovelArteTarjaCor")?.value || "#050505",
+      clientBandColor: $("automovelArteTarjaClienteCor")?.value || $("automovelArteTarjaCor")?.value || "#050505",
       titleFontSize: Number($("automovelArteTarjaTituloFonte")?.value || 48) || 48,
       priceFontSize: Number($("automovelArteTarjaPrecoFonte")?.value || 54) || 54,
       showTitle: $("automovelArteTarjaTituloShow")?.checked !== false,
@@ -5566,7 +5569,10 @@ function opcoesArteAutomovel() {
       titleOffsetY: Number($("automovelArteTarjaTituloY")?.value || 0) || 0,
       showPrice: $("automovelArteTarjaPrecoShow")?.checked !== false,
       priceOffsetX: Number($("automovelArteTarjaPrecoX")?.value || 0) || 0,
-      priceOffsetY: Number($("automovelArteTarjaPrecoY")?.value || 0) || 0
+      priceOffsetY: Number($("automovelArteTarjaPrecoY")?.value || 0) || 0,
+      showClient: $("automovelArteTarjaClienteShow")?.checked !== false,
+      clientOffsetX: Number($("automovelArteTarjaClienteX")?.value || 0) || 0,
+      clientOffsetY: Number($("automovelArteTarjaClienteY")?.value || 0) || 0
     },
     imageSettings: {
       scale: Number($("automovelArteImageScale")?.value || 1) || 1,
@@ -5649,6 +5655,21 @@ function retangulosArrastaveisArteAutomovel(options = opcoesArteAutomovel()) {
   if ((options.formato || "premium45") === "tresFotosTarjas") {
     const config = options.threePhotos || {};
     const rects = [];
+    if (config.showClient !== false) {
+      rects.push({
+        tipo: "tarjaCliente",
+        x: 42 + Number(config.clientOffsetX || 0),
+        y: 1186 + Number(config.clientOffsetY || 0),
+        w: 486,
+        h: 110,
+        inputX: "automovelArteTarjaClienteX",
+        inputY: "automovelArteTarjaClienteY",
+        minX: -900,
+        maxX: 900,
+        minY: -900,
+        maxY: 900
+      });
+    }
     if (config.showPrice !== false) {
       rects.push({
         tipo: "tarjaPreco",
@@ -6275,7 +6296,10 @@ function desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo, si
   const config = options.threePhotos || {};
   const defaults = defaultsTarjaAutomovel(item);
   const imgs = [fotos[0], fotos[1] || fotos[0], fotos[2] || fotos[1] || fotos[0]].filter(Boolean);
-  const bandColor = /^#[0-9a-f]{6}$/i.test(String(config.bandColor || "")) ? config.bandColor : "#050505";
+  const corHexTarja = (value, fallback = "#050505") => /^#[0-9a-f]{6}$/i.test(String(value || "")) ? value : fallback;
+  const titleBandColor = corHexTarja(config.titleBandColor || config.bandColor);
+  const priceBandColor = corHexTarja(config.priceBandColor || config.bandColor);
+  const clientBandColor = corHexTarja(config.clientBandColor || config.bandColor);
   const titleFontSize = Math.max(26, Math.min(74, Number(config.titleFontSize || 48)));
   const priceFontSize = Math.max(28, Math.min(76, Number(config.priceFontSize || 54)));
   const line1 = textoCurtoArte(config.line1 || defaults.line1, 38).toUpperCase();
@@ -6304,10 +6328,10 @@ function desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo, si
     const titleH = 96;
     const titleX = 130 + Number(config.titleOffsetX || 0);
     const titleY = 402 + Number(config.titleOffsetY || 0);
-    preencherRoundRect(ctx, titleX, titleY, titleW, titleH, 0, hexParaRgbaArte(bandColor, .86));
+    preencherRoundRect(ctx, titleX, titleY, titleW, titleH, 22, hexParaRgbaArte(titleBandColor, .86));
     ctx.fillStyle = "rgba(255,255,255,.10)";
-    ctx.fillRect(titleX, titleY, titleW, 2);
-    ctx.fillRect(titleX, titleY + titleH - 2, titleW, 2);
+    preencherRoundRect(ctx, titleX + 16, titleY + 8, titleW - 32, 2, 1, "rgba(255,255,255,.10)");
+    preencherRoundRect(ctx, titleX + 16, titleY + titleH - 10, titleW - 32, 2, 1, "rgba(255,255,255,.10)");
     desenharLogoSemFundoCanvas(ctx, logo, titleX + 18, titleY + 12, 74, 72);
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "left";
@@ -6335,10 +6359,10 @@ function desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo, si
     const priceH = 88;
     const priceX = 215 + Number(config.priceOffsetX || 0);
     const priceY = 856 + Number(config.priceOffsetY || 0);
-    preencherRoundRect(ctx, priceX, priceY, priceW, priceH, 0, hexParaRgbaArte(bandColor, .9));
+    preencherRoundRect(ctx, priceX, priceY, priceW, priceH, 22, hexParaRgbaArte(priceBandColor, .9));
     ctx.fillStyle = "rgba(255,255,255,.10)";
-    ctx.fillRect(priceX, priceY, priceW, 2);
-    ctx.fillRect(priceX, priceY + priceH - 2, priceW, 2);
+    preencherRoundRect(ctx, priceX + 16, priceY + 8, priceW - 32, 2, 1, "rgba(255,255,255,.10)");
+    preencherRoundRect(ctx, priceX + 16, priceY + priceH - 10, priceW - 32, 2, 1, "rgba(255,255,255,.10)");
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "center";
     ctx.font = "900 18px Arial";
@@ -6348,18 +6372,22 @@ function desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo, si
   }
 
   const logoY = 1186;
-  preencherRoundRect(ctx, 42, logoY, 486, 110, 0, "rgba(0,0,0,.56)");
-  desenharLogoSemFundoCanvas(ctx, logo, 62, logoY + 18, 92, 74);
-  ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "left";
-  fonteQueCabeCanvas(ctx, establishment.toUpperCase(), 900, 24, 13, 340);
-  ctx.fillText(establishment.toUpperCase(), 172, logoY + 50);
-  ctx.fillStyle = "rgba(255,255,255,.72)";
-  ctx.font = "800 15px Arial";
-  ctx.fillText("VEICULO EM DESTAQUE", 172, logoY + 76);
+  if (config.showClient !== false) {
+    const clientX = 42 + Number(config.clientOffsetX || 0);
+    const clientY = logoY + Number(config.clientOffsetY || 0);
+    preencherRoundRect(ctx, clientX, clientY, 486, 110, 22, hexParaRgbaArte(clientBandColor, .62));
+    desenharLogoSemFundoCanvas(ctx, logo, clientX + 20, clientY + 18, 92, 74);
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "left";
+    fonteQueCabeCanvas(ctx, establishment.toUpperCase(), 900, 24, 13, 340);
+    ctx.fillText(establishment.toUpperCase(), clientX + 130, clientY + 50);
+    ctx.fillStyle = "rgba(255,255,255,.72)";
+    ctx.font = "800 15px Arial";
+    ctx.fillText("VEICULO EM DESTAQUE", clientX + 130, clientY + 76);
+  }
 
   if (options.showSiteLogo !== false) {
-    preencherRoundRect(ctx, 710, logoY + 12, 328, 88, 0, "rgba(0,0,0,.44)");
+    preencherRoundRect(ctx, 710, logoY + 12, 328, 88, 22, "rgba(0,0,0,.44)");
     desenharImagemContain(ctx, siteLogo, 738, logoY + 28, 272, 56, 0, "rgba(255,255,255,0)");
   }
 }
@@ -13789,7 +13817,7 @@ function bindEvents() {
     atualizarVisibilidadeLayoutAutomovelArte();
     atualizarPreviaArteAutomovel({ silent: true });
   });
-  ["automovelArteTitulo", "automovelArteLayout", "automovelArteSubtitulo", "automovelArteTema", "automovelArteSubtitulo2", "automovelArteRodape", "automovelArteShowSiteLogo", "automovelArteTarjaLinha1", "automovelArteTarjaLinha2", "automovelArteTarjaPreco", "automovelArteTarjaCor", "automovelArteTarjaTituloFonte", "automovelArteTarjaPrecoFonte", "automovelArteTarjaTituloShow", "automovelArteTarjaTituloX", "automovelArteTarjaTituloY", "automovelArteTarjaPrecoShow", "automovelArteTarjaPrecoX", "automovelArteTarjaPrecoY", "automovelArteImageScale", "automovelArteImageOffsetX", "automovelArteImageOffsetY", "automovelArteDarkOverlay"].forEach((id) => {
+  ["automovelArteTitulo", "automovelArteLayout", "automovelArteSubtitulo", "automovelArteTema", "automovelArteSubtitulo2", "automovelArteRodape", "automovelArteShowSiteLogo", "automovelArteTarjaLinha1", "automovelArteTarjaLinha2", "automovelArteTarjaPreco", "automovelArteTarjaTituloCor", "automovelArteTarjaPrecoCor", "automovelArteTarjaClienteCor", "automovelArteTarjaTituloFonte", "automovelArteTarjaPrecoFonte", "automovelArteTarjaTituloShow", "automovelArteTarjaTituloX", "automovelArteTarjaTituloY", "automovelArteTarjaPrecoShow", "automovelArteTarjaPrecoX", "automovelArteTarjaPrecoY", "automovelArteTarjaClienteShow", "automovelArteTarjaClienteX", "automovelArteTarjaClienteY", "automovelArteImageScale", "automovelArteImageOffsetX", "automovelArteImageOffsetY", "automovelArteDarkOverlay"].forEach((id) => {
     $(id)?.addEventListener("input", () => agendarPreviaArteAutomovel());
     $(id)?.addEventListener("change", () => {
       if (id === "automovelArteLayout") atualizarVisibilidadeLayoutAutomovelArte();
