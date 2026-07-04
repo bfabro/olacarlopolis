@@ -2408,6 +2408,14 @@ button[type="submit"]:hover,
   min-height: 44px;
 }
 
+.automovel-art-panel .auto-art-three-field {
+  display: grid;
+}
+
+.automovel-art-panel:not(.auto-art-layout-three) .auto-art-three-field {
+  display: none;
+}
+
 .automovel-art-panel .auto-art-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
