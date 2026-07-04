@@ -331,10 +331,34 @@ function addAliasKey(target, value) {
   if (normalized) target[normalized] = true;
 }
 
+function aliasKeyVariants(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return [];
+  const variants = new Set([raw, slugify(raw), normalizeName(raw)]);
+  const parts = slugify(raw).split("-").filter(Boolean);
+  if (parts.length > 1) {
+    variants.add(parts.slice(0, 2).join("-"));
+    variants.add(parts.slice(0, 2).join(""));
+    variants.add(parts.slice(0, 3).join("-"));
+    variants.add(parts.slice(0, 3).join(""));
+    variants.add(parts.slice(1).join("-"));
+    variants.add(parts.slice(1).join(""));
+    variants.add(parts.slice(-2).join("-"));
+    variants.add(parts.slice(-2).join(""));
+    variants.add(parts.slice(-3).join("-"));
+    variants.add(parts.slice(-3).join(""));
+  }
+  return [...variants].filter(Boolean);
+}
+
+function addAliasVariants(target, value) {
+  aliasKeyVariants(value).forEach((variant) => addAliasKey(target, variant));
+}
+
 function buildClientPublicAliases(clientId, payload, sourceClient = null, useFormContext = true) {
   const form = useFormContext ? $("clientForm") : null;
   const aliases = { ...(sourceClient?.aliases || {}) };
-  const add = (value) => addAliasKey(aliases, value);
+  const add = (value) => addAliasVariants(aliases, value);
   const names = [
     clientId,
     payload?.nome,
@@ -1080,9 +1104,10 @@ function clientMetricScopeKeys(client = currentClientRecord()) {
     currentClientId(),
     client?.id,
     client?.nomeNormalizado,
+    clientCanonicalId(client),
     normalizeName(client?.nome || client?.name || ""),
     ...Object.keys(client?.aliases || {})
-  ].map((value) => String(value || "").trim()).filter(Boolean))];
+  ].flatMap(aliasKeyVariants).map((value) => String(value || "").trim()).filter(Boolean))];
 }
 
 function stopClientMetricsRealtime() {
@@ -9058,7 +9083,7 @@ function clientMetricKeys(client = {}) {
     clientCanonicalId(client),
     ...(client.aliases ? Object.keys(client.aliases) : [])
   ];
-  return [...new Set(values.map((value) => normalizeName(value)).filter(Boolean))];
+  return [...new Set(values.flatMap(aliasKeyVariants).map((value) => normalizeName(value)).filter(Boolean))];
 }
 
 function metricKeyBelongsToClient(metricKey, keys = []) {

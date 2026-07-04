@@ -547,7 +547,42 @@ function resolverChaveMetricaCliente(idEstabelecimento) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
-  return window.__metricClientIds?.[normalized] || normalized;
+  const mapped = variantesChaveMetricaCliente(original)
+    .map((variant) => variant
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, ""))
+    .map((key) => window.__metricClientIds?.[key])
+    .find(Boolean);
+  return mapped || normalized;
+}
+
+function variantesChaveMetricaCliente(valor) {
+  const bruto = String(valor || "").trim();
+  if (!bruto) return [];
+  const slug = bruto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const compacta = slug.replace(/-/g, "");
+  const variantes = new Set([bruto, slug, compacta]);
+  const partes = slug.split("-").filter(Boolean);
+  if (partes.length > 1) {
+    variantes.add(partes.slice(0, 2).join("-"));
+    variantes.add(partes.slice(0, 2).join(""));
+    variantes.add(partes.slice(0, 3).join("-"));
+    variantes.add(partes.slice(0, 3).join(""));
+    variantes.add(partes.slice(1).join("-"));
+    variantes.add(partes.slice(1).join(""));
+    variantes.add(partes.slice(-2).join("-"));
+    variantes.add(partes.slice(-2).join(""));
+    variantes.add(partes.slice(-3).join("-"));
+    variantes.add(partes.slice(-3).join(""));
+  }
+  return [...variantes].filter(Boolean);
 }
 
 function registrarMetricaCliente(idEstabelecimento, grupo, tipo, detalhes = {}) {
@@ -19455,8 +19490,10 @@ plotarPinsImoveis(stateImoveis.filtered);
             ...Object.keys(cliente?.aliases || {})
           ];
           aliases.forEach((alias) => {
-            const key = normalizeName(alias || "");
-            if (key) window.__metricClientIds[key] = clienteId;
+            variantesChaveMetricaCliente(alias).forEach((variant) => {
+              const key = normalizeName(variant || "");
+              if (key) window.__metricClientIds[key] = clienteId;
+            });
           });
         });
         aplicarCategoriasAdminNoMenu(categoriasAdmin);
