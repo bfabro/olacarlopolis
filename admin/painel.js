@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 386,
-  label: "v392",
+  numero: 387,
+  label: "v393",
   data: "2026-07-04",
-  nota: "Tarjas da arte de veiculos ganharam cores separadas, cantos arredondados e tarja do cliente ajustavel."
+  nota: "Logo Ola Carlopolis da arte de veiculos ficou sem tarja e ajustavel, com exclusao direta na lista."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -518,6 +518,7 @@ function canManageInformacoes() {
 }
 
 function canAccessView(viewName) {
+  if (viewName === "dashboard") return true;
   if (canManageClients()) {
     if (viewName === "pagamentoSistema") return isMaster();
     if (viewName === "paginaInicialSite") return isMaster();
@@ -536,10 +537,7 @@ function canAccessView(viewName) {
 }
 
 function initialViewForProfile() {
-  if (canManageClients()) return "dashboard";
-  if (canAccessAutomoveis()) return "automoveis";
-  if (canAccessImoveis()) return "imoveis";
-  return "minhaEmpresa";
+  return "dashboard";
 }
 
 function moneyBR(value) {
@@ -5572,7 +5570,9 @@ function opcoesArteAutomovel() {
       priceOffsetY: Number($("automovelArteTarjaPrecoY")?.value || 0) || 0,
       showClient: $("automovelArteTarjaClienteShow")?.checked !== false,
       clientOffsetX: Number($("automovelArteTarjaClienteX")?.value || 0) || 0,
-      clientOffsetY: Number($("automovelArteTarjaClienteY")?.value || 0) || 0
+      clientOffsetY: Number($("automovelArteTarjaClienteY")?.value || 0) || 0,
+      siteLogoOffsetX: Number($("automovelArteSiteLogoX")?.value || 0) || 0,
+      siteLogoOffsetY: Number($("automovelArteSiteLogoY")?.value || 0) || 0
     },
     imageSettings: {
       scale: Number($("automovelArteImageScale")?.value || 1) || 1,
@@ -5655,6 +5655,21 @@ function retangulosArrastaveisArteAutomovel(options = opcoesArteAutomovel()) {
   if ((options.formato || "premium45") === "tresFotosTarjas") {
     const config = options.threePhotos || {};
     const rects = [];
+    if (options.showSiteLogo !== false) {
+      rects.push({
+        tipo: "logoSite",
+        x: 738 + Number(config.siteLogoOffsetX || 0),
+        y: 1214 + Number(config.siteLogoOffsetY || 0),
+        w: 272,
+        h: 56,
+        inputX: "automovelArteSiteLogoX",
+        inputY: "automovelArteSiteLogoY",
+        minX: -900,
+        maxX: 900,
+        minY: -900,
+        maxY: 900
+      });
+    }
     if (config.showClient !== false) {
       rects.push({
         tipo: "tarjaCliente",
@@ -6387,8 +6402,16 @@ function desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo, si
   }
 
   if (options.showSiteLogo !== false) {
-    preencherRoundRect(ctx, 710, logoY + 12, 328, 88, 22, "rgba(0,0,0,.44)");
-    desenharImagemContain(ctx, siteLogo, 738, logoY + 28, 272, 56, 0, "rgba(255,255,255,0)");
+    desenharImagemContain(
+      ctx,
+      siteLogo,
+      738 + Number(config.siteLogoOffsetX || 0),
+      logoY + 28 + Number(config.siteLogoOffsetY || 0),
+      272,
+      56,
+      0,
+      "rgba(255,255,255,0)"
+    );
   }
 }
 
@@ -6642,8 +6665,11 @@ function renderAutomoveisList() {
         <div class="list-meta">${escapeHtml([item.tipo, item.condicao, item.ano, item.preco].filter(Boolean).join(" - ") || "Sem valor")}</div>
         <div class="list-meta">${escapeHtml([item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ") || "Sem contato")}</div>
         <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
-        ${canGenerateVeiculoImages() ? `<button type="button" data-art-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte premium</button>` : ""}
-        ${hasPermission("veiculos") ? `<button type="button" data-edit-automovel="${escapeAttr(item.id)}">Editar</button>` : ""}
+        <div class="list-card-actions">
+          ${canGenerateVeiculoImages() ? `<button type="button" data-art-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte premium</button>` : ""}
+          ${hasPermission("veiculos") ? `<button type="button" data-edit-automovel="${escapeAttr(item.id)}">Editar</button>` : ""}
+          ${hasPermission("veiculos") ? `<button type="button" class="danger-mini" data-delete-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-trash"></i> Excluir</button>` : ""}
+        </div>
       </article>
     `;
   }).join("");
@@ -6660,6 +6686,27 @@ function renderAutomoveisList() {
       if (item) fillAutomovelForm(item);
     });
   });
+  box.querySelectorAll("[data-delete-automovel]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      await excluirAutomovelPorId(button.dataset.deleteAutomovel || "");
+    });
+  });
+}
+
+async function excluirAutomovelPorId(automovelId) {
+  if (!automovelId) return;
+  const original = state.automoveis.find((item) => item.id === automovelId);
+  if (!original || !itemBelongsToCurrentClient(original)) {
+    showToast("Voce nao tem permissao para excluir este automovel.");
+    return;
+  }
+  const titulo = [original.marca, original.modelo, original.ano].filter(Boolean).join(" ") || original.codRef || original.id;
+  if (!(await confirmarExclusao(titulo, "automovel"))) return;
+  await remove(ref(db, `conteudosInformativos/automoveis/${automovelId}`));
+  await removerNovidadesPorDestino("veiculo", automovelId, automovelId);
+  showToast("Automovel excluido.");
+  if (state.selectedAutomovelId === automovelId) resetAutomovelForm();
+  await loadAllData();
 }
 
 function resetImovelForm() {
@@ -13817,7 +13864,7 @@ function bindEvents() {
     atualizarVisibilidadeLayoutAutomovelArte();
     atualizarPreviaArteAutomovel({ silent: true });
   });
-  ["automovelArteTitulo", "automovelArteLayout", "automovelArteSubtitulo", "automovelArteTema", "automovelArteSubtitulo2", "automovelArteRodape", "automovelArteShowSiteLogo", "automovelArteTarjaLinha1", "automovelArteTarjaLinha2", "automovelArteTarjaPreco", "automovelArteTarjaTituloCor", "automovelArteTarjaPrecoCor", "automovelArteTarjaClienteCor", "automovelArteTarjaTituloFonte", "automovelArteTarjaPrecoFonte", "automovelArteTarjaTituloShow", "automovelArteTarjaTituloX", "automovelArteTarjaTituloY", "automovelArteTarjaPrecoShow", "automovelArteTarjaPrecoX", "automovelArteTarjaPrecoY", "automovelArteTarjaClienteShow", "automovelArteTarjaClienteX", "automovelArteTarjaClienteY", "automovelArteImageScale", "automovelArteImageOffsetX", "automovelArteImageOffsetY", "automovelArteDarkOverlay"].forEach((id) => {
+  ["automovelArteTitulo", "automovelArteLayout", "automovelArteSubtitulo", "automovelArteTema", "automovelArteSubtitulo2", "automovelArteRodape", "automovelArteShowSiteLogo", "automovelArteTarjaLinha1", "automovelArteTarjaLinha2", "automovelArteTarjaPreco", "automovelArteTarjaTituloCor", "automovelArteTarjaPrecoCor", "automovelArteTarjaClienteCor", "automovelArteTarjaTituloFonte", "automovelArteTarjaPrecoFonte", "automovelArteTarjaTituloShow", "automovelArteTarjaTituloX", "automovelArteTarjaTituloY", "automovelArteTarjaPrecoShow", "automovelArteTarjaPrecoX", "automovelArteTarjaPrecoY", "automovelArteTarjaClienteShow", "automovelArteTarjaClienteX", "automovelArteTarjaClienteY", "automovelArteSiteLogoX", "automovelArteSiteLogoY", "automovelArteImageScale", "automovelArteImageOffsetX", "automovelArteImageOffsetY", "automovelArteDarkOverlay"].forEach((id) => {
     $(id)?.addEventListener("input", () => agendarPreviaArteAutomovel());
     $(id)?.addEventListener("change", () => {
       if (id === "automovelArteLayout") atualizarVisibilidadeLayoutAutomovelArte();
@@ -14390,19 +14437,7 @@ function bindEvents() {
   });
 
   $("deleteAutomovelButton")?.addEventListener("click", async () => {
-    if (!state.selectedAutomovelId) return;
-    const original = state.automoveis.find((item) => item.id === state.selectedAutomovelId);
-    if (!original || !itemBelongsToCurrentClient(original)) {
-      showToast("Voce nao tem permissao para excluir este automovel.");
-      return;
-    }
-    const titulo = [original.marca, original.modelo, original.ano].filter(Boolean).join(" ") || original.codRef || original.id;
-    if (!(await confirmarExclusao(titulo, "automovel"))) return;
-    await remove(ref(db, `conteudosInformativos/automoveis/${state.selectedAutomovelId}`));
-    await removerNovidadesPorDestino("veiculo", state.selectedAutomovelId, state.selectedAutomovelId);
-    showToast("Automovel excluido.");
-    resetAutomovelForm();
-    await loadAllData();
+    await excluirAutomovelPorId(state.selectedAutomovelId);
   });
 
   $("infoDeathNoticeForm")?.addEventListener("submit", async (event) => {

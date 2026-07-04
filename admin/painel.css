@@ -992,6 +992,18 @@ button[type="submit"]:hover,
   font-weight: 800;
 }
 
+.ghost-button.new-entry-button {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, .18);
+}
+
+.ghost-button.new-entry-button:hover {
+  background: var(--brand-strong);
+  border-color: var(--brand-strong);
+}
+
 .panel-view {
   display: grid;
   gap: 18px;
@@ -1621,6 +1633,17 @@ button[type="submit"]:hover,
   border-radius: 8px;
   padding: 8px 10px;
   font-weight: 800;
+}
+
+.list-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.list-card button.danger-mini {
+  color: #b91c1c;
+  background: #fee2e2;
 }
 
 .category-row {
