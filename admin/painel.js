@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 381,
-  label: "v387",
+  numero: 382,
+  label: "v388",
   data: "2026-07-04",
-  nota: "Layout de arte de veiculos permite ajustar e ocultar tarjas no modelo de 3 fotos."
+  nota: "Cadastro novo de veiculos carrega dados do estabelecimento vinculado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5271,6 +5271,16 @@ function resetAutomovelForm() {
   $("deleteAutomovelButton")?.classList.add("hidden");
   renderAutomovelImagesPreview();
   setFormCardOpen("automovelForm", false);
+}
+
+function preencherDadosEstabelecimentoAutomovelNovo() {
+  const linkedClient = currentClientRecord();
+  if (!linkedClient) return;
+  const telefone = linkedClient.whatsapp || linkedClient.contato || linkedClient.telefone || "";
+  if ($("automovelContato")) $("automovelContato").value = telefone;
+  if ($("automovelVendedor")) $("automovelVendedor").value = linkedClient.nome || "";
+  if ($("automovelInstagram")) $("automovelInstagram").value = linkedClient.instagram || "";
+  if ($("automovelCidade") && linkedClient.cidade) $("automovelCidade").value = linkedClient.cidade;
 }
 
 function toggleAutomovelFieldGroup(ids = [], visible = true) {
@@ -13609,6 +13619,7 @@ function bindEvents() {
   });
   $("newAutomovelButton")?.addEventListener("click", () => {
     resetAutomovelForm();
+    preencherDadosEstabelecimentoAutomovelNovo();
     openFormForEdit("automovelForm");
   });
   $("closeAutomovelFormButton")?.addEventListener("click", resetAutomovelForm);
