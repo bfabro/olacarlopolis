@@ -1212,15 +1212,6 @@
                 <button id="deleteAutomovelButton" type="button" class="danger hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
               </div>
             </form>
-          </section>
-
-          <section class="panel-card">
-            <div class="section-head">
-              <div>
-                <h2>Automoveis cadastrados</h2>
-                <p>Edite, inative ou remova anuncios.</p>
-              </div>
-            </div>
             <div class="imovel-art-panel automovel-art-panel" data-permission="gerar_imagens_veiculos">
               <div>
                 <strong>Arte premium para Instagram</strong>
@@ -1272,10 +1263,24 @@
                 <input id="automovelArteTarjaCor" type="color" value="#050505">
               </label>
               <label class="auto-art-three-field">Fonte titulo
-                <input id="automovelArteTarjaTituloFonte" type="range" min="34" max="88" step="1" value="62">
+                <input id="automovelArteTarjaTituloFonte" type="range" min="26" max="74" step="1" value="48">
               </label>
               <label class="auto-art-three-field">Fonte preco
-                <input id="automovelArteTarjaPrecoFonte" type="range" min="34" max="92" step="1" value="66">
+                <input id="automovelArteTarjaPrecoFonte" type="range" min="28" max="76" step="1" value="54">
+              </label>
+              <label class="check-row auto-art-three-field"><input id="automovelArteTarjaTituloShow" type="checkbox" checked> Mostrar tarja do veiculo</label>
+              <label class="auto-art-three-field">Tarja veiculo - horizontal
+                <input id="automovelArteTarjaTituloX" type="range" min="-360" max="360" step="5" value="0">
+              </label>
+              <label class="auto-art-three-field">Tarja veiculo - vertical
+                <input id="automovelArteTarjaTituloY" type="range" min="-220" max="220" step="5" value="0">
+              </label>
+              <label class="check-row auto-art-three-field"><input id="automovelArteTarjaPrecoShow" type="checkbox" checked> Mostrar tarja do preco</label>
+              <label class="auto-art-three-field">Tarja preco - horizontal
+                <input id="automovelArteTarjaPrecoX" type="range" min="-360" max="360" step="5" value="0">
+              </label>
+              <label class="auto-art-three-field">Tarja preco - vertical
+                <input id="automovelArteTarjaPrecoY" type="range" min="-220" max="220" step="5" value="0">
               </label>
               <label>Escala da foto
                 <input id="automovelArteImageScale" type="range" min="0.75" max="1.35" step="0.01" value="1">
@@ -1296,6 +1301,15 @@
               <div class="auto-art-actions">
                 <button id="previewAutomovelArtButton" type="button" class="ghost-button"><i class="fa-solid fa-eye"></i> Atualizar prévia</button>
                 <button id="generateAutomovelArtButton" type="button"><i class="fa-solid fa-download"></i> Baixar imagem</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <div class="section-head">
+              <div>
+                <h2>Automoveis cadastrados</h2>
+                <p>Edite, inative ou remova anuncios.</p>
               </div>
             </div>
             <input id="automovelSearch" class="search-input" placeholder="Buscar automovel...">

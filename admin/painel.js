@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 380,
-  label: "v386",
+  numero: 381,
+  label: "v387",
   data: "2026-07-04",
-  nota: "Gerador de arte de veiculos ganhou layout com 3 fotos e tarjas editaveis."
+  nota: "Layout de arte de veiculos permite ajustar e ocultar tarjas no modelo de 3 fotos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5544,8 +5544,14 @@ function opcoesArteAutomovel() {
       line2: $("automovelArteTarjaLinha2")?.value.trim() || "",
       price: $("automovelArteTarjaPreco")?.value.trim() || "",
       bandColor: $("automovelArteTarjaCor")?.value || "#050505",
-      titleFontSize: Number($("automovelArteTarjaTituloFonte")?.value || 62) || 62,
-      priceFontSize: Number($("automovelArteTarjaPrecoFonte")?.value || 66) || 66
+      titleFontSize: Number($("automovelArteTarjaTituloFonte")?.value || 48) || 48,
+      priceFontSize: Number($("automovelArteTarjaPrecoFonte")?.value || 54) || 54,
+      showTitle: $("automovelArteTarjaTituloShow")?.checked !== false,
+      titleOffsetX: Number($("automovelArteTarjaTituloX")?.value || 0) || 0,
+      titleOffsetY: Number($("automovelArteTarjaTituloY")?.value || 0) || 0,
+      showPrice: $("automovelArteTarjaPrecoShow")?.checked !== false,
+      priceOffsetX: Number($("automovelArteTarjaPrecoX")?.value || 0) || 0,
+      priceOffsetY: Number($("automovelArteTarjaPrecoY")?.value || 0) || 0
     },
     imageSettings: {
       scale: Number($("automovelArteImageScale")?.value || 1) || 1,
@@ -6112,8 +6118,8 @@ function desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo, si
   const defaults = defaultsTarjaAutomovel(item);
   const imgs = [fotos[0], fotos[1] || fotos[0], fotos[2] || fotos[1] || fotos[0]].filter(Boolean);
   const bandColor = /^#[0-9a-f]{6}$/i.test(String(config.bandColor || "")) ? config.bandColor : "#050505";
-  const titleFontSize = Math.max(34, Math.min(88, Number(config.titleFontSize || 62)));
-  const priceFontSize = Math.max(34, Math.min(92, Number(config.priceFontSize || 66)));
+  const titleFontSize = Math.max(26, Math.min(74, Number(config.titleFontSize || 48)));
+  const priceFontSize = Math.max(28, Math.min(76, Number(config.priceFontSize || 54)));
   const line1 = textoCurtoArte(config.line1 || defaults.line1, 38).toUpperCase();
   const line2 = textoCurtoArte(config.line2 || defaults.line2, 38).toUpperCase();
   const price = textoCurtoArte(config.price || defaults.price, 34).toUpperCase();
@@ -6135,43 +6141,53 @@ function desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo, si
   ctx.fillStyle = topGrad;
   ctx.fillRect(0, 0, w, 190);
 
-  const titleY = 508;
-  preencherRoundRect(ctx, 54, titleY, 972, 178, 0, hexParaRgbaArte(bandColor, .9));
-  ctx.fillStyle = "rgba(255,255,255,.10)";
-  ctx.fillRect(54, titleY, 972, 3);
-  ctx.fillRect(54, titleY + 175, 972, 3);
-  desenharLogoSemFundoCanvas(ctx, logo, 76, titleY + 26, 132, 126);
-  ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "left";
-  desenharTextoInteiroCanvas(ctx, line1, 240, titleY + 34, 730, 1, {
-    peso: 900,
-    tamanho: titleFontSize,
-    minimo: 28,
-    lineHeight: Math.round(titleFontSize * 1.04),
-    blockHeight: Math.round(titleFontSize * 1.12),
-    align: "left"
-  });
-  ctx.fillStyle = "rgba(255,255,255,.88)";
-  desenharTextoInteiroCanvas(ctx, line2, 240, titleY + 98, 730, 1, {
-    peso: 800,
-    tamanho: Math.max(28, Math.round(titleFontSize * .66)),
-    minimo: 20,
-    lineHeight: Math.round(titleFontSize * .76),
-    blockHeight: Math.round(titleFontSize * .82),
-    align: "left"
-  });
+  if (config.showTitle !== false) {
+    const titleW = 820;
+    const titleH = 96;
+    const titleX = 130 + Number(config.titleOffsetX || 0);
+    const titleY = 402 + Number(config.titleOffsetY || 0);
+    preencherRoundRect(ctx, titleX, titleY, titleW, titleH, 0, hexParaRgbaArte(bandColor, .86));
+    ctx.fillStyle = "rgba(255,255,255,.10)";
+    ctx.fillRect(titleX, titleY, titleW, 2);
+    ctx.fillRect(titleX, titleY + titleH - 2, titleW, 2);
+    desenharLogoSemFundoCanvas(ctx, logo, titleX + 18, titleY + 12, 74, 72);
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "left";
+    desenharTextoInteiroCanvas(ctx, line1, titleX + 112, titleY + 12, titleW - 140, 1, {
+      peso: 900,
+      tamanho: titleFontSize,
+      minimo: 22,
+      lineHeight: Math.round(titleFontSize * 1.02),
+      blockHeight: Math.round(titleFontSize * 1.08),
+      align: "left"
+    });
+    ctx.fillStyle = "rgba(255,255,255,.88)";
+    desenharTextoInteiroCanvas(ctx, line2, titleX + 112, titleY + 56, titleW - 140, 1, {
+      peso: 800,
+      tamanho: Math.max(20, Math.round(titleFontSize * .58)),
+      minimo: 16,
+      lineHeight: Math.round(titleFontSize * .68),
+      blockHeight: Math.round(titleFontSize * .72),
+      align: "left"
+    });
+  }
 
-  const priceY = 1002;
-  preencherRoundRect(ctx, 120, priceY, 840, 130, 0, hexParaRgbaArte(bandColor, .92));
-  ctx.fillStyle = "rgba(255,255,255,.10)";
-  ctx.fillRect(120, priceY, 840, 3);
-  ctx.fillRect(120, priceY + 127, 840, 3);
-  ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "center";
-  ctx.font = "900 24px Arial";
-  ctx.fillText("POR APENAS", w / 2, priceY + 38);
-  fonteQueCabeCanvas(ctx, price, 900, priceFontSize, 30, 760);
-  ctx.fillText(price, w / 2, priceY + 98);
+  if (config.showPrice !== false) {
+    const priceW = 650;
+    const priceH = 88;
+    const priceX = 215 + Number(config.priceOffsetX || 0);
+    const priceY = 856 + Number(config.priceOffsetY || 0);
+    preencherRoundRect(ctx, priceX, priceY, priceW, priceH, 0, hexParaRgbaArte(bandColor, .9));
+    ctx.fillStyle = "rgba(255,255,255,.10)";
+    ctx.fillRect(priceX, priceY, priceW, 2);
+    ctx.fillRect(priceX, priceY + priceH - 2, priceW, 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "center";
+    ctx.font = "900 18px Arial";
+    ctx.fillText("POR APENAS", priceX + priceW / 2, priceY + 28);
+    fonteQueCabeCanvas(ctx, price, 900, priceFontSize, 26, priceW - 52);
+    ctx.fillText(price, priceX + priceW / 2, priceY + 70);
+  }
 
   const logoY = 1186;
   preencherRoundRect(ctx, 42, logoY, 486, 110, 0, "rgba(0,0,0,.56)");
@@ -13604,7 +13620,7 @@ function bindEvents() {
     atualizarVisibilidadeLayoutAutomovelArte();
     atualizarPreviaArteAutomovel({ silent: true });
   });
-  ["automovelArteTitulo", "automovelArteLayout", "automovelArteSubtitulo", "automovelArteTema", "automovelArteSubtitulo2", "automovelArteRodape", "automovelArteShowSiteLogo", "automovelArteTarjaLinha1", "automovelArteTarjaLinha2", "automovelArteTarjaPreco", "automovelArteTarjaCor", "automovelArteTarjaTituloFonte", "automovelArteTarjaPrecoFonte", "automovelArteImageScale", "automovelArteImageOffsetX", "automovelArteImageOffsetY", "automovelArteDarkOverlay"].forEach((id) => {
+  ["automovelArteTitulo", "automovelArteLayout", "automovelArteSubtitulo", "automovelArteTema", "automovelArteSubtitulo2", "automovelArteRodape", "automovelArteShowSiteLogo", "automovelArteTarjaLinha1", "automovelArteTarjaLinha2", "automovelArteTarjaPreco", "automovelArteTarjaCor", "automovelArteTarjaTituloFonte", "automovelArteTarjaPrecoFonte", "automovelArteTarjaTituloShow", "automovelArteTarjaTituloX", "automovelArteTarjaTituloY", "automovelArteTarjaPrecoShow", "automovelArteTarjaPrecoX", "automovelArteTarjaPrecoY", "automovelArteImageScale", "automovelArteImageOffsetX", "automovelArteImageOffsetY", "automovelArteDarkOverlay"].forEach((id) => {
     $(id)?.addEventListener("input", () => agendarPreviaArteAutomovel());
     $(id)?.addEventListener("change", () => {
       if (id === "automovelArteLayout") atualizarVisibilidadeLayoutAutomovelArte();
