@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 382,
-  label: "v388",
+  numero: 383,
+  label: "v389",
   data: "2026-07-04",
-  nota: "Cadastro novo de veiculos carrega dados do estabelecimento vinculado."
+  nota: "Previa de arte de veiculos permite arrastar elementos conforme o layout."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -55,6 +55,7 @@ let adminIdleTimer = null;
 let clientMetricsRealtimeUnsubscribers = [];
 let clientMetricsRealtimeSignature = "";
 let automovelArtePreviewTimer = null;
+let automovelArteDragState = null;
 
 let state = {
   user: null,
@@ -5599,8 +5600,143 @@ function preencherDefaultsTarjaAutomovel(force = false) {
 
 function atualizarVisibilidadeLayoutAutomovelArte() {
   const isThree = ($("automovelArteLayout")?.value || "premium45") === "tresFotosTarjas";
-  document.querySelector(".automovel-art-panel")?.classList.toggle("auto-art-layout-three", isThree);
+  const panel = document.querySelector(".automovel-art-panel");
+  panel?.classList.toggle("auto-art-layout-three", isThree);
+  panel?.classList.toggle("auto-art-layout-premium", !isThree);
+  automovelArteDragState = null;
   if (isThree) preencherDefaultsTarjaAutomovel(false);
+}
+
+function clampNumero(valor, min, max) {
+  const numero = Number(valor) || 0;
+  return Math.max(min, Math.min(max, numero));
+}
+
+function setValorControleArteAutomovel(id, valor) {
+  const input = $(id);
+  if (!input) return;
+  input.value = String(valor);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function pontoCanvasArteAutomovel(event, canvas = $("automovelArtePreview")) {
+  if (!canvas) return null;
+  const rect = canvas.getBoundingClientRect();
+  if (!rect.width || !rect.height) return null;
+  return {
+    x: (event.clientX - rect.left) * (canvas.width / rect.width),
+    y: (event.clientY - rect.top) * (canvas.height / rect.height)
+  };
+}
+
+function pontoDentroRetanguloArteAutomovel(ponto, rect) {
+  return ponto && rect && ponto.x >= rect.x && ponto.x <= rect.x + rect.w && ponto.y >= rect.y && ponto.y <= rect.y + rect.h;
+}
+
+function retangulosArrastaveisArteAutomovel(options = opcoesArteAutomovel()) {
+  if ((options.formato || "premium45") === "tresFotosTarjas") {
+    const config = options.threePhotos || {};
+    const rects = [];
+    if (config.showPrice !== false) {
+      rects.push({
+        tipo: "tarjaPreco",
+        x: 215 + Number(config.priceOffsetX || 0),
+        y: 856 + Number(config.priceOffsetY || 0),
+        w: 650,
+        h: 88,
+        inputX: "automovelArteTarjaPrecoX",
+        inputY: "automovelArteTarjaPrecoY",
+        minX: -360,
+        maxX: 360,
+        minY: -220,
+        maxY: 220
+      });
+    }
+    if (config.showTitle !== false) {
+      rects.push({
+        tipo: "tarjaTitulo",
+        x: 130 + Number(config.titleOffsetX || 0),
+        y: 402 + Number(config.titleOffsetY || 0),
+        w: 820,
+        h: 96,
+        inputX: "automovelArteTarjaTituloX",
+        inputY: "automovelArteTarjaTituloY",
+        minX: -360,
+        maxX: 360,
+        minY: -220,
+        maxY: 220
+      });
+    }
+    return rects;
+  }
+  return [{
+    tipo: "fotoPrincipal",
+    x: 305,
+    y: 375,
+    w: 730,
+    h: 445,
+    inputX: "automovelArteImageOffsetX",
+    inputY: "automovelArteImageOffsetY",
+    minX: -160,
+    maxX: 160,
+    minY: -140,
+    maxY: 140
+  }];
+}
+
+function elementoArrastavelArteAutomovel(ponto) {
+  return retangulosArrastaveisArteAutomovel().find((rect) => pontoDentroRetanguloArteAutomovel(ponto, rect)) || null;
+}
+
+function atualizarCursorArteAutomovel(event) {
+  const canvas = $("automovelArtePreview");
+  if (!canvas || automovelArteDragState) return;
+  const ponto = pontoCanvasArteAutomovel(event, canvas);
+  canvas.style.cursor = elementoArrastavelArteAutomovel(ponto) ? "grab" : "default";
+}
+
+function iniciarArrasteArteAutomovel(event) {
+  const canvas = $("automovelArtePreview");
+  const ponto = pontoCanvasArteAutomovel(event, canvas);
+  const alvo = elementoArrastavelArteAutomovel(ponto);
+  if (!canvas || !ponto || !alvo) return;
+  event.preventDefault();
+  automovelArteDragState = {
+    pointerId: event.pointerId,
+    alvo,
+    startX: ponto.x,
+    startY: ponto.y,
+    initialX: Number($(alvo.inputX)?.value || 0) || 0,
+    initialY: Number($(alvo.inputY)?.value || 0) || 0
+  };
+  canvas.setPointerCapture?.(event.pointerId);
+  canvas.style.cursor = "grabbing";
+}
+
+function moverArrasteArteAutomovel(event) {
+  const canvas = $("automovelArtePreview");
+  if (!automovelArteDragState || !canvas || event.pointerId !== automovelArteDragState.pointerId) {
+    atualizarCursorArteAutomovel(event);
+    return;
+  }
+  const ponto = pontoCanvasArteAutomovel(event, canvas);
+  if (!ponto) return;
+  event.preventDefault();
+  const { alvo, startX, startY, initialX, initialY } = automovelArteDragState;
+  const nextX = Math.round(clampNumero(initialX + ponto.x - startX, alvo.minX, alvo.maxX));
+  const nextY = Math.round(clampNumero(initialY + ponto.y - startY, alvo.minY, alvo.maxY));
+  setValorControleArteAutomovel(alvo.inputX, nextX);
+  setValorControleArteAutomovel(alvo.inputY, nextY);
+  atualizarPreviaArteAutomovel({ silent: true });
+}
+
+function finalizarArrasteArteAutomovel(event) {
+  const canvas = $("automovelArtePreview");
+  if (!automovelArteDragState || event.pointerId !== automovelArteDragState.pointerId) return;
+  canvas?.releasePointerCapture?.(event.pointerId);
+  automovelArteDragState = null;
+  if (canvas) canvas.style.cursor = "grab";
+  atualizarPreviaArteAutomovel({ silent: true });
 }
 
 function textoTituloAutomovelArte(item = {}, options = {}) {
@@ -13643,6 +13779,11 @@ function bindEvents() {
   $("previewAutomovelArtButton")?.addEventListener("click", () => {
     atualizarPreviaArteAutomovel();
   });
+  $("automovelArtePreview")?.addEventListener("pointerdown", iniciarArrasteArteAutomovel);
+  $("automovelArtePreview")?.addEventListener("pointermove", moverArrasteArteAutomovel);
+  $("automovelArtePreview")?.addEventListener("pointerup", finalizarArrasteArteAutomovel);
+  $("automovelArtePreview")?.addEventListener("pointercancel", finalizarArrasteArteAutomovel);
+  $("automovelArtePreview")?.addEventListener("pointerleave", atualizarCursorArteAutomovel);
   $("generateAutomovelArtButton")?.addEventListener("click", () => {
     gerarArteInstagramAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, "premium45", opcoesArteAutomovel());
   });
