@@ -540,22 +540,32 @@ function getHojeBR() {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
-function resolverChaveMetricaCliente(idEstabelecimento) {
-  const original = String(idEstabelecimento || "").trim();
-  const normalized = original
+function normalizarChaveMetricaCliente(valor) {
+  return String(valor || "")
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
+}
+
+function resolverChaveMetricaCliente(idEstabelecimento) {
+  const original = String(idEstabelecimento || "").trim();
+  const normalized = normalizarChaveMetricaCliente(original);
   const mapped = variantesChaveMetricaCliente(original)
-    .map((variant) => variant
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]/g, ""))
+    .map(normalizarChaveMetricaCliente)
     .map((key) => window.__metricClientIds?.[key])
     .find(Boolean);
-  return mapped || normalized;
+  if (mapped) return mapped;
+
+  const metricClientIds = window.__metricClientIds || {};
+  const fuzzyMatch = Object.entries(metricClientIds)
+    .filter(([key]) => {
+      const normalizedKey = normalizarChaveMetricaCliente(key);
+      return normalizedKey.length > 3 && normalized.length > 3
+        && (normalized.includes(normalizedKey) || normalizedKey.includes(normalized));
+    })
+    .sort((a, b) => String(b[0]).length - String(a[0]).length)[0];
+  return fuzzyMatch?.[1] || normalized;
 }
 
 function variantesChaveMetricaCliente(valor) {
@@ -586,7 +596,19 @@ function variantesChaveMetricaCliente(valor) {
 }
 
 function registrarMetricaCliente(idEstabelecimento, grupo, tipo, detalhes = {}) {
-  const clienteKey = resolverChaveMetricaCliente(idEstabelecimento);
+  const explicitClientId = String(detalhes.clienteId || "").trim();
+  const explicitClientKey = /^[a-z0-9-]+$/.test(explicitClientId) ? explicitClientId : "";
+  const metricCandidates = [
+    explicitClientKey,
+    detalhes.clienteId,
+    detalhes.estabelecimentoId,
+    detalhes.clienteNome,
+    detalhes.vendedor,
+    detalhes.loja,
+    detalhes.corretor,
+    idEstabelecimento
+  ].filter(Boolean);
+  const clienteKey = explicitClientKey || metricCandidates.map(resolverChaveMetricaCliente).find(Boolean);
   if (!clienteKey) return Promise.resolve();
 
   const hoje = getHojeBR();

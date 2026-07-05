@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 387,
-  label: "v393",
-  data: "2026-07-04",
-  nota: "Logo Ola Carlopolis da arte de veiculos ficou sem tarja e ajustavel, com exclusao direta na lista."
+  numero: 388,
+  label: "v394",
+  data: "2026-07-05",
+  nota: "Admin cliente abre em Dados da empresa e relatorio contabiliza melhor cliques de veiculos/imoveis por cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -414,6 +414,13 @@ function clienteAssociadoImoveis(client = {}, includeCurrentPermission = false) 
   return categoryMatches || permissionMatches;
 }
 
+function clienteAssociadoAutomoveis(client = {}, includeCurrentPermission = false) {
+  const category = normalizeName(client.categoria || client.category || client.categoriaId || client.tipoCliente || client.tipo || "");
+  const categoryMatches = /automovel|veiculo|revenda|carro|moto/.test(category);
+  const permissionMatches = includeCurrentPermission && Boolean(state.profile?.permissoes?.veiculos);
+  return categoryMatches || permissionMatches;
+}
+
 function atualizarVisibilidadeCreciCliente() {
   const field = $("clientCreciField");
   if (!field) return;
@@ -454,7 +461,7 @@ function canAccessImoveis() {
 }
 
 function canAccessAutomoveis() {
-  return hasPermission("veiculos") || canGenerateVeiculoImages();
+  return hasPermission("veiculos") || canGenerateVeiculoImages() || clienteAssociadoAutomoveis(currentClientRecord());
 }
 
 function currentClientId() {
@@ -9628,8 +9635,8 @@ function clientReportAvailability(client = {}, counts = {}) {
     || Number(counts.promocoes || 0) > 0
     || Number(counts.whatsappPromocao || 0) > 0;
   const hasWhatsappGroup = Boolean(client.grupoWhatsappAtivo !== false && client.grupoWhatsappLink);
-  const hasImoveis = canAccessImoveis();
-  const hasVeiculos = hasPermission("veiculos");
+  const hasImoveis = canAccessImoveis() || clienteAssociadoImoveis(client, true) || Number(counts.imoveis || 0) > 0;
+  const hasVeiculos = hasPermission("veiculos") || clienteAssociadoAutomoveis(client, true) || Number(counts.veiculos || 0) > 0;
   return {
     whats: hasContacts,
     whatsappPromocao: hasPromotions,
@@ -9711,6 +9718,8 @@ function renderClientMetricReportContent(client = {}) {
     promocoes: promocoesLiquidas,
     whatsappPromocao,
     historicoPromocoes,
+    imoveis,
+    veiculos,
     novidades,
     outrasRedes,
     outros
