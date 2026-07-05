@@ -9536,7 +9536,6 @@ plotarPinsImoveis(stateImoveis.filtered);
               ${imagens.length > 1 ? `
                 <button class="auto-gallery-nav auto-gallery-prev" type="button" aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
                 <button class="auto-gallery-nav auto-gallery-next" type="button" aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
-                <span class="auto-gallery-count">1/${imagens.length}</span>
               ` : ""}
             ` : `<div class="auto-card-img auto-card-img-empty"><i class="fa-solid fa-car-side"></i></div>`}
             ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(formatarPrecoAutomoveis(item.preco))}</strong>` : ""}
@@ -9615,7 +9614,6 @@ plotarPinsImoveis(stateImoveis.filtered);
     const detalhes = [
       ["Marca", item.marca],
       ["Modelo", item.modelo],
-      ["Tipo", item.tipo],
       ["Condicao", item.condicao],
       ["Ano", item.ano],
       ["KM", item.km],
@@ -9636,13 +9634,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       ["Aceita troca", item.aceitaTroca],
       ["Aceita financiamento", item.aceitaFinanciamento],
       ["Documentacao", item.documentacao],
-      ["Cidade", item.cidade],
-      ["Loja", item.loja],
-      ["Vendedor", item.vendedor || item.clienteNome],
-      ["Contato", contato],
-      ["Instagram", instagram],
-      ["Status", item.status],
-      ["ID", item.id]
+      ["Cidade", item.cidade]
     ].filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== "" && String(value) !== "0");
 
     const modal = document.createElement("div");
@@ -9651,7 +9643,6 @@ plotarPinsImoveis(stateImoveis.filtered);
       <section class="imovel-detalhes-dialog auto-detalhes-dialog" role="dialog" aria-modal="true" aria-label="Detalhes de ${textoSeguroAutomoveis(titulo)}">
         <button type="button" class="imovel-detalhes-fechar auto-detalhes-fechar" aria-label="Fechar detalhes" title="Fechar">&times;</button>
         <div class="imovel-detalhes-media auto-detalhes-media">
-          <span class="imovel-detalhes-finalidade auto-detalhes-finalidade">${textoSeguroAutomoveis(String(item.tipo || "Veiculo").toUpperCase())}</span>
           ${imagens[0] ? `
             <div class="imovel-detalhes-galeria-track auto-detalhes-galeria-track" data-auto-detalhes-galeria-track>
               ${imagens.map((src, index) => `<img src="${textoSeguroAutomoveis(src)}" alt="Foto ${index + 1} de ${textoSeguroAutomoveis(titulo)}" loading="lazy" decoding="async">`).join("")}
@@ -9659,7 +9650,6 @@ plotarPinsImoveis(stateImoveis.filtered);
             ${imagens.length > 1 ? `
               <button type="button" class="imovel-detalhes-galeria-nav anterior" data-auto-detalhes-galeria-anterior aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button>
               <button type="button" class="imovel-detalhes-galeria-nav proxima" data-auto-detalhes-galeria-proxima aria-label="Proxima foto"><i class="fa-solid fa-chevron-right"></i></button>
-              <span class="imovel-detalhes-galeria-contador" data-auto-detalhes-galeria-contador>1 / ${imagens.length}</span>
             ` : ""}
           ` : `<div class="imovel-detalhes-sem-foto auto-detalhes-sem-foto"><i class="fa-solid fa-car-side"></i></div>`}
         </div>
@@ -9702,12 +9692,10 @@ plotarPinsImoveis(stateImoveis.filtered);
     };
     let indiceImagem = 0;
     const galeriaTrack = modal.querySelector("[data-auto-detalhes-galeria-track]");
-    const contadorGaleria = modal.querySelector("[data-auto-detalhes-galeria-contador]");
     const atualizarGaleria = (novoIndice) => {
       if (!galeriaTrack || !imagens.length) return;
       indiceImagem = (novoIndice + imagens.length) % imagens.length;
       galeriaTrack.style.transform = `translateX(-${indiceImagem * 100}%)`;
-      if (contadorGaleria) contadorGaleria.textContent = `${indiceImagem + 1} / ${imagens.length}`;
     };
     const navegarGaleria = (direcao) => {
       registrarCliqueAutomovel("fotos", item);
@@ -9750,27 +9738,18 @@ plotarPinsImoveis(stateImoveis.filtered);
   function configurarGaleriasAutomoveis(box) {
     box.querySelectorAll(".auto-card-media").forEach((media) => {
       const track = media.querySelector(".auto-gallery-track");
-      const count = media.querySelector(".auto-gallery-count");
       const imagens = lerImagensGaleriaAutomovel(media);
-      const atualizarContador = () => {
-        if (!track || !count || !imagens.length) return;
-        const indice = Math.round(track.scrollLeft / Math.max(track.clientWidth, 1));
-        count.textContent = `${Math.min(indice + 1, imagens.length)}/${imagens.length}`;
-      };
 
       media.querySelector(".auto-gallery-prev")?.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
         track?.scrollBy({ left: -track.clientWidth, behavior: "smooth" });
-        setTimeout(atualizarContador, 260);
       });
       media.querySelector(".auto-gallery-next")?.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
         track?.scrollBy({ left: track.clientWidth, behavior: "smooth" });
-        setTimeout(atualizarContador, 260);
       });
-      track?.addEventListener("scroll", atualizarContador, { passive: true });
       media.querySelectorAll(".auto-gallery-img").forEach((img) => {
         img.addEventListener("click", (event) => {
           event.preventDefault();
