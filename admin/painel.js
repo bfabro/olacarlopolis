@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 391,
-  label: "v397",
+  numero: 392,
+  label: "v398",
   data: "2026-07-06",
-  nota: "Logo Ola Carlopolis maior no layout 3 fotos e escolha da logo em artes de veiculos controlada pelo master."
+  nota: "Logo Ola Carlopolis no layout 3 fotos ficou fixa no canto inferior direito com margem segura."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5679,12 +5679,16 @@ function pontoDentroRetanguloArteAutomovel(ponto, rect) {
   return ponto && rect && ponto.x >= rect.x && ponto.x <= rect.x + rect.w && ponto.y >= rect.y && ponto.y <= rect.y + rect.h;
 }
 
-function retanguloLogoSiteTresFotosArteAutomovel(config = {}) {
+function retanguloLogoSiteTresFotosArteAutomovel() {
+  const largura = 150;
+  const altura = 70;
+  const margemDireita = 35;
+  const margemInferior = 45;
   return {
-    x: 734 + Number(config.siteLogoOffsetX || 0),
-    y: 1218 + Number(config.siteLogoOffsetY || 0),
-    w: 326,
-    h: 112
+    x: 1080 - margemDireita - largura,
+    y: 1350 - margemInferior - altura,
+    w: largura,
+    h: altura
   };
 }
 
@@ -5692,22 +5696,6 @@ function retangulosArrastaveisArteAutomovel(options = opcoesArteAutomovel()) {
   if ((options.formato || "premium45") === "tresFotosTarjas") {
     const config = options.threePhotos || {};
     const rects = [];
-    if (options.showSiteLogo !== false) {
-      const logoRect = retanguloLogoSiteTresFotosArteAutomovel(config);
-      rects.push({
-        tipo: "logoSite",
-        x: logoRect.x,
-        y: logoRect.y,
-        w: logoRect.w,
-        h: logoRect.h,
-        inputX: "automovelArteSiteLogoX",
-        inputY: "automovelArteSiteLogoY",
-        minX: -900,
-        maxX: 900,
-        minY: -900,
-        maxY: 900
-      });
-    }
     if (config.showClient !== false) {
       rects.push({
         tipo: "tarjaCliente",
