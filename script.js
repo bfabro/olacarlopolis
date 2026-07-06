@@ -7214,14 +7214,11 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   // ============ PROMOÇÕES ============
 
   function chavePromocaoPublica(item = {}, contexto = {}) {
-    const estabelecimento = normalizeName(
-      contexto.estabelecimentoId
-      || contexto.nomeNormalizado
-      || contexto.estabelecimento
-      || item.estabelecimentoId
-      || item.estabelecimento
-      || ""
-    );
+    const estabelecimento = [...chavesDonoPromocaoPublica(item, contexto)][0] || "";
+    return `${estabelecimento}|${conteudoPromocaoPublica(item)}`;
+  }
+
+  function conteudoPromocaoPublica(item = {}) {
     const titulo = normalizeName(item.titulo || item.nome || item.name || "");
     const descricao = normalizeName(item.descricao || item.description || item.obs || item.observacoes || "");
     const imagem = normalizeName(item.imagem || item.image || item.imagemUrl || item.imageUrl || item.foto || item.fotoUrl || item.banner || "");
@@ -7230,7 +7227,6 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const validade = normalizeName(item.validadeFim || item.validade || "");
     const fallbackId = normalizeName(item.id || "");
     return [
-      estabelecimento,
       titulo || fallbackId,
       preco,
       desconto,
@@ -7240,13 +7236,59 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     ].join("|");
   }
 
+  function chavesDonoPromocaoPublica(item = {}, contexto = {}) {
+    const valores = [
+      contexto.estabelecimentoId,
+      contexto.nomeNormalizado,
+      contexto.estabelecimento,
+      contexto.clienteId,
+      contexto.clienteNome,
+      item.estabelecimentoId,
+      item.estabelecimento,
+      item.clienteId,
+      item.clienteNome,
+      item.nomeCliente
+    ];
+    const chaves = new Set(valores.map((value) => normalizeName(value)).filter(Boolean));
+    const alvo = [...chaves].find(Boolean);
+    if (alvo && typeof encontrarCategoriaEstabelecimentoPublico === "function") {
+      const encontrado = encontrarCategoriaEstabelecimentoPublico(alvo);
+      if (encontrado?.estabelecimento) {
+        chavesEstabelecimentoPublico(encontrado.estabelecimento).forEach((chave) => chaves.add(chave));
+        const cliente = clientePublicoDoEstabelecimento(encontrado.estabelecimento);
+        if (cliente) {
+          [cliente.id, cliente.nome, cliente.name, cliente.nomeNormalizado].map((value) => normalizeName(value)).filter(Boolean).forEach((chave) => chaves.add(chave));
+        }
+      }
+    }
+    if (typeof window !== "undefined") {
+      Object.entries(window.__clientesPublicosCache || {}).forEach(([id, cliente]) => {
+        const aliases = [id, cliente?.nome, cliente?.name, cliente?.nomeNormalizado].map((value) => normalizeName(value)).filter(Boolean);
+        if (!aliases.some((alias) => chaves.has(alias))) return;
+        aliases.forEach((alias) => chaves.add(alias));
+      });
+    }
+    return chaves;
+  }
+
+  function donosPromocaoRelacionados(a = new Set(), b = new Set()) {
+    if (!a.size || !b.size) return false;
+    return [...a].some((chaveA) => [...b].some((chaveB) => (
+      chaveA === chaveB
+      || (chaveA.length >= 4 && chaveB.length >= 4 && (chaveA.includes(chaveB) || chaveB.includes(chaveA)))
+    )));
+  }
+
   function deduplicarPromocoesPublicas(lista = []) {
-    const vistos = new Set();
+    const vistosPorConteudo = new Map();
     return (lista || []).filter((item) => {
-      const chave = chavePromocaoPublica(item);
-      if (!chave.trim()) return true;
-      if (vistos.has(chave)) return false;
-      vistos.add(chave);
+      const conteudo = conteudoPromocaoPublica(item);
+      if (!conteudo.trim()) return true;
+      const donos = chavesDonoPromocaoPublica(item);
+      const vistos = vistosPorConteudo.get(conteudo) || [];
+      if (vistos.some((anteriores) => donosPromocaoRelacionados(donos, anteriores))) return false;
+      vistos.push(donos);
+      vistosPorConteudo.set(conteudo, vistos);
       return true;
     });
   }
