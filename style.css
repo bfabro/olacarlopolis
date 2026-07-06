@@ -20768,11 +20768,171 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   align-items: stretch;
 }
 
+.loja-itens-aba .automoveis-page.auto-cards-mode .auto-cards-grid,
+.loja-itens-aba .imoveis-wrap.im-cards-mode .loja-itens-grid,
+.loja-itens-aba .promo-city-screen .loja-cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+}
+
 .loja-itens-wrap .auto-card,
 .loja-itens-wrap .card-imovel,
 .loja-produto-card {
   width: 100%;
   min-width: 0;
+}
+
+.loja-itens-aba .automoveis-page.auto-cards-mode .auto-card,
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-imovel,
+.loja-itens-aba .promo-city-screen .loja-produto-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  margin: 0 !important;
+}
+
+.loja-itens-aba .promo-city-screen {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 12px 0 4px !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.loja-itens-aba .promo-city-screen .loja-produto-card {
+  position: relative !important;
+  overflow: hidden !important;
+  border: 1px solid #dbe5f2 !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .10) !important;
+  cursor: pointer !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-card-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  min-height: 100% !important;
+  padding: 8px !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-produto {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  padding: 0 !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-image-wrap {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-image-wrap::after {
+  display: none !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-img-zoom,
+.loja-itens-aba .promo-city-screen .promo-produto img,
+.loja-itens-aba .promo-city-screen .promo-sem-imagem {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  max-height: none !important;
+  border-radius: 12px !important;
+  object-fit: cover !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-sem-imagem {
+  display: grid !important;
+  place-items: center !important;
+  background: #eef4fb !important;
+  color: #64748b !important;
+  font-size: .86rem !important;
+  font-weight: 900 !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-info {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  padding: 0 !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-estab {
+  color: #2563eb !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-nome {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #0f172a !important;
+  font-size: .98rem !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-obs {
+  display: -webkit-box !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #64748b !important;
+  font-size: .78rem !important;
+  line-height: 1.25 !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.loja-itens-aba .promo-city-screen .promo-obs::before,
+.loja-itens-aba .promo-city-screen .promo-validade-media,
+.loja-itens-aba .promo-city-screen .promo-discount-badge,
+.loja-itens-aba .promo-city-screen .promo-days,
+.loja-itens-aba .promo-city-screen .promo-det,
+.loja-itens-aba .promo-city-screen .promo-preco-label,
+.loja-itens-aba .promo-city-screen .promo-unidade,
+.loja-itens-aba .promo-city-screen .promo-preco .promo-validade {
+  display: none !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-preco {
+  position: static !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  margin: auto 0 0 !important;
+  padding: 8px 10px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: #eef6ff !important;
+  box-shadow: none !important;
+}
+
+.loja-itens-aba .promo-city-screen .promo-preco-atual {
+  color: #155bd5 !important;
+  font-size: .9rem !important;
+  font-weight: 950 !important;
+  line-height: 1.1 !important;
+  text-align: center !important;
 }
 
 .loja-itens-wrap .auto-card,
@@ -20794,5 +20954,20 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 
   .loja-produtos-grid.promo-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  .loja-itens-aba .automoveis-page.auto-cards-mode .auto-cards-grid,
+  .loja-itens-aba .imoveis-wrap.im-cards-mode .loja-itens-grid,
+  .loja-itens-aba .promo-city-screen .loja-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .loja-itens-aba .promo-city-screen .promo-nome {
+    font-size: .9rem !important;
+  }
+
+  .loja-itens-aba .promo-city-screen .promo-preco-atual {
+    font-size: .82rem !important;
   }
 }

@@ -21543,8 +21543,8 @@ ${!establishment.descricaoFalecido ? `
        <!-- FOTOS -->
 ${mostrarAbaVeiculosInicial ? `
   <div class="aba loja-itens-aba" id="veiculos-${slugEstabelecimentoPublico}" style="display:none">
-    <section class="imoveis-wrap automoveis-page loja-itens-wrap">
-      <div class="im-grid loja-itens-grid">
+    <section class="imoveis-wrap automoveis-page auto-cards-mode loja-itens-wrap loja-veiculos-wrap">
+      <div class="im-grid auto-cards-grid loja-itens-grid loja-veiculos-grid">
         ${veiculosIniciaisLoja.length ? "" : `<div class="list-meta">Carregando veiculos desta loja...</div>`}
       </div>
     </section>
@@ -21592,8 +21592,8 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
 
 ${produtosIniciaisLoja.length ? `
   <div class="aba loja-itens-aba" id="produtos-${slugEstabelecimentoPublico}" style="display:none">
-    <section class="promo-city-screen loja-itens-wrap">
-      <div class="promo-grid loja-produtos-grid">${produtosIniciaisLoja.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div>
+    <section class="promo-city-screen loja-itens-wrap loja-produtos-wrap">
+      <div class="promo-grid loja-produtos-grid loja-cards-grid">${produtosIniciaisLoja.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div>
     </section>
   </div>
 ` : ``}
