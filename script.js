@@ -7266,6 +7266,80 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     ].map(normalizeName).filter(Boolean);
   }
 
+  function usuariosPublicosDoCliente(clienteId = "") {
+    const id = String(clienteId || "").trim();
+    if (!id || typeof window === "undefined") return [];
+    const usuarios = window.__usuariosPublicosCache || {};
+    return Object.values(usuarios).filter((user) => (
+      user
+      && user.status !== "inativo"
+      && user.status !== "bloqueado"
+      && String(user.clienteId || "") === id
+    ));
+  }
+
+  function clientePublicoDoEstabelecimento(est = {}) {
+    if (est.__clientePublico) return est.__clientePublico;
+    const clientes = typeof window !== "undefined" ? (window.__clientesPublicosCache || {}) : {};
+    const chaves = new Set(chavesEstabelecimentoPublico(est));
+    const cliente = Object.entries(clientes).map(([id, value]) => ({ id, ...value })).find((item) => (
+      chaves.has(normalizeName(item.id))
+      || chaves.has(normalizeName(item.nome))
+      || chaves.has(normalizeName(item.name))
+      || chaves.has(normalizeName(item.nomeNormalizado))
+    )) || null;
+    if (cliente) est.__clientePublico = cliente;
+    return cliente;
+  }
+
+  function moduloClientePublicoAtivo(est = {}, modulo = "") {
+    const cliente = clientePublicoDoEstabelecimento(est) || {};
+    const usuarios = usuariosPublicosDoCliente(cliente.id || est.clienteId || "");
+    const permissoes = usuarios.reduce((acc, user) => {
+      Object.entries(user.permissoes || {}).forEach(([key, value]) => {
+        acc[key] = Boolean(acc[key] || value);
+      });
+      return acc;
+    }, {
+      ...(cliente.permissoes || {}),
+      ...(est.permissoes || {})
+    });
+    if (Object.prototype.hasOwnProperty.call(permissoes, modulo)) return Boolean(permissoes[modulo]);
+    if (modulo === "veiculos") return estabelecimentoPublicoEhDeVeiculos({ ...est, ...cliente });
+    if (modulo === "imoveis") {
+      const texto = normalizeName([
+        est.categoria,
+        est.categoriaId,
+        est.__categoriaPublica,
+        cliente.categoria,
+        cliente.categoriaId,
+        cliente.tipo,
+        cliente.tipoCliente
+      ].filter(Boolean).join(" "));
+      return /imovel|imoveis|imobili|corretor/.test(texto);
+    }
+    return Boolean(permissoes[modulo]);
+  }
+
+  async function carregarModulosClientesPublicos() {
+    if (typeof window === "undefined") return;
+    if (window.__clientesPublicosCache && window.__usuariosPublicosCache) return;
+    if (window.__modulosClientesPublicosPromise) return window.__modulosClientesPublicosPromise;
+    window.__modulosClientesPublicosPromise = (async () => {
+      const dbAdmin = await esperarFirebaseDatabase();
+      if (!dbAdmin) return;
+      const [clientesSnap, usuariosSnap] = await Promise.all([
+        dbAdmin.ref("clientes").once("value"),
+        dbAdmin.ref("usuariosByUid").once("value")
+      ]);
+      window.__clientesPublicosCache = window.__clientesPublicosCache || clientesSnap.val() || {};
+      window.__usuariosPublicosCache = window.__usuariosPublicosCache || usuariosSnap.val() || {};
+    })().catch((error) => {
+      console.warn("Nao foi possivel carregar modulos publicos dos clientes.", error);
+    });
+    return window.__modulosClientesPublicosPromise;
+  }
+
   function itemPertenceAoEstabelecimentoPublico(item = {}, est = {}) {
     const chaves = new Set(chavesEstabelecimentoPublico(est));
     if (!chaves.size) return false;
@@ -7350,7 +7424,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   }
 
   function produtosDoEstabelecimentoPublico(est = {}) {
-    const origem = est.produtos || est.products || est.itens || est.items || [];
+    const cliente = clientePublicoDoEstabelecimento(est) || {};
+    const origem = est.produtos || cliente.produtos || est.products || cliente.products || est.itens || cliente.itens || est.items || cliente.items || [];
     const lista = Array.isArray(origem)
       ? origem
       : Object.entries(origem || {}).map(([id, value]) => (
@@ -7370,11 +7445,48 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       .filter((item) => item.status !== "inativo" && item.ativo !== false && item.titulo);
   }
 
+  function normalizarPromocoesPublicas(origem = [], contexto = {}) {
+    const lista = Array.isArray(origem)
+      ? origem
+      : Object.entries(origem || {}).map(([id, value]) => (
+        value && typeof value === "object" ? { id, ...value } : { id, titulo: value }
+      ));
+    return lista
+      .map((item, index) => ({
+        id: item.id || `promo-${normalizeName(contexto.estabelecimentoId || contexto.estabelecimento || "loja")}-${index}`,
+        estabelecimento: contexto.estabelecimento || item.estabelecimento || "",
+        estabelecimentoId: contexto.estabelecimentoId || item.estabelecimentoId || "",
+        titulo: item.titulo || item.nome || item.name || "Promocao",
+        descricao: item.descricao || item.description || item.obs || "",
+        preco: item.preco || item.valor || item.price || "",
+        desconto: item.desconto || item.discount || "",
+        imagem: item.imagem || item.image || item.foto || item.fotoUrl || item.imagemUrl || "",
+        validadeInicio: item.validadeInicio || item.validade || null,
+        validadeFim: item.validadeFim || null,
+        diasSemana: normalizarDiasSemanaPromocao(item.diasSemana || item.dias || item.recorrenciaDias || item.diaSemana),
+        obs: item.obs || item.observacoes || "",
+        ativo: item.ativo === false ? false : true,
+        status: item.status || "ativo"
+      }))
+      .filter((item) => item.status !== "inativo" && item.ativo !== false && item.titulo);
+  }
+
   function promocoesDoEstabelecimentoPublico(est = {}) {
     const chaves = new Set(chavesEstabelecimentoPublico(est));
-    return coletarTodasPromocoes()
+    const cliente = clientePublicoDoEstabelecimento(est) || {};
+    const promocoesCliente = normalizarPromocoesPublicas(cliente.promocoes || est.promocoes || est.promotions || [], {
+      estabelecimento: est.name || cliente.nome || cliente.name || "",
+      estabelecimentoId: normalizeName(est.nomeNormalizado || cliente.nomeNormalizado || cliente.id || est.name || "")
+    });
+    const porId = new Map();
+    [...coletarTodasPromocoes(), ...promocoesCliente]
       .filter((promo) => chaves.has(normalizeName(promo.estabelecimentoId)) || chaves.has(normalizeName(promo.estabelecimento)))
-      .filter((promo) => !promoExpirada(promo) && promoDisponivelHoje(promo));
+      .filter((promo) => !promoExpirada(promo) && promoDisponivelHoje(promo))
+      .forEach((promo) => {
+        const id = String(promo.id || `${promo.estabelecimentoId}-${promo.titulo}`);
+        if (!porId.has(id)) porId.set(id, promo);
+      });
+    return Array.from(porId.values());
   }
 
   function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
@@ -10384,6 +10496,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     const autos = Array.isArray(options.autos) ? options.autos : (window.__automoveisCache || []);
     const imoveis = Array.isArray(options.imoveis) ? options.imoveis : (window.__imoveisPublicosCache || []);
+    await carregarModulosClientesPublicos();
     if (carregarRemoto) {
       carregarAutomoveisFirebase({ reidratarLojas: false })
         .then((lista) => {
@@ -10436,7 +10549,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       const imoveisDoEst = (imoveis || []).filter((item) => item.status !== "inativo" && item.ativo !== false && itemPertenceAoEstabelecimentoPublico(item, est));
       const produtos = produtosDoEstabelecimentoPublico(est);
       const promocoes = promocoesDoEstabelecimentoPublico(est);
-      const deveMostrarAbaVeiculos = veiculos.length || estabelecimentoPublicoEhDeVeiculos(est);
+      const deveMostrarAbaVeiculos = veiculos.length && moduloClientePublicoAtivo(est, "veiculos");
+      const deveMostrarAbaImoveis = imoveisDoEst.length && moduloClientePublicoAtivo(est, "imoveis");
+      const deveMostrarAbaProdutos = produtos.length && moduloClientePublicoAtivo(est, "produtos");
+      const deveMostrarAbaPromocoes = promocoes.length && moduloClientePublicoAtivo(est, "promocoes");
       const temAbaItens = Boolean(li.querySelector(
         `[data-target="veiculos-${slug}"],[data-target="imoveis-${slug}"],[data-target="produtos-${slug}"],[data-target="promocoes-${slug}"]`
       ));
@@ -10454,14 +10570,14 @@ plotarPinsImoveis(stateImoveis.filtered);
         }) || abasInseridas;
       }
 
-      if (imoveisDoEst.length) {
+      if (deveMostrarAbaImoveis) {
         abasInseridas = adicionarAba(li, slug, "imoveis", "Imoveis", "fa-house", (pane) => {
           pane.innerHTML = `<section class="imoveis-wrap im-cards-mode loja-itens-wrap"><div class="im-grid loja-itens-grid"></div></section>`;
           renderImoveisCardsEstabelecimento(imoveisDoEst, pane.querySelector(".loja-itens-grid"));
         }) || abasInseridas;
       }
 
-      if (produtos.length) {
+      if (deveMostrarAbaProdutos) {
         abasInseridas = adicionarAba(li, slug, "produtos", "Produtos", "fa-box-open", (pane) => {
           pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap"><div class="promo-grid loja-produtos-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
@@ -10478,7 +10594,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         }) || abasInseridas;
       }
 
-      if (promocoes.length) {
+      if (deveMostrarAbaPromocoes) {
         abasInseridas = adicionarAba(li, slug, "promocoes", "Promocoes", "fa-tags", (pane) => {
           const itens = promocoes.map((promo) => ({
             id: promo.id,
@@ -20164,15 +20280,18 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!dbAdmin) return;
 
       try {
-        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, gruposWhatsappSnap] = await Promise.all([
+        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, gruposWhatsappSnap, usuariosSnap] = await Promise.all([
           dbAdmin.ref("clientes").once("value"),
           dbAdmin.ref("categorias").once("value"),
           dbAdmin.ref("conteudosInformativos/notaFalecimento").once("value"),
           dbAdmin.ref("eventos").once("value"),
           dbAdmin.ref("configuracoes/paginaInicial").once("value"),
-          dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value")
+          dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value"),
+          dbAdmin.ref("usuariosByUid").once("value")
         ]);
         const clientes = clientesSnap.val() || {};
+        window.__clientesPublicosCache = clientes;
+        window.__usuariosPublicosCache = usuariosSnap.val() || {};
         const categoriasAdmin = categoriasSnap.val() || {};
         const notasFalecimentoAdmin = notasFalecimentoSnap.val() || {};
         const eventosAdmin = eventosSnap.val() || {};
@@ -20987,12 +21106,13 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
       let mostrarAbaVeiculosInicial = false;
       try {
         veiculosIniciaisLoja = automoveisDoEstabelecimentoPublico(establishment, window.__automoveisCache || []);
-        mostrarAbaVeiculosInicial = Boolean(veiculosIniciaisLoja.length || estabelecimentoPublicoEhDeVeiculos(establishment));
+        mostrarAbaVeiculosInicial = Boolean(veiculosIniciaisLoja.length && moduloClientePublicoAtivo(establishment, "veiculos"));
       } catch (error) {
         console.warn("Nao foi possivel preparar aba inicial de veiculos.", error);
       }
       try {
         produtosIniciaisLoja = produtosDoEstabelecimentoPublico(establishment);
+        if (!moduloClientePublicoAtivo(establishment, "produtos")) produtosIniciaisLoja = [];
       } catch (error) {
         console.warn("Nao foi possivel preparar aba inicial de produtos.", error);
       }
