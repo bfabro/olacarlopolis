@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 401,
-  label: "v407",
+  numero: 402,
+  label: "v408",
   data: "2026-07-06",
-  nota: "Aba Veiculos da loja publica e reprocessada em qualquer rota do estabelecimento."
+  nota: "Aba Veiculos e Produtos nascem direto no card publico do estabelecimento."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

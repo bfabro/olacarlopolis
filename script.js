@@ -20907,6 +20907,12 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
       
           
       ${paidEstablishments.map((establishment) => {
+      establishment.__categoriaPublica = title;
+      const slugEstabelecimentoPublico = normalizeName(establishment.name);
+      const veiculosIniciaisLoja = automoveisDoEstabelecimentoPublico(establishment, window.__automoveisCache || []);
+      const mostrarAbaVeiculosInicial = veiculosIniciaisLoja.length || estabelecimentoPublicoEhDeVeiculos(establishment);
+      const produtosIniciaisLoja = produtosDoEstabelecimentoPublico(establishment);
+      const promocoesIniciaisLoja = promocoesDoEstabelecimentoPublico(establishment);
       let statusAberto = "";
       if (establishment.funcionamento24Horas || establishment.horarios) {
         const aberto = establishment.funcionamento24Horas || estaAbertoAgora(establishment.horarios);
@@ -20978,22 +20984,34 @@ ${!establishment.descricaoFalecido ? `
 
 
             <div class="abas-nav">
-          <button class="aba-tab active"  data-target="info-${normalizeName(establishment.name)}"><i class="fas fa-circle-info tab-icon"></i> Info</button>
+          <button class="aba-tab active"  data-target="info-${slugEstabelecimentoPublico}"><i class="fas fa-circle-info tab-icon"></i> Info</button>
+
+  ${mostrarAbaVeiculosInicial ? `
+    <button class="aba-tab" data-target="veiculos-${slugEstabelecimentoPublico}"><i class="fa-solid fa-car-side tab-icon"></i> Veiculos</button>
+  ` : ''}
 
   ${(establishment.novidadesImages && establishment.novidadesImages.length) ? `
-    <button class="aba-tab"   data-target="fotos-${normalizeName(establishment.name)}">📷 Fotos (${establishment.novidadesImages.length})</button>
+    <button class="aba-tab"   data-target="fotos-${slugEstabelecimentoPublico}">📷 Fotos (${establishment.novidadesImages.length})</button>
   ` : ''}
 
   ${cardapioVisivel(establishment) ? `
-    <button class="aba-tab"       data-target="cardapio-${normalizeName(establishment.name)}"
+    <button class="aba-tab"       data-target="cardapio-${slugEstabelecimentoPublico}"
             ${establishment.cardapioLink ? `data-link="${establishment.cardapioLink}"` : ''}>
       🍽️ Cardápio${(establishment.menuImages && establishment.menuImages.length) ? ` (${establishment.menuImages.length})` : ``}
     </button>
   ` : ''}
+
+  ${produtosIniciaisLoja.length ? `
+    <button class="aba-tab" data-target="produtos-${slugEstabelecimentoPublico}"><i class="fa-solid fa-box-open tab-icon"></i> Produtos</button>
+  ` : ''}
+
+  ${promocoesIniciaisLoja.length ? `
+    <button class="aba-tab" data-target="promocoes-${slugEstabelecimentoPublico}"><i class="fa-solid fa-tags tab-icon"></i> Promocoes</button>
+  ` : ''}
 </div>
 
-<div class="abas-conteudo" data-estab="${normalizeName(establishment.name)}">
-  <div class="aba aba-info visible" id="info-${normalizeName(establishment.name)}">
+<div class="abas-conteudo" data-estab="${slugEstabelecimentoPublico}">
+  <div class="aba aba-info visible" id="info-${slugEstabelecimentoPublico}">
        <!-- TODO: aqui ficam as info-box (funcionamento, endereço, etc.) -->
 
          ${establishment.statusAberto ? `
@@ -21221,8 +21239,18 @@ ${!establishment.descricaoFalecido ? `
    
 
        <!-- FOTOS -->
+${mostrarAbaVeiculosInicial ? `
+  <div class="aba loja-itens-aba" id="veiculos-${slugEstabelecimentoPublico}" style="display:none">
+    <section class="imoveis-wrap automoveis-page loja-itens-wrap">
+      <div class="im-grid loja-itens-grid">
+        ${veiculosIniciaisLoja.length ? "" : `<div class="list-meta">Carregando veiculos desta loja...</div>`}
+      </div>
+    </section>
+  </div>
+` : ``}
+
 ${(establishment.novidadesImages && establishment.novidadesImages.length > 0) ? `
-  <div class="aba" id="fotos-${normalizeName(establishment.name)}" style="display:none">
+  <div class="aba" id="fotos-${slugEstabelecimentoPublico}" style="display:none">
     <div class="swiper" id="novidades-${encodeURIComponent(establishment.name)}">
       <div class="swiper-wrapper">
         ${establishment.novidadesImages.map((img, idx) => `
@@ -21242,7 +21270,7 @@ ${(establishment.novidadesImages && establishment.novidadesImages.length > 0) ? 
 
 <!-- CARDÁPIO -->
 ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.menuImages.length > 0) ? `
-  <div class="aba" id="cardapio-${normalizeName(establishment.name)}" style="display:none">
+  <div class="aba" id="cardapio-${slugEstabelecimentoPublico}" style="display:none">
     <div class="swiper" id="menu-${encodeURIComponent(establishment.name)}">
       <div class="swiper-wrapper">
         ${establishment.menuImages.map((img, idx) => `
@@ -21257,6 +21285,30 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
       <div class="swiper-button-prev"></div>
       <div class="swiper-button-next"></div>
     </div>
+  </div>
+` : ``}
+
+${produtosIniciaisLoja.length ? `
+  <div class="aba loja-itens-aba" id="produtos-${slugEstabelecimentoPublico}" style="display:none">
+    <section class="promo-city-screen loja-itens-wrap">
+      <div class="promo-grid loja-produtos-grid">${produtosIniciaisLoja.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div>
+    </section>
+  </div>
+` : ``}
+
+${promocoesIniciaisLoja.length ? `
+  <div class="aba loja-itens-aba" id="promocoes-${slugEstabelecimentoPublico}" style="display:none">
+    <section class="promo-city-screen loja-itens-wrap">
+      <div class="promo-grid loja-produtos-grid">${promocoesIniciaisLoja.map((promo) => renderProdutoCardEstabelecimento({
+        id: promo.id,
+        titulo: promo.titulo,
+        descricao: promo.descricao || promo.obs,
+        preco: promo.preco,
+        imagem: promo.imagem,
+        observacoes: [promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "", promo.desconto ? `Desconto: ${promo.desconto}` : ""].filter(Boolean).join(" | "),
+        categoria: "Promocao"
+      }, "promocao")).join("")}</div>
+    </section>
   </div>
 ` : ``}
 
