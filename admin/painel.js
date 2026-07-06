@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 393,
-  label: "v399",
+  numero: 394,
+  label: "v400",
   data: "2026-07-06",
-  nota: "Logo Ola Carlopolis no layout 3 fotos ficou um pouco maior e mais proxima do canto direito."
+  nota: "Logo Ola Carlopolis no layout 3 fotos ficou maior com margem direita ajustada para 25px."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5680,9 +5680,9 @@ function pontoDentroRetanguloArteAutomovel(ponto, rect) {
 }
 
 function retanguloLogoSiteTresFotosArteAutomovel() {
-  const largura = 170;
-  const altura = 80;
-  const margemDireita = 20;
+  const largura = 185;
+  const altura = 88;
+  const margemDireita = 25;
   const margemInferior = 45;
   return {
     x: 1080 - margemDireita - largura,
