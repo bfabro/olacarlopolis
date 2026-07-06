@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 394,
-  label: "v400",
+  numero: 395,
+  label: "v401",
   data: "2026-07-06",
-  nota: "Logo Ola Carlopolis no layout 3 fotos ficou maior com margem direita ajustada para 25px."
+  nota: "Permissao para arte de veiculo sem logo Ola Carlopolis passou para a tela de usuarios por cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5598,7 +5598,7 @@ function opcoesArteAutomovel() {
 }
 
 function clientePodeEscolherLogoArteAutomovel() {
-  return canManageClients() || Boolean(state.paginaInicialSite?.permitirClienteOcultarLogoArteVeiculo);
+  return canManageClients() || Boolean(state.profile?.permissoes?.ocultar_logo_arte_veiculo);
 }
 
 function aplicarPermissaoLogoArteAutomovel() {
@@ -10367,9 +10367,6 @@ function renderHomePageSettings() {
   $("homeBannerActive").checked = config.ativo !== false;
   $("homeBannerTitle").value = config.titulo || "Carlópolis em tempo real";
   $("homeBannerSubtitle").value = config.subtitulo || "Acesse os principais serviços, eventos, novidades e promoções da cidade.";
-  if ($("homeAllowClientHideVehicleArtLogo")) {
-    $("homeAllowClientHideVehicleArtLogo").checked = Boolean(config.permitirClienteOcultarLogoArteVeiculo);
-  }
   const list = $("homeBannerImagesList");
   if (!list) return;
   list.innerHTML = imagens.length ? imagens.map((url, index) => `
@@ -14022,7 +14019,6 @@ function bindEvents() {
       titulo: $("homeBannerTitle")?.value.trim() || "Carlópolis em tempo real",
       subtitulo: $("homeBannerSubtitle")?.value.trim() || "Acesse os principais serviços, eventos, novidades e promoções da cidade.",
       imagens: Array.isArray(state.paginaInicialSite?.imagens) ? state.paginaInicialSite.imagens.filter(Boolean) : [],
-      permitirClienteOcultarLogoArteVeiculo: Boolean($("homeAllowClientHideVehicleArtLogo")?.checked),
       updatedAt: serverTimestamp(),
       updatedBy: state.user?.uid || ""
     };
