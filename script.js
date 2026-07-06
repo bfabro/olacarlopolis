@@ -7213,6 +7213,44 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
 
   // ============ PROMOÇÕES ============
 
+  function chavePromocaoPublica(item = {}, contexto = {}) {
+    const estabelecimento = normalizeName(
+      contexto.estabelecimentoId
+      || contexto.nomeNormalizado
+      || contexto.estabelecimento
+      || item.estabelecimentoId
+      || item.estabelecimento
+      || ""
+    );
+    const titulo = normalizeName(item.titulo || item.nome || item.name || "");
+    const descricao = normalizeName(item.descricao || item.description || item.obs || item.observacoes || "");
+    const imagem = normalizeName(item.imagem || item.image || item.imagemUrl || item.imageUrl || item.foto || item.fotoUrl || item.banner || "");
+    const preco = normalizeName(item.preco || item.valor || item.price || "");
+    const desconto = normalizeName(item.desconto || item.discount || "");
+    const validade = normalizeName(item.validadeFim || item.validade || "");
+    const fallbackId = normalizeName(item.id || "");
+    return [
+      estabelecimento,
+      titulo || fallbackId,
+      preco,
+      desconto,
+      validade,
+      imagem,
+      descricao
+    ].join("|");
+  }
+
+  function deduplicarPromocoesPublicas(lista = []) {
+    const vistos = new Set();
+    return (lista || []).filter((item) => {
+      const chave = chavePromocaoPublica(item);
+      if (!chave.trim()) return true;
+      if (vistos.has(chave)) return false;
+      vistos.add(chave);
+      return true;
+    });
+  }
+
   // Coleta TODAS as promoções percorrendo categories/establishments
   function coletarTodasPromocoes() {
     const itens = [];
@@ -7225,14 +7263,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       const nomeEst = contexto.estabelecimento || "";
       const promoId = p.id || "";
       const tituloPromo = p.titulo || p.nome || p.name || "";
-      const chavePromo = normalizeName([
-        idEst,
-        promoId,
-        tituloPromo,
-        p.validadeFim || "",
-        p.preco || "",
-        p.desconto || p.discount || ""
-      ].join("|"));
+      const chavePromo = chavePromocaoPublica(p, contexto);
       if (chavePromo && vistos.has(chavePromo)) return;
       if (chavePromo) vistos.add(chavePromo);
       itens.push({
@@ -7305,7 +7336,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         });
       });
     });
-    return itens;
+    return deduplicarPromocoesPublicas(itens);
   }
 
   function chavesEstabelecimentoPublico(est = {}) {
@@ -7572,7 +7603,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       .filter((promo) => chaves.has(normalizeName(promo.estabelecimentoId)) || chaves.has(normalizeName(promo.estabelecimento)))
       .filter((promo) => !promoExpirada(promo) && promoDisponivelHoje(promo))
       .forEach((promo) => {
-        const id = String(promo.id || `${promo.estabelecimentoId}-${promo.titulo}`);
+        const id = chavePromocaoPublica(promo) || String(promo.id || `${promo.estabelecimentoId}-${promo.titulo}`);
         if (!porId.has(id)) porId.set(id, promo);
       });
     return Array.from(porId.values());
@@ -11164,7 +11195,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         .catch((err) => console.warn("Nao foi possivel atualizar promocoes do Firebase.", err));
     }
     const todos = coletarTodasPromocoes();
-    const promoAtivasDisponiveis = todos.filter(i => !promoExpirada(i) && promoDisponivelHoje(i));
+    const promoAtivasDisponiveis = deduplicarPromocoesPublicas(todos.filter(i => !promoExpirada(i) && promoDisponivelHoje(i)));
 
     // prepara lista de estabelecimentos que têm promo
     const estabelecimentos = Array.from(
@@ -11187,9 +11218,9 @@ plotarPinsImoveis(stateImoveis.filtered);
     // aplica filtro (força comparação por string para evitar mismatch)
     const filtro = String(filtroEstabId || "todos").trim();
     const filtroCategoria = filtro.startsWith("categoria::") ? filtro.replace("categoria::", "") : "";
-    const itens = filtroCategoria
+    const itens = deduplicarPromocoesPublicas(filtroCategoria
       ? todos.filter(i => String(i.categoria || "").trim() === filtroCategoria)
-      : todos;
+      : todos);
     const buscaAtual = opcoes.busca !== undefined ? String(opcoes.busca || "") : String(window.__promoBuscaAtual || "");
     window.__promoBuscaAtual = buscaAtual;
     const buscaNorm = normalizeName(buscaAtual);
@@ -11208,7 +11239,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     // ⚠️ Remover itens vencidos (no próprio dia da validade já some)
     const ordemAtual = opcoes.ordem || window.__promoOrdemAtual || "recentes";
     window.__promoOrdemAtual = ordemAtual;
-    const itensFiltrados = itensComFiltrosExtras
+    const itensFiltrados = deduplicarPromocoesPublicas(itensComFiltrosExtras
       .filter(i => !promoExpirada(i) && promoDisponivelHoje(i))
       .sort((a, b) => {
         if (ordemAtual === "termina") {
@@ -11217,7 +11248,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (ordemAtual === "menorValor") return numeroPrecoPromocao(a.preco) - numeroPrecoPromocao(b.preco);
         if (ordemAtual === "desconto") return descontoPromocao(b) - descontoPromocao(a);
         return Number(a.ordem || 0) - Number(b.ordem || 0);
-      });
+      }));
     const totalDisponiveis = itensFiltrados.length;
     const totalEstabelecimentos = estabelecimentos.length;
 
