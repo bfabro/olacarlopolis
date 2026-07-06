@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 396,
-  label: "v402",
+  numero: 397,
+  label: "v403",
   data: "2026-07-06",
-  nota: "Tela publica do estabelecimento ganhou abas de veiculos, imoveis, produtos e promocoes vinculadas."
+  nota: "Produtos no admin e vinculo publico das abas da loja com veiculos corrigido."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -97,7 +97,9 @@ let state = {
   clientImages: [],
   clientMenuImages: [],
   clientPromocoes: [],
+  clientProdutos: [],
   clientPromoEditIndex: null,
+  clientProductEditIndex: null,
   staffPromoEditIndex: null,
   selectedPromoArtId: "",
   selectedAutomovelArtId: "",
@@ -767,6 +769,33 @@ function normalizePromocoes(items) {
     }))
     .filter((item) => item.titulo)
     .slice(0, 30);
+}
+
+function normalizeProdutos(items) {
+  const source = Array.isArray(items)
+    ? items
+    : Object.entries(items || {}).map(([id, value]) => (
+      value && typeof value === "object" ? { id, ...value } : { id, nome: value }
+    ));
+  return source
+    .map((item, index) => {
+      const titulo = String(item?.titulo || item?.nome || item?.name || item?.produto || "").trim();
+      const fallbackId = `produto-${slugify(titulo || `item-${index}`)}-${index}`;
+      return {
+        id: item?.id || fallbackId,
+        titulo,
+        nome: String(item?.nome || item?.titulo || item?.name || item?.produto || "").trim(),
+        categoria: String(item?.categoria || item?.tipo || "").trim(),
+        preco: String(item?.preco || item?.valor || item?.price || "").trim(),
+        descricao: String(item?.descricao || item?.description || "").trim(),
+        observacoes: String(item?.observacoes || item?.obs || item?.detalhes || "").trim(),
+        imagem: String(item?.imagem || item?.image || item?.foto || item?.fotoUrl || item?.imagemUrl || "").trim(),
+        status: String(item?.status || "ativo").trim(),
+        ativo: item?.ativo === false ? false : true
+      };
+    })
+    .filter((item) => item.titulo && item.status !== "excluido")
+    .slice(0, 80);
 }
 
 function normalizeVagasTrabalho(items, legacy = null) {
@@ -1881,7 +1910,7 @@ function hidePanelLoading() {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -1935,7 +1964,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -2687,7 +2716,9 @@ function resetClientForm() {
   state.clientImages = [];
   state.clientMenuImages = [];
   state.clientPromocoes = [];
+  state.clientProdutos = [];
   state.clientPromoEditIndex = null;
+  state.clientProductEditIndex = null;
   $("clientForm").reset();
   delete $("clientForm").dataset.originalCategory;
   delete $("clientForm").dataset.originalClientId;
@@ -2715,6 +2746,7 @@ function resetClientForm() {
   renderClientImagesPreview();
   renderClientMenuPreview();
   renderClientPromocoesPreview();
+  renderClientProdutosPreview();
   setAllClientSectionsExpanded(false);
   setClientFocusMode(false);
 }
@@ -2779,6 +2811,7 @@ function getClientFormData() {
     cardapioLink: $("clientMenuLink").value.trim(),
     menuImages: normalizeUrlList(state.clientMenuImages),
     promocoes: normalizePromocoes(state.clientPromocoes),
+    produtos: normalizeProdutos(state.clientProdutos),
     vagaAtiva: Boolean($("clientJobActive")?.checked),
     vagaTitulo: $("clientJobTitle")?.value.trim() || "",
     vagaCargo: $("clientJobTitle")?.value.trim() || "",
@@ -3093,6 +3126,9 @@ function fillClientForm(client) {
   $("clientMenuLink").value = client.cardapioLink || "";
   state.clientMenuImages = normalizeUrlList(client.menuImages);
   state.clientPromocoes = normalizePromocoes(client.promocoes);
+  state.clientProdutos = normalizeProdutos(client.produtos);
+  state.clientPromoEditIndex = null;
+  state.clientProductEditIndex = null;
   if ($("clientJobActive")) $("clientJobActive").checked = client.vagaAtiva !== false && Boolean(client.infoVagaTrabalho || client.vagaTitulo || client.vagaCargo || client.vagaDescricao);
   if ($("clientJobTitle")) $("clientJobTitle").value = client.vagaTitulo || client.vagaCargo || "";
   if ($("clientJobDescription")) $("clientJobDescription").value = client.infoVagaTrabalho || client.vagaDescricao || "";
@@ -3109,6 +3145,7 @@ function fillClientForm(client) {
   renderClientImagesPreview();
   renderClientMenuPreview();
   renderClientPromocoesPreview();
+  renderClientProdutosPreview();
   setClientFocusMode(true);
 }
 
@@ -3296,6 +3333,45 @@ function readPromoFields(prefix, scope = document, fallbackId = "") {
   };
 }
 
+function clearProductFields(prefix, scope = document) {
+  ["Title", "Price", "Category", "Status", "Description", "Notes", "ImageUrl"].forEach((suffix) => {
+    const field = scope.querySelector(`#${prefix}Product${suffix}`);
+    if (field) field.value = suffix === "Status" ? "ativo" : "";
+  });
+  const upload = scope.querySelector(`#${prefix}ProductImageUpload`);
+  if (upload) upload.value = "";
+}
+
+function fillProductFields(prefix, product, scope = document) {
+  const set = (suffix, value) => {
+    const field = scope.querySelector(`#${prefix}Product${suffix}`);
+    if (field) field.value = value || "";
+  };
+  set("Title", product?.titulo || product?.nome);
+  set("Price", product?.preco);
+  set("Category", product?.categoria);
+  set("Status", product?.status || "ativo");
+  set("Description", product?.descricao);
+  set("Notes", product?.observacoes);
+  set("ImageUrl", product?.imagem);
+}
+
+function readProductFields(prefix, scope = document, fallbackId = "") {
+  const get = (suffix) => scope.querySelector(`#${prefix}Product${suffix}`)?.value.trim() || "";
+  return {
+    id: fallbackId || `produto-${Date.now()}`,
+    titulo: get("Title"),
+    nome: get("Title"),
+    preco: get("Price"),
+    categoria: get("Category"),
+    status: get("Status") || "ativo",
+    descricao: get("Description"),
+    observacoes: get("Notes"),
+    imagem: get("ImageUrl"),
+    ativo: (get("Status") || "ativo") !== "inativo"
+  };
+}
+
 function clearJobFields(prefix, scope = document) {
   ["Title", "Salary", "Schedule", "ValidUntil", "Place", "Contact", "Description", "Requirements", "Apply"].forEach((suffix) => {
     const field = scope.querySelector(`#${prefix}Job${suffix}`);
@@ -3400,6 +3476,61 @@ function renderClientPromocoesPreview() {
   });
 }
 
+function renderClientProdutosPreview() {
+  const box = $("clientProductsPreview");
+  const count = $("clientProductsCount");
+  if (!box || !count) return;
+  state.clientProdutos = normalizeProdutos(state.clientProdutos);
+  count.textContent = `${state.clientProdutos.length} item${state.clientProdutos.length === 1 ? "" : "s"}`;
+  box.innerHTML = renderProdutosMarkup(state.clientProdutos, "client-product-remove", "client-product-edit");
+  box.querySelectorAll("[data-client-product-edit]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.clientProductEdit);
+      const produto = state.clientProdutos[index];
+      if (!produto) return;
+      state.clientProductEditIndex = index;
+      fillProductFields("client", produto);
+      $("addClientProductButton").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar alteracoes`;
+      $("cancelClientProductEditButton")?.classList.remove("hidden");
+      $("clientProductTitle")?.focus();
+    });
+  });
+  box.querySelectorAll("[data-client-product-remove]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const index = Number(button.dataset.clientProductRemove);
+      const produto = state.clientProdutos[index];
+      if (!produto || !(await confirmarExclusao(produto.titulo || "sem titulo", "produto"))) return;
+      state.clientProdutos.splice(index, 1);
+      state.clientProductEditIndex = null;
+      clearProductFields("client");
+      renderClientProdutosPreview();
+      const saved = await persistClientProdutosIfEditing("Produto removido e salvo.");
+      if (!saved) showToast("Produto removido. Clique em salvar cliente para gravar.");
+    });
+  });
+}
+
+async function persistClientProdutosIfEditing(message = "Produtos salvos.") {
+  if (!canManageClients() || !state.selectedClientId) return false;
+  const client = state.clientes.find((item) => item.id === state.selectedClientId) || null;
+  const targetId = client?.id || state.selectedClientId;
+  await update(ref(db, `clientes/${targetId}`), {
+    produtos: normalizeProdutos(state.clientProdutos),
+    origem: "painel",
+    editadoNoPainel: true,
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  });
+  upsertClientInState(targetId, {
+    ...(client || {}),
+    produtos: normalizeProdutos(state.clientProdutos),
+    origem: "painel",
+    editadoNoPainel: true
+  });
+  showToast(message);
+  return true;
+}
+
 async function persistClientPromocoesIfEditing(message = "Promocoes salvas.") {
   if (!canManageClients() || !state.selectedClientId) return false;
   const client = state.clientes.find((item) => item.id === state.selectedClientId) || null;
@@ -3465,6 +3596,34 @@ async function addClientPromocao() {
     });
   }
   if (!saved) showToast(`${editingIndex >= 0 ? "Promocao atualizada" : "Promocao adicionada"}. Clique em salvar cliente para gravar.`);
+}
+
+async function addClientProduct() {
+  const title = $("clientProductTitle")?.value.trim();
+  if (!title) {
+    showToast("Informe o nome do produto.");
+    return;
+  }
+  const currentId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
+  let image = $("clientProductImageUrl")?.value.trim() || "";
+  const file = $("clientProductImageUpload")?.files?.[0];
+  if (file && !image) {
+    showToast("Enviando imagem do produto...");
+    image = await uploadPromoImageForClient(currentId, file);
+  }
+  const editingIndex = Number.isInteger(state.clientProductEditIndex) ? state.clientProductEditIndex : -1;
+  const current = editingIndex >= 0 ? state.clientProdutos[editingIndex] : null;
+  const payload = readProductFields("client", document, current?.id || `produto-${Date.now()}`);
+  payload.imagem = image;
+  if (editingIndex >= 0 && current) state.clientProdutos[editingIndex] = payload;
+  else state.clientProdutos.unshift(payload);
+  state.clientProductEditIndex = null;
+  clearProductFields("client");
+  $("addClientProductButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar produto`;
+  $("cancelClientProductEditButton")?.classList.add("hidden");
+  renderClientProdutosPreview();
+  const saved = await persistClientProdutosIfEditing(editingIndex >= 0 ? "Produto atualizado e salvo." : "Produto adicionado e salvo.");
+  if (!saved) showToast(`${editingIndex >= 0 ? "Produto atualizado" : "Produto adicionado"}. Clique em salvar cliente para gravar.`);
 }
 
 async function uploadClientImages(files) {
@@ -4597,7 +4756,7 @@ function resetUserForm() {
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-user-plus"></i> Criar usuario`;
   $("deleteUserButton")?.classList.add("hidden");
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
-    input.checked = ["dados", "destaque", "vagas", "imagens", "cardapio", "promocoes", "faturas"].includes(input.value);
+    input.checked = ["dados", "destaque", "vagas", "imagens", "cardapio", "produtos", "promocoes", "faturas"].includes(input.value);
   });
   setFormCardOpen("userForm", false);
 }
@@ -11818,11 +11977,13 @@ function renderClientOnlyEditor() {
   const imagens = normalizeImageItems(client.imagens);
   const menuImages = normalizeUrlList(client.menuImages);
   const promocoes = normalizePromocoes(client.promocoes);
+  const produtos = normalizeProdutos(client.produtos);
   const vagasTrabalho = normalizeVagasTrabalho(client.vagasTrabalho, client);
   const canEditDados = hasPermission("dados");
   const canEditImages = hasPermission("imagens");
   const canEditVagas = hasPermission("vagas");
   const canEditCardapio = hasPermission("cardapio");
+  const canEditProdutos = hasPermission("produtos");
   const canEditPromocoes = hasPermission("promocoes");
   const canGeneratePromoImages = hasPermission("gerar_imagens_promocoes");
   const canEditDestaque = hasPermission("destaque") || hasPermission("dados");
@@ -11833,9 +11994,10 @@ function renderClientOnlyEditor() {
     item.id === clientWhatsappGroupId ||
     item.clienteId === client.id
   )) || {};
-  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditPromocoes || canGeneratePromoImages || canEditDestaque;
+  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditProdutos || canEditPromocoes || canGeneratePromoImages || canEditDestaque;
   const hasAnyClientModule = true;
   let coPromoEditIndex = -1;
+  let coProductEditIndex = -1;
   let coJobEditIndex = -1;
   const setCoPromoEditMode = (index = -1) => {
     coPromoEditIndex = index;
@@ -11859,6 +12021,17 @@ function renderClientOnlyEditor() {
     }
     $("coCancelJobEditButton")?.classList.toggle("hidden", !editing);
   };
+  const setCoProductEditMode = (index = -1) => {
+    coProductEditIndex = index;
+    const editing = index >= 0;
+    const addButton = $("coAddProductButton");
+    if (addButton) {
+      addButton.innerHTML = editing
+        ? `<i class="fa-solid fa-floppy-disk"></i> Salvar alteracoes`
+        : `<i class="fa-solid fa-plus"></i> Adicionar produto`;
+    }
+    $("coCancelProductEditButton")?.classList.toggle("hidden", !editing);
+  };
   const clientModuleGroups = [
     {
       label: "Cadastro",
@@ -11872,6 +12045,7 @@ function renderClientOnlyEditor() {
       label: "Negocio",
       items: [
         { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas },
+        { id: "client-module-produtos", icon: "fa-solid fa-box-open", label: "Produtos", show: canEditProdutos },
         { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes || canGeneratePromoImages },
         { id: "client-module-grupo-whatsapp", icon: "fa-brands fa-whatsapp", label: "Grupos WhatsApp", show: true },
         { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque }
@@ -12051,6 +12225,35 @@ function renderClientOnlyEditor() {
           </div>
           <div id="coImagesPreview" class="image-grid">
             ${renderImagesMarkup(imagens, "co")}
+          </div>
+        </section>
+      ` : ""}
+      ${canEditProdutos ? `
+        <section id="client-module-produtos" class="wide upload-panel client-feature-card feature-produtos client-module-panel">
+          <div class="section-head compact feature-card-head">
+            <div>
+              <span class="feature-kicker">Vitrine</span>
+              <h3>Produtos</h3>
+              <p>Cadastre produtos fixos que aparecem na aba Produtos da tela publica.</p>
+            </div>
+            <span id="coProductsCount" class="badge">${produtos.length} item${produtos.length === 1 ? "" : "s"}</span>
+          </div>
+          <div class="promo-admin-form">
+            <label>Nome do produto<input id="coProductTitle" placeholder="Ex.: Dipirona 500mg"></label>
+            <label>Preco<input id="coProductPrice" placeholder="Ex.: 12,90"></label>
+            <label>Categoria<input id="coProductCategory" placeholder="Ex.: Medicamentos"></label>
+            <label>Status<select id="coProductStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
+            <label class="wide">Descricao<textarea id="coProductDescription" rows="3" placeholder="Detalhes do produto"></textarea></label>
+            <label class="wide">Observacoes<textarea id="coProductNotes" rows="2" placeholder="Opcional"></textarea></label>
+            <label>Imagem do produto<input id="coProductImageUpload" type="file" accept="image/*"></label>
+            <label>Ou URL da imagem<input id="coProductImageUrl" placeholder="https://..."></label>
+            <div class="promo-form-actions wide">
+              <button id="coAddProductButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar produto</button>
+              <button id="coCancelProductEditButton" type="button" class="ghost-button hidden"><i class="fa-solid fa-xmark"></i> Cancelar edicao</button>
+            </div>
+          </div>
+          <div id="coProductsPreview" class="promo-admin-list">
+            ${renderProdutosMarkup(produtos)}
           </div>
         </section>
       ` : ""}
@@ -12483,6 +12686,41 @@ function renderClientOnlyEditor() {
     );
   });
 
+  mount.querySelector("#coAddProductButton")?.addEventListener("click", async () => {
+    const title = $("coProductTitle")?.value.trim();
+    if (!title) {
+      showToast("Informe o nome do produto.");
+      return;
+    }
+
+    let image = $("coProductImageUrl")?.value.trim() || "";
+    const imageFile = $("coProductImageUpload")?.files?.[0];
+    if (imageFile && !image) {
+      showToast("Enviando imagem do produto...");
+      image = await uploadPromoImageForClient(client.id, imageFile);
+    }
+
+    const current = coProductEditIndex >= 0 ? produtos[coProductEditIndex] : null;
+    const payload = readProductFields("co", mount, current?.id || `produto-${Date.now()}`);
+    payload.imagem = image;
+    if (coProductEditIndex >= 0 && current) produtos[coProductEditIndex] = payload;
+    else produtos.unshift(payload);
+
+    await update(ref(db, `clientes/${client.id}`), {
+      produtos: normalizeProdutos(produtos),
+      origem: "painel",
+      editadoNoPainel: true,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user.uid
+    });
+    showToast(coProductEditIndex >= 0 ? "Produto atualizado." : "Produto adicionado.");
+    clearProductFields("co", mount);
+    setCoProductEditMode(-1);
+    await loadAllData();
+    state.pendingClientModuleTarget = "client-module-produtos";
+    renderClientOnlyEditor();
+  });
+
   mount.querySelector("#coAddPromoButton")?.addEventListener("click", async () => {
     const title = $("coPromoTitle").value.trim();
     if (!title) {
@@ -12597,8 +12835,18 @@ function renderClientOnlyEditor() {
     setCoPromoEditMode(-1);
   });
 
+  mount.querySelector("#coCancelProductEditButton")?.addEventListener("click", () => {
+    clearProductFields("co", mount);
+    setCoProductEditMode(-1);
+  });
+
   mount.querySelector("#coPromoImageUpload")?.addEventListener("change", async (event) => {
     await uploadSelectedPromoImage("coPromoImageUpload", "coPromoImageUrl", client.id);
+    event.target.value = "";
+  });
+
+  mount.querySelector("#coProductImageUpload")?.addEventListener("change", async (event) => {
+    await uploadSelectedPromoImage("coProductImageUpload", "coProductImageUrl", client.id);
     event.target.value = "";
   });
 
@@ -12782,6 +13030,38 @@ function renderClientOnlyEditor() {
     });
   });
 
+  mount.querySelectorAll("[data-product-edit]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.productEdit);
+      const produto = produtos[index];
+      if (!produto) return;
+      fillProductFields("co", produto, mount);
+      setCoProductEditMode(index);
+      $("coProductTitle")?.focus();
+      $("coProductTitle")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  });
+
+  mount.querySelectorAll("[data-product-remove]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const index = Number(button.dataset.productRemove);
+      const produto = produtos[index];
+      if (!produto || !(await confirmarExclusao(produto.titulo || "sem titulo", "produto"))) return;
+      produtos.splice(index, 1);
+      await update(ref(db, `clientes/${client.id}`), {
+        produtos: normalizeProdutos(produtos),
+        origem: "painel",
+        editadoNoPainel: true,
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user.uid
+      });
+      showToast("Produto removido.");
+      await loadAllData();
+      state.pendingClientModuleTarget = "client-module-produtos";
+      renderClientOnlyEditor();
+    });
+  });
+
   mount.querySelectorAll("[data-job-edit]").forEach((button) => {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.jobEdit);
@@ -12907,6 +13187,9 @@ function renderClientOnlyEditor() {
     if (canEditPromocoes) {
       payload.promocoes = normalizePromocoes(promocoes);
     }
+    if (canEditProdutos) {
+      payload.produtos = normalizeProdutos(produtos);
+    }
     if (canEditDestaque) {
       const destaqueAtivo = Boolean($("coFeaturedWeek")?.checked);
       const destaqueTipo = $("coFeaturedType")?.value || "semanal";
@@ -12975,6 +13258,27 @@ function renderPromocoesMarkup(promocoes, removeAttr = "promo-remove", editAttr 
         <small>Disponivel: ${escapeHtml(promoWeekDaysLabel(promo.diasSemana))}</small>
         ${promo.obs ? `<small>${escapeHtml(promo.obs)}</small>` : ""}
         ${promo.instagramMensagem ? `<small>Instagram: ${escapeHtml(promo.instagramMensagem)}</small>` : ""}
+      </div>
+      <div class="promo-admin-actions">
+        <button type="button" data-${editAttr}="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button>
+        <button type="button" data-${removeAttr}="${index}" class="danger-mini"><i class="fa-solid fa-trash"></i> Remover</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderProdutosMarkup(produtos, removeAttr = "product-remove", editAttr = "product-edit") {
+  const list = normalizeProdutos(produtos);
+  if (!list.length) return `<div class="list-meta">Nenhum produto cadastrado ainda.</div>`;
+  return list.map((produto, index) => `
+    <article class="promo-admin-item">
+      ${produto.imagem ? `<img src="${escapeAttr(displayImageUrl(produto.imagem))}" alt="${escapeAttr(produto.titulo)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : `<div class="promo-admin-empty"><i class="fa-solid fa-box-open"></i></div>`}
+      <div>
+        <strong>${escapeHtml(produto.titulo)}</strong>
+        <span>${escapeHtml([produto.preco ? `R$ ${produto.preco}` : "", produto.categoria].filter(Boolean).join(" - ") || "Sem preco/categoria")}</span>
+        ${produto.descricao ? `<small>${escapeHtml(produto.descricao)}</small>` : ""}
+        ${produto.observacoes ? `<small>${escapeHtml(produto.observacoes)}</small>` : ""}
+        ${produto.status === "inativo" || produto.ativo === false ? `<small>Inativo no site publico</small>` : ""}
       </div>
       <div class="promo-admin-actions">
         <button type="button" data-${editAttr}="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button>
@@ -13825,6 +14129,13 @@ function bindEvents() {
     $("addClientPromoButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar promocao`;
     $("cancelClientPromoEditButton")?.classList.add("hidden");
   });
+  $("addClientProductButton")?.addEventListener("click", addClientProduct);
+  $("cancelClientProductEditButton")?.addEventListener("click", () => {
+    state.clientProductEditIndex = null;
+    clearProductFields("client");
+    $("addClientProductButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar produto`;
+    $("cancelClientProductEditButton")?.classList.add("hidden");
+  });
   ["clientFeaturedWeek", "clientFeaturedWeeks", "clientFeaturedBilling"].forEach((id) => {
     $(id)?.addEventListener("input", refreshClientFeaturedSummary);
     $(id)?.addEventListener("change", refreshClientFeaturedSummary);
@@ -13833,6 +14144,11 @@ function bindEvents() {
   $("clientPromoImageUpload")?.addEventListener("change", async (event) => {
     const targetId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
     await uploadSelectedPromoImage("clientPromoImageUpload", "clientPromoImageUrl", targetId);
+    event.target.value = "";
+  });
+  $("clientProductImageUpload")?.addEventListener("change", async (event) => {
+    const targetId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
+    await uploadSelectedPromoImage("clientProductImageUpload", "clientProductImageUrl", targetId);
     event.target.value = "";
   });
   $("newEventButton").addEventListener("click", () => {

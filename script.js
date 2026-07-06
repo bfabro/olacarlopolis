@@ -7248,14 +7248,21 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   }
 
   function chavesEstabelecimentoPublico(est = {}) {
+    const aliases = est.aliases || est.apelidos || [];
+    const aliasValues = Array.isArray(aliases)
+      ? aliases
+      : [...Object.keys(aliases || {}), ...Object.values(aliases || {})];
     return [
       est.id,
       est.clienteId,
+      est.clienteNome,
+      est.nomeCliente,
       est.nomeNormalizado,
       est.__adminOriginalSlug,
       est.__adminOriginalName,
       est.name,
-      est.nome
+      est.nome,
+      ...aliasValues
     ].map(normalizeName).filter(Boolean);
   }
 
@@ -7266,13 +7273,23 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       item.estabelecimentoId,
       item.clienteId,
       item.clienteNome,
+      item.nomeCliente,
       item.estabelecimento,
+      item.estabelecimentoNome,
       item.vendedor,
       item.loja,
+      item.lojaNome,
       item.corretor,
       ...(Array.isArray(item.corretores) ? item.corretores : [])
     ].map(normalizeName).filter(Boolean);
-    return candidatos.some((valor) => chaves.has(valor));
+    return candidatos.some((valor) => {
+      if (chaves.has(valor)) return true;
+      return [...chaves].some((chave) => (
+        chave.length >= 4
+        && valor.length >= 4
+        && (valor.includes(chave) || chave.includes(valor))
+      ));
+    });
   }
 
   function produtosDoEstabelecimentoPublico(est = {}) {
@@ -7293,7 +7310,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         categoria: item.categoria || item.tipo || "",
         status: item.status || "ativo"
       }))
-      .filter((item) => item.status !== "inativo" && item.titulo);
+      .filter((item) => item.status !== "inativo" && item.ativo !== false && item.titulo);
   }
 
   function promocoesDoEstabelecimentoPublico(est = {}) {
@@ -10214,13 +10231,24 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   async function hidratarAbasItensEstabelecimentoPublico(root, estabelecimentos = []) {
     const area = root || document;
-    const cards = [...area.querySelectorAll("li[data-id]")];
+    const cards = [...area.querySelectorAll("li[data-id], li[id]")];
     if (!cards.length) return;
 
     const estabelecimentosPorChave = new Map();
     estabelecimentos.forEach((est) => {
       chavesEstabelecimentoPublico(est).forEach((chave) => estabelecimentosPorChave.set(chave, est));
     });
+    const encontrarEstabelecimentoPorSlug = (slug) => {
+      const chaveCard = normalizeName(slug);
+      if (!chaveCard) return null;
+      const direto = estabelecimentosPorChave.get(chaveCard);
+      if (direto) return direto;
+      return estabelecimentos.find((est) => chavesEstabelecimentoPublico(est).some((chave) => (
+        chave.length >= 4
+        && chaveCard.length >= 4
+        && (chave.includes(chaveCard) || chaveCard.includes(chave))
+      ))) || null;
+    };
 
     const [autosResult, imoveisResult] = await Promise.allSettled([
       carregarAutomoveisFirebase(),
@@ -10242,12 +10270,12 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     cards.forEach((li) => {
       const slug = normalizeName(li.dataset.id || li.id || "");
-      const est = estabelecimentosPorChave.get(slug);
+      const est = encontrarEstabelecimentoPorSlug(slug);
       if (!est || li.dataset.lojaItensHidratados === "1") return;
       li.dataset.lojaItensHidratados = "1";
 
-      const veiculos = (autos || []).filter((item) => item.status !== "inativo" && itemPertenceAoEstabelecimentoPublico(item, est));
-      const imoveisDoEst = (imoveis || []).filter((item) => item.status !== "inativo" && itemPertenceAoEstabelecimentoPublico(item, est));
+      const veiculos = (autos || []).filter((item) => item.status !== "inativo" && item.ativo !== false && itemPertenceAoEstabelecimentoPublico(item, est));
+      const imoveisDoEst = (imoveis || []).filter((item) => item.status !== "inativo" && item.ativo !== false && itemPertenceAoEstabelecimentoPublico(item, est));
       const produtos = produtosDoEstabelecimentoPublico(est);
       const promocoes = promocoesDoEstabelecimentoPublico(est);
 
@@ -19224,6 +19252,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     preservarIdentidadeAdminEstabelecimento(est);
 
     if (campoExiste(cliente, "nome")) est.name = cliente.nome || est.name;
+    est.clienteNome = cliente.nome || est.clienteNome || "";
+    if (cliente.aliases) est.aliases = cliente.aliases;
     est.nomeNormalizado = est.__adminOriginalSlug || normalizeName(est.name);
     const imagensAdmin = Array.isArray(cliente.imagens)
       ? cliente.imagens.map((item) => typeof item === "string" ? { url: item, texto: "" } : item).filter((item) => item && item.url)
@@ -19312,6 +19342,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     const contatos = contatosDetalhados.map((item) => item.numero);
     return {
       clienteId,
+      clienteNome: cliente.nome || "",
+      aliases: cliente.aliases || [],
       nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
       image: cliente.imagem || (imagensAdmin[0]?.url || ""),
       name: cliente.nome || clienteId,
