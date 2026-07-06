@@ -10643,11 +10643,23 @@ plotarPinsImoveis(stateImoveis.filtered);
 
       if (deveMostrarAbaVeiculos) {
         abasInseridas = adicionarAba(li, slug, "veiculos", "Veiculos", "fa-car-side", (pane) => {
-          pane.innerHTML = `<section class="imoveis-wrap automoveis-page loja-itens-wrap"><div class="im-grid loja-itens-grid"></div></section>`;
+          pane.innerHTML = `<section class="imoveis-wrap automoveis-page auto-cards-mode loja-itens-wrap"><div class="im-grid auto-cards-grid loja-itens-grid loja-veiculos-grid"></div></section>`;
           const box = pane.querySelector(".loja-itens-grid");
           if (veiculos.length) {
             renderAutomoveisCards(veiculos, box);
             configurarDetalhesAutomoveisEmBox(box, () => veiculos);
+            box.querySelectorAll("[data-auto-detalhes]").forEach((trigger) => {
+              trigger.addEventListener("click", (event) => {
+                if (event.__autoDetalhesHandled) return;
+                event.preventDefault();
+                event.stopPropagation();
+                const item = veiculos.find((auto) => String(auto.id) === String(trigger.dataset.autoDetalhes));
+                if (!item) return;
+                event.__autoDetalhesHandled = true;
+                registrarCliqueAutomovel("visualizacao", item);
+                abrirModalDetalhesAutomovel(item);
+              });
+            });
           } else if (box) {
             box.innerHTML = `<div class="list-meta">Carregando veiculos desta loja...</div>`;
           }
@@ -10663,7 +10675,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
       if (deveMostrarAbaProdutos) {
         abasInseridas = adicionarAba(li, slug, "produtos", "Produtos", "fa-box-open", (pane) => {
-          pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap"><div class="promo-grid loja-produtos-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
+          pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap loja-produtos-wrap"><div class="promo-grid loja-produtos-grid loja-cards-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
               if (event.__lojaProdutoHandled) return;
@@ -10689,7 +10701,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             observacoes: [promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "", promo.desconto ? `Desconto: ${promo.desconto}` : ""].filter(Boolean).join(" | "),
             categoria: "Promocao"
           }));
-          pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap"><div class="promo-grid loja-produtos-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
+          pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap loja-promocoes-wrap"><div class="promo-grid loja-produtos-grid loja-cards-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
               if (event.__lojaProdutoHandled) return;

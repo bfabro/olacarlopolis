@@ -20760,6 +20760,21 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   margin: 0;
 }
 
+.loja-itens-wrap .loja-itens-grid,
+.loja-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.loja-itens-wrap .auto-card,
+.loja-itens-wrap .card-imovel,
+.loja-produto-card {
+  width: 100%;
+  min-width: 0;
+}
+
 .loja-itens-wrap .auto-card,
 .loja-itens-wrap .card-imovel,
 .loja-produto-card {
