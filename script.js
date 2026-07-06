@@ -7171,6 +7171,56 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const itens = [];
     const vistos = new Set();
     let ordem = 0;
+    const adicionarPromocao = (p = {}, contexto = {}) => {
+      if (p && p.ativo === false) return;
+      if (p && p.status === "inativo") return;
+      const idEst = normalizeName(contexto.estabelecimentoId || contexto.nomeNormalizado || contexto.estabelecimento || "");
+      const nomeEst = contexto.estabelecimento || "";
+      const promoId = p.id || "";
+      const tituloPromo = p.titulo || p.nome || p.name || "";
+      const chavePromo = normalizeName([
+        idEst,
+        promoId,
+        tituloPromo,
+        p.validadeFim || "",
+        p.preco || "",
+        p.desconto || p.discount || ""
+      ].join("|"));
+      if (chavePromo && vistos.has(chavePromo)) return;
+      if (chavePromo) vistos.add(chavePromo);
+      itens.push({
+        ordem: ordem++,
+        id: promoId || `promo_${idEst || "cliente"}_${ordem}`,
+        estabelecimento: nomeEst,
+        estabelecimentoId: idEst,
+        categoria: contexto.categoria || p.categoria || "",
+        titulo: tituloPromo,
+        descricao: p.descricao || p.description || p.obs || [p.volume, p.embalagem].filter(Boolean).join(" + "),
+        volume: p.volume || "",
+        embalagem: p.embalagem || "",
+        preco: p.preco,
+        desconto: p.desconto || p.discount || "",
+        tipoOferta: p.tipoOferta || "",
+        entregaRetirada: p.entregaRetirada || "",
+        faixaPreco: p.faixaPreco || "",
+        modoPreco: p.modoPreco || "",
+        destaque: p.destaque || p.badge || "",
+        tipoDesconto: p.tipoDesconto || p.tipo || "",
+        valorTexto: p.valorTexto || p.valor || "",
+        precoAntigo: p.precoAntigo || null,
+        unidade: p.unidade || "",
+        imagem: p.imagem || p.image || p.imagemUrl || p.imageUrl || p.foto || p.fotoUrl || p.banner || "",
+        logo: p.logo || p.logoUrl || p.perfil || p.perfilUrl || contexto.logo || "",
+        validadeInicio: p.validadeInicio || p.validade || null,
+        validadeFim: p.validadeFim || null,
+        diasSemana: normalizarDiasSemanaPromocao(p.diasSemana || p.dias || p.recorrenciaDias || p.diaSemana),
+        obs: p.obs || p.observacoes || "",
+        instagramMensagem: p.instagramMensagem || p.mensagemInstagram || p.chamadaInstagram || contexto.instagramMensagem || "Siga no Instagram e fique por dentro das novidades!",
+        contact: contexto.contact || "",
+        instagram: contexto.instagram || "",
+        criadoEm: p.criadoEm || p.createdAt || ""
+      });
+    };
     (categories || []).forEach(cat => {
       (cat.establishments || []).forEach(est => {
         const nomeEst = est.name;
@@ -7178,52 +7228,33 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         const statusEst = statusEstabelecimentos[idEst] || statusEstabelecimentos[normalizeName(nomeEst)];
         if (statusEst && statusEst !== "s") return;
         const lista = est.promocoes || est.promotions || [];
-        lista.forEach(p => {
-          if (p && p.ativo === false) return;
-          const promoId = p.id || "";
-          const tituloPromo = p.titulo || p.nome || "";
-          const chavePromo = normalizeName([
-            idEst,
-            promoId,
-            tituloPromo,
-            p.validadeFim || "",
-            p.preco || "",
-            p.desconto || p.discount || ""
-          ].join("|"));
-          if (chavePromo && vistos.has(chavePromo)) return;
-          if (chavePromo) vistos.add(chavePromo);
-          itens.push({
-            ordem: ordem++,
-            id: promoId || `promo_${idEst}_${ordem}`,
-            estabelecimento: nomeEst,
-            estabelecimentoId: idEst,
-            categoria: cat.title || "",
-            titulo: tituloPromo,
-            descricao: p.descricao || p.obs || [p.volume, p.embalagem].filter(Boolean).join(" + "),
-            volume: p.volume || "",
-            embalagem: p.embalagem || "",
-            preco: p.preco,                     // número ou string
-            desconto: p.desconto || p.discount || "",
-            tipoOferta: p.tipoOferta || "",
-            entregaRetirada: p.entregaRetirada || "",
-            faixaPreco: p.faixaPreco || "",
-            modoPreco: p.modoPreco || "",
-            destaque: p.destaque || p.badge || "",
-            tipoDesconto: p.tipoDesconto || p.tipo || "",
-            valorTexto: p.valorTexto || p.valor || "",
-            precoAntigo: p.precoAntigo || null, // opcional
-            unidade: p.unidade || "",           // ex: "A UNIDADE", "NO FARDO"
-            imagem: p.imagem || p.image || p.imagemUrl || p.imageUrl || p.foto || p.fotoUrl || p.banner || "",  // url da promocao
-            logo: p.logo || p.logoUrl || p.perfil || p.perfilUrl || est.logo || est.logoUrl || est.profileImage || est.perfil || est.imagemPerfil || est.image || "",
-            validadeInicio: p.validadeInicio || p.validade || null,
-            validadeFim: p.validadeFim || null,
-            diasSemana: normalizarDiasSemanaPromocao(p.diasSemana || p.dias || p.recorrenciaDias || p.diaSemana),
-            obs: p.obs || "",                    // qualquer extra
-            instagramMensagem: p.instagramMensagem || p.mensagemInstagram || p.chamadaInstagram || est.instagramMensagem || "Siga no Instagram e fique por dentro das novidades!",
-            contact: getPrimeiroContato(est.contact) || "",
-            instagram: est.instagram || "",
-            criadoEm: p.criadoEm || p.createdAt || ""
-          });
+        lista.forEach(p => adicionarPromocao(p, {
+          estabelecimento: nomeEst,
+          estabelecimentoId: idEst,
+          categoria: cat.title || "",
+          logo: est.logo || est.logoUrl || est.profileImage || est.perfil || est.imagemPerfil || est.image || "",
+          instagramMensagem: est.instagramMensagem,
+          contact: getPrimeiroContato(est.contact) || "",
+          instagram: est.instagram || ""
+        }));
+      });
+    });
+    Object.entries((typeof window !== "undefined" ? window.__clientesPublicosCache : null) || {}).forEach(([clienteId, cliente]) => {
+      const lista = Array.isArray(cliente?.promocoes)
+        ? cliente.promocoes
+        : Object.entries(cliente?.promocoes || {}).map(([id, value]) => (
+          value && typeof value === "object" ? { id, ...value } : { id, titulo: value }
+        ));
+      lista.forEach((p) => {
+        adicionarPromocao(p, {
+          estabelecimento: cliente.nome || cliente.name || clienteId,
+          estabelecimentoId: clienteId,
+          nomeNormalizado: cliente.nomeNormalizado || clienteId,
+          categoria: cliente.categoria || "",
+          logo: cliente.imagem || cliente.image || "",
+          instagramMensagem: cliente.instagramMensagem,
+          contact: getPrimeiroContato(cliente.contato || cliente.whatsapp || "") || "",
+          instagram: cliente.instagram || ""
         });
       });
     });
@@ -7312,12 +7343,13 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     window.__modulosClientesPublicosPromise = (async () => {
       const dbAdmin = await esperarFirebaseDatabase();
       if (!dbAdmin) return;
-      const [clientesSnap, usuariosSnap] = await Promise.all([
-        dbAdmin.ref("clientes").once("value"),
-        dbAdmin.ref("usuariosByUid").once("value")
-      ]);
+      const clientesSnap = await dbAdmin.ref("clientes").once("value");
       window.__clientesPublicosCache = window.__clientesPublicosCache || clientesSnap.val() || {};
-      window.__usuariosPublicosCache = window.__usuariosPublicosCache || usuariosSnap.val() || {};
+      const usuariosSnap = await dbAdmin.ref("usuariosByUid").once("value").catch((error) => {
+        console.warn("Permissoes publicas dos usuarios indisponiveis; abas serao liberadas por itens vinculados.", error);
+        return null;
+      });
+      window.__usuariosPublicosCache = window.__usuariosPublicosCache || usuariosSnap?.val?.() || {};
     })().catch((error) => {
       console.warn("Nao foi possivel carregar modulos publicos dos clientes.", error);
     });
@@ -7425,7 +7457,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
 
   function produtosDoEstabelecimentoPublico(est = {}) {
     const cliente = clientePublicoDoEstabelecimento(est) || {};
-    const origem = est.produtos || cliente.produtos || est.products || cliente.products || est.itens || cliente.itens || est.items || cliente.items || [];
+    const origem = cliente.produtos || est.produtos || cliente.products || est.products || cliente.itens || est.itens || cliente.items || est.items || [];
     const lista = Array.isArray(origem)
       ? origem
       : Object.entries(origem || {}).map(([id, value]) => (
@@ -7456,10 +7488,19 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         id: item.id || `promo-${normalizeName(contexto.estabelecimentoId || contexto.estabelecimento || "loja")}-${index}`,
         estabelecimento: contexto.estabelecimento || item.estabelecimento || "",
         estabelecimentoId: contexto.estabelecimentoId || item.estabelecimentoId || "",
+        categoria: contexto.categoria || item.categoria || "",
         titulo: item.titulo || item.nome || item.name || "Promocao",
         descricao: item.descricao || item.description || item.obs || "",
         preco: item.preco || item.valor || item.price || "",
         desconto: item.desconto || item.discount || "",
+        tipoOferta: item.tipoOferta || "",
+        entregaRetirada: item.entregaRetirada || "",
+        faixaPreco: item.faixaPreco || "",
+        modoPreco: item.modoPreco || "",
+        precoAntigo: item.precoAntigo || null,
+        unidade: item.unidade || "",
+        volume: item.volume || "",
+        embalagem: item.embalagem || "",
         imagem: item.imagem || item.image || item.foto || item.fotoUrl || item.imagemUrl || "",
         validadeInicio: item.validadeInicio || item.validade || null,
         validadeFim: item.validadeFim || null,
@@ -7476,7 +7517,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const cliente = clientePublicoDoEstabelecimento(est) || {};
     const promocoesCliente = normalizarPromocoesPublicas(cliente.promocoes || est.promocoes || est.promotions || [], {
       estabelecimento: est.name || cliente.nome || cliente.name || "",
-      estabelecimentoId: normalizeName(est.nomeNormalizado || cliente.nomeNormalizado || cliente.id || est.name || "")
+      estabelecimentoId: normalizeName(cliente.id || est.clienteId || cliente.nomeNormalizado || est.nomeNormalizado || est.name || ""),
+      categoria: cliente.categoria || est.categoria || ""
     });
     const porId = new Map();
     [...coletarTodasPromocoes(), ...promocoesCliente]
@@ -20280,18 +20322,24 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!dbAdmin) return;
 
       try {
-        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, gruposWhatsappSnap, usuariosSnap] = await Promise.all([
+        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, gruposWhatsappSnap] = await Promise.all([
           dbAdmin.ref("clientes").once("value"),
           dbAdmin.ref("categorias").once("value"),
           dbAdmin.ref("conteudosInformativos/notaFalecimento").once("value"),
           dbAdmin.ref("eventos").once("value"),
           dbAdmin.ref("configuracoes/paginaInicial").once("value"),
-          dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value"),
-          dbAdmin.ref("usuariosByUid").once("value")
+          dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value")
         ]);
         const clientes = clientesSnap.val() || {};
         window.__clientesPublicosCache = clientes;
-        window.__usuariosPublicosCache = usuariosSnap.val() || {};
+        dbAdmin.ref("usuariosByUid").once("value")
+          .then((usuariosSnap) => {
+            window.__usuariosPublicosCache = usuariosSnap.val() || {};
+          })
+          .catch((error) => {
+            window.__usuariosPublicosCache = window.__usuariosPublicosCache || {};
+            console.warn("Permissoes publicas dos usuarios indisponiveis; seguindo com clientes.", error);
+          });
         const categoriasAdmin = categoriasSnap.val() || {};
         const notasFalecimentoAdmin = notasFalecimentoSnap.val() || {};
         const eventosAdmin = eventosSnap.val() || {};
