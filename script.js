@@ -630,6 +630,11 @@ function registrarMetricaCliente(idEstabelecimento, grupo, tipo, detalhes = {}) 
   return Promise.allSettled([contador, log]);
 }
 
+function erroPermissaoFirebase(erro) {
+  const texto = String(erro?.code || erro?.message || erro || "").toLowerCase();
+  return texto.includes("permission_denied") || texto.includes("permission denied");
+}
+
 // Função para registrar clique no Firebase (contador + detalhado)
 function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes = {}) {
   const hoje = getHojeBR();
@@ -658,7 +663,9 @@ function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes
       (atual) => (atual || 0) + 1,
       async (erro) => {
         if (erro) {
-          console.error("[CliqueBotao] Erro no contador:", erro);
+          if (!erroPermissaoFirebase(erro)) {
+            console.warn("[CliqueBotao] Erro no contador:", erro);
+          }
           resolve({ ok: false, erroContador: true });
           return;
         }
@@ -666,7 +673,9 @@ function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes
           await Promise.all([refLog.set(payload), metricaCliente]);
           resolve({ ok: true });
         } catch (e) {
-          console.error("[CliqueBotao] Erro ao salvar detalhado:", e);
+          if (!erroPermissaoFirebase(e)) {
+            console.warn("[CliqueBotao] Erro ao salvar detalhado:", e);
+          }
           resolve({ ok: true, logFalhou: true });
         }
       }
@@ -7580,22 +7589,20 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       window.__lojaProdutosDetalhes[cacheKey] = { ...item, id };
     }
     return `
-      <article class="promo-card promo-card-new loja-produto-card" data-loja-produto="${escapePromoHtml(id)}" data-loja-produto-tipo="${tipo}" data-loja-produto-key="${escapePromoHtml(cacheKey)}">
-        <div class="promo-card-body">
-          <div class="promo-produto">
-            <div class="promo-image-wrap">
+      <article class="loja-produto-card loja-card-produto" data-loja-produto="${escapePromoHtml(id)}" data-loja-produto-tipo="${tipo}" data-loja-produto-key="${escapePromoHtml(cacheKey)}">
+        <div class="loja-produto-card-body">
+          <div class="loja-produto-media">
               ${item.imagem
-                ? `<img class="promo-img-zoom" src="${escapePromoHtml(item.imagem)}" alt="${titulo}" loading="lazy">`
-                : `<div class="promo-sem-imagem">Imagem do produto</div>`}
-            </div>
-            <div class="promo-info">
-              ${item.categoria ? `<div class="promo-estab">${escapePromoHtml(item.categoria)}</div>` : ""}
-              <div class="promo-nome">${titulo}</div>
-              ${descricao ? `<div class="promo-obs">${descricao}</div>` : ""}
-            </div>
+                ? `<img src="${escapePromoHtml(item.imagem)}" alt="${titulo}" loading="lazy">`
+                : `<div class="loja-produto-sem-imagem">Imagem do produto</div>`}
           </div>
-          <div class="promo-preco promo-price-badge promo-price-${preco ? "super" : "promo"}">
-            <div class="promo-preco-atual">${preco || "Ver detalhes"}</div>
+          <div class="loja-produto-info">
+            ${item.categoria ? `<div class="loja-produto-categoria">${escapePromoHtml(item.categoria)}</div>` : ""}
+            <div class="loja-produto-nome">${titulo}</div>
+            ${descricao ? `<div class="loja-produto-descricao">${descricao}</div>` : ""}
+          </div>
+          <div class="loja-produto-preco">
+            <span>${preco || "Ver detalhes"}</span>
           </div>
         </div>
       </article>
@@ -10675,7 +10682,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
       if (deveMostrarAbaProdutos) {
         abasInseridas = adicionarAba(li, slug, "produtos", "Produtos", "fa-box-open", (pane) => {
-          pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap loja-produtos-wrap"><div class="promo-grid loja-produtos-grid loja-cards-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
+          pane.innerHTML = `<section class="loja-itens-wrap loja-produtos-wrap"><div class="loja-produtos-grid loja-cards-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
               if (event.__lojaProdutoHandled) return;
@@ -10701,7 +10708,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             observacoes: [promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "", promo.desconto ? `Desconto: ${promo.desconto}` : ""].filter(Boolean).join(" | "),
             categoria: "Promocao"
           }));
-          pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap loja-promocoes-wrap"><div class="promo-grid loja-produtos-grid loja-cards-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
+          pane.innerHTML = `<section class="loja-itens-wrap loja-promocoes-wrap"><div class="loja-produtos-grid loja-cards-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
               if (event.__lojaProdutoHandled) return;
@@ -21592,8 +21599,8 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
 
 ${produtosIniciaisLoja.length ? `
   <div class="aba loja-itens-aba" id="produtos-${slugEstabelecimentoPublico}" style="display:none">
-    <section class="promo-city-screen loja-itens-wrap loja-produtos-wrap">
-      <div class="promo-grid loja-produtos-grid loja-cards-grid">${produtosIniciaisLoja.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div>
+    <section class="loja-itens-wrap loja-produtos-wrap">
+      <div class="loja-produtos-grid loja-cards-grid">${produtosIniciaisLoja.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div>
     </section>
   </div>
 ` : ``}

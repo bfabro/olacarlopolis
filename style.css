@@ -20941,6 +20941,106 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   cursor: pointer;
 }
 
+.loja-card-produto {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #dbe5f2;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, .08), rgba(37, 99, 235, .04) 38%, rgba(255,255,255,1) 39%),
+    #fff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .10);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.loja-card-produto:hover {
+  transform: translateY(-2px);
+  border-color: #9cc5ee;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, .13);
+}
+
+.loja-produto-card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  min-height: 100%;
+}
+
+.loja-produto-media {
+  overflow: hidden;
+  border-radius: 12px;
+  background: #eef4fb;
+}
+
+.loja-produto-media img,
+.loja-produto-sem-imagem {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.loja-produto-sem-imagem {
+  display: grid;
+  place-items: center;
+  color: #64748b;
+  font-size: .86rem;
+  font-weight: 900;
+  text-align: center;
+  padding: 10px;
+}
+
+.loja-produto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.loja-produto-categoria {
+  color: #2563eb;
+  font-size: .72rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.loja-produto-nome {
+  color: #0f172a;
+  font-size: .98rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.loja-produto-descricao {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #64748b;
+  font-size: .78rem;
+  line-height: 1.25;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.loja-produto-preco {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  margin-top: auto;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #eef6ff;
+  color: #155bd5;
+  font-size: .9rem;
+  font-weight: 950;
+  line-height: 1.1;
+  text-align: center;
+}
+
 .loja-produto-dialog .loja-produto-media img {
   width: 100%;
   height: 100%;
