@@ -7327,6 +7327,19 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     return Array.from(porId.values());
   }
 
+  function estabelecimentoPublicoEhDeVeiculos(est = {}) {
+    const texto = normalizeName([
+      est.categoria,
+      est.categoriaId,
+      est.tipoCliente,
+      est.tipo,
+      est.__categoriaPublica,
+      est.name,
+      est.nome
+    ].filter(Boolean).join(" "));
+    return /automovel|automoveis|veiculo|veiculos|revenda|carro|moto/.test(texto);
+  }
+
   function produtosDoEstabelecimentoPublico(est = {}) {
     const origem = est.produtos || est.products || est.itens || est.items || [];
     const lista = Array.isArray(origem)
@@ -10313,12 +10326,19 @@ plotarPinsImoveis(stateImoveis.filtered);
     const adicionarAba = (li, slug, tipo, label, icon, renderizar) => {
       const nav = li.querySelector(".abas-nav");
       const conteudo = li.querySelector(".abas-conteudo");
-      if (!nav || !conteudo || nav.querySelector(`[data-target="${tipo}-${slug}"]`)) return false;
-      nav.insertAdjacentHTML("beforeend", `<button class="aba-tab" data-target="${tipo}-${slug}"><i class="fa-solid ${icon} tab-icon"></i> ${label}</button>`);
-      conteudo.insertAdjacentHTML("beforeend", `<div class="aba loja-itens-aba" id="${tipo}-${slug}" style="display:none"></div>`);
-      const pane = conteudo.querySelector(`#${CSS.escape(`${tipo}-${slug}`)}`);
+      if (!nav || !conteudo) return false;
+      const targetId = `${tipo}-${slug}`;
+      const jaExiste = Boolean(nav.querySelector(`[data-target="${targetId}"]`));
+      if (!jaExiste) {
+        nav.insertAdjacentHTML("beforeend", `<button class="aba-tab" data-target="${targetId}"><i class="fa-solid ${icon} tab-icon"></i> ${label}</button>`);
+      }
+      let pane = conteudo.querySelector(`#${CSS.escape(targetId)}`);
+      if (!pane) {
+        conteudo.insertAdjacentHTML("beforeend", `<div class="aba loja-itens-aba" id="${targetId}" style="display:none"></div>`);
+        pane = conteudo.querySelector(`#${CSS.escape(targetId)}`);
+      }
       renderizar(pane);
-      return true;
+      return !jaExiste;
     };
 
     cards.forEach((li) => {
@@ -10331,13 +10351,18 @@ plotarPinsImoveis(stateImoveis.filtered);
       const imoveisDoEst = (imoveis || []).filter((item) => item.status !== "inativo" && item.ativo !== false && itemPertenceAoEstabelecimentoPublico(item, est));
       const produtos = produtosDoEstabelecimentoPublico(est);
       const promocoes = promocoesDoEstabelecimentoPublico(est);
+      const deveMostrarAbaVeiculos = veiculos.length || estabelecimentoPublicoEhDeVeiculos(est);
 
-      if (veiculos.length) {
+      if (deveMostrarAbaVeiculos) {
         abasInseridas = adicionarAba(li, slug, "veiculos", "Veiculos", "fa-car-side", (pane) => {
           pane.innerHTML = `<section class="imoveis-wrap automoveis-page loja-itens-wrap"><div class="im-grid loja-itens-grid"></div></section>`;
           const box = pane.querySelector(".loja-itens-grid");
-          renderAutomoveisCards(veiculos, box);
-          configurarDetalhesAutomoveisEmBox(box, () => veiculos);
+          if (veiculos.length) {
+            renderAutomoveisCards(veiculos, box);
+            configurarDetalhesAutomoveisEmBox(box, () => veiculos);
+          } else if (box) {
+            box.innerHTML = `<div class="list-meta">Nenhum veiculo ativo vinculado a esta loja no momento.</div>`;
+          }
         }) || abasInseridas;
       }
 
@@ -10383,8 +10408,11 @@ plotarPinsImoveis(stateImoveis.filtered);
         }) || abasInseridas;
       }
 
-      if (abasInseridas) {
+      const veiculosPendentes = deveMostrarAbaVeiculos && !veiculos.length;
+      if (abasInseridas && !veiculosPendentes) {
         li.dataset.lojaItensHidratados = "1";
+        moveTabSlider(li.querySelector(".abas-nav"));
+      } else if (abasInseridas) {
         moveTabSlider(li.querySelector(".abas-nav"));
       }
     });
@@ -19355,6 +19383,10 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (campoExiste(cliente, "facebook")) est.facebook = cliente.facebook || "";
     if (campoExiste(cliente, "tiktok")) est.tiktok = cliente.tiktok || "";
     if (campoExiste(cliente, "site")) est.site = cliente.site || "";
+    est.categoria = cliente.categoria || est.categoria || "";
+    est.categoriaId = cliente.categoriaId || est.categoriaId || normalizeName(est.categoria || "");
+    est.tipoCliente = cliente.tipoCliente || cliente.tipo || est.tipoCliente || "";
+    est.tipo = cliente.tipo || cliente.tipoCliente || est.tipo || "";
     ["grupoWhatsappId", "grupoWhatsappNome", "grupoWhatsappLink", "grupoWhatsappDescricao", "grupoWhatsappImagem", "grupoWhatsappAtivo"].forEach((campo) => {
       if (campoExiste(cliente, campo)) est[campo] = cliente[campo];
     });
@@ -19401,6 +19433,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       clienteId,
       clienteNome: cliente.nome || "",
       aliases: cliente.aliases || [],
+      categoria: cliente.categoria || "",
+      categoriaId: cliente.categoriaId || normalizeName(cliente.categoria || ""),
+      tipoCliente: cliente.tipoCliente || cliente.tipo || "",
+      tipo: cliente.tipo || cliente.tipoCliente || "",
       nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
       image: cliente.imagem || (imagensAdmin[0]?.url || ""),
       name: cliente.nome || clienteId,
@@ -21189,6 +21225,9 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
                    </ul>
                      `;
 
+    paidEstablishments.forEach((establishment) => {
+      establishment.__categoriaPublica = title;
+    });
     window.__lojaItensUltimosEstabelecimentos = paidEstablishments;
     hidratarAbasItensEstabelecimentoPublico(contentArea, paidEstablishments)
       .catch((error) => console.warn("Nao foi possivel carregar abas de itens do estabelecimento.", error));
