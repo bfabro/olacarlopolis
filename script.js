@@ -7315,7 +7315,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       est.name,
       est.nome,
       ...aliasValues
-    ].map(normalizeName).filter(Boolean);
+    ].map((value) => normalizeName(value)).filter(Boolean);
   }
 
   function usuariosPublicosDoCliente(clienteId = "") {
@@ -11998,7 +11998,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   if (!searchInput) return; // Evita erro se o campo de busca não existir
 
   function normalizeName(name) {
-    return name
+    return String(name || "")
       .toLowerCase()
       .normalize("NFD")                // separa letras de acentos
       .replace(/[\u0300-\u036f]/g, "") // remove acentos
