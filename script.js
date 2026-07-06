@@ -7283,9 +7283,18 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       item.loja,
       item.lojaNome,
       item.nomeLoja,
+      item.Loja,
+      item.NomeLoja,
+      item.LojaNome,
       item.empresa,
+      item.Empresa,
       item.anunciante,
+      item.Anunciante,
       item.corretor,
+      item.raw?.clienteId,
+      item.raw?.clienteNome,
+      item.raw?.estabelecimentoId,
+      item.raw?.estabelecimento,
       ...(Array.isArray(item.corretores) ? item.corretores : [])
     ].map(normalizeName).filter(Boolean);
     return candidatos.some((valor) => {
@@ -8847,11 +8856,22 @@ plotarPinsImoveis(stateImoveis.filtered);
     // conecta botões
     el.querySelectorAll(".card-imovel").forEach((card) => {
       card.addEventListener("click", (ev) => {
+        if (ev.__imovelDetalhesHandled) return;
         if (ev.target.closest("button, a, input, select, textarea, [data-imovel-detalhes]")) return;
         const im = stateImoveis.all.find((item) => item.id === card.dataset.id);
         if (im) {
           registrarCliqueImovel("visualizacao", im);
-          if (typeof focarNoMapa === "function") focarNoMapa(im.id);
+          const cardsAtivos = Boolean(
+            window.__imoveisModoCards
+            || document.getElementById("imModoCards")?.checked
+            || document.querySelector(".imoveis-wrap")?.classList.contains("im-cards-mode")
+          );
+          if (cardsAtivos) {
+            ev.__imovelDetalhesHandled = true;
+            abrirModalDetalhesImovel(im);
+          } else if (typeof focarNoMapa === "function") {
+            focarNoMapa(im.id);
+          }
         }
       });
     });
@@ -8859,6 +8879,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (el.dataset.imovelDetalhesDelegado !== "1") {
       el.dataset.imovelDetalhesDelegado = "1";
       const abrirDetalhes = (ev) => {
+        if (ev.__imovelDetalhesHandled) return;
         const titulo = ev.target.closest?.("[data-imovel-detalhes]");
         if (!titulo || !el.contains(titulo)) return;
         const cardsAtivos = Boolean(
@@ -8871,6 +8892,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         ev.stopPropagation();
         const im = stateImoveis.all.find((item) => item.id === titulo.getAttribute("data-imovel-detalhes"));
         if (!im) return;
+        ev.__imovelDetalhesHandled = true;
         registrarCliqueImovel("visualizacao", im).catch(() => { });
         abrirModalDetalhesImovel(im);
       };
@@ -9269,6 +9291,10 @@ plotarPinsImoveis(stateImoveis.filtered);
     const responsavel = nomeResponsavel(im);
     const instagram = instagramResponsavelImovel(im);
     const instagramUrl = instagram ? fixInstagramUrl(instagram) : "";
+    if (typeof window !== "undefined") {
+      window.__imoveisDetalhesById = window.__imoveisDetalhesById || {};
+      if (im?.id) window.__imoveisDetalhesById[String(im.id)] = im;
+    }
 
 
 
@@ -9646,6 +9672,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       estabelecimentoId: item.estabelecimentoId || item.EstabelecimentoId || item.estabelecimentoID || item.estabelecimento || item.estabelecimentoSlug || "",
       estabelecimentoNome: item.estabelecimentoNome || item.nomeEstabelecimento || item.EstabelecimentoNome || item.estabelecimento || "",
       nomeEstabelecimento: item.nomeEstabelecimento || item.estabelecimentoNome || item.EstabelecimentoNome || item.estabelecimento || "",
+      raw: item,
       instagram: item.Instagram || item.instagram || item.linkInstagram || "",
       combustivel: item.Combustivel || item.combustivel || "",
       cambio: item.Cambio || item.cambio || "",
@@ -9684,20 +9711,24 @@ plotarPinsImoveis(stateImoveis.filtered);
     }, 0);
     box.querySelectorAll(".card-imovel").forEach((card) => {
       card.addEventListener("click", (ev) => {
+        if (ev.__imovelDetalhesHandled) return;
         if (ev.target.closest("button, a, input, select, textarea, [data-imovel-detalhes]")) return;
         const im = lista.find((item) => String(item.id) === String(card.dataset.id));
         if (!im) return;
+        ev.__imovelDetalhesHandled = true;
         registrarCliqueImovel("visualizacao", im).catch(() => { });
         abrirModalDetalhesImovel(im);
       });
     });
     box.addEventListener("click", (ev) => {
+      if (ev.__imovelDetalhesHandled) return;
       const titulo = ev.target.closest?.("[data-imovel-detalhes]");
       if (titulo && box.contains(titulo)) {
         ev.preventDefault();
         ev.stopPropagation();
         const im = lista.find((item) => String(item.id) === String(titulo.getAttribute("data-imovel-detalhes")));
         if (!im) return;
+        ev.__imovelDetalhesHandled = true;
         registrarCliqueImovel("visualizacao", im).catch(() => { });
         abrirModalDetalhesImovel(im);
         return;
@@ -9715,12 +9746,14 @@ plotarPinsImoveis(stateImoveis.filtered);
       }
     });
     box.addEventListener("keydown", (ev) => {
+      if (ev.__imovelDetalhesHandled) return;
       if (!["Enter", " "].includes(ev.key)) return;
       const titulo = ev.target.closest?.("[data-imovel-detalhes]");
       if (!titulo || !box.contains(titulo)) return;
       ev.preventDefault();
       const im = lista.find((item) => String(item.id) === String(titulo.getAttribute("data-imovel-detalhes")));
       if (!im) return;
+      ev.__imovelDetalhesHandled = true;
       registrarCliqueImovel("visualizacao", im).catch(() => { });
       abrirModalDetalhesImovel(im);
     });
@@ -9777,6 +9810,12 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (!lista.length) {
       box.innerHTML = `<div class="list-meta">Nenhum automovel encontrado com esses filtros.</div>`;
       return;
+    }
+    if (typeof window !== "undefined") {
+      window.__automoveisDetalhesById = window.__automoveisDetalhesById || {};
+      lista.forEach((item) => {
+        if (item?.id) window.__automoveisDetalhesById[String(item.id)] = item;
+      });
     }
 
     box.innerHTML = lista.map((item) => {
@@ -9850,8 +9889,11 @@ plotarPinsImoveis(stateImoveis.filtered);
       const item = lista.find((entry) => String(entry.id) === String(card.dataset.autoId));
       if (!item) return;
       card.addEventListener("click", (event) => {
-        if (event.target.closest("a, button, [data-auto-detalhes]")) return;
+        if (event.__autoDetalhesHandled) return;
+        if (event.target.closest("a, button")) return;
+        event.__autoDetalhesHandled = true;
         registrarCliqueAutomovel("visualizacao", item);
+        abrirModalDetalhesAutomovel(item);
       });
       card.querySelectorAll(".auto-gallery-img").forEach((image) => {
         image.addEventListener("click", () => registrarCliqueAutomovel("fotos", item));
@@ -9998,6 +10040,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (!box || box.dataset.autoDetalhesDelegado === "1") return;
     box.dataset.autoDetalhesDelegado = "1";
     const abrirDetalhesAutomovelDelegado = (event) => {
+      if (event.__autoDetalhesHandled) return;
       const trigger = event.target.closest?.("[data-auto-detalhes]");
       if (!trigger || !box.contains(trigger)) return;
       if (event.type === "keydown" && !["Enter", " "].includes(event.key)) return;
@@ -10008,6 +10051,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       const item = lista.find((entry) => String(entry.id) === String(itemId))
         || (Array.isArray(window.__automoveisCache) ? window.__automoveisCache.find((entry) => String(entry.id) === String(itemId)) : null);
       if (!item) return;
+      event.__autoDetalhesHandled = true;
       registrarCliqueAutomovel("visualizacao", item);
       abrirModalDetalhesAutomovel(item);
     };
