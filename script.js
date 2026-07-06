@@ -3948,14 +3948,32 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 500);
   }
 
-  function navegarParaEstabelecimentoPublico(chave, event = null) {
+  async function navegarParaEstabelecimentoPublico(chave, event = null) {
     const id = normalizeName(chave || "");
     if (!id) return;
     event?.preventDefault?.();
     event?.stopPropagation?.();
     if (event?.stopImmediatePropagation) event.stopImmediatePropagation();
     document.querySelectorAll(".imovel-detalhes-modal, .auto-detalhes-modal, .loja-produto-modal").forEach((modal) => modal.remove());
-    if (typeof abrirEstabelecimentoDaHome === "function") abrirEstabelecimentoDaHome(id);
+    let encontrado = typeof encontrarCategoriaEstabelecimentoPublico === "function"
+      ? encontrarCategoriaEstabelecimentoPublico(id)
+      : null;
+    if (!encontrado && typeof aplicarDadosAdminClientes === "function") {
+      try {
+        await aplicarDadosAdminClientes();
+        ADMIN_CLIENTES_LOADED = true;
+        encontrado = encontrarCategoriaEstabelecimentoPublico(id);
+      } catch (error) {
+        console.warn("Nao foi possivel carregar dados publicos antes de abrir o cliente.", error);
+      }
+    }
+    if (encontrado && typeof abrirEstabelecimentoDaHome === "function") {
+      abrirEstabelecimentoDaHome(id);
+      return;
+    }
+    if (id && window.location.hash !== `#${id}`) {
+      window.location.hash = `#${id}`;
+    }
   }
 
   if (typeof document !== "undefined" && typeof window !== "undefined" && !window.__publicClientLinkBound) {
