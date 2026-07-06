@@ -10294,10 +10294,12 @@ plotarPinsImoveis(stateImoveis.filtered);
     aplicar();
   }
 
-  async function hidratarAbasItensEstabelecimentoPublico(root, estabelecimentos = []) {
+  async function hidratarAbasItensEstabelecimentoPublico(root, estabelecimentos = [], options = {}) {
     const area = root || document;
     const cards = [...area.querySelectorAll("li[data-id], li[id]")];
     if (!cards.length) return;
+    const carregarRemoto = options.carregarRemoto !== false;
+    const atualizar = options.atualizar === true;
 
     const estabelecimentosPorChave = new Map();
     estabelecimentos.forEach((est) => {
@@ -10315,13 +10317,31 @@ plotarPinsImoveis(stateImoveis.filtered);
       ))) || null;
     };
 
-    const [autosResult, imoveisResult] = await Promise.allSettled([
-      carregarAutomoveisFirebase({ reidratarLojas: false }),
+    const autos = Array.isArray(options.autos) ? options.autos : (window.__automoveisCache || []);
+    const imoveis = Array.isArray(options.imoveis) ? options.imoveis : (window.__imoveisPublicosCache || []);
+    if (carregarRemoto) {
+      carregarAutomoveisFirebase({ reidratarLojas: false })
+        .then((lista) => {
+          hidratarAbasItensEstabelecimentoPublico(area, estabelecimentos, {
+            autos: lista,
+            imoveis: window.__imoveisPublicosCache || imoveis,
+            carregarRemoto: false,
+            atualizar: true
+          }).catch((error) => console.warn("Nao foi possivel atualizar aba de veiculos.", error));
+        })
+        .catch((error) => console.warn("Nao foi possivel carregar veiculos da loja.", error));
       montarListaImoveisPublica()
-    ]);
-    const autos = autosResult.status === "fulfilled" ? autosResult.value : (window.__automoveisCache || []);
-    const imoveis = imoveisResult.status === "fulfilled" ? imoveisResult.value : (window.__imoveisPublicosCache || []);
-    if (imoveisResult.status === "fulfilled") window.__imoveisPublicosCache = imoveis;
+        .then((lista) => {
+          window.__imoveisPublicosCache = lista;
+          hidratarAbasItensEstabelecimentoPublico(area, estabelecimentos, {
+            autos: window.__automoveisCache || autos,
+            imoveis: lista,
+            carregarRemoto: false,
+            atualizar: true
+          }).catch((error) => console.warn("Nao foi possivel atualizar aba de imoveis.", error));
+        })
+        .catch((error) => console.warn("Nao foi possivel carregar imoveis da loja.", error));
+    }
 
     const adicionarAba = (li, slug, tipo, label, icon, renderizar) => {
       const nav = li.querySelector(".abas-nav");
@@ -10344,7 +10364,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     cards.forEach((li) => {
       const slug = normalizeName(li.dataset.id || li.id || "");
       const est = encontrarEstabelecimentoPorSlug(slug);
-      if (!est || li.dataset.lojaItensHidratados === "1") return;
+      if (!est || (li.dataset.lojaItensHidratados === "1" && !atualizar)) return;
       let abasInseridas = false;
 
       const veiculos = automoveisDoEstabelecimentoPublico(est, autos || []);
@@ -10352,6 +10372,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       const produtos = produtosDoEstabelecimentoPublico(est);
       const promocoes = promocoesDoEstabelecimentoPublico(est);
       const deveMostrarAbaVeiculos = veiculos.length || estabelecimentoPublicoEhDeVeiculos(est);
+      const temAbaItens = Boolean(li.querySelector(
+        `[data-target="veiculos-${slug}"],[data-target="imoveis-${slug}"],[data-target="produtos-${slug}"],[data-target="promocoes-${slug}"]`
+      ));
 
       if (deveMostrarAbaVeiculos) {
         abasInseridas = adicionarAba(li, slug, "veiculos", "Veiculos", "fa-car-side", (pane) => {
@@ -10361,7 +10384,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             renderAutomoveisCards(veiculos, box);
             configurarDetalhesAutomoveisEmBox(box, () => veiculos);
           } else if (box) {
-            box.innerHTML = `<div class="list-meta">Nenhum veiculo ativo vinculado a esta loja no momento.</div>`;
+            box.innerHTML = `<div class="list-meta">Carregando veiculos desta loja...</div>`;
           }
         }) || abasInseridas;
       }
@@ -10409,7 +10432,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       }
 
       const veiculosPendentes = deveMostrarAbaVeiculos && !veiculos.length;
-      if (abasInseridas && !veiculosPendentes) {
+      if ((abasInseridas || temAbaItens) && !veiculosPendentes) {
         li.dataset.lojaItensHidratados = "1";
         moveTabSlider(li.querySelector(".abas-nav"));
       } else if (abasInseridas) {
