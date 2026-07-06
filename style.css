@@ -7767,6 +7767,24 @@ body > .im-modal .swiper-slide img {
   text-overflow: ellipsis;
 }
 
+.public-client-link,
+.auto-seller-link,
+.promo-estab-link,
+.promo-event-store,
+.imovel-detalhes-endereco a {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.public-client-link:hover,
+.auto-seller-link:hover,
+.promo-estab-link:hover,
+.promo-event-store:hover,
+.imovel-detalhes-endereco a:hover {
+  text-decoration: underline;
+}
+
 .corretor-instagram-link {
   display: inline-flex;
   align-items: center;

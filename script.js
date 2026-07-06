@@ -3948,6 +3948,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 500);
   }
 
+  function navegarParaEstabelecimentoPublico(chave, event = null) {
+    const id = normalizeName(chave || "");
+    if (!id) return;
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    if (event?.stopImmediatePropagation) event.stopImmediatePropagation();
+    document.querySelectorAll(".imovel-detalhes-modal, .auto-detalhes-modal, .loja-produto-modal").forEach((modal) => modal.remove());
+    if (typeof abrirEstabelecimentoDaHome === "function") abrirEstabelecimentoDaHome(id);
+  }
+
+  if (typeof document !== "undefined" && typeof window !== "undefined" && !window.__publicClientLinkBound) {
+    window.__publicClientLinkBound = true;
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest?.("[data-public-client-link], .auto-seller-link, [data-promo-est-link]");
+      if (!link) return;
+      const chave = link.dataset.publicClientLink || link.dataset.promoEstLink || link.getAttribute("href")?.replace(/^#/, "") || "";
+      navegarParaEstabelecimentoPublico(chave, event);
+    }, true);
+  }
+
   function mostrarVagasTrabalhoPublicas() {
     const categoria = categories.find((cat) => normalizeName(cat.title || "") === "vagasdetrabalho");
     if (!categoria) return;
@@ -9303,6 +9323,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   function abrirModalDetalhesImovel(im = {}) {
     document.querySelector(".imovel-detalhes-modal")?.remove();
     const responsavel = nomeResponsavel(im);
+    const responsavelSlug = normalizeName(im.estabelecimentoId || im.clienteId || im.clienteNome || responsavel || "");
     const valor = Number(im.valor || 0);
     const valorFormatado = valor
       ? valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) + (im.tipo === "aluguel" ? " / mes" : "")
@@ -9349,6 +9370,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             <div>
               <h2>${escapePromoHtml(im.titulo || "Imovel")}</h2>
               ${im.endereco ? `<p class="imovel-detalhes-endereco"><i class="fa-solid fa-location-dot"></i><span>${escapePromoHtml(im.endereco)}</span></p>` : ""}
+              ${responsavel ? `<p class="imovel-detalhes-endereco"><i class="fa-solid fa-user-tie"></i><a href="#${escapePromoHtml(responsavelSlug)}" data-public-client-link="${escapePromoHtml(responsavelSlug)}">${escapePromoHtml(responsavel)}</a></p>` : ""}
             </div>
             <div class="imovel-detalhes-financeiro">
               <strong class="imovel-detalhes-valor">${escapePromoHtml(valorFormatado)}</strong>
@@ -9445,6 +9467,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const responsavel = nomeResponsavel(im);
     const instagram = instagramResponsavelImovel(im);
     const instagramUrl = instagram ? fixInstagramUrl(instagram) : "";
+    const responsavelSlug = normalizeName(im.estabelecimentoId || im.clienteId || im.clienteNome || responsavel || "");
     if (typeof window !== "undefined") {
       window.__imoveisDetalhesById = window.__imoveisDetalhesById || {};
       if (im?.id) window.__imoveisDetalhesById[String(im.id)] = im;
@@ -9505,7 +9528,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       ${responsavel ? `
         <div class="corretor-banner corretor-imovel-identificacao">
           <span class="k">Corretor</span>
-          <strong class="v" title="${escapePromoHtml(responsavel)}">${escapePromoHtml(responsavel)}</strong>
+          <a class="v public-client-link" href="#${escapePromoHtml(responsavelSlug)}" data-public-client-link="${escapePromoHtml(responsavelSlug)}" title="${escapePromoHtml(responsavel)}">${escapePromoHtml(responsavel)}</a>
           ${instagramUrl ? `<a class="corretor-instagram-link" data-action="instagram" data-id="${im.id}" href="${instagramUrl}" target="_blank" rel="noopener noreferrer" aria-label="Abrir Instagram de ${escapePromoHtml(responsavel)}" title="Instagram de ${escapePromoHtml(responsavel)}">
             <i class="fa-brands fa-instagram"></i>
           </a>` : ""}
@@ -10026,7 +10049,7 @@ plotarPinsImoveis(stateImoveis.filtered);
                 </h3>
               </div>
             </div>
-            <p class="auto-seller"><span>Loja/Vendedor</span><strong>${sellerSlug ? `<a class="auto-seller-link" href="#${textoSeguroAutomoveis(sellerSlug)}">${textoSeguroAutomoveis(vendedor || item.clienteNome || "Nao informado")}</a>` : textoSeguroAutomoveis(vendedor || "Nao informado")}</strong>${instagramUrl ? `<a class="auto-instagram-icon" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}" aria-label="Instagram de ${textoSeguroAutomoveis(vendedor || titulo)}"><i class="fa-brands fa-instagram"></i></a>` : ""}</p>
+            <p class="auto-seller"><span>Loja/Vendedor</span><strong>${sellerSlug ? `<a class="auto-seller-link" href="#${textoSeguroAutomoveis(sellerSlug)}" data-public-client-link="${textoSeguroAutomoveis(sellerSlug)}">${textoSeguroAutomoveis(vendedor || item.clienteNome || "Nao informado")}</a>` : textoSeguroAutomoveis(vendedor || "Nao informado")}</strong>${instagramUrl ? `<a class="auto-instagram-icon" target="_blank" href="${textoSeguroAutomoveis(instagramUrl)}" aria-label="Instagram de ${textoSeguroAutomoveis(vendedor || titulo)}"><i class="fa-brands fa-instagram"></i></a>` : ""}</p>
             ${detalhesTabela.length ? `<div class="auto-spec-table">${detalhesTabela.map(([label, valor]) => `<div><span>${textoSeguroAutomoveis(label)}</span><strong>${textoSeguroAutomoveis(valor)}</strong></div>`).join("")}</div>` : ""}
             ${item.opcionais ? `<p class="auto-info-line"><span>Opcionais</span><strong>${textoSeguroAutomoveis(item.opcionais)}</strong></p>` : ""}
             ${item.descricao ? `<p class="auto-info-line auto-description"><span>Descricao</span><strong>${textoSeguroAutomoveis(item.descricao)}</strong></p>` : ""}
@@ -10069,6 +10092,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const valorFormatado = item.preco ? formatarPrecoAutomoveis(item.preco) : "Consulte";
     const contato = String(item.contato || "").replace(/\D/g, "");
     const vendedor = item.vendedor || item.loja || item.clienteNome || "";
+    const vendedorSlug = normalizeName(item.estabelecimentoId || item.clienteNome || item.clienteId || vendedor || "");
     const instagram = String(item.instagram || "").trim();
     const instagramUrl = instagram && instagram.startsWith("http") ? instagram : (instagram ? `https://instagram.com/${instagram.replace(/^@/, "")}` : "");
     const whatsappTexto = [
@@ -10124,7 +10148,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           <div class="imovel-detalhes-topo">
             <div>
               <h2>${textoSeguroAutomoveis(titulo)}</h2>
-              ${vendedor ? `<p class="imovel-detalhes-endereco auto-detalhes-vendedor"><i class="fa-solid fa-store"></i><span>${textoSeguroAutomoveis(vendedor)}</span></p>` : ""}
+              ${vendedor ? `<p class="imovel-detalhes-endereco auto-detalhes-vendedor"><i class="fa-solid fa-store"></i><a href="#${textoSeguroAutomoveis(vendedorSlug)}" data-public-client-link="${textoSeguroAutomoveis(vendedorSlug)}">${textoSeguroAutomoveis(vendedor)}</a></p>` : ""}
             </div>
             <div class="imovel-detalhes-financeiro">
               <strong class="imovel-detalhes-valor">${textoSeguroAutomoveis(valorFormatado)}</strong>
