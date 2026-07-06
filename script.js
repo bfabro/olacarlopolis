@@ -7293,6 +7293,17 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     });
   }
 
+  function deduplicarPromocoesMesmoEstabelecimentoPublico(lista = []) {
+    const vistos = new Set();
+    return (lista || []).filter((item) => {
+      const chave = conteudoPromocaoPublica(item);
+      if (!chave.trim()) return true;
+      if (vistos.has(chave)) return false;
+      vistos.add(chave);
+      return true;
+    });
+  }
+
   // Coleta TODAS as promoções percorrendo categories/establishments
   function coletarTodasPromocoes() {
     const itens = [];
@@ -7648,7 +7659,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         const id = chavePromocaoPublica(promo) || String(promo.id || `${promo.estabelecimentoId}-${promo.titulo}`);
         if (!porId.has(id)) porId.set(id, promo);
       });
-    return Array.from(porId.values());
+    return deduplicarPromocoesMesmoEstabelecimentoPublico(Array.from(porId.values()));
   }
 
   function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
@@ -10772,7 +10783,8 @@ plotarPinsImoveis(stateImoveis.filtered);
 
       if (deveMostrarAbaPromocoes) {
         abasInseridas = adicionarAba(li, slug, "promocoes", "Promocoes", "fa-tags", (pane) => {
-          const itens = promocoes.map((promo) => ({
+          const promocoesUnicas = deduplicarPromocoesMesmoEstabelecimentoPublico(promocoes);
+          const itens = promocoesUnicas.map((promo) => ({
             id: promo.id,
             titulo: promo.titulo,
             descricao: promo.descricao || promo.obs,
