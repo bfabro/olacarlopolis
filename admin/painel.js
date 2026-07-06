@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 390,
-  label: "v396",
-  data: "2026-07-05",
-  nota: "Abertura de detalhes de imoveis e veiculos ficou estavel no primeiro clique em modo cards."
+  numero: 391,
+  label: "v397",
+  data: "2026-07-06",
+  nota: "Logo Ola Carlopolis maior no layout 3 fotos e escolha da logo em artes de veiculos controlada pelo master."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2524,7 +2524,10 @@ function switchView(name) {
   if (target === "promocoesClientes") renderStaffPromocoesView();
   if (target === "noticias") renderNewsAdminList();
   if (target === "imoveis") renderImoveisList();
-  if (target === "automoveis") renderAutomoveisList();
+  if (target === "automoveis") {
+    renderAutomoveisList();
+    aplicarPermissaoLogoArteAutomovel();
+  }
   if (target === "informacoes" && !canManageInformacoes()) {
     switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
     return;
@@ -5554,6 +5557,7 @@ function desenharLogosAutoArte(ctx, client, logo, siteLogo, showSiteLogo, layout
 }
 
 function opcoesArteAutomovel() {
+  const podeEscolherLogoSite = clientePodeEscolherLogoArteAutomovel();
   return {
     formato: $("automovelArteLayout")?.value || "premium45",
     tema: $("automovelArteTema")?.value || "premium4x4",
@@ -5561,7 +5565,7 @@ function opcoesArteAutomovel() {
     subtitle: $("automovelArteSubtitulo")?.value.trim() || "",
     subtitle2: $("automovelArteSubtitulo2")?.value.trim() || "",
     footer: $("automovelArteRodape")?.value.trim() || "Olá Carlópolis • veículos e oportunidades locais",
-    showSiteLogo: $("automovelArteShowSiteLogo")?.checked !== false,
+    showSiteLogo: podeEscolherLogoSite ? $("automovelArteShowSiteLogo")?.checked !== false : true,
     threePhotos: {
       line1: $("automovelArteTarjaLinha1")?.value.trim() || "",
       line2: $("automovelArteTarjaLinha2")?.value.trim() || "",
@@ -5593,6 +5597,19 @@ function opcoesArteAutomovel() {
   };
 }
 
+function clientePodeEscolherLogoArteAutomovel() {
+  return canManageClients() || Boolean(state.paginaInicialSite?.permitirClienteOcultarLogoArteVeiculo);
+}
+
+function aplicarPermissaoLogoArteAutomovel() {
+  const input = $("automovelArteShowSiteLogo");
+  if (!input) return;
+  const podeEscolher = clientePodeEscolherLogoArteAutomovel();
+  if (!podeEscolher) input.checked = true;
+  input.disabled = !podeEscolher;
+  input.closest(".auto-art-logo-check")?.classList.toggle("hidden", !podeEscolher);
+}
+
 function automovelArteSelecionado() {
   const id = $("automovelArteItem")?.value || state.selectedAutomovelArtId || "";
   return state.automoveis.find((auto) => auto.id === id && itemBelongsToCurrentClient(auto)) || null;
@@ -5619,6 +5636,7 @@ function preencherDefaultsTarjaAutomovel(force = false) {
 }
 
 function atualizarVisibilidadeLayoutAutomovelArte() {
+  aplicarPermissaoLogoArteAutomovel();
   const isThree = ($("automovelArteLayout")?.value || "premium45") === "tresFotosTarjas";
   const panel = document.querySelector(".automovel-art-panel");
   panel?.classList.toggle("auto-art-layout-three", isThree);
@@ -5661,17 +5679,27 @@ function pontoDentroRetanguloArteAutomovel(ponto, rect) {
   return ponto && rect && ponto.x >= rect.x && ponto.x <= rect.x + rect.w && ponto.y >= rect.y && ponto.y <= rect.y + rect.h;
 }
 
+function retanguloLogoSiteTresFotosArteAutomovel(config = {}) {
+  return {
+    x: 734 + Number(config.siteLogoOffsetX || 0),
+    y: 1218 + Number(config.siteLogoOffsetY || 0),
+    w: 326,
+    h: 112
+  };
+}
+
 function retangulosArrastaveisArteAutomovel(options = opcoesArteAutomovel()) {
   if ((options.formato || "premium45") === "tresFotosTarjas") {
     const config = options.threePhotos || {};
     const rects = [];
     if (options.showSiteLogo !== false) {
+      const logoRect = retanguloLogoSiteTresFotosArteAutomovel(config);
       rects.push({
         tipo: "logoSite",
-        x: 738 + Number(config.siteLogoOffsetX || 0),
-        y: 1214 + Number(config.siteLogoOffsetY || 0),
-        w: 272,
-        h: 56,
+        x: logoRect.x,
+        y: logoRect.y,
+        w: logoRect.w,
+        h: logoRect.h,
         inputX: "automovelArteSiteLogoX",
         inputY: "automovelArteSiteLogoY",
         minX: -900,
@@ -6412,13 +6440,14 @@ function desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo, si
   }
 
   if (options.showSiteLogo !== false) {
+    const logoRect = retanguloLogoSiteTresFotosArteAutomovel(config);
     desenharImagemContain(
       ctx,
       siteLogo,
-      738 + Number(config.siteLogoOffsetX || 0),
-      logoY + 28 + Number(config.siteLogoOffsetY || 0),
-      272,
-      56,
+      logoRect.x,
+      logoRect.y,
+      logoRect.w,
+      logoRect.h,
       0,
       "rgba(255,255,255,0)"
     );
@@ -10350,6 +10379,9 @@ function renderHomePageSettings() {
   $("homeBannerActive").checked = config.ativo !== false;
   $("homeBannerTitle").value = config.titulo || "Carlópolis em tempo real";
   $("homeBannerSubtitle").value = config.subtitulo || "Acesse os principais serviços, eventos, novidades e promoções da cidade.";
+  if ($("homeAllowClientHideVehicleArtLogo")) {
+    $("homeAllowClientHideVehicleArtLogo").checked = Boolean(config.permitirClienteOcultarLogoArteVeiculo);
+  }
   const list = $("homeBannerImagesList");
   if (!list) return;
   list.innerHTML = imagens.length ? imagens.map((url, index) => `
@@ -14002,6 +14034,7 @@ function bindEvents() {
       titulo: $("homeBannerTitle")?.value.trim() || "Carlópolis em tempo real",
       subtitulo: $("homeBannerSubtitle")?.value.trim() || "Acesse os principais serviços, eventos, novidades e promoções da cidade.",
       imagens: Array.isArray(state.paginaInicialSite?.imagens) ? state.paginaInicialSite.imagens.filter(Boolean) : [],
+      permitirClienteOcultarLogoArteVeiculo: Boolean($("homeAllowClientHideVehicleArtLogo")?.checked),
       updatedAt: serverTimestamp(),
       updatedBy: state.user?.uid || ""
     };
