@@ -7272,13 +7272,19 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const candidatos = [
       item.estabelecimentoId,
       item.clienteId,
+      item.idCliente,
+      item.clienteSlug,
       item.clienteNome,
       item.nomeCliente,
       item.estabelecimento,
       item.estabelecimentoNome,
+      item.nomeEstabelecimento,
       item.vendedor,
       item.loja,
       item.lojaNome,
+      item.nomeLoja,
+      item.empresa,
+      item.anunciante,
       item.corretor,
       ...(Array.isArray(item.corretores) ? item.corretores : [])
     ].map(normalizeName).filter(Boolean);
@@ -7290,6 +7296,35 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         && (valor.includes(chave) || chave.includes(valor))
       ));
     });
+  }
+
+  function automoveisDoEstabelecimentoPublico(est = {}, autos = []) {
+    const externos = (autos || []).filter((item) => (
+      item.status !== "inativo"
+      && item.ativo !== false
+      && itemPertenceAoEstabelecimentoPublico(item, est)
+    ));
+    const internosOrigem = est.automoveis || est.veiculos || est.vehicles || est.cars || [];
+    const internos = (Array.isArray(internosOrigem)
+      ? internosOrigem
+      : Object.entries(internosOrigem || {}).map(([id, value]) => (
+        value && typeof value === "object" ? { id, ...value } : { id, modelo: value }
+      ))
+    )
+      .map((item, index) => automovelDeRegistro({
+        ...item,
+        clienteId: item.clienteId || est.clienteId || "",
+        clienteNome: item.clienteNome || est.clienteNome || est.name || est.nome || "",
+        estabelecimentoId: item.estabelecimentoId || est.nomeNormalizado || est.id || "",
+        loja: item.loja || item.vendedor || est.name || est.nome || ""
+      }, item.id || `veiculo-${normalizeName(est.name || est.nome || "loja")}-${index}`))
+      .filter((item) => item.status !== "inativo" && item.ativo !== false);
+    const porId = new Map();
+    [...externos, ...internos].forEach((item) => {
+      const id = String(item.id || `${item.clienteId || item.clienteNome || ""}-${item.marca || ""}-${item.modelo || ""}-${item.ano || ""}`);
+      if (!porId.has(id)) porId.set(id, item);
+    });
+    return Array.from(porId.values());
   }
 
   function produtosDoEstabelecimentoPublico(est = {}) {
@@ -9565,9 +9600,18 @@ plotarPinsImoveis(stateImoveis.filtered);
       contato: item.Contato || item.contato || item.whatsapp || "",
       vendedor: item.Vendedor || item.vendedor || item.loja || item.nomeLoja || item.lojaNome || item.empresa || item.clienteNome || item.cliente || item.anunciante || item.nomeVendedor || "",
       loja: item.Loja || item.loja || item.nomeLoja || item.lojaNome || item.empresa || item.clienteNome || item.cliente || item.anunciante || item.vendedor || "",
-      clienteId: item.clienteId || item.ClienteId || item.cliente || "",
-      clienteNome: item.clienteNome || item.ClienteNome || "",
-      estabelecimentoId: item.estabelecimentoId || item.estabelecimento || "",
+      lojaNome: item.lojaNome || item.nomeLoja || item.LojaNome || item.NomeLoja || "",
+      nomeLoja: item.nomeLoja || item.lojaNome || item.NomeLoja || item.LojaNome || "",
+      empresa: item.empresa || item.Empresa || "",
+      anunciante: item.anunciante || item.Anunciante || "",
+      clienteId: item.clienteId || item.ClienteId || item.ClienteID || item.idCliente || item.cliente_id || item.cliente || "",
+      idCliente: item.idCliente || item.ClienteId || item.ClienteID || item.clienteId || item.cliente_id || "",
+      clienteSlug: item.clienteSlug || item.slugCliente || item.cliente_slug || "",
+      clienteNome: item.clienteNome || item.ClienteNome || item.nomeCliente || item.NomeCliente || "",
+      nomeCliente: item.nomeCliente || item.NomeCliente || item.clienteNome || item.ClienteNome || "",
+      estabelecimentoId: item.estabelecimentoId || item.EstabelecimentoId || item.estabelecimentoID || item.estabelecimento || item.estabelecimentoSlug || "",
+      estabelecimentoNome: item.estabelecimentoNome || item.nomeEstabelecimento || item.EstabelecimentoNome || item.estabelecimento || "",
+      nomeEstabelecimento: item.nomeEstabelecimento || item.estabelecimentoNome || item.EstabelecimentoNome || item.estabelecimento || "",
       instagram: item.Instagram || item.instagram || item.linkInstagram || "",
       combustivel: item.Combustivel || item.combustivel || "",
       cambio: item.Cambio || item.cambio || "",
@@ -9589,7 +9633,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       cidade: item.Cidade || item.cidade || item.local || "",
       acessorios: item.acessorios || item.Acessorios || item["Acessórios"] || "",
       opcionais: item.Opcionais || item.opcionais || "",
-      status: item.status || "ativo"
+      status: item.status || "ativo",
+      ativo: item.ativo === false ? false : true
     };
   }
 
@@ -10058,7 +10103,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (clear) clear.style.display = "none";
   }
 
-  async function carregarAutomoveisFirebase() {
+  async function carregarAutomoveisFirebase(options = {}) {
+    const deveReidratarLojas = options.reidratarLojas !== false;
     const dbAdmin = await esperarFirebaseDatabase();
     if (!dbAdmin) return window.__automoveisCache || [];
     const timeout = new Promise((_, reject) => {
@@ -10082,6 +10128,12 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
     const ativos = lista.filter((item) => item.status !== "inativo");
     window.__automoveisCache = ativos;
+    if (deveReidratarLojas && typeof hidratarAbasItensEstabelecimentoPublico === "function" && Array.isArray(window.__lojaItensUltimosEstabelecimentos)) {
+      setTimeout(() => {
+        hidratarAbasItensEstabelecimentoPublico(document.querySelector(".content_area"), window.__lojaItensUltimosEstabelecimentos)
+          .catch((error) => console.warn("Nao foi possivel reidratar abas de veiculos.", error));
+      }, 0);
+    }
     return ativos;
   }
 
@@ -10251,7 +10303,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     };
 
     const [autosResult, imoveisResult] = await Promise.allSettled([
-      carregarAutomoveisFirebase(),
+      carregarAutomoveisFirebase({ reidratarLojas: false }),
       montarListaImoveisPublica()
     ]);
     const autos = autosResult.status === "fulfilled" ? autosResult.value : (window.__automoveisCache || []);
@@ -10261,42 +10313,43 @@ plotarPinsImoveis(stateImoveis.filtered);
     const adicionarAba = (li, slug, tipo, label, icon, renderizar) => {
       const nav = li.querySelector(".abas-nav");
       const conteudo = li.querySelector(".abas-conteudo");
-      if (!nav || !conteudo || nav.querySelector(`[data-target="${tipo}-${slug}"]`)) return;
+      if (!nav || !conteudo || nav.querySelector(`[data-target="${tipo}-${slug}"]`)) return false;
       nav.insertAdjacentHTML("beforeend", `<button class="aba-tab" data-target="${tipo}-${slug}"><i class="fa-solid ${icon} tab-icon"></i> ${label}</button>`);
       conteudo.insertAdjacentHTML("beforeend", `<div class="aba loja-itens-aba" id="${tipo}-${slug}" style="display:none"></div>`);
       const pane = conteudo.querySelector(`#${CSS.escape(`${tipo}-${slug}`)}`);
       renderizar(pane);
+      return true;
     };
 
     cards.forEach((li) => {
       const slug = normalizeName(li.dataset.id || li.id || "");
       const est = encontrarEstabelecimentoPorSlug(slug);
       if (!est || li.dataset.lojaItensHidratados === "1") return;
-      li.dataset.lojaItensHidratados = "1";
+      let abasInseridas = false;
 
-      const veiculos = (autos || []).filter((item) => item.status !== "inativo" && item.ativo !== false && itemPertenceAoEstabelecimentoPublico(item, est));
+      const veiculos = automoveisDoEstabelecimentoPublico(est, autos || []);
       const imoveisDoEst = (imoveis || []).filter((item) => item.status !== "inativo" && item.ativo !== false && itemPertenceAoEstabelecimentoPublico(item, est));
       const produtos = produtosDoEstabelecimentoPublico(est);
       const promocoes = promocoesDoEstabelecimentoPublico(est);
 
       if (veiculos.length) {
-        adicionarAba(li, slug, "veiculos", "Veiculos", "fa-car-side", (pane) => {
+        abasInseridas = adicionarAba(li, slug, "veiculos", "Veiculos", "fa-car-side", (pane) => {
           pane.innerHTML = `<section class="imoveis-wrap automoveis-page loja-itens-wrap"><div class="im-grid loja-itens-grid"></div></section>`;
           const box = pane.querySelector(".loja-itens-grid");
           renderAutomoveisCards(veiculos, box);
           configurarDetalhesAutomoveisEmBox(box, () => veiculos);
-        });
+        }) || abasInseridas;
       }
 
       if (imoveisDoEst.length) {
-        adicionarAba(li, slug, "imoveis", "Imoveis", "fa-house", (pane) => {
+        abasInseridas = adicionarAba(li, slug, "imoveis", "Imoveis", "fa-house", (pane) => {
           pane.innerHTML = `<section class="imoveis-wrap im-cards-mode loja-itens-wrap"><div class="im-grid loja-itens-grid"></div></section>`;
           renderImoveisCardsEstabelecimento(imoveisDoEst, pane.querySelector(".loja-itens-grid"));
-        });
+        }) || abasInseridas;
       }
 
       if (produtos.length) {
-        adicionarAba(li, slug, "produtos", "Produtos", "fa-box-open", (pane) => {
+        abasInseridas = adicionarAba(li, slug, "produtos", "Produtos", "fa-box-open", (pane) => {
           pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap"><div class="promo-grid loja-produtos-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
@@ -10305,11 +10358,11 @@ plotarPinsImoveis(stateImoveis.filtered);
               if (item) abrirModalProdutoEstabelecimento(item, "Produto");
             });
           });
-        });
+        }) || abasInseridas;
       }
 
       if (promocoes.length) {
-        adicionarAba(li, slug, "promocoes", "Promocoes", "fa-tags", (pane) => {
+        abasInseridas = adicionarAba(li, slug, "promocoes", "Promocoes", "fa-tags", (pane) => {
           const itens = promocoes.map((promo) => ({
             id: promo.id,
             titulo: promo.titulo,
@@ -10327,10 +10380,13 @@ plotarPinsImoveis(stateImoveis.filtered);
               if (item) abrirModalProdutoEstabelecimento(item, "Promocao");
             });
           });
-        });
+        }) || abasInseridas;
       }
 
-      moveTabSlider(li.querySelector(".abas-nav"));
+      if (abasInseridas) {
+        li.dataset.lojaItensHidratados = "1";
+        moveTabSlider(li.querySelector(".abas-nav"));
+      }
     });
   }
 
@@ -19247,11 +19303,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       })[0];
   }
 
-  function aplicarClienteAdminNoEstabelecimento(est, cliente) {
+  function aplicarClienteAdminNoEstabelecimento(est, cliente, clienteId = "") {
     if (!est || !cliente) return;
     preservarIdentidadeAdminEstabelecimento(est);
 
     if (campoExiste(cliente, "nome")) est.name = cliente.nome || est.name;
+    est.clienteId = clienteId || cliente.id || est.clienteId || "";
     est.clienteNome = cliente.nome || est.clienteNome || "";
     if (cliente.aliases) est.aliases = cliente.aliases;
     est.nomeNormalizado = est.__adminOriginalSlug || normalizeName(est.name);
@@ -20060,7 +20117,7 @@ plotarPinsImoveis(stateImoveis.filtered);
               .filter((item) => clienteAdminCombinaComEstabelecimento(item.clienteId, item.cliente, item.est, catSlug));
             const escolhido = escolherClienteAdminParaEstabelecimento(candidatos, catSlug);
             if (escolhido) {
-              aplicarClienteAdminNoEstabelecimento(est, escolhido.cliente);
+              aplicarClienteAdminNoEstabelecimento(est, escolhido.cliente, escolhido.clienteId);
               definirStatusClienteAdmin(escolhido.cliente, escolhido.clienteId);
             }
           });
@@ -21132,6 +21189,7 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
                    </ul>
                      `;
 
+    window.__lojaItensUltimosEstabelecimentos = paidEstablishments;
     hidratarAbasItensEstabelecimentoPublico(contentArea, paidEstablishments)
       .catch((error) => console.warn("Nao foi possivel carregar abas de itens do estabelecimento.", error));
 
