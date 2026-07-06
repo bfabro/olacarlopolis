@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 389,
-  label: "v395",
+  numero: 390,
+  label: "v396",
   data: "2026-07-05",
-  nota: "Tela publica de automoveis sem contador de imagens no card e modal com detalhes mais limpos."
+  nota: "Abertura de detalhes de imoveis e veiculos ficou estavel no primeiro clique em modo cards."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

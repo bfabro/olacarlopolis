@@ -8635,12 +8635,18 @@ plotarPinsImoveis(stateImoveis.filtered);
       card.addEventListener("click", (ev) => {
         if (ev.target.closest("button, a, input, select, textarea, [data-imovel-detalhes]")) return;
         const im = stateImoveis.all.find((item) => item.id === card.dataset.id);
-        if (im) registrarCliqueImovel("visualizacao", im);
+        if (im) {
+          registrarCliqueImovel("visualizacao", im);
+          if (typeof focarNoMapa === "function") focarNoMapa(im.id);
+        }
       });
     });
 
-    el.querySelectorAll("[data-imovel-detalhes]").forEach((titulo) => {
+    if (el.dataset.imovelDetalhesDelegado !== "1") {
+      el.dataset.imovelDetalhesDelegado = "1";
       const abrirDetalhes = (ev) => {
+        const titulo = ev.target.closest?.("[data-imovel-detalhes]");
+        if (!titulo || !el.contains(titulo)) return;
         const cardsAtivos = Boolean(
           window.__imoveisModoCards
           || document.getElementById("imModoCards")?.checked
@@ -8654,11 +8660,11 @@ plotarPinsImoveis(stateImoveis.filtered);
         registrarCliqueImovel("visualizacao", im).catch(() => { });
         abrirModalDetalhesImovel(im);
       };
-      titulo.addEventListener("click", abrirDetalhes);
-      titulo.addEventListener("keydown", (ev) => {
+      el.addEventListener("click", abrirDetalhes);
+      el.addEventListener("keydown", (ev) => {
         if (ev.key === "Enter" || ev.key === " ") abrirDetalhes(ev);
       });
-    });
+    }
 
     // [FOTOS] – abre a galeria E registra clique "fotos"
     // permitir abrir a galeria clicando na imagem ou no botão de lupa
@@ -9054,7 +9060,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
     return `
-  <article id="${novidadeDomId("imovel", im.id)}" class="card-imovel ${tag} ${isFechado ? "is-sold" : ""}" data-id="${im.id}" data-novidade-destino="imovel-${im.id}" onclick="focarNoMapa && focarNoMapa('${im.id}')">
+  <article id="${novidadeDomId("imovel", im.id)}" class="card-imovel ${tag} ${isFechado ? "is-sold" : ""}" data-id="${im.id}" data-novidade-destino="imovel-${im.id}">
     <div class="card-top">
       <div class="swiper swiper-imovel-mini">
         <div class="swiper-wrapper">
@@ -9569,19 +9575,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (event.target.closest("a, button, [data-auto-detalhes]")) return;
         registrarCliqueAutomovel("visualizacao", item);
       });
-      card.querySelector("[data-auto-detalhes]")?.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        registrarCliqueAutomovel("visualizacao", item);
-        abrirModalDetalhesAutomovel(item);
-      });
-      card.querySelector("[data-auto-detalhes]")?.addEventListener("keydown", (event) => {
-        if (!["Enter", " "].includes(event.key)) return;
-        event.preventDefault();
-        event.stopPropagation();
-        registrarCliqueAutomovel("visualizacao", item);
-        abrirModalDetalhesAutomovel(item);
-      });
       card.querySelectorAll(".auto-gallery-img").forEach((image) => {
         image.addEventListener("click", () => registrarCliqueAutomovel("fotos", item));
       });
@@ -9917,6 +9910,22 @@ plotarPinsImoveis(stateImoveis.filtered);
     const filtroBox = document.getElementById("filtrosAutomoveis");
     const toggleFiltros = document.getElementById("autoToggleFiltros");
     let lista = Array.isArray(window.__automoveisCache) ? window.__automoveisCache : [];
+
+    const abrirDetalhesAutomovelDelegado = (event) => {
+      const trigger = event.target.closest?.("[data-auto-detalhes]");
+      if (!trigger || !box?.contains(trigger)) return;
+      if (event.type === "keydown" && !["Enter", " "].includes(event.key)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const itemId = trigger.dataset.autoDetalhes || "";
+      const item = lista.find((entry) => String(entry.id) === String(itemId))
+        || (Array.isArray(window.__automoveisCache) ? window.__automoveisCache.find((entry) => String(entry.id) === String(itemId)) : null);
+      if (!item) return;
+      registrarCliqueAutomovel("visualizacao", item);
+      abrirModalDetalhesAutomovel(item);
+    };
+    box?.addEventListener("click", abrirDetalhesAutomovelDelegado);
+    box?.addEventListener("keydown", abrirDetalhesAutomovelDelegado);
 
     const preencherSelect = (id, campo) => {
       const el = document.getElementById(id);
