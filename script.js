@@ -7247,6 +7247,134 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     return itens;
   }
 
+  function chavesEstabelecimentoPublico(est = {}) {
+    return [
+      est.id,
+      est.clienteId,
+      est.nomeNormalizado,
+      est.__adminOriginalSlug,
+      est.__adminOriginalName,
+      est.name,
+      est.nome
+    ].map(normalizeName).filter(Boolean);
+  }
+
+  function itemPertenceAoEstabelecimentoPublico(item = {}, est = {}) {
+    const chaves = new Set(chavesEstabelecimentoPublico(est));
+    if (!chaves.size) return false;
+    const candidatos = [
+      item.estabelecimentoId,
+      item.clienteId,
+      item.clienteNome,
+      item.estabelecimento,
+      item.vendedor,
+      item.loja,
+      item.corretor,
+      ...(Array.isArray(item.corretores) ? item.corretores : [])
+    ].map(normalizeName).filter(Boolean);
+    return candidatos.some((valor) => chaves.has(valor));
+  }
+
+  function produtosDoEstabelecimentoPublico(est = {}) {
+    const origem = est.produtos || est.products || est.itens || est.items || [];
+    const lista = Array.isArray(origem)
+      ? origem
+      : Object.entries(origem || {}).map(([id, value]) => (
+        value && typeof value === "object" ? { id, ...value } : { id, nome: value }
+      ));
+    return lista
+      .map((item, index) => ({
+        id: item.id || `produto-${normalizeName(est.name || "loja")}-${index}`,
+        titulo: item.titulo || item.nome || item.name || item.produto || "Produto",
+        descricao: item.descricao || item.description || item.obs || item.observacoes || "",
+        preco: item.preco || item.valor || item.price || "",
+        imagem: item.imagem || item.image || item.foto || item.fotoUrl || item.imagemUrl || "",
+        observacoes: item.observacoes || item.obs || item.detalhes || "",
+        categoria: item.categoria || item.tipo || "",
+        status: item.status || "ativo"
+      }))
+      .filter((item) => item.status !== "inativo" && item.titulo);
+  }
+
+  function promocoesDoEstabelecimentoPublico(est = {}) {
+    const chaves = new Set(chavesEstabelecimentoPublico(est));
+    return coletarTodasPromocoes()
+      .filter((promo) => chaves.has(normalizeName(promo.estabelecimentoId)) || chaves.has(normalizeName(promo.estabelecimento)))
+      .filter((promo) => !promoExpirada(promo) && promoDisponivelHoje(promo));
+  }
+
+  function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
+    const preco = formatarMoedaPromo(item.preco);
+    const titulo = escapePromoHtml(item.titulo || "Produto");
+    const descricao = escapePromoHtml(item.descricao || item.observacoes || "");
+    return `
+      <article class="promo-card promo-card-new loja-produto-card" data-loja-produto="${escapePromoHtml(item.id || "")}" data-loja-produto-tipo="${tipo}">
+        <div class="promo-card-body">
+          <div class="promo-produto">
+            <div class="promo-image-wrap">
+              ${item.imagem
+                ? `<img class="promo-img-zoom" src="${escapePromoHtml(item.imagem)}" alt="${titulo}" loading="lazy">`
+                : `<div class="promo-sem-imagem">Imagem do produto</div>`}
+            </div>
+            <div class="promo-info">
+              ${item.categoria ? `<div class="promo-estab">${escapePromoHtml(item.categoria)}</div>` : ""}
+              <div class="promo-nome">${titulo}</div>
+              ${descricao ? `<div class="promo-obs">${descricao}</div>` : ""}
+            </div>
+          </div>
+          <div class="promo-preco promo-price-badge promo-price-${preco ? "super" : "promo"}">
+            <div class="promo-preco-atual">${preco || "Ver detalhes"}</div>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function abrirModalProdutoEstabelecimento(item = {}, tituloPadrao = "Produto") {
+    document.querySelector(".loja-produto-modal")?.remove();
+    const titulo = item.titulo || tituloPadrao;
+    const preco = formatarMoedaPromo(item.preco);
+    const modal = document.createElement("div");
+    modal.className = "imovel-detalhes-modal loja-produto-modal";
+    modal.innerHTML = `
+      <section class="imovel-detalhes-dialog loja-produto-dialog" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(titulo)}">
+        <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
+        <div class="imovel-detalhes-media loja-produto-media">
+          ${item.imagem ? `<img src="${escapePromoHtml(item.imagem)}" alt="${escapePromoHtml(titulo)}" loading="lazy">` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-box-open"></i></div>`}
+        </div>
+        <div class="imovel-detalhes-conteudo">
+          <div class="imovel-detalhes-topo">
+            <div>
+              <h2>${escapePromoHtml(titulo)}</h2>
+              ${item.categoria ? `<p class="imovel-detalhes-endereco"><i class="fa-solid fa-tag"></i><span>${escapePromoHtml(item.categoria)}</span></p>` : ""}
+            </div>
+            ${preco ? `<div class="imovel-detalhes-financeiro"><strong class="imovel-detalhes-valor">${escapePromoHtml(preco)}</strong></div>` : ""}
+          </div>
+          ${(item.descricao || item.observacoes) ? `
+            <section class="imovel-detalhes-descricao">
+              <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-align-left"></i><span>Detalhes</span></div>
+              ${item.descricao ? `<p>${escapePromoHtml(item.descricao)}</p>` : ""}
+              ${item.observacoes ? `<p>${escapePromoHtml(item.observacoes)}</p>` : ""}
+            </section>
+          ` : ""}
+        </div>
+      </section>
+    `;
+    const fechar = () => {
+      document.removeEventListener("keydown", fecharComEsc);
+      modal.remove();
+    };
+    const fecharComEsc = (event) => {
+      if (event.key === "Escape") fechar();
+    };
+    modal.querySelector(".loja-produto-fechar")?.addEventListener("click", fechar);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) fechar();
+    });
+    document.addEventListener("keydown", fecharComEsc);
+    document.body.appendChild(modal);
+  }
+
   function numeroPrecoPromocao(valor) {
     if (typeof valor === "number") return valor;
     const texto = String(valor || "").replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
@@ -9448,6 +9576,60 @@ plotarPinsImoveis(stateImoveis.filtered);
     };
   }
 
+  function renderImoveisCardsEstabelecimento(lista = [], box) {
+    if (!box) return;
+    box.innerHTML = lista.length
+      ? lista.map((im) => cardImovelHTML(im)).join("")
+      : `<p class="list-meta">Nenhum imovel cadastrado para este estabelecimento.</p>`;
+    setTimeout(() => {
+      box.querySelectorAll(".swiper-imovel-mini").forEach((swiperBox) => {
+        if (!swiperBox.swiper) new Swiper(swiperBox, { loop: true, autoplay: { delay: 4000 } });
+      });
+    }, 0);
+    box.querySelectorAll(".card-imovel").forEach((card) => {
+      card.addEventListener("click", (ev) => {
+        if (ev.target.closest("button, a, input, select, textarea, [data-imovel-detalhes]")) return;
+        const im = lista.find((item) => String(item.id) === String(card.dataset.id));
+        if (!im) return;
+        registrarCliqueImovel("visualizacao", im).catch(() => { });
+        abrirModalDetalhesImovel(im);
+      });
+    });
+    box.addEventListener("click", (ev) => {
+      const titulo = ev.target.closest?.("[data-imovel-detalhes]");
+      if (titulo && box.contains(titulo)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const im = lista.find((item) => String(item.id) === String(titulo.getAttribute("data-imovel-detalhes")));
+        if (!im) return;
+        registrarCliqueImovel("visualizacao", im).catch(() => { });
+        abrirModalDetalhesImovel(im);
+        return;
+      }
+      const zoom = ev.target.closest?.(".card-imovel .swiper-imovel-mini img, .card-imovel .zoom-thumb");
+      if (zoom && box.contains(zoom)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const card = zoom.closest(".card-imovel");
+        const id = card?.getAttribute("data-id") || zoom.getAttribute("data-id");
+        const im = lista.find((item) => String(item.id) === String(id));
+        if (!im) return;
+        registrarCliqueImovel("fotos", im).catch(() => { });
+        abrirModalImoveis(im, zoom.currentSrc || zoom.src || "");
+      }
+    });
+    box.addEventListener("keydown", (ev) => {
+      if (!["Enter", " "].includes(ev.key)) return;
+      const titulo = ev.target.closest?.("[data-imovel-detalhes]");
+      if (!titulo || !box.contains(titulo)) return;
+      ev.preventDefault();
+      const im = lista.find((item) => String(item.id) === String(titulo.getAttribute("data-imovel-detalhes")));
+      if (!im) return;
+      registrarCliqueImovel("visualizacao", im).catch(() => { });
+      abrirModalDetalhesImovel(im);
+    });
+  }
+
   function normalizarTextoAutomoveis(valor) {
     return String(valor || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   }
@@ -9716,6 +9898,27 @@ plotarPinsImoveis(stateImoveis.filtered);
     modal.querySelector(".auto-detalhes-fechar")?.focus();
   }
 
+  function configurarDetalhesAutomoveisEmBox(box, obterLista) {
+    if (!box || box.dataset.autoDetalhesDelegado === "1") return;
+    box.dataset.autoDetalhesDelegado = "1";
+    const abrirDetalhesAutomovelDelegado = (event) => {
+      const trigger = event.target.closest?.("[data-auto-detalhes]");
+      if (!trigger || !box.contains(trigger)) return;
+      if (event.type === "keydown" && !["Enter", " "].includes(event.key)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const itemId = trigger.dataset.autoDetalhes || "";
+      const lista = typeof obterLista === "function" ? obterLista() : (obterLista || []);
+      const item = lista.find((entry) => String(entry.id) === String(itemId))
+        || (Array.isArray(window.__automoveisCache) ? window.__automoveisCache.find((entry) => String(entry.id) === String(itemId)) : null);
+      if (!item) return;
+      registrarCliqueAutomovel("visualizacao", item);
+      abrirModalDetalhesAutomovel(item);
+    };
+    box.addEventListener("click", abrirDetalhesAutomovelDelegado);
+    box.addEventListener("keydown", abrirDetalhesAutomovelDelegado);
+  }
+
   function registrarCliqueAutomovel(tipo, item = {}) {
     const responsavel = item.clienteId || item.estabelecimentoId || item.clienteNome || item.vendedor || item.loja;
     if (!responsavel) return Promise.resolve();
@@ -9911,21 +10114,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const toggleFiltros = document.getElementById("autoToggleFiltros");
     let lista = Array.isArray(window.__automoveisCache) ? window.__automoveisCache : [];
 
-    const abrirDetalhesAutomovelDelegado = (event) => {
-      const trigger = event.target.closest?.("[data-auto-detalhes]");
-      if (!trigger || !box?.contains(trigger)) return;
-      if (event.type === "keydown" && !["Enter", " "].includes(event.key)) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const itemId = trigger.dataset.autoDetalhes || "";
-      const item = lista.find((entry) => String(entry.id) === String(itemId))
-        || (Array.isArray(window.__automoveisCache) ? window.__automoveisCache.find((entry) => String(entry.id) === String(itemId)) : null);
-      if (!item) return;
-      registrarCliqueAutomovel("visualizacao", item);
-      abrirModalDetalhesAutomovel(item);
-    };
-    box?.addEventListener("click", abrirDetalhesAutomovelDelegado);
-    box?.addEventListener("keydown", abrirDetalhesAutomovelDelegado);
+    configurarDetalhesAutomoveisEmBox(box, () => lista);
 
     const preencherSelect = (id, campo) => {
       const el = document.getElementById(id);
@@ -10021,6 +10210,100 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     preencherFiltros();
     aplicar();
+  }
+
+  async function hidratarAbasItensEstabelecimentoPublico(root, estabelecimentos = []) {
+    const area = root || document;
+    const cards = [...area.querySelectorAll("li[data-id]")];
+    if (!cards.length) return;
+
+    const estabelecimentosPorChave = new Map();
+    estabelecimentos.forEach((est) => {
+      chavesEstabelecimentoPublico(est).forEach((chave) => estabelecimentosPorChave.set(chave, est));
+    });
+
+    const [autosResult, imoveisResult] = await Promise.allSettled([
+      carregarAutomoveisFirebase(),
+      montarListaImoveisPublica()
+    ]);
+    const autos = autosResult.status === "fulfilled" ? autosResult.value : (window.__automoveisCache || []);
+    const imoveis = imoveisResult.status === "fulfilled" ? imoveisResult.value : (window.__imoveisPublicosCache || []);
+    if (imoveisResult.status === "fulfilled") window.__imoveisPublicosCache = imoveis;
+
+    const adicionarAba = (li, slug, tipo, label, icon, renderizar) => {
+      const nav = li.querySelector(".abas-nav");
+      const conteudo = li.querySelector(".abas-conteudo");
+      if (!nav || !conteudo || nav.querySelector(`[data-target="${tipo}-${slug}"]`)) return;
+      nav.insertAdjacentHTML("beforeend", `<button class="aba-tab" data-target="${tipo}-${slug}"><i class="fa-solid ${icon} tab-icon"></i> ${label}</button>`);
+      conteudo.insertAdjacentHTML("beforeend", `<div class="aba loja-itens-aba" id="${tipo}-${slug}" style="display:none"></div>`);
+      const pane = conteudo.querySelector(`#${CSS.escape(`${tipo}-${slug}`)}`);
+      renderizar(pane);
+    };
+
+    cards.forEach((li) => {
+      const slug = normalizeName(li.dataset.id || li.id || "");
+      const est = estabelecimentosPorChave.get(slug);
+      if (!est || li.dataset.lojaItensHidratados === "1") return;
+      li.dataset.lojaItensHidratados = "1";
+
+      const veiculos = (autos || []).filter((item) => item.status !== "inativo" && itemPertenceAoEstabelecimentoPublico(item, est));
+      const imoveisDoEst = (imoveis || []).filter((item) => item.status !== "inativo" && itemPertenceAoEstabelecimentoPublico(item, est));
+      const produtos = produtosDoEstabelecimentoPublico(est);
+      const promocoes = promocoesDoEstabelecimentoPublico(est);
+
+      if (veiculos.length) {
+        adicionarAba(li, slug, "veiculos", "Veiculos", "fa-car-side", (pane) => {
+          pane.innerHTML = `<section class="imoveis-wrap automoveis-page loja-itens-wrap"><div class="im-grid loja-itens-grid"></div></section>`;
+          const box = pane.querySelector(".loja-itens-grid");
+          renderAutomoveisCards(veiculos, box);
+          configurarDetalhesAutomoveisEmBox(box, () => veiculos);
+        });
+      }
+
+      if (imoveisDoEst.length) {
+        adicionarAba(li, slug, "imoveis", "Imoveis", "fa-house", (pane) => {
+          pane.innerHTML = `<section class="imoveis-wrap im-cards-mode loja-itens-wrap"><div class="im-grid loja-itens-grid"></div></section>`;
+          renderImoveisCardsEstabelecimento(imoveisDoEst, pane.querySelector(".loja-itens-grid"));
+        });
+      }
+
+      if (produtos.length) {
+        adicionarAba(li, slug, "produtos", "Produtos", "fa-box-open", (pane) => {
+          pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap"><div class="promo-grid loja-produtos-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
+          pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
+            card.addEventListener("click", (event) => {
+              if (event.target.closest("a, button")) return;
+              const item = produtos.find((produto) => String(produto.id) === String(card.dataset.lojaProduto));
+              if (item) abrirModalProdutoEstabelecimento(item, "Produto");
+            });
+          });
+        });
+      }
+
+      if (promocoes.length) {
+        adicionarAba(li, slug, "promocoes", "Promocoes", "fa-tags", (pane) => {
+          const itens = promocoes.map((promo) => ({
+            id: promo.id,
+            titulo: promo.titulo,
+            descricao: promo.descricao || promo.obs,
+            preco: promo.preco,
+            imagem: promo.imagem,
+            observacoes: [promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "", promo.desconto ? `Desconto: ${promo.desconto}` : ""].filter(Boolean).join(" | "),
+            categoria: "Promocao"
+          }));
+          pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap"><div class="promo-grid loja-produtos-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
+          pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
+            card.addEventListener("click", (event) => {
+              if (event.target.closest("a, button")) return;
+              const item = itens.find((produto) => String(produto.id) === String(card.dataset.lojaProduto));
+              if (item) abrirModalProdutoEstabelecimento(item, "Promocao");
+            });
+          });
+        });
+      }
+
+      moveTabSlider(li.querySelector(".abas-nav"));
+    });
   }
 
   const elMenuAutomoveis = document.getElementById("menuAutomoveis");
@@ -19008,6 +19291,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       }
     }
     if (Array.isArray(cliente.promocoes)) est.promocoes = cliente.promocoes;
+    if (Array.isArray(cliente.produtos)) est.produtos = cliente.produtos;
     if (Array.isArray(cliente.vagasTrabalho)) est.vagasTrabalho = cliente.vagasTrabalho;
     ["vagaAtiva", "vagaTitulo", "vagaCargo", "infoVagaTrabalho", "vagaDescricao", "vagaPreRequisito", "vagaRequisitos", "vagaSalario", "vagaJornada", "vagaLocal", "vagaContato", "vagaComoCandidatar", "vagaValidade"].forEach((campo) => {
       if (campoExiste(cliente, campo)) est[campo] = cliente[campo] || (campo === "vagaAtiva" ? false : "");
@@ -19027,6 +19311,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const contatosDetalhados = getContatosDetalhadosEstabelecimento(cliente);
     const contatos = contatosDetalhados.map((item) => item.numero);
     return {
+      clienteId,
       nomeNormalizado: normalizeName(cliente.nomeNormalizado || cliente.nome || clienteId),
       image: cliente.imagem || (imagensAdmin[0]?.url || ""),
       name: cliente.nome || clienteId,
@@ -19062,6 +19347,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       cardapioLink: cardapioAtivo ? (cliente.cardapioLink || "") : "",
       menuImages: cardapioAtivo ? (cliente.menuImages || []) : [],
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : [],
+      produtos: Array.isArray(cliente.produtos) ? cliente.produtos : [],
       vagasTrabalho: Array.isArray(cliente.vagasTrabalho) ? cliente.vagasTrabalho : [],
       vagaAtiva: cliente.vagaAtiva !== false && Boolean(cliente.infoVagaTrabalho || cliente.vagaTitulo || cliente.vagaCargo || cliente.vagaDescricao),
       vagaTitulo: cliente.vagaTitulo || cliente.vagaCargo || "",
@@ -19126,6 +19412,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         ? Boolean(cliente.cardapioAtivo || cliente.menuAtivo || cliente.exibirCardapio)
         : Boolean(cliente.cardapioLink || (Array.isArray(cliente.menuImages) && cliente.menuImages.length) || base.cardapioLink || (Array.isArray(base.menuImages) && base.menuImages.length)),
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : (base.promocoes || base.promotions || []),
+      produtos: Array.isArray(cliente.produtos) ? cliente.produtos : (base.produtos || base.products || []),
       vagaAtiva: cliente.vagaAtiva !== false && Boolean(cliente.infoVagaTrabalho || cliente.vagaTitulo || cliente.vagaCargo || cliente.vagaDescricao || (Array.isArray(cliente.vagasTrabalho) && cliente.vagasTrabalho.length)),
       vagaTitulo: cliente.vagaTitulo || cliente.vagaCargo || "",
       vagaCargo: cliente.vagaCargo || cliente.vagaTitulo || "",
@@ -20810,8 +21097,11 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
                       </li>
   `;
     }).join('')}
-                  </ul>
-                    `;
+                   </ul>
+                     `;
+
+    hidratarAbasItensEstabelecimentoPublico(contentArea, paidEstablishments)
+      .catch((error) => console.warn("Nao foi possivel carregar abas de itens do estabelecimento.", error));
 
 
 
@@ -22385,11 +22675,15 @@ document.addEventListener('click', function (e) {
   container.querySelectorAll('.aba').forEach(sec => { sec.style.display = 'none'; sec.classList.remove('visible'); });
 
   const targetId = tab.dataset.target || tab.getAttribute('data-target') || '';
-  const nome = targetId.replace(/^(info-|fotos-|cardapio-)/, '');
+  const nome = targetId.replace(/^(info-|fotos-|cardapio-|veiculos-|imoveis-|produtos-|promocoes-)/, '');
 
   // 🔢 CONTAGEM
   if (targetId.startsWith('fotos-')) window.registrarCliqueBotao?.('fotos', nome);
   if (targetId.startsWith('cardapio-')) window.registrarCliqueBotao?.('cardapio', nome);
+  if (targetId.startsWith('veiculos-')) window.registrarCliqueBotao?.('veiculos', nome);
+  if (targetId.startsWith('imoveis-')) window.registrarCliqueBotao?.('imoveis', nome);
+  if (targetId.startsWith('produtos-')) window.registrarCliqueBotao?.('produtos', nome);
+  if (targetId.startsWith('promocoes-')) window.registrarCliqueBotao?.('promocoes', nome);
 
   // abre a seção alvo
   const alvo = container.querySelector('#' + CSS.escape(targetId));

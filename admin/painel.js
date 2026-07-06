@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 395,
-  label: "v401",
+  numero: 396,
+  label: "v402",
   data: "2026-07-06",
-  nota: "Permissao para arte de veiculo sem logo Ola Carlopolis passou para a tela de usuarios por cliente."
+  nota: "Tela publica do estabelecimento ganhou abas de veiculos, imoveis, produtos e promocoes vinculadas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

@@ -20724,3 +20724,42 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
     justify-content: flex-start !important;
   }
 }
+
+.loja-itens-aba {
+  width: 100%;
+}
+
+.loja-itens-wrap {
+  width: 100%;
+  margin: 12px 0 4px;
+  padding: 0;
+  background: transparent;
+}
+
+.loja-itens-wrap .loja-itens-grid,
+.loja-produtos-grid {
+  width: 100%;
+  margin: 0;
+}
+
+.loja-itens-wrap .auto-card,
+.loja-itens-wrap .card-imovel,
+.loja-produto-card {
+  cursor: pointer;
+}
+
+.loja-produto-dialog .loja-produto-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 720px) {
+  .loja-itens-wrap {
+    margin-top: 10px;
+  }
+
+  .loja-produtos-grid.promo-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
