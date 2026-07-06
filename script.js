@@ -10441,6 +10441,44 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
   }
 
+  function estabelecimentosVisiveisParaAbasPublicas(root = document) {
+    const area = root || document;
+    const ids = new Set([...area.querySelectorAll("li[data-id], li[id]")]
+      .map((li) => normalizeName(li.dataset.id || li.id || ""))
+      .filter(Boolean));
+    if (!ids.size) return [];
+    const encontrados = [];
+    (categories || []).forEach((cat) => {
+      (cat.establishments || []).forEach((est) => {
+        const chaves = chavesEstabelecimentoPublico(est);
+        const combina = chaves.some((chave) => ids.has(chave) || [...ids].some((id) => (
+          chave.length >= 4
+          && id.length >= 4
+          && (chave.includes(id) || id.includes(chave))
+        )));
+        if (!combina) return;
+        est.__categoriaPublica = cat.title || est.__categoriaPublica || "";
+        encontrados.push(est);
+      });
+    });
+    return encontrados;
+  }
+
+  let lojaItensAutoHydrateTimer = null;
+  function agendarHidratacaoAbasItensPublicas(root = document, delay = 120) {
+    if (lojaItensAutoHydrateTimer) clearTimeout(lojaItensAutoHydrateTimer);
+    lojaItensAutoHydrateTimer = setTimeout(() => {
+      const area = root?.querySelector?.(".content_area") || document.querySelector(".content_area") || root || document;
+      const estabelecimentos = estabelecimentosVisiveisParaAbasPublicas(area);
+      if (!estabelecimentos.length) return;
+      const carregarRemoto = !window.__lojaItensAutoHydrateRemoteStarted;
+      window.__lojaItensAutoHydrateRemoteStarted = true;
+      window.__lojaItensUltimosEstabelecimentos = estabelecimentos;
+      hidratarAbasItensEstabelecimentoPublico(area, estabelecimentos, { carregarRemoto, atualizar: true })
+        .catch((error) => console.warn("Nao foi possivel hidratar abas de itens visiveis.", error));
+    }, delay);
+  }
+
   const elMenuAutomoveis = document.getElementById("menuAutomoveis");
   if (elMenuAutomoveis) {
     elMenuAutomoveis.addEventListener("click", function (event) {
@@ -21254,6 +21292,7 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
     window.__lojaItensUltimosEstabelecimentos = paidEstablishments;
     hidratarAbasItensEstabelecimentoPublico(contentArea, paidEstablishments)
       .catch((error) => console.warn("Nao foi possivel carregar abas de itens do estabelecimento.", error));
+    agendarHidratacaoAbasItensPublicas(contentArea, 80);
 
 
 
@@ -22915,6 +22954,12 @@ document.addEventListener('click', function (e) {
 /* posiciona ao abrir a tela e ao redimensionar */
 window.addEventListener('load', () => document.querySelectorAll('.abas-nav').forEach(moveTabSlider));
 window.addEventListener('resize', () => document.querySelectorAll('.abas-nav').forEach(moveTabSlider));
+window.addEventListener('load', () => {
+  if (typeof agendarHidratacaoAbasItensPublicas === "function") agendarHidratacaoAbasItensPublicas(document, 180);
+});
+window.addEventListener('hashchange', () => {
+  if (typeof agendarHidratacaoAbasItensPublicas === "function") agendarHidratacaoAbasItensPublicas(document, 220);
+});
 
 /* se os cards são inseridos dinamicamente, observa o DOM e posiciona o slider quando surgir uma nova .abas-nav */
 new MutationObserver((mutations) => {
@@ -22923,6 +22968,9 @@ new MutationObserver((mutations) => {
       if (!(node instanceof HTMLElement)) return;
       if (node.classList && node.classList.contains('abas-nav')) moveTabSlider(node);
       else node.querySelectorAll?.('.abas-nav').forEach(moveTabSlider);
+      if (node.classList?.contains('abas-nav') || node.querySelector?.('.abas-nav')) {
+        if (typeof agendarHidratacaoAbasItensPublicas === "function") agendarHidratacaoAbasItensPublicas(document, 120);
+      }
     });
   }
 }).observe(document.body, { childList: true, subtree: true });
