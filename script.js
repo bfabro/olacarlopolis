@@ -20909,10 +20909,20 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
       ${paidEstablishments.map((establishment) => {
       establishment.__categoriaPublica = title;
       const slugEstabelecimentoPublico = normalizeName(establishment.name);
-      const veiculosIniciaisLoja = automoveisDoEstabelecimentoPublico(establishment, window.__automoveisCache || []);
-      const mostrarAbaVeiculosInicial = veiculosIniciaisLoja.length || estabelecimentoPublicoEhDeVeiculos(establishment);
-      const produtosIniciaisLoja = produtosDoEstabelecimentoPublico(establishment);
-      const promocoesIniciaisLoja = promocoesDoEstabelecimentoPublico(establishment);
+      let veiculosIniciaisLoja = [];
+      let produtosIniciaisLoja = [];
+      let mostrarAbaVeiculosInicial = false;
+      try {
+        veiculosIniciaisLoja = automoveisDoEstabelecimentoPublico(establishment, window.__automoveisCache || []);
+        mostrarAbaVeiculosInicial = Boolean(veiculosIniciaisLoja.length || estabelecimentoPublicoEhDeVeiculos(establishment));
+      } catch (error) {
+        console.warn("Nao foi possivel preparar aba inicial de veiculos.", error);
+      }
+      try {
+        produtosIniciaisLoja = produtosDoEstabelecimentoPublico(establishment);
+      } catch (error) {
+        console.warn("Nao foi possivel preparar aba inicial de produtos.", error);
+      }
       let statusAberto = "";
       if (establishment.funcionamento24Horas || establishment.horarios) {
         const aberto = establishment.funcionamento24Horas || estaAbertoAgora(establishment.horarios);
@@ -21005,9 +21015,6 @@ ${!establishment.descricaoFalecido ? `
     <button class="aba-tab" data-target="produtos-${slugEstabelecimentoPublico}"><i class="fa-solid fa-box-open tab-icon"></i> Produtos</button>
   ` : ''}
 
-  ${promocoesIniciaisLoja.length ? `
-    <button class="aba-tab" data-target="promocoes-${slugEstabelecimentoPublico}"><i class="fa-solid fa-tags tab-icon"></i> Promocoes</button>
-  ` : ''}
 </div>
 
 <div class="abas-conteudo" data-estab="${slugEstabelecimentoPublico}">
@@ -21295,27 +21302,6 @@ ${produtosIniciaisLoja.length ? `
     </section>
   </div>
 ` : ``}
-
-${promocoesIniciaisLoja.length ? `
-  <div class="aba loja-itens-aba" id="promocoes-${slugEstabelecimentoPublico}" style="display:none">
-    <section class="promo-city-screen loja-itens-wrap">
-      <div class="promo-grid loja-produtos-grid">${promocoesIniciaisLoja.map((promo) => renderProdutoCardEstabelecimento({
-        id: promo.id,
-        titulo: promo.titulo,
-        descricao: promo.descricao || promo.obs,
-        preco: promo.preco,
-        imagem: promo.imagem,
-        observacoes: [promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "", promo.desconto ? `Desconto: ${promo.desconto}` : ""].filter(Boolean).join(" | "),
-        categoria: "Promocao"
-      }, "promocao")).join("")}</div>
-    </section>
-  </div>
-` : ``}
-
-
-
-
-
 
 </div>
 
