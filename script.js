@@ -7372,8 +7372,14 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const preco = formatarMoedaPromo(item.preco);
     const titulo = escapePromoHtml(item.titulo || "Produto");
     const descricao = escapePromoHtml(item.descricao || item.observacoes || "");
+    const id = String(item.id || `produto-${normalizeName(item.titulo || item.nome || "item")}`);
+    const cacheKey = `${tipo}:${id}`;
+    if (typeof window !== "undefined") {
+      window.__lojaProdutosDetalhes = window.__lojaProdutosDetalhes || {};
+      window.__lojaProdutosDetalhes[cacheKey] = { ...item, id };
+    }
     return `
-      <article class="promo-card promo-card-new loja-produto-card" data-loja-produto="${escapePromoHtml(item.id || "")}" data-loja-produto-tipo="${tipo}">
+      <article class="promo-card promo-card-new loja-produto-card" data-loja-produto="${escapePromoHtml(id)}" data-loja-produto-tipo="${tipo}" data-loja-produto-key="${escapePromoHtml(cacheKey)}">
         <div class="promo-card-body">
           <div class="promo-produto">
             <div class="promo-image-wrap">
@@ -7438,6 +7444,21 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     });
     document.addEventListener("keydown", fecharComEsc);
     document.body.appendChild(modal);
+  }
+
+  if (typeof document !== "undefined" && typeof window !== "undefined" && !window.__lojaProdutoDelegadoBound) {
+    window.__lojaProdutoDelegadoBound = true;
+    document.addEventListener("click", (event) => {
+      if (event.__lojaProdutoHandled) return;
+      const card = event.target.closest("[data-loja-produto]");
+      if (!card || event.target.closest("a, button")) return;
+      const tipo = card.dataset.lojaProdutoTipo || "produto";
+      const key = card.dataset.lojaProdutoKey || `${tipo}:${card.dataset.lojaProduto || ""}`;
+      const item = window.__lojaProdutosDetalhes?.[key];
+      if (!item) return;
+      event.__lojaProdutoHandled = true;
+      abrirModalProdutoEstabelecimento(item, tipo === "promocao" ? "Promocao" : "Produto");
+    });
   }
 
   function numeroPrecoPromocao(valor) {
@@ -10401,9 +10422,13 @@ plotarPinsImoveis(stateImoveis.filtered);
           pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap"><div class="promo-grid loja-produtos-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
+              if (event.__lojaProdutoHandled) return;
               if (event.target.closest("a, button")) return;
               const item = produtos.find((produto) => String(produto.id) === String(card.dataset.lojaProduto));
-              if (item) abrirModalProdutoEstabelecimento(item, "Produto");
+              if (item) {
+                event.__lojaProdutoHandled = true;
+                abrirModalProdutoEstabelecimento(item, "Produto");
+              }
             });
           });
         }) || abasInseridas;
@@ -10423,9 +10448,13 @@ plotarPinsImoveis(stateImoveis.filtered);
           pane.innerHTML = `<section class="promo-city-screen loja-itens-wrap"><div class="promo-grid loja-produtos-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
+              if (event.__lojaProdutoHandled) return;
               if (event.target.closest("a, button")) return;
               const item = itens.find((produto) => String(produto.id) === String(card.dataset.lojaProduto));
-              if (item) abrirModalProdutoEstabelecimento(item, "Promocao");
+              if (item) {
+                event.__lojaProdutoHandled = true;
+                abrirModalProdutoEstabelecimento(item, "Promocao");
+              }
             });
           });
         }) || abasInseridas;

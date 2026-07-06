@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 403,
-  label: "v409",
+  numero: 404,
+  label: "v410",
   data: "2026-07-06",
-  nota: "Render publico dos clientes protegido ao criar abas Veiculos e Produtos."
+  nota: "Produtos do cliente em multiplos cards com detalhes expansivos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3612,6 +3612,7 @@ async function addClientProduct() {
     image = await uploadPromoImageForClient(currentId, file);
   }
   const editingIndex = Number.isInteger(state.clientProductEditIndex) ? state.clientProductEditIndex : -1;
+  state.clientProdutos = normalizeProdutos(state.clientProdutos);
   const current = editingIndex >= 0 ? state.clientProdutos[editingIndex] : null;
   const payload = readProductFields("client", document, current?.id || `produto-${Date.now()}`);
   payload.imagem = image;
@@ -12700,14 +12701,16 @@ function renderClientOnlyEditor() {
       image = await uploadPromoImageForClient(client.id, imageFile);
     }
 
-    const current = coProductEditIndex >= 0 ? produtos[coProductEditIndex] : null;
+    const listaProdutos = normalizeProdutos(produtos);
+    const current = coProductEditIndex >= 0 ? listaProdutos[coProductEditIndex] : null;
     const payload = readProductFields("co", mount, current?.id || `produto-${Date.now()}`);
     payload.imagem = image;
-    if (coProductEditIndex >= 0 && current) produtos[coProductEditIndex] = payload;
-    else produtos.unshift(payload);
+    if (coProductEditIndex >= 0 && current) listaProdutos[coProductEditIndex] = payload;
+    else listaProdutos.unshift(payload);
+    produtos.splice(0, produtos.length, ...listaProdutos);
 
     await update(ref(db, `clientes/${client.id}`), {
-      produtos: normalizeProdutos(produtos),
+      produtos: normalizeProdutos(listaProdutos),
       origem: "painel",
       editadoNoPainel: true,
       updatedAt: serverTimestamp(),
