@@ -3909,23 +3909,15 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!idEst) return;
 
     // 1) Descobre em qual categoria esse estabelecimento está
-    let categoriaEncontrada = null;
-
-    categories.forEach(cat => {
-      if (categoriaEncontrada) return;
-      cat.establishments?.forEach(est => {
-        const norm = normalizeName(est.name || "");
-        if (norm === idEst) {
-          categoriaEncontrada = cat;
-        }
-      });
-    });
+    const encontrado = encontrarCategoriaEstabelecimentoPublico(idEst);
+    const categoriaEncontrada = encontrado?.categoria || null;
+    const estabelecimento = encontrado?.estabelecimento || null;
+    const idPublico = normalizeName(estabelecimento?.name || estabelecimento?.nome || idEst);
 
     if (!categoriaEncontrada) {
       console.warn("Estabelecimento não encontrado para id:", idEst);
       return;
     }
-    const estabelecimento = categoriaEncontrada.establishments?.find((est) => normalizeName(est.name || "") === idEst);
     registrarCliqueBotao("perfil", idEst, "perfil-cliente", {
       estabelecimento: estabelecimento?.name || "",
       origem: "atalho-home"
@@ -3947,7 +3939,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 4) Depois que a categoria carregar, rola até o li do comércio e destaca
     setTimeout(() => {
-      const alvo = document.getElementById(idEst);
+      const alvo = document.getElementById(idPublico) || document.querySelector(`[data-id="${idPublico}"]`) || document.getElementById(idEst) || document.querySelector(`[data-id="${idEst}"]`);
       if (alvo) {
         alvo.scrollIntoView({ behavior: "smooth", block: "start" });
         alvo.classList.add("destaque-home");
@@ -3981,16 +3973,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!id) return;
 
     // Verifica se esse id corresponde a algum comércio
-    let existe = false;
-    categories.forEach(cat => {
-      if (existe) return;
-      cat.establishments?.forEach(est => {
-        const norm = normalizeName(est.name || "");
-        if (norm === id) {
-          existe = true;
-        }
-      });
-    });
+    const existe = Boolean(encontrarCategoriaEstabelecimentoPublico(id));
 
     // Se não for um comércio, deixa outras rotas funcionarem normalmente
     if (!existe) return;
@@ -7305,6 +7288,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       ...(est.permissoes || {})
     });
     if (Object.prototype.hasOwnProperty.call(permissoes, modulo)) return Boolean(permissoes[modulo]);
+    if (!usuarios.length && !Object.keys(permissoes).length) return true;
     if (modulo === "veiculos") return estabelecimentoPublicoEhDeVeiculos({ ...est, ...cliente });
     if (modulo === "imoveis") {
       const texto = normalizeName([
@@ -7338,6 +7322,22 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       console.warn("Nao foi possivel carregar modulos publicos dos clientes.", error);
     });
     return window.__modulosClientesPublicosPromise;
+  }
+
+  function encontrarCategoriaEstabelecimentoPublico(chave = "") {
+    const alvo = normalizeName(chave);
+    if (!alvo) return null;
+    for (const categoria of categories || []) {
+      for (const estabelecimento of categoria.establishments || []) {
+        const chaves = chavesEstabelecimentoPublico(estabelecimento);
+        const encontrou = chaves.some((item) => (
+          item === alvo
+          || (item.length >= 4 && alvo.length >= 4 && (item.includes(alvo) || alvo.includes(item)))
+        ));
+        if (encontrou) return { categoria, estabelecimento };
+      }
+    }
+    return null;
   }
 
   function itemPertenceAoEstabelecimentoPublico(item = {}, est = {}) {
