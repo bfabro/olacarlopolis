@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 422,
-  label: "v428",
-  data: "2026-07-06",
-  nota: "Aba publica de imoveis abre detalhes tambem por codigo de referencia."
+  numero: 423,
+  label: "v429",
+  data: "2026-07-07",
+  nota: "Exclusao de imoveis remove itens da lista do admin e respeita tombstones."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2334,6 +2334,11 @@ function mergeImoveisBaseComFirebase(scriptImoveis, firebaseImoveis) {
     map.set(String(item.id), item);
   });
   (firebaseImoveis || []).forEach((item) => {
+    const status = String(item.status || "").toLowerCase();
+    if (item.ocultarBaseInicial || ["inativo", "inativa", "excluido", "excluida", "removido", "removida"].includes(status)) {
+      map.delete(String(item.id));
+      return;
+    }
     map.set(String(item.id), {
       ...(map.get(String(item.id)) || {}),
       ...item,
@@ -8347,7 +8352,13 @@ function renderImoveisList() {
   if (!box) return;
   renderImovelArteOptions();
   const q = String($("imovelSearch")?.value || "").toLowerCase().trim();
-  const list = state.imoveis.filter(itemBelongsToCurrentClient).filter((item) => {
+  const imovelVisivel = (item = {}) => {
+    const status = String(item.status || "ativo").toLowerCase();
+    return !item.ocultarBaseInicial
+      && !item.deletedAt
+      && !["inativo", "inativa", "excluido", "excluida", "removido", "removida"].includes(status);
+  };
+  const list = state.imoveis.filter(itemBelongsToCurrentClient).filter(imovelVisivel).filter((item) => {
     const hay = `${item.codRef || ""} ${item.codigo || ""} ${item.titulo || ""} ${item.tipo || ""} ${item.procura || ""} ${item.valor || ""} ${item.corretor || ""} ${item.endereco || ""}`.toLowerCase();
     return !q || hay.includes(q);
   });
@@ -8413,8 +8424,11 @@ async function excluirImovelPorId(imovelId) {
   }
   await removerNovidadesPorDestino("imovel", imovelId, imovelId);
   showToast("Imovel excluido.");
+  state.imoveis = state.imoveis.filter((item) => item.id !== imovelId);
   resetImovelForm();
   await loadAllData();
+  renderImoveisList();
+  renderImovelArteOptions();
 }
 
 function resetInfoDeathNoticeForm() {
