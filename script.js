@@ -7832,6 +7832,65 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     `;
   }
 
+  function renderFotoCardEstabelecimento(est = {}, img = "", index = 0) {
+    const nome = est.name || est.nome || "Cliente";
+    const descricao = est.novidadesDescriptions?.[index] || est.descricoesFotos?.[index] || "";
+    const slug = normalizeName(nome);
+    const cacheKey = `${slug}:${index}`;
+    if (typeof window !== "undefined") {
+      window.__lojaFotosDetalhes = window.__lojaFotosDetalhes || {};
+      window.__lojaFotosGrupos = window.__lojaFotosGrupos || {};
+      window.__lojaFotosGrupos[slug] = {
+        nome,
+        imagens: Array.isArray(est.novidadesImages) ? est.novidadesImages : [],
+        descricoes: Array.isArray(est.novidadesDescriptions) ? est.novidadesDescriptions : []
+      };
+      window.__lojaFotosDetalhes[cacheKey] = { slug, index, img, descricao };
+    }
+    return `
+      <article class="loja-foto-card loja-card-foto" data-loja-foto="${escapePromoHtml(cacheKey)}">
+        <div class="loja-foto-media">
+          <img src="${escapePromoHtml(img)}" alt="Foto ${index + 1} de ${escapePromoHtml(nome)}" loading="lazy" decoding="async">
+        </div>
+        <div class="loja-foto-info">
+          <strong>Foto ${index + 1}</strong>
+          ${descricao ? `<p>${escapePromoHtml(descricao)}</p>` : `<p>${escapePromoHtml(nome)}</p>`}
+        </div>
+      </article>
+    `;
+  }
+
+  function abrirModalFotosEstabelecimentoPublico(grupo = {}, initialIndex = 0) {
+    const imagens = Array.isArray(grupo.imagens) ? grupo.imagens.filter(Boolean) : [];
+    if (!imagens.length) return;
+    document.querySelectorAll(".modal-fotos-overlay").forEach((el) => el.remove());
+    const descricoes = Array.isArray(grupo.descricoes) ? grupo.descricoes : [];
+    const ordenadas = imagens.map((img, index) => ({ img, index }))
+      .sort((a, b) => (a.index === initialIndex ? -1 : b.index === initialIndex ? 1 : a.index - b.index));
+    const html = `
+      <div class="modal-fotos-overlay">
+        <div class="modal-fotos">
+          <button class="close-modal-fotos" aria-label="Fechar">&times;</button>
+          <h2>Fotos de ${escapePromoHtml(grupo.nome || "cliente")}</h2>
+          <div class="modal-fotos-imgs">
+            ${ordenadas.map(({ img, index }) => `
+              <div>
+                <img src="${escapePromoHtml(img)}" alt="Foto ${index + 1}" loading="lazy">
+                ${descricoes[index] ? `<div>${escapePromoHtml(descricoes[index])}</div>` : ""}
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", html);
+    const overlay = document.querySelector(".modal-fotos-overlay");
+    overlay?.querySelector(".close-modal-fotos")?.addEventListener("click", () => overlay.remove());
+    overlay?.addEventListener("click", (event) => {
+      if (event.target === overlay) overlay.remove();
+    });
+  }
+
   function abrirModalProdutoEstabelecimento(item = {}, tituloPadrao = "Produto") {
     document.querySelector(".loja-produto-modal")?.remove();
     const titulo = item.titulo || tituloPadrao;
@@ -7880,6 +7939,15 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   if (typeof document !== "undefined" && typeof window !== "undefined" && !window.__lojaProdutoDelegadoBound) {
     window.__lojaProdutoDelegadoBound = true;
     document.addEventListener("click", (event) => {
+      const fotoCard = event.target.closest("[data-loja-foto]");
+      if (fotoCard && !event.target.closest("a, button")) {
+        const item = window.__lojaFotosDetalhes?.[fotoCard.dataset.lojaFoto];
+        if (!item?.slug) return;
+        event.preventDefault();
+        event.stopPropagation();
+        abrirModalFotosEstabelecimentoPublico(window.__lojaFotosGrupos?.[item.slug] || {}, item.index || 0);
+        return;
+      }
       if (event.__lojaProdutoHandled) return;
       const card = event.target.closest("[data-loja-produto]");
       if (!card || event.target.closest("a, button")) return;
@@ -10946,7 +11014,7 @@ plotarPinsImoveis(stateImoveis.filtered);
             observacoes: [promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "", promo.desconto ? `Desconto: ${promo.desconto}` : ""].filter(Boolean).join(" | "),
             categoria: "Promocao"
           }));
-          pane.innerHTML = `<section class="loja-itens-wrap loja-promocoes-wrap"><div class="loja-produtos-grid loja-cards-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
+          pane.innerHTML = `<section class="loja-itens-wrap loja-promocoes-wrap promo-city-screen"><div class="loja-produtos-grid loja-cards-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
               if (event.__lojaProdutoHandled) return;
@@ -21783,21 +21851,12 @@ ${mostrarAbaVeiculosInicial ? `
 ` : ``}
 
 ${(establishment.novidadesImages && establishment.novidadesImages.length > 0) ? `
-  <div class="aba" id="fotos-${slugEstabelecimentoPublico}" style="display:none">
-    <div class="swiper" id="novidades-${encodeURIComponent(establishment.name)}">
-      <div class="swiper-wrapper">
-        ${establishment.novidadesImages.map((img, idx) => `
-          <div class="swiper-slide">
-            <img src="${img}" alt="Foto ${idx + 1}" loading="lazy">
-            ${establishment.novidadesDescriptions && establishment.novidadesDescriptions[idx]
-            ? `<div class="descricao-foto">${establishment.novidadesDescriptions[idx]}</div>` : ''}
-          </div>
-        `).join('')}
+  <div class="aba loja-itens-aba" id="fotos-${slugEstabelecimentoPublico}" style="display:none">
+    <section class="loja-itens-wrap loja-fotos-wrap">
+      <div class="loja-fotos-grid loja-cards-grid">
+        ${establishment.novidadesImages.map((img, idx) => renderFotoCardEstabelecimento(establishment, img, idx)).join('')}
       </div>
-      <div class="swiper-pagination"></div>
-      <div class="swiper-button-prev"></div>
-      <div class="swiper-button-next"></div>
-    </div>
+    </section>
   </div>
 ` : ``}
 

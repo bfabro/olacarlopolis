@@ -4235,6 +4235,14 @@ a:focus {
   justify-content: center;
 }
 
+.modal-fotos-imgs img {
+  max-width: min(370px, 82vw);
+  max-height: 425px;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px #0002;
+  object-fit: contain;
+}
+
 .foto-com-descricao {
   text-align: center;
   max-width: 300px;
@@ -20955,7 +20963,8 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 }
 
 .loja-itens-wrap .loja-itens-grid,
-.loja-produtos-grid {
+.loja-produtos-grid,
+.loja-fotos-grid {
   width: 100%;
   margin: 0;
 }
@@ -20982,7 +20991,8 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 
 .loja-itens-wrap .auto-card,
 .loja-itens-wrap .card-imovel,
-.loja-produto-card {
+.loja-produto-card,
+.loja-foto-card {
   width: 100%;
   min-width: 0;
 }
@@ -21057,6 +21067,53 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   background: #fff !important;
   box-shadow: 0 8px 18px rgba(15, 23, 42, .10) !important;
   cursor: pointer !important;
+}
+
+.loja-foto-card {
+  overflow: hidden;
+  border: 1px solid #dbe5f2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .10);
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.loja-foto-media {
+  width: 100%;
+  background: #eef4fb;
+}
+
+.loja-foto-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.loja-foto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+}
+
+.loja-foto-info strong {
+  color: #0f172a;
+  font-size: .95rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.loja-foto-info p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: #64748b;
+  font-size: .78rem;
+  line-height: 1.25;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .loja-itens-aba .promo-city-screen .promo-card-body {
@@ -21182,7 +21239,8 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 
 .loja-itens-wrap .auto-card,
 .loja-itens-wrap .card-imovel,
-.loja-produto-card {
+.loja-produto-card,
+.loja-foto-card {
   cursor: pointer;
 }
 
@@ -21200,6 +21258,12 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 }
 
 .loja-card-produto:hover {
+  transform: translateY(-2px);
+  border-color: #9cc5ee;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, .13);
+}
+
+.loja-foto-card:hover {
   transform: translateY(-2px);
   border-color: #9cc5ee;
   box-shadow: 0 14px 30px rgba(15, 23, 42, .13);
