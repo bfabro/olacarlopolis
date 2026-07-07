@@ -4460,13 +4460,14 @@ a:focus {
 .abas-nav {
   position: relative;
   display: flex;
-  gap: 8px;
-  padding: 6px;
-  border: 1px solid #e5e7eb;
+  gap: 0;
+  padding: 8px;
+  border: 1px solid #eef2f7;
   border-radius: 12px;
   background: #fff;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
 }
 
 .abas-nav .aba-tab {
@@ -4474,31 +4475,214 @@ a:focus {
   z-index: 1;
   border: 0;
   background: transparent;
-  padding: 8px 14px;
-  border-radius: 10px;
+  padding: 8px 13px;
+  border-radius: 0;
   font-weight: 700;
   color: #334155;
   cursor: pointer;
   white-space: nowrap;
-  transition: color .2s ease;
+  transition: color .2s ease, background .2s ease;
 }
 
 .abas-nav .aba-tab.active {
-  color: #fff;
+  color: #1f2937;
 }
 
 /* fundo que "anda" para a aba ativa */
 .abas-nav .tab-slider {
+  display: none !important;
+}
+
+.abas-nav .cliente-tab-card {
+  flex: 1 0 82px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 7px;
+  min-width: 78px;
+  min-height: 70px;
+  border-right: 1px solid #edf1f6;
+  color: #334155;
+}
+
+.abas-nav .cliente-tab-card:last-of-type {
+  border-right: 0;
+}
+
+.cliente-tab-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.cliente-tab-blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.cliente-tab-green {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.cliente-tab-purple {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.cliente-tab-orange {
+  background: #ffedd5;
+  color: #f97316;
+}
+
+.cliente-tab-badge {
   position: absolute;
-  z-index: 0;
-  top: 6px;
-  left: 6px;
-  height: calc(100% - 12px);
-  width: 0;
-  border-radius: 10px;
-  background: var(--blue-color, #4070f4);
-  box-shadow: 0 8px 20px rgba(64, 112, 244, .30);
-  transition: left .25s ease, width .25s ease;
+  top: -8px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #22c55e;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.cliente-tab-orange .cliente-tab-badge,
+.cliente-tab-purple .cliente-tab-badge {
+  background: #fb923c;
+}
+
+.cliente-tab-label {
+  color: #334155;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.abas-nav .cliente-tab-card.active::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 999px 999px 0 0;
+  background: #4070f4;
+}
+
+.cliente-funcionamento-card {
+  margin: 10px -4px;
+  border: 1px solid #edf1f6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
+}
+
+.cliente-funcionamento-card summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.cliente-funcionamento-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.cliente-funcionamento-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cliente-funcionamento-status .status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.cliente-funcionamento-status .status-tag.fechado {
+  background: #ef233c;
+  color: #fff;
+}
+
+.cliente-funcionamento-status .status-tag.aberto,
+.cliente-funcionamento-status .status-tag.vinte-quatro-horas {
+  background: #16a34a;
+  color: #fff;
+}
+
+.cliente-funcionamento-status .proximo-horario {
+  color: #111827;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.cliente-funcionamento-resumo {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cliente-funcionamento-resumo strong {
+  overflow: hidden;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cliente-funcionamento-resumo small {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cliente-funcionamento-seta {
+  color: #94a3b8;
+  font-size: 12px;
+  transition: transform .2s ease;
+}
+
+.cliente-funcionamento-card[open] .cliente-funcionamento-seta {
+  transform: rotate(90deg);
+}
+
+.cliente-funcionamento-detalhes {
+  border-top: 1px solid #eef2f7;
+  padding: 0 12px 12px;
+}
+
+.cliente-funcionamento-card .horarios-publicos {
+  margin-top: 10px;
+}
+
+.cliente-funcionamento-card-static {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
 }
 
 /* conteúdo (seu JS já alterna .visible) */
@@ -4632,6 +4816,17 @@ html {
   .abas-nav .aba-tab {
     font-size: clamp(17px, 4vw, 19px);
   }
+}
+
+.abas-nav .cliente-tab-card {
+  padding: 8px 13px !important;
+  min-height: 70px !important;
+  font-size: inherit !important;
+  letter-spacing: 0 !important;
+}
+
+.abas-nav .cliente-tab-card .cliente-tab-label {
+  font-size: 11px !important;
 }
 
 

@@ -7304,6 +7304,53 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     });
   }
 
+  function renderAbaClientePublica({ target, label, icon, count = 0, active = false, tone = "blue", extra = "" } = {}) {
+    const badge = Number(count || 0) > 0 ? `<span class="cliente-tab-badge">${Number(count)}</span>` : "";
+    return `
+      <button class="aba-tab cliente-tab-card ${active ? "active" : ""}" data-target="${target}" ${extra}>
+        <span class="cliente-tab-icon cliente-tab-${tone}">
+          <i class="${icon}"></i>
+          ${badge}
+        </span>
+        <span class="cliente-tab-label">${label}</span>
+      </button>
+    `;
+  }
+
+  function renderFuncionamentoClientePublico(establishment = {}, statusHtml = "") {
+    const temHorarios = establishment.horarios && typeof establishment.horarios === "object";
+    const temTexto = !temHorarios && establishment.hours;
+    if (!establishment.funcionamento24Horas && !temHorarios && !temTexto && !statusHtml) return "";
+    const status = statusHtml || (establishment.funcionamento24Horas
+      ? `<span class='status-tag vinte-quatro-horas'>ABERTO 24 HORAS</span>`
+      : `<span class='status-tag aberto'>HORARIO</span>`);
+    if (temHorarios) {
+      return `
+        <details class="cliente-funcionamento-card">
+          <summary>
+            <span class="cliente-funcionamento-status">${status}</span>
+            <span class="cliente-funcionamento-resumo">
+              <strong>${statusHtml.includes("FECHADO") ? statusHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().replace(/^FECHADO\s*/i, "") || "Consulte os horarios" : "Ver horarios de funcionamento"}</strong>
+              <small>Ver todos os horarios</small>
+            </span>
+            <i class="fa-solid fa-chevron-right cliente-funcionamento-seta"></i>
+          </summary>
+          <div class="cliente-funcionamento-detalhes">
+            ${renderHorariosFuncionamento(establishment.horarios)}
+          </div>
+        </details>
+      `;
+    }
+    return `
+      <div class="cliente-funcionamento-card cliente-funcionamento-card-static">
+        <div class="cliente-funcionamento-status">${status}</div>
+        <div class="cliente-funcionamento-resumo">
+          <strong>${escapePromoHtml(temTexto ? establishment.hours : "Funcionamento 24 horas")}</strong>
+        </div>
+      </div>
+    `;
+  }
+
   // Coleta TODAS as promoções percorrendo categories/establishments
   function coletarTodasPromocoes() {
     const itens = [];
@@ -10696,14 +10743,21 @@ plotarPinsImoveis(stateImoveis.filtered);
         .catch((error) => console.warn("Nao foi possivel carregar imoveis da loja.", error));
     }
 
-    const adicionarAba = (li, slug, tipo, label, icon, renderizar) => {
+    const adicionarAba = (li, slug, tipo, label, icon, renderizar, count = 0) => {
       const nav = li.querySelector(".abas-nav");
       const conteudo = li.querySelector(".abas-conteudo");
       if (!nav || !conteudo) return false;
       const targetId = `${tipo}-${slug}`;
       const jaExiste = Boolean(nav.querySelector(`[data-target="${targetId}"]`));
       if (!jaExiste) {
-        nav.insertAdjacentHTML("beforeend", `<button class="aba-tab" data-target="${targetId}"><i class="fa-solid ${icon} tab-icon"></i> ${label}</button>`);
+        const tone = tipo === "promocoes" ? "orange" : (tipo === "produtos" || tipo === "cardapio" ? "purple" : (tipo === "fotos" ? "green" : "blue"));
+        nav.insertAdjacentHTML("beforeend", renderAbaClientePublica({
+          target: targetId,
+          label,
+          icon: `fa-solid ${icon}`,
+          count,
+          tone
+        }));
       }
       let pane = conteudo.querySelector(`#${CSS.escape(targetId)}`);
       if (!pane) {
@@ -10754,14 +10808,14 @@ plotarPinsImoveis(stateImoveis.filtered);
           } else if (box) {
             box.innerHTML = `<div class="list-meta">Carregando veiculos desta loja...</div>`;
           }
-        }) || abasInseridas;
+        }, veiculos.length) || abasInseridas;
       }
 
       if (deveMostrarAbaImoveis) {
         abasInseridas = adicionarAba(li, slug, "imoveis", "Imoveis", "fa-house", (pane) => {
           pane.innerHTML = `<section class="imoveis-wrap im-cards-mode loja-itens-wrap"><div class="im-grid loja-itens-grid"></div></section>`;
           renderImoveisCardsEstabelecimento(imoveisDoEst, pane.querySelector(".loja-itens-grid"));
-        }) || abasInseridas;
+        }, imoveisDoEst.length) || abasInseridas;
       }
 
       if (deveMostrarAbaProdutos) {
@@ -10778,7 +10832,7 @@ plotarPinsImoveis(stateImoveis.filtered);
               }
             });
           });
-        }) || abasInseridas;
+        }, produtos.length) || abasInseridas;
       }
 
       if (deveMostrarAbaPromocoes) {
@@ -10805,7 +10859,7 @@ plotarPinsImoveis(stateImoveis.filtered);
               }
             });
           });
-        }) || abasInseridas;
+        }, deduplicarPromocoesMesmoEstabelecimentoPublico(promocoes).length) || abasInseridas;
       }
 
       const veiculosPendentes = deveMostrarAbaVeiculos && !veiculos.length;
@@ -21381,25 +21435,29 @@ ${!establishment.descricaoFalecido ? `
 
 
             <div class="abas-nav">
-          <button class="aba-tab active"  data-target="info-${slugEstabelecimentoPublico}"><i class="fas fa-circle-info tab-icon"></i> Info</button>
+          ${renderAbaClientePublica({ target: `info-${slugEstabelecimentoPublico}`, label: "Info", icon: "fas fa-circle-info", active: true, tone: "blue" })}
 
   ${mostrarAbaVeiculosInicial ? `
-    <button class="aba-tab" data-target="veiculos-${slugEstabelecimentoPublico}"><i class="fa-solid fa-car-side tab-icon"></i> Veiculos</button>
+    ${renderAbaClientePublica({ target: `veiculos-${slugEstabelecimentoPublico}`, label: "Veiculos", icon: "fa-solid fa-car-side", count: veiculosIniciaisLoja.length, tone: "blue" })}
   ` : ''}
 
   ${(establishment.novidadesImages && establishment.novidadesImages.length) ? `
-    <button class="aba-tab"   data-target="fotos-${slugEstabelecimentoPublico}">📷 Fotos (${establishment.novidadesImages.length})</button>
+    ${renderAbaClientePublica({ target: `fotos-${slugEstabelecimentoPublico}`, label: "Fotos", icon: "fa-solid fa-camera", count: establishment.novidadesImages.length, tone: "green" })}
   ` : ''}
 
   ${cardapioVisivel(establishment) ? `
-    <button class="aba-tab"       data-target="cardapio-${slugEstabelecimentoPublico}"
-            ${establishment.cardapioLink ? `data-link="${establishment.cardapioLink}"` : ''}>
-      🍽️ Cardápio${(establishment.menuImages && establishment.menuImages.length) ? ` (${establishment.menuImages.length})` : ``}
-    </button>
+    ${renderAbaClientePublica({
+      target: `cardapio-${slugEstabelecimentoPublico}`,
+      label: "Cardapio",
+      icon: "fa-solid fa-utensils",
+      count: establishment.menuImages?.length || 0,
+      tone: "purple",
+      extra: establishment.cardapioLink ? `data-link="${establishment.cardapioLink}"` : ""
+    })}
   ` : ''}
 
   ${produtosIniciaisLoja.length ? `
-    <button class="aba-tab" data-target="produtos-${slugEstabelecimentoPublico}"><i class="fa-solid fa-box-open tab-icon"></i> Produtos</button>
+    ${renderAbaClientePublica({ target: `produtos-${slugEstabelecimentoPublico}`, label: "Produtos", icon: "fa-solid fa-box-open", count: produtosIniciaisLoja.length, tone: "purple" })}
   ` : ''}
 
 </div>
@@ -21408,15 +21466,7 @@ ${!establishment.descricaoFalecido ? `
   <div class="aba aba-info visible" id="info-${slugEstabelecimentoPublico}">
        <!-- TODO: aqui ficam as info-box (funcionamento, endereço, etc.) -->
 
-         ${establishment.statusAberto ? `
-                    <div class="info-box">
-                      
-                      <div>
-                        <div class="info-label"> ${statusAberto}</div>
-                        
-                      </div>
-                    </div>` : ""
-        }
+         ${renderFuncionamentoClientePublico(establishment, statusAberto)}
 
 
         ${dataEventoPublico(establishment) ? `
@@ -21432,16 +21482,6 @@ ${!establishment.descricaoFalecido ? `
                   
 
 
-
-        ${(!establishment.funcionamento24Horas && (establishment.horarios || establishment.hours)) ? `
-          <div class="info-box">
-            <i class="fas fa-clock info-icon"></i>
-            <div>
-              <div class="info-label">Funcionamento: </div>
-              <div class="info-value">${establishment.horarios ? renderHorariosFuncionamento(establishment.horarios) : establishment.hours}</div>
-            </div>
-          </div>` : ""
-        }
 
         ${establishment.address ? `
           <div class="info-box">
