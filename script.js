@@ -10987,7 +10987,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
       if (deveMostrarAbaProdutos) {
         abasInseridas = adicionarAba(li, slug, "produtos", "Produtos", "fa-box-open", (pane) => {
-          pane.innerHTML = `<section class="loja-itens-wrap loja-produtos-wrap"><div class="loja-produtos-grid loja-cards-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
+          pane.innerHTML = `<section class="loja-itens-wrap loja-produtos-wrap auto-cards-mode"><div class="loja-produtos-grid loja-cards-grid loja-itens-grid">${produtos.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
               if (event.__lojaProdutoHandled) return;
@@ -21882,8 +21882,8 @@ ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.m
 
 ${produtosIniciaisLoja.length ? `
   <div class="aba loja-itens-aba" id="produtos-${slugEstabelecimentoPublico}" style="display:none">
-    <section class="loja-itens-wrap loja-produtos-wrap">
-      <div class="loja-produtos-grid loja-cards-grid">${produtosIniciaisLoja.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div>
+    <section class="loja-itens-wrap loja-produtos-wrap auto-cards-mode">
+      <div class="loja-produtos-grid loja-cards-grid loja-itens-grid">${produtosIniciaisLoja.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div>
     </section>
   </div>
 ` : ``}
