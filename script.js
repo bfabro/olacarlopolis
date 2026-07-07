@@ -2754,6 +2754,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function novidadeDestinoNome(tipo) {
     const key = normalizeName(tipo || "");
     if (key.includes("promoc")) return "promoção";
+    if (key.includes("produto")) return "produto";
     if (key.includes("imovel")) return "imóvel";
     if (key.includes("veiculo") || key.includes("automovel")) return "veículo";
     if (key.includes("evento")) return "evento";
@@ -2878,6 +2879,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const texto = normalizeName(`${item?.titulo || ""} ${item?.acao || ""} ${item?.descricao || ""}`);
     if (tipo.includes("imovel")) return { key: "imoveis", label: "Imóvel", icon: "fa-house" };
     if (tipo.includes("veiculo") || tipo.includes("automovel")) return { key: "veiculos", label: "Veículo", icon: "fa-car" };
+    if (tipo.includes("produto")) return { key: "produtos", label: "Produto", icon: "fa-box-open" };
     if (tipo.includes("promoc")) return { key: "promocoes", label: "Promoção", icon: "fa-tag" };
     if (novidadeEhEvento(item)) return { key: "servicos", label: "Evento", icon: "fa-calendar-days" };
     if (tipo.includes("grupo") || tipo.includes("whatsapp")) return { key: "grupo-whatsapp", label: "Grupo WhatsApp", icon: "fa-user-group" };
@@ -2949,6 +2951,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const key = normalizeName(tipo || "");
     if (key.includes("imovel")) return "tipo-imovel";
     if (key.includes("veiculo") || key.includes("automovel")) return "tipo-veiculo";
+    if (key.includes("produto")) return "tipo-produto";
     if (key.includes("promoc")) return "tipo-promocao";
     if (key.includes("evento") || novidadeEhEvento(item || { tipo })) return "tipo-evento";
     if (key.includes("vaga")) return "tipo-veiculo";
@@ -3062,6 +3065,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const tipo = normalizeName(item.destinoTipo || item.tipo || "");
         const acao = normalizeName(`${item.acao || ""} ${item.titulo || ""}`);
         if (acao.includes("preco")) return "preco";
+        if (tipo.includes("produto")) return "produto";
         if (tipo.includes("promoc")) return "promocao";
         if (tipo.includes("imovel")) return "imovel";
         if (tipo.includes("veiculo") || tipo.includes("automovel")) return "automovel";
@@ -3084,6 +3088,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const livePromoCards = new Set();
       const livePromoClients = new Set();
       const livePromoTitles = new Set();
+      const liveProdutos = new Set();
       const liveAutomoveis = new Set();
       const liveImoveis = new Set();
       const liveEventos = new Set();
@@ -3149,6 +3154,50 @@ document.addEventListener("DOMContentLoaded", function () {
         (vagasCat?.establishments || []).forEach((vaga) => {
           if (vaga.vagaId) liveVagas.add(String(vaga.vagaId));
           liveVagas.add(`${normalizeName(vaga.name || vaga.nome || "")}|${normalizeName(vaga.vagaTitulo || vaga.vagaCargo || "")}`);
+        });
+      } catch (e) { }
+
+      try {
+        await carregarModulosClientesPublicos();
+        const clientesPublicos = window.__clientesPublicosCache || {};
+        Object.entries(clientesPublicos).forEach(([clienteId, cliente]) => {
+          const nomeCliente = cliente?.nome || cliente?.name || cliente?.nomeFantasia || clienteId;
+          const clienteKey = cliente?.nomeNormalizado || normalizeName(nomeCliente || clienteId);
+          if (!clienteEstaPublico(clienteId, clienteKey, nomeCliente)) return;
+          const estProduto = {
+            ...(cliente || {}),
+            id: cliente?.id || clienteId,
+            clienteId,
+            nomeNormalizado: clienteKey,
+            name: nomeCliente,
+            nome: nomeCliente
+          };
+          produtosDoEstabelecimentoPublico(estProduto).forEach((produto) => {
+            const produtoId = String(produto.id || "");
+            if (!produtoId) return;
+            liveProdutos.add(produtoId);
+            liveProdutos.add(`${clienteKey}|${produtoId}`);
+            const dataMs = novidadeCidadeMs(produto.createdAt || produto.updatedAt || produto.criadoEm || produto.dataCriacao);
+            if (!dataMs) return;
+            geradas.push(montarNovidadeRecord({
+              id: `produto-${produtoId}-${clienteKey}`,
+              tipo: "produto",
+              titulo: "Novo produto cadastrado",
+              acao: "Produto inserido",
+              descricao: produto.descricao || "Produto inserido",
+              tituloConteudo: produto.titulo || produto.nome || "Produto disponível",
+              estabelecimento: nomeCliente,
+              imagem: produto.imagem || "",
+              imagens: produto.imagem ? [produto.imagem] : [],
+              dataCriacao: dataMs,
+              destinoTipo: "produto",
+              destinoId: clienteKey,
+              itemId: produtoId,
+              destinoCardId: novidadeDomId("produto", `${produtoId}-${clienteKey}`),
+              categoria: produto.categoria || cliente?.categoria || "",
+              valor: produto.preco || produto.valor || ""
+            }));
+          });
         });
       } catch (e) { }
 
@@ -3252,6 +3301,11 @@ document.addEventListener("DOMContentLoaded", function () {
           if (tituloPromo) return livePromoTitles.has(`${String(item.destinoId || "")}|${tituloPromo}`);
           return livePromoClients.has(String(item.destinoId || ""));
         }
+        if (tipo.includes("produto")) {
+          const itemId = String(item.raw?.itemId || item.itemId || "");
+          if (itemId && liveProdutos.has(`${normalizeName(item.destinoId || "")}|${itemId}`)) return true;
+          return itemId ? liveProdutos.has(itemId) : true;
+        }
         if (tipo.includes("veiculo") || tipo.includes("automovel")) return liveAutomoveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("imovel")) return liveImoveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("evento")) return liveEventos.has(String(item.destinoId || item.raw?.itemId || "")) || liveEventos.has(normalizeName(item.tituloConteudo || item.raw?.tituloConteudo || item.descricao || item.estabelecimento || item.titulo || ""));
@@ -3308,6 +3362,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const filtros = [
       ["todos", "Todos"],
       ["comercios", "Comércios"],
+      ["produtos", "Produtos"],
       ["promocoes", "Promoções"],
       ["imoveis", "Imóveis"],
       ["veiculos", "Veículos"],
@@ -3655,6 +3710,13 @@ document.addEventListener("DOMContentLoaded", function () {
         ? document.getElementById(item.destinoCardId)
         : [...document.querySelectorAll(".promo-card")].find((card) => card.dataset.promoEst === item.destinoId);
       return destacarElementoNovidade(alvo);
+    }
+    if (tipo.includes("produto")) {
+      const id = normalizeName(item.destinoId || item.estabelecimento || item.raw?.clienteId || item.raw?.clienteNome || "");
+      if (id) {
+        location.hash = `#${id}`;
+        return carregarEstabelecimentoPeloHash();
+      }
     }
     if (tipo.includes("imovel")) {
       await Promise.resolve(mostrarImoveisV2());
@@ -7677,7 +7739,10 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         imagem: item.imagem || item.image || item.foto || item.fotoUrl || item.imagemUrl || "",
         observacoes: item.observacoes || item.obs || item.detalhes || "",
         categoria: item.categoria || item.tipo || "",
-        status: item.status || "ativo"
+        status: item.status || "ativo",
+        ativo: item.ativo === false ? false : true,
+        createdAt: item.createdAt || item.criadoEm || "",
+        updatedAt: item.updatedAt || item.dataAtualizacao || ""
       }))
       .filter((item) => item.status !== "inativo" && item.ativo !== false && item.titulo);
   }

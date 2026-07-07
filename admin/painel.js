@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 423,
-  label: "v429",
+  numero: 424,
+  label: "v430",
   data: "2026-07-07",
-  nota: "Exclusao de imoveis remove itens da lista do admin e respeita tombstones."
+  nota: "Produtos cadastrados pelos clientes entram nas novidades publicas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -118,6 +118,7 @@ let state = {
 
 const AUDIT_IGNORED_ROOTS = new Set(["auditLogs", "novidades"]);
 const NOVIDADES_TOPICS = {
+  produto: ["Produtos", "Novo produto ou atualizacao de item."],
   novoCliente: ["Novo cliente", "Cadastro de um novo comércio, serviço ou instituição."],
   nomeCliente: ["Nome do cliente", "Alteração do nome comercial."],
   endereco: ["Endereço", "Alteração do endereço do cliente."],
@@ -791,7 +792,9 @@ function normalizeProdutos(items) {
         observacoes: String(item?.observacoes || item?.obs || item?.detalhes || "").trim(),
         imagem: String(item?.imagem || item?.image || item?.foto || item?.fotoUrl || item?.imagemUrl || "").trim(),
         status: String(item?.status || "ativo").trim(),
-        ativo: item?.ativo === false ? false : true
+        ativo: item?.ativo === false ? false : true,
+        createdAt: item?.createdAt || item?.criadoEm || "",
+        updatedAt: item?.updatedAt || item?.dataAtualizacao || ""
       };
     })
     .filter((item) => item.titulo && item.status !== "excluido")
@@ -2847,6 +2850,7 @@ function tituloConteudoNovidadeAdmin(tipo, payload = {}) {
   const key = normalizeName(tipo || "");
   if (key.includes("veiculo") || key.includes("automovel")) return [payload.marca, payload.modelo, payload.ano].filter(Boolean).join(" ") || "Veiculo";
   if (key.includes("imovel")) return payload.titulo || payload.endereco || "Imovel";
+  if (key.includes("produto")) return payload.titulo || payload.nome || "Produto";
   if (key.includes("promoc")) return payload.titulo || "Promocao";
   if (key.includes("evento")) return payload.titulo || payload.nome || "Evento";
   if (key.includes("vaga")) return payload.titulo || payload.vagaTitulo || payload.vagaCargo || "Vaga de trabalho";
@@ -2879,6 +2883,14 @@ function acaoNovidadeAdmin(tipo, isNew, payload = {}, original = {}) {
     if (antes > 0 && agora > 0 && agora < antes) return "Preco da promocao abaixou";
     return "Promocao atualizada";
   }
+  if (key.includes("produto")) {
+    if (isNew) return "Produto inserido";
+    const antes = numberFromMoney(original.preco || original.valor || "");
+    const agora = numberFromMoney(payload.preco || payload.valor || "");
+    if (antes > 0 && agora > 0 && agora < antes) return "Preco do produto abaixou";
+    if (antes > 0 && agora > 0 && agora !== antes) return "Preco do produto atualizado";
+    return "Produto atualizado";
+  }
   if (key.includes("vaga")) return isNew ? "Vaga de trabalho inserida" : "Vaga de trabalho atualizada";
   if (key.includes("evento")) return isNew ? "Evento inserido" : "Evento atualizado";
   if (key.includes("grupo")) return isNew ? "Novo grupo de WhatsApp criado" : "Grupo de WhatsApp atualizado";
@@ -2890,6 +2902,7 @@ function novidadeTopicFromPayload(payload = {}) {
   const tipo = normalizeName(payload.destinoTipo || payload.tipo || "");
   const acao = normalizeName(`${payload.acao || ""} ${payload.titulo || ""}`);
   if (acao.includes("preco")) return "preco";
+  if (tipo.includes("produto")) return "produto";
   if (tipo.includes("promoc")) return "promocao";
   if (tipo.includes("imovel")) return "imovel";
   if (tipo.includes("veiculo") || tipo.includes("automovel")) return "automovel";
@@ -3603,6 +3616,27 @@ async function addClientPromocao() {
   if (!saved) showToast(`${editingIndex >= 0 ? "Promocao atualizada" : "Promocao adicionada"}. Clique em salvar cliente para gravar.`);
 }
 
+async function registrarProdutoNovidadeClienteAdmin({ clientId = "", clientName = "", categoria = "", payload = {}, current = null, isNew = false } = {}) {
+  const destinoId = normalizeName(clientName || clientId);
+  const acao = acaoNovidadeAdmin("produto", isNew, payload, current || {});
+  await registrarNovidadeAdmin({
+    tipo: "produto",
+    novidadeTema: "produto",
+    titulo: acao,
+    acao,
+    descricao: acao,
+    tituloConteudo: tituloConteudoNovidadeAdmin("produto", payload),
+    estabelecimento: clientName || clientId,
+    imagem: payload.imagem,
+    valor: payload.preco || payload.valor || "",
+    categoria,
+    destinoTipo: "produto",
+    destinoId,
+    itemId: payload.id,
+    destinoCardId: `produto-${payload.id}-${destinoId}`
+  });
+}
+
 async function addClientProduct() {
   const title = $("clientProductTitle")?.value.trim();
   if (!title) {
@@ -3621,6 +3655,9 @@ async function addClientProduct() {
   const current = editingIndex >= 0 ? state.clientProdutos[editingIndex] : null;
   const payload = readProductFields("client", document, current?.id || `produto-${Date.now()}`);
   payload.imagem = image;
+  const agora = Date.now();
+  payload.createdAt = current?.createdAt || agora;
+  payload.updatedAt = agora;
   if (editingIndex >= 0 && current) state.clientProdutos[editingIndex] = payload;
   else state.clientProdutos.unshift(payload);
   state.clientProductEditIndex = null;
@@ -3629,6 +3666,16 @@ async function addClientProduct() {
   $("cancelClientProductEditButton")?.classList.add("hidden");
   renderClientProdutosPreview();
   const saved = await persistClientProdutosIfEditing(editingIndex >= 0 ? "Produto atualizado e salvo." : "Produto adicionado e salvo.");
+  if (saved) {
+    await registrarProdutoNovidadeClienteAdmin({
+      clientId: currentId,
+      clientName: $("clientName")?.value.trim() || currentId,
+      categoria: $("clientCategory")?.value || "",
+      payload,
+      current,
+      isNew: editingIndex < 0
+    });
+  }
   if (!saved) showToast(`${editingIndex >= 0 ? "Produto atualizado" : "Produto adicionado"}. Clique em salvar cliente para gravar.`);
 }
 
@@ -12715,11 +12762,15 @@ function renderClientOnlyEditor() {
       image = await uploadPromoImageForClient(client.id, imageFile);
     }
 
+    const editingIndex = coProductEditIndex;
     const listaProdutos = normalizeProdutos(produtos);
-    const current = coProductEditIndex >= 0 ? listaProdutos[coProductEditIndex] : null;
+    const current = editingIndex >= 0 ? listaProdutos[editingIndex] : null;
     const payload = readProductFields("co", mount, current?.id || `produto-${Date.now()}`);
     payload.imagem = image;
-    if (coProductEditIndex >= 0 && current) listaProdutos[coProductEditIndex] = payload;
+    const agora = Date.now();
+    payload.createdAt = current?.createdAt || agora;
+    payload.updatedAt = agora;
+    if (editingIndex >= 0 && current) listaProdutos[editingIndex] = payload;
     else listaProdutos.unshift(payload);
     produtos.splice(0, produtos.length, ...listaProdutos);
 
@@ -12730,7 +12781,15 @@ function renderClientOnlyEditor() {
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     });
-    showToast(coProductEditIndex >= 0 ? "Produto atualizado." : "Produto adicionado.");
+    await registrarProdutoNovidadeClienteAdmin({
+      clientId: client.id,
+      clientName: client.nome || client.id,
+      categoria: client.categoria || "",
+      payload,
+      current,
+      isNew: editingIndex < 0
+    });
+    showToast(editingIndex >= 0 ? "Produto atualizado." : "Produto adicionado.");
     clearProductFields("co", mount);
     setCoProductEditMode(-1);
     await loadAllData();

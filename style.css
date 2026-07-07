@@ -20175,6 +20175,11 @@ body.vaga-modal-open {
   --novidade-color: #059669;
 }
 
+.novidade-feed-card.tipo-produto,
+.novidade-preview-modal.tipo-produto {
+  --novidade-color: #7c3aed;
+}
+
 .novidade-feed-card.tipo-promocao,
 .novidade-preview-modal.tipo-promocao {
   --novidade-color: #f97316;
