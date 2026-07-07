@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 421,
-  label: "v427",
+  numero: 422,
+  label: "v428",
   data: "2026-07-06",
-  nota: "Aba publica de imoveis do corretor oculta tarja de tipo no modo cards."
+  nota: "Aba publica de imoveis abre detalhes tambem por codigo de referencia."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

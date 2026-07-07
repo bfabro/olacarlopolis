@@ -10061,6 +10061,12 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function renderImoveisCardsEstabelecimento(lista = [], box) {
     if (!box) return;
+    const encontrarImovel = (identificador) => {
+      const alvo = String(identificador || "").trim().toLowerCase();
+      if (!alvo) return null;
+      return lista.find((item) => [item.id, item.codRef, item.codigo]
+        .some((valor) => String(valor || "").trim().toLowerCase() === alvo)) || null;
+    };
     box.innerHTML = lista.length
       ? lista.map((im) => cardImovelHTML(im)).join("")
       : `<p class="list-meta">Nenhum imovel cadastrado para este estabelecimento.</p>`;
@@ -10073,7 +10079,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       card.addEventListener("click", (ev) => {
         if (ev.__imovelDetalhesHandled) return;
         if (ev.target.closest("button, a, input, select, textarea, [data-imovel-detalhes]")) return;
-        const im = lista.find((item) => String(item.id) === String(card.dataset.id));
+        const im = encontrarImovel(card.dataset.id);
         if (!im) return;
         ev.__imovelDetalhesHandled = true;
         registrarCliqueImovel("visualizacao", im).catch(() => { });
@@ -10086,7 +10092,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (titulo && box.contains(titulo)) {
         ev.preventDefault();
         ev.stopPropagation();
-        const im = lista.find((item) => String(item.id) === String(titulo.getAttribute("data-imovel-detalhes")));
+        const im = encontrarImovel(titulo.getAttribute("data-imovel-detalhes"));
         if (!im) return;
         ev.__imovelDetalhesHandled = true;
         registrarCliqueImovel("visualizacao", im).catch(() => { });
@@ -10099,7 +10105,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         ev.stopPropagation();
         const card = zoom.closest(".card-imovel");
         const id = card?.getAttribute("data-id") || zoom.getAttribute("data-id");
-        const im = lista.find((item) => String(item.id) === String(id));
+        const im = encontrarImovel(id);
         if (!im) return;
         registrarCliqueImovel("fotos", im).catch(() => { });
         abrirModalImoveis(im, zoom.currentSrc || zoom.src || "");
@@ -10111,7 +10117,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       const titulo = ev.target.closest?.("[data-imovel-detalhes]");
       if (!titulo || !box.contains(titulo)) return;
       ev.preventDefault();
-      const im = lista.find((item) => String(item.id) === String(titulo.getAttribute("data-imovel-detalhes")));
+      const im = encontrarImovel(titulo.getAttribute("data-imovel-detalhes"));
       if (!im) return;
       ev.__imovelDetalhesHandled = true;
       registrarCliqueImovel("visualizacao", im).catch(() => { });
