@@ -21027,6 +21027,11 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   z-index: 8 !important;
 }
 
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .tag.venda,
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .tag.aluguel {
+  display: none !important;
+}
+
 .loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .ribbon {
   z-index: 9 !important;
 }
