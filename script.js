@@ -7317,20 +7317,47 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     `;
   }
 
+  function tipoAbaClientePublica(target = "") {
+    return String(target || "").split("-")[0] || "";
+  }
+
+  function ordenarAbasClientePublica(nav) {
+    if (!nav) return;
+    const ordem = {
+      info: 0,
+      produtos: 1,
+      promocoes: 2,
+      cardapio: 3,
+      veiculos: 4,
+      fotos: 5,
+      imoveis: 6
+    };
+    [...nav.querySelectorAll(".aba-tab")].map((tab, index) => ({ tab, index }))
+      .sort((a, b) => {
+        const tipoA = tipoAbaClientePublica(a.tab.dataset.target);
+        const tipoB = tipoAbaClientePublica(b.tab.dataset.target);
+        return (ordem[tipoA] ?? 50) - (ordem[tipoB] ?? 50) || a.index - b.index;
+      })
+      .forEach(({ tab }) => nav.appendChild(tab));
+  }
+
   function renderFuncionamentoClientePublico(establishment = {}, statusHtml = "") {
     const temHorarios = establishment.horarios && typeof establishment.horarios === "object";
     const temTexto = !temHorarios && establishment.hours;
     if (!establishment.funcionamento24Horas && !temHorarios && !temTexto && !statusHtml) return "";
-    const status = statusHtml || (establishment.funcionamento24Horas
+    const statusBase = statusHtml || (establishment.funcionamento24Horas
       ? `<span class='status-tag vinte-quatro-horas'>ABERTO 24 HORAS</span>`
       : `<span class='status-tag aberto'>HORARIO</span>`);
+    const status = statusBase.match(/<span class=['"]status-tag[^>]*>.*?<\/span>/i)?.[0] || statusBase;
+    const proximo = statusBase.match(/<span class=['"]proximo-horario['"]>(.*?)<\/span>/i)?.[1] || "";
+    const resumo = proximo || (statusBase.includes("FECHADO") ? "Consulte os horarios" : "Ver todos os horarios");
     if (temHorarios) {
       return `
         <details class="cliente-funcionamento-card">
           <summary>
             <span class="cliente-funcionamento-status">${status}</span>
             <span class="cliente-funcionamento-resumo">
-              <strong>${statusHtml.includes("FECHADO") ? statusHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().replace(/^FECHADO\s*/i, "") || "Consulte os horarios" : "Ver horarios de funcionamento"}</strong>
+              <strong>${resumo}</strong>
               <small>Ver todos os horarios</small>
             </span>
             <i class="fa-solid fa-chevron-right cliente-funcionamento-seta"></i>
@@ -10758,6 +10785,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           count,
           tone
         }));
+        ordenarAbasClientePublica(nav);
       }
       let pane = conteudo.querySelector(`#${CSS.escape(targetId)}`);
       if (!pane) {
@@ -21437,12 +21465,8 @@ ${!establishment.descricaoFalecido ? `
             <div class="abas-nav">
           ${renderAbaClientePublica({ target: `info-${slugEstabelecimentoPublico}`, label: "Info", icon: "fas fa-circle-info", active: true, tone: "blue" })}
 
-  ${mostrarAbaVeiculosInicial ? `
-    ${renderAbaClientePublica({ target: `veiculos-${slugEstabelecimentoPublico}`, label: "Veiculos", icon: "fa-solid fa-car-side", count: veiculosIniciaisLoja.length, tone: "blue" })}
-  ` : ''}
-
-  ${(establishment.novidadesImages && establishment.novidadesImages.length) ? `
-    ${renderAbaClientePublica({ target: `fotos-${slugEstabelecimentoPublico}`, label: "Fotos", icon: "fa-solid fa-camera", count: establishment.novidadesImages.length, tone: "green" })}
+  ${produtosIniciaisLoja.length ? `
+    ${renderAbaClientePublica({ target: `produtos-${slugEstabelecimentoPublico}`, label: "Produtos", icon: "fa-solid fa-box-open", count: produtosIniciaisLoja.length, tone: "purple" })}
   ` : ''}
 
   ${cardapioVisivel(establishment) ? `
@@ -21456,8 +21480,12 @@ ${!establishment.descricaoFalecido ? `
     })}
   ` : ''}
 
-  ${produtosIniciaisLoja.length ? `
-    ${renderAbaClientePublica({ target: `produtos-${slugEstabelecimentoPublico}`, label: "Produtos", icon: "fa-solid fa-box-open", count: produtosIniciaisLoja.length, tone: "purple" })}
+  ${mostrarAbaVeiculosInicial ? `
+    ${renderAbaClientePublica({ target: `veiculos-${slugEstabelecimentoPublico}`, label: "Veiculos", icon: "fa-solid fa-car-side", count: veiculosIniciaisLoja.length, tone: "blue" })}
+  ` : ''}
+
+  ${(establishment.novidadesImages && establishment.novidadesImages.length) ? `
+    ${renderAbaClientePublica({ target: `fotos-${slugEstabelecimentoPublico}`, label: "Fotos", icon: "fa-solid fa-camera", count: establishment.novidadesImages.length, tone: "green" })}
   ` : ''}
 
 </div>
