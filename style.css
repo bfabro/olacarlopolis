@@ -21369,9 +21369,28 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 
   .loja-itens-aba .automoveis-page.auto-cards-mode .auto-cards-grid,
   .loja-itens-aba .imoveis-wrap.im-cards-mode .loja-itens-grid,
+  .loja-itens-aba .loja-produtos-wrap.auto-cards-mode .loja-cards-grid,
+  .loja-itens-aba .loja-fotos-wrap .loja-cards-grid,
   .loja-itens-aba .promo-city-screen .loja-cards-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 10px !important;
+  }
+
+  .loja-itens-aba .loja-produtos-wrap.auto-cards-mode .loja-produto-card,
+  .loja-itens-aba .loja-fotos-wrap .loja-foto-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    margin: 0 !important;
+  }
+
+  .loja-itens-aba .loja-produtos-wrap.auto-cards-mode .loja-produto-media img,
+  .loja-itens-aba .loja-produtos-wrap.auto-cards-mode .loja-produto-sem-imagem,
+  .loja-itens-aba .loja-fotos-wrap .loja-foto-media img {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    height: auto !important;
+    object-fit: cover !important;
   }
 
   .loja-itens-aba .imoveis-wrap.im-cards-mode .card-top,

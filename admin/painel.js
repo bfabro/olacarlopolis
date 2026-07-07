@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 426,
-  label: "v432",
+  numero: 427,
+  label: "v433",
   data: "2026-07-07",
-  nota: "Aba Produtos do perfil publico usa a mesma grade de cards da aba Veiculos."
+  nota: "Produtos e fotos do perfil publico mantem cards tambem no mobile."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
