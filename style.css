@@ -20991,6 +20991,46 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   margin: 0 !important;
 }
 
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top {
+  position: relative !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  min-height: 170px !important;
+  border-radius: 12px 12px 0 0 !important;
+  background: #eef4fb !important;
+}
+
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-imovel-mini,
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-wrapper,
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-slide {
+  width: 100% !important;
+  height: 170px !important;
+  min-height: 170px !important;
+}
+
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-imovel-mini img,
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-slide img {
+  display: block !important;
+  width: 100% !important;
+  height: 170px !important;
+  min-height: 170px !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+}
+
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .tag,
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .price-pill,
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .ribbon,
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .zoom-thumb {
+  z-index: 8 !important;
+}
+
+.loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .ribbon {
+  z-index: 9 !important;
+}
+
 .loja-itens-aba .promo-city-screen {
   width: 100% !important;
   max-width: none !important;
@@ -21256,6 +21296,16 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   .loja-itens-aba .promo-city-screen .loja-cards-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 10px !important;
+  }
+
+  .loja-itens-aba .imoveis-wrap.im-cards-mode .card-top,
+  .loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-imovel-mini,
+  .loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-wrapper,
+  .loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-slide,
+  .loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-imovel-mini img,
+  .loja-itens-aba .imoveis-wrap.im-cards-mode .card-top .swiper-slide img {
+    height: 130px !important;
+    min-height: 130px !important;
   }
 
   .loja-itens-aba .promo-city-screen .promo-nome {
