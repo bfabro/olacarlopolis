@@ -21470,3 +21470,29 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
     font-size: .82rem !important;
   }
 }
+
+.promo-nome-btn {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.promo-nome-btn:hover,
+.promo-nome-btn:focus-visible {
+  color: #155bd5;
+}
+
+.promo-nome-btn:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, .25);
+  outline-offset: 3px;
+}
+
+.promo-event-title-btn {
+  padding: 0;
+}

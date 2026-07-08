@@ -7992,11 +7992,12 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
             </div>
             ${preco ? `<div class="imovel-detalhes-financeiro"><strong class="imovel-detalhes-valor">${escapePromoHtml(preco)}</strong></div>` : ""}
           </div>
-          ${(item.descricao || item.observacoes) ? `
+          ${(item.descricao || item.observacoes || item.obs) ? `
             <section class="imovel-detalhes-descricao">
               <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-align-left"></i><span>Detalhes</span></div>
               ${item.descricao ? `<p>${escapePromoHtml(item.descricao)}</p>` : ""}
               ${item.observacoes ? `<p>${escapePromoHtml(item.observacoes)}</p>` : ""}
+              ${!item.observacoes && item.obs ? `<p>${escapePromoHtml(item.obs)}</p>` : ""}
             </section>
           ` : ""}
           ${isProduto && detalhesProdutoHtml ? `
@@ -11750,6 +11751,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     // grid de cards
     html += `<section class="promo-grid">`;
 
+    const promoDetalhesRenderizados = {};
     if (itensFiltrados.length === 0) {
       html += `<div class="promo-vazio">Nenhuma promoção cadastrada.</div>`;
     } else {
@@ -11771,6 +11773,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         const economiaFmt = (precoAtualNum && precoAntigoNum && precoAntigoNum > precoAtualNum)
           ? (precoAntigoNum - precoAtualNum).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
           : "";
+        const promoKey = `${i.estabelecimentoId || "todos"}::${i.id || index}`;
+        promoDetalhesRenderizados[promoKey] = i;
 
         // validade
         let validadeTxt = "";
@@ -11789,7 +11793,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           const dataCompacta = i.validadeFim ? formatarDataBR(i.validadeFim) : (i.validadeInicio ? formatarDataBR(i.validadeInicio) : "");
           const detalheCompacto = dataCompacta ? `V&aacute;lido at&eacute;: ${dataCompacta}` : "";
           html += `
-    <article id="${novidadeDomId("promocao", `${i.id || "promo"}-${i.estabelecimentoId || "todos"}`)}" class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+    <article id="${novidadeDomId("promocao", `${i.id || "promo"}-${i.estabelecimentoId || "todos"}`)}" class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" data-promo-detail-key="${escapePromoHtml(promoKey)}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
       <div class="card-divulgacao-img-wrap">
         ${i.imagem
               ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
@@ -11809,7 +11813,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           </span>
         </div>
         <div class="card-divulgacao-linha">
-          <h4>${i.titulo}</h4>
+          <h4><button type="button" class="promo-nome-btn promo-event-title-btn" data-promo-detail-key="${escapePromoHtml(promoKey)}">${i.titulo}</button></h4>
         </div>
         <a class="promo-event-store" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.estabelecimento}</a>
         ${detalheCompacto ? `<small>${detalheCompacto}</small>` : ""}
@@ -11820,7 +11824,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         }
 
         html += `
-    <article id="${novidadeDomId("promocao", `${i.id || "promo"}-${i.estabelecimentoId || "todos"}`)}" class="promo-card promo-card-new" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
+    <article id="${novidadeDomId("promocao", `${i.id || "promo"}-${i.estabelecimentoId || "todos"}`)}" class="promo-card promo-card-new" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" data-promo-detail-key="${escapePromoHtml(promoKey)}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
     <div class="promo-card-body">
       <div class="promo-produto">
         <div class="promo-image-wrap">
@@ -11835,7 +11839,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         </div>
         
         <div class="promo-info">
-          <div class="promo-nome">${i.titulo}</div>
+          <button type="button" class="promo-nome promo-nome-btn" data-promo-detail-key="${escapePromoHtml(promoKey)}">${i.titulo}</button>
           ${i.obs ? `<div class="promo-obs">${i.obs}</div>` : (!i.volume && !i.embalagem && descricaoPromo ? `<div class="promo-obs">${descricaoPromo}</div>` : "")}
           <div class="promo-store-strip">
             <a class="promo-estab promo-estab-link" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">
@@ -11898,6 +11902,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     const areaPromocoes = definirTelaContentArea(null);
     areaPromocoes.innerHTML = html;
+    window.__promocoesPublicasDetalhes = promoDetalhesRenderizados;
 
     // Converte "2025-09-15" em "15-09-2025"
     function formatarDataBR(dataISO) {
@@ -12143,15 +12148,37 @@ plotarPinsImoveis(stateImoveis.filtered);
     document.querySelectorAll("[data-promo-est-link]").forEach((link) => {
       link.addEventListener("click", (event) => {
         event.preventDefault();
+        event.stopPropagation();
         const estId = link.dataset.promoEstLink || "";
         if (estId && typeof abrirEstabelecimentoDaHome === "function") abrirEstabelecimentoDaHome(estId);
       });
     });
 
+    document.querySelectorAll("[data-promo-detail-key]").forEach((el) => {
+      el.addEventListener("click", (event) => {
+        if (event.target.closest("[data-promo-est-link], [data-promo-action], [data-promo-share], a[href^='http']")) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const key = el.dataset.promoDetailKey || el.closest(".promo-card")?.dataset?.promoDetailKey || "";
+        const item = window.__promocoesPublicasDetalhes?.[key];
+        if (!item) return;
+        const card = el.closest(".promo-card");
+        const estId = card?.dataset?.promoEst || item.estabelecimentoId || "";
+        if (estId) registrarCliqueNaPromocao(estId, {
+          promoId: card?.dataset?.promoId || item.id || "",
+          promoTitulo: card?.dataset?.promoTitle || item.titulo || "",
+          acao: "detalhes"
+        });
+        abrirModalProdutoEstabelecimento(item, "Promocao");
+      });
+    });
+
     document.querySelectorAll(".promo-event-style-card").forEach((card) => {
-      card.addEventListener("click", () => {
-        const estId = card.dataset?.promoEst || "";
-        if (estId && typeof abrirEstabelecimentoDaHome === "function") abrirEstabelecimentoDaHome(estId);
+      card.addEventListener("click", (event) => {
+        if (event.target.closest("a, button, [data-promo-action], [data-promo-share]")) return;
+        event.preventDefault();
+        const item = window.__promocoesPublicasDetalhes?.[card.dataset.promoDetailKey || ""];
+        if (item) abrirModalProdutoEstabelecimento(item, "Promocao");
       });
       card.querySelectorAll("a").forEach((link) => link.addEventListener("click", (event) => event.stopPropagation()));
     });
